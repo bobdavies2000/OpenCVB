@@ -59,9 +59,6 @@ Public Class VB_to_CPP
         Next
         vbList.Text = GetSetting("OpenCVB1", "TranslateToCPP", "TranslateToCPP", "Addweighted_Basics")
     End Sub
-    Private Sub VB_to_CPP_Resize(sender As Object, e As EventArgs) Handles Me.Resize
-
-    End Sub
     Private Sub vbList_SelectedValueChanged(sender As Object, e As EventArgs) Handles vbList.SelectedValueChanged
         SaveSetting("OpenCVB1", "TranslateToCPP", "TranslateToCPP", vbList.Text)
         algorithmVBName = vbList.Text
@@ -79,12 +76,41 @@ Public Class VB_to_CPP
             If line.Contains(algorithmVBName + " : Inherits VB_Algorithm") Then Exit For
         Next
 
-
-
         VBrtb.Text = "Translate this vb.Net code to C++" + vbCrLf
         For vbIndex = vbIndex To vbInput.Count - 1
             VBrtb.Text += vbInput(vbIndex) + vbCrLf
             If vbInput(vbIndex).Contains("End Class") Then Exit For
+        Next
+    End Sub
+    Private Sub PrepareCPP_Click(sender As Object, e As EventArgs) Handles PrepareCPP.Click
+        Dim cppCode = CPPrtb.Text
+        Dim split = cppCode.Split(vbLf)
+        CPPrtb.Clear()
+        Dim functionName As String = ""
+        For i = 0 To split.Count - 1
+            If i = 0 Then
+                Dim tokens = split(0).Split(" ")
+                functionName = tokens(1)
+                split(0) = split(0).Replace("{", ": public algorithmCPP" + " {")
+                split(0) = split(0).Replace("class ", "class CPP_")
+            End If
+            If split(i).Contains("// Assuming") Then
+                split(i) = split(i).Substring(0, split(i).IndexOf("// Assuming"))
+            End If
+            If split(i).Contains("// Explicit") Then
+                split(i) = split(i).Substring(0, split(i).IndexOf("// Explicit"))
+            End If
+            If split(i).Contains("// Corrected") Then
+                split(i) = split(i).Substring(0, split(i).IndexOf("// Corrected"))
+            End If
+
+            If Trim(split(i)).StartsWith(functionName) Then
+                split(i) = split(i).Replace(functionName + "()", "CPP_" + functionName + "(int rows, int cols)") + vbCrLf
+                split(i) += vbTab + "traceName = """ + "CPP_" + functionName + """;"
+            End If
+
+            split(i) = split(i).Replace("task.", "task->")
+            CPPrtb.Text += split(i) + vbCrLf
         Next
     End Sub
 End Class

@@ -2,6 +2,7 @@
 Public Class algorithmList
 Public Enum functionNames
 CPP_AddWeighted_Basics_
+CPP_Bezier_Basics_
 CPP_Feature_Agast_
 CPP_Resize_Basics_
 CPP_Delaunay_Basics_
@@ -262,6 +263,7 @@ if algorithmName = "CPP_ApproxPoly_Basics" Then return new CPP_Basics(functionNa
 if algorithmName = "CPP_ApproxPoly_FindandDraw" Then return new CPP_Basics(functionNames.CPP_ApproxPoly_FindandDraw_)
 if algorithmName = "CPP_ApproxPoly_Hull" Then return new CPP_Basics(functionNames.CPP_ApproxPoly_Hull_)
 if algorithmName = "CPP_BackProject_Basics" Then return new CPP_Basics(functionNames.CPP_BackProject_Basics_)
+if algorithmName = "CPP_Bezier_Basics" Then return new CPP_Basics(functionNames.CPP_Bezier_Basics_)
 if algorithmName = "CPP_Binarize_Simple" Then return new CPP_Basics(functionNames.CPP_Binarize_Simple_)
 if algorithmName = "CPP_Contour_Largest" Then return new CPP_Basics(functionNames.CPP_Contour_Largest_)
 if algorithmName = "CPP_Delaunay_Basics" Then return new CPP_Basics(functionNames.CPP_Delaunay_Basics_)

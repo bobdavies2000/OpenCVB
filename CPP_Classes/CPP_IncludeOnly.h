@@ -88,13 +88,14 @@ struct sortInt
 #define YELLOW Scalar(0, 255, 255)
 #define BLACK Scalar(0, 0, 0)
 #define GRAY Scalar(127, 127, 127)
-vector<Scalar> highLightColors = { YELLOW, WHITE, BLUE, GRAY, RED, GREEN };
+vector<Scalar> highlightColors = { YELLOW, WHITE, BLUE, GRAY, RED, GREEN };
 
 vector<string> mapNames = { "Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                             "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter" };
 enum functions
 {
     CPP_AddWeighted_Basics_,
+    CPP_Bezier_Basics_,
     CPP_Feature_Agast_,
     CPP_Resize_Basics_,
     CPP_Delaunay_Basics_,
@@ -153,6 +154,7 @@ private:
 public:
     Mat dst0, dst1, dst2, dst3;
     bool standalone;
+    String advice;
     String desc;
     string traceName;
     Vec3b black = Vec3b(0, 0, 0);
@@ -183,14 +185,18 @@ class cppTask
 private:
 public:
     algorithmCPP* alg;
-    Mat color, depthRGB, depth32f, pointCloud, gCloud, leftView, rightView; int cppFunction; int lineWidth; int lineType;
-    Mat depthMask, noDepthMask; Mat gridMask; int gridRows; int gridCols;
-    int font; float fontSize; Scalar fontColor;
+    Mat color, depthRGB, depth32f, pointCloud, gCloud, leftView, rightView; 
+    int cppFunction; int lineWidth; int lineType; 
+    int gridRows, gridCols;
+    Mat depthMask, noDepthMask, gridMask; 
+    int font; 
+    float fontSize; 
+    Scalar fontColor;
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
 
     bool optionsChanged; double addWeightPercent; bool heartBeat; int dotSize; int gridSize; float maxDepth;
     int histogramBins; int pixelDiffThreshold; bool gravityPointCloud; bool useKalman;
-    int paletteIndex; int polyCount; bool firstPass; Scalar highLightColor; int frameHistory;
+    int paletteIndex; int polyCount; bool firstPass; Scalar highlightColor; int frameHistory;
     Point clickPoint; bool mouseClickFlag; int mousePicTag; Point mouseMovePoint; bool mouseMovePointUpdated;
     Scalar scalarColors[256]; Vec3b vecColors[256]; Rect drawRect; bool displayDst0; bool displayDst1;
     Mat gMatrix; vector<Mat> pcSplit;
@@ -2659,16 +2665,53 @@ public:
 
 
 
-class CPP_Guess_Depth : public algorithmCPP
-{
-private: 
-public: 
-	CPP_Guess_Depth(int rows, int cols) : algorithmCPP(rows, cols) 
-{
-	traceName = "CPP_Guess_Depth";
-	}
-	void Run(Mat src)
-	{
-		dst2 = src.clone();
-	}
+
+
+
+
+class CPP_Bezier_Basics : public algorithmCPP {
+public:
+    std::vector<cv::Point> points;
+
+    CPP_Bezier_Basics(int rows, int cols) {
+        traceName = "CPP_Bezier_Basics";
+        advice = "Update the public points array and then Run.";
+        points = { cv::Point(100, 100),
+                  cv::Point(150, 50),
+                  cv::Point(250, 150),
+                  cv::Point(300, 100),
+                  cv::Point(350, 150),
+                  cv::Point(450, 50) };
+        desc = "Use n points to draw a Bezier curve.";
+    }
+
+    cv::Point nextPoint(std::vector<cv::Point> points, int i, float t) {
+        int x = pow(1 - t, 3) * points[i].x +
+            3 * t * pow(1 - t, 2) * points[i + 1].x +
+            3 * pow(t, 2) * (1 - t) * points[i + 2].x +
+            pow(t, 3) * points[i + 3].x;
+
+        int y = pow(1 - t, 3) * points[i].y +
+            3 * t * pow(1 - t, 2) * points[i + 1].y +
+            3 * pow(t, 2) * (1 - t) * points[i + 2].y +
+            pow(t, 3) * points[i + 3].y;
+        return cv::Point(x, y);
+    }
+
+    void Run(cv::Mat src) {
+        cv::Point p1;
+        for (int i = 0; i < points.size() - 4; i += 3) {
+            for (int j = 0; j <= 100; j++) {
+                cv::Point p2 = nextPoint(points, i, j / 100.0f);
+                if (j > 0) {
+                    cv::line(dst2, p1, p2, task->highlightColor, task->lineWidth);
+                }
+                p1 = p2;
+            }
+        }
+    }
 };
+
+
+
+

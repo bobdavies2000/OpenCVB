@@ -28,6 +28,7 @@ Partial Class VB_to_CPP
         Me.CPPrtb = New System.Windows.Forms.RichTextBox()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
+        Me.PrepareCPP = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'vbList
@@ -89,11 +90,21 @@ Partial Class VB_to_CPP
         Me.Label3.TabIndex = 5
         Me.Label3.Text = "C++ Code - Paste output of translate from Bard here "
         '
+        'PrepareCPP
+        '
+        Me.PrepareCPP.Location = New System.Drawing.Point(1015, 89)
+        Me.PrepareCPP.Name = "PrepareCPP"
+        Me.PrepareCPP.Size = New System.Drawing.Size(417, 37)
+        Me.PrepareCPP.TabIndex = 6
+        Me.PrepareCPP.Text = "Review and update the C++ Code"
+        Me.PrepareCPP.UseVisualStyleBackColor = True
+        '
         'VB_to_CPP
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1970, 1632)
+        Me.Controls.Add(Me.PrepareCPP)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.CPPrtb)
@@ -114,4 +125,5 @@ Partial Class VB_to_CPP
     Friend WithEvents CPPrtb As RichTextBox
     Friend WithEvents Label2 As Label
     Friend WithEvents Label3 As Label
+    Friend WithEvents PrepareCPP As Button
 End Class

@@ -32,6 +32,7 @@ Public Class Bezier_Basics : Inherits VB_Algorithm
                 p1 = p2
             Next
         Next
+        labels(2) = "Bezier output"
     End Sub
 End Class
 

@@ -35,12 +35,14 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     task->displayDst0 = displayDst0;
     task->displayDst1 = displayDst1;
 
-    task->highLightColor = highLightColors[task->frameCount % highLightColors.size()];
+    task->highlightColor = highlightColors[task->frameCount % highlightColors.size()];
 
     switch (function)
     {
-    case CPP_AddWeighted_Basics_ :
+    case CPP_AddWeighted_Basics_:
     {task->alg = new CPP_AddWeighted_Basics(rows, cols); break; }
+    case CPP_Bezier_Basics_:
+    {task->alg = new CPP_Bezier_Basics(rows, cols); break; }
     case CPP_Feature_Agast_ :
     {task->alg = new CPP_Feature_Agast(rows, cols);break;}
     case CPP_Resize_Basics_ :
