@@ -61,8 +61,6 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {task->alg = new CPP_Stable_Basics(rows, cols);break;}
     case CPP_Feature_Basics_ :
     {task->alg = new CPP_Feature_Basics(rows, cols);break;}
-	case CPP_FPoly_TopFeatures_ :
-	{task->alg = new CPP_FPoly_TopFeatures(rows, cols);break;}
 	case CPP_Stable_BasicsCount_ :
 	{task->alg = new CPP_Stable_BasicsCount(rows, cols);break;}
 	case CPP_Remap_Basics_ :

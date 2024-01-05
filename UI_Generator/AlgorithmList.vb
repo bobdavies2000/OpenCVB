@@ -12,7 +12,6 @@ CPP_KNN_Lossy_
 CPP_Delaunay_Generations_
 CPP_Stable_Basics_
 CPP_Feature_Basics_
-CPP_FPoly_TopFeatures_
 CPP_Remap_Basics_
 CPP_Edge_Canny_
 CPP_Edge_Sobel_
@@ -285,7 +284,6 @@ if algorithmName = "CPP_Feature_Agast" Then return new CPP_Basics(functionNames.
 if algorithmName = "CPP_Feature_Basics" Then return new CPP_Basics(functionNames.CPP_Feature_Basics_)
 if algorithmName = "CPP_FeatureLess_Basics" Then return new CPP_Basics(functionNames.CPP_FeatureLess_Basics_)
 if algorithmName = "CPP_FeatureLess_Edge" Then return new CPP_Basics(functionNames.CPP_FeatureLess_Edge_)
-if algorithmName = "CPP_FPoly_TopFeatures" Then return new CPP_Basics(functionNames.CPP_FPoly_TopFeatures_)
 if algorithmName = "CPP_Grid_Basics" Then return new CPP_Basics(functionNames.CPP_Grid_Basics_)
 if algorithmName = "CPP_Histogram_Basics" Then return new CPP_Basics(functionNames.CPP_Histogram_Basics_)
 if algorithmName = "CPP_Hull_Basics" Then return new CPP_Basics(functionNames.CPP_Hull_Basics_)

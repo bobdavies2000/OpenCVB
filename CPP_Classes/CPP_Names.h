@@ -11,7 +11,6 @@ vector<String> functionNames({
 "CPP_Delaunay_Generations_",
 "CPP_Stable_Basics_",
 "CPP_Feature_Basics_",
-"CPP_FPoly_TopFeatures_",
 "CPP_Remap_Basics_",
 "CPP_Edge_Canny_",
 "CPP_Edge_Sobel_",

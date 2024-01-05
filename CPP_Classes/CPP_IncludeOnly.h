@@ -105,7 +105,6 @@ enum functions
     CPP_Delaunay_Generations_,
     CPP_Stable_Basics_,
     CPP_Feature_Basics_,
-    CPP_FPoly_TopFeatures_,
     CPP_Remap_Basics_,
     CPP_Edge_Canny_,
     CPP_Edge_Sobel_,
@@ -1107,41 +1106,41 @@ public:
 
 
 
-class CPP_FPoly_TopFeatures : public algorithmCPP
-{
-private: 
-public: 
-    CPP_Stable_BasicsCount *stable;
-    vector<Point2f> poly;
-	CPP_FPoly_TopFeatures(int rows, int cols) : algorithmCPP(rows, cols) 
-    {
-        traceName = "CPP_FPoly_TopFeatures";
-        stable = new CPP_Stable_BasicsCount(rows, cols);
-        desc = "Get the top features and validate them";
-    }
-	void Run(Mat src)
-	{
-        stable->Run(src);
-		
-        dst2 = stable->dst2;
-        dst3.setTo(0);
-        poly.clear();
-
-        int i = 0;
-        for (pair<const int, int> index : stable->goodCounts)
-        {
-            Point2f pt = stable->basics->ptList[index.second];
-            int g = stable->basics->facetGen->dst0.at<int>(pt.y, pt.x);
-            task->setText(to_string(g), dst2, pt);
-            if (i++ < task->polyCount) poly.push_back(pt);
-        }
-
-        for (size_t i = 0; i < poly.size() - 1; i++)
-        {
-            line(dst2, poly[i], poly[i + 1], WHITE, task->lineWidth, task->lineType);
-        }
-	}
-};
+//class CPP_FPoly_TopFeatures : public algorithmCPP
+//{
+//private: 
+//public: 
+//    CPP_Stable_BasicsCount *stable;
+//    vector<Point2f> poly;
+//	CPP_FPoly_TopFeatures(int rows, int cols) : algorithmCPP(rows, cols) 
+//    {
+//        traceName = "CPP_FPoly_TopFeatures";
+//        stable = new CPP_Stable_BasicsCount(rows, cols);
+//        desc = "Get the top features and validate them";
+//    }
+//	void Run(Mat src)
+//	{
+//        stable->Run(src);
+//		
+//        dst2 = stable->dst2;
+//        dst3.setTo(0);
+//        poly.clear();
+//
+//        int i = 0;
+//        for (pair<const int, int> index : stable->goodCounts)
+//        {
+//            Point2f pt = stable->basics->ptList[index.second];
+//            int g = stable->basics->facetGen->dst0.at<int>(pt.y, pt.x);
+//            task->setText(to_string(g), dst2, pt);
+//            if (i++ < task->polyCount) poly.push_back(pt);
+//        }
+//
+//        for (size_t i = 0; i < poly.size() - 1; i++)
+//        {
+//            line(dst2, poly[i], poly[i + 1], WHITE, task->lineWidth, task->lineType);
+//        }
+//	}
+//};
 
 
 
