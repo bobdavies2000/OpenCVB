@@ -164,7 +164,7 @@ Public Class VB_to_CPP
         ' output the C++ code.
         cppLines.Clear()
 
-        cppLines.Add("class " + CPPName + " : public algorithmX")
+        cppLines.Add("class " + CPPName + " : public algorithmCPP")
         cppLines.Add("{")
         cppLines.Add("private:")
         cppLines.Add("public:")
@@ -265,7 +265,7 @@ Public Class VB_to_CPP
             Dim offset = InStr(line, "Public Sub New()")
             tabs = countTabs(cppLines(i))
             If offset > 0 Then
-                cppLines(i) = line.Substring(0, offset - 1) + CPPName + "(int rows, int cols) : algorithmX(rows, cols) {" +
+                cppLines(i) = line.Substring(0, offset - 1) + CPPName + "(int rows, int cols) : algorithmCPP(rows, cols) {" +
                               vbCrLf + tabs + vbTab + "traceName = """ + CPPName + """;"
             End If
 

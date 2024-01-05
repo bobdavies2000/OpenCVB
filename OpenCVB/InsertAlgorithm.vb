@@ -343,11 +343,11 @@ Public Class InsertAlgorithm
             sw.WriteLine(line)
         Next
 
-        sw.WriteLine(vbCrLf + vbCrLf + vbCrLf + vbCrLf + "class CPP_" + nameNoCPP + " : public algorithmX")
+        sw.WriteLine(vbCrLf + vbCrLf + vbCrLf + vbCrLf + "class CPP_" + nameNoCPP + " : public algorithmCPP")
         sw.WriteLine("{")
         sw.WriteLine("private: ")
         sw.WriteLine("public: ")
-        sw.WriteLine(vbTab + "CPP_" + nameNoCPP + "(int rows, int cols) : algorithmX(rows, cols) " + vbCrLf + "{" +
+        sw.WriteLine(vbTab + "CPP_" + nameNoCPP + "(int rows, int cols) : algorithmCPP(rows, cols) " + vbCrLf + "{" +
                      vbCrLf + vbTab + "traceName = """ + "CPP_" + nameNoCPP + """;" + vbCrLf + vbTab + "}")
         sw.WriteLine(vbTab + "void Run(Mat src)")
         sw.WriteLine(vbTab + "{")

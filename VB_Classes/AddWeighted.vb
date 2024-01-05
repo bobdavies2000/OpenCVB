@@ -1,11 +1,10 @@
 Imports cv = OpenCvSharp
-Imports System.Threading
 Public Class AddWeighted_Basics : Inherits VB_Algorithm
     Public src2 As cv.Mat
     Public Sub New()
         desc = "Add 2 images with specified weights."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim srcPlus = src2
         If standalone Or src2 Is Nothing Then srcPlus = task.depthRGB ' algorithm user normally provides src2! 
         If srcPlus.Type <> src.Type Then
