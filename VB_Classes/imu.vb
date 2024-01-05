@@ -973,3 +973,99 @@ Public Class IMU_BasicsWithOptions : Inherits VB_Algorithm
         setTrueText(strOut)
     End Sub
 End Class
+
+
+
+
+
+
+' https://www.codeproject.com/Articles/1247960/3D-graphics-engine-with-basic-math-on-CPU
+Public Class IMU_GMatrixWithOptions : Inherits VB_Algorithm
+    Public cx As Single = 1, sx As Single = 0, cy As Single = 1, sy As Single = 0, cz As Single = 1, sz As Single = 0
+    Public gMatrix As cv.Mat
+    Public Sub New()
+        desc = "Find the angle of tilt for the camera with respect to gravity."
+    End Sub
+    Private Sub getSliderValues()
+        Static xSlider = findSlider("Rotate pointcloud around X-axis (degrees)")
+        Static ySlider = findSlider("Rotate pointcloud around Y-axis (degrees)")
+        Static zSlider = findSlider("Rotate pointcloud around Z-axis (degrees)")
+        cx = Math.Cos(xSlider.value * cv.Cv2.PI / 180)
+        sx = Math.Sin(xSlider.value * cv.Cv2.PI / 180)
+
+        cy = Math.Cos(ySlider.Value * cv.Cv2.PI / 180)
+        sy = Math.Sin(ySlider.Value * cv.Cv2.PI / 180)
+
+        cz = Math.Cos(zSlider.value * cv.Cv2.PI / 180)
+        sz = Math.Sin(zSlider.value * cv.Cv2.PI / 180)
+    End Sub
+    Private Function buildGmatrix() As cv.Mat
+        '[cx -sx    0]  [1  0   0 ] 
+        '[sx  cx    0]  [0  cz -sz]
+        '[0   0     1]  [0  sz  cz]
+        Dim gArray As Single(,) = {{cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
+                                   {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
+                                   {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
+
+        Dim tmpGMatrix = New cv.Mat(3, 3, cv.MatType.CV_32F, {
+                  {gArray(0, 0) * cy + gArray(0, 1) * 0 + gArray(0, 2) * sy},
+                  {gArray(0, 0) * 0 + gArray(0, 1) * 1 + gArray(0, 2) * 0},
+                  {gArray(0, 0) * -sy + gArray(0, 1) * 0 + gArray(0, 2) * cy},
+                  {gArray(1, 0) * cy + gArray(1, 1) * 0 + gArray(1, 2) * sy},
+                  {gArray(1, 0) * 0 + gArray(1, 1) * 1 + gArray(1, 2) * 0},
+                  {gArray(1, 0) * -sy + gArray(1, 1) * 0 + gArray(1, 2) * cy},
+                  {gArray(2, 0) * cy + gArray(2, 1) * 0 + gArray(2, 2) * sy},
+                  {gArray(2, 0) * 0 + gArray(2, 1) * 1 + gArray(2, 2) * 0},
+                  {gArray(2, 0) * -sy + gArray(2, 1) * 0 + gArray(2, 2) * cy}})
+
+        Return tmpGMatrix
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        Static xSlider = findSlider("Rotate pointcloud around X-axis (degrees)")
+        Static ySlider = findSlider("Rotate pointcloud around Y-axis (degrees)")
+        Static zSlider = findSlider("Rotate pointcloud around Z-axis (degrees)")
+
+        If gOptions.gravityPointCloud.Checked Then
+            '[cos(a) -sin(a)    0]
+            '[sin(a)  cos(a)    0]
+            '[0       0         1] rotate the point cloud around the x-axis.
+            cz = Math.Cos(task.accRadians.Z)
+            sz = Math.Sin(task.accRadians.Z)
+
+            '[1       0         0      ] rotate the point cloud around the z-axis.
+            '[0       cos(a)    -sin(a)]
+            '[0       sin(a)    cos(a) ]
+            cx = Math.Cos(task.accRadians.X)
+            sx = Math.Sin(task.accRadians.X)
+        Else
+            getSliderValues()
+        End If
+
+        gMatrix = buildGmatrix()
+
+        If standalone Then
+            Dim g = task.IMU_Acceleration
+            strOut = "IMU Acceleration in X-direction = " + vbTab + vbTab + Format(g.X, fmt4) + vbCrLf
+            strOut += "IMU Acceleration in Y-direction = " + vbTab + vbTab + Format(g.Y, fmt4) + vbCrLf
+            strOut += "IMU Acceleration in Z-direction = " + vbTab + vbTab + Format(g.Z, fmt4) + vbCrLf + vbCrLf
+            strOut += "Rotate around X-axis (in degrees) = " + vbTab + Format(xSlider.value, fmt4) + vbCrLf
+            strOut += "Rotate around Y-axis (in degrees) = " + vbTab + Format(ySlider.value, fmt4) + vbCrLf
+            strOut += "Rotate around Z-axis (in degrees) = " + vbTab + Format(zSlider.value, fmt4) + vbCrLf
+
+            strOut += vbCrLf + "sqrt (" + vbTab + Format(g.X, fmt4) + "*" + Format(g.X, fmt4) + vbTab +
+                      vbTab + Format(g.Y, fmt4) + "*" + Format(g.Y, fmt4) + vbTab +
+                      vbTab + Format(g.Z, fmt4) + "*" + Format(g.Z, fmt4) + " ) = " + vbTab +
+                      vbTab + Format(Math.Sqrt(g.X * g.X + g.Y * g.Y + g.Z * g.Z), fmt4) + vbCrLf +
+                      "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
+
+            Dim tmpGMat1 = buildGmatrix()
+            strOut += vbCrLf + "Gravity-oriented gMatrix - move camera to test this:" + vbCrLf + gMatrixToStr(tmpGMat1)
+
+            getSliderValues()
+            Dim tmpGMat2 = buildGmatrix()
+            strOut += vbCrLf + "gMatrix with slider input - use Options_IMU Sliders to change this:" + vbCrLf + gMatrixToStr(tmpGMat2)
+        End If
+        setTrueText(strOut)
+        task.gMatrix = gMatrix
+    End Sub
+End Class

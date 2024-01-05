@@ -136,7 +136,8 @@ End Class
 
 
 Public Class PointCloud_Spin : Inherits VB_Algorithm
-    Dim gMat As New IMU_GMatrix
+    Dim options As New Options_IMU
+    Dim gMat As New IMU_GMatrixWithOptions
     Public Sub New()
         If findfrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)

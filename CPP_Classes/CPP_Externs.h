@@ -39,105 +39,105 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 
     switch (function)
     {
-    case fAddWeighted_Basics:
+    case CPP_AddWeighted_Basics_ :
     {task->alg = new CPP_AddWeighted_Basics(rows, cols); break; }
-    case fFeature_Agast:
+    case CPP_Feature_Agast_ :
     {task->alg = new CPP_Feature_Agast(rows, cols);break;}
-    case fResize_Basics:
+    case CPP_Resize_Basics_ :
     {task->alg = new CPP_Resize_Basics(rows, cols);break;}
-    case fDelaunay_Basics:
+    case CPP_Delaunay_Basics_ :
     {task->alg = new CPP_Delaunay_Basics(rows, cols);break;}
-    case fDelaunay_GenerationsNoKNN:
+    case CPP_Delaunay_GenerationsNoKNN_ :
     {task->alg = new CPP_Delaunay_GenerationsNoKNN(rows, cols);break;}
-    case fKNN_Basics:
+    case CPP_KNN_Basics_ :
     {task->alg = new CPP_KNN_Basics(rows, cols);break;}
-    case fRandom_Basics:
+    case CPP_Random_Basics_ :
     {task->alg = new CPP_Random_Basics(rows, cols);break;}
-    case fKNN_Lossy:
+    case CPP_KNN_Lossy_ :
     {task->alg = new CPP_KNN_Lossy(rows, cols);break;}
-    case fDelaunay_Generations:
+    case CPP_Delaunay_Generations_ :
     {task->alg = new CPP_Delaunay_Generations(rows, cols);break;}
-    case fStable_Basics:
+    case CPP_Stable_Basics_ :
     {task->alg = new CPP_Stable_Basics(rows, cols);break;}
-    case fFeature_Basics:
+    case CPP_Feature_Basics_ :
     {task->alg = new CPP_Feature_Basics(rows, cols);break;}
-	case fFPoly_TopFeatures :
+	case CPP_FPoly_TopFeatures_ :
 	{task->alg = new CPP_FPoly_TopFeatures(rows, cols);break;}
-	case fStable_BasicsCount :
+	case CPP_Stable_BasicsCount_ :
 	{task->alg = new CPP_Stable_BasicsCount(rows, cols);break;}
-	case fRemap_Basics :
+	case CPP_Remap_Basics_ :
 	{task->alg = new CPP_Remap_Basics(rows, cols);break;}
-	case fEdge_Canny:
+	case CPP_Edge_Canny_ :
 	{task->alg = new CPP_Edge_Canny(rows, cols);break;}
-	case fEdge_Sobel :
+	case CPP_Edge_Sobel_ :
 	{task->alg = new CPP_Edge_Sobel(rows, cols);break;}
-	case fEdge_Scharr :
+	case CPP_Edge_Scharr_ :
 	{task->alg = new CPP_Edge_Scharr(rows, cols);break;}
-	case fMat_4to1 :
+	case CPP_Mat_4to1_ :
 	{task->alg = new CPP_Mat_4to1(rows, cols);break;}
-	case fGrid_Basics :
+	case CPP_Grid_Basics_ :
 	{task->alg = new CPP_Grid_Basics(rows, cols);break;}
-	case fDepth_Colorizer :
+	case CPP_Depth_Colorizer_ :
 	{task->alg = new CPP_Depth_Colorizer(rows, cols);break;}
-	case fRedCloud_PrepData :
+	case CPP_RedCloud_PrepData_ :
 	{task->alg = new CPP_RedCloud_PrepData(rows, cols);break;}
-	case fRedCloud_Flood :
+	case CPP_RedCloud_Flood_ :
 	{task->alg = new CPP_RedCloud_Flood(rows, cols);break;}
-	case fDepth_PointCloud :
+	case CPP_Depth_PointCloud_ :
 	{task->alg = new CPP_Depth_PointCloud(rows, cols);break;}
-	case fIMU_GMatrix :
+	case CPP_IMU_GMatrix_ :
 	{task->alg = new CPP_IMU_GMatrix(rows, cols);break;}
-	case fIMU_GMatrix_QT :
+	case CPP_IMU_GMatrix_QT_ :
 	{task->alg = new CPP_IMU_GMatrix_QT(rows, cols);break;}
-	case fDepth_PointCloud_IMU :
+	case CPP_Depth_PointCloud_IMU_ :
 	{task->alg = new CPP_Depth_PointCloud_IMU(rows, cols);break;}
-	case fBinarize_Simple :
+	case CPP_Binarize_Simple_ :
 	{task->alg = new CPP_Binarize_Simple(rows, cols);break;}
-	case fPlot_Histogram :
+	case CPP_Plot_Histogram_ :
 	{task->alg = new CPP_Plot_Histogram(rows, cols);break;}
-	case fHistogram_Basics :
+	case CPP_Histogram_Basics_ :
 	{task->alg = new CPP_Histogram_Basics(rows, cols);break;}
-	case fBackProject_Basics :
+	case CPP_BackProject_Basics_ :
 	{task->alg = new CPP_BackProject_Basics(rows, cols);break;}
-	case fRectangle_Basics :
+	case CPP_Rectangle_Basics_ :
 	{task->alg = new CPP_Rectangle_Basics(rows, cols);break;}
-	case fRectangle_Rotated :
+	case CPP_Rectangle_Rotated_ :
 	{task->alg = new CPP_Rectangle_Rotated(rows, cols);break;}
-	case fContour_Largest :
+	case CPP_Contour_Largest_ :
 	{task->alg = new CPP_Contour_Largest(rows, cols);break;}
-	case fDiff_Basics :
+	case CPP_Diff_Basics_ :
 	{task->alg = new CPP_Diff_Basics(rows, cols);break;}
-	case fApproxPoly_FindandDraw:
+	case CPP_ApproxPoly_FindandDraw_ :
 	{task->alg = new CPP_ApproxPoly_FindandDraw(rows, cols);break;}
-	case fApproxPoly_Basics :
+	case CPP_ApproxPoly_Basics_ :
 	{task->alg = new CPP_ApproxPoly_Basics(rows, cols);break;}
-	case fHull_Basics :
+	case CPP_Hull_Basics_ :
 	{task->alg = new CPP_Hull_Basics(rows, cols);break;}
-	case fApproxPoly_Hull :
+	case CPP_ApproxPoly_Hull_ :
 	{task->alg = new CPP_ApproxPoly_Hull(rows, cols);break;}
-	case fEdge_Segments :
+	case CPP_Edge_Segments_ :
 	{task->alg = new CPP_Edge_Segments(rows, cols);break;}
-	case fMotion_Basics :
+	case CPP_Motion_Basics_ :
 	{task->alg = new CPP_Motion_Basics(rows, cols);break;}
-	case fEdge_MotionAccum :
+	case CPP_Edge_MotionAccum_ :
 	{task->alg = new CPP_Edge_MotionAccum(rows, cols);break;}
-	case fEdge_MotionFrames :
+	case CPP_Edge_MotionFrames_ :
 	{task->alg = new CPP_Edge_MotionFrames(rows, cols);break;}
-	case fEdgePreserving_Basics :
+	case CPP_EdgePreserving_Basics_ :
 	{task->alg = new CPP_EdgePreserving_Basics(rows, cols);break;}
-	case fEdgeDraw_Basics :
+	case CPP_EdgeDraw_Basics_ :
 	{task->alg = new CPP_EdgeDraw_Basics(rows, cols);break;}
-	case fTEE_Basics :
+	case CPP_TEE_Basics_ :
 	{task->alg = new CPP_TEE_Basics(rows, cols);break;}
-	case fRedCloud_Hulls :
+	case CPP_RedCloud_Hulls_ :
 	{task->alg = new CPP_RedCloud_Hulls(rows, cols);break;}
-	case fDistance_Basics :
+	case CPP_Distance_Basics_ :
 	{task->alg = new CPP_Distance_Basics(rows, cols);break;}
-	case fFeatureLess_Basics :
+	case CPP_FeatureLess_Basics_ :
 	{task->alg = new CPP_FeatureLess_Basics(rows, cols);break;}
-	case fFeatureLess_Edge :
+	case CPP_FeatureLess_Edge_ :
 	{task->alg = new CPP_FeatureLess_Edge(rows, cols);break;}
-	case fRedCloud_FeatureLess2 :
+	case CPP_RedCloud_FeatureLess2_ :
 	{task->alg = new CPP_RedCloud_FeatureLess2(rows, cols);break;}
     // end of switch - don't remove...
     }
@@ -235,7 +235,7 @@ extern "C" __declspec(dllexport)
 int* cppTask_Close(cppTask * task)
 {
     if (task == (cppTask*)0) return (int*)0;
-    if (task->cppFunction != fDelaunay_GenerationsNoKNN) delete task;  // why does fDelaunay_GenerationsNoKNN fail.  Skipping it for now.
+    if (task->cppFunction != CPP_Delaunay_GenerationsNoKNN_) delete task;  // why does fDelaunay_GenerationsNoKNN fail.  Skipping it for now.
     return (int*)0;
 }
 

@@ -20,8 +20,8 @@ Module UI_GeneratorMain
                     If line = "};" Then Exit While
                     Dim split = line.Split(",")
                     If split(0).Contains("MAX_FUNCTION") Then Continue While
-                    functionNames.Add(split(0).Substring(1), split(0))
-                    unsortedFunctions.Add(split(0).Substring(1))
+                    functionNames.Add(split(0).Substring(0), split(0))
+                    unsortedFunctions.Add(split(0).Substring(0))
                 End While
             End If
         End While
@@ -130,7 +130,9 @@ Module UI_GeneratorMain
             If nextName.StartsWith("CPP_Basics") Then
                 For j = 0 To functionNames.Count - 1
                     Dim functionText = functionNames.ElementAt(j).Key
-                    sw.WriteLine("if algorithmName = """ + "CPP_" + functionText + """ Then return new CPP_Basics(functionNames." + functionText + ")")
+                    Dim func = functionText
+                    functionText = functionText.Substring(0, functionText.Length - 1)
+                    sw.WriteLine("if algorithmName = """ + functionText + """ Then return new CPP_Basics(functionNames." + func + ")")
                 Next
             End If
             'End If
@@ -151,7 +153,7 @@ Module UI_GeneratorMain
             If cleanNames(i).StartsWith("CPP_Basics") Then
                 For j = 0 To functionNames.Count - 1
                     Dim functionText = functionNames.ElementAt(j).Key
-                    sw.WriteLine("CPP_" + functionText)
+                    sw.WriteLine(functionText.Substring(0, functionText.Length - 1))
                 Next
             End If
         Next

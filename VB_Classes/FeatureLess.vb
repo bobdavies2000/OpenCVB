@@ -53,7 +53,7 @@ Public Class FeatureLess_EdgeDrawing : Inherits VB_Algorithm
     Dim cpp As New CPP_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold distance", 0, 100, 10)
-        cpp.updateFunction(algorithmList.functionNames.EdgeDraw_Basics)
+        cpp.updateFunction(algorithmList.functionNames.CPP_EdgeDraw_Basics_)
         desc = "Use EdgeDrawing to define featureless regions."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -361,7 +361,7 @@ End Class
 Public Class FeatureLess_Edge_CPP : Inherits VB_Algorithm
     Dim cpp As New CPP_Basics
     Public Sub New()
-        cpp.updateFunction(algorithmList.functionNames.EdgeDraw_Basics)
+        cpp.updateFunction(algorithmList.functionNames.CPP_EdgeDraw_Basics_)
         desc = "Floodfill the output of the Edge Drawing filter (C++)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
