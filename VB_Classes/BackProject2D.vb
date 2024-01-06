@@ -79,7 +79,7 @@ Public Class BackProject2D_Compare : Inherits VB_Algorithm
         mats.mat(2) = backP.dst3
 
         If firstPass Then task.quadrantIndex = 3
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
 

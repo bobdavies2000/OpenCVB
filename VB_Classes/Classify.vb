@@ -31,7 +31,7 @@
 '        Static classifier As Object
 '        If heartBeat() Then
 '            If standalone Then
-'                random.Run(Nothing)
+'                random.Run(empty)
 '                pointList = New List(Of cv.Point2f)(random.pointList)
 '                responses.Clear()
 '                For Each pt In pointList
@@ -67,7 +67,7 @@
 '                Case "Support Vector Machine (SVM)"
 '                    ' SVM has all the options available in an options form with sliders and checkboxes...
 '                    Static optionsSVM As New Options_SVM
-'                    optionsSVM.Run(Nothing)
+'                    optionsSVM.Run(empty)
 '                    classifier = optionsSVM.createSVM
 '                    ' NOTE: SVM predictions are the opposite of what they should be! All the others are fine.
 '                Case "Decision Tree (DTree)"
@@ -143,7 +143,7 @@
 '    End Sub
 '    Public Sub RunVB(src as cv.Mat)
 '        If heartBeat() Then
-'            random.Run(Nothing)
+'            random.Run(empty)
 '            dst2.SetTo(0)
 '            classify.pointList = New List(Of cv.Point2f)(random.pointList)
 '            classify.responses.Clear()
@@ -155,7 +155,7 @@
 '            dst2.Line(New cv.Point(dst2.Width / 2, 0), New cv.Point(dst2.Width / 2, dst2.Height), cv.Scalar.White, task.lineWidth, task.lineType)
 '        End If
 
-'        classify.Run(Nothing)
+'        classify.Run(empty)
 '        dst2 = classify.dst2
 '        setTrueText("Current classification scheme = " + classify.options.classifierName + vbCrLf +
 '                    "This algorithm is identical to Classify_Basics except it is external" + vbCrLf +
@@ -179,7 +179,7 @@
 '    End Sub
 '    Public Sub RunVB(src as cv.Mat)
 '        If heartBeat() Then
-'            random.Run(Nothing)
+'            random.Run(empty)
 '            dst2.SetTo(0)
 '            classify.responses.Clear()
 '            classify.pointList = New List(Of cv.Point2f)(random.pointList)
@@ -199,7 +199,7 @@
 '            dst2.Line(New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), cv.Scalar.White, task.lineWidth, task.lineType)
 '        End If
 
-'        classify.Run(Nothing)
+'        classify.Run(empty)
 '        dst2 = classify.dst2
 '        setTrueText("Current classification scheme = " + classify.options.classifierName + vbCrLf +
 '                    "Click repeatedly in any quadrant And the color should match the points in that quadrant.", 3)
@@ -226,7 +226,7 @@
 '    End Sub
 '    Public Sub RunVB(src as cv.Mat)
 '        If heartBeat() Then
-'            random.Run(Nothing)
+'            random.Run(empty)
 '            dst2.SetTo(0)
 '            classify.responses.Clear()
 '            classify.pointList3D = New List(Of cv.Point3f)(random.PointList)
@@ -246,7 +246,7 @@
 '            dst2.Line(New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), cv.Scalar.White, task.lineWidth, task.lineType)
 '        End If
 
-'        classify.Run(Nothing)
+'        classify.Run(empty)
 '        dst2 = classify.dst2
 '        setTrueText("Current classification scheme = " + classify.options.classifierName + vbCrLf +
 '                    "Click repeatedly in any quadrant And the color should match the points in that quadrant.", 3)
@@ -270,7 +270,7 @@
 '    Public Sub New()
 '        classify.colors = {cv.Scalar.Yellow, cv.Scalar.White}
 '        csv.inputFile = task.homeDir + "Data/ClassificationProblem.csv"
-'        csv.Run(Nothing)
+'        csv.Run(empty)
 '        classify.pointList = New List(Of cv.Point2f)
 '        classify.responses.Clear()
 '        For Each index In csv.arrayList(2)
@@ -321,7 +321,7 @@
 '    Public outputs() As Integer
 '    Public Sub New()
 '        excel.inputFile = task.homeDir + "Data/examples.xls"
-'        excel.Run(Nothing)
+'        excel.Run(empty)
 
 '        Dim xArray = excel.dataTable.Columns("Column0").ToArray
 '        Dim yArray = excel.dataTable.Columns("Column1").ToArray
@@ -381,7 +381,7 @@
 '    Dim data As New Classify_YinYangData
 '    Dim DTree As New CS_DecisionTrees
 '    Public Sub New()
-'        data.Run(Nothing)
+'        data.Run(empty)
 '        dst2 = data.dst2
 '        labels = {"", "", "Ground truth", "After classification"}
 '        desc = "Accord: Use learning techniques with overlapping data in 2 classes"
@@ -414,7 +414,7 @@
 'Public Class Classify_NaiveBayes : Inherits VB_Algorithm
 '    Dim data As New Classify_YinYangData
 '    Public Sub New()
-'        data.Run(Nothing)
+'        data.Run(empty)
 '        dst2 = data.dst2
 '        labels = {"", "", "Ground truth", "After classification"}
 '        desc = "Accord: Use learning techniques with overlapping data in 2 classes"
@@ -447,7 +447,7 @@
 '    Dim data As New Classify_YinYangData
 '    Dim nb As New CS_NaiveBayes
 '    Public Sub New()
-'        data.Run(Nothing)
+'        data.Run(empty)
 '        dst2 = data.dst2
 '        labels = {"", "", "Ground truth", "After classification"}
 '        desc = "Accord: Use learning techniques with overlapping data in 2 classes"
@@ -475,7 +475,7 @@
 'Public Class Classify_SVMLinear : Inherits VB_Algorithm
 '    Dim data As New Classify_YinYangData
 '    Public Sub New()
-'        data.Run(Nothing)
+'        data.Run(empty)
 '        dst2 = data.dst2
 '        labels = {"", "", "Ground truth", "After classification"}
 '        desc = "Accord: Use learning techniques with overlapping data in 2 classes"
@@ -514,7 +514,7 @@
 '    Dim data As New Classify_YinYangData
 '    Dim svm As New CS_SVMLinear
 '    Public Sub New()
-'        data.Run(Nothing)
+'        data.Run(empty)
 '        dst2 = data.dst2
 '        labels = {"", "", "Ground truth", "After classification"}
 '        desc = "Accord: Use learning techniques with overlapping data in 2 classes"
@@ -542,7 +542,7 @@
 '    Dim data As New Classify_YinYangData
 '    Dim kernel As New CS_KernelMethod
 '    Public Sub New()
-'        data.Run(Nothing)
+'        data.Run(empty)
 '        dst2 = data.dst2
 '        labels = {"", "", "Ground truth", "After classification"}
 '        desc = "Accord: Use learning techniques with overlapping data in 2 classes"
@@ -619,7 +619,7 @@
 '    Dim data As New Classify_YinYangData
 '    Dim sigmoid As New CS_BipolarSigmoid
 '    Public Sub New()
-'        data.Run(Nothing)
+'        data.Run(empty)
 '        dst2 = data.dst2
 '        labels = {"", "", "Ground truth", "After classification"}
 '        desc = "Accord: Use learning techniques with overlapping data in 2 classes"
@@ -648,7 +648,7 @@
 '    Dim data As New Classify_YinYangData
 '    Dim logistic As New CS_LogisticRegression
 '    Public Sub New()
-'        data.Run(Nothing)
+'        data.Run(empty)
 '        dst2 = data.dst2
 '        labels = {"", "", "Ground truth", "After classification"}
 '        desc = "Accord: Use learning techniques with overlapping data in 2 classes"

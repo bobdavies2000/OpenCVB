@@ -93,7 +93,7 @@ Public Class Video_CarCounting : Inherits VB_Algorithm
         Dim tmp = videoImage.Resize(src.Size())
         If tmp.Channels <> dst2.Channels Then tmp = tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         flow.msgs.Add("  Cars " + CStr(carCount))
-        flow.Run(Nothing)
+        flow.Run(empty)
         dst2 = dst2 Or tmp
     End Sub
 End Class

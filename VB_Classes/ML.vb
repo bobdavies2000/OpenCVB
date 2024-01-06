@@ -235,7 +235,7 @@ Public Class ML_DepthFromColor : Inherits VB_Algorithm
         colorizer.Run(predictedDepth)
         mats.mat(0) = colorizer.dst2.Clone()
 
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
         labels(2) = "prediction, shadow, Depth Mask < " + CStr(depthSlider.Value) + ", Learn Input"
         dst3 = mats.dst3
@@ -317,7 +317,7 @@ Public Class ML_DepthFromXYColor : Inherits VB_Algorithm
         colorizer.Run(predictedDepth)
         dst2 = colorizer.dst2.Clone()
 
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst3 = mats.dst2
         labels(3) = "shadow, empty, Depth Mask < " + CStr(depthSlider.Value) + ", Learn Input"
     End Sub

@@ -107,12 +107,12 @@ Public Class Annealing_MultiThreaded : Inherits VB_Algorithm
     Dim options As New Options_Annealing
     Private Sub setup()
         random.options.countSlider.Value = options.cityCount
-        random.Run(Nothing) ' get the city positions (may or may not be used below.)
+        random.Run(empty) ' get the city positions (may or may not be used below.)
 
         For i = 0 To anneal.Length - 1
             anneal(i) = New Annealing_Basics_CPP()
             anneal(i).numberOfCities = options.cityCount
-            anneal(i).cityPositions = random.PointList.ToArray
+            anneal(i).cityPositions = random.pointList.ToArray
             anneal(i).circularPattern = options.circularFlag
             anneal(i).setup()
             anneal(i).cityPositions = anneal(0).cityPositions.Clone() ' duplicate for all threads - working on the same set of points.
@@ -128,7 +128,7 @@ Public Class Annealing_MultiThreaded : Inherits VB_Algorithm
         labels = {"", "", "Top 2 are best solutions, bottom 2 are worst.", "Log of Annealing progress"}
         desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         If task.optionsChanged Then setup()
         Parallel.For(0, anneal.Length,
@@ -157,7 +157,7 @@ Public Class Annealing_MultiThreaded : Inherits VB_Algorithm
             mats.mat(2) = anneal(CInt(bestList.ElementAt(bestList.Count - 2).Value)).dst2
             mats.mat(3) = anneal(CInt(bestList.ElementAt(bestList.Count - 1).Value)).dst2
         End If
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
 
         ' copy the top half of the solutions to the bottom half (worst solutions)

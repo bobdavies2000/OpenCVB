@@ -26,7 +26,7 @@ Public Class Mat_PointToMat : Inherits VB_Algorithm
         desc = "Convert point2f into a mat of points"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        random.Run(Nothing)
+        random.Run(empty)
         dst2 = random.dst2
         Dim rows = random.pointList.Count
         Dim pMat = New cv.Mat(rows, 1, cv.MatType.CV_32FC2, random.pointList.ToArray)
@@ -205,7 +205,7 @@ Public Class Mat_MultiplyReview : Inherits VB_Algorithm
             flow.msgs.Add(nextLine)
         Next
 
-        flow.Run(Nothing)
+        flow.Run(empty)
     End Sub
 End Class
 
@@ -282,7 +282,7 @@ Public Class Mat_Inverse : Inherits VB_Algorithm
             Next
         End If
 
-        flow.Run(Nothing)
+        flow.Run(empty)
     End Sub
 End Class
 
@@ -403,7 +403,7 @@ Public Class Mat_4Click : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         mat = mats.mat
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2.Clone
         If standalone Then
             mat(0) = task.color.Clone

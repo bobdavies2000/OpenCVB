@@ -52,7 +52,7 @@ Public Class Line3D_Draw : Inherits VB_Algorithm
 
         plot.plotData = New cv.Scalar(c1, c2, 0)
 
-        plot.Run(Nothing)
+        plot.Run(empty)
         dst2 = plot.dst2
         dst3 = plot.dst3
         labels(3) = "using " + CStr(nextList.Count) + " points, the correlation of X to Z = " + Format(c1, fmt3) + " (blue), correlation of Y to Z = " + Format(c2, fmt3) + " (green)"

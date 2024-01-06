@@ -139,7 +139,7 @@ Public Class RedTrack_FeaturesKNN : Inherits VB_Algorithm
         dst2 = good.dst2
 
         knn.queries = New List(Of cv.Point2f)(good.corners)
-        knn.Run(Nothing)
+        knn.Run(empty)
 
         dst3 = src.Clone
         For i = 0 To knn.neighbors.Count - 1
@@ -242,7 +242,7 @@ Public Class RedTrack_GoodCellInput : Inherits VB_Algorithm
         dst2 = good.dst2
 
         knn.queries = New List(Of cv.Point2f)(good.corners)
-        knn.Run(Nothing)
+        knn.Run(empty)
 
         featureList.Clear()
         For i = 0 To knn.neighbors.Count - 1

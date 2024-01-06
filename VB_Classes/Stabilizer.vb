@@ -331,7 +331,7 @@ Public Class Stabilizer_VerticalIMUKalman : Inherits VB_Algorithm
         angleYValue.Add(task.accRadians.Y)
 
         kalman.kInput = {angleXValue.Average, angleYValue.Average}
-        kalman.Run(Nothing)
+        kalman.Run(empty)
 
         strOut = "IMU X" + vbTab + "IMU Y" + vbTab + "IMU Z" + vbCrLf
         strOut += Format(task.accRadians.X * 57.2958, fmt1) + vbTab + Format(task.accRadians.Y * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbCrLf

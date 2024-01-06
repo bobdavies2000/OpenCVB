@@ -61,7 +61,7 @@ Public Class Photon_Test : Inherits VB_Algorithm
                       Format(counts(i).Max, "###,##0.0") + vbCrLf
         Next
         setTrueText(strout, 3)
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
 
         Dim colWidth = dst2.Width / testCount

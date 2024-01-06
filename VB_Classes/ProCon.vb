@@ -67,7 +67,7 @@ Public Class ProCon_Basics : Inherits VB_Algorithm
         End If
 
         SyncLock mutex
-            flow.Run(Nothing)
+            flow.Run(empty)
         End SyncLock
     End Sub
     Public Sub Close()

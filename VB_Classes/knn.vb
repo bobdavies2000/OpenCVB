@@ -35,10 +35,10 @@ Public Class KNN_Basics : Inherits VB_Algorithm
 
         If standalone Then
             If heartBeat() Then
-                random.Run(Nothing)
+                random.Run(empty)
                 trainInput = New List(Of cv.Point2f)(random.pointList)
             End If
-            random.Run(Nothing)
+            random.Run(empty)
             queries = New List(Of cv.Point2f)(random.PointList)
         End If
 
@@ -118,13 +118,13 @@ Public Class KNN_Basics2DTest : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         If heartBeat() Then
             dst3.SetTo(0)
-            random.Run(Nothing)
+            random.Run(empty)
             knn.trainInput = New List(Of cv.Point2f)(random.pointList)
         End If
-        random.Run(Nothing)
+        random.Run(empty)
         knn.queries = New List(Of cv.Point2f)(random.PointList)
 
-        knn.Run(Nothing)
+        knn.Run(empty)
         knn.displayResults()
         dst2 = knn.dst2
         accumulateDisplay()
@@ -308,7 +308,7 @@ Public Class KNN_Basics3DTest : Inherits VB_Algorithm
         If heartBeat() Then
             knn.queries.Clear()
             knn.trainInput.Clear()
-            random.Run(Nothing)
+            random.Run(empty)
             For Each pt In random.PointList
                 Dim vec = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
                 If knn.trainInput.Count = 10 Then
@@ -322,7 +322,7 @@ Public Class KNN_Basics3DTest : Inherits VB_Algorithm
             Next
         End If
 
-        knn.Run(Nothing)
+        knn.Run(empty)
 
         dst2.SetTo(0)
         dist.inPoint1 = knn.queries(0)
@@ -367,13 +367,13 @@ Public Class KNN_Basics4DTest : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If heartBeat() Then
-            random.Run(Nothing)
+            random.Run(empty)
             knn.trainInput = New List(Of cv.Vec4f)(random.PointList)
             knn.queries.Clear()
             knn.queries.Add(New cv.Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, dst2.Height), msRNG.Next(0, dst2.Height)))
         End If
 
-        knn.Run(Nothing)
+        knn.Run(empty)
 
         dst2.SetTo(0)
         dist.inPoint1 = knn.queries(0)
@@ -432,7 +432,7 @@ Public Class KNN_BasicsNTest : Inherits VB_Algorithm
             Next
         End If
 
-        knn.Run(Nothing)
+        knn.Run(empty)
         dst2.SetTo(0)
         For i = 0 To knn.trainInput.Count - 1 Step knn.knnDimension
             Dim pt = New cv.Point2f(knn.trainInput(i), knn.trainInput(i + 1))
@@ -478,7 +478,7 @@ Public Class KNN_Emax : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         em.Run(src)
-        random.Run(Nothing)
+        random.Run(empty)
 
         knn.queries = New List(Of cv.Point2f)(em.centers)
         knn.Run(src)
@@ -517,10 +517,10 @@ Public Class KNN_Input : Inherits VB_Algorithm
         Static trainSlider = findSlider("KNN Train count")
         Static querySlider = findSlider("KNN Query count")
         randomTrain.options.countSlider.Value = trainSlider.Value
-        randomTrain.Run(Nothing)
+        randomTrain.Run(empty)
 
         randomQuery.options.countSlider.Value = querySlider.Value
-        randomQuery.Run(Nothing)
+        randomQuery.Run(empty)
 
         ' query/train points need to be manufactured when standalone
         trainingPoints = New List(Of cv.Point2f)(randomTrain.pointList)
@@ -900,10 +900,10 @@ Public Class KNN_LossyOld : Inherits VB_Algorithm
         If standalone Then
             Static random As New Random_Basics
             If heartBeat() Then
-                random.Run(Nothing)
+                random.Run(empty)
                 knn.trainInput = New List(Of cv.Point2f)(random.pointList)
             End If
-            random.Run(Nothing)
+            random.Run(empty)
             queries = New List(Of cv.Point2f)(random.pointList)
         End If
 
@@ -913,7 +913,7 @@ Public Class KNN_LossyOld : Inherits VB_Algorithm
         End If
 
         knn.queries = queries
-        knn.Run(Nothing)
+        knn.Run(empty)
         knn.displayResults()
         dst2 = knn.dst2
 
@@ -995,10 +995,10 @@ Public Class KNN_Lossy : Inherits VB_Algorithm
         If standalone Then
             Static random As New Random_Basics
             If heartBeat() Then
-                random.Run(Nothing)
+                random.Run(empty)
                 knn.trainInput = New List(Of cv.Point2f)(random.pointList)
             End If
-            random.Run(Nothing)
+            random.Run(empty)
             queries = New List(Of cv.Point2f)(random.pointList)
         End If
 
@@ -1008,7 +1008,7 @@ Public Class KNN_Lossy : Inherits VB_Algorithm
         End If
 
         knn.queries = queries
-        knn.Run(Nothing)
+        knn.Run(empty)
         knn.displayResults()
         dst2 = knn.dst2
 
@@ -1068,13 +1068,13 @@ Public Class KNN_Farthest : Inherits VB_Algorithm
         If standalone Then
             Static random As New Random_Basics
             If heartBeat() Then
-                random.Run(Nothing)
+                random.Run(empty)
                 knn.trainInput = New List(Of cv.Point2f)(random.pointList)
                 knn.queries = New List(Of cv.Point2f)(knn.trainInput)
             End If
         End If
 
-        knn.Run(Nothing)
+        knn.Run(empty)
 
         dst2.SetTo(0)
         dst3.SetTo(0)

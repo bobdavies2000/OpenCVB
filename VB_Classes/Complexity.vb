@@ -92,7 +92,7 @@ Public Class Complexity_PlotOpenCV : Inherits VB_Algorithm
             plot.srcY.Add(nextTime)
             If nextTime > maxTime Then maxTime = nextTime
         Next
-        plot.Run(Nothing)
+        plot.Run(empty)
         dst2 = plot.dst2.Clone
         Return maxTime
     End Function

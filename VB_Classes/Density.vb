@@ -36,7 +36,7 @@ Public Class Density_Phase : Inherits VB_Algorithm
         desc = "Display gradient phase and 2D density side by side."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        gradient.Run(Nothing)
+        gradient.Run(empty)
         dst3 = vbNormalize32f(gradient.dst3)
 
         dense.Run(src)

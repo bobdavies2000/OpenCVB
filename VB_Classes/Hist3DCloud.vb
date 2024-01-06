@@ -79,10 +79,10 @@ Public Class Hist3Dcloud_DepthSplit : Inherits VB_Algorithm
             mats2.mat(i) = hist2d(i).histogram.ConvertScaleAbs
         Next
 
-        mats1.Run(Nothing)
+        mats1.Run(empty)
         dst2 = mats1.dst2
 
-        mats2.Run(Nothing)
+        mats2.Run(empty)
         dst3 = mats2.dst2
     End Sub
 End Class

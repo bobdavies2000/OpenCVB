@@ -84,7 +84,7 @@ Public Class Image_Series : Inherits VB_Algorithm
             ' to work on a specific file, specify it here.
             ' images.fileNameForm.filename.Text = task.homeDir + "Images/train/103041.jpg"
 
-            images.Run(Nothing)
+            images.Run(empty)
             dst2 = images.dst2
         End If
     End Sub
@@ -107,7 +107,7 @@ Public Class Image_RedCloudColor : Inherits VB_Algorithm
         desc = "Use RedCloud on a photo instead of the video stream."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        images.Run(Nothing)
+        images.Run(empty)
         dst0 = images.dst2.Clone
         dst1 = images.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -138,7 +138,7 @@ Public Class Image_RedCloudColorSeries : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If heartBeat() Then loadNextImage = True
-        images.Run(Nothing)
+        images.Run(empty)
         dst0 = images.dst0
         dst1 = images.dst1
         dst2 = images.dst2
@@ -166,7 +166,7 @@ Public Class Image_CellStats : Inherits VB_Algorithm
         task.pointCloud.SetTo(0)
         task.pcSplit = task.pointCloud.Split()
 
-        images.Run(Nothing)
+        images.Run(empty)
         dst0 = images.dst0
         dst1 = images.dst1
         dst2 = images.dst2
@@ -210,7 +210,7 @@ Public Class Image_MSER : Inherits VB_Algorithm
         loadNextImage = nextCheck.checked
         nextCheck.checked = False
 
-        images.Run(Nothing)
+        images.Run(empty)
         dst0 = images.dst2
 
         core.Run(dst0)

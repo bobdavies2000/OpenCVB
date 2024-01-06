@@ -77,7 +77,7 @@ Public Class FLANN_Basics : Inherits VB_Algorithm
         Static epsSlider = findSlider("EPS X100")
 
         Dim reuseData = reuseCheck.checked
-        If reuseData = False Or task.frameCount < 2 Or task.mouseClickFlag Then random.Run(Nothing) ' fill result1 with random points in x and y range of the image.
+        If reuseData = False Or task.frameCount < 2 Or task.mouseClickFlag Then random.Run(empty) ' fill result1 with random points in x and y range of the image.
         Dim features As New cv.Mat(random.PointList.Count, 2, cv.MatType.CV_32F, random.PointList.ToArray)
 
         Dim matchCount = Math.Min(matchSlider.Value, random.PointList.Count - 1)

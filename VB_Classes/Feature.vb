@@ -645,7 +645,7 @@ Public Class Feature_Lines_Tutorial2 : Inherits VB_Algorithm
         If raw3D.Count = 0 Then
             setTrueText("No vertical or horizontal lines were found")
         Else
-            gMat.Run(Nothing)
+            gMat.Run(empty)
             task.gMatrix = gMat.gMatrix
             Dim matLines3D As cv.Mat = (New cv.Mat(raw3D.Count, 3, cv.MatType.CV_32F, raw3D.ToArray)) * task.gMatrix
         End If
@@ -833,7 +833,7 @@ Public Class Feature_tCellTracker : Inherits VB_Algorithm
 
         If standalone Then
             flow.msgs.Add(strOut)
-            flow.Run(Nothing)
+            flow.Run(empty)
         End If
 
         tcells = New List(Of tCell)(newCells)
@@ -890,7 +890,7 @@ Public Class Feature_PointTracker : Inherits VB_Algorithm
         Next
         If standalone Then
             flow.msgs.Add(strOut)
-            flow.Run(Nothing)
+            flow.Run(empty)
         End If
 
         labels(2) = "Of the " + CStr(good.corners.Count) + " input points, " + CStr(mPoints.ptx.Count) +
@@ -966,7 +966,7 @@ Public Class Feature_LongestV_Tutorial2 : Inherits VB_Algorithm
         Next
 
         Dim saveVec = knn.queries(0)
-        knn.Run(Nothing)
+        knn.Run(empty)
 
         Dim index = knn.result(0, 0)
         Dim p1 = New cv.Point2f(knn.trainInput(index)(0), knn.trainInput(index)(1))
@@ -1173,7 +1173,7 @@ Public Class Feature_ArcYAll : Inherits VB_Algorithm
                 flow.msgs.Add(Format(arcY, fmt3) + vbTab + Format(len3D, fmt3) + "m " + vbTab + Format(pt1.Z, fmt1) + "m")
             End If
         Next
-        If standalone Then flow.Run(Nothing)
+        If standalone Then flow.Run(empty)
 
         Static firstAverage As New List(Of Single)
         Static firstBest As Integer
@@ -1218,7 +1218,7 @@ Public Class Feature_BasicsKNN : Inherits VB_Algorithm
 
         knn.queries = New List(Of cv.Point2f)(good.corners)
         If firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
-        knn.Run(Nothing)
+        knn.Run(empty)
 
         For i = 0 To knn.neighbors.Count - 1
             Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
@@ -1341,7 +1341,7 @@ Public Class Feature_Grid : Inherits VB_Algorithm
 
         knn.queries = New List(Of cv.Point2f)(corners)
         If firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
-        knn.Run(Nothing)
+        knn.Run(empty)
 
         For i = 0 To knn.neighbors.Count - 1
             Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
@@ -1441,7 +1441,7 @@ Public Class Feature_TraceKNN : Inherits VB_Algorithm
         Dim lastIndex = cornerHistory.Count - 1
         knn.trainInput = New List(Of cv.Point2f)(cornerHistory.ElementAt(0))
         knn.queries = New List(Of cv.Point2f)(cornerHistory.ElementAt(lastIndex))
-        knn.Run(Nothing)
+        knn.Run(empty)
 
         dst2.SetTo(0)
         mpList.Clear()

@@ -331,7 +331,7 @@ Public Class Draw_ClipLine : Inherits VB_Algorithm
         setTrueText("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
                      New cv.Point(src.Width / 2, 200))
         If r = rect Then setup()
-        flow.Run(Nothing)
+        flow.Run(empty)
     End Sub
 End Class
 

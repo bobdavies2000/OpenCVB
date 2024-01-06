@@ -121,7 +121,7 @@ Public Class CellularAutomata_Life : Inherits VB_Algorithm
         Static randomSlider = findSlider("Random Pixel Count")
         Static savePointCount As Integer
         If randomSlider.Value <> savePointCount Or generation = 0 Then
-            random.Run(Nothing)
+            random.Run(empty)
             generation = 0
             savePointCount = randomSlider.Value
             For i = 0 To random.pointList.Count - 1
@@ -221,7 +221,7 @@ Public Class CellularAutomata_LifePopulation : Inherits VB_Algorithm
         dst2 = game.dst2
 
         plot.plotData = New cv.Scalar(game.population, 0, 0)
-        plot.Run(Nothing)
+        plot.Run(empty)
         dst3 = plot.dst2
     End Sub
 End Class

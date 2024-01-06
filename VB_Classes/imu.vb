@@ -173,7 +173,7 @@ Public Class IMU_PlotIMUFrameTime : Inherits VB_Algorithm
                         "IMU Anchor Frame Time = White (IMU Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
 
             plot.plotData = New cv.Scalar(task.IMU_FrameTime, task.CPU_FrameTime, IMUtoCaptureEstimate, IMUanchor)
-            plot.Run(Nothing)
+            plot.Run(empty)
 
             If plot.maxScale - plot.minScale > histogramIMU.Count Then ReDim histogramIMU(plot.maxScale - plot.minScale)
 
@@ -241,7 +241,7 @@ Public Class IMU_PlotTotalDelay : Inherits VB_Algorithm
                      "White" + vbTab + "Host+IMU Anchor Frame Time (Host Frame Time that occurs most often)" + vbCrLf + vbCrLf + vbCrLf
 
         plot.plotData = New cv.Scalar(imu.IMUtoCaptureEstimate, host.HostInterruptDelayEstimate, totaldelay, kalman.stateResult)
-        plot.Run(Nothing)
+        plot.Run(empty)
 
         If plot.lastXdelta.Count > plotLastX Then
             For i = 0 To plot.plotCount - 1
@@ -312,7 +312,7 @@ Public Class IMU_PlotGravityAngles : Inherits VB_Algorithm
                     "Yaw = " + Format(task.IMU_AngularVelocity.Y, fmt2) + vbCrLf + " Roll = " + Format(task.IMU_AngularVelocity.Z, fmt2), 1)
 
         plot.plotData = New cv.Scalar(task.accRadians.X * 57.2958, task.accRadians.Y * 57.2958, task.accRadians.Z * 57.2958)
-        plot.Run(Nothing)
+        plot.Run(empty)
         dst2 = plot.dst2
         dst3 = plot.dst3
     End Sub
@@ -340,7 +340,7 @@ Public Class IMU_PlotAngularVelocity : Inherits VB_Algorithm
                     "Move the camera to move values off of zero...", 1)
 
         plot.plotData = New cv.Scalar(task.IMU_AngularVelocity.X, task.IMU_AngularVelocity.Y, task.IMU_AngularVelocity.Z)
-        plot.Run(Nothing)
+        plot.Run(empty)
         dst2 = plot.dst2
         dst3 = plot.dst3
     End Sub
@@ -433,7 +433,7 @@ Public Class IMU_Lines : Inherits VB_Algorithm
             Dim lastp2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
 
             kalman.kInput = {p1.X, p1.Y, p2.X, p2.Y}
-            kalman.Run(Nothing)
+            kalman.Run(empty)
 
             p1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
             p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
@@ -475,7 +475,7 @@ Public Class IMU_PlotAcceleration : Inherits VB_Algorithm
                     "Yaw = " + Format(task.IMU_AngularVelocity.Y, fmt2) + vbCrLf + " Roll = " + Format(task.IMU_AngularVelocity.Z, fmt2), 1)
 
         plot.plotData = New cv.Scalar(task.IMU_Acceleration.X, task.IMU_Acceleration.Y, task.IMU_Acceleration.Z)
-        plot.Run(Nothing)
+        plot.Run(empty)
         dst2 = plot.dst2
         dst3 = plot.dst3
     End Sub
@@ -526,18 +526,18 @@ Public Class IMU_PlotCompareIMU : Inherits VB_Algorithm
         desc = "Compare the results of the raw IMU data with the same values after Kalman"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        imuAll.Run(Nothing)
+        imuAll.Run(empty)
 
         plot(0).plotData = New cv.Scalar(task.IMU_RawAcceleration.X, task.IMU_Acceleration.X, task.kalmanIMUacc.X, task.IMU_AverageAcceleration.X)
-        plot(0).Run(Nothing)
+        plot(0).Run(empty)
         dst0 = plot(0).dst2
 
         plot(1).plotData = New cv.Scalar(task.IMU_RawAcceleration.Y, task.IMU_Acceleration.Y, task.kalmanIMUacc.Y, task.IMU_AverageAcceleration.Y)
-        plot(1).Run(Nothing)
+        plot(1).Run(empty)
         dst1 = plot(1).dst2
 
         plot(2).plotData = New cv.Scalar(task.IMU_RawAcceleration.Z, task.IMU_Acceleration.Z, task.kalmanIMUacc.Z, task.IMU_AverageAcceleration.Z)
-        plot(2).Run(Nothing)
+        plot(2).Run(empty)
         dst2 = plot(2).dst2
 
         setTrueText("Blue (usually hidden) is the raw signal" + vbCrLf + "Green (usually hidden) is the Velocity-filtered results" + vbCrLf +
@@ -565,7 +565,7 @@ Public Class IMU_Kalman : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         kalman.kInput = {task.IMU_RawAcceleration.X, task.IMU_RawAcceleration.Y, task.IMU_RawAcceleration.Z,
                          task.IMU_RawAngularVelocity.X, task.IMU_RawAngularVelocity.Y, task.IMU_RawAngularVelocity.Z}
-        kalman.Run(Nothing)
+        kalman.Run(empty)
         task.kalmanIMUacc = New cv.Point3f(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2))
         task.kalmanIMUvelocity = New cv.Point3f(kalman.kOutput(3), kalman.kOutput(4), kalman.kOutput(5))
         strOut = "IMU Acceleration Raw" + vbTab + "IMU Velocity Raw" + vbCrLf +
@@ -594,9 +594,9 @@ Public Class IMU_AllMethods : Inherits VB_Algorithm
         desc = "Compute the IMU acceleration using all available methods - raw, Kalman, averaging, and velocity-filtered."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        basics.Run(Nothing)
-        kalman.Run(Nothing)
-        imuAvg.Run(Nothing)
+        basics.Run(empty)
+        kalman.Run(empty)
+        imuAvg.Run(empty)
 
         setTrueText(basics.strOut + vbCrLf + kalman.strOut + vbCrLf + vbCrLf + imuAvg.strOut, 2)
     End Sub
@@ -712,7 +712,7 @@ Public Class IMU_Plot : Inherits VB_Algorithm
         If redCheck.checked Then redX = red
 
         plot.plotData = New cv.Scalar(blueX, greenX, redX)
-        plot.Run(Nothing)
+        plot.Run(empty)
         dst2 = plot.dst2
         dst3 = plot.dst3
         labels(2) = "When run standalone, the default is to plot the angular velocity for X, Y, and Z"
@@ -740,7 +740,7 @@ Public Class IMU_VelocityPlot : Inherits VB_Algorithm
         plot.red = task.roll * 1000
         plot.labels(2) = "pitch X 1000 (blue), Yaw X 1000 (green), and roll X 1000 (red)"
 
-        plot.Run(Nothing)
+        plot.Run(empty)
         dst2 = plot.dst2
         dst3 = plot.dst3
 
@@ -840,7 +840,7 @@ Public Class IMU_PlotHostFrameTimes : Inherits VB_Algorithm
                          "White" + vbTab + "Host Anchor Frame Time (Host Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
 
             plot.plotData = New cv.Scalar(task.IMU_FrameTime, task.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
-            plot.Run(Nothing)
+            plot.Run(empty)
 
             If plot.maxScale - plot.minScale > hist.Count Then ReDim hist(plot.maxScale - plot.minScale)
 
@@ -904,7 +904,7 @@ Public Class IMU_PlotHostFrameScalar : Inherits VB_Algorithm
                      "White" + vbTab + "Host Anchor Frame Time (Host Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
 
             plot.plotData = New cv.Scalar(task.IMU_FrameTime, task.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
-            plot.Run(Nothing)
+            plot.Run(empty)
             dst2 = plot.dst2
             dst3 = plot.dst3
             setTrueText(strOut, 1)

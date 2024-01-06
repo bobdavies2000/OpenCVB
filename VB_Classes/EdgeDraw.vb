@@ -134,7 +134,7 @@ End Module
 '            knn.queries.Add(pt)
 '        Next
 
-'        knn.Run(Nothing)
+'        knn.Run(empty)
 '        If knn.neighbors Is Nothing Then Exit Sub ' no query points?
 '        If knn.neighbors.Count < 2 Then Exit Sub ' not enough points.
 '        If edgeD.segPoints.Count = 0 Then Exit Sub

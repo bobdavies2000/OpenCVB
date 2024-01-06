@@ -253,7 +253,7 @@ Public Class Profile_ConcentrationTop : Inherits VB_Algorithm
         Dim vecMat As New cv.Mat(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
 
         ySlider.Value += 1
-        rotate.Run(Nothing)
+        rotate.Run(empty)
         Dim output = (vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix).ToMat  ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
         vecMat = output.Reshape(3, vecMat.Rows)
 
@@ -271,7 +271,7 @@ Public Class Profile_ConcentrationTop : Inherits VB_Algorithm
         End If
 
         plot.plotData = New cv.Scalar(count, 0, 0)
-        plot.Run(Nothing)
+        plot.Run(empty)
         dst3 = plot.dst2
 
         If ySlider.Value >= 45 Then
@@ -309,7 +309,7 @@ Public Class Profile_OpenGL : Inherits VB_Algorithm
 
         If rc.contour3D.Count > 0 Then
             Dim vecMat As New cv.Mat(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
-            rotate.Run(Nothing)
+            rotate.Run(empty)
             Dim output As cv.Mat = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix  ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
             task.ogl.dataInput = output.Reshape(3, vecMat.Rows)
             task.ogl.pointCloudInput = New cv.Mat
@@ -352,7 +352,7 @@ Public Class Profile_Kalman : Inherits VB_Algorithm
             kalman.kInput(i * 2 + 1) = sides.corners(i).Y
         Next
 
-        kalman.Run(Nothing)
+        kalman.Run(empty)
 
         If rc.index > 0 Then
             dst3.SetTo(0)

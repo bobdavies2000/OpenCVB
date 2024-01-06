@@ -23,7 +23,7 @@ Public Class EMax_Basics : Inherits VB_Algorithm
         Static useInputClusters As Boolean
         If eLabels.Count = 0 Or useInputClusters Then
             useInputClusters = True
-            emaxInput.Run(Nothing)
+            emaxInput.Run(empty)
             eLabels = New List(Of Integer)(emaxInput.eLabels.ToList)
             eSamples = New List(Of cv.Point2f)(emaxInput.eSamples)
             regionCount = emaxInput.regionCount
@@ -178,7 +178,7 @@ Public Class EMax_VB_Failing : Inherits VB_Algorithm
         desc = "OpenCV expectation maximization example."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        emaxInput.Run(Nothing)
+        emaxInput.Run(empty)
         eLabels = New List(Of Integer)(emaxInput.eLabels.ToList)
         eSamples = New List(Of cv.Point2f)(emaxInput.eSamples)
         regionCount = emaxInput.regionCount
@@ -245,7 +245,7 @@ Public Class EMax_PointTracker : Inherits VB_Algorithm
         dst2 = emax.dst2
 
         knn.queries = New List(Of cv.Point2f)(emax.centers)
-        knn.Run(Nothing)
+        knn.Run(empty)
         If firstPass Then
             knn.trainInput = New List(Of cv.Point2f)(knn.queries)
             Exit Sub
@@ -283,7 +283,7 @@ Public Class EMax_RandomClusters : Inherits VB_Algorithm
         Static regionSlider = findSlider("Number of Clusters")
         emax.regionCount = regionSlider.Value
 
-        clusters.Run(Nothing)
+        clusters.Run(empty)
         dst3 = clusters.dst2
         emax.eLabels.Clear()
         emax.eSamples.Clear()

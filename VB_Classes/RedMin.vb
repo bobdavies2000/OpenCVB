@@ -224,7 +224,7 @@ Public Class RedMin_BasicsAssist : Inherits VB_Algorithm
         mats.mat(2) = rMin.rMotion.dst3
         mats.mat(3) = rMin.rMotion.motion.dst3
 
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
         labels(3) = rMin.labels(3)

@@ -54,7 +54,7 @@ Public Class MSER_Basics : Inherits VB_Algorithm
 
             rp.index = mserCells.Count
             matchCell.rp = rp
-            matchCell.Run(Nothing)
+            matchCell.Run(empty)
 
             Dim rc = matchCell.rc
 
@@ -554,7 +554,7 @@ Public Class MSER_Regions : Inherits VB_Algorithm
 
             rp.index = mserCells.Count
             matchCell.rp = rp
-            matchCell.Run(Nothing)
+            matchCell.Run(empty)
 
             Dim rc = matchCell.rc
 

@@ -293,11 +293,11 @@ Public Class LeftRight_RedCloudBoth : Inherits VB_Algorithm
         desc = "Match cells in the left view to the right view - something is flipped here..."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        stRight.Run(Nothing)
+        stRight.Run(empty)
         dst2 = stRight.dst2
         labels(2) = "Left view - " + stRight.labels(2)
 
-        stLeft.Run(Nothing)
+        stLeft.Run(empty)
         dst3 = stLeft.dst2
         labels(3) = "Right view - " + stLeft.labels(2)
     End Sub

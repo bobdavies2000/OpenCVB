@@ -306,7 +306,7 @@ Public Class Edge_BinarizedCanny : Inherits VB_Algorithm
         edges.Run(binarize.mats.mat(3))  ' the darkest of the dark half
         mats.mat(2) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         mats.mat(3) = mats.mat(2) Or mats.mat(3)
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
         If mats.dst3.Channels = 3 Then
             labels(3) = "Combo of first 3 below.  Click quadrants in dst2."
@@ -581,7 +581,7 @@ Public Class Edge_BinarizedSobel : Inherits VB_Algorithm
         mats.mat(2) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         mats.mat(3) = mats.mat(2) Or mats.mat(3)
 
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

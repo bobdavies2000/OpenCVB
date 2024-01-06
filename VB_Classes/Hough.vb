@@ -252,7 +252,7 @@ Public Class Hough_LaneFinder : Inherits VB_Algorithm
         desc = "Use Hough to isolate features in the mask of the road."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        hls.Run(Nothing)
+        hls.Run(empty)
         If task.optionsChanged Then
             Dim w = hls.input.video.dst2.Width
             Dim h = hls.input.video.dst2.Height

@@ -9,7 +9,7 @@ Public Class Covariance_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         dst3.SetTo(0)
         If standalone Then
-            random.Run(Nothing)
+            random.Run(empty)
             src = New cv.Mat(random.PointList.Count, 2, cv.MatType.CV_32F, random.PointList.ToArray)
             For i = 0 To random.PointList.Count - 1
                 dst3.Circle(random.PointList(i), 3, cv.Scalar.White, -1, task.lineType)

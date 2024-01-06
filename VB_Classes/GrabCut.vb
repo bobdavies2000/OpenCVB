@@ -87,7 +87,7 @@ Public Class GrabCut_FineTune : Inherits VB_Algorithm
         mats.mat(0) = basics.dst2
         mats.mat(1) = basics.fgFineTune
         mats.mat(2) = basics.bgFineTune
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
 
         dst3 = basics.dst3

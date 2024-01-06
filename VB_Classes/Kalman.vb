@@ -87,7 +87,7 @@ Public Class Kalman_Compare : Inherits VB_Algorithm
         End If
 
         plot.plotData = src.Mean()
-        plot.Run(Nothing)
+        plot.Run(empty)
         dst2 = plot.dst2
 
         For i = 0 To kalman.Count - 1
@@ -96,7 +96,7 @@ Public Class Kalman_Compare : Inherits VB_Algorithm
         Next
 
         kPlot.plotData = New cv.Scalar(kalman(0).stateResult, kalman(1).stateResult, kalman(2).stateResult)
-        kPlot.Run(Nothing)
+        kPlot.Run(empty)
         dst3 = kPlot.dst2
     End Sub
 End Class
@@ -382,7 +382,7 @@ Public Class Kalman_Single : Inherits VB_Algorithm
         stateResult = kf.Correct(measurement).Get(Of Single)(0, 0)
         If standalone Then
             plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
-            plot.Run(Nothing)
+            plot.Run(empty)
             dst2 = plot.dst2
             dst3 = plot.dst3
             labels(2) = "Mean of the grayscale image is predicted"
@@ -594,7 +594,7 @@ Public Class Kalman_VB_Basics : Inherits VB_Algorithm
 
         If standalone Then
             plot.plotData = New cv.Scalar(kOutput, kInput, kAverage)
-            plot.Run(Nothing)
+            plot.Run(empty)
             dst2 = plot.dst2
             dst3 = plot.dst3
         End If

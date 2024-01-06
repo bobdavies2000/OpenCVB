@@ -23,7 +23,7 @@ Public Class FrameRate_Basics : Inherits VB_Algorithm
             Next
         End If
         setTrueText(strOut, 3)
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
         lastImages = {task.color.Clone, task.leftview.Clone, task.rightview.Clone, task.depthRGB.Clone}
     End Sub
@@ -61,7 +61,7 @@ Public Class FrameRate_BasicsGray : Inherits VB_Algorithm
             Next
         End If
         setTrueText(strOut, 3)
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
 
         lastImages = {task.color.Clone, task.leftview.Clone, task.rightview.Clone, task.depthRGB.Clone}

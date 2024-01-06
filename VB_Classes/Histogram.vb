@@ -141,7 +141,7 @@ Public Class Histogram_EqualizeGray : Inherits VB_Algorithm
         mats.mat(1) = histogramEQ.dst2
         mats.mat(2) = src
         mats.mat(3) = dst2
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst3 = mats.dst2
     End Sub
 End Class
@@ -195,7 +195,7 @@ Public Class Histogram_ColorsAndGray : Inherits VB_Algorithm
             mats.mat(i) = histogram.plot.dst2.Clone
         Next
 
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
@@ -419,7 +419,7 @@ Public Class Histogram_PeaksRGB : Inherits VB_Algorithm
             task.mousePicTag = RESULT_DST2
         End If
 
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
@@ -578,7 +578,7 @@ Public Class Histogram_EqualizeColor : Inherits VB_Algorithm
             kalmanEq.Run(rgbEq(channel).Clone())
             mats.mat(1) = kalmanEq.dst2.Clone()
 
-            mats.Run(Nothing)
+            mats.Run(empty)
             dst3 = mats.dst2
             labels(3) = "Before (top) and After Red Histogram"
         End If
@@ -695,7 +695,7 @@ Public Class Histogram_CompareNumber : Inherits VB_Algorithm
         Dim sum = cv.Cv2.Sum(comp.normHistDiff)(0) * 100
         Dim sumAbs = cv.Cv2.Sum(comp.normHistDiffAbs)(0) * 100
         plot.plotData = New cv.Scalar(sum, sumAbs, 0)
-        plot.Run(Nothing)
+        plot.Run(empty)
         dst2 = plot.dst2
         dst3 = plot.dst3
 

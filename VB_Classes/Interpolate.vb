@@ -74,7 +74,7 @@ Public Class Interpolate_Kalman : Inherits VB_Algorithm
             Next
         Next
 
-        kalman.Run(Nothing)
+        kalman.Run(empty)
 
         i = 0
         For y = 0 To dst2.Height - 1

@@ -230,7 +230,7 @@ Public Class Pixel_GetSet : Inherits VB_Algorithm
 
         setTrueText(output, New cv.Point(src.Width / 2 + 10, src.Height / 2 + 20))
 
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
@@ -290,7 +290,7 @@ Public Class Pixel_Sampler : Inherits VB_Algorithm
         Else
             random.range = New cv.Rect(0, 0, src.Width, src.Height)
         End If
-        random.Run(Nothing)
+        random.Run(empty)
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim index As New List(Of cv.Point)
@@ -363,7 +363,7 @@ Public Class Pixel_SampleColor : Inherits VB_Algorithm
         Dim pixels As New List(Of cv.Vec3b)
         Dim counts As New List(Of Integer)
         Dim pixel0 = New cv.Vec3b
-        random.Run(Nothing)
+        random.Run(empty)
         For Each pt In random.pointList
             Dim pixel = src.Get(Of cv.Vec3b)(pt.Y, pt.X)
             If pixel <> pixel0 Then

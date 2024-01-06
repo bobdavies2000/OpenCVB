@@ -11,7 +11,7 @@ Public Class Delaunay_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If heartBeat() And standalone Then
-            Random.Run(Nothing)
+            random.Run(empty)
             inputPoints = New List(Of cv.Point2f)(random.points)
             dst3 = random.dst2
         End If
@@ -63,7 +63,7 @@ Public Class Delaunay_SubDiv : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If standalone Then If heartBeat() = False Then Exit Sub
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, dst2.Width, dst2.Height))
-        random.Run(Nothing)
+        random.Run(empty)
         dst2.SetTo(0)
         For Each pt In random.pointList
             subdiv.Insert(pt)
@@ -76,7 +76,7 @@ Public Class Delaunay_SubDiv : Inherits VB_Algorithm
             Next
         Next
 
-        For Each pt In random.PointList
+        For Each pt In random.pointList
             dst2.Circle(pt, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType)
         Next
 
@@ -111,7 +111,7 @@ Public Class Delaunay_Subdiv2D : Inherits VB_Algorithm
         labels(3) = "Voronoi facets for the same subdiv2D"
         desc = "Generate random points and divide the image around those points."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If heartBeat() = False Then Exit Sub ' too fast otherwise...
         dst2.SetTo(0)
         Dim points = Enumerable.Range(0, 100).Select(Of cv.Point2f)(
@@ -166,11 +166,11 @@ Public Class Delaunay_GenerationsNoKNN : Inherits VB_Algorithm
         labels = {"", "Mask of unmatched regions - generation set to 0", "Facet Image with index of each region", "Generation counts for each region."}
         desc = "Create a region in an image for each point provided with KNN."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If standalone And heartBeat() Then
             Static random As New Random_Basics
             If firstPass Then random.options.countSlider.Value = 10
-            random.Run(Nothing)
+            random.Run(empty)
             inputPoints = New List(Of cv.Point2f)(random.pointList)
         End If
 
@@ -220,16 +220,16 @@ Public Class Delaunay_Generations : Inherits VB_Algorithm
                   "Generation counts in CV_32SC1 format"}
         desc = "Create a region in an image for each point provided"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If standalone Then
             Static random As New Random_Basics
             If firstPass Then random.options.countSlider.Value = 10
-            If heartBeat() Then random.Run(Nothing)
-            inputPoints = New List(Of cv.Point2f)(random.PointList)
+            If heartBeat() Then random.Run(empty)
+            inputPoints = New List(Of cv.Point2f)(random.pointList)
         End If
 
         knn.queries = New List(Of cv.Point2f)(inputPoints)
-        knn.Run(Nothing)
+        knn.Run(empty)
 
         facet.inputPoints = New List(Of cv.Point2f)(inputPoints)
         facet.Run(src)

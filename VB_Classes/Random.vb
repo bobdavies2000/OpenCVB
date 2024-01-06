@@ -171,7 +171,7 @@ Public Class Random_LUTMask : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         Static lutMat As cv.Mat
         If heartBeat() Then
-            random.Run(Nothing)
+            random.Run(empty)
             lutMat = cv.Mat.Zeros(New cv.Size(1, 256), cv.MatType.CV_8UC3)
             Dim lutIndex = 0
             km.Run(src)
@@ -556,7 +556,7 @@ Public Class Random_60sTVFaster : Inherits VB_Algorithm
 
         cv.Cv2.Add(dst2, valMat, dst2, plusMask)
         cv.Cv2.Subtract(dst2, valMat, dst2, minusMask)
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst3 = mats.dst2
     End Sub
 End Class
@@ -617,7 +617,7 @@ Public Class Random_KalmanPoints : Inherits VB_Algorithm
         Static currSet As New List(Of cv.Point2f)
         Static refreshPoints As Boolean = True
         If refreshPoints Then
-            random.Run(Nothing)
+            random.Run(empty)
             targetSet = New List(Of cv.Point2f)(random.pointList)
             currSet = New List(Of cv.Point2f)(random.pointList) ' just to get the updated size
             refreshPoints = False

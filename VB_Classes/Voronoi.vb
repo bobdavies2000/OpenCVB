@@ -19,7 +19,7 @@ Public Class Voronoi_Basics : Inherits VB_Algorithm
         Next
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If heartBeat() Then random.Run(Nothing)
+        If heartBeat() Then random.Run(empty)
         vDemo.RunCS(dst2, random.PointList)
         vDisplay(dst2, random.PointList, cv.Scalar.Yellow)
     End Sub
@@ -41,7 +41,7 @@ Public Class Voronoi_Compare : Inherits VB_Algorithm
         desc = "C# implementations of the BruteForce and OrderedList Voronoi algorithms"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        random.Run(Nothing)
+        random.Run(empty)
         basics.vDemo.RunCS(dst2, random.PointList, True)
         basics.vDisplay(dst2, random.PointList, cv.Scalar.Yellow)
 
@@ -83,7 +83,7 @@ Public Class Voronoi_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static countSlider = findSlider("Random Pixel Count")
-        If heartBeat() Then vDemo.random.Run(Nothing)
+        If heartBeat() Then vDemo.random.Run(empty)
         Dim ptList = vbFloat2Int(vDemo.random.pointList)
         Dim handleSrc = GCHandle.Alloc(ptList.ToArray, GCHandleType.Pinned)
         Dim imagePtr = VoronoiDemo_Run(cPtr, handleSrc.AddrOfPinnedObject(), countSlider.Value, dst2.Width, dst2.Height)

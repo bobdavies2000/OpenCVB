@@ -60,7 +60,7 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
             rightView = task.rightview.Clone
         End If
 
-        feat.Run(Nothing)
+        feat.Run(empty)
         If feat.leftCorners.Count = 0 Then
             dst3.SetTo(0)
             setTrueText("No corners were found in the image.", 3)
@@ -200,7 +200,7 @@ Public Class FeatureMatch_History : Inherits VB_Algorithm
             allCorrs.Clear()
         End If
 
-        feat.Run(Nothing)
+        feat.Run(empty)
 
         allLists.Add(New List(Of linePoints)(feat.mpList))
         allCorrs.Add(New List(Of Single)(feat.corrList))

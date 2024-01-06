@@ -26,7 +26,7 @@ Public Class SuperRes_Basics : Inherits VB_Algorithm
             Exit Sub
         End If
 
-        video.Run(Nothing)
+        video.Run(empty)
         dst2 = video.dst2
 
         If optFlow Is Nothing Then
@@ -71,7 +71,7 @@ Public Class SuperRes_Input : Inherits VB_Algorithm
         desc = "Input data for the superres testing"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        video.Run(Nothing)
+        video.Run(empty)
         dst2 = video.dst2
     End Sub
 End Class
@@ -94,7 +94,7 @@ Public Class SuperRes_SubPixelZoom : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         task.mouseMovePoint = New cv.Point(45, 60)
-        video.Run(Nothing)
+        video.Run(empty)
         If video.video.captureVideo.PosFrames > 30 Then Exit Sub
         dst1 = video.dst2
         zoom.Run(video.dst2)

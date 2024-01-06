@@ -825,7 +825,7 @@ Public Class OpenGL_PeakFlat : Inherits VB_Algorithm
         labels(2) = peak.labels(3)
 
         kalman.kInput = {peak.peakFloor, peak.peakCeiling}
-        kalman.Run(Nothing)
+        kalman.Run(empty)
 
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.dataInput = New cv.Mat(2, 1, cv.MatType.CV_32F, {kalman.kOutput(0), kalman.kOutput(1)})
@@ -1434,7 +1434,7 @@ Public Class OpenGL_Profile : Inherits VB_Algorithm
         If rc.contour3D.Count > 0 Then
             Dim vecMat As New cv.Mat(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
 
-            rotate.Run(Nothing)
+            rotate.Run(empty)
             Dim output As cv.Mat = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * rotate.gMat.gMatrix ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
             vecMat = output.Reshape(3, vecMat.Rows)
 

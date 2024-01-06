@@ -378,7 +378,7 @@ Public Class PhotoShop_EmbossAll : Inherits VB_Algorithm
             dst2 = mats.mat(i) Or dst2
         Next
 
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst3 = mats.dst2
     End Sub
 End Class

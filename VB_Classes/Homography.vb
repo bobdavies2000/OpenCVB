@@ -11,9 +11,9 @@ Public Class Homography_Basics : Inherits VB_Algorithm
         Options.RunVB()
 
         If standalone And heartBeat() And options.hMethod = cv.HomographyMethods.None Then
-            random.Run(Nothing)
+            random.Run(empty)
             corners1 = New List(Of cv.Point2d)(random.PointList)
-            random.Run(Nothing)
+            random.Run(empty)
             corners2 = New List(Of cv.Point2d)(random.PointList)
         End If
 

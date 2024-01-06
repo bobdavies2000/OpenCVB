@@ -202,7 +202,7 @@ Public Class Color_ComplementaryTest : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         images.fileNameForm.filename.Text = task.homeDir + "Data/Glasses by Gilles Tran.png"
-        images.Run(Nothing)
+        images.Run(empty)
         dst2 = images.dst2
 
         comp.Run(dst2)

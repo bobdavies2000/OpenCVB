@@ -464,7 +464,7 @@ Public Class RedCloud_CoreTest : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
 
-        prep.Run(Nothing)
+        prep.Run(empty)
         prep.dst2.ConvertScaleAbs().CopyTo(reduction.dst2, task.depthMask)
 
         rMin.Run(reduction.dst2)
@@ -793,7 +793,7 @@ Public Class RedCloud_Equations : Inherits VB_Algorithm
         For Each rc As rcData In redCells
             If rc.contour.Count > 4 Then
                 eq.rc = rc
-                eq.Run(Nothing)
+                eq.Run(empty)
                 newCells.Add(eq.rc)
             End If
         Next
@@ -987,7 +987,7 @@ Public Class RedCloud_FPS : Inherits VB_Algorithm
         desc = "Display RedCloud output at a fixed frame rate"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        fps.Run(Nothing)
+        fps.Run(empty)
 
         If fps.heartBeat Then
             redC.Run(src)
@@ -1028,9 +1028,9 @@ Public Class RedCloud_PlaneColor : Inherits VB_Algorithm
         Dim fitPoints As New List(Of cv.Point3f)
         For Each rc In redC.redCells
             If options.useMaskPoints Then
-                planeMask.Run(Nothing)
+                planeMask.Run(empty)
             ElseIf options.useContourPoints Then
-                planeContour.Run(Nothing)
+                planeContour.Run(empty)
             ElseIf options.use3Points Then
                 If rc.contour.Count > 3 Then rc.eq = build3PointEquation(rc)
             End If
@@ -1293,7 +1293,7 @@ Public Class RedCloud_ProjectCell : Inherits VB_Algorithm
         mats.mat(1) = topView.dst3
         mats.mat(2) = sideView.dst2
         mats.mat(3) = sideView.dst3
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst1 = mats.dst2
         dst3 = mats.dst3
 
@@ -1500,7 +1500,7 @@ Public Class RedCloud_PlaneEq3D : Inherits VB_Algorithm
         Dim rc = task.rcSelect
         If rc.maxVec.Z Then
             eq.rc = rc
-            eq.Run(Nothing)
+            eq.Run(empty)
             rc = eq.rc
         End If
 
@@ -1799,7 +1799,7 @@ Public Class RedCloud_NearestStableCell : Inherits VB_Algorithm
         Next
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
 
-        knn.Run(Nothing)
+        knn.Run(empty)
         If knn.queries.Count < 3 Then Exit Sub
 
         dst3 = dst2.Clone
@@ -1923,7 +1923,7 @@ Public Class RedCloud_Combine2Pass : Inherits VB_Algorithm
         labels(2) = redC2.labels(2)
         mats.mat(2) = redC2.dst2.Clone
         mats.mat(3) = redC2.dst3.Clone
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

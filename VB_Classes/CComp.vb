@@ -83,7 +83,7 @@ Public Class CComp_Shapes : Inherits VB_Algorithm
         mats.mat(1) = labelview
         mats.mat(2) = binary
         mats.mat(3) = gray
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

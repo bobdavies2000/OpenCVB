@@ -262,7 +262,7 @@ Public Class Plane_EqCorrelation : Inherits VB_Algorithm
         If count(index) > plane.equations.Count / 4 Then
             Static kalman As New Kalman_Basics
             kalman.kInput = {pt(0), pt(1), pt(2), pt(3)}
-            kalman.Run(Nothing)
+            kalman.Run(empty)
 
             strOut = "Normalized Plane equation: " + Format(kalman.kOutput(0), fmt3) + "x" + s1 + Format(Math.Abs(kalman.kOutput(1)), fmt3) + "y" + s2 +
                      Format(Math.Abs(kalman.kOutput(2)), fmt3) + "z = " + Format(-kalman.kOutput(3), fmt3) + " with " + CStr(count(index)) +
@@ -387,7 +387,7 @@ Public Class Plane_Points : Inherits VB_Algorithm
                         list2Dinput.Add(list2D(ptIndex))
                     Next
 
-                    plane.Run(Nothing)
+                    plane.Run(empty)
                     strOut += vbFormatEquation(New cv.Vec4f(plane.cross.X, plane.cross.Y, plane.cross.Z, plane.k))
                     equations.Add(New cv.Vec4f(plane.cross.X, plane.cross.Y, plane.cross.Z, plane.k))
                     ptList2D.Add(list2Dinput)

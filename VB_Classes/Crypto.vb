@@ -32,7 +32,7 @@ Public Class Crypto_Hash : Inherits VB_Algorithm
                 flow.msgs.Add(guids(i))
             Next
             If guids.Count >= 25 Then guids.RemoveAt(0)
-            flow.Run(Nothing)
+            flow.Run(empty)
         End If
     End Sub
 End Class

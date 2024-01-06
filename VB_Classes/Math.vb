@@ -120,7 +120,7 @@ Public Class Math_RGBCorrelation : Inherits VB_Algorithm
         Dim redBlueCorrelation = "Red-Blue " + match.labels(2)
 
         flow.msgs.Add(blueGreenCorrelation + " " + redGreenCorrelation + " " + redBlueCorrelation)
-        flow.Run(Nothing)
+        flow.Run(empty)
         labels(2) = "Log of " + match.options.matchText
     End Sub
 End Class

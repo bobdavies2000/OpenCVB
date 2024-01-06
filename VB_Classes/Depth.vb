@@ -18,9 +18,9 @@ Public Class Depth_Basics : Inherits VB_Algorithm
             dst3 = task.maxDepthMask
             setTrueText(gMatrixToStr(task.gMatrix), 3)
         Else
-            IMUBasics.Run(Nothing)
+            IMUBasics.Run(empty)
 
-            gMat.Run(Nothing)
+            gMat.Run(empty)
             task.gMatrix = gMat.gMatrix
             If gOptions.useHistoryCloud.Checked Or gOptions.gravityPointCloud.Checked Then
 
@@ -314,7 +314,7 @@ Public Class Depth_Palette : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         gColor.gradientWidth = 255
-        gColor.Run(Nothing)
+        gColor.Run(empty)
         customColorMap = gColor.gradient
 
         Dim mult = 255 / task.maxZmeters
@@ -608,7 +608,7 @@ Public Class Depth_Smoothing : Inherits VB_Algorithm
         reduction.dst2.ConvertTo(reducedDepth, cv.MatType.CV_32F)
         colorize.Run(reducedDepth)
         dst2 = colorize.dst2
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst3 = mats.dst2
         labels(2) = smooth.labels(2)
     End Sub
@@ -879,7 +879,7 @@ Public Class Depth_World : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Dim inputRes = New cv.Size(1280, 720)
         If task.workingRes.Height = 320 Or task.workingRes.Height = 160 Then inputRes = New cv.Size(640, 480)
-        If firstPass Then template.Run(Nothing) ' intrinsics arrive with the first buffers.
+        If firstPass Then template.Run(empty) ' intrinsics arrive with the first buffers.
 
         Dim depth32f As cv.Mat = task.pcSplit(2).Clone
         If task.workingRes <> inputRes Then depth32f = depth32f.Resize(inputRes, 0, 0, cv.InterpolationFlags.Nearest)

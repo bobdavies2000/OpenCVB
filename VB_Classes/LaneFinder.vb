@@ -41,7 +41,7 @@ Public Class LaneFinder_Videos : Inherits VB_Algorithm
             Dim inputfile As New FileInfo(task.homeDir + "/Data/" + findRadioText(frm.check))
             If inputfile.Exists Then video.fileNameForm.filename.Text = inputfile.FullName
         End If
-        video.Run(Nothing)
+        video.Run(empty)
         dst2 = video.dst2
     End Sub
 End Class
@@ -59,7 +59,7 @@ Public Class LaneFinder_Edges : Inherits VB_Algorithm
         desc = "Using the videos provided, find the lane markers."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        input.Run(Nothing)
+        input.Run(empty)
         dst0 = input.dst2
         edges.Run(dst0)
         dst2 = edges.dst2
@@ -81,7 +81,7 @@ Public Class LaneFinder_HLSColor : Inherits VB_Algorithm
         desc = "Isolate the colors for the white and yellow"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        input.Run(Nothing)
+        input.Run(empty)
         dst0 = input.dst2.CvtColor(cv.ColorConversionCodes.BGR2HLS)
         dst1 = dst0.InRange(New cv.Scalar(0, 200, 0), New cv.Scalar(255, 255, 255))
         dst2 = dst0.InRange(New cv.Scalar(10, 0, 100), New cv.Scalar(40, 255, 255))
@@ -105,7 +105,7 @@ Public Class LaneFinder_ROI : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static pListList = New cv.Point()() {Nothing}
-        hls.Run(Nothing)
+        hls.Run(empty)
 
         If task.optionsChanged Then
             Dim w = hls.input.video.dst2.Width
@@ -148,7 +148,7 @@ Public Class LaneFinder_SlopeIntercept : Inherits VB_Algorithm
         desc = "Use the Hough lines found to build a slope intercept format line."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        hough.Run(Nothing)
+        hough.Run(empty)
         dst0 = hough.dst0
         dst1 = hough.dst2
         dst2 = hough.dst3

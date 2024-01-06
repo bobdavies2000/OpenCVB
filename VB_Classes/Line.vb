@@ -560,7 +560,7 @@ Public Class Line_PointSlope : Inherits VB_Algorithm
             Exit Sub
         End If
 
-        knn.Run(Nothing)
+        knn.Run(empty)
 
         Dim nextLines As New List(Of linePoints)
         Dim usedBest As New List(Of Integer)
@@ -707,7 +707,7 @@ Public Class Line_Movement : Inherits VB_Algorithm
                 dst2.SetTo(0)
             End If
             kalman.kInput = {k1.X, k1.Y, k2.X, k2.Y}
-            kalman.Run(Nothing)
+            kalman.Run(empty)
             p1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
             p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
         End If
@@ -768,7 +768,7 @@ Public Class Line_IMUVerticals : Inherits VB_Algorithm
 
         dst2 = src.Clone
 
-        gMat.Run(Nothing)
+        gMat.Run(empty)
 
         Dim points As New cv.Mat(lines3.Count, 3, cv.MatType.CV_32F, lines3.ToArray)
         Dim gPoints As cv.Mat = (points * gMat.gMatrix).ToMat
@@ -845,7 +845,7 @@ Public Class Line_IMUVerts : Inherits VB_Algorithm
             newVerts.Add(vert)
         Next
         If lines3.Count Then
-            gMat.Run(Nothing)
+            gMat.Run(empty)
 
             Dim points As New cv.Mat(lines3.Count, 3, cv.MatType.CV_32F, lines3.ToArray)
             Dim gPoints As cv.Mat = (points * gMat.gMatrix).ToMat

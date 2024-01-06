@@ -12,7 +12,7 @@ Public Class Hull_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If (standalone And heartBeat()) Or (useRandomPoints And heartBeat()) Then
-            random.Run(Nothing)
+            random.Run(empty)
             dst2 = random.dst2
             inputPoints = New List(Of cv.Point2f)(random.pointList)
         End If

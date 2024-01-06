@@ -169,7 +169,7 @@ Public Class DCT_Surfaces_debug : Inherits VB_Algorithm
 
         mats.mat(3) = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, 0)
         src(task.gridList(maxIndex)).CopyTo(mats.mat(3)(task.gridList(maxIndex)), mask(task.gridList(maxIndex)))
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst3 = mats.dst2
 
         Dim roi = task.gridList(maxIndex) ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
@@ -198,6 +198,6 @@ Public Class DCT_Surfaces_debug : Inherits VB_Algorithm
                 End If
             End If
         End If
-        flow.Run(Nothing)
+        flow.Run(empty)
     End Sub
 End Class

@@ -20,7 +20,7 @@ Public Class Plot_Basics : Inherits VB_Algorithm
             plot.srcX.Add(i)
             plot.srcY.Add(hist.histRaw(0).Get(Of Single)(i, 0))
         Next
-        plot.Run(Nothing)
+        plot.Run(empty)
         dst3 = plot.dst2
         labels(2) = hist.labels(2)
     End Sub
@@ -105,7 +105,7 @@ Public Class Plot_Depth : Inherits VB_Algorithm
             plotDepth.srcX.Add(i * task.maxZmeters / task.histogramBins)
             plotDepth.srcY.Add(hist.histogram.Get(Of Single)(i, 0))
         Next
-        plotDepth.Run(Nothing)
+        plotDepth.Run(empty)
         dst2 = plotDepth.dst2
 
         If heartBeat() Then labels(2) = plotDepth.labels(2)
@@ -229,7 +229,7 @@ Public Class Plot_OverTimeScalar : Inherits VB_Algorithm
             mats.mat(i) = plotList(i).dst2
         Next
 
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

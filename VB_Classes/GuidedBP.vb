@@ -102,7 +102,7 @@ Public Class GuidedBP_CellHistograms : Inherits VB_Algorithm
             vbDrawContour(dst0, gbp.contour, cv.Scalar.Yellow, task.lineWidth)
         End If
 
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
         dst1 = mats.dst3
 
@@ -313,7 +313,7 @@ Public Class GuidedBP_HotPointsKNN : Inherits VB_Algorithm
 
         If firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
 
-        knn.Run(Nothing)
+        knn.Run(empty)
 
         For i = 0 To knn.queries.Count - 1
             Dim p1 = knn.queries(i)

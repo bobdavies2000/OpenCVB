@@ -229,7 +229,7 @@ Public Class Binarize_Recurse : Inherits VB_Algorithm
         binarize.Run(gray)
         mats.mat(3) = binarize.dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
 
-        If standalone Then mats.Run(Nothing)
+        If standalone Then mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
         labels(3) = mats.labels(3)
@@ -297,7 +297,7 @@ Public Class Binarize_KMeansMasks : Inherits VB_Algorithm
             If i >= 3 Then Exit For
         Next
 
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
@@ -325,7 +325,7 @@ Public Class Binarize_KMeansRGB : Inherits VB_Algorithm
             src.CopyTo(mats.mat(i), km.masks(i))
             If i >= 3 Then Exit For
         Next
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

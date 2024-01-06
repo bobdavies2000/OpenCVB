@@ -636,7 +636,7 @@ Public Class PointCloud_SurfaceH_CPP : Inherits VB_Algorithm
         For i = plot.srcY.Count - 1 To 0 Step -1
             If botRow = 0 And plot.srcY(i) > 10 Then botRow = i
         Next
-        plot.Run(Nothing)
+        plot.Run(empty)
         dst3 = plot.dst2.Transpose()
         dst3 = dst3.Flip(cv.FlipMode.Y)
         labels(2) = "Top row = " + CStr(topRow) + " peak row = " + CStr(peakRow) + " bottom row = " + CStr(botRow)

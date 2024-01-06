@@ -106,7 +106,7 @@ Public Class KMeans_k2_to_k8 : Inherits VB_Algorithm
         km.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         Mats.mat(kmIndex) = km.dst2 * 255 / km.classCount
 
-        Mats.Run(Nothing)
+        Mats.Run(empty)
         dst2 = Mats.dst2
         dst3 = Mats.dst3
     End Sub
@@ -194,7 +194,7 @@ Public Class KMeans_CustomData : Inherits VB_Algorithm
             Static randslider = findSlider("Random Pixel Count")
             If firstPass Then randslider.Value = 50
             If randslider.Value < k Then randslider.Value = k
-            If heartBeat() Then random.Run(Nothing)
+            If heartBeat() Then random.Run(empty)
 
             Dim input As New List(Of Single)
             For Each pt In random.pointlist

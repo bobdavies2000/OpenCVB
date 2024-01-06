@@ -66,14 +66,14 @@ Public Class Threshold_Definitions : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         Static truncateSlider = findSlider("Threshold")
         Dim threshold = truncateSlider.value
-        gradient.Run(Nothing)
+        gradient.Run(empty)
         dst0 = gradient.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = dst0.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
         mats.mat(0) = dst0.Threshold(threshold, 255, cv.ThresholdTypes.BinaryInv)
         mats.mat(1) = dst0.Threshold(threshold, 255, cv.ThresholdTypes.Trunc)
         mats.mat(2) = dst0.Threshold(threshold, 255, cv.ThresholdTypes.Tozero)
         mats.mat(3) = dst0.Threshold(threshold, 255, cv.ThresholdTypes.TozeroInv)
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
         setTrueText("Input Gradient Image", 0)

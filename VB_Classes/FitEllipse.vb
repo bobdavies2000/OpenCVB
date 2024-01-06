@@ -158,7 +158,7 @@ Public Class FitEllipse_RedCloud : Inherits VB_Algorithm
         For Each pt In task.rcSelect.contour
             fitE.inputPoints.Add(New cv.Point2f(pt.X, pt.Y))
         Next
-        fitE.Run(Nothing)
+        fitE.Run(empty)
         dst3.SetTo(0)
         dst3.Rectangle(task.rcSelect.rect, cv.Scalar.White, task.lineWidth, task.lineType)
         dst3(task.rcSelect.rect).Ellipse(fitE.box, cv.Scalar.Yellow, task.lineWidth, task.lineType)

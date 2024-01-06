@@ -52,7 +52,7 @@ Public Class LongLine_Depth : Inherits VB_Algorithm
         Dim mm = vbMinMax(task.pcSplit(2), dst0)
 
         kalman.kInput = {mm.minLoc.X, mm.minLoc.Y, mm.maxLoc.X, mm.maxLoc.Y}
-        kalman.Run(Nothing)
+        kalman.Run(empty)
         mm.minLoc = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
         mm.maxLoc = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
 
@@ -70,7 +70,7 @@ Public Class LongLine_Depth : Inherits VB_Algorithm
                     Format(mm.maxVal, fmt1) + " meters "
 
         plot.plotData = New cv.Scalar(depth, mm.minVal, mm.maxVal)
-        plot.Run(Nothing)
+        plot.Run(empty)
         dst2 = plot.dst2
         dst3 = plot.dst3
     End Sub
@@ -141,7 +141,7 @@ Public Class LongLine_Point : Inherits VB_Algorithm
         Dim p1 = longLine.longP1
         Dim p2 = longLine.longP2
         kalman.kInput = {p1.X, p1.Y, p2.X, p2.Y}
-        kalman.Run(Nothing)
+        kalman.Run(empty)
         p1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
         p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
         longPt = New cv.Point((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
@@ -279,7 +279,7 @@ Public Class LongLine_ExtendParallel : Inherits VB_Algorithm
 
         If knn.queries.Count = 0 Then Exit Sub ' no input...possible in a dark room...
 
-        knn.Run(Nothing)
+        knn.Run(empty)
         dst2 = src.Clone
         parList.Clear()
         Dim checkList As New List(Of cv.Point)
@@ -359,12 +359,12 @@ Public Class LongLine_Coincident : Inherits VB_Algorithm
             near.p1 = cp.p1
             near.p2 = cp.p2
             near.pt = cp.p3
-            near.Run(Nothing)
+            near.Run(empty)
             If near.distance1 < maxDistance Or near.distance2 < maxDistance Then
                 coinList.Add(cp)
             Else
                 near.pt = cp.p4
-                near.Run(Nothing)
+                near.Run(empty)
                 If near.distance1 < maxDistance Or near.distance2 < maxDistance Then coinList.Add(cp)
             End If
         Next

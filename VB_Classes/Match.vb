@@ -123,7 +123,7 @@ Public Class Match_RandomTest : Inherits VB_Algorithm
             dst2.SetTo(0)
             labels(2) = options.matchText + " for " + CStr(template.Cols) + " random test samples = " + Format(correlation, "#,##0.00")
             flow.msgs.Add(options.matchText + " = " + Format(correlation, "#,##0.00"))
-            flow.Run(Nothing)
+            flow.Run(empty)
             setTrueText("The expectation is that the " + CStr(template.Cols) + " random test samples should produce" + vbCrLf +
                         " a correlation coefficient near zero" + vbCrLf +
                         "The larger the sample size, the closer to zero the correlation will be - See 'Sample Size' slider nearby." + vbCrLf +
@@ -256,7 +256,7 @@ Public Class Match_Lines : Inherits VB_Algorithm
             knn.queries.Add(New cv.Vec4f(mps.p1.X, mps.p1.Y, mps.p2.X, mps.p2.Y))
         Next
         If task.optionsChanged Then knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
-        knn.Run(Nothing)
+        knn.Run(empty)
 
         If knn.queries.Count = 0 Then Exit Sub
 
@@ -351,7 +351,7 @@ Public Class Match_PointSlope : Inherits VB_Algorithm
         Next
 
         ' templates = New List(Of cv.Mat)(newTemplates)
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst3 = mats.dst2
 
         Static strOut1 As String
@@ -662,7 +662,7 @@ Public Class Match_GoodFeatureKNN : Inherits VB_Algorithm
         good.Run(src)
 
         knn.queries = New List(Of cv.Point2f)(good.corners)
-        knn.Run(Nothing)
+        knn.Run(empty)
 
         Static frameList As New List(Of cv.Mat)
         If task.optionsChanged Then

@@ -57,7 +57,7 @@ Public Class Blob_Input : Inherits VB_Algorithm
 
         poly.Run(src)
         Mats.mat(3) = poly.dst3
-        mats.Run(Nothing)
+        mats.Run(empty)
         dst2 = Mats.dst2
         dst3 = Mats.dst3
     End Sub

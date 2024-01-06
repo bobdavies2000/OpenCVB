@@ -525,7 +525,7 @@ Public Class Motion_MinRect : Inherits VB_Algorithm
             Dim p4 = inputPoints(pty.IndexOf(pty.Min))
 
             mRect.inputPoints = New List(Of cv.Point2f)({p1, p2, p3, p4})
-            mRect.Run(Nothing)
+            mRect.Run(empty)
             drawRotatedRectangle(mRect.minRect, dst3, cv.Scalar.White)
         End If
     End Sub

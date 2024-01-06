@@ -13,7 +13,7 @@ Public Class Options_Annealing : Inherits VB_Algorithm
     Public circularFlag As Boolean
     Public successCount As Integer
     Public Sub New()
-        random.Run(Nothing) ' get the city positions (may or may not be used below.)
+        random.Run(empty) ' get the city positions (may or may not be used below.)
 
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Anneal Number of Cities", 5, 500, 25)
@@ -763,7 +763,7 @@ Public Class Options_Threshold : Inherits VB_Algorithm
             radio.check(0).Checked = True
         End If
 
-        gradient.Run(Nothing)
+        gradient.Run(empty)
         dst2 = gradient.dst2
     End Sub
     Public Sub RunVB()
