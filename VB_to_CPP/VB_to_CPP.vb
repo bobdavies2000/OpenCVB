@@ -38,7 +38,7 @@ Public Class VB_to_CPP
             If vbInput(vbIndex).Contains("End Class") Then Exit For
         Next
 
-        UpdateInfrastructure.Text = "Step 4: Add " + CPPName + " to OpenCVB interface"
+        UpdateInfrastructure.Text = "Step 5: Add " + CPPName + " to OpenCVB interface"
     End Sub
     Private Sub PrepareCPP_Click(sender As Object, e As EventArgs) Handles PrepareCPP.Click
         Dim cppCode = CPPrtb.Text
@@ -78,7 +78,7 @@ Public Class VB_to_CPP
         Dim allNames = File.ReadAllLines(input.FullName)
         Dim buttonText = UpdateInfrastructure.Text
         Dim split = buttonText.Split(" ")
-        Dim functionName = split(3)
+        Dim functionName = Trim(split(3))
         For Each line In allNames
             If line.Contains(functionName) Then
                 MsgBox(functionName + " infrastructure is already present.")
@@ -101,8 +101,8 @@ Public Class VB_to_CPP
         For Each line In externs
             sw.WriteLine(line)
             If line.Contains("new CPP_AddWeighted_Basics(rows, cols); break; }") Then
-                sw.WriteLine("case """ + functionName + "_""" + " :")
-                sw.WriteLine("{task->alg = new " + functionName + "(rows, cols); break; }")
+                sw.WriteLine(vbTab + "case " + functionName + "_" + " :")
+                sw.WriteLine(vbTab + "{task->alg = new " + functionName + "(rows, cols); break; }")
             End If
         Next
         sw.Close()
@@ -112,7 +112,7 @@ Public Class VB_to_CPP
         sw = New StreamWriter(input.FullName)
         For Each line In includeOnly
             sw.WriteLine(line)
-            If line.Contains("CPP_AddWeighted_Basics_,") Then sw.WriteLine(functionName + "_")
+            If line.Contains("CPP_AddWeighted_Basics_,") Then sw.WriteLine(functionName + "_,")
         Next
         sw.Close()
     End Sub

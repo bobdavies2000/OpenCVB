@@ -49,7 +49,7 @@ Partial Class VB_to_CPP
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(624, 35)
         Me.Label1.TabIndex = 1
-        Me.Label1.Text = "VB.Net Algorithms - select one to translate to C++"
+        Me.Label1.Text = "Step 1: VB.Net Algorithms - select one to translate to C++"
         '
         'VBrtb
         '
@@ -79,7 +79,7 @@ Partial Class VB_to_CPP
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(653, 35)
         Me.Label2.TabIndex = 4
-        Me.Label2.Text = "Step 1: Copy And paste this code into Google's Bard"
+        Me.Label2.Text = "Step 2: Copy And paste this code into Google's Bard"
         '
         'Label3
         '
@@ -89,7 +89,7 @@ Partial Class VB_to_CPP
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(624, 35)
         Me.Label3.TabIndex = 5
-        Me.Label3.Text = "Step 2: Paste output of translate from Bard here "
+        Me.Label3.Text = "Step 3: Paste output of translate from Bard here "
         '
         'PrepareCPP
         '
@@ -97,7 +97,7 @@ Partial Class VB_to_CPP
         Me.PrepareCPP.Name = "PrepareCPP"
         Me.PrepareCPP.Size = New System.Drawing.Size(328, 37)
         Me.PrepareCPP.TabIndex = 6
-        Me.PrepareCPP.Text = "Step 3: Update Bard's C++ Code"
+        Me.PrepareCPP.Text = "Step 4: Update Bard's C++ Code"
         Me.PrepareCPP.UseVisualStyleBackColor = True
         '
         'UpdateInfrastructure

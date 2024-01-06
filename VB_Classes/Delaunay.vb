@@ -3,6 +3,7 @@ Public Class Delaunay_Basics : Inherits VB_Algorithm
     Public inputPoints As New List(Of cv.Point2f)
     Public facetList As New List(Of List(Of cv.Point))
     Public facet32s As cv.Mat
+    Dim random As New Random_Enumerable
     Dim subdiv As New cv.Subdiv2D
     Public Sub New()
         facet32s = New cv.Mat(dst2.Size, cv.MatType.CV_32SC1, 0)
@@ -10,8 +11,7 @@ Public Class Delaunay_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If heartBeat() And standalone Then
-            Static random As New Random_Enumerable
-            random.Run(Nothing)
+            Random.Run(Nothing)
             inputPoints = New List(Of cv.Point2f)(random.points)
             dst3 = random.dst2
         End If

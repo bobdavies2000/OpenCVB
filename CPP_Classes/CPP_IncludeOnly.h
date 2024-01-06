@@ -97,6 +97,7 @@ vector<string> mapNames = { "Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "
 enum functions
 {
     CPP_AddWeighted_Basics_,
+CPP_Random_Enumerable_,
     CPP_Bezier_Basics_,
     CPP_Feature_Agast_,
     CPP_Resize_Basics_,
@@ -543,62 +544,115 @@ public:
 
 
 
-
-
-class CPP_Delaunay_Basics : public algorithmCPP
-{
-private:
+class CPP_Delaunay_Basics : public algorithmCPP {
 public:
-    Mat facet32s;
-    vector<Point2f> inputPoints;
-    vector<vector<Point>> facetlist;
-    Subdiv2D subdiv;
-    CPP_Random_Basics* rpt;
-    CPP_Delaunay_Basics(int rows, int cols) : algorithmCPP(rows, cols)
-    {
+    std::vector<cv::Point2f> inputPoints;
+    std::vector<std::vector<cv::Point>> facetList;
+    cv::Mat facet32s;
+    CPP_Random_Enumerable random;  // No need for static keyword in C++
+    cv::Subdiv2D subdiv;
+
+    CPP_Delaunay_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Delaunay_Basics";
-        facet32s = Mat(rows, cols, CV_32S);
-        facet32s.setTo(0);
-        rpt = new CPP_Random_Basics(rows, cols);
-        subdiv = Subdiv2D(Rect(0, 0, cols, rows));
+        facet32s = cv::Mat::zeros(dst2.size(), CV_32SC1);
         desc = "Subdivide an image based on the points provided.";
     }
-    void randomInput(Mat src)
-    {
-        rpt->Run(src);
-        inputPoints = rpt->pointList;
-    }
-    void Run(Mat src) {
-        if (task->heartBeat && standalone) randomInput(src);
-        subdiv.initDelaunay(Rect(0, 0, dst2.cols, dst2.rows));
+
+    void Run(cv::Mat src) {
+        if (task->heartBeat && standalone) {
+            random.Run(src);
+            inputPoints = random.points;
+            dst3 = random.dst2;
+        }
+
+        subdiv.initDelaunay(cv::Rect(0, 0, dst2.cols, dst2.rows));
         subdiv.insert(inputPoints);
 
-        vector<vector<Point2f>> facets;
-        vector<Point2f> centers;
-        subdiv.getVoronoiFacetList(vector<int>(), facets, centers);
+        std::vector<std::vector<cv::Point2f>> facets;
+        subdiv.getVoronoiFacetList(std::vector<int>(), facets, std::vector<cv::Point>());
 
-        vector<Vec3b> usedColors;
-        facetlist.clear();
-        dst3 = dst2.clone();
-        for (size_t i = 0; i < facets.size(); i++)
-        {
-            vector<Point> nextFacet;
-            for (size_t j = 0; j < facets[i].size(); j++)
-            {
-                nextFacet.push_back(Point(int(facets[i][j].x), int(facets[i][j].y)));
+        std::vector<cv::Vec3b> usedColors;
+        facetList.clear();
+        static cv::Mat lastColor = cv::Mat::zeros(dst2.size(), CV_8UC3);
+        for (int i = 0; i < facets.size(); i++) {
+            std::vector<cv::Point> nextFacet;
+            for (int j = 0; j < facets[i].size(); j++) {
+                nextFacet.push_back(cv::Point(facets[i][j].x, facets[i][j].y));
             }
-            facetlist.push_back(nextFacet);
 
-            Vec3b nextColor = dst3.at<Vec3b>(int(inputPoints[i].y), int(inputPoints[i].x));
-            if (count(usedColors.begin(), usedColors.end(), nextColor))
-                nextColor = Vec3b(rand() % 255, rand() % 255, rand() % 255);
+            cv::Point2f pt = inputPoints[i];
+            cv::Vec3b nextColor = lastColor.at<cv::Vec3b>(pt);
+            if (std::find(usedColors.begin(), usedColors.end(), nextColor) != usedColors.end()) {
+                nextColor = randomCellColor();
+            }
             usedColors.push_back(nextColor);
-            fillConvexPoly(dst2, nextFacet, Scalar(nextColor));
-            fillConvexPoly(facet32s, nextFacet, Scalar(i + 1));
+
+            cv::fillConvexPoly(dst2, nextFacet, cv::Scalar(nextColor[0], nextColor[1], nextColor[2]));
+
+            cv::fillConvexPoly(facet32s, nextFacet, i, task->lineType);
+            facetList.push_back(nextFacet);
         }
-        labels[2] =  "Delaunay_Basics: " + to_string(inputPoints.size()) + " cells were present.";
+        facet32s.convertTo(dst1, CV_8U);
+
+        lastColor = dst2.clone();
+        labels[2] = traceName + ": " + std::to_string(inputPoints.size()) + " cells were present.";
     }
 };
+
+//class CPP_Delaunay_Basics : public algorithmCPP
+//{
+//private:
+//public:
+//    Mat facet32s;
+//    vector<Point2f> inputPoints;
+//    vector<vector<Point>> facetlist;
+//    Subdiv2D subdiv;
+//    CPP_Random_Basics* rpt;
+//    CPP_Delaunay_Basics(int rows, int cols) : algorithmCPP(rows, cols)
+//    {
+//        traceName = "CPP_Delaunay_Basics";
+//        facet32s = Mat(rows, cols, CV_32S);
+//        facet32s.setTo(0);
+//        rpt = new CPP_Random_Basics(rows, cols);
+//        subdiv = Subdiv2D(Rect(0, 0, cols, rows));
+//        desc = "Subdivide an image based on the points provided.";
+//    }
+//    void randomInput(Mat src)
+//    {
+//        rpt->Run(src);
+//        inputPoints = rpt->pointList;
+//    }
+//    void Run(Mat src) {
+//        if (task->heartBeat && standalone) randomInput(src);
+//        subdiv.initDelaunay(Rect(0, 0, dst2.cols, dst2.rows));
+//        subdiv.insert(inputPoints);
+//
+//        vector<vector<Point2f>> facets;
+//        vector<Point2f> centers;
+//        subdiv.getVoronoiFacetList(vector<int>(), facets, centers);
+//
+//        vector<Vec3b> usedColors;
+//        facetlist.clear();
+//        dst3 = dst2.clone();
+//        for (size_t i = 0; i < facets.size(); i++)
+//        {
+//            vector<Point> nextFacet;
+//            for (size_t j = 0; j < facets[i].size(); j++)
+//            {
+//                nextFacet.push_back(Point(int(facets[i][j].x), int(facets[i][j].y)));
+//            }
+//            facetlist.push_back(nextFacet);
+//
+//            Vec3b nextColor = dst3.at<Vec3b>(int(inputPoints[i].y), int(inputPoints[i].x));
+//            if (count(usedColors.begin(), usedColors.end(), nextColor))
+//                nextColor = Vec3b(rand() % 255, rand() % 255, rand() % 255);
+//            usedColors.push_back(nextColor);
+//            fillConvexPoly(dst2, nextFacet, Scalar(nextColor));
+//            fillConvexPoly(facet32s, nextFacet, Scalar(i + 1));
+//        }
+//        labels[2] =  "Delaunay_Basics: " + to_string(inputPoints.size()) + " cells were present.";
+//    }
+//};
 
 
 
