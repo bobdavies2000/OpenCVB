@@ -4,7 +4,7 @@
 CPP_Grid_Basics* gridBasics;
 
 extern "C" __declspec(dllexport)
-int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWeightPercent, 
+int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWeighted, 
                    int lineWidth, int lineType, int dotSize,
                    int gridSize, int histogramBins, bool gravityPointCloud, int pixelDiffThreshold,
                    bool useKalman, int paletteIndex, bool optionsChanged, int frameHistory,
@@ -19,7 +19,7 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     task->dotSize = dotSize;
     task->pixelDiffThreshold = pixelDiffThreshold;
     task->gravityPointCloud = gravityPointCloud;
-    task->addWeightPercent = double(addWeightPercent);
+    task->addWeighted = double(addWeighted);
     task->gridSize = gridSize;
     task->histogramBins = histogramBins;
     task->useKalman = useKalman;
@@ -277,11 +277,11 @@ int* cppTask_GetDst3(cppTask * task)
 
 extern "C" __declspec(dllexport)
 int* cppTask_RunCPP(cppTask * task, int* dataPtr, int channels, int frameCount, int rows, int cols, float x, float y, float z,
-                    bool optionsChanged, bool heartBeat, bool displayDst0, bool displayDst1, float addWeightedPercent)
+                    bool optionsChanged, bool heartBeat, bool displayDst0, bool displayDst1, float addWeighted)
 {
     task->optionsChanged = optionsChanged;
     task->heartBeat = heartBeat;
-    task->addWeightPercent = double(addWeightedPercent);
+    task->addWeighted = double(addWeighted);
     task->displayDst0 = displayDst0;
     task->displayDst1 = displayDst1;
     task->accRadians = Point3f(x, y, z);

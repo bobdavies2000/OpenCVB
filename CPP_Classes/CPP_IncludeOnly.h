@@ -194,7 +194,7 @@ public:
     Scalar fontColor;
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
 
-    bool optionsChanged; double addWeightPercent; bool heartBeat; int dotSize; int gridSize; float maxDepth;
+    bool optionsChanged; double addWeighted; bool heartBeat; int dotSize; int gridSize; float maxDepth;
     int histogramBins; int pixelDiffThreshold; bool gravityPointCloud; bool useKalman;
     int paletteIndex; int polyCount; bool firstPass; Scalar highlightColor; int frameHistory;
     Point clickPoint; bool mouseClickFlag; int mousePicTag; Point mouseMovePoint; bool mouseMovePointUpdated;
@@ -350,35 +350,41 @@ cppTask* task;
 
 
 
-class CPP_AddWeighted_Basics : public algorithmCPP
-{
-private:
+class CPP_AddWeighted_Basics : public algorithmCPP {
 public:
-    Mat src2;
-    CPP_AddWeighted_Basics(int rows, int cols) : algorithmCPP(rows, cols) 
-    {
+    cv::Mat src2;
+
+    CPP_AddWeighted_Basics(int rows, int cols) {
         traceName = "CPP_AddWeighted_Basics";
         desc = "Add 2 images with specified weights.";
     }
 
-    void Run(Mat src) 
-    {
-        if (standalone) src2 = task->depthRGB;
-        if (src.type() != src2.type()) {
-            if (src.type() == CV_8UC3 || src2.type() == CV_8UC3) {
-                if (src.type() == CV_32FC1) src = task->normalize32f(src);
-                if (src2.type() == CV_32FC1) src2 = task->normalize32f(src2);
-                if (src.type() != CV_8UC3) cvtColor(src, src, COLOR_GRAY2BGR);
-                if (src2.type() != CV_8UC3) cvtColor(src2, src2, COLOR_GRAY2BGR);
-            }
-            else {
-                throw std::invalid_argument("The images must have the same type.");
+    void Run(cv::Mat src) {
+        cv::Mat srcPlus = src2;
+        if (standalone || src2.empty()) {
+            srcPlus = task->depthRGB;
+        }
+
+        if (srcPlus.type() != src.type()) {
+            if (src.type() != CV_8UC3 || srcPlus.type() != CV_8UC3) {
+                if (src.type() == CV_32FC1) {
+                    src.convertTo(src, CV_8UC1, 255.0);  // Normalize 32-bit float
+                }
+                if (srcPlus.type() == CV_32FC1) {
+                    srcPlus.convertTo(srcPlus, CV_8UC1, 255.0);
+                }
+                if (src.type() != CV_8UC3) {
+                    cv::cvtColor(src, src, cv::COLOR_GRAY2BGR);
+                }
+                if (srcPlus.type() != CV_8UC3) {
+                    cv::cvtColor(srcPlus, srcPlus, cv::COLOR_GRAY2BGR);
+                }
             }
         }
 
-        double wt = task->addWeightPercent / 100.0;
-        addWeighted(src, wt, src2, 1.0 - wt, 0, dst2);
-        labels[2] = "depth " + std::to_string(100 * (1.0 - wt)) + " BGR " + std::to_string(100 * wt);
+        double wt = task->addWeighted;
+        cv::addWeighted(src, wt, srcPlus, 1.0 - wt, 0.0, dst2);  // Ensure correct syntax
+        labels[2] = "depth " + std::to_string((int)((1 - wt) * 100)) + " BGR " + std::to_string((int)(wt * 100));
     }
 };
 
@@ -2709,6 +2715,7 @@ public:
                 p1 = p2;
             }
         }
+        labels[2] = "Bezier output";
     }
 };
 

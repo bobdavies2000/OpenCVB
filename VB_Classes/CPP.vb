@@ -67,7 +67,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
                                       task.accRadians.X, task.accRadians.Y, task.accRadians.Z,
                                       task.optionsChanged,
                                       heartBeat(), gOptions.displayDst0.Checked, gOptions.displayDst1.Checked,
-                                      gOptions.AddWeightedSlider.Value)
+                                      task.AddWeighted)
         handleInput.Free()
         getOptions()
 
@@ -93,7 +93,7 @@ End Class
 Module CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function cppTask_Open(cppFunction As Integer, rows As Integer, cols As Integer,
-                                 heartBeat As Boolean, addWeightPercent As Single, lineWidth As Integer,
+                                 heartBeat As Boolean, addWeighted As Single, lineWidth As Integer,
                                  lineType As Integer, dotSize As Integer, gridSize As Integer,
                                  histogramBins As Integer, ocvheartBeat As Boolean, gravityPointCloud As Boolean,
                                  pixelDiffThreshold As Integer, useKalman As Boolean, paletteIndex As Integer,
@@ -110,7 +110,7 @@ Module CPP_Module
     Public Function cppTask_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, channels As Integer, frameCount As Integer,
                                    rows As Integer, cols As Integer, x As Single, y As Single, z As Single,
                                    optionsChanged As Boolean, heartBeat As Boolean, displayDst0 As Boolean,
-                                   displayDst1 As Boolean, addWeightedPercent As Single) As IntPtr
+                                   displayDst1 As Boolean, addWeighted As Single) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function cppTask_PointCloud(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr

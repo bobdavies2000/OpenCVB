@@ -96,7 +96,7 @@ Partial Class VB_to_CPP
         Me.PrepareCPP.Name = "PrepareCPP"
         Me.PrepareCPP.Size = New System.Drawing.Size(417, 37)
         Me.PrepareCPP.TabIndex = 6
-        Me.PrepareCPP.Text = "Review and update the C++ Code"
+        Me.PrepareCPP.Text = "Review and update Bard's C++ Code"
         Me.PrepareCPP.UseVisualStyleBackColor = True
         '
         'VB_to_CPP
