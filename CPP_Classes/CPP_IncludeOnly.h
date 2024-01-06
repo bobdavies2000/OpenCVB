@@ -97,7 +97,7 @@ vector<string> mapNames = { "Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "
 enum functions
 {
     CPP_AddWeighted_Basics_,
-CPP_Random_Enumerable_,
+    CPP_Random_Enumerable_,
     CPP_Bezier_Basics_,
     CPP_Feature_Agast_,
     CPP_Resize_Basics_,
@@ -155,7 +155,7 @@ class algorithmCPP
 {
 private:
 public:
-    Mat dst0, dst1, dst2, dst3;
+    Mat dst0, dst1, dst2, dst3, empty;
     bool standalone;
     String advice;
     String desc;
@@ -243,7 +243,7 @@ public:
         vec.assign((Point *)hull2i.data, (Point *)hull2i.data + hull2i.total());
         return vec;
     }
-    void setText(String text, Mat dst, Point2f pt = Point2f(10, 50))
+    void setTrueText(String text, Mat dst, Point2f pt = Point2f(10, 50))
     {
         if (cppFunction < 0) return;
         putText(dst, text, pt, this->font, this->fontSize, this->fontColor);
@@ -258,6 +258,15 @@ public:
             minMaxLoc(mat, &mm.minVal, &mm.maxVal, &mm.minLoc, &mm.maxLoc, mask);
         }
         return mm;
+    }
+    Vec3b randomCellColor() {
+        static std::random_device rd;
+        static std::mt19937 gen(rd());  // Mersenne Twister engine for randomness
+        std::uniform_int_distribution<> dist(50, 240);
+
+        // Generate three random values between 50 and 240 (inclusive)
+        // using std::uniform_int_distribution for more control over range
+        return cv::Vec3b(dist(gen), dist(gen), dist(gen));
     }
     void AddPlotScale(Mat dst, double minVal, double maxVal, int lineCount) {
         auto spacer = int(dst.rows / (lineCount + 1));
@@ -275,7 +284,7 @@ public:
                 strOut = to_string(int(nextVal / 1000)) + "k";
             else
                 strOut = to_string(int(nextVal));
-            setText(strOut, dst, p1);
+            setTrueText(strOut, dst, p1);
         }
     }
     Mat normalize32f(Mat input)
@@ -544,35 +553,71 @@ public:
 
 
 
-class CPP_Delaunay_Basics : public algorithmCPP {
+class CPP_Random_Enumerable : public algorithmCPP {
 public:
-    std::vector<cv::Point2f> inputPoints;
-    std::vector<std::vector<cv::Point>> facetList;
-    cv::Mat facet32s;
-    CPP_Random_Enumerable random;  // No need for static keyword in C++
-    cv::Subdiv2D subdiv;
+    int sizeRequest = 100;
+    std::vector<cv::Point2f> points;
 
-    CPP_Delaunay_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
-        traceName = "CPP_Delaunay_Basics";
-        facet32s = cv::Mat::zeros(dst2.size(), CV_32SC1);
-        desc = "Subdivide an image based on the points provided.";
+    CPP_Random_Enumerable(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_Random_Enumerable";
+        desc = "Create an enumerable list of points using a lambda function";
     }
 
     void Run(cv::Mat src) {
+        std::random_device rd;
+        std::mt19937 gen(rd());  // Mersenne Twister engine for randomness
+        std::uniform_int_distribution<> dist_width(0, dst2.cols - 1);  // Ensure width is within bounds
+        std::uniform_int_distribution<> dist_height(0, dst2.rows - 1); // Ensure height is within bounds
+
+        points.clear();
+        for (int i = 0; i < sizeRequest; i++) {
+            points.push_back(cv::Point2f(dist_width(gen), dist_height(gen)));
+        }
+
+        dst2 = cv::Mat::zeros(dst2.size(), dst2.type());  // Set dst2 to black
+        for (const cv::Point2f& pt : points) {
+            cv::circle(dst2, pt, task->dotSize, cv::Scalar(0, 255, 255), -1, task->lineType, 0);
+        }
+    }
+};
+
+
+
+class CPP_Delaunay_Basics : public algorithmCPP {
+public:
+    std::vector<cv::Point2f> inputPoints;
+    cv::Mat facet32s;
+    CPP_Random_Enumerable* randEnum;
+    cv::Subdiv2D subdiv;
+    vector<vector<Point>> facetlist;
+
+    CPP_Delaunay_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_Delaunay_Basics";
+        randEnum = new CPP_Random_Enumerable(rows, cols);
+        facet32s = cv::Mat::zeros(dst2.size(), CV_32SC1);
+        desc = "Subdivide an image based on the points provided.";
+    }
+    void randomInput(Mat src)
+    {
+        randEnum->Run(src);
+        inputPoints = randEnum->points;
+    }
+    void Run(cv::Mat src) {
         if (task->heartBeat && standalone) {
-            random.Run(src);
-            inputPoints = random.points;
-            dst3 = random.dst2;
+            randEnum->Run(src);
+            inputPoints = randEnum->points;
+            dst3 = randEnum->dst2;
         }
 
         subdiv.initDelaunay(cv::Rect(0, 0, dst2.cols, dst2.rows));
         subdiv.insert(inputPoints);
 
         std::vector<std::vector<cv::Point2f>> facets;
-        subdiv.getVoronoiFacetList(std::vector<int>(), facets, std::vector<cv::Point>());
+        vector<Point2f> centers;
+        subdiv.getVoronoiFacetList(std::vector<int>(), facets, centers);
 
         std::vector<cv::Vec3b> usedColors;
-        facetList.clear();
+        facetlist.clear();
         static cv::Mat lastColor = cv::Mat::zeros(dst2.size(), CV_8UC3);
         for (int i = 0; i < facets.size(); i++) {
             std::vector<cv::Point> nextFacet;
@@ -583,14 +628,14 @@ public:
             cv::Point2f pt = inputPoints[i];
             cv::Vec3b nextColor = lastColor.at<cv::Vec3b>(pt);
             if (std::find(usedColors.begin(), usedColors.end(), nextColor) != usedColors.end()) {
-                nextColor = randomCellColor();
+                nextColor = task->randomCellColor();
             }
             usedColors.push_back(nextColor);
 
             cv::fillConvexPoly(dst2, nextFacet, cv::Scalar(nextColor[0], nextColor[1], nextColor[2]));
 
             cv::fillConvexPoly(facet32s, nextFacet, i, task->lineType);
-            facetList.push_back(nextFacet);
+            facetlist.push_back(nextFacet);
         }
         facet32s.convertTo(dst1, CV_8U);
 
@@ -599,101 +644,60 @@ public:
     }
 };
 
-//class CPP_Delaunay_Basics : public algorithmCPP
-//{
-//private:
-//public:
-//    Mat facet32s;
-//    vector<Point2f> inputPoints;
-//    vector<vector<Point>> facetlist;
-//    Subdiv2D subdiv;
-//    CPP_Random_Basics* rpt;
-//    CPP_Delaunay_Basics(int rows, int cols) : algorithmCPP(rows, cols)
-//    {
-//        traceName = "CPP_Delaunay_Basics";
-//        facet32s = Mat(rows, cols, CV_32S);
-//        facet32s.setTo(0);
-//        rpt = new CPP_Random_Basics(rows, cols);
-//        subdiv = Subdiv2D(Rect(0, 0, cols, rows));
-//        desc = "Subdivide an image based on the points provided.";
-//    }
-//    void randomInput(Mat src)
-//    {
-//        rpt->Run(src);
-//        inputPoints = rpt->pointList;
-//    }
-//    void Run(Mat src) {
-//        if (task->heartBeat && standalone) randomInput(src);
-//        subdiv.initDelaunay(Rect(0, 0, dst2.cols, dst2.rows));
-//        subdiv.insert(inputPoints);
-//
-//        vector<vector<Point2f>> facets;
-//        vector<Point2f> centers;
-//        subdiv.getVoronoiFacetList(vector<int>(), facets, centers);
-//
-//        vector<Vec3b> usedColors;
-//        facetlist.clear();
-//        dst3 = dst2.clone();
-//        for (size_t i = 0; i < facets.size(); i++)
-//        {
-//            vector<Point> nextFacet;
-//            for (size_t j = 0; j < facets[i].size(); j++)
-//            {
-//                nextFacet.push_back(Point(int(facets[i][j].x), int(facets[i][j].y)));
-//            }
-//            facetlist.push_back(nextFacet);
-//
-//            Vec3b nextColor = dst3.at<Vec3b>(int(inputPoints[i].y), int(inputPoints[i].x));
-//            if (count(usedColors.begin(), usedColors.end(), nextColor))
-//                nextColor = Vec3b(rand() % 255, rand() % 255, rand() % 255);
-//            usedColors.push_back(nextColor);
-//            fillConvexPoly(dst2, nextFacet, Scalar(nextColor));
-//            fillConvexPoly(facet32s, nextFacet, Scalar(i + 1));
-//        }
-//        labels[2] =  "Delaunay_Basics: " + to_string(inputPoints.size()) + " cells were present.";
-//    }
-//};
 
 
 
 
-
-
-
-
-class CPP_Delaunay_GenerationsNoKNN : public algorithmCPP
-{
-private:
+class CPP_Delaunay_GenerationsNoKNN : public algorithmCPP {
 public:
-    CPP_Delaunay_Basics* basics;
-    CPP_Delaunay_GenerationsNoKNN(int rows, int cols) : algorithmCPP(rows, cols)
-    {
+    std::vector<cv::Point2f> inputPoints;
+    CPP_Random_Basics* random;
+    CPP_Delaunay_Basics* facet;
+
+    CPP_Delaunay_GenerationsNoKNN(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Delaunay_GenerationsNoKNN";
-        basics = new CPP_Delaunay_Basics(rows, cols);
-        desc = "Create a region in an image for each point provided without KNN.";
+        facet = new CPP_Delaunay_Basics(rows, cols);
+        random = new CPP_Random_Basics(rows, cols);
+        dst3 = cv::Mat::zeros(dst3.size(), CV_32S);
+        labels = { "", "Mask of unmatched regions - generation set to 0", "Facet Image with index of each region", "Generation counts for each region." };
+        desc = "Create a region in an image for each point provided with KNN.";
     }
-    void Run(Mat src) {
-        if (task->heartBeat && standalone) basics->randomInput(src);
 
-        basics->Run(src);
-        dst2 = basics->dst2;
-
-        if (task->firstPass) dst0 = basics->facet32s.clone();
-        Mat generationMap = dst0.clone();
-        vector<int> usedG;
-        for (size_t i = 0; i < basics->inputPoints.size(); i++)
-        {
-            Point2f pt = basics->inputPoints[i];
-            int g = generationMap.at<int>( int(pt.y), int(pt.x)) + 1;
-            while (count(usedG.begin(), usedG.end(), g)) g++;
-            usedG.push_back(g);
-            if (i < int(basics->facetlist.size()))
-            {
-                vector<Point> nextFacet = basics->facetlist[i];
-                fillConvexPoly(dst0, nextFacet, g);
-            }
-            task->setText(to_string(g), dst2, pt);
+    void Run(cv::Mat src) {
+        if (standalone && task->heartBeat) {
+            random->Run(empty);
+            inputPoints = random->pointList;   
         }
+
+        facet->inputPoints = inputPoints;
+        facet->Run(src);
+        dst2 = facet->dst2;
+
+        cv::Mat generationMap = dst3.clone();
+        if (task->heartBeat) generationMap.setTo(0);
+        dst3.setTo(0);
+        std::vector<int> usedG;
+        int g;
+        for (const auto& pt : inputPoints) {
+            int index = facet->facet32s.at<int>(pt.y, pt.x);
+            if (index >= facet->facetlist.size()) continue;
+            std::vector<cv::Point> nextFacet = facet->facetlist[index];
+
+            // Ensure unique generation numbers
+            if (task->firstPass) {
+                g = usedG.size();
+            }
+            else {
+                g = generationMap.at<int>(pt.y, pt.x) + 1;
+                while (std::find(usedG.begin(), usedG.end(), g) != usedG.end()) {
+                    g++;
+                }
+            }
+            fillConvexPoly(dst3, nextFacet, g, task->lineType);
+            usedG.push_back(g);
+            task->setTrueText(std::to_string(g), dst2, pt);   
+        }
+        generationMap = dst3.clone();
     }
 };
 
@@ -790,7 +794,7 @@ public:
         if (standalone) generateRandom(src);
         if (queries.size() == 0)
         {
-            task->setText("No queries were provided", dst2);
+            task->setTrueText("No queries were provided", dst2);
             return;
         }
         if (trainInput.size() == 0) trainInput = queries; 
@@ -829,7 +833,7 @@ public:
             circle(dst2, pt, task->dotSize + 3, RED, -1, task->lineType);
         }
         
-        task->setText("KNN - red is training data, green = queries", dst3);
+        task->setTrueText("KNN - red is training data, green = queries", dst3);
         if (task->heartBeat) dst3.setTo(0);
         bitwise_or(dst2, dst3, dst3);
     }
@@ -912,7 +916,7 @@ public:
             }
         }
         if (standalone == false) basics->trainInput = basics->queries;
-        task->setText("KNN_Lossy - red is training data, green = queries", dst3);
+        task->setTrueText("KNN_Lossy - red is training data, green = queries", dst3);
     }
 };
 
@@ -967,7 +971,7 @@ public:
             {
                 vector<Point> nextFacet = basics->facetlist[i];
                 fillConvexPoly(dst0, nextFacet, Scalar(g, g, g));
-                task->setText(to_string(g), dst2, pt);
+                task->setTrueText(to_string(g), dst2, pt);
             }
         }
     }
@@ -1054,7 +1058,7 @@ public:
             generations.push_back(g);
             vector<Point> nextFacet = facetGen->basics->facetlist[fIndex];
             ptList.push_back(pt);
-            task->setText(to_string(g), dst2, pt);
+            task->setTrueText(to_string(g), dst2, pt);
         }
 
         auto iter = max_element(generations.begin(), generations.end());
@@ -1066,7 +1070,7 @@ public:
             vector<Point> bestFacet = facetGen->basics->facetlist[index];
             fillConvexPoly(dst2, bestFacet, BLACK, task->lineType);
             task->drawContour(dst2, bestFacet, YELLOW);
-            task->setText(to_string(generations[index]), dst2, anchorPoint);
+            task->setTrueText(to_string(generations[index]), dst2, anchorPoint);
         }
 
         dst3 = src.clone();
@@ -1111,7 +1115,7 @@ public:
             circle(dst2, pt, task->dotSize, YELLOW, task->lineWidth, task->lineType);
             g = basics->facetGen->dst0.at<int>(pt.y, pt.x);
             goodCounts[g] = i;
-            task->setText(to_string(g), dst2, pt);
+            task->setTrueText(to_string(g), dst2, pt);
         }
     }
 };
@@ -1143,7 +1147,7 @@ public:
 //        {
 //            Point2f pt = stable->basics->ptList[index.second];
 //            int g = stable->basics->facetGen->dst0.at<int>(pt.y, pt.x);
-//            task->setText(to_string(g), dst2, pt);
+//            task->setTrueText(to_string(g), dst2, pt);
 //            if (i++ < task->polyCount) poly.push_back(pt);
 //        }
 //
@@ -1480,7 +1484,7 @@ public:
         //qt->cy = cos(rotateY * PI / 180);
         //qt->sy = sin(rotateY * PI / 180);
         qt->Run(src);
-        task->setText("task->gMatrix is set...", dst2);
+        task->setTrueText("task->gMatrix is set...", dst2);
     }
 };
 
@@ -1513,7 +1517,7 @@ public:
         if (option_resizeFactor != 1) {
             resize(dst0, dst1, Size(int((dst2.cols * option_resizeFactor)), int((dst2.rows * option_resizeFactor))));
         }
-        task->setText("gCloud is ready for use", dst3);
+        task->setTrueText("gCloud is ready for use", dst3);
 
         cloud->Run(task->gCloud);
         dst2 = cloud->dst2;
@@ -1705,7 +1709,7 @@ public:
         srcMin = mm.minVal;
         srcMax = mm.maxVal;
         if (mm.minVal == mm.maxVal) {
-            task->setText("The input image is empty - srcMin and srcMax are both zero...", dst2);
+            task->setTrueText("The input image is empty - srcMin and srcMax are both zero...", dst2);
             return;
         }
         int chan[] = { 0 };
@@ -1743,7 +1747,7 @@ public:
         if (input.channels() != 1) cvtColor(input, input, COLOR_BGR2GRAY);
         hist->Run(input);
         if (hist->srcMin == hist->srcMax) {
-            task->setText("The input image is empty - srcMin and srcMax are both zero...", dst2);
+            task->setTrueText("The input image is empty - srcMin and srcMax are both zero...", dst2);
             return;
         }
         dst2 = hist->dst2;
@@ -2719,33 +2723,3 @@ public:
     }
 };
 
-
-
-
-class CPP_Random_Enumerable : public algorithmCPP {
-public:
-    int sizeRequest = 100;
-    std::vector<cv::Point2f> points;
-
-    CPP_Random_Enumerable(int rows, int cols) : algorithmCPP(rows, cols) {
-        traceName = "CPP_Random_Enumerable";
-        desc = "Create an enumerable list of points using a lambda function";
-    }
-
-    void Run(cv::Mat src) {
-        std::random_device rd;
-        std::mt19937 gen(rd());  // Mersenne Twister engine for randomness
-        std::uniform_int_distribution<> dist_width(0, dst2.cols - 1);  // Ensure width is within bounds
-        std::uniform_int_distribution<> dist_height(0, dst2.rows - 1); // Ensure height is within bounds
-
-        points.clear();
-        for (int i = 0; i < sizeRequest; i++) {
-            points.push_back(cv::Point2f(dist_width(gen), dist_height(gen)));
-        }
-
-        dst2 = cv::Mat::zeros(dst2.size(), dst2.type());  // Set dst2 to black
-        for (const cv::Point2f& pt : points) {
-            cv::circle(dst2, pt, task->dotSize, cv::Scalar(0, 255, 255), -1, task->lineType, 0);
-        }
-    }
-};

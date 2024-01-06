@@ -52,15 +52,11 @@ Public Class VB_to_CPP
                 split(i) = split(i).Replace("{", ": public algorithmCPP" + " {")
                 split(i) = split(i).Replace("class ", "class CPP_")
             End If
-            If split(i).Contains("// Assuming") Then
-                split(i) = split(i).Substring(0, split(i).IndexOf("// Assuming"))
-            End If
-            If split(i).Contains("// Explicit") Then
-                split(i) = split(i).Substring(0, split(i).IndexOf("// Explicit"))
-            End If
-            If split(i).Contains("// Corrected") Then
-                split(i) = split(i).Substring(0, split(i).IndexOf("// Corrected"))
-            End If
+
+            split(i) = split(i).Replace("// Explicit", "")
+            split(i) = split(i).Replace("// Assuming", "")
+            split(i) = split(i).Replace("// Corrected", "")
+            split(i) = split(i).Replace("// No need for static keyword", "")
 
             If Trim(split(i)).StartsWith(functionName) Then
                 split(i) = split(i).Replace(functionName + "()", "CPP_" + functionName +
@@ -70,6 +66,8 @@ Public Class VB_to_CPP
 
             split(i) = split(i).Replace("task.", "task->")
             split(i) = split(i).Replace("heartBeat()", "task->heartBeat")
+            split(i) = split(i).Replace("firstPass", "task->firstPass")
+            split(i) = split(i).Replace("setTrueText", "task->setTrueText")
             CPPrtb.Text += split(i) + vbCrLf
         Next
     End Sub
@@ -112,7 +110,7 @@ Public Class VB_to_CPP
         sw = New StreamWriter(input.FullName)
         For Each line In includeOnly
             sw.WriteLine(line)
-            If line.Contains("CPP_AddWeighted_Basics_,") Then sw.WriteLine(functionName + "_,")
+            If line.Contains("CPP_AddWeighted_Basics_,") Then sw.WriteLine(vbTab + functionName + "_,")
         Next
         sw.Close()
     End Sub

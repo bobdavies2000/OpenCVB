@@ -327,9 +327,10 @@ int* cppTask_RunCPP(cppTask * task, int* dataPtr, int channels, int frameCount, 
     task->xdst1 = task->alg->dst1;
     task->xdst2 = task->alg->dst2;
     task->xdst3 = task->alg->dst3;
-    if (task->alg->dst0.type() == CV_8U) cvtColor(task->alg->dst0, task->xdst0, COLOR_GRAY2BGR);
-    if (task->alg->dst1.type() == CV_8U) cvtColor(task->alg->dst1, task->xdst1, COLOR_GRAY2BGR);
-    if (task->alg->dst2.type() == CV_8U) cvtColor(task->alg->dst2, task->xdst2, COLOR_GRAY2BGR);
-    if (task->alg->dst3.type() == CV_8U) cvtColor(task->alg->dst3, task->xdst3, COLOR_GRAY2BGR);
+    if (task->alg->dst3.type() == CV_32S) task->alg->dst3.convertTo(task->xdst3, CV_8U);
+    if (task->xdst0.type() == CV_8U) cvtColor(task->xdst0, task->xdst0, COLOR_GRAY2BGR);
+    if (task->xdst1.type() == CV_8U) cvtColor(task->xdst1, task->xdst1, COLOR_GRAY2BGR);
+    if (task->xdst2.type() == CV_8U) cvtColor(task->xdst2, task->xdst2, COLOR_GRAY2BGR);
+    if (task->xdst3.type() == CV_8U) cvtColor(task->xdst3, task->xdst3, COLOR_GRAY2BGR);
     return (int*)task->xdst2.data;
 }

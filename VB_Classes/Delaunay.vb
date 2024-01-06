@@ -3,7 +3,7 @@ Public Class Delaunay_Basics : Inherits VB_Algorithm
     Public inputPoints As New List(Of cv.Point2f)
     Public facetList As New List(Of List(Of cv.Point))
     Public facet32s As cv.Mat
-    Dim random As New Random_Enumerable
+    Dim randEnum As New Random_Enumerable
     Dim subdiv As New cv.Subdiv2D
     Public Sub New()
         facet32s = New cv.Mat(dst2.Size, cv.MatType.CV_32SC1, 0)
@@ -11,9 +11,9 @@ Public Class Delaunay_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If heartBeat() And standalone Then
-            random.Run(empty)
-            inputPoints = New List(Of cv.Point2f)(random.points)
-            dst3 = random.dst2
+            randEnum.Run(empty)
+            inputPoints = New List(Of cv.Point2f)(randEnum.points)
+            dst3 = randEnum.dst2
         End If
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
@@ -164,7 +164,7 @@ Public Class Delaunay_GenerationsNoKNN : Inherits VB_Algorithm
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32S, 0)
         labels = {"", "Mask of unmatched regions - generation set to 0", "Facet Image with index of each region", "Generation counts for each region."}
-        desc = "Create a region in an image for each point provided with KNN."
+        desc = "Create a region in an image for each point provided without using KNN."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone And heartBeat() Then
