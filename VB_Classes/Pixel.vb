@@ -364,7 +364,7 @@ Public Class Pixel_SampleColor : Inherits VB_Algorithm
         Dim counts As New List(Of Integer)
         Dim pixel0 = New cv.Vec3b
         random.Run(Nothing)
-        For Each pt In random.PointList
+        For Each pt In random.pointList
             Dim pixel = src.Get(Of cv.Vec3b)(pt.Y, pt.X)
             If pixel <> pixel0 Then
                 If pixels.Contains(pixel) Then

@@ -412,7 +412,7 @@ public:
         pointList.clear();
         if (!task->paused) {
             while (pointList.size() < sizeRequest) {
-                pointList.push_back(Point2f(range.x + float((rand() % dst2.cols)), range.y + float((rand() % dst2.rows))));
+                pointList.push_back(Point2f(range.x + float((rand() % range.width)), range.y + float((rand() % range.height))));
             }
 
             dst2.setTo(0);
