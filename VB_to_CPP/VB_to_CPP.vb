@@ -56,6 +56,7 @@ Public Class VB_to_CPP
             split(i) = split(i).Replace("// Explicit", "")
             split(i) = split(i).Replace("// Assuming", "")
             split(i) = split(i).Replace("// Corrected", "")
+            split(i) = split(i).Replace("// Create", "")
             split(i) = split(i).Replace("// No need for static keyword", "")
 
             If Trim(split(i)).StartsWith(functionName) Then

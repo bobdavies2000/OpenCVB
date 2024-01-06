@@ -49,7 +49,7 @@ Partial Class VB_to_CPP
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(624, 35)
         Me.Label1.TabIndex = 1
-        Me.Label1.Text = "Step 1: VB.Net Algorithms - select one to translate to C++"
+        Me.Label1.Text = "Step 1: select a VB.Net algorithm to translate to C++"
         '
         'VBrtb
         '
@@ -77,9 +77,9 @@ Partial Class VB_to_CPP
         Me.Label2.Location = New System.Drawing.Point(18, 151)
         Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(653, 35)
+        Me.Label2.Size = New System.Drawing.Size(978, 35)
         Me.Label2.TabIndex = 4
-        Me.Label2.Text = "Step 2: Copy And paste this code into Google's Bard"
+        Me.Label2.Text = "Step 2: Copy And paste this code into Google's Bard (it includes instruction.)"
         '
         'Label3
         '

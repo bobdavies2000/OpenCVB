@@ -24,6 +24,7 @@
 using namespace std;
 using namespace cv;
 using namespace ximgproc;
+using namespace cv::ml;
 
 #include "../CPP_Classes/PragmaLibs.h"
 
@@ -786,8 +787,107 @@ public:
 
 
 
+class CPP_KNN_BasicsNew : public algorithmCPP {
+public:
+    cv::Ptr<cv::ml::KNearest> knn = cv::ml::KNearest::create();
+    std::vector<cv::Point2f> trainInput;
+    std::vector<cv::Point2f> queries;
+    std::vector<std::vector<int>> neighbors;
+    cv::Mat result;
+    int desiredMatches = -1;
+    CPP_Random_Basics* random;
+    vector<int> neighborIndexToTrain;
+    CPP_KNN_BasicsNew(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_KNN_Basics";
+        random = new CPP_Random_Basics(rows, cols);
+        labels[2] = "Red=TrainingData, yellow = queries";
+        desc = "Train a KNN model and map each query to the nearest training neighbor.";
+    }
 
-using namespace cv::ml;
+    void displayResults() {
+        dst2.setTo(0);
+        int dm = std::min(trainInput.size(), queries.size());
+        for (int i = 0; i < queries.size(); i++) {
+            cv::Point2f pt = queries[i];
+            if (result.at<int>(i, 0) < trainInput.size() && result.at<int>(i, 0) >= 0) {
+                cv::Point2f nn = trainInput[result.at<int>(i, 0)];
+                cv::circle(dst2, pt, task->dotSize + 4, cv::Scalar(0, 255, 255), -1, task->lineType);
+                cv::line(dst2, pt, nn, cv::Scalar(0, 255, 255), task->lineWidth, task->lineType);
+            }
+        }
+        for (cv::Point2f pt : trainInput) {
+            cv::circle(dst2, pt, task->dotSize + 4, cv::Scalar(0, 0, 255), -1, task->lineType);
+        }
+    }
+    void generateRandom(Mat src)
+    {
+        random->Run(src);
+        queries = random->pointList;
+        if (task->heartBeat) 
+            trainInput = queries;
+    }
+    void RunVB(cv::Mat src) {
+        int KNNdimension = 2;
+
+        if (standalone) {
+            if (task->heartBeat) {
+                random->Run(empty);
+                trainInput = random->pointList;
+            }
+            random->Run(empty);
+            queries = random->pointList;
+        }
+
+        cv::Mat queryMat((int) queries.size(), KNNdimension, CV_32F, queries.data());
+        if (queryMat.rows == 0) {
+            task->setTrueText("There were no queries provided. There is nothing to do...", dst2);
+            return;
+        }
+
+        if (trainInput.empty()) {
+            trainInput = queries;  // First pass, just match the queries.
+        }
+        cv::Mat trainData((int) trainInput.size(), KNNdimension, CV_32F, trainInput.data());
+        Mat initOnes(1, trainData.rows, CV_32S, 1);
+        cv::Mat response(trainData.rows, 1, CV_32S, initOnes.data);  // Create response matrix
+        knn->train(trainData, cv::ml::ROW_SAMPLE, response);
+
+        int dm = desiredMatches < 0 ? (int)trainInput.size() : desiredMatches;
+        Mat results; 
+        Mat neighborMat;
+        knn->findNearest(queryMat, dm, results, neighborMat);
+
+        if (neighborMat.rows != queryMat.rows || neighborMat.cols != dm) {
+            std::cerr << "KNN's FindNearest did not return the correct number of neighbors.\n";
+            return;
+        }
+
+        std::vector<float> nData(queryMat.rows * dm);
+        if (nData.empty()) return;
+        memcpy(nData.data(), neighborMat.data, nData.size() * sizeof(float));
+
+        for (int i = 0; i < nData.size(); i++) {
+            if (std::abs(nData[i]) > trainInput.size()) nData[i] = 0;  // Clamp within trainInput range
+        }
+
+        result.create(queryMat.rows, dm - 1, CV_32S);
+        neighbors.clear();
+        for (int i = 0; i < queryMat.rows; i++) {
+            cv::Point2f pt = queries[i];
+            std::vector<int> res;
+            for (int j = 0; j < dm - 1; j++) {
+                int test = static_cast<int>(nData[i * dm + j]);
+                if (test >= 0 && test < nData.size()) {
+                    result.at<int>(i, j) = test;
+                    res.push_back(test);
+                }
+            }
+            neighbors.push_back(res);
+        }
+        displayResults();
+    }
+};
+
 class CPP_KNN_Basics : public algorithmCPP
 {
 private:
@@ -879,7 +979,7 @@ public:
     {
         traceName = "CPP_KNN_Lossy";
         basics = new CPP_KNN_Basics(rows, cols);
-        desc = "Map points 1:1 with losses. Toss any farther duplicates.";
+        desc = "Map points 1:1 with losses. Toss any duplicates that are farther.";
     }
     void Run(Mat src)
     {
