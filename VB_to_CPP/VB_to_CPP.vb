@@ -68,6 +68,7 @@ Public Class VB_to_CPP
             split(i) = split(i).Replace("heartBeat()", "task->heartBeat")
             split(i) = split(i).Replace("firstPass", "task->firstPass")
             split(i) = split(i).Replace("setTrueText", "task->setTrueText")
+            split(i) = split(i).Replace("gOptions.GridSize.value", "task->gridSize")
             CPPrtb.Text += split(i) + vbCrLf
         Next
     End Sub

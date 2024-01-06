@@ -191,7 +191,7 @@ public:
     Mat color, depthRGB, depth32f, pointCloud, gCloud, leftView, rightView; 
     int cppFunction; int lineWidth; int lineType; 
     int gridRows, gridCols;
-    Mat depthMask, noDepthMask, gridMask; 
+    Mat depthMask, noDepthMask, gridMask;
     int font; 
     float fontSize; 
     Scalar fontColor;
@@ -203,6 +203,11 @@ public:
     int paletteIndex; int polyCount; bool firstPass; Scalar highlightColor; int frameHistory;
     Point clickPoint; bool mouseClickFlag; int mousePicTag; Point mouseMovePoint; bool mouseMovePointUpdated;
     Scalar scalarColors[256]; Vec3b vecColors[256]; Rect drawRect; bool displayDst0; bool displayDst1;
+    bool gridROIclicked;
+    Mat gridToRoiIndex;
+    vector<Rect> gridList;
+    vector<vector<int>> gridNeighbors;
+
     Mat gMatrix; vector<Mat> pcSplit;
     bool paused = false;
     Mat xdst0, xdst1, xdst2, xdst3;
@@ -685,7 +690,7 @@ public:
 
             // Ensure unique generation numbers
             if (task->firstPass) {
-                g = usedG.size();
+                g = (int) usedG.size();
             }
             else {
                 g = generationMap.at<int>(pt.y, pt.x) + 1;
@@ -707,53 +712,72 @@ public:
 
 
 
-class CPP_Grid_Basics : public algorithmCPP
-{
-private:
+class CPP_Grid_Basics : public algorithmCPP {
 public:
-    Mat gridToRoiIndex;
     CPP_Grid_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Grid_Basics";
-        task->gridMask = Mat(dst2.size(), CV_8U);
-        gridToRoiIndex = Mat(dst2.size(), CV_32S);
-        desc = "Create a grid for use with parallel.ForEach.";
+        desc = "Create a grid of squares covering the entire image.";
     }
-    void Run(Mat src) {
+
+    void Run(cv::Mat src) {
+        if (task->mouseClickFlag && !task->firstPass) {
+            task->gridROIclicked = task->gridToRoiIndex.at<int>(task->clickPoint.y, task->clickPoint.x);
+        }
         if (task->optionsChanged) {
-            task->roiList.clear();
+            task->gridMask = cv::Mat::zeros(src.size(), CV_8U);
+            task->gridToRoiIndex = cv::Mat::zeros(src.size(), CV_32S);
+
+            task->gridList.clear();
             task->gridRows = 0;
             task->gridCols = 0;
-            for (auto y = 0; y < dst2.rows; y += task->gridSize) {
-                for (auto x = 0; x < dst2.cols; x += task->gridSize) {
-                    auto roi = Rect(x, y, task->gridSize, task->gridSize);
-                    if (x + roi.width >= dst2.cols) roi.width = dst2.cols - x;
-                    if (y + roi.height >= dst2.rows) roi.height = dst2.rows - y;
+            for (int y = 0; y < src.rows; y += task->gridSize) {
+                for (int x = 0; x < src.cols; x += task->gridSize) {
+                    cv::Rect roi(x, y, task->gridSize, task->gridSize);
+                    if (x + roi.width >= src.cols) roi.width = src.cols - x;
+                    if (y + roi.height >= src.rows) roi.height = src.rows - y;
                     if (roi.width > 0 && roi.height > 0) {
-                        if (x == 0) task->gridRows += 1;
-                        if (y == 0) task->gridCols += 1;
-                        task->roiList.push_back(roi);
+                        if (x == 0) task->gridRows++;
+                        if (y == 0) task->gridCols++;
+                        task->gridList.push_back(roi);
                     }
                 }
             }
-            task->gridMask.setTo(0);
-            // Review this For Loop >>>> x = task->gridSize To dst2.cols - 1 Step task->gridSize
-            for (auto x = 0; x < dst2.cols; x += task->gridSize) {
-                auto p1 = Point(x, 0), p2 = Point(x, dst2.rows);
-                line(task->gridMask, p1, p2, 255, task->lineWidth);
+            task->gridMask = cv::Mat::zeros(src.size(), CV_8U);
+            for (int x = task->gridSize; x < src.cols; x += task->gridSize) {
+                cv::Point p1(x, 0), p2(x, src.rows);
+                cv::line(task->gridMask, p1, p2, cv::Scalar(255), task->lineWidth);
             }
-            // Review this For Loop >>>> y = task->gridSize To dst2.rows - 1 Step task->gridSize
-            for (auto y = 0; y < dst2.rows; y += task->gridSize) {
-                auto p1 = Point(0, y), p2 = Point(dst2.cols, y);
-                line(task->gridMask, p1, p2, 255, task->lineWidth);
+            for (int y = task->gridSize; y < src.rows; y += task->gridSize) {
+                cv::Point p1(0, y), p2(src.cols, y);
+                cv::line(task->gridMask, p1, p2, cv::Scalar(255), task->lineWidth);
             }
-            for (auto i = 0; i < task->roiList.size(); i++) {
-                Rect roi = task->roiList[i];
-                rectangle(gridToRoiIndex, roi, i, -1);
+
+            for (int i = 0; i < task->gridList.size(); i++) {
+                cv::Rect roi = task->gridList[i];
+                rectangle(task->gridToRoiIndex, roi, Scalar(255, 255, 255), 1);
+            }
+
+            task->gridNeighbors.clear();
+            for (const cv::Rect& roi : task->gridList) {
+                vector<int> neighbors;
+                task->gridNeighbors.push_back(neighbors);
+                for (int i = 0; i < 8; i++) {
+                    int x = (i % 3 == 1) ? roi.x + roi.width : (i < 3) ? roi.x - 1 : roi.x + roi.width + 1;
+                    int y = (i < 3) ? roi.y - 1 : (i < 6) ? roi.y + roi.height + 1 : roi.y;
+                    if (x >= 0 && x < src.cols && y >= 0 && y < src.rows) {
+                        task->gridNeighbors.back().push_back(task->gridToRoiIndex.at<int>(y, x));
+                    }
+                }
             }
         }
         if (standalone) {
+            dst2 = cv::Mat::zeros(src.size(), CV_8U);
             task->color.copyTo(dst2);
-            dst2.setTo(WHITE, task->gridMask);
+            dst2.setTo(cv::Scalar(255, 255, 255), task->gridMask); 
+            std::stringstream ss;
+            ss << "Grid_Basics " << task->gridList.size() << " (" << task->gridRows << "X" << task->gridCols << ") "
+                << task->gridSize << "X" << task->gridSize << " regions";
+            labels[2] = ss.str();
         }
     }
 };
