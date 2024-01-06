@@ -98,6 +98,7 @@ enum functions
 {
     CPP_AddWeighted_Basics_,
     CPP_Bezier_Basics_,
+    CPP_Random_Enumerable_,
     CPP_Feature_Agast_,
     CPP_Resize_Basics_,
     CPP_Delaunay_Basics_,
@@ -196,7 +197,8 @@ public:
     Scalar fontColor;
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
 
-    bool optionsChanged; double addWeighted; bool heartBeat; int dotSize; int gridSize; float maxDepth;
+    bool heartBeat;
+    bool optionsChanged; double addWeighted; int dotSize; int gridSize; float maxDepth;
     int histogramBins; int pixelDiffThreshold; bool gravityPointCloud; bool useKalman;
     int paletteIndex; int polyCount; bool firstPass; Scalar highlightColor; int frameHistory;
     Point clickPoint; bool mouseClickFlag; int mousePicTag; Point mouseMovePoint; bool mouseMovePointUpdated;
@@ -356,7 +358,7 @@ class CPP_AddWeighted_Basics : public algorithmCPP {
 public:
     cv::Mat src2;
 
-    CPP_AddWeighted_Basics(int rows, int cols) {
+    CPP_AddWeighted_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_AddWeighted_Basics";
         desc = "Add 2 images with specified weights.";
     }
@@ -400,7 +402,7 @@ public:
     cv::Rect range;
     int sizeRequest = 10;
 
-    CPP_Random_Basics(int rows, int cols) {
+    CPP_Random_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Random_Basics";
         range = cv::Rect(0, 0, dst2.cols, dst2.rows);
         desc = "Create a uniform random mask with a specified number of pixels.";
@@ -458,29 +460,27 @@ public:
 
 
 
-
-
-class CPP_Resize_Basics : public algorithmCPP
-{
-private:
+class CPP_Resize_Basics : public algorithmCPP {
 public:
-    float resizePercent;
-    CPP_Resize_Basics(int rows, int cols) : algorithmCPP(rows, cols)
-    {
+    cv::Size newSize;
+    float resizePercent = 0.5;
+
+    CPP_Resize_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Resize_Basics";
-        resizePercent = 0.5f;
-        labels[2] = "Image resized for display.";
-        labels[3] = "Actual size of the image.";
+        if (standalone) {
+            task->drawRect = cv::Rect(dst2.cols / 4, dst2.rows / 4, dst2.cols / 2, dst2.rows / 2);
+        }
         desc = "Resize with different options and compare them";
+        labels[2] = "Rectangle highlight above resized";
     }
-    void Run(Mat src)
-    {
-        if (resizePercent < 0 || resizePercent > 1) resizePercent = 1;
-        dst2 = dst0.clone();
-        resize(src, dst2, Size(int(src.cols * resizePercent), int(src.rows * resizePercent)));
-        Rect r = Rect(0, 0, int(src.cols * resizePercent), int(src.rows * resizePercent));
-        dst3.setTo(0);
-        dst2.copyTo(dst3(r));
+
+    void Run(cv::Mat src) {
+        if (task->drawRect.width != 0) {
+            src = src(task->drawRect);
+            newSize = task->drawRect.size();
+        }
+
+        resize(src, dst2, Size(int(src.cols * resizePercent), int(src.rows * resizePercent)), 0, 0, INTER_NEAREST_EXACT);
     }
 };
 
@@ -490,103 +490,56 @@ public:
 
 
 
-class CPP_Remap_Basics : public algorithmCPP
-{
-private:
+class CPP_Remap_Basics : public algorithmCPP {
 public:
-    int direction = 0;
-    vector<string> remapLabels = {"Remap_Basics - original", "Remap vertically", "Remap horizontally", "Remap horizontally and vertically"};
-    Mat mapXV, mapYV;
-    Mat mapXH, mapYH;
-    Mat mapXhv, mapYhv;
-    CPP_Remap_Basics(int rows, int cols) : algorithmCPP(rows, cols)
-    {
+    int direction = 3;  // Default to remap horizontally and vertically
+
+    CPP_Remap_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Remap_Basics";
-        for (int direction = 1; direction < 4; direction++)
-        {
-            Mat map_x = Mat(dst2.size(), CV_32F);
-            Mat map_y = Mat(dst2.size(), CV_32F);
-            for (auto j = 0; j < map_x.rows; j++)
-            {
-                for (auto i = 0; i < map_x.cols; i++)
-                {
-                    switch (direction)
-                    {
-                    case  1:
-                    {
-                        map_x.at<float>(j, i) = float(i);
-                        map_y.at<float>(j, i) = float(dst2.rows - j);
-                        break;
-                    }
-                    case  2:
-                    {
-                        map_x.at<float>(j, i) = float(dst2.cols - i);
-                        map_y.at<float>(j, i) = float(j);
-                        break;
-                    }
-                    case  3:
-                    {
-                        map_x.at<float>(j, i) = float(dst2.cols - i);
-                        map_y.at<float>(j, i) = float(dst2.rows - j);
-                        break;
-                    }
-                    }
-                }
-            }
-            switch (direction)
-            {
-            case 1:
-            {
-                mapXV = map_x.clone();
-                mapYV = map_y.clone();
-                break;
-            }
-            case 2:
-            {
-                mapXH = map_x.clone();
-                mapYH = map_y.clone();
-                break;
-            }
-            case 3:
-            {
-                mapXhv = map_x.clone();
-                mapYhv = map_y.clone();
-                break;
-            }
-            }
-        }
         desc = "Use remap to reflect an image in 4 directions.";
     }
-    void Run(Mat src)
-    {
-        labels[2] = remapLabels[direction % 4];
-        switch (direction % 4)
-        {
-        case 0:
-        {
-            dst2 = src.clone();
-            break;
+
+    void Run(cv::Mat src) {
+        cv::Mat map_x(src.size(), CV_32F);
+        cv::Mat map_y(src.size(), CV_32F);
+
+        labels[2] = std::string("Remap_Basics - ") + (direction == 0 ? "original" :
+            (direction == 1 ? "Remap vertically" :
+                (direction == 2 ? "Remap horizontally" : "Remap horizontally and vertically")));
+
+        // Build maps for remap
+        for (int j = 0; j < map_x.rows; j++) {
+            for (int i = 0; i < map_x.cols; i++) {
+                switch (direction) {
+                    case 0:  // Leave original unmoved
+                        dst2 = src;
+                        break;
+                    case 1:
+                        map_x.at<float>(j, i) = i;
+                        map_y.at<float>(j, i) = src.rows - j;
+                        break;
+                    case 2:
+                        map_x.at<float>(j, i) = src.cols - i;
+                        map_y.at<float>(j, i) = j;
+                        break;
+                    case 3:
+                        map_x.at<float>(j, i) = src.cols - i;
+                        map_y.at<float>(j, i) = src.rows - j;
+                        break;
+                }
+            }
         }
-        case 1:
-        {
-            remap(src, dst2, mapXV, mapYV, INTER_LINEAR);
-            break;
+
+        if (direction != 0) {
+            cv::remap(src, dst2, map_x, map_y, cv::INTER_LINEAR);  // Added interpolation for clarity
         }
-        case 2:
-        {
-            remap(src, dst2, mapXH, mapYH, INTER_LINEAR);
-            break;
+
+        if (task->heartBeat) {
+            direction++;
+            direction %= 4;
         }
-        case 3:
-        {
-            remap(src, dst2, mapXhv, mapYhv, INTER_LINEAR);
-            break;
-        }
-        }
-        if (task->heartBeat) direction += 1;
     }
 };
-
 
 
 
@@ -647,7 +600,6 @@ public:
         labels[2] =  "Delaunay_Basics: " + to_string(inputPoints.size()) + " cells were present.";
     }
 };
-
 
 
 
@@ -2674,7 +2626,7 @@ class CPP_Bezier_Basics : public algorithmCPP {
 public:
     std::vector<cv::Point> points;
 
-    CPP_Bezier_Basics(int rows, int cols) {
+    CPP_Bezier_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Bezier_Basics";
         advice = "Update the public points array and then Run.";
         points = { cv::Point(100, 100),
@@ -2717,3 +2669,30 @@ public:
 
 
 
+class CPP_Random_Enumerable : public algorithmCPP {
+public:
+    int sizeRequest = 100;
+    std::vector<cv::Point2f> points;
+
+    CPP_Random_Enumerable(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_Random_Enumerable";
+        desc = "Create an enumerable list of points using a lambda function";
+    }
+
+    void Run(cv::Mat src) {
+        std::random_device rd;
+        std::mt19937 gen(rd());  // Mersenne Twister engine for randomness
+        std::uniform_int_distribution<> dist_width(0, dst2.cols - 1);  // Ensure width is within bounds
+        std::uniform_int_distribution<> dist_height(0, dst2.rows - 1); // Ensure height is within bounds
+
+        points.clear();
+        for (int i = 0; i < sizeRequest; i++) {
+            points.push_back(cv::Point2f(dist_width(gen), dist_height(gen)));
+        }
+
+        dst2 = cv::Mat::zeros(dst2.size(), dst2.type());  // Set dst2 to black
+        for (const cv::Point2f& pt : points) {
+            cv::circle(dst2, pt, task->dotSize, cv::Scalar(0, 255, 255), -1, task->lineType, 0);
+        }
+    }
+};

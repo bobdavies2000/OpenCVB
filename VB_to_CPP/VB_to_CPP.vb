@@ -5,57 +5,13 @@
 '               https://www.tangiblesoftwaresolutions.com/product_details/vb_to_cplusplus_converter_details.html
 Public Class VB_to_CPP
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim input = New FileInfo("../../data/VBKeywords.txt")
-        Dim keys = File.ReadAllLines(input.FullName)
-        For Each line In keys
-            line = line.Trim
-            If Len(line) = 0 Then Continue For
-            vbKeywords.Add(line)
-        Next
-        vbKeywords.Add("New")
-        vbKeywords.Add("New()")
-        vbKeywords.Add("End")
-        vbKeywords.Add("Class")
-        vbKeywords.Add("Sub")
-        vbKeywords.Add("if(")
-        vbKeywords.Add("For")
-        vbKeywords.Add("Structure")
-        vbKeywords.Add("In")
-
-        input = New FileInfo("../../data/OpenCVAPI.txt")
-        Dim ocvLines = File.ReadLines(input.FullName)
-        For Each line In ocvLines
-            ocvKeywords.Add(line)
-            line = UCase(line.Substring(0, 1)) + line.Substring(1)
-            ocvbKeywords.Add(line)
-
-        Next
-
-        input = New FileInfo("../../data/AlgorithmList.txt")
+        Dim input = New FileInfo("../../data/AlgorithmList.txt")
         Dim algList = File.ReadAllLines(input.FullName)
         For i = 1 To algList.Count - 1
             Dim line = algList(i)
             If line.StartsWith("CPP_") Or line.EndsWith("_CPP") Then Continue For
             If line.EndsWith(".py") Then Continue For
             vbList.Items.Add(line)
-        Next
-
-        input = New FileInfo("../../VB_Classes/Options.vb")
-        Dim optionsList = File.ReadAllLines(input.FullName)
-        Dim splitstr1() As Char = {")", ","}
-        Dim splitstr2() As Char = {" ", "_"}
-        Dim split() As String
-        For Each line In optionsList
-            If line.Contains("Public Class") Then
-                split = line.Split(splitstr2)
-                vbModule = split(3)
-            End If
-            If line.Contains("sliders.setupTrackBar(") Then
-                split = line.Split("""")
-                Dim textVal = vbModule + " " + split(1)
-                split = split(2).Trim.Split(splitstr1)
-                sliderText.Add(textVal, split(2))
-            End If
         Next
         vbList.Text = GetSetting("OpenCVB1", "TranslateToCPP", "TranslateToCPP", "Addweighted_Basics")
     End Sub
@@ -81,6 +37,8 @@ Public Class VB_to_CPP
             VBrtb.Text += vbInput(vbIndex) + vbCrLf
             If vbInput(vbIndex).Contains("End Class") Then Exit For
         Next
+
+        UpdateInfrastructure.Text = "Step 4: Add " + CPPName + " to OpenCVB interface"
     End Sub
     Private Sub PrepareCPP_Click(sender As Object, e As EventArgs) Handles PrepareCPP.Click
         Dim cppCode = CPPrtb.Text
@@ -88,11 +46,11 @@ Public Class VB_to_CPP
         CPPrtb.Clear()
         Dim functionName As String = ""
         For i = 0 To split.Count - 1
-            If i = 0 Then
-                Dim tokens = split(0).Split(" ")
+            If Trim(split(i)).StartsWith("class") Then
+                Dim tokens = split(i).Split(" ")
                 functionName = tokens(1)
-                split(0) = split(0).Replace("{", ": public algorithmCPP" + " {")
-                split(0) = split(0).Replace("class ", "class CPP_")
+                split(i) = split(i).Replace("{", ": public algorithmCPP" + " {")
+                split(i) = split(i).Replace("class ", "class CPP_")
             End If
             If split(i).Contains("// Assuming") Then
                 split(i) = split(i).Substring(0, split(i).IndexOf("// Assuming"))
@@ -105,12 +63,37 @@ Public Class VB_to_CPP
             End If
 
             If Trim(split(i)).StartsWith(functionName) Then
-                split(i) = split(i).Replace(functionName + "()", "CPP_" + functionName + "(int rows, int cols)") + vbCrLf
+                split(i) = split(i).Replace(functionName + "()", "CPP_" + functionName +
+                                            "(int rows, int cols) : algorithmCPP(rows, cols) ") + vbCrLf
                 split(i) += vbTab + "traceName = """ + "CPP_" + functionName + """;"
             End If
 
             split(i) = split(i).Replace("task.", "task->")
+            split(i) = split(i).Replace("heartBeat()", "task->heartBeat")
             CPPrtb.Text += split(i) + vbCrLf
         Next
+    End Sub
+
+    Private Sub UpdateInfrastructure_Click(sender As Object, e As EventArgs) Handles UpdateInfrastructure.Click
+        Dim input = New FileInfo("../../CPP_Classes/CPP_Names.h")
+        Dim allNames = File.ReadAllLines(input.FullName)
+        Dim buttonText = UpdateInfrastructure.Text
+        Dim split = buttonText.Split(" ")
+        Dim functionName = split(3)
+        For Each line In allNames
+            If line.Contains(functionName) Then
+                MsgBox(functionName + " infrastructure is already present.")
+                Exit Sub
+            End If
+        Next
+
+        Dim sw = New StreamWriter(input.FullName)
+        For Each line In allNames
+            sw.WriteLine(line)
+            If line.Contains("CPP_AddWeighted_Basics_") Then
+                sw.WriteLine("""" + functionName + "_""" + ",")
+            End If
+        Next
+        sw.Close()
     End Sub
 End Class

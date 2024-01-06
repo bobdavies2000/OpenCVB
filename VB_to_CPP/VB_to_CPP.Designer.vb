@@ -29,6 +29,7 @@ Partial Class VB_to_CPP
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.PrepareCPP = New System.Windows.Forms.Button()
+        Me.UpdateInfrastructure = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'vbList
@@ -76,9 +77,9 @@ Partial Class VB_to_CPP
         Me.Label2.Location = New System.Drawing.Point(18, 151)
         Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(624, 35)
+        Me.Label2.Size = New System.Drawing.Size(653, 35)
         Me.Label2.TabIndex = 4
-        Me.Label2.Text = "Copy And paste this code into Google's Bard"
+        Me.Label2.Text = "Step 1: Copy And paste this code into Google's Bard"
         '
         'Label3
         '
@@ -88,22 +89,32 @@ Partial Class VB_to_CPP
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(624, 35)
         Me.Label3.TabIndex = 5
-        Me.Label3.Text = "C++ Code - Paste output of translate from Bard here "
+        Me.Label3.Text = "Step 2: Paste output of translate from Bard here "
         '
         'PrepareCPP
         '
         Me.PrepareCPP.Location = New System.Drawing.Point(1015, 89)
         Me.PrepareCPP.Name = "PrepareCPP"
-        Me.PrepareCPP.Size = New System.Drawing.Size(417, 37)
+        Me.PrepareCPP.Size = New System.Drawing.Size(328, 37)
         Me.PrepareCPP.TabIndex = 6
-        Me.PrepareCPP.Text = "Review and update Bard's C++ Code"
+        Me.PrepareCPP.Text = "Step 3: Update Bard's C++ Code"
         Me.PrepareCPP.UseVisualStyleBackColor = True
+        '
+        'UpdateInfrastructure
+        '
+        Me.UpdateInfrastructure.Location = New System.Drawing.Point(1349, 89)
+        Me.UpdateInfrastructure.Name = "UpdateInfrastructure"
+        Me.UpdateInfrastructure.Size = New System.Drawing.Size(609, 37)
+        Me.UpdateInfrastructure.TabIndex = 7
+        Me.UpdateInfrastructure.Text = "Update infrastructure"
+        Me.UpdateInfrastructure.UseVisualStyleBackColor = True
         '
         'VB_to_CPP
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1970, 1632)
+        Me.Controls.Add(Me.UpdateInfrastructure)
         Me.Controls.Add(Me.PrepareCPP)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label2)
@@ -126,4 +137,5 @@ Partial Class VB_to_CPP
     Friend WithEvents Label2 As Label
     Friend WithEvents Label3 As Label
     Friend WithEvents PrepareCPP As Button
+    Friend WithEvents UpdateInfrastructure As Button
 End Class

@@ -984,6 +984,7 @@ Public Class IMU_GMatrixWithOptions : Inherits VB_Algorithm
     Public cx As Single = 1, sx As Single = 0, cy As Single = 1, sy As Single = 0, cz As Single = 1, sz As Single = 0
     Public gMatrix As cv.Mat
     Public Sub New()
+        If standalone Then Static options = New Options_IMU
         desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
     Private Sub getSliderValues()
@@ -1051,12 +1052,11 @@ Public Class IMU_GMatrixWithOptions : Inherits VB_Algorithm
             strOut += "Rotate around X-axis (in degrees) = " + vbTab + Format(xSlider.value, fmt4) + vbCrLf
             strOut += "Rotate around Y-axis (in degrees) = " + vbTab + Format(ySlider.value, fmt4) + vbCrLf
             strOut += "Rotate around Z-axis (in degrees) = " + vbTab + Format(zSlider.value, fmt4) + vbCrLf
-
             strOut += vbCrLf + "sqrt (" + vbTab + Format(g.X, fmt4) + "*" + Format(g.X, fmt4) + vbTab +
-                      vbTab + Format(g.Y, fmt4) + "*" + Format(g.Y, fmt4) + vbTab +
-                      vbTab + Format(g.Z, fmt4) + "*" + Format(g.Z, fmt4) + " ) = " + vbTab +
-                      vbTab + Format(Math.Sqrt(g.X * g.X + g.Y * g.Y + g.Z * g.Z), fmt4) + vbCrLf +
-                      "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
+                          vbTab + Format(g.Y, fmt4) + "*" + Format(g.Y, fmt4) + vbTab +
+                          vbTab + Format(g.Z, fmt4) + "*" + Format(g.Z, fmt4) + " ) = " + vbTab +
+                          vbTab + Format(Math.Sqrt(g.X * g.X + g.Y * g.Y + g.Z * g.Z), fmt4) + vbCrLf +
+                          "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
 
             Dim tmpGMat1 = buildGmatrix()
             strOut += vbCrLf + "Gravity-oriented gMatrix - move camera to test this:" + vbCrLf + gMatrixToStr(tmpGMat1)

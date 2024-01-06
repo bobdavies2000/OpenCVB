@@ -28,7 +28,7 @@ Public Class Remap_Basics : Inherits VB_Algorithm
             Next
         Next
 
-        If direction <> 0 Then cv.Cv2.Remap(src, dst2, map_x, map_y)
+        If direction <> 0 Then cv.Cv2.Remap(src, dst2, map_x, map_y, cv.InterpolationFlags.Nearest)
 
         If heartBeat() Then
             direction += 1

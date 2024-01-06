@@ -3,6 +3,7 @@ Public Class algorithmList
 Public Enum functionNames
 CPP_AddWeighted_Basics_
 CPP_Bezier_Basics_
+CPP_Random_Enumerable_
 CPP_Feature_Agast_
 CPP_Resize_Basics_
 CPP_Delaunay_Basics_
@@ -297,6 +298,7 @@ if algorithmName = "CPP_Mat_4to1" Then return new CPP_Basics(functionNames.CPP_M
 if algorithmName = "CPP_Motion_Basics" Then return new CPP_Basics(functionNames.CPP_Motion_Basics_)
 if algorithmName = "CPP_Plot_Histogram" Then return new CPP_Basics(functionNames.CPP_Plot_Histogram_)
 if algorithmName = "CPP_Random_Basics" Then return new CPP_Basics(functionNames.CPP_Random_Basics_)
+if algorithmName = "CPP_Random_Enumerable" Then return new CPP_Basics(functionNames.CPP_Random_Enumerable_)
 if algorithmName = "CPP_Rectangle_Basics" Then return new CPP_Basics(functionNames.CPP_Rectangle_Basics_)
 if algorithmName = "CPP_Rectangle_Rotated" Then return new CPP_Basics(functionNames.CPP_Rectangle_Rotated_)
 if algorithmName = "CPP_RedCloud_FeatureLess2" Then return new CPP_Basics(functionNames.CPP_RedCloud_FeatureLess2_)
