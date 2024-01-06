@@ -73,7 +73,6 @@ Public Class VB_to_CPP
             CPPrtb.Text += split(i) + vbCrLf
         Next
     End Sub
-
     Private Sub UpdateInfrastructure_Click(sender As Object, e As EventArgs) Handles UpdateInfrastructure.Click
         Dim input = New FileInfo("../../CPP_Classes/CPP_Names.h")
         Dim allNames = File.ReadAllLines(input.FullName)
@@ -93,6 +92,27 @@ Public Class VB_to_CPP
             If line.Contains("CPP_AddWeighted_Basics_") Then
                 sw.WriteLine("""" + functionName + "_""" + ",")
             End If
+        Next
+        sw.Close()
+
+        input = New FileInfo("../../CPP_Classes/CPP_Externs.h")
+        Dim externs = File.ReadAllLines(input.FullName)
+        sw = New StreamWriter(input.FullName)
+        For Each line In externs
+            sw.WriteLine(line)
+            If line.Contains("new CPP_AddWeighted_Basics(rows, cols); break; }") Then
+                sw.WriteLine("case """ + functionName + "_""" + " :")
+                sw.WriteLine("{task->alg = new " + functionName + "(rows, cols); break; }")
+            End If
+        Next
+        sw.Close()
+
+        input = New FileInfo("../../CPP_Classes/CPP_IncludeOnly.h")
+        Dim includeOnly = File.ReadAllLines(input.FullName)
+        sw = New StreamWriter(input.FullName)
+        For Each line In includeOnly
+            sw.WriteLine(line)
+            If line.Contains("CPP_AddWeighted_Basics_,") Then sw.WriteLine(functionName + "_")
         Next
         sw.Close()
     End Sub
