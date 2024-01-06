@@ -214,7 +214,7 @@ extern "C" __declspec(dllexport)
 void cppTask_OptionsVBtoCPP(cppTask * task, int& gridSize, 
     int& histogramBins, int& pixelDiffThreshold, bool& useKalman,
     int& frameHistory, int& rectX, int& rectY, int& rectWidth, int& rectHeight,
-    int& lineWidth, int& lineType)
+    int& lineWidth, int& lineType, int& dotSize)
 {
     task->pixelDiffThreshold = pixelDiffThreshold;
     task->gridSize = gridSize;
@@ -227,6 +227,7 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int& gridSize,
     task->drawRect.height = rectHeight;
     task->lineWidth = lineWidth;
     task->lineType = lineType;
+    task->dotSize = dotSize;
 }
 
 

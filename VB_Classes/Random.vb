@@ -13,7 +13,8 @@ Public Class Random_Basics : Inherits VB_Algorithm
         pointList.Clear()
         If task.paused = False Then
             While pointList.Count < sizeRequest
-                pointList.Add(New cv.Point2f(msRNG.Next(range.X, range.X + range.Width), msRNG.Next(range.Y, range.Y + range.Height)))
+                pointList.Add(New cv.Point2f(msRNG.Next(range.X, range.X + dst2.Width),
+                                             msRNG.Next(range.Y, range.Y + dst2.Height)))
             End While
             dst2.SetTo(0)
             For Each pt In pointList

@@ -18,6 +18,8 @@
 #include <sstream>
 #include <iostream>
 #include <memory>
+#include <vector>
+#include <random>
 
 using namespace std;
 using namespace cv;
@@ -392,39 +394,32 @@ public:
 
 
 
-
-
-class CPP_Random_Basics : public algorithmCPP
-{
-private:
+class CPP_Random_Basics : public algorithmCPP {
 public:
-    vector<Point2f> pointList;
-    Rect range;
+    std::vector<cv::Point2f> pointList;
+    cv::Rect range;
     int sizeRequest = 10;
-    CPP_Random_Basics(int rows, int cols) : algorithmCPP(rows, cols)
-    {
+
+    CPP_Random_Basics(int rows, int cols) {
         traceName = "CPP_Random_Basics";
-        range = Rect(0, 0, dst2.cols, dst2.rows);
-        desc = "Create a uniform random mask with a specificied number of pixels.";
+        range = cv::Rect(0, 0, dst2.cols, dst2.rows);
+        desc = "Create a uniform random mask with a specified number of pixels.";
     }
-    void Run(Mat src)
-    {
+
+    void Run(cv::Mat src) {
         pointList.clear();
-        if (task->paused == false)
-        {
-            while (pointList.size() < sizeRequest)
-            {
-                pointList.push_back(Point2f(range.x + float((rand() % range.width)), range.y + float((rand() % range.height))));
+        if (!task->paused) {
+            while (pointList.size() < sizeRequest) {
+                pointList.push_back(Point2f(range.x + float((rand() % dst2.cols)), range.y + float((rand() % dst2.rows))));
             }
+
             dst2.setTo(0);
-            for (Point2f pt : pointList)
-            {
-                circle(dst2, pt, task->dotSize, YELLOW, -1, task->lineType, 0);
+            for (cv::Point2f pt : pointList) {
+                cv::circle(dst2, pt, task->dotSize, cv::Scalar(0, 255, 255), -1, task->lineType, 0);
             }
         }
     }
 };
-
 
 
 

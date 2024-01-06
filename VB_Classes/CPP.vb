@@ -57,7 +57,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
                                gOptions.PixelDiffThreshold.Value, gOptions.UseKalman.Checked,
                                task.historyCount,
                                task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height,
-                               task.lineWidth, task.lineType)
+                               task.lineWidth, task.lineType, task.dotSize)
 
 
         Dim inputImage(src.Total * src.ElemSize - 1) As Byte
@@ -135,6 +135,7 @@ Module CPP_Module
                                         ByRef pixelDiffThreshold As Integer,
                                         ByRef useKalman As Boolean, ByRef frameHistory As Integer,
                                         ByRef rectX As Integer, ByRef rectY As Integer, ByRef rectWidth As Integer,
-                                        ByRef rectHeight As Integer, ByRef lineWidth As Integer, ByRef lineType As Integer)
+                                        ByRef rectHeight As Integer, ByRef lineWidth As Integer,
+                                        ByRef lineType As Integer, ByRef dotSize As Integer)
     End Sub
 End Module 
