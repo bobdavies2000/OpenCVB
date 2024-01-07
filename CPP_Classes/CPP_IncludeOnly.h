@@ -1225,7 +1225,7 @@ public:
         {
             Point2f pt = basics->ptList[i];
             circle(dst2, pt, task->dotSize, YELLOW, task->lineWidth, task->lineType);
-            g = basics->facetGen->dst0.at<int>(pt.y, pt.x);
+            g = basics->facetGen->dst3.at<int>(pt.y, pt.x);
             goodCounts[g] = i;
             task->setTrueText(to_string(g), dst2, pt);
         }

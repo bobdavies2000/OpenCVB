@@ -1614,3 +1614,29 @@ Public Class Feature_History : Inherits VB_Algorithm
                     " and minimum distance = " + CStr(good.options.minDistance)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Feature_Reduction : Inherits VB_Algorithm
+    Dim reduction As New Reduction_Basics
+    Dim good As New Feature_Basics
+    Public Sub New()
+        labels = {"", "", "Good features", "History of good features"}
+        advice = ""
+        desc = "Get the features in a reduction grayscale image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        reduction.Run(src)
+        dst2 = src
+
+        good.Run(reduction.dst2)
+        If task.heartBeat Then dst3.SetTo(0)
+        For Each pt In good.corners
+            dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            dst3.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+        Next
+    End Sub
+End Class

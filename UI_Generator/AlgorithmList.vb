@@ -524,6 +524,7 @@ if algorithmName = "Feature_Points" Then return new Feature_Points
 if algorithmName = "Feature_PointsDelaunay" Then return new Feature_PointsDelaunay
 if algorithmName = "Feature_PointsKNN" Then return new Feature_PointsKNN
 if algorithmName = "Feature_PointTracker" Then return new Feature_PointTracker
+if algorithmName = "Feature_Reduction" Then return new Feature_Reduction
 if algorithmName = "Feature_ShiTomasi" Then return new Feature_ShiTomasi
 if algorithmName = "Feature_Sift" Then return new Feature_Sift
 if algorithmName = "Feature_Sift_MT" Then return new Feature_Sift_MT

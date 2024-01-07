@@ -53,11 +53,9 @@ Public Class VB_to_CPP
                 split(i) = split(i).Replace("class ", "class CPP_")
             End If
 
-            split(i) = split(i).Replace("// Explicit", "")
-            split(i) = split(i).Replace("// Assuming", "")
-            split(i) = split(i).Replace("// Corrected", "")
-            split(i) = split(i).Replace("// Create", "")
-            split(i) = split(i).Replace("// No need for static keyword", "")
+            If split(i).Contains("//") Then
+                split(i) = split(i).Substring(0, InStr(split(i), "//") - 1)
+            End If
 
             If Trim(split(i)).StartsWith(functionName) Then
                 split(i) = split(i).Replace(functionName + "()", "CPP_" + functionName +
