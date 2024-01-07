@@ -452,6 +452,7 @@ Partial Class OptionsRedCloud
         Me.XYZReduction.Size = New System.Drawing.Size(143, 24)
         Me.XYZReduction.TabIndex = 8
         Me.XYZReduction.TabStop = True
+        Me.XYZReduction.Tag = "6"
         Me.XYZReduction.Text = "XYZ Reduction"
         Me.XYZReduction.UseVisualStyleBackColor = True
         '
@@ -463,6 +464,7 @@ Partial Class OptionsRedCloud
         Me.YZReduction.Size = New System.Drawing.Size(132, 24)
         Me.YZReduction.TabIndex = 7
         Me.YZReduction.TabStop = True
+        Me.YZReduction.Tag = "5"
         Me.YZReduction.Text = "YZ Reduction"
         Me.YZReduction.UseVisualStyleBackColor = True
         '
@@ -474,6 +476,7 @@ Partial Class OptionsRedCloud
         Me.XZReduction.Size = New System.Drawing.Size(132, 24)
         Me.XZReduction.TabIndex = 6
         Me.XZReduction.TabStop = True
+        Me.XZReduction.Tag = "4"
         Me.XZReduction.Text = "XZ Reduction"
         Me.XZReduction.UseVisualStyleBackColor = True
         '
@@ -485,6 +488,7 @@ Partial Class OptionsRedCloud
         Me.XYReduction.Size = New System.Drawing.Size(133, 24)
         Me.XYReduction.TabIndex = 5
         Me.XYReduction.TabStop = True
+        Me.XYReduction.Tag = "3"
         Me.XYReduction.Text = "XY Reduction"
         Me.XYReduction.UseVisualStyleBackColor = True
         '
@@ -496,6 +500,7 @@ Partial Class OptionsRedCloud
         Me.ZReduction.Size = New System.Drawing.Size(121, 24)
         Me.ZReduction.TabIndex = 4
         Me.ZReduction.TabStop = True
+        Me.ZReduction.Tag = "2"
         Me.ZReduction.Text = "Z Reduction"
         Me.ZReduction.UseVisualStyleBackColor = True
         '
@@ -507,6 +512,7 @@ Partial Class OptionsRedCloud
         Me.YReduction.Size = New System.Drawing.Size(122, 24)
         Me.YReduction.TabIndex = 3
         Me.YReduction.TabStop = True
+        Me.YReduction.Tag = "1"
         Me.YReduction.Text = "Y Reduction"
         Me.YReduction.UseVisualStyleBackColor = True
         '
@@ -518,6 +524,7 @@ Partial Class OptionsRedCloud
         Me.XReduction.Size = New System.Drawing.Size(122, 24)
         Me.XReduction.TabIndex = 0
         Me.XReduction.TabStop = True
+        Me.XReduction.Tag = "0"
         Me.XReduction.Text = "X Reduction"
         Me.XReduction.UseVisualStyleBackColor = True
         '

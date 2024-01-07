@@ -1836,19 +1836,19 @@ Public Class RedCloud_Core : Inherits VB_Algorithm
         Dim split = dst0.Split()
 
         Select Case redOptions.PCReduction
-            Case "X Reduction"
+            Case 0 ' "X Reduction"
                 dst0 = (split(0) * reduceAmt).toMat
-            Case "Y Reduction"
+            Case 1 ' "Y Reduction"
                 dst0 = (split(1) * reduceAmt).toMat
-            Case "Z Reduction"
+            Case 2 ' "Z Reduction"
                 dst0 = (split(2) * reduceAmt).toMat
-            Case "XY Reduction"
+            Case 3 ' "XY Reduction"
                 dst0 = (split(0) * reduceAmt + split(1) * reduceAmt).toMat
-            Case "XZ Reduction"
+            Case 4 ' "XZ Reduction"
                 dst0 = (split(0) * reduceAmt + split(2) * reduceAmt).toMat
-            Case "YZ Reduction"
+            Case 5 ' "YZ Reduction"
                 dst0 = (split(1) * reduceAmt + split(2) * reduceAmt).toMat
-            Case "XYZ Reduction"
+            Case 6 ' "XYZ Reduction"
                 dst0 = (split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt).toMat
         End Select
 

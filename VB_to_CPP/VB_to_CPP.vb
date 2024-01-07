@@ -57,12 +57,15 @@ Public Class VB_to_CPP
                 split(i) = split(i).Substring(0, InStr(split(i), "//") - 1)
             End If
 
-            If Trim(split(i)).StartsWith(functionName) Then
-                split(i) = split(i).Replace(functionName + "()", "CPP_" + functionName +
+            If functionName <> "" Then
+                If Trim(split(i)).StartsWith(functionName) Then
+                    split(i) = split(i).Replace(functionName + "()", "CPP_" + functionName +
                                             "(int rows, int cols) : algorithmCPP(rows, cols) ") + vbCrLf
-                split(i) += vbTab + "traceName = """ + "CPP_" + functionName + """;"
+                    split(i) += vbTab + "traceName = """ + "CPP_" + functionName + """;"
+                End If
             End If
 
+            split(i) = split(i).Replace("CStr(", "to_string(")
             split(i) = split(i).Replace("task.", "task->")
             split(i) = split(i).Replace("heartBeat()", "task->heartBeat")
             split(i) = split(i).Replace("firstPass", "task->firstPass")

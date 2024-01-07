@@ -7,7 +7,7 @@ Public Class OptionsRedCloud
     Public reductionType As String = "Use Simple Reduction"
     Public depthInput As String = "RedCloud_Core"
 
-    Public PCReduction As String
+    Public PCReduction As Integer
     Public channels() As Integer = {0, 1}
     Public channelIndex As Integer
     Public rangesBGR() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 256), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
@@ -71,7 +71,7 @@ Public Class OptionsRedCloud
 
         Reduction_Basics.Checked = True ' Reduction_basics is the default.
         SimpleReduction.Checked = True
-        PCReduction = "XY Reduction"
+        PCReduction = 3
         XYReduction.Checked = True
         GuidedBP_Depth.Checked = True
         histBinList = {task.histogramBins, task.histogramBins}
@@ -117,36 +117,36 @@ Public Class OptionsRedCloud
 
         channelIndex = 0
         Select Case redOptions.PCReduction
-            Case "X Reduction"
+            Case 0 ' "X Reduction"
                 ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
                 channels = {0}
                 histBinList = {task.histogramBins}
-            Case "Y Reduction"
+            Case 1 ' "Y Reduction"
                 ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1)}
                 channels = {1}
                 histBinList = {task.histogramBins}
-            Case "Z Reduction"
+            Case 2 ' "Z Reduction"
                 ranges = New cv.Rangef() {New cv.Rangef(rz.Item0, rz.Item1)}
                 channels = {2}
                 histBinList = {task.histogramBins}
-            Case "XY Reduction"
+            Case 3 ' "XY Reduction"
                 ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1)}
                 channelCount = 2
                 channels = {0, 1}
                 histBinList = {task.histogramBins, task.histogramBins}
-            Case "XZ Reduction"
+            Case 4 ' "XZ Reduction"
                 ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
                 channelCount = 2
                 channels = {0, 2}
                 channelIndex = 1
                 histBinList = {task.histogramBins, task.histogramBins}
-            Case "YZ Reduction"
+            Case 5 ' "YZ Reduction"
                 ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
                 channelCount = 2
                 channels = {1, 2}
                 channelIndex = 1
                 histBinList = {task.histogramBins, task.histogramBins}
-            Case "XYZ Reduction"
+            Case 6 ' "XYZ Reduction"
                 ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
                 channelCount = 3
                 channels = {0, 1, 2}
@@ -242,37 +242,37 @@ Public Class OptionsRedCloud
 
     Private Sub XReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = XReduction.Text
+        PCReduction = XReduction.Tag
         gOptions.HistBinSlider.Value = 16
     End Sub
     Private Sub YReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = YReduction.Text
+        PCReduction = YReduction.Tag
         gOptions.HistBinSlider.Value = 16
     End Sub
     Private Sub ZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles ZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = ZReduction.Text
+        PCReduction = ZReduction.Tag
         gOptions.HistBinSlider.Value = 16
     End Sub
     Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs) Handles XYReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = XYReduction.Text
+        PCReduction = XYReduction.Tag
         gOptions.HistBinSlider.Value = 16
     End Sub
     Private Sub XZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = XZReduction.Text
+        PCReduction = XZReduction.Tag
         gOptions.HistBinSlider.Value = 16
     End Sub
     Private Sub YZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = YZReduction.Text
+        PCReduction = YZReduction.Tag
         gOptions.HistBinSlider.Value = 16
     End Sub
     Public Sub XYZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XYZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = XYZReduction.Text
+        PCReduction = XYZReduction.Tag
         gOptions.HistBinSlider.Value = 6
     End Sub
 

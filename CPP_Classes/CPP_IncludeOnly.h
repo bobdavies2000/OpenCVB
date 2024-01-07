@@ -119,6 +119,7 @@ vector<string> mapNames = { "Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "
 enum functions
 {
     CPP_AddWeighted_Basics_,
+CPP_RedCloud_Core_,
 CPP_FPoly_TopFeatures_,
     CPP_Random_Enumerable_,
     CPP_Bezier_Basics_,
@@ -214,13 +215,13 @@ public:
     Mat color, depthRGB, depth32f, pointCloud, gCloud, leftView, rightView; 
     int cppFunction; int lineWidth; int lineType; 
     int gridRows, gridCols;
-    Mat depthMask, noDepthMask, gridMask;
+    Mat depthMask, noDepthMask, gridMask, maxDepthMask;
     int font; 
     float fontSize; 
     Scalar fontColor;
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
 
-    bool heartBeat; bool debugCheckBox; Size minRes;
+    bool heartBeat; bool debugCheckBox; Size minRes; int PCReduction;
     bool optionsChanged; double addWeighted; int dotSize; int gridSize; float maxZmeters;
     int histogramBins; int pixelDiffThreshold; bool gravityPointCloud; bool useKalman;
     int paletteIndex; int polyCount; bool firstPass; Scalar highlightColor; int frameHistory;
@@ -1400,39 +1401,64 @@ public:
 
 
 
-//class CPP_Depth_Colorizer : public algorithmCPP
-//{
-//private: 
-//public: 
-//    int option_maxZmeters = 5000;
-//	CPP_Depth_Colorizer(int rows, int cols) : algorithmCPP(rows, cols) 
-//    {
-//        traceName = "CPP_Depth_Colorizer";
-//        desc = "Colorize the depth with across a range of 2 colors";
-//    }
-//	void Run(Mat src)
-//	{
-//        float nearColor[3] = { 0, 1.0f, 1.0f };
-//        float farColor[3] = { 1.0f, 0, 0 };
-//        auto rgb = (unsigned char*)dst2.data;
-//        float* depthImage = (float*)task->depth32f.data;
-//            
-//        for (int i = 0; i < dst2.cols * dst2.rows; i++)
-//        {
-//            float t = depthImage[i] / option_maxZmeters;
-//            if (t > 0 && t <= 1)
-//            {
-//                *rgb++ = uchar(((1 - t) * nearColor[0] + t * farColor[0]) * 255);
-//                *rgb++ = uchar(((1 - t) * nearColor[1] + t * farColor[1]) * 255);
-//                *rgb++ = uchar(((1 - t) * nearColor[2] + t * farColor[2]) * 255);
-//            }
-//            else {
-//                *rgb++ = 0; *rgb++ = 0; *rgb++ = 0;
-//            }
-//        }
-//    }
-//};
 
+
+class CPP_RedCloud_Core : public algorithmCPP {
+public:
+    int classCount, givenClassCount;
+
+    CPP_RedCloud_Core(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_RedCloud_Core";
+        desc = "Reduction transform for the point cloud";
+    }
+
+    void Run(Mat src) {
+        int reduceAmt = 500;
+        dst0 = task->pointCloud.clone();
+        dst0.convertTo(dst0, CV_32S, 1000.0 / reduceAmt);
+
+        vector<Mat> msplit;
+        split(dst0, msplit);
+
+        switch (task->PCReduction) {
+        case 0: // "X Reduction":
+            dst0 = msplit[0] * reduceAmt;
+            break;
+        case 1: // "Y Reduction":
+            dst0 = msplit[1] * reduceAmt;
+            break;
+        case 2: // "Z Reduction":
+            dst0 = msplit[2] * reduceAmt;
+            break;
+        case 3: // "XY Reduction":
+            dst0 = msplit[0] * reduceAmt + msplit[1] * reduceAmt;
+            break;
+        case 4: // "XZ Reduction":
+            dst0 = msplit[0] * reduceAmt + msplit[2] * reduceAmt;
+            break;
+        case 5: // "YZ Reduction":
+            dst0 = msplit[1] * reduceAmt + msplit[2] * reduceAmt;
+            break;
+        case 6: // "XYZ Reduction":
+            dst0 = msplit[0] * reduceAmt + msplit[1] * reduceAmt + msplit[2] * reduceAmt;
+            break;
+        }
+
+        double minVal, maxVal;
+        minMaxLoc(dst0, &minVal, &maxVal);
+        dst2 = dst0 - minVal;
+
+        dst2.setTo(maxVal - minVal, task->maxDepthMask);
+        minMaxLoc(dst2, &minVal, &maxVal);
+        classCount = 255 - givenClassCount - 1;
+        dst2 *= classCount / maxVal;
+        dst2 += givenClassCount + 1;
+        dst2.convertTo(dst2, CV_8U);
+
+        labels[2] = "Reduced Pointcloud - reduction factor = " + to_string(reduceAmt) +
+                    " produced " + to_string(classCount) + " regions";
+    }
+};
 
 
 

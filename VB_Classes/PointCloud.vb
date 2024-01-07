@@ -1069,14 +1069,14 @@ Public Class PointCloud_Histograms : Inherits VB_Algorithm
                         histogram, redOptions.channelCount, redOptions.histBinList, redOptions.ranges)
 
         Select Case redOptions.PCReduction
-            Case "X Reduction", "Y Reduction", "Z Reduction"
+            Case 0, 1, 2 ' "X Reduction", "Y Reduction", "Z Reduction"
                 plot.Run(histogram)
                 dst2 = plot.dst2
                 labels(2) = plot.labels(2)
-            Case "XY Reduction", "XZ Reduction", "YZ Reduction"
+            Case 3, 4, 5 ' "XY Reduction", "XZ Reduction", "YZ Reduction"
                 plot2D.Run(histogram)
                 dst2 = plot2D.dst2
-            Case "XYZ Reduction"
+            Case 6 ' "XYZ Reduction"
                 If dst2.Type <> cv.MatType.CV_8U Then dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
 
                 hcloud.Run(task.pointCloud)

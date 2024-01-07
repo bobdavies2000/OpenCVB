@@ -1,6 +1,7 @@
 #pragma once
 vector<String> functionNames({
 "CPP_AddWeighted_Basics_",
+"CPP_RedCloud_Core_",
 "CPP_FPoly_TopFeatures_",
 "CPP_Random_Enumerable_",
 "CPP_Bezier_Basics_",

@@ -42,6 +42,14 @@ Public Class CPP_Basics : Inherits VB_Algorithm
     Public Sub New()
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        cppTask_OptionsVBtoCPP(cPtr, gOptions.GridSize.Value,
+                               gOptions.HistBinSlider.Value,
+                               gOptions.PixelDiffThreshold.Value, gOptions.UseKalman.Checked,
+                               task.historyCount,
+                               task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height,
+                               task.lineWidth, task.lineType, task.dotSize, task.minRes.Width, task.minRes.Height,
+                               task.maxZmeters, redOptions.PCReduction)
+
         Dim pointCloudData(task.pointCloud.Total * task.pointCloud.ElemSize - 1) As Byte
         Marshal.Copy(task.pointCloud.Data, pointCloudData, 0, pointCloudData.Length)
         Dim handlePointCloud = GCHandle.Alloc(pointCloudData, GCHandleType.Pinned)
@@ -69,14 +77,6 @@ Public Class CPP_Basics : Inherits VB_Algorithm
         handleDepthRGB.Free()
         handleLeftView.Free()
         handleRightView.Free()
-
-        cppTask_OptionsVBtoCPP(cPtr, gOptions.GridSize.Value,
-                               gOptions.HistBinSlider.Value,
-                               gOptions.PixelDiffThreshold.Value, gOptions.UseKalman.Checked,
-                               task.historyCount,
-                               task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height,
-                               task.lineWidth, task.lineType, task.dotSize, task.minRes.Width, task.minRes.Height,
-                               task.maxZmeters)
 
 
         Dim inputImage(src.Total * src.ElemSize - 1) As Byte
@@ -161,6 +161,7 @@ Module CPP_Module
                                       ByRef rectX As Integer, ByRef rectY As Integer, ByRef rectWidth As Integer,
                                       ByRef rectHeight As Integer, ByRef lineWidth As Integer,
                                       ByRef lineType As Integer, ByRef dotSize As Integer, ByRef minResWidth As Integer,
-                                      ByRef minResHeight As Integer, ByRef maxZmeters As Single)
+                                      ByRef minResHeight As Integer, ByRef maxZmeters As Single,
+                                      ByRef PCReduction As Integer)
     End Sub
 End Module 

@@ -41,6 +41,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case CPP_AddWeighted_Basics_:
     {task->alg = new CPP_AddWeighted_Basics(rows, cols); break; }
+	case CPP_RedCloud_Core_ :
+	{task->alg = new CPP_RedCloud_Core(rows, cols); break; }
 	case CPP_FPoly_TopFeatures_ :
 	{task->alg = new CPP_FPoly_TopFeatures(rows, cols); break; }
 	case CPP_Random_Enumerable_ :
@@ -219,7 +221,7 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int& gridSize,
                             int& histogramBins, int& pixelDiffThreshold, bool& useKalman,
                             int& frameHistory, int& rectX, int& rectY, int& rectWidth, int& rectHeight,
                             int& lineWidth, int& lineType, int& dotSize, int& minResWidth, int& minResHeight,
-                            float& maxZmeters)
+                            float& maxZmeters, int& PCReduction)
 {
     task->pixelDiffThreshold = pixelDiffThreshold;
     task->gridSize = gridSize;
@@ -235,6 +237,7 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int& gridSize,
     task->dotSize = dotSize;
     task->minRes = Size(minResWidth, minResHeight);
     task->maxZmeters = maxZmeters;
+    task->PCReduction = PCReduction;
 }
 
 
@@ -259,7 +262,10 @@ int* cppTask_PointCloud(cppTask * task, int* dataPtr, int rows, int cols)
     convertScaleAbs(task->pcSplit[2], depthRGBsplit[2], 255);
     task->depthMask = task->depth32f > 0;
     bitwise_not(task->depthMask, task->noDepthMask);
-    
+
+    cv::threshold(task->pcSplit[2], task->maxDepthMask, task->maxZmeters, 255, cv::THRESH_BINARY);  
+    task->maxDepthMask.convertTo(task->maxDepthMask, CV_8U);
+
     static CPP_Depth_PointCloud_IMU* pCloud = new CPP_Depth_PointCloud_IMU(rows, cols);
     pCloud->Run(task->pointCloud); // build the task->gCloud - oriented toward gravity.
 

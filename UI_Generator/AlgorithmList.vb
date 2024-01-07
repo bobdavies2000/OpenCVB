@@ -2,6 +2,7 @@
 Public Class algorithmList
 Public Enum functionNames
 CPP_AddWeighted_Basics_
+CPP_RedCloud_Core_
 CPP_FPoly_TopFeatures_
 CPP_Random_Enumerable_
 CPP_Bezier_Basics_
@@ -303,6 +304,7 @@ if algorithmName = "CPP_Random_Basics" Then return new CPP_Basics(functionNames.
 if algorithmName = "CPP_Random_Enumerable" Then return new CPP_Basics(functionNames.CPP_Random_Enumerable_)
 if algorithmName = "CPP_Rectangle_Basics" Then return new CPP_Basics(functionNames.CPP_Rectangle_Basics_)
 if algorithmName = "CPP_Rectangle_Rotated" Then return new CPP_Basics(functionNames.CPP_Rectangle_Rotated_)
+if algorithmName = "CPP_RedCloud_Core" Then return new CPP_Basics(functionNames.CPP_RedCloud_Core_)
 if algorithmName = "CPP_RedCloud_FeatureLess2" Then return new CPP_Basics(functionNames.CPP_RedCloud_FeatureLess2_)
 if algorithmName = "CPP_RedCloud_Flood" Then return new CPP_Basics(functionNames.CPP_RedCloud_Flood_)
 if algorithmName = "CPP_RedCloud_Hulls" Then return new CPP_Basics(functionNames.CPP_RedCloud_Hulls_)
