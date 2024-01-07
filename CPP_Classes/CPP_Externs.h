@@ -254,8 +254,6 @@ int* cppTask_PointCloud(cppTask * task, int* dataPtr, int rows, int cols)
     convertScaleAbs(task->pcSplit[0], depthRGBsplit[0], 255);
     convertScaleAbs(task->pcSplit[1], depthRGBsplit[1], 255);
     convertScaleAbs(task->pcSplit[2], depthRGBsplit[2], 255);
-    vector<Mat> channels = { depthRGBsplit[0], depthRGBsplit[1], depthRGBsplit[2] };
-    merge(channels, task->depthRGB);
     task->depthMask = task->depth32f > 0;
     bitwise_not(task->depthMask, task->noDepthMask);
     
