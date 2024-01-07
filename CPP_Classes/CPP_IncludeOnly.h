@@ -140,7 +140,6 @@ CPP_FPoly_TopFeatures_,
     CPP_Mat_4to1_,
     CPP_Grid_Basics_,
     CPP_Depth_Colorizer_,
-    CPP_RedCloud_PrepData_,
     CPP_RedCloud_Flood_,
     CPP_Depth_PointCloud_,
     CPP_IMU_GMatrix_,
@@ -1464,107 +1463,6 @@ public:
 
 
 
-class CPP_RedCloud_PrepData : public algorithmCPP
-{
-private:
-    int option_reduction = 500;
-    int option_selectCase = 3;
-    double minValStable = 0.0;
-    double maxValStable = 0.0;
-public:
-    CPP_RedCloud_PrepData(int rows, int cols) : algorithmCPP(rows, cols) {
-        traceName = "CPP_RedCloud_PrepData";
-        desc = "Prepare the reduced point cloud";
-    }
-    void Run(Mat src) {
-        if (src.type() != CV_32FC3)
-        {
-            task->pointCloud.convertTo(dst0, CV_32SC3, 1000.0f / option_reduction);
-        }
-        else {
-            src.convertTo(dst0, CV_32SC3, 1000.0f / option_reduction);
-        }
-
-        Mat msplit[3];
-        split(dst0, msplit);
-        
-        switch (option_selectCase)
-        {
-        case 0:
-        {
-            msplit[0] *= option_reduction;
-            msplit[1].setTo(0);
-            msplit[2].setTo(0);
-            break;
-        }
-        case 1:
-        {
-            msplit[0].setTo(0);
-            msplit[1] *= option_reduction;
-            msplit[2].setTo(0);
-            break;
-        }
-        case 2:
-        {
-            msplit[0].setTo(0);
-            msplit[1].setTo(0);
-            msplit[2] *= option_reduction;
-            break;
-        }
-        case 3:
-        {
-            msplit[0] *= option_reduction;
-            msplit[1] *= option_reduction;
-            msplit[2].setTo(0);
-            break;
-        }
-        case 4:
-        {
-            msplit[0] *= option_reduction;
-            msplit[1].setTo(0);
-            msplit[2] *= option_reduction;
-            break;
-        }
-        case 5:
-        {
-            msplit[0].setTo(0);
-            msplit[1] *= option_reduction;
-            msplit[2] *= option_reduction;
-            break;
-        }
-        case 6:
-        {
-            dst1 *= option_reduction;
-            dst1.convertTo(dst2, CV_32FC3);
-            cvtColor(dst2, dst0, COLOR_BGR2GRAY);
-            dst0.convertTo(dst2, CV_32SC1);
-        }
-        }
-
-        double minVal = 0.0, maxVal = 0.0;
-        if (option_selectCase != 6) {
-            vector<Mat> channels = { msplit[0], msplit[1], msplit[2] };
-            merge(channels, dst1);
-            dst1.convertTo(dst2, CV_32FC3);
-            cvtColor(dst2, dst0, COLOR_BGR2GRAY);
-            dst0.convertTo(dst2, CV_32SC1);
-            minMaxLoc(dst2, &minVal, &maxVal);
-            dst2 += abs(minVal) + 1; // get away from zero value.
-        }
-        if (standalone)
-        {
-            if (minValStable > minVal) minValStable = minVal;
-            if (maxValStable < maxVal) maxValStable = maxVal;
-            convertScaleAbs(dst2, dst2, 255 / ((maxValStable - minValStable)));
-        }
-        minMaxLoc(dst2, &minVal, &maxVal);
-        int x = 0;
-    }
-};
-
-
-
-
 
 class CPP_Depth_PointCloud : public algorithmCPP
 {
@@ -2239,7 +2137,7 @@ class CPP_RedCloud_Flood : public algorithmCPP
 private:
 public:
     Mat inputMask;
-    CPP_RedCloud_PrepData* prepData;
+    CPP_RedCloud_Core* prepData;
     int option_loDiff = 0;
     int option_hiDiff = 0;
     int option_minSizeCell = 75;
@@ -2250,7 +2148,7 @@ public:
     vector<int> sizes;
     CPP_RedCloud_Flood(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_RedCloud_Flood";
-        prepData = new CPP_RedCloud_PrepData(rows, cols);
+        prepData = new CPP_RedCloud_Core(rows, cols);
         desc = "Perform the RedCloud low level FloodFill";
     }
     rcData buildZeroEntry() {

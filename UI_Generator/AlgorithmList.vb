@@ -23,7 +23,6 @@ CPP_Edge_Scharr_
 CPP_Mat_4to1_
 CPP_Grid_Basics_
 CPP_Depth_Colorizer_
-CPP_RedCloud_PrepData_
 CPP_RedCloud_Flood_
 CPP_Depth_PointCloud_
 CPP_IMU_GMatrix_
@@ -308,7 +307,6 @@ if algorithmName = "CPP_RedCloud_Core" Then return new CPP_Basics(functionNames.
 if algorithmName = "CPP_RedCloud_FeatureLess2" Then return new CPP_Basics(functionNames.CPP_RedCloud_FeatureLess2_)
 if algorithmName = "CPP_RedCloud_Flood" Then return new CPP_Basics(functionNames.CPP_RedCloud_Flood_)
 if algorithmName = "CPP_RedCloud_Hulls" Then return new CPP_Basics(functionNames.CPP_RedCloud_Hulls_)
-if algorithmName = "CPP_RedCloud_PrepData" Then return new CPP_Basics(functionNames.CPP_RedCloud_PrepData_)
 if algorithmName = "CPP_Remap_Basics" Then return new CPP_Basics(functionNames.CPP_Remap_Basics_)
 if algorithmName = "CPP_Resize_Basics" Then return new CPP_Basics(functionNames.CPP_Resize_Basics_)
 if algorithmName = "CPP_Stable_Basics" Then return new CPP_Basics(functionNames.CPP_Stable_Basics_)

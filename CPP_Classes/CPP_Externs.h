@@ -85,8 +85,6 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 	{task->alg = new CPP_Grid_Basics(rows, cols);break;}
 	case CPP_Depth_Colorizer_ :
 	{task->alg = new CPP_Depth_Colorizer(rows, cols);break;}
-	case CPP_RedCloud_PrepData_ :
-	{task->alg = new CPP_RedCloud_PrepData(rows, cols);break;}
 	case CPP_RedCloud_Flood_ :
 	{task->alg = new CPP_RedCloud_Flood(rows, cols);break;}
 	case CPP_Depth_PointCloud_ :

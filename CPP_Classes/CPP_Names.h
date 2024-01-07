@@ -22,7 +22,6 @@ vector<String> functionNames({
 "CPP_Mat_4to1_",
 "CPP_Grid_Basics_",
 "CPP_Depth_Colorizer_",
-"CPP_RedCloud_PrepData_",
 "CPP_RedCloud_Flood_",
 "CPP_Depth_PointCloud_",
 "CPP_IMU_GMatrix_",
