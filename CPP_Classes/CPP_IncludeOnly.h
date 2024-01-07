@@ -1295,26 +1295,27 @@ public:
 
 
 
-
-class CPP_Edge_Scharr : public algorithmCPP
-{
-private:
+class CPP_Edge_Scharr : public algorithmCPP {
 public:
     CPP_Edge_Scharr(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Edge_Scharr";
         desc = "Scharr is most accurate with 3x3 kernel.";
     }
+
     void Run(Mat src) {
-        Mat gray, xField, yField;
+        float optionScharrMultiplier = 50;
+        Mat gray;
         cvtColor(src, gray, COLOR_BGR2GRAY);
+
+        Mat xField, yField;
         Scharr(gray, xField, CV_32FC1, 1, 0);
         Scharr(gray, yField, CV_32FC1, 0, 1);
-        add(xField, yField, dst3);
-        dst3.convertTo(dst2, CV_8U);
-        normalize(dst3, dst3, 0, 255, NORM_MINMAX);
-        dst3.convertTo(dst3, CV_8U);
+
+        add(xField, yField, dst0);
+        dst0.convertTo(dst2, CV_8U, optionScharrMultiplier / 100.0);
     }
 };
+
 
 
 
