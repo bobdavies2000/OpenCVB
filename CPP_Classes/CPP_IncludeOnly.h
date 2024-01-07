@@ -787,7 +787,8 @@ public:
 
 
 
-class CPP_KNN_BasicsNew : public algorithmCPP {
+class CPP_KNN_Basics : public algorithmCPP
+{
 public:
     cv::Ptr<cv::ml::KNearest> knn = cv::ml::KNearest::create();
     std::vector<cv::Point2f> trainInput;
@@ -797,36 +798,40 @@ public:
     int desiredMatches = -1;
     CPP_Random_Basics* random;
     vector<int> neighborIndexToTrain;
-    CPP_KNN_BasicsNew(int rows, int cols) : algorithmCPP(rows, cols) {
+    
+    CPP_KNN_Basics(int rows, int cols) : algorithmCPP(rows, cols)
+    {
         traceName = "CPP_KNN_Basics";
         random = new CPP_Random_Basics(rows, cols);
         labels[2] = "Red=TrainingData, yellow = queries";
         desc = "Train a KNN model and map each query to the nearest training neighbor.";
     }
-
     void displayResults() {
-        dst2.setTo(0);
+        dst2.setTo(0);  // Assuming dst2 is a cv::Mat object
         int dm = std::min(trainInput.size(), queries.size());
+
         for (int i = 0; i < queries.size(); i++) {
             cv::Point2f pt = queries[i];
-            if (result.at<int>(i, 0) < trainInput.size() && result.at<int>(i, 0) >= 0) {
-                cv::Point2f nn = trainInput[result.at<int>(i, 0)];
-                cv::circle(dst2, pt, task->dotSize + 4, cv::Scalar(0, 255, 255), -1, task->lineType);
-                cv::line(dst2, pt, nn, cv::Scalar(0, 255, 255), task->lineWidth, task->lineType);
-            }
+            int test = result.at<int>(i, 0);
+            if (test >= trainInput.size() || test < 0) continue;
+            cv::Point2f nn = trainInput[result.at<int>(i, 0)];
+            cv::circle(dst2, pt, task->dotSize + 4, cv::Scalar(0, 255, 255), -1, task->lineType);  // Yellow
+            cv::line(dst2, pt, nn, cv::Scalar(0, 255, 255), task->lineWidth, task->lineType);
         }
+
         for (cv::Point2f pt : trainInput) {
-            cv::circle(dst2, pt, task->dotSize + 4, cv::Scalar(0, 0, 255), -1, task->lineType);
+            cv::circle(dst2, pt, task->dotSize + 4, cv::Scalar(0, 0, 255), -1, task->lineType);  // Red
         }
     }
     void generateRandom(Mat src)
     {
         random->Run(src);
         queries = random->pointList;
-        if (task->heartBeat) 
+        if (task->heartBeat)
             trainInput = queries;
     }
-    void RunVB(cv::Mat src) {
+    void Run(Mat src)
+    {
         int KNNdimension = 2;
 
         if (standalone) {
@@ -838,7 +843,7 @@ public:
             queries = random->pointList;
         }
 
-        cv::Mat queryMat((int) queries.size(), KNNdimension, CV_32F, queries.data());
+        cv::Mat queryMat((int)queries.size(), KNNdimension, CV_32F, queries.data());
         if (queryMat.rows == 0) {
             task->setTrueText("There were no queries provided. There is nothing to do...", dst2);
             return;
@@ -847,15 +852,15 @@ public:
         if (trainInput.empty()) {
             trainInput = queries;  // First pass, just match the queries.
         }
-        cv::Mat trainData((int) trainInput.size(), KNNdimension, CV_32F, trainInput.data());
-        Mat initOnes(1, trainData.rows, CV_32S, 1);
-        cv::Mat response(trainData.rows, 1, CV_32S, initOnes.data);  // Create response matrix
+        cv::Mat trainData((int)trainInput.size(), KNNdimension, CV_32F, trainInput.data());
+        vector<int> array(trainData.rows);
+        iota(array.begin(), array.end(), 0);
+        cv::Mat response(trainData.rows, 1, CV_32S, array.data());  // Create response matrix
         knn->train(trainData, cv::ml::ROW_SAMPLE, response);
 
         int dm = desiredMatches < 0 ? (int)trainInput.size() : desiredMatches;
-        Mat results; 
         Mat neighborMat;
-        knn->findNearest(queryMat, dm, results, neighborMat);
+        knn->findNearest(queryMat, dm, cv::noArray(), neighborMat);
 
         if (neighborMat.rows != queryMat.rows || neighborMat.cols != dm) {
             std::cerr << "KNN's FindNearest did not return the correct number of neighbors.\n";
@@ -888,81 +893,7 @@ public:
     }
 };
 
-class CPP_KNN_Basics : public algorithmCPP
-{
-private:
-public:
-    CPP_Random_Basics* rpt;
-    vector<Point2f> queries;
-    vector<Point2f> trainInput;
-    vector<Point2f> neighbors;
-    vector<int> neighborIndexToTrain;
-    Mat neighborResponses;
-    int knnDimension;
-    CPP_KNN_Basics(int rows, int cols) : algorithmCPP(rows, cols)
-    {
-        traceName = "CPP_KNN_Basics";
-        rpt = new CPP_Random_Basics(rows, cols);
-        knnDimension = 2; // default dimension...
-        desc = "Train a KNN model and map each query to the nearest training neighbor.";
-    }
-    void generateRandom(Mat src)
-    {
-        rpt->Run(src);
-        queries = rpt->pointList;
-        if (task->heartBeat) 
-            trainInput = queries;
-    }
-    void Run(Mat src)
-    {
-        if (standalone) generateRandom(src);
-        if (queries.size() == 0)
-        {
-            task->setTrueText("No queries were provided", dst2);
-            return;
-        }
-        if (trainInput.size() == 0) trainInput = queries; 
-        Mat trainingData = Mat(int(trainInput.size()), knnDimension, CV_32F, trainInput.data());
 
-        vector<int> resp(int(trainInput.size()));
-        iota(resp.begin(), resp.end(), 0);
-        Mat trainingLabels = Mat(int(trainInput.size()), 1, CV_32S, resp.data());
-
-        Ptr<KNearest> knn = ml::KNearest::create();
-        knn->train(trainingData, ml::SampleTypes::ROW_SAMPLE, trainingLabels);
-        Mat results;
-
-        Mat queryMat = Mat(int(queries.size()), knnDimension, CV_32F, queries.data());
-        knn->findNearest(queryMat, int(trainInput.size()), results, neighborResponses);
-
-        neighbors.clear();
-        neighborIndexToTrain.clear();
-        for (int i = 0; i < results.rows; i++)
-        {
-            int index = int(neighborResponses.at<float>(i, 0));
-            neighbors.push_back(trainInput[index]);
-            neighborIndexToTrain.push_back(index);
-        }
-
-        dst2.setTo(0);
-        for (size_t i = 0; i < queries.size(); i++)
-        {
-            circle(dst2, queries[i], task->dotSize + 3, GREEN, -1, task->lineType);
-            circle(dst2, neighbors[i], task->dotSize + 3, RED, -1, task->lineType);
-            line(dst2, queries[i], neighbors[i], Scalar(255, 255, 0), task->lineWidth, task->lineType);
-        }
-
-        for (Point2f pt : trainInput)
-        {
-            circle(dst2, pt, task->dotSize + 3, RED, -1, task->lineType);
-        }
-        
-        task->setTrueText("KNN - red is training data, green = queries", dst3);
-        if (task->heartBeat) dst3.setTo(0);
-        bitwise_or(dst2, dst3, dst3);
-    }
-};
- 
 
 
 

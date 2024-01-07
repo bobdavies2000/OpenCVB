@@ -53,8 +53,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {task->alg = new CPP_Delaunay_Basics(rows, cols);break;}
     case CPP_Delaunay_GenerationsNoKNN_ :
     {task->alg = new CPP_Delaunay_GenerationsNoKNN(rows, cols);break;}
-    case CPP_KNN_Basics_ :
-    {task->alg = new CPP_KNN_Basics(rows, cols);break;}
+    case CPP_KNN_Basics_:
+    {task->alg = new CPP_KNN_Basics(rows, cols); break; }
     case CPP_Random_Basics_ :
     {task->alg = new CPP_Random_Basics(rows, cols);break;}
     case CPP_KNN_Lossy_ :
