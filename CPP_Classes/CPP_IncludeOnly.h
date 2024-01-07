@@ -588,7 +588,6 @@ public:
 
 
 
-
 class CPP_Random_Enumerable : public algorithmCPP {
 public:
     int sizeRequest = 100;
