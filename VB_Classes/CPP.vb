@@ -75,7 +75,8 @@ Public Class CPP_Basics : Inherits VB_Algorithm
                                gOptions.PixelDiffThreshold.Value, gOptions.UseKalman.Checked,
                                task.historyCount,
                                task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height,
-                               task.lineWidth, task.lineType, task.dotSize)
+                               task.lineWidth, task.lineType, task.dotSize, task.minRes.Width, task.minRes.Height,
+                               task.maxZmeters)
 
 
         Dim inputImage(src.Total * src.ElemSize - 1) As Byte
@@ -154,11 +155,12 @@ Module CPP_Module
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub cppTask_OptionsVBtoCPP(cPtr As IntPtr, ByRef gridSize As Integer,
-                                        ByRef histogramBins As Integer,
-                                        ByRef pixelDiffThreshold As Integer,
-                                        ByRef useKalman As Boolean, ByRef frameHistory As Integer,
-                                        ByRef rectX As Integer, ByRef rectY As Integer, ByRef rectWidth As Integer,
-                                        ByRef rectHeight As Integer, ByRef lineWidth As Integer,
-                                        ByRef lineType As Integer, ByRef dotSize As Integer)
+                                      ByRef histogramBins As Integer,
+                                      ByRef pixelDiffThreshold As Integer,
+                                      ByRef useKalman As Boolean, ByRef frameHistory As Integer,
+                                      ByRef rectX As Integer, ByRef rectY As Integer, ByRef rectWidth As Integer,
+                                      ByRef rectHeight As Integer, ByRef lineWidth As Integer,
+                                      ByRef lineType As Integer, ByRef dotSize As Integer, ByRef minResWidth As Integer,
+                                      ByRef minResHeight As Integer, ByRef maxZmeters As Single)
     End Sub
 End Module 

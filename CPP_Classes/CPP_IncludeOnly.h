@@ -220,8 +220,8 @@ public:
     Scalar fontColor;
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
 
-    bool heartBeat; bool debugCheckBox;
-    bool optionsChanged; double addWeighted; int dotSize; int gridSize; float maxDepth;
+    bool heartBeat; bool debugCheckBox; Size minRes;
+    bool optionsChanged; double addWeighted; int dotSize; int gridSize; float maxZmeters;
     int histogramBins; int pixelDiffThreshold; bool gravityPointCloud; bool useKalman;
     int paletteIndex; int polyCount; bool firstPass; Scalar highlightColor; int frameHistory;
     Point clickPoint; bool mouseClickFlag; int mousePicTag; Point mouseMovePoint; bool mouseMovePointUpdated;
@@ -1367,84 +1367,71 @@ public:
 };
 
 
-
-
-//class CPP_Mat_4to1 : public algorithmCPP
-//{
-//private:
-//public:
-//    Mat mat[4];
-//    bool lineSeparators = true;
-//    CPP_Mat_4to1(int rows, int cols) : algorithmCPP(rows, cols) {
-//        traceName = "CPP_Mat_4to1";
-//        for (auto i = 0; i < 4; i++) {
-//            mat[i] = dst2.clone();
-//        }
-//        desc = "Use one Mat for up to 4 images";
-//    }
-//    void Run(Mat src) {
-//        auto nSize = Size(dst2.cols / 2, dst2.rows / 2);
-//        auto roiTopLeft = Rect(0, 0, nSize.width, nSize.height);
-//        auto roiTopRight = Rect(nSize.width, 0, nSize.width, nSize.height);
-//        auto roibotLeft = Rect(0, nSize.height, nSize.width, nSize.height);
-//        auto roibotRight = Rect(nSize.width, nSize.height, nSize.width, nSize.height);
-//        if (standalone) {
-//            mat[0] = src.clone();
-//            mat[1] = task->depthRGB.clone();
-//            mat[2] = task->leftView.clone();
-//            mat[3] = task->rightView.clone();
-//        }
-//        dst2 = Mat(dst2.size(), CV_8UC3);
-//        Rect rects[] = { roiTopLeft, roiTopRight, roibotLeft, roibotRight };
-//        for (auto i = 0; i < 4; i++) {
-//            auto tmp = mat[i].clone();
-//            if (tmp.channels() == 1) cvtColor(mat[i], tmp, COLOR_GRAY2BGR);
-//
-//            resize(tmp, dst2(rects[i]), nSize);
-//        }
-//        if (lineSeparators) {
-//            line(dst2, Point(0, dst2.rows / 2), Point(dst2.cols, dst2.rows / 2), WHITE, task->lineWidth + 1);
-//            line(dst2, Point(dst2.cols / 2, 0), Point(dst2.cols / 2, dst2.rows), WHITE, task->lineWidth + 1);
-//        }
-//    }
-//};
-
-
-
-
-
-class CPP_Depth_Colorizer : public algorithmCPP
-{
-private: 
-public: 
-    int option_MaxDepth = 5000;
-	CPP_Depth_Colorizer(int rows, int cols) : algorithmCPP(rows, cols) 
-    {
+class CPP_Depth_Colorizer : public algorithmCPP {
+public:
+    CPP_Depth_Colorizer(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Depth_Colorizer";
-        desc = "Colorize the depth with across a range of 2 colors";
+        desc = "Colorize the depth based on the near and far colors.";
     }
-	void Run(Mat src)
-	{
-        float nearColor[3] = { 0, 1.0f, 1.0f };
-        float farColor[3] = { 1.0f, 0, 0 };
-        auto rgb = (unsigned char*)dst2.data;
-        float* depthImage = (float*)task->depth32f.data;
-            
-        for (int i = 0; i < dst2.cols * dst2.rows; i++)
-        {
-            float t = depthImage[i] / option_MaxDepth;
-            if (t > 0 && t <= 1)
-            {
-                *rgb++ = uchar(((1 - t) * nearColor[0] + t * farColor[0]) * 255);
-                *rgb++ = uchar(((1 - t) * nearColor[1] + t * farColor[1]) * 255);
-                *rgb++ = uchar(((1 - t) * nearColor[2] + t * farColor[2]) * 255);
-            }
-            else {
-                *rgb++ = 0; *rgb++ = 0; *rgb++ = 0;
+
+    void Run(Mat src) {
+        if (src.type() != CV_32F) {
+            src = task->pcSplit[2];
+        }
+
+        dst2.setTo(0);
+        Scalar nearColor = Scalar(0, 1.0f, 1.0f);
+        Scalar farColor = Scalar(1.0f, 0, 0);
+        for (int y = 0; y < src.rows; y++) {
+            for (int x = 0; x < src.cols; x++) {
+                float pixel = src.at<float>(y, x);
+                if (pixel != 0)
+                    int k = 0;
+                if (pixel > 0 && pixel <= task->maxZmeters) {
+                    float t = pixel / task->maxZmeters;
+                    Scalar colorS = 255 * ((1 - t) * nearColor + t * farColor);
+                    Vec3b color = Vec3b(colorS[0], colorS[1], colorS[2]);
+                    dst2.at<Vec3b>(y, x) = color;
+                }
             }
         }
     }
 };
+
+
+
+//class CPP_Depth_Colorizer : public algorithmCPP
+//{
+//private: 
+//public: 
+//    int option_maxZmeters = 5000;
+//	CPP_Depth_Colorizer(int rows, int cols) : algorithmCPP(rows, cols) 
+//    {
+//        traceName = "CPP_Depth_Colorizer";
+//        desc = "Colorize the depth with across a range of 2 colors";
+//    }
+//	void Run(Mat src)
+//	{
+//        float nearColor[3] = { 0, 1.0f, 1.0f };
+//        float farColor[3] = { 1.0f, 0, 0 };
+//        auto rgb = (unsigned char*)dst2.data;
+//        float* depthImage = (float*)task->depth32f.data;
+//            
+//        for (int i = 0; i < dst2.cols * dst2.rows; i++)
+//        {
+//            float t = depthImage[i] / option_maxZmeters;
+//            if (t > 0 && t <= 1)
+//            {
+//                *rgb++ = uchar(((1 - t) * nearColor[0] + t * farColor[0]) * 255);
+//                *rgb++ = uchar(((1 - t) * nearColor[1] + t * farColor[1]) * 255);
+//                *rgb++ = uchar(((1 - t) * nearColor[2] + t * farColor[2]) * 255);
+//            }
+//            else {
+//                *rgb++ = 0; *rgb++ = 0; *rgb++ = 0;
+//            }
+//        }
+//    }
+//};
 
 
 
