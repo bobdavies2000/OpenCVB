@@ -1267,25 +1267,29 @@ public:
 
 
 // https://docs.opencv.org/4.x/da/d22/tutorial_py_canny.html
-class CPP_Edge_Canny : public algorithmCPP
-{
-private:
+class CPP_Edge_Canny : public algorithmCPP {
 public:
     CPP_Edge_Canny(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Edge_Canny";
-        desc = "Show canny edge detection";
+        desc = "Show canny edge detection with varying thresholds";
     }
+
     void Run(Mat src) {
         int threshold1 = 50;
         int threshold2 = 50;
         int aperture = 3;
-        if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
-        Canny(src, dst2, threshold1, threshold2, aperture);
+
+        if (src.channels() == 3) {
+            cvtColor(src, src, COLOR_BGR2GRAY);
+        }
+
+        if (src.depth() != CV_8U) {
+            src.convertTo(src, CV_8U);
+        }
+
+        Canny(src, dst2, threshold1, threshold2, aperture, true);
     }
 };
-
-
-
 
 
 
