@@ -1075,42 +1075,74 @@ public:
 
 
 
+class CPP_Feature_Basicstest : public algorithmCPP {
+public:
+    cv::Ptr<cv::BRISK> brisk;
+    std::vector<cv::Point2f> corners;
+    bool useBRISK = true;
+    int minDistance = 15;
+    int sampleSize = 400;
+    int quality = 1;
+
+    CPP_Feature_Basicstest(int rows, int cols) : algorithmCPP(rows, cols) {
+    }
+
+    void Run(const cv::Mat& src) {
+    }
+};
+
+
 
 
 class CPP_Feature_Basics : public algorithmCPP
 {
 private: 
 public: 
-    vector<Point2f> corners;
-   
-    int numPoints = 20;
-    double qualityLevel = 0.01;
-    double minDistance = 15;
-    int blockSize = 7;
-    int gradientSize = 3;
-    bool useHarris = true;
-    CPP_Feature_Basics(int rows, int cols) : algorithmCPP(rows, cols) 
+    cv::Ptr<cv::BRISK> brisk;
+    std::vector<cv::Point2f> corners;
+    bool useBRISK = true;
+    int minDistance = 15;
+    int sampleSize = 400;
+    int quality = 1;
+
+    CPP_Feature_Basics(int rows, int cols) : algorithmCPP(rows, cols)
     {
         traceName = "CPP_Feature_Basics";
-        desc = "Find the good feature points.";
+        brisk = cv::BRISK::create();
+        desc = "Find good features to track in a BGR image.";
     }
 	void Run(Mat src)
 	{
-        if (src.channels() == 3) cvtColor(src, dst0, COLOR_BGR2GRAY);
-        vector<Point2f> allCorners; // more than we need...
-        goodFeaturesToTrack(dst0, allCorners, numPoints + 10, qualityLevel, minDistance, Mat(), blockSize, 
-                            gradientSize, useHarris);
-        dst2 = src;
-        dst3.setTo(0);
-        corners.clear();
-        for (Point2f pt : allCorners)
-        {
-            circle(dst2, pt, task->dotSize, YELLOW, -1, task->lineType);
-            circle(dst3, pt, task->dotSize, YELLOW, -1, task->lineType);
-            corners.push_back(pt);
-            if (corners.size() >= numPoints) break;
+        cv::Mat dst2 = src.clone();
+
+        if (src.channels() == 3) {
+            cv::cvtColor(src, src, cv::COLOR_BGR2GRAY);
         }
-	}
+
+        corners.clear();
+        if (useBRISK) {
+            std::vector<cv::KeyPoint> keyPoints;
+            brisk->detect(src, keyPoints);
+            for (const cv::KeyPoint& kp : keyPoints) {
+                if (kp.size >= minDistance) {
+                    corners.push_back(kp.pt);
+                }
+            }
+        }
+        else {
+            std::vector<cv::Point2f> tempCorners;
+            cv::goodFeaturesToTrack(src, tempCorners, sampleSize, quality, minDistance, cv::noArray(), 7, true, 3);
+            corners = tempCorners;
+        }
+
+        cv::Scalar color = dst2.channels() == 3 ? cv::Scalar(0, 255, 255) : cv::Scalar(255, 255, 255);
+        for (const cv::Point2f& c : corners) {
+            cv::circle(dst2, c, task->dotSize, color, -1, task->lineType);
+        }
+
+        labels[2] = "Found " + to_string(corners.size()) + " points with quality = " + to_string(quality) +
+                    " and minimum distance = " + to_string(minDistance);
+    }
 };
 
 
