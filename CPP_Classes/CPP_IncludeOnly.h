@@ -1008,57 +1008,68 @@ public:
 
 
 
-
 class CPP_Delaunay_Generations : public algorithmCPP
 {
 private:
 public:
-    CPP_Delaunay_Basics* basics;
+    std::vector<cv::Point2f> inputPoints;
+    CPP_Delaunay_Basics* facet;
     CPP_KNN_Lossy* knn;
-    vector<Point2f> inputPoints;
+    CPP_Random_Basics* random;
+
     CPP_Delaunay_Generations(int rows, int cols) : algorithmCPP(rows, cols)
     {
         traceName = "CPP_Delaunay_Generations";
-        basics = new CPP_Delaunay_Basics(rows, cols);
+        dst3 = cv::Mat::zeros(dst3.size(), CV_32S);
         knn = new CPP_KNN_Lossy(rows, cols);
-        dst0 = Mat(dst0.rows, dst0.cols, CV_32S);
-        dst0.setTo(0);
+        facet = new CPP_Delaunay_Basics(rows, cols);
+        random = new CPP_Random_Basics(rows, cols);
+        labels = {"", "Mask of unmatched regions - generation set to 0", "Facet Image with count for each region",
+                  "Generation counts in CV_32SC1 format" };
         desc = "Create a region in an image for each point provided";
     }
     void Run(Mat src) {
-        //if (task->heartBeat && standalone)
-        //{
-        //    basics->randomInput(src);
-        //    inputPoints = basics->inputPoints;
-        //}
+        if (standalone) {
+            if (task->firstPass) {
+                random->sizeRequest = 10;
+            }
+            if (task->heartBeat) {
+                random->Run(empty);
+            }
+            inputPoints = random->pointList;
+        }
 
-        //knn->basics->queries = inputPoints;
-        //knn->Run(src);
+        knn->queries = inputPoints;
+        knn->Run(empty);
 
-        //basics->inputPoints = inputPoints;
-        //basics->Run(src);
-        //dst2 = basics->dst2;
+        facet->inputPoints = inputPoints;
+        facet->Run(src);
+        dst2 = facet->dst2;
 
-        //Mat generationMap = dst0.clone();
-        //dst0.setTo(0);
-        //int g;
-        //for (size_t i = 0; i < knn->neighbors.size(); i++)
-        //{
-        //    if (knn->neighbors[i] == -1) continue;
-        //    Point2f pt = knn->matchp2[i];
+        cv::Mat generationMap = dst3.clone();
+        dst3.setTo(0);
+        std::vector<int> usedG;
+        int g;
+        for (const linePoints& mp : knn->matches) {
+            int index = facet->facet32s.at<int>(mp.p2.y, mp.p2.x);
+            if (index >= facet->facetlist.size()) continue;
+            const std::vector<cv::Point>& nextFacet = facet->facetlist[index];
 
-        //    if (task->firstPass)
-        //        g = int(i);
-        //    else
-        //        g = generationMap.at<int>(int(pt.y), int(pt.x)) + 1;
+            // Ensure unique generation numbers
+            if (task->firstPass) {
+                g = (int)usedG.size();
+            }
+            else {
+                g = generationMap.at<int>(mp.p2.y, mp.p2.x) + 1;
+                while (std::find(usedG.begin(), usedG.end(), g) != usedG.end()) {
+                    g++;
+                }
+            }
 
-        //    if (i < int(basics->facetlist.size()))
-        //    {
-        //        vector<Point> nextFacet = basics->facetlist[i];
-        //        fillConvexPoly(dst0, nextFacet, Scalar(g, g, g));
-        //        task->setTrueText(to_string(g), dst2, pt);
-        //    }
-        //}
+            cv::fillConvexPoly(dst3, nextFacet, g, task->lineType);
+            usedG.push_back(g);
+            task->setTrueText(to_string(g), dst2, mp.p2);
+        }
     }
 };
 
@@ -1123,47 +1134,47 @@ public:
     }
     void Run(Mat src)
     {
-        if (standalone)
-        {
-            good->Run(src);
-            facetGen->inputPoints = vector<Point2f>(good->corners);
-        }
+        //if (standalone)
+        //{
+        //    good->Run(src);
+        //    facetGen->inputPoints = vector<Point2f>(good->corners);
+        //}
 
-        facetGen->Run(src);
-        if (facetGen->inputPoints.size() == 0) return; // nothing to work on ...
-        dst2 = facetGen->dst2.clone();
+        //facetGen->Run(src);
+        //if (facetGen->inputPoints.size() == 0) return; // nothing to work on ...
+        //dst2 = facetGen->dst2.clone();
 
-        ptList.clear();
-        vector<int> generations;
-        for (Point2f pt : facetGen->inputPoints)
-        {
-            int fIndex = facetGen->basics->facet32s.at<int>(int(pt.y), int(pt.x));
-            if (fIndex >= facetGen->basics->facetlist.size()) continue; // new point.
-            int g = facetGen->dst0.at<int>(int(pt.y), int(pt.x));
-            generations.push_back(g);
-            vector<Point> nextFacet = facetGen->basics->facetlist[fIndex];
-            ptList.push_back(pt);
-            task->setTrueText(to_string(g), dst2, pt);
-        }
+        //ptList.clear();
+        //vector<int> generations;
+        //for (Point2f pt : facetGen->inputPoints)
+        //{
+        //    int fIndex = facetGen->basics->facet32s.at<int>(int(pt.y), int(pt.x));
+        //    if (fIndex >= facetGen->basics->facetlist.size()) continue; // new point.
+        //    int g = facetGen->dst0.at<int>(int(pt.y), int(pt.x));
+        //    generations.push_back(g);
+        //    vector<Point> nextFacet = facetGen->basics->facetlist[fIndex];
+        //    ptList.push_back(pt);
+        //    task->setTrueText(to_string(g), dst2, pt);
+        //}
 
-        auto iter = max_element(generations.begin(), generations.end());
-        auto maxGens = *iter;
-        auto index = iter - generations.begin();
-        if (index < int(facetGen->basics->facetlist.size()) && index < int(generations.size()))
-        {
-            anchorPoint = ptList[index];
-            vector<Point> bestFacet = facetGen->basics->facetlist[index];
-            fillConvexPoly(dst2, bestFacet, BLACK, task->lineType);
-            task->drawContour(dst2, bestFacet, YELLOW);
-            task->setTrueText(to_string(generations[index]), dst2, anchorPoint);
-        }
+        //auto iter = max_element(generations.begin(), generations.end());
+        //auto maxGens = *iter;
+        //auto index = iter - generations.begin();
+        //if (index < int(facetGen->basics->facetlist.size()) && index < int(generations.size()))
+        //{
+        //    anchorPoint = ptList[index];
+        //    vector<Point> bestFacet = facetGen->basics->facetlist[index];
+        //    fillConvexPoly(dst2, bestFacet, BLACK, task->lineType);
+        //    task->drawContour(dst2, bestFacet, YELLOW);
+        //    task->setTrueText(to_string(generations[index]), dst2, anchorPoint);
+        //}
 
-        dst3 = src.clone();
-        for (Point2f pt : ptList)
-        {
-            circle(dst2, pt, task->dotSize, YELLOW, -1, task->lineType);
-            circle(dst3, pt, task->dotSize, YELLOW, -1, task->lineType);
-        }
+        //dst3 = src.clone();
+        //for (Point2f pt : ptList)
+        //{
+        //    circle(dst2, pt, task->dotSize, YELLOW, -1, task->lineType);
+        //    circle(dst3, pt, task->dotSize, YELLOW, -1, task->lineType);
+        //}
     }
 };
 
