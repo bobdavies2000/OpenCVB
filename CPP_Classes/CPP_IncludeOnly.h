@@ -83,6 +83,27 @@ struct sortInt
     }
 };
 
+class linePoints {
+public:
+    cv::Point2f p1;
+    cv::Point2f p2;
+    float slope;
+    float yIntercept;
+
+    linePoints(const cv::Point2f& _p1, const cv::Point2f& _p2) : p1(_p1), p2(_p2) {
+        float verticalSlope = 100000;
+        slope = (p1.x != p2.x) ? (p1.y - p2.y) / (p1.x - p2.x) : verticalSlope;
+        yIntercept = p1.y - slope * p1.x;
+    }
+
+    linePoints() :
+        p1(cv::Point2f()), p2(cv::Point2f()) {}
+
+    bool compare(const linePoints& mp) const {
+        return mp.p1.x == p1.x && mp.p1.y == p1.y && mp.p2.x == p2.x && mp.p2.y == p2.y;
+    }
+};
+
 #define LINE_WIDTH 1
 #define WHITE Scalar(255, 255, 255)
 #define BLUE Scalar(255, 0, 0)
@@ -901,79 +922,88 @@ class CPP_KNN_Lossy : public algorithmCPP
 {
 private:
 public:
+    std::vector<linePoints> matches;
+    std::vector<cv::Point> noMatch;
     CPP_KNN_Basics* basics;
-    vector<Point2f> matchp1;
-    vector<Point2f> matchp2;
-    vector<Point2f> noMatch;
-    vector<int>neighbors;
-    CPP_KNN_Lossy(int rows, int cols) : algorithmCPP(rows, cols)
-    {
+    std::vector<cv::Point2f> queries;
+    std::vector<int> neighbors;
+    CPP_Random_Basics* random;
+
+    CPP_KNN_Lossy(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_KNN_Lossy";
         basics = new CPP_KNN_Basics(rows, cols);
+        random = new CPP_Random_Basics(rows, cols);
         desc = "Map points 1:1 with losses. Toss any duplicates that are farther.";
     }
     void Run(Mat src)
     {
-        if (standalone) basics->generateRandom(src);
+        if (standalone) {
+            if (task->heartBeat) {
+                random->Run(empty);
+                basics->trainInput = random->pointList;
+            }
+            random->Run(empty);
+            queries = random->pointList;
+        }
 
-        basics->Run(src);
+        if (queries.empty()) {
+            task->setTrueText("Place some input points in queries before starting the knn run.", dst2);
+            return;
+        }
+
+        basics->queries = queries;
+        basics->Run(empty);
+        basics->displayResults();
         dst2 = basics->dst2;
 
-        neighbors = basics->neighborIndexToTrain;
-        for (auto i = 0; i < neighbors.size(); i++)
-        {
-            int index = neighbors[i];
-            Point2f p1 = basics->queries[i];
-            for (auto j = i + 1; j < neighbors.size(); j++)
-            {
-                int chkIndex = neighbors[j];
-                if (chkIndex == -1) continue;
-                if (index == chkIndex)
-                {
-                    Point2f ptn = basics->trainInput[index];
-                    Point2f p2 = basics->queries[j];
-                    auto d1 = (p1.x - ptn.x) * (p1.x - ptn.x) + (p1.y - ptn.y) * (p1.y - ptn.y);
-                    auto d2 = (p2.x - ptn.x) * (p2.x - ptn.x) + (p2.y - ptn.y) * (p2.y - ptn.y);
-                    if (d1 > d2)
-                    {
-                        neighbors[i] = -1;
-                        break;
-                    }
-                    else neighbors[j] = -1;
+        // Extract the first nearest neighbor for each query
+        neighbors.clear();
+        for (const auto& neighborRow : basics->neighbors) {
+            neighbors.push_back(neighborRow[0]);
+        }
+
+        // Resolve duplicate matches based on distances
+        for (int i = 0; i < neighbors.size(); i++) {
+            if (neighbors[i] == -1) continue;
+            cv::Point2f p1 = queries[i];
+            cv::Point2f ptn = basics->trainInput[neighbors[i]];
+            for (int j = i + 1; j < neighbors.size(); j++) {
+                if (neighbors[j] == neighbors[i]) {
+                    cv::Point2f p2 = queries[j];
+                    double d1 = cv::norm(p1 - ptn);
+                    double d2 = cv::norm(p2 - ptn);
+                    neighbors[d1 > d2 ? i : j] = -1;
                 }
             }
         }
 
+        // Display results
         dst3.setTo(0);
-        for (Point2f pt : basics->trainInput)
-        {
-            circle(dst3, pt, task->dotSize + 3, RED, -1, task->lineType);
+        for (const cv::Point2f& pt : basics->trainInput) {
+            cv::circle(dst3, pt, task->dotSize + 4, cv::Scalar(0, 0, 255), -1, task->lineType);
         }
 
-        matchp1.clear();
-        matchp2.clear();
         noMatch.clear();
-        for (auto i = 0; i < neighbors.size(); i++)
-        {
-            Point2f pt = basics->queries[i];
-            circle(dst3, pt, task->dotSize + 3, GREEN, -1, task->lineType);
-            if (neighbors[i] == -1)
-            {
+        matches.clear();
+        for (int i = 0; i < neighbors.size(); i++) {
+            cv::Point2f pt = queries[i];
+            cv::circle(dst3, pt, task->dotSize + 4, cv::Scalar(0, 255, 255), -1, task->lineType);
+            if (neighbors[i] == -1) {
                 noMatch.push_back(pt);
-                matchp1.push_back(Point2f(-1, -1));
-                matchp2.push_back(Point2f(-1, -1));
             }
             else {
-                Point2f nn = basics->trainInput[neighbors[i]];
-                matchp1.push_back(pt);
-                matchp2.push_back(nn);
-                line(dst3, nn, pt, Scalar(255, 255, 0), task->lineWidth, task->lineType);
+                cv::Point2f nn = basics->trainInput[neighbors[i]];
+                matches.emplace_back(pt, nn);
+                cv::line(dst3, nn, pt, cv::Scalar(255, 255, 255), task->lineWidth, task->lineType);
             }
         }
-        if (standalone == false) basics->trainInput = basics->queries;
-        task->setTrueText("KNN_Lossy - red is training data, green = queries", dst3);
+
+        if (!standalone) {
+            basics->trainInput = queries;
+        }
     }
 };
+
 
 
 
@@ -996,39 +1026,39 @@ public:
         desc = "Create a region in an image for each point provided";
     }
     void Run(Mat src) {
-        if (task->heartBeat && standalone)
-        {
-            basics->randomInput(src);
-            inputPoints = basics->inputPoints;
-        }
+        //if (task->heartBeat && standalone)
+        //{
+        //    basics->randomInput(src);
+        //    inputPoints = basics->inputPoints;
+        //}
 
-        knn->basics->queries = inputPoints;
-        knn->Run(src);
+        //knn->basics->queries = inputPoints;
+        //knn->Run(src);
 
-        basics->inputPoints = inputPoints;
-        basics->Run(src);
-        dst2 = basics->dst2;
+        //basics->inputPoints = inputPoints;
+        //basics->Run(src);
+        //dst2 = basics->dst2;
 
-        Mat generationMap = dst0.clone();
-        dst0.setTo(0);
-        int g;
-        for (size_t i = 0; i < knn->neighbors.size(); i++)
-        {
-            if (knn->neighbors[i] == -1) continue;
-            Point2f pt = knn->matchp2[i];
+        //Mat generationMap = dst0.clone();
+        //dst0.setTo(0);
+        //int g;
+        //for (size_t i = 0; i < knn->neighbors.size(); i++)
+        //{
+        //    if (knn->neighbors[i] == -1) continue;
+        //    Point2f pt = knn->matchp2[i];
 
-            if (task->firstPass)
-                g = int(i);
-            else
-                g = generationMap.at<int>(int(pt.y), int(pt.x)) + 1;
+        //    if (task->firstPass)
+        //        g = int(i);
+        //    else
+        //        g = generationMap.at<int>(int(pt.y), int(pt.x)) + 1;
 
-            if (i < int(basics->facetlist.size()))
-            {
-                vector<Point> nextFacet = basics->facetlist[i];
-                fillConvexPoly(dst0, nextFacet, Scalar(g, g, g));
-                task->setTrueText(to_string(g), dst2, pt);
-            }
-        }
+        //    if (i < int(basics->facetlist.size()))
+        //    {
+        //        vector<Point> nextFacet = basics->facetlist[i];
+        //        fillConvexPoly(dst0, nextFacet, Scalar(g, g, g));
+        //        task->setTrueText(to_string(g), dst2, pt);
+        //    }
+        //}
     }
 };
 
