@@ -539,9 +539,11 @@ public:
         Mat map_x(src.size(), CV_32F);
         Mat map_y(src.size(), CV_32F);
 
-        labels[2] = string("Remap_Basics - ") + (direction == 0 ? "original" :
-            (direction == 1 ? "Remap vertically" :
-                (direction == 2 ? "Remap horizontally" : "Remap horizontally and vertically")));
+        labels[2] = string("Remap_Basics - ") + 
+                    (direction == 0 ? "original" :
+                    (direction == 1 ? "Remap vertically" :
+                    (direction == 2 ? "Remap horizontally" : 
+                    "Remap horizontally and vertically")));
 
         // Build maps for remap
         for (int j = 0; j < map_x.rows; j++) {
@@ -567,7 +569,7 @@ public:
         }
 
         if (direction != 0) {
-            remap(src, dst2, map_x, map_y, INTER_LINEAR);  // Added interpolation for clarity
+            remap(src, dst2, map_x, map_y, INTER_NEAREST);  // Added interpolation for clarity
         }
 
         if (task->heartBeat) {
