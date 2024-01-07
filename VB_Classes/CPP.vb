@@ -67,7 +67,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
                                       task.accRadians.X, task.accRadians.Y, task.accRadians.Z,
                                       task.optionsChanged,
                                       heartBeat(), gOptions.displayDst0.Checked, gOptions.displayDst1.Checked,
-                                      task.AddWeighted)
+                                      task.AddWeighted, gOptions.DebugCheckBox.Checked)
         handleInput.Free()
         getOptions()
 
@@ -110,7 +110,7 @@ Module CPP_Module
     Public Function cppTask_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, channels As Integer, frameCount As Integer,
                                    rows As Integer, cols As Integer, x As Single, y As Single, z As Single,
                                    optionsChanged As Boolean, heartBeat As Boolean, displayDst0 As Boolean,
-                                   displayDst1 As Boolean, addWeighted As Single) As IntPtr
+                                   displayDst1 As Boolean, addWeighted As Single, debugCheckBox As Boolean) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function cppTask_PointCloud(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr

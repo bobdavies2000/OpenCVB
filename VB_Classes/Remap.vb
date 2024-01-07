@@ -1,34 +1,42 @@
 Imports cv = OpenCvSharp
 Public Class Remap_Basics : Inherits VB_Algorithm
     Public direction As Integer = 3 ' default to remap horizontally and vertically
+    Dim mapx1 As cv.Mat, mapx2 As cv.Mat, mapx3 As cv.Mat
+    Dim mapy1 As cv.Mat, mapy2 As cv.Mat, mapy3 As cv.Mat
     Public Sub New()
-        desc = "Use remap to reflect an image in 4 directions."
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Dim map_x = New cv.Mat(src.Size(), cv.MatType.CV_32F)
-        Dim map_y = New cv.Mat(src.Size(), cv.MatType.CV_32F)
+        mapx1 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
+        mapy1 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
+        mapx2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
+        mapy2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
+        mapx3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
+        mapy3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
 
-        labels(2) = Choose(direction + 1, "Remap_Basics - original", "Remap vertically", "Remap horizontally", "Remap horizontally and vertically")
-        ' build a map for use with remap!
-        For j = 0 To map_x.Rows - 1
-            For i = 0 To map_x.Cols - 1
-                Select Case direction
-                    Case 0 ' leave the original unmoved!
-                        dst2 = src
-                    Case 1
-                        map_x.Set(Of Single)(j, i, i)
-                        map_y.Set(Of Single)(j, i, src.Rows - j)
-                    Case 2
-                        map_x.Set(Of Single)(j, i, src.Cols - i)
-                        map_y.Set(Of Single)(j, i, j)
-                    Case 3
-                        map_x.Set(Of Single)(j, i, src.Cols - i)
-                        map_y.Set(Of Single)(j, i, src.Rows - j)
-                End Select
+        For j = 0 To mapx1.Rows - 1
+            For i = 0 To mapx1.Cols - 1
+                mapx1.Set(Of Single)(j, i, i)
+                mapy1.Set(Of Single)(j, i, dst2.Rows - j)
+                mapx2.Set(Of Single)(j, i, dst2.Cols - i)
+                mapy2.Set(Of Single)(j, i, j)
+                mapx3.Set(Of Single)(j, i, dst2.Cols - i)
+                mapy3.Set(Of Single)(j, i, dst2.Rows - j)
             Next
         Next
 
-        If direction <> 0 Then cv.Cv2.Remap(src, dst2, map_x, map_y, cv.InterpolationFlags.Nearest)
+        desc = "Use remap to reflect an image in 4 directions."
+    End Sub
+    Public Sub RunVB(src as cv.Mat)
+        labels(2) = Choose(direction + 1, "Remap_Basics - original", "Remap vertically", "Remap horizontally", "Remap horizontally and vertically")
+
+        Select Case direction
+            Case 0
+                dst2 = src
+            Case 1
+                cv.Cv2.Remap(src, dst2, mapx1, mapy1, cv.InterpolationFlags.Nearest)
+            Case 2
+                cv.Cv2.Remap(src, dst2, mapx2, mapy2, cv.InterpolationFlags.Nearest)
+            Case 3
+                cv.Cv2.Remap(src, dst2, mapx3, mapy3, cv.InterpolationFlags.Nearest)
+        End Select
 
         If heartBeat() Then
             direction += 1
