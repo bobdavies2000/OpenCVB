@@ -6,7 +6,6 @@ Public Class CPP_Basics : Inherits VB_Algorithm
     Public result As cv.Mat
     Public neighbors As New List(Of cv.Point2f)
     Public neighborIndexToTrain As List(Of Integer)
-    Dim taskList As New List(Of Integer)
     Public Sub New(_cppFunction As Integer)
         updateFunction(_cppFunction)
     End Sub
@@ -49,9 +48,28 @@ Public Class CPP_Basics : Inherits VB_Algorithm
         Dim pcPtr = cppTask_PointCloud(cPtr, handlePointCloud.AddrOfPinnedObject(),
                                        task.pointCloud.Rows, task.pointCloud.Cols)
         handlePointCloud.Free()
-        If task.algName.StartsWith("CPP_") Then
-            task.depthRGB = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, pcPtr)
-        End If
+
+        Dim depthRGBData(task.depthRGB.Total * task.depthRGB.ElemSize - 1) As Byte
+        Dim leftData(task.leftView.Total * task.leftView.ElemSize - 1) As Byte
+        Dim rightData(task.rightView.Total * task.rightView.ElemSize - 1) As Byte
+
+        Marshal.Copy(task.depthRGB.Data, depthRGBData, 0, depthRGBData.Length)
+        Marshal.Copy(task.leftView.Data, leftData, 0, leftData.Length)
+        Marshal.Copy(task.rightView.Data, rightData, 0, rightData.Length)
+
+        Dim handleDepthRGB = GCHandle.Alloc(depthRGBData, GCHandleType.Pinned)
+        Dim handleLeftView = GCHandle.Alloc(leftData, GCHandleType.Pinned)
+        Dim handleRightView = GCHandle.Alloc(rightData, GCHandleType.Pinned)
+
+        Dim depthRGBPtr = cppTask_DepthLeftRight(cPtr, handleDepthRGB.AddrOfPinnedObject(),
+                                                 handleLeftView.AddrOfPinnedObject(),
+                                                 handleRightView.AddrOfPinnedObject(),
+                                                 task.depthRGB.Rows, task.depthRGB.Cols)
+
+        handleDepthRGB.Free()
+        handleLeftView.Free()
+        handleRightView.Free()
+
         cppTask_OptionsVBtoCPP(cPtr, gOptions.GridSize.Value,
                                gOptions.HistBinSlider.Value,
                                gOptions.PixelDiffThreshold.Value, gOptions.UseKalman.Checked,
@@ -114,6 +132,11 @@ Module CPP_Module
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function cppTask_PointCloud(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
+    End Function
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function cppTask_DepthLeftRight(cPtr As IntPtr, dataPtr As IntPtr, leftPtr As IntPtr,
+                                           rightPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
     End Function
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>

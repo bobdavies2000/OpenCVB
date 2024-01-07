@@ -266,11 +266,11 @@ int* cppTask_PointCloud(cppTask * task, int* dataPtr, int rows, int cols)
 }
 
 extern "C" __declspec(dllexport)
-void cppTask_depthRGB(cppTask * task, int* dataPtr, int rows, int cols)
+void cppTask_DepthLeftRight(cppTask * task, int* depthRGBPtr, int* leftView, int* rightView, int rows, int cols)
 {
-    task->pointCloud = Mat(rows, cols, CV_32FC3); // just in case the cppTask_PointCloud is not in use...
-    task->pointCloud.setTo(0);
-    task->depthRGB = Mat(rows, cols, CV_8UC3, dataPtr);
+    task->depthRGB = Mat(rows, cols, CV_8UC3, depthRGBPtr);
+    task->leftView = Mat(rows, cols, CV_8UC3, leftView);
+    task->rightView = Mat(rows, cols, CV_8UC3, rightView);
 }
 
 

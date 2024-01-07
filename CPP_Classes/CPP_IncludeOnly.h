@@ -236,10 +236,6 @@ public:
     Mat xdst0, xdst1, xdst2, xdst3;
     cppTask(int rows, int cols)
     {
-        leftView = Mat(rows, cols, CV_8UC3);
-        leftView.setTo(0);
-        rightView = Mat(rows, cols, CV_8UC3);
-        rightView.setTo(0);
         cppFunction = -1;
         firstPass = true;
 
@@ -1322,45 +1318,96 @@ public:
 
 
 
-class CPP_Mat_4to1 : public algorithmCPP
-{
-private:
+class CPP_Mat_4to1 : public algorithmCPP {
 public:
     Mat mat[4];
     bool lineSeparators = true;
+
     CPP_Mat_4to1(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Mat_4to1";
-        for (auto i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             mat[i] = dst2.clone();
         }
+
         desc = "Use one Mat for up to 4 images";
     }
+
     void Run(Mat src) {
-        auto nSize = Size(dst2.cols / 2, dst2.rows / 2);
-        auto roiTopLeft = Rect(0, 0, nSize.width, nSize.height);
-        auto roiTopRight = Rect(nSize.width, 0, nSize.width, nSize.height);
-        auto roibotLeft = Rect(0, nSize.height, nSize.width, nSize.height);
-        auto roibotRight = Rect(nSize.width, nSize.height, nSize.width, nSize.height);
+        Size nSize(dst2.cols / 2, dst2.rows / 2);
+        Rect roiTopLeft(0, 0, nSize.width, nSize.height);
+        Rect roiTopRight(nSize.width, 0, nSize.width, nSize.height);
+        Rect roiBotLeft(0, nSize.height, nSize.width, nSize.height);
+        Rect roiBotRight(nSize.width, nSize.height, nSize.width, nSize.height);
+
         if (standalone) {
+            Mat tmpLeft = task->leftView;
+            if (task->leftView.channels() == 1) cvtColor(task->leftView, task->leftView, COLOR_GRAY2BGR);
+            Mat tmpRight = task->rightView;
+            if (task->rightView.channels() == 1) cvtColor(task->rightView, task->rightView, COLOR_GRAY2BGR);
             mat[0] = src.clone();
             mat[1] = task->depthRGB.clone();
-            mat[2] = task->leftView.clone();
-            mat[3] = task->rightView.clone();
+            mat[2] = tmpLeft;
+            mat[3] = tmpRight;
         }
-        dst2 = Mat(dst2.size(), CV_8UC3);
-        Rect rects[] = { roiTopLeft, roiTopRight, roibotLeft, roibotRight };
-        for (auto i = 0; i < 4; i++) {
-            auto tmp = mat[i].clone();
-            if (tmp.channels() == 1) cvtColor(mat[i], tmp, COLOR_GRAY2BGR);
 
-            resize(tmp, dst2(rects[i]), nSize);
+        dst2 = Mat(dst2.size(), CV_8UC3);
+        Rect rois[] = {roiTopLeft, roiTopRight, roiBotLeft, roiBotRight};
+        for (int i = 0; i < 4; i++) {
+            if (mat[i].channels() == 1) {
+                cvtColor(mat[i], mat[i], COLOR_GRAY2BGR);
+            }
+            resize(mat[i], dst2(rois[i]), nSize);
         }
+
         if (lineSeparators) {
-            line(dst2, Point(0, dst2.rows / 2), Point(dst2.cols, dst2.rows / 2), WHITE, task->lineWidth + 1);
-            line(dst2, Point(dst2.cols / 2, 0), Point(dst2.cols / 2, dst2.rows), WHITE, task->lineWidth + 1);
+            line(dst2, Point(0, dst2.rows / 2), Point(dst2.cols, dst2.rows / 2), Scalar(255, 255, 255), task->lineWidth + 1);
+            line(dst2, Point(dst2.cols / 2, 0), Point(dst2.cols / 2, dst2.rows), Scalar(255, 255, 255), task->lineWidth + 1);
         }
     }
 };
+
+
+
+
+//class CPP_Mat_4to1 : public algorithmCPP
+//{
+//private:
+//public:
+//    Mat mat[4];
+//    bool lineSeparators = true;
+//    CPP_Mat_4to1(int rows, int cols) : algorithmCPP(rows, cols) {
+//        traceName = "CPP_Mat_4to1";
+//        for (auto i = 0; i < 4; i++) {
+//            mat[i] = dst2.clone();
+//        }
+//        desc = "Use one Mat for up to 4 images";
+//    }
+//    void Run(Mat src) {
+//        auto nSize = Size(dst2.cols / 2, dst2.rows / 2);
+//        auto roiTopLeft = Rect(0, 0, nSize.width, nSize.height);
+//        auto roiTopRight = Rect(nSize.width, 0, nSize.width, nSize.height);
+//        auto roibotLeft = Rect(0, nSize.height, nSize.width, nSize.height);
+//        auto roibotRight = Rect(nSize.width, nSize.height, nSize.width, nSize.height);
+//        if (standalone) {
+//            mat[0] = src.clone();
+//            mat[1] = task->depthRGB.clone();
+//            mat[2] = task->leftView.clone();
+//            mat[3] = task->rightView.clone();
+//        }
+//        dst2 = Mat(dst2.size(), CV_8UC3);
+//        Rect rects[] = { roiTopLeft, roiTopRight, roibotLeft, roibotRight };
+//        for (auto i = 0; i < 4; i++) {
+//            auto tmp = mat[i].clone();
+//            if (tmp.channels() == 1) cvtColor(mat[i], tmp, COLOR_GRAY2BGR);
+//
+//            resize(tmp, dst2(rects[i]), nSize);
+//        }
+//        if (lineSeparators) {
+//            line(dst2, Point(0, dst2.rows / 2), Point(dst2.cols, dst2.rows / 2), WHITE, task->lineWidth + 1);
+//            line(dst2, Point(dst2.cols / 2, 0), Point(dst2.cols / 2, dst2.rows), WHITE, task->lineWidth + 1);
+//        }
+//    }
+//};
 
 
 
