@@ -24,7 +24,7 @@
 using namespace std;
 using namespace cv;
 using namespace ximgproc;
-using namespace cv::ml;
+using namespace ml;
 
 #include "../CPP_Classes/PragmaLibs.h"
 
@@ -72,7 +72,7 @@ struct sortInt
 
     sortInt(int key, int value) : key(key), value(value) {}
 
-    // these allows you to sort the struct by the key with std::sort(vec.begin(), vec.end());
+    // these allows you to sort the struct by the key with sort(vec.begin(), vec.end());
     bool operator < (const sortInt& keyVal)
     {
         return (key < keyVal.key);
@@ -85,19 +85,19 @@ struct sortInt
 
 class linePoints {
 public:
-    cv::Point2f p1;
-    cv::Point2f p2;
+    Point2f p1;
+    Point2f p2;
     float slope;
     float yIntercept;
 
-    linePoints(const cv::Point2f& _p1, const cv::Point2f& _p2) : p1(_p1), p2(_p2) {
+    linePoints(const Point2f& _p1, const Point2f& _p2) : p1(_p1), p2(_p2) {
         float verticalSlope = 100000;
         slope = (p1.x != p2.x) ? (p1.y - p2.y) / (p1.x - p2.x) : verticalSlope;
         yIntercept = p1.y - slope * p1.x;
     }
 
     linePoints() :
-        p1(cv::Point2f()), p2(cv::Point2f()) {}
+        p1(Point2f()), p2(Point2f()) {}
 
     bool compare(const linePoints& mp) const {
         return mp.p1.x == p1.x && mp.p1.y == p1.y && mp.p2.x == p2.x && mp.p2.y == p2.y;
@@ -287,13 +287,13 @@ public:
         return mm;
     }
     Vec3b randomCellColor() {
-        static std::random_device rd;
-        static std::mt19937 gen(rd());  // Mersenne Twister engine for randomness
-        std::uniform_int_distribution<> dist(50, 240);
+        static random_device rd;
+        static mt19937 gen(rd());  // Mersenne Twister engine for randomness
+        uniform_int_distribution<> dist(50, 240);
 
         // Generate three random values between 50 and 240 (inclusive)
-        // using std::uniform_int_distribution for more control over range
-        return cv::Vec3b(dist(gen), dist(gen), dist(gen));
+        // using uniform_int_distribution for more control over range
+        return Vec3b(dist(gen), dist(gen), dist(gen));
     }
     void AddPlotScale(Mat dst, double minVal, double maxVal, int lineCount) {
         auto spacer = int(dst.rows / (lineCount + 1));
@@ -317,7 +317,7 @@ public:
     Mat normalize32f(Mat input)
     {
         Mat outMat;
-        normalize(input, outMat, 255, 0, cv::NormTypes::NORM_MINMAX);
+        normalize(input, outMat, 255, 0, NormTypes::NORM_MINMAX);
         outMat.convertTo(outMat, CV_8U);
         cvtColor(outMat, outMat, COLOR_GRAY2BGR);
         return outMat;
@@ -343,7 +343,7 @@ public:
         vector<Mat> splitMat;
         split(pts32f, splitMat);
         Mat correlationMat;
-        matchTemplate(splitMat[0], splitMat[1], correlationMat, cv::TemplateMatchModes::TM_CCOEFF_NORMED);
+        matchTemplate(splitMat[0], splitMat[1], correlationMat, TemplateMatchModes::TM_CCOEFF_NORMED);
         return correlationMat.at<float>(0, 0);
     }
     Rect validateRect(Rect r, int w, int h)
@@ -392,15 +392,15 @@ cppTask* task;
 
 class CPP_AddWeighted_Basics : public algorithmCPP {
 public:
-    cv::Mat src2;
+    Mat src2;
 
     CPP_AddWeighted_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_AddWeighted_Basics";
         desc = "Add 2 images with specified weights.";
     }
 
-    void Run(cv::Mat src) {
-        cv::Mat srcPlus = src2;
+    void Run(Mat src) {
+        Mat srcPlus = src2;
         if (standalone || src2.empty()) {
             srcPlus = task->depthRGB;
         }
@@ -414,17 +414,17 @@ public:
                     srcPlus.convertTo(srcPlus, CV_8UC1, 255.0);
                 }
                 if (src.type() != CV_8UC3) {
-                    cv::cvtColor(src, src, cv::COLOR_GRAY2BGR);
+                    cvtColor(src, src, COLOR_GRAY2BGR);
                 }
                 if (srcPlus.type() != CV_8UC3) {
-                    cv::cvtColor(srcPlus, srcPlus, cv::COLOR_GRAY2BGR);
+                    cvtColor(srcPlus, srcPlus, COLOR_GRAY2BGR);
                 }
             }
         }
 
         double wt = task->addWeighted;
-        cv::addWeighted(src, wt, srcPlus, 1.0 - wt, 0.0, dst2);  // Ensure correct syntax
-        labels[2] = "depth " + std::to_string((int)((1 - wt) * 100)) + " BGR " + std::to_string((int)(wt * 100));
+        addWeighted(src, wt, srcPlus, 1.0 - wt, 0.0, dst2);  // Ensure correct syntax
+        labels[2] = "depth " + to_string((int)((1 - wt) * 100)) + " BGR " + to_string((int)(wt * 100));
     }
 };
 
@@ -434,17 +434,17 @@ public:
 
 class CPP_Random_Basics : public algorithmCPP {
 public:
-    std::vector<cv::Point2f> pointList;
-    cv::Rect range;
+    vector<Point2f> pointList;
+    Rect range;
     int sizeRequest = 10;
 
     CPP_Random_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Random_Basics";
-        range = cv::Rect(0, 0, dst2.cols, dst2.rows);
+        range = Rect(0, 0, dst2.cols, dst2.rows);
         desc = "Create a uniform random mask with a specified number of pixels.";
     }
 
-    void Run(cv::Mat src) {
+    void Run(Mat src) {
         pointList.clear();
         if (!task->paused) {
             while (pointList.size() < sizeRequest) {
@@ -452,8 +452,8 @@ public:
             }
 
             dst2.setTo(0);
-            for (cv::Point2f pt : pointList) {
-                cv::circle(dst2, pt, task->dotSize, cv::Scalar(0, 255, 255), -1, task->lineType, 0);
+            for (Point2f pt : pointList) {
+                circle(dst2, pt, task->dotSize, Scalar(0, 255, 255), -1, task->lineType, 0);
             }
         }
     }
@@ -498,19 +498,19 @@ public:
 
 class CPP_Resize_Basics : public algorithmCPP {
 public:
-    cv::Size newSize;
+    Size newSize;
     float resizePercent = 0.5;
 
     CPP_Resize_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Resize_Basics";
         if (standalone) {
-            task->drawRect = cv::Rect(dst2.cols / 4, dst2.rows / 4, dst2.cols / 2, dst2.rows / 2);
+            task->drawRect = Rect(dst2.cols / 4, dst2.rows / 4, dst2.cols / 2, dst2.rows / 2);
         }
         desc = "Resize with different options and compare them";
         labels[2] = "Rectangle highlight above resized";
     }
 
-    void Run(cv::Mat src) {
+    void Run(Mat src) {
         if (task->drawRect.width != 0) {
             src = src(task->drawRect);
             newSize = task->drawRect.size();
@@ -535,11 +535,11 @@ public:
         desc = "Use remap to reflect an image in 4 directions.";
     }
 
-    void Run(cv::Mat src) {
-        cv::Mat map_x(src.size(), CV_32F);
-        cv::Mat map_y(src.size(), CV_32F);
+    void Run(Mat src) {
+        Mat map_x(src.size(), CV_32F);
+        Mat map_y(src.size(), CV_32F);
 
-        labels[2] = std::string("Remap_Basics - ") + (direction == 0 ? "original" :
+        labels[2] = string("Remap_Basics - ") + (direction == 0 ? "original" :
             (direction == 1 ? "Remap vertically" :
                 (direction == 2 ? "Remap horizontally" : "Remap horizontally and vertically")));
 
@@ -567,7 +567,7 @@ public:
         }
 
         if (direction != 0) {
-            cv::remap(src, dst2, map_x, map_y, cv::INTER_LINEAR);  // Added interpolation for clarity
+            remap(src, dst2, map_x, map_y, INTER_LINEAR);  // Added interpolation for clarity
         }
 
         if (task->heartBeat) {
@@ -583,27 +583,27 @@ public:
 class CPP_Random_Enumerable : public algorithmCPP {
 public:
     int sizeRequest = 100;
-    std::vector<cv::Point2f> points;
+    vector<Point2f> points;
 
     CPP_Random_Enumerable(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Random_Enumerable";
         desc = "Create an enumerable list of points using a lambda function";
     }
 
-    void Run(cv::Mat src) {
-        std::random_device rd;
-        std::mt19937 gen(rd());  // Mersenne Twister engine for randomness
-        std::uniform_int_distribution<> dist_width(0, dst2.cols - 1);  // Ensure width is within bounds
-        std::uniform_int_distribution<> dist_height(0, dst2.rows - 1); // Ensure height is within bounds
+    void Run(Mat src) {
+        random_device rd;
+        mt19937 gen(rd());  // Mersenne Twister engine for randomness
+        uniform_int_distribution<> dist_width(0, dst2.cols - 1);  // Ensure width is within bounds
+        uniform_int_distribution<> dist_height(0, dst2.rows - 1); // Ensure height is within bounds
 
         points.clear();
         for (int i = 0; i < sizeRequest; i++) {
-            points.push_back(cv::Point2f(dist_width(gen), dist_height(gen)));
+            points.push_back(Point2f(dist_width(gen), dist_height(gen)));
         }
 
-        dst2 = cv::Mat::zeros(dst2.size(), dst2.type());  // Set dst2 to black
-        for (const cv::Point2f& pt : points) {
-            cv::circle(dst2, pt, task->dotSize, cv::Scalar(0, 255, 255), -1, task->lineType, 0);
+        dst2 = Mat::zeros(dst2.size(), dst2.type());  // Set dst2 to black
+        for (const Point2f& pt : points) {
+            circle(dst2, pt, task->dotSize, Scalar(0, 255, 255), -1, task->lineType, 0);
         }
     }
 };
@@ -612,16 +612,16 @@ public:
 
 class CPP_Delaunay_Basics : public algorithmCPP {
 public:
-    std::vector<cv::Point2f> inputPoints;
-    cv::Mat facet32s;
+    vector<Point2f> inputPoints;
+    Mat facet32s;
     CPP_Random_Enumerable* randEnum;
-    cv::Subdiv2D subdiv;
+    Subdiv2D subdiv;
     vector<vector<Point>> facetlist;
 
     CPP_Delaunay_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Delaunay_Basics";
         randEnum = new CPP_Random_Enumerable(rows, cols);
-        facet32s = cv::Mat::zeros(dst2.size(), CV_32SC1);
+        facet32s = Mat::zeros(dst2.size(), CV_32SC1);
         desc = "Subdivide an image based on the points provided.";
     }
     void randomInput(Mat src)
@@ -629,45 +629,45 @@ public:
         randEnum->Run(src);
         inputPoints = randEnum->points;
     }
-    void Run(cv::Mat src) {
+    void Run(Mat src) {
         if (task->heartBeat && standalone) {
             randEnum->Run(src);
             inputPoints = randEnum->points;
             dst3 = randEnum->dst2;
         }
 
-        subdiv.initDelaunay(cv::Rect(0, 0, dst2.cols, dst2.rows));
+        subdiv.initDelaunay(Rect(0, 0, dst2.cols, dst2.rows));
         subdiv.insert(inputPoints);
 
-        std::vector<std::vector<cv::Point2f>> facets;
+        vector<vector<Point2f>> facets;
         vector<Point2f> centers;
-        subdiv.getVoronoiFacetList(std::vector<int>(), facets, centers);
+        subdiv.getVoronoiFacetList(vector<int>(), facets, centers);
 
-        std::vector<cv::Vec3b> usedColors;
+        vector<Vec3b> usedColors;
         facetlist.clear();
-        static cv::Mat lastColor = cv::Mat::zeros(dst2.size(), CV_8UC3);
+        static Mat lastColor = Mat::zeros(dst2.size(), CV_8UC3);
         for (int i = 0; i < facets.size(); i++) {
-            std::vector<cv::Point> nextFacet;
+            vector<Point> nextFacet;
             for (int j = 0; j < facets[i].size(); j++) {
-                nextFacet.push_back(cv::Point(facets[i][j].x, facets[i][j].y));
+                nextFacet.push_back(Point(facets[i][j].x, facets[i][j].y));
             }
 
-            cv::Point2f pt = inputPoints[i];
-            cv::Vec3b nextColor = lastColor.at<cv::Vec3b>(pt);
-            if (std::find(usedColors.begin(), usedColors.end(), nextColor) != usedColors.end()) {
+            Point2f pt = inputPoints[i];
+            Vec3b nextColor = lastColor.at<Vec3b>(pt);
+            if (find(usedColors.begin(), usedColors.end(), nextColor) != usedColors.end()) {
                 nextColor = task->randomCellColor();
             }
             usedColors.push_back(nextColor);
 
-            cv::fillConvexPoly(dst2, nextFacet, cv::Scalar(nextColor[0], nextColor[1], nextColor[2]));
+            fillConvexPoly(dst2, nextFacet, Scalar(nextColor[0], nextColor[1], nextColor[2]));
 
-            cv::fillConvexPoly(facet32s, nextFacet, i, task->lineType);
+            fillConvexPoly(facet32s, nextFacet, i, task->lineType);
             facetlist.push_back(nextFacet);
         }
         facet32s.convertTo(dst1, CV_8U);
 
         lastColor = dst2.clone();
-        labels[2] = traceName + ": " + std::to_string(inputPoints.size()) + " cells were present.";
+        labels[2] = traceName + ": " + to_string(inputPoints.size()) + " cells were present.";
     }
 };
 
@@ -677,7 +677,7 @@ public:
 
 class CPP_Delaunay_GenerationsNoKNN : public algorithmCPP {
 public:
-    std::vector<cv::Point2f> inputPoints;
+    vector<Point2f> inputPoints;
     CPP_Random_Basics* random;
     CPP_Delaunay_Basics* facet;
 
@@ -685,12 +685,12 @@ public:
         traceName = "CPP_Delaunay_GenerationsNoKNN";
         facet = new CPP_Delaunay_Basics(rows, cols);
         random = new CPP_Random_Basics(rows, cols);
-        dst3 = cv::Mat::zeros(dst3.size(), CV_32S);
+        dst3 = Mat::zeros(dst3.size(), CV_32S);
         labels = { "", "Mask of unmatched regions - generation set to 0", "Facet Image with index of each region", "Generation counts for each region." };
         desc = "Create a region in an image for each point provided with KNN.";
     }
 
-    void Run(cv::Mat src) {
+    void Run(Mat src) {
         if (standalone && task->heartBeat) {
             random->Run(empty);
             inputPoints = random->pointList;   
@@ -700,15 +700,15 @@ public:
         facet->Run(src);
         dst2 = facet->dst2;
 
-        cv::Mat generationMap = dst3.clone();
+        Mat generationMap = dst3.clone();
         if (task->heartBeat) generationMap.setTo(0);
         dst3.setTo(0);
-        std::vector<int> usedG;
+        vector<int> usedG;
         int g;
         for (const auto& pt : inputPoints) {
             int index = facet->facet32s.at<int>(pt.y, pt.x);
             if (index >= facet->facetlist.size()) continue;
-            std::vector<cv::Point> nextFacet = facet->facetlist[index];
+            vector<Point> nextFacet = facet->facetlist[index];
 
             // Ensure unique generation numbers
             if (task->firstPass) {
@@ -716,13 +716,13 @@ public:
             }
             else {
                 g = generationMap.at<int>(pt.y, pt.x) + 1;
-                while (std::find(usedG.begin(), usedG.end(), g) != usedG.end()) {
+                while (find(usedG.begin(), usedG.end(), g) != usedG.end()) {
                     g++;
                 }
             }
             fillConvexPoly(dst3, nextFacet, g, task->lineType);
             usedG.push_back(g);
-            task->setTrueText(std::to_string(g), dst2, pt);   
+            task->setTrueText(to_string(g), dst2, pt);   
         }
         generationMap = dst3.clone();
     }
@@ -741,20 +741,20 @@ public:
         desc = "Create a grid of squares covering the entire image.";
     }
 
-    void Run(cv::Mat src) {
+    void Run(Mat src) {
         if (task->mouseClickFlag && !task->firstPass) {
             task->gridROIclicked = task->gridToRoiIndex.at<int>(task->clickPoint.y, task->clickPoint.x);
         }
         if (task->optionsChanged) {
-            task->gridMask = cv::Mat::zeros(src.size(), CV_8U);
-            task->gridToRoiIndex = cv::Mat::zeros(src.size(), CV_32S);
+            task->gridMask = Mat::zeros(src.size(), CV_8U);
+            task->gridToRoiIndex = Mat::zeros(src.size(), CV_32S);
 
             task->gridList.clear();
             task->gridRows = 0;
             task->gridCols = 0;
             for (int y = 0; y < src.rows; y += task->gridSize) {
                 for (int x = 0; x < src.cols; x += task->gridSize) {
-                    cv::Rect roi(x, y, task->gridSize, task->gridSize);
+                    Rect roi(x, y, task->gridSize, task->gridSize);
                     if (x + roi.width >= src.cols) roi.width = src.cols - x;
                     if (y + roi.height >= src.rows) roi.height = src.rows - y;
                     if (roi.width > 0 && roi.height > 0) {
@@ -764,23 +764,23 @@ public:
                     }
                 }
             }
-            task->gridMask = cv::Mat::zeros(src.size(), CV_8U);
+            task->gridMask = Mat::zeros(src.size(), CV_8U);
             for (int x = task->gridSize; x < src.cols; x += task->gridSize) {
-                cv::Point p1(x, 0), p2(x, src.rows);
-                cv::line(task->gridMask, p1, p2, cv::Scalar(255), task->lineWidth);
+                Point p1(x, 0), p2(x, src.rows);
+                line(task->gridMask, p1, p2, Scalar(255), task->lineWidth);
             }
             for (int y = task->gridSize; y < src.rows; y += task->gridSize) {
-                cv::Point p1(0, y), p2(src.cols, y);
-                cv::line(task->gridMask, p1, p2, cv::Scalar(255), task->lineWidth);
+                Point p1(0, y), p2(src.cols, y);
+                line(task->gridMask, p1, p2, Scalar(255), task->lineWidth);
             }
 
             for (int i = 0; i < task->gridList.size(); i++) {
-                cv::Rect roi = task->gridList[i];
+                Rect roi = task->gridList[i];
                 rectangle(task->gridToRoiIndex, roi, Scalar(255, 255, 255), 1);
             }
 
             task->gridNeighbors.clear();
-            for (const cv::Rect& roi : task->gridList) {
+            for (const Rect& roi : task->gridList) {
                 vector<int> neighbors;
                 task->gridNeighbors.push_back(neighbors);
                 for (int i = 0; i < 8; i++) {
@@ -793,10 +793,10 @@ public:
             }
         }
         if (standalone) {
-            dst2 = cv::Mat::zeros(src.size(), CV_8U);
+            dst2 = Mat::zeros(src.size(), CV_8U);
             task->color.copyTo(dst2);
-            dst2.setTo(cv::Scalar(255, 255, 255), task->gridMask); 
-            std::stringstream ss;
+            dst2.setTo(Scalar(255, 255, 255), task->gridMask); 
+            stringstream ss;
             ss << "Grid_Basics " << task->gridList.size() << " (" << task->gridRows << "X" << task->gridCols << ") "
                 << task->gridSize << "X" << task->gridSize << " regions";
             labels[2] = ss.str();
@@ -811,11 +811,11 @@ public:
 class CPP_KNN_Basics : public algorithmCPP
 {
 public:
-    cv::Ptr<cv::ml::KNearest> knn = cv::ml::KNearest::create();
-    std::vector<cv::Point2f> trainInput;
-    std::vector<cv::Point2f> queries;
-    std::vector<std::vector<int>> neighbors;
-    cv::Mat result;
+    Ptr<ml::KNearest> knn = ml::KNearest::create();
+    vector<Point2f> trainInput;
+    vector<Point2f> queries;
+    vector<vector<int>> neighbors;
+    Mat result;
     int desiredMatches = -1;
     CPP_Random_Basics* random;
     vector<int> neighborIndexToTrain;
@@ -828,20 +828,20 @@ public:
         desc = "Train a KNN model and map each query to the nearest training neighbor.";
     }
     void displayResults() {
-        dst2.setTo(0);  // Assuming dst2 is a cv::Mat object
-        int dm = std::min(trainInput.size(), queries.size());
+        dst2.setTo(0);  // Assuming dst2 is a Mat object
+        int dm = min(trainInput.size(), queries.size());
 
         for (int i = 0; i < queries.size(); i++) {
-            cv::Point2f pt = queries[i];
+            Point2f pt = queries[i];
             int test = result.at<int>(i, 0);
             if (test >= trainInput.size() || test < 0) continue;
-            cv::Point2f nn = trainInput[result.at<int>(i, 0)];
-            cv::circle(dst2, pt, task->dotSize + 4, cv::Scalar(0, 255, 255), -1, task->lineType);  // Yellow
-            cv::line(dst2, pt, nn, cv::Scalar(0, 255, 255), task->lineWidth, task->lineType);
+            Point2f nn = trainInput[result.at<int>(i, 0)];
+            circle(dst2, pt, task->dotSize + 4, Scalar(0, 255, 255), -1, task->lineType);  // Yellow
+            line(dst2, pt, nn, Scalar(0, 255, 255), task->lineWidth, task->lineType);
         }
 
-        for (cv::Point2f pt : trainInput) {
-            cv::circle(dst2, pt, task->dotSize + 4, cv::Scalar(0, 0, 255), -1, task->lineType);  // Red
+        for (Point2f pt : trainInput) {
+            circle(dst2, pt, task->dotSize + 4, Scalar(0, 0, 255), -1, task->lineType);  // Red
         }
     }
     void generateRandom(Mat src)
@@ -864,7 +864,7 @@ public:
             queries = random->pointList;
         }
 
-        cv::Mat queryMat((int)queries.size(), KNNdimension, CV_32F, queries.data());
+        Mat queryMat((int)queries.size(), KNNdimension, CV_32F, queries.data());
         if (queryMat.rows == 0) {
             task->setTrueText("There were no queries provided. There is nothing to do...", dst2);
             return;
@@ -873,34 +873,34 @@ public:
         if (trainInput.empty()) {
             trainInput = queries;  // First pass, just match the queries.
         }
-        cv::Mat trainData((int)trainInput.size(), KNNdimension, CV_32F, trainInput.data());
+        Mat trainData((int)trainInput.size(), KNNdimension, CV_32F, trainInput.data());
         vector<int> array(trainData.rows);
         iota(array.begin(), array.end(), 0);
-        cv::Mat response(trainData.rows, 1, CV_32S, array.data());  // Create response matrix
-        knn->train(trainData, cv::ml::ROW_SAMPLE, response);
+        Mat response(trainData.rows, 1, CV_32S, array.data());  // Create response matrix
+        knn->train(trainData, ml::ROW_SAMPLE, response);
 
         int dm = desiredMatches < 0 ? (int)trainInput.size() : desiredMatches;
         Mat neighborMat;
-        knn->findNearest(queryMat, dm, cv::noArray(), neighborMat);
+        knn->findNearest(queryMat, dm, noArray(), neighborMat);
 
         if (neighborMat.rows != queryMat.rows || neighborMat.cols != dm) {
-            std::cerr << "KNN's FindNearest did not return the correct number of neighbors.\n";
+            cerr << "KNN's FindNearest did not return the correct number of neighbors.\n";
             return;
         }
 
-        std::vector<float> nData(queryMat.rows * dm);
+        vector<float> nData(queryMat.rows * dm);
         if (nData.empty()) return;
         memcpy(nData.data(), neighborMat.data, nData.size() * sizeof(float));
 
         for (int i = 0; i < nData.size(); i++) {
-            if (std::abs(nData[i]) > trainInput.size()) nData[i] = 0;  // Clamp within trainInput range
+            if (abs(nData[i]) > trainInput.size()) nData[i] = 0;  // Clamp within trainInput range
         }
 
         result.create(queryMat.rows, dm - 1, CV_32S);
         neighbors.clear();
         for (int i = 0; i < queryMat.rows; i++) {
-            cv::Point2f pt = queries[i];
-            std::vector<int> res;
+            Point2f pt = queries[i];
+            vector<int> res;
             for (int j = 0; j < dm - 1; j++) {
                 int test = static_cast<int>(nData[i * dm + j]);
                 if (test >= 0 && test < nData.size()) {
@@ -922,11 +922,11 @@ class CPP_KNN_Lossy : public algorithmCPP
 {
 private:
 public:
-    std::vector<linePoints> matches;
-    std::vector<cv::Point> noMatch;
+    vector<linePoints> matches;
+    vector<Point> noMatch;
     CPP_KNN_Basics* basics;
-    std::vector<cv::Point2f> queries;
-    std::vector<int> neighbors;
+    vector<Point2f> queries;
+    vector<int> neighbors;
     CPP_Random_Basics* random;
 
     CPP_KNN_Lossy(int rows, int cols) : algorithmCPP(rows, cols) {
@@ -965,13 +965,13 @@ public:
         // Resolve duplicate matches based on distances
         for (int i = 0; i < neighbors.size(); i++) {
             if (neighbors[i] == -1) continue;
-            cv::Point2f p1 = queries[i];
-            cv::Point2f ptn = basics->trainInput[neighbors[i]];
+            Point2f p1 = queries[i];
+            Point2f ptn = basics->trainInput[neighbors[i]];
             for (int j = i + 1; j < neighbors.size(); j++) {
                 if (neighbors[j] == neighbors[i]) {
-                    cv::Point2f p2 = queries[j];
-                    double d1 = cv::norm(p1 - ptn);
-                    double d2 = cv::norm(p2 - ptn);
+                    Point2f p2 = queries[j];
+                    double d1 = norm(p1 - ptn);
+                    double d2 = norm(p2 - ptn);
                     neighbors[d1 > d2 ? i : j] = -1;
                 }
             }
@@ -979,22 +979,22 @@ public:
 
         // Display results
         dst3.setTo(0);
-        for (const cv::Point2f& pt : basics->trainInput) {
-            cv::circle(dst3, pt, task->dotSize + 4, cv::Scalar(0, 0, 255), -1, task->lineType);
+        for (const Point2f& pt : basics->trainInput) {
+            circle(dst3, pt, task->dotSize + 4, Scalar(0, 0, 255), -1, task->lineType);
         }
 
         noMatch.clear();
         matches.clear();
         for (int i = 0; i < neighbors.size(); i++) {
-            cv::Point2f pt = queries[i];
-            cv::circle(dst3, pt, task->dotSize + 4, cv::Scalar(0, 255, 255), -1, task->lineType);
+            Point2f pt = queries[i];
+            circle(dst3, pt, task->dotSize + 4, Scalar(0, 255, 255), -1, task->lineType);
             if (neighbors[i] == -1) {
                 noMatch.push_back(pt);
             }
             else {
-                cv::Point2f nn = basics->trainInput[neighbors[i]];
+                Point2f nn = basics->trainInput[neighbors[i]];
                 matches.emplace_back(pt, nn);
-                cv::line(dst3, nn, pt, cv::Scalar(255, 255, 255), task->lineWidth, task->lineType);
+                line(dst3, nn, pt, Scalar(255, 255, 255), task->lineWidth, task->lineType);
             }
         }
 
@@ -1012,7 +1012,7 @@ class CPP_Delaunay_Generations : public algorithmCPP
 {
 private:
 public:
-    std::vector<cv::Point2f> inputPoints;
+    vector<Point2f> inputPoints;
     CPP_Delaunay_Basics* facet;
     CPP_KNN_Lossy* knn;
     CPP_Random_Basics* random;
@@ -1020,7 +1020,7 @@ public:
     CPP_Delaunay_Generations(int rows, int cols) : algorithmCPP(rows, cols)
     {
         traceName = "CPP_Delaunay_Generations";
-        dst3 = cv::Mat::zeros(dst3.size(), CV_32S);
+        dst3 = Mat::zeros(dst3.size(), CV_32S);
         knn = new CPP_KNN_Lossy(rows, cols);
         facet = new CPP_Delaunay_Basics(rows, cols);
         random = new CPP_Random_Basics(rows, cols);
@@ -1046,14 +1046,14 @@ public:
         facet->Run(src);
         dst2 = facet->dst2;
 
-        cv::Mat generationMap = dst3.clone();
+        Mat generationMap = dst3.clone();
         dst3.setTo(0);
-        std::vector<int> usedG;
+        vector<int> usedG;
         int g;
         for (const linePoints& mp : knn->matches) {
             int index = facet->facet32s.at<int>(mp.p2.y, mp.p2.x);
             if (index >= facet->facetlist.size()) continue;
-            const std::vector<cv::Point>& nextFacet = facet->facetlist[index];
+            const vector<Point>& nextFacet = facet->facetlist[index];
 
             // Ensure unique generation numbers
             if (task->firstPass) {
@@ -1061,12 +1061,12 @@ public:
             }
             else {
                 g = generationMap.at<int>(mp.p2.y, mp.p2.x) + 1;
-                while (std::find(usedG.begin(), usedG.end(), g) != usedG.end()) {
+                while (find(usedG.begin(), usedG.end(), g) != usedG.end()) {
                     g++;
                 }
             }
 
-            cv::fillConvexPoly(dst3, nextFacet, g, task->lineType);
+            fillConvexPoly(dst3, nextFacet, g, task->lineType);
             usedG.push_back(g);
             task->setTrueText(to_string(g), dst2, mp.p2);
         }
@@ -1075,69 +1075,49 @@ public:
 
 
 
-class CPP_Feature_Basicstest : public algorithmCPP {
-public:
-    cv::Ptr<cv::BRISK> brisk;
-    std::vector<cv::Point2f> corners;
-    bool useBRISK = true;
-    int minDistance = 15;
-    int sampleSize = 400;
-    int quality = 1;
-
-    CPP_Feature_Basicstest(int rows, int cols) : algorithmCPP(rows, cols) {
-    }
-
-    void Run(const cv::Mat& src) {
-    }
-};
 
 
-
-
-class CPP_Feature_Basics : public algorithmCPP
-{
+class CPP_Feature_Basics : public algorithmCPP {
 private: 
 public: 
-    cv::Ptr<cv::BRISK> brisk;
-    std::vector<cv::Point2f> corners;
+    Ptr<BRISK> brisk;
+    vector<Point2f> corners;
     bool useBRISK = true;
     int minDistance = 15;
     int sampleSize = 400;
     int quality = 1;
 
-    CPP_Feature_Basics(int rows, int cols) : algorithmCPP(rows, cols)
-    {
+    CPP_Feature_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Feature_Basics";
-        brisk = cv::BRISK::create();
+        brisk = BRISK::create();
         desc = "Find good features to track in a BGR image.";
     }
 	void Run(Mat src)
 	{
-        cv::Mat dst2 = src.clone();
+        dst2 = src.clone();
 
         if (src.channels() == 3) {
-            cv::cvtColor(src, src, cv::COLOR_BGR2GRAY);
+            cvtColor(src, src, COLOR_BGR2GRAY);
         }
 
         corners.clear();
         if (useBRISK) {
-            std::vector<cv::KeyPoint> keyPoints;
+            vector<KeyPoint> keyPoints;
             brisk->detect(src, keyPoints);
-            for (const cv::KeyPoint& kp : keyPoints) {
+            for (const KeyPoint& kp : keyPoints) {
                 if (kp.size >= minDistance) {
                     corners.push_back(kp.pt);
                 }
             }
-        }
-        else {
-            std::vector<cv::Point2f> tempCorners;
-            cv::goodFeaturesToTrack(src, tempCorners, sampleSize, quality, minDistance, cv::noArray(), 7, true, 3);
+        } else {
+            vector<Point2f> tempCorners;
+            goodFeaturesToTrack(src, tempCorners, sampleSize, quality, minDistance, noArray(), 7, true, 3);
             corners = tempCorners;
         }
 
-        cv::Scalar color = dst2.channels() == 3 ? cv::Scalar(0, 255, 255) : cv::Scalar(255, 255, 255);
-        for (const cv::Point2f& c : corners) {
-            cv::circle(dst2, c, task->dotSize, color, -1, task->lineType);
+        Scalar color = dst2.channels() == 3 ? Scalar(0, 255, 255) : Scalar(255, 255, 255);
+        for (const Point2f& c : corners) {
+            circle(dst2, c, task->dotSize, color, -1, task->lineType);
         }
 
         labels[2] = "Found " + to_string(corners.size()) + " points with quality = " + to_string(quality) +
@@ -1149,66 +1129,61 @@ public:
 
 
 
-class CPP_Stable_Basics : public algorithmCPP
-{
-private:
-    CPP_Feature_Basics* good;
+class CPP_Stable_Basics : public algorithmCPP {
 public:
+    CPP_Delaunay_Generations* facetGen;
     vector<Point2f> ptList;
     Point2f anchorPoint;
-    CPP_Delaunay_Generations* facetGen;
-    CPP_Stable_Basics(int rows, int cols) : algorithmCPP(rows, cols)
-    {
+    CPP_Feature_Basics* good;
+
+    CPP_Stable_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Stable_Basics";
-        facetGen = new CPP_Delaunay_Generations(rows, cols);
         good = new CPP_Feature_Basics(rows, cols);
+        facetGen = new CPP_Delaunay_Generations(rows, cols);
         desc = "Maintain the generation counts around the feature points.";
     }
-    void Run(Mat src)
-    {
-        //if (standalone)
-        //{
-        //    good->Run(src);
-        //    facetGen->inputPoints = vector<Point2f>(good->corners);
-        //}
 
-        //facetGen->Run(src);
-        //if (facetGen->inputPoints.size() == 0) return; // nothing to work on ...
-        //dst2 = facetGen->dst2.clone();
+    void Run(Mat src) {
+        if (standalone) {
+            good->Run(src);
+            facetGen->inputPoints = good->corners;
+        }
 
-        //ptList.clear();
-        //vector<int> generations;
-        //for (Point2f pt : facetGen->inputPoints)
-        //{
-        //    int fIndex = facetGen->basics->facet32s.at<int>(int(pt.y), int(pt.x));
-        //    if (fIndex >= facetGen->basics->facetlist.size()) continue; // new point.
-        //    int g = facetGen->dst0.at<int>(int(pt.y), int(pt.x));
-        //    generations.push_back(g);
-        //    vector<Point> nextFacet = facetGen->basics->facetlist[fIndex];
-        //    ptList.push_back(pt);
-        //    task->setTrueText(to_string(g), dst2, pt);
-        //}
+        facetGen->Run(src);
+        if (facetGen->inputPoints.empty()) return; // nothing to work on
 
-        //auto iter = max_element(generations.begin(), generations.end());
-        //auto maxGens = *iter;
-        //auto index = iter - generations.begin();
-        //if (index < int(facetGen->basics->facetlist.size()) && index < int(generations.size()))
-        //{
-        //    anchorPoint = ptList[index];
-        //    vector<Point> bestFacet = facetGen->basics->facetlist[index];
-        //    fillConvexPoly(dst2, bestFacet, BLACK, task->lineType);
-        //    task->drawContour(dst2, bestFacet, YELLOW);
-        //    task->setTrueText(to_string(generations[index]), dst2, anchorPoint);
-        //}
+        ptList.clear();
+        vector<int> generations;
+        for (const Point2f& pt : facetGen->inputPoints) {
+            int fIndex = facetGen->facet->facet32s.at<int>(pt.y, pt.x);
+            if (fIndex >= facetGen->facet->facetlist.size()) continue; // new point
+            int g = facetGen->dst3.at<int>(pt.y, pt.x);
+            generations.push_back(g);
+            ptList.push_back(pt);
+            task->setTrueText(to_string(g), dst2, pt);
+        }
 
-        //dst3 = src.clone();
-        //for (Point2f pt : ptList)
-        //{
-        //    circle(dst2, pt, task->dotSize, YELLOW, -1, task->lineType);
-        //    circle(dst3, pt, task->dotSize, YELLOW, -1, task->lineType);
-        //}
+        int maxGens = *max_element(generations.begin(), generations.end());
+        int index = distance(generations.begin(), find(generations.begin(), generations.end(), maxGens));
+        anchorPoint = ptList[index];
+        if (index < facetGen->facet->facetlist.size()) {
+            const vector<Point>& bestFacet = facetGen->facet->facetlist[index];
+            fillConvexPoly(dst2, bestFacet, Scalar(0, 0, 0), task->lineType);
+            drawContours(dst2, vector<vector<Point>> {bestFacet}, -1, Scalar(0, 255, 255), task->lineWidth);
+        }
+
+        dst2 = facetGen->dst2;
+        dst3 = src.clone();
+        for (const Point2f& pt : ptList) {
+            circle(dst2, pt, task->dotSize, Scalar(0, 255, 255), task->lineWidth, task->lineType);
+            circle(dst3, pt, task->dotSize, Scalar(255, 255, 255), task->lineWidth, task->lineType);
+        }
+
+        string text = to_string(ptList.size()) + " stable points were identified with " + to_string(maxGens) + " generations at the anchor point";
+        labels[2] = text;
     }
 };
+
 
 
 
@@ -1219,7 +1194,7 @@ private:
 public:
     CPP_Stable_Basics* basics;
     CPP_Feature_Basics* good;
-    std::map<int, int, std::greater<float>> goodCounts;
+    map<int, int, greater<float>> goodCounts;
     CPP_Stable_BasicsCount(int rows, int cols) : algorithmCPP(rows, cols)
     {
         traceName = "CPP_Stable_BasicsCount";
@@ -1998,7 +1973,7 @@ public:
             dst2 = src;
         }
         if (dst2.channels() != 1) cvtColor(dst2, dst2, COLOR_BGR2GRAY);
-        findContours(dst2, allContours, cv::RetrievalModes::RETR_LIST, cv::ContourApproximationModes::CHAIN_APPROX_NONE);
+        findContours(dst2, allContours, RetrievalModes::RETR_LIST, ContourApproximationModes::CHAIN_APPROX_NONE);
         auto maxCount = 0;
         maxIndex = -1;
         // Review this For Loop >>>> i = 0 To allContours.size() - 1
@@ -2614,7 +2589,7 @@ public:
         if (standalone) src = task->depthRGB;
         if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
         distanceTransform(src, dst0, DIST_L1, 3);
-        normalize(dst0, dst1, 0, 255, cv::NormTypes::NORM_MINMAX);
+        normalize(dst0, dst1, 0, 255, NormTypes::NORM_MINMAX);
         dst1.convertTo(dst2, CV_8UC1);
     }
 };
@@ -2809,21 +2784,21 @@ public:
 
 class CPP_Bezier_Basics : public algorithmCPP {
 public:
-    std::vector<cv::Point> points;
+    vector<Point> points;
 
     CPP_Bezier_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Bezier_Basics";
         advice = "Update the public points array and then Run.";
-        points = { cv::Point(100, 100),
-                  cv::Point(150, 50),
-                  cv::Point(250, 150),
-                  cv::Point(300, 100),
-                  cv::Point(350, 150),
-                  cv::Point(450, 50) };
+        points = { Point(100, 100),
+                  Point(150, 50),
+                  Point(250, 150),
+                  Point(300, 100),
+                  Point(350, 150),
+                  Point(450, 50) };
         desc = "Use n points to draw a Bezier curve.";
     }
 
-    cv::Point nextPoint(std::vector<cv::Point> points, int i, float t) {
+    Point nextPoint(vector<Point> points, int i, float t) {
         int x = pow(1 - t, 3) * points[i].x +
             3 * t * pow(1 - t, 2) * points[i + 1].x +
             3 * pow(t, 2) * (1 - t) * points[i + 2].x +
@@ -2833,16 +2808,16 @@ public:
             3 * t * pow(1 - t, 2) * points[i + 1].y +
             3 * pow(t, 2) * (1 - t) * points[i + 2].y +
             pow(t, 3) * points[i + 3].y;
-        return cv::Point(x, y);
+        return Point(x, y);
     }
 
-    void Run(cv::Mat src) {
-        cv::Point p1;
+    void Run(Mat src) {
+        Point p1;
         for (int i = 0; i < points.size() - 4; i += 3) {
             for (int j = 0; j <= 100; j++) {
-                cv::Point p2 = nextPoint(points, i, j / 100.0f);
+                Point p2 = nextPoint(points, i, j / 100.0f);
                 if (j > 0) {
-                    cv::line(dst2, p1, p2, task->highlightColor, task->lineWidth);
+                    line(dst2, p1, p2, task->highlightColor, task->lineWidth);
                 }
                 p1 = p2;
             }

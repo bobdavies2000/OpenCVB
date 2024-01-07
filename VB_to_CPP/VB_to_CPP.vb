@@ -70,6 +70,9 @@ Public Class VB_to_CPP
             split(i) = split(i).Replace("firstPass", "task->firstPass")
             split(i) = split(i).Replace("setTrueText", "task->setTrueText")
             split(i) = split(i).Replace("gOptions.GridSize.value", "task->gridSize")
+            split(i) = split(i).Replace("cv::", "")
+            split(i) = split(i).Replace("std::", "")
+            split(i) = split(i).Replace("const Mat& src", "Mat src")
             CPPrtb.Text += split(i) + vbCrLf
         Next
     End Sub
