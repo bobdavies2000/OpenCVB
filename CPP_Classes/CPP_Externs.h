@@ -41,6 +41,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case CPP_AddWeighted_Basics_:
     {task->alg = new CPP_AddWeighted_Basics(rows, cols); break; }
+	case CPP_FPoly_TopFeatures_ :
+	{task->alg = new CPP_FPoly_TopFeatures(rows, cols); break; }
 	case CPP_Random_Enumerable_ :
 	{task->alg = new CPP_Random_Enumerable(rows, cols); break; }
     case CPP_Bezier_Basics_:

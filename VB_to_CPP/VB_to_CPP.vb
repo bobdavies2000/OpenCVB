@@ -113,7 +113,7 @@ Public Class VB_to_CPP
         sw = New StreamWriter(input.FullName)
         For Each line In includeOnly
             sw.WriteLine(line)
-            If line.Contains("CPP_AddWeighted_Basics_,") Then sw.WriteLine(vbTab + functionName + "_,")
+            If line.Contains("CPP_AddWeighted_Basics_,") Then sw.WriteLine(functionName + "_,")
         Next
         sw.Close()
     End Sub

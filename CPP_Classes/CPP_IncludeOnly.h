@@ -119,6 +119,7 @@ vector<string> mapNames = { "Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "
 enum functions
 {
     CPP_AddWeighted_Basics_,
+CPP_FPoly_TopFeatures_,
     CPP_Random_Enumerable_,
     CPP_Bezier_Basics_,
     CPP_Feature_Agast_,
@@ -918,7 +919,7 @@ public:
             }
             neighbors.push_back(res);
         }
-        displayResults();
+        if (neighbors.size() > 1) displayResults();
     }
 };
 
@@ -961,14 +962,15 @@ public:
 
         basics->queries = queries;
         basics->Run(empty);
-        basics->displayResults();
+        if (queries.size() > 1) basics->displayResults();
         dst2 = basics->dst2;
 
         // Extract the first nearest neighbor for each query
         neighbors.clear();
-        for (const auto& neighborRow : basics->neighbors) {
-            neighbors.push_back(neighborRow[0]);
-        }
+        if (basics->neighbors.size() > 1)
+            for (const auto& neighborRow : basics->neighbors) {
+                neighbors.push_back(neighborRow[0]);
+            }
 
         // Resolve duplicate matches based on distances
         for (int i = 0; i < neighbors.size(); i++) {
@@ -1232,42 +1234,35 @@ public:
 };
 
 
+class CPP_FPoly_TopFeatures : public algorithmCPP {
+public:
+    CPP_Stable_BasicsCount* stable;
+    vector<Point2f> poly;
 
-//class CPP_FPoly_TopFeatures : public algorithmCPP
-//{
-//private: 
-//public: 
-//    CPP_Stable_BasicsCount *stable;
-//    vector<Point2f> poly;
-//	CPP_FPoly_TopFeatures(int rows, int cols) : algorithmCPP(rows, cols) 
-//    {
-//        traceName = "CPP_FPoly_TopFeatures";
-//        stable = new CPP_Stable_BasicsCount(rows, cols);
-//        desc = "Get the top features and validate them";
-//    }
-//	void Run(Mat src)
-//	{
-//        stable->Run(src);
-//		
-//        dst2 = stable->dst2;
-//        dst3.setTo(0);
-//        poly.clear();
-//
-//        int i = 0;
-//        for (pair<const int, int> index : stable->goodCounts)
-//        {
-//            Point2f pt = stable->basics->ptList[index.second];
-//            int g = stable->basics->facetGen->dst0.at<int>(pt.y, pt.x);
-//            task->setTrueText(to_string(g), dst2, pt);
-//            if (i++ < task->polyCount) poly.push_back(pt);
-//        }
-//
-//        for (size_t i = 0; i < poly.size() - 1; i++)
-//        {
-//            line(dst2, poly[i], poly[i + 1], WHITE, task->lineWidth, task->lineType);
-//        }
-//	}
-//};
+    CPP_FPoly_TopFeatures(int rows, int cols) : algorithmCPP(rows, cols) {
+        stable = new CPP_Stable_BasicsCount(rows, cols);
+        traceName = "CPP_FPoly_TopFeatures";
+        desc = "Get the top features and validate them";
+    }
+
+    void Run(Mat src) {
+        stable->Run(src);
+        dst2 = stable->dst2;
+        poly.clear();
+        for (const auto& keyVal : stable->goodCounts) {
+            const Point2f& pt = stable->basics->ptList[keyVal.second];
+            int g = stable->basics->facetGen->dst3.at<int>(pt.y, pt.x);
+
+            if (poly.size() < task->polyCount) poly.push_back(pt);
+        }
+
+        if (poly.size() > 1)
+            for (int i = 0; i < poly.size() - 1; i++) {
+                line(dst2, poly[i], poly[i + 1], Scalar(255, 255, 255), task->lineWidth, task->lineType);
+            }
+    }
+};
+
 
 
 
