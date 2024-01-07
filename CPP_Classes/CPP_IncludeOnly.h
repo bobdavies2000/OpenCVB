@@ -219,7 +219,7 @@ public:
     Scalar fontColor;
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
 
-    bool heartBeat;
+    bool heartBeat; bool debugCheckBox;
     bool optionsChanged; double addWeighted; int dotSize; int gridSize; float maxDepth;
     int histogramBins; int pixelDiffThreshold; bool gravityPointCloud; bool useKalman;
     int paletteIndex; int polyCount; bool firstPass; Scalar highlightColor; int frameHistory;
@@ -525,59 +525,66 @@ public:
 
 
 
-
 class CPP_Remap_Basics : public algorithmCPP {
 public:
     int direction = 3;  // Default to remap horizontally and vertically
+    Mat mapx1, mapx2, mapx3, mapy1, mapy2, mapy3;
 
     CPP_Remap_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Remap_Basics";
+        // Initialize map matrices with appropriate size and type
+        mapx1 = Mat::zeros(dst2.size(), CV_32FC1);
+        mapy1 = Mat::zeros(dst2.size(), CV_32FC1);
+        mapx2 = Mat::zeros(dst2.size(), CV_32FC1);
+        mapy2 = Mat::zeros(dst2.size(), CV_32FC1);
+        mapx3 = Mat::zeros(dst2.size(), CV_32FC1);
+        mapy3 = Mat::zeros(dst2.size(), CV_32FC1);
+
+        // Populate map matrices with values for remapping
+        for (int j = 0; j < mapx1.rows; j++) {
+            for (int i = 0; i < mapx1.cols; i++) {
+                mapx1.at<float>(j, i) = i;
+                mapy1.at<float>(j, i) = dst2.rows - j;
+                mapx2.at<float>(j, i) = dst2.cols - i;
+                mapy2.at<float>(j, i) = j;
+                mapx3.at<float>(j, i) = dst2.cols - i;
+                mapy3.at<float>(j, i) = dst2.rows - j;
+            }
+        }
+
         desc = "Use remap to reflect an image in 4 directions.";
     }
 
     void Run(Mat src) {
-        Mat map_x(src.size(), CV_32F);
-        Mat map_y(src.size(), CV_32F);
+        vector<string> labels = {
+            "Remap_Basics - original",
+            "Remap vertically",
+            "Remap horizontally",
+            "Remap horizontally and vertically"
+        };
+        string label = labels[direction];
 
-        labels[2] = string("Remap_Basics - ") + 
-                    (direction == 0 ? "original" :
-                    (direction == 1 ? "Remap vertically" :
-                    (direction == 2 ? "Remap horizontally" : 
-                    "Remap horizontally and vertically")));
-
-        // Build maps for remap
-        for (int j = 0; j < map_x.rows; j++) {
-            for (int i = 0; i < map_x.cols; i++) {
-                switch (direction) {
-                    case 0:  // Leave original unmoved
-                        dst2 = src;
-                        break;
-                    case 1:
-                        map_x.at<float>(j, i) = i;
-                        map_y.at<float>(j, i) = src.rows - j;
-                        break;
-                    case 2:
-                        map_x.at<float>(j, i) = src.cols - i;
-                        map_y.at<float>(j, i) = j;
-                        break;
-                    case 3:
-                        map_x.at<float>(j, i) = src.cols - i;
-                        map_y.at<float>(j, i) = src.rows - j;
-                        break;
-                }
-            }
-        }
-
-        if (direction != 0) {
-            remap(src, dst2, map_x, map_y, INTER_NEAREST);  // Added interpolation for clarity
+        switch (direction) {
+        case 0:
+            dst2 = src.clone();  // Use clone for copying
+            break;
+        case 1:
+            remap(src, dst2, mapx1, mapy1, INTER_NEAREST);
+            break;
+        case 2:
+            remap(src, dst2, mapx2, mapy2, INTER_NEAREST);
+            break;
+        case 3:
+            remap(src, dst2, mapx3, mapy3, INTER_NEAREST);
+            break;
         }
 
         if (task->heartBeat) {
-            direction++;
-            direction %= 4;
+            direction = (direction + 1) % 4;
         }
     }
 };
+
 
 
 

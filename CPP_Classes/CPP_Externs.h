@@ -280,7 +280,8 @@ int* cppTask_GetDst3(cppTask * task)
 
 extern "C" __declspec(dllexport)
 int* cppTask_RunCPP(cppTask * task, int* dataPtr, int channels, int frameCount, int rows, int cols, float x, float y, float z,
-                    bool optionsChanged, bool heartBeat, bool displayDst0, bool displayDst1, float addWeighted)
+                    bool optionsChanged, bool heartBeat, bool displayDst0, bool displayDst1, float addWeighted,
+                    bool debugCheckBox)
 {
     task->optionsChanged = optionsChanged;
     task->heartBeat = heartBeat;
@@ -288,6 +289,7 @@ int* cppTask_RunCPP(cppTask * task, int* dataPtr, int channels, int frameCount, 
     task->displayDst0 = displayDst0;
     task->displayDst1 = displayDst1;
     task->accRadians = Point3f(x, y, z);
+    task->debugCheckBox = debugCheckBox;
     if (task->alg->dst0.rows != rows || task->alg->dst0.cols != cols)
     {
         task->alg->dst0 = Mat(rows, cols, CV_8UC3);
