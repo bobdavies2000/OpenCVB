@@ -378,25 +378,34 @@ public:
         return Rect(dist(gen), dist(gen), dist(gen), dist(gen));
     }
 
-    void DrawRotatedRectangle(Mat& image, Point centerPoint, Size rectangleSize, double rotationDegrees, 
-                              Scalar color)
-    {
-        // Create the rotated rectangle
-        RotatedRect rotatedRectangle(centerPoint, rectangleSize, rotationDegrees);
-
-        // We take the edges that OpenCV calculated for us
-        Point2f vertices2f[4];
-        rotatedRectangle.points(vertices2f);
-
-        // Convert them so we can use them in a fillConvexPoly
-        Point vertices[4];
-        for (int i = 0; i < 4; ++i) {
-            vertices[i] = vertices2f[i];
+    void drawRotatedRectangle(RotatedRect rotatedRect, Mat dst2, const Scalar color) {
+        vector<cv::Point2f> vertices2f; // = rotatedRect.points();
+        vector<cv::Point> vertices(vertices2f.size());
+        for (int j = 0; j < vertices2f.size(); j++) {
+            vertices[j] = cv::Point(cvRound(vertices2f[j].x), cvRound(vertices2f[j].y));
         }
-
-        // Now we can fill the rotated rectangle with our specified color
-        fillConvexPoly(image, vertices, 4, color, lineType);
+        cv::fillConvexPoly(dst2, vertices, color, this->lineType);  
     }
+
+    //void DrawRotatedRectangle(Mat& image, Point centerPoint, Size rectangleSize, double rotationDegrees, 
+    //                          Scalar color)
+    //{
+    //    // Create the rotated rectangle
+    //    RotatedRect rotatedRectangle(centerPoint, rectangleSize, rotationDegrees);
+
+    //    // We take the edges that OpenCV calculated for us
+    //    Point2f vertices2f[4];
+    //    rotatedRectangle.points(vertices2f);
+
+    //    // Convert them so we can use them in a fillConvexPoly
+    //    Point vertices[4];
+    //    for (int i = 0; i < 4; ++i) {
+    //        vertices[i] = vertices2f[i];
+    //    }
+
+    //    // Now we can fill the rotated rectangle with our specified color
+    //    fillConvexPoly(image, vertices, 4, color, lineType);
+    //}
 };
 
 
@@ -2012,48 +2021,97 @@ public:
 
 
 
-
-
-
-class CPP_Rectangle_Basics : public algorithmCPP
-{
-private:
+class CPP_Rectangle_Basics : public algorithmCPP {
 public:
-    vector < Rect > rectangles;
-    vector < RotatedRect > rotatedRectangles;
-    bool options_drawRotated = false;
+    vector<Rect> rectangles;
+    vector<RotatedRect> rotatedRectangles;
+    int options_DrawCount = 3;
     bool options_drawFilled = false;
-    int options_drawCount = 5;
+    bool options_drawRotated = false;
+
     CPP_Rectangle_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Rectangle_Basics";
         desc = "Draw the requested number of rectangles.";
     }
+
     void Run(Mat src) {
         if (task->heartBeat) {
-            dst2.setTo(BLACK);
+            dst2 = Mat::zeros(src.size(), CV_8UC3);
             rectangles.clear();
             rotatedRectangles.clear();
-            for (auto i = 0; i < options_drawCount; i++) {
-                Point2f nPoint = Point2f(rand() % src.cols, rand() % src.rows);
-                auto width = rand() % int(src.cols - nPoint.x);
-                auto height = rand() % int(src.rows - nPoint.y);
-                auto eSize = Size2f(float(rand() % src.cols - nPoint.x - 1), float(rand() % src.rows - nPoint.y - 1));
-                auto angle = 180.0F * float(rand() % 1000) / 1000.0f;
-                auto nextColor = Scalar(task->vecColors[i].val[0], task->vecColors[i].val[1], task->vecColors[i].val[2]);
-                auto rr = RotatedRect(nPoint, eSize, angle);
-                Rect r = Rect(nPoint.x, nPoint.y, width, height);
+
+            for (int i = 0; i < options_DrawCount; i++) {
+                random_device rd;
+                mt19937 gen(rd());
+                uniform_int_distribution<> distX(0, src.cols - 1);
+                uniform_int_distribution<> distY(0, src.rows - 1);
+                uniform_real_distribution<> distAngle(0.0, 180.0);
+
+                Point2f nPoint(distX(gen), distY(gen));
+                int width = distX(gen);
+                int height = distY(gen);
+                Size2f eSize(distX(gen), distY(gen));
+                float angle = distAngle(gen);
+
+                Scalar nextColor = Scalar(task->vecColors[i][0], task->vecColors[i][1], task->vecColors[i][2]);
+                RotatedRect rr(nPoint, eSize, angle);
+                Rect r(nPoint, Size(width, height));
+
                 if (options_drawRotated) {
-                    task->DrawRotatedRectangle(dst2, nPoint, eSize, angle, 
-                                               task->vecColors[i]);
-                } else {
-                    rectangle(dst2, r, nextColor, task->lineWidth);
+                    task->drawRotatedRectangle(rr, dst2, nextColor);  
                 }
+                else {
+                    rectangle(dst2, r, nextColor, options_drawFilled ? -1 : 1);
+                }
+
                 rotatedRectangles.push_back(rr);
                 rectangles.push_back(r);
             }
         }
     }
 };
+
+
+
+//class CPP_Rectangle_Basics : public algorithmCPP
+//{
+//private:
+//public:
+//    vector < Rect > rectangles;
+//    vector < RotatedRect > rotatedRectangles;
+//    bool options_drawRotated = false;
+//    bool options_drawFilled = false;
+//    int options_drawCount = 5;
+//    CPP_Rectangle_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
+//        traceName = "CPP_Rectangle_Basics";
+//        desc = "Draw the requested number of rectangles.";
+//    }
+//    void Run(Mat src) {
+//        if (task->heartBeat) {
+//            dst2.setTo(BLACK);
+//            rectangles.clear();
+//            rotatedRectangles.clear();
+//            for (auto i = 0; i < options_drawCount; i++) {
+//                Point2f nPoint = Point2f(rand() % src.cols, rand() % src.rows);
+//                auto width = rand() % int(src.cols - nPoint.x);
+//                auto height = rand() % int(src.rows - nPoint.y);
+//                auto eSize = Size2f(float(rand() % src.cols - nPoint.x - 1), float(rand() % src.rows - nPoint.y - 1));
+//                auto angle = 180.0F * float(rand() % 1000) / 1000.0f;
+//                auto nextColor = Scalar(task->vecColors[i].val[0], task->vecColors[i].val[1], task->vecColors[i].val[2]);
+//                auto rr = RotatedRect(nPoint, eSize, angle);
+//                Rect r = Rect(nPoint.x, nPoint.y, width, height);
+//                if (options_drawRotated) {
+//                    task->DrawRotatedRectangle(dst2, nPoint, eSize, angle, 
+//                                               task->vecColors[i]);
+//                } else {
+//                    rectangle(dst2, r, nextColor, task->lineWidth);
+//                }
+//                rotatedRectangles.push_back(rr);
+//                rectangles.push_back(r);
+//            }
+//        }
+//    }
+//};
 
 
 

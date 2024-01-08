@@ -148,17 +148,17 @@ Module CPP_Module
                                         <MarshalAs(UnmanagedType.LPStr)> ByVal desc As StringBuilder)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub cppTask_OptionsVBtoCPP(cPtr As IntPtr, ByRef gridSize As Integer,
-                                      ByRef histogramBins As Integer,
-                                      ByRef pixelDiffThreshold As Integer,
-                                      ByRef useKalman As Boolean, ByRef frameHistory As Integer,
-                                      ByRef rectX As Integer, ByRef rectY As Integer, ByRef rectWidth As Integer,
-                                      ByRef rectHeight As Integer, ByRef lineWidth As Integer,
-                                      ByRef lineType As Integer, ByRef dotSize As Integer, ByRef minResWidth As Integer,
-                                      ByRef minResHeight As Integer, ByRef maxZmeters As Single,
-                                      ByRef PCReduction As Integer, ByRef fontSize As Single,
-                                      ByRef fontThickness As Integer, ByRef clickX As Integer,
-                                      ByRef clickY As Integer, ByRef clickFlag As Boolean, ByRef picTag As Integer,
-                                      ByRef moveX As Integer, ByRef moveY As Integer)
+    Public Sub cppTask_OptionsVBtoCPP(cPtr As IntPtr, gridSize As Integer,
+                                      histogramBins As Integer,
+                                      pixelDiffThreshold As Integer,
+                                      useKalman As Boolean, frameHistory As Integer,
+                                      rectX As Integer, rectY As Integer, rectWidth As Integer,
+                                      rectHeight As Integer, lineWidth As Integer,
+                                      lineType As Integer, dotSize As Integer, minResWidth As Integer,
+                                      minResHeight As Integer, maxZmeters As Single,
+                                      PCReduction As Integer, fontSize As Single,
+                                      fontThickness As Integer, clickX As Integer,
+                                      clickY As Integer, clickFlag As Boolean, picTag As Integer,
+                                      moveX As Integer, moveY As Integer)
     End Sub
 End Module 

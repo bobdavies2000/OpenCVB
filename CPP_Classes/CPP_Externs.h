@@ -165,9 +165,9 @@ void cppTask_Labels(cppTask * task)
 // https://www.codeproject.com/Articles/197493/Marshal-variable-length-array-of-structs-from-C-to
 extern "C" __declspec(dllexport)
 void cppTask_OptionsCPPtoVB(cppTask * task, int& gridSize,
-                            int& histogramBins, int& pixelDiffThreshold, bool& useKalman,
-                            int& frameHistory, int& rectX, int& rectY, int& rectWidth, int& rectHeight,
-                            LPSTR labelBuffer, LPSTR buffer)
+    int& histogramBins, int& pixelDiffThreshold, bool& useKalman,
+    int& frameHistory, int& rectX, int& rectY, int& rectWidth, int& rectHeight,
+    LPSTR labelBuffer, LPSTR buffer)
 {
     pixelDiffThreshold = task->pixelDiffThreshold;
     gridSize = task->gridSize;
@@ -189,12 +189,12 @@ void cppTask_OptionsCPPtoVB(cppTask * task, int& gridSize,
 
 // https://www.codeproject.com/Articles/197493/Marshal-variable-length-array-of-structs-from-C-to
 extern "C" __declspec(dllexport)
-void cppTask_OptionsVBtoCPP(cppTask * task, int& gridSize,
-                            int& histogramBins, int& pixelDiffThreshold, bool& useKalman,
-                            int& frameHistory, int& rectX, int& rectY, int& rectWidth, int& rectHeight,
-                            int& lineWidth, int& lineType, int& dotSize, int& minResWidth, int& minResHeight,
-                            float& maxZmeters, int& PCReduction, float& fontSize, int& fontThickness,
-                            int& clickX, int& clickY, bool& clickFlag, int& picTag, int& moveX, int& moveY)
+void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
+                            int histogramBins, int pixelDiffThreshold, bool useKalman,
+                            int frameHistory, int rectX, int rectY, int rectWidth, int rectHeight,
+                            int lineWidth, int lineType, int dotSize, int minResWidth, int minResHeight,
+                            float maxZmeters, int PCReduction, float fontSize, int fontThickness,
+                            int clickX, int clickY, bool clickFlag, int picTag, int moveX, int moveY)
 {
     task->pixelDiffThreshold = pixelDiffThreshold;
     task->gridSize = gridSize;
