@@ -153,7 +153,8 @@ Module UI_GeneratorMain
             If cleanNames(i).StartsWith("CPP_Basics") Then
                 For j = 0 To functionNames.Count - 1
                     Dim functionText = functionNames.ElementAt(j).Key
-                    sw.WriteLine(functionText.Substring(0, functionText.Length - 1))
+                    sw.WriteLine(functionText)
+                    ' sw.WriteLine(functionText.Substring(0, functionText.Length - 1))
                 Next
             End If
         Next

@@ -65,6 +65,13 @@ Public Class VB_to_CPP
                 End If
             End If
 
+            split(i) = split(i).Replace("initRandomRect(", "task->initRandomRect(")
+            split(i) = split(i).Replace("validateRect(", "task->validateRect(")
+            split(i) = split(i).Replace("gOptions.UseKalman.Checked", "task->useKalman")
+            split(i) = split(i).Replace("gOptions.HistBinSlider.Value", "task->histogramBins")
+            split(i) = split(i).Replace("vbMinMax(", "task->getMinMax(")
+            split(i) = split(i).Replace(".Run(", "->Run(")
+            split(i) = split(i).Replace(".dst", "->dst")
             split(i) = split(i).Replace("CStr(", "to_string(")
             split(i) = split(i).Replace("task.", "task->")
             split(i) = split(i).Replace("heartBeat()", "task->heartBeat")

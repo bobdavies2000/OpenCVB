@@ -2,6 +2,7 @@
 Public Class algorithmList
 Public Enum functionNames
 CPP_AddWeighted_Basics_
+CPP_Kalman_Basics_
 CPP_RedCloud_Core_
 CPP_FPoly_TopFeatures_
 CPP_Random_Enumerable_
@@ -294,6 +295,7 @@ if algorithmName = "CPP_Histogram_Basics" Then return new CPP_Basics(functionNam
 if algorithmName = "CPP_Hull_Basics" Then return new CPP_Basics(functionNames.CPP_Hull_Basics_)
 if algorithmName = "CPP_IMU_GMatrix" Then return new CPP_Basics(functionNames.CPP_IMU_GMatrix_)
 if algorithmName = "CPP_IMU_GMatrix_QT" Then return new CPP_Basics(functionNames.CPP_IMU_GMatrix_QT_)
+if algorithmName = "CPP_Kalman_Basics" Then return new CPP_Basics(functionNames.CPP_Kalman_Basics_)
 if algorithmName = "CPP_KNN_Basics" Then return new CPP_Basics(functionNames.CPP_KNN_Basics_)
 if algorithmName = "CPP_KNN_Lossy" Then return new CPP_Basics(functionNames.CPP_KNN_Lossy_)
 if algorithmName = "CPP_Mat_4to1" Then return new CPP_Basics(functionNames.CPP_Mat_4to1_)

@@ -407,16 +407,22 @@ Public Class Kalman_Simple : Implements IDisposable
     Public MeasurementNoiseCov As Single = 0.1
     Public ErrorCovPost As Single = 1
     Public transitionMatrix() As Single = {1, 1, 0, 1} ' Change the transition matrix externally and set newTransmissionMatrix.
-    Public newTransmissionMatrix As Boolean = True
-    Public Sub New()
-        Dim tMatrix() As Single = {1, 1, 0, 1}
-        kf.TransitionMatrix = New cv.Mat(2, 2, cv.MatType.CV_32F, tMatrix)
+    Public newTMatrix As Boolean = True
+    Public Sub updateTMatrix()
+        kf.TransitionMatrix = New cv.Mat(2, 2, cv.MatType.CV_32F, transitionMatrix)
         kf.MeasurementMatrix.SetIdentity(1)
         kf.ProcessNoiseCov.SetIdentity(0.00001)
         kf.MeasurementNoiseCov.SetIdentity(0.1)
         kf.ErrorCovPost.SetIdentity(1)
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub New()
+        Dim tMatrix() As Single = {1, 1, 0, 1}
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If newTMatrix Then
+            newTMatrix = False
+            updateTMatrix()
+        End If
         Dim prediction = kf.Predict()
         measurement.Set(Of Single)(0, 0, inputReal)
         stateResult = kf.Correct(measurement).Get(Of Single)(0, 0)

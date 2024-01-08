@@ -20,6 +20,7 @@
 #include <memory>
 #include <vector>
 #include <random>
+#include "opencv2/video/tracking.hpp"
 
 using namespace std;
 using namespace cv;
@@ -119,6 +120,8 @@ vector<string> mapNames = { "Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "
 enum functions
 {
     CPP_AddWeighted_Basics_,
+CPP_Histogram_Kalman_,
+CPP_Kalman_Basics_,
 CPP_RedCloud_Core_,
 CPP_FPoly_TopFeatures_,
     CPP_Random_Enumerable_,
@@ -293,7 +296,7 @@ public:
         // using uniform_int_distribution for more control over range
         return Vec3b(dist(gen), dist(gen), dist(gen));
     }
-    void AddPlotScale(cv::Mat& dst, double minVal, double maxVal, int lineCount = 3) {
+    void AddPlotScale(Mat& dst, double minVal, double maxVal, int lineCount = 3) {
         // Draw a scale along the side
         int spacer = cvRound(dst.rows / (lineCount + 1));
         int spaceVal = cvRound((maxVal - minVal) / (lineCount + 1));
@@ -303,9 +306,9 @@ public:
         spaceVal += spaceVal % 10; // Ensure even spacing
 
         for (int i = 0; i <= lineCount; i++) {
-            cv::Point p1(0, spacer * i);
-            cv::Point p2(dst.cols, spacer * i);
-            cv::line(dst, p1, p2, cv::Scalar(255, 255, 255), this->cvFontThickness); // White line
+            Point p1(0, spacer * i);
+            Point p2(dst.cols, spacer * i);
+            line(dst, p1, p2, Scalar(255, 255, 255), this->cvFontThickness); // White line
 
             double nextVal = maxVal - spaceVal * i;
             std::string nextText;
@@ -316,7 +319,7 @@ public:
                 nextText = std::to_string(cvRound(nextVal)); // Normal formatting
             }
 
-            cv::putText(dst, nextText, p1, cv::FONT_HERSHEY_PLAIN, this->cvFontSize, cv::Scalar(255, 255, 255),
+            putText(dst, nextText, p1, FONT_HERSHEY_PLAIN, this->cvFontSize, Scalar(255, 255, 255),
                         this->cvFontThickness, this->lineType);
         }
     }
@@ -353,21 +356,26 @@ public:
         matchTemplate(splitMat[0], splitMat[1], correlationMat, TemplateMatchModes::TM_CCOEFF_NORMED);
         return correlationMat.at<float>(0, 0);
     }
-    Rect validateRect(Rect r, int w, int h)
-    {
-        if (r.width <= 0) r.width = 1;
-        if (r.height <= 0) r.height = 1;
-        if (r.x < 0) r.x = 0;
-        if (r.y < 0) r.y = 0;
-        if (r.x > w) r.x = w - 1;
-        if (r.y > h) r.y = h - 1;
-        if (r.x + r.width >= w) r.width = w - r.x - 1;
-        if (r.y + r.height >= h) r.height = h - r.y - 1;
-        if (r.width <= 0) r.width = 1;
-        if (r.height <= 0) r.height = 1;
-        if (r.x == w) r.x = r.x - 1;
-        if (r.y == h) r.y = r.y - 1;
-        return r;
+
+    Rect validateRect(const Rect& r, int width, int height) {
+        Rect result = r;
+        if (result.width < 0) result.width = 1;
+        if (result.height < 0) result.height = 1;
+        if (result.x < 0) result.x = 0;
+        if (result.y < 0) result.y = 0;
+        if (result.x > width) result.x = width;
+        if (result.y > height) result.y = height;
+        if (result.x + result.width > width) result.width = width - result.x;
+        if (result.y + result.height > height) result.height = height - result.y;
+        return result;
+    }
+
+    Rect initRandomRect(int margin, int width) {
+        // Use C++11's random number generator for better randomness
+        static random_device rd;
+        static mt19937 gen(rd());  // Mersenne Twister engine
+        static uniform_int_distribution<> dist(margin, width - 2 * margin);
+        return Rect(dist(gen), dist(gen), dist(gen), dist(gen));
     }
 
     void DrawRotatedRectangle(Mat& image, Point centerPoint, Size rectangleSize, double rotationDegrees, 
@@ -1801,124 +1809,254 @@ public:
     }
 };
 
-//class CPP_Histogram_Basics : public algorithmCPP
+
+class Kalman_Simple {
+public:
+    KalmanFilter* kf;
+    Mat processNoise = Mat(2, 1, CV_32F);
+    Mat measurement = Mat(1, 1, CV_32F, 0.0);
+    float inputReal;
+    float stateResult;
+    float processNoiseCov = 0.00001f;
+    float measurementNoiseCov = 0.1f;
+    float errorCovPost = 1;
+    float transitionMatrix[4] = { 1, 1, 0, 1 };  // Change externally and set new TransmissionMatrix
+    bool newTMatrix = true;
+
+    void updateTMatrix()
+    {
+        kf->transitionMatrix = Mat(2, 2, CV_32F, transitionMatrix);
+        kf->measurementMatrix = Mat::eye(1, 2, CV_32F);  // Set identity
+        kf->processNoiseCov = Mat::eye(2, 2, CV_32F) * processNoiseCov;
+        kf->measurementNoiseCov = Mat::eye(1, 1, CV_32F) * measurementNoiseCov;
+        kf->errorCovPost = Mat::eye(2, 2, CV_32F) * errorCovPost;
+    }
+    Kalman_Simple() {
+        kf = new KalmanFilter(2, 1, 0);
+    }
+
+    void Run() {
+        if (newTMatrix)
+        {
+            newTMatrix = false;
+            updateTMatrix();
+        }
+
+        Mat prediction = kf->predict();
+        measurement.at<float>(0, 0) = inputReal;
+        stateResult = kf->correct(measurement).at<float>(0, 0);
+    }
+
+    ~Kalman_Simple() {}
+};
+
+
+
+class CPP_Kalman_Basics : public algorithmCPP {
+public:
+    vector<Kalman_Simple> kalman;
+    vector<float> kInput = { 0, 0, 0, 0 };
+    vector<float> kOutput;
+    int saveDimension = -1;
+
+    CPP_Kalman_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_Kalman_Basics";
+        desc = "Use Kalman to stabilize values (such as a Rect)";
+    }
+
+    void Run(Mat src) {
+        if (task->optionsChanged) {
+            kalman.clear();
+            saveDimension = int(kInput.size());
+            for (int i = 0; i < kInput.size(); i++) {
+                kalman.push_back(Kalman_Simple());
+            }
+            kOutput.resize(kInput.size());
+        }
+
+        if (task->useKalman) {
+            for (int i = 0; i < kalman.size(); i++) {
+                kalman[i].inputReal = kInput[i];
+                kalman[i].Run();
+                if (isnan(kalman[i].stateResult)) {
+                    kalman[i].stateResult = kalman[i].inputReal;
+                }
+                kOutput[i] = kalman[i].stateResult;
+            }
+        }
+        else {
+            kOutput = kInput;
+        }
+
+        if (standalone) {
+            dst2 = src.clone();
+            Rect rect(cvRound(kOutput[0]), cvRound(kOutput[1]), cvRound(kOutput[2]), cvRound(kOutput[3]));
+            rect = task->validateRect(rect, dst2.cols, dst2.rows);
+            static Rect lastRect = rect;
+            if (rect == lastRect) {
+                Rect r = task->initRandomRect(src.rows <= 240 ? 20 : 50, dst2.cols);
+                kInput = { float(r.x), float(r.y), float(r.width), float(r.height) };
+            }
+            lastRect = rect;
+            rectangle(dst2, rect, Scalar(255, 255, 255), task->lineWidth + 1);
+            rectangle(dst2, rect, Scalar(0, 0, 255), task->lineWidth);
+        }
+    }
+};
+
+
+
+
+
+class CPP_Histogram_Kalman : public algorithmCPP {
+public:
+    CPP_Histogram_Basics* hist;
+    CPP_Kalman_Basics* kalman;
+
+    CPP_Histogram_Kalman(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_Histogram_Kalman";
+        kalman = new CPP_Kalman_Basics(rows, cols);
+        hist = new CPP_Histogram_Basics(rows, cols);
+        labels = { "", "", "With Kalman", "Without Kalman" };
+        desc = "Use Kalman to smooth the histogram results.";
+    }
+
+    void Run(Mat src) {
+        hist->Run(src);
+        dst3 = hist->dst2.clone();
+
+        if (hist->histogram.empty()) {
+            hist->histogram = Mat(task->histogramBins, 1, CV_32F, 0);
+        }
+
+        if (kalman->kInput.size() != task->histogramBins) {
+            kalman->kInput.resize(task->histogramBins);
+        }
+        for (int i = 0; i < task->histogramBins; i++) {
+            kalman->kInput[i] = hist->histogram.at<float>(i, 0);
+        }
+
+        kalman->Run(src);
+
+        hist->histogram = Mat(int(kalman->kOutput.size()), 1, CV_32FC1, kalman->kOutput.data());
+        hist->plot->Run(hist->histogram);
+        dst2 = hist->dst2;
+    }
+};
+
+
+
+
+
+class CPP_BackProject_Basics : public algorithmCPP {
+public:
+    CPP_Histogram_Kalman* histK;
+    Scalar minRange, maxRange;
+
+    CPP_BackProject_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
+        histK = new CPP_Histogram_Kalman(rows, cols);
+        traceName = "CPP_BackProject_Basics";
+        labels[2] = "Move mouse to backproject a histogram column";
+        dst1 = Mat(dst1.size(), CV_8U, 0);
+        desc = "Mouse over any bin to see the color histogram backprojected.";
+    }
+
+    void Run(Mat src) {
+        Mat input = src.clone();
+        if (input.channels() != 1) {
+            cvtColor(input, input, COLOR_BGR2GRAY);
+        }
+
+        histK->Run(input);
+        if (histK->hist->mm.minVal == histK->hist->mm.maxVal) {
+
+            task->setTrueText("The input image is empty - mm.minVal and mm.maxVal are both zero...", dst2);
+            return;
+        }
+
+
+        dst2 = histK->dst2;
+
+        int totalPixels = int(dst2.total());
+        //if (histK->hist->plot.removeZeroEntry) {
+        //    totalPixels = countNonZero(input);
+        //}
+
+        int brickWidth = dst2.cols / task->histogramBins;
+        float incr = (histK->hist->mm.maxVal - histK->hist->mm.minVal) / task->histogramBins;
+        int histIndex = floor(task->mouseMovePoint.x / brickWidth);
+
+        minRange = Scalar(histIndex * incr);
+        maxRange = Scalar((histIndex + 1) * incr);
+        if (histIndex + 1 == task->histogramBins) {
+            maxRange = Scalar(255);
+        }
+
+        inRange(input, minRange, maxRange, dst0);
+
+        int actualCount = countNonZero(dst0);
+
+        dst3 = task->color.clone();
+        dst3.setTo(Scalar(0, 255, 255), dst0);
+
+        auto count = histK->hist->histogram.at<float>(histIndex, 0);
+        mmData histMax = task->getMinMax(histK->hist->histogram);
+
+        labels[3] = "Backprojecting " + to_string(minRange(0)) + " to " + to_string(maxRange(0)) +
+            " with " + to_string(count) + " of " + to_string(totalPixels) + " samples compared to " +
+            " mask pixels = " + to_string(actualCount) +
+            " Histogram max count = " + to_string(histMax.maxVal);
+        rectangle(dst2, Rect(histIndex * brickWidth, 0, brickWidth, dst2.rows), Scalar(0, 255, 255), task->lineWidth);
+    }
+};
+
+
+
+
+//class CPP_BackProject_Basics : public algorithmCPP
 //{
 //private:
 //public:
-//    Mat histogram;
-//    CPP_Plot_Histogram* plot;
-//    bool removeZeroEntry;
-//    double srcMin;
-//    double srcMax;
-//    Range ranges[1];
-//    int splitIndex;
-//    CPP_Histogram_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
-//        plot = new CPP_Plot_Histogram(rows, cols);
-//        desc = "Create a raw histogram (no Kalman)";
-//    }
-//    void plotHistogram() {
-//        if (removeZeroEntry) histogram.at<float>(0, 0) = 0;
-//        plot->Run(histogram);
-//        dst2 = plot->dst2;
+//    CPP_Histogram_Basics* hist;
+//    CPP_BackProject_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
+//        traceName = "CPP_BackProject_Basics";
+//        hist = new CPP_Histogram_Basics(rows, cols);
+//        labels[2] = "Move mouse to backproject a histogram column";
+//        dst1 = Mat(dst1.size(), CV_8U);
+//        desc = "Use the mouse to select what bin in the provided histogram should be backprojected.";
 //    }
 //    void Run(Mat src) {
-//        if (standalone) {
-//            if (task->heartBeat) {
-//                splitIndex += 1;
-//                splitIndex %= 3;
-//                switch (splitIndex)
-//                {
-//                case 0:
-//                {
-//                    plot->backColor = BLUE;
-//                    break;
-//                }
-//                case 1:
-//                {
-//                    plot->backColor = GREEN;
-//                    break;
-//                }
-//                case 2:
-//                {
-//                    plot->backColor = RED;
-//                    break;
-//                }
-//                }
-//            }
-//            Mat msplit[3];
-//            split(src, msplit);
-//            src = msplit[splitIndex];
-//        }
-//        if (src.channels() != 1) cvtColor(src, src, COLOR_BGR2GRAY);
-//        auto mm = task->getMinMax(src);
-//        srcMin = mm.minVal;
-//        srcMax = mm.maxVal;
-//        if (mm.minVal == mm.maxVal) {
+//        auto input = src.clone();
+//        if (input.channels() != 1) cvtColor(input, input, COLOR_BGR2GRAY);
+//        hist->Run(input);
+//        if (hist->mm.minVal == hist->mm.maxVal) {
 //            task->setTrueText("The input image is empty - srcMin and srcMax are both zero...", dst2);
 //            return;
 //        }
-//        int chan[] = { 0 };
-//        int bins[] = { task->histogramBins };
-//        float hRange[] = { float(srcMin), float(srcMax)};
-//        const float* range[] = { hRange };
-//        calcHist(&src, 1, chan, Mat(), histogram, 1, bins, range, true, false);
-//        plotHistogram();
-//        // 		labels[2] = Choose(splitIndex + 1, "Blue", "Green", "Red") + " histogram, bins = " + to_string(task->histogramBins) + ", X ranges from " + Format(mm.minVal, "0.0") + " to " + Format(mm.maxVal, "0.0") + ", y is occurances";// <<<<< build an array and index it.
+//        dst2 = hist->dst2;
+//        auto totalPixels = dst2.total();
+//        //if (hist->removeZeroEntry) totalPixels = countNonZero(input);
+//        auto barWidth = dst2.cols / task->histogramBins;
+//        auto incr = (hist->mm.maxVal - hist->mm.minVal) / task->histogramBins;
+//        int histIndex = task->mouseMovePoint.x / barWidth;
+//        auto minRange = Scalar(histIndex * incr);
+//        auto maxRange = Scalar((histIndex + 1) * incr);
+//        if (histIndex + 1 == task->histogramBins) maxRange = Scalar(255);
+//        Mat mask;
+//        float bRange[] = { float(minRange.val[0]), float(maxRange.val[0])};
+//        const float* ranges[] = { bRange };
+//        calcBackProject(&input, 1, 0, hist->histogram, mask, ranges, 1, true);
+//        auto actualCount = countNonZero(mask);
+//        dst3 = src;
+//        dst3.setTo(YELLOW, mask);
+//        auto count = hist->histogram.at<float>(int(histIndex), 0);
+//        mmData histMax = task->getMinMax(hist->histogram);
+//        labels[3] = "Backprojecting " + to_string(int(minRange.val[0])) + " to " + to_string(int(maxRange.val[0])) + " with " +
+//            to_string(count) + " of " + to_string(totalPixels) + " samples compared to " + " mask pixels = " + to_string(actualCount) +
+//            " Histogram max count = " + to_string(int(histMax.maxVal));
+//        rectangle(dst2, Rect(int(histIndex * barWidth), 0, barWidth, dst2.rows), YELLOW, task->lineWidth);
 //    }
 //};
-
-
-
-
-
-
-
-
-
-class CPP_BackProject_Basics : public algorithmCPP
-{
-private:
-public:
-    CPP_Histogram_Basics* hist;
-    CPP_BackProject_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
-        traceName = "CPP_BackProject_Basics";
-        hist = new CPP_Histogram_Basics(rows, cols);
-        labels[2] = "Move mouse to backproject a histogram column";
-        dst1 = Mat(dst1.size(), CV_8U);
-        desc = "Use the mouse to select what bin in the provided histogram should be backprojected.";
-    }
-    void Run(Mat src) {
-        auto input = src.clone();
-        if (input.channels() != 1) cvtColor(input, input, COLOR_BGR2GRAY);
-        hist->Run(input);
-        if (hist->mm.minVal == hist->mm.maxVal) {
-            task->setTrueText("The input image is empty - srcMin and srcMax are both zero...", dst2);
-            return;
-        }
-        dst2 = hist->dst2;
-        auto totalPixels = dst2.total();
-        //if (hist->removeZeroEntry) totalPixels = countNonZero(input);
-        auto barWidth = dst2.cols / task->histogramBins;
-        auto incr = (hist->mm.maxVal - hist->mm.minVal) / task->histogramBins;
-        int histIndex = task->mouseMovePoint.x / barWidth;
-        auto minRange = Scalar(histIndex * incr);
-        auto maxRange = Scalar((histIndex + 1) * incr);
-        if (histIndex + 1 == task->histogramBins) maxRange = Scalar(255);
-        Mat mask;
-        float bRange[] = { float(minRange.val[0]), float(maxRange.val[0])};
-        const float* ranges[] = { bRange };
-        calcBackProject(&input, 1, 0, hist->histogram, mask, ranges, 1, true);
-        auto actualCount = countNonZero(mask);
-        dst3 = src;
-        dst3.setTo(YELLOW, mask);
-        auto count = hist->histogram.at<float>(int(histIndex), 0);
-        mmData histMax = task->getMinMax(hist->histogram);
-        labels[3] = "Backprojecting " + to_string(int(minRange.val[0])) + " to " + to_string(int(maxRange.val[0])) + " with " +
-            to_string(count) + " of " + to_string(totalPixels) + " samples compared to " + " mask pixels = " + to_string(actualCount) +
-            " Histogram max count = " + to_string(int(histMax.maxVal));
-        rectangle(dst2, Rect(int(histIndex * barWidth), 0, barWidth, dst2.rows), YELLOW, task->lineWidth);
-    }
-};
 
 
 

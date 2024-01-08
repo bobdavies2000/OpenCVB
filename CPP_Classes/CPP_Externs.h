@@ -41,6 +41,10 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case CPP_AddWeighted_Basics_:
     {task->alg = new CPP_AddWeighted_Basics(rows, cols); break; }
+	case CPP_Histogram_Kalman_ :
+	{task->alg = new CPP_Histogram_Kalman(rows, cols); break; }
+	case CPP_Kalman_Basics_ :
+	{task->alg = new CPP_Kalman_Basics(rows, cols); break; }
 	case CPP_RedCloud_Core_ :
 	{task->alg = new CPP_RedCloud_Core(rows, cols); break; }
 	case CPP_FPoly_TopFeatures_ :
