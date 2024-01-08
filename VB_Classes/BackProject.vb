@@ -6,7 +6,6 @@ Public Class BackProject_Basics : Inherits VB_Algorithm
     Public minRange As cv.Scalar, maxRange As cv.Scalar
     Public Sub New()
         labels(2) = "Move mouse to backproject a histogram column"
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Mouse over any bin to see the color histogram backprojected."
     End Sub
     Public Sub RunVB(src as cv.Mat)

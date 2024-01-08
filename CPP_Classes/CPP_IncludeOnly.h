@@ -1957,7 +1957,6 @@ public:
         histK = new CPP_Histogram_Kalman(rows, cols);
         traceName = "CPP_BackProject_Basics";
         labels[2] = "Move mouse to backproject a histogram column";
-        dst1 = Mat(dst1.size(), CV_8U, 0);
         desc = "Mouse over any bin to see the color histogram backprojected.";
     }
 
@@ -1973,7 +1972,6 @@ public:
             task->setTrueText("The input image is empty - mm.minVal and mm.maxVal are both zero...", dst2);
             return;
         }
-
 
         dst2 = histK->dst2;
 
@@ -2010,53 +2008,6 @@ public:
     }
 };
 
-
-
-
-//class CPP_BackProject_Basics : public algorithmCPP
-//{
-//private:
-//public:
-//    CPP_Histogram_Basics* hist;
-//    CPP_BackProject_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
-//        traceName = "CPP_BackProject_Basics";
-//        hist = new CPP_Histogram_Basics(rows, cols);
-//        labels[2] = "Move mouse to backproject a histogram column";
-//        dst1 = Mat(dst1.size(), CV_8U);
-//        desc = "Use the mouse to select what bin in the provided histogram should be backprojected.";
-//    }
-//    void Run(Mat src) {
-//        auto input = src.clone();
-//        if (input.channels() != 1) cvtColor(input, input, COLOR_BGR2GRAY);
-//        hist->Run(input);
-//        if (hist->mm.minVal == hist->mm.maxVal) {
-//            task->setTrueText("The input image is empty - srcMin and srcMax are both zero...", dst2);
-//            return;
-//        }
-//        dst2 = hist->dst2;
-//        auto totalPixels = dst2.total();
-//        //if (hist->removeZeroEntry) totalPixels = countNonZero(input);
-//        auto barWidth = dst2.cols / task->histogramBins;
-//        auto incr = (hist->mm.maxVal - hist->mm.minVal) / task->histogramBins;
-//        int histIndex = task->mouseMovePoint.x / barWidth;
-//        auto minRange = Scalar(histIndex * incr);
-//        auto maxRange = Scalar((histIndex + 1) * incr);
-//        if (histIndex + 1 == task->histogramBins) maxRange = Scalar(255);
-//        Mat mask;
-//        float bRange[] = { float(minRange.val[0]), float(maxRange.val[0])};
-//        const float* ranges[] = { bRange };
-//        calcBackProject(&input, 1, 0, hist->histogram, mask, ranges, 1, true);
-//        auto actualCount = countNonZero(mask);
-//        dst3 = src;
-//        dst3.setTo(YELLOW, mask);
-//        auto count = hist->histogram.at<float>(int(histIndex), 0);
-//        mmData histMax = task->getMinMax(hist->histogram);
-//        labels[3] = "Backprojecting " + to_string(int(minRange.val[0])) + " to " + to_string(int(maxRange.val[0])) + " with " +
-//            to_string(count) + " of " + to_string(totalPixels) + " samples compared to " + " mask pixels = " + to_string(actualCount) +
-//            " Histogram max count = " + to_string(int(histMax.maxVal));
-//        rectangle(dst2, Rect(int(histIndex * barWidth), 0, barWidth, dst2.rows), YELLOW, task->lineWidth);
-//    }
-//};
 
 
 
