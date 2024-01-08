@@ -45,9 +45,6 @@
     <ClInclude Include="PragmaLibs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CPP_Names.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PointCloudConvert.h">
       <Filter>Header Files</Filter>
     </ClInclude>

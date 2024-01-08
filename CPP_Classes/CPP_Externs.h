@@ -39,7 +39,7 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 
     switch (function)
     {
-    case CPP_AddWeighted_Basics_:
+    case CPP_AddWeighted_Basics_ :
     {task->alg = new CPP_AddWeighted_Basics(rows, cols); break; }
 	case CPP_Histogram_Kalman_ :
 	{task->alg = new CPP_Histogram_Kalman(rows, cols); break; }
@@ -51,7 +51,7 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 	{task->alg = new CPP_FPoly_TopFeatures(rows, cols); break; }
 	case CPP_Random_Enumerable_ :
 	{task->alg = new CPP_Random_Enumerable(rows, cols); break; }
-    case CPP_Bezier_Basics_:
+    case CPP_Bezier_Basics_ :
     {task->alg = new CPP_Bezier_Basics(rows, cols); break; }
     case CPP_Feature_Agast_ :
     {task->alg = new CPP_Feature_Agast(rows, cols);break;}
@@ -61,7 +61,7 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {task->alg = new CPP_Delaunay_Basics(rows, cols);break;}
     case CPP_Delaunay_GenerationsNoKNN_ :
     {task->alg = new CPP_Delaunay_GenerationsNoKNN(rows, cols);break;}
-    case CPP_KNN_Basics_:
+    case CPP_KNN_Basics_ :
     {task->alg = new CPP_KNN_Basics(rows, cols); break; }
     case CPP_Random_Basics_ :
     {task->alg = new CPP_Random_Basics(rows, cols);break;}

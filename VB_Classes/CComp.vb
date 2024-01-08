@@ -50,7 +50,6 @@ End Class
 
 
 
-
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.ConnectedComponents.RenderBlobs(OpenCvSharp.Mat)/
 Public Class CComp_Shapes : Inherits VB_Algorithm
     Dim shapes As cv.Mat

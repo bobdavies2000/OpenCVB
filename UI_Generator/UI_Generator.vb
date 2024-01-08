@@ -20,6 +20,7 @@ Module UI_GeneratorMain
                     If line = "};" Then Exit While
                     Dim split = line.Split(",")
                     If split(0).Contains("MAX_FUNCTION") Then Continue While
+                    split(0) = split(0).Substring(0, split(0).Length - 1)
                     functionNames.Add(split(0).Substring(0), split(0))
                     unsortedFunctions.Add(split(0).Substring(0))
                 End While
@@ -27,14 +28,14 @@ Module UI_GeneratorMain
         End While
         srFunctions.Close()
 
-        Dim swInclude As New StreamWriter(VBcodeDir.FullName + "../CPP_Classes/CPP_Names.h")
-        swInclude.WriteLine("#pragma once")
-        swInclude.WriteLine("vector<String> functionNames({")
-        For Each name In unsortedFunctions
-            swInclude.WriteLine("""" + name + """,")
-        Next
-        swInclude.WriteLine("});")
-        swInclude.Close()
+        'Dim swInclude As New StreamWriter(VBcodeDir.FullName + "../CPP_Classes/CPP_Names.h")
+        'swInclude.WriteLine("#pragma once")
+        'swInclude.WriteLine("vector<String> functionNames({")
+        'For Each name In unsortedFunctions
+        '    swInclude.WriteLine("""" + name + """,")
+        'Next
+        'swInclude.WriteLine("});")
+        'swInclude.Close()
 
         Dim fileNames As New List(Of String)
         Dim fileEntries As String() = Directory.GetFiles(VBcodeDir.FullName)
@@ -131,7 +132,7 @@ Module UI_GeneratorMain
                 For j = 0 To functionNames.Count - 1
                     Dim functionText = functionNames.ElementAt(j).Key
                     Dim func = functionText
-                    functionText = functionText.Substring(0, functionText.Length - 1)
+                    'functionText = functionText.Substring(0, functionText.Length - 1)
                     sw.WriteLine("if algorithmName = """ + functionText + """ Then return new CPP_Basics(functionNames." + func + ")")
                 Next
             End If
@@ -153,7 +154,8 @@ Module UI_GeneratorMain
             If cleanNames(i).StartsWith("CPP_Basics") Then
                 For j = 0 To functionNames.Count - 1
                     Dim functionText = functionNames.ElementAt(j).Key
-                    sw.WriteLine(functionText.Substring(0, functionText.Length - 1))
+                    sw.WriteLine(functionText)
+                    ' sw.WriteLine(functionText.Substring(0, functionText.Length - 1))
                 Next
             End If
         Next
