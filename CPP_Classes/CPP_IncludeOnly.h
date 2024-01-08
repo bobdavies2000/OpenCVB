@@ -2048,43 +2048,42 @@ public:
 
 
 
-
-
-class CPP_Rectangle_Rotated : public algorithmCPP
-{
-private:
+class CPP_Rectangle_Rotated : public algorithmCPP {
 public:
-    CPP_Rectangle_Basics* rRectangle;
+    CPP_Rectangle_Basics* rectangle;
+
     CPP_Rectangle_Rotated(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Rectangle_Rotated";
-        rRectangle = new CPP_Rectangle_Basics(rows, cols);
-        rRectangle->options_drawRotated = true;
+        rectangle = new CPP_Rectangle_Basics(rows, cols);
+        rectangle->options_drawRotated = true;
         desc = "Draw the requested number of rectangles.";
     }
+
     void Run(Mat src) {
-        rRectangle->Run(src);
-        dst2 = rRectangle->dst2;
+        rectangle->Run(src);
+        dst2 = rectangle->dst2;
     }
 };
 
 
 
 
-
-class CPP_Contour_Largest : public algorithmCPP
-{
-private:
+class CPP_Contour_Largest : public algorithmCPP {
 public:
     vector<Point> bestContour;
     vector<vector<Point>> allContours;
+    RetrievalModes options_retrievalMode = RetrievalModes::RETR_LIST;
+    ContourApproximationModes options_approximationMode = ContourApproximationModes::CHAIN_APPROX_NONE;
     int maxIndex;
     CPP_Rectangle_Rotated* rotatedRect;
+
     CPP_Contour_Largest(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Contour_Largest";
-        labels = { "", "", "Input to FindContours", "Largest single contour in the input image." };
         rotatedRect = new CPP_Rectangle_Rotated(rows, cols);
+        labels = { "", "", "Input to FindContours", "Largest single contour in the input image." };
         desc = "Create a mask from the largest contour of the input.";
     }
+
     void Run(Mat src) {
         if (standalone) {
             if (task->heartBeat) {
@@ -2095,25 +2094,84 @@ public:
         else {
             dst2 = src;
         }
+
         if (dst2.channels() != 1) cvtColor(dst2, dst2, COLOR_BGR2GRAY);
-        findContours(dst2, allContours, RetrievalModes::RETR_LIST, ContourApproximationModes::CHAIN_APPROX_NONE);
-        auto maxCount = 0;
+        if (options_retrievalMode == RETR_FLOODFILL) {
+            dst2.convertTo(dst1, CV_32SC1);
+            findContours(dst1, allContours, noArray(), options_retrievalMode, options_approximationMode);
+            dst1.convertTo(dst3, CV_8UC1);
+        }
+        else {
+            findContours(dst2, allContours, noArray(), options_retrievalMode, options_approximationMode);
+        }
+
+        int maxCount = 0;
         maxIndex = -1;
-        // Review this For Loop >>>> i = 0 To allContours.size() - 1
-        for (auto i = 0; i < allContours.size(); i++) {
-            auto len = int(allContours[i].size());
+        if (allContours.empty()) return;
+        for (int i = 0; i < allContours.size(); i++) {
+            int len = allContours[i].size();
             if (len > maxCount) {
                 maxCount = len;
                 maxIndex = i;
             }
         }
-        if (maxIndex >= 0 && maxCount >= 2) {
-            dst3.setTo(0);
-            drawContours(dst3, allContours, maxIndex, WHITE, -1, task->lineType);
-            bestContour = allContours[maxIndex];
+        bestContour = allContours[maxIndex];
+        if (standalone) {
+            dst3 = Mat::zeros(dst2.size(), CV_8UC1);
+            if (maxIndex >= 0 && maxCount >= 2) {
+                drawContours(dst3, allContours, maxIndex, Scalar(255), -1, task->lineType);
+            }
         }
     }
 };
+
+
+
+
+
+//class CPP_Contour_Largest : public algorithmCPP
+//{
+//private:
+//public:
+//    vector<Point> bestContour;
+//    vector<vector<Point>> allContours;
+//    int maxIndex;
+//    CPP_Rectangle_Rotated* rotatedRect;
+//    CPP_Contour_Largest(int rows, int cols) : algorithmCPP(rows, cols) {
+//        traceName = "CPP_Contour_Largest";
+//        labels = { "", "", "Input to FindContours", "Largest single contour in the input image." };
+//        rotatedRect = new CPP_Rectangle_Rotated(rows, cols);
+//        desc = "Create a mask from the largest contour of the input.";
+//    }
+//    void Run(Mat src) {
+//        if (standalone) {
+//            if (task->heartBeat) {
+//                rotatedRect->Run(src);
+//                dst2 = rotatedRect->dst2;
+//            }
+//        }
+//        else {
+//            dst2 = src;
+//        }
+//        if (dst2.channels() != 1) cvtColor(dst2, dst2, COLOR_BGR2GRAY);
+//        findContours(dst2, allContours, RetrievalModes::RETR_LIST, ContourApproximationModes::CHAIN_APPROX_NONE);
+//        auto maxCount = 0;
+//        maxIndex = -1;
+//        // Review this For Loop >>>> i = 0 To allContours.size() - 1
+//        for (auto i = 0; i < allContours.size(); i++) {
+//            auto len = int(allContours[i].size());
+//            if (len > maxCount) {
+//                maxCount = len;
+//                maxIndex = i;
+//            }
+//        }
+//        if (maxIndex >= 0 && maxCount >= 2) {
+//            dst3.setTo(0);
+//            drawContours(dst3, allContours, maxIndex, WHITE, -1, task->lineType);
+//            bestContour = allContours[maxIndex];
+//        }
+//    }
+//};
 
 
 
