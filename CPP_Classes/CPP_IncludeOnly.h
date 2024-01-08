@@ -1747,71 +1747,125 @@ public:
 
 
 
-class CPP_Histogram_Basics : public algorithmCPP
+class CPP_Histogram_Basics : public algorithmCPP 
 {
-private:
 public:
     Mat histogram;
+    mmData mm;
     CPP_Plot_Histogram* plot;
-    bool removeZeroEntry;
-    double srcMin;
-    double srcMax;
-    Range ranges[1];
-    int splitIndex;
-    CPP_Histogram_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
+    vector<Range> ranges;
+    int splitIndex = 0;
+    CPP_Histogram_Basics(int rows, int cols) : algorithmCPP(rows, cols) 
+    {
         plot = new CPP_Plot_Histogram(rows, cols);
-        desc = "Create a raw histogram (no Kalman)";
+        traceName = "CPP_Histogram_Basics";
+        desc = "Create a histogram (no Kalman)";
     }
-    void plotHistogram() {
-        if (removeZeroEntry) histogram.at<float>(0, 0) = 0;
-        plot->Run(histogram);
-        dst2 = plot->dst2;
-    }
+
     void Run(Mat src) {
         if (standalone) {
             if (task->heartBeat) {
-                splitIndex += 1;
-                splitIndex %= 3;
-                switch (splitIndex)
-                {
-                case 0:
-                {
-                    plot->backColor = BLUE;
-                    break;
-                }
-                case 1:
-                {
-                    plot->backColor = GREEN;
-                    break;
-                }
-                case 2:
-                {
-                    plot->backColor = RED;
-                    break;
-                }
-                }
+                splitIndex = (splitIndex + 1) % 3;
             }
+
             Mat msplit[3];
             split(src, msplit);
             src = msplit[splitIndex];
+
+            plot->backColor = Scalar(splitIndex == 0 ? 255 : 0,
+                                    splitIndex == 1 ? 255 : 0,
+                                    splitIndex == 2 ? 255 : 0);
         }
-        if (src.channels() != 1) cvtColor(src, src, COLOR_BGR2GRAY);
-        auto mm = task->getMinMax(src);
-        srcMin = mm.minVal;
-        srcMax = mm.maxVal;
-        if (mm.minVal == mm.maxVal) {
-            task->setTrueText("The input image is empty - srcMin and srcMax are both zero...", dst2);
-            return;
+        else {
+            if (src.channels() != 1) {
+                cvtColor(src, src, COLOR_BGR2GRAY);
+            }
         }
-        int chan[] = { 0 };
+        mm = task->getMinMax(src);
+
+        float histDelta = 0.001f;
         int bins[] = { task->histogramBins };
-        float hRange[] = { float(srcMin), float(srcMax)};
+        float hRange[] = { (float)(mm.minVal - histDelta), (float)(mm.maxVal + histDelta) };
         const float* range[] = { hRange };
-        calcHist(&src, 1, chan, Mat(), histogram, 1, bins, range, true, false);
-        plotHistogram();
-        // 		labels[2] = Choose(splitIndex + 1, "Blue", "Green", "Red") + " histogram, bins = " + to_string(task->histogramBins) + ", X ranges from " + Format(mm.minVal, "0.0") + " to " + Format(mm.maxVal, "0.0") + ", y is occurances";// <<<<< build an array and index it.
+        calcHist(&src, 1, { 0 }, Mat(), histogram, 1, bins, range, true, false);
+
+        plot->Run(histogram);
+        histogram = plot->histogram;
+
+
+        dst2 = plot->dst2;
+        labels[2] = " histogram, bins = " +
+                    to_string(task->histogramBins) + ", X ranges from " + to_string(mm.minVal) +
+                    " to " + to_string(mm.maxVal) + ", y is sample count";
+        labels[2] = (splitIndex == 0 ? "Blue" : splitIndex == 1 ? "Green" : "Red") + labels[2];
     }
 };
+
+//class CPP_Histogram_Basics : public algorithmCPP
+//{
+//private:
+//public:
+//    Mat histogram;
+//    CPP_Plot_Histogram* plot;
+//    bool removeZeroEntry;
+//    double srcMin;
+//    double srcMax;
+//    Range ranges[1];
+//    int splitIndex;
+//    CPP_Histogram_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
+//        plot = new CPP_Plot_Histogram(rows, cols);
+//        desc = "Create a raw histogram (no Kalman)";
+//    }
+//    void plotHistogram() {
+//        if (removeZeroEntry) histogram.at<float>(0, 0) = 0;
+//        plot->Run(histogram);
+//        dst2 = plot->dst2;
+//    }
+//    void Run(Mat src) {
+//        if (standalone) {
+//            if (task->heartBeat) {
+//                splitIndex += 1;
+//                splitIndex %= 3;
+//                switch (splitIndex)
+//                {
+//                case 0:
+//                {
+//                    plot->backColor = BLUE;
+//                    break;
+//                }
+//                case 1:
+//                {
+//                    plot->backColor = GREEN;
+//                    break;
+//                }
+//                case 2:
+//                {
+//                    plot->backColor = RED;
+//                    break;
+//                }
+//                }
+//            }
+//            Mat msplit[3];
+//            split(src, msplit);
+//            src = msplit[splitIndex];
+//        }
+//        if (src.channels() != 1) cvtColor(src, src, COLOR_BGR2GRAY);
+//        auto mm = task->getMinMax(src);
+//        srcMin = mm.minVal;
+//        srcMax = mm.maxVal;
+//        if (mm.minVal == mm.maxVal) {
+//            task->setTrueText("The input image is empty - srcMin and srcMax are both zero...", dst2);
+//            return;
+//        }
+//        int chan[] = { 0 };
+//        int bins[] = { task->histogramBins };
+//        float hRange[] = { float(srcMin), float(srcMax)};
+//        const float* range[] = { hRange };
+//        calcHist(&src, 1, chan, Mat(), histogram, 1, bins, range, true, false);
+//        plotHistogram();
+//        // 		labels[2] = Choose(splitIndex + 1, "Blue", "Green", "Red") + " histogram, bins = " + to_string(task->histogramBins) + ", X ranges from " + Format(mm.minVal, "0.0") + " to " + Format(mm.maxVal, "0.0") + ", y is occurances";// <<<<< build an array and index it.
+//    }
+//};
 
 
 
@@ -1837,15 +1891,15 @@ public:
         auto input = src.clone();
         if (input.channels() != 1) cvtColor(input, input, COLOR_BGR2GRAY);
         hist->Run(input);
-        if (hist->srcMin == hist->srcMax) {
+        if (hist->mm.minVal == hist->mm.maxVal) {
             task->setTrueText("The input image is empty - srcMin and srcMax are both zero...", dst2);
             return;
         }
         dst2 = hist->dst2;
         auto totalPixels = dst2.total();
-        if (hist->removeZeroEntry) totalPixels = countNonZero(input);
+        //if (hist->removeZeroEntry) totalPixels = countNonZero(input);
         auto barWidth = dst2.cols / task->histogramBins;
-        auto incr = (hist->srcMax - hist->srcMin) / task->histogramBins;
+        auto incr = (hist->mm.maxVal - hist->mm.minVal) / task->histogramBins;
         int histIndex = task->mouseMovePoint.x / barWidth;
         auto minRange = Scalar(histIndex * incr);
         auto maxRange = Scalar((histIndex + 1) * incr);
