@@ -48,7 +48,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
                                task.historyCount,
                                task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height,
                                task.lineWidth, task.lineType, task.dotSize, task.minRes.Width, task.minRes.Height,
-                               task.maxZmeters, redOptions.PCReduction)
+                               task.maxZmeters, redOptions.PCReduction, task.cvFontSize)
 
         Dim pointCloudData(task.pointCloud.Total * task.pointCloud.ElemSize - 1) As Byte
         Marshal.Copy(task.pointCloud.Data, pointCloudData, 0, pointCloudData.Length)
@@ -162,6 +162,6 @@ Module CPP_Module
                                       ByRef rectHeight As Integer, ByRef lineWidth As Integer,
                                       ByRef lineType As Integer, ByRef dotSize As Integer, ByRef minResWidth As Integer,
                                       ByRef minResHeight As Integer, ByRef maxZmeters As Single,
-                                      ByRef PCReduction As Integer)
+                                      ByRef PCReduction As Integer, ByRef fontSize As Single)
     End Sub
 End Module 

@@ -147,30 +147,7 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     }
 
     task->alg->standalone = true;
-    task->font = FONT_HERSHEY_SIMPLEX;
-    switch (cols)
-    {
-    case 1280:
-    {
-        task->fontSize = 1.2f;
-        break;
-    }
-    case 640:
-    {
-        task->fontSize = 0.6f;
-        break;
-    }
-    case 320:
-    {
-        task->fontSize = 0.35f;
-        break;
-    }
-    case 160:
-    {
-        task->fontSize = 0.2f;
-        break;
-    }
-    }
+    task->font = FONT_HERSHEY_SIMPLEX; // fontSize is set below...
     task->fontColor = Scalar(255, 255, 255);
     task->cppFunction = function;
     gridBasics = new CPP_Grid_Basics(rows, cols);
@@ -219,7 +196,7 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int& gridSize,
                             int& histogramBins, int& pixelDiffThreshold, bool& useKalman,
                             int& frameHistory, int& rectX, int& rectY, int& rectWidth, int& rectHeight,
                             int& lineWidth, int& lineType, int& dotSize, int& minResWidth, int& minResHeight,
-                            float& maxZmeters, int& PCReduction)
+                            float& maxZmeters, int& PCReduction, float& fontSize)
 {
     task->pixelDiffThreshold = pixelDiffThreshold;
     task->gridSize = gridSize;
@@ -236,6 +213,7 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int& gridSize,
     task->minRes = Size(minResWidth, minResHeight);
     task->maxZmeters = maxZmeters;
     task->PCReduction = PCReduction;
+    task->fontSize = fontSize * 0.6;
 }
 
 

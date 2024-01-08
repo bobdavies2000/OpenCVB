@@ -1524,7 +1524,8 @@ public:
                                 gMt[2][0] * 0   + gMt[2][1] * 1 + gMt[2][2] * 0,
                                 gMt[2][0] * -sy + gMt[2][1] * 0 + gMt[2][2] * cy}};
         task->gMatrix = Mat(3, 3, CV_32F, gMatrix).clone();
-     }
+        task->setTrueText("task->gMatrix is set...", dst2);
+    }
 };
 
 
@@ -1596,41 +1597,34 @@ public:
 
 
 
-
-class CPP_Edge_Sobel : public algorithmCPP
-{
-private:
+class CPP_Edge_Sobel : public algorithmCPP {
 public:
-    Mat grayX;
-    Mat grayY;
-    int option_kernelSize = 5;
-    bool horizontalOnly = false;
+    bool horizontalDerivative = true;
+    bool verticalDerivative = true;
+    int kernelSize = 3;
     CPP_AddWeighted_Basics* addw;
     CPP_Edge_Sobel(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Edge_Sobel";
-        addw = new CPP_AddWeighted_Basics(rows, cols);
-        desc = "Show Sobel edge detection with varying kernel sizes";
+        labels = { "", "", "Horizontal derivative", "Vertical derivative" };
+        desc = "Show Sobel edge detection with varying kernel sizes and directions.";
     }
+
     void Run(Mat src) {
-        if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
-        Sobel(src, grayX, CV_32F, 1, 0, option_kernelSize);
-        if (horizontalOnly == false) {
-            Sobel(src, grayY, CV_32F, 0, 1, option_kernelSize);
-            if (standalone) {
-                addw->src2 = grayY;
-                addw->Run(grayX);
-                convertScaleAbs(addw->dst2, dst2);
-            }
-            else {
-                convertScaleAbs((grayY + grayX), dst2);
-            }
+        if (src.channels() == 3) {
+            cvtColor(src, src, COLOR_BGR2GRAY);
         }
-        else {
-            convertScaleAbs(grayX, dst2);
+
+        if (horizontalDerivative) {
+            Sobel(src, dst2, CV_32F, 1, 0, kernelSize);
+            convertScaleAbs(dst2, dst2);
+        }
+
+        if (verticalDerivative) {
+            Sobel(src, dst3, CV_32F, 0, 1, kernelSize);
+            convertScaleAbs(dst3, dst3);
         }
     }
 };
-
 
 
 
