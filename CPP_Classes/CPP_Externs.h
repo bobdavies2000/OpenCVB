@@ -196,7 +196,7 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int& gridSize,
                             int& histogramBins, int& pixelDiffThreshold, bool& useKalman,
                             int& frameHistory, int& rectX, int& rectY, int& rectWidth, int& rectHeight,
                             int& lineWidth, int& lineType, int& dotSize, int& minResWidth, int& minResHeight,
-                            float& maxZmeters, int& PCReduction, float& fontSize)
+                            float& maxZmeters, int& PCReduction, float& fontSize, int& fontThickness)
 {
     task->pixelDiffThreshold = pixelDiffThreshold;
     task->gridSize = gridSize;
@@ -213,7 +213,8 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int& gridSize,
     task->minRes = Size(minResWidth, minResHeight);
     task->maxZmeters = maxZmeters;
     task->PCReduction = PCReduction;
-    task->fontSize = fontSize * 0.6;
+    task->cvFontSize = fontSize * 0.6;
+    task->cvFontThickness = fontThickness;
 }
 
 

@@ -216,7 +216,8 @@ public:
     int gridRows, gridCols;
     Mat depthMask, noDepthMask, gridMask, maxDepthMask;
     int font; 
-    float fontSize; 
+    float cvFontSize; 
+    int cvFontThickness;
     Scalar fontColor;
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
 
@@ -270,7 +271,7 @@ public:
     void setTrueText(String text, Mat dst, Point2f pt = Point2f(10, 50))
     {
         if (cppFunction < 0) return;
-        putText(dst, text, pt, this->font, this->fontSize, this->fontColor);
+        putText(dst, text, pt, this->font, this->cvFontSize, this->fontColor);
     }
     mmData getMinMax(Mat mat, Mat mask = Mat())
     {
@@ -292,25 +293,34 @@ public:
         // using uniform_int_distribution for more control over range
         return Vec3b(dist(gen), dist(gen), dist(gen));
     }
-    void AddPlotScale(Mat dst, double minVal, double maxVal, int lineCount) {
-        auto spacer = int(dst.rows / (lineCount + 1));
-        auto spaceVal = int((maxVal - minVal) / (lineCount + 1));
-        if (spaceVal < 1) spaceVal = 1;
-        if (spaceVal > 10) spaceVal += spaceVal % 10;
-        string strOut = "";
-        for (auto i = 0; i <= lineCount; i++) {
-            auto p1 = Point(0, spacer * i);
-            auto p2 = Point(dst.cols, spacer * i);
-            line(dst, p1, p2, WHITE, 1);
-            if (i == 0) p1.y += 10;
-            auto nextVal = (maxVal - spaceVal * i);
-            if(maxVal > 1000)
-                strOut = to_string(int(nextVal / 1000)) + "k";
-            else
-                strOut = to_string(int(nextVal));
-            setTrueText(strOut, dst, p1);
+    void AddPlotScale(cv::Mat& dst, double minVal, double maxVal, int lineCount = 3) {
+        // Draw a scale along the side
+        int spacer = cvRound(dst.rows / (lineCount + 1));
+        int spaceVal = cvRound((maxVal - minVal) / (lineCount + 1));
+        if (lineCount > 1 && spaceVal < 1) {
+            spaceVal = 1;
+        }
+        spaceVal += spaceVal % 10; // Ensure even spacing
+
+        for (int i = 0; i <= lineCount; i++) {
+            cv::Point p1(0, spacer * i);
+            cv::Point p2(dst.cols, spacer * i);
+            cv::line(dst, p1, p2, cv::Scalar(255, 255, 255), this->cvFontThickness); // White line
+
+            double nextVal = maxVal - spaceVal * i;
+            std::string nextText;
+            if (maxVal > 1000) {
+                nextText = std::to_string(cvRound(nextVal / 1000)) + "k"; // Format for thousands
+            }
+            else {
+                nextText = std::to_string(cvRound(nextVal)); // Normal formatting
+            }
+
+            cv::putText(dst, nextText, p1, cv::FONT_HERSHEY_PLAIN, this->cvFontSize, cv::Scalar(255, 255, 255),
+                        this->cvFontThickness, this->lineType);
         }
     }
+
     Mat normalize32f(Mat input)
     {
         Mat outMat;
@@ -1663,59 +1673,76 @@ public:
 
 
 
-
-class CPP_Plot_Histogram : public algorithmCPP
-{
-private:
+class CPP_Plot_Histogram : public algorithmCPP {
 public:
-    Mat hist;
+    Mat histogram;
     float minRange = 0;
     float maxRange = 255;
-    Scalar backColor = RED;
-    int plotMaxValue;
-    int plotCenter;
-    int barWidth;
+    Scalar backColor = Scalar(0, 0, 255);
+    float maxValue;
+    float minValue;
+    float plotCenter;
+    float barWidth;
     bool addLabels = true;
-    int labelImage = 2;
-    Mat dst;
+    bool removeZeroEntry = true;
+    bool createHistogram = false;
+
     CPP_Plot_Histogram(int rows, int cols) : algorithmCPP(rows, cols) {
-        dst = dst2;
+        traceName = "CPP_Plot_Histogram";
         desc = "Plot histogram data with a stable scale at the left of the image.";
     }
+
     void Run(Mat src) {
-        if (standalone) {
-            if (src.channels() != 1) cvtColor(src, src, COLOR_BGR2GRAY);
-            int chan[] = { 0 };
+        if (standalone || createHistogram) {
+            if (src.channels() != 1) {
+                cvtColor(src, src, COLOR_BGR2GRAY);
+            }
             int bins[] = { task->histogramBins };
             float hRange[] = { minRange, maxRange };
             const float* range[] = { hRange };
-            calcHist(&src, 1, chan, Mat(), hist, 1, bins, range, true, false);
+            calcHist(&src, 1, { 0 }, Mat(), histogram, 1, bins, range, true, false);
         }
         else {
-            hist = src;
-        }
-        dst.setTo(backColor);
-        barWidth = dst.cols / hist.rows;
-        plotCenter = barWidth * hist.rows / 2 + barWidth / 2;
-        auto mm = task->getMinMax(hist);
-        if (plotMaxValue > 0) mm.maxVal = plotMaxValue;
-        if (mm.maxVal > 0 && hist.rows > 0) {
-            auto incr = int(255 / hist.rows);
-            // Review this For Loop >>>> i = 0 To hist.rows - 1
-            for (auto i = 0; i < hist.rows; i++) {
-                auto offset = hist.at<float>(i);
-                if (isnan(offset)) offset = 0;
-                auto h = int(offset * dst.rows / mm.maxVal);
-                auto sIncr = int((i % 256) * incr);
-                auto color = Scalar(sIncr, sIncr, sIncr);
-                if (hist.rows > 255) color = BLACK;
-                rectangle(dst, Rect(i * barWidth, dst.rows - h, barWidth, h), color, -1);
-            }
-            if (addLabels) task->AddPlotScale(dst, 0, mm.maxVal, 3);
+            histogram = src;
         }
 
+        if (removeZeroEntry) {
+            histogram.at<float>(0) = 0;
+        }
+
+        dst2 = backColor;
+        barWidth = dst2.cols / histogram.rows;
+        plotCenter = barWidth * histogram.rows / 2 + barWidth / 2;
+
+        vector<float> histArray(histogram.rows);
+        memcpy(histArray.data(), histogram.ptr<float>(), histArray.size() * sizeof(float));
+
+        double minVal, maxVal;
+        minMaxIdx(histogram, &minVal, &maxVal);
+
+        if (maxVal > 0 && histogram.rows > 0) {
+            int incr = 255 / histogram.rows;
+            for (int i = 0; i < histArray.size(); i++) {
+                if (isnan(histArray[i])) {
+                    histArray[i] = 0;
+                }
+                if (histArray[i] > 0) {
+                    int h = cvRound(histArray[i] * dst2.rows / maxVal);
+                    int sIncr = (i % 256) * incr;
+                    Scalar color(sIncr, sIncr, sIncr);
+                    if (histogram.rows > 255) {
+                        color = Scalar(0, 0, 0);
+                    }
+                    rectangle(dst2, Rect(i * barWidth, dst2.rows - h, fmax(1, barWidth), h), color, -1);
+                }
+            }
+            if (addLabels) {
+                task->AddPlotScale(dst2, minVal, maxVal);
+            }
+        }
     }
 };
+
 
 
 
