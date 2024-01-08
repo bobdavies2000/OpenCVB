@@ -1629,34 +1629,35 @@ public:
 
 
 
-
-class CPP_Binarize_Simple : public algorithmCPP
-{
-private:
+class CPP_Binarize_Simple : public algorithmCPP {
 public:
     Scalar meanScalar;
     Mat mask;
     int injectVal = 255;
+
     CPP_Binarize_Simple(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Binarize_Simple";
-        mask = Mat(dst2.size(), CV_8U, 255);
+        mask = Mat::ones(dst2.size(), CV_8U) * 255;
         desc = "Binarize an image using Threshold with OTSU.";
     }
+
     void Run(Mat src) {
-        if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
-        if (mask.rows == 0) {
+        if (src.channels() == 3) {
+            cvtColor(src, src, COLOR_BGR2GRAY);
+        }
+
+        if (mask.empty()) {
             meanScalar = mean(src);
         }
         else {
-            Mat tmp = Mat(src.size(), CV_8U, 255);
-            if (mask.type() != CV_8U) mask.convertTo(mask, CV_8U);
+            Mat tmp = Mat::ones(src.size(), CV_8U) * 255;
             src.copyTo(tmp, mask);
             meanScalar = mean(tmp, mask);
         }
-        threshold(src, dst2, meanScalar(0), injectVal, THRESH_BINARY);
+
+        threshold(src, dst2, meanScalar[0], injectVal, THRESH_BINARY);
     }
 };
-
 
 
 
