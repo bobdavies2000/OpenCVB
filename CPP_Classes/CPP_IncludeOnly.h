@@ -1983,10 +1983,11 @@ public:
         int brickWidth = dst2.cols / task->histogramBins;
         float incr = (histK->hist->mm.maxVal - histK->hist->mm.minVal) / task->histogramBins;
         int histIndex = floor(task->mouseMovePoint.x / brickWidth);
+        if (histIndex >= task->histogramBins) histIndex = task->histogramBins - 1;
 
         minRange = Scalar(histIndex * incr);
         maxRange = Scalar((histIndex + 1) * incr);
-        if (histIndex + 1 == task->histogramBins) {
+        if (histIndex == task->histogramBins) {
             maxRange = Scalar(255);
         }
 

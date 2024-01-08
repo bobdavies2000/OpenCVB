@@ -18,12 +18,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
                             gOptions.GridSize.Value, task.histogramBins,
                             gOptions.gravityPointCloud.Checked, gOptions.PixelDiffThreshold.Value,
                             gOptions.UseKalman.Checked, gOptions.Palettes.SelectedIndex, task.optionsChanged,
-                            task.historyCount, task.clickPoint.X,
-                            task.clickPoint.Y, task.mouseClickFlag,
-                            task.mousePicTag, task.mouseMovePoint.X, task.mouseMovePoint.Y,
-                            task.mouseMovePointUpdated,
-                            task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height,
-                            gOptions.displayDst0.Checked, gOptions.displayDst1.Checked)
+                            task.historyCount, gOptions.displayDst0.Checked, gOptions.displayDst1.Checked)
 
         getOptions()
     End Sub
@@ -48,7 +43,9 @@ Public Class CPP_Basics : Inherits VB_Algorithm
                                task.historyCount,
                                task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height,
                                task.lineWidth, task.lineType, task.dotSize, task.minRes.Width, task.minRes.Height,
-                               task.maxZmeters, redOptions.PCReduction, task.cvFontSize, task.cvFontThickness)
+                               task.maxZmeters, redOptions.PCReduction, task.cvFontSize, task.cvFontThickness,
+                               task.clickPoint.X, task.clickPoint.Y, task.mouseClickFlag,
+                               task.mousePicTag, task.mouseMovePoint.X, task.mouseMovePoint.Y)
 
         Dim pointCloudData(task.pointCloud.Total * task.pointCloud.ElemSize - 1) As Byte
         Marshal.Copy(task.pointCloud.Data, pointCloudData, 0, pointCloudData.Length)
@@ -116,10 +113,7 @@ Module CPP_Module
                                  lineType As Integer, dotSize As Integer, gridSize As Integer,
                                  histogramBins As Integer, ocvheartBeat As Boolean, gravityPointCloud As Boolean,
                                  pixelDiffThreshold As Integer, useKalman As Boolean, paletteIndex As Integer,
-                                 frameHistory As Integer, clickX As Integer,
-                                 clickY As Integer, clickFlag As Boolean, picTag As Integer, moveX As Integer,
-                                 moveY As Integer, moveUpdated As Boolean, rectX As Integer, rectY As Integer,
-                                 rectWidth As Integer, rectHeight As Integer, displayDst0 As Boolean,
+                                 frameHistory As Integer, displayDst0 As Boolean,
                                  displayDst1 As Boolean) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -163,6 +157,8 @@ Module CPP_Module
                                       ByRef lineType As Integer, ByRef dotSize As Integer, ByRef minResWidth As Integer,
                                       ByRef minResHeight As Integer, ByRef maxZmeters As Single,
                                       ByRef PCReduction As Integer, ByRef fontSize As Single,
-                                      ByRef fontThickness As Integer)
+                                      ByRef fontThickness As Integer, ByRef clickX As Integer,
+                                      ByRef clickY As Integer, ByRef clickFlag As Boolean, ByRef picTag As Integer,
+                                      ByRef moveX As Integer, ByRef moveY As Integer)
     End Sub
 End Module 

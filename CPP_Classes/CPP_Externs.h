@@ -8,8 +8,7 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
                    int lineWidth, int lineType, int dotSize,
                    int gridSize, int histogramBins, bool gravityPointCloud, int pixelDiffThreshold,
                    bool useKalman, int paletteIndex, bool optionsChanged, int frameHistory,
-                   int clickX, int clickY, bool clickFlag, int picTag, int moveX, int moveY, bool moveUpdated,
-                   int rectX, int rectY, int rectWidth, int rectHeight, bool displayDst0, bool displayDst1)
+                   bool displayDst0, bool displayDst1)
 {
     task = new cppTask(rows, cols);
 
@@ -26,12 +25,6 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     task->paletteIndex = paletteIndex;
     task->optionsChanged = optionsChanged;
     task->frameHistory = frameHistory;
-    task->clickPoint = Point(clickX, clickY);
-    task->mouseMovePoint = Point(moveX, moveY);
-    task->mouseClickFlag = clickFlag;
-    task->mousePicTag = picTag;
-    task->mouseMovePointUpdated = moveUpdated;
-    task->drawRect = Rect(rectX, rectY, rectWidth, rectHeight);
     task->displayDst0 = displayDst0;
     task->displayDst1 = displayDst1;
 
@@ -200,7 +193,8 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int& gridSize,
                             int& histogramBins, int& pixelDiffThreshold, bool& useKalman,
                             int& frameHistory, int& rectX, int& rectY, int& rectWidth, int& rectHeight,
                             int& lineWidth, int& lineType, int& dotSize, int& minResWidth, int& minResHeight,
-                            float& maxZmeters, int& PCReduction, float& fontSize, int& fontThickness)
+                            float& maxZmeters, int& PCReduction, float& fontSize, int& fontThickness,
+                            int& clickX, int& clickY, bool& clickFlag, int& picTag, int& moveX, int& moveY)
 {
     task->pixelDiffThreshold = pixelDiffThreshold;
     task->gridSize = gridSize;
@@ -219,6 +213,10 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int& gridSize,
     task->PCReduction = PCReduction;
     task->cvFontSize = fontSize * 0.6;
     task->cvFontThickness = fontThickness;
+    task->clickPoint = Point(clickX, clickY);
+    task->mouseMovePoint = Point(moveX, moveY);
+    task->mouseClickFlag = clickFlag;
+    task->mousePicTag = picTag;
 }
 
 
