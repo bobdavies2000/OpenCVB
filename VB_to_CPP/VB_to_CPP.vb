@@ -7,11 +7,15 @@ Public Class VB_to_CPP
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim input = New FileInfo("../../data/AlgorithmList.txt")
         Dim algList = File.ReadAllLines(input.FullName)
+        Dim lastGroup As String = ""
         For i = 1 To algList.Count - 1
             Dim line = algList(i)
             If line.StartsWith("CPP_") Or line.EndsWith("_CPP") Then Continue For
             If line.EndsWith(".py") Then Continue For
+            Dim tokens = line.Split("_")
+            If line.StartsWith(lastGroup) = False Then vbList.Items.Add("")
             vbList.Items.Add(line)
+            lastGroup = tokens(0)
         Next
         vbList.Text = GetSetting("OpenCVB1", "TranslateToCPP", "TranslateToCPP", "Addweighted_Basics")
     End Sub

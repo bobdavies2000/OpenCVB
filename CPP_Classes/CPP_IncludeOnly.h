@@ -120,6 +120,7 @@ vector<string> mapNames = { "Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "
 enum functions
 {
     _CPP_AddWeighted_Basics,
+_CPP_History_Average,
 _CPP_History_Sum8u,
     _CPP_Motion_Core,
 _CPP_Histogram_Kalman,
@@ -2419,12 +2420,7 @@ public:
         }
         Mat input = src.clone();
         if (input.channels() != 1) cvtColor(input, input, COLOR_BGR2GRAY);
-        if (task->firstPass) {
-            if (dst2.type() != input.type() || dst2.channels() != input.channels()) {
-                dst2 = Mat(input.size(), input.type());
-                dst2.setTo(0);
-            }
-        }
+        if (dst2.type() != input.type() || dst2.channels() != input.channels()) dst2 = input;
         if (task->optionsChanged) {
             saveFrames.clear();
             dst2.setTo(0);
@@ -2441,6 +2437,34 @@ public:
 
 
 
+class CPP_History_Average : public algorithmCPP {
+public:
+    vector<Mat> saveFrames;
+    CPP_History_Average(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_History_Average";
+        desc = "Create a frame history and average the last X frames";
+    }
+    void Run(Mat src) override {
+        Mat input = src.clone();
+        if (input.type() != CV_32F) input.convertTo(input, CV_32F);
+        if (input.channels() != dst1.channels() || input.type() != dst1.type() ) dst1 = input;
+
+        if (task->optionsChanged) {
+            saveFrames.clear();
+            dst1 = input;
+        } else {
+            add(dst1, input, dst1);
+        }
+        saveFrames.push_back(input);
+        if (saveFrames.size() > task->frameHistoryCount) {
+            subtract(dst1, saveFrames[0], dst1);
+            saveFrames.erase(saveFrames.begin());
+        }
+        dst2 = dst1 / (double)saveFrames.size();
+        dst2.convertTo(dst2, CV_8UC3);
+        labels[2] = "The image below is composed of " + to_string(saveFrames.size()) + " BGR frames";
+    }
+};
 
 
 class CPP_Motion_Basics : public algorithmCPP
