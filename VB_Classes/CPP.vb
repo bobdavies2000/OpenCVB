@@ -18,7 +18,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
                             gOptions.GridSize.Value, task.histogramBins,
                             gOptions.gravityPointCloud.Checked, gOptions.PixelDiffThreshold.Value,
                             gOptions.UseKalman.Checked, gOptions.Palettes.SelectedIndex, task.optionsChanged,
-                            task.historyCount, gOptions.displayDst0.Checked, gOptions.displayDst1.Checked)
+                            task.frameHistoryCount, gOptions.displayDst0.Checked, gOptions.displayDst1.Checked)
 
         getOptions()
     End Sub
@@ -28,7 +28,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
         cppTask_OptionsCPPtoVB(cPtr, gOptions.GridSize.Value,
                                gOptions.HistBinSlider.Value,
                                gOptions.PixelDiffThreshold.Value, gOptions.UseKalman.Checked,
-                               task.historyCount, task.drawRect.X, task.drawRect.Y,
+                               task.frameHistoryCount, task.drawRect.X, task.drawRect.Y,
                                task.drawRect.Width, task.drawRect.Height, labelBuffer, buffer)
 
         labels = labelBuffer.ToString.Split("|")
@@ -40,7 +40,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
         cppTask_OptionsVBtoCPP(cPtr, gOptions.GridSize.Value,
                                gOptions.HistBinSlider.Value,
                                gOptions.PixelDiffThreshold.Value, gOptions.UseKalman.Checked,
-                               task.historyCount,
+                               task.frameHistoryCount,
                                task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height,
                                task.lineWidth, task.lineType, task.dotSize, task.minRes.Width, task.minRes.Height,
                                task.maxZmeters, redOptions.PCReduction, task.cvFontSize, task.cvFontThickness,

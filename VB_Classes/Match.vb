@@ -405,7 +405,7 @@ Public Class Match_TraceRedC : Inherits VB_Algorithm
         labels(2) = CStr(redC.redCells.Count) + " cells added"
 
         frameList.Add(dst0.Clone)
-        If frameList.Count >= task.historyCount Then
+        If frameList.Count >= task.frameHistoryCount Then
             dst1 = dst1.Subtract(frameList(0))
             frameList.RemoveAt(0)
         End If
@@ -675,7 +675,7 @@ Public Class Match_GoodFeatureKNN : Inherits VB_Algorithm
             If mp.p1.DistanceTo(mp.p2) <= maxDistance Then dst0.Line(mp.p1, mp.p2, 255, task.lineWidth + 2, cv.LineTypes.Link4)
         Next
         frameList.Add(dst0.Clone)
-        If frameList.Count >= task.historyCount Then
+        If frameList.Count >= task.frameHistoryCount Then
             dst1 = dst1.Subtract(frameList(0))
             frameList.RemoveAt(0)
         End If

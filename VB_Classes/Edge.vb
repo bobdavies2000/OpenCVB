@@ -411,7 +411,7 @@ Public Class Edge_ConsistentExplore : Inherits VB_Algorithm
 
         Dim tmp = If(edges.dst3.Channels = 1, edges.dst3.Clone, edges.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         saveFrames.Add(tmp)
-        If saveFrames.Count > task.historyCount Then saveFrames.RemoveAt(0)
+        If saveFrames.Count > task.frameHistoryCount Then saveFrames.RemoveAt(0)
 
         dst2 = saveFrames(0)
         For i = 1 To saveFrames.Count - 1
@@ -445,7 +445,7 @@ Public Class Edge_Consistent : Inherits VB_Algorithm
 
         Dim tmp = If(edges.dst2.Channels = 1, edges.dst2.Clone, edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         saveFrames.Add(tmp)
-        If saveFrames.Count > task.historyCount Then saveFrames.RemoveAt(0)
+        If saveFrames.Count > task.frameHistoryCount Then saveFrames.RemoveAt(0)
 
         dst2 = saveFrames(0)
         For i = 1 To saveFrames.Count - 1
@@ -1111,10 +1111,10 @@ Public Class Edge_MotionFrames : Inherits VB_Algorithm
 
         edges.Run(src)
 
-        dst1 = edges.dst2.Threshold(0, 255 / task.historyCount, cv.ThresholdTypes.Binary)
+        dst1 = edges.dst2.Threshold(0, 255 / task.frameHistoryCount, cv.ThresholdTypes.Binary)
         dst2 += dst1
         frames.Add(dst1)
-        If frames.Count >= task.historyCount Then
+        If frames.Count >= task.frameHistoryCount Then
             dst2 -= frames.ElementAt(0)
             frames.RemoveAt(0)
         End If
@@ -1141,7 +1141,7 @@ Public Class Edge_MotionAccum : Inherits VB_Algorithm
         If task.optionsChanged Then task.motionReset = True
         motion.Run(src)
 
-        If task.frameCount Mod task.historyCount = 0 Then dst2.SetTo(0)
+        If task.frameCount Mod task.frameHistoryCount = 0 Then dst2.SetTo(0)
 
         edges.Run(src)
         dst2.SetTo(255, edges.dst2)
@@ -1297,7 +1297,7 @@ Public Class Edge_CannyHistory : Inherits VB_Algorithm
         For Each m In frameList
             dst3 = dst3 Or m
         Next
-        If frameList.Count >= task.historyCount Then frameList.RemoveAt(0)
+        If frameList.Count >= task.frameHistoryCount Then frameList.RemoveAt(0)
     End Sub
 End Class
 

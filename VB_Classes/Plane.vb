@@ -474,7 +474,7 @@ Public Class Plane_Verticals : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         solo.Run(src)
-        dst3 = solo.heat.topSum.dst2.InRange(task.redThresholdTop * task.historyCount, dst2.Total)
+        dst3 = solo.heat.topSum.dst2.InRange(task.redThresholdTop * task.frameHistoryCount, dst2.Total)
 
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, 0)
         solo.heat.dst0.CopyTo(dst1, dst3)
@@ -508,7 +508,7 @@ Public Class Plane_Horizontals : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         solo.Run(src)
-        dst3 = solo.heat.sideSum.dst2.InRange(task.redThresholdSide * task.historyCount, dst2.Total)
+        dst3 = solo.heat.sideSum.dst2.InRange(task.redThresholdSide * task.frameHistoryCount, dst2.Total)
 
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, 0)
         solo.heat.dst1.CopyTo(dst1, dst3)

@@ -572,8 +572,8 @@ Public Class PointCloud_Solo : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         heat.Run(src)
-        dst2 = heat.dst0.InRange(task.historyCount, task.historyCount).ConvertScaleAbs
-        dst3 = heat.dst1.InRange(task.historyCount, task.historyCount).ConvertScaleAbs
+        dst2 = heat.dst0.InRange(task.frameHistoryCount, task.frameHistoryCount).ConvertScaleAbs
+        dst3 = heat.dst1.InRange(task.frameHistoryCount, task.frameHistoryCount).ConvertScaleAbs
     End Sub
 End Class
 
@@ -930,7 +930,7 @@ Public Class PointCloud_Average : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         pcHistory.Add(task.pointCloud)
-        If pcHistory.Count >= task.historyCount Then pcHistory.RemoveAt(0)
+        If pcHistory.Count >= task.frameHistoryCount Then pcHistory.RemoveAt(0)
 
         dst3.SetTo(0)
         For Each m In pcHistory

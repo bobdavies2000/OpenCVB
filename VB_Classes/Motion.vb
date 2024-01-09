@@ -584,7 +584,7 @@ Public Class Motion_History : Inherits VB_Algorithm
         frames.Run(dst1)
 
         dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        labels(2) = "Cumulative diff for the last " + CStr(task.historyCount) + " frames"
+        labels(2) = "Cumulative diff for the last " + CStr(task.frameHistoryCount) + " frames"
     End Sub
 End Class
 

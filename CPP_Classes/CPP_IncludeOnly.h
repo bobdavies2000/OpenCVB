@@ -119,62 +119,63 @@ vector<string> mapNames = { "Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "
                             "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter" };
 enum functions
 {
-    CPP_AddWeighted_Basics_,
-CPP_Motion_Core_,
-CPP_Histogram_Kalman_,
-CPP_Kalman_Basics_,
-CPP_RedCloud_Core_,
-CPP_FPoly_TopFeatures_,
-    CPP_Random_Enumerable_,
-    CPP_Bezier_Basics_,
-    CPP_Feature_Agast_,
-    CPP_Resize_Basics_,
-    CPP_Delaunay_Basics_,
-    CPP_Delaunay_GenerationsNoKNN_,
-    CPP_KNN_Basics_,
-    CPP_Random_Basics_,
-    CPP_KNN_Lossy_,
-    CPP_Delaunay_Generations_,
-    CPP_Stable_Basics_,
-    CPP_Feature_Basics_,
-    CPP_Remap_Basics_,
-    CPP_Edge_Canny_,
-    CPP_Edge_Sobel_,
-    CPP_Edge_Scharr_,
-    CPP_Mat_4to1_,
-    CPP_Grid_Basics_,
-    CPP_Depth_Colorizer_,
-    CPP_RedCloud_Flood_,
-    CPP_Depth_PointCloud_,
-    CPP_IMU_GMatrix_,
-    CPP_IMU_GMatrix_QT_,
-    CPP_Depth_PointCloud_IMU_,
-    CPP_Binarize_Simple_,
-    CPP_Plot_Histogram_,
-    CPP_Histogram_Basics_,
-    CPP_BackProject_Basics_,
-    CPP_Rectangle_Basics_,
-    CPP_Rectangle_Rotated_,
-    CPP_Contour_Largest_,
-    CPP_Diff_Basics_,
-    CPP_ApproxPoly_FindandDraw_,
-    CPP_ApproxPoly_Basics_,
-    CPP_Hull_Basics_,
-    CPP_ApproxPoly_Hull_,
-    CPP_Edge_Segments_,
-    CPP_Motion_Basics_,
-    CPP_Edge_MotionAccum_,
-    CPP_Edge_MotionFrames_,
-    CPP_EdgePreserving_Basics_,
-    CPP_EdgeDraw_Basics_,
-    CPP_TEE_Basics_,
-    CPP_RedCloud_Hulls_,
-    CPP_Distance_Basics_,
-    CPP_FeatureLess_Basics_,
-    CPP_FeatureLess_Edge_,
-    CPP_RedCloud_FeatureLess2_,
-    CPP_Stable_BasicsCount_,
-MAX_FUNCTION = CPP_Stable_BasicsCount_,
+    _CPP_AddWeighted_Basics,
+_CPP_History_Sum8u,
+    _CPP_Motion_Core,
+_CPP_Histogram_Kalman,
+_CPP_Kalman_Basics,
+_CPP_RedCloud_Core,
+_CPP_FPoly_TopFeatures,
+    _CPP_Random_Enumerable,
+    _CPP_Bezier_Basics,
+    _CPP_Feature_Agast,
+    _CPP_Resize_Basics,
+    _CPP_Delaunay_Basics,
+    _CPP_Delaunay_GenerationsNoKNN,
+    _CPP_KNN_Basics,
+    _CPP_Random_Basics,
+    _CPP_KNN_Lossy,
+    _CPP_Delaunay_Generations,
+    _CPP_Stable_Basics,
+    _CPP_Feature_Basics,
+    _CPP_Remap_Basics,
+    _CPP_Edge_Canny,
+    _CPP_Edge_Sobel,
+    _CPP_Edge_Scharr,
+    _CPP_Mat_4to1,
+    _CPP_Grid_Basics,
+    _CPP_Depth_Colorizer,
+    _CPP_RedCloud_Flood,
+    _CPP_Depth_PointCloud,
+    _CPP_IMU_GMatrix,
+    _CPP_IMU_GMatrix_QT,
+    _CPP_Depth_PointCloud_IMU,
+    _CPP_Binarize_Simple,
+    _CPP_Plot_Histogram,
+    _CPP_Histogram_Basics,
+    _CPP_BackProject_Basics,
+    _CPP_Rectangle_Basics,
+    _CPP_Rectangle_Rotated,
+    _CPP_Contour_Largest,
+    _CPP_Diff_Basics,
+    _CPP_ApproxPoly_FindandDraw,
+    _CPP_ApproxPoly_Basics,
+    _CPP_Hull_Basics,
+    _CPP_ApproxPoly_Hull,
+    _CPP_Edge_Segments,
+    _CPP_Motion_Basics,
+    _CPP_Edge_MotionAccum,
+    _CPP_Edge_MotionFrames,
+    _CPP_EdgePreserving_Basics,
+    _CPP_EdgeDraw_Basics,
+    _CPP_TEE_Basics,
+    _CPP_RedCloud_Hulls,
+    _CPP_Distance_Basics,
+    _CPP_FeatureLess_Basics,
+    _CPP_FeatureLess_Edge,
+    _CPP_RedCloud_FeatureLess2,
+    _CPP_Stable_BasicsCount,
+MAX_FUNCTION = _CPP_Stable_BasicsCount,
 };
 
 
@@ -229,7 +230,7 @@ public:
     bool heartBeat; bool debugCheckBox; Size minRes; int PCReduction;
     bool optionsChanged; double addWeighted; int dotSize; int gridSize; float maxZmeters;
     int histogramBins; int pixelDiffThreshold; bool gravityPointCloud; bool useKalman;
-    int paletteIndex; int polyCount; bool firstPass; Scalar highlightColor; int frameHistory;
+    int paletteIndex; int polyCount; bool firstPass; Scalar highlightColor; int frameHistoryCount;
     Point clickPoint; bool mouseClickFlag; int mousePicTag; Point mouseMovePoint; bool mouseMovePointUpdated;
     Scalar scalarColors[256]; Vec3b vecColors[256]; Rect drawRect; bool displayDst0; bool displayDst1;
     bool gridROIclicked;
@@ -2365,7 +2366,7 @@ class CPP_Motion_Core : public algorithmCPP {
 public:
     CPP_Diff_Basics* diff;
     int cumulativePixels;
-    float options_cumulativePercentThreshold = 0.1;
+    float options_cumulativePercentThreshold = 0.1f;
     int options_motionThreshold;
     int saveFrameCount;
     CPP_Motion_Core(int rows, int cols) : algorithmCPP(rows, cols) {
@@ -2398,6 +2399,42 @@ public:
         int threshold = src.total() * options_cumulativePercentThreshold;
         string strOut = "Cumulative threshold = " + to_string(threshold / 1000) + "k ";
         labels[2] = strOut + "Current cumulative pixels changed = " + to_string(cumulativePixels / 1000) + "k";
+    }
+};
+
+
+
+
+class CPP_History_Sum8u : public algorithmCPP {
+public:
+    vector<Mat> saveFrames;
+    CPP_History_Sum8u(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_History_Sum8u";
+        desc = "Create a frame history and sum the last X frames - note that saturation is permitted.";
+    }
+    void Run(Mat src) override {
+        if (task->frameHistoryCount == 1) {
+            dst2 = src.clone();
+            return;
+        }
+        Mat input = src.clone();
+        if (input.channels() != 1) cvtColor(input, input, COLOR_BGR2GRAY);
+        if (task->firstPass) {
+            if (dst2.type() != input.type() || dst2.channels() != input.channels()) {
+                dst2 = Mat(input.size(), input.type());
+                dst2.setTo(0);
+            }
+        }
+        if (task->optionsChanged) {
+            saveFrames.clear();
+            dst2.setTo(0);
+        }
+        if (saveFrames.size() >= task->frameHistoryCount) {
+            subtract(dst2, saveFrames[0], dst2);
+            saveFrames.erase(saveFrames.begin());
+        }
+        saveFrames.push_back(input);
+        add(input, dst2, dst2);
     }
 };
 
@@ -2514,7 +2551,7 @@ public:
     void Run(Mat src)
     {
         static vector<Mat> frames;
-        auto fCount = task->frameHistory;
+        auto fCount = task->frameHistoryCount;
         if (task->optionsChanged) frames.clear();
         edges->Run(src);
         threshold(edges->dst2, dst1, 0, 255.0f / fCount, THRESH_BINARY);

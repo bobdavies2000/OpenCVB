@@ -664,7 +664,7 @@ Public Class Line_TimeView : Inherits VB_Algorithm
             Next
         Next
 
-        If frameList.Count >= task.historyCount Then frameList.RemoveAt(0)
+        If frameList.Count >= task.frameHistoryCount Then frameList.RemoveAt(0)
         pixelcount = dst3.CountNonZero
         labels(3) = "There were " + CStr(lineTotal) + " lines detected using " + Format(pixelcount / 1000, "#.0") + "k pixels"
     End Sub

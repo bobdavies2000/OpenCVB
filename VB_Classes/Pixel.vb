@@ -421,7 +421,7 @@ Public Class Pixel_Unstable : Inherits VB_Algorithm
         dst3 = dst3.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
 
         unstable.Add(dst3)
-        If unstable.Count > task.historyCount Then unstable.RemoveAt(0)
+        If unstable.Count > task.frameHistoryCount Then unstable.RemoveAt(0)
 
         unstablePixels = unstable(0)
         For i = 1 To unstable.Count - 1

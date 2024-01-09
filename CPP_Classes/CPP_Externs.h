@@ -24,7 +24,7 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     task->useKalman = useKalman;
     task->paletteIndex = paletteIndex;
     task->optionsChanged = optionsChanged;
-    task->frameHistory = frameHistory;
+    task->frameHistoryCount = frameHistory;
     task->displayDst0 = displayDst0;
     task->displayDst1 = displayDst1;
 
@@ -32,115 +32,117 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 
     switch (function)
     {
-    case CPP_AddWeighted_Basics_ :
+    case _CPP_AddWeighted_Basics :
     {task->alg = new CPP_AddWeighted_Basics(rows, cols); break; }
-	case CPP_Motion_Core_ :
+	case _CPP_History_Sum8u :
+	{task->alg = new CPP_History_Sum8u(rows, cols); break; }
+	case _CPP_Motion_Core :
 	{task->alg = new CPP_Motion_Core(rows, cols); break; }
-	case CPP_Histogram_Kalman_ :
+	case _CPP_Histogram_Kalman :
 	{task->alg = new CPP_Histogram_Kalman(rows, cols); break; }
-	case CPP_Kalman_Basics_ :
+	case _CPP_Kalman_Basics :
 	{task->alg = new CPP_Kalman_Basics(rows, cols); break; }
-	case CPP_RedCloud_Core_ :
+	case _CPP_RedCloud_Core :
 	{task->alg = new CPP_RedCloud_Core(rows, cols); break; }
-	case CPP_FPoly_TopFeatures_ :
+	case _CPP_FPoly_TopFeatures :
 	{task->alg = new CPP_FPoly_TopFeatures(rows, cols); break; }
-	case CPP_Random_Enumerable_ :
+	case _CPP_Random_Enumerable :
 	{task->alg = new CPP_Random_Enumerable(rows, cols); break; }
-    case CPP_Bezier_Basics_ :
+    case _CPP_Bezier_Basics :
     {task->alg = new CPP_Bezier_Basics(rows, cols); break; }
-    case CPP_Feature_Agast_ :
+    case _CPP_Feature_Agast :
     {task->alg = new CPP_Feature_Agast(rows, cols);break;}
-    case CPP_Resize_Basics_ :
+    case _CPP_Resize_Basics :
     {task->alg = new CPP_Resize_Basics(rows, cols);break;}
-    case CPP_Delaunay_Basics_ :
+    case _CPP_Delaunay_Basics :
     {task->alg = new CPP_Delaunay_Basics(rows, cols);break;}
-    case CPP_Delaunay_GenerationsNoKNN_ :
+    case _CPP_Delaunay_GenerationsNoKNN :
     {task->alg = new CPP_Delaunay_GenerationsNoKNN(rows, cols);break;}
-    case CPP_KNN_Basics_ :
+    case _CPP_KNN_Basics :
     {task->alg = new CPP_KNN_Basics(rows, cols); break; }
-    case CPP_Random_Basics_ :
+    case _CPP_Random_Basics :
     {task->alg = new CPP_Random_Basics(rows, cols);break;}
-    case CPP_KNN_Lossy_ :
+    case _CPP_KNN_Lossy :
     {task->alg = new CPP_KNN_Lossy(rows, cols);break;}
-    case CPP_Delaunay_Generations_ :
+    case _CPP_Delaunay_Generations :
     {task->alg = new CPP_Delaunay_Generations(rows, cols);break;}
-    case CPP_Stable_Basics_ :
+    case _CPP_Stable_Basics :
     {task->alg = new CPP_Stable_Basics(rows, cols);break;}
-    case CPP_Feature_Basics_ :
+    case _CPP_Feature_Basics :
     {task->alg = new CPP_Feature_Basics(rows, cols);break;}
-	case CPP_Stable_BasicsCount_ :
+	case _CPP_Stable_BasicsCount :
 	{task->alg = new CPP_Stable_BasicsCount(rows, cols);break;}
-	case CPP_Remap_Basics_ :
+	case _CPP_Remap_Basics :
 	{task->alg = new CPP_Remap_Basics(rows, cols);break;}
-	case CPP_Edge_Canny_ :
+	case _CPP_Edge_Canny :
 	{task->alg = new CPP_Edge_Canny(rows, cols);break;}
-	case CPP_Edge_Sobel_ :
+	case _CPP_Edge_Sobel :
 	{task->alg = new CPP_Edge_Sobel(rows, cols);break;}
-	case CPP_Edge_Scharr_ :
+	case _CPP_Edge_Scharr :
 	{task->alg = new CPP_Edge_Scharr(rows, cols);break;}
-	case CPP_Mat_4to1_ :
+	case _CPP_Mat_4to1 :
 	{task->alg = new CPP_Mat_4to1(rows, cols);break;}
-	case CPP_Grid_Basics_ :
+	case _CPP_Grid_Basics :
 	{task->alg = new CPP_Grid_Basics(rows, cols);break;}
-	case CPP_Depth_Colorizer_ :
+	case _CPP_Depth_Colorizer :
 	{task->alg = new CPP_Depth_Colorizer(rows, cols);break;}
-	case CPP_RedCloud_Flood_ :
+	case _CPP_RedCloud_Flood :
 	{task->alg = new CPP_RedCloud_Flood(rows, cols);break;}
-	case CPP_Depth_PointCloud_ :
+	case _CPP_Depth_PointCloud :
 	{task->alg = new CPP_Depth_PointCloud(rows, cols);break;}
-	case CPP_IMU_GMatrix_ :
+	case _CPP_IMU_GMatrix :
 	{task->alg = new CPP_IMU_GMatrix(rows, cols);break;}
-	case CPP_IMU_GMatrix_QT_ :
+	case _CPP_IMU_GMatrix_QT :
 	{task->alg = new CPP_IMU_GMatrix_QT(rows, cols);break;}
-	case CPP_Depth_PointCloud_IMU_ :
+	case _CPP_Depth_PointCloud_IMU :
 	{task->alg = new CPP_Depth_PointCloud_IMU(rows, cols);break;}
-	case CPP_Binarize_Simple_ :
+	case _CPP_Binarize_Simple :
 	{task->alg = new CPP_Binarize_Simple(rows, cols);break;}
-	case CPP_Plot_Histogram_ :
+	case _CPP_Plot_Histogram :
 	{task->alg = new CPP_Plot_Histogram(rows, cols);break;}
-	case CPP_Histogram_Basics_ :
+	case _CPP_Histogram_Basics :
 	{task->alg = new CPP_Histogram_Basics(rows, cols);break;}
-	case CPP_BackProject_Basics_ :
+	case _CPP_BackProject_Basics :
 	{task->alg = new CPP_BackProject_Basics(rows, cols);break;}
-	case CPP_Rectangle_Basics_ :
+	case _CPP_Rectangle_Basics :
 	{task->alg = new CPP_Rectangle_Basics(rows, cols);break;}
-	case CPP_Rectangle_Rotated_ :
+	case _CPP_Rectangle_Rotated :
 	{task->alg = new CPP_Rectangle_Rotated(rows, cols);break;}
-	case CPP_Contour_Largest_ :
+	case _CPP_Contour_Largest :
 	{task->alg = new CPP_Contour_Largest(rows, cols);break;}
-	case CPP_Diff_Basics_ :
+	case _CPP_Diff_Basics :
 	{task->alg = new CPP_Diff_Basics(rows, cols);break;}
-	case CPP_ApproxPoly_FindandDraw_ :
+	case _CPP_ApproxPoly_FindandDraw :
 	{task->alg = new CPP_ApproxPoly_FindandDraw(rows, cols);break;}
-	case CPP_ApproxPoly_Basics_ :
+	case _CPP_ApproxPoly_Basics :
 	{task->alg = new CPP_ApproxPoly_Basics(rows, cols);break;}
-	case CPP_Hull_Basics_ :
+	case _CPP_Hull_Basics :
 	{task->alg = new CPP_Hull_Basics(rows, cols);break;}
-	case CPP_ApproxPoly_Hull_ :
+	case _CPP_ApproxPoly_Hull :
 	{task->alg = new CPP_ApproxPoly_Hull(rows, cols);break;}
-	case CPP_Edge_Segments_ :
+	case _CPP_Edge_Segments :
 	{task->alg = new CPP_Edge_Segments(rows, cols);break;}
-	case CPP_Motion_Basics_ :
+	case _CPP_Motion_Basics :
 	{task->alg = new CPP_Motion_Basics(rows, cols);break;}
-	case CPP_Edge_MotionAccum_ :
+	case _CPP_Edge_MotionAccum :
 	{task->alg = new CPP_Edge_MotionAccum(rows, cols);break;}
-	case CPP_Edge_MotionFrames_ :
+	case _CPP_Edge_MotionFrames :
 	{task->alg = new CPP_Edge_MotionFrames(rows, cols);break;}
-	case CPP_EdgePreserving_Basics_ :
+	case _CPP_EdgePreserving_Basics :
 	{task->alg = new CPP_EdgePreserving_Basics(rows, cols);break;}
-	case CPP_EdgeDraw_Basics_ :
+	case _CPP_EdgeDraw_Basics :
 	{task->alg = new CPP_EdgeDraw_Basics(rows, cols);break;}
-	case CPP_TEE_Basics_ :
+	case _CPP_TEE_Basics :
 	{task->alg = new CPP_TEE_Basics(rows, cols);break;}
-	case CPP_RedCloud_Hulls_ :
+	case _CPP_RedCloud_Hulls :
 	{task->alg = new CPP_RedCloud_Hulls(rows, cols);break;}
-	case CPP_Distance_Basics_ :
+	case _CPP_Distance_Basics :
 	{task->alg = new CPP_Distance_Basics(rows, cols);break;}
-	case CPP_FeatureLess_Basics_ :
+	case _CPP_FeatureLess_Basics :
 	{task->alg = new CPP_FeatureLess_Basics(rows, cols);break;}
-	case CPP_FeatureLess_Edge_ :
+	case _CPP_FeatureLess_Edge :
 	{task->alg = new CPP_FeatureLess_Edge(rows, cols);break;}
-	case CPP_RedCloud_FeatureLess2_ :
+	case _CPP_RedCloud_FeatureLess2 :
 	{task->alg = new CPP_RedCloud_FeatureLess2(rows, cols);break;}
     // end of switch - don't remove...
     }
@@ -175,7 +177,7 @@ void cppTask_OptionsCPPtoVB(cppTask * task, int& gridSize,
     gridSize = task->gridSize;
     histogramBins = task->histogramBins;
     useKalman = task->useKalman;
-    frameHistory = task->frameHistory;
+    frameHistory = task->frameHistoryCount;
     rectX = task->drawRect.x;
     rectY = task->drawRect.y;
     rectWidth = task->drawRect.width;
@@ -202,7 +204,7 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
     task->gridSize = gridSize;
     task->histogramBins = histogramBins;
     task->useKalman = useKalman;
-    task->frameHistory = frameHistory;
+    task->frameHistoryCount = frameHistory;
     task->drawRect.x = rectX;
     task->drawRect.y = rectY;
     task->drawRect.width = rectWidth;
@@ -227,7 +229,7 @@ extern "C" __declspec(dllexport)
 int* cppTask_Close(cppTask * task)
 {
     if (task == (cppTask*)0) return (int*)0;
-    if (task->cppFunction != CPP_Delaunay_GenerationsNoKNN_) delete task;  // why does fDelaunay_GenerationsNoKNN fail.  Skipping it for now.
+    if (task->cppFunction != _CPP_Delaunay_GenerationsNoKNN) delete task;  // why does fDelaunay_GenerationsNoKNN fail.  Skipping it for now.
     return (int*)0;
 }
 

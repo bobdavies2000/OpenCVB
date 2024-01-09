@@ -498,7 +498,7 @@ Public Class IMU_Average : Inherits VB_Algorithm
         Dim accMat = New cv.Mat(accList.Count, 1, cv.MatType.CV_64FC4, accList.ToArray)
         Dim imuMean = accMat.Mean()
         task.IMU_AverageAcceleration = New cv.Point3f(imuMean(0), imuMean(1), imuMean(2))
-        If accList.Count >= task.historyCount Then accList.RemoveAt(0)
+        If accList.Count >= task.frameHistoryCount Then accList.RemoveAt(0)
         strOut = "Average IMU acceleration: " + vbCrLf + Format(task.IMU_AverageAcceleration.X, fmt3) + vbTab + Format(task.IMU_AverageAcceleration.Y, fmt3) + vbTab +
                   Format(task.IMU_AverageAcceleration.Z, fmt3) + vbCrLf
         setTrueText(strOut)

@@ -165,7 +165,7 @@ End Module
 '        Next
 
 '        pointPairLists.Add(matches)
-'        If pointPairLists.Count >= task.historyCount Then pointPairLists.RemoveAt(0)
+'        If pointPairLists.Count >= task.frameHistoryCount Then pointPairLists.RemoveAt(0)
 
 '        labels(2) = CStr(edgeD.segPoints.Count / 2) + " lines were found and " + CStr(matches.Count / 2) + " matched the previous generation."
 '    End Sub

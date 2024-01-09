@@ -4,7 +4,7 @@ Public Class RedTrack_Basics : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        If task.workingRes <> New cv.Size(168, 94) Then task.historyCount = 1
+        If task.workingRes <> New cv.Size(168, 94) Then task.frameHistoryCount = 1
         desc = "Get stats on each RedCloud cell."
     End Sub
     Public Sub RunVB(src As cv.Mat)

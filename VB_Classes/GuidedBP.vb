@@ -760,7 +760,7 @@ Public Class GuidedBP_History : Inherits VB_Algorithm
         End If
 
 
-        If kCellList.Count >= task.historyCount Then kCellList.RemoveAt(0)
+        If kCellList.Count >= task.frameHistoryCount Then kCellList.RemoveAt(0)
         If heartBeat() Then labels(2) = CStr(gbpCells.Count) + " objects were consistently present"
     End Sub
 End Class

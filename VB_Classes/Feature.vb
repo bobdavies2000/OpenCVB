@@ -205,7 +205,7 @@ Public Class Feature_Tracer : Inherits VB_Algorithm
         Dim ptList As New List(Of cv.Point2f)(features.good.corners)
         goodList.Add(ptList)
 
-        If goodList.Count >= task.historyCount Then goodList.RemoveAt(0)
+        If goodList.Count >= task.frameHistoryCount Then goodList.RemoveAt(0)
 
         dst2.SetTo(0)
         For Each ptList In goodList
@@ -1391,7 +1391,7 @@ Public Class Feature_GoodFeatureTrace : Inherits VB_Algorithm
             task.color.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
         Next
         frameList.Add(dst0.Clone)
-        If frameList.Count >= task.historyCount Then
+        If frameList.Count >= task.frameHistoryCount Then
             dst1 = dst1.Subtract(frameList(0))
             frameList.RemoveAt(0)
         End If
@@ -1435,7 +1435,7 @@ Public Class Feature_TraceKNN : Inherits VB_Algorithm
         Static cornerHistory As New List(Of List(Of cv.Point2f))
         If task.optionsChanged Then cornerHistory.Clear()
 
-        Dim histCount = task.historyCount
+        Dim histCount = task.frameHistoryCount
         cornerHistory.Add(New List(Of cv.Point2f)(good.corners))
 
         Dim lastIndex = cornerHistory.Count - 1
@@ -1574,8 +1574,8 @@ Public Class Feature_SiftPoints : Inherits VB_Algorithm
                 stablePoints.Add(pt)
             End If
         Next
-        If history.count >= task.historyCount Then history.removeat(0)
-        labels(3) = "Sift keypoints that are present in the last " + CStr(task.historyCount) + "  frames."
+        If history.count >= task.frameHistoryCount Then history.removeat(0)
+        labels(3) = "Sift keypoints that are present in the last " + CStr(task.frameHistoryCount) + "  frames."
     End Sub
 End Class
 
@@ -1600,7 +1600,7 @@ Public Class Feature_History : Inherits VB_Algorithm
         Static cornerHistory As New List(Of List(Of cv.Point2f))
 
         cornerHistory.Add(New List(Of cv.Point2f)(good.corners))
-        If cornerHistory.Count > task.historyCount Then cornerHistory.RemoveAt(0)
+        If cornerHistory.Count > task.frameHistoryCount Then cornerHistory.RemoveAt(0)
 
         corners.Clear()
         For Each cList In cornerHistory

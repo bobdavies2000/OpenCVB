@@ -692,10 +692,10 @@ Public Class KNN_TrackEach : Inherits VB_Algorithm
             Next
         Next
 
-        labels(2) = CStr(good.corners.Count) + " good features were tracked across " + CStr(task.historyCount) + " frames."
+        labels(2) = CStr(good.corners.Count) + " good features were tracked across " + CStr(task.frameHistoryCount) + " frames."
         setTrueText(labels(2) + vbCrLf + "The highlighted dots are the good feature points", 3)
 
-        If trackAll.Count >= task.historyCount Then
+        If trackAll.Count >= task.frameHistoryCount Then
             trackAll.RemoveAt(1)
             trackAll.RemoveAt(0)
         End If

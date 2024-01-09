@@ -5,7 +5,7 @@ Public Class History_Sum8u : Inherits VB_Algorithm
         desc = "Create a frame history and sum the last X frames - not that saturation is permitted."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.historyCount = 1 Then
+        If task.frameHistoryCount = 1 Then
             dst2 = src
             Exit Sub
         End If
@@ -22,7 +22,7 @@ Public Class History_Sum8u : Inherits VB_Algorithm
             dst2.SetTo(0)
         End If
 
-        If saveFrames.Count >= task.historyCount Then
+        If saveFrames.Count >= task.frameHistoryCount Then
             dst2 = dst2.Subtract(saveFrames.ElementAt(0))
             saveFrames.RemoveAt(0)
         End If
@@ -57,7 +57,7 @@ Public Class History_Sum32f : Inherits VB_Algorithm
             dst2.SetTo(0)
         End If
 
-        If saveFrames.Count >= task.historyCount Then
+        If saveFrames.Count >= task.frameHistoryCount Then
             dst2 = dst2.Subtract(saveFrames.ElementAt(0))
             saveFrames.RemoveAt(0)
         End If
@@ -91,7 +91,7 @@ Public Class History_Average : Inherits VB_Algorithm
         End If
 
         saveFrames.Add(input)
-        If saveFrames.Count > task.historyCount Then
+        If saveFrames.Count > task.frameHistoryCount Then
             dst1 -= saveFrames(0)
             saveFrames.RemoveAt(0)
         End If
@@ -116,7 +116,7 @@ Public Class History_MaskCopy : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         Dim input = src.Clone
         Static countFrames As Integer
-        If task.optionsChanged Or countFrames >= task.historyCount Then
+        If task.optionsChanged Or countFrames >= task.frameHistoryCount Then
             dst2 = input
             countFrames = 1
         Else
@@ -144,7 +144,7 @@ Public Class History_MaskCopy8U : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         Dim input = src.Clone
         Static countFrames As Integer
-        If task.optionsChanged Or task.frameCount Mod task.historyCount = 0 Then
+        If task.optionsChanged Or task.frameCount Mod task.frameHistoryCount = 0 Then
             dst2 = input
             countFrames = 1
         Else
@@ -177,7 +177,7 @@ Public Class History_Cloud : Inherits VB_Algorithm
             dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         End If
 
-        If saveFrames.Count >= task.historyCount Then
+        If saveFrames.Count >= task.frameHistoryCount Then
             dst3 = dst3.Subtract(saveFrames.ElementAt(0))
             saveFrames.RemoveAt(0)
         End If
@@ -212,7 +212,7 @@ Public Class History_Sum8uNoSaturation : Inherits VB_Algorithm
             dst3.SetTo(0)
         End If
 
-        If saveFrames.Count >= task.historyCount Then
+        If saveFrames.Count >= task.frameHistoryCount Then
             dst3 = dst3.Subtract(saveFrames.ElementAt(0))
             saveFrames.RemoveAt(0)
         End If

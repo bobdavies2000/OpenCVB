@@ -66,7 +66,7 @@ Public Class Model_FlatSurfaces : Inherits VB_Algorithm
         Dim floorY = rect.Y
         floorList.Add(nextY)
         task.pcFloor = floorList.Average()
-        If floorList.Count > task.historyCount Then floorList.RemoveAt(0)
+        If floorList.Count > task.frameHistoryCount Then floorList.RemoveAt(0)
         labels(2) = "Y = " + Format(task.pcFloor, fmt3) + " separates the floor.  Total pixels below floor level = " + Format(totalPixels, fmt0)
 
         For y = 0 To dst2.Height - 1
@@ -84,7 +84,7 @@ Public Class Model_FlatSurfaces : Inherits VB_Algorithm
         Dim ceilingY = rect.Y
         ceilingList.Add(nextY)
         task.pcCeiling = ceilingList.Average()
-        If ceilingList.Count > task.historyCount Then ceilingList.RemoveAt(0)
+        If ceilingList.Count > task.frameHistoryCount Then ceilingList.RemoveAt(0)
         labels(3) = "Y = " + Format(task.pcCeiling, fmt3) + " separates the ceiling.  Total pixels above ceiling level = " + Format(totalPixels, fmt0)
 
         If standalone Then

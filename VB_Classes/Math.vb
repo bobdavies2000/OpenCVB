@@ -305,7 +305,7 @@ Public Class Math_ImageAverage : Inherits VB_Algorithm
         End If
         cv.Cv2.Multiply(dst3, cv.Scalar.All(1 / (images.Count + 1)), dst3)
         images.Add(dst3.Clone)
-        If images.Count > task.historyCount Then images.RemoveAt(0)
+        If images.Count > task.frameHistoryCount Then images.RemoveAt(0)
 
         dst3.SetTo(0)
         For Each img In images
@@ -313,7 +313,7 @@ Public Class Math_ImageAverage : Inherits VB_Algorithm
         Next
         If dst3.Type <> src.Type Then dst3.ConvertTo(dst2, src.Type) Else dst2 = dst3.Clone
         dst3 = vbNormalize32f(dst3)
-        labels(2) = "Average image over previous " + CStr(task.historyCount) + " images"
+        labels(2) = "Average image over previous " + CStr(task.frameHistoryCount) + " images"
     End Sub
 End Class
 

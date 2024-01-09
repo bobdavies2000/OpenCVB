@@ -130,7 +130,7 @@ Public Class Diff_RGBAccum : Inherits VB_Algorithm
         diff.Run(src)
         If task.optionsChanged Then history.Clear()
         history.Add(diff.dst3)
-        If history.Count > task.historyCount Then history.RemoveAt(0)
+        If history.Count > task.frameHistoryCount Then history.RemoveAt(0)
 
         dst2.SetTo(0)
         For Each m In history

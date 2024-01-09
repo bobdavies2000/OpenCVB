@@ -205,7 +205,7 @@ Public Class FeatureMatch_History : Inherits VB_Algorithm
         allLists.Add(New List(Of linePoints)(feat.mpList))
         allCorrs.Add(New List(Of Single)(feat.corrList))
 
-        If allLists.Count > task.historyCount Then
+        If allLists.Count > task.frameHistoryCount Then
             allLists.RemoveAt(0)
             allCorrs.RemoveAt(0)
         End If

@@ -27,8 +27,8 @@ Public Class HeatMap_Basics : Inherits VB_Algorithm
 
         dst2 = vbPalette(dst0.ConvertScaleAbs())
         dst3 = vbPalette(dst1.ConvertScaleAbs())
-        labels(2) = "Top view of heat map with the last " + CStr(task.historyCount) + " frames"
-        labels(3) = "Side view of heat map with the last " + CStr(task.historyCount) + " frames"
+        labels(2) = "Top view of heat map with the last " + CStr(task.frameHistoryCount) + " frames"
+        labels(3) = "Side view of heat map with the last " + CStr(task.frameHistoryCount) + " frames"
     End Sub
 End Class
 

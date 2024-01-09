@@ -32,7 +32,7 @@ Public Class Depth_Basics : Inherits VB_Algorithm
                 task.pcSplit = task.pointCloud.Split
                 task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
                 If gOptions.useHistoryCloud.Checked Then
-                    task.historyCount = gOptions.FrameHistory.Value
+                    task.frameHistoryCount = gOptions.FrameHistory.Value
                     hCloud.Run(task.pointCloud)
                     task.pointCloud = hCloud.dst2
 
@@ -67,7 +67,7 @@ Public Class Depth_Basics : Inherits VB_Algorithm
             maxMask.Run(task.maxDepthMask)
             task.maxDepthMask = maxMask.dst2 ' Use the contour of the mask
         End If
-        If task.historyCount = 0 Then task.historyCount = 1
+        If task.frameHistoryCount = 0 Then task.frameHistoryCount = 1
     End Sub
 End Class
 
@@ -193,9 +193,9 @@ Public Class Depth_MeanStdev_MT : Inherits VB_Algorithm
         desc = "Collect a time series of depth mean and stdev to highlight where depth is unstable."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.optionsChanged Then meanSeries = New cv.Mat(task.gridList.Count, task.historyCount, cv.MatType.CV_32F, 0)
+        If task.optionsChanged Then meanSeries = New cv.Mat(task.gridList.Count, task.frameHistoryCount, cv.MatType.CV_32F, 0)
 
-        Dim index = task.frameCount Mod task.historyCount
+        Dim index = task.frameCount Mod task.frameHistoryCount
         Dim meanValues(task.gridList.Count - 1) As Single
         Dim stdValues(task.gridList.Count - 1) As Single
         Parallel.For(0, task.gridList.Count,
@@ -204,14 +204,14 @@ Public Class Depth_MeanStdev_MT : Inherits VB_Algorithm
             Dim mean As cv.Scalar, stdev As cv.Scalar
             cv.Cv2.MeanStdDev(task.pcSplit(2)(roi), mean, stdev, task.depthMask(roi))
             meanSeries.Set(Of Single)(i, index, mean)
-            If task.frameCount >= task.historyCount - 1 Then
+            If task.frameCount >= task.frameHistoryCount - 1 Then
                 cv.Cv2.MeanStdDev(meanSeries.Row(i), mean, stdev)
                 meanValues(i) = mean
                 stdValues(i) = stdev
             End If
         End Sub)
 
-        If task.frameCount >= task.historyCount Then
+        If task.frameCount >= task.frameHistoryCount Then
             Dim means As New cv.Mat(task.gridList.Count, 1, cv.MatType.CV_32F, meanValues.ToArray)
             Dim stdevs As New cv.Mat(task.gridList.Count, 1, cv.MatType.CV_32F, stdValues.ToArray)
             Dim meanmask = means.Threshold(1, task.maxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -701,7 +701,7 @@ Public Class Depth_Fusion : Inherits VB_Algorithm
         If task.optionsChanged Then fuseFrames = New List(Of cv.Mat)
 
         fuseFrames.Add(src.Clone)
-        If fuseFrames.Count > task.historyCount Then fuseFrames.RemoveAt(0)
+        If fuseFrames.Count > task.frameHistoryCount Then fuseFrames.RemoveAt(0)
 
         If fuseFrames.Count = 0 Then Exit Sub
         dst2 = fuseFrames(0).Clone
@@ -1210,8 +1210,8 @@ Public Class Depth_ForegroundOverTime : Inherits VB_Algorithm
         labels = {"", "", "Foreground objects", "Edges for the Foreground Objects"}
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        task.historyCount = 5
-        desc = "Create a fused foreground mask over x number of frames (task.historyCount)"
+        task.frameHistoryCount = 5
+        desc = "Create a fused foreground mask over x number of frames (task.frameHistoryCount)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static lastFrames As New List(Of cv.Mat)
@@ -1225,7 +1225,7 @@ Public Class Depth_ForegroundOverTime : Inherits VB_Algorithm
         For Each m In lastFrames
             dst2 += m
         Next
-        If lastFrames.Count >= task.historyCount Then lastFrames.RemoveAt(0)
+        If lastFrames.Count >= task.frameHistoryCount Then lastFrames.RemoveAt(0)
 
         contours.Run(dst2)
         dst2.SetTo(0)
@@ -1477,7 +1477,7 @@ Public Class Depth_TierCount : Inherits VB_Algorithm
         kValues.Add(valley.valleyOrder.Count)
 
         classCount = CInt(kValues.Average)
-        If kValues.Count > task.historyCount * 10 Then kValues.RemoveAt(0)
+        If kValues.Count > task.frameHistoryCount * 10 Then kValues.RemoveAt(0)
 
         setTrueText("'K' value = " + CStr(classCount) + " after averaging.  Instanteous value = " +
                     CStr(valley.valleyOrder.Count), 3)

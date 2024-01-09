@@ -1541,7 +1541,7 @@ Public Class RedCloud_DelaunayGuidedFeatures : Inherits VB_Algorithm
         Dim nextGood As New List(Of cv.Point2f)(features.good.corners)
         goodList.Add(nextGood)
 
-        If goodList.Count >= task.historyCount Then goodList.RemoveAt(0)
+        If goodList.Count >= task.frameHistoryCount Then goodList.RemoveAt(0)
 
         dst3.SetTo(0)
         For Each ptList In goodList

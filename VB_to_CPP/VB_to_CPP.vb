@@ -41,10 +41,32 @@ Public Class VB_to_CPP
         UpdateInfrastructure.Text = "Step 5: Add " + CPPName + " to OpenCVB interface"
     End Sub
     Private Sub PrepareCPP_Click(sender As Object, e As EventArgs) Handles PrepareCPP.Click
+        ' read all the existing CPP_ algorithms so names can be recognized when parsing the new algorithm.
+        Dim Input = New FileInfo("../../CPP_Classes/CPP_IncludeOnly.h")
+        Dim includeOnly = File.ReadAllLines(Input.FullName)
+        Dim functions As New List(Of String)
+        For Each line In includeOnly
+            line = Trim(line)
+            If line.StartsWith("_") Or line.Contains("MAX_FUNCTION") Then
+                Dim triggerDone As Boolean
+                If line.Contains("MAX_FUNCTION") Then
+                    triggerDone = True
+                    line = line.Substring(Len("MAX_FUNCTION = "))
+                End If
+
+                Dim nextLine = line.Substring(5)
+                nextLine = nextLine.Substring(0, Len(nextLine) - 1)
+                functions.Add(nextLine)
+                If triggerDone Then Exit For
+            End If
+        Next
+
         Dim cppCode = CPPrtb.Text
         Dim split = cppCode.Split(vbLf)
         CPPrtb.Clear()
         Dim functionName As String = ""
+        Dim constructorAdds As New List(Of String)
+        Dim objectNames As New List(Of String)
         For i = 0 To split.Count - 1
             If split(i).Contains("#include") Or split(i) = "" Then Continue For
             If Trim(split(i)).StartsWith("class") Then
@@ -63,17 +85,33 @@ Public Class VB_to_CPP
                     split(i) = split(i).Replace(functionName + "()", "CPP_" + functionName +
                                                 "(int rows, int cols) : algorithmCPP(rows, cols) ") + vbCrLf
                     split(i) += vbTab + "traceName = """ + "CPP_" + functionName + """;"
+                    For Each con In constructorAdds
+                        split(i) += vbCrLf + con
+                    Next
                 End If
             End If
 
+            For Each func In functions
+                If split(i).Contains(func) And functionName.Contains(func) = False Then
+                    Dim nextLine = Trim(split(i))
+                    Dim tokens = nextLine.Split(" ")
+                    split(i) = split(i).Replace(tokens(0), "CPP_" + tokens(0) + "*")
+                    tokens(1) = tokens(1).Replace(";", "")
+                    objectNames.Add(tokens(1))
+                    constructorAdds.Add(vbTab + tokens(1) + " = new CPP_" + tokens(0) + "(rows, cols);")
+                End If
+            Next
+
+            For Each obj In objectNames
+                split(i) = split(i).Replace(obj + ".", obj + "->")
+            Next
+            split(i) = split(i).Replace("CPP_CPP_", "CPP_")
             split(i) = split(i).Replace("gOptions.PixelDiffThreshold.Value", "task->pixelDiffThreshold")
             split(i) = split(i).Replace("initRandomRect(", "task->initRandomRect(")
             split(i) = split(i).Replace("validateRect(", "task->validateRect(")
             split(i) = split(i).Replace("gOptions.UseKalman.Checked", "task->useKalman")
             split(i) = split(i).Replace("gOptions.HistBinSlider.Value", "task->histogramBins")
             split(i) = split(i).Replace("vbMinMax(", "task->getMinMax(")
-            split(i) = split(i).Replace(".Run(", "->Run(")
-            split(i) = split(i).Replace(".dst", "->dst")
             split(i) = split(i).Replace("CStr(", "to_string(")
             split(i) = split(i).Replace("task.", "task->")
             split(i) = split(i).Replace("heartBeat()", "task->heartBeat")
@@ -83,6 +121,7 @@ Public Class VB_to_CPP
             split(i) = split(i).Replace("cv::", "")
             split(i) = split(i).Replace("std::", "")
             split(i) = split(i).Replace("const Mat& src", "Mat src")
+
             CPPrtb.Text += split(i) + vbCrLf
         Next
     End Sub
@@ -103,7 +142,7 @@ Public Class VB_to_CPP
         For Each line In externs
             sw.WriteLine(line)
             If line.Contains("new CPP_AddWeighted_Basics(rows, cols); break; }") Then
-                sw.WriteLine(vbTab + "case " + functionName + "_" + " :")
+                sw.WriteLine(vbTab + "case " + "_" + functionName + " :")
                 sw.WriteLine(vbTab + "{task->alg = new " + functionName + "(rows, cols); break; }")
             End If
         Next
@@ -114,8 +153,8 @@ Public Class VB_to_CPP
         sw = New StreamWriter(input.FullName)
         For Each line In includeOnly
             sw.WriteLine(line)
-            If line.Contains("CPP_AddWeighted_Basics_,") Then
-                sw.WriteLine(functionName + "_,")
+            If line.Contains("_CPP_AddWeighted_Basics,") Then
+                sw.WriteLine("_" + functionName + ",")
             End If
         Next
         sw.Close()

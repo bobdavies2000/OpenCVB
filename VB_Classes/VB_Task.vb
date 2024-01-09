@@ -219,7 +219,7 @@ Public Class VBtask : Implements IDisposable
     Public channelsTop() As Integer
     Public channelsSide() As Integer
     Public bins2D() As Integer
-    Public historyCount As Integer ' count of how much history to use for the point cloud.
+    Public frameHistoryCount As Integer ' count of how much history to use for the point cloud.
     Public depthThresholdPercent As Single
 
     Public redThresholdSide As Integer ' In heatmap side view, this defines the boundary between red and blue
