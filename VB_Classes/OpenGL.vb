@@ -1696,7 +1696,7 @@ End Class
 
 
 Public Class OpenGL_CloudMisses : Inherits VB_Algorithm
-    Dim sum8u As New History_Sum8u
+    Dim sum8u As New History_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         labels = {"", "", "Point cloud after over the last X frames", ""}

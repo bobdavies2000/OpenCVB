@@ -276,7 +276,7 @@ End Class
 
 Public Class Hist3D_PixelDiffMask : Inherits VB_Algorithm
     Dim pixel As New Hist3D_Pixel
-    Dim sum8u As New History_Sum8uNoSaturation
+    Dim sum8u As New History_BasicsNoSaturation
     Dim rMin As New RedMin_Basics
     Public Sub New()
         advice = ""

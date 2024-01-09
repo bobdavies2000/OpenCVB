@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 ' http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 Public Class Plane_Basics : Inherits VB_Algorithm
-    Dim sum32f As New History_Sum32f
+    Dim sum32f As New History_Basics
     Public Sub New()
         labels = {"", "Top down mask after after thresholding heatmap", "Vertical regions", "Horizontal regions"}
         desc = "Find the regions that are mostly vertical and mostly horizontal."
@@ -464,7 +464,7 @@ End Class
 
 Public Class Plane_Verticals : Inherits VB_Algorithm
     Dim solo As New PointCloud_Solo
-    Dim sum32 As New History_Sum32f
+    Dim sum32 As New History_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         labels = {"RGB image with highlights for likely vertical surfaces over X frames.",
@@ -498,7 +498,7 @@ End Class
 
 Public Class Plane_Horizontals : Inherits VB_Algorithm
     Dim solo As New PointCloud_Solo
-    Dim sum32 As New History_Sum32f
+    Dim sum32 As New History_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         labels = {"RGB image with highlights for likely floor or ceiling over X frames.",
@@ -533,7 +533,7 @@ End Class
 
 Public Class Plane_SoloPoints : Inherits VB_Algorithm
     Dim solo As New PointCloud_Solo
-    Dim sum32 As New History_Sum32f
+    Dim sum32 As New History_Basics
     Public Sub New()
         labels = {"RGB image with solo points for likely floor or ceiling over X frames.",
                   "", "Solo points in top view", "Solo points in side view"}

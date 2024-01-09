@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class HeatMap_Basics : Inherits VB_Algorithm
-    Public topSum As New History_Sum32f
-    Public sideSum As New History_Sum32f
+    Public topSum As New History_Basics
+    Public sideSum As New History_Basics
     Public histogramTop As New cv.Mat
     Public histogramSide As New cv.Mat
     Dim options As New Options_HeatMap

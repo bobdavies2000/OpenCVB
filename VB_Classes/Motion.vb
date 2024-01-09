@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
 Public Class Motion_Basics : Inherits VB_Algorithm
     Public motionCore As New Motion_Core
-    Dim sum8u As New History_Sum8u
+    Dim sum8u As New History_Basics
     Public Sub New()
         gOptions.FrameHistory.Value = 10
         desc = "Accumulate differences from the previous BGR images."
@@ -570,7 +570,7 @@ End Class
 
 Public Class Motion_History : Inherits VB_Algorithm
     Dim diff As New Diff_Basics
-    Dim frames As New History_Sum8u
+    Dim frames As New History_Basics
     Public Sub New()
         gOptions.PixelDiffThreshold.Value = 10
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)

@@ -326,7 +326,7 @@ End Class
 
 Public Class RedMin_Gaps : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
-    Dim sum8u As New History_Sum8u
+    Dim sum8u As New History_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         advice = ""

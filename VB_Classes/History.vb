@@ -1,38 +1,36 @@
 ﻿Imports cv = OpenCvSharp
-Public Class History_Sum8u : Inherits VB_Algorithm
-    Public saveFrames As New List(Of cv.Mat)
-    Public Sub New()
-        desc = "Create a frame history and sum the last X frames - not that saturation is permitted."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If task.frameHistoryCount = 1 Then
-            dst2 = src
-            Exit Sub
-        End If
+'Public Class History_Basics : Inherits VB_Algorithm
+'    Public saveFrames As New List(Of cv.Mat)
+'    Public Sub New()
+'        desc = "Create a frame history and sum the last X frames - not that saturation is permitted."
+'    End Sub
+'    Public Sub RunVB(src As cv.Mat)
+'        If task.frameHistoryCount = 1 Then
+'            dst2 = src
+'            Exit Sub
+'        End If
 
-        Dim input = src.Clone
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+'        Dim input = src.Clone
+'        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        If firstPass Then
-            If dst2.Type <> input.Type Or dst2.Channels <> input.Channels Then dst2 = New cv.Mat(input.Size, input.Type, 0)
-        End If
+'        If firstPass Then
+'            If dst2.Type <> input.Type Or dst2.Channels <> input.Channels Then dst2 = New cv.Mat(input.Size, input.Type, 0)
+'        End If
 
-        If task.optionsChanged Then
-            saveFrames.Clear()
-            dst2.SetTo(0)
-        End If
+'        If task.optionsChanged Then
+'            saveFrames.Clear()
+'            dst2.SetTo(0)
+'        End If
 
-        If saveFrames.Count >= task.frameHistoryCount Then
-            dst2 = dst2.Subtract(saveFrames.ElementAt(0))
-            saveFrames.RemoveAt(0)
-        End If
+'        If saveFrames.Count >= task.frameHistoryCount Then
+'            dst2 = dst2.Subtract(saveFrames.ElementAt(0))
+'            saveFrames.RemoveAt(0)
+'        End If
 
-        saveFrames.Add(input)
-        dst2 = input + dst2
-    End Sub
-End Class
-
-
+'        saveFrames.Add(input)
+'        dst2 = input + dst2
+'    End Sub
+'End Class
 
 
 
@@ -40,67 +38,37 @@ End Class
 
 
 
-Public Class History_Sum32f : Inherits VB_Algorithm
+
+
+Public Class History_Basics : Inherits VB_Algorithm
     Public saveFrames As New List(Of cv.Mat)
     Public Sub New()
         desc = "Create a frame history to sum the last X frames"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim input = src.Clone
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If input.Type <> cv.MatType.CV_32F Then input.ConvertTo(input, cv.MatType.CV_32F)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(src, cv.MatType.CV_32F)
 
-        If dst2.Type <> input.Type Or dst2.Channels <> input.Channels Then dst2 = New cv.Mat(input.Size, input.Type, 0)
-
-        If task.optionsChanged Then
+        If dst1.Type <> src.Type Or dst1.Channels <> src.Channels Or task.optionsChanged Then
+            dst1 = src
             saveFrames.Clear()
-            dst2.SetTo(0)
         End If
 
-        If saveFrames.Count >= task.frameHistoryCount Then
-            dst2 = dst2.Subtract(saveFrames.ElementAt(0))
-            saveFrames.RemoveAt(0)
-        End If
+        If saveFrames.Count >= task.frameHistoryCount Then saveFrames.RemoveAt(0)
+        saveFrames.Add(src)
 
-        saveFrames.Add(input)
-        dst2 = input + dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class History_Average : Inherits VB_Algorithm
-    Public saveFrames As New List(Of cv.Mat)
-    Public Sub New()
-        desc = "Create a frame history and average the last X frames"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Dim input = src.Clone
-        If input.Type <> cv.MatType.CV_32F Then input.ConvertTo(input, cv.MatType.CV_32F)
-        If input.Channels <> dst1.Channels Then dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
-
-        If task.optionsChanged Then
-            saveFrames.Clear()
-            dst1 = input
+        For Each m In saveFrames
+            dst1 += m
+        Next
+        dst1 *= 1 / saveFrames.Count
+        If src.Channels = 1 Then
+            dst1.ConvertTo(dst2, cv.MatType.CV_8U)
         Else
-            dst1 += input
+            dst1.ConvertTo(dst2, cv.MatType.CV_8UC3)
         End If
-
-        saveFrames.Add(input)
-        If saveFrames.Count > task.frameHistoryCount Then
-            dst1 -= saveFrames(0)
-            saveFrames.RemoveAt(0)
-        End If
-
-        dst2 = dst1 / saveFrames.Count
-        dst2.ConvertTo(dst2, cv.MatType.CV_8UC3)
-        labels(2) = "The image below is composed of " + CStr(saveFrames.Count) + " BGR frames"
     End Sub
 End Class
+
 
 
 
@@ -113,7 +81,7 @@ Public Class History_MaskCopy : Inherits VB_Algorithm
     Public Sub New()
         desc = "Create a frame history that creates a mask for the current frame and copies merges it with the last X frames"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim input = src.Clone
         Static countFrames As Integer
         If task.optionsChanged Or countFrames >= task.frameHistoryCount Then
@@ -141,7 +109,7 @@ Public Class History_MaskCopy8U : Inherits VB_Algorithm
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Create a frame history that creates a mask for the current frame and copies merges it with the last X frames"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim input = src.Clone
         Static countFrames As Integer
         If task.optionsChanged Or task.frameCount Mod task.frameHistoryCount = 0 Then
@@ -163,7 +131,7 @@ End Class
 
 
 Public Class History_Cloud : Inherits VB_Algorithm
-    Public sum8u As New History_Sum8uNoSaturation
+    Public sum8u As New History_BasicsNoSaturation
     Public Sub New()
         desc = "Create a frame history and sum the last X task.pointcloud's"
     End Sub
@@ -195,7 +163,7 @@ End Class
 
 
 
-Public Class History_Sum8uNoSaturation : Inherits VB_Algorithm
+Public Class History_BasicsNoSaturation : Inherits VB_Algorithm
     Public saveFrames As New List(Of cv.Mat)
     Public Sub New()
         desc = "Create a frame history and sum the last X frames (without saturation!)"
@@ -230,8 +198,8 @@ End Class
 
 
 
-Public Class History_Sum8uDiff : Inherits VB_Algorithm
-    Dim sum8u As New History_Sum8uNoSaturation
+Public Class History_BasicsDiff : Inherits VB_Algorithm
+    Dim sum8u As New History_BasicsNoSaturation
     Dim diff As New Diff_Basics
     Public Sub New()
         gOptions.PixelDiffThreshold.Value = 0

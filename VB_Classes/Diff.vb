@@ -197,7 +197,7 @@ End Class
 
 Public Class Diff_DepthAccum : Inherits VB_Algorithm
     Dim diff As New Diff_Depth
-    Dim sum8u As New History_Sum8u
+    Dim sum8u As New History_Basics
     Public Sub New()
         desc = "Accumulate the mask of depth differences."
     End Sub

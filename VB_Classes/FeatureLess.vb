@@ -23,7 +23,7 @@ End Class
 
 Public Class FeatureLess_BasicsAccum : Inherits VB_Algorithm
     Dim edgeD As New EdgeDraw_Basics
-    Dim sum8u As New History_Sum8u
+    Dim sum8u As New History_Basics
     Public Sub New()
         gOptions.FrameHistory.Value = 10
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -313,10 +313,10 @@ Public Class FeatureLess_LeftRight : Inherits VB_Algorithm
         desc = "Find the featureless regions of the left and right images"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        fLess.Run(task.leftview)
+        fLess.Run(task.leftView)
         dst2 = fLess.dst2.Clone
 
-        fLess.Run(task.rightview)
+        fLess.Run(task.rightView)
         dst3 = fLess.dst2
     End Sub
 End Class
@@ -412,7 +412,7 @@ End Class
 
 Public Class FeatureLess_History : Inherits VB_Algorithm
     Dim fLess As New FeatureLess_Basics
-    Dim sum8u As New History_Sum8u
+    Dim sum8u As New History_Basics
     Public Sub New()
         desc = "Accumulate the edges over a span of X images."
     End Sub

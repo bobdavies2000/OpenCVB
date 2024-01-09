@@ -3,7 +3,7 @@ Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
 _CPP_History_Average
-_CPP_History_Sum8u
+_CPP_History_Basics
 _CPP_Motion_Core
 _CPP_Histogram_Kalman
 _CPP_Kalman_Basics
@@ -298,7 +298,7 @@ if algorithmName = "CPP_Grid_Basics" Then return new CPP_Basics(functionNames._C
 if algorithmName = "CPP_Histogram_Basics" Then return new CPP_Basics(functionNames._CPP_Histogram_Basics)
 if algorithmName = "CPP_Histogram_Kalman" Then return new CPP_Basics(functionNames._CPP_Histogram_Kalman)
 if algorithmName = "CPP_History_Average" Then return new CPP_Basics(functionNames._CPP_History_Average)
-if algorithmName = "CPP_History_Sum8u" Then return new CPP_Basics(functionNames._CPP_History_Sum8u)
+if algorithmName = "CPP_History_Basics" Then return new CPP_Basics(functionNames._CPP_History_Basics)
 if algorithmName = "CPP_Hull_Basics" Then return new CPP_Basics(functionNames._CPP_Hull_Basics)
 if algorithmName = "CPP_IMU_GMatrix" Then return new CPP_Basics(functionNames._CPP_IMU_GMatrix)
 if algorithmName = "CPP_IMU_GMatrix_QT" Then return new CPP_Basics(functionNames._CPP_IMU_GMatrix_QT)
@@ -753,14 +753,12 @@ if algorithmName = "Histogram2D_PlotHistogram1D" Then return new Histogram2D_Plo
 if algorithmName = "Histogram2D_Side" Then return new Histogram2D_Side
 if algorithmName = "Histogram2D_Top" Then return new Histogram2D_Top
 if algorithmName = "Histogram2D_Zoom" Then return new Histogram2D_Zoom
-if algorithmName = "History_Average" Then return new History_Average
+if algorithmName = "History_Basics" Then return new History_Basics
+if algorithmName = "History_BasicsDiff" Then return new History_BasicsDiff
+if algorithmName = "History_BasicsNoSaturation" Then return new History_BasicsNoSaturation
 if algorithmName = "History_Cloud" Then return new History_Cloud
 if algorithmName = "History_MaskCopy" Then return new History_MaskCopy
 if algorithmName = "History_MaskCopy8U" Then return new History_MaskCopy8U
-if algorithmName = "History_Sum32f" Then return new History_Sum32f
-if algorithmName = "History_Sum8u" Then return new History_Sum8u
-if algorithmName = "History_Sum8uDiff" Then return new History_Sum8uDiff
-if algorithmName = "History_Sum8uNoSaturation" Then return new History_Sum8uNoSaturation
 if algorithmName = "HistPeak2D_Basics" Then return new HistPeak2D_Basics
 if algorithmName = "HistPeak2D_BGR" Then return new HistPeak2D_BGR
 if algorithmName = "HistPeak2D_Edges" Then return new HistPeak2D_Edges

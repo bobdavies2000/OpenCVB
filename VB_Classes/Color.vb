@@ -312,7 +312,7 @@ End Class
 
 
 Public Class Color_Smoothing : Inherits VB_Algorithm
-    Dim frames As New History_Average
+    Dim frames As New History_Basics
     Public Sub New()
         labels = {"", "", "Averaged BGR image over the last X frames", ""}
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32FC3, 0)

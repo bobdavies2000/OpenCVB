@@ -121,7 +121,7 @@ enum functions
 {
     _CPP_AddWeighted_Basics,
 _CPP_History_Average,
-_CPP_History_Sum8u,
+_CPP_History_Basics,
     _CPP_Motion_Core,
 _CPP_Histogram_Kalman,
 _CPP_Kalman_Basics,
@@ -2406,11 +2406,11 @@ public:
 
 
 
-class CPP_History_Sum8u : public algorithmCPP {
+class CPP_History_Basics : public algorithmCPP {
 public:
     vector<Mat> saveFrames;
-    CPP_History_Sum8u(int rows, int cols) : algorithmCPP(rows, cols) {
-        traceName = "CPP_History_Sum8u";
+    CPP_History_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_History_Basics";
         desc = "Create a frame history and sum the last X frames - note that saturation is permitted.";
     }
     void Run(Mat src) override {
