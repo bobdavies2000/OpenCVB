@@ -95,21 +95,25 @@ Public Class VB_to_CPP
                 End If
             End If
 
-            For Each func In functions
-                If split(i).Contains(func) And functionName.Contains(func) = False Then
-                    Dim nextLine = Trim(split(i))
-                    Dim tokens = nextLine.Split(" ")
-                    split(i) = split(i).Replace(tokens(0), "CPP_" + tokens(0) + "*")
-                    tokens(1) = tokens(1).Replace(";", "")
-                    objectNames.Add(tokens(1))
-                    constructorAdds.Add(vbTab + tokens(1) + " = new CPP_" + tokens(0) + "(rows, cols);")
-                End If
-            Next
+            If split(i).Contains("CPP_") = False Then
+                For Each func In functions
+                    If split(i).Contains(func) And functionName.Contains(func) = False Then
+                        Dim nextLine = Trim(split(i))
+                        Dim tokens = nextLine.Split(" ")
+                        split(i) = split(i).Replace(tokens(0), "CPP_" + tokens(0) + "*")
+                        tokens(1) = tokens(1).Replace(";", "")
+                        objectNames.Add(tokens(1))
+                        constructorAdds.Add(vbTab + tokens(1) + " = new CPP_" + tokens(0) + "(rows, cols);")
+                    End If
+                Next
+            End If
 
             For Each obj In objectNames
                 split(i) = split(i).Replace(obj + ".", obj + "->")
             Next
-            split(i) = split(i).Replace("CPP_CPP_", "CPP_")
+
+
+            split(i) = split(i).Replace("gOptions.FrameHistory.Value", "task->frameHistoryCount")
             split(i) = split(i).Replace("gOptions.PixelDiffThreshold.Value", "task->pixelDiffThreshold")
             split(i) = split(i).Replace("initRandomRect(", "task->initRandomRect(")
             split(i) = split(i).Replace("validateRect(", "task->validateRect(")
@@ -125,6 +129,7 @@ Public Class VB_to_CPP
             split(i) = split(i).Replace("cv::", "")
             split(i) = split(i).Replace("std::", "")
             split(i) = split(i).Replace("const Mat& src", "Mat src")
+            split(i) = split(i).Replace("CPP_CPP_", "CPP_")
 
             CPPrtb.Text += split(i) + vbCrLf
         Next

@@ -82,7 +82,7 @@ struct sortInt
     {
         return (key > keyVal.key);
     }
-};
+}; 
 
 class linePoints {
 public:
@@ -2413,6 +2413,10 @@ public:
         desc = "Create a frame history to sum the last X frames";
     }
     void Run(Mat src) override {
+        if (task->frameHistoryCount == 1) {
+            dst2 = src.clone();
+            return;
+        }
         if (src.type() != CV_32F) src.convertTo(src, CV_32F);
         if (dst1.type() != src.type() || dst1.channels() != src.channels() || task->optionsChanged) {
             dst1 = src.clone();
@@ -2421,7 +2425,7 @@ public:
         if (saveFrames.size() >= task->frameHistoryCount) {
             saveFrames.erase(saveFrames.begin());
         }
-        saveFrames.push_back(src);
+        saveFrames.push_back(src.clone());
         for (const auto& m : saveFrames) {
             add(dst1, m, dst1);
         }
@@ -2437,55 +2441,80 @@ public:
 
 
 
-class CPP_Motion_Basics : public algorithmCPP
-{
-private:
+
+
+class CPP_Motion_Basics : public algorithmCPP {
 public:
-    CPP_Diff_Basics* diff;
-    int changedPixels;
-    int cumulativePixels;
-    bool resetAll = true;
-    CPP_Motion_Basics(int rows, int cols) : algorithmCPP(rows, cols)
-    {
+    CPP_Motion_Core* motionCore;
+    CPP_History_Basics* sum8u;
+    CPP_Motion_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Motion_Basics";
-        diff = new CPP_Diff_Basics(rows, cols);
-        task->pixelDiffThreshold = 25;
-        dst3 = Mat(dst3.size(), CV_8U);
-        dst3.setTo(0);
-        desc = "Detect contours in the motion data and the resulting rectangles";
+        motionCore = new CPP_Motion_Core(rows, cols);
+        sum8u = new CPP_History_Basics(rows, cols);
+        task->frameHistoryCount = 10;
+        desc = "Accumulate differences from the previous BGR images.";
     }
-    void Run(Mat src)
-    {
-        auto percentOfImage = float(10.0f / 100.0f);
-        static auto saveFrameCount = task->frameCount;
-        if (saveFrameCount != task->frameCount)
-        {
-            saveFrameCount = task->frameCount;
-            if (src.channels() != 1) cvtColor(src, src, COLOR_BGR2GRAY);
-            diff->Run(src);
-            dst2 = diff->dst3;
-            changedPixels = diff->changedPixels;
-            if (changedPixels > 0)
-            {
-                cumulativePixels += changedPixels;
-                resetAll = cumulativePixels / src.total() > percentOfImage || changedPixels > dst2.total() / 16 || task->optionsChanged;
-                if (resetAll || task->heartBeat)
-                {
-                    dst2.copyTo(dst3);
-                    cumulativePixels = 0;
-                }
-                else
-                {
-                    dst3.setTo(255, dst2);
-                }
-            }
-            auto threshold = src.total() * 10 / 100;
-            auto strOut = "Cumulative threshold = " + to_string(int(threshold / 1000)) + "k";
-            strOut += "Current cumulative pixels changed = " + to_string(int(cumulativePixels / 1000)) + "k" + "/n";
-            labels[2] = strOut;
-        }
+    void Run(Mat src) override {
+        motionCore->Run(src);
+        dst2 = motionCore->dst2;
+        sum8u->Run(dst2);
+        dst3 = sum8u->dst2;
     }
 };
+
+
+
+
+
+//class CPP_Motion_Basics : public algorithmCPP
+//{
+//private:
+//public:
+//    CPP_Diff_Basics* diff;
+//    int changedPixels;
+//    int cumulativePixels;
+//    bool resetAll = true;
+//    CPP_Motion_Basics(int rows, int cols) : algorithmCPP(rows, cols)
+//    {
+//        traceName = "CPP_Motion_Basics";
+//        diff = new CPP_Diff_Basics(rows, cols);
+//        task->pixelDiffThreshold = 25;
+//        dst3 = Mat(dst3.size(), CV_8U);
+//        dst3.setTo(0);
+//        desc = "Detect contours in the motion data and the resulting rectangles";
+//    }
+//    void Run(Mat src)
+//    {
+//        auto percentOfImage = float(10.0f / 100.0f);
+//        static auto saveFrameCount = task->frameCount;
+//        if (saveFrameCount != task->frameCount)
+//        {
+//            saveFrameCount = task->frameCount;
+//            if (src.channels() != 1) cvtColor(src, src, COLOR_BGR2GRAY);
+//            diff->Run(src);
+//            dst2 = diff->dst3;
+//            changedPixels = diff->changedPixels;
+//            if (changedPixels > 0)
+//            {
+//                cumulativePixels += changedPixels;
+//                resetAll = cumulativePixels / src.total() > percentOfImage || changedPixels > dst2.total() / 16 || task->optionsChanged;
+//                if (resetAll || task->heartBeat)
+//                {
+//                    dst2.copyTo(dst3);
+//                    cumulativePixels = 0;
+//                }
+//                else
+//                {
+//                    dst3.setTo(255, dst2);
+//                }
+//            }
+//            auto threshold = src.total() * 10 / 100;
+//            auto strOut = "Cumulative threshold = " + to_string(int(threshold / 1000)) + "k";
+//            strOut += "Current cumulative pixels changed = " + to_string(int(cumulativePixels / 1000)) + "k" + "/n";
+//            labels[2] = strOut;
+//        }
+//    }
+//};
 
 
 
@@ -2513,12 +2542,12 @@ public:
     }
     void Run(Mat src)
     {
-        if (task->optionsChanged) motion->resetAll = true;
-        motion->Run(src);
-        if (motion->resetAll || task->heartBeat) dst2.setTo(0);
-        edges->Run(src);
-        dst2.setTo(255, edges->dst2);
-        labels[3] = motion->labels[2];
+        //if (task->optionsChanged) motion->resetAll = true;
+        //motion->Run(src);
+        //if (motion->resetAll || task->heartBeat) dst2.setTo(0);
+        //edges->Run(src);
+        //dst2.setTo(255, edges->dst2);
+        //labels[3] = motion->labels[2];
     }
 };
 

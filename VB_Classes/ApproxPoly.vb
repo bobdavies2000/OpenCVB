@@ -17,7 +17,7 @@ Public Class ApproxPoly_Basics : Inherits VB_Algorithm
         labels = {"", "", "Input to the ApproxPolyDP", "Output of ApproxPolyDP"}
         desc = "Using the input contours, create ApproxPoly output"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static epsilonSlider = findSlider("epsilon - max distance from original curve")
         Dim epsilon = epsilonSlider.value
         Static closedPolyCheck = findCheckBox("Closed polygon - connect first and last vertices.")

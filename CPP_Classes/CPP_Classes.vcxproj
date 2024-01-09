@@ -197,6 +197,9 @@
       <Message>
       </Message>
     </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>$(ProjectDir)..\bin\Release\UI_Generator.exe</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -254,6 +257,9 @@
       <Message>
       </Message>
     </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>$(ProjectDir)..\bin\Release\UI_Generator.exe</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
