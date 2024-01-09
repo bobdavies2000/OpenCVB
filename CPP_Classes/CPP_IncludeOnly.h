@@ -2109,7 +2109,7 @@ public:
         maxIndex = -1;
         if (allContours.empty()) return;
         for (int i = 0; i < allContours.size(); i++) {
-            int len = allContours[i].size();
+            int len = int(allContours[i].size());
             if (len > maxCount) {
                 maxCount = len;
                 maxIndex = i;
@@ -2128,76 +2128,26 @@ public:
 
 
 
-
-//class CPP_Contour_Largest : public algorithmCPP
-//{
-//private:
-//public:
-//    vector<Point> bestContour;
-//    vector<vector<Point>> allContours;
-//    int maxIndex;
-//    CPP_Rectangle_Rotated* rotatedRect;
-//    CPP_Contour_Largest(int rows, int cols) : algorithmCPP(rows, cols) {
-//        traceName = "CPP_Contour_Largest";
-//        labels = { "", "", "Input to FindContours", "Largest single contour in the input image." };
-//        rotatedRect = new CPP_Rectangle_Rotated(rows, cols);
-//        desc = "Create a mask from the largest contour of the input.";
-//    }
-//    void Run(Mat src) {
-//        if (standalone) {
-//            if (task->heartBeat) {
-//                rotatedRect->Run(src);
-//                dst2 = rotatedRect->dst2;
-//            }
-//        }
-//        else {
-//            dst2 = src;
-//        }
-//        if (dst2.channels() != 1) cvtColor(dst2, dst2, COLOR_BGR2GRAY);
-//        findContours(dst2, allContours, RetrievalModes::RETR_LIST, ContourApproximationModes::CHAIN_APPROX_NONE);
-//        auto maxCount = 0;
-//        maxIndex = -1;
-//        // Review this For Loop >>>> i = 0 To allContours.size() - 1
-//        for (auto i = 0; i < allContours.size(); i++) {
-//            auto len = int(allContours[i].size());
-//            if (len > maxCount) {
-//                maxCount = len;
-//                maxIndex = i;
-//            }
-//        }
-//        if (maxIndex >= 0 && maxCount >= 2) {
-//            dst3.setTo(0);
-//            drawContours(dst3, allContours, maxIndex, WHITE, -1, task->lineType);
-//            bestContour = allContours[maxIndex];
-//        }
-//    }
-//};
-
-
-
-
-
-
-class CPP_Diff_Basics : public algorithmCPP
-{
-private:
+class CPP_Diff_Basics : public algorithmCPP {
 public:
     int changedPixels;
     Mat lastGray;
+
     CPP_Diff_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Diff_Basics";
-        labels = { "", "", "Stable gray", "Unstable mask" };
+        labels = {"", "", "Stable gray", "Unstable mask"};
         desc = "Capture an image and compare it to previous frame using absDiff and threshold";
     }
-    void Run(Mat src) {
+
+    void Run(Mat src) override {
         if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
-        if(task->firstPass) lastGray = src.clone();
+        if (task->firstPass) lastGray = src.clone();
         if (task->optionsChanged || lastGray.size() != src.size()) {
             lastGray = src.clone();
             dst3 = src.clone();
         }
+
         absdiff(src, lastGray, dst0);
-        task->pixelDiffThreshold = 25;  // NOTE: normally this is in the constructor but is overidden if so.
         threshold(dst0, dst3, task->pixelDiffThreshold, 255, THRESH_BINARY);
         changedPixels = countNonZero(dst3);
         if (changedPixels > 0) {
@@ -2212,14 +2162,10 @@ public:
 
 
 
-
-
-
-class CPP_ApproxPoly_FindandDraw : public algorithmCPP
-{
-private:
+class CPP_ApproxPoly_FindandDraw : public algorithmCPP {
 public:
     CPP_Rectangle_Rotated* rotatedRect;
+    vector<vector<Point>> allContours;
     CPP_ApproxPoly_FindandDraw(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_ApproxPoly_FindandDraw";
         rotatedRect = new CPP_Rectangle_Rotated(rows, cols);
@@ -2227,22 +2173,21 @@ public:
         labels[3] = "FindandDraw output - note the change in line width where ApproxPoly differs from DrawContours";
         desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours.";
     }
-    void Run(Mat src) {
+    void Run(Mat src) override {
         rotatedRect->Run(src);
         dst2 = rotatedRect->dst2;
         cvtColor(dst2, dst0, COLOR_BGR2GRAY);
         threshold(dst0, dst0, 1, 255, THRESH_BINARY);
         dst0.convertTo(dst1, CV_32SC1);
-        vector<vector<Point>> allContours;
-        findContours(dst1, allContours, RetrievalModes::RETR_FLOODFILL, ContourApproximationModes::CHAIN_APPROX_SIMPLE);
-        dst3.setTo(0);
-        Mat nextContour;
-        vector<Mat> contours;
-        for (auto i = 0; i < allContours.size(); i++) {
+        findContours(dst1, allContours, noArray(), RETR_FLOODFILL, CHAIN_APPROX_SIMPLE);
+        dst3 = Mat::zeros(dst2.size(), CV_8UC1);
+        vector<vector<Point>> contours;
+        vector<Point> nextContour;
+        for (int i = 0; i < allContours.size(); i++) {
             approxPolyDP(allContours[i], nextContour, 3, true);
-            if (nextContour.rows > 2) contours.push_back(nextContour);
+            if (nextContour.size() > 2) contours.push_back(nextContour);
         }
-        drawContours(dst3, contours, -1, YELLOW, task->lineWidth, task->lineType);
+        drawContours(dst3, contours, -1, Scalar(0, 255, 255), task->lineWidth, task->lineType);
     }
 };
 

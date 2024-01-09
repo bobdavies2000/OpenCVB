@@ -46,10 +46,11 @@ Public Class VB_to_CPP
         CPPrtb.Clear()
         Dim functionName As String = ""
         For i = 0 To split.Count - 1
+            If split(i).Contains("#include") Or split(i) = "" Then Continue For
             If Trim(split(i)).StartsWith("class") Then
                 Dim tokens = split(i).Split(" ")
                 functionName = tokens(1)
-                split(i) = split(i).Replace("{", ": public algorithmCPP" + " {")
+                split(i) = split(i).Replace("VB_Algorithm", "algorithmCPP")
                 split(i) = split(i).Replace("class ", "class CPP_")
             End If
 
@@ -60,11 +61,12 @@ Public Class VB_to_CPP
             If functionName <> "" Then
                 If Trim(split(i)).StartsWith(functionName) Then
                     split(i) = split(i).Replace(functionName + "()", "CPP_" + functionName +
-                                            "(int rows, int cols) : algorithmCPP(rows, cols) ") + vbCrLf
+                                                "(int rows, int cols) : algorithmCPP(rows, cols) ") + vbCrLf
                     split(i) += vbTab + "traceName = """ + "CPP_" + functionName + """;"
                 End If
             End If
 
+            split(i) = split(i).Replace("gOptions.PixelDiffThreshold.Value", "task->pixelDiffThreshold")
             split(i) = split(i).Replace("initRandomRect(", "task->initRandomRect(")
             split(i) = split(i).Replace("validateRect(", "task->validateRect(")
             split(i) = split(i).Replace("gOptions.UseKalman.Checked", "task->useKalman")
