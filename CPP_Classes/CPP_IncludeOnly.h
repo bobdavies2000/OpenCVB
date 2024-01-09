@@ -120,7 +120,6 @@ vector<string> mapNames = { "Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "
 enum functions
 {
     _CPP_AddWeighted_Basics,
-_CPP_History_Average,
 _CPP_History_Basics,
     _CPP_Motion_Core,
 _CPP_Histogram_Kalman,
@@ -2411,60 +2410,31 @@ public:
     vector<Mat> saveFrames;
     CPP_History_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_History_Basics";
-        desc = "Create a frame history and sum the last X frames - note that saturation is permitted.";
+        desc = "Create a frame history to sum the last X frames";
     }
     void Run(Mat src) override {
-        if (task->frameHistoryCount == 1) {
-            dst2 = src.clone();
-            return;
-        }
-        Mat input = src.clone();
-        if (input.channels() != 1) cvtColor(input, input, COLOR_BGR2GRAY);
-        if (dst2.type() != input.type() || dst2.channels() != input.channels()) dst2 = input;
-        if (task->optionsChanged) {
+        if (src.type() != CV_32F) src.convertTo(src, CV_32F);
+        if (dst1.type() != src.type() || dst1.channels() != src.channels() || task->optionsChanged) {
+            dst1 = src.clone();
             saveFrames.clear();
-            dst2.setTo(0);
         }
         if (saveFrames.size() >= task->frameHistoryCount) {
-            subtract(dst2, saveFrames[0], dst2);
             saveFrames.erase(saveFrames.begin());
         }
-        saveFrames.push_back(input);
-        add(input, dst2, dst2);
+        saveFrames.push_back(src);
+        for (const auto& m : saveFrames) {
+            add(dst1, m, dst1);
+        }
+        dst1 *= 1.0 / saveFrames.size();
+        if (src.channels() == 1) {
+            dst1.convertTo(dst2, CV_8U);
+        }
+        else {
+            dst1.convertTo(dst2, CV_8UC3);
+        }
     }
 };
 
-
-
-
-class CPP_History_Average : public algorithmCPP {
-public:
-    vector<Mat> saveFrames;
-    CPP_History_Average(int rows, int cols) : algorithmCPP(rows, cols) {
-        traceName = "CPP_History_Average";
-        desc = "Create a frame history and average the last X frames";
-    }
-    void Run(Mat src) override {
-        Mat input = src.clone();
-        if (input.type() != CV_32F) input.convertTo(input, CV_32F);
-        if (input.channels() != dst1.channels() || input.type() != dst1.type() ) dst1 = input;
-
-        if (task->optionsChanged) {
-            saveFrames.clear();
-            dst1 = input;
-        } else {
-            add(dst1, input, dst1);
-        }
-        saveFrames.push_back(input);
-        if (saveFrames.size() > task->frameHistoryCount) {
-            subtract(dst1, saveFrames[0], dst1);
-            saveFrames.erase(saveFrames.begin());
-        }
-        dst2 = dst1 / (double)saveFrames.size();
-        dst2.convertTo(dst2, CV_8UC3);
-        labels[2] = "The image below is composed of " + to_string(saveFrames.size()) + " BGR frames";
-    }
-};
 
 
 class CPP_Motion_Basics : public algorithmCPP

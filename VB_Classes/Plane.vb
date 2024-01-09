@@ -470,7 +470,7 @@ Public Class Plane_Verticals : Inherits VB_Algorithm
         labels = {"RGB image with highlights for likely vertical surfaces over X frames.",
                   "Heatmap top view", "Single frame backprojection of red areas in the heatmap",
                   "Thresholded heatmap top view mask - flipped for backprojection"}
-        desc = "Use a heatmap to isolate vertical walls."
+        desc = "Use a heatmap to isolate vertical walls - incomplete!"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         solo.Run(src)
@@ -479,15 +479,15 @@ Public Class Plane_Verticals : Inherits VB_Algorithm
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, 0)
         solo.heat.dst0.CopyTo(dst1, dst3)
 
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, dst2, task.rangesTop)
+        'cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, dst2, task.rangesTop)
 
-        sum32.Run(dst2)
-        sum32.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst2 = sum32.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        dst2.ConvertTo(dst0, cv.MatType.CV_8U)
-        task.color.SetTo(cv.Scalar.White, dst0)
+        'sum32.Run(dst2)
+        'sum32.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        'dst2 = sum32.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        'dst2.ConvertTo(dst0, cv.MatType.CV_8U)
+        'task.color.SetTo(cv.Scalar.White, dst0)
 
-        dst1 = solo.heat.dst2
+        'dst1 = solo.heat.dst2
     End Sub
 End Class
 
@@ -535,22 +535,20 @@ Public Class Plane_SoloPoints : Inherits VB_Algorithm
     Dim solo As New PointCloud_Solo
     Dim sum32 As New History_Basics
     Public Sub New()
-        labels = {"RGB image with solo points for likely floor or ceiling over X frames.",
-                  "", "Solo points in top view", "Solo points in side view"}
-        desc = "Use the solo points to find flat surfaces anywhere in the gravity-oriented point cloud"
+        labels = {"", "", "Solo points in top view", "Solo points in side view"}
+        desc = "Backproject the points in the PointCloud_Solo output into the src view - incomplete!"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         solo.Run(src)
-        dst3 = solo.dst2
-        dst1 = solo.heat.dst0.Clone
-        dst1.SetTo(0, Not dst3)
+        dst2 = solo.dst2
+        dst3 = solo.dst3
 
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, dst2, task.rangesTop)
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, dst0, task.rangesTop)
 
-        sum32.Run(dst2)
-        sum32.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        task.color.SetTo(cv.Scalar.White, dst2)
+        sum32.Run(dst0)
+        'sum32.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        'dst2 = dst2.Threshold(task.frameHistoryCount, 255, cv.ThresholdTypes.Binary)
+        'task.color.SetTo(cv.Scalar.White, dst2)
     End Sub
 End Class
 

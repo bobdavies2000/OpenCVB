@@ -1,52 +1,14 @@
 ﻿Imports cv = OpenCvSharp
-'Public Class History_Basics : Inherits VB_Algorithm
-'    Public saveFrames As New List(Of cv.Mat)
-'    Public Sub New()
-'        desc = "Create a frame history and sum the last X frames - not that saturation is permitted."
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        If task.frameHistoryCount = 1 Then
-'            dst2 = src
-'            Exit Sub
-'        End If
-
-'        Dim input = src.Clone
-'        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-'        If firstPass Then
-'            If dst2.Type <> input.Type Or dst2.Channels <> input.Channels Then dst2 = New cv.Mat(input.Size, input.Type, 0)
-'        End If
-
-'        If task.optionsChanged Then
-'            saveFrames.Clear()
-'            dst2.SetTo(0)
-'        End If
-
-'        If saveFrames.Count >= task.frameHistoryCount Then
-'            dst2 = dst2.Subtract(saveFrames.ElementAt(0))
-'            saveFrames.RemoveAt(0)
-'        End If
-
-'        saveFrames.Add(input)
-'        dst2 = input + dst2
-'    End Sub
-'End Class
-
-
-
-
-
-
-
-
-
 Public Class History_Basics : Inherits VB_Algorithm
     Public saveFrames As New List(Of cv.Mat)
     Public Sub New()
         desc = "Create a frame history to sum the last X frames"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.frameHistoryCount = 1 Then
+            dst2 = src
+            Exit Sub
+        End If
         If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(src, cv.MatType.CV_32F)
 
         If dst1.Type <> src.Type Or dst1.Channels <> src.Channels Or task.optionsChanged Then
@@ -55,7 +17,7 @@ Public Class History_Basics : Inherits VB_Algorithm
         End If
 
         If saveFrames.Count >= task.frameHistoryCount Then saveFrames.RemoveAt(0)
-        saveFrames.Add(src)
+        saveFrames.Add(src.Clone)
 
         For Each m In saveFrames
             dst1 += m

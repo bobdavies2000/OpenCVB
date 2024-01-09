@@ -34,8 +34,6 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case _CPP_AddWeighted_Basics :
     {task->alg = new CPP_AddWeighted_Basics(rows, cols); break; }
-	case _CPP_History_Average :
-	{task->alg = new CPP_History_Average(rows, cols); break; }
 	case _CPP_History_Basics :
 	{task->alg = new CPP_History_Basics(rows, cols); break; }
 	case _CPP_Motion_Core :
