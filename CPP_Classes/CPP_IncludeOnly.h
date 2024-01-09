@@ -2194,12 +2194,7 @@ public:
 
 
 
-
-
-
-class CPP_ApproxPoly_Basics : public algorithmCPP
-{
-private:
+class CPP_ApproxPoly_Basics : public algorithmCPP {
 public:
     CPP_Contour_Largest* contour;
     CPP_Rectangle_Rotated* rotatedRect;
@@ -2207,22 +2202,30 @@ public:
         traceName = "CPP_ApproxPoly_Basics";
         contour = new CPP_Contour_Largest(rows, cols);
         rotatedRect = new CPP_Rectangle_Rotated(rows, cols);
-        labels = { "", "", "Input to the ApproxPolyDP", "Output of ApproxPolyDP - note smoother edges." };
-        desc = "Using the input contours, create a list of ApproxPoly output";
+        labels = { "", "", "Input to the ApproxPolyDP", "Output of ApproxPolyDP" };
+        desc = "Using the input contours, create ApproxPoly output";
     }
-    void Run(Mat src) {
+    void Run(Mat src) override {
+        double epsilon = 3; // getSliderValue("epsilon - max distance from original curve");
+        bool closedPoly = true; // getCheckBoxState("Closed polygon - connect first and last vertices.");
         if (standalone) {
             if (task->heartBeat) rotatedRect->Run(src);
-            src = rotatedRect->dst2;
+            dst2 = rotatedRect->dst2;
         }
-        contour->Run(src);
-        dst2 = contour->dst3;
-        Mat nextContour;
-        approxPolyDP(contour->allContours[contour->maxIndex], nextContour, 3, true);
-        dst3.setTo(0);
-        task->drawContour(dst3, nextContour, YELLOW);
+        contour->Run(dst2);
+        dst2 = contour->dst2;
+        if (!contour->allContours.empty()) {
+            vector<Point> nextContour;
+            approxPolyDP(contour->bestContour, nextContour, epsilon, closedPoly);
+            dst3 = Mat::zeros(dst2.size(), CV_8UC1);
+            task->drawContour(dst3, nextContour, Scalar(0, 255, 255));
+        }
+        else {
+            task->setTrueText("No contours found", dst2);
+        }
     }
 };
+
 
 
 
