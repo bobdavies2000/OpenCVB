@@ -2229,12 +2229,7 @@ public:
 
 
 
-
-
-
-class CPP_Hull_Basics : public algorithmCPP
-{
-private:
+class CPP_Hull_Basics : public algorithmCPP {
 public:
     CPP_Random_Basics* random;
     vector<Point2f> inputPoints;
@@ -2243,21 +2238,23 @@ public:
     CPP_Hull_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Hull_Basics";
         random = new CPP_Random_Basics(rows, cols);
-        labels = { "", "", "Input Points - draw a rectangle anywhere.  Enclosing rectangle in yellow.", "" };
+        labels = { "", "", "Input Points - draw a rectangle anywhere. Enclosing rectangle in yellow.", "" };
+        if (standalone) random->range = Rect(100, 100, 50, 50);
         desc = "Given a list of points, create a hull that encloses them.";
     }
-    void Run(Mat src) {
+    void Run(Mat src) override {
         if ((standalone && task->heartBeat) || (useRandomPoints && task->heartBeat)) {
-            random->Run(src);
+            random->Run(empty);
             dst2 = random->dst2;
             inputPoints = random->pointList;
         }
         Mat hull2f;
-        convexHull(inputPoints, hull2f, true);
+        convexHull(inputPoints, hull2f);
         hull = task->convert2f2i(hull2f);
-        task->drawContour(dst2, hull, YELLOW);
+        task->drawContour(dst2, hull, Scalar(0, 255, 255));
     }
 };
+
 
 
 
