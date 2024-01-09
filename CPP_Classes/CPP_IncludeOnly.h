@@ -120,6 +120,7 @@ vector<string> mapNames = { "Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "
 enum functions
 {
     CPP_AddWeighted_Basics_,
+CPP_Motion_Core_,
 CPP_Histogram_Kalman_,
 CPP_Kalman_Basics_,
 CPP_RedCloud_Core_,
@@ -223,6 +224,7 @@ public:
     int cvFontThickness;
     Scalar fontColor;
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
+    bool motionReset;
 
     bool heartBeat; bool debugCheckBox; Size minRes; int PCReduction;
     bool optionsChanged; double addWeighted; int dotSize; int gridSize; float maxZmeters;
@@ -2259,11 +2261,7 @@ public:
 
 
 
-
-
-class CPP_ApproxPoly_Hull : public algorithmCPP
-{
-private:
+class CPP_ApproxPoly_Hull : public algorithmCPP {
 public:
     CPP_Hull_Basics* hull;
     CPP_ApproxPoly_Basics* aPoly;
@@ -2275,18 +2273,13 @@ public:
         labels = { "", "", "Original Hull", "Hull after ApproxPoly" };
         desc = "Use ApproxPolyDP on a hull to show impact of options (which appears to be minimal - what is wrong?)";
     }
-    void Run(Mat src) {
+    void Run(Mat src) override {
         hull->Run(src);
         dst2 = hull->dst2;
         aPoly->Run(dst2);
         dst3 = aPoly->dst2;
     }
 };
-
-
-
-
-
 
 
 
@@ -2363,6 +2356,50 @@ public:
     }
 };
 
+
+
+
+
+
+class CPP_Motion_Core : public algorithmCPP {
+public:
+    CPP_Diff_Basics* diff;
+    int cumulativePixels;
+    float options_cumulativePercentThreshold = 0.1;
+    int options_motionThreshold;
+    int saveFrameCount;
+    CPP_Motion_Core(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_Motion_Core";
+        task->pixelDiffThreshold = 25;
+        options_motionThreshold = rows * cols / 16;
+        diff = new CPP_Diff_Basics(rows, cols);
+        dst3 = Mat::zeros(dst3.size(), CV_8U);
+        labels[3] = "Accumulated changed pixels from the last heartbeat";
+        desc = "Accumulate differences from the previous BGR image.";
+    }
+    void Run(Mat src) override {
+        diff->Run(src);
+        dst2 = diff->dst3;
+        if (task->heartBeat) cumulativePixels = 0;
+        if (diff->changedPixels > 0 || task->heartBeat) {
+            cumulativePixels += diff->changedPixels;
+            task->motionReset =
+                (double)cumulativePixels / src.total() > options_cumulativePercentThreshold ||
+                diff->changedPixels > options_motionThreshold || task->optionsChanged;
+            if (task->motionReset || task->heartBeat) {
+                dst2.copyTo(dst3);
+                cumulativePixels = 0;
+                saveFrameCount = task->frameCount;
+            }
+            else {
+                dst3.setTo(255, dst2);
+            }
+        }
+        int threshold = src.total() * options_cumulativePercentThreshold;
+        string strOut = "Cumulative threshold = " + to_string(threshold / 1000) + "k ";
+        labels[2] = strOut + "Current cumulative pixels changed = " + to_string(cumulativePixels / 1000) + "k";
+    }
+};
 
 
 
