@@ -2,6 +2,7 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
+_CPP_Line_Basics
 _CPP_Convex_Basics
 _CPP_Resize_Preserve
 _CPP_History_Basics
@@ -303,6 +304,7 @@ if algorithmName = "CPP_IMU_GMatrix_QT" Then return new CPP_Basics(functionNames
 if algorithmName = "CPP_Kalman_Basics" Then return new CPP_Basics(functionNames._CPP_Kalman_Basics)
 if algorithmName = "CPP_KNN_Basics" Then return new CPP_Basics(functionNames._CPP_KNN_Basics)
 if algorithmName = "CPP_KNN_Lossy" Then return new CPP_Basics(functionNames._CPP_KNN_Lossy)
+if algorithmName = "CPP_Line_Basics" Then return new CPP_Basics(functionNames._CPP_Line_Basics)
 if algorithmName = "CPP_Mat_4to1" Then return new CPP_Basics(functionNames._CPP_Mat_4to1)
 if algorithmName = "CPP_Motion_Basics" Then return new CPP_Basics(functionNames._CPP_Motion_Basics)
 if algorithmName = "CPP_Motion_Core" Then return new CPP_Basics(functionNames._CPP_Motion_Core)

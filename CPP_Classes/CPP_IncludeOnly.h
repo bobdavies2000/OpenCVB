@@ -110,22 +110,21 @@ struct sortInt
 
 class linePoints {
 public:
-    Point2f p1;
-    Point2f p2;
+    cv::Point2f p1;
+    cv::Point2f p2;
     float slope;
     float yIntercept;
+    static constexpr float verticalSlope = 1000000.0f;  // Using constexpr for constant
 
-    linePoints(const Point2f& _p1, const Point2f& _p2) : p1(_p1), p2(_p2) {
-        float verticalSlope = 100000;
+    linePoints(const cv::Point2f& _p1, const cv::Point2f& _p2) : p1(_p1), p2(_p2) {
         slope = (p1.x != p2.x) ? (p1.y - p2.y) / (p1.x - p2.x) : verticalSlope;
         yIntercept = p1.y - slope * p1.x;
     }
 
-    linePoints() :
-        p1(Point2f()), p2(Point2f()) {}
+    linePoints() : p1(), p2() {}  // Default constructor
 
-    bool compare(const linePoints& mp) const {
-        return mp.p1.x == p1.x && mp.p1.y == p1.y && mp.p2.x == p2.x && mp.p2.y == p2.y;
+    bool compare(const linePoints& mp) const {  // Using const for non-modifying methods
+        return mp.p1 == p1 && mp.p2 == p2;
     }
 };
 
@@ -2606,6 +2605,69 @@ public:
 
 
 
+class CPP_Line_Basics : public algorithmCPP {
+public: 
+    Ptr<ximgproc::FastLineDetector> ld;
+    map<float, int> sortLength;
+    vector<linePoints> mpList;
+    vector<Point2f> ptList;
+    Rect subsetRect;
+    int options_lineLengthThreshold = 20;
+    // vector<tCell> tCells;
+    CPP_Line_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
+        subsetRect = Rect(0, 0, dst2.cols, dst2.rows);
+        traceName = "CPP_Line_Basics";
+        dst3 = Mat::zeros(dst3.size(), CV_8U);
+        ld = ximgproc::createFastLineDetector();
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present.";
+    }
+    void Run(Mat src) override {
+        if (src.channels() == 3) {
+            cvtColor(src, dst2, COLOR_BGR2GRAY);
+        }
+        else {
+            dst2 = src.clone();
+        }
+        if (dst2.type() != CV_8U) {
+            dst2.convertTo(dst2, CV_8U);
+        }
+        vector<Vec4f> lines;
+        ld->detect(dst2(subsetRect), lines);
+        sortLength.clear();
+        mpList.clear();
+        ptList.clear();
+       //  tCells.clear();
+        for (const Vec4f& v : lines) {
+            int x1 = v[0] + subsetRect.x, y1 = v[1] + subsetRect.y;
+            int x2 = v[2] + subsetRect.x, y2 = v[3] + subsetRect.y;
+            if (0 <= x1 && x1 < dst2.cols && 0 <= y1 && y1 < dst2.rows &&
+                0 <= x2 && x2 < dst2.cols && 0 <= y2 && y2 < dst2.rows) {
+                Point p1(x1, y1), p2(x2, y2);
+                if (norm(p1 - p2) >= options_lineLengthThreshold) {
+                    linePoints mps(p1, p2);
+                    mpList.push_back(mps);
+                    ptList.push_back(p1);
+                    ptList.push_back(p2);
+                    sortLength[norm(p1 - p2)] = int(mpList.size()) - 1;
+                    //tCells.push_back({ p1 });
+                    //tCells.push_back({ p2 });
+                }
+            }
+        }
+        dst2 = src.clone();
+        dst3.setTo(0);
+        for (const auto& nextLine : sortLength) {
+            const linePoints& mps = mpList[nextLine.second];
+            line(dst2, mps.p1, mps.p2, Scalar(255, 255, 255), task->lineWidth, task->lineType);
+            line(dst3, mps.p1, mps.p2, 255, task->lineWidth, task->lineType);
+        }
+        labels[2] = to_string(mpList.size()) + " lines were detected in the current frame";
+    }
+};
+
+
+
+
 
 
 class CPP_Edge_Segments : public algorithmCPP
@@ -2710,35 +2772,6 @@ public:
         }
     }
 };
-
-
-//class CPP_FeatureLess_Basics : public algorithmCPP
-//{
-//private:
-//public:
-//    CPP_Edge_Canny* edges;
-//    CPP_Distance_Basics* dist;
-//    int options_threshold = 10;
-//    CPP_FeatureLess_Basics(int rows, int cols) : algorithmCPP(rows, cols)
-//    {
-//        traceName = "CPP_FeatureLess_Basics";
-//        edges = new CPP_Edge_Canny(rows, cols);
-//        dist = new CPP_Distance_Basics(rows, cols);
-//        desc = "Find the top pixels in the distance algorithmCPP.";
-//    }
-//    void Run(Mat src)
-//    {
-//        edges->Run(src);
-//        bitwise_not(edges->dst2, dst0);
-//        dist->Run(dst0);
-//        threshold(dist->dst2, dst2, options_threshold, 255, THRESH_BINARY);
-//    }
-//};
-
-
-
-
-
 
 
 

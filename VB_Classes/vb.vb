@@ -579,6 +579,7 @@ End Class
 
 
 
+
 Public Structure cPoints
     Dim p1 As cv.Point
     Dim p2 As cv.Point

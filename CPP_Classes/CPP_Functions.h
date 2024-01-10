@@ -2,6 +2,7 @@
 enum functions
 {
     _CPP_AddWeighted_Basics,
+_CPP_Line_Basics,
     _CPP_Convex_Basics,
     _CPP_Resize_Preserve,
     _CPP_History_Basics,

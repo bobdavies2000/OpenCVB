@@ -34,6 +34,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case _CPP_AddWeighted_Basics :
     {task->alg = new CPP_AddWeighted_Basics(rows, cols); break; }
+	case _CPP_Line_Basics :
+	{task->alg = new CPP_Line_Basics(rows, cols); break; }
 	case _CPP_Convex_Basics :
 	{task->alg = new CPP_Convex_Basics(rows, cols); break; }
 	case _CPP_Resize_Preserve :

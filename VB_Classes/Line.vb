@@ -5,7 +5,6 @@ Public Class Line_Basics : Inherits VB_Algorithm
     Public mpList As New List(Of linePoints)
     Public ptList As New List(Of cv.Point2f)
     Public options As New Options_Line
-    Public extend As New LongLine_Extend
     Public skipDistanceCheck As Boolean
     Public subsetRect As cv.Rect
     Public tCells As New List(Of tCell)
@@ -50,8 +49,8 @@ Public Class Line_Basics : Inherits VB_Algorithm
 
         dst2 = src
         dst3.SetTo(0)
-        For Each line In sortLength
-            Dim mps = mpList(line.Value)
+        For Each nextLine In sortLength
+            Dim mps = mpList(nextLine.Value)
             dst2.Line(mps.p1, mps.p2, cv.Scalar.White, task.lineWidth, task.lineType)
             dst3.Line(mps.p1, mps.p2, 255, task.lineWidth, task.lineType)
         Next
