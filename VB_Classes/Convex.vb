@@ -109,11 +109,9 @@ End Class
 
 
 
-
 Public Class Convex_RedCloudDefects : Inherits VB_Algorithm
     Dim convex As New Convex_RedCloud
     Dim contours As New Contour_Largest
-    Dim resize As New Resize_Preserve
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         labels = {"", "", "Hull outline in green, lines show defects.", "Output of RedCloud_Basics"}
@@ -144,22 +142,16 @@ Public Class Convex_RedCloudDefects : Inherits VB_Algorithm
         Return newC
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static percentSlider = findSlider("Resize Percentage (%)")
-        Dim percent = (100 - percentSlider.value) / 100
-        Dim percentOffset = (100 - percentSlider.value) / 100 / 2
-        Dim rect = New cv.Rect(dst2.Width * percentOffset, dst2.Height * percentOffset, dst2.Width * percent, dst2.Height * percent)
-
         convex.Run(src)
-        dst0 = convex.redC.dst0
         dst1 = convex.redC.dst2
-        dst3 = convex.dst3
         labels(1) = convex.redC.labels(2)
+        dst3 = convex.dst3
 
         Dim rc = task.rcSelect
         If rc.mask Is Nothing Then Exit Sub
 
-        resize.Run(rc.mask.Resize(dst2.Size))
-        contours.Run(resize.dst2)
+        dst2 = rc.mask.Resize(dst2.Size, cv.InterpolationFlags.Nearest)
+        contours.Run(dst2)
         Dim c = contours.bestContour
 
         Dim hull = cv.Cv2.ConvexHull(c, False)
@@ -173,3 +165,8 @@ Public Class Convex_RedCloudDefects : Inherits VB_Algorithm
         vbDrawContour(dst2, rc.contour, cv.Scalar.Red)
     End Sub
 End Class
+
+
+
+
+
