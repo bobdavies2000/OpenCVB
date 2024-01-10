@@ -2607,36 +2607,6 @@ public:
 
 
 
-class CPP_FeatureLess_Basics : public algorithmCPP
-{
-private:
-public:
-    CPP_Edge_Canny* edges;
-    CPP_Distance_Basics* dist;
-    int options_threshold = 10;
-    CPP_FeatureLess_Basics(int rows, int cols) : algorithmCPP(rows, cols)
-    {
-        traceName = "CPP_FeatureLess_Basics";
-        edges = new CPP_Edge_Canny(rows, cols);
-        dist = new CPP_Distance_Basics(rows, cols);
-        desc = "Find the top pixels in the distance algorithmCPP.";
-    }
-    void Run(Mat src)
-    {
-        edges->Run(src);
-        bitwise_not(edges->dst2, dst0);
-        dist->Run(dst0);
-        threshold(dist->dst2, dst2, options_threshold, 255, THRESH_BINARY);
-    }
-};
-
-
-
-
-
-
-
-
 
 class CPP_Edge_Segments : public algorithmCPP
 {
@@ -2682,10 +2652,6 @@ public:
 
 
 
-
-
-
-
 class CPP_EdgeDraw_Basics : public algorithmCPP
 {
 private:
@@ -2721,6 +2687,55 @@ public:
         threshold(dst2, dst2, 0, 255, THRESH_BINARY);
     }
 };
+
+
+
+
+
+class CPP_FeatureLess_Basics : public algorithmCPP {
+public:
+    CPP_EdgeDraw_Basics* edgeD;
+    CPP_FeatureLess_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_FeatureLess_Basics";
+        edgeD = new CPP_EdgeDraw_Basics(rows, cols);
+        labels = { "", "", "EdgeDraw_Basics output", "" };
+        desc = "Access the EdgeDraw_Basics algorithm directly rather than through the CPP_Basics interface - more efficient";
+    }
+    void Run(Mat src) override {
+        edgeD->Run(src);
+        dst2 = edgeD->dst2;
+        if (standalone) {
+            dst3 = src.clone();
+            dst3.setTo(Scalar(0, 255, 255), dst2);
+        }
+    }
+};
+
+
+//class CPP_FeatureLess_Basics : public algorithmCPP
+//{
+//private:
+//public:
+//    CPP_Edge_Canny* edges;
+//    CPP_Distance_Basics* dist;
+//    int options_threshold = 10;
+//    CPP_FeatureLess_Basics(int rows, int cols) : algorithmCPP(rows, cols)
+//    {
+//        traceName = "CPP_FeatureLess_Basics";
+//        edges = new CPP_Edge_Canny(rows, cols);
+//        dist = new CPP_Distance_Basics(rows, cols);
+//        desc = "Find the top pixels in the distance algorithmCPP.";
+//    }
+//    void Run(Mat src)
+//    {
+//        edges->Run(src);
+//        bitwise_not(edges->dst2, dst0);
+//        dist->Run(dst0);
+//        threshold(dist->dst2, dst2, options_threshold, 255, THRESH_BINARY);
+//    }
+//};
+
+
 
 
 
