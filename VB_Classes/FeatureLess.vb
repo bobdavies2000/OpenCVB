@@ -23,7 +23,7 @@ End Class
 
 Public Class FeatureLess_BasicsAccum : Inherits VB_Algorithm
     Dim edgeD As New EdgeDraw_Basics
-    Dim sum8u As New History_Basics
+    Dim frames As New History_Basics
     Public Sub New()
         gOptions.FrameHistory.Value = 10
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -33,8 +33,8 @@ Public Class FeatureLess_BasicsAccum : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         edgeD.Run(src)
 
-        sum8u.Run(edgeD.dst2)
-        dst2 = sum8u.dst2
+        frames.Run(edgeD.dst2)
+        dst2 = frames.dst2
         If standalone Or testIntermediate(traceName) Then
             dst3 = src.Clone
             dst3.SetTo(cv.Scalar.Yellow, dst2)
@@ -412,7 +412,7 @@ End Class
 
 Public Class FeatureLess_History : Inherits VB_Algorithm
     Dim fLess As New FeatureLess_Basics
-    Dim sum8u As New History_Basics
+    Dim frames As New History_Basics
     Public Sub New()
         desc = "Accumulate the edges over a span of X images."
     End Sub
@@ -420,8 +420,8 @@ Public Class FeatureLess_History : Inherits VB_Algorithm
         fLess.Run(src)
         dst2 = fLess.dst2
 
-        sum8u.Run(dst2)
-        dst3 = sum8u.dst2
+        frames.Run(dst2)
+        dst3 = frames.dst2
     End Sub
 End Class
 

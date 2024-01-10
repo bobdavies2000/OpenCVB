@@ -326,7 +326,7 @@ End Class
 
 Public Class RedMin_Gaps : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
-    Dim sum8u As New History_Basics
+    Dim frames As New History_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         advice = ""
@@ -337,8 +337,8 @@ Public Class RedMin_Gaps : Inherits VB_Algorithm
         dst2 = rMin.dst3
         labels(2) = rMin.labels(3)
 
-        sum8u.Run(rMin.dst2.InRange(0, 0))
-        dst3 = sum8u.dst2
+        frames.Run(rMin.dst2.InRange(0, 0))
+        dst3 = frames.dst2
 
         If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
 

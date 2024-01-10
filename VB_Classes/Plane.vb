@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 ' http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 Public Class Plane_Basics : Inherits VB_Algorithm
-    Dim sum32f As New History_Basics
+    Dim frames As New History_Basics
     Public Sub New()
         labels = {"", "Top down mask after after thresholding heatmap", "Vertical regions", "Horizontal regions"}
         desc = "Find the regions that are mostly vertical and mostly horizontal."
@@ -15,8 +15,8 @@ Public Class Plane_Basics : Inherits VB_Algorithm
         dst1.ConvertTo(dst1, cv.MatType.CV_32F)
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, topBackP, task.rangesTop)
 
-        sum32f.Run(topBackP)
-        sum32f.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        frames.Run(topBackP)
+        frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
         dst3 = Not dst2
         dst3.SetTo(0, task.noDepthMask)
@@ -464,7 +464,6 @@ End Class
 
 Public Class Plane_Verticals : Inherits VB_Algorithm
     Dim solo As New PointCloud_Solo
-    Dim sum32 As New History_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         labels = {"RGB image with highlights for likely vertical surfaces over X frames.",
@@ -474,16 +473,16 @@ Public Class Plane_Verticals : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         solo.Run(src)
-        dst3 = solo.heat.topSum.dst2.InRange(task.redThresholdTop * task.frameHistoryCount, dst2.Total)
+        dst3 = solo.heat.topframes.dst2.InRange(task.redThresholdTop * task.frameHistoryCount, dst2.Total)
 
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, 0)
         solo.heat.dst0.CopyTo(dst1, dst3)
 
         'cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, dst2, task.rangesTop)
 
-        'sum32.Run(dst2)
-        'sum32.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        'dst2 = sum32.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        'frames.Run(dst2)
+        'frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        'dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         'dst2.ConvertTo(dst0, cv.MatType.CV_8U)
         'task.color.SetTo(cv.Scalar.White, dst0)
 
@@ -498,7 +497,7 @@ End Class
 
 Public Class Plane_Horizontals : Inherits VB_Algorithm
     Dim solo As New PointCloud_Solo
-    Dim sum32 As New History_Basics
+    Dim frames As New History_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         labels = {"RGB image with highlights for likely floor or ceiling over X frames.",
@@ -508,16 +507,16 @@ Public Class Plane_Horizontals : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         solo.Run(src)
-        dst3 = solo.heat.sideSum.dst2.InRange(task.redThresholdSide * task.frameHistoryCount, dst2.Total)
+        dst3 = solo.heat.sideframes.dst2.InRange(task.redThresholdSide * task.frameHistoryCount, dst2.Total)
 
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, 0)
         solo.heat.dst1.CopyTo(dst1, dst3)
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, dst1, dst2, task.rangesSide)
 
-        sum32.Run(dst2)
-        sum32.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst2 = sum32.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        frames.Run(dst2)
+        frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         dst2.ConvertTo(dst0, cv.MatType.CV_8U)
         task.color.SetTo(cv.Scalar.White, dst0)
 
@@ -533,7 +532,7 @@ End Class
 
 Public Class Plane_SoloPoints : Inherits VB_Algorithm
     Dim solo As New PointCloud_Solo
-    Dim sum32 As New History_Basics
+    Dim frames As New History_Basics
     Public Sub New()
         labels = {"", "", "Solo points in top view", "Solo points in side view"}
         desc = "Backproject the points in the PointCloud_Solo output into the src view - incomplete!"
@@ -545,8 +544,8 @@ Public Class Plane_SoloPoints : Inherits VB_Algorithm
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, dst0, task.rangesTop)
 
-        sum32.Run(dst0)
-        'sum32.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        frames.Run(dst0)
+        'frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
         'dst2 = dst2.Threshold(task.frameHistoryCount, 255, cv.ThresholdTypes.Binary)
         'task.color.SetTo(cv.Scalar.White, dst2)
     End Sub

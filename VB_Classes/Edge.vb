@@ -1096,33 +1096,23 @@ End Class
 
 
 
-
-
 Public Class Edge_MotionFrames : Inherits VB_Algorithm
     Dim edges As New Edge_Canny
+    Dim frames As New History_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels = {"", "", "The multi-frame edges output", "The Edge_Canny output for the last frame only"}
+        findSlider("Canny threshold1").Value = 50
+        findSlider("Canny threshold2").Value = 50
         desc = "Collect edges over several frames controlled with global frame history"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static frames As New List(Of cv.Mat)
-        If task.optionsChanged Then frames.Clear()
-
         edges.Run(src)
+        dst3 = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        dst1 = edges.dst2.Threshold(0, 255 / task.frameHistoryCount, cv.ThresholdTypes.Binary)
-        dst2 += dst1
-        frames.Add(dst1)
-        If frames.Count >= task.frameHistoryCount Then
-            dst2 -= frames.ElementAt(0)
-            frames.RemoveAt(0)
-        End If
-        dst3 = edges.dst2
+        frames.Run(edges.dst2)
+        dst2 = frames.dst2
     End Sub
 End Class
-
-
 
 
 
@@ -1148,11 +1138,6 @@ Public Class Edge_MotionAccum : Inherits VB_Algorithm
         labels(3) = motion.labels(2)
     End Sub
 End Class
-
-
-
-
-
 
 
 

@@ -197,14 +197,14 @@ End Class
 
 Public Class Diff_DepthAccum : Inherits VB_Algorithm
     Dim diff As New Diff_Depth
-    Dim sum8u As New History_Basics
+    Dim frames As New History_Basics
     Public Sub New()
         desc = "Accumulate the mask of depth differences."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         diff.Run(src)
-        sum8u.Run(diff.dst2)
-        dst2 = sum8u.dst2
+        frames.Run(diff.dst2)
+        dst2 = frames.dst2
         labels = diff.labels
     End Sub
 End Class

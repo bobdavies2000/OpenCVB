@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class HeatMap_Basics : Inherits VB_Algorithm
-    Public topSum As New History_Basics
-    Public sideSum As New History_Basics
+    Public topframes As New History_Basics
+    Public sideframes As New History_Basics
     Public histogramTop As New cv.Mat
     Public histogramSide As New cv.Mat
     Dim options As New Options_HeatMap
@@ -19,11 +19,11 @@ Public Class HeatMap_Basics : Inherits VB_Algorithm
         cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, histogramSide, 2, task.bins2D, task.rangesSide)
         histogramSide.Col(0).SetTo(0)
 
-        topSum.Run(histogramTop)
-        dst0 = topSum.dst2
+        topframes.Run(histogramTop)
+        dst0 = topframes.dst2
 
-        sideSum.Run(histogramSide)
-        dst1 = sideSum.dst2
+        sideframes.Run(histogramSide)
+        dst1 = sideframes.dst2
 
         dst2 = vbPalette(dst0.ConvertScaleAbs())
         dst3 = vbPalette(dst1.ConvertScaleAbs())

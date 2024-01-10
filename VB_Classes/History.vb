@@ -93,7 +93,7 @@ End Class
 
 
 Public Class History_Cloud : Inherits VB_Algorithm
-    Public sum8u As New History_BasicsNoSaturation
+    Public frames As New History_BasicsNoSaturation
     Public Sub New()
         desc = "Create a frame history and sum the last X task.pointcloud's"
     End Sub
@@ -116,8 +116,8 @@ Public Class History_Cloud : Inherits VB_Algorithm
         dst3 = src + dst3
         dst2 = dst3 / saveFrames.Count
 
-        sum8u.Run(task.depthMask)
-        dst2.SetTo(0, Not sum8u.dst2)
+        frames.Run(task.depthMask)
+        dst2.SetTo(0, Not frames.dst2)
     End Sub
 End Class
 
@@ -161,7 +161,7 @@ End Class
 
 
 Public Class History_BasicsDiff : Inherits VB_Algorithm
-    Dim sum8u As New History_BasicsNoSaturation
+    Dim frames As New History_BasicsNoSaturation
     Dim diff As New Diff_Basics
     Public Sub New()
         gOptions.PixelDiffThreshold.Value = 0
@@ -169,10 +169,10 @@ Public Class History_BasicsDiff : Inherits VB_Algorithm
         desc = "Find the floodfill trouble spots."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        sum8u.Run(src)
-        dst2 = vbPalette(sum8u.dst2)
+        frames.Run(src)
+        dst2 = vbPalette(frames.dst2)
 
-        diff.Run(sum8u.dst2)
+        diff.Run(frames.dst2)
         dst3 = diff.dst2
     End Sub
 End Class

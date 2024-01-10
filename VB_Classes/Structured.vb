@@ -875,7 +875,7 @@ Public Class Structured_SliceXPlot : Inherits VB_Algorithm
         Dim col = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
 
         Dim rect = New cv.Rect(col, 0, If(col + options.cushion >= dst3.Width, dst3.Width - col, options.cushion), dst3.Height - 1)
-        Dim mm = vbMinMax(multi.heat.topSum.dst2(rect))
+        Dim mm = vbMinMax(multi.heat.topframes.dst2(rect))
 
         dst3.Circle(New cv.Point(col, mm.maxLoc.Y), task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
 
@@ -913,7 +913,7 @@ Public Class Structured_SliceYPlot : Inherits VB_Algorithm
         Dim row = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
 
         Dim rect = New cv.Rect(0, row, dst3.Width - 1, If(row + options.cushion >= dst3.Height, dst3.Height - row, options.cushion))
-        Dim mm = vbMinMax(multi.heat.sideSum.dst2(rect))
+        Dim mm = vbMinMax(multi.heat.sideframes.dst2(rect))
 
         If mm.maxVal > 0 Then
             dst3.Circle(New cv.Point(mm.maxLoc.X, row), task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)

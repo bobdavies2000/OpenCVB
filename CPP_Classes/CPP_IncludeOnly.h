@@ -1273,33 +1273,6 @@ public:
 
 
 
-// https://docs.opencv.org/4.x/da/d22/tutorial_py_canny.html
-class CPP_Edge_Canny : public algorithmCPP {
-public:
-    CPP_Edge_Canny(int rows, int cols) : algorithmCPP(rows, cols) {
-        traceName = "CPP_Edge_Canny";
-        desc = "Show canny edge detection with varying thresholds";
-    }
-
-    void Run(Mat src) {
-        int threshold1 = 50;
-        int threshold2 = 50;
-        int aperture = 3;
-
-        if (src.channels() == 3) {
-            cvtColor(src, src, COLOR_BGR2GRAY);
-        }
-
-        if (src.depth() != CV_8U) {
-            src.convertTo(src, CV_8U);
-        }
-
-        Canny(src, dst2, threshold1, threshold2, aperture, true);
-    }
-};
-
-
-
 
 
 class CPP_Edge_Scharr : public algorithmCPP {
@@ -2466,88 +2439,55 @@ public:
 
 
 
-//class CPP_Motion_Basics : public algorithmCPP
-//{
-//private:
-//public:
-//    CPP_Diff_Basics* diff;
-//    int changedPixels;
-//    int cumulativePixels;
-//    bool resetAll = true;
-//    CPP_Motion_Basics(int rows, int cols) : algorithmCPP(rows, cols)
-//    {
-//        traceName = "CPP_Motion_Basics";
-//        diff = new CPP_Diff_Basics(rows, cols);
-//        task->pixelDiffThreshold = 25;
-//        dst3 = Mat(dst3.size(), CV_8U);
-//        dst3.setTo(0);
-//        desc = "Detect contours in the motion data and the resulting rectangles";
-//    }
-//    void Run(Mat src)
-//    {
-//        auto percentOfImage = float(10.0f / 100.0f);
-//        static auto saveFrameCount = task->frameCount;
-//        if (saveFrameCount != task->frameCount)
-//        {
-//            saveFrameCount = task->frameCount;
-//            if (src.channels() != 1) cvtColor(src, src, COLOR_BGR2GRAY);
-//            diff->Run(src);
-//            dst2 = diff->dst3;
-//            changedPixels = diff->changedPixels;
-//            if (changedPixels > 0)
-//            {
-//                cumulativePixels += changedPixels;
-//                resetAll = cumulativePixels / src.total() > percentOfImage || changedPixels > dst2.total() / 16 || task->optionsChanged;
-//                if (resetAll || task->heartBeat)
-//                {
-//                    dst2.copyTo(dst3);
-//                    cumulativePixels = 0;
-//                }
-//                else
-//                {
-//                    dst3.setTo(255, dst2);
-//                }
-//            }
-//            auto threshold = src.total() * 10 / 100;
-//            auto strOut = "Cumulative threshold = " + to_string(int(threshold / 1000)) + "k";
-//            strOut += "Current cumulative pixels changed = " + to_string(int(cumulativePixels / 1000)) + "k" + "/n";
-//            labels[2] = strOut;
-//        }
-//    }
-//};
+// https://docs.opencv.org/4.x/da/d22/tutorial_py_canny.html
+class CPP_Edge_Canny : public algorithmCPP {
+public:
+    CPP_Edge_Canny(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_Edge_Canny";
+        desc = "Show canny edge detection with varying thresholds";
+    }
+
+    void Run(Mat src) {
+        int threshold1 = 50;
+        int threshold2 = 50;
+        int aperture = 3;
+
+        if (src.channels() == 3) {
+            cvtColor(src, src, COLOR_BGR2GRAY);
+        }
+
+        if (src.depth() != CV_8U) {
+            src.convertTo(src, CV_8U);
+        }
+
+        Canny(src, dst2, threshold1, threshold2, aperture, true);
+    }
+};
 
 
 
 
 
-
-
-
-class CPP_Edge_MotionAccum : public algorithmCPP
-{
-private:
+class CPP_Edge_MotionAccum : public algorithmCPP {
 public:
     CPP_Edge_Canny* edges;
     CPP_Motion_Basics* motion;
     float percentMotion;
-    CPP_Edge_MotionAccum(int rows, int cols) : algorithmCPP(rows, cols)
-    {
+    CPP_Edge_MotionAccum(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Edge_MotionAccum";
         edges = new CPP_Edge_Canny(rows, cols);
         motion = new CPP_Motion_Basics(rows, cols);
-        dst2 = Mat(dst2.size(), CV_8U);
-        dst2.setTo(0);
+        dst2 = Mat::zeros(dst2.size(), CV_8U);
         labels = { "", "", "Accumulated edges tempered by motion thresholds", "" };
         desc = "Accumulate edges and use motion to clear";
     }
-    void Run(Mat src)
-    {
-        //if (task->optionsChanged) motion->resetAll = true;
-        //motion->Run(src);
-        //if (motion->resetAll || task->heartBeat) dst2.setTo(0);
-        //edges->Run(src);
-        //dst2.setTo(255, edges->dst2);
-        //labels[3] = motion->labels[2];
+    void Run(Mat src) override {
+        if (task->optionsChanged) task->motionReset = true;
+        motion->Run(src);
+        if (task->frameCount % task->frameHistoryCount == 0) dst2.setTo(0);
+        edges->Run(src);
+        dst2.setTo(255, edges->dst2);
+        labels[3] = motion->labels[2];
     }
 };
 
@@ -2556,38 +2496,62 @@ public:
 
 
 
-
-class CPP_Edge_MotionFrames : public algorithmCPP
-{
-private:
+class CPP_Edge_MotionFrames : public algorithmCPP {
 public:
     CPP_Edge_Canny* edges;
-    CPP_Edge_MotionFrames(int rows, int cols) : algorithmCPP(rows, cols)
-    {
+    CPP_History_Basics* frames;
+    CPP_Edge_MotionFrames(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Edge_MotionFrames";
         edges = new CPP_Edge_Canny(rows, cols);
-        dst2 = Mat(dst2.size(), CV_8U);
-        dst2.setTo(0);
+        frames = new CPP_History_Basics(rows, cols);
         labels = { "", "", "The multi-frame edges output", "The Edge_Canny output for the last frame only" };
         desc = "Collect edges over several frames controlled with global frame history";
     }
-    void Run(Mat src)
-    {
-        static vector<Mat> frames;
-        auto fCount = task->frameHistoryCount;
-        if (task->optionsChanged) frames.clear();
+    void Run(Mat src) override {
         edges->Run(src);
-        threshold(edges->dst2, dst1, 0, 255.0f / fCount, THRESH_BINARY);
-        dst2 += dst1;
-        frames.push_back(dst1);
-        if (frames.size() >= fCount)
-        {
-            dst2 -= frames[0];
-            frames.erase(frames.begin());
-        }
-        dst3 = edges->dst2;
+        threshold(edges->dst2, dst3, 0, 255, THRESH_BINARY);
+        frames->Run(edges->dst2);
+        dst2 = frames->dst2;
     }
 };
+
+
+
+
+
+
+
+//class CPP_Edge_MotionFrames : public algorithmCPP
+//{
+//private:
+//public:
+//    CPP_Edge_Canny* edges;
+//    CPP_Edge_MotionFrames(int rows, int cols) : algorithmCPP(rows, cols)
+//    {
+//        traceName = "CPP_Edge_MotionFrames";
+//        edges = new CPP_Edge_Canny(rows, cols);
+//        dst2 = Mat(dst2.size(), CV_8U);
+//        dst2.setTo(0);
+//        labels = { "", "", "The multi-frame edges output", "The Edge_Canny output for the last frame only" };
+//        desc = "Collect edges over several frames controlled with global frame history";
+//    }
+//    void Run(Mat src)
+//    {
+//        static vector<Mat> frames;
+//        auto fCount = task->frameHistoryCount;
+//        if (task->optionsChanged) frames.clear();
+//        edges->Run(src);
+//        threshold(edges->dst2, dst1, 0, 255.0f / fCount, THRESH_BINARY);
+//        dst2 += dst1;
+//        frames.push_back(dst1);
+//        if (frames.size() >= fCount)
+//        {
+//            dst2 -= frames[0];
+//            frames.erase(frames.begin());
+//        }
+//        dst3 = edges->dst2;
+//    }
+//};
 
 
 

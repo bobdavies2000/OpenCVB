@@ -1696,16 +1696,16 @@ End Class
 
 
 Public Class OpenGL_CloudMisses : Inherits VB_Algorithm
-    Dim sum8u As New History_Basics
+    Dim frames As New History_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         labels = {"", "", "Point cloud after over the last X frames", ""}
         desc = "Run OpenGL removing all pixels not present for all X frames"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        sum8u.Run(task.depthMask / 255)
-        dst2 = sum8u.dst2
-        dst2 = dst2.Threshold(sum8u.saveFrames.Count - 1, 255, cv.ThresholdTypes.Binary)
+        frames.Run(task.depthMask / 255)
+        dst2 = frames.dst2
+        dst2 = dst2.Threshold(frames.saveFrames.Count - 1, 255, cv.ThresholdTypes.Binary)
 
         task.ogl.pointCloudInput.SetTo(0)
         task.pointCloud.CopyTo(task.ogl.pointCloudInput, dst2)

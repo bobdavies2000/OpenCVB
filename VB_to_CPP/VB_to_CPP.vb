@@ -95,7 +95,7 @@ Public Class VB_to_CPP
                 End If
             End If
 
-            If split(i).Contains("CPP_") = False Then
+            If split(i).Contains("CPP_") = False And Trim(split(i)).StartsWith("labels") = False Then
                 For Each func In functions
                     If split(i).Contains(func) And functionName.Contains(func) = False Then
                         Dim nextLine = Trim(split(i))
@@ -111,7 +111,6 @@ Public Class VB_to_CPP
             For Each obj In objectNames
                 split(i) = split(i).Replace(obj + ".", obj + "->")
             Next
-
 
             split(i) = split(i).Replace("gOptions.FrameHistory.Value", "task->frameHistoryCount")
             split(i) = split(i).Replace("gOptions.PixelDiffThreshold.Value", "task->pixelDiffThreshold")
