@@ -34,6 +34,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case _CPP_AddWeighted_Basics :
     {task->alg = new CPP_AddWeighted_Basics(rows, cols); break; }
+	case _CPP_Resize_Preserve :
+	{task->alg = new CPP_Resize_Preserve(rows, cols); break; } 
 	case _CPP_History_Basics :
 	{task->alg = new CPP_History_Basics(rows, cols); break; }
 	case _CPP_Motion_Core :
@@ -128,8 +130,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 	{task->alg = new CPP_Edge_MotionAccum(rows, cols);break;}
 	case _CPP_Edge_MotionFrames :
 	{task->alg = new CPP_Edge_MotionFrames(rows, cols);break;}
-	case _CPP_EdgePreserving_Basics :
-	{task->alg = new CPP_EdgePreserving_Basics(rows, cols);break;}
+	case _CPP_Edge_Preserving:
+	{task->alg = new CPP_Edge_Preserving(rows, cols);break;}
 	case _CPP_EdgeDraw_Basics :
 	{task->alg = new CPP_EdgeDraw_Basics(rows, cols);break;}
 	case _CPP_TEE_Basics :

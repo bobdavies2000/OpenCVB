@@ -2,6 +2,7 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
+_CPP_Resize_Preserve
 _CPP_History_Basics
 _CPP_Motion_Core
 _CPP_Histogram_Kalman
@@ -48,7 +49,7 @@ _CPP_Edge_Segments
 _CPP_Motion_Basics
 _CPP_Edge_MotionAccum
 _CPP_Edge_MotionFrames
-_CPP_EdgePreserving_Basics
+_CPP_Edge_Preserving
 _CPP_EdgeDraw_Basics
 _CPP_TEE_Basics
 _CPP_RedCloud_Hulls
@@ -283,11 +284,11 @@ if algorithmName = "CPP_Distance_Basics" Then return new CPP_Basics(functionName
 if algorithmName = "CPP_Edge_Canny" Then return new CPP_Basics(functionNames._CPP_Edge_Canny)
 if algorithmName = "CPP_Edge_MotionAccum" Then return new CPP_Basics(functionNames._CPP_Edge_MotionAccum)
 if algorithmName = "CPP_Edge_MotionFrames" Then return new CPP_Basics(functionNames._CPP_Edge_MotionFrames)
+if algorithmName = "CPP_Edge_Preserving" Then return new CPP_Basics(functionNames._CPP_Edge_Preserving)
 if algorithmName = "CPP_Edge_Scharr" Then return new CPP_Basics(functionNames._CPP_Edge_Scharr)
 if algorithmName = "CPP_Edge_Segments" Then return new CPP_Basics(functionNames._CPP_Edge_Segments)
 if algorithmName = "CPP_Edge_Sobel" Then return new CPP_Basics(functionNames._CPP_Edge_Sobel)
 if algorithmName = "CPP_EdgeDraw_Basics" Then return new CPP_Basics(functionNames._CPP_EdgeDraw_Basics)
-if algorithmName = "CPP_EdgePreserving_Basics" Then return new CPP_Basics(functionNames._CPP_EdgePreserving_Basics)
 if algorithmName = "CPP_Feature_Agast" Then return new CPP_Basics(functionNames._CPP_Feature_Agast)
 if algorithmName = "CPP_Feature_Basics" Then return new CPP_Basics(functionNames._CPP_Feature_Basics)
 if algorithmName = "CPP_FeatureLess_Basics" Then return new CPP_Basics(functionNames._CPP_FeatureLess_Basics)
@@ -317,6 +318,7 @@ if algorithmName = "CPP_RedCloud_Flood" Then return new CPP_Basics(functionNames
 if algorithmName = "CPP_RedCloud_Hulls" Then return new CPP_Basics(functionNames._CPP_RedCloud_Hulls)
 if algorithmName = "CPP_Remap_Basics" Then return new CPP_Basics(functionNames._CPP_Remap_Basics)
 if algorithmName = "CPP_Resize_Basics" Then return new CPP_Basics(functionNames._CPP_Resize_Basics)
+if algorithmName = "CPP_Resize_Preserve" Then return new CPP_Basics(functionNames._CPP_Resize_Preserve)
 if algorithmName = "CPP_Stable_Basics" Then return new CPP_Basics(functionNames._CPP_Stable_Basics)
 if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(functionNames._CPP_Stable_BasicsCount)
 if algorithmName = "CPP_TEE_Basics" Then return new CPP_Basics(functionNames._CPP_TEE_Basics)

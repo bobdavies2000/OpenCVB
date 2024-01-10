@@ -120,6 +120,7 @@ vector<string> mapNames = { "Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "
 enum functions
 {
     _CPP_AddWeighted_Basics,
+_CPP_Resize_Preserve,
 _CPP_History_Basics,
     _CPP_Motion_Core,
 _CPP_Histogram_Kalman,
@@ -166,7 +167,7 @@ _CPP_FPoly_TopFeatures,
     _CPP_Motion_Basics,
     _CPP_Edge_MotionAccum,
     _CPP_Edge_MotionFrames,
-    _CPP_EdgePreserving_Basics,
+    _CPP_Edge_Preserving,
     _CPP_EdgeDraw_Basics,
     _CPP_TEE_Basics,
     _CPP_RedCloud_Hulls,
@@ -2519,73 +2520,24 @@ public:
 
 
 
-
-
-//class CPP_Edge_MotionFrames : public algorithmCPP
-//{
-//private:
-//public:
-//    CPP_Edge_Canny* edges;
-//    CPP_Edge_MotionFrames(int rows, int cols) : algorithmCPP(rows, cols)
-//    {
-//        traceName = "CPP_Edge_MotionFrames";
-//        edges = new CPP_Edge_Canny(rows, cols);
-//        dst2 = Mat(dst2.size(), CV_8U);
-//        dst2.setTo(0);
-//        labels = { "", "", "The multi-frame edges output", "The Edge_Canny output for the last frame only" };
-//        desc = "Collect edges over several frames controlled with global frame history";
-//    }
-//    void Run(Mat src)
-//    {
-//        static vector<Mat> frames;
-//        auto fCount = task->frameHistoryCount;
-//        if (task->optionsChanged) frames.clear();
-//        edges->Run(src);
-//        threshold(edges->dst2, dst1, 0, 255.0f / fCount, THRESH_BINARY);
-//        dst2 += dst1;
-//        frames.push_back(dst1);
-//        if (frames.size() >= fCount)
-//        {
-//            dst2 -= frames[0];
-//            frames.erase(frames.begin());
-//        }
-//        dst3 = edges->dst2;
-//    }
-//};
-
-
-
-
-
-
-
-
-
-
-
-class CPP_EdgePreserving_Basics : public algorithmCPP
-{
-private:
+class CPP_Edge_Preserving : public algorithmCPP {
 public:
-    CPP_Diff_Basics* diff;
-    CPP_EdgePreserving_Basics(int rows, int cols) : algorithmCPP(rows, cols)
-    {
-        diff = new CPP_Diff_Basics(rows, cols);
-        traceName = "CPP_EdgePreserving_Basics";
-        labels[2] = "Output of the EdgePreserving Filter - draw anywhere to test more";
-        task->drawRect = Rect(100, 100, 50, 50);
-        desc = "Example using the OpenCV ximgproc extention for edge preserving filter";
+    int sigma_s = 10;
+    double sigma_r = 40;
+    CPP_Edge_Preserving(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_Edge_Preserving";
+        task->drawRect = Rect(50, 50, 25, 25);
+        labels = { "", "", "", "Edge preserving blur for BGR depth image above" };
+        desc = "OpenCV's edge preserving filter.";
     }
-    void Run(Mat src)
-    {
+    void Run(Mat src) override {
         dst2 = src;
-
-        if (task->drawRect.width == 0) task->drawRect = Rect(100, 100, 50, 50);
-        Mat small = src(task->drawRect);
-
-        ximgproc::edgePreservingFilter(small, dst2(task->drawRect), 9, 20);
+        dst3 = task->depthRGB;
+        edgePreservingFilter(dst2(task->drawRect), dst2(task->drawRect), sigma_s, sigma_r);
+        edgePreservingFilter(task->depthRGB(task->drawRect), dst3(task->drawRect), sigma_s, sigma_r);
     }
 };
+
 
 
 
@@ -2695,6 +2647,32 @@ public:
     }
 };
 
+
+
+
+class CPP_Resize_Preserve : public algorithmCPP {
+public:
+    int options_resizePercent = 120;
+    int options_topLeftOffset = 10;
+    InterpolationFlags options_warpFlag = INTER_NEAREST; 
+    Size newSize;
+    CPP_Resize_Preserve(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_Resize_Preserve";
+
+        desc = "Decrease the size but preserve the full image size.";
+    }
+    void Run(Mat src) override {
+        newSize = Size(ceil(src.cols * options_resizePercent / 100.0),
+        ceil(src.rows * options_resizePercent / 100.0));
+        Mat dst0;
+        resize(src, dst0, newSize, 0, 0, INTER_NEAREST);
+        dst0.setTo(0);
+        Rect rect(options_topLeftOffset, options_topLeftOffset, src.cols, src.rows);
+        src.copyTo(dst0(rect));
+        resize(dst0, dst2, dst2.size(), 0, 0, options_warpFlag);
+        labels[2] = "Image after resizing to: " + to_string(newSize.width) + "X" + to_string(newSize.height);
+    }
+};
 
 
 
