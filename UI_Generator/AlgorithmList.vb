@@ -2,6 +2,7 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
+_CPP_Convex_Basics
 _CPP_Resize_Preserve
 _CPP_History_Basics
 _CPP_Motion_Core
@@ -51,12 +52,9 @@ _CPP_Edge_MotionAccum
 _CPP_Edge_MotionFrames
 _CPP_Edge_Preserving
 _CPP_EdgeDraw_Basics
-_CPP_TEE_Basics
-_CPP_RedCloud_Hulls
 _CPP_Distance_Basics
 _CPP_FeatureLess_Basics
 _CPP_FeatureLess_Edge
-_CPP_RedCloud_FeatureLess2
 _CPP_Stable_BasicsCount
 End Enum
 Public Function createAlgorithm( algorithmName as string) As Object
@@ -273,6 +271,7 @@ if algorithmName = "CPP_BackProject_Basics" Then return new CPP_Basics(functionN
 if algorithmName = "CPP_Bezier_Basics" Then return new CPP_Basics(functionNames._CPP_Bezier_Basics)
 if algorithmName = "CPP_Binarize_Simple" Then return new CPP_Basics(functionNames._CPP_Binarize_Simple)
 if algorithmName = "CPP_Contour_Largest" Then return new CPP_Basics(functionNames._CPP_Contour_Largest)
+if algorithmName = "CPP_Convex_Basics" Then return new CPP_Basics(functionNames._CPP_Convex_Basics)
 if algorithmName = "CPP_Delaunay_Basics" Then return new CPP_Basics(functionNames._CPP_Delaunay_Basics)
 if algorithmName = "CPP_Delaunay_Generations" Then return new CPP_Basics(functionNames._CPP_Delaunay_Generations)
 if algorithmName = "CPP_Delaunay_GenerationsNoKNN" Then return new CPP_Basics(functionNames._CPP_Delaunay_GenerationsNoKNN)
@@ -313,15 +312,12 @@ if algorithmName = "CPP_Random_Enumerable" Then return new CPP_Basics(functionNa
 if algorithmName = "CPP_Rectangle_Basics" Then return new CPP_Basics(functionNames._CPP_Rectangle_Basics)
 if algorithmName = "CPP_Rectangle_Rotated" Then return new CPP_Basics(functionNames._CPP_Rectangle_Rotated)
 if algorithmName = "CPP_RedCloud_Core" Then return new CPP_Basics(functionNames._CPP_RedCloud_Core)
-if algorithmName = "CPP_RedCloud_FeatureLess2" Then return new CPP_Basics(functionNames._CPP_RedCloud_FeatureLess2)
 if algorithmName = "CPP_RedCloud_Flood" Then return new CPP_Basics(functionNames._CPP_RedCloud_Flood)
-if algorithmName = "CPP_RedCloud_Hulls" Then return new CPP_Basics(functionNames._CPP_RedCloud_Hulls)
 if algorithmName = "CPP_Remap_Basics" Then return new CPP_Basics(functionNames._CPP_Remap_Basics)
 if algorithmName = "CPP_Resize_Basics" Then return new CPP_Basics(functionNames._CPP_Resize_Basics)
 if algorithmName = "CPP_Resize_Preserve" Then return new CPP_Basics(functionNames._CPP_Resize_Preserve)
 if algorithmName = "CPP_Stable_Basics" Then return new CPP_Basics(functionNames._CPP_Stable_Basics)
 if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(functionNames._CPP_Stable_BasicsCount)
-if algorithmName = "CPP_TEE_Basics" Then return new CPP_Basics(functionNames._CPP_TEE_Basics)
 if algorithmName = "Crypto_Hash" Then return new Crypto_Hash
 if algorithmName = "CSV_Basics" Then return new CSV_Basics
 if algorithmName = "DCT_Basics" Then return new DCT_Basics

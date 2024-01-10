@@ -46,7 +46,7 @@ Public Class VB_to_CPP
     End Sub
     Private Sub PrepareCPP_Click(sender As Object, e As EventArgs) Handles PrepareCPP.Click
         ' read all the existing CPP_ algorithms so names can be recognized when parsing the new algorithm.
-        Dim Input = New FileInfo("../../CPP_Classes/CPP_IncludeOnly.h")
+        Dim Input = New FileInfo("../../CPP_Classes/CPP_Functions.h")
         Dim includeOnly = File.ReadAllLines(Input.FullName)
         Dim functions As New List(Of String)
         For Each line In includeOnly
@@ -112,6 +112,7 @@ Public Class VB_to_CPP
                 split(i) = split(i).Replace(obj + ".", obj + "->")
             Next
 
+            split(i) = split(i).Replace("vbDrawContour", "task->drawContour")
             split(i) = split(i).Replace("gOptions.FrameHistory.Value", "task->frameHistoryCount")
             split(i) = split(i).Replace("gOptions.PixelDiffThreshold.Value", "task->pixelDiffThreshold")
             split(i) = split(i).Replace("initRandomRect(", "task->initRandomRect(")
@@ -156,7 +157,7 @@ Public Class VB_to_CPP
         Next
         sw.Close()
 
-        input = New FileInfo("../../CPP_Classes/CPP_IncludeOnly.h")
+        input = New FileInfo("../../CPP_Classes/CPP_Functions.h")
         Dim includeOnly = File.ReadAllLines(input.FullName)
         sw = New StreamWriter(input.FullName)
         For Each line In includeOnly

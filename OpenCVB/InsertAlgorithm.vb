@@ -17,8 +17,7 @@ Public Class InsertAlgorithm
         addCPP = 2
         addCS = 3
         addPyStream = 4
-        addIncludeOnly = 5
-        addOpenGL = 6
+        addOpenGL = 5
     End Enum
     Private Function nextAlgorithm(algorithmType As algType) As Boolean
         If InStr(AlgorithmName.Text, "_") = False Then
@@ -59,16 +58,6 @@ Public Class InsertAlgorithm
 
                 ret = MsgBox("Would you like to add the PyStream algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + vbCrLf + vbCrLf +
                              " to: " + vbCrLf + vbCrLf + "Python File: " + PyStreamOutputName.Name, MsgBoxStyle.OkCancel)
-
-            Case algType.addIncludeOnly
-                If split.Length <> 3 Then
-                    MsgBox("The algorithm name must be of the form 'CPP_ModuleName_ClassName', i.e. CPP_TEE_Basics")
-                    Return False
-                End If
-
-                IncludeOnlyOutputName = New FileInfo("..\..\CPP_Classes\CPP_IncludeOnly.h")
-                ret = MsgBox("Would you like to add " + AlgorithmName.Text + " to: " + vbCrLf + vbCrLf +
-                             IncludeOnlyOutputName.Name, MsgBoxStyle.OkCancel)
 
             Case algType.addOpenGL
                 VBoutputName = New FileInfo("..\..\VB_Classes\OpenGL.vb")
@@ -312,66 +301,5 @@ Public Class InsertAlgorithm
     End Sub
     Private Sub InsertAlgorithm_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.Escape Then Me.Close()
-    End Sub
-
-    Private Sub AddIncludeOnly_Click(sender As Object, e As EventArgs) Handles AddIncludeOnly.Click
-        If AlgorithmName.Text.StartsWith("cpp_") Then AlgorithmName.Text = AlgorithmName.Text.Substring(4) + "CPP_"
-        If AlgorithmName.Text.StartsWith("CPP_") = False Then AlgorithmName.Text = "CPP_" + AlgorithmName.Text
-        If nextAlgorithm(algType.addIncludeOnly) = False Then Exit Sub
-
-        Dim split = AlgorithmName.Text.Split("_")
-        Dim nameNoCPP As String = split(1) + "_" + split(2)
-
-        VBoutputName = New FileInfo("..\..\VB_Classes\CPP.vb") ' Touch a VB.Net to force recompile of VB_Classes.
-        Dim cppVBcode = File.ReadAllLines(VBoutputName.FullName)
-        sw = New StreamWriter(VBoutputName.FullName, True)
-        sw.Write(" ") ' force a recompile of the VB_Classes to trigger the UIGenerator 
-        sw.Close()
-
-        Dim incOnlyName = New FileInfo("..\..\CPP_Classes\CPP_IncludeOnly.h")
-        Dim incOnlycode = File.ReadAllLines(incOnlyName.FullName)
-        sw = New StreamWriter(incOnlyName.FullName)
-        Dim enumTrigger As Boolean
-        For Each line In incOnlycode
-            If InStr(line, "enum functions") Then enumTrigger = True
-            If enumTrigger Then
-                If InStr(line, "fStable_BasicsCount,") Then
-                    sw.WriteLine("f" + nameNoCPP + ",")
-                    enumTrigger = False
-                End If
-            End If
-            sw.WriteLine(line)
-        Next
-
-        sw.WriteLine(vbCrLf + vbCrLf + vbCrLf + vbCrLf + "class CPP_" + nameNoCPP + " : public algorithmCPP")
-        sw.WriteLine("{")
-        sw.WriteLine("private: ")
-        sw.WriteLine("public: ")
-        sw.WriteLine(vbTab + "CPP_" + nameNoCPP + "(int rows, int cols) : algorithmCPP(rows, cols) " + vbCrLf + "{" +
-                     vbCrLf + vbTab + "traceName = """ + "CPP_" + nameNoCPP + """;" + vbCrLf + vbTab + "}")
-        sw.WriteLine(vbTab + "void Run(Mat src)")
-        sw.WriteLine(vbTab + "{")
-        sw.WriteLine(vbTab + vbTab + "dst2 = src.clone();")
-        sw.WriteLine(vbTab + "}")
-        sw.WriteLine("};")
-
-        sw.Close()
-
-        Dim externName = New FileInfo("..\..\CPP_Classes\CPP_Externs.h")
-        Dim externCode = File.ReadAllLines(externName.FullName)
-        sw = New StreamWriter(externName.FullName)
-        For Each line In externCode
-            If line.Contains("end of switch") Then
-                sw.WriteLine(vbTab + "case f" + nameNoCPP + " :")
-                sw.WriteLine(vbTab + "{task->alg = new CPP_" + nameNoCPP + "(rows, cols);break;}")
-            End If
-            sw.WriteLine(line)
-        Next
-
-        sw.Close()
-
-        MsgBox("Restart OpenCVB to use: " + AlgorithmName.Text + vbCrLf + vbCrLf + "Edit " + AlgorithmName.Text + " in: " + vbCrLf + vbCrLf +
-               "CPP_Classes\CPP_IncludeOnly.h")
-        Me.Close()
     End Sub
 End Class

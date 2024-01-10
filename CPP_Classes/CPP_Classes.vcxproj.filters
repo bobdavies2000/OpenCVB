@@ -48,6 +48,9 @@
     <ClInclude Include="PointCloudConvert.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CPP_Functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Corners.cpp">

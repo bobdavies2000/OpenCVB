@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPP_Externs.h" />
+    <ClInclude Include="CPP_Functions.h" />
     <ClInclude Include="CvHMM.h" />
     <ClInclude Include="DepthColorizer.hpp" />
     <ClInclude Include="harrisDetector.h" />

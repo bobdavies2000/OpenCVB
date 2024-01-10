@@ -34,6 +34,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case _CPP_AddWeighted_Basics :
     {task->alg = new CPP_AddWeighted_Basics(rows, cols); break; }
+	case _CPP_Convex_Basics :
+	{task->alg = new CPP_Convex_Basics(rows, cols); break; }
 	case _CPP_Resize_Preserve :
 	{task->alg = new CPP_Resize_Preserve(rows, cols); break; } 
 	case _CPP_History_Basics :
@@ -134,18 +136,12 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 	{task->alg = new CPP_Edge_Preserving(rows, cols);break;}
 	case _CPP_EdgeDraw_Basics :
 	{task->alg = new CPP_EdgeDraw_Basics(rows, cols);break;}
-	case _CPP_TEE_Basics :
-	{task->alg = new CPP_TEE_Basics(rows, cols);break;}
-	case _CPP_RedCloud_Hulls :
-	{task->alg = new CPP_RedCloud_Hulls(rows, cols);break;}
 	case _CPP_Distance_Basics :
 	{task->alg = new CPP_Distance_Basics(rows, cols);break;}
 	case _CPP_FeatureLess_Basics :
 	{task->alg = new CPP_FeatureLess_Basics(rows, cols);break;}
 	case _CPP_FeatureLess_Edge :
 	{task->alg = new CPP_FeatureLess_Edge(rows, cols);break;}
-	case _CPP_RedCloud_FeatureLess2 :
-	{task->alg = new CPP_RedCloud_FeatureLess2(rows, cols);break;}
     // end of switch - don't remove...
     }
 

@@ -10,7 +10,7 @@ Module UI_GeneratorMain
         End If
 
         ' first read all the cpp functions that are present in the project
-        Dim functionInput As New FileInfo(VBcodeDir.FullName + "../CPP_Classes/CPP_IncludeOnly.h")
+        Dim functionInput As New FileInfo(VBcodeDir.FullName + "../CPP_Classes/CPP_Functions.h")
         Dim srFunctions = New StreamReader(functionInput.FullName)
         Dim functionNames As New SortedList(Of String, String)
         Dim unsortedFunctions As New List(Of String)

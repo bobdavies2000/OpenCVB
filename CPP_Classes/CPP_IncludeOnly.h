@@ -29,31 +29,55 @@ using namespace ml;
 
 #include "../CPP_Classes/PragmaLibs.h"
 
-struct rcData {
-    Rect rect;
-    Mat mask;
+class rcData {
+public:
+    cv::Rect rect;
+    cv::Rect motionRect;  // the union of the previous rect with the current rect.
+    cv::Mat mask;
+    cv::Mat depthMask;
+
     int pixels;
+    int depthPixels;
 
-    Scalar depthMean;
-    Scalar depthStdev;
-    double depthMin;
-    Point depthMinLoc;
-    double depthMax;
-    Point depthMaxLoc;
+    cv::Vec3b color;
+    cv::Scalar colorMean;
+    cv::Scalar colorStdev;
+    int colorDistance;
+    int grayMean;
 
-    Point maxDist;
+    cv::Point3f depthMean;
+    cv::Point3f depthStdev;
+    float depthDistance;  // Adjusted to float for consistency with Point3f
+
+    cv::Point3f minVec;
+    cv::Point3f maxVec;
+
+    cv::Point maxDist;
+    cv::Point maxDStable;  // keep maxDist the same if it is still on the cell.
 
     int index;
     int indexLast;
-    int indexCurr;// lastCells will link to the redCells with this link.
+    int matchCount;
 
-    Vec3b color;
-    vector<Point> contour;
-    vector<Point> hull;
+    std::vector<cv::Point> contour;
+    std::vector<cv::Point> corners;
+    std::vector<cv::Point3f> contour3D;
+    std::vector<cv::Point> hull;  // Using std::vector for consistency
 
-    Vec4f eq;
+    bool motionDetected;
 
-    Point2f center;
+    cv::Point floodPoint;
+    bool depthCell;  // true if no depth.
+
+    cv::Vec4f eq;  // plane equation
+    cv::Vec3f pcaVec;
+    std::map<int, int> specG;  // Using std::map for key-value pairs
+    std::map<int, int> specD;  // Using std::map for key-value pairs
+
+    rcData() : index(0), depthCell(true) {
+        mask = cv::Mat(1, 1, CV_8U);
+        rect = cv::Rect(0, 0, 1, 1);
+    }
 };
 
 
@@ -117,68 +141,8 @@ vector<Scalar> highlightColors = { YELLOW, WHITE, BLUE, GRAY, RED, GREEN };
 
 vector<string> mapNames = { "Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                             "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter" };
-enum functions
-{
-    _CPP_AddWeighted_Basics,
-_CPP_Resize_Preserve,
-_CPP_History_Basics,
-    _CPP_Motion_Core,
-_CPP_Histogram_Kalman,
-_CPP_Kalman_Basics,
-_CPP_RedCloud_Core,
-_CPP_FPoly_TopFeatures,
-    _CPP_Random_Enumerable,
-    _CPP_Bezier_Basics,
-    _CPP_Feature_Agast,
-    _CPP_Resize_Basics,
-    _CPP_Delaunay_Basics,
-    _CPP_Delaunay_GenerationsNoKNN,
-    _CPP_KNN_Basics,
-    _CPP_Random_Basics,
-    _CPP_KNN_Lossy,
-    _CPP_Delaunay_Generations,
-    _CPP_Stable_Basics,
-    _CPP_Feature_Basics,
-    _CPP_Remap_Basics,
-    _CPP_Edge_Canny,
-    _CPP_Edge_Sobel,
-    _CPP_Edge_Scharr,
-    _CPP_Mat_4to1,
-    _CPP_Grid_Basics,
-    _CPP_Depth_Colorizer,
-    _CPP_RedCloud_Flood,
-    _CPP_Depth_PointCloud,
-    _CPP_IMU_GMatrix,
-    _CPP_IMU_GMatrix_QT,
-    _CPP_Depth_PointCloud_IMU,
-    _CPP_Binarize_Simple,
-    _CPP_Plot_Histogram,
-    _CPP_Histogram_Basics,
-    _CPP_BackProject_Basics,
-    _CPP_Rectangle_Basics,
-    _CPP_Rectangle_Rotated,
-    _CPP_Contour_Largest,
-    _CPP_Diff_Basics,
-    _CPP_ApproxPoly_FindandDraw,
-    _CPP_ApproxPoly_Basics,
-    _CPP_Hull_Basics,
-    _CPP_ApproxPoly_Hull,
-    _CPP_Edge_Segments,
-    _CPP_Motion_Basics,
-    _CPP_Edge_MotionAccum,
-    _CPP_Edge_MotionFrames,
-    _CPP_Edge_Preserving,
-    _CPP_EdgeDraw_Basics,
-    _CPP_TEE_Basics,
-    _CPP_RedCloud_Hulls,
-    _CPP_Distance_Basics,
-    _CPP_FeatureLess_Basics,
-    _CPP_FeatureLess_Edge,
-    _CPP_RedCloud_FeatureLess2,
-    _CPP_Stable_BasicsCount,
-MAX_FUNCTION = _CPP_Stable_BasicsCount,
-};
 
+#include "CPP_Functions.h"
 
 class algorithmCPP
 {
@@ -226,7 +190,7 @@ public:
     int cvFontThickness;
     Scalar fontColor;
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
-    bool motionReset;
+    bool motionReset; rcData rcSelect;
 
     bool heartBeat; bool debugCheckBox; Size minRes; int PCReduction;
     bool optionsChanged; double addWeighted; int dotSize; int gridSize; float maxZmeters;
@@ -2543,113 +2507,6 @@ public:
 
 
 
-
-class CPP_TEE_Basics : public algorithmCPP
-{
-private:
-public:
-    map<int, int> sizeSorted;
-    vector<rcData> redCells;
-    vector<rcData> lastCells;
-    Mat lastcellMap;
-    Mat cellMap = Mat(dst2.size(), CV_32S);
-    CPP_Contour_Largest* contours;
-    CPP_RedCloud_Flood* redF;
-    CPP_TEE_Basics(int rows, int cols) : algorithmCPP(rows, cols)
-    {
-        traceName = "CPP_TEE_Basics";
-        cellMap.setTo(0);
-        contours = new CPP_Contour_Largest(rows, cols);
-        redF = new CPP_RedCloud_Flood(rows, cols);
-        if (standalone) task->displayDst0 = true;
-        task->gravityPointCloud = true;
-        //labels[3] = "Note that the maxDist point does not move until it reaches the boundary of the cell.";
-        desc = "Run floodFill on XY reduced point cloud";
-    }
-    rcData rcSelection(Mat output)
-    {
-        int index = cellMap.at<int>(task->clickPoint.y, task->clickPoint.x);
-        rcData rc = redCells[index];
-        dst0 = task->color;
-        if (redF->options_highlightCell == false) return rc;
-        if (task->displayDst0) task->drawContour(dst0(rc.rect), rc.contour, YELLOW);
-        task->drawContour(output(rc.rect), rc.contour, WHITE, -1);
-        return rc;
-    }
-    void Run(Mat src)
-    {
-        lastCells = vector<rcData>(redCells);
-        lastcellMap = cellMap.clone();
-        if (task->optionsChanged) lastcellMap.setTo(0);
-        redF->Run(src);
-        if (redF->totalCount == 0) return;
-        redCells.clear();
-        auto rc = redF->buildZeroEntry();
-        redCells.push_back(rc);
-        sizeSorted.clear();
-        int count8u = 1;
-        cellMap.setTo(0);
-        dst2.setTo(0);
-        int matchedCells = 0;
-        vector<Vec3b> colors;
-        for (auto i = 1; i < redF->totalCount; i++)
-        {
-            rc.rect = redF->rects[i];
-            rc.rect = task->validateRect(rc.rect, dst2.cols, dst2.rows);
-            rc.pixels = redF->sizes[i];
-            rc.mask = redF->dst2(rc.rect).clone();
-            inRange(rc.mask, count8u, count8u, rc.mask);
-            count8u += 1;
-            if (count8u == 256) count8u = 1;
-            rc.maxDist = task->getMaxDist(rc.mask, rc.rect);
-            rc.center = Point(rc.rect.x + rc.rect.width / 2, rc.rect.y + rc.rect.height / 2);
-            rc.index = i;
-            rc.indexLast = lastcellMap.at<int>(rc.maxDist.y, rc.maxDist.x);
-            if (rc.indexLast > 0)
-            {
-                rcData lrc = lastCells[rc.indexLast];
-                int testIndex = lastcellMap.at<int>(lrc.maxDist.y, lrc.maxDist.x);
-                if (testIndex == rc.indexLast)
-                {
-                    //rc.maxDist = lrc.maxDist;
-                }
-                rc.color = lrc.color;
-                matchedCells += 1;
-                lrc.indexCurr = i;
-                lastCells[rc.indexLast] = lrc;
-            }
-            if (rc.color == black || count(colors.begin(), colors.end(), rc.color))
-            {
-                rc.color = Vec3b(rand() % 240, rand() % 240, rand() % 240);
-            }
-            colors.push_back(rc.color);
-            contours->Run(rc.mask);
-            rc.contour = vector<Point>(contours->bestContour);
-            Mat tmp(rc.mask.rows, rc.mask.cols, CV_32FC1);
-            tmp.setTo(0);
-            task->pcSplit[2](rc.rect).copyTo(tmp, rc.mask);
-            minMaxLoc(tmp, &rc.depthMin, &rc.depthMax, &rc.depthMinLoc, &rc.depthMaxLoc);
-            meanStdDev(task->gCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.mask);
-            if (rc.depthMax > rc.depthMean.val[2] + rc.depthStdev.val[2] * 3) rc.depthMax = rc.depthMean.val[2] + 3 * rc.depthStdev.val[2];
-            dst2(rc.rect).setTo(rc.color, rc.mask);
-            cellMap(rc.rect).setTo(rc.index, rc.mask);
-            sizeSorted.insert(make_pair(rc.pixels, rc.index));
-            redCells.push_back(rc);
-        }
-        labels[2] = to_string(matchedCells) + " of " + to_string(redCells.size()) + " cells matched previous generation. " +
-                    to_string(redCells.size() - matchedCells) + " not matched.";
-        rc = rcSelection(dst2);
-        dst3 = dst2.clone();
-        for (rcData rc : redCells)
-        {
-            circle(dst3, rc.maxDist, task->dotSize, YELLOW, -1, task->lineType);
-        }
-    }
-};
-
-
-
-
 class CPP_Resize_Preserve : public algorithmCPP {
 public:
     int options_resizePercent = 120;
@@ -2658,7 +2515,6 @@ public:
     Size newSize;
     CPP_Resize_Preserve(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Resize_Preserve";
-
         desc = "Decrease the size but preserve the full image size.";
     }
     void Run(Mat src) override {
@@ -2676,89 +2532,76 @@ public:
 
 
 
-class CPP_RedCloud_Hulls : public algorithmCPP
-{
-private:
-public:
-    CPP_TEE_Basics* redC;
-    vector<rcData> redCells;
-    Mat cellMap;
-    int selectedIndex;
-    Mat lastcellMap;
-    CPP_RedCloud_Hulls(int rows, int cols) : algorithmCPP(rows, cols)
-    {
-        traceName = "CPP_RedCloud_Hulls";
-        redC = new CPP_TEE_Basics(rows, cols);
-        if (standalone) task->displayDst0 = true;
-        lastcellMap = Mat(dst2.size(), CV_32S);
-        labels = { "", "", "RedCloud hulls", "Outline of each RedCloud hull showing overlap" };
-        lastcellMap.setTo(0);
-        cellMap = Mat(dst2.size(), CV_32S);
-        desc = "Add contours and hulls to each RedCloud Cell";
+
+class CPP_Convex_Basics : public algorithmCPP {
+public: 
+    vector<Point> hull;
+    CPP_Convex_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_Convex_Basics";
+        desc = "Surround a set of random points with a convex hull";
+        labels = { "", "", "Convex Hull - red dot is center and the black dots are the input points", "" };
     }
-    rcData showHull(Mat dstFill)
-    {
-        selectedIndex = cellMap.at<int>(task->clickPoint.y, task->clickPoint.x);
-        rcData rc = redCells[selectedIndex];
-        if (redC->redF->options_highlightCell == false) return rc;
-        task->drawContour(dstFill(rc.rect), rc.hull, WHITE, -1);
-        return rc;
+    vector<Point> buildRandomHullPoints() {
+        int count = 10;
+        int pad = 4; 
+        int w = dst2.cols - dst2.cols / pad;
+        int h = dst2.rows - dst2.rows / pad;
+        random_device rd;
+        mt19937 gen(rd());
+        uniform_int_distribution<> dist_w(dst2.cols / pad, w);
+        uniform_int_distribution<> dist_h(dst2.rows / pad, h);
+        vector<Point> hullList;
+        for (int i = 0; i < count; i++) {
+            hullList.emplace_back(dist_w(gen), dist_h(gen));
+        }
+        return hullList;
     }
-    void Run(Mat src)
-    {
-        redC->Run(src);
-        dst3 = src.clone();
-        redCells.clear();
+    void Run(Mat src) override {
+        vector<Point> hullList = task->rcSelect.contour;
+        if (standalone) {
+            if (!task->heartBeat) return;
+            hullList = buildRandomHullPoints();
+        } 
+
+        if (hullList.empty()) {
+            task->setTrueText("No points were provided. Update hullList before running.", dst2);
+            return;
+        }
+        hull.clear();
+        convexHull(hullList, hull);
         dst2.setTo(0);
-        cellMap.setTo(0);
-        for (rcData rc : redC->redCells)
-        {
-            convexHull(rc.contour, rc.hull);
-            rc.index = int(redCells.size());
-            rc.indexLast = lastcellMap.at<int>(rc.maxDist.y, rc.maxDist.x);
-            redCells.push_back(rc);
-            task->drawContour(dst2(rc.rect), rc.hull, rc.color, -1);
-            task->drawContour(cellMap(rc.rect), rc.hull, Scalar(rc.index, rc.index, rc.index), -1);
-            task->drawContour(dst3(rc.rect), rc.hull, YELLOW);
+
+        task->drawContour(dst2, hullList, Scalar(255, 255, 255), -1);
+        for (int i = 0; i < hull.size(); i++) {
+            line(dst2, hull[i], hull[(i + 1) % hull.size()], Scalar(255, 255, 255), task->lineWidth);
         }
-        if (redCells.size() == 0) return;
-        auto rcX = showHull(dst2);
-        if (task->displayDst0)
-        {
-            dst0 = task->color.clone();
-            task->drawContour(dst0(rcX.rect), rcX.hull, YELLOW);
-        }
-        lastcellMap = cellMap.clone();
-        labels[2] = to_string(redCells.size()) + " hulls identified below.";
     }
 };
 
 
 
 
-
-
-
-class CPP_Distance_Basics : public algorithmCPP
-{
-private:
+class CPP_Distance_Basics : public algorithmCPP {
 public:
-    CPP_Distance_Basics(int rows, int cols) : algorithmCPP(rows, cols)
-    {
+    DistanceTypes options_distanceType = DIST_L1;
+    int options_kernelSize = 0;
+    CPP_Distance_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Distance_Basics";
-        labels[2] = "Distance Transform";
-        desc = "Distance algorithmCPP basics.";
+        labels = { "", "", "Distance transform - create a mask with threshold", "" };
+        desc = "Distance algorithm basics.";
     }
-    void Run(Mat src)
-    {
-        if (standalone) src = task->depthRGB;
-        if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
-        distanceTransform(src, dst0, DIST_L1, 3);
-        normalize(dst0, dst1, 0, 255, NormTypes::NORM_MINMAX);
-        dst1.convertTo(dst2, CV_8UC1);
+    void Run(Mat src) override {
+        if (standalone) {
+            src = task->depthRGB;
+        }
+        if (src.channels() == 3) {
+            cvtColor(src, src, COLOR_BGR2GRAY);
+        }
+        distanceTransform(src, dst0, options_distanceType, options_kernelSize);
+        normalize(dst0, dst0, 0, 255, NORM_MINMAX);
+        dst0.convertTo(dst2, CV_8UC1);
     }
 };
-
 
 
 
@@ -2906,37 +2749,6 @@ public:
         bitwise_not(eDraw->dst2, dst0);
         dist->Run(dst0);
         threshold(dist->dst2, dst2, 0, 255, THRESH_BINARY);
-    }
-};
-
-
-
-
-
-
-class CPP_RedCloud_FeatureLess2 : public algorithmCPP
-{
-private:
-public:
-    CPP_FeatureLess_Edge* fLess;
-    CPP_TEE_Basics* redC;
-    CPP_RedCloud_FeatureLess2(int rows, int cols) : algorithmCPP(rows, cols)
-    {
-        traceName = "CPP_RedCloud_FeatureLess2";
-        fLess = new CPP_FeatureLess_Edge(rows, cols);
-        redC = new CPP_TEE_Basics(rows, cols);
-        labels[3] = "Mask showing regions that are NOT featureless.";
-        desc = "Identify and track the featureless regions produced with EdgeDrawing2.";
-    }
-    void Run(Mat src)
-    {
-        fLess->Run(src);
-        bitwise_not(fLess->dst2, dst3);
-        dst3.convertTo(dst0, CV_32S);
-        redC->redF->inputMask = fLess->dst2;
-        redC->Run(dst0);
-        dst2 = redC->dst2;
-        labels[2] = "There were " + to_string(redC->redCells.size()) + " featureless regions identified";
     }
 };
 
