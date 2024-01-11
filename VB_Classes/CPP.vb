@@ -1,6 +1,8 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text
+Imports System.Windows.Markup
+
 Public Class CPP_Basics : Inherits VB_Algorithm
     Public cppFunction As Integer
     Public result As cv.Mat
@@ -89,13 +91,18 @@ Public Class CPP_Basics : Inherits VB_Algorithm
         getOptions()
 
         If imagePtr <> 0 Then
-            Dim channels As Integer
-            For i = 0 To 3
-                Dim dst = Choose(i + 1, dst0, dst1, dst2, dst3)
-                Dim dstPtr = cppTask_GetDst(cPtr, i, channels)
-                Dim type = Choose(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3)
-                dst = New cv.Mat(src.Rows, src.Cols, type, dstPtr)
-            Next
+            Dim channels As Integer, dstPtr As IntPtr
+            dstPtr = cppTask_GetDst(cPtr, 0, channels)
+            dst0 = New cv.Mat(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
+
+            dstPtr = cppTask_GetDst(cPtr, 1, channels)
+            dst1 = New cv.Mat(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
+
+            dstPtr = cppTask_GetDst(cPtr, 2, channels)
+            dst2 = New cv.Mat(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
+
+            dstPtr = cppTask_GetDst(cPtr, 3, channels)
+            dst3 = New cv.Mat(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
         End If
     End Sub
     Public Sub Close()

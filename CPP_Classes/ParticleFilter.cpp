@@ -1,5 +1,6 @@
 #include "ParticleFilter.h"
 #include <fstream>
+#include "OpenCVB_Extern.h"
 
 #define CV_REDUCE_SUM 0
 #define CV_REDUCE_AVG 1
@@ -366,7 +367,7 @@ public:
  	}
 };
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 ParticleFilterTest * ParticleFilterTest_Open(char* dataDirName, int rows, int cols) {
 	std::string dataDir(dataDirName);
 	ParticleFilterTest* cPtr = new ParticleFilterTest(dataDir);
@@ -374,14 +375,14 @@ ParticleFilterTest * ParticleFilterTest_Open(char* dataDirName, int rows, int co
 	return cPtr;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int *ParticleFilterTest_Close(ParticleFilterTest * cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int* ParticleFilterTest_Run(ParticleFilterTest * cPtr)
 {
 	cPtr->Run();

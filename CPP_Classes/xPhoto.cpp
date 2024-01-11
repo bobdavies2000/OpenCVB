@@ -6,6 +6,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstdio>
+#include "OpenCVB_Extern.h"
 
 using namespace std;
 using namespace  cv;
@@ -21,21 +22,21 @@ public:
     }
 };
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 xPhoto_OilPaint *xPhoto_OilPaint_Open()
 {
     xPhoto_OilPaint * cPtr = new xPhoto_OilPaint();
     return cPtr;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int *xPhoto_OilPaint_Close(xPhoto_OilPaint * cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int *xPhoto_OilPaint_Run(xPhoto_OilPaint * cPtr, int *imagePtr, int rows, int cols, int size, int dynRatio, int colorCode)
 {
     cPtr->src = Mat(rows, cols, CV_8UC3, imagePtr);
@@ -61,21 +62,21 @@ public:
     }
 };
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 xPhoto_Inpaint * xPhoto_Inpaint_Open()
 {
     xPhoto_Inpaint* cPtr = new xPhoto_Inpaint();
     return cPtr;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int * xPhoto_Inpaint_Close(xPhoto_Inpaint * cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int* xPhoto_Inpaint_Run(xPhoto_Inpaint * cPtr, int* imagePtr, int* maskPtr, int rows, int cols, int iType)
 {
     cPtr->src = Mat(rows, cols, CV_8UC3, imagePtr);

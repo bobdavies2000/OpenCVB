@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "OpenCVB_Extern.h"
 // https://machinelearningmastery.com/a-gentle-introduction-to-the-jacobian/#:~:text=The%20Jacobian%20matrix%20collects%20all,one%20coordinate%20space%20and%20another.
 // https://github.com/oneapi-src/oneAPI-samples/blob/master/DirectProgramming/DPC%2B%2B/DenseLinearAlgebra/jacobi_iterative/sycl_dpct_migrated/src/jacobi.h
 // https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant

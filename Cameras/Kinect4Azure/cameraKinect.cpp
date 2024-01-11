@@ -20,6 +20,7 @@
 #include <k4a/k4a.hpp>
 #include <k4apixel.h>
 #include "PragmaLibs.h"
+#include "OpenCVB_Extern.h"
 
 using namespace std;
 using namespace  cv;
@@ -157,13 +158,13 @@ public:
 	}
 };
 
-extern "C" __declspec(dllexport) int K4ADeviceCount(K4Acamera * cPtr) { return cPtr->deviceCount; }
-extern "C" __declspec(dllexport) int* K4ADeviceName(K4Acamera * cPtr) { return (int*)cPtr->serial_number; }
-extern "C" __declspec(dllexport) int* K4AIntrinsics(K4Acamera * cPtr) { return (int*)&cPtr->calibration.color_camera_calibration.intrinsics.parameters.v; }
-extern "C" __declspec(dllexport) int* K4AColor(K4Acamera * cPtr) { return (int*)cPtr->colorMat.data; }
-extern "C" __declspec(dllexport) int* K4APointCloud(K4Acamera * cPtr) { return (int*)k4a_image_get_buffer(cPtr->point_cloud_image); }
-extern "C" __declspec(dllexport) int* K4ALeftView(K4Acamera * cPtr) { return (int *)cPtr->leftView.data; }
-extern "C" __declspec(dllexport) 
+VB_EXTERN int K4ADeviceCount(K4Acamera * cPtr) { return cPtr->deviceCount; }
+VB_EXTERN int* K4ADeviceName(K4Acamera * cPtr) { return (int*)cPtr->serial_number; }
+VB_EXTERN int* K4AIntrinsics(K4Acamera * cPtr) { return (int*)&cPtr->calibration.color_camera_calibration.intrinsics.parameters.v; }
+VB_EXTERN int* K4AColor(K4Acamera * cPtr) { return (int*)cPtr->colorMat.data; }
+VB_EXTERN int* K4APointCloud(K4Acamera * cPtr) { return (int*)k4a_image_get_buffer(cPtr->point_cloud_image); }
+VB_EXTERN int* K4ALeftView(K4Acamera * cPtr) { return (int *)cPtr->leftView.data; }
+VB_EXTERN 
 int* K4AWaitFrame(K4Acamera* cPtr, int w, int h)
 { 
 	int* imuFrame = cPtr->waitForFrame();
@@ -179,13 +180,13 @@ int* K4AWaitFrame(K4Acamera* cPtr, int w, int h)
 	return imuFrame;
 }
 
-extern "C" __declspec(dllexport) int* K4AOpen(int width, int height)
+VB_EXTERN int* K4AOpen(int width, int height)
 {
 	K4Acamera* cPtr = new K4Acamera(width, height);
 	if (cPtr->deviceCount == 0) return 0;
 	return (int*)cPtr;
 }
-extern "C" __declspec(dllexport) void K4AClose(K4Acamera * cPtr)
+VB_EXTERN void K4AClose(K4Acamera * cPtr)
 {
 	if (cPtr->point_cloud_image) k4a_image_release(cPtr->point_cloud_image);
 	if (cPtr->colorImage) k4a_image_release(cPtr->colorImage);

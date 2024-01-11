@@ -30,21 +30,21 @@ public:
         }
     }
 };
-extern "C" __declspec(dllexport)
+VB_EXTERN
 RedMin_FindPixels *RedMin_FindPixels_Open() {
     RedMin_FindPixels *cPtr = new RedMin_FindPixels();
     return cPtr;
 }
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void RedMin_FindPixels_Close(RedMin_FindPixels *cPtr)
 {
     delete cPtr;
 }
-extern "C" __declspec(dllexport) int* RedMin_FindPixels_Pixels(RedMin_FindPixels * cPtr)
+VB_EXTERN int* RedMin_FindPixels_Pixels(RedMin_FindPixels * cPtr)
 {
     return (int*)&cPtr->pixelList[0];
 }
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int RedMin_FindPixels_RunCPP(RedMin_FindPixels *cPtr, int *dataPtr, int rows, int cols)
 {
 	cPtr->src = Mat(rows, cols, CV_8UC3, dataPtr);

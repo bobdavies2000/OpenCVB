@@ -10,6 +10,7 @@
 #include <mynteyed\utils.h>
 #include "util/cam_utils.h"
 #include "util/counter.h"
+#include "OpenCVB_Extern.h"
 
 MYNTEYE_USE_NAMESPACE
 using namespace  cv;
@@ -92,7 +93,7 @@ float acceleration[3];
 float gyro[3];
 double imuTimeStamp;
 
-extern "C" __declspec(dllexport) void MyntDtaskIMU(CameraMyntD * cPtr)
+VB_EXTERN void MyntDtaskIMU(CameraMyntD * cPtr)
 {
 	if (cPtr->cam.IsMotionDatasSupported()) cPtr->cam.EnableMotionDatas(0);
 	util::Counter counter;
@@ -122,7 +123,7 @@ extern "C" __declspec(dllexport) void MyntDtaskIMU(CameraMyntD * cPtr)
 	}
 }
 
-extern "C" __declspec(dllexport) int* MyntDWaitFrame(CameraMyntD * cPtr, int w, int h) 
+VB_EXTERN int* MyntDWaitFrame(CameraMyntD * cPtr, int w, int h) 
 { 
 	cPtr->waitForFrame();
 	if (cPtr->left_color == 0 || cPtr->right_color == 0 || cPtr->pcFullSize.data == 0) return 0;
@@ -137,12 +138,12 @@ extern "C" __declspec(dllexport) int* MyntDWaitFrame(CameraMyntD * cPtr, int w, 
 	cPtr->pointCloud = cPtr->pcFullSize;
 	return (int*)cPtr->color.data;
 }
-extern "C" __declspec(dllexport) int* MyntDOpen(int width, int height, int frameRate) { return (int*) new CameraMyntD(width, height);}
-extern "C" __declspec(dllexport) void MyntDClose(CameraMyntD * cPtr) { delete cPtr; }
-extern "C" __declspec(dllexport) int* MyntDIntrinsicsLeft(CameraMyntD * cPtr) { return (int*)&cPtr->intrinsicsBoth.left; }
-extern "C" __declspec(dllexport) int* MyntDRightImage(CameraMyntD * cPtr) {return (int*)cPtr->rightView.data;}
-extern "C" __declspec(dllexport) int* MyntDPointCloud(CameraMyntD * cPtr) { return (int*)cPtr->pointCloud.data; }
-extern "C" __declspec(dllexport) int* MyntDAcceleration(CameraMyntD * cPtr){return (int*)&acceleration;}
-extern "C" __declspec(dllexport) int* MyntDGyro(CameraMyntD * cPtr){return (int*)&gyro;}
-extern "C" __declspec(dllexport) double MyntDIMU_TimeStamp(CameraMyntD * cPtr){return imuTimeStamp;}
+VB_EXTERN int* MyntDOpen(int width, int height, int frameRate) { return (int*) new CameraMyntD(width, height);}
+VB_EXTERN void MyntDClose(CameraMyntD * cPtr) { delete cPtr; }
+VB_EXTERN int* MyntDIntrinsicsLeft(CameraMyntD * cPtr) { return (int*)&cPtr->intrinsicsBoth.left; }
+VB_EXTERN int* MyntDRightImage(CameraMyntD * cPtr) {return (int*)cPtr->rightView.data;}
+VB_EXTERN int* MyntDPointCloud(CameraMyntD * cPtr) { return (int*)cPtr->pointCloud.data; }
+VB_EXTERN int* MyntDAcceleration(CameraMyntD * cPtr){return (int*)&acceleration;}
+VB_EXTERN int* MyntDGyro(CameraMyntD * cPtr){return (int*)&gyro;}
+VB_EXTERN double MyntDIMU_TimeStamp(CameraMyntD * cPtr){return imuTimeStamp;}
 #endif

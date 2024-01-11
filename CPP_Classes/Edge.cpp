@@ -6,6 +6,7 @@
 #include <opencv2/ximgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include "opencv2/core/utility.hpp"
+#include "OpenCVB_Extern.h"
 
 using namespace std;
 using namespace  cv;
@@ -32,20 +33,20 @@ public:
 	}
  };
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 Edge_RandomForest *Edge_RandomForest_Open(char *modelFileName)
 {
   return new Edge_RandomForest(modelFileName);
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int * Edge_RandomForest_Close(Edge_RandomForest *Edge_RandomForestPtr)
 {
     delete Edge_RandomForestPtr;
 	return (int*)0;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int *Edge_RandomForest_Run(Edge_RandomForest *Edge_RandomForestPtr, int *bgrPtr, int rows, int cols)
 {
 	Edge_RandomForestPtr->Run(Mat(rows, cols, CV_8UC3, bgrPtr));
@@ -76,21 +77,21 @@ public:
 	}
 };
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 Edge_Deriche * Edge_Deriche_Open()
 {
 	Edge_Deriche* dPtr = new Edge_Deriche();
 	return dPtr;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int * Edge_Deriche_Close(Edge_Deriche * dPtr)
 {
 	delete dPtr;
 	return (int*)0;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int* Edge_Deriche_Run(Edge_Deriche * dPtr, int* bgrPtr, int rows, int cols, float alpha, float omega)
 {
 	dPtr->src = Mat(rows, cols, CV_8UC3, bgrPtr);
@@ -138,20 +139,20 @@ public:
 	}
 };
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 Edge_ColorGap *Edge_ColorGap_Open() {
     Edge_ColorGap *cPtr = new Edge_ColorGap();
     return cPtr;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int * Edge_ColorGap_Close(Edge_ColorGap *cPtr)
 {
     delete cPtr;
 	return (int*)0;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int *Edge_ColorGap_Run(Edge_ColorGap *cPtr, int *grayPtr, int rows, int cols, int distance, int diff)
 {
 		cPtr->src = Mat(rows, cols, CV_8UC1, grayPtr);
@@ -199,20 +200,20 @@ public:
 	}
 };
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 Edge_DepthGap * Edge_DepthGap_Open() {
 	Edge_DepthGap* cPtr = new Edge_DepthGap();
 	return cPtr;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int* Edge_DepthGap_Close(Edge_DepthGap * cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int* Edge_DepthGap_RunCPP(Edge_DepthGap * cPtr, int* dataPtr, int rows, int cols, float minDiff)
 {
 	cPtr->src = Mat(rows, cols, CV_32FC1, dataPtr);

@@ -10,6 +10,7 @@ Copyright (c) 2014 Brosix
 
 #include <iostream>
 #include <cstdlib>
+#include "OpenCVB_Extern.h"
 /////////////////////////////////////////////////////////////////////////////
 //	Macroses used in dithering functions
 /////////////////////////////////////////////////////////////////////////////
@@ -99,7 +100,7 @@ const	int	BAYER_PATTERN_16X16[16][16] = {	//	16x16 Bayer Dithering Matrix.  Colo
 												{	169, 106, 153,  90, 165, 102, 149,  86, 168, 105, 152,  89, 164, 101, 148,  85	}
 };
 //	Ordered dither using matrix
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherBayer16(BYTE* pixels, int width, int height)	
 {
 	int	col = 0;
@@ -127,7 +128,7 @@ void ditherBayer16(BYTE* pixels, int width, int height)
 		pixels += width * 3;
 	}
 }
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherBayer8(BYTE* pixels, int width, int height)	
 {
 	int	col = 0;
@@ -155,7 +156,7 @@ void ditherBayer8(BYTE* pixels, int width, int height)
 		pixels += width * 3;
 	}
 }
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherBayer4(BYTE* pixels, int width, int height)	
 {
 	int	col = 0;
@@ -183,7 +184,7 @@ void ditherBayer4(BYTE* pixels, int width, int height)
 		pixels += width * 3;
 	}
 }
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherBayer3(BYTE* pixels, int width, int height)	
 {
 	int	col = 0;
@@ -211,7 +212,7 @@ void ditherBayer3(BYTE* pixels, int width, int height)
 		pixels += width * 3;
 	}
 }
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherBayer2(BYTE* pixels, int width, int height)	
 {
 	int	col = 0;
@@ -247,7 +248,7 @@ void ditherBayer2(BYTE* pixels, int width, int height)
 //	7		- color (3 bit per color plane,  9 bits per pixel)
 //	15		- color (4 bit per color plane, 12 bits per pixel)
 //	31		- color (5 bit per color plane, 15 bits per pixel)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherBayerRgbNbpp(BYTE* pixels, int width, int height, int ncolors)	
 {
 	int	divider = 256 / ncolors;
@@ -285,7 +286,7 @@ void ditherBayerRgbNbpp(BYTE* pixels, int width, int height, int ncolors)
 	}
 }
 //	Color ordered dither using 3 bits per pixel (1 bit per color plane)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherBayerRgb3bpp(BYTE* pixels, int width, int height)	
 {
 	int	col = 0;
@@ -308,7 +309,7 @@ void ditherBayerRgb3bpp(BYTE* pixels, int width, int height)
 	}
 }
 //	Color ordered dither using 6 bits per pixel (2 bit per color plane)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherBayerRgb6bpp(BYTE* pixels, int width, int height)	
 {
 	for (int y = 0; y < height; y++)
@@ -381,7 +382,7 @@ void ditherBayerRgb6bpp( BYTE* pixels, int width, int height )
 }
 */
 //	Color ordered dither using 9 bits per pixel (3 bit per color plane)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherBayerRgb9bpp(BYTE* pixels, int width, int height)	
 {
 	for (int y = 0; y < height; y++)
@@ -444,7 +445,7 @@ void ditherBayerRgb9bpp( BYTE* pixels, int width, int height )
 }
 */
 //	Color ordered dither using 12 bits per pixel (4 bit per color plane)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherBayerRgb12bpp(BYTE* pixels, int width, int height)	
 {
 	for (int y = 0; y < height; y++)
@@ -507,7 +508,7 @@ void ditherBayerRgb12bpp( BYTE* pixels, int width, int height )
 }
 */
 //	Color ordered dither using 15 bits per pixel (5 bit per color plane)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherBayerRgb15bpp(BYTE* pixels, int width, int height)	
 {
 	for (int y = 0; y < height; y++)
@@ -570,7 +571,7 @@ void ditherBayerRgb15bpp( BYTE* pixels, int width, int height )
 }
 */
 //	Color ordered dither using 18 bits per pixel (6 bit per color plane)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherBayerRgb18bpp(BYTE* pixels, int width, int height)	
 {
 	for (int y = 0; y < height; y++)
@@ -653,7 +654,7 @@ void ditherBayerRgb18bpp( BYTE* pixels, int width, int height )
 //	7		- color (3 bit per color plane,  9 bits per pixel)
 //	15		- color (4 bit per color plane, 12 bits per pixel)
 //	31		- color (5 bit per color plane, 15 bits per pixel)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherFSRgbNbpp(BYTE* pixels, int width, int height, int ncolors)	
 {
 	int	divider = 256 / ncolors;
@@ -747,7 +748,7 @@ void ditherFSRgbNbpp(BYTE* pixels, int width, int height, int ncolors)
 	free(errorR);
 }
 //	Back-white Floyd-Steinberg dither
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherFS(BYTE* pixels, int width, int height)	
 {
 	const int	size = width * height;
@@ -803,7 +804,7 @@ void ditherFS(BYTE* pixels, int width, int height)
 	free(error);
 }
 //	Color Floyd-Steinberg dither using 3 bits per pixel (1 bit per color plane)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherFSRgb3bpp(BYTE* pixels, int width, int height)	
 {
 	const int	size = width * height;
@@ -887,7 +888,7 @@ void ditherFSRgb3bpp(BYTE* pixels, int width, int height)
 	free(errorR);
 }
 //	Color Floyd-Steinberg dither using 6 bits per pixel (2 bit per color plane)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherFSRgb6bpp(BYTE* pixels, int width, int height)	
 {
 	const int	size = width * height;
@@ -975,7 +976,7 @@ void ditherFSRgb6bpp(BYTE* pixels, int width, int height)
 	free(errorR);
 }
 //	Color Floyd-Steinberg dither using 9 bits per pixel (3 bit per color plane)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherFSRgb9bpp(BYTE* pixels, int width, int height)	
 {
 	const int	size = width * height;
@@ -1063,7 +1064,7 @@ void ditherFSRgb9bpp(BYTE* pixels, int width, int height)
 	free(errorR);
 }
 //	Color Floyd-Steinberg dither using 12 bits per pixel (4 bit per color plane)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherFSRgb12bpp(BYTE* pixels, int width, int height)	
 {
 	const int	size = width * height;
@@ -1151,7 +1152,7 @@ void ditherFSRgb12bpp(BYTE* pixels, int width, int height)
 	free(errorR);
 }
 //	Color Floyd-Steinberg dither using 15 bits per pixel (5 bit per color plane)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherFSRgb15bpp(BYTE* pixels, int width, int height)	
 {
 	const int	size = width * height;
@@ -1239,7 +1240,7 @@ void ditherFSRgb15bpp(BYTE* pixels, int width, int height)
 	free(errorR);
 }
 //	Color Floyd-Steinberg dither using 18 bits per pixel (6 bit per color plane)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherFSRgb18bpp(BYTE* pixels, int width, int height)	
 {
 	const int	size = width * height;
@@ -1336,7 +1337,7 @@ void ditherFSRgb18bpp(BYTE* pixels, int width, int height)
 //	7		- color (3 bit per color plane,  9 bits per pixel)
 //	15		- color (4 bit per color plane, 12 bits per pixel)
 //	31		- color (5 bit per color plane, 15 bits per pixel)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherSierraLiteRgbNbpp(BYTE* pixels, int width, int height, int ncolors)	
 {
 	int	divider = 256 / ncolors;
@@ -1421,7 +1422,7 @@ void ditherSierraLiteRgbNbpp(BYTE* pixels, int width, int height, int ncolors)
 	free(errorR);
 }
 //	Black-white Sierra Lite dithering (variation of Floyd-Steinberg with less computational cost)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherSierraLite(BYTE* pixels, int width, int height)	
 {
 	//	To avoid real number calculations, I will raise the level of INT arythmetics by shifting with 8 bits to the left ( << 8 )
@@ -1491,7 +1492,7 @@ void ditherSierraLite(BYTE* pixels, int width, int height)
 //	7		- color (3 bit per color plane,  9 bits per pixel)
 //	15		- color (4 bit per color plane, 12 bits per pixel)
 //	31		- color (5 bit per color plane, 15 bits per pixel)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherSierraRgbNbpp(BYTE* pixels, int width, int height, int ncolors)	
 {
 	int	divider = 256 / ncolors;
@@ -1628,7 +1629,7 @@ void ditherSierraRgbNbpp(BYTE* pixels, int width, int height, int ncolors)
 	free(errorR);
 }
 //	Black-white Sierra Lite dithering (variation of Floyd-Steinberg with less computational cost)
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void ditherSierra(BYTE* pixels, int width, int height)	
 {
 	//	To avoid real number calculations, I will raise the level of INT arythmetics by shifting with 8 bits to the left ( << 8 )

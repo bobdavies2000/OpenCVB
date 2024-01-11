@@ -5,6 +5,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
+#include "OpenCVB_Extern.h"
 
 using namespace std;
 using namespace  cv;
@@ -15,7 +16,7 @@ using namespace  cv;
 // When run in VB.Net the histogram output has rows = -1 and cols = -1
 // The rows and cols are both -1 so I had assumed there was a bug but the data is accessible with the at method.
 // If you attempt the same access to the data in managed code, it does not work (AFAIK).
-extern "C" __declspec(dllexport)
+VB_EXTERN
 float* Hist3Dcolor_Run(int* bgrPtr, int rows, int cols, int bins)
 {
 	float hRange[] = { 0, 256 }; // ranges are exclusive in the top of the range, hence 256
@@ -40,7 +41,7 @@ static Mat newImage;
 // When run in VB.Net the histogram output has rows = -1 and cols = -1
 // The rows and cols are both -1 so I had assumed there was a bug but the data is accessible with the at method.
 // If you attempt the same access to the data in managed code, it does not work (AFAIK).
-extern "C" __declspec(dllexport)
+VB_EXTERN
 uchar * BackProjectBGR_Run(int* bgrPtr, int rows, int cols, int bins, float threshold)
 {
 	Mat input = Mat(rows, cols, CV_8UC3, bgrPtr);
@@ -69,7 +70,7 @@ uchar * BackProjectBGR_Run(int* bgrPtr, int rows, int cols, int bins, float thre
 
 
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 uchar * Hist3Dcloud_Run(int* inputPtr, int rows, int cols, int bins,
 					   float minX, float minY, float minZ,
 					   float maxX, float maxY, float maxZ)
@@ -97,7 +98,7 @@ uchar * Hist3Dcloud_Run(int* inputPtr, int rows, int cols, int bins,
 
 static Mat mask;
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 uchar* BackProjectCloud_Run(int* inputPtr, int rows, int cols, int bins, float threshold,
 							float minX, float minY, float minZ,
 							float maxX, float maxY, float maxZ)

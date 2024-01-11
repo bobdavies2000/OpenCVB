@@ -6,6 +6,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/plot.hpp>
+#include "OpenCVB_Extern.h"
 
 using namespace std;
 using namespace  cv;
@@ -33,11 +34,11 @@ public:
 	}
 };
 
-extern "C" __declspec(dllexport) PlotOpenCV * PlotOpenCV_Open() { PlotOpenCV* cPtr = new PlotOpenCV(); return cPtr; }
-extern "C" __declspec(dllexport) void PlotOpenCV_Close(PlotOpenCV * cPtr) { delete cPtr; }
+VB_EXTERN PlotOpenCV * PlotOpenCV_Open() { PlotOpenCV* cPtr = new PlotOpenCV(); return cPtr; }
+VB_EXTERN void PlotOpenCV_Close(PlotOpenCV * cPtr) { delete cPtr; }
 
 // https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int *PlotOpenCV_Run(PlotOpenCV * cPtr, double *inX, double *inY, int len, int rows, int cols)
 {
 	cPtr->dst.setTo(0);

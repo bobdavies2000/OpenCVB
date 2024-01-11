@@ -6,6 +6,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include "opencv2/photo.hpp"
+#include "OpenCVB_Extern.h"
 
 using namespace std;
 using namespace  cv;
@@ -23,21 +24,21 @@ public:
     }
 };
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 Denoise_Basics * Denoise_Basics_Open(int frameCount) {
     Denoise_Basics* cPtr = new Denoise_Basics();
     cPtr->frameCount = frameCount;
     return cPtr;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int * Denoise_Basics_Close(Denoise_Basics * cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int* Denoise_Basics_Run(Denoise_Basics * cPtr, int* bufferPtr, int rows, int cols)
 {
     Mat src = Mat(rows, cols, CV_8UC1, bufferPtr);
@@ -97,29 +98,29 @@ public:
             }
     }
 };
-extern "C" __declspec(dllexport)
+VB_EXTERN
 Denoise_Pixels * Denoise_Pixels_Open() {
     Denoise_Pixels* cPtr = new Denoise_Pixels();
     return cPtr;
 }
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void Denoise_Pixels_Close(Denoise_Pixels * cPtr)
 {
     delete cPtr;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int Denoise_Pixels_EdgeCountBefore(Denoise_Pixels * cPtr)
 {
     return cPtr->edgeCountBefore;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int Denoise_Pixels_EdgeCountAfter(Denoise_Pixels * cPtr)
 {
     return cPtr->edgeCountAfter;
 }
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int* Denoise_Pixels_RunCPP(Denoise_Pixels * cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);

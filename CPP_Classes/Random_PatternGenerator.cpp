@@ -8,6 +8,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include "opencv2/ccalib/randpattern.hpp"
+#include "OpenCVB_Extern.h"
 
 using namespace std;
 using namespace  cv;
@@ -20,20 +21,20 @@ public:
     void Run() {}
 };
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 Random_PatternGenerator *Random_PatternGenerator_Open() {
     Random_PatternGenerator *Random_PatternGeneratorPtr = new Random_PatternGenerator();
     return Random_PatternGeneratorPtr;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int *Random_PatternGenerator_Close(Random_PatternGenerator * rPtr)
 {
     delete rPtr;
 	return (int*)0;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int *Random_PatternGenerator_Run(Random_PatternGenerator *rPtr, int rows, int cols)
 {
 	randpattern::RandomPatternGenerator generator(cols, rows);
@@ -71,20 +72,20 @@ public:
 	}
 };
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 Random_DiscreteDistribution * Random_DiscreteDistribution_Open() {
 	Random_DiscreteDistribution* cPtr = new Random_DiscreteDistribution();
 	return cPtr;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int *Random_DiscreteDistribution_Close(Random_DiscreteDistribution * cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int* Random_DiscreteDistribution_Run(Random_DiscreteDistribution * cPtr, int rows, int cols)
 {
 	cPtr->discrete = Mat(rows, cols, CV_32F, 0);

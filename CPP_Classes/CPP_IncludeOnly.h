@@ -31,6 +31,8 @@ namespace fs = std::filesystem;
 
 #define STATIC_EXTERNS
 #include "floodCell.cpp"
+#define VB_EXTERN extern "C" __declspec(dllexport)
+
 #include "../CPP_Classes/PragmaLibs.h"
 #include "CPP_Task.h"
 

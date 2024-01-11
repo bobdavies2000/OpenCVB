@@ -271,7 +271,6 @@ void cppTask_DepthLeftRight(cppTask * task, int* depthRGBPtr, int* leftView, int
     task->rightView = Mat(rows, cols, CV_8UC3, rightView);
 }
 
-
 extern "C" __declspec(dllexport)
 int* cppTask_GetDst(cppTask * task, int index, int& channels)
 {
@@ -291,27 +290,6 @@ int* cppTask_GetDst(cppTask * task, int index, int& channels)
         return (int*)task->xdst3.data;
     }
     return 0;
-}
-
-extern "C" __declspec(dllexport)
-int* cppTask_GetDst1(cppTask * task, int& channels)
-{
-    channels = task->xdst1.channels();
-    return (int*)task->xdst1.data;
-}
-
-extern "C" __declspec(dllexport)
-int* cppTask_GetDst2(cppTask * task, int& channels)
-{
-    channels = task->xdst2.channels();
-    return (int*)task->xdst2.data;
-}
-
-extern "C" __declspec(dllexport)
-int* cppTask_GetDst3(cppTask * task, int& channels)
-{
-    channels = task->xdst3.channels();
-    return (int*)task->xdst3.data;
 }
 
 extern "C" __declspec(dllexport)
@@ -365,9 +343,9 @@ int* cppTask_RunCPP(cppTask * task, int* dataPtr, int channels, int frameCount, 
     task->xdst1 = task->alg->dst1;
     task->xdst2 = task->alg->dst2;
     task->xdst3 = task->alg->dst3;
-    if (task->alg->dst0.type() == CV_32S) task->alg->dst3.convertTo(task->xdst3, CV_8U);
-    if (task->alg->dst1.type() == CV_32S) task->alg->dst3.convertTo(task->xdst3, CV_8U);
-    if (task->alg->dst2.type() == CV_32S) task->alg->dst3.convertTo(task->xdst3, CV_8U);
+    if (task->alg->dst0.type() == CV_32S) task->alg->dst0.convertTo(task->xdst0, CV_8U);
+    if (task->alg->dst1.type() == CV_32S) task->alg->dst1.convertTo(task->xdst1, CV_8U);
+    if (task->alg->dst2.type() == CV_32S) task->alg->dst2.convertTo(task->xdst2, CV_8U);
     if (task->alg->dst3.type() == CV_32S) task->alg->dst3.convertTo(task->xdst3, CV_8U);
     return (int*)task->xdst2.data;
 }

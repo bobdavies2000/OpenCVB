@@ -7,6 +7,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/ximgproc.hpp>
 #include <atlstr.h>
+#include "OpenCVB_Extern.h"
 
 using namespace std;
 using namespace  cv;
@@ -23,7 +24,7 @@ public:
 	}
 };
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 BGSubtract_BGFG *BGSubtract_BGFG_Open(int currMethod) {
     BGSubtract_BGFG *bgfs = new BGSubtract_BGFG();
 	if (currMethod == 0)      bgfs->algo = createBackgroundSubtractorGMG(20, 0.7);
@@ -36,14 +37,14 @@ BGSubtract_BGFG *BGSubtract_BGFG_Open(int currMethod) {
 	return bgfs;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int * BGSubtract_BGFG_Close(BGSubtract_BGFG *bgfs)
 {
     delete bgfs;
 	return (int*)0;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int *BGSubtract_BGFG_Run(BGSubtract_BGFG *bgfs, int *bgrPtr, int rows, int cols, int channels)
 {
 	bgfs->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, bgrPtr);
@@ -66,7 +67,7 @@ public:
 	}
 };
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 BGSubtract_Synthetic *BGSubtract_Synthetic_Open(int* bgrPtr, int rows, int cols, LPSTR fgFilename, double amplitude, double magnitude,
 												double wavespeed, double objectspeed) 
 {
@@ -79,14 +80,14 @@ BGSubtract_Synthetic *BGSubtract_Synthetic_Open(int* bgrPtr, int rows, int cols,
 	return cPtr;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int * BGSubtract_Synthetic_Close(BGSubtract_Synthetic * cPtr)
 {
     delete cPtr;
 	return (int*)0;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int *BGSubtract_Synthetic_Run(BGSubtract_Synthetic * cPtr)
 {
 	cPtr->gen->getNextFrame(cPtr->output, cPtr->fgMask);

@@ -7,6 +7,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/core/utility.hpp>
 #include <map>
+#include "OpenCVB_Extern.h"
 using namespace std;
 using namespace  cv;
 class MSER_Interface
@@ -59,7 +60,7 @@ public:
         }
     }
 };
-extern "C" __declspec(dllexport)
+VB_EXTERN
 MSER_Interface *MSER_Open(int delta, int minArea, int maxArea, float maxVariation, float minDiversity, int maxEvolution, float areaThreshold,
                        float minMargin, int edgeBlurSize, int pass2Setting) 
 {
@@ -67,32 +68,32 @@ MSER_Interface *MSER_Open(int delta, int minArea, int maxArea, float maxVariatio
                                        edgeBlurSize, pass2Setting);
     return cPtr;
 }
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void MSER_Close(MSER_Interface *cPtr)
 {
     delete cPtr;
 }
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int* MSER_Rects(MSER_Interface * cPtr)
 {
     return (int*)&cPtr->containers[0];
 }
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int* MSER_FloodPoints(MSER_Interface * cPtr)
 {
     return (int*)&cPtr->floodPoints[0];
 }
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int* MSER_MaskCounts(MSER_Interface * cPtr)
 {
     return (int*)&cPtr->maskCounts[0];
 }
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int MSER_Count(MSER_Interface * cPtr)
 {
     return (int)cPtr->containers.size();
 }
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int *MSER_RunCPP(MSER_Interface *cPtr, int *dataPtr, int rows, int cols, int channels)
 {
 		cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, dataPtr);

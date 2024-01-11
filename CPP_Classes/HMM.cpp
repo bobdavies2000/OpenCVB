@@ -6,6 +6,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include "cvHmm.h"
+#include "OpenCVB_Extern.h"
 
 using namespace std;
 using namespace  cv;
@@ -121,20 +122,20 @@ public:
 	}
 };
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 HMM* HMM_Open() {
 	HMM* cPtr = new HMM();
 	return cPtr;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int * HMM_Close(HMM* cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int* HMM_Run(HMM* cPtr, int* bgrPtr, int rows, int cols, int channels)
 {
 	cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, bgrPtr);

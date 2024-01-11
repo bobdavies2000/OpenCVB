@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "SemiGlobalMatching.h"
 #include <opencv2/calib3d.hpp>
+#include "OpenCVB_Extern.h"
 using namespace std;
 using namespace  cv;
 class SemiGlobalMatching
@@ -63,14 +64,14 @@ public:
 
 
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 SemiGlobalMatching *SemiGlobalMatching_Open(int rows, int cols, int disparityRange)
 {
   SemiGlobalMatching *SemiGlobalMatchingPtr = new SemiGlobalMatching(rows, cols, disparityRange);
   return SemiGlobalMatchingPtr;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int * SemiGlobalMatching_Close(SemiGlobalMatching *SemiGlobalMatchingPtr)
 {
   delete SemiGlobalMatchingPtr;
@@ -78,7 +79,7 @@ int * SemiGlobalMatching_Close(SemiGlobalMatching *SemiGlobalMatchingPtr)
 }
 
 // https://github.com/epiception/SGM-Census
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int *SemiGlobalMatching_Run(SemiGlobalMatching *SemiGlobalMatchingPtr, int *leftPtr, int *rightPtr, int rows, int cols)
 {
 	SemiGlobalMatchingPtr->leftImage = Mat(rows, cols, CV_8U, leftPtr);

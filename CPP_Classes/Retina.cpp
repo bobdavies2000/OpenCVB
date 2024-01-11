@@ -6,6 +6,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include "opencv2/bioinspired.hpp"
+#include "OpenCVB_Extern.h"
 
 // https://docs.opencv.org/3.4/d3/d86/tutorial_bioinspired_retina_model.html
 using namespace std;
@@ -57,21 +58,21 @@ public:
 	}
 };
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 Retina *Retina_Basics_Open(int rows, int cols, int useLogSampling, float samplingFactor)
 {
 	Retina * cPtr = new Retina(rows, cols, useLogSampling, samplingFactor);
 	return cPtr;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int *Retina_Basics_Close(Retina * cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int *Retina_Basics_Run(Retina * cPtr, int *bgrPtr, int rows, int cols, int *magno)
 {
 	cPtr->src = Mat(rows, cols, CV_8UC3, bgrPtr);

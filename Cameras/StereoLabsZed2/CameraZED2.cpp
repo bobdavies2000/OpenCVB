@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <algorithm>
+#include "OpenCVB_Extern.h"
 
 #include "../CameraDefines.hpp"
 #ifdef STEREOLAB_INSTALLED
@@ -196,27 +197,27 @@ public:
 	};
 
 
-extern "C" __declspec(dllexport) int* Zed2Open(int w, int h) { StereoLabsZed2* cPtr = new StereoLabsZed2(w, h); return (int*)cPtr; }
-extern "C" __declspec(dllexport) void Zed2Close(StereoLabsZed2 * cPtr) { cPtr->zed.close(); }
-extern "C" __declspec(dllexport) int* Zed2Acceleration(StereoLabsZed2 * cPtr) { return (int*)&cPtr->sensordata.imu.linear_acceleration; }
-extern "C" __declspec(dllexport) int* Zed2AngularVelocity(StereoLabsZed2 * cPtr) { return (int*)&cPtr->sensordata.imu.angular_velocity; }
-extern "C" __declspec(dllexport) int Zed2SerialNumber(StereoLabsZed2 * cPtr) { return cPtr->serialNumber; }
-extern "C" __declspec(dllexport) void Zed2WaitForFrame(StereoLabsZed2 * cPtr) { cPtr->waitForFrame(); }
-extern "C" __declspec(dllexport) double Zed2IMU_TimeStamp(StereoLabsZed2 * cPtr) { return cPtr->imuTimeStamp; }
-extern "C" __declspec(dllexport) void Zed2GetData(StereoLabsZed2 * cPtr, int w, int h) { cPtr->GetData(w, h); }
-extern "C" __declspec(dllexport) int* Zed2Color(StereoLabsZed2 * cPtr)
+VB_EXTERN int* Zed2Open(int w, int h) { StereoLabsZed2* cPtr = new StereoLabsZed2(w, h); return (int*)cPtr; }
+VB_EXTERN void Zed2Close(StereoLabsZed2 * cPtr) { cPtr->zed.close(); }
+VB_EXTERN int* Zed2Acceleration(StereoLabsZed2 * cPtr) { return (int*)&cPtr->sensordata.imu.linear_acceleration; }
+VB_EXTERN int* Zed2AngularVelocity(StereoLabsZed2 * cPtr) { return (int*)&cPtr->sensordata.imu.angular_velocity; }
+VB_EXTERN int Zed2SerialNumber(StereoLabsZed2 * cPtr) { return cPtr->serialNumber; }
+VB_EXTERN void Zed2WaitForFrame(StereoLabsZed2 * cPtr) { cPtr->waitForFrame(); }
+VB_EXTERN double Zed2IMU_TimeStamp(StereoLabsZed2 * cPtr) { return cPtr->imuTimeStamp; }
+VB_EXTERN void Zed2GetData(StereoLabsZed2 * cPtr, int w, int h) { cPtr->GetData(w, h); }
+VB_EXTERN int* Zed2Color(StereoLabsZed2 * cPtr)
 {
 	return (int*)cPtr->color.data;
 }
-extern "C" __declspec(dllexport) int* Zed2PointCloud(StereoLabsZed2 * cPtr)
+VB_EXTERN int* Zed2PointCloud(StereoLabsZed2 * cPtr)
 {
 	return (int*)cPtr->pointCloud.data;
 }
-extern "C" __declspec(dllexport) int* Zed2RightView(StereoLabsZed2 * cPtr)
+VB_EXTERN int* Zed2RightView(StereoLabsZed2 * cPtr)
 {
 	return (int*)cPtr->rightView.data;
 }
-extern "C" __declspec(dllexport) int* Zed2Intrinsics(StereoLabsZed2 * cPtr) { return (int*)&cPtr->cameraData; }
+VB_EXTERN int* Zed2Intrinsics(StereoLabsZed2 * cPtr) { return (int*)&cPtr->cameraData; }
 #else
-extern "C" __declspec(dllexport) int placeholder() { return 0; }
+VB_EXTERN int placeholder() { return 0; }
 #endif

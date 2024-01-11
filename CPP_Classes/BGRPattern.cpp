@@ -6,6 +6,7 @@
 #include <opencv2/ximgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/core/utility.hpp>
+#include "OpenCVB_Extern.h"
 using namespace std;
 using namespace  cv;
 class BGRPattern_Basics
@@ -44,24 +45,24 @@ public:
             }
     }
 };
-extern "C" __declspec(dllexport)
+VB_EXTERN
 BGRPattern_Basics * BGRPattern_Open() {
     BGRPattern_Basics* cPtr = new BGRPattern_Basics();
     return cPtr;
 }
-extern "C" __declspec(dllexport)
+VB_EXTERN
 void BGRPattern_Close(BGRPattern_Basics * cPtr)
 {
     delete cPtr;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int BGRPattern_ClassCount(BGRPattern_Basics * cPtr)
 {
     return cPtr->classCount;
 }
 
-extern "C" __declspec(dllexport)
+VB_EXTERN
 int* BGRPattern_RunCPP(BGRPattern_Basics * cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->src = Mat(rows, cols, CV_8UC3, dataPtr);
