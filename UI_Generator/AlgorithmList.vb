@@ -1504,7 +1504,6 @@ if algorithmName = "RedColor_Histogram3DBP" Then return new RedColor_Histogram3D
 if algorithmName = "RedColor_InputColor" Then return new RedColor_InputColor
 if algorithmName = "RedColor_LeftRight" Then return new RedColor_LeftRight
 if algorithmName = "RedMin_Basics" Then return new RedMin_Basics
-if algorithmName = "RedMin_BasicsAssist" Then return new RedMin_BasicsAssist
 if algorithmName = "RedMin_BasicsMotion" Then return new RedMin_BasicsMotion
 if algorithmName = "RedMin_Blobs" Then return new RedMin_Blobs
 if algorithmName = "RedMin_ContourVsFeatureLess" Then return new RedMin_ContourVsFeatureLess
