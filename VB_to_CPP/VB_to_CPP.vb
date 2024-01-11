@@ -1,8 +1,4 @@
 ﻿Imports System.IO
-' this translator is hacked together from converting the 30 lines of an algorithm to C++
-' There is no formal approach used here.  It is just a empirical - what do we need - approach.
-' If you want a thorough VB.Net to C++ translator, consider this product:
-'               https://www.tangiblesoftwaresolutions.com/product_details/vb_to_cplusplus_converter_details.html
 Public Class VB_to_CPP
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim input = New FileInfo("../../data/AlgorithmList.txt")
@@ -37,9 +33,31 @@ Public Class VB_to_CPP
         Next
 
         VBrtb.Text = "Translate this vb.Net code to C++" + vbCrLf
-        For vbIndex = vbIndex To vbInput.Count - 1
-            VBrtb.Text += vbInput(vbIndex) + vbCrLf
-            If vbInput(vbIndex).Contains("End Class") Then Exit For
+        Dim marshalCopyInput As New List(Of String)
+        For i = vbIndex To vbInput.Count - 1
+            If vbInput(i).Contains("_Open()") Then
+                Dim tokens = Trim(vbInput(i)).Split(" ")
+                Dim objName = tokens(2).Substring(0, InStr(tokens(2), "_") - 1)
+                vbInput(i) = objName + "* cPtr" + vbCrLf + "task.cPtr = new " + objName
+            End If
+
+            If i < vbInput.Count - 1 Then
+                If vbInput(i + 1).Contains("Marshal.Copy") Then
+                    Dim tokens = Trim(vbInput(i)).Split(" "c, "."c, "("c)
+                    marshalCopyInput.Add(tokens(2))
+                    vbInput(i) = "'" + tokens(2)
+                    vbInput(i + 1) = ""
+                    vbInput(i + 2) = ""
+                End If
+            End If
+            If marshalCopyInput.Count > 0 Then
+                vbInput(i) = vbInput(i).Replace("handleInput.AddrOfPinnedObject()", marshalCopyInput(0) + ".data()")
+                vbInput(i) = vbInput(i).Replace("handleInput.AddrOfPinnedObject()", marshalCopyInput(0) + ".data()")
+            End If
+            If vbInput(i).Contains(".Free()") Then vbInput(i) = ""
+            If vbInput(i) = "" Then Continue For
+            VBrtb.Text += vbInput(i) + vbCrLf
+            If vbInput(i).Contains("End Class") Then Exit For
         Next
 
         UpdateInfrastructure.Text = "Step 5: Add " + CPPName + " to OpenCVB interface"
@@ -104,6 +122,7 @@ Public Class VB_to_CPP
                         tokens(1) = tokens(1).Replace(";", "")
                         objectNames.Add(tokens(1))
                         constructorAdds.Add(vbTab + tokens(1) + " = new CPP_" + tokens(0) + "(rows, cols);")
+                        Exit For
                     End If
                 Next
             End If
@@ -112,6 +131,10 @@ Public Class VB_to_CPP
                 split(i) = split(i).Replace(obj + ".", obj + "->")
             Next
 
+            split(i) = split(i).Replace("Mat dst", "dst = Mat")
+            split(i) = split(i).Replace("~" + functionName, "~CPP_" + functionName)
+            split(i) = split(i).Replace(" override", "")
+            split(i) = split(i).Replace(" || testIntermediate(traceName)", "")
             split(i) = split(i).Replace("vbDrawContour", "task->drawContour")
             split(i) = split(i).Replace("gOptions.FrameHistory.Value", "task->frameHistoryCount")
             split(i) = split(i).Replace("gOptions.PixelDiffThreshold.Value", "task->pixelDiffThreshold")

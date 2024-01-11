@@ -139,7 +139,7 @@ End Class
 Public Class RedMin_Core : Inherits VB_Algorithm
     Public sortedCells As New SortedList(Of Integer, segCell)(New compareAllowIdenticalIntegerInverted)
     Public inputMask As cv.Mat
-    Dim fLess As New FeatureLess_BasicsAccum
+    Dim fLess As New FeatureLess_History
     Public Sub New()
         cPtr = FloodCell_Open()
         desc = "Another minimalist approach to building RedCloud color-based cells."

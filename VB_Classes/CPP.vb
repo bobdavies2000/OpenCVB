@@ -36,6 +36,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub New()
     End Sub
+
     Public Sub RunVB(src As cv.Mat)
         cppTask_OptionsVBtoCPP(cPtr, gOptions.GridSize.Value,
                                gOptions.HistBinSlider.Value,
@@ -45,7 +46,8 @@ Public Class CPP_Basics : Inherits VB_Algorithm
                                task.lineWidth, task.lineType, task.dotSize, task.minRes.Width, task.minRes.Height,
                                task.maxZmeters, redOptions.PCReduction, task.cvFontSize, task.cvFontThickness,
                                task.clickPoint.X, task.clickPoint.Y, task.mouseClickFlag,
-                               task.mousePicTag, task.mouseMovePoint.X, task.mouseMovePoint.Y)
+                               task.mousePicTag, task.mouseMovePoint.X, task.mouseMovePoint.Y,
+                               task.paletteIndex)
 
         Dim pointCloudData(task.pointCloud.Total * task.pointCloud.ElemSize - 1) As Byte
         Marshal.Copy(task.pointCloud.Data, pointCloudData, 0, pointCloudData.Length)
@@ -75,7 +77,6 @@ Public Class CPP_Basics : Inherits VB_Algorithm
         handleLeftView.Free()
         handleRightView.Free()
 
-
         Dim inputImage(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, inputImage, 0, inputImage.Length)
         Dim handleInput = GCHandle.Alloc(inputImage, GCHandleType.Pinned)
@@ -88,11 +89,13 @@ Public Class CPP_Basics : Inherits VB_Algorithm
         getOptions()
 
         If imagePtr <> 0 Then
-            dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
-            Dim dst3Ptr = cppTask_GetDst3(cPtr)
-            dst3 = New cv.Mat(dst0.Rows, dst0.Cols, cv.MatType.CV_8UC3, dst3Ptr)
-        Else
-            setTrueText("The C++ algorithm interface appears to be failing!")
+            Dim channels As Integer
+            For i = 0 To 3
+                Dim dst = Choose(i + 1, dst0, dst1, dst2, dst3)
+                Dim dstPtr = cppTask_GetDst(cPtr, i, channels)
+                Dim type = Choose(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3)
+                dst = New cv.Mat(src.Rows, src.Cols, type, dstPtr)
+            Next
         End If
     End Sub
     Public Sub Close()
@@ -135,7 +138,7 @@ Module CPP_Module
     End Function
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function cppTask_GetDst3(cPtr As IntPtr) As IntPtr
+    Public Function cppTask_GetDst(cPtr As IntPtr, index As Integer, ByRef channels As Integer) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub cppTask_OptionsCPPtoVB(cPtr As IntPtr, ByRef gridSize As Integer,
@@ -159,6 +162,6 @@ Module CPP_Module
                                       PCReduction As Integer, fontSize As Single,
                                       fontThickness As Integer, clickX As Integer,
                                       clickY As Integer, clickFlag As Boolean, picTag As Integer,
-                                      moveX As Integer, moveY As Integer)
+                                      moveX As Integer, moveY As Integer, paletteIndex As Integer)
     End Sub
 End Module 

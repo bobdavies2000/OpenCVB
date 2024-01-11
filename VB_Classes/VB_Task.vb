@@ -89,6 +89,7 @@ Public Class VBtask : Implements IDisposable
 
     Public palette As Palette_Basics
     Public paletteGradient As cv.Mat
+    Public paletteIndex As Integer
 
     Public mouseClickFlag As Boolean
     Public clickPoint As cv.Point

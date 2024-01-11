@@ -320,7 +320,8 @@ Public Class Depth_Palette : Inherits VB_Algorithm
         Dim mult = 255 / task.maxZmeters
         Dim depthNorm = (task.pcSplit(2) * mult).ToMat
         depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
-        dst2 = Palette_Custom_Apply(depthNorm.CvtColor(cv.ColorConversionCodes.GRAY2BGR), customColorMap).SetTo(0, task.noDepthMask)
+        Dim ColorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, customColorMap.Data())
+        cv.Cv2.ApplyColorMap(src, dst2, ColorMap)
     End Sub
 End Class
 

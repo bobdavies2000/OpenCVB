@@ -51,6 +51,12 @@
     <ClInclude Include="CPP_Functions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CPP_Task.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenCVB_Extern.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Corners.cpp">
@@ -102,9 +108,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HMM.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Palette.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Plot_OpenCV.cpp">

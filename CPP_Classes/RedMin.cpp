@@ -5,7 +5,8 @@
 #include <opencv2/core.hpp>
 #include <opencv2/ximgproc.hpp>
 #include <opencv2/highgui.hpp>
-#include <opencv2/core/utility.hpp>
+#include <opencv2/core/utility.hpp> 
+#include "OpenCVB_Extern.h"
 using namespace std;
 using namespace  cv;
 class RedMin_FindPixels

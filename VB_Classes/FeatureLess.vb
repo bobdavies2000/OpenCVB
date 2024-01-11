@@ -21,32 +21,6 @@ End Class
 
 
 
-Public Class FeatureLess_BasicsAccum : Inherits VB_Algorithm
-    Dim edgeD As New EdgeDraw_Basics
-    Dim frames As New History_Basics
-    Public Sub New()
-        gOptions.FrameHistory.Value = 10
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels = {"", "", "EdgeDraw_Basics output", ""}
-        desc = "Access the EdgeDraw_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        edgeD.Run(src)
-
-        frames.Run(edgeD.dst2)
-        dst2 = frames.dst2
-        If standalone Or testIntermediate(traceName) Then
-            dst3 = src.Clone
-            dst3.SetTo(cv.Scalar.Yellow, dst2)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class FeatureLess_EdgeDrawing : Inherits VB_Algorithm

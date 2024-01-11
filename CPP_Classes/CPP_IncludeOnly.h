@@ -21,346 +21,20 @@
 #include <vector>
 #include <random>
 #include "opencv2/video/tracking.hpp"
+#include <filesystem> 
 
 using namespace std;
 using namespace cv;
 using namespace ximgproc;
 using namespace ml;
+namespace fs = std::filesystem;
 
+#define STATIC_EXTERNS
+#include "floodCell.cpp"
 #include "../CPP_Classes/PragmaLibs.h"
-
-class rcData {
-public:
-    cv::Rect rect;
-    cv::Rect motionRect;  // the union of the previous rect with the current rect.
-    cv::Mat mask;
-    cv::Mat depthMask;
-
-    int pixels;
-    int depthPixels;
-
-    cv::Vec3b color;
-    cv::Scalar colorMean;
-    cv::Scalar colorStdev;
-    int colorDistance;
-    int grayMean;
-
-    cv::Point3f depthMean;
-    cv::Point3f depthStdev;
-    float depthDistance;  // Adjusted to float for consistency with Point3f
-
-    cv::Point3f minVec;
-    cv::Point3f maxVec;
-
-    cv::Point maxDist;
-    cv::Point maxDStable;  // keep maxDist the same if it is still on the cell.
-
-    int index;
-    int indexLast;
-    int matchCount;
-
-    std::vector<cv::Point> contour;
-    std::vector<cv::Point> corners;
-    std::vector<cv::Point3f> contour3D;
-    std::vector<cv::Point> hull;  // Using std::vector for consistency
-
-    bool motionDetected;
-
-    cv::Point floodPoint;
-    bool depthCell;  // true if no depth.
-
-    cv::Vec4f eq;  // plane equation
-    cv::Vec3f pcaVec;
-    std::map<int, int> specG;  // Using std::map for key-value pairs
-    std::map<int, int> specD;  // Using std::map for key-value pairs
-
-    rcData() : index(0), depthCell(true) {
-        mask = cv::Mat(1, 1, CV_8U);
-        rect = cv::Rect(0, 0, 1, 1);
-    }
-};
-
-
-struct mmData
-{
-    double minVal;
-    double maxVal;
-    Point minLoc;
-    Point maxLoc;
-};
-
-// https://stackoverflow.com/questions/1380463/sorting-a-vector-of-custom-objects
-struct sortInt
-{
-    int key;
-    int value;
-
-    sortInt(int key, int value) : key(key), value(value) {}
-
-    // these allows you to sort the struct by the key with sort(vec.begin(), vec.end());
-    bool operator < (const sortInt& keyVal)
-    {
-        return (key < keyVal.key);
-    }
-    bool operator > (const sortInt& keyVal)
-    {
-        return (key > keyVal.key);
-    }
-}; 
-
-class linePoints {
-public:
-    cv::Point2f p1;
-    cv::Point2f p2;
-    float slope;
-    float yIntercept;
-    static constexpr float verticalSlope = 1000000.0f;  // Using constexpr for constant
-
-    linePoints(const cv::Point2f& _p1, const cv::Point2f& _p2) : p1(_p1), p2(_p2) {
-        slope = (p1.x != p2.x) ? (p1.y - p2.y) / (p1.x - p2.x) : verticalSlope;
-        yIntercept = p1.y - slope * p1.x;
-    }
-
-    linePoints() : p1(), p2() {}  // Default constructor
-
-    bool compare(const linePoints& mp) const {  // Using const for non-modifying methods
-        return mp.p1 == p1 && mp.p2 == p2;
-    }
-};
-
-#define LINE_WIDTH 1
-#define WHITE Scalar(255, 255, 255)
-#define BLUE Scalar(255, 0, 0)
-#define RED Scalar(0, 0, 255)
-#define GREEN Scalar(0, 255, 0)
-#define YELLOW Scalar(0, 255, 255)
-#define BLACK Scalar(0, 0, 0)
-#define GRAY Scalar(127, 127, 127)
-vector<Scalar> highlightColors = { YELLOW, WHITE, BLUE, GRAY, RED, GREEN };
-
-vector<string> mapNames = { "Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
-                            "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter" };
-
-#include "CPP_Functions.h"
-
-class algorithmCPP
-{
-private:
-public:
-    Mat dst0, dst1, dst2, dst3, empty;
-    bool standalone;
-    String advice;
-    String desc;
-    string traceName;
-    Vec3b black = Vec3b(0, 0, 0);
-    vector<string> labels{ "", "", "", "" };
-    algorithmCPP() {}
-    algorithmCPP(int rows, int cols)
-    {
-        dst0 = Mat(rows, cols, CV_8UC3);
-        dst0.setTo(0);
-        dst1 = Mat(rows, cols, CV_8UC3);
-        dst1.setTo(0);
-        dst2 = Mat(rows, cols, CV_8UC3);
-        dst2.setTo(0);
-        dst3 = Mat(rows, cols, CV_8UC3);
-        dst3.setTo(0);
-    };
-
-    virtual void Run(Mat src) = 0;  // forces the child class to have a void Run function has the same paramters.
-};
-
-
-
-
-
-
-class cppTask
-{
-private:
-public:
-    algorithmCPP* alg;
-    Mat color, depthRGB, depth32f, pointCloud, gCloud, leftView, rightView; 
-    int cppFunction; int lineWidth; int lineType; 
-    int gridRows, gridCols;
-    Mat depthMask, noDepthMask, gridMask, maxDepthMask;
-    int font; 
-    float cvFontSize; 
-    int cvFontThickness;
-    Scalar fontColor;
-    int frameCount;  Point3f accRadians; vector<Rect> roiList;
-    bool motionReset; rcData rcSelect;
-
-    bool heartBeat; bool debugCheckBox; Size minRes; int PCReduction;
-    bool optionsChanged; double addWeighted; int dotSize; int gridSize; float maxZmeters;
-    int histogramBins; int pixelDiffThreshold; bool gravityPointCloud; bool useKalman;
-    int paletteIndex; int polyCount; bool firstPass; Scalar highlightColor; int frameHistoryCount;
-    Point clickPoint; bool mouseClickFlag; int mousePicTag; Point mouseMovePoint; bool mouseMovePointUpdated;
-    Scalar scalarColors[256]; Vec3b vecColors[256]; Rect drawRect; bool displayDst0; bool displayDst1;
-    bool gridROIclicked;
-    Mat gridToRoiIndex;
-    vector<Rect> gridList;
-    vector<vector<int>> gridNeighbors;
-
-    Mat gMatrix; vector<Mat> pcSplit;
-    bool paused = false;
-    Mat xdst0, xdst1, xdst2, xdst3;
-    cppTask(int rows, int cols)
-    {
-        cppFunction = -1;
-        firstPass = true;
-
-        polyCount = 10; // use FPoly_TopFeatures and the slider to double-check this value.  It seems pretty good.
-        buildColors();
-    };
-    void buildColors()
-    {
-        srand(time(0));
-        for (int i = 0; i < 256; i++)
-        {
-            vecColors[i] = Vec3b(rand() % 256, rand() % 256, rand() % 256);
-            scalarColors[i] = Scalar(vecColors[i].val[0], vecColors[i].val[1], vecColors[i].val[2]);
-        }
-    }
-    void drawContour(Mat dst, vector<Point> contour, Scalar color, int lineWidth = -10)
-    {
-        if (lineWidth == -10) lineWidth = this->lineWidth;
-        if (contour.size() < 3) return;
-        vector<vector<Point>> pointList;
-        pointList.push_back(contour);
-        drawContours(dst, pointList, -1, color, lineWidth, this->lineType);
-    }
-    vector<Point> convert2f2i(Mat hull2f)
-    {
-        Mat hull2i = Mat(hull2f.rows, 1, CV_32SC2);
-        hull2f.convertTo(hull2i, CV_32SC2);
-        vector<Point> vec;
-        vec.assign((Point *)hull2i.data, (Point *)hull2i.data + hull2i.total());
-        return vec;
-    }
-    void setTrueText(String text, Mat dst, Point2f pt = Point2f(10, 50))
-    {
-        if (cppFunction < 0) return;
-        putText(dst, text, pt, this->font, this->cvFontSize, this->fontColor);
-    }
-    mmData getMinMax(Mat mat, Mat mask = Mat())
-    {
-        mmData mm;
-        if (mask.rows == 0)
-        {
-            minMaxLoc(mat, &mm.minVal, &mm.maxVal, &mm.minLoc, &mm.maxLoc);
-        } else {
-            minMaxLoc(mat, &mm.minVal, &mm.maxVal, &mm.minLoc, &mm.maxLoc, mask);
-        }
-        return mm;
-    }
-    Vec3b randomCellColor() {
-        static random_device rd;
-        static mt19937 gen(rd());  // Mersenne Twister engine for randomness
-        uniform_int_distribution<> dist(50, 240);
-
-        // Generate three random values between 50 and 240 (inclusive)
-        // using uniform_int_distribution for more control over range
-        return Vec3b(dist(gen), dist(gen), dist(gen));
-    }
-    void AddPlotScale(Mat& dst, double minVal, double maxVal, int lineCount = 3) {
-        // Draw a scale along the side
-        int spacer = cvRound(dst.rows / (lineCount + 1));
-        int spaceVal = cvRound((maxVal - minVal) / (lineCount + 1));
-        if (lineCount > 1 && spaceVal < 1) {
-            spaceVal = 1;
-        }
-        spaceVal += spaceVal % 10; // Ensure even spacing
-
-        for (int i = 0; i <= lineCount; i++) {
-            Point p1(0, spacer * i);
-            Point p2(dst.cols, spacer * i);
-            line(dst, p1, p2, Scalar(255, 255, 255), this->cvFontThickness); // White line
-
-            double nextVal = maxVal - spaceVal * i;
-            std::string nextText;
-            if (maxVal > 1000) {
-                nextText = std::to_string(cvRound(nextVal / 1000)) + "k"; // Format for thousands
-            }
-            else {
-                nextText = std::to_string(cvRound(nextVal)); // Normal formatting
-            }
-
-            putText(dst, nextText, p1, FONT_HERSHEY_PLAIN, this->cvFontSize, Scalar(255, 255, 255),
-                        this->cvFontThickness, this->lineType);
-        }
-    }
-
-    Mat normalize32f(Mat input)
-    {
-        Mat outMat;
-        normalize(input, outMat, 255, 0, NormTypes::NORM_MINMAX);
-        outMat.convertTo(outMat, CV_8U);
-        cvtColor(outMat, outMat, COLOR_GRAY2BGR);
-        return outMat;
-    }
-    Point2f getMaxDist(Mat mask, Rect rect)
-    {
-        Mat tmpMask = mask.clone();
-        rectangle(tmpMask, Rect(0, 0, mask.cols - 1, mask.rows - 1), 0, 1);
-        Mat distance32f;
-        distanceTransform(tmpMask, distance32f, DIST_L1, 3);
-        double minVal, maxVal;
-        Point minDistanceLoc, maxDistanceLoc;
-        minMaxLoc(distance32f, &minVal, &maxVal, &minDistanceLoc, &maxDistanceLoc);
-        maxDistanceLoc.x += rect.x;
-        maxDistanceLoc.y += rect.y;
-        return maxDistanceLoc;
-    }
-    float shapeCorrelation(vector<Point> points)
-    {
-        Mat pts = Mat(int(points.size()), 1, CV_32SC2, points.data());
-        Mat pts32f;
-        pts.convertTo(pts32f, CV_32FC2);
-        vector<Mat> splitMat;
-        split(pts32f, splitMat);
-        Mat correlationMat;
-        matchTemplate(splitMat[0], splitMat[1], correlationMat, TemplateMatchModes::TM_CCOEFF_NORMED);
-        return correlationMat.at<float>(0, 0);
-    }
-
-    Rect validateRect(const Rect& r, int width, int height) {
-        Rect result = r;
-        if (result.width < 0) result.width = 1;
-        if (result.height < 0) result.height = 1;
-        if (result.x < 0) result.x = 0;
-        if (result.y < 0) result.y = 0;
-        if (result.x > width) result.x = width;
-        if (result.y > height) result.y = height;
-        if (result.x + result.width > width) result.width = width - result.x;
-        if (result.y + result.height > height) result.height = height - result.y;
-        return result;
-    }
-
-    Rect initRandomRect(int margin, int width) {
-        // Use C++11's random number generator for better randomness
-        static random_device rd;
-        static mt19937 gen(rd());  // Mersenne Twister engine
-        static uniform_int_distribution<> dist(margin, width - 2 * margin);
-        return Rect(dist(gen), dist(gen), dist(gen), dist(gen));
-    }
-
-    void drawRotatedRectangle(RotatedRect rr, Mat dst2, const Scalar color) {
-        vector<Point2f> vertices2f; 
-        rr.points(vertices2f);
-        vector<cv::Point> vertices(vertices2f.size());
-        for (int j = 0; j < vertices2f.size(); j++) {
-            vertices[j] = cv::Point(cvRound(vertices2f[j].x), cvRound(vertices2f[j].y));
-        }
-        cv::fillConvexPoly(dst2, vertices, color, this->lineType);  
-    }
-};
-
-
+#include "CPP_Task.h"
 
 cppTask* task;
-
-
 
 class CPP_AddWeighted_Basics : public algorithmCPP {
 public:
@@ -2757,13 +2431,13 @@ public:
 class CPP_FeatureLess_Basics : public algorithmCPP {
 public:
     CPP_EdgeDraw_Basics* edgeD;
-    CPP_FeatureLess_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
+    CPP_FeatureLess_Basics(int rows, int cols) : algorithmCPP(rows, cols)
+    {
         traceName = "CPP_FeatureLess_Basics";
         edgeD = new CPP_EdgeDraw_Basics(rows, cols);
-        labels = { "", "", "EdgeDraw_Basics output", "" };
         desc = "Access the EdgeDraw_Basics algorithm directly rather than through the CPP_Basics interface - more efficient";
     }
-    void Run(Mat src) override {
+    void Run(Mat src) {
         edgeD->Run(src);
         dst2 = edgeD->dst2;
         if (standalone) {
@@ -2772,8 +2446,6 @@ public:
         }
     }
 };
-
-
 
 
 
@@ -2850,4 +2522,140 @@ public:
         labels[2] = "Bezier output";
     }
 };
+
+
+
+
+class CPP_FeatureLess_History : public algorithmCPP {
+public:
+    CPP_EdgeDraw_Basics* edgeD;
+    CPP_History_Basics* frames;
+    CPP_FeatureLess_History(int rows, int cols) : algorithmCPP(rows, cols) 
+    {
+        dst2 = Mat::zeros(dst2.size(), CV_8U); 
+        traceName = "CPP_FeatureLess_History";
+        edgeD = new CPP_EdgeDraw_Basics(rows, cols);
+        frames = new CPP_History_Basics(rows, cols);
+        desc = "Access the EdgeDraw_Basics algorithm directly rather than through the CPP_Basics interface - more efficient";
+        task->frameHistoryCount = 10;
+    }
+    void Run(Mat src) {
+        edgeD->Run(src);
+        frames->Run(edgeD->dst2);
+        dst2 = frames->dst2;
+        if (standalone) {
+            dst3 = src.clone();
+            dst3.setTo(Scalar(0, 255, 255), dst2);
+        }
+    }
+};
+
+
+
+
+
+
+class CPP_Palette_Basics : public algorithmCPP {
+public:
+    bool whitebackground = false;
+    Mat gradientColorMap;
+    //fs::path cMapDir = task->homeDir + "opencv/modules/imgproc/doc/pics/colormaps";
+    fs::path cMapDir = "c:/_src/OpenCVB/opencv/modules/imgproc/doc/pics/colormaps";
+    CPP_Palette_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_Palette_Basics";
+        buildColorMap();
+        desc = "Apply the different color maps in OpenCV - Painterly Effect";
+    }
+private:
+    void buildColorMap() {
+        filesystem::path str = cMapDir / ("colorscale_Jet.jpg");
+        gradientColorMap = imread(str.string());
+        gradientColorMap.col(0).setTo(whitebackground ? Scalar(255, 255, 255) : Scalar(0, 0, 0));
+    }
+public:
+    void Run(Mat src) {
+        if (src.empty()) return;
+        labels[2] = "ColorMap = Jet";
+        if (task->optionsChanged) buildColorMap();
+        if (src.type() == CV_32F) {
+            normalize(src, src, 0, 255, NORM_MINMAX);
+            src.convertTo(src, CV_8U);
+        }
+        if (standalone) cvtColor(src, src, COLOR_BGR2GRAY);
+
+        applyColorMap(src, dst2, (ColormapTypes) task->paletteIndex);
+    }
+};
+
+
+
+
+
+class CPP_RedMin_Core : public algorithmCPP {
+public:
+    map<int, segCell, compareAllowIdenticalIntegerInverted> sortedCells;
+    Mat inputMask;
+    CPP_FeatureLess_History* fLess;
+    FloodCell* cPtr;
+    float redOptions_imageThresholdPercent = 0.95f;
+    int redOptions_DesiredCellSlider = 30;
+    CPP_RedMin_Core(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_RedMin_Core";
+        fLess = new CPP_FeatureLess_History(rows, cols);
+        cPtr = new FloodCell();
+        desc = "Another minimalist approach to building RedCloud color-based cells.";
+    }
+    ~CPP_RedMin_Core() {
+
+        if (cPtr) {
+            FloodCell_Close(cPtr);
+            delete cPtr;
+        }
+    }
+    void Run(Mat src) {
+        if (src.channels() != 1) {
+            fLess->Run(src);
+            src = fLess->dst2;
+        }
+        void* imagePtr;
+        Mat* srcPtr = &src;
+        if (inputMask.empty()) {
+            imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, 0, src.rows, src.cols,
+                src.type(), redOptions_imageThresholdPercent, redOptions_DesiredCellSlider, 0);
+        }
+        else {
+            Mat* maskPtr = &inputMask;
+            imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, (uchar *)maskPtr->data, src.rows, src.cols,
+                                     src.type(), redOptions_imageThresholdPercent, redOptions_DesiredCellSlider, 0);
+        }
+        int classCount = FloodCell_Count(cPtr);
+
+        dst2 = Mat(src.rows, src.cols, CV_8UC1, imagePtr);
+        //Mat dst3 = vbPalette(dst2 * 255 / classCount);
+        int count = countNonZero(dst2);
+        if (task->heartBeat) {
+            labels[3] = to_string(classCount) + " cells found";
+        }
+        if (classCount <= 1) {
+            return;
+        }
+        Mat sizeData(classCount, 1, CV_32SC1, FloodCell_Sizes(cPtr));
+        Mat rectData(classCount, 1, CV_32SC4, FloodCell_Rects(cPtr));
+        Mat floodPointData(classCount, 1, CV_32SC2, FloodCell_FloodPoints(cPtr));
+        sortedCells.clear();
+        for (int i = 0; i < classCount; i++) {
+            segCell cell;
+            cell.index = i + 1;
+            cell.rect = task->validateRect(rectData.at<Rect>(i, 0), dst2.cols, dst2.rows);
+            cell.mask = dst2(cell.rect).clone();
+
+        }
+        if (task->heartBeat) {
+            labels[2] = "CV_8U format - " + to_string(classCount) + " cells were identified.";
+        }
+    }
+};
+
+
+
 

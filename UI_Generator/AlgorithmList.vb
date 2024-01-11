@@ -2,6 +2,9 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
+_CPP_Palette_Basics
+_CPP_RedMin_Core
+_CPP_FeatureLess_History
 _CPP_Line_Basics
 _CPP_Convex_Basics
 _CPP_Resize_Preserve
@@ -293,6 +296,7 @@ if algorithmName = "CPP_Feature_Agast" Then return new CPP_Basics(functionNames.
 if algorithmName = "CPP_Feature_Basics" Then return new CPP_Basics(functionNames._CPP_Feature_Basics)
 if algorithmName = "CPP_FeatureLess_Basics" Then return new CPP_Basics(functionNames._CPP_FeatureLess_Basics)
 if algorithmName = "CPP_FeatureLess_Edge" Then return new CPP_Basics(functionNames._CPP_FeatureLess_Edge)
+if algorithmName = "CPP_FeatureLess_History" Then return new CPP_Basics(functionNames._CPP_FeatureLess_History)
 if algorithmName = "CPP_FPoly_TopFeatures" Then return new CPP_Basics(functionNames._CPP_FPoly_TopFeatures)
 if algorithmName = "CPP_Grid_Basics" Then return new CPP_Basics(functionNames._CPP_Grid_Basics)
 if algorithmName = "CPP_Histogram_Basics" Then return new CPP_Basics(functionNames._CPP_Histogram_Basics)
@@ -308,6 +312,7 @@ if algorithmName = "CPP_Line_Basics" Then return new CPP_Basics(functionNames._C
 if algorithmName = "CPP_Mat_4to1" Then return new CPP_Basics(functionNames._CPP_Mat_4to1)
 if algorithmName = "CPP_Motion_Basics" Then return new CPP_Basics(functionNames._CPP_Motion_Basics)
 if algorithmName = "CPP_Motion_Core" Then return new CPP_Basics(functionNames._CPP_Motion_Core)
+if algorithmName = "CPP_Palette_Basics" Then return new CPP_Basics(functionNames._CPP_Palette_Basics)
 if algorithmName = "CPP_Plot_Histogram" Then return new CPP_Basics(functionNames._CPP_Plot_Histogram)
 if algorithmName = "CPP_Random_Basics" Then return new CPP_Basics(functionNames._CPP_Random_Basics)
 if algorithmName = "CPP_Random_Enumerable" Then return new CPP_Basics(functionNames._CPP_Random_Enumerable)
@@ -315,6 +320,7 @@ if algorithmName = "CPP_Rectangle_Basics" Then return new CPP_Basics(functionNam
 if algorithmName = "CPP_Rectangle_Rotated" Then return new CPP_Basics(functionNames._CPP_Rectangle_Rotated)
 if algorithmName = "CPP_RedCloud_Core" Then return new CPP_Basics(functionNames._CPP_RedCloud_Core)
 if algorithmName = "CPP_RedCloud_Flood" Then return new CPP_Basics(functionNames._CPP_RedCloud_Flood)
+if algorithmName = "CPP_RedMin_Core" Then return new CPP_Basics(functionNames._CPP_RedMin_Core)
 if algorithmName = "CPP_Remap_Basics" Then return new CPP_Basics(functionNames._CPP_Remap_Basics)
 if algorithmName = "CPP_Resize_Basics" Then return new CPP_Basics(functionNames._CPP_Resize_Basics)
 if algorithmName = "CPP_Resize_Preserve" Then return new CPP_Basics(functionNames._CPP_Resize_Preserve)
@@ -544,7 +550,6 @@ if algorithmName = "Feature_TraceKNN" Then return new Feature_TraceKNN
 if algorithmName = "Feature_Tracer" Then return new Feature_Tracer
 if algorithmName = "Feature_VerticalVerify" Then return new Feature_VerticalVerify
 if algorithmName = "FeatureLess_Basics" Then return new FeatureLess_Basics
-if algorithmName = "FeatureLess_BasicsAccum" Then return new FeatureLess_BasicsAccum
 if algorithmName = "FeatureLess_Canny" Then return new FeatureLess_Canny
 if algorithmName = "FeatureLess_DCT" Then return new FeatureLess_DCT
 if algorithmName = "FeatureLess_Density" Then return new FeatureLess_Density
@@ -1267,6 +1272,7 @@ if algorithmName = "Options_XPhoto" Then return new Options_XPhoto
 if algorithmName = "ORB_Basics" Then return new ORB_Basics
 if algorithmName = "ORB_Match" Then return new ORB_Match
 if algorithmName = "Palette_Basics" Then return new Palette_Basics
+if algorithmName = "Palette_BuildColorMap" Then return new Palette_BuildColorMap
 if algorithmName = "Palette_Color" Then return new Palette_Color
 if algorithmName = "Palette_Create" Then return new Palette_Create
 if algorithmName = "Palette_DepthColorMap" Then return new Palette_DepthColorMap

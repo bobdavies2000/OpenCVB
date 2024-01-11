@@ -34,6 +34,12 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case _CPP_AddWeighted_Basics :
     {task->alg = new CPP_AddWeighted_Basics(rows, cols); break; }
+	case _CPP_Palette_Basics :
+	{task->alg = new CPP_Palette_Basics(rows, cols); break; }
+	case _CPP_RedMin_Core :
+	{task->alg = new CPP_RedMin_Core(rows, cols); break; }
+	case _CPP_FeatureLess_History :
+	{task->alg = new CPP_FeatureLess_History(rows, cols); break; }
 	case _CPP_Line_Basics :
 	{task->alg = new CPP_Line_Basics(rows, cols); break; }
 	case _CPP_Convex_Basics :
@@ -198,7 +204,8 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
                             int frameHistory, int rectX, int rectY, int rectWidth, int rectHeight,
                             int lineWidth, int lineType, int dotSize, int minResWidth, int minResHeight,
                             float maxZmeters, int PCReduction, float fontSize, int fontThickness,
-                            int clickX, int clickY, bool clickFlag, int picTag, int moveX, int moveY)
+                            int clickX, int clickY, bool clickFlag, int picTag, int moveX, int moveY,
+                            int paletteIndex)
 {
     task->pixelDiffThreshold = pixelDiffThreshold;
     task->gridSize = gridSize;
@@ -221,6 +228,7 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
     task->mouseMovePoint = Point(moveX, moveY);
     task->mouseClickFlag = clickFlag;
     task->mousePicTag = picTag;
+    task->paletteIndex = paletteIndex;
 }
 
 
@@ -265,8 +273,44 @@ void cppTask_DepthLeftRight(cppTask * task, int* depthRGBPtr, int* leftView, int
 
 
 extern "C" __declspec(dllexport)
-int* cppTask_GetDst3(cppTask * task)
+int* cppTask_GetDst(cppTask * task, int index, int& channels)
 {
+    switch (index)
+    {
+    case 0:
+        channels = task->xdst0.channels();
+        return (int*)task->xdst0.data;
+    case 1:
+        channels = task->xdst1.channels();
+        return (int*)task->xdst1.data;
+    case 2:
+        channels = task->xdst2.channels();
+        return (int*)task->xdst2.data;
+    case 3:
+        channels = task->xdst3.channels();
+        return (int*)task->xdst3.data;
+    }
+    return 0;
+}
+
+extern "C" __declspec(dllexport)
+int* cppTask_GetDst1(cppTask * task, int& channels)
+{
+    channels = task->xdst1.channels();
+    return (int*)task->xdst1.data;
+}
+
+extern "C" __declspec(dllexport)
+int* cppTask_GetDst2(cppTask * task, int& channels)
+{
+    channels = task->xdst2.channels();
+    return (int*)task->xdst2.data;
+}
+
+extern "C" __declspec(dllexport)
+int* cppTask_GetDst3(cppTask * task, int& channels)
+{
+    channels = task->xdst3.channels();
     return (int*)task->xdst3.data;
 }
 
@@ -325,9 +369,5 @@ int* cppTask_RunCPP(cppTask * task, int* dataPtr, int channels, int frameCount, 
     if (task->alg->dst1.type() == CV_32S) task->alg->dst3.convertTo(task->xdst3, CV_8U);
     if (task->alg->dst2.type() == CV_32S) task->alg->dst3.convertTo(task->xdst3, CV_8U);
     if (task->alg->dst3.type() == CV_32S) task->alg->dst3.convertTo(task->xdst3, CV_8U);
-    if (task->xdst0.type() == CV_8U) cvtColor(task->xdst0, task->xdst0, COLOR_GRAY2BGR);
-    if (task->xdst1.type() == CV_8U) cvtColor(task->xdst1, task->xdst1, COLOR_GRAY2BGR);
-    if (task->xdst2.type() == CV_8U) cvtColor(task->xdst2, task->xdst2, COLOR_GRAY2BGR);
-    if (task->xdst3.type() == CV_8U) cvtColor(task->xdst3, task->xdst3, COLOR_GRAY2BGR);
     return (int*)task->xdst2.data;
 }

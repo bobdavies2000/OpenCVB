@@ -1,7 +1,41 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
+Imports System.Drawing.Imaging
+
 Public Class Palette_Basics : Inherits VB_Algorithm
+    Public whitebackground As Boolean
+    Public gradientColorMap As New cv.Mat
+    Dim cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
+    Public Sub New()
+        desc = "Apply the different color maps in OpenCV"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        labels(2) = "ColorMap = " + gOptions.Palettes.Text
+
+        If src.Type = cv.MatType.CV_32F Then
+            src = vbNormalize32f(src)
+            src.ConvertTo(src, cv.MatType.CV_8U)
+        End If
+
+        Dim mapIndex = Choose(task.paletteIndex + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone,
+                              cv.ColormapTypes.Cividis, cv.ColormapTypes.Cool, cv.ColormapTypes.Hot,
+                              cv.ColormapTypes.Hsv, cv.ColormapTypes.Inferno, cv.ColormapTypes.Jet,
+                              cv.ColormapTypes.Magma, cv.ColormapTypes.Ocean, cv.ColormapTypes.Parula,
+                              cv.ColormapTypes.Pink, cv.ColormapTypes.Plasma, cv.ColormapTypes.Rainbow,
+                              cv.ColormapTypes.Spring, cv.ColormapTypes.Summer, cv.ColormapTypes.Twilight,
+                              cv.ColormapTypes.TwilightShifted, cv.ColormapTypes.Viridis, cv.ColormapTypes.Winter)
+        cv.Cv2.ApplyColorMap(src, dst2, mapIndex)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Palette_BuildColorMap : Inherits VB_Algorithm
     Public whitebackground As Boolean
     Public gradientColorMap As New cv.Mat
     Dim cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
@@ -25,7 +59,14 @@ Public Class Palette_Basics : Inherits VB_Algorithm
             src = vbNormalize32f(src)
             src.ConvertTo(src, cv.MatType.CV_8U)
         End If
-        dst2 = Palette_Custom_Apply(src, gradientColorMap)
+        Dim mapIndex = Choose(task.paletteIndex + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone,
+                              cv.ColormapTypes.Cividis, cv.ColormapTypes.Cool, cv.ColormapTypes.Hot,
+                              cv.ColormapTypes.Hsv, cv.ColormapTypes.Inferno, cv.ColormapTypes.Jet,
+                              cv.ColormapTypes.Magma, cv.ColormapTypes.Ocean, cv.ColormapTypes.Parula,
+                              cv.ColormapTypes.Pink, cv.ColormapTypes.Plasma, cv.ColormapTypes.Rainbow,
+                              cv.ColormapTypes.Spring, cv.ColormapTypes.Summer, cv.ColormapTypes.Twilight,
+                              cv.ColormapTypes.TwilightShifted, cv.ColormapTypes.Viridis, cv.ColormapTypes.Winter)
+        cv.Cv2.ApplyColorMap(src, dst2, mapIndex)
         dst3 = gradientColorMap.Resize(dst3.Size)
     End Sub
 End Class
@@ -35,14 +76,12 @@ End Class
 
 
 
-
-
 Public Class Palette_Color : Inherits VB_Algorithm
     Dim options As New Options_Colors
     Public Sub New()
-        desc = "Define a color using sliders."
+        desc = "Define a color Using sliders."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         dst2.SetTo(New cv.Scalar(options.blue, options.green, options.red))
         dst3.SetTo(New cv.Scalar(255 - options.blue, 255 - options.green, 255 - options.red))
@@ -60,7 +99,7 @@ End Class
 Public Class Palette_LinearPolar : Inherits VB_Algorithm
     Public rotateOptions As New Options_Resize
     Public Sub New()
-        desc = "Use LinearPolar to create gradient image"
+        desc = "Use LinearPolar To create gradient image"
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("LinearPolar radius", 0, dst2.Cols, dst2.Cols / 2)
         End If
@@ -88,96 +127,62 @@ End Class
 
 
 
-Module Palette_Custom_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst2 As IntPtr, rows As Integer, cols As Integer, channels As Integer)
-    End Sub
-    Public Function Palette_Custom_Apply(src As cv.Mat, customColorMap As cv.Mat) As cv.Mat
-        ' the VB.Net interface to OpenCV doesn't support adding a random lookup table to ApplyColorMap API.  It is available in C++ though.
-        Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-        Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
-
-        Dim mapData(customColorMap.Total * customColorMap.ElemSize - 1) As Byte
-        Dim handleMap = GCHandle.Alloc(mapData, GCHandleType.Pinned)
-        Marshal.Copy(customColorMap.Data, mapData, 0, mapData.Length)
-
-        Dim dstData(src.Total * 3 - 1) As Byte ' it always comes back in color...
-        Dim handledst1 = GCHandle.Alloc(dstData, GCHandleType.Pinned)
-
-        ' the custom colormap API is not implemented for custom color maps.  Only colormapTypes can be provided.
-        Palette_Custom(handleSrc.AddrOfPinnedObject, handleMap.AddrOfPinnedObject, handledst1.AddrOfPinnedObject, src.Rows, src.Cols, src.Channels)
-
-        Dim output = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
-        Marshal.Copy(dstData, 0, output.Data, dstData.Length)
-        handleSrc.Free()
-        handleMap.Free()
-        handledst1.Free()
-        Return output
-    End Function
-End Module
-
-
-
-
 
 
 
 Public Class Palette_Reduction : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        redOptions.SimpleReduction.Checked = True
-        desc = "Map colors to different palette - Painterly Effect."
+        advice = "Use 'Reduction' options (redOptions) to control results."
+        desc = "Map colors To different palette"
         labels(2) = "Reduced Colors"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        If redOptions.SimpleReductionSlider.Value < 32 Then
-            redOptions.SimpleReductionSlider.Value = 32
-            Console.WriteLine("This algorithm gets very slow unless there is lots of reduction.  Resetting reduction slider value to 32")
-        End If
+    Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
-        dst2 = reduction.dst2
+        dst3 = reduction.dst2
 
-        Dim palette As New SortedList(Of Byte, Integer)
-        For y = 0 To dst2.Height - 1
-            For x = 0 To dst2.Width - 1
-                Dim nextVal = dst2.Get(Of Byte)(y, x)
-                If nextVal <> cv.Scalar.Black Then
-                    If palette.ContainsKey(nextVal) Then
-                        palette(nextVal) = palette(nextVal) + 1
-                    Else
-                        palette.Add(nextVal, 1)
-                    End If
-                End If
-            Next
-        Next
+        dst2 = vbPalette(dst3 * 255 / reduction.classCount)
 
-        labels(2) = "palette count = " + CStr(palette.Count)
-        Dim max As Integer
-        Dim maxIndex As Integer
-        For i = 0 To palette.Count - 1
-            If palette.ElementAt(i).Value > max Then
-                max = palette.ElementAt(i).Value
-                maxIndex = i
-            End If
-        Next
+        'Dim palette As New SortedList(Of Byte, Integer)
+        'For y = 0 To dst2.Height - 1
+        '    For x = 0 To dst2.Width - 1
+        '        Dim nextVal = dst2.Get(Of Byte)(y, x)
+        '        If nextVal <> cv.Scalar.Black Then
+        '            If palette.ContainsKey(nextVal) Then
+        '                palette(nextVal) = palette(nextVal) + 1
+        '            Else
+        '                palette.Add(nextVal, 1)
+        '            End If
+        '        End If
+        '    Next
+        'Next
 
-        If palette.Count > 0 Then
-            Dim nextVal = palette.ElementAt(maxIndex).Key
-            Dim loValue = cv.Scalar.All(nextVal - 1)
-            Dim hiValue = cv.Scalar.All(nextVal + 1)
-            If loValue(0) < 0 Then loValue(0) = 0
-            If hiValue(0) > 255 Then hiValue(0) = 255
+        'labels(2) = "palette count = " + CStr(palette.Count)
+        'Dim max As Integer
+        'Dim maxIndex As Integer
+        'For i = 0 To palette.Count - 1
+        '    If palette.ElementAt(i).Value > max Then
+        '        max = palette.ElementAt(i).Value
+        '        maxIndex = i
+        '    End If
+        'Next
 
-            Dim mask As New cv.Mat
-            cv.Cv2.InRange(dst2, loValue, hiValue, mask)
+        'If palette.Count > 0 Then
+        '    Dim nextVal = palette.ElementAt(maxIndex).Key
+        '    Dim loValue = cv.Scalar.All(nextVal - 1)
+        '    Dim hiValue = cv.Scalar.All(nextVal + 1)
+        '    If loValue(0) < 0 Then loValue(0) = 0
+        '    If hiValue(0) > 255 Then hiValue(0) = 255
 
-            Dim maxCount = cv.Cv2.CountNonZero(mask)
+        '    Dim mask As New cv.Mat
+        '    cv.Cv2.InRange(dst2, loValue, hiValue, mask)
 
-            dst3 = src.EmptyClone.SetTo(0)
-            dst3.SetTo(cv.Scalar.All(255), mask)
-            labels(3) = "Most Common Color +- " + CStr(1) + " count = " + CStr(maxCount)
-        End If
+        '    Dim maxCount = cv.Cv2.CountNonZero(mask)
+
+        '    dst3 = src.EmptyClone.SetTo(0)
+        '    dst3.SetTo(cv.Scalar.All(255), mask)
+        '    labels(3) = "Most Common Color +- " + CStr(1) + " count = " + CStr(maxCount)
+        'End If
     End Sub
 End Class
 
@@ -188,7 +193,7 @@ Public Class Palette_DrawTest : Inherits VB_Algorithm
     Dim draw As New Draw_Shapes
     Public Sub New()
         task.palette.whitebackground = True
-        desc = "Experiment with palette using a drawn image"
+        desc = "Experiment With palette Using a drawn image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         draw.Run(src)
@@ -204,10 +209,10 @@ Public Class Palette_Gradient : Inherits VB_Algorithm
     Public color1 As cv.Scalar
     Public color2 As cv.Scalar
     Public Sub New()
-        labels(3) = "From and To colors"
+        labels(3) = "From And To colors"
         desc = "Create gradient image"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If heartBeat() Then
             If standalone Then
                 ' every 30 frames try a different pair of random colors.
@@ -238,14 +243,14 @@ Public Class Palette_RandomColorMap : Inherits VB_Algorithm
     Dim gColor As New Gradient_Color
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Number of color transitions (Used only with Random)", 1, 255, 180)
+            sliders.setupTrackBar("Number Of color transitions (Used only With Random)", 1, 255, 7)
         End If
 
         labels(3) = "Generated colormap"
         desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static paletteSlider = findSlider("Number of color transitions (Used only with Random)")
+    Public Sub RunVB(src As cv.Mat)
+        Static paletteSlider = findSlider("Number Of color transitions (Used only With Random)")
         If transitionCount <> paletteSlider.Value Then
             transitionCount = paletteSlider.Value
 
@@ -262,7 +267,8 @@ Public Class Palette_RandomColorMap : Inherits VB_Algorithm
             If standalone Then dst3 = gradientColorMap
             gradientColorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b) ' black is black!
         End If
-        dst2 = Palette_Custom_Apply(src, gradientColorMap)
+        Dim ColorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
+        cv.Cv2.ApplyColorMap(src, dst2, ColorMap)
     End Sub
 End Class
 
@@ -274,12 +280,13 @@ Public Class Palette_DepthColorMap : Inherits VB_Algorithm
     Public gradientColorMap As New cv.Mat
     Dim gColor As New Gradient_Color
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Convert and Scale value", 0, 100, 45)
-        labels(3) = "Palette used to color left image"
+        advice = "Use the local 'Convert and Scale' slider to adjust color"
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Convert And Scale", 0, 100, 45)
+        labels(3) = "Palette used To color left image"
         desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static cvtScaleSlider = findSlider("Convert and Scale value")
+    Public Sub RunVB(src As cv.Mat)
+        Static cvtScaleSlider = findSlider("Convert And Scale")
         If task.optionsChanged Then
             gColor.color1 = cv.Scalar.Yellow
             gColor.color2 = cv.Scalar.Red
@@ -307,7 +314,8 @@ Public Class Palette_DepthColorMap : Inherits VB_Algorithm
         End If
 
         Dim depth8u = task.pcSplit(2).ConvertScaleAbs(cvtScaleSlider.Value)
-        dst2 = Palette_Custom_Apply(depth8u, gradientColorMap)
+        Dim ColorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
+        cv.Cv2.ApplyColorMap(depth8u, dst2, ColorMap)
         dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class
@@ -324,7 +332,7 @@ Public Class Palette_RGBDepth : Inherits VB_Algorithm
     Public Sub New()
         desc = "Build a colormap that best shows the depth.  NOTE: duplicate of Palette_DepthColorMap but no slider."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If task.optionsChanged Then
             gColor.color1 = cv.Scalar.Yellow
             gColor.color2 = cv.Scalar.Red
@@ -344,7 +352,8 @@ Public Class Palette_RGBDepth : Inherits VB_Algorithm
 
         Dim sliderVal = If(task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i", 50, 80)
         Dim depth8u = task.pcSplit(2).ConvertScaleAbs(sliderVal)
-        dst2 = Palette_Custom_Apply(depth8u, gradientColorMap)
+        Dim ColorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
+        cv.Cv2.ApplyColorMap(depth8u, dst2, ColorMap)
     End Sub
 End Class
 
@@ -358,7 +367,7 @@ Public Class Palette_Layout2D : Inherits VB_Algorithm
     Public Sub New()
         desc = "Layout the available colors in a 2D grid"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim index As Integer
         For Each r In task.gridList
             dst2(r).SetTo(task.scalarColors(index Mod 256))
@@ -380,23 +389,16 @@ Public Class Palette_LeftRightImages : Inherits VB_Algorithm
         desc = "Use a palette with the left and right images."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst2 = vbPalette(task.leftview.ConvertScaleAbs)
-        dst3 = vbPalette(task.rightview.ConvertScaleAbs)
+        dst2 = vbPalette(task.leftView.ConvertScaleAbs)
+        dst3 = vbPalette(task.rightView.ConvertScaleAbs)
     End Sub
 End Class
-
-
-
-
-
-
-
 Public Class Palette_TaskColors : Inherits VB_Algorithm
     Public Sub New()
         labels = {"", "", "ScalarColors", "VecColors"}
         desc = "Display that task.scalarColors and task.vecColors"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static direction = 1
 
         If gOptions.GridSize.Value <= 10 Then direction *= -1
@@ -421,7 +423,7 @@ End Class
 Public Class Palette_Create : Inherits VB_Algorithm
     Dim schemes() As FileInfo
     Dim schemeName As String
-    Dim colorMap As New cv.Mat
+    Dim colorGrad As New cv.Mat
     Public Sub New()
         Dim dirInfo = New DirectoryInfo(task.homeDir + "Data")
         schemes = dirInfo.GetFiles("scheme*.jpg")
@@ -472,18 +474,19 @@ Public Class Palette_Create : Inherits VB_Algorithm
                     gradMat = colorTransition(color1, color2, 255)
                     color1 = color2
                     color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-                    If i = 0 Then colorMap = gradMat Else cv.Cv2.HConcat(colorMap, gradMat, colorMap)
+                    If i = 0 Then colorGrad = gradMat Else cv.Cv2.HConcat(colorGrad, gradMat, colorGrad)
                 Next
-                colorMap = colorMap.Resize(New cv.Size(256, 1))
-                cv.Cv2.ImWrite(task.homeDir + "data\nextScheme.jpg", colorMap) ' use this to create new color schemes.
+                colorGrad = colorGrad.Resize(New cv.Size(256, 1))
+                cv.Cv2.ImWrite(task.homeDir + "data\nextScheme.jpg", colorGrad) ' use this to create new color schemes.
             Else
-                colorMap = cv.Cv2.ImRead(schemeName).Row(0).Clone
+                colorGrad = cv.Cv2.ImRead(schemeName).Row(0).Clone
             End If
         End If
 
         setTrueText("Use the 'Color Transitions' slider and radio buttons to change the color ranges.", 3)
         Dim depth8u = task.pcSplit(2).ConvertScaleAbs(colorTransitionCount)
-        dst2 = Palette_Custom_Apply(depth8u, colorMap)
+        Dim colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, colorGrad.Data())
+        cv.Cv2.ApplyColorMap(depth8u, dst2, colorMap)
         dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class
@@ -493,18 +496,19 @@ End Class
 
 
 Public Class Palette_Random : Inherits VB_Algorithm
-    Public colorMap As cv.Mat
+    Public colorGrad As cv.Mat
     Public Sub New()
-        colorMap = New cv.Mat(1, 256, cv.MatType.CV_8UC3, 0)
+        colorGrad = New cv.Mat(1, 256, cv.MatType.CV_8UC3, 0)
         For i = 0 To 255
-            colorMap.Set(Of cv.Vec3b)(0, i, randomCellColor())
+            colorGrad.Set(Of cv.Vec3b)(0, i, randomCellColor())
         Next
-        colorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b(0, 0, 0)) ' set 0th entry to black...
+        colorGrad.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b(0, 0, 0)) ' set 0th entry to black...
 
-        desc = "Build a random colormap - no smooth transitions."
+        desc = "Build a random colorGrad - no smooth transitions."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        dst2 = Palette_Custom_Apply(src, colorMap)
+        Dim colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, colorGrad.Data())
+        cv.Cv2.ApplyColorMap(src, dst2, colorMap)
     End Sub
 End Class
 
@@ -513,21 +517,22 @@ End Class
 
 
 Public Class Palette_Variable : Inherits VB_Algorithm
-    Public colorMap As cv.Mat
+    Public colorGrad As cv.Mat
     Public originalColorMap As cv.Mat
     Public colors As New List(Of cv.Vec3b)
     Public Sub New()
-        colorMap = New cv.Mat(1, 256, cv.MatType.CV_8UC3, 0)
+        colorGrad = New cv.Mat(1, 256, cv.MatType.CV_8UC3, 0)
         For i = 0 To 255
-            colorMap.Set(Of cv.Vec3b)(0, i, randomCellColor())
+            colorGrad.Set(Of cv.Vec3b)(0, i, randomCellColor())
         Next
-        originalColorMap = colorMap.Clone
+        originalColorMap = colorGrad.Clone
         desc = "Build a new palette for every frame."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         For i = 0 To colors.Count - 1
-            colorMap.Set(Of cv.Vec3b)(0, i, colors(i))
+            colorGrad.Set(Of cv.Vec3b)(0, i, colors(i))
         Next
-        dst2 = Palette_Custom_Apply(src, colorMap)
+        Dim colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, colorGrad.Data())
+        cv.Cv2.ApplyColorMap(src, dst2, colorMap)
     End Sub
 End Class

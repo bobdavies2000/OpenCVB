@@ -6,6 +6,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <map>
+#include "OpenCVB_Extern.h"
 
 using namespace std;
 using namespace  cv;
@@ -63,32 +64,29 @@ public:
     }
 };
 
-extern "C" __declspec(dllexport) FloodCell * FloodCell_Open() { FloodCell* cPtr = new FloodCell(); return cPtr; }
-extern "C" __declspec(dllexport) int FloodCell_Count(FloodCell * cPtr)
+VB_EXTERN FloodCell * FloodCell_Open() { return new FloodCell(); }
+VB_EXTERN int FloodCell_Count(FloodCell * cPtr)
 {
     return (int)cPtr->cellRects.size();
 }
 
-extern "C" __declspec(dllexport) int* FloodCell_Rects(FloodCell * cPtr)
+VB_EXTERN int* FloodCell_Rects(FloodCell * cPtr)
 {
     return (int*)&cPtr->cellRects[0];
 }
 
-extern "C" __declspec(dllexport) int* FloodCell_FloodPoints(FloodCell * cPtr)
+VB_EXTERN int* FloodCell_FloodPoints(FloodCell * cPtr)
 {
     return (int*)&cPtr->floodPoints[0];
 }
 
-extern "C" __declspec(dllexport) int* FloodCell_Sizes(FloodCell * cPtr)
+VB_EXTERN int* FloodCell_Sizes(FloodCell * cPtr)
 {
     return (int*)&cPtr->cellSizes[0];
 }
 
-extern "C" __declspec(dllexport) int* FloodCell_Close(FloodCell * cPtr) { delete cPtr; return (int*)0; }
-extern "C" __declspec(dllexport) int* 
-
-
-
+VB_EXTERN int* FloodCell_Close(FloodCell * cPtr) { delete cPtr; return (int*)0; }
+VB_EXTERN int*
 FloodCell_Run(FloodCell * cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols, int type, 
               float sizeThreshold, int maxClassCount, int diff)
 {
