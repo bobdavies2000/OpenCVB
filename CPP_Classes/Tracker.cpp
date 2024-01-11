@@ -7,7 +7,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/tracking.hpp>
 #include <opencv2/core/ocl.hpp>
-#include "OpenCVB_Extern.h"
+
 
 
 using namespace std;
@@ -63,20 +63,20 @@ public:
     }
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Tracker_Basics *Tracker_Basics_Open(int trackType) {
     Tracker_Basics *cPtr = new Tracker_Basics(trackType);
     return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *Tracker_Basics_Close(Tracker_Basics * cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *Tracker_Basics_Run(Tracker_Basics *cPtr, int *bgrPtr, int rows, int cols, int x, int y, int w, int h)
 {
 	cPtr->src = Mat(rows, cols, CV_8UC1, bgrPtr);

@@ -6,7 +6,7 @@
 #include <opencv2/ximgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include "opencv2/core/utility.hpp"
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -41,20 +41,20 @@ public:
 	}
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 EdgeDraw_Basics * EdgeDraw_Basics_Open() {
 	EdgeDraw_Basics* cPtr = new EdgeDraw_Basics();
 	return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* EdgeDraw_Basics_Close(EdgeDraw_Basics * cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* EdgeDraw_Basics_RunCPP(EdgeDraw_Basics * cPtr, int* dataPtr, int rows, int cols, int lineWidth)
 {
 	if (cPtr->dst.rows == 0) cPtr->dst = Mat(rows, cols, CV_8U);
@@ -98,20 +98,20 @@ public:
 	}
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 EdgeDraw_Segments * EdgeDraw_Edges_Open() {
 	EdgeDraw_Segments* cPtr = new EdgeDraw_Segments();
 	return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* EdgeDraw_Edges_Close(EdgeDraw_Segments * cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* EdgeDraw_Segments_RunCPP(EdgeDraw_Segments * cPtr, int* dataPtr, int rows, int cols, int lineWidth)
 {
 	if (cPtr->dst.rows == 0) cPtr->dst = Mat(rows, cols, CV_8U);
@@ -145,26 +145,26 @@ public:
 	}
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 EdgeDraw_Lines * EdgeDraw_Lines_Open() {
 	EdgeDraw_Lines* cPtr = new EdgeDraw_Lines();
 	return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* EdgeDraw_Lines_Close(EdgeDraw_Lines * cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int EdgeDraw_Lines_Count(EdgeDraw_Lines * cPtr)
 {
 	return int(cPtr->lines.size());
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* EdgeDraw_Lines_RunCPP(EdgeDraw_Lines * cPtr, int* dataPtr, int rows, int cols, int lineWidth)
 {
 	if (cPtr->dst.rows == 0) cPtr->dst = Mat(rows, cols, CV_8U);

@@ -6,7 +6,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/video.hpp>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -29,20 +29,20 @@ public:
     }
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 WarpModel *WarpModel_Open() {
     WarpModel * cPtr = new WarpModel();
     return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int * WarpModel_Close(WarpModel * cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *WarpModel_Run(WarpModel * cPtr, int* src1Ptr, int* src2Ptr, int rows, int cols, int channels, int warpMode)
 {
     Mat src1 = Mat(rows, cols, CV_8UC1, src1Ptr);

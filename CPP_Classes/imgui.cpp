@@ -11,7 +11,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include "opencv2/photo.hpp"
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -35,21 +35,21 @@ public:
     }
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 imgui_Example * imgui_Example_Open(int frameCount) {
     imgui_Example* cPtr = new imgui_Example();
     cPtr->frameCount = frameCount;
     return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int * imgui_Example_Close(imgui_Example * cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* imgui_Example_Run(imgui_Example * cPtr, int* bufferPtr, int rows, int cols, int channels)
 {
     Mat src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, bufferPtr);
@@ -90,7 +90,7 @@ public:
     }
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 imgui_OpenGL * imgui_OpenGL_Open(int frameCount) {
     // ImGui_ImplGlfw_InitForOpenGL(window, true);
     imgui_OpenGL* cPtr = new imgui_OpenGL();
@@ -98,14 +98,14 @@ imgui_OpenGL * imgui_OpenGL_Open(int frameCount) {
     return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int * imgui_OpenGL_Close(imgui_OpenGL * cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* imgui_OpenGL_Run(imgui_OpenGL * cPtr, int* bufferPtr, int rows, int cols, int channels)
 {
     Mat src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, bufferPtr);

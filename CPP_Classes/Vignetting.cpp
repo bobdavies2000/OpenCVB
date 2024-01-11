@@ -5,7 +5,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -50,20 +50,20 @@ public:
     }
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Vignetting_CPP *Vignetting_Open() {
     Vignetting_CPP *cPtr = new Vignetting_CPP();
     return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int * Vignetting_Close(Vignetting_CPP *cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *Vignetting_RunCPP(Vignetting_CPP *cPtr, int *dataPtr, int rows, int cols, double radius, double centerX, double centerY, bool removal)
 {
 	cPtr->src = Mat(rows, cols, CV_8UC3, dataPtr);

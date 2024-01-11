@@ -6,7 +6,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include "rbf.hpp"
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -26,21 +26,21 @@ public:
 	}
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 recursiveBilateralFilter *RecursiveBilateralFilter_Open()
 {
 	recursiveBilateralFilter * cPtr = new recursiveBilateralFilter();
 	return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *RecursiveBilateralFilter_Close(recursiveBilateralFilter * cPtr)
 {
   delete cPtr;
   return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *RecursiveBilateralFilter_Run(recursiveBilateralFilter * cPtr, int *bgrPtr, int rows, int cols, int recursions)
 {
 	cPtr->src = Mat(rows, cols, CV_8U, bgrPtr);

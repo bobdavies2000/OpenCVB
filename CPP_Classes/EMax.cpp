@@ -6,7 +6,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/ml.hpp>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -52,21 +52,21 @@ public:
 	}
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 EMax_Raw *EMax_Open()
 {
     EMax_Raw * cPtr = new EMax_Raw();
     return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int * EMax_Close(EMax_Raw * cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *EMax_Run(EMax_Raw *cPtr, int *samplePtr, int *labelsPtr, int inCount, int dimension, int rows, int cols, int clusters,
 					 int stepSize, int covarianceMatrixType)
 {

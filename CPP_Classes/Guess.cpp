@@ -6,7 +6,7 @@
 #include <opencv2/ximgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/core/utility.hpp>
-#include "OpenCVB_Extern.h"
+
 using namespace std;
 using namespace  cv;
 class Guess_Depth
@@ -35,17 +35,17 @@ public:
 };
 
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Guess_Depth *Guess_Depth_Open() {
     Guess_Depth *cPtr = new Guess_Depth();
     return cPtr;
 }
-VB_EXTERN
+extern "C" __declspec(dllexport)
 void Guess_Depth_Close(Guess_Depth *cPtr)
 {
     delete cPtr;
 }
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *Guess_Depth_RunCPP(Guess_Depth *cPtr, int *dataPtr, int rows, int cols)
 {
 		cPtr->src = Mat(rows, cols, CV_32FC3, dataPtr);
@@ -129,17 +129,17 @@ public:
 
 
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Guess_ImageEdges *Guess_ImageEdges_Open() {
     Guess_ImageEdges *cPtr = new Guess_ImageEdges();
     return cPtr;
 }
-VB_EXTERN
+extern "C" __declspec(dllexport)
 void Guess_ImageEdges_Close(Guess_ImageEdges *cPtr)
 {
     delete cPtr;
 }
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *Guess_ImageEdges_RunCPP(Guess_ImageEdges *cPtr, int *dataPtr, int rows, int cols, int maxDistanceToEdge)
 {
 	cPtr->pc = Mat(rows, cols, CV_32FC3, dataPtr);

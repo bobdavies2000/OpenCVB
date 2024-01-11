@@ -6,7 +6,7 @@
 #include <opencv2/ximgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/core/utility.hpp> 
-#include "OpenCVB_Extern.h"
+
 using namespace std;
 using namespace  cv;
 class RedMin_FindPixels
@@ -30,21 +30,21 @@ public:
         }
     }
 };
-VB_EXTERN
+extern "C" __declspec(dllexport)
 RedMin_FindPixels *RedMin_FindPixels_Open() {
     RedMin_FindPixels *cPtr = new RedMin_FindPixels();
     return cPtr;
 }
-VB_EXTERN
+extern "C" __declspec(dllexport)
 void RedMin_FindPixels_Close(RedMin_FindPixels *cPtr)
 {
     delete cPtr;
 }
-VB_EXTERN int* RedMin_FindPixels_Pixels(RedMin_FindPixels * cPtr)
+extern "C" __declspec(dllexport) int* RedMin_FindPixels_Pixels(RedMin_FindPixels * cPtr)
 {
     return (int*)&cPtr->pixelList[0];
 }
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int RedMin_FindPixels_RunCPP(RedMin_FindPixels *cPtr, int *dataPtr, int rows, int cols)
 {
 	cPtr->src = Mat(rows, cols, CV_8UC3, dataPtr);

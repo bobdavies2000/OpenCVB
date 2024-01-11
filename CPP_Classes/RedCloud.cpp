@@ -6,7 +6,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <map>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -59,10 +59,10 @@ public:
     }
 };
 
-VB_EXTERN RedCloud * RedCloud_Open() { RedCloud* cPtr = new RedCloud(); return cPtr; }
-VB_EXTERN int* RedCloud_FloodPointList(RedCloud * cPtr) { return (int*)&cPtr->floodPoints[0]; }
-VB_EXTERN int* RedCloud_Close(RedCloud * cPtr) { delete cPtr; return (int*)0; }
-VB_EXTERN int RedCloud_Run(RedCloud * cPtr, int* dataPtr, int* maskPtr, int rows, int cols,
+extern "C" __declspec(dllexport) RedCloud * RedCloud_Open() { RedCloud* cPtr = new RedCloud(); return cPtr; }
+extern "C" __declspec(dllexport) int* RedCloud_FloodPointList(RedCloud * cPtr) { return (int*)&cPtr->floodPoints[0]; }
+extern "C" __declspec(dllexport) int* RedCloud_Close(RedCloud * cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int RedCloud_Run(RedCloud * cPtr, int* dataPtr, int* maskPtr, int rows, int cols,
                                                   float sizeThreshold, int maxClassCount)
 {
     cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
@@ -109,18 +109,18 @@ public:
         }
     }
 };
-VB_EXTERN
+extern "C" __declspec(dllexport)
 RedCloud_FindCells * RedCloud_FindCells_Open() {
     RedCloud_FindCells* cPtr = new RedCloud_FindCells();
     return cPtr;
 }
-VB_EXTERN
+extern "C" __declspec(dllexport)
 void RedCloud_FindCells_Close(RedCloud_FindCells * cPtr)
 {
     delete cPtr;
 }
-VB_EXTERN int RedCloud_FindCells_TotalCount(RedCloud_FindCells * cPtr) { return int(cPtr->cellList.size()); }
-VB_EXTERN
+extern "C" __declspec(dllexport) int RedCloud_FindCells_TotalCount(RedCloud_FindCells * cPtr) { return int(cPtr->cellList.size()); }
+extern "C" __declspec(dllexport)
 int* RedCloud_FindCells_RunCPP(RedCloud_FindCells * cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->RunCPP(Mat(rows, cols, CV_8UC1, dataPtr));

@@ -5,7 +5,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -33,20 +33,20 @@ public:
     }
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Kmeans_Simple *Kmeans_Simple_Open() {
     Kmeans_Simple *cPtr = new Kmeans_Simple();
     return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int * Kmeans_Simple_Close(Kmeans_Simple *cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *Kmeans_Simple_RunCPP(Kmeans_Simple *cPtr, int *dataPtr, int rows, int cols, float minVal, float maxVal)
 {
     cPtr->src = Mat(rows, cols, CV_32F, dataPtr);

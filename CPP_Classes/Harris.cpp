@@ -6,7 +6,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include "harrisDetector.h"
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -28,20 +28,20 @@ public:
 	}
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Harris_Features *Harris_Features_Open()
 {
 	return new Harris_Features();
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int * Harris_Features_Close(Harris_Features *Harris_FeaturesPtr)
 {
 	delete Harris_FeaturesPtr;
 	return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *Harris_Features_Run(Harris_Features *Harris_FeaturesPtr, int *bgrPtr, int rows, int cols, float threshold, int neighborhood, int aperture, float HarrisParm)
 {
 	Harris_FeaturesPtr->threshold = threshold;
@@ -72,20 +72,20 @@ public:
 	}
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Harris_Detector *Harris_Detector_Open()
 {
 	return new Harris_Detector();
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int * Harris_Detector_Close(Harris_Detector * cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *Harris_Detector_Run(Harris_Detector * cPtr, int *bgrPtr, int rows, int cols, double qualityLevel, int *count)
 { 
 	cPtr->qualityLevel = qualityLevel;

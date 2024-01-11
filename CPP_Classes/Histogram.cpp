@@ -5,12 +5,12 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
 
-//VB_EXTERN
+//extern "C" __declspec(dllexport)
 //float* Histogram_1DBug(int* bgrPtr, int rows, int cols, int bins)
 //{
 //	float hRange[] = { 0, 256 }; // ranges are exclusive in the top of the range, hence 256
@@ -39,22 +39,22 @@ public:
 		calcHist(&src, 1, { 0 }, Mat(), histogram, 1, hbins, range, true, false);
 	}
 };
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Histogram_1D * Histogram_1D_Open() {
 	Histogram_1D* cPtr = new Histogram_1D();
 	return cPtr;
 }
-VB_EXTERN
+extern "C" __declspec(dllexport)
 float Histogram_1D_Sum(Histogram_1D *cPtr) {
 	Scalar count = cv::sum(cPtr->histogram);
 	return count[0];
 }
-VB_EXTERN
+extern "C" __declspec(dllexport)
 void Histogram_1D_Close(Histogram_1D *cPtr)
 {
     delete cPtr;
 }
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *Histogram_1D_RunCPP(Histogram_1D *cPtr, int *dataPtr, int rows, int cols, int bins)
 {
 		cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);

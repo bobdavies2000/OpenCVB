@@ -37,7 +37,7 @@
 #include <sstream>
 #include <iostream>
 #include <memory>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -113,18 +113,18 @@ public:
 	}
 };
 
-VB_EXTERN double RS2IMUTimeStamp(RealSense2Camera* cPtr) { if (cPtr->gyro == 0) return 0; return cPtr->gyro.get_timestamp();}
-VB_EXTERN int* RS2Gyro(RealSense2Camera * cPtr) {if (cPtr->gyro == 0) return 0; return (int*)cPtr->gyro.get_data();}
-VB_EXTERN int * RS2Accel(RealSense2Camera * cPtr) { if (cPtr->accel == 0) return 0; return (int *)cPtr->accel.get_data(); }
-VB_EXTERN int* RS2LeftRaw(RealSense2Camera* cPtr) { return (int*)cPtr->leftView.data;}
-VB_EXTERN int* RS2RightRaw(RealSense2Camera * cPtr) { return (int*)cPtr->rightView.data; }
-VB_EXTERN int* RS2intrinsics(RealSense2Camera * cPtr) { return (int*)&cPtr->intrinsics.ppx; }
-VB_EXTERN int* RS2Color(RealSense2Camera * cPtr) { return (int*)cPtr->color.data; }
-VB_EXTERN int* RS2PointCloud(RealSense2Camera * cPtr)
+extern "C" __declspec(dllexport) double RS2IMUTimeStamp(RealSense2Camera* cPtr) { if (cPtr->gyro == 0) return 0; return cPtr->gyro.get_timestamp();}
+extern "C" __declspec(dllexport) int* RS2Gyro(RealSense2Camera * cPtr) {if (cPtr->gyro == 0) return 0; return (int*)cPtr->gyro.get_data();}
+extern "C" __declspec(dllexport) int * RS2Accel(RealSense2Camera * cPtr) { if (cPtr->accel == 0) return 0; return (int *)cPtr->accel.get_data(); }
+extern "C" __declspec(dllexport) int* RS2LeftRaw(RealSense2Camera* cPtr) { return (int*)cPtr->leftView.data;}
+extern "C" __declspec(dllexport) int* RS2RightRaw(RealSense2Camera * cPtr) { return (int*)cPtr->rightView.data; }
+extern "C" __declspec(dllexport) int* RS2intrinsics(RealSense2Camera * cPtr) { return (int*)&cPtr->intrinsics.ppx; }
+extern "C" __declspec(dllexport) int* RS2Color(RealSense2Camera * cPtr) { return (int*)cPtr->color.data; }
+extern "C" __declspec(dllexport) int* RS2PointCloud(RealSense2Camera * cPtr)
 {
 	return (int*)cPtr->pc.process(cPtr->processedFrames.get_depth_frame()).as<rs2::points>().get_data();
 }
-VB_EXTERN void RS2WaitForFrame(RealSense2Camera * cPtr, int w, int h)
+extern "C" __declspec(dllexport) void RS2WaitForFrame(RealSense2Camera * cPtr, int w, int h)
 { 
 	cPtr->waitForFrame(); 
 
@@ -139,7 +139,7 @@ VB_EXTERN void RS2WaitForFrame(RealSense2Camera * cPtr, int w, int h)
 	tmp = Mat(cPtr->height, cPtr->width, CV_8UC1, (int*)cPtr->frames.get_infrared_frame(2).get_data());
 	resize(tmp, cPtr->rightView, Size(w, h), INTER_NEAREST);
 }
-VB_EXTERN 
+extern "C" __declspec(dllexport) 
 void RS2Stop(RealSense2Camera * cPtr) { 
 	if (cPtr != 0) 
 	{ 
@@ -148,7 +148,7 @@ void RS2Stop(RealSense2Camera * cPtr) {
 		delete cPtr; 
 	} 
 }
-VB_EXTERN int* RS2Open(LPSTR devName, int w, int h, int workingWidth, int workingHeight)
+extern "C" __declspec(dllexport) int* RS2Open(LPSTR devName, int w, int h, int workingWidth, int workingHeight)
 {
 	string serialNumber;
 	rs2::context ctx;

@@ -1,5 +1,4 @@
 #include "depthai/depthai.hpp"
-#include "../../CPP_Classes/OpenCVB_Extern.h"
  
 using namespace std;
 using namespace cv;
@@ -197,14 +196,14 @@ public:
 };
 
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *OakDOpen(int w, int h)
 {
 	OakDCamera* cPtr = new OakDCamera(w, h);
 	return (int *)cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* OakDintrinsics(OakDCamera * cPtr)
 {
 	std::vector<std::vector<float>> intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::RGB, 1280, 720);
@@ -215,7 +214,7 @@ int* OakDintrinsics(OakDCamera * cPtr)
 
 
 
-VB_EXTERN int* OakDRawDepth(OakDCamera * cPtr) 
+extern "C" __declspec(dllexport) int* OakDRawDepth(OakDCamera * cPtr) 
 {
 	return (int*)cPtr->depth16u.data; 
 }
@@ -223,16 +222,16 @@ VB_EXTERN int* OakDRawDepth(OakDCamera * cPtr)
 
 
 //http://graphics.cs.cmu.edu/courses/15-463/2017_fall/lectures/lecture19.pdf
-VB_EXTERN int* OakDPointCloud(OakDCamera * cPtr) { return 0; }
-VB_EXTERN double OakDIMUTimeStamp(OakDCamera * cPtr) { return cPtr->imuTimeStamp;}
-VB_EXTERN int* OakDGyro(OakDCamera * cPtr) { return (int *)&cPtr->gyroValues.x; }
-VB_EXTERN int* OakDAccel(OakDCamera * cPtr) { return (int*)&cPtr->acceleroValues.x;}
-VB_EXTERN int* OakDColor(OakDCamera * cPtr) { return (int*)cPtr->rgb.data; }
-VB_EXTERN void OakDWaitForFrame(OakDCamera * cPtr) { cPtr->waitForFrame(false);}
-VB_EXTERN void OakDStop(OakDCamera * cPtr) 
+extern "C" __declspec(dllexport) int* OakDPointCloud(OakDCamera * cPtr) { return 0; }
+extern "C" __declspec(dllexport) double OakDIMUTimeStamp(OakDCamera * cPtr) { return cPtr->imuTimeStamp;}
+extern "C" __declspec(dllexport) int* OakDGyro(OakDCamera * cPtr) { return (int *)&cPtr->gyroValues.x; }
+extern "C" __declspec(dllexport) int* OakDAccel(OakDCamera * cPtr) { return (int*)&cPtr->acceleroValues.x;}
+extern "C" __declspec(dllexport) int* OakDColor(OakDCamera * cPtr) { return (int*)cPtr->rgb.data; }
+extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera * cPtr) { cPtr->waitForFrame(false);}
+extern "C" __declspec(dllexport) void OakDStop(OakDCamera * cPtr) 
 { 
 	cPtr->waitForFrame(true); 
 	if (cPtr != 0) delete cPtr; 
 }
-VB_EXTERN int* OakDLeftImage(OakDCamera * cPtr) { return (int*)cPtr->leftView.data; }
-VB_EXTERN int* OakDRightImage(OakDCamera * cPtr) { return (int*)cPtr->rightView.data; }
+extern "C" __declspec(dllexport) int* OakDLeftImage(OakDCamera * cPtr) { return (int*)cPtr->leftView.data; }
+extern "C" __declspec(dllexport) int* OakDRightImage(OakDCamera * cPtr) { return (int*)cPtr->rightView.data; }

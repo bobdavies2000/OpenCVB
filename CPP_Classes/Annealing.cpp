@@ -12,7 +12,7 @@
 #include <sstream>
 #include <random>
 #include <intrin.h>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -76,7 +76,7 @@ public:
 	}
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 CitySolver *Annealing_Basics_Open(Point2f *cityPositions, int count)
 {
 	CitySolver *cPtr = new CitySolver();
@@ -84,14 +84,14 @@ CitySolver *Annealing_Basics_Open(Point2f *cityPositions, int count)
 	return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int * Annealing_Basics_Close(CitySolver *cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 char *Annealing_Basics_Run(CitySolver *cPtr, int *cityOrder, int count)
 {
 	cPtr->cityOrder.assign(cityOrder, cityOrder + count);

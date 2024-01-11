@@ -5,7 +5,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -82,21 +82,21 @@ public:
 	}
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 WhiteBalance * WhiteBalance_Open(float ppx, float ppy, float fx, float fy)
 {
 	WhiteBalance* cPtr =  new WhiteBalance();
 	return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* WhiteBalance_Close(WhiteBalance * cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* WhiteBalance_Run(WhiteBalance * cPtr, int* rgb, int rows, int cols, float thresholdVal)
 {
 	cPtr->output = Mat(rows, cols, CV_8UC3);

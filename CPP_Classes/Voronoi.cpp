@@ -17,7 +17,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#include "OpenCVB_Extern.h"
+
 
     //  class Point represents a two dimensional point 
 class Point
@@ -316,21 +316,21 @@ public:
 };
 
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 VoronoiDemo * VoronoiDemo_Open()
 {
     VoronoiDemo* cPtr = new VoronoiDemo();
     return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int * VoronoiDemo_Close(VoronoiDemo *cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* VoronoiDemo_Run(VoronoiDemo *cPtr, cv::Point *input, int pointCount, int width, int height)
 {
     cPtr->test_points.clear();

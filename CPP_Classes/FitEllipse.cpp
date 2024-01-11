@@ -7,13 +7,13 @@
 #include <opencv2/highgui.hpp>
 
 #include <winsock2.h>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
 
 float outputTriangleAMS[5];
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* FitEllipse_AMS(float *inputPoints, int count)
 {
 	Mat input(count, 1, CV_32FC2, inputPoints);
@@ -29,7 +29,7 @@ int* FitEllipse_AMS(float *inputPoints, int count)
 
 
 float outputTriangle[5];
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* FitEllipse_Direct(float *inputPoints, int count)
 {
 	Mat input(count, 1, CV_32FC2, inputPoints);

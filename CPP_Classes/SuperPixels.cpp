@@ -6,7 +6,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/ximgproc.hpp>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -28,7 +28,7 @@ public:
     }
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 SuperPixels *SuperPixel_Open(int _width, int _height, int _num_superpixels, int _num_levels, int _prior) 
 {
     SuperPixels *spPtr = new SuperPixels();
@@ -42,20 +42,20 @@ SuperPixels *SuperPixel_Open(int _width, int _height, int _num_superpixels, int 
 	return spPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *SuperPixel_Close(SuperPixels * cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *SuperPixel_GetLabels(SuperPixels * cPtr)
 {
 	return (int *)cPtr->labels.data;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *SuperPixel_Run(SuperPixels * cPtr, int* srcPtr)
 {
 	cPtr->src = Mat(cPtr->height, cPtr->width, CV_8UC3, srcPtr);

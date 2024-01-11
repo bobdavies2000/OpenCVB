@@ -29,10 +29,6 @@ using namespace ximgproc;
 using namespace ml;
 namespace fs = std::filesystem;
 
-#define STATIC_EXTERNS
-#include "floodCell.cpp"
-#define VB_EXTERN extern "C" __declspec(dllexport)
-
 #include "../CPP_Classes/PragmaLibs.h"
 #include "CPP_Task.h"
 
@@ -2593,70 +2589,70 @@ public:
 
 
 
-class CPP_RedMin_Core : public algorithmCPP {
-public:
-    map<int, segCell, compareAllowIdenticalIntegerInverted> sortedCells;
-    Mat inputMask;
-    CPP_FeatureLess_History* fLess;
-    FloodCell* cPtr;
-    float redOptions_imageThresholdPercent = 0.95f;
-    int redOptions_DesiredCellSlider = 30;
-    CPP_RedMin_Core(int rows, int cols) : algorithmCPP(rows, cols) {
-        traceName = "CPP_RedMin_Core";
-        fLess = new CPP_FeatureLess_History(rows, cols);
-        cPtr = new FloodCell();
-        desc = "Another minimalist approach to building RedCloud color-based cells.";
-    }
-    ~CPP_RedMin_Core() {
-
-        if (cPtr) {
-            FloodCell_Close(cPtr);
-            delete cPtr;
-        }
-    }
-    void Run(Mat src) {
-        if (src.channels() != 1) {
-            fLess->Run(src);
-            src = fLess->dst2;
-        }
-        void* imagePtr;
-        Mat* srcPtr = &src;
-        if (inputMask.empty()) {
-            imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, 0, src.rows, src.cols,
-                src.type(), redOptions_imageThresholdPercent, redOptions_DesiredCellSlider, 0);
-        }
-        else {
-            Mat* maskPtr = &inputMask;
-            imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, (uchar *)maskPtr->data, src.rows, src.cols,
-                                     src.type(), redOptions_imageThresholdPercent, redOptions_DesiredCellSlider, 0);
-        }
-        int classCount = FloodCell_Count(cPtr);
-
-        dst2 = Mat(src.rows, src.cols, CV_8UC1, imagePtr);
-        //Mat dst3 = vbPalette(dst2 * 255 / classCount);
-        int count = countNonZero(dst2);
-        if (task->heartBeat) {
-            labels[3] = to_string(classCount) + " cells found";
-        }
-        if (classCount <= 1) {
-            return;
-        }
-        Mat sizeData(classCount, 1, CV_32SC1, FloodCell_Sizes(cPtr));
-        Mat rectData(classCount, 1, CV_32SC4, FloodCell_Rects(cPtr));
-        Mat floodPointData(classCount, 1, CV_32SC2, FloodCell_FloodPoints(cPtr));
-        sortedCells.clear();
-        for (int i = 0; i < classCount; i++) {
-            segCell cell;
-            cell.index = i + 1;
-            cell.rect = task->validateRect(rectData.at<Rect>(i, 0), dst2.cols, dst2.rows);
-            cell.mask = dst2(cell.rect).clone();
-
-        }
-        if (task->heartBeat) {
-            labels[2] = "CV_8U format - " + to_string(classCount) + " cells were identified.";
-        }
-    }
-};
+//class CPP_RedMin_Core : public algorithmCPP {
+//public:
+//    map<int, segCell, compareAllowIdenticalIntegerInverted> sortedCells;
+//    Mat inputMask;
+//    CPP_FeatureLess_History* fLess;
+//    FloodCell* cPtr;
+//    float redOptions_imageThresholdPercent = 0.95f;
+//    int redOptions_DesiredCellSlider = 30;
+//    CPP_RedMin_Core(int rows, int cols) : algorithmCPP(rows, cols) {
+//        traceName = "CPP_RedMin_Core";
+//        fLess = new CPP_FeatureLess_History(rows, cols);
+//        cPtr = new FloodCell();
+//        desc = "Another minimalist approach to building RedCloud color-based cells.";
+//    }
+//    ~CPP_RedMin_Core() {
+//
+//        if (cPtr) {
+//            FloodCell_Close(cPtr);
+//            delete cPtr;
+//        }
+//    }
+//    void Run(Mat src) {
+//        if (src.channels() != 1) {
+//            fLess->Run(src);
+//            src = fLess->dst2;
+//        }
+//        void* imagePtr;
+//        Mat* srcPtr = &src;
+//        if (inputMask.empty()) {
+//            imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, 0, src.rows, src.cols,
+//                src.type(), redOptions_imageThresholdPercent, redOptions_DesiredCellSlider, 0);
+//        }
+//        else {
+//            Mat* maskPtr = &inputMask;
+//            imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, (uchar *)maskPtr->data, src.rows, src.cols,
+//                                     src.type(), redOptions_imageThresholdPercent, redOptions_DesiredCellSlider, 0);
+//        }
+//        int classCount = FloodCell_Count(cPtr);
+//
+//        dst2 = Mat(src.rows, src.cols, CV_8UC1, imagePtr);
+//        //Mat dst3 = vbPalette(dst2 * 255 / classCount);
+//        int count = countNonZero(dst2);
+//        if (task->heartBeat) {
+//            labels[3] = to_string(classCount) + " cells found";
+//        }
+//        if (classCount <= 1) {
+//            return;
+//        }
+//        Mat sizeData(classCount, 1, CV_32SC1, FloodCell_Sizes(cPtr));
+//        Mat rectData(classCount, 1, CV_32SC4, FloodCell_Rects(cPtr));
+//        Mat floodPointData(classCount, 1, CV_32SC2, FloodCell_FloodPoints(cPtr));
+//        sortedCells.clear();
+//        for (int i = 0; i < classCount; i++) {
+//            segCell cell;
+//            cell.index = i + 1;
+//            cell.rect = task->validateRect(rectData.at<Rect>(i, 0), dst2.cols, dst2.rows);
+//            cell.mask = dst2(cell.rect).clone();
+//
+//        }
+//        if (task->heartBeat) {
+//            labels[2] = "CV_8U format - " + to_string(classCount) + " cells were identified.";
+//        }
+//    }
+//};
 
 
 

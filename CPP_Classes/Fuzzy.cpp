@@ -5,7 +5,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -32,20 +32,20 @@ public:
     }
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Fuzzy *Fuzzy_Open() {
     Fuzzy *cPtr = new Fuzzy();
     return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int * Fuzzy_Close(Fuzzy *cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *Fuzzy_Run(Fuzzy *cPtr, int *grayPtr, int rows, int cols)
 {
 		cPtr->src = Mat(rows, cols, CV_8UC1, grayPtr);

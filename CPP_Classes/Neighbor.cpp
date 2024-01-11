@@ -6,7 +6,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <map>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -52,30 +52,30 @@ public:
     }
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Neighbors * Neighbors_Open() {
     Neighbors* cPtr = new Neighbors();
     return cPtr;
 }
-VB_EXTERN
+extern "C" __declspec(dllexport)
 void Neighbors_Close(Neighbors * cPtr)
 {
     delete cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* Neighbors_CellData(Neighbors * cPtr)
 {
     return (int*)&cPtr->cellData[0];
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* Neighbors_Points(Neighbors * cPtr)
 {
     return (int*)&cPtr->nPoints[0];
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int Neighbors_RunCPP(Neighbors * cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
@@ -114,24 +114,24 @@ public:
     }
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Neighbor2 * Neighbor2_Open() {
     Neighbor2* cPtr = new Neighbor2();
     return cPtr;
 }
-VB_EXTERN
+extern "C" __declspec(dllexport)
 void Neighbor2_Close(Neighbor2 * cPtr)
 {
     delete cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* Neighbor2_Points(Neighbor2 * cPtr)
 {
     return (int*)&cPtr->nPoints[0];
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int Neighbor2_RunCPP(Neighbor2 * cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
@@ -172,10 +172,10 @@ public:
             }
     }
 };
-VB_EXTERN Neighbor_Map * Neighbor_Map_Open() { Neighbor_Map* cPtr = new Neighbor_Map(); return cPtr; }
-VB_EXTERN void Neighbor_Map_Close(Neighbor_Map * cPtr){delete cPtr;}
-VB_EXTERN int* Neighbor_NabList(Neighbor_Map * cPtr) { return (int*)&cPtr->nabList[0]; }
-VB_EXTERN
+extern "C" __declspec(dllexport) Neighbor_Map * Neighbor_Map_Open() { Neighbor_Map* cPtr = new Neighbor_Map(); return cPtr; }
+extern "C" __declspec(dllexport) void Neighbor_Map_Close(Neighbor_Map * cPtr){delete cPtr;}
+extern "C" __declspec(dllexport) int* Neighbor_NabList(Neighbor_Map * cPtr) { return (int*)&cPtr->nabList[0]; }
+extern "C" __declspec(dllexport)
 int Neighbor_Map_RunCPP(Neighbor_Map * cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);

@@ -6,7 +6,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/core/utils/trace.hpp>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -24,7 +24,7 @@ public:
 	}
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Trace_OpenCV *Trace_OpenCV_Open() {
 	CV_TRACE_FUNCTION();
 	Trace_OpenCV * cPtr = new Trace_OpenCV();
@@ -32,14 +32,14 @@ Trace_OpenCV *Trace_OpenCV_Open() {
 	return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int * Trace_OpenCV_Close(Trace_OpenCV * cPtr)
 {
     delete cPtr;
 	return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* Trace_OpenCV_Run(Trace_OpenCV * cPtr, int* bgrPtr, int rows, int cols, int channels)
 {
 	CV_TRACE_REGION_NEXT("process");

@@ -5,7 +5,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv; 
@@ -128,21 +128,21 @@ public:
 	}
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Salience *Salience_Open()
 {
 	Salience * cPtr = new Salience();
 	return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int * Salience_Close(Salience * cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *Salience_Run(Salience * cPtr, int numScales, int *grayInput, int rows, int cols)
 {
 	cPtr->numScales = numScales;

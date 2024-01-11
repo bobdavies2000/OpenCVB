@@ -5,7 +5,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -45,12 +45,12 @@ public:
     }
 };
 
-VB_EXTERN MLPrepLearn *MLPrepLearn_Open() { MLPrepLearn*cPtr = new MLPrepLearn(); return cPtr; }
-VB_EXTERN int* MLPrepLearn_Close(MLPrepLearn * cPtr) { delete cPtr; return (int*)0; }
-VB_EXTERN int MLPrepLearn_GetCount(MLPrepLearn * cPtr) { return cPtr->index - 1;} 
-VB_EXTERN int *MLPrepLearn_GetResponse(MLPrepLearn * cPtr) {  return (int *) cPtr->response.data; }
-VB_EXTERN int MLPrepLearn_GetInputCount(MLPrepLearn * cPtr) { return cPtr->inputCount; }
-VB_EXTERN int *MLPrepLearn_Run(MLPrepLearn *cPtr, int *grayDispPtr, int rows, int cols)
+extern "C" __declspec(dllexport) MLPrepLearn *MLPrepLearn_Open() { MLPrepLearn*cPtr = new MLPrepLearn(); return cPtr; }
+extern "C" __declspec(dllexport) int* MLPrepLearn_Close(MLPrepLearn * cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int MLPrepLearn_GetCount(MLPrepLearn * cPtr) { return cPtr->index - 1;} 
+extern "C" __declspec(dllexport) int *MLPrepLearn_GetResponse(MLPrepLearn * cPtr) {  return (int *) cPtr->response.data; }
+extern "C" __declspec(dllexport) int MLPrepLearn_GetInputCount(MLPrepLearn * cPtr) { return cPtr->inputCount; }
+extern "C" __declspec(dllexport) int *MLPrepLearn_Run(MLPrepLearn *cPtr, int *grayDispPtr, int rows, int cols)
 {
 		cPtr->src = Mat(rows, cols, CV_32S, grayDispPtr);
 		cPtr->Run();
@@ -83,9 +83,9 @@ public:
     }
 };
 
-VB_EXTERN Sort_MLPrepTest *Sort_MLPrepTest_Open() { Sort_MLPrepTest *cPtr = new Sort_MLPrepTest(); return cPtr; }
-VB_EXTERN int * Sort_MLPrepTest_Close(Sort_MLPrepTest *cPtr) { delete cPtr; return (int*)0;}
-VB_EXTERN int *Sort_MLPrepTest_Run(Sort_MLPrepTest *cPtr, int * grayPtr, int rows, int cols) 
+extern "C" __declspec(dllexport) Sort_MLPrepTest *Sort_MLPrepTest_Open() { Sort_MLPrepTest *cPtr = new Sort_MLPrepTest(); return cPtr; }
+extern "C" __declspec(dllexport) int * Sort_MLPrepTest_Close(Sort_MLPrepTest *cPtr) { delete cPtr; return (int*)0;}
+extern "C" __declspec(dllexport) int *Sort_MLPrepTest_Run(Sort_MLPrepTest *cPtr, int * grayPtr, int rows, int cols) 
 {
 		cPtr->src = Mat(rows, cols, CV_8U, grayPtr);
 		cPtr->Run();
@@ -146,10 +146,10 @@ public:
     }
 };
 
-VB_EXTERN ML_RemoveDups *ML_RemoveDups_Open() { ML_RemoveDups *cPtr = new ML_RemoveDups(); return cPtr; }
-VB_EXTERN int ML_RemoveDups_GetCount(ML_RemoveDups * cPtr) { return cPtr->index - 1; }
-VB_EXTERN int* ML_RemoveDups_Close(ML_RemoveDups * cPtr) { delete cPtr; return (int*)0; }
-VB_EXTERN int *ML_RemoveDups_Run(ML_RemoveDups *cPtr, int *dataPtr, int rows, int cols, int type)
+extern "C" __declspec(dllexport) ML_RemoveDups *ML_RemoveDups_Open() { ML_RemoveDups *cPtr = new ML_RemoveDups(); return cPtr; }
+extern "C" __declspec(dllexport) int ML_RemoveDups_GetCount(ML_RemoveDups * cPtr) { return cPtr->index - 1; }
+extern "C" __declspec(dllexport) int* ML_RemoveDups_Close(ML_RemoveDups * cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int *ML_RemoveDups_Run(ML_RemoveDups *cPtr, int *dataPtr, int rows, int cols, int type)
 {
 		cPtr->src = Mat(rows, cols, type, dataPtr);
 		cPtr->Run();
@@ -186,10 +186,10 @@ public:
     }
 };
 
-VB_EXTERN FLess_Range * FLess_Range_Open() { FLess_Range* cPtr = new FLess_Range(); return cPtr; }
-VB_EXTERN int* FLess_Range_Close(FLess_Range * cPtr) { delete cPtr; return (int*)0; }
-VB_EXTERN int FLess_Range_Count(FLess_Range * cPtr) { return (int)cPtr->fBytes.size(); }
-VB_EXTERN int* FLess_Range_Run(FLess_Range * cPtr, int* grayPtr, int rows, int cols)
+extern "C" __declspec(dllexport) FLess_Range * FLess_Range_Open() { FLess_Range* cPtr = new FLess_Range(); return cPtr; }
+extern "C" __declspec(dllexport) int* FLess_Range_Close(FLess_Range * cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int FLess_Range_Count(FLess_Range * cPtr) { return (int)cPtr->fBytes.size(); }
+extern "C" __declspec(dllexport) int* FLess_Range_Run(FLess_Range * cPtr, int* grayPtr, int rows, int cols)
 {
     cPtr->src = Mat(rows, cols, CV_8U, grayPtr);
     cPtr->Run();

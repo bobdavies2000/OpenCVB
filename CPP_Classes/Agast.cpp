@@ -6,7 +6,7 @@
 #include <opencv2/ximgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include "opencv2/core/utility.hpp"
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -27,21 +27,21 @@ public:
 	}
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Agast * Agast_Open()
 {
 	Agast* cPtr = new Agast();
 	return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int * Agast_Close(Agast * cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* Agast_Run(Agast * cPtr, int* bgrPtr, int rows, int cols, int* count)
 {
 	cPtr->src = Mat(rows, cols, CV_8UC3, bgrPtr);

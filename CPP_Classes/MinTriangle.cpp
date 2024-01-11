@@ -5,12 +5,12 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 void MinTriangle_Run(float *inputPoints, int count, float *outputTriangle)
 {
 	Mat input(count, 1, CV_32FC2, inputPoints);

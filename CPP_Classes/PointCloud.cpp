@@ -7,7 +7,7 @@
 #include <opencv2/highgui.hpp>
 #include "cvHmm.h"
 #include "DepthColorizer.hpp"
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -43,26 +43,26 @@ public:
 	}
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 SimpleProjection * SimpleProjectionOpen() 
 {
 	SimpleProjection* cPtr = new SimpleProjection();
 	return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 void SimpleProjectionClose(SimpleProjection * cPtr)
 {
 	delete cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* SimpleProjectionSide(SimpleProjection * cPtr)
 {
 	return (int*)cPtr->viewSide.data;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* SimpleProjectionRun(SimpleProjection * cPtr, int* depthPtr, float desiredMin, float desiredMax, int rows, int cols)
 {
 	cPtr->depth32f = Mat(rows, cols, CV_32F, depthPtr);
@@ -120,27 +120,27 @@ public:
 	}
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Project_GravityHistogram * Project_GravityHist_Open()
 {
 	Project_GravityHistogram* cPtr = new Project_GravityHistogram();
 	return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int * Project_GravityHist_Close(Project_GravityHistogram * cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* Project_GravityHist_Side(Project_GravityHistogram * cPtr)
 {
 	return (int*)cPtr->histSide.data;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* Project_GravityHist_Run(Project_GravityHistogram * cPtr, int* xyzPtr, float maxZ, int rows, int cols)
 {
 	cPtr->xyz = Mat(rows, cols, CV_32FC3, xyzPtr);

@@ -5,7 +5,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -69,20 +69,20 @@ public:
     }
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 KMeans_MultiGaussian *KMeans_MultiGaussian_Open() {
     KMeans_MultiGaussian *cPtr = new KMeans_MultiGaussian();
     return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *KMeans_MultiGaussian_Close(KMeans_MultiGaussian *cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *KMeans_MultiGaussian_RunCPP(KMeans_MultiGaussian *cPtr, int rows, int cols)
 {
 		cPtr->dst = Mat(rows, cols, CV_8UC3);

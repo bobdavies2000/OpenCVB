@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef STATIC_EXTERNS
-#define VB_EXTERN static
+#define extern "C" __declspec(dllexport) static
 #else
-#define VB_EXTERN extern "C" __declspec(dllexport)
+#define extern "C" __declspec(dllexport) extern "C" __declspec(dllexport)
 #endif

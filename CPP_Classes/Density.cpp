@@ -6,7 +6,7 @@
 #include <opencv2/ximgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/core/utility.hpp>
-#include "OpenCVB_Extern.h"
+
 using namespace std;
 using namespace  cv;
 class Density_2D
@@ -42,19 +42,19 @@ public:
     }
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Density_2D * Density_2D_Open() {
     Density_2D* cPtr = new Density_2D();
     return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 void Density_2D_Close(Density_2D * cPtr)
 {
     delete cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* Density_2D_RunCPP(Density_2D * cPtr, int* dataPtr, int rows, int cols, float zDistance)
 {
     cPtr->dst = Mat(rows, cols, CV_8U);
@@ -97,19 +97,19 @@ public:
     }
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Density_Count * Density_Count_Open() {
     Density_Count* cPtr = new Density_Count();
     return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 void Density_Count_Close(Density_Count * cPtr)
 {
     delete cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int* Density_Count_RunCPP(Density_Count * cPtr, int* dataPtr, int rows, int cols, int zCount)
 {
     cPtr->dst = Mat(rows, cols, CV_8U);

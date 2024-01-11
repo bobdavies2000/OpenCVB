@@ -36,8 +36,6 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {task->alg = new CPP_AddWeighted_Basics(rows, cols); break; }
 	case _CPP_Palette_Basics :
 	{task->alg = new CPP_Palette_Basics(rows, cols); break; }
-	case _CPP_RedMin_Core :
-	{task->alg = new CPP_RedMin_Core(rows, cols); break; }
 	case _CPP_FeatureLess_History :
 	{task->alg = new CPP_FeatureLess_History(rows, cols); break; }
 	case _CPP_Line_Basics :

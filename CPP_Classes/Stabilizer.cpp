@@ -6,7 +6,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include "VideoStab.h"
-#include "OpenCVB_Extern.h"
+
 
 using namespace std;
 using namespace  cv;
@@ -28,14 +28,14 @@ public:
 	}
 };
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 Stabilizer_Basics_CPP *Stabilizer_Basics_Open()
 {
     Stabilizer_Basics_CPP * cPtr = new Stabilizer_Basics_CPP();
     return cPtr;
 }
 
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *Stabilizer_Basics_Close(Stabilizer_Basics_CPP * cPtr)
 {
     delete cPtr;
@@ -43,7 +43,7 @@ int *Stabilizer_Basics_Close(Stabilizer_Basics_CPP * cPtr)
 }
 
 // https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
-VB_EXTERN
+extern "C" __declspec(dllexport)
 int *Stabilizer_Basics_Run(Stabilizer_Basics_CPP * cPtr, int *bgrPtr, int rows, int cols)
 {
 	cPtr->rgb = Mat(rows, cols, CV_8UC3, bgrPtr);

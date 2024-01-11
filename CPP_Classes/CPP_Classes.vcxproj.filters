@@ -54,7 +54,7 @@
     <ClInclude Include="CPP_Task.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OpenCVB_Extern.h">
+    <ClInclude Include="OpenCextern "C" __declspec(dllexport).h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
