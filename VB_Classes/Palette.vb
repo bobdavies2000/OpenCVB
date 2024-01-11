@@ -5,8 +5,6 @@ Imports System.Drawing.Imaging
 
 Public Class Palette_Basics : Inherits VB_Algorithm
     Public whitebackground As Boolean
-    Public gradientColorMap As New cv.Mat
-    Dim cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
     Public Sub New()
         desc = "Apply the different color maps in OpenCV"
     End Sub
@@ -35,7 +33,7 @@ End Class
 
 
 
-Public Class Palette_BuildColorMap : Inherits VB_Algorithm
+Public Class Palette_LoadColorMap : Inherits VB_Algorithm
     Public whitebackground As Boolean
     Public gradientColorMap As New cv.Mat
     Dim cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")

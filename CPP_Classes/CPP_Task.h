@@ -287,6 +287,7 @@ public:
         }
         return mm;
     }
+
     Vec3b randomCellColor() {
         static random_device rd;
         static mt19937 gen(rd());  // Mersenne Twister engine for randomness

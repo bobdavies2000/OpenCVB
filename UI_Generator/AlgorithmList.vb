@@ -2,8 +2,8 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
-_CPP_Palette_Basics
 _CPP_RedMin_Core
+_CPP_Palette_Basics
 _CPP_FeatureLess_History
 _CPP_Line_Basics
 _CPP_Convex_Basics
@@ -1272,7 +1272,6 @@ if algorithmName = "Options_XPhoto" Then return new Options_XPhoto
 if algorithmName = "ORB_Basics" Then return new ORB_Basics
 if algorithmName = "ORB_Match" Then return new ORB_Match
 if algorithmName = "Palette_Basics" Then return new Palette_Basics
-if algorithmName = "Palette_BuildColorMap" Then return new Palette_BuildColorMap
 if algorithmName = "Palette_Color" Then return new Palette_Color
 if algorithmName = "Palette_Create" Then return new Palette_Create
 if algorithmName = "Palette_DepthColorMap" Then return new Palette_DepthColorMap
@@ -1281,6 +1280,7 @@ if algorithmName = "Palette_Gradient" Then return new Palette_Gradient
 if algorithmName = "Palette_Layout2D" Then return new Palette_Layout2D
 if algorithmName = "Palette_LeftRightImages" Then return new Palette_LeftRightImages
 if algorithmName = "Palette_LinearPolar" Then return new Palette_LinearPolar
+if algorithmName = "Palette_LoadColorMap" Then return new Palette_LoadColorMap
 if algorithmName = "Palette_Random" Then return new Palette_Random
 if algorithmName = "Palette_RandomColorMap" Then return new Palette_RandomColorMap
 if algorithmName = "Palette_Reduction" Then return new Palette_Reduction

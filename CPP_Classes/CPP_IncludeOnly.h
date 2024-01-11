@@ -32,6 +32,8 @@ namespace fs = std::filesystem;
 #include "../CPP_Classes/PragmaLibs.h"
 #include "CPP_Task.h"
 
+#include "FloodCell.h"
+
 cppTask* task;
 
 class CPP_AddWeighted_Basics : public algorithmCPP {
@@ -2552,36 +2554,28 @@ public:
 
 
 
-
 class CPP_Palette_Basics : public algorithmCPP {
 public:
-    bool whitebackground = false;
-    Mat gradientColorMap;
-    //fs::path cMapDir = task->homeDir + "opencv/modules/imgproc/doc/pics/colormaps";
-    fs::path cMapDir = "c:/_src/OpenCVB/opencv/modules/imgproc/doc/pics/colormaps";
+    bool whitebackground;
+    int paletteIndex = 8;
     CPP_Palette_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Palette_Basics";
-        buildColorMap();
-        desc = "Apply the different color maps in OpenCV - Painterly Effect";
+        desc = "Apply the different color maps in OpenCV";
     }
-private:
-    void buildColorMap() {
-        filesystem::path str = cMapDir / ("colorscale_Jet.jpg");
-        gradientColorMap = imread(str.string());
-        gradientColorMap.col(0).setTo(whitebackground ? Scalar(255, 255, 255) : Scalar(0, 0, 0));
-    }
-public:
     void Run(Mat src) {
-        if (src.empty()) return;
-        labels[2] = "ColorMap = Jet";
-        if (task->optionsChanged) buildColorMap();
         if (src.type() == CV_32F) {
             normalize(src, src, 0, 255, NORM_MINMAX);
             src.convertTo(src, CV_8U);
         }
-        if (standalone) cvtColor(src, src, COLOR_BGR2GRAY);
-
-        applyColorMap(src, dst2, (ColormapTypes) task->paletteIndex);
+        vector<ColormapTypes> colormapTypes = {
+            COLORMAP_AUTUMN, COLORMAP_BONE, COLORMAP_CIVIDIS, COLORMAP_COOL,
+            COLORMAP_HOT, COLORMAP_HSV, COLORMAP_INFERNO, COLORMAP_JET,
+            COLORMAP_MAGMA, COLORMAP_OCEAN, COLORMAP_PARULA, COLORMAP_PINK,
+            COLORMAP_PLASMA, COLORMAP_RAINBOW, COLORMAP_SPRING, COLORMAP_SUMMER,
+            COLORMAP_TWILIGHT, COLORMAP_TWILIGHT_SHIFTED, COLORMAP_VIRIDIS, COLORMAP_WINTER
+        };
+        ColormapTypes mapIndex = colormapTypes[paletteIndex];
+        applyColorMap(src, dst2, mapIndex);
     }
 };
 
@@ -2589,70 +2583,76 @@ public:
 
 
 
-//class CPP_RedMin_Core : public algorithmCPP {
-//public:
-//    map<int, segCell, compareAllowIdenticalIntegerInverted> sortedCells;
-//    Mat inputMask;
-//    CPP_FeatureLess_History* fLess;
-//    FloodCell* cPtr;
-//    float redOptions_imageThresholdPercent = 0.95f;
-//    int redOptions_DesiredCellSlider = 30;
-//    CPP_RedMin_Core(int rows, int cols) : algorithmCPP(rows, cols) {
-//        traceName = "CPP_RedMin_Core";
-//        fLess = new CPP_FeatureLess_History(rows, cols);
-//        cPtr = new FloodCell();
-//        desc = "Another minimalist approach to building RedCloud color-based cells.";
-//    }
-//    ~CPP_RedMin_Core() {
-//
-//        if (cPtr) {
-//            FloodCell_Close(cPtr);
-//            delete cPtr;
-//        }
-//    }
-//    void Run(Mat src) {
-//        if (src.channels() != 1) {
-//            fLess->Run(src);
-//            src = fLess->dst2;
-//        }
-//        void* imagePtr;
-//        Mat* srcPtr = &src;
-//        if (inputMask.empty()) {
-//            imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, 0, src.rows, src.cols,
-//                src.type(), redOptions_imageThresholdPercent, redOptions_DesiredCellSlider, 0);
-//        }
-//        else {
-//            Mat* maskPtr = &inputMask;
-//            imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, (uchar *)maskPtr->data, src.rows, src.cols,
-//                                     src.type(), redOptions_imageThresholdPercent, redOptions_DesiredCellSlider, 0);
-//        }
-//        int classCount = FloodCell_Count(cPtr);
-//
-//        dst2 = Mat(src.rows, src.cols, CV_8UC1, imagePtr);
-//        //Mat dst3 = vbPalette(dst2 * 255 / classCount);
-//        int count = countNonZero(dst2);
-//        if (task->heartBeat) {
-//            labels[3] = to_string(classCount) + " cells found";
-//        }
-//        if (classCount <= 1) {
-//            return;
-//        }
-//        Mat sizeData(classCount, 1, CV_32SC1, FloodCell_Sizes(cPtr));
-//        Mat rectData(classCount, 1, CV_32SC4, FloodCell_Rects(cPtr));
-//        Mat floodPointData(classCount, 1, CV_32SC2, FloodCell_FloodPoints(cPtr));
-//        sortedCells.clear();
-//        for (int i = 0; i < classCount; i++) {
-//            segCell cell;
-//            cell.index = i + 1;
-//            cell.rect = task->validateRect(rectData.at<Rect>(i, 0), dst2.cols, dst2.rows);
-//            cell.mask = dst2(cell.rect).clone();
-//
-//        }
-//        if (task->heartBeat) {
-//            labels[2] = "CV_8U format - " + to_string(classCount) + " cells were identified.";
-//        }
-//    }
-//};
+
+class CPP_RedMin_Core : public algorithmCPP {
+public:
+    map<int, segCell, compareAllowIdenticalIntegerInverted> sortedCells;
+    Mat inputMask;
+    CPP_FeatureLess_History* fLess;
+    FloodCell* cPtr;
+    float redOptions_imageThresholdPercent = 0.95f;
+    int redOptions_DesiredCellSlider = 30;
+    CPP_Palette_Basics* palette;
+    CPP_RedMin_Core(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_RedMin_Core";
+        palette = new CPP_Palette_Basics(rows, cols);
+        task->paletteIndex = 8;
+        fLess = new CPP_FeatureLess_History(rows, cols);
+        cPtr = new FloodCell();
+        desc = "Another minimalist approach to building RedCloud color-based cells.";
+    }
+    ~CPP_RedMin_Core() {
+
+        if (cPtr) {
+            FloodCell_Close(cPtr);
+            delete cPtr;
+        }
+    }
+    void Run(Mat src) {
+        if (src.channels() != 1) {
+            fLess->Run(src);
+            src = fLess->dst2;
+        }
+        void* imagePtr;
+        Mat* srcPtr = &src;
+        if (inputMask.empty()) {
+            imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, 0, src.rows, src.cols,
+                src.type(), redOptions_imageThresholdPercent, redOptions_DesiredCellSlider, 0);
+        }
+        else {
+            Mat* maskPtr = &inputMask;
+            imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, (uchar *)maskPtr->data, src.rows, src.cols,
+                                     src.type(), redOptions_imageThresholdPercent, redOptions_DesiredCellSlider, 0);
+        }
+        int classCount = FloodCell_Count(cPtr);
+
+        dst2 = Mat(src.rows, src.cols, CV_8UC1, imagePtr);
+        palette->Run(dst2 * 255 / classCount);
+        dst3 = palette->dst2;
+
+        if (task->heartBeat) {
+            labels[3] = to_string(classCount) + " cells found";
+        }
+
+        if (classCount <= 1) {
+            return;
+        }
+        Mat sizeData(classCount, 1, CV_32SC1, FloodCell_Sizes(cPtr));
+        Mat rectData(classCount, 1, CV_32SC4, FloodCell_Rects(cPtr));
+        Mat floodPointData(classCount, 1, CV_32SC2, FloodCell_FloodPoints(cPtr));
+        sortedCells.clear();
+        for (int i = 0; i < classCount; i++) {
+            segCell cell;
+            cell.index = i + 1;
+            cell.rect = task->validateRect(rectData.at<Rect>(i, 0), dst2.cols, dst2.rows);
+            cell.mask = dst2(cell.rect).clone();
+        }
+
+        if (task->heartBeat) {
+            labels[2] = "CV_8U format - " + to_string(classCount) + " cells were identified.";
+        }
+    }
+};
 
 
 

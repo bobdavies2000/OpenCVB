@@ -87,7 +87,7 @@ Public Class VBtask : Implements IDisposable
 
     Public ogl As OpenGL_Basics
 
-    Public palette As Palette_Basics
+    Public palette As Palette_LoadColorMap
     Public paletteGradient As cv.Mat
     Public paletteIndex As Integer
 
@@ -365,7 +365,7 @@ Public Class VBtask : Implements IDisposable
         redOptions.Show()
         gOptions.Show()
         task.toggleFrame = -1
-        palette = New Palette_Basics
+        palette = New Palette_LoadColorMap
         If algName.StartsWith("OpenGL_") Or algName.EndsWith("_OpenGL") Or algName.StartsWith("Model_") Then
             ogl = New OpenGL_Basics
         End If

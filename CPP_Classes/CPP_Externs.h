@@ -34,6 +34,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case _CPP_AddWeighted_Basics :
     {task->alg = new CPP_AddWeighted_Basics(rows, cols); break; }
+	case _CPP_RedMin_Core :
+	{task->alg = new CPP_RedMin_Core(rows, cols); break; }
 	case _CPP_Palette_Basics :
 	{task->alg = new CPP_Palette_Basics(rows, cols); break; }
 	case _CPP_FeatureLess_History :
@@ -335,12 +337,16 @@ int* cppTask_RunCPP(cppTask * task, int* dataPtr, int channels, int frameCount, 
 
     task->firstPass = false;
 
+    if (src.size() != task->alg->dst0.size()) resize(task->alg->dst0, task->alg->dst0, src.size());
+    if (src.size() != task->alg->dst1.size()) resize(task->alg->dst1, task->alg->dst1, src.size());
     if (src.size() != task->alg->dst2.size()) resize(task->alg->dst2, task->alg->dst2, src.size());
     if (src.size() != task->alg->dst3.size()) resize(task->alg->dst3, task->alg->dst3, src.size());
+
     task->xdst0 = task->alg->dst0;
     task->xdst1 = task->alg->dst1;
     task->xdst2 = task->alg->dst2;
     task->xdst3 = task->alg->dst3;
+
     if (task->alg->dst0.type() == CV_32S) task->alg->dst0.convertTo(task->xdst0, CV_8U);
     if (task->alg->dst1.type() == CV_32S) task->alg->dst1.convertTo(task->xdst1, CV_8U);
     if (task->alg->dst2.type() == CV_32S) task->alg->dst2.convertTo(task->xdst2, CV_8U);
