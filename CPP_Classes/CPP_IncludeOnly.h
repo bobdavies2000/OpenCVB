@@ -2587,7 +2587,6 @@ public:
 class CPP_Palette_Basics : public algorithmCPP {
 public:
     bool whitebackground;
-    int paletteIndex = 8;
     CPP_Palette_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_Palette_Basics";
         desc = "Apply the different color maps in OpenCV";
@@ -2604,7 +2603,7 @@ public:
             COLORMAP_PLASMA, COLORMAP_RAINBOW, COLORMAP_SPRING, COLORMAP_SUMMER,
             COLORMAP_TWILIGHT, COLORMAP_TWILIGHT_SHIFTED, COLORMAP_VIRIDIS, COLORMAP_WINTER
         };
-        ColormapTypes mapIndex = colormapTypes[paletteIndex];
+        ColormapTypes mapIndex = colormapTypes[task->paletteIndex];
         applyColorMap(src, dst2, mapIndex);
     }
 };
@@ -2647,7 +2646,6 @@ public:
     CPP_RedMin_Core(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_RedMin_Core";
         vbPalette(dst2);
-        task->paletteIndex = 1;
         fLess = new CPP_FeatureLess_Basics(rows, cols);
         cPtr = new FloodCell();
         desc = "Another minimalist approach to building RedCloud color-based cells.";
