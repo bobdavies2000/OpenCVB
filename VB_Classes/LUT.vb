@@ -43,7 +43,7 @@ End Class
 Public Class LUT_Sliders : Inherits VB_Algorithm
     Dim options As New Options_LUT
     Public Sub New()
-        desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
+        desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
@@ -72,7 +72,7 @@ Public Class LUT_CustomColor : Inherits VB_Algorithm
     Public Sub New()
         findSlider("Number of color transitions (Used only with Random)").Value = 5
         labels(3) = "Custom Color Lookup Table"
-        desc = "Use a palette to provide the lookup table for LUT - Painterly Effect"
+        desc = "Use a palette to provide the lookup table for LUT"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static colorSlider = findSlider("Number of color transitions (Used only with Random)")
@@ -104,7 +104,7 @@ Public Class LUT_Reduction : Inherits VB_Algorithm
             vector.Set(Of cv.Vec3b)(i, 0, randomCellColor())
         Next
         labels(3) = "Custom Color Lookup Table"
-        desc = "Build and use a custom color palette - Painterly Effect"
+        desc = "Build and use a custom color palette"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)

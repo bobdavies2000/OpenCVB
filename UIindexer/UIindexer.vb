@@ -8,7 +8,6 @@ Module IndexMain
     Dim nonPYnames As New SortedList(Of String, String)
     Dim onlyCPP As New SortedList(Of String, String)
     Dim PYStreamNames As New SortedList(Of String, String)
-    Dim Painterly As New SortedList(Of String, String)
     Dim MatchShapes As New SortedList(Of String, String)
     Dim LastEdits As New SortedList(Of String, String)
     Private Function trimQuotes(line As String)
@@ -99,7 +98,6 @@ Module IndexMain
                 If line.Contains("Parallel.For") Then
                     If multiThreaded.ContainsKey(classname) = False Then multiThreaded.Add(classname, classname)
                 End If
-                If lcaseLine.Contains("painterly") And Painterly.ContainsKey(classname) = False Then Painterly.Add(classname, classname)
                 If lcaseLine.Contains("matchshapes: ") And MatchShapes.ContainsKey(classname) = False Then MatchShapes.Add(classname, classname)
                 If line = "" Or Trim(line).StartsWith("'") Or Trim(line).StartsWith("#") Then Continue While
                 If LCase(line).StartsWith("public class") And LCase(line).EndsWith("inherits vb_algorithm") Then
@@ -203,12 +201,6 @@ Module IndexMain
         sw.Write("<OpenGL>")
         For i = 0 To OpenGLnames.Count - 1
             sw.Write("," + OpenGLnames.ElementAt(i).Key)
-        Next
-        sw.WriteLine()
-
-        sw.Write("<Painterly>")
-        For i = 0 To Painterly.Count - 1
-            sw.Write("," + Painterly.ElementAt(i).Key)
         Next
         sw.WriteLine()
 

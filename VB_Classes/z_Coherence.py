@@ -10,8 +10,6 @@ import sys
 titleWindow = 'z_Coherence.py'
 import numpy as np
 import cv2 as cv
-#"Painterly Effect" #include this to put this example in the 'Painterly Effect' group.
-
 def coherence_filter(img, sigma = 11, str_sigma = 11, blend = 0.5, iter_n = 4):
     height, width = img.shape[:2]
 

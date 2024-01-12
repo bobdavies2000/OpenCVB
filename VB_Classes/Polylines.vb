@@ -35,7 +35,7 @@ Public Class Polylines_Random : Inherits VB_Algorithm
     Dim zoom As New Pixel_Zoom
     Public Sub New()
         labels(2) = "To zoom move the mouse over the image"
-        desc = "Create a random procedural image - Painterly Effect"
+        desc = "Create a random procedural image"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If task.frameCount Mod (task.fpsRate * 3) = 0 Then ' every x frames.

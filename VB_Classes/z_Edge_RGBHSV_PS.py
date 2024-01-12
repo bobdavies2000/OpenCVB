@@ -14,7 +14,6 @@ def sobel_each(image):
 def sobel_hsv(image):
     return filters.sobel(image)
 
-# painterly
 # https://scikit-image.org/docs/dev/auto_examples/color_exposure/plot_adapt_rgb.html#sphx-glr-auto-examples-color-exposure-plot-adapt-rgb-py
 def OpenCVCode(image, depth32f, frameCount):
     rgb64f = rescale_intensity(1 - sobel_each(image))

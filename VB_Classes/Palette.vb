@@ -39,7 +39,7 @@ Public Class Palette_LoadColorMap : Inherits VB_Algorithm
     Dim cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
     Public Sub New()
         buildColorMap()
-        desc = "Apply the different color maps in OpenCV - Painterly Effect"
+        desc = "Apply the different color maps in OpenCV"
     End Sub
     Private Sub buildColorMap()
         Dim str = cMapDir.FullName + "/colorscale_" + gOptions.Palettes.Text + ".jpg"
@@ -245,7 +245,7 @@ Public Class Palette_RandomColorMap : Inherits VB_Algorithm
         End If
 
         labels(3) = "Generated colormap"
-        desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
+        desc = "Build a random colormap that smoothly transitions colors"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static paletteSlider = findSlider("Number Of color transitions (Used only With Random)")

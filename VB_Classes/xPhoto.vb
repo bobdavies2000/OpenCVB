@@ -51,12 +51,11 @@ End Class
 Public Class XPhoto_OilPaint_CPP : Inherits VB_Algorithm
     ReadOnly options As New Options_XPhoto
     Public Sub New()
-        Application.DoEvents() ' because the rest of initialization takes so long, let the show() above take effect.
         cPtr = xPhoto_OilPaint_Open()
-        desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
+        desc = "Use the xPhoto Oil Painting transform"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
@@ -92,7 +91,7 @@ Public Class XPhoto_Inpaint : Inherits VB_Algorithm
         labels(3) = "Repaired result..."
         desc = "Use the xPhoto inpaint to fill in the depth holes"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static radioFast = findRadio("FSR_Fast")
         Static radioSMap = findRadio("ShiftMap")
         dst2 = src
@@ -115,7 +114,7 @@ Public Class XPhoto_Inpaint_CPP : Inherits VB_Algorithm
     Public Sub New()
         cPtr = xPhoto_Inpaint_Open()
         labels = {"", "Mask for inpainted repair", "output with inpainted data repaired", "Input to the inpaint C++ algorithm - not working!!!"}
-        desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
+        desc = "Use the xPhoto Oil Painting transform"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static radioFast = findRadio("FSR_Fast")

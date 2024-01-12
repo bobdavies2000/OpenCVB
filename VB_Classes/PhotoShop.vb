@@ -479,10 +479,10 @@ Public Class PhotoShop_UnsharpMask : Inherits VB_Algorithm
             sliders.setupTrackBar("threshold", 0, 255, 5)
             sliders.setupTrackBar("Shift Amount", 0, 5000, 1000)
         End If
-        desc = "Sharpen an image - Painterly Effect"
+        desc = "Sharpen an image"
         labels(3) = "Unsharp mask (difference from Blur)"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static sigmaSlider = findSlider("sigma")
         Static thresholdSlider = findSlider("threshold")
         Static shiftSlider = findSlider("Shift Amount")
@@ -511,9 +511,9 @@ Public Class PhotoShop_SharpenDetail : Inherits VB_Algorithm
             sliders.setupTrackBar("DetailEnhance Sigma_s", 0, 200, 60)
             sliders.setupTrackBar("DetailEnhance Sigma_r X100", 1, 100, 7)
         End If
-        desc = "Enhance detail on an image - Painterly Effect"
+        desc = "Enhance detail on an image"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static sSigmaSlider = findSlider("DetailEnhance Sigma_s")
         Static rSigmaSlider = findSlider("DetailEnhance Sigma_r X100")
         cv.Cv2.DetailEnhance(src, dst2, sSigmaSlider.Value, rSigmaSlider.Value / rSigmaSlider.Maximum)
@@ -533,9 +533,9 @@ Public Class PhotoShop_SharpenStylize : Inherits VB_Algorithm
             sliders.setupTrackBar("Stylize Sigma_s", 0, 200, 60)
             sliders.setupTrackBar("Stylize Sigma_r X100", 1, 100, 7)
         End If
-        desc = "Stylize an image - Painterly Effect"
+        desc = "Stylize an image"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static sSlider = findSlider("Stylize Sigma_s")
         Static rSlider = findSlider("Stylize Sigma_r X100")
         cv.Cv2.Stylization(src, dst2, sSlider.Value, rSlider.Value / rSlider.maximum)
@@ -557,9 +557,9 @@ Public Class PhotoShop_Pencil_Basics : Inherits VB_Algorithm
             sliders.setupTrackBar("Pencil Shade Factor X100", 1, 200, 40)
         End If
 
-        desc = "Convert image to a pencil sketch - Painterly Effect"
+        desc = "Convert image to a pencil sketch"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static sSlider = findSlider("Pencil Sigma_s")
         Static rSlider = findSlider("Pencil Sigma_r X100")
         Static shadeSlider = findSlider("Pencil Shade Factor X100")
@@ -585,7 +585,7 @@ Public Class PhotoShop_Pencil_Manual : Inherits VB_Algorithm
             radio.addRadio("Pencil blur image")
             radio.check(0).Checked = True
         End If
-        desc = "Break down the process of converting an image to a sketch - Painterly Effect"
+        desc = "Break down the process of converting an image to a sketch"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

@@ -54,7 +54,7 @@ Public Class Texture_Flow : Inherits VB_Algorithm
             sliders.setupTrackBar("Texture Eigen Ksize", 1, 15, 1)
         End If
 
-        desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
+        desc = "Find and mark the texture flow in an image - see texture_flow.py"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static deltaSlider = findSlider("Texture Flow Delta")

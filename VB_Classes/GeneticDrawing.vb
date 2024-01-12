@@ -27,7 +27,7 @@ Public Class GeneticDrawing_Basics : Inherits VB_Algorithm
 
         labels(2) = "(clkwise) original, imgStage, imgGeneration, magnitude"
         labels(3) = "Current result"
-        desc = "Create a painting from the current video input using a genetic algorithm. Draw anywhere to focus brushes. Painterly"
+        desc = "Create a painting from the current video input using a genetic algorithm. Draw anywhere to focus brushes"
     End Sub
     Private Function runDNAseq(dna() As DNAentry) As cv.Mat
         Dim nextImage = imgGeneration.Clone()
@@ -214,7 +214,7 @@ Public Class GeneticDrawing_Color : Inherits VB_Algorithm
         gDraw(2) = New GeneticDrawing_Basics()
 
         labels(2) = "Intermediate results - original+2 partial+Mag"
-        desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes. Painterly"
+        desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static restartCheck = findCheckBox("Restart the algorithm with the current settings")
@@ -262,7 +262,7 @@ Public Class GeneticDrawing_Photo : Inherits VB_Algorithm
         fileNameForm.Setup(traceName)
         fileNameForm.Show()
 
-        desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
+        desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes"
     End Sub
     Public Sub RunVB(src as cv.Mat)
 

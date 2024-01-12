@@ -210,7 +210,7 @@ Public Class DFT_Shapes : Inherits VB_Algorithm
             radio.check(0).Checked = True
         End If
         labels = {"Inverse of the DFT - the same grayscale input.", "", "Input to the DFT", "Discrete Fourier Transform Output"}
-        desc = "Show the spectrum magnitude for some standard shapes. Painterly"
+        desc = "Show the spectrum magnitude for some standard shapes"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()

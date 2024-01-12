@@ -19,7 +19,7 @@ Public Class Gabor_Basics : Inherits VB_Algorithm
             sliders.setupTrackBar("Gabor gamma X10", 0, 10, 5)
             sliders.setupTrackBar("Gabor Phase offset X100", 0, 100, 0)
         End If
-        desc = "Explore Gabor kernel - Painterly Effect"
+        desc = "Explore Gabor kernel"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static ksizeSlider = findSlider("Gabor Kernel Size")
@@ -62,7 +62,7 @@ Public Class Gabor_Basics_MT : Inherits VB_Algorithm
             gabor(i).theta = i * 180 / gabor.Length
         Next
 
-        desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
+        desc = "Apply multiple Gabor filters sweeping through different values of theta."
     End Sub
     Public Sub RunVB(src as cv.Mat)
         grid.Run(src)

@@ -9,7 +9,7 @@ Public Class Coherence_Basics : Inherits VB_Algorithm
             sliders.setupTrackBar("Coherence eigen kernel", 1, 31, 1)
         End If
         labels(2) = "Coherence - draw rectangle to apply"
-        desc = "Find lines that are artistically coherent in the image - Painterly"
+        desc = "Find lines that are artistically coherent in the image"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static sigmaSlider = findSlider("Coherence Sigma")
@@ -91,7 +91,7 @@ End Class
 Public Class Coherence_Depth : Inherits VB_Algorithm
     Dim coherent As New Coherence_Basics
     Public Sub New()
-        desc = "Find coherent lines in the depth image - Painterly"
+        desc = "Find coherent lines in the depth image"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         coherent.Run(task.depthRGB)

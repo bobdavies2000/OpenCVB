@@ -9,7 +9,6 @@ Usage:
 '''
 import numpy as np
 import cv2 as cv
-taskdesc = "Painterly Effect"
 titleWindow = 'z_TextureFlow.py'
 
 def main():

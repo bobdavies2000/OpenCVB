@@ -199,7 +199,7 @@ Public Class Edge_Deriche_CPP : Inherits VB_Algorithm
         End If
         cPtr = Edge_Deriche_Open()
         labels(3) = "Image enhanced with Deriche results"
-        desc = "Edge detection using the Deriche X and Y gradients - Painterly"
+        desc = "Edge detection using the Deriche X and Y gradients"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static alphaSlider = findSlider("Deriche Alpha X100")
@@ -702,7 +702,7 @@ End Class
 Public Class Edge_RGB : Inherits VB_Algorithm
     Dim sobel As New Edge_Sobel_Old
     Public Sub New()
-        desc = "Combine the edges from all 3 channels.  Painterly"
+        desc = "Combine the edges from all 3 channels"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim img32f As New cv.Mat
@@ -731,7 +731,7 @@ End Class
 Public Class Edge_HSV : Inherits VB_Algorithm
     Dim edges As New Edge_RGB
     Public Sub New()
-        desc = "Combine the edges from all 3 HSV channels.  Painterly"
+        desc = "Combine the edges from all 3 HSV channels"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)

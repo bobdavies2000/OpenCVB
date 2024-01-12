@@ -282,7 +282,7 @@ Public Class BGSubtract_Synthetic_CPP : Inherits VB_Algorithm
     Dim options As New Options_BGSubtractSynthetic
     Public Sub New()
         labels(2) = "Synthetic background/foreground image."
-        desc = "Generate a synthetic input to background subtraction method - Painterly"
+        desc = "Generate a synthetic input to background subtraction method"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
@@ -315,7 +315,7 @@ Public Class BGSubtract_Synthetic : Inherits VB_Algorithm
     Dim bgfg As New BGSubtract_Basics_CPP
     Dim synth As New BGSubtract_Synthetic_CPP
     Public Sub New()
-        desc = "Demonstrate background subtraction algorithms with synthetic images - Painterly"
+        desc = "Demonstrate background subtraction algorithms with synthetic images"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         synth.Run(src)

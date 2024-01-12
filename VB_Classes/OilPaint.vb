@@ -8,7 +8,7 @@ Public Class OilPaint_Pointilism : Inherits VB_Algorithm
     Dim options As New Options_Pointilism
     Public Sub New()
         task.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)
-        desc = "Alter the image to effect the pointilism style - Painterly Effect"
+        desc = "Alter the image to effect the pointilism style"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
@@ -78,7 +78,7 @@ End Class
 '        kSlider = findSlider("KMeans k")
 '        kSlider.Value = 12 ' we would like a dozen colors or so in the color image.
 '        labels(3) = "Color probabilities"
-'        desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
+'        desc = "Determine color probabilities on the output of kMeans"
 '    End Sub
 '    Public Sub RunVB(src as cv.Mat)
 '        km.Run(src)
@@ -112,7 +112,7 @@ Public Class OilPaint_ManualVB : Inherits VB_Algorithm
     Public options As New Options_OilPaint
     Public Sub New()
         task.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)
-        desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
+        desc = "Alter an image so it appears more like an oil painting.  Select a region of interest."
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
@@ -169,7 +169,7 @@ Public Class OilPaint_Manual : Inherits VB_Algorithm
     Public Sub New()
         task.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)
         labels(3) = "Selected area only"
-        desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
+        desc = "Alter an image so it appears painted by a pointilist.  Select a region of interest to paint."
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
@@ -196,7 +196,7 @@ Public Class OilPaint_Cartoon : Inherits VB_Algorithm
         task.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)
         labels(2) = "OilPaint_Cartoon"
         labels(3) = "Laplacian Edges"
-        desc = "Alter an image so it appears more like a cartoon - Painterly Effect"
+        desc = "Alter an image so it appears more like a cartoon"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Dim roi = task.drawRect
