@@ -351,13 +351,10 @@ Public Class RedMin_Motion : Inherits VB_Algorithm
             sortedCells = minCore.sortedCells
         End If
 
-        Dim minPixels = gOptions.minPixelsSlider.Value
-        If task.quarterBeat Then dst3.SetTo(0)
-
         minCells.Clear()
         For Each key In sortedCells
             Dim cell = key.Value
-            Dim tmp As cv.Mat = cell.mask And motion.dst3(cell.rect)
+            Dim tmp As cv.Mat = cell.mask And motion.dst2(cell.rect)
             If tmp.CountNonZero Then cell.motionFlag = True
             minCells.Add(cell)
         Next

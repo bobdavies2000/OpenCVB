@@ -1,13 +1,27 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Motion_Basics : Inherits VB_Algorithm
-    Public motion As New BGSubtract_Basics_CPP
+    Public options As New Options_BGSubtract_CPP
     Public Sub New()
-        desc = "Use background subtract to find the motion in the image."
+        labels(2) = "BGSubtract output"
+        desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        motion.Run(src)
-        dst2 = motion.dst2
+        options.RunVB()
+
+        If task.optionsChanged Then cPtr = BGSubtract_BGFG_Open(options.currMethod)
+
+        Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+        Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+        Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        handleSrc.Free()
+
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
+        labels(2) = options.methodDesc
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = BGSubtract_BGFG_Close(cPtr)
     End Sub
 End Class
 
