@@ -661,7 +661,7 @@ Public Class MSER_CPP : Inherits VB_Algorithm
 
         dst1 = dst0.InRange(255, 255)
 
-        If standalone Or testIntermediate(traceName) Then
+        If standalone Or showIntermediate() Then
             dst2 = vbPalette(dst0 * 255 / classcount)
 
             dst3 = src

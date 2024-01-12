@@ -8,9 +8,8 @@ Public Class Area_MinTriangle_CPP : Inherits VB_Algorithm
         desc = "Find minimum containing triangle for a set of points."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() = False Then Exit Sub
-        If srcPoints Is Nothing Then
-            options.RunVB()
+        options.RunVB()
+        If heartBeat() Then
             srcPoints = New List(Of cv.Point2f)(options.srcPoints)
         Else
             If srcPoints.Count < 3 Then Exit Sub ' not enough points

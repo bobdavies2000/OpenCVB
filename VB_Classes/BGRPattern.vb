@@ -26,7 +26,7 @@ Public Class BGRPattern_Basics : Inherits VB_Algorithm
         denoise.Run(dst2)
         dst2 = denoise.dst2
 
-        If standalone Or testIntermediate(traceName) Then
+        If standalone Or showIntermediate() Then
             dst2 = dst2 * 255 / classCount
             dst3 = vbPalette(dst2)
         End If

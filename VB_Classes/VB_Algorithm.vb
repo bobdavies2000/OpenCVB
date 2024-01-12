@@ -141,6 +141,11 @@ Public Class VB_Algorithm : Implements IDisposable
         Dim str As New trueText(text, pt.X, pt.Y, picTag)
         trueData.Add(str)
     End Sub
+    Public Function showIntermediate() As Boolean
+        If task.intermediateObject Is Nothing Then Return False
+        If task.intermediateObject.traceName = traceName Then Return True
+        Return False
+    End Function
     Public Sub setFlowText(text As String, picTag As Integer)
         Dim pt = New cv.Point(0, 0)
         Dim str As New trueText(text, pt.X, pt.Y, picTag)

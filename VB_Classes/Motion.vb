@@ -411,7 +411,7 @@ Public Class Motion_Rect : Inherits VB_Algorithm
             dst2 = src.Clone
         End If
 
-        If standalone Or testIntermediate(traceName) Then
+        If standalone Or showIntermediate() Then
             dst2 = dst1
             If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
                 dst3(task.motionRect).SetTo(255)
@@ -419,7 +419,7 @@ Public Class Motion_Rect : Inherits VB_Algorithm
             End If
         End If
 
-        If standalone Or testIntermediate(traceName) Then
+        If standalone Or showIntermediate() Then
             If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
                 src(task.motionRect).CopyTo(dst0(task.motionRect))
                 color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth, task.lineType)

@@ -171,11 +171,6 @@ Module VB
 
         Return outStr
     End Function
-    Public Function testIntermediate(traceName As String) As Boolean
-        If task.intermediateObject Is Nothing Then Return False
-        If task.intermediateObject.traceName = traceName Then Return True
-        Return False
-    End Function
     Public Sub setPointCloudGrid()
         gOptions.GridSize.Value = 8
         If task.workingRes.Width = 640 Then

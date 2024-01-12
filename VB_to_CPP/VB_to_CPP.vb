@@ -136,7 +136,7 @@ Public Class VB_to_CPP
             split(i) = split(i).Replace("Mat dst", "dst = Mat")
             split(i) = split(i).Replace("~" + functionName, "~CPP_" + functionName)
             split(i) = split(i).Replace(" override", "")
-            split(i) = split(i).Replace(" || testIntermediate(traceName)", "")
+            split(i) = split(i).Replace(" || showIntermediate()", "")
             split(i) = split(i).Replace("vbDrawContour", "task->drawContour")
             split(i) = split(i).Replace("gOptions.FrameHistory.Value", "task->frameHistoryCount")
             split(i) = split(i).Replace("gOptions.PixelDiffThreshold.Value", "task->pixelDiffThreshold")

@@ -711,7 +711,7 @@ Public Class Contour_Image : Inherits VB_Algorithm
             If ctr.Length > minLengthContour Then vbDrawContour(dst3, ctr.ToList, cv.Scalar.White)
         Next
 
-        If standalone Or testIntermediate(traceName) Then
+        If standalone Or showIntermediate() Then
             dst2 = vbPalette(dst2 * 255 / colorClass.classCount)
         End If
     End Sub

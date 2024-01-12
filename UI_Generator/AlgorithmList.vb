@@ -1679,6 +1679,7 @@ if algorithmName = "TransformationMatrix_Basics" Then return new TransformationM
 if algorithmName = "Triangle_Basics" Then return new Triangle_Basics
 if algorithmName = "Triangle_Cell" Then return new Triangle_Cell
 if algorithmName = "Triangle_HullContour" Then return new Triangle_HullContour
+if algorithmName = "Triangle_KNN" Then return new Triangle_KNN
 if algorithmName = "Triangle_Mask" Then return new Triangle_Mask
 if algorithmName = "Triangle_RedCloud" Then return new Triangle_RedCloud
 if algorithmName = "Vector_Magnitude" Then return new Vector_Magnitude

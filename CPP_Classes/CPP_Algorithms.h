@@ -1897,3 +1897,571 @@ uchar * BackProjectCloud_Run(int* inputPtr, int rows, int cols, int bins, float 
 
 	return (uchar*)mask.data;
 }
+
+
+
+
+
+
+class Histogram_1D
+{
+private:
+public:
+	Mat src;
+	Mat histogram;
+	Histogram_1D() {}
+	void RunCPP(int bins) {
+		float hRange[] = { 0, 256 };
+		int hbins[] = { bins };
+		const float* range[] = { hRange };
+		calcHist(&src, 1, { 0 }, Mat(), histogram, 1, hbins, range, true, false);
+	}
+};
+extern "C" __declspec(dllexport)
+Histogram_1D * Histogram_1D_Open() {
+	Histogram_1D* cPtr = new Histogram_1D();
+	return cPtr;
+}
+extern "C" __declspec(dllexport)
+float Histogram_1D_Sum(Histogram_1D * cPtr) {
+	Scalar count = cv::sum(cPtr->histogram);
+	return count[0];
+}
+extern "C" __declspec(dllexport)
+void Histogram_1D_Close(Histogram_1D * cPtr)
+{
+	delete cPtr;
+}
+extern "C" __declspec(dllexport)
+int* Histogram_1D_RunCPP(Histogram_1D * cPtr, int* dataPtr, int rows, int cols, int bins)
+{
+	cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
+	cPtr->RunCPP(bins);
+	return (int*)cPtr->histogram.data;
+}
+
+
+
+
+
+
+// http://man.hubwiz.com/docset/OpenCV.docset/Contents/Resources/Documents/d9/dde/samples_2cpp_2kmeans_8cpp-example.html
+
+cv::Scalar colorTab[] =
+{
+	Scalar(0, 0, 255),
+	Scalar(0,255,0),
+	Scalar(255,100,100),
+	Scalar(255,0,255),
+	Scalar(0,255,255)
+};
+
+class KMeans_MultiGaussian
+{
+private:
+	RNG rng;
+public:
+	Mat dst;
+	KMeans_MultiGaussian() { rng = rng(12345); }
+	const int MAX_CLUSTERS = 5;
+
+	void RunCPP() {
+		int k, clusterCount = rng.uniform(2, MAX_CLUSTERS + 1);
+		int i, sampleCount = rng.uniform(1, 1001);
+		Mat points(sampleCount, 1, CV_32FC2), labels;
+
+		clusterCount = MIN(clusterCount, sampleCount);
+		std::vector<Point2f> centers;
+
+		/* generate random sample from multigaussian distribution */
+		for (k = 0; k < clusterCount; k++)
+		{
+			Point center;
+			center.x = rng.uniform(0, dst.cols);
+			center.y = rng.uniform(0, dst.rows);
+			Mat pointChunk = points.rowRange(k * sampleCount / clusterCount,
+				k == clusterCount - 1 ? sampleCount :
+				(k + 1) * sampleCount / clusterCount);
+			rng.fill(pointChunk, RNG::NORMAL, Scalar(center.x, center.y), Scalar(dst.cols * 0.05, dst.rows * 0.05));
+		}
+
+		randShuffle(points, 1, &rng);
+
+		double compactness = kmeans(points, clusterCount, labels,
+			TermCriteria(TermCriteria::EPS + TermCriteria::COUNT, 10, 1.0),
+			3, KMEANS_PP_CENTERS, centers);
+
+		for (i = 0; i < sampleCount; i++)
+		{
+			int clusterIdx = labels.at<int>(i);
+			Point ipt = points.at<Point2f>(i);
+			circle(dst, ipt, 2, colorTab[clusterIdx], FILLED, LINE_AA);
+		}
+		for (i = 0; i < int(centers.size()); ++i)
+		{
+			Point2f c = centers[i];
+			circle(dst, c, 40, colorTab[i], 1, LINE_AA);
+		}
+	}
+};
+
+extern "C" __declspec(dllexport)
+KMeans_MultiGaussian * KMeans_MultiGaussian_Open() {
+	KMeans_MultiGaussian* cPtr = new KMeans_MultiGaussian();
+	return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* KMeans_MultiGaussian_Close(KMeans_MultiGaussian * cPtr)
+{
+	delete cPtr;
+	return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* KMeans_MultiGaussian_RunCPP(KMeans_MultiGaussian * cPtr, int rows, int cols)
+{
+	cPtr->dst = Mat(rows, cols, CV_8UC3);
+	cPtr->dst.setTo(0);
+	cPtr->RunCPP();
+	return (int*)cPtr->dst.data;
+}
+
+
+
+
+
+
+
+class Kmeans_Simple
+{
+private:
+public:
+	Mat src, dst;
+	Kmeans_Simple() {}
+	void RunCPP(float minVal, float maxVal) {
+		dst.setTo(0);
+		Vec3b yellow(0, 255, 255);
+		Vec3b blue(255, 0, 0);
+		for (int y = 0; y < dst.rows; y++)
+		{
+			for (int x = 0; x < dst.cols; x++)
+			{
+				float b = src.at<float>(y, x);
+				if (b != 0)
+				{
+					if ((maxVal - b) < (b - minVal)) dst.at<Vec3b>(y, x) = blue; else dst.at<Vec3b>(y, x) = yellow;
+				}
+			}
+		}
+	}
+};
+
+extern "C" __declspec(dllexport)
+Kmeans_Simple * Kmeans_Simple_Open() {
+	Kmeans_Simple* cPtr = new Kmeans_Simple();
+	return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* Kmeans_Simple_Close(Kmeans_Simple * cPtr)
+{
+	delete cPtr;
+	return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* Kmeans_Simple_RunCPP(Kmeans_Simple * cPtr, int* dataPtr, int rows, int cols, float minVal, float maxVal)
+{
+	cPtr->src = Mat(rows, cols, CV_32F, dataPtr);
+	cPtr->dst = Mat(rows, cols, CV_8UC3);
+	cPtr->RunCPP(minVal, maxVal);
+	return (int*)cPtr->dst.data;
+}
+
+
+
+
+
+extern "C" __declspec(dllexport)
+void MinTriangle_Run(float* inputPoints, int count, float* outputTriangle)
+{
+	Mat input(count, 1, CV_32FC2, inputPoints);
+	vector<Point2f> triangle;
+	minEnclosingTriangle(input, triangle);
+	for (int i = 0; i < 3; ++i)
+	{
+		outputTriangle[i * 2 + 0] = triangle.at(i).x;
+		outputTriangle[i * 2 + 1] = triangle.at(i).y;
+	}
+}
+
+
+
+
+
+class Sort_MLPrepTest
+{
+private:
+public:
+	Mat src, dst;
+	Sort_MLPrepTest() {}
+	void Run() {
+		dst = Mat(src.rows, src.cols, CV_32FC2);
+		for (int y = 0; y < src.rows; y++)
+		{
+			for (int x = 0; x < src.cols; x++)
+			{
+				int gray = src.at<unsigned char>(y, x);
+				dst.at<cv::Point2f>(y, x) = cv::Point2f(float(gray), float(y));
+			}
+		}
+	}
+};
+
+extern "C" __declspec(dllexport) Sort_MLPrepTest * Sort_MLPrepTest_Open() { Sort_MLPrepTest* cPtr = new Sort_MLPrepTest(); return cPtr; }
+extern "C" __declspec(dllexport) int* Sort_MLPrepTest_Close(Sort_MLPrepTest * cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int* Sort_MLPrepTest_Run(Sort_MLPrepTest * cPtr, int* grayPtr, int rows, int cols)
+{
+	cPtr->src = Mat(rows, cols, CV_8U, grayPtr);
+	cPtr->Run();
+	return (int*)cPtr->dst.data;
+}
+
+
+
+
+
+
+class ML_RemoveDups
+{
+private:
+public:
+	Mat src, dst;
+	ML_RemoveDups() {}
+	int index = 0;
+	void Run() {
+		index = 0;
+		int lastVal = -1;
+		if (src.type() == CV_32S)
+		{
+			dst = Mat(int(src.total()), 1, CV_32S);
+			dst.setTo(0);
+			for (int y = 0; y < src.rows; y++)
+			{
+				for (int x = 0; x < src.cols; x++)
+				{
+					int val = src.at<int>(y, x);
+					if (val != lastVal)
+					{
+						dst.at<int>(index, 0) = val;
+						lastVal = val;
+						index++;
+					}
+				}
+			}
+		}
+		else
+		{
+			dst = Mat(int(src.total()), 1, CV_8U);
+			dst.setTo(0);
+			for (int y = 0; y < src.rows; y++)
+			{
+				for (int x = 0; x < src.cols; x++)
+				{
+					int val = src.at<unsigned char>(y, x);
+					if (val != lastVal)
+					{
+						dst.at<unsigned char>(index, 0) = val;
+						lastVal = val;
+						index++;
+					}
+				}
+			}
+		}
+	}
+};
+
+extern "C" __declspec(dllexport) ML_RemoveDups * ML_RemoveDups_Open() { ML_RemoveDups* cPtr = new ML_RemoveDups(); return cPtr; }
+extern "C" __declspec(dllexport) int ML_RemoveDups_GetCount(ML_RemoveDups * cPtr) { return cPtr->index - 1; }
+extern "C" __declspec(dllexport) int* ML_RemoveDups_Close(ML_RemoveDups * cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int* ML_RemoveDups_Run(ML_RemoveDups * cPtr, int* dataPtr, int rows, int cols, int type)
+{
+	cPtr->src = Mat(rows, cols, type, dataPtr);
+	cPtr->Run();
+	return (int*)cPtr->dst.data;
+}
+
+
+
+
+
+class MSER_Interface
+{
+private:
+public:
+	Mat src, dst;
+	Ptr<MSER> mser;
+	vector<Rect> containers;
+	vector<Point> floodPoints;
+	vector<int> maskCounts;
+	vector<vector<Point>> regions;
+	vector<Rect> boxes;
+	MSER_Interface(int delta, int minArea, int maxArea, float maxVariation, float minDiversity, int maxEvolution, float areaThreshold,
+		float minMargin, int edgeBlurSize, int pass2Setting)
+	{
+		mser = mser->create(delta, minArea, maxArea, maxVariation, minDiversity, maxEvolution, areaThreshold, minMargin, edgeBlurSize);
+		mser->setPass2Only(pass2Setting);
+	}
+	void RunCPP() {
+		mser->detectRegions(src, regions, boxes);
+
+		multimap<int, int, greater<int>> sizeSorted;
+		for (auto i = 0; i < regions.size(); i++)
+		{
+			sizeSorted.insert(make_pair(regions[i].size(), i));
+		}
+
+		int index = 1;
+		maskCounts.clear();
+		containers.clear();
+		floodPoints.clear();
+		dst.setTo(255);
+		for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
+		{
+			Rect box = boxes[it->second];
+			Point center = Point(box.x + box.width / 2, box.y + box.height / 2);
+			int val = dst.at<uchar>(center.y, center.x);
+			if (val == 255)
+			{
+				floodPoints.push_back(regions[it->second][0]);
+				maskCounts.push_back((int)regions[it->second].size());
+				for (Point pt : regions[it->second])
+				{
+					dst.at<uchar>(pt.y, pt.x) = index;
+				}
+				index++;
+				containers.push_back(box);
+			}
+		}
+	}
+};
+extern "C" __declspec(dllexport)
+MSER_Interface * MSER_Open(int delta, int minArea, int maxArea, float maxVariation, float minDiversity, int maxEvolution, float areaThreshold,
+	float minMargin, int edgeBlurSize, int pass2Setting)
+{
+	MSER_Interface* cPtr = new MSER_Interface(delta, minArea, maxArea, maxVariation, minDiversity, maxEvolution, areaThreshold, minMargin,
+		edgeBlurSize, pass2Setting);
+	return cPtr;
+}
+extern "C" __declspec(dllexport)
+void MSER_Close(MSER_Interface * cPtr)
+{
+	delete cPtr;
+}
+extern "C" __declspec(dllexport)
+int* MSER_Rects(MSER_Interface * cPtr)
+{
+	return (int*)&cPtr->containers[0];
+}
+extern "C" __declspec(dllexport)
+int* MSER_FloodPoints(MSER_Interface * cPtr)
+{
+	return (int*)&cPtr->floodPoints[0];
+}
+extern "C" __declspec(dllexport)
+int* MSER_MaskCounts(MSER_Interface * cPtr)
+{
+	return (int*)&cPtr->maskCounts[0];
+}
+extern "C" __declspec(dllexport)
+int MSER_Count(MSER_Interface * cPtr)
+{
+	return (int)cPtr->containers.size();
+}
+extern "C" __declspec(dllexport)
+int* MSER_RunCPP(MSER_Interface * cPtr, int* dataPtr, int rows, int cols, int channels)
+{
+	cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, dataPtr);
+	cPtr->dst = Mat(rows, cols, CV_8UC1);
+	cPtr->RunCPP();
+	return (int*)cPtr->dst.data;
+}
+
+
+
+
+
+
+
+class Neighbors
+{
+private:
+public:
+	Mat src, contour;
+	vector<Point> nPoints;
+	vector<uchar> cellData;
+	void RunCPP()
+	{
+		nPoints.clear();
+		cellData.clear();
+		for (int y = 1; y < src.rows - 3; y++)
+			for (int x = 1; x < src.cols - 3; x++)
+			{
+				vector<uchar> nabs;
+				vector<uchar> ids = { 0, 0, 0, 0 };
+				int index = 0;
+				for (int yy = y; yy < y + 2; yy++)
+				{
+					for (int xx = x; xx < x + 2; xx++)
+					{
+						uchar val = src.at<uchar>(yy, xx);
+						if (count(nabs.begin(), nabs.end(), val) == 0)
+						{
+							nabs.push_back(val);
+						}
+						ids[index++] = val;
+					}
+				}
+				if (nabs.size() > 2)
+				{
+					nPoints.push_back(Point(x, y));
+					cellData.push_back(ids[0]);
+					cellData.push_back(ids[1]);
+					cellData.push_back(ids[2]);
+					cellData.push_back(ids[3]);
+				}
+			}
+	}
+};
+
+extern "C" __declspec(dllexport)
+Neighbors * Neighbors_Open() {
+	Neighbors* cPtr = new Neighbors();
+	return cPtr;
+}
+extern "C" __declspec(dllexport)
+void Neighbors_Close(Neighbors * cPtr)
+{
+	delete cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* Neighbors_CellData(Neighbors * cPtr)
+{
+	return (int*)&cPtr->cellData[0];
+}
+
+extern "C" __declspec(dllexport)
+int* Neighbors_Points(Neighbors * cPtr)
+{
+	return (int*)&cPtr->nPoints[0];
+}
+
+extern "C" __declspec(dllexport)
+int Neighbors_RunCPP(Neighbors * cPtr, int* dataPtr, int rows, int cols)
+{
+	cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
+	cPtr->RunCPP();
+	return (int)cPtr->nPoints.size();
+}
+
+
+
+
+
+
+
+
+class Neighbor2
+{
+private:
+public:
+	Mat src, contour;
+	vector<Point> nPoints;
+	void RunCPP()
+	{
+		nPoints.clear();
+		for (int y = 1; y < src.rows - 2; y++)
+			for (int x = 1; x < src.cols - 2; x++)
+			{
+				Point pt = Point(src.at<uchar>(y, x), src.at<uchar>(y, x - 1));
+				if (pt.x == pt.y) continue;
+				if (pt.x == 0 || pt.y == 0) continue;
+				if (count(nPoints.begin(), nPoints.end(), pt) == 0)
+				{
+					pt = Point(src.at<uchar>(y, x - 1), src.at<uchar>(y, x));
+					if (count(nPoints.begin(), nPoints.end(), pt) == 0) nPoints.push_back(pt);
+				}
+			}
+	}
+};
+
+extern "C" __declspec(dllexport)
+Neighbor2 * Neighbor2_Open() {
+	Neighbor2* cPtr = new Neighbor2();
+	return cPtr;
+}
+extern "C" __declspec(dllexport)
+void Neighbor2_Close(Neighbor2 * cPtr)
+{
+	delete cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* Neighbor2_Points(Neighbor2 * cPtr)
+{
+	return (int*)&cPtr->nPoints[0];
+}
+
+extern "C" __declspec(dllexport)
+int Neighbor2_RunCPP(Neighbor2 * cPtr, int* dataPtr, int rows, int cols)
+{
+	cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
+	cPtr->RunCPP();
+	return (int)cPtr->nPoints.size();
+}
+
+
+
+
+
+
+class Neighbor_Map
+{
+private:
+public:
+	Mat src;
+	vector <Point> nabList;
+
+	Neighbor_Map() {}
+	void checkPoint(Point pt)
+	{
+		if (pt.x != pt.y)
+		{
+			if (pt.x > pt.y) pt = Point(pt.y, pt.x);
+			std::vector<Point>::iterator it = std::find(nabList.begin(), nabList.end(), pt);
+			if (it == nabList.end()) nabList.push_back(pt);
+		}
+	}
+	void RunCPP() {
+		nabList.clear();
+		for (int y = 1; y < src.rows; y++)
+			for (int x = 1; x < src.cols; x++)
+			{
+				uchar val = src.at<uchar>(y, x);
+				checkPoint(Point(src.at<uchar>(y, x - 1), val));
+				checkPoint(Point(src.at<uchar>(y - 1, x), val));
+			}
+	}
+};
+extern "C" __declspec(dllexport) Neighbor_Map * Neighbor_Map_Open() { Neighbor_Map* cPtr = new Neighbor_Map(); return cPtr; }
+extern "C" __declspec(dllexport) void Neighbor_Map_Close(Neighbor_Map * cPtr) { delete cPtr; }
+extern "C" __declspec(dllexport) int* Neighbor_NabList(Neighbor_Map * cPtr) { return (int*)&cPtr->nabList[0]; }
+extern "C" __declspec(dllexport)
+int Neighbor_Map_RunCPP(Neighbor_Map * cPtr, int* dataPtr, int rows, int cols)
+{
+	cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
+	cPtr->RunCPP();
+	return (int)cPtr->nabList.size();
+}

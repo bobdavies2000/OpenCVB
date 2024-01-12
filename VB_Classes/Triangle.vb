@@ -223,3 +223,19 @@ Public Class Triangle_Mask : Inherits VB_Algorithm
         labels(2) = redC.labels(2)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Triangle_KNN : Inherits VB_Algorithm
+    Dim random As New Random_Basics
+    Public Sub New()
+        advice = "Adjust the number of points with the options_random."
+        desc = "Build triangles from points using minTriangle"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+    End Sub
+End Class

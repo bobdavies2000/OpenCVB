@@ -71,7 +71,7 @@ Public Class BackProject_Full : Inherits VB_Algorithm
         cv.Cv2.CalcBackProject({dst1}, {0}, histogram, dst2, ranges)
 
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        If standalone Or testIntermediate(traceName) Then dst3 = vbPalette(dst2 * 255 / classCount)
+        If standalone Or showIntermediate() Then dst3 = vbPalette(dst2 * 255 / classCount)
     End Sub
 End Class
 

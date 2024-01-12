@@ -10,16 +10,18 @@ Public Class Random_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Dim sizeRequest = options.countSlider.Value
-        pointList.Clear()
         If task.paused = False Then
+            pointList.Clear()
             While pointList.Count < sizeRequest
                 pointList.Add(New cv.Point2f(msRNG.Next(range.X, range.X + range.Width),
                                              msRNG.Next(range.Y, range.Y + range.Height)))
             End While
-            dst2.SetTo(0)
-            For Each pt In pointList
-                dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType, 0)
-            Next
+            If standalone Or showIntermediate() Then
+                dst2.SetTo(0)
+                For Each pt In pointList
+                    dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType, 0)
+                Next
+            End If
         End If
     End Sub
 End Class

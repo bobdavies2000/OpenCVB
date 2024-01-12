@@ -49,7 +49,7 @@ Public Class KMeans_Basics : Inherits VB_Algorithm
         saveLabels = dst2.Clone
 
         dst2.Reshape(1, src.Height).ConvertTo(dst2, cv.MatType.CV_8U)
-        If standalone Or testIntermediate(traceName) Then dst3 = vbPalette(dst2 * 255 / classCount)
+        If standalone Or showIntermediate() Then dst3 = vbPalette(dst2 * 255 / classCount)
         lastK = classCount
         labels(2) = "KMeans labels 0-" + CStr(lastK) + " spread out across 255 values."
     End Sub

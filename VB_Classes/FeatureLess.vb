@@ -8,7 +8,7 @@ Public Class FeatureLess_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         edgeD.Run(src)
         dst2 = edgeD.dst2
-        If standalone Or testIntermediate(traceName) Then
+        If standalone Or showIntermediate() Then
             dst3 = src.Clone
             dst3.SetTo(cv.Scalar.Yellow, dst2)
         End If

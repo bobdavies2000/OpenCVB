@@ -12,7 +12,6 @@
 #include <opencv2/highgui.hpp>
 #include "opencv2/photo.hpp"
 
-
 using namespace std;
 using namespace  cv;
 class imgui_Example

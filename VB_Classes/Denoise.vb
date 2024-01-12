@@ -64,7 +64,7 @@ Public Class Denoise_Pixels : Inherits VB_Algorithm
             dst2 = src
         End If
 
-        If standalone Or testIntermediate(traceName) Then
+        If standalone Or showIntermediate() Then
             dst2 *= 255 / classCount
             dst3 = vbPalette(dst2)
         End If

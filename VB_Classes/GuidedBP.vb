@@ -520,7 +520,7 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
         cv.Cv2.CalcBackProject({src}, redOptions.channels, hist.histogram, dst2, redOptions.ranges)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
         ' dst2.SetTo(254, task.depthOutline)
-        If standalone Or testIntermediate(traceName) Then
+        If standalone Or showIntermediate() Then
             labels(3) = "Note that colors are shifting because this is before RedCloud matching."
             dst2 += 1
             dst2.SetTo(0, task.noDepthMask)

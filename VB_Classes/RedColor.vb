@@ -104,7 +104,7 @@ Public Class RedColor_FeatureLess : Inherits VB_Algorithm
         Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
         fCells.Clear()
         fCells.Add(New rcData) ' placeholder so index aligns with offset.
-        If standalone Or testIntermediate(traceName) Then dst3.SetTo(0)
+        If standalone Or showIntermediate() Then dst3.SetTo(0)
         For i = 0 To classCount - 1
             Dim rc As New rcData
             rc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))

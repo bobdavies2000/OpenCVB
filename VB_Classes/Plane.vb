@@ -622,7 +622,7 @@ Public Class Plane_Equation : Inherits VB_Algorithm
                               Format(dotlist.Average, "0.00")
             End If
         End If
-        If standalone Or testIntermediate(traceName) Then
+        If standalone Or showIntermediate() Then
             setTrueText(strOut, 3)
             dst3.SetTo(0)
             vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)

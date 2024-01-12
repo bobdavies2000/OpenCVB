@@ -24,7 +24,7 @@ Public Class Reduction_Basics : Inherits VB_Algorithm
             labels(2) = "No reduction requested"
         End If
 
-        If standalone Or testIntermediate(traceName) Then dst3 = vbPalette(dst2 * 255 / classCount)
+        If standalone Or showIntermediate() Then dst3 = vbPalette(dst2 * 255 / classCount)
         labels(2) = CStr(classCount) + " colors after reduction"
     End Sub
 End Class

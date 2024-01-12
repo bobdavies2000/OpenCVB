@@ -159,7 +159,7 @@ Public Class Hist3D_DepthWithMask : Inherits VB_Algorithm
         desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Or testIntermediate(traceName) Then
+        If standalone Or showIntermediate() Then
             Static fore As New Foreground_KMeans2
             fore.Run(src)
             depthMask = fore.dst2 Or task.noDepthMask
