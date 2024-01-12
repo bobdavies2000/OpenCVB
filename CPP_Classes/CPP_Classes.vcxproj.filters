@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Annealing.cpp" />
-    <ClCompile Include="BGRPattern.cpp" />
-    <ClCompile Include="BGSubtract.cpp" />
     <ClCompile Include="Corners.cpp" />
     <ClCompile Include="DCT.cpp" />
     <ClCompile Include="Denoise.cpp" />

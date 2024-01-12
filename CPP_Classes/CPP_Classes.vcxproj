@@ -36,9 +36,6 @@
     <ClInclude Include="videostab.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Annealing.cpp" />
-    <ClCompile Include="BGRPattern.cpp" />
-    <ClCompile Include="BGSubtract.cpp" />
     <ClCompile Include="Corners.cpp" />
     <ClCompile Include="CPP_IncludeOnly.cpp" />
     <ClCompile Include="DCT.cpp" />

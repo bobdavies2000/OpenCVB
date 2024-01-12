@@ -2717,6 +2717,12 @@ Public Class Options_BGSubtract_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB()
         Static frm = findfrm(traceName + " Radio Buttons")
+        If firstPass Then
+            firstPass = False
+            frm.Left = gOptions.Width / 2
+            frm.top = gOptions.Height / 2
+        End If
+
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 If currMethod = i Then

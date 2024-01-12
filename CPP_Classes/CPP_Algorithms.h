@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>
@@ -9,10 +8,12 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include "opencv2/core/utility.hpp"
+#include "opencv2/bgsegm.hpp"
 #include <map>
 
 using namespace std;
 using namespace  cv;
+using namespace bgsegm;
 
 class FloodCell
 {
@@ -318,4 +319,250 @@ int* Agast_Run(Agast * cPtr, int* bgrPtr, int rows, int cols, int* count)
 	count[0] = int(cPtr->keypoints.size());
 	if (count[0] == 0) return 0;
 	return (int*)cPtr->dst.data;
+}
+
+
+
+
+
+
+#ifdef _DEBUG
+const int cityMultiplier = 100;
+const int puzzleMultiplier = 1;
+#else
+const int puzzleMultiplier = 1000;
+const int cityMultiplier = 10000;
+#endif
+
+class CitySolver
+{
+public:
+	std::vector<Point2f> cityPositions;
+	std::vector<int> cityOrder;
+	RNG rng;
+	double currentTemperature = 100.0;
+	char outMsg[512];
+	int d0, d1, d2, d3;
+private:
+
+public:
+	CitySolver()
+	{
+		rng = RNG(__rdtsc()); // When called in rapid succession, the rdtsc will prevent duplication when multi-threading...
+		// rng = theRNG(); // To see the duplication problem with MT, uncomment this line.  Watch all the energy levels will be the same!
+		currentTemperature = 100.0f;
+	}
+	/** Give energy value for a state of system.*/
+	double energy() const
+	{
+		double e = 0;
+		for (size_t i = 0; i < cityOrder.size(); i++)
+		{
+			e += norm(cityPositions[i] - cityPositions[cityOrder[i]]);
+		}
+		return e;
+	}
+
+	/** Function which change the state of system (random perturbation).*/
+	void changeState()
+	{
+		d0 = rng.uniform(0, static_cast<int>(cityPositions.size()));
+		d1 = cityOrder[d0];
+		d2 = cityOrder[d1];
+		d3 = cityOrder[d2];
+
+		cityOrder[d0] = d2;
+		cityOrder[d2] = d1;
+		cityOrder[d1] = d3;
+	}
+
+	/** Function to reverse to the previous state.*/
+	void reverseState()
+	{
+		cityOrder[d0] = d1;
+		cityOrder[d1] = d2;
+		cityOrder[d2] = d3;
+	}
+};
+
+extern "C" __declspec(dllexport)
+CitySolver * Annealing_Basics_Open(Point2f * cityPositions, int count)
+{
+	CitySolver* cPtr = new CitySolver();
+	cPtr->cityPositions.assign(cityPositions, cityPositions + count);
+	return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* Annealing_Basics_Close(CitySolver * cPtr)
+{
+	delete cPtr;
+	return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+char* Annealing_Basics_Run(CitySolver * cPtr, int* cityOrder, int count)
+{
+	cPtr->cityOrder.assign(cityOrder, cityOrder + count);
+	int changesApplied = ml::simulatedAnnealingSolver(*cPtr, cPtr->currentTemperature,
+		cPtr->currentTemperature * 0.97, 0.99,
+		cityMultiplier * count, &cPtr->currentTemperature, cPtr->rng);
+	copy(cPtr->cityOrder.begin(), cPtr->cityOrder.end(), cityOrder);
+	string msg = " changesApplied=" + to_string(changesApplied) + " temp=" + to_string(cPtr->currentTemperature) + " result = " + to_string(cPtr->energy());
+	strcpy_s(cPtr->outMsg, msg.c_str());
+	return cPtr->outMsg;
+}
+
+
+
+
+
+class BGRPattern_Basics
+{
+private:
+public:
+	Mat src, dst;
+	int classCount = 5;
+	BGRPattern_Basics() {}
+	void RunCPP() {
+		for (int y = 0; y < src.rows; y++)
+			for (int x = 0; x < src.cols; x++)
+			{
+				Vec3b vec = src.at<Vec3b>(y, x);
+				int b = vec[0]; int g = vec[1]; int r = vec[2];
+				if (b == g && g == r)
+				{
+					dst.at<uchar>(y, x) = 1;
+				}
+				else if (b <= g && g <= r)
+				{
+					dst.at<uchar>(y, x) = 2;
+				}
+				else if (b >= g && g >= r)
+				{
+					dst.at<uchar>(y, x) = 3;
+				}
+				else if (b >= g && g <= r)
+				{
+					dst.at<uchar>(y, x) = 4;
+				}
+				else if (b <= g && g >= r)
+				{
+					dst.at<uchar>(y, x) = classCount;
+				}
+			}
+	}
+};
+extern "C" __declspec(dllexport)
+BGRPattern_Basics * BGRPattern_Open() {
+	BGRPattern_Basics* cPtr = new BGRPattern_Basics();
+	return cPtr;
+}
+extern "C" __declspec(dllexport)
+void BGRPattern_Close(BGRPattern_Basics * cPtr)
+{
+	delete cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int BGRPattern_ClassCount(BGRPattern_Basics * cPtr)
+{
+	return cPtr->classCount;
+}
+
+extern "C" __declspec(dllexport)
+int* BGRPattern_RunCPP(BGRPattern_Basics * cPtr, int* dataPtr, int rows, int cols)
+{
+	cPtr->src = Mat(rows, cols, CV_8UC3, dataPtr);
+	cPtr->dst = Mat(rows, cols, CV_8U);
+	cPtr->RunCPP();
+	return (int*)cPtr->dst.data;
+}
+
+
+
+
+
+
+
+class BGSubtract_BGFG
+{
+private:
+public:
+	Ptr<BackgroundSubtractor> algo;
+	Mat src, fgMask;
+	BGSubtract_BGFG() {}
+	void Run() {
+		algo->apply(src, fgMask);
+	}
+};
+
+extern "C" __declspec(dllexport)
+BGSubtract_BGFG * BGSubtract_BGFG_Open(int currMethod) {
+	BGSubtract_BGFG* bgfs = new BGSubtract_BGFG();
+	if (currMethod == 0)      bgfs->algo = createBackgroundSubtractorGMG(20, 0.7);
+	else if (currMethod == 1) bgfs->algo = createBackgroundSubtractorCNT();
+	else if (currMethod == 2) bgfs->algo = createBackgroundSubtractorKNN();
+	else if (currMethod == 3) bgfs->algo = createBackgroundSubtractorMOG();
+	else if (currMethod == 4) bgfs->algo = createBackgroundSubtractorMOG2();
+	else if (currMethod == 5) bgfs->algo = createBackgroundSubtractorGSOC();
+	else if (currMethod == 6) bgfs->algo = createBackgroundSubtractorLSBP();
+	return bgfs;
+}
+
+extern "C" __declspec(dllexport)
+int* BGSubtract_BGFG_Close(BGSubtract_BGFG * bgfs)
+{
+	delete bgfs;
+	return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* BGSubtract_BGFG_Run(BGSubtract_BGFG * bgfs, int* bgrPtr, int rows, int cols, int channels)
+{
+	bgfs->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, bgrPtr);
+	bgfs->Run();
+	return (int*)bgfs->fgMask.data;
+}
+
+
+
+
+
+class BGSubtract_Synthetic
+{
+private:
+public:
+	Ptr<bgsegm::SyntheticSequenceGenerator> gen;
+	Mat src, output, fgMask;
+	BGSubtract_Synthetic() {}
+	void Run() {
+	}
+};
+
+extern "C" __declspec(dllexport)
+BGSubtract_Synthetic * BGSubtract_Synthetic_Open(int* bgrPtr, int rows, int cols, LPSTR fgFilename, double amplitude, double magnitude,
+	double wavespeed, double objectspeed)
+{
+	BGSubtract_Synthetic* cPtr = new BGSubtract_Synthetic();
+	Mat bg = Mat(rows, cols, CV_8UC3, bgrPtr);
+	Mat fg = imread(fgFilename, IMREAD_COLOR);
+	resize(fg, fg, Size(10, 10)); // adjust the object size here...
+	cPtr->gen = bgsegm::createSyntheticSequenceGenerator(bg, fg, amplitude, magnitude, wavespeed, objectspeed);
+	cPtr->gen->getNextFrame(cPtr->output, cPtr->fgMask);
+	return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* BGSubtract_Synthetic_Close(BGSubtract_Synthetic * cPtr)
+{
+	delete cPtr;
+	return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* BGSubtract_Synthetic_Run(BGSubtract_Synthetic * cPtr)
+{
+	cPtr->gen->getNextFrame(cPtr->output, cPtr->fgMask);
+	return (int*)cPtr->output.data;
 }

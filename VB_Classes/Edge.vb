@@ -1052,7 +1052,7 @@ End Class
 
 Public Class Edge_MotionAccum : Inherits VB_Algorithm
     Dim edges As New Edge_Canny
-    Public motion As New Motion_Basics
+    Public motion As New Motion_History2
     Public percentMotion As Single
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)

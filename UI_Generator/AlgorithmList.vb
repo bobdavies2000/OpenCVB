@@ -1041,6 +1041,7 @@ if algorithmName = "Motion_Contours2" Then return new Motion_Contours2
 if algorithmName = "Motion_Core" Then return new Motion_Core
 if algorithmName = "Motion_DepthReconstructed" Then return new Motion_DepthReconstructed
 if algorithmName = "Motion_History" Then return new Motion_History
+if algorithmName = "Motion_History2" Then return new Motion_History2
 if algorithmName = "Motion_MinRect" Then return new Motion_MinRect
 if algorithmName = "Motion_PixelDiff" Then return new Motion_PixelDiff
 if algorithmName = "Motion_Rect" Then return new Motion_Rect

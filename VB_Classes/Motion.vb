@@ -1,7 +1,23 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-'  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
 Public Class Motion_Basics : Inherits VB_Algorithm
+    Public motion As New BGSubtract_Basics_CPP
+    Public Sub New()
+        desc = "Use background subtract to find the motion in the image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        motion.Run(src)
+        dst2 = motion.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+'  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
+Public Class Motion_History2 : Inherits VB_Algorithm
     Public motionCore As New Motion_Core
     Dim frames As New History_Basics
     Public Sub New()
@@ -406,7 +422,7 @@ End Class
 
 
 Public Class Motion_Contours : Inherits VB_Algorithm
-    Public motion As New Motion_Basics
+    Public motion As New Motion_History2
     Dim contours As New Contour_Basics
     Public intersect As New Rectangle_Intersection
     Public changedPixels As Integer
