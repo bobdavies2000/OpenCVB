@@ -8,7 +8,6 @@
 #include <opencv2/highgui.hpp>
 #include "opencv2/core/utility.hpp"
 
-
 using namespace std;
 using namespace  cv;
 using namespace ximgproc;
@@ -71,14 +70,14 @@ int* EdgeDraw_Basics_RunCPP(EdgeDraw_Basics * cPtr, int* dataPtr, int rows, int 
 
 
 
-class EdgeDraw_Segments
+class EdgeDraw
 {
 private:
 public:
 	Mat src, dst;
 	Ptr<EdgeDraw_Basics> eDraw;
 	vector<Vec4f> lines;
-	EdgeDraw_Segments()
+	EdgeDraw()
 	{
 		eDraw = new EdgeDraw_Basics();
 	}
@@ -100,20 +99,20 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-EdgeDraw_Segments * EdgeDraw_Edges_Open() {
-	EdgeDraw_Segments* cPtr = new EdgeDraw_Segments();
+EdgeDraw * EdgeDraw_Edges_Open() {
+	EdgeDraw* cPtr = new EdgeDraw();
 	return cPtr;
 }
 
 extern "C" __declspec(dllexport)
-int* EdgeDraw_Edges_Close(EdgeDraw_Segments * cPtr)
+int* EdgeDraw_Edges_Close(EdgeDraw * cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
 extern "C" __declspec(dllexport)
-int* EdgeDraw_Segments_RunCPP(EdgeDraw_Segments * cPtr, int* dataPtr, int rows, int cols, int lineWidth)
+int* EdgeDraw_RunCPP(EdgeDraw * cPtr, int* dataPtr, int rows, int cols, int lineWidth)
 {
 	if (cPtr->dst.rows == 0) cPtr->dst = Mat(rows, cols, CV_8U);
 	cPtr->src = Mat(rows, cols, CV_8U, dataPtr);

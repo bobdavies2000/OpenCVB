@@ -12,7 +12,7 @@ Public Class EdgeDraw_Basics : Inherits VB_Algorithm
         Dim cppData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = EdgeDraw_Segments_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
+        Dim imagePtr = EdgeDraw_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
         handleSrc.Free()
         If imagePtr <> 0 Then dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
         dst2.Rectangle(New cv.Rect(0, 0, dst2.Width, dst2.Height), 255, task.lineWidth)
@@ -84,7 +84,7 @@ Module EdgeDraw_Basics_CPP_Module
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Edges_Close(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Segments_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
     End Function
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Lines_Open() As IntPtr
@@ -112,7 +112,7 @@ End Module
 
 
 'Public Class EdgeDraw_LineData : Inherits VB_Algorithm
-'    Dim edgeD As New EdgeDraw_Segments
+'    Dim edgeD As New EdgeDraw
 '    Dim knn As New KNN_Basics
 '    Public pointPairLists As New List(Of List(Of cv.Point2f))
 '    Public Sub New()

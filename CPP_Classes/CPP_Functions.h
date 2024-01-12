@@ -2,6 +2,7 @@
 enum functions
 {
     _CPP_AddWeighted_Basics,
+_CPP_RedMin_Basics,
 _CPP_RedMin_Core,
 _CPP_Palette_Basics,
 _CPP_FeatureLess_History,

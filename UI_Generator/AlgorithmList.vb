@@ -2,6 +2,7 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
+_CPP_RedMin_Basics
 _CPP_RedMin_Core
 _CPP_Palette_Basics
 _CPP_FeatureLess_History
@@ -320,6 +321,7 @@ if algorithmName = "CPP_Rectangle_Basics" Then return new CPP_Basics(functionNam
 if algorithmName = "CPP_Rectangle_Rotated" Then return new CPP_Basics(functionNames._CPP_Rectangle_Rotated)
 if algorithmName = "CPP_RedCloud_Core" Then return new CPP_Basics(functionNames._CPP_RedCloud_Core)
 if algorithmName = "CPP_RedCloud_Flood" Then return new CPP_Basics(functionNames._CPP_RedCloud_Flood)
+if algorithmName = "CPP_RedMin_Basics" Then return new CPP_Basics(functionNames._CPP_RedMin_Basics)
 if algorithmName = "CPP_RedMin_Core" Then return new CPP_Basics(functionNames._CPP_RedMin_Core)
 if algorithmName = "CPP_Remap_Basics" Then return new CPP_Basics(functionNames._CPP_Remap_Basics)
 if algorithmName = "CPP_Resize_Basics" Then return new CPP_Basics(functionNames._CPP_Resize_Basics)

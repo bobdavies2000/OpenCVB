@@ -5,65 +5,65 @@
 
 class rcData {
 public:
-    cv::Rect rect;
-    cv::Rect motionRect;  // the union of the previous rect with the current rect.
-    cv::Mat mask;
-    cv::Mat depthMask;
+    Rect rect;
+    Rect motionRect;  // the union of the previous rect with the current rect.
+    Mat mask;
+    Mat depthMask;
 
     int pixels;
     int depthPixels;
 
-    cv::Vec3b color;
-    cv::Scalar colorMean;
-    cv::Scalar colorStdev;
+    Vec3b color;
+    Scalar colorMean;
+    Scalar colorStdev;
     int colorDistance;
     int grayMean;
 
-    cv::Point3f depthMean;
-    cv::Point3f depthStdev;
+    Point3f depthMean;
+    Point3f depthStdev;
     float depthDistance;  // Adjusted to float for consistency with Point3f
 
-    cv::Point3f minVec;
-    cv::Point3f maxVec;
+    Point3f minVec;
+    Point3f maxVec;
 
-    cv::Point maxDist;
-    cv::Point maxDStable;  // keep maxDist the same if it is still on the cell.
+    Point maxDist;
+    Point maxDStable;  // keep maxDist the same if it is still on the cell.
 
     int index;
     int indexLast;
     int matchCount;
 
-    std::vector<cv::Point> contour;
-    std::vector<cv::Point> corners;
-    std::vector<cv::Point3f> contour3D;
-    std::vector<cv::Point> hull;  // Using std::vector for consistency
+    std::vector<Point> contour;
+    std::vector<Point> corners;
+    std::vector<Point3f> contour3D;
+    std::vector<Point> hull;  // Using std::vector for consistency
 
     bool motionDetected;
 
-    cv::Point floodPoint;
+    Point floodPoint;
     bool depthCell;  // true if no depth.
 
-    cv::Vec4f eq;  // plane equation
-    cv::Vec3f pcaVec;
+    Vec4f eq;  // plane equation
+    Vec3f pcaVec;
     std::map<int, int> specG;  // Using std::map for key-value pairs
     std::map<int, int> specD;  // Using std::map for key-value pairs
 
     rcData() : index(0), depthCell(true) {
-        mask = cv::Mat(1, 1, CV_8U);
-        rect = cv::Rect(0, 0, 1, 1);
+        mask = Mat(1, 1, CV_8U);
+        rect = Rect(0, 0, 1, 1);
     }
 };
 
 class segCell {
 public:
-    cv::Rect rect;
-    cv::Mat mask;
-    cv::Point floodPoint;
+    Rect rect;
+    Mat mask;
+    Point floodPoint;
     int index;
     int pixels;
-    cv::Point maxDist;
+    Point maxDist;
     bool motionFlag;
-    cv::Vec3b color;
+    Vec3b color;
 
     segCell() {}  // Default constructor
 };
@@ -79,43 +79,43 @@ struct mmData
 // Custom comparators for allowing duplicates
 struct compareAllowIdenticalDoubleInverted {
     bool operator()(double a, double b) const {
-        return a <= b;  // Never return 0 for equality
+        return a > b; 
     }
 };
 
 struct compareAllowIdenticalDouble {
     bool operator()(double a, double b) const {
-        return a >= b;  // Never return 0 for equality
+        return a < b;  
     }
 };
 
 struct compareAllowIdenticalSingleInverted {
     bool operator()(float a, float b) const {
-        return a <= b;
+        return a > b;
     }
 };
 
 struct compareAllowIdenticalSingle {
     bool operator()(float a, float b) const {
-        return a >= b;
+        return a < b;
     }
 };
 
 struct compareAllowIdenticalIntegerInverted {
     bool operator()(int a, int b) const {
-        return a <= b;
+        return a > b;
     }
 };
 
 struct compareAllowIdenticalInteger {
     bool operator()(int a, int b) const {
-        return a >= b;
+        return a < b;
     }
 };
 
 struct CompareMaskSize {
     bool operator()(int a, int b) const {
-        return a <= b;
+        return a > b;
     }
 };
 
@@ -141,13 +141,13 @@ struct sortInt
 
 class linePoints {
 public:
-    cv::Point2f p1;
-    cv::Point2f p2;
+    Point2f p1;
+    Point2f p2;
     float slope;
     float yIntercept;
     static constexpr float verticalSlope = 1000000.0f;  // Using constexpr for constant
 
-    linePoints(const cv::Point2f& _p1, const cv::Point2f& _p2) : p1(_p1), p2(_p2) {
+    linePoints(const Point2f& _p1, const Point2f& _p2) : p1(_p1), p2(_p2) {
         slope = (p1.x != p2.x) ? (p1.y - p2.y) / (p1.x - p2.x) : verticalSlope;
         yIntercept = p1.y - slope * p1.x;
     }
@@ -221,7 +221,7 @@ public:
     int cvFontThickness;
     Scalar fontColor;
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
-    bool motionReset; rcData rcSelect;
+    bool motionReset; rcData rcSelect; segCell cellSelect;
 
     bool heartBeat; bool debugCheckBox; Size minRes; int PCReduction;
     bool optionsChanged; double addWeighted; int dotSize; int gridSize; float maxZmeters;
@@ -275,7 +275,15 @@ public:
         if (cppFunction < 0) return;
         putText(dst, text, pt, this->font, this->cvFontSize, this->fontColor);
     }
-    mmData getMinMax(Mat mat, Mat mask = Mat())
+   Point vbGetMaxDist(const Mat& mask) {
+        Mat distance32f;
+        distanceTransform(mask, distance32f, cv::DIST_L1, 0); 
+        double minVal, maxVal;
+        Point minLoc, maxLoc;
+        minMaxLoc(distance32f, &minVal, &maxVal, &minLoc, &maxLoc);
+        return maxLoc;
+    }
+    mmData vbMinMax(Mat mat, Mat mask = Mat())
     {
         mmData mm;
         if (mask.rows == 0)
@@ -382,10 +390,10 @@ public:
     void drawRotatedRectangle(RotatedRect rr, Mat dst2, const Scalar color) {
         vector<Point2f> vertices2f;
         rr.points(vertices2f);
-        vector<cv::Point> vertices(vertices2f.size());
+        vector<Point> vertices(vertices2f.size());
         for (int j = 0; j < vertices2f.size(); j++) {
-            vertices[j] = cv::Point(cvRound(vertices2f[j].x), cvRound(vertices2f[j].y));
+            vertices[j] = Point(cvRound(vertices2f[j].x), cvRound(vertices2f[j].y));
         }
-        cv::fillConvexPoly(dst2, vertices, color, this->lineType);
+        fillConvexPoly(dst2, vertices, color, this->lineType);
     }
 };

@@ -34,6 +34,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case _CPP_AddWeighted_Basics :
     {task->alg = new CPP_AddWeighted_Basics(rows, cols); break; }
+	case _CPP_RedMin_Basics :
+	{task->alg = new CPP_RedMin_Basics(rows, cols); break; }
 	case _CPP_RedMin_Core :
 	{task->alg = new CPP_RedMin_Core(rows, cols); break; }
 	case _CPP_Palette_Basics :
@@ -254,7 +256,7 @@ int* cppTask_PointCloud(cppTask * task, int* dataPtr, int rows, int cols)
     task->depthMask = task->depth32f > 0;
     bitwise_not(task->depthMask, task->noDepthMask);
 
-    cv::threshold(task->pcSplit[2], task->maxDepthMask, task->maxZmeters, 255, cv::THRESH_BINARY);  
+    threshold(task->pcSplit[2], task->maxDepthMask, task->maxZmeters, 255, THRESH_BINARY);  
     task->maxDepthMask.convertTo(task->maxDepthMask, CV_8U);
 
     static CPP_Depth_PointCloud_IMU* pCloud = new CPP_Depth_PointCloud_IMU(rows, cols);
@@ -353,3 +355,5 @@ int* cppTask_RunCPP(cppTask * task, int* dataPtr, int channels, int frameCount, 
     if (task->alg->dst3.type() == CV_32S) task->alg->dst3.convertTo(task->xdst3, CV_8U);
     return (int*)task->xdst2.data;
 }
+
+

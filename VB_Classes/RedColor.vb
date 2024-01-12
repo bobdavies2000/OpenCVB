@@ -90,8 +90,7 @@ Public Class RedColor_FeatureLess : Inherits VB_Algorithm
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
         Dim imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols, src.Type,
-                                     redOptions.imageThresholdPercent, redOptions.DesiredCellSlider.Value,
-                                     gOptions.PixelDiffThreshold.Value)
+                                     redOptions.DesiredCellSlider.Value, gOptions.PixelDiffThreshold.Value)
         handleInput.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr)

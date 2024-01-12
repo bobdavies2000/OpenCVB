@@ -15,7 +15,7 @@ class MSER_Interface
 private:
 public:
     Mat src, dst;
-    cv::Ptr<cv::MSER> mser;
+    Ptr<MSER> mser;
     vector<Rect> containers;
     vector<Point> floodPoints;
     vector<int> maskCounts;

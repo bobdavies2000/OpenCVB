@@ -17,7 +17,7 @@ Public Class OptionsRedCloud
     Public channelCount As Integer
     Public histBinList() As Integer
     Public bins3D As Integer
-    Public imageThresholdPercent As Single
+    Public imageThresholdPercent As Single = 0.95
     Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
         Me.Text = "Options mostly for RedCloud_Basics but other related algorithms too."
@@ -107,8 +107,6 @@ Public Class OptionsRedCloud
 
         task.redThresholdSide = SideViewThreshold.Value
         task.redThresholdTop = TopViewThreshold.Value
-
-        imageThresholdPercent = imageSizeThresholdSlider.Value / 100
 
         Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
         Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
@@ -285,12 +283,6 @@ Public Class OptionsRedCloud
     Private Sub RedCloud_Core_CheckedChanged(sender As Object, e As EventArgs) Handles RedCloud_Core.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         depthInput = RedCloud_Core.Text
-    End Sub
-
-    Private Sub imageSizeThresholdSlider_ValueChanged(sender As Object, e As EventArgs) Handles imageSizeThresholdSlider.ValueChanged
-        If task IsNot Nothing Then task.optionsChanged = True
-        LabelimageSizePercent.Text = Format(imageSizeThresholdSlider.Value / 100, "0%")
-        imageThresholdPercent = imageSizeThresholdSlider.Value / 100
     End Sub
     Private Sub desiredCellSlider_ValueChanged(sender As Object, e As EventArgs) Handles DesiredCellSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True

@@ -47,7 +47,6 @@
     <ClCompile Include="Density.cpp" />
     <ClCompile Include="Dither.cpp" />
     <ClCompile Include="Edge.cpp" />
-    <ClCompile Include="EdgeDraw.cpp" />
     <ClCompile Include="EMax.cpp" />
     <ClCompile Include="FitEllipse.cpp" />
     <ClCompile Include="Fuzzy.cpp" />

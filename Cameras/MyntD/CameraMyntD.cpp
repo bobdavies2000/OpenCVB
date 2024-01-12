@@ -54,7 +54,7 @@ public:
 		cam.Open(params);
 
 		intrinsicsBoth = cam.GetStreamIntrinsics(params.stream_mode);
-		pcFullSize = cv::Mat(height, width, CV_32FC3);
+		pcFullSize = Mat(height, width, CV_32FC3);
 	}
 
 	void waitForFrame()
@@ -67,10 +67,10 @@ public:
 		if (right.img) right_color = right.img->To(ImageFormat::COLOR_BGR)->ToMat().data;
 		
 		auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
-		cv::Mat depth;
+		Mat depth;
 		if (image_depth.img) depth = image_depth.img->ToMat();
 
-		cv::Point3f p;
+		Point3f p;
 		CameraIntrinsics cam_in_ = intrinsicsBoth.left;
 		for (int m = 0; m < depth.rows; m++) {
 			for (int n = 0; n < depth.cols; n++) {
@@ -83,7 +83,7 @@ public:
 				p.x = (n - cam_in_.cx) * p.z / cam_in_.fx;
 				p.y = (m - cam_in_.cy) * p.z / cam_in_.fy;
 
-				pcFullSize.at<cv::Point3f>(m, n) = p;
+				pcFullSize.at<Point3f>(m, n) = p;
 			}
 		}
 	}

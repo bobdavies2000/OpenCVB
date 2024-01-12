@@ -32,6 +32,7 @@ namespace fs = std::filesystem;
 #include "../CPP_Classes/PragmaLibs.h"
 #include "CPP_Task.h"
 
+#include "EdgeDraw.h"
 #include "FloodCell.h"
 
 cppTask* task;
@@ -1393,7 +1394,7 @@ public:
                 cvtColor(src, src, COLOR_BGR2GRAY);
             }
         }
-        mm = task->getMinMax(src);
+        mm = task->vbMinMax(src);
 
         float histDelta = 0.001f;
         int bins[] = { task->histogramBins };
@@ -1603,7 +1604,7 @@ public:
         dst3.setTo(Scalar(0, 255, 255), dst0);
 
         auto count = histK->hist->histogram.at<float>(histIndex, 0);
-        mmData histMax = task->getMinMax(histK->hist->histogram);
+        mmData histMax = task->vbMinMax(histK->hist->histogram);
 
         labels[3] = "Backprojecting " + to_string(minRange(0)) + " to " + to_string(maxRange(0)) +
             " with " + to_string(count) + " of " + to_string(totalPixels) + " samples compared to " +
@@ -2388,41 +2389,70 @@ public:
 
 
 
-class CPP_EdgeDraw_Basics : public algorithmCPP
-{
-private:
+//class CPP_EdgeDraw_Basics : public algorithmCPP
+//{
+//private:
+//public:
+//    CPP_Edge_Segments* eDraw;
+//    CPP_EdgeDraw_Basics(int rows, int cols) : algorithmCPP(rows, cols)
+//    {
+//        eDraw = new CPP_Edge_Segments(rows, cols);
+//        traceName = "CPP_EdgeDraw_Basics";
+//        dst3 = Mat(dst3.size(), CV_8U);
+//        labels[2] = "Line segments of the Edge Drawing Filter - drawn on the src input";
+//        labels[3] = "Line segments of the Edge Drawing Filter";
+//        desc = "Display segments found with the EdgeDrawing filter in ximgproc";
+//    }
+//    void Run(Mat src)
+//    {
+//        dst3 = src;
+//        eDraw->Run(src);
+//        vector<vector<Point> > segments = eDraw->ed->getSegments();
+//
+//        dst2.setTo(0);
+//        for (size_t i = 0; i < segments.size(); i++)
+//        {
+//            const Point* pts = &segments[i][0];
+//            int n = (int)segments[i].size();
+//            float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
+//            bool drawClosed = distance < 10;
+//            polylines(dst2, &pts, &n, 1, drawClosed, Scalar(255, 255, 255), task->lineWidth, task->lineType);
+//            polylines(dst3, &pts, &n, 1, drawClosed, YELLOW, task->lineWidth, task->lineType);
+//        }
+//
+//        rectangle(dst2, Rect(0, 0, dst3.cols, dst3.rows), 255, task->lineWidth, task->lineType);
+//        threshold(dst2, dst2, 0, 255, THRESH_BINARY);
+//    }
+//};
+
+
+
+class CPP_EdgeDraw_Basics : public algorithmCPP {
 public:
-    CPP_Edge_Segments* eDraw;
-    CPP_EdgeDraw_Basics(int rows, int cols) : algorithmCPP(rows, cols)
-    {
-        eDraw = new CPP_Edge_Segments(rows, cols);
+    EdgeDraw* cPtr;
+    CPP_EdgeDraw_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_EdgeDraw_Basics";
-        dst3 = Mat(dst3.size(), CV_8U);
-        labels[2] = "Line segments of the Edge Drawing Filter - drawn on the src input";
-        labels[3] = "Line segments of the Edge Drawing Filter";
-        desc = "Display segments found with the EdgeDrawing filter in ximgproc";
+        cPtr = new EdgeDraw;
+        labels = { "", "", "EdgeDraw_Basics output", "" };
+        desc = "Access EdgeDraw directly for efficiency";
     }
-    void Run(Mat src)
-    {
-        dst3 = src;
-        eDraw->Run(src);
-        vector<vector<Point> > segments = eDraw->ed->getSegments();
-
-        dst2.setTo(0);
-        for (size_t i = 0; i < segments.size(); i++)
-        {
-            const Point* pts = &segments[i][0];
-            int n = (int)segments[i].size();
-            float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
-            bool drawClosed = distance < 10;
-            polylines(dst2, &pts, &n, 1, drawClosed, Scalar(255, 255, 255), task->lineWidth, task->lineType);
-            polylines(dst3, &pts, &n, 1, drawClosed, YELLOW, task->lineWidth, task->lineType);
+    void Run(Mat src) {
+        if (src.channels() != 1) {
+            cvtColor(src, src, COLOR_BGR2GRAY);
         }
-
-        rectangle(dst2, Rect(0, 0, dst3.cols, dst3.rows), 255, task->lineWidth, task->lineType);
-        threshold(dst2, dst2, 0, 255, THRESH_BINARY);
+        Mat* srcPtr = &src;
+        int* imagePtr = EdgeDraw_RunCPP(cPtr, (int *)srcPtr->data, src.rows, src.cols, task->lineWidth);
+        if (imagePtr != nullptr) {
+            dst2 = Mat(src.rows, src.cols, CV_8UC1, imagePtr);
+            rectangle(dst2, Rect(0, 0, dst2.cols, dst2.rows), Scalar(255), task->lineWidth);
+        }
+    }
+    ~CPP_EdgeDraw_Basics() {
+        EdgeDraw_Edges_Close(cPtr);
+        delete cPtr;
     }
 };
+
 
 
 
@@ -2580,6 +2610,28 @@ public:
 };
 
 
+vector<Point> contourBuild(const Mat& mask, int approxMode) {
+    std::vector<std::vector<Point>> allContours;
+    findContours(mask, allContours, RETR_EXTERNAL, approxMode);  // Adjusted retrieval mode
+
+    int maxCount = 0, maxIndex = -1;
+    for (int i = 0; i < allContours.size(); i++) {
+        int len = int(allContours[i].size());
+        if (len > maxCount) {
+            maxCount = len;
+            maxIndex = i;
+        }
+    }
+
+    return (maxIndex >= 0) ? allContours[maxIndex] : std::vector<Point>();
+}
+
+Mat vbPalette(Mat input)
+{
+    static CPP_Palette_Basics* palette = new CPP_Palette_Basics(input.rows, input.cols);
+    if (input.type() == CV_8U) palette->Run(input);
+    return palette->dst2;
+}
 
 
 
@@ -2588,22 +2640,21 @@ class CPP_RedMin_Core : public algorithmCPP {
 public:
     map<int, segCell, compareAllowIdenticalIntegerInverted> sortedCells;
     Mat inputMask;
-    CPP_FeatureLess_History* fLess;
+    CPP_FeatureLess_Basics* fLess;
     FloodCell* cPtr;
     float redOptions_imageThresholdPercent = 0.95f;
     int redOptions_DesiredCellSlider = 30;
-    CPP_Palette_Basics* palette;
     CPP_RedMin_Core(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_RedMin_Core";
-        palette = new CPP_Palette_Basics(rows, cols);
-        task->paletteIndex = 8;
-        fLess = new CPP_FeatureLess_History(rows, cols);
+        vbPalette(dst2);
+        task->paletteIndex = 1;
+        fLess = new CPP_FeatureLess_Basics(rows, cols);
         cPtr = new FloodCell();
         desc = "Another minimalist approach to building RedCloud color-based cells.";
     }
     ~CPP_RedMin_Core() {
 
-        if (cPtr) {
+        if (cPtr) { 
             FloodCell_Close(cPtr);
             delete cPtr;
         }
@@ -2616,19 +2667,18 @@ public:
         void* imagePtr;
         Mat* srcPtr = &src;
         if (inputMask.empty()) {
-            imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, 0, src.rows, src.cols,
-                src.type(), redOptions_imageThresholdPercent, redOptions_DesiredCellSlider, 0);
+            imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, 0, src.rows, src.cols, src.type(), 
+                                     redOptions_DesiredCellSlider, 0);
         }
         else {
             Mat* maskPtr = &inputMask;
             imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, (uchar *)maskPtr->data, src.rows, src.cols,
-                                     src.type(), redOptions_imageThresholdPercent, redOptions_DesiredCellSlider, 0);
+                                     src.type(), redOptions_DesiredCellSlider, 0);
         }
         int classCount = FloodCell_Count(cPtr);
 
         dst2 = Mat(src.rows, src.cols, CV_8UC1, imagePtr);
-        palette->Run(dst2 * 255 / classCount);
-        dst3 = palette->dst2;
+        dst3 = vbPalette(dst2 * 255 / classCount);
 
         if (task->heartBeat) {
             labels[3] = to_string(classCount) + " cells found";
@@ -2641,11 +2691,21 @@ public:
         Mat rectData(classCount, 1, CV_32SC4, FloodCell_Rects(cPtr));
         Mat floodPointData(classCount, 1, CV_32SC2, FloodCell_FloodPoints(cPtr));
         sortedCells.clear();
+
         for (int i = 0; i < classCount; i++) {
             segCell cell;
-            cell.index = i + 1;
-            cell.rect = task->validateRect(rectData.at<Rect>(i, 0), dst2.cols, dst2.rows);
-            cell.mask = dst2(cell.rect).clone();
+            cell.index = int(sortedCells.size()) + 1;
+            cell.rect = task->validateRect(rectData.at<cv::Rect>(i, 0), dst2.cols, dst2.rows);
+            inRange(dst2(cell.rect), cell.index, cell.index, cell.mask);
+            //vector<Point> contour = contourBuild(cell.mask, cv::CHAIN_APPROX_NONE); 
+            //drawContours(cell.mask, vector<vector<Point>> {contour}, 255, -1);
+
+            cell.pixels = sizeData.at<int>(i, 0);
+            cell.floodPoint = floodPointData.at<cv::Point>(i, 0);
+            rectangle(cell.mask, cv::Rect(0, 0, cell.mask.cols, cell.mask.rows), 0, 1);
+            Point pt = task->vbGetMaxDist(cell.mask); 
+            cell.maxDist = cv::Point(pt.x + cell.rect.x, pt.y + cell.rect.y);
+            sortedCells.insert({ cell.pixels, cell }); 
         }
 
         if (task->heartBeat) {
@@ -2656,4 +2716,67 @@ public:
 
 
 
+
+
+
+
+
+
+class CPP_RedMin_Basics : public algorithmCPP {
+public:
+    CPP_RedMin_Core* minCore;
+    vector<segCell> minCells;
+    Mat lastColors;
+    Mat lastMap = dst2.clone();
+    CPP_RedMin_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
+        traceName = "CPP_RedMin_Basics";
+        minCore = new CPP_RedMin_Core(rows, cols);
+        dst2 = Mat::zeros(dst2.size(), CV_8U);  
+        labels = { "", "Mask of active RedMin cells", "CV_8U representation of minCells", "" };
+        desc = "Track the color cells from floodfill - trying a minimalist approach to build cells.";
+    }
+    void Run(Mat src) {
+        minCore->Run(src);
+        vector<segCell> lastCells = minCells;
+        if (task->firstPass) lastColors = dst3.clone();
+        minCells.clear();
+        dst2.setTo(0);
+        dst3.setTo(0);
+        vector<Vec3b> usedColors = { Vec3b(0, 0, 0) };
+        for (const auto ele : minCore->sortedCells) {
+            segCell cell = ele.second;
+            uchar index = lastMap.at<uchar>(cell.maxDist.y, cell.maxDist.x);
+            if (index > 0 && index < lastCells.size()) {
+                cell.color = lastColors.at<Vec3b>(cell.maxDist.y, cell.maxDist.x);
+            }
+            if (find(usedColors.begin(), usedColors.end(), cell.color) != usedColors.end()) {
+                cell.color = task->randomCellColor();
+            }
+            usedColors.push_back(cell.color);
+            if (dst2.at<uchar>(cell.maxDist.y, cell.maxDist.x) == 0) {
+                cell.index = int(minCells.size()) + 1;
+                minCells.push_back(cell);
+                dst2(cell.rect).setTo(cell.index, cell.mask);
+                dst3(cell.rect).setTo(cell.color, cell.mask);
+                //task->setTrueText(to_string(cell.index), cell.maxDist, 2);
+                //task->setTrueText(to_string(cell.index), cell.maxDist, 3);
+            }
+        }
+        labels[3] = to_string(minCells.size()) + " cells were identified.";
+        task->cellSelect = segCell();
+        if (task->clickPoint == Point(0, 0)) {
+            if (minCells.size() > 2) {
+                task->clickPoint = minCells[0].maxDist;
+                task->cellSelect = minCells[0];
+            }
+        }
+        else {
+            uchar index = dst2.at<uchar>(task->clickPoint.y, task->clickPoint.x);
+            if (index != 0) task->cellSelect = minCells[index - 1];
+        }
+        lastColors = dst3.clone();
+        lastMap = dst2.clone();
+        if (minCells.size() > 0) dst1 = vbPalette(lastMap * 255 / minCells.size());
+    }
+};
 

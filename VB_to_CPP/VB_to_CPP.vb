@@ -50,6 +50,8 @@ Public Class VB_to_CPP
                     vbInput(i + 2) = ""
                 End If
             End If
+
+            vbInput(i) = vbInput(i).Replace("vbDrawContour", "drawContours")
             If marshalCopyInput.Count > 0 Then
                 vbInput(i) = vbInput(i).Replace("handleInput.AddrOfPinnedObject()", marshalCopyInput(0) + ".data()")
                 vbInput(i) = vbInput(i).Replace("handleInput.AddrOfPinnedObject()", marshalCopyInput(0) + ".data()")
@@ -142,7 +144,6 @@ Public Class VB_to_CPP
             split(i) = split(i).Replace("validateRect(", "task->validateRect(")
             split(i) = split(i).Replace("gOptions.UseKalman.Checked", "task->useKalman")
             split(i) = split(i).Replace("gOptions.HistBinSlider.Value", "task->histogramBins")
-            split(i) = split(i).Replace("vbMinMax(", "task->getMinMax(")
             split(i) = split(i).Replace("CStr(", "to_string(")
             split(i) = split(i).Replace("task.", "task->")
             split(i) = split(i).Replace("heartBeat()", "task->heartBeat")

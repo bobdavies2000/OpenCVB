@@ -16,12 +16,12 @@ class Agast
 private:
 public:
 	Mat src, dst;
-	std::vector<cv::KeyPoint> keypoints;
+	std::vector<KeyPoint> keypoints;
 	Agast()	{}
 	void Run() {
 		keypoints.clear();
-		static cv::Ptr<cv::AgastFeatureDetector> agastFD = cv::AgastFeatureDetector::create(10,
-												 true, cv::AgastFeatureDetector::OAST_9_16);
+		static Ptr<AgastFeatureDetector> agastFD = AgastFeatureDetector::create(10,
+												 true, AgastFeatureDetector::OAST_9_16);
 		agastFD->detect(src, keypoints);
 		dst = Mat(int(keypoints.size()), 7, CV_32F, keypoints.data());
 	}

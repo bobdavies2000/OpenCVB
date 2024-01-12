@@ -516,7 +516,7 @@ Module Red_Module
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodCell_Run(
                 cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr, rows As Integer, cols As Integer,
-                type As Integer, sizeThreshold As Single, maxClassCount As Integer, diff As Integer) As IntPtr
+                type As Integer, maxClassCount As Integer, diff As Integer) As IntPtr
     End Function
 
 
@@ -548,7 +548,7 @@ Module Red_Module
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function RedCloud_Run(cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr, rows As Integer, cols As Integer,
-                                 sizeThreshold As Single, maxClassCount As Integer) As Integer
+                                 maxClassCount As Integer) As Integer
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function RedCloud_FloodPointList(cPtr As IntPtr) As IntPtr
@@ -2173,11 +2173,10 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
             Marshal.Copy(task.noDepthMask.Data, maskData, 0, maskData.Length)
             Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
             classCount = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(),
-                                      src.Rows, src.Cols, redOptions.imageThresholdPercent, 250)
+                                      src.Rows, src.Cols, 250)
             handleMask.Free()
         Else
-            classCount = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols,
-                                      redOptions.imageThresholdPercent, 250)
+            classCount = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols, 250)
         End If
         handleInput.Free()
 

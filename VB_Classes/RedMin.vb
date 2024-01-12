@@ -6,15 +6,14 @@ Public Class RedMin_Basics : Inherits VB_Algorithm
     Dim lastColors As cv.Mat
     Dim lastMap As cv.Mat = dst2.Clone
     Public Sub New()
-        redOptions.DesiredCellSlider.Value = 30
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "Mask of active RedMin cells", "CV_8U representation of minCells", ""}
+        lastColors = dst3.Clone
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         minCore.Run(src)
         Dim lastCells As New List(Of segCell)(minCells)
-        If firstPass Then lastColors = dst3.Clone
 
         minCells.Clear()
         dst2.SetTo(0)
@@ -70,7 +69,6 @@ Public Class RedMin_BasicsMotion : Inherits VB_Algorithm
     Dim lastColors = dst3.Clone
     Dim lastMap As cv.Mat = dst2.Clone
     Public Sub New()
-        redOptions.DesiredCellSlider.Value = 30
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "Mask of active RedMin cells", "CV_8U representation of minCells", ""}
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
@@ -157,7 +155,7 @@ Public Class RedMin_Core : Inherits VB_Algorithm
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
             imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols,
-                                     src.Type, redOptions.imageThresholdPercent, redOptions.DesiredCellSlider.Value, 0)
+                                     src.Type, redOptions.DesiredCellSlider.Value, 0)
             handleInput.Free()
         Else
             Dim inputData(src.Total - 1) As Byte
@@ -169,7 +167,7 @@ Public Class RedMin_Core : Inherits VB_Algorithm
             Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
 
             imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                     src.Type, redOptions.imageThresholdPercent, redOptions.DesiredCellSlider.Value, 0)
+                                     src.Type, redOptions.DesiredCellSlider.Value, 0)
             handleMask.Free()
             handleInput.Free()
         End If
@@ -190,8 +188,8 @@ Public Class RedMin_Core : Inherits VB_Algorithm
             cell.index = i + 1
             cell.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
             cell.mask = dst2(cell.rect).InRange(cell.index, cell.index)
-            Dim contour = contourBuild(cell.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            vbDrawContour(cell.mask, contour, 255, -1)
+            'Dim contour = contourBuild(cell.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            'vbDrawContour(cell.mask, contour, 255, -1)
 
             cell.pixels = sizeData.Get(Of Integer)(i, 0)
             cell.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)

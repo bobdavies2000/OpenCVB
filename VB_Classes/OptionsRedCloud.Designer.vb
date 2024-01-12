@@ -75,9 +75,6 @@ Partial Class OptionsRedCloud
         Me.LabelDesiredCell = New System.Windows.Forms.Label()
         Me.DesiredCellSlider = New System.Windows.Forms.TrackBar()
         Me.Label5 = New System.Windows.Forms.Label()
-        Me.LabelimageSizePercent = New System.Windows.Forms.Label()
-        Me.imageSizeThresholdSlider = New System.Windows.Forms.TrackBar()
-        Me.Label3 = New System.Windows.Forms.Label()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -94,7 +91,6 @@ Partial Class OptionsRedCloud
         Me.GroupBox2.SuspendLayout()
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DesiredCellSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.imageSizeThresholdSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'RedCloudSliders
@@ -111,7 +107,7 @@ Partial Class OptionsRedCloud
         Me.RedCloudSliders.Controls.Add(Me.XLabel)
         Me.RedCloudSliders.Controls.Add(Me.XRangeSlider)
         Me.RedCloudSliders.Controls.Add(Me.Label2)
-        Me.RedCloudSliders.Location = New System.Drawing.Point(12, 257)
+        Me.RedCloudSliders.Location = New System.Drawing.Point(12, 175)
         Me.RedCloudSliders.Name = "RedCloudSliders"
         Me.RedCloudSliders.Size = New System.Drawing.Size(763, 300)
         Me.RedCloudSliders.TabIndex = 2
@@ -614,12 +610,9 @@ Partial Class OptionsRedCloud
         Me.GroupBox2.Controls.Add(Me.LabelDesiredCell)
         Me.GroupBox2.Controls.Add(Me.DesiredCellSlider)
         Me.GroupBox2.Controls.Add(Me.Label5)
-        Me.GroupBox2.Controls.Add(Me.LabelimageSizePercent)
-        Me.GroupBox2.Controls.Add(Me.imageSizeThresholdSlider)
-        Me.GroupBox2.Controls.Add(Me.Label3)
         Me.GroupBox2.Location = New System.Drawing.Point(12, 4)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(763, 255)
+        Me.GroupBox2.Size = New System.Drawing.Size(763, 158)
         Me.GroupBox2.TabIndex = 9
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Histogram 3D Options"
@@ -627,7 +620,7 @@ Partial Class OptionsRedCloud
         'LabelHistogramBins
         '
         Me.LabelHistogramBins.AutoSize = True
-        Me.LabelHistogramBins.Location = New System.Drawing.Point(668, 163)
+        Me.LabelHistogramBins.Location = New System.Drawing.Point(668, 103)
         Me.LabelHistogramBins.Name = "LabelHistogramBins"
         Me.LabelHistogramBins.Size = New System.Drawing.Size(57, 20)
         Me.LabelHistogramBins.TabIndex = 32
@@ -635,7 +628,7 @@ Partial Class OptionsRedCloud
         '
         'HistBinSlider
         '
-        Me.HistBinSlider.Location = New System.Drawing.Point(156, 156)
+        Me.HistBinSlider.Location = New System.Drawing.Point(156, 96)
         Me.HistBinSlider.Maximum = 16
         Me.HistBinSlider.Minimum = 2
         Me.HistBinSlider.Name = "HistBinSlider"
@@ -646,7 +639,7 @@ Partial Class OptionsRedCloud
         '
         'Label7
         '
-        Me.Label7.Location = New System.Drawing.Point(8, 163)
+        Me.Label7.Location = New System.Drawing.Point(8, 103)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(152, 48)
         Me.Label7.TabIndex = 30
@@ -655,7 +648,7 @@ Partial Class OptionsRedCloud
         'LabelDesiredCell
         '
         Me.LabelDesiredCell.AutoSize = True
-        Me.LabelDesiredCell.Location = New System.Drawing.Point(668, 98)
+        Me.LabelDesiredCell.Location = New System.Drawing.Point(668, 38)
         Me.LabelDesiredCell.Name = "LabelDesiredCell"
         Me.LabelDesiredCell.Size = New System.Drawing.Size(57, 20)
         Me.LabelDesiredCell.TabIndex = 29
@@ -663,50 +656,22 @@ Partial Class OptionsRedCloud
         '
         'DesiredCellSlider
         '
-        Me.DesiredCellSlider.Location = New System.Drawing.Point(156, 91)
+        Me.DesiredCellSlider.Location = New System.Drawing.Point(156, 31)
         Me.DesiredCellSlider.Maximum = 100
         Me.DesiredCellSlider.Minimum = 1
         Me.DesiredCellSlider.Name = "DesiredCellSlider"
         Me.DesiredCellSlider.Size = New System.Drawing.Size(506, 69)
         Me.DesiredCellSlider.TabIndex = 28
         Me.DesiredCellSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.DesiredCellSlider.Value = 8
+        Me.DesiredCellSlider.Value = 30
         '
         'Label5
         '
-        Me.Label5.Location = New System.Drawing.Point(8, 98)
+        Me.Label5.Location = New System.Drawing.Point(8, 38)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(152, 48)
         Me.Label5.TabIndex = 27
         Me.Label5.Text = "Desired RedMin Cells"
-        '
-        'LabelimageSizePercent
-        '
-        Me.LabelimageSizePercent.AutoSize = True
-        Me.LabelimageSizePercent.Location = New System.Drawing.Point(668, 34)
-        Me.LabelimageSizePercent.Name = "LabelimageSizePercent"
-        Me.LabelimageSizePercent.Size = New System.Drawing.Size(57, 20)
-        Me.LabelimageSizePercent.TabIndex = 26
-        Me.LabelimageSizePercent.Text = "Label5"
-        '
-        'imageSizeThresholdSlider
-        '
-        Me.imageSizeThresholdSlider.Location = New System.Drawing.Point(156, 27)
-        Me.imageSizeThresholdSlider.Maximum = 100
-        Me.imageSizeThresholdSlider.Minimum = 1
-        Me.imageSizeThresholdSlider.Name = "imageSizeThresholdSlider"
-        Me.imageSizeThresholdSlider.Size = New System.Drawing.Size(506, 69)
-        Me.imageSizeThresholdSlider.TabIndex = 25
-        Me.imageSizeThresholdSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.imageSizeThresholdSlider.Value = 95
-        '
-        'Label3
-        '
-        Me.Label3.Location = New System.Drawing.Point(8, 34)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(152, 48)
-        Me.Label3.TabIndex = 24
-        Me.Label3.Text = "RedMin Image %"
         '
         'OptionsRedCloud
         '
@@ -747,7 +712,6 @@ Partial Class OptionsRedCloud
         Me.GroupBox2.PerformLayout()
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DesiredCellSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.imageSizeThresholdSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -801,9 +765,6 @@ Partial Class OptionsRedCloud
     Friend WithEvents LabelDesiredCell As Windows.Forms.Label
     Friend WithEvents DesiredCellSlider As Windows.Forms.TrackBar
     Friend WithEvents Label5 As Windows.Forms.Label
-    Friend WithEvents LabelimageSizePercent As Windows.Forms.Label
-    Friend WithEvents imageSizeThresholdSlider As Windows.Forms.TrackBar
-    Friend WithEvents Label3 As Windows.Forms.Label
     Friend WithEvents LabelHistogramBins As Windows.Forms.Label
     Friend WithEvents HistBinSlider As Windows.Forms.TrackBar
     Friend WithEvents Label7 As Windows.Forms.Label
