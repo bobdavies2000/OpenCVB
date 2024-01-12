@@ -83,7 +83,7 @@ Public Class KNN_Basics : Inherits VB_Algorithm
             Next
             neighbors.Add(res)
         Next
-        displayResults()
+        If standalone Or showIntermediate() Then displayResults()
     End Sub
 End Class
 

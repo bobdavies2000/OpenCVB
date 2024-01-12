@@ -172,12 +172,12 @@ Public Class Random_LUTMask : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static lutMat As cv.Mat
-        If heartBeat() Then
+        If heartBeat() Or task.frameCount < 10 Then
             random.Run(empty)
-            lutMat = cv.Mat.Zeros(New cv.Size(1, 256), cv.MatType.CV_8UC3)
+            lutMat = New cv.Mat(New cv.Size(1, 256), cv.MatType.CV_8UC3, 0)
             Dim lutIndex = 0
             km.Run(src)
-            dst2 = km.km.dst3
+            dst2 = km.dst2
             For Each pt In random.pointList
                 lutMat.Set(lutIndex, 0, dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
                 lutIndex += 1
@@ -461,7 +461,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class Random_60sTV : Inherits VB_Algorithm
+Public Class Random_StaticTV : Inherits VB_Algorithm
     Public Sub New()
 
         If sliders.Setup(traceName) Then
@@ -474,7 +474,7 @@ Public Class Random_60sTV : Inherits VB_Algorithm
         labels(3) = "Resized selection rectangle in dst2"
         desc = "Imitate an old TV appearance using randomness."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static valSlider = findSlider("Range of noise to apply (from 0 to this value)")
         Static threshSlider = findSlider("Percentage of pixels to include noise")
         Dim val = valSlider.Value
@@ -499,15 +499,15 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class Random_60sTVFaster : Inherits VB_Algorithm
+Public Class Random_StaticTVFaster : Inherits VB_Algorithm
     Dim random As New Random_UniformDist
     Dim mats As New Mat_4to1
-    Dim options As New Random_60sTV
+    Dim options As New Random_StaticTV
     Public Sub New()
         labels(3) = "Changed pixels, add/sub mask, plusMask, minusMask"
         desc = "A faster way to apply noise to imitate an old TV appearance using randomness and thresholding."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static valSlider = findSlider("Range of noise to apply (from 0 to this value)")
         Static percentSlider = findSlider("Percentage of pixels to include noise")
 
@@ -543,13 +543,13 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class Random_60sTVFastSimple : Inherits VB_Algorithm
+Public Class Random_StaticTVFastSimple : Inherits VB_Algorithm
     Dim random As New Random_UniformDist
-    Dim options As New Random_60sTV
+    Dim options As New Random_StaticTV
     Public Sub New()
         desc = "Remove diagnostics from the faster algorithm to simplify code."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static valSlider = findSlider("Range of noise to apply (from 0 to this value)")
         Static percentSlider = findSlider("Percentage of pixels to include noise")
 

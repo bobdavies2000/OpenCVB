@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Windows.Media.Media3D
+Imports cv = OpenCvSharp
 
 Public Class Hull_Basics : Inherits VB_Algorithm
     Dim random As New Random_Basics
@@ -10,10 +11,13 @@ Public Class Hull_Basics : Inherits VB_Algorithm
         If standalone Then random.range = New cv.Rect(100, 100, 50, 50)
         desc = "Given a list of points, create a hull that encloses them."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If (standalone And heartBeat()) Or (useRandomPoints And heartBeat()) Then
             random.Run(empty)
-            dst2 = random.dst2
+            dst2.SetTo(0)
+            For Each pt In random.pointList
+                dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType, 0)
+            Next
             inputPoints = New List(Of cv.Point2f)(random.pointList)
         End If
         Dim hull2f = cv.Cv2.ConvexHull(inputPoints, True)

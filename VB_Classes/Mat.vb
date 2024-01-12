@@ -1,3 +1,4 @@
+Imports System.Windows.Media.Media3D
 Imports cv = OpenCvSharp
 Public Class Mat_Repeat : Inherits VB_Algorithm
     Public Sub New()
@@ -27,7 +28,11 @@ Public Class Mat_PointToMat : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         random.Run(empty)
-        dst2 = random.dst2
+        dst2.SetTo(0)
+        For Each pt In random.pointList
+            dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType, 0)
+        Next
+
         Dim rows = random.pointList.Count
         Dim pMat = New cv.Mat(rows, 1, cv.MatType.CV_32FC2, random.pointList.ToArray)
         Dim indexer = pMat.GetGenericIndexer(Of cv.Vec2f)()
@@ -49,10 +54,10 @@ Public Class Mat_MatToPoint : Inherits VB_Algorithm
         desc = "Convert a mat into a vector of points."
         labels(2) = "Reconstructed BGR Image"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim points(src.Total - 1) As cv.Vec3b
         Dim vec As New cv.Vec3b
-        Dim index As integer = 0
+        Dim index As Integer = 0
         Dim m3b = src.Clone()
         Dim indexer = m3b.GetGenericIndexer(Of cv.Vec3b)()
         For y = 0 To src.Rows - 1
@@ -78,7 +83,7 @@ Public Class Mat_Transpose : Inherits VB_Algorithm
         labels(2) = "Color Image Transposed"
         labels(3) = "Color Image Transposed back (artifacts)"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim trColor = src.T()
         dst2 = trColor.ToMat.Resize(New cv.Size(src.Cols, src.Rows))
         Dim trBack = dst2.T()
@@ -98,7 +103,7 @@ Public Class Mat_Tricks : Inherits VB_Algorithm
         labels(3) = "Mat transposed around the diagonal"
         desc = "Show some Mat tricks."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim mat = src.Resize(New cv.Size(src.Height, src.Height))
         Dim roi = New cv.Rect(0, 0, mat.Width, mat.Height)
         dst2(roi) = mat
@@ -117,7 +122,7 @@ Public Class Mat_RowColRange : Inherits VB_Algorithm
         labels(2) = "BitwiseNot of RowRange and ColRange"
         desc = "Perform operation on a range of cols and/or Rows."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim midX = src.Width / 2
         Dim midY = src.Height / 2
         dst2 = src
@@ -135,7 +140,7 @@ Public Class Mat_Managed : Inherits VB_Algorithm
         labels(2) = "Color change is in the managed cv.vec3b array"
         desc = "There is a limited ability to use Mat data in Managed code directly."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static autoRand As New Random()
         Static img(src.Total) As cv.Vec3b
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, img)
@@ -161,7 +166,7 @@ Public Class Mat_MultiplyReview : Inherits VB_Algorithm
     Public Sub New()
         desc = "Review matrix multiplication"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim a(,) = {{1, 4, 2}, {2, 5, 1}}
         Dim b(,) = {{3, 4, 2}, {3, 5, 7}, {1, 2, 1}}
         Dim nextLine = ""
@@ -234,7 +239,7 @@ Public Class Mat_Inverse : Inherits VB_Algorithm
         End If
         desc = "Given a 3x3 matrix, invert it and present results."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim nextline = ""
 
         Dim decompType = cv.DecompTypes.Cholesky
@@ -361,7 +366,7 @@ Public Class Mat_2to1 : Inherits VB_Algorithm
         labels(2) = ""
         desc = "Fill a Mat with 2 images"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim nSize = New cv.Size(task.workingRes.Width, task.workingRes.Height / 2)
         Dim roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Dim roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
@@ -408,8 +413,8 @@ Public Class Mat_4Click : Inherits VB_Algorithm
         If standalone Then
             mat(0) = task.color.Clone
             mat(1) = task.depthRGB.Clone
-            mat(2) = If(task.leftview.Channels = 1, task.leftview.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.leftview)
-            mat(3) = If(task.rightview.Channels = 1, task.rightview.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightview)
+            mat(2) = If(task.leftView.Channels = 1, task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.leftView)
+            mat(3) = If(task.rightView.Channels = 1, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView)
         End If
 
         If (task.mouseClickFlag And task.mousePicTag) = RESULT_DST2 Or firstPass Then
@@ -448,10 +453,10 @@ Public Class Mat_4to1 : Inherits VB_Algorithm
         Dim roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         Dim roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
         If standalone Then
-            Dim tmpLeft = If(task.leftview.Channels = 1, task.leftview.CvtColor(cv.ColorConversionCodes.GRAY2BGR),
-                             task.leftview)
-            Dim tmpRight = If(task.rightview.Channels = 1, task.rightview.CvtColor(cv.ColorConversionCodes.GRAY2BGR),
-                              task.rightview)
+            Dim tmpLeft = If(task.leftView.Channels = 1, task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR),
+task.leftView)
+            Dim tmpRight = If(task.rightView.Channels = 1, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR),
+task.rightView)
             mat = {task.color.Clone, task.depthRGB.Clone, tmpLeft, tmpRight}
         End If
 
