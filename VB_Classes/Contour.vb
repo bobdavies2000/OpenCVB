@@ -9,7 +9,6 @@ Public Class Contour_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         dst2 = src.Clone
         If standalone Then
-
             Static rotatedRect As New Rectangle_Rotated
             If heartBeat() = False Then Exit Sub
             rotatedRect.Run(src)
@@ -23,8 +22,14 @@ Public Class Contour_Basics : Inherits VB_Algorithm
             If src.Channels = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
 
-        cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.External,
+        If dst2.Type = cv.MatType.CV_8U Then
+            cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.External,
                             cv.ContourApproximationModes.ApproxTC89KCOS)
+        Else
+            If dst2.Type <> cv.MatType.CV_32S Then dst2.ConvertTo(dst2, cv.MatType.CV_32S)
+            cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.FloodFill,
+                            cv.ContourApproximationModes.ApproxTC89KCOS)
+        End If
 
         contourlist.Clear()
         Dim minPixels = gOptions.minPixelsSlider.Value

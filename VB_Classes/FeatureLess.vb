@@ -340,8 +340,9 @@ Public Class FeatureLess_Edge_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         cpp.Run(src)
-        dst2 = cpp.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If standalone Then dst3 = cpp.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = cpp.dst2
+        dst3 = cpp.dst3
+        setTrueText("The objective here is to show how to get the output of a C++ IncludeOnly algorithm.", 3)
     End Sub
 End Class
 
