@@ -1,5 +1,4 @@
-﻿Imports OpenCvSharp
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Triangle_Basics : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cv.Point3f)
@@ -221,75 +220,5 @@ Public Class Triangle_Mask : Inherits VB_Algorithm
                                       yFactor * (rc.maxDist.Y - rc.rect.Y) / rc.rect.Height)
         dst3.Circle(newMaxDist, task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
         labels(2) = redC.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Triangle_KNN : Inherits VB_Algorithm
-    Dim random As New Random_Basics
-    Dim knn As New KNN_Basics
-    Public Sub New()
-        labels(2) = "Triangles built with each random point and its 2 nearest neighbors."
-        advice = "Adjust the number of points with the options_random."
-        desc = "Build triangles from points using minTriangle"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then
-            random.Run(empty)
-            knn.queries = random.pointList
-            knn.Run(empty)
-
-            dst2.SetTo(0)
-            For i = 0 To knn.queries.Count - 1
-                Dim p0 = knn.queries(i)
-                Dim p1 = knn.queries(knn.result(i, 1))
-                dst2.Line(p0, p1, white, task.lineWidth, task.lineType)
-                Dim p2 = knn.queries(knn.result(i, 2))
-                dst2.Line(p0, p2, white, task.lineWidth, task.lineType)
-            Next
-            For i = 0 To knn.queries.Count - 1
-                dst2.Circle(knn.queries(i), task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
-            Next
-            knn.trainInput = knn.queries
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Triangle_Features : Inherits VB_Algorithm
-    Dim feat As New Feature_Basics
-    Dim knn As New KNN_Basics
-    Public Sub New()
-        labels(2) = "Triangles built with each feature point and its 2 nearest neighbors."
-        advice = "Adjust the number of points with the options_random."
-        desc = "Build triangles from points using minTriangle"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        feat.Run(src)
-        If heartBeat() Then knn.queries = feat.corners
-        knn.Run(empty)
-
-        dst2.SetTo(0)
-        'For i = 0 To knn.queries.Count - 1
-        '    Dim p0 = knn.queries(i)
-        '    Dim p1 = knn.queries(knn.result(i, 1))
-        '    dst2.Line(p0, p1, white, task.lineWidth, task.lineType)
-        '    Dim p2 = knn.queries(knn.result(i, 2))
-        '    dst2.Line(p0, p2, white, task.lineWidth, task.lineType)
-        'Next
-        'For i = 0 To knn.queries.Count - 1
-        '    dst2.Circle(knn.queries(i), task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
-        'Next
-        'knn.trainInput = knn.queries
     End Sub
 End Class
