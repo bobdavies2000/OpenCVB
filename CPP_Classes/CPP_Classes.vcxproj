@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CPP_Algorithms.h" />
     <ClInclude Include="CPP_Externs.h" />
     <ClInclude Include="CPP_Functions.h" />
     <ClInclude Include="CPP_Task.h" />
@@ -35,7 +36,6 @@
     <ClInclude Include="videostab.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Agast.cpp" />
     <ClCompile Include="Annealing.cpp" />
     <ClCompile Include="BGRPattern.cpp" />
     <ClCompile Include="BGSubtract.cpp" />

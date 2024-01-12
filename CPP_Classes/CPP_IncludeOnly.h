@@ -31,9 +31,7 @@ namespace fs = std::filesystem;
 
 #include "../CPP_Classes/PragmaLibs.h"
 #include "CPP_Task.h"
-
-#include "EdgeDraw.h"
-#include "FloodCell.h"
+#include "CPP_Algorithms.h"
 
 cppTask* task;
 

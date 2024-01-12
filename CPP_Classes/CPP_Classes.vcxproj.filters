@@ -1,12 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Agast.cpp" />
     <ClCompile Include="Annealing.cpp" />
     <ClCompile Include="BGRPattern.cpp" />
     <ClCompile Include="BGSubtract.cpp" />
     <ClCompile Include="Corners.cpp" />
-    <ClCompile Include="CPP_IncludeOnly.cpp" />
     <ClCompile Include="DCT.cpp" />
     <ClCompile Include="Denoise.cpp" />
     <ClCompile Include="Depth.cpp" />
@@ -50,6 +48,7 @@
     <ClCompile Include="WarpModel.cpp" />
     <ClCompile Include="WhiteBalance.cpp" />
     <ClCompile Include="xPhoto.cpp" />
+    <ClCompile Include="CPP_IncludeOnly.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPP_Externs.h" />
@@ -66,5 +65,6 @@
     <ClInclude Include="rbf.hpp" />
     <ClInclude Include="SemiGlobalMatching.h" />
     <ClInclude Include="videostab.h" />
+    <ClInclude Include="CPP_Algorithms.h" />
   </ItemGroup>
 </Project>
