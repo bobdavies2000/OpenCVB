@@ -85,7 +85,7 @@ Public Class Fuzzy_Filter : Inherits VB_Algorithm
         kernel *= 1 / 9
         desc = "Use a 2D filter to find smooth areas"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Options.RunVB()
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -113,7 +113,7 @@ Public Class Fuzzy_Filter : Inherits VB_Algorithm
             Dim pt = contours(i)(0)
             For y = pt.Y - 1 To pt.Y + 1
                 For x = pt.X - 1 To pt.X + 1
-                    If x <src.Width And y <src.Height And x >= 0 And y >= 0 Then
+                    If x < src.Width And y < src.Height And x >= 0 And y >= 0 Then
                         Dim val = reduction.dst2.Get(Of Byte)(y, x)
                         If val <> 0 Then
                             maskID = val
@@ -130,25 +130,6 @@ Public Class Fuzzy_Filter : Inherits VB_Algorithm
         dst2.SetTo(0, dst3)
     End Sub
 End Class
-
-
-
-
-
-
-
-
-Module Fuzzy_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Fuzzy_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Fuzzy_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Fuzzy_Run(cPtr As IntPtr, bgrPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
-    End Function
-End Module
 
 
 

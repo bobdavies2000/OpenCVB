@@ -83,24 +83,6 @@ End Class
 
 
 
-
-Module ParticleFilter
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function ParticleFilterTest_Open(matlabFileName As String, rows As Integer, cols As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function ParticleFilterTest_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function ParticleFilterTest_Run(pfPtr As IntPtr) As IntPtr
-    End Function
-End Module
-
-
-
-
-
-
 Public Class ParticleFilter_Net : Inherits VB_Algorithm
     Dim trace As New Feature_TraceKNN
     Public Sub New()

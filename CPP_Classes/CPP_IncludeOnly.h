@@ -2642,12 +2642,12 @@ public:
     CPP_FeatureLess_Basics* fLess;
     FloodCell* cPtr;
     float redOptions_imageThresholdPercent = 0.95f;
-    int redOptions_DesiredCellSlider = 30;
     CPP_RedMin_Core(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_RedMin_Core";
         vbPalette(dst2);
         fLess = new CPP_FeatureLess_Basics(rows, cols);
         cPtr = new FloodCell();
+        advice = "In redOptions the 'Desired RedMin Cells' slider has a big impact.";
         desc = "Another minimalist approach to building RedCloud color-based cells.";
     }
     ~CPP_RedMin_Core() {
@@ -2666,12 +2666,12 @@ public:
         Mat* srcPtr = &src;
         if (inputMask.empty()) {
             imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, 0, src.rows, src.cols, src.type(), 
-                                     redOptions_DesiredCellSlider, 0);
+                                     task->desiredCells, 0);
         }
         else {
             Mat* maskPtr = &inputMask;
             imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, (uchar *)maskPtr->data, src.rows, src.cols,
-                                     src.type(), redOptions_DesiredCellSlider, 0);
+                                     src.type(), task->desiredCells, 0);
         }
         int classCount = FloodCell_Count(cPtr);
 
@@ -2729,6 +2729,7 @@ public:
     CPP_RedMin_Basics(int rows, int cols) : algorithmCPP(rows, cols) {
         traceName = "CPP_RedMin_Basics";
         minCore = new CPP_RedMin_Core(rows, cols);
+        advice = minCore->advice;
         dst2 = Mat::zeros(dst2.size(), CV_8U);  
         labels = { "", "Mask of active RedMin cells", "CV_8U representation of minCells", "" };
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells.";

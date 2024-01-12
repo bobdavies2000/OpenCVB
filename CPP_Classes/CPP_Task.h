@@ -221,7 +221,7 @@ public:
     int cvFontThickness;
     Scalar fontColor;
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
-    bool motionReset; rcData rcSelect; segCell cellSelect;
+    bool motionReset; rcData rcSelect; segCell cellSelect; int desiredCells;
 
     bool heartBeat; bool debugCheckBox; Size minRes; int PCReduction;
     bool optionsChanged; double addWeighted; int dotSize; int gridSize; float maxZmeters;

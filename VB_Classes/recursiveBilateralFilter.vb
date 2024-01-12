@@ -1,19 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-
-Module RecursiveBilateralFilter_Exports
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RecursiveBilateralFilter_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RecursiveBilateralFilter_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RecursiveBilateralFilter_Run(cPtr As IntPtr, inputPtr As IntPtr, rows As Integer, cols As Integer, recursions As Integer) As IntPtr
-    End Function
-End Module
-
-
 ' https://github.com/ufoym
 Public Class RecursiveBilateralFilter_CPP : Inherits VB_Algorithm
     Dim dataSrc(0) As Byte

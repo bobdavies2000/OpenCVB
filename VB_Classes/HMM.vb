@@ -1,21 +1,5 @@
-
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-
-Module HMM_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function HMM_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function HMM_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function HMM_Run(HMMPtr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
-    End Function
-End Module
-
-
-
 'https://github.com/omidsakhi/cv-hmm
 Public Class HMM_Example_CPP : Inherits VB_Algorithm
     Public Sub New()

@@ -115,33 +115,6 @@ End Class
 
 
 
-Module Edge_Exports
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edge_RandomForest_Open(modelFileName As String) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edge_RandomForest_Close(Edges_RandomForestPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edge_RandomForest_Run(Edges_RandomForestPtr As IntPtr, inputPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
-    End Function
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edge_Deriche_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edge_Deriche_Close(Edges_DerichePtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edge_Deriche_Run(Edges_DerichePtr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer, alpha As Single, omega As Single) As IntPtr
-    End Function
-End Module
-
-
-
-
-
-
 
 '  https://docs.opencv.org/3.1.0/d0/da5/tutorial_ximgproc_prediction.html
 Public Class Edge_RandomForest_CPP : Inherits VB_Algorithm
@@ -796,28 +769,6 @@ End Class
 
 
 
-
-
-
-
-Module Edge_ColorGap_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edge_ColorGap_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edge_ColorGap_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edge_ColorGap_Run(cPtr As IntPtr, bgrPtr As IntPtr, rows As Int32, cols As Int32, distance As Int32, diff As Int32) As IntPtr
-    End Function
-End Module
-
-
-
-
-
-
-
 Public Class Edge_ColorGap_CPP : Inherits VB_Algorithm
     Dim gap As New Edge_ColorGap_VB
     Public Sub New()
@@ -1041,25 +992,6 @@ Public Class Edge_DepthGap_VB : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-Module Edge_DepthGap_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edge_DepthGap_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edge_DepthGap_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edge_DepthGap_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, minDiff As Single) As IntPtr
-    End Function
-End Module
 
 
 

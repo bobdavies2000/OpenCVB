@@ -26,15 +26,18 @@ Public Class CPP_Basics : Inherits VB_Algorithm
     End Sub
     Private Sub getOptions()
         Dim labelBuffer As StringBuilder = New StringBuilder(512)
-        Dim buffer As StringBuilder = New StringBuilder(512)
+        Dim descBuffer As StringBuilder = New StringBuilder(512)
+        Dim adviceBuffer As StringBuilder = New StringBuilder(512)
         cppTask_OptionsCPPtoVB(cPtr, gOptions.GridSize.Value,
                                gOptions.HistBinSlider.Value,
                                gOptions.PixelDiffThreshold.Value, gOptions.UseKalman.Checked,
                                task.frameHistoryCount, task.drawRect.X, task.drawRect.Y,
-                               task.drawRect.Width, task.drawRect.Height, labelBuffer, buffer)
+                               task.drawRect.Width, task.drawRect.Height, labelBuffer, descBuffer,
+                               adviceBuffer)
 
         labels = labelBuffer.ToString.Split("|")
-        desc = buffer.ToString
+        desc = descbuffer.ToString
+        advice = adviceBuffer.tostring
     End Sub
     Public Sub New()
     End Sub
@@ -49,7 +52,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
                                task.maxZmeters, redOptions.PCReduction, task.cvFontSize, task.cvFontThickness,
                                task.clickPoint.X, task.clickPoint.Y, task.mouseClickFlag,
                                task.mousePicTag, task.mouseMovePoint.X, task.mouseMovePoint.Y,
-                               task.paletteIndex)
+                               task.paletteIndex, redOptions.DesiredCellSlider.Value)
 
         Dim pointCloudData(task.pointCloud.Total * task.pointCloud.ElemSize - 1) As Byte
         Marshal.Copy(task.pointCloud.Data, pointCloudData, 0, pointCloudData.Length)
@@ -109,66 +112,3 @@ Public Class CPP_Basics : Inherits VB_Algorithm
         If cPtr <> 0 Then cPtr = cppTask_Close(cPtr)
     End Sub
 End Class
-
-
-
-
-
-
-
-Module CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function cppTask_Open(cppFunction As Integer, rows As Integer, cols As Integer,
-                                 heartBeat As Boolean, addWeighted As Single, lineWidth As Integer,
-                                 lineType As Integer, dotSize As Integer, gridSize As Integer,
-                                 histogramBins As Integer, ocvheartBeat As Boolean, gravityPointCloud As Boolean,
-                                 pixelDiffThreshold As Integer, useKalman As Boolean, paletteIndex As Integer,
-                                 frameHistory As Integer, displayDst0 As Boolean,
-                                 displayDst1 As Boolean) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function cppTask_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function cppTask_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, channels As Integer, frameCount As Integer,
-                                   rows As Integer, cols As Integer, x As Single, y As Single, z As Single,
-                                   optionsChanged As Boolean, heartBeat As Boolean, displayDst0 As Boolean,
-                                   displayDst1 As Boolean, addWeighted As Single, debugCheckBox As Boolean) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function cppTask_PointCloud(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
-    End Function
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function cppTask_DepthLeftRight(cPtr As IntPtr, dataPtr As IntPtr, leftPtr As IntPtr,
-                                           rightPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
-    End Function
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function cppTask_GetDst(cPtr As IntPtr, index As Integer, ByRef channels As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub cppTask_OptionsCPPtoVB(cPtr As IntPtr, ByRef gridSize As Integer,
-                                        ByRef histogramBins As Integer,
-                                        ByRef pixelDiffThreshold As Integer,
-                                        ByRef useKalman As Boolean, ByRef frameHistory As Integer,
-                                        ByRef rectX As Integer, ByRef rectY As Integer, ByRef rectWidth As Integer,
-                                        ByRef rectHeight As Integer,
-                                        <MarshalAs(UnmanagedType.LPStr)> ByVal labels As StringBuilder,
-                                        <MarshalAs(UnmanagedType.LPStr)> ByVal desc As StringBuilder)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub cppTask_OptionsVBtoCPP(cPtr As IntPtr, gridSize As Integer,
-                                      histogramBins As Integer,
-                                      pixelDiffThreshold As Integer,
-                                      useKalman As Boolean, frameHistory As Integer,
-                                      rectX As Integer, rectY As Integer, rectWidth As Integer,
-                                      rectHeight As Integer, lineWidth As Integer,
-                                      lineType As Integer, dotSize As Integer, minResWidth As Integer,
-                                      minResHeight As Integer, maxZmeters As Single,
-                                      PCReduction As Integer, fontSize As Single,
-                                      fontThickness As Integer, clickX As Integer,
-                                      clickY As Integer, clickFlag As Boolean, picTag As Integer,
-                                      moveX As Integer, moveY As Integer, paletteIndex As Integer)
-    End Sub
-End Module 

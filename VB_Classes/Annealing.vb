@@ -79,27 +79,6 @@ End Class
 
 
 
-
-Module Annealing_Exports
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Annealing_Basics_Open(cityPositions As IntPtr, numberOfCities As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Annealing_Basics_Close(saPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Annealing_Basics_Run(saPtr As IntPtr, cityOrder As IntPtr, numberOfCities As Integer) As IntPtr
-    End Function
-End Module
-
-
-
-
-
-
-
-
-
 Public Class Annealing_MultiThreaded : Inherits VB_Algorithm
     Dim random As New Random_Basics
     Dim anneal() As Annealing_Basics_CPP

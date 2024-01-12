@@ -1,19 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports  System.IO
-
-Module Retina_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Retina_Basics_Open(rows As integer, cols As integer, useLogSampling As Boolean, samplingFactor As Single) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Retina_Basics_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Retina_Basics_Run(RetinaPtr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer, magno As IntPtr, useLogSampling As Integer) As IntPtr
-    End Function
-End Module
-
 'https://docs.opencv.org/3.4/d3/d86/tutorial_bioinspired_retina_model.html
 Public Class Retina_Basics_CPP : Inherits VB_Algorithm
     Dim startInfo As New ProcessStartInfo

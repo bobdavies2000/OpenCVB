@@ -83,22 +83,6 @@ End Class
 
 
 
-
-Module FitEllipse_Exports
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function FitEllipse_AMS(inputPtr As IntPtr, numberOfPoints As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function FitEllipse_Direct(inputPtr As IntPtr, numberOfPoints As Integer) As IntPtr
-    End Function
-End Module
-
-
-
-
-
-
-
 ' https://docs.opencv.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
 Public Class FitEllipse_Direct_CPP : Inherits VB_Algorithm
     Dim options As New Options_MinArea

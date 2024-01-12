@@ -464,42 +464,6 @@ End Class
 
 
 
-
-
-Module MSER_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MSER_Open(delta As Integer, minArea As Integer, maxArea As Integer, maxVariation As Single, minDiversity As Single,
-                              maxEvolution As Integer, areaThreshold As Single, minMargin As Single, edgeBlurSize As Integer,
-                              pass2Setting As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub MSER_Close(cPtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MSER_Rects(cPtr As IntPtr) As IntPtr
-    End Function
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MSER_FloodPoints(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MSER_MaskCounts(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MSER_Count(cPtr As IntPtr) As Integer
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MSER_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
-    End Function
-End Module
-
-
-
-
-
-
-
-
 Public Class MSER_Regions : Inherits VB_Algorithm
     Dim core As New MSER_Detect
     Public mserCells As New List(Of rcData)

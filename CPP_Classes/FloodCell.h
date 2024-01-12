@@ -28,7 +28,7 @@ public:
         multimap<int, Point, greater<int>> sizeSorted;
         int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
         int count; Point pt;
-        float cellSizehreshold = src.total() * 0.001f; // if the cell is < 1/10 of 1%, then skip it.
+        float cellSizehreshold = src.total() * 0.0001f; // if the cell is < 1/100 of 1%, then skip it.
         for (int y = 0; y < src.rows; y++)
         {
             for (int x = 0; x < src.cols; x++)

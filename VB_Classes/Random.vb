@@ -317,33 +317,6 @@ End Class
 
 
 
-Module Random_PatternGenerator_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Random_PatternGenerator_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Random_PatternGenerator_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Random_PatternGenerator_Run(Random_PatternGeneratorPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
-    End Function
-
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Random_DiscreteDistribution_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Random_DiscreteDistribution_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Random_DiscreteDistribution_Run(rPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
-    End Function
-End Module
-
-
-
-
-
 
 
 Public Class Random_PatternGenerator_CPP : Inherits VB_Algorithm

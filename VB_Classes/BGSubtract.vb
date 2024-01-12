@@ -255,32 +255,6 @@ End Class
 
 
 
-Module BGSubtract_BGFG_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_BGFG_Open(currMethod As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_BGFG_Close(bgfs As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_BGFG_Run(bgfs As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_Synthetic_Open(bgrPtr As IntPtr, rows As Integer, cols As Integer, fgFilename As String, amplitude As Double,
-                                          magnitude As Double, wavespeed As Double, objectspeed As Double) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_Synthetic_Close(synthPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_Synthetic_Run(synthPtr As IntPtr) As IntPtr
-    End Function
-End Module
-
-
-
-
-
 Public Class BGSubtract_Video : Inherits VB_Algorithm
     Dim bgfg As New BGSubtract_Basics_CPP
     Dim video As New Video_Basics

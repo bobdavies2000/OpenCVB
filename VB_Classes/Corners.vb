@@ -108,13 +108,6 @@ End Class
 
 
 
-Module corners_Exports
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Corners_ShiTomasi(grayPtr As IntPtr, rows As Integer, cols As Integer, blocksize As Integer, aperture As Integer) As IntPtr
-    End Function
-End Module
-
-
 
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
 Public Class Corners_ShiTomasi_CPP : Inherits VB_Algorithm
@@ -325,33 +318,6 @@ Public Class Corners_Harris_CPP : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-Module Harris_Exports
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Harris_Features_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Harris_Features_Close(Harris_FeaturesPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Harris_Features_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As Integer, cols As Integer, threshold As Single,
-                                        neighborhood As Int16, aperture As Int16, HarrisParm As Single) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Harris_Detector_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Harris_Detector_Close(Harris_FeaturesPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Harris_Detector_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As Integer, cols As Integer, qualityLevel As Double,
-                                        count As IntPtr) As IntPtr
-    End Function
-End Module
 
 
 

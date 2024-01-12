@@ -55,63 +55,6 @@ End Class
 
 
 
-
-Module MLPrep_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MLPrepLearn_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MLPrepLearn_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MLPrepLearn_GetCount(cPtr As IntPtr) As Integer
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MLPrepLearn_GetResponse(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MLPrepLearn_GetInputCount(cPtr As IntPtr) As Integer
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MLPrepLearn_Run(cPtr As IntPtr, bgrPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
-    End Function
-
-
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Sort_MLPrepTest_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Sort_MLPrepTest_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Sort_MLPrepTest_Run(cPtr As IntPtr, bgrPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
-    End Function
-
-
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function FLess_Range_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function FLess_Range_Count(cPtr As IntPtr) As Integer
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function FLess_Range_Close(cPtr As IntPtr) As IntPtr
-    End Function
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function FLess_Range_Run(cPtr As IntPtr, bgrPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
-    End Function
-End Module
-
-
-
-
-
-
-
-
 Public Class Sort_MLPrepTest_CPP : Inherits VB_Algorithm
     Public reduction As New Reduction_Basics
     Public MLTestData As New cv.Mat

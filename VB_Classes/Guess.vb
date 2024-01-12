@@ -23,18 +23,6 @@ Public Class Guess_Depth_CPP : Inherits VB_Algorithm
     End Sub
 End Class
 
-Module Guess_Depth_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Guess_Depth_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Guess_Depth_Close(cPtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Guess_Depth_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
-    End Function
-End Module
-
 
 
 
@@ -71,15 +59,3 @@ Public Class Guess_ImageEdges_CPP : Inherits VB_Algorithm
         Guess_ImageEdges_Close(cPtr)
     End Sub
 End Class
-
-Module Guess_ImageEdges_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Guess_ImageEdges_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Guess_ImageEdges_Close(cPtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Guess_ImageEdges_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, maxDistanceToEdge As Int32) As IntPtr
-    End Function
-End Module

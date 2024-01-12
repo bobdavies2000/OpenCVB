@@ -54,26 +54,6 @@ End Class
 
 
 
-
-
-
-Module Voronoi
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function VoronoiDemo_Open(matlabFileName As String, rows As Integer, cols As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function VoronoiDemo_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function VoronoiDemo_Run(pfPtr As IntPtr, Input As IntPtr, pointCount As Integer, width As Integer, height As Integer) As IntPtr
-    End Function
-End Module
-
-
-
-
-
-
 'https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
 Public Class Voronoi_CPP : Inherits VB_Algorithm
     Dim vDemo As New Voronoi_Basics

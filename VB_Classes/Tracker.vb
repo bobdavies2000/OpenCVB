@@ -19,7 +19,7 @@ Public Class Tracker_Basics : Inherits VB_Algorithm
         If task.testAllRunning Then task.drawRect = New cv.Rect(25, 25, 25, 25)
         desc = "Use C++ to track objects.  Results are poor compared to Match_DrawRect"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static frm = findfrm(traceName + " Radio Buttons")
         Static trackType As Integer
         For i = 0 To frm.check.Count - 1
@@ -63,18 +63,3 @@ Public Class Tracker_Basics : Inherits VB_Algorithm
         If cPtr <> 0 Then cPtr = Tracker_Basics_Close(cPtr)
     End Sub
 End Class
-
-
-
-
-
-Module Tracker_Basics_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function Tracker_Basics_Open(trackType As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function Tracker_Basics_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Tracker_Basics_Run(cPtr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer,
-                                       x As Integer, y As Integer, w As Integer, h As Integer) As IntPtr
-    End Function
-End Module

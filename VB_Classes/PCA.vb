@@ -270,19 +270,6 @@ Public Class PCA_Prep_CPP : Inherits VB_Algorithm
     End Sub
 End Class
 
-Module PCA_Prep_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function PCA_Prep_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub PCA_Prep_Close(cPtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function PCA_Prep_GetCount(cPtr As IntPtr) As integer
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function PCA_Prep_Run(cPtr As IntPtr, dataPtr As IntPtr,
-                                                                                                              rows As integer, cols As integer) As IntPtr
-    End Function
-End Module
-
-
 
 
 

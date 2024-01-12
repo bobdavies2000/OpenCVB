@@ -215,21 +215,6 @@ End Class
 
 
 
-Module EMax_Exports
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EMax_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EMax_Close(EMax_RawPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function EMax_Run(EMax_RawPtr As IntPtr, samplesPtr As IntPtr, labelsPtr As IntPtr, inputCount As Integer, dimension As Integer, rows As Integer, cols As Integer,
-                                 clusters As Integer, stepSize As Integer, covarianceMatrixType As Integer) As IntPtr
-    End Function
-End Module
-
-
-
-
-
 
 
 

@@ -44,33 +44,6 @@ End Class
 
 
 
-Module XPhoto_OilPaint_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function xPhoto_OilPaint_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function xPhoto_OilPaint_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function xPhoto_OilPaint_Run(xPhoto_OilPaint_Ptr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer,
-                                       size As Integer, dynRatio As Integer, colorCode As Integer) As IntPtr
-    End Function
-
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function xPhoto_Inpaint_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function xPhoto_Inpaint_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function xPhoto_Inpaint_Run(xPhoto_Inpaint_Ptr As IntPtr, bgrPtr As IntPtr, maskPtr As IntPtr, rows As Integer, cols As Integer, iType As Integer) As IntPtr
-    End Function
-End Module
-
-
-
-
 
 
 

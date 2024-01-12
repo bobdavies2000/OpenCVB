@@ -1,11 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Module MinTriangle_Exports
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub MinTriangle_Run(inputPtr As IntPtr, numberOfPoints As Integer, outputTriangle As IntPtr)
-    End Sub
-End Module
-
 Public Class Area_MinTriangle_CPP : Inherits VB_Algorithm
     Public triangle As cv.Mat
     Public options As New Options_MinArea
@@ -13,10 +7,10 @@ Public Class Area_MinTriangle_CPP : Inherits VB_Algorithm
     Public Sub New()
         desc = "Find minimum containing triangle for a set of points."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If heartBeat() = False Then Exit Sub
         If srcPoints Is Nothing Then
-            Options.RunVB()
+            options.RunVB()
             srcPoints = New List(Of cv.Point2f)(options.srcPoints)
         Else
             If srcPoints.Count < 3 Then Exit Sub ' not enough points

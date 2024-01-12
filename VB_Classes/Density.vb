@@ -50,41 +50,6 @@ End Class
 
 
 
-
-
-
-
-
-
-Module Density_2D_CPP_Module
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Density_2D_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Density_2D_Close(cPtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Density_2D_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, distance As Single) As IntPtr
-    End Function
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Density_Count_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Density_Count_Close(cPtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Density_Count_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, zCount As Integer) As IntPtr
-    End Function
-End Module
-
-
-
-
-
-
-
 Public Class Density_Count_CPP : Inherits VB_Algorithm
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Neighboring Z count", 0, 8, 3)

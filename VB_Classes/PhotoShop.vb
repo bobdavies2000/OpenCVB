@@ -92,20 +92,6 @@ End Class
 
 
 
-Module PhotoShop_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function WhiteBalance_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function WhiteBalance_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function WhiteBalance_Run(wPtr As IntPtr, rgb As IntPtr, rows As Integer, cols As Integer, thresholdVal As Single) As IntPtr
-    End Function
-End Module
-
-
-
 
 
 ' https://blog.csdn.net/just_sort/article/details/85982871

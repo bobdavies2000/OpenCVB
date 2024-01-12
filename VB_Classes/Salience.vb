@@ -1,21 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-
-Module Salience_Exports
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Salience_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Salience_Run(classPtr As IntPtr, numScales As integer, grayInput As IntPtr, rows As integer, cols As integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Salience_Close(cPtr As IntPtr) As IntPtr
-    End Function
-End Module
-
-
-
-
 Public Class Salience_Basics_CPP : Inherits VB_Algorithm
     Dim grayData(0) As Byte
     Dim numScales As Integer
@@ -24,7 +8,7 @@ Public Class Salience_Basics_CPP : Inherits VB_Algorithm
         cPtr = Salience_Open()
         desc = "Show results of Salience algorithm when using C++"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static numSlider = findSlider("Salience numScales")
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If src.Total <> grayData.Length Then ReDim grayData(src.Total - 1)

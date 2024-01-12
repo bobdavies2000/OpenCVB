@@ -179,7 +179,7 @@ extern "C" __declspec(dllexport)
 void cppTask_OptionsCPPtoVB(cppTask * task, int& gridSize,
     int& histogramBins, int& pixelDiffThreshold, bool& useKalman,
     int& frameHistory, int& rectX, int& rectY, int& rectWidth, int& rectHeight,
-    LPSTR labelBuffer, LPSTR buffer)
+    LPSTR labelBuffer, LPSTR desc, LPSTR advice)
 {
     pixelDiffThreshold = task->pixelDiffThreshold;
     gridSize = task->gridSize;
@@ -193,7 +193,8 @@ void cppTask_OptionsCPPtoVB(cppTask * task, int& gridSize,
 
     string labels = task->alg->labels[0] + "|" + task->alg->labels[1] + "|" + task->alg->labels[2] + "|" + task->alg->labels[3];
     memcpy(labelBuffer, labels.c_str(), labels.length() + 1);
-    memcpy(buffer, task->alg->desc.c_str(), task->alg->desc.length() + 1);
+    memcpy(desc, task->alg->desc.c_str(), task->alg->desc.length() + 1);
+    memcpy(advice, task->alg->advice.c_str(), task->alg->advice.length() + 1);
 }
 
 
@@ -207,7 +208,7 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
                             int lineWidth, int lineType, int dotSize, int minResWidth, int minResHeight,
                             float maxZmeters, int PCReduction, float fontSize, int fontThickness,
                             int clickX, int clickY, bool clickFlag, int picTag, int moveX, int moveY,
-                            int paletteIndex)
+                            int paletteIndex, int desiredCells)
 {
     task->pixelDiffThreshold = pixelDiffThreshold;
     task->gridSize = gridSize;
@@ -231,6 +232,7 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
     task->mouseClickFlag = clickFlag;
     task->mousePicTag = picTag;
     task->paletteIndex = paletteIndex;
+    task->desiredCells = desiredCells;
 }
 
 

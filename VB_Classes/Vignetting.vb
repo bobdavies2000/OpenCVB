@@ -115,20 +115,3 @@ Public Class Vignetting_Devignetting : Inherits VB_Algorithm
         dst3 = devignet.dst3
     End Sub
 End Class
-
-
-
-
-
-Module Vignetting_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Vignetting_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Vignetting_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Vignetting_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, radius As Double,
-                                      centerX As Double, centerY As Double, removeal As Boolean) As IntPtr
-    End Function
-End Module

@@ -21,27 +21,6 @@ End Class
 
 
 
-
-
-Module SuperPixel_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function SuperPixel_Open(width As Integer, height As Integer, num_superpixels As Integer, num_levels As Integer, prior As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function SuperPixel_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function SuperPixel_GetLabels(spPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function SuperPixel_Run(spPtr As IntPtr, bgrPtr As IntPtr) As IntPtr
-    End Function
-End Module
-
-
-
-
-
 Public Class SuperPixel_Basics_CPP : Inherits VB_Algorithm
     Public wireGrid As cv.Mat
     Public gridColor = cv.Scalar.White

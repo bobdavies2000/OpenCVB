@@ -139,26 +139,6 @@ End Class
 
 
 
-
-
-
-
-Module KMeans_MultiGaussian_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function KMeans_MultiGaussian_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function KMeans_MultiGaussian_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function KMeans_MultiGaussian_RunCPP(cPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
-    End Function
-End Module
-
-
-
-
-
 ' http://man.hubwiz.com/docset/OpenCV.docset/Contents/Resources/Documents/d9/dde/samples_2cpp_2kmeans_8cpp-example.html
 Public Class KMeans_MultiGaussian_CPP : Inherits VB_Algorithm
     Public Sub New()
@@ -208,26 +188,6 @@ Public Class KMeans_CustomData : Inherits VB_Algorithm
         dst2 = vbPalette(km.dst2 * 255 / km.classCount)
     End Sub
 End Class
-
-
-
-
-
-
-
-
-
-Module Kmeans_Simple_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Kmeans_Simple_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Kmeans_Simple_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Kmeans_Simple_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, minVal As Single, maxVal As Single) As IntPtr
-    End Function
-End Module
 
 
 

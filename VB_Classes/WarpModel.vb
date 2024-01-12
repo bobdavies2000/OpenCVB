@@ -177,25 +177,3 @@ Public Class WarpModel_Input : Inherits VB_Algorithm
         dst3(r(0)) = merged
     End Sub
 End Class
-
-
-
-
-Module WarpModel_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function WarpModel_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function WarpModel_Close(WarpModelPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function WarpModel_Run(WarpModelPtr As IntPtr, src1Ptr As IntPtr, src2Ptr As IntPtr, rows As Integer, cols As Integer, channels As Integer, warpMode As Integer) As IntPtr
-    End Function
-End Module
-
-
-
-
-
-
-

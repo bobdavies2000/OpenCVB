@@ -71,46 +71,6 @@ End Class
 
 
 
-
-Module EdgeDraw_Basics_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Basics_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Basics_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Basics_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
-    End Function
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Edges_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Edges_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
-    End Function
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Lines_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Lines_Count(cPtr As IntPtr) As Integer
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Lines_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeDraw_Lines_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
-    End Function
-End Module
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 'Public Class EdgeDraw_LineData : Inherits VB_Algorithm
 '    Dim edgeD As New EdgeDraw
 '    Dim knn As New KNN_Basics
