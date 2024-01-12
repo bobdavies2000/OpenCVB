@@ -47,13 +47,14 @@ Public Class Hist3D_BuildHistogram : Inherits VB_Algorithm
     Public histArray() As Single
     Public Sub New()
         advice = "redOptions '3D Histogram Bins'" + vbCrLf
-        desc = "Build a simulated (guided) 3D histogram from the 3D histogram supplied in src."
+        desc = "Build a guided 3D histogram from the 3D histogram supplied in src."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC1 Then
-            Static plot1D As New Hist3Dcloud_PlotHist1D
-            plot1D.Run(src)
-            src = plot1D.histogram
+        If standalone Then
+            gOptions.HistBinSlider.Value = 100
+            Static plot As New Histogram_Depth
+            plot.Run(src)
+            src = plot.histogram
         End If
 
         ReDim histArray(src.Total - 1)

@@ -200,9 +200,9 @@ End Class
 Public Class Hist3Dcloud_PlotHist1D : Inherits VB_Algorithm
     Dim hcloud As New Hist3Dcloud_Basics
     Dim plot As New Plot_Histogram
-    Dim simK As New Hist3D_BuildHistogram
     Public histogram As cv.Mat
     Public histArray() As Single
+    Dim simK As New Hist3D_BuildHistogram
     Public Sub New()
         plot.removeZeroEntry = False
         labels(2) = "The 3D histogram of the pointcloud data stream - note the number of gaps"

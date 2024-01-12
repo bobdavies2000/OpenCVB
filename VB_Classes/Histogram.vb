@@ -1151,6 +1151,7 @@ Public Class Histogram_Depth : Inherits VB_Algorithm
     Public rc As rcData
     Public gbp As New gbpData
     Public mm As mmData
+    Public histogram As New cv.Mat
     Public Sub New()
         desc = "Show depth data as a histogram."
     End Sub
@@ -1167,10 +1168,11 @@ Public Class Histogram_Depth : Inherits VB_Algorithm
             plot.maxRange = mm.maxVal
         End If
 
-        cv.Cv2.CalcHist({src}, {0}, New cv.Mat, plot.histogram, 1, {task.histogramBins},
+        cv.Cv2.CalcHist({src}, {0}, New cv.Mat, histogram, 1, {task.histogramBins},
                         {New cv.Rangef(plot.minRange, plot.maxRange)})
         ' plot.histogram.Row(0).Set(Of Single)(0, 0, 0)
 
+        plot.histogram = histogram
         plot.Run(plot.histogram)
         dst2 = plot.dst2
 

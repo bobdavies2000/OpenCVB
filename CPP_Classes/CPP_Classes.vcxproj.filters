@@ -2,9 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Dither.cpp" />
-    <ClCompile Include="Harris.cpp" />
     <ClCompile Include="Histogram.cpp" />
-    <ClCompile Include="Hist3D.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="Jacobian.cpp" />
     <ClCompile Include="KMeans.cpp" />
@@ -39,7 +37,6 @@
     <ClInclude Include="CPP_Externs.h" />
     <ClInclude Include="CPP_Functions.h" />
     <ClInclude Include="CPP_Task.h" />
-    <ClInclude Include="harrisDetector.h" />
     <ClInclude Include="CPP_IncludeOnly.h" />
     <ClInclude Include="OpenCVB_Extern.h" />
     <ClInclude Include="ParticleFilter.h" />
