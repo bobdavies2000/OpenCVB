@@ -107,7 +107,7 @@ Public Class VB_to_CPP
             If functionName <> "" Then
                 If Trim(split(i)).StartsWith(functionName) Then
                     split(i) = split(i).Replace(functionName + "()", "CPP_" + functionName +
-                                                "(int rows, int cols) : algorithmCPP(rows, cols) ") + vbCrLf
+                                                "() : algorithmCPP() ") + vbCrLf
                     split(i) += vbTab + "traceName = """ + "CPP_" + functionName + """;"
                     For Each con In constructorAdds
                         split(i) += vbCrLf + con
@@ -123,7 +123,7 @@ Public Class VB_to_CPP
                         split(i) = split(i).Replace(tokens(0), "CPP_" + tokens(0) + "*")
                         tokens(1) = tokens(1).Replace(";", "")
                         objectNames.Add(tokens(1))
-                        constructorAdds.Add(vbTab + tokens(1) + " = new CPP_" + tokens(0) + "(rows, cols);")
+                        constructorAdds.Add(vbTab + tokens(1) + " = new CPP_" + tokens(0) + "();")
                         Exit For
                     End If
                 Next
@@ -153,6 +153,8 @@ Public Class VB_to_CPP
             split(i) = split(i).Replace("cv::", "")
             split(i) = split(i).Replace("std::", "")
             split(i) = split(i).Replace("const Mat& src", "Mat src")
+            split(i) = split(i).Replace("Mat& src", "Mat src")
+            split(i) = split(i).Replace("RunVB", "Run")
             split(i) = split(i).Replace("CPP_CPP_", "CPP_")
 
             CPPrtb.Text += split(i) + vbCrLf
@@ -174,9 +176,9 @@ Public Class VB_to_CPP
         Dim sw = New StreamWriter(input.FullName)
         For Each line In externs
             sw.WriteLine(line)
-            If line.Contains("new CPP_AddWeighted_Basics(rows, cols); break; }") Then
+            If line.Contains("new CPP_AddWeighted_Basics(); break; }") Then
                 sw.WriteLine(vbTab + "case " + "_" + functionName + " :")
-                sw.WriteLine(vbTab + "{task->alg = new " + functionName + "(rows, cols); break; }")
+                sw.WriteLine(vbTab + "{task->alg = new " + functionName + "(); break; }")
             End If
         Next
         sw.Close()

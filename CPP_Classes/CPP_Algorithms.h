@@ -1,4 +1,3 @@
-#pragma once
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>

@@ -1,4 +1,4 @@
 #pragma once
-#include "CPP_IncludeOnly.h"
+#include "CPP_AI_Generated.h"
 #include "CPP_Externs.h"
 #include "PragmaLibs.h"

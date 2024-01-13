@@ -169,14 +169,12 @@ public:
 #define GRAY Scalar(127, 127, 127)
 vector<Scalar> highlightColors = { YELLOW, WHITE, BLUE, GRAY, RED, GREEN };
 
-vector<string> mapNames = { "Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
-                            "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter" };
-
 #include "CPP_Functions.h"
+
+Size workingRes;
 
 class algorithmCPP
 {
-private:
 public:
     Mat dst0, dst1, dst2, dst3, empty;
     bool standalone;
@@ -184,18 +182,16 @@ public:
     String desc;
     int* cPtr;
     string traceName;
-    Vec3b black = Vec3b(0, 0, 0);
     vector<string> labels{ "", "", "", "" };
-    algorithmCPP() {}
-    algorithmCPP(int rows, int cols)
+    algorithmCPP()
     {
-        dst0 = Mat(rows, cols, CV_8UC3);
+        dst0 = Mat(workingRes.height, workingRes.width, CV_8UC3);
         dst0.setTo(0);
-        dst1 = Mat(rows, cols, CV_8UC3);
+        dst1 = Mat(dst0.size(), CV_8UC3);
         dst1.setTo(0);
-        dst2 = Mat(rows, cols, CV_8UC3);
+        dst2 = Mat(dst0.size(), CV_8UC3);
         dst2.setTo(0);
-        dst3 = Mat(rows, cols, CV_8UC3);
+        dst3 = Mat(dst0.size(), CV_8UC3);
         dst3.setTo(0);
     };
 
@@ -224,7 +220,7 @@ public:
     bool motionReset; rcData rcSelect; segCell cellSelect; int desiredCells;
 
     bool heartBeat; bool debugCheckBox; Size minRes; int PCReduction;
-    bool optionsChanged; double addWeighted; int dotSize; int gridSize; float maxZmeters;
+    bool optionsChanged; double AddWeighted; int dotSize; int gridSize; float maxZmeters;
     int histogramBins; int pixelDiffThreshold; bool gravityPointCloud; bool useKalman;
     int paletteIndex; int polyCount; bool firstPass; Scalar highlightColor; int frameHistoryCount;
     Point clickPoint; bool mouseClickFlag; int mousePicTag; Point mouseMovePoint; bool mouseMovePointUpdated;
@@ -237,8 +233,10 @@ public:
     Mat gMatrix; vector<Mat> pcSplit;
     bool paused = false;
     Mat xdst0, xdst1, xdst2, xdst3;
+    Size workingRes;
     cppTask(int rows, int cols)
     {
+        workingRes = Size(rows, cols);
         cppFunction = -1;
         firstPass = true;
 
