@@ -2,6 +2,7 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
+_CPP_Mesh_Basics
 _CPP_RedMin_Basics
 _CPP_RedMin_Core
 _CPP_Palette_Basics
@@ -311,6 +312,7 @@ if algorithmName = "CPP_KNN_Basics" Then return new CPP_Basics(functionNames._CP
 if algorithmName = "CPP_KNN_Lossy" Then return new CPP_Basics(functionNames._CPP_KNN_Lossy)
 if algorithmName = "CPP_Line_Basics" Then return new CPP_Basics(functionNames._CPP_Line_Basics)
 if algorithmName = "CPP_Mat_4to1" Then return new CPP_Basics(functionNames._CPP_Mat_4to1)
+if algorithmName = "CPP_Mesh_Basics" Then return new CPP_Basics(functionNames._CPP_Mesh_Basics)
 if algorithmName = "CPP_Motion_Basics" Then return new CPP_Basics(functionNames._CPP_Motion_Basics)
 if algorithmName = "CPP_Motion_Core" Then return new CPP_Basics(functionNames._CPP_Motion_Core)
 if algorithmName = "CPP_Palette_Basics" Then return new CPP_Basics(functionNames._CPP_Palette_Basics)
@@ -1009,6 +1011,7 @@ if algorithmName = "MatrixInverse_OpenCV" Then return new MatrixInverse_OpenCV
 if algorithmName = "MeanShift_Basics" Then return new MeanShift_Basics
 if algorithmName = "MeanShift_Depth" Then return new MeanShift_Depth
 if algorithmName = "MeanSubtraction_Basics" Then return new MeanSubtraction_Basics
+if algorithmName = "Mesh_Agast" Then return new Mesh_Agast
 if algorithmName = "Mesh_Basics" Then return new Mesh_Basics
 if algorithmName = "Mesh_Features" Then return new Mesh_Features
 if algorithmName = "MFI_Basics" Then return new MFI_Basics

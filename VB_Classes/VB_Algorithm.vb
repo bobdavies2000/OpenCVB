@@ -122,7 +122,7 @@ Public Class VB_Algorithm : Implements IDisposable
         If task.testAllRunning = False Then measureStartRun(traceName)
 
         trueData.Clear()
-        algorithm.RunVB(src)
+        If task.paused = False Then algorithm.RunVB(src)
         firstPass = False
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub

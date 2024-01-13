@@ -113,10 +113,11 @@ End Class
 
 
 
+
 Public Class Feature_Agast : Inherits VB_Algorithm
     Dim ptCount(1) As Integer
     Public featurePoints As New List(Of cv.Point2f)
-    Public stablePoints As New List(Of cv.Point)
+    Public stablePoints As New List(Of cv.Point2f)
     Public Sub New()
         cPtr = Agast_Open()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -133,36 +134,31 @@ Public Class Feature_Agast : Inherits VB_Algorithm
         handleCount.Free()
 
         Dim ptMat = New cv.Mat(ptCount(0), 7, cv.MatType.CV_32F, imagePtr).Clone
-        dst2 = src.Clone
         featurePoints.Clear()
-        Dim points As New List(Of cv.Point)
         For i = 0 To ptMat.Rows - 1
-            Dim pt = New cv.Point2f(ptMat.Get(Of Single)(i, 0), ptMat.Get(Of Single)(i, 1))
+            Dim pt = New cv.Point2f(CInt(ptMat.Get(Of Single)(i, 0)), CInt(ptMat.Get(Of Single)(i, 1)))
             featurePoints.Add(pt)
-            dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
-            points.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
         Next
 
-        Static lastDst3 As New cv.Mat(dst3.Size, cv.MatType.CV_8U, 255)
-        dst3.SetTo(0)
+        If heartBeat() Then labels(2) = "Found " + CStr(featurePoints.Count) + " features"
+        If heartBeat() Then labels(3) = "Found " + CStr(stablePoints.Count) + " stable features"
+
+        Static lastPoints As New List(Of cv.Point2f)(featurePoints)
+        If heartBeat() Then lastPoints = New List(Of cv.Point2f)(featurePoints)
         stablePoints.Clear()
-        For Each pt In points
-            If lastDst3.Get(Of Byte)(pt.Y, pt.X) Then
+        dst2 = src
+        For Each pt In featurePoints
+            If lastPoints.Contains(pt) Then
                 stablePoints.Add(pt)
-                dst3.Circle(pt, task.dotSize, 255, -1, task.lineType)
+                dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
             End If
         Next
-        lastDst3 = dst3.Clone
-        labels(2) = "Found " + CStr(featurePoints.Count) + " features"
-        labels(3) = "Found " + CStr(stablePoints.Count) + " stable features"
+        lastPoints = New List(Of cv.Point2f)(stablePoints)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
     End Sub
 End Class
-
-
-
 
 
 

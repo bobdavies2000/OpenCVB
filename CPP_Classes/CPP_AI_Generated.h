@@ -84,7 +84,7 @@ public:
 
     CPP_Random_Basics() : algorithmCPP() {
         traceName = "CPP_Random_Basics";
-        range = Rect(0, 0, dst2.cols, dst2.rows);
+        range = Rect(0, 0, dst2.rows, dst2.cols);
         desc = "Create a uniform random mask with a specified number of pixels.";
     }
 
@@ -2738,3 +2738,45 @@ public:
     }
 };
 
+
+
+
+
+class CPP_Mesh_Basics : public algorithmCPP {
+public:
+    CPP_Random_Basics* random;
+    CPP_KNN_Basics* knn;
+    CPP_Mesh_Basics() : algorithmCPP() {
+        traceName = "CPP_Mesh_Basics";
+        random = new CPP_Random_Basics();
+        knn = new CPP_KNN_Basics();
+        labels[2] = "Triangles built with each random point and its 2 nearest neighbors.";
+        advice = "Adjust the number of points with the options_random";
+        desc = "Build triangles from random points";
+    }
+    Mat showMesh(const vector<Point2f>& pointList) {
+        knn->queries = pointList;
+        knn->trainInput = knn->queries;
+        knn->Run(empty);
+
+        dst2.setTo(0);
+        for (int i = 0; i < knn->queries.size(); i++) {
+            Point2f p0 = knn->queries[i];
+            Point2f p1 = knn->queries[knn->result.at<int>(i, 1)];
+            Point2f p2 = knn->queries[knn->result.at<int>(i, 2)];
+            line(dst2, p0, p1, Scalar(255, 255, 255), task->lineWidth, task->lineType);
+            line(dst2, p0, p2, Scalar(255, 255, 255), task->lineWidth, task->lineType);
+            line(dst2, p1, p2, Scalar(255, 255, 255), task->lineWidth, task->lineType);
+        }
+        for (int i = 0; i < knn->queries.size(); i++) {
+            circle(dst2, knn->queries[i], task->dotSize + 2, Scalar(0, 0, 255), -1, task->lineType);
+        }
+        return dst2;
+    }
+    void Run(Mat src) {
+        if (task->heartBeat) {
+            random->Run(empty);
+            showMesh(random->pointList);
+        }
+    }
+};

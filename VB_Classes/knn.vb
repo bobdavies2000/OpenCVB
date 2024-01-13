@@ -8,7 +8,6 @@ Public Class KNN_Basics : Inherits VB_Algorithm
     Public neighbors As new List(Of List(Of Integer))
     Public result(,) As Integer ' Get results here...
     Public desiredMatches As Integer = -1 ' -1 indicates it is to use the number of queries.
-    Dim random As New Random_Basics
     Public Sub New()
         knn = cv.ML.KNearest.Create()
         labels(2) = "Red=TrainingData, yellow = queries"
@@ -34,6 +33,7 @@ Public Class KNN_Basics : Inherits VB_Algorithm
         Dim KNNdimension = 2
 
         If standalone Then
+            Static random As New Random_Basics
             If heartBeat() Then
                 random.Run(empty)
                 trainInput = New List(Of cv.Point2f)(random.pointList)
