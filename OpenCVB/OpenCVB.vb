@@ -1189,6 +1189,7 @@ Public Class OpenCVB
             mbuf(i).pointCloud = New cv.Mat(settings.workingRes, cv.MatType.CV_32FC3)
         Next
 
+        Dim myFrameCount As Integer
         While 1
             If restartCameraRequest Or settings.workingRes <> saveWorkingRes Then
                 restartCameraRequest = False
@@ -1211,21 +1212,24 @@ Public Class OpenCVB
             If camera Is Nothing Then Continue While ' transition from one camera to another.  Problem showed up once.
             camera.GetNextFrame(settings.workingRes)
 
-            SyncLock cameraLock
-                mbuf(mbIndex) = camera.mbuf(camera.mbIndex)
-                camera.mbindex += 1
-                If camera.mbindex >= mbuf.Count Then camera.mbindex = 0
+            ' The first few frames from the camera are junk.  Skip them.
+            myFrameCount += 1
+            If myFrameCount > 10 Then
+                SyncLock cameraLock
+                    mbuf(mbIndex) = camera.mbuf(camera.mbIndex)
+                    camera.mbindex += 1
+                    If camera.mbindex >= mbuf.Count Then camera.mbindex = 0
 
-                Try
-                    If camera.mbuf(mbIndex).color.width > 0 Then
-                        paintNewImages = True ' trigger the paint 
-                        newCameraImages = True
-                    End If
-                Catch ex As Exception
-                    Console.WriteLine(ex.Message + " in CameraTask - very unusual but recoverable.  Switching buffers.")
-                End Try
-            End SyncLock
-
+                    Try
+                        If camera.mbuf(mbIndex).color.width > 0 Then
+                            paintNewImages = True ' trigger the paint 
+                            newCameraImages = True
+                        End If
+                    Catch ex As Exception
+                        Console.WriteLine(ex.Message + " in CameraTask - very unusual but recoverable.  Switching buffers.")
+                    End Try
+                End SyncLock
+            End If
             If cameraTaskHandle Is Nothing Then
                 camera.stopCamera()
                 Exit Sub

@@ -140,11 +140,8 @@ Public Class Feature_Agast : Inherits VB_Algorithm
             featurePoints.Add(pt)
         Next
 
-        If heartBeat() Then labels(2) = "Found " + CStr(featurePoints.Count) + " features"
-        If heartBeat() Then labels(3) = "Found " + CStr(stablePoints.Count) + " stable features"
-
-        Static lastPoints As New List(Of cv.Point2f)(featurePoints)
-        If heartBeat() Then lastPoints = New List(Of cv.Point2f)(featurePoints)
+        Static lastPoints As New List(Of cv.Point2f)
+        If heartBeat() Or lastPoints.Count < 10 Then lastPoints = New List(Of cv.Point2f)(featurePoints)
         stablePoints.Clear()
         dst2 = src
         For Each pt In featurePoints
@@ -154,6 +151,9 @@ Public Class Feature_Agast : Inherits VB_Algorithm
             End If
         Next
         lastPoints = New List(Of cv.Point2f)(stablePoints)
+        If task.midHeartBeat Then
+            labels(2) = CStr(featurePoints.Count) + " features found and " + CStr(stablePoints.Count) + " of them were stable"
+        End If
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Agast_Close(cPtr)

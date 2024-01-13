@@ -219,7 +219,7 @@ public:
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
     bool motionReset; rcData rcSelect; segCell cellSelect; int desiredCells;
 
-    bool heartBeat; bool debugCheckBox; Size minRes; int PCReduction;
+    bool heartBeat; bool midHeartBeat; bool quarterBeat; bool debugCheckBox; Size minRes; int PCReduction;
     bool optionsChanged; double AddWeighted; int dotSize; int gridSize; float maxZmeters;
     int histogramBins; int pixelDiffThreshold; bool gravityPointCloud; bool useKalman;
     int paletteIndex; int polyCount; bool firstPass; Scalar highlightColor; int frameHistoryCount;

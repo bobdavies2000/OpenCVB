@@ -75,5 +75,6 @@ Public Class Mesh_Agast : Inherits VB_Algorithm
         If agast.stablePoints.Count < 3 Then Exit Sub
         mesh.dst2 = src
         dst2 = mesh.showMesh(agast.stablePoints)
+        labels(3) = agast.labels(2)
     End Sub
 End Class

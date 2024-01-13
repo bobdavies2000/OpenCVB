@@ -109,37 +109,6 @@ public:
 
 
 
-
-
-class CPP_Feature_Agast : public algorithmCPP
-{
-private:
-public:
-    vector<KeyPoint> featurePoints;
-    CPP_Feature_Agast() : algorithmCPP()
-    {
-        traceName = "CPP_Feature_Agast";
-        desc = "Use the Agast Feature Detector in the OpenCV Contrib.";
-    }
-    void Run(Mat src) {
-        featurePoints.clear();
-        static Ptr<AgastFeatureDetector> agastFD = AgastFeatureDetector::create(10, true, AgastFeatureDetector::OAST_9_16);
-        agastFD->detect(src, featurePoints);
-        dst2 = src;
-        for (size_t i = 0; i < featurePoints.size(); i++)
-        {
-            circle(dst2, featurePoints[i].pt, task->dotSize, RED, -1, task->lineType);
-        }
-        labels[2] = "Found " + to_string(featurePoints.size()) + " features";
-    }
-};
-
-
-
-
-
-
-
 class CPP_Resize_Basics : public algorithmCPP {
 public:
     Size newSize;
@@ -2759,7 +2728,6 @@ public:
         knn->trainInput = knn->queries;
         knn->Run(empty);
 
-        dst2.setTo(0);
         for (int i = 0; i < knn->queries.size(); i++) {
             Point2f p0 = knn->queries[i];
             Point2f p1 = knn->queries[knn->result.at<int>(i, 1)];
@@ -2780,3 +2748,84 @@ public:
         }
     }
 };
+
+
+
+
+
+
+
+
+
+class CPP_Feature_Agast : public algorithmCPP
+{
+private:
+public:
+    vector<KeyPoint> featurePoints;
+    vector<Point2f> stablePoints;
+    CPP_Feature_Agast() : algorithmCPP()
+    {
+        traceName = "CPP_Feature_Agast";
+        desc = "Use the Agast Feature Detector in the OpenCV Contrib.";
+    }
+    void Run(Mat src) {
+        featurePoints.clear();
+        static Ptr<AgastFeatureDetector> agastFD = AgastFeatureDetector::create(10, true, AgastFeatureDetector::OAST_9_16);
+        agastFD->detect(src, featurePoints);
+        static std::vector<cv::Point2f> lastPoints;
+        if (task->heartBeat || lastPoints.size() < 10) {
+            lastPoints.clear();
+            for (const KeyPoint& pt : featurePoints) {
+                lastPoints.push_back(pt.pt);
+            }
+        }
+
+        stablePoints.clear();
+        dst2 = src; 
+        for (const KeyPoint& pt : featurePoints) {
+            auto p1 = Point2f(round(pt.pt.x), round(pt.pt.y));
+            if (find(lastPoints.begin(), lastPoints.end(), p1) != lastPoints.end()) {
+                stablePoints.push_back(p1);
+                circle(dst2, p1, task->dotSize, Scalar(0, 0, 255), -1, task->lineType);
+            }
+        }
+
+        lastPoints = stablePoints;
+        if (task->midHeartBeat) {
+            labels[2] = std::to_string(featurePoints.size()) + " features found and " + std::to_string(stablePoints.size()) + " of them were stable";
+        }
+
+        labels[2] = "Found " + to_string(featurePoints.size()) + " features";
+    }
+};
+
+
+
+
+
+
+
+
+class CPP_Mesh_Agast : public algorithmCPP {
+public:
+    CPP_Feature_Agast* agast;
+    CPP_Mesh_Basics* mesh;
+    CPP_Mesh_Agast() : algorithmCPP() {
+        traceName = "CPP_Mesh_Agast";
+        agast = new CPP_Feature_Agast();
+        mesh = new CPP_Mesh_Basics();
+        labels[2] = "Triangles built with each feature point and its 2 nearest neighbors.";
+        advice = "Use Options_Features to update results.";
+        desc = "Build triangles from Agast points";
+    }
+    void Run(Mat src) {
+        agast->Run(src);
+        if (agast->stablePoints.size() < 3) {
+            return;
+        }
+        mesh->dst2 = src;
+        dst2 = mesh->showMesh(agast->stablePoints);
+        labels[3] = agast->labels[2];
+    }
+};
+

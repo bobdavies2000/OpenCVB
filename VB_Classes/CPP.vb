@@ -52,7 +52,8 @@ Public Class CPP_Basics : Inherits VB_Algorithm
                                task.maxZmeters, redOptions.PCReduction, task.cvFontSize, task.cvFontThickness,
                                task.clickPoint.X, task.clickPoint.Y, task.mouseClickFlag,
                                task.mousePicTag, task.mouseMovePoint.X, task.mouseMovePoint.Y,
-                               task.paletteIndex, redOptions.DesiredCellSlider.Value)
+                               task.paletteIndex, redOptions.DesiredCellSlider.Value, task.midHeartBeat,
+                               task.quarterBeat)
 
         Dim pointCloudData(task.pointCloud.Total * task.pointCloud.ElemSize - 1) As Byte
         Marshal.Copy(task.pointCloud.Data, pointCloudData, 0, pointCloudData.Length)

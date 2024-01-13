@@ -163,7 +163,7 @@ Module CPP_Externs
                                       fontThickness As Integer, clickX As Integer,
                                       clickY As Integer, clickFlag As Boolean, picTag As Integer,
                                       moveX As Integer, moveY As Integer, paletteIndex As Integer,
-                                      desiredCells As Integer)
+                                      desiredCells As Integer, midHeartBeat As Boolean, quarterBeat As Boolean)
     End Sub
 
 

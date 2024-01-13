@@ -3845,7 +3845,7 @@ Public Class Options_Features : Inherits VB_Algorithm
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Distance threshold (pixels)", 1, 30, 16)
-            sliders.setupTrackBar("Min Distance to next", 1, 100, 15)
+            sliders.setupTrackBar("Min Distance to next", 1, 100, 10)
             sliders.setupTrackBar("Quality Level", 1, 100, 1)
             sliders.setupTrackBar("Minimum Arc-Y threshold angle (degrees)", 70, 90, 80)
         End If

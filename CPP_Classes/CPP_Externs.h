@@ -34,6 +34,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case _CPP_AddWeighted_Basics :
     {task->alg = new CPP_AddWeighted_Basics(); break; }
+	case _CPP_Mesh_Agast:
+	{task->alg = new CPP_Mesh_Agast(); break; }
 	case _CPP_Mesh_Basics :
 	{task->alg = new CPP_Mesh_Basics(); break; }
 	case _CPP_RedMin_Basics :
@@ -210,7 +212,7 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
                             int lineWidth, int lineType, int dotSize, int minResWidth, int minResHeight,
                             float maxZmeters, int PCReduction, float fontSize, int fontThickness,
                             int clickX, int clickY, bool clickFlag, int picTag, int moveX, int moveY,
-                            int paletteIndex, int desiredCells)
+                            int paletteIndex, int desiredCells, bool midHeartBeat, bool quarterBeat)
 {
     task->pixelDiffThreshold = pixelDiffThreshold;
     task->gridSize = gridSize;
@@ -235,6 +237,8 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
     task->mousePicTag = picTag;
     task->paletteIndex = paletteIndex;
     task->desiredCells = desiredCells;
+    task->midHeartBeat = midHeartBeat;
+    task->quarterBeat = quarterBeat;
 }
 
 
