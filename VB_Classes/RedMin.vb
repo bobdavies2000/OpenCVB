@@ -368,20 +368,19 @@ End Class
 
 Public Class RedMin_FindPixels_CPP : Inherits VB_Algorithm
     Public Sub New()
-        task.drawRect = New cv.Rect(100, 100, 80, 60)
         cPtr = RedMin_FindPixels_Open()
         advice = ""
         desc = "Create the list of pixels in a RedMin Cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        ' src = src(task.drawRect)
+        If task.drawRect <> New cv.Rect Then src = src(task.drawRect)
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim classCount = RedMin_FindPixels_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()
 
-        If classCount = 0 Then Exit Sub
+        If classCount = 0 Or FloodCell_Sizes(cPtr) = 0 Then Exit Sub
         Dim pixelData = New cv.Mat(classCount, 1, cv.MatType.CV_8UC3, FloodCell_Sizes(cPtr))
         setTrueText(CStr(classCount) + " unique BGR pixels were found in the src." + vbCrLf +
                     "Or " + Format(classCount / src.Total, "0%") + " of the input.")

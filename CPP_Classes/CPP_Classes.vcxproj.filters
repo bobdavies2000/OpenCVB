@@ -3,26 +3,13 @@
   <ItemGroup>
     <ClCompile Include="Dither.cpp" />
     <ClCompile Include="ParticleFilter.cpp" />
-    <ClCompile Include="PCA_Prep.cpp" />
-    <ClCompile Include="Plot_OpenCV.cpp" />
-    <ClCompile Include="Random_PatternGenerator.cpp" />
     <ClCompile Include="recursiveBilateralFilter.cpp" />
-    <ClCompile Include="RedCloud.cpp" />
-    <ClCompile Include="RedMin.cpp" />
     <ClCompile Include="Retina.cpp" />
     <ClCompile Include="Salience.cpp" />
     <ClCompile Include="SemiGlobalMatching.cpp" />
-    <ClCompile Include="Stabilizer.cpp" />
-    <ClCompile Include="SuperPixels.cpp" />
-    <ClCompile Include="Trace.cpp" />
-    <ClCompile Include="Tracker.cpp" />
-    <ClCompile Include="videostab.cpp" />
-    <ClCompile Include="Vignetting.cpp" />
     <ClCompile Include="Voronoi.cpp" />
-    <ClCompile Include="WarpModel.cpp" />
-    <ClCompile Include="WhiteBalance.cpp" />
-    <ClCompile Include="xPhoto.cpp" />
     <ClCompile Include="CPP_IncludeOnly.cpp" />
+    <ClCompile Include="Tracker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPP_Externs.h" />
@@ -30,11 +17,7 @@
     <ClInclude Include="CPP_Task.h" />
     <ClInclude Include="CPP_IncludeOnly.h" />
     <ClInclude Include="ParticleFilter.h" />
-    <ClInclude Include="PointCloudConvert.h" />
     <ClInclude Include="PragmaLibs.h" />
-    <ClInclude Include="rbf.hpp" />
-    <ClInclude Include="SemiGlobalMatching.h" />
-    <ClInclude Include="videostab.h" />
     <ClInclude Include="CPP_Algorithms.h" />
   </ItemGroup>
 </Project>

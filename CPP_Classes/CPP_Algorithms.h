@@ -13,10 +13,44 @@
 #include <map>
 #include <opencv2/ml.hpp>
 #include "harrisDetector.h"
+#include <opencv2/plot.hpp>
+#include "opencv2/ccalib/randpattern.hpp"
+#include "opencv2/xphoto/oilpainting.hpp"
 
 using namespace std;
 using namespace  cv;
 using namespace bgsegm;
+
+#ifndef VIDEOSTAB_H
+#define VIDEOSTAB_H
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
+
+using namespace  cv;
+
+class VideoStab
+{
+public:
+	VideoStab();
+	Mat errScale, qScale, rScale, sScale, sumScale;
+	Mat lastFrame;
+	Mat gray;
+	int k;
+
+	const int HORIZONTAL_BORDER_CROP = 30;
+
+	Mat affine;
+	Mat smoothedMat;
+	Mat smoothedFrame;
+
+	Mat stabilize(Mat rgb);
+	void Kalman_Filter();
+};
+
+#endif // VIDEOSTAB_H
+
+
 
 class FloodCell
 {
@@ -2464,4 +2498,860 @@ int Neighbor_Map_RunCPP(Neighbor_Map * cPtr, int* dataPtr, int rows, int cols)
 	cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
 	cPtr->RunCPP();
 	return (int)cPtr->nabList.size();
+}
+
+
+
+
+
+class PCA_Prep
+{
+private:
+public:
+	vector<Point3f>pcaList;
+	Mat src;
+	PCA_Prep() {}
+	void Run() {
+		pcaList.clear();
+		for (int y = 0; y < src.rows; y++)
+		{
+			for (int x = 0; x < src.cols; x++)
+			{
+				auto vec = src.at<Point3f>(y, x);
+				if (vec.z > 0) pcaList.push_back(vec);
+			}
+		}
+	}
+};
+
+extern "C" __declspec(dllexport) PCA_Prep * PCA_Prep_Open() { PCA_Prep* cPtr = new PCA_Prep(); return cPtr; }
+extern "C" __declspec(dllexport) int* PCA_Prep_Close(PCA_Prep * cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int PCA_Prep_GetCount(PCA_Prep * cPtr) { return int(cPtr->pcaList.size()); }
+extern "C" __declspec(dllexport) int* PCA_Prep_Run(PCA_Prep * cPtr, int* pointCloudData, int rows, int cols)
+{
+	cPtr->src = Mat(rows, cols, CV_32FC3, pointCloudData);
+	cPtr->Run();
+	return (int*)cPtr->pcaList.data();
+}
+
+
+
+
+
+
+
+class PlotOpenCV
+{
+private:
+public:
+	Mat src, srcX, srcY, dst;
+	vector<Point>floodPoints;
+
+	PlotOpenCV() {}
+	void RunCPP() {
+		Mat result;
+		Ptr<plot::Plot2d> plot = plot::Plot2d::create(srcX, srcY);
+		plot->setInvertOrientation(true);
+		plot->setShowText(false);
+		plot->setShowGrid(false);
+		plot->setPlotBackgroundColor(Scalar(255, 200, 200));
+		plot->setPlotLineColor(Scalar(255, 0, 0));
+		plot->setPlotLineWidth(2);
+		plot->render(result);
+		resize(result, dst, dst.size());
+	}
+};
+
+extern "C" __declspec(dllexport) PlotOpenCV * PlotOpenCV_Open() { PlotOpenCV* cPtr = new PlotOpenCV(); return cPtr; }
+extern "C" __declspec(dllexport) void PlotOpenCV_Close(PlotOpenCV * cPtr) { delete cPtr; }
+
+// https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
+extern "C" __declspec(dllexport)
+int* PlotOpenCV_Run(PlotOpenCV * cPtr, double* inX, double* inY, int len, int rows, int cols)
+{
+	cPtr->dst.setTo(0);
+	cPtr->srcX = Mat(1, len, CV_64F, inX);
+	cPtr->srcY = Mat(1, len, CV_64F, inY);
+	cPtr->dst = Mat(rows, cols, CV_8UC3);
+	cPtr->RunCPP();
+	return (int*)cPtr->dst.data;
+}
+
+
+
+
+
+
+class Random_PatternGenerator
+{
+private:
+public:
+	Mat pattern;
+	Random_PatternGenerator() {}
+	void Run() {}
+};
+
+extern "C" __declspec(dllexport)
+Random_PatternGenerator * Random_PatternGenerator_Open() {
+	Random_PatternGenerator* Random_PatternGeneratorPtr = new Random_PatternGenerator();
+	return Random_PatternGeneratorPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* Random_PatternGenerator_Close(Random_PatternGenerator * rPtr)
+{
+	delete rPtr;
+	return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* Random_PatternGenerator_Run(Random_PatternGenerator * rPtr, int rows, int cols)
+{
+	randpattern::RandomPatternGenerator generator(cols, rows);
+	generator.generatePattern();
+	rPtr->pattern = generator.getPattern();
+	return (int*)rPtr->pattern.data;
+}
+
+
+
+
+
+
+
+
+// https://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
+class Random_DiscreteDistribution
+{
+private:
+	std::random_device rd;
+public:
+	Mat discrete;
+	Random_DiscreteDistribution() {}
+	void Run()
+	{
+		std::mt19937 gen(rd());
+		std::map<int, int> m;
+		std::discrete_distribution<> d({ 40, 10, 10, 40 });
+		for (int n = 0; n < 10000; ++n) {
+			++m[d(gen)];
+		}
+		for (auto p : m) {
+			std::cout << p.first << " generated " << p.second << " times\n";
+		}
+	}
+};
+
+extern "C" __declspec(dllexport)
+Random_DiscreteDistribution * Random_DiscreteDistribution_Open() {
+	Random_DiscreteDistribution* cPtr = new Random_DiscreteDistribution();
+	return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* Random_DiscreteDistribution_Close(Random_DiscreteDistribution * cPtr)
+{
+	delete cPtr;
+	return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* Random_DiscreteDistribution_Run(Random_DiscreteDistribution * cPtr, int rows, int cols)
+{
+	cPtr->discrete = Mat(rows, cols, CV_32F, 0);
+	return (int*)cPtr->discrete.data;
+}
+
+
+
+
+
+
+
+
+class RedCloud
+{
+private:
+public:
+	Mat src, mask;
+	vector<Point>floodPoints;
+
+	RedCloud() {}
+	void RunCPP(float sizeThreshold, int maxClassCount) {
+		vector<Point>points;
+		Rect rect;
+
+		multimap<int, int, greater<int>> sizeSorted;
+		int floodFlag = 4 | FLOODFILL_FIXED_RANGE;
+		for (int y = 0; y < src.rows; y++)
+		{
+			for (int x = 0; x < src.cols; x++)
+			{
+				Point pt = Point(x, y);
+				uchar valCurr = src.at<unsigned char>(y, x);
+				if (mask.at<unsigned char>(y, x) == 0)
+				{
+					int count = floodFill(src, mask, pt, valCurr, &rect, 0, 0, floodFlag | (255 << 8));
+					if (count > 1)
+					{
+						points.push_back(pt);
+						sizeSorted.insert(make_pair(count, sizeSorted.size()));
+					}
+				}
+			}
+		}
+
+		floodPoints.clear();
+		float totalCount = 0; float srcTotal = src.rows * src.cols;
+		for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
+		{
+			int index = it->second;
+			floodPoints.push_back(points[index]);
+			totalCount += it->first;
+			if (totalCount / srcTotal > sizeThreshold || floodPoints.size() > maxClassCount)
+				break;
+		}
+	}
+};
+
+extern "C" __declspec(dllexport) RedCloud * RedCloud_Open() { RedCloud* cPtr = new RedCloud(); return cPtr; }
+extern "C" __declspec(dllexport) int* RedCloud_FloodPointList(RedCloud * cPtr) { return (int*)&cPtr->floodPoints[0]; }
+extern "C" __declspec(dllexport) int* RedCloud_Close(RedCloud * cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int RedCloud_Run(RedCloud * cPtr, int* dataPtr, int* maskPtr, int rows, int cols,
+	float sizeThreshold, int maxClassCount)
+{
+	cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
+	cPtr->mask = Mat(rows + 2, cols + 2, CV_8U);
+	cPtr->mask.setTo(0);
+	if (maskPtr)
+	{
+		Rect rect = Rect(1, 1, cPtr->mask.cols - 2, cPtr->mask.rows - 2);
+		Mat mask = Mat(rows, cols, CV_8U, maskPtr);
+		mask.copyTo(cPtr->mask(rect));
+	}
+
+	cPtr->RunCPP(sizeThreshold, maxClassCount);
+	return (int)cPtr->floodPoints.size();
+}
+
+
+
+
+
+
+
+
+class RedCloud_FindCells
+{
+private:
+public:
+	vector <int> cellList;
+	RedCloud_FindCells() {}
+	void RunCPP(Mat src)
+	{
+		cellList.clear();
+		for (int y = 0; y < src.rows; y++)
+		{
+			for (int x = 0; x < src.cols; x++)
+			{
+				auto val = src.at<unsigned char>(y, x);
+				if (val > 0)
+				{
+					if (count(cellList.begin(), cellList.end(), val) == 0)
+						cellList.push_back(val);
+				}
+			}
+		}
+	}
+};
+extern "C" __declspec(dllexport)
+RedCloud_FindCells * RedCloud_FindCells_Open() {
+	RedCloud_FindCells* cPtr = new RedCloud_FindCells();
+	return cPtr;
+}
+extern "C" __declspec(dllexport)
+void RedCloud_FindCells_Close(RedCloud_FindCells * cPtr)
+{
+	delete cPtr;
+}
+extern "C" __declspec(dllexport) int RedCloud_FindCells_TotalCount(RedCloud_FindCells * cPtr) { return int(cPtr->cellList.size()); }
+extern "C" __declspec(dllexport)
+int* RedCloud_FindCells_RunCPP(RedCloud_FindCells * cPtr, int* dataPtr, int rows, int cols)
+{
+	cPtr->RunCPP(Mat(rows, cols, CV_8UC1, dataPtr));
+	return (int*)&cPtr->cellList[0];
+}
+
+
+
+
+
+
+class RedMin_FindPixels
+{
+private:
+public:
+	Mat src, dst;
+	RedMin_FindPixels() {}
+	vector <Vec3b> pixelList;
+	void RunCPP()
+	{
+		pixelList.clear();
+		for (int y = 0; y < src.rows; y++)
+		{
+			for (int x = 0; x < src.cols; x++)
+			{
+				auto val = src.at<Vec3b>(y, x);
+				if (count(pixelList.begin(), pixelList.end(), val) == 0)
+					pixelList.push_back(val);
+			}
+		}
+	}
+};
+extern "C" __declspec(dllexport)
+RedMin_FindPixels * RedMin_FindPixels_Open() {
+	RedMin_FindPixels* cPtr = new RedMin_FindPixels();
+	return cPtr;
+}
+extern "C" __declspec(dllexport)
+void RedMin_FindPixels_Close(RedMin_FindPixels * cPtr)
+{
+	delete cPtr;
+}
+extern "C" __declspec(dllexport) int* RedMin_FindPixels_Pixels(RedMin_FindPixels * cPtr)
+{
+	return (int*)&cPtr->pixelList[0];
+}
+extern "C" __declspec(dllexport)
+int RedMin_FindPixels_RunCPP(RedMin_FindPixels * cPtr, int* dataPtr, int rows, int cols)
+{
+	cPtr->src = Mat(rows, cols, CV_8UC3, dataPtr);
+	cPtr->RunCPP();
+	return (int)cPtr->pixelList.size();
+}
+
+
+
+
+
+class Stabilizer_Basics_CPP
+{
+private:
+public:
+	VideoStab stab;
+	Mat rgb;
+	Mat smoothedFrame;
+	Stabilizer_Basics_CPP()
+	{
+		smoothedFrame = Mat(2, 3, CV_64F);
+	}
+	void Run()
+	{
+		smoothedFrame = stab.stabilize(rgb);
+	}
+};
+
+extern "C" __declspec(dllexport)
+Stabilizer_Basics_CPP * Stabilizer_Basics_Open()
+{
+	Stabilizer_Basics_CPP* cPtr = new Stabilizer_Basics_CPP();
+	return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* Stabilizer_Basics_Close(Stabilizer_Basics_CPP * cPtr)
+{
+	delete cPtr;
+	return (int*)0;
+}
+
+// https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
+extern "C" __declspec(dllexport)
+int* Stabilizer_Basics_Run(Stabilizer_Basics_CPP * cPtr, int* bgrPtr, int rows, int cols)
+{
+	cPtr->rgb = Mat(rows, cols, CV_8UC3, bgrPtr);
+	cvtColor(cPtr->rgb, cPtr->stab.gray, COLOR_BGR2GRAY);
+	if (cPtr->stab.lastFrame.rows > 0) cPtr->Run(); // skips the first pass while the frames get loaded.
+	cPtr->stab.gray.copyTo(cPtr->stab.lastFrame);
+	return (int*)cPtr->stab.smoothedFrame.data;
+}
+
+
+
+
+
+
+class SuperPixels
+{
+private:
+public:
+	Mat src, labels, dst;
+	Ptr<cv::ximgproc::SuperpixelSEEDS> seeds;
+	int width, height, num_superpixels = 400, num_levels = 4, prior = 2;
+	SuperPixels() {}
+	void Run()
+	{
+		Mat hsv;
+		//cvtColor(src, hsv, cv::ColorConversionCodes::COLOR_BGR2HSV);
+		seeds->iterate(src);
+		seeds->getLabelContourMask(dst, false);
+		seeds->getLabels(labels);
+	}
+};
+
+extern "C" __declspec(dllexport)
+SuperPixels * SuperPixel_Open(int _width, int _height, int _num_superpixels, int _num_levels, int _prior)
+{
+	SuperPixels* spPtr = new SuperPixels();
+	spPtr->width = _width;
+	spPtr->height = _height;
+	spPtr->num_superpixels = _num_superpixels;
+	spPtr->num_levels = _num_levels;
+	spPtr->prior = _prior;
+	spPtr->seeds = cv::ximgproc::createSuperpixelSEEDS(_width, _height, 3, _num_superpixels, _num_levels, _prior);
+	spPtr->labels = Mat(spPtr->height, spPtr->width, CV_32S);
+	return spPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* SuperPixel_Close(SuperPixels * cPtr)
+{
+	delete cPtr;
+	return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* SuperPixel_GetLabels(SuperPixels * cPtr)
+{
+	return (int*)cPtr->labels.data;
+}
+
+extern "C" __declspec(dllexport)
+int* SuperPixel_Run(SuperPixels * cPtr, int* srcPtr)
+{
+	cPtr->src = Mat(cPtr->height, cPtr->width, CV_8UC3, srcPtr);
+	cPtr->Run();
+	return (int*)cPtr->dst.data;
+}
+
+
+
+
+
+
+// Parameters for Kalman Filter
+#define Q1 0.004
+#define R1 0.5
+
+VideoStab::VideoStab()
+{
+	smoothedMat.create(2, 3, CV_64F);
+	k = 1;
+	errScale = Mat(5, 1, CV_64F).setTo(1);
+	qScale = Mat(5, 1, CV_64F).setTo(Q1);
+	rScale = Mat(5, 1, CV_64F).setTo(R1);
+	sumScale = Mat(5, 1, CV_64F).setTo(0);
+	sScale = Mat(5, 1, CV_64F).setTo(0);
+}
+
+// https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
+//The main stabilization function
+Mat VideoStab::stabilize(Mat rgb)
+{
+	int vert_border = HORIZONTAL_BORDER_CROP * gray.rows / gray.cols;
+
+	vector <Point2f> features1, features2;
+	vector <Point2f> goodFeatures1, goodFeatures2;
+	vector <uchar> status;
+	vector <float> err;
+
+	//Estimating the features in gray1 and gray2
+	goodFeaturesToTrack(gray, features1, 200, 0.01, 30);
+	calcOpticalFlowPyrLK(gray, lastFrame, features1, features2, status, err);
+
+	for (size_t i = 0; i < status.size(); i++)
+	{
+		if (status[i] && err[i] < 2)
+		{
+			goodFeatures1.push_back(features1[i]);
+			goodFeatures2.push_back(features2[i]);
+		}
+	}
+
+	if (goodFeatures1.size() > 0 && goodFeatures2.size() > 0)
+	{
+		//All the parameters scale, angle, and translation are stored in affine
+		affine = getAffineTransform(goodFeatures1.data(), goodFeatures2.data());
+
+		double dx = affine.at<double>(0, 2);
+		double dy = affine.at<double>(1, 2);
+		double da = atan2(affine.at<double>(1, 0), affine.at<double>(0, 0));
+		double ds_x = affine.at<double>(0, 0) / cos(da);
+		double ds_y = affine.at<double>(1, 1) / cos(da);
+		double saveDX = dx, saveDY = dy, saveDA = da;
+
+		char original[1000];
+		sprintf_s(original, "da = %f, dx = %f, dy = %f", da, dx, dy);
+
+		double sx = ds_x;
+		double sy = ds_y;
+
+		double deltaArray[5] = { ds_x, ds_y, da, dx, dy };
+		Mat delta(5, 1, CV_64F, deltaArray);
+		cv::add(sumScale, delta, sumScale);
+
+		//Don't calculate the predicted state of Kalman Filter on 1st iteration
+		if (k == 1) k++; else Kalman_Filter();
+
+		Mat diff(5, 1, CV_64F);
+		cv::subtract(sScale, sumScale, diff);
+
+		if (diff.at<double>(2, 0) < 1000 && diff.at<double>(3, 0) < 1000 && diff.at<double>(4, 0) < 1000)
+		{
+			da += diff.at<double>(2, 0);
+			dx += diff.at<double>(3, 0);
+			dx += diff.at<double>(4, 0);
+		}
+		if (fabs(dx) > 50)  dx = saveDX;
+		if (fabs(dy) > 50)  dy = saveDY;
+		if (fabs(da) > 50)  da = saveDA;
+
+		//Creating the smoothed parameters matrix
+		smoothedMat.at<double>(0, 0) = sx * cos(da);
+		smoothedMat.at<double>(0, 1) = sx * -sin(da);
+		smoothedMat.at<double>(1, 0) = sy * sin(da);
+		smoothedMat.at<double>(1, 1) = sy * cos(da);
+
+		smoothedMat.at<double>(0, 2) = dx;
+		smoothedMat.at<double>(1, 2) = dy;
+
+		//Warp the new frame using the smoothed parameters
+		warpAffine(rgb, smoothedFrame, smoothedMat, rgb.size());
+
+		//Crop the smoothed frame a little to eliminate black region due to Kalman Filter
+		smoothedFrame = smoothedFrame(Range(vert_border, smoothedFrame.rows - vert_border), Range(HORIZONTAL_BORDER_CROP, smoothedFrame.cols - HORIZONTAL_BORDER_CROP));
+
+		resize(smoothedFrame, smoothedFrame, rgb.size());
+		for (int i = 0; i < features1.size(); ++i)
+		{
+			cv::circle(smoothedFrame, features1[i], 5, cv::Scalar::all(255), -1, cv::LineTypes::LINE_AA);
+		}
+		cv::putText(smoothedFrame, original, cv::Point(10, 50), cv::HersheyFonts::FONT_HERSHEY_COMPLEX, 0.4, cv::Scalar::all(255), 1);
+
+		char buffer[1000];
+		sprintf_s(buffer, "da = %f, dx = %f, dy = %f", da, dx, dy);
+		cv::putText(smoothedFrame, buffer, cv::Point(10, 100), cv::HersheyFonts::FONT_HERSHEY_COMPLEX, 0.4, cv::Scalar::all(255), 1);
+	}
+	return smoothedFrame;
+}
+
+void VideoStab::Kalman_Filter()
+{
+	Mat f1err = Mat(5, 1, CV_64F);
+	cv::add(errScale, qScale, f1err);
+	for (int i = 0; i < f1err.rows; ++i)
+	{
+		double gainScale = f1err.at<double>(i, 0) / (f1err.at<double>(i, 0) + rScale.at<double>(i, 0));
+		sScale.at<double>(i, 0) = sScale.at<double>(i, 0) + gainScale * (sumScale.at<double>(i, 0) - sScale.at<double>(i, 0));
+		errScale.at<double>(i, 0) = (1.0 - gainScale) * f1err.at<double>(i, 0);
+	}
+}
+
+
+
+
+
+
+
+
+// https://stackoverflow.com/questions/22654770/creating-vignette-filter-in-opencv
+class Vignetting_CPP
+{
+private:
+public:
+	Mat src, dst;
+	Vignetting_CPP() {}
+	double fastCos(double x) {
+		x += 1.57079632;
+		if (x > 3.14159265) x -= 6.28318531;
+		if (x < 0) return 1.27323954 * x + 0.405284735 * x * x;
+		return 1.27323954 * x - 0.405284735 * x * x;
+	}
+	double dist(double ax, double ay, double bx, double by) {
+		return sqrt((ax - bx) * (ax - bx) + (ay - by) * (ay - by));
+	}
+	void RunCPP(double radius, double centerX, double centerY, bool removal) {
+		dst = src.clone();
+		double maxDis = radius * dist(0, 0, centerX, centerY);
+		double temp;
+
+		for (int y = 0; y < src.rows; y++) {
+			for (int x = 0; x < src.cols; x++) {
+				temp = fastCos(dist(centerX, centerY, x, y) / maxDis);
+				temp *= temp;
+				if (removal)
+				{
+					dst.at<Vec3b>(y, x)[0] = saturate_cast<uchar>((src.at<Vec3b>(y, x)[0]) / temp);
+					dst.at<Vec3b>(y, x)[1] = saturate_cast<uchar>((src.at<Vec3b>(y, x)[1]) / temp);
+					dst.at<Vec3b>(y, x)[2] = saturate_cast<uchar>((src.at<Vec3b>(y, x)[2]) / temp);
+				}
+				else {
+					dst.at<Vec3b>(y, x)[0] = saturate_cast<uchar>((src.at<Vec3b>(y, x)[0]) * temp);
+					dst.at<Vec3b>(y, x)[1] = saturate_cast<uchar>((src.at<Vec3b>(y, x)[1]) * temp);
+					dst.at<Vec3b>(y, x)[2] = saturate_cast<uchar>((src.at<Vec3b>(y, x)[2]) * temp);
+				}
+			}
+		}
+	}
+};
+
+extern "C" __declspec(dllexport)
+Vignetting_CPP * Vignetting_Open() {
+	Vignetting_CPP* cPtr = new Vignetting_CPP();
+	return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* Vignetting_Close(Vignetting_CPP * cPtr)
+{
+	delete cPtr;
+	return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* Vignetting_RunCPP(Vignetting_CPP * cPtr, int* dataPtr, int rows, int cols, double radius, double centerX, double centerY, bool removal)
+{
+	cPtr->src = Mat(rows, cols, CV_8UC3, dataPtr);
+	cPtr->RunCPP(radius, centerX, centerY, removal);
+	return (int*)cPtr->dst.data;
+}
+
+
+
+
+
+
+
+class WarpModel
+{
+private:
+public:
+	int warpMode = MOTION_EUCLIDEAN;
+	double termination_eps = 1e-5;
+	int number_of_iterations = 50;
+	TermCriteria criteria = TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, number_of_iterations, termination_eps);
+	Mat warpMatrix;
+	WarpModel() {}
+	void Run(Mat src1, Mat src2) {
+		if (warpMode != MOTION_HOMOGRAPHY)
+			warpMatrix = Mat::eye(2, 3, CV_32F);
+		else
+			warpMatrix = Mat::eye(3, 3, CV_32F);
+		findTransformECC(src1, src2, warpMatrix, warpMode, criteria); // wish this were available in C#/VB.Net?
+	}
+};
+
+extern "C" __declspec(dllexport)
+WarpModel * WarpModel_Open() {
+	WarpModel* cPtr = new WarpModel();
+	return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* WarpModel_Close(WarpModel * cPtr)
+{
+	delete cPtr;
+	return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* WarpModel_Run(WarpModel * cPtr, int* src1Ptr, int* src2Ptr, int rows, int cols, int channels, int warpMode)
+{
+	Mat src1 = Mat(rows, cols, CV_8UC1, src1Ptr);
+	Mat src2 = Mat(rows, cols, CV_8UC1, src2Ptr);
+	cPtr->warpMode = warpMode; // don't worry - the enumerations are identical...
+	cPtr->Run(src1, src2);
+	return (int*)cPtr->warpMatrix.data;
+}
+
+
+
+
+
+
+// https://blog.csdn.net/just_sort/article/details/85982871
+class WhiteBalance
+{
+private:
+public:
+	Mat src, output;
+	WhiteBalance() {}
+
+	void Run(float thresholdVal)
+	{
+		int row = src.rows, col = src.cols;
+		int HistRGB[768] = { 0 };
+		int MaxVal = 0;
+		for (int i = 0; i < row; i++) {
+			for (int j = 0; j < col; j++) {
+				int b = int(src.at<Vec3b>(i, j)[0]);
+				int g = int(src.at<Vec3b>(i, j)[1]);
+				int r = int(src.at<Vec3b>(i, j)[2]);
+				MaxVal = max(MaxVal, b);
+				MaxVal = max(MaxVal, g);
+				MaxVal = max(MaxVal, r);
+				int sum = b + g + r;
+				HistRGB[sum]++;
+			}
+		}
+		int Threshold = 0;
+		int sum = 0;
+		for (int i = 767; i >= 0; i--) {
+			sum += HistRGB[i];
+			if (sum > int(row * col) * thresholdVal) {
+				Threshold = i;
+				break;
+			}
+		}
+
+		int AvgB = 0;
+		int AvgG = 0;
+		int AvgR = 0;
+		int cnt = 0;
+		for (int i = 0; i < row; i++) {
+			for (int j = 0; j < col; j++) {
+				int sumP = src.at<Vec3b>(i, j)[0] + src.at<Vec3b>(i, j)[1] + src.at<Vec3b>(i, j)[2];
+				if (sumP > Threshold) {
+					AvgB += src.at<Vec3b>(i, j)[0];
+					AvgG += src.at<Vec3b>(i, j)[1];
+					AvgR += src.at<Vec3b>(i, j)[2];
+					cnt++;
+				}
+			}
+		}
+		if (cnt > 0)
+		{
+			AvgB /= cnt;
+			AvgG /= cnt;
+			AvgR /= cnt;
+			for (int i = 0; i < row; i++) {
+				for (int j = 0; j < col; j++) {
+					if (AvgB == 0 || AvgG == 0 || AvgR == 0) continue;
+					int Blue = src.at<Vec3b>(i, j)[0] * MaxVal / AvgB;
+					int Green = src.at<Vec3b>(i, j)[1] * MaxVal / AvgG;
+					int Red = src.at<Vec3b>(i, j)[2] * MaxVal / AvgR;
+					if (Red > 255) Red = 255; else if (Red < 0) Red = 0;
+					if (Green > 255) Green = 255; else if (Green < 0) Green = 0;
+					if (Blue > 255) Blue = 255; else if (Blue < 0) Blue = 0;
+					output.at<Vec3b>(i, j)[0] = Blue;
+					output.at<Vec3b>(i, j)[1] = Green;
+					output.at<Vec3b>(i, j)[2] = Red;
+				}
+			}
+		}
+	}
+};
+
+extern "C" __declspec(dllexport)
+WhiteBalance * WhiteBalance_Open(float ppx, float ppy, float fx, float fy)
+{
+	WhiteBalance* cPtr = new WhiteBalance();
+	return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* WhiteBalance_Close(WhiteBalance * cPtr)
+{
+	delete cPtr;
+	return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* WhiteBalance_Run(WhiteBalance * cPtr, int* rgb, int rows, int cols, float thresholdVal)
+{
+	cPtr->output = Mat(rows, cols, CV_8UC3);
+	cPtr->src = Mat(rows, cols, CV_8UC3, rgb);
+	cPtr->Run(thresholdVal);
+	return (int*)cPtr->output.data;
+}
+
+
+
+
+
+
+class xPhoto_OilPaint
+{
+private:
+public:
+	Mat src, dst;
+	xPhoto_OilPaint() {}
+	void Run(int size, int dynRatio, int colorCode)
+	{
+		xphoto::oilPainting(src, dst, size, dynRatio, colorCode);
+	}
+};
+
+extern "C" __declspec(dllexport)
+xPhoto_OilPaint * xPhoto_OilPaint_Open()
+{
+	xPhoto_OilPaint* cPtr = new xPhoto_OilPaint();
+	return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* xPhoto_OilPaint_Close(xPhoto_OilPaint * cPtr)
+{
+	delete cPtr;
+	return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* xPhoto_OilPaint_Run(xPhoto_OilPaint * cPtr, int* imagePtr, int rows, int cols, int size, int dynRatio, int colorCode)
+{
+	cPtr->src = Mat(rows, cols, CV_8UC3, imagePtr);
+	cPtr->Run(size, dynRatio, colorCode);
+	return (int*)cPtr->dst.data;
+}
+
+
+
+
+
+
+class xPhoto_Inpaint
+{
+private:
+public:
+	Mat src, dst;
+	xPhoto_Inpaint() {}
+	void Run(Mat mask, int iType)
+	{
+		dst.setTo(0);
+		//xphoto::inpaint(src, mask, dst, iType);
+	}
+};
+
+extern "C" __declspec(dllexport)
+xPhoto_Inpaint * xPhoto_Inpaint_Open()
+{
+	xPhoto_Inpaint* cPtr = new xPhoto_Inpaint();
+	return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* xPhoto_Inpaint_Close(xPhoto_Inpaint * cPtr)
+{
+	delete cPtr;
+	return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* xPhoto_Inpaint_Run(xPhoto_Inpaint * cPtr, int* imagePtr, int* maskPtr, int rows, int cols, int iType)
+{
+	cPtr->src = Mat(rows, cols, CV_8UC3, imagePtr);
+	cPtr->dst = Mat(rows, cols, CV_8UC3);
+	Mat mask = Mat(rows, cols, CV_8UC1, maskPtr);
+	cPtr->Run(mask, iType);
+	return (int*)cPtr->dst.data;
 }

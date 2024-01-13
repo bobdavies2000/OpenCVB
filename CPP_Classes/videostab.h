@@ -26,3 +26,4 @@ public:
 };
 
 #endif // VIDEOSTAB_H
+	
