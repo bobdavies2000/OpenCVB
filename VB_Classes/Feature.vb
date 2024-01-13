@@ -120,6 +120,7 @@ Public Class Feature_Agast : Inherits VB_Algorithm
     Public stablePoints As New List(Of cv.Point2f)
     Public Sub New()
         cPtr = Agast_Open()
+        advice = "Agast has no options right now..."
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Use the Agast Feature Detector in the OpenCV Contrib"
     End Sub
@@ -129,7 +130,8 @@ Public Class Feature_Agast : Inherits VB_Algorithm
 
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
         Dim handleCount = GCHandle.Alloc(ptCount, GCHandleType.Pinned)
-        Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, handleCount.AddrOfPinnedObject())
+        Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                 handleCount.AddrOfPinnedObject())
         handleSrc.Free()
         handleCount.Free()
 

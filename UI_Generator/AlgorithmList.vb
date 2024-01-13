@@ -2,6 +2,7 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
+_CPP_Mesh_Features
 _CPP_Mesh_Agast
 _CPP_Mesh_Basics
 _CPP_RedMin_Basics
@@ -315,6 +316,7 @@ if algorithmName = "CPP_Line_Basics" Then return new CPP_Basics(functionNames._C
 if algorithmName = "CPP_Mat_4to1" Then return new CPP_Basics(functionNames._CPP_Mat_4to1)
 if algorithmName = "CPP_Mesh_Agast" Then return new CPP_Basics(functionNames._CPP_Mesh_Agast)
 if algorithmName = "CPP_Mesh_Basics" Then return new CPP_Basics(functionNames._CPP_Mesh_Basics)
+if algorithmName = "CPP_Mesh_Features" Then return new CPP_Basics(functionNames._CPP_Mesh_Features)
 if algorithmName = "CPP_Motion_Basics" Then return new CPP_Basics(functionNames._CPP_Motion_Basics)
 if algorithmName = "CPP_Motion_Core" Then return new CPP_Basics(functionNames._CPP_Motion_Core)
 if algorithmName = "CPP_Palette_Basics" Then return new CPP_Basics(functionNames._CPP_Palette_Basics)
@@ -1016,6 +1018,7 @@ if algorithmName = "MeanSubtraction_Basics" Then return new MeanSubtraction_Basi
 if algorithmName = "Mesh_Agast" Then return new Mesh_Agast
 if algorithmName = "Mesh_Basics" Then return new Mesh_Basics
 if algorithmName = "Mesh_Features" Then return new Mesh_Features
+if algorithmName = "Mesh_StableAgast" Then return new Mesh_StableAgast
 if algorithmName = "MFI_Basics" Then return new MFI_Basics
 if algorithmName = "MFI_BasicsNew" Then return new MFI_BasicsNew
 if algorithmName = "MFI_BasicsOld" Then return new MFI_BasicsOld

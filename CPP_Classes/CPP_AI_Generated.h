@@ -2829,3 +2829,29 @@ public:
     }
 };
 
+
+
+
+
+
+class CPP_Mesh_Features : public algorithmCPP {
+public:
+    CPP_Feature_Basics* feat;
+    CPP_Mesh_Basics* mesh;
+    CPP_Mesh_Features() : algorithmCPP() {
+        traceName = "CPP_Mesh_Features";
+        feat = new CPP_Feature_Basics();
+        mesh = new CPP_Mesh_Basics();
+        labels[2] = "Triangles built with each feature point and its 2 nearest neighbors.";
+        advice = "Use Options_Features to update results.";
+        desc = "Build triangles from feature points";
+    }
+    void Run(Mat src) {
+        feat->Run(src);
+        if (feat->corners.size() < 3) {
+            return;
+        }
+        mesh->dst2 = src;
+        dst2 = mesh->showMesh(feat->corners);
+    }
+};

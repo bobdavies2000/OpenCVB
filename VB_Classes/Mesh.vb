@@ -14,8 +14,8 @@ Public Class Mesh_Basics : Inherits VB_Algorithm
         For i = 0 To knn.queries.Count - 1
             Dim p0 = knn.queries(i)
             Dim p1 = knn.queries(knn.result(i, 1))
-            dst2.Line(p0, p1, white, task.lineWidth, task.lineType)
             Dim p2 = knn.queries(knn.result(i, 2))
+            dst2.Line(p0, p1, white, task.lineWidth, task.lineType)
             dst2.Line(p0, p2, white, task.lineWidth, task.lineType)
             dst2.Line(p1, p2, white, task.lineWidth, task.lineType)
         Next
@@ -46,7 +46,7 @@ Public Class Mesh_Features : Inherits VB_Algorithm
     Dim mesh As New Mesh_Basics
     Public Sub New()
         labels(2) = "Triangles built with each feature point and its 2 nearest neighbors."
-        advice = "Use Options_Features to update results."
+        advice = "Use 'Options_Features' to update results."
         desc = "Build triangles from feature points"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -67,7 +67,29 @@ Public Class Mesh_Agast : Inherits VB_Algorithm
     Dim mesh As New Mesh_Basics
     Public Sub New()
         labels(2) = "Triangles built with each feature point and its 2 nearest neighbors."
-        advice = "Use Options_Features to update results."
+        advice = agast.advice
+        desc = "Build triangles from Agast points"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        agast.Run(src)
+        If agast.stablePoints.Count < 3 Then Exit Sub
+        mesh.dst2 = src
+        dst2 = mesh.showMesh(agast.stablePoints)
+        labels(3) = agast.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Mesh_StableAgast : Inherits VB_Algorithm
+    Dim agast As New Feature_Agast
+    Dim mesh As New Mesh_Basics
+    Public Sub New()
+        labels(2) = "Triangles built with each feature point and its 2 nearest neighbors."
+        advice = agast.advice
         desc = "Build triangles from Agast points"
     End Sub
     Public Sub RunVB(src As cv.Mat)
