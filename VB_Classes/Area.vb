@@ -161,28 +161,11 @@ Public Class Area_MinRect : Inherits VB_Algorithm
     Public Sub New()
         desc = "Find minimum containing rectangle for a set of points."
     End Sub
-    Public Function drawMinRectRotated() As cv.Mat
-        dst2.SetTo(0)
-        drawRotatedRectangle(minRect, dst2, cv.Scalar.Yellow)
-        Return dst2
-    End Function
-    Public Function drawMinRectangle() As cv.Mat
-        dst0 = New cv.Mat(inputPoints.Count, 1, cv.MatType.CV_32FC2, inputPoints.ToArray)
-        Dim split = dst0.Split()
-        Dim mm1 = vbMinMax(split(0))
-        Dim mm2 = vbMinMax(split(1))
-        dst2.Rectangle(New cv.Rect(mm1.minVal, mm2.minVal, mm1.maxVal - mm1.minVal, mm2.maxVal - mm2.minVal), cv.Scalar.White, task.lineWidth)
-
-        For Each pt In inputPoints
-            dst2.Circle(pt, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType)
-        Next
-        Return dst2
-    End Function
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
             If heartBeat() = False Then Exit Sub
             options.RunVB()
-            inputPoints = options.srcPoints
+            inputPoints = quickRandomPoints(options.numPoints, options.squareWidth)
         End If
 
         minRect = cv.Cv2.MinAreaRect(inputPoints.ToArray)
@@ -192,14 +175,7 @@ Public Class Area_MinRect : Inherits VB_Algorithm
             For Each pt In inputPoints
                 dst2.Circle(pt, task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
             Next
-            Dim pts = minRect.Points()
-            Dim lastPt = pts(0)
-            For i = 1 To pts.Length
-                Dim index = i Mod pts.Length
-                Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
-                dst2.Line(pt, lastPt, task.highlightColor, task.lineWidth, task.lineType)
-                lastPt = pt
-            Next
+            drawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
         End If
     End Sub
 End Class

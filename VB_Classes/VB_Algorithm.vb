@@ -166,14 +166,27 @@ Public Class VB_Algorithm : Implements IDisposable
         Next
         dst2.FillConvexPoly(vertices, color, task.lineType)
     End Sub
-    Public Sub drawRotatedOutline(rr As cv.RotatedRect, dst As cv.Mat, color As cv.Scalar)
-        Dim vertices = rr.Points()
-        For i = 0 To 4 - 1
-            dst.Line(New cv.Point(vertices(i).X, vertices(i).Y), New cv.Point(vertices((i + 1) Mod 4).X, vertices((i + 1) Mod 4).Y),
-                     color, task.lineWidth, task.lineType)
+    Public Sub drawRotatedOutline(rotatedRect As cv.RotatedRect, dst2 As cv.Mat, color As cv.Scalar)
+        Dim pts = rotatedRect.Points()
+        Dim lastPt = pts(0)
+        For i = 1 To pts.Length
+            Dim index = i Mod pts.Length
+            Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
+            dst2.Line(pt, lastPt, task.highlightColor, task.lineWidth, task.lineType)
+            lastPt = pt
         Next
-        dst.Rectangle(rr.BoundingRect, color, task.lineWidth, task.lineType)
     End Sub
+    Public Function quickRandomPoints(howMany As Integer, squareWidth As Integer) As List(Of cv.Point2f)
+        Dim srcPoints As New List(Of cv.Point2f)
+        Dim w = task.workingRes.Width
+        Dim h = task.workingRes.Height
+        For i = 0 To howMany - 1
+            Dim pt = New cv.Point2f(msRNG.Next(w / 2 - squareWidth, w / 2 + squareWidth),
+                                    msRNG.Next(h / 2 - squareWidth, h / 2 + squareWidth))
+            srcPoints.Add(pt)
+        Next
+        Return srcPoints
+    End Function
     Public Function findCorrelation(pts1 As cv.Mat, pts2 As cv.Mat) As Single
         Dim correlationMat As New cv.Mat
         cv.Cv2.MatchTemplate(pts1, pts2, correlationMat, cv.TemplateMatchModes.CCoeffNormed)

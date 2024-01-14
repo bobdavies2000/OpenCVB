@@ -985,6 +985,8 @@ End Class
 
 Public Class Options_MinArea : Inherits VB_Algorithm
     Public srcPoints As New List(Of cv.Point2f)
+    Public squareWidth As Integer
+    Public numPoints As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Area Number of Points", 1, 30, 5)
@@ -998,8 +1000,8 @@ Public Class Options_MinArea : Inherits VB_Algorithm
         srcPoints.Clear()
 
         Dim pt As cv.Point2f
-        Dim num = numSlider.Value
-        For i = 0 To num - 1
+        numPoints = numSlider.Value
+        For i = 0 To numPoints - 1
             pt.X = msRNG.Next(dst2.Width / 2 - squareWidth, dst2.Width / 2 + squareWidth)
             pt.Y = msRNG.Next(dst2.Height / 2 - squareWidth, dst2.Height / 2 + squareWidth)
             srcPoints.Add(pt)

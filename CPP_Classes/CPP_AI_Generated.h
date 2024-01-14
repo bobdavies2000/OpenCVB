@@ -2855,3 +2855,33 @@ public:
         dst2 = mesh->showMesh(feat->corners);
     }
 };
+
+
+
+
+
+
+class CPP_Area_MinRect : public algorithmCPP {
+public:
+    RotatedRect minRect;
+    vector<Point2f> inputPoints;
+    CPP_Area_MinRect() : algorithmCPP() {
+        traceName = "CPP_Area_MinRect";
+        desc = "Find minimum containing rectangle for a set of points.";
+    }
+    void Run(Mat src) {
+        if (standalone) {
+            if (!task->heartBeat) return;
+
+            inputPoints = task->quickRandomPoints(10);
+        }
+        minRect = minAreaRect(inputPoints);
+        if (standalone) {
+            dst2.setTo(0);
+            for (const Point2f& pt : inputPoints) {
+                circle(dst2, pt, task->dotSize + 2, Scalar(0, 0, 255), -1, task->lineType);
+            }
+            task->drawRotatedOutline(minRect, dst2, Scalar(0, 255, 255));
+        }
+    }
+};

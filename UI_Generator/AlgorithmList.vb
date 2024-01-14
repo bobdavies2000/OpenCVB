@@ -2,6 +2,7 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
+_CPP_Area_MinRect
 _CPP_Mesh_Features
 _CPP_Mesh_Agast
 _CPP_Mesh_Basics
@@ -275,6 +276,7 @@ if algorithmName = "CPP_AddWeighted_Basics" Then return new CPP_Basics(functionN
 if algorithmName = "CPP_ApproxPoly_Basics" Then return new CPP_Basics(functionNames._CPP_ApproxPoly_Basics)
 if algorithmName = "CPP_ApproxPoly_FindandDraw" Then return new CPP_Basics(functionNames._CPP_ApproxPoly_FindandDraw)
 if algorithmName = "CPP_ApproxPoly_Hull" Then return new CPP_Basics(functionNames._CPP_ApproxPoly_Hull)
+if algorithmName = "CPP_Area_MinRect" Then return new CPP_Basics(functionNames._CPP_Area_MinRect)
 if algorithmName = "CPP_BackProject_Basics" Then return new CPP_Basics(functionNames._CPP_BackProject_Basics)
 if algorithmName = "CPP_Bezier_Basics" Then return new CPP_Basics(functionNames._CPP_Bezier_Basics)
 if algorithmName = "CPP_Binarize_Simple" Then return new CPP_Basics(functionNames._CPP_Binarize_Simple)

@@ -320,14 +320,7 @@ Public Class Rectangle_Enclosing : Inherits VB_Algorithm
         End If
 
         Dim minRect = cv.Cv2.MinAreaRect(pointList.ToArray)
-        Dim pts = minRect.Points()
-        Dim lastPt = pts(0)
-        For i = 1 To pts.Length
-            Dim index = i Mod pts.Length
-            Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
-            dst2.Line(pt, lastPt, task.highlightColor, task.lineWidth, task.lineType)
-            lastPt = pt
-        Next
+        drawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
     End Sub
 End Class
 

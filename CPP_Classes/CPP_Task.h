@@ -293,7 +293,32 @@ public:
         }
         return mm;
     }
+    void drawRotatedOutline(const RotatedRect& rotatedRect, Mat& dst2, const Scalar& color) {
+        vector<Point2f> pts;
+        rotatedRect.points(pts);
 
+        Point lastPt = pts[0];
+        for (int i = 1; i <= pts.size(); i++) {
+            int index = i % pts.size();
+            cv::Point pt = pts[index];
+            cv::line(dst2, pt, lastPt, highlightColor, lineWidth, lineType);
+            lastPt = pt;
+        }
+    }
+    std::vector<cv::Point2f> quickRandomPoints(int howMany) {
+        std::vector<cv::Point2f> srcPoints;
+        random_device rd;
+        mt19937 gen(rd());  // Mersenne Twister engine for randomness
+        uniform_int_distribution<> dist_width(0, workingRes.width - 1);  
+        uniform_int_distribution<> dist_height(0, workingRes.height - 1);
+
+        srcPoints.clear();
+        for (int i = 0; i < howMany; i++) {
+            srcPoints.push_back(Point2f(dist_height(gen), dist_width(gen)));
+        }
+
+        return srcPoints;
+    }
     Vec3b randomCellColor() {
         static random_device rd;
         static mt19937 gen(rd());  // Mersenne Twister engine for randomness
