@@ -183,86 +183,6 @@ End Class
 
 
 
-Public Class Motion_RectAlt : Inherits VB_Algorithm
-    Dim motion As New Motion_History
-    Dim options As New Options_Flood
-    Dim smallSize As New cv.Size(160, 120)
-    Dim minCount = 2
-    Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        If dst0.Height = 480 Or dst0.Height = 240 Then minCount = 4
-        If dst0.Height = 720 Or dst0.Height = 360 Or dst0.Height = 180 Then minCount = 16
-        desc = "Construct the BGR image from a heartbeat image and the portion of the BGR image that has changed."
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Dim rectList As New List(Of cv.Rect)
-        Dim restoreF = CInt(src.Width / smallSize.Width)
-        Dim srcSmall = src.Resize(smallSize, cv.InterpolationFlags.Nearest)
-        dst0 = New cv.Mat(smallSize, cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(smallSize, cv.MatType.CV_8UC3, 0)
-        Static dst As New cv.Mat(srcSmall.Size, cv.MatType.CV_8UC3, 0)
-        If heartBeat() Then
-            dst = task.color.Resize(smallSize, cv.InterpolationFlags.Nearest)
-            dst1.SetTo(0)
-            task.motionRect = New cv.Rect
-        Else
-            motion.Run(srcSmall)
-            dst3 = motion.dst2
-
-            Dim tmp As New cv.Mat
-            cv.Cv2.FindNonZero(dst3, tmp)
-
-            Dim dots(tmp.Total * 2 - 1) As Integer
-            If tmp.Total > srcSmall.Total / 4 Then
-                dst = srcSmall
-            ElseIf tmp.Total > 0 Then
-                Marshal.Copy(tmp.Data, dots, 0, dots.Length)
-                Dim pointList As New List(Of cv.Point)
-                For i = 0 To dots.Length - 1 Step 2
-                    If dots(i) >= 1 And dots(i) < dst1.Width - 2 And dots(i + 1) >= 1 And dots(i + 1) < dst1.Height - 2 Then
-                        pointList.Add(New cv.Point(dots(i), dots(i + 1)))
-                    End If
-                Next
-
-                Dim flags = 4 Or cv.FloodFillFlags.MaskOnly Or cv.FloodFillFlags.FixedRange
-                Dim rect As cv.Rect
-                dst0.SetTo(0)
-                Dim matPoints = dst3(New cv.Rect(1, 1, dst3.Width - 2, dst3.Height - 2))
-                For Each pt In pointList
-                    If dst0.Get(Of Byte)(pt.Y, pt.X) = 0 And matPoints.Get(Of Byte)(pt.Y, pt.X) <> 0 Then
-                        Dim count = matPoints.FloodFill(dst0, pt, 255, rect, 0, 0, flags Or (255 << 8))
-                        rectList.Add(New cv.Rect(rect.X, rect.Y, rect.Width + 1, rect.Height + 1))
-                    End If
-                Next
-                For Each r In rectList
-                    If r.X <> 0 And r.Y <> 0 Then
-                        task.motionRect = If(task.motionRect.Width = 0, r, task.motionRect.Union(r))
-                        dst3.Rectangle(r, cv.Scalar.White, 1)
-                    End If
-                Next
-                dst3.Rectangle(task.motionRect, cv.Scalar.White, 1)
-            End If
-            labels(3) = "There were " + CStr(CInt(dots.Length / 2)) + " points collected"
-        End If
-        If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
-            Dim r = task.motionRect
-            Dim motionRect = New cv.Rect(r.Left / restoreF, r.Top / restoreF, r.Width / restoreF, r.Height / restoreF)
-            If motionRect.Width > 0 And motionRect.Height > 0 Then ' could have rounded to 0.
-                srcSmall(motionRect).CopyTo(dst1(motionRect))
-                srcSmall(motionRect).CopyTo(dst(motionRect))
-            End If
-        End If
-        dst2 = dst.Resize(dst2.Size)
-        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width, dst2.Height), cv.Scalar.Black, 1)
-        labels(2) = CStr(rectList.Count) + " rects were found"
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class Motion_PixelDiff : Inherits VB_Algorithm
@@ -332,102 +252,6 @@ End Class
 
 
 
-
-
-
-
-
-
-
-Public Class Motion_Rect : Inherits VB_Algorithm
-    Dim motion As New Motion_History
-    Dim minCount = 4
-    Dim reconstructedRGB As Integer
-    Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        If dst2.Width = 1280 Or dst2.Width = 640 Then minCount = 16
-        desc = "Track the max rectangle that covers all the motion until there is no motion in it."
-    End Sub
-    Private Function buildEnclosingRect(tmp As cv.Mat)
-        Dim rectList As New List(Of cv.Rect)
-        Dim dots(tmp.Total * 2 - 1) As Integer
-        Marshal.Copy(tmp.Data, dots, 0, dots.Length)
-        Dim pointList As New List(Of cv.Point)
-        For i = 0 To dots.Length - 1 Step 2
-            If dots(i) >= 1 And dots(i) < dst2.Width - 2 And dots(i + 1) >= 1 And dots(i + 1) < dst2.Height - 2 Then
-                pointList.Add(New cv.Point(dots(i), dots(i + 1)))
-            End If
-        Next
-
-        Dim flags = 4 Or cv.FloodFillFlags.MaskOnly Or cv.FloodFillFlags.FixedRange
-        Dim rect As cv.Rect
-        Dim motionMat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim matPoints = dst1(New cv.Rect(1, 1, motionMat.Width - 2, motionMat.Height - 2))
-        For Each pt In pointList
-            If motionMat.Get(Of Byte)(pt.Y, pt.X) = 0 And matPoints.Get(Of Byte)(pt.Y, pt.X) <> 0 Then
-                Dim count = matPoints.FloodFill(motionMat, pt, 255, rect, 0, 0, flags Or (255 << 8))
-                If count <= minCount Then Continue For
-                rectList.Add(New cv.Rect(rect.X, rect.Y, rect.Width + 1, rect.Height + 1))
-            End If
-        Next
-
-        labels(3) = "There were " + CStr(CInt(dots.Length / 2)) + " points collected"
-
-        If rectList.Count = 0 Then Return New cv.Rect
-        Dim motionRect As cv.Rect = rectList(0)
-        For Each r In rectList
-            motionRect = motionRect.Union(r)
-        Next
-        Return motionRect
-    End Function
-    Public Sub RunVB(src as cv.Mat)
-        Static color = src.Clone
-        Static lastMotionRect As cv.Rect = task.motionRect
-        task.motionFlag = False
-        If heartBeat() Or task.motionRect.Width * task.motionRect.Height > src.Total / 2 Or task.optionsChanged Then
-            task.motionFlag = True
-        Else
-            motion.Run(src)
-            dst1 = motion.dst2
-            Dim tmp As New cv.Mat
-            cv.Cv2.FindNonZero(dst1, tmp)
-
-            If tmp.Total > src.Total / 2 Then
-                task.motionFlag = True
-            ElseIf tmp.Total > 0 Then
-                reconstructedRGB += 1
-                task.motionRect = buildEnclosingRect(tmp)
-                If task.motionRect.IntersectsWith(lastMotionRect) Then task.motionRect = task.motionRect.Union(lastMotionRect)
-                If task.motionRect.Width * task.motionRect.Height > src.Total / 2 Then task.motionFlag = True
-            End If
-        End If
-
-        dst3.SetTo(0)
-        If task.motionFlag Then
-            labels(2) = CStr(reconstructedRGB) + " frames since last full image"
-            reconstructedRGB = 0
-            task.motionRect = New cv.Rect
-            dst2 = src.Clone
-        End If
-
-        If standalone Or showIntermediate() Then
-            dst2 = dst1
-            If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
-                dst3(task.motionRect).SetTo(255)
-                src(task.motionRect).CopyTo(dst2(task.motionRect))
-            End If
-        End If
-
-        If standalone Or showIntermediate() Then
-            If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
-                src(task.motionRect).CopyTo(dst0(task.motionRect))
-                color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth, task.lineType)
-            End If
-        End If
-        lastMotionRect = task.motionRect
-    End Sub
-End Class
 
 
 
@@ -598,6 +422,7 @@ End Class
 
 
 
+
 Public Class Motion_History : Inherits VB_Algorithm
     Dim diff As New Diff_Basics
     Dim frames As New History_Basics
@@ -617,4 +442,281 @@ Public Class Motion_History : Inherits VB_Algorithm
         labels(2) = "Cumulative diff for the last " + CStr(task.frameHistoryCount) + " frames"
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+Public Class Motion_RectAlt : Inherits VB_Algorithm
+    Dim motion As New Motion_History
+    Dim options As New Options_Flood
+    Dim smallSize As New cv.Size(160, 120)
+    Dim minCount = 2
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        If dst0.Height = 480 Or dst0.Height = 240 Then minCount = 4
+        If dst0.Height = 720 Or dst0.Height = 360 Or dst0.Height = 180 Then minCount = 16
+        desc = "Construct the BGR image from a heartbeat image and the portion of the BGR image that has changed."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim rectList As New List(Of cv.Rect)
+        Dim restoreF = CInt(src.Width / smallSize.Width)
+        Dim srcSmall = src.Resize(smallSize, cv.InterpolationFlags.Nearest)
+        dst0 = New cv.Mat(smallSize, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(smallSize, cv.MatType.CV_8UC3, 0)
+        Static dst As New cv.Mat(srcSmall.Size, cv.MatType.CV_8UC3, 0)
+        If heartBeat() Then
+            dst = task.color.Resize(smallSize, cv.InterpolationFlags.Nearest)
+            dst1.SetTo(0)
+            task.motionRect = New cv.Rect
+        Else
+            motion.Run(srcSmall)
+            dst3 = motion.dst2
+
+            Dim tmp As New cv.Mat
+            cv.Cv2.FindNonZero(dst3, tmp)
+
+            Dim dots(tmp.Total * 2 - 1) As Integer
+            If tmp.Total > srcSmall.Total / 4 Then
+                dst = srcSmall
+            ElseIf tmp.Total > 0 Then
+                Marshal.Copy(tmp.Data, dots, 0, dots.Length)
+                Dim pointList As New List(Of cv.Point)
+                For i = 0 To dots.Length - 1 Step 2
+                    If dots(i) >= 1 And dots(i) < dst1.Width - 2 And dots(i + 1) >= 1 And dots(i + 1) < dst1.Height - 2 Then
+                        pointList.Add(New cv.Point(dots(i), dots(i + 1)))
+                    End If
+                Next
+
+                Dim flags = 4 Or cv.FloodFillFlags.MaskOnly Or cv.FloodFillFlags.FixedRange
+                Dim rect As cv.Rect
+                dst0.SetTo(0)
+                Dim matPoints = dst3(New cv.Rect(1, 1, dst3.Width - 2, dst3.Height - 2))
+                For Each pt In pointList
+                    If dst0.Get(Of Byte)(pt.Y, pt.X) = 0 And matPoints.Get(Of Byte)(pt.Y, pt.X) <> 0 Then
+                        Dim count = matPoints.FloodFill(dst0, pt, 255, rect, 0, 0, flags Or (255 << 8))
+                        rectList.Add(New cv.Rect(rect.X, rect.Y, rect.Width + 1, rect.Height + 1))
+                    End If
+                Next
+                For Each r In rectList
+                    If r.X <> 0 And r.Y <> 0 Then
+                        task.motionRect = If(task.motionRect.Width = 0, r, task.motionRect.Union(r))
+                        dst3.Rectangle(r, cv.Scalar.White, 1)
+                    End If
+                Next
+                dst3.Rectangle(task.motionRect, cv.Scalar.White, 1)
+            End If
+            labels(3) = "There were " + CStr(CInt(dots.Length / 2)) + " points collected"
+        End If
+        If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
+            Dim r = task.motionRect
+            Dim motionRect = New cv.Rect(r.Left / restoreF, r.Top / restoreF, r.Width / restoreF, r.Height / restoreF)
+            If motionRect.Width > 0 And motionRect.Height > 0 Then ' could have rounded to 0.
+                srcSmall(motionRect).CopyTo(dst1(motionRect))
+                srcSmall(motionRect).CopyTo(dst(motionRect))
+            End If
+        End If
+        dst2 = dst.Resize(dst2.Size)
+        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width, dst2.Height), cv.Scalar.Black, 1)
+        labels(2) = CStr(rectList.Count) + " rects were found"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Motion_Rect : Inherits VB_Algorithm
+    Dim motion As New Motion_History
+    Dim minCount = 4
+    Dim reconstructedRGB As Integer
+    Public Sub New()
+        If standalone Then gOptions.displayDst0.Checked = True
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        If dst2.Width = 1280 Or dst2.Width = 640 Then minCount = 16
+        desc = "Track the max rectangle that covers all the motion until there is no motion in it."
+    End Sub
+    Private Function buildEnclosingRect(tmp As cv.Mat)
+        Dim rectList As New List(Of cv.Rect)
+        Dim dots(tmp.Total * 2 - 1) As Integer
+        Marshal.Copy(tmp.Data, dots, 0, dots.Length)
+        Dim pointList As New List(Of cv.Point)
+        For i = 0 To dots.Length - 1 Step 2
+            If dots(i) >= 1 And dots(i) < dst2.Width - 2 And dots(i + 1) >= 1 And dots(i + 1) < dst2.Height - 2 Then
+                pointList.Add(New cv.Point(dots(i), dots(i + 1)))
+            End If
+        Next
+
+        Dim flags = 4 Or cv.FloodFillFlags.MaskOnly Or cv.FloodFillFlags.FixedRange
+        Dim rect As cv.Rect
+        Dim motionMat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim matPoints = dst1(New cv.Rect(1, 1, motionMat.Width - 2, motionMat.Height - 2))
+        For Each pt In pointList
+            If motionMat.Get(Of Byte)(pt.Y, pt.X) = 0 And matPoints.Get(Of Byte)(pt.Y, pt.X) <> 0 Then
+                Dim count = matPoints.FloodFill(motionMat, pt, 255, rect, 0, 0, flags Or (255 << 8))
+                If count <= minCount Then Continue For
+                rectList.Add(New cv.Rect(rect.X, rect.Y, rect.Width + 1, rect.Height + 1))
+            End If
+        Next
+
+        labels(3) = "There were " + CStr(CInt(dots.Length / 2)) + " points collected"
+
+        If rectList.Count = 0 Then Return New cv.Rect
+        Dim motionRect As cv.Rect = rectList(0)
+        For Each r In rectList
+            motionRect = motionRect.Union(r)
+        Next
+        Return motionRect
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        Static color = src.Clone
+        Static lastMotionRect As cv.Rect = task.motionRect
+        task.motionFlag = False
+        If heartBeat() Or task.motionRect.Width * task.motionRect.Height > src.Total / 2 Or task.optionsChanged Then
+            task.motionFlag = True
+        Else
+            motion.Run(src)
+            dst1 = motion.dst2
+            Dim tmp As New cv.Mat
+            cv.Cv2.FindNonZero(dst1, tmp)
+
+            If tmp.Total > src.Total / 2 Then
+                task.motionFlag = True
+            ElseIf tmp.Total > 0 Then
+                reconstructedRGB += 1
+                task.motionRect = buildEnclosingRect(tmp)
+                If task.motionRect.IntersectsWith(lastMotionRect) Then task.motionRect = task.motionRect.Union(lastMotionRect)
+                If task.motionRect.Width * task.motionRect.Height > src.Total / 2 Then task.motionFlag = True
+            End If
+        End If
+
+        dst3.SetTo(0)
+        If task.motionFlag Then
+            labels(2) = CStr(reconstructedRGB) + " frames since last full image"
+            reconstructedRGB = 0
+            task.motionRect = New cv.Rect
+            dst2 = src.Clone
+        End If
+
+        If standalone Or showIntermediate() Then
+            dst2 = dst1
+            If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
+                dst3(task.motionRect).SetTo(255)
+                src(task.motionRect).CopyTo(dst2(task.motionRect))
+            End If
+        End If
+
+        If standalone Or showIntermediate() Then
+            If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
+                src(task.motionRect).CopyTo(dst0(task.motionRect))
+                color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth, task.lineType)
+            End If
+        End If
+        lastMotionRect = task.motionRect
+    End Sub
+End Class
+
+
+
+
+
+Public Class Motion_RectNew : Inherits VB_Algorithm
+    Dim motion As New Motion_Basics
+    Dim minCount = 4
+    Dim reconstructedRGB As Integer
+    Public Sub New()
+        If standalone Then gOptions.displayDst0.Checked = True
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        If dst2.Width = 1280 Or dst2.Width = 640 Then minCount = 16
+        desc = "Track the max rectangle that covers all the motion until there is no motion in it."
+    End Sub
+    Private Function buildEnclosingRect(tmp As cv.Mat)
+        Dim rectList As New List(Of cv.Rect)
+        Dim dots(tmp.Total * 2 - 1) As Integer
+        Marshal.Copy(tmp.Data, dots, 0, dots.Length)
+        Dim pointList As New List(Of cv.Point)
+        For i = 0 To dots.Length - 1 Step 2
+            If dots(i) >= 1 And dots(i) < dst2.Width - 2 And dots(i + 1) >= 1 And dots(i + 1) < dst2.Height - 2 Then
+                pointList.Add(New cv.Point(dots(i), dots(i + 1)))
+            End If
+        Next
+
+        Dim flags = 4 Or cv.FloodFillFlags.MaskOnly Or cv.FloodFillFlags.FixedRange
+        Dim rect As cv.Rect
+        Dim motionMat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim matPoints = dst1(New cv.Rect(1, 1, motionMat.Width - 2, motionMat.Height - 2))
+        For Each pt In pointList
+            If motionMat.Get(Of Byte)(pt.Y, pt.X) = 0 And matPoints.Get(Of Byte)(pt.Y, pt.X) <> 0 Then
+                Dim count = matPoints.FloodFill(motionMat, pt, 255, rect, 0, 0, flags Or (255 << 8))
+                If count <= minCount Then Continue For
+                rectList.Add(New cv.Rect(rect.X, rect.Y, rect.Width + 1, rect.Height + 1))
+            End If
+        Next
+
+        labels(3) = "There were " + CStr(CInt(dots.Length / 2)) + " points collected"
+
+        If rectList.Count = 0 Then Return New cv.Rect
+        Dim motionRect As cv.Rect = rectList(0)
+        For Each r In rectList
+            motionRect = motionRect.Union(r)
+        Next
+        Return motionRect
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        Static color = src.Clone
+        Static lastMotionRect As cv.Rect = task.motionRect
+        task.motionFlag = False
+        If heartBeat() Or task.motionRect.Width * task.motionRect.Height > src.Total / 2 Or task.optionsChanged Then
+            task.motionFlag = True
+        Else
+            motion.Run(src)
+            dst1 = motion.dst2
+            Dim tmp As New cv.Mat
+            cv.Cv2.FindNonZero(dst1, tmp)
+
+            If tmp.Total > src.Total / 2 Then
+                task.motionFlag = True
+            ElseIf tmp.Total > 0 Then
+                reconstructedRGB += 1
+                task.motionRect = buildEnclosingRect(tmp)
+                If task.motionRect.IntersectsWith(lastMotionRect) Then task.motionRect = task.motionRect.Union(lastMotionRect)
+                If task.motionRect.Width * task.motionRect.Height > src.Total / 2 Then task.motionFlag = True
+            End If
+        End If
+
+        dst3.SetTo(0)
+        If task.motionFlag Then
+            labels(2) = CStr(reconstructedRGB) + " frames since last full image"
+            reconstructedRGB = 0
+            task.motionRect = New cv.Rect
+            dst2 = src.Clone
+        End If
+
+        If standalone Or showIntermediate() Then
+            dst2 = dst1
+            If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
+                dst3(task.motionRect).SetTo(255)
+                src(task.motionRect).CopyTo(dst2(task.motionRect))
+            End If
+        End If
+
+        If standalone Or showIntermediate() Then
+            If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
+                src(task.motionRect).CopyTo(dst0(task.motionRect))
+                color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth, task.lineType)
+            End If
+        End If
+        lastMotionRect = task.motionRect
+    End Sub
+End Class
+
+
+
+
+
 

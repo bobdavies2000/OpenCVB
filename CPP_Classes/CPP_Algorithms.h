@@ -2676,12 +2676,13 @@ public:
 	vector<Point>floodPoints;
 
 	RedCloud() {}
-	void RunCPP(float sizeThreshold, int maxClassCount) {
+	void RunCPP(int maxClassCount) {
 		vector<Point>points;
 		Rect rect;
 
 		multimap<int, int, greater<int>> sizeSorted;
 		int floodFlag = 4 | FLOODFILL_FIXED_RANGE;
+		float sizeThreshold = 0.95f;
 		for (int y = 0; y < src.rows; y++)
 		{
 			for (int x = 0; x < src.cols; x++)
@@ -2716,8 +2717,8 @@ public:
 extern "C" __declspec(dllexport) RedCloud * RedCloud_Open() { RedCloud* cPtr = new RedCloud(); return cPtr; }
 extern "C" __declspec(dllexport) int* RedCloud_FloodPointList(RedCloud * cPtr) { return (int*)&cPtr->floodPoints[0]; }
 extern "C" __declspec(dllexport) int* RedCloud_Close(RedCloud * cPtr) { delete cPtr; return (int*)0; }
-extern "C" __declspec(dllexport) int RedCloud_Run(RedCloud * cPtr, int* dataPtr, int* maskPtr, int rows, int cols,
-	float sizeThreshold, int maxClassCount)
+extern "C" __declspec(dllexport) int RedCloud_Run(RedCloud * cPtr, int* dataPtr, int* maskPtr, int rows, 
+											      int cols, int maxClassCount)
 {
 	cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
 	cPtr->mask = Mat(rows + 2, cols + 2, CV_8U);
@@ -2729,7 +2730,7 @@ extern "C" __declspec(dllexport) int RedCloud_Run(RedCloud * cPtr, int* dataPtr,
 		mask.copyTo(cPtr->mask(rect));
 	}
 
-	cPtr->RunCPP(sizeThreshold, maxClassCount);
+	cPtr->RunCPP(maxClassCount);
 	return (int)cPtr->floodPoints.size();
 }
 

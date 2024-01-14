@@ -115,8 +115,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         task.rcMatchMax = 0
         Dim rc As rcData
         Dim minPixels = gOptions.minPixelsSlider.Value
-        Dim newCells As New List(Of rcData)
-        newCells.Add(New rcData)
+        Dim newCells As New List(Of rcData)({New rcData})
         For Each rp In minCells
             rc = matchPreviousCell(rp)
             rc.index = newCells.Count

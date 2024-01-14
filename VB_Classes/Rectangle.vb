@@ -1,3 +1,5 @@
+Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Rectangle_Basics : Inherits VB_Algorithm
     Public rectangles As New List(Of cv.Rect)
@@ -6,8 +8,8 @@ Public Class Rectangle_Basics : Inherits VB_Algorithm
     Public Sub New()
         desc = "Draw the requested number of rectangles."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
         If heartBeat() Then
             dst2.SetTo(cv.Scalar.Black)
             rectangles.Clear()
@@ -43,7 +45,7 @@ Public Class Rectangle_Rotated : Inherits VB_Algorithm
         findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)").Checked = True
         desc = "Draw the requested number of rectangles."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         rectangle.Run(src)
         dst2 = rectangle.dst2
     End Sub
@@ -65,7 +67,7 @@ Public Class Rectangle_Overlap : Inherits VB_Algorithm
         findSlider("DrawCount").Value = 2
         desc = "Test if 2 rectangles overlap"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static typeCheckBox = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
         If heartBeat() = False Then Exit Sub
         If standalone Then
@@ -133,7 +135,7 @@ Public Class Rectangle_Intersection : Inherits VB_Algorithm
         otherRects = New List(Of cv.Rect)(newOther)
         Return enclosing
     End Function
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static mergeSlider = findSlider("Merge rectangles within X pixels")
 
         If standalone Then
@@ -196,7 +198,7 @@ Public Class Rectangle_Union : Inherits VB_Algorithm
     Public Sub New()
         desc = "Create a rectangle that contains all the input rectangles"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If standalone Then
             Static countSlider = findSlider("DrawCount")
             Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
@@ -247,7 +249,7 @@ Public Class Rectangle_MultiOverlap : Inherits VB_Algorithm
     Public Sub New()
         desc = "Given a group of rectangles, merge all the rectangles that overlap"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If standalone Then
             Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             Static countSlider = findSlider("DrawCount")
@@ -291,3 +293,41 @@ Public Class Rectangle_MultiOverlap : Inherits VB_Algorithm
         End If
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class Rectangle_Enclosing : Inherits VB_Algorithm
+    Public pointList As New List(Of cv.Point2f)
+    Public Sub New()
+        advice = "If standalone, use the 'Options_Random' to change results."
+        desc = "Build an enclosing rectangle for the supplied pointlist"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then
+            Static random As New Random_Basics
+            random.range = New cv.Rect(dst2.Width / 3, dst2.Height / 3, dst2.Width / 3, dst2.Height / 3)
+            random.Run(src)
+            dst2.SetTo(0)
+            For Each pt In random.pointList
+                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            Next
+            pointList = random.pointList
+        End If
+
+        Dim minRect = cv.Cv2.MinAreaRect(pointList.ToArray)
+        Dim pts = minRect.Points()
+        Dim lastPt = pts(0)
+        For i = 1 To pts.Length
+            Dim index = i Mod pts.Length
+            Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
+            dst2.Line(pt, lastPt, task.highlightColor, task.lineWidth, task.lineType)
+            lastPt = pt
+        Next
+    End Sub
+End Class
+

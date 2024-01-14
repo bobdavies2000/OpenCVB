@@ -1,5 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Windows.Media.Media3D
+
 Public Class Area_MinTriangle_CPP : Inherits VB_Algorithm
     Public triangle As cv.Mat
     Public options As New Options_MinArea
@@ -65,7 +67,7 @@ Public Class Area_MinMotionRect : Inherits VB_Algorithm
         Next
         Return gray
     End Function
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         bgSub.Run(src)
         Dim gray As cv.Mat
         If bgSub.dst2.Channels = 1 Then gray = bgSub.dst2 Else gray = bgSub.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -87,7 +89,7 @@ Public Class Area_FindNonZero : Inherits VB_Algorithm
         labels(3) = "Non-zero original points"
         desc = "Use FindNonZero API to get coordinates of non-zero points."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If standalone Then
             src = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
             Dim srcPoints(100 - 1) As cv.Point ' doesn't really matter how many there are.
@@ -159,27 +161,45 @@ Public Class Area_MinRect : Inherits VB_Algorithm
     Public Sub New()
         desc = "Find minimum containing rectangle for a set of points."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Function drawMinRectRotated() As cv.Mat
+        dst2.SetTo(0)
+        drawRotatedRectangle(minRect, dst2, cv.Scalar.Yellow)
+        Return dst2
+    End Function
+    Public Function drawMinRectangle() As cv.Mat
+        dst0 = New cv.Mat(inputPoints.Count, 1, cv.MatType.CV_32FC2, inputPoints.ToArray)
+        Dim split = dst0.Split()
+        Dim mm1 = vbMinMax(split(0))
+        Dim mm2 = vbMinMax(split(1))
+        dst2.Rectangle(New cv.Rect(mm1.minVal, mm2.minVal, mm1.maxVal - mm1.minVal, mm2.maxVal - mm2.minVal), cv.Scalar.White, task.lineWidth)
+
+        For Each pt In inputPoints
+            dst2.Circle(pt, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType)
+        Next
+        Return dst2
+    End Function
+    Public Sub RunVB(src As cv.Mat)
         If standalone Then
             If heartBeat() = False Then Exit Sub
             options.RunVB()
             inputPoints = options.srcPoints
         End If
 
-        dst2.SetTo(0)
         minRect = cv.Cv2.MinAreaRect(inputPoints.ToArray)
 
-        If standalone Then
-            drawRotatedRectangle(minRect, dst2, cv.Scalar.Yellow)
-            dst0 = New cv.Mat(inputPoints.Count, 1, cv.MatType.CV_32FC2, inputPoints.ToArray)
-            Dim split = dst0.Split()
-            Dim mm1 = vbMinMax(split(0))
-            Dim mm2 = vbMinMax(split(1))
-            dst2.Rectangle(New cv.Rect(mm1.minVal, mm2.minVal, mm1.maxVal - mm1.minVal, mm2.maxVal - mm2.minVal), cv.Scalar.white, task.lineWidth)
+        If standalone Or showIntermediate() Then
+            dst2.SetTo(0)
+            For Each pt In inputPoints
+                dst2.Circle(pt, task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
+            Next
+            Dim pts = minRect.Points()
+            Dim lastPt = pts(0)
+            For i = 1 To pts.Length
+                Dim index = i Mod pts.Length
+                Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
+                dst2.Line(pt, lastPt, task.highlightColor, task.lineWidth, task.lineType)
+                lastPt = pt
+            Next
         End If
-
-        For Each pt In inputPoints
-            dst2.Circle(pt, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType)
-        Next
     End Sub
 End Class
