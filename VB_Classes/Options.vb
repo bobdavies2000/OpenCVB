@@ -2730,7 +2730,6 @@ Public Class Options_BGSubtract_CPP : Inherits VB_Algorithm
                 If currMethod = i Then
                     Exit For
                 Else
-                    If firstPass = False Then BGSubtract_BGFG_Close(cPtr)
                     currMethod = i
                     methodDesc = "Method = " + frm.check(i).Text
                 End If

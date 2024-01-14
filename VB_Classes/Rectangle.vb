@@ -301,26 +301,44 @@ End Class
 
 
 
-Public Class Rectangle_EnclosingPoints : Inherits VB_Algorithm
-    Public pointList As New List(Of cv.Point2f)
+Public Class Rectangle_EnclosingRect : Inherits VB_Algorithm
+    Dim redC As New RedCloud_CPP
+    Public motionRect As New cv.Rect
     Public Sub New()
-        advice = "If standalone, use the 'Options_Random' to change results."
+        redOptions.UseColor.Checked = True
+        cPtr = BGSubtract_BGFG_Open(4)
+        labels(2) = "MOG2 is the best option.  See BGSubtract_Basics to see more options."
+        advice = "If standalone, no options for this."
         desc = "Build an enclosing rectangle for the supplied pointlist"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
-            Static random As New Random_Basics
-            random.range = New cv.Rect(dst2.Width / 3, dst2.Height / 3, dst2.Width / 3, dst2.Height / 3)
-            random.Run(src)
-            dst2.SetTo(0)
-            For Each pt In random.pointList
-                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-            Next
-            pointList = random.pointList
-        End If
+        Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+        Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+        Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        handleSrc.Free()
 
-        Dim minRect = cv.Cv2.MinAreaRect(pointList.ToArray)
-        drawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        redC.inputMask = Not dst2
+        redC.Run(dst2)
+
+        motionRect = New cv.Rect
+        If redC.minCells.Count > 1 Then
+            Dim rect As cv.Rect = redC.minCells(1).rect
+            For i = 2 To redC.minCells.Count - 1
+                Dim cell = redC.minCells(i)
+                rect = rect.Union(cell.rect)
+            Next
+            motionRect = rect
+        End If
+        If motionRect.Width > dst2.Width / 2 And motionRect.Height > dst2.Height / 2 Then
+            motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+        End If
+        dst2.Rectangle(motionRect, 255, task.lineWidth, task.lineType)
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = BGSubtract_BGFG_Close(cPtr)
     End Sub
 End Class
 
@@ -331,22 +349,19 @@ End Class
 
 
 
-Public Class Rectangle_EnclosingContour : Inherits VB_Algorithm
+Public Class Rectangle_EnclosingPoints : Inherits VB_Algorithm
     Public pointList As New List(Of cv.Point2f)
     Public Sub New()
-        advice = "If standalone, use the 'Options_Random' to change results."
+        advice = "If standalone, there are no options."
         desc = "Build an enclosing rectangle for the supplied pointlist"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
-            Static random As New Random_Basics
-            random.range = New cv.Rect(dst2.Width / 3, dst2.Height / 3, dst2.Width / 3, dst2.Height / 3)
-            random.Run(src)
+            pointList = quickRandomPoints(20)
             dst2.SetTo(0)
-            For Each pt In random.pointList
+            For Each pt In pointList
                 dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
             Next
-            pointList = random.pointList
         End If
 
         Dim minRect = cv.Cv2.MinAreaRect(pointList.ToArray)

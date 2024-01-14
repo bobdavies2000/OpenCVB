@@ -2015,6 +2015,7 @@ End Class
 Public Class RedCloud_CPP : Inherits VB_Algorithm
     Public minCells As New List(Of segCell)
     Public classCount As Integer
+    Public inputMask As cv.Mat
     Public Sub New()
         cPtr = RedCloud_Open()
         gOptions.HistBinSlider.Value = 16 ' jumpstart the likely option automation result.
@@ -2033,9 +2034,10 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
 
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        If redOptions.UseDepth.Checked Then
-            Dim maskData(task.noDepthMask.Total - 1) As Byte
-            Marshal.Copy(task.noDepthMask.Data, maskData, 0, maskData.Length)
+        If redOptions.UseDepth.Checked Or inputMask IsNot Nothing Then
+            If inputMask Is Nothing Then inputMask = task.noDepthMask
+            Dim maskData(inputMask.Total - 1) As Byte
+            Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
             Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
             classCount = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(),
                                       src.Rows, src.Cols, 250)
@@ -2062,8 +2064,8 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
         other.rect = New cv.Rect(0, 0, 1, 1)
         minCells.Add(other)
         Dim mask As New cv.Mat(src.Height + 2, src.Width + 2, cv.MatType.CV_8U, 0)
-        If redOptions.UseDepth.Checked Then
-            task.noDepthMask.CopyTo(mask(New cv.Rect(1, 1, mask.Width - 2, mask.Height - 2)))
+        If redOptions.UseDepth.Checked Or inputMask IsNot Nothing Then
+            inputMask.CopyTo(mask(New cv.Rect(1, 1, mask.Width - 2, mask.Height - 2)))
             mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 255, 1)
         End If
         Dim fill As Integer

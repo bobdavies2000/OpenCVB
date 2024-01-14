@@ -3,13 +3,17 @@ Imports System.Runtime.InteropServices
 Public Class Motion_Basics : Inherits VB_Algorithm
     Public options As New Options_BGSubtract_CPP
     Public Sub New()
+        cPtr = BGSubtract_BGFG_Open(options.currMethod)
         labels(2) = "BGSubtract output"
         desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If task.optionsChanged Then cPtr = BGSubtract_BGFG_Open(options.currMethod)
+        If task.optionsChanged Then
+            BGSubtract_BGFG_Close(cPtr)
+            cPtr = BGSubtract_BGFG_Open(options.currMethod)
+        End If
 
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
@@ -720,3 +724,40 @@ End Class
 
 
 
+
+Public Class Motion_Enclosing : Inherits VB_Algorithm
+    Dim motion As New Rectangle_EnclosingRect
+    Public Sub New()
+        advice = "gOptions frame history slider will impact results."
+        labels(3) = "The white spots show the difference of the constructed image from the current image."
+        desc = "Track the RGB image using Rectangle_EnclosingRect to isolate the motion"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static lastRects As New List(Of cv.Rect)
+        motion.Run(src)
+        Dim r = motion.motionRect
+        If heartBeat() Or r.Width * r.Height > src.Total / 2 Or task.frameCount < 50 Then
+            dst2 = src.Clone
+            lastRects.Clear()
+        Else
+            If r.Width > 0 And r.Height > 0 Then
+                For Each rect In lastRects
+                    r = r.Union(rect)
+                Next
+                src(r).CopyTo(dst2(r))
+                lastRects.Add(r)
+                If lastRects.Count > gOptions.FrameHistory.Value Then lastRects.RemoveAt(0)
+            Else
+                lastRects.Clear()
+            End If
+        End If
+
+        If standalone Then
+            Static diff As New Diff_Basics
+            diff.lastGray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            diff.Run(dst2)
+            dst3 = diff.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst3.Rectangle(r, task.highlightColor, task.lineWidth, task.lineType)
+        End If
+    End Sub
+End Class
