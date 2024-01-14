@@ -301,7 +301,37 @@ End Class
 
 
 
-Public Class Rectangle_Enclosing : Inherits VB_Algorithm
+Public Class Rectangle_EnclosingPoints : Inherits VB_Algorithm
+    Public pointList As New List(Of cv.Point2f)
+    Public Sub New()
+        advice = "If standalone, use the 'Options_Random' to change results."
+        desc = "Build an enclosing rectangle for the supplied pointlist"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then
+            Static random As New Random_Basics
+            random.range = New cv.Rect(dst2.Width / 3, dst2.Height / 3, dst2.Width / 3, dst2.Height / 3)
+            random.Run(src)
+            dst2.SetTo(0)
+            For Each pt In random.pointList
+                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            Next
+            pointList = random.pointList
+        End If
+
+        Dim minRect = cv.Cv2.MinAreaRect(pointList.ToArray)
+        drawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Rectangle_EnclosingContour : Inherits VB_Algorithm
     Public pointList As New List(Of cv.Point2f)
     Public Sub New()
         advice = "If standalone, use the 'Options_Random' to change results."

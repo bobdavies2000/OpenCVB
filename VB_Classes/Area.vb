@@ -165,7 +165,7 @@ Public Class Area_MinRect : Inherits VB_Algorithm
         If standalone Then
             If heartBeat() = False Then Exit Sub
             options.RunVB()
-            inputPoints = quickRandomPoints(options.numPoints, options.squareWidth)
+            inputPoints = quickRandomPoints(options.numPoints)
         End If
 
         minRect = cv.Cv2.MinAreaRect(inputPoints.ToArray)

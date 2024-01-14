@@ -2872,7 +2872,6 @@ public:
     void Run(Mat src) {
         if (standalone) {
             if (!task->heartBeat) return;
-
             inputPoints = task->quickRandomPoints(10);
         }
         minRect = minAreaRect(inputPoints);

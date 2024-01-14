@@ -176,13 +176,12 @@ Public Class VB_Algorithm : Implements IDisposable
             lastPt = pt
         Next
     End Sub
-    Public Function quickRandomPoints(howMany As Integer, squareWidth As Integer) As List(Of cv.Point2f)
+    Public Function quickRandomPoints(howMany As Integer) As List(Of cv.Point2f)
         Dim srcPoints As New List(Of cv.Point2f)
         Dim w = task.workingRes.Width
         Dim h = task.workingRes.Height
         For i = 0 To howMany - 1
-            Dim pt = New cv.Point2f(msRNG.Next(w / 2 - squareWidth, w / 2 + squareWidth),
-                                    msRNG.Next(h / 2 - squareWidth, h / 2 + squareWidth))
+            Dim pt = New cv.Point2f(msRNG.Next(0, w), msRNG.Next(0, h))
             srcPoints.Add(pt)
         Next
         Return srcPoints
