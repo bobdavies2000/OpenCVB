@@ -33,8 +33,7 @@ Public Class FeatureLess_EdgeDrawing : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Static thresholdSlider = findSlider("Threshold distance")
         cpp.Run(src)
-        dst2 = Not cpp.dst2.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
-        dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = cpp.dst2
     End Sub
 End Class
 

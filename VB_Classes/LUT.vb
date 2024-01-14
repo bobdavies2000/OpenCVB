@@ -66,34 +66,6 @@ End Class
 
 
 
-Public Class LUT_CustomColor : Inherits VB_Algorithm
-    Dim gradMap As New Palette_RandomColorMap
-    Public colorMap As cv.Mat
-    Public Sub New()
-        findSlider("Number of color transitions (Used only with Random)").Value = 5
-        labels(3) = "Custom Color Lookup Table"
-        desc = "Use a palette to provide the lookup table for LUT"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static colorSlider = findSlider("Number of color transitions (Used only with Random)")
-        Static saveColorCount = -1
-        If saveColorCount <> colorSlider.Value Or heartBeat() Then
-            If saveColorCount = 20 Then colorSlider.Value = 5 Else colorSlider.Value += 1
-            saveColorCount = colorSlider.Value
-            gradMap.Run(src)
-            colorMap = gradMap.gradientColorMap.Flip(cv.FlipMode.X)
-        End If
-        dst2 = src.LUT(colorMap)
-        dst3 = colorMap.Resize(src.Size())
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 Public Class LUT_Reduction : Inherits VB_Algorithm
@@ -207,5 +179,34 @@ Public Class LUT_Watershed : Inherits VB_Algorithm
 
         wShed.Run(dst3)
         dst2 = wShed.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class LUT_CustomColor : Inherits VB_Algorithm
+    Dim gradMap As New Palette_RandomColorMap
+    Public colorMap As cv.Mat
+    Public Sub New()
+        findSlider("Color transitions").Value = 5
+        labels(3) = "Custom Color Lookup Table"
+        desc = "Use a palette to provide the lookup table for LUT"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static colorSlider = findSlider("Color transitions")
+        Static saveColorCount = -1
+        If task.optionsChanged Or heartBeat() Then
+            If saveColorCount = 20 Then colorSlider.Value = 5 Else colorSlider.Value += 1
+            saveColorCount = colorSlider.Value
+            gradMap.Run(src)
+            colorMap = gradMap.gradientColorMap.Flip(cv.FlipMode.X)
+        End If
+        dst2 = src.LUT(colorMap)
+        dst3 = colorMap.Resize(src.Size())
     End Sub
 End Class

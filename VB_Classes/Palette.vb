@@ -235,45 +235,6 @@ End Class
 
 
 
-Public Class Palette_RandomColorMap : Inherits VB_Algorithm
-    Public gradientColorMap As New cv.Mat
-    Public transitionCount As Integer = -1
-    Dim gColor As New Gradient_Color
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Number Of color transitions (Used only With Random)", 1, 255, 7)
-        End If
-
-        labels(3) = "Generated colormap"
-        desc = "Build a random colormap that smoothly transitions colors"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static paletteSlider = findSlider("Number Of color transitions (Used only With Random)")
-        If transitionCount <> paletteSlider.Value Then
-            transitionCount = paletteSlider.Value
-
-            gColor.color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-            gColor.color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-            For i = 0 To transitionCount - 1
-                gColor.gradientWidth = dst2.Width
-                gColor.Run(empty)
-                gColor.color2 = gColor.color1
-                gColor.color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-                If i = 0 Then gradientColorMap = gColor.gradient Else cv.Cv2.HConcat(gradientColorMap, gColor.gradient, gradientColorMap)
-            Next
-            gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
-            If standalone Then dst3 = gradientColorMap
-            gradientColorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b) ' black is black!
-        End If
-        Dim ColorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
-        cv.Cv2.ApplyColorMap(src, dst2, ColorMap)
-    End Sub
-End Class
-
-
-
-
-
 Public Class Palette_DepthColorMap : Inherits VB_Algorithm
     Public gradientColorMap As New cv.Mat
     Dim gColor As New Gradient_Color
@@ -534,3 +495,40 @@ Public Class Palette_Variable : Inherits VB_Algorithm
         cv.Cv2.ApplyColorMap(src, dst2, colorMap)
     End Sub
 End Class
+
+
+
+
+
+Public Class Palette_RandomColorMap : Inherits VB_Algorithm
+    Public gradientColorMap As New cv.Mat
+    Public transitionCount As Integer = -1
+    Dim gColor As New Gradient_Color
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Color transitions", 1, 255, 7)
+        labels(3) = "Generated colormap"
+        desc = "Build a random colormap that smoothly transitions colors"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static paletteSlider = findSlider("Color transitions")
+        If transitionCount <> paletteSlider.Value Then
+            transitionCount = paletteSlider.Value
+
+            gColor.color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+            gColor.color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+            For i = 0 To transitionCount - 1
+                gColor.gradientWidth = dst2.Width
+                gColor.Run(empty)
+                gColor.color2 = gColor.color1
+                gColor.color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                If i = 0 Then gradientColorMap = gColor.gradient Else cv.Cv2.HConcat(gradientColorMap, gColor.gradient, gradientColorMap)
+            Next
+            gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
+            If standalone Then dst3 = gradientColorMap
+            gradientColorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b) ' black is black!
+        End If
+        Dim ColorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
+        cv.Cv2.ApplyColorMap(src, dst2, ColorMap)
+    End Sub
+End Class
+

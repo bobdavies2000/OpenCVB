@@ -1060,7 +1060,6 @@ End Class
 Public Class KNN_Farthest : Inherits VB_Algorithm
     Dim knn As New KNN_Basics
     Public Sub New()
-        findSlider("Random Pixel Count").Value = 10
         labels = {"", "", "Lines connecting pairs that are farthest.", "Training Input which is also query input and longest line"}
         desc = "Use KNN to find the farthest point from each query point."
     End Sub

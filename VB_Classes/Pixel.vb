@@ -19,6 +19,8 @@ Public Class Pixel_Viewer : Inherits VB_Algorithm
         If standalone Then
             task.dst0 = task.color.Clone
             task.dst1 = task.depthRGB.Clone
+            task.dst2 = New cv.Mat(task.dst1.Size, cv.MatType.CV_8UC3, 0)
+            task.dst3 = New cv.Mat(task.dst1.Size, cv.MatType.CV_8UC3, 0)
         End If
 
         Dim dst = Choose(task.mousePicTag + 1, task.dst0, task.dst1, task.dst2, task.dst3)
