@@ -52,7 +52,7 @@ Public Class OpticalFlow_Sparse : Inherits VB_Algorithm
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static lastGray As cv.Mat = src.Clone
         good.Run(src)
-        features = good.corners
+        features = good.featurePoints
         Dim features1 = New cv.Mat(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
         Dim features2 = New cv.Mat
         Dim status As New cv.Mat, err As New cv.Mat, winSize As New cv.Size(3, 3)

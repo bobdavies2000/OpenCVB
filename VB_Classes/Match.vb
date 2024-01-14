@@ -661,7 +661,7 @@ Public Class Match_GoodFeatureKNN : Inherits VB_Algorithm
 
         good.Run(src)
 
-        knn.queries = New List(Of cv.Point2f)(good.corners)
+        knn.queries = New List(Of cv.Point2f)(good.featurePoints)
         knn.Run(empty)
 
         Static frameList As New List(Of cv.Mat)
@@ -749,7 +749,7 @@ Public Class Match_Points : Inherits VB_Algorithm
 
         If standalone Then
             good.Run(src)
-            ptx = New List(Of cv.Point2f)(good.corners)
+            ptx = New List(Of cv.Point2f)(good.featurePoints)
             setTrueText("Move camera around to watch the point being tracked", 3)
         End If
 

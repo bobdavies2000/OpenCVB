@@ -67,16 +67,16 @@ Public Class Corners_SubPix : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         Static kernelSlider = findSlider("SubPix kernel Size")
         good.Run(src)
-        If good.corners.Count = 0 Then Exit Sub ' no good features right now...
+        If good.featurePoints.Count = 0 Then Exit Sub ' no good features right now...
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim winSize = New cv.Size(CInt(kernelSlider.Value), CInt(kernelSlider.Value))
-        cv.Cv2.CornerSubPix(gray, good.corners, winSize, New cv.Size(-1, -1), term)
+        cv.Cv2.CornerSubPix(gray, good.featurePoints, winSize, New cv.Size(-1, -1), term)
 
         src.CopyTo(dst2)
         Dim p As New cv.Point
-        For i = 0 To good.corners.Count - 1
-            p.X = CInt(good.corners(i).X)
-            p.Y = CInt(good.corners(i).Y)
+        For i = 0 To good.featurePoints.Count - 1
+            p.X = CInt(good.featurePoints(i).X)
+            p.Y = CInt(good.featurePoints(i).Y)
             dst2.Circle(p, 3, New cv.Scalar(0, 0, 255), -1, task.lineType)
         Next
     End Sub

@@ -138,7 +138,7 @@ Public Class RedTrack_FeaturesKNN : Inherits VB_Algorithm
         good.Run(src)
         dst2 = good.dst2
 
-        knn.queries = New List(Of cv.Point2f)(good.corners)
+        knn.queries = New List(Of cv.Point2f)(good.featurePoints)
         knn.Run(empty)
 
         dst3 = src.Clone
@@ -241,7 +241,7 @@ Public Class RedTrack_GoodCellInput : Inherits VB_Algorithm
         good.Run(src)
         dst2 = good.dst2
 
-        knn.queries = New List(Of cv.Point2f)(good.corners)
+        knn.queries = New List(Of cv.Point2f)(good.featurePoints)
         knn.Run(empty)
 
         featureList.Clear()
@@ -307,7 +307,7 @@ Public Class RedTrack_Features : Inherits VB_Algorithm
         good.Run(src)
 
         If heartBeat() Then dst2.SetTo(0)
-        For Each pt In good.corners
+        For Each pt In good.featurePoints
             dst2.Circle(pt, task.dotSize, 255, -1)
         Next
 

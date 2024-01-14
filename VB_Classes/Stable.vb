@@ -10,7 +10,7 @@ Public Class Stable_Basics : Inherits VB_Algorithm
         If standalone Then
             Static good As New Feature_BasicsKNN
             good.Run(src)
-            facetGen.inputPoints = New List(Of cv.Point2f)(good.corners)
+            facetGen.inputPoints = New List(Of cv.Point2f)(good.featurePoints)
         End If
 
         facetGen.Run(src)
@@ -66,7 +66,7 @@ Public Class Stable_BasicsCount : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         good.Run(src)
-        basics.facetGen.inputPoints = New List(Of cv.Point2f)(good.corners)
+        basics.facetGen.inputPoints = New List(Of cv.Point2f)(good.featurePoints)
         basics.Run(src)
         dst2 = basics.dst2
         dst3 = basics.dst3
@@ -81,7 +81,8 @@ Public Class Stable_BasicsCount : Inherits VB_Algorithm
             setTrueText(CStr(g), pt)
         Next
 
-        labels(2) = CStr(good.corners.Count) + " good features were found and " + CStr(basics.ptList.Count) + " were stable"
+        labels(2) = CStr(good.featurePoints.Count) + " good features were found and " +
+                    CStr(basics.ptList.Count) + " were stable"
     End Sub
 End Class
 
@@ -181,9 +182,9 @@ Public Class Stable_GoodFeatures : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         good.Run(src)
         dst3 = basics.dst3
-        If good.corners.Count = 0 Then Exit Sub ' nothing to work on...
+        If good.featurePoints.Count = 0 Then Exit Sub ' nothing to work on...
 
-        basics.facetGen.inputPoints = New List(Of cv.Point2f)(good.corners)
+        basics.facetGen.inputPoints = New List(Of cv.Point2f)(good.featurePoints)
         basics.Run(src)
         dst2 = basics.dst2
 
@@ -200,6 +201,6 @@ Public Class Stable_GoodFeatures : Inherits VB_Algorithm
             dst2.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
         Next
         labels(2) = basics.labels(2)
-        labels(3) = CStr(good.corners.Count) + " good features were found and " + CStr(basics.ptList.Count) + " were stable"
+        labels(3) = CStr(good.featurePoints.Count) + " good features were found and " + CStr(basics.ptList.Count) + " were stable"
     End Sub
 End Class

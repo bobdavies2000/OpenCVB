@@ -131,7 +131,7 @@ Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
         good.Run(task.rightview)
         Dim tmpRight As New List(Of cv.Point2f)
         Dim ptRight As New List(Of Integer)
-        For Each pt In good.corners
+        For Each pt In good.featurePoints
             tmpRight.Add(pt)
             ptRight.Add(CInt(pt.Y))
         Next
@@ -140,7 +140,7 @@ Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
         good.Run(task.leftview)
 
         Dim tmpLeft As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
-        For Each pt In good.corners
+        For Each pt In good.featurePoints
             tmpLeft.Add(pt.Y, pt)
         Next
         dst2 = good.dst2
