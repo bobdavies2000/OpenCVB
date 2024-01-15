@@ -2887,6 +2887,7 @@ public:
 class CPP_Mat_4Click : public algorithmCPP {
 public:
     CPP_Mat_4to1* mats;
+    int quadrant = 0;
     CPP_Mat_4Click() : algorithmCPP() {
         traceName = "CPP_Mat_4Click";
         mats = new CPP_Mat_4to1();
@@ -2894,7 +2895,6 @@ public:
         desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst3";
     }
     void Run(Mat src) {
-        static int quadrant = 0;
         if (standalone) mats->defaultMats(src);
         if (task->firstPass) {
             task->mouseClickFlag = true;
@@ -2902,7 +2902,7 @@ public:
             task->mousePicTag = RESULT_DST2;
         }
         if (task->mouseClickFlag && task->mousePicTag == RESULT_DST2) {
-            if (task->clickPoint.y < dst2.rows / 2) {
+            if (task->clickPoint.y < task->workingRes.height / 2) {
                 quadrant = (task->clickPoint.x < task->workingRes.width / 2) ? RESULT_DST0 : RESULT_DST1;
             }
             else {
@@ -2910,8 +2910,8 @@ public:
             }
         }
         mats->Run(empty);
-        dst2 = mats->dst2.clone();
-        dst3 = mats->mat[quadrant].clone();
+        dst2 = mats->dst2;
+        dst3 = mats->mat[quadrant];
     }
 };
 
@@ -2934,7 +2934,7 @@ public:
     void Run(Mat src) {
         Mat gray;
         if (src.channels() == 1) {
-            gray = src.clone();
+            gray = src;
         }
         else {
             cvtColor(src, gray, COLOR_BGR2GRAY);
@@ -2945,7 +2945,7 @@ public:
         double topColor = mean(gray, mask)(0);
         double botColor = mean(gray, ~mask)(0);
         inRange(gray, topColor, 255, mats->mats->mat[0]);
-        inRange(gray, midColor, botColor, mats->mats->mat[1]);
+        inRange(gray, midColor, topColor, mats->mats->mat[1]);
         inRange(gray, botColor, midColor, mats->mats->mat[2]);
         inRange(gray, 0, botColor, mats->mats->mat[3]);
         if (standalone) {

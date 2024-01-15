@@ -236,7 +236,7 @@ public:
     Size workingRes;
     cppTask(int rows, int cols)
     {
-        workingRes = Size(rows, cols);
+        workingRes = Size(cols, rows);
         cppFunction = -1;
         firstPass = true;
 

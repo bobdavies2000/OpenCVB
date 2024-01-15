@@ -424,7 +424,7 @@ Public Class Mat_4Click : Inherits VB_Algorithm
             task.clickPoint = New cv.Point(0, 0)
             task.mousePicTag = RESULT_DST2
         End If
-        If task.mouseClickFlag AndAlso task.mousePicTag = RESULT_DST2 Then
+        If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then
             If task.clickPoint.Y < dst2.Rows / 2 Then
                 quadrant = If(task.clickPoint.X < task.workingRes.Width / 2, RESULT_DST0, RESULT_DST1)
             Else

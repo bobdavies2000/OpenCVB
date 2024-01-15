@@ -2,6 +2,7 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
+_CPP_Binarize_FourWay
 _CPP_Mat_4Click
 _CPP_Area_MinRect
 _CPP_Mesh_Features
@@ -280,6 +281,7 @@ if algorithmName = "CPP_ApproxPoly_Hull" Then return new CPP_Basics(functionName
 if algorithmName = "CPP_Area_MinRect" Then return new CPP_Basics(functionNames._CPP_Area_MinRect)
 if algorithmName = "CPP_BackProject_Basics" Then return new CPP_Basics(functionNames._CPP_BackProject_Basics)
 if algorithmName = "CPP_Bezier_Basics" Then return new CPP_Basics(functionNames._CPP_Bezier_Basics)
+if algorithmName = "CPP_Binarize_FourWay" Then return new CPP_Basics(functionNames._CPP_Binarize_FourWay)
 if algorithmName = "CPP_Binarize_Simple" Then return new CPP_Basics(functionNames._CPP_Binarize_Simple)
 if algorithmName = "CPP_Contour_Largest" Then return new CPP_Basics(functionNames._CPP_Contour_Largest)
 if algorithmName = "CPP_Convex_Basics" Then return new CPP_Basics(functionNames._CPP_Convex_Basics)
