@@ -60,6 +60,7 @@ Public Class Hist3Dcloud_DepthSplit : Inherits VB_Algorithm
     Dim mats1 As New Mat_4Click
     Dim mats2 As New Mat_4Click
     Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
         hist = New List(Of Histogram_Kalman)({New Histogram_Kalman, New Histogram_Kalman, New Histogram_Kalman})
         hist2d = New List(Of Histogram2D_Cloud)({New Histogram2D_Cloud, New Histogram2D_Cloud, New Histogram2D_Cloud})
         labels(2) = "Histograms (Kalman) for X (upper left), Y (upper right) and Z.  UseZeroDepth removes 0 (no depth) entries."
@@ -81,9 +82,10 @@ Public Class Hist3Dcloud_DepthSplit : Inherits VB_Algorithm
 
         mats1.Run(empty)
         dst2 = mats1.dst2
+        dst3 = mats1.mat(mats1.quadrant)
 
         mats2.Run(empty)
-        dst3 = mats2.dst2
+        dst1 = mats2.dst2
     End Sub
 End Class
 

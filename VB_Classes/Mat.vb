@@ -401,6 +401,7 @@ End Class
 Public Class Mat_4Click : Inherits VB_Algorithm
     Public mats As New Mat_4to1
     Public mat() As cv.Mat
+    Public quadrant As Integer = RESULT_DST3
     Public Sub New()
         mat = mats.mat
         labels(3) = "Click a quadrant in dst2 to view it in dst3"
@@ -410,22 +411,29 @@ Public Class Mat_4Click : Inherits VB_Algorithm
         mat = mats.mat
         mats.Run(empty)
         dst2 = mats.dst2.Clone
-        If standalone Then
-            mat(0) = task.color.Clone
-            mat(1) = task.depthRGB.Clone
-            mat(2) = If(task.leftView.Channels = 1, task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.leftView)
-            mat(3) = If(task.rightView.Channels = 1, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView)
+        If standalone Then mats.defaultMats(src)
+        If firstPass Then
+            task.mouseClickFlag = True
+            task.clickPoint = New cv.Point(0, 0)
+            task.mousePicTag = RESULT_DST2
         End If
 
-        If (task.mouseClickFlag And task.mousePicTag) = RESULT_DST2 Or firstPass Then
-            If firstPass Then
-                task.mouseClickFlag = True
-                task.clickPoint = New cv.Point(0, 0)
-                task.mousePicTag = RESULT_DST2
-            End If
-            setMyActiveMat()
+        If standalone Then mats.defaultMats(src)
+        If firstPass Then
+            task.mouseClickFlag = True
+            task.clickPoint = New cv.Point(0, 0)
+            task.mousePicTag = RESULT_DST2
         End If
-        dst3 = mats.mat(task.quadrantIndex).Clone
+        If task.mouseClickFlag AndAlso task.mousePicTag = RESULT_DST2 Then
+            If task.clickPoint.Y < dst2.Rows / 2 Then
+                quadrant = If(task.clickPoint.X < task.workingRes.Width / 2, RESULT_DST0, RESULT_DST1)
+            Else
+                quadrant = If(task.clickPoint.X < task.workingRes.Width / 2, RESULT_DST2, RESULT_DST3)
+            End If
+        End If
+        mats.Run(empty)
+        dst2 = mats.dst2.Clone
+        dst3 = mats.mat(quadrant).Clone
     End Sub
 End Class
 
@@ -438,6 +446,7 @@ End Class
 Public Class Mat_4to1 : Inherits VB_Algorithm
     Public mat(3) As cv.Mat
     Public lineSeparators = True ' if they want lines or not...
+    Public quadrant As Integer = 0
     Public Sub New()
         For i = 0 To mat.Length - 1
             mat(i) = dst2.Clone
@@ -446,19 +455,20 @@ Public Class Mat_4to1 : Inherits VB_Algorithm
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Use one Mat for up to 4 images"
     End Sub
+    Public Sub defaultMats(src As cv.Mat)
+        Dim tmpLeft = If(task.leftView.Channels = 1, task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR),
+task.leftView)
+        Dim tmpRight = If(task.rightView.Channels = 1, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR),
+task.rightView)
+        mat = {task.color.Clone, task.depthRGB.Clone, tmpLeft, tmpRight}
+    End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim nSize = New cv.Size(dst2.Width / 2, dst2.Height / 2)
         Dim roiTopLeft = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Dim roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
         Dim roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         Dim roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
-        If standalone Then
-            Dim tmpLeft = If(task.leftView.Channels = 1, task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR),
-task.leftView)
-            Dim tmpRight = If(task.rightView.Channels = 1, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR),
-task.rightView)
-            mat = {task.color.Clone, task.depthRGB.Clone, tmpLeft, tmpRight}
-        End If
+        If standalone Then defaultMats(src)
 
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3)
         For i = 0 To 4 - 1

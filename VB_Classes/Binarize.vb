@@ -212,7 +212,7 @@ Public Class Binarize_FourWay : Inherits VB_Algorithm
         Dim topColor = cv.Cv2.Mean(gray, mask)(0)
         Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
         mats.mat(0) = gray.InRange(topColor, 255)
-        mats.mat(1) = gray.InRange(midColor, midColor)
+        mats.mat(1) = gray.InRange(midColor, topColor)
         mats.mat(2) = gray.InRange(botColor, midColor)
         mats.mat(3) = gray.InRange(0, botColor)
 

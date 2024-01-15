@@ -129,8 +129,6 @@ Public Class VBtask : Implements IDisposable
     Public pythonProcess As Process
     Public pythonReady As Boolean
 
-    Public quadrantIndex As Integer = QUAD3
-
     Public labels(4 - 1) As String
     Public desc As String
     Public advice As String

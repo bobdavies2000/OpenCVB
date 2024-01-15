@@ -215,7 +215,7 @@ Public Class Reduction_BGR : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Dim mats As New Mat_4Click
     Public Sub New()
-        desc = "Reduce RGB in parallel"
+        desc = "Reduce BGR image in parallel"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim split = src.Split

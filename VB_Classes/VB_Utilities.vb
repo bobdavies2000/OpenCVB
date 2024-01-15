@@ -46,10 +46,6 @@ Module vbUtilities
     Public Const RESULT_DST1 = 1 ' 0=rgb 1=depth 2=dst1 3=dst2
     Public Const RESULT_DST2 = 2 ' 0=rgb 1=depth 2=dst1 3=dst2
     Public Const RESULT_DST3 = 3 ' 0=rgb 1=depth 2=dst1 3=dst2
-    Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.
-    Public Const QUAD1 = 1
-    Public Const QUAD2 = 2
-    Public Const QUAD3 = 3
     Public Const screenDWidth As Integer = 18
     Public Const screenDHeight As Integer = 20
     Public term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)

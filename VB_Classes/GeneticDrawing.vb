@@ -13,7 +13,7 @@ Public Class GeneticDrawing_Basics : Inherits VB_Algorithm
     Public generation As Integer
     Dim imgGeneration As cv.Mat
     Dim imgStage As cv.Mat
-    Public mats as New Mat_4to1
+    Public mats As New Mat_4Click
     Dim brushPercent As Integer
     Dim options As Options_GeneticDrawing
     Dim stageTotal = 100
@@ -193,8 +193,7 @@ Public Class GeneticDrawing_Basics : Inherits VB_Algorithm
         mats.Run(empty)
         dst2 = mats.dst2
         labels(3) = " stage " + CStr(stage) + "/" + CStr(stageTotal) + " Gen " + Format(generation, "00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
-        If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then setMyActiveMat()
-        dst3 = mats.mat(task.quadrantIndex)
+        dst3 = mats.mat(mats.quadrant)
     End Sub
 End Class
 

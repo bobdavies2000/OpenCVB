@@ -87,7 +87,7 @@ Public Class GuidedBP_CellHistograms : Inherits VB_Algorithm
                     plot.maxRange = Choose(i + 1, task.xRange, task.yRange, task.maxZmeters)
                     Dim prefix = Choose(i + 1, "X ", "Y ", "Z ")
                     labels(2) += " " + prefix + " (" + Format(plot.minRange, fmt1) + ", " + Format(plot.maxRange, fmt1) + ")"
-                    If i = task.quadrantIndex Then
+                    If i = mats.quadrant Then
                         labels(1) = "histogram range (" + Format(plot.minRange, fmt1) + ", " + Format(plot.maxRange, fmt1) + ")"
                     End If
                     task.pcSplit(i).SetTo(0, zeroMat)
@@ -115,7 +115,7 @@ Public Class GuidedBP_CellHistograms : Inherits VB_Algorithm
         End If
 
         Dim picTag = 2
-        If task.quadrantIndex = 3 Then
+        If mats.quadrant = RESULT_DST3 Then
             dst1.SetTo(0)
             picTag = 1
         End If

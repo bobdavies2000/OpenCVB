@@ -535,8 +535,6 @@ Public Class Edge_BinarizedSobel : Inherits VB_Algorithm
         desc = "Collect Sobel edges from binarized images"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then setMyActiveMat()
-
         binarize.Run(src)
 
         edges.Run(binarize.mats.mat(0)) ' the light and dark halves

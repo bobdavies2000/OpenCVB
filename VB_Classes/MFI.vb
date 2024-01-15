@@ -230,8 +230,6 @@ Public Class MFI_FloodFill : Inherits VB_Algorithm
             Next
         End If
 
-        If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then setMyActiveMat()
-
         masks.Clear()
         maskSizes.Clear()
         rects.Clear()

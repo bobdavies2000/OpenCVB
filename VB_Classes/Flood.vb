@@ -40,7 +40,7 @@ Public Class Flood_Point : Inherits VB_Algorithm
             pt = New cv.Point(msRNG.Next(0, dst2.Width - 1), msRNG.Next(0, dst2.Height - 1))
             edges.Run(src)
             dst2 = edges.mats.dst2
-            dst3 = edges.mats.mat(task.quadrantIndex)
+            dst3 = edges.mats.mat(edges.mats.quadrant)
         Else
             Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1, 0)
             Dim maskRect = New cv.Rect(1, 1, dst2.Width, dst2.Height)

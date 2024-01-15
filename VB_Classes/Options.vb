@@ -2838,88 +2838,6 @@ End Class
 
 
 
-
-
-
-
-Public Class Options_Edges_All : Inherits VB_Algorithm
-    Public edges As Object
-    Public saveSelection As String
-    Dim canny As New Edge_Canny
-    Dim scharr As New Edge_Scharr
-    Dim binRed As New Edge_BinarizedReduction
-    Dim sobel = New Edge_Sobel
-    Dim binSobel As New Edge_BinarizedSobel
-    Dim colorGap As New Edge_ColorGap_CPP
-    Dim deriche As New Edge_Deriche_CPP
-    Dim laplacian As New Edge_Laplacian
-    Dim resizeAdd As New Edge_ResizeAdd
-    Dim regions As New Edge_DepthRegions
-    Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Canny")
-            radio.addRadio("Sobel")
-            radio.addRadio("Scharr")
-            radio.addRadio("Binarized Reduction")
-            radio.addRadio("Binarized Sobel")
-            radio.addRadio("Color Gap")
-            radio.addRadio("Deriche")
-            radio.addRadio("Laplacian")
-            radio.addRadio("Resize And Add")
-            radio.addRadio("Depth Region Boundaries")
-            radio.check(0).Checked = True
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
-        Dim eSelection As String = ""
-        For i = 0 To frm.check.Count - 1
-            If frm.check(i).checked Then
-                eSelection = frm.check(i).text
-                Exit For
-            End If
-        Next
-
-        If saveSelection <> eSelection Then
-            Select Case eSelection
-                Case "Canny"
-                    edges = canny
-                Case "Sobel"
-                    edges = sobel
-                Case "Scharr"
-                    edges = scharr
-                Case "Binarized Reduction"
-                    edges = binRed
-                Case "Binarized Sobel"
-                    edges = binSobel
-                Case "Color Gap"
-                    edges = colorGap
-                Case "Deriche"
-                    edges = deriche
-                Case "Laplacian"
-                    edges = laplacian
-                Case "Resize And Add"
-                    edges = resizeAdd
-                Case "Depth Region Boundaries"
-                    edges = regions
-            End Select
-            saveSelection = eSelection
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
-
 Public Class Options_Intercepts : Inherits VB_Algorithm
     Public interceptRange As Integer
     Public mouseMovePoint As Integer
@@ -4324,6 +4242,85 @@ Public Class Options_Complexity : Inherits VB_Algorithm
             firstpass = False
             frm.Left = gOptions.Width / 2
             frm.top = gOptions.Height / 2
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Options_Edges_All : Inherits VB_Algorithm
+    Public edges As Object
+    Public saveSelection As String
+    Dim canny As New Edge_Canny
+    Dim scharr As New Edge_Scharr
+    Dim binRed As New Edge_BinarizedReduction
+    Dim sobel = New Edge_Sobel
+    Dim binSobel As New Edge_BinarizedSobel
+    Dim colorGap As New Edge_ColorGap_CPP
+    Dim deriche As New Edge_Deriche_CPP
+    Dim laplacian As New Edge_Laplacian
+    Dim resizeAdd As New Edge_ResizeAdd
+    Dim regions As New Edge_DepthRegions
+    Public Sub New()
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Canny")
+            radio.addRadio("Sobel")
+            radio.addRadio("Scharr")
+            radio.addRadio("Binarized Reduction")
+            radio.addRadio("Binarized Sobel")
+            radio.addRadio("Color Gap")
+            radio.addRadio("Deriche")
+            radio.addRadio("Laplacian")
+            radio.addRadio("Resize And Add")
+            radio.addRadio("Depth Region Boundaries")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static frm = findfrm(traceName + " Radio Buttons")
+        If firstPass Then
+            firstPass = False
+            frm.Left = gOptions.Width / 2
+            frm.top = gOptions.Height / 2
+        End If
+        Dim eSelection As String = ""
+        For i = 0 To frm.check.Count - 1
+            If frm.check(i).checked Then
+                eSelection = frm.check(i).text
+                Exit For
+            End If
+        Next
+
+        If saveSelection <> eSelection Then
+            Select Case eSelection
+                Case "Canny"
+                    edges = canny
+                Case "Sobel"
+                    edges = sobel
+                Case "Scharr"
+                    edges = scharr
+                Case "Binarized Reduction"
+                    edges = binRed
+                Case "Binarized Sobel"
+                    edges = binSobel
+                Case "Color Gap"
+                    edges = colorGap
+                Case "Deriche"
+                    edges = deriche
+                Case "Laplacian"
+                    edges = laplacian
+                Case "Resize And Add"
+                    edges = resizeAdd
+                Case "Depth Region Boundaries"
+                    edges = regions
+            End Select
+            saveSelection = eSelection
         End If
     End Sub
 End Class

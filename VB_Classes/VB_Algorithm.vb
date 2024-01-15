@@ -284,18 +284,6 @@ Public Class VB_Algorithm : Implements IDisposable
         radio.Dispose()
         combo.Dispose()
     End Sub
-
-    Public Sub setMyActiveMat()
-        If task.mouseClickFlag Then
-            Dim pt = task.clickPoint
-            If pt.Y < task.workingRes.Height / 2 Then
-                If pt.X < task.workingRes.Width / 2 Then task.quadrantIndex = QUAD0 Else task.quadrantIndex = QUAD1
-            Else
-                If pt.X < task.workingRes.Width / 2 Then task.quadrantIndex = QUAD2 Else task.quadrantIndex = QUAD3
-            End If
-            task.mouseClickFlag = False
-        End If
-    End Sub
     Public Sub NextFrame(src As cv.Mat)
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
         task.pcSplit(2).SetTo(task.maxZmeters, task.maxDepthMask)
