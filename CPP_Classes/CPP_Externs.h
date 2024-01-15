@@ -34,6 +34,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case _CPP_AddWeighted_Basics :
     {task->alg = new CPP_AddWeighted_Basics(); break; }
+	case _CPP_Binarize_FourWayCombine :
+	{task->alg = new CPP_Binarize_FourWayCombine(); break; }
 	case _CPP_Binarize_FourWay :
 	{task->alg = new CPP_Binarize_FourWay(); break; }
 	case _CPP_Mat_4Click :

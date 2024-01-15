@@ -2,6 +2,7 @@
 enum functions
 {
     _CPP_AddWeighted_Basics,
+_CPP_Binarize_FourWayCombine,
 _CPP_Binarize_FourWay,
 _CPP_Mat_4Click,
 _CPP_Area_MinRect,

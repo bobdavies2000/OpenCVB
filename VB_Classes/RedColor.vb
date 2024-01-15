@@ -144,28 +144,6 @@ End Class
 
 
 
-Public Class RedColor_Binarize : Inherits VB_Algorithm
-    Dim binarize As New Binarize_FourWayCombine
-    Dim rMin As New RedMin_Basics
-    Public Sub New()
-        labels(3) = "A 4-way split of the input grayscale image based on the amount of light"
-        desc = "Use RedCloud on a 4-way split based on light to dark in the image."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        binarize.Run(src)
-        dst3 = vbPalette(binarize.dst1 * 255 / 4)
-
-        rMin.Run(binarize.dst1)
-        dst2 = rMin.dst3
-        labels(2) = rMin.labels(3)
-    End Sub
-End Class
-
-
-
-
-
-
 
 ' https://docs.opencv.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
 Public Class RedColor_CComp : Inherits VB_Algorithm
@@ -304,5 +282,28 @@ Public Class RedColor_Cells : Inherits VB_Algorithm
 
         cellmap = redC.cellMap
         redCells = redC.redCells
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedColor_Binarize : Inherits VB_Algorithm
+    Dim binarize As New Binarize_FourWayCombine
+    Dim rMin As New RedMin_Basics
+    Public Sub New()
+        labels(3) = "A 4-way split of the input grayscale image based on the amount of light"
+        desc = "Use RedCloud on a 4-way split based on light to dark in the image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binarize.Run(src)
+        dst3 = vbPalette(binarize.dst1 * 255 / 8)
+
+        rMin.Run(binarize.dst1)
+        dst2 = rMin.dst3
+        labels(2) = rMin.labels(3)
     End Sub
 End Class

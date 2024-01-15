@@ -2956,3 +2956,30 @@ public:
         }
     }
 };
+
+
+
+
+
+class CPP_Binarize_FourWayCombine : public algorithmCPP {
+public:
+    CPP_Binarize_FourWay* binarize;
+    CPP_Binarize_FourWayCombine() : algorithmCPP() {
+        binarize = new CPP_Binarize_FourWay();
+        traceName = "CPP_Binarize_FourWayCombine";
+        dst1 = Mat::zeros(dst3.size(), CV_8U);
+        desc = "Add the 4-way split of images to define the different regions.";
+    }
+    void Run(Mat src) {
+        binarize->Run(src);
+        dst1 = 0;
+        dst1.setTo(2, binarize->mats->mats->mat[0]);
+        dst1.setTo(4, binarize->mats->mats->mat[1]);
+        dst1.setTo(6, binarize->mats->mats->mat[2]);
+        dst1.setTo(8, binarize->mats->mats->mat[3]);
+        if (standalone) {
+            dst3 = dst1 * 255 / 5;
+            dst2 = vbPalette(dst3);
+        }
+    }
+};
