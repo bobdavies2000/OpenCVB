@@ -177,24 +177,13 @@ End Class
 
 Public Class Binarize_Simple : Inherits VB_Algorithm
     Public meanScalar As cv.Scalar
-    Public mask As cv.Mat
     Public injectVal As Integer = 255
     Public Sub New()
-        mask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        If mask Is Nothing Then
-            meanScalar = cv.Cv2.Mean(src) ' use the whole src when there is no mask
-        Else
-            Dim tmp As New cv.Mat(src.Size, cv.MatType.CV_8U, 255)
-            If mask.Type <> cv.MatType.CV_8U Then mask.ConvertTo(mask, cv.MatType.CV_8U)
-            src.CopyTo(tmp, mask)
-            meanScalar = cv.Cv2.Mean(tmp, mask)
-        End If
-
+        meanScalar = cv.Cv2.Mean(src)
         dst2 = src.Threshold(meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
     End Sub
 End Class
@@ -206,33 +195,32 @@ End Class
 
 
 
-Public Class Binarize_Recurse : Inherits VB_Algorithm
+Public Class Binarize_FourWay : Inherits VB_Algorithm
     Dim binarize As New Binarize_Simple
     Public mats As New Mat_4Click
     Public Sub New()
-        labels(2) = "A 4-way split - Lighter half (upper left), lightest (upper right), darker half (lower left), darkest (lower right)"
+        labels(2) = "A 4-way split - lightest (upper left) to darkest (lower right)"
         desc = "Binarize an image twice using masks"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
-        binarize.mask = Nothing
         binarize.Run(gray)
-        mats.mat(0) = binarize.dst2.Clone
+        Dim mask = binarize.dst2.Clone
 
-        binarize.mask = mats.mat(0)
-        binarize.Run(gray)
-        mats.mat(1) = binarize.dst2.Clone
+        Dim meanScalarTop = cv.Cv2.Mean(gray, mask)
+        Dim meanScalarBot = cv.Cv2.Mean(gray, Not mask)
+        mats.mat(0) = gray.InRange(meanScalarTop(0), 255)
+        mats.mat(1) = gray.InRange(binarize.meanScalar(0), meanScalarTop(0))
+        mats.mat(2) = gray.InRange(meanScalarBot(0), binarize.meanScalar(0))
+        mats.mat(3) = gray.InRange(0, meanScalarBot(0))
 
-        mats.mat(2) = Not mats.mat(0)
-        binarize.mask = mats.mat(0).Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        binarize.Run(gray)
-        mats.mat(3) = binarize.dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-
-        If standalone Then mats.Run(empty)
-        dst2 = mats.dst2
-        dst3 = mats.dst3
-        labels(3) = mats.labels(3)
+        If standalone Then
+            mats.Run(empty)
+            dst2 = mats.dst2
+            dst3 = mats.dst3
+            labels(3) = mats.labels(3)
+        End If
     End Sub
 End Class
 
@@ -249,7 +237,7 @@ End Class
 
 
 Public Class Binarize_RecurseAdd : Inherits VB_Algorithm
-    Dim binarize As New Binarize_Recurse
+    Dim binarize As New Binarize_FourWay
     Public Sub New()
         dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Add the 4-way split of images to define the different regions."

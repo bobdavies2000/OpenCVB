@@ -257,10 +257,9 @@ End Class
 
 Public Class Edge_BinarizedCanny : Inherits VB_Algorithm
     Dim edges As New Edge_Canny
-    Dim binarize As Binarize_Recurse
+    Dim binarize As New Binarize_FourWay
     Dim mats As New Mat_4Click
     Public Sub New()
-        binarize = New Binarize_Recurse
         labels(2) = "Edges between halves, lightest, darkest, and the combo"
         desc = "Collect edges from binarized images"
     End Sub
@@ -527,12 +526,10 @@ End Class
 
 Public Class Edge_BinarizedSobel : Inherits VB_Algorithm
     Dim edges As New Edge_Sobel_Old
-    Dim binarize As Binarize_Recurse
+    Dim binarize As New Binarize_FourWay
     Public mats As New Mat_4Click
     Public Sub New()
-        binarize = New Binarize_Recurse
         findSlider("Sobel kernel Size").Value = 5
-
         labels(2) = "Edges between halves, lightest, darkest, and the combo"
         labels(3) = "Click any quadrant in dst3 to enlarge it in dst2"
         desc = "Collect Sobel edges from binarized images"
