@@ -226,6 +226,7 @@ public:
     Point clickPoint; bool mouseClickFlag; int mousePicTag; Point mouseMovePoint; bool mouseMovePointUpdated;
     Scalar scalarColors[256]; Vec3b vecColors[256]; Rect drawRect; bool displayDst0; bool displayDst1;
     bool gridROIclicked;
+    int quadrantIndex;
     Mat gridToRoiIndex;
     vector<Rect> gridList;
     vector<vector<int>> gridNeighbors;
@@ -293,6 +294,34 @@ public:
         }
         return mm;
     }
+
+#define QUAD0 0
+#define QUAD1 1
+#define QUAD2 2
+#define QUAD3 3
+    void setMyActiveMat() {
+        if (this->mouseClickFlag) {
+            cv::Point pt = this->clickPoint;
+            if (pt.y < this->workingRes.height / 2) {
+                if (pt.x < this->workingRes.width / 2) {
+                    this->quadrantIndex = QUAD0;
+                }
+                else {
+                    this->quadrantIndex = QUAD1;
+                }
+            }
+            else {
+                if (pt.x < this->workingRes.width / 2) {
+                    this->quadrantIndex = QUAD2;
+                }
+                else {
+                    this->quadrantIndex = QUAD3;
+                }
+            }
+            this->mouseClickFlag = false;
+        }
+    }
+
     void drawRotatedOutline(const RotatedRect& rotatedRect, Mat& dst2, const Scalar& color) {
         vector<Point2f> pts;
         rotatedRect.points(pts);

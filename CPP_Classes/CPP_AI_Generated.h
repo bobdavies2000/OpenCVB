@@ -903,59 +903,6 @@ public:
 
 
 
-
-
-
-
-class CPP_Mat_4to1 : public algorithmCPP {
-public:
-    Mat mat[4];
-    bool lineSeparators = true;
-
-    CPP_Mat_4to1() : algorithmCPP() {
-        traceName = "CPP_Mat_4to1";
-        for (int i = 0; i < 4; i++) {
-            mat[i] = dst2.clone();
-        }
-
-        desc = "Use one Mat for up to 4 images";
-    }
-
-    void Run(Mat src) {
-        Size nSize(dst2.cols / 2, dst2.rows / 2);
-        Rect roiTopLeft(0, 0, nSize.width, nSize.height);
-        Rect roiTopRight(nSize.width, 0, nSize.width, nSize.height);
-        Rect roiBotLeft(0, nSize.height, nSize.width, nSize.height);
-        Rect roiBotRight(nSize.width, nSize.height, nSize.width, nSize.height);
-
-        if (standalone) {
-            Mat tmpLeft = task->leftView;
-            if (task->leftView.channels() == 1) cvtColor(task->leftView, task->leftView, COLOR_GRAY2BGR);
-            Mat tmpRight = task->rightView;
-            if (task->rightView.channels() == 1) cvtColor(task->rightView, task->rightView, COLOR_GRAY2BGR);
-            mat[0] = src.clone();
-            mat[1] = task->depthRGB.clone();
-            mat[2] = tmpLeft;
-            mat[3] = tmpRight;
-        }
-
-        dst2 = Mat(dst2.size(), CV_8UC3);
-        Rect rois[] = {roiTopLeft, roiTopRight, roiBotLeft, roiBotRight};
-        for (int i = 0; i < 4; i++) {
-            if (mat[i].channels() == 1) {
-                cvtColor(mat[i], mat[i], COLOR_GRAY2BGR);
-            }
-            resize(mat[i], dst2(rois[i]), nSize);
-        }
-
-        if (lineSeparators) {
-            line(dst2, Point(0, dst2.rows / 2), Point(dst2.cols, dst2.rows / 2), Scalar(255, 255, 255), task->lineWidth + 1);
-            line(dst2, Point(dst2.cols / 2, 0), Point(dst2.cols / 2, dst2.rows), Scalar(255, 255, 255), task->lineWidth + 1);
-        }
-    }
-};
-
-
 class CPP_Depth_Colorizer : public algorithmCPP {
 public:
     CPP_Depth_Colorizer() : algorithmCPP() {
@@ -2868,6 +2815,139 @@ public:
                 circle(dst2, pt, task->dotSize + 2, Scalar(0, 0, 255), -1, task->lineType);
             }
             task->drawRotatedOutline(minRect, dst2, Scalar(0, 255, 255));
+        }
+    }
+};
+
+
+
+
+
+
+
+class CPP_Mat_4to1 : public algorithmCPP {
+public:
+    Mat mat[4];
+    bool lineSeparators = true;
+
+    CPP_Mat_4to1() : algorithmCPP() {
+        traceName = "CPP_Mat_4to1";
+        for (int i = 0; i < 4; i++) {
+            mat[i] = dst2.clone();
+        }
+
+        desc = "Use one Mat for up to 4 images";
+    }
+
+    void defaultMats(Mat src)
+    {
+        Mat tmpLeft = task->leftView;
+        if (task->leftView.channels() == 1) cvtColor(task->leftView, task->leftView, COLOR_GRAY2BGR);
+        Mat tmpRight = task->rightView;
+        if (task->rightView.channels() == 1) cvtColor(task->rightView, task->rightView, COLOR_GRAY2BGR);
+        mat[0] = src.clone();
+        mat[1] = task->depthRGB.clone();
+        mat[2] = tmpLeft;
+        mat[3] = tmpRight;
+    }
+    void Run(Mat src) {
+        Size nSize(dst2.cols / 2, dst2.rows / 2);
+        Rect roiTopLeft(0, 0, nSize.width, nSize.height);
+        Rect roiTopRight(nSize.width, 0, nSize.width, nSize.height);
+        Rect roiBotLeft(0, nSize.height, nSize.width, nSize.height);
+        Rect roiBotRight(nSize.width, nSize.height, nSize.width, nSize.height);
+
+        if (standalone) defaultMats(src);
+
+        dst2 = Mat(dst2.size(), CV_8UC3);
+        Rect rois[] = { roiTopLeft, roiTopRight, roiBotLeft, roiBotRight };
+        for (int i = 0; i < 4; i++) {
+            if (mat[i].channels() == 1) {
+                cvtColor(mat[i], mat[i], COLOR_GRAY2BGR);
+            }
+            resize(mat[i], dst2(rois[i]), nSize);
+        }
+
+        if (lineSeparators) {
+            line(dst2, Point(0, dst2.rows / 2), Point(dst2.cols, dst2.rows / 2), Scalar(255, 255, 255), task->lineWidth + 1);
+            line(dst2, Point(dst2.cols / 2, 0), Point(dst2.cols / 2, dst2.rows), Scalar(255, 255, 255), task->lineWidth + 1);
+        }
+    }
+};
+
+
+#define RESULT_DST0 0
+#define RESULT_DST1 1
+#define RESULT_DST2 2
+#define RESULT_DST3 3
+
+
+
+
+class CPP_Mat_4Click : public algorithmCPP {
+public:
+    CPP_Mat_4to1* mats;
+    Mat mat[4];
+    CPP_Mat_4Click() : algorithmCPP() {
+        traceName = "CPP_Mat_4Click";
+        mats = new CPP_Mat_4to1();
+        labels[3] = "Click a quadrant in dst2 to view it in dst3";
+        desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst3";
+    }
+    void Run(Mat src) {
+        if (standalone) mats->defaultMats(src);
+        if ((task->mouseClickFlag && task->mousePicTag == RESULT_DST2) || task->firstPass) {
+            if (task->firstPass) {
+                task->mouseClickFlag = true;
+                task->clickPoint = Point(0, 0);
+                task->mousePicTag = RESULT_DST2;
+            }
+            task->setMyActiveMat();
+        }
+        mats->Run(empty);
+        dst2 = mats->dst2.clone();
+        dst3 = mats->mat[task->quadrantIndex];
+    }
+};
+
+
+
+
+
+
+class CPP_Binarize_FourWay : public algorithmCPP {
+public:
+    CPP_Binarize_Simple* binarize;
+    CPP_Mat_4Click* mats;
+    CPP_Binarize_FourWay() : algorithmCPP() {
+        traceName = "CPP_Binarize_FourWay";
+        binarize = new CPP_Binarize_Simple();
+        mats = new CPP_Mat_4Click();
+        labels[2] = "A 4-way split - lightest (upper left) to darkest (lower right)";
+        desc = "Binarize an image twice using masks";
+    }
+    void Run(Mat src) {
+        Mat gray;
+        if (src.channels() == 1) {
+            gray = src.clone();
+        }
+        else {
+            cvtColor(src, gray, COLOR_BGR2GRAY);
+        }
+        binarize->Run(gray);
+        Mat mask = binarize->dst2.clone();
+        double midColor = binarize->meanScalar(0);
+        double topColor = mean(gray, mask)(0);
+        double botColor = mean(gray, ~mask)(0);
+        inRange(gray, topColor, 255, mats->mat[0]);
+        inRange(gray, midColor, botColor, mats->mat[1]);
+        inRange(gray, botColor, midColor, mats->mat[2]);
+        inRange(gray, 0, botColor, mats->mat[3]);
+        if (standalone) {
+            mats->Run(empty);
+            dst2 = mats->dst2;
+            dst3 = mats->dst3;
+            labels[3] = mats->labels[3];
         }
     }
 };

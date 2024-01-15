@@ -208,14 +208,15 @@ Public Class Binarize_FourWay : Inherits VB_Algorithm
         binarize.Run(gray)
         Dim mask = binarize.dst2.Clone
 
-        Dim meanScalarTop = cv.Cv2.Mean(gray, mask)
-        Dim meanScalarBot = cv.Cv2.Mean(gray, Not mask)
-        mats.mat(0) = gray.InRange(meanScalarTop(0), 255)
-        mats.mat(1) = gray.InRange(binarize.meanScalar(0), meanScalarTop(0))
-        mats.mat(2) = gray.InRange(meanScalarBot(0), binarize.meanScalar(0))
-        mats.mat(3) = gray.InRange(0, meanScalarBot(0))
+        Dim midColor = binarize.meanScalar(0)
+        Dim topColor = cv.Cv2.Mean(gray, mask)(0)
+        Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
+        mats.mat(0) = gray.InRange(topColor, 255)
+        mats.mat(1) = gray.InRange(midColor, midColor)
+        mats.mat(2) = gray.InRange(botColor, midColor)
+        mats.mat(3) = gray.InRange(0, botColor)
 
-        If standalone Then
+        If standalone Or showIntermediate() Then
             mats.Run(empty)
             dst2 = mats.dst2
             dst3 = mats.dst3
@@ -236,7 +237,7 @@ End Class
 
 
 
-Public Class Binarize_RecurseAdd : Inherits VB_Algorithm
+Public Class Binarize_FourWayCombine : Inherits VB_Algorithm
     Dim binarize As New Binarize_FourWay
     Public Sub New()
         dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -246,12 +247,12 @@ Public Class Binarize_RecurseAdd : Inherits VB_Algorithm
         binarize.Run(src)
 
         dst1.SetTo(0)
-        dst1.SetTo(1, binarize.mats.mat(0))
-        dst1.SetTo(2, binarize.mats.mat(1))
-        dst1.SetTo(3, binarize.mats.mat(2))
-        dst1.SetTo(4, binarize.mats.mat(3))
+        dst1.SetTo(2, binarize.mats.mat(0))
+        dst1.SetTo(4, binarize.mats.mat(1))
+        dst1.SetTo(6, binarize.mats.mat(2))
+        dst1.SetTo(8, binarize.mats.mat(3))
 
-        If standalone Then
+        If standalone Or showIntermediate() Then
             dst3 = dst1 * 255 / 5
             dst2 = vbPalette(dst3)
         End If

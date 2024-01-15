@@ -2682,7 +2682,7 @@ public:
 
 		multimap<int, int, greater<int>> sizeSorted;
 		int floodFlag = 4 | FLOODFILL_FIXED_RANGE;
-		float sizeThreshold = 0.95f;
+		float sizeThreshold = 0.98f;
 		for (int y = 0; y < src.rows; y++)
 		{
 			for (int x = 0; x < src.cols; x++)

@@ -2,6 +2,7 @@
 enum functions
 {
     _CPP_AddWeighted_Basics,
+_CPP_Mat_4Click,
 _CPP_Area_MinRect,
 _CPP_Mesh_Features,
     _CPP_Mesh_Agast,

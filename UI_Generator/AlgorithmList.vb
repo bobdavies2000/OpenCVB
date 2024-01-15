@@ -2,6 +2,7 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
+_CPP_Mat_4Click
 _CPP_Area_MinRect
 _CPP_Mesh_Features
 _CPP_Mesh_Agast
@@ -150,12 +151,12 @@ if algorithmName = "Binarize_Basics" Then return new Binarize_Basics
 if algorithmName = "Binarize_Bernson" Then return new Binarize_Bernson
 if algorithmName = "Binarize_Bernson_MT" Then return new Binarize_Bernson_MT
 if algorithmName = "Binarize_FourWay" Then return new Binarize_FourWay
+if algorithmName = "Binarize_FourWayCombine" Then return new Binarize_FourWayCombine
 if algorithmName = "Binarize_KMeansMasks" Then return new Binarize_KMeansMasks
 if algorithmName = "Binarize_KMeansRGB" Then return new Binarize_KMeansRGB
 if algorithmName = "Binarize_Niblack_Nick" Then return new Binarize_Niblack_Nick
 if algorithmName = "Binarize_Niblack_Sauvola" Then return new Binarize_Niblack_Sauvola
 if algorithmName = "Binarize_OTSU" Then return new Binarize_OTSU
-if algorithmName = "Binarize_RecurseAdd" Then return new Binarize_RecurseAdd
 if algorithmName = "Binarize_Simple" Then return new Binarize_Simple
 if algorithmName = "Bitmap_ToMat" Then return new Bitmap_ToMat
 if algorithmName = "Blob_Basics" Then return new Blob_Basics
@@ -315,6 +316,7 @@ if algorithmName = "CPP_Kalman_Basics" Then return new CPP_Basics(functionNames.
 if algorithmName = "CPP_KNN_Basics" Then return new CPP_Basics(functionNames._CPP_KNN_Basics)
 if algorithmName = "CPP_KNN_Lossy" Then return new CPP_Basics(functionNames._CPP_KNN_Lossy)
 if algorithmName = "CPP_Line_Basics" Then return new CPP_Basics(functionNames._CPP_Line_Basics)
+if algorithmName = "CPP_Mat_4Click" Then return new CPP_Basics(functionNames._CPP_Mat_4Click)
 if algorithmName = "CPP_Mat_4to1" Then return new CPP_Basics(functionNames._CPP_Mat_4to1)
 if algorithmName = "CPP_Mesh_Agast" Then return new CPP_Basics(functionNames._CPP_Mesh_Agast)
 if algorithmName = "CPP_Mesh_Basics" Then return new CPP_Basics(functionNames._CPP_Mesh_Basics)

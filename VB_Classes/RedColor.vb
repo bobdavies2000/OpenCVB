@@ -145,7 +145,7 @@ End Class
 
 
 Public Class RedColor_Binarize : Inherits VB_Algorithm
-    Dim binarize As New Binarize_RecurseAdd
+    Dim binarize As New Binarize_FourWayCombine
     Dim rMin As New RedMin_Basics
     Public Sub New()
         labels(3) = "A 4-way split of the input grayscale image based on the amount of light"

@@ -34,6 +34,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case _CPP_AddWeighted_Basics :
     {task->alg = new CPP_AddWeighted_Basics(); break; }
+	case _CPP_Mat_4Click :
+	{task->alg = new CPP_Mat_4Click(); break; }
 	case _CPP_Area_MinRect :
 	{task->alg = new CPP_Area_MinRect(); break; }
 	case _CPP_Mesh_Features :
