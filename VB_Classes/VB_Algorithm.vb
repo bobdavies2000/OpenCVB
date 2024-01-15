@@ -126,6 +126,14 @@ Public Class VB_Algorithm : Implements IDisposable
         firstPass = False
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
+    Public Sub identifyCells(minCells As List(Of segCell), showMaxIndex As Integer)
+        For Each cell In minCells
+            If cell.index <= showMaxIndex Then
+                setTrueText(CStr(cell.index), cell.maxDist, 2)
+                setTrueText(CStr(cell.index), cell.maxDist, 3)
+            End If
+        Next
+    End Sub
     Public Sub setTrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
         Dim str As New trueText(text, pt.X, pt.Y, picTag)
         trueData.Add(str)

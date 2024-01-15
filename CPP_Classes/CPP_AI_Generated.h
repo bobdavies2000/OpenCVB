@@ -2880,10 +2880,6 @@ public:
 #define RESULT_DST1 1
 #define RESULT_DST2 2
 #define RESULT_DST3 3
-
-
-
-
 class CPP_Mat_4Click : public algorithmCPP {
 public:
     CPP_Mat_4to1* mats;
@@ -2972,11 +2968,10 @@ public:
     }
     void Run(Mat src) {
         binarize->Run(src);
-        dst1 = 0;
-        dst1.setTo(2, binarize->mats->mats->mat[0]);
-        dst1.setTo(4, binarize->mats->mats->mat[1]);
-        dst1.setTo(6, binarize->mats->mats->mat[2]);
-        dst1.setTo(8, binarize->mats->mats->mat[3]);
+        dst1.setTo(1, binarize->mats->mats->mat[0]);
+        dst1.setTo(2, binarize->mats->mats->mat[1]);
+        dst1.setTo(3, binarize->mats->mats->mat[2]);
+        dst1.setTo(4, binarize->mats->mats->mat[3]);
         if (standalone) {
             dst3 = dst1 * 255 / 5;
             dst2 = vbPalette(dst3);

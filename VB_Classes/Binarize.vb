@@ -193,83 +193,6 @@ End Class
 
 
 
-
-
-Public Class Binarize_FourWay : Inherits VB_Algorithm
-    Dim binarize As New Binarize_Simple
-    Public mats As New Mat_4Click
-    Public Sub New()
-        labels(2) = "A 4-way split - lightest (upper left) to darkest (lower right)"
-        desc = "Binarize an image twice using masks"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-        binarize.Run(gray)
-        Dim mask = binarize.dst2.Clone
-
-        Dim midColor = binarize.meanScalar(0)
-        Dim topColor = cv.Cv2.Mean(gray, mask)(0)
-        Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
-        mats.mat(0) = gray.InRange(topColor, 255)
-        mats.mat(1) = gray.InRange(midColor, topColor)
-        mats.mat(2) = gray.InRange(botColor, midColor)
-        mats.mat(3) = gray.InRange(0, botColor)
-
-        If standalone Or showIntermediate() Then
-            mats.Run(empty)
-            dst2 = mats.dst2
-            dst3 = mats.dst3
-            labels(3) = mats.labels(3)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
-
-
-Public Class Binarize_FourWayCombine : Inherits VB_Algorithm
-    Dim binarize As New Binarize_FourWay
-    Public Sub New()
-        dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Add the 4-way split of images to define the different regions."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        binarize.Run(src)
-
-        dst1.SetTo(0)
-        dst1.SetTo(2, binarize.mats.mat(0))
-        dst1.SetTo(4, binarize.mats.mat(1))
-        dst1.SetTo(6, binarize.mats.mat(2))
-        dst1.SetTo(8, binarize.mats.mat(3))
-
-        If standalone Or showIntermediate() Then
-            dst3 = dst1 * 255 / 5
-            dst2 = vbPalette(dst3)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
-
 Public Class Binarize_KMeansMasks : Inherits VB_Algorithm
     Dim km As New KMeans_Image
     Dim mats As New Mat_4Click
@@ -320,3 +243,87 @@ Public Class Binarize_KMeansRGB : Inherits VB_Algorithm
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class Binarize_Four : Inherits VB_Algorithm
+    Dim binarize As New Binarize_Simple
+    Public mats As New Mat_4Click
+    Public Sub New()
+        labels(2) = "A 4-way split - lightest (upper left) to darkest (lower right)"
+        desc = "Binarize an image twice using masks"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        binarize.Run(gray)
+        Dim mask = binarize.dst2.Clone
+
+        Dim midColor = binarize.meanScalar(0)
+        Dim topColor = cv.Cv2.Mean(gray, mask)(0)
+        Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
+        mats.mat(0) = gray.InRange(topColor, 255)
+        mats.mat(1) = gray.InRange(midColor, topColor)
+        mats.mat(2) = gray.InRange(botColor, midColor)
+        mats.mat(3) = gray.InRange(0, botColor)
+
+        If standalone Or showIntermediate() Then
+            mats.Run(empty)
+            dst2 = mats.dst2
+            dst3 = mats.dst3
+            labels(3) = mats.labels(3)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Binarize_FourCombine : Inherits VB_Algorithm
+    Dim binarize As New Binarize_Four
+    Public Sub New()
+        dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Add the 4-way split of images to define the different regions."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binarize.Run(src)
+
+        dst1.SetTo(1, binarize.mats.mat(0))
+        dst1.SetTo(2, binarize.mats.mat(1))
+        dst1.SetTo(3, binarize.mats.mat(2))
+        dst1.SetTo(4, binarize.mats.mat(3))
+
+        If standalone Or showIntermediate() Then
+            dst3 = dst1 * 255 / 5
+            dst2 = vbPalette(dst3)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Binarize_FourPixelFlips : Inherits VB_Algorithm
+    Dim binarize As New Binarize_FourCombine
+    Public Sub New()
+        advice = ""
+        desc = "Identify the marginal regions that flip between subdivisions based on brightness."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binarize.Run(src)
+        dst2 = vbPalette(binarize.dst1 * 255 / 5)
+
+        Static lastSubD As cv.Mat = binarize.dst1.Clone
+        dst3 = lastSubD - binarize.dst1
+        dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        lastSubD = binarize.dst1.Clone
+    End Sub
+End Class

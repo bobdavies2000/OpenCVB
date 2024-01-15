@@ -91,7 +91,7 @@ public:
             count = floodFill(src, maskCopy, it->second, fill, &rect, diff, diff, floodFlag | (fill << 8));
             if (count >= 1)
             {
-                if (rect.width >= src.cols - 2 || rect.height >= src.rows - 2) continue;
+                //if (rect.width >= src.cols - 2 || rect.height >= src.rows - 2) continue;
                 cellRects.push_back(rect);
                 cellSizes.push_back(count);
                 floodPoints.push_back(it->second);

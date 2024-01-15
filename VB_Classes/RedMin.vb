@@ -5,9 +5,9 @@ Public Class RedMin_Basics : Inherits VB_Algorithm
     Public minCells As New List(Of segCell)
     Dim lastColors As cv.Mat
     Dim lastMap As cv.Mat = dst2.Clone
+    Public showMaxIndex = 20
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels = {"", "Mask of active RedMin cells", "CV_8U representation of minCells", ""}
         lastColors = dst3.Clone
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
     End Sub
@@ -19,29 +19,34 @@ Public Class RedMin_Basics : Inherits VB_Algorithm
         dst2.SetTo(0)
         dst3.SetTo(0)
         Dim usedColors = New List(Of cv.Vec3b)({black})
+        Dim unmatched As Integer
         For Each key In minCore.sortedCells
             Dim cell = key.Value
             Dim index = lastMap.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X)
-
-            If index > 0 And index < lastCells.Count Then
+            If index < lastCells.Count Then
                 cell.color = lastColors.Get(Of cv.Vec3b)(cell.maxDist.Y, cell.maxDist.X)
+                'cell.maxDist = lastCells(index).maxDist
+            Else
+                unmatched += 1
             End If
-            If usedColors.Contains(cell.color) Then cell.color = randomCellColor()
+            If usedColors.Contains(cell.color) Then
+                unmatched += 1
+                cell.color = randomCellColor()
+            End If
             usedColors.Add(cell.color)
 
             If dst2.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X) = 0 Then
-                cell.index = minCells.Count + 1
+                cell.index = minCells.Count
                 minCells.Add(cell)
                 dst2(cell.rect).SetTo(cell.index, cell.mask)
                 dst3(cell.rect).SetTo(cell.color, cell.mask)
-
-                setTrueText(CStr(cell.index), cell.maxDist, 2)
-                setTrueText(CStr(cell.index), cell.maxDist, 3)
             End If
         Next
 
-        labels(3) = CStr(minCells.Count) + " cells were identified."
+        If standalone Or showIntermediate() Then identifyCells(minCells, showMaxIndex)
 
+        labels(3) = CStr(minCells.Count) + " cells were identified.  The top " + CStr(showMaxIndex) + " are numbered"
+        labels(2) = minCore.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
         task.cellSelect = New segCell
         If task.clickPoint = New cv.Point(0, 0) Then
             If minCells.Count > 2 Then
@@ -55,6 +60,83 @@ Public Class RedMin_Basics : Inherits VB_Algorithm
         lastColors = dst3.Clone
         lastMap = dst2.Clone
         If minCells.Count > 0 Then dst1 = vbPalette(lastMap * 255 / minCells.Count)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedMin_Core : Inherits VB_Algorithm
+    Public sortedCells As New SortedList(Of Integer, segCell)(New compareAllowIdenticalIntegerInverted)
+    Public inputMask As cv.Mat
+    Public Sub New()
+        cPtr = FloodCell_Open()
+        desc = "Another minimalist approach to building RedCloud color-based cells."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 1 Then
+            Static binarize As New Binarize_FourCombine
+            binarize.Run(src)
+            src = binarize.dst1
+        End If
+
+        Dim imagePtr As IntPtr
+        If inputMask Is Nothing Then
+            Dim inputData(src.Total - 1) As Byte
+            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+            imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols,
+                                     src.Type, redOptions.DesiredCellSlider.Value, 0)
+            handleInput.Free()
+        Else
+            Dim inputData(src.Total - 1) As Byte
+            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+            Dim maskData(inputMask.Total - 1) As Byte
+            Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
+            Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
+
+            imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                     src.Type, redOptions.DesiredCellSlider.Value, 0)
+            handleMask.Free()
+            handleInput.Free()
+        End If
+
+        Dim classCount = FloodCell_Count(cPtr)
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst3 = vbPalette(dst2 * 255 / classCount)
+
+        If heartBeat() Then labels(3) = CStr(classCount) + " cells found"
+        If classCount <= 1 Then Exit Sub
+
+        Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, FloodCell_Sizes(cPtr))
+        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, FloodCell_Rects(cPtr))
+        Dim floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, FloodCell_FloodPoints(cPtr))
+        sortedCells.Clear()
+        For i = 0 To classCount - 1
+            Dim cell As New segCell
+            cell.index = i + 1
+            cell.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
+            cell.mask = dst2(cell.rect).InRange(cell.index, cell.index).Threshold(0, 255, cv.ThresholdTypes.Binary)
+            'Dim contour = contourBuild(cell.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            'vbDrawContour(cell.mask, contour, 255, -1)
+
+            cell.pixels = sizeData.Get(Of Integer)(i, 0)
+            cell.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
+            cell.mask.Rectangle(New cv.Rect(0, 0, cell.mask.Width, cell.mask.Height), 0, 1)
+            Dim pt = vbGetMaxDist(cell.mask)
+            cell.maxDist = New cv.Point(pt.X + cell.rect.X, pt.Y + cell.rect.Y)
+            sortedCells.Add(cell.pixels, cell)
+        Next
+
+        If heartBeat() Then labels(2) = "CV_8U format - " + CStr(classCount) + " cells were identified."
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = FloodCell_Close(cPtr)
     End Sub
 End Class
 
@@ -129,82 +211,6 @@ Public Class RedMin_BasicsMotion : Inherits VB_Algorithm
         If minCells.Count > 0 Then dst1 = vbPalette(lastMap * 255 / minCells.Count)
     End Sub
 End Class
-
-
-
-
-
-Public Class RedMin_Core : Inherits VB_Algorithm
-    Public sortedCells As New SortedList(Of Integer, segCell)(New compareAllowIdenticalIntegerInverted)
-    Public inputMask As cv.Mat
-    Dim fLess As New FeatureLess_Basics
-    Public Sub New()
-        cPtr = FloodCell_Open()
-        desc = "Another minimalist approach to building RedCloud color-based cells."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            fLess.Run(src)
-            src = fLess.dst2
-        End If
-
-        Dim imagePtr As IntPtr
-        If inputMask Is Nothing Then
-            Dim inputData(src.Total - 1) As Byte
-            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-            imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols,
-                                     src.Type, redOptions.DesiredCellSlider.Value, 0)
-            handleInput.Free()
-        Else
-            Dim inputData(src.Total - 1) As Byte
-            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-            Dim maskData(inputMask.Total - 1) As Byte
-            Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
-            Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
-
-            imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                     src.Type, redOptions.DesiredCellSlider.Value, 0)
-            handleMask.Free()
-            handleInput.Free()
-        End If
-
-        Dim classCount = FloodCell_Count(cPtr)
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-        dst3 = vbPalette(dst2 * 255 / classCount)
-
-        If heartBeat() Then labels(3) = CStr(classCount) + " cells found"
-        If classCount <= 1 Then Exit Sub
-
-        Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, FloodCell_Sizes(cPtr))
-        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, FloodCell_Rects(cPtr))
-        Dim floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, FloodCell_FloodPoints(cPtr))
-        sortedCells.Clear()
-        For i = 0 To classCount - 1
-            Dim cell As New segCell
-            cell.index = i + 1
-            cell.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
-            cell.mask = dst2(cell.rect).InRange(cell.index, cell.index)
-            'Dim contour = contourBuild(cell.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            'vbDrawContour(cell.mask, contour, 255, -1)
-
-            cell.pixels = sizeData.Get(Of Integer)(i, 0)
-            cell.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
-            cell.mask.Rectangle(New cv.Rect(0, 0, cell.mask.Width, cell.mask.Height), 0, 1)
-            Dim pt = vbGetMaxDist(cell.mask)
-            cell.maxDist = New cv.Point(pt.X + cell.rect.X, pt.Y + cell.rect.Y)
-            sortedCells.Add(cell.pixels, cell)
-        Next
-        If heartBeat() Then labels(2) = "CV_8U format - " + CStr(classCount) + " cells were identified."
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = FloodCell_Close(cPtr)
-    End Sub
-End Class
-
 
 
 

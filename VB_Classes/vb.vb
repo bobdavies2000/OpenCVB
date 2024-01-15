@@ -187,7 +187,7 @@ Module VB
         Dim rect = New cv.Rect(x, y, w, h)
         Return rc.mask
     End Function
-    Public Sub drawFatDot(pt As cv.Point2f, dst As cv.Mat)
+    Public Sub drawPolkaDot(pt As cv.Point2f, dst As cv.Mat)
         dst.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
         dst.Circle(pt, task.dotSize, cv.Scalar.Black, -1, task.lineType)
     End Sub

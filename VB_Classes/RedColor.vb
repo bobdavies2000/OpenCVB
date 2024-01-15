@@ -292,18 +292,66 @@ End Class
 
 
 Public Class RedColor_Binarize : Inherits VB_Algorithm
-    Dim binarize As New Binarize_FourWayCombine
+    Dim binarize As New Binarize_FourCombine
     Dim rMin As New RedMin_Basics
     Public Sub New()
-        labels(3) = "A 4-way split of the input grayscale image based on the amount of light"
+        labels(3) = "A 4-way split of the input grayscale image based on brightness"
         desc = "Use RedCloud on a 4-way split based on light to dark in the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binarize.Run(src)
-        dst3 = vbPalette(binarize.dst1 * 255 / 8)
+        dst3 = vbPalette(binarize.dst1 * 255 / 5)
 
         rMin.Run(binarize.dst1)
         dst2 = rMin.dst3
         labels(2) = rMin.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedColor_Flippers : Inherits VB_Algorithm
+    Dim binarize As New Binarize_FourCombine
+    Dim rMin As New RedMin_Basics
+    Public Sub New()
+        redOptions.DesiredCellSlider.Value = 100
+        labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
+        desc = "Identify the 4-way split cells that are flipping between brightness boundaries."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binarize.Run(src)
+
+        rMin.Run(binarize.dst1)
+        dst2 = rMin.dst3
+        labels(2) = rMin.labels(3)
+
+        Static lastMap As cv.Mat = rMin.dst3.Clone
+        dst3.SetTo(0)
+        Dim unMatched As Integer
+        Dim unMatchedPixels As Integer
+        For Each cell In rMin.minCells
+            Dim lastColor = lastMap.Get(Of cv.Vec3b)(cell.maxDist.Y, cell.maxDist.X)
+            If lastColor <> cell.color Then
+                dst3(cell.rect).SetTo(cell.color, cell.mask)
+                unMatched += 1
+                unMatchedPixels += cell.pixels
+            End If
+        Next
+        lastMap = rMin.dst3.Clone
+
+        If standalone Or showIntermediate() Then identifyCells(rMin.minCells, rMin.showMaxIndex)
+
+        If task.cellSelect.index <> 0 Then
+            dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
+            drawPolkaDot(task.cellSelect.maxDist, dst2)
+        End If
+
+        If heartBeat() Then
+            labels(3) = "Unmatched to previous frame: " + CStr(unMatched) + " totaling " + CStr(unMatchedPixels) + " pixels."
+        End If
     End Sub
 End Class

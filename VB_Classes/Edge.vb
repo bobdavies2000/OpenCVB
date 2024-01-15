@@ -257,7 +257,7 @@ End Class
 
 Public Class Edge_BinarizedCanny : Inherits VB_Algorithm
     Dim edges As New Edge_Canny
-    Dim binarize As New Binarize_FourWay
+    Dim binarize As New Binarize_Four
     Dim mats As New Mat_4Click
     Public Sub New()
         labels(2) = "Edges between halves, lightest, darkest, and the combo"
@@ -526,7 +526,7 @@ End Class
 
 Public Class Edge_BinarizedSobel : Inherits VB_Algorithm
     Dim edges As New Edge_Sobel_Old
-    Dim binarize As New Binarize_FourWay
+    Dim binarize As New Binarize_Four
     Public mats As New Mat_4Click
     Public Sub New()
         findSlider("Sobel kernel Size").Value = 5

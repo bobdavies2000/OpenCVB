@@ -760,7 +760,7 @@ Public Class Match_Points : Inherits VB_Algorithm
             mPoint.Run(src)
             correlation.Add(mPoint.correlation)
             ptx(i) = mPoint.pt
-            drawFatDot(ptx(i), dst2)
+            drawPolkaDot(ptx(i), dst2)
             dst2.Rectangle(mPoint.searchRect, cv.Scalar.Yellow, 1)
         Next
         mPoint.target = src.Clone
