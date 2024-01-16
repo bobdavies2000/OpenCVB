@@ -208,6 +208,10 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         colorInput = FeatureLessRadio.Text
     End Sub
+    Private Sub BinarizeRadio_CheckedChanged(sender As Object, e As EventArgs) Handles BinarizeRadio.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        colorInput = BinarizeRadio.Text
+    End Sub
 
 
 

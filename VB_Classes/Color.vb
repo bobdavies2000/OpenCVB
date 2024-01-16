@@ -8,6 +8,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Dim fLess As New RedColor_FeatureLess
+    Dim binarize As New Binarize_FourWay
     Dim classifier As Object = reduction
     Public Sub New()
         classifier = reduction
@@ -28,12 +29,14 @@ Public Class Color_Basics : Inherits VB_Algorithm
                     classifier = hColor
                 Case "FeatureLess"
                     classifier = fLess
+                Case "Binarize_FourWay"
+                    classifier = binarize
             End Select
         End If
 
         dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
         classifier.run(dst1)
-        classCount = classifier.classcount
+        classCount = classifier.classCount
 
         dst2 = classifier.dst2
         dst3 = vbPalette(dst2 * 255 / classCount)

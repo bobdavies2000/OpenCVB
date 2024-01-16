@@ -75,6 +75,7 @@ Partial Class OptionsRedCloud
         Me.LabelDesiredCell = New System.Windows.Forms.Label()
         Me.DesiredCellSlider = New System.Windows.Forms.TrackBar()
         Me.Label5 = New System.Windows.Forms.Label()
+        Me.BinarizeRadio = New System.Windows.Forms.RadioButton()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -229,6 +230,7 @@ Partial Class OptionsRedCloud
         '
         'RGBSource
         '
+        Me.RGBSource.Controls.Add(Me.BinarizeRadio)
         Me.RGBSource.Controls.Add(Me.FeatureLessRadio)
         Me.RGBSource.Controls.Add(Me.BackProject3D)
         Me.RGBSource.Controls.Add(Me.KMeans_Basics)
@@ -237,7 +239,7 @@ Partial Class OptionsRedCloud
         Me.RGBSource.Controls.Add(Me.BackProject_Full)
         Me.RGBSource.Location = New System.Drawing.Point(1019, 31)
         Me.RGBSource.Name = "RGBSource"
-        Me.RGBSource.Size = New System.Drawing.Size(250, 220)
+        Me.RGBSource.Size = New System.Drawing.Size(250, 266)
         Me.RGBSource.TabIndex = 3
         Me.RGBSource.TabStop = False
         Me.RGBSource.Text = "Color Source"
@@ -313,7 +315,7 @@ Partial Class OptionsRedCloud
         Me.ReductionTypeGroup.Controls.Add(Me.NoReduction)
         Me.ReductionTypeGroup.Controls.Add(Me.BitwiseReduction)
         Me.ReductionTypeGroup.Controls.Add(Me.SimpleReduction)
-        Me.ReductionTypeGroup.Location = New System.Drawing.Point(1019, 257)
+        Me.ReductionTypeGroup.Location = New System.Drawing.Point(1019, 303)
         Me.ReductionTypeGroup.Name = "ReductionTypeGroup"
         Me.ReductionTypeGroup.Size = New System.Drawing.Size(250, 129)
         Me.ReductionTypeGroup.TabIndex = 5
@@ -673,6 +675,17 @@ Partial Class OptionsRedCloud
         Me.Label5.TabIndex = 27
         Me.Label5.Text = "Desired RedMin Cells"
         '
+        'BinarizeRadio
+        '
+        Me.BinarizeRadio.AutoSize = True
+        Me.BinarizeRadio.Location = New System.Drawing.Point(28, 219)
+        Me.BinarizeRadio.Name = "BinarizeRadio"
+        Me.BinarizeRadio.Size = New System.Drawing.Size(164, 24)
+        Me.BinarizeRadio.TabIndex = 7
+        Me.BinarizeRadio.TabStop = True
+        Me.BinarizeRadio.Text = "Binarize_FourWay"
+        Me.BinarizeRadio.UseVisualStyleBackColor = True
+        '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -768,4 +781,5 @@ Partial Class OptionsRedCloud
     Friend WithEvents LabelHistogramBins As Windows.Forms.Label
     Friend WithEvents HistBinSlider As Windows.Forms.TrackBar
     Friend WithEvents Label7 As Windows.Forms.Label
+    Friend WithEvents BinarizeRadio As Windows.Forms.RadioButton
 End Class

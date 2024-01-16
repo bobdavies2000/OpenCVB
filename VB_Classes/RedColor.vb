@@ -292,7 +292,7 @@ End Class
 
 
 Public Class RedColor_Binarize : Inherits VB_Algorithm
-    Dim binarize As New Binarize_FourCombine
+    Dim binarize As New Binarize_FourWay
     Dim rMin As New RedMin_Basics
     Public Sub New()
         labels(3) = "A 4-way split of the input grayscale image based on brightness"
@@ -300,9 +300,9 @@ Public Class RedColor_Binarize : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binarize.Run(src)
-        dst3 = vbPalette(binarize.dst1 * 255 / 5)
+        dst3 = vbPalette(binarize.dst2 * 255 / 5)
 
-        rMin.Run(binarize.dst1)
+        rMin.Run(binarize.dst2)
         dst2 = rMin.dst3
         labels(2) = rMin.labels(3)
     End Sub
@@ -315,7 +315,7 @@ End Class
 
 
 Public Class RedColor_Flippers : Inherits VB_Algorithm
-    Dim binarize As New Binarize_FourCombine
+    Dim binarize As New Binarize_FourWay
     Dim rMin As New RedMin_Basics
     Public Sub New()
         redOptions.DesiredCellSlider.Value = 100
@@ -325,7 +325,7 @@ Public Class RedColor_Flippers : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         binarize.Run(src)
 
-        rMin.Run(binarize.dst1)
+        rMin.Run(binarize.dst2)
         dst2 = rMin.dst3
         labels(2) = rMin.labels(3)
 

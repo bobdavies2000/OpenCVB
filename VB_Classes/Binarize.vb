@@ -285,23 +285,23 @@ End Class
 
 
 
-Public Class Binarize_FourCombine : Inherits VB_Algorithm
+Public Class Binarize_FourWay : Inherits VB_Algorithm
     Dim binarize As New Binarize_Four
+    Public classCount = 4 ' 4-way split 
     Public Sub New()
-        dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Add the 4-way split of images to define the different regions."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binarize.Run(src)
 
-        dst1.SetTo(1, binarize.mats.mat(0))
-        dst1.SetTo(2, binarize.mats.mat(1))
-        dst1.SetTo(3, binarize.mats.mat(2))
-        dst1.SetTo(4, binarize.mats.mat(3))
+        dst2.SetTo(1, binarize.mats.mat(0))
+        dst2.SetTo(2, binarize.mats.mat(1))
+        dst2.SetTo(3, binarize.mats.mat(2))
+        dst2.SetTo(4, binarize.mats.mat(3))
 
         If standalone Or showIntermediate() Then
-            dst3 = dst1 * 255 / 5
-            dst2 = vbPalette(dst3)
+            dst3 = vbPalette(dst2 * 255 / 4)
         End If
     End Sub
 End Class
@@ -312,18 +312,18 @@ End Class
 
 
 Public Class Binarize_FourPixelFlips : Inherits VB_Algorithm
-    Dim binarize As New Binarize_FourCombine
+    Dim binarize As New Binarize_FourWay
     Public Sub New()
         advice = ""
         desc = "Identify the marginal regions that flip between subdivisions based on brightness."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binarize.Run(src)
-        dst2 = vbPalette(binarize.dst1 * 255 / 5)
+        dst2 = vbPalette(binarize.dst2 * 255 / 5)
 
-        Static lastSubD As cv.Mat = binarize.dst1.Clone
-        dst3 = lastSubD - binarize.dst1
+        Static lastSubD As cv.Mat = binarize.dst2.Clone
+        dst3 = lastSubD - binarize.dst2
         dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        lastSubD = binarize.dst1.Clone
+        lastSubD = binarize.dst2.Clone
     End Sub
 End Class
