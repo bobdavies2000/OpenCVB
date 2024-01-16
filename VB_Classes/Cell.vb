@@ -143,57 +143,6 @@ End Class
 
 
 
-Public Class Cell_Join : Inherits VB_Algorithm
-    Dim colorC As New RedColor_FeatureLess
-    Dim redC As New RedCloud_OnlyDepth
-    Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        desc = "Combine cells using the results from the RedColor_FeatureLess"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        colorC.Run(src)
-        dst1 = colorC.dst2
-
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        Dim colors As New List(Of cv.Vec3b)
-        Dim cellList As New List(Of String)
-        For Each rc In redC.redC.redCells
-            If rc.index = 0 Then Continue For
-            Dim color = dst1.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-            Dim index = colors.IndexOf(color)
-            If index < 0 Then
-                colors.Add(color)
-                cellList.Add(CStr(rc.index) + ",")
-            Else
-                cellList(index) += CStr(rc.index) + ","
-            End If
-        Next
-
-        For Each cells In cellList
-            Dim split = cells.Split(",")
-            Dim rc = redC.redC.redCells(split(0))
-            Dim color = rc.color
-            For i = 1 To split.Count - 2
-                rc = redC.redC.redCells(split(i))
-                rc.color = color
-                redC.redC.redCells(split(i)) = rc
-            Next
-        Next
-
-        dst3.SetTo(0)
-        For Each rc In redC.redC.redCells
-            dst3(rc.rect).SetTo(rc.color, rc.mask)
-        Next
-    End Sub
-End Class
-
-
-
-
-
 
 
 

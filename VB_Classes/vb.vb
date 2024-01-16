@@ -191,7 +191,15 @@ Module VB
         dst.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
         dst.Circle(pt, task.dotSize, cv.Scalar.Black, -1, task.lineType)
     End Sub
-    Public Sub showSelection(ByRef redCells As List(Of rcData), ByRef cellMap As cv.Mat)
+    Public Sub showSelectedCell(dst As cv.Mat)
+        Dim rc = task.rcSelect
+        dst(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+        dst.Circle(rc.maxDist, task.dotSize, cv.Scalar.Black, -1, task.lineType)
+
+        dst.Circle(rc.maxDStable, task.dotSize + 2, cv.Scalar.Black, -1, task.lineType)
+        dst.Circle(rc.maxDStable, task.dotSize, cv.Scalar.White, -1, task.lineType)
+    End Sub
+    Public Sub setSelectedCell(ByRef redCells As List(Of rcData), ByRef cellMap As cv.Mat)
         task.rcSelect = New rcData
         If task.clickPoint = New cv.Point(0, 0) Then
             If redCells.Count > 2 Then
@@ -204,6 +212,14 @@ Module VB
             Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             task.rcSelect = redCells(index)
         End If
+
+        Dim rc = task.rcSelect
+
+        task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+        task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+
+        task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+        task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
     End Sub
     Public Function showSelectionGBP(ByRef gbpCells As List(Of gbpData), ByRef cellMap As cv.Mat) As gbpData
         If task.clickPoint = New cv.Point(0, 0) Then
@@ -779,28 +795,11 @@ Public Class segCell
     Public maxDist As cv.Point
     Public motionFlag As Boolean
     Public color As cv.Vec3b
-    Public Sub New()
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class rMinData
-    Public rect As cv.Rect
-    Public mask As cv.Mat
-    Public index As Integer
-    Public maxDist As cv.Point
     Public histogram As cv.Mat
     Public histList As List(Of Single)
     Public Sub New()
     End Sub
 End Class
-
 
 
 

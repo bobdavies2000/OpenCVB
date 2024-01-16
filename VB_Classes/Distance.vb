@@ -300,7 +300,7 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Dim valleys As New HistValley_Basics
-    Public d3Cells As New List(Of rMinData)
+    Public d3Cells As New List(Of segCell)
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         redOptions.HistBinSlider.Value = 5
@@ -313,7 +313,7 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
 
         d3Cells.Clear()
         For i = 0 To rMin.minCells.Count - 1
-            Dim rm As New rMinData
+            Dim rm As New segCell
             Dim rp = rMin.minCells(i)
             rm.mask = rp.mask
             rm.rect = rp.rect

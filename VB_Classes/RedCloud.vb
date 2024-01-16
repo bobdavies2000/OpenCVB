@@ -184,7 +184,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         End If
         changedTotal += unMatchedCells
 
-        showSelection(redCells, cellMap)
+        setSelectedCell(redCells, cellMap)
 
         dst3.SetTo(0, task.maxDepthMask)
         If displaySelectedCell Then showSelectedCell(dst2)

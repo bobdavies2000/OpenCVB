@@ -1,17 +1,17 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class RedColor_Basics : Inherits VB_Algorithm
-    Dim fLess As New RedColor_FeatureLess
-    Public fCells As New List(Of rcData)
+    Dim fLess As New RedColor_Core
+    Public redCells As New List(Of rcData)
     Dim lastMap As cv.Mat
     Public Sub New()
         dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         lastMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels(3) = "The colors are unstable because there is no cell matching to the previous generation."
-        desc = "Match fCells from the current generation to the last."
+        desc = "Match redCells from the current generation to the last."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim lastCells As New List(Of rcData)(fLess.fCells)
+        Dim lastCells As New List(Of rcData)(fLess.redCells)
         Dim lastMap = dst3.Clone
 
         fLess.Run(src)
@@ -19,7 +19,7 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
         Dim ftmp As New List(Of rcData)
         Dim lrc As rcData
         Dim usedColors1 As New List(Of cv.Vec3b)
-        For Each rc In fLess.fCells
+        For Each rc In fLess.redCells
             Dim prev = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If prev < lastCells.Count And prev <> 0 Then
                 lrc = lastCells(prev)
@@ -45,17 +45,9 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
             dst2(rc.rect).SetTo(rc.index, rc.mask)
         Next
 
-        fCells = New List(Of rcData)(ftmp)
-        If task.clickPoint <> New cv.Point Then
-            Dim index = dst3.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If index < fCells.Count Then
-                fLess.fcSelect = fCells(index)
-                Dim fc = fLess.fcSelect
-                dst3(fc.rect).SetTo(white, fc.mask)
-                task.color(fc.rect).SetTo(white, fc.mask)
-            End If
-        End If
-
+        redCells = New List(Of rcData)(ftmp)
+        setSelectedCell(redCells, dst2)
+        showSelectedCell(dst2)
         labels(2) = fLess.labels(2)
     End Sub
 End Class
@@ -67,10 +59,9 @@ End Class
 
 
 
-Public Class RedColor_FeatureLess : Inherits VB_Algorithm
+Public Class RedColor_Core : Inherits VB_Algorithm
     Public classCount As Integer
-    Public fCells As New List(Of rcData)
-    Public fcSelect As New rcData
+    Public redCells As New List(Of rcData)
     Dim color As New Color_Basics
     Public Sub New()
         cPtr = FloodCell_Open()
@@ -98,14 +89,14 @@ Public Class RedColor_FeatureLess : Inherits VB_Algorithm
         Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, FloodCell_Sizes(cPtr))
         Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, FloodCell_Rects(cPtr))
         Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
-        fCells.Clear()
-        fCells.Add(New rcData) ' placeholder so index aligns with offset.
+        redCells.Clear()
+        redCells.Add(New rcData) ' placeholder so index aligns with offset.
         If standalone Or showIntermediate() Then dst3.SetTo(0)
         For i = 0 To classCount - 1
             Dim rc As New rcData
             rc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
             rc.pixels = sizeData.Get(Of Integer)(i, 0)
-            rc.index = fCells.Count
+            rc.index = redCells.Count
             rc.mask = dst2(rc.rect).InRange(rc.index, rc.index)
             rc.color = task.vecColors(i) ' never more than 255...
             rc.maxDist = vbGetMaxDist(rc)
@@ -123,7 +114,7 @@ Public Class RedColor_FeatureLess : Inherits VB_Algorithm
             rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
             rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
 
-            fCells.Add(rc)
+            redCells.Add(rc)
 
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
