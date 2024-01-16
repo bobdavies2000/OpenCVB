@@ -233,7 +233,7 @@ End Class
 Public Class Flood_Featureless : Inherits VB_Algorithm
     Public classCount As Integer
     Dim rMin As New RedColor_Basics
-    Dim minCells As New List(Of segCell)
+    Dim minCells As New List(Of rcData)
     Dim contour As New Contour_Basics
     Public Sub New()
         labels = {"", "", "", "Palette output of image at left"}

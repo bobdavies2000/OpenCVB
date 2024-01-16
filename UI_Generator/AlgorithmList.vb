@@ -1075,6 +1075,7 @@ if algorithmName = "MotionBlur_Deblur" Then return new MotionBlur_Deblur
 if algorithmName = "Mouse_Basics" Then return new Mouse_Basics
 if algorithmName = "Mouse_LeftClickZoom" Then return new Mouse_LeftClickZoom
 if algorithmName = "MSER_Basics" Then return new MSER_Basics
+if algorithmName = "MSER_Binarize" Then return new MSER_Binarize
 if algorithmName = "MSER_CPP" Then return new MSER_CPP
 if algorithmName = "MSER_Detect" Then return new MSER_Detect
 if algorithmName = "MSER_Grayscale" Then return new MSER_Grayscale

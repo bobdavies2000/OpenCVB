@@ -25,13 +25,13 @@ Public Class MSER_Basics : Inherits VB_Algorithm
         boxes = New List(Of cv.Rect)(detect.boxes)
         floodPoints = New List(Of cv.Point)(detect.floodPoints)
 
-        Dim minCells As New SortedList(Of Integer, segCell)(New compareAllowIdenticalIntegerInverted)
+        Dim minCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To detect.boxes.Count - 1
-            Dim rp As New segCell
-            rp.rect = detect.boxes(i)
-            rp.mask = detect.dst0(rp.rect).InRange(i, i)
-            rp.floodPoint = floodPoints(i)
-            minCells.Add(detect.maskCounts(i), rp)
+            Dim rc As New rcData
+            rc.rect = detect.boxes(i)
+            rc.mask = detect.dst0(rc.rect).InRange(i, i)
+            rc.floodPoint = floodPoints(i)
+            minCells.Add(detect.maskCounts(i), rc)
         Next
 
         If task.optionsChanged Then
@@ -485,16 +485,16 @@ Public Class MSER_Regions : Inherits VB_Algorithm
 
         core.Run(src)
 
-        Dim minCells As New SortedList(Of Integer, segCell)(New compareAllowIdenticalIntegerInverted)
+        Dim minCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To core.boxes.Count - 1
-            Dim rp As New segCell
-            rp.rect = core.boxes(i)
-            rp.mask = New cv.Mat(rp.rect.Height, rp.rect.Width, cv.MatType.CV_8U, 0)
-            rp.floodPoint = core.regions(i)(0)
+            Dim rc As New rcData
+            rc.rect = core.boxes(i)
+            rc.mask = New cv.Mat(rc.rect.Height, rc.rect.Width, cv.MatType.CV_8U, 0)
+            rc.floodPoint = core.regions(i)(0)
             For Each pt In core.regions(i)
-                rp.mask.Set(Of Byte)(pt.Y - rp.rect.Y, pt.X - rp.rect.X, i Mod 255)
+                rc.mask.Set(Of Byte)(pt.Y - rc.rect.Y, pt.X - rc.rect.X, i Mod 255)
             Next
-            minCells.Add(core.regions(i).Count, rp)
+            minCells.Add(core.regions(i).Count, rc)
         Next
 
         If task.optionsChanged Then
@@ -723,5 +723,27 @@ Public Class MSER_Mask_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub Close()
         MSER_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class MSER_Binarize : Inherits VB_Algorithm
+    Dim mser As New MSER_Basics
+    Dim binarize As New Binarize_FourWay
+    Public Sub New()
+        advice = ""
+        desc = "Instead of a BGR src, try using the color output of Binarize_FourWay"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binarize.Run(src)
+        dst2 = vbPalette(binarize.dst2 * 255 / 4)
+
+        mser.Run(dst2)
+        dst3 = mser.dst3
+        labels(3) = mser.labels(2)
     End Sub
 End Class

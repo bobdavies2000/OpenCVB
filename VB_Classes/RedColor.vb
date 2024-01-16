@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Public Class RedColor_Basics : Inherits VB_Algorithm
     Public minCore As New RedColor_Core
-    Public minCells As New List(Of segCell)
+    Public minCells As New List(Of rcData)
     Dim lastColors As cv.Mat
     Dim lastMap As cv.Mat = dst2.Clone
     Public showMaxIndex = 20
@@ -13,7 +13,7 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         minCore.Run(src)
-        Dim lastCells As New List(Of segCell)(minCells)
+        Dim lastCells As New List(Of rcData)(minCells)
 
         minCells.Clear()
         dst2.SetTo(0)
@@ -47,7 +47,7 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
 
         labels(3) = CStr(minCells.Count) + " cells were identified.  The top " + CStr(showMaxIndex) + " are numbered"
         labels(2) = minCore.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
-        task.cellSelect = New segCell
+        task.cellSelect = New rcData
         If task.clickPoint = New cv.Point(0, 0) Then
             If minCells.Count > 2 Then
                 task.clickPoint = minCells(0).maxDist
@@ -69,7 +69,7 @@ End Class
 
 
 Public Class RedColor_Core : Inherits VB_Algorithm
-    Public sortedCells As New SortedList(Of Integer, segCell)(New compareAllowIdenticalIntegerInverted)
+    Public sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
     Public inputMask As cv.Mat
     Public Sub New()
         cPtr = FloodCell_Open()
@@ -118,19 +118,19 @@ Public Class RedColor_Core : Inherits VB_Algorithm
         Dim floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, FloodCell_FloodPoints(cPtr))
         sortedCells.Clear()
         For i = 0 To classCount - 1
-            Dim cell As New segCell
-            cell.index = i + 1
-            cell.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
-            cell.mask = dst2(cell.rect).InRange(cell.index, cell.index).Threshold(0, 255, cv.ThresholdTypes.Binary)
-            'Dim contour = contourBuild(cell.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            'vbDrawContour(cell.mask, contour, 255, -1)
+            Dim rc As New rcData
+            rc.index = i + 1
+            rc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
+            rc.mask = dst2(rc.rect).InRange(rc.index, rc.index).Threshold(0, 255, cv.ThresholdTypes.Binary)
+            'Dim contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            'vbDrawContour(rc.mask, contour, 255, -1)
 
-            cell.pixels = sizeData.Get(Of Integer)(i, 0)
-            cell.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
-            cell.mask.Rectangle(New cv.Rect(0, 0, cell.mask.Width, cell.mask.Height), 0, 1)
-            Dim pt = vbGetMaxDist(cell.mask)
-            cell.maxDist = New cv.Point(pt.X + cell.rect.X, pt.Y + cell.rect.Y)
-            sortedCells.Add(cell.pixels, cell)
+            rc.pixels = sizeData.Get(Of Integer)(i, 0)
+            rc.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
+            rc.mask.Rectangle(New cv.Rect(0, 0, rc.mask.Width, rc.mask.Height), 0, 1)
+            Dim pt = vbGetMaxDist(rc.mask)
+            rc.maxDist = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
+            sortedCells.Add(rc.pixels, rc)
         Next
 
         If heartBeat() Then labels(2) = "CV_8U format - " + CStr(classCount) + " cells were identified."

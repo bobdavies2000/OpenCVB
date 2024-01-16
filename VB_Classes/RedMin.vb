@@ -8,7 +8,7 @@ Imports System.Runtime.InteropServices
 
 Public Class RedColor_BasicsMotion : Inherits VB_Algorithm
     Public minCore As New RedColor_Core
-    Public minCells As New List(Of segCell)
+    Public minCells As New List(Of rcData)
     Public rMotion As New RedMin_Motion
     Dim lastColors = dst3.Clone
     Dim lastMap As cv.Mat = dst2.Clone
@@ -23,7 +23,7 @@ Public Class RedColor_BasicsMotion : Inherits VB_Algorithm
         rMotion.sortedCells = minCore.sortedCells
         rMotion.Run(task.color.Clone)
 
-        Dim lastCells As New List(Of segCell)(minCells)
+        Dim lastCells As New List(Of rcData)(minCells)
 
         minCells.Clear()
         dst2.SetTo(0)
@@ -58,7 +58,7 @@ Public Class RedColor_BasicsMotion : Inherits VB_Algorithm
         labels(3) = "There were " + CStr(minCells.Count) + " collected cells and " + CStr(motionCount) +
                     " cells removed because of motion.  "
 
-        task.cellSelect = New segCell
+        task.cellSelect = New rcData
         If task.clickPoint = New cv.Point(0, 0) Then
             If minCells.Count > 2 Then
                 task.clickPoint = minCells(0).maxDist
@@ -200,8 +200,8 @@ End Class
 
 Public Class RedMin_Motion : Inherits VB_Algorithm
     Public motion As New Motion_Basics
-    Public minCells As New List(Of segCell)
-    Public sortedCells As New SortedList(Of Integer, segCell)(New compareAllowIdenticalIntegerInverted)
+    Public minCells As New List(Of rcData)
+    Public sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         gOptions.PixelDiffThreshold.Value = 25
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -336,7 +336,7 @@ Public Class RedMin_PixelVectors : Inherits VB_Algorithm
     Public rMin As New RedColor_Basics
     Dim hVector As New Hist3Dcolor_Vector
     Public pixelVector As New List(Of Single())
-    Public minCells As New List(Of segCell)
+    Public minCells As New List(Of rcData)
     Public Sub New()
         labels = {"", "", "RedColor_Basics output", ""}
         desc = "Create a vector for each cell's 3D histogram."

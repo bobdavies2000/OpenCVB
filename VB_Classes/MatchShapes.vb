@@ -66,7 +66,7 @@ End Class
 Public Class MatchShapes_NearbyHull : Inherits VB_Algorithm
     Public similarCells As New List(Of rcData)
     Public bestCell As Integer
-    Dim rcX As New rcData
+    Dim rc As New rcData
     Dim options As New Options_MatchShapes
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
@@ -80,7 +80,7 @@ Public Class MatchShapes_NearbyHull : Inherits VB_Algorithm
             hulls.Run(task.color)
             If hulls.redC.redCells.Count = 0 Then Exit Sub
             dst2 = hulls.dst2
-            rcX = task.rcSelect
+            rc = task.rcSelect
         End If
 
         dst3.SetTo(0)
@@ -88,9 +88,9 @@ Public Class MatchShapes_NearbyHull : Inherits VB_Algorithm
 
         Dim minMatch As Single = Single.MaxValue
         For Each rc2 In hulls.redC.redCells
-            If rc2.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
-            If Math.Abs(rc2.maxDist.Y - rcX.maxDist.Y) > options.maxYdelta Then Continue For
-            Dim matchVal = cv.Cv2.MatchShapes(rcX.hull, rc2.hull, options.matchOption)
+            If rc2.hull Is Nothing Or rc.hull Is Nothing Then Continue For
+            If Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta Then Continue For
+            Dim matchVal = cv.Cv2.MatchShapes(rc.hull, rc2.hull, options.matchOption)
             If matchVal < options.matchThreshold Then
                 If matchVal < minMatch And matchVal > 0 Then
                     minMatch = matchVal
@@ -118,7 +118,7 @@ Public Class MatchShapes_Nearby : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public similarCells As New List(Of rcData)
     Public bestCell As Integer
-    Public rcX As New rcData
+    Public rc As New rcData
     Dim options As New Options_MatchShapes
     Public runStandalone As Boolean = False
     Dim redC As New RedCloud_Basics
@@ -137,7 +137,7 @@ Public Class MatchShapes_Nearby : Inherits VB_Algorithm
             If redC.redCells.Count = 0 Then Exit Sub
             dst2 = redC.dst2
             redCells = New List(Of rcData)(redC.redCells)
-            rcX = task.rcSelect
+            rc = task.rcSelect
         End If
 
         If heartBeat() And myStandalone Then dst3.SetTo(0)
@@ -145,7 +145,7 @@ Public Class MatchShapes_Nearby : Inherits VB_Algorithm
 
         If gOptions.displayDst0.Checked Then
             dst0 = task.color.Clone
-            vbDrawContour(dst0(rcX.rect), rcX.contour, task.highlightColor)
+            vbDrawContour(dst0(rc.rect), rc.contour, task.highlightColor)
         End If
 
         Dim minMatch As Single = Single.MaxValue
@@ -155,8 +155,8 @@ Public Class MatchShapes_Nearby : Inherits VB_Algorithm
             Dim rc2 = redCells(i)
             If rc2.contour Is Nothing Then Continue For
             If rc2.pixels < minPixels Then Continue For
-            If Math.Abs(rc2.maxDist.Y - rcX.maxDist.Y) > options.maxYdelta And myStandalone = False Then Continue For
-            Dim matchVal = cv.Cv2.MatchShapes(rcX.contour, rc2.contour, options.matchOption)
+            If Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta And myStandalone = False Then Continue For
+            Dim matchVal = cv.Cv2.MatchShapes(rc.contour, rc2.contour, options.matchOption)
             If matchVal < options.matchThreshold Then
                 If matchVal < minMatch And matchVal > 0 Then
                     minMatch = matchVal

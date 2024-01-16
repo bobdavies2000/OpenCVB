@@ -1149,7 +1149,6 @@ End Class
 Public Class Histogram_Depth : Inherits VB_Algorithm
     Public plot As New Plot_Histogram
     Public rc As rcData
-    Public gbp As New rcData
     Public mm As mmData
     Public histogram As New cv.Mat
     Public Sub New()

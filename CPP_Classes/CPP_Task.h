@@ -38,7 +38,7 @@ public:
     std::vector<Point3f> contour3D;
     std::vector<Point> hull;  // Using std::vector for consistency
 
-    bool motionDetected;
+    bool motionFlag;
 
     Point floodPoint;
     bool depthCell;  // true if no depth.

@@ -311,16 +311,6 @@ Module VB
     Public Function convertVec3bToScalar(vec As cv.Vec3b) As cv.Scalar
         Return New cv.Scalar(vec(0), vec(1), vec(2))
     End Function
-    Public Function vbGetMaxDist(ByRef rp As segCell) As cv.Point
-        Dim mask = rp.mask.Clone
-        mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-        Dim mm = vbMinMax(distance32f)
-        mm.maxLoc.X += rp.rect.X
-        mm.maxLoc.Y += rp.rect.Y
-
-        Return mm.maxLoc
-    End Function
     Public Function vbGetMaxDist(ByRef rc As rcData) As cv.Point
         Dim mask = rc.mask.Clone
         mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
@@ -747,28 +737,6 @@ End Structure
 
 
 
-
-
-
-Public Class segCell
-    Public rect As cv.Rect
-    Public mask As cv.Mat
-    Public floodPoint As cv.Point
-    Public index As Integer
-    Public pixels As Integer
-    Public maxDist As cv.Point
-    Public motionFlag As Boolean
-    Public color As cv.Vec3b
-    Public histogram As cv.Mat
-    Public histList As List(Of Single)
-    Public Sub New()
-    End Sub
-End Class
-
-
-
-
-
 Public Class rcData
     Public rect As cv.Rect
     Public motionRect As cv.Rect ' the union of the previous rect with the current rect.
@@ -807,7 +775,9 @@ Public Class rcData
     Public contour3D As New List(Of cv.Point3f)
     Public hull As New List(Of cv.Point)
 
-    Public motionDetected As Boolean
+    Public motionFlag As Boolean
+    Public histogram As cv.Mat
+    Public histList As List(Of Single)
 
     Public floodPoint As cv.Point
     Public depthCell As Boolean ' true if no depth.
