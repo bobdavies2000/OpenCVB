@@ -84,7 +84,7 @@ public:
 
     CPP_Random_Basics() : algorithmCPP() {
         traceName = "CPP_Random_Basics";
-        range = Rect(0, 0, dst2.rows, dst2.cols);
+        range = Rect(0, 0, dst2.cols, dst2.rows);
         desc = "Create a uniform random mask with a specified number of pixels.";
     }
 
@@ -646,18 +646,14 @@ public:
         knn = new CPP_KNN_Lossy();
         facet = new CPP_Delaunay_Basics();
         random = new CPP_Random_Basics();
+        random->sizeRequest = 10;
         labels = {"", "Mask of unmatched regions - generation set to 0", "Facet Image with count for each region",
                   "Generation counts in CV_32SC1 format" };
         desc = "Create a region in an image for each point provided";
     }
     void Run(Mat src) {
         if (standalone) {
-            if (task->firstPass) {
-                random->sizeRequest = 10;
-            }
-            if (task->heartBeat) {
-                random->Run(empty);
-            }
+            if (task->heartBeat) random->Run(empty);
             inputPoints = random->pointList;
         }
 
