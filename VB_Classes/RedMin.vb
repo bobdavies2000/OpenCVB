@@ -77,9 +77,9 @@ Public Class RedMin_Core : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            Static binarize As New Binarize_FourWay
-            binarize.Run(src)
-            src = binarize.dst2
+            Static colorClass As New Color_Basics
+            colorClass.Run(src)
+            src = colorClass.dst2
         End If
 
         Dim imagePtr As IntPtr

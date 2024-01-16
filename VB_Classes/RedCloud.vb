@@ -1887,7 +1887,7 @@ End Class
 Public Class RedCloud_OutlineColor : Inherits VB_Algorithm
     Dim outline As New Depth_Outline
     Dim redC As New RedCloud_Basics
-    Dim color As New Color_Basics
+    Dim colorClass As New Color_Basics
     Public Sub New()
         labels(3) = "Color input to RedCloud_Basics with depth boundary blocking color connections."
         desc = "Use the depth outline as input to RedCloud_Basics"
@@ -1895,10 +1895,10 @@ Public Class RedCloud_OutlineColor : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         outline.Run(src)
 
-        color.Run(src)
-        dst1 = color.dst2 + 1
+        colorClass.Run(src)
+        dst1 = colorClass.dst2 + 1
         dst1.SetTo(0, task.depthOutline)
-        dst3 = vbPalette(dst1 * 255 / color.classCount)
+        dst3 = vbPalette(dst1 * 255 / colorClass.classCount)
 
         redC.Run(dst1)
         dst2 = redC.dst2
@@ -2129,7 +2129,6 @@ Public Class RedCloud_OnlyColor : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Public Sub New()
         redOptions.UseColor.Checked = True  ' <<<<<<< this is what is different.
-        redOptions.FeatureLessRadio.Checked = True
         desc = "Create RedCloud output using only color."
     End Sub
     Public Sub RunVB(src As cv.Mat)

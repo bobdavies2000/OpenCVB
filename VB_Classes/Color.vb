@@ -7,7 +7,6 @@ Public Class Color_Basics : Inherits VB_Algorithm
     Dim lut As New LUT_Basics
     Dim reduction As New Reduction_Basics
     Dim hColor As New Hist3Dcolor_Basics
-    Dim fLess As New FeatureLess_Basics
     Dim binarize As New Binarize_FourWay
     Dim classifier As Object = reduction
     Public Sub New()
@@ -27,8 +26,6 @@ Public Class Color_Basics : Inherits VB_Algorithm
                     classifier = reduction
                 Case "3D BackProjection"
                     classifier = hColor
-                Case "FeatureLess"
-                    classifier = fLess
                 Case "Binarize_FourWay"
                     classifier = binarize
             End Select

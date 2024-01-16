@@ -36,7 +36,7 @@ Partial Class OptionsRedCloud
         Me.XRangeSlider = New System.Windows.Forms.TrackBar()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.RGBSource = New System.Windows.Forms.GroupBox()
-        Me.FeatureLessRadio = New System.Windows.Forms.RadioButton()
+        Me.BinarizeRadio = New System.Windows.Forms.RadioButton()
         Me.BackProject3D = New System.Windows.Forms.RadioButton()
         Me.KMeans_Basics = New System.Windows.Forms.RadioButton()
         Me.LUT_Basics = New System.Windows.Forms.RadioButton()
@@ -75,7 +75,6 @@ Partial Class OptionsRedCloud
         Me.LabelDesiredCell = New System.Windows.Forms.Label()
         Me.DesiredCellSlider = New System.Windows.Forms.TrackBar()
         Me.Label5 = New System.Windows.Forms.Label()
-        Me.BinarizeRadio = New System.Windows.Forms.RadioButton()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -231,7 +230,6 @@ Partial Class OptionsRedCloud
         'RGBSource
         '
         Me.RGBSource.Controls.Add(Me.BinarizeRadio)
-        Me.RGBSource.Controls.Add(Me.FeatureLessRadio)
         Me.RGBSource.Controls.Add(Me.BackProject3D)
         Me.RGBSource.Controls.Add(Me.KMeans_Basics)
         Me.RGBSource.Controls.Add(Me.LUT_Basics)
@@ -244,16 +242,16 @@ Partial Class OptionsRedCloud
         Me.RGBSource.TabStop = False
         Me.RGBSource.Text = "Color Source"
         '
-        'FeatureLessRadio
+        'BinarizeRadio
         '
-        Me.FeatureLessRadio.AutoSize = True
-        Me.FeatureLessRadio.Location = New System.Drawing.Point(28, 100)
-        Me.FeatureLessRadio.Name = "FeatureLessRadio"
-        Me.FeatureLessRadio.Size = New System.Drawing.Size(124, 24)
-        Me.FeatureLessRadio.TabIndex = 6
-        Me.FeatureLessRadio.TabStop = True
-        Me.FeatureLessRadio.Text = "FeatureLess"
-        Me.FeatureLessRadio.UseVisualStyleBackColor = True
+        Me.BinarizeRadio.AutoSize = True
+        Me.BinarizeRadio.Location = New System.Drawing.Point(29, 204)
+        Me.BinarizeRadio.Name = "BinarizeRadio"
+        Me.BinarizeRadio.Size = New System.Drawing.Size(164, 24)
+        Me.BinarizeRadio.TabIndex = 7
+        Me.BinarizeRadio.TabStop = True
+        Me.BinarizeRadio.Text = "Binarize_FourWay"
+        Me.BinarizeRadio.UseVisualStyleBackColor = True
         '
         'BackProject3D
         '
@@ -269,7 +267,7 @@ Partial Class OptionsRedCloud
         'KMeans_Basics
         '
         Me.KMeans_Basics.AutoSize = True
-        Me.KMeans_Basics.Location = New System.Drawing.Point(28, 129)
+        Me.KMeans_Basics.Location = New System.Drawing.Point(28, 100)
         Me.KMeans_Basics.Name = "KMeans_Basics"
         Me.KMeans_Basics.Size = New System.Drawing.Size(148, 24)
         Me.KMeans_Basics.TabIndex = 3
@@ -280,7 +278,7 @@ Partial Class OptionsRedCloud
         'LUT_Basics
         '
         Me.LUT_Basics.AutoSize = True
-        Me.LUT_Basics.Location = New System.Drawing.Point(28, 159)
+        Me.LUT_Basics.Location = New System.Drawing.Point(28, 134)
         Me.LUT_Basics.Name = "LUT_Basics"
         Me.LUT_Basics.Size = New System.Drawing.Size(120, 24)
         Me.LUT_Basics.TabIndex = 2
@@ -291,7 +289,7 @@ Partial Class OptionsRedCloud
         'Reduction_Basics
         '
         Me.Reduction_Basics.AutoSize = True
-        Me.Reduction_Basics.Location = New System.Drawing.Point(28, 189)
+        Me.Reduction_Basics.Location = New System.Drawing.Point(28, 169)
         Me.Reduction_Basics.Name = "Reduction_Basics"
         Me.Reduction_Basics.Size = New System.Drawing.Size(163, 24)
         Me.Reduction_Basics.TabIndex = 1
@@ -675,17 +673,6 @@ Partial Class OptionsRedCloud
         Me.Label5.TabIndex = 27
         Me.Label5.Text = "Desired RedMin Cells"
         '
-        'BinarizeRadio
-        '
-        Me.BinarizeRadio.AutoSize = True
-        Me.BinarizeRadio.Location = New System.Drawing.Point(28, 219)
-        Me.BinarizeRadio.Name = "BinarizeRadio"
-        Me.BinarizeRadio.Size = New System.Drawing.Size(164, 24)
-        Me.BinarizeRadio.TabIndex = 7
-        Me.BinarizeRadio.TabStop = True
-        Me.BinarizeRadio.Text = "Binarize_FourWay"
-        Me.BinarizeRadio.UseVisualStyleBackColor = True
-        '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -773,7 +760,6 @@ Partial Class OptionsRedCloud
     Friend WithEvents UseDepth As Windows.Forms.RadioButton
     Friend WithEvents UseColor As Windows.Forms.RadioButton
     Friend WithEvents UseDepthAndColor As Windows.Forms.RadioButton
-    Friend WithEvents FeatureLessRadio As Windows.Forms.RadioButton
     Friend WithEvents GroupBox2 As Windows.Forms.GroupBox
     Friend WithEvents LabelDesiredCell As Windows.Forms.Label
     Friend WithEvents DesiredCellSlider As Windows.Forms.TrackBar

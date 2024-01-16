@@ -85,15 +85,15 @@ End Class
 Public Class RedColor_Core : Inherits VB_Algorithm
     Public classCount As Integer
     Public redCells As New List(Of rcData)
-    Dim color As New Color_Basics
+    Dim colorClass As New Color_Basics
     Public Sub New()
         cPtr = FloodCell_Open()
         gOptions.PixelDiffThreshold.Value = 0
         desc = "Floodfill an image so each cell can be tracked.  NOTE: cells are not matched to previous image.  Use RedMin_Basics for matching."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        color.Run(src)
-        src = color.dst2
+        colorClass.Run(src)
+        src = colorClass.dst2
 
         Dim inputData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
@@ -311,11 +311,6 @@ Public Class RedColor_Flippers : Inherits VB_Algorithm
         lastMap = rMin.dst3.Clone
 
         If standalone Or showIntermediate() Then identifyCells(rMin.minCells, rMin.showMaxIndex)
-
-        If task.cellSelect.index <> 0 Then
-            dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
-            drawPolkaDot(task.cellSelect.maxDist, dst2)
-        End If
 
         If heartBeat() Then
             labels(3) = "Unmatched to previous frame: " + CStr(unMatched) + " totaling " + CStr(unMatchedPixels) + " pixels."
