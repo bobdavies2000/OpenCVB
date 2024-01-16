@@ -214,21 +214,14 @@ Module VB
         End If
 
         Dim rc = task.rcSelect
+        If rc.index <> 0 And rc.rect.Width > 1 And rc.rect.Height > 1 Then
+            task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+            task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
 
-        task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-        task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-
-        task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-        task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-    End Sub
-    Public Function showSelectionGBP(ByRef gbpCells As List(Of rcData), ByRef cellMap As cv.Mat) As rcData
-        If task.clickPoint = New cv.Point(0, 0) Then
-            task.clickPoint = gbpCells(1).maxDist
-            Return gbpCells(1)
+            task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+            task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
         End If
-        Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        Return gbpCells(index)
-    End Function
+    End Sub
     Public Function contourBuild(mask As cv.Mat, approxMode As cv.ContourApproximationModes) As List(Of cv.Point)
         Dim allContours As cv.Point()()
         cv.Cv2.FindContours(mask, allContours, Nothing, cv.RetrievalModes.External, approxMode)

@@ -72,15 +72,14 @@ Public Class GuidedBP_CellHistograms : Inherits VB_Algorithm
         gpbWare.Run(src)
         dst3 = gpbWare.dst2
 
-        Dim gbp As New rcData
-        If gpbWare.gbpCells.Count > 1 Then
-            gbp = showSelectionGBP(gpbWare.gbpCells, gpbWare.kMap)
-            vbDrawContour(dst3, gbp.contour, gbp.color)
+        Dim rc As New rcData
+        If gpbWare.redCells.Count > 1 Then
+            vbDrawContour(dst3, rc.contour, rc.color)
         End If
 
         If heartBeat() Then
-            If gbp.index <> 0 Then
-                Dim zeroMat = Not gbp.mask
+            If rc.index <> 0 Then
+                Dim zeroMat = Not rc.mask
                 labels(2) = "Histograms for "
                 For i = 0 To 2
                     plot.minRange = Choose(i + 1, -task.xRange, -task.yRange, 0)
@@ -94,24 +93,24 @@ Public Class GuidedBP_CellHistograms : Inherits VB_Algorithm
                     plot.Run(task.pcSplit(i))
                     mats.mat(i) = plot.dst2.Clone
                 Next
-                dst3.SetTo(cv.Scalar.White, gbp.mask)
+                dst3.SetTo(cv.Scalar.White, rc.mask)
             End If
         End If
 
-        If gbp.index <> 0 Then
-            vbDrawContour(dst0, gbp.contour, cv.Scalar.Yellow, task.lineWidth)
+        If rc.index <> 0 Then
+            vbDrawContour(dst0, rc.contour, cv.Scalar.Yellow, task.lineWidth)
         End If
 
         mats.Run(empty)
         dst2 = mats.dst2
         dst1 = mats.dst3
 
-        labels(3) = CStr(gpbWare.gbpCells.Count) + " objects detected - click to highlight"
-        If heartBeat() And gbp.index <> 0 Then
+        labels(3) = CStr(gpbWare.redCells.Count) + " objects detected - click to highlight"
+        If heartBeat() And rc.index <> 0 Then
             strOut = "Select a cell in image at right to see actual ranges " + vbCrLf +
-                     "X min = " + Format(gbp.mmX.minVal, fmt1) + " X max = " + Format(gbp.mmX.maxVal, fmt1) + vbCrLf +
-                     "Y min = " + Format(gbp.mmY.minVal, fmt1) + " Y max = " + Format(gbp.mmY.maxVal, fmt1) + vbCrLf +
-                     "Z min = " + Format(gbp.mmZ.minVal, fmt1) + " Z max = " + Format(gbp.mmZ.maxVal, fmt1)
+                     "X min = " + Format(rc.mmX.minVal, fmt1) + " X max = " + Format(rc.mmX.maxVal, fmt1) + vbCrLf +
+                     "Y min = " + Format(rc.mmY.minVal, fmt1) + " Y max = " + Format(rc.mmY.maxVal, fmt1) + vbCrLf +
+                     "Z min = " + Format(rc.mmZ.minVal, fmt1) + " Z max = " + Format(rc.mmZ.maxVal, fmt1)
         End If
 
         Dim picTag = 2
@@ -143,19 +142,20 @@ Public Class GuidedBP_Cells : Inherits VB_Algorithm
         gpbWare.Run(src)
         dst2 = gpbWare.dst2
 
-        Dim gbp As New rcData
-        If gpbWare.gbpCells.Count > 1 Then
-            gbp = showSelectionGBP(gpbWare.gbpCells, gpbWare.kMap)
-            vbDrawContour(dst2, gbp.contour, gbp.color)
+        Dim rc As New rcData
+        If gpbWare.redCells.Count > 1 Then
+            setSelectedCell(gpbWare.redCells, gpbWare.kMap)
+            rc = task.rcSelect
+            vbDrawContour(dst2, rc.contour, rc.color)
         End If
 
         Static strOut As String
         If heartBeat() Then
-            strOut = "Range for X min/max" + vbTab + Format(gbp.mmX.minVal, fmt1) + "/" + Format(gbp.mmX.maxVal, fmt1) + vbCrLf
-            strOut += "Range for Y min/max" + vbTab + Format(gbp.mmY.minVal, fmt1) + "/" + Format(gbp.mmY.maxVal, fmt1) + vbCrLf
-            strOut += "Range for Z min/max" + vbTab + Format(gbp.mmZ.minVal, fmt1) + "/" + Format(gbp.mmZ.maxVal, fmt1) + vbCrLf
+            strOut = "Range for X min/max" + vbTab + Format(rc.mmX.minVal, fmt1) + "/" + Format(rc.mmX.maxVal, fmt1) + vbCrLf
+            strOut += "Range for Y min/max" + vbTab + Format(rc.mmY.minVal, fmt1) + "/" + Format(rc.mmY.maxVal, fmt1) + vbCrLf
+            strOut += "Range for Z min/max" + vbTab + Format(rc.mmZ.minVal, fmt1) + "/" + Format(rc.mmZ.maxVal, fmt1) + vbCrLf
 
-            dst1 = gbp.mask
+            dst1 = rc.mask
         End If
         setTrueText(strOut, 3)
     End Sub
@@ -538,8 +538,8 @@ End Class
 
 Public Class GuidedBP_Hulls : Inherits VB_Algorithm
     Dim bpDoctor As New GuidedBP_Points
-    Public gbpCells As New List(Of rcData)
-    Public gbpCellsLast As New List(Of rcData)
+    Public redCells As New List(Of rcData)
+    Public redCellsLast As New List(Of rcData)
     Public kMap As New cv.Mat
     Dim contours As New Contour_Largest
     Dim plot As New Histogram_Depth
@@ -562,90 +562,89 @@ Public Class GuidedBP_Hulls : Inherits VB_Algorithm
             dst2.SetTo(0)
             Dim sizes As New List(Of Integer)
             For i = 1 To bpDoctor.classCount
-                Dim kw As New rcData
-                kw.mask = bpDoctor.backP.InRange(i, i).Threshold(0, 255, cv.ThresholdTypes.Binary)
+                Dim rc As New rcData
+                rc.mask = bpDoctor.backP.InRange(i, i).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-                contours.Run(kw.mask)
-                kw.contour = contours.bestContour
-                kw.hull = cv.Cv2.ConvexHull(kw.contour.ToArray, True).ToList
+                contours.Run(rc.mask)
+                rc.contour = contours.bestContour
+                rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
 
-                vbDrawContour(kw.mask, kw.contour, 255, -1)
-                kw.maxDist = vbHullCenter(kw.hull)
-                Dim validate = kw.mask.Get(Of Byte)(kw.maxDist.Y, kw.maxDist.X)
-                If validate = 0 Then kw.maxDist = vbGetMaxDist(kw.mask)
+                vbDrawContour(rc.mask, rc.contour, 255, -1)
+                rc.maxDist = vbHullCenter(rc.hull)
+                Dim validate = rc.mask.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If validate = 0 Then rc.maxDist = vbGetMaxDist(rc.mask)
 
-                Dim mask = kw.mask And task.depthMask
-                kw.mmX = vbMinMax(task.pcSplit(0), mask)
-                kw.mmY = vbMinMax(task.pcSplit(1), mask)
-                kw.mmZ = vbMinMax(task.pcSplit(2), mask)
-                kw.pixels = kw.mask.CountNonZero()
-                If sizes.Contains(kw.pixels) = False Then
-                    newCells.Add(kw.pixels, kw)
-                    sizes.Add(kw.pixels)
+                Dim mask = rc.mask And task.depthMask
+                rc.mmX = vbMinMax(task.pcSplit(0), mask)
+                rc.mmY = vbMinMax(task.pcSplit(1), mask)
+                rc.mmZ = vbMinMax(task.pcSplit(2), mask)
+                rc.pixels = rc.mask.CountNonZero()
+                If sizes.Contains(rc.pixels) = False Then
+                    newCells.Add(rc.pixels, rc)
+                    sizes.Add(rc.pixels)
                 End If
-                kw.color = randomCellColor()
-                vbDrawContour(dst2, kw.contour, kw.color, -1)
+                rc.color = randomCellColor()
+                vbDrawContour(dst2, rc.contour, rc.color, -1)
             Next
             dst0 = task.color.Clone
-            gbpCellsLast = New List(Of rcData)(gbpCells)
-            gbpCells.Clear()
-            gbpCells.Add(New rcData)
+            redCellsLast = New List(Of rcData)(redCells)
+            redCells.Clear()
+            redCells.Add(New rcData)
 
             Dim cellUpdates As New List(Of rcData)
             Dim usedColors As New List(Of cv.Vec3b)({black})
             For Each entry In newCells
-                Dim kw As New rcData
-                kw = entry.Value
+                Dim rc As New rcData
+                rc = entry.Value
 
-                kw.index = gbpCells.Count
-                Dim index = kMapLast.Get(Of Byte)(kw.maxDist.Y, kw.maxDist.X)
-                Dim lkw As rcData
+                rc.index = redCells.Count
+                Dim index = kMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                Dim lrc As rcData
                 If index <> 0 Then
-                    lkw = gbpCellsLast(index)
-                    kw.indexLast = lkw.index
-                    lkw.index = gbpCells.Count
-                    kw.color = lkw.color
+                    lrc = redCellsLast(index)
+                    rc.indexLast = lrc.index
+                    lrc.index = redCells.Count
+                    rc.color = lrc.color
                 End If
 
-                If usedColors.Contains(kw.color) Then kw.color = randomCellColor()
+                If usedColors.Contains(rc.color) Then rc.color = randomCellColor()
 
-                vbDrawContour(kMap, kw.hull, kw.index, -1)
-                vbDrawContour(dst2, kw.contour, kw.color, -1)
+                vbDrawContour(kMap, rc.hull, rc.index, -1)
+                vbDrawContour(dst2, rc.contour, rc.color, -1)
 
-                gbpCells.Add(kw)
-                usedColors.Add(kw.color)
-                If gbpCells.Count > 20 Then Exit For ' more than 20 objects?  Likely small artifacts...
+                redCells.Add(rc)
+                usedColors.Add(rc.color)
+                If redCells.Count > 20 Then Exit For ' more than 20 objects?  Likely small artifacts...
             Next
             strOut = "Index" + vbTab + "Size" + vbTab + "Depth Range" + vbTab
             strOut += "Hull" + vbTab + vbTab + vbTab + vbCrLf
-            For Each kw In gbpCells
-                If kw.index = 0 Then Continue For
-                strOut += CStr(kw.index) + vbTab + Format(kw.pixels, fmt0) + vbTab
-                strOut += Format(kw.mmZ.minVal, fmt2) + "/" + Format(kw.mmZ.maxVal, fmt2) + vbTab
-                strOut += hullStr(kw.hull) + vbCrLf
+            For Each rc In redCells
+                If rc.index = 0 Then Continue For
+                strOut += CStr(rc.index) + vbTab + Format(rc.pixels, fmt0) + vbTab
+                strOut += Format(rc.mmZ.minVal, fmt2) + "/" + Format(rc.mmZ.maxVal, fmt2) + vbTab
+                strOut += hullStr(rc.hull) + vbCrLf
             Next
             setTrueText(strOut, 3)
 
-            For Each kw In gbpCells
-                If kw.index = 0 Then Continue For
-                setTrueText(CStr(kw.index), kw.maxDist, 2)
-                dst2.Circle(kw.maxDist, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            For Each rc In redCells
+                If rc.index = 0 Then Continue For
+                setTrueText(CStr(rc.index), rc.maxDist, 2)
+                dst2.Circle(rc.maxDist, task.dotSize, cv.Scalar.White, -1, task.lineType)
             Next
 
             saveTtext = New List(Of trueText)(trueData)
         End If
 
-        Dim gbp As New rcData
-        If gbpCells.Count > 1 Then
-            plot.gbp = showSelectionGBP(gbpCells, kMap)
-            vbDrawContour(dst2, gbp.contour, gbp.color)
+        If redCells.Count > 1 Then
+            setSelectedCell(redCells, kMap)
+            vbDrawContour(dst2, task.rcSelect.contour, task.rcSelect.color)
         End If
 
         plot.Run(task.pcSplit(2))
         dst1 = plot.dst2
 
         trueData = New List(Of trueText)(saveTtext)
-        labels(2) = "There were " + CStr(gbpCells.Count) + " objects identified in the image."
+        labels(2) = "There were " + CStr(redCells.Count) + " objects identified in the image."
     End Sub
 End Class
 
@@ -668,21 +667,21 @@ Public Class GuidedBP_Objects : Inherits VB_Algorithm
         reduction.Run(src)
 
         dst1.SetTo(0)
-        For Each kw In kHist.gbpCells
-            If kw.index = 0 Then Continue For
-            vbDrawContour(dst1, kw.contour, kw.index + reduction.classCount, -1)
-            setTrueText(CStr(kw.index), kw.maxDist, 2)
+        For Each rc In kHist.redCells
+            If rc.index = 0 Then Continue For
+            vbDrawContour(dst1, rc.contour, rc.index + reduction.classCount, -1)
+            setTrueText(CStr(rc.index), rc.maxDist, 2)
         Next
 
-        If kHist.gpbWare.gbpCells.Count > 1 Then
-            Dim gbp = showSelectionGBP(kHist.gpbWare.gbpCells, kHist.gpbWare.kMap)
-            vbDrawContour(dst2, gbp.hull, cv.Scalar.White, task.lineWidth)
+        If kHist.gpbWare.redCells.Count > 1 Then
+            setSelectedCell(kHist.gpbWare.redCells, kHist.gpbWare.kMap)
+            vbDrawContour(dst2, task.rcSelect.hull, cv.Scalar.White, task.lineWidth)
         End If
 
         reduction.dst2.SetTo(0, dst1)
         dst1 += reduction.dst2
 
-        labels(2) = CStr(kHist.gbpCells.Count) + " objects found"
+        labels(2) = CStr(kHist.redCells.Count) + " objects found"
     End Sub
 End Class
 
@@ -694,7 +693,7 @@ End Class
 Public Class GuidedBP_History : Inherits VB_Algorithm
     Public gpbWare As New GuidedBP_Hulls
     Dim kCellList As New List(Of List(Of rcData))
-    Public gbpCells As New List(Of rcData)
+    Public redCells As New List(Of rcData)
     Public kMap As New cv.Mat
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -715,7 +714,7 @@ Public Class GuidedBP_History : Inherits VB_Algorithm
 
         gpbWare.Run(src)
 
-        kCellList.Add(New List(Of rcData)(gpbWare.gbpCells))
+        kCellList.Add(New List(Of rcData)(gpbWare.redCells))
 
         Dim sortCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For Each cellList In kCellList
@@ -725,43 +724,43 @@ Public Class GuidedBP_History : Inherits VB_Algorithm
         Next
 
         kMap.SetTo(0)
-        gbpCells.Clear()
-        gbpCells.Add(New rcData)
+        redCells.Clear()
+        redCells.Add(New rcData)
         Dim lastDst2 = dst2.Clone
         Dim usedColors As New List(Of cv.Vec3b)({black})
         For Each entry In sortCells
-            Dim kw = entry.Value
-            Dim index = kMap.Get(Of Byte)(kw.maxDist.Y, kw.maxDist.X)
-            Dim lkw = gbpCells(index)
-            If Math.Abs((kw.mmZ.minVal + kw.mmZ.maxVal) / 2 - (lkw.mmZ.minVal + lkw.mmZ.maxVal) / 2) > distanceMin Then
-                If kw.pixels >= minSize Then
-                    kw.index = gbpCells.Count
-                    Dim color = lastDst2.Get(Of cv.Vec3b)(kw.maxDist.Y, kw.maxDist.X)
-                    If usedColors.Contains(color) = False Then kw.color = color
-                    vbDrawContour(kMap, kw.contour, kw.index, -1)
-                    gbpCells.Add(kw)
-                    usedColors.Add(kw.color)
+            Dim rc = entry.Value
+            Dim index = kMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            Dim lrc = redCells(index)
+            If Math.Abs((rc.mmZ.minVal + rc.mmZ.maxVal) / 2 - (lrc.mmZ.minVal + lrc.mmZ.maxVal) / 2) > distanceMin Then
+                If rc.pixels >= minSize Then
+                    rc.index = redCells.Count
+                    Dim color = lastDst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                    If usedColors.Contains(color) = False Then rc.color = color
+                    vbDrawContour(kMap, rc.contour, rc.index, -1)
+                    redCells.Add(rc)
+                    usedColors.Add(rc.color)
                 End If
             End If
         Next
 
         dst2.SetTo(0)
-        For Each kw In gbpCells
-            vbDrawContour(dst2, kw.contour, kw.color, -1)
-            setTrueText(CStr(kw.index), kw.maxDist, 2)
+        For Each rc In redCells
+            vbDrawContour(dst2, rc.contour, rc.color, -1)
+            setTrueText(CStr(rc.index), rc.maxDist, 2)
         Next
 
         setTrueText(gpbWare.strOut, 3)
 
-        If gbpCells.Count > 1 Then
-            Dim gbp = showSelectionGBP(gbpCells, kMap)
-            vbDrawContour(dst2, gbp.hull, cv.Scalar.White, task.lineWidth)
-            vbDrawContour(task.color, gbp.contour, cv.Scalar.Yellow)
+        If redCells.Count > 1 Then
+            setSelectedCell(redCells, kMap)
+            vbDrawContour(dst2, task.rcSelect.hull, cv.Scalar.White, task.lineWidth)
+            vbDrawContour(task.color, task.rcSelect.contour, cv.Scalar.Yellow)
         End If
 
 
         If kCellList.Count >= task.frameHistoryCount Then kCellList.RemoveAt(0)
-        If heartBeat() Then labels(2) = CStr(gbpCells.Count) + " objects were consistently present"
+        If heartBeat() Then labels(2) = CStr(redCells.Count) + " objects were consistently present"
     End Sub
 End Class
 
