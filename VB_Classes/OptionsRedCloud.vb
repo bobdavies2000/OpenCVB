@@ -312,4 +312,14 @@ Public Class OptionsRedCloud
         LabelHistogramBins.Text = CStr(HistBinSlider.Value)
         bins3D = HistBinSlider.Value * HistBinSlider.Value * HistBinSlider.Value
     End Sub
+
+    Private Sub UseDepthAndColor_CheckedChanged(sender As Object, e As EventArgs) Handles UseDepthAndColor.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+    End Sub
+    Private Sub UseDepth_CheckedChanged(sender As Object, e As EventArgs) Handles UseDepth.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+    End Sub
+    Private Sub UseColor_CheckedChanged(sender As Object, e As EventArgs) Handles UseColor.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+    End Sub
 End Class

@@ -302,7 +302,7 @@ End Class
 
 
 Public Class Rectangle_EnclosingRect : Inherits VB_Algorithm
-    Dim redC As New RedCloud_CPP
+    Dim redC As New RedColor_Core
     Public motionRect As New cv.Rect
     Public Sub New()
         redOptions.UseColor.Checked = True
@@ -324,10 +324,10 @@ Public Class Rectangle_EnclosingRect : Inherits VB_Algorithm
         redC.Run(dst2)
 
         motionRect = New cv.Rect
-        If redC.minCells.Count > 1 Then
-            Dim rect As cv.Rect = redC.minCells(1).rect
-            For i = 2 To redC.minCells.Count - 1
-                Dim cell = redC.minCells(i)
+        If redC.sortedCells.Count > 1 Then
+            Dim rect As cv.Rect = redC.sortedCells.ElementAt(1).Value.rect
+            For i = 2 To redC.sortedCells.Count - 1
+                Dim cell = redC.sortedCells.ElementAt(i).Value
                 rect = rect.Union(cell.rect)
             Next
             motionRect = rect

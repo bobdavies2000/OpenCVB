@@ -2581,7 +2581,7 @@ public:
 class CPP_RedColor_FeatureLess : public algorithmCPP {
 public:
     CPP_RedColor_FeatureLessCore* minCore;
-    vector<rcData> minCells;
+    vector<rcData> redCells;
     Mat lastColors;
     Mat lastMap = dst2.clone();
     CPP_RedColor_FeatureLess() : algorithmCPP() {
@@ -2589,14 +2589,14 @@ public:
         minCore = new CPP_RedColor_FeatureLessCore();
         advice = minCore->advice;
         dst2 = Mat::zeros(dst2.size(), CV_8U);  
-        labels = { "", "Mask of active RedMin cells", "CV_8U representation of minCells", "" };
+        labels = { "", "Mask of active RedMin cells", "CV_8U representation of redCells", "" };
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells.";
     }
     void Run(Mat src) {
         minCore->Run(src);
-        vector<rcData> lastCells = minCells;
+        vector<rcData> lastCells = redCells;
         if (task->firstPass) lastColors = dst3.clone();
-        minCells.clear();
+        redCells.clear();
         dst2.setTo(0);
         dst3.setTo(0);
         vector<Vec3b> usedColors = { Vec3b(0, 0, 0) };
@@ -2611,29 +2611,29 @@ public:
             }
             usedColors.push_back(cell.color);
             if (dst2.at<uchar>(cell.maxDist.y, cell.maxDist.x) == 0) {
-                cell.index = int(minCells.size()) + 1;
-                minCells.push_back(cell);
+                cell.index = int(redCells.size()) + 1;
+                redCells.push_back(cell);
                 dst2(cell.rect).setTo(cell.index, cell.mask);
                 dst3(cell.rect).setTo(cell.color, cell.mask);
                 //task->setTrueText(to_string(cell.index), cell.maxDist, 2);
                 //task->setTrueText(to_string(cell.index), cell.maxDist, 3);
             }
         }
-        labels[3] = to_string(minCells.size()) + " cells were identified.";
+        labels[3] = to_string(redCells.size()) + " cells were identified.";
         task->rcSelect = rcData();
         if (task->clickPoint == Point(0, 0)) {
-            if (minCells.size() > 2) {
-                task->clickPoint = minCells[0].maxDist;
-                task->rcSelect = minCells[0];
+            if (redCells.size() > 2) {
+                task->clickPoint = redCells[0].maxDist;
+                task->rcSelect = redCells[0];
             }
         }
         else {
             uchar index = dst2.at<uchar>(task->clickPoint.y, task->clickPoint.x);
-            if (index != 0) task->rcSelect = minCells[index - 1];
+            if (index != 0) task->rcSelect = redCells[index - 1];
         }
         lastColors = dst3.clone();
         lastMap = dst2.clone();
-        if (minCells.size() > 0) dst1 = vbPalette(lastMap * 255 / minCells.size());
+        if (redCells.size() > 0) dst1 = vbPalette(lastMap * 255 / redCells.size());
     }
 };
 

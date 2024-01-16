@@ -132,7 +132,7 @@ Public Class Foreground_RedMinFront : Inherits VB_Algorithm
     Dim fore As New Foreground_Hist3D
     Public rMin As New RedColor_Basics
     Dim hist3D As New Hist3D_DepthWithMask
-    Public minCells As New List(Of rcData)
+    Public redCells As New List(Of rcData)
     Public Sub New()
         redOptions.UseColor.Checked = True
         advice = "redOptions '3D Histogram Bins' " + vbCrLf + "redOptions other 'Histogram 3D Options'"
@@ -161,7 +161,7 @@ Public Class Foreground_RedMinBack : Inherits VB_Algorithm
     Dim fore As New Foreground_Hist3D
     Public rMin As New RedColor_Basics
     Dim hist3D As New Hist3D_DepthWithMask
-    Public minCells As New List(Of rcData)
+    Public redCells As New List(Of rcData)
     Public Sub New()
         redOptions.UseColor.Checked = True
         advice = "redOptions '3D Histogram Bins' " + vbCrLf + "redOptions other 'Histogram 3D Options'"

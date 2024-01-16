@@ -11,7 +11,7 @@ Public Class Flood_Basics : Inherits VB_Algorithm
         dst2 = rMin.dst2
         dst3 = rMin.dst3
         labels(2) = rMin.labels(2)
-        classCount = rMin.minCells.Count
+        classCount = rMin.redCells.Count
     End Sub
 End Class
 
@@ -233,7 +233,7 @@ End Class
 Public Class Flood_Featureless : Inherits VB_Algorithm
     Public classCount As Integer
     Dim rMin As New RedColor_Basics
-    Dim minCells As New List(Of rcData)
+    Dim redCells As New List(Of rcData)
     Dim contour As New Contour_Basics
     Public Sub New()
         labels = {"", "", "", "Palette output of image at left"}
@@ -248,18 +248,18 @@ Public Class Flood_Featureless : Inherits VB_Algorithm
         End If
 
         rMin.Run(src)
-        classCount = rMin.minCells.Count
+        classCount = rMin.redCells.Count
 
         dst2.SetTo(0)
-        minCells.Clear()
-        For Each rp In rMin.minCells
+        redCells.Clear()
+        For Each rp In rMin.redCells
             Dim contour = contourBuild(rp.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             Dim hull = cv.Cv2.ConvexHull(contour, True).ToList
             vbDrawContour(dst2(rp.rect), hull, rp.index, -1)
-            minCells.Add(rp)
+            redCells.Add(rp)
         Next
 
-        labels(2) = "Hulls were added for each of the " + CStr(minCells.Count) + " cells identified"
-        dst3 = vbPalette(dst2 * 255 / minCells.Count)
+        labels(2) = "Hulls were added for each of the " + CStr(redCells.Count) + " cells identified"
+        dst3 = vbPalette(dst2 * 255 / redCells.Count)
     End Sub
 End Class

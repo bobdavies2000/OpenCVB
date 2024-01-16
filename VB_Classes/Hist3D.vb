@@ -236,7 +236,7 @@ Public Class Hist3D_PixelCells : Inherits VB_Algorithm
         pixel.Run(src)
 
         dst0.SetTo(0)
-        For Each cell In rMin.minCells
+        For Each cell In rMin.redCells
             cv.Cv2.CalcBackProject({src(cell.rect)}, {0, 1, 2}, pixel.histogram, dst1(cell.rect), redOptions.rangesBGR)
             dst1(cell.rect).CopyTo(dst0(cell.rect), cell.mask)
         Next
@@ -334,11 +334,11 @@ Public Class Hist3D_RedMinGrid : Inherits VB_Algorithm
                         Dim vec = rMin.pixelVector(index - 1)
                         distances.Add(distanceN(vec, hVector.histArray))
                     Next
-                    Dim cell = rMin.minCells(candidates(distances.IndexOf(distances.Min)) - 1)
+                    Dim cell = rMin.redCells(candidates(distances.IndexOf(distances.Min)) - 1)
                     dst1(roi).SetTo(cell.color, dst3(roi))
                     dst2(roi).SetTo(cell.color, dst3(roi))
                 ElseIf candidates.Count = 1 Then
-                    Dim cell = rMin.minCells(candidates(0) - 1)
+                    Dim cell = rMin.redCells(candidates(0) - 1)
                     dst1(roi).SetTo(cell.color, dst3(roi))
                     dst2(roi).SetTo(cell.color, dst3(roi))
                 End If

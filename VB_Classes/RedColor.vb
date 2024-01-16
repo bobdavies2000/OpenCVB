@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Public Class RedColor_Basics : Inherits VB_Algorithm
     Public minCore As New RedColor_Core
-    Public minCells As New List(Of rcData)
+    Public redCells As New List(Of rcData)
     Dim lastColors As cv.Mat
     Dim lastMap As cv.Mat = dst2.Clone
     Public showMaxIndex = 20
@@ -13,9 +13,9 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         minCore.Run(src)
-        Dim lastCells As New List(Of rcData)(minCells)
+        Dim lastCells As New List(Of rcData)(redCells)
 
-        minCells.Clear()
+        redCells.Clear()
         dst2.SetTo(0)
         dst3.SetTo(0)
         Dim usedColors = New List(Of cv.Vec3b)({black})
@@ -36,32 +36,129 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
             usedColors.Add(cell.color)
 
             If dst2.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X) = 0 Then
-                cell.index = minCells.Count
-                minCells.Add(cell)
+                cell.index = redCells.Count
+                redCells.Add(cell)
                 dst2(cell.rect).SetTo(cell.index, cell.mask)
                 dst3(cell.rect).SetTo(cell.color, cell.mask)
             End If
         Next
 
-        If standalone Or showIntermediate() Then identifyCells(minCells, showMaxIndex)
+        If standalone Or showIntermediate() Then identifyCells(redCells, showMaxIndex)
 
-        labels(3) = CStr(minCells.Count) + " cells were identified.  The top " + CStr(showMaxIndex) + " are numbered"
+        labels(3) = CStr(redCells.Count) + " cells were identified.  The top " + CStr(showMaxIndex) + " are numbered"
         labels(2) = minCore.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
         task.cellSelect = New rcData
         If task.clickPoint = New cv.Point(0, 0) Then
-            If minCells.Count > 2 Then
-                task.clickPoint = minCells(0).maxDist
-                task.cellSelect = minCells(0)
+            If redCells.Count > 2 Then
+                task.clickPoint = redCells(0).maxDist
+                task.cellSelect = redCells(0)
             End If
         Else
             Dim index = dst2.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If index <> 0 Then task.cellSelect = minCells(index - 1)
+            If index <> 0 Then task.cellSelect = redCells(index - 1)
         End If
         lastColors = dst3.Clone
         lastMap = dst2.Clone
-        If minCells.Count > 0 Then dst1 = vbPalette(lastMap * 255 / minCells.Count)
+        If redCells.Count > 0 Then dst1 = vbPalette(lastMap * 255 / redCells.Count)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+'Public Class RedCloud_CPP : Inherits VB_Algorithm
+'    Public redCells As New List(Of rcData)
+'    Public cellCount As Integer
+'    Public inputMask As cv.Mat
+'    Public Sub New()
+'        cPtr = RedCloud_Open()
+'        desc = "Floodfill every pixel in the prepared input."
+'    End Sub
+'    Public Sub RunVB(src As cv.Mat)
+'        If task.optionsChanged Then inputMask = Nothing
+'        If src.Channels <> 1 Then
+'            Static colorClass As New Color_Basics
+'            colorClass.Run(src)
+'            src = colorClass.dst2
+'        End If
+
+'        Dim inputData(src.Total - 1) As Byte
+'        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+
+'        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+'        If redOptions.UseDepth.Checked Or inputMask IsNot Nothing Then
+'            If inputMask Is Nothing Then inputMask = task.noDepthMask
+'            Dim maskData(inputMask.Total - 1) As Byte
+'            Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
+'            Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
+'            cellCount = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(),
+'                                      src.Rows, src.Cols, 250)
+'            handleMask.Free()
+'        Else
+'            cellCount = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols, 250)
+'        End If
+'        handleInput.Free()
+
+'        If cellCount = 0 Then Exit Sub ' no depth yet...
+
+'        Dim ptData = New cv.Mat(cellCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPointList(cPtr))
+
+'        Dim floodPoints As New List(Of cv.Point)
+'        For i = 0 To cellCount - 1
+'            floodPoints.Add(ptData.Get(Of cv.Point)(i, 0))
+'        Next
+
+'        Dim floodFlag = 4 Or cv.FloodFillFlags.FixedRange
+
+'        redCells.Clear()
+'        Dim other = New rcData
+'        other.mask = New cv.Mat(1, 1, cv.MatType.CV_8U, 255)
+'        other.rect = New cv.Rect(0, 0, 1, 1)
+'        redCells.Add(other)
+'        Dim mask As New cv.Mat(src.Height + 2, src.Width + 2, cv.MatType.CV_8U, 0)
+'        If redOptions.UseDepth.Checked Or inputMask IsNot Nothing Then
+'            inputMask.CopyTo(mask(New cv.Rect(1, 1, mask.Width - 2, mask.Height - 2)))
+'            mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 255, 1)
+'        End If
+'        Dim fill As Integer
+'        Dim totalPixels As Integer
+'        cellCount = 1
+'        Dim colorRun = redOptions.UseColor.Checked
+'        For i = 0 To floodPoints.Count - 1
+'            Dim rc As New rcData
+'            fill = cellCount
+'            rc.floodPoint = floodPoints(i)
+'            If mask.Get(Of Byte)(rc.floodPoint.Y, rc.floodPoint.X) = 0 Then
+'                If colorRun Then
+'                    If task.depthOutline.Get(Of Byte)(rc.floodPoint.Y, rc.floodPoint.X) <> 0 Then Continue For
+'                End If
+'                rc.index = cellCount
+'                rc.pixels = src.FloodFill(mask, rc.floodPoint, New cv.Scalar(fill), rc.rect, 0, 0, floodFlag Or fill << 8)
+'                If rc.rect.Width = 0 Then Continue For
+'                rc.mask = mask(rc.rect).InRange(fill, fill)
+'                redCells.Add(rc)
+'                totalPixels += rc.pixels
+'                cellCount += 1
+'            End If
+'        Next
+
+'        dst2 = src
+'        dst3 = vbPalette(dst2 * 255 / cellCount)
+'        If heartBeat() Then
+'            labels(2) = "Found " + CStr(cellCount) + " cells - " + Format(totalPixels / src.Total, "0%") +
+'                        " of the image."
+'        End If
+'    End Sub
+'    Public Sub Close()
+'        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+'    End Sub
+'End Class
 
 
 
@@ -73,7 +170,7 @@ Public Class RedColor_Core : Inherits VB_Algorithm
     Public inputMask As cv.Mat
     Public Sub New()
         cPtr = FloodCell_Open()
-        desc = "Another minimalist approach to building RedCloud color-based cells."
+        desc = "Core interface to the C++ code for floodfill."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
@@ -160,7 +257,7 @@ Public Class RedColor_Binarize : Inherits VB_Algorithm
 
         rMin.Run(binarize.dst2)
         dst2 = rMin.dst3
-        If standalone Or showIntermediate() Then identifyCells(rMin.minCells, rMin.showMaxIndex)
+        If standalone Or showIntermediate() Then identifyCells(rMin.redCells, rMin.showMaxIndex)
         labels(2) = rMin.labels(3)
     End Sub
 End Class
@@ -312,7 +409,7 @@ Public Class RedColor_Flippers : Inherits VB_Algorithm
         dst3.SetTo(0)
         Dim unMatched As Integer
         Dim unMatchedPixels As Integer
-        For Each cell In rMin.minCells
+        For Each cell In rMin.redCells
             Dim lastColor = lastMap.Get(Of cv.Vec3b)(cell.maxDist.Y, cell.maxDist.X)
             If lastColor <> cell.color Then
                 dst3(cell.rect).SetTo(cell.color, cell.mask)
@@ -322,7 +419,7 @@ Public Class RedColor_Flippers : Inherits VB_Algorithm
         Next
         lastMap = rMin.dst3.Clone
 
-        If standalone Or showIntermediate() Then identifyCells(rMin.minCells, rMin.showMaxIndex)
+        If standalone Or showIntermediate() Then identifyCells(rMin.redCells, rMin.showMaxIndex)
 
         If heartBeat() Then
             labels(3) = "Unmatched to previous frame: " + CStr(unMatched) + " totaling " + CStr(unMatchedPixels) + " pixels."

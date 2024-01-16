@@ -25,13 +25,13 @@ Public Class MSER_Basics : Inherits VB_Algorithm
         boxes = New List(Of cv.Rect)(detect.boxes)
         floodPoints = New List(Of cv.Point)(detect.floodPoints)
 
-        Dim minCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim redCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To detect.boxes.Count - 1
             Dim rc As New rcData
             rc.rect = detect.boxes(i)
             rc.mask = detect.dst0(rc.rect).InRange(i, i)
             rc.floodPoint = floodPoints(i)
-            minCells.Add(detect.maskCounts(i), rc)
+            redCells.Add(detect.maskCounts(i), rc)
         Next
 
         If task.optionsChanged Then
@@ -49,7 +49,7 @@ Public Class MSER_Basics : Inherits VB_Algorithm
 
         cellMap.SetTo(task.redOther)
         dst2.SetTo(0)
-        For Each key In minCells
+        For Each key In redCells
             Dim rp = key.Value
 
             rp.index = mserCells.Count
@@ -485,7 +485,7 @@ Public Class MSER_Regions : Inherits VB_Algorithm
 
         core.Run(src)
 
-        Dim minCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim redCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To core.boxes.Count - 1
             Dim rc As New rcData
             rc.rect = core.boxes(i)
@@ -494,7 +494,7 @@ Public Class MSER_Regions : Inherits VB_Algorithm
             For Each pt In core.regions(i)
                 rc.mask.Set(Of Byte)(pt.Y - rc.rect.Y, pt.X - rc.rect.X, i Mod 255)
             Next
-            minCells.Add(core.regions(i).Count, rc)
+            redCells.Add(core.regions(i).Count, rc)
         Next
 
         If task.optionsChanged Then
@@ -513,7 +513,7 @@ Public Class MSER_Regions : Inherits VB_Algorithm
         If heartBeat() Then dst2.SetTo(0)
         dst3.SetTo(0)
         Dim minPixels = gOptions.minPixelsSlider.Value
-        For Each key In minCells
+        For Each key In redCells
             Dim rp = key.Value
 
             rp.index = mserCells.Count

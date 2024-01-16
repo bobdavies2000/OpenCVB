@@ -185,7 +185,7 @@ Public Class GuidedBP_kTop : Inherits VB_Algorithm
         dst2 = colorC.dst2
 
         dst3.SetTo(0)
-        For Each rp In colorC.rMin.minCells
+        For Each rp In colorC.rMin.redCells
             Dim histogram As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
             autoX.histogram(rp.rect).CopyTo(histogram(rp.rect), rp.mask)
             cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogram, dst0, task.rangesTop)
@@ -227,7 +227,7 @@ Public Class GuidedBP_kSide : Inherits VB_Algorithm
         dst2 = colorC.dst2
 
         dst3.SetTo(0)
-        For Each rp In colorC.rMin.minCells
+        For Each rp In colorC.rMin.redCells
             Dim histogram As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
             autoY.histogram(rp.rect).CopyTo(histogram(rp.rect), rp.mask)
             cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogram, dst0, task.rangesSide)

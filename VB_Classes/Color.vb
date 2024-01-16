@@ -36,7 +36,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
         classCount = classifier.classCount
 
         dst2 = classifier.dst2
-        dst3 = vbPalette(dst2 * 255 / classCount)
+        If standalone Or showIntermediate() Then dst3 = vbPalette(dst2 * 255 / classCount)
 
         labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) + " pixel classifications"
     End Sub

@@ -126,8 +126,8 @@ Public Class VB_Algorithm : Implements IDisposable
         firstPass = False
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
-    Public Sub identifyCells(minCells As List(Of rcData), showMaxIndex As Integer)
-        For Each cell In minCells
+    Public Sub identifyCells(redCells As List(Of rcData), showMaxIndex As Integer)
+        For Each cell In redCells
             If cell.index <= showMaxIndex Then
                 setTrueText(CStr(cell.index), cell.maxDist, 2)
                 setTrueText(CStr(cell.index), cell.maxDist, 3)

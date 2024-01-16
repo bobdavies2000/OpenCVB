@@ -225,11 +225,11 @@ Public Class Distance_RedMin : Inherits VB_Algorithm
 
         Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
         Static lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
-        Static lastMinCells As New List(Of rcData)
+        Static lastredCells As New List(Of rcData)
         pixelVector.Clear()
         distances.Clear()
-        For i = 0 To rMin.minCells.Count - 1
-            Dim rc = rMin.minCells(i)
+        For i = 0 To rMin.redCells.Count - 1
+            Dim rc = rMin.redCells(i)
             hColor.inputMask = rc.mask
             hColor.Run(src(rc.rect))
 
@@ -246,7 +246,7 @@ Public Class Distance_RedMin : Inherits VB_Algorithm
                 If index Mod 6 = 5 Then strOut += vbCrLf
                 index += 1
 
-                Dim rc = rMin.minCells(el.Value)
+                Dim rc = rMin.redCells(el.Value)
                 setTrueText(CStr(el.Value), rc.maxDist)
             Next
 
@@ -257,18 +257,18 @@ Public Class Distance_RedMin : Inherits VB_Algorithm
                 strOut += Format(el.Key, fmt1) + vbTab
                 If index Mod 6 = 5 Then strOut += vbCrLf
                 index += 1
-                Dim rc = lastMinCells(el.Value)
+                Dim rc = lastredCells(el.Value)
                 setTrueText(el.Value, New cv.Point(rc.maxDist.X, rc.maxDist.Y + 10))
             Next
 
             For Each el In distances
-                Dim rc = rMin.minCells(el.Value)
+                Dim rc = rMin.redCells(el.Value)
                 setTrueText(CStr(el.Value), rc.maxDist)
             Next
         End If
 
         For Each el In lastDistances
-            Dim rp = lastMinCells(el.Value)
+            Dim rp = lastredCells(el.Value)
             setTrueText(el.Value, New cv.Point(rp.maxDist.X, rp.maxDist.Y + 10))
         Next
 
@@ -277,7 +277,7 @@ Public Class Distance_RedMin : Inherits VB_Algorithm
         dst2.SetTo(0)
         dst3.SetTo(0)
         For i = 0 To distances.Count - 1
-            Dim rp = rMin.minCells(distances.ElementAt(i).Value)
+            Dim rp = rMin.redCells(distances.ElementAt(i).Value)
             task.color(rp.rect).CopyTo(dst2(rp.rect), rp.mask)
             dst3(rp.rect).SetTo(task.scalarColors(i), rp.mask)
         Next
@@ -288,7 +288,7 @@ Public Class Distance_RedMin : Inherits VB_Algorithm
             lastDistances.Add(el.Key, el.Value)
         Next
 
-        lastMinCells = New List(Of rcData)(rMin.minCells)
+        lastredCells = New List(Of rcData)(rMin.redCells)
     End Sub
 End Class
 
@@ -312,9 +312,9 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
         rMin.Run(src)
 
         d3Cells.Clear()
-        For i = 0 To rMin.minCells.Count - 1
+        For i = 0 To rMin.redCells.Count - 1
             Dim rm As New rcData
-            Dim rp = rMin.minCells(i)
+            Dim rp = rMin.redCells(i)
             rm.mask = rp.mask
             rm.rect = rp.rect
             rm.index = i + 1

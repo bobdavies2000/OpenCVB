@@ -8,13 +8,13 @@ Imports System.Runtime.InteropServices
 
 Public Class RedColor_BasicsMotion : Inherits VB_Algorithm
     Public minCore As New RedColor_Core
-    Public minCells As New List(Of rcData)
+    Public redCells As New List(Of rcData)
     Public rMotion As New RedMin_Motion
     Dim lastColors = dst3.Clone
     Dim lastMap As cv.Mat = dst2.Clone
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels = {"", "Mask of active RedMin cells", "CV_8U representation of minCells", ""}
+        labels = {"", "Mask of active RedMin cells", "CV_8U representation of redCells", ""}
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -23,14 +23,14 @@ Public Class RedColor_BasicsMotion : Inherits VB_Algorithm
         rMotion.sortedCells = minCore.sortedCells
         rMotion.Run(task.color.Clone)
 
-        Dim lastCells As New List(Of rcData)(minCells)
+        Dim lastCells As New List(Of rcData)(redCells)
 
-        minCells.Clear()
+        redCells.Clear()
         dst2.SetTo(0)
         dst3.SetTo(0)
         Dim usedColors = New List(Of cv.Vec3b)({black})
         Dim motionCount As Integer
-        For Each cell In rMotion.minCells
+        For Each cell In rMotion.redCells
             Dim index = lastMap.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X)
             If cell.motionFlag = False Then
                 If index > 0 And index < lastCells.Count Then cell = lastCells(index - 1)
@@ -45,8 +45,8 @@ Public Class RedColor_BasicsMotion : Inherits VB_Algorithm
             usedColors.Add(cell.color)
 
             If dst2.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X) = 0 Then
-                cell.index = minCells.Count + 1
-                minCells.Add(cell)
+                cell.index = redCells.Count + 1
+                redCells.Add(cell)
                 dst2(cell.rect).SetTo(cell.index, cell.mask)
                 dst3(cell.rect).SetTo(cell.color, cell.mask)
 
@@ -55,22 +55,22 @@ Public Class RedColor_BasicsMotion : Inherits VB_Algorithm
             End If
         Next
 
-        labels(3) = "There were " + CStr(minCells.Count) + " collected cells and " + CStr(motionCount) +
+        labels(3) = "There were " + CStr(redCells.Count) + " collected cells and " + CStr(motionCount) +
                     " cells removed because of motion.  "
 
         task.cellSelect = New rcData
         If task.clickPoint = New cv.Point(0, 0) Then
-            If minCells.Count > 2 Then
-                task.clickPoint = minCells(0).maxDist
-                task.cellSelect = minCells(0)
+            If redCells.Count > 2 Then
+                task.clickPoint = redCells(0).maxDist
+                task.cellSelect = redCells(0)
             End If
         Else
             Dim index = dst2.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If index <> 0 Then task.cellSelect = minCells(index - 1)
+            If index <> 0 Then task.cellSelect = redCells(index - 1)
         End If
         lastColors = dst3.Clone
         lastMap = dst2.Clone
-        If minCells.Count > 0 Then dst1 = vbPalette(lastMap * 255 / minCells.Count)
+        If redCells.Count > 0 Then dst1 = vbPalette(lastMap * 255 / redCells.Count)
     End Sub
 End Class
 
@@ -122,9 +122,9 @@ Public Class RedMin_Blobs : Inherits VB_Algorithm
         labels(2) = rMin.labels(3)
 
         Dim index = gOptions.DebugSlider.Value
-        If index < rMin.minCells.Count Then
+        If index < rMin.redCells.Count Then
             dst3.SetTo(0)
-            Dim cell = rMin.minCells(index)
+            Dim cell = rMin.redCells(index)
             dst3(cell.rect).SetTo(cell.color, cell.mask)
         End If
     End Sub
@@ -200,7 +200,7 @@ End Class
 
 Public Class RedMin_Motion : Inherits VB_Algorithm
     Public motion As New Motion_Basics
-    Public minCells As New List(Of rcData)
+    Public redCells As New List(Of rcData)
     Public sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         gOptions.PixelDiffThreshold.Value = 25
@@ -219,12 +219,12 @@ Public Class RedMin_Motion : Inherits VB_Algorithm
             sortedCells = minCore.sortedCells
         End If
 
-        minCells.Clear()
+        redCells.Clear()
         For Each key In sortedCells
             Dim cell = key.Value
             Dim tmp As cv.Mat = cell.mask And motion.dst2(cell.rect)
             If tmp.CountNonZero Then cell.motionFlag = True
-            minCells.Add(cell)
+            redCells.Add(cell)
         Next
     End Sub
 End Class
@@ -303,7 +303,7 @@ Public Class RedMin_PixelVector3D : Inherits VB_Algorithm
         If heartBeat() Then
             pixelVector.Clear()
             strOut = "3D histogram counts for each cell - " + CStr(maxRegion) + " largest only for readability..." + vbCrLf
-            For Each cell In rMin.minCells
+            For Each cell In rMin.redCells
                 hColor.inputMask = cell.mask
                 hColor.Run(src(cell.rect))
                 pixelVector.Add(hColor.histArray.ToList)
@@ -319,7 +319,7 @@ Public Class RedMin_PixelVector3D : Inherits VB_Algorithm
 
         dst1.SetTo(0)
         dst2.SetTo(0)
-        For Each cell In rMin.minCells
+        For Each cell In rMin.redCells
             task.color(cell.rect).CopyTo(dst2(cell.rect), cell.mask)
             dst1(cell.rect).SetTo(cell.color, cell.mask)
             If cell.index <= maxRegion Then setTrueText(CStr(cell.index), cell.maxDist, 2)
@@ -336,7 +336,7 @@ Public Class RedMin_PixelVectors : Inherits VB_Algorithm
     Public rMin As New RedColor_Basics
     Dim hVector As New Hist3Dcolor_Vector
     Public pixelVector As New List(Of Single())
-    Public minCells As New List(Of rcData)
+    Public redCells As New List(Of rcData)
     Public Sub New()
         labels = {"", "", "RedColor_Basics output", ""}
         desc = "Create a vector for each cell's 3D histogram."
@@ -348,12 +348,12 @@ Public Class RedMin_PixelVectors : Inherits VB_Algorithm
 
         Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
         pixelVector.Clear()
-        For Each cell In rMin.minCells
+        For Each cell In rMin.redCells
             hVector.inputMask = cell.mask
             hVector.Run(src(cell.rect))
             pixelVector.Add(hVector.histArray)
         Next
-        minCells = rMin.minCells
+        redCells = rMin.redCells
 
         setTrueText("3D color histograms were created for " + CStr(pixelVector.Count) + " cells", 3)
     End Sub

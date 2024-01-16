@@ -969,18 +969,18 @@ Module CPP_Externs
 
 
 
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloud_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedCloud_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedCloud_Run(cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr, rows As Integer,
-                                 cols As Integer, maxClassCount As Integer) As Integer
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedCloud_FloodPointList(cPtr As IntPtr) As IntPtr
-    End Function
+    '<DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloud_Open() As IntPtr
+    'End Function
+    '<DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    'Public Function RedCloud_Close(cPtr As IntPtr) As IntPtr
+    'End Function
+    '<DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    'Public Function RedCloud_Run(cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr, rows As Integer,
+    '                             cols As Integer, maxClassCount As Integer) As Integer
+    'End Function
+    '<DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    'Public Function RedCloud_FloodPointList(cPtr As IntPtr) As IntPtr
+    'End Function
 
 
 
