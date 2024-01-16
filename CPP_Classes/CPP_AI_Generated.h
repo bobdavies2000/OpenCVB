@@ -2498,20 +2498,20 @@ public:
     map<int, rcData, compareAllowIdenticalIntegerInverted> sortedCells;
     Mat inputMask;
     CPP_FeatureLess_Basics* fLess;
-    FloodCell* cPtr;
+    RedCloud* cPtr;
     float redOptions_imageThresholdPercent = 0.95f;
     CPP_RedColor_FeatureLessCore() : algorithmCPP() {
         traceName = "CPP_RedColor_FeatureLessCore";
         vbPalette(dst2);
         fLess = new CPP_FeatureLess_Basics();
-        cPtr = new FloodCell();
+        cPtr = new RedCloud();
         advice = "In redOptions the 'Desired RedMin Cells' slider has a big impact.";
         desc = "Another minimalist approach to building RedCloud color-based cells.";
     }
     ~CPP_RedColor_FeatureLessCore() {
 
         if (cPtr) { 
-            FloodCell_Close(cPtr);
+            RedCloud_Close(cPtr);
             delete cPtr;
         }
     }
@@ -2523,15 +2523,15 @@ public:
         void* imagePtr;
         Mat* srcPtr = &src;
         if (inputMask.empty()) {
-            imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, 0, src.rows, src.cols, src.type(), 
+            imagePtr = RedCloud_Run(cPtr, (int *)srcPtr->data, 0, src.rows, src.cols, src.type(), 
                                      task->desiredCells, 0);
         }
         else {
             Mat* maskPtr = &inputMask;
-            imagePtr = FloodCell_Run(cPtr, (int *)srcPtr->data, (uchar *)maskPtr->data, src.rows, src.cols,
+            imagePtr = RedCloud_Run(cPtr, (int *)srcPtr->data, (uchar *)maskPtr->data, src.rows, src.cols,
                                      src.type(), task->desiredCells, 0);
         }
-        int classCount = FloodCell_Count(cPtr);
+        int classCount = RedCloud_Count(cPtr);
 
         dst2 = Mat(src.rows, src.cols, CV_8UC1, imagePtr);
         dst3 = vbPalette(dst2 * 255 / classCount);
@@ -2543,9 +2543,9 @@ public:
         if (classCount <= 1) {
             return;
         }
-        Mat sizeData(classCount, 1, CV_32SC1, FloodCell_Sizes(cPtr));
-        Mat rectData(classCount, 1, CV_32SC4, FloodCell_Rects(cPtr));
-        Mat floodPointData(classCount, 1, CV_32SC2, FloodCell_FloodPoints(cPtr));
+        Mat sizeData(classCount, 1, CV_32SC1, RedCloud_Sizes(cPtr));
+        Mat rectData(classCount, 1, CV_32SC4, RedCloud_Rects(cPtr));
+        Mat floodPointData(classCount, 1, CV_32SC2, RedCloud_FloodPoints(cPtr));
         sortedCells.clear();
 
         for (int i = 0; i < classCount; i++) {

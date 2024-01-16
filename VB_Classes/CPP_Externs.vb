@@ -930,19 +930,20 @@ Module CPP_Externs
 
 
 
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodCell_Open() As IntPtr
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloud_Open() As IntPtr
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodCell_Close(cPtr As IntPtr) As IntPtr
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloud_Close(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodCell_Rects(cPtr As IntPtr) As IntPtr
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloud_Rects(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodCell_FloodPoints(cPtr As IntPtr) As IntPtr
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedCloud_FloodPoints(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodCell_Sizes(cPtr As IntPtr) As IntPtr
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloud_Sizes(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodCell_Count(cPtr As IntPtr) As Integer
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloud_Count(cPtr As IntPtr) As Integer
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodCell_Run(
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloud_Run(
                 cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr, rows As Integer, cols As Integer,
                 type As Integer, maxClassCount As Integer, diff As Integer) As IntPtr
     End Function
@@ -1014,7 +1015,7 @@ Module CPP_Externs
     Public Function RedMin_FindPixels_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As Integer
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedMin_FindPixels_Sizes(cPtr As IntPtr) As IntPtr
+    Public Function RedMin_FindPixels_Pixels(cPtr As IntPtr) As IntPtr
     End Function
 
 

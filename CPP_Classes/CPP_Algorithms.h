@@ -2571,7 +2571,7 @@ int* Random_DiscreteDistribution_Run(Random_DiscreteDistribution * cPtr, int row
 
 
 
-class FloodCell
+class RedCloud
 {
 private:
 public:
@@ -2580,7 +2580,7 @@ public:
 	vector<int> cellSizes;
 	vector<Point> floodPoints;
 
-	FloodCell() {}
+	RedCloud() {}
 	void RunCPP(int maxClassCount, int diff) {
 		Rect rect;
 
@@ -2624,30 +2624,30 @@ public:
 	}
 };
 
-extern "C" __declspec(dllexport) FloodCell * FloodCell_Open() { return new FloodCell(); }
-extern "C" __declspec(dllexport) int FloodCell_Count(FloodCell * cPtr)
+extern "C" __declspec(dllexport) RedCloud * RedCloud_Open() { return new RedCloud(); }
+extern "C" __declspec(dllexport) int RedCloud_Count(RedCloud * cPtr)
 {
 	return (int)cPtr->cellRects.size();
 }
 
-extern "C" __declspec(dllexport) int* FloodCell_Rects(FloodCell * cPtr)
+extern "C" __declspec(dllexport) int* RedCloud_Rects(RedCloud * cPtr)
 {
 	return (int*)&cPtr->cellRects[0];
 }
 
-extern "C" __declspec(dllexport) int* FloodCell_FloodPoints(FloodCell * cPtr)
+extern "C" __declspec(dllexport) int* RedCloud_FloodPoints(RedCloud * cPtr)
 {
 	return (int*)&cPtr->floodPoints[0];
 }
 
-extern "C" __declspec(dllexport) int* FloodCell_Sizes(FloodCell * cPtr)
+extern "C" __declspec(dllexport) int* RedCloud_Sizes(RedCloud * cPtr)
 {
 	return (int*)&cPtr->cellSizes[0];
 }
 
-extern "C" __declspec(dllexport) int* FloodCell_Close(FloodCell * cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int* RedCloud_Close(RedCloud * cPtr) { delete cPtr; return (int*)0; }
 extern "C" __declspec(dllexport) int*
-FloodCell_Run(FloodCell * cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols, int type,
+RedCloud_Run(RedCloud * cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols, int type,
 	int maxClassCount, int diff)
 {
 	cPtr->src = Mat(rows, cols, type, dataPtr);

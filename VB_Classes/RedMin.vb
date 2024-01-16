@@ -248,8 +248,8 @@ Public Class RedMin_FindPixels_CPP : Inherits VB_Algorithm
         Dim classCount = RedMin_FindPixels_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()
 
-        If classCount = 0 Or FloodCell_Sizes(cPtr) = 0 Then Exit Sub
-        Dim pixelData = New cv.Mat(classCount, 1, cv.MatType.CV_8UC3, FloodCell_Sizes(cPtr))
+        If classCount = 0 Then Exit Sub
+        Dim pixelData = New cv.Mat(classCount, 1, cv.MatType.CV_8UC3, RedMin_FindPixels_Pixels(cPtr))
         setTrueText(CStr(classCount) + " unique BGR pixels were found in the src." + vbCrLf +
                     "Or " + Format(classCount / src.Total, "0%") + " of the input.")
     End Sub
