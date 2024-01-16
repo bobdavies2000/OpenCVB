@@ -1,7 +1,30 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class RedColor_Basics : Inherits VB_Algorithm
-    Dim fLess As New RedColor_Core
+    Dim binarize As New Binarize_FourWay
+    Dim rMin As New RedMin_Basics
+    Public Sub New()
+        labels(3) = "A 4-way split of the input grayscale image based on brightness"
+        desc = "Use RedCloud on a 4-way split based on light to dark in the image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binarize.Run(src)
+        dst3 = vbPalette(binarize.dst2 * 255 / 5)
+
+        rMin.Run(binarize.dst2)
+        dst2 = rMin.dst3
+        If standalone Or showIntermediate() Then identifyCells(rMin.minCells, rMin.showMaxIndex)
+        labels(2) = rMin.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedColor_BasicsOld : Inherits VB_Algorithm
+    Dim redCore As New RedColor_Core
     Public redCells As New List(Of rcData)
     Dim lastMap As cv.Mat
     Public Sub New()
@@ -11,15 +34,15 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
         desc = "Match redCells from the current generation to the last."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim lastCells As New List(Of rcData)(fLess.redCells)
+        Dim lastCells As New List(Of rcData)(redCore.redCells)
         Dim lastMap = dst3.Clone
 
-        fLess.Run(src)
+        redCore.Run(src)
 
         Dim ftmp As New List(Of rcData)
         Dim lrc As rcData
         Dim usedColors1 As New List(Of cv.Vec3b)
-        For Each rc In fLess.redCells
+        For Each rc In redCore.redCells
             Dim prev = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If prev < lastCells.Count And prev <> 0 Then
                 lrc = lastCells(prev)
@@ -48,7 +71,7 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
         redCells = New List(Of rcData)(ftmp)
         setSelectedCell(redCells, dst2)
         showSelectedCell(dst2)
-        labels(2) = fLess.labels(2)
+        labels(2) = redCore.labels(2)
     End Sub
 End Class
 
@@ -118,6 +141,11 @@ Public Class RedColor_Core : Inherits VB_Algorithm
 
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
+
+        If standalone Then
+            setSelectedCell(redCells, dst2)
+            showSelectedCell(dst2)
+        End If
         If heartBeat() Then labels(2) = CStr(classCount) + " cells were identified."
     End Sub
     Public Sub Close()
@@ -150,32 +178,6 @@ Public Class RedColor_CComp : Inherits VB_Algorithm
         labels(2) = rMin.labels(3)
     End Sub
 End Class
-
-
-
-
-
-
-
-
-
-Public Class RedColor_CCompBinarized : Inherits VB_Algorithm
-    Dim edges As New Edge_BinarizedSobel
-    Dim ccomp As New RedColor_Binarize
-    Public Sub New()
-        labels(3) = "Binarized Sobel output"
-        desc = "Use the binarized edges to find the different blobs in the image"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        edges.Run(src)
-        dst3 = edges.dst2
-
-        ccomp.Run(dst3)
-        dst2 = ccomp.dst2
-        labels(2) = ccomp.labels(2)
-    End Sub
-End Class
-
 
 
 
@@ -272,28 +274,6 @@ Public Class RedColor_Cells : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class RedColor_Binarize : Inherits VB_Algorithm
-    Dim binarize As New Binarize_FourWay
-    Dim rMin As New RedMin_Basics
-    Public Sub New()
-        labels(3) = "A 4-way split of the input grayscale image based on brightness"
-        desc = "Use RedCloud on a 4-way split based on light to dark in the image."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        binarize.Run(src)
-        dst3 = vbPalette(binarize.dst2 * 255 / 5)
-
-        rMin.Run(binarize.dst2)
-        dst2 = rMin.dst3
-        labels(2) = rMin.labels(3)
-    End Sub
-End Class
 
 
 
