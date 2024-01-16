@@ -289,7 +289,7 @@ Public Class Hist3D_PixelDiffMask : Inherits VB_Algorithm
         dst2 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
         lastImage = pixel.dst2.Clone
 
-        rMin.minCore.inputMask = dst2
+        rMin.redCore.inputMask = dst2
         rMin.Run(pixel.dst2)
         dst3 = rMin.dst3.Clone
         labels(3) = rMin.labels(3)

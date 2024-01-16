@@ -144,7 +144,7 @@ Public Class Foreground_RedMinFront : Inherits VB_Algorithm
         hist3D.depthMask = fore.dst2 Or task.noDepthMask
         hist3D.Run(src)
 
-        rMin.minCore.inputMask = Not hist3D.depthMask
+        rMin.redCore.inputMask = Not hist3D.depthMask
         rMin.Run(hist3D.dst2)
 
         dst2 = rMin.dst3.Clone
@@ -173,7 +173,7 @@ Public Class Foreground_RedMinBack : Inherits VB_Algorithm
         hist3D.depthMask = fore.dst3 Or task.noDepthMask
         hist3D.Run(src)
 
-        rMin.minCore.inputMask = Not hist3D.depthMask
+        rMin.redCore.inputMask = Not hist3D.depthMask
         rMin.Run(hist3D.dst2)
 
         dst2 = rMin.dst3.Clone

@@ -1844,13 +1844,14 @@ End Class
 Public Class RedCloud_Combine : Inherits VB_Algorithm
     Dim color As New Color_Basics
     Public guided As New GuidedBP_Depth
-    Dim redP As New RedColor_Core
+    Dim redCore As New RedCloud_CPP
     Public combinedCells As New List(Of rcData)
     Public Sub New()
         desc = "Combined the color and cloud as indicated in the RedOptions panel."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If redOptions.UseColor.Checked Or redOptions.UseDepthAndColor.Checked Then
+            redCore.inputMask = Nothing
             If src.Channels = 3 Then
                 color.Run(src)
                 dst2 = color.dst2.Clone
@@ -1858,6 +1859,7 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
                 dst2 = src
             End If
         Else
+            redCore.inputMask = task.noDepthMask
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             color.classCount = 0
         End If
@@ -1876,17 +1878,95 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
             End Select
         End If
 
-        redP.Run(dst2)
-        dst2 = redP.dst2
-        dst3 = redP.dst3
+        redCore.Run(dst2)
+        dst2 = redCore.dst2
+        dst3 = redCore.dst3
 
         combinedCells.Clear()
         Dim limitedPrepRun As Boolean
         If task.drawRect.Width * task.drawRect.Height > 10 Then limitedPrepRun = True
-        For Each key In redP.sortedCells
+        For Each key In redCore.sortedCells
             Dim rc = key.Value
             If limitedPrepRun Then If task.drawRect.Contains(rc.floodPoint) = False Then Continue For
             combinedCells.Add(rc)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_CPP : Inherits VB_Algorithm
+    Public sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+    Public inputMask As cv.Mat
+    Public Sub New()
+        cPtr = FloodCell_Open()
+        desc = "Core interface to the C++ code for floodfill."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 1 Then
+            Static colorClass As New Color_Basics
+            colorClass.Run(src)
+            src = colorClass.dst2
+        End If
+
+        Dim imagePtr As IntPtr
+        If inputMask Is Nothing Then
+            Dim inputData(src.Total - 1) As Byte
+            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+            imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols,
+                                     src.Type, redOptions.DesiredCellSlider.Value, 0)
+            handleInput.Free()
+        Else
+            Dim inputData(src.Total - 1) As Byte
+            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+            Dim maskData(inputMask.Total - 1) As Byte
+            Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
+            Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
+
+            imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                     src.Type, redOptions.DesiredCellSlider.Value, 0)
+            handleMask.Free()
+            handleInput.Free()
+        End If
+
+        Dim classCount = FloodCell_Count(cPtr)
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst3 = vbPalette(dst2 * 255 / classCount)
+
+        If heartBeat() Then labels(3) = CStr(classCount) + " cells found"
+        If classCount <= 1 Then Exit Sub
+
+        Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, FloodCell_Sizes(cPtr))
+        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, FloodCell_Rects(cPtr))
+        Dim floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, FloodCell_FloodPoints(cPtr))
+        sortedCells.Clear()
+        For i = 0 To classCount - 1
+            Dim rc As New rcData
+            rc.index = i + 1
+            rc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
+            rc.mask = dst2(rc.rect).InRange(rc.index, rc.index).Threshold(0, 255, cv.ThresholdTypes.Binary)
+            'Dim contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            'vbDrawContour(rc.mask, contour, 255, -1)
+
+            rc.pixels = sizeData.Get(Of Integer)(i, 0)
+            rc.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
+            rc.mask.Rectangle(New cv.Rect(0, 0, rc.mask.Width, rc.mask.Height), 0, 1)
+            Dim pt = vbGetMaxDist(rc.mask)
+            rc.maxDist = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
+            sortedCells.Add(rc.pixels, rc)
+        Next
+
+        If heartBeat() Then labels(2) = "CV_8U format - " + CStr(classCount) + " cells were identified."
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = FloodCell_Close(cPtr)
     End Sub
 End Class

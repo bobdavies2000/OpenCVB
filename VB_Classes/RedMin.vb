@@ -7,7 +7,7 @@ Imports System.Runtime.InteropServices
 
 
 Public Class RedColor_BasicsMotion : Inherits VB_Algorithm
-    Public minCore As New RedColor_Core
+    Public redCore As New RedCloud_CPP
     Public redCells As New List(Of rcData)
     Public rMotion As New RedMin_Motion
     Dim lastColors = dst3.Clone
@@ -18,9 +18,9 @@ Public Class RedColor_BasicsMotion : Inherits VB_Algorithm
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        minCore.Run(src)
+        redCore.Run(src)
 
-        rMotion.sortedCells = minCore.sortedCells
+        rMotion.sortedCells = redCore.sortedCells
         rMotion.Run(task.color.Clone)
 
         Dim lastCells As New List(Of rcData)(redCells)
@@ -80,14 +80,14 @@ End Class
 
 
 Public Class RedMin_ContourVsFeatureLess : Inherits VB_Algorithm
-    Dim redMin As New RedColor_Core
+    Dim redCore As New RedCloud_CPP
     Dim contour As New Contour_WholeImage
     Dim fLess As New FeatureLess_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        labels = {"", "Contour_WholeImage Input", "RedColor_Core - toggling between Contour and Featureless inputs",
+        labels = {"", "Contour_WholeImage Input", "RedCloud_CPP - toggling between Contour and Featureless inputs",
                   "FeatureLess_Basics Input"}
-        desc = "Compare Contour_WholeImage and FeatureLess_Basics as input to RedColor_Core"
+        desc = "Compare Contour_WholeImage and FeatureLess_Basics as input to RedCloud_CPP"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static useContours = findRadio("Use Contour_WholeImage")
@@ -98,8 +98,8 @@ Public Class RedMin_ContourVsFeatureLess : Inherits VB_Algorithm
         fLess.Run(src)
         dst3 = fLess.dst2
 
-        If task.toggleOn Then redMin.Run(dst3) Else redMin.Run(dst1)
-        dst2 = redMin.dst3
+        If task.toggleOn Then redCore.Run(dst3) Else redCore.Run(dst1)
+        dst2 = redCore.dst3
     End Sub
 End Class
 
@@ -212,11 +212,11 @@ Public Class RedMin_Motion : Inherits VB_Algorithm
         dst3 = motion.dst2
 
         If standalone Then
-            Static minCore As New RedColor_Core
-            minCore.Run(src)
-            dst2 = minCore.dst3
-            labels(2) = minCore.labels(3)
-            sortedCells = minCore.sortedCells
+            Static redCore As New RedCloud_CPP
+            redCore.Run(src)
+            dst2 = redCore.dst3
+            labels(2) = redCore.labels(3)
+            sortedCells = redCore.sortedCells
         End If
 
         redCells.Clear()
