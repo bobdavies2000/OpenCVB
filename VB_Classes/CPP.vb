@@ -2,6 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text
 Imports System.Windows.Markup
+Imports OpenCvSharp.Extensions
 
 Public Class CPP_Basics : Inherits VB_Algorithm
     Public cppFunction As Integer
@@ -36,13 +37,15 @@ Public Class CPP_Basics : Inherits VB_Algorithm
                                adviceBuffer)
 
         labels = labelBuffer.ToString.Split("|")
-        desc = descbuffer.ToString
+        desc = descBuffer.ToString
         advice = adviceBuffer.tostring
     End Sub
     Public Sub New()
     End Sub
 
     Public Sub RunVB(src As cv.Mat)
+        Dim colorInput As Integer
+
         cppTask_OptionsVBtoCPP(cPtr, gOptions.GridSize.Value,
                                gOptions.HistBinSlider.Value,
                                gOptions.PixelDiffThreshold.Value, gOptions.UseKalman.Checked,
@@ -53,7 +56,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
                                task.clickPoint.X, task.clickPoint.Y, task.mouseClickFlag,
                                task.mousePicTag, task.mouseMovePoint.X, task.mouseMovePoint.Y,
                                task.paletteIndex, redOptions.DesiredCellSlider.Value, task.midHeartBeat,
-                               task.quarterBeat)
+                               task.quarterBeat, colorInput)
 
         Dim pointCloudData(task.pointCloud.Total * task.pointCloud.ElemSize - 1) As Byte
         Marshal.Copy(task.pointCloud.Data, pointCloudData, 0, pointCloudData.Length)

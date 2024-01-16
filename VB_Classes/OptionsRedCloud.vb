@@ -1,9 +1,10 @@
 ﻿Imports System.Runtime.InteropServices
 Imports System.Windows.Controls
 Imports NAudio.Gui
+Imports OpenCvSharp.Extensions
 Imports cv = OpenCvSharp
 Public Class OptionsRedCloud
-    Public colorInput As String = "Reduction_Basics"
+    Public colorInputName As String
     Public reductionType As String = "Use Simple Reduction"
     Public depthInput As String = "RedCloud_Core"
 
@@ -151,14 +152,6 @@ Public Class OptionsRedCloud
                 channelIndex = 2
                 histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
         End Select
-
-        Dim testVal = colorInput = "Reduction_Basics"
-        ReductionSliders.Enabled = testVal
-        ReductionTypeGroup.Enabled = testVal
-        If testVal Then
-            SimpleReductionSlider.Enabled = reductionType = "Use Simple Reduction"
-            BitwiseReductionSlider.Enabled = reductionType = "Use Bitwise Reduction"
-        End If
     End Sub
 
 
@@ -184,29 +177,54 @@ Public Class OptionsRedCloud
 
 
 
+    Private Sub setColorIndex(colorInput As String)
+        Dim reductionTest As Boolean
+        Select Case colorInput
+            Case "BackProject_Full"
+                task.colorInputIndex = 0
+            Case "KMeans_Basics"
+                task.colorInputIndex = 1
+            Case "LUT_Basics"
+                task.colorInputIndex = 2
+            Case "Reduction_Basics"
+                task.colorInputIndex = 3
+                reductionTest = True
+            Case "3D BackProjection"
+                task.colorInputIndex = 4
+            Case "Binarize_FourWay"
+                task.colorInputIndex = 5
+        End Select
+        colorInputName = colorInput
+        ReductionSliders.Enabled = reductionTest
+        ReductionTypeGroup.Enabled = reductionTest
+        If reductionTest Then
+            SimpleReductionSlider.Enabled = reductionType = "Use Simple Reduction"
+            BitwiseReductionSlider.Enabled = reductionType = "Use Bitwise Reduction"
+        End If
+    End Sub
     Private Sub RadioButton1_CheckedChanged(sender As Object, e As EventArgs) Handles BackProject_Full.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        colorInput = BackProject_Full.Text
+        setColorIndex(BackProject_Full.Text)
     End Sub
     Private Sub RadioButton4_CheckedChanged(sender As Object, e As EventArgs) Handles KMeans_Basics.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        colorInput = KMeans_Basics.Text
+        setColorIndex(KMeans_Basics.Text)
     End Sub
     Private Sub RadioButton3_CheckedChanged(sender As Object, e As EventArgs) Handles LUT_Basics.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        colorInput = LUT_Basics.Text
+        setColorIndex(LUT_Basics.Text)
     End Sub
     Private Sub RadioButton2_CheckedChanged(sender As Object, e As EventArgs) Handles Reduction_Basics.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        colorInput = Reduction_Basics.Text
+        setColorIndex(Reduction_Basics.Text)
     End Sub
     Private Sub BackProject3D_CheckedChanged(sender As Object, e As EventArgs) Handles BackProject3D.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        colorInput = BackProject3D.Text
+        setColorIndex(BackProject3D.Text)
     End Sub
     Private Sub BinarizeRadio_CheckedChanged(sender As Object, e As EventArgs) Handles BinarizeRadio.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        colorInput = BinarizeRadio.Text
+        setColorIndex(BinarizeRadio.Text)
     End Sub
 
 

@@ -227,6 +227,7 @@ public:
     Scalar scalarColors[256]; Vec3b vecColors[256]; Rect drawRect; bool displayDst0; bool displayDst1;
     bool gridROIclicked;
     Mat gridToRoiIndex;
+    int colorInputIndex;
     vector<Rect> gridList;
     vector<vector<int>> gridNeighbors;
 

@@ -1112,7 +1112,7 @@ Public Class OpenGL_3DColors : Inherits VB_Algorithm
         colorClass.Run(src)
         dst2 = colorClass.dst3
         dst2.ConvertTo(dst1, cv.MatType.CV_32FC3)
-        labels(2) = "There are " + CStr(colorClass.classCount) + " classes for " + redOptions.colorInput
+        labels(2) = "There are " + CStr(colorClass.classCount) + " classes for " + redOptions.colorInputName
         task.ogl.pointCloudInput = dst1.Normalize(0, 1, cv.NormTypes.MinMax)
         task.ogl.Run(src)
         If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3

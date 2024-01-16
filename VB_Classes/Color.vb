@@ -1,21 +1,21 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Color_Basics : Inherits VB_Algorithm
     Public classCount As Integer
-    Public CurrentColorClassifier As String
     Dim backP As New BackProject_Full
     Dim km As New KMeans_Basics
     Dim lut As New LUT_Basics
     Dim reduction As New Reduction_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Dim binarize As New Binarize_FourWay
-    Dim classifier As Object = reduction
+    Public classifier As Object = binarize
     Public Sub New()
-        classifier = reduction
+        advice = "The redOptions 'Color Source' radio buttons control which method is used."
+        labels(3) = "vbPalette output of dst2 at left"
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.optionsChanged Then
-            Select Case redOptions.colorInput
+            Select Case redOptions.colorInputName
                 Case "BackProject_Full"
                     classifier = backP
                 Case "KMeans_Basics"
@@ -38,8 +38,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
         dst2 = classifier.dst2
         dst3 = vbPalette(dst2 * 255 / classCount)
 
-        setTrueText(redOptions.colorInput)
-        labels(2) = "Color_Basics: method = " + redOptions.colorInput + " produced " + CStr(classCount) + " pixel classifications"
+        labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) + " pixel classifications"
     End Sub
 End Class
 

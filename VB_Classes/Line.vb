@@ -1264,7 +1264,7 @@ Public Class Line_ColorClass : Inherits VB_Algorithm
         dst3 = lines.dst3
 
         labels(1) = "Input to Line_Basics"
-        labels(2) = "Lines found in the " + colorClass.CurrentColorClassifier + " output"
+        labels(2) = "Lines found in the " + colorClass.classifier.traceName + " output"
     End Sub
 End Class
 

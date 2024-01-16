@@ -2974,3 +2974,57 @@ public:
         }
     }
 };
+
+
+
+
+
+
+class CPP_Color_Basics : public algorithmCPP {
+public:
+    int classCount;
+    string CurrentColorClassifier;
+    //BackProject_Full* backP;
+    //KMeans_Basics* km;
+    //LUT_Basics* lut;
+    //Reduction_Basics* reduction;
+    //Hist3Dcolor_Basics* hColor;
+    CPP_Binarize_FourWay* binarize;
+    algorithmCPP* classifier = binarize;
+    CPP_Color_Basics() : algorithmCPP() {
+        traceName = "CPP_Color_Basics";
+        binarize = new CPP_Binarize_FourWay();
+        desc = "Classify pixels by color using a variety of techniques";
+    }
+    void Run(Mat src) {
+        if (task->optionsChanged) {
+            switch (task->colorInputIndex) {
+            case 0: // "BackProject_Full":
+                //classifier = backP;
+                break;
+            case 1: // "KMeans_Basics":
+                //classifier = km;
+                break;
+            case 2: //"LUT_Basics":
+                //classifier = lut;
+                break;
+            case 3: //"Reduction_Basics":
+                //classifier = reduction;
+                break;
+            case 4: //"3D BackProjection":
+                //classifier = hColor;
+                break;
+            case 5:
+                classifier = binarize;
+                break;
+            }
+        }
+        //dst1 = src.channels() == 3 ? src.cvtColor(COLOR_BGR2GRAY) : src.clone();
+        //classifier->run(dst1);
+        //classCount = classifier->classCount;
+        //dst2 = classifier->dst2;
+        //dst3 = vbPalette(dst2 * 255 / classCount);
+        //task->setTrueText(redOptions.colorInput);
+        //labels[2] = "Color_Basics: method = " + redOptions.colorInput + " produced " + to_string(classCount) + " pixel classifications";
+    }
+};

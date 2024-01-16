@@ -222,7 +222,8 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
                             int lineWidth, int lineType, int dotSize, int minResWidth, int minResHeight,
                             float maxZmeters, int PCReduction, float fontSize, int fontThickness,
                             int clickX, int clickY, bool clickFlag, int picTag, int moveX, int moveY,
-                            int paletteIndex, int desiredCells, bool midHeartBeat, bool quarterBeat)
+                            int paletteIndex, int desiredCells, bool midHeartBeat, bool quarterBeat,
+                            int colorIndex)
 {
     task->pixelDiffThreshold = pixelDiffThreshold;
     task->gridSize = gridSize;
@@ -249,6 +250,7 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
     task->desiredCells = desiredCells;
     task->midHeartBeat = midHeartBeat;
     task->quarterBeat = quarterBeat;
+    task->colorInputIndex = colorIndex;
 }
 
 
