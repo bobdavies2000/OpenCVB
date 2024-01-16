@@ -5,7 +5,6 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
     Public fCells As New List(Of rcData)
     Dim lastMap As cv.Mat
     Public Sub New()
-        redOptions.FeatureLessRadio.Checked = True
         dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         lastMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels(3) = "The colors are unstable because there is no cell matching to the previous generation."
@@ -41,9 +40,7 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
         dst3.SetTo(0)
         Dim usedColors2 As New List(Of cv.Vec3b)
         For Each rc In ftmp
-            If usedColors2.Contains(rc.color) Then
-                rc.color = randomCellColor()
-            End If
+            If usedColors2.Contains(rc.color) Then rc.color = randomCellColor()
             dst3(rc.rect).SetTo(rc.color, rc.mask)
             dst2(rc.rect).SetTo(rc.index, rc.mask)
         Next
@@ -74,16 +71,15 @@ Public Class RedColor_FeatureLess : Inherits VB_Algorithm
     Public classCount As Integer
     Public fCells As New List(Of rcData)
     Public fcSelect As New rcData
-    Dim fLess As New FeatureLess_Basics
+    Dim color As New Color_Basics
     Public Sub New()
         cPtr = FloodCell_Open()
         gOptions.PixelDiffThreshold.Value = 0
         desc = "Floodfill an image so each cell can be tracked.  NOTE: cells are not matched to previous image.  Use RedMin_Basics for matching."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If redOptions.colorInput <> "FeatureLess" Then redOptions.FeatureLessRadio.Checked = True
-        fLess.Run(src)
-        src = fLess.dst2
+        color.Run(src)
+        src = color.dst2
 
         Dim inputData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
