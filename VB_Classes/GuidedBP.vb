@@ -578,10 +578,10 @@ Public Class GuidedBP_Hulls : Inherits VB_Algorithm
                 kw.mmX = vbMinMax(task.pcSplit(0), mask)
                 kw.mmY = vbMinMax(task.pcSplit(1), mask)
                 kw.mmZ = vbMinMax(task.pcSplit(2), mask)
-                kw.size = kw.mask.CountNonZero()
-                If sizes.Contains(kw.size) = False Then
-                    newCells.Add(kw.size, kw)
-                    sizes.Add(kw.size)
+                kw.pixels = kw.mask.CountNonZero()
+                If sizes.Contains(kw.pixels) = False Then
+                    newCells.Add(kw.pixels, kw)
+                    sizes.Add(kw.pixels)
                 End If
                 kw.color = randomCellColor()
                 vbDrawContour(dst2, kw.contour, kw.color, -1)
@@ -620,7 +620,7 @@ Public Class GuidedBP_Hulls : Inherits VB_Algorithm
             strOut += "Hull" + vbTab + vbTab + vbTab + vbCrLf
             For Each kw In gbpCells
                 If kw.index = 0 Then Continue For
-                strOut += CStr(kw.index) + vbTab + Format(kw.size, fmt0) + vbTab
+                strOut += CStr(kw.index) + vbTab + Format(kw.pixels, fmt0) + vbTab
                 strOut += Format(kw.mmZ.minVal, fmt2) + "/" + Format(kw.mmZ.maxVal, fmt2) + vbTab
                 strOut += hullStr(kw.hull) + vbCrLf
             Next
@@ -720,7 +720,7 @@ Public Class GuidedBP_History : Inherits VB_Algorithm
         Dim sortCells As New SortedList(Of Integer, gbpData)(New compareAllowIdenticalIntegerInverted)
         For Each cellList In kCellList
             For i = 1 To cellList.Count - 1
-                sortCells.Add(cellList(i).size, cellList(i))
+                sortCells.Add(cellList(i).pixels, cellList(i))
             Next
         Next
 
@@ -734,7 +734,7 @@ Public Class GuidedBP_History : Inherits VB_Algorithm
             Dim index = kMap.Get(Of Byte)(kw.maxDist.Y, kw.maxDist.X)
             Dim lkw = gbpCells(index)
             If Math.Abs((kw.mmZ.minVal + kw.mmZ.maxVal) / 2 - (lkw.mmZ.minVal + lkw.mmZ.maxVal) / 2) > distanceMin Then
-                If kw.size >= minSize Then
+                If kw.pixels >= minSize Then
                     kw.index = gbpCells.Count
                     Dim color = lastDst2.Get(Of cv.Vec3b)(kw.maxDist.Y, kw.maxDist.X)
                     If usedColors.Contains(color) = False Then kw.color = color

@@ -756,35 +756,6 @@ End Structure
 
 
 
-Public Class gbpData
-    Public mask As cv.Mat
-    Public hull As List(Of cv.Point)
-    Public contour As List(Of cv.Point)
-    Public rect As cv.Rect
-
-    Public size As Integer
-    Public index As Integer
-    Public indexLast As Integer
-    Public maxDist As cv.Point
-    Public color As cv.Vec3b
-
-    Public mmX As mmData
-    Public mmY As mmData
-    Public mmZ As mmData
-    Public Sub New()
-        index = 0
-        mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
-        hull = New List(Of cv.Point)
-        contour = New List(Of cv.Point)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class segCell
     Public rect As cv.Rect
@@ -807,6 +778,35 @@ End Class
 
 
 
+
+
+
+
+
+
+
+Public Class gbpData
+    Public mask As cv.Mat
+    Public hull As List(Of cv.Point)
+    Public contour As List(Of cv.Point)
+    Public rect As cv.Rect
+
+    Public pixels As Integer
+    Public index As Integer
+    Public indexLast As Integer
+    Public maxDist As cv.Point
+    Public color As cv.Vec3b
+
+    Public mmX As mmData
+    Public mmY As mmData
+    Public mmZ As mmData
+    Public Sub New()
+        index = 0
+        mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
+        hull = New List(Of cv.Point)
+        contour = New List(Of cv.Point)
+    End Sub
+End Class
 Public Class rcData
     Public rect As cv.Rect
     Public motionRect As cv.Rect ' the union of the previous rect with the current rect.
