@@ -454,7 +454,7 @@ End Class
 
 Public Class RedCloud_CoreTest : Inherits VB_Algorithm
     Dim prep As New RedCloud_Core
-    Public rMin As New RedMin_Basics
+    Public rMin As New RedColor_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
         gOptions.HistBinSlider.Value = 20
@@ -1449,7 +1449,7 @@ End Class
 
 Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
     Dim guided As New GuidedBP_Depth
-    Public rMin As New RedMin_Basics
+    Public rMin As New RedColor_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
         desc = "Segment the image based on both the reduced point cloud and color"

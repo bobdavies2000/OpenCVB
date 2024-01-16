@@ -9,8 +9,8 @@ _CPP_Area_MinRect
 _CPP_Mesh_Features
 _CPP_Mesh_Agast
 _CPP_Mesh_Basics
-_CPP_RedMin_Basics
-_CPP_RedMin_Core
+_CPP_RedColor_FeatureLess
+_CPP_RedColor_FeatureLessCore
 _CPP_Palette_Basics
 _CPP_FeatureLess_History
 _CPP_Line_Basics
@@ -335,8 +335,8 @@ if algorithmName = "CPP_Rectangle_Basics" Then return new CPP_Basics(functionNam
 if algorithmName = "CPP_Rectangle_Rotated" Then return new CPP_Basics(functionNames._CPP_Rectangle_Rotated)
 if algorithmName = "CPP_RedCloud_Core" Then return new CPP_Basics(functionNames._CPP_RedCloud_Core)
 if algorithmName = "CPP_RedCloud_Flood" Then return new CPP_Basics(functionNames._CPP_RedCloud_Flood)
-if algorithmName = "CPP_RedMin_Basics" Then return new CPP_Basics(functionNames._CPP_RedMin_Basics)
-if algorithmName = "CPP_RedMin_Core" Then return new CPP_Basics(functionNames._CPP_RedMin_Core)
+if algorithmName = "CPP_RedColor_FeatureLess" Then return new CPP_Basics(functionNames._CPP_RedColor_FeatureLess)
+if algorithmName = "CPP_RedColor_FeatureLessCore" Then return new CPP_Basics(functionNames._CPP_RedColor_FeatureLessCore)
 if algorithmName = "CPP_Remap_Basics" Then return new CPP_Basics(functionNames._CPP_Remap_Basics)
 if algorithmName = "CPP_Resize_Basics" Then return new CPP_Basics(functionNames._CPP_Resize_Basics)
 if algorithmName = "CPP_Resize_Preserve" Then return new CPP_Basics(functionNames._CPP_Resize_Preserve)
@@ -1521,7 +1521,8 @@ if algorithmName = "RedCloud_World" Then return new RedCloud_World
 if algorithmName = "RedCloud_XZ" Then return new RedCloud_XZ
 if algorithmName = "RedCloud_YZ" Then return new RedCloud_YZ
 if algorithmName = "RedColor_Basics" Then return new RedColor_Basics
-if algorithmName = "RedColor_BasicsOld" Then return new RedColor_BasicsOld
+if algorithmName = "RedColor_BasicsMotion" Then return new RedColor_BasicsMotion
+if algorithmName = "RedColor_Binarize" Then return new RedColor_Binarize
 if algorithmName = "RedColor_CComp" Then return new RedColor_CComp
 if algorithmName = "RedColor_Cells" Then return new RedColor_Cells
 if algorithmName = "RedColor_Core" Then return new RedColor_Core
@@ -1529,11 +1530,8 @@ if algorithmName = "RedColor_Flippers" Then return new RedColor_Flippers
 if algorithmName = "RedColor_Histogram3DBP" Then return new RedColor_Histogram3DBP
 if algorithmName = "RedColor_InputColor" Then return new RedColor_InputColor
 if algorithmName = "RedColor_LeftRight" Then return new RedColor_LeftRight
-if algorithmName = "RedMin_Basics" Then return new RedMin_Basics
-if algorithmName = "RedMin_BasicsMotion" Then return new RedMin_BasicsMotion
 if algorithmName = "RedMin_Blobs" Then return new RedMin_Blobs
 if algorithmName = "RedMin_ContourVsFeatureLess" Then return new RedMin_ContourVsFeatureLess
-if algorithmName = "RedMin_Core" Then return new RedMin_Core
 if algorithmName = "RedMin_FindPixels_CPP" Then return new RedMin_FindPixels_CPP
 if algorithmName = "RedMin_Gaps" Then return new RedMin_Gaps
 if algorithmName = "RedMin_Motion" Then return new RedMin_Motion

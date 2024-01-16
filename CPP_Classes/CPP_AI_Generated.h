@@ -2493,22 +2493,22 @@ Mat vbPalette(Mat input)
 
 
 
-class CPP_RedMin_Core : public algorithmCPP {
+class CPP_RedColor_FeatureLessCore : public algorithmCPP {
 public:
     map<int, segCell, compareAllowIdenticalIntegerInverted> sortedCells;
     Mat inputMask;
     CPP_FeatureLess_Basics* fLess;
     FloodCell* cPtr;
     float redOptions_imageThresholdPercent = 0.95f;
-    CPP_RedMin_Core() : algorithmCPP() {
-        traceName = "CPP_RedMin_Core";
+    CPP_RedColor_FeatureLessCore() : algorithmCPP() {
+        traceName = "CPP_RedColor_FeatureLessCore";
         vbPalette(dst2);
         fLess = new CPP_FeatureLess_Basics();
         cPtr = new FloodCell();
         advice = "In redOptions the 'Desired RedMin Cells' slider has a big impact.";
         desc = "Another minimalist approach to building RedCloud color-based cells.";
     }
-    ~CPP_RedMin_Core() {
+    ~CPP_RedColor_FeatureLessCore() {
 
         if (cPtr) { 
             FloodCell_Close(cPtr);
@@ -2578,15 +2578,15 @@ public:
 
 
 
-class CPP_RedMin_Basics : public algorithmCPP {
+class CPP_RedColor_FeatureLess : public algorithmCPP {
 public:
-    CPP_RedMin_Core* minCore;
+    CPP_RedColor_FeatureLessCore* minCore;
     vector<segCell> minCells;
     Mat lastColors;
     Mat lastMap = dst2.clone();
-    CPP_RedMin_Basics() : algorithmCPP() {
-        traceName = "CPP_RedMin_Basics";
-        minCore = new CPP_RedMin_Core();
+    CPP_RedColor_FeatureLess() : algorithmCPP() {
+        traceName = "CPP_RedColor_FeatureLess";
+        minCore = new CPP_RedColor_FeatureLessCore();
         advice = minCore->advice;
         dst2 = Mat::zeros(dst2.size(), CV_8U);  
         labels = { "", "Mask of active RedMin cells", "CV_8U representation of minCells", "" };

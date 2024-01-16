@@ -48,10 +48,10 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 	{task->alg = new CPP_Mesh_Agast(); break; }
 	case _CPP_Mesh_Basics :
 	{task->alg = new CPP_Mesh_Basics(); break; }
-	case _CPP_RedMin_Basics :
-	{task->alg = new CPP_RedMin_Basics(); break; }
-	case _CPP_RedMin_Core :
-	{task->alg = new CPP_RedMin_Core(); break; }
+	case _CPP_RedColor_FeatureLess :
+	{task->alg = new CPP_RedColor_FeatureLess(); break; }
+	case _CPP_RedColor_FeatureLessCore :
+	{task->alg = new CPP_RedColor_FeatureLessCore(); break; }
 	case _CPP_Palette_Basics :
 	{task->alg = new CPP_Palette_Basics(); break; }
 	case _CPP_FeatureLess_History :

@@ -130,7 +130,7 @@ End Class
 
 Public Class Foreground_RedMinFront : Inherits VB_Algorithm
     Dim fore As New Foreground_Hist3D
-    Public rMin As New RedMin_Basics
+    Public rMin As New RedColor_Basics
     Dim hist3D As New Hist3D_DepthWithMask
     Public minCells As New List(Of segCell)
     Public Sub New()
@@ -159,7 +159,7 @@ End Class
 
 Public Class Foreground_RedMinBack : Inherits VB_Algorithm
     Dim fore As New Foreground_Hist3D
-    Public rMin As New RedMin_Basics
+    Public rMin As New RedColor_Basics
     Dim hist3D As New Hist3D_DepthWithMask
     Public minCells As New List(Of segCell)
     Public Sub New()

@@ -204,7 +204,7 @@ End Class
 
 
 Public Class Distance_RedMin : Inherits VB_Algorithm
-    Dim rMin As New RedMin_Basics
+    Dim rMin As New RedColor_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
@@ -297,7 +297,7 @@ End Class
 
 
 Public Class Distance_D3Cells : Inherits VB_Algorithm
-    Dim rMin As New RedMin_Basics
+    Dim rMin As New RedColor_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Dim valleys As New HistValley_Basics
     Public d3Cells As New List(Of segCell)
@@ -306,7 +306,7 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
         redOptions.HistBinSlider.Value = 5
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "CV_8U format of the backprojected cells - before vbPalette."
-        desc = "Experiment that failed - backprojecting each cell from RedMin_Basics"
+        desc = "Experiment that failed - backprojecting each cell from RedColor_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         rMin.Run(src)

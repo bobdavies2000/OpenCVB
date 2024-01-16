@@ -407,7 +407,7 @@ End Class
 
 
 Public Class FeatureLess_RedCloud : Inherits VB_Algorithm
-    Public rMin As New RedMin_Basics
+    Public rMin As New RedColor_Basics
     Dim fless As New FeatureLess_Basics
     Public Sub New()
         desc = "Floodfill the FeatureLess output so each cell can be tracked."

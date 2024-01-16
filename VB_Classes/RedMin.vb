@@ -1,151 +1,13 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class RedMin_Basics : Inherits VB_Algorithm
-    Public minCore As New RedMin_Core
-    Public minCells As New List(Of segCell)
-    Dim lastColors As cv.Mat
-    Dim lastMap As cv.Mat = dst2.Clone
-    Public showMaxIndex = 20
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        lastColors = dst3.Clone
-        desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        minCore.Run(src)
-        Dim lastCells As New List(Of segCell)(minCells)
-
-        minCells.Clear()
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        Dim usedColors = New List(Of cv.Vec3b)({black})
-        Dim unmatched As Integer
-        For Each key In minCore.sortedCells
-            Dim cell = key.Value
-            Dim index = lastMap.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X)
-            If index < lastCells.Count Then
-                cell.color = lastColors.Get(Of cv.Vec3b)(cell.maxDist.Y, cell.maxDist.X)
-                'cell.maxDist = lastCells(index).maxDist
-            Else
-                unmatched += 1
-            End If
-            If usedColors.Contains(cell.color) Then
-                unmatched += 1
-                cell.color = randomCellColor()
-            End If
-            usedColors.Add(cell.color)
-
-            If dst2.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X) = 0 Then
-                cell.index = minCells.Count
-                minCells.Add(cell)
-                dst2(cell.rect).SetTo(cell.index, cell.mask)
-                dst3(cell.rect).SetTo(cell.color, cell.mask)
-            End If
-        Next
-
-        If standalone Or showIntermediate() Then identifyCells(minCells, showMaxIndex)
-
-        labels(3) = CStr(minCells.Count) + " cells were identified.  The top " + CStr(showMaxIndex) + " are numbered"
-        labels(2) = minCore.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
-        task.cellSelect = New segCell
-        If task.clickPoint = New cv.Point(0, 0) Then
-            If minCells.Count > 2 Then
-                task.clickPoint = minCells(0).maxDist
-                task.cellSelect = minCells(0)
-            End If
-        Else
-            Dim index = dst2.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If index <> 0 Then task.cellSelect = minCells(index - 1)
-        End If
-        lastColors = dst3.Clone
-        lastMap = dst2.Clone
-        If minCells.Count > 0 Then dst1 = vbPalette(lastMap * 255 / minCells.Count)
-    End Sub
-End Class
 
 
 
 
 
 
-Public Class RedMin_Core : Inherits VB_Algorithm
-    Public sortedCells As New SortedList(Of Integer, segCell)(New compareAllowIdenticalIntegerInverted)
-    Public inputMask As cv.Mat
-    Public Sub New()
-        cPtr = FloodCell_Open()
-        desc = "Another minimalist approach to building RedCloud color-based cells."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static colorClass As New Color_Basics
-            colorClass.Run(src)
-            src = colorClass.dst2
-        End If
-
-        Dim imagePtr As IntPtr
-        If inputMask Is Nothing Then
-            Dim inputData(src.Total - 1) As Byte
-            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-            imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols,
-                                     src.Type, redOptions.DesiredCellSlider.Value, 0)
-            handleInput.Free()
-        Else
-            Dim inputData(src.Total - 1) As Byte
-            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-            Dim maskData(inputMask.Total - 1) As Byte
-            Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
-            Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
-
-            imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                     src.Type, redOptions.DesiredCellSlider.Value, 0)
-            handleMask.Free()
-            handleInput.Free()
-        End If
-
-        Dim classCount = FloodCell_Count(cPtr)
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-        dst3 = vbPalette(dst2 * 255 / classCount)
-
-        If heartBeat() Then labels(3) = CStr(classCount) + " cells found"
-        If classCount <= 1 Then Exit Sub
-
-        Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, FloodCell_Sizes(cPtr))
-        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, FloodCell_Rects(cPtr))
-        Dim floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, FloodCell_FloodPoints(cPtr))
-        sortedCells.Clear()
-        For i = 0 To classCount - 1
-            Dim cell As New segCell
-            cell.index = i + 1
-            cell.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
-            cell.mask = dst2(cell.rect).InRange(cell.index, cell.index).Threshold(0, 255, cv.ThresholdTypes.Binary)
-            'Dim contour = contourBuild(cell.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            'vbDrawContour(cell.mask, contour, 255, -1)
-
-            cell.pixels = sizeData.Get(Of Integer)(i, 0)
-            cell.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
-            cell.mask.Rectangle(New cv.Rect(0, 0, cell.mask.Width, cell.mask.Height), 0, 1)
-            Dim pt = vbGetMaxDist(cell.mask)
-            cell.maxDist = New cv.Point(pt.X + cell.rect.X, pt.Y + cell.rect.Y)
-            sortedCells.Add(cell.pixels, cell)
-        Next
-
-        If heartBeat() Then labels(2) = "CV_8U format - " + CStr(classCount) + " cells were identified."
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = FloodCell_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
-Public Class RedMin_BasicsMotion : Inherits VB_Algorithm
-    Public minCore As New RedMin_Core
+Public Class RedColor_BasicsMotion : Inherits VB_Algorithm
+    Public minCore As New RedColor_Core
     Public minCells As New List(Of segCell)
     Public rMotion As New RedMin_Motion
     Dim lastColors = dst3.Clone
@@ -218,14 +80,14 @@ End Class
 
 
 Public Class RedMin_ContourVsFeatureLess : Inherits VB_Algorithm
-    Dim redMin As New RedMin_Core
+    Dim redMin As New RedColor_Core
     Dim contour As New Contour_WholeImage
     Dim fLess As New FeatureLess_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        labels = {"", "Contour_WholeImage Input", "Redmin_Core - toggling between Contour and Featureless inputs",
+        labels = {"", "Contour_WholeImage Input", "RedColor_Core - toggling between Contour and Featureless inputs",
                   "FeatureLess_Basics Input"}
-        desc = "Compare Contour_WholeImage and FeatureLess_Basics as input to RedMin_Core"
+        desc = "Compare Contour_WholeImage and FeatureLess_Basics as input to RedColor_Core"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static useContours = findRadio("Use Contour_WholeImage")
@@ -249,7 +111,7 @@ End Class
 
 
 Public Class RedMin_Blobs : Inherits VB_Algorithm
-    Dim rMin As New RedMin_Basics
+    Dim rMin As New RedColor_Basics
     Public Sub New()
         gOptions.DebugSlider.Value = 0
         desc = "Select blobs by size using the DebugSlider in the global options"
@@ -277,7 +139,7 @@ End Class
 
 Public Class RedMin_RedCloud : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
-    Dim rMin As New RedMin_Basics
+    Dim rMin As New RedColor_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         redOptions.UseDepth.Checked = True
@@ -306,12 +168,12 @@ End Class
 
 
 Public Class RedMin_Gaps : Inherits VB_Algorithm
-    Dim rMin As New RedMin_Basics
+    Dim rMin As New RedColor_Basics
     Dim frames As New History_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         advice = ""
-        desc = "Find the gaps that are different in the RedMin_Basics results."
+        desc = "Find the gaps that are different in the RedColor_Basics results."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         rMin.Run(src)
@@ -350,7 +212,7 @@ Public Class RedMin_Motion : Inherits VB_Algorithm
         dst3 = motion.dst2
 
         If standalone Then
-            Static minCore As New RedMin_Core
+            Static minCore As New RedColor_Core
             minCore.Run(src)
             dst2 = minCore.dst3
             labels(2) = minCore.labels(3)
@@ -403,10 +265,10 @@ End Class
 
 Public Class RedMin_PixelClassifier : Inherits VB_Algorithm
     Dim pixel As New Hist3D_Pixel
-    Dim rMin As New RedMin_Basics
+    Dim rMin As New RedColor_Basics
     Public Sub New()
         advice = ""
-        desc = "Speed up RedMin_Basics by using the backprojection of the 3D color histogram."
+        desc = "Speed up RedColor_Basics by using the backprojection of the 3D color histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         pixel.Run(src)
@@ -424,13 +286,13 @@ End Class
 
 
 Public Class RedMin_PixelVector3D : Inherits VB_Algorithm
-    Dim rMin As New RedMin_Basics
+    Dim rMin As New RedColor_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         redOptions.HistBinSlider.Value = 3
-        labels = {"", "RedMin_Basics output", "3D Histogram counts for each of the cells at left", ""}
+        labels = {"", "RedColor_Basics output", "3D Histogram counts for each of the cells at left", ""}
         desc = "Identify RedMin cells and create a vector for each cell's 3D histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -471,12 +333,12 @@ End Class
 
 
 Public Class RedMin_PixelVectors : Inherits VB_Algorithm
-    Public rMin As New RedMin_Basics
+    Public rMin As New RedColor_Basics
     Dim hVector As New Hist3Dcolor_Vector
     Public pixelVector As New List(Of Single())
     Public minCells As New List(Of segCell)
     Public Sub New()
-        labels = {"", "", "RedMin_Basics output", ""}
+        labels = {"", "", "RedColor_Basics output", ""}
         desc = "Create a vector for each cell's 3D histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)

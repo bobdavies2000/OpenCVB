@@ -69,7 +69,7 @@ Public Class OptionsRedCloud
         task.channelsTop = {2, 0}
         task.channelsSide = {1, 2}
 
-        Reduction_Basics.Checked = True ' Reduction_basics is the default.
+        BinarizeRadio.Checked = True
         SimpleReduction.Checked = True
         PCReduction = 3
         XYReduction.Checked = True

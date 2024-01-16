@@ -125,12 +125,12 @@ End Class
 
 
 Public Class Hist3D_RedMin : Inherits VB_Algorithm
-    Dim rMin As New RedMin_Basics
+    Dim rMin As New RedColor_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         redOptions.UseColor.Checked = True
         advice = "redOptions '3D Histogram Bins' "
-        desc = "Use the Hist3D color classes to segment the image with RedMin_Basics"
+        desc = "Use the Hist3D color classes to segment the image with RedColor_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         hColor.Run(src)
@@ -221,7 +221,7 @@ End Class
 
 Public Class Hist3D_PixelCells : Inherits VB_Algorithm
     Dim pixel As New Hist3D_Pixel
-    Dim rMin As New RedMin_Basics
+    Dim rMin As New RedColor_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -254,10 +254,10 @@ End Class
 
 Public Class Hist3D_PixelClassify : Inherits VB_Algorithm
     Dim pixel As New Hist3D_Pixel
-    Dim rMin As New RedMin_Basics
+    Dim rMin As New RedColor_Basics
     Public Sub New()
         advice = ""
-        desc = "Classify each pixel with a 3D histogram backprojection and run RedMin_Basics on the output."
+        desc = "Classify each pixel with a 3D histogram backprojection and run RedColor_Basics on the output."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         pixel.Run(src)
@@ -277,7 +277,7 @@ End Class
 
 Public Class Hist3D_PixelDiffMask : Inherits VB_Algorithm
     Dim pixel As New Hist3D_Pixel
-    Dim rMin As New RedMin_Basics
+    Dim rMin As New RedColor_Basics
     Public Sub New()
         advice = ""
         desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection"

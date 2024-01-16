@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Algorithm
     Public classCount As Integer
-    Public rMin As New RedMin_Basics
+    Public rMin As New RedColor_Basics
     Public Sub New()
         labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
         desc = "FloodFill the input and paint it"
@@ -232,7 +232,7 @@ End Class
 
 Public Class Flood_Featureless : Inherits VB_Algorithm
     Public classCount As Integer
-    Dim rMin As New RedMin_Basics
+    Dim rMin As New RedColor_Basics
     Dim minCells As New List(Of segCell)
     Dim contour As New Contour_Basics
     Public Sub New()
