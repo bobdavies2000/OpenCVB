@@ -44,7 +44,6 @@ Public Class CPP_Basics : Inherits VB_Algorithm
     End Sub
 
     Public Sub RunVB(src As cv.Mat)
-        Dim colorInput As Integer
 
         cppTask_OptionsVBtoCPP(cPtr, gOptions.GridSize.Value,
                                gOptions.HistBinSlider.Value,
@@ -56,7 +55,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
                                task.clickPoint.X, task.clickPoint.Y, task.mouseClickFlag,
                                task.mousePicTag, task.mouseMovePoint.X, task.mouseMovePoint.Y,
                                task.paletteIndex, redOptions.DesiredCellSlider.Value, task.midHeartBeat,
-                               task.quarterBeat, colorInput)
+                               task.quarterBeat, redOptions.colorInputIndex)
 
         Dim pointCloudData(task.pointCloud.Total * task.pointCloud.ElemSize - 1) As Byte
         Marshal.Copy(task.pointCloud.Data, pointCloudData, 0, pointCloudData.Length)

@@ -54,19 +54,6 @@ public:
     }
 };
 
-class segCell {
-public:
-    Rect rect;
-    Mat mask;
-    Point floodPoint;
-    int index;
-    int pixels;
-    Point maxDist;
-    bool motionFlag;
-    Vec3b color;
-
-    segCell() {}  // Default constructor
-};
 
 struct mmData
 {
@@ -217,7 +204,7 @@ public:
     int cvFontThickness;
     Scalar fontColor;
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
-    bool motionReset; rcData rcSelect; segCell cellSelect; int desiredCells;
+    bool motionReset; rcData rcSelect; int desiredCells;
 
     bool heartBeat; bool midHeartBeat; bool quarterBeat; bool debugCheckBox; Size minRes; int PCReduction;
     bool optionsChanged; double AddWeighted; int dotSize; int gridSize; float maxZmeters;

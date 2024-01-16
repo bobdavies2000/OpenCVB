@@ -5,6 +5,7 @@ Imports OpenCvSharp.Extensions
 Imports cv = OpenCvSharp
 Public Class OptionsRedCloud
     Public colorInputName As String
+    Public colorInputIndex As Integer
     Public reductionType As String = "Use Simple Reduction"
     Public depthInput As String = "RedCloud_Core"
 
@@ -181,18 +182,18 @@ Public Class OptionsRedCloud
         Dim reductionTest As Boolean
         Select Case colorInput
             Case "BackProject_Full"
-                task.colorInputIndex = 0
+                colorInputIndex = 0
             Case "KMeans_Basics"
-                task.colorInputIndex = 1
+                colorInputIndex = 1
             Case "LUT_Basics"
-                task.colorInputIndex = 2
+                colorInputIndex = 2
             Case "Reduction_Basics"
-                task.colorInputIndex = 3
+                colorInputIndex = 3
                 reductionTest = True
             Case "3D BackProjection"
-                task.colorInputIndex = 4
+                colorInputIndex = 4
             Case "Binarize_FourWay"
-                task.colorInputIndex = 5
+                colorInputIndex = 5
         End Select
         colorInputName = colorInput
         ReductionSliders.Enabled = reductionTest

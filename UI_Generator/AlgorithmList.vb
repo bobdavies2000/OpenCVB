@@ -2,6 +2,7 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
+_CPP_Color_Basics
 _CPP_Binarize_FourWayCombine
 _CPP_Binarize_FourWay
 _CPP_Mat_4Click
@@ -285,6 +286,7 @@ if algorithmName = "CPP_Bezier_Basics" Then return new CPP_Basics(functionNames.
 if algorithmName = "CPP_Binarize_FourWay" Then return new CPP_Basics(functionNames._CPP_Binarize_FourWay)
 if algorithmName = "CPP_Binarize_FourWayCombine" Then return new CPP_Basics(functionNames._CPP_Binarize_FourWayCombine)
 if algorithmName = "CPP_Binarize_Simple" Then return new CPP_Basics(functionNames._CPP_Binarize_Simple)
+if algorithmName = "CPP_Color_Basics" Then return new CPP_Basics(functionNames._CPP_Color_Basics)
 if algorithmName = "CPP_Contour_Largest" Then return new CPP_Basics(functionNames._CPP_Contour_Largest)
 if algorithmName = "CPP_Convex_Basics" Then return new CPP_Basics(functionNames._CPP_Convex_Basics)
 if algorithmName = "CPP_Delaunay_Basics" Then return new CPP_Basics(functionNames._CPP_Delaunay_Basics)

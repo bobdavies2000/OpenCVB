@@ -2495,7 +2495,7 @@ Mat vbPalette(Mat input)
 
 class CPP_RedColor_FeatureLessCore : public algorithmCPP {
 public:
-    map<int, segCell, compareAllowIdenticalIntegerInverted> sortedCells;
+    map<int, rcData, compareAllowIdenticalIntegerInverted> sortedCells;
     Mat inputMask;
     CPP_FeatureLess_Basics* fLess;
     FloodCell* cPtr;
@@ -2549,7 +2549,7 @@ public:
         sortedCells.clear();
 
         for (int i = 0; i < classCount; i++) {
-            segCell cell;
+            rcData cell;
             cell.index = int(sortedCells.size()) + 1;
             cell.rect = task->validateRect(rectData.at<cv::Rect>(i, 0), dst2.cols, dst2.rows);
             inRange(dst2(cell.rect), cell.index, cell.index, cell.mask);
@@ -2581,7 +2581,7 @@ public:
 class CPP_RedColor_FeatureLess : public algorithmCPP {
 public:
     CPP_RedColor_FeatureLessCore* minCore;
-    vector<segCell> minCells;
+    vector<rcData> minCells;
     Mat lastColors;
     Mat lastMap = dst2.clone();
     CPP_RedColor_FeatureLess() : algorithmCPP() {
@@ -2594,14 +2594,14 @@ public:
     }
     void Run(Mat src) {
         minCore->Run(src);
-        vector<segCell> lastCells = minCells;
+        vector<rcData> lastCells = minCells;
         if (task->firstPass) lastColors = dst3.clone();
         minCells.clear();
         dst2.setTo(0);
         dst3.setTo(0);
         vector<Vec3b> usedColors = { Vec3b(0, 0, 0) };
         for (const auto ele : minCore->sortedCells) {
-            segCell cell = ele.second;
+            rcData cell = ele.second;
             uchar index = lastMap.at<uchar>(cell.maxDist.y, cell.maxDist.x);
             if (index > 0 && index < lastCells.size()) {
                 cell.color = lastColors.at<Vec3b>(cell.maxDist.y, cell.maxDist.x);
@@ -2620,16 +2620,16 @@ public:
             }
         }
         labels[3] = to_string(minCells.size()) + " cells were identified.";
-        task->cellSelect = segCell();
+        task->rcSelect = rcData();
         if (task->clickPoint == Point(0, 0)) {
             if (minCells.size() > 2) {
                 task->clickPoint = minCells[0].maxDist;
-                task->cellSelect = minCells[0];
+                task->rcSelect = minCells[0];
             }
         }
         else {
             uchar index = dst2.at<uchar>(task->clickPoint.y, task->clickPoint.x);
-            if (index != 0) task->cellSelect = minCells[index - 1];
+            if (index != 0) task->rcSelect = minCells[index - 1];
         }
         lastColors = dst3.clone();
         lastMap = dst2.clone();
@@ -2956,6 +2956,7 @@ public:
 class CPP_Binarize_FourWayCombine : public algorithmCPP {
 public:
     CPP_Binarize_FourWay* binarize;
+    int classCount = 4;
     CPP_Binarize_FourWayCombine() : algorithmCPP() {
         binarize = new CPP_Binarize_FourWay();
         traceName = "CPP_Binarize_FourWayCombine";
@@ -2989,42 +2990,63 @@ public:
     //LUT_Basics* lut;
     //Reduction_Basics* reduction;
     //Hist3Dcolor_Basics* hColor;
-    CPP_Binarize_FourWay* binarize;
-    algorithmCPP* classifier = binarize;
+    String colorInput; 
+    CPP_Binarize_FourWayCombine* binarize;
     CPP_Color_Basics() : algorithmCPP() {
         traceName = "CPP_Color_Basics";
-        binarize = new CPP_Binarize_FourWay();
+        binarize = new CPP_Binarize_FourWayCombine();
         desc = "Classify pixels by color using a variety of techniques";
     }
     void Run(Mat src) {
-        if (task->optionsChanged) {
-            switch (task->colorInputIndex) {
-            case 0: // "BackProject_Full":
-                //classifier = backP;
-                break;
-            case 1: // "KMeans_Basics":
-                //classifier = km;
-                break;
-            case 2: //"LUT_Basics":
-                //classifier = lut;
-                break;
-            case 3: //"Reduction_Basics":
-                //classifier = reduction;
-                break;
-            case 4: //"3D BackProjection":
-                //classifier = hColor;
-                break;
-            case 5:
-                classifier = binarize;
-                break;
+
+        if (src.channels() == 3)
+        {
+            cvtColor(src, dst1, COLOR_BGR2GRAY);
+            if (task->optionsChanged) {
+                switch (task->colorInputIndex) {
+                case 0: // "BackProject_Full":
+                    //backP->Run(dst1);
+                    //classCount = backP->classCount;
+                    //dst2 = backP->dst2;
+                    //colorInput = backP->traceName;
+                    break;
+                case 1: // "KMeans_Basics":
+                    //km->Run(dst1);
+                    //classCount = km->classCount;
+                    //dst2 = km->dst2;
+                    //colorInput = km->traceName;
+                    break;
+                case 2: //"LUT_Basics":
+                    //lut->Run(dst1);
+                    //classCount = lut->classCount;
+                    //dst2 = lut->dst2;
+                    //colorInput = lut->traceName;
+                    break;
+                case 3: //"Reduction_Basics":
+                    // reduction->Run(dst1);
+                    //classCount = reduction->classCount;
+                    //dst2 = reduction->dst2;
+                    //colorInput = reduction->traceName;
+                    break;
+                case 4: //"3D BackProjection":
+                    //hColor->Run(dst1);
+                    //classCount = hColor->classCount;
+                    //dst2 = hColor->dst2;
+                    //colorInput = hColor->traceName;
+                    break;
+                case 5:
+                    binarize->Run(dst1);
+                    classCount = binarize->classCount;
+                    dst2 = binarize->dst1;
+                    colorInput = binarize->traceName;
+                    break;
+                }
             }
+        } else {
+            dst1 = src.clone();
         }
-        //dst1 = src.channels() == 3 ? src.cvtColor(COLOR_BGR2GRAY) : src.clone();
-        //classifier->run(dst1);
-        //classCount = classifier->classCount;
-        //dst2 = classifier->dst2;
-        //dst3 = vbPalette(dst2 * 255 / classCount);
-        //task->setTrueText(redOptions.colorInput);
-        //labels[2] = "Color_Basics: method = " + redOptions.colorInput + " produced " + to_string(classCount) + " pixel classifications";
+        dst3 = vbPalette(dst2 * 255 / classCount);
+        labels[2] = "Color_Basics: method = " + colorInput + " produced " + to_string(classCount) + 
+                    " pixel classifications";
     }
 };

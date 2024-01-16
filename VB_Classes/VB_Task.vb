@@ -22,7 +22,6 @@ Public Class VBtask : Implements IDisposable
     Public toggleOn As Boolean ' toggles on the heartbeat.
     Public toggleFrame As Integer
     Public optionsChanged As Boolean ' global or local options changed.
-    Public colorInputIndex As Integer
     Public paused As Boolean
     Public showAllOptions As Boolean ' show all options when initializing the options for all algorithms.
 
