@@ -221,7 +221,7 @@ Module VB
         task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
         task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
     End Sub
-    Public Function showSelectionGBP(ByRef gbpCells As List(Of gbpData), ByRef cellMap As cv.Mat) As gbpData
+    Public Function showSelectionGBP(ByRef gbpCells As List(Of rcData), ByRef cellMap As cv.Mat) As rcData
         If task.clickPoint = New cv.Point(0, 0) Then
             task.clickPoint = gbpCells(1).maxDist
             Return gbpCells(1)
@@ -776,37 +776,6 @@ End Class
 
 
 
-
-
-
-
-
-
-
-
-
-Public Class gbpData
-    Public mask As cv.Mat
-    Public hull As List(Of cv.Point)
-    Public contour As List(Of cv.Point)
-    Public rect As cv.Rect
-
-    Public pixels As Integer
-    Public index As Integer
-    Public indexLast As Integer
-    Public maxDist As cv.Point
-    Public color As cv.Vec3b
-
-    Public mmX As mmData
-    Public mmY As mmData
-    Public mmZ As mmData
-    Public Sub New()
-        index = 0
-        mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
-        hull = New List(Of cv.Point)
-        contour = New List(Of cv.Point)
-    End Sub
-End Class
 Public Class rcData
     Public rect As cv.Rect
     Public motionRect As cv.Rect ' the union of the previous rect with the current rect.
@@ -828,6 +797,10 @@ Public Class rcData
 
     Public minVec As cv.Point3f
     Public maxVec As cv.Point3f
+
+    Public mmX As mmData
+    Public mmY As mmData
+    Public mmZ As mmData
 
     Public maxDist As cv.Point
     Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.

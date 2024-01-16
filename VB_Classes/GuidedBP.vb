@@ -72,7 +72,7 @@ Public Class GuidedBP_CellHistograms : Inherits VB_Algorithm
         gpbWare.Run(src)
         dst3 = gpbWare.dst2
 
-        Dim gbp As New gbpData
+        Dim gbp As New rcData
         If gpbWare.gbpCells.Count > 1 Then
             gbp = showSelectionGBP(gpbWare.gbpCells, gpbWare.kMap)
             vbDrawContour(dst3, gbp.contour, gbp.color)
@@ -143,7 +143,7 @@ Public Class GuidedBP_Cells : Inherits VB_Algorithm
         gpbWare.Run(src)
         dst2 = gpbWare.dst2
 
-        Dim gbp As New gbpData
+        Dim gbp As New rcData
         If gpbWare.gbpCells.Count > 1 Then
             gbp = showSelectionGBP(gpbWare.gbpCells, gpbWare.kMap)
             vbDrawContour(dst2, gbp.contour, gbp.color)
@@ -538,8 +538,8 @@ End Class
 
 Public Class GuidedBP_Hulls : Inherits VB_Algorithm
     Dim bpDoctor As New GuidedBP_Points
-    Public gbpCells As New List(Of gbpData)
-    Public gbpCellsLast As New List(Of gbpData)
+    Public gbpCells As New List(Of rcData)
+    Public gbpCellsLast As New List(Of rcData)
     Public kMap As New cv.Mat
     Dim contours As New Contour_Largest
     Dim plot As New Histogram_Depth
@@ -555,14 +555,14 @@ Public Class GuidedBP_Hulls : Inherits VB_Algorithm
         ' Use the DebugCheckBox box and it will rerun the exact same input.
         If gOptions.DebugCheckBox.Checked = False Then bpDoctor.Run(src)
 
-        Dim newCells As New SortedList(Of Integer, gbpData)(New compareAllowIdenticalIntegerInverted)
+        Dim newCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         Dim kMapLast = kMap.Clone
         If heartBeat() Then
             kMap.SetTo(0)
             dst2.SetTo(0)
             Dim sizes As New List(Of Integer)
             For i = 1 To bpDoctor.classCount
-                Dim kw As New gbpData
+                Dim kw As New rcData
                 kw.mask = bpDoctor.backP.InRange(i, i).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
                 contours.Run(kw.mask)
@@ -587,19 +587,19 @@ Public Class GuidedBP_Hulls : Inherits VB_Algorithm
                 vbDrawContour(dst2, kw.contour, kw.color, -1)
             Next
             dst0 = task.color.Clone
-            gbpCellsLast = New List(Of gbpData)(gbpCells)
+            gbpCellsLast = New List(Of rcData)(gbpCells)
             gbpCells.Clear()
-            gbpCells.Add(New gbpData)
+            gbpCells.Add(New rcData)
 
-            Dim cellUpdates As New List(Of gbpData)
+            Dim cellUpdates As New List(Of rcData)
             Dim usedColors As New List(Of cv.Vec3b)({black})
             For Each entry In newCells
-                Dim kw As New gbpData
+                Dim kw As New rcData
                 kw = entry.Value
 
                 kw.index = gbpCells.Count
                 Dim index = kMapLast.Get(Of Byte)(kw.maxDist.Y, kw.maxDist.X)
-                Dim lkw As gbpData
+                Dim lkw As rcData
                 If index <> 0 Then
                     lkw = gbpCellsLast(index)
                     kw.indexLast = lkw.index
@@ -635,7 +635,7 @@ Public Class GuidedBP_Hulls : Inherits VB_Algorithm
             saveTtext = New List(Of trueText)(trueData)
         End If
 
-        Dim gbp As New gbpData
+        Dim gbp As New rcData
         If gbpCells.Count > 1 Then
             plot.gbp = showSelectionGBP(gbpCells, kMap)
             vbDrawContour(dst2, gbp.contour, gbp.color)
@@ -693,8 +693,8 @@ End Class
 
 Public Class GuidedBP_History : Inherits VB_Algorithm
     Public gpbWare As New GuidedBP_Hulls
-    Dim kCellList As New List(Of List(Of gbpData))
-    Public gbpCells As New List(Of gbpData)
+    Dim kCellList As New List(Of List(Of rcData))
+    Public gbpCells As New List(Of rcData)
     Public kMap As New cv.Mat
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -715,9 +715,9 @@ Public Class GuidedBP_History : Inherits VB_Algorithm
 
         gpbWare.Run(src)
 
-        kCellList.Add(New List(Of gbpData)(gpbWare.gbpCells))
+        kCellList.Add(New List(Of rcData)(gpbWare.gbpCells))
 
-        Dim sortCells As New SortedList(Of Integer, gbpData)(New compareAllowIdenticalIntegerInverted)
+        Dim sortCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For Each cellList In kCellList
             For i = 1 To cellList.Count - 1
                 sortCells.Add(cellList(i).pixels, cellList(i))
@@ -726,7 +726,7 @@ Public Class GuidedBP_History : Inherits VB_Algorithm
 
         kMap.SetTo(0)
         gbpCells.Clear()
-        gbpCells.Add(New gbpData)
+        gbpCells.Add(New rcData)
         Dim lastDst2 = dst2.Clone
         Dim usedColors As New List(Of cv.Vec3b)({black})
         For Each entry In sortCells
