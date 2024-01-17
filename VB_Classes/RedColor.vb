@@ -218,25 +218,22 @@ End Class
 
 
 Public Class RedColor_Flippers : Inherits VB_Algorithm
-    Dim binarize As New Binarize_FourWay
-    Dim rMin As New RedColor_Basics
+    Dim redC As New RedColor_Basics
     Public Sub New()
         redOptions.DesiredCellSlider.Value = 100
         labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
         desc = "Identify the 4-way split cells that are flipping between brightness boundaries."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        binarize.Run(src)
+        redC.Run(src)
+        dst3 = redC.dst3
+        labels(3) = redC.labels(2)
 
-        rMin.Run(binarize.dst2)
-        dst2 = rMin.dst3
-        labels(2) = rMin.labels(3)
-
-        Static lastMap As cv.Mat = rMin.dst3.Clone
-        dst3.SetTo(0)
+        Static lastMap As cv.Mat = redC.dst2.Clone
+        dst2.SetTo(0)
         Dim unMatched As Integer
         Dim unMatchedPixels As Integer
-        For Each cell In rMin.redCells
+        For Each cell In redC.redCells
             Dim lastColor = lastMap.Get(Of cv.Vec3b)(cell.maxDist.Y, cell.maxDist.X)
             If lastColor <> cell.color Then
                 dst3(cell.rect).SetTo(cell.color, cell.mask)
@@ -244,9 +241,12 @@ Public Class RedColor_Flippers : Inherits VB_Algorithm
                 unMatchedPixels += cell.pixels
             End If
         Next
-        lastMap = rMin.dst3.Clone
+        lastMap = redC.dst2.Clone
 
-        If standalone Or showIntermediate() Then identifyCells(rMin.redCells, rMin.showMaxIndex)
+        If (standalone Or showIntermediate()) And redC.redCells.Count > 1 Then
+            identifyCells(redC.redCells, redC.showMaxIndex)
+            setSelectedCell(redC.redCells, redC.dst2)
+        End If
 
         If heartBeat() Then
             labels(3) = "Unmatched to previous frame: " + CStr(unMatched) + " totaling " + CStr(unMatchedPixels) + " pixels."

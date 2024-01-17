@@ -201,20 +201,24 @@ Module VB
     End Sub
     Public Sub setSelectedCell(ByRef redCells As List(Of rcData), ByRef cellMap As cv.Mat)
         task.rcSelect = New rcData
-        If task.clickPoint = New cv.Point(0, 0) Then
-            If redCells.Count > 2 Then
-                task.clickPoint = redCells(1).maxDist
-                task.rcSelect = redCells(1)
-            Else
-                Exit Sub
-            End If
-        Else
-            Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+        Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+        If task.mouseClickFlag Then
             task.rcSelect = redCells(index)
+        Else
+            If task.clickPoint = New cv.Point(0, 0) Or index >= redCells.Count Then
+                If redCells.Count > 2 Then
+                    task.clickPoint = redCells(1).maxDist
+                    task.rcSelect = redCells(1)
+                Else
+                    Exit Sub
+                End If
+            Else
+                task.rcSelect = redCells(index)
+            End If
         End If
 
         Dim rc = task.rcSelect
-        If rc.index <> 0 And rc.rect.Width > 1 And rc.rect.Height > 1 Then
+        If rc.rect.Width > 1 And rc.rect.Height > 1 Then
             task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
             task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
 
