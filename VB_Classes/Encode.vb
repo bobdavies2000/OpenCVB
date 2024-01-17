@@ -19,10 +19,9 @@ Public Class Encode_Basics : Inherits VB_Algorithm
         Dim output As New cv.Mat
         cv.Cv2.Absdiff(src, dst3, output)
 
-        Static scaleSlider = findSlider("Encode Output Scaling")
-        If firstPass Then scaleSlider.Value = 10
+        If firstPass Then options.scalingLevel = 10
 
-        output.ConvertTo(dst2, cv.MatType.CV_8UC3, scaleSlider.Value)
+        output.ConvertTo(dst2, cv.MatType.CV_8UC3, options.scalingLevel)
         Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
         labels(3) = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.0%") + ")"
     End Sub
@@ -41,7 +40,6 @@ Public Class Encode_Scaling : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Static scaleSlider = findSlider("Encode Output Scaling")
         Dim fileExtension = ".jpg"
         Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}
 
@@ -52,8 +50,7 @@ Public Class Encode_Scaling : Inherits VB_Algorithm
         Dim output As New cv.Mat
         cv.Cv2.Absdiff(src, dst3, output)
 
-        Dim scale = scaleSlider.Value
-        output.ConvertTo(dst2, cv.MatType.CV_8UC3, scale)
+        output.ConvertTo(dst2, cv.MatType.CV_8UC3, options.scalingLevel)
         Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
     End Sub
 End Class

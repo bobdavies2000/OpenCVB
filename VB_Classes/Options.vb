@@ -244,11 +244,12 @@ End Class
 ' https://answers.opencv.org/question/31519/encode-image-in-jpg-with-opencv-avoiding-the-artifacts-effect/
 Public Class Options_Encode : Inherits VB_Algorithm
     Public qualityLevel As Integer = 1
+    Public scalingLevel As Integer = 85
     Public encodeOption = cv.ImwriteFlags.JpegProgressive
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
-            sliders.setupTrackBar("Encode Output Scaling", 1, 100, 85)
+            sliders.setupTrackBar("Encode Quality Level", 1, 100, qualityLevel) ' make it low quality to highlight how different it can be.
+            sliders.setupTrackBar("Encode Output Scaling", 1, 100, scalingLevel)
         End If
         If radio.Setup(traceName) Then
             radio.addRadio("JpegChromaQuality")
@@ -285,7 +286,7 @@ End Class
 Public Class Options_Filter : Inherits VB_Algorithm
     Public kernelSize As Integer = 3
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Filter kernel size", 1, 21, 3)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Filter kernel size", 1, 21, kernelSize)
     End Sub
     Public Sub RunVB()
         Static kernelSlider = findSlider("Filter kernel size")
