@@ -104,8 +104,8 @@ Public Class Filter_Minimum : Inherits VB_Algorithm
         desc = "Implement the Minimum Filter - use minimum value in kernel"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static kernelSlider = findSlider("Filter kernel size")
-        Dim kernelSize As Integer = If(standalone, (task.frameCount Mod 20) + 1, kernelSlider.Value)
+        options.RunVB()
+        Dim kernelSize As Integer = If(standalone, (task.frameCount Mod 20) + 1, options.kernelSize)
         Dim element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(kernelSize, kernelSize))
         dst2 = src.Erode(element)
     End Sub
@@ -123,8 +123,8 @@ Public Class Filter_Maximum : Inherits VB_Algorithm
         desc = "Implement the Maximum Filter - use maximum value in kernel"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static kernelSlider = findSlider("Filter kernel size")
-        Dim kernelSize As Integer = If(standalone, (task.frameCount Mod 20) + 1, kernelSlider.Value)
+        options.RunVB()
+        Dim kernelSize As Integer = If(standalone, (task.frameCount Mod 20) + 1, options.kernelSize)
         Dim element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(kernelSize, kernelSize))
         dst2 = src.Dilate(element)
     End Sub
@@ -142,8 +142,8 @@ Public Class Filter_Mean : Inherits VB_Algorithm
         desc = "Implement the Mean Filter - use mean value in kernel"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static kernelSlider = findSlider("Filter kernel size")
-        Dim kernelSize As Integer = If(standalone, (task.frameCount Mod 20) + 1, kernelSlider.Value)
+        options.RunVB()
+        Dim kernelSize As Integer = If(standalone, (task.frameCount Mod 20) + 1, options.kernelSize)
         Dim kernel = (cv.Mat.Ones(cv.MatType.CV_32FC1, kernelSize, kernelSize) / (kernelSize * kernelSize)).ToMat
         dst2 = src.Filter2D(-1, kernel)
     End Sub
@@ -161,30 +161,9 @@ Public Class Filter_Median : Inherits VB_Algorithm
         desc = "Implement the Median Filter - use median value in kernel"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static kernelSlider = findSlider("Filter kernel size")
-        Dim kernelSize As Integer = If(standalone, (task.frameCount Mod 20) + 1, kernelSlider.Value)
+        options.RunVB()
+        Dim kernelSize As Integer = If(standalone, (task.frameCount Mod 20) + 1, options.kernelSize)
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         dst2 = src.MedianBlur(kernelSize)
     End Sub
 End Class
-
-
-
-
-
-
-
-'Public Class Filter_AccordSuite : Inherits VB_Algorithm
-'    Dim options As New options_AccordSuite
-'    Dim suite As New CS_AccordSuite
-'    Public Sub New()
-'        desc = "Accord: a suite of Accord filters"
-'    End Sub
-'    Public Sub RunVB(src as cv.Mat)
-'        Options.RunVB()
-'        labels(2) = "Filter selected from the Accord suite is " + options.selection
-'        Dim Bitmap = cv.Extensions.BitmapConverter.ToBitmap(src)
-'        Bitmap = suite.RunCS(options.selectedIndex, Bitmap)
-'        dst2 = cv.Extensions.BitmapConverter.ToMat(Bitmap)
-'    End Sub
-'End Class
