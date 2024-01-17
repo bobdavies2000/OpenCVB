@@ -63,6 +63,7 @@ Public Class Cell_Basics : Inherits VB_Algorithm
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
+            setSelectedCell(redC.redCells, redC.cellMap)
         End If
         If task.rcSelect.index = 0 Then strOut = "Select any cell to get the statistics on it"
         If heartBeat() And task.rcSelect.index <> 0 Then statsString(src)

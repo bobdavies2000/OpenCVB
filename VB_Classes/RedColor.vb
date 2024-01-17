@@ -3,6 +3,7 @@ Imports System.Runtime.InteropServices
 Public Class RedColor_Basics : Inherits VB_Algorithm
     Public redCore As New RedCloud_CPP
     Public redCells As New List(Of rcData)
+    Public cellMat As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim lastColors As cv.Mat
     Dim lastMap As cv.Mat = dst2.Clone
     Public showMaxIndex = 20
@@ -16,6 +17,7 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
         Dim lastCells As New List(Of rcData)(redCells)
 
         redCells.Clear()
+        cellMat.SetTo(0)
         dst2.SetTo(0)
         dst3.SetTo(0)
         Dim usedColors = New List(Of cv.Vec3b)({black})
@@ -57,6 +59,8 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
             Dim index = dst2.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             If index <> 0 Then task.cellSelect = redCells(index - 1)
         End If
+
+        cellMat = dst2.Clone
         lastColors = dst3.Clone
         lastMap = dst2.Clone
         If redCells.Count > 0 Then dst1 = vbPalette(lastMap * 255 / redCells.Count)
@@ -168,7 +172,7 @@ End Class
 
 
 Public Class RedColor_Histogram3DBP : Inherits VB_Algorithm
-    Dim colorC As New RedColor_Basics
+    Dim rMin As New RedColor_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         desc = "Use the backprojection of the 3D RGB histogram as input to RedColor_Basics."
@@ -178,10 +182,10 @@ Public Class RedColor_Histogram3DBP : Inherits VB_Algorithm
         dst2 = hColor.dst3
         labels(2) = hColor.labels(3)
 
-        colorC.Run(dst2)
-        dst3 = colorC.dst2
+        rMin.Run(dst2)
+        dst3 = rMin.dst2
         dst3.SetTo(0, task.noDepthMask)
-        labels(3) = colorC.labels(2)
+        labels(3) = rMin.labels(2)
     End Sub
 End Class
 
@@ -218,22 +222,22 @@ End Class
 
 
 Public Class RedColor_Flippers : Inherits VB_Algorithm
-    Dim redC As New RedColor_Basics
+    Dim rMin As New RedColor_Basics
     Public Sub New()
         redOptions.DesiredCellSlider.Value = 100
         labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
         desc = "Identify the 4-way split cells that are flipping between brightness boundaries."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst3 = redC.dst3
-        labels(3) = redC.labels(2)
+        rMin.Run(src)
+        dst3 = rMin.dst3
+        labels(3) = rMin.labels(2)
 
-        Static lastMap As cv.Mat = redC.dst2.Clone
+        Static lastMap As cv.Mat = rMin.dst2.Clone
         dst2.SetTo(0)
         Dim unMatched As Integer
         Dim unMatchedPixels As Integer
-        For Each cell In redC.redCells
+        For Each cell In rMin.redCells
             Dim lastColor = lastMap.Get(Of cv.Vec3b)(cell.maxDist.Y, cell.maxDist.X)
             If lastColor <> cell.color Then
                 dst3(cell.rect).SetTo(cell.color, cell.mask)
@@ -241,11 +245,11 @@ Public Class RedColor_Flippers : Inherits VB_Algorithm
                 unMatchedPixels += cell.pixels
             End If
         Next
-        lastMap = redC.dst2.Clone
+        lastMap = rMin.dst2.Clone
 
-        If (standalone Or showIntermediate()) And redC.redCells.Count > 1 Then
-            identifyCells(redC.redCells, redC.showMaxIndex)
-            setSelectedCell(redC.redCells, redC.dst2)
+        If (standalone Or showIntermediate()) And rMin.redCells.Count > 1 Then
+            identifyCells(rMin.redCells, rMin.showMaxIndex)
+            setSelectedCell(rMin.redCells, rMin.dst2)
         End If
 
         If heartBeat() Then
