@@ -3,15 +3,14 @@ Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class CamShift_Basics : Inherits VB_Algorithm
     Public trackBox As New cv.RotatedRect
-    Dim options As New Options_CamShift
     Dim redHue As New CamShift_RedHue
     Public Sub New()
+        advice = adviceCamshift
         labels(2) = "Draw anywhere to create histogram and start camshift"
         labels(3) = "Histogram of targeted region (hue only)"
         desc = "CamShift Demo - draw on the images to define the object to track. "
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
         Static roi As New cv.Rect
         Static histogram As New cv.Mat
 
@@ -51,6 +50,7 @@ Public Class CamShift_Foreground : Inherits VB_Algorithm
     Dim fore As New Depth_Foreground
     Dim flood As New Flood_PointList
     Public Sub New()
+        advice = adviceCamshift
         labels(2) = "Draw anywhere to start Camshift"
         labels(3) = "The foreground BGR from depth data"
         desc = "Use depth to isolate foreground for use with camshift demo."
@@ -79,6 +79,7 @@ End Class
 Public Class CamShift_RedHue : Inherits VB_Algorithm
     Dim options As New Options_CamShift
     Public Sub New()
+        advice = adviceCamshift
         labels = {"", "Hue", "Image regions with red hue", "Mask for hue regions"}
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Find that portion of the image where red dominates"

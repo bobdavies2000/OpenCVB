@@ -149,6 +149,7 @@ End Class
 Public Class Color_RedHue : Inherits VB_Algorithm
     Dim options As New Options_CamShift
     Public Sub New()
+        advice = "This mask of the red hue areas is available for use."
         labels = {"", "", "Pixels with Red Hue", ""}
         desc = "Find all the reddish pixels in the image - indicate some life form."
     End Sub

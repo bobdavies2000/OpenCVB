@@ -124,9 +124,9 @@ Public Class Options_CamShift : Inherits VB_Algorithm
     Public camSBins As cv.Scalar = New cv.Scalar(0, 40, 32)
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("CamShift vMin", 0, 255, 32)
-            sliders.setupTrackBar("CamShift vMax", 0, 255, 255)
-            sliders.setupTrackBar("CamShift Smin", 0, 255, 40)
+            sliders.setupTrackBar("CamShift vMin", 0, 255, camSBins(2))
+            sliders.setupTrackBar("CamShift vMax", 0, 255, camMax)
+            sliders.setupTrackBar("CamShift Smin", 0, 255, camSBins(1))
         End If
     End Sub
     Public Sub RunVB()
@@ -189,7 +189,7 @@ Public Class Options_Contours : Inherits VB_Algorithm
         End If
 
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Contour epsilon (arc length percent)", 0, 100, 3)
+            sliders.setupTrackBar("Contour epsilon (arc length percent)", 0, 100, epsilon * 100)
         End If
     End Sub
     Public Sub RunVB()
@@ -221,7 +221,7 @@ Public Class Options_Draw : Inherits VB_Algorithm
     Public drawFilled As Integer = 2
     Public drawRotated As Boolean = False
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("DrawCount", 0, 20, 3)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("DrawCount", 0, 20, drawCount)
 
         If check.Setup(traceName) Then
             check.addCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
@@ -263,6 +263,7 @@ Public Class Options_Encode : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB()
         Static qualitySlider = findSlider("Encode Quality Level")
+        Static scalingSlider = findSlider("Encode Output Scaling")
         Static frm = findfrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
@@ -272,6 +273,7 @@ Public Class Options_Encode : Inherits VB_Algorithm
             End If
         Next
         qualityLevel = qualitySlider.Value
+        scalingLevel = scalingSlider.value
         If encodeOption = cv.ImwriteFlags.JpegProgressive Then qualityLevel = 1 ' just on or off
         If encodeOption = cv.ImwriteFlags.JpegOptimize Then qualityLevel = 1 ' just on or off
     End Sub
@@ -302,6 +304,7 @@ End Class
 Public Class Options_GeneticDrawing : Inherits VB_Algorithm
     Public stageTotal = 100
     Public brushPercent = 1.0
+    Public strokeCount As Integer = 10
     Public snapCheck As Boolean = False
     Public generations As Integer = 20
     Public Sub New()
@@ -311,10 +314,10 @@ Public Class Options_GeneticDrawing : Inherits VB_Algorithm
             check.Box(1).Checked = True
         End If
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Number of Generations", 1, 200, 20)
+            sliders.setupTrackBar("Number of Generations", 1, 200, generations)
             sliders.setupTrackBar("Number of Stages", 1, 2000, stageTotal)
-            sliders.setupTrackBar("Brushstroke count per generation", 1, 20, 10)
-            sliders.setupTrackBar("Brush size Percentage", 5, 100, 100)
+            sliders.setupTrackBar("Brushstroke count per generation", 1, 20, strokeCount)
+            sliders.setupTrackBar("Brush size Percentage", 5, 100, brushPercent * 100)
         End If
     End Sub
     Public Sub RunVB()
@@ -322,12 +325,14 @@ Public Class Options_GeneticDrawing : Inherits VB_Algorithm
         Static stageSlider = findSlider("Number of Stages")
         Static brushSlider = findSlider("Brush size Percentage")
         Static snapCheckbox = findCheckBox("Snapshot Video input to initialize genetic drawing")
+        Static strokeSlider = findSlider("Brushstroke count per generation")
 
         If snapCheckbox.checked Then snapCheckbox.checked = False
         snapCheck = snapCheckbox.checked
         stageTotal = stageSlider.value
         generations = genSlider.value
         brushPercent = brushSlider.value / 100
+        strokeCount = strokeSlider.value
     End Sub
 End Class
 
@@ -336,14 +341,12 @@ End Class
 
 
 
-
-
-
 Public Class Options_Line : Inherits VB_Algorithm
-    Public lineLengthThreshold As Integer
-    Public searchRange As Integer
+    Public lineLengthThreshold As Integer = 20
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Line length threshold in pixels", 1, 400, 20)
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Line length threshold in pixels", 1, 400, lineLengthThreshold)
+        End If
     End Sub
     Public Sub RunVB()
         Static lenSlider = findSlider("Line length threshold in pixels")
@@ -361,9 +364,10 @@ End Class
 
 
 Public Class Options_MatchShapes : Inherits VB_Algorithm
-    Public matchOption As cv.ShapeMatchModes
-    Public matchThreshold As Single
-    Public maxYdelta As Single
+    Public matchOption = cv.ShapeMatchModes.I1
+    Public matchThreshold As Single = 0.8
+    Public maxYdelta As Single = 0.05
+    Public minSize As Single = dst2.Total / 100
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -374,16 +378,18 @@ Public Class Options_MatchShapes : Inherits VB_Algorithm
         End If
 
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Match Threshold %", 0, 100, 80)
-            sliders.setupTrackBar("Max Y Delta % (of height)", 0, 10, 5)
-            sliders.setupTrackBar("Min Size % of image size", 0, 20, 3)
+            sliders.setupTrackBar("Match Threshold %", 0, 100, matchThreshold * 100)
+            sliders.setupTrackBar("Max Y Delta % (of height)", 0, 10, maxYdelta * 100)
+            sliders.setupTrackBar("Min Size % of image size", 0, 20, dst2.Total / 100)
         End If
     End Sub
     Public Sub RunVB()
         Static thresholdSlider = findSlider("Match Threshold %")
         Static ySlider = findSlider("Max Y Delta % (of height)")
+        Static minSlider = findSlider("Min Size % of image size")
         matchThreshold = thresholdSlider.Value / 100
         maxYdelta = ySlider.Value * dst2.Height / 100
+        minSize = minSlider.value * dst2.Total / 100
 
         Static frm = findfrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
@@ -404,7 +410,7 @@ End Class
 
 
 Public Class Options_Plane : Inherits VB_Algorithm
-    Public rmsThreshold As Single
+    Public rmsThreshold As Single = 0.1
     Public useMaskPoints As Boolean
     Public useContourPoints As Boolean
     Public use3Points As Boolean
@@ -419,7 +425,9 @@ Public Class Options_Plane : Inherits VB_Algorithm
             radio.check(1).Checked = True
         End If
 
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("RMS error threshold for flat X100", 0, 100, 10)
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("RMS error threshold for flat X100", 0, 100, rmsThreshold * 100)
+        End If
     End Sub
     Public Sub RunVB()
         Static rmsSlider = findSlider("RMS error threshold for flat X100")

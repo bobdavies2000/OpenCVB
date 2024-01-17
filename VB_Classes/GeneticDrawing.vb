@@ -74,14 +74,11 @@ Public Class GeneticDrawing_Basics : Inherits VB_Algorithm
         Return diff1.Sum()
     End Function
     Private Sub startNewStage(r As cv.Rect)
-        Static strokeSlider = findSlider("Brushstroke count per generation")
-        Dim brushstrokeCount = strokeSlider.Value
-
-        ReDim DNAseq(brushstrokeCount - 1)
+        ReDim DNAseq(options.strokeCount - 1)
         minSize = calcBrushSize(minBrushRange)
         maxSize = calcBrushSize(maxBrushRange)
 
-        For i = 0 To brushstrokeCount - 1
+        For i = 0 To options.strokeCount - 1
             Dim e = New DNAentry
             e.color = msRNG.Next(0, 255)
             e.size = msRNG.NextDouble() * (maxSize - minSize) + minSize

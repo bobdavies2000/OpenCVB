@@ -123,7 +123,6 @@ Public Class MatchShapes_Nearby : Inherits VB_Algorithm
     Public runStandalone As Boolean = False
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        If standalone Then findSlider("Min Size % of image size").Value = 1
         labels = {"Left floodfill image", "Right floodfill image", "Left image of identified cells", "Right image with identified cells"}
         desc = "MatchShapes: Find matches at similar latitude (controlled with slider)"
     End Sub

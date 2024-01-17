@@ -324,7 +324,9 @@ Public Class Plane_CellColor : Inherits VB_Algorithm
                 rc.eq = build3PointEquation(rc)
             End If
             newCells.Add(rc)
-            dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)), Math.Abs(255 * rc.eq(1)), Math.Abs(255 * rc.eq(2))), rc.mask)
+            dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)),
+                                              Math.Abs(255 * rc.eq(1)),
+                                              Math.Abs(255 * rc.eq(2))), rc.mask)
         Next
         redC.redCells = New List(Of rcData)(newCells)
     End Sub

@@ -43,6 +43,7 @@ Public Class VB_Algorithm : Implements IDisposable
     Public cPtr As IntPtr
     Public trueData As New List(Of trueText)
     Public strOut As String
+    Public adviceCamshift = "Draw on any available red hue area."
     Public Sub initParent()
         If task.algName.StartsWith("CPP_") Then
             task.callTrace.Clear()

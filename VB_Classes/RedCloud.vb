@@ -703,6 +703,7 @@ Public Class RedCloud_PlaneColor : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Dim planeMask As New RedCloud_PlaneFromMask
     Dim planeContour As New RedCloud_PlaneFromContour
+    Dim planeCells As New Plane_CellColor
     Public Sub New()
         labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
         desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
@@ -717,14 +718,17 @@ Public Class RedCloud_PlaneColor : Inherits VB_Algorithm
         dst3.SetTo(0)
         Dim fitPoints As New List(Of cv.Point3f)
         For Each rc In redC.redCells
+            rc.eq = New cv.Vec4f
             If options.useMaskPoints Then
-                planeMask.Run(empty)
+                rc.eq = fitDepthPlane(planeCells.buildMaskPointEq(rc))
             ElseIf options.useContourPoints Then
-                planeContour.Run(empty)
+                rc.eq = fitDepthPlane(planeCells.buildContourPoints(rc))
             ElseIf options.use3Points Then
-                If rc.contour.Count > 3 Then rc.eq = build3PointEquation(rc)
+                rc.eq = build3PointEquation(rc)
             End If
-            dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)), Math.Abs(255 * rc.eq(1)), Math.Abs(255 * rc.eq(2))), rc.mask)
+            dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)),
+                                              Math.Abs(255 * rc.eq(1)),
+                                              Math.Abs(255 * rc.eq(2))), rc.mask)
         Next
     End Sub
 End Class
