@@ -294,7 +294,7 @@ Public Class RedCloud_CoreTest : Inherits VB_Algorithm
 
         rMin.Run(reduction.dst2)
 
-        dst2 = rMin.dst2
+        dst2 = rMin.cellMap
         dst3 = rMin.dst3
         labels = rMin.labels
     End Sub
@@ -1288,7 +1288,7 @@ Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
         guided.dst2.CopyTo(combined, task.depthMask)
         rMin.Run(combined)
 
-        dst2 = rMin.dst2
+        dst2 = rMin.cellMap
         dst3 = rMin.dst3
         labels = rMin.labels
 
@@ -1302,15 +1302,17 @@ End Class
 
 
 
+
 Public Class RedCloud_FeatureLess : Inherits VB_Algorithm
-    Dim fLess As New FeatureLess_RedCloud
+    Dim cpp As New CPP_Basics
     Public Sub New()
+        cpp.updateFunction(algorithmList.functionNames._CPP_RedColor_FeatureLess)
         desc = "This is a duplicate of FeatureLess_RedCloud to make it easier to find."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        fLess.Run(src)
-        dst2 = fLess.dst2
-        labels(2) = fLess.labels(2)
+        cpp.Run(src)
+        dst2 = cpp.dst3
+        labels(2) = cpp.labels(2)
     End Sub
 End Class
 

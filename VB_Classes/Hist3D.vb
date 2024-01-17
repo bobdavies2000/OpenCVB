@@ -230,7 +230,7 @@ Public Class Hist3D_PixelCells : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         rMin.Run(src)
-        dst2 = rMin.dst2
+        dst2 = rMin.cellMap
         labels(2) = rMin.labels(3)
 
         pixel.Run(src)
@@ -311,11 +311,11 @@ Public Class Hist3D_RedMinGrid : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         rMin.Run(src)
-        dst2 = rMin.dst2
+        dst2 = rMin.rMin.cellMap
         dst3 = dst2.InRange(0, 0)
         If rMin.pixelVector.Count = 0 Then Exit Sub
         dst1.SetTo(0)
-        dst0 = rMin.rMin.dst2
+        dst0 = rMin.rMin.cellMap
         For Each roi In task.gridList
             If dst3(roi).CountNonZero Then
                 Dim candidates As New List(Of Integer)

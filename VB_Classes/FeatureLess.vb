@@ -23,27 +23,6 @@ End Class
 
 
 
-Public Class FeatureLess_EdgeDrawing : Inherits VB_Algorithm
-    Dim cpp As New CPP_Basics
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold distance", 0, 100, 10)
-        cpp.updateFunction(algorithmList.functionNames._CPP_EdgeDraw_Basics)
-        desc = "Use EdgeDrawing to define featureless regions."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Threshold distance")
-        cpp.Run(src)
-        dst2 = cpp.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class FeatureLess_Canny : Inherits VB_Algorithm
     Dim edges As New Edge_Canny
     Public Sub New()
@@ -416,7 +395,7 @@ Public Class FeatureLess_RedCloud : Inherits VB_Algorithm
         fless.Run(src)
         rMin.Run(fless.dst2)
 
-        dst2 = rMin.dst2
+        dst2 = rMin.cellmap
         dst3 = rMin.dst3
         labels(2) = rMin.labels(2)
     End Sub

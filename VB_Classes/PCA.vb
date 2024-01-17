@@ -64,7 +64,7 @@ Public Class PCA_Basics : Inherits VB_Algorithm
             rMin.Run(src)
             dst2 = rMin.dst3
             labels(2) = rMin.labels(2)
-            setSelectedCell(rMin.redCells, rMin.cellMat)
+            setSelectedCell(rMin.redCells, rMin.cellMap)
             rc = task.rcSelect
         End If
 

@@ -211,7 +211,7 @@ Public Class Distance_RedMin : Inherits VB_Algorithm
         If standalone Then gOptions.displayDst1.Checked = True
         redOptions.HistBinSlider.Value = 5
         labels(3) = "3D Histogram distance for each of the cells at left"
-        desc = "Identify RedMin cells using each cell's 3D histogram distance from zero"
+        desc = "Identify RedCloud cells using the cell's 3D histogram distance from zero"
     End Sub
     Private Function distanceFromZero(histlist As List(Of Single)) As Double
         Dim result As Double
@@ -299,7 +299,6 @@ End Class
 Public Class Distance_D3Cells : Inherits VB_Algorithm
     Dim rMin As New RedColor_Basics
     Dim hColor As New Hist3Dcolor_Basics
-    Dim valleys As New HistValley_Basics
     Public d3Cells As New List(Of rcData)
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True

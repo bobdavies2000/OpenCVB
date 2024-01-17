@@ -8,7 +8,7 @@ Public Class Flood_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         rMin.Run(src)
-        dst2 = rMin.dst2
+        dst2 = rMin.cellmap
         dst3 = rMin.dst3
         labels(2) = rMin.labels(2)
         classCount = rMin.redCells.Count

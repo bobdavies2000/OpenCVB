@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Public Class RedColor_Basics : Inherits VB_Algorithm
     Public redCore As New RedCloud_CPP
     Public redCells As New List(Of rcData)
-    Public cellMat As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim lastColors As cv.Mat
     Dim lastMap As cv.Mat = dst2.Clone
     Public showMaxIndex = 20
@@ -17,7 +17,7 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
         Dim lastCells As New List(Of rcData)(redCells)
 
         redCells.Clear()
-        cellMat.SetTo(0)
+        cellMap.SetTo(0)
         dst2.SetTo(0)
         dst3.SetTo(0)
         Dim usedColors = New List(Of cv.Vec3b)({black})
@@ -60,7 +60,7 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
             If index <> 0 Then task.cellSelect = redCells(index - 1)
         End If
 
-        cellMat = dst2.Clone
+        cellMap = dst2.Clone
         lastColors = dst3.Clone
         lastMap = dst2.Clone
         If redCells.Count > 0 Then dst1 = vbPalette(lastMap * 255 / redCells.Count)
@@ -136,7 +136,7 @@ Public Class RedColor_InputColor : Inherits VB_Algorithm
         color.Run(src)
         rMin.Run(color.dst2)
 
-        dst2 = rMin.dst2
+        dst2 = rMin.cellMap
         dst3 = rMin.dst3
         labels(2) = rMin.labels(2)
         labels(3) = rMin.labels(3)
@@ -183,7 +183,7 @@ Public Class RedColor_Histogram3DBP : Inherits VB_Algorithm
         labels(2) = hColor.labels(3)
 
         rMin.Run(dst2)
-        dst3 = rMin.dst2
+        dst3 = rMin.cellMap
         dst3.SetTo(0, task.noDepthMask)
         labels(3) = rMin.labels(2)
     End Sub
@@ -233,7 +233,7 @@ Public Class RedColor_Flippers : Inherits VB_Algorithm
         dst3 = rMin.dst3
         labels(3) = rMin.labels(2)
 
-        Static lastMap As cv.Mat = rMin.dst2.Clone
+        Static lastMap As cv.Mat = rMin.cellMap.Clone
         dst2.SetTo(0)
         Dim unMatched As Integer
         Dim unMatchedPixels As Integer
@@ -245,11 +245,11 @@ Public Class RedColor_Flippers : Inherits VB_Algorithm
                 unMatchedPixels += cell.pixels
             End If
         Next
-        lastMap = rMin.dst2.Clone
+        lastMap = rMin.cellMap.Clone
 
         If (standalone Or showIntermediate()) And rMin.redCells.Count > 1 Then
             identifyCells(rMin.redCells, rMin.showMaxIndex)
-            setSelectedCell(rMin.redCells, rMin.dst2)
+            setSelectedCell(rMin.redCells, rMin.cellMap)
         End If
 
         If heartBeat() Then
