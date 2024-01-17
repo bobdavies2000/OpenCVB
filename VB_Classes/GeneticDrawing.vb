@@ -14,9 +14,7 @@ Public Class GeneticDrawing_Basics : Inherits VB_Algorithm
     Dim imgGeneration As cv.Mat
     Dim imgStage As cv.Mat
     Public mats As New Mat_4Click
-    Dim brushPercent As Integer
     Dim options As Options_GeneticDrawing
-    Dim stageTotal = 100
     Public gradient As New Gradient_CartToPolar
     Public restartRequested As Boolean = True
     Public Sub New()
@@ -35,7 +33,8 @@ Public Class GeneticDrawing_Basics : Inherits VB_Algorithm
             Dim d = dna(i)
             Dim brushImg = brushes(d.brushNumber)
 
-            Dim br = brushImg.Resize(New cv.Size((brushImg.Width * d.size + 1) * brushPercent / 100, (brushImg.Height * d.size + 1) * brushPercent / 100))
+            Dim br = brushImg.Resize(New cv.Size(CInt((brushImg.Width * d.size + 1) * options.brushPercent),
+                                                 CInt((brushImg.Height * d.size + 1) * options.brushPercent)))
             Dim m = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(br.Cols / 2, br.Rows / 2), d.rotation, 1)
             cv.Cv2.WarpAffine(br, br, m, New cv.Size(br.Cols, br.Rows))
 
@@ -63,7 +62,7 @@ Public Class GeneticDrawing_Basics : Inherits VB_Algorithm
         Return nextImage
     End Function
     Private Function calcBrushSize(range As cv.Rangef) As Single
-        Dim t = stage / Math.Max(stageTotal - 1, 1)
+        Dim t = stage / Math.Max(options.stageTotal - 1, 1)
         Return (range.End - range.Start) * (-t * t + 1) + range.Start
     End Function
     Private Function calculateError(ByRef img As cv.Mat) As Single
@@ -98,22 +97,14 @@ Public Class GeneticDrawing_Basics : Inherits VB_Algorithm
         mats.mat(3) = runDNAseq(DNAseq)
         totalError = calculateError(mats.mat(3))
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static genSlider = findSlider("Number of Generations")
-        Static stageSlider = findSlider("Number of Stages")
-        Static brushSlider = findSlider("Brush size Percentage")
-        Static gradientMagSlider = findSlider("Contrast exponent to use X100")
-        Static sobelSlider = findSlider("Sobel kernel Size")
-        Static snapCheck = findCheckBox("Snapshot Video input to initialize genetic drawing")
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
         If task.intermediateObject IsNot Nothing Then
             setTrueText("There are too many operations inside GeneticDrawing_Basics to break down the intermediate results")
             Exit Sub
         End If
 
-        brushPercent = brushSlider.Value
-        stageTotal = stageSlider.Value
-        Dim sobelKernel = sobelSlider.Value
         Static r = New cv.Rect(0, 0, src.Width, src.Height)
         If task.drawRect.Width > 0 Then r = task.drawRect
         If restartRequested Then
@@ -124,9 +115,8 @@ Public Class GeneticDrawing_Basics : Inherits VB_Algorithm
             stage = 0
 
             If standalone Then
-                src = If(snapCheck.Checked, src.Clone, cv.Cv2.ImRead(task.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
+                src = If(options.snapCheck, src.Clone, cv.Cv2.ImRead(task.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
             End If
-            snapCheck.Checked = False
 
             src = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
             mats.mat(0) = src
@@ -135,7 +125,7 @@ Public Class GeneticDrawing_Basics : Inherits VB_Algorithm
 
             startNewStage(r)
         End If
-        If stage >= stageTotal Then Exit Sub ' request is complete...
+        If stage >= options.stageTotal Then Exit Sub ' request is complete...
         If DNAseq Is Nothing Then
             restartRequested = True
             Exit Sub
@@ -182,7 +172,7 @@ Public Class GeneticDrawing_Basics : Inherits VB_Algorithm
         End If
 
         generation += 1
-        If generation = genSlider.Value Then
+        If generation = options.generations Then
             imgStage = mats.mat(3)
             mats.mat(1) = imgStage
             generation = 0
@@ -192,7 +182,7 @@ Public Class GeneticDrawing_Basics : Inherits VB_Algorithm
 
         mats.Run(empty)
         dst2 = mats.dst2
-        labels(3) = " stage " + CStr(stage) + "/" + CStr(stageTotal) + " Gen " + Format(generation, "00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
+        labels(3) = " stage " + CStr(stage) + "/" + CStr(options.stageTotal) + " Gen " + Format(generation, "00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
         dst3 = mats.mat(mats.quadrant)
     End Sub
 End Class
@@ -302,4 +292,8 @@ Public Class GeneticDrawing_Photo : Inherits VB_Algorithm
         labels(3) = gDraw.labels(3)
     End Sub
 End Class
+
+
+
+
 

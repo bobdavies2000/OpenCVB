@@ -8,7 +8,9 @@ Public Class Encode_Basics : Inherits VB_Algorithm
         labels(3) = "Original decompressed"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Dim encodeParams() As Integer = {options.getEncodeParameter(), options.qualityLevel}
+        options.RunVB()
+
+        Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}
 
         Dim buf() = src.ImEncode(".jpg", encodeParams)
         Dim image = New cv.Mat(buf.Count, 1, cv.MatType.CV_8U, buf)
@@ -23,5 +25,35 @@ Public Class Encode_Basics : Inherits VB_Algorithm
         output.ConvertTo(dst2, cv.MatType.CV_8UC3, scaleSlider.Value)
         Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
         labels(3) = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.0%") + ")"
+    End Sub
+End Class
+
+
+
+
+
+' https://answers.opencv.org/question/31519/encode-image-in-jpg-with-opencv-avoiding-the-artifacts-effect/
+Public Class Encode_Scaling : Inherits VB_Algorithm
+    Dim options As New Options_Encode
+    Public Sub New()
+        desc = "JPEG Encoder"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        Static scaleSlider = findSlider("Encode Output Scaling")
+        Dim fileExtension = ".jpg"
+        Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}
+
+        Dim buf() = src.ImEncode(".jpg", encodeParams)
+        Dim image = New cv.Mat(buf.Count, 1, cv.MatType.CV_8U, buf)
+        dst3 = cv.Cv2.ImDecode(image, cv.ImreadModes.AnyColor)
+
+        Dim output As New cv.Mat
+        cv.Cv2.Absdiff(src, dst3, output)
+
+        Dim scale = scaleSlider.Value
+        output.ConvertTo(dst2, cv.MatType.CV_8UC3, scale)
+        Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
     End Sub
 End Class

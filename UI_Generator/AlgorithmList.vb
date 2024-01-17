@@ -524,6 +524,7 @@ if algorithmName = "EMax_PointTracker" Then return new EMax_PointTracker
 if algorithmName = "EMax_RandomClusters" Then return new EMax_RandomClusters
 if algorithmName = "EMax_VB_Failing" Then return new EMax_VB_Failing
 if algorithmName = "Encode_Basics" Then return new Encode_Basics
+if algorithmName = "Encode_Scaling" Then return new Encode_Scaling
 if algorithmName = "Entropy_Basics" Then return new Entropy_Basics
 if algorithmName = "Entropy_DrawRect" Then return new Entropy_DrawRect
 if algorithmName = "Entropy_FAST" Then return new Entropy_FAST

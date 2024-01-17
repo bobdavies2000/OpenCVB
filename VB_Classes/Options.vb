@@ -1,10 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Numerics
-Imports System.Windows.Forms
-Imports System.Windows.Controls
-Imports System.Drawing
-
 Public Class Options_Annealing : Inherits VB_Algorithm
     Dim random As New Random_Basics
     Public cityCount As Integer = 25
@@ -200,12 +196,14 @@ Public Class Options_Contours : Inherits VB_Algorithm
         options2.RunVB()
         Static epsilonSlider = findSlider("Contour epsilon (arc length percent)")
 
-        epsilon = epsilonSlider.Value
+        epsilon = epsilonSlider.Value / 100
 
         Static frm = findfrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                retrievalMode = Choose(i + 1, cv.RetrievalModes.CComp, cv.RetrievalModes.External, cv.RetrievalModes.FloodFill, cv.RetrievalModes.List, cv.RetrievalModes.Tree)
+                retrievalMode = Choose(i + 1, cv.RetrievalModes.CComp, cv.RetrievalModes.External,
+                                       cv.RetrievalModes.FloodFill, cv.RetrievalModes.List,
+                                       cv.RetrievalModes.Tree)
                 Exit For
             End If
         Next
@@ -219,10 +217,9 @@ End Class
 
 
 Public Class Options_Draw : Inherits VB_Algorithm
-    Public drawCount As Integer
-    Public updateFrequency As Integer
-    Public drawFilled As Integer
-    Public drawRotated As Boolean
+    Public drawCount As Integer = 3
+    Public drawFilled As Integer = 2
+    Public drawRotated As Boolean = False
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("DrawCount", 0, 20, 3)
 
@@ -243,9 +240,11 @@ End Class
 
 
 
+
 ' https://answers.opencv.org/question/31519/encode-image-in-jpg-with-opencv-avoiding-the-artifacts-effect/
 Public Class Options_Encode : Inherits VB_Algorithm
-    Public qualityLevel As Integer
+    Public qualityLevel As Integer = 1
+    Public encodeOption = cv.ImwriteFlags.JpegProgressive
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
@@ -261,10 +260,9 @@ Public Class Options_Encode : Inherits VB_Algorithm
             radio.check(1).Checked = True
         End If
     End Sub
-    Public Function getEncodeParameter() As Integer
+    Public Sub RunVB()
         Static qualitySlider = findSlider("Encode Quality Level")
         Static frm = findfrm(traceName + " Radio Buttons")
-        Dim encodeOption As Integer
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 encodeOption = Choose(i + 1, cv.ImwriteFlags.JpegChromaQuality, cv.ImwriteFlags.JpegLumaQuality, cv.ImwriteFlags.JpegOptimize, cv.ImwriteFlags.JpegProgressive,
@@ -275,25 +273,6 @@ Public Class Options_Encode : Inherits VB_Algorithm
         qualityLevel = qualitySlider.Value
         If encodeOption = cv.ImwriteFlags.JpegProgressive Then qualityLevel = 1 ' just on or off
         If encodeOption = cv.ImwriteFlags.JpegOptimize Then qualityLevel = 1 ' just on or off
-        Return encodeOption
-    End Function
-    Public Sub RunVB()
-        Dim src = task.color
-        Static scaleSlider = findSlider("Encode Output Scaling")
-
-        Dim fileExtension = ".jpg"
-        Dim encodeParams() As Integer = {getEncodeParameter(), qualityLevel}
-
-        Dim buf() = src.ImEncode(".jpg", encodeParams)
-        Dim image = New cv.Mat(buf.Count, 1, cv.MatType.CV_8U, buf)
-        dst3 = cv.Cv2.ImDecode(image, cv.ImreadModes.AnyColor)
-
-        Dim output As New cv.Mat
-        cv.Cv2.Absdiff(src, dst3, output)
-
-        Dim scale = scaleSlider.Value
-        output.ConvertTo(dst2, cv.MatType.CV_8UC3, scale)
-        Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
     End Sub
 End Class
 
@@ -303,14 +282,14 @@ End Class
 
 
 
-
-
-
 Public Class Options_Filter : Inherits VB_Algorithm
+    Public kernelSize As Integer = 3
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Filter kernel size", 1, 21, 3)
     End Sub
     Public Sub RunVB()
+        Static kernelSlider = findSlider("Filter kernel size")
+        kernelSize = kernelSlider.value Or 1
     End Sub
 End Class
 
@@ -321,17 +300,15 @@ End Class
 
 Public Class Options_GeneticDrawing : Inherits VB_Algorithm
     Public stageTotal = 100
+    Public brushPercent = 1.0
+    Public snapCheck As Boolean = False
+    Public generations As Integer = 20
     Public Sub New()
-        Windows.Forms.Application.DoEvents()
-
         If check.Setup(traceName) Then
             check.addCheckBox("Snapshot Video input to initialize genetic drawing")
             check.addCheckBox("Restart the algorithm with the current settings")
             check.Box(1).Checked = True
         End If
-
-        Windows.Forms.Application.DoEvents()
-
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Number of Generations", 1, 200, 20)
             sliders.setupTrackBar("Number of Stages", 1, 2000, stageTotal)
@@ -340,6 +317,16 @@ Public Class Options_GeneticDrawing : Inherits VB_Algorithm
         End If
     End Sub
     Public Sub RunVB()
+        Static genSlider = findSlider("Number of Generations")
+        Static stageSlider = findSlider("Number of Stages")
+        Static brushSlider = findSlider("Brush size Percentage")
+        Static snapCheckbox = findCheckBox("Snapshot Video input to initialize genetic drawing")
+
+        If snapCheckbox.checked Then snapCheckbox.checked = False
+        snapCheck = snapCheckbox.checked
+        stageTotal = stageSlider.value
+        generations = genSlider.value
+        brushPercent = brushSlider.value / 100
     End Sub
 End Class
 

@@ -53,9 +53,9 @@ Public Class Filter_Normalized2D : Inherits VB_Algorithm
     Public Sub New()
         desc = "Create and apply a normalized kernel."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static kernelSlider = findSlider("Filter kernel size")
-        Dim kernelSize As Integer = If(standalone, (task.frameCount Mod 20) + 1, kernelSlider.Value)
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        Dim kernelSize As Integer = If(standalone, (task.frameCount Mod 20) + 1, options.kernelSize)
         Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
         dst2 = src.Filter2D(-1, kernel)
         labels(2) = "Normalized KernelSize = " + CStr(kernelSize)

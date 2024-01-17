@@ -355,7 +355,8 @@ Public Class Contour_Sorted : Inherits VB_Algorithm
             Dim area = cv.Cv2.ContourArea(contours.contourlist(i))
             If area > minPixels And contours.contourlist(i).Length > minLengthContour Then
                 sortedByArea.Add(area, i)
-                sortedContours.Add(area, cv.Cv2.ApproxPolyDP(contours.contourlist(i), contours.options.epsilon, True))
+                sortedContours.Add(area, cv.Cv2.ApproxPolyDP(contours.contourlist(i),
+                                                             contours.options.epsilon, True))
                 vbDrawContour(dst3, contours.contourlist(i).ToList, cv.Scalar.White, -1)
             End If
         Next
