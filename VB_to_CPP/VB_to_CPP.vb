@@ -91,6 +91,7 @@ Public Class VB_to_CPP
         Dim functionName As String = ""
         Dim constructorAdds As New List(Of String)
         Dim objectNames As New List(Of String)
+        Dim startComments As Boolean
         For i = 0 To split.Count - 1
             If split(i).Contains("#include") Or split(i) = "" Then Continue For
             If Trim(split(i)).StartsWith("class") Then
@@ -156,6 +157,23 @@ Public Class VB_to_CPP
             split(i) = split(i).Replace("Mat& src", "Mat src")
             split(i) = split(i).Replace("RunVB", "Run")
             split(i) = split(i).Replace("CPP_CPP_", "CPP_")
+
+            ' updates for options
+            If split(i).Contains("CPP_Options_") Then
+                split(i) = split(i).Replace(": public algorithmCPP", "")
+            End If
+            If startComments Then split(i) = vbTab + "//" + split(i)
+
+            If split(i).Contains("algorithmCPP()") Then
+                split(i) = split(i).Replace("traceName", "//" + vbTab + "traceName")
+                split(i) = split(i).Replace(": algorithmCPP()", "")
+                startComments = True
+            End If
+            If split(i).StartsWith(vbTab + "//    }") Then
+                startComments = False
+                split(i) = split(i).Replace("//", "")
+            End If
+            If split(i).Contains("void Run()") Then startComments = True
 
             CPPrtb.Text += split(i) + vbCrLf
         Next

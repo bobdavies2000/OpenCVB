@@ -1190,7 +1190,6 @@ if algorithmName = "OpenGL_ViewObjects" Then return new OpenGL_ViewObjects
 if algorithmName = "OpenGL_World" Then return new OpenGL_World
 if algorithmName = "OpticalFlow_DenseBasics" Then return new OpticalFlow_DenseBasics
 if algorithmName = "OpticalFlow_Sparse" Then return new OpticalFlow_Sparse
-if algorithmName = "Options_AccordSuite" Then return new Options_AccordSuite
 if algorithmName = "Options_Annealing" Then return new Options_Annealing
 if algorithmName = "Options_Bernson" Then return new Options_Bernson
 if algorithmName = "Options_BGSubtract" Then return new Options_BGSubtract

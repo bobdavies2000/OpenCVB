@@ -7,11 +7,10 @@ Imports System.Drawing
 
 Public Class Options_Annealing : Inherits VB_Algorithm
     Dim random As New Random_Basics
-    Public anneal As Annealing_Basics_CPP
-    Public cityCount As Integer
-    Public copyBestFlag As Boolean
-    Public circularFlag As Boolean
-    Public successCount As Integer
+    Public cityCount As Integer = 25
+    Public copyBestFlag As Boolean = False
+    Public circularFlag As Boolean = True
+    Public successCount As Integer = 8
     Public Sub New()
         random.Run(empty) ' get the city positions (may or may not be used below.)
 
@@ -50,7 +49,7 @@ End Class
 
 
 Public Class Options_BGSubtract : Inherits VB_Algorithm
-    Public MOGlearnRate As Single
+    Public MOGlearnRate As Single = 1 / 1000
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("MOG Learn Rate X1000", 1, 1000, 1)
     End Sub
@@ -125,8 +124,8 @@ End Class
 
 
 Public Class Options_CamShift : Inherits VB_Algorithm
-    Public camMax As Integer
-    Public camSBins As cv.Scalar
+    Public camMax As Integer = 255
+    Public camSBins As cv.Scalar = New cv.Scalar(0, 40, 32)
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("CamShift vMin", 0, 255, 32)
@@ -156,7 +155,7 @@ End Class
 
 
 Public Class Options_Contours2 : Inherits VB_Algorithm
-    Public ApproximationMode As cv.ContourApproximationModes
+    Public ApproximationMode = cv.ContourApproximationModes.ApproxTC89KCOS
     Dim radioChoices = {cv.ContourApproximationModes.ApproxNone, cv.ContourApproximationModes.ApproxSimple,
                         cv.ContourApproximationModes.ApproxTC89KCOS, cv.ContourApproximationModes.ApproxTC89L1}
     Public Sub New()
@@ -179,9 +178,9 @@ End Class
 
 
 Public Class Options_Contours : Inherits VB_Algorithm
-    Public retrievalMode As cv.RetrievalModes
-    Public ApproximationMode As cv.ContourApproximationModes
-    Public epsilon As Single
+    Public retrievalMode = cv.RetrievalModes.External
+    Public ApproximationMode = cv.ContourApproximationModes.ApproxTC89KCOS
+    Public epsilon As Single = 3 / 100
     Dim options2 As New Options_Contours2
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -193,7 +192,9 @@ Public Class Options_Contours : Inherits VB_Algorithm
             radio.check(1).Checked = True
         End If
 
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Contour epsilon (arc length percent)", 0, 100, 3)
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Contour epsilon (arc length percent)", 0, 100, 3)
+        End If
     End Sub
     Public Sub RunVB()
         options2.RunVB()
@@ -3057,8 +3058,8 @@ End Class
 
 
 Public Class Options_Blur : Inherits VB_Algorithm
-    Public kernelSize As Integer
-    Public sigma As Single
+    Public kernelSize As Integer = 3
+    Public sigma As Single = 1.5
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Blur Kernel Size", 0, 32, 3)
@@ -3109,64 +3110,6 @@ Public Class Options_Harris : Inherits VB_Algorithm
         harrisParm = parmSlider.Value / 100
     End Sub
 End Class
-
-
-
-
-
-
-
-
-
-
-
-
-Public Class Options_AccordSuite : Inherits VB_Algorithm
-    Public selection As String
-    Public selectedIndex As Integer
-    Public Sub New()
-        If findfrm(traceName + " Radio Options") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("0: Grayscale")
-            radio.addRadio("1: Sepia")
-            radio.addRadio("2: Invert")
-            radio.addRadio("3: Rotate Channel")
-            radio.addRadio("4: Color Filtering")
-            radio.addRadio("5: Levels linear correction")
-            radio.addRadio("6: Hue Modifier")
-            radio.addRadio("7: Saturation Adjusting")
-            radio.addRadio("8: Brightness Adjusting")
-            radio.addRadio("9: Contrast Adjusting")
-            radio.addRadio("10: HSL Filtering")
-            radio.addRadio("11: YCbCr linear correction")
-            radio.addRadio("12: YCbCr filtering")
-            radio.addRadio("13: Threshold binarization")
-            radio.addRadio("14: Floyd-Steinberg dithering")
-            radio.addRadio("15: Ordered dithering")
-            radio.addRadio("16: Convolution")
-            radio.addRadio("17: Sharpen")
-            radio.addRadio("18: Gaussian Blur")
-            radio.addRadio("19: Difference Edge Detector")
-            radio.addRadio("20: Homography Edge Detector")
-            radio.addRadio("21: Sobel Edge Detector")
-            radio.addRadio("22: Jitter")
-            radio.addRadio("23: Oil Painting")
-            radio.addRadio("24: Texture")
-            radio.addRadio("25: FastGuidedFilter")
-            radio.check(2).Checked = True
-        End If
-    End Sub
-    Public Sub RunVB()
-        If standalone Then Exit Sub
-        Static frm = findfrm(traceName + " Radio Buttons")
-        selection = frm.check(findRadioIndex(frm.check)).text
-        selectedIndex = findRadioIndex(frm.check)
-    End Sub
-End Class
-
-
-
-
 
 
 

@@ -19,5 +19,6 @@
     <ClInclude Include="ParticleFilter.h" />
     <ClInclude Include="PragmaLibs.h" />
     <ClInclude Include="CPP_Algorithms.h" />
+    <ClInclude Include="Options.h" />
   </ItemGroup>
 </Project>
