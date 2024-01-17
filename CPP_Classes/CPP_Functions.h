@@ -2,6 +2,7 @@
 enum functions
 {
     _CPP_AddWeighted_Basics,
+_CPP_Blur_Basics,
 _CPP_Color_Basics,
 _CPP_Binarize_FourWayCombine,
 _CPP_Binarize_FourWay,

@@ -3050,3 +3050,22 @@ public:
                     " pixel classifications";
     }
 };
+
+
+
+
+
+class CPP_Blur_Basics : public algorithmCPP {
+public:
+    int options_kernelSize = 3;
+    float options_sigma = 1.5f;
+    CPP_Blur_Basics() : algorithmCPP() {
+        traceName = "CPP_Blur_Basics";
+        desc = "Smooth each pixel with a Gaussian kernel of different sizes.";
+    }
+    void Run(Mat src) {
+        options_kernelSize |= 1; // to insure it is an odd number
+        GaussianBlur(src, dst2, Size(options_kernelSize, options_kernelSize), 
+                     options_sigma, options_sigma);
+    }
+};
