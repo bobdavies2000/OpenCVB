@@ -453,13 +453,13 @@ End Class
 
 
 Public Class Options_Neighbors : Inherits VB_Algorithm
-    Public threshold As Single
-    Public pixels As Integer
+    Public threshold As Single = 0.005
+    Public pixels As Integer = 6
     Public patchZ As Boolean
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Difference from neighbor in mm's", 0, 20, 5)
-            sliders.setupTrackBar("Minimum offset to neighbor pixel", 1, 100, 6)
+            sliders.setupTrackBar("Difference from neighbor in mm's", 0, 20, threshold * 1000)
+            sliders.setupTrackBar("Minimum offset to neighbor pixel", 1, 100, pixels)
             sliders.setupTrackBar("Patch z-values", 0, 1, 1)
         End If
     End Sub
@@ -478,12 +478,37 @@ End Class
 
 
 
+Public Class Options_Interpolate : Inherits VB_Algorithm
+    Public threshold As Integer = 3
+    Public interpolationThreshold = 4
+    Public saveDefaultThreshold As Integer = threshold
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Resize % (Grab to control)", 1, 100, threshold)
+            sliders.setupTrackBar("Interpolation threshold", 1, 255, interpolationThreshold)
+            findRadio("WarpFillOutliers").Enabled = False ' does not work here...
+            findRadio("WarpInverseMap").Enabled = False ' does not work here...
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static thresholdSlider = findSlider("Resize % (Grab to control)")
+        Static interpolationSlider = findSlider("Resize % (Grab to control)")
+        threshold = thresholdSlider.value
+        interpolationThreshold = interpolationSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
 
 Public Class Options_Resize : Inherits VB_Algorithm
-    Public warpFlag As cv.InterpolationFlags
+    Public warpFlag = cv.InterpolationFlags.Nearest
     Public radioIndex As Integer
-    Public resizePercent As Single
-    Public topLeftOffset As Integer
+    Public resizePercent As Single = 0.03
+    Public topLeftOffset As Integer = 10
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("Area")
@@ -493,11 +518,11 @@ Public Class Options_Resize : Inherits VB_Algorithm
             radio.addRadio("Nearest (preserves pixel values best)")
             radio.addRadio("WarpFillOutliers")
             radio.addRadio("WarpInverseMap")
-            radio.check(3).Checked = True
+            radio.check(4).Checked = True
         End If
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Resize Percentage (%)", 1, 100, 3)
-            sliders.setupTrackBar("Offset from top left corner", 1, 50, 10)
+            sliders.setupTrackBar("Resize Percentage (%)", 1, 100, resizePercent * 100)
+            sliders.setupTrackBar("Offset from top left corner", 1, 50, topLeftOffset)
         End If
     End Sub
     Public Sub RunVB()

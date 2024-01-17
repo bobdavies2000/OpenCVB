@@ -647,13 +647,12 @@ Partial Class OptionsGlobal
         'UseKalman
         '
         Me.UseKalman.AutoSize = True
-        Me.UseKalman.Location = New System.Drawing.Point(544, 275)
+        Me.UseKalman.Location = New System.Drawing.Point(24, 265)
         Me.UseKalman.Name = "UseKalman"
         Me.UseKalman.Size = New System.Drawing.Size(176, 24)
         Me.UseKalman.TabIndex = 0
         Me.UseKalman.Text = "Use Kalman filtering"
         Me.UseKalman.UseVisualStyleBackColor = True
-        Me.UseKalman.Visible = False
         '
         'Label8
         '
