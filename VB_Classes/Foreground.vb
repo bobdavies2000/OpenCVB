@@ -128,7 +128,7 @@ End Class
 
 
 
-Public Class Foreground_RedMinFront : Inherits VB_Algorithm
+Public Class Foreground_RedForeground : Inherits VB_Algorithm
     Dim fore As New Foreground_Hist3D
     Public rMin As New RedColor_Basics
     Dim hist3D As New Hist3D_DepthWithMask
@@ -149,7 +149,9 @@ Public Class Foreground_RedMinFront : Inherits VB_Algorithm
 
         dst2 = rMin.dst3.Clone
         labels(2) = rMin.labels(3)
-        If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
+        If rMin.redCells.Count > 0 Then
+            dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
+        End If
     End Sub
 End Class
 
@@ -157,7 +159,7 @@ End Class
 
 
 
-Public Class Foreground_RedMinBack : Inherits VB_Algorithm
+Public Class Foreground_RedBackground : Inherits VB_Algorithm
     Dim fore As New Foreground_Hist3D
     Public rMin As New RedColor_Basics
     Dim hist3D As New Hist3D_DepthWithMask
@@ -180,7 +182,9 @@ Public Class Foreground_RedMinBack : Inherits VB_Algorithm
         dst2.SetTo(0, fore.dst2)
 
         labels(2) = rMin.labels(3)
-        If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
+        If rMin.redCells.Count > 0 Then
+            dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
+        End If
     End Sub
 End Class
 
@@ -189,8 +193,8 @@ End Class
 
 
 Public Class Foreground_RedMin : Inherits VB_Algorithm
-    Dim fore As New Foreground_RedMinFront
-    Dim back As New Foreground_RedMinBack
+    Dim fore As New Foreground_RedForeground
+    Dim back As New Foreground_RedBackground
     Public Sub New()
         advice = "redOptions '3D Histogram Bins' " + vbCrLf + "redOptions other 'Histogram 3D Options'"
         desc = "Isolate foreground from background, then segment each with RedMin"
@@ -203,7 +207,9 @@ Public Class Foreground_RedMin : Inherits VB_Algorithm
         back.Run(src)
         dst3 = back.dst2
         labels(3) = back.labels(2)
-        If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
+        If fore.rMin.redCells.Count > 0 Then
+            dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
+        End If
     End Sub
 End Class
 

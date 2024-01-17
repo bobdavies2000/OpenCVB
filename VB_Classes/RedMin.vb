@@ -58,16 +58,6 @@ Public Class RedColor_BasicsMotion : Inherits VB_Algorithm
         labels(3) = "There were " + CStr(redCells.Count) + " collected cells and " + CStr(motionCount) +
                     " cells removed because of motion.  "
 
-        task.cellSelect = New rcData
-        If task.clickPoint = New cv.Point(0, 0) Then
-            If redCells.Count > 2 Then
-                task.clickPoint = redCells(0).maxDist
-                task.cellSelect = redCells(0)
-            End If
-        Else
-            Dim index = dst2.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If index <> 0 Then task.cellSelect = redCells(index - 1)
-        End If
         lastColors = dst3.Clone
         lastMap = dst2.Clone
         If redCells.Count > 0 Then dst1 = vbPalette(lastMap * 255 / redCells.Count)
@@ -113,6 +103,7 @@ End Class
 Public Class RedMin_Blobs : Inherits VB_Algorithm
     Dim rMin As New RedColor_Basics
     Public Sub New()
+        advice = "Use the goptions 'DebugSlider' to select which cell is isolated."
         gOptions.DebugSlider.Value = 0
         desc = "Select blobs by size using the DebugSlider in the global options"
     End Sub
@@ -183,8 +174,14 @@ Public Class RedMin_Gaps : Inherits VB_Algorithm
         frames.Run(rMin.cellMap.InRange(0, 0))
         dst3 = frames.dst2
 
-        If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
+        If rMin.redCells.Count > 0 Then
+            dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
+        End If
 
+        If rMin.redCells.Count > 0 Then
+            Dim rc = rMin.redCells(0) ' index can now be zero.
+            dst3(rc.rect).SetTo(0, rc.mask)
+        End If
         Dim count = dst3.CountNonZero
         labels(3) = "Unclassified pixel count = " + CStr(count) + " or " + Format(count / src.Total, "0%")
     End Sub
@@ -277,7 +274,9 @@ Public Class RedMin_PixelClassifier : Inherits VB_Algorithm
         dst2 = rMin.dst3
         labels(2) = rMin.labels(3)
 
-        If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
+        If rMin.redCells.Count > 0 Then
+            dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
+        End If
     End Sub
 End Class
 

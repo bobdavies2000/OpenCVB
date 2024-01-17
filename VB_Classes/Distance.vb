@@ -203,7 +203,7 @@ End Class
 
 
 
-Public Class Distance_RedMin : Inherits VB_Algorithm
+Public Class Distance_RedCloud : Inherits VB_Algorithm
     Dim rMin As New RedColor_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
@@ -301,8 +301,8 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
     Dim hColor As New Hist3Dcolor_Basics
     Public d3Cells As New List(Of rcData)
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
         redOptions.HistBinSlider.Value = 5
+        hColor.alwaysRun = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "CV_8U format of the backprojected cells - before vbPalette."
         desc = "Experiment that failed - backprojecting each cell from RedColor_Basics"
@@ -313,13 +313,13 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
         d3Cells.Clear()
         For i = 0 To rMin.redCells.Count - 1
             Dim rm As New rcData
-            Dim rp = rMin.redCells(i)
-            rm.mask = rp.mask
-            rm.rect = rp.rect
+            Dim rc = rMin.redCells(i)
+            rm.mask = rc.mask
+            rm.rect = rc.rect
             rm.index = i + 1
 
-            hColor.inputMask = rp.mask
-            hColor.Run(src(rp.rect))
+            hColor.inputMask = rc.mask
+            hColor.Run(src(rc.rect))
             rm.histogram = hColor.histogram.Clone
             rm.histList = hColor.histArray.ToList
 

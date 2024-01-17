@@ -8,7 +8,6 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
     Dim lastMap As cv.Mat = dst2.Clone
     Public showMaxIndex = 20
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         lastColors = dst3.Clone
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
     End Sub
@@ -18,7 +17,6 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
 
         redCells.Clear()
         cellMap.SetTo(0)
-        dst2.SetTo(0)
         dst3.SetTo(0)
         Dim usedColors = New List(Of cv.Vec3b)({black})
         Dim unmatched As Integer
@@ -37,32 +35,24 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
             End If
             usedColors.Add(cell.color)
 
-            If dst2.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X) = 0 Then
+            If cellMap.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X) = 0 Then
                 cell.index = redCells.Count
                 redCells.Add(cell)
-                dst2(cell.rect).SetTo(cell.index, cell.mask)
+                cellMap(cell.rect).SetTo(cell.index, cell.mask)
                 dst3(cell.rect).SetTo(cell.color, cell.mask)
             End If
         Next
 
         If standalone Or showIntermediate() Then identifyCells(redCells, showMaxIndex)
 
+        If standalone And redCells.Count > 0 Then setSelectedCell(redCells, cellMap)
+
         labels(3) = CStr(redCells.Count) + " cells were identified.  The top " + CStr(showMaxIndex) + " are numbered"
         labels(2) = redCore.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
-        task.cellSelect = New rcData
-        If task.clickPoint = New cv.Point(0, 0) Then
-            If redCells.Count > 2 Then
-                task.clickPoint = redCells(0).maxDist
-                task.cellSelect = redCells(0)
-            End If
-        Else
-            Dim index = dst2.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If index <> 0 Then task.cellSelect = redCells(index - 1)
-        End If
 
-        cellMap = dst2.Clone
         lastColors = dst3.Clone
-        lastMap = dst2.Clone
+        dst2 = cellMap.Clone
+        lastMap = cellMap.Clone
         If redCells.Count > 0 Then dst1 = vbPalette(lastMap * 255 / redCells.Count)
     End Sub
 End Class
@@ -224,7 +214,6 @@ End Class
 Public Class RedColor_Flippers : Inherits VB_Algorithm
     Dim rMin As New RedColor_Basics
     Public Sub New()
-        redOptions.DesiredCellSlider.Value = 100
         labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
         desc = "Identify the 4-way split cells that are flipping between brightness boundaries."
     End Sub
@@ -240,12 +229,12 @@ Public Class RedColor_Flippers : Inherits VB_Algorithm
         For Each cell In rMin.redCells
             Dim lastColor = lastMap.Get(Of cv.Vec3b)(cell.maxDist.Y, cell.maxDist.X)
             If lastColor <> cell.color Then
-                dst3(cell.rect).SetTo(cell.color, cell.mask)
+                dst2(cell.rect).SetTo(cell.color, cell.mask)
                 unMatched += 1
                 unMatchedPixels += cell.pixels
             End If
         Next
-        lastMap = rMin.cellMap.Clone
+        lastMap = rMin.dst3.Clone
 
         If (standalone Or showIntermediate()) And rMin.redCells.Count > 1 Then
             identifyCells(rMin.redCells, rMin.showMaxIndex)

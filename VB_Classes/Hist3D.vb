@@ -124,7 +124,7 @@ End Class
 
 
 
-Public Class Hist3D_RedMin : Inherits VB_Algorithm
+Public Class Hist3D_RedColor : Inherits VB_Algorithm
     Dim rMin As New RedColor_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
@@ -141,7 +141,9 @@ Public Class Hist3D_RedMin : Inherits VB_Algorithm
         dst2 = rMin.dst3
         labels(2) = rMin.labels(3)
 
-        If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
+        If rMin.redCells.Count > 0 Then
+            dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
+        End If
     End Sub
 End Class
 
@@ -266,7 +268,9 @@ Public Class Hist3D_PixelClassify : Inherits VB_Algorithm
         dst2 = rMin.dst3
         labels(2) = rMin.labels(3)
 
-        If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
+        If rMin.redCells.Count > 0 Then
+            dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
+        End If
     End Sub
 End Class
 
@@ -301,13 +305,13 @@ End Class
 
 
 
-Public Class Hist3D_RedMinGrid : Inherits VB_Algorithm
+Public Class Hist3D_RedCloudGrid : Inherits VB_Algorithm
     Dim rMin As New RedMin_PixelVectors
     Dim hVector As New Hist3Dcolor_Vector
     Public Sub New()
         gOptions.GridSize.Value = 8
         advice = ""
-        desc = "Build RedMin pixel vectors and then measure each grid element's distance to those vectors."
+        desc = "Build RedCloud pixel vectors and then measure each grid element's distance to those vectors."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         rMin.Run(src)
