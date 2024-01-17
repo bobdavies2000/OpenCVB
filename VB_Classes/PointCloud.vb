@@ -990,10 +990,11 @@ Public Class PointCloud_Histograms : Inherits VB_Algorithm
             Case 0, 1, 2 ' "X Reduction", "Y Reduction", "Z Reduction"
                 plot.Run(histogram)
                 dst2 = plot.histogram
-                labels(2) = plot.labels(2)
+                labels(2) = "2D plot of 1D histogram."
             Case 3, 4, 5 ' "XY Reduction", "XZ Reduction", "YZ Reduction"
                 plot2D.Run(histogram)
                 dst2 = plot2D.dst2
+                labels(2) = "2D plot of 2D histogram."
             Case 6 ' "XYZ Reduction"
                 If dst2.Type <> cv.MatType.CV_8U Then dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
 
@@ -1015,6 +1016,7 @@ Public Class PointCloud_Histograms : Inherits VB_Algorithm
                     dst2.SetTo(0)
                 End If
                 histData(0) = 0 ' count of zero pixels - distorts results..
+
                 Dim maxVal = histData.ToList.Max
                 For i = 0 To task.gridList.Count - 1
                     If i >= histData.Length Then Exit For

@@ -8,7 +8,7 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
     Public maskInput As New cv.Mat
     Public simK As New Hist3D_BuildHistogram
     Public Sub New()
-        redOptions.XYZReduction.Checked = True
+        If standalone Then redOptions.XYZReduction.Checked = True
         labels(2) = "dst2 = backprojection of pointcloud (8UC1 format)."
         advice = "redOptions '3D Histogram Bins'" + vbCrLf + "redOptions - Histogram Channels"
         desc = "Build a 3D histogram from the pointcloud and backproject it to segment the image."
