@@ -6,7 +6,6 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim lastColors As cv.Mat
     Dim lastMap As cv.Mat = dst2.Clone
-    Public showMaxIndex = 20
     Public Sub New()
         lastColors = dst3.Clone
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
@@ -43,11 +42,11 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
             End If
         Next
 
-        If standalone Or showIntermediate() Then identifyCells(redCells, showMaxIndex)
+        If standalone Or showIntermediate() Then identifyCells(redCells)
 
         If standalone And redCells.Count > 0 Then setSelectedCell(redCells, cellMap)
 
-        labels(3) = CStr(redCells.Count) + " cells were identified.  The top " + CStr(showMaxIndex) + " are numbered"
+        labels(3) = CStr(redCells.Count) + " cells were identified.  The top " + CStr(identifyCount) + " are numbered"
         labels(2) = redCore.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
 
         lastColors = dst3.Clone
@@ -78,7 +77,7 @@ Public Class RedColor_Binarize : Inherits VB_Algorithm
 
         rMin.Run(binarize.dst2)
         dst2 = rMin.dst3
-        If standalone Or showIntermediate() Then identifyCells(rMin.redCells, rMin.showMaxIndex)
+        If standalone Or showIntermediate() Then identifyCells(rMin.redCells)
         labels(2) = rMin.labels(3)
     End Sub
 End Class
@@ -237,7 +236,7 @@ Public Class RedColor_Flippers : Inherits VB_Algorithm
         lastMap = rMin.dst3.Clone
 
         If (standalone Or showIntermediate()) And rMin.redCells.Count > 1 Then
-            identifyCells(rMin.redCells, rMin.showMaxIndex)
+            identifyCells(rMin.redCells)
             setSelectedCell(rMin.redCells, rMin.cellMap)
         End If
 

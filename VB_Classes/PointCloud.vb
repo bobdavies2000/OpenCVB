@@ -989,7 +989,7 @@ Public Class PointCloud_Histograms : Inherits VB_Algorithm
         Select Case redOptions.PCReduction
             Case 0, 1, 2 ' "X Reduction", "Y Reduction", "Z Reduction"
                 plot.Run(histogram)
-                dst2 = plot.dst2
+                dst2 = plot.histogram
                 labels(2) = plot.labels(2)
             Case 3, 4, 5 ' "XY Reduction", "XZ Reduction", "YZ Reduction"
                 plot2D.Run(histogram)

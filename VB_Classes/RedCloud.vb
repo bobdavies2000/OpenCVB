@@ -13,7 +13,6 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public useLastRC As Boolean = False
     Public removeOverlappingCells As Boolean = True
     Public displaySelectedCell As Boolean = True
-    Public showMaxIndex = 20
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Match cells from the previous generation"

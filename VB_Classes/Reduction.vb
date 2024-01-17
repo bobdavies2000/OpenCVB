@@ -45,7 +45,7 @@ Public Class Reduction_Floodfill : Inherits VB_Algorithm
         reduction.Run(src)
         dst2 = vbPalette(reduction.dst2 * 255 / reduction.classCount)
         rMin.Run(reduction.dst2)
-        If standalone Or showIntermediate() Then identifyCells(rMin.redCells, rMin.showMaxIndex)
+        If standalone Or showIntermediate() Then identifyCells(rMin.redCells)
         dst3 = rMin.dst3
         labels(3) = rMin.labels(3)
     End Sub
