@@ -35,13 +35,11 @@ Public Class Fractal_Mandelbrot : Inherits VB_Algorithm
             dst2.Set(Of Byte)(y, x, If(iter < options.iterations, 255 * iter / (options.iterations - 1), 0))
         Next
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Options.RunVB()
-        If task.optionsChanged Then
-            For y = 0 To src.Height - 1
-                mandelbrotLoop(y)
-            Next
-        End If
+        For y = 0 To src.Height - 1
+            mandelbrotLoop(y)
+        Next
     End Sub
 End Class
 
@@ -89,7 +87,10 @@ Public Class Fractal_MandelbrotZoom : Inherits VB_Algorithm
             task.drawRectClear = True
         End If
         If mandel.options.resetCheck.Checked Then mandel.reset()
-        If task.optionsChanged Then
+
+        Static saveDrawRect As New cv.Rect(1, 1, 1, 1)
+        If task.optionsChanged Or saveDrawRect <> task.drawRect Then
+            saveDrawRect = task.drawRect
             mandel.Run(src)
             mandel.options.resetCheck.Checked = False
         End If

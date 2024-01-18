@@ -12,7 +12,7 @@ Public Class Distance_Basics : Inherits VB_Algorithm
         If standalone Then src = task.depthRGB
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim dst0 = src.DistanceTransform(options.distanceType, options.kernelSize)
+        Dim dst0 = src.DistanceTransform(options.distanceType, 0)
         dst1 = vbNormalize32f(dst0)
         dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
     End Sub

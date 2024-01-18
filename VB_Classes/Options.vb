@@ -1,6 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Numerics
+Imports OpenCvSharp.ML
+
 Public Class Options_Annealing : Inherits VB_Algorithm
     Dim random As New Random_Basics
     Public cityCount As Integer = 25
@@ -620,7 +622,7 @@ Public Class Options_SuperRes : Inherits VB_Algorithm
             radio.check(0).Checked = True
         End If
 
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("SuperRes Iterations", 10, 200, 10)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("SuperRes Iterations", 10, 200, iterations)
     End Sub
     Public Sub RunVB()
         Static iterSlider = findSlider("SuperRes Iterations")
@@ -678,26 +680,26 @@ End Class
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
 Public Class Options_SVM : Inherits VB_Algorithm
     Public kernelType = cv.ML.SVM.KernelTypes.Poly
-    Public granularity As Integer
-    Public svmDegree As Integer
-    Public gamma As Integer
-    Public svmCoef0 As Single
-    Public svmC As Single
-    Public svmNu As Single
-    Public svmP As Single
-    Public sampleCount As Integer
+    Public granularity As Integer = 5
+    Public svmDegree As Single = 1
+    Public gamma As Integer = 1
+    Public svmCoef0 As Single = 1
+    Public svmC As Single = 1
+    Public svmNu As Single = 0.5
+    Public svmP As Single = 0
+    Public sampleCount As Integer = 500
     Dim options2 As New Options_SVM2
     Dim radioChoices = {cv.ML.SVM.KernelTypes.Linear, cv.ML.SVM.KernelTypes.Poly, cv.ML.SVM.KernelTypes.Rbf, cv.ML.SVM.KernelTypes.Sigmoid}
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Granularity", 1, 50, 5)
-            sliders.setupTrackBar("SVM Degree", 1, 100, 100)
-            sliders.setupTrackBar("SVM Gamma", 1, 100, 100)
-            sliders.setupTrackBar("SVM Coef0 X100", 1, 100, 100)
-            sliders.setupTrackBar("SVM C X100", 0, 100, 100)
-            sliders.setupTrackBar("SVM Nu X100", 1, 100, 50)
+            sliders.setupTrackBar("Granularity", 1, 50, granularity)
+            sliders.setupTrackBar("SVM Degree", 1, 100, svmDegree * 100)
+            sliders.setupTrackBar("SVM Gamma", 1, 100, gamma * 100)
+            sliders.setupTrackBar("SVM Coef0 X100", 1, 100, svmCoef0 * 100)
+            sliders.setupTrackBar("SVM C X100", 0, 100, svmC * 100)
+            sliders.setupTrackBar("SVM Nu X100", 1, 100, svmNu * 100)
             sliders.setupTrackBar("SVM P X100", 0, 100, 0)
-            sliders.setupTrackBar("SVM Sample Count", 2, 1000, 500)
+            sliders.setupTrackBar("SVM Sample Count", 2, 1000, sampleCount)
         End If
 
         If radio.Setup(traceName) Then
@@ -759,8 +761,8 @@ End Class
 
 Public Class Options_Threshold : Inherits VB_Algorithm
     Public thresholdOption As cv.ThresholdTypes
-    Public maxVal As Integer
-    Public threshold As Integer
+    Public maxVal As Integer = 255
+    Public threshold As Integer = 100
     Public gradient As New Gradient_Color
     Public inputGray As Boolean
     Public otsuOption As Boolean
@@ -768,8 +770,8 @@ Public Class Options_Threshold : Inherits VB_Algorithm
                         cv.ThresholdTypes.TozeroInv, cv.ThresholdTypes.Triangle, cv.ThresholdTypes.Trunc}
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Threshold value", 0, 255, 100)
-            sliders.setupTrackBar("MaxVal setting", 0, 255, 255)
+            sliders.setupTrackBar("Threshold value", 0, 255, threshold)
+            sliders.setupTrackBar("MaxVal setting", 0, 255, maxVal)
         End If
 
         If findfrm(traceName + " CheckBoxes") Is Nothing Then
@@ -903,31 +905,31 @@ Public Class Options_OpenGL : Inherits VB_Algorithm
     Public pitch As Single = 3
     Public roll As Single = 0
     Public zNear As Single = 0
-    Public zFar As Single = 20.0
+    Public zFar As Single = 20
     Public pointSize As Integer = 2
     Public zTrans As Single = 0.5
     Public eye As New cv.Vec3f(0, 0, -40)
     Public scaleXYZ As New cv.Vec3f(10, 10, 1)
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("OpenGL yaw (degrees)", -180, 180, -3)
-            sliders.setupTrackBar("OpenGL pitch (degrees)", -180, 180, 3)
-            sliders.setupTrackBar("OpenGL roll (degrees)", -180, 180, 0)
+            sliders.setupTrackBar("OpenGL yaw (degrees)", -180, 180, yaw)
+            sliders.setupTrackBar("OpenGL pitch (degrees)", -180, 180, pitch)
+            sliders.setupTrackBar("OpenGL roll (degrees)", -180, 180, roll)
 
-            sliders.setupTrackBar("OpenGL Eye X X100", -180, 180, 0)
-            sliders.setupTrackBar("OpenGL Eye Y X100", -180, 180, 0)
-            sliders.setupTrackBar("OpenGL Eye Z X100", -180, 180, -40)
+            sliders.setupTrackBar("OpenGL Eye X X100", -180, 180, eye(0))
+            sliders.setupTrackBar("OpenGL Eye Y X100", -180, 180, eye(1))
+            sliders.setupTrackBar("OpenGL Eye Z X100", -180, 180, eye(2))
 
-            sliders.setupTrackBar("OpenGL Scale X X10", 1, 100, 10)
-            sliders.setupTrackBar("OpenGL Scale Y X10", 1, 100, 10)
-            sliders.setupTrackBar("OpenGL Scale Z X10", 1, 100, 1)
+            sliders.setupTrackBar("OpenGL Scale X X10", 1, 100, scaleXYZ(0))
+            sliders.setupTrackBar("OpenGL Scale Y X10", 1, 100, scaleXYZ(1))
+            sliders.setupTrackBar("OpenGL Scale Z X10", 1, 100, scaleXYZ(2))
 
-            sliders.setupTrackBar("OpenGL zNear", 0, 100, 0)
-            sliders.setupTrackBar("OpenGL zFar", -50, 200, 20)
-            sliders.setupTrackBar("OpenGL Point Size", 1, 20, 2)
-            sliders.setupTrackBar("zTrans (X100)", -1000, 1000, 50)
+            sliders.setupTrackBar("OpenGL zNear", 0, 100, zNear)
+            sliders.setupTrackBar("OpenGL zFar", -50, 200, zFar)
+            sliders.setupTrackBar("OpenGL Point Size", 1, 20, pointSize)
+            sliders.setupTrackBar("zTrans (X100)", -1000, 1000, zTrans * 100)
 
-            sliders.setupTrackBar("OpenGL FOV", 1, 180, 75)
+            sliders.setupTrackBar("OpenGL FOV", 1, 180, FOV)
             If task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then findSlider("OpenGL yaw (degrees)").Value = 135
         End If
     End Sub
@@ -1011,12 +1013,12 @@ End Class
 
 Public Class Options_MinArea : Inherits VB_Algorithm
     Public srcPoints As New List(Of cv.Point2f)
-    Public squareWidth As Integer
-    Public numPoints As Integer
+    Public squareWidth As Integer = 100
+    Public numPoints As Integer = 5
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Area Number of Points", 1, 30, 5)
-            sliders.setupTrackBar("Area size", 10, 300, 200)
+            sliders.setupTrackBar("Area Number of Points", 1, 30, numPoints)
+            sliders.setupTrackBar("Area size", 10, 300, squareWidth * 2)
         End If
     End Sub
     Public Sub RunVB()
@@ -1044,12 +1046,12 @@ End Class
 
 Public Class Options_DCT : Inherits VB_Algorithm
     Public dctFlag As cv.DctFlags
-    Public runLengthMin As Integer
-    Public removeFrequency As Integer
+    Public runLengthMin As Integer = 15
+    Public removeFrequency As Integer = 1
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Remove Frequencies < x", 0, 100, 1)
-            sliders.setupTrackBar("Run Length Minimum", 1, 100, 15)
+            sliders.setupTrackBar("Remove Frequencies < x", 0, 100, removeFrequency)
+            sliders.setupTrackBar("Run Length Minimum", 1, 100, runLengthMin)
         End If
         If radio.Setup(traceName) Then
             radio.addRadio("DCT Flags None")
@@ -1081,14 +1083,14 @@ End Class
 Public Class Options_Eigen : Inherits VB_Algorithm
     Public highlight As Boolean
     Public recompute As Boolean
-    Public randomCount As Integer
-    Public linePointCount As Integer
-    Public noiseOffset As Integer
+    Public randomCount As Integer = 100
+    Public linePointCount As Integer = 20
+    Public noiseOffset As Integer = 10
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Random point count", 0, 500, 100)
-            sliders.setupTrackBar("Line Point Count", 0, 500, 20)
-            sliders.setupTrackBar("Line Noise", 1, 100, 10)
+            sliders.setupTrackBar("Random point count", 0, 500, randomCount)
+            sliders.setupTrackBar("Line Point Count", 0, 500, linePointCount)
+            sliders.setupTrackBar("Line Noise", 1, 100, noiseOffset)
         End If
         If check.Setup(traceName) Then
             check.addCheckBox("Highlight Line Data")
@@ -1118,12 +1120,12 @@ End Class
 
 
 Public Class Options_FitLine : Inherits VB_Algorithm
-    Public radiusAccuracy As Integer
-    Public angleAccuracy As Integer
+    Public radiusAccuracy As Integer = 10
+    Public angleAccuracy As Integer = 10
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Accuracy for the radius X100", 0, 100, 10)
-            sliders.setupTrackBar("Accuracy for the angle X100", 0, 100, 10)
+            sliders.setupTrackBar("Accuracy for the radius X100", 0, 100, radiusAccuracy)
+            sliders.setupTrackBar("Accuracy for the angle X100", 0, 100, angleAccuracy)
         End If
     End Sub
     Public Sub RunVB()
@@ -1141,15 +1143,11 @@ End Class
 
 
 Public Class Options_Fractal : Inherits VB_Algorithm
-    Public iterations As Integer
+    Public iterations As Integer = 34
     Public resetCheck As Windows.Forms.CheckBox
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Mandelbrot iterations", 1, 50, 34)
-        End If
-        If check.Setup(traceName) Then
-            check.addCheckBox("Reset to original Mandelbrot")
-        End If
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Mandelbrot iterations", 1, 50, iterations)
+        If check.Setup(traceName) Then check.addCheckBox("Reset to original Mandelbrot")
         resetCheck = findCheckBox("Reset to original Mandelbrot")
     End Sub
     Public Sub RunVB()
@@ -1166,14 +1164,14 @@ End Class
 
 Public Class Options_ProCon : Inherits VB_Algorithm
     Public buffer(10 - 1) As Integer
-    Public pduration As Integer
-    Public cduration As Integer
+    Public pduration As Integer = 1
+    Public cduration As Integer = 1
     Public bufferSize As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Buffer Size", 1, 100, buffer.Length)
-            sliders.setupTrackBar("Producer Workload Duration (ms)", 1, 1000, 1)
-            sliders.setupTrackBar("Consumer Workload Duration (ms)", 1, 1000, 1)
+            sliders.setupTrackBar("Producer Workload Duration (ms)", 1, 1000, pduration)
+            sliders.setupTrackBar("Consumer Workload Duration (ms)", 1, 1000, cduration)
         End If
         buffer = Enumerable.Repeat(-1, buffer.Length).ToArray
     End Sub
@@ -1195,16 +1193,16 @@ End Class
 
 
 Public Class Options_OilPaint : Inherits VB_Algorithm
-    Public kernelSize As Integer
-    Public intensity As Integer
-    Public threshold As Integer
-    Public filterSize As Integer
+    Public kernelSize As Integer = 4
+    Public intensity As Integer = 20
+    Public threshold As Integer = 25
+    Public filterSize As Integer = 3
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Kernel Size", 2, 10, 4)
-            sliders.setupTrackBar("Intensity", 1, 250, 20)
-            sliders.setupTrackBar("Filter Size", 3, 15, 3)
-            sliders.setupTrackBar("Threshold", 0, 200, 25)
+            sliders.setupTrackBar("Kernel Size", 2, 10, kernelSize)
+            sliders.setupTrackBar("Intensity", 1, 250, intensity)
+            sliders.setupTrackBar("Filter Size", 3, 15, filterSize)
+            sliders.setupTrackBar("Threshold", 0, 200, threshold)
         End If
     End Sub
     Public Sub RunVB()
@@ -1231,13 +1229,13 @@ End Class
 
 
 Public Class Options_Pointilism : Inherits VB_Algorithm
-    Public smoothingRadius As Integer
-    Public strokeSize As Integer
-    Public useElliptical As Boolean
+    Public smoothingRadius As Integer = 32 * 2 + 1
+    Public strokeSize As Integer = 3
+    Public useElliptical As Boolean = False
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Stroke Scale", 1, 5, 3)
-            sliders.setupTrackBar("Smoothing Radius", 0, 100, 32)
+            sliders.setupTrackBar("Stroke Scale", 1, 5, strokeSize)
+            sliders.setupTrackBar("Smoothing Radius", 0, 100, smoothingRadius / 2 - 1)
         End If
         If radio.Setup(traceName) Then
             radio.addRadio("Use Elliptical stroke")
@@ -1264,11 +1262,11 @@ End Class
 Public Class Options_MotionBlur : Inherits VB_Algorithm
     Public showDirection As Boolean = True
     Public redoCheckBox As Windows.Forms.CheckBox
-    Public kernelSize As Integer
+    Public kernelSize As Integer = 51
     Public theta As Single
-    Public restoreLen As Integer
-    Public SNR As Integer
-    Public gamma As Integer
+    Public restoreLen As Integer = 10
+    Public SNR As Integer = 700
+    Public gamma As Integer = 5
     Public Sub New()
         If check.Setup(traceName) Then
             check.addCheckBox("Redo motion blurred image")
@@ -1277,12 +1275,12 @@ Public Class Options_MotionBlur : Inherits VB_Algorithm
         redoCheckBox = findCheckBox("Redo motion blurred image")
 
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Deblur Restore Vector", 1, 10, 10)
-            sliders.setupTrackBar("Deblur Angle of Restore Vector", -90, 90, 0)
+            sliders.setupTrackBar("Deblur Restore Vector", 1, 10, restoreLen)
+            sliders.setupTrackBar("Deblur Angle of Restore Vector", -90, 90, theta)
             sliders.setupTrackBar("Motion Blur Angle", -90, 90, 0)
-            sliders.setupTrackBar("Motion Blur Length", 1, 101, 51)
-            sliders.setupTrackBar("Deblur Signal to Noise Ratio", 1, 1000, 700)
-            sliders.setupTrackBar("Deblur Gamma", 1, 100, 5)
+            sliders.setupTrackBar("Motion Blur Length", 1, 101, kernelSize)
+            sliders.setupTrackBar("Deblur Signal to Noise Ratio", 1, 1000, SNR)
+            sliders.setupTrackBar("Deblur Gamma", 1, 100, gamma)
         End If
     End Sub
     Public Sub RunVB()
@@ -1302,7 +1300,6 @@ Public Class Options_MotionBlur : Inherits VB_Algorithm
 
         SNR = CDbl(SNRSlider.Value)
         gamma = CDbl(gammaSlider.Value)
-
     End Sub
 End Class
 
@@ -1313,13 +1310,16 @@ End Class
 
 
 Public Class Options_BGSubtractSynthetic : Inherits VB_Algorithm
-    Public amplitude As Double, magnitude As Double, waveSpeed As Double, objectSpeed As Double
+    Public amplitude As Double = 200
+    Public magnitude As Double = 20
+    Public waveSpeed As Double = 20
+    Public objectSpeed As Double = 15
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Synthetic Amplitude x100", 1, 400, 200)
-            sliders.setupTrackBar("Synthetic Magnitude", 1, 40, 20)
-            sliders.setupTrackBar("Synthetic Wavespeed x100", 1, 400, 20)
-            sliders.setupTrackBar("Synthetic ObjectSpeed", 1, 20, 15)
+            sliders.setupTrackBar("Synthetic Amplitude x100", 1, 400, amplitude)
+            sliders.setupTrackBar("Synthetic Magnitude", 1, 40, magnitude)
+            sliders.setupTrackBar("Synthetic Wavespeed x100", 1, 400, waveSpeed)
+            sliders.setupTrackBar("Synthetic ObjectSpeed", 1, 20, objectSpeed)
         End If
     End Sub
     Public Sub RunVB()
@@ -1340,18 +1340,18 @@ End Class
 
 
 Public Class Options_BinarizeNiBlack : Inherits VB_Algorithm
-    Public kernelSize As Integer
-    Public niBlackK As Single
-    Public nickK As Single
-    Public sauvolaK As Single
-    Public sauvolaR As Single
+    Public kernelSize As Integer = 51
+    Public niBlackK As Single = -200 / 1000
+    Public nickK As Single = 100 / 1000
+    Public sauvolaK As Single = 100 / 1000
+    Public sauvolaR As Single = 64
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Kernel Size", 3, 500, 51)
-            sliders.setupTrackBar("Niblack k", -1000, 1000, -200)
-            sliders.setupTrackBar("Nick k", -1000, 1000, 100)
-            sliders.setupTrackBar("Sauvola k", -1000, 1000, 100)
-            sliders.setupTrackBar("Sauvola r", 1, 100, 64)
+            sliders.setupTrackBar("Kernel Size", 3, 500, kernelSize)
+            sliders.setupTrackBar("Niblack k", -1000, 1000, niBlackK * 1000)
+            sliders.setupTrackBar("Nick k", -1000, 1000, nickK * 1000)
+            sliders.setupTrackBar("Sauvola k", -1000, 1000, sauvolaK * 1000)
+            sliders.setupTrackBar("Sauvola r", 1, 100, sauvolaR)
         End If
     End Sub
     Public Sub RunVB()
@@ -1374,14 +1374,14 @@ End Class
 
 
 Public Class Options_Bernson : Inherits VB_Algorithm
-    Public kernelSize As Integer
-    Public bgThreshold As Integer
-    Public contrastMin As Integer
+    Public kernelSize As Integer = 51
+    Public bgThreshold As Integer = 100
+    Public contrastMin As Integer = 50
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Kernel Size", 3, 500, 51)
-            sliders.setupTrackBar("Contrast min", 0, 255, 50)
-            sliders.setupTrackBar("bg Threshold", 0, 255, 100)
+            sliders.setupTrackBar("Kernel Size", 3, 500, kernelSize)
+            sliders.setupTrackBar("Contrast min", 0, 255, contrastMin)
+            sliders.setupTrackBar("bg Threshold", 0, 255, bgThreshold)
         End If
     End Sub
     Public Sub RunVB()
@@ -1402,12 +1402,12 @@ End Class
 
 
 Public Class Options_BlockMatching : Inherits VB_Algorithm
-    Public numDisparity As Integer
+    Public numDisparity As Integer = 2 * 16
     Public blockSize As Integer
     Public distance As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Blockmatch max disparity", 2, 5, 2)
+            sliders.setupTrackBar("Blockmatch max disparity", 2, 5, 2 / 16)
             sliders.setupTrackBar("Blockmatch block size", 5, 255, 15)
             sliders.setupTrackBar("Blockmatch distance in meters", 1, 100, 20)
         End If
@@ -1428,16 +1428,16 @@ End Class
 
 
 Public Class Options_Cartoonify : Inherits VB_Algorithm
-    Public medianBlur As Integer
-    Public medianBlur2 As Integer
-    Public kernelSize As Integer
-    Public threshold As Integer
+    Public medianBlur As Integer = 7
+    Public medianBlur2 As Integer = 3
+    Public kernelSize As Integer = 5
+    Public threshold As Integer = 80
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Cartoon Median Blur kernel", 1, 21, 7)
-            sliders.setupTrackBar("Cartoon Median Blur kernel 2", 1, 21, 3)
-            sliders.setupTrackBar("Cartoon threshold", 1, 255, 80)
-            sliders.setupTrackBar("Cartoon Laplacian kernel", 1, 21, 5)
+            sliders.setupTrackBar("Cartoon Median Blur kernel", 1, 21, medianBlur)
+            sliders.setupTrackBar("Cartoon Median Blur kernel 2", 1, 21, medianBlur2)
+            sliders.setupTrackBar("Cartoon threshold", 1, 255, threshold)
+            sliders.setupTrackBar("Cartoon Laplacian kernel", 1, 21, kernelSize)
         End If
     End Sub
     Public Sub RunVB()
@@ -1457,14 +1457,14 @@ End Class
 
 
 Public Class Options_DFT : Inherits VB_Algorithm
-    Public radius As Integer
-    Public order As Integer
+    Public radius As Integer = dst2.Rows
+    Public order As Integer = 2
     Public butterworthFilter(1) As cv.Mat
     Public dftFlag As cv.DctFlags
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("DFT B Filter - Radius", 1, dst2.Rows, dst2.Rows)
-            sliders.setupTrackBar("DFT B Filter - Order", 1, dst2.Rows, 2)
+            sliders.setupTrackBar("DFT B Filter - Radius", 1, dst2.Rows, radius)
+            sliders.setupTrackBar("DFT B Filter - Order", 1, dst2.Rows, order)
         End If
         If radio.Setup(traceName) Then
             radio.addRadio("DFT Flags ComplexOutput")
@@ -1499,10 +1499,10 @@ End Class
 
 Public Class Options_Dither : Inherits VB_Algorithm
     Public radioIndex As Integer
-    Public bppIndex As Integer
+    Public bppIndex As Integer = 1
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Bits per color plane (Nbpp only)", 1, 5, 1)
+            sliders.setupTrackBar("Bits per color plane (Nbpp only)", 1, 5, bppIndex)
         End If
         If radio.Setup(traceName) Then
             Dim radioChoices = {"Bayer16", "Bayer8", "Bayer4", "Bayer3", "Bayer2", "BayerRgbNbpp", "BayerRgb3bpp", "BayerRgb6bpp",
@@ -1679,9 +1679,9 @@ End Class
 
 
 Public Class Options_SepFilter2D : Inherits VB_Algorithm
-    Public xDim As Integer
-    Public yDim As Integer
-    Public sigma As Single
+    Public xDim As Integer = 5
+    Public yDim As Integer = 11
+    Public sigma As Single = 17
     Public diffCheck As Boolean
     Public Sub New()
         If check.Setup(traceName) Then
@@ -1690,9 +1690,9 @@ Public Class Options_SepFilter2D : Inherits VB_Algorithm
         End If
 
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Kernel X size", 1, 21, 5)
-            sliders.setupTrackBar("Kernel Y size", 1, 21, 11)
-            sliders.setupTrackBar("SepFilter2D Sigma X10", 0, 100, 17)
+            sliders.setupTrackBar("Kernel X size", 1, 21, xDim)
+            sliders.setupTrackBar("Kernel Y size", 1, 21, yDim)
+            sliders.setupTrackBar("SepFilter2D Sigma X10", 0, 100, sigma)
         End If
     End Sub
     Public Sub RunVB()
@@ -1713,14 +1713,14 @@ End Class
 
 
 Public Class Options_IMUFrameTime : Inherits VB_Algorithm
-    Public minDelayIMU As Integer
-    Public minDelayHost As Integer
-    Public plotLastX As Integer
+    Public minDelayIMU As Integer = 4
+    Public minDelayHost As Integer = 4
+    Public plotLastX As Integer = 20
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Minimum Host interrupt delay (ms)", 1, 10, 4)
-            sliders.setupTrackBar("Minimum IMU to Capture time (ms)", 1, 10, 4)
-            sliders.setupTrackBar("Number of Plot Values", 5, 30, 20)
+            sliders.setupTrackBar("Minimum Host interrupt delay (ms)", 1, 10, minDelayIMU)
+            sliders.setupTrackBar("Minimum IMU to Capture time (ms)", 1, 10, minDelayHost)
+            sliders.setupTrackBar("Number of Plot Values", 5, 30, plotLastX)
         End If
     End Sub
     Public Sub RunVB()
@@ -1811,19 +1811,19 @@ End Class
 
 Public Class Options_KLT : Inherits VB_Algorithm
     Public inputPoints() As cv.Point2f
-    Public maxCorners As Integer
-    Public qualityLevel As Single
-    Public minDistance As Integer
-    Public blockSize As Integer
+    Public maxCorners As Integer = 100
+    Public qualityLevel As Single = 0.01
+    Public minDistance As Integer = 7
+    Public blockSize As Integer = 7
     Public nightMode As Boolean
     Public subPixWinSize As New cv.Size(10, 10)
     Public winSize As New cv.Size(3, 3)
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("KLT - MaxCorners", 1, 200, 100)
-            sliders.setupTrackBar("KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
-            sliders.setupTrackBar("KLT - minDistance", 1, 100, 7)
-            sliders.setupTrackBar("KLT - BlockSize", 1, 100, 7)
+            sliders.setupTrackBar("KLT - MaxCorners", 1, 200, maxCorners)
+            sliders.setupTrackBar("KLT - qualityLevel", 1, 100, qualityLevel * 100) ' low quality!  We want lots of points.
+            sliders.setupTrackBar("KLT - minDistance", 1, 100, minDistance)
+            sliders.setupTrackBar("KLT - BlockSize", 1, 100, blockSize)
         End If
 
         If check.Setup(traceName) Then
@@ -1859,18 +1859,18 @@ End Class
 
 
 Public Class Options_Laplacian : Inherits VB_Algorithm
-    Public kernel As cv.Size
-    Public scale As Single
-    Public delta As Single
+    Public kernel As New cv.Size(3, 3)
+    Public scale As Single = 1
+    Public delta As Single = 0
     Public gaussianBlur As Boolean
     Public boxFilterBlur As Boolean
-    Public threshold As Integer
+    Public threshold As Integer = 15
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Laplacian Kernel size", 1, 21, 3)
-            sliders.setupTrackBar("Laplacian Scale", 0, 100, 100)
-            sliders.setupTrackBar("Laplacian Delta", 0, 1000, 0)
-            sliders.setupTrackBar("LaPlacian Threshold", 0, 100, 15)
+            sliders.setupTrackBar("Laplacian Kernel size", 1, 21, kernel.Width)
+            sliders.setupTrackBar("Laplacian Scale", 0, 100, scale * 100)
+            sliders.setupTrackBar("Laplacian Delta", 0, 1000, delta * 100)
+            sliders.setupTrackBar("LaPlacian Threshold", 0, 100, threshold)
         End If
 
         If radio.Setup(traceName) Then
@@ -1932,10 +1932,10 @@ End Class
 
 
 Public Class Options_OpticalFlow : Inherits VB_Algorithm
-    Public pyrScale As Single
-    Public levels As Integer
-    Public winSize As Integer
-    Public iterations As Integer
+    Public pyrScale As Single = 35 / 100
+    Public levels As Integer = 1
+    Public winSize As Integer = 1
+    Public iterations As Integer = 1
     Public polyN As Single
     Public polySigma As Single
     Public OpticalFlowFlags As cv.OpticalFlowFlags
@@ -1951,10 +1951,10 @@ Public Class Options_OpticalFlow : Inherits VB_Algorithm
         End If
 
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Optical Flow pyrScale", 1, 100, 35)
-            sliders.setupTrackBar("Optical Flow Levels", 1, 10, 1)
-            sliders.setupTrackBar("Optical Flow winSize", 1, 9, 1)
-            sliders.setupTrackBar("Optical Flow Iterations", 1, 10, 1)
+            sliders.setupTrackBar("Optical Flow pyrScale", 1, 100, pyrScale * 100)
+            sliders.setupTrackBar("Optical Flow Levels", 1, 10, levels)
+            sliders.setupTrackBar("Optical Flow winSize", 1, 9, winSize)
+            sliders.setupTrackBar("Optical Flow Iterations", 1, 10, iterations)
             sliders.setupTrackBar("Optical Flow PolyN", 1, 15, 5)
             sliders.setupTrackBar("Optical Flow Scaling Output", 1, 100, 50)
         End If
@@ -2156,13 +2156,13 @@ End Class
 
 
 Public Class Options_FPoly : Inherits VB_Algorithm
-    Public removeThreshold As Integer
-    Public autoResyncAfterX As Integer
+    Public removeThreshold As Integer = 4
+    Public autoResyncAfterX As Integer = 500
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Resync if feature moves > X pixels", 1, 20, 4)
+            sliders.setupTrackBar("Resync if feature moves > X pixels", 1, 20, removeThreshold)
             sliders.setupTrackBar("Points to use in Feature Poly", 3, 20, 10)
-            sliders.setupTrackBar("Automatically resync after X frames", 10, 1000, 500)
+            sliders.setupTrackBar("Automatically resync after X frames", 10, 1000, autoResyncAfterX)
         End If
     End Sub
     Public Sub RunVB()
@@ -2250,18 +2250,18 @@ End Class
 
 
 Public Class Options_Hough : Inherits VB_Algorithm
-    Public rho As Integer
-    Public theta As Single
-    Public threshold As Integer
-    Public lineCount As Integer
-    Public relativeIntensity As Single
+    Public rho As Integer = 1
+    Public theta As Single = 1000 * Math.PI / 180
+    Public threshold As Integer = 3
+    Public lineCount As Integer = 25
+    Public relativeIntensity As Single = 90 / 1000
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Relative Intensity (Accord)", 1, 100, 90)
-            sliders.setupTrackBar("Hough rho", 1, 100, 1)
-            sliders.setupTrackBar("Hough theta", 1, 1000, 1000 * Math.PI / 180)
-            sliders.setupTrackBar("Hough threshold", 1, 100, 3)
-            sliders.setupTrackBar("Lines to Plot", 1, 1000, 25)
+            sliders.setupTrackBar("Relative Intensity (Accord)", 1, 100, relativeIntensity * 1000)
+            sliders.setupTrackBar("Hough rho", 1, 100, rho)
+            sliders.setupTrackBar("Hough theta", 1, 1000, theta * 1000)
+            sliders.setupTrackBar("Hough threshold", 1, 100, threshold)
+            sliders.setupTrackBar("Lines to Plot", 1, 1000, lineCount)
             sliders.setupTrackBar("Minimum feature pixels", 0, 250, 25)
         End If
     End Sub
@@ -2287,14 +2287,14 @@ End Class
 
 
 Public Class Options_Canny : Inherits VB_Algorithm
-    Public threshold1 As Integer
-    Public threshold2 As Integer
-    Public aperture As Integer
+    Public threshold1 As Integer = 100
+    Public threshold2 As Integer = 150
+    Public aperture As Integer = 3
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Canny threshold1", 1, 255, 100)
-            sliders.setupTrackBar("Canny threshold2", 1, 255, 150)
-            sliders.setupTrackBar("Canny Aperture", 3, 7, 3)
+            sliders.setupTrackBar("Canny threshold1", 1, 255, threshold1)
+            sliders.setupTrackBar("Canny threshold2", 1, 255, threshold2)
+            sliders.setupTrackBar("Canny Aperture", 3, 7, aperture)
         End If
     End Sub
     Public Sub RunVB()
@@ -2318,8 +2318,6 @@ Public Class Options_ColorMatch : Inherits VB_Algorithm
     Public minSizeRegion As Integer
     Public maxDistanceCheck As Boolean
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Remove contours < X points", 1, 100, 10)
-
         If findfrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Show Max Distance point")
@@ -2380,7 +2378,6 @@ End Class
 
 Public Class Options_Distance : Inherits VB_Algorithm
     Public distanceType As cv.DistanceTypes
-    Public kernelSize = 0
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -4206,8 +4203,8 @@ Public Class Options_Complexity : Inherits VB_Algorithm
                 Exit For
             End If
         Next
-        If firstpass Then
-            firstpass = False
+        If firstPass Then
+            firstPass = False
             frm.Left = gOptions.Width / 2
             frm.top = gOptions.Height / 2
         End If
