@@ -308,7 +308,7 @@ Public Class Structured_Rebuild : Inherits VB_Algorithm
 
         options.RunVB()
         Dim metersPerPixel = task.maxZmeters / dst3.Height
-        thickness = options.cushion * metersPerPixel
+        thickness = options.sliceSize * metersPerPixel
         heat.Run(src)
 
         If rebuiltRadio.checked Then
@@ -677,7 +677,8 @@ Public Class Structured_CountTop : Inherits VB_Algorithm
         dst0 = makeXSlice(index)
         dst2 = task.color.Clone
         dst2.SetTo(cv.Scalar.White, dst0)
-        dst1.Line(New cv.Point(index, 0), New cv.Point(index, dst1.Height), cv.Scalar.Red, slice.options.cushion)
+        dst1.Line(New cv.Point(index, 0), New cv.Point(index, dst1.Height), cv.Scalar.Red,
+                  slice.options.sliceSize)
 
         Dim hist As New cv.Mat(dst0.Width, 1, cv.MatType.CV_32F, counts.ToArray)
         plot.Run(hist)
@@ -874,7 +875,8 @@ Public Class Structured_SliceXPlot : Inherits VB_Algorithm
 
         Dim col = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
 
-        Dim rect = New cv.Rect(col, 0, If(col + options.cushion >= dst3.Width, dst3.Width - col, options.cushion), dst3.Height - 1)
+        Dim rect = New cv.Rect(col, 0, If(col + options.sliceSize >= dst3.Width, dst3.Width - col,
+                               options.sliceSize), dst3.Height - 1)
         Dim mm = vbMinMax(multi.heat.topframes.dst2(rect))
 
         dst3.Circle(New cv.Point(col, mm.maxLoc.Y), task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
@@ -912,7 +914,8 @@ Public Class Structured_SliceYPlot : Inherits VB_Algorithm
 
         Dim row = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
 
-        Dim rect = New cv.Rect(0, row, dst3.Width - 1, If(row + options.cushion >= dst3.Height, dst3.Height - row, options.cushion))
+        Dim rect = New cv.Rect(0, row, dst3.Width - 1, If(row + options.sliceSize >= dst3.Height,
+                               dst3.Height - row, options.sliceSize))
         Dim mm = vbMinMax(multi.heat.sideframes.dst2(rect))
 
         If mm.maxVal > 0 Then
@@ -1022,12 +1025,16 @@ Public Class Structured_SliceEither : Inherits VB_Algorithm
         labels(3) = heat.labels(3)
 
         dst3 = heat.dst3
-        dst3.Circle(New cv.Point(task.topCameraPoint.X, dst3.Height), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+        dst3.Circle(New cv.Point(task.topCameraPoint.X, dst3.Height), task.dotSize,
+                    cv.Scalar.Yellow, -1, task.lineType)
         If topView Then
-            dst3.Line(New cv.Point(sliceVal, 0), New cv.Point(sliceVal, dst3.Height), cv.Scalar.Yellow, task.lineWidth)
+            dst3.Line(New cv.Point(sliceVal, 0), New cv.Point(sliceVal, dst3.Height),
+                      cv.Scalar.Yellow, task.lineWidth)
         Else
-            Dim yPlaneOffset = If(sliceVal < dst3.Height - options.cushion, CInt(sliceVal), dst3.Height - options.cushion - 1)
-            dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), cv.Scalar.Yellow, options.cushion)
+            Dim yPlaneOffset = If(sliceVal < dst3.Height - options.sliceSize, CInt(sliceVal),
+                                  dst3.Height - options.sliceSize - 1)
+            dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), cv.Scalar.Yellow,
+                      options.sliceSize)
         End If
         If standalone Then
             dst2 = src
@@ -1062,20 +1069,21 @@ Public Class Structured_SliceV : Inherits VB_Algorithm
         Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
         If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
 
-        Dim thicknessMeters = options.cushion * task.metersPerPixel
+        Dim thicknessMeters = options.sliceSize * task.metersPerPixel
         Dim minVal = planeX - thicknessMeters
         Dim maxVal = planeX + thicknessMeters
         cv.Cv2.InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
         If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
 
-        labels(2) = "At offset " + CStr(xCoordinate) + " x = " + Format((maxVal + minVal) / 2, fmt2) + " with " +
-                 Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
+        labels(2) = "At offset " + CStr(xCoordinate) + " x = " + Format((maxVal + minVal) / 2, fmt2) +
+                    " with " + Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
 
         labels(3) = heat.labels(3)
 
         dst3 = heat.dst2
         dst3.Circle(New cv.Point(task.topCameraPoint.X, dst3.Height), task.dotSize, task.highlightColor, -1, task.lineType)
-        dst3.Line(New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), task.highlightColor, options.cushion)
+        dst3.Line(New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), task.highlightColor,
+                  options.sliceSize)
         If standalone Then
             dst2 = src
             dst2.SetTo(cv.Scalar.White, sliceMask)
@@ -1107,7 +1115,7 @@ Public Class Structured_TransformH : Inherits VB_Algorithm
         Dim planeY = -task.yRange * (task.sideCameraPoint.Y - ycoordinate) / task.sideCameraPoint.Y
         If ycoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (ycoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
 
-        Dim thicknessMeters = options.cushion * task.metersPerPixel
+        Dim thicknessMeters = options.sliceSize * task.metersPerPixel
         Dim minVal = planeY - thicknessMeters
         Dim maxVal = planeY + thicknessMeters
         cv.Cv2.InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
@@ -1153,7 +1161,7 @@ Public Class Structured_TransformV : Inherits VB_Algorithm
         Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
         If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
 
-        Dim thicknessMeters = options.cushion * task.metersPerPixel
+        Dim thicknessMeters = options.sliceSize * task.metersPerPixel
         Dim minVal = planeX - thicknessMeters
         Dim maxVal = planeX + thicknessMeters
         cv.Cv2.InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
@@ -1203,20 +1211,22 @@ Public Class Structured_SliceH : Inherits VB_Algorithm
         Dim planeY = -task.yRange * (task.sideCameraPoint.Y - ycoordinate) / task.sideCameraPoint.Y
         If ycoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (ycoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
 
-        Dim thicknessMeters = options.cushion * task.metersPerPixel
+        Dim thicknessMeters = options.sliceSize * task.metersPerPixel
         Dim minVal = planeY - thicknessMeters
         Dim maxVal = planeY + thicknessMeters
         cv.Cv2.InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
 
-        labels(2) = "At offset " + CStr(ycoordinate) + " y = " + Format((maxVal + minVal) / 2, fmt2) + " with " +
-                 Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
+        labels(2) = "At offset " + CStr(ycoordinate) + " y = " + Format((maxVal + minVal) / 2, fmt2) +
+                    " with " + Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
         If minVal <= 0 And maxVal >= 0 Then sliceMask.SetTo(0, task.noDepthMask)
         labels(3) = heat.labels(2)
 
         dst3 = heat.dst3
-        Dim yPlaneOffset = If(ycoordinate < dst3.Height - options.cushion, CInt(ycoordinate), dst3.Height - options.cushion - 1)
+        Dim yPlaneOffset = If(ycoordinate < dst3.Height - options.sliceSize, CInt(ycoordinate),
+                              dst3.Height - options.sliceSize - 1)
         dst3.Circle(New cv.Point(0, task.sideCameraPoint.Y), task.dotSize, task.highlightColor, -1, task.lineType)
-        dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.highlightColor, options.cushion)
+        dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.highlightColor,
+                  options.sliceSize)
         If standalone Then
             dst2 = src
             dst2.SetTo(cv.Scalar.White, sliceMask)
@@ -1261,7 +1271,7 @@ Public Class Structured_CountSide : Inherits VB_Algorithm
         Dim max = counts.Max
         maxCountIndex = counts.IndexOf(max)
         dst2.Line(New cv.Point(0, maxCountIndex), New cv.Point(dst2.Width, maxCountIndex),
-                  cv.Scalar.Red, slice.options.cushion)
+                  cv.Scalar.Red, slice.options.sliceSize)
 
         Dim hist As New cv.Mat(dst0.Height, 1, cv.MatType.CV_32F, counts.ToArray)
         plot.dst2 = New cv.Mat(dst2.Height, dst2.Height, cv.MatType.CV_8UC3, 0)

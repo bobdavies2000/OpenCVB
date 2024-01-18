@@ -159,7 +159,8 @@ Public Class Plane_FloorStudy : Inherits VB_Algorithm
         yList.Add(nextY)
         planeY = yList.Average()
         If yList.Count > 20 Then yList.RemoveAt(0)
-        dst1.Line(New cv.Point(0, rect.Y), New cv.Point(dst2.Width, rect.Y), cv.Scalar.Yellow, slice.options.cushion, task.lineType)
+        dst1.Line(New cv.Point(0, rect.Y), New cv.Point(dst2.Width, rect.Y), cv.Scalar.Yellow,
+                  slice.options.sliceSize, task.lineType)
     End Sub
 End Class
 

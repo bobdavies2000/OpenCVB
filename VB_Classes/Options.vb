@@ -479,22 +479,26 @@ End Class
 
 
 Public Class Options_Interpolate : Inherits VB_Algorithm
-    Public threshold As Integer = 3
+    Public resizePercent As Integer = 2
     Public interpolationThreshold = 4
-    Public saveDefaultThreshold As Integer = threshold
+    Public pixelCountThreshold = 0
+    Public saveDefaultThreshold As Integer = resizePercent
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Resize % (Grab to control)", 1, 100, threshold)
+            sliders.setupTrackBar("Interpolation Resize %", 1, 100, resizePercent)
             sliders.setupTrackBar("Interpolation threshold", 1, 255, interpolationThreshold)
-            findRadio("WarpFillOutliers").Enabled = False ' does not work here...
-            findRadio("WarpInverseMap").Enabled = False ' does not work here...
+            sliders.setupTrackBar("Number of interplation pixels that changed", 0, 100, pixelCountThreshold)
         End If
+        findRadio("WarpFillOutliers").Enabled = False
+        findRadio("WarpInverseMap").Enabled = False
     End Sub
     Public Sub RunVB()
-        Static thresholdSlider = findSlider("Resize % (Grab to control)")
-        Static interpolationSlider = findSlider("Resize % (Grab to control)")
-        threshold = thresholdSlider.value
+        Static resizeSlider = findSlider("Interpolation Resize %")
+        Static interpolationSlider = findSlider("Interpolation Resize %")
+        Static pixelSlider = findSlider("Number of interplation pixels that changed")
+        resizePercent = resizeSlider.value
         interpolationThreshold = interpolationSlider.value
+        pixelCountThreshold = pixelSlider.value
     End Sub
 End Class
 
@@ -551,14 +555,14 @@ End Class
 
 
 Public Class Options_Smoothing : Inherits VB_Algorithm
-    Public iterations As Integer
-    Public interiorTension As Single
-    Public stepSize As Integer
+    Public iterations As Integer = 8
+    Public interiorTension As Single = 0.5
+    Public stepSize As Integer = 30
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Smoothing iterations", 1, 20, 8)
-            sliders.setupTrackBar("Smoothing tension X100 (Interior Only)", 1, 100, 50)
-            sliders.setupTrackBar("Step size when adding points (1 is identity)", 1, 500, 30)
+            sliders.setupTrackBar("Smoothing iterations", 1, 20, iterations)
+            sliders.setupTrackBar("Smoothing tension X100 (Interior Only)", 1, 100, interiorTension * 100)
+            sliders.setupTrackBar("Step size when adding points (1 is identity)", 1, 500, stepSize)
         End If
     End Sub
     Public Sub RunVB()
@@ -576,18 +580,18 @@ End Class
 
 
 Public Class Options_Structured : Inherits VB_Algorithm
-    Public cushion As Integer
-    Public stepSize As Integer
+    Public sliceSize As Integer = 1
+    Public stepSize As Integer = 20
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Structured Depth slice thickness in pixels", 1, 10, 1)
-            sliders.setupTrackBar("Slice step size in pixels (multi-slice option only)", 1, 100, 20)
+            sliders.setupTrackBar("Structured Depth slice thickness in pixels", 1, 10, sliceSize)
+            sliders.setupTrackBar("Slice step size in pixels (multi-slice option only)", 1, 100, stepSize)
         End If
     End Sub
     Public Sub RunVB()
-        Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
+        Static sliceSlider = findSlider("Structured Depth slice thickness in pixels")
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
-        cushion = cushionSlider.Value
+        sliceSize = sliceSlider.Value
         stepSize = stepSlider.Value
     End Sub
 End Class
