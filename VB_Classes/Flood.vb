@@ -1,17 +1,19 @@
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Algorithm
     Public classCount As Integer
-    Public rMin As New RedColor_Basics
+    Public redC As New RedCloud_Basics
     Public Sub New()
-        labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
+        redOptions.UseColor.Checked = True
+        labels(3) = "The flooded cells numbered from largest to smallast"
         desc = "FloodFill the input and paint it"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        rMin.Run(src)
-        dst2 = rMin.cellmap
-        dst3 = rMin.dst3
-        labels(2) = rMin.labels(2)
-        classCount = rMin.redCells.Count
+        redC.Run(src)
+        dst2 = redC.cellMap
+        dst3 = redC.dst2
+        labels(2) = redC.labels(2)
+        If standalone Then identifyCells(redC.redCells)
+        classCount = redC.redCells.Count
     End Sub
 End Class
 
@@ -230,12 +232,12 @@ End Class
 
 
 
-Public Class Flood_Featureless : Inherits VB_Algorithm
+Public Class Flood_FeaturelessHulls : Inherits VB_Algorithm
     Public classCount As Integer
-    Dim rMin As New RedColor_Basics
+    Dim redC As New RedCloud_Basics
     Dim redCells As New List(Of rcData)
-    Dim contour As New Contour_Basics
     Public Sub New()
+        redOptions.UseColor.Checked = True
         labels = {"", "", "", "Palette output of image at left"}
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "FloodFill the input and paint it with LUT"
@@ -247,12 +249,12 @@ Public Class Flood_Featureless : Inherits VB_Algorithm
             src = fless.dst2
         End If
 
-        rMin.Run(src)
-        classCount = rMin.redCells.Count
+        redC.Run(src)
+        classCount = redC.redCells.Count
 
         dst2.SetTo(0)
         redCells.Clear()
-        For Each rp In rMin.redCells
+        For Each rp In redC.redCells
             Dim contour = contourBuild(rp.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             Dim hull = cv.Cv2.ConvexHull(contour, True).ToList
             vbDrawContour(dst2(rp.rect), hull, rp.index, -1)

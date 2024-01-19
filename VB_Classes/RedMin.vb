@@ -32,7 +32,7 @@ End Class
 
 
 Public Class RedMin_Blobs : Inherits VB_Algorithm
-    Dim rMin As New RedColor_Basics
+    Dim rMin As New RedCloud_OnlyColorAlt
     Public Sub New()
         advice = "Use the goptions 'DebugSlider' to select which cell is isolated."
         gOptions.DebugSlider.Value = 0
@@ -61,7 +61,7 @@ End Class
 
 Public Class RedMin_RedCloud : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
-    Dim rMin As New RedColor_Basics
+    Dim rMin As New RedCloud_OnlyColorAlt
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         redOptions.UseDepth.Checked = True
@@ -90,12 +90,12 @@ End Class
 
 
 Public Class RedMin_Gaps : Inherits VB_Algorithm
-    Dim rMin As New RedColor_Basics
+    Dim rMin As New RedCloud_OnlyColorAlt
     Dim frames As New History_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         advice = ""
-        desc = "Find the gaps that are different in the RedColor_Basics results."
+        desc = "Find the gaps that are different in the RedCloud_OnlyColorAlt results."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         rMin.Run(src)
@@ -193,10 +193,10 @@ End Class
 
 Public Class RedMin_PixelClassifier : Inherits VB_Algorithm
     Dim pixel As New Hist3D_Pixel
-    Dim rMin As New RedColor_Basics
+    Dim rMin As New RedCloud_OnlyColorAlt
     Public Sub New()
         advice = ""
-        desc = "Speed up RedColor_Basics by using the backprojection of the 3D color histogram."
+        desc = "Speed up RedCloud_OnlyColorAlt by using the backprojection of the 3D color histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         pixel.Run(src)
@@ -216,13 +216,13 @@ End Class
 
 
 Public Class RedMin_PixelVector3D : Inherits VB_Algorithm
-    Dim rMin As New RedColor_Basics
+    Dim rMin As New RedCloud_OnlyColorAlt
     Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         redOptions.HistBinSlider.Value = 3
-        labels = {"", "RedColor_Basics output", "3D Histogram counts for each of the cells at left", ""}
+        labels = {"", "RedCloud_OnlyColorAlt output", "3D Histogram counts for each of the cells at left", ""}
         desc = "Identify RedMin cells and create a vector for each cell's 3D histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -263,12 +263,12 @@ End Class
 
 
 Public Class RedMin_PixelVectors : Inherits VB_Algorithm
-    Public rMin As New RedColor_Basics
+    Public rMin As New RedCloud_OnlyColorAlt
     Dim hVector As New Hist3Dcolor_Vector
     Public pixelVector As New List(Of Single())
     Public redCells As New List(Of rcData)
     Public Sub New()
-        labels = {"", "", "RedColor_Basics output", ""}
+        labels = {"", "", "RedCloud_OnlyColorAlt output", ""}
         desc = "Create a vector for each cell's 3D histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)

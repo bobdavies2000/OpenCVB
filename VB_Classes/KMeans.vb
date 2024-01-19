@@ -232,7 +232,7 @@ Public Class KMeans_Edges : Inherits VB_Algorithm
     Dim edges As New Edge_Canny
     Public km As New KMeans_Image
     Public classCount As Integer
-    Dim rMin As New RedColor_Basics
+    Dim rMin As New RedCloud_OnlyColorAlt
     Public Sub New()
         labels(3) = "KMeans with edges output"
         desc = "Use edges to isolate regions in the KMeans output - not much different from KMeans_Basics."

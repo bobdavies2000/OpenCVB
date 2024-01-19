@@ -60,7 +60,7 @@ Public Class PCA_Basics : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src As cv.Mat)
         If standalone Or runRedCloud Then
-            Static rMin As New RedColor_Basics
+            Static rMin As New RedCloud_OnlyColorAlt
             rMin.Run(src)
             dst2 = rMin.dst3
             labels(2) = rMin.labels(2)

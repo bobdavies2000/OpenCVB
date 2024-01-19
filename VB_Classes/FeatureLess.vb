@@ -386,17 +386,18 @@ End Class
 
 
 Public Class FeatureLess_RedCloud : Inherits VB_Algorithm
-    Public rMin As New RedColor_Basics
+    Public redC As New RedCloud_Basics
     Dim fless As New FeatureLess_Basics
     Public Sub New()
+        redOptions.UseColor.Checked = True
         desc = "Floodfill the FeatureLess output so each cell can be tracked."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         fless.Run(src)
-        rMin.Run(fless.dst2)
+        redC.Run(fless.dst2)
 
-        dst2 = rMin.cellmap
-        dst3 = rMin.dst3
-        labels(2) = rMin.labels(2)
+        dst2 = redC.cellMap
+        dst3 = redC.dst2
+        labels(2) = redC.labels(2)
     End Sub
 End Class

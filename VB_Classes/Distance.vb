@@ -204,13 +204,14 @@ End Class
 
 
 Public Class Distance_RedCloud : Inherits VB_Algorithm
-    Dim rMin As New RedColor_Basics
+    Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
+        redOptions.UseColor.Checked = True
         redOptions.HistBinSlider.Value = 5
-        labels(3) = "3D Histogram distance for each of the cells at left"
+        labels(1) = "3D Histogram distance for each of the cells at left"
         desc = "Identify RedCloud cells using the cell's 3D histogram distance from zero"
     End Sub
     Private Function distanceFromZero(histlist As List(Of Single)) As Double
@@ -221,15 +222,15 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
         Return Math.Sqrt(result)
     End Function
     Public Sub RunVB(src As cv.Mat)
-        rMin.Run(src)
+        redC.Run(src)
 
         Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
         Static lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
         Static lastredCells As New List(Of rcData)
         pixelVector.Clear()
         distances.Clear()
-        For i = 0 To rMin.redCells.Count - 1
-            Dim rc = rMin.redCells(i)
+        For i = 0 To redC.redCells.Count - 1
+            Dim rc = redC.redCells(i)
             hColor.inputMask = rc.mask
             hColor.Run(src(rc.rect))
 
@@ -246,7 +247,7 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
                 If index Mod 6 = 5 Then strOut += vbCrLf
                 index += 1
 
-                Dim rc = rMin.redCells(el.Value)
+                Dim rc = redC.redCells(el.Value)
                 setTrueText(CStr(el.Value), rc.maxDist)
             Next
 
@@ -262,7 +263,7 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
             Next
 
             For Each el In distances
-                Dim rc = rMin.redCells(el.Value)
+                Dim rc = redC.redCells(el.Value)
                 setTrueText(CStr(el.Value), rc.maxDist)
             Next
         End If
@@ -277,18 +278,18 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
         dst2.SetTo(0)
         dst3.SetTo(0)
         For i = 0 To distances.Count - 1
-            Dim rp = rMin.redCells(distances.ElementAt(i).Value)
+            Dim rp = redC.redCells(distances.ElementAt(i).Value)
             task.color(rp.rect).CopyTo(dst2(rp.rect), rp.mask)
             dst3(rp.rect).SetTo(task.scalarColors(i), rp.mask)
         Next
-        labels(2) = rMin.labels(3)
+        labels(2) = redC.labels(3)
 
         lastDistances.Clear()
         For Each el In distances
             lastDistances.Add(el.Key, el.Value)
         Next
 
-        lastredCells = New List(Of rcData)(rMin.redCells)
+        lastredCells = New List(Of rcData)(redC.redCells)
     End Sub
 End Class
 
@@ -297,23 +298,24 @@ End Class
 
 
 Public Class Distance_D3Cells : Inherits VB_Algorithm
-    Dim rMin As New RedColor_Basics
+    Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public d3Cells As New List(Of rcData)
     Public Sub New()
+        redOptions.UseColor.Checked = True
         redOptions.HistBinSlider.Value = 5
         hColor.alwaysRun = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "CV_8U format of the backprojected cells - before vbPalette."
-        desc = "Experiment that failed - backprojecting each cell from RedColor_Basics"
+        desc = "Experiment that failed - backprojecting each cell from RedCloud_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        rMin.Run(src)
+        redC.Run(src)
 
         d3Cells.Clear()
-        For i = 0 To rMin.redCells.Count - 1
+        For i = 0 To redC.redCells.Count - 1
             Dim rm As New rcData
-            Dim rc = rMin.redCells(i)
+            Dim rc = redC.redCells(i)
             rm.mask = rc.mask
             rm.rect = rc.rect
             rm.index = i + 1
@@ -339,6 +341,7 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
         Next
         dst2 = vbPalette(dst3 * 255 / d3Cells.Count)
 
-        labels(2) = rMin.labels(3)
+        If standalone Then identifyCells(redC.redCells)
+        labels(2) = redC.labels(3)
     End Sub
 End Class

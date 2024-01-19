@@ -130,7 +130,7 @@ End Class
 
 Public Class Foreground_RedForeground : Inherits VB_Algorithm
     Dim fore As New Foreground_Hist3D
-    Public rMin As New RedColor_Basics
+    Public rMin As New RedCloud_OnlyColorAlt
     Dim hist3D As New Hist3D_DepthWithMask
     Public redCells As New List(Of rcData)
     Public Sub New()
@@ -161,7 +161,7 @@ End Class
 
 Public Class Foreground_RedBackground : Inherits VB_Algorithm
     Dim fore As New Foreground_Hist3D
-    Public rMin As New RedColor_Basics
+    Public rMin As New RedCloud_OnlyColorAlt
     Dim hist3D As New Hist3D_DepthWithMask
     Public redCells As New List(Of rcData)
     Public Sub New()
