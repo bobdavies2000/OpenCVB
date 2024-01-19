@@ -2406,7 +2406,11 @@ End Class
 
 
 Public Class Options_Warp : Inherits VB_Algorithm
-    Public alpha As Double, beta As Double, gamma As Double, f As Double, distance As Double
+    Public alpha As Double
+    Public beta As Double
+    Public gamma As Double
+    Public f As Double
+    Public distance As Double
     Public transformMatrix As cv.Mat
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -2530,7 +2534,7 @@ End Class
 
 
 Public Class Options_LeftRight : Inherits VB_Algorithm
-    Public alpha As Integer
+    Public alpha As Single
     Public beta As Integer
     Public Sub New()
         Dim alphaDefault = 2000
@@ -2568,9 +2572,9 @@ End Class
 
 
 Public Class Options_MatchCell : Inherits VB_Algorithm
-    Public overlapPercent As Single
+    Public overlapPercent As Single = 0.5
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent overlap", 0, 100, 50)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent overlap", 0, 100, overlapPercent * 100)
     End Sub
     Public Sub RunVB()
         Static overlapSlider = findSlider("Percent overlap")
@@ -2661,7 +2665,7 @@ End Class
 
 Public Class Options_OpenGL_Contours : Inherits VB_Algorithm
     Public depthPointStyle As Integer
-    Public filterThreshold As Single
+    Public filterThreshold As Single = 0.3
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -2671,7 +2675,7 @@ Public Class Options_OpenGL_Contours : Inherits VB_Algorithm
             radio.addRadio("Flatten and filter depth points")
             radio.check(3).Checked = True
         End If
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Filter threshold in meters X100", 0, 100, 30)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Filter threshold in meters X100", 0, 100, filterThreshold * 100)
     End Sub
     Public Sub RunVB()
         Static thresholdSlider = findSlider("Filter threshold in meters X100")
@@ -2704,11 +2708,11 @@ End Class
 
 Public Class Options_Motion : Inherits VB_Algorithm
     Public motionThreshold As Integer
-    Public cumulativePercentThreshold As Single
+    Public cumulativePercentThreshold As Single = 0.1
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Single frame motion threshold", 1, dst2.Total / 4, dst2.Total / 16)
-            sliders.setupTrackBar("Cumulative motion threshold percent of image", 1, 100, 10)
+            sliders.setupTrackBar("Cumulative motion threshold percent of image", 1, 100, cumulativePercentThreshold * 100)
         End If
     End Sub
     Public Sub RunVB()
@@ -2767,17 +2771,12 @@ End Class
 
 
 
-
-
-
-
-
 Public Class Options_Emax : Inherits VB_Algorithm
-    Public predictionStepSize As Integer
+    Public predictionStepSize As Integer = 5
     Public consistentcolors As Integer
     Public covarianceType = cv.EMTypes.CovMatDefault
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("EMax Prediction Step Size", 1, 20, 5)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("EMax Prediction Step Size", 1, 20, predictionStepSize)
 
         If radio.Setup(traceName) Then
             radio.addRadio("EMax matrix type Spherical")
@@ -2813,15 +2812,9 @@ End Class
 
 
 
-
-
-
-
-
-
 Public Class Options_Threshold_Adaptive : Inherits VB_Algorithm
     Public method As cv.AdaptiveThresholdTypes
-    Public blockSize As Integer
+    Public blockSize As Integer = 5
     Public constantVal As Integer
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
@@ -2832,7 +2825,7 @@ Public Class Options_Threshold_Adaptive : Inherits VB_Algorithm
         End If
 
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("AdaptiveThreshold block size", 3, 21, 5)
+            sliders.setupTrackBar("AdaptiveThreshold block size", 3, 21, blockSize)
             sliders.setupTrackBar("Constant subtracted from mean Or weighted mean", -20, 20, 0)
         End If
 
@@ -2862,11 +2855,11 @@ End Class
 
 
 Public Class Options_Intercepts : Inherits VB_Algorithm
-    Public interceptRange As Integer
+    Public interceptRange As Integer = 10
     Public mouseMovePoint As Integer
     Public selectedIntercept As Integer
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Intercept width range in pixels", 1, 50, 10)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Intercept width range in pixels", 1, 50, interceptRange)
         If radio.Setup(traceName) Then
             radio.addRadio("Show Top intercepts")
             radio.addRadio("Show Bottom intercepts")
@@ -2925,15 +2918,15 @@ End Class
 
 
 Public Class Options_ForeGround : Inherits VB_Algorithm
-    Public maxForegroundDepthInMeters As Single
-    Public minSizeContour As Integer
+    Public maxForegroundDepthInMeters As Single = 1500 / 1000
+    Public minSizeContour As Integer = 100
     Public depthPerRegion As Single
-    Public numberOfRegions As Integer
+    Public numberOfRegions As Integer = 5
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Max foreground depth in mm's", 200, 2000, 1500)
-            sliders.setupTrackBar("Min length contour", 10, 2000, 100)
-            sliders.setupTrackBar("Number of depth ranges", 1, 20, 5)
+            sliders.setupTrackBar("Max foreground depth in mm's", 200, 2000, maxForegroundDepthInMeters * 1000)
+            sliders.setupTrackBar("Min length contour", 10, 2000, minSizeContour)
+            sliders.setupTrackBar("Number of depth ranges", 1, 20, numberOfRegions)
         End If
     End Sub
     Public Sub RunVB()
@@ -2954,14 +2947,14 @@ End Class
 
 
 Public Class Options_Sobel : Inherits VB_Algorithm
-    Public kernelSize As Integer
-    Public threshold As Integer
+    Public kernelSize As Integer = 3
+    Public threshold As Integer = 50
     Public horizontalDerivative As Boolean
     Public verticalDerivative As Boolean
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Sobel kernel Size", 1, 31, 3)
-            sliders.setupTrackBar("Threshold to zero pixels below this value", 0, 255, 50)
+            sliders.setupTrackBar("Sobel kernel Size", 1, 31, kernelSize)
+            sliders.setupTrackBar("Threshold to zero pixels below this value", 0, 255, threshold)
         End If
 
         If findfrm(traceName + " CheckBox Options") Is Nothing Then
@@ -2994,10 +2987,9 @@ End Class
 
 Public Class Options_Flood : Inherits VB_Algorithm
     Public floodFlag As cv.FloodFillFlags = 4 Or cv.FloodFillFlags.FixedRange
-    Public stepSize As Integer
-    Public gridHeight As Integer
+    Public stepSize As Integer = 30
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Step Size", 1, dst2.Cols / 2, 30)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Step Size", 1, dst2.Cols / 2, stepSize)
         If findfrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Use floating range")
@@ -3084,8 +3076,8 @@ Public Class Options_Blur : Inherits VB_Algorithm
     Public sigma As Single = 1.5
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Blur Kernel Size", 0, 32, 3)
-            sliders.setupTrackBar("Blur Sigma", 1, 10, 3)
+            sliders.setupTrackBar("Blur Kernel Size", 0, 32, kernelSize)
+            sliders.setupTrackBar("Blur Sigma", 1, 10, sigma * 2)
         End If
     End Sub
     Public Sub RunVB()
@@ -3108,16 +3100,16 @@ End Class
 
 
 Public Class Options_Harris : Inherits VB_Algorithm
-    Public threshold As Single
-    Public neighborhood As Integer
-    Public aperture As Integer
-    Public harrisParm As Single
+    Public threshold As Single = 1 / 10000
+    Public neighborhood As Integer = 21
+    Public aperture As Integer = 21
+    Public harrisParm As Single = 1
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Harris Threshold", 1, 100, 1)
-            sliders.setupTrackBar("Harris Neighborhood", 1, 41, 21)
-            sliders.setupTrackBar("Harris aperture", 1, 31, 21)
-            sliders.setupTrackBar("Harris Parameter", 1, 100, 1)
+            sliders.setupTrackBar("Harris Threshold", 1, 100, threshold * 10000)
+            sliders.setupTrackBar("Harris Neighborhood", 1, 41, neighborhood)
+            sliders.setupTrackBar("Harris aperture", 1, 31, aperture)
+            sliders.setupTrackBar("Harris Parameter", 1, 100, harrisParm * 100)
         End If
     End Sub
     Public Sub RunVB()
@@ -3142,9 +3134,9 @@ End Class
 
 Public Class Options_Wavelet : Inherits VB_Algorithm
     Public useHaar As Boolean
-    Public iterations As Integer
+    Public iterations As Integer = 3
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Wavelet Iterations", 1, 5, 3)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Wavelet Iterations", 1, 5, iterations)
 
         If findfrm(traceName + " Radio Options") Is Nothing Then
             radio.Setup(traceName)
@@ -3170,14 +3162,14 @@ End Class
 
 
 Public Class Options_SOM : Inherits VB_Algorithm
-    Public iterations As Integer
-    Public learningRate As Single
-    Public radius As Integer
+    Public iterations As Integer = 3000
+    Public learningRate As Single = 0.1
+    Public radius As Integer = 15
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Iterations (000's)", 1, 10, 3)
-            sliders.setupTrackBar("Initial Learning Rate %", 1, 100, 10)
-            sliders.setupTrackBar("Radius in Pixels", 1, 100, 15)
+            sliders.setupTrackBar("Iterations (000's)", 1, 10, iterations / 1000)
+            sliders.setupTrackBar("Initial Learning Rate %", 1, 100, learningRate * 100)
+            sliders.setupTrackBar("Radius in Pixels", 1, 100, radius)
         End If
     End Sub
     Public Sub RunVB()
