@@ -3722,7 +3722,7 @@ Public Class Options_Features : Inherits VB_Algorithm
     Public useBRISK As Boolean
     Public quality As Double = 0.01
     Public minDistance As Double = 10
-    Dim roi As cv.Rect
+    Public roi As cv.Rect
     Public distanceThreshold As Integer = 16
     Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
     Public matchText As String = ""
@@ -3766,7 +3766,7 @@ End Class
 
 
 Public Class Options_HeatMap : Inherits VB_Algorithm
-    Public redThreshold As Integer
+    Public redThreshold As Integer = 20
     Public viewName As String = "vertical"
     Public showHistory As Boolean
     Public topView As Boolean = True
@@ -3780,8 +3780,7 @@ Public Class Options_HeatMap : Inherits VB_Algorithm
         End If
 
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Threshold for Red channel", 0, 255, 20)
-            sliders.setupTrackBar("Show top concentration %", 0, 100, 25)
+            sliders.setupTrackBar("Threshold for Red channel", 0, 255, redThreshold)
         End If
     End Sub
     Public Sub RunVB()
@@ -3802,11 +3801,11 @@ End Class
 
 
 Public Class Options_Boundary : Inherits VB_Algorithm
-    Public desiredBoundaries As Integer
+    Public desiredBoundaries As Integer = 15
     Public peakDistance As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Desired boundary count", 2, 100, 15)
+            sliders.setupTrackBar("Desired boundary count", 2, 100, desiredBoundaries)
             sliders.setupTrackBar("Distance to next Peak (pixels)", 2, dst2.Width / 10, dst2.Width / 20)
         End If
     End Sub
@@ -3851,58 +3850,57 @@ End Class
 
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class Options_MSER : Inherits VB_Algorithm
-    Public delta As Integer
+    Public delta As Integer = 9
     Public minArea As Integer
     Public maxArea As Integer
-    Public maxVariation As Single
-    Public minDiversity As Single
-    Public maxEvolution As Integer
-    Public areaThreshold As Single
-    Public minMargin As Single
-    Public edgeBlurSize As Integer
+    Public maxVariation As Single = 0.25
+    Public minDiversity As Single = 0.2
+    Public maxEvolution As Integer = 200
+    Public areaThreshold As Single = 1.01
+    Public minMargin As Single = 0.003
+    Public edgeBlurSize As Integer = 5
     Public pass2Setting As Boolean
     Public graySetting As Boolean
     Public Sub New()
-        Dim maxDefault = 10000, minDefault = 1000
         Select Case task.workingRes.Width
             Case 1920
-                maxDefault = 350000
-                minDefault = 6000
+                maxArea = 350000
+                minArea = 6000
             Case 960
-                maxDefault = 100000
-                minDefault = 3000
+                maxArea = 100000
+                minArea = 3000
             Case 480
-                maxDefault = 25000
-                minDefault = 1500
+                maxArea = 25000
+                minArea = 1500
             Case 1280
-                maxDefault = 150000
-                minDefault = 1500
+                maxArea = 150000
+                minArea = 1500
             Case 640
-                maxDefault = 50000
-                minDefault = 600
+                maxArea = 50000
+                minArea = 600
             Case 320
-                maxDefault = 5000
-                minDefault = 300
+                maxArea = 5000
+                minArea = 300
             Case 672
-                maxDefault = 30000
-                minDefault = 300
+                maxArea = 30000
+                minArea = 300
             Case 336
-                maxDefault = 15000
-                minDefault = 200
+                maxArea = 15000
+                minArea = 200
             Case 168
-                maxDefault = 2000
-                minDefault = 10
+                maxArea = 2000
+                minArea = 10
         End Select
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("MSER Delta", 1, 100, 9)
-            sliders.setupTrackBar("MSER Min Area", 1, 10000, minDefault)
-            sliders.setupTrackBar("MSER Max Area", 1000, 500000, maxDefault)
-            sliders.setupTrackBar("MSER Max Variation", 1, 100, 25)
-            sliders.setupTrackBar("MSER Diversity", 0, 100, 20)
-            sliders.setupTrackBar("MSER Max Evolution", 1, 1000, 200)
-            sliders.setupTrackBar("MSER Area Threshold", 1, 101, 101)
-            sliders.setupTrackBar("MSER Min Margin", 1, 100, 3)
-            sliders.setupTrackBar("MSER Edge BlurSize", 1, 20, 5)
+            sliders.setupTrackBar("MSER Delta", 1, 100, delta)
+            sliders.setupTrackBar("MSER Min Area", 1, 10000, minArea)
+            sliders.setupTrackBar("MSER Max Area", 1000, 500000, maxArea)
+            sliders.setupTrackBar("MSER Max Variation", 1, 100, maxVariation * 100)
+            sliders.setupTrackBar("MSER Diversity", 0, 100, minDiversity)
+            sliders.setupTrackBar("MSER Max Evolution", 1, 1000, maxEvolution)
+            sliders.setupTrackBar("MSER Area Threshold", 1, 101, areaThreshold * 100)
+            sliders.setupTrackBar("MSER Min Margin", 1, 100, minMargin * 1000)
+            sliders.setupTrackBar("MSER Edge BlurSize", 1, 20, edgeBlurSize)
         End If
 
         If check.Setup(traceName) Then
@@ -4131,15 +4129,15 @@ End Class
 
 
 Public Class Options_HistXD : Inherits VB_Algorithm
-    Public sideThreshold As Integer
-    Public topThreshold As Integer
-    Public threshold3D As Integer
+    Public sideThreshold As Integer = 5
+    Public topThreshold As Integer = 15
+    Public threshold3D As Integer = 40
     Public selectedBin As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Min side bin samples", 0, 100, 5) ' for 2D histograms
-            sliders.setupTrackBar("Min top bin samples", 0, 100, 15) ' for 2D histograms
-            sliders.setupTrackBar("Min samples per bin", 0, 500, 40) ' for 3D histograms
+            sliders.setupTrackBar("Min side bin samples", 0, 100, sideThreshold) ' for 2D histograms
+            sliders.setupTrackBar("Min top bin samples", 0, 100, topThreshold) ' for 2D histograms
+            sliders.setupTrackBar("Min samples per bin", 0, 500, threshold3D) ' for 3D histograms
         End If
     End Sub
     Public Sub RunVB()

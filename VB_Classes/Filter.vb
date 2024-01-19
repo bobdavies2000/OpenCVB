@@ -4,12 +4,13 @@ Imports OpenCvSharp.Text
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Filter_Laplacian : Inherits VB_Algorithm
     Public Sub New()
-        desc = "Use a filter to approximate the Laplacian derivative."
         labels(2) = "Sharpened image using Filter2D output"
         labels(3) = "Output of Filter2D (approximated Laplacian)"
+        desc = "Use a filter to approximate the Laplacian derivative."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Dim imgLaplacian = src.Filter2D(cv.MatType.CV_32F, New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1}))
+        Dim imgLaplacian = src.Filter2D(cv.MatType.CV_32F,
+                                        New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1}))
         src.ConvertTo(dst1, cv.MatType.CV_32F)
         dst0 = (dst1 - imgLaplacian).ToMat
         dst0.ConvertTo(dst2, src.Type)
