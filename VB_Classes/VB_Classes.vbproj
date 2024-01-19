@@ -120,7 +120,7 @@
     <Compile Include="BGRPattern.vb" />
     <Compile Include="Cell.vb" />
     <Compile Include="Complexity.vb" />
-    <Compile Include="CPP_Externs.vb" />
+    <Compile Include="VB_Externs.vb" />
     <Compile Include="CPPExtract.vb" />
     <Compile Include="Foreground.vb" />
     <Compile Include="FrameRate.vb" />
@@ -164,7 +164,6 @@
     <Compile Include="Projection.vb" />
     <Compile Include="PyrFilter.vb" />
     <Compile Include="RedCloud.vb" />
-    <Compile Include="RedMin.vb" />
     <Compile Include="RedTrack.vb" />
     <Compile Include="ROI.vb" />
     <Compile Include="BackProject.vb" />

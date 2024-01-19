@@ -2718,12 +2718,12 @@ int* RedCloud_FindCells_RunCPP(RedCloud_FindCells * cPtr, int* dataPtr, int rows
 
 
 
-class RedMin_FindPixels
+class Pixels_Vector
 {
 private:
 public:
 	Mat src, dst;
-	RedMin_FindPixels() {}
+	Pixels_Vector() {}
 	vector <Vec3b> pixelList;
 	void RunCPP()
 	{
@@ -2740,21 +2740,21 @@ public:
 	}
 };
 extern "C" __declspec(dllexport)
-RedMin_FindPixels * RedMin_FindPixels_Open() {
-	RedMin_FindPixels* cPtr = new RedMin_FindPixels();
+Pixels_Vector * Pixels_Vector_Open() {
+	Pixels_Vector* cPtr = new Pixels_Vector();
 	return cPtr;
 }
 extern "C" __declspec(dllexport)
-void RedMin_FindPixels_Close(RedMin_FindPixels * cPtr)
+void Pixels_Vector_Close(Pixels_Vector * cPtr)
 {
 	delete cPtr;
 }
-extern "C" __declspec(dllexport) int* RedMin_FindPixels_Pixels(RedMin_FindPixels * cPtr)
+extern "C" __declspec(dllexport) int* Pixels_Vector_Pixels(Pixels_Vector * cPtr)
 {
 	return (int*)&cPtr->pixelList[0];
 }
 extern "C" __declspec(dllexport)
-int RedMin_FindPixels_RunCPP(RedMin_FindPixels * cPtr, int* dataPtr, int rows, int cols)
+int Pixels_Vector_RunCPP(Pixels_Vector * cPtr, int* dataPtr, int rows, int cols)
 {
 	cPtr->src = Mat(rows, cols, CV_8UC3, dataPtr);
 	cPtr->RunCPP();

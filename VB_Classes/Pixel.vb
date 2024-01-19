@@ -711,3 +711,113 @@ Public Class Pixel_NeighborsPatchNeighbors : Inherits VB_Algorithm
         cv.Cv2.Merge(task.pcSplit, dst3)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Pixel_Vector3D : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim hColor As New Hist3Dcolor_Basics
+    Public pixelVector As New List(Of List(Of Single))
+    Public Sub New()
+        redOptions.UseColor.Checked = True
+        If standalone Then gOptions.displayDst1.Checked = True
+        redOptions.HistBinSlider.Value = 3
+        labels = {"", "RedCloud_Basics output", "3D Histogram counts for each of the cells at left", ""}
+        desc = "Identify RedMin cells and create a vector for each cell's 3D histogram."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        Dim maxRegion = 20
+
+        Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
+        If heartBeat() Then
+            pixelVector.Clear()
+            strOut = "3D histogram counts for each cell - " + CStr(maxRegion) + " largest only for readability..." + vbCrLf
+            For Each cell In redC.redCells
+                hColor.inputMask = cell.mask
+                hColor.Run(src(cell.rect))
+                pixelVector.Add(hColor.histArray.ToList)
+                strOut += "(" + CStr(cell.index) + ") "
+                For Each count In hColor.histArray
+                    strOut += CStr(count) + ","
+                Next
+                strOut += vbCrLf
+                If cell.index >= maxRegion Then Exit For
+            Next
+        End If
+        setTrueText(strOut, 3)
+
+        dst1.SetTo(0)
+        dst2.SetTo(0)
+        For Each cell In redC.redCells
+            task.color(cell.rect).CopyTo(dst2(cell.rect), cell.mask)
+            dst1(cell.rect).SetTo(cell.color, cell.mask)
+            If cell.index <= maxRegion Then setTrueText(CStr(cell.index), cell.maxDist, 2)
+        Next
+        labels(2) = redC.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Pixel_Unique_CPP : Inherits VB_Algorithm
+    Public Sub New()
+        redOptions.UseColor.Checked = True
+        cPtr = Pixels_Vector_Open()
+        advice = ""
+        desc = "Create the list of pixels in a RedMin Cell"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.drawRect <> New cv.Rect Then src = src(task.drawRect)
+        Dim cppData(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+        Dim classCount = Pixels_Vector_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
+        handleSrc.Free()
+
+        If classCount = 0 Then Exit Sub
+        Dim pixelData = New cv.Mat(classCount, 1, cv.MatType.CV_8UC3, Pixels_Vector_Pixels(cPtr))
+        setTrueText(CStr(classCount) + " unique BGR pixels were found in the src." + vbCrLf +
+                    "Or " + Format(classCount / src.Total, "0%") + " of the input.")
+    End Sub
+    Public Sub Close()
+        Pixels_Vector_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Pixel_Vectors : Inherits VB_Algorithm
+    Public redC As New RedCloud_Basics
+    Dim hVector As New Hist3Dcolor_Vector
+    Public pixelVector As New List(Of Single())
+    Public redCells As New List(Of rcData)
+    Public Sub New()
+        labels = {"", "", "RedCloud_Basics output", ""}
+        desc = "Create a vector for each cell's 3D histogram."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(3)
+
+        Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
+        pixelVector.Clear()
+        For Each cell In redC.redCells
+            hVector.inputMask = cell.mask
+            hVector.Run(src(cell.rect))
+            pixelVector.Add(hVector.histArray)
+        Next
+        redCells = redC.redCells
+
+        setTrueText("3D color histograms were created for " + CStr(pixelVector.Count) + " cells", 3)
+    End Sub
+End Class

@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Imports System.Text
 
-Module CPP_Externs
+Module VB_Externs
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function SemiGlobalMatching_Open(rows As Integer, cols As Integer, disparityRange As Integer) As IntPtr
     End Function
@@ -1006,16 +1006,16 @@ Module CPP_Externs
 
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedMin_FindPixels_Open() As IntPtr
+    Public Function Pixels_Vector_Open() As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub RedMin_FindPixels_Close(cPtr As IntPtr)
+    Public Sub Pixels_Vector_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedMin_FindPixels_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As Integer
+    Public Function Pixels_Vector_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As Integer
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedMin_FindPixels_Pixels(cPtr As IntPtr) As IntPtr
+    Public Function Pixels_Vector_Pixels(cPtr As IntPtr) As IntPtr
     End Function
 
 

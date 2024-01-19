@@ -1,5 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp.Flann
 Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public lastCells As New List(Of rcData)
@@ -306,42 +307,6 @@ Public Class RedCloud_OnlyCoreToo : Inherits VB_Algorithm
         labels = redC.labels
     End Sub
 End Class
-
-
-
-
-
-
-Public Class RedCloud_Motion : Inherits VB_Algorithm
-    Public redC As New RedCloud_Basics
-    Dim diff As New Diff_Basics
-    Public motionList As New List(Of Integer)
-    Public Sub New()
-        gOptions.PixelDiffThreshold.Value = 9
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Use absDiff to build a mask of cells that changed."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        diff.Run(src)
-
-        redC.Run(src)
-        dst2 = redC.dst2
-
-        Dim minPixels = gOptions.minPixelsSlider.Value
-        Dim rect As New cv.Rect
-        For Each rc In redC.redCells
-            Dim tmp As cv.Mat = rc.mask And diff.dst3(rc.rect)
-            If tmp.CountNonZero > minPixels And rc.index > 0 Then
-                If rect.Width = 0 Then rect = rc.motionRect Else rect = rect.Union(rc.motionRect)
-            End If
-        Next
-
-        dst3.SetTo(0)
-        If rect.Width > 0 Then dst3(rect).SetTo(255)
-    End Sub
-End Class
-
-
 
 
 
@@ -1051,89 +1016,6 @@ Public Class RedCloud_NoDepth : Inherits VB_Algorithm
         Next
     End Sub
 End Class
-
-
-
-
-
-
-Public Class RedCloud_StructuredH : Inherits VB_Algorithm
-    Dim motion As New RedCloud_Motion
-    Dim transform As New Structured_TransformH
-    Dim topView As New Histogram2D_Top
-    Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
-        desc = "Display the RedCloud cells found with a horizontal slice through the cellMap."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim sliceMask = transform.createSliceMaskH()
-        dst0 = src
-
-        motion.Run(sliceMask.Clone)
-
-        If heartBeat() Then dst1.SetTo(0)
-        dst1.SetTo(cv.Scalar.White, sliceMask)
-        labels = motion.labels
-
-        dst2.SetTo(0)
-        For Each index In motion.motionList
-            Dim rc As rcData = motion.redC.redCells(index)
-            vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
-        Next
-
-        Dim pc As New cv.Mat(task.pointCloud.Size, cv.MatType.CV_32FC3, 0)
-        task.pointCloud.CopyTo(pc, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        topView.Run(pc)
-        dst3 = topView.dst2
-
-        dst2.SetTo(cv.Scalar.White, sliceMask)
-        dst0.SetTo(cv.Scalar.White, sliceMask)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class RedCloud_StructuredV : Inherits VB_Algorithm
-    Dim motion As New RedCloud_Motion
-    Dim transform As New Structured_TransformV
-    Dim sideView As New Histogram2D_Side
-    Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
-        desc = "Display the RedCloud cells found with a vertical slice through the cellMap."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim sliceMask = transform.createSliceMaskV()
-        dst0 = src
-
-        motion.Run(sliceMask.Clone)
-
-        If heartBeat() Then dst1.SetTo(0)
-        dst1.SetTo(cv.Scalar.White, sliceMask)
-        labels = motion.labels
-        setTrueText("Move mouse in image to see impact.", 3)
-
-        dst2.SetTo(0)
-        For Each index In motion.motionList
-            Dim rc As rcData = motion.redC.redCells(index)
-            vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
-        Next
-
-        Dim pc As New cv.Mat(task.pointCloud.Size, cv.MatType.CV_32FC3, 0)
-        task.pointCloud.CopyTo(pc, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        sideView.Run(pc)
-        dst3 = sideView.dst2
-
-        dst2.SetTo(cv.Scalar.White, sliceMask)
-        dst0.SetTo(cv.Scalar.White, sliceMask)
-    End Sub
-End Class
-
-
 
 
 
@@ -2052,69 +1934,6 @@ End Class
 
 
 
-Public Class RedCloud_BasicsMotion : Inherits VB_Algorithm
-    Public redCore As New RedCloud_CPP
-    Public redCells As New List(Of rcData)
-    Public rMotion As New RedMin_Motion
-    Dim lastColors = dst3.Clone
-    Dim lastMap As cv.Mat = dst2.Clone
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels = {"", "Mask of active RedMin cells", "CV_8U representation of redCells", ""}
-        desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redCore.Run(src)
-
-        rMotion.sortedCells = redCore.sortedCells
-        rMotion.Run(task.color.Clone)
-
-        Dim lastCells As New List(Of rcData)(redCells)
-
-        redCells.Clear()
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        Dim usedColors = New List(Of cv.Vec3b)({black})
-        Dim motionCount As Integer
-        For Each cell In rMotion.redCells
-            Dim index = lastMap.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X)
-            If cell.motionFlag = False Then
-                If index > 0 And index < lastCells.Count Then cell = lastCells(index - 1)
-            Else
-                motionCount += 1
-            End If
-
-            If index > 0 And index < lastCells.Count Then
-                cell.color = lastColors.Get(Of cv.Vec3b)(cell.maxDist.Y, cell.maxDist.X)
-            End If
-            If usedColors.Contains(cell.color) Then cell.color = randomCellColor()
-            usedColors.Add(cell.color)
-
-            If dst2.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X) = 0 Then
-                cell.index = redCells.Count + 1
-                redCells.Add(cell)
-                dst2(cell.rect).SetTo(cell.index, cell.mask)
-                dst3(cell.rect).SetTo(cell.color, cell.mask)
-
-                setTrueText(CStr(cell.index), cell.maxDist, 2)
-                setTrueText(CStr(cell.index), cell.maxDist, 3)
-            End If
-        Next
-
-        labels(3) = "There were " + CStr(redCells.Count) + " collected cells and " + CStr(motionCount) +
-                    " cells removed because of motion.  "
-
-        lastColors = dst3.Clone
-        lastMap = dst2.Clone
-        If redCells.Count > 0 Then dst1 = vbPalette(lastMap * 255 / redCells.Count)
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class RedCloud_OnlyColorHist3D : Inherits VB_Algorithm
@@ -2227,5 +2046,311 @@ Public Class RedCloud_Combine2Runs : Inherits VB_Algorithm
         redC.cellMap.CopyTo(cellmap, task.depthMask)
 
         setSelectedCell(redC.redCells, redC.cellMap)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_Gaps : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim frames As New History_Basics
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        advice = ""
+        desc = "Find the gaps that are different in the RedCloud_Basics results."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(3)
+
+        frames.Run(redC.cellMap.InRange(0, 0))
+        dst3 = frames.dst2
+
+        If redC.redCells.Count > 0 Then
+            dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
+        End If
+
+        If redC.redCells.Count > 0 Then
+            Dim rc = redC.redCells(0) ' index can now be zero.
+            dst3(rc.rect).SetTo(0, rc.mask)
+        End If
+        Dim count = dst3.CountNonZero
+        labels(3) = "Unclassified pixel count = " + CStr(count) + " or " + Format(count / src.Total, "0%")
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_SizeOrder : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        redOptions.UseColor.Checked = True
+        advice = "Use the goptions 'DebugSlider' to select which cell is isolated."
+        gOptions.DebugSlider.Value = 0
+        desc = "Select blobs by size using the DebugSlider in the global options"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        setTrueText("Use the goptions 'DebugSlider' to select cells by size." + vbCrLf + "Size order changes frequently.", 3)
+        redC.Run(src)
+        dst2 = redC.dst3
+        labels(2) = redC.labels(3)
+
+        Dim index = gOptions.DebugSlider.Value
+        If index < redC.redCells.Count Then
+            dst3.SetTo(0)
+            Dim cell = redC.redCells(index)
+            dst3(cell.rect).SetTo(cell.color, cell.mask)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_StructuredH : Inherits VB_Algorithm
+    Dim motion As New RedCloud_MotionBGsubtract
+    Dim transform As New Structured_TransformH
+    Dim topView As New Histogram2D_Top
+    Public Sub New()
+        If standalone Then gOptions.displayDst0.Checked = True
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Display the RedCloud cells found with a horizontal slice through the cellMap."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim sliceMask = transform.createSliceMaskH()
+        dst0 = src
+
+        motion.Run(sliceMask.Clone)
+
+        If heartBeat() Then dst1.SetTo(0)
+        dst1.SetTo(cv.Scalar.White, sliceMask)
+        labels = motion.labels
+
+        dst2.SetTo(0)
+        For Each rc In motion.redCells
+            If rc.motionFlag Then vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
+        Next
+
+        Dim pc As New cv.Mat(task.pointCloud.Size, cv.MatType.CV_32FC3, 0)
+        task.pointCloud.CopyTo(pc, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        topView.Run(pc)
+        dst3 = topView.dst2
+
+        dst2.SetTo(cv.Scalar.White, sliceMask)
+        dst0.SetTo(cv.Scalar.White, sliceMask)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_StructuredV : Inherits VB_Algorithm
+    Dim motion As New RedCloud_MotionBGsubtract
+    Dim transform As New Structured_TransformV
+    Dim sideView As New Histogram2D_Side
+    Public Sub New()
+        If standalone Then gOptions.displayDst0.Checked = True
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Display the RedCloud cells found with a vertical slice through the cellMap."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim sliceMask = transform.createSliceMaskV()
+        dst0 = src
+
+        motion.Run(sliceMask.Clone)
+
+        If heartBeat() Then dst1.SetTo(0)
+        dst1.SetTo(cv.Scalar.White, sliceMask)
+        labels = motion.labels
+        setTrueText("Move mouse in image to see impact.", 3)
+
+        dst2.SetTo(0)
+        For Each rc In motion.redCells
+            If rc.motionFlag Then vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
+        Next
+
+        Dim pc As New cv.Mat(task.pointCloud.Size, cv.MatType.CV_32FC3, 0)
+        task.pointCloud.CopyTo(pc, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        sideView.Run(pc)
+        dst3 = sideView.dst2
+
+        dst2.SetTo(cv.Scalar.White, sliceMask)
+        dst0.SetTo(cv.Scalar.White, sliceMask)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_MotionBasics : Inherits VB_Algorithm
+    Public redCore As New RedCloud_CPP
+    Public redCells As New List(Of rcData)
+    Public rMotion As New RedCloud_MotionBGsubtract
+    Dim lastColors = dst3.Clone
+    Dim lastMap As cv.Mat = dst2.Clone
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels = {"", "Mask of active RedMin cells", "CV_8U representation of redCells", ""}
+        desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redCore.Run(src)
+
+        rMotion.sortedCells = redCore.sortedCells
+        rMotion.Run(task.color.Clone)
+
+        Dim lastCells As New List(Of rcData)(redCells)
+
+        redCells.Clear()
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        Dim usedColors = New List(Of cv.Vec3b)({black})
+        Dim motionCount As Integer
+        For Each cell In rMotion.redCells
+            Dim index = lastMap.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X)
+            If cell.motionFlag = False Then
+                If index > 0 And index < lastCells.Count Then cell = lastCells(index - 1)
+            Else
+                motionCount += 1
+            End If
+
+            If index > 0 And index < lastCells.Count Then
+                cell.color = lastColors.Get(Of cv.Vec3b)(cell.maxDist.Y, cell.maxDist.X)
+            End If
+            If usedColors.Contains(cell.color) Then cell.color = randomCellColor()
+            usedColors.Add(cell.color)
+
+            If dst2.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X) = 0 Then
+                cell.index = redCells.Count + 1
+                redCells.Add(cell)
+                dst2(cell.rect).SetTo(cell.index, cell.mask)
+                dst3(cell.rect).SetTo(cell.color, cell.mask)
+
+                setTrueText(CStr(cell.index), cell.maxDist, 2)
+                setTrueText(CStr(cell.index), cell.maxDist, 3)
+            End If
+        Next
+
+        labels(3) = "There were " + CStr(redCells.Count) + " collected cells and " + CStr(motionCount) +
+                            " cells removed because of motion.  "
+
+        lastColors = dst3.Clone
+        lastMap = dst2.Clone
+        If redCells.Count > 0 Then dst1 = vbPalette(lastMap * 255 / redCells.Count)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_MotionBGsubtract : Inherits VB_Algorithm
+    Public motion As New Motion_Basics
+    Public redCells As New List(Of rcData)
+    Public sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        gOptions.PixelDiffThreshold.Value = 25
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Use absDiff to build a mask of cells that changed."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        motion.Run(src)
+        dst3 = motion.dst2
+
+        Static redC As New RedCloud_Basics
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(3)
+
+        redCells.Clear()
+        dst1.SetTo(0)
+        For Each rc In redc.redCells
+            Dim tmp As cv.Mat = rc.mask And motion.dst2(rc.rect)
+            If tmp.CountNonZero Then
+                dst1(rc.rect).SetTo(rc.color, rc.mask)
+                rc.motionFlag = True
+            End If
+            redCells.Add(rc)
+        Next
+
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCloud_MotionDiff : Inherits VB_Algorithm
+    Public redC As New RedCloud_Basics
+    Dim diff As New Diff_Basics
+    Public motionList As New List(Of Integer)
+    Public Sub New()
+        gOptions.PixelDiffThreshold.Value = 9
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Use absDiff to build a mask of cells that changed."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        diff.Run(src)
+
+        redC.Run(src)
+        dst2 = redC.dst2
+
+        Dim minPixels = gOptions.minPixelsSlider.Value
+        Dim rect As New cv.Rect
+        For Each rc In redC.redCells
+            Dim tmp As cv.Mat = rc.mask And diff.dst3(rc.rect)
+            If tmp.CountNonZero > minPixels And rc.index > 0 Then
+                If rect.Width = 0 Then rect = rc.motionRect Else rect = rect.Union(rc.motionRect)
+            End If
+        Next
+
+        dst3.SetTo(0)
+        If rect.Width > 0 Then dst3(rect).SetTo(255)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_ContourVsFeatureLess : Inherits VB_Algorithm
+    Dim redCore As New RedCloud_CPP
+    Dim contour As New Contour_WholeImage
+    Dim fLess As New FeatureLess_Basics
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        labels = {"", "Contour_WholeImage Input", "RedCloud_CPP - toggling between Contour and Featureless inputs",
+                  "FeatureLess_Basics Input"}
+        desc = "Compare Contour_WholeImage and FeatureLess_Basics as input to RedCloud_CPP"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static useContours = findRadio("Use Contour_WholeImage")
+
+        contour.Run(src)
+        dst1 = contour.dst2
+
+        fLess.Run(src)
+        dst3 = fLess.dst2
+
+        If task.toggleOn Then redCore.Run(dst3) Else redCore.Run(dst1)
+        dst2 = redCore.dst3
     End Sub
 End Class
