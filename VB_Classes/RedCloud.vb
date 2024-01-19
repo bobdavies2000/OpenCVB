@@ -46,7 +46,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
 
         rc.maxDStable = rc.maxDist ' assume it has to use the latest.
         rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-        If rc.indexLast < lastCells.Count And rc.indexLast <> task.redOther Then
+        If rc.indexLast < lastCells.Count Then
             lrc = lastCells(rc.indexLast)
             rc.motionRect = rc.rect.Union(lrc.rect)
             rc.color = lrc.color
@@ -114,7 +114,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         task.rcMatchMax = 0
         Dim rc As rcData
         Dim minPixels = gOptions.minPixelsSlider.Value
-        Dim newCells As New List(Of rcData)({New rcData})
+        Dim newCells As New List(Of rcData)
         For Each rp In combine.combinedCells
             rc = matchPreviousCell(rp)
             rc.index = newCells.Count

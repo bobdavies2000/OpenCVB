@@ -152,7 +152,8 @@ Public Class Foreground_RedForeground : Inherits VB_Algorithm
         If redC.redCells.Count > 0 Then
             dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
         End If
-        dst2.SetTo(0, fore.dst3)
+        ' dst2.SetTo(0, fore.dst3)
+        If standalone Then identifyCells(redC.redCells)
     End Sub
 End Class
 
