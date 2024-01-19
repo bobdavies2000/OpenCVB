@@ -14,7 +14,7 @@ Public Class OptionsRedCloud
     Public channelIndex As Integer
     Public rangesBGR() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 256), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
     Public rangesHSV() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
-    Dim rangesCloud() As cv.Rangef
+    Public rangesCloud() As cv.Rangef
     Public ranges() As cv.Rangef
     Public channelCount As Integer
     Public histBinList() As Integer
@@ -113,8 +113,9 @@ Public Class OptionsRedCloud
         Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
         Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
         Dim rz = New cv.Vec2f(0, task.maxZmeters)
-        channelCount = 1
+        rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
 
+        channelCount = 1
         channelIndex = 0
         Select Case redOptions.PCReduction
             Case 0 ' "X Reduction"

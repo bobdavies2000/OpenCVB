@@ -130,7 +130,7 @@ End Class
 
 Public Class Foreground_RedForeground : Inherits VB_Algorithm
     Dim fore As New Foreground_Hist3D
-    Public rMin As New RedCloud_OnlyColorAlt
+    Public redC As New RedCloud_Basics
     Dim hist3D As New Hist3D_DepthWithMask
     Public redCells As New List(Of rcData)
     Public Sub New()
@@ -144,14 +144,15 @@ Public Class Foreground_RedForeground : Inherits VB_Algorithm
         hist3D.depthMask = fore.dst2 Or task.noDepthMask
         hist3D.Run(src)
 
-        rMin.redCore.inputMask = Not hist3D.depthMask
-        rMin.Run(hist3D.dst2)
+        redC.combine.redCore.inputMask = Not hist3D.depthMask
+        redC.Run(hist3D.dst2)
 
-        dst2 = rMin.dst3.Clone
-        labels(2) = rMin.labels(3)
-        If rMin.redCells.Count > 0 Then
+        dst2 = redC.dst2.Clone
+        labels(2) = redC.labels(3)
+        If redC.redCells.Count > 0 Then
             dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
         End If
+        dst2.SetTo(0, fore.dst3)
     End Sub
 End Class
 
@@ -161,9 +162,8 @@ End Class
 
 Public Class Foreground_RedBackground : Inherits VB_Algorithm
     Dim fore As New Foreground_Hist3D
-    Public rMin As New RedCloud_OnlyColorAlt
+    Public redC As New RedCloud_Basics
     Dim hist3D As New Hist3D_DepthWithMask
-    Public redCells As New List(Of rcData)
     Public Sub New()
         redOptions.UseColor.Checked = True
         advice = "redOptions '3D Histogram Bins' " + vbCrLf + "redOptions other 'Histogram 3D Options'"
@@ -175,16 +175,17 @@ Public Class Foreground_RedBackground : Inherits VB_Algorithm
         hist3D.depthMask = fore.dst3 Or task.noDepthMask
         hist3D.Run(src)
 
-        rMin.redCore.inputMask = Not hist3D.depthMask
-        rMin.Run(hist3D.dst2)
+        redC.combine.redCore.inputMask = Not hist3D.depthMask
+        redC.Run(hist3D.dst2)
 
-        dst2 = rMin.dst3.Clone
+        dst2 = redC.dst2.Clone
         dst2.SetTo(0, fore.dst2)
 
-        labels(2) = rMin.labels(3)
-        If rMin.redCells.Count > 0 Then
+        labels(2) = redC.labels(3)
+        If redC.redCells.Count > 0 Then
             dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
         End If
+        If standalone Then identifyCells(redC.redCells)
     End Sub
 End Class
 
@@ -207,7 +208,7 @@ Public Class Foreground_RedMin : Inherits VB_Algorithm
         back.Run(src)
         dst3 = back.dst2
         labels(3) = back.labels(2)
-        If fore.rMin.redCells.Count > 0 Then
+        If fore.redC.redCells.Count > 0 Then
             dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
         End If
     End Sub

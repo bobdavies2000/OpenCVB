@@ -6,7 +6,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public overlappingCells As New List(Of Integer)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
 
-    Dim combine As New RedCloud_Combine
+    Public combine As New RedCloud_Combine
 
     Dim lastCellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim usedColors As New List(Of cv.Vec3b)
@@ -1811,7 +1811,7 @@ End Class
 Public Class RedCloud_Combine : Inherits VB_Algorithm
     Dim color As New Color_Basics
     Public guided As New GuidedBP_Depth
-    Dim redCore As New RedCloud_CPP
+    Public redCore As New RedCloud_CPP
     Public combinedCells As New List(Of rcData)
     Public Sub New()
         desc = "Combined the color and cloud as indicated in the RedOptions panel."
