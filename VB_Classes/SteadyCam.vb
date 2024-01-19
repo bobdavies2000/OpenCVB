@@ -6,7 +6,7 @@ Public Class SteadyCam_Basics : Inherits VB_Algorithm
     Public Sub New()
         flow.dst = RESULT_DST1
         If standalone Then gOptions.displayDst1.Checked = True
-        findSlider("Sample Size").Value = 100
+        findSlider("Feature Sample Size").Value = 100
         labels(3) = "Plot of fraction of points that matched - move camera to see what happens."
         desc = "Find the Feature_Points and determine if most are steady.  If so, the camera is not moving."
     End Sub

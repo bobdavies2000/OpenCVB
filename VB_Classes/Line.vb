@@ -746,7 +746,7 @@ Public Class Line_IMUVerticals : Inherits VB_Algorithm
         maxAngleX = angleXSlider.Value
         maxAngleZ = angleZSlider.Value
         Dim radius = CInt(cellSlider.Value / 2)
-        Dim rSize = options.rSize
+        Dim rSize = options.fOptions.matchCellSize
 
         lines.subsetRect = New cv.Rect(rSize * 3, rSize * 3, src.Width - rSize * 6, src.Height - rSize * 6)
         lines.Run(src.Clone)
@@ -833,7 +833,7 @@ Public Class Line_IMUVerts : Inherits VB_Algorithm
             vert.tc1 = match.tCells(0)
             vert.tc2 = match.tCells(1)
 
-            Dim threshold = verts.options.correlationThreshold
+            Dim threshold = verts.options.fOptions.correlationThreshold
             If vert.tc1.correlation >= threshold And vert.tc2.correlation >= threshold Then
                 lines2.Add(vert.tc1.center)
                 lines2.Add(vert.tc2.center)

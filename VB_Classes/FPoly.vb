@@ -8,7 +8,7 @@ Public Class FPoly_Basics : Inherits VB_Algorithm
     Dim topFeatures As New FPoly_TopFeatures
     Public sides As New FPoly_Sides
     Public Sub New()
-        findSlider("Sample Size").Value = 30
+        findSlider("Feature Sample Size").Value = 30
         If dst2.Width >= 640 Then findSlider("Resync if feature moves > X pixels").Value = 15
         If standalone Then gOptions.displayDst1.Checked = True
         labels = {"", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
@@ -245,7 +245,7 @@ Public Class FPoly_BasicsOriginal : Inherits VB_Algorithm
     Public center As Object
     Public Sub New()
         center = New FPoly_Center ' FPoly_PerpendicularsTest can be used to test the perpendicular method of finding the rotate center.
-        findSlider("Sample Size").Value = 30
+        findSlider("Feature Sample Size").Value = 30
         If dst2.Width >= 640 Then findSlider("Resync if feature moves > X pixels").Value = 15
         If standalone Then gOptions.displayDst1.Checked = True
         labels = {"", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
@@ -1313,7 +1313,7 @@ Public Class FPoly_Core : Inherits VB_Algorithm
             sliders.setupTrackBar("Anchor point max movement", 1, 10, 5)
         End If
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F, 0)
-        findSlider("Sample Size").Value = 20
+        findSlider("Feature Sample Size").Value = 20
         labels = {"", "Distance change from previous frame", "", "Feature Grid with anchor"}
         desc = "Feature Grid: compute distances between good features from frame to frame"
     End Sub

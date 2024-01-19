@@ -67,13 +67,13 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
             Exit Sub ' nothing found?  Pretty extreme but can happen in darkness.
         End If
 
-        Dim correlationmat As New cv.Mat, rSize = feat.good.options.rSize, roi = feat.good.options.roi
+        Dim correlationmat As New cv.Mat, rSize = feat.good.options.fOptions.matchCellSize, roi = feat.good.options.roi
         Dim rightIndex As Integer = 0, rectL = roi, rectR = roi, lastKey = feat.leftCorners.ElementAt(0).Key
         Dim correlations As New List(Of Single)
         mpList.Clear()
         corrList.Clear()
         vecList.Clear()
-        Dim minCorr = feat.good.options.correlationThreshold
+        Dim minCorr = feat.good.options.fOptions.correlationThreshold
         For Each entry In feat.leftCorners
             Dim p1 = entry.Value
             If entry.Key <> lastKey Then rightIndex += correlations.Count
@@ -148,7 +148,7 @@ Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
         leftCorners.Clear()
         rightCorners.Clear()
         Dim rowList As New List(Of Integer)
-        Dim rSize = good.options.rSize
+        Dim rSize = good.options.fOptions.matchCellSize
         For Each entry In tmpLeft
             Dim row = entry.Key
             Dim index = ptRight.IndexOf(row)

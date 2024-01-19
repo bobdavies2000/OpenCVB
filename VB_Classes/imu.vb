@@ -356,6 +356,10 @@ End Class
 Public Class IMU_VerticalVerify : Inherits VB_Algorithm
     Public gCells As New List(Of gravityLine)
     Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Minimum Arc-Y threshold angle (degrees)", 70, 90, 80)
+        End If
+
         labels = {"", "", "Highlighted vertical lines", "Line details"}
         desc = "Use the Y-Arc to confirm which vertical lines are valid"
     End Sub

@@ -8,7 +8,7 @@ Public Class Feature_Basics : Inherits VB_Algorithm
     Public options As New Options_Features
     Public Sub New()
         Brisk = cv.BRISK.Create()
-        findSlider("Sample Size").Value = 400
+        findSlider("Feature Sample Size").Value = 400
         advice = "Use 'Options_Features' to control output."
         desc = "Find good features to track in a BGR image."
     End Sub
@@ -18,13 +18,14 @@ Public Class Feature_Basics : Inherits VB_Algorithm
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         featurePoints.Clear()
+        Dim sampleSize = options.fOptions.featurePoints
         If options.useBRISK Then
             Dim keyPoints = Brisk.Detect(src).ToList
             For Each kp In keyPoints
                 If kp.Size >= options.minDistance Then featurePoints.Add(New cv.Point2f(CInt(kp.Pt.X), CInt(kp.Pt.Y)))
             Next
         Else
-            featurePoints = cv.Cv2.GoodFeaturesToTrack(src, options.sampleSize, options.quality, options.minDistance, Nothing, 7, True, 3).ToList
+            featurePoints = cv.Cv2.GoodFeaturesToTrack(src, sampleSize, options.quality, options.minDistance, Nothing, 7, True, 3).ToList
         End If
 
         Dim color = If(dst2.Channels = 3, cv.Scalar.Yellow, cv.Scalar.White)
@@ -54,7 +55,8 @@ Public Class Feature_BasicsOld : Inherits VB_Algorithm
         dst2 = src.Clone
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim features = cv.Cv2.GoodFeaturesToTrack(src, options.sampleSize, options.quality, options.minDistance, Nothing, 7, True, 3)
+        Dim sampleSize = options.fOptions.featurePoints
+        Dim features = cv.Cv2.GoodFeaturesToTrack(src, sampleSize, options.quality, options.minDistance, Nothing, 7, True, 3)
 
         featurePoints.Clear()
         For i = 0 To features.Length - 1
@@ -347,12 +349,12 @@ Public Class Feature_Line : Inherits VB_Algorithm
         Dim distanceThreshold = 50 ' pixels - arbitrary but realistically needs some value
         Dim linePercentThreshold = 0.7 ' if less than 70% of the pixels in the line are edges, then find a better line.  Again, arbitrary but realistic.
 
-        Dim threshold = options.correlationThreshold
+        Dim threshold = options.fOptions.correlationThreshold
         Dim correlationTest = tcells(0).correlation <= threshold Or tcells(1).correlation <= threshold
         lineDisp.distance = tcells(0).center.DistanceTo(tcells(1).center)
         If task.optionsChanged Or correlationTest Or lineDisp.maskCount / lineDisp.distance < linePercentThreshold Or lineDisp.distance < distanceThreshold Then
             lineDisp.myHighLightColor = If(lineDisp.myHighLightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
-            Dim rSize = options.rSize
+            Dim rSize = options.fOptions.matchCellSize
             lines.subsetRect = New cv.Rect(rSize * 3, rSize * 3, src.Width - rSize * 6, src.Height - rSize * 6)
             lines.Run(src.Clone)
 
@@ -427,8 +429,8 @@ Public Class Feature_LinesVH : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        gLines.lines.subsetRect = New cv.Rect(options.rSize * 3, options.rSize * 3, src.Width - options.rSize * 6,
-                                                                                    src.Height - options.rSize * 6)
+        Dim rsize = options.fOptions.matchCellSize
+        gLines.lines.subsetRect = New cv.Rect(rsize * 3, rsize * 3, src.Width - rsize * 6, src.Height - rsize * 6)
         gLines.Run(src)
 
         Static vertRadio = findRadio("Vertical lines")
@@ -455,7 +457,7 @@ Public Class Feature_LinesVH : Inherits VB_Algorithm
             match.tCells.Add(gc.tc2)
 
             match.Run(src)
-            Dim threshold = options.correlationThreshold
+            Dim threshold = options.fOptions.correlationThreshold
             If match.tCells(0).correlation >= threshold And match.tCells(1).correlation >= threshold Then
                 gc.tc1 = match.tCells(0)
                 gc.tc2 = match.tCells(1)
@@ -642,9 +644,9 @@ End Class
 Public Class Feature_Longest : Inherits VB_Algorithm
     Dim glines As New Line_GCloud
     Public knn As New KNN_ClosestTracker
-    Dim options As New Options_Features
+    Public options As New Options_Features
     Public gline As gravityLine
-    Dim match As New Match_Basics
+    Public match As New Match_Basics
     Public Sub New()
         desc = "Find and track the longest line in the BGR image with a lightweight KNN."
     End Sub
@@ -663,7 +665,7 @@ Public Class Feature_Longest : Inherits VB_Algorithm
         Dim rect = validateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
         match.template = src(rect).Clone
         match.Run(src)
-        If match.correlation >= options.correlationThreshold Then
+        If match.correlation >= options.fOptions.correlationThreshold Then
             dst3 = match.dst0.Resize(dst3.Size)
             dst2.Line(p1, p2, myHighLightColor, task.lineWidth, task.lineType)
             dst2.Circle(p1, task.dotSize, task.highlightColor, -1, task.lineType)
@@ -678,35 +680,6 @@ Public Class Feature_Longest : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class Feature_Points : Inherits VB_Algorithm
-    Public good As New Feature_Basics
-    Public Sub New()
-        labels(3) = "Features found in the image"
-        desc = "Use the sorted list of Delaunay regions to find the top X points to track."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static monitorSlider = findSlider("Sample Size")
-        Dim monitorCount = monitorSlider.Value
-
-        good.Run(src)
-        dst2 = good.dst2
-        dst3.SetTo(0)
-
-        Dim ptCount = Math.Min(monitorCount, good.featurePoints.Count)
-        For Each pt In good.featurePoints
-            dst2.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
-            dst3.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
-        Next
-        labels(2) = CStr(ptCount) + " targets were present with " + CStr(monitorCount) + " requested."
-    End Sub
-End Class
 
 
 
@@ -729,8 +702,8 @@ Public Class Feature_tCellTracker : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        Dim monitorCount = options.sampleSize
-        Dim minCorrelation = options.correlationThreshold
+        Dim monitorCount = options.fOptions.featurePoints
+        Dim minCorrelation = options.fOptions.correlationThreshold
 
         strOut = ""
         If tcells.Count < tracker.good.featurePoints.Count / 3 Or tcells.Count < 2 Or task.optionsChanged Then
@@ -790,8 +763,8 @@ Public Class Feature_PointTracker : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        Dim minCorrelation = options.correlationThreshold
-        Dim rSize = options.rSize
+        Dim minCorrelation = options.fOptions.correlationThreshold
+        Dim rSize = options.fOptions.matchCellSize
         Dim radius = rSize / 2
 
         strOut = ""
@@ -1195,7 +1168,7 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
         Dim minPoints = minSlider.Value
 
         good.Run(src)
-        Dim rSize = good.good.options.rSize
+        Dim rSize = good.good.options.fOptions.matchCellSize
 
         src.CopyTo(dst2)
         Dim nextTemplates As New List(Of cv.Mat)
@@ -1250,7 +1223,7 @@ Public Class Feature_Grid : Inherits VB_Algorithm
     Public corners As New List(Of cv.Point2f)
     Public options As New Options_Features
     Public Sub New()
-        findSlider("Sample Size").Value = 1
+        findSlider("Feature Sample Size").Value = 1
         desc = "Find good features to track in each roi of the task.gridList"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1261,7 +1234,8 @@ Public Class Feature_Grid : Inherits VB_Algorithm
         corners.Clear()
 
         For Each roi In task.gridList
-            Dim features = cv.Cv2.GoodFeaturesToTrack(src(roi), options.sampleSize, options.quality, options.minDistance, Nothing, 7, True, 3)
+            Dim sampleSize = options.fOptions.featurePoints
+            Dim features = cv.Cv2.GoodFeaturesToTrack(src(roi), sampleSize, options.quality, options.minDistance, Nothing, 7, True, 3)
             For Each pt In features
                 corners.Add(New cv.Point2f(roi.X + pt.X, roi.Y + pt.Y))
             Next
@@ -1353,7 +1327,7 @@ Public Class Feature_TraceKNN : Inherits VB_Algorithm
     Dim good As New Feature_Basics
     Public mpList As New List(Of linePoints)
     Public Sub New()
-        findSlider("Sample Size").Value = 200
+        findSlider("Feature Sample Size").Value = 200
         findSlider("Distance threshold (pixels)").Value = 20
         desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."
     End Sub
@@ -1517,7 +1491,7 @@ Public Class Feature_History : Inherits VB_Algorithm
     Public corners As New List(Of cv.Point2f)
     Public good As New Feature_Basics
     Public Sub New()
-        findSlider("Sample Size").Value = 200
+        findSlider("Feature Sample Size").Value = 200
         findSlider("Min Distance to next").Value = 1
         desc = "Find good features across multiple frames."
     End Sub
@@ -1712,5 +1686,31 @@ Public Class Feature_StableGood : Inherits VB_Algorithm
         Next
         labels(2) = CStr(stablePoints.Count) + " stable points were present at least " +
                     CStr(CInt(stable.threshold)) + " generations"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Feature_Points : Inherits VB_Algorithm
+    Public good As New Feature_Basics
+    Public Sub New()
+        labels(3) = "Features found in the image"
+        desc = "Use the sorted list of Delaunay regions to find the top X points to track."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        good.Run(src)
+        dst2 = good.dst2
+        dst3.SetTo(0)
+
+        For Each pt In good.featurePoints
+            dst2.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
+            dst3.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
+        Next
+        labels(2) = CStr(good.featurePoints.Count) + " targets were present with " + CStr(good.options.fOptions.featurePoints) + " requested."
     End Sub
 End Class

@@ -59,7 +59,7 @@ End Class
 Public Class LeftRight_GoodFeatures : Inherits VB_Algorithm
     Public good As New Feature_Basics
     Public Sub New()
-        findSlider("Sample Size").Value = 200
+        findSlider("Feature Sample Size").Value = 200
         findSlider("Min Distance to next").Value = 10
         desc = "Find GoodFeatures in the left and right depalettized infrared images"
         labels(2) = "Left Image"

@@ -556,7 +556,7 @@ Public Class KNN_TrackMean : Inherits VB_Algorithm
     Public shiftY As Single
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Average distance multiplier", 1, 20, 10)
-        findSlider("Sample Size").Value = 200
+        findSlider("Feature Sample Size").Value = 200
         If standalone Then gOptions.displayDst1.Checked = True
         labels = {"", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion"}
         desc = "Track points with KNN and match the goodFeatures from frame to frame"

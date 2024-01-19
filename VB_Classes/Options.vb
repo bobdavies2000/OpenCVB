@@ -3195,7 +3195,7 @@ End Class
 
 Public Class Options_Sift : Inherits VB_Algorithm
     Public useBFMatcher As Boolean
-    Public pointCount As Integer
+    Public pointCount As Integer = 200
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("Use BF Matcher")
@@ -3203,7 +3203,7 @@ Public Class Options_Sift : Inherits VB_Algorithm
             radio.check(0).Checked = True
         End If
 
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Points to Match", 1, 1000, 200)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Points to Match", 1, 1000, pointCount)
     End Sub
     Public Sub RunVB()
         Static bfRadio = findRadio("Use BF Matcher")
@@ -3222,15 +3222,15 @@ End Class
 
 
 Public Class Options_Erode : Inherits VB_Algorithm
-    Public kernelSize As Integer
-    Public iterations As Integer
+    Public kernelSize As Integer = 3
+    Public iterations As Integer = 1
     Public morphShape As cv.MorphShapes
     Public element As cv.Mat
     Public noshape As Boolean
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Erode Kernel Size", 1, 32, 3)
-            sliders.setupTrackBar("Erode Iterations", 0, 32, 1)
+            sliders.setupTrackBar("Erode Kernel Size", 1, 32, kernelSize)
+            sliders.setupTrackBar("Erode Iterations", 0, 32, iterations)
         End If
 
         If radio.Setup(traceName) Then
@@ -3265,15 +3265,15 @@ End Class
 
 
 Public Class Options_Dilate : Inherits VB_Algorithm
-    Public kernelSize As Integer
-    Public iterations As Integer
+    Public kernelSize As Integer = 3
+    Public iterations As Integer = 1
     Public morphShape As cv.MorphShapes
     Public element As cv.Mat
     Public noshape As Boolean
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Dilate Kernel Size", 1, 32, 3)
-            sliders.setupTrackBar("Dilate Iterations", 0, 32, 1)
+            sliders.setupTrackBar("Dilate Kernel Size", 1, 32, kernelSize)
+            sliders.setupTrackBar("Dilate Iterations", 0, 32, iterations)
         End If
 
         If radio.Setup(traceName) Then
@@ -3311,9 +3311,9 @@ End Class
 
 Public Class Options_KMeans : Inherits VB_Algorithm
     Public kMeansFlag As cv.KMeansFlags
-    Public kMeansK As Integer
+    Public kMeansK As Integer = 5
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("KMeans k", 2, 32, 5)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("KMeans k", 2, 32, kMeansK)
 
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -3346,12 +3346,12 @@ End Class
 
 
 Public Class Options_LUT : Inherits VB_Algorithm
-    Public lutSegments As Integer
+    Public lutSegments As Integer = 10
     Public splits() As Integer
     Public vals() As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Number of LUT Segments", 2, 255, 10)
+            sliders.setupTrackBar("Number of LUT Segments", 2, 255, lutSegments)
             sliders.setupTrackBar("LUT zero through xxx", 1, 255, 65)
             sliders.setupTrackBar("LUT xxx through yyy", 1, 255, 110)
             sliders.setupTrackBar("LUT yyy through zzz", 1, 255, 160)
@@ -3426,12 +3426,12 @@ End Class
 
 
 Public Class Options_CComp : Inherits VB_Algorithm
-    Public light As Integer
-    Public dark As Integer
+    Public light As Integer = 127
+    Public dark As Integer = 50
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Threshold for lighter input", 1, 255, 127)
-            sliders.setupTrackBar("Threshold for darker input", 1, 255, 50)
+            sliders.setupTrackBar("Threshold for lighter input", 1, 255, light)
+            sliders.setupTrackBar("Threshold for darker input", 1, 255, dark)
         End If
 
         desc = "Options for CComp_Both"
@@ -3636,15 +3636,15 @@ Public Class Options_IMU : Inherits VB_Algorithm
     Public rotateX As Integer
     Public rotateY As Integer
     Public rotateZ As Integer
-    Public alpha As Single
-    Public stableThreshold As Single
+    Public alpha As Single = 0.98
+    Public stableThreshold As Single = 0.02
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Rotate pointcloud around X-axis (degrees)", -90, 90, 0)
-            sliders.setupTrackBar("Rotate pointcloud around Y-axis (degrees)", -90, 90, 0)
-            sliders.setupTrackBar("Rotate pointcloud around Z-axis (degrees)", -90, 90, 0)
-            sliders.setupTrackBar("IMU_Basics: Alpha X100", 0, 100, 98)
-            sliders.setupTrackBar("IMU Stability Threshold (radians) X100", 0, 100, 2)
+            sliders.setupTrackBar("Rotate pointcloud around X-axis (degrees)", -90, 90, rotateX)
+            sliders.setupTrackBar("Rotate pointcloud around Y-axis (degrees)", -90, 90, rotateY)
+            sliders.setupTrackBar("Rotate pointcloud around Z-axis (degrees)", -90, 90, rotateZ)
+            sliders.setupTrackBar("IMU_Basics: Alpha X100", 0, 100, alpha * 100)
+            sliders.setupTrackBar("IMU Stability Threshold (radians) X100", 0, 100, stableThreshold * 100)
         End If
     End Sub
     Public Sub RunVB()
@@ -3668,6 +3668,9 @@ End Class
 Public Class Options_FeatureMatch : Inherits VB_Algorithm
     Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
     Public matchText As String = ""
+    Public featurePoints As Integer = 16
+    Public correlationThreshold As Single = 0.9
+    Public matchCellSize As Integer = 10
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("CCoeff")
@@ -3680,9 +3683,9 @@ Public Class Options_FeatureMatch : Inherits VB_Algorithm
         End If
 
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Sample Size", 1, 1000, 16)
-            sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, 90)
-            sliders.setupTrackBar("MatchTemplate Cell Size", 2, 60, If(task.workingRes.Height >= 480, 20, 10))
+            sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
+            sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, correlationThreshold * 100)
+            sliders.setupTrackBar("MatchTemplate Cell Size", 2, 60, If(task.workingRes.Height >= 480, 20, matchCellSize * 2))
         End If
     End Sub
     Public Sub RunVB()
@@ -3695,6 +3698,15 @@ Public Class Options_FeatureMatch : Inherits VB_Algorithm
                 Exit For
             End If
         Next
+
+        Static featureSlider = findSlider("Feature Sample Size")
+        featurePoints = featureSlider.value
+
+        Static corrSlider = findSlider("Feature Correlation Threshold")
+        correlationThreshold = corrSlider.value / 100
+
+        Static cellSlider = findSlider("MatchTemplate Cell Size")
+        matchCellSize = cellSlider.value / 2
     End Sub
 End Class
 
@@ -3708,22 +3720,18 @@ End Class
 
 Public Class Options_Features : Inherits VB_Algorithm
     Public useBRISK As Boolean
-    Public sampleSize As Integer
-    Public quality As Double
-    Public minDistance As Double
-    Public rSize As Integer
-    Public roi As cv.Rect
-    Public correlationThreshold As Single
-    Public distanceThreshold As Integer
+    Public quality As Double = 0.01
+    Public minDistance As Double = 10
+    Dim roi As cv.Rect
+    Public distanceThreshold As Integer = 16
     Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
     Public matchText As String = ""
-    Dim fOptions As New Options_FeatureMatch
+    Public fOptions As New Options_FeatureMatch
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Distance threshold (pixels)", 1, 30, 16)
-            sliders.setupTrackBar("Min Distance to next", 1, 100, 10)
-            sliders.setupTrackBar("Quality Level", 1, 100, 1)
-            sliders.setupTrackBar("Minimum Arc-Y threshold angle (degrees)", 70, 90, 80)
+            sliders.setupTrackBar("Distance threshold (pixels)", 1, 30, distanceThreshold)
+            sliders.setupTrackBar("Min Distance to next", 1, 100, minDistance)
+            sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
         End If
 
         If findfrm(traceName + " Radio Options") Is Nothing Then
@@ -3735,11 +3743,8 @@ Public Class Options_Features : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB()
         Static distanceSlider = findSlider("Distance threshold (pixels)")
-        Static numSlider = findSlider("Sample Size")
         Static qualitySlider = findSlider("Quality Level")
         Static distSlider = findSlider("Min Distance to next")
-        Static cellSlider = findSlider("MatchTemplate Cell Size")
-        Static thresholdSlider = findSlider("Feature Correlation Threshold")
         Static briskRadio = findRadio("Use BRISK")
         useBRISK = briskRadio.checked
 
@@ -3748,13 +3753,10 @@ Public Class Options_Features : Inherits VB_Algorithm
         matchText = fOptions.matchText
 
         If task.optionsChanged Then
-            correlationThreshold = thresholdSlider.Value / 100
             distanceThreshold = distanceSlider.value
-            sampleSize = numSlider.Value
             quality = qualitySlider.Value / 100
             minDistance = distSlider.Value
-            rSize = cellSlider.Value / 2
-            roi = New cv.Rect(0, 0, rSize * 2, rSize * 2)
+            roi = New cv.Rect(0, 0, fOptions.matchCellSize * 2, fOptions.matchCellSize * 2)
         End If
     End Sub
 End Class
