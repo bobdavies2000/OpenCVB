@@ -22,7 +22,6 @@ Imports OpenCvSharp
 Public Class PCA_Basics : Inherits VB_Algorithm
     Dim prep As New PCA_Prep_CPP
     Public pca_analysis As New cv.PCA
-    Public rc As New rcData
     Public runRedCloud As Boolean
     Public Sub New()
         desc = "Find the Principal Component Analysis vector for the 3D points in a RedCloud cell contour."
@@ -60,29 +59,30 @@ Public Class PCA_Basics : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src As cv.Mat)
         If standalone Or runRedCloud Then
-            Static rMin As New RedCloud_OnlyColorAlt
-            rMin.Run(src)
-            dst2 = rMin.dst3
-            labels(2) = rMin.labels(2)
-            setSelectedCell(rMin.redCells, rMin.cellMap)
-            rc = task.rcSelect
+            Static redC As New RedCloud_Basics
+            If firstPass Then redOptions.UseColor.Checked = True
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+            setSelectedCell(redC.redCells, redC.cellMap)
         End If
 
-        If rc.index Then
-            Dim inputPoints As New List(Of cv.Point3f)
-            For Each pt In rc.contour
-                Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
-                If vec.Z > 0 Then inputPoints.Add(vec)
-            Next
+        Dim rc = task.rcSelect
+        Dim inputPoints As New List(Of cv.Point3f)
+        For Each pt In rc.contour
+            Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
+            If vec.Z > 0 Then inputPoints.Add(vec)
+        Next
 
-            If inputPoints.Count > 0 Then
-                Dim inputMat = New cv.Mat(inputPoints.Count, 3, cv.MatType.CV_32F, inputPoints.ToArray)
-                pca_analysis = New cv.PCA(inputMat, New cv.Mat, cv.PCA.Flags.DataAsRow)
-            End If
+        If inputPoints.Count > 0 Then
+            Dim inputMat = New cv.Mat(inputPoints.Count, 3, cv.MatType.CV_32F, inputPoints.ToArray)
+            pca_analysis = New cv.PCA(inputMat, New cv.Mat, cv.PCA.Flags.DataAsRow)
 
             strOut = displayResults()
+            setTrueText(strOut, 3)
+        Else
+            setTrueText("Select a cell to compute the eigenvector")
         End If
-        setTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -106,7 +106,7 @@ Public Class PCA_CellMask : Inherits VB_Algorithm
         dst2 = pca.dst2
         labels(2) = pca.labels(2)
 
-        Dim rc = pca.rc
+        Dim rc = task.rcSelect
         If rc.maxVec.Z > 0 Then
             pcaPrep.Run(task.pointCloud(rc.rect).Clone)
 

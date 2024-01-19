@@ -167,10 +167,11 @@ End Class
 
 Public Class GuidedBP_kTop : Inherits VB_Algorithm
     Dim autoX As New OpAuto_XRange
-    Public colorC As New RedCloud_ColorAndCloud
+    Public redC As New RedCloud_Basics
     Dim contours As New Contour_Largest
     Dim hist2d As New Histogram2D_Top
     Public Sub New()
+        redOptions.UseColor.Checked = True
         gOptions.useHistoryCloud.Checked = False
         labels(3) = "Back projection of the top view"
         desc = "Subdivide the OpAuto_XRange output using RedCloud_Basics"
@@ -181,25 +182,25 @@ Public Class GuidedBP_kTop : Inherits VB_Algorithm
         autoX.Run(hist2d.histogram)
 
         dst1 = autoX.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        colorC.Run(dst1)
-        dst2 = colorC.dst2
+        redC.Run(dst1)
+        dst2 = redC.dst2
 
         dst3.SetTo(0)
-        For Each rp In colorC.rMin.redCells
+        For Each rc In redC.redCells
             Dim histogram As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-            autoX.histogram(rp.rect).CopyTo(histogram(rp.rect), rp.mask)
+            autoX.histogram(rc.rect).CopyTo(histogram(rc.rect), rc.mask)
             cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogram, dst0, task.rangesTop)
             Dim mask = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
             contours.Run(mask)
-            setTrueText(CStr(rp.index), rp.maxDist)
-            vbDrawContour(dst3, contours.bestContour, rp.color, -1)
+            setTrueText(CStr(rc.index), rc.maxDist)
+            vbDrawContour(dst3, contours.bestContour, rc.color, -1)
         Next
 
         Static saveTrueData As List(Of trueText)
         If heartBeat() Then saveTrueData = New List(Of trueText)(trueData)
         trueData = New List(Of trueText)(saveTrueData)
 
-        labels(2) = colorC.labels(2)
+        labels(2) = redC.labels(2)
         setTrueText("camera at top", New cv.Point(dst2.Width * 2 / 3, 0), 2)
     End Sub
 End Class
@@ -211,9 +212,10 @@ End Class
 Public Class GuidedBP_kSide : Inherits VB_Algorithm
     Dim autoY As New OpAuto_YRange
     Public hist2d As New Histogram2D_Side
-    Public colorC As New RedCloud_ColorAndCloud
+    Public redC As New RedCloud_Basics
     Dim contours As New Contour_Largest
     Public Sub New()
+        redOptions.UseColor.Checked = True
         gOptions.useHistoryCloud.Checked = False
         labels(3) = "Back projection of the top view"
         desc = "Subdivide the GuidedBP_HistogramSide output using RedCloud_Basics"
@@ -223,25 +225,25 @@ Public Class GuidedBP_kSide : Inherits VB_Algorithm
         autoY.Run(hist2d.histogram)
 
         dst1 = autoY.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        colorC.Run(dst1)
-        dst2 = colorC.dst2
+        redC.Run(dst1)
+        dst2 = redC.dst2
 
         dst3.SetTo(0)
-        For Each rp In colorC.rMin.redCells
+        For Each rc In redC.redCells
             Dim histogram As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-            autoY.histogram(rp.rect).CopyTo(histogram(rp.rect), rp.mask)
+            autoY.histogram(rc.rect).CopyTo(histogram(rc.rect), rc.mask)
             cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogram, dst0, task.rangesSide)
             Dim mask = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
             contours.Run(mask)
-            setTrueText(CStr(rp.index), rp.maxDist)
-            vbDrawContour(dst3, contours.bestContour, rp.color, -1)
+            setTrueText(CStr(rc.index), rc.maxDist)
+            vbDrawContour(dst3, contours.bestContour, rc.color, -1)
         Next
 
         Static saveTrueData As List(Of trueText)
         If heartBeat() Then saveTrueData = New List(Of trueText)(trueData)
         trueData = New List(Of trueText)(saveTrueData)
 
-        labels(2) = colorC.labels(2)
+        labels(2) = redC.labels(2)
         setTrueText("camera at side", New cv.Point(0, dst2.Height / 3), 2)
     End Sub
 End Class

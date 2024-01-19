@@ -203,7 +203,7 @@ Module VB
         task.rcSelect = New rcData
         Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
         If task.mouseClickFlag Then
-            task.rcSelect = redCells(index)
+            task.rcSelect = If(redCells.Count > 0, redCells(index), New rcData)
         Else
             If task.clickPoint = New cv.Point(0, 0) Or index >= redCells.Count Then
                 If redCells.Count > 2 Then

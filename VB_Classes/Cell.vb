@@ -52,7 +52,6 @@ Public Class Cell_Basics : Inherits VB_Algorithm
             rc = eq.rc
             strOut += vbCrLf + eq.strOut + vbCrLf
 
-            pca.rc = rc
             pca.Run(empty)
             strOut += vbCrLf + pca.strOut
         End If

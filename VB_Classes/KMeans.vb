@@ -232,8 +232,9 @@ Public Class KMeans_Edges : Inherits VB_Algorithm
     Dim edges As New Edge_Canny
     Public km As New KMeans_Image
     Public classCount As Integer
-    Dim rMin As New RedCloud_OnlyColorAlt
+    Dim redC As New RedCloud_Basics
     Public Sub New()
+        redOptions.UseColor.Checked = True
         labels(3) = "KMeans with edges output"
         desc = "Use edges to isolate regions in the KMeans output - not much different from KMeans_Basics."
     End Sub
@@ -245,9 +246,9 @@ Public Class KMeans_Edges : Inherits VB_Algorithm
         dst3 = km.dst2 + 1
         classCount = km.classCount
 
-        rMin.Run(dst3)
-        dst2 = rMin.dst3
-        labels(2) = rMin.labels(3)
+        redC.Run(dst3)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(3)
     End Sub
 End Class
 

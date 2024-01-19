@@ -341,7 +341,7 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
         Next
         dst2 = vbPalette(dst3 * 255 / d3Cells.Count)
 
-        If standalone Then identifyCells(redC.redCells)
+        If standalone Or showIntermediate() Then identifyCells(redC.redCells)
         labels(2) = redC.labels(3)
     End Sub
 End Class

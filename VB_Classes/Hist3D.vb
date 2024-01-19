@@ -125,25 +125,26 @@ End Class
 
 
 Public Class Hist3D_RedColor : Inherits VB_Algorithm
-    Dim rMin As New RedCloud_OnlyColorAlt
+    Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         redOptions.UseColor.Checked = True
         advice = "redOptions '3D Histogram Bins' "
-        desc = "Use the Hist3D color classes to segment the image with RedCloud_OnlyColorAlt"
+        desc = "Use the Hist3D color classes to segment the image with RedCloud_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         hColor.Run(src)
         dst3 = hColor.dst3
         labels(3) = hColor.labels(3)
 
-        rMin.Run(hColor.dst2)
-        dst2 = rMin.dst3
-        labels(2) = rMin.labels(3)
+        redC.Run(hColor.dst2)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(3)
 
-        If rMin.redCells.Count > 0 Then
+        If redC.redCells.Count > 0 Then
             dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
         End If
+        If standalone Or showIntermediate() Then identifyCells(redC.redCells)
     End Sub
 End Class
 
@@ -223,22 +224,23 @@ End Class
 
 Public Class Hist3D_PixelCells : Inherits VB_Algorithm
     Dim pixel As New Hist3D_Pixel
-    Dim rMin As New RedCloud_OnlyColorAlt
+    Dim redC As New RedCloud_Basics
     Public Sub New()
+        redOptions.UseColor.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         advice = ""
-        desc = "After classifying each pixel, backproject each RedMin cell using the same 3D histogram."
+        desc = "After classifying each pixel, backproject each redCell using the same 3D histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        rMin.Run(src)
-        dst2 = rMin.cellMap
-        labels(2) = rMin.labels(3)
+        redC.Run(src)
+        dst2 = redC.cellMap
+        labels(2) = redC.labels(3)
 
         pixel.Run(src)
 
         dst0.SetTo(0)
-        For Each cell In rMin.redCells
+        For Each cell In redC.redCells
             cv.Cv2.CalcBackProject({src(cell.rect)}, {0, 1, 2}, pixel.histogram, dst1(cell.rect), redOptions.rangesBGR)
             dst1(cell.rect).CopyTo(dst0(cell.rect), cell.mask)
         Next
@@ -256,19 +258,19 @@ End Class
 
 Public Class Hist3D_PixelClassify : Inherits VB_Algorithm
     Dim pixel As New Hist3D_Pixel
-    Dim rMin As New RedCloud_OnlyColorAlt
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         advice = ""
-        desc = "Classify each pixel with a 3D histogram backprojection and run RedCloud_OnlyColorAlt on the output."
+        desc = "Classify each pixel with a 3D histogram backprojection and run RedCloud_Basics on the output."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         pixel.Run(src)
 
-        rMin.Run(pixel.dst2)
-        dst2 = rMin.dst3
-        labels(2) = rMin.labels(3)
+        redC.Run(pixel.dst2)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(3)
 
-        If rMin.redCells.Count > 0 Then
+        If redC.redCells.Count > 0 Then
             dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
         End If
     End Sub
@@ -281,8 +283,9 @@ End Class
 
 Public Class Hist3D_PixelDiffMask : Inherits VB_Algorithm
     Dim pixel As New Hist3D_Pixel
-    Dim rMin As New RedCloud_OnlyColorAlt
+    Dim redC As New RedCloud_Basics
     Public Sub New()
+        redOptions.UseColor.Checked = True
         advice = ""
         desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection"
     End Sub
@@ -293,10 +296,11 @@ Public Class Hist3D_PixelDiffMask : Inherits VB_Algorithm
         dst2 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
         lastImage = pixel.dst2.Clone
 
-        rMin.redCore.inputMask = dst2
-        rMin.Run(pixel.dst2)
-        dst3 = rMin.dst3.Clone
-        labels(3) = rMin.labels(3)
+        redC.combine.redCore.inputMask = dst2
+        redC.Run(pixel.dst2)
+        dst3 = redC.dst2.Clone
+        dst3.SetTo(0, dst2)
+        labels(3) = redC.labels(3)
     End Sub
 End Class
 

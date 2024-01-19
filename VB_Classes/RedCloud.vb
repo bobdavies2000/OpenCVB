@@ -18,21 +18,6 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Match cells from the previous generation"
     End Sub
-    Public Sub showSelectedCell(dst As cv.Mat)
-        Dim rc = task.rcSelect
-
-        task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-        task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-
-        task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-        task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-
-        dst(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-        dst.Circle(rc.maxDist, task.dotSize, cv.Scalar.Black, -1, task.lineType)
-
-        dst.Circle(rc.maxDStable, task.dotSize + 2, cv.Scalar.Black, -1, task.lineType)
-        dst.Circle(rc.maxDStable, task.dotSize, cv.Scalar.White, -1, task.lineType)
-    End Sub
     Private Function matchPreviousCell(rp As rcData) As rcData
         Dim rc = New rcData, lrc As New rcData
         rc.rect = rp.rect
@@ -186,7 +171,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         If standalone Then setSelectedCell(redCells, cellMap)
 
         dst3.SetTo(0, task.maxDepthMask)
-        If displaySelectedCell Then showSelectedCell(dst2)
+        If displaySelectedCell Then setSelectedCell(redCells, cellMap)
     End Sub
 End Class
 
@@ -275,11 +260,12 @@ End Class
 
 
 
-Public Class RedCloud_CoreTest : Inherits VB_Algorithm
+Public Class RedCloud_OnlyCore : Inherits VB_Algorithm
     Dim prep As New RedCloud_Core
-    Public rMin As New RedCloud_OnlyColorAlt
+    Public redC As New RedCloud_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
+        redOptions.UseColor.Checked = True
         gOptions.HistBinSlider.Value = 20
         desc = "Segment the image based on both the reduced point cloud and color"
     End Sub
@@ -289,11 +275,35 @@ Public Class RedCloud_CoreTest : Inherits VB_Algorithm
         prep.Run(empty)
         prep.dst2.ConvertScaleAbs().CopyTo(reduction.dst2, task.depthMask)
 
-        rMin.Run(reduction.dst2)
+        redC.Run(reduction.dst2)
 
-        dst2 = rMin.cellMap
-        dst3 = rMin.dst3
-        labels = rMin.labels
+        dst2 = redC.cellMap
+        dst3 = redC.dst2
+        labels = redC.labels
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_OnlyCoreToo : Inherits VB_Algorithm
+    Public redC As New RedCloud_Basics
+    Public Sub New()
+        redOptions.UseColor.Checked = True
+        redOptions.Reduction_Basics.Checked = True
+        redOptions.RedCloud_Core.Checked = True
+        gOptions.HistBinSlider.Value = 20
+        desc = "Identical to RedCloud_OnlyCore but using only RedOptions."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.cellMap
+        dst3 = redC.dst2
+        labels = redC.labels
     End Sub
 End Class
 
@@ -1253,36 +1263,6 @@ End Class
 
 
 
-Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
-    Dim guided As New GuidedBP_Depth
-    Public rMin As New RedCloud_OnlyColorAlt
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        desc = "Segment the image based on both the reduced point cloud and color"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        guided.Run(src)
-
-        reduction.Run(src)
-        Dim combined = reduction.dst2.Clone
-        guided.dst2.CopyTo(combined, task.depthMask)
-        rMin.Run(combined)
-
-        dst2 = rMin.cellMap
-        dst3 = rMin.dst3
-        labels = rMin.labels
-
-        If heartBeat() Then labels(2) = CStr(rMin.redCells.Count) + " regions identified"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class RedCloud_FeatureLess : Inherits VB_Algorithm
     Dim cpp As New CPP_Basics
     Public Sub New()
@@ -1630,43 +1610,6 @@ End Class
 
 
 
-Public Class RedCloud_Combine2Runs : Inherits VB_Algorithm
-    Public redC As New RedCloud_Basics
-    Public colorOnly As New RedCloud_Cells
-    Public Sub New()
-        redC.displaySelectedCell = False
-        desc = "Run RedCloud_Cells and RedCloud_OnlyDepth and then combine."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redOptions.UseDepth.Checked = True
-        redC.Run(src)
-        dst2 = redC.dst2.Clone
-        labels(2) = redC.labels(2)
-
-        redOptions.UseColor.Checked = True
-        colorOnly.Run(src)
-        dst3 = colorOnly.dst2.Clone
-        labels(3) = colorOnly.labels(2)
-
-        Dim cellmap = colorOnly.cellmap.Clone
-        redC.cellMap.CopyTo(cellmap, task.depthMask)
-
-        Dim val = task.depthMask.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        Dim index = cellmap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        If val Then
-            task.rcSelect = redC.redCells(index)
-        Else
-            task.rcSelect = colorOnly.redCells(index)
-        End If
-        redC.showSelectedCell(dst2)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class RedCloud_MostlyColor : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Public Sub New()
@@ -1966,8 +1909,9 @@ End Class
 
 Public Class RedCloud_BinarizeColor : Inherits VB_Algorithm
     Dim binarize As New Binarize_FourWay
-    Dim rMin As New RedCloud_OnlyColorAlt
+    Dim redC As New RedCloud_Basics
     Public Sub New()
+        redOptions.UseColor.Checked = True
         labels(3) = "A 4-way split of the input grayscale image based on brightness"
         desc = "Use RedCloud on a 4-way split based on light to dark in the image."
     End Sub
@@ -1975,10 +1919,10 @@ Public Class RedCloud_BinarizeColor : Inherits VB_Algorithm
         binarize.Run(src)
         dst3 = vbPalette(binarize.dst2 * 255 / 5)
 
-        rMin.Run(binarize.dst2)
-        dst2 = rMin.dst3
-        If standalone Or showIntermediate() Then identifyCells(rMin.redCells)
-        labels(2) = rMin.labels(3)
+        redC.Run(binarize.dst2)
+        dst2 = redC.dst2
+        If standalone Or showIntermediate() Then identifyCells(redC.redCells)
+        labels(2) = redC.labels(3)
     End Sub
 End Class
 
@@ -2249,5 +2193,39 @@ Public Class RedCloud_OnlyColorAlt : Inherits VB_Algorithm
         dst2 = cellMap.Clone
         lastMap = cellMap.Clone
         If redCells.Count > 0 Then dst1 = vbPalette(lastMap * 255 / redCells.Count)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_Combine2Runs : Inherits VB_Algorithm
+    Public colorC As New RedCloud_Basics
+    Public redC As New RedCloud_Basics
+    Public Sub New()
+        redC.displaySelectedCell = False
+        desc = "Run RedCloud for depth and for color at the same time and then combine."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redOptions.UseDepth.Checked = True
+        task.optionsChanged = False
+        redC.Run(src)
+        dst2 = redC.dst2.Clone
+        labels(2) = redC.labels(2)
+
+        redOptions.UseColor.Checked = True
+        task.optionsChanged = False
+        colorC.Run(src)
+        dst3 = colorC.dst2.Clone
+        labels(3) = colorC.labels(2)
+
+        Dim cellmap = colorC.cellMap.Clone
+        redC.cellMap.CopyTo(cellmap, task.depthMask)
+
+        setSelectedCell(redC.redCells, redC.cellMap)
     End Sub
 End Class

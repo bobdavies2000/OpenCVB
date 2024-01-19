@@ -12,7 +12,7 @@ Public Class Flood_Basics : Inherits VB_Algorithm
         dst2 = redC.cellMap
         dst3 = redC.dst2
         labels(2) = redC.labels(2)
-        If standalone Then identifyCells(redC.redCells)
+        If standalone Or showIntermediate() Then identifyCells(redC.redCells)
         classCount = redC.redCells.Count
     End Sub
 End Class
