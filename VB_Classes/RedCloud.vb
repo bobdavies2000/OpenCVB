@@ -132,14 +132,14 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         Next
 
         overlappingCells.Clear()
-        cellMap.SetTo(task.redOther)
+        cellMap.SetTo(0)
         If redOptions.UseDepth.Checked Or redOptions.UseDepthAndColor.Checked Then
             For i = 0 To newCells.Count - 1
                 rc = newCells(i)
                 ' if maxdist is already occupied or the cell is in the maxDepthMask, then toss this cell...
                 Dim valMap = cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 Dim maxDepth = task.maxDepthMask.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If valMap <> task.redOther Or maxDepth <> 0 Then
+                If maxDepth <> 0 Then
                     overlappingCells.Add(rc.index)
                 Else
                     cellMap(rc.rect).SetTo(rc.index, rc.mask)
@@ -215,7 +215,7 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
             Dim w = msRNG.Next(1, dst2.Width / 2), h = msRNG.Next(1, dst2.Height / 2)
             rp.rect = New cv.Rect(rp.floodPoint.X, rp.floodPoint.Y, w, h)
             rp.mask = task.depthRGB(rp.rect).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            lastCellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, task.redOther)
+            lastCellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             dst2.SetTo(0)
         End If
 
@@ -227,7 +227,7 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
 
         rc.maxDStable = rc.maxDist ' assume it has to use the latest.
         rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-        If rc.indexLast < lastCells.Count And rc.indexLast <> task.redOther Then
+        If rc.indexLast < lastCells.Count Then
             Dim lrc = lastCells(rc.indexLast)
             rc.motionRect = rc.rect.Union(lrc.rect)
             rc.color = lrc.color
@@ -352,7 +352,7 @@ Public Class RedCloud_Hulls : Inherits VB_Algorithm
 
         dst3.SetTo(0)
         Dim defectCount As Integer
-        redC.cellMap.SetTo(task.redOther)
+        redC.cellMap.SetTo(0)
         Dim redCells As New List(Of rcData)
         For Each rc In redC.redCells
             If rc.contour.Count >= 5 Then
@@ -1245,27 +1245,6 @@ Public Class RedCloud_DelaunayGuidedFeatures : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class RedCloud_Other : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        desc = "Highlight the unidentified pixels in the RedCloud output"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-
-        dst3 = redC.cellMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        If heartBeat() Then labels(2) = redC.labels(2)
-        If heartBeat() Then labels(3) = CStr(dst3.CountNonZero) + " unclassified pixels - identified with task.redOther value."
-    End Sub
-End Class
 
 
 

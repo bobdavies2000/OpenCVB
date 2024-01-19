@@ -114,7 +114,7 @@ Public Class Image_RedCloudColor : Inherits VB_Algorithm
         redC.Run(dst0)
         dst2 = redC.dst2
 
-        Dim mask = redC.redC.cellMap.InRange(task.redOther, task.redOther)
+        Dim mask = redC.redC.cellMap.InRange(0, 0)
         dst2.SetTo(cv.Scalar.Black, mask)
 
         labels(2) = redC.labels(2)

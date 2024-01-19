@@ -1520,7 +1520,6 @@ if algorithmName = "RedCloud_OnlyColor" Then return new RedCloud_OnlyColor
 if algorithmName = "RedCloud_OnlyColorAlt" Then return new RedCloud_OnlyColorAlt
 if algorithmName = "RedCloud_OnlyColorHist3D" Then return new RedCloud_OnlyColorHist3D
 if algorithmName = "RedCloud_OnlyDepth" Then return new RedCloud_OnlyDepth
-if algorithmName = "RedCloud_Other" Then return new RedCloud_Other
 if algorithmName = "RedCloud_OutlineColor" Then return new RedCloud_OutlineColor
 if algorithmName = "RedCloud_PlaneColor" Then return new RedCloud_PlaneColor
 if algorithmName = "RedCloud_PlaneEq3D" Then return new RedCloud_PlaneEq3D

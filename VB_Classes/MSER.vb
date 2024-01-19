@@ -35,7 +35,7 @@ Public Class MSER_Basics : Inherits VB_Algorithm
         Next
 
         If task.optionsChanged Then
-            cellMap.SetTo(task.redOther)
+            cellMap.SetTo(0)
             matchCell.lastCells.Clear()
         End If
 
@@ -47,7 +47,7 @@ Public Class MSER_Basics : Inherits VB_Algorithm
         mserCells.Clear()
         mserCells.Add(New rcData) ' "Other"
 
-        cellMap.SetTo(task.redOther)
+        cellMap.SetTo(0)
         dst2.SetTo(0)
         For Each key In redCells
             Dim rp = key.Value
@@ -66,7 +66,7 @@ Public Class MSER_Basics : Inherits VB_Algorithm
         If task.paused = False Then
             For Each rc In matchCell.lastCells
                 Dim val = detect.dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If val = task.redOther And rc.index <> task.redOther Then
+                If val = 0 Then
                     rc.index = mserCells.Count
                     mserCells.Add(rc)
                 End If
