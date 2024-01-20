@@ -551,7 +551,7 @@ Public Class Match_tCell : Inherits VB_Algorithm
             Dim tc = tCells(i)
             Dim input = src(tc.searchRect)
             cv.Cv2.MatchTemplate(tc.template, input, dst0, cv.TemplateMatchModes.CCoeffNormed)
-            Dim mm = vbMinMax(dst0)
+            Dim mm as mmData = vbMinMax(dst0)
             tc.center = New cv.Point2f(tc.searchRect.X + mm.maxLoc.X + rSize, tc.searchRect.Y + mm.maxLoc.Y + rSize)
             tc.searchRect = validateRect(New cv.Rect(tc.center.X - rSize * 3, tc.center.Y - rSize * 3, rSize * 6, rSize * 6))
             tc.rect = validateRect(New cv.Rect(tc.center.X - rSize, tc.center.Y - rSize, rSize * 2, rSize * 2))

@@ -94,6 +94,7 @@ Public Class VB_to_CPP
         Dim startComments As Boolean
         For i = 0 To split.Count - 1
             If split(i).Contains("#include") Or split(i) = "" Then Continue For
+            split(i) = split(i).Replace("cv::Scalar minVal, maxVal;", "double minVal, maxVal;")
             If Trim(split(i)).StartsWith("class") Then
                 Dim tokens = split(i).Split(" ")
                 functionName = tokens(1)
@@ -164,10 +165,12 @@ Public Class VB_to_CPP
             End If
             If startComments Then split(i) = vbTab + "//" + split(i)
 
-            If split(i).Contains("algorithmCPP()") Then
-                split(i) = split(i).Replace("traceName", "//" + vbTab + "traceName")
-                split(i) = split(i).Replace(": algorithmCPP()", "")
-                startComments = True
+            If split(i).Contains("CPP_Options_") Then
+                If split(i).Contains("algorithmCPP()") Then
+                    split(i) = split(i).Replace("traceName", "//" + vbTab + "traceName")
+                    split(i) = split(i).Replace(": algorithmCPP()", "")
+                    startComments = True
+                End If
             End If
             If split(i).StartsWith(vbTab + "//    }") Then
                 startComments = False

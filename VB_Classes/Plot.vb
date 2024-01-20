@@ -64,7 +64,7 @@ Public Class Plot_Histogram : Inherits VB_Algorithm
         Dim histArray(histogram.Rows - 1) As Single
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
-        Dim mm = vbMinMax(histogram)
+        Dim mm as mmData = vbMinMax(histogram)
 
         If mm.maxVal > 0 And histogram.Rows > 0 Then
             Dim incr = 255 / histogram.Rows

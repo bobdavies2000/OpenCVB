@@ -88,7 +88,7 @@ Public Class HistPeak2D_NotHotTop : Inherits VB_Algorithm
         hist2d.Run(src)
         dst1 = hist2d.histogram.InRange(0, 0).ConvertScaleAbs
 
-        Dim mm = vbMinMax(hist2d.histogram)
+        Dim mm as mmData = vbMinMax(hist2d.histogram)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, mm.maxVal)
         dst3 -= hist2d.histogram
         dst3.SetTo(0, dst1)

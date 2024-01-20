@@ -239,7 +239,7 @@ Public Class OpAuto_Peaks2D : Inherits VB_Algorithm
         clusterPoints.Clear()
         clusterPoints.Add(New cv.Point(0, 0))
         For i = 0 To desiredBoundaries - 1
-            Dim mm = vbMinMax(src)
+            Dim mm as mmData = vbMinMax(src)
             If clusterPoints.Contains(mm.maxLoc) = False Then clusterPoints.Add(mm.maxLoc)
             src.Circle(mm.maxLoc, peakDistance, 0, -1, task.lineType)
         Next
@@ -278,7 +278,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits VB_Algorithm
 
         Dim pointPop As New SortedList(Of Single, cv.Point)(New compareAllowIdenticalSingleInverted)
         For Each roi In task.gridList
-            Dim mm = vbMinMax(src(roi))
+            Dim mm as mmData = vbMinMax(src(roi))
             If mm.maxVal = 0 Then Continue For
             pointPop.Add(mm.maxVal, New cv.Point(roi.X + mm.maxLoc.X, roi.Y + mm.maxLoc.Y))
         Next

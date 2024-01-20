@@ -131,7 +131,7 @@ Public Class Depth_FirstLastDistance : Inherits VB_Algorithm
         setTrueText(text, pt, 3)
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim mm = vbMinMax(task.pcSplit(2), task.depthMask)
+        Dim mm as mmData = vbMinMax(task.pcSplit(2), task.depthMask)
         task.depthRGB.CopyTo(dst2)
 
         If heartBeat() Then dst3.SetTo(0)
@@ -215,7 +215,7 @@ Public Class Depth_MeanStdev_MT : Inherits VB_Algorithm
             Dim means As New cv.Mat(task.gridList.Count, 1, cv.MatType.CV_32F, meanValues.ToArray)
             Dim stdevs As New cv.Mat(task.gridList.Count, 1, cv.MatType.CV_32F, stdValues.ToArray)
             Dim meanmask = means.Threshold(1, task.maxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-            Dim mm = vbMinMax(means, meanmask)
+            Dim mm as mmData = vbMinMax(means, meanmask)
             Dim stdMask = stdevs.Threshold(0.001, task.maxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs() ' volatile region is x cm stdev.
             Dim mmStd = vbMinMax(stdevs, stdMask)
 
@@ -381,7 +381,7 @@ Public Class Depth_LocalMinMax_MT : Inherits VB_Algorithm
         Parallel.For(0, task.gridList.Count,
         Sub(i)
             Dim roi = task.gridList(i)
-            Dim mm = vbMinMax(task.pcSplit(2)(roi), task.depthMask(roi))
+            Dim mm as mmData = vbMinMax(task.pcSplit(2)(roi), task.depthMask(roi))
             If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cv.Point2f(0, 0)
             minPoint(i) = New cv.Point(mm.minLoc.X + roi.X, mm.minLoc.Y + roi.Y)
             maxPoint(i) = New cv.Point(mm.maxLoc.X + roi.X, mm.maxLoc.Y + roi.Y)
@@ -420,7 +420,7 @@ Public Class Depth_MinMaxToVoronoi : Inherits VB_Algorithm
         Parallel.For(0, task.gridList.Count,
         Sub(i)
             Dim roi = task.gridList(i)
-            Dim mm = vbMinMax(task.pcSplit(2)(roi), depthmask(roi))
+            Dim mm as mmData = vbMinMax(task.pcSplit(2)(roi), depthmask(roi))
             If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cv.Point2f(0, 0)
             kalman.kInput(i * 4) = mm.minLoc.X
             kalman.kInput(i * 4 + 1) = mm.minLoc.Y
@@ -1327,7 +1327,7 @@ Public Class Depth_Grid : Inherits VB_Algorithm
         dst3 = task.pcSplit(2)
         dst2 = task.gridMask.Clone
         For Each roi In task.gridList
-            Dim mm = vbMinMax(dst3(roi))
+            Dim mm as mmData = vbMinMax(dst3(roi))
             If Math.Abs(mm.minVal - mm.maxVal) > 0.1 Then dst2(roi).SetTo(cv.Scalar.White)
         Next
     End Sub
@@ -1567,7 +1567,7 @@ Public Class Depth_PunchBlob : Inherits VB_Algorithm
         depthInc.Run(src)
         dst2 = depthInc.dst2
 
-        Dim mm = vbMinMax(dst2)
+        Dim mm as mmData = vbMinMax(dst2)
         dst2.ConvertTo(dst1, cv.MatType.CV_8U)
         contours.Run(dst1)
         dst3 = contours.dst3

@@ -1026,7 +1026,7 @@ Public Class PointCloud_Histograms : Inherits VB_Algorithm
                 labels(2) = "2D plot of the resulting 3D histogram."
         End Select
 
-        Dim mm = vbMinMax(dst2)
+        Dim mm as mmData = vbMinMax(dst2)
         dst3 = vbPalette(dst2 * 255 / mm.maxVal)
     End Sub
 End Class

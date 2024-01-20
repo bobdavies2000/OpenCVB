@@ -441,7 +441,7 @@ Public Class Plane_Histogram : Inherits VB_Algorithm
         Dim rangePerBin = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
 
         Dim midHist = task.histogramBins / 2
-        Dim mm = vbMinMax(hist.histogram(New cv.Rect(0, midHist, 1, midHist)))
+        Dim mm as mmData = vbMinMax(hist.histogram(New cv.Rect(0, midHist, 1, midHist)))
         floorPop = mm.maxVal
         Dim peak = hist.mm.minVal + (midHist + mm.maxLoc.Y + 1) * rangePerBin
         Dim rX As Integer = (midHist + mm.maxLoc.Y) * binWidth

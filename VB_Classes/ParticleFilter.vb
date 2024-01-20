@@ -35,7 +35,7 @@ Public Class ParticleFilter_Basics : Inherits VB_Algorithm
         plot1D.Run(histogram)
         dst3 = plot1D.dst2
 
-        Dim mm = vbMinMax(histogram)
+        Dim mm as mmData = vbMinMax(histogram)
 
         Dim w = CInt(dst2.Width / matSize)
         Dim h = CInt(dst2.Height / matSize)

@@ -1310,7 +1310,7 @@ Public Class RedCloud_Core : Inherits VB_Algorithm
                 dst0 = (split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt).toMat
         End Select
 
-        Dim mm = vbMinMax(dst0)
+        Dim mm As mmData = vbMinMax(dst0)
         dst2 = (dst0 - mm.minVal)
 
         dst2.SetTo(mm.maxVal - mm.minVal, task.maxDepthMask)

@@ -205,7 +205,7 @@ Public Class KMeans_Simple_CPP : Inherits VB_Algorithm
         If standalone Then src = task.pcSplit(2)
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim mm = vbMinMax(src, task.depthMask)
+        Dim mm as mmData = vbMinMax(src, task.depthMask)
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)

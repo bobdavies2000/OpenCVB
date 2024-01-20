@@ -29,7 +29,7 @@ Public Class Structured_LinearizeFloor : Inherits VB_Algorithm
         If sliceMask.CountNonZero > 0 Then
             Dim split = imuPC.Split()
             If xCheck.Checked Then
-                Dim mm = vbMinMax(split(0), sliceMask)
+                Dim mm as mmData = vbMinMax(split(0), sliceMask)
 
                 Dim firstCol As Integer, lastCol As Integer
                 For firstCol = 0 To sliceMask.Width - 1
@@ -47,7 +47,7 @@ Public Class Structured_LinearizeFloor : Inherits VB_Algorithm
             End If
 
             If yCheck.Checked Then
-                Dim mm = vbMinMax(split(1), sliceMask)
+                Dim mm as mmData = vbMinMax(split(1), sliceMask)
                 kalman.kInput = (mm.minVal + mm.maxVal) / 2
                 kalman.Run(src)
                 floorYPlane = kalman.kAverage
@@ -877,7 +877,7 @@ Public Class Structured_SliceXPlot : Inherits VB_Algorithm
 
         Dim rect = New cv.Rect(col, 0, If(col + options.sliceSize >= dst3.Width, dst3.Width - col,
                                options.sliceSize), dst3.Height - 1)
-        Dim mm = vbMinMax(multi.heat.topframes.dst2(rect))
+        Dim mm as mmData = vbMinMax(multi.heat.topframes.dst2(rect))
 
         dst3.Circle(New cv.Point(col, mm.maxLoc.Y), task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
 
@@ -916,7 +916,7 @@ Public Class Structured_SliceYPlot : Inherits VB_Algorithm
 
         Dim rect = New cv.Rect(0, row, dst3.Width - 1, If(row + options.sliceSize >= dst3.Height,
                                dst3.Height - row, options.sliceSize))
-        Dim mm = vbMinMax(multi.heat.sideframes.dst2(rect))
+        Dim mm as mmData = vbMinMax(multi.heat.sideframes.dst2(rect))
 
         If mm.maxVal > 0 Then
             dst3.Circle(New cv.Point(mm.maxLoc.X, row), task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)

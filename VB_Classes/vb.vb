@@ -319,7 +319,7 @@ Module VB
         Dim mask = rc.mask.Clone
         mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
         Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-        Dim mm = vbMinMax(distance32f)
+        Dim mm As mmData = vbMinMax(distance32f)
         mm.maxLoc.X += rc.rect.X
         mm.maxLoc.Y += rc.rect.Y
 
@@ -327,7 +327,7 @@ Module VB
     End Function
     Public Function vbGetMaxDist(mask As cv.Mat) As cv.Point
         Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-        Dim mm = vbMinMax(distance32f)
+        Dim mm As mmData = vbMinMax(distance32f)
         Return mm.maxLoc
     End Function
     Public Function vbContourToRect(contour As List(Of cv.Point)) As cv.Rect

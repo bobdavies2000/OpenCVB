@@ -550,7 +550,7 @@ Module VB_Externs
         Dim img As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
         Dim binCount = hist.Height
         Dim binWidth = img.Width / hist.Height
-        Dim mm = vbMinMax(hist)
+        Dim mm as mmData = vbMinMax(hist)
         img.SetTo(0)
         If mm.maxVal > 0 Then
             For i = 0 To binCount - 2

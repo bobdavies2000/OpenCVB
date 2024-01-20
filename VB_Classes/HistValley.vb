@@ -427,7 +427,7 @@ Public Class HistValley_Peaks : Inherits VB_Algorithm
             Next
         Next
 
-        Dim mm = vbMinMax(src)
+        Dim mm as mmData = vbMinMax(src)
         Dim incr = (mm.maxVal - mm.minVal) / task.histogramBins
         peaks.clear()
         For Each el In sortPeaks

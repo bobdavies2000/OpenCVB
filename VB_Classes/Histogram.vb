@@ -249,7 +249,7 @@ Public Class Histogram_PeakMax : Inherits VB_Algorithm
         hist.Run(src)
         dst3 = hist.dst2
 
-        Dim mm = vbMinMax(hist.histogram)
+        Dim mm as mmData = vbMinMax(hist.histogram)
         Dim brickWidth = dst2.Width / task.histogramBins
         Dim brickRange = 255 / task.histogramBins
         Dim histindex = mm.maxLoc.Y
@@ -343,7 +343,7 @@ Public Class Histogram_PeakFinder : Inherits VB_Algorithm
             sortedPeaks.Add(peakCounts(i), i)
         Next
 
-        Dim mm = vbMinMax(histogram)
+        Dim mm as mmData = vbMinMax(histogram)
         If mm.maxVal = 0 Then Exit Sub ' entries are all zero?  Likely camera trouble.
         Dim brickWidth = dst2.Width / histogram.Rows
         histogramPeaks.Clear()
@@ -476,7 +476,7 @@ Public Class Histogram_Color : Inherits VB_Algorithm
         Dim mask As New cv.Mat
         cv.Cv2.CalcBackProject({input}, {1, 2}, histogram, mask, ranges)
 
-        Dim mm = vbMinMax(mask)
+        Dim mm as mmData = vbMinMax(mask)
 
         plot.Run(test)
         dst2 = plot.dst2
@@ -665,7 +665,7 @@ Public Class Histogram_ComparePlot : Inherits VB_Algorithm
             comp.histK.hist.plot.Run(histX)
             dst3 = comp.histK.hist.plot.dst2.Clone
 
-            Dim mm = vbMinMax(histX)
+            Dim mm as mmData = vbMinMax(histX)
             AddPlotScale(dst2, 0, mm.maxVal)
         End If
         trueData = New List(Of trueText)(ttLabels)
@@ -817,7 +817,7 @@ Public Class Histogram_PointCloudXYZ : Inherits VB_Algorithm
         Static ttlists As New List(Of List(Of trueText))({New List(Of trueText), New List(Of trueText), New List(Of trueText)})
         For i = 0 To 2
             dst0 = task.pcSplit(i)
-            Dim mm = vbMinMax(dst0)
+            Dim mm as mmData = vbMinMax(dst0)
 
             Select Case i
                 Case 0
@@ -863,7 +863,7 @@ Public Class Histogram_FlatSurfaces : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Dim maxRange = 4
         Dim cloudY = task.pcSplit(1).Clone
-        Dim mm = vbMinMax(cloudY)
+        Dim mm as mmData = vbMinMax(cloudY)
         cloudY = cloudY.Threshold(maxRange, mm.maxVal, cv.ThresholdTypes.Trunc)
         Static saveMinVal = mm.minVal, saveMaxVal = mm.maxVal
         If heartBeat() Then

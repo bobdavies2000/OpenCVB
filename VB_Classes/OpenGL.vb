@@ -1423,7 +1423,7 @@ Public Class OpenGL_Profile : Inherits VB_Algorithm
         If rc.contour.Count = 0 Then Exit Sub
 
         Dim split = contourMat.Split()
-        Dim mm = vbMinMax(split(0))
+        Dim mm as mmData = vbMinMax(split(0))
         Dim p1 = rc.contour.ElementAt(mm.minLoc.Y)
         Dim p2 = rc.contour.ElementAt(mm.maxLoc.Y)
 

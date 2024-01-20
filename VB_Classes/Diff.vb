@@ -97,7 +97,7 @@ Public Class Diff_Depth : Inherits VB_Algorithm
 
         cv.Cv2.Absdiff(dst0, lastDepth32s, dst1)
         dst1 = dst1.ConvertScaleAbs
-        Dim mm = vbMinMax(dst1)
+        Dim mm as mmData = vbMinMax(dst1)
 
         dst2 = dst1.Threshold(millimeters - 1, 255, cv.ThresholdTypes.Binary)
 

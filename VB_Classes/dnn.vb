@@ -38,7 +38,7 @@ Public Class DNN_Test : Inherits VB_Algorithm
         net.SetInput(inputBlob, "data")
         Dim prob = net.Forward("prob")
 
-        Dim mm = vbMinMax(prob.Reshape(1, 1))
+        Dim mm as mmData = vbMinMax(prob.Reshape(1, 1))
         setTrueText("Best classification: index = " + CStr(mm.maxLoc.X) + " which is for '" + classnames(mm.maxLoc.X) + "' with Probability " +
                     Format(mm.maxVal, "#0.00%"), New cv.Point(40, 200))
     End Sub

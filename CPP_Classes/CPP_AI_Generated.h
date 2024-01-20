@@ -933,25 +933,22 @@ public:
 
 
 
-
-
 class CPP_RedCloud_Core : public algorithmCPP {
 public:
-    int classCount, givenClassCount;
-
+    int classCount;
+    int givenClassCount = 0;
+    int reduceAmt = 250;
     CPP_RedCloud_Core() : algorithmCPP() {
         traceName = "CPP_RedCloud_Core";
+        //if (standalone) {
+        //    redOptions.RedCloud_Core.Checked = true;
+        //}
         desc = "Reduction transform for the point cloud";
     }
-
     void Run(Mat src) {
-        int reduceAmt = 500;
-        dst0 = task->pointCloud.clone();
-        dst0.convertTo(dst0, CV_32S, 1000.0 / reduceAmt);
-
+        task->pointCloud.convertTo(dst0, CV_32S, 1000.0 / reduceAmt);
         vector<Mat> msplit;
         split(dst0, msplit);
-
         switch (task->PCReduction) {
         case 0: // "X Reduction":
             dst0 = msplit[0] * reduceAmt;
@@ -975,22 +972,20 @@ public:
             dst0 = msplit[0] * reduceAmt + msplit[1] * reduceAmt + msplit[2] * reduceAmt;
             break;
         }
-
         double minVal, maxVal;
         minMaxLoc(dst0, &minVal, &maxVal);
         dst2 = dst0 - minVal;
-
         dst2.setTo(maxVal - minVal, task->maxDepthMask);
+
         minMaxLoc(dst2, &minVal, &maxVal);
         classCount = 255 - givenClassCount - 1;
-        dst2 *= classCount / maxVal;
+        dst2 *= (double)classCount / maxVal;
         dst2 += givenClassCount + 1;
         dst2.convertTo(dst2, CV_8U);
-
-        labels[2] = "Reduced Pointcloud - reduction factor = " + to_string(reduceAmt) +
-                    " produced " + to_string(classCount) + " regions";
+        labels[2] = "Reduced Pointcloud - reduction factor = " + to_string(reduceAmt) + " produced " + to_string(classCount) + " regions";
     }
 };
+
 
 
 

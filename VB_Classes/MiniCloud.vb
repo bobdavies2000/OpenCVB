@@ -106,7 +106,7 @@ Public Class MiniCloud_RotateAngle : Inherits VB_Algorithm
         If ySlider.Value + 1 >= ySlider.maximum Then ySlider.Value = ySlider.minimum Else ySlider.Value += 1
 
         peak.Run(src)
-        Dim mm = vbMinMax(peak.histogram)
+        Dim mm as mmData = vbMinMax(peak.histogram)
 
         Dim mean = peak.histogram.Mean()(0) * 100
         Dim mask = peak.histogram.Threshold(mean, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
