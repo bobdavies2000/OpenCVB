@@ -43,11 +43,11 @@ Public Class Neighbor_Basics : Inherits VB_Algorithm
                 stats.Run(task.color)
 
                 strOut = stats.strOut
-                If nabList(task.rcSelect.index).Count > 0 Then
+                If nabList(task.rc.index).Count > 0 Then
                     strOut += "Neighbors: "
                     dst1.SetTo(0)
-                    dst1(task.rcSelect.rect).SetTo(task.rcSelect.color, task.rcSelect.mask)
-                    For Each index In nabList(task.rcSelect.index)
+                    dst1(task.rc.rect).SetTo(task.rc.color, task.rc.mask)
+                    For Each index In nabList(task.rc.index)
                         Dim rc = redCells(index)
                         dst1(rc.rect).SetTo(rc.color, rc.mask)
                         strOut += CStr(index) + ","
@@ -242,7 +242,7 @@ Public Class Neighbor_Flood : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
         If rc.floodPoint.X > 0 Then
             Dim rcNeighbor = redC.redCells(redC.cellMap.Get(Of Byte)(rc.floodPoint.Y, rc.floodPoint.X - 1))
             vbDrawContour(dst2(rcNeighbor.rect), rcNeighbor.contour, cv.Scalar.White, task.lineWidth)
@@ -272,8 +272,8 @@ Public Class Neighbor_BasicsTest : Inherits VB_Algorithm
         nabs.Run(redC.cellMap)
 
         dst3.SetTo(0)
-        dst3(task.rcSelect.rect).SetTo(task.rcSelect.color, task.rcSelect.mask)
-        For Each index In nabs.nabList(task.rcSelect.index)
+        dst3(task.rc.rect).SetTo(task.rc.color, task.rc.mask)
+        For Each index In nabs.nabList(task.rc.index)
             Dim rc = redC.redCells(index)
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next

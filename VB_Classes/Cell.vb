@@ -10,13 +10,13 @@ Public Class Cell_Basics : Inherits VB_Algorithm
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString(src As cv.Mat)
-        Dim tmp = New cv.Mat(task.rcSelect.mask.Rows, task.rcSelect.mask.Cols, cv.MatType.CV_32F, 0)
-        task.pcSplit(2)(task.rcSelect.rect).CopyTo(tmp, task.rcSelect.mask)
-        plot.rc = task.rcSelect
+        Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, 0)
+        task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
+        plot.rc = task.rc
         plot.Run(tmp)
         dst1 = plot.dst2
 
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
 
         Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
         strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbCrLf
@@ -57,15 +57,15 @@ Public Class Cell_Basics : Inherits VB_Algorithm
         End If
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone or runRedCloud Then
+        If standalone Or runRedCloud Then
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
             setSelectedCell(redC.redCells, redC.cellMap)
         End If
-        If task.rcSelect.index = 0 Then strOut = "Select any cell to get the statistics on it"
-        If heartBeat() And task.rcSelect.index <> 0 Then statsString(src)
+        If task.rc.index = 0 Then strOut = "Select any cell to get the statistics on it"
+        If heartBeat() And task.rc.index <> 0 Then statsString(src)
 
         setTrueText(strOut, 3)
         labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.maxZmeters)) + " meters"
@@ -130,7 +130,7 @@ Public Class Cell_Stable : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
         dst3 = dst2.Clone
-        dst3(task.rcSelect.rect).SetTo(task.rcSelect.color, task.rcSelect.mask)
+        dst3(task.rc.rect).SetTo(task.rc.color, task.rc.mask)
         labels(2) = redC.labels(2)
 
         Static prevList As New List(Of cv.Point)
@@ -425,8 +425,8 @@ Public Class Cell_Distance : Inherits VB_Algorithm
             Dim maxColorDistance As Integer
             Static maxDistance As Integer
             For Each rc In redC.redCells
-                rc.colorDistance = CInt(distance3D(task.rcSelect.colorMean, rc.colorMean))
-                rc.depthDistance = distance3D(task.rcSelect.depthMean, rc.depthMean)
+                rc.colorDistance = CInt(distance3D(task.rc.colorMean, rc.colorMean))
+                rc.depthDistance = distance3D(task.rc.depthMean, rc.depthMean)
                 redCells.Add(rc)
                 If maxColorDistance < rc.colorDistance Then maxColorDistance = rc.colorDistance
             Next
@@ -502,8 +502,6 @@ Public Class Cell_DistanceDepth : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Public colorOnly As New RedCloud_Cells
     Public Sub New()
-        redC.displaySelectedCell = False
-        colorOnly.redC.displaySelectedCell = False
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Measure color distance from black for both color and depth cells."
     End Sub

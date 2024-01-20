@@ -18,7 +18,7 @@ Public Class Projection_Basics : Inherits VB_Algorithm
         dst1 = heat.dst2.Clone
         dst3 = heat.dst3.Clone
 
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
 
         dst0.SetTo(0)
         task.pointCloud(rc.rect).CopyTo(dst0(rc.rect), rc.mask)

@@ -11,7 +11,7 @@ Public Class Triangle_Basics : Inherits VB_Algorithm
         dst2 = redC.dst2
 
         If redC.redCells.Count <= 1 Then Exit Sub
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
         If rc.index = 0 Then Exit Sub
 
         dst3.SetTo(0)
@@ -52,7 +52,7 @@ Public Class Triangle_HullContour : Inherits VB_Algorithm
         hulls.Run(src)
         dst2 = hulls.dst2
         If hulls.redC.redCells.Count <= 1 Then Exit Sub
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
 
         rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxTC89L1)
 
@@ -90,7 +90,7 @@ Public Class Triangle_RedCloud : Inherits VB_Algorithm
         dst2 = redC.dst2
 
         If redC.redCells.Count <= 1 Then Exit Sub
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
         If rc.index = 0 Then Exit Sub
 
         triangles.Clear()
@@ -131,7 +131,7 @@ Public Class Triangle_Cell : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
         If redC.redCells.Count <= 1 Then Exit Sub
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
         If rc.index = 0 Then Exit Sub
 
         dst3.SetTo(0)
@@ -187,7 +187,7 @@ Public Class Triangle_Mask : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
         If redC.redCells.Count <= 1 Then Exit Sub
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
         If rc.index = 0 Then Exit Sub
 
         dst3.SetTo(0)

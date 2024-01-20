@@ -192,7 +192,7 @@ Module VB
         dst.Circle(pt, task.dotSize, cv.Scalar.Black, -1, task.lineType)
     End Sub
     Public Sub showSelectedCell(dst As cv.Mat)
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
         dst(rc.rect).SetTo(cv.Scalar.White, rc.mask)
         dst.Circle(rc.maxDist, task.dotSize, cv.Scalar.Black, -1, task.lineType)
 
@@ -200,24 +200,24 @@ Module VB
         dst.Circle(rc.maxDStable, task.dotSize, cv.Scalar.White, -1, task.lineType)
     End Sub
     Public Sub setSelectedCell(ByRef redCells As List(Of rcData), ByRef cellMap As cv.Mat)
-        task.rcSelect = New rcData
+        task.rc = New rcData
         Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
         If task.mouseClickFlag Then
-            task.rcSelect = If(redCells.Count > 0, redCells(index), New rcData)
+            task.rc = If(redCells.Count > 0, redCells(index), New rcData)
         Else
             If task.clickPoint = New cv.Point(0, 0) Or index >= redCells.Count Then
                 If redCells.Count > 2 Then
                     task.clickPoint = redCells(1).maxDist
-                    task.rcSelect = redCells(1)
+                    task.rc = redCells(1)
                 Else
                     Exit Sub
                 End If
             Else
-                task.rcSelect = redCells(index)
+                task.rc = redCells(index)
             End If
         End If
 
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
         If rc.rect.Width > 1 And rc.rect.Height > 1 Then
             task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
             task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)

@@ -12,7 +12,7 @@ Public Class Spectrum_Basics : Inherits VB_Algorithm
         dSpec.Run(src)
         gSpec.Run(src)
 
-        If heartBeat() And task.rcSelect.index > 0 Then
+        If heartBeat() And task.rc.index > 0 Then
             strOut = dSpec.strOut + vbCrLf + vbCrLf
             strOut += gSpec.strOut
         End If
@@ -37,8 +37,8 @@ Public Class Spectrum_X : Inherits VB_Algorithm
 
         If standalone Then dst2 = options.runRedCloud(labels(2))
 
-        If heartBeat() And task.rcSelect.index > 0 Then
-            Dim ranges = options.buildDepthRanges(task.pcSplit(0)(task.rcSelect.rect).Clone, " pointcloud X ")
+        If heartBeat() And task.rc.index > 0 Then
+            Dim ranges = options.buildDepthRanges(task.pcSplit(0)(task.rc.rect).Clone, " pointcloud X ")
             strOut = options.strOut
         End If
         setTrueText(strOut, 3)
@@ -61,8 +61,8 @@ Public Class Spectrum_Y : Inherits VB_Algorithm
 
         If standalone Then dst2 = options.runRedCloud(labels(2))
 
-        If heartBeat() And task.rcSelect.index > 0 Then
-            Dim ranges = options.buildDepthRanges(task.pcSplit(1)(task.rcSelect.rect).Clone, " pointcloud Y ")
+        If heartBeat() And task.rc.index > 0 Then
+            Dim ranges = options.buildDepthRanges(task.pcSplit(1)(task.rc.rect).Clone, " pointcloud Y ")
             strOut = options.strOut
         End If
         setTrueText(strOut, 3)
@@ -84,8 +84,8 @@ Public Class Spectrum_Z : Inherits VB_Algorithm
         options.RunVB()
         If standalone Then dst2 = options.runRedCloud(labels(2))
 
-        If heartBeat() And task.rcSelect.index > 0 Then
-            Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rcSelect.rect).Clone, " pointcloud Z ")
+        If heartBeat() And task.rc.index > 0 Then
+            Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rc.rect).Clone, " pointcloud Z ")
             strOut = options.strOut
         End If
         setTrueText(strOut, 3)
@@ -239,7 +239,7 @@ Public Class Spectrum_Breakdown : Inherits VB_Algorithm
             dst2 = options.runRedCloud(labels(2))
         End If
 
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
         Dim ranges As List(Of rangeData), input As cv.Mat, typeSpec As String
         If rc.depthPixels / rc.pixels < 0.5 Then
             input = New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
@@ -287,7 +287,7 @@ Public Class Spectrum_Breakdown : Inherits VB_Algorithm
         End If
 
         rc.mask = rc.mask.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        task.rcSelect = rc
+        task.rc = rc
     End Sub
 End Class
 
@@ -311,9 +311,9 @@ Public Class Spectrum_RedCloud : Inherits VB_Algorithm
         redCells.Clear()
         dst3.SetTo(0)
         For Each rc In breakdown.options.redC.redCells
-            task.rcSelect = rc
+            task.rc = rc
             breakdown.Run(src)
-            rc = task.rcSelect
+            rc = task.rc
             redCells.Add(rc)
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
@@ -360,7 +360,7 @@ Public Class Spectrum_Gray : Inherits VB_Algorithm
 
         If standalone Then dst2 = options.runRedCloud(labels(2))
 
-        Dim input = src(task.rcSelect.rect)
+        Dim input = src(task.rc.rect)
         If input.Type <> cv.MatType.CV_8U Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim ranges = options.buildColorRanges(input, typeSpec)
         strOut = options.strOut

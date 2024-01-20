@@ -150,7 +150,7 @@ Public Class Foreground_RedForeground : Inherits VB_Algorithm
         dst2 = redC.dst2.Clone
         labels(2) = redC.labels(3)
         If redC.redCells.Count > 0 Then
-            dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
+            dst2(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
         End If
         ' dst2.SetTo(0, fore.dst3)
         If standalone Or showIntermediate() Then identifyCells(redC.redCells)
@@ -184,7 +184,7 @@ Public Class Foreground_RedBackground : Inherits VB_Algorithm
 
         labels(2) = redC.labels(3)
         If redC.redCells.Count > 0 Then
-            dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
+            dst2(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
         End If
         If standalone Or showIntermediate() Then identifyCells(redC.redCells)
     End Sub
@@ -210,7 +210,7 @@ Public Class Foreground_RedMin : Inherits VB_Algorithm
         dst3 = back.dst2
         labels(3) = back.labels(2)
         If fore.redC.redCells.Count > 0 Then
-            dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
+            dst2(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
         End If
     End Sub
 End Class

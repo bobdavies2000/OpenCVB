@@ -3,7 +3,6 @@ Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public displaySelectedCell As Boolean = True
     Public combine As New RedCloud_Combine
     Dim unmatched As New RedCloud_UnmatchedCount
     Public Sub New()
@@ -94,7 +93,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         dst3 = unmatched.dst3
         labels = unmatched.labels
 
-        If (standalone Or showIntermediate()) And displaySelectedCell Then setSelectedCell(redCells, cellMap)
+        If standalone Or showIntermediate() Then setSelectedCell(redCells, cellMap)
     End Sub
 End Class
 
@@ -295,7 +294,7 @@ Public Class RedCloud_FindCells : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
 
         Dim cells As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim r = New cv.Rect(rc.rect.X - 1, rc.rect.Y - 1, rc.rect.Width + 2, rc.rect.Height + 2)
@@ -495,7 +494,7 @@ Public Class RedCloud_Features : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
 
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
 
         dst0 = task.color
         Dim correlationMat As New cv.Mat, correlationXtoZ As Single, correlationYtoZ As Single
@@ -544,7 +543,7 @@ Public Class RedCloud_ShapeCorrelation : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
         If rc.contour.Count > 0 Then
             Dim shape = shapeCorrelation(rc.contour)
             strOut = "Contour correlation for selected cell contour X to Y = " + Format(shape, fmt3) + vbCrLf + vbCrLf +
@@ -649,7 +648,7 @@ Public Class RedCloud_PlaneFromContour : Inherits VB_Algorithm
             labels(2) = redC.labels(2)
         End If
 
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
         Dim fitPoints As New List(Of cv.Point3f)
         For Each pt In rc.contour
             If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
@@ -685,7 +684,7 @@ Public Class RedCloud_PlaneFromMask : Inherits VB_Algorithm
             labels(2) = redC.labels(2)
         End If
 
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
         Dim fitPoints As New List(Of cv.Point3f)
         For y = 0 To rc.rect.Height - 1
             For x = 0 To rc.rect.Width - 1
@@ -868,7 +867,7 @@ Public Class RedCloud_ProjectCell : Inherits VB_Algorithm
 
         labels(2) = redC.labels(2)
 
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
 
         Dim pc = New cv.Mat(rc.rect.Height, rc.rect.Width, cv.MatType.CV_32FC3, 0)
         task.pointCloud(rc.rect).CopyTo(pc, rc.mask)
@@ -980,7 +979,7 @@ Public Class RedCloud_LikelyFlatSurfaces : Inherits VB_Algorithm
             End If
         Next
 
-        Dim rcX = task.rcSelect
+        Dim rcX = task.rc
         setTrueText("mean depth = " + Format(rcX.depthMean.Z, "0.0"), 3)
         labels(2) = redC.labels(2)
     End Sub
@@ -1004,7 +1003,7 @@ Public Class RedCloud_PlaneEq3D : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Dim rc = task.rcSelect
+        Dim rc = task.rc
         If rc.maxVec.Z Then
             eq.rc = rc
             eq.Run(empty)
@@ -1565,6 +1564,8 @@ Public Class RedCloud_OnlyColor : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
+
+        setSelectedCell(redC.redCells, redC.cellMap)
     End Sub
 End Class
 
@@ -1847,39 +1848,6 @@ End Class
 
 
 
-
-Public Class RedCloud_Combine2Runs : Inherits VB_Algorithm
-    Public colorC As New RedCloud_Basics
-    Public redC As New RedCloud_Basics
-    Public Sub New()
-        redC.displaySelectedCell = False
-        desc = "Run RedCloud for depth and for color at the same time and then combine."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redOptions.UseDepth.Checked = True
-        task.optionsChanged = False
-        redC.Run(src)
-        dst2 = redC.dst2.Clone
-        labels(2) = redC.labels(2)
-
-        redOptions.UseColor.Checked = True
-        task.optionsChanged = False
-        colorC.Run(src)
-        dst3 = colorC.dst2.Clone
-        labels(3) = colorC.labels(2)
-
-        Dim cellmap = colorC.cellMap.Clone
-        redC.cellMap.CopyTo(cellmap, task.depthMask)
-
-        setSelectedCell(redC.redCells, redC.cellMap)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class RedCloud_Gaps : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Dim frames As New History_Basics
@@ -1897,7 +1865,7 @@ Public Class RedCloud_Gaps : Inherits VB_Algorithm
         dst3 = frames.dst2
 
         If redC.redCells.Count > 0 Then
-            dst2(task.rcSelect.rect).SetTo(cv.Scalar.White, task.rcSelect.mask)
+            dst2(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
         End If
 
         If redC.redCells.Count > 0 Then
@@ -2107,7 +2075,7 @@ Public Class RedCloud_MotionBGsubtract : Inherits VB_Algorithm
 
         redCells.Clear()
         dst1.SetTo(0)
-        For Each rc In redc.redCells
+        For Each rc In redC.redCells
             Dim tmp As cv.Mat = rc.mask And motion.dst2(rc.rect)
             If tmp.CountNonZero Then
                 dst1(rc.rect).SetTo(rc.color, rc.mask)
@@ -2367,5 +2335,64 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_Both : Inherits VB_Algorithm
+    Public colorC As New RedCloud_Basics
+    Public redC As New RedCloud_Basics
+    Public Sub New()
+        desc = "Run RedCloud for depth and for color at the same time and then combine."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redOptions.UseDepth.Checked = True
+        task.optionsChanged = False
+        redC.Run(src)
+        dst2 = redC.dst2.Clone
+        labels(2) = redC.labels(2)
+
+        redOptions.UseColor.Checked = True
+        task.optionsChanged = False
+        colorC.Run(src)
+        dst3 = colorC.dst2.Clone
+        labels(3) = colorC.labels(2)
+
+        Dim cellmap = colorC.cellMap.Clone
+        redC.cellMap.CopyTo(cellmap, task.depthMask)
+
+        Static redCSelected As Integer
+        If task.mouseClickFlag Then
+            redCSelected = If(task.mousePicTag = 2, RESULT_DST2, RESULT_DST3)
+        End If
+
+        If redCSelected = RESULT_DST2 Then
+            setSelectedCell(redC.redCells, redC.cellMap)
+        ElseIf redCSelected = RESULT_DST3 Then
+            setSelectedCell(colorC.redCells, colorC.cellMap)
+        End If
+        dst3(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class newClass_Basics : Inherits VB_Algorithm
+    Public Sub New()
+        labels = {"", "", "Grayscale", "dst3Label"}
+        advice = ""
+        desc = "description"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class

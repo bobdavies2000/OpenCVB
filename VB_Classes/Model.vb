@@ -134,7 +134,7 @@ Public Class Model_CellZoom : Inherits VB_Algorithm
         dst2 = oglData.dst2
         dst3 = oglData.oglD.dst3
 
-        Dim rcX = task.rcSelect
+        Dim rcX = task.rc
 
         dst1.SetTo(0)
         Dim mask = dst3.InRange(cv.Scalar.White, cv.Scalar.White)

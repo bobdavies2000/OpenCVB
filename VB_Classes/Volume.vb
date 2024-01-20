@@ -10,7 +10,7 @@ Public Class Volume_Basics : Inherits VB_Algorithm
         If standalone Then
             redC.Run(src)
             dst2 = redC.dst2
-            rc = task.rcSelect
+            rc = task.rc
         End If
 
         Dim xList As New List(Of Single)
