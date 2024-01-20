@@ -754,7 +754,6 @@ Public Class rcData
     Public colorMean As New cv.Scalar
     Public colorStdev As New cv.Scalar
     Public colorDistance As Integer
-    Public grayMean As Integer
 
     Public depthMean As cv.Point3f
     Public depthStdev As cv.Point3f

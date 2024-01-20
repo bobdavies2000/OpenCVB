@@ -4,93 +4,72 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public displaySelectedCell As Boolean = True
-    Public contourToMask As Boolean = True
     Public combine As New RedCloud_Combine
     Dim unmatched As New RedCloud_UnmatchedCount
     Public Sub New()
         desc = "Match cells from the previous generation"
     End Sub
-    Private Function matchPreviousCell(rc As rcData) As rcData
-        Static lastCells As New List(Of rcData), lastCellMap As New cv.Mat, usedColors As New List(Of cv.Vec3b)
-        If rc.index = 1 Then
-            lastCellMap = cellMap.Clone
-            lastCells = New List(Of rcData)(redCells)
-            usedColors.Clear()
-            usedColors.Add(black)
-        End If
-        Dim lrc As New rcData
-        rc.motionRect = rc.rect
-        Dim val = task.pcSplit(2).Get(Of Single)(rc.floodPoint.Y, rc.floodPoint.X)
-        If val = 0 Then rc.depthCell = False Else rc.depthCell = True
 
-        rc.maxDStable = rc.maxDist ' assume it has to use the latest.
-        Dim indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-        If indexLast < lastCells.Count Then
-            lrc = lastCells(indexLast)
-            rc.motionRect = rc.rect.Union(lrc.rect)
-            rc.color = lrc.color
-
-            Dim stableCheck = lastCellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
-            If stableCheck = indexLast Then
-                rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
-                rc.matchCount = lrc.matchCount + 1
-            End If
-        End If
-
-        rc.matchFlag = True
-        If usedColors.Contains(rc.color) Then
-            rc.color = randomCellColor()
-            rc.matchCount = 0
-            rc.matchFlag = False
-        End If
-
-        usedColors.Add(rc.color)
-
-        If contourToMask Then
-            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            vbDrawContour(rc.mask, rc.contour, 255, -1)
-        End If
-
-        rc.depthMask = rc.mask.Clone
-        rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
-        rc.depthPixels = rc.depthMask.CountNonZero
-
-        Dim minLoc As cv.Point, maxLoc As cv.Point
-        If rc.depthPixels Then
-            task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.depthMask)
-            task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.depthMask)
-            task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.depthMask)
-
-            Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
-            cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.depthMask)
-
-            rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
-            rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
-        End If
-
-        rc.pixels = rc.mask.CountNonZero
-
-        Return rc
-    End Function
     Public Sub RunVB(src As cv.Mat)
         combine.Run(src)
 
         If task.optionsChanged Then cellMap.SetTo(0)
+        Dim lastCells As New List(Of rcData)(redCells), lastCellMap As cv.Mat = cellMap.Clone, usedColors As New List(Of cv.Vec3b)
 
         If dst2.Size <> src.Size Then dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
 
         task.rcMatchMax = 0
-        Dim rc As rcData
         Dim minPixels = gOptions.minPixelsSlider.Value
         Dim newCells As New List(Of rcData)
         For Each rc In combine.combinedCells
-            rc = matchPreviousCell(rc)
+            Dim lrc As New rcData
+            rc.maxDStable = rc.maxDist ' assume it has to use the latest.
+            rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If rc.indexLast < lastCells.Count Then
+                lrc = lastCells(rc.indexLast)
+                rc.motionRect = rc.rect.Union(lrc.rect)
+                rc.color = lrc.color
+                rc.matchFlag = True
+
+                Dim stableCheck = lastCellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
+                If stableCheck = rc.indexLast Then
+                    rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+                    rc.matchCount = lrc.matchCount + 1
+                End If
+            End If
+
+            If usedColors.Contains(rc.color) Then
+                rc.color = randomCellColor()
+                rc.matchCount = 0
+                rc.matchFlag = False
+            End If
+
+            usedColors.Add(rc.color)
+
+            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            vbDrawContour(rc.mask, rc.contour, 255, -1)
+
+            rc.depthMask = rc.mask.Clone
+            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
+            rc.depthPixels = rc.depthMask.CountNonZero
+
+            Dim minLoc As cv.Point, maxLoc As cv.Point
+            If rc.depthPixels Then
+                task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.depthMask)
+                task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.depthMask)
+                task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.depthMask)
+
+                Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
+                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.depthMask)
+
+                rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
+                rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
+            End If
+
             rc.index = newCells.Count
             cv.Cv2.MeanStdDev(src(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-            Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
-            cv.Cv2.MeanStdDev(task.gray(rc.rect), grayMean, grayStdev, rc.mask)
-            rc.grayMean = CInt(grayMean(0))
 
+            rc.pixels = rc.mask.CountNonZero
             If rc.mask.Size = dst2.Size Or rc.pixels < minPixels Then Continue For
             If heartBeat() Then rc.matchCount = 1
             newCells.Add(rc)
@@ -1578,7 +1557,6 @@ End Class
 Public Class RedCloud_OnlyColor : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Public Sub New()
-        ' redC.contourToMask = False
         redOptions.UseColor.Checked = True  ' <<<<<<< this is what is different.
         desc = "Create RedCloud output using only color."
     End Sub
@@ -2372,12 +2350,16 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
             rc.index = i + 1
             rc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
             rc.mask = dst2(rc.rect).InRange(rc.index, rc.index).Threshold(0, 255, cv.ThresholdTypes.Binary)
+            rc.motionRect = rc.rect ' initialize the motionRect. It will be modified in RedCloud_Basics.
 
             rc.pixels = sizeData.Get(Of Integer)(i, 0)
             rc.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
             rc.mask.Rectangle(New cv.Rect(0, 0, rc.mask.Width, rc.mask.Height), 0, 1)
             Dim pt = vbGetMaxDist(rc.mask)
             rc.maxDist = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
+            Dim val = task.pcSplit(2).Get(Of Single)(rc.floodPoint.Y, rc.floodPoint.X)
+            If val = 0 Then rc.depthCell = False Else rc.depthCell = True
+
             sortedCells.Add(rc.pixels, rc)
         Next
 

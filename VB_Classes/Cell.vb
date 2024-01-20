@@ -299,12 +299,10 @@ Public Class Cell_JumpUp : Inherits VB_Algorithm
 
         jumpCells.Clear()
         For Each rc In redC.redCells
-            If rc.indexLast <> 0 Then
-                Dim lrc = lastCells(rc.indexLast)
-                If (rc.pixels - lrc.pixels) / rc.pixels >= percentJump Then
-                    dst3(lrc.rect).SetTo(cv.Scalar.White, lrc.mask)
-                    jumpCells.Add(rc.index, New cv.Vec2i(lrc.index, rc.index))
-                End If
+            Dim lrc = lastCells(rc.indexLast)
+            If (rc.pixels - lrc.pixels) / rc.pixels >= percentJump Then
+                dst3(lrc.rect).SetTo(cv.Scalar.White, lrc.mask)
+                jumpCells.Add(rc.index, New cv.Vec2i(lrc.index, rc.index))
             End If
         Next
         If heartBeat() Then labels(3) = "There were " + CStr(jumpCells.Count) + " cells jumped up more than " +
@@ -472,7 +470,9 @@ Public Class Cell_Binarize : Inherits VB_Algorithm
 
             Dim grayMeans As New List(Of Single)
             For Each rc In redC.redCells
-                grayMeans.Add(rc.grayMean)
+                Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
+                cv.Cv2.MeanStdDev(task.gray(rc.rect), grayMean, grayStdev, rc.mask)
+                grayMeans.Add(grayMean(0))
             Next
             Dim min = grayMeans.Min
             Dim max = grayMeans.Max
@@ -480,9 +480,9 @@ Public Class Cell_Binarize : Inherits VB_Algorithm
 
             dst3.SetTo(0)
             For Each rc In redC.redCells
-                Dim color = (rc.grayMean - min) * 255 / (max - min)
+                Dim color = (grayMeans(rc.index) - min) * 255 / (max - min)
                 dst3(rc.rect).SetTo(color, rc.mask)
-                dst1(rc.rect).SetTo(If(rc.grayMean > avg, 255, 0), rc.mask)
+                dst1(rc.rect).SetTo(If(grayMeans(rc.index) > avg, 255, 0), rc.mask)
             Next
         End If
     End Sub
