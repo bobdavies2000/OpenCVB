@@ -5,7 +5,7 @@
 
 class rcData {
 public:
-    Rect rect;
+    cv::Rect rect;
     Rect motionRect;  // the union of the previous rect with the current rect.
     Mat mask;
     Mat depthMask;
@@ -49,7 +49,7 @@ public:
     std::map<int, int> specD;  // Using std::map for key-value pairs
 
     rcData() : index(0), depthCell(true) {
-        mask = Mat(1, 1, CV_8U);
+        mask = Mat(1, 1, CV_8U); 
         rect = Rect(0, 0, 1, 1);
     }
 };
@@ -190,6 +190,7 @@ public:
 
 
 
+
 class cppTask
 {
 private:
@@ -206,7 +207,15 @@ public:
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
     bool motionReset; rcData rcSelect; int desiredCells;
 
-    bool heartBeat; bool midHeartBeat; bool quarterBeat; bool debugCheckBox; Size minRes; int PCReduction;
+    bool heartBeat; bool midHeartBeat; bool quarterBeat; bool debugCheckBox; Size minRes; 
+    
+    // redOptions
+    int PCReduction;
+    int channels[3];
+    int channelIndex;
+    int channelCount;
+    int histBins[3];
+
     bool optionsChanged; double AddWeighted; int dotSize; int gridSize; float maxZmeters;
     int histogramBins; int pixelDiffThreshold; bool gravityPointCloud; bool useKalman;
     int paletteIndex; int polyCount; bool firstPass; Scalar highlightColor; int frameHistoryCount;
@@ -216,6 +225,7 @@ public:
     Mat gridToRoiIndex;
     int colorInputIndex;
     int depthInputIndex;
+    float xRangeDefault; float yRangeDefault;
     vector<Rect> gridList;
     vector<vector<int>> gridNeighbors;
 

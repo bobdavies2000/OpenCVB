@@ -3,6 +3,7 @@ Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
 _CPP_Plot_Histogram2D
+_CPP_Histogram_RedOptions
 _CPP_Palette_Random
 _CPP_Blur_Basics
 _CPP_Color_Basics
@@ -317,6 +318,7 @@ if algorithmName = "CPP_FPoly_TopFeatures" Then return new CPP_Basics(functionNa
 if algorithmName = "CPP_Grid_Basics" Then return new CPP_Basics(functionNames._CPP_Grid_Basics)
 if algorithmName = "CPP_Histogram_Basics" Then return new CPP_Basics(functionNames._CPP_Histogram_Basics)
 if algorithmName = "CPP_Histogram_Kalman" Then return new CPP_Basics(functionNames._CPP_Histogram_Kalman)
+if algorithmName = "CPP_Histogram_RedOptions" Then return new CPP_Basics(functionNames._CPP_Histogram_RedOptions)
 if algorithmName = "CPP_History_Basics" Then return new CPP_Basics(functionNames._CPP_History_Basics)
 if algorithmName = "CPP_Hull_Basics" Then return new CPP_Basics(functionNames._CPP_Hull_Basics)
 if algorithmName = "CPP_IMU_GMatrix" Then return new CPP_Basics(functionNames._CPP_IMU_GMatrix)

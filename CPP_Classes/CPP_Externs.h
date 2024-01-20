@@ -2,6 +2,7 @@
 #include "CPP_AI_Generated.h"
 
 CPP_Grid_Basics* gridBasics;
+CPP_Histogram_RedOptions* redOptions;
 
 extern "C" __declspec(dllexport)
 int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWeighted, 
@@ -34,9 +35,11 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case _CPP_AddWeighted_Basics :
     {task->alg = new CPP_AddWeighted_Basics(); break; }
-	case _CPP_Plot_Histogram2D :
-	{task->alg = new CPP_Plot_Histogram2D(); break; }
-	case _CPP_Palette_Random :
+    case _CPP_Plot_Histogram2D:
+    {task->alg = new CPP_Plot_Histogram2D(); break; }
+    case _CPP_Histogram_RedOptions:
+    {task->alg = new CPP_Histogram_RedOptions(); break; }
+    case _CPP_Palette_Random :
 	{task->alg = new CPP_Palette_Random(); break; }
 	case _CPP_Blur_Basics :
 	{task->alg = new CPP_Blur_Basics(); break; }
@@ -182,6 +185,7 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     task->fontColor = Scalar(255, 255, 255);
     task->cppFunction = function;
     gridBasics = new CPP_Grid_Basics();
+    redOptions = new CPP_Histogram_RedOptions();
 
     return (int *) task;
 }
@@ -231,7 +235,7 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
                             float maxZmeters, int PCReduction, float fontSize, int fontThickness,
                             int clickX, int clickY, bool clickFlag, int picTag, int moveX, int moveY,
                             int paletteIndex, int desiredCells, bool midHeartBeat, bool quarterBeat,
-                            int colorIndex, int depthInputIndex)
+                            int colorIndex, int depthInputIndex, float xRangeDefault, float yRangeDefault)
 {
     task->pixelDiffThreshold = pixelDiffThreshold;
     task->gridSize = gridSize;
@@ -260,6 +264,8 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
     task->quarterBeat = quarterBeat;
     task->colorInputIndex = colorIndex;
     task->depthInputIndex = depthInputIndex;
+    task->xRangeDefault = xRangeDefault;
+    task->yRangeDefault = yRangeDefault;
 }
 
 
@@ -417,6 +423,7 @@ int* cppTask_RunCPP(cppTask * task, int* dataPtr, int channels, int frameCount, 
 
     // any algorithms run on every iteration are inserted here...
     gridBasics->Run(src);
+    redOptions->Run(src);
 
     task->alg->Run(src);   //<<<<<< the real work is done here...
 

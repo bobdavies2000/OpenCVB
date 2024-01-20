@@ -3090,25 +3090,94 @@ public:
 
 
 
+class CPP_Histogram_RedOptions : public algorithmCPP {
+public:
+    std::vector<cv::Range> ranges;
+    std::vector<cv::Range> rangesCloud;
+    CPP_Histogram_RedOptions() : algorithmCPP() {
+        advice = "See redOption 'Histogram Channels' to control the settings here.";
+        desc = "Build the channels, channel count, and ranges based on the PointCloud Reduction setting.";
+    }
+    void Run(Mat src) {
+        cv::Vec2f rx(-task->xRangeDefault, task->xRangeDefault);
+        cv::Vec2f ry(-task->yRangeDefault, task->yRangeDefault);
+        cv::Vec2f rz(0, task->maxZmeters);
+        rangesCloud = { cv::Range(rx[0], rx[1]), cv::Range(ry[0], ry[1]), cv::Range(rz[0], rz[1]) };
+
+        task->channelCount = 1;
+        task->histBins[0] = task->histogramBins;
+        task->histBins[1] = task->histogramBins;
+        task->histBins[2] = task->histogramBins;
+        switch (task->PCReduction) {
+        case 0: // "X Reduction"
+            ranges = { cv::Range(rx[0], rx[1]) };
+            task->channels[0] = 0;
+            break;
+        case 1: // "Y Reduction"
+            ranges = { cv::Range(ry[0], ry[1]) };
+            task->channels[0] = 1;
+            break;
+        case 2: // "Z Reduction"
+            ranges = { cv::Range(rz[0], rz[1]) };
+            task->channels[0] = 2;
+            break;
+        case 3: // "XY Reduction"
+            ranges = { cv::Range(rx[0], rx[1]), cv::Range(ry[0], ry[1]) };
+            task->channelCount = 2;
+            task->channels[0] = 0;
+            task->channels[1] = 1;
+            break;
+        case 4: // "XZ Reduction"
+            ranges = { cv::Range(rx[0], rx[1]), cv::Range(rz[0], rz[1]) };
+            task->channelCount = 2;
+            task->channels[0] = 0;
+            task->channels[1] = 2;
+            task->channelIndex = 1;
+            break;
+        case 5: // "YZ Reduction"
+            ranges = { cv::Range(ry[0], ry[1]), cv::Range(rz[0], rz[1]) };
+            task->channelCount = 2;
+            task->channels[0] = 1;
+            task->channels[1] = 2;
+            task->channelIndex = 1;
+            break;
+        case 6: // "XYZ Reduction"
+            ranges = { cv::Range(rx[0], rx[1]), cv::Range(ry[0], ry[1]), cv::Range(rz[0], rz[1]) };
+            task->channelCount = 3;
+            task->channels[0] = 0;
+            task->channels[1] = 1;
+            task->channels[2] = 2;
+            task->channelIndex = 2;
+            break;
+        }
+
+        labels[2] = "RedOptions are now set...";
+    }
+};
+
+
+
+
+
+
 class CPP_Plot_Histogram2D : public algorithmCPP {
 public:
     CPP_Plot_Histogram2D() : algorithmCPP() {
         traceName = "CPP_Plot_Histogram2D";
-        labels = { "", "", "2D Histogram", "" };
+        labels = { "", "", "2D Histogram", "Threshold of all non-zero values in the plot at left." };
         desc = "Plot a 2D histogram from the input Mat";
     }
     void Run(Mat src) {
         Mat histogram = src.clone();
         if (standalone) {
-            int bins[] = { task->histogramBins, task->histogramBins };
             float hRange[] = { 0, 255 };
-            const float* range[] = { hRange,hRange };
-            int channels[] = { 0, 1 };
-            calcHist(&src, 1, channels, Mat(), histogram, 2, bins, range, true, false);
+            const float* range[] = { hRange,hRange,hRange };
+            calcHist(&src, 1, task->channels, Mat(), histogram, task->channelCount, task->histBins, range, true, false);
         }
-        resize(histogram, dst2, dst2.size(), 0, 0, INTER_NEAREST);
-        if (standalone) {
-            threshold(dst2, dst3, 0, 255, THRESH_BINARY);
-        }
+        if (histogram.rows > 0 && histogram.cols > 0)
+            resize(histogram, dst2, dst2.size(), 0, 0, INTER_NEAREST);
+        else
+            labels[2] = "Unable to portray a 3D histogram here.";
+        if (standalone) threshold(dst2, dst3, 0, 255, THRESH_BINARY);
     }
 };
