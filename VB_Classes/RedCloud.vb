@@ -1819,8 +1819,9 @@ End Class
 ' https://docs.opencv.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
 Public Class RedCloud_CCompColor : Inherits VB_Algorithm
     Dim ccomp As New CComp_Both
-    Dim rMin As New RedCloud_OnlyColorAlt
+    Dim redC As New RedCloud_Basics
     Public Sub New()
+        redOptions.UseColor.Checked = True
         desc = "Identify each Connected component as a RedCloud Cell."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1829,9 +1830,9 @@ Public Class RedCloud_CCompColor : Inherits VB_Algorithm
         dst3 = vbNormalize32f(ccomp.dst1)
         labels(3) = ccomp.labels(2)
 
-        rMin.Run(dst3)
-        dst2 = rMin.dst3
-        labels(2) = rMin.labels(3)
+        redC.Run(dst3)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(3)
     End Sub
 End Class
 

@@ -35,19 +35,20 @@ End Class
 
 Public Class Reduction_Floodfill : Inherits VB_Algorithm
     Public reduction As New Reduction_Basics
-    Public rMin As New RedCloud_OnlyColorAlt
+    Public redC As New RedCloud_Basics
     Public Sub New()
+        redOptions.UseColor.Checked = True
         labels(2) = "Reduced input to floodfill"
         redOptions.SimpleReductionSlider.Value = 32
-        desc = "Use the reduction output as input to floodfill to get masks of large masses."
+        desc = "Use the reduction output as input to floodfill to get masks of cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
         dst2 = vbPalette(reduction.dst2 * 255 / reduction.classCount)
-        rMin.Run(reduction.dst2)
-        If standalone Or showIntermediate() Then identifyCells(rMin.redCells)
-        dst3 = rMin.dst3
-        labels(3) = rMin.labels(3)
+        redC.Run(reduction.dst2)
+        If standalone Or showIntermediate() Then identifyCells(redC.redCells)
+        dst3 = redC.dst2
+        labels(3) = redC.labels(3)
     End Sub
 End Class
 
