@@ -308,20 +308,74 @@ int* cppTask_GetDst(cppTask * task, int index, int& channels)
     switch (index)
     {
     case 0:
-        channels = task->xdst0.channels();
-        return (int*)task->xdst0.data;
+        channels = task->alg->dst0.channels();
+        return (int*)task->alg->dst0.data;
     case 1:
-        channels = task->xdst1.channels();
-        return (int*)task->xdst1.data;
+        channels = task->alg->dst1.channels();
+        return (int*)task->alg->dst1.data;
     case 2:
-        channels = task->xdst2.channels();
-        return (int*)task->xdst2.data;
+        channels = task->alg->dst2.channels();
+        return (int*)task->alg->dst2.data;
     case 3:
-        channels = task->xdst3.channels();
-        return (int*)task->xdst3.data;
+        channels = task->alg->dst3.channels();
+        return (int*)task->alg->dst3.data;
     }
     return 0;
 }
+
+
+cv::Mat vbNormalize32f(const cv::Mat& input) {
+    cv::Mat outMat;
+    cv::normalize(input, outMat, 0, 255, cv::NORM_MINMAX, CV_8U);  // Normalize to 8-bit unsigned
+
+    if (input.channels() == 1) {
+        cv::cvtColor(outMat, outMat, cv::COLOR_GRAY2BGR);  // Convert single-channel to BGR
+    }
+    else {
+        outMat.convertTo(outMat, CV_8UC3);  // Convert to 3-channel CV_8UC3 for consistency
+    }
+
+    return outMat;
+}
+
+Mat MakeSureImage8uC3(const Mat& input) {
+    Mat outMat;
+    if (input.type() == CV_8UC3) {
+        outMat = input.clone();
+        return outMat;
+    }
+
+    if (input.type() == CV_32F) {
+        outMat = vbNormalize32f(input);  // Assuming this function is defined
+    }
+    else if (input.type() == CV_32SC1) {
+        input.convertTo(outMat, CV_32F);
+        outMat = vbNormalize32f(outMat);
+    }
+    else if (input.type() == CV_32SC3) {
+        input.convertTo(outMat, CV_32F);
+        cvtColor(outMat, outMat, COLOR_BGR2GRAY);
+        outMat = vbNormalize32f(outMat);
+    }
+    else if (input.type() == CV_32FC3) {
+        std::vector<Mat> split;
+        cv::split(input, split);
+        split[0].convertTo(split[0], CV_8U, 255);  // ConvertScaleAbs equivalent
+        split[1].convertTo(split[1], CV_8U, 255);
+        split[2].convertTo(split[2], CV_8U, 255);
+        merge(split, outMat);
+    }
+    else {
+        outMat = input.clone();
+    }
+
+    if (input.channels() == 1 && input.type() == CV_8UC1) {
+        cvtColor(input, outMat, COLOR_GRAY2BGR);
+    }
+
+    return outMat;
+}
+
 
 extern "C" __declspec(dllexport)
 int* cppTask_RunCPP(cppTask * task, int* dataPtr, int channels, int frameCount, int rows, int cols, float x, float y, float z,
@@ -373,16 +427,12 @@ int* cppTask_RunCPP(cppTask * task, int* dataPtr, int channels, int frameCount, 
     if (src.size() != task->alg->dst2.size()) resize(task->alg->dst2, task->alg->dst2, src.size());
     if (src.size() != task->alg->dst3.size()) resize(task->alg->dst3, task->alg->dst3, src.size());
 
-    task->xdst0 = task->alg->dst0;
-    task->xdst1 = task->alg->dst1;
-    task->xdst2 = task->alg->dst2;
-    task->xdst3 = task->alg->dst3;
+    if (task->alg->dst0.type() != CV_8UC3) task->alg->dst0 = MakeSureImage8uC3(task->alg->dst0);
+    if (task->alg->dst1.type() != CV_8UC3) task->alg->dst1 = MakeSureImage8uC3(task->alg->dst1);
+    if (task->alg->dst2.type() != CV_8UC3) task->alg->dst2 = MakeSureImage8uC3(task->alg->dst2);
+    if (task->alg->dst3.type() != CV_8UC3) task->alg->dst3 = MakeSureImage8uC3(task->alg->dst3);
 
-    if (task->alg->dst0.type() == CV_32S) task->alg->dst0.convertTo(task->xdst0, CV_8U);
-    if (task->alg->dst1.type() == CV_32S) task->alg->dst1.convertTo(task->xdst1, CV_8U);
-    if (task->alg->dst2.type() == CV_32S) task->alg->dst2.convertTo(task->xdst2, CV_8U);
-    if (task->alg->dst3.type() == CV_32S) task->alg->dst3.convertTo(task->xdst3, CV_8U);
-    return (int*)task->xdst2.data;
+    return 0;
 }
 
 

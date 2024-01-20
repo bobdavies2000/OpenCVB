@@ -27,19 +27,19 @@ public:
         switch (trackType)
         {
         case 1: // MIL
-            tracker = cv::TrackerMIL::create();
+            tracker = TrackerMIL::create();
             break;
         case 2: // KCF
-            tracker = cv::TrackerKCF::create();
+            tracker = TrackerKCF::create();
             break;
         case 5: // GOTURN
-            tracker = cv::TrackerGOTURN::create();
+            tracker = TrackerGOTURN::create();
             break;
         case 7: // CSRT
-            tracker = cv::TrackerCSRT::create();
+            tracker = TrackerCSRT::create();
             break;
         default: // MIL
-            tracker = cv::TrackerMIL::create();
+            tracker = TrackerMIL::create();
             break;
         }
     }

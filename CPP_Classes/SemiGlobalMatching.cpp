@@ -131,7 +131,7 @@ void init_paths(int image_height, int image_width)
 	}
 }
 
-void calculateCostHamming(cv::Mat& firstImage, cv::Mat& secondImage, int disparityRange, unsigned long*** C, unsigned long*** S)
+void calculateCostHamming(Mat& firstImage, Mat& secondImage, int disparityRange, unsigned long*** C, unsigned long*** S)
 {
 	unsigned long census_left = 0;
 	unsigned long census_right = 0;
@@ -302,7 +302,7 @@ void disprange_aggregation(int disparityRange, unsigned long*** C, unsigned int*
 }
 
 
-void aggregation(cv::Mat& leftImage, cv::Mat& rightImage, int disparityRange, unsigned long*** C, unsigned long*** S, unsigned int**** A)
+void aggregation(Mat& leftImage, Mat& rightImage, int disparityRange, unsigned long*** C, unsigned long*** S, unsigned int**** A)
 {
 	for (int ch_path = 0; ch_path < PATHS_PER_SCAN; ++ch_path)
 

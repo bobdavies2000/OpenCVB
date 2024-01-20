@@ -94,7 +94,7 @@ Public Class VB_to_CPP
         Dim startComments As Boolean
         For i = 0 To split.Count - 1
             If split(i).Contains("#include") Or split(i) = "" Then Continue For
-            split(i) = split(i).Replace("cv::Scalar minVal, maxVal;", "double minVal, maxVal;")
+            split(i) = split(i).Replace("Scalar minVal, maxVal;", "double minVal, maxVal;")
             If Trim(split(i)).StartsWith("class") Then
                 Dim tokens = split(i).Split(" ")
                 functionName = tokens(1)
@@ -152,7 +152,7 @@ Public Class VB_to_CPP
             split(i) = split(i).Replace("firstPass", "task->firstPass")
             split(i) = split(i).Replace("setTrueText", "task->setTrueText")
             split(i) = split(i).Replace("gOptions.GridSize.value", "task->gridSize")
-            split(i) = split(i).Replace("cv::", "")
+            split(i) = split(i).Replace("", "")
             split(i) = split(i).Replace("std::", "")
             split(i) = split(i).Replace("const Mat& src", "Mat src")
             split(i) = split(i).Replace("Mat& src", "Mat src")

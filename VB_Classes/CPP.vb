@@ -88,28 +88,26 @@ Public Class CPP_Basics : Inherits VB_Algorithm
         Dim inputImage(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, inputImage, 0, inputImage.Length)
         Dim handleInput = GCHandle.Alloc(inputImage, GCHandleType.Pinned)
-        Dim imagePtr = cppTask_RunCPP(cPtr, handleInput.AddrOfPinnedObject(), src.Channels, task.frameCount, dst2.Rows, dst2.Cols,
-                                      task.accRadians.X, task.accRadians.Y, task.accRadians.Z,
-                                      task.optionsChanged,
-                                      heartBeat(), gOptions.displayDst0.Checked, gOptions.displayDst1.Checked,
-                                      task.AddWeighted, gOptions.DebugCheckBox.Checked)
+        cppTask_RunCPP(cPtr, handleInput.AddrOfPinnedObject(), src.Channels, task.frameCount, dst2.Rows, dst2.Cols,
+                       task.accRadians.X, task.accRadians.Y, task.accRadians.Z,
+                       task.optionsChanged,
+                       heartBeat(), gOptions.displayDst0.Checked, gOptions.displayDst1.Checked,
+                       task.AddWeighted, gOptions.DebugCheckBox.Checked)
         handleInput.Free()
         getOptions()
 
-        If imagePtr <> 0 Then
-            Dim channels As Integer, dstPtr As IntPtr
-            dstPtr = cppTask_GetDst(cPtr, 0, channels)
-            dst0 = New cv.Mat(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
+        Dim channels As Integer, dstPtr As IntPtr
+        dstPtr = cppTask_GetDst(cPtr, 0, channels)
+        dst0 = New cv.Mat(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
 
-            dstPtr = cppTask_GetDst(cPtr, 1, channels)
-            dst1 = New cv.Mat(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
+        dstPtr = cppTask_GetDst(cPtr, 1, channels)
+        dst1 = New cv.Mat(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
 
-            dstPtr = cppTask_GetDst(cPtr, 2, channels)
-            dst2 = New cv.Mat(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
+        dstPtr = cppTask_GetDst(cPtr, 2, channels)
+        dst2 = New cv.Mat(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
 
-            dstPtr = cppTask_GetDst(cPtr, 3, channels)
-            dst3 = New cv.Mat(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
-        End If
+        dstPtr = cppTask_GetDst(cPtr, 3, channels)
+        dst3 = New cv.Mat(src.Rows, src.Cols, If(channels = 1, cv.MatType.CV_8UC1, cv.MatType.CV_8UC3), dstPtr)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = cppTask_Close(cPtr)

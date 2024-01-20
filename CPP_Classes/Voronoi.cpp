@@ -83,141 +83,140 @@ typedef std::set<Point>         SetPoints;
 //  distance between two points, it calculates squared distance, 
 //  which also takes advantage of the exact integer value; 
 //  
-class VoronoiDemo 
+class VoronoiDemo
 {
     //  type for non-negative values of DistanceSquared()  
-    typedef unsigned int    uint ; 
+    typedef unsigned int    uint;
 public:
     cv::Mat outImage;
     std::vector<Point> test_points;
     VoronoiDemo(void) {}
 
-    uint DistanceSquared 
-        ( 
-            Point const &   pnt_a , 
-            Point const &   pnt_b 
-        )
+    uint DistanceSquared
+    (
+        Point const& pnt_a,
+        Point const& pnt_b
+    )
     {
-        int     x = pnt_b.X() - pnt_a.X() ; 
-        int     y = pnt_b.Y() - pnt_a.Y() ; 
-        uint    d = static_cast<uint>( x*x + y*y ) ; 
+        int     x = pnt_b.X() - pnt_a.X();
+        int     y = pnt_b.Y() - pnt_a.Y();
+        uint    d = static_cast<uint>(x * x + y * y);
 
-        return d ; 
-    } 
+        return d;
+    }
 
 
     //  struct LowerBoundMemberFunction is a 
     //  function object for STL containers, such as std::set<T>, 
     //  that support member functions lower_bound(); 
-    template < typename _OrderedSet > 
+    template < typename _OrderedSet >
     struct LowerBoundMemberFunction
     {
-        typedef typename _OrderedSet::const_iterator  CtIterator ; 
+        typedef typename _OrderedSet::const_iterator  CtIterator;
 
-        LowerBoundMemberFunction ( ) { } ; 
+        LowerBoundMemberFunction() { };
 
         CtIterator
-        operator ( ) 
-            ( 
-                _OrderedSet const &     set_points , 
-                Point const &           pnt          
-            ) const 
+            operator ( )
+            (
+                _OrderedSet const& set_points,
+                Point const& pnt
+                ) const
         {
-            CtIterator  iter_res = set_points . lower_bound ( pnt ) ; 
-            return iter_res ; 
-        } 
-    } ; 
+            CtIterator  iter_res = set_points.lower_bound(pnt);
+            return iter_res;
+        }
+    };
 
- 
+
     //  struct LowerBoundSTDAlgorithm is a 
     //  function object for STL sequence containers 
     //  that store ordered elements; 
     //  for the best performance requires a container 
     //  with random access iterators;
-    template < typename _OrderedContainer > 
+    template < typename _OrderedContainer >
     struct LowerBoundSTDAlgorithm
     {
-        typedef typename _OrderedContainer::const_iterator  CtIterator ; 
+        typedef typename _OrderedContainer::const_iterator  CtIterator;
 
-        LowerBoundSTDAlgorithm ( ) { } ; 
+        LowerBoundSTDAlgorithm() { };
 
         CtIterator
-        operator ( ) 
-            ( 
-                _OrderedContainer const &   ordered_points , 
-                Point const &               pnt          
-            ) const 
+            operator ( )
+            (
+                _OrderedContainer const& ordered_points,
+                Point const& pnt
+                ) const
         {
-            CtIterator  iter_begin = ordered_points . begin ( ) ; 
-            CtIterator  iter_end   = ordered_points . end ( )   ;
-            CtIterator  iter_res   = std::lower_bound ( iter_begin , iter_end , pnt ) ; 
-            return iter_res ; 
-        } 
-    } ; 
+            CtIterator  iter_begin = ordered_points.begin();
+            CtIterator  iter_end = ordered_points.end();
+            CtIterator  iter_res = std::lower_bound(iter_begin, iter_end, pnt);
+            return iter_res;
+        }
+    };
 
 
     //  the function FindForward() is a helper 
     //  for the function MinDistanceOrderedSet() 
-    template < typename _CtIterator > 
-    void FindForward 
-        ( 
-            Point const &   pnt      , 
-            _CtIterator     it_cur   , 
-            _CtIterator     it_end   , 
-            uint &          dist_min 
-        )
+    template < typename _CtIterator >
+    void FindForward
+    (
+        Point const& pnt,
+        _CtIterator     it_cur,
+        _CtIterator     it_end,
+        uint& dist_min
+    )
     {
-        uint        dist_cur = 0 ; 
-        uint        dist_x   = 0 ; 
+        uint        dist_cur = 0;
+        uint        dist_x = 0;
 
-        while ( it_cur != it_end ) 
+        while (it_cur != it_end)
         {
-            dist_cur = DistanceSquared ( *it_cur , pnt ) ; 
-            dist_x   = (it_cur->X() - pnt.X())*(it_cur->X() - pnt.X()) ; 
+            dist_cur = DistanceSquared(*it_cur, pnt);
+            dist_x = (it_cur->X() - pnt.X()) * (it_cur->X() - pnt.X());
 
-            if ( dist_cur < dist_min ) 
-                dist_min = dist_cur ; 
+            if (dist_cur < dist_min)
+                dist_min = dist_cur;
 
-            if ( dist_x > dist_min ) 
-                break ; 
+            if (dist_x > dist_min)
+                break;
 
-            ++it_cur ; 
-        } 
-    } 
+            ++it_cur;
+        }
+    }
 
 
     //  the function FindBackward() is a helper 
     //  for the function MinDistanceOrderedSet(), 
     //  generally, it is NOT safe if container is empty;
-    template < typename _CtIterator > 
-    void FindBackward 
-        ( 
-            Point const &   pnt      , 
-            _CtIterator     it_cur   , 
-            _CtIterator     it_begin , 
-            uint &          dist_min
-        )
+    template < typename _CtIterator >
+    void FindBackward
+    (
+        Point const& pnt,
+        _CtIterator     it_cur,
+        _CtIterator     it_begin,
+        uint& dist_min
+    )
     {
-        uint        dist_cur = 0 ; 
-        uint        dist_x   = 0 ; 
+        uint        dist_cur = 0;
+        uint        dist_x = 0;
 
-        do 
+        do
         {
             //  it is safe if input ( it_cur == container.end() )  
             //  and container is NOT empty 
-            --it_cur ; 
+            --it_cur;
 
-            dist_cur = DistanceSquared ( *it_cur , pnt ) ; 
-            dist_x   = (it_cur->X() - pnt.X())*(it_cur->X() - pnt.X()) ; 
+            dist_cur = DistanceSquared(*it_cur, pnt);
+            dist_x = (it_cur->X() - pnt.X()) * (it_cur->X() - pnt.X());
 
-            if ( dist_cur < dist_min ) 
-                dist_min = dist_cur ; 
+            if (dist_cur < dist_min)
+                dist_min = dist_cur;
 
-            if ( dist_x > dist_min ) 
-                break ; 
-        }
-        while ( it_cur != it_begin ) ;
-    } 
+            if (dist_x > dist_min)
+                break;
+        } while (it_cur != it_begin);
+    }
 
 
     //  the function MinDistanceOrderedSet() implements  
@@ -241,33 +240,33 @@ public:
     //  for examples how to use the function MinDistanceOrderedSet(), 
     //  see the code below in this file; 
     //  
-    template < typename _OrderedSet , typename _FuncLowBound > 
-    uint  MinDistanceOrderedSet 
-        ( 
-            _OrderedSet const &     set_points , 
-            _FuncLowBound           find_LB    , 
-            Point const &           pnt         
-        )
+    template < typename _OrderedSet, typename _FuncLowBound >
+    uint  MinDistanceOrderedSet
+    (
+        _OrderedSet const& set_points,
+        _FuncLowBound           find_LB,
+        Point const& pnt
+    )
     {
-        typedef typename _OrderedSet::const_iterator  CtIterator ; 
+        typedef typename _OrderedSet::const_iterator  CtIterator;
 
-        uint        dist_min   = UINT_MAX ; 
-        CtIterator  iter_begin = set_points . begin ( ) ; 
-        CtIterator  iter_end   = set_points . end ( )   ;
+        uint        dist_min = UINT_MAX;
+        CtIterator  iter_begin = set_points.begin();
+        CtIterator  iter_end = set_points.end();
         //  call lower boundary algorithm through a function object
-        CtIterator  iter_forw  = find_LB ( set_points , pnt ) ; 
-        CtIterator  iter_back  = iter_forw ; 
+        CtIterator  iter_forw = find_LB(set_points, pnt);
+        CtIterator  iter_back = iter_forw;
 
-        bool        move_forward  = ( iter_forw != iter_end   ) ; 
-        bool        move_backward = ( iter_back != iter_begin ) ; 
+        bool        move_forward = (iter_forw != iter_end);
+        bool        move_backward = (iter_back != iter_begin);
 
-        if ( move_forward ) 
-            FindForward  ( pnt , iter_forw , iter_end   , dist_min ) ; 
-        if ( move_backward ) 
-            FindBackward ( pnt , iter_back , iter_begin , dist_min ) ; 
+        if (move_forward)
+            FindForward(pnt, iter_forw, iter_end, dist_min);
+        if (move_backward)
+            FindBackward(pnt, iter_back, iter_begin, dist_min);
 
-        return dist_min ; 
-    } 
+        return dist_min;
+    }
 
 
     //  the function TestOrderedSet() tests the efficiency of 
@@ -277,26 +276,26 @@ public:
     //  it calculates the minimum distance from each point in 
     //  the given rectangle to a point in the input set; 
     //
-    template < typename _OrderedSet , typename _FuncLowBound > 
-    cv::Mat TestOrderedSet(const int rect_width, const int rect_height) 
+    template < typename _OrderedSet, typename _FuncLowBound >
+    cv::Mat TestOrderedSet(const int rect_width, const int rect_height)
     {
-        _OrderedSet     set_points ( test_points.begin() , test_points.end() ) ; 
-        _FuncLowBound   func_lower_bound ;    
+        _OrderedSet     set_points(test_points.begin(), test_points.end());
+        _FuncLowBound   func_lower_bound;
 
         cv::Mat dist = cv::Mat(rect_height, rect_width, CV_32F);
-        for     ( int  x = 0 ; x < rect_width  ; ++x )
+        for (int x = 0; x < rect_width; ++x)
         {
-            for ( int  y = 0 ; y < rect_height ; ++y )
+            for (int y = 0; y < rect_height; ++y)
             {
-                Point p(x, y); 
+                Point p(x, y);
                 float nextVal = (float)MinDistanceOrderedSet(test_points, func_lower_bound, p);
                 dist.at<float>(y, x) = nextVal;
             }
         }
 
-        
-        return dist; 
-    } 
+
+        return dist;
+    }
 
 
     //  the function Run: 
@@ -324,14 +323,14 @@ VoronoiDemo * VoronoiDemo_Open()
 }
 
 extern "C" __declspec(dllexport)
-int * VoronoiDemo_Close(VoronoiDemo *cPtr)
+int* VoronoiDemo_Close(VoronoiDemo * cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
 extern "C" __declspec(dllexport)
-int* VoronoiDemo_Run(VoronoiDemo *cPtr, cv::Point *input, int pointCount, int width, int height)
+int* VoronoiDemo_Run(VoronoiDemo * cPtr, cv::Point * input, int pointCount, int width, int height)
 {
     cPtr->test_points.clear();
     for (int i = 0; i < pointCount; ++i)

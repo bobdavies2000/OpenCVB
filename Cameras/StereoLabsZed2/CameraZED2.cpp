@@ -99,7 +99,7 @@ public:
 		if (dataPtr != 0)
 		{
 			tmp = cv::Mat(captureHeight, captureWidth, CV_8UC4, dataPtr);
-			cv::cvtColor(tmp, tmp, cv::ColorConversionCodes::COLOR_BGRA2BGR);
+			cvtColor(tmp, tmp, ColorConversionCodes::COLOR_BGRA2BGR);
 		}
 		else {
 			tmp = cv::Mat(captureHeight, captureWidth, CV_8UC3);
@@ -108,18 +108,18 @@ public:
 			int thickness = 2;
 			int y = 20, incr = 20;
 			int font = FONT_HERSHEY_SIMPLEX;
-			cv::putText(tmp, "Buffers from StereoLabs ZED driver are 0", cv::Point(20, y), font, scale,
-				cv::Scalar::all(255), thickness);
-			cv::putText(tmp, "Recommendation: install the latest CUDA and StereoLabs SDK",
-				cv::Point(20, y + incr), font, scale, cv::Scalar::all(255), thickness);
-			cv::putText(tmp, "A working version of CUDA is required for StereoLabs cameras.",
-				cv::Point(20, y + incr * 2), font, scale, cv::Scalar::all(255), thickness);
-			cv::putText(tmp, "And make sure that the latest CUDA installed properly.",
-				cv::Point(20, y + incr * 3), font, scale, cv::Scalar::all(255), thickness);
-			cv::putText(tmp, "The NSight Visual Studio Edition can fail and is not essential.",
-				cv::Point(20, y + incr * 4), font, scale, cv::Scalar::all(255), thickness);
-			cv::putText(tmp, "Use the 'Custom' install to remove NSight.",
-				cv::Point(20, y + incr * 5), font, scale, cv::Scalar::all(255), thickness);
+			putText(tmp, "Buffers from StereoLabs ZED driver are 0", Point(20, y), font, scale,
+				Scalar::all(255), thickness);
+			putText(tmp, "Recommendation: install the latest CUDA and StereoLabs SDK",
+				Point(20, y + incr), font, scale, Scalar::all(255), thickness);
+			putText(tmp, "A working version of CUDA is required for StereoLabs cameras.",
+				Point(20, y + incr * 2), font, scale, Scalar::all(255), thickness);
+			putText(tmp, "And make sure that the latest CUDA installed properly.",
+				Point(20, y + incr * 3), font, scale, Scalar::all(255), thickness);
+			putText(tmp, "The NSight Visual Studio Edition can fail and is not essential.",
+				Point(20, y + incr * 4), font, scale, Scalar::all(255), thickness);
+			putText(tmp, "Use the 'Custom' install to remove NSight.",
+				Point(20, y + incr * 5), font, scale, Scalar::all(255), thickness);
 		}
 		if (w != captureWidth) resize(tmp, tmp, Size(w, h), INTER_NEAREST_EXACT);
 		return tmp;
@@ -163,11 +163,11 @@ public:
 				pc32fC3[index + 2] = -pc[offset + 2];
 			}
 
-		//cv::Mat splitMats[3]{};
+		//Mat splitMats[3]{};
 		//split(pointCloud, splitMats);
 		//auto test = countNonZero(splitMats[2]);
 		//double maxVal;
-		//cv::Mat testMat;
+		//Mat testMat;
 		//splitMats[2].convertTo(testMat, CV_8UC1);
 		//minMaxLoc(testMat, NULL, &maxVal);
 		//imshow("testMat", testMat * 255 / 8);

@@ -221,7 +221,6 @@ public:
 
     Mat gMatrix; vector<Mat> pcSplit;
     bool paused = false;
-    Mat xdst0, xdst1, xdst2, xdst3;
     Size workingRes;
     cppTask(int rows, int cols)
     {
@@ -264,7 +263,7 @@ public:
     }
    Point vbGetMaxDist(const Mat& mask) {
         Mat distance32f;
-        distanceTransform(mask, distance32f, cv::DIST_L1, 0); 
+        distanceTransform(mask, distance32f, DIST_L1, 0); 
         double minVal, maxVal;
         Point minLoc, maxLoc;
         minMaxLoc(distance32f, &minVal, &maxVal, &minLoc, &maxLoc);
@@ -289,13 +288,13 @@ public:
         Point lastPt = pts[0];
         for (int i = 1; i <= pts.size(); i++) {
             int index = i % pts.size();
-            cv::Point pt = pts[index];
-            cv::line(dst2, pt, lastPt, highlightColor, lineWidth, lineType);
+            Point pt = pts[index];
+            line(dst2, pt, lastPt, highlightColor, lineWidth, lineType);
             lastPt = pt;
         }
     }
-    std::vector<cv::Point2f> quickRandomPoints(int howMany) {
-        std::vector<cv::Point2f> srcPoints;
+    std::vector<Point2f> quickRandomPoints(int howMany) {
+        std::vector<Point2f> srcPoints;
         random_device rd;
         mt19937 gen(rd());  // Mersenne Twister engine for randomness
         uniform_int_distribution<> dist_width(0, workingRes.width - 1);  

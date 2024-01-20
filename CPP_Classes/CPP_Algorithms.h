@@ -1638,9 +1638,9 @@ public:
 	Harris_Features() {}
 	void Run()
 	{
-		cv::Mat cornerStrength;
-		cv::cornerHarris(src, cornerStrength, neighborhood, aperture, HarrisParm);
-		cv::threshold(cornerStrength, dst, threshold, 255, cv::THRESH_BINARY_INV);
+		Mat cornerStrength;
+		cornerHarris(src, cornerStrength, neighborhood, aperture, HarrisParm);
+		cv::threshold(cornerStrength, dst, threshold, 255, THRESH_BINARY_INV);
 	}
 };
 
@@ -1675,7 +1675,7 @@ class Harris_Detector
 {
 private:
 public:
-	std::vector<cv::Point> pts;
+	std::vector<Point> pts;
 	Mat src;
 	double qualityLevel = 0.02;
 	HarrisDetector harris;
@@ -1861,7 +1861,7 @@ Histogram_1D * Histogram_1D_Open() {
 }
 extern "C" __declspec(dllexport)
 float Histogram_1D_Sum(Histogram_1D * cPtr) {
-	Scalar count = cv::sum(cPtr->histogram);
+	Scalar count = sum(cPtr->histogram);
 	return count[0];
 }
 extern "C" __declspec(dllexport)
@@ -1884,7 +1884,7 @@ int* Histogram_1D_RunCPP(Histogram_1D * cPtr, int* dataPtr, int rows, int cols, 
 
 // http://man.hubwiz.com/docset/OpenCV.docset/Contents/Resources/Documents/d9/dde/samples_2cpp_2kmeans_8cpp-example.html
 
-cv::Scalar colorTab[] =
+Scalar colorTab[] =
 {
 	Scalar(0, 0, 255),
 	Scalar(0,255,0),
@@ -2050,7 +2050,7 @@ public:
 			for (int x = 0; x < src.cols; x++)
 			{
 				int gray = src.at<unsigned char>(y, x);
-				dst.at<cv::Point2f>(y, x) = cv::Point2f(float(gray), float(y));
+				dst.at<Point2f>(y, x) = Point2f(float(gray), float(y));
 			}
 		}
 	}
@@ -2817,13 +2817,13 @@ class SuperPixels
 private:
 public:
 	Mat src, labels, dst;
-	Ptr<cv::ximgproc::SuperpixelSEEDS> seeds;
+	Ptr<ximgproc::SuperpixelSEEDS> seeds;
 	int width, height, num_superpixels = 400, num_levels = 4, prior = 2;
 	SuperPixels() {}
 	void Run()
 	{
 		Mat hsv;
-		//cvtColor(src, hsv, cv::ColorConversionCodes::COLOR_BGR2HSV);
+		//cvtColor(src, hsv, ColorConversionCodes::COLOR_BGR2HSV);
 		seeds->iterate(src);
 		seeds->getLabelContourMask(dst, false);
 		seeds->getLabels(labels);
@@ -2839,7 +2839,7 @@ SuperPixels * SuperPixel_Open(int _width, int _height, int _num_superpixels, int
 	spPtr->num_superpixels = _num_superpixels;
 	spPtr->num_levels = _num_levels;
 	spPtr->prior = _prior;
-	spPtr->seeds = cv::ximgproc::createSuperpixelSEEDS(_width, _height, 3, _num_superpixels, _num_levels, _prior);
+	spPtr->seeds = ximgproc::createSuperpixelSEEDS(_width, _height, 3, _num_superpixels, _num_levels, _prior);
 	spPtr->labels = Mat(spPtr->height, spPtr->width, CV_32S);
 	return spPtr;
 }
@@ -2929,13 +2929,13 @@ Mat VideoStab::stabilize(Mat rgb)
 
 		double deltaArray[5] = { ds_x, ds_y, da, dx, dy };
 		Mat delta(5, 1, CV_64F, deltaArray);
-		cv::add(sumScale, delta, sumScale);
+		add(sumScale, delta, sumScale);
 
 		//Don't calculate the predicted state of Kalman Filter on 1st iteration
 		if (k == 1) k++; else Kalman_Filter();
 
 		Mat diff(5, 1, CV_64F);
-		cv::subtract(sScale, sumScale, diff);
+		subtract(sScale, sumScale, diff);
 
 		if (diff.at<double>(2, 0) < 1000 && diff.at<double>(3, 0) < 1000 && diff.at<double>(4, 0) < 1000)
 		{
@@ -2965,13 +2965,13 @@ Mat VideoStab::stabilize(Mat rgb)
 		resize(smoothedFrame, smoothedFrame, rgb.size());
 		for (int i = 0; i < features1.size(); ++i)
 		{
-			cv::circle(smoothedFrame, features1[i], 5, cv::Scalar::all(255), -1, cv::LineTypes::LINE_AA);
+			circle(smoothedFrame, features1[i], 5, Scalar::all(255), -1, LineTypes::LINE_AA);
 		}
-		cv::putText(smoothedFrame, original, cv::Point(10, 50), cv::HersheyFonts::FONT_HERSHEY_COMPLEX, 0.4, cv::Scalar::all(255), 1);
+		putText(smoothedFrame, original, Point(10, 50), HersheyFonts::FONT_HERSHEY_COMPLEX, 0.4, Scalar::all(255), 1);
 
 		char buffer[1000];
 		sprintf_s(buffer, "da = %f, dx = %f, dy = %f", da, dx, dy);
-		cv::putText(smoothedFrame, buffer, cv::Point(10, 100), cv::HersheyFonts::FONT_HERSHEY_COMPLEX, 0.4, cv::Scalar::all(255), 1);
+		putText(smoothedFrame, buffer, Point(10, 100), HersheyFonts::FONT_HERSHEY_COMPLEX, 0.4, Scalar::all(255), 1);
 	}
 	return smoothedFrame;
 }
@@ -2979,7 +2979,7 @@ Mat VideoStab::stabilize(Mat rgb)
 void VideoStab::Kalman_Filter()
 {
 	Mat f1err = Mat(5, 1, CV_64F);
-	cv::add(errScale, qScale, f1err);
+	add(errScale, qScale, f1err);
 	for (int i = 0; i < f1err.rows; ++i)
 	{
 		double gainScale = f1err.at<double>(i, 0) / (f1err.at<double>(i, 0) + rScale.at<double>(i, 0));

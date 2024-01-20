@@ -22,7 +22,7 @@ public:
 	float samplingFactor;
 	Mat src;
 	// create a retina instance with default parameters setup, uncomment the initialisation you wanna test
-	cv::Ptr<cv::bioinspired::Retina> myRetina;
+	Ptr<bioinspired::Retina> myRetina;
 	Retina(int rows, int cols, bool _useLogSampling, float _samplingFactor)
 	{
 		useLogSampling = _useLogSampling;
@@ -30,10 +30,10 @@ public:
 		src = Mat(rows, cols, CV_8UC3);
 		if (useLogSampling)
 		{
-			myRetina = cv::bioinspired::Retina::create(src.size(), true, cv::bioinspired::RETINA_COLOR_BAYER, useLogSampling, samplingFactor, 10.0);
+			myRetina = bioinspired::Retina::create(src.size(), true, bioinspired::RETINA_COLOR_BAYER, useLogSampling, samplingFactor, 10.0);
 		}
 		else// -> else allocate "classical" retina :
-			myRetina = cv::bioinspired::Retina::create(src.size());
+			myRetina = bioinspired::Retina::create(src.size());
 
 		// save default retina parameters file in order to let you see this and maybe modify it and reload using method "setup"
 		myRetina->write("RetinaDefaultParameters.xml");
@@ -51,7 +51,7 @@ public:
 			myRetina->getParvo(retinaOutput_parvo);
 			myRetina->getMagno(retinaOutput_magno);
 		}
-		catch (const cv::Exception& e)
+		catch (const Exception& e)
 		{
 			std::cerr << "Error using Retina : " << e.what() << std::endl;
 		}

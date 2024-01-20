@@ -356,8 +356,8 @@ public:
 		pf.resampleParticles();
 		Mat pImage = pf.showParticles(inImage);
 		pImage = pf.showPredictedLocation(pImage);
-		//cv::imshow("pf Out", pImage);
-		//cv::waitKey(0);
+		//imshow("pf Out", pImage);
+		//waitKey(0);
 
 		// predict next state
 		pf.predict();
