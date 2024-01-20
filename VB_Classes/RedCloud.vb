@@ -6,43 +6,42 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public displaySelectedCell As Boolean = True
     Public contourToMask As Boolean = True
     Public combine As New RedCloud_Combine
-    Dim lastCells As New List(Of rcData)
-    Dim lastCellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Dim usedColors As New List(Of cv.Vec3b)
+    Dim unmatched As New RedCloud_UnmatchedCount
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Match cells from the previous generation"
     End Sub
-    Private Function matchPreviousCell(rp As rcData) As rcData
-        Dim rc = New rcData, lrc As New rcData
-        rc.rect = rp.rect
+    Private Function matchPreviousCell(rc As rcData) As rcData
+        Static lastCells As New List(Of rcData), lastCellMap As New cv.Mat, usedColors As New List(Of cv.Vec3b)
+        If rc.index = 1 Then
+            lastCellMap = cellMap.Clone
+            lastCells = New List(Of rcData)(redCells)
+            usedColors.Clear()
+            usedColors.Add(black)
+        End If
+        Dim lrc As New rcData
         rc.motionRect = rc.rect
-        rc.mask = rp.mask.Clone
-        rc.floodPoint = rp.floodPoint
-        rc.maxDist = vbGetMaxDist(rc)
-
         Dim val = task.pcSplit(2).Get(Of Single)(rc.floodPoint.Y, rc.floodPoint.X)
         If val = 0 Then rc.depthCell = False Else rc.depthCell = True
 
         rc.maxDStable = rc.maxDist ' assume it has to use the latest.
-        rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-        If rc.indexLast < lastCells.Count Then
-            lrc = lastCells(rc.indexLast)
+        Dim indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+        If indexLast < lastCells.Count Then
+            lrc = lastCells(indexLast)
             rc.motionRect = rc.rect.Union(lrc.rect)
             rc.color = lrc.color
 
             Dim stableCheck = lastCellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
-            If stableCheck = rc.indexLast Then
+            If stableCheck = indexLast Then
                 rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
                 rc.matchCount = lrc.matchCount + 1
             End If
         End If
 
+        rc.matchFlag = True
         If usedColors.Contains(rc.color) Then
             rc.color = randomCellColor()
-            rc.indexLast = 0
             rc.matchCount = 0
-            dst3(rc.rect).SetTo(255, rc.mask)
+            rc.matchFlag = False
         End If
 
         usedColors.Add(rc.color)
@@ -77,20 +76,15 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         combine.Run(src)
 
         If task.optionsChanged Then cellMap.SetTo(0)
-        lastCellMap = cellMap.Clone
-        lastCells = New List(Of rcData)(redCells)
-        usedColors.Clear()
-        usedColors.Add(black)
 
         If dst2.Size <> src.Size Then dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
-        If heartBeat() Then dst3.SetTo(0)
 
         task.rcMatchMax = 0
         Dim rc As rcData
         Dim minPixels = gOptions.minPixelsSlider.Value
         Dim newCells As New List(Of rcData)
-        For Each rp In combine.combinedCells
-            rc = matchPreviousCell(rp)
+        For Each rc In combine.combinedCells
+            rc = matchPreviousCell(rc)
             rc.index = newCells.Count
             cv.Cv2.MeanStdDev(src(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
             Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
@@ -102,43 +96,28 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
             newCells.Add(rc)
 
             If task.rcMatchMax < rc.matchCount Then task.rcMatchMax = rc.matchCount
-            If newCells.Count >= 255 Then Exit For ' we are going to handle only the largest 255 cells - "Other" (zero) for the rest.
+            If newCells.Count >= 255 Then Exit For ' we are going to handle only the largest 255 cells - rest are zero.
         Next
 
         cellMap.SetTo(0)
         dst2.SetTo(0)
         redCells.Clear()
-        For i = 0 To newCells.Count - 1
-            rc = newCells(i)
+        For Each rc In newCells
             rc.index = redCells.Count
             redCells.Add(rc)
             cellMap(rc.rect).SetTo(rc.index, rc.mask)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
-        Static changedTotal As Integer, unMatchedCells As Integer
-        unMatchedCells = 0
-        labels(3) = CStr(changedTotal) + " new/moved cells in the last second " +
-                    Format(changedTotal / (task.frameCount - task.toggleFrame), fmt1) + " unmatched per frame"
-        If heartBeat() Then
-            Dim mostlyColor As Integer
-            For i = 1 To redCells.Count - 1
-                rc = redCells(i)
-                If redCells(i).depthPixels / redCells(i).pixels < 0.5 Then mostlyColor += 1
-                If rc.indexLast = 0 Then unMatchedCells += 1
-            Next
-            labels(2) = CStr(redCells.Count) + " cells, unmatched cells = " + CStr(unMatchedCells) + "   " +
-                        CStr(mostlyColor) + " cells were mostly color and " + CStr(redCells.Count - mostlyColor) + " had depth."
+        unmatched.redCells = redCells
+        unmatched.Run(src)
+        dst3 = unmatched.dst3
+        labels = unmatched.labels
 
-            changedTotal = 0
-        End If
-        changedTotal += unMatchedCells
-
-        If standalone Then setSelectedCell(redCells, cellMap)
-
-        If displaySelectedCell Then setSelectedCell(redCells, cellMap)
+        If (standalone Or showIntermediate()) And displaySelectedCell Then setSelectedCell(redCells, cellMap)
     End Sub
 End Class
+
 
 
 
@@ -1576,141 +1555,6 @@ End Class
 
 
 
-Public Class RedCloud_Combine : Inherits VB_Algorithm
-    Dim color As New Color_Basics
-    Public guided As New GuidedBP_Depth
-    Public redCore As New RedCloud_CPP
-    Public combinedCells As New List(Of rcData)
-    Public Sub New()
-        desc = "Combined the color and cloud as indicated in the RedOptions panel."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If redOptions.UseColor.Checked Or redOptions.UseDepthAndColor.Checked Then
-            redCore.inputMask = Nothing
-            If src.Channels = 3 Then
-                color.Run(src)
-                dst2 = color.dst2.Clone
-            Else
-                dst2 = src
-            End If
-        Else
-            redCore.inputMask = task.noDepthMask
-            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            color.classCount = 0
-        End If
-
-        If redOptions.UseDepth.Checked Or redOptions.UseDepthAndColor.Checked Then
-            Select Case redOptions.depthInput
-                Case "GuidedBP_Depth"
-                    guided.Run(src)
-                    If color.classCount > 0 Then guided.dst2 += color.classCount
-                    guided.dst2.CopyTo(dst2, task.depthMask)
-                Case "RedCloud_Core"
-                    Static prep As New RedCloud_Core
-                    prep.Run(task.pointCloud)
-                    If color.classCount > 0 Then prep.dst2 += color.classCount
-                    prep.dst2.CopyTo(dst2, task.depthMask)
-            End Select
-        End If
-
-        redCore.Run(dst2)
-        dst2 = redCore.dst2
-        dst3 = redCore.dst3
-
-        combinedCells.Clear()
-        Dim limitedPrepRun As Boolean
-        If task.drawRect.Width * task.drawRect.Height > 10 Then limitedPrepRun = True
-        For Each key In redCore.sortedCells
-            Dim rc = key.Value
-            If limitedPrepRun Then If task.drawRect.Contains(rc.floodPoint) = False Then Continue For
-            combinedCells.Add(rc)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class RedCloud_CPP : Inherits VB_Algorithm
-    Public sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-    Public inputMask As cv.Mat
-    Public Sub New()
-        cPtr = RedCloud_Open()
-        desc = "Core interface to the C++ code for floodfill."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static colorClass As New Color_Basics
-            colorClass.Run(src)
-            src = colorClass.dst2
-        End If
-
-        Dim imagePtr As IntPtr
-        If inputMask Is Nothing Then
-            Dim inputData(src.Total - 1) As Byte
-            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-            imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols,
-                                     src.Type, redOptions.DesiredCellSlider.Value, 0)
-            handleInput.Free()
-        Else
-            Dim inputData(src.Total - 1) As Byte
-            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-            Dim maskData(inputMask.Total - 1) As Byte
-            Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
-            Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
-
-            imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                     src.Type, redOptions.DesiredCellSlider.Value, 0)
-            handleMask.Free()
-            handleInput.Free()
-        End If
-
-        Dim classCount = RedCloud_Count(cPtr)
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-        dst3 = vbPalette(dst2 * 255 / classCount)
-
-        If heartBeat() Then labels(3) = CStr(classCount) + " cells found"
-        If classCount <= 1 Then Exit Sub
-
-        Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, RedCloud_Sizes(cPtr))
-        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
-        Dim floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
-        sortedCells.Clear()
-        For i = 0 To classCount - 1
-            Dim rc As New rcData
-            rc.index = i + 1
-            rc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
-            rc.mask = dst2(rc.rect).InRange(rc.index, rc.index).Threshold(0, 255, cv.ThresholdTypes.Binary)
-            'Dim contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            'vbDrawContour(rc.mask, contour, 255, -1)
-
-            rc.pixels = sizeData.Get(Of Integer)(i, 0)
-            rc.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
-            rc.mask.Rectangle(New cv.Rect(0, 0, rc.mask.Width, rc.mask.Height), 0, 1)
-            Dim pt = vbGetMaxDist(rc.mask)
-            rc.maxDist = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
-            sortedCells.Add(rc.pixels, rc)
-        Next
-
-        If heartBeat() Then labels(2) = "CV_8U format - " + CStr(classCount) + " cells were identified."
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class RedCloud_OnlyDepth : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
@@ -1894,6 +1738,44 @@ Public Class RedCloud_Flippers : Inherits VB_Algorithm
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class RedCloud_Overlaps : Inherits VB_Algorithm
+    Public redCells As New List(Of rcData)
+    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        advice = ""
+        desc = "Remove the overlapping cells.  Keep the largest."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels = redC.labels
+
+        Dim overlappingCells As New List(Of Integer)
+        cellMap.SetTo(0)
+        redCells.Clear()
+        For Each rc In redC.redCells
+            Dim valMap = cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            redCells.Add(rc)
+        Next
+
+        dst3.SetTo(0)
+        For i = overlappingCells.Count - 1 To 0 Step -1
+            Dim rc = redCells(overlappingCells(i))
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
+            redCells.RemoveAt(overlappingCells(i))
+        Next
+
+        labels(3) = "Before removing overlapping cells: " + CStr(redC.redCells.Count) + ". After: " + CStr(redCells.Count)
+    End Sub
+End Class
 
 
 
@@ -2326,149 +2208,47 @@ End Class
 
 
 
-Public Class RedCloud_BasicsNew : Inherits VB_Algorithm
+
+Public Class RedCloud_UnmatchedCount : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
-    Public lastCells As New List(Of rcData)
-    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-
-    Public combine As New RedCloud_Combine
-
-    Dim lastCellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Dim usedColors As New List(Of cv.Vec3b)
-    Public displaySelectedCell As Boolean = True
-    Public contourToMask As Boolean = True
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Match cells from the previous generation"
+        advice = ""
+        desc = "Count the unmatched cells and display them."
     End Sub
-    Private Function matchPreviousCell(rp As rcData) As rcData
-        Dim rc = New rcData, lrc As New rcData
-        rc.rect = rp.rect
-        rc.motionRect = rc.rect
-        rc.mask = rp.mask.Clone
-        rc.floodPoint = rp.floodPoint
-        rc.maxDist = vbGetMaxDist(rc)
-
-        Dim val = task.pcSplit(2).Get(Of Single)(rc.floodPoint.Y, rc.floodPoint.X)
-        If val = 0 Then rc.depthCell = False Else rc.depthCell = True
-
-        rc.maxDStable = rc.maxDist ' assume it has to use the latest.
-        rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-        If rc.indexLast < lastCells.Count Then
-            lrc = lastCells(rc.indexLast)
-            rc.motionRect = rc.rect.Union(lrc.rect)
-            rc.color = lrc.color
-
-            Dim stableCheck = lastCellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
-            If stableCheck = rc.indexLast Then
-                rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
-                rc.matchCount = lrc.matchCount + 1
-            End If
-        End If
-
-        If usedColors.Contains(rc.color) Then
-            rc.color = randomCellColor()
-            rc.indexLast = 0
-            rc.matchCount = 0
-            dst3(rc.rect).SetTo(255, rc.mask)
-        End If
-
-        usedColors.Add(rc.color)
-
-        If contourToMask Then
-            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            vbDrawContour(rc.mask, rc.contour, 255, -1)
-        End If
-
-        rc.depthMask = rc.mask.Clone
-        rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
-        rc.depthPixels = rc.depthMask.CountNonZero
-
-        Dim minLoc As cv.Point, maxLoc As cv.Point
-        If rc.depthPixels Then
-            task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.depthMask)
-            task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.depthMask)
-            task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.depthMask)
-
-            Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
-            cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.depthMask)
-
-            rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
-            rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
-        End If
-
-        rc.pixels = rc.mask.CountNonZero
-
-        Return rc
-    End Function
     Public Sub RunVB(src As cv.Mat)
-        combine.Run(src)
-
-        If task.optionsChanged Then
-            cellMap.SetTo(0)
-            lastCells = New List(Of rcData)
+        If standalone Or showIntermediate() Then
+            Static redC As New RedCloud_Basics
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels = redC.labels
+            redCells = redC.redCells
         End If
 
-        lastCellMap = cellMap.Clone
-        lastCells = New List(Of rcData)(redCells)
-        usedColors.Clear()
-        usedColors.Add(black)
-
-        If dst2.Size <> src.Size Then dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
-        If heartBeat() Then dst3.SetTo(0)
-
-        task.rcMatchMax = 0
-        Dim rc As rcData
-        Dim minPixels = gOptions.minPixelsSlider.Value
-        Dim newCells As New List(Of rcData)
-        For Each rp In combine.combinedCells
-            rc = matchPreviousCell(rp)
-            rc.index = newCells.Count
-            cv.Cv2.MeanStdDev(src(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-            Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
-            cv.Cv2.MeanStdDev(task.gray(rc.rect), grayMean, grayStdev, rc.mask)
-            rc.grayMean = CInt(grayMean(0))
-
-            If rc.mask.Size = dst2.Size Or rc.pixels < minPixels Then Continue For
-            If heartBeat() Then rc.matchCount = 1
-            newCells.Add(rc)
-
-            If task.rcMatchMax < rc.matchCount Then task.rcMatchMax = rc.matchCount
-            If newCells.Count >= 255 Then Exit For ' we are going to handle only the largest 255 cells - "Other" (zero) for the rest.
+        Static changedCellCounts As New List(Of Integer)
+        Dim unMatchedCells As Integer
+        Dim mostlyColor As Integer
+        For i = 0 To redCells.Count - 1
+            Dim rc = redCells(i)
+            If redCells(i).depthPixels / redCells(i).pixels < 0.5 Then mostlyColor += 1
+            If rc.matchFlag = False Then
+                Dim val = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If val = 0 Then
+                    dst3(rc.rect).SetTo(255, rc.mask)
+                    unMatchedCells += 1
+                End If
+            End If
         Next
+        changedCellCounts.Add(unMatchedCells)
 
-        cellMap.SetTo(0)
-        dst2.SetTo(0)
-        redCells.Clear()
-        For i = 0 To newCells.Count - 1
-            rc = newCells(i)
-            rc.index = redCells.Count
-            redCells.Add(rc)
-            cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-        Next
-
-        Static changedTotal As Integer, unMatchedCells As Integer
-        unMatchedCells = 0
-        labels(3) = CStr(changedTotal) + " new/moved cells in the last second " +
-                    Format(changedTotal / (task.frameCount - task.toggleFrame), fmt1) + " unmatched per frame"
         If heartBeat() Then
-            Dim mostlyColor As Integer
-            For i = 1 To redCells.Count - 1
-                rc = redCells(i)
-                If redCells(i).depthPixels / redCells(i).pixels < 0.5 Then mostlyColor += 1
-                If rc.indexLast = 0 Then unMatchedCells += 1
-            Next
+            dst3.SetTo(0)
+            Dim sum = changedCellCounts.Sum(), avg = If(changedCellCounts.Count > 0, changedCellCounts.Average(), 0)
+            labels(3) = CStr(sum) + " new/moved cells in the last second " + Format(avg, fmt1) + " changed per frame"
             labels(2) = CStr(redCells.Count) + " cells, unmatched cells = " + CStr(unMatchedCells) + "   " +
                         CStr(mostlyColor) + " cells were mostly color and " + CStr(redCells.Count - mostlyColor) + " had depth."
-
-            changedTotal = 0
+            changedCellCounts.Clear()
         End If
-        changedTotal += unMatchedCells
-
-        If standalone Then setSelectedCell(redCells, cellMap)
-
-        If displaySelectedCell Then setSelectedCell(redCells, cellMap)
     End Sub
 End Class
 
@@ -2478,35 +2258,132 @@ End Class
 
 
 
-Public Class RedCloud_Overlaps : Inherits VB_Algorithm
-    Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Dim redC As New RedCloud_Basics
+Public Class RedCloud_Combine : Inherits VB_Algorithm
+    Dim color As New Color_Basics
+    Public guided As New GuidedBP_Depth
+    Public redCore As New RedCloud_CPP
+    Public combinedCells As New List(Of rcData)
     Public Sub New()
-        advice = ""
-        desc = "Remove the overlapping cells.  Keep the largest."
+        desc = "Combined the color and cloud as indicated in the RedOptions panel."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels = redC.labels
+        If redOptions.UseColor.Checked Or redOptions.UseDepthAndColor.Checked Then
+            redCore.inputMask = Nothing
+            If src.Channels = 3 Then
+                color.Run(src)
+                dst2 = color.dst2.Clone
+            Else
+                dst2 = src
+            End If
+        Else
+            redCore.inputMask = task.noDepthMask
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            color.classCount = 0
+        End If
 
-        Dim overlappingCells As New List(Of Integer)
-        cellMap.SetTo(0)
-        redCells.Clear()
-        For Each rc In redC.redCells
-            Dim valMap = cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            redCells.Add(rc)
+        If redOptions.UseDepth.Checked Or redOptions.UseDepthAndColor.Checked Then
+            Select Case redOptions.depthInput
+                Case "GuidedBP_Depth"
+                    guided.Run(src)
+                    If color.classCount > 0 Then guided.dst2 += color.classCount
+                    guided.dst2.CopyTo(dst2, task.depthMask)
+                Case "RedCloud_Core"
+                    Static prep As New RedCloud_Core
+                    prep.Run(task.pointCloud)
+                    If color.classCount > 0 Then prep.dst2 += color.classCount
+                    prep.dst2.CopyTo(dst2, task.depthMask)
+            End Select
+        End If
+
+        redCore.Run(dst2)
+        dst2 = redCore.dst2
+        dst3 = redCore.dst3
+
+        combinedCells.Clear()
+        Dim limitedPrepRun As Boolean
+        If task.drawRect.Width * task.drawRect.Height > 10 Then limitedPrepRun = True
+        For Each key In redCore.sortedCells
+            Dim rc = key.Value
+            If limitedPrepRun Then If task.drawRect.Contains(rc.floodPoint) = False Then Continue For
+            combinedCells.Add(rc)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_CPP : Inherits VB_Algorithm
+    Public sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+    Public inputMask As cv.Mat
+    Public Sub New()
+        cPtr = RedCloud_Open()
+        desc = "Core interface to the C++ code for floodfill."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 1 Then
+            Static colorClass As New Color_Basics
+            colorClass.Run(src)
+            src = colorClass.dst2
+        End If
+
+        Dim imagePtr As IntPtr
+        If inputMask Is Nothing Then
+            Dim inputData(src.Total - 1) As Byte
+            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+            imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols,
+                                     src.Type, redOptions.DesiredCellSlider.Value, 0)
+            handleInput.Free()
+        Else
+            Dim inputData(src.Total - 1) As Byte
+            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+            Dim maskData(inputMask.Total - 1) As Byte
+            Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
+            Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
+
+            imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                     src.Type, redOptions.DesiredCellSlider.Value, 0)
+            handleMask.Free()
+            handleInput.Free()
+        End If
+
+        Dim classCount = RedCloud_Count(cPtr)
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst3 = vbPalette(dst2 * 255 / classCount)
+
+        If heartBeat() Then labels(3) = CStr(classCount) + " cells found"
+        If classCount <= 1 Then Exit Sub
+
+        Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, RedCloud_Sizes(cPtr))
+        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+        Dim floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
+        sortedCells.Clear()
+        For i = 0 To classCount - 1
+            Dim rc As New rcData
+            rc.index = i + 1
+            rc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
+            rc.mask = dst2(rc.rect).InRange(rc.index, rc.index).Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+            rc.pixels = sizeData.Get(Of Integer)(i, 0)
+            rc.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
+            rc.mask.Rectangle(New cv.Rect(0, 0, rc.mask.Width, rc.mask.Height), 0, 1)
+            Dim pt = vbGetMaxDist(rc.mask)
+            rc.maxDist = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
+            sortedCells.Add(rc.pixels, rc)
         Next
 
-        dst3.SetTo(0)
-        For i = overlappingCells.Count - 1 To 0 Step -1
-            Dim rc = redCells(overlappingCells(i))
-            dst3(rc.rect).SetTo(rc.color, rc.mask)
-            redCells.RemoveAt(overlappingCells(i))
-        Next
-
-        labels(3) = "Before removing overlapping cells: " + CStr(redC.redCells.Count) + ". After: " + CStr(redCells.Count)
+        If heartBeat() Then labels(2) = "CV_8U format - " + CStr(classCount) + " cells were identified."
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
     End Sub
 End Class

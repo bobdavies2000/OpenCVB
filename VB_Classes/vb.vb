@@ -773,6 +773,7 @@ Public Class rcData
     Public index As Integer
     Public indexLast As Integer
     Public matchCount As Integer
+    Public matchFlag As Boolean
 
     Public contour As New List(Of cv.Point)
     Public corners As New List(Of cv.Point)
