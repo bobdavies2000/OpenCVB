@@ -3063,3 +3063,52 @@ public:
                      options->sigma, options->sigma);
     }
 };
+
+
+
+
+
+
+class CPP_Palette_Random : public algorithmCPP {
+public:
+    Mat colorMap;
+    CPP_Palette_Random() : algorithmCPP() {
+        traceName = "CPP_Palette_Random";
+        colorMap = Mat(256, 1, CV_8UC3, Scalar(0, 0, 0));
+        for (int i = 1; i < 256; i++) {
+            colorMap.at<Vec3b>(i, 0) = task->randomCellColor();
+        }
+        desc = "Build a random colorGrad - no smooth transitions.";
+    }
+    void Run(Mat src) {
+        applyColorMap(src, dst2, colorMap);
+    }
+};
+
+
+
+
+
+
+class CPP_Plot_Histogram2D : public algorithmCPP {
+public:
+    CPP_Plot_Histogram2D() : algorithmCPP() {
+        traceName = "CPP_Plot_Histogram2D";
+        labels = { "", "", "2D Histogram", "" };
+        desc = "Plot a 2D histogram from the input Mat";
+    }
+    void Run(Mat src) {
+        Mat histogram = src.clone();
+        if (standalone) {
+            int bins[] = { task->histogramBins, task->histogramBins };
+            float hRange[] = { 0, 255 };
+            const float* range[] = { hRange,hRange };
+            int channels[] = { 0, 1 };
+            calcHist(&src, 1, channels, Mat(), histogram, 2, bins, range, true, false);
+        }
+        resize(histogram, dst2, dst2.size(), 0, 0, INTER_NEAREST);
+        if (standalone) {
+            threshold(dst2, dst3, 0, 255, THRESH_BINARY);
+        }
+    }
+};

@@ -455,18 +455,18 @@ End Class
 
 
 Public Class Palette_Random : Inherits VB_Algorithm
-    Public colorGrad As cv.Mat
+    Public colorMap As cv.Mat
     Public Sub New()
-        colorGrad = New cv.Mat(1, 256, cv.MatType.CV_8UC3, 0)
+        advice = "There are no options - just produces a colorMap filled with random vec3b's."
+        colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, 0)
         For i = 0 To 255
-            colorGrad.Set(Of cv.Vec3b)(0, i, randomCellColor())
+            colorMap.Set(Of cv.Vec3b)(i, 0, randomCellColor())
         Next
-        colorGrad.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b(0, 0, 0)) ' set 0th entry to black...
+        colorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b(0, 0, 0)) ' set 0th entry to black...
 
         desc = "Build a random colorGrad - no smooth transitions."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Dim colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, colorGrad.Data())
         cv.Cv2.ApplyColorMap(src, dst2, colorMap)
     End Sub
 End Class

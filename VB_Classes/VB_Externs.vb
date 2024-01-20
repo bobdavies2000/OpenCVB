@@ -164,7 +164,7 @@ Module VB_Externs
                                       clickY As Integer, clickFlag As Boolean, picTag As Integer,
                                       moveX As Integer, moveY As Integer, paletteIndex As Integer,
                                       desiredCells As Integer, midHeartBeat As Boolean,
-                                      quarterBeat As Boolean, colorInputIndex As Integer)
+                                      quarterBeat As Boolean, colorInputIndex As Integer, depthInputIndex As Integer)
     End Sub
 
 

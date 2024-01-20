@@ -2,6 +2,8 @@
 enum functions
 {
     _CPP_AddWeighted_Basics,
+_CPP_Plot_Histogram2D,
+_CPP_Palette_Random,
 _CPP_Blur_Basics,
 _CPP_Color_Basics,
 _CPP_Binarize_FourWayCombine,

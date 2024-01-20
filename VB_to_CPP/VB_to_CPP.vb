@@ -158,6 +158,7 @@ Public Class VB_to_CPP
             split(i) = split(i).Replace("Mat& src", "Mat src")
             split(i) = split(i).Replace("RunVB", "Run")
             split(i) = split(i).Replace("CPP_CPP_", "CPP_")
+            split(i) = split(i).Replace("randomCellColor", "task->randomCellColor")
 
             ' updates for options
             If split(i).Contains("CPP_Options_") Then

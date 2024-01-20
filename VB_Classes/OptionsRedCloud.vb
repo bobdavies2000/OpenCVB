@@ -7,7 +7,7 @@ Public Class OptionsRedCloud
     Public colorInputName As String
     Public colorInputIndex As Integer
     Public reductionType As String = "Use Simple Reduction"
-    Public depthInput As String = "RedCloud_Core"
+    Public depthInputIndex As Integer = 0 ' guidedBP is the default.
 
     Public PCReduction As Integer
     Public channels() As Integer = {0, 1}
@@ -298,11 +298,11 @@ Public Class OptionsRedCloud
 
     Private Sub GuidedBP_Depth_CheckedChanged(sender As Object, e As EventArgs) Handles GuidedBP_Depth.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        depthInput = GuidedBP_Depth.Text
+        depthInputIndex = 0
     End Sub
     Private Sub RedCloud_Core_CheckedChanged(sender As Object, e As EventArgs) Handles RedCloud_Core.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        depthInput = RedCloud_Core.Text
+        depthInputIndex = 1
     End Sub
     Private Sub desiredCellSlider_ValueChanged(sender As Object, e As EventArgs) Handles DesiredCellSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True

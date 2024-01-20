@@ -1,4 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class GuidedBP_Basics : Inherits VB_Algorithm
     Public ptHot As New GuidedBP_HotPoints

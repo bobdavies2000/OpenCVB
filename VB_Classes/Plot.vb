@@ -138,7 +138,6 @@ Public Class Plot_Histogram2D : Inherits VB_Algorithm
             Static options As New Options_ColorFormat
             options.RunVB()
             src = options.dst2
-            Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 255), New cv.Rangef(0, 255)}
             Dim bins = task.histogramBins
             cv.Cv2.CalcHist({src}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, redOptions.rangesBGR)
         End If

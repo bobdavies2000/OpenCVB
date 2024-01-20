@@ -215,6 +215,7 @@ public:
     bool gridROIclicked;
     Mat gridToRoiIndex;
     int colorInputIndex;
+    int depthInputIndex;
     vector<Rect> gridList;
     vector<vector<int>> gridNeighbors;
 

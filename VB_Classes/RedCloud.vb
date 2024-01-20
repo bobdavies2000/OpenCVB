@@ -2261,12 +2261,12 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
         End If
 
         If redOptions.UseDepth.Checked Or redOptions.UseDepthAndColor.Checked Then
-            Select Case redOptions.depthInput
-                Case "GuidedBP_Depth"
+            Select Case redOptions.depthInputIndex
+                Case 0 ' "GuidedBP_Depth"
                     guided.Run(src)
                     If color.classCount > 0 Then guided.dst2 += color.classCount
                     guided.dst2.CopyTo(dst2, task.depthMask)
-                Case "RedCloud_Core"
+                Case 1 ' "RedCloud_Core"
                     Static prep As New RedCloud_Core
                     prep.Run(task.pointCloud)
                     If color.classCount > 0 Then prep.dst2 += color.classCount
