@@ -79,34 +79,6 @@ End Class
 
 
 
-Public Class Cell_Overlaps : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        redC.removeOverlappingCells = False
-        desc = "Do any of the redCloud cells overlap?  This tests if the cell maxDist is already covered by another cell."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        If heartBeat() Then dst3.SetTo(0)
-        For Each index In redC.overlappingCells
-            Dim rc = redC.redCells(index)
-            dst3(rc.rect).SetTo(rc.color, rc.mask)
-        Next
-        labels(3) = "There were " + CStr(redC.overlappingCells.Count) + " cells that overlap with another cell"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class Cell_PixelCountCompare : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -319,6 +291,7 @@ Public Class Cell_JumpUp : Inherits VB_Algorithm
         Static percentSlider = findSlider("Percent jump in size")
         Dim percentJump = percentSlider.value / 100
 
+        Dim lastCells = New List(Of rcData)(redC.redCells)
         redC.Run(src)
         dst2 = redC.dst2
         If heartBeat() Then dst3.SetTo(0)
@@ -327,7 +300,7 @@ Public Class Cell_JumpUp : Inherits VB_Algorithm
         jumpCells.Clear()
         For Each rc In redC.redCells
             If rc.indexLast <> 0 Then
-                Dim lrc = redC.lastCells(rc.indexLast)
+                Dim lrc = lastCells(rc.indexLast)
                 If (rc.pixels - lrc.pixels) / rc.pixels >= percentJump Then
                     dst3(lrc.rect).SetTo(cv.Scalar.White, lrc.mask)
                     jumpCells.Add(rc.index, New cv.Vec2i(lrc.index, rc.index))
@@ -360,6 +333,7 @@ Public Class Cell_JumpDown : Inherits VB_Algorithm
         Static percentSlider = findSlider("Percent jump in size")
         Dim percentJump = percentSlider.value / 100
 
+        Dim lastCells = New List(Of rcData)(redC.redCells)
         redC.Run(src)
         dst2 = redC.dst2
         If heartBeat() Then dst3.SetTo(0)
@@ -368,7 +342,7 @@ Public Class Cell_JumpDown : Inherits VB_Algorithm
         jumpCells.Clear()
         For Each rc In redC.redCells
             If rc.indexLast <> 0 Then
-                Dim lrc = redC.lastCells(rc.indexLast)
+                Dim lrc = lastCells(rc.indexLast)
                 If (lrc.pixels - rc.pixels) / rc.pixels >= percentJump Then
                     dst3(lrc.rect).SetTo(cv.Scalar.White, lrc.mask)
                     jumpCells.Add(rc.index, New cv.Vec2i(lrc.index, rc.index))
@@ -402,6 +376,7 @@ Public Class Cell_JumpUnstable : Inherits VB_Algorithm
         Dim percentJump = percentSlider.value / 100
 
         If heartBeat() Or task.midHeartBeat Then
+            Dim lastCells As New List(Of rcData)(redC.redCells)
             redC.Run(src)
             dst2 = redC.dst2
             dst3 = dst1.Clone
@@ -411,7 +386,7 @@ Public Class Cell_JumpUnstable : Inherits VB_Algorithm
             jumpCells.Clear()
             For Each rc In redC.redCells
                 If rc.indexLast <> 0 Then
-                    Dim lrc = redC.lastCells(rc.indexLast)
+                    Dim lrc = lastCells(rc.indexLast)
                     If Math.Abs(lrc.pixels - rc.pixels) / rc.pixels >= percentJump Then
                         dst1(lrc.rect).SetTo(cv.Scalar.White, lrc.mask)
                         jumpCells.Add(rc.index, New cv.Vec2i(lrc.index, rc.index))
