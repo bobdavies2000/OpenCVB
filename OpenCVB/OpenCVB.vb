@@ -1406,17 +1406,17 @@ Public Class OpenCVB
                 If newCameraImages Then
                     Dim copyTime = Now
 
+                    task.color = mbuf(mbIndex).color
+                    task.leftView = mbuf(mbIndex).leftView
+                    task.rightView = mbuf(mbIndex).rightView
+                    task.pointCloud = mbuf(mbIndex).pointCloud
+
                     SyncLock cameraLock
                         task.mbuf(mbIndex) = mbuf(mbIndex)
                         task.mbIndex = mbIndex
                         mbIndex += 1
                         If mbIndex >= mbuf.Count Then mbIndex = 0
                     End SyncLock
-
-                    task.color = mbuf(mbIndex).color
-                    task.leftView = mbuf(mbIndex).leftView
-                    task.rightView = mbuf(mbIndex).rightView
-                    task.pointCloud = mbuf(mbIndex).pointCloud
 
                     task.activateTaskRequest = activateTaskRequest
                     activateTaskRequest = False

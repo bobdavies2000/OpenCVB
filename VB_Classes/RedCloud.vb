@@ -14,7 +14,8 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         combine.Run(src)
 
         If task.optionsChanged Then cellMap.SetTo(0)
-        Dim lastCells As New List(Of rcData)(redCells), lastCellMap As cv.Mat = cellMap.Clone, usedColors As New List(Of cv.Vec3b)
+        Dim lastCells As New List(Of rcData)(redCells), lastCellMap As cv.Mat = cellMap.Clone
+        Dim usedColors As New List(Of cv.Vec3b)({black})
 
         If dst2.Size <> src.Size Then dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
 
@@ -2278,11 +2279,11 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
         dst3 = redCore.dst3
 
         combinedCells.Clear()
-        Dim limitedPrepRun As Boolean
-        If task.drawRect.Width * task.drawRect.Height > 10 Then limitedPrepRun = True
+        Dim drawRectOnlyRun As Boolean
+        If task.drawRect.Width * task.drawRect.Height > 10 Then drawRectOnlyRun = True
         For Each key In redCore.sortedCells
             Dim rc = key.Value
-            If limitedPrepRun Then If task.drawRect.Contains(rc.floodPoint) = False Then Continue For
+            If drawRectOnlyRun Then If task.drawRect.Contains(rc.floodPoint) = False Then Continue For
             combinedCells.Add(rc)
         Next
     End Sub
@@ -2329,7 +2330,7 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
             Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
 
             imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                     src.Type, redOptions.DesiredCellSlider.Value, 0)
+                                    src.Type, redOptions.DesiredCellSlider.Value, 0)
             handleMask.Free()
             handleInput.Free()
         End If
@@ -2339,7 +2340,6 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
         dst3 = vbPalette(dst2 * 255 / classCount)
 
         If heartBeat() Then labels(3) = CStr(classCount) + " cells found"
-        If classCount <= 1 Then Exit Sub
 
         Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, RedCloud_Sizes(cPtr))
         Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
