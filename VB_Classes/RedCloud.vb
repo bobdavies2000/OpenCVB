@@ -5,6 +5,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public combine As New RedCloud_Combine
     Dim unmatched As New RedCloud_UnmatchedCount
+    Dim colorMap As New cv.Mat(256, 1, cv.MatType.CV_8UC3, 0)
     Public Sub New()
         desc = "Match cells from the previous generation"
     End Sub
@@ -22,11 +23,10 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         Dim minPixels = gOptions.minPixelsSlider.Value
         Dim newCells As New List(Of rcData)
         For Each rc In combine.combinedCells
-            Dim lrc As New rcData
             rc.maxDStable = rc.maxDist ' assume it has to use the latest.
             rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If rc.indexLast < lastCells.Count Then
-                lrc = lastCells(rc.indexLast)
+                Dim lrc = lastCells(rc.indexLast)
                 rc.motionRect = rc.rect.Union(lrc.rect)
                 rc.color = lrc.color
                 rc.matchFlag = True
@@ -66,7 +66,6 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
                 rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
             End If
 
-            rc.index = newCells.Count
             cv.Cv2.MeanStdDev(src(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
 
             rc.pixels = rc.mask.CountNonZero
@@ -83,11 +82,13 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         redCells.Clear()
         For Each rc In newCells
             rc.index = redCells.Count
+            colorMap.Set(Of cv.Vec3b)(rc.index, 0, rc.color) ' <<<< switch to using colormap.
             redCells.Add(rc)
             cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            ' dst2(rc.rect).SetTo(rc.color, rc.mask)  ' <<<< switch to using colormap.
         Next
 
+        cv.Cv2.ApplyColorMap(cellMap, dst2, colorMap)  ' <<<< switch to using colormap.
         unmatched.redCells = redCells
         unmatched.Run(src)
         dst3 = unmatched.dst3
@@ -2305,7 +2306,7 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
 
         Dim classCount = RedCloud_Count(cPtr)
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-        dst3 = vbPalette(dst2 * 255 / classCount)
+        If standalone Or showIntermediate() Then dst3 = vbPalette(dst2 * 255 / classCount)
 
         If heartBeat() Then labels(3) = CStr(classCount) + " cells found"
 
@@ -2356,6 +2357,7 @@ Public Class RedCloud_Both : Inherits VB_Algorithm
         task.optionsChanged = False
         redC.Run(src)
         dst2 = redC.dst2.Clone
+        dst2.SetTo(0, task.noDepthMask)
         labels(2) = redC.labels(2)
 
         redOptions.UseColor.Checked = True
@@ -2381,18 +2383,3 @@ Public Class RedCloud_Both : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-Public Class newClass_Basics : Inherits VB_Algorithm
-    Public Sub New()
-        labels = {"", "", "Grayscale", "dst3Label"}
-        advice = ""
-        desc = "description"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-    End Sub
-End Class

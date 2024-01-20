@@ -3050,17 +3050,16 @@ public:
 
 
 
-
 class CPP_Blur_Basics : public algorithmCPP {
 public:
-    CPP_Options_Blur* options = new CPP_Options_Blur();
+    CPP_Options_Blur* options = new CPP_Options_Blur;
     CPP_Blur_Basics() : algorithmCPP() {
         traceName = "CPP_Blur_Basics";
         desc = "Smooth each pixel with a Gaussian kernel of different sizes.";
     }
-    void Run(Mat src) {
-        GaussianBlur(src, dst2, Size(options->kernelSize, options->kernelSize), 
-                     options->sigma, options->sigma);
+    void Run(cv::Mat src) {
+        options->Run();
+        cv::GaussianBlur(src, dst2, cv::Size(options->kernelSize, options->kernelSize), options->sigma, options->sigma);
     }
 };
 

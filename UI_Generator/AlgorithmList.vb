@@ -1113,7 +1113,6 @@ if algorithmName = "Neighbor_Corners" Then return new Neighbor_Corners
 if algorithmName = "Neighbor_Flood" Then return new Neighbor_Flood
 if algorithmName = "Neighbor_ImageEdges" Then return new Neighbor_ImageEdges
 if algorithmName = "Neighbor_StableMax" Then return new Neighbor_StableMax
-if algorithmName = "newClass_Basics" Then return new newClass_Basics
 if algorithmName = "OilPaint_Cartoon" Then return new OilPaint_Cartoon
 if algorithmName = "OilPaint_Manual" Then return new OilPaint_Manual
 if algorithmName = "OilPaint_ManualVB" Then return new OilPaint_ManualVB

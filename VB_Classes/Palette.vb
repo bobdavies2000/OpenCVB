@@ -48,7 +48,6 @@ Public Class Palette_LoadColorMap : Inherits VB_Algorithm
         gradientColorMap.Col(0).SetTo(If(whitebackground, cv.Scalar.White, cv.Scalar.Black))
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src Is Nothing Then Exit Sub
         labels(2) = "ColorMap = " + gOptions.Palettes.Text
 
         If task.optionsChanged Then buildColorMap()
@@ -462,7 +461,6 @@ Public Class Palette_Random : Inherits VB_Algorithm
         For i = 0 To 255
             colorMap.Set(Of cv.Vec3b)(i, 0, randomCellColor())
         Next
-        colorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b(0, 0, 0)) ' set 0th entry to black...
 
         desc = "Build a random colorGrad - no smooth transitions."
     End Sub

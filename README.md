@@ -1,28 +1,37 @@
-# Recent Changes – January 2024
+# Recent Changes – January 2024 (Part 2)
 
--   Over 1700 algorithms are included, averaging 31 lines of code per algorithm.
--   Algorithm complexity can now be visualized with OpenCVB.
-    -   A new button will collect algorithm performance at all available resolutions.
-    -   The new button is shorthand for O(n), typically used to represent complexity.
-    -   The sample output below highlights the complexity icon in OpenCVB.
+-   Over 1800 algorithms are included, averaging 29 lines of code per algorithm.
+-   The jump in the algorithm count is due to the AI generated C++ copies.
+-   See “CPP_AI_Generated.h” for the examples of the AI generated C++ versions.
+    -   Any VB.Net algorithm can be translated to C++ using AI.
+    -   A step-by-step method is available in OpenCVB to translate VB.Net code.
+    -   The OpenCVB translator has been rewritten to use Google’s Bard AI engine.
+    -   The “T” for translate button is available in OpenCVB’s main toolbar:
 
-![](media/11e21246b61a18500926fa8d55db2d0b.png)
+![](media/86bab3338bba640ac3c8fa4505296c86.png)
 
--   Also, note the presence of another new icon to the right of the Complexity icon.
-    -   The ‘Advice’ icon will display any advice associated with the algorithm.
-    -   Advice is usually just a list of options that impact the current algorithm.
-    -   Only a few algorithms include the advice feature but more are coming.
--   Default options were reduced – overloaded and too detailed.
-    -   Algorithms that need all options use \<Algorithm Name\>WithOptions.
--   Complementary problem with hidden important algorithm-specific options
-    -   Options can override the default to hide the option form at the side.
-    -   See Gif_Basics for an example of overriding the default to hide the form.
--   Foreground in depth can be found using several methods in Foreground.vb.
--   A log of changes is included at the bottom of this document.
+-   OpenCVB’s short algorithms are ideal tests for Bard’s translator.
+    -   Bard is aware of OpenCV and the differences in the API’s from VB.Net to C++.
+-   But every translation requires a few touch-ups to get the C++ version working.
+-   A tutorial shows how to create a C++ version of an OpenCVB algorithm.
+    -   All translated algorithms are in an “include only” format – no library needed.
+    -   Just add the CPP_IncludeOnly.cpp file in your (non-OpenCVB) C++ applications.
+    -   See the tutorial titled “(7) AI Generated C++” in the OpenCVB tree.
+-   The review of the C++ algorithms prompted a reorganization of the C++ code.
+    -   The reduced number of files should make it easier to reuse the code elsewhere.
+-   Why not put everything in C++? Answer: Bard is not that good and it is real work!
+    -   Translators make assumptions and short algorithms make fewer of them.
+-   Translating an algorithm is an excellent way to review the code.
+    -   Often improvements become clear when implementing the C++ version.
+    -   Translation back to VB.Net keeps the 2 trees in sync (Bard can do that too.)
+-   This version also introduces another RedCloud color source: Binarize_FourWay.
+    -   Binarize an image and binarize each half to classify each pixel.
+    -   Below is an example of the output from RedCloud_BinarizeColor.
+-   A log of previous changes is included at the bottom of this document.
 
-![](media/bf94edf2ee5f261622a2e31f34db3d51.png)
+![](media/9b95f50d8a35d8ee7156f9fb857f4557.jpeg)
 
-**Complexity_Basics:** *To collect complexity data, select any OpenCVB algorithm and click the ‘O’ button in the toolbar. This will run the algorithm for 30 seconds at each of the available resolutions – click the same button to stop data collection. After the data has been collected, use the “Complexity_Basics” algorithm to review the data. The right side of the image above shows all the algorithms that have data in the directory. The plot on the left side shows the plot for the algorithm selected in the options using the same scale. By default, the selected algorithm is the last one collected but a set of radio buttons in the options allows the data for other algorithms to be selected.*
+**RedCloud_BinarizeFourWay:** *Each pixel in the image can be separated into 4 categories using just the color data. The grayscale brightness is binarized and then each half is binarized again to produce 4 classifications of pixels. Each resulting region is found with RedCloud to produce the typical cells shown in the lower left image. The lower right shows the output of the Binarize_FourWay algorithm which is then input to a RedCloud color-only analysis.*
 
 # Introduction
 
@@ -1186,3 +1195,29 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A computer generated image of a building Description automatically generated](media/7e883a32a7ee8faaf76107f24eea917a.gif)
 
 **OpenGL_Filtered3D:** *The histogram interface in OpenCV supports 3D point clouds where the bins can be thought of as 3D bricks in the 3D point cloud. The ‘Histogram Bins’ slider controls a threshold that is used to zero out bricks that have fewer samples than the threshold. When the slider is set to zero, all the blowback pixels appear and extend behind the wall in this side angle view in OpenGL. Bins with less than the specified threshold are set to zero and the backprojection creates a mask that reduces the blowback. The camera used in this example is the Intel D455. The Microsoft Kinect for Azure camera is more accurate and does not have much blowback.*
+
+# Recent Changes – January 2024
+
+-   Over 1700 algorithms are included, averaging 31 lines of code per algorithm.
+-   Algorithm complexity can now be visualized with OpenCVB.
+    -   A new button will collect algorithm performance at all available resolutions.
+    -   The new button is shorthand for O(n), typically used to represent complexity.
+    -   The sample output below highlights the complexity icon in OpenCVB.
+
+![](media/11e21246b61a18500926fa8d55db2d0b.png)
+
+-   Also, note the presence of another new icon to the right of the Complexity icon.
+    -   The ‘Advice’ icon will display any advice associated with the algorithm.
+    -   Advice is usually just a list of options that impact the current algorithm.
+    -   Only a few algorithms include the advice feature but more are coming.
+-   Default options were reduced – overloaded and too detailed.
+    -   Algorithms that need all options use \<Algorithm Name\>WithOptions.
+-   Complementary problem with hidden important algorithm-specific options
+    -   Options can override the default to hide the option form at the side.
+    -   See Gif_Basics for an example of overriding the default to hide the form.
+-   Foreground in depth can be found using several methods in Foreground.vb.
+-   A log of changes is included at the bottom of this document.
+
+![A screen shot of a computer Description automatically generated](media/bf94edf2ee5f261622a2e31f34db3d51.png)
+
+**Complexity_Basics:** *To collect complexity data, select any OpenCVB algorithm and click the ‘O’ button in the toolbar. This will run the algorithm for 30 seconds at each of the available resolutions – click the same button to stop data collection. After the data has been collected, use the “Complexity_Basics” algorithm to review the data. The right side of the image above shows all the algorithms that have data in the directory. The plot on the left side shows the plot for the algorithm selected in the options using the same scale. By default, the selected algorithm is the last one collected but a set of radio buttons in the options allows the data for other algorithms to be selected.*

@@ -152,14 +152,19 @@ Public Class VB_to_CPP
             split(i) = split(i).Replace("firstPass", "task->firstPass")
             split(i) = split(i).Replace("setTrueText", "task->setTrueText")
             split(i) = split(i).Replace("gOptions.GridSize.value", "task->gridSize")
-            split(i) = split(i).Replace("", "")
             split(i) = split(i).Replace("std::", "")
             split(i) = split(i).Replace("const Mat& src", "Mat src")
             split(i) = split(i).Replace("Mat& src", "Mat src")
             split(i) = split(i).Replace("RunVB", "Run")
             split(i) = split(i).Replace("CPP_CPP_", "CPP_")
             split(i) = split(i).Replace("randomCellColor", "task->randomCellColor")
+            If split(i).Contains(" options;") Then
+                split(i) = split(i).Replace("Options_", "CPP_Options_")
+                Dim tokens = Trim(split(i)).Split(" ")
+                split(i) = split(i).Replace(" options;", "*  options = new " + tokens(0) + ";")
+            End If
 
+            split(i) = split(i).Replace("options.", "options->")
             ' updates for options
             If split(i).Contains("CPP_Options_") Then
                 split(i) = split(i).Replace(": public algorithmCPP", "")
