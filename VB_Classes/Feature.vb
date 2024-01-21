@@ -8,8 +8,8 @@ Public Class Feature_Basics : Inherits VB_Algorithm
     Public options As New Options_Features
     Public Sub New()
         Brisk = cv.BRISK.Create()
-        findSlider("Feature_Basics: Feature Sample Size").Value = 400
-        vbAddAdvice("Use 'Options_Features' to control output.")
+        findSlider("Feature Sample Size").Value = 400
+        vbAddAdvice("Feature_Basics: Use 'Options_Features' to control output.")
         desc = "Find good features to track in a BGR image."
     End Sub
     Public Sub RunVB(src As cv.Mat)

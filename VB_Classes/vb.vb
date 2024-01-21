@@ -462,7 +462,7 @@ Module VB
     End Function
     Public Sub vbAddAdvice(advice As String)
         Dim split = advice.Split(":")
-        If task.advice.Contains(split(0)) Then Return
+        If task.advice.Contains(split(0) + ":") Then Return
         task.advice += advice + vbCrLf + vbCrLf
     End Sub
     Public Function vbMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
