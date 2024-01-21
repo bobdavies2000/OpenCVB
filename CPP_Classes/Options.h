@@ -488,3 +488,825 @@ public:
 
 
 
+class CPP_Options_Filter {
+public:
+	int kernelSize = 3;
+	CPP_Options_Filter() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+class CPP_Options_FilterNorm {
+public:
+	cv::Mat kernel;
+	CPP_Options_FilterNorm() {
+	}
+	void RunVB() {
+		float defaults[21] = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+		kernel = Mat(1, 21, CV_32FC1, defaults);
+	}
+};
+
+
+
+
+
+class CPP_Options_FitLine {
+public:
+	int radiusAccuracy = 10;
+	int angleAccuracy = 10;
+	CPP_Options_FitLine() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Flood {
+public:
+	cv::FloodFillFlags floodFlag;
+	int stepSize = 30;
+	CPP_Options_Flood() {
+		floodFlag = cv::FloodFillFlags::FLOODFILL_FIXED_RANGE;
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_ForeGround {
+public:
+	float maxForegroundDepthInMeters = 1500 / 1000;
+	int minSizeContour = 100;
+	float depthPerRegion;
+	int numberOfRegions = 5;
+	CPP_Options_ForeGround() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_FPoly {
+public:
+	int removeThreshold = 4;
+	int autoResyncAfterX = 500;
+	CPP_Options_FPoly() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Fractal {
+public:
+	int iterations = 34;
+	bool resetCheck = false;
+	CPP_Options_Fractal() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_GeneticDrawing {
+public:
+	int stageTotal = 100;
+	float brushPercent = 1.0;
+	int strokeCount = 10;
+	bool snapCheck = false;
+	int generations = 20;
+	CPP_Options_GeneticDrawing() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+class CPP_Options_Harris {
+public:
+	float threshold = 1 / 10000;
+	int neighborhood = 21;
+	int aperture = 21;
+	float harrisParm = 1;
+	CPP_Options_Harris() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_HeatMap {
+public:
+	int redThreshold = 20;
+	String viewName = "vertical";
+	bool showHistory;
+	bool topView = true;
+	bool sideView;
+	CPP_Options_HeatMap() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+class CPP_Options_HistCompare {
+public:
+	cv::HistCompMethods compareMethod;
+	String compareName;
+	CPP_Options_HistCompare() {
+		compareMethod = cv::HistCompMethods::HISTCMP_CORREL;
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+
+class CPP_Options_HistXD {
+public:
+	int sideThreshold = 5;
+	int topThreshold = 15;
+	int threshold3D = 40;
+	int selectedBin = 0;
+	CPP_Options_HistXD() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+
+class CPP_Options_Hough {
+public:
+	int rho = 1;
+	float theta = float(1000 * CV_PI / 180);
+	int threshold = 3;
+	int lineCount = 25;
+	float relativeIntensity = 90 / 1000;
+	CPP_Options_Hough() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_IMUFrameTime {
+public:
+	int minDelayIMU = 4;
+	int minDelayHost = 4;
+	int plotLastX = 20;
+	CPP_Options_IMUFrameTime() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_InPaint {
+public:
+	bool telea = false;
+	CPP_Options_InPaint() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Intercepts {
+public:
+	int interceptRange = 10;
+	int mouseMovePoint;
+	int selectedIntercept;
+	CPP_Options_Intercepts() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Interpolate {
+public:
+	int resizePercent = 2;
+	int interpolationThreshold = 4;
+	int pixelCountThreshold = 0;
+	int saveDefaultThreshold = resizePercent;
+	CPP_Options_Interpolate() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_KLT {
+public:
+	cv::Point2f* inputPoints;
+	int maxCorners = 100;
+	float qualityLevel = 0.01f;
+	int minDistance = 7;
+	int blockSize = 7;
+	bool nightMode;
+	CPP_Options_KLT() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+
+class CPP_Options_KMeans {
+public:
+	cv::KmeansFlags kMeansFlag;
+	int kMeansK = 5;
+	CPP_Options_KMeans() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Laplacian {
+public:
+	float scale = 1;
+	float delta = 0;
+	bool gaussianBlur;
+	bool boxFilterBlur;
+	int threshold = 15;
+	CPP_Options_Laplacian() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+
+class CPP_Options_LeftRight {
+public:
+	float alpha = 2000;
+	int beta = -100;
+	CPP_Options_LeftRight() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Line {
+public:
+	int lineLengthThreshold = 20;
+	CPP_Options_Line() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+
+class CPP_Options_MatchCell {
+public:
+	float overlapPercent = 0.5f;
+	CPP_Options_MatchCell() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+
+class CPP_Options_MatchShapes {
+public:
+	cv::ShapeMatchModes matchOption;
+	float matchThreshold = 0.8f;
+	float maxYdelta = 0.05f;
+	float minSize = (task->workingRes.width * task->workingRes.height) / 100;
+	CPP_Options_MatchShapes() {
+		matchOption = cv::ShapeMatchModes::CONTOURS_MATCH_I1;
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_MinArea {
+public:
+	int squareWidth = 100;
+	int numPoints = 5;
+	CPP_Options_MinArea() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_MinMaxNone {
+public:
+	bool useMax;
+	bool useMin;
+	bool useNone;
+	CPP_Options_MinMaxNone() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Motion {
+public:
+	int motionThreshold;
+	float cumulativePercentThreshold = 0.1f;
+	CPP_Options_Motion() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_MotionBlur {
+public:
+	bool showDirection = true;
+	int kernelSize = 51;
+	float theta;
+	int restoreLen = 10;
+	int SNR = 700;
+	int gamma = 5;
+	CPP_Options_MotionBlur() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_MSER {
+public:
+	int delta = 9;
+	int minArea = 0;
+	int maxArea = 0;
+	float maxVariation = 0.25f;
+	float minDiversity = 0.2f;
+	int maxEvolution = 200;
+	float areaThreshold = 1.01f;
+	float minMargin = 0.003f;
+	int edgeBlurSize = 5;
+	bool pass2Setting = false;
+	bool graySetting = false;
+	CPP_Options_MSER() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Neighbors {
+public:
+	float threshold = 0.005f;
+	int pixels = 6;
+	bool patchZ;
+	CPP_Options_Neighbors() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_OilPaint {
+public:
+	int kernelSize = 4;
+	int intensity = 20;
+	int threshold = 25;
+	int filterSize = 3;
+	CPP_Options_OilPaint() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_OpenGL {
+public:
+	float FOV = 75;
+	float yaw = -3;
+	float pitch = 3;
+	float roll = 0;
+	float zNear = 0;
+	float zFar = 20;
+	int pointSize = 2;
+	float zTrans = 0.5f;
+	CPP_Options_OpenGL() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+
+
+class CPP_Options_OpenGL_Contours {
+public:
+	int depthPointStyle;
+	float filterThreshold = 0.3f;
+	CPP_Options_OpenGL_Contours() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_OpenGLFunctions {
+public:
+	cv::Point3f moveAmount;
+	float FOV = 75;
+	float yaw = -3;
+	float pitch = 3;
+	float roll = 0;
+	float zNear = 0;
+	float zFar = 20.0f;
+	float zTrans = 0.5f;
+	CPP_Options_OpenGLFunctions() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Photoshop {
+public:
+	int switchVal = 0;
+	CPP_Options_Photoshop() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Plane {
+public:
+	float rmsThreshold = 0.1f;
+	bool useMaskPoints = false;
+	bool useContourPoints = false;
+	bool use3Points = false;
+	bool reuseRawDepthData = false;
+	CPP_Options_Plane() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+class CPP_Options_PlaneEstimation {
+public:
+	bool useDiagonalLines = false;
+	bool useContour_SidePoints = false;
+	CPP_Options_PlaneEstimation() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Pointilism {
+public:
+	int smoothingRadius = 32 * 2 + 1;
+	int strokeSize = 3;
+	bool useElliptical = false;
+	CPP_Options_Pointilism() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+class CPP_Options_ProCon {
+public:
+    int buffer[10];
+	int pduration = 1;
+	int cduration = 1;
+	int bufferSize = 10;
+	CPP_Options_ProCon() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+
+class CPP_Options_Resize {
+public:
+	cv::InterpolationFlags warpFlag = cv::InterpolationFlags::INTER_NEAREST;
+	int radioIndex;
+	float resizePercent = 0.03f;
+	int topLeftOffset = 10;
+	CPP_Options_Resize() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+class CPP_Options_SepFilter2D {
+public:
+	int xDim = 5;
+	int yDim = 11;
+	float sigma = 17;
+	bool diffCheck = false;
+	CPP_Options_SepFilter2D() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Sift {
+public:
+	bool useBFMatcher = false;
+	int pointCount = 200;
+	CPP_Options_Sift() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Smoothing {
+public:
+	int iterations = 8;
+	float interiorTension = 0.5f;
+	int stepSize = 30;
+	CPP_Options_Smoothing() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Sobel {
+public:
+	int kernelSize = 3;
+	int threshold = 50;
+	bool horizontalDerivative = true;
+	bool verticalDerivative = true;
+	CPP_Options_Sobel() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+class CPP_Options_SOM {
+public:
+	int iterations = 3000;
+	float learningRate = 0.1f;
+	int radius = 15;
+	CPP_Options_SOM() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Spectrum {
+public:
+	int gapDepth = 1;
+	int gapGray = 1;
+	int sampleThreshold = 10;
+	CPP_Options_Spectrum() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Structured {
+public:
+	int sliceSize = 1;
+	int stepSize = 20;
+	CPP_Options_Structured() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_SuperRes {
+public:
+	String method = "farneback";
+	int iterations = 10;
+	bool restartWithNewOptions = false;
+	CPP_Options_SuperRes() {
+	}
+	void RunVB() {}
+	};
+
+
+
+
+
+class CPP_Options_SVM {
+public:
+	cv::ml::SVM::KernelTypes kernelType;
+	int granularity = 5;
+	float svmDegree = 1;
+	int gamma = 1;
+	float svmCoef0 = 1;
+	float svmC = 1;
+	float svmNu = 0.5f;
+	float svmP = 0;
+	int sampleCount = 500;
+	CPP_Options_SVM() {
+		kernelType = cv::ml::SVM::KernelTypes::POLY;
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_SVM2 {
+public:
+	cv::ml::SVM::KernelTypes SVMType;
+	CPP_Options_SVM2() {
+		SVMType = cv::ml::SVM::KernelTypes::CHI2;
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_SymmetricalShapes {
+public:
+	float rotateAngle = 0;
+	cv::Scalar fillColor = cv::Scalar(0, 0, 255);
+	int numPoints = 500;
+	int nGenPer = 100;
+	int radius1 = task->workingRes.height / 4;
+	int radius2 = task->workingRes.height / 8;
+	float dTheta = 2 * CV_PI / numPoints;
+	bool symmetricRipple = true;
+	bool reverseInOut = false;
+	bool fillRequest = true;
+	CPP_Options_SymmetricalShapes() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Threshold {
+public:
+	cv::ThresholdTypes thresholdOption;
+	int maxVal = 255;
+	int threshold = 100;
+	bool inputGray = false;
+	bool otsuOption = true;
+	CPP_Options_Threshold() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Threshold_Adaptive {
+public:
+	cv::AdaptiveThresholdTypes method;
+	int blockSize = 5;
+	int constantVal = 0;
+	CPP_Options_Threshold_Adaptive() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+class CPP_Options_Warp {
+public:
+	double alpha = 0.9;
+	double beta = 0.9;
+	double gamma = 0.9;
+	double f = 600;
+	double distance = 400;
+	CPP_Options_Warp() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_Wavelet {
+public:
+	bool useHaar = false;
+	int iterations = 3;
+	CPP_Options_Wavelet() {
+	}
+	void RunVB() {}
+};
+
+
+
+
+
+class CPP_Options_XPhoto {
+public:
+	cv::ColorConversionCodes colorCode;
+	int dynamicRatio;
+	int blockSize;
+	CPP_Options_XPhoto() {
+		colorCode = cv::ColorConversionCodes::COLOR_BGR2GRAY;
+	}
+	void RunVB() {}
+};

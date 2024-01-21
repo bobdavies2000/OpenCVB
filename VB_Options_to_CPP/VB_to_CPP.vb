@@ -85,7 +85,7 @@ Public Class VB_to_CPP
                     Else
                         Dim saveline = Trim(line)
                         Dim tokens = saveline.Split(" ")
-                        If tokens.Count >= 3 Then
+                        If tokens.Count > 3 Then
                             line = tokens(3) + " " + tokens(1) + " "
                         End If
                         If saveline.Contains("=") Then
@@ -105,6 +105,7 @@ Public Class VB_to_CPP
 
 
             line = line.Replace(" False", " false")
+            line = line.Replace(" True", " true")
             line = line.Replace("dst2.Rows", "task->workingRes.width")
             line = line.Replace("dst2.Cols ", "task->workingRes.height")
             line = line.Replace("cv.", "cv::")
