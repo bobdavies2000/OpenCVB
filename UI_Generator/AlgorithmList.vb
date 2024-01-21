@@ -2,6 +2,7 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
+_CPP_Options_Extrinsics
 _CPP_Plot_Histogram2D
 _CPP_Histogram_RedOptions
 _CPP_Palette_Random
@@ -334,6 +335,7 @@ if algorithmName = "CPP_Mesh_Basics" Then return new CPP_Basics(functionNames._C
 if algorithmName = "CPP_Mesh_Features" Then return new CPP_Basics(functionNames._CPP_Mesh_Features)
 if algorithmName = "CPP_Motion_Basics" Then return new CPP_Basics(functionNames._CPP_Motion_Basics)
 if algorithmName = "CPP_Motion_Core" Then return new CPP_Basics(functionNames._CPP_Motion_Core)
+if algorithmName = "CPP_Options_Extrinsics" Then return new CPP_Basics(functionNames._CPP_Options_Extrinsics)
 if algorithmName = "CPP_Palette_Basics" Then return new CPP_Basics(functionNames._CPP_Palette_Basics)
 if algorithmName = "CPP_Palette_Random" Then return new CPP_Basics(functionNames._CPP_Palette_Random)
 if algorithmName = "CPP_Plot_Histogram" Then return new CPP_Basics(functionNames._CPP_Plot_Histogram)

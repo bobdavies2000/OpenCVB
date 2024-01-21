@@ -1,22 +1,11 @@
 class CPP_Options_Blur {
 public:
 	int kernelSize = 3;
-	float sigma = 1.5f;
+	float sigma = 1.5;
 	CPP_Options_Blur() {
-		//	traceName = "CPP_Options_Blur";
-		//        if (sliders.Setup(traceName)) {
-		//            sliders.setupTrackBar("Blur Kernel Size", 0, 32, 3);
-		//            sliders.setupTrackBar("Blur Sigma", 1, 10, 3);
-		//        }
 	}
-	void Run() {
-		//        static Trackbar* kernelSlider = findSlider("Blur Kernel Size");
-		//        static Trackbar* sigmaSlider = findSlider("Blur Sigma");
-		//        kernelSize = kernelSlider->value | 1;  
-		//        sigma = sigmaSlider->value * 0.5f;
-	}
+	void Run() {}
 };
-
 
 
 
@@ -193,79 +182,78 @@ public:
 
 
 
+
+
 class CPP_Options_Bernson {
 public:
-	int kernelSize;
-	int bgThreshold;
-	int contrastMin;
+	int kernelSize = 51;
+	int bgThreshold = 100;
+	int contrastMin = 50;
 	CPP_Options_Bernson() {
-		//	traceName = "CPP_Options_Bernson";
-		//        if (sliders.Setup(traceName)) {
-		//            sliders.setupTrackBar("Kernel Size", 3, 500, kernelSize);
-		//            sliders.setupTrackBar("Contrast min", 0, 255, contrastMin);
-		//            sliders.setupTrackBar("bg Threshold", 0, 255, bgThreshold);
-		//        }
-	}
-	void Run() {
-		//        static Slider* kernelSlider = findSlider("Kernel Size");
-		//        static Slider* contrastSlider = findSlider("Contrast min");
-		//        static Slider* bgSlider = findSlider("bg Threshold");
-		//        kernelSize = kernelSlider->value | 1;  
-		//        bgThreshold = bgSlider->value;
-		//        contrastMin = contrastSlider->value;
 	}
 };
-
-
-
-
-
-
-
-class CPP_Options_BGSubtract {
-public:
-	float MOGlearnRate;
-	CPP_Options_BGSubtract() {
-		//	traceName = "CPP_Options_BGSubtract";
-		//        if (sliders.Setup(traceName)) {
-		//            sliders.setupTrackBar("MOG Learn Rate X1000", 1, 1000, 1);
-		//        }
-	}
-	void Run() {
-		//        static Slider* learnRateSlider = findSlider("MOG Learn Rate X1000");
-		//        MOGlearnRate = learnRateSlider->value / 1000.0f;
-	}
-};
-
-
-
 
 
 
 
 class CPP_Options_BGSubtractSynthetic {
 public:
-	double amplitude;
-	double magnitude;
-	double waveSpeed;
-	double objectSpeed;
+	double amplitude = 200;
+	double magnitude = 20;
+	double waveSpeed = 20;
+	double objectSpeed = 15;
 	CPP_Options_BGSubtractSynthetic() {
-		//	traceName = "CPP_Options_BGSubtractSynthetic";
-		//        if (sliders.Setup(traceName)) {
-		//            sliders.setupTrackBar("Synthetic Amplitude x100", 1, 400, amplitude);
-		//            sliders.setupTrackBar("Synthetic Magnitude", 1, 40, magnitude);
-		//            sliders.setupTrackBar("Synthetic Wavespeed x100", 1, 400, waveSpeed);
-		//            sliders.setupTrackBar("Synthetic ObjectSpeed", 1, 20, objectSpeed);
-		//        }
 	}
-	void Run() {
-		//        static Slider* amplitudeSlider = findSlider("Synthetic Amplitude x100");
-		//        static Slider* magnitudeSlider = findSlider("Synthetic Magnitude");
-		//        static Slider* waveSpeedSlider = findSlider("Synthetic Wavespeed x100");
-		//        static Slider* objectSpeedSlider = findSlider("Synthetic ObjectSpeed");
-		//        amplitude = amplitudeSlider->value;
-		//        magnitude = magnitudeSlider->value;
-		//        waveSpeed = waveSpeedSlider->value;
-		//        objectSpeed = objectSpeedSlider->value;
+};
+
+class CPP_Options_BGSubtract {
+public:
+	float MOGlearnRate = 1 / 1000;
+	CPP_Options_BGSubtract() {
+	}
+};
+
+
+
+
+class CPP_Options_BinarizeNiBlack {
+public:
+	int kernelSize = 51;
+	float niBlackK = -200 / 1000;
+	float nickK = 100 / 1000;
+	float sauvolaK = 100 / 1000;
+	float sauvolaR = 64;
+	CPP_Options_BinarizeNiBlack() {
+	}
+};
+
+
+
+
+class CPP_Options_Blob {
+public:
+	cv::SimpleBlobDetector::Params blobParams;
+	CPP_Options_Blob() {
+	}
+};
+
+
+
+class CPP_Options_BlockMatching {
+public:
+	int numDisparity = 2 * 16;
+	int blockSize = 15;
+	int distance = 20;
+	CPP_Options_BlockMatching() {
+	}
+};
+
+
+
+class CPP_Options_Boundary {
+public:
+	int desiredBoundaries = 15;
+	int peakDistance = task->workingRes.width / 20;
+	CPP_Options_Boundary() {
 	}
 };

@@ -1403,13 +1403,13 @@ End Class
 
 Public Class Options_BlockMatching : Inherits VB_Algorithm
     Public numDisparity As Integer = 2 * 16
-    Public blockSize As Integer
-    Public distance As Integer
+    Public blockSize As Integer = 15
+    Public distance As Integer = 20
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Blockmatch max disparity", 2, 5, 2 / 16)
-            sliders.setupTrackBar("Blockmatch block size", 5, 255, 15)
-            sliders.setupTrackBar("Blockmatch distance in meters", 1, 100, 20)
+            sliders.setupTrackBar("Blockmatch max disparity", 2, 5, numDisparity / 16)
+            sliders.setupTrackBar("Blockmatch block size", 5, 255, blockSize)
+            sliders.setupTrackBar("Blockmatch distance in meters", 1, 100, distance)
         End If
     End Sub
     Public Sub RunVB()
@@ -3802,11 +3802,11 @@ End Class
 
 Public Class Options_Boundary : Inherits VB_Algorithm
     Public desiredBoundaries As Integer = 15
-    Public peakDistance As Integer
+    Public peakDistance As Integer = task.workingRes.Width / 20
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Desired boundary count", 2, 100, desiredBoundaries)
-            sliders.setupTrackBar("Distance to next Peak (pixels)", 2, dst2.Width / 10, dst2.Width / 20)
+            sliders.setupTrackBar("Distance to next Peak (pixels)", 2, dst2.Width / 10, peakDistance)
         End If
     End Sub
     Public Sub RunVB()

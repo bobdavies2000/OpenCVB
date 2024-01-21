@@ -1,4 +1,10 @@
 ﻿Imports System.IO
+Module methods
+    Public algorithmVBName As String
+    Public fIndexName As String
+    Public CPPName As String
+    Public vbModule As String = ""
+End Module
 Public Class VB_to_CPP
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim input = New FileInfo("../../data/AlgorithmList.txt")

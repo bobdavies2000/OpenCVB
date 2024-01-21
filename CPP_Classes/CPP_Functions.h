@@ -2,6 +2,7 @@
 enum functions
 {
     _CPP_AddWeighted_Basics,
+_CPP_Options_Extrinsics,
     _CPP_Plot_Histogram2D,
     _CPP_Histogram_RedOptions,
     _CPP_Palette_Random,

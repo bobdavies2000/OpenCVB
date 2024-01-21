@@ -3058,7 +3058,7 @@ public:
         desc = "Smooth each pixel with a Gaussian kernel of different sizes.";
     }
     void Run(cv::Mat src) {
-        options->Run();
+        options->RunVB();
         cv::GaussianBlur(src, dst2, cv::Size(options->kernelSize, options->kernelSize), 
                          options->sigma, options->sigma);
     }
