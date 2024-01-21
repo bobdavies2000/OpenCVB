@@ -298,6 +298,7 @@ Public Class Cell_JumpUp : Inherits VB_Algorithm
         labels(2) = redC.labels(2)
 
         jumpCells.Clear()
+        If lastCells.Count = 0 Then Exit Sub
         For Each rc In redC.redCells
             Dim lrc = lastCells(rc.indexLast)
             If (rc.pixels - lrc.pixels) / rc.pixels >= percentJump Then
@@ -338,13 +339,12 @@ Public Class Cell_JumpDown : Inherits VB_Algorithm
         labels(2) = redC.labels(2)
 
         jumpCells.Clear()
+        If lastCells.Count = 0 Then Exit Sub
         For Each rc In redC.redCells
-            If rc.indexLast <> 0 Then
-                Dim lrc = lastCells(rc.indexLast)
-                If (lrc.pixels - rc.pixels) / rc.pixels >= percentJump Then
-                    dst3(lrc.rect).SetTo(cv.Scalar.White, lrc.mask)
-                    jumpCells.Add(rc.index, New cv.Vec2i(lrc.index, rc.index))
-                End If
+            Dim lrc = lastCells(rc.indexLast)
+            If (lrc.pixels - rc.pixels) / rc.pixels >= percentJump Then
+                dst3(lrc.rect).SetTo(cv.Scalar.White, lrc.mask)
+                jumpCells.Add(rc.index, New cv.Vec2i(lrc.index, rc.index))
             End If
         Next
         If heartBeat() Then labels(3) = "There were " + CStr(jumpCells.Count) + " cells jumped down more than " +
@@ -382,13 +382,12 @@ Public Class Cell_JumpUnstable : Inherits VB_Algorithm
             labels(2) = redC.labels(2)
 
             jumpCells.Clear()
+            If lastCells.Count = 0 Then Exit Sub
             For Each rc In redC.redCells
-                If rc.indexLast <> 0 Then
-                    Dim lrc = lastCells(rc.indexLast)
-                    If Math.Abs(lrc.pixels - rc.pixels) / rc.pixels >= percentJump Then
-                        dst1(lrc.rect).SetTo(cv.Scalar.White, lrc.mask)
-                        jumpCells.Add(rc.index, New cv.Vec2i(lrc.index, rc.index))
-                    End If
+                Dim lrc = lastCells(rc.indexLast)
+                If Math.Abs(lrc.pixels - rc.pixels) / rc.pixels >= percentJump Then
+                    dst1(lrc.rect).SetTo(cv.Scalar.White, lrc.mask)
+                    jumpCells.Add(rc.index, New cv.Vec2i(lrc.index, rc.index))
                 End If
             Next
             labels(3) = "There were " + CStr(jumpCells.Count) + " cells changed more than " + Format(percentJump, "0%")

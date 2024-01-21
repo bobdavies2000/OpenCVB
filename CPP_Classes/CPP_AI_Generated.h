@@ -3059,7 +3059,8 @@ public:
     }
     void Run(cv::Mat src) {
         options->Run();
-        cv::GaussianBlur(src, dst2, cv::Size(options->kernelSize, options->kernelSize), options->sigma, options->sigma);
+        cv::GaussianBlur(src, dst2, cv::Size(options->kernelSize, options->kernelSize), 
+                         options->sigma, options->sigma);
     }
 };
 
