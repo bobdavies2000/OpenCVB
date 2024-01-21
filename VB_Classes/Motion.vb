@@ -728,7 +728,7 @@ End Class
 Public Class Motion_Enclosing : Inherits VB_Algorithm
     Dim motion As New Rectangle_EnclosingRect
     Public Sub New()
-        advice = "gOptions frame history slider will impact results."
+        vbAddAdvice("Motion_Enclosing: gOptions frame history slider will impact results.")
         labels(3) = "The white spots show the difference of the constructed image from the current image."
         desc = "Track the RGB image using Rectangle_EnclosingRect to isolate the motion"
     End Sub

@@ -460,6 +460,11 @@ Module VB
                             ((1 - factor) * farBlue(1) + factor * nearYellow(1)),
                             ((1 - factor) * farBlue(2) + factor * nearYellow(2)))
     End Function
+    Public Sub vbAddAdvice(advice As String)
+        Dim split = advice.Split(":")
+        If task.advice.Contains(split(0)) Then Return
+        task.advice += advice + vbCrLf + vbCrLf
+    End Sub
     Public Function vbMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData
         If mask Is Nothing Then

@@ -13,7 +13,6 @@ Public Class Hist3D_Basics : Inherits VB_Algorithm
         End If
 
         labels = {"", "", "Sum of 8UC1 outputs of Hist3Dcolor_Basics and Hist3Dcloud_basics", ""}
-        advice = "redOptions '3D Histogram Bins' "
         desc = "Build an 8UC1 image by adding Hist3Dcolor_Basics and Hist3Dcloud_Basics output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -46,7 +45,6 @@ Public Class Hist3D_BuildHistogram : Inherits VB_Algorithm
     Public classCount As Integer
     Public histArray() As Single
     Public Sub New()
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf
         desc = "Build a guided 3D histogram from the 3D histogram supplied in src."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -103,7 +101,6 @@ Public Class Hist3D_RedCloud : Inherits VB_Algorithm
     Public Sub New()
         redOptions.UseColor.Checked = True
         labels = {"", "", "Grayscale", "dst3Label"}
-        advice = "redOptions '3D Histogram Bins' "
         desc = "Run RedCloud_Basics on the combined Hist3D color/cloud output."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -129,7 +126,6 @@ Public Class Hist3D_RedColor : Inherits VB_Algorithm
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         redOptions.UseColor.Checked = True
-        advice = "redOptions '3D Histogram Bins' "
         desc = "Use the Hist3D color classes to segment the image with RedCloud_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -158,7 +154,6 @@ Public Class Hist3D_DepthWithMask : Inherits VB_Algorithm
     Dim hColor As New Hist3Dcolor_Basics
     Public depthMask As New cv.Mat
     Public Sub New()
-        advice = ""
         desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -192,7 +187,6 @@ Public Class Hist3D_Pixel : Inherits VB_Algorithm
     Public histArray() As Single
     Public classCount As Integer
     Public Sub New()
-        advice = "redOptions '3D Histogram Bins' "
         desc = "Classify each pixel using a 3D histogram backprojection."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -229,7 +223,6 @@ Public Class Hist3D_PixelCells : Inherits VB_Algorithm
         redOptions.UseColor.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        advice = ""
         desc = "After classifying each pixel, backproject each redCell using the same 3D histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -260,7 +253,6 @@ Public Class Hist3D_PixelClassify : Inherits VB_Algorithm
     Dim pixel As New Hist3D_Pixel
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        advice = ""
         desc = "Classify each pixel with a 3D histogram backprojection and run RedCloud_Basics on the output."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -286,7 +278,6 @@ Public Class Hist3D_PixelDiffMask : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public Sub New()
         redOptions.UseColor.Checked = True
-        advice = ""
         desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -314,7 +305,6 @@ Public Class Hist3D_RedCloudGrid : Inherits VB_Algorithm
     Dim hVector As New Hist3Dcolor_Vector
     Public Sub New()
         gOptions.GridSize.Value = 8
-        advice = ""
         desc = "Build RedCloud pixel vectors and then measure each grid element's distance to those vectors."
     End Sub
     Public Sub RunVB(src As cv.Mat)

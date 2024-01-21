@@ -6,9 +6,9 @@ Public Class Interpolate_Basics : Inherits VB_Algorithm
     Public options As New Options_Resize
     Public iOptions As New Options_Interpolate
     Public Sub New()
-        advice = "Local option 'Interpolation threshold' is the primary control" + vbCrLf +
-                 "Local option 'Resize %' has a secondary effect." + vbCrLf +
-                 "Local option 'Line length' affects the lines found."
+        vbAddAdvice("Interpolate_Basics: 'Interpolation threshold' is the primary control" + vbCrLf +
+                    "Local option 'Resize %' has a secondary effect." + vbCrLf +
+                    "Local option 'Line length' affects the lines found.")
         desc = "Resize image using all available interpolation methods in OpenCV"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -49,10 +49,9 @@ Public Class Interpolate_Kalman : Inherits VB_Algorithm
     Dim inter As New Interpolate_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()
-        advice = inter.advice
         desc = "Use Kalman to smooth the grayscale results of interpolation"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static updatedFrames As Integer
         Static myFrameCount As Integer
 
@@ -87,7 +86,7 @@ Public Class Interpolate_Kalman : Inherits VB_Algorithm
         End If
 
         Static lastframe As cv.Mat = dst2.Clone
-        If lastframe.size <> dst2.Size Then lastframe = dst2.Clone
+        If lastframe.Size <> dst2.Size Then lastframe = dst2.Clone
         Dim tmp As cv.Mat = dst2 - lastframe
         Dim diffCount = tmp.CountNonZero
         If diffCount > inter.iOptions.pixelCountThreshold Then
@@ -120,7 +119,6 @@ End Class
 '    Dim inter As New Interpolate_Basics
 '    Dim kalman As New Kalman_Basics
 '    Public Sub New()
-'        advice = inter.advice
 '        desc = "Use Kalman to smooth the grayscale results of interpolation"
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
@@ -185,7 +183,6 @@ Public Class Interpolate_Lines : Inherits VB_Algorithm
     Dim lines As New Line_Basics
     Dim inter As New Interpolate_Basics
     Public Sub New()
-        advice = inter.advice
         findSlider("Interpolation Resize %").Value = 80
         findSlider("Interpolation threshold").Value = 100
         desc = "Detect lines in interpolation results."
@@ -214,7 +211,6 @@ Public Class Interpolate_Difference : Inherits VB_Algorithm
     Dim inter As New Interpolate_Kalman
     Dim diff As New Diff_Basics
     Public Sub New()
-        advice = inter.advice
         desc = "Highlight the difference between the interpolation results and the current image."
     End Sub
     Public Sub RunVB(src As cv.Mat)

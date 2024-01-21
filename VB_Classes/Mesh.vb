@@ -3,7 +3,7 @@ Public Class Mesh_Basics : Inherits VB_Algorithm
     Dim knn As New KNN_Basics
     Public Sub New()
         labels(2) = "Triangles built with each random point and its 2 nearest neighbors."
-        advice = "Adjust the number of points with the options_random."
+        vbAddAdvice("Mesh_Basics: Adjust the number of points with the options_random.")
         desc = "Build triangles from random points"
     End Sub
     Public Function showMesh(pointList As List(Of cv.Point2f)) As cv.Mat
@@ -46,7 +46,7 @@ Public Class Mesh_Features : Inherits VB_Algorithm
     Dim mesh As New Mesh_Basics
     Public Sub New()
         labels(2) = "Triangles built with each feature point and its 2 nearest neighbors."
-        advice = "Use 'Options_Features' to update results."
+        vbAddAdvice("Mesh_Features: Use 'Options_Features' to update results.")
         desc = "Build triangles from feature points"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -67,7 +67,6 @@ Public Class Mesh_Agast : Inherits VB_Algorithm
     Dim mesh As New Mesh_Basics
     Public Sub New()
         labels(2) = "Triangles built with each feature point and its 2 nearest neighbors."
-        advice = agast.advice
         desc = "Build triangles from Agast points"
     End Sub
     Public Sub RunVB(src As cv.Mat)

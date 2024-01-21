@@ -9,7 +9,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
     Dim binarize As New Binarize_FourWay
     Public classifier As Object = binarize
     Public Sub New()
-        advice = "The redOptions 'Color Source' radio buttons control which method is used."
+        vbAddAdvice("Color_Basics: redOptions 'Color Source' control which method is used.")
         labels(3) = "vbPalette output of dst2 at left"
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
@@ -149,7 +149,7 @@ End Class
 Public Class Color_RedHue : Inherits VB_Algorithm
     Dim options As New Options_CamShift
     Public Sub New()
-        advice = "This mask of the red hue areas is available for use."
+        vbAddAdvice("Color_RedHue: This mask of red hue areas is available for use.")
         labels = {"", "", "Pixels with Red Hue", ""}
         desc = "Find all the reddish pixels in the image - indicate some life form."
     End Sub

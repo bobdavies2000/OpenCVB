@@ -1104,8 +1104,8 @@ Public Class OpenGL_3DColors : Inherits VB_Algorithm
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
-        findSlider("OpenGL Point Size").Value = 20
-        advice = "Use the redOptions.reduction slider to see pattern."
+        findSlider("OpenGL_3DColors: OpenGL Point Size").Value = 20
+        vbAddAdvice("Use the redOptions.reduction slider to see pattern.")
         desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)"
     End Sub
     Public Sub RunVB(src As cv.Mat)

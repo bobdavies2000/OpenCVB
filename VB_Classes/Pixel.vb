@@ -770,7 +770,6 @@ Public Class Pixel_Unique_CPP : Inherits VB_Algorithm
     Public Sub New()
         redOptions.UseColor.Checked = True
         cPtr = Pixels_Vector_Open()
-        advice = ""
         desc = "Create the list of pixels in a RedMin Cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)

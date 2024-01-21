@@ -308,7 +308,6 @@ Public Class Rectangle_EnclosingRect : Inherits VB_Algorithm
         redOptions.UseColor.Checked = True
         cPtr = BGSubtract_BGFG_Open(4)
         labels(2) = "MOG2 is the best option.  See BGSubtract_Basics to see more options."
-        advice = "If standalone, no options for this."
         desc = "Build an enclosing rectangle for the supplied pointlist"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -352,7 +351,6 @@ End Class
 Public Class Rectangle_EnclosingPoints : Inherits VB_Algorithm
     Public pointList As New List(Of cv.Point2f)
     Public Sub New()
-        advice = "If standalone, there are no options."
         desc = "Build an enclosing rectangle for the supplied pointlist"
     End Sub
     Public Sub RunVB(src As cv.Mat)

@@ -165,7 +165,6 @@ Public Class History_BasicsDiff : Inherits VB_Algorithm
     Dim diff As New Diff_Basics
     Public Sub New()
         gOptions.PixelDiffThreshold.Value = 0
-        advice = ""
         desc = "Find the floodfill trouble spots."
     End Sub
     Public Sub RunVB(src As cv.Mat)

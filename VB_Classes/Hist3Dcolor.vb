@@ -9,7 +9,6 @@ Public Class Hist3Dcolor_Basics : Inherits VB_Algorithm
     Public simK As New Hist3D_BuildHistogram
     Public alwaysRun As Boolean
     Public Sub New()
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf
         desc = "Capture a 3D color histogram, find the gaps, and backproject the clusters found."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -46,7 +45,6 @@ Public Class Hist3Dcolor_UniqueRGBPixels : Inherits VB_Algorithm
     Public pixels As New List(Of cv.Point3f)
     Public counts As New List(Of Integer)
     Public Sub New()
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf
         desc = "Get the number of non-zero BGR elements in the 3D color histogram of the current image and their BGR values"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -82,7 +80,6 @@ Public Class Hist3Dcolor_TopXColors : Inherits VB_Algorithm
     Public topXPixels As New List(Of cv.Point3i)
     Public mapTopX As Integer = 16
     Public Sub New()
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf
         desc = "Get the top 256 of non-zero BGR elements in the 3D color histogram of the current image and their BGR values"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -118,7 +115,6 @@ Public Class Hist3Dcolor_Reduction : Inherits VB_Algorithm
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         redOptions.SimpleReductionSlider.Value = 45
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf + "redOptions 'Simple Reduction'"
         desc = "Backproject the 3D histogram for RGB after reduction"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -144,7 +140,6 @@ Public Class Hist3Dcolor_ZeroGroups : Inherits VB_Algorithm
     Public classCount As Integer
     Public histogram As New cv.Mat
     Public Sub New()
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf
         desc = "Breakdown the 3D histogram using the '0' entries as boundaries between clusters."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -207,7 +202,6 @@ Public Class Hist3Dcolor_PlotHist1D : Inherits VB_Algorithm
         hColor.alwaysRun = True
         plot.removeZeroEntry = False
         labels(2) = "The 3D histogram of the RGB image stream - note the number of gaps"
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf
         desc = "Present the 3D histogram as a typical histogram bar chart."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -229,7 +223,6 @@ Public Class Hist3Dcolor_Select : Inherits VB_Algorithm
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         labels(3) = "The highlighted pixels are in the selected bin"
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf + "goptions 'DebugSlider'"
         desc = "Build a 3D histogram from the BGR image and backproject the 'Selected bin' (in options_HistXD sliders)."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -262,7 +255,6 @@ Public Class Hist3Dcolor_Basics_CPP : Inherits VB_Algorithm
     Public simK As New Hist3D_BuildHistogram
     Public classCount As Integer
     Public Sub New()
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf
         desc = "Build a 3D histogram from the BGR image and sort it by histogram entry size."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -307,7 +299,6 @@ Public Class Hist3Dcolor_Diff : Inherits VB_Algorithm
     Public Sub New()
         gOptions.PixelDiffThreshold.Value = 0
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf + "goptions 'Pixel Difference'"
         desc = "Create a mask for the color pixels that are changing with every frame of the Hist3Dcolor_basics."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -337,7 +328,7 @@ Public Class Hist3Dcolor_Vector : Inherits VB_Algorithm
     Public Sub New()
         Dim bins = redOptions.HistBinSlider.Value
         binArray = {bins, bins, bins}
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf
+        vbAddAdvice("Hist3Dcolor_Vector: redOptions '3D Histogram Bins'")
         desc = "Capture a 3D color histogram for input src - likely to be src(rect)."
     End Sub
     Public Sub RunVB(src As cv.Mat)

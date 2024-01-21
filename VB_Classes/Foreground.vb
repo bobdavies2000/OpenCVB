@@ -112,7 +112,6 @@ Public Class Foreground_Hist3D : Inherits VB_Algorithm
     Public Sub New()
         hcloud.maskInput = task.noDepthMask
         labels = {"", "", "Foreground", "Background"}
-        advice = hcloud.advice
         desc = "Use the first class of hist3Dcloud_Basics as the definition of foreground"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -135,7 +134,6 @@ Public Class Foreground_RedForeground : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public Sub New()
         redOptions.UseColor.Checked = True
-        advice = "redOptions '3D Histogram Bins' " + vbCrLf + "redOptions other 'Histogram 3D Options'"
         desc = "Run the foreground through RedCloud_Basics "
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -167,7 +165,6 @@ Public Class Foreground_RedBackground : Inherits VB_Algorithm
     Dim hist3D As New Hist3D_DepthWithMask
     Public Sub New()
         redOptions.UseColor.Checked = True
-        advice = "redOptions '3D Histogram Bins' " + vbCrLf + "redOptions other 'Histogram 3D Options'"
         desc = "Run the foreground through RedCloud_Basics "
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -198,7 +195,6 @@ Public Class Foreground_RedMin : Inherits VB_Algorithm
     Dim fore As New Foreground_RedForeground
     Dim back As New Foreground_RedBackground
     Public Sub New()
-        advice = "redOptions '3D Histogram Bins' " + vbCrLf + "redOptions other 'Histogram 3D Options'"
         desc = "Isolate foreground from background, then segment each with RedMin"
     End Sub
     Public Sub RunVB(src As cv.Mat)

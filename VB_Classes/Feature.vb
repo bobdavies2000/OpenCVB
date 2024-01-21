@@ -8,8 +8,8 @@ Public Class Feature_Basics : Inherits VB_Algorithm
     Public options As New Options_Features
     Public Sub New()
         Brisk = cv.BRISK.Create()
-        findSlider("Feature Sample Size").Value = 400
-        advice = "Use 'Options_Features' to control output."
+        findSlider("Feature_Basics: Feature Sample Size").Value = 400
+        vbAddAdvice("Use 'Options_Features' to control output.")
         desc = "Find good features to track in a BGR image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -47,7 +47,7 @@ Public Class Feature_BasicsOld : Inherits VB_Algorithm
     Public featurePoints As New List(Of cv.Point2f)
     Public options As New Options_Features
     Public Sub New()
-        advice = "Use 'Options_Features' to control output."
+        vbAddAdvice("Feature_BasicsOld: Use 'Options_Features' to control output.")
         desc = "Find good features to track in a BGR image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -95,18 +95,18 @@ Public Class Feature_ShiTomasi : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Static typeRadio = findRadio("Harris features")
         If typeRadio.checked Then
-            harris.Run(task.leftview)
+            harris.Run(task.leftView)
             dst2 = harris.dst2.Clone
 
-            harris.Run(task.rightview)
+            harris.Run(task.rightView)
             dst3 = harris.dst2
         Else
-            dst2 = task.leftview
-            dst3 = task.rightview
-            shiTomasi.Run(task.leftview)
+            dst2 = task.leftView
+            dst3 = task.rightView
+            shiTomasi.Run(task.leftView)
             dst2.SetTo(cv.Scalar.White, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
-            shiTomasi.Run(task.rightview)
+            shiTomasi.Run(task.rightView)
             dst3.SetTo(cv.Scalar.White, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         End If
     End Sub
@@ -1379,7 +1379,7 @@ Public Class Feature_Sift : Inherits VB_Algorithm
         options.RunVB()
 
         Dim doubleSize As New cv.Mat(dst2.Rows, dst2.Cols * 2, cv.MatType.CV_8UC3)
-        siftCS.RunCS(task.leftview, task.rightview, doubleSize, options.useBFMatcher, options.pointCount)
+        siftCS.RunCS(task.leftView, task.rightView, doubleSize, options.useBFMatcher, options.pointCount)
 
         doubleSize(New cv.Rect(0, 0, dst2.Width, dst2.Height)).CopyTo(dst2)
         doubleSize(New cv.Rect(dst2.Width, 0, dst2.Width, dst2.Height)).CopyTo(dst3)
@@ -1417,8 +1417,8 @@ Public Class Feature_Sift_MT : Inherits VB_Algorithm
         Dim numFeatures = numPointSlider.Value
         Parallel.ForEach(task.gridList,
         Sub(roi)
-            Dim left = task.leftview(roi).Clone()  ' sift wants the inputs to be continuous and roi-modified Mats are not continuous.
-            Dim right = task.rightview(roi).Clone()
+            Dim left = task.leftView(roi).Clone()  ' sift wants the inputs to be continuous and roi-modified Mats are not continuous.
+            Dim right = task.rightView(roi).Clone()
             Dim dstROI = New cv.Rect(roi.X, roi.Y, roi.Width * 2, roi.Height)
             Dim dstTmp = output(dstROI).Clone()
             siftCS.RunCS(left, right, dstTmp, bfRadio.Checked, numFeatures)
@@ -1527,7 +1527,6 @@ Public Class Feature_Reduction : Inherits VB_Algorithm
     Dim good As New Feature_Basics
     Public Sub New()
         labels = {"", "", "Good features", "History of good features"}
-        advice = ""
         desc = "Get the features in a reduction grayscale image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1553,7 +1552,7 @@ Public Class Feature_Agast : Inherits VB_Algorithm
     Public featurePoints As New List(Of cv.Point2f)
     Public Sub New()
         cPtr = Agast_Open()
-        advice = "Agast has no options right now..."
+        vbAddAdvice("Feature_Agast: Agast has no options right now...")
         desc = "Use the Agast Feature Detector in the OpenCV Contrib"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1600,7 +1599,6 @@ Public Class Feature_Stable : Inherits VB_Algorithm
             sliders.setupTrackBar("Generation Threshold", 1, 20, 10)
             sliders.setupTrackBar("Desired Count", 1, 500, 200)
         End If
-        advice = agast.advice
         desc = "Age out the unstable feature points."
     End Sub
     Public Function ageGenerations(inputPoints As List(Of cv.Point2f)) As List(Of cv.Point2f)
@@ -1665,7 +1663,6 @@ Public Class Feature_StableGood : Inherits VB_Algorithm
     Public generations As New List(Of Integer)
     Public Sub New()
         labels(3) = "The raw Feature_Basics output"
-        advice = feat.advice
         desc = "Age out the unstable feature points."
     End Sub
     Public Sub RunVB(src As cv.Mat)

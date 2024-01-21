@@ -38,7 +38,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
 
         labels = labelBuffer.ToString.Split("|")
         desc = descBuffer.ToString
-        advice = adviceBuffer.tostring
+        vbAddAdvice("CPP_Basics: " + adviceBuffer.ToString)
     End Sub
     Public Sub New()
     End Sub

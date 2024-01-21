@@ -7,6 +7,8 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Dim unmatched As New RedCloud_UnmatchedCount
     Dim colorMap As New cv.Mat(256, 1, cv.MatType.CV_8UC3, 0)
     Public Sub New()
+        vbAddAdvice("RedCloud_Basics: there is dedicated panel for RedCloud algorithms." + vbCrLf +
+                    "It is behind the global options (which affect most algorithms.)")
         desc = "Match cells from the previous generation"
     End Sub
 
@@ -1730,7 +1732,6 @@ Public Class RedCloud_Overlaps : Inherits VB_Algorithm
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        advice = ""
         desc = "Remove the overlapping cells.  Keep the largest."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1854,7 +1855,6 @@ Public Class RedCloud_Gaps : Inherits VB_Algorithm
     Dim frames As New History_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        advice = ""
         desc = "Find the gaps that are different in the RedCloud_Basics results."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1888,7 +1888,7 @@ Public Class RedCloud_SizeOrder : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public Sub New()
         redOptions.UseColor.Checked = True
-        advice = "Use the goptions 'DebugSlider' to select which cell is isolated."
+        vbAddAdvice("RedCloud_SizeOrder: Use the goptions 'DebugSlider' to select which cell is isolated.")
         gOptions.DebugSlider.Value = 0
         desc = "Select blobs by size using the DebugSlider in the global options"
     End Sub
@@ -2347,7 +2347,6 @@ Public Class RedCloud_UnmatchedCount : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        advice = ""
         desc = "Count the unmatched cells and display them."
     End Sub
     Public Sub RunVB(src As cv.Mat)

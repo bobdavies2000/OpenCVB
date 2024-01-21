@@ -33,7 +33,6 @@ Public Class VB_Algorithm : Implements IDisposable
     Public algorithm As Object
     Public traceName As String
     Public desc As String
-    Public advice As String
     Dim callStack = ""
     Public nearColor = cv.Scalar.Yellow
     Public farColor = cv.Scalar.Blue
@@ -43,7 +42,6 @@ Public Class VB_Algorithm : Implements IDisposable
     Public cPtr As IntPtr
     Public trueData As New List(Of trueText)
     Public strOut As String
-    Public adviceCamshift = "Draw on any available red hue area."
     Public Sub initParent()
         If task.algName.StartsWith("CPP_") Then
             task.callTrace.Clear()

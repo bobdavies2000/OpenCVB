@@ -9,7 +9,6 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
     Public simK As New Hist3D_BuildHistogram
     Public Sub New()
         labels(2) = "dst2 = backprojection of pointcloud (8UC1 format)."
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf + "redOptions - Histogram Channels"
         desc = "Build a 3D histogram from the pointcloud and backproject it to segment the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -63,7 +62,6 @@ Public Class Hist3Dcloud_DepthSplit : Inherits VB_Algorithm
         hist2d = New List(Of Histogram2D_Cloud)({New Histogram2D_Cloud, New Histogram2D_Cloud, New Histogram2D_Cloud})
         labels(2) = "Histograms (Kalman) for X (upper left), Y (upper right) and Z.  UseZeroDepth removes 0 (no depth) entries."
         labels(3) = "X to Y histogram (upper left), X to Z (upper right), and Y to Z (bottom)."
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf + "redOptions - Histogram Channels"
         desc = "Plot the 3 histograms of the depth data dimensions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -97,7 +95,6 @@ Public Class Hist3Dcloud_Highlights : Inherits VB_Algorithm
     Public histogram As New cv.Mat
     Public ranges() As cv.Rangef
     Public Sub New()
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf + "redOptions - Histogram Channels"
         desc = "Plot the 3D histogram of the depth data"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -161,7 +158,6 @@ Public Class Hist3Dcloud_BP_Filter : Inherits VB_Algorithm
         redOptions.HistBinSlider.Value = 16
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
         labels(2) = "Mask of the pointcloud image after backprojection that removes 'blowback' pixels"
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf + "redOptions - Histogram Channels"
         desc = "Backproject a 3D pointcloud histogram after thresholding the bins with the small samples."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -206,7 +202,6 @@ Public Class Hist3Dcloud_PlotHist1D : Inherits VB_Algorithm
     Public Sub New()
         plot.removeZeroEntry = False
         labels(2) = "The 3D histogram of the pointcloud data stream - note the number of gaps"
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf + "redOptions - Histogram Channels"
         desc = "Present the 3D histogram as a typical histogram bar chart."
     End Sub
     Public Sub RunVB(src As cv.Mat)

@@ -312,7 +312,6 @@ End Class
 Public Class Binarize_FourPixelFlips : Inherits VB_Algorithm
     Dim binarize As New Binarize_FourWay
     Public Sub New()
-        advice = ""
         desc = "Identify the marginal regions that flip between subdivisions based on brightness."
     End Sub
     Public Sub RunVB(src As cv.Mat)

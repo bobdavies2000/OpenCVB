@@ -165,7 +165,7 @@ class algorithmCPP
 public:
     Mat dst0, dst1, dst2, dst3, empty;
     bool standalone;
-    String advice;
+    String advice = "";
     String desc;
     int* cPtr;
     string traceName;
