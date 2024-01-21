@@ -4,15 +4,15 @@ The majority of the algorithms in OpenCVB are written in VB.Net. This tutorial w
 
 The real work involved in the translation is currently being done using Google’s Bard – see bard.google.com – but there are plenty of alternatives. Google has not released an official API interface to allow programs like OpenCVB to directly input commands to Bard and export output from Bard but a step-by-step procedure translates using just cut-and-paste into and out of Google’s user interface.
 
-One key advantage is that there is no cost to perform the translation either (yet.)
+One key advantage is that there is no cost to perform the translation (yet.)
 
 The process of converting an algorithm is currently tailored to OpenCVB algorithms to C++. This effort is not intended as a general-purpose translator.
 
 The algorithms in OpenCVB average about 30 lines each and this is small enough that the translation will work. The resulting C++ code is then pasted into the CPP_AI_Generated.cpp file. However, there are almost always touch-ups required to make the algorithms work.
 
-As the VB.Net algorithms evolve, retranslating the algorithm is likely to be straightforward. The biggest stumbling block is the ability to test a variety of options like the VB.Net algorithms. However, the options code is there but with no ability to accept user input but only the default options are available to the C++ version.
+As the VB.Net algorithms evolve, retranslating the algorithm is likely to be straightforward. The biggest stumbling block is the ability to test a variety of options like the VB.Net algorithms. However, the options code is there but with no ability to accept user input. Only the default options are available to the C++ version. The overnight testing is run with the default settings and is likely to work.
 
-# Step 1: Select an VB.Net Algorithm
+# Step 1: Select a VB.Net Algorithm
 
 All the AI-generated algorithms are available in OpenCVB with the prefix “CPP_”. Here is a partial list of some of the algorithms currently available.
 
@@ -50,7 +50,7 @@ The C++ code from Bard is close but still requires some automated fixups before 
 
 ![A screenshot of a computer Description automatically generated](media/5d612fcedf0a0ab2d37f3158d578aeb8.png)
 
-**Step 3 – Paste Bard Output:** *Above is the full dialog box for the translator showing the before and after versions of the algorithm. Step 3 is simply to paste the Bard output into the text box on the right.*
+**Step 3 – Paste Bard Output:** *Above is the full dialog box for the translator showing the before and after versions of the algorithm. Step 3 is to paste the Bard output into the text box on the right.*
 
 Bard always shows the \#include files which are not needed for each algorithm – they are already present in the OpenCVB CPP_AI_Generated.cpp module. There are other touch-ups that will be automatically applied to the Bard output as well.
 
@@ -62,15 +62,13 @@ There are 2 buttons above the text box for the Bard output. The first labeled �
 
 ![](media/d9a8bc2cdc95111d40590a216b9ff8ff.png)
 
-**Step 4: Update Bard’s C++ Code:** *In this partial display of the OpenCVB translator dialog, the last 3 steps are visible. Step 4 is to click on the top left button. In this output, the C++ code is shown after all the touch-ups.*
+**Step 4: Update Bard’s C++ Code:** *In this partial display of the OpenCVB translator dialog, the last steps are shown. Step 4 is to click on the top left button. In this output, the C++ code is shown after all the touch-ups.*
 
 The C++ code in the text box can now be copied into the ‘CPP_AI_Generated.cpp’ module in the OpenCVB solution. If you compile the code there will be a few errors. As mentioned earlier, only the default settings for each option are currently available.
 
 # Compiling the C++ Algorithm
 
-In this example, the output of the CPP_Blur_Basics algorithm will not compile because the ‘Options_Blur’ form is not available to C++. After deleting lines involving the options form, the variables ‘options.kernelSize’ and ‘options.sigma’ show up as compile errors as they are not defined.
-
-If text messages or image labels are hard to read because of the rapid updates, turning on the “Synchronize Output with Debug” option can slow things down enough to make most messages readable.
+Once Step 4 has completed, the version of the C++ algorithm can now be copied into CPP_AI_Generated.cpp.
 
 ![](media/06a16085a84467575d8b2ccda246d90a.png)
 
@@ -82,6 +80,6 @@ To make the algorithm visible to OpenCVB’s user interface, click on the Step 5
 
 # Conclusion
 
-Clearly, this example was simple and was translated easily. However, most algorithms require more attention because there may be infrastructure that is available in the VB.Net code but has not been translated yet. The VB_to_CPP project is where all the translation steps are implemented. It is often the case that translating an algorithm prompts additional improvements.
+Clearly, this example was simple and was translated easily. However, most algorithms require more attention because there may be infrastructure that is available in the VB.Net code but has not been translated yet. The VB_to_CPP project is where all the translation steps are implemented. It is often the case that translating an algorithm prompts additional improvements. This application is under development.
 
 # 
