@@ -534,14 +534,13 @@ Public Class KMeans_SimKDepth : Inherits VB_Algorithm
         If heartBeat() Then
             plot1D.Run(src)
             dst3 = plot1D.dst2
-            labels(3) = "The 3D histogram of the depth stream in 1D - note the number of gaps"
+            labels(3) = "The 3D histogram of the depth stream in 1D"
 
             simK.Run(plot1D.histogram)
             plot1D.histogram = simK.dst2
             classCount = simK.classCount
         End If
-        Dim ranges() As cv.Rangef = {redOptions.ranges(2)}
-        cv.Cv2.CalcBackProject({src}, {2}, plot1D.histogram, dst1, ranges)
+        cv.Cv2.CalcBackProject({src}, {2}, plot1D.histogram, dst1, redOptions.rangesCloud)
         dst1 = dst1.ConvertScaleAbs
 
         dst2 = vbPalette(dst1 * 255 / classCount)
