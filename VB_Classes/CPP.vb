@@ -90,10 +90,9 @@ Public Class CPP_Basics : Inherits VB_Algorithm
         Marshal.Copy(src.Data, inputImage, 0, inputImage.Length)
         Dim handleInput = GCHandle.Alloc(inputImage, GCHandleType.Pinned)
         cppTask_RunCPP(cPtr, handleInput.AddrOfPinnedObject(), src.Channels, task.frameCount, dst2.Rows, dst2.Cols,
-                       task.accRadians.X, task.accRadians.Y, task.accRadians.Z,
-                       task.optionsChanged,
-                       heartBeat(), gOptions.displayDst0.Checked, gOptions.displayDst1.Checked,
-                       task.AddWeighted, gOptions.DebugCheckBox.Checked)
+                       task.accRadians.X, task.accRadians.Y, task.accRadians.Z, task.optionsChanged, heartBeat(),
+                       gOptions.displayDst0.Checked, gOptions.displayDst1.Checked, task.AddWeighted,
+                       gOptions.DebugCheckBox.Checked)
         handleInput.Free()
         getOptions()
 
