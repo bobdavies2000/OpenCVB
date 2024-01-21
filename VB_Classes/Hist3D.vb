@@ -344,11 +344,11 @@ Public Class Hist3D_RedCloudGrid : Inherits VB_Algorithm
                     Next
                     Dim cell = pixels.redCells(candidates(distances.IndexOf(distances.Min)) - 1)
                     dst1(roi).SetTo(cell.color, dst3(roi))
-                    dst2(roi).SetTo(cell.color, dst3(roi))
+                    ' dst2(roi).SetTo(cell.color, dst3(roi))
                 ElseIf candidates.Count = 1 Then
                     Dim cell = pixels.redCells(candidates(0) - 1)
                     dst1(roi).SetTo(cell.color, dst3(roi))
-                    dst2(roi).SetTo(cell.color, dst3(roi))
+                    ' dst2(roi).SetTo(cell.color, dst3(roi))
                 End If
             End If
         Next

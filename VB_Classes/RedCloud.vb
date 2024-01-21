@@ -2157,55 +2157,6 @@ End Class
 
 
 
-Public Class RedCloud_UnmatchedCount : Inherits VB_Algorithm
-    Public redCells As New List(Of rcData)
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        advice = ""
-        desc = "Count the unmatched cells and display them."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standalone Or showIntermediate() Then
-            Static redC As New RedCloud_Basics
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels = redC.labels
-            redCells = redC.redCells
-        End If
-
-        Static changedCellCounts As New List(Of Integer)
-        Dim unMatchedCells As Integer
-        Dim mostlyColor As Integer
-        For i = 0 To redCells.Count - 1
-            Dim rc = redCells(i)
-            If redCells(i).depthPixels / redCells(i).pixels < 0.5 Then mostlyColor += 1
-            If rc.matchFlag = False Then
-                Dim val = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If val = 0 Then
-                    dst3(rc.rect).SetTo(255, rc.mask)
-                    unMatchedCells += 1
-                End If
-            End If
-        Next
-        changedCellCounts.Add(unMatchedCells)
-
-        If heartBeat() Then
-            dst3.SetTo(0)
-            Dim sum = changedCellCounts.Sum(), avg = If(changedCellCounts.Count > 0, changedCellCounts.Average(), 0)
-            labels(3) = CStr(sum) + " new/moved cells in the last second " + Format(avg, fmt1) + " changed per frame"
-            labels(2) = CStr(redCells.Count) + " cells, unmatched cells = " + CStr(unMatchedCells) + "   " +
-                        CStr(mostlyColor) + " cells were mostly color and " + CStr(redCells.Count - mostlyColor) + " had depth."
-            changedCellCounts.Clear()
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class RedCloud_Combine : Inherits VB_Algorithm
     Dim color As New Color_Basics
     Public guided As New GuidedBP_Depth
@@ -2383,3 +2334,53 @@ Public Class RedCloud_Both : Inherits VB_Algorithm
     End Sub
 End Class
 
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_UnmatchedCount : Inherits VB_Algorithm
+    Public redCells As New List(Of rcData)
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        advice = ""
+        desc = "Count the unmatched cells and display them."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Or showIntermediate() Then
+            setTrueText("RedCloud_UnmatchedCount has no output when run standalone." + vbCrLf +
+                        "It requires redCells and RedCloud_Basics is the only way to create redCells." + vbCrLf +
+                        "Since RedCloud_Basics calls RedCloud_UnmatchedCount, it would be circular and never finish the initialize.")
+            Exit Sub
+        End If
+
+        Static changedCellCounts As New List(Of Integer)
+        Dim unMatchedCells As Integer
+        Dim mostlyColor As Integer
+        For i = 0 To redCells.Count - 1
+            Dim rc = redCells(i)
+            If redCells(i).depthPixels / redCells(i).pixels < 0.5 Then mostlyColor += 1
+            If rc.matchFlag = False Then
+                Dim val = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If val = 0 Then
+                    dst3(rc.rect).SetTo(255, rc.mask)
+                    unMatchedCells += 1
+                End If
+            End If
+        Next
+        changedCellCounts.Add(unMatchedCells)
+
+        If heartBeat() Then
+            dst3.SetTo(0)
+            Dim sum = changedCellCounts.Sum(), avg = If(changedCellCounts.Count > 0, changedCellCounts.Average(), 0)
+            labels(3) = CStr(sum) + " new/moved cells in the last second " + Format(avg, fmt1) + " changed per frame"
+            labels(2) = CStr(redCells.Count) + " cells, unmatched cells = " + CStr(unMatchedCells) + "   " +
+                        CStr(mostlyColor) + " cells were mostly color and " + CStr(redCells.Count - mostlyColor) + " had depth."
+            changedCellCounts.Clear()
+        End If
+    End Sub
+End Class
