@@ -71,7 +71,7 @@ Public Class VB_to_CPP
         For Each line In vbCode
             If line.Contains("New()") Then hitNew = True
             If line.Contains("End Sub") Then
-                CPPrtb.Text += vbTab + "}" + vbCrLf + vbTab + "void Run() {}" + vbCrLf + "};"
+                CPPrtb.Text += vbTab + "}" + vbCrLf + vbTab + "void RunVB() {}" + vbCrLf + "};"
                 Exit For
             End If
             If hitNew = False Then
@@ -83,9 +83,11 @@ Public Class VB_to_CPP
                     If line.Contains(" As New") Then
                         line = "//" + line
                     Else
-                        Dim saveline = line
-                        Dim tokens = Trim(line).Split(" ")
-                        line = tokens(3) + " " + tokens(1) + " "
+                        Dim saveline = Trim(line)
+                        Dim tokens = saveline.Split(" ")
+                        If tokens.Count >= 3 Then
+                            line = tokens(3) + " " + tokens(1) + " "
+                        End If
                         If saveline.Contains("=") Then
                             Dim split = Trim(saveline).Split("=")
                             line += " = " + split(1)
@@ -102,12 +104,17 @@ Public Class VB_to_CPP
             End If
 
 
+            line = line.Replace(" False", " false")
+            line = line.Replace("dst2.Rows", "task->workingRes.width")
+            line = line.Replace("dst2.Cols ", "task->workingRes.height")
+            line = line.Replace("cv.", "cv::")
+            line = line.Replace("New Scalar", "Scalar")
             line = line.Replace("task.", "task->")
             line = line.Replace(".Width", ".width")
-            line = line.Replace("Double", vbTab + "double")
-            line = line.Replace("Single", vbTab + "float")
-            line = line.Replace("Integer", vbTab + "int")
-            line = line.Replace("Boolean", vbTab + "bool")
+            line = line.Replace("Double ", vbTab + "double ")
+            line = line.Replace("Single ", vbTab + "float ")
+            line = line.Replace("Integer ", vbTab + "int ")
+            line = line.Replace("Boolean ", vbTab + "bool ")
             If line.StartsWith("//") = False Then CPPrtb.Text += line + vbCrLf
         Next
         vbCode.Clear()

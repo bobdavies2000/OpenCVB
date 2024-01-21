@@ -1612,12 +1612,12 @@ End Class
 
 
 Public Class Options_DrawArc : Inherits VB_Algorithm
-    Public saveMargin As Integer
+    Public saveMargin As Integer = task.workingRes.Width / 16
     Public drawFull As Boolean
     Public drawFill As Boolean
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Clearance from image edge (margin size)", 5, dst2.Width / 8, dst2.Width / 16)
+            sliders.setupTrackBar("Clearance from image edge (margin size)", 5, dst2.Width / 8, saveMargin * 16)
         End If
 
         If radio.Setup(traceName) Then
@@ -1631,7 +1631,7 @@ Public Class Options_DrawArc : Inherits VB_Algorithm
         Static marginSlider = findSlider("Clearance from image edge (margin size)")
         Static fillCheck = findRadio("Draw Filled Arc")
         Static fullCheck = findRadio("Draw Full Ellipse")
-        saveMargin = marginSlider.Value
+        saveMargin = marginSlider.Value / 16
         drawFull = fullCheck.checked
         drawFill = fillCheck.checked
     End Sub
@@ -2315,13 +2315,11 @@ End Class
 
 
 Public Class Options_ColorMatch : Inherits VB_Algorithm
-    Public minSizeRegion As Integer
     Public maxDistanceCheck As Boolean
     Public Sub New()
         If findfrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Show Max Distance point")
-            check.Box(0).Checked = False
         End If
     End Sub
     Public Sub RunVB()
