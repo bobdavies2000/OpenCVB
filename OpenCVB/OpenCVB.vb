@@ -1042,7 +1042,6 @@ Public Class OpenCVB
             drawRect = New cv.Rect
             Dim task = New VB_Classes.VBtask(parms)
             textDesc = task.desc
-            textAdvice = task.advice
             intermediateReview = ""
 
             If ComplexityTimer.Enabled = False Then
@@ -1455,6 +1454,7 @@ Public Class OpenCVB
                         BothFirstAndLastReady = False
                     End If
 
+                    textAdvice = task.advice
                     If task.pointCloud.Width = 0 Then Continue While Else Exit While
                 End If
             End While

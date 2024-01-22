@@ -84,6 +84,7 @@ Public Class OpenGL_Basics : Inherits VB_Algorithm
         MoveWindow(openGL_hwnd, Left, Top, task.oglRect.Width, task.oglRect.Height, True)
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        If firstPass Then vbAddAdvice("OpenGL_Basics: 'Show All' to see all the OpenGL options.")
         If standalone Then pointCloudInput = task.pointCloud
 
         ' adjust the point cloud if present and the 'move' sliders are non-zero
@@ -1081,76 +1082,6 @@ End Class
 
 
 
-Public Class OpenGL_3D : Inherits VB_Algorithm
-    Public Sub New()
-        task.OpenGLTitle = "OpenGL_Functions"
-        task.ogl.oglFunction = oCase.pointCloudAndRGB
-        desc = "Create an OpenGL plot using the BGR data normalized to between 0 and 1."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        src.ConvertTo(src, cv.MatType.CV_32FC3)
-        task.ogl.pointCloudInput = src.Normalize(0, 1, cv.NormTypes.MinMax)
-        task.ogl.Run(New cv.Mat)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
-    End Sub
-End Class
-
-
-
-
-
-Public Class OpenGL_3DColors : Inherits VB_Algorithm
-    Dim colorClass As New Color_Basics
-    Public Sub New()
-        task.OpenGLTitle = "OpenGL_Functions"
-        task.ogl.oglFunction = oCase.pointCloudAndRGB
-        findSlider("OpenGL Point Size").Value = 20
-        vbAddAdvice("OpenGL_3DColors: Use the redOptions.reduction slider to see pattern.")
-        desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        colorClass.Run(src)
-        dst2 = colorClass.dst3
-        dst2.ConvertTo(dst1, cv.MatType.CV_32FC3)
-        labels(2) = "There are " + CStr(colorClass.classCount) + " classes for " + redOptions.colorInputName
-        task.ogl.pointCloudInput = dst1.Normalize(0, 1, cv.NormTypes.MinMax)
-        task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-
-' https://docs.opencv.org/3.4/d1/d1d/tutorial_histo3D.html
-Public Class OpenGL_3Ddepth : Inherits VB_Algorithm
-    Dim hcloud As New Hist3Dcloud_Basics
-    Public Sub New()
-        task.ogl.oglFunction = oCase.Histogram3D
-        task.OpenGLTitle = "OpenGL_Functions"
-        task.ogl.options.PointSizeSlider.Value = 10
-        desc = "Display the 3D histogram of the depth in OpenGL"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        hcloud.Run(src)
-        Dim histogram = New cv.Mat(redOptions.bins3D, 1, cv.MatType.CV_32F, hcloud.histogram.Data)
-        task.ogl.dataInput = histogram
-        task.ogl.pointCloudInput = New cv.Mat
-        task.ogl.Run(New cv.Mat)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
-        setTrueText("Use the sliders for X/Y/Z histogram bins to add more points")
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 
@@ -2078,7 +2009,7 @@ End Class
 
 
 
-Public Class OpenGL_3DRGB : Inherits VB_Algorithm
+Public Class OpenGL_HistBGR3D : Inherits VB_Algorithm
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
@@ -2094,5 +2025,78 @@ Public Class OpenGL_3DRGB : Inherits VB_Algorithm
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(New cv.Mat)
         If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OpenGL_HistNorm3D : Inherits VB_Algorithm
+    Public Sub New()
+        task.OpenGLTitle = "OpenGL_Functions"
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        desc = "Create an OpenGL plot using the BGR data normalized to between 0 and 1."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        src.ConvertTo(src, cv.MatType.CV_32FC3)
+        task.ogl.pointCloudInput = src.Normalize(0, 1, cv.NormTypes.MinMax)
+        task.ogl.Run(New cv.Mat)
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
+    End Sub
+End Class
+
+
+
+
+
+Public Class OpenGL_HistColor3D : Inherits VB_Algorithm
+    Dim colorClass As New Color_Basics
+    Public Sub New()
+        task.OpenGLTitle = "OpenGL_Functions"
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        colorClass.updateImages = True
+        findSlider("OpenGL Point Size").Value = 20
+        desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        colorClass.Run(src)
+        dst2 = colorClass.dst3
+        dst2.ConvertTo(dst1, cv.MatType.CV_32FC3)
+        labels(2) = "There are " + CStr(colorClass.classCount) + " classes for " + redOptions.colorInputName
+        dst1 = dst1.Normalize(0, 1, cv.NormTypes.MinMax)
+        Dim split = dst1.Split()
+        split(1) *= -1
+        cv.Cv2.Merge(split, task.ogl.pointCloudInput)
+        task.ogl.Run(src)
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://docs.opencv.org/3.4/d1/d1d/tutorial_histo3D.html
+Public Class OpenGL_HistDepth3D : Inherits VB_Algorithm
+    Dim hcloud As New Hist3Dcloud_Basics
+    Public Sub New()
+        task.ogl.oglFunction = oCase.Histogram3D
+        task.OpenGLTitle = "OpenGL_Functions"
+        task.ogl.options.PointSizeSlider.Value = 10
+        desc = "Display the 3D histogram of the depth in OpenGL"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hcloud.Run(src)
+        Dim histogram = New cv.Mat(redOptions.bins3D, 1, cv.MatType.CV_32F, hcloud.histogram.Data)
+        task.ogl.dataInput = histogram
+        task.ogl.pointCloudInput = New cv.Mat
+        task.ogl.Run(New cv.Mat)
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
+        setTrueText("Use the sliders for X/Y/Z histogram bins to add more points")
     End Sub
 End Class

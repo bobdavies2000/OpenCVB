@@ -94,8 +94,8 @@ Public Class OptionsGlobal
                 task.minRes = New cv.Size(320, 180)
                 task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 150
-                gravityPointCloud.Checked = False ' too expensive at this resolution
-                useHistoryCloud.Checked = False ' too expensive at this resolution
+                'gravityPointCloud.Checked = False ' too expensive at this resolution
+                'useHistoryCloud.Checked = False ' too expensive at this resolution
             Case 640
                 GridSize.Value = 64
                 task.cvFontSize = 1.5

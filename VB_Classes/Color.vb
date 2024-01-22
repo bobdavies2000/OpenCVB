@@ -8,6 +8,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
     Dim hColor As New Hist3Dcolor_Basics
     Dim binarize As New Binarize_FourWay
     Public classifier As Object = binarize
+    Public updateImages As Boolean
     Public Sub New()
         vbAddAdvice("Color_Basics: redOptions 'Color Source' control which method is used.")
         labels(3) = "vbPalette output of dst2 at left"
@@ -36,7 +37,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
         classCount = classifier.classCount
 
         dst2 = classifier.dst2
-        If standalone Or showIntermediate() Then dst3 = vbPalette(dst2 * 255 / classCount)
+        If standalone Or showIntermediate() Or updateImages Then dst3 = vbPalette(dst2 * 255 / classCount)
 
         labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) + " pixel classifications"
     End Sub
