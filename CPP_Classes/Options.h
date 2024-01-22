@@ -18,32 +18,9 @@ public:
 	bool circularFlag = true;
 	int successCount = 8;
 	CPP_Options_Annealing() {
-		//	traceName = "CPP_Options_Annealing";
 		random = new CPP_Random_Basics();
-		//        random->Run(empty);  
-		//        if (sliders.Setup(traceName)) {
-		//            sliders.setupTrackBar("Anneal Number of Cities", 5, 500, cityCount);  
-		//            sliders.setupTrackBar("Success = top X threads agree on energy level.", 2, thread::hardware_concurrency(), successCount);  
-		//        }
-		//        if (check.Setup(traceName)) {
-		//            check.addCheckBox("Restart Traveling Salesman");
-		//            check.addCheckBox("Copy Best Intermediate solutions (top half) to Bottom Half");
-		//            check.addCheckBox("Circular pattern of cities (allows you to visually check if successful.)");
-		//            check.Box(0).Checked = true;
-		//            check.Box(2).Checked = true;
-		//        }
 	}
 	void RunVB() {
-		//        static Trackbar* citySlider = findSlider("Anneal Number of Cities");
-		//        static Trackbar* successSlider = findSlider("Success = top X threads agree on energy level.");
-		//        static CheckBox* travelCheck = findCheckBox("Restart Traveling Salesman");
-		//        static CheckBox* copyBestCheck = findCheckBox("Copy Best Intermediate solutions (top half) to Bottom Half");
-		//        static CheckBox* circularCheck = findCheckBox("Circular pattern of cities (allows you to visually check if successful.)");
-		//        copyBestFlag = copyBestCheck->checked;
-		//        circularFlag = circularCheck->checked;
-		//        cityCount = citySlider->value;  
-		//        successCount = successSlider->value;  
-		//        travelCheck->checked = false;
 	}
 };
 
