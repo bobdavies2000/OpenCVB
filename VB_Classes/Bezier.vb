@@ -2,13 +2,13 @@
 Public Class Bezier_Basics : Inherits VB_Algorithm
     Public points() As cv.Point
     Public Sub New()
-        vbAddAdvice("Bezier_Basics: Update the public points array variable.  No exposed options.")
         points = {New cv.Point(100, 100),
                   New cv.Point(150, 50),
                   New cv.Point(250, 150),
                   New cv.Point(300, 100),
                   New cv.Point(350, 150),
                   New cv.Point(450, 50)}
+        vbAddAdvice(traceName + ": Update the public points array variable.  No exposed options.")
         desc = "Use n points to draw a Bezier curve."
     End Sub
     Public Function nextPoint(points() As cv.Point, i As Integer, t As Single) As cv.Point

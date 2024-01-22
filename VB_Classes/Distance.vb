@@ -4,6 +4,7 @@ Public Class Distance_Basics : Inherits VB_Algorithm
     Dim options As New Options_Distance
     Public Sub New()
         labels = {"", "", "Distance transform - create a mask with threshold", ""}
+        vbAddAdvice(traceName + ": use local options to control which method is used.")
         desc = "Distance algorithm basics."
     End Sub
     Public Sub RunVB(src As cv.Mat)

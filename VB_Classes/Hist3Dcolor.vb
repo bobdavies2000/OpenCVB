@@ -328,7 +328,7 @@ Public Class Hist3Dcolor_Vector : Inherits VB_Algorithm
     Public Sub New()
         Dim bins = redOptions.HistBinSlider.Value
         binArray = {bins, bins, bins}
-        vbAddAdvice("Hist3Dcolor_Vector: redOptions '3D Histogram Bins'")
+        vbAddAdvice(traceName + ": redOptions '3D Histogram Bins'")
         desc = "Capture a 3D color histogram for input src - likely to be src(rect)."
     End Sub
     Public Sub RunVB(src As cv.Mat)

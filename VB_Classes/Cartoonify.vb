@@ -5,6 +5,7 @@ Public Class Cartoonify_Basics : Inherits VB_Algorithm
     Public Sub New()
         labels(2) = "Mask for Cartoon"
         labels(3) = "Cartoonify Result"
+        vbAddAdvice(traceName + ": click 'Show All' to control cartoonify options.")
         desc = "Create a cartoon from a color image"
     End Sub
     Public Sub RunVB(src as cv.Mat)

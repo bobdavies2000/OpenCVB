@@ -3,13 +3,14 @@ Imports System.Runtime.InteropServices
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
 Public Class Depth_Basics : Inherits VB_Algorithm
-    Public gMat As New IMU_GMatrix
-    Public colorizer As New Depth_Colorizer_CPP
-    Public IMUBasics As New IMU_Basics
-    Dim hCloud As New History_Cloud
+    Dim gMat As New IMU_GMatrix
+    Dim IMUBasics As New IMU_Basics
     Dim outline As New Depth_Outline
+    Dim hCloud As New History_Cloud
     Dim maxMask As New Depth_MaxMask
+    Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
+        vbAddAdvice(traceName + ": use global option to control 'Max Depth'.")
         desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU (but quietly)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -58,6 +59,7 @@ Public Class Depth_Basics : Inherits VB_Algorithm
 
             task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
             task.metersPerPixel = task.maxZmeters / dst3.Height ' meters per pixel in projections - side and top.
+
             colorizer.Run(task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc))
             task.depthRGB = colorizer.dst2
 

@@ -130,7 +130,7 @@ End Class
 Public Class Palette_Reduction : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        vbAddAdvice("Palette_Reduction: redOptions 'Reduction' to control results.")
+        vbAddAdvice(traceName + ": redOptions 'Reduction' to control results.")
         desc = "Map colors To different palette"
         labels(2) = "Reduced Colors"
     End Sub
@@ -238,7 +238,7 @@ Public Class Palette_DepthColorMap : Inherits VB_Algorithm
     Public gradientColorMap As New cv.Mat
     Dim gColor As New Gradient_Color
     Public Sub New()
-        vbAddAdvice("Palette_DepthColorMap: adjust color with 'Convert and Scale' slider")
+        vbAddAdvice(traceName + ": adjust color with 'Convert and Scale' slider")
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Convert And Scale", 0, 100, 45)
         labels(3) = "Palette used To color left image"
         desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
@@ -456,7 +456,7 @@ End Class
 Public Class Palette_Random : Inherits VB_Algorithm
     Public colorMap As cv.Mat
     Public Sub New()
-        vbAddAdvice("Palette_Random: There are no options" + vbCrLf + "Just produces a colorMap filled with random vec3b's.")
+        vbAddAdvice(traceName + ": There are no options" + vbCrLf + "Just produces a colorMap filled with random vec3b's.")
         colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, 0)
         For i = 0 To 255
             colorMap.Set(Of cv.Vec3b)(i, 0, randomCellColor())

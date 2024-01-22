@@ -5,9 +5,10 @@ Public Class CamShift_Basics : Inherits VB_Algorithm
     Public trackBox As New cv.RotatedRect
     Dim redHue As New CamShift_RedHue
     Public Sub New()
-        vbAddAdvice("CamShift_Basics: Draw on any available red hue area.")
+        vbAddAdvice(traceName + ": Draw on any available red hue area.")
         labels(2) = "Draw anywhere to create histogram and start camshift"
         labels(3) = "Histogram of targeted region (hue only)"
+        vbAddAdvice(traceName + ": click 'Show All' to control camShift options.")
         desc = "CamShift Demo - draw on the images to define the object to track. "
     End Sub
     Public Sub RunVB(src as cv.Mat)

@@ -2,6 +2,7 @@ Imports cv = OpenCvSharp
 Public Class AddWeighted_Basics : Inherits VB_Algorithm
     Public src2 As cv.Mat
     Public Sub New()
+        vbAddAdvice(traceName + ": use the global option slider 'Add Weighted %'")
         desc = "Add 2 images with specified weights."
     End Sub
     Public Sub RunVB(src As cv.Mat)

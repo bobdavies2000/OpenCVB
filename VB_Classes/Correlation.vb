@@ -4,6 +4,7 @@ Public Class Correlation_Basics : Inherits VB_Algorithm
     Dim options As New Options_FeatureMatch
     Public Sub New()
         labels(3) = "Plot of z (vertical scale) to x with ranges shown on the plot."
+        vbAddAdvice(traceName + ": there are several local options panels.")
         desc = "Compute a correlation for src rows (See also: Match.vb"
     End Sub
     Public Sub RunVB(src as cv.Mat)

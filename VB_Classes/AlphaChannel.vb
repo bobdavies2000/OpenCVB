@@ -7,7 +7,6 @@ Public Class AlphaChannel_Basics : Inherits VB_Algorithm
     Public Sub New()
         alpha.Show()
         alpha.Size = New System.Drawing.Size(dst2.Width + 10, dst2.Height + 10)
-
         desc = "Use the the Windows 10 alpha channel to separate foreground and background"
     End Sub
     Public Sub RunVB(ByVal src As cv.Mat)

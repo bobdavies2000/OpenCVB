@@ -14,6 +14,7 @@ Public Class Binarize_Basics : Inherits VB_Algorithm
     Public useBlur As Boolean
     Public Sub New()
         mask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+        vbAddAdvice(traceName + ": use local options to control the kernel size and sigma.")
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub RunVB(src As cv.Mat)

@@ -7,6 +7,7 @@ Public Class Delaunay_Basics : Inherits VB_Algorithm
     Dim subdiv As New cv.Subdiv2D
     Public Sub New()
         facet32s = New cv.Mat(dst2.Size, cv.MatType.CV_32SC1, 0)
+        vbAddAdvice(traceName + ": use local options to control the number of points")
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Sub RunVB(src As cv.Mat)

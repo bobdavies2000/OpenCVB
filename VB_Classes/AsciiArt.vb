@@ -8,6 +8,7 @@ Public Class AsciiArt_Basics : Inherits VB_Algorithm
             sliders.setupTrackBar("Character width in pixels", 20, 200, 55)
         End If
 
+        vbAddAdvice(traceName + ": use the local options for height and width.")
         labels = {"", "", "Ascii version", "Grayscale input to ascii art"}
         desc = "Build an ascii art representation of the input stream."
     End Sub

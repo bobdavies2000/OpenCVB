@@ -15,6 +15,7 @@ Public Class EMax_Basics : Inherits VB_Algorithm
         cPtr = EMax_Open()
         findSlider("EMax Number of Samples per region").Value = 1
         labels(3) = "Emax regions as integers"
+        vbAddAdvice(traceName + ": use local options to control EMax.")
         desc = "Use EMax - Expectation Maximization - to classify the regions around a series of labeled points"
     End Sub
     Public Sub RunVB(src as cv.Mat)

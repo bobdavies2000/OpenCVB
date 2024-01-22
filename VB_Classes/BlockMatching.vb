@@ -5,9 +5,10 @@ Public Class BlockMatching_Basics : Inherits VB_Algorithm
     Dim options As New Options_BlockMatching
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        desc = "Use OpenCV's block matching on left and right views"
         labels(2) = "Block matching disparity colorized like depth"
         labels(3) = "Right Image (used with left image)"
+        vbAddAdvice(traceName + ": click 'Show All' to see all the available options.")
+        desc = "Use OpenCV's block matching on left and right views"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()

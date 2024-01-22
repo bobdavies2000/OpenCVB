@@ -6,7 +6,7 @@ Public Class Interpolate_Basics : Inherits VB_Algorithm
     Public options As New Options_Resize
     Public iOptions As New Options_Interpolate
     Public Sub New()
-        vbAddAdvice("Interpolate_Basics: 'Interpolation threshold' is the primary control" + vbCrLf +
+        vbAddAdvice(traceName + ": 'Interpolation threshold' is the primary control" + vbCrLf +
                     "Local option 'Resize %' has a secondary effect." + vbCrLf +
                     "Local option 'Line length' affects the lines found.")
         desc = "Resize image using all available interpolation methods in OpenCV"

@@ -464,6 +464,7 @@ Public Class Contour_Largest : Inherits VB_Algorithm
     Public allContours As cv.Point()()
     Public options As New Options_Contours
     Public Sub New()
+        vbAddAdvice(traceName + ": use the local options in 'Options_Contours'")
         labels = {"", "", "Input to FindContours", "Largest single contour in the input image."}
         desc = "Create a mask from the largest contour of the input."
     End Sub

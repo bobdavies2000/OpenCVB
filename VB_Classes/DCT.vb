@@ -2,8 +2,9 @@ Imports cv = OpenCvSharp
 Public Class DCT_Basics : Inherits VB_Algorithm
     Public options As New Options_DCT
     Public Sub New()
-        desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
         labels(3) = "Difference from original"
+        vbAddAdvice(traceName + ": local options control the Discrete Cosine Transform'")
+        desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()

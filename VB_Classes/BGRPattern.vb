@@ -1,11 +1,12 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class BGRPattern_Basics : Inherits VB_Algorithm
-    Dim options As New Options_ColorFormat
     Dim denoise As New Denoise_Pixels
+    Dim options As New Options_ColorFormat
     Public classCount As Integer
     Public Sub New()
         cPtr = BGRPattern_Open()
+        vbAddAdvice(traceName + ": local options 'Options_ColorFormat' selects color.")
         desc = "Classify each 3-channel input pixel according to their relative values"
     End Sub
     Public Sub RunVB(ByVal src As cv.Mat)

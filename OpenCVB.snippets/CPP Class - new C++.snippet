@@ -53,7 +53,7 @@ Public Class Anyname_CPP : Inherits VB_Algorithm
     Public Sub New()
         cPtr = Anyname_Open()
 	    labels = {"", "", "Grayscale image of src", "dst3Label"}
-        advice = "" 
+        vbAddAdvice(traceName + ": <place advice here on any options that are useful>"
         desc = "description"
 	  End Sub
     Public Sub RunVB(src as cv.Mat)

@@ -4,6 +4,7 @@ Public Class Diff_Basics : Inherits VB_Algorithm
     Public lastGray As New cv.Mat
     Public Sub New()
         labels = {"", "", "Stable gray", "Unstable mask"}
+        vbAddAdvice(traceName + ": use local options to control the dilation.")
         desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Sub RunVB(src As cv.Mat)

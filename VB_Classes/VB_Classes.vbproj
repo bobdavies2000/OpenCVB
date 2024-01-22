@@ -130,7 +130,6 @@
     <Compile Include="Neighbor.vb" />
     <Compile Include="OpAuto.vb" />
     <Compile Include="BackProject2D.vb" />
-    <Compile Include="Classify.vb" />
     <Compile Include="Color.vb" />
     <Compile Include="CSV.vb" />
     <Compile Include="Density.vb" />

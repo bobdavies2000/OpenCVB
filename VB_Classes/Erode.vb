@@ -2,6 +2,7 @@ Imports cv = OpenCvSharp
 Public Class Erode_Basics : Inherits VB_Algorithm
     Public options As New Options_Erode
     Public Sub New()
+        vbAddAdvice(traceName + ": use local options to control erosion.")
         desc = "Erode the image provided."
     End Sub
     Public Sub RunVB(src as cv.Mat)

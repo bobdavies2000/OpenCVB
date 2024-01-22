@@ -5,6 +5,7 @@ Public Class BRISK_Basics : Inherits VB_Algorithm
     Public Sub New()
         brisk = cv.BRISK.Create()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("BRISK Radius Threshold", 1, 100, 5)
+        vbAddAdvice(traceName + ": use local options to control the BRISK Radius threshold.")
         desc = "Detect features with BRISK"
     End Sub
     Public Sub RunVB(src As cv.Mat)

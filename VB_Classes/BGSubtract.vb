@@ -4,6 +4,7 @@ Imports System.Threading
 Public Class BGSubtract_Basics : Inherits VB_Algorithm
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 990)
+        vbAddAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
         desc = "Detect Motion in the color image"
     End Sub
     Public Sub RunVB(src as cv.Mat)

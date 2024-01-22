@@ -10,8 +10,8 @@ Public Class Color_Basics : Inherits VB_Algorithm
     Public classifier As Object = binarize
     Public updateImages As Boolean
     Public Sub New()
-        vbAddAdvice("Color_Basics: redOptions 'Color Source' control which method is used.")
         labels(3) = "vbPalette output of dst2 at left"
+        vbAddAdvice(traceName + ": redOptions 'Color Source' control which method is used.")
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -150,7 +150,7 @@ End Class
 Public Class Color_RedHue : Inherits VB_Algorithm
     Dim options As New Options_CamShift
     Public Sub New()
-        vbAddAdvice("Color_RedHue: This mask of red hue areas is available for use.")
+        vbAddAdvice(traceName + ": This mask of red hue areas is available for use.")
         labels = {"", "", "Pixels with Red Hue", ""}
         desc = "Find all the reddish pixels in the image - indicate some life form."
     End Sub

@@ -9,7 +9,7 @@ Public Class Feature_Basics : Inherits VB_Algorithm
     Public Sub New()
         Brisk = cv.BRISK.Create()
         findSlider("Feature Sample Size").Value = 400
-        vbAddAdvice("Feature_Basics: Use 'Options_Features' to control output.")
+        vbAddAdvice(traceName + ": Use 'Options_Features' to control output.")
         desc = "Find good features to track in a BGR image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -47,7 +47,7 @@ Public Class Feature_BasicsOld : Inherits VB_Algorithm
     Public featurePoints As New List(Of cv.Point2f)
     Public options As New Options_Features
     Public Sub New()
-        vbAddAdvice("Feature_BasicsOld: Use 'Options_Features' to control output.")
+        vbAddAdvice(traceName + ": Use 'Options_Features' to control output.")
         desc = "Find good features to track in a BGR image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1552,7 +1552,7 @@ Public Class Feature_Agast : Inherits VB_Algorithm
     Public featurePoints As New List(Of cv.Point2f)
     Public Sub New()
         cPtr = Agast_Open()
-        vbAddAdvice("Feature_Agast: Agast has no options right now...")
+        vbAddAdvice(traceName + ": Agast has no options right now...")
         desc = "Use the Agast Feature Detector in the OpenCV Contrib"
     End Sub
     Public Sub RunVB(src As cv.Mat)

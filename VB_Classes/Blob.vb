@@ -6,6 +6,7 @@ Public Class Blob_Basics : Inherits VB_Algorithm
     Dim blobDetector As New CS_Classes.Blob_Basics
     Public Sub New()
         blobDetector = New CS_Classes.Blob_Basics
+        vbAddAdvice(traceName + ": click 'Show All' to see all the available options.")
         desc = "Isolate and list blobs with specified options"
     End Sub
     Public Sub RunVB(src as cv.Mat)
