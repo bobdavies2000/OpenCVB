@@ -1455,6 +1455,7 @@ Public Class OpenCVB
                     End If
 
                     textAdvice = task.advice
+
                     If task.pointCloud.Width = 0 Then Continue While Else Exit While
                 End If
             End While

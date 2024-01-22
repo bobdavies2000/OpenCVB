@@ -461,6 +461,7 @@ Module VB
                             ((1 - factor) * farBlue(2) + factor * nearYellow(2)))
     End Function
     Public Sub vbAddAdvice(advice As String)
+        If task.advice.StartsWith("No advice for ") Then task.advice = ""
         Dim split = advice.Split(":")
         If task.advice.Contains(split(0) + ":") Then Return
         task.advice += advice + vbCrLf + vbCrLf

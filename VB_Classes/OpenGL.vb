@@ -17,6 +17,7 @@ Public Class OpenGL_Basics : Inherits VB_Algorithm
     Dim pointCloudBuffer(0) As Byte
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
+        vbAddAdvice("OpenGL_Basics: 'Show All' to see all the OpenGL options.")
         pointCloudInput = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         gOptions.useHistoryCloud.Checked = True
         desc = "Create an OpenGL window and update it with images"
@@ -84,7 +85,6 @@ Public Class OpenGL_Basics : Inherits VB_Algorithm
         MoveWindow(openGL_hwnd, Left, Top, task.oglRect.Width, task.oglRect.Height, True)
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If firstPass Then vbAddAdvice("OpenGL_Basics: 'Show All' to see all the OpenGL options.")
         If standalone Then pointCloudInput = task.pointCloud
 
         ' adjust the point cloud if present and the 'move' sliders are non-zero
@@ -2021,9 +2021,10 @@ Public Class OpenGL_HistBGR3D : Inherits VB_Algorithm
         hColor.Run(src)
         dst2 = hColor.dst3
 
-        task.ogl.dataInput = hColor.dst2
-        task.ogl.pointCloudInput = New cv.Mat
-        task.ogl.Run(New cv.Mat)
+        hColor.dst2.ConvertTo(dst1, cv.MatType.CV_32FC3)
+        task.ogl.pointCloudInput = dst1.Normalize(0, 1, cv.NormTypes.MinMax)
+
+        task.ogl.Run(src)
         If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
@@ -2070,7 +2071,7 @@ Public Class OpenGL_HistColor3D : Inherits VB_Algorithm
         Dim split = dst1.Split()
         split(1) *= -1
         cv.Cv2.Merge(split, task.ogl.pointCloudInput)
-        task.ogl.Run(src)
+        task.ogl.Run(dst2)
         If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class

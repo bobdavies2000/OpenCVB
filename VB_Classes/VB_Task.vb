@@ -375,6 +375,7 @@ Public Class VBtask : Implements IDisposable
         Else
             desc = algorithmObject.desc
         End If
+
         If task.advice = "" Then
             task.advice = "No advice for " + algName + " yet." + vbCrLf +
                            "Please use 'vbAddAdvice(<your advice>)' in the constructor)."
