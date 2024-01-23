@@ -22,15 +22,15 @@ Public Class Feature_Basics : Inherits VB_Algorithm
         If options.useBRISK Then
             Dim keyPoints = Brisk.Detect(src).ToList
             For Each kp In keyPoints
-                If kp.Size >= options.minDistance Then featurePoints.Add(New cv.Point2f(CInt(kp.Pt.X), CInt(kp.Pt.Y)))
+                If kp.Size >= options.minDistance Then featurePoints.Add(kp.Pt)
             Next
         Else
             featurePoints = cv.Cv2.GoodFeaturesToTrack(src, sampleSize, options.quality, options.minDistance, Nothing, 7, True, 3).ToList
         End If
 
         Dim color = If(dst2.Channels = 3, cv.Scalar.Yellow, cv.Scalar.White)
-        For Each c In featurePoints
-            dst2.Circle(c, task.dotSize, color, -1, task.lineType)
+        For Each pt In featurePoints
+            dst2.Circle(pt, task.dotSize, color, -1, task.lineType)
         Next
 
         labels(2) = "Found " + CStr(featurePoints.Count) + " points with quality = " + CStr(options.quality) +
@@ -1551,26 +1551,40 @@ Public Class Feature_Agast : Inherits VB_Algorithm
     Dim ptCount(1) As Integer
     Public featurePoints As New List(Of cv.Point2f)
     Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Agast Threshold", 1, 200, 10)
+
         cPtr = Agast_Open()
         vbAddAdvice(traceName + ": Agast has no options right now...")
         desc = "Use the Agast Feature Detector in the OpenCV Contrib"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim dataSrc(dst2.Total * dst2.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+        Static thresholdSlider = findSlider("Agast Threshold")
+
+        Dim input As cv.Mat, useResize As Boolean, resizeFactor = 4
+        If src.Width >= 1280 Then
+            input = src.Resize(New cv.Size(task.workingRes.Width / resizeFactor, task.workingRes.Height / resizeFactor))
+            useResize = True
+        Else
+            input = src
+        End If
+
+        Dim dataSrc(input.Total * input.ElemSize - 1) As Byte
+        Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length)
 
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
         Dim handleCount = GCHandle.Alloc(ptCount, GCHandleType.Pinned)
-        Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                 handleCount.AddrOfPinnedObject())
+        Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), input.Rows, input.Cols,
+                                 handleCount.AddrOfPinnedObject(), thresholdSlider.value)
         handleSrc.Free()
         handleCount.Free()
 
-        Dim ptMat = New cv.Mat(ptCount(0), 7, cv.MatType.CV_32F, imagePtr).Clone
+        Dim ptMat = New cv.Mat(ptCount(0), 1, cv.MatType.CV_32FC2, imagePtr).Clone
         featurePoints.Clear()
-        If standalone Then dst2 = src
+        If standalone Then dst2 = input
+
         For i = 0 To ptMat.Rows - 1
-            Dim pt = New cv.Point2f(CInt(ptMat.Get(Of Single)(i, 0)), CInt(ptMat.Get(Of Single)(i, 1)))
+            Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
+            If useResize Then pt = New cv.Point(pt.X * resizeFactor, pt.Y * resizeFactor)
             featurePoints.Add(pt)
             If standalone Or showIntermediate() Then dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
         Next
@@ -1588,7 +1602,68 @@ End Class
 
 
 
-Public Class Feature_Stable : Inherits VB_Algorithm
+
+Public Class Feature_StableGood : Inherits VB_Algorithm
+    Dim feat As New Feature_Basics
+    Dim stable As New Feature_StableAgast
+    Public stablePoints As New List(Of cv.Point2f)
+    Public generations As New List(Of Integer)
+    Public Sub New()
+        labels(3) = "The raw Feature_Basics output"
+        desc = "Age out the unstable feature points."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src.Clone)
+        dst3 = feat.dst2
+        dst2 = src
+
+        Dim candidates = stable.ageGenerations(feat.featurePoints)
+
+        stablePoints.Clear()
+        generations.Clear()
+        For i = 0 To Math.Min(candidates.Count, stable.desiredCount) - 1
+            If stable.generations(i) >= stable.threshold Then
+                stablePoints.Add(candidates(i))
+                generations.Add(stable.generations(i))
+                dst2.Circle(candidates(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
+            End If
+        Next
+        labels(2) = CStr(stablePoints.Count) + " stable points were present at least " +
+                    CStr(CInt(stable.threshold)) + " generations"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Feature_Points : Inherits VB_Algorithm
+    Public good As New Feature_Basics
+    Public Sub New()
+        labels(3) = "Features found in the image"
+        desc = "Use the sorted list of Delaunay regions to find the top X points to track."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        good.Run(src)
+        dst2 = good.dst2
+        dst3.SetTo(0)
+
+        For Each pt In good.featurePoints
+            dst2.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
+            dst3.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
+        Next
+        labels(2) = CStr(good.featurePoints.Count) + " targets were present with " + CStr(good.options.fOptions.featurePoints) + " requested."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Feature_StableAgast : Inherits VB_Algorithm
     Dim agast As New Feature_Agast
     Public threshold As Integer
     Public desiredCount As Integer
@@ -1656,33 +1731,57 @@ End Class
 
 
 
-Public Class Feature_StableGood : Inherits VB_Algorithm
-    Dim feat As New Feature_Basics
-    Dim stable As New Feature_Stable
+Public Class Feature_StableSorted : Inherits VB_Algorithm
+    Dim good As New Feature_Basics
+    Public desiredCount As Integer
     Public stablePoints As New List(Of cv.Point2f)
     Public generations As New List(Of Integer)
     Public Sub New()
-        labels(3) = "The raw Feature_Basics output"
-        desc = "Age out the unstable feature points."
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired Count", 1, 500, 200)
+        desc = "Display the top X feature points ordered by generations they were present."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        feat.Run(src.Clone)
-        dst3 = feat.dst2
+        Static countSlider = findSlider("Desired Count")
+        desiredCount = countSlider.value
+
+        good.Run(src.Clone)
+        dst3 = good.dst2
         dst2 = src
 
-        Dim candidates = stable.ageGenerations(feat.featurePoints)
+        If task.optionsChanged Then
+            stablePoints.Clear()
+            generations.Clear()
+        End If
 
-        stablePoints.Clear()
-        generations.Clear()
-        For i = 0 To Math.Min(candidates.Count, stable.desiredCount) - 1
-            If stable.generations(i) >= stable.threshold Then
-                stablePoints.Add(candidates(i))
-                generations.Add(stable.generations(i))
-                dst2.Circle(candidates(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
+        For i = 0 To good.featurePoints.Count - 1
+            Dim pt = good.featurePoints(i)
+            If stablePoints.Contains(pt) Then
+                generations(i) += 1
+            Else
+                stablePoints.Add(pt)
+                generations.Add(1)
             End If
         Next
-        labels(2) = CStr(stablePoints.Count) + " stable points were present at least " +
-                    CStr(CInt(stable.threshold)) + " generations"
+
+        Dim sortByGen As New SortedList(Of Integer, cv.Point2f)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To stablePoints.Count - 1
+            sortByGen.Add(generations(i), stablePoints(i))
+        Next
+
+        Dim displayCount As Integer
+        stablePoints.Clear()
+        generations.Clear()
+        For i = 0 To Math.Min(sortByGen.Count, desiredCount * 2) - 1
+            Dim ele = sortByGen.ElementAt(i)
+            Dim pt = ele.Value
+            If displayCount < desiredCount Then
+                dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+                displayCount += 1
+            End If
+            stablePoints.Add(ele.Value)
+            generations.Add(ele.Key)
+        Next
+        labels(2) = CStr(displayCount) + " stable points were present the most"
     End Sub
 End Class
 
@@ -1690,24 +1789,56 @@ End Class
 
 
 
-
-
-
-Public Class Feature_Points : Inherits VB_Algorithm
-    Public good As New Feature_Basics
+Public Class Feature_StableKNN : Inherits VB_Algorithm
+    Dim good As New Feature_Basics
+    Dim knn As New KNN_Basics
+    Public desiredCount As Integer
+    Public stablePoints As New List(Of cv.Point2f)
+    Public generations As New List(Of Integer)
     Public Sub New()
-        labels(3) = "Features found in the image"
-        desc = "Use the sorted list of Delaunay regions to find the top X points to track."
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired Count", 1, 500, 200)
+        desc = "Display the top X feature points ordered by generations they were present."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        good.Run(src)
-        dst2 = good.dst2
-        dst3.SetTo(0)
+        Static countSlider = findSlider("Desired Count")
+        desiredCount = countSlider.value
 
-        For Each pt In good.featurePoints
-            dst2.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
-            dst3.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
+        good.Run(src.Clone)
+        dst3 = good.dst2
+        dst2 = src
+
+        If task.optionsChanged Then
+            stablePoints.Clear()
+            generations.Clear()
+        End If
+
+        For i = 0 To good.featurePoints.Count - 1
+            Dim pt = good.featurePoints(i)
+            If stablePoints.Contains(pt) Then
+                generations(i) += 1
+            Else
+                stablePoints.Add(pt)
+                generations.Add(1)
+            End If
         Next
-        labels(2) = CStr(good.featurePoints.Count) + " targets were present with " + CStr(good.options.fOptions.featurePoints) + " requested."
+
+        Dim sortByGen As New SortedList(Of Integer, cv.Point2f)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To stablePoints.Count - 1
+            sortByGen.Add(generations(i), stablePoints(i))
+        Next
+
+        Dim displayCount As Integer
+        stablePoints.Clear()
+        generations.Clear()
+        For i = 0 To Math.Min(sortByGen.Count, desiredCount * 2) - 1
+            Dim ele = sortByGen.ElementAt(i)
+            Dim pt = ele.Value
+            If displayCount < desiredCount Then
+                dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+                displayCount += 1
+            End If
+            stablePoints.Add(ele.Value)
+            generations.Add(ele.Key)
+        Next
     End Sub
 End Class

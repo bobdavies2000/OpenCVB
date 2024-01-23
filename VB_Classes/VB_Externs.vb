@@ -419,7 +419,8 @@ Module VB_Externs
     Public Function Agast_Close(Harris_FeaturesPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Agast_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As Integer, cols As Integer, count As IntPtr) As IntPtr
+    Public Function Agast_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As Integer, cols As Integer,
+                              count As IntPtr, threshold As Integer) As IntPtr
     End Function
 
 

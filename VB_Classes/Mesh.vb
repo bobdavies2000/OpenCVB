@@ -7,6 +7,8 @@ Public Class Mesh_Basics : Inherits VB_Algorithm
         desc = "Build triangles from random points"
     End Sub
     Public Function showMesh(pointList As List(Of cv.Point2f)) As cv.Mat
+        If pointList.Count <= 3 Then Return dst2 ' Not enough points To draw...
+
         knn.queries = pointList
         knn.trainInput = knn.queries
         knn.Run(empty)
@@ -63,7 +65,7 @@ End Class
 
 
 Public Class Mesh_Agast : Inherits VB_Algorithm
-    Dim agast As New Feature_Stable
+    Dim agast As New Feature_StableAgast
     Dim mesh As New Mesh_Basics
     Public Sub New()
         labels(2) = "Triangles built with each feature point and its 2 nearest neighbors."

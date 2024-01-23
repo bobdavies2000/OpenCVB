@@ -645,68 +645,6 @@ End Class
 
 
 
-
-
-
-
-
-
-Public Class KNN_TrackEach : Inherits VB_Algorithm
-    Dim knn As New KNN_Lossy
-    Dim good As New Feature_Basics
-    Dim trackAll As New List(Of List(Of cv.Point2f))
-    Public Sub New()
-        desc = "Track each good feature with KNN and match the goodFeatures from frame to frame"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim minDistance = good.options.minDistance
-        If task.motionFlag = False Or task.optionsChanged = False Then minDistance = 2 ' if there was no motion, use minDistance to eliminate the unstable points.
-
-        good.Run(src)
-
-        knn.queries = New List(Of cv.Point2f)(good.featurePoints)
-        knn.Run(src)
-
-        Dim track1 As New List(Of cv.Point2f)
-        Dim track2 As New List(Of cv.Point2f)
-        dst2 = src.Clone
-        For Each mps In knn.matches
-            If mps.p1.DistanceTo(mps.p2) < minDistance Then
-                track1.Add(mps.p1)
-                track2.Add(mps.p2)
-            End If
-        Next
-
-        trackAll.Add(track1)
-        trackAll.Add(track2)
-
-        For i = 0 To trackAll.Count - 1 Step 2
-            Dim t1 = trackAll(i)
-            Dim t2 = trackAll(i + 1)
-            For j = 0 To t1.Count - 1
-                Dim p1 = t1(j)
-                Dim p2 = t2(j)
-                dst2.Circle(p1, task.dotSize, task.highlightColor, -1, task.lineType)
-                dst2.Circle(p2, task.dotSize, task.highlightColor, -1, task.lineType)
-                dst2.Line(p1, p2, cv.Scalar.Red, task.lineWidth, task.lineType)
-            Next
-        Next
-
-        labels(2) = CStr(good.featurePoints.Count) + " good features were tracked across " + CStr(task.frameHistoryCount) + " frames."
-        setTrueText(labels(2) + vbCrLf + "The highlighted dots are the good feature points", 3)
-
-        If trackAll.Count >= task.frameHistoryCount Then
-            trackAll.RemoveAt(1)
-            trackAll.RemoveAt(0)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class KNN_ClosestTracker : Inherits VB_Algorithm
     Public lines As New Line_Basics
     Public lastPair As New linePoints
@@ -1096,5 +1034,65 @@ Public Class KNN_Farthest : Inherits VB_Algorithm
         Dim maxIndex = distances.IndexOf(distances.Max())
         Dim mpFar = farthest(maxIndex)
         dst3.Line(mpFar.p1, mpFar.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class KNN_TrackEach : Inherits VB_Algorithm
+    Dim knn As New KNN_Lossy
+    Dim good As New Feature_Basics
+    Dim trackAll As New List(Of List(Of cv.Point2f))
+    Public Sub New()
+        desc = "Track each good feature with KNN and match the goodFeatures from frame to frame"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim minDistance = good.options.minDistance
+        ' if there was no motion, use minDistance to eliminate the unstable points.
+        If task.motionFlag = False Or task.optionsChanged = False Then minDistance = 2
+
+        good.Run(src)
+
+        knn.queries = New List(Of cv.Point2f)(good.featurePoints)
+        knn.Run(src)
+
+        Dim track1 As New List(Of cv.Point2f)
+        Dim track2 As New List(Of cv.Point2f)
+        dst2 = src.Clone
+        For Each mp In knn.matches
+            If mp.p1.DistanceTo(mp.p2) < minDistance Then
+                track1.Add(mp.p1)
+                track2.Add(mp.p2)
+            End If
+        Next
+
+        trackAll.Add(track1)
+        trackAll.Add(track2)
+
+        For i = 0 To trackAll.Count - 1 Step 2
+            Dim t1 = trackAll(i)
+            Dim t2 = trackAll(i + 1)
+            For j = 0 To t1.Count - 1
+                Dim p1 = t1(j)
+                Dim p2 = t2(j)
+                dst2.Circle(p1, task.dotSize, task.highlightColor, -1, task.lineType)
+                dst2.Circle(p2, task.dotSize, task.highlightColor, -1, task.lineType)
+                dst2.Line(p1, p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+            Next
+        Next
+
+        labels(2) = CStr(good.featurePoints.Count) + " good features were tracked across " + CStr(task.frameHistoryCount) + " frames."
+        setTrueText(labels(2) + vbCrLf + "The highlighted dots are the good feature points", 3)
+
+        If trackAll.Count >= task.frameHistoryCount Then
+            trackAll.RemoveAt(1)
+            trackAll.RemoveAt(0)
+        End If
     End Sub
 End Class

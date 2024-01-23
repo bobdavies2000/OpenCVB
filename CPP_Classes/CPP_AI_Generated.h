@@ -430,6 +430,8 @@ public:
 
 
 
+
+
 class CPP_KNN_Basics : public algorithmCPP
 {
 public:
@@ -2650,10 +2652,10 @@ public:
         desc = "Build triangles from random points";
     }
     Mat showMesh(const vector<Point2f>& pointList) {
+        if (pointList.size() <= 3) return dst2; // not enough points to draw...
         knn->queries = pointList;
         knn->trainInput = knn->queries;
         knn->Run(empty);
-
         for (int i = 0; i < knn->queries.size(); i++) {
             Point2f p0 = knn->queries[i];
             Point2f p1 = knn->queries[knn->result.at<int>(i, 1)];
@@ -2695,14 +2697,25 @@ public:
         desc = "Use the Agast Feature Detector in the OpenCV Contrib.";
     }
     void Run(Mat src) {
+        int resizeFactor = 1;
+        Mat input;
+        if (src.cols >= 1280)
+        {
+            resize(src, input, cv::Size(src.cols / 4, src.rows / 4));
+            resizeFactor = 4;
+        }
+        else {
+            input = src;
+        }
+
         featurePoints.clear();
         static Ptr<AgastFeatureDetector> agastFD = AgastFeatureDetector::create(10, true, AgastFeatureDetector::OAST_9_16);
-        agastFD->detect(src, featurePoints);
-        static std::vector<cv::Point2f> lastPoints;
+        agastFD->detect(input, featurePoints);
+        static std::vector<Point2f> lastPoints;
         if (task->heartBeat || lastPoints.size() < 10) {
             lastPoints.clear();
-            for (const KeyPoint& pt : featurePoints) {
-                lastPoints.push_back(pt.pt);
+            for (const KeyPoint& kpt : featurePoints) {
+                lastPoints.push_back(Point2f(round(kpt.pt.x) * resizeFactor, round(kpt.pt.y) * resizeFactor));
             }
         }
 

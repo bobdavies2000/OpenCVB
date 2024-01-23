@@ -2,22 +2,45 @@
 Imports System.Text.RegularExpressions
 Module UI_GeneratorMain
     Sub Main()
+        Dim cppAlgorithmInput = New FileInfo("../CPP_Classes/CPP_Algorithms.h")
+        Dim Input = New FileInfo("../CPP_Classes/CPP_AI_Generated.h")
         Dim VBcodeDir As New DirectoryInfo(CurDir)
+        If cppAlgorithmInput.Exists = False Then
+            cppAlgorithmInput = New FileInfo("../../CPP_Classes/CPP_Algorithms.h")
+            Input = New FileInfo("../../CPP_Classes/CPP_AI_Generated.h")
+        End If
+
         If CurDir.Contains("CPP_Classes") Then
             VBcodeDir = New DirectoryInfo(CurDir() + "/../vb_classes/")
         Else
             VBcodeDir = New DirectoryInfo(CurDir() + "/../../vb_classes/")
         End If
 
+        Dim includeOnly = File.ReadAllLines(Input.FullName)
+        Dim cppLines As Integer
+        For Each line In includeOnly
+            line = Trim(line)
+            If line.StartsWith("//") Then Continue For
+            If line.Length = 0 Then Continue For
+            cppLines += 1
+        Next
+
+        Dim cppAlgorithms = File.ReadAllLines(Input.FullName)
+        For Each line In cppAlgorithms
+            line = Trim(line)
+            If line.StartsWith("//") Then Continue For
+            If line.Length = 0 Then Continue For
+            cppLines += 1
+        Next
+
+
         ' first read all the cpp functions that are present in the project
         Dim functionInput As New FileInfo(VBcodeDir.FullName + "../CPP_Classes/CPP_Functions.h")
         Dim srFunctions = New StreamReader(functionInput.FullName)
         Dim functionNames As New SortedList(Of String, String)
         Dim unsortedFunctions As New List(Of String)
-        Dim cppLineCount As Integer
         While srFunctions.EndOfStream = False
             Dim line = srFunctions.ReadLine()
-            If line.Trim.Length > 0 Then cppLineCount += 1
             If line.Contains("enum functions") Then
                 While 1
                     line = Trim(srFunctions.ReadLine())
@@ -65,7 +88,7 @@ Module UI_GeneratorMain
         readProj.Close()
 
         Dim className As String = ""
-        Dim CodeLineCount As Integer = cppLineCount ' now adding in the C++ lines...
+        Dim CodeLineCount As Integer = cppLines ' now adding in the C++ lines...
         Dim sortedNames As New SortedList(Of String, Integer)
         Dim sIndex As Integer
         For Each fileName In fileNames
@@ -75,7 +98,7 @@ Module UI_GeneratorMain
                 sIndex += 1
                 fileName = fileinfo.FullName
             Else
-                If fileName.EndsWith("VB_Algorithm.vb") = False Then ' And fileName.EndsWith("Options.vb") = False 
+                If fileName.EndsWith("VB_Algorithm.vb") = False Then
                     Dim nextFile As New System.IO.StreamReader(fileName)
                     While nextFile.Peek() <> -1
                         Dim line = Trim(nextFile.ReadLine())
@@ -143,7 +166,7 @@ Module UI_GeneratorMain
         sw = New StreamWriter(textInfo.FullName)
         sw.WriteLine("CodeLineCount = " + CStr(CodeLineCount))
         For i = 0 To cleanNames.Count - 1
-            If cleanNames(i) <> "CPP_Basics" Then ' cleanNames(i).StartsWith("Options_") = False And
+            If cleanNames(i) <> "CPP_Basics" Then
                 sw.WriteLine(cleanNames(i))
             End If
             If cleanNames(i).StartsWith("CPP_Basics") Then

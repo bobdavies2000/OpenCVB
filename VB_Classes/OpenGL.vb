@@ -1058,34 +1058,6 @@ End Class
 
 
 
-Public Class OpenGL_3DColorShape : Inherits VB_Algorithm
-    Dim colorClass As New Color_Basics
-    Public Sub New()
-        task.OpenGLTitle = "OpenGL_Functions"
-        task.ogl.oglFunction = oCase.Histogram3D
-        desc = "Create an OpenGL plot using the different color formats normalized to between 0 and 1."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        colorClass.Run(src)
-        dst2 = colorClass.dst3
-        dst2.ConvertTo(dst1, cv.MatType.CV_32FC3)
-        task.ogl.dataInput = dst1.Normalize(0, 1, cv.NormTypes.MinMax)
-        task.ogl.pointCloudInput = New cv.Mat
-        task.ogl.Run(New cv.Mat)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
 Public Class OpenGL_PCLineCandidates : Inherits VB_Algorithm
     Dim pts As New PointCloud_Basics
     Public Sub New()
@@ -2008,12 +1980,11 @@ End Class
 
 
 
-
-Public Class OpenGL_HistBGR3D : Inherits VB_Algorithm
+Public Class OpenGL_Color3D : Inherits VB_Algorithm
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
-        task.ogl.oglFunction = oCase.Histogram3D
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
         task.ogl.options.PointSizeSlider.Value = 10
         desc = "Plot the results of a 3D histogram of the BGR data "
     End Sub
@@ -2021,10 +1992,41 @@ Public Class OpenGL_HistBGR3D : Inherits VB_Algorithm
         hColor.Run(src)
         dst2 = hColor.dst3
 
-        hColor.dst2.ConvertTo(dst1, cv.MatType.CV_32FC3)
-        task.ogl.pointCloudInput = dst1.Normalize(0, 1, cv.NormTypes.MinMax)
+        dst2.ConvertTo(dst1, cv.MatType.CV_32FC3)
+        dst1 = dst1.Normalize(0, 1, cv.NormTypes.MinMax)
 
-        task.ogl.Run(src)
+        Dim split = dst1.Split()
+        split(1) *= -1
+        cv.Cv2.Merge(split, task.ogl.pointCloudInput)
+
+        task.ogl.Run(dst2)
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
+    End Sub
+End Class
+
+
+
+
+
+Public Class OpenGL_ColorReduced3D : Inherits VB_Algorithm
+    Dim colorClass As New Color_Basics
+    Public Sub New()
+        task.OpenGLTitle = "OpenGL_Functions"
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        colorClass.updateImages = True
+        findSlider("OpenGL Point Size").Value = 20
+        desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        colorClass.Run(src)
+        dst2 = colorClass.dst3
+        dst2.ConvertTo(dst1, cv.MatType.CV_32FC3)
+        labels(2) = "There are " + CStr(colorClass.classCount) + " classes for " + redOptions.colorInputName
+        dst1 = dst1.Normalize(0, 1, cv.NormTypes.MinMax)
+        Dim split = dst1.Split()
+        split(1) *= -1
+        cv.Cv2.Merge(split, task.ogl.pointCloudInput)
+        task.ogl.Run(dst2)
         If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
@@ -2045,33 +2047,6 @@ Public Class OpenGL_HistNorm3D : Inherits VB_Algorithm
         src.ConvertTo(src, cv.MatType.CV_32FC3)
         task.ogl.pointCloudInput = src.Normalize(0, 1, cv.NormTypes.MinMax)
         task.ogl.Run(New cv.Mat)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
-    End Sub
-End Class
-
-
-
-
-
-Public Class OpenGL_HistColor3D : Inherits VB_Algorithm
-    Dim colorClass As New Color_Basics
-    Public Sub New()
-        task.OpenGLTitle = "OpenGL_Functions"
-        task.ogl.oglFunction = oCase.pointCloudAndRGB
-        colorClass.updateImages = True
-        findSlider("OpenGL Point Size").Value = 20
-        desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        colorClass.Run(src)
-        dst2 = colorClass.dst3
-        dst2.ConvertTo(dst1, cv.MatType.CV_32FC3)
-        labels(2) = "There are " + CStr(colorClass.classCount) + " classes for " + redOptions.colorInputName
-        dst1 = dst1.Normalize(0, 1, cv.NormTypes.MinMax)
-        Dim split = dst1.Split()
-        split(1) *= -1
-        cv.Cv2.Merge(split, task.ogl.pointCloudInput)
-        task.ogl.Run(dst2)
         If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class

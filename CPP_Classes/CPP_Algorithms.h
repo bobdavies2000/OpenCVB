@@ -226,14 +226,28 @@ class Agast
 private:
 public:
 	Mat src, dst;
-	std::vector<KeyPoint> keypoints;
+	std::vector<Point2f> points;
+
 	Agast() {}
-	void Run() {
-		keypoints.clear();
-		static Ptr<AgastFeatureDetector> agastFD = AgastFeatureDetector::create(10,
-			true, AgastFeatureDetector::OAST_9_16);
-		agastFD->detect(src, keypoints);
-		dst = Mat(int(keypoints.size()), 7, CV_32F, keypoints.data());
+	void Run(int threshold) {
+		int resizeFactor = 1;
+		Mat input;
+		if (src.cols >= 1280)
+		{
+			resize(src, input, cv::Size(src.cols / 4, src.rows / 4));
+			resizeFactor = 4;
+		}
+		else {
+			input = src;
+		}
+		std::vector<KeyPoint> keypoints;
+		static Ptr<AgastFeatureDetector> agastFD = AgastFeatureDetector::create(threshold, true, AgastFeatureDetector::OAST_9_16);
+		agastFD->detect(input, keypoints);
+		points.clear();
+		for (KeyPoint kpt : keypoints)
+		{
+			points.push_back(Point2f(round(kpt.pt.x), round(kpt.pt.y)));
+		}
 	}
 };
 
@@ -252,13 +266,13 @@ int* Agast_Close(Agast * cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int* Agast_Run(Agast * cPtr, int* bgrPtr, int rows, int cols, int* count)
+int* Agast_Run(Agast * cPtr, int* bgrPtr, int rows, int cols, int* count, int threshold)
 {
 	cPtr->src = Mat(rows, cols, CV_8UC3, bgrPtr);
-	cPtr->Run();
-	count[0] = int(cPtr->keypoints.size());
+	cPtr->Run(threshold);
+	count[0] = int(cPtr->points.size());
 	if (count[0] == 0) return 0;
-	return (int*)cPtr->dst.data;
+	return (int*) &cPtr->points[0];
 }
 
 

@@ -11,7 +11,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
     Public updateImages As Boolean
     Public Sub New()
         labels(3) = "vbPalette output of dst2 at left"
-        vbAddAdvice(traceName + ": redOptions 'Color Source' control which method is used.")
+        vbAddAdvice(traceName + ": redOptions 'Color Source' control which color source is used.")
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
     Public Sub RunVB(src As cv.Mat)
