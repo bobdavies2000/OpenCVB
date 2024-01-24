@@ -3235,8 +3235,8 @@ public:
             stablePoints.push_back(pt);
             generations.push_back(it->first);
         }
-        labels[2] = to_string(displayCount) + " stable points were present the most";
-        labels[3] = to_string(feat->featurePoints.size()) + " points found";
+        labels[2] = "The most stable " + to_string(displayCount) + " are highlighted below";
+        labels[3] = "Output of CPP_Feature_Basics" + to_string(feat->featurePoints.size()) + " points found";
     }
 };
 

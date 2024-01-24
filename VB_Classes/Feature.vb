@@ -1785,7 +1785,7 @@ Public Class Feature_StableSorted : Inherits VB_Algorithm
             stablePoints.Add(ele.Value)
             generations.Add(ele.Key)
         Next
-        labels(2) = CStr(displayCount) + " stable points were present the most"
-        labels(3) = CStr(feat.featurePoints.Count) + " points found"
+        labels(2) = "The most stable " + CStr(displayCount) + " points are highlighted below"
+        labels(3) = "Output of Feature_Basics" + CStr(feat.featurePoints.Count) + " points found"
     End Sub
 End Class
