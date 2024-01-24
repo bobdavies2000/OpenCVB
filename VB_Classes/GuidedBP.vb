@@ -303,12 +303,12 @@ End Class
 
 Public Class GuidedBP_HotPointsKNN : Inherits VB_Algorithm
     Dim ptHot As New GuidedBP_HotPoints
-    Dim knnSide As New KNN_Basics
-    Dim knnTop As New KNN_Basics
+    Dim knnSide As New KNN_Core
+    Dim knnTop As New KNN_Core
     Public Sub New()
         desc = "Correlate the hot points with the previous generation to ID each object"
     End Sub
-    Private Sub runKNN(knn As KNN_Basics, rectList As List(Of cv.Rect), dst As cv.Mat, dstindex As Integer)
+    Private Sub runKNN(knn As KNN_Core, rectList As List(Of cv.Rect), dst As cv.Mat, dstindex As Integer)
         knn.queries.Clear()
         For Each r In rectList
             knn.queries.Add(New cv.Point2f(CSng(r.X + r.Width / 2), CSng(r.Y + r.Height / 2)))

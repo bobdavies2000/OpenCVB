@@ -510,7 +510,7 @@ End Class
 Public Class Line_PointSlope : Inherits VB_Algorithm
     Dim extend As New LongLine_Extend
     Dim lines As New Line_Basics
-    Dim knn As New KNN_BasicsN
+    Dim knn As New KNN_CoreN
     Public bestLines As New List(Of linePoints)
     Const lineCount As Integer = 3
     Const searchCount As Integer = 100

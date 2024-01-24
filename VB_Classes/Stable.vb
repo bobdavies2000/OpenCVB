@@ -59,14 +59,14 @@ End Class
 
 Public Class Stable_BasicsCount : Inherits VB_Algorithm
     Public basics As New Stable_Basics
-    Public good As New Feature_BasicsKNN
+    Public feat As New Feature_BasicsKNN
     Public goodCounts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         desc = "Track the stable good features found in the BGR image."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        good.Run(src)
-        basics.facetGen.inputPoints = New List(Of cv.Point2f)(good.featurePoints)
+        feat.Run(src)
+        basics.facetGen.inputPoints = New List(Of cv.Point2f)(feat.featurePoints)
         basics.Run(src)
         dst2 = basics.dst2
         dst3 = basics.dst3
@@ -81,7 +81,7 @@ Public Class Stable_BasicsCount : Inherits VB_Algorithm
             setTrueText(CStr(g), pt)
         Next
 
-        labels(2) = CStr(good.featurePoints.Count) + " good features were found and " +
+        labels(2) = CStr(feat.featurePoints.Count) + " good features were found and " +
                     CStr(basics.ptList.Count) + " were stable"
     End Sub
 End Class
@@ -173,18 +173,18 @@ End Class
 
 Public Class Stable_GoodFeatures : Inherits VB_Algorithm
     Public basics As New Stable_Basics
-    Public good As New Feature_BasicsKNN
+    Public feat As New Feature_BasicsKNN
     Public genSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Track the stable good features found in the BGR image."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        good.Run(src)
+        feat.Run(src)
         dst3 = basics.dst3
-        If good.featurePoints.Count = 0 Then Exit Sub ' nothing to work on...
+        If feat.featurePoints.Count = 0 Then Exit Sub ' nothing to work on...
 
-        basics.facetGen.inputPoints = New List(Of cv.Point2f)(good.featurePoints)
+        basics.facetGen.inputPoints = New List(Of cv.Point2f)(feat.featurePoints)
         basics.Run(src)
         dst2 = basics.dst2
 
@@ -201,6 +201,6 @@ Public Class Stable_GoodFeatures : Inherits VB_Algorithm
             dst2.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
         Next
         labels(2) = basics.labels(2)
-        labels(3) = CStr(good.featurePoints.Count) + " good features were found and " + CStr(basics.ptList.Count) + " were stable"
+        labels(3) = CStr(feat.featurePoints.Count) + " good features were found and " + CStr(basics.ptList.Count) + " were stable"
     End Sub
 End Class

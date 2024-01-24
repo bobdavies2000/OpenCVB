@@ -2,6 +2,8 @@
 enum functions
 {
     _CPP_AddWeighted_Basics,
+    _CPP_Stable_Basics,
+    _CPP_Feature_StableSorted,
     _CPP_Plot_Histogram2D,
     _CPP_Histogram_RedOptions,
     _CPP_Palette_Random,
@@ -33,11 +35,10 @@ enum functions
     _CPP_Resize_Basics,
     _CPP_Delaunay_Basics,
     _CPP_Delaunay_GenerationsNoKNN,
-    _CPP_KNN_Basics,
+    _CPP_KNN_Core,
     _CPP_Random_Basics,
-    _CPP_KNN_Lossy,
+    _CPP_KNN_Basics,
     _CPP_Delaunay_Generations,
-    _CPP_Stable_Basics,
     _CPP_Feature_Basics,
     _CPP_Remap_Basics,
     _CPP_Edge_Canny,

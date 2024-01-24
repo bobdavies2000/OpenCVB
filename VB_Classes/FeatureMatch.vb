@@ -67,13 +67,13 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
             Exit Sub ' nothing found?  Pretty extreme but can happen in darkness.
         End If
 
-        Dim correlationmat As New cv.Mat, rSize = feat.good.options.fOptions.matchCellSize, roi = feat.good.options.roi
+        Dim correlationmat As New cv.Mat, rSize = feat.feat.options.fOptions.matchCellSize, roi = feat.feat.options.roi
         Dim rightIndex As Integer = 0, rectL = roi, rectR = roi, lastKey = feat.leftCorners.ElementAt(0).Key
         Dim correlations As New List(Of Single)
         mpList.Clear()
         corrList.Clear()
         vecList.Clear()
-        Dim minCorr = feat.good.options.fOptions.correlationThreshold
+        Dim minCorr = feat.feat.options.fOptions.correlationThreshold
         For Each entry In feat.leftCorners
             Dim p1 = entry.Value
             If entry.Key <> lastKey Then rightIndex += correlations.Count
@@ -86,7 +86,7 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
                 Dim p2 = rightEntry.Value
                 rectR.X = p2.X - rSize
                 rectR.Y = p2.Y - rSize
-                cv.Cv2.MatchTemplate(leftView(rectL), rightView(rectR), correlationmat, feat.good.options.matchOption)
+                cv.Cv2.MatchTemplate(leftView(rectL), rightView(rectR), correlationmat, feat.feat.options.matchOption)
                 correlations.Add(correlationmat.Get(Of Single)(0, 0))
             Next
 
@@ -119,7 +119,7 @@ End Class
 
 
 Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
-    Public good As New Feature_Basics
+    Public feat As New Feature_Basics
     Public leftCorners As New SortedList(Of Integer, cv.Point2f)(New compareAllowIdenticalInteger)
     Public rightCorners As New SortedList(Of Integer, cv.Point2f)(New compareAllowIdenticalInteger)
     Public Sub New()
@@ -128,27 +128,27 @@ Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
         desc = "Detect good features in the left and right images."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        good.Run(task.rightview)
+        feat.Run(task.rightView)
         Dim tmpRight As New List(Of cv.Point2f)
         Dim ptRight As New List(Of Integer)
-        For Each pt In good.featurePoints
+        For Each pt In feat.featurePoints
             tmpRight.Add(pt)
             ptRight.Add(CInt(pt.Y))
         Next
-        dst3 = good.dst2
+        dst3 = feat.dst2
 
-        good.Run(task.leftview)
+        feat.Run(task.leftView)
 
         Dim tmpLeft As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
-        For Each pt In good.featurePoints
+        For Each pt In feat.featurePoints
             tmpLeft.Add(pt.Y, pt)
         Next
-        dst2 = good.dst2
+        dst2 = feat.dst2
 
         leftCorners.Clear()
         rightCorners.Clear()
         Dim rowList As New List(Of Integer)
-        Dim rSize = good.options.fOptions.matchCellSize
+        Dim rSize = feat.options.fOptions.matchCellSize
         For Each entry In tmpLeft
             Dim row = entry.Key
             Dim index = ptRight.IndexOf(row)

@@ -57,7 +57,7 @@ End Class
 
 
 Public Class LeftRight_GoodFeatures : Inherits VB_Algorithm
-    Public good As New Feature_Basics
+    Public feat As New Feature_Basics
     Public Sub New()
         findSlider("Feature Sample Size").Value = 200
         findSlider("Min Distance to next").Value = 10
@@ -66,16 +66,16 @@ Public Class LeftRight_GoodFeatures : Inherits VB_Algorithm
         labels(3) = "Right Image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        good.Run(task.leftview)
+        feat.Run(task.leftView)
         task.rightview.CopyTo(dst3)
-        For i = 0 To good.featurePoints.Count - 1
-            dst3.Circle(good.featurePoints(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
+        For i = 0 To feat.featurePoints.Count - 1
+            dst3.Circle(feat.featurePoints(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
         Next
 
-        good.Run(task.leftview)
+        feat.Run(task.leftView)
         task.leftview.CopyTo(dst2)
-        For i = 0 To good.featurePoints.Count - 1
-            dst2.Circle(good.featurePoints(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
+        For i = 0 To feat.featurePoints.Count - 1
+            dst2.Circle(feat.featurePoints(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
         Next
     End Sub
 End Class

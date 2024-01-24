@@ -220,7 +220,7 @@ End Class
 
 
 Public Class EMax_PointTracker : Inherits VB_Algorithm
-    Dim knn As New KNN_Basics
+    Dim knn As New KNN_Core
     Dim emax As New EMax_Basics
     Public Sub New()
         labels = {"", "", "Output of EMax_RedCloud", "Emax centers tracked and smoothed."}

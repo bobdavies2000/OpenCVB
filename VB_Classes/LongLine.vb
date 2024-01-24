@@ -258,7 +258,7 @@ End Class
 
 Public Class LongLine_ExtendParallel : Inherits VB_Algorithm
     Dim extendAll As New LongLine_ExtendAll
-    Dim knn As New KNN_Basics
+    Dim knn As New KNN_Core
     Dim near As New Line_Nearest
     Public parList As New List(Of cPoints)
     Public Sub New()

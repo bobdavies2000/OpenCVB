@@ -241,7 +241,7 @@ End Class
 
 
 Public Class Match_Lines : Inherits VB_Algorithm
-    Dim knn As New KNN_Basics4D
+    Dim knn As New KNN_Core4D
     Dim lines As New Line_Basics
     Public Sub New()
         labels(2) = "This is not matching lines from the previous frame because lines often disappear and nearby lines are selected."
@@ -647,8 +647,8 @@ End Class
 
 
 Public Class Match_GoodFeatureKNN : Inherits VB_Algorithm
-    Public knn As New KNN_Lossy
-    Public good As New Feature_Basics
+    Public knn As New KNN_Basics
+    Public feat As New Feature_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Maximum travel distance per frame", 1, 20, 5)
         dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
@@ -660,9 +660,9 @@ Public Class Match_GoodFeatureKNN : Inherits VB_Algorithm
         Static distSlider = findSlider("Maximum travel distance per frame")
         Dim maxDistance = distSlider.Value
 
-        good.Run(src)
+        feat.Run(src)
 
-        knn.queries = New List(Of cv.Point2f)(good.featurePoints)
+        knn.queries = New List(Of cv.Point2f)(feat.featurePoints)
         knn.Run(empty)
 
         Static frameList As New List(Of cv.Mat)
@@ -740,7 +740,7 @@ Public Class Match_Points : Inherits VB_Algorithm
     Public correlation As New List(Of Single)
     Public mPoint As New Match_Point
     Dim options As New Options_Features
-    Dim good As New Feature_Basics
+    Dim feat As New Feature_Basics
     Public Sub New()
         labels(2) = "Rectangle shown is the search rectangle."
         desc = "Track the selected points"
@@ -749,8 +749,8 @@ Public Class Match_Points : Inherits VB_Algorithm
         If firstPass Then mPoint.target = src.Clone
 
         If standalone Then
-            good.Run(src)
-            ptx = New List(Of cv.Point2f)(good.featurePoints)
+            feat.Run(src)
+            ptx = New List(Of cv.Point2f)(feat.featurePoints)
             setTrueText("Move camera around to watch the point being tracked", 3)
         End If
 

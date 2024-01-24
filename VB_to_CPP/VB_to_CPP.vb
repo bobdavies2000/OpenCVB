@@ -99,36 +99,37 @@ Public Class VB_to_CPP
         Dim objectNames As New List(Of String)
         Dim startComments As Boolean
         For i = 0 To split.Count - 1
-            If split(i).Contains("#include") Or split(i) = "" Then Continue For
-            split(i) = split(i).Replace("Scalar minVal, maxVal;", "double minVal, maxVal;")
-            If Trim(split(i)).StartsWith("class") Then
-                Dim tokens = split(i).Split(" ")
+            Dim line = split(i)
+            If line.Contains("#include") Or line = "" Then Continue For
+            line = line.Replace("Scalar minVal, maxVal;", "double minVal, maxVal;")
+            If Trim(line).StartsWith("class") Then
+                Dim tokens = line.Split(" ")
                 functionName = tokens(1)
-                split(i) = split(i).Replace("VB_Algorithm", "algorithmCPP")
-                split(i) = split(i).Replace("class ", "class CPP_")
+                line = line.Replace("VB_Algorithm", "algorithmCPP")
+                line = line.Replace("class ", "class CPP_")
             End If
 
-            If split(i).Contains("//") Then
-                split(i) = split(i).Substring(0, InStr(split(i), "//") - 1)
+            If line.Contains("//") Then
+                line = line.Substring(0, InStr(line, "//") - 1)
             End If
 
             If functionName <> "" Then
-                If Trim(split(i)).StartsWith(functionName) Then
-                    split(i) = split(i).Replace(functionName + "()", "CPP_" + functionName +
+                If Trim(line).StartsWith(functionName) Then
+                    line = line.Replace(functionName + "()", "CPP_" + functionName +
                                                 "() : algorithmCPP() ") + vbCrLf
-                    split(i) += vbTab + "traceName = """ + "CPP_" + functionName + """;"
+                    line += vbTab + "traceName = """ + "CPP_" + functionName + """;"
                     For Each con In constructorAdds
-                        split(i) += vbCrLf + con
+                        line += vbCrLf + con
                     Next
                 End If
             End If
 
-            If split(i).Contains("CPP_") = False And Trim(split(i)).StartsWith("labels") = False Then
+            If line.Contains("CPP_") = False And Trim(line).StartsWith("labels") = False Then
                 For Each func In functions
-                    If split(i).Contains(func) And functionName.Contains(func) = False Then
-                        Dim nextLine = Trim(split(i))
+                    If line.Contains(func) And functionName.Contains(func) = False Then
+                        Dim nextLine = Trim(line)
                         Dim tokens = nextLine.Split(" ")
-                        split(i) = split(i).Replace(tokens(0), "CPP_" + tokens(0) + "*")
+                        line = line.Replace(tokens(0), "CPP_" + tokens(0) + "*")
                         tokens(1) = tokens(1).Replace(";", "")
                         objectNames.Add(tokens(1))
                         constructorAdds.Add(vbTab + tokens(1) + " = new CPP_" + tokens(0) + "();")
@@ -138,59 +139,60 @@ Public Class VB_to_CPP
             End If
 
             For Each obj In objectNames
-                split(i) = split(i).Replace(obj + ".", obj + "->")
+                line = line.Replace(obj + ".", obj + "->")
             Next
 
-            split(i) = split(i).Replace("Mat dst", "dst = Mat")
-            split(i) = split(i).Replace("~" + functionName, "~CPP_" + functionName)
-            split(i) = split(i).Replace(" override", "")
-            split(i) = split(i).Replace(" || showIntermediate()", "")
-            split(i) = split(i).Replace("vbDrawContour", "task->drawContour")
-            split(i) = split(i).Replace("gOptions.FrameHistory.Value", "task->frameHistoryCount")
-            split(i) = split(i).Replace("gOptions.PixelDiffThreshold.Value", "task->pixelDiffThreshold")
-            split(i) = split(i).Replace("initRandomRect(", "task->initRandomRect(")
-            split(i) = split(i).Replace("validateRect(", "task->validateRect(")
-            split(i) = split(i).Replace("gOptions.UseKalman.Checked", "task->useKalman")
-            split(i) = split(i).Replace("gOptions.HistBinSlider.Value", "task->histogramBins")
-            split(i) = split(i).Replace("CStr(", "to_string(")
-            split(i) = split(i).Replace("task.", "task->")
-            split(i) = split(i).Replace("heartBeat()", "task->heartBeat")
-            split(i) = split(i).Replace("firstPass", "task->firstPass")
-            split(i) = split(i).Replace("setTrueText", "task->setTrueText")
-            split(i) = split(i).Replace("gOptions.GridSize.value", "task->gridSize")
-            split(i) = split(i).Replace("std::", "")
-            split(i) = split(i).Replace("const Mat& src", "Mat src")
-            split(i) = split(i).Replace("Mat& src", "Mat src")
-            split(i) = split(i).Replace("RunVB", "Run")
-            split(i) = split(i).Replace("CPP_CPP_", "CPP_")
-            split(i) = split(i).Replace("randomCellColor", "task->randomCellColor")
-            If split(i).Contains(" options;") Then
-                split(i) = split(i).Replace("Options_", "CPP_Options_")
-                Dim tokens = Trim(split(i)).Split(" ")
-                split(i) = split(i).Replace(" options;", "*  options = new " + tokens(0) + ";")
+            line = line.Replace("Mat dst", "dst = Mat")
+            line = line.Replace("~" + functionName, "~CPP_" + functionName)
+            line = line.Replace(" override", "")
+            line = line.Replace(" || showIntermediate()", "")
+            line = line.Replace("vbDrawContour", "task->drawContour")
+            line = line.Replace("gOptions.FrameHistory.Value", "task->frameHistoryCount")
+            line = line.Replace("gOptions.PixelDiffThreshold.Value", "task->pixelDiffThreshold")
+            line = line.Replace("initRandomRect(", "task->initRandomRect(")
+            line = line.Replace("validateRect(", "task->validateRect(")
+            line = line.Replace("gOptions.UseKalman.Checked", "task->useKalman")
+            line = line.Replace("gOptions.HistBinSlider.Value", "task->histogramBins")
+            line = line.Replace("CStr(", "to_string(")
+            line = line.Replace("task.", "task->")
+            line = line.Replace("heartBeat()", "task->heartBeat")
+            line = line.Replace("firstPass", "task->firstPass")
+            line = line.Replace("setTrueText", "task->setTrueText")
+            line = line.Replace("gOptions.GridSize.value", "task->gridSize")
+            line = line.Replace("std::", "")
+            line = line.Replace("const Mat& src", "Mat src")
+            line = line.Replace("Mat& src", "Mat src")
+            line = line.Replace("RunVB", "Run")
+            line = line.Replace("CPP_CPP_", "CPP_")
+            line = line.Replace("randomCellColor", "task->randomCellColor")
+            If line.Contains(" options;") Then
+                line = line.Replace("Options_", "CPP_Options_")
+                Dim tokens = Trim(line).Split(" ")
+                line = line.Replace(" options;", "*  options = new " + tokens(0) + ";")
             End If
 
-            split(i) = split(i).Replace("options.", "options->")
+            line = line.Replace("options.", "options->")
             ' updates for options
-            If split(i).Contains("CPP_Options_") Then
-                split(i) = split(i).Replace(": public algorithmCPP", "")
+            If line.Contains("CPP_Options_") Then
+                line = line.Replace(": public algorithmCPP", "")
             End If
-            If startComments Then split(i) = vbTab + "//" + split(i)
+            If startComments Then line = vbTab + "//" + line
 
-            If split(i).Contains("CPP_Options_") Then
-                If split(i).Contains("algorithmCPP()") Then
-                    split(i) = split(i).Replace("traceName", "//" + vbTab + "traceName")
-                    split(i) = split(i).Replace(": algorithmCPP()", "")
+            If line.Contains("CPP_Options_") Then
+                If line.Contains("algorithmCPP()") Then
+                    line = line.Replace("traceName", "//" + vbTab + "traceName")
+                    line = line.Replace(": algorithmCPP()", "")
                     startComments = True
                 End If
             End If
-            If split(i).StartsWith(vbTab + "//    }") Then
+            If line.StartsWith(vbTab + "//    }") Then
                 startComments = False
-                split(i) = split(i).Replace("//", "")
+                line = line.Replace("//", "")
             End If
-            If split(i).Contains("void Run()") Then startComments = True
-
-            CPPrtb.Text += split(i) + vbCrLf
+            If line.Contains("void Run()") Then startComments = True
+            line = line.Replace("cv::", "")
+            line = line.Replace("std::", "")
+            CPPrtb.Text += line + vbCrLf
         Next
     End Sub
     Private Sub UpdateInfrastructure_Click(sender As Object, e As EventArgs) Handles UpdateInfrastructure.Click

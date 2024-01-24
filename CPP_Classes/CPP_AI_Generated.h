@@ -432,7 +432,7 @@ public:
 
 
 
-class CPP_KNN_Basics : public algorithmCPP
+class CPP_KNN_Core : public algorithmCPP
 {
 public:
     Ptr<ml::KNearest> knn = ml::KNearest::create();
@@ -444,9 +444,9 @@ public:
     CPP_Random_Basics* random;
     vector<int> neighborIndexToTrain;
     
-    CPP_KNN_Basics() : algorithmCPP()
+    CPP_KNN_Core() : algorithmCPP()
     {
-        traceName = "CPP_KNN_Basics";
+        traceName = "CPP_KNN_Core";
         random = new CPP_Random_Basics();
         labels[2] = "Red=TrainingData, yellow = queries";
         desc = "Train a KNN model and map each query to the nearest training neighbor.";
@@ -542,20 +542,20 @@ public:
 
 
 
-class CPP_KNN_Lossy : public algorithmCPP
+class CPP_KNN_Basics : public algorithmCPP
 {
 private:
 public:
     vector<linePoints> matches;
     vector<Point> noMatch;
-    CPP_KNN_Basics* basics;
+    CPP_KNN_Core* basics;
     vector<Point2f> queries;
     vector<int> neighbors;
     CPP_Random_Basics* random;
 
-    CPP_KNN_Lossy() : algorithmCPP() {
-        traceName = "CPP_KNN_Lossy";
-        basics = new CPP_KNN_Basics();
+    CPP_KNN_Basics() : algorithmCPP() {
+        traceName = "CPP_KNN_Basics";
+        basics = new CPP_KNN_Core();
         random = new CPP_Random_Basics();
         desc = "Map points 1:1 with losses. Toss any duplicates that are farther.";
     }
@@ -639,14 +639,14 @@ private:
 public:
     vector<Point2f> inputPoints;
     CPP_Delaunay_Basics* facet;
-    CPP_KNN_Lossy* knn;
+    CPP_KNN_Basics* knn;
     CPP_Random_Basics* random;
 
     CPP_Delaunay_Generations() : algorithmCPP()
     {
         traceName = "CPP_Delaunay_Generations";
         dst3 = Mat::zeros(dst3.size(), CV_32S);
-        knn = new CPP_KNN_Lossy();
+        knn = new CPP_KNN_Basics();
         facet = new CPP_Delaunay_Basics();
         random = new CPP_Random_Basics();
         random->sizeRequest = 10;
@@ -697,52 +697,40 @@ public:
 
 
 
-
 class CPP_Feature_Basics : public algorithmCPP {
-private: 
-public: 
-    Ptr<BRISK> brisk;
-    vector<Point2f> corners;
-    bool useBRISK = true;
-    int minDistance = 15;
-    int sampleSize = 400;
-    int quality = 1;
+private:
+    cv::Ptr<cv::BRISK> Brisk;
+public:
+    vector<cv::Point2f> featurePoints;
+    CPP_Options_Features* options = new CPP_Options_Features;
 
     CPP_Feature_Basics() : algorithmCPP() {
         traceName = "CPP_Feature_Basics";
-        brisk = BRISK::create();
+        Brisk = cv::BRISK::create();
         desc = "Find good features to track in a BGR image.";
     }
-	void Run(Mat src)
-	{
+
+    void Run(cv::Mat src) {
         dst2 = src.clone();
-
-        if (src.channels() == 3) {
-            cvtColor(src, src, COLOR_BGR2GRAY);
-        }
-
-        corners.clear();
-        if (useBRISK) {
-            vector<KeyPoint> keyPoints;
-            brisk->detect(src, keyPoints);
-            for (const KeyPoint& kp : keyPoints) {
-                if (kp.size >= minDistance) {
-                    corners.push_back(kp.pt);
-                }
+        if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
+        featurePoints.clear();
+        int sampleSize = options->fOptions.featurePoints;
+        if (options->useBRISK) {
+            vector<cv::KeyPoint> keyPoints;
+            Brisk->detect(src, keyPoints);
+            for (const auto& kp : keyPoints) {
+                if (kp.size >= options->minDistance) featurePoints.push_back(kp.pt);
             }
-        } else {
-            vector<Point2f> tempCorners;
-            goodFeaturesToTrack(src, tempCorners, sampleSize, quality, minDistance, noArray(), 7, true, 3);
-            corners = tempCorners;
         }
-
-        Scalar color = dst2.channels() == 3 ? Scalar(0, 255, 255) : Scalar(255, 255, 255);
-        for (const Point2f& c : corners) {
-            circle(dst2, c, task->dotSize, color, -1, task->lineType);
+        else {
+            cv::goodFeaturesToTrack(src, featurePoints, sampleSize, options->quality, options->minDistance);
         }
-
-        labels[2] = "Found " + to_string(corners.size()) + " points with quality = " + to_string(quality) +
-                    " and minimum distance = " + to_string(minDistance);
+        cv::Scalar color = (dst2.channels() == 3) ? cv::Scalar(0, 255, 255) : cv::Scalar(255, 255, 255);
+        for (const auto& pt : featurePoints) {
+            cv::circle(dst2, pt, task->dotSize, color, -1, task->lineType);
+        }
+        labels[2] = "Found " + to_string(featurePoints.size()) + " points with quality = " + to_string(options->quality) +
+            " and minimum distance = " + to_string(options->minDistance);
     }
 };
 
@@ -767,7 +755,7 @@ public:
     void Run(Mat src) {
         if (standalone) {
             good->Run(src);
-            facetGen->inputPoints = good->corners;
+            facetGen->inputPoints = good->featurePoints;
         }
 
         facetGen->Run(src);
@@ -826,7 +814,7 @@ public:
     void Run(Mat src)
     {
         good->Run(src);
-        basics->facetGen->inputPoints = good->corners;
+        basics->facetGen->inputPoints = good->featurePoints;
         basics->Run(src);
         dst2 = basics->dst2;
         dst3 = basics->dst3;
@@ -2642,11 +2630,11 @@ public:
 class CPP_Mesh_Basics : public algorithmCPP {
 public:
     CPP_Random_Basics* random;
-    CPP_KNN_Basics* knn;
+    CPP_KNN_Core* knn;
     CPP_Mesh_Basics() : algorithmCPP() {
         traceName = "CPP_Mesh_Basics";
         random = new CPP_Random_Basics();
-        knn = new CPP_KNN_Basics();
+        knn = new CPP_KNN_Core();
         labels[2] = "Triangles built with each random point and its 2 nearest neighbors.";
         advice = "Adjust the number of points with the options_random";
         desc = "Build triangles from random points";
@@ -2787,11 +2775,11 @@ public:
     }
     void Run(Mat src) {
         feat->Run(src);
-        if (feat->corners.size() < 3) {
+        if (feat->featurePoints.size() < 3) {
             return;
         }
         mesh->dst2 = src;
-        dst2 = mesh->showMesh(feat->corners);
+        dst2 = mesh->showMesh(feat->featurePoints);
     }
 };
 
@@ -3194,3 +3182,66 @@ public:
         if (standalone) threshold(dst2, dst3, 0, 255, THRESH_BINARY);
     }
 };
+
+
+
+
+
+class CPP_Feature_StableSorted : public algorithmCPP {
+public:
+    CPP_Feature_Basics* feat;
+    int desiredCount = 200;
+    vector<Point2f> stablePoints;
+    vector<int> generations;
+    CPP_Feature_StableSorted() : algorithmCPP() {
+        traceName = "CPP_Feature_StableSorted";
+        feat = new CPP_Feature_Basics();
+        desc = "Display the top X feature points ordered by generations they were present.";
+    }
+    void Run(Mat src) {
+        feat->Run(src.clone());
+        dst3 = feat->dst2;
+        dst2 = src;
+        if (task->optionsChanged) {
+            stablePoints.clear();
+            generations.clear();
+        }
+        for (int i = 0; i < feat->featurePoints.size(); i++) {
+            Point2f pt = feat->featurePoints[i];
+            auto it = find(stablePoints.begin(), stablePoints.end(), pt);
+            if (it != stablePoints.end()) {
+                int index = distance(stablePoints.begin(), it);
+                generations[index]++;
+            }
+            else {
+                stablePoints.push_back(pt);
+                generations.push_back(1);
+            }
+        }
+        map<int, Point2f, greater<int>> sortByGen;
+        for (int i = 0; i < stablePoints.size(); i++) {
+            sortByGen[generations[i]] = stablePoints[i];
+        }
+        int displayCount = 0;
+        stablePoints.clear();
+        generations.clear();
+        for (auto it = sortByGen.begin(); it != sortByGen.end(); it++) {
+            if (displayCount >= desiredCount * 2) break;
+            Point2f pt = it->second;
+            if (displayCount < desiredCount) {
+                circle(dst2, pt, task->dotSize, Scalar(255, 255, 255), -1, task->lineType);
+                displayCount++;
+            }
+            stablePoints.push_back(pt);
+            generations.push_back(it->first);
+        }
+        labels[2] = to_string(displayCount) + " stable points were present the most";
+        labels[3] = to_string(feat->featurePoints.size()) + " points found";
+    }
+};
+
+
+
+
+
+

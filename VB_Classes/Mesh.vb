@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Mesh_Basics : Inherits VB_Algorithm
-    Dim knn As New KNN_Basics
+    Dim knn As New KNN_Core
     Public Sub New()
         labels(2) = "Triangles built with each random point and its 2 nearest neighbors."
         vbAddAdvice(traceName + ": Adjust the number of points with the options_random.")

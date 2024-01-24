@@ -128,17 +128,17 @@ End Class
 
 
 Public Class RedTrack_FeaturesKNN : Inherits VB_Algorithm
-    Public knn As New KNN_Basics
-    Public good As New Feature_Basics
+    Public knn As New KNN_Core
+    Public feat As New Feature_Basics
     Public Sub New()
         labels = {"", "", "Output of Feature_Basics", "Grid of points to measure motion."}
         desc = "Use KNN with the good features in the image to create a grid of points"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        good.Run(src)
-        dst2 = good.dst2
+        feat.Run(src)
+        dst2 = feat.dst2
 
-        knn.queries = New List(Of cv.Point2f)(good.featurePoints)
+        knn.queries = New List(Of cv.Point2f)(feat.featurePoints)
         knn.Run(empty)
 
         dst3 = src.Clone
@@ -227,8 +227,8 @@ End Class
 
 
 Public Class RedTrack_GoodCellInput : Inherits VB_Algorithm
-    Public knn As New KNN_Basics
-    Public good As New Feature_Basics
+    Public knn As New KNN_Core
+    Public feat As New Feature_Basics
     Public featureList As New List(Of cv.Point2f)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max feature travel distance", 0, 100, 10)
@@ -238,10 +238,10 @@ Public Class RedTrack_GoodCellInput : Inherits VB_Algorithm
         Static distSlider = findSlider("Max feature travel distance")
         Dim maxDistance = distSlider.Value
 
-        good.Run(src)
-        dst2 = good.dst2
+        feat.Run(src)
+        dst2 = feat.dst2
 
-        knn.queries = New List(Of cv.Point2f)(good.featurePoints)
+        knn.queries = New List(Of cv.Point2f)(feat.featurePoints)
         knn.Run(empty)
 
         featureList.Clear()
@@ -295,7 +295,7 @@ End Class
 
 Public Class RedTrack_Features : Inherits VB_Algorithm
     Dim options As New Options_Flood
-    Dim good As New Feature_Basics
+    Dim feat As New Feature_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -304,10 +304,10 @@ Public Class RedTrack_Features : Inherits VB_Algorithm
         desc = "Similar to RedTrack_KNNPoints"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        good.Run(src)
+        feat.Run(src)
 
         If heartBeat() Then dst2.SetTo(0)
-        For Each pt In good.featurePoints
+        For Each pt In feat.featurePoints
             dst2.Circle(pt, task.dotSize, 255, -1)
         Next
 

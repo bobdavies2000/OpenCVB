@@ -172,7 +172,7 @@ End Class
 
 ' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
 Public Class Stabilizer_OpticalFlow : Inherits VB_Algorithm
-    Public good As New Feature_Basics
+    Public feat As New Feature_Basics
     Public inputFeat As New List(Of cv.Point2f)
     Public borderCrop = 30
     Dim sumScale As cv.Mat, sScale As cv.Mat, features1 As cv.Mat
@@ -194,8 +194,8 @@ Public Class Stabilizer_OpticalFlow : Inherits VB_Algorithm
         dst2 = src
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        good.Run(src)
-        inputFeat = New List(Of cv.Point2f)(good.featurePoints)
+        feat.Run(src)
+        inputFeat = New List(Of cv.Point2f)(feat.featurePoints)
         features1 = New cv.Mat(inputFeat.Count, 1, cv.MatType.CV_32FC2, inputFeat.ToArray)
 
         Static lastFrame As cv.Mat = src.Clone()

@@ -58,7 +58,7 @@ End Class
 
 
 Public Class Corners_SubPix : Inherits VB_Algorithm
-    Public good As New Feature_BasicsKNN
+    Public feat As New Feature_BasicsKNN
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("SubPix kernel Size", 1, 20, 3)
         labels(2) = "Output of GoodFeatures"
@@ -66,17 +66,17 @@ Public Class Corners_SubPix : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static kernelSlider = findSlider("SubPix kernel Size")
-        good.Run(src)
-        If good.featurePoints.Count = 0 Then Exit Sub ' no good features right now...
+        feat.Run(src)
+        If feat.featurePoints.Count = 0 Then Exit Sub ' no good features right now...
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim winSize = New cv.Size(CInt(kernelSlider.Value), CInt(kernelSlider.Value))
-        cv.Cv2.CornerSubPix(gray, good.featurePoints, winSize, New cv.Size(-1, -1), term)
+        cv.Cv2.CornerSubPix(gray, feat.featurePoints, winSize, New cv.Size(-1, -1), term)
 
         src.CopyTo(dst2)
         Dim p As New cv.Point
-        For i = 0 To good.featurePoints.Count - 1
-            p.X = CInt(good.featurePoints(i).X)
-            p.Y = CInt(good.featurePoints(i).Y)
+        For i = 0 To feat.featurePoints.Count - 1
+            p.X = CInt(feat.featurePoints(i).X)
+            p.Y = CInt(feat.featurePoints(i).Y)
             dst2.Circle(p, 3, New cv.Scalar(0, 0, 255), -1, task.lineType)
         Next
     End Sub

@@ -28,7 +28,7 @@ End Class
 ' https://www.learnopencv.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
 Public Class OpticalFlow_Sparse : Inherits VB_Algorithm
     Public features As New List(Of cv.Point2f)
-    Dim good As New Feature_Basics
+    Dim feat As New Feature_Basics
     Dim sumScale As cv.Mat, sScale As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Dim options As New Options_OpticalFlowSparse
@@ -51,8 +51,8 @@ Public Class OpticalFlow_Sparse : Inherits VB_Algorithm
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static lastGray As cv.Mat = src.Clone
-        good.Run(src)
-        features = good.featurePoints
+        feat.Run(src)
+        features = feat.featurePoints
         Dim features1 = New cv.Mat(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
         Dim features2 = New cv.Mat
         Dim status As New cv.Mat, err As New cv.Mat, winSize As New cv.Size(3, 3)

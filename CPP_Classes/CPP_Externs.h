@@ -35,6 +35,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case _CPP_AddWeighted_Basics :
     {task->alg = new CPP_AddWeighted_Basics(); break; }
+	case _CPP_Feature_StableSorted :
+	{task->alg = new CPP_Feature_StableSorted(); break; }
     case _CPP_Plot_Histogram2D:
     {task->alg = new CPP_Plot_Histogram2D(); break; }
     case _CPP_Histogram_RedOptions:
@@ -97,12 +99,12 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {task->alg = new CPP_Delaunay_Basics();break;}
     case _CPP_Delaunay_GenerationsNoKNN :
     {task->alg = new CPP_Delaunay_GenerationsNoKNN();break;}
-    case _CPP_KNN_Basics :
-    {task->alg = new CPP_KNN_Basics(); break; }
+    case _CPP_KNN_Core :
+    {task->alg = new CPP_KNN_Core(); break; }
     case _CPP_Random_Basics :
     {task->alg = new CPP_Random_Basics();break;}
-    case _CPP_KNN_Lossy :
-    {task->alg = new CPP_KNN_Lossy();break;}
+    case _CPP_KNN_Basics :
+    {task->alg = new CPP_KNN_Basics();break;}
     case _CPP_Delaunay_Generations :
     {task->alg = new CPP_Delaunay_Generations();break;}
     case _CPP_Stable_Basics :

@@ -1047,7 +1047,7 @@ Public Class RedCloud_DelaunayGuidedFeatures : Inherits VB_Algorithm
         Static goodList As New List(Of List(Of cv.Point2f))
         If heartBeat() Then goodList.Clear()
 
-        Dim nextGood As New List(Of cv.Point2f)(features.good.featurePoints)
+        Dim nextGood As New List(Of cv.Point2f)(features.feat.featurePoints)
         goodList.Add(nextGood)
 
         If goodList.Count >= task.frameHistoryCount Then goodList.RemoveAt(0)
@@ -1237,7 +1237,7 @@ End Class
 
 
 Public Class RedCloud_NearestStableCell : Inherits VB_Algorithm
-    Public knn As New KNN_Basics
+    Public knn As New KNN_Core
     Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Line connects current maxDStable point to nearest neighbor using KNN."

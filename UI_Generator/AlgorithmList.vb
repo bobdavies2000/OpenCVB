@@ -2,6 +2,8 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
+_CPP_Stable_Basics
+_CPP_Feature_StableSorted
 _CPP_Plot_Histogram2D
 _CPP_Histogram_RedOptions
 _CPP_Palette_Random
@@ -33,11 +35,10 @@ _CPP_Feature_Agast
 _CPP_Resize_Basics
 _CPP_Delaunay_Basics
 _CPP_Delaunay_GenerationsNoKNN
-_CPP_KNN_Basics
+_CPP_KNN_Core
 _CPP_Random_Basics
-_CPP_KNN_Lossy
+_CPP_KNN_Basics
 _CPP_Delaunay_Generations
-_CPP_Stable_Basics
 _CPP_Feature_Basics
 _CPP_Remap_Basics
 _CPP_Edge_Canny
@@ -311,6 +312,7 @@ if algorithmName = "CPP_Edge_Sobel" Then return new CPP_Basics(functionNames._CP
 if algorithmName = "CPP_EdgeDraw_Basics" Then return new CPP_Basics(functionNames._CPP_EdgeDraw_Basics)
 if algorithmName = "CPP_Feature_Agast" Then return new CPP_Basics(functionNames._CPP_Feature_Agast)
 if algorithmName = "CPP_Feature_Basics" Then return new CPP_Basics(functionNames._CPP_Feature_Basics)
+if algorithmName = "CPP_Feature_StableSorted" Then return new CPP_Basics(functionNames._CPP_Feature_StableSorted)
 if algorithmName = "CPP_FeatureLess_Basics" Then return new CPP_Basics(functionNames._CPP_FeatureLess_Basics)
 if algorithmName = "CPP_FeatureLess_Edge" Then return new CPP_Basics(functionNames._CPP_FeatureLess_Edge)
 if algorithmName = "CPP_FeatureLess_History" Then return new CPP_Basics(functionNames._CPP_FeatureLess_History)
@@ -325,7 +327,7 @@ if algorithmName = "CPP_IMU_GMatrix" Then return new CPP_Basics(functionNames._C
 if algorithmName = "CPP_IMU_GMatrix_QT" Then return new CPP_Basics(functionNames._CPP_IMU_GMatrix_QT)
 if algorithmName = "CPP_Kalman_Basics" Then return new CPP_Basics(functionNames._CPP_Kalman_Basics)
 if algorithmName = "CPP_KNN_Basics" Then return new CPP_Basics(functionNames._CPP_KNN_Basics)
-if algorithmName = "CPP_KNN_Lossy" Then return new CPP_Basics(functionNames._CPP_KNN_Lossy)
+if algorithmName = "CPP_KNN_Core" Then return new CPP_Basics(functionNames._CPP_KNN_Core)
 if algorithmName = "CPP_Line_Basics" Then return new CPP_Basics(functionNames._CPP_Line_Basics)
 if algorithmName = "CPP_Mat_4Click" Then return new CPP_Basics(functionNames._CPP_Mat_4Click)
 if algorithmName = "CPP_Mat_4to1" Then return new CPP_Basics(functionNames._CPP_Mat_4to1)
@@ -575,7 +577,6 @@ if algorithmName = "Feature_Sift_MT" Then return new Feature_Sift_MT
 if algorithmName = "Feature_SiftPoints" Then return new Feature_SiftPoints
 if algorithmName = "Feature_StableAgast" Then return new Feature_StableAgast
 if algorithmName = "Feature_StableGood" Then return new Feature_StableGood
-if algorithmName = "Feature_StableKNN" Then return new Feature_StableKNN
 if algorithmName = "Feature_StableSorted" Then return new Feature_StableSorted
 if algorithmName = "Feature_tCellTracker" Then return new Feature_tCellTracker
 if algorithmName = "Feature_TraceKNN" Then return new Feature_TraceKNN
@@ -901,21 +902,21 @@ if algorithmName = "KMeans_Simple_CPP" Then return new KMeans_Simple_CPP
 if algorithmName = "KMeans_TierCount" Then return new KMeans_TierCount
 if algorithmName = "KMeans_Valleys" Then return new KMeans_Valleys
 if algorithmName = "KNN_Basics" Then return new KNN_Basics
-if algorithmName = "KNN_Basics2DTest" Then return new KNN_Basics2DTest
-if algorithmName = "KNN_Basics3D" Then return new KNN_Basics3D
-if algorithmName = "KNN_Basics3DTest" Then return new KNN_Basics3DTest
-if algorithmName = "KNN_Basics4D" Then return new KNN_Basics4D
-if algorithmName = "KNN_Basics4DTest" Then return new KNN_Basics4DTest
-if algorithmName = "KNN_BasicsN" Then return new KNN_BasicsN
-if algorithmName = "KNN_BasicsNTest" Then return new KNN_BasicsNTest
+if algorithmName = "KNN_BasicsOld" Then return new KNN_BasicsOld
 if algorithmName = "KNN_ClosestLine" Then return new KNN_ClosestLine
 if algorithmName = "KNN_ClosestTracker" Then return new KNN_ClosestTracker
 if algorithmName = "KNN_ClosestVertical" Then return new KNN_ClosestVertical
+if algorithmName = "KNN_Core" Then return new KNN_Core
+if algorithmName = "KNN_Core2DTest" Then return new KNN_Core2DTest
+if algorithmName = "KNN_Core3D" Then return new KNN_Core3D
+if algorithmName = "KNN_Core3DTest" Then return new KNN_Core3DTest
+if algorithmName = "KNN_Core4D" Then return new KNN_Core4D
+if algorithmName = "KNN_Core4DTest" Then return new KNN_Core4DTest
+if algorithmName = "KNN_CoreN" Then return new KNN_CoreN
+if algorithmName = "KNN_CoreNTest" Then return new KNN_CoreNTest
 if algorithmName = "KNN_Emax" Then return new KNN_Emax
 if algorithmName = "KNN_Farthest" Then return new KNN_Farthest
 if algorithmName = "KNN_Input" Then return new KNN_Input
-if algorithmName = "KNN_Lossy" Then return new KNN_Lossy
-if algorithmName = "KNN_LossyOld" Then return new KNN_LossyOld
 if algorithmName = "KNN_TrackEach" Then return new KNN_TrackEach
 if algorithmName = "KNN_TrackMean" Then return new KNN_TrackMean
 if algorithmName = "LaneFinder_Basics" Then return new LaneFinder_Basics

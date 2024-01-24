@@ -48,11 +48,11 @@ public:
 
 class CPP_Options_FeatureMatch {
 public:
-	int matchOption;
-	string matchText;
-	int featurePoints;
-	float correlationThreshold;
-	int matchCellSize;
+	cv::TemplateMatchModes matchOption = cv::TemplateMatchModes::TM_CCOEFF_NORMED;
+	string matchText = "";
+	int featurePoints = 200;
+	float correlationThreshold = 0.9f;
+	int matchCellSize = 10;
 	CPP_Options_FeatureMatch() {
 	}
 	void RunVB() {
@@ -65,13 +65,13 @@ public:
 
 class CPP_Options_Features {
 public:
-	bool useBRISK;
-	double quality;
-	double minDistance;
+	bool useBRISK = false;
+	double quality = 0.01;
+	double minDistance = 10;
 	cv::Rect roi;
-	int distanceThreshold;
-	int matchOption;
-	string matchText;
+	int distanceThreshold = 16;
+	cv::TemplateMatchModes matchOption = cv::TemplateMatchModes::TM_CCOEFF_NORMED;
+	string matchText = "";
 	CPP_Options_FeatureMatch fOptions;
 	CPP_Options_Features() {
 	}

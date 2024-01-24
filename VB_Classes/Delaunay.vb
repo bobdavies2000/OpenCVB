@@ -214,7 +214,7 @@ End Class
 Public Class Delaunay_Generations : Inherits VB_Algorithm
     Public inputPoints As New List(Of cv.Point2f)
     Public facet As New Delaunay_Basics
-    Dim knn As New KNN_Lossy
+    Dim knn As New KNN_Basics
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
         labels = {"", "Mask of unmatched regions - generation set to 0", "Facet Image with count for each region",

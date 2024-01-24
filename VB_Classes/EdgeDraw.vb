@@ -73,7 +73,7 @@ End Class
 
 'Public Class EdgeDraw_LineData : Inherits VB_Algorithm
 '    Dim edgeD As New EdgeDraw
-'    Dim knn As New KNN_Basics
+'    Dim knn As New KNN_Core
 '    Public pointPairLists As New List(Of List(Of cv.Point2f))
 '    Public Sub New()
 '        knn.desiredMatches = 2
