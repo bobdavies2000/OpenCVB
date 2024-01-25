@@ -178,32 +178,6 @@ End Class
 
 
 
-
-Public Class Distance_Threshold : Inherits VB_Algorithm
-    Dim accum As New Edge_MotionAccum
-    Dim dist As New Distance_Basics
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold distance", 0, 100, 20)
-        desc = "Find the top pixels in the distance algorithm."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Threshold distance")
-        Dim testSlider = thresholdSlider.value
-
-        accum.Run(src)
-
-        dist.Run(Not accum.dst2)
-        dst2 = dist.dst2
-        dst3 = dst2.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Distance_RedCloud : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics

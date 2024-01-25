@@ -19,9 +19,9 @@ Public Class MotionRect_Basics : Inherits VB_Algorithm
         If task.pcSplit Is Nothing Then Exit Sub
 
         redCPP.Run(bgSub.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary))
-        If redCPP.sortedCells.Count < 3 Then Exit Sub
+        If redCPP.sortedCells.Count < 2 Then Exit Sub
 
-        Dim nextRect = redCPP.sortedCells.ElementAt(2).Value.rect
+        Dim nextRect = redCPP.sortedCells.ElementAt(1).Value.rect
         For Each key In redCPP.sortedCells
             Dim rc = key.Value
             If rc.index = 1 Then Continue For
@@ -32,7 +32,11 @@ Public Class MotionRect_Basics : Inherits VB_Algorithm
         rectList.Add(nextRect)
         task.motionRect = New cv.Rect
         For Each r In rectList
-            task.motionRect = task.motionRect.Union(r)
+            If task.motionRect.Width = 0 Or task.motionRect.Height = 0 Then
+                task.motionRect = r
+            Else
+                task.motionRect = task.motionRect.Union(r)
+            End If
         Next
         If rectList.Count > gOptions.FrameHistory.Value Then rectList.RemoveAt(0)
         If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
@@ -83,103 +87,7 @@ End Class
 
 
 
-
-
-Public Class MotionRect_History : Inherits VB_Algorithm
-    Dim motion As New Motion_History
-    Dim minCount = 4
-    Dim reconstructedRGB As Integer
-    Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        If dst2.Width = 1280 Or dst2.Width = 640 Then minCount = 16
-        desc = "Track the max rectangle that covers all the motion until there is no motion in it."
-    End Sub
-    Private Function buildEnclosingRect(tmp As cv.Mat)
-        Dim rectList As New List(Of cv.Rect)
-        Dim dots(tmp.Total * 2 - 1) As Integer
-        Marshal.Copy(tmp.Data, dots, 0, dots.Length)
-        Dim pointList As New List(Of cv.Point)
-        For i = 0 To dots.Length - 1 Step 2
-            If dots(i) >= 1 And dots(i) < dst2.Width - 2 And dots(i + 1) >= 1 And dots(i + 1) < dst2.Height - 2 Then
-                pointList.Add(New cv.Point(dots(i), dots(i + 1)))
-            End If
-        Next
-
-        Dim flags = 4 Or cv.FloodFillFlags.MaskOnly Or cv.FloodFillFlags.FixedRange
-        Dim rect As cv.Rect
-        Dim motionMat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim matPoints = dst1(New cv.Rect(1, 1, motionMat.Width - 2, motionMat.Height - 2))
-        For Each pt In pointList
-            If motionMat.Get(Of Byte)(pt.Y, pt.X) = 0 And matPoints.Get(Of Byte)(pt.Y, pt.X) <> 0 Then
-                Dim count = matPoints.FloodFill(motionMat, pt, 255, rect, 0, 0, flags Or (255 << 8))
-                If count <= minCount Then Continue For
-                rectList.Add(New cv.Rect(rect.X, rect.Y, rect.Width + 1, rect.Height + 1))
-            End If
-        Next
-
-        labels(3) = "There were " + CStr(CInt(dots.Length / 2)) + " points collected"
-
-        If rectList.Count = 0 Then Return New cv.Rect
-        Dim motionRect As cv.Rect = rectList(0)
-        For Each r In rectList
-            motionRect = motionRect.Union(r)
-        Next
-        Return motionRect
-    End Function
-    Public Sub RunVB(src As cv.Mat)
-        Static color = src.Clone
-        Static lastMotionRect As cv.Rect = task.motionRect
-        task.motionFlag = False
-        If heartBeat() Or task.motionRect.Width * task.motionRect.Height > src.Total / 2 Or task.optionsChanged Then
-            task.motionFlag = True
-        Else
-            motion.Run(src)
-            dst1 = motion.dst2
-            Dim tmp As New cv.Mat
-            cv.Cv2.FindNonZero(dst1, tmp)
-
-            If tmp.Total > src.Total / 2 Then
-                task.motionFlag = True
-            ElseIf tmp.Total > 0 Then
-                reconstructedRGB += 1
-                task.motionRect = buildEnclosingRect(tmp)
-                If task.motionRect.IntersectsWith(lastMotionRect) Then task.motionRect = task.motionRect.Union(lastMotionRect)
-                If task.motionRect.Width * task.motionRect.Height > src.Total / 2 Then task.motionFlag = True
-            End If
-        End If
-
-        dst3.SetTo(0)
-        If task.motionFlag Then
-            labels(2) = CStr(reconstructedRGB) + " frames since last full image"
-            reconstructedRGB = 0
-            task.motionRect = New cv.Rect
-            dst2 = src.Clone
-        End If
-
-        If standalone Or showIntermediate() Then
-            dst2 = dst1
-            If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
-                dst3(task.motionRect).SetTo(255)
-                src(task.motionRect).CopyTo(dst2(task.motionRect))
-            End If
-        End If
-
-        If standalone Or showIntermediate() Then
-            If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
-                src(task.motionRect).CopyTo(dst0(task.motionRect))
-                color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth, task.lineType)
-            End If
-        End If
-        lastMotionRect = task.motionRect
-    End Sub
-End Class
-
-
-
-
-
-Public Class Motion_RectNew : Inherits VB_Algorithm
+Public Class MotionRect_Rect : Inherits VB_Algorithm
     Dim motion As New Motion_Basics
     Dim minCount = 4
     Dim reconstructedRGB As Integer
@@ -275,7 +183,7 @@ End Class
 
 
 
-Public Class Motion_Rect1 : Inherits VB_Algorithm
+Public Class MotionRect_Rect1 : Inherits VB_Algorithm
     Dim motion As New MotionRect_Enclosing
     Public Sub New()
         vbAddAdvice(traceName + ": gOptions frame history slider will impact results.")
@@ -320,7 +228,7 @@ End Class
 
 
 
-Public Class Motion_History : Inherits VB_Algorithm
+Public Class MotionRect_HistoryTest : Inherits VB_Algorithm
     Dim diff As New Diff_Basics
     Dim frames As New History_Basics
     Public Sub New()
@@ -347,7 +255,7 @@ End Class
 
 
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
-Public Class Motion_History2 : Inherits VB_Algorithm
+Public Class MotionRect_History2 : Inherits VB_Algorithm
     Public motionCore As New Motion_Core
     Dim frames As New History_Basics
     Public Sub New()
@@ -368,184 +276,13 @@ End Class
 
 
 
-
-Public Class Motion_History3 : Inherits VB_Algorithm
-    Public bgSub As New BGSubtract_Basics
-    Dim frames As New History_Basics
-    Public Sub New()
-        desc = "Create motion history based on background subtraction."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        bgSub.Run(src)
-        dst2 = bgSub.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Motion_RectAlt : Inherits VB_Algorithm
-    Dim motion As New Motion_History
-    Dim options As New Options_Flood
-    Dim smallSize As New cv.Size(160, 120)
-    Dim minCount = 2
-    Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        If dst0.Height = 480 Or dst0.Height = 240 Then minCount = 4
-        If dst0.Height = 720 Or dst0.Height = 360 Or dst0.Height = 180 Then minCount = 16
-        desc = "Construct the BGR image from a heartbeat image and the portion of the BGR image that has changed."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim rectList As New List(Of cv.Rect)
-        Dim restoreF = CInt(src.Width / smallSize.Width)
-        Dim srcSmall = src.Resize(smallSize, cv.InterpolationFlags.Nearest)
-        dst0 = New cv.Mat(smallSize, cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(smallSize, cv.MatType.CV_8UC3, 0)
-        Static dst As New cv.Mat(srcSmall.Size, cv.MatType.CV_8UC3, 0)
-        If heartBeat() Then
-            dst = task.color.Resize(smallSize, cv.InterpolationFlags.Nearest)
-            dst1.SetTo(0)
-            task.motionRect = New cv.Rect
-        Else
-            motion.Run(srcSmall)
-            dst3 = motion.dst2
-
-            Dim tmp As New cv.Mat
-            cv.Cv2.FindNonZero(dst3, tmp)
-
-            Dim dots(tmp.Total * 2 - 1) As Integer
-            If tmp.Total > srcSmall.Total / 4 Then
-                dst = srcSmall
-            ElseIf tmp.Total > 0 Then
-                Marshal.Copy(tmp.Data, dots, 0, dots.Length)
-                Dim pointList As New List(Of cv.Point)
-                For i = 0 To dots.Length - 1 Step 2
-                    If dots(i) >= 1 And dots(i) < dst1.Width - 2 And dots(i + 1) >= 1 And dots(i + 1) < dst1.Height - 2 Then
-                        pointList.Add(New cv.Point(dots(i), dots(i + 1)))
-                    End If
-                Next
-
-                Dim flags = 4 Or cv.FloodFillFlags.MaskOnly Or cv.FloodFillFlags.FixedRange
-                Dim rect As cv.Rect
-                dst0.SetTo(0)
-                Dim matPoints = dst3(New cv.Rect(1, 1, dst3.Width - 2, dst3.Height - 2))
-                For Each pt In pointList
-                    If dst0.Get(Of Byte)(pt.Y, pt.X) = 0 And matPoints.Get(Of Byte)(pt.Y, pt.X) <> 0 Then
-                        Dim count = matPoints.FloodFill(dst0, pt, 255, rect, 0, 0, flags Or (255 << 8))
-                        rectList.Add(New cv.Rect(rect.X, rect.Y, rect.Width + 1, rect.Height + 1))
-                    End If
-                Next
-                For Each r In rectList
-                    If r.X <> 0 And r.Y <> 0 Then
-                        task.motionRect = If(task.motionRect.Width = 0, r, task.motionRect.Union(r))
-                        dst3.Rectangle(r, cv.Scalar.White, 1)
-                    End If
-                Next
-                dst3.Rectangle(task.motionRect, cv.Scalar.White, 1)
-            End If
-            labels(3) = "There were " + CStr(CInt(dots.Length / 2)) + " points collected"
-        End If
-        If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
-            Dim r = task.motionRect
-            Dim motionRect = New cv.Rect(r.Left / restoreF, r.Top / restoreF, r.Width / restoreF, r.Height / restoreF)
-            If motionRect.Width > 0 And motionRect.Height > 0 Then ' could have rounded to 0.
-                srcSmall(motionRect).CopyTo(dst1(motionRect))
-                srcSmall(motionRect).CopyTo(dst(motionRect))
-            End If
-        End If
-        dst2 = dst.Resize(dst2.Size)
-        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width, dst2.Height), cv.Scalar.Black, 1)
-        labels(2) = CStr(rectList.Count) + " rects were found"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class MotionRect_Filter : Inherits VB_Algorithm
-    Public motion As New Motion_Contours
-    Public stableImg As cv.Mat
-    Dim dMax As New Depth_StableMax
-    Public Sub New()
-        If radio.Setup(traceName) Then
-            radio.addRadio("Use motion-filtered pixel values")
-            radio.addRadio("Use original (unchanged) pixels")
-            radio.check(0).Checked = True
-        End If
-        labels(2) = "Motion-filtered image"
-        desc = "Motion-Filtered Images (MFI) - update only the changed regions"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        dMax.Run(src)
-
-        motion.Run(task.gray)
-        labels(3) = motion.labels(3)
-        dst3 = If(motion.dst3.Channels = 1, motion.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR), motion.dst3.Clone)
-
-        Dim radioVal As Integer
-        Static frm As OptionsRadioButtons = findfrm(traceName + " Radio Buttons")
-        For radioVal = 0 To frm.check.Count - 1
-            If frm.check(radioVal).Checked Then Exit For
-        Next
-
-        If task.motionReset Or firstPass Or radioVal = 1 Then
-            stableImg = src.Clone
-        End If
-
-        dst2 = stableImg.Clone
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class MotionRect_Sobel : Inherits VB_Algorithm
-    Dim mfi As New MotionRect_Filter
-    Dim sobel As New Edge_Sobel_Old
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Pixel threshold to zero", 0, 255, 100)
-        End If
-
-        labels(2) = "Sobel edges of Motion-Filtered RGB"
-        desc = "Motion-Filtered Images (MFI) - Stabilize the Sobel output with MFD"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Pixel threshold to zero")
-        mfi.Run(src)
-        dst3 = mfi.dst3
-        labels(3) = mfi.labels(3)
-
-        sobel.Run(mfi.dst2)
-        dst2 = sobel.dst2.Threshold(thresholdSlider.Value, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class MotionRect_Enclosing : Inherits VB_Algorithm
     Dim redCPP As New RedCloud_CPP
     Public motionRect As New cv.Rect
     Public Sub New()
-        redOptions.UseColor.Checked = True
         cPtr = BGSubtract_BGFG_Open(4)
         labels(2) = "MOG2 is the best option.  See BGSubtract_Basics to see more options."
-        desc = "Build an enclosing rectangle for the supplied pointlist"
+        desc = "Build an enclosing rectangle for the motion"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
@@ -560,14 +297,13 @@ Public Class MotionRect_Enclosing : Inherits VB_Algorithm
         redCPP.Run(dst2)
 
         motionRect = New cv.Rect
-        If redCPP.sortedCells.Count > 1 Then
-            Dim rect As cv.Rect = redCPP.sortedCells.ElementAt(1).Value.rect
-            For i = 2 To redCPP.sortedCells.Count - 1
-                Dim cell = redCPP.sortedCells.ElementAt(i).Value
-                rect = rect.Union(cell.rect)
-            Next
-            motionRect = rect
-        End If
+        If redCPP.sortedCells.Count < 2 Then Exit Sub
+        motionRect = redCPP.sortedCells.ElementAt(1).Value.rect
+        For i = 2 To redCPP.sortedCells.Count - 1
+            Dim cell = redCPP.sortedCells.ElementAt(i).Value
+            motionRect = motionRect.Union(cell.rect)
+        Next
+
         If motionRect.Width > dst2.Width / 2 And motionRect.Height > dst2.Height / 2 Then
             motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
         End If
@@ -586,7 +322,6 @@ End Class
 
 Public Class MotionRect_Depth : Inherits VB_Algorithm
     Public motion As New MotionRect_Basics
-    Public rect As cv.Rect
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         If standalone Then motion.showDiff = True
@@ -600,16 +335,16 @@ Public Class MotionRect_Depth : Inherits VB_Algorithm
         dst1 = motion.dst2
 
         If task.motionRect.Width = 0 And task.motionRect.Height = 0 Then Exit Sub
-        rect = rect.Union(task.motionRect)
 
-        task.pcSplit(2)(rect).CopyTo(dst2(rect))
+        task.pcSplit(2)(task.motionRect).CopyTo(dst2(task.motionRect))
 
         If standalone Or showIntermediate() Then
             Static diff As New Diff_Depth32f
-            diff.lastDepth32f = dst2
+            If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
             diff.Run(task.pcSplit(2))
             dst3 = diff.dst2
-            dst3.Rectangle(rect, 255, task.lineWidth)
+            dst3.Rectangle(task.motionRect, 255, task.lineWidth)
+            diff.lastDepth32f = task.pcSplit(2)
         End If
     End Sub
 End Class

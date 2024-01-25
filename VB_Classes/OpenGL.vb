@@ -1207,37 +1207,6 @@ End Class
 
 
 
-
-Public Class OpenGL_DepthAverage : Inherits VB_Algorithm
-    Dim stable As New Depth_AveragingStable
-    Public Sub New()
-        task.ogl.oglFunction = oCase.pointCloudAndRGB
-        labels(3) = "32-bit format stabilized depth data"
-        desc = "Use the depth_stabilizer output as input the an OpenGL display"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2) * 1000
-
-        stable.Run(src)
-        dst2 = stable.dst3
-
-        task.pcSplit(2) = stable.dst3 * 0.001
-        cv.Cv2.Merge(task.pcSplit, dst1)
-        task.ogl.pointCloudInput = dst1
-        task.ogl.Run(task.color)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
 Public Class OpenGL_PlaneClusters3D : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Dim eq As New Plane_Equation

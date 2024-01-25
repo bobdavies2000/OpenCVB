@@ -342,60 +342,26 @@ End Class
 
 
 
-Public Class Edge_Features : Inherits VB_Algorithm
-    Dim featLess As New FeatureLess_MotionAccum
-    Dim edges As New Edge_All
-    Public Sub New()
-        findRadio("Binarized Sobel").Checked = True
-        labels(2) = "Output of Edge_BinarizedSobel"
-        labels(3) = "dst2 with featureless areas removed."
-        desc = "Removing the featureless regions after a binarized sobel"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        task.mouseClickFlag = False ' edges calls a mat_4clicks algorithm.
-        edges.Run(src)
-        dst2 = edges.dst2
-        labels(2) = edges.labels(2)
+'Public Class Edge_Features : Inherits VB_Algorithm
+'    Dim featLess As New FeatureLess_MotionAccum
+'    Dim edges As New Edge_All
+'    Public Sub New()
+'        findRadio("Binarized Sobel").Checked = True
+'        labels(2) = "Output of Edge_BinarizedSobel"
+'        labels(3) = "dst2 with featureless areas removed."
+'        desc = "Removing the featureless regions after a binarized sobel"
+'    End Sub
+'    Public Sub RunVB(src As cv.Mat)
+'        task.mouseClickFlag = False ' edges calls a mat_4clicks algorithm.
+'        edges.Run(src)
+'        dst2 = edges.dst2
+'        labels(2) = edges.labels(2)
 
-        featLess.Run(src)
-        dst3 = dst2.Clone
-        dst3.SetTo(0, featLess.dst2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Edge_ConsistentExplore : Inherits VB_Algorithm
-    Dim edges As New Edge_Features
-    Public Sub New()
-        desc = "Edges that are consistent for x number of frames"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static saveFrames As New List(Of cv.Mat)
-        If task.optionsChanged Then saveFrames = New List(Of cv.Mat)
-
-        edges.Run(src)
-
-        Dim tmp = If(edges.dst3.Channels = 1, edges.dst3.Clone, edges.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        saveFrames.Add(tmp)
-        If saveFrames.Count > task.frameHistoryCount Then saveFrames.RemoveAt(0)
-
-        dst2 = saveFrames(0)
-        For i = 1 To saveFrames.Count - 1
-            dst2 = saveFrames(i) And dst2
-        Next
-
-        dst3.SetTo(0)
-        src.CopyTo(dst3, Not dst2)
-    End Sub
-End Class
-
-
+'        featLess.Run(src)
+'        dst3 = dst2.Clone
+'        dst3.SetTo(0, featLess.dst2)
+'    End Sub
+'End Class
 
 
 
@@ -1041,30 +1007,6 @@ Public Class Edge_MotionFrames : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-Public Class Edge_MotionAccum : Inherits VB_Algorithm
-    Dim edges As New Edge_Canny
-    Public motion As New Motion_History2
-    Public percentMotion As Single
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels = {"", "", "Accumulated edges tempered by motion thresholds", ""}
-        desc = "Accumulate edges and use motion to clear"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If task.optionsChanged Then task.motionReset = True
-        motion.Run(src)
-
-        If task.frameCount Mod task.frameHistoryCount = 0 Then dst2.SetTo(0)
-
-        edges.Run(src)
-        dst2.SetTo(255, edges.dst2)
-        labels(3) = motion.labels(2)
-    End Sub
-End Class
 
 
 

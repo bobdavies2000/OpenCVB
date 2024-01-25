@@ -495,7 +495,7 @@ Public Class VBtask : Implements IDisposable
                         task.pointCloud = motion.dst2.Clone
                     End If
 
-                    If task.motionRect.Width <> 0 Or task.pcSplit Is Nothing Then
+                    If task.motionRect.Width <> 0 Or task.pcSplit Is Nothing Or heartBeat Or task.optionsChanged Then
                         task.pcSplit = task.pointCloud.Split
 
                         'Dim maxD = gOptions.MaxDepth.Value - 0.1 ' why -0.1?  Because histograms are inclusive at boundaries.
