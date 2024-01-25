@@ -33,7 +33,6 @@ End Class
 Public Class MiniCloud_Rotate : Inherits VB_Algorithm
     Public mini As New MiniCloud_Basics
     Public histogram As New cv.Mat
-    Dim gCloud As New Depth_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Side view after resize percentage - use Y-Axis slider to rotate image."

@@ -3,6 +3,26 @@ Imports System.Runtime.InteropServices
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
 Public Class Depth_Basics : Inherits VB_Algorithm
+    Dim colorizer As New Depth_Colorizer_CPP
+    Public Sub New()
+        vbAddAdvice(traceName + ": use global option to control 'Max Depth'.")
+        desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU (but quietly)"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst2 = task.pcSplit(2)
+        dst3 = task.maxDepthMask
+        setTrueText(gMatrixToStr(task.gMatrix), 3)
+
+        colorizer.Run(task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc))
+        task.depthRGB = colorizer.dst2
+    End Sub
+End Class
+
+
+
+
+
+Public Class Depth_BasicsOld : Inherits VB_Algorithm
     Dim hCloud As New History_Cloud
     Dim maxMask As New Depth_MaxMask
     Dim colorizer As New Depth_Colorizer_CPP
@@ -64,68 +84,6 @@ Public Class Depth_Basics : Inherits VB_Algorithm
 End Class
 
 
-
-
-
-
-Public Class Depth_BasicsMotion : Inherits VB_Algorithm
-    Dim motionRect As New MotionRect_PointCloud
-    Dim maxMask As New Depth_MaxMask
-    Dim colorizer As New Depth_Colorizer_CPP
-    Public Sub New()
-        vbAddAdvice(traceName + ": use global option to control 'Max Depth'.")
-        desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU (but quietly)"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standalone Then
-            dst2 = task.pcSplit(2)
-            dst3 = task.maxDepthMask
-            setTrueText(gMatrixToStr(task.gMatrix), 3)
-        Else
-            If gOptions.MotionFilteredCloud.Checked Or gOptions.gravityPointCloud.Checked Then
-
-                If gOptions.gravityPointCloud.Checked Then
-                    '******* this is the rotation *******
-                    task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).ToMat.Reshape(3, src.Rows)
-                End If
-
-                motionRect.Run(task.pointCloud)
-                task.pcSplit = task.pointCloud.Split
-                task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-                If gOptions.MotionFilteredCloud.Checked Then
-
-                    task.pcSplit = task.pointCloud.Split
-                    task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-                End If
-            Else
-                task.pcSplit = task.pointCloud.Split
-                task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-            End If
-            task.noDepthMask = Not task.depthMask
-
-            Dim maxD = gOptions.MaxDepth.Value - 0.1 ' why -0.1?  Because histograms are inclusive at boundaries.
-            task.maxDepthMask = task.pcSplit(2).Threshold(maxD, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-
-            If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
-                Dim xRatio = task.xRangeDefault / task.xRange
-                Dim yRatio = task.yRangeDefault / task.yRange
-                task.pcSplit(0) *= xRatio
-                task.pcSplit(1) *= yRatio
-                cv.Cv2.Merge(task.pcSplit, task.pointCloud)
-            End If
-
-            task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
-            task.metersPerPixel = task.maxZmeters / dst3.Height ' meters per pixel in projections - side and top.
-
-            colorizer.Run(task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc))
-            task.depthRGB = colorizer.dst2
-
-            maxMask.Run(task.maxDepthMask)
-            task.maxDepthMask = maxMask.dst2 ' Use the contour of the mask
-        End If
-        If task.frameHistoryCount = 0 Then task.frameHistoryCount = 1
-    End Sub
-End Class
 
 
 

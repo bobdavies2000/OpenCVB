@@ -81,6 +81,7 @@ Module vbUtilities
         task.AddWeighted = gOptions.AddWeightedSlider.Value / 100
 
         task.maxZmeters = gOptions.MaxDepth.Value
+        task.metersPerPixel = task.maxZmeters / task.workingRes.Height ' meters per pixel in projections - side and top.
         task.SyncOutput = gOptions.SyncOutput.Checked
     End Sub
     Public Function GetWindowImage(ByVal WindowHandle As IntPtr, ByVal rect As cv.Rect) As Bitmap

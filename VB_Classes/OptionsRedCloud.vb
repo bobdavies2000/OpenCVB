@@ -104,8 +104,8 @@ Public Class OptionsRedCloud
         task.sideCameraPoint = New cv.Point(0, CInt(task.workingRes.Height / 2))
         task.topCameraPoint = New cv.Point(CInt(task.workingRes.Width / 2), 0)
 
-        task.xRange = XRangeSlider.Value / 100 + 0.01 ' why add a cm?  Because histograms are exclusive on ranges.
-        task.yRange = YRangeSlider.Value / 100 + 0.01 ' why add a cm?  Because histograms are exclusive on ranges.
+        task.xRange = XRangeSlider.Value / 100
+        task.yRange = YRangeSlider.Value / 100
 
         task.redThresholdSide = SideViewThreshold.Value
         task.redThresholdTop = TopViewThreshold.Value
