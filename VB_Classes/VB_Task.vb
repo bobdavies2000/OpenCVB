@@ -52,7 +52,6 @@ Public Class VBtask : Implements IDisposable
     ' add any global algorithms here
     Public motionRect As cv.Rect
     Public motionMask As cv.Mat
-    Public mfiBasics As MFI_Basics
     Public motionFlag As Boolean ' any motion
     Public motionReset As Boolean ' thresholds triggered.
 

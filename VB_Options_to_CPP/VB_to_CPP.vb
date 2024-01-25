@@ -35,6 +35,7 @@ Public Class VB_to_CPP
         Next
 
         Dim marshalCopyInput As New List(Of String)
+        VBrtb.Text = "Translate this vb.Net code to C++" + vbCrLf
         For i = vbIndex To vbInput.Count - 1
             If vbInput(i).Contains("_Open()") Then
                 Dim tokens = Trim(vbInput(i)).Split(" ")

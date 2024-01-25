@@ -453,30 +453,30 @@ public:
 
 extern "C" __declspec(dllexport)
 BGSubtract_BGFG * BGSubtract_BGFG_Open(int currMethod) {
-	BGSubtract_BGFG* bgfs = new BGSubtract_BGFG();
-	if (currMethod == 0)      bgfs->algo = createBackgroundSubtractorGMG(20, 0.7);
-	else if (currMethod == 1) bgfs->algo = createBackgroundSubtractorCNT();
-	else if (currMethod == 2) bgfs->algo = createBackgroundSubtractorKNN();
-	else if (currMethod == 3) bgfs->algo = createBackgroundSubtractorMOG();
-	else if (currMethod == 4) bgfs->algo = createBackgroundSubtractorMOG2();
-	else if (currMethod == 5) bgfs->algo = createBackgroundSubtractorGSOC();
-	else if (currMethod == 6) bgfs->algo = createBackgroundSubtractorLSBP();
-	return bgfs;
+	BGSubtract_BGFG* cPtr = new BGSubtract_BGFG();
+	if (currMethod == 0)      cPtr->algo = createBackgroundSubtractorGMG(20, 0.7);
+	else if (currMethod == 1) cPtr->algo = createBackgroundSubtractorCNT();
+	else if (currMethod == 2) cPtr->algo = createBackgroundSubtractorKNN();
+	else if (currMethod == 3) cPtr->algo = createBackgroundSubtractorMOG();
+	else if (currMethod == 4) cPtr->algo = createBackgroundSubtractorMOG2();
+	else if (currMethod == 5) cPtr->algo = createBackgroundSubtractorGSOC();
+	else if (currMethod == 6) cPtr->algo = createBackgroundSubtractorLSBP();
+	return cPtr;
 }
 
 extern "C" __declspec(dllexport)
-int* BGSubtract_BGFG_Close(BGSubtract_BGFG * bgfs)
+int* BGSubtract_BGFG_Close(BGSubtract_BGFG * cPtr)
 {
-	delete bgfs;
+	delete cPtr;
 	return (int*)0;
 }
 
 extern "C" __declspec(dllexport)
-int* BGSubtract_BGFG_Run(BGSubtract_BGFG * bgfs, int* bgrPtr, int rows, int cols, int channels)
+int* BGSubtract_BGFG_Run(BGSubtract_BGFG * cPtr, int* bgrPtr, int rows, int cols, int channels)
 {
-	bgfs->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, bgrPtr);
-	bgfs->Run();
-	return (int*)bgfs->fgMask.data;
+	cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, bgrPtr);
+	cPtr->Run();
+	return (int*)cPtr->fgMask.data;
 }
 
 
@@ -2596,13 +2596,14 @@ public:
 	vector<Point> floodPoints;
 
 	RedCloud() {}
-	void RunCPP(int maxClassCount, int diff) {
+	void RunCPP(int maxClassCount, int diff, float imageThresholdPercent, float cellMinPercent) {
 		Rect rect;
 
 		multimap<int, Point, greater<int>> sizeSorted;
 		int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
 		int count; Point pt;
-		float cellSizehreshold = src.total() * 0.0001f; // if the cell is < 1/100 of 1%, then skip it.
+		int cellSizeThreshold = int(src.total() * cellMinPercent); // if the cell is smaller than this, skip it.
+		if (cellSizeThreshold < 1) cellSizeThreshold = 1;
 		for (int y = 0; y < src.rows; y++)
 		{
 			for (int x = 0; x < src.cols; x++)
@@ -2611,7 +2612,7 @@ public:
 				{
 					pt = Point(x, y);
 					int count = floodFill(src, mask, pt, 255, &rect, diff, diff, floodFlag | (255 << 8));
-					if (count >= cellSizehreshold) sizeSorted.insert(make_pair(count, pt));
+					if (count >= cellSizeThreshold) sizeSorted.insert(make_pair(count, pt));
 				}
 			}
 		}
@@ -2620,7 +2621,7 @@ public:
 		cellSizes.clear();
 		int fill = 1;
 		int totalCount = 0;
-		float totalImageThreshold = src.total() * 0.98f; // Threshold is almost the whole image.
+		int threshold = int(imageThresholdPercent * src.total());
 		for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
 		{
 			count = floodFill(src, maskCopy, it->second, fill, &rect, diff, diff, floodFlag | (fill << 8));
@@ -2631,7 +2632,7 @@ public:
 				floodPoints.push_back(it->second);
 				totalCount += count;
 
-				if (count > totalImageThreshold || fill >= maxClassCount)
+				if (count > threshold || fill >= maxClassCount)
 					break; // just taking up to the top X largest objects found.
 				fill++;
 			}
@@ -2663,7 +2664,7 @@ extern "C" __declspec(dllexport) int* RedCloud_Sizes(RedCloud * cPtr)
 extern "C" __declspec(dllexport) int* RedCloud_Close(RedCloud * cPtr) { delete cPtr; return (int*)0; }
 extern "C" __declspec(dllexport) int*
 RedCloud_Run(RedCloud * cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols, int type,
-	int maxClassCount, int diff)
+	int maxClassCount, int diff, float imageThresholdPercent, float cellMinPercent)
 {
 	cPtr->src = Mat(rows, cols, type, dataPtr);
 	cPtr->mask = Mat::zeros(rows + 2, cols + 2, CV_8U);
@@ -2675,7 +2676,7 @@ RedCloud_Run(RedCloud * cPtr, int* dataPtr, unsigned char* maskPtr, int rows, in
 		mask.copyTo(cPtr->mask(r));
 	}
 	cPtr->maskCopy = cPtr->mask.clone();
-	cPtr->RunCPP(maxClassCount, diff);
+	cPtr->RunCPP(maxClassCount, diff, imageThresholdPercent, cellMinPercent);
 
 	cPtr->maskCopy(r).copyTo(cPtr->result);
 	return (int*)cPtr->result.data;

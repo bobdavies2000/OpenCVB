@@ -1574,7 +1574,7 @@ End Class
 
 
 Public Class OpenGL_DiffDepth : Inherits VB_Algorithm
-    Dim diff As New Diff_Depth
+    Dim diff As New Diff_Depth32S
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         labels = {"", "", "Point cloud after filtering for consistent depth", ""}

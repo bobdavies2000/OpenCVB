@@ -46,21 +46,6 @@ End Class
 
 
 
-Public Class Options_BGSubtract : Inherits VB_Algorithm
-    Public MOGlearnRate As Single = 1 / 1000
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("MOG Learn Rate X1000", 1, 1000, 1)
-    End Sub
-    Public Sub RunVB()
-        Static learnRateSlider = findSlider("MOG Learn Rate X1000")
-        MOGlearnRate = learnRateSlider.Value / 1000
-    End Sub
-End Class
-
-
-
-
-
 
 
 
@@ -1303,37 +1288,6 @@ Public Class Options_MotionBlur : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Options_BGSubtractSynthetic : Inherits VB_Algorithm
-    Public amplitude As Double = 200
-    Public magnitude As Double = 20
-    Public waveSpeed As Double = 20
-    Public objectSpeed As Double = 15
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Synthetic Amplitude x100", 1, 400, amplitude)
-            sliders.setupTrackBar("Synthetic Magnitude", 1, 40, magnitude)
-            sliders.setupTrackBar("Synthetic Wavespeed x100", 1, 400, waveSpeed)
-            sliders.setupTrackBar("Synthetic ObjectSpeed", 1, 20, objectSpeed)
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static amplitudeSlider = findSlider("Synthetic Amplitude x100")
-        Static MagSlider = findSlider("Synthetic Magnitude")
-        Static speedSlider = findSlider("Synthetic Wavespeed x100")
-        Static objectSlider = findSlider("Synthetic ObjectSpeed")
-
-        amplitude = amplitudeSlider.Value
-        magnitude = MagSlider.Value
-        waveSpeed = speedSlider.Value
-        objectSpeed = objectSlider.Value
-    End Sub
-End Class
 
 
 
@@ -2721,47 +2675,6 @@ Public Class Options_Motion : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Options_BGSubtract_CPP : Inherits VB_Algorithm
-    Public methodDesc As String
-    Public currMethod As Integer
-    Public Sub New()
-        If radio.Setup(traceName) Then
-            radio.addRadio("GMG")
-            radio.addRadio("CNT - Counting")
-            radio.addRadio("KNN")
-            radio.addRadio("MOG")
-            radio.addRadio("MOG2")
-            radio.addRadio("GSOC")
-            radio.addRadio("LSBP")
-            radio.check(4).Checked = True ' mog2 appears to be the best...
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
-        If firstPass Then
-            firstPass = False
-            frm.Left = gOptions.Width / 2
-            frm.top = gOptions.Height / 2
-        End If
-
-        For i = 0 To frm.check.Count - 1
-            If frm.check(i).Checked Then
-                If currMethod = i Then
-                    Exit For
-                Else
-                    currMethod = i
-                    methodDesc = "Method = " + frm.check(i).Text
-                End If
-            End If
-        Next
-    End Sub
-End Class
 
 
 
@@ -4277,5 +4190,81 @@ Public Class Options_Edges_All : Inherits VB_Algorithm
             End Select
             saveSelection = eSelection
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_BGSubtractSynthetic : Inherits VB_Algorithm
+    Public amplitude As Double = 200
+    Public magnitude As Double = 20
+    Public waveSpeed As Double = 20
+    Public objectSpeed As Double = 15
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Synthetic Amplitude x100", 1, 400, amplitude)
+            sliders.setupTrackBar("Synthetic Magnitude", 1, 40, magnitude)
+            sliders.setupTrackBar("Synthetic Wavespeed x100", 1, 400, waveSpeed)
+            sliders.setupTrackBar("Synthetic ObjectSpeed", 1, 20, objectSpeed)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static amplitudeSlider = findSlider("Synthetic Amplitude x100")
+        Static MagSlider = findSlider("Synthetic Magnitude")
+        Static speedSlider = findSlider("Synthetic Wavespeed x100")
+        Static objectSlider = findSlider("Synthetic ObjectSpeed")
+
+        amplitude = amplitudeSlider.Value
+        magnitude = MagSlider.Value
+        waveSpeed = speedSlider.Value
+        objectSpeed = objectSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_BGSubtract : Inherits VB_Algorithm
+    Public MOGlearnRate As Single = 1 / 1000
+    Public methodDesc As String
+    Public currMethod As Integer
+    Public Sub New()
+        If radio.Setup(traceName) Then
+            radio.addRadio("GMG")
+            radio.addRadio("CNT - Counting")
+            radio.addRadio("KNN")
+            radio.addRadio("MOG")
+            radio.addRadio("MOG2")
+            radio.addRadio("GSOC")
+            radio.addRadio("LSBP")
+            radio.check(4).Checked = True ' mog2 appears to be the best...
+        End If
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("MOG Learn Rate X1000", 1, 1000, 1)
+    End Sub
+    Public Sub RunVB()
+        Static learnRateSlider = findSlider("MOG Learn Rate X1000")
+        Static frm = findfrm(traceName + " Radio Buttons")
+        If firstPass Then
+            firstPass = False
+            frm.Left = gOptions.Width / 2
+            frm.top = gOptions.Height / 2
+        End If
+
+        For i = 0 To frm.check.Count - 1
+            If frm.check(i).Checked Then
+                If currMethod = i Then
+                    Exit For
+                Else
+                    currMethod = i
+                    methodDesc = "Method = " + frm.check(i).Text
+                End If
+            End If
+        Next
+        MOGlearnRate = learnRateSlider.Value / 1000
     End Sub
 End Class

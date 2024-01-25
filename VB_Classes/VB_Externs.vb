@@ -947,7 +947,8 @@ Module VB_Externs
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloud_Run(
                 cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr, rows As Integer, cols As Integer,
-                type As Integer, maxClassCount As Integer, diff As Integer) As IntPtr
+                type As Integer, maxClassCount As Integer, diff As Integer, imageThresholdPercent As Single,
+                cellMinPercent As Single) As IntPtr
     End Function
 
 

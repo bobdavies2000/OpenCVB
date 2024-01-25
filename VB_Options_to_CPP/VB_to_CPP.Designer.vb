@@ -26,8 +26,6 @@ Partial Class VB_to_CPP
         Me.Label1 = New System.Windows.Forms.Label()
         Me.VBrtb = New System.Windows.Forms.RichTextBox()
         Me.CPPrtb = New System.Windows.Forms.RichTextBox()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.Label3 = New System.Windows.Forms.Label()
         Me.PrepareCPP = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
@@ -53,50 +51,30 @@ Partial Class VB_to_CPP
         'VBrtb
         '
         Me.VBrtb.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.VBrtb.Location = New System.Drawing.Point(1, 191)
+        Me.VBrtb.Location = New System.Drawing.Point(1, 124)
         Me.VBrtb.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.VBrtb.Name = "VBrtb"
-        Me.VBrtb.Size = New System.Drawing.Size(995, 1439)
+        Me.VBrtb.Size = New System.Drawing.Size(995, 1506)
         Me.VBrtb.TabIndex = 2
         Me.VBrtb.Text = ""
         '
         'CPPrtb
         '
         Me.CPPrtb.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.CPPrtb.Location = New System.Drawing.Point(1006, 191)
+        Me.CPPrtb.Location = New System.Drawing.Point(1006, 124)
         Me.CPPrtb.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.CPPrtb.Name = "CPPrtb"
-        Me.CPPrtb.Size = New System.Drawing.Size(968, 1439)
+        Me.CPPrtb.Size = New System.Drawing.Size(968, 1506)
         Me.CPPrtb.TabIndex = 3
         Me.CPPrtb.Text = ""
         '
-        'Label2
-        '
-        Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(18, 151)
-        Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(978, 35)
-        Me.Label2.TabIndex = 4
-        Me.Label2.Text = "Step 2: Copy And paste this code into Google's Bard (it includes instruction.)"
-        '
-        'Label3
-        '
-        Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.Location = New System.Drawing.Point(1016, 151)
-        Me.Label3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(624, 35)
-        Me.Label3.TabIndex = 5
-        Me.Label3.Text = "Step 3: Paste output of translate from Bard here "
-        '
         'PrepareCPP
         '
-        Me.PrepareCPP.Location = New System.Drawing.Point(1015, 89)
+        Me.PrepareCPP.Location = New System.Drawing.Point(1015, 78)
         Me.PrepareCPP.Name = "PrepareCPP"
-        Me.PrepareCPP.Size = New System.Drawing.Size(328, 37)
+        Me.PrepareCPP.Size = New System.Drawing.Size(568, 37)
         Me.PrepareCPP.TabIndex = 6
-        Me.PrepareCPP.Text = "Step 4: Update Bard's C++ Code"
+        Me.PrepareCPP.Text = "Step 2: Create C++ version with the default values."
         Me.PrepareCPP.UseVisualStyleBackColor = True
         '
         'VB_to_CPP
@@ -105,8 +83,6 @@ Partial Class VB_to_CPP
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1970, 1632)
         Me.Controls.Add(Me.PrepareCPP)
-        Me.Controls.Add(Me.Label3)
-        Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.CPPrtb)
         Me.Controls.Add(Me.VBrtb)
         Me.Controls.Add(Me.Label1)
@@ -123,7 +99,5 @@ Partial Class VB_to_CPP
     Friend WithEvents Label1 As Label
     Friend WithEvents VBrtb As RichTextBox
     Friend WithEvents CPPrtb As RichTextBox
-    Friend WithEvents Label2 As Label
-    Friend WithEvents Label3 As Label
     Friend WithEvents PrepareCPP As Button
 End Class

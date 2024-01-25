@@ -301,52 +301,6 @@ End Class
 
 
 
-Public Class Rectangle_EnclosingRect : Inherits VB_Algorithm
-    Dim redCore As New RedCloud_CPP
-    Public motionRect As New cv.Rect
-    Public Sub New()
-        redOptions.UseColor.Checked = True
-        cPtr = BGSubtract_BGFG_Open(4)
-        labels(2) = "MOG2 is the best option.  See BGSubtract_Basics to see more options."
-        desc = "Build an enclosing rectangle for the supplied pointlist"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
-        Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-        Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
-        handleSrc.Free()
-
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-        redCore.inputMask = Not dst2
-        redCore.Run(dst2)
-
-        motionRect = New cv.Rect
-        If redCore.sortedCells.Count > 1 Then
-            Dim rect As cv.Rect = redCore.sortedCells.ElementAt(1).Value.rect
-            For i = 2 To redCore.sortedCells.Count - 1
-                Dim cell = redCore.sortedCells.ElementAt(i).Value
-                rect = rect.Union(cell.rect)
-            Next
-            motionRect = rect
-        End If
-        If motionRect.Width > dst2.Width / 2 And motionRect.Height > dst2.Height / 2 Then
-            motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-        End If
-        dst2.Rectangle(motionRect, 255, task.lineWidth, task.lineType)
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = BGSubtract_BGFG_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class Rectangle_EnclosingPoints : Inherits VB_Algorithm
     Public pointList As New List(Of cv.Point2f)

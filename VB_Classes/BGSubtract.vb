@@ -1,49 +1,15 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports System.Threading
-Public Class BGSubtract_Basics : Inherits VB_Algorithm
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 990)
-        vbAddAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
-        desc = "Detect Motion in the color image"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static correlationSlider = findSlider("Correlation Threshold")
-        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.frameCount < 10 Or task.optionsChanged Then dst3 = src.Clone
-
-        Dim updateCount As Integer
-        Parallel.ForEach(Of cv.Rect)(task.gridList,
-            Sub(roi)
-                Dim correlation As New cv.Mat
-                cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
-                If correlation.Get(Of Single)(0, 0) < CCthreshold Then
-                    Interlocked.Increment(updateCount)
-                    src(roi).CopyTo(dst3(roi))
-                End If
-            End Sub)
-        dst2 = src
-        labels(2) = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(task.gridList.Count)
-        labels(3) = CStr(task.gridList.Count - updateCount) + " segments out of " + CStr(task.gridList.Count) + " had > " +
-                         Format(correlationSlider.Value / 1000, "0.0%") + " correlation.  Artifacts will appear below if correlation threshold is too low."
-    End Sub
-End Class
-
-
-
-
-
-
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
-Public Class BGSubtract_Basics_CPP : Inherits VB_Algorithm
-    Public options As New Options_BGSubtract_CPP
+Public Class BGSubtract_Basics : Inherits VB_Algorithm
+    Public options As New Options_BGSubtract
     Public Sub New()
         labels = {"", "", "BGSubtract output - aging differences", "Mask for any changes"}
-        desc = "Demonstrate all the different background subtraction algorithms in OpenCV - some only available in C++"
+        vbAddAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
+        desc = "Different background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
         If task.optionsChanged Then cPtr = BGSubtract_BGFG_Open(options.currMethod)
 
@@ -89,7 +55,7 @@ Public Class BGSubtract_MotionDetect : Inherits VB_Algorithm
         labels(3) = "Only Motion Added"
         desc = "Detect Motion for use with background subtraction"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static correlationSlider = findSlider("Correlation Threshold")
         Static frm = findfrm(traceName + " Radio Buttons")
         Dim threadData = radioChoices(findRadioIndex(frm.check))
@@ -134,8 +100,8 @@ Public Class BGSubtract_MOG : Inherits VB_Algorithm
         MOG = cv.BackgroundSubtractorMOG.Create()
         desc = "Subtract background using a mixture of Gaussians"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOG.Apply(src, dst2, options.MOGlearnRate)
     End Sub
@@ -154,8 +120,8 @@ Public Class BGSubtract_MOG2 : Inherits VB_Algorithm
         MOG2 = cv.BackgroundSubtractorMOG2.Create()
         desc = "Subtract background using a mixture of Gaussians"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOG2.Apply(src, dst2, options.MOGlearnRate)
     End Sub
@@ -175,8 +141,8 @@ Public Class BGSubtract_GMG_KNN : Inherits VB_Algorithm
         knn = cv.BackgroundSubtractorKNN.Create()
         desc = "GMG and KNN API's to subtract background"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
         If task.frameCount < 120 Then
             setTrueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(task.frameCount))
         Else
@@ -205,8 +171,8 @@ Public Class BGSubtract_MOG_RGBDepth : Inherits VB_Algorithm
         labels = {"", "", "Unstable depth", "Unstable color (if there is motion)"}
         desc = "Isolate motion in both depth and color data using a mixture of Gaussians"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
         gray = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOGDepth.Apply(gray, gray, options.MOGlearnRate)
         dst2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -225,7 +191,7 @@ Public Class BGSubtract_MOG_Retina : Inherits VB_Algorithm
         labels = {"", "", "MOG results of depth motion", "Difference from retina depth motion."}
         desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         retina.Run(task.depthRGB)
         bgSub.Run(retina.dst3.Clone())
         dst2 = bgSub.dst2
@@ -241,7 +207,7 @@ Public Class BGSubtract_DepthOrColorMotion : Inherits VB_Algorithm
     Public Sub New()
         desc = "Detect motion with both depth and color changes"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         motion.Run(src)
         dst2 = motion.dst2
         dst3 = motion.dst3
@@ -257,17 +223,17 @@ End Class
 
 
 Public Class BGSubtract_Video : Inherits VB_Algorithm
-    Dim bgfg As New BGSubtract_Basics_CPP
+    Dim bgSub As New BGSubtract_Basics
     Dim video As New Video_Basics
     Public Sub New()
         video.srcVideo = task.homeDir + "Data/vtest.avi"
         desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         video.Run(src)
         dst3 = video.dst2
-        bgfg.Run(dst3)
-        dst2 = bgfg.dst2
+        bgSub.Run(dst3)
+        dst2 = bgSub.dst2
     End Sub
 End Class
 
@@ -285,8 +251,8 @@ Public Class BGSubtract_Synthetic_CPP : Inherits VB_Algorithm
         labels(2) = "Synthetic background/foreground image."
         desc = "Generate a synthetic input to background subtraction method"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
         If task.optionsChanged Then
             If firstPass = False Then BGSubtract_Synthetic_Close(cPtr)
 
@@ -313,16 +279,16 @@ End Class
 
 
 Public Class BGSubtract_Synthetic : Inherits VB_Algorithm
-    Dim bgfg As New BGSubtract_Basics_CPP
+    Dim bgSub As New BGSubtract_Basics
     Dim synth As New BGSubtract_Synthetic_CPP
     Public Sub New()
         desc = "Demonstrate background subtraction algorithms with synthetic images"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         synth.Run(src)
         dst3 = synth.dst2
-        bgfg.Run(dst3)
-        dst2 = bgfg.dst2
+        bgSub.Run(dst3)
+        dst2 = bgSub.dst2
     End Sub
 End Class
 
@@ -334,18 +300,19 @@ End Class
 
 Public Class BGSubtract_Reduction : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
-    Dim bgfg As New BGSubtract_Basics_CPP
+    Dim bgSub As New BGSubtract_Basics
     Public Sub New()
         desc = "Use BGSubtract with the output of a reduction"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
 
         dst2 = vbPalette(reduction.dst2.Clone)
 
-        bgfg.Run(dst2)
-        dst3 = bgfg.dst2.Clone
+        bgSub.Run(dst2)
+        dst3 = bgSub.dst2.Clone
 
         labels(3) = "Count nonzero = " + CStr(dst3.CountNonZero)
     End Sub
 End Class
+

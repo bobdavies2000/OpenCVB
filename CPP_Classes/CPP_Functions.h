@@ -2,6 +2,7 @@
 enum functions
 {
     _CPP_AddWeighted_Basics,
+_CPP_BGSubtract_Basics,
     _CPP_Stable_Basics,
     _CPP_Feature_StableSorted,
     _CPP_Plot_Histogram2D,

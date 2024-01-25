@@ -79,45 +79,6 @@ End Class
 
 
 
-Public Class Diff_Depth : Inherits VB_Algorithm
-    Dim diff As New Diff_Basics ' not used but has options...
-    Public depthFrames As Integer
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Depth varies more than X mm's", 1, 100, 50)
-        desc = "Where is the depth difference between frames greater than X centimeters."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static mmSlider = findSlider("Depth varies more than X mm's")
-        Dim millimeters As Integer = mmSlider.value
-
-        Dim depth32f As cv.Mat = 1000 * task.pcSplit(2)
-        depth32f.ConvertTo(dst0, cv.MatType.CV_32S)
-
-        Static lastDepth32s As cv.Mat = dst0.Clone
-        If task.optionsChanged Then lastDepth32s = dst0.Clone
-
-        cv.Cv2.Absdiff(dst0, lastDepth32s, dst1)
-        dst1 = dst1.ConvertScaleAbs
-        Dim mm as mmData = vbMinMax(dst1)
-
-        dst2 = dst1.Threshold(millimeters - 1, 255, cv.ThresholdTypes.Binary)
-
-        lastDepth32s = dst0.Clone
-        If heartBeat() Then
-            labels(2) = "Mask where depth difference between frames is more than " + CStr(millimeters) + " mm's"
-            Dim count = dst2.CountNonZero()
-            labels(3) = CStr(count) + " pixels (" + Format(count / task.depthMask.CountNonZero, "0%") +
-                        " of all depth pixels)" + "were different by more than " + CStr(millimeters) + " mm's"
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class Diff_RGBAccum : Inherits VB_Algorithm
     Dim diff As New Diff_Basics
@@ -197,7 +158,7 @@ End Class
 
 
 Public Class Diff_DepthAccum : Inherits VB_Algorithm
-    Dim diff As New Diff_Depth
+    Dim diff As New Diff_Depth32S
     Dim frames As New History_Basics
     Public Sub New()
         desc = "Accumulate the mask of depth differences."
@@ -207,5 +168,79 @@ Public Class Diff_DepthAccum : Inherits VB_Algorithm
         frames.Run(diff.dst2)
         dst2 = frames.dst2
         labels = diff.labels
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Diff_Depth32S : Inherits VB_Algorithm
+    Dim diff As New Diff_Basics ' not used but has options...
+    Public lastDepth32s As cv.Mat = dst0.Clone
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Depth varies more than X mm's", 1, 100, 50)
+        desc = "Where is the depth difference between frames greater than X centimeters."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static mmSlider = findSlider("Depth varies more than X mm's")
+        Dim millimeters As Integer = mmSlider.value
+
+        Dim depth32f As cv.Mat = 1000 * task.pcSplit(2)
+        depth32f.ConvertTo(dst0, cv.MatType.CV_32S)
+
+        If task.optionsChanged Then lastDepth32s = dst0.Clone
+
+        cv.Cv2.Absdiff(dst0, lastDepth32s, dst1)
+        dst1 = dst1.ConvertScaleAbs
+        Dim mm As mmData = vbMinMax(dst1)
+
+        dst2 = dst1.Threshold(millimeters - 1, 255, cv.ThresholdTypes.Binary)
+
+        lastDepth32s = dst0.Clone
+        If heartBeat() Then
+            labels(2) = "Mask where depth difference between frames is more than " + CStr(millimeters) + " mm's"
+            Dim count = dst2.CountNonZero()
+            labels(3) = CStr(count) + " pixels (" + Format(count / task.depthMask.CountNonZero, "0%") +
+                        " of all depth pixels)" + "were different by more than " + CStr(millimeters) + " mm's"
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Diff_Depth32f : Inherits VB_Algorithm
+    Dim diff As New Diff_Basics ' not used but has options...
+    Public lastDepth32f As New cv.Mat
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Depth varies more than X mm's", 1, 200, 100)
+        desc = "Where is the depth difference between frames greater than X centimeters."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static mmSlider = findSlider("Depth varies more than X mm's")
+        Dim millimeters = mmSlider.value / 1000
+
+        If task.optionsChanged Then lastDepth32f = task.pcSplit(2)
+
+        cv.Cv2.Absdiff(task.pcSplit(2), lastDepth32f, dst1)
+        Dim mm As mmData = vbMinMax(dst1)
+
+        dst2 = dst1.Threshold(millimeters, 255, cv.ThresholdTypes.Binary)
+
+        lastDepth32f = task.pcSplit(2).Clone
+        If heartBeat() Then
+            labels(2) = "Mask where depth difference between frames is more than " + CStr(mmSlider.value) + " mm's"
+            Dim count = dst2.CountNonZero()
+            labels(3) = CStr(count) + " pixels (" + Format(count / task.depthMask.CountNonZero, "0%") +
+                        " of all depth pixels) were different by more than " + CStr(millimeters) + " mm's"
+        End If
     End Sub
 End Class

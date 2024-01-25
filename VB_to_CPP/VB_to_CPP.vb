@@ -97,7 +97,6 @@ Public Class VB_to_CPP
         Dim functionName As String = ""
         Dim constructorAdds As New List(Of String)
         Dim objectNames As New List(Of String)
-        Dim startComments As Boolean
         For i = 0 To split.Count - 1
             Dim line = split(i)
             If line.Contains("#include") Or line = "" Then Continue For
@@ -176,20 +175,16 @@ Public Class VB_to_CPP
             If line.Contains("CPP_Options_") Then
                 line = line.Replace(": public algorithmCPP", "")
             End If
-            If startComments Then line = vbTab + "//" + line
 
             If line.Contains("CPP_Options_") Then
                 If line.Contains("algorithmCPP()") Then
                     line = line.Replace("traceName", "//" + vbTab + "traceName")
                     line = line.Replace(": algorithmCPP()", "")
-                    startComments = True
                 End If
             End If
-            If line.StartsWith(vbTab + "//    }") Then
-                startComments = False
-                line = line.Replace("//", "")
-            End If
-            If line.Contains("void Run()") Then startComments = True
+
+            If line.Contains("options->Run()") Then Continue For
+            If line.Contains("vbAddAdvice(") Then Continue For
             line = line.Replace("cv::", "")
             line = line.Replace("std::", "")
             CPPrtb.Text += line + vbCrLf

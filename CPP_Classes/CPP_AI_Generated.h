@@ -2510,12 +2510,12 @@ public:
         Mat* srcPtr = &src;
         if (inputMask.empty()) {
             imagePtr = RedCloud_Run(cPtr, (int *)srcPtr->data, 0, src.rows, src.cols, src.type(), 
-                                     task->desiredCells, 0);
+                                     task->desiredCells, 0, 0.98, 0.0001);
         }
         else {
             Mat* maskPtr = &inputMask;
             imagePtr = RedCloud_Run(cPtr, (int *)srcPtr->data, (uchar *)maskPtr->data, src.rows, src.cols,
-                                     src.type(), task->desiredCells, 0);
+                                     src.type(), task->desiredCells, 0, 0.98, 0.0001);
         }
         int classCount = RedCloud_Count(cPtr);
 
@@ -3244,4 +3244,33 @@ public:
 
 
 
+
+class CPP_BGSubtract_Basics : public algorithmCPP {
+public:
+    CPP_Options_BGSubtract* options = new CPP_Options_BGSubtract;
+    BGSubtract_BGFG* cPtr = nullptr;
+    vector<string> labels = { "", "", "BGSubtract output - aging differences", "Mask for any changes" };
+    CPP_BGSubtract_Basics() : algorithmCPP() {
+        traceName = "CPP_BGSubtract_Basics";
+        desc = "Different background subtraction algorithms in OpenCV - some only available in C++";
+    }
+    void Run(Mat src) {
+        if (task->optionsChanged) {
+            Close();
+            cPtr = BGSubtract_BGFG_Open(options->currMethod);
+        }
+        void* imagePtr = BGSubtract_BGFG_Run(cPtr, (int*)src.data, src.rows, src.cols, src.channels());
+        if (imagePtr) {
+            dst2 = Mat(src.rows, src.cols, CV_8UC1, imagePtr).clone();
+            threshold(dst2, dst3, 0, 255, THRESH_BINARY);
+        }
+        labels[2] = options->methodDesc;
+    }
+    void Close() {
+        if (cPtr) {
+            BGSubtract_BGFG_Close(cPtr);
+            cPtr = nullptr;
+        }
+    }
+};
 

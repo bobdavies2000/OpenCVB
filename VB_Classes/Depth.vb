@@ -491,17 +491,17 @@ End Class
 
 
 Public Class Depth_NotMissing : Inherits VB_Algorithm
-    Public mog As New BGSubtract_Basics_CPP
+    Public bgSub As New BGSubtract_Basics
     Public Sub New()
         labels(3) = "Stable (non-zero) Depth"
         desc = "Collect X frames, compute stable depth using the BGR and Depth image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then src = task.depthRGB
-        mog.Run(src)
-        dst2 = mog.dst2
-        dst3 = Not mog.dst2
-        labels(2) = "Unstable Depth" + " using " + mog.options.radio.check(mog.options.currMethod).Text + " method"
+        bgSub.Run(src)
+        dst2 = bgSub.dst2
+        dst3 = Not bgSub.dst2
+        labels(2) = "Unstable Depth" + " using " + bgSub.options.radio.check(bgSub.options.currMethod).Text + " method"
         dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class
@@ -887,7 +887,7 @@ End Class
 
 
 Public Class Depth_BGSubtract : Inherits VB_Algorithm
-    Dim bgSub As New BGSubtract_Basics_CPP
+    Dim bgSub As New BGSubtract_Basics
     Public Sub New()
         labels = {"", "", "Latest task.noDepthMask", "BGSubtract output for the task.noDepthMask"}
         desc = "Create a mask for the missing depth across multiple frame"

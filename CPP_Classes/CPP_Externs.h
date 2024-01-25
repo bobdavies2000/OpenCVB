@@ -35,6 +35,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case _CPP_AddWeighted_Basics :
     {task->alg = new CPP_AddWeighted_Basics(); break; }
+	case _CPP_BGSubtract_Basics :
+	{task->alg = new CPP_BGSubtract_Basics(); break; }
 	case _CPP_Feature_StableSorted :
 	{task->alg = new CPP_Feature_StableSorted(); break; }
     case _CPP_Plot_Histogram2D:

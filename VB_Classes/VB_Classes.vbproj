@@ -120,6 +120,7 @@
     <Compile Include="BGRPattern.vb" />
     <Compile Include="Cell.vb" />
     <Compile Include="Complexity.vb" />
+    <Compile Include="MotionRect.vb" />
     <Compile Include="VB_Externs.vb" />
     <Compile Include="CPPExtract.vb" />
     <Compile Include="Foreground.vb" />
@@ -199,7 +200,6 @@
     <Compile Include="LongLine.vb" />
     <Compile Include="Match.vb" />
     <Compile Include="MatchShapes.vb" />
-    <Compile Include="MFI.vb" />
     <Compile Include="MiniCloud.vb" />
     <Compile Include="Pendulum.vb" />
     <Compile Include="Stable.vb" />

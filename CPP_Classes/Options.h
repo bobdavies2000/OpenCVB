@@ -108,8 +108,13 @@ public:
 	void RunVB() {}
 };
 
+
+
+
 class CPP_Options_BGSubtract {
 public:
+	String methodDesc = "MOG2";
+	int currMethod = 4;
 	float MOGlearnRate = 1 / 1000;
 	CPP_Options_BGSubtract() {
 	}
