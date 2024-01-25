@@ -4252,7 +4252,7 @@ Public Class Options_BGSubtract : Inherits VB_Algorithm
         If firstPass Then
             firstPass = False
             frm.Left = gOptions.Width / 2
-            frm.top = gOptions.Height / 2
+            frm.top = gOptions.Height / 2 + 25
         End If
 
         For i = 0 To frm.check.Count - 1

@@ -61,6 +61,7 @@ Public Class VBtask : Implements IDisposable
     Public IMUBasics As IMU_Basics
     Public hCloud As History_Cloud
     Public maxMask As Depth_MaxMask
+    Public motion As MotionRect_PointCloud
     Public rgbFilter As Object
 
     Public noDepthMask As New cv.Mat
@@ -361,6 +362,7 @@ Public Class VBtask : Implements IDisposable
         gMat = New IMU_GMatrix
         hCloud = New History_Cloud
         maxMask = New Depth_MaxMask
+        motion = New MotionRect_PointCloud
 
         updateSettings()
         redOptions.Show()
@@ -481,42 +483,51 @@ Public Class VBtask : Implements IDisposable
 
                     task.frameHistoryCount = gOptions.FrameHistory.Value
 
-                    If gOptions.UseHistoryCloud.Checked Then
-                        hCloud.Run(task.pointCloud)
-                        task.pointCloud = hCloud.dst2
-                    ElseIf gOptions.MotionFilteredCloud.Checked Then
-
-                    End If
                     If gOptions.gravityPointCloud.Checked Then
                         '******* this is the rotation *******
                         task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).ToMat.Reshape(3, src.Rows)
                     End If
 
-                    task.pcSplit = task.pointCloud.Split
-
-                    Dim maxD = gOptions.MaxDepth.Value - 0.1 ' why -0.1?  Because histograms are inclusive at boundaries.
-                    task.maxDepthMask = task.pcSplit(2).Threshold(maxD, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-                    maxMask.Run(task.maxDepthMask) ' fill in the holes of the maxdepthmask
-                    task.maxDepthMask = maxMask.dst2 ' Use the contour of the mask
-
-                    If gOptions.unFilteredCloud.Checked = False Then
-                        task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
-                        'task.pcSplit(2).SetTo(maxD, task.maxDepthMask)
+                    If gOptions.UseHistoryCloud.Checked Then
+                        hCloud.Run(task.pointCloud)
+                        task.pointCloud = hCloud.dst2
+                    ElseIf gOptions.MotionFilteredCloud.Checked Then
+                        motion.Run(src)
+                        task.pointCloud = motion.dst2.Clone
                     End If
 
-                    task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-                    task.noDepthMask = Not task.depthMask
+                    If motion.rect.Width <> 0 Or task.pcSplit Is Nothing Then
+                        task.pcSplit = task.pointCloud.Split
 
-                    If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
-                        Dim xRatio = task.xRangeDefault / task.xRange
-                        Dim yRatio = task.yRangeDefault / task.yRange
-                        task.pcSplit(0) *= xRatio
-                        task.pcSplit(1) *= yRatio
+                        'Dim maxD = gOptions.MaxDepth.Value - 0.1 ' why -0.1?  Because histograms are inclusive at boundaries.
+                        'task.maxDepthMask = task.pcSplit(2).Threshold(maxD, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+                        'maxMask.Run(task.maxDepthMask) ' fill in the holes of the maxdepthmask
+                        'task.maxDepthMask = maxMask.dst2 ' Use the contour of the mask
+
+                        'If gOptions.unFilteredCloud.Checked = False Then
+                        '    task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
+                        '    'task.pcSplit(2).SetTo(maxD, task.maxDepthMask)
+                        'End If
+
+                        task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+                        task.noDepthMask = Not task.depthMask
+
+                        If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
+                            Dim xRatio = task.xRangeDefault / task.xRange
+                            Dim yRatio = task.yRangeDefault / task.yRange
+                            task.pcSplit(0) *= xRatio
+                            task.pcSplit(1) *= yRatio
+                        End If
+
+                        cv.Cv2.Merge(task.pcSplit, task.pointCloud)
                     End If
-
-                    cv.Cv2.Merge(task.pcSplit, task.pointCloud)
 
                     depthBasics.Run(src) ' colorize the depth 
+
+                    If gOptions.DebugCheckBox.Checked Then
+                        motion.motion.showDiff = True
+                        cv.Cv2.ImShow("motion.dst2", motion.motion.dst2)
+                    End If
                 End If
 
                 TaskTimer.Enabled = True

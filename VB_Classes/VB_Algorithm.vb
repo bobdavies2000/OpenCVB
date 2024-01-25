@@ -294,7 +294,6 @@ Public Class VB_Algorithm : Implements IDisposable
     End Sub
     Public Sub NextFrame(src As cv.Mat)
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
-        task.pcSplit(2).SetTo(task.maxZmeters, task.maxDepthMask)
         algorithm.Run(src)
 
         task.labels = labels

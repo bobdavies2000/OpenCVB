@@ -17,6 +17,8 @@ Public Class MotionRect_Basics : Inherits VB_Algorithm
         bgSub.Run(src)
         If standalone Or showIntermediate() Or showDiff Then dst2 = bgSub.dst2
 
+        If task.pcSplit Is Nothing Then Exit Sub
+
         redCPP.Run(bgSub.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary))
         If redCPP.sortedCells.Count < 3 Then Exit Sub
 
@@ -610,7 +612,8 @@ End Class
 
 Public Class MotionRect_PointCloud : Inherits VB_Algorithm
     Public motion As New MotionRect_Basics
-    Public rect As cv.Rect
+    Public rect As cv.Rect = New cv.Rect(0, 0, task.workingRes.Width, task.workingRes.Height)
+    Public diff As New Diff_Depth32f
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         If standalone Then motion.showDiff = True
@@ -618,7 +621,11 @@ Public Class MotionRect_PointCloud : Inherits VB_Algorithm
         desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then dst2 = task.pointCloud.Clone
+        If heartBeat() Then
+            motion.rect = New cv.Rect
+            rect = New cv.Rect
+            dst2 = task.pointCloud.Clone
+        End If
 
         motion.Run(src)
         dst1 = motion.dst2
@@ -630,12 +637,11 @@ Public Class MotionRect_PointCloud : Inherits VB_Algorithm
         task.pointCloud(rect).CopyTo(dst2(rect))
 
         If standalone Or showIntermediate() Then
-            Static diff As New Diff_Depth32f
             If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
             diff.Run(task.pcSplit(2))
             dst3 = diff.dst2
-            diff.lastDepth32f = task.pcSplit(2)
             dst3.Rectangle(rect, 255, task.lineWidth)
+            diff.lastDepth32f = task.pcSplit(2)
         End If
     End Sub
 End Class
