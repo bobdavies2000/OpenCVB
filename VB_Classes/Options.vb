@@ -4242,7 +4242,7 @@ Public Class Options_BGSubtract : Inherits VB_Algorithm
             radio.addRadio("MOG2")
             radio.addRadio("GSOC")
             radio.addRadio("LSBP")
-            radio.check(4).Checked = True ' mog2 appears to be the best...
+            radio.check(3).Checked = True ' mog2 appears to be the best...
         End If
         If sliders.Setup(traceName) Then sliders.setupTrackBar("MOG Learn Rate X1000", 1, 1000, 1)
     End Sub

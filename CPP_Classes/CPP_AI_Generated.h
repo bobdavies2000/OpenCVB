@@ -2510,12 +2510,12 @@ public:
         Mat* srcPtr = &src;
         if (inputMask.empty()) {
             imagePtr = RedCloud_Run(cPtr, (int *)srcPtr->data, 0, src.rows, src.cols, src.type(), 
-                                     task->desiredCells, 0, 0.98, 0.0001);
+                                     task->desiredCells, 0, 0.98f, 0.0001f);
         }
         else {
             Mat* maskPtr = &inputMask;
             imagePtr = RedCloud_Run(cPtr, (int *)srcPtr->data, (uchar *)maskPtr->data, src.rows, src.cols,
-                                     src.type(), task->desiredCells, 0, 0.98, 0.0001);
+                                     src.type(), task->desiredCells, 0, 0.98f, 0.0001f);
         }
         int classCount = RedCloud_Count(cPtr);
 

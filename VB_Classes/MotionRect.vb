@@ -4,7 +4,6 @@ Imports System.Threading
 Public Class MotionRect_Basics : Inherits VB_Algorithm
     Dim bgSub As New BGSubtract_Basics
     Dim redCPP As New RedCloud_CPP
-    Public rect As cv.Rect
     Public showDiff As Boolean
     Public Sub New()
         redOptions.UseColor.Checked = True
@@ -22,13 +21,25 @@ Public Class MotionRect_Basics : Inherits VB_Algorithm
         redCPP.Run(bgSub.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary))
         If redCPP.sortedCells.Count < 3 Then Exit Sub
 
-        rect = redCPP.sortedCells.ElementAt(2).Value.rect
+        Dim nextRect = redCPP.sortedCells.ElementAt(2).Value.rect
         For Each key In redCPP.sortedCells
             Dim rc = key.Value
             If rc.index = 1 Then Continue For
-            rect = rect.Union(rc.rect)
+            nextRect = nextRect.Union(rc.rect)
         Next
-        If standalone Or showIntermediate() Or showDiff Then dst2.Rectangle(rect, 255, task.lineWidth)
+
+        Static rectList As New List(Of cv.Rect)
+        rectList.Add(nextRect)
+        task.motionRect = New cv.Rect
+        For Each r In rectList
+            task.motionRect = task.motionRect.Union(r)
+        Next
+        If rectList.Count > gOptions.FrameHistory.Value Then rectList.RemoveAt(0)
+        If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
+            task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+        End If
+
+        If standalone Or showIntermediate() Or showDiff Then dst2.Rectangle(task.motionRect, 255, task.lineWidth)
 
         labels(2) = CStr(redCPP.sortedCells.Count) + " cells were found with " + CStr(redCPP.classCount) + " flood points"
     End Sub
@@ -587,10 +598,9 @@ Public Class MotionRect_Depth : Inherits VB_Algorithm
 
         motion.Run(src)
         dst1 = motion.dst2
-        If heartBeat() Or motion.rect.Width > dst2.Width / 2 And motion.rect.Height > dst2.Height / 2 Then rect = motion.rect
 
-        If motion.rect.Width = 0 And motion.rect.Height = 0 Then Exit Sub
-        rect = rect.Union(motion.rect)
+        If task.motionRect.Width = 0 And task.motionRect.Height = 0 Then Exit Sub
+        rect = rect.Union(task.motionRect)
 
         task.pcSplit(2)(rect).CopyTo(dst2(rect))
 
@@ -612,7 +622,6 @@ End Class
 
 Public Class MotionRect_PointCloud : Inherits VB_Algorithm
     Public motion As New MotionRect_Basics
-    Public rect As cv.Rect = New cv.Rect(0, 0, task.workingRes.Width, task.workingRes.Height)
     Public diff As New Diff_Depth32f
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
@@ -622,25 +631,21 @@ Public Class MotionRect_PointCloud : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If heartBeat() Then
-            motion.rect = New cv.Rect
-            rect = New cv.Rect
+            task.motionRect = New cv.Rect
             dst2 = task.pointCloud.Clone
         End If
 
         motion.Run(src)
         dst1 = motion.dst2
-        If heartBeat() Or motion.rect.Width > dst2.Width / 2 And motion.rect.Height > dst2.Height / 2 Then rect = motion.rect
 
-        If motion.rect.Width = 0 And motion.rect.Height = 0 Then Exit Sub
-        rect = rect.Union(motion.rect)
-
-        task.pointCloud(rect).CopyTo(dst2(rect))
+        If task.motionRect.Width = 0 And task.motionRect.Height = 0 Then Exit Sub
+        task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
 
         If standalone Or showIntermediate() Then
             If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
             diff.Run(task.pcSplit(2))
             dst3 = diff.dst2
-            dst3.Rectangle(rect, 255, task.lineWidth)
+            dst3.Rectangle(task.motionRect, 255, task.lineWidth)
             diff.lastDepth32f = task.pcSplit(2)
         End If
     End Sub

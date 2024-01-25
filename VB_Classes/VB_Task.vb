@@ -50,7 +50,6 @@ Public Class VBtask : Implements IDisposable
     Public disparityAdjustment As Single ' adjusts for resolution and some hidden elements.
 
     Public motionRect As cv.Rect
-    Public motionMask As cv.Mat
     Public motionFlag As Boolean ' any motion
     Public motionReset As Boolean ' thresholds triggered.
 
@@ -496,7 +495,7 @@ Public Class VBtask : Implements IDisposable
                         task.pointCloud = motion.dst2.Clone
                     End If
 
-                    If motion.rect.Width <> 0 Or task.pcSplit Is Nothing Then
+                    If task.motionRect.Width <> 0 Or task.pcSplit Is Nothing Then
                         task.pcSplit = task.pointCloud.Split
 
                         'Dim maxD = gOptions.MaxDepth.Value - 0.1 ' why -0.1?  Because histograms are inclusive at boundaries.
