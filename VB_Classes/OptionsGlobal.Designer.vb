@@ -50,12 +50,10 @@ Partial Class OptionsGlobal
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.useHistoryCloud = New System.Windows.Forms.CheckBox()
         Me.ShowGrid = New System.Windows.Forms.CheckBox()
         Me.SyncOutput = New System.Windows.Forms.CheckBox()
         Me.UseMultiThreading = New System.Windows.Forms.CheckBox()
         Me.ShowAllOptions = New System.Windows.Forms.CheckBox()
-        Me.useMotion = New System.Windows.Forms.CheckBox()
         Me.OpenGLCapture = New System.Windows.Forms.CheckBox()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.CreateGif = New System.Windows.Forms.CheckBox()
@@ -77,6 +75,10 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.unFilteredCloud = New System.Windows.Forms.RadioButton()
+        Me.MotionFilteredCloud = New System.Windows.Forms.RadioButton()
+        Me.UseHistoryCloud = New System.Windows.Forms.RadioButton()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.minPixelsSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -90,6 +92,7 @@ Partial Class OptionsGlobal
         Me.GeometrySettings.SuspendLayout()
         CType(Me.dotSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.LineWidth, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
         'MinMaxDepth
@@ -371,12 +374,11 @@ Partial Class OptionsGlobal
         '
         'GroupBox2
         '
-        Me.GroupBox2.Controls.Add(Me.useHistoryCloud)
+        Me.GroupBox2.Controls.Add(Me.GroupBox1)
         Me.GroupBox2.Controls.Add(Me.ShowGrid)
         Me.GroupBox2.Controls.Add(Me.SyncOutput)
         Me.GroupBox2.Controls.Add(Me.UseMultiThreading)
         Me.GroupBox2.Controls.Add(Me.ShowAllOptions)
-        Me.GroupBox2.Controls.Add(Me.useMotion)
         Me.GroupBox2.Controls.Add(Me.OpenGLCapture)
         Me.GroupBox2.Controls.Add(Me.Label2)
         Me.GroupBox2.Controls.Add(Me.CreateGif)
@@ -398,16 +400,6 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
         '
-        'useHistoryCloud
-        '
-        Me.useHistoryCloud.AutoSize = True
-        Me.useHistoryCloud.Location = New System.Drawing.Point(24, 235)
-        Me.useHistoryCloud.Name = "useHistoryCloud"
-        Me.useHistoryCloud.Size = New System.Drawing.Size(388, 24)
-        Me.useHistoryCloud.TabIndex = 68
-        Me.useHistoryCloud.Text = "Use history point cloud (unchecked use raw cloud)"
-        Me.useHistoryCloud.UseVisualStyleBackColor = True
-        '
         'ShowGrid
         '
         Me.ShowGrid.AutoSize = True
@@ -421,7 +413,7 @@ Partial Class OptionsGlobal
         'SyncOutput
         '
         Me.SyncOutput.AutoSize = True
-        Me.SyncOutput.Location = New System.Drawing.Point(24, 176)
+        Me.SyncOutput.Location = New System.Drawing.Point(24, 148)
         Me.SyncOutput.Name = "SyncOutput"
         Me.SyncOutput.Size = New System.Drawing.Size(259, 24)
         Me.SyncOutput.TabIndex = 66
@@ -431,7 +423,7 @@ Partial Class OptionsGlobal
         'UseMultiThreading
         '
         Me.UseMultiThreading.AutoSize = True
-        Me.UseMultiThreading.Location = New System.Drawing.Point(544, 215)
+        Me.UseMultiThreading.Location = New System.Drawing.Point(544, 371)
         Me.UseMultiThreading.Name = "UseMultiThreading"
         Me.UseMultiThreading.Size = New System.Drawing.Size(253, 24)
         Me.UseMultiThreading.TabIndex = 65
@@ -449,21 +441,10 @@ Partial Class OptionsGlobal
         Me.ShowAllOptions.Text = "Show All Options on Open"
         Me.ShowAllOptions.UseVisualStyleBackColor = True
         '
-        'useMotion
-        '
-        Me.useMotion.AutoSize = True
-        Me.useMotion.Location = New System.Drawing.Point(544, 151)
-        Me.useMotion.Name = "useMotion"
-        Me.useMotion.Size = New System.Drawing.Size(374, 24)
-        Me.useMotion.TabIndex = 63
-        Me.useMotion.Text = "Use Motion-Filtered Images (MFI) for all images."
-        Me.useMotion.UseVisualStyleBackColor = True
-        Me.useMotion.Visible = False
-        '
         'OpenGLCapture
         '
         Me.OpenGLCapture.AutoSize = True
-        Me.OpenGLCapture.Location = New System.Drawing.Point(544, 245)
+        Me.OpenGLCapture.Location = New System.Drawing.Point(544, 401)
         Me.OpenGLCapture.Name = "OpenGLCapture"
         Me.OpenGLCapture.Size = New System.Drawing.Size(211, 24)
         Me.OpenGLCapture.TabIndex = 58
@@ -484,7 +465,7 @@ Partial Class OptionsGlobal
         'CreateGif
         '
         Me.CreateGif.AutoSize = True
-        Me.CreateGif.Location = New System.Drawing.Point(24, 205)
+        Me.CreateGif.Location = New System.Drawing.Point(24, 178)
         Me.CreateGif.Name = "CreateGif"
         Me.CreateGif.Size = New System.Drawing.Size(256, 24)
         Me.CreateGif.TabIndex = 24
@@ -502,7 +483,7 @@ Partial Class OptionsGlobal
         'gravityPointCloud
         '
         Me.gravityPointCloud.AutoSize = True
-        Me.gravityPointCloud.Location = New System.Drawing.Point(24, 147)
+        Me.gravityPointCloud.Location = New System.Drawing.Point(24, 235)
         Me.gravityPointCloud.Name = "gravityPointCloud"
         Me.gravityPointCloud.Size = New System.Drawing.Size(294, 24)
         Me.gravityPointCloud.TabIndex = 23
@@ -521,15 +502,15 @@ Partial Class OptionsGlobal
         'RGBFilterList
         '
         Me.RGBFilterList.FormattingEnabled = True
-        Me.RGBFilterList.Location = New System.Drawing.Point(544, 52)
+        Me.RGBFilterList.Location = New System.Drawing.Point(528, 52)
         Me.RGBFilterList.Name = "RGBFilterList"
-        Me.RGBFilterList.Size = New System.Drawing.Size(272, 28)
+        Me.RGBFilterList.Size = New System.Drawing.Size(288, 28)
         Me.RGBFilterList.TabIndex = 19
         '
         'useFilter
         '
         Me.useFilter.AutoSize = True
-        Me.useFilter.Location = New System.Drawing.Point(382, 55)
+        Me.useFilter.Location = New System.Drawing.Point(366, 54)
         Me.useFilter.Name = "useFilter"
         Me.useFilter.Size = New System.Drawing.Size(138, 24)
         Me.useFilter.TabIndex = 16
@@ -647,7 +628,7 @@ Partial Class OptionsGlobal
         'UseKalman
         '
         Me.UseKalman.AutoSize = True
-        Me.UseKalman.Location = New System.Drawing.Point(24, 265)
+        Me.UseKalman.Location = New System.Drawing.Point(24, 205)
         Me.UseKalman.Name = "UseKalman"
         Me.UseKalman.Size = New System.Drawing.Size(176, 24)
         Me.UseKalman.TabIndex = 0
@@ -664,6 +645,51 @@ Partial Class OptionsGlobal
         Me.Label8.Text = "All values are restored to their default values at the start of each algorithm.  " &
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.UseHistoryCloud)
+        Me.GroupBox1.Controls.Add(Me.MotionFilteredCloud)
+        Me.GroupBox1.Controls.Add(Me.unFilteredCloud)
+        Me.GroupBox1.Location = New System.Drawing.Point(528, 106)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(304, 139)
+        Me.GroupBox1.TabIndex = 69
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "PointCloud Input"
+        '
+        'unFilteredCloud
+        '
+        Me.unFilteredCloud.AutoSize = True
+        Me.unFilteredCloud.Location = New System.Drawing.Point(21, 23)
+        Me.unFilteredCloud.Name = "unFilteredCloud"
+        Me.unFilteredCloud.Size = New System.Drawing.Size(142, 24)
+        Me.unFilteredCloud.TabIndex = 0
+        Me.unFilteredCloud.TabStop = True
+        Me.unFilteredCloud.Text = "Unfiltered (raw)"
+        Me.unFilteredCloud.UseVisualStyleBackColor = True
+        '
+        'MotionFilteredCloud
+        '
+        Me.MotionFilteredCloud.AutoSize = True
+        Me.MotionFilteredCloud.Location = New System.Drawing.Point(21, 53)
+        Me.MotionFilteredCloud.Name = "MotionFilteredCloud"
+        Me.MotionFilteredCloud.Size = New System.Drawing.Size(220, 24)
+        Me.MotionFilteredCloud.TabIndex = 1
+        Me.MotionFilteredCloud.TabStop = True
+        Me.MotionFilteredCloud.Text = "Motion Filtered PointCloud"
+        Me.MotionFilteredCloud.UseVisualStyleBackColor = True
+        '
+        'UseHistoryCloud
+        '
+        Me.UseHistoryCloud.AutoSize = True
+        Me.UseHistoryCloud.Location = New System.Drawing.Point(21, 83)
+        Me.UseHistoryCloud.Name = "UseHistoryCloud"
+        Me.UseHistoryCloud.Size = New System.Drawing.Size(244, 24)
+        Me.UseHistoryCloud.TabIndex = 2
+        Me.UseHistoryCloud.TabStop = True
+        Me.UseHistoryCloud.Text = "History PointCloud (averaged)"
+        Me.UseHistoryCloud.UseVisualStyleBackColor = True
         '
         'OptionsGlobal
         '
@@ -692,6 +718,8 @@ Partial Class OptionsGlobal
         Me.GeometrySettings.PerformLayout()
         CType(Me.dotSizeSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.LineWidth, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -740,7 +768,6 @@ Partial Class OptionsGlobal
     Friend WithEvents Palettes As Windows.Forms.ComboBox
     Friend WithEvents DebugCheckBox As Windows.Forms.CheckBox
     Friend WithEvents OpenGLCapture As Windows.Forms.CheckBox
-    Friend WithEvents useMotion As Windows.Forms.CheckBox
     Friend WithEvents ShowAllOptions As Windows.Forms.CheckBox
     Friend WithEvents UseMultiThreading As Windows.Forms.CheckBox
     Friend WithEvents TempSliderLabel As Windows.Forms.Label
@@ -751,5 +778,8 @@ Partial Class OptionsGlobal
     Friend WithEvents minPixelsSlider As Windows.Forms.TrackBar
     Friend WithEvents Label13 As Windows.Forms.Label
     Friend WithEvents ShowGrid As Windows.Forms.CheckBox
-    Friend WithEvents useHistoryCloud As Windows.Forms.CheckBox
+    Friend WithEvents GroupBox1 As Windows.Forms.GroupBox
+    Friend WithEvents UseHistoryCloud As Windows.Forms.RadioButton
+    Friend WithEvents MotionFilteredCloud As Windows.Forms.RadioButton
+    Friend WithEvents unFilteredCloud As Windows.Forms.RadioButton
 End Class

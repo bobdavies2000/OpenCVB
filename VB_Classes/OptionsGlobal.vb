@@ -19,7 +19,7 @@ Public Class OptionsGlobal
         End If
         AddWeightedSlider.Value = 50
         FrameHistory.Value = 3
-        useHistoryCloud.Checked = True
+        MotionFilteredCloud.Checked = True
         gravityPointCloud.Checked = True
 
         maxCount.Text = CStr(MaxDepth.Value)
@@ -67,8 +67,7 @@ Public Class OptionsGlobal
                 task.minRes = New cv.Size(240, 135)
                 task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 40
-                gravityPointCloud.Checked = False ' too expensive at this resolution
-                useHistoryCloud.Checked = False ' too expensive at this resolution
+                'gravityPointCloud.Checked = False ' too expensive at this resolution
             Case 960
                 GridSize.Value = 96
                 task.cvFontSize = 2.0
@@ -95,7 +94,6 @@ Public Class OptionsGlobal
                 task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 150
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
-                'useHistoryCloud.Checked = False ' too expensive at this resolution
             Case 640
                 GridSize.Value = 64
                 task.cvFontSize = 1.5
@@ -246,7 +244,7 @@ Public Class OptionsGlobal
     Private Sub OpenGLCapture_Click(sender As Object, e As EventArgs) Handles OpenGLCapture.Click
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
-    Private Sub useMotion_CheckedChanged(sender As Object, e As EventArgs) Handles useMotion.CheckedChanged
+    Private Sub useMotion_CheckedChanged(sender As Object, e As EventArgs)
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
     Private Sub ShowAllByDefault_CheckedChanged(sender As Object, e As EventArgs) Handles ShowAllOptions.CheckedChanged
@@ -266,7 +264,7 @@ Public Class OptionsGlobal
         If task IsNot Nothing Then task.optionsChanged = True
         MinPixels.Text = CStr(minPixelsSlider.Value)
     End Sub
-    Private Sub useCloudHistory_CheckedChanged(sender As Object, e As EventArgs) Handles useHistoryCloud.CheckedChanged
+    Private Sub useCloudHistory_CheckedChanged(sender As Object, e As EventArgs)
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
 End Class

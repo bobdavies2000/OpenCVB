@@ -49,21 +49,20 @@ Public Class VBtask : Implements IDisposable
     Public resolutionRatio As Single ' mousepoints/drawrects need the ratio of the display to the working resolution.
     Public disparityAdjustment As Single ' adjusts for resolution and some hidden elements.
 
-    ' add any global algorithms here
     Public motionRect As cv.Rect
     Public motionMask As cv.Mat
     Public motionFlag As Boolean ' any motion
     Public motionReset As Boolean ' thresholds triggered.
 
+    ' add any global algorithms here
     Public PixelViewer As Pixel_Viewer
     Public depthBasics As Depth_Basics
+    Public gMat As IMU_GMatrix
+    Public IMUBasics As IMU_Basics
     Public rgbFilter As Object
 
     Public noDepthMask As New cv.Mat
     Public depthMask As New cv.Mat
-
-    Public depthContours As New cv.Mat
-    Public depthOutline As New cv.Mat
 
     Public maxDepthMask As New cv.Mat
     Public depthRGB As New cv.Mat
@@ -356,6 +355,9 @@ Public Class VBtask : Implements IDisposable
         PixelViewer = New Pixel_Viewer
 
         depthBasics = New Depth_Basics
+        IMUBasics = New IMU_Basics
+        gMat = New IMU_GMatrix
+
         updateSettings()
         redOptions.Show()
         gOptions.Show()
@@ -468,7 +470,12 @@ Public Class VBtask : Implements IDisposable
                 End If
 
                 updateSettings()
-                If task.paused = False Then depthBasics.Run(src)
+                If task.paused = False Then
+                    IMUBasics.Run(src)
+                    gMat.Run(src)
+                    task.gMatrix = gMat.gMatrix
+                    depthBasics.Run(src)
+                End If
 
                 TaskTimer.Enabled = True
                 task.highlightColor = highlightColors(0) ' task.frameCount Mod highlightColors.Count)

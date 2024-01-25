@@ -377,6 +377,7 @@ if algorithmName = "Density_Phase" Then return new Density_Phase
 if algorithmName = "Depth_Averaging" Then return new Depth_Averaging
 if algorithmName = "Depth_AveragingStable" Then return new Depth_AveragingStable
 if algorithmName = "Depth_Basics" Then return new Depth_Basics
+if algorithmName = "Depth_BasicsMotion" Then return new Depth_BasicsMotion
 if algorithmName = "Depth_BGSubtract" Then return new Depth_BGSubtract
 if algorithmName = "Depth_Colorizer_CPP" Then return new Depth_Colorizer_CPP
 if algorithmName = "Depth_Colorizer_VB" Then return new Depth_Colorizer_VB

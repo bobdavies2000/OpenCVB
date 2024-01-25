@@ -173,7 +173,7 @@ Public Class GuidedBP_kTop : Inherits VB_Algorithm
     Dim hist2d As New Histogram2D_Top
     Public Sub New()
         redOptions.UseColor.Checked = True
-        gOptions.useHistoryCloud.Checked = False
+        gOptions.unFilteredCloud.Checked = True
         labels(3) = "Back projection of the top view"
         desc = "Subdivide the OpAuto_XRange output using RedCloud_Basics"
     End Sub
@@ -217,7 +217,7 @@ Public Class GuidedBP_kSide : Inherits VB_Algorithm
     Dim contours As New Contour_Largest
     Public Sub New()
         redOptions.UseColor.Checked = True
-        gOptions.useHistoryCloud.Checked = False
+        gOptions.unFilteredCloud.Checked = True
         labels(3) = "Back projection of the top view"
         desc = "Subdivide the GuidedBP_HistogramSide output using RedCloud_Basics"
     End Sub
@@ -522,7 +522,6 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
 
         cv.Cv2.CalcBackProject({src}, redOptions.channels, hist.histogram, dst2, redOptions.ranges)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        ' dst2.SetTo(254, task.depthOutline)
         If standalone Or showIntermediate() Then
             labels(3) = "Note that colors are shifting because this is before RedCloud matching."
             dst2 += 1

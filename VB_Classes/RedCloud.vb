@@ -1451,11 +1451,11 @@ Public Class RedCloud_OutlineColor : Inherits VB_Algorithm
         desc = "Use the depth outline as input to RedCloud_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        outline.Run(src)
+        outline.Run(task.depthMask)
 
         colorClass.Run(src)
         dst1 = colorClass.dst2 + 1
-        dst1.SetTo(0, task.depthOutline)
+        dst1.SetTo(0, outline.dst2)
         dst3 = vbPalette(dst1 * 255 / colorClass.classCount)
 
         redC.Run(dst1)
@@ -1470,14 +1470,17 @@ End Class
 
 
 Public Class RedCloud_ColorInDepth : Inherits VB_Algorithm
+    Dim outline As New Depth_Outline
     Dim redC As New RedCloud_Basics
     Public Sub New()
         redOptions.UseColor.Checked = True
         desc = "Create RedCloud output using only color"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        outline.Run(task.depthMask)
+
         dst0 = src
-        dst0.SetTo(0, task.depthOutline)
+        dst0.SetTo(0, outline.dst2)
         redC.Run(dst0)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
@@ -1490,15 +1493,18 @@ End Class
 
 
 Public Class RedCloud_DepthOutline : Inherits VB_Algorithm
+    Dim outline As New Depth_Outline
     Dim redC As New RedCloud_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         redOptions.UseColor.Checked = True
-        desc = "Use the task.depthOutline over time to isolate high quality cells"
+        desc = "Use the Depth_Outline output over time to isolate high quality cells"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        outline.Run(task.depthMask)
+
         If heartBeat() Then dst3.SetTo(0)
-        dst3 = dst3 Or task.depthOutline
+        dst3 = dst3 Or outline.dst2
 
         dst1.SetTo(0)
         src.CopyTo(dst1, Not dst3)

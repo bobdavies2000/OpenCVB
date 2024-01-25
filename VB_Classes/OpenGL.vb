@@ -19,7 +19,6 @@ Public Class OpenGL_Basics : Inherits VB_Algorithm
         task.OpenGLTitle = "OpenGL_Functions"
         vbAddAdvice(traceName + ": 'Show All' to see all the OpenGL options.")
         pointCloudInput = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        gOptions.useHistoryCloud.Checked = True
         desc = "Create an OpenGL window and update it with images"
     End Sub
     Private Function memMapFill() As Double()
