@@ -12,7 +12,7 @@ Public Class VB_to_CPP
         Dim lastGroup As String = ""
         For i = 1 To algList.Count - 1
             Dim line = algList(i)
-            If line.StartsWith("CPP_") Or line.EndsWith("_CPP") Then Continue For
+            If line.StartsWith("CPP_") Then Continue For
             If line.EndsWith(".py") Then Continue For
             Dim tokens = line.Split("_")
             If line.StartsWith(lastGroup) = False Then vbList.Items.Add("")

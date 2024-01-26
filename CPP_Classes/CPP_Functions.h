@@ -2,6 +2,7 @@
 enum functions
 {
     _CPP_AddWeighted_Basics,
+_CPP_RedCloud_CPP,
 _CPP_BGSubtract_Basics,
     _CPP_Stable_Basics,
     _CPP_Feature_StableSorted,

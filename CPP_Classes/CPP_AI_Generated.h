@@ -1937,28 +1937,6 @@ public:
 
 
 
-class CPP_Motion_Basics : public algorithmCPP {
-public:
-    CPP_Motion_Core* motionCore;
-    CPP_History_Basics* sum8u;
-    CPP_Motion_Basics() : algorithmCPP() {
-        traceName = "CPP_Motion_Basics";
-        motionCore = new CPP_Motion_Core();
-        sum8u = new CPP_History_Basics();
-        task->frameHistoryCount = 10;
-        desc = "Accumulate differences from the previous BGR images.";
-    }
-    void Run(Mat src) override {
-        motionCore->Run(src);
-        dst2 = motionCore->dst2;
-        sum8u->Run(dst2);
-        dst3 = sum8u->dst2;
-    }
-};
-
-
-
-
 
 // https://docs.opencv.org/4.x/da/d22/tutorial_py_canny.html
 class CPP_Edge_Canny : public algorithmCPP {
@@ -1985,32 +1963,6 @@ public:
     }
 };
 
-
-
-
-
-class CPP_Edge_MotionAccum : public algorithmCPP {
-public:
-    CPP_Edge_Canny* edges;
-    CPP_Motion_Basics* motion;
-    float percentMotion;
-    CPP_Edge_MotionAccum() : algorithmCPP() {
-        traceName = "CPP_Edge_MotionAccum";
-        edges = new CPP_Edge_Canny();
-        motion = new CPP_Motion_Basics();
-        dst2 = Mat::zeros(dst2.size(), CV_8U);
-        labels = { "", "", "Accumulated edges tempered by motion thresholds", "" };
-        desc = "Accumulate edges and use motion to clear";
-    }
-    void Run(Mat src) override {
-        if (task->optionsChanged) task->motionReset = true;
-        motion->Run(src);
-        if (task->frameCount % task->frameHistoryCount == 0) dst2.setTo(0);
-        edges->Run(src);
-        dst2.setTo(255, edges->dst2);
-        labels[3] = motion->labels[2];
-    }
-};
 
 
 
@@ -2999,48 +2951,44 @@ public:
         if (src.channels() == 3)
         {
             cvtColor(src, dst1, COLOR_BGR2GRAY);
-            if (task->optionsChanged) {
-                switch (task->colorInputIndex) {
-                case 0: // "BackProject_Full":
-                    //backP->Run(dst1);
-                    //classCount = backP->classCount;
-                    //dst2 = backP->dst2;
-                    //colorInput = backP->traceName;
-                    break;
-                case 1: // "KMeans_Basics":
-                    //km->Run(dst1);
-                    //classCount = km->classCount;
-                    //dst2 = km->dst2;
-                    //colorInput = km->traceName;
-                    break;
-                case 2: //"LUT_Basics":
-                    //lut->Run(dst1);
-                    //classCount = lut->classCount;
-                    //dst2 = lut->dst2;
-                    //colorInput = lut->traceName;
-                    break;
-                case 3: //"Reduction_Basics":
-                    // reduction->Run(dst1);
-                    //classCount = reduction->classCount;
-                    //dst2 = reduction->dst2;
-                    //colorInput = reduction->traceName;
-                    break;
-                case 4: //"3D BackProjection":
-                    //hColor->Run(dst1);
-                    //classCount = hColor->classCount;
-                    //dst2 = hColor->dst2;
-                    //colorInput = hColor->traceName;
-                    break;
-                case 5:
-                    binarize->Run(dst1);
-                    classCount = binarize->classCount;
-                    dst2 = binarize->dst1;
-                    colorInput = binarize->traceName;
-                    break;
-                }
+            switch (task->colorInputIndex) {
+            case 0: // "BackProject_Full":
+                //backP->Run(dst1);
+                //classCount = backP->classCount;
+                //dst2 = backP->dst2;
+                //colorInput = backP->traceName;
+                break;
+            case 1: // "KMeans_Basics":
+                //km->Run(dst1);
+                //classCount = km->classCount;
+                //dst2 = km->dst2;
+                //colorInput = km->traceName;
+                break;
+            case 2: //"LUT_Basics":
+                //lut->Run(dst1);
+                //classCount = lut->classCount;
+                //dst2 = lut->dst2;
+                //colorInput = lut->traceName;
+                break;
+            case 3: //"Reduction_Basics":
+                // reduction->Run(dst1);
+                //classCount = reduction->classCount;
+                //dst2 = reduction->dst2;
+                //colorInput = reduction->traceName;
+                break;
+            case 4: //"3D BackProjection":
+                //hColor->Run(dst1);
+                //classCount = hColor->classCount;
+                //dst2 = hColor->dst2;
+                //colorInput = hColor->traceName;
+                break;
+            case 5:
+                binarize->Run(dst1);
+                classCount = binarize->classCount;
+                dst2 = binarize->dst1;
+                colorInput = binarize->traceName;
+                break;
             }
-        } else {
-            dst1 = src.clone();
         }
         dst3 = vbPalette(dst2 * 255 / classCount);
         labels[2] = "Color_Basics: method = " + colorInput + " produced " + to_string(classCount) + 
@@ -3273,4 +3221,242 @@ public:
         }
     }
 };
+
+
+
+
+
+class CPP_Motion_Basics : public algorithmCPP {
+public:
+    CPP_Options_BGSubtract* options = new CPP_Options_BGSubtract;
+    BGSubtract_BGFG* cPtr = nullptr;
+    string desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++";
+    CPP_Motion_Basics() : algorithmCPP() {
+        traceName = "CPP_Motion_Basics";
+        cPtr = BGSubtract_BGFG_Open(options->currMethod);
+        labels[2] = "BGSubtract output";
+    }
+    void Run(Mat src) {
+        if (task->optionsChanged) {
+            Close();
+            cPtr = BGSubtract_BGFG_Open(options->currMethod);
+        }
+        void* imagePtr = BGSubtract_BGFG_Run(cPtr, (int *)src.data, src.rows, src.cols, src.channels());
+        dst2 = Mat(src.rows, src.cols, CV_8UC1, imagePtr);
+        labels[2] = options->methodDesc;
+    }
+    void Close() {
+        if (cPtr) {
+            BGSubtract_BGFG_Close(cPtr);
+            cPtr = nullptr;
+        }
+    }
+};
+
+
+
+
+
+
+class CPP_RedCloud_CPP : public algorithmCPP {
+public:
+    map<int, rcData, compareAllowIdenticalIntegerInverted> sortedCells;
+    Mat inputMask;
+    int classCount;
+    float imageThresholdPercent = 0.98f;
+    float cellMinPercent = 0.0001f;
+    CPP_Color_Basics* colorClass = new CPP_Color_Basics();
+    RedCloud* cPtr;
+    CPP_RedCloud_CPP() : algorithmCPP() {
+        traceName = "CPP_RedCloud_CPP";
+        cPtr = new RedCloud;
+        desc = "Core interface to the C++ code for floodfill.";
+    }
+    void Run(Mat src) {
+        if (src.channels() != 1) {
+            colorClass->Run(src);
+            src = colorClass->dst2.clone();
+        }
+
+        int* imagePtr;
+        if (!inputMask.empty()) {
+            imagePtr = RedCloud_Run(cPtr, (int*)src.data, inputMask.data, src.rows, src.cols,
+                src.type(), task->desiredCells, 0, imageThresholdPercent, cellMinPercent);
+        }
+        else {
+            imagePtr = RedCloud_Run(cPtr, (int*)src.data, nullptr, src.rows, src.cols,
+                src.type(), task->desiredCells, 0, imageThresholdPercent, cellMinPercent);
+        }
+        classCount = RedCloud_Count(cPtr);
+        if (classCount == 0) return;
+
+        dst2 = Mat(src.rows, src.cols, CV_8U, imagePtr).clone();
+        if (standalone) {
+            dst3 = vbPalette(dst2 * 255 / classCount);
+        }
+        if (task->heartBeat) labels[3] = to_string(classCount) + " cells found";
+        Mat sizeData(classCount, 1, CV_32S, RedCloud_Sizes(cPtr));
+        Mat rectData(classCount, 1, CV_32SC4, RedCloud_Rects(cPtr));
+        Mat floodPointData(classCount, 1, CV_32SC2, RedCloud_FloodPoints(cPtr));
+        sortedCells.clear();
+        for (int i = 0; i < classCount; ++i) {
+            rcData rc;
+            rc.index = i + 1;
+            Rect r = rectData.at<Rect>(i, 0);
+            rc.rect = task->validateRect(r, dst2.cols, dst2.rows);
+            inRange(dst2(rc.rect), rc.index, rc.index, rc.mask);
+            threshold(rc.mask, rc.mask, 0, 255, THRESH_BINARY);
+            rc.motionRect = rc.rect;
+            rc.pixels = sizeData.at<int>(i, 0);
+            rc.floodPoint = floodPointData.at<Point>(i, 0);
+            rectangle(rc.mask, Rect(0, 0, rc.mask.cols, rc.mask.rows), 0, 1);
+            rc.maxDist = rc.rect.tl() + task->vbGetMaxDist(rc.mask);
+            rc.depthCell = task->pcSplit[2].at<float>(rc.floodPoint.y, rc.floodPoint.x) != 0;
+            sortedCells[rc.pixels] = rc;
+        }
+        if (task->heartBeat) labels[2] = "CV_8U format - " + to_string(classCount) + " cells were identified.";
+    }
+    void Close() {
+        if (cPtr) {
+            RedCloud_Close(cPtr);
+            cPtr = nullptr;
+        }
+    }
+};
+
+
+
+
+
+
+
+
+
+
+class CPP_RedCloud_Native : public algorithmCPP {
+public:
+    map<int, rcData, compareAllowIdenticalIntegerInverted> sortedCells;
+    Mat inputMask;
+    int classCount;
+    float imageThresholdPercent = 0.98f;
+    float cellMinPercent = 0.0001f;
+    CPP_Color_Basics* colorClass = new CPP_Color_Basics();
+    RedCloud* cPtr;
+    CPP_RedCloud_Native() : algorithmCPP() {
+        traceName = "CPP_RedCloud_Native";
+        cPtr = new RedCloud;
+        desc = "Core interface to the C++ code for floodfill.";
+    }
+    void Run(Mat src) {
+        if (src.channels() != 1) {
+            colorClass->Run(src);
+            src = colorClass->dst2.clone();
+        }
+
+        int* imagePtr;
+        if (!inputMask.empty()) {
+            imagePtr = RedCloud_Run(cPtr, (int*)src.data, inputMask.data, src.rows, src.cols,
+                src.type(), task->desiredCells, 0, imageThresholdPercent, cellMinPercent);
+        }
+        else {
+            imagePtr = RedCloud_Run(cPtr, (int*)src.data, nullptr, src.rows, src.cols,
+                src.type(), task->desiredCells, 0, imageThresholdPercent, cellMinPercent);
+        }
+        classCount = RedCloud_Count(cPtr);
+        if (classCount == 0) return;
+
+        dst2 = Mat(src.rows, src.cols, CV_8U, imagePtr).clone();
+        if (standalone) {
+            dst3 = vbPalette(dst2 * 255 / classCount);
+        }
+        if (task->heartBeat) labels[3] = to_string(classCount) + " cells found";
+        Mat sizeData(classCount, 1, CV_32S, RedCloud_Sizes(cPtr));
+        Mat rectData(classCount, 1, CV_32SC4, RedCloud_Rects(cPtr));
+        Mat floodPointData(classCount, 1, CV_32SC2, RedCloud_FloodPoints(cPtr));
+        sortedCells.clear();
+        for (int i = 0; i < classCount; ++i) {
+            rcData rc;
+            rc.index = i + 1;
+            Rect r = rectData.at<Rect>(i, 0);
+            rc.rect = task->validateRect(r, dst2.cols, dst2.rows);
+            inRange(dst2(rc.rect), rc.index, rc.index, rc.mask);
+            threshold(rc.mask, rc.mask, 0, 255, THRESH_BINARY);
+            rc.motionRect = rc.rect;
+            rc.pixels = sizeData.at<int>(i, 0);
+            rc.floodPoint = floodPointData.at<Point>(i, 0);
+            rectangle(rc.mask, Rect(0, 0, rc.mask.cols, rc.mask.rows), 0, 1);
+            rc.maxDist = rc.rect.tl() + task->vbGetMaxDist(rc.mask);
+            rc.depthCell = task->pcSplit[2].at<float>(rc.floodPoint.y, rc.floodPoint.x) != 0;
+            sortedCells[rc.pixels] = rc;
+        }
+        if (task->heartBeat) labels[2] = "CV_8U format - " + to_string(classCount) + " cells were identified.";
+    }
+    void Close() {
+        if (cPtr) {
+            RedCloud_Close(cPtr);
+            cPtr = nullptr;
+        }
+    }
+};
+
+
+
+
+
+
+
+//class CPP_MotionRect_Basics : public algorithmCPP {
+//public:
+//    CPP_BGSubtract_Basics* bgSub;
+//    RedCloud_CPP redCPP;
+//    dst = Mat2;
+//    bool showDiff;
+//    CPP_MotionRect_Basics() : algorithmCPP() {
+//        traceName = "CPP_MotionRect_Basics";
+//        bgSub = new CPP_BGSubtract_Basics();
+//        redOptions.UseColor.Checked = true;
+//        redCPP.imageThresholdPercent = 1.0;
+//        redCPP.cellMinPercent = 0;
+//        desc = "Use floodfill to find all the real motion in an image.";
+//    }
+//    void Run(Mat src) {
+//        bgSub->Run(src);
+//        if (standalone || showDiff) {
+//            dst2 = bgSub->dst2;
+//        }
+//        if (!task->pcSplit) {
+//            return;
+//        }
+//        threshold(bgSub->dst2, dst2, 0, 255, THRESH_BINARY);
+//        redCPP.Run(dst2);
+//        if (redCPP.sortedCells.size() < 2) {
+//            return;
+//        }
+//        Rect nextRect = redCPP.sortedCells[1].value.rect;
+//        for (int i = 2; i < redCPP.sortedCells.size(); ++i) {
+//            auto& rc = redCPP.sortedCells[i].value;
+//            nextRect = nextRect | rc.rect;
+//        }
+//        static vector<Rect> rectList;
+//        rectList.push_back(nextRect);
+//        task->motionRect = Rect();
+//        for (const Rect& r : rectList) {
+//            task->motionRect = task->motionRect.empty() ? r : task->motionRect | r;
+//        }
+//        if (rectList.size() > task->frameHistoryCount) {
+//            rectList.erase(rectList.begin());
+//        }
+//        if (task->motionRect.width > dst2.cols / 2 && task->motionRect.height > dst2.rows / 2) {
+//            task->motionRect = Rect(0, 0, dst2.cols, dst2.rows);
+//        }
+//        if (standalone || showDiff) {
+//            rectangle(dst2, task->motionRect, Scalar(255), task->lineWidth);
+//        }
+//        labels[2] = to_string(redCPP.sortedCells.size()) + " cells were found with " +
+//            to_string(redCPP.classCount) + " flood points";
+//    }
+//};
+
+
+
 

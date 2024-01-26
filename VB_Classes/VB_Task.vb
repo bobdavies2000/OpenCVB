@@ -523,10 +523,10 @@ Public Class VBtask : Implements IDisposable
 
                     depthBasics.Run(src) ' colorize the depth 
 
-                    If gOptions.DebugCheckBox.Checked Then
-                        motion.motion.showDiff = True
-                        cv.Cv2.ImShow("motion.dst2", motion.motion.dst2)
-                    End If
+                    'If gOptions.DebugCheckBox.Checked Then
+                    '    motion.motion.showDiff = True
+                    '    cv.Cv2.ImShow("motion.dst2", motion.motion.dst2)
+                    'End If
                 End If
 
                 TaskTimer.Enabled = True

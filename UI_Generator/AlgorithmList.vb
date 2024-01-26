@@ -2,6 +2,7 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
+_CPP_RedCloud_CPP
 _CPP_BGSubtract_Basics
 _CPP_Stable_Basics
 _CPP_Feature_StableSorted
@@ -346,6 +347,7 @@ if algorithmName = "CPP_Random_Enumerable" Then return new CPP_Basics(functionNa
 if algorithmName = "CPP_Rectangle_Basics" Then return new CPP_Basics(functionNames._CPP_Rectangle_Basics)
 if algorithmName = "CPP_Rectangle_Rotated" Then return new CPP_Basics(functionNames._CPP_Rectangle_Rotated)
 if algorithmName = "CPP_RedCloud_Core" Then return new CPP_Basics(functionNames._CPP_RedCloud_Core)
+if algorithmName = "CPP_RedCloud_CPP" Then return new CPP_Basics(functionNames._CPP_RedCloud_CPP)
 if algorithmName = "CPP_RedCloud_Flood" Then return new CPP_Basics(functionNames._CPP_RedCloud_Flood)
 if algorithmName = "CPP_RedColor_FeatureLess" Then return new CPP_Basics(functionNames._CPP_RedColor_FeatureLess)
 if algorithmName = "CPP_RedColor_FeatureLessCore" Then return new CPP_Basics(functionNames._CPP_RedColor_FeatureLessCore)
