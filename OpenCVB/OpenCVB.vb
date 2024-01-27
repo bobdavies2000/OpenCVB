@@ -626,9 +626,9 @@ Public Class OpenCVB
         End While
         sr.Close()
 
-        Dim AlgorithmMapFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmMapToOpenCV.txt")
+        Dim AlgorithmMapFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmGroupNames.txt")
         If AlgorithmMapFileInfo.Exists = False Then
-            MsgBox("The AlgorithmMapToOpenCV.txt file is missing.  Look at the 'UIindexer' Project that creates the mapping of algorithms to OpenCV keywords.")
+            MsgBox("The AlgorithmGroupNames.txt file is missing.  Look at the 'UIindexer' Project that creates the mapping of algorithms to OpenCV keywords.")
             End
         End If
         sr = New StreamReader(AlgorithmMapFileInfo.FullName)

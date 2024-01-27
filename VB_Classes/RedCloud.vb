@@ -11,9 +11,8 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
                         "It is behind the global options (which affect most algorithms.)")
         desc = "Match cells from the previous generation"
     End Sub
-
     Public Sub RunVB(src As cv.Mat)
-        If noMotion() = False Or firstPass Then
+        If motionDetected() Or heartBeat() Then
             combine.Run(src)
 
             If task.optionsChanged Then cellMap.SetTo(0)
@@ -2167,8 +2166,7 @@ End Class
 
 
 Public Class RedCloud_Combine : Inherits VB_Algorithm
-    Dim colorB As New Color_Basics
-    Dim colorF As New Color_MotionFiltered
+    Dim color As New Color_Basics
     Public guided As New GuidedBP_Depth
     Public redCPP As New RedCloud_Color
     Public combinedCells As New List(Of rcData)
@@ -2176,19 +2174,11 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
         desc = "Combined the color and cloud as indicated in the RedOptions panel."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim classCount As Integer = 0
         If redOptions.UseColor.Checked Or redOptions.UseDepthAndColor.Checked Then
             redCPP.inputMask = Nothing
             If src.Channels = 3 Then
-                If gOptions.MotionFilteredColorAndCloud.Checked Or gOptions.MotionFilteredColorOnly.Checked Then
-                    colorF.Run(src)
-                    classCount = colorF.classCount
-                    dst2 = colorF.dst2.Clone
-                Else
-                    colorB.Run(src)
-                    classCount = colorB.classCount
-                    dst2 = colorB.dst2.Clone
-                End If
+                color.Run(src)
+                dst2 = color.dst2.Clone
             Else
                 dst2 = src
             End If
@@ -2201,12 +2191,12 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
             Select Case redOptions.depthInputIndex
                 Case 0 ' "GuidedBP_Depth"
                     guided.Run(src)
-                    If classCount > 0 Then guided.dst2 += classCount
+                    If color.classCount > 0 Then guided.dst2 += color.classCount
                     guided.dst2.CopyTo(dst2, task.depthMask)
                 Case 1 ' "RedCloud_Core"
                     Static prep As New RedCloud_Core
                     prep.Run(task.pointCloud)
-                    If classCount > 0 Then prep.dst2 += classCount
+                    If color.classCount > 0 Then prep.dst2 += color.classCount
                     prep.dst2.CopyTo(dst2, task.depthMask)
             End Select
         End If

@@ -262,7 +262,7 @@ Module VB
         listOfPoints.Add(contour)
         cv.Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType)
     End Sub
-    Public Function noMotion() As Boolean
+    Public Function motionDetected() As Boolean
         If task.motionRect.Width = 0 Or task.motionRect.Height = 0 Then Return True
         If task.motionRect.Width <> task.workingRes.Width Or task.motionRect.Height <> task.workingRes.Height Then Return False
         Return True

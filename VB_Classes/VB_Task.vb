@@ -577,6 +577,8 @@ Public Class VBtask : Implements IDisposable
 
                 algorithmObject.NextFrame(src)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
+                task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
+
                 task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
                 task.optionsChanged = False
                 TaskTimer.Enabled = False

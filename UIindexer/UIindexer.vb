@@ -163,7 +163,7 @@ Module IndexMain
             End If
         Next
 
-        Dim sw As New StreamWriter(directoryInfo.FullName + "/../Data/AlgorithmMapToOpenCV.txt")
+        Dim sw As New StreamWriter(directoryInfo.FullName + "/../Data/AlgorithmGroupNames.txt")
         sw.WriteLine("<All>")
 
         sw.Write("<All but Python>")
@@ -172,7 +172,7 @@ Module IndexMain
         Next
         sw.WriteLine()
 
-        sw.WriteLine("<All using recorded data>")
+        'sw.WriteLine("<All using recorded data>")
 
         sw.Write("<C++>")
         For i = 0 To onlyCPP.Count - 1

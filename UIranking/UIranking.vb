@@ -1,9 +1,9 @@
-﻿Imports  System.IO
+﻿Imports System.IO
 Module UIranking
     Sub Main()
         Dim dataDir As New DirectoryInfo("../../../../Data")
         If dataDir.Exists = False Then dataDir = New DirectoryInfo("../../Data")
-        Dim rankingInput As New FileInfo(dataDir.FullName + "/AlgorithmMapToOpenCV.txt")
+        Dim rankingInput As New FileInfo(dataDir.FullName + "/AlgorithmGroupNames.txt")
         Dim rankList As New FileInfo(dataDir.FullName + "/RankList.txt")
         Dim sr = New StreamReader(rankingInput.FullName)
         Dim code As String = sr.ReadToEnd
@@ -25,6 +25,11 @@ Module UIranking
                     End If
                 End If
             End If
+        Next
+
+        Dim buildReuseList As String = "<All Reused>"
+        For Each alg In algorithms
+            buildReuseList += "," + alg.Key
         Next
 
         Dim algorithmRank As New SortedList(Of String, String)
@@ -57,6 +62,9 @@ Module UIranking
         For saveIndex = 0 To lines.Count - 1
             swAll.WriteLine(lines(saveIndex))
             If lines(saveIndex).Contains("<PyStream>") Then Exit For
+            If lines(saveIndex).Contains("<All but Python>") Then
+                swAll.WriteLine(buildReuseList)
+            End If
         Next
 
         sr = New StreamReader(rankList.FullName)
