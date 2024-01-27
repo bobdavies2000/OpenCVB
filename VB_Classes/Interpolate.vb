@@ -218,7 +218,7 @@ Public Class Interpolate_Difference : Inherits VB_Algorithm
         dst2 = inter.dst3
         labels(2) = inter.labels(3)
 
-        diff.lastGray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        diff.lastFrame = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         diff.Run(dst2)
         dst3 = diff.dst3
     End Sub
@@ -247,7 +247,7 @@ Public Class Interpolate_Fake : Inherits VB_Algorithm
             diff.Run(src)
             dst3 = diff.dst3
             If diff.dst3.CountNonZero > 0 Then
-                diff.lastGray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                diff.lastFrame = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 dst2 = src
                 updatedFrames += 1
             End If

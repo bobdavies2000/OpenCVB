@@ -2,7 +2,8 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
-_CPP_RedCloud_CPP
+_CPP_RedCloud_ColorNative
+_CPP_RedCloud_Color
 _CPP_BGSubtract_Basics
 _CPP_Stable_Basics
 _CPP_Feature_StableSorted
@@ -229,6 +230,7 @@ if algorithmName = "Color_Depth" Then return new Color_Depth
 if algorithmName = "Color_Grayscale" Then return new Color_Grayscale
 if algorithmName = "Color_InRange" Then return new Color_InRange
 if algorithmName = "Color_KMeans" Then return new Color_KMeans
+if algorithmName = "Color_MotionFiltered" Then return new Color_MotionFiltered
 if algorithmName = "Color_RedHue" Then return new Color_RedHue
 if algorithmName = "Color_Smoothing" Then return new Color_Smoothing
 if algorithmName = "Color_TopX_VB" Then return new Color_TopX_VB
@@ -346,8 +348,9 @@ if algorithmName = "CPP_Random_Basics" Then return new CPP_Basics(functionNames.
 if algorithmName = "CPP_Random_Enumerable" Then return new CPP_Basics(functionNames._CPP_Random_Enumerable)
 if algorithmName = "CPP_Rectangle_Basics" Then return new CPP_Basics(functionNames._CPP_Rectangle_Basics)
 if algorithmName = "CPP_Rectangle_Rotated" Then return new CPP_Basics(functionNames._CPP_Rectangle_Rotated)
+if algorithmName = "CPP_RedCloud_Color" Then return new CPP_Basics(functionNames._CPP_RedCloud_Color)
+if algorithmName = "CPP_RedCloud_ColorNative" Then return new CPP_Basics(functionNames._CPP_RedCloud_ColorNative)
 if algorithmName = "CPP_RedCloud_Core" Then return new CPP_Basics(functionNames._CPP_RedCloud_Core)
-if algorithmName = "CPP_RedCloud_CPP" Then return new CPP_Basics(functionNames._CPP_RedCloud_CPP)
 if algorithmName = "CPP_RedCloud_Flood" Then return new CPP_Basics(functionNames._CPP_RedCloud_Flood)
 if algorithmName = "CPP_RedColor_FeatureLess" Then return new CPP_Basics(functionNames._CPP_RedColor_FeatureLess)
 if algorithmName = "CPP_RedColor_FeatureLessCore" Then return new CPP_Basics(functionNames._CPP_RedColor_FeatureLessCore)
@@ -1066,8 +1069,10 @@ if algorithmName = "Motion_ThruCorrelation" Then return new Motion_ThruCorrelati
 if algorithmName = "MotionBlur_Basics" Then return new MotionBlur_Basics
 if algorithmName = "MotionBlur_Deblur" Then return new MotionBlur_Deblur
 if algorithmName = "MotionRect_Basics" Then return new MotionRect_Basics
+if algorithmName = "MotionRect_Color" Then return new MotionRect_Color
 if algorithmName = "MotionRect_Depth" Then return new MotionRect_Depth
 if algorithmName = "MotionRect_Enclosing" Then return new MotionRect_Enclosing
+if algorithmName = "MotionRect_Grayscale" Then return new MotionRect_Grayscale
 if algorithmName = "MotionRect_Grid" Then return new MotionRect_Grid
 if algorithmName = "MotionRect_History2" Then return new MotionRect_History2
 if algorithmName = "MotionRect_HistoryTest" Then return new MotionRect_HistoryTest
@@ -1482,12 +1487,12 @@ if algorithmName = "RedCloud_CellChanges" Then return new RedCloud_CellChanges
 if algorithmName = "RedCloud_Cells" Then return new RedCloud_Cells
 if algorithmName = "RedCloud_CellsAtDepth" Then return new RedCloud_CellsAtDepth
 if algorithmName = "RedCloud_CellStats" Then return new RedCloud_CellStats
+if algorithmName = "RedCloud_Color" Then return new RedCloud_Color
 if algorithmName = "RedCloud_ColorInDepth" Then return new RedCloud_ColorInDepth
 if algorithmName = "RedCloud_Combine" Then return new RedCloud_Combine
 if algorithmName = "RedCloud_Combine2Pass" Then return new RedCloud_Combine2Pass
 if algorithmName = "RedCloud_ContourVsFeatureLess" Then return new RedCloud_ContourVsFeatureLess
 if algorithmName = "RedCloud_Core" Then return new RedCloud_Core
-if algorithmName = "RedCloud_CPP" Then return new RedCloud_CPP
 if algorithmName = "RedCloud_DelaunayGuidedFeatures" Then return new RedCloud_DelaunayGuidedFeatures
 if algorithmName = "RedCloud_DepthOutline" Then return new RedCloud_DepthOutline
 if algorithmName = "RedCloud_Diff" Then return new RedCloud_Diff

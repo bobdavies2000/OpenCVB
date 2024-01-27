@@ -510,7 +510,7 @@ Public Class Depth_NotMissing : Inherits VB_Algorithm
         bgSub.Run(src)
         dst2 = bgSub.dst2
         dst3 = Not bgSub.dst2
-        labels(2) = "Unstable Depth" + " using " + bgSub.options.radio.check(bgSub.options.currMethod).Text + " method"
+        labels(2) = "Unstable Depth" + " using " + bgSub.options.methodDesc + " method"
         dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class

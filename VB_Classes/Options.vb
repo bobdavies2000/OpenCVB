@@ -4242,18 +4242,18 @@ Public Class Options_BGSubtract : Inherits VB_Algorithm
             radio.addRadio("MOG2")
             radio.addRadio("GSOC")
             radio.addRadio("LSBP")
-            radio.check(3).Checked = True ' mog2 appears to be the best...
+            radio.check(4).Checked = True ' mog2 appears to be the best...
         End If
         If sliders.Setup(traceName) Then sliders.setupTrackBar("MOG Learn Rate X1000", 1, 1000, 1)
     End Sub
     Public Sub RunVB()
         Static learnRateSlider = findSlider("MOG Learn Rate X1000")
         Static frm = findfrm(traceName + " Radio Buttons")
-        If firstPass Then
-            firstPass = False
-            frm.Left = gOptions.Width / 2
-            frm.top = gOptions.Height / 2 + 25
-        End If
+        'If firstPass Then
+        '    firstPass = False
+        '    frm.Left = gOptions.Width / 2
+        '    frm.top = gOptions.Height / 2 + 25
+        'End If
 
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then

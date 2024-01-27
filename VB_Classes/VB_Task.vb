@@ -60,7 +60,9 @@ Public Class VBtask : Implements IDisposable
     Public IMUBasics As IMU_Basics
     Public hCloud As History_Cloud
     Public maxMask As Depth_MaxMask
-    Public motion As MotionRect_PointCloud
+    Public motionCloud As MotionRect_PointCloud
+    Public motionColor As MotionRect_Color
+    Public motionBasics As MotionRect_Basics
     Public rgbFilter As Object
 
     Public noDepthMask As New cv.Mat
@@ -361,7 +363,9 @@ Public Class VBtask : Implements IDisposable
         gMat = New IMU_GMatrix
         hCloud = New History_Cloud
         maxMask = New Depth_MaxMask
-        motion = New MotionRect_PointCloud
+        motionCloud = New MotionRect_PointCloud
+        motionColor = New MotionRect_Color
+        motionBasics = New MotionRect_Basics
 
         updateSettings()
         redOptions.Show()
@@ -487,12 +491,22 @@ Public Class VBtask : Implements IDisposable
                         task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).ToMat.Reshape(3, src.Rows)
                     End If
 
+                    motionBasics.Run(src) ' always get the task.motionRect
+
                     If gOptions.UseHistoryCloud.Checked Then
                         hCloud.Run(task.pointCloud)
                         task.pointCloud = hCloud.dst2
-                    ElseIf gOptions.MotionFilteredCloud.Checked Then
-                        motion.Run(src)
-                        task.pointCloud = motion.dst2.Clone
+                    ElseIf gOptions.MotionFilteredColorAndCloud.Checked Then
+                        motionColor.Run(src)
+                        motionCloud.Run(src)
+                        task.color = motionColor.dst2.Clone
+                        task.pointCloud = motionCloud.dst2.Clone
+                    ElseIf gOptions.MotionFilteredCloudOnly.Checked Then
+                        motionCloud.Run(src)
+                        task.pointCloud = motionCloud.dst2.Clone
+                    ElseIf gOptions.MotionFilteredColorOnly.Checked Then
+                        motionColor.Run(src)
+                        task.color = motionColor.dst2.Clone
                     End If
 
                     If task.motionRect.Width <> 0 Or task.pcSplit Is Nothing Or heartBeat Or task.optionsChanged Then

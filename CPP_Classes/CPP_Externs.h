@@ -34,10 +34,12 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     switch (function)
     {
     case _CPP_AddWeighted_Basics :
-    {task->alg = new CPP_AddWeighted_Basics(); break; }
-	case _CPP_RedCloud_CPP :
-	{task->alg = new CPP_RedCloud_CPP(); break; }
-	case _CPP_BGSubtract_Basics :
+    {task->alg = new CPP_AddWeighted_Basics(); break; } 
+    case _CPP_RedCloud_ColorNative:
+    {task->alg = new CPP_RedCloud_ColorNative(); break; }
+    case _CPP_RedCloud_Color:
+    {task->alg = new CPP_RedCloud_Color(); break; }
+    case _CPP_BGSubtract_Basics :
 	{task->alg = new CPP_BGSubtract_Basics(); break; }
 	case _CPP_Feature_StableSorted :
 	{task->alg = new CPP_Feature_StableSorted(); break; }

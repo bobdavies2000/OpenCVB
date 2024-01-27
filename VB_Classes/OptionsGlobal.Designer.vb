@@ -50,6 +50,10 @@ Partial Class OptionsGlobal
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.UseHistoryCloud = New System.Windows.Forms.RadioButton()
+        Me.MotionFilteredCloudOnly = New System.Windows.Forms.RadioButton()
+        Me.unFilteredCloud = New System.Windows.Forms.RadioButton()
         Me.ShowGrid = New System.Windows.Forms.CheckBox()
         Me.SyncOutput = New System.Windows.Forms.CheckBox()
         Me.UseMultiThreading = New System.Windows.Forms.CheckBox()
@@ -75,10 +79,8 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
-        Me.unFilteredCloud = New System.Windows.Forms.RadioButton()
-        Me.MotionFilteredCloud = New System.Windows.Forms.RadioButton()
-        Me.UseHistoryCloud = New System.Windows.Forms.RadioButton()
+        Me.MotionFilteredColorAndCloud = New System.Windows.Forms.RadioButton()
+        Me.MotionFilteredColorOnly = New System.Windows.Forms.RadioButton()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.minPixelsSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -89,10 +91,10 @@ Partial Class OptionsGlobal
         CType(Me.GridSize, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MaxDepth, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
         Me.GeometrySettings.SuspendLayout()
         CType(Me.dotSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.LineWidth, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
         'MinMaxDepth
@@ -400,6 +402,53 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
         '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.MotionFilteredColorOnly)
+        Me.GroupBox1.Controls.Add(Me.MotionFilteredColorAndCloud)
+        Me.GroupBox1.Controls.Add(Me.UseHistoryCloud)
+        Me.GroupBox1.Controls.Add(Me.MotionFilteredCloudOnly)
+        Me.GroupBox1.Controls.Add(Me.unFilteredCloud)
+        Me.GroupBox1.Location = New System.Drawing.Point(366, 89)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(306, 186)
+        Me.GroupBox1.TabIndex = 69
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Color and PointCloud Input"
+        '
+        'UseHistoryCloud
+        '
+        Me.UseHistoryCloud.AutoSize = True
+        Me.UseHistoryCloud.Location = New System.Drawing.Point(22, 145)
+        Me.UseHistoryCloud.Name = "UseHistoryCloud"
+        Me.UseHistoryCloud.Size = New System.Drawing.Size(244, 24)
+        Me.UseHistoryCloud.TabIndex = 2
+        Me.UseHistoryCloud.TabStop = True
+        Me.UseHistoryCloud.Text = "History PointCloud (averaged)"
+        Me.UseHistoryCloud.UseVisualStyleBackColor = True
+        '
+        'MotionFilteredCloudOnly
+        '
+        Me.MotionFilteredCloudOnly.AutoSize = True
+        Me.MotionFilteredCloudOnly.Location = New System.Drawing.Point(21, 53)
+        Me.MotionFilteredCloudOnly.Name = "MotionFilteredCloudOnly"
+        Me.MotionFilteredCloudOnly.Size = New System.Drawing.Size(219, 24)
+        Me.MotionFilteredCloudOnly.TabIndex = 1
+        Me.MotionFilteredCloudOnly.TabStop = True
+        Me.MotionFilteredCloudOnly.Text = "Motion Filtered Cloud Only"
+        Me.MotionFilteredCloudOnly.UseVisualStyleBackColor = True
+        '
+        'unFilteredCloud
+        '
+        Me.unFilteredCloud.AutoSize = True
+        Me.unFilteredCloud.Location = New System.Drawing.Point(21, 23)
+        Me.unFilteredCloud.Name = "unFilteredCloud"
+        Me.unFilteredCloud.Size = New System.Drawing.Size(142, 24)
+        Me.unFilteredCloud.TabIndex = 0
+        Me.unFilteredCloud.TabStop = True
+        Me.unFilteredCloud.Text = "Unfiltered (raw)"
+        Me.unFilteredCloud.UseVisualStyleBackColor = True
+        '
         'ShowGrid
         '
         Me.ShowGrid.AutoSize = True
@@ -455,7 +504,7 @@ Partial Class OptionsGlobal
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(166, 374)
+        Me.Label2.Location = New System.Drawing.Point(632, 297)
         Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(59, 20)
@@ -475,7 +524,7 @@ Partial Class OptionsGlobal
         'Palettes
         '
         Me.Palettes.FormattingEnabled = True
-        Me.Palettes.Location = New System.Drawing.Point(171, 397)
+        Me.Palettes.Location = New System.Drawing.Point(636, 324)
         Me.Palettes.Name = "Palettes"
         Me.Palettes.Size = New System.Drawing.Size(146, 28)
         Me.Palettes.TabIndex = 54
@@ -520,7 +569,7 @@ Partial Class OptionsGlobal
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(20, 374)
+        Me.Label5.Location = New System.Drawing.Point(485, 301)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(77, 20)
         Me.Label5.TabIndex = 15
@@ -529,7 +578,7 @@ Partial Class OptionsGlobal
         'LineType
         '
         Me.LineType.FormattingEnabled = True
-        Me.LineType.Location = New System.Drawing.Point(22, 397)
+        Me.LineType.Location = New System.Drawing.Point(487, 324)
         Me.LineType.Name = "LineType"
         Me.LineType.Size = New System.Drawing.Size(120, 28)
         Me.LineType.TabIndex = 14
@@ -646,50 +695,27 @@ Partial Class OptionsGlobal
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
-        'GroupBox1
+        'MotionFilteredColorAndCloud
         '
-        Me.GroupBox1.Controls.Add(Me.UseHistoryCloud)
-        Me.GroupBox1.Controls.Add(Me.MotionFilteredCloud)
-        Me.GroupBox1.Controls.Add(Me.unFilteredCloud)
-        Me.GroupBox1.Location = New System.Drawing.Point(528, 106)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(304, 139)
-        Me.GroupBox1.TabIndex = 69
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "PointCloud Input"
+        Me.MotionFilteredColorAndCloud.AutoSize = True
+        Me.MotionFilteredColorAndCloud.Location = New System.Drawing.Point(22, 113)
+        Me.MotionFilteredColorAndCloud.Name = "MotionFilteredColorAndCloud"
+        Me.MotionFilteredColorAndCloud.Size = New System.Drawing.Size(256, 24)
+        Me.MotionFilteredColorAndCloud.TabIndex = 3
+        Me.MotionFilteredColorAndCloud.TabStop = True
+        Me.MotionFilteredColorAndCloud.Text = "Motion Filtered Color and Cloud"
+        Me.MotionFilteredColorAndCloud.UseVisualStyleBackColor = True
         '
-        'unFilteredCloud
+        'MotionFilteredColorOnly
         '
-        Me.unFilteredCloud.AutoSize = True
-        Me.unFilteredCloud.Location = New System.Drawing.Point(21, 23)
-        Me.unFilteredCloud.Name = "unFilteredCloud"
-        Me.unFilteredCloud.Size = New System.Drawing.Size(142, 24)
-        Me.unFilteredCloud.TabIndex = 0
-        Me.unFilteredCloud.TabStop = True
-        Me.unFilteredCloud.Text = "Unfiltered (raw)"
-        Me.unFilteredCloud.UseVisualStyleBackColor = True
-        '
-        'MotionFilteredCloud
-        '
-        Me.MotionFilteredCloud.AutoSize = True
-        Me.MotionFilteredCloud.Location = New System.Drawing.Point(21, 53)
-        Me.MotionFilteredCloud.Name = "MotionFilteredCloud"
-        Me.MotionFilteredCloud.Size = New System.Drawing.Size(220, 24)
-        Me.MotionFilteredCloud.TabIndex = 1
-        Me.MotionFilteredCloud.TabStop = True
-        Me.MotionFilteredCloud.Text = "Motion Filtered PointCloud"
-        Me.MotionFilteredCloud.UseVisualStyleBackColor = True
-        '
-        'UseHistoryCloud
-        '
-        Me.UseHistoryCloud.AutoSize = True
-        Me.UseHistoryCloud.Location = New System.Drawing.Point(21, 83)
-        Me.UseHistoryCloud.Name = "UseHistoryCloud"
-        Me.UseHistoryCloud.Size = New System.Drawing.Size(244, 24)
-        Me.UseHistoryCloud.TabIndex = 2
-        Me.UseHistoryCloud.TabStop = True
-        Me.UseHistoryCloud.Text = "History PointCloud (averaged)"
-        Me.UseHistoryCloud.UseVisualStyleBackColor = True
+        Me.MotionFilteredColorOnly.AutoSize = True
+        Me.MotionFilteredColorOnly.Location = New System.Drawing.Point(22, 83)
+        Me.MotionFilteredColorOnly.Name = "MotionFilteredColorOnly"
+        Me.MotionFilteredColorOnly.Size = New System.Drawing.Size(215, 24)
+        Me.MotionFilteredColorOnly.TabIndex = 4
+        Me.MotionFilteredColorOnly.TabStop = True
+        Me.MotionFilteredColorOnly.Text = "Motion Filtered Color Only"
+        Me.MotionFilteredColorOnly.UseVisualStyleBackColor = True
         '
         'OptionsGlobal
         '
@@ -714,12 +740,12 @@ Partial Class OptionsGlobal
         CType(Me.MaxDepth, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
         Me.GeometrySettings.ResumeLayout(False)
         Me.GeometrySettings.PerformLayout()
         CType(Me.dotSizeSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.LineWidth, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -780,6 +806,8 @@ Partial Class OptionsGlobal
     Friend WithEvents ShowGrid As Windows.Forms.CheckBox
     Friend WithEvents GroupBox1 As Windows.Forms.GroupBox
     Friend WithEvents UseHistoryCloud As Windows.Forms.RadioButton
-    Friend WithEvents MotionFilteredCloud As Windows.Forms.RadioButton
+    Friend WithEvents MotionFilteredCloudOnly As Windows.Forms.RadioButton
     Friend WithEvents unFilteredCloud As Windows.Forms.RadioButton
+    Friend WithEvents MotionFilteredColorOnly As Windows.Forms.RadioButton
+    Friend WithEvents MotionFilteredColorAndCloud As Windows.Forms.RadioButton
 End Class

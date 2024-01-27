@@ -18,7 +18,7 @@ Public Class Denoise_Basics_CPP : Inherits VB_Algorithm
 
         If imagePtr <> 0 Then
             dst3 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
-            diff.lastGray = dst2
+            diff.lastFrame = dst2
             diff.Run(dst3)
             dst3 = diff.dst2
             setTrueText("Denoise C++ code does not seem to be working.  More work needed", 3)

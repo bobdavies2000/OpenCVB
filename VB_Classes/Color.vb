@@ -345,3 +345,23 @@ Public Class Color_Denoise : Inherits VB_Algorithm
         setTrueText(denoise.strOut, 2)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Color_MotionFiltered : Inherits VB_Algorithm
+    Dim colorClass As New Color_Basics
+    Public classCount As Integer
+    Public Sub New()
+        colorClass.updateImages = True
+        desc = "Prepare a Color_Basics image using the task.motionRect"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst3 = task.motionColor.dst2
+        colorClass.Run(task.motionColor.dst2)
+        dst2 = colorClass.dst3
+        classCount = colorClass.classCount
+    End Sub
+End Class

@@ -2603,7 +2603,7 @@ public:
 		int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
 		int count; Point pt;
 		int cellSizeThreshold = int(src.total() * cellMinPercent); // if the cell is smaller than this, skip it.
-		if (cellSizeThreshold < 1) cellSizeThreshold = 1;
+		if (cellSizeThreshold < 2) cellSizeThreshold = 2;
 		for (int y = 0; y < src.rows; y++)
 		{
 			for (int x = 0; x < src.cols; x++)
@@ -2619,6 +2619,7 @@ public:
 
 		cellRects.clear();
 		cellSizes.clear();
+		floodPoints.clear();
 		int fill = 1;
 		int totalCount = 0;
 		int threshold = int(imageThresholdPercent * src.total());

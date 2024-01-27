@@ -3,10 +3,9 @@ Imports System.Runtime.InteropServices
 Imports System.Threading
 Public Class MotionRect_Basics : Inherits VB_Algorithm
     Dim bgSub As New BGSubtract_Basics
-    Dim redCPP As New RedCloud_CPP
+    Dim redCPP As New RedCloud_Color
     Public showDiff As Boolean
     Public Sub New()
-        redOptions.UseColor.Checked = True
         redCPP.imageThresholdPercent = 1.0
         redCPP.cellMinPercent = 0
         vbAddAdvice(traceName + ": redOptions are used as well as BGSubtract options.")
@@ -19,7 +18,10 @@ Public Class MotionRect_Basics : Inherits VB_Algorithm
         If task.pcSplit Is Nothing Then Exit Sub
 
         redCPP.Run(bgSub.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary))
-        If redCPP.sortedCells.Count < 2 Then Exit Sub
+        If redCPP.sortedCells.Count < 2 Then
+            dst3.SetTo(0)
+            Exit Sub
+        End If
 
         Dim nextRect = redCPP.sortedCells.ElementAt(1).Value.rect
         For Each key In redCPP.sortedCells
@@ -41,6 +43,7 @@ Public Class MotionRect_Basics : Inherits VB_Algorithm
         If rectList.Count > gOptions.FrameHistory.Value Then rectList.RemoveAt(0)
         If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
             task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+            rectList.Clear()
         End If
 
         If standalone Or showIntermediate() Or showDiff Then dst2.Rectangle(task.motionRect, 255, task.lineWidth)
@@ -212,7 +215,7 @@ Public Class MotionRect_Rect1 : Inherits VB_Algorithm
 
         If standalone Then
             Static diff As New Diff_Basics
-            diff.lastGray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            diff.lastFrame = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             diff.Run(dst2)
             dst3 = diff.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst3.Rectangle(r, task.highlightColor, task.lineWidth, task.lineType)
@@ -277,7 +280,7 @@ End Class
 
 
 Public Class MotionRect_Enclosing : Inherits VB_Algorithm
-    Dim redCPP As New RedCloud_CPP
+    Dim redCPP As New RedCloud_Color
     Public motionRect As New cv.Rect
     Public Sub New()
         cPtr = BGSubtract_BGFG_Open(4)
@@ -320,19 +323,52 @@ End Class
 
 
 
-Public Class MotionRect_Depth : Inherits VB_Algorithm
-    Public motion As New MotionRect_Basics
+
+Public Class MotionRect_PointCloud : Inherits VB_Algorithm
+    Public diff As New Diff_Depth32f
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        If standalone Then motion.showDiff = True
         labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
         desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        If heartBeat() Then
+            task.motionRect = New cv.Rect
+            dst2 = task.pointCloud.Clone
+        End If
+
+        dst1 = task.motionColor.dst2
+
+        If task.motionRect.Width = 0 And task.motionRect.Height = 0 Then Exit Sub
+        task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
+
+        If standalone Or showIntermediate() Then
+            If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
+            diff.Run(task.pcSplit(2))
+            dst3 = diff.dst2
+            dst3.Rectangle(task.motionRect, 255, task.lineWidth)
+            diff.lastDepth32f = task.pcSplit(2)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class MotionRect_Depth : Inherits VB_Algorithm
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
+        desc = "Display the depth data after updating only the motion rectangle.  Resync every heartbeat."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
         If heartBeat() Then dst2 = task.pcSplit(2).Clone
 
-        motion.Run(src)
-        dst1 = motion.dst2
+        dst1 = task.motionColor.dst2
 
         If task.motionRect.Width = 0 And task.motionRect.Height = 0 Then Exit Sub
 
@@ -354,34 +390,68 @@ End Class
 
 
 
-
-Public Class MotionRect_PointCloud : Inherits VB_Algorithm
-    Public motion As New MotionRect_Basics
-    Public diff As New Diff_Depth32f
+Public Class MotionRect_Grayscale : Inherits VB_Algorithm
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        If standalone Then motion.showDiff = True
-        labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
-        desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat."
+        labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated grayscale image",
+                  "Diff of input and latest accumulated grayscale image"}
+        desc = "Display the grayscale image after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then
-            task.motionRect = New cv.Rect
-            dst2 = task.pointCloud.Clone
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If heartBeat() Then dst2 = src.Clone
+
+        dst1 = task.motionColor.dst2
+
+        If task.motionRect.Width = 0 And task.motionRect.Height = 0 Then
+            dst3.SetTo(0)
+            Exit Sub
         End If
 
-        motion.Run(src)
-        dst1 = motion.dst2
-
-        If task.motionRect.Width = 0 And task.motionRect.Height = 0 Then Exit Sub
-        task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
+        src(task.motionRect).CopyTo(dst2(task.motionRect))
 
         If standalone Or showIntermediate() Then
-            If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
-            diff.Run(task.pcSplit(2))
-            dst3 = diff.dst2
+            Static diff As New Diff_Basics
+            If diff.lastFrame.Width = 0 Then diff.lastFrame = dst2.Clone
+            diff.Run(src)
+            dst3 = diff.dst3
             dst3.Rectangle(task.motionRect, 255, task.lineWidth)
-            diff.lastDepth32f = task.pcSplit(2)
+            diff.lastFrame = src.Clone
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class MotionRect_Color : Inherits VB_Algorithm
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated color image",
+                  "Diff of input and latest accumulated color image"}
+        desc = "Display the color image after updating only the motion rectangle.  Resync every heartbeat."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If heartBeat() Then dst2 = src.Clone
+
+        dst1 = task.motionColor.dst2
+
+        If task.motionRect.Width = 0 And task.motionRect.Height = 0 Then
+            dst3.SetTo(0)
+            Exit Sub
+        End If
+
+        src(task.motionRect).CopyTo(dst2(task.motionRect))
+
+        If standalone Or showIntermediate() Then
+            Static diff As New Diff_Color
+            If diff.diff.lastFrame.Width = 0 Then diff.diff.lastFrame = dst2.Clone
+            diff.Run(src)
+            dst3 = diff.dst3
+            dst3.Rectangle(task.motionRect, 255, task.lineWidth)
+            diff.diff.lastFrame = src.Clone
         End If
     End Sub
 End Class

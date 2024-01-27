@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Diff_Basics : Inherits VB_Algorithm
     Public changedPixels As Integer
-    Public lastGray As New cv.Mat
+    Public lastFrame As New cv.Mat
     Public Sub New()
         labels = {"", "", "Stable gray", "Unstable mask"}
         vbAddAdvice(traceName + ": use local options to control the dilation.")
@@ -9,20 +9,20 @@ Public Class Diff_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If firstPass Then lastGray = src.Clone
-        If task.optionsChanged Or lastGray.Size <> src.Size Then
-            lastGray = src.Clone
+        If firstPass Then lastFrame = src.Clone
+        If task.optionsChanged Or lastFrame.Size <> src.Size Then
+            lastFrame = src.Clone
             dst3 = src.Clone
         End If
 
-        cv.Cv2.Absdiff(src, lastGray, dst0)
+        cv.Cv2.Absdiff(src, lastFrame, dst0)
         dst3 = dst0.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
         changedPixels = dst3.CountNonZero
         If changedPixels > 0 Then
             dst3 = dst0.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
             dst2 = src.Clone
             dst2.SetTo(0, dst3)
-            lastGray = src.Clone
+            lastFrame = src.Clone
         End If
     End Sub
 End Class
@@ -39,7 +39,7 @@ Public Class Diff_Color : Inherits VB_Algorithm
         desc = "Use Diff_Basics with a color image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If firstPass Then diff.lastGray = src.Reshape(1, src.Rows * 3)
+        If firstPass Then diff.lastFrame = src.Reshape(1, src.Rows * 3)
         diff.Run(src.Reshape(1, src.Rows * 3))
         dst2 = diff.dst3.Reshape(3, src.Rows)
         dst3 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

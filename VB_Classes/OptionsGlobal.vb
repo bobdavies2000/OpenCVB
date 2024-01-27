@@ -19,7 +19,7 @@ Public Class OptionsGlobal
         End If
         AddWeightedSlider.Value = 50
         FrameHistory.Value = 3
-        MotionFilteredCloud.Checked = True
+        MotionFilteredColorAndCloud.Checked = True
         gravityPointCloud.Checked = True
 
         maxCount.Text = CStr(MaxDepth.Value)

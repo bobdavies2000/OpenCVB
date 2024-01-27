@@ -3258,7 +3258,7 @@ public:
 
 
 
-class CPP_RedCloud_CPP : public algorithmCPP {
+class CPP_RedCloud_Color : public algorithmCPP {
 public:
     map<int, rcData, compareAllowIdenticalIntegerInverted> sortedCells;
     Mat inputMask;
@@ -3267,8 +3267,8 @@ public:
     float cellMinPercent = 0.0001f;
     CPP_Color_Basics* colorClass = new CPP_Color_Basics();
     RedCloud* cPtr;
-    CPP_RedCloud_CPP() : algorithmCPP() {
-        traceName = "CPP_RedCloud_CPP";
+    CPP_RedCloud_Color() : algorithmCPP() {
+        traceName = "CPP_RedCloud_Color";
         cPtr = new RedCloud;
         desc = "Core interface to the C++ code for floodfill.";
     }
@@ -3291,10 +3291,9 @@ public:
         if (classCount == 0) return;
 
         dst2 = Mat(src.rows, src.cols, CV_8U, imagePtr).clone();
-        if (standalone) {
-            dst3 = vbPalette(dst2 * 255 / classCount);
-        }
+        if (standalone) dst3 = vbPalette(dst2 * 255 / classCount);
         if (task->heartBeat) labels[3] = to_string(classCount) + " cells found";
+
         Mat sizeData(classCount, 1, CV_32S, RedCloud_Sizes(cPtr));
         Mat rectData(classCount, 1, CV_32SC4, RedCloud_Rects(cPtr));
         Mat floodPointData(classCount, 1, CV_32SC2, RedCloud_FloodPoints(cPtr));
@@ -3333,19 +3332,21 @@ public:
 
 
 
-class CPP_RedCloud_Native : public algorithmCPP {
+class CPP_RedCloud_ColorNative : public algorithmCPP {
 public:
     map<int, rcData, compareAllowIdenticalIntegerInverted> sortedCells;
-    Mat inputMask;
     int classCount;
+    int maxClassCount = 255;
+    vector<Rect>cellRects;
+    vector<int> cellSizes;
+    vector<Point> floodPoints;
     float imageThresholdPercent = 0.98f;
     float cellMinPercent = 0.0001f;
     CPP_Color_Basics* colorClass = new CPP_Color_Basics();
-    RedCloud* cPtr;
-    CPP_RedCloud_Native() : algorithmCPP() {
-        traceName = "CPP_RedCloud_Native";
-        cPtr = new RedCloud;
-        desc = "Core interface to the C++ code for floodfill.";
+    CPP_RedCloud_ColorNative() : algorithmCPP() {
+        traceName = "CPP_RedCloud_ColorNative";
+        dst2 = Mat(dst2.size(), CV_8U);
+        desc = "This algorithm is the same as CPP_RedCLoud_Color.  It was meant only to test if it could be faster by eliminating some moves.";
     }
     void Run(Mat src) {
         if (src.channels() != 1) {
@@ -3353,49 +3354,76 @@ public:
             src = colorClass->dst2.clone();
         }
 
-        int* imagePtr;
-        if (!inputMask.empty()) {
-            imagePtr = RedCloud_Run(cPtr, (int*)src.data, inputMask.data, src.rows, src.cols,
-                src.type(), task->desiredCells, 0, imageThresholdPercent, cellMinPercent);
-        }
-        else {
-            imagePtr = RedCloud_Run(cPtr, (int*)src.data, nullptr, src.rows, src.cols,
-                src.type(), task->desiredCells, 0, imageThresholdPercent, cellMinPercent);
-        }
-        classCount = RedCloud_Count(cPtr);
-        if (classCount == 0) return;
+        Mat mask = Mat::zeros(dst2.rows + 2, dst2.cols + 2, CV_8U);
+        mask.setTo(0);
+        Rect rect;
 
-        dst2 = Mat(src.rows, src.cols, CV_8U, imagePtr).clone();
-        if (standalone) {
-            dst3 = vbPalette(dst2 * 255 / classCount);
+        multimap<int, Point, greater<int>> sizeSorted;
+        int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
+        int count; Point pt;
+        int cellSizeThreshold = int(src.total() * cellMinPercent); // if the cell is smaller than this, skip it.
+        if (cellSizeThreshold < 1) cellSizeThreshold = 1;
+        for (int y = 0; y < src.rows; y++)
+        {
+            for (int x = 0; x < src.cols; x++)
+            {
+                if (mask.at<unsigned char>(y, x) == 0)
+                {
+                    pt = Point(x, y);
+                    int count = floodFill(src, mask, pt, 255, &rect, 0, 0, floodFlag | (255 << 8));
+                    if (count >= cellSizeThreshold) sizeSorted.insert(make_pair(count, pt));
+                }
+            }
         }
+
+        cellRects.clear();
+        cellSizes.clear();
+        floodPoints.clear();
+        int fill = 1;
+        int totalCount = 0;
+        int threshold = int(imageThresholdPercent * src.total());
+        mask.setTo(0);
+        for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
+        {
+            count = floodFill(src, mask, it->second, fill, &rect, 0, 0, floodFlag | (fill << 8));
+            if (count >= 1)
+            {
+                cellRects.push_back(rect);
+                cellSizes.push_back(count);
+                floodPoints.push_back(it->second);
+                totalCount += count;
+
+                if (count > threshold || fill >= maxClassCount)
+                    break; // just taking up to the top X largest objects found.
+                fill++;
+            }
+        }
+
+        Rect r = Rect(1, 1, dst2.cols, dst2.rows);
+        dst2 = mask(r).clone();
+
+        classCount = int(cellRects.size());
+        if (standalone) dst3 = vbPalette(dst2 * 255 / classCount);
         if (task->heartBeat) labels[3] = to_string(classCount) + " cells found";
-        Mat sizeData(classCount, 1, CV_32S, RedCloud_Sizes(cPtr));
-        Mat rectData(classCount, 1, CV_32SC4, RedCloud_Rects(cPtr));
-        Mat floodPointData(classCount, 1, CV_32SC2, RedCloud_FloodPoints(cPtr));
+
         sortedCells.clear();
         for (int i = 0; i < classCount; ++i) {
             rcData rc;
             rc.index = i + 1;
-            Rect r = rectData.at<Rect>(i, 0);
+            Rect r = cellRects[i];
             rc.rect = task->validateRect(r, dst2.cols, dst2.rows);
             inRange(dst2(rc.rect), rc.index, rc.index, rc.mask);
-            threshold(rc.mask, rc.mask, 0, 255, THRESH_BINARY);
+            cv::threshold(rc.mask, rc.mask, 0, 255, THRESH_BINARY);
             rc.motionRect = rc.rect;
-            rc.pixels = sizeData.at<int>(i, 0);
-            rc.floodPoint = floodPointData.at<Point>(i, 0);
+            rc.pixels = cellSizes[i];
+            rc.floodPoint = floodPoints[i];
             rectangle(rc.mask, Rect(0, 0, rc.mask.cols, rc.mask.rows), 0, 1);
             rc.maxDist = rc.rect.tl() + task->vbGetMaxDist(rc.mask);
             rc.depthCell = task->pcSplit[2].at<float>(rc.floodPoint.y, rc.floodPoint.x) != 0;
             sortedCells[rc.pixels] = rc;
         }
+
         if (task->heartBeat) labels[2] = "CV_8U format - " + to_string(classCount) + " cells were identified.";
-    }
-    void Close() {
-        if (cPtr) {
-            RedCloud_Close(cPtr);
-            cPtr = nullptr;
-        }
     }
 };
 
@@ -3408,7 +3436,7 @@ public:
 //class CPP_MotionRect_Basics : public algorithmCPP {
 //public:
 //    CPP_BGSubtract_Basics* bgSub;
-//    RedCloud_CPP redCPP;
+//    RedCloud_Color redCPP;
 //    dst = Mat2;
 //    bool showDiff;
 //    CPP_MotionRect_Basics() : algorithmCPP() {
