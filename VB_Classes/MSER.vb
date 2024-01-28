@@ -84,7 +84,7 @@ Public Class MSER_Basics : Inherits VB_Algorithm
             dst3.Rectangle(r, task.highlightColor, task.lineWidth)
         Next
 
-        If heartBeat() Then labels(2) = CStr(mserCells.Count) + " Cells identified"
+        If task.heartBeat Then labels(2) = CStr(mserCells.Count) + " Cells identified"
     End Sub
 End Class
 
@@ -262,7 +262,7 @@ Public Class MSER_Hulls : Inherits VB_Algorithm
             vbDrawContour(dst3(rc.rect), rc.hull, rc.color, -1)
         Next
 
-        If heartBeat() Then labels(2) = CStr(mBase.mserCells.Count) + " Regions with average size " + CStr(CInt(pixels / mBase.mserCells.Count))
+        If task.heartBeat Then labels(2) = CStr(mBase.mserCells.Count) + " Regions with average size " + CStr(CInt(pixels / mBase.mserCells.Count))
     End Sub
 End Class
 
@@ -510,7 +510,7 @@ Public Class MSER_Regions : Inherits VB_Algorithm
         mserCells.Clear()
         cellMap.SetTo(mserLast)
         Dim lastDst2 = dst2.Clone
-        If heartBeat() Then dst2.SetTo(0)
+        If task.heartBeat Then dst2.SetTo(0)
         dst3.SetTo(0)
         Dim minPixels = gOptions.minPixelsSlider.Value
         For Each key In redCells
@@ -703,7 +703,7 @@ Public Class MSER_Mask_CPP : Inherits VB_Algorithm
 
         If options.graySetting And src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        If heartBeat() Then
+        If task.heartBeat Then
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
             Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)

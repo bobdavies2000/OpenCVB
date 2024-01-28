@@ -236,7 +236,7 @@ Public Class DFT_Shapes : Inherits VB_Algorithm
                 symShapes.Run(src)
                 dst2 = symShapes.dst2
             Case "Draw Point"
-                If heartBeat() Then
+                If task.heartBeat Then
                     dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
                     Dim pt1 = New cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10))
                     Dim pt2 = New cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10))

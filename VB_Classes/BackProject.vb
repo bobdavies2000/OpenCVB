@@ -356,7 +356,7 @@ Public Class BackProject_MaskLines : Inherits VB_Algorithm
         dst2 = masks.dst2
         dst3 = src.Clone
 
-        If heartBeat() Then dst1.SetTo(0)
+        If task.heartBeat Then dst1.SetTo(0)
 
         lines.Run(masks.mask)
         For Each mp In lines.mpList

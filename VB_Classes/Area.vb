@@ -11,7 +11,7 @@ Public Class Area_MinTriangle_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        If heartBeat() Then
+        If task.heartBeat Then
             srcPoints = New List(Of cv.Point2f)(options.srcPoints)
         Else
             If srcPoints.Count < 3 Then Exit Sub ' not enough points
@@ -163,7 +163,7 @@ Public Class Area_MinRect : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
-            If heartBeat() = False Then Exit Sub
+            If task.heartBeat = False Then Exit Sub
             options.RunVB()
             inputPoints = quickRandomPoints(options.numPoints)
         End If

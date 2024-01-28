@@ -532,7 +532,7 @@ Public Class Line_PointSlope : Inherits VB_Algorithm
             bestInput.Add(mps)
         Next
 
-        If bestLines.Count < lineCount Or heartBeat() Then
+        If bestLines.Count < lineCount Or task.heartBeat Then
             dst3.SetTo(0)
             bestLines.Clear()
             knn.queries.Clear()
@@ -970,7 +970,7 @@ Public Class Line_Verify : Inherits VB_Algorithm
         Static percentSlider = findSlider("Verify edge threshold percentage")
         Dim thresholdPercentage = percentSlider.Value / 100
 
-        If standalone And heartBeat() Then
+        If standalone And task.heartBeat Then
             Static lines As New Line_Basics
             lines.Run(src.Clone)
             tcells = lines.tCells
@@ -1036,7 +1036,7 @@ Public Class Line_DisplayInfo : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         dst2 = src
-        If standalone And heartBeat() Then
+        If standalone And task.heartBeat Then
             Dim tc As tCell
             tcells.Clear()
             For i = 0 To 2 - 1
@@ -1094,7 +1094,7 @@ Public Class Line_Perpendicular : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static externalUse = If(p1 = New cv.Point2f, False, True)
-        If heartBeat() Or externalUse Then
+        If task.heartBeat Or externalUse Then
             If standalone Then
                 p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
                 p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -1136,7 +1136,7 @@ Public Class Line_Nearest : Inherits VB_Algorithm
         desc = "Find the nearest point on a line"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone And heartBeat() Then
+        If standalone And task.heartBeat Then
             p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             pt = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -1191,7 +1191,7 @@ Public Class Line_Intersection : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f
-        If heartBeat() Then
+        If task.heartBeat Then
             p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             p3 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))

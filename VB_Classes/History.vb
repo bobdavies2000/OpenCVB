@@ -44,7 +44,7 @@ Public Class History_MotionRect : Inherits VB_Algorithm
         desc = "Create an image that is the motionRect applied to the previous image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Or task.motionReset Then dst2 = src.Clone
+        If task.heartBeat Or task.motionReset Then dst2 = src.Clone
 
         If task.motionDetected Then
             src(task.motionRect).CopyTo(dst2(task.motionRect))

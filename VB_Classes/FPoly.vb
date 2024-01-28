@@ -136,7 +136,7 @@ Public Class FPoly_Sides : Inherits VB_Algorithm
         If firstPass Then prevImage = src.Clone
         Options.RunVB()
 
-        If standalone And heartBeat() Then
+        If standalone And task.heartBeat Then
             Static random As New Random_Basics
             random.Run(empty)
             currPoly = New List(Of cv.Point2f)(random.pointList)
@@ -444,7 +444,7 @@ Public Class FPoly_PlotWeighted : Inherits VB_Algorithm
         addw.src2 = plot.dst2
         addw.Run(lastPlot)
         dst2 = addw.dst2
-        If heartBeat() Then
+        If task.heartBeat Then
             Dim avg = If(fPlot.distDiff.Count > 0, fPlot.distDiff.Average, 0)
             labels(2) = "Average distance change (after threshholding) = " + Format(avg, fmt3) + ", peak at " +
                         CStr(peakIndex) + " with " + Format(peak, fmt1) + " occurances"

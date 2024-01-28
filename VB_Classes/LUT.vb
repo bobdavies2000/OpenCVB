@@ -200,7 +200,7 @@ Public Class LUT_CustomColor : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Static colorSlider = findSlider("Color transitions")
         Static saveColorCount = -1
-        If task.optionsChanged Or heartBeat() Then
+        If task.optionsChanged Or task.heartBeat Then
             If saveColorCount = 20 Then colorSlider.Value = 5 Else colorSlider.Value += 1
             saveColorCount = colorSlider.Value
             gradMap.Run(src)

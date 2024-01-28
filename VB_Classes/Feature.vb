@@ -169,7 +169,7 @@ Public Class Feature_CellGrid : Inherits VB_Algorithm
         desc = "Track the GoodFeatures in each Grid_Basics cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then dst0.SetTo(0)
+        If task.heartBeat Then dst0.SetTo(0)
 
         dst2 = src
 
@@ -319,7 +319,7 @@ Public Class Feature_PointsDelaunay : Inherits VB_Algorithm
                 ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
             Next
 
-            Dim index = If(heartBeat(), i * incr, dst3.Get(Of Byte)(feat.featurePoints(i).Y, feat.featurePoints(i).X))
+            Dim index = If(task.heartBeat, i * incr, dst3.Get(Of Byte)(feat.featurePoints(i).Y, feat.featurePoints(i).X))
             vbDrawContour(dst3, ifacet.ToList, index, -1)
         Next
 

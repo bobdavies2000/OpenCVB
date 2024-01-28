@@ -10,7 +10,7 @@ Public Class Entropy_Basics : Inherits VB_Algorithm
         entropy.Run(src)
 
         If standalone Then
-            If heartBeat() Then strOut = "More histogram bins means higher entropy values" + vbCrLf + vbCrLf + "Total entropy = " + Format(entropy.entropyVal, fmt1) + vbCrLf + entropy.entropyChannels
+            If task.heartBeat Then strOut = "More histogram bins means higher entropy values" + vbCrLf + vbCrLf + "Total entropy = " + Format(entropy.entropyVal, fmt1) + vbCrLf + entropy.entropyChannels
             setTrueText(strout, 2)
         End If
     End Sub

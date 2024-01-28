@@ -154,7 +154,7 @@ Public Class Match_BestEntropy : Inherits VB_Algorithm
         desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If heartBeat() Then
+        If task.heartBeat Then
             entropy.Run(src)
             task.drawRect = entropy.eMaxRect
         End If
@@ -363,7 +363,7 @@ Public Class Match_PointSlope : Inherits VB_Algorithm
             dst2.Line(mr.p1, mr.p2, task.highlightColor, task.lineWidth, task.lineType)
             dst2.Circle(mr.p1, task.dotSize, task.highlightColor, -1, task.lineType)
             dst2.Circle(mr.p2, task.dotSize, task.highlightColor, -1, task.lineType)
-            If heartBeat() Then
+            If task.heartBeat Then
                 strOut1 = Format(mr.correlation1, fmt3)
                 strOut2 = Format(mr.correlation2, fmt3)
             End If
@@ -391,7 +391,7 @@ Public Class Match_TraceRedC : Inherits VB_Algorithm
         desc = "Track each RedCloud cell center to highlight zones of RedCloud cell instability.  Look for clusters of points in dst2."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Or task.cameraStable = False Then dst2.SetTo(0)
+        If task.heartBeat Or task.cameraStable = False Then dst2.SetTo(0)
         redC.Run(src)
 
         Static frameList As New List(Of cv.Mat)
@@ -540,7 +540,7 @@ Public Class Match_tCell : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src as cv.Mat)
         Dim rSize = cellSlider.Value
-        If standalone And heartBeat() Then
+        If standalone And task.heartBeat Then
             options.RunVB()
             tCells.Clear()
             tCells.Add(createCell(src, 0, New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))))

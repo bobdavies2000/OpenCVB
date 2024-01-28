@@ -48,7 +48,7 @@ Public Class EdgeDraw_Segments : Inherits VB_Algorithm
 
         Dim ptData = New cv.Mat(EdgeDraw_Lines_Count(cPtr), 2, cv.MatType.CV_32FC2, vecPtr).Clone
         dst2.SetTo(0)
-        If heartBeat() Then dst3.SetTo(0)
+        If task.heartBeat Then dst3.SetTo(0)
         segPoints.Clear()
         For i = 0 To ptData.Rows - 1 Step 2
             Dim pt1 = ptData.Get(Of cv.Point2f)(i, 0)

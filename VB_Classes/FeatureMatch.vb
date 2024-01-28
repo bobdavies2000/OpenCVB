@@ -106,7 +106,7 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
         Next
 
         Dim matchcount = showMatches(mpList, corrList)
-        If heartBeat() Then
+        If task.heartBeat Then
             labels(3) = CStr(matchcount) + " points were matched with a minimum " + Format(minCorr, fmt1) +
                         " correlation"
         End If
@@ -165,7 +165,7 @@ Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
                 End If
             End If
         Next
-        If heartBeat() Then
+        If task.heartBeat Then
             labels(2) = "There were " + CStr(rowList.Count) + " rows with features in both rows."
             labels(3) = "Left image has " + CStr(leftCorners.Count) + " good features and the right camera has " +
                                        CStr(rightCorners.Count) + " good features"
@@ -227,7 +227,7 @@ Public Class FeatureMatch_History : Inherits VB_Algorithm
         dst3 = feat.dst3
 
         trueData = New List(Of trueText)(feat.trueData)
-        If heartBeat() Then
+        If task.heartBeat Then
             labels(3) = CStr(mpList.Count) + " points were matched with a minimum " + Format(minCorr, fmt1) + " correlation"
         End If
     End Sub

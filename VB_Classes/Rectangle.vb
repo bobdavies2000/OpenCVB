@@ -10,7 +10,7 @@ Public Class Rectangle_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        If heartBeat() Then
+        If task.heartBeat Then
             dst2.SetTo(cv.Scalar.Black)
             rectangles.Clear()
             rotatedRectangles.Clear()
@@ -69,7 +69,7 @@ Public Class Rectangle_Overlap : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static typeCheckBox = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-        If heartBeat() = False Then Exit Sub
+        If task.heartBeat = False Then Exit Sub
         If standalone Then
             draw.Run(src)
             dst2 = draw.dst2
@@ -139,7 +139,7 @@ Public Class Rectangle_Intersection : Inherits VB_Algorithm
         Static mergeSlider = findSlider("Merge rectangles within X pixels")
 
         If standalone Then
-            If heartBeat() Then
+            If task.heartBeat Then
                 Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
                 Static countSlider = findSlider("DrawCount")
 

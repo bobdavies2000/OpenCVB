@@ -12,7 +12,7 @@ Public Class Spectrum_Basics : Inherits VB_Algorithm
         dSpec.Run(src)
         gSpec.Run(src)
 
-        If heartBeat() And task.rc.index > 0 Then
+        If task.heartBeat And task.rc.index > 0 Then
             strOut = dSpec.strOut + vbCrLf + vbCrLf
             strOut += gSpec.strOut
         End If
@@ -37,7 +37,7 @@ Public Class Spectrum_X : Inherits VB_Algorithm
 
         If standalone Then dst2 = options.runRedCloud(labels(2))
 
-        If heartBeat() And task.rc.index > 0 Then
+        If task.heartBeat And task.rc.index > 0 Then
             Dim ranges = options.buildDepthRanges(task.pcSplit(0)(task.rc.rect).Clone, " pointcloud X ")
             strOut = options.strOut
         End If
@@ -61,7 +61,7 @@ Public Class Spectrum_Y : Inherits VB_Algorithm
 
         If standalone Then dst2 = options.runRedCloud(labels(2))
 
-        If heartBeat() And task.rc.index > 0 Then
+        If task.heartBeat And task.rc.index > 0 Then
             Dim ranges = options.buildDepthRanges(task.pcSplit(1)(task.rc.rect).Clone, " pointcloud Y ")
             strOut = options.strOut
         End If
@@ -84,7 +84,7 @@ Public Class Spectrum_Z : Inherits VB_Algorithm
         options.RunVB()
         If standalone Then dst2 = options.runRedCloud(labels(2))
 
-        If heartBeat() And task.rc.index > 0 Then
+        If task.heartBeat And task.rc.index > 0 Then
             Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rc.rect).Clone, " pointcloud Z ")
             strOut = options.strOut
         End If
@@ -113,7 +113,7 @@ Public Class Spectrum_Cloud : Inherits VB_Algorithm
 
         If standalone Then dst2 = options.runRedCloud(labels(2))
 
-        If heartBeat() Then
+        If task.heartBeat Then
             specX.Run(src)
             strOut = specX.strOut + vbCrLf
             specY.Run(src)
@@ -144,7 +144,7 @@ Public Class Spectrum_GrayAndCloud : Inherits VB_Algorithm
 
         If standalone Then dst2 = options.runRedCloud(labels(2))
 
-        If heartBeat() Then
+        If task.heartBeat Then
             sCloud.Run(src)
             strOut = sCloud.strOut + vbCrLf
             gSpec.Run(src)
@@ -174,15 +174,15 @@ Public Class Spectrum_RGB : Inherits VB_Algorithm
         Dim split = src.Split()
         gSpec.typeSpec = " blue "
         gSpec.Run(split(0))
-        If heartBeat() Then strOut = gSpec.strOut + vbCrLf
+        If task.heartBeat Then strOut = gSpec.strOut + vbCrLf
 
         gSpec.typeSpec = " green "
         gSpec.Run(split(1))
-        If heartBeat() Then strOut += gSpec.strOut + vbCrLf
+        If task.heartBeat Then strOut += gSpec.strOut + vbCrLf
 
         gSpec.typeSpec = " red "
         gSpec.Run(split(2))
-        If heartBeat() Then strOut += gSpec.strOut
+        If task.heartBeat Then strOut += gSpec.strOut
 
         setTrueText(strOut, 3)
     End Sub
@@ -207,7 +207,7 @@ Public Class Spectrum_CellZoom : Inherits VB_Algorithm
 
         dst2 = breakdown.options.runRedCloud(labels(2))
 
-        If heartBeat() Then
+        If task.heartBeat Then
             breakdown.Run(src)
             setTrueText(breakdown.strOut, 1)
 
@@ -339,7 +339,7 @@ Public Class Spectrum_Mask : Inherits VB_Algorithm
         gSpec.Run(src)
         dst1 = gSpec.dst2
         labels(2) = gSpec.labels(2)
-        If heartBeat() Then strOut = gSpec.strOut
+        If task.heartBeat Then strOut = gSpec.strOut
     End Sub
 End Class
 

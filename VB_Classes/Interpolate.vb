@@ -99,7 +99,7 @@ Public Class Interpolate_Kalman : Inherits VB_Algorithm
                     " savings = " + CStr(myFrameCount - updatedFrames) + " or " +
                     Format((myFrameCount - updatedFrames) / myFrameCount, "0%") + " diffCount = " + CStr(diffCount)
 
-        If heartBeat() Then
+        If task.heartBeat Then
             Static heartCount As Integer
             heartCount += 1
             If heartCount Mod 10 = 0 Then
@@ -253,7 +253,7 @@ Public Class Interpolate_Fake : Inherits VB_Algorithm
             End If
         End If
 
-        If heartBeat() Then
+        If task.heartBeat Then
             Static heartCount As Integer
             heartCount += 1
             If heartCount Mod 3 = 0 Then

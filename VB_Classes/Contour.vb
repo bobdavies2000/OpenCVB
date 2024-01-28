@@ -10,7 +10,7 @@ Public Class Contour_Basics : Inherits VB_Algorithm
         dst2 = src.Clone
         If standalone Then
             Static rotatedRect As New Rectangle_Rotated
-            If heartBeat() = False Then Exit Sub
+            If task.heartBeat = False Then Exit Sub
             rotatedRect.Run(src)
             dst2 = rotatedRect.dst2
             If dst2.Channels = 3 Then
@@ -64,7 +64,7 @@ Public Class Contour_BasicsWithOptions : Inherits VB_Algorithm
         If standalone Then
 
             Static rotatedRect As New Rectangle_Rotated
-            If heartBeat() = False Then Exit Sub
+            If task.heartBeat = False Then Exit Sub
             rotatedRect.Run(src)
             dst2 = rotatedRect.dst2
             If dst2.Channels = 3 Then
@@ -235,7 +235,7 @@ Public Class Contour_SidePoints : Inherits VB_Algorithm
         dst2 = sides.dst2
         Dim rc = task.rc
 
-        If sides.corners.Count > 0 And heartBeat() Then
+        If sides.corners.Count > 0 And task.heartBeat Then
             ptLeft = sides.corners(1)
             ptRight = sides.corners(2)
             ptTop = sides.corners(3)
@@ -253,7 +253,7 @@ Public Class Contour_SidePoints : Inherits VB_Algorithm
                 dst3.Line(ptLeft, ptRight, cv.Scalar.White, task.lineWidth, task.lineType)
                 dst3.Line(ptTop, ptBot, cv.Scalar.White, task.lineWidth, task.lineType)
             End If
-            If heartBeat() Then
+            If task.heartBeat Then
                 strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + " 3D location (units=meters)" + vbCrLf
                 strOut += vec3fToString(vecLeft) + vbTab + " Left side average (blue)" + vbCrLf
                 strOut += vec3fToString(vecRight) + vbTab + " Right side average (red)" + vbCrLf
@@ -433,7 +433,7 @@ Public Class Contour_SelfIntersect : Inherits VB_Algorithm
 
         Dim selfInt As Boolean
         Dim ptList As New List(Of String)
-        If heartBeat() Then dst1.SetTo(0)
+        If task.heartBeat Then dst1.SetTo(0)
         For Each pt In rc.contour
             Dim ptStr = Format(pt.X, "0000") + Format(pt.Y, "0000")
             If ptList.Contains(ptStr) Then
@@ -472,7 +472,7 @@ Public Class Contour_Largest : Inherits VB_Algorithm
         options.RunVB()
         If standalone Then
             Static rotatedRect As New Rectangle_Rotated
-            If heartBeat() Then
+            If task.heartBeat Then
                 rotatedRect.Run(src)
                 dst2 = rotatedRect.dst2
             End If
@@ -568,7 +568,7 @@ Public Class Contour_Smoothing : Inherits VB_Algorithm
         Dim newContour = contourBuild(rc.mask, options.ApproximationMode)
         vbDrawContour(dst3(rc.rect), newContour, cv.Scalar.Yellow)
 
-        If heartBeat() Then labels(3) = "Contour points count reduced from " + CStr(poorContour.Count) + " to " + CStr(newContour.Count)
+        If task.heartBeat Then labels(3) = "Contour points count reduced from " + CStr(poorContour.Count) + " to " + CStr(newContour.Count)
     End Sub
 End Class
 

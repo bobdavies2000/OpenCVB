@@ -12,7 +12,7 @@ Public Class Hull_Basics : Inherits VB_Algorithm
         desc = "Given a list of points, create a hull that encloses them."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If (standalone And heartBeat()) Or (useRandomPoints And heartBeat()) Then
+        If (standalone And task.heartBeat) Or (useRandomPoints And task.heartBeat) Then
             random.Run(empty)
             dst2.SetTo(0)
             For Each pt In random.pointList

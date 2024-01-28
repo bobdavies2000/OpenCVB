@@ -1793,7 +1793,7 @@ Public Class Options_KLT : Inherits VB_Algorithm
         Static nightCheck = findCheckBox("KLT - Night Mode")
         Static deleteCheck = findCheckBox("KLT - delete all Points")
 
-        If deleteCheck.Checked Or heartBeat() Then
+        If deleteCheck.Checked Or task.heartBeat Then
             inputPoints = Nothing ' just delete all points and start again.
             deleteCheck.Checked = False
         End If

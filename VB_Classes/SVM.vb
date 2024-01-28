@@ -111,7 +111,7 @@ Public Class SVM_TestCase : Inherits VB_Algorithm
         Static points As New List(Of cv.Point2f)
         Static responses As New List(Of Integer)
 
-        If heartBeat() Then
+        If task.heartBeat Then
             points.Clear()
             responses.Clear()
             For i = 0 To 4 - 1
@@ -172,7 +172,7 @@ Public Class SVM_ReuseBasics : Inherits VB_Algorithm
         Static points As New List(Of cv.Point2f)
         Static responses As New List(Of Integer)
 
-        If heartBeat() Then
+        If task.heartBeat Then
             points.Clear()
             responses.Clear()
             For i = 0 To 4 - 1
@@ -234,7 +234,7 @@ Public Class SVM_ReuseRandom : Inherits VB_Algorithm
         End If
 
         Static blueCount As Integer
-        If heartBeat() Then
+        If task.heartBeat Then
             dst2.SetTo(0)
             blueCount = 0
             svm.points.Clear()

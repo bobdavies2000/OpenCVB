@@ -27,7 +27,7 @@ Public Class Mesh_Basics : Inherits VB_Algorithm
         Return dst2
     End Function
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then
+        If task.heartBeat Then
             If standalone Then
                 Static random As New Random_Basics
                 random.Run(empty)

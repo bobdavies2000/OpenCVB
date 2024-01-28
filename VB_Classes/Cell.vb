@@ -64,7 +64,7 @@ Public Class Cell_Basics : Inherits VB_Algorithm
             labels(2) = redC.labels(2)
             setSelectedCell(redC.redCells, redC.cellMap)
         End If
-        If heartBeat() Then statsString(src)
+        If task.heartBeat Then statsString(src)
 
         setTrueText(strOut, 3)
         labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.maxZmeters)) + " meters"
@@ -105,7 +105,7 @@ Public Class Cell_PixelCountCompare : Inherits VB_Algorithm
                 End If
             End If
         Next
-        If heartBeat() Then labels(3) = "There were " + CStr(missCount) + " cells that contained an island of depth pixels - value = (pixels, depthpixels)"
+        If task.heartBeat Then labels(3) = "There were " + CStr(missCount) + " cells that contained an island of depth pixels - value = (pixels, depthpixels)"
     End Sub
 End Class
 
@@ -133,7 +133,7 @@ Public Class Cell_Stable : Inherits VB_Algorithm
         labels(2) = redC.labels(2)
 
         Static prevList As New List(Of cv.Point)
-        If heartBeat() Or task.frameCount = 2 Then
+        If task.heartBeat Or task.frameCount = 2 Then
             prevList.Clear()
             For Each rc In redC.redCells
                 prevList.Add(rc.maxDStable)
@@ -293,7 +293,7 @@ Public Class Cell_JumpUp : Inherits VB_Algorithm
         Dim lastCells = New List(Of rcData)(redC.redCells)
         redC.Run(src)
         dst2 = redC.dst2
-        If heartBeat() Then dst3.SetTo(0)
+        If task.heartBeat Then dst3.SetTo(0)
         labels(2) = redC.labels(2)
 
         jumpCells.Clear()
@@ -306,7 +306,7 @@ Public Class Cell_JumpUp : Inherits VB_Algorithm
                 End If
             End If
         Next
-        If heartBeat() Then labels(3) = "There were " + CStr(jumpCells.Count) + " cells jumped up more than " +
+        If task.heartBeat Then labels(3) = "There were " + CStr(jumpCells.Count) + " cells jumped up more than " +
                                          Format(percentJump, "0%")
         If task.almostHeartBeat Then dst1 = dst3.Clone
     End Sub
@@ -335,7 +335,7 @@ Public Class Cell_JumpDown : Inherits VB_Algorithm
         Dim lastCells = New List(Of rcData)(redC.redCells)
         redC.Run(src)
         dst2 = redC.dst2
-        If heartBeat() Then dst3.SetTo(0)
+        If task.heartBeat Then dst3.SetTo(0)
         labels(2) = redC.labels(2)
 
         jumpCells.Clear()
@@ -348,7 +348,7 @@ Public Class Cell_JumpDown : Inherits VB_Algorithm
                 End If
             End If
         Next
-        If heartBeat() Then labels(3) = "There were " + CStr(jumpCells.Count) + " cells jumped down more than " +
+        If task.heartBeat Then labels(3) = "There were " + CStr(jumpCells.Count) + " cells jumped down more than " +
                                          Format(percentJump, "0%")
         If task.almostHeartBeat Then dst1 = dst3.Clone
     End Sub
@@ -374,7 +374,7 @@ Public Class Cell_JumpUnstable : Inherits VB_Algorithm
         Static percentSlider = findSlider("Percent jump in size")
         Dim percentJump = percentSlider.value / 100
 
-        If heartBeat() Or task.midHeartBeat Then
+        If task.heartBeat Or task.midHeartBeat Then
             Dim lastCells As New List(Of rcData)(redC.redCells)
             redC.Run(src)
             dst2 = redC.dst2
@@ -415,7 +415,7 @@ Public Class Cell_Distance : Inherits VB_Algorithm
         desc = "Measure the color distance of each cell to the selected cell."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Or task.quarterBeat Then
+        If task.heartBeat Or task.quarterBeat Then
             redC.Run(src)
             dst0 = task.color
             cellMap = redC.cellMap
@@ -433,7 +433,7 @@ Public Class Cell_Distance : Inherits VB_Algorithm
             Next
 
             If maxDistance < maxColorDistance Then maxDistance = maxColorDistance
-            If heartBeat() Then maxDistance = maxColorDistance
+            If task.heartBeat Then maxDistance = maxColorDistance
 
             dst1.SetTo(0)
             dst3.SetTo(0)
@@ -464,7 +464,7 @@ Public Class Cell_Binarize : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst0 = src
-        If heartBeat() Or task.quarterBeat Then
+        If task.heartBeat Or task.quarterBeat Then
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
@@ -507,7 +507,7 @@ Public Class Cell_DistanceDepth : Inherits VB_Algorithm
         desc = "Measure color distance from black for both color and depth cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Or task.quarterBeat Then
+        If task.heartBeat Or task.quarterBeat Then
             redOptions.UseDepth.Checked = True
             redC.Run(src)
             dst2 = redC.dst2.Clone

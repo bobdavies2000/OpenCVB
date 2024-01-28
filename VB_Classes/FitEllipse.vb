@@ -10,9 +10,9 @@ Public Class FitEllipse_Basics : Inherits VB_Algorithm
         desc = "Use FitEllipse OpenCV API to draw around a set of points"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If heartBeat() = False Then Exit Sub
+        If task.heartBeat = False Then Exit Sub
         If standalone Then
-            Options.RunVB()
+            options.RunVB()
             inputPoints = options.srcPoints
         End If
 
@@ -46,10 +46,10 @@ Public Class FitEllipse_AMS_CPP : Inherits VB_Algorithm
         labels(2) = "FitEllipse_AMS_CPP C++ "
         desc = "Use FitEllipse_AMS to draw around a set of points"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        If heartBeat() = False Then Exit Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat = False Then Exit Sub
         If standalone Then
-            Options.RunVB()
+            options.RunVB()
             inputPoints = options.srcPoints
         End If
         dst2.SetTo(0)
@@ -90,8 +90,8 @@ Public Class FitEllipse_Direct_CPP : Inherits VB_Algorithm
         labels(2) = "The FitEllipse_Direct C++ "
         desc = "Use FitEllipse to draw around a set of points"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        If heartBeat() = False Then Exit Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat = False Then Exit Sub
         options.RunVB()
         Dim dataSrc(options.srcPoints.Count * 2 - 1) As Single
 
@@ -132,8 +132,8 @@ Public Class FitEllipse_RedCloud : Inherits VB_Algorithm
     Public Sub New()
         desc = "Create an ellipse from a contour"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        If heartBeat() = False Then Exit Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat = False Then Exit Sub
         redC.Run(src)
         dst2 = redC.dst2
 

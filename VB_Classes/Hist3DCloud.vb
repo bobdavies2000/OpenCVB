@@ -137,7 +137,7 @@ Public Class Hist3Dcloud_Highlights : Inherits VB_Algorithm
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, ranges)
 
         Static maskval As Integer
-        If heartBeat() Then maskval += 1
+        If task.heartBeat Then maskval += 1
 
         If sortedHist.ElementAt(maskval).Key = 0 Then maskval = 0
         Dim index = sortedHist.ElementAt(maskval).Value

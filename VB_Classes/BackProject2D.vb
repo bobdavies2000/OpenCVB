@@ -41,7 +41,7 @@ Public Class BackProject2D_Basics : Inherits VB_Algorithm
 
         dst3.SetTo(0)
         dst3.SetTo(cv.Scalar.Yellow, dst0)
-        If heartBeat() Then
+        If task.heartBeat Then
             labels(2) = options.colorFormat + " format image: Selected cell has minX/maxX " + Format(minX, "0") + "/" + Format(maxX, "0") + " minY/maxY " + Format(minY, "0") + "/" +
                         Format(maxY, "0") + " - brighter means higher population"
             labels(3) = "That combination of channel 0/1 has " + CStr(bpCount) + " pixels while image total is " + Format(dst0.Total, "0")

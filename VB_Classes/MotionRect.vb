@@ -135,7 +135,7 @@ Public Class MotionRect_Rect : Inherits VB_Algorithm
         Static color = src.Clone
         Static lastMotionRect As cv.Rect = task.motionRect
         task.motionFlag = False
-        If heartBeat() Or task.motionRect.Width * task.motionRect.Height > src.Total / 2 Or task.optionsChanged Then
+        If task.heartBeat Or task.motionRect.Width * task.motionRect.Height > src.Total / 2 Or task.optionsChanged Then
             task.motionFlag = True
         Else
             motion.Run(src)
@@ -196,7 +196,7 @@ Public Class MotionRect_Rect1 : Inherits VB_Algorithm
         Static lastRects As New List(Of cv.Rect)
         motion.Run(src)
         Dim r = motion.motionRect
-        If heartBeat() Or r.Width * r.Height > src.Total / 2 Or task.frameCount < 50 Then
+        If task.heartBeat Or r.Width * r.Height > src.Total / 2 Or task.frameCount < 50 Then
             dst2 = src.Clone
             lastRects.Clear()
         Else
@@ -330,7 +330,7 @@ Public Class MotionRect_PointCloud : Inherits VB_Algorithm
         desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Or task.motionReset Then dst2 = task.pointCloud.Clone
+        If task.heartBeat Or task.motionReset Then dst2 = task.pointCloud.Clone
 
         If task.motionDetected Then task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
 
@@ -357,7 +357,7 @@ Public Class MotionRect_Depth : Inherits VB_Algorithm
         desc = "Display the depth data after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Or task.motionReset Then dst2 = task.pcSplit(2).Clone
+        If task.heartBeat Or task.motionReset Then dst2 = task.pcSplit(2).Clone
 
         If task.motionDetected Then task.pcSplit(2)(task.motionRect).CopyTo(dst2(task.motionRect))
 
@@ -385,7 +385,7 @@ Public Class MotionRect_Grayscale : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If heartBeat() Or task.motionReset Then dst2 = src.Clone
+        If task.heartBeat Or task.motionReset Then dst2 = src.Clone
         If task.motionDetected Then src(task.motionRect).CopyTo(dst2(task.motionRect))
 
         If standalone Or showIntermediate() Then
@@ -411,7 +411,7 @@ Public Class MotionRect_Color : Inherits VB_Algorithm
         desc = "Display the color image after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Or task.motionReset Then dst2 = src.Clone
+        If task.heartBeat Or task.motionReset Then dst2 = src.Clone
         If task.motionDetected Then src(task.motionRect).CopyTo(dst2(task.motionRect))
 
         If (standalone Or showIntermediate()) And task.motionDetected Then

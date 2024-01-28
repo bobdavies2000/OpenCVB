@@ -1324,7 +1324,7 @@ Public Class Structured_CountSideSum : Inherits VB_Algorithm
             End If
         Next
 
-        If heartBeat() Then
+        If task.heartBeat Then
             strOut = "Flat surface at: "
             For i = 0 To surfaces.Count - 1
                 strOut += Format(surfaces(i), fmt3) + ", "

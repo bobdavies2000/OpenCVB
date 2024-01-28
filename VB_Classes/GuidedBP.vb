@@ -78,7 +78,7 @@ Public Class GuidedBP_CellHistograms : Inherits VB_Algorithm
             vbDrawContour(dst3, rc.contour, rc.color)
         End If
 
-        If heartBeat() Then
+        If task.heartBeat Then
             If rc.index <> 0 Then
                 Dim zeroMat = Not rc.mask
                 labels(2) = "Histograms for "
@@ -107,7 +107,7 @@ Public Class GuidedBP_CellHistograms : Inherits VB_Algorithm
         dst1 = mats.dst3
 
         labels(3) = CStr(gpbWare.redCells.Count) + " objects detected - click to highlight"
-        If heartBeat() And rc.index <> 0 Then
+        If task.heartBeat And rc.index <> 0 Then
             strOut = "Select a cell in image at right to see actual ranges " + vbCrLf +
                      "X min = " + Format(rc.mmX.minVal, fmt1) + " X max = " + Format(rc.mmX.maxVal, fmt1) + vbCrLf +
                      "Y min = " + Format(rc.mmY.minVal, fmt1) + " Y max = " + Format(rc.mmY.maxVal, fmt1) + vbCrLf +
@@ -151,7 +151,7 @@ Public Class GuidedBP_Cells : Inherits VB_Algorithm
         End If
 
         Static strOut As String
-        If heartBeat() Then
+        If task.heartBeat Then
             strOut = "Range for X min/max" + vbTab + Format(rc.mmX.minVal, fmt1) + "/" + Format(rc.mmX.maxVal, fmt1) + vbCrLf
             strOut += "Range for Y min/max" + vbTab + Format(rc.mmY.minVal, fmt1) + "/" + Format(rc.mmY.maxVal, fmt1) + vbCrLf
             strOut += "Range for Z min/max" + vbTab + Format(rc.mmZ.minVal, fmt1) + "/" + Format(rc.mmZ.maxVal, fmt1) + vbCrLf
@@ -198,7 +198,7 @@ Public Class GuidedBP_kTop : Inherits VB_Algorithm
         Next
 
         Static saveTrueData As List(Of trueText)
-        If heartBeat() Then saveTrueData = New List(Of trueText)(trueData)
+        If task.heartBeat Then saveTrueData = New List(Of trueText)(trueData)
         trueData = New List(Of trueText)(saveTrueData)
 
         labels(2) = redC.labels(2)
@@ -241,7 +241,7 @@ Public Class GuidedBP_kSide : Inherits VB_Algorithm
         Next
 
         Static saveTrueData As List(Of trueText)
-        If heartBeat() Then saveTrueData = New List(Of trueText)(trueData)
+        If task.heartBeat Then saveTrueData = New List(Of trueText)(trueData)
         trueData = New List(Of trueText)(saveTrueData)
 
         labels(2) = redC.labels(2)
@@ -419,8 +419,8 @@ Public Class GuidedBP_HotPoints : Inherits VB_Algorithm
         If sideList.Count < 8 And redOptions.SideViewThreshold.Value > redOptions.SideViewThreshold.Minimum Then redOptions.SideViewThreshold.Value -= 1
         If sideList.Count > 15 And redOptions.SideViewThreshold.Value < redOptions.SideViewThreshold.Maximum Then redOptions.SideViewThreshold.Value += 1
 
-        If heartBeat() Then labels(2) = CStr(topList.Count) + " objects were identified in the top view."
-        If heartBeat() Then labels(3) = CStr(sideList.Count) + " objects were identified in the side view."
+        If task.heartBeat Then labels(2) = CStr(topList.Count) + " objects were identified in the top view."
+        If task.heartBeat Then labels(3) = CStr(sideList.Count) + " objects were identified in the side view."
     End Sub
 End Class
 
@@ -559,7 +559,7 @@ Public Class GuidedBP_Hulls : Inherits VB_Algorithm
 
         Dim newCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         Dim kMapLast = kMap.Clone
-        If heartBeat() Then
+        If task.heartBeat Then
             kMap.SetTo(0)
             dst2.SetTo(0)
             Dim sizes As New List(Of Integer)
@@ -762,7 +762,7 @@ Public Class GuidedBP_History : Inherits VB_Algorithm
 
 
         If kCellList.Count >= task.frameHistoryCount Then kCellList.RemoveAt(0)
-        If heartBeat() Then labels(2) = CStr(redCells.Count) + " objects were consistently present"
+        If task.heartBeat Then labels(2) = CStr(redCells.Count) + " objects were consistently present"
     End Sub
 End Class
 
@@ -802,7 +802,7 @@ Public Class GuidedBP_Points : Inherits VB_Algorithm
         classCount = topRects.Count + sideRects.Count
 
         If task.mouseClickFlag Then selectedPoint = task.clickPoint
-        If heartBeat() Then labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
-        If heartBeat() Then labels(3) = CStr(sideRects.Count) + " objects were identified in the side view."
+        If task.heartBeat Then labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
+        If task.heartBeat Then labels(3) = CStr(sideRects.Count) + " objects were identified in the side view."
     End Sub
 End Class

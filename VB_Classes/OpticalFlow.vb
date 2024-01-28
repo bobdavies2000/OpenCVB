@@ -75,7 +75,7 @@ Public Class OpticalFlow_Sparse : Inherits VB_Algorithm
         Next
         labels(2) = "Matched " + CStr(features.Count) + " points "
 
-        If heartBeat() Then lastGray = src.Clone()
+        If task.heartBeat Then lastGray = src.Clone()
         lastGray = src.Clone()
     End Sub
 End Class

@@ -172,7 +172,7 @@ Public Class Random_LUTMask : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static lutMat As cv.Mat
-        If heartBeat() Or task.frameCount < 10 Then
+        If task.heartBeat Or task.frameCount < 10 Then
             random.Run(empty)
             lutMat = New cv.Mat(New cv.Size(1, 256), cv.MatType.CV_8UC3, 0)
             Dim lutIndex = 0
@@ -655,7 +655,7 @@ Public Class Random_Clusters : Inherits VB_Algorithm
         desc = "Use OpenCV's randN API to create a cluster around a random mean with a requested stdev"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If heartBeat() = False Then Exit Sub
+        If task.heartBeat = False Then Exit Sub
 
         Static clustSlider = findSlider("Number of Clusters")
         Static numSlider = findSlider("Number of points per cluster")

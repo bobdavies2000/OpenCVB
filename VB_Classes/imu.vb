@@ -156,7 +156,7 @@ Public Class IMU_PlotIMUFrameTime : Inherits VB_Algorithm
         If IMUtoCaptureEstimate < options.minDelayIMU Then IMUtoCaptureEstimate = options.minDelayIMU
 
         Static sampledIMUFrameTime = task.IMU_FrameTime
-        If heartBeat() Then sampledIMUFrameTime = task.IMU_FrameTime
+        If task.heartBeat Then sampledIMUFrameTime = task.IMU_FrameTime
 
         histogramIMU(Math.Min(CInt(task.IMU_FrameTime), histogramIMU.Length - 1)) += 1
 
@@ -224,7 +224,7 @@ Public Class IMU_PlotTotalDelay : Inherits VB_Algorithm
         Static sampledIMUDelay = imu.IMUtoCaptureEstimate
         Static sampledTotalDelay = totaldelay
         Static sampledSmooth = kalman.stateResult
-        If heartBeat() Then
+        If task.heartBeat Then
             sampledCPUDelay = host.HostInterruptDelayEstimate
             sampledIMUDelay = imu.IMUtoCaptureEstimate
             sampledTotalDelay = totaldelay
@@ -430,7 +430,7 @@ Public Class IMU_Lines : Inherits VB_Algorithm
         If cells.Count > 0 Then gcell = cells.ElementAt(0).Value Else gcell = lastGcell
         If gcell.len3D > 0 Then
             strOut = "ID" + vbTab + "len3D" + vbTab + "Depth" + vbTab + "Arc Y" + vbTab + "Image" + vbTab + "IMU Y" + vbTab + vbCrLf
-            If heartBeat() Then dst3.SetTo(0)
+            If task.heartBeat Then dst3.SetTo(0)
             Dim p1 = gcell.tc1.center
             Dim p2 = gcell.tc2.center
             Dim lastP1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
@@ -748,7 +748,7 @@ Public Class IMU_VelocityPlot : Inherits VB_Algorithm
         dst2 = plot.dst2
         dst3 = plot.dst3
 
-        If heartBeat() Then
+        If task.heartBeat Then
             strOut = "Pitch X1000 (blue): " + vbTab + Format(task.pitch * 1000, fmt1) + vbCrLf +
                      "Yaw X1000 (green): " + vbTab + Format(task.yaw * 1000, fmt1) + vbCrLf +
                      "Roll X1000 (red): " + vbTab + Format(task.roll * 1000, fmt1)
@@ -775,7 +775,7 @@ Public Class IMU_IscameraStable : Inherits VB_Algorithm
         task.pitch = task.IMU_AngularVelocity.X
         task.yaw = task.IMU_AngularVelocity.Y
         task.roll = task.IMU_AngularVelocity.Z
-        If heartBeat() Then
+        If task.heartBeat Then
             strOut = "Pitch X1000 (blue): " + vbTab + Format(task.pitch * 1000, fmt1) + vbCrLf +
                      "Yaw X1000 (green): " + vbTab + Format(task.yaw * 1000, fmt1) + vbCrLf +
                      "Roll X1000 (red): " + vbTab + Format(task.roll * 1000, fmt1)
@@ -827,7 +827,7 @@ Public Class IMU_PlotHostFrameTimes : Inherits VB_Algorithm
         If HostInterruptDelayEstimate < 0 Then HostInterruptDelayEstimate = options.minDelayHost
 
         Static sampledCPUFrameTime = task.CPU_FrameTime
-        If heartBeat() Then sampledCPUFrameTime = task.CPU_FrameTime
+        If task.heartBeat Then sampledCPUFrameTime = task.CPU_FrameTime
 
         hist(Math.Min(CInt(task.CPU_FrameTime), hist.Length - 1)) += 1
 
@@ -893,7 +893,7 @@ Public Class IMU_PlotHostFrameScalar : Inherits VB_Algorithm
         If HostInterruptDelayEstimate < 0 Then HostInterruptDelayEstimate = options.minDelayHost
 
         Static sampledCPUFrameTime = task.CPU_FrameTime
-        If heartBeat() Then sampledCPUFrameTime = task.CPU_FrameTime
+        If task.heartBeat Then sampledCPUFrameTime = task.CPU_FrameTime
 
         If standalone Then
             strOut = "IMU_TimeStamp (ms) " + Format(task.IMU_TimeStamp, "00") + vbCrLf +

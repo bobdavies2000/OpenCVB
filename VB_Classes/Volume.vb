@@ -35,7 +35,7 @@ Public Class Volume_Basics : Inherits VB_Algorithm
         Dim meterFactor As Integer = 100
         Dim mString = If(meterFactor = 100, "centimeters", If(meterFactor = 1, "meters", "decimeters"))
         volume = (maxX - minX) * (maxY - minY) * (maxZ - minZ) * meterFactor * meterFactor * meterFactor
-        If heartBeat() Then
+        If task.heartBeat Then
             strOut = "Volume = " + Format(volume, fmt0) + " cubic " + mString + vbCrLf + vbCrLf
             strOut += "Min " + vbTab + "Max " + vbTab + "Range " + vbTab + " units=" + mString + vbCrLf
             strOut += Format(minX * meterFactor, fmt0) + vbTab + Format(maxX * meterFactor, fmt0) + vbTab + Format((maxX - minX) * meterFactor, fmt0) + vbTab + " X dimension" + vbCrLf

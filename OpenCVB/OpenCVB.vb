@@ -1563,7 +1563,7 @@ Public Class OpenCVB
             frameCount += 1
             ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
             ' Each image will represent the one just finished by the algorithm.
-            If task.DebugSyncUI Then Thread.Sleep(100)
+            If task.debugSyncUI Then Thread.Sleep(100)
         End While
     End Sub
 

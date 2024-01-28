@@ -299,7 +299,7 @@ Public Class Grid_Neighbors : Inherits VB_Algorithm
 
         dst2 = src
         If standalone Then
-            If heartBeat() Then
+            If task.heartBeat Then
                 task.mouseClickFlag = True
                 task.clickPoint = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             End If

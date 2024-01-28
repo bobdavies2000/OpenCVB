@@ -113,7 +113,7 @@ Public Class MotionBlur_Deblur : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         mblur.Options.RunVB()
 
-        If heartBeat() Then mblur.options.redoCheckBox.Checked = True
+        If task.heartBeat Then mblur.options.redoCheckBox.Checked = True
         If mblur.options.redoCheckBox.Checked Then
             mblur.Run(src)
             mblur.options.showDirection = False

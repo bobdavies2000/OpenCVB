@@ -57,7 +57,7 @@ Public Class HistValley_Depth : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static histogram As cv.Mat
-        If heartBeat() Then
+        If task.heartBeat Then
             valley.Run(src)
             dst2 = valley.dst2
 
@@ -189,7 +189,7 @@ Public Class HistValley_BasicsOptionAuto : Inherits VB_Algorithm
         desc = "Isolate the different levels of gray using the histogram valleys."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then
+        If task.heartBeat Then
             kalman.Run(src)
             dst2 = kalman.dst2
             histogram = kalman.hist.histogram.Clone
@@ -285,7 +285,7 @@ Public Class HistValley_Colors : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static splitIndex As Integer
-        If heartBeat() Then splitIndex = (splitIndex + 1) Mod 3
+        If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
         src = src.ExtractChannel(splitIndex)
         hist.hist.plot.backColor = Choose(splitIndex + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
 

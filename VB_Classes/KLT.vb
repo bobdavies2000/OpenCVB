@@ -76,7 +76,7 @@ Public Class KLT_OpticalFlow : Inherits VB_Algorithm
                     ' dst2.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
                     'Static lastFlowPoints() As cv.Point2f = klt.inputPoints
                     ' dst3.Line(lastFlowPoints(i), klt.inputPoints(i), cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
-                    'If heartBeat() Then lastFlowPoints = klt.inputPoints
+                    'If task.heartBeat Then lastFlowPoints = klt.inputPoints
                 End If
             Next
         End If

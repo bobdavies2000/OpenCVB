@@ -45,7 +45,7 @@ Public Class DisparityFunction_Basics : Inherits VB_Algorithm
 
         Static depthStr As String
         Static dispStr As String
-        If heartBeat() Then
+        If task.heartBeat Then
             dispStr = "Disparity: " + vbCrLf
             depthStr = "Depth: " + vbCrLf
             Dim index As Integer

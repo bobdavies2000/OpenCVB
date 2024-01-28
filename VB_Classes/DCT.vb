@@ -148,7 +148,7 @@ Public Class DCT_Surfaces_debug : Inherits VB_Algorithm
         desc = "Find plane equation for a featureless surface - debugging one region for now."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        ' If heartBeat() Then flow.msgs.Clear()
+        ' If task.heartBeat Then flow.msgs.Clear()
 
         mats.mat(0) = src.Clone
         mats.mat(0).SetTo(cv.Scalar.White, task.gridMask)

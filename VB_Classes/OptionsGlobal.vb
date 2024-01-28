@@ -253,7 +253,7 @@ Public Class OptionsGlobal
     Private Sub tempSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
         TempSliderLabel.Text = CStr(DebugSlider.Value)
     End Sub
-    Private Sub DebugSyncUI_CheckedChanged(sender As Object, e As EventArgs) Handles DebugSyncUI.CheckedChanged
+    Private Sub debugSyncUI_CheckedChanged(sender As Object, e As EventArgs) Handles debugSyncUI.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
     Private Sub minPixelsSlider_Scroll(sender As Object, e As EventArgs) Handles minPixelsSlider.Scroll

@@ -12,7 +12,7 @@ Public Class Histogram_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
-            If heartBeat() Then splitIndex = (splitIndex + 1) Mod 3
+            If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
             mm = vbMinMax(src.ExtractChannel(splitIndex))
             plot.backColor = Choose(splitIndex + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
         Else
@@ -503,7 +503,7 @@ Public Class Histogram_KalmanAuto : Inherits VB_Algorithm
         Static splitIndex = 0
         Static colorName = "Gray"
         If standalone Then
-            If heartBeat() Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
+            If task.heartBeat Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
             colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
             Dim split = src.Split()
             src = split(splitIndex)
@@ -659,7 +659,7 @@ Public Class Histogram_ComparePlot : Inherits VB_Algorithm
         dst2 = comp.dst2.Clone
 
         Static ttLabels As New List(Of trueText)
-        If heartBeat() Then
+        If task.heartBeat Then
             ttLabels = New List(Of trueText)(comp.trueData)
             Dim histX = comp.histDiffAbs
             comp.histK.hist.plot.Run(histX)
@@ -843,7 +843,7 @@ Public Class Histogram_PointCloudXYZ : Inherits VB_Algorithm
                 Case 2
                     dst3 = plot.dst2.Clone
             End Select
-            If heartBeat() Then labels(i + 1) = "Histogram " + Choose(i + 1, "X", "Y", "Z") + " ranges from " + Format(plot.minRange, "0.0") + "m to " +
+            If task.heartBeat Then labels(i + 1) = "Histogram " + Choose(i + 1, "X", "Y", "Z") + " ranges from " + Format(plot.minRange, "0.0") + "m to " +
                                                 Format(plot.maxRange, "0.0") + "m"
         Next
     End Sub
@@ -866,7 +866,7 @@ Public Class Histogram_FlatSurfaces : Inherits VB_Algorithm
         Dim mm as mmData = vbMinMax(cloudY)
         cloudY = cloudY.Threshold(maxRange, mm.maxVal, cv.ThresholdTypes.Trunc)
         Static saveMinVal = mm.minVal, saveMaxVal = mm.maxVal
-        If heartBeat() Then
+        If task.heartBeat Then
             saveMinVal = mm.minVal
             saveMaxVal = mm.maxVal
         End If
@@ -970,7 +970,7 @@ Public Class Histogram_Gotcha2D : Inherits VB_Algorithm
 
         Dim actual = histogram.Sum(0)
 
-        If heartBeat() Then
+        If task.heartBeat Then
             strOut = "Expected sample count:" + vbTab + CStr(expected) + vbCrLf +
                      "Actual sample count:" + vbTab + CStr(actual) + vbCrLf +
                      "The number of samples input is the expected value." + vbCrLf +
@@ -1005,7 +1005,7 @@ Public Class Histogram_Gotcha : Inherits VB_Algorithm
 
         Dim actual = hist.histogram.Sum(0)
 
-        If heartBeat() Then
+        If task.heartBeat Then
             strOut = "Expected sample count:" + vbTab + CStr(expected) + vbCrLf +
                      "Actual sample count:" + vbTab + CStr(actual) + vbCrLf +
                      "Difference:" + vbTab + vbTab + CStr(Math.Abs(actual - expected)) + vbCrLf +
@@ -1035,7 +1035,7 @@ Public Class Histogram_GotchaFixed_CPP : Inherits VB_Algorithm
         Dim imagePtr = Histogram_1D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.histogramBins)
         handleSrc.Free()
 
-        If heartBeat() Then
+        If task.heartBeat Then
             Dim actual = CInt(Histogram_1D_Sum(cPtr))
             strOut = "Expected sample count:" + vbTab + CStr(dst2.Total) + vbCrLf +
                      "Actual sample count:" + vbTab + CStr(actual) + vbCrLf +
@@ -1181,7 +1181,7 @@ Public Class Histogram_Depth : Inherits VB_Algorithm
         Next
 
         If standalone Then
-            If heartBeat() Then
+            If task.heartBeat Then
                 Dim expected = src.CountNonZero
                 Dim actual = CInt(plot.histogram.Sum(0))
                 strOut = "Expected sample count (non-zero task.pcSplit(2) entries):" + vbTab + CStr(expected) + vbCrLf

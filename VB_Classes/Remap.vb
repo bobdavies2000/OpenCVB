@@ -38,7 +38,7 @@ Public Class Remap_Basics : Inherits VB_Algorithm
                 cv.Cv2.Remap(src, dst2, mapx3, mapy3, cv.InterpolationFlags.Nearest)
         End Select
 
-        If heartBeat() Then
+        If task.heartBeat Then
             direction += 1
             direction = direction Mod 4
         End If
@@ -66,7 +66,7 @@ Public Class Remap_Flip : Inherits VB_Algorithm
             Case 3 ' flip horizontally and vertically
                 cv.Cv2.Flip(src, dst2, cv.FlipMode.XY)
         End Select
-        If heartBeat() Then
+        If task.heartBeat Then
             direction += 1
             direction = direction Mod 4
         End If

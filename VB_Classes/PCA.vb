@@ -283,7 +283,7 @@ End Class
 '        desc = "Identify cells with similar plane equations"
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
-'        If heartBeat() Then
+'        If task.heartBeat Then
 '            Dim blue As New cv.Scalar(255, 0, 0), red As New cv.Scalar(0, 0, 255), green As New cv.Scalar(0, 255, 0)
 '            dst3.SetTo(0)
 '            Dim color As cv.Scalar

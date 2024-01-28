@@ -210,7 +210,7 @@ Public Class Palette_Gradient : Inherits VB_Algorithm
         desc = "Create gradient image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then
+        If task.heartBeat Then
             If standalone Then
                 ' every 30 frames try a different pair of random colors.
                 color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))

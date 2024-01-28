@@ -139,7 +139,7 @@ Public Class MatchShapes_Nearby : Inherits VB_Algorithm
             rc = task.rc
         End If
 
-        If heartBeat() And myStandalone Then dst3.SetTo(0)
+        If task.heartBeat And myStandalone Then dst3.SetTo(0)
         similarCells.Clear()
 
         If gOptions.displayDst0.Checked Then
@@ -208,7 +208,7 @@ Public Class MatchShapes_LeftRight : Inherits VB_Algorithm
         'End If
 
         'match.redCells = leftCells
-        'If heartBeat() Then
+        'If task.heartBeat Then
         '    dst2.SetTo(0)
         '    dst3.SetTo(0)
         'End If
@@ -265,7 +265,7 @@ Public Class MatchShapes_Hulls : Inherits VB_Algorithm
 
         hulls.Run(src)
         dst2 = hulls.dst2
-        If heartBeat() Then dst3.SetTo(0)
+        If task.heartBeat Then dst3.SetTo(0)
 
         Dim rcX = task.rc
 
@@ -300,7 +300,7 @@ Public Class MatchShapes_Contours : Inherits VB_Algorithm
 
         redC.Run(src)
         dst2 = redC.dst2
-        If heartBeat() Then dst3.SetTo(0)
+        If task.heartBeat Then dst3.SetTo(0)
 
         Dim rcX = task.rc
 

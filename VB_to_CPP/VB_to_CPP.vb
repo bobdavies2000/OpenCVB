@@ -154,7 +154,7 @@ Public Class VB_to_CPP
             line = line.Replace("gOptions.HistBinSlider.Value", "task->histogramBins")
             line = line.Replace("CStr(", "to_string(")
             line = line.Replace("task.", "task->")
-            line = line.Replace("heartBeat()", "task->heartBeat")
+            line = line.Replace("task.heartBeat", "task->heartBeat")
             line = line.Replace("firstPass", "task->firstPass")
             line = line.Replace("setTrueText", "task->setTrueText")
             line = line.Replace("gOptions.GridSize.value", "task->gridSize")

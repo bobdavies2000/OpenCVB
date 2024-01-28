@@ -44,7 +44,7 @@ Public Class Draw_Ellipses : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
-        If heartBeat() Then
+        If task.heartBeat Then
             dst2.SetTo(cv.Scalar.Black)
             For i = 0 To options.drawCount - 1
                 Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
@@ -68,7 +68,7 @@ Public Class Draw_Circles : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
-        If heartBeat() Then
+        If task.heartBeat Then
             dst2.SetTo(cv.Scalar.Black)
             For i = 0 To options.drawCount - 1
                 Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
@@ -94,7 +94,7 @@ Public Class Draw_Lines : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
-        If heartBeat() Then
+        If task.heartBeat Then
             dst2.SetTo(cv.Scalar.Black)
             For i = 0 To options.drawCount - 1
                 Dim nPoint1 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
@@ -121,7 +121,7 @@ Public Class Draw_Polygon : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
 
-        If heartBeat() = False Then Exit Sub
+        If task.heartBeat = False Then Exit Sub
         Dim height = src.Height / 8
         Dim width = src.Width / 8
         Dim polyColor = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
@@ -249,7 +249,7 @@ Public Class Draw_Arc : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
-        If heartBeat() Then
+        If task.heartBeat Then
             rect = initRandomRect(options.saveMargin)
             angle = msRNG.Next(0, 360)
             colorIndex = msRNG.Next(0, 255)
@@ -402,7 +402,7 @@ Public Class Draw_LineTest : Inherits VB_Algorithm
         desc = "Test the external use of the Draw_Line algorithm - provide 2 points and draw the line..."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then
+        If task.heartBeat Then
             line.p1 = New cv.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
             line.p2 = New cv.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
         End If

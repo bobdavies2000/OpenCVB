@@ -37,7 +37,7 @@ Public Class RedTrack_Lines : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         lines.Run(src)
 
-        If heartBeat() Or task.motionFlag Then dst3.SetTo(0)
+        If task.heartBeat Or task.motionFlag Then dst3.SetTo(0)
         For i = 0 To Math.Min(lines.sortLength.Count - 1, 10)
             Dim line = lines.sortLength.ElementAt(i)
             Dim mps = lines.mpList(line.Value)
@@ -306,7 +306,7 @@ Public Class RedTrack_Features : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         feat.Run(src)
 
-        If heartBeat() Then dst2.SetTo(0)
+        If task.heartBeat Then dst2.SetTo(0)
         For Each pt In feat.featurePoints
             dst2.Circle(pt, task.dotSize, 255, -1)
         Next

@@ -211,7 +211,7 @@ End Class
 '        dst3 = sort.dst3
 
 '        dst3(New cv.Rect(0, dst2.Height / 2, dst2.Width, dst2.Height / 2)).SetTo(0)
-'        If heartBeat() Then
+'        If task.heartBeat Then
 '            strOut = ""
 '            For i = sort.rangeStart.Count - 1 To 0 Step -1
 '                strOut += "Range " + CStr(sort.rangeStart.Count - i) + " from " + CStr(sort.rangeEnd(i)) + " to " + CStr(sort.rangeStart(i)) + vbCrLf

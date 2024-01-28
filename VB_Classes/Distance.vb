@@ -115,7 +115,7 @@ Public Class Distance_Point3D : Inherits VB_Algorithm
         desc = "Compute the distance in meters between 3D points in the point cloud"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone And heartBeat() Then
+        If standalone And task.heartBeat Then
             inPoint1 = New cv.Point3f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, 10000))
             inPoint2 = New cv.Point3f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, 10000))
 
@@ -213,7 +213,7 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
             distances.Add(nextD, i)
         Next
 
-        If heartBeat() Then
+        If task.heartBeat Then
             strOut = "3D histogram distances from zero for each cell" + vbCrLf
             Dim index As Integer
             For Each el In distances

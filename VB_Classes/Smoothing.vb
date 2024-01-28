@@ -49,7 +49,7 @@ Public Class Smoothing_Exterior : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         smOptions.RunVB()
         If standalone Then
-            If heartBeat() And Not task.paused Then
+            If task.heartBeat And Not task.paused Then
                 Dim hullList = hull.buildRandomHullPoints()
                 dst2.SetTo(0)
                 hull.Run(src)
@@ -126,7 +126,7 @@ Public Class Smoothing_Interior : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         smOptions.RunVB()
         If standalone Then
-            If heartBeat() And task.paused = False Then
+            If task.heartBeat And task.paused = False Then
                 Dim hullList = hull.buildRandomHullPoints()
                 dst2.SetTo(0)
                 hull.Run(src)

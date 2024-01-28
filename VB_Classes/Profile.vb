@@ -75,7 +75,7 @@ Public Class Profile_Basics : Inherits VB_Algorithm
             dst3.Circle(corners(i), task.dotSize + 2, cornerColors(i), -1, task.lineType)
         Next
 
-        If heartBeat() Then
+        If task.heartBeat Then
             strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + "units=meters" + vbCrLf
             Dim w = gOptions.GridSize.Value
             For i = 0 To corners.Count - 1

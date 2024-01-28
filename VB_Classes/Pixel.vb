@@ -282,7 +282,7 @@ Public Class Pixel_Sampler : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If standalone Then
-            If heartBeat() Then
+            If task.heartBeat Then
                 If task.drawRect <> New cv.Rect Then
                     random.range = task.drawRect
                 Else
@@ -349,7 +349,7 @@ Public Class Pixel_SampleColor : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If standalone Then
-            If heartBeat() Then
+            If task.heartBeat Then
                 Dim w = 25, h = 25
                 If task.drawRect <> New cv.Rect Then
                     random.range = task.drawRect
@@ -734,7 +734,7 @@ Public Class Pixel_Vector3D : Inherits VB_Algorithm
         Dim maxRegion = 20
 
         Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
-        If heartBeat() Then
+        If task.heartBeat Then
             pixelVector.Clear()
             strOut = "3D histogram counts for each cell - " + CStr(maxRegion) + " largest only for readability..." + vbCrLf
             For Each cell In redC.redCells

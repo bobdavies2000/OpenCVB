@@ -53,7 +53,7 @@ Public Class SVD_Example2 : Inherits VB_Algorithm
 
         Dim rc = task.rc
 
-        If heartBeat() Then
+        If task.heartBeat Then
             Dim m = cv.Cv2.Moments(rc.mask, True)
             Dim center = New cv.Point2f(m.M10 / rc.pixels, m.M01 / rc.pixels)
             task.color(rc.rect).Circle(center, task.dotSize, task.highlightColor, -1, task.lineType)

@@ -63,7 +63,7 @@ Public Class Eigen_FitLineInput : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
-        If heartBeat() Then
+        If task.heartBeat Then
             If task.testAllRunning = False Then options.recompute = False
             dst2.SetTo(0)
             Dim width = src.Width

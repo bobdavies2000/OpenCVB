@@ -23,7 +23,7 @@ Public Class ApproxPoly_Basics : Inherits VB_Algorithm
         Static closedPolyCheck = findCheckBox("Closed polygon - connect first and last vertices.")
 
         If standalone Then
-            If heartBeat() Then rotatedRect.Run(src)
+            If task.heartBeat Then rotatedRect.Run(src)
             dst2 = rotatedRect.dst2
         End If
 

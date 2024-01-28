@@ -147,7 +147,7 @@ Public Class KMeans_MultiGaussian_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim imagePtr = KMeans_MultiGaussian_RunCPP(cPtr, src.Rows, src.Cols)
-        If imagePtr <> 0 And heartBeat() Then dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
+        If imagePtr <> 0 And task.heartBeat Then dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = KMeans_MultiGaussian_Close(cPtr)
@@ -174,7 +174,7 @@ Public Class KMeans_CustomData : Inherits VB_Algorithm
             Static randslider = findSlider("Random Pixel Count")
             If firstPass Then randslider.Value = 50
             If randslider.Value < k Then randslider.Value = k
-            If heartBeat() Then random.Run(empty)
+            If task.heartBeat Then random.Run(empty)
 
             Dim input As New List(Of Single)
             For Each pt In random.pointlist
@@ -338,7 +338,7 @@ Public Class KMeans_Image : Inherits VB_Algorithm
             counts.Add(mask.CountNonZero)
         Next
         Static maskIndex As Integer
-        If heartBeat() Then maskIndex += 1
+        If task.heartBeat Then maskIndex += 1
         If maskIndex >= masks.Count Then maskIndex = 0
         dst3 = masks(maskIndex)
     End Sub
@@ -501,7 +501,7 @@ Public Class KMeans_SimKColor : Inherits VB_Algorithm
         desc = "Use the gaps in the 3D histogram of the color image to find 'k' and backproject the results."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then
+        If task.heartBeat Then
             plot1D.Run(src)
             dst3 = plot1D.dst2
             labels(3) = "The 3D histogram of the RGB image stream in 1D - note the number of gaps"
@@ -531,7 +531,7 @@ Public Class KMeans_SimKDepth : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        If heartBeat() Then
+        If task.heartBeat Then
             plot1D.Run(src)
             dst3 = plot1D.dst2
             labels(3) = "The 3D histogram of the depth stream in 1D"

@@ -57,7 +57,7 @@ Partial Class OptionsGlobal
         Me.MotionFilteredCloudOnly = New System.Windows.Forms.RadioButton()
         Me.unFiltered = New System.Windows.Forms.RadioButton()
         Me.ShowGrid = New System.Windows.Forms.CheckBox()
-        Me.DebugSyncUI = New System.Windows.Forms.CheckBox()
+        Me.debugSyncUI = New System.Windows.Forms.CheckBox()
         Me.UseMultiThreading = New System.Windows.Forms.CheckBox()
         Me.ShowAllOptions = New System.Windows.Forms.CheckBox()
         Me.OpenGLCapture = New System.Windows.Forms.CheckBox()
@@ -378,7 +378,7 @@ Partial Class OptionsGlobal
         '
         Me.GroupBox2.Controls.Add(Me.GroupBox1)
         Me.GroupBox2.Controls.Add(Me.ShowGrid)
-        Me.GroupBox2.Controls.Add(Me.DebugSyncUI)
+        Me.GroupBox2.Controls.Add(Me.debugSyncUI)
         Me.GroupBox2.Controls.Add(Me.UseMultiThreading)
         Me.GroupBox2.Controls.Add(Me.ShowAllOptions)
         Me.GroupBox2.Controls.Add(Me.OpenGLCapture)
@@ -481,15 +481,15 @@ Partial Class OptionsGlobal
         Me.ShowGrid.Text = "Show grid"
         Me.ShowGrid.UseVisualStyleBackColor = True
         '
-        'DebugSyncUI
+        'debugSyncUI
         '
-        Me.DebugSyncUI.AutoSize = True
-        Me.DebugSyncUI.Location = New System.Drawing.Point(24, 148)
-        Me.DebugSyncUI.Name = "DebugSyncUI"
-        Me.DebugSyncUI.Size = New System.Drawing.Size(259, 24)
-        Me.DebugSyncUI.TabIndex = 66
-        Me.DebugSyncUI.Text = "Synchronize Debug with Output"
-        Me.DebugSyncUI.UseVisualStyleBackColor = True
+        Me.debugSyncUI.AutoSize = True
+        Me.debugSyncUI.Location = New System.Drawing.Point(24, 148)
+        Me.debugSyncUI.Name = "debugSyncUI"
+        Me.debugSyncUI.Size = New System.Drawing.Size(259, 24)
+        Me.debugSyncUI.TabIndex = 66
+        Me.debugSyncUI.Text = "Synchronize Debug with Output"
+        Me.debugSyncUI.UseVisualStyleBackColor = True
         '
         'UseMultiThreading
         '
@@ -799,7 +799,7 @@ Partial Class OptionsGlobal
     Friend WithEvents TempSliderLabel As Windows.Forms.Label
     Friend WithEvents DebugSlider As Windows.Forms.TrackBar
     Friend WithEvents Label11 As Windows.Forms.Label
-    Friend WithEvents DebugSyncUI As Windows.Forms.CheckBox
+    Friend WithEvents debugSyncUI As Windows.Forms.CheckBox
     Friend WithEvents MinPixels As Windows.Forms.Label
     Friend WithEvents minPixelsSlider As Windows.Forms.TrackBar
     Friend WithEvents Label13 As Windows.Forms.Label

@@ -15,7 +15,7 @@ Public Class HistPeak2D_Basics : Inherits VB_Algorithm
             bgr.Run(src)
             histogram = bgr.histogram02
         End If
-        If heartBeat() Then
+        If task.heartBeat Then
             auto.Run(histogram)
             delaunay.inputPoints = New List(Of cv.Point2f)(auto.clusterPoints)
             delaunay.Run(src)

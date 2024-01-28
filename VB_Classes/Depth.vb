@@ -81,7 +81,7 @@ Public Class Depth_FirstLastDistance : Inherits VB_Algorithm
         Dim mm As mmData = vbMinMax(task.pcSplit(2), task.depthMask)
         task.depthRGB.CopyTo(dst2)
 
-        If heartBeat() Then dst3.SetTo(0)
+        If task.heartBeat Then dst3.SetTo(0)
         labels(2) = "Min Depth " + Format(mm.minVal, fmt1) + "m"
         identifyMinMax(mm.minLoc, labels(2))
 
@@ -180,7 +180,7 @@ Public Class Depth_MeanStdev_MT : Inherits VB_Algorithm
                 dst2(roi).SetTo(0, task.noDepthMask(roi))
             End Sub)
 
-            If heartBeat() Then
+            If task.heartBeat Then
                 maxMeanVal = 0
                 maxStdevVal = 0
             End If
@@ -324,7 +324,7 @@ Public Class Depth_LocalMinMax_MT : Inherits VB_Algorithm
             ReDim maxPoint(task.gridList.Count - 1)
         End If
 
-        If heartBeat() Then dst3.SetTo(0)
+        If task.heartBeat Then dst3.SetTo(0)
         Parallel.For(0, task.gridList.Count,
         Sub(i)
             Dim roi = task.gridList(i)
@@ -1079,7 +1079,7 @@ Public Class Depth_MinMaxNone : Inherits VB_Algorithm
         options.RunVB()
 
         Static filtered As Integer
-        If heartBeat() Then
+        If task.heartBeat Then
             dst3 = split(2)
             filtered = 0
         End If
@@ -1274,7 +1274,7 @@ Public Class Depth_Grid : Inherits VB_Algorithm
         dst3 = task.pcSplit(2)
         dst2 = task.gridMask.Clone
         For Each roi In task.gridList
-            Dim mm as mmData = vbMinMax(dst3(roi))
+            Dim mm As mmData = vbMinMax(dst3(roi))
             If Math.Abs(mm.minVal - mm.maxVal) > 0.1 Then dst2(roi).SetTo(cv.Scalar.White)
         Next
     End Sub
@@ -1330,7 +1330,7 @@ Public Class Depth_InRange : Inherits VB_Algorithm
         If standalone Then
             dst2 = vbPalette(dst2 * 255 / classCount)
         End If
-        If heartBeat() Then labels(2) = Format(classCount, "000") + " regions were found"
+        If task.heartBeat Then labels(2) = Format(classCount, "000") + " regions were found"
     End Sub
 End Class
 
@@ -1514,7 +1514,7 @@ Public Class Depth_PunchBlob : Inherits VB_Algorithm
         depthInc.Run(src)
         dst2 = depthInc.dst2
 
-        Dim mm as mmData = vbMinMax(dst2)
+        Dim mm As mmData = vbMinMax(dst2)
         dst2.ConvertTo(dst1, cv.MatType.CV_8U)
         contours.Run(dst1)
         dst3 = contours.dst3
@@ -1624,7 +1624,7 @@ Public Class Depth_Outline : Inherits VB_Algorithm
         Next
 
         If standalone Then
-            If heartBeat() Then dst3.SetTo(0)
+            If task.heartBeat Then dst3.SetTo(0)
             dst3 = dst3 Or dst2
         End If
     End Sub

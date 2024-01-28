@@ -43,7 +43,7 @@ Public Class VBtask : Implements IDisposable
     Public pcFloor As Single ' y-value for floor...
     Public pcCeiling As Single ' y-value for ceiling...
 
-    Public DebugSyncUI As Boolean
+    Public debugSyncUI As Boolean
 
     Public workingRes As cv.Size
     Public resolutionRatio As Single ' mousepoints/drawrects need the ratio of the display to the working resolution.
@@ -480,6 +480,7 @@ Public Class VBtask : Implements IDisposable
                 End If
 
                 updateSettings()
+                task.heartBeat = task.heartBeat Or task.debugSyncUI Or task.optionsChanged Or task.mouseClickFlag
                 If task.paused = False Then
                     IMUBasics.Run(src)
                     gMat.Run(src)
@@ -511,7 +512,6 @@ Public Class VBtask : Implements IDisposable
                         task.color = motionColor.dst2.Clone
                     End If
 
-                    task.heartBeat = task.heartBeat Or task.DebugSyncUI Or task.optionsChanged Or task.mouseClickFlag
                     If task.heartBeat Or gOptions.unFiltered.Checked Then
                         task.motionReset = True
                         task.motionDetected = False

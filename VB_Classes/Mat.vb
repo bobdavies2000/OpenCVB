@@ -145,7 +145,7 @@ Public Class Mat_Managed : Inherits VB_Algorithm
         Static img(src.Total) As cv.Vec3b
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, img)
         Static nextColor As cv.Vec3b
-        If heartBeat() Then
+        If task.heartBeat Then
             If nextColor = New cv.Vec3b(0, 0, 255) Then nextColor = New cv.Vec3b(0, 255, 0) Else nextColor = New cv.Vec3b(0, 0, 255)
         End If
         For i = 0 To img.Length - 1

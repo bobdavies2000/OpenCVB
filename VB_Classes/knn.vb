@@ -14,7 +14,7 @@ Public Class KNN_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
             Static random As New Random_Basics
-            If heartBeat() Then
+            If task.heartBeat Then
                 random.Run(empty)
                 knn.trainInput = New List(Of cv.Point2f)(random.pointList)
             End If
@@ -111,7 +111,7 @@ Public Class KNN_Core : Inherits VB_Algorithm
 
         If standalone Then
             Static random As New Random_Basics
-            If heartBeat() Then
+            If task.heartBeat Then
                 random.Run(empty)
                 trainInput = New List(Of cv.Point2f)(random.pointList)
             End If
@@ -193,7 +193,7 @@ Public Class KNN_Core2DTest : Inherits VB_Algorithm
     End Sub
 
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then
+        If task.heartBeat Then
             dst3.SetTo(0)
             random.Run(empty)
             knn.trainInput = New List(Of cv.Point2f)(random.pointList)
@@ -382,7 +382,7 @@ Public Class KNN_Core3DTest : Inherits VB_Algorithm
         desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then
+        If task.heartBeat Then
             knn.queries.Clear()
             knn.trainInput.Clear()
             random.Run(empty)
@@ -443,7 +443,7 @@ Public Class KNN_Core4DTest : Inherits VB_Algorithm
         desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then
+        If task.heartBeat Then
             random.Run(empty)
             knn.trainInput = New List(Of cv.Vec4f)(random.PointList)
             knn.queries.Clear()
@@ -495,7 +495,7 @@ Public Class KNN_CoreNTest : Inherits VB_Algorithm
         knn.knnDimension = dimSlider.Value
         Dim points = randomSlider.Value
 
-        If heartBeat() Then
+        If task.heartBeat Then
             knn.trainInput.Clear()
             For i = 0 To points - 1
                 For j = 0 To knn.knnDimension - 1
@@ -914,7 +914,7 @@ Public Class KNN_BasicsOld : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
             Static random As New Random_Basics
-            If heartBeat() Then
+            If task.heartBeat Then
                 random.Run(empty)
                 knn.trainInput = New List(Of cv.Point2f)(random.pointList)
             End If
@@ -1005,7 +1005,7 @@ Public Class KNN_Farthest : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
             Static random As New Random_Basics
-            If heartBeat() Then
+            If task.heartBeat Then
                 random.Run(empty)
                 knn.trainInput = New List(Of cv.Point2f)(random.pointList)
                 knn.queries = New List(Of cv.Point2f)(knn.trainInput)

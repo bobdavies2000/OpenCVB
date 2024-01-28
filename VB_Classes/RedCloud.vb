@@ -70,7 +70,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
 
             rc.pixels = rc.mask.CountNonZero
             If rc.mask.Size = dst2.Size Or rc.pixels < minPixels Then Continue For
-            If heartBeat() Then rc.matchCount = 1
+            If task.heartBeat Then rc.matchCount = 1
             newCells.Add(rc)
 
             If task.rcMatchMax < rc.matchCount Then task.rcMatchMax = rc.matchCount
@@ -126,7 +126,7 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
         desc = "Build a RedCloud cell from the rcData input"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone And heartBeat() Then
+        If standalone And task.heartBeat Then
             rp.floodPoint = New cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2))
             Dim w = msRNG.Next(1, dst2.Width / 2), h = msRNG.Next(1, dst2.Height / 2)
             rp.rect = New cv.Rect(rp.floodPoint.X, rp.floodPoint.Y, w, h)
@@ -154,7 +154,7 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
             rc.color = randomCellColor()
             If standalone Then dst2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
             rc.indexLast = 0
-            If heartBeat() Then dst3.SetTo(0)
+            If task.heartBeat Then dst3.SetTo(0)
             dst3(rc.rect).SetTo(255, rc.mask)
         End If
 
@@ -390,7 +390,7 @@ Public Class RedCloud_Equations : Inherits VB_Algorithm
 
         redCells = New List(Of rcData)(newCells)
 
-        If heartBeat() Then
+        If task.heartBeat Then
             Dim index As Integer
             strOut = ""
             For Each rc In redCells
@@ -1047,7 +1047,7 @@ Public Class RedCloud_DelaunayGuidedFeatures : Inherits VB_Algorithm
         dst2 = redC.dst2
 
         Static goodList As New List(Of List(Of cv.Point2f))
-        If heartBeat() Then goodList.Clear()
+        If task.heartBeat Then goodList.Clear()
 
         Dim nextGood As New List(Of cv.Point2f)(features.feat.featurePoints)
         goodList.Add(nextGood)
@@ -1134,7 +1134,7 @@ Public Class RedCloud_UnstableCells : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        If heartBeat() Or task.frameCount = 2 Then
+        If task.heartBeat Or task.frameCount = 2 Then
             dst1 = dst2.Clone
             dst3.SetTo(0)
         End If
@@ -1173,7 +1173,7 @@ Public Class RedCloud_UnstableHulls : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        If heartBeat() Or task.frameCount = 2 Then
+        If task.heartBeat Or task.frameCount = 2 Then
             dst1 = dst2.Clone
             dst3.SetTo(0)
         End If
@@ -1224,7 +1224,7 @@ Public Class RedCloud_CellChanges : Inherits VB_Algorithm
         Next
 
         dst2Last = dst2.Clone
-        If heartBeat() Then
+        If task.heartBeat Then
             labels(2) = "Changed cells = " + Format(changedCells, "000") + " cells or " + Format(changedCells / redC.redCells.Count, "0%")
             labels(3) = "Changed pixel total = " + Format(changedPixels / 1000, "0.0") + "k or " + Format(changedPixels / dst2.Total, "0%")
         End If
@@ -1505,7 +1505,7 @@ Public Class RedCloud_DepthOutline : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         outline.Run(task.depthMask)
 
-        If heartBeat() Then dst3.SetTo(0)
+        If task.heartBeat Then dst3.SetTo(0)
         dst3 = dst3 Or outline.dst2
 
         dst1.SetTo(0)
@@ -1723,7 +1723,7 @@ Public Class RedCloud_Flippers : Inherits VB_Algorithm
             setSelectedCell(rMin.redCells, rMin.cellMap)
         End If
 
-        If heartBeat() Then
+        If task.heartBeat Then
             labels(3) = "Unmatched to previous frame: " + CStr(unMatched) + " totaling " + CStr(unMatchedPixels) + " pixels."
         End If
     End Sub
@@ -1935,7 +1935,7 @@ Public Class RedCloud_StructuredH : Inherits VB_Algorithm
 
         motion.Run(sliceMask.Clone)
 
-        If heartBeat() Then dst1.SetTo(0)
+        If task.heartBeat Then dst1.SetTo(0)
         dst1.SetTo(cv.Scalar.White, sliceMask)
         labels = motion.labels
 
@@ -1974,7 +1974,7 @@ Public Class RedCloud_StructuredV : Inherits VB_Algorithm
 
         motion.Run(sliceMask.Clone)
 
-        If heartBeat() Then dst1.SetTo(0)
+        If task.heartBeat Then dst1.SetTo(0)
         dst1.SetTo(cv.Scalar.White, sliceMask)
         labels = motion.labels
         setTrueText("Move mouse in image to see impact.", 3)
@@ -2181,7 +2181,7 @@ Public Class RedCloud_Color : Inherits VB_Algorithm
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
         If standalone Or showIntermediate() Then dst3 = vbPalette(dst2 * 255 / classCount)
 
-        If heartBeat() Then labels(3) = CStr(classCount) + " cells found"
+        If task.heartBeat Then labels(3) = CStr(classCount) + " cells found"
 
         Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, RedCloud_Sizes(cPtr))
         Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
@@ -2204,7 +2204,7 @@ Public Class RedCloud_Color : Inherits VB_Algorithm
             sortedCells.Add(rc.pixels, rc)
         Next
 
-        If heartBeat() Then labels(2) = "CV_8U format - " + CStr(classCount) + " cells were identified."
+        If task.heartBeat Then labels(2) = "CV_8U format - " + CStr(classCount) + " cells were identified."
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
@@ -2305,7 +2305,7 @@ Public Class RedCloud_UnmatchedCount : Inherits VB_Algorithm
         End If
         changedCellCounts.Add(unMatchedCells)
 
-        If heartBeat() Then
+        If task.heartBeat Then
             dst3.SetTo(0)
             framecounts.Clear()
             frameLoc.Clear()

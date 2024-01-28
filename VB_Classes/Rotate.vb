@@ -148,7 +148,7 @@ Public Class Rotate_PolyQT : Inherits VB_Algorithm
         desc = "Rotate a triangle around a center of rotation"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If heartBeat() Then
+        If task.heartBeat Then
             dst2.SetTo(0)
             dst3.SetTo(0)
         End If

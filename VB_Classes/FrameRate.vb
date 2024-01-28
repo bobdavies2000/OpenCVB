@@ -15,7 +15,7 @@ Public Class FrameRate_Basics : Inherits VB_Algorithm
             If count(0) > 0 Or count(1) > 0 Or count(2) > 0 Then frameCounts(i) += 1
             mats.mat(i) = mats.mat(i).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         Next
-        If heartBeat() Then
+        If task.heartBeat Then
             strOut = ""
             For i = 0 To frameCounts.Count - 1
                 strOut += Choose(i + 1, "Color", "Left", "Right", "Depth") + vbTab + " image frameCount = " + vbTab
@@ -53,7 +53,7 @@ Public Class FrameRate_BasicsGray : Inherits VB_Algorithm
             If count > 0 Then frameCounts(i) += 1
             mats.mat(i) = mats.mat(i).Threshold(0, 255, cv.ThresholdTypes.Binary)
         Next
-        If heartBeat() Then
+        If task.heartBeat Then
             strOut = ""
             For i = 0 To frameCounts.Count - 1
                 strOut += Choose(i + 1, "Color", "Left", "Right", "Depth") + vbTab + " image frameCount = " + vbTab

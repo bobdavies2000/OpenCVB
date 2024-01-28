@@ -51,7 +51,7 @@ Public Class Projection_Lines : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Static thresholdSlider = findSlider("Concentration threshold")
         Static topCheck = findCheckBox("Top View (Unchecked Side View)")
-        If heartBeat() Then
+        If task.heartBeat Then
             dst1.SetTo(0)
             dst3.SetTo(0)
         End If

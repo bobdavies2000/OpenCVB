@@ -83,7 +83,7 @@ Public Class Plane_FlatSurfaces : Inherits VB_Algorithm
         plane.Run(src)
 
         dst2 = plane.dst2
-        If task.cameraStable = False Or heartBeat() Then addW.src2.SetTo(0)
+        If task.cameraStable = False Or task.heartBeat Then addW.src2.SetTo(0)
 
         Dim flatCount = 0
         For Each rc In plane.redC.redCells
@@ -372,7 +372,7 @@ Public Class Plane_Points : Inherits VB_Algorithm
         Next
 
         Static needOutput As Boolean
-        If heartBeat() Or needOutput Then
+        If task.heartBeat Or needOutput Then
             ptList2D.Clear()
             equations.Clear()
             needOutput = False
@@ -609,7 +609,7 @@ Public Class Plane_Equation : Inherits VB_Algorithm
             rc.eq = New cv.Vec4f(xList(dotIndex), yList(dotIndex), zList(dotIndex), kList(dotIndex))
         End If
         If dotlist.Count Then
-            If heartBeat() Then
+            If task.heartBeat Then
                 justEquation = Format(rc.eq(0), fmt3) + "*X + " + Format(rc.eq(1), fmt3) + "*Y + "
                 justEquation += Format(rc.eq(2), fmt3) + "*Z + " + Format(rc.eq(3), fmt3) + vbCrLf
                 If xList.Count > 0 Then

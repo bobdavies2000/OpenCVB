@@ -206,7 +206,7 @@ Public Class LongLine_ExtendTest : Inherits VB_Algorithm
     End Sub
 
     Public Sub RunVB(src as cv.Mat)
-        If heartBeat() Then
+        If task.heartBeat Then
             Dim p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             Dim p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
 
@@ -412,7 +412,7 @@ Public Class LongLine_Extend : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src as cv.Mat)
         Static saveP1 As cv.Point, saveP2 As cv.Point, p1 As cv.Point, p2 As cv.Point
-        If standalone And heartBeat() Then
+        If standalone And task.heartBeat Then
             p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             saveP1 = p1

@@ -154,7 +154,7 @@ Public Class GrabCut_ImageMask : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Static bgModel As New cv.Mat, fgModel As New cv.Mat
 
-        If heartBeat() Then
+        If task.heartBeat Then
             dst2 = image
             dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cv.ThresholdTypes.Binary)
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)

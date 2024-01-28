@@ -141,7 +141,7 @@ Public Class Diff_Heartbeat : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If heartBeat() Then
+        If task.heartBeat Then
             dst1 = src.Clone
             dst2.SetTo(0)
         End If
@@ -201,7 +201,7 @@ Public Class Diff_Depth32S : Inherits VB_Algorithm
         dst2 = dst1.Threshold(millimeters - 1, 255, cv.ThresholdTypes.Binary)
 
         lastDepth32s = dst0.Clone
-        If heartBeat() Then
+        If task.heartBeat Then
             labels(2) = "Mask where depth difference between frames is more than " + CStr(millimeters) + " mm's"
             Dim count = dst2.CountNonZero()
             labels(3) = CStr(count) + " pixels (" + Format(count / task.depthMask.CountNonZero, "0%") +
@@ -236,7 +236,7 @@ Public Class Diff_Depth32f : Inherits VB_Algorithm
         dst2 = dst1.Threshold(millimeters, 255, cv.ThresholdTypes.Binary)
 
         lastDepth32f = task.pcSplit(2).Clone
-        If heartBeat() Then
+        If task.heartBeat Then
             labels(2) = "Mask where depth difference between frames is more than " + CStr(mmSlider.value) + " mm's"
             Dim count = dst2.CountNonZero()
             labels(3) = CStr(count) + " pixels (" + Format(count / task.depthMask.CountNonZero, "0%") +

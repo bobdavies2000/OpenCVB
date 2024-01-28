@@ -137,7 +137,7 @@ Public Class Image_RedCloudColorSeries : Inherits VB_Algorithm
         desc = "Use RedCloud on a series of photos instead of the video stream."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then loadNextImage = True
+        If task.heartBeat Then loadNextImage = True
         images.Run(empty)
         dst0 = images.dst0
         dst1 = images.dst1

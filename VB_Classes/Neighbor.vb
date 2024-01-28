@@ -39,7 +39,7 @@ Public Class Neighbor_Basics : Inherits VB_Algorithm
             Next
             nabList(0).Clear()
 
-            If heartBeat() And standalone Then
+            If task.heartBeat And standalone Then
                 stats.Run(task.color)
 
                 strOut = stats.strOut

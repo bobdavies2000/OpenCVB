@@ -68,7 +68,7 @@ Public Class Denoise_Pixels : Inherits VB_Algorithm
             dst2 *= 255 / classCount
             dst3 = vbPalette(dst2)
         End If
-        If heartBeat() Then
+        If task.heartBeat Then
             strOut = CStr(classCount) + " pixel classes" + vbCrLf
             strOut += CStr(Denoise_Pixels_EdgeCountBefore(cPtr)) + " edges before" + vbCrLf
             strOut += CStr(Denoise_Pixels_EdgeCountAfter(cPtr)) + " edges after"

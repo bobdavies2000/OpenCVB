@@ -108,7 +108,7 @@ Public Class Plot_Depth : Inherits VB_Algorithm
         plotDepth.Run(empty)
         dst2 = plotDepth.dst2
 
-        If heartBeat() Then labels(2) = plotDepth.labels(2)
+        If task.heartBeat Then labels(2) = plotDepth.labels(2)
         Dim Split = Regex.Split(labels(2), "\W+")
         Dim lineCount = CInt(Split(4))
         If lineCount > 0 Then
@@ -314,7 +314,7 @@ Public Class Plot_OverTime : Inherits VB_Algorithm
         Next
 
 
-        If heartBeat() Then
+        If task.heartBeat Then
             dst2.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst2.Height), cv.Scalar.White, 1)
         End If
 
@@ -393,7 +393,7 @@ Public Class Plot_OverTimeFixedScale : Inherits VB_Algorithm
 
         If lastXdelta.Count >= plotSeriesCount Then lastXdelta.RemoveAt(0)
 
-        If heartBeat() Then
+        If task.heartBeat Then
             plotOutput.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, plotOutput.Height), cv.Scalar.White, task.lineWidth)
         End If
 

@@ -127,8 +127,8 @@ Public Class OpAuto_FloorCeiling : Inherits VB_Algorithm
 
         If bpLine.mpList.Count > 0 Then
             strOut = "Y range = " + Format(task.yRange, fmt3) + vbCrLf + vbCrLf
-            If heartBeat() Then yList.Clear()
-            If heartBeat() Then dst1.SetTo(0)
+            If task.heartBeat Then yList.Clear()
+            If task.heartBeat Then dst1.SetTo(0)
             Dim h = dst2.Height / 2
             For Each mp In bpLine.mpList
                 Dim nextY = task.yRange * (mp.p1.Y - h) / h
@@ -318,7 +318,7 @@ Public Class OpAuto_PixelDifference : Inherits VB_Algorithm
         desc = "Find the peaks in a 2D histogram"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() = False And task.frameCount > 10 Then Exit Sub
+        If task.heartBeat = False And task.frameCount > 10 Then Exit Sub
         If standalone Then
             Static diff As New Diff_Basics
             diff.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -363,7 +363,7 @@ Public Class OpAuto_MSER : Inherits VB_Algorithm
         dst2 = src.Clone
 
         Static checkOften As Boolean = True
-        If heartBeat() Or checkOften Then
+        If task.heartBeat Or checkOften Then
             If src.Channels <> 1 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src
             Dim count = dst1.CountNonZero
             Dim desired = CInt(dst2.Total * 0.6)

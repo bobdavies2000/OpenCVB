@@ -51,12 +51,12 @@ Public Class Motion_Core : Inherits VB_Algorithm
 
         diff.Run(src)
         dst2 = diff.dst3
-        If heartBeat() Then cumulativePixels = 0
-        If diff.changedPixels > 0 Or heartBeat() Then
+        If task.heartBeat Then cumulativePixels = 0
+        If diff.changedPixels > 0 Or task.heartBeat Then
             cumulativePixels += diff.changedPixels
             task.motionReset = cumulativePixels / src.Total > options.cumulativePercentThreshold Or
                                diff.changedPixels > options.motionThreshold Or task.optionsChanged
-            If task.motionReset Or heartBeat() Then
+            If task.motionReset Or task.heartBeat Then
                 dst2.CopyTo(dst3)
                 cumulativePixels = 0
                 saveFrameCount = task.frameCount
@@ -129,7 +129,7 @@ Public Class Motion_ThruCorrelation : Inherits VB_Algorithm
 
         lastFrame = input.Clone
 
-        If heartBeat() Then dst2 = src.Clone Else src.CopyTo(dst2, dst3)
+        If task.heartBeat Then dst2 = src.Clone Else src.CopyTo(dst2, dst3)
     End Sub
 End Class
 
@@ -186,7 +186,7 @@ Public Class Motion_PixelDiff : Inherits VB_Algorithm
         Static changeCount As Integer, frames As Integer
         If task.motionFlag Then changeCount += 1
         frames += 1
-        If heartBeat() Then
+        If task.heartBeat Then
             strOut = "Pixels changed = " + CStr(changedPixels) + " at last heartbeat.  Since last heartbeat: " +
                      Format(changeCount / frames, "0%") + " of frames were different"
             changeCount = 0
@@ -254,7 +254,7 @@ Public Class Motion_Contours2 : Inherits VB_Algorithm
         dst3 = motion.dst3
         Dim changedPixels = dst3.CountNonZero
 
-        If heartBeat() Then cumulativePixels = changedPixels Else cumulativePixels += changedPixels
+        If task.heartBeat Then cumulativePixels = changedPixels Else cumulativePixels += changedPixels
         If changedPixels > 0 Then
             contours.Run(dst3)
             vbDrawContour(dst2, contours.bestContour, cv.Scalar.Yellow)
@@ -280,7 +280,7 @@ Public Class Motion_MinRect : Inherits VB_Algorithm
         dst2 = motion.dst2
 
         Dim nonzeros = dst2.FindNonZero()
-        If heartBeat() Then dst3.SetTo(0)
+        If task.heartBeat Then dst3.SetTo(0)
         If nonzeros.Rows > 5 Then
             Dim ptx As New List(Of Integer)
             Dim pty As New List(Of Integer)
@@ -321,7 +321,7 @@ Public Class Motion_BasicsTest : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If heartBeat() Then
+        If task.heartBeat Then
             dst1 = src.Clone
             dst2.SetTo(0)
         End If
