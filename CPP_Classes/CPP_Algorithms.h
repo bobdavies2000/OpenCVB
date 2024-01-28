@@ -2702,11 +2702,8 @@ public:
 			for (int x = 0; x < src.cols; x++)
 			{
 				auto val = src.at<unsigned char>(y, x);
-				if (val > 0)
-				{
-					if (count(cellList.begin(), cellList.end(), val) == 0)
-						cellList.push_back(val);
-				}
+				if (count(cellList.begin(), cellList.end(), val) == 0)
+					cellList.push_back(val);
 			}
 		}
 	}
@@ -2726,6 +2723,7 @@ extern "C" __declspec(dllexport)
 int* RedCloud_FindCells_RunCPP(RedCloud_FindCells * cPtr, int* dataPtr, int rows, int cols)
 {
 	cPtr->RunCPP(Mat(rows, cols, CV_8UC1, dataPtr));
+	if (cPtr->cellList.size() == 0) return 0;	
 	return (int*)&cPtr->cellList[0];
 }
 

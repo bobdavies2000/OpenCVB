@@ -191,11 +191,11 @@ End Class
 
 
 
-Public Class Foreground_RedMin : Inherits VB_Algorithm
+Public Class Foreground_RedCloud : Inherits VB_Algorithm
     Dim fore As New Foreground_RedForeground
     Dim back As New Foreground_RedBackground
     Public Sub New()
-        desc = "Isolate foreground from background, then segment each with RedMin"
+        desc = "Isolate foreground from background, then segment each with RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         fore.Run(src)

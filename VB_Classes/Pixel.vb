@@ -727,7 +727,7 @@ Public Class Pixel_Vector3D : Inherits VB_Algorithm
         If standalone Then gOptions.displayDst1.Checked = True
         redOptions.HistBinSlider.Value = 3
         labels = {"", "RedCloud_Basics output", "3D Histogram counts for each of the cells at left", ""}
-        desc = "Identify RedMin cells and create a vector for each cell's 3D histogram."
+        desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
@@ -770,7 +770,7 @@ Public Class Pixel_Unique_CPP : Inherits VB_Algorithm
     Public Sub New()
         redOptions.UseColor.Checked = True
         cPtr = Pixels_Vector_Open()
-        desc = "Create the list of pixels in a RedMin Cell"
+        desc = "Create the list of pixels in a RedCloud Cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.drawRect <> New cv.Rect Then src = src(task.drawRect)

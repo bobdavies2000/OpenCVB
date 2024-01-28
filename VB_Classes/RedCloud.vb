@@ -77,7 +77,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
             If newCells.Count >= 255 Then Exit For ' we are going to handle only the largest 255 cells - rest are zero.
         Next
 
-        cellMap.SetTo(0)
+        cellMap.SetTo(99)
         dst2.SetTo(0)
         redCells.Clear()
         For Each rc In newCells
@@ -95,7 +95,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         dst3 = unmatched.dst3
         labels = unmatched.labels
 
-        If standalone Or showIntermediate() Then setSelectedCell(redCells, cellMap)
+        setSelectedCell(redCells, cellMap)
     End Sub
 End Class
 
@@ -294,34 +294,33 @@ Public Class RedCloud_FindCells : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Dim rc = task.rc
-
-        Dim cells As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim r = New cv.Rect(rc.rect.X - 1, rc.rect.Y - 1, rc.rect.Width + 2, rc.rect.Height + 2)
-        r = validateRect(r)
-        redC.cellMap(r).CopyTo(cells(r))
-
-        Dim cppData(cells.Total - 1) As Byte
-        Marshal.Copy(cells.Data, cppData, 0, cppData.Length - 1)
-        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = RedCloud_FindCells_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), cells.Rows, cells.Cols)
-        handleSrc.Free()
-
-        Dim count = RedCloud_FindCells_TotalCount(cPtr)
-        If count = 0 Then Exit Sub
-
-        Dim cellsFound(count - 1) As Integer
-        Marshal.Copy(imagePtr, cellsFound, 0, cellsFound.Length)
-
-        cellList = cellsFound.ToList
+        Dim count As Integer
         dst3.SetTo(0)
-        dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        For Each index In cellList
-            Dim rcX As rcData = redC.redCells(index)
-            vbDrawContour(dst3(rcX.rect), rcX.contour, rcX.color, -1)
-            dst3(rcX.rect).SetTo(cv.Scalar.White, dst0(rcX.rect))
-        Next
+        If task.motionDetected Then
+            dst1 = redC.cellMap(task.motionRect).Clone
+            Dim cppData(dst1.Total - 1) As Byte
+            Marshal.Copy(dst1.Data, cppData, 0, cppData.Length - 1)
+            Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+            Dim imagePtr = RedCloud_FindCells_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+            handleSrc.Free()
+
+            count = RedCloud_FindCells_TotalCount(cPtr)
+            If count = 0 Then Exit Sub
+
+            Dim cellsFound(count - 1) As Integer
+            Marshal.Copy(imagePtr, cellsFound, 0, cellsFound.Length)
+
+            cellList = cellsFound.ToList
+            dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+            For Each index In cellList
+                Dim rc = redC.redCells(index)
+                vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+                dst3(rc.rect).SetTo(cv.Scalar.White, dst0(rc.rect))
+            Next
+            dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
+        End If
+        identifyCells(redC.redCells)
         labels(3) = CStr(count) + " cells were found using the motion mask"
     End Sub
     Public Sub Close()
@@ -2002,7 +2001,7 @@ Public Class RedCloud_MotionBasics : Inherits VB_Algorithm
     Dim lastMap As cv.Mat = dst2.Clone
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels = {"", "Mask of active RedMin cells", "CV_8U representation of redCells", ""}
+        labels = {"", "Mask of active RedCloud cells", "CV_8U representation of redCells", ""}
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)

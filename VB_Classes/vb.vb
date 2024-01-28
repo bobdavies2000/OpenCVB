@@ -203,27 +203,18 @@ Module VB
         task.rc = New rcData
         Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
         If task.mouseClickFlag Then
-            task.rc = If(redCells.Count > 0, redCells(index), New rcData)
+            task.rc = redCells(index)
         Else
             If task.clickPoint = New cv.Point(0, 0) Or index >= redCells.Count Then
-                If redCells.Count > 2 Then
-                    task.clickPoint = redCells(1).maxDist
-                    task.rc = redCells(1)
+                If redCells.Count > 0 Then
+                    task.clickPoint = redCells(0).maxDist
+                    task.rc = redCells(0)
                 Else
                     Exit Sub
                 End If
             Else
                 task.rc = redCells(index)
             End If
-        End If
-
-        Dim rc = task.rc
-        If rc.rect.Width > 1 And rc.rect.Height > 1 Then
-            task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-            task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-
-            task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-            task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
         End If
     End Sub
     Public Function contourBuild(mask As cv.Mat, approxMode As cv.ContourApproximationModes) As List(Of cv.Point)
@@ -749,7 +740,6 @@ End Structure
 
 Public Class rcData
     Public rect As cv.Rect
-    Public motionRect As cv.Rect ' the union of the previous rect with the current rect.
     Public mask As cv.Mat
     Public depthMask As cv.Mat
 

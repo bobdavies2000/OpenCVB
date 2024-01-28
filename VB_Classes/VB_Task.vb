@@ -588,6 +588,15 @@ Public Class VBtask : Implements IDisposable
 
                 If task.motionDetected Then task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
 
+                Dim rc = task.rc
+                If rc.rect.Width > 1 And rc.rect.Height > 1 Then
+                    task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+                    task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+
+                    task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+                    task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+                End If
+
                 task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
                 task.optionsChanged = False
                 TaskTimer.Enabled = False

@@ -64,8 +64,7 @@ Public Class Cell_Basics : Inherits VB_Algorithm
             labels(2) = redC.labels(2)
             setSelectedCell(redC.redCells, redC.cellMap)
         End If
-        If task.rc.index = 0 Then strOut = "Select any cell to get the statistics on it"
-        If heartBeat() And task.rc.index <> 0 Then statsString(src)
+        If heartBeat() Then statsString(src)
 
         setTrueText(strOut, 3)
         labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.maxZmeters)) + " meters"

@@ -2443,7 +2443,7 @@ public:
         vbPalette(dst2);
         fLess = new CPP_FeatureLess_Basics();
         cPtr = new RedCloud();
-        advice = "In redOptions the 'Desired RedMin Cells' slider has a big impact.";
+        advice = "In redOptions the 'Desired RedCloud Cells' slider has a big impact.";
         desc = "Another minimalist approach to building RedCloud color-based cells.";
     }
     ~CPP_RedColor_FeatureLessCore() {
@@ -2527,7 +2527,7 @@ public:
         minCore = new CPP_RedColor_FeatureLessCore();
         advice = minCore->advice;
         dst2 = Mat::zeros(dst2.size(), CV_8U);  
-        labels = { "", "Mask of active RedMin cells", "CV_8U representation of redCells", "" };
+        labels = { "", "Mask of active RedCloud cells", "CV_8U representation of redCells", "" };
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells.";
     }
     void Run(Mat src) {

@@ -671,7 +671,7 @@ Partial Class OptionsRedCloud
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(152, 48)
         Me.Label5.TabIndex = 27
-        Me.Label5.Text = "Desired RedMin Cells"
+        Me.Label5.Text = "Desired RedCloud Cells"
         '
         'OptionsRedCloud
         '
