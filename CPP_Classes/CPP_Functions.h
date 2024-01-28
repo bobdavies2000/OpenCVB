@@ -27,7 +27,7 @@ enum functions
     _CPP_Convex_Basics,
     _CPP_Resize_Preserve,
     _CPP_History_Basics,
-    _CPP_Motion_Core,
+    _CPP_Motion_Simple,
     _CPP_Histogram_Kalman,
     _CPP_Kalman_Basics,
     _CPP_RedCloud_Core,

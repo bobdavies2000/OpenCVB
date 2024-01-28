@@ -4268,3 +4268,7 @@ Public Class Options_BGSubtract : Inherits VB_Algorithm
         MOGlearnRate = learnRateSlider.Value / 1000
     End Sub
 End Class
+
+
+
+

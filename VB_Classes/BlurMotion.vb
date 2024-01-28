@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
-Public Class MotionBlur_Basics : Inherits VB_Algorithm
+Public Class BlurMotion_Basics : Inherits VB_Algorithm
     Public kernel As cv.Mat
     Public options As New Options_MotionBlur
     Public Sub New()
         desc = "Use Filter2D to create a motion blur"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
         If standaloneTest() Then
             Static blurSlider = findSlider("Motion Blur Length")
             Static blurAngleSlider = findSlider("Motion Blur Angle")
@@ -27,8 +27,8 @@ End Class
 
 
 ' https://docs.opencv.org/trunk/d1/dfd/tutorial_motion_deblur_filter.html
-Public Class MotionBlur_Deblur : Inherits VB_Algorithm
-    ReadOnly mblur As New MotionBlur_Basics
+Public Class BlurMotion_Deblur : Inherits VB_Algorithm
+    ReadOnly mblur As New BlurMotion_Basics
     Private Function calcPSF(filterSize As cv.Size, len As Integer, theta As Double) As cv.Mat
         Dim h As New cv.Mat(filterSize, cv.MatType.CV_32F, 0)
         Dim pt = New cv.Point(filterSize.Width / 2, filterSize.Height / 2)

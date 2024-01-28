@@ -61,9 +61,9 @@ Public Class VBtask : Implements IDisposable
     Public IMUBasics As IMU_Basics
     Public hCloud As History_Cloud
     Public maxMask As Depth_MaxMask
-    Public motionCloud As MotionRect_PointCloud
-    Public motionColor As MotionRect_Color
-    Public motionBasics As MotionRect_Basics
+    Public motionCloud As Motion_PointCloud
+    Public motionColor As Motion_Color
+    Public motionBasics As Motion_Basics
     Public rgbFilter As Object
 
     Public noDepthMask As New cv.Mat
@@ -364,9 +364,9 @@ Public Class VBtask : Implements IDisposable
         gMat = New IMU_GMatrix
         hCloud = New History_Cloud
         maxMask = New Depth_MaxMask
-        motionCloud = New MotionRect_PointCloud
-        motionColor = New MotionRect_Color
-        motionBasics = New MotionRect_Basics
+        motionCloud = New Motion_PointCloud
+        motionColor = New Motion_Color
+        motionBasics = New Motion_Basics
 
         updateSettings()
         redOptions.Show()

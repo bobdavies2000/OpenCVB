@@ -2057,7 +2057,7 @@ End Class
 
 
 Public Class RedCloud_MotionBGsubtract : Inherits VB_Algorithm
-    Public motion As New Motion_Basics
+    Public motion As New BGSubtract_Basics
     Public redCells As New List(Of rcData)
     Public sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()

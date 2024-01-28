@@ -4,14 +4,17 @@ Imports System.Runtime.InteropServices
 Public Class BGSubtract_Basics : Inherits VB_Algorithm
     Public options As New Options_BGSubtract
     Public Sub New()
-        labels = {"", "", "BGSubtract output - aging differences", "Mask for any changes"}
+        cPtr = BGSubtract_BGFG_Open(options.currMethod)
         vbAddAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
-        desc = "Different background subtraction algorithms in OpenCV - some only available in C++"
+        desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If task.optionsChanged Or firstPass Then cPtr = BGSubtract_BGFG_Open(options.currMethod)
+        If task.optionsChanged Then
+            BGSubtract_BGFG_Close(cPtr)
+            cPtr = BGSubtract_BGFG_Open(options.currMethod)
+        End If
 
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
@@ -19,17 +22,13 @@ Public Class BGSubtract_Basics : Inherits VB_Algorithm
         Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then
-            dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
-            dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        End If
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
         labels(2) = options.methodDesc
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = BGSubtract_BGFG_Close(cPtr)
     End Sub
 End Class
-
 
 
 

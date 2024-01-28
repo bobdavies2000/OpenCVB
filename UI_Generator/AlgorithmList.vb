@@ -27,7 +27,7 @@ _CPP_Line_Basics
 _CPP_Convex_Basics
 _CPP_Resize_Preserve
 _CPP_History_Basics
-_CPP_Motion_Core
+_CPP_Motion_Simple
 _CPP_Histogram_Kalman
 _CPP_Kalman_Basics
 _CPP_RedCloud_Core
@@ -184,6 +184,8 @@ if algorithmName = "Blur_Median" Then return new Blur_Median
 if algorithmName = "Blur_Median_CS" Then return new Blur_Median_CS
 if algorithmName = "Blur_PlusHistogram" Then return new Blur_PlusHistogram
 if algorithmName = "Blur_TopoMap" Then return new Blur_TopoMap
+if algorithmName = "BlurMotion_Basics" Then return new BlurMotion_Basics
+if algorithmName = "BlurMotion_Deblur" Then return new BlurMotion_Deblur
 if algorithmName = "BRISK_Basics" Then return new BRISK_Basics
 if algorithmName = "CamShift_Basics" Then return new CamShift_Basics
 if algorithmName = "CamShift_Foreground" Then return new CamShift_Foreground
@@ -339,7 +341,7 @@ if algorithmName = "CPP_Mesh_Agast" Then return new CPP_Basics(functionNames._CP
 if algorithmName = "CPP_Mesh_Basics" Then return new CPP_Basics(functionNames._CPP_Mesh_Basics)
 if algorithmName = "CPP_Mesh_Features" Then return new CPP_Basics(functionNames._CPP_Mesh_Features)
 if algorithmName = "CPP_Motion_Basics" Then return new CPP_Basics(functionNames._CPP_Motion_Basics)
-if algorithmName = "CPP_Motion_Core" Then return new CPP_Basics(functionNames._CPP_Motion_Core)
+if algorithmName = "CPP_Motion_Simple" Then return new CPP_Basics(functionNames._CPP_Motion_Simple)
 if algorithmName = "CPP_Palette_Basics" Then return new CPP_Basics(functionNames._CPP_Palette_Basics)
 if algorithmName = "CPP_Palette_Random" Then return new CPP_Basics(functionNames._CPP_Palette_Random)
 if algorithmName = "CPP_Plot_Histogram" Then return new CPP_Basics(functionNames._CPP_Plot_Histogram)
@@ -1058,25 +1060,23 @@ if algorithmName = "Moments_CentroidKalman" Then return new Moments_CentroidKalm
 if algorithmName = "Motion_Basics" Then return new Motion_Basics
 if algorithmName = "Motion_BasicsTest" Then return new Motion_BasicsTest
 if algorithmName = "Motion_CCmerge" Then return new Motion_CCmerge
-if algorithmName = "Motion_Contours2" Then return new Motion_Contours2
-if algorithmName = "Motion_Core" Then return new Motion_Core
+if algorithmName = "Motion_Color" Then return new Motion_Color
+if algorithmName = "Motion_Contours" Then return new Motion_Contours
+if algorithmName = "Motion_Depth" Then return new Motion_Depth
 if algorithmName = "Motion_DepthReconstructed" Then return new Motion_DepthReconstructed
+if algorithmName = "Motion_Enclosing" Then return new Motion_Enclosing
+if algorithmName = "Motion_Grayscale" Then return new Motion_Grayscale
+if algorithmName = "Motion_Grid" Then return new Motion_Grid
+if algorithmName = "Motion_Grid_MP" Then return new Motion_Grid_MP
+if algorithmName = "Motion_History" Then return new Motion_History
+if algorithmName = "Motion_HistoryTest" Then return new Motion_HistoryTest
+if algorithmName = "Motion_Intersect" Then return new Motion_Intersect
 if algorithmName = "Motion_MinRect" Then return new Motion_MinRect
 if algorithmName = "Motion_PixelDiff" Then return new Motion_PixelDiff
+if algorithmName = "Motion_PointCloud" Then return new Motion_PointCloud
+if algorithmName = "Motion_RectTest" Then return new Motion_RectTest
+if algorithmName = "Motion_Simple" Then return new Motion_Simple
 if algorithmName = "Motion_ThruCorrelation" Then return new Motion_ThruCorrelation
-if algorithmName = "MotionBlur_Basics" Then return new MotionBlur_Basics
-if algorithmName = "MotionBlur_Deblur" Then return new MotionBlur_Deblur
-if algorithmName = "MotionRect_Basics" Then return new MotionRect_Basics
-if algorithmName = "MotionRect_Color" Then return new MotionRect_Color
-if algorithmName = "MotionRect_Depth" Then return new MotionRect_Depth
-if algorithmName = "MotionRect_Enclosing" Then return new MotionRect_Enclosing
-if algorithmName = "MotionRect_Grayscale" Then return new MotionRect_Grayscale
-if algorithmName = "MotionRect_Grid" Then return new MotionRect_Grid
-if algorithmName = "MotionRect_History2" Then return new MotionRect_History2
-if algorithmName = "MotionRect_HistoryTest" Then return new MotionRect_HistoryTest
-if algorithmName = "MotionRect_PointCloud" Then return new MotionRect_PointCloud
-if algorithmName = "MotionRect_Rect" Then return new MotionRect_Rect
-if algorithmName = "MotionRect_Rect1" Then return new MotionRect_Rect1
 if algorithmName = "Mouse_Basics" Then return new Mouse_Basics
 if algorithmName = "Mouse_LeftClickZoom" Then return new Mouse_LeftClickZoom
 if algorithmName = "MSER_Basics" Then return new MSER_Basics

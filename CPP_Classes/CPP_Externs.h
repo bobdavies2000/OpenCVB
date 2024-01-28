@@ -83,8 +83,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 	{task->alg = new CPP_Resize_Preserve(); break; } 
 	case _CPP_History_Basics :
 	{task->alg = new CPP_History_Basics(); break; }
-	case _CPP_Motion_Core :
-	{task->alg = new CPP_Motion_Core(); break; }
+	case _CPP_Motion_Simple :
+	{task->alg = new CPP_Motion_Simple(); break; }
 	case _CPP_Histogram_Kalman :
 	{task->alg = new CPP_Histogram_Kalman(); break; }
 	case _CPP_Kalman_Basics :

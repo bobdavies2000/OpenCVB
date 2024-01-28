@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Threading
-Public Class MotionRect_Basics : Inherits VB_Algorithm
+Public Class Motion_Basics : Inherits VB_Algorithm
     Dim bgSub As New BGSubtract_Basics
     Dim redCPP As New RedCloud_Color
     Public showDiff As Boolean
@@ -55,17 +55,19 @@ End Class
 
 
 
-Public Class MotionRect_Grid : Inherits VB_Algorithm
+Public Class Motion_Grid_MP : Inherits VB_Algorithm
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 990)
         vbAddAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
-        desc = "Detect Motion in the color image"
+        desc = "Detect Motion in the color image using multi-threading."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static correlationSlider = findSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.frameCount < 10 Or task.optionsChanged Then dst3 = src.Clone
+        If task.heartBeat Then dst3 = src.Clone
+
+        dst2 = src
 
         Dim updateCount As Integer
         Parallel.ForEach(Of cv.Rect)(task.gridList,
@@ -75,12 +77,47 @@ Public Class MotionRect_Grid : Inherits VB_Algorithm
                 If correlation.Get(Of Single)(0, 0) < CCthreshold Then
                     Interlocked.Increment(updateCount)
                     src(roi).CopyTo(dst3(roi))
+                    dst2.Rectangle(roi, cv.Scalar.White, task.lineWidth)
                 End If
             End Sub)
-        dst2 = src
         labels(2) = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(task.gridList.Count)
         labels(3) = CStr(task.gridList.Count - updateCount) + " segments out of " + CStr(task.gridList.Count) + " had > " +
-                         Format(correlationSlider.Value / 1000, "0.0%") + " correlation.  Artifacts will appear below if correlation threshold is too low."
+                         Format(correlationSlider.Value / 1000, "0.0%") + " correlation. "
+    End Sub
+End Class
+
+
+
+
+
+Public Class Motion_Grid : Inherits VB_Algorithm
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 990)
+        vbAddAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
+        desc = "Detect Motion in the color image"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static correlationSlider = findSlider("Correlation Threshold")
+        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.heartBeat Then dst3 = src.Clone
+
+        Dim roiMotion As New List(Of cv.Rect)
+        For Each roi In task.gridList
+            Dim correlation As New cv.Mat
+            cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+            If correlation.Get(Of Single)(0, 0) < CCthreshold Then
+                src(roi).CopyTo(dst3(roi))
+                roiMotion.Add(roi)
+            End If
+        Next
+        dst2 = src
+        For Each roi In roiMotion
+            dst2.Rectangle(roi, cv.Scalar.White, task.lineWidth)
+        Next
+        labels(2) = "Motion added to dst3 for " + CStr(roiMotion.Count) + " segments out of " + CStr(task.gridList.Count)
+        labels(3) = CStr(task.gridList.Count - roiMotion.Count) + " segments out of " + CStr(task.gridList.Count) + " had > " +
+                         Format(correlationSlider.Value / 1000, "0.0%") + " correlation. "
     End Sub
 End Class
 
@@ -89,8 +126,8 @@ End Class
 
 
 
-Public Class MotionRect_Rect : Inherits VB_Algorithm
-    Dim motion As New Motion_Basics
+Public Class Motion_Intersect : Inherits VB_Algorithm
+    Dim motion As New BGSubtract_Basics
     Dim minCount = 4
     Dim reconstructedRGB As Integer
     Public Sub New()
@@ -185,12 +222,12 @@ End Class
 
 
 
-Public Class MotionRect_Rect1 : Inherits VB_Algorithm
-    Dim motion As New MotionRect_Enclosing
+Public Class Motion_RectTest : Inherits VB_Algorithm
+    Dim motion As New Motion_Enclosing
     Public Sub New()
         vbAddAdvice(traceName + ": gOptions frame history slider will impact results.")
         labels(3) = "The white spots show the difference of the constructed image from the current image."
-        desc = "Track the RGB image using MotionRect_Enclosing to isolate the motion"
+        desc = "Track the RGB image using Motion_Enclosing to isolate the motion"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static lastRects As New List(Of cv.Rect)
@@ -230,7 +267,7 @@ End Class
 
 
 
-Public Class MotionRect_HistoryTest : Inherits VB_Algorithm
+Public Class Motion_HistoryTest : Inherits VB_Algorithm
     Dim diff As New Diff_Basics
     Dim frames As New History_Basics
     Public Sub New()
@@ -257,8 +294,8 @@ End Class
 
 
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
-Public Class MotionRect_History2 : Inherits VB_Algorithm
-    Public motionCore As New Motion_Core
+Public Class Motion_History : Inherits VB_Algorithm
+    Public motionCore As New Motion_Simple
     Dim frames As New History_Basics
     Public Sub New()
         gOptions.FrameHistory.Value = 10
@@ -278,7 +315,7 @@ End Class
 
 
 
-Public Class MotionRect_Enclosing : Inherits VB_Algorithm
+Public Class Motion_Enclosing : Inherits VB_Algorithm
     Dim redCPP As New RedCloud_Color
     Public motionRect As New cv.Rect
     Public Sub New()
@@ -323,7 +360,7 @@ End Class
 
 
 
-Public Class MotionRect_PointCloud : Inherits VB_Algorithm
+Public Class Motion_PointCloud : Inherits VB_Algorithm
     Public diff As New Diff_Depth32f
     Public Sub New()
         labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
@@ -351,7 +388,7 @@ End Class
 
 
 
-Public Class MotionRect_Depth : Inherits VB_Algorithm
+Public Class Motion_Depth : Inherits VB_Algorithm
     Public Sub New()
         labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
         desc = "Display the depth data after updating only the motion rectangle.  Resync every heartbeat."
@@ -377,7 +414,7 @@ End Class
 
 
 
-Public Class MotionRect_Grayscale : Inherits VB_Algorithm
+Public Class Motion_Grayscale : Inherits VB_Algorithm
     Public Sub New()
         labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated grayscale image",
                   "Diff of input and latest accumulated grayscale image"}
@@ -404,7 +441,7 @@ End Class
 
 
 
-Public Class MotionRect_Color : Inherits VB_Algorithm
+Public Class Motion_Color : Inherits VB_Algorithm
     Public Sub New()
         labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated color image",
                   "Diff of input and latest accumulated color image"}

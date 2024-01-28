@@ -120,7 +120,6 @@
     <Compile Include="BGRPattern.vb" />
     <Compile Include="Cell.vb" />
     <Compile Include="Complexity.vb" />
-    <Compile Include="MotionRect.vb" />
     <Compile Include="VB_Externs.vb" />
     <Compile Include="CPPExtract.vb" />
     <Compile Include="Foreground.vb" />
@@ -335,7 +334,7 @@
     <Compile Include="MeanSubtraction.vb" />
     <Compile Include="ML.vb" />
     <Compile Include="Moments.vb" />
-    <Compile Include="MotionBlur.vb" />
+    <Compile Include="BlurMotion.vb" />
     <Compile Include="Mouse.vb" />
     <Compile Include="MSER.vb" />
     <Compile Include="MultiDimensionalScaling.vb" />

@@ -1856,15 +1856,15 @@ public:
 
 
 
-class CPP_Motion_Core : public algorithmCPP {
+class CPP_Motion_Simple : public algorithmCPP {
 public:
     CPP_Diff_Basics* diff;
-    int cumulativePixels;
+    double cumulativePixels;
     float options_cumulativePercentThreshold = 0.1f;
     int options_motionThreshold;
     int saveFrameCount;
-    CPP_Motion_Core() : algorithmCPP() {
-        traceName = "CPP_Motion_Core";
+    CPP_Motion_Simple() : algorithmCPP() {
+        traceName = "CPP_Motion_Simple";
         task->pixelDiffThreshold = 25;
         options_motionThreshold = dst2.rows * dst2.cols / 16;
         diff = new CPP_Diff_Basics();
@@ -1878,10 +1878,9 @@ public:
         if (task->heartBeat) cumulativePixels = 0;
         if (diff->changedPixels > 0 || task->heartBeat) {
             cumulativePixels += diff->changedPixels;
-            task->motionReset =
-                (double)cumulativePixels / src.total() > options_cumulativePercentThreshold ||
-                diff->changedPixels > options_motionThreshold || task->optionsChanged;
-            if (task->motionReset || task->heartBeat) {
+            task->motionReset = cumulativePixels / src.total() > options_cumulativePercentThreshold ||
+                                diff->changedPixels > options_motionThreshold || task->optionsChanged;
+            if (task->motionReset) {
                 dst2.copyTo(dst3);
                 cumulativePixels = 0;
                 saveFrameCount = task->frameCount;
