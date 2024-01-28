@@ -3305,7 +3305,6 @@ public:
             rc.rect = task->validateRect(r, dst2.cols, dst2.rows);
             inRange(dst2(rc.rect), rc.index, rc.index, rc.mask);
             threshold(rc.mask, rc.mask, 0, 255, THRESH_BINARY);
-            rc.motionRect = rc.rect;
             rc.pixels = sizeData.at<int>(i, 0);
             rc.floodPoint = floodPointData.at<Point>(i, 0);
             rectangle(rc.mask, Rect(0, 0, rc.mask.cols, rc.mask.rows), 0, 1);
@@ -3414,7 +3413,6 @@ public:
             rc.rect = task->validateRect(r, dst2.cols, dst2.rows);
             inRange(dst2(rc.rect), rc.index, rc.index, rc.mask);
             cv::threshold(rc.mask, rc.mask, 0, 255, THRESH_BINARY);
-            rc.motionRect = rc.rect;
             rc.pixels = cellSizes[i];
             rc.floodPoint = floodPoints[i];
             rectangle(rc.mask, Rect(0, 0, rc.mask.cols, rc.mask.rows), 0, 1);

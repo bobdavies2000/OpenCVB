@@ -51,11 +51,12 @@ Public Class VBtask : Implements IDisposable
 
     Public motionRect As cv.Rect
     Public motionFlag As Boolean ' any motion
+    Public motionDetected As Boolean ' scene motion only, not camera motion.
     Public motionReset As Boolean ' thresholds triggered.
 
     ' add any global algorithms here
     Public PixelViewer As Pixel_Viewer
-    Public depthBasics As Depth_Basics
+    Public colorizer As Depth_Colorizer_CPP
     Public gMat As IMU_GMatrix
     Public IMUBasics As IMU_Basics
     Public hCloud As History_Cloud
@@ -358,7 +359,7 @@ Public Class VBtask : Implements IDisposable
         grid = New Grid_Basics
         PixelViewer = New Pixel_Viewer
 
-        depthBasics = New Depth_Basics
+        colorizer = New Depth_Colorizer_CPP
         IMUBasics = New IMU_Basics
         gMat = New IMU_GMatrix
         hCloud = New History_Cloud
@@ -491,57 +492,65 @@ Public Class VBtask : Implements IDisposable
                         task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).ToMat.Reshape(3, src.Rows)
                     End If
 
-                    motionBasics.Run(src) ' always get the task.motionRect
+                    If task.pcSplit Is Nothing Then task.pcSplit = task.pointCloud.Split
+
+                    motionBasics.Run(src) ' always set the task.motionRect
+                    motionColor.Run(src)
 
                     If gOptions.UseHistoryCloud.Checked Then
                         hCloud.Run(task.pointCloud)
                         task.pointCloud = hCloud.dst2
                     ElseIf gOptions.MotionFilteredColorAndCloud.Checked Then
-                        motionColor.Run(src)
-                        motionCloud.Run(src)
                         task.color = motionColor.dst2.Clone
+                        motionCloud.Run(src)
                         task.pointCloud = motionCloud.dst2.Clone
                     ElseIf gOptions.MotionFilteredCloudOnly.Checked Then
                         motionCloud.Run(src)
                         task.pointCloud = motionCloud.dst2.Clone
                     ElseIf gOptions.MotionFilteredColorOnly.Checked Then
-                        motionColor.Run(src)
                         task.color = motionColor.dst2.Clone
                     End If
 
-                    If task.motionRect.Width <> 0 Or task.pcSplit Is Nothing Or heartBeat Or task.optionsChanged Then
-                        task.pcSplit = task.pointCloud.Split
+                    task.heartBeat = task.heartBeat Or task.SyncOutput Or task.optionsChanged Or task.mouseClickFlag
+                    If task.heartBeat Or gOptions.unFiltered.Checked Then
+                        task.motionReset = True
+                        task.motionDetected = False
+                    End If
+                End If
 
-                        'Dim maxD = gOptions.MaxDepth.Value - 0.1 ' why -0.1?  Because histograms are inclusive at boundaries.
-                        'task.maxDepthMask = task.pcSplit(2).Threshold(maxD, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-                        'maxMask.Run(task.maxDepthMask) ' fill in the holes of the maxdepthmask
-                        'task.maxDepthMask = maxMask.dst2 ' Use the contour of the mask
+                If task.motionDetected Or heartBeat Or task.motionReset Then
+                    task.pcSplit = task.pointCloud.Split
 
-                        'If gOptions.unFilteredCloud.Checked = False Then
-                        '    task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
-                        '    'task.pcSplit(2).SetTo(maxD, task.maxDepthMask)
-                        'End If
+                    'Dim maxD = gOptions.MaxDepth.Value - 0.1 ' why -0.1?  Because histograms are inclusive at boundaries.
+                    'task.maxDepthMask = task.pcSplit(2).Threshold(maxD, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+                    'maxMask.Run(task.maxDepthMask) ' fill in the holes of the maxdepthmask
+                    'task.maxDepthMask = maxMask.dst2 ' Use the contour of the mask
 
-                        task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-                        task.noDepthMask = Not task.depthMask
+                    'If gOptions.unFilteredCloud.Checked = False Then
+                    '    task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
+                    '    'task.pcSplit(2).SetTo(maxD, task.maxDepthMask)
+                    'End If
 
-                        If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
-                            Dim xRatio = task.xRangeDefault / task.xRange
-                            Dim yRatio = task.yRangeDefault / task.yRange
-                            task.pcSplit(0) *= xRatio
-                            task.pcSplit(1) *= yRatio
-                        End If
+                    task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+                    task.noDepthMask = Not task.depthMask
+
+                    If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
+                        Dim xRatio = task.xRangeDefault / task.xRange
+                        Dim yRatio = task.yRangeDefault / task.yRange
+                        task.pcSplit(0) *= xRatio
+                        task.pcSplit(1) *= yRatio
 
                         cv.Cv2.Merge(task.pcSplit, task.pointCloud)
                     End If
-
-                    depthBasics.Run(src) ' colorize the depth 
-
-                    'If gOptions.DebugCheckBox.Checked Then
-                    '    motion.motion.showDiff = True
-                    '    cv.Cv2.ImShow("motion.dst2", motion.motion.dst2)
-                    'End If
                 End If
+
+                colorizer.Run(task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc))
+                task.depthRGB = colorizer.dst2
+
+                'If gOptions.DebugCheckBox.Checked Then
+                '    motion.motion.showDiff = True
+                '    cv.Cv2.ImShow("motion.dst2", motion.motion.dst2)
+                'End If
 
                 TaskTimer.Enabled = True
                 task.highlightColor = highlightColors(0) ' task.frameCount Mod highlightColors.Count)
@@ -577,7 +586,7 @@ Public Class VBtask : Implements IDisposable
 
                 algorithmObject.NextFrame(src)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
-                task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
+                If task.motionDetected Then task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
 
                 task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
                 task.optionsChanged = False

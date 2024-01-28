@@ -11,7 +11,7 @@ Public Class BGSubtract_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If task.optionsChanged Then cPtr = BGSubtract_BGFG_Open(options.currMethod)
+        If task.optionsChanged Or firstPass Then cPtr = BGSubtract_BGFG_Open(options.currMethod)
 
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)

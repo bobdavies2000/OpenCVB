@@ -164,7 +164,7 @@ Public Class ML_FillRGBDepth_MT : Inherits VB_Algorithm
         labels = {"", "", "ML filled shadow", ""}
         desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim minLearnCount = 5
         Parallel.ForEach(task.gridList,
             Sub(roi)
@@ -192,7 +192,7 @@ Public Class ML_DepthFromColor : Inherits VB_Algorithm
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static depthSlider = findSlider("Prediction Max Depth")
         mats.mat(1) = task.noDepthMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 

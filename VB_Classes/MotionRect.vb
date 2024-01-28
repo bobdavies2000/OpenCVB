@@ -12,21 +12,22 @@ Public Class MotionRect_Basics : Inherits VB_Algorithm
         desc = "Use floodfill to find all the real motion in an image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        task.motionDetected = False
+        task.motionReset = True
+
         bgSub.Run(src)
         If standalone Or showIntermediate() Or showDiff Then dst2 = bgSub.dst2
 
-        If task.pcSplit Is Nothing Then Exit Sub
-
         redCPP.Run(bgSub.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary))
         If redCPP.sortedCells.Count < 2 Then
-            dst3.SetTo(0)
+            task.motionReset = False
+            task.motionRect = New cv.Rect
             Exit Sub
         End If
 
         Dim nextRect = redCPP.sortedCells.ElementAt(1).Value.rect
-        For Each key In redCPP.sortedCells
-            Dim rc = key.Value
-            If rc.index = 1 Then Continue For
+        For i = 2 To redCPP.sortedCells.Count - 1
+            Dim rc = redCPP.sortedCells.ElementAt(i).Value
             nextRect = nextRect.Union(rc.rect)
         Next
 
@@ -34,20 +35,18 @@ Public Class MotionRect_Basics : Inherits VB_Algorithm
         rectList.Add(nextRect)
         task.motionRect = New cv.Rect
         For Each r In rectList
-            If task.motionRect.Width = 0 Or task.motionRect.Height = 0 Then
-                task.motionRect = r
-            Else
-                task.motionRect = task.motionRect.Union(r)
-            End If
+            If task.motionRect.Width = 0 Then task.motionRect = r Else task.motionRect = task.motionRect.Union(r)
         Next
         If rectList.Count > gOptions.FrameHistory.Value Then rectList.RemoveAt(0)
         If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
-            task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
             rectList.Clear()
+            task.motionRect = New cv.Rect
+        Else
+            task.motionReset = False
+            If task.motionRect.Width <> 0 Or task.motionRect.Height <> 0 Then task.motionDetected = True
         End If
 
         If standalone Or showIntermediate() Or showDiff Then dst2.Rectangle(task.motionRect, 255, task.lineWidth)
-
         labels(2) = CStr(redCPP.sortedCells.Count) + " cells were found with " + CStr(redCPP.classCount) + " flood points"
     End Sub
 End Class
@@ -327,20 +326,13 @@ End Class
 Public Class MotionRect_PointCloud : Inherits VB_Algorithm
     Public diff As New Diff_Depth32f
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
         labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
         desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then
-            task.motionRect = New cv.Rect
-            dst2 = task.pointCloud.Clone
-        End If
+        If heartBeat() Or task.motionReset Then dst2 = task.pointCloud.Clone
 
-        dst1 = task.motionColor.dst2
-
-        If task.motionRect.Width = 0 And task.motionRect.Height = 0 Then Exit Sub
-        task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
+        If task.motionDetected Then task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
 
         If standalone Or showIntermediate() Then
             If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
@@ -361,18 +353,13 @@ End Class
 
 Public Class MotionRect_Depth : Inherits VB_Algorithm
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
         labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
         desc = "Display the depth data after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then dst2 = task.pcSplit(2).Clone
+        If heartBeat() Or task.motionReset Then dst2 = task.pcSplit(2).Clone
 
-        dst1 = task.motionColor.dst2
-
-        If task.motionRect.Width = 0 And task.motionRect.Height = 0 Then Exit Sub
-
-        task.pcSplit(2)(task.motionRect).CopyTo(dst2(task.motionRect))
+        If task.motionDetected Then task.pcSplit(2)(task.motionRect).CopyTo(dst2(task.motionRect))
 
         If standalone Or showIntermediate() Then
             Static diff As New Diff_Depth32f
@@ -392,23 +379,14 @@ End Class
 
 Public Class MotionRect_Grayscale : Inherits VB_Algorithm
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
         labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated grayscale image",
                   "Diff of input and latest accumulated grayscale image"}
         desc = "Display the grayscale image after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If heartBeat() Then dst2 = src.Clone
-
-        dst1 = task.motionColor.dst2
-
-        If task.motionRect.Width = 0 And task.motionRect.Height = 0 Then
-            dst3.SetTo(0)
-            Exit Sub
-        End If
-
-        src(task.motionRect).CopyTo(dst2(task.motionRect))
+        If heartBeat() Or task.motionReset Then dst2 = src.Clone
+        If task.motionDetected Then src(task.motionRect).CopyTo(dst2(task.motionRect))
 
         If standalone Or showIntermediate() Then
             Static diff As New Diff_Basics
@@ -428,30 +406,16 @@ End Class
 
 Public Class MotionRect_Color : Inherits VB_Algorithm
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
         labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated color image",
                   "Diff of input and latest accumulated color image"}
         desc = "Display the color image after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then dst2 = src.Clone
+        If heartBeat() Or task.motionReset Then dst2 = src.Clone
+        If task.motionDetected Then src(task.motionRect).CopyTo(dst2(task.motionRect))
 
-        dst1 = task.motionColor.dst2
-
-        If task.motionRect.Width = 0 And task.motionRect.Height = 0 Then
-            dst3.SetTo(0)
-            Exit Sub
-        End If
-
-        src(task.motionRect).CopyTo(dst2(task.motionRect))
-
-        If standalone Or showIntermediate() Then
-            Static diff As New Diff_Color
-            If diff.diff.lastFrame.Width = 0 Then diff.diff.lastFrame = dst2.Clone
-            diff.Run(src)
-            dst3 = diff.dst3
-            dst3.Rectangle(task.motionRect, 255, task.lineWidth)
-            diff.diff.lastFrame = src.Clone
+        If (standalone Or showIntermediate()) And task.motionDetected Then
+            dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
         End If
     End Sub
 End Class

@@ -51,9 +51,11 @@ Partial Class OptionsGlobal
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.MotionFilteredColorOnly = New System.Windows.Forms.RadioButton()
+        Me.MotionFilteredColorAndCloud = New System.Windows.Forms.RadioButton()
         Me.UseHistoryCloud = New System.Windows.Forms.RadioButton()
         Me.MotionFilteredCloudOnly = New System.Windows.Forms.RadioButton()
-        Me.unFilteredCloud = New System.Windows.Forms.RadioButton()
+        Me.unFiltered = New System.Windows.Forms.RadioButton()
         Me.ShowGrid = New System.Windows.Forms.CheckBox()
         Me.SyncOutput = New System.Windows.Forms.CheckBox()
         Me.UseMultiThreading = New System.Windows.Forms.CheckBox()
@@ -79,8 +81,6 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.MotionFilteredColorAndCloud = New System.Windows.Forms.RadioButton()
-        Me.MotionFilteredColorOnly = New System.Windows.Forms.RadioButton()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.minPixelsSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -408,13 +408,35 @@ Partial Class OptionsGlobal
         Me.GroupBox1.Controls.Add(Me.MotionFilteredColorAndCloud)
         Me.GroupBox1.Controls.Add(Me.UseHistoryCloud)
         Me.GroupBox1.Controls.Add(Me.MotionFilteredCloudOnly)
-        Me.GroupBox1.Controls.Add(Me.unFilteredCloud)
+        Me.GroupBox1.Controls.Add(Me.unFiltered)
         Me.GroupBox1.Location = New System.Drawing.Point(366, 89)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(306, 186)
         Me.GroupBox1.TabIndex = 69
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Color and PointCloud Input"
+        '
+        'MotionFilteredColorOnly
+        '
+        Me.MotionFilteredColorOnly.AutoSize = True
+        Me.MotionFilteredColorOnly.Location = New System.Drawing.Point(22, 83)
+        Me.MotionFilteredColorOnly.Name = "MotionFilteredColorOnly"
+        Me.MotionFilteredColorOnly.Size = New System.Drawing.Size(215, 24)
+        Me.MotionFilteredColorOnly.TabIndex = 4
+        Me.MotionFilteredColorOnly.TabStop = True
+        Me.MotionFilteredColorOnly.Text = "Motion Filtered Color Only"
+        Me.MotionFilteredColorOnly.UseVisualStyleBackColor = True
+        '
+        'MotionFilteredColorAndCloud
+        '
+        Me.MotionFilteredColorAndCloud.AutoSize = True
+        Me.MotionFilteredColorAndCloud.Location = New System.Drawing.Point(22, 113)
+        Me.MotionFilteredColorAndCloud.Name = "MotionFilteredColorAndCloud"
+        Me.MotionFilteredColorAndCloud.Size = New System.Drawing.Size(256, 24)
+        Me.MotionFilteredColorAndCloud.TabIndex = 3
+        Me.MotionFilteredColorAndCloud.TabStop = True
+        Me.MotionFilteredColorAndCloud.Text = "Motion Filtered Color and Cloud"
+        Me.MotionFilteredColorAndCloud.UseVisualStyleBackColor = True
         '
         'UseHistoryCloud
         '
@@ -438,16 +460,16 @@ Partial Class OptionsGlobal
         Me.MotionFilteredCloudOnly.Text = "Motion Filtered Cloud Only"
         Me.MotionFilteredCloudOnly.UseVisualStyleBackColor = True
         '
-        'unFilteredCloud
+        'unFiltered
         '
-        Me.unFilteredCloud.AutoSize = True
-        Me.unFilteredCloud.Location = New System.Drawing.Point(21, 23)
-        Me.unFilteredCloud.Name = "unFilteredCloud"
-        Me.unFilteredCloud.Size = New System.Drawing.Size(142, 24)
-        Me.unFilteredCloud.TabIndex = 0
-        Me.unFilteredCloud.TabStop = True
-        Me.unFilteredCloud.Text = "Unfiltered (raw)"
-        Me.unFilteredCloud.UseVisualStyleBackColor = True
+        Me.unFiltered.AutoSize = True
+        Me.unFiltered.Location = New System.Drawing.Point(21, 23)
+        Me.unFiltered.Name = "unFiltered"
+        Me.unFiltered.Size = New System.Drawing.Size(142, 24)
+        Me.unFiltered.TabIndex = 0
+        Me.unFiltered.TabStop = True
+        Me.unFiltered.Text = "Unfiltered (raw)"
+        Me.unFiltered.UseVisualStyleBackColor = True
         '
         'ShowGrid
         '
@@ -695,28 +717,6 @@ Partial Class OptionsGlobal
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
-        'MotionFilteredColorAndCloud
-        '
-        Me.MotionFilteredColorAndCloud.AutoSize = True
-        Me.MotionFilteredColorAndCloud.Location = New System.Drawing.Point(22, 113)
-        Me.MotionFilteredColorAndCloud.Name = "MotionFilteredColorAndCloud"
-        Me.MotionFilteredColorAndCloud.Size = New System.Drawing.Size(256, 24)
-        Me.MotionFilteredColorAndCloud.TabIndex = 3
-        Me.MotionFilteredColorAndCloud.TabStop = True
-        Me.MotionFilteredColorAndCloud.Text = "Motion Filtered Color and Cloud"
-        Me.MotionFilteredColorAndCloud.UseVisualStyleBackColor = True
-        '
-        'MotionFilteredColorOnly
-        '
-        Me.MotionFilteredColorOnly.AutoSize = True
-        Me.MotionFilteredColorOnly.Location = New System.Drawing.Point(22, 83)
-        Me.MotionFilteredColorOnly.Name = "MotionFilteredColorOnly"
-        Me.MotionFilteredColorOnly.Size = New System.Drawing.Size(215, 24)
-        Me.MotionFilteredColorOnly.TabIndex = 4
-        Me.MotionFilteredColorOnly.TabStop = True
-        Me.MotionFilteredColorOnly.Text = "Motion Filtered Color Only"
-        Me.MotionFilteredColorOnly.UseVisualStyleBackColor = True
-        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -807,7 +807,7 @@ Partial Class OptionsGlobal
     Friend WithEvents GroupBox1 As Windows.Forms.GroupBox
     Friend WithEvents UseHistoryCloud As Windows.Forms.RadioButton
     Friend WithEvents MotionFilteredCloudOnly As Windows.Forms.RadioButton
-    Friend WithEvents unFilteredCloud As Windows.Forms.RadioButton
+    Friend WithEvents unFiltered As Windows.Forms.RadioButton
     Friend WithEvents MotionFilteredColorOnly As Windows.Forms.RadioButton
     Friend WithEvents MotionFilteredColorAndCloud As Windows.Forms.RadioButton
 End Class

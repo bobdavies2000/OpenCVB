@@ -224,7 +224,7 @@ Public Class Motion_DepthReconstructed : Inherits VB_Algorithm
             labels(3) = motion.labels(2)
         End If
 
-        If task.motionRect = New cv.Rect Then Exit Sub
+        If task.motionDetected = False Then Exit Sub
 
         src(task.motionRect).CopyTo(dst0(task.motionRect))
         task.noDepthMask(task.motionRect).CopyTo(dst1(task.motionRect))

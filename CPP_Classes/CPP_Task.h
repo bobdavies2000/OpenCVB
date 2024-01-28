@@ -6,7 +6,6 @@
 class rcData {
 public:
     cv::Rect rect;
-    Rect motionRect;  // the union of the previous rect with the current rect.
     Mat mask;
     Mat depthMask;
 

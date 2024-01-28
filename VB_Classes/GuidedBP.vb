@@ -173,7 +173,7 @@ Public Class GuidedBP_kTop : Inherits VB_Algorithm
     Dim hist2d As New Histogram2D_Top
     Public Sub New()
         redOptions.UseColor.Checked = True
-        gOptions.unFilteredCloud.Checked = True
+        gOptions.unFiltered.Checked = True
         labels(3) = "Back projection of the top view"
         desc = "Subdivide the OpAuto_XRange output using RedCloud_Basics"
     End Sub
@@ -217,7 +217,7 @@ Public Class GuidedBP_kSide : Inherits VB_Algorithm
     Dim contours As New Contour_Largest
     Public Sub New()
         redOptions.UseColor.Checked = True
-        gOptions.unFilteredCloud.Checked = True
+        gOptions.unFiltered.Checked = True
         labels(3) = "Back projection of the top view"
         desc = "Subdivide the GuidedBP_HistogramSide output using RedCloud_Basics"
     End Sub

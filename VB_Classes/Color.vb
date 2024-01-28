@@ -32,18 +32,16 @@ Public Class Color_Basics : Inherits VB_Algorithm
             End Select
         End If
 
-        If task.motionRect.Width = 0 Then
-            dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
-            classifier.run(dst1)
-            classCount = classifier.classCount
-            dst2 = classifier.dst2
+        dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
+        classifier.run(dst1)
+        If task.motionDetected Then
+            classifier.dst2(task.motionRect).copyto(dst2(task.motionRect))
         Else
-            dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)(task.motionRect), src(task.motionRect))
-            classifier.run(dst1)
-            dst2(task.motionRect) = classifier.dst2
+            classCount = classifier.classCount
+            If task.motionReset Then dst2 = classifier.dst2.clone
         End If
-        If standalone Or showIntermediate() Or updateImages Then dst3 = vbPalette(dst2 * 255 / classCount)
 
+        If standalone Or showIntermediate() Or updateImages Then dst3 = vbPalette(dst2 * 255 / classCount)
         labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) + " pixel classifications"
     End Sub
 End Class

@@ -267,4 +267,22 @@ Public Class OptionsGlobal
     Private Sub useCloudHistory_CheckedChanged(sender As Object, e As EventArgs)
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
+
+
+
+    Private Sub unFiltered_CheckedChanged(sender As Object, e As EventArgs) Handles unFiltered.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+    End Sub
+    Private Sub MotionFilteredCloudOnly_CheckedChanged(sender As Object, e As EventArgs) Handles MotionFilteredCloudOnly.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+    End Sub
+    Private Sub MotionFilteredColorOnly_CheckedChanged(sender As Object, e As EventArgs) Handles MotionFilteredColorOnly.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+    End Sub
+    Private Sub MotionFilteredColorAndCloud_CheckedChanged(sender As Object, e As EventArgs) Handles MotionFilteredColorAndCloud.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+    End Sub
+    Private Sub UseHistoryCloud_CheckedChanged(sender As Object, e As EventArgs) Handles UseHistoryCloud.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+    End Sub
 End Class

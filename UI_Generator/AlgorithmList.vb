@@ -1514,7 +1514,6 @@ if algorithmName = "RedCloud_MeterByMeter" Then return new RedCloud_MeterByMeter
 if algorithmName = "RedCloud_MostlyColor" Then return new RedCloud_MostlyColor
 if algorithmName = "RedCloud_MotionBasics" Then return new RedCloud_MotionBasics
 if algorithmName = "RedCloud_MotionBGsubtract" Then return new RedCloud_MotionBGsubtract
-if algorithmName = "RedCloud_MotionDiff" Then return new RedCloud_MotionDiff
 if algorithmName = "RedCloud_NearestStableCell" Then return new RedCloud_NearestStableCell
 if algorithmName = "RedCloud_NoDepth" Then return new RedCloud_NoDepth
 if algorithmName = "RedCloud_OnlyColor" Then return new RedCloud_OnlyColor
