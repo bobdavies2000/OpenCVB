@@ -8,11 +8,11 @@ Public Class Hull_Basics : Inherits VB_Algorithm
     Public useRandomPoints As Boolean
     Public Sub New()
         labels = {"", "", "Input Points - draw a rectangle anywhere.  Enclosing rectangle in yellow.", ""}
-        If standalone Then random.range = New cv.Rect(100, 100, 50, 50)
+        If standaloneTest() Then random.range = New cv.Rect(100, 100, 50, 50)
         desc = "Given a list of points, create a hull that encloses them."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If (standalone And task.heartBeat) Or (useRandomPoints And task.heartBeat) Then
+        If (standaloneTest() And task.heartBeat) Or (useRandomPoints And task.heartBeat) Then
             random.Run(empty)
             dst2.SetTo(0)
             For Each pt In random.pointList

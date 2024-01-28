@@ -11,7 +11,7 @@ Public Class KMeans_Basics : Inherits VB_Algorithm
         desc = "Cluster the input using kMeans."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone And src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standaloneTest() And src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         options.RunVB()
         classCount = options.kMeansK
         Static lastK = classCount
@@ -49,7 +49,7 @@ Public Class KMeans_Basics : Inherits VB_Algorithm
         saveLabels = dst2.Clone
 
         dst2.Reshape(1, src.Height).ConvertTo(dst2, cv.MatType.CV_8U)
-        If standalone Or showIntermediate() Then dst3 = vbPalette(dst2 * 255 / classCount)
+        If standaloneTest() Then dst3 = vbPalette(dst2 * 255 / classCount)
         lastK = classCount
         labels(2) = "KMeans labels 0-" + CStr(lastK) + " spread out across 255 values."
     End Sub
@@ -70,7 +70,7 @@ Public Class KMeans_MultiChannel : Inherits VB_Algorithm
         desc = "Cluster the input using kMeans."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then task.color.ConvertTo(src, cv.MatType.CV_32FC3)
+        If standaloneTest() Then task.color.ConvertTo(src, cv.MatType.CV_32FC3)
         If src.Type = cv.MatType.CV_8UC3 Then src.ConvertTo(src, cv.MatType.CV_32FC3)
         If src.Type = cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_32F)
         km.Run(src)
@@ -169,7 +169,7 @@ Public Class KMeans_CustomData : Inherits VB_Algorithm
         Dim k = km.options.kMeansK
         If src.Rows < k Then k = src.Rows
 
-        If standalone Then
+        If standaloneTest() Then
             Static random = New Random_Basics
             Static randslider = findSlider("Random Pixel Count")
             If firstPass Then randslider.Value = 50
@@ -202,7 +202,7 @@ Public Class KMeans_Simple_CPP : Inherits VB_Algorithm
         desc = "Split the input into 3 levels - zero (no depth), closer to min, closer to max."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then src = task.pcSplit(2)
+        If standaloneTest() Then src = task.pcSplit(2)
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim mm as mmData = vbMinMax(src, task.depthMask)
@@ -374,7 +374,7 @@ Public Class KMeans_DepthPlusGray : Inherits VB_Algorithm
         dst3 = km.dst2
         dst3.SetTo(0, task.noDepthMask)
 
-        If standalone Then dst2 = vbPalette(km.dst2 * 255 / k)
+        If standaloneTest() Then dst2 = vbPalette(km.dst2 * 255 / k)
     End Sub
 End Class
 

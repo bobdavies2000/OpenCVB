@@ -9,7 +9,7 @@ Public Class Laplacian_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
-        If standalone Then src = src.GaussianBlur(options.kernel, 0, 0)
+        If standaloneTest() Then src = src.GaussianBlur(options.kernel, 0, 0)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst3 = src.Laplacian(cv.MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs()
 

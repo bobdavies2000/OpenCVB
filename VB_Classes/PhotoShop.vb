@@ -114,7 +114,7 @@ Public Class PhotoShop_WhiteBalance : Inherits VB_Algorithm
         handleSrc.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
-        If standalone Then
+        If standaloneTest() Then
             Dim diff = dst2 - src
             diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst3 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)

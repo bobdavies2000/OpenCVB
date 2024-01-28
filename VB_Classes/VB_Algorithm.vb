@@ -48,7 +48,7 @@ Public Class VB_Algorithm : Implements IDisposable
             task.callTrace.Add("CPP_Basics\")
         End If
 
-        standalone = task.callTrace(0) = traceName + "\" ' only the first is standalone (the primary algorithm.)
+        standalone = task.callTrace(0) = traceName + "\" ' only the first is standaloneTest() (the primary algorithm.)
         If traceName = "Python_Run" Then standalone = True
         If standalone = False And task.callTrace.Contains(callStack) = False Then
             task.callTrace.Add(callStack)
@@ -85,6 +85,10 @@ Public Class VB_Algorithm : Implements IDisposable
         End If
         firstPass = True
     End Sub
+    Public Function standaloneTest() As Boolean
+        If standalone Or showIntermediate() Then Return True
+        Return False
+    End Function
     Public Function checkIntermediateResults() As VB_Algorithm
         For Each obj In task.activeObjects
             If obj.traceName = task.intermediateName And obj.firstPass = False Then Return obj

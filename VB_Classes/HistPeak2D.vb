@@ -6,12 +6,12 @@ Public Class HistPeak2D_Basics : Inherits VB_Algorithm
     Public histogram As New cv.Mat
     Public ranges() As cv.Rangef
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Find the top X peaks in a 2D histogram and use Delaunay to setup the backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        ' if standalone, go get a histogram for input.  Src is the 3-channel input to the histogram.
-        If standalone Then
+        ' if standaloneTest(), go get a histogram for input.  Src is the 3-channel input to the histogram.
+        If standaloneTest() Then
             bgr.Run(src)
             histogram = bgr.histogram02
         End If

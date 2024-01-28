@@ -164,7 +164,7 @@ Public Class Gif_OpenCVB : Inherits VB_Algorithm
         setTrueText("Results are best when the main form is set to an 'auto-sized' setting.", 3)
         Static snapCheck = findCheckBox("Check this box when Gif_Basics dst2 contains the desired snapshot.")
 
-        If snapCheck.checked Or (standalone And task.heartBeat) And task.mainFormLocation.Width > 0 Then
+        If snapCheck.checked Or (standaloneTest() And task.heartBeat) And task.mainFormLocation.Width > 0 Then
             Dim snapshot As Bitmap = GetWindowImage(task.main_hwnd,
                                      New cv.Rect(0, 0, task.mainFormLocation.Width, task.mainFormLocation.Height))
             Dim r = New cv.Rect(0, 0, snapshot.Width - 16, snapshot.Height - 40)

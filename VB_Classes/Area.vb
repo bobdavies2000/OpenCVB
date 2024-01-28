@@ -90,7 +90,7 @@ Public Class Area_FindNonZero : Inherits VB_Algorithm
         desc = "Use FindNonZero API to get coordinates of non-zero points."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             src = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
             Dim srcPoints(100 - 1) As cv.Point ' doesn't really matter how many there are.
             For i = 0 To srcPoints.Length - 1
@@ -162,7 +162,7 @@ Public Class Area_MinRect : Inherits VB_Algorithm
         desc = "Find minimum containing rectangle for a set of points."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             If task.heartBeat = False Then Exit Sub
             options.RunVB()
             inputPoints = quickRandomPoints(options.numPoints)
@@ -170,7 +170,7 @@ Public Class Area_MinRect : Inherits VB_Algorithm
 
         minRect = cv.Cv2.MinAreaRect(inputPoints.ToArray)
 
-        If standalone Or showIntermediate() Then
+        If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In inputPoints
                 dst2.Circle(pt, task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)

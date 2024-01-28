@@ -550,7 +550,7 @@ Public Class MSER_TestExample : Inherits VB_Algorithm
     Public Sub New()
         labels(2) = "Contour regions from MSER"
         labels(3) = "Box regions from MSER"
-        If standalone Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
         desc = "Maximally Stable Extremal Regions example - still image"
         image = cv.Cv2.ImRead(task.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         mser = cv.MSER.Create()
@@ -661,7 +661,7 @@ Public Class MSER_CPP : Inherits VB_Algorithm
 
         dst1 = dst0.InRange(255, 255)
 
-        If standalone Or showIntermediate() Then
+        If standaloneTest() Then
             dst2 = vbPalette(dst0 * 255 / classcount)
 
             dst3 = src

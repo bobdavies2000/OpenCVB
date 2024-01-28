@@ -185,7 +185,7 @@ Public Class Depth_MeanStdev_MT : Inherits VB_Algorithm
                 maxStdevVal = 0
             End If
 
-            If standalone Then
+            If standaloneTest() Then
                 For i = 0 To task.gridList.Count - 1
                     Dim roi = task.gridList(i)
                     setTrueText(Format(meanValues(i), fmt3) + vbCrLf + Format(stdValues(i), fmt3), New cv.Point(roi.X, roi.Y), 3)
@@ -314,7 +314,7 @@ Public Class Depth_LocalMinMax_MT : Inherits VB_Algorithm
         desc = "Find min and max depth in each segment."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             src.CopyTo(dst2)
             dst2.SetTo(cv.Scalar.White, task.gridMask)
         End If
@@ -442,7 +442,7 @@ Public Class Depth_NotMissing : Inherits VB_Algorithm
         desc = "Collect X frames, compute stable depth using the BGR and Depth image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then src = task.depthRGB
+        If standaloneTest() Then src = task.depthRGB
         bgSub.Run(src)
         dst2 = bgSub.dst2
         dst3 = Not bgSub.dst2
@@ -498,7 +498,7 @@ Public Class Depth_SmoothingMat : Inherits VB_Algorithm
         Static thresholdSlider = findSlider("Threshold in millimeters")
         Static lastDepth = task.pcSplit(2)
 
-        If standalone Then src = task.pcSplit(2)
+        If standaloneTest() Then src = task.pcSplit(2)
         Dim rect = If(task.drawRect.Width <> 0, task.drawRect, New cv.Rect(0, 0, src.Width, src.Height))
 
         cv.Cv2.Subtract(lastDepth, task.pcSplit(2), dst2)
@@ -609,7 +609,7 @@ Public Class Depth_Holes : Inherits VB_Algorithm
         dst2 = dst2.Dilate(element, Nothing, holeSlider.Value)
         dst3 = dst2.Dilate(element, Nothing, borderSlider.Value)
         dst3 = dst3 Xor dst2
-        If standalone Then task.depthRGB.CopyTo(dst3, dst3)
+        If standaloneTest() Then task.depthRGB.CopyTo(dst3, dst3)
     End Sub
 End Class
 
@@ -1293,8 +1293,8 @@ Public Class Depth_InRange : Inherits VB_Algorithm
     Dim contours As New Contour_Largest
     Public classCount As Integer = 1
     Public Sub New()
-        labels = {"", "", "Looks empty! But the values are there - 0 to classcount.  Run standalone to see the palette output for this", "Edges between the depth regions."}
-        If standalone Then gOptions.displayDst0.Checked = True
+        labels = {"", "", "Looks empty! But the values are there - 0 to classcount.  Run standaloneTest() to see the palette output for this", "Edges between the depth regions."}
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
         dst3 = New cv.Mat(dst0.Size, cv.MatType.CV_8U)
         desc = "Create the selected number of depth ranges "
     End Sub
@@ -1327,7 +1327,7 @@ Public Class Depth_InRange : Inherits VB_Algorithm
         dst0 = src.Clone
         dst0.SetTo(cv.Scalar.White, dst3)
 
-        If standalone Then
+        If standaloneTest() Then
             dst2 = vbPalette(dst2 * 255 / classCount)
         End If
         If task.heartBeat Then labels(2) = Format(classCount, "000") + " regions were found"
@@ -1356,7 +1356,7 @@ Public Class Depth_Regions : Inherits VB_Algorithm
         dst0.ConvertTo(dst2, cv.MatType.CV_8U)
         dst2.SetTo(0, task.noDepthMask)
 
-        If standalone Then dst3 = vbPalette(dst2)
+        If standaloneTest() Then dst3 = vbPalette(dst2)
         labels(2) = CStr(classCount) + " regions defined in the depth data"
     End Sub
 End Class
@@ -1376,14 +1376,14 @@ Public Class Depth_Tiers : Inherits VB_Algorithm
         desc = "Create a reduced image of the depth data to define tiers of similar values"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Or src.Type = cv.MatType.CV_8UC3 Then src = task.pcSplit(2)
+        If standaloneTest() Or src.Type = cv.MatType.CV_8UC3 Then src = task.pcSplit(2)
         dst1 = src.Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
 
         classCount = task.maxZmeters
         dst2.SetTo(0, task.noDepthMask)
 
-        If standalone Or showIntermediate() Then dst3 = vbPalette(dst2 * 255 / classCount)
+        If standaloneTest() Then dst3 = vbPalette(dst2 * 255 / classCount)
     End Sub
 End Class
 
@@ -1615,7 +1615,7 @@ Public Class Depth_Outline : Inherits VB_Algorithm
         desc = "Provide a line that separates depth from no depth throughout the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then src = task.depthMask
+        If standaloneTest() Then src = task.depthMask
         contour.Run(src)
 
         dst2.SetTo(0)
@@ -1623,7 +1623,7 @@ Public Class Depth_Outline : Inherits VB_Algorithm
             vbDrawContour(dst2, tour.ToList, 255, task.lineWidth)
         Next
 
-        If standalone Then
+        If standaloneTest() Then
             If task.heartBeat Then dst3.SetTo(0)
             dst3 = dst3 Or dst2
         End If

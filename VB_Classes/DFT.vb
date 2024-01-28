@@ -198,7 +198,7 @@ Public Class DFT_Shapes : Inherits VB_Algorithm
     Dim options As New Options_Draw
     Public Sub New()
         findSlider("DrawCount").Value = 1
-        If standalone Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
         If radio.Setup(traceName) Then
             radio.addRadio("Draw Circle")
             radio.addRadio("Draw Ellipse")

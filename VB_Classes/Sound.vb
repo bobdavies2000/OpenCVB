@@ -221,7 +221,7 @@ Public Class Sound_Display : Inherits VB_Algorithm
         Static formatIndex As Integer
         Static samplesperLine As Single
         Static starttime As Date
-        If standalone Then soundSource.Run(src)
+        If standaloneTest() Then soundSource.Run(src)
         If fileStarted = False Then
             fileStarted = True
             soundSource.Run(src)

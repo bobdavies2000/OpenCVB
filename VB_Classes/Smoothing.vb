@@ -48,7 +48,7 @@ Public Class Smoothing_Exterior : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         smOptions.RunVB()
-        If standalone Then
+        If standaloneTest() Then
             If task.heartBeat And Not task.paused Then
                 Dim hullList = hull.buildRandomHullPoints()
                 dst2.SetTo(0)
@@ -117,7 +117,7 @@ Public Class Smoothing_Interior : Inherits VB_Algorithm
         Return nl
     End Function
     Public Sub New()
-        If standalone Then findSlider("Hull random points").Value = 16
+        If standaloneTest() Then findSlider("Hull random points").Value = 16
 
         labels(2) = "Original Points (white) Smoothed (yellow)"
         labels(3) = ""
@@ -125,7 +125,7 @@ Public Class Smoothing_Interior : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         smOptions.RunVB()
-        If standalone Then
+        If standaloneTest() Then
             If task.heartBeat And task.paused = False Then
                 Dim hullList = hull.buildRandomHullPoints()
                 dst2.SetTo(0)

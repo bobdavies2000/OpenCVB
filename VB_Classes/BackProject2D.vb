@@ -11,8 +11,8 @@ Public Class BackProject2D_Basics : Inherits VB_Algorithm
     Public options As New Options_ColorFormat
     Public bpCol As Integer, bpRow As Integer, brickW As Integer, brickH As Integer
     Public Sub New()
-        If standalone Then gOptions.GridSize.Value = 5
-        If standalone Then hist2d.histRowsCols = {gOptions.GridSize.Value, gOptions.GridSize.Value}
+        If standaloneTest() Then gOptions.GridSize.Value = 5
+        If standaloneTest() Then hist2d.histRowsCols = {gOptions.GridSize.Value, gOptions.GridSize.Value}
         vbAddAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.")
         desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed and explored."
     End Sub
@@ -68,7 +68,7 @@ Public Class BackProject2D_Compare : Inherits VB_Algorithm
     Dim mats As New Mat_4Click
     Public Sub New()
         labels(2) = "Hue (upper left), sat (upper right), highlighted backprojection (bottom left)"
-        If standalone Then gOptions.GridSize.Value = 10
+        If standaloneTest() Then gOptions.GridSize.Value = 10
         desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -111,7 +111,7 @@ Public Class BackProject2D_RowCol : Inherits VB_Algorithm
         End If
 
         findRadio("HSV").Checked = True
-        If standalone Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
         gOptions.GridSize.Value = 10
         desc = "Backproject the whole row or column of the 2D histogram"
     End Sub
@@ -136,7 +136,7 @@ Public Class BackProject2D_RowCol : Inherits VB_Algorithm
         dst0.SetTo(0, dst1)
 
         With backp
-            If standalone Then
+            If standaloneTest() Then
                 If Not rowRadio.checked Then dst2.Rectangle(New cv.Rect(.bpCol * .brickW, 0, .brickW, dst2.Height), cv.Scalar.Yellow, task.lineWidth, task.lineType)
                 If rowRadio.checked Then dst2.Rectangle(New cv.Rect(0, .bpRow * .brickH, dst2.Width, .brickH), cv.Scalar.Yellow, task.lineWidth, task.lineType)
             End If
@@ -173,7 +173,7 @@ Public Class BackProject2D_FullImage : Inherits VB_Algorithm
         dst2 = backp.dst2
 
         With backp
-            If standalone Then dst2.Rectangle(New cv.Rect(.bpCol * .brickW, .bpRow * .brickH, .brickW - 1, .brickH - 1),
+            If standaloneTest() Then dst2.Rectangle(New cv.Rect(.bpCol * .brickW, .bpRow * .brickH, .brickW - 1, .brickH - 1),
                                               cv.Scalar.Yellow, task.lineWidth, task.lineType)
         End With
 
@@ -265,7 +265,7 @@ Public Class BackProject2D_Filter : Inherits VB_Algorithm
         desc = "Filter a 2D histogram for the backprojection."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, src, 2, task.bins2D, task.rangesSide)
         End If
         src.Col(0).SetTo(0)

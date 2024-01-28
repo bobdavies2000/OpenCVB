@@ -100,21 +100,21 @@ Public Class Profile_Rotation : Inherits VB_Algorithm
                               "It is a common mistake to the OpenGL sliders to try to move cell but they don't - use 'Options_IMU' sliders"
     Dim options As New Options_IMU
     Public Sub New()
-        If standalone Then gOptions.gravityPointCloud.Checked = False
+        If standaloneTest() Then gOptions.gravityPointCloud.Checked = False
         labels(2) = "Top matrix is the current gMatrix while the bottom one includes the Y-axis rotation."
         desc = "Build the rotation matrix around the Y-axis"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static ySlider = findSlider("Rotate pointcloud around Y-axis")
             ySlider.value += 1
             If ySlider.value = ySlider.maximum Then ySlider.value = ySlider.minimum
-            setTrueText("When running standalone, the Y-axis slider is rotating from -90 to 90.", 3)
+            setTrueText("When running standaloneTest(), the Y-axis slider is rotating from -90 to 90.", 3)
         End If
 
         gMat.Run(src)
 
-        If standalone Then
+        If standaloneTest() Then
             options.RunVB()
             strOut = "Gravity-oriented gMatrix" + vbCrLf
             strOut += gMatrixToStr(task.gMatrix) + vbCrLf
@@ -137,7 +137,7 @@ End Class
 Public Class Profile_Derivative : Inherits VB_Algorithm
     Public sides As New Profile_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "", "Select a cell to analyze its contour", "Selected cell:  yellow = closer, blue = farther, white = no depth"}
         desc = "Visualize the derivative of X, Y, and Z in the contour of a RedCloud cell"
     End Sub
@@ -296,7 +296,7 @@ Public Class Profile_OpenGL : Inherits VB_Algorithm
     Dim heat As New HeatMap_Basics
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32FC3, 0)
-        If standalone Then gOptions.gravityPointCloud.Checked = False
+        If standaloneTest() Then gOptions.gravityPointCloud.Checked = False
         task.ogl.options.PointSizeSlider.Value = 10
         task.ogl.oglFunction = oCase.pcPointsAlone
         desc = "Visualize just the RedCloud cell contour in OpenGL"
@@ -335,7 +335,7 @@ Public Class Profile_Kalman : Inherits VB_Algorithm
     Dim kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(12 - 1)
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "", "Profile_Basics output without Kalman", "Profile_Basics output with Kalman"}
         desc = "Use Kalman to smooth the results of the contour key points"
     End Sub

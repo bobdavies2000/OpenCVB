@@ -10,7 +10,7 @@ Public Class MeanShift_Basics : Inherits VB_Algorithm
         desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone Then usingDrawRect = True
+        If standaloneTest() Then usingDrawRect = True
         If usingDrawRect Then inputRect = task.drawRect
         If inputRect.X + inputRect.Width > src.Width Then inputRect.Width = src.Width - inputRect.X
         If inputRect.Y + inputRect.Height > src.Height Then inputRect.Height = src.Height - inputRect.Y

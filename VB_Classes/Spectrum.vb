@@ -35,7 +35,7 @@ Public Class Spectrum_X : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If standalone Then dst2 = options.runRedCloud(labels(2))
+        If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
 
         If task.heartBeat And task.rc.index > 0 Then
             Dim ranges = options.buildDepthRanges(task.pcSplit(0)(task.rc.rect).Clone, " pointcloud X ")
@@ -59,7 +59,7 @@ Public Class Spectrum_Y : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If standalone Then dst2 = options.runRedCloud(labels(2))
+        If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
 
         If task.heartBeat And task.rc.index > 0 Then
             Dim ranges = options.buildDepthRanges(task.pcSplit(1)(task.rc.rect).Clone, " pointcloud Y ")
@@ -82,7 +82,7 @@ Public Class Spectrum_Z : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        If standalone Then dst2 = options.runRedCloud(labels(2))
+        If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
 
         If task.heartBeat And task.rc.index > 0 Then
             Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rc.rect).Clone, " pointcloud Z ")
@@ -111,7 +111,7 @@ Public Class Spectrum_Cloud : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If standalone Then dst2 = options.runRedCloud(labels(2))
+        If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
 
         If task.heartBeat Then
             specX.Run(src)
@@ -142,7 +142,7 @@ Public Class Spectrum_GrayAndCloud : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If standalone Then dst2 = options.runRedCloud(labels(2))
+        If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
 
         If task.heartBeat Then
             sCloud.Run(src)
@@ -169,7 +169,7 @@ Public Class Spectrum_RGB : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If standalone Then dst2 = options.runRedCloud(labels(2))
+        If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
 
         Dim split = src.Split()
         gSpec.typeSpec = " blue "
@@ -199,7 +199,7 @@ Public Class Spectrum_CellZoom : Inherits VB_Algorithm
     Dim breakdown As New Spectrum_Breakdown
     Public Sub New()
         labels = {"", "Cell trimming information", "", "White is after trimming, gray is before trim, black is outside the cell mask."}
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Zoom in on the selected RedCloud cell before and after Spectrum filtering."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -234,7 +234,7 @@ Public Class Spectrum_Breakdown : Inherits VB_Algorithm
         desc = "Breakdown a cell if possible."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             options.RunVB()
             dst2 = options.runRedCloud(labels(2))
         End If
@@ -280,7 +280,7 @@ Public Class Spectrum_Breakdown : Inherits VB_Algorithm
             dst3.SetTo(255, rangeClip)
         End If
 
-        If standalone Then
+        If standaloneTest() Then
             Static proportion As New Resize_Proportional
             proportion.Run(dst3)
             dst3 = proportion.dst2
@@ -331,8 +331,8 @@ End Class
 Public Class Spectrum_Mask : Inherits VB_Algorithm
     Dim gSpec As New Spectrum_Gray
     Public Sub New()
-        If standalone Then strOut = "Select a cell to see its depth spectrum"
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then strOut = "Select a cell to see its depth spectrum"
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Create a mask from the Spectrum ranges"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -358,7 +358,7 @@ Public Class Spectrum_Gray : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If standalone Then dst2 = options.runRedCloud(labels(2))
+        If standaloneTest() Then dst2 = options.runRedCloud(labels(2))
 
         Dim input = src(task.rc.rect)
         If input.Type <> cv.MatType.CV_8U Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

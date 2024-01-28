@@ -8,7 +8,7 @@ Public Class FeatureLess_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         edgeD.Run(src)
         dst2 = edgeD.dst2
-        If standalone Or showIntermediate() Then
+        If standaloneTest() Then
             dst3 = src.Clone
             dst3.SetTo(cv.Scalar.Yellow, dst2)
         End If
@@ -150,7 +150,7 @@ Public Class FeatureLess_UniquePixels : Inherits VB_Algorithm
     Dim fless As New Hough_FeatureLessTopX
     Dim sort As New Sort_1Channel
     Public Sub New()
-        If standalone Then findSlider("Threshold for sort input").Value = 0
+        If standaloneTest() Then findSlider("Threshold for sort input").Value = 0
         labels = {"", "Gray scale input to sort/remove dups", "Unique pixels", ""}
         desc = "Find the unique gray pixels for the featureless regions"
     End Sub

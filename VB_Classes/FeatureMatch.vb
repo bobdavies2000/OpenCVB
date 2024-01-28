@@ -10,7 +10,7 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
     Dim leftView As cv.Mat, rightView As cv.Mat
     Public Sub New()
         findSlider("MatchTemplate Cell Size").Value = 6
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         dst2X = New cv.Mat(dst2.Height, dst2.Width * 2, cv.MatType.CV_8U)
         desc = "Pair left/right features using correlation coefficients"
     End Sub
@@ -185,7 +185,7 @@ Public Class FeatureMatch_History : Inherits VB_Algorithm
     Public corrList As New List(Of Single)
     Dim matchCount As Integer
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels(1) = "The AddWeighted output of the left and right images connecting the corresponding points."
         desc = "Pair left/right features using correlation coefficients"
     End Sub

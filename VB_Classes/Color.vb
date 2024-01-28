@@ -41,7 +41,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
             If task.motionReset Then dst2 = classifier.dst2.clone
         End If
 
-        If standalone Or showIntermediate() Or updateImages Then dst3 = vbPalette(dst2 * 255 / classCount)
+        If standaloneTest() Or updateImages Then dst3 = vbPalette(dst2 * 255 / classCount)
         labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) + " pixel classifications"
     End Sub
 End Class
@@ -116,8 +116,8 @@ Public Class Color_KMeans : Inherits VB_Algorithm
     Public km2 As New KMeans_Basics
     Dim options As New Options_ColorFormat
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels(0) = "Recombined channels in other images."
         desc = "Run KMeans on each of the 3 color channels"
     End Sub

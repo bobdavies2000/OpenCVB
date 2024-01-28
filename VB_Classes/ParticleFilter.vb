@@ -5,7 +5,7 @@ Public Class ParticleFilter_Basics : Inherits VB_Algorithm
     Dim trace As New Feature_TraceKNN
     Dim plot1D As New Plot_Histogram2D
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "", "Particle traffic", "Largest count in 2D Histogram"}
         desc = "Use the good features of an image to create a histogram of particle motion. Peak histogram is net movement of the camera."
     End Sub

@@ -27,7 +27,7 @@ Public Class Concat_4way : Inherits VB_Algorithm
         desc = "Concatenate 4 images - horizontally and vertically"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             img(0) = src
             img(1) = task.depthRGB
             img(2) = If(task.leftView.Channels = 1, task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.leftView)

@@ -12,7 +12,7 @@ Public Class ORB_Basics : Inherits VB_Algorithm
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         orb = cv.ORB.Create(countSlider.Value)
         keypoints = orb.Detect(src)
-        If standalone Then
+        If standaloneTest() Then
             dst2 = src.Clone().CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             For Each kpt In keypoints
                 dst2.Circle(kpt.Pt, task.dotSize + 1, cv.Scalar.Yellow, -1, task.lineType)

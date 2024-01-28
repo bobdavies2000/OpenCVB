@@ -10,7 +10,7 @@ Public Class Match_Basics : Inherits VB_Algorithm
     Public options As New Options_FeatureMatch
     Public matchCenter As cv.Point
     Public Sub New()
-        labels(2) = If(standalone, "Draw anywhere to define a new target", "Both drawRect must be provided by the caller.")
+        labels(2) = If(standaloneTest(), "Draw anywhere to define a new target", "Both drawRect must be provided by the caller.")
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
         desc = "Find the requested template in an image.  Managing template is responsibility of caller (allows multiple targets per image.)"
     End Sub
@@ -31,8 +31,8 @@ Public Class Match_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If standalone Then
-            setTrueText("This algorithm has no output when run standalone")
+        If standaloneTest() Then
+            setTrueText("This algorithm has no output when run standaloneTest()")
             Exit Sub
         End If
 
@@ -61,7 +61,7 @@ Public Class Match_BasicsTest : Inherits VB_Algorithm
         desc = "Test the Match_Basics algorithm"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If (firstPass Or (task.mouseClickFlag And task.drawRect.Width <> 0)) And standalone Then
+        If (firstPass Or (task.mouseClickFlag And task.drawRect.Width <> 0)) And standaloneTest() Then
             match.drawRect = If(firstPass, New cv.Rect(25, 25, 25, 25), validateRect(task.drawRect))
             match.template = src(match.drawRect)
             task.drawRectClear = True
@@ -69,7 +69,7 @@ Public Class Match_BasicsTest : Inherits VB_Algorithm
 
         match.Run(src)
 
-        If standalone Then
+        If standaloneTest() Then
             match.dst2 = src
             dst3 = match.displayResults()
             dst2 = match.dst2
@@ -99,7 +99,7 @@ Public Class Match_RandomTest : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
-        If standalone Then
+        If standaloneTest() Then
             Dim sampleSize = options.fOptions.featurePoints
             Static saveSampleCount = sampleSize
             If saveSampleCount <> sampleSize Then
@@ -120,7 +120,7 @@ Public Class Match_RandomTest : Inherits VB_Algorithm
         If correlation < minCorrelation Then minCorrelation = correlation
         If correlation > maxCorrelation Then maxCorrelation = correlation
         labels(2) = "Correlation = " + Format(correlation, "#,##0.000")
-        If standalone Then
+        If standaloneTest() Then
             dst2.SetTo(0)
             labels(2) = options.matchText + " for " + CStr(template.Cols) + " random test samples = " + Format(correlation, "#,##0.00")
             flow.msgs.Add(options.matchText + " = " + Format(correlation, "#,##0.00"))
@@ -289,7 +289,7 @@ Public Class Match_PointSlope : Inherits VB_Algorithm
     Dim templates As New List(Of cv.Mat)
     Dim mats As New Mat_4to1
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "Output of Lines_PointSlope", "Matched lines", "correlationMats"}
         desc = "Initialize with the best lines in the image and track them using matchTemplate.  Reinitialize when correlations drop."
     End Sub
@@ -431,7 +431,7 @@ Public Class Match_DrawRect : Inherits VB_Algorithm
     Public Sub New()
         drawRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40) ' arbitrary template to match
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
-        If standalone Then labels(3) = "Probabilities (draw rectangle to test again)"
+        If standaloneTest() Then labels(3) = "Probabilities (draw rectangle to test again)"
         labels(2) = "Red dot marks best match for the selected region.  Draw a rectangle anywhere to test again. "
         desc = "Find the requested template in task.drawrect in an image"
     End Sub
@@ -446,7 +446,7 @@ Public Class Match_DrawRect : Inherits VB_Algorithm
 
         match.Run(src)
 
-        If standalone Or showOutput Then
+        If standaloneTest() Or showOutput Then
             dst0 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
             dst3.SetTo(0)
             dst0.CopyTo(dst3(New cv.Rect(drawRect.Width / 2, drawRect.Height / 2, dst0.Width, dst0.Height)))
@@ -458,7 +458,7 @@ Public Class Match_DrawRect : Inherits VB_Algorithm
         setTrueText("maxLoc = " + CStr(maxLoc.X) + ", " + CStr(maxLoc.Y), New cv.Point(1, 1), 3)
         drawRect = validateRect(New cv.Rect(maxLoc.X - drawRect.Width / 2, maxLoc.Y - drawRect.Height / 2, drawRect.Width, drawRect.Height))
 
-        If standalone Then
+        If standaloneTest() Then
             dst2.Circle(maxLoc.X, maxLoc.Y, task.dotSize, cv.Scalar.Red, -1, task.lineType)
             setTrueText(Format(match.correlation, fmt3), maxLoc, 2)
         End If
@@ -540,7 +540,7 @@ Public Class Match_tCell : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src as cv.Mat)
         Dim rSize = cellSlider.Value
-        If standalone And task.heartBeat Then
+        If standaloneTest() And task.heartBeat Then
             options.RunVB()
             tCells.Clear()
             tCells.Add(createCell(src, 0, New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))))
@@ -561,7 +561,7 @@ Public Class Match_tCell : Inherits VB_Algorithm
             tCells(i) = tc
         Next
 
-        If standalone Then
+        If standaloneTest() Then
             Static lineDisp As New Line_DisplayInfo
             lineDisp.tcells = tCells
             lineDisp.Run(src)
@@ -706,10 +706,10 @@ Public Class Match_Point : Inherits VB_Algorithm
         desc = "Track the selected point"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             setTrueText("Set the target mat and the pt then run to track an individual point." + vbCrLf +
                         "After running, the pt is updated with the new location and correlation with the updated correlation." + vbCrLf +
-                        "There is no output when run standalone")
+                        "There is no output when run standaloneTest()")
             Exit Sub
         End If
 
@@ -748,7 +748,7 @@ Public Class Match_Points : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         If firstPass Then mPoint.target = src.Clone
 
-        If standalone Then
+        If standaloneTest() Then
             feat.Run(src)
             ptx = New List(Of cv.Point2f)(feat.featurePoints)
             setTrueText("Move camera around to watch the point being tracked", 3)

@@ -729,14 +729,14 @@ Public Class Feature_tCellTracker : Inherits VB_Algorithm
             If match.tCells(0).correlation >= minCorrelation Then
                 tc = match.tCells(0)
                 setTrueText(Format(tc.correlation, fmt3), tc.center)
-                If standalone Then strOut += Format(tc.correlation, fmt3) + ", "
+                If standaloneTest() Then strOut += Format(tc.correlation, fmt3) + ", "
                 dst2.Circle(tc.center, task.dotSize, myHighLightColor, -1, task.lineType)
                 dst2.Rectangle(tc.rect, myHighLightColor, task.lineWidth, task.lineType)
                 newCells.Add(tc)
             End If
         Next
 
-        If standalone Then
+        If standaloneTest() Then
             flow.msgs.Add(strOut)
             flow.Run(empty)
         End If
@@ -793,7 +793,7 @@ Public Class Feature_PointTracker : Inherits VB_Algorithm
                 mPoints.ptx.RemoveAt(i)
             End If
         Next
-        If standalone Then
+        If standaloneTest() Then
             flow.msgs.Add(strOut)
             flow.Run(empty)
         End If
@@ -1078,7 +1078,7 @@ Public Class Feature_ArcYAll : Inherits VB_Algorithm
                 flow.msgs.Add(Format(arcY, fmt3) + vbTab + Format(len3D, fmt3) + "m " + vbTab + Format(pt1.Z, fmt1) + "m")
             End If
         Next
-        If standalone Then flow.Run(empty)
+        If standaloneTest() Then flow.Run(empty)
 
         Static firstAverage As New List(Of Single)
         Static firstBest As Integer
@@ -1162,7 +1162,7 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
             sliders.setupTrackBar("Minimum number of points (or resync with good features.)", 1, 20, 10)
         End If
 
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Find good features and track them with matchTemplate."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1584,13 +1584,13 @@ Public Class Feature_Agast : Inherits VB_Algorithm
 
         Dim ptMat = New cv.Mat(ptCount(0), 1, cv.MatType.CV_32FC2, imagePtr).Clone
         featurePoints.Clear()
-        If standalone Then dst2 = input
+        If standaloneTest() Then dst2 = input
 
         For i = 0 To ptMat.Rows - 1
             Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
             If useResize Then pt = New cv.Point(pt.X * resizeFactor, pt.Y * resizeFactor)
             featurePoints.Add(pt)
-            If standalone Or showIntermediate() Then dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            If standaloneTest() Then dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
         Next
 
         If task.midHeartBeat Then

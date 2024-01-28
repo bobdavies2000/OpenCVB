@@ -56,7 +56,7 @@ Public Class Filter_Normalized2D : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        Dim kernelSize As Integer = If(standalone, (task.frameCount Mod 20) + 1, options.kernelSize)
+        Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
         Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
         dst2 = src.Filter2D(-1, kernel)
         labels(2) = "Normalized KernelSize = " + CStr(kernelSize)
@@ -106,7 +106,7 @@ Public Class Filter_Minimum : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         options.RunVB()
-        Dim kernelSize As Integer = If(standalone, (task.frameCount Mod 20) + 1, options.kernelSize)
+        Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
         Dim element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(kernelSize, kernelSize))
         dst2 = src.Erode(element)
     End Sub
@@ -125,7 +125,7 @@ Public Class Filter_Maximum : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         options.RunVB()
-        Dim kernelSize As Integer = If(standalone, (task.frameCount Mod 20) + 1, options.kernelSize)
+        Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
         Dim element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(kernelSize, kernelSize))
         dst2 = src.Dilate(element)
     End Sub
@@ -144,7 +144,7 @@ Public Class Filter_Mean : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         options.RunVB()
-        Dim kernelSize As Integer = If(standalone, (task.frameCount Mod 20) + 1, options.kernelSize)
+        Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
         Dim kernel = (cv.Mat.Ones(cv.MatType.CV_32FC1, kernelSize, kernelSize) / (kernelSize * kernelSize)).ToMat
         dst2 = src.Filter2D(-1, kernel)
     End Sub
@@ -163,7 +163,7 @@ Public Class Filter_Median : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         options.RunVB()
-        Dim kernelSize As Integer = If(standalone, (task.frameCount Mod 20) + 1, options.kernelSize)
+        Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         dst2 = src.MedianBlur(kernelSize)
     End Sub

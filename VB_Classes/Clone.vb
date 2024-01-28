@@ -21,7 +21,7 @@ Public Class Clone_Basics : Inherits VB_Algorithm
         End If
         dst3 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        If standalone And task.frameCount Mod 10 = 0 Then cloneSpec += 1
+        If standaloneTest() And task.frameCount Mod 10 = 0 Then cloneSpec += 1
         Select Case cloneSpec Mod 3
             Case 0
                 cv.Cv2.ColorChange(src, mask, dst2, colorChangeValues(0), colorChangeValues(1), colorChangeValues(2))

@@ -122,11 +122,11 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         strOut = "RedCloud_MatchCell takes an rcData cell and builds an rcData cell." + vbCrLf +
-                 "When standalone, it just build a fake rcData cell and displays the rcData equivalent."
+                 "When standaloneTest(), it just build a fake rcData cell and displays the rcData equivalent."
         desc = "Build a RedCloud cell from the rcData input"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone And task.heartBeat Then
+        If standaloneTest() And task.heartBeat Then
             rp.floodPoint = New cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2))
             Dim w = msRNG.Next(1, dst2.Width / 2), h = msRNG.Next(1, dst2.Height / 2)
             rp.rect = New cv.Rect(rp.floodPoint.X, rp.floodPoint.Y, w, h)
@@ -152,7 +152,7 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
 
         If usedColors.Contains(rc.color) Then
             rc.color = randomCellColor()
-            If standalone Then dst2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+            If standaloneTest() Then dst2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
             rc.indexLast = 0
             If task.heartBeat Then dst3.SetTo(0)
             dst3(rc.rect).SetTo(255, rc.mask)
@@ -178,7 +178,7 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
             rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
         End If
 
-        If standalone Then setTrueText(strOut, 3)
+        If standaloneTest() Then setTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -372,7 +372,7 @@ Public Class RedCloud_Equations : Inherits VB_Algorithm
         desc = "Show the estimated plane equations for all the cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
@@ -646,7 +646,7 @@ Public Class RedCloud_PlaneFromContour : Inherits VB_Algorithm
         desc = "Create a plane equation each cell's contour"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
@@ -661,7 +661,7 @@ Public Class RedCloud_PlaneFromContour : Inherits VB_Algorithm
             fitPoints.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X))
         Next
         rc.eq = fitDepthPlane(fitPoints)
-        If standalone Then
+        If standaloneTest() Then
             dst3.SetTo(0)
             dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)), Math.Abs(255 * rc.eq(1)), Math.Abs(255 * rc.eq(2))), rc.mask)
         End If
@@ -682,7 +682,7 @@ Public Class RedCloud_PlaneFromMask : Inherits VB_Algorithm
         desc = "Create a plane equation from the pointcloud samples in a RedCloud cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
@@ -697,7 +697,7 @@ Public Class RedCloud_PlaneFromMask : Inherits VB_Algorithm
             Next
         Next
         rc.eq = fitDepthPlane(fitPoints)
-        If standalone Then
+        If standaloneTest() Then
             dst3.SetTo(0)
             dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)), Math.Abs(255 * rc.eq(1)), Math.Abs(255 * rc.eq(2))), rc.mask)
         End If
@@ -1207,7 +1207,7 @@ End Class
 Public Class RedCloud_CellChanges : Inherits VB_Algorithm
     Dim redC As Object
     Public Sub New()
-        If standalone Then redC = New RedCloud_Basics
+        If standaloneTest() Then redC = New RedCloud_Basics
         desc = "Count the cells that have changed in a RedCloud generation"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1287,7 +1287,7 @@ Public Class RedCloud_Core : Inherits VB_Algorithm
     Public givenClassCount As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("RedCloud_Core Reduction", 1, 2500, 250)
-        If standalone Then redOptions.RedCloud_Core.Checked = True
+        If standaloneTest() Then redOptions.RedCloud_Core.Checked = True
         desc = "Reduction transform for the point cloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1339,7 +1339,7 @@ Public Class RedCloud_FloodPoint : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Dim stats As New Cell_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Verify that floodpoints correctly determine if depth is present."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1575,8 +1575,6 @@ Public Class RedCloud_OnlyColor : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
-
-        setSelectedCell(redC.redCells, redC.cellMap)
     End Sub
 End Class
 
@@ -1602,7 +1600,7 @@ Public Class RedCloud_BinarizeColor : Inherits VB_Algorithm
 
         redC.Run(binarize.dst2)
         dst2 = redC.dst2
-        If standalone Or showIntermediate() Then identifyCells(redC.redCells)
+        If standaloneTest() Then identifyCells(redC.redCells)
         labels(2) = redC.labels(3)
     End Sub
 End Class
@@ -1693,22 +1691,22 @@ End Class
 
 
 Public Class RedCloud_Flippers : Inherits VB_Algorithm
-    Dim rMin As New RedCloud_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         redOptions.UseColor.Checked = True
         labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
         desc = "Identify the 4-way split cells that are flipping between brightness boundaries."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        rMin.Run(src)
-        dst3 = rMin.dst3
-        labels(3) = rMin.labels(2)
+        redC.Run(src)
+        dst3 = redC.dst3
+        labels(3) = redC.labels(2)
 
-        Static lastMap As cv.Mat = rMin.cellMap.Clone
+        Static lastMap As cv.Mat = redC.cellMap.Clone
         dst2.SetTo(0)
         Dim unMatched As Integer
         Dim unMatchedPixels As Integer
-        For Each cell In rMin.redCells
+        For Each cell In redC.redCells
             Dim lastColor = lastMap.Get(Of cv.Vec3b)(cell.maxDist.Y, cell.maxDist.X)
             If lastColor <> cell.color Then
                 dst2(cell.rect).SetTo(cell.color, cell.mask)
@@ -1716,12 +1714,9 @@ Public Class RedCloud_Flippers : Inherits VB_Algorithm
                 unMatchedPixels += cell.pixels
             End If
         Next
-        lastMap = rMin.dst3.Clone
+        lastMap = redC.dst3.Clone
 
-        If (standalone Or showIntermediate()) And rMin.redCells.Count > 1 Then
-            identifyCells(rMin.redCells)
-            setSelectedCell(rMin.redCells, rMin.cellMap)
-        End If
+        If (standaloneTest()) And redC.redCells.Count > 1 Then identifyCells(redC.redCells)
 
         If task.heartBeat Then
             labels(3) = "Unmatched to previous frame: " + CStr(unMatched) + " totaling " + CStr(unMatchedPixels) + " pixels."
@@ -1838,9 +1833,7 @@ Public Class RedCloud_OnlyColorAlt : Inherits VB_Algorithm
             End If
         Next
 
-        If standalone Or showIntermediate() Then identifyCells(redCells)
-
-        If standalone And redCells.Count > 0 Then setSelectedCell(redCells, cellMap)
+        If standaloneTest() Then identifyCells(redCells)
 
         labels(3) = CStr(redCells.Count) + " cells were identified.  The top " + CStr(identifyCount) + " are numbered"
         labels(2) = redCPP.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
@@ -1925,8 +1918,8 @@ Public Class RedCloud_StructuredH : Inherits VB_Algorithm
     Dim transform As New Structured_TransformH
     Dim topView As New Histogram2D_Top
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Display the RedCloud cells found with a horizontal slice through the cellMap."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1964,8 +1957,8 @@ Public Class RedCloud_StructuredV : Inherits VB_Algorithm
     Dim transform As New Structured_TransformV
     Dim sideView As New Histogram2D_Side
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Display the RedCloud cells found with a vertical slice through the cellMap."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -2068,7 +2061,7 @@ Public Class RedCloud_MotionBGsubtract : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         gOptions.PixelDiffThreshold.Value = 25
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Use absDiff to build a mask of cells that changed."
@@ -2107,7 +2100,7 @@ Public Class RedCloud_ContourVsFeatureLess : Inherits VB_Algorithm
     Dim contour As New Contour_WholeImage
     Dim fLess As New FeatureLess_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "Contour_WholeImage Input", "RedCloud_Color - toggling between Contour and Featureless inputs",
                   "FeatureLess_Basics Input"}
         desc = "Compare Contour_WholeImage and FeatureLess_Basics as input to RedCloud_Color"
@@ -2179,7 +2172,7 @@ Public Class RedCloud_Color : Inherits VB_Algorithm
         If classCount = 0 Then Exit Sub ' no data to process.
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-        If standalone Or showIntermediate() Then dst3 = vbPalette(dst2 * 255 / classCount)
+        If standaloneTest() Then dst3 = vbPalette(dst2 * 255 / classCount)
 
         If task.heartBeat Then labels(3) = CStr(classCount) + " cells found"
 
@@ -2274,8 +2267,8 @@ Public Class RedCloud_UnmatchedCount : Inherits VB_Algorithm
         Static myFrameCount As Integer
         Static changedCellCounts As New List(Of Integer)
         myFrameCount += 1
-        If standalone Then
-            setTrueText("RedCloud_UnmatchedCount has no output when run standalone." + vbCrLf +
+        If standaloneTest() Then
+            setTrueText("RedCloud_UnmatchedCount has no output when run standaloneTest()." + vbCrLf +
                         "It requires redCells and RedCloud_Basics is the only way to create redCells." + vbCrLf +
                         "Since RedCloud_Basics calls RedCloud_UnmatchedCount, it would be circular and never finish the initialize.")
             Exit Sub

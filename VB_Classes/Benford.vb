@@ -34,7 +34,7 @@ Public Class Benford_Basics : Inherits VB_Algorithm
         use99 = True
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             dst2 = If(src.Channels = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             src = New cv.Mat(dst2.Size, cv.MatType.CV_32F)
             dst2.ConvertTo(src, cv.MatType.CV_32F)

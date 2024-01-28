@@ -10,7 +10,7 @@ Public Class Erode_Basics : Inherits VB_Algorithm
 
         If options.noshape Or options.iterations = 0 Then dst2 = src Else dst2 = src.Erode(options.element, Nothing, options.iterations)
 
-        If standalone Or showIntermediate() Then
+        If standaloneTest() Then
             dst3 = task.depthRGB.Erode(options.element, Nothing, options.iterations)
             labels(3) = "Eroded Depth " + CStr(options.iterations) + " times"
         End If

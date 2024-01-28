@@ -210,7 +210,7 @@ End Class
 Public Class Structured_Depth : Inherits VB_Algorithm
     Dim sliceH As New Structured_SliceH
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
         labels = {"", "", "Use mouse to explore slices", "Top down view of the highlighted slice (at left)"}
         desc = "Use the structured depth to enhance the depth away from the centerline."
     End Sub
@@ -597,7 +597,7 @@ Public Class Structured_TilesQuad : Inherits VB_Algorithm
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
         gOptions.GridSize.Value = 10
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
         labels = {"", "RedCloud cells", "Simplified depth map - CV_32FC3", "Simplified depth map with RedCloud cell colors"}
         desc = "Simplify the OpenGL quads without using OpenGL's point size"
@@ -613,7 +613,7 @@ Public Class Structured_TilesQuad : Inherits VB_Algorithm
         Dim vec As cv.Scalar
         For Each roi In task.gridList
             Dim c = dst2.Get(Of cv.Vec3b)(roi.Y, roi.X)
-            If standalone Then dst3(roi).SetTo(c)
+            If standaloneTest() Then dst3(roi).SetTo(c)
             If c = black Then Continue For
 
             oglData.Add(New cv.Vec3f(c(2) / 255, c(1) / 255, c(0) / 255))
@@ -630,7 +630,7 @@ Public Class Structured_TilesQuad : Inherits VB_Algorithm
 
             vec = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y + roi.Height, v(2))) + options.moveAmount
             oglData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
-            If standalone Then dst1(roi).SetTo(v)
+            If standaloneTest() Then dst1(roi).SetTo(v)
         Next
         labels(2) = traceName + " with " + CStr(task.gridList.Count) + " regions was created"
     End Sub
@@ -646,7 +646,7 @@ Public Class Structured_CountTop : Inherits VB_Algorithm
     Dim plot As New Plot_Histogram
     Dim counts As New List(Of Single)
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "Structured Slice heatmap input - red line is max", "Max Slice output - likely vertical surface", "Histogram of pixel counts in each slice"}
         desc = "Count the number of pixels found in each slice of the point cloud data."
     End Sub
@@ -973,7 +973,7 @@ Public Class Structured_MouseSlice : Inherits VB_Algorithm
             'dst3.Line(topPt, botPt, cv.Scalar.Red, task.lineWidth, task.lineType)
             'dst2.Line(topPt, botPt, task.highlightColor, task.lineWidth + 2, task.lineType)
         End If
-        If standalone Then
+        If standaloneTest() Then
             dst2 = src
             dst2.SetTo(cv.Scalar.White, dst3)
         End If
@@ -1036,7 +1036,7 @@ Public Class Structured_SliceEither : Inherits VB_Algorithm
             dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), cv.Scalar.Yellow,
                       options.sliceSize)
         End If
-        If standalone Then
+        If standaloneTest() Then
             dst2 = src
             dst2.SetTo(cv.Scalar.White, sliceMask)
         End If
@@ -1084,7 +1084,7 @@ Public Class Structured_SliceV : Inherits VB_Algorithm
         dst3.Circle(New cv.Point(task.topCameraPoint.X, dst3.Height), task.dotSize, task.highlightColor, -1, task.lineType)
         dst3.Line(New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), task.highlightColor,
                   options.sliceSize)
-        If standalone Then
+        If standaloneTest() Then
             dst2 = src
             dst2.SetTo(cv.Scalar.White, sliceMask)
         End If
@@ -1132,7 +1132,7 @@ Public Class Structured_TransformH : Inherits VB_Algorithm
         topView.Run(task.pointCloud.SetTo(0, Not sliceMask))
         dst3 = topView.dst2
 
-        If standalone Then
+        If standaloneTest() Then
             dst2 = src
             dst2.SetTo(cv.Scalar.White, sliceMask)
         End If
@@ -1179,7 +1179,7 @@ Public Class Structured_TransformV : Inherits VB_Algorithm
         sideView.Run(task.pointCloud.SetTo(0, Not sliceMask))
         dst3 = sideView.dst2
 
-        If standalone Then
+        If standaloneTest() Then
             dst2 = src
             dst2.SetTo(cv.Scalar.White, sliceMask)
         End If
@@ -1206,7 +1206,7 @@ Public Class Structured_SliceH : Inherits VB_Algorithm
 
         heat.Run(src)
 
-        If standalone Then ycoordinate = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
+        If standaloneTest() Then ycoordinate = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
 
         Dim planeY = -task.yRange * (task.sideCameraPoint.Y - ycoordinate) / task.sideCameraPoint.Y
         If ycoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (ycoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
@@ -1227,7 +1227,7 @@ Public Class Structured_SliceH : Inherits VB_Algorithm
         dst3.Circle(New cv.Point(0, task.sideCameraPoint.Y), task.dotSize, task.highlightColor, -1, task.lineType)
         dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.highlightColor,
                   options.sliceSize)
-        If standalone Then
+        If standaloneTest() Then
             dst2 = src
             dst2.SetTo(cv.Scalar.White, sliceMask)
         End If
@@ -1248,7 +1248,7 @@ Public Class Structured_CountSide : Inherits VB_Algorithm
     Public Sub New()
         rotate.rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Width / 2)
         rotate.rotateAngle = -90
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
         desc = "Count the number of pixels found in each slice of the point cloud data."
     End Sub

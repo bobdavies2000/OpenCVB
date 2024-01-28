@@ -57,7 +57,7 @@ Public Class Annealing_Basics_CPP : Inherits VB_Algorithm
         Dim msg = Marshal.PtrToStringAnsi(out)
         Dim split As String() = Regex.Split(msg, "\W+")
         energy = CSng(split(split.Count - 2) + "." + split(split.Count - 1))
-        If standalone Then
+        If standaloneTest() Then
             If energyLast = energy Or task.optionsChanged Then
                 Annealing_Basics_Close(cPtr)
                 setup()

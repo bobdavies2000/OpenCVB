@@ -84,7 +84,7 @@ Public Class OpenGL_Basics : Inherits VB_Algorithm
         MoveWindow(openGL_hwnd, Left, Top, task.oglRect.Width, task.oglRect.Height, True)
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then pointCloudInput = task.pointCloud
+        If standaloneTest() Then pointCloudInput = task.pointCloud
 
         ' adjust the point cloud if present and the 'move' sliders are non-zero
         options.RunVB()
@@ -139,7 +139,7 @@ Public Class OpenGL_Basics : Inherits VB_Algorithm
         Catch ex As Exception
             ' OpenGL window was likely closed.  
         End Try
-        If standalone Then setTrueText(gMatrixToStr(task.gMatrix), 3)
+        If standaloneTest() Then setTrueText(gMatrixToStr(task.gMatrix), 3)
     End Sub
 End Class
 
@@ -161,7 +161,7 @@ Public Class OpenGL_BasicsSliders : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If standalone Then task.ogl.pointCloudInput = task.pointCloud Else task.ogl.pointCloudInput = pointCloudInput
+        If standaloneTest() Then task.ogl.pointCloudInput = task.pointCloud Else task.ogl.pointCloudInput = pointCloudInput
 
         ' update all the options from the slider values.
         task.ogl.options.FOV = options.FOV
@@ -885,7 +885,7 @@ Public Class OpenGL_FPolyCloud : Inherits VB_Algorithm
     Dim fpolyPC As New FPoly_PointCloud
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Display the pointcloud after FPoly_PointCloud identifies the changes depth pixels"
     End Sub
@@ -1279,8 +1279,8 @@ Public Class OpenGL_Profile : Inherits VB_Algorithm
     Dim heat As New HeatMap_Basics
     Dim ogl As New OpenGL_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        If standalone Then gOptions.gravityPointCloud.Checked = False
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.gravityPointCloud.Checked = False
         ogl.oglFunction = oCase.pcPointsAlone
         labels(3) = "Contour of selected cell is shown below.  Blue dot represents the minimum X (leftmost) point and red the maximum X (rightmost)"
         desc = "Visualize a RedCloud Cell and rotate it using the Options_IMU Sliders"
@@ -1329,7 +1329,7 @@ Public Class OpenGL_ProfileSweep : Inherits VB_Algorithm
     Dim visuals As New OpenGL_Profile
     Dim options As New Options_IMU
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         gOptions.gravityPointCloud.Checked = False
         desc = "Test the X-, Y-, and Z-axis rotation in sequence"
     End Sub

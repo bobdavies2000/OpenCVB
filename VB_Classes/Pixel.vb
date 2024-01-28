@@ -16,7 +16,7 @@ Public Class Pixel_Viewer : Inherits VB_Algorithm
         desc = "Display pixels under the cursor"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             task.dst0 = task.color.Clone
             task.dst1 = task.depthRGB.Clone
             task.dst2 = New cv.Mat(task.dst1.Size, cv.MatType.CV_8UC3, 0)
@@ -281,7 +281,7 @@ Public Class Pixel_Sampler : Inherits VB_Algorithm
         desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             If task.heartBeat Then
                 If task.drawRect <> New cv.Rect Then
                     random.range = task.drawRect
@@ -322,7 +322,7 @@ Public Class Pixel_Sampler : Inherits VB_Algorithm
             dominantGray = vbMinMax(src).maxVal
         End If
 
-        If standalone Then
+        If standaloneTest() Then
             dst2 = src
             dst2.Rectangle(random.range, cv.Scalar.White, 1)
             For Each pt In random.PointList
@@ -348,7 +348,7 @@ Public Class Pixel_SampleColor : Inherits VB_Algorithm
         desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             If task.heartBeat Then
                 Dim w = 25, h = 25
                 If task.drawRect <> New cv.Rect Then
@@ -380,7 +380,7 @@ Public Class Pixel_SampleColor : Inherits VB_Algorithm
 
         If pixels.Count > 0 Then maskColor = pixels(counts.IndexOf(counts.Max))
 
-        If standalone Then
+        If standaloneTest() Then
             dst2 = src
             dst2.Rectangle(random.range, cv.Scalar.White, 1)
             For Each pt In random.PointList
@@ -724,7 +724,7 @@ Public Class Pixel_Vector3D : Inherits VB_Algorithm
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
         redOptions.UseColor.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         redOptions.HistBinSlider.Value = 3
         labels = {"", "RedCloud_Basics output", "3D Histogram counts for each of the cells at left", ""}
         desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."

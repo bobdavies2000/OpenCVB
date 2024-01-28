@@ -16,7 +16,7 @@ Public Class Interpolate_Basics : Inherits VB_Algorithm
         iOptions.RunVB()
         Static saveSliderValue As Integer = iOptions.interpolationThreshold
 
-        If standalone Then
+        If standaloneTest() Then
             Dim userGrab As Boolean = iOptions.interpolationThreshold <> iOptions.saveDefaultThreshold
             If userGrab = False Then
                 Static direction = 1

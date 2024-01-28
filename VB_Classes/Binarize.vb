@@ -271,7 +271,7 @@ Public Class Binarize_Four : Inherits VB_Algorithm
         mats.mat(2) = gray.InRange(botColor, midColor)
         mats.mat(3) = gray.InRange(0, botColor)
 
-        If standalone Or showIntermediate() Then
+        If standaloneTest() Then
             mats.Run(empty)
             dst2 = mats.dst2
             dst3 = mats.dst3
@@ -301,7 +301,7 @@ Public Class Binarize_FourWay : Inherits VB_Algorithm
         dst2.SetTo(3, binarize.mats.mat(2))
         dst2.SetTo(4, binarize.mats.mat(3))
 
-        If standalone Or showIntermediate() Then dst3 = vbPalette(dst2 * 255 / 4)
+        If standaloneTest() Then dst3 = vbPalette(dst2 * 255 / 4)
     End Sub
 End Class
 

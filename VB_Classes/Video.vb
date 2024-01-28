@@ -143,7 +143,7 @@ Public Class Video_MinRect : Inherits VB_Algorithm
 
             contours = cv.Cv2.FindContoursAsArray(bgSub.dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
             dst2 = bgSub.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            If standalone Then
+            If standaloneTest() Then
                 For i = 0 To contours.Length - 1
                     Dim minRect = cv.Cv2.MinAreaRect(contours(i))
                     drawRotatedRectangle(minRect, dst2, cv.Scalar.Red)

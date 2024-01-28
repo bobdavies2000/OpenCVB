@@ -16,7 +16,7 @@ Public Class Guess_Depth_CPP : Inherits VB_Algorithm
         handleSrc.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32FC3, imagePtr).Clone
-        If standalone Then dst3 = task.pointCloud
+        If standaloneTest() Then dst3 = task.pointCloud
     End Sub
     Public Sub Close() 
         Guess_Depth_Close(cPtr)
@@ -53,7 +53,7 @@ Public Class Guess_ImageEdges_CPP : Inherits VB_Algorithm
         handleSrc.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32FC3, cppData).Clone
-        If standalone Then dst3 = task.pointCloud
+        If standaloneTest() Then dst3 = task.pointCloud
     End Sub
     Public Sub Close()
         Guess_ImageEdges_Close(cPtr)

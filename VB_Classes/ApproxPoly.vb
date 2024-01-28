@@ -22,7 +22,7 @@ Public Class ApproxPoly_Basics : Inherits VB_Algorithm
         Dim epsilon = epsilonSlider.value
         Static closedPolyCheck = findCheckBox("Closed polygon - connect first and last vertices.")
 
-        If standalone Then
+        If standaloneTest() Then
             If task.heartBeat Then rotatedRect.Run(src)
             dst2 = rotatedRect.dst2
         End If

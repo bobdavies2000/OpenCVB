@@ -130,7 +130,7 @@ Public Class Plane_FloorStudy : Inherits VB_Algorithm
     Public planeY As Single
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Pixel Count threshold that indicates floor", 1, 100, 10)
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "", "", ""}
         desc = "Find the floor plane (if present)"
     End Sub
@@ -468,7 +468,7 @@ End Class
 Public Class Plane_Verticals : Inherits VB_Algorithm
     Dim solo As New PointCloud_Solo
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"RGB image with highlights for likely vertical surfaces over X frames.",
                   "Heatmap top view", "Single frame backprojection of red areas in the heatmap",
                   "Thresholded heatmap top view mask - flipped for backprojection"}
@@ -502,7 +502,7 @@ Public Class Plane_Horizontals : Inherits VB_Algorithm
     Dim solo As New PointCloud_Solo
     Dim frames As New History_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"RGB image with highlights for likely floor or ceiling over X frames.",
                   "Heatmap side view", "Single frame backprojection read areas in the heatmap",
                   "Thresholded heatmap top view mask - flipped for backprojection"}
@@ -568,7 +568,7 @@ Public Class Plane_Equation : Inherits VB_Algorithm
         desc = "Compute the coefficients for an estimated plane equation given the rc contour"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
@@ -625,7 +625,7 @@ Public Class Plane_Equation : Inherits VB_Algorithm
                               Format(dotlist.Average, "0.00")
             End If
         End If
-        If standalone Or showIntermediate() Then
+        If standaloneTest() Then
             setTrueText(strOut, 3)
             dst3.SetTo(0)
             vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)

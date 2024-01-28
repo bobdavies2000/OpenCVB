@@ -6,7 +6,7 @@ Public Class SLR_Basics : Inherits VB_Algorithm
     Dim slr As New CS_Classes.SLR
     Dim plot As New Plot_Basics_CPP
     Public Sub New()
-        If standalone Then
+        If standaloneTest() Then
             input.Run(dst2)
             labels(2) = "Sample data input"
         End If
@@ -44,7 +44,7 @@ Public Class SLR_Basics : Inherits VB_Algorithm
             dst3.SetTo(0)
             setTrueText(labels(2) + " yielded no results...")
         End If
-        If standalone = False Then
+        If standaloneTest() = False Then
             input.dataX.Clear()
             input.dataY.Clear()
         End If

@@ -5,14 +5,14 @@ Imports System.Runtime.InteropServices
 Public Class WarpModel_Basics : Inherits VB_Algorithm
     ReadOnly ecc As New WarpModel_ECC
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"Original Blue plane", "Original Green plane", "Original Red plane", "ECC Aligned image"}
         desc = "Align the BGR inputs raw images from the Prokudin examples."
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static gradientCheck = findCheckBox("Use Gradient in WarpInput")
-        If standalone Then ecc.warpInput.Run(src)
+        If standaloneTest() Then ecc.warpInput.Run(src)
         dst0 = ecc.warpInput.rgb(0).Clone
         dst1 = ecc.warpInput.rgb(1).Clone
         dst2 = ecc.warpInput.rgb(2).Clone
@@ -64,7 +64,7 @@ Public Class WarpModel_ECC : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
 
-        If standalone Then
+        If standaloneTest() Then
             warpInput.Run(src)
             If options.useGradient Then
                 src = warpInput.gradient(0)
@@ -139,8 +139,8 @@ Public Class WarpModel_Input : Inherits VB_Algorithm
     ReadOnly sobel as new Edge_Sobel_Old
     ReadOnly options As New Options_WarpModel
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"Original Blue plane", "Original Green plane", "Original Red plane", "Naively Aligned image"}
         desc = "Import the misaligned input."
     End Sub

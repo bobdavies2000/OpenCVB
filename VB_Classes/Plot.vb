@@ -48,7 +48,7 @@ Public Class Plot_Histogram : Inherits VB_Algorithm
         desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Or createHistogram Then
+        If standaloneTest() Or createHistogram Then
             If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             cv.Cv2.CalcHist({src}, {0}, New cv.Mat(), histogram, 1, {task.histogramBins}, {New cv.Rangef(minRange, maxRange)})
         Else
@@ -134,7 +134,7 @@ Public Class Plot_Histogram2D : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim histogram = src.Clone
-        If standalone Then
+        If standaloneTest() Then
             Static options As New Options_ColorFormat
             options.RunVB()
             src = options.dst2
@@ -144,7 +144,7 @@ Public Class Plot_Histogram2D : Inherits VB_Algorithm
 
         dst2 = histogram.Resize(dst2.Size, 0, 0, cv.InterpolationFlags.Nearest)
 
-        If standalone Then dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        If standaloneTest() Then dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -167,7 +167,7 @@ Public Class Plot_OverTimeSingle : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Static inputList As New List(Of Single)
         dst2 = dst2.Resize(task.quarterRes)
-        If standalone Then plotData = task.color.Mean(task.depthMask)(0)
+        If standaloneTest() Then plotData = task.color.Mean(task.depthMask)(0)
 
         If inputList.Count >= dst2.Width Then inputList.RemoveAt(0)
         inputList.Add(plotData)
@@ -196,7 +196,7 @@ Public Class Plot_OverTimeSingle : Inherits VB_Algorithm
         Dim p1 = New cv.Point(0, dst2.Height / 2)
         Dim p2 = New cv.Point(dst2.Width, dst2.Height / 2)
         dst2.Line(p1, p2, cv.Scalar.White, task.cvFontThickness)
-        If standalone Then setTrueText("Standalone test is with the blue channel mean of the color image.", 3)
+        If standaloneTest() Then setTrueText("standaloneTest() test is with the blue channel mean of the color image.", 3)
     End Sub
 End Class
 
@@ -220,7 +220,7 @@ Public Class Plot_OverTimeScalar : Inherits VB_Algorithm
         desc = "Plot the requested number of entries in the cv.scalar input"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then plotData = task.color.Mean()
+        If standaloneTest() Then plotData = task.color.Mean()
 
         For i = 0 To Math.Min(plotCount, 4) - 1
             plotList(i).plotData = plotData(i)
@@ -276,7 +276,7 @@ Public Class Plot_OverTime : Inherits VB_Algorithm
             columnIndex = 1
         End If
         dst2.ColRange(columnIndex, columnIndex + task.dotSize).SetTo(backColor)
-        If standalone Then plotData = task.color.Mean()
+        If standaloneTest() Then plotData = task.color.Mean()
 
         For i = 0 To plotCount - 1
             If Math.Floor(plotData(i)) < minScale Or Math.Ceiling(plotData(i)) > maxScale Then
@@ -320,7 +320,7 @@ Public Class Plot_OverTime : Inherits VB_Algorithm
 
         columnIndex += task.dotSize
         dst2.Col(columnIndex).SetTo(0)
-        If standalone Then labels(2) = "RGB Means: blue = " + Format(plotData(0), fmt1) + " green = " + Format(plotData(1), fmt1) + " red = " + Format(plotData(2), fmt1)
+        If standaloneTest() Then labels(2) = "RGB Means: blue = " + Format(plotData(0), fmt1) + " green = " + Format(plotData(1), fmt1) + " red = " + Format(plotData(2), fmt1)
         Dim lineCount = CInt(maxScale - minScale - 1)
         If lineCount > 3 Or lineCount < 0 Then lineCount = 3
         AddPlotScale(dst2, minScale, maxScale, lineCount)
@@ -362,7 +362,7 @@ Public Class Plot_OverTimeFixedScale : Inherits VB_Algorithm
             columnIndex = 1
         End If
         plotOutput.ColRange(columnIndex, columnIndex + task.dotSize).SetTo(backColor)
-        If standalone Then plotData = task.color.Mean()
+        If standaloneTest() Then plotData = task.color.Mean()
 
         For i = 0 To plotCount - 1
             If Math.Floor(plotData(i)) < minScale Or Math.Ceiling(plotData(i)) > maxScale Then
@@ -461,7 +461,7 @@ Public Class Plot_Basics_CPP : Inherits VB_Algorithm
     Public srcX As New List(Of Double)
     Public srcY As New List(Of Double)
     Public Sub New()
-        For i = 0 To 50 ' something to plot if standalone.
+        For i = 0 To 50 ' something to plot if standaloneTest().
             srcX.Add(i)
             srcY.Add(i * i * i)
         Next
@@ -499,7 +499,7 @@ Public Class Plot_Dots : Inherits VB_Algorithm
     Public plotColor = cv.Scalar.Yellow
     Public wipeSlate As Boolean = True
     Public Sub New()
-        For i = 0 To 50 ' something to plot if standalone.
+        For i = 0 To 50 ' something to plot if standaloneTest().
             srcX.Add(i)
             srcY.Add(i * i * i)
         Next

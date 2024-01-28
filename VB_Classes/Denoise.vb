@@ -45,7 +45,7 @@ Public Class Denoise_Pixels : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If standalone Then
+        If standaloneTest() Then
             Static reduction As New Reduction_Basics
             reduction.Run(src)
             src = reduction.dst2
@@ -64,7 +64,7 @@ Public Class Denoise_Pixels : Inherits VB_Algorithm
             dst2 = src
         End If
 
-        If standalone Or showIntermediate() Then
+        If standaloneTest() Then
             dst2 *= 255 / classCount
             dst3 = vbPalette(dst2)
         End If

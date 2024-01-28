@@ -254,7 +254,7 @@ Public Class Corners_FASTCentroids : Inherits VB_Algorithm
     Dim fast As New Corners_FAST
     Dim fastCenters() As cv.Point2f
     Public Sub New()
-        If standalone Then gOptions.GridSize.Value = 16
+        If standaloneTest() Then gOptions.GridSize.Value = 16
         desc = "Use a thread grid to find the centroids in each grid element"
     End Sub
     Public Sub RunVB(src as cv.Mat)

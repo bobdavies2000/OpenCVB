@@ -7,7 +7,7 @@ Public Class Stable_Basics : Inherits VB_Algorithm
         desc = "Maintain the generation counts around the feature points."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static good As New Feature_BasicsKNN
             good.Run(src)
             facetGen.inputPoints = New List(Of cv.Point2f)(good.featurePoints)
@@ -96,7 +96,7 @@ Public Class Stable_Lines : Inherits VB_Algorithm
     Public basics As New Stable_Basics
     Dim lines As New Line_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Track the line end points found in the BGR image and keep those that are stable."
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -114,7 +114,7 @@ Public Class Stable_Lines : Inherits VB_Algorithm
         dst3 = basics.dst3
         For Each pt In basics.ptList
             dst2.Circle(pt, task.dotSize + 1, task.highlightColor, -1, task.lineType)
-            If standalone Then
+            If standaloneTest() Then
                 Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 setTrueText(CStr(g), pt)
             End If
@@ -151,7 +151,7 @@ Public Class Stable_FAST : Inherits VB_Algorithm
         dst2 = basics.dst2
         For Each pt In basics.ptList
             dst2.Circle(pt, task.dotSize + 1, task.highlightColor, -1, task.lineType)
-            If standalone Then
+            If standaloneTest() Then
                 Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 setTrueText(CStr(g), pt)
             End If
@@ -192,7 +192,7 @@ Public Class Stable_GoodFeatures : Inherits VB_Algorithm
         genSorted.Clear()
         For i = 0 To basics.ptList.Count - 1
             Dim pt = basics.ptList(i)
-            If standalone Then dst2.Circle(pt, task.dotSize + 1, cv.Scalar.Yellow, -1, task.lineType)
+            If standaloneTest() Then dst2.Circle(pt, task.dotSize + 1, cv.Scalar.Yellow, -1, task.lineType)
             dst1.Set(Of Byte)(pt.Y, pt.X, 255)
 
             Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)

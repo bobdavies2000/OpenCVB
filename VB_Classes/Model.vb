@@ -7,7 +7,7 @@ Public Class Model_Basics : Inherits VB_Algorithm
         desc = "Capture the output of the OpenGL window"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then oglM.Run(src)
+        If standaloneTest() Then oglM.Run(src)
         dst2 = oglM.dst2
         dst3 = oglM.dst3
     End Sub
@@ -27,7 +27,7 @@ Public Class Model_OpenGL_Sliders : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         task.ogl.pointCloudInput = task.pointCloud
-        If standalone Then task.ogl.Run(src)
+        If standaloneTest() Then task.ogl.Run(src)
         model.Run(src)
         dst2 = model.dst2
     End Sub
@@ -87,7 +87,7 @@ Public Class Model_FlatSurfaces : Inherits VB_Algorithm
         If ceilingList.Count > task.frameHistoryCount Then ceilingList.RemoveAt(0)
         labels(3) = "Y = " + Format(task.pcCeiling, fmt3) + " separates the ceiling.  Total pixels above ceiling level = " + Format(totalPixels, fmt0)
 
-        If standalone Then
+        If standaloneTest() Then
             dst2 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
             dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -125,7 +125,7 @@ End Class
 Public Class Model_CellZoom : Inherits VB_Algorithm
     Dim oglData As New Model_RedCloud
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "", "RedCloud_Hull output", "Selected cell in 3D"}
         desc = "Zoom in on the selected RedCloud cell in the OpenGL output"
     End Sub

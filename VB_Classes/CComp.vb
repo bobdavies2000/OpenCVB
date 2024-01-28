@@ -169,7 +169,7 @@ Public Class CComp_Stats : Inherits VB_Algorithm
         options.RunVB()
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If standalone Then src = src.Threshold(options.light, 255, cv.ThresholdTypes.BinaryInv)
+        If standaloneTest() Then src = src.Threshold(options.light, 255, cv.ThresholdTypes.BinaryInv)
 
         Dim stats As New cv.Mat
         Dim centroidRaw As New cv.Mat

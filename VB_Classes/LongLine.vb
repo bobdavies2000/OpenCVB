@@ -34,7 +34,7 @@ Public Class LongLine_Depth : Inherits VB_Algorithm
     Dim plot As New Plot_OverTimeScalar
     Dim kalman As New Kalman_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         plot.dst2 = dst3
         desc = "Find the longest line in BGR and use it to measure the average depth for the line"
@@ -412,7 +412,7 @@ Public Class LongLine_Extend : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src as cv.Mat)
         Static saveP1 As cv.Point, saveP2 As cv.Point, p1 As cv.Point, p2 As cv.Point
-        If standalone And task.heartBeat Then
+        If standaloneTest() And task.heartBeat Then
             p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             saveP1 = p1
@@ -422,7 +422,7 @@ Public Class LongLine_Extend : Inherits VB_Algorithm
         Dim mps = New linePoints(p1, p2)
         Dim emps = buildELine(mps, dst2.Width, dst2.Height)
 
-        If standalone Then
+        If standaloneTest() Then
             labels(2) = emps.p1.ToString + " and " + emps.p2.ToString + " started with " + saveP1.ToString + " and " + saveP2.ToString
             dst2 = src
             dst2.Line(emps.p1, emps.p2, task.highlightColor, task.lineWidth, task.lineType)

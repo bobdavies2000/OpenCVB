@@ -464,7 +464,7 @@ Public Class Edge_SobelLRBinarized : Inherits VB_Algorithm
         If task.mouseClickFlag Then task.mouseClickFlag = False ' preempt use of quadrants.
 
         edges.Run(task.rightView)
-        If standalone Then
+        If standaloneTest() Then
             addw.src2 = edges.dst3
             addw.Run(task.rightView)
             dst3 = addw.dst2.Clone
@@ -473,7 +473,7 @@ Public Class Edge_SobelLRBinarized : Inherits VB_Algorithm
         End If
 
         edges.Run(task.leftView)
-        If standalone Then
+        If standaloneTest() Then
             addw.src2 = edges.dst3
             addw.Run(task.leftView)
             dst2 = addw.dst2
@@ -769,7 +769,7 @@ End Class
 
 Public Class Edge_ColorGap_VB : Inherits VB_Algorithm
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Input pixel distance", 0, 20, 5)
             sliders.setupTrackBar("Input pixel difference", 0, 50, If(task.workingRes.Width = 640, 10, 20))
@@ -911,7 +911,7 @@ End Class
 
 Public Class Edge_DepthGap_VB : Inherits VB_Algorithm
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Input depth distance", 0, 20, 5)
             sliders.setupTrackBar("Input depth difference in mm's", 0, 2000, 1000)
@@ -1325,8 +1325,8 @@ End Class
 Public Class Edge_SobelCustomLeftRight : Inherits VB_Algorithm
     Dim custom As New Edge_SobelCustom
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"Left Image Custom 1", "Left Image Custom 2", "Right Image Custom 1", "Right Image Custom 2"}
         desc = "Show Sobel edge detection for both left and right images"
     End Sub
@@ -1362,7 +1362,7 @@ Public Class Edge_Sobel_Old : Inherits VB_Algorithm
         dst0 = src.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
         If options.horizontalDerivative And options.verticalDerivative Then
             dst1 = src.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
-            If standalone Then
+            If standaloneTest() Then
                 addw.src2 = dst1
                 addw.Run(dst0)
                 dst2 = addw.dst2.ConvertScaleAbs()

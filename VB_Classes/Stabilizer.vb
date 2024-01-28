@@ -84,7 +84,7 @@ Public Class Stabilizer_Basics : Inherits VB_Algorithm
             input.CopyTo(lastFrame)
             dst3 = lastFrame.clone
         End If
-        If standalone Then dst3.Rectangle(templateRect, cv.Scalar.White, 1) ' when not standalone, traceName doesn't want artificial rectangle.
+        If standaloneTest() Then dst3.Rectangle(templateRect, cv.Scalar.White, 1) ' when not standaloneTest(), traceName doesn't want artificial rectangle.
     End Sub
 End Class
 
@@ -160,7 +160,7 @@ Public Class Stabilizer_BasicsTest : Inherits VB_Algorithm
 
         dst2 = stable.dst2
         dst3 = stable.dst3
-        If standalone Then dst3.Rectangle(stable.templateRect, cv.Scalar.White, 1)
+        If standaloneTest() Then dst3.Rectangle(stable.templateRect, cv.Scalar.White, 1)
         labels(3) = stable.labels(3)
     End Sub
 End Class

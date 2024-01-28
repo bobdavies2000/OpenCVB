@@ -271,7 +271,7 @@ Public Class PointCloud_SetupSide : Inherits VB_Algorithm
         Dim distanceRatio As Single = 1
         If src.Channels <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        If standalone Then dst2.SetTo(0) Else src.CopyTo(dst2)
+        If standaloneTest() Then dst2.SetTo(0) Else src.CopyTo(dst2)
         dst2.Circle(task.sideCameraPoint, task.dotSize, cv.Scalar.BlueViolet, -1, task.lineType)
         For i = 1 To task.maxZmeters
             Dim xmeter = CInt(dst2.Width * i / task.maxZmeters * distanceRatio)
@@ -305,7 +305,7 @@ Public Class PointCloud_SetupSide : Inherits VB_Algorithm
             markerRight = New cv.Point((markerRight.X - cam.X) * Math.Cos(task.accRadians.Z) - (markerRight.Y - cam.Y) * Math.Sin(task.accRadians.Z) + cam.X,
                                                (markerRight.Y - cam.Y) * Math.Cos(task.accRadians.Z) + (markerRight.X - cam.X) * Math.Sin(task.accRadians.Z) + cam.Y)
         End If
-        If standalone = False Then
+        If standaloneTest() = False Then
             dst2.Circle(markerLeft, task.dotSize, cv.Scalar.Red, -1, task.lineType)
             dst2.Circle(markerRight, task.dotSize, cv.Scalar.Red, -1, task.lineType)
         End If
@@ -350,7 +350,7 @@ Public Class PointCloud_SetupTop : Inherits VB_Algorithm
         Dim distanceRatio As Single = 1
         If src.Channels <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        If standalone Then dst2.SetTo(0) Else src.CopyTo(dst2)
+        If standaloneTest() Then dst2.SetTo(0) Else src.CopyTo(dst2)
         dst2.Circle(task.topCameraPoint, task.dotSize, cv.Scalar.BlueViolet, -1, task.lineType)
         For i = 1 To task.maxZmeters
             Dim ymeter = CInt(dst2.Height - dst2.Height * i / (task.maxZmeters * distanceRatio))

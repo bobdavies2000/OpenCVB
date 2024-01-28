@@ -11,7 +11,7 @@ Public Class FitEllipse_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If task.heartBeat = False Then Exit Sub
-        If standalone Then
+        If standaloneTest() Then
             options.RunVB()
             inputPoints = options.srcPoints
         End If
@@ -24,7 +24,7 @@ Public Class FitEllipse_Basics : Inherits VB_Algorithm
         If inputPoints.Count > 4 Then
             box = cv.Cv2.FitEllipse(inputPoints)
             vertices = box.Points()
-            If standalone Then
+            If standaloneTest() Then
                 For j = 0 To vertices.Count - 1
                     dst2.Line(vertices(j), vertices((j + 1) Mod 4), cv.Scalar.Green, task.lineWidth, task.lineType)
                 Next
@@ -48,7 +48,7 @@ Public Class FitEllipse_AMS_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.heartBeat = False Then Exit Sub
-        If standalone Then
+        If standaloneTest() Then
             options.RunVB()
             inputPoints = options.srcPoints
         End If

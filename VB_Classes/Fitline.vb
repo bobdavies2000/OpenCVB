@@ -14,7 +14,7 @@ Public Class Fitline_Basics : Inherits VB_Algorithm
         If task.heartBeat = False Then Exit Sub
         options.RunVB()
 
-        If standalone Then
+        If standaloneTest() Then
             draw.Run(src)
             dst3 = draw.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
             dst2 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -32,7 +32,7 @@ Public Class Fitline_Basics : Inherits VB_Algorithm
             Dim rightY = Math.Round((src.Cols - line2d.X1) * slope + line2d.Y1)
             Dim p1 = New cv.Point(0, leftY)
             Dim p2 = New cv.Point(src.Cols - 1, rightY)
-            If standalone Then
+            If standaloneTest() Then
                 lines.Add(p1)
                 lines.Add(p2)
             End If

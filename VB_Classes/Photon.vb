@@ -37,7 +37,7 @@ Public Class Photon_Test : Inherits VB_Algorithm
     Dim counts(4 - 1) As List(Of Integer)
     Dim mats As New Mat_4to1
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         For i = 0 To counts.Count - 1
             counts(i) = New List(Of Integer)
         Next

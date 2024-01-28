@@ -8,7 +8,7 @@ Public Class Fuzzy_Basics : Inherits VB_Algorithm
     Public Sub New()
         Dim floodRadio = findRadio("FloodFill")
         If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         redOptions.SimpleReductionSlider.Value = 32
         cPtr = Fuzzy_Open()
         findRadio("CComp").Checked = True

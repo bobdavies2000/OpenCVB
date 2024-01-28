@@ -11,7 +11,7 @@ Public Class Moments_Basics : Inherits VB_Algorithm
         desc = "Compute the centroid of the provided mask file."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             foreground.Run(src)
             dst2 = foreground.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
@@ -26,7 +26,7 @@ Public Class Moments_Basics : Inherits VB_Algorithm
         Else
             center = New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00)
         End If
-        If standalone Then dst2.Circle(center, task.dotSize + 5, cv.Scalar.Red, -1, task.lineType)
+        If standaloneTest() Then dst2.Circle(center, task.dotSize + 5, cv.Scalar.Red, -1, task.lineType)
         centroid = New cv.Point2f(scaleFactor * (offsetPt.X + center.X), scaleFactor * (offsetPt.Y + center.Y))
     End Sub
 End Class

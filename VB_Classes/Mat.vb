@@ -251,7 +251,7 @@ Public Class Mat_Inverse : Inherits VB_Algorithm
             End If
         Next
 
-        If standalone Or validateInverse Then
+        If standaloneTest() Or validateInverse Then
             flow.msgs.Add("Matrix Input")
             For i = 0 To matrix.GetLength(0) - 1
                 nextline = ""
@@ -265,7 +265,7 @@ Public Class Mat_Inverse : Inherits VB_Algorithm
         Dim input = New cv.Mat(3, 3, cv.MatType.CV_32F, matrix)
         cv.Cv2.Invert(input, inverse, decompType)
 
-        If standalone Or validateInverse Then
+        If standaloneTest() Or validateInverse Then
             flow.msgs.Add("Matrix Inverse")
             For i = 0 To matrix.GetLength(0) - 1
                 nextline = ""
@@ -370,7 +370,7 @@ Public Class Mat_2to1 : Inherits VB_Algorithm
         Dim nSize = New cv.Size(task.workingRes.Width, task.workingRes.Height / 2)
         Dim roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Dim roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
-        If standalone Then
+        If standaloneTest() Then
             mat1 = src
             mat2 = task.depthRGB
             mat = {mat1, mat2}
@@ -411,14 +411,14 @@ Public Class Mat_4Click : Inherits VB_Algorithm
         mat = mats.mat
         mats.Run(empty)
         dst2 = mats.dst2.Clone
-        If standalone Then mats.defaultMats(src)
+        If standaloneTest() Then mats.defaultMats(src)
         If firstPass Then
             task.mouseClickFlag = True
             task.clickPoint = New cv.Point(0, 0)
             task.mousePicTag = RESULT_DST2
         End If
 
-        If standalone Then mats.defaultMats(src)
+        If standaloneTest() Then mats.defaultMats(src)
         If firstPass Then
             task.mouseClickFlag = True
             task.clickPoint = New cv.Point(0, 0)
@@ -468,7 +468,7 @@ task.rightView)
         Dim roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
         Dim roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         Dim roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
-        If standalone Then defaultMats(src)
+        If standaloneTest() Then defaultMats(src)
 
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3)
         For i = 0 To 4 - 1

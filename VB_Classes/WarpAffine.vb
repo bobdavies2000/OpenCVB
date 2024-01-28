@@ -12,7 +12,7 @@ Public Class WarpAffine_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         options.RunVB()
 
-        If standalone And task.heartBeat Then
+        If standaloneTest() And task.heartBeat Then
             Static angleSlider = findSlider("Angle")
             rotateAngle = angleSlider.Value
             rotateCenter.X = msRNG.Next(0, dst2.Width)
@@ -41,7 +41,7 @@ Public Class WarpAffine_BasicsQT : Inherits VB_Algorithm
         desc = "Use WarpAffine to transform input images with no options."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone And task.heartBeat Then
+        If standaloneTest() And task.heartBeat Then
             setTrueText("There is no output for the " + traceName + " algorithm.  Use WarpAffine_Basics to test.")
             Exit Sub
         End If

@@ -111,7 +111,7 @@ Public Class GeneticDrawing_Basics : Inherits VB_Algorithm
             generation = 0
             stage = 0
 
-            If standalone Then
+            If standaloneTest() Then
                 src = If(options.snapCheck, src.Clone, cv.Cv2.ImRead(task.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
             End If
 

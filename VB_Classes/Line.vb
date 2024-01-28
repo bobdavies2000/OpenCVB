@@ -217,7 +217,7 @@ Public Class Line_Intercepts : Inherits VB_Algorithm
             If emps.p2.Y = dst2.Height Then botIntercepts.Add(saveP2.X, i)
         Next
 
-        If standalone Then hightLightIntercept(dst2)
+        If standaloneTest() Then hightLightIntercept(dst2)
     End Sub
 End Class
 
@@ -270,8 +270,8 @@ Public Class Line_LeftRightImages : Inherits VB_Algorithm
     Public Sub New()
         If check.Setup(traceName) Then check.addCheckBox("Show lines from BGR in green")
 
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         findSlider("Line length threshold in pixels").Value = 30
         labels(2) = "Left image lines(red) with Right(blue)"
         desc = "Find lines in the infrared images and overlay them in a single image"
@@ -516,7 +516,7 @@ Public Class Line_PointSlope : Inherits VB_Algorithm
     Const searchCount As Integer = 100
     Public Sub New()
         knn.knnDimension = 5 ' slope, p1.x, p1.y, p2.x, p2.y
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "TrainInput to KNN", "Tracking these lines", "Query inputs to KNN"}
         desc = "Find the 3 longest lines in the image and identify them from frame to frame using the point and slope."
     End Sub
@@ -697,7 +697,7 @@ Public Class Line_Movement : Inherits VB_Algorithm
         desc = "Show the movement of the line provided"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static k1 = p1
             Static k2 = p2
             If k1.DistanceTo(p1) = 0 And k2.DistanceTo(p2) = 0 Then
@@ -960,7 +960,7 @@ Public Class Line_Verify : Inherits VB_Algorithm
     Public verifiedCells As New List(Of tCell)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Verify edge threshold percentage", 0, 100, 50)
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels = {"", "Drawn lines based on p1 and p2", "Highlighted lines", "Edges in the src after drawn lines were used as a mask"}
@@ -970,13 +970,13 @@ Public Class Line_Verify : Inherits VB_Algorithm
         Static percentSlider = findSlider("Verify edge threshold percentage")
         Dim thresholdPercentage = percentSlider.Value / 100
 
-        If standalone And task.heartBeat Then
+        If standaloneTest() And task.heartBeat Then
             Static lines As New Line_Basics
             lines.Run(src.Clone)
             tcells = lines.tCells
             dst2 = src
         Else
-            If standalone = False Then dst2 = src
+            If standaloneTest() = False Then dst2 = src
         End If
 
         canny.Run(dst2)
@@ -1031,12 +1031,12 @@ Public Class Line_DisplayInfo : Inherits VB_Algorithm
     Public Sub New()
         dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        labels(2) = "When running standalone, a pair of random points is used to test the algorithm."
+        labels(2) = "When running standaloneTest(), a pair of random points is used to test the algorithm."
         desc = "Display the line provided in mp"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         dst2 = src
-        If standalone And task.heartBeat Then
+        If standaloneTest() And task.heartBeat Then
             Dim tc As tCell
             tcells.Clear()
             For i = 0 To 2 - 1
@@ -1095,7 +1095,7 @@ Public Class Line_Perpendicular : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         Static externalUse = If(p1 = New cv.Point2f, False, True)
         If task.heartBeat Or externalUse Then
-            If standalone Then
+            If standaloneTest() Then
                 p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
                 p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             End If
@@ -1136,7 +1136,7 @@ Public Class Line_Nearest : Inherits VB_Algorithm
         desc = "Find the nearest point on a line"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone And task.heartBeat Then
+        If standaloneTest() And task.heartBeat Then
             p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             pt = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -1172,7 +1172,7 @@ Public Class Line_Nearest : Inherits VB_Algorithm
         distance1 = pt.DistanceTo(p1)
         distance2 = pt.DistanceTo(p2)
         If onTheLine = False Then nearPoint = If(distance1 < distance2, p1, p2)
-        If standalone Then
+        If standaloneTest() Then
             dst2.SetTo(0)
             dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             dst2.Line(pt, nearPoint, cv.Scalar.White, task.lineWidth, task.lineType)
@@ -1250,7 +1250,7 @@ Public Class Line_ColorClass : Inherits VB_Algorithm
     Dim colorClass As New Color_Basics
     Dim lines As New Line_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         findSlider("Line length threshold in pixels").Value = 50
         labels = {"", "", "Lines for the current color class", "Color Class input"}
         desc = "Review lines in all the different color classes"

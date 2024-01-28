@@ -35,7 +35,7 @@ Public Class HistValley_Basics : Inherits VB_Algorithm
             Dim nextVal = start + testList.IndexOf(testList.Min)
             valleys.Add(nextVal)
         Next
-        If standalone Then
+        If standaloneTest() Then
             updatePlot(dst2, task.histogramBins)
             setTrueText("Input data used by default is the color image", 3)
         End If
@@ -83,7 +83,7 @@ Public Class HistValley_Depth : Inherits VB_Algorithm
             dst1.ConvertTo(dst1, cv.MatType.CV_8U)
             dst3 = vbPalette(dst1 * 255 / valley.valleys.Count)
         End If
-        If standalone Then valley.updatePlot(dst2, task.histogramBins)
+        If standaloneTest() Then valley.updatePlot(dst2, task.histogramBins)
     End Sub
 End Class
 
@@ -118,7 +118,7 @@ Public Class HistValley_Test : Inherits VB_Algorithm
     Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public options As New Options_Boundary
     Public Sub New()
-        If standalone Then gOptions.HistBinSlider.Value = 256
+        If standaloneTest() Then gOptions.HistBinSlider.Value = 256
         desc = "Get the top X highest quality valley points in the histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -126,7 +126,7 @@ Public Class HistValley_Test : Inherits VB_Algorithm
         Dim desiredBoundaries = options.desiredBoundaries
 
         ' input should be a histogram.  If not, get one...
-        If standalone Then
+        If standaloneTest() Then
             Static kalmanHist As New Histogram_Kalman
             kalmanHist.Run(src)
             dst2 = kalmanHist.dst2
@@ -163,7 +163,7 @@ Public Class HistValley_Test : Inherits VB_Algorithm
             valleyOrder.Add(valleys(desiredBoundaries - 1), 256)
         End If
 
-        If standalone Then
+        If standaloneTest() Then
             For Each entry In valleyOrder
                 Dim col = entry.Value * dst2.Width / task.histogramBins
                 dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White, task.lineWidth)
@@ -232,7 +232,7 @@ Public Class HistValley_Diff : Inherits VB_Algorithm
     Dim diff As New Diff_Basics
     Dim valley As New HistValley_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Compare frame to frame what has changed"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -279,8 +279,8 @@ Public Class HistValley_Colors : Inherits VB_Algorithm
     Dim hist As New Histogram_Kalman
     Dim auto As New OpAuto_Valley
     Public Sub New()
-        If standalone Then gOptions.HistBinSlider.Value = 256
-        If standalone Then findSlider("Desired boundary count").Value = 10
+        If standaloneTest() Then gOptions.HistBinSlider.Value = 256
+        If standaloneTest() Then findSlider("Desired boundary count").Value = 10
         desc = "Find the histogram valleys for each of the colors."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -378,11 +378,11 @@ Public Class HistValley_Peaks : Inherits VB_Algorithm
         options.RunVB()
         Dim desiredBoundaries = options.desiredBoundaries
 
-        If standalone Then
+        If standaloneTest() Then
             src = task.pcSplit(2)
-            setTrueText("Default input when running standalone is the depth data.", 3)
+            setTrueText("Default input when running standaloneTest() is the depth data.", 3)
         End If
-        If src.Type <> cv.MatType.CV_32FC1 Or standalone Then
+        If src.Type <> cv.MatType.CV_32FC1 Or standaloneTest() Then
             src = task.pcSplit(2)
             hist.Run(src)
             dst2 = hist.dst2

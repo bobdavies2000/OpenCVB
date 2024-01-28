@@ -113,7 +113,7 @@ Public Class Hist3Dcolor_Reduction : Inherits VB_Algorithm
     Dim reduction As New Reduction_BGR
     Public classCount As Integer
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         redOptions.SimpleReductionSlider.Value = 45
         desc = "Backproject the 3D histogram for RGB after reduction"
     End Sub
@@ -342,6 +342,6 @@ Public Class Hist3Dcolor_Vector : Inherits VB_Algorithm
 
         ReDim histArray(histogram.Total - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
-        If standalone Then setTrueText("Vector prepared in histArray")
+        If standaloneTest() Then setTrueText("Vector prepared in histArray")
     End Sub
 End Class

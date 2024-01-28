@@ -160,7 +160,7 @@ Public Class IMU_PlotIMUFrameTime : Inherits VB_Algorithm
 
         histogramIMU(Math.Min(CInt(task.IMU_FrameTime), histogramIMU.Length - 1)) += 1
 
-        If standalone Then
+        If standaloneTest() Then
             Dim output = "IMU_TimeStamp (ms) " + Format(task.IMU_TimeStamp, "00") + vbCrLf +
                         "CPU TimeStamp (ms) " + Format(task.CPU_TimeStamp, "00") + vbCrLf +
                         "IMU Frametime (ms, sampled) " + Format(sampledIMUFrameTime, "000.00") +
@@ -302,7 +302,7 @@ End Class
 Public Class IMU_PlotGravityAngles : Inherits VB_Algorithm
     ReadOnly plot As New Plot_OverTimeScalar
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Plot the motion of the camera based on the IMU data in degrees"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -329,7 +329,7 @@ End Class
 Public Class IMU_PlotAngularVelocity : Inherits VB_Algorithm
     ReadOnly plot As New Plot_OverTimeScalar
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Plot the IMU Velocity over time."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -366,7 +366,7 @@ Public Class IMU_VerticalVerify : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         dst2 = src.Clone
 
-        If standalone Then
+        If standaloneTest() Then
             Static linesVH As New Feature_LinesVH
             linesVH.Run(src)
             gCells = linesVH.gCells
@@ -469,7 +469,7 @@ End Class
 Public Class IMU_PlotAcceleration : Inherits VB_Algorithm
     ReadOnly plot As New Plot_OverTimeScalar
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Plot the IMU Acceleration in m/Sec^2 over time."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -518,8 +518,8 @@ Public Class IMU_PlotCompareIMU : Inherits VB_Algorithm
     ReadOnly plot(3 - 1) As Plot_OverTimeScalar
     ReadOnly imuAll As New IMU_AllMethods
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
 
         For i = 0 To plot.Count - 1
             plot(i) = New Plot_OverTimeScalar
@@ -654,7 +654,7 @@ Public Class IMU_GMatrix : Inherits VB_Algorithm
 
         gMatrix = buildGmatrix()
 
-        If standalone Then
+        If standaloneTest() Then
             Dim g = task.IMU_Acceleration
             strOut = "IMU Acceleration in X-direction = " + vbTab + vbTab + Format(g.X, fmt4) + vbCrLf
             strOut += "IMU Acceleration in Y-direction = " + vbTab + vbTab + Format(g.Y, fmt4) + vbCrLf
@@ -699,7 +699,7 @@ Public Class IMU_Plot : Inherits VB_Algorithm
         desc = "Plot the angular velocity of the camera based on the IMU data"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             blue = task.IMU_AngularVelocity.X * 1000
             green = task.IMU_AngularVelocity.Y * 1000
             red = task.IMU_AngularVelocity.Z * 1000
@@ -719,7 +719,7 @@ Public Class IMU_Plot : Inherits VB_Algorithm
         plot.Run(empty)
         dst2 = plot.dst2
         dst3 = plot.dst3
-        labels(2) = "When run standalone, the default is to plot the angular velocity for X, Y, and Z"
+        labels(2) = "When run standaloneTest(), the default is to plot the angular velocity for X, Y, and Z"
     End Sub
 End Class
 
@@ -731,7 +731,7 @@ End Class
 Public Class IMU_VelocityPlot : Inherits VB_Algorithm
     Dim plot As New IMU_Plot
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Plot the angular velocity"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -831,7 +831,7 @@ Public Class IMU_PlotHostFrameTimes : Inherits VB_Algorithm
 
         hist(Math.Min(CInt(task.CPU_FrameTime), hist.Length - 1)) += 1
 
-        If standalone Then
+        If standaloneTest() Then
             Dim output = "IMU_TimeStamp (ms) " + Format(task.IMU_TimeStamp, "00") + vbCrLf +
                          "CPU TimeStamp (ms) " + Format(task.CPU_TimeStamp, "00") + vbCrLf +
                          "Host Frametime (ms, sampled) " + Format(sampledCPUFrameTime, "000.00") +
@@ -876,7 +876,7 @@ Public Class IMU_PlotHostFrameScalar : Inherits VB_Algorithm
     Public HostInterruptDelayEstimate As Double
     Dim options As New Options_IMUFrameTime
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         plot.plotCount = 4
         labels(3) = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
@@ -895,7 +895,7 @@ Public Class IMU_PlotHostFrameScalar : Inherits VB_Algorithm
         Static sampledCPUFrameTime = task.CPU_FrameTime
         If task.heartBeat Then sampledCPUFrameTime = task.CPU_FrameTime
 
-        If standalone Then
+        If standaloneTest() Then
             strOut = "IMU_TimeStamp (ms) " + Format(task.IMU_TimeStamp, "00") + vbCrLf +
                      "CPU TimeStamp (ms) " + Format(task.CPU_TimeStamp, "00") + vbCrLf +
                      "Host Frametime (ms, sampled) " + Format(sampledCPUFrameTime, "000.00") +
@@ -988,7 +988,7 @@ Public Class IMU_GMatrixWithOptions : Inherits VB_Algorithm
     Public cx As Single = 1, sx As Single = 0, cy As Single = 1, sy As Single = 0, cz As Single = 1, sz As Single = 0
     Public gMatrix As cv.Mat
     Public Sub New()
-        If standalone Then Static options = New Options_IMU
+        If standaloneTest() Then Static options = New Options_IMU
         desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
     Private Sub getSliderValues()
@@ -1048,7 +1048,7 @@ Public Class IMU_GMatrixWithOptions : Inherits VB_Algorithm
 
         gMatrix = buildGmatrix()
 
-        If standalone Then
+        If standaloneTest() Then
             Dim g = task.IMU_Acceleration
             strOut = "IMU Acceleration in X-direction = " + vbTab + vbTab + Format(g.X, fmt4) + vbCrLf
             strOut += "IMU Acceleration in Y-direction = " + vbTab + vbTab + Format(g.Y, fmt4) + vbCrLf

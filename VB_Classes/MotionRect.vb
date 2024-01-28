@@ -16,7 +16,7 @@ Public Class MotionRect_Basics : Inherits VB_Algorithm
         task.motionReset = True
 
         bgSub.Run(src)
-        If standalone Or showIntermediate() Or showDiff Then dst2 = bgSub.dst2
+        If standaloneTest() Or showDiff Then dst2 = bgSub.dst2
 
         redCPP.Run(bgSub.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary))
         If redCPP.sortedCells.Count < 2 Then
@@ -46,7 +46,7 @@ Public Class MotionRect_Basics : Inherits VB_Algorithm
             If task.motionRect.Width <> 0 Or task.motionRect.Height <> 0 Then task.motionDetected = True
         End If
 
-        If standalone Or showIntermediate() Or showDiff Then dst2.Rectangle(task.motionRect, 255, task.lineWidth)
+        If standaloneTest() Or showDiff Then dst2.Rectangle(task.motionRect, 255, task.lineWidth)
         labels(2) = CStr(redCPP.sortedCells.Count) + " cells were found with " + CStr(redCPP.classCount) + " flood points"
     End Sub
 End Class
@@ -94,7 +94,7 @@ Public Class MotionRect_Rect : Inherits VB_Algorithm
     Dim minCount = 4
     Dim reconstructedRGB As Integer
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         If dst2.Width = 1280 Or dst2.Width = 640 Then minCount = 16
         desc = "Track the max rectangle that covers all the motion until there is no motion in it."
@@ -161,7 +161,7 @@ Public Class MotionRect_Rect : Inherits VB_Algorithm
             dst2 = src.Clone
         End If
 
-        If standalone Or showIntermediate() Then
+        If standaloneTest() Then
             dst2 = dst1
             If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
                 dst3(task.motionRect).SetTo(255)
@@ -169,7 +169,7 @@ Public Class MotionRect_Rect : Inherits VB_Algorithm
             End If
         End If
 
-        If standalone Or showIntermediate() Then
+        If standaloneTest() Then
             If task.motionRect.Width > 0 And task.motionRect.Height > 0 Then
                 src(task.motionRect).CopyTo(dst0(task.motionRect))
                 color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth, task.lineType)
@@ -212,7 +212,7 @@ Public Class MotionRect_Rect1 : Inherits VB_Algorithm
             End If
         End If
 
-        If standalone Then
+        If standaloneTest() Then
             Static diff As New Diff_Basics
             diff.lastFrame = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             diff.Run(dst2)
@@ -334,7 +334,7 @@ Public Class MotionRect_PointCloud : Inherits VB_Algorithm
 
         If task.motionDetected Then task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
 
-        If standalone Or showIntermediate() Then
+        If standaloneTest() Then
             If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
             diff.Run(task.pcSplit(2))
             dst3 = diff.dst2
@@ -361,7 +361,7 @@ Public Class MotionRect_Depth : Inherits VB_Algorithm
 
         If task.motionDetected Then task.pcSplit(2)(task.motionRect).CopyTo(dst2(task.motionRect))
 
-        If standalone Or showIntermediate() Then
+        If standaloneTest() Then
             Static diff As New Diff_Depth32f
             If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
             diff.Run(task.pcSplit(2))
@@ -388,7 +388,7 @@ Public Class MotionRect_Grayscale : Inherits VB_Algorithm
         If task.heartBeat Or task.motionReset Then dst2 = src.Clone
         If task.motionDetected Then src(task.motionRect).CopyTo(dst2(task.motionRect))
 
-        If standalone Or showIntermediate() Then
+        If standaloneTest() Then
             Static diff As New Diff_Basics
             If diff.lastFrame.Width = 0 Then diff.lastFrame = dst2.Clone
             diff.Run(src)
@@ -414,7 +414,7 @@ Public Class MotionRect_Color : Inherits VB_Algorithm
         If task.heartBeat Or task.motionReset Then dst2 = src.Clone
         If task.motionDetected Then src(task.motionRect).CopyTo(dst2(task.motionRect))
 
-        If (standalone Or showIntermediate()) And task.motionDetected Then
+        If (standaloneTest()) And task.motionDetected Then
             dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
         End If
     End Sub

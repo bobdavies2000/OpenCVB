@@ -11,7 +11,7 @@ Public Class Delaunay_Basics : Inherits VB_Algorithm
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat And standalone Then
+        If task.heartBeat And standaloneTest() Then
             randEnum.Run(empty)
             inputPoints = New List(Of cv.Point2f)(randEnum.points)
             dst3 = randEnum.dst2
@@ -62,7 +62,7 @@ Public Class Delaunay_SubDiv : Inherits VB_Algorithm
         desc = "Use Delaunay to subdivide an image into triangles."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then If task.heartBeat = False Then Exit Sub
+        If standaloneTest() Then If task.heartBeat = False Then Exit Sub
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         random.Run(empty)
         dst2.SetTo(0)
@@ -168,7 +168,7 @@ Public Class Delaunay_GenerationsNoKNN : Inherits VB_Algorithm
         desc = "Create a region in an image for each point provided without using KNN."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone And task.heartBeat Then
+        If standaloneTest() And task.heartBeat Then
             Static random As New Random_Basics
             If firstPass Then random.options.countSlider.Value = 10
             random.Run(empty)
@@ -222,7 +222,7 @@ Public Class Delaunay_Generations : Inherits VB_Algorithm
         desc = "Create a region in an image for each point provided"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static random As New Random_Basics
             If firstPass Then random.options.countSlider.Value = 10
             If task.heartBeat Then random.Run(empty)

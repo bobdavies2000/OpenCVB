@@ -12,7 +12,7 @@ Public Class Blob_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         options.RunVB()
 
-        If standalone Then
+        If standaloneTest() Then
             input.Run(src)
             dst2 = input.dst2
         Else

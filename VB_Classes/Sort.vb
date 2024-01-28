@@ -33,7 +33,7 @@ Public Class Sort_RectAndMask : Inherits VB_Algorithm
     Public rect As cv.Rect
     Public Sub New()
         labels(3) = "Original input to sort"
-        If standalone Then task.drawRect = New cv.Rect(100, 100, 100, 100)
+        If standaloneTest() Then task.drawRect = New cv.Rect(100, 100, 100, 100)
         desc = "Sort the grayscale image portion in a rect while allowing for a mask."
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -47,7 +47,7 @@ Public Class Sort_RectAndMask : Inherits VB_Algorithm
         sort.Run(dst1)
         dst2 = sort.dst2.Reshape(1, dst1.Rows)
         dst2 = dst2.Resize(dst3.Size)
-        If standalone Then dst3 = src(tmpRect).Resize(dst3.Size)
+        If standaloneTest() Then dst3 = src(tmpRect).Resize(dst3.Size)
     End Sub
 End Class
 
@@ -95,7 +95,7 @@ Public Class Sort_3Channel : Inherits VB_Algorithm
     Dim sort As New Sort_Basics
     Dim dups As New ML_RemoveDups_CPP
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         findRadio("Sort all pixels descending").Checked = True
         labels = {"", "The BGRA input to sort - shown here as 1-channel CV_32S format", "Output of sort - no duplicates", "Input before removing the dups - use slider to increase/decrease the amount of data"}
         desc = "Take some 3-channel input, convert it to BGRA, sort it as integers, and provide the list of unique elements"
@@ -103,7 +103,7 @@ Public Class Sort_3Channel : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         Static thresholdSlider = findSlider("Threshold for sort input")
         Dim inputMask = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If standalone Then inputMask = inputMask.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+        If standaloneTest() Then inputMask = inputMask.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
 
         Static bgra As cv.Mat
         bgra = src.CvtColor(cv.ColorConversionCodes.BGR2BGRA)
@@ -135,9 +135,9 @@ Public Class Sort_1Channel : Inherits VB_Algorithm
     Public rangeStart As New List(Of Integer)
     Public rangeEnd As New List(Of Integer)
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         findRadio("Sort all pixels descending").Checked = True
-        If standalone Then gOptions.GridSize.Value = 10
+        If standaloneTest() Then gOptions.GridSize.Value = 10
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels = {"", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates"}
         desc = "Take some 1-channel input, sort it, and provide the list of unique elements"

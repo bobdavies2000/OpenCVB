@@ -115,7 +115,7 @@ Public Class Python_MemMap : Inherits VB_Algorithm
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length)
 
-        If standalone Then
+        If standaloneTest() Then
             If task.externalPythonInvocation = False Then
                 python.StartPython("--MemMapLength=" + CStr(memMapbufferSize))
                 If python.strOut <> "" Then setTrueText(python.strOut)
@@ -126,8 +126,8 @@ Public Class Python_MemMap : Inherits VB_Algorithm
         End If
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone Then
-            setTrueText(traceName + " has no output when run standalone.")
+        If standaloneTest() Then
+            setTrueText(traceName + " has no output when run standaloneTest().")
             Exit Sub
         End If
 
@@ -163,7 +163,7 @@ Public Class Python_Stream : Inherits VB_Algorithm
         End Try
         task.pythonPipeIn = New NamedPipeServerStream(task.pipeName + "Results", PipeDirection.In)
 
-        ' Was this class invoked standalone?  Then just run something that works with BGR and depth...
+        ' Was this class invoked standaloneTest()?  Then just run something that works with BGR and depth...
         If task.pythonTaskName.EndsWith("Python_Stream") Then
             task.pythonTaskName = task.homeDir + "VB_Classes/Python_Stream_PS.py"
         End If
@@ -184,8 +184,8 @@ Public Class Python_Stream : Inherits VB_Algorithm
         desc = "General purpose class to pipe BGR and Depth to Python scripts."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone Then
-            setTrueText(traceName + " has no output when run standalone.")
+        If standaloneTest() Then
+            setTrueText(traceName + " has no output when run standaloneTest().")
             Exit Sub
         End If
 

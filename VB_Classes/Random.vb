@@ -16,7 +16,7 @@ Public Class Random_Basics : Inherits VB_Algorithm
                 pointList.Add(New cv.Point2f(msRNG.Next(range.X, range.X + range.Width),
                                              msRNG.Next(range.Y, range.Y + range.Height)))
             End While
-            If standalone Or showIntermediate() Then
+            If standaloneTest() Then
                 dst2.SetTo(0)
                 For Each pt In pointList
                     dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType, 0)
@@ -44,7 +44,7 @@ Public Class Random_Point2d : Inherits VB_Algorithm
             For i = 0 To options.countSlider.Value - 1
                 PointList.Add(New cv.Point2d(msRNG.Next(range.X, range.X + range.Width), msRNG.Next(range.Y, range.Y + range.Height)))
             Next
-            If standalone Then
+            If standaloneTest() Then
                 dst2.SetTo(0)
                 For Each pt In PointList
                     dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType, 0)
@@ -98,7 +98,7 @@ Public Class Random_Basics3D : Inherits VB_Algorithm
             For i = 0 To count - 1
                 PointList.Add(New cv.Point3f(msRNG.Next(ranges(0), ranges(1)), msRNG.Next(ranges(2), ranges(3)), msRNG.Next(ranges(4), ranges(5))))
             Next
-            If standalone Then
+            If standaloneTest() Then
                 dst2.SetTo(0)
                 For Each pt In PointList
                     dst2.Circle(New cv.Point2f(pt.X, pt.Y), task.dotSize, cv.Scalar.Yellow, -1, task.lineType, 0)
@@ -131,7 +131,7 @@ Public Class Random_Basics4D : Inherits VB_Algorithm
                 PointList.Add(New cv.Vec4f(msRNG.Next(ranges(0), ranges(1)), msRNG.Next(ranges(2), ranges(3)),
                                            msRNG.Next(ranges(4), ranges(5)), msRNG.Next(ranges(6), ranges(7))))
             Next
-            If standalone Then
+            If standaloneTest() Then
                 dst2.SetTo(0)
                 For Each v In PointList
                     dst2.Circle(New cv.Point2f(v(0), v(1)), task.dotSize, cv.Scalar.Yellow, -1, task.lineType, 0)
@@ -412,7 +412,7 @@ Public Class Random_MonteCarlo : Inherits VB_Algorithm
             End While
         Next
 
-        If standalone Then
+        If standaloneTest() Then
             plot.Run(histogram)
             dst2 = plot.dst2
         End If
@@ -446,7 +446,7 @@ Public Class Random_CustomHistogram : Inherits VB_Algorithm
         random.inputCDF = saveHist ' it will convert the histogram into a cdf where the last value must be near one.
         random.Run(src)
 
-        If standalone Then
+        If standaloneTest() Then
             hist.plot.maxValue = 100
             hist.plot.Run(random.outputHistogram)
             dst3 = hist.plot.dst2

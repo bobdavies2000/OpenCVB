@@ -198,7 +198,7 @@ Public Class Blur_Detection : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim r = New cv.Rect(dst2.Width / 2 - 25, dst2.Height / 2 - 25, 50, 50)
-        If standalone Then
+        If standaloneTest() Then
             If task.drawRect <> New cv.Rect Then r = task.drawRect
             ' deliberately blur a small region to test the algorithm
             If task.frameCount Mod 2 Then
@@ -215,7 +215,7 @@ Public Class Blur_Detection : Inherits VB_Algorithm
         cv.Cv2.MeanStdDev(dst2, mean, stdev)
         setTrueText("Blur variance is " + Format(stdev * stdev, fmt3), 3)
 
-        If standalone Then dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
+        If standaloneTest() Then dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
     End Sub
 End Class
 

@@ -7,11 +7,11 @@ Public Class Histogram_Basics : Inherits VB_Algorithm
     Public ranges() As cv.Rangef
     Dim splitIndex As Integer
     Public Sub New()
-        If standalone Then gOptions.HistBinSlider.Value = 255
+        If standaloneTest() Then gOptions.HistBinSlider.Value = 255
         desc = "Create a histogram (no Kalman)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
             mm = vbMinMax(src.ExtractChannel(splitIndex))
             plot.backColor = Choose(splitIndex + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
@@ -67,7 +67,7 @@ Public Class Histogram_Graph : Inherits VB_Algorithm
             histRaw(i) = hist.Clone()
             mm = vbMinMax(histRaw(i))
             histNormalized(i) = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
-            If standalone Or plotRequested Then
+            If standaloneTest() Or plotRequested Then
                 Dim points = New List(Of cv.Point)
                 Dim listOfPoints = New List(Of List(Of cv.Point))
                 For j = 0 To task.histogramBins - 1
@@ -78,7 +78,7 @@ Public Class Histogram_Graph : Inherits VB_Algorithm
             End If
         Next
 
-        If standalone Or plotRequested Then
+        If standaloneTest() Or plotRequested Then
             plotMaxValue = Math.Round(mm.maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
             AddPlotScale(dst2, 0, plotMaxValue)
             labels(2) = "Histogram for src image (default color) - " + CStr(task.histogramBins) + " bins"
@@ -211,7 +211,7 @@ End Class
 Public Class Histogram_Frustrum : Inherits VB_Algorithm
     Dim heat As New HeatMap_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         gOptions.gravityPointCloud.Checked = False
         desc = "Options for the side and top view.  See OptionCommon_Histogram to make settings permanent."
     End Sub
@@ -502,7 +502,7 @@ Public Class Histogram_KalmanAuto : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Static splitIndex = 0
         Static colorName = "Gray"
-        If standalone Then
+        If standaloneTest() Then
             If task.heartBeat Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
             colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
             Dim split = src.Split()
@@ -530,7 +530,7 @@ Public Class Histogram_KalmanAuto : Inherits VB_Algorithm
         histogram = New cv.Mat(kalman.kOutput.Length, 1, cv.MatType.CV_32FC1, kalman.kOutput)
 
         Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
-        If standalone Then plot.backColor = splitColors(splitIndex)
+        If standaloneTest() Then plot.backColor = splitColors(splitIndex)
         plot.Run(histogram)
         dst2 = plot.dst2
 
@@ -569,7 +569,7 @@ Public Class Histogram_EqualizeColor : Inherits VB_Algorithm
             cv.Cv2.EqualizeHist(rgbEq(i), rgbEq(i))
         Next
 
-        If standalone Or displayHist Then
+        If standaloneTest() Or displayHist Then
             cv.Cv2.Split(src, rgb) ' equalizehist alters the input...
             kalman.plot.backColor = cv.Scalar.Red
             kalman.Run(rgb(channel).Clone())
@@ -682,7 +682,7 @@ Public Class Histogram_CompareNumber : Inherits VB_Algorithm
     Dim comp As New Histogram_CompareGray
     Dim plot As New Plot_OverTimeScalar
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         plot.plotCount = 2
 
         labels = {"", "", "Kalman-smoothed normalized histogram output", "Plot of the sum of the differences between recent normalized histograms"}
@@ -778,8 +778,8 @@ End Class
 Public Class Histogram_Lab : Inherits VB_Algorithm
     Dim hist As New Histogram_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"Lab Colors ", "Lab Channel 0", "Lab Channel 1", "Lab Channel 2"}
         desc = "Create a histogram from a BGR image converted to LAB."
     End Sub
@@ -809,7 +809,7 @@ Public Class Histogram_PointCloudXYZ : Inherits VB_Algorithm
     Public plot As New Plot_Histogram
     Public Sub New()
         plot.createHistogram = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "Histogram of the X channel", "Histogram of the Y channel", "Histogram of the Z channel"}
         desc = "Show individual channel of the point cloud data as a histogram."
     End Sub
@@ -1180,7 +1180,7 @@ Public Class Histogram_Depth : Inherits VB_Algorithm
             dst2.Line(New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), cv.Scalar.White, task.cvFontThickness)
         Next
 
-        If standalone Then
+        If standaloneTest() Then
             If task.heartBeat Then
                 Dim expected = src.CountNonZero
                 Dim actual = CInt(plot.histogram.Sum(0))

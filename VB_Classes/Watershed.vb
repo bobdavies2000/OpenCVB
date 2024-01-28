@@ -11,7 +11,7 @@ Public Class Watershed_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then rects.Add(task.drawRect)
 
-        If (standalone Or UseCorners) And task.optionsChanged Then
+        If (standaloneTest() Or UseCorners) And task.optionsChanged Then
             For i = 0 To 4 - 1
                 Dim r As New cv.Rect(0, 0, src.Width / 10, src.Height / 10)
                 Select Case i

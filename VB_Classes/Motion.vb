@@ -208,7 +208,7 @@ End Class
 Public Class Motion_DepthReconstructed : Inherits VB_Algorithm
     Public motion As New MotionRect_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
         labels(2) = "The yellow rectangle indicates where the motion is and only that portion of the point cloud and depth mask is updated."
         desc = "Rebuild the point cloud based on the BGR motion history."

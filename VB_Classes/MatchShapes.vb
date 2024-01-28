@@ -33,7 +33,7 @@ Public Class MatchShapes_Basics : Inherits VB_Algorithm
         options.RunVB()
         match.RunVB()
 
-        If standalone Then
+        If standaloneTest() Then
             dst2 = dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst3 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
@@ -76,7 +76,7 @@ Public Class MatchShapes_NearbyHull : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If standalone Then
+        If standaloneTest() Then
             hulls.Run(task.color)
             If hulls.redC.redCells.Count = 0 Then Exit Sub
             dst2 = hulls.dst2
@@ -129,7 +129,7 @@ Public Class MatchShapes_Nearby : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Dim myStandalone = standalone Or runStandalone
+        Dim myStandalone = standaloneTest() Or runStandalone
 
         If myStandalone Then
             redC.Run(task.color)
@@ -186,8 +186,8 @@ Public Class MatchShapes_LeftRight : Inherits VB_Algorithm
     Public rightCells As New List(Of rcData)
     Dim doubleSize As cv.Mat
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         doubleSize = New cv.Mat(dst2.Rows, dst2.Cols * 2, cv.MatType.CV_8UC3)
         labels = {"", "", "Left image RedCloud output", "Right image RedCloud output"}
         desc = "MatchShapes: Match shapes in the left and right images"
@@ -196,7 +196,7 @@ Public Class MatchShapes_LeftRight : Inherits VB_Algorithm
         'Static sizeSlider = findSlider("Min Size % of image size")
         'Dim minSize = sizeSlider.value * dst2.Total / 100
 
-        'If standalone Then
+        'If standaloneTest() Then
         '    Static lrRed As New Flood_LeftRight
 
         '    lrRed.Run(src)

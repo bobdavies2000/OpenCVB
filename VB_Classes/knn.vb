@@ -12,7 +12,7 @@ Public Class KNN_Basics : Inherits VB_Algorithm
         desc = "Map points 1:1 with losses. Toss any farther duplicates. Easier to follow than previous version."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static random As New Random_Basics
             If task.heartBeat Then
                 random.Run(empty)
@@ -69,7 +69,7 @@ Public Class KNN_Basics : Inherits VB_Algorithm
                 dst3.Line(nn, pt, cv.Scalar.White, task.lineWidth, task.lineType)
             End If
         Next
-        If standalone = False Then knn.trainInput = New List(Of cv.Point2f)(queries)
+        If standaloneTest() = False Then knn.trainInput = New List(Of cv.Point2f)(queries)
     End Sub
 End Class
 
@@ -109,7 +109,7 @@ Public Class KNN_Core : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Dim KNNdimension = 2
 
-        If standalone Then
+        If standaloneTest() Then
             Static random As New Random_Basics
             If task.heartBeat Then
                 random.Run(empty)
@@ -160,7 +160,7 @@ Public Class KNN_Core : Inherits VB_Algorithm
             Next
             neighbors.Add(res)
         Next
-        If standalone Or showIntermediate() Then displayResults()
+        If standaloneTest() Then displayResults()
     End Sub
 End Class
 
@@ -226,8 +226,8 @@ Public Class KNN_Core3D : Inherits VB_Algorithm
         desc = "Use knn with the input 3D points in the image.  Find the nearest neighbors."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
-            setTrueText("There is no output for the " + traceName + " algorithm when run standalone.  Use the " + traceName + "Test algorithm")
+        If standaloneTest() Then
+            setTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "Test algorithm")
             Exit Sub
         End If
 
@@ -275,8 +275,8 @@ Public Class KNN_Core4D : Inherits VB_Algorithm
         desc = "Use knn with the input 4D points in the image.  Find the nearest neighbors."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
-            setTrueText("There is no output for the " + traceName + " algorithm when run standalone.  Use the " + traceName + "Test algorithm")
+        If standaloneTest() Then
+            setTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "Test algorithm")
             Exit Sub
         End If
 
@@ -330,8 +330,8 @@ Public Class KNN_CoreN : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim responseList As IEnumerable(Of Integer) = Enumerable.Range(0, 10).Select(Function(x) x)
-        If standalone Then
-            setTrueText("There is no output for the " + traceName + " algorithm when run standalone.  Use the " + traceName + "_Test algorithm")
+        If standaloneTest() Then
+            setTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "_Test algorithm")
             Exit Sub
         End If
 
@@ -523,7 +523,7 @@ Public Class KNN_CoreNTest : Inherits VB_Algorithm
             dst2.Circle(pt, task.dotSize + 1, task.highlightColor, -1, task.lineType)
             dst2.Line(pt, nn, task.highlightColor, task.lineWidth, task.lineType)
         Next
-        If standalone Then
+        If standaloneTest() Then
             setTrueText("Results are easily verified for the 2-dimensional case.  For higher dimension, " + vbCrLf +
                         "the results may appear incorrect because the higher dimensions are projected into " + vbCrLf +
                         "a 2-dimensional presentation.", 3)
@@ -588,7 +588,7 @@ Public Class KNN_Input : Inherits VB_Algorithm
 
         labels(2) = "Random training points"
         labels(3) = "Random query points"
-        desc = "Source of query/train points - generate points if standalone.  Reuse points if requested."
+        desc = "Source of query/train points - generate points if standaloneTest().  Reuse points if requested."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static trainSlider = findSlider("KNN Train count")
@@ -599,7 +599,7 @@ Public Class KNN_Input : Inherits VB_Algorithm
         randomQuery.options.countSlider.Value = querySlider.Value
         randomQuery.Run(empty)
 
-        ' query/train points need to be manufactured when standalone
+        ' query/train points need to be manufactured when standaloneTest()
         trainingPoints = New List(Of cv.Point2f)(randomTrain.pointList)
         queryPoints = New List(Of cv.Point2f)(randomQuery.pointList)
 
@@ -634,7 +634,7 @@ Public Class KNN_TrackMean : Inherits VB_Algorithm
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Average distance multiplier", 1, 20, 10)
         findSlider("Feature Sample Size").Value = 200
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion"}
         desc = "Track points with KNN and match the goodFeatures from frame to frame"
     End Sub
@@ -727,7 +727,7 @@ Public Class KNN_ClosestTracker : Inherits VB_Algorithm
     Public lastPair As New linePoints
     Public trainInput As New List(Of cv.Point2f)
     Public Sub New()
-        labels = {"", "", "Highlight the tracked line", "Candidate lines - standalone only"}
+        labels = {"", "", "Highlight the tracked line", "Candidate lines - standaloneTest() only"}
         desc = "Find the longest line and keep finding it among the list of lines using a minimized KNN test."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -912,7 +912,7 @@ Public Class KNN_BasicsOld : Inherits VB_Algorithm
         desc = "Map points 1:1 with losses.  When duplicates are found, toss the farthest.  Too hard to follow.  Trying a better approach."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static random As New Random_Basics
             If task.heartBeat Then
                 random.Run(empty)
@@ -985,7 +985,7 @@ Public Class KNN_BasicsOld : Inherits VB_Algorithm
                 End If
             End If
         Next
-        If standalone = False Then knn.trainInput = New List(Of cv.Point2f)(queries)
+        If standaloneTest() = False Then knn.trainInput = New List(Of cv.Point2f)(queries)
     End Sub
 End Class
 
@@ -1003,7 +1003,7 @@ Public Class KNN_Farthest : Inherits VB_Algorithm
         desc = "Use KNN to find the farthest point from each query point."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static random As New Random_Basics
             If task.heartBeat Then
                 random.Run(empty)

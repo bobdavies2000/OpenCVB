@@ -12,7 +12,7 @@ Public Class Flood_Basics : Inherits VB_Algorithm
         dst2 = redC.cellMap
         dst3 = redC.dst2
         labels(2) = redC.labels(2)
-        If standalone Or showIntermediate() Then identifyCells(redC.redCells)
+        If standaloneTest() Then identifyCells(redC.redCells)
         classCount = redC.redCells.Count
     End Sub
 End Class
@@ -31,14 +31,14 @@ Public Class Flood_Point : Inherits VB_Algorithm
     Dim options As New Options_Flood
     Public Sub New()
         labels(2) = "Input image to floodfill"
-        labels(3) = If(standalone, "Flood_Point standalone just shows the edges", "Resulting mask from floodfill")
+        labels(3) = If(standaloneTest(), "Flood_Point standaloneTest() just shows the edges", "Resulting mask from floodfill")
         desc = "Use floodfill at a single location in a grayscale image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
         dst2 = src.Clone()
-        If standalone Then
+        If standaloneTest() Then
             pt = New cv.Point(msRNG.Next(0, dst2.Width - 1), msRNG.Next(0, dst2.Height - 1))
             edges.Run(src)
             dst2 = edges.mats.dst2
@@ -158,7 +158,7 @@ Public Class Flood_PointList : Inherits VB_Algorithm
         reduction.Run(src)
         dst0 = reduction.dst2.Clone
 
-        If task.optionsChanged Or standalone Then
+        If task.optionsChanged Or standaloneTest() Then
             For y = options.stepSize To dst3.Height - 1 Step options.stepSize
                 For x = options.stepSize To dst3.Width - options.stepSize - 1 Step options.stepSize
                     Dim p1 = New cv.Point(x, y)
@@ -243,7 +243,7 @@ Public Class Flood_FeaturelessHulls : Inherits VB_Algorithm
         desc = "FloodFill the input and paint it with LUT"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static fless As New FeatureLess_Basics
             fless.Run(src)
             src = fless.dst2

@@ -3,7 +3,7 @@ Public Class Resize_Basics : Inherits VB_Algorithm
     Public newSize As cv.Size
     Public options As New Options_Resize
     Public Sub New()
-        If standalone Then task.drawRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
+        If standaloneTest() Then task.drawRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
         desc = "Resize with different options and compare them"
         labels(2) = "Rectangle highlight above resized"
     End Sub
@@ -84,7 +84,7 @@ Public Class Resize_Proportional : Inherits VB_Algorithm
         desc = "Resize the input but keep the results proportional to the original."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static options As New Options_Spectrum
             options.RunVB()
             dst3 = options.runRedCloud(labels(2))

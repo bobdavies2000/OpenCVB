@@ -3,7 +3,7 @@ Public Class Line3D_Draw : Inherits VB_Algorithm
     Public p1 As cv.Point, p2 As cv.Point
     Dim plot As New Plot_OverTimeScalar
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         plot.plotCount = 2
 
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -17,7 +17,7 @@ Public Class Line3D_Draw : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         Static toggleFirstSecond As Boolean
 
-        If standalone Then
+        If standaloneTest() Then
             If task.mouseClickFlag Then
                 If toggleFirstSecond = False Then
                     p1 = task.clickPoint

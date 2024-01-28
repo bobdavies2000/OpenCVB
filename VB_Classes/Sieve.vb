@@ -49,7 +49,7 @@ Public Class Sieve_BasicsVB : Inherits VB_Algorithm
                           End Function) Then output.Add(nextEntry)
             nextEntry += 1
         End While
-        If standalone Then
+        If standaloneTest() Then
             If output.Count > 0 Then setTrueText(shareResults(output))
         Else
             primes = New List(Of Integer)(output)

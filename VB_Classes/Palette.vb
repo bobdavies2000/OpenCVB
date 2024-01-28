@@ -211,7 +211,7 @@ Public Class Palette_Gradient : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.heartBeat Then
-            If standalone Then
+            If standaloneTest() Then
                 ' every 30 frames try a different pair of random colors.
                 color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
                 color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
@@ -226,7 +226,7 @@ Public Class Palette_Gradient : Inherits VB_Algorithm
                 f -= 1 / dst1.Rows
             Next
         End If
-        If standalone Then dst2 = dst1.Resize(dst2.Size)
+        If standaloneTest() Then dst2 = dst1.Resize(dst2.Size)
     End Sub
 End Class
 
@@ -261,7 +261,7 @@ Public Class Palette_DepthColorMap : Inherits VB_Algorithm
             cv.Cv2.HConcat(gradientColorMap, gColor.gradient, gradientColorMap)
             gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
 
-            If standalone Then
+            If standaloneTest() Then
                 If dst3.Width < 255 Then dst3 = New cv.Mat(dst3.Height, 255, cv.MatType.CV_8UC3, 0)
                 Dim r As New cv.Rect(0, 0, 255, 1)
                 For i = 0 To dst3.Height - 1
@@ -522,7 +522,7 @@ Public Class Palette_RandomColorMap : Inherits VB_Algorithm
                 If i = 0 Then gradientColorMap = gColor.gradient Else cv.Cv2.HConcat(gradientColorMap, gColor.gradient, gradientColorMap)
             Next
             gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
-            If standalone Then dst3 = gradientColorMap
+            If standaloneTest() Then dst3 = gradientColorMap
             gradientColorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b) ' black is black!
         End If
         Dim ColorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())

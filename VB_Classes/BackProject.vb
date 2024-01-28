@@ -72,7 +72,7 @@ Public Class BackProject_Full : Inherits VB_Algorithm
         cv.Cv2.CalcBackProject({dst1}, {0}, histogram, dst2, ranges)
 
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        If standalone Or showIntermediate() Then dst3 = vbPalette(dst2 * 255 / classCount)
+        If standaloneTest() Then dst3 = vbPalette(dst2 * 255 / classCount)
     End Sub
 End Class
 
@@ -345,7 +345,7 @@ Public Class BackProject_MaskLines : Inherits VB_Algorithm
     Dim masks As New BackProject_Masks
     Dim lines As New Line_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels = {"", "lines detected in the backProjection mask", "Histogram of pixels in a grayscale image.  Move mouse to see lines detected in the backprojection mask",
                   "Yellow is backProjection, lines detected are highlighted"}

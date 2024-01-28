@@ -8,7 +8,7 @@
 '        desc = "Accord Shape Detection"
 '    End Sub
 '    Public Sub RunVB(src as cv.Mat)
-'        If standalone Then
+'        If standaloneTest() Then
 '            Dim bitmapTmp = New Bitmap(task.homeDir + "Data/demo1.jpg")
 '            src = cv.Extensions.BitmapConverter.ToMat(bitmapTmp).Resize(src.Size)
 '        End If
@@ -73,8 +73,8 @@
 'Public Class ShapeDetect_Example : Inherits VB_Algorithm
 '    Dim options As New Options_ShapeDetect
 '    Public Sub New()
-'        If standalone Then gOptions.displayDst0.Checked = True
-'        If standalone Then gOptions.displayDst1.Checked = True
+'        If standaloneTest() Then gOptions.displayDst0.Checked = True
+'        If standaloneTest() Then gOptions.displayDst1.Checked = True
 
 '        labels = {"", "Identified shapes", "Original image", "Labeled shapes"}
 '        desc = "Accord Shape Detection example"

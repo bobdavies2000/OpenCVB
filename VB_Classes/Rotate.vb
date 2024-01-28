@@ -42,8 +42,8 @@ Public Class Rotate_BasicsQT : Inherits VB_Algorithm
         desc = "Rotate a rectangle by a specified angle"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone Then
-            setTrueText(traceName + " has no output when run standalone")
+        If standaloneTest() Then
+            setTrueText(traceName + " has no output when run standaloneTest()")
             Exit Sub
         End If
 
@@ -153,8 +153,8 @@ Public Class Rotate_PolyQT : Inherits VB_Algorithm
             dst3.SetTo(0)
         End If
 
-        If standalone Then
-            setTrueText(traceName + " has no output when run standalone.")
+        If standaloneTest() Then
+            setTrueText(traceName + " has no output when run standaloneTest().")
             Exit Sub
         End If
 

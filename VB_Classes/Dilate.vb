@@ -9,7 +9,7 @@ Public Class Dilate_Basics : Inherits VB_Algorithm
 
         If options.noshape Or options.iterations = 0 Then dst2 = src Else dst2 = src.Dilate(options.element, Nothing, options.iterations)
 
-        If standalone Then
+        If standaloneTest() Then
             dst3 = task.depthRGB.Dilate(options.element, Nothing, options.iterations)
             labels(3) = "Dilated Depth " + CStr(options.iterations) + " times"
         End If

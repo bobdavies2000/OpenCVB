@@ -157,8 +157,8 @@ Public Class Image_CellStats : Inherits VB_Algorithm
     Dim images As New Image_RedCloudColor
     Dim stats As New Cell_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         redOptions.UseColor.Checked = True
         desc = "Display the statistics for the selected cell"
     End Sub
@@ -195,7 +195,7 @@ Public Class Image_MSER : Inherits VB_Algorithm
     Public images As New Image_Series
     Dim core As New MSER_Detect
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
         If findfrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Load the next image")

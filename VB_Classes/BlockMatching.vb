@@ -4,7 +4,7 @@ Public Class BlockMatching_Basics : Inherits VB_Algorithm
     Dim colorizer As New Depth_Colorizer_CPP
     Dim options As New Options_BlockMatching
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels(2) = "Block matching disparity colorized like depth"
         labels(3) = "Right Image (used with left image)"
         vbAddAdvice(traceName + ": click 'Show All' to see all the available options.")

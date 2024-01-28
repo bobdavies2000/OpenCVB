@@ -6,7 +6,7 @@ Public Class Cell_Basics : Inherits VB_Algorithm
     Dim eq As New Plane_Equation
     Public runRedCloud As Boolean
     Public Sub New()
-        If standalone Then gOptions.HistBinSlider.Value = 20
+        If standaloneTest() Then gOptions.HistBinSlider.Value = 20
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString(src As cv.Mat)
@@ -57,12 +57,11 @@ Public Class Cell_Basics : Inherits VB_Algorithm
         End If
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Or runRedCloud Then
+        If standaloneTest() Or runRedCloud Then
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            setSelectedCell(redC.redCells, redC.cellMap)
         End If
         If task.heartBeat Then statsString(src)
 
@@ -122,7 +121,7 @@ Public Class Cell_Stable : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public rcUnstableList As New List(Of rcData)
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Use maxDStable to identify stable cells - cells which were NOT present in the previous generation."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -174,7 +173,7 @@ Public Class Cell_StableMax : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Highligh cells that were present the max number of match counts."
@@ -208,7 +207,7 @@ End Class
 Public Class Cell_StableColors : Inherits VB_Algorithm
     Dim stable As New Cell_StableMax
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         redOptions.UseColor.Checked = True
         desc = "Identify cells using only color and find the cells that are stable."
     End Sub
@@ -407,8 +406,8 @@ Public Class Cell_Distance : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public cellMap As cv.Mat
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels = {"", "Depth distance to selected cell", "", "Color distance to selected cell"}
@@ -455,8 +454,8 @@ End Class
 Public Class Cell_Binarize : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels = {"", "Binarized image", "", "Relative gray image"}

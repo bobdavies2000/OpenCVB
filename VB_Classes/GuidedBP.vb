@@ -60,8 +60,8 @@ Public Class GuidedBP_CellHistograms : Inherits VB_Algorithm
     Dim mats As New Mat_4Click
     Dim plot As New Plot_Histogram
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         plot.createHistogram = True
         mats.mats.lineSeparators = False
 
@@ -135,7 +135,7 @@ End Class
 Public Class GuidedBP_Cells : Inherits VB_Algorithm
     Dim gpbWare As New GuidedBP_Hulls
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "", "Output of GuidedBP_Hulls", "Ranges for the point cloud data"}
         desc = "Display ranges for X, Y, and Z for the selected KWhere cell."
     End Sub
@@ -522,7 +522,7 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
 
         cv.Cv2.CalcBackProject({src}, redOptions.channels, hist.histogram, dst2, redOptions.ranges)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        If standalone Or showIntermediate() Then
+        If standaloneTest() Then
             labels(3) = "Note that colors are shifting because this is before RedCloud matching."
             dst2 += 1
             dst2.SetTo(0, task.noDepthMask)

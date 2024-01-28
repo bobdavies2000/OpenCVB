@@ -55,7 +55,7 @@ Public Class Options_Blob : Inherits VB_Algorithm
     Public blobParams = New cv.SimpleBlobDetector.Params
     Public Sub New()
         blobDetector = New CS_Classes.Blob_Basics
-        If standalone Then blob.updateFrequency = 30
+        If standaloneTest() Then blob.updateFrequency = 30
 
         If radio.Setup(traceName) Then
             radio.addRadio("FilterByArea")
@@ -650,7 +650,7 @@ Public Class Options_SVM2 : Inherits VB_Algorithm
                 Exit For
             End If
         Next
-        If standalone Then setTrueText(traceName + " has no output when run standalone." + vbCrLf + "It is used to setup more SVM options.")
+        If standaloneTest() Then setTrueText(traceName + " has no output when run standaloneTest()." + vbCrLf + "It is used to setup more SVM options.")
     End Sub
 End Class
 
@@ -2740,7 +2740,7 @@ Public Class Options_Threshold_Adaptive : Inherits VB_Algorithm
             sliders.setupTrackBar("Constant subtracted from mean Or weighted mean", -20, 20, 0)
         End If
 
-        If standalone = False Then
+        If standaloneTest() = False Then
             findRadio("ToZero").Enabled = False
             findRadio("ToZero Inverse").Enabled = False
             findRadio("Triangle - use maxVal slider to see impact").Enabled = False
@@ -3378,8 +3378,8 @@ Public Class Options_WarpModel2 : Inherits VB_Algorithm
         desc = "Additional WarpModel options - needed an additional radio button set."
     End Sub
     Public Sub RunVB()
-        If standalone Then
-            setTrueText("Options for the WarpModel algorithms.  No output when run standalone.")
+        If standaloneTest() Then
+            setTrueText("Options for the WarpModel algorithms.  No output when run standaloneTest().")
             Exit Sub
         End If
 

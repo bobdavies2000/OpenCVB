@@ -7,7 +7,7 @@ Public Class Volume_Basics : Inherits VB_Algorithm
         desc = "Build a box containing all the 3D points of a RedCloud cell"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             redC.Run(src)
             dst2 = redC.dst2
             rc = task.rc

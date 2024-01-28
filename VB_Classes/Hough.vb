@@ -15,7 +15,7 @@ Public Class Hough_Basics : Inherits VB_Algorithm
         segments = cv.Cv2.HoughLines(edges.dst2, options.rho, options.theta, options.threshold)
         labels(2) = "Found " + CStr(segments.Length) + " Lines"
 
-        If standalone Then
+        If standaloneTest() Then
             src.CopyTo(dst2)
             dst2.SetTo(cv.Scalar.White, edges.dst2)
             src.CopyTo(dst3)
@@ -194,7 +194,7 @@ Public Class Hough_FeatureLessTopX : Inherits VB_Algorithm
     Public maskFeat As cv.Mat
     Public maskPredict As cv.Mat
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         gOptions.GridSize.Value = 10
         maskFless = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         maskFeat = New cv.Mat(dst2.Size, cv.MatType.CV_8U)

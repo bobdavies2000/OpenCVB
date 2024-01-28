@@ -24,7 +24,7 @@ Public Class Reduction_Basics : Inherits VB_Algorithm
             labels(2) = "No reduction requested"
         End If
 
-        If standalone Or showIntermediate() Then dst3 = vbPalette(dst2 * 255 / classCount)
+        If standaloneTest() Then dst3 = vbPalette(dst2 * 255 / classCount)
         labels(2) = CStr(classCount) + " colors after reduction"
     End Sub
 End Class
@@ -46,7 +46,7 @@ Public Class Reduction_Floodfill : Inherits VB_Algorithm
         reduction.Run(src)
         dst2 = vbPalette(reduction.dst2 * 255 / reduction.classCount)
         redC.Run(reduction.dst2)
-        If standalone Or showIntermediate() Then identifyCells(redC.redCells)
+        If standaloneTest() Then identifyCells(redC.redCells)
         dst3 = redC.dst2
         labels(3) = redC.labels(3)
     End Sub
@@ -224,11 +224,11 @@ Public Class Reduction_BGR : Inherits VB_Algorithm
 
         For i = 0 To 2
             reduction.Run(split(i))
-            If standalone Then mats.mat(i) = vbPalette(reduction.dst2 * 255 / reduction.classCount)
+            If standaloneTest() Then mats.mat(i) = vbPalette(reduction.dst2 * 255 / reduction.classCount)
             split(0) = reduction.dst2.Clone
         Next
 
-        If standalone Then
+        If standaloneTest() Then
             mats.mat(3) = (mats.mat(0) + mats.mat(1) + mats.mat(2))
             mats.Run(empty)
             dst3 = mats.dst2

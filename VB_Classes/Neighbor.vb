@@ -6,11 +6,11 @@ Public Class Neighbor_Basics : Inherits VB_Algorithm
     Public redCells As List(Of rcData)
     Public Sub New()
         cPtr = Neighbor_Map_Open()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Find all the neighbors in a RedCloud cellmap"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
@@ -39,7 +39,7 @@ Public Class Neighbor_Basics : Inherits VB_Algorithm
             Next
             nabList(0).Clear()
 
-            If task.heartBeat And standalone Then
+            If task.heartBeat And standaloneTest() Then
                 stats.Run(task.color)
 
                 strOut = stats.strOut
@@ -77,7 +77,7 @@ Public Class Neighbor_Corners : Inherits VB_Algorithm
         desc = "Find the corner points where multiple cells intersect."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Or src.Type <> cv.MatType.CV_8U Then
+        If standaloneTest() Or src.Type <> cv.MatType.CV_8U Then
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
@@ -112,7 +112,7 @@ Public Class Neighbor_Corners : Inherits VB_Algorithm
             nPoints.Add(pt)
         Next
 
-        If standalone Then
+        If standaloneTest() Then
             dst3 = task.color.Clone
             For Each pt In nPoints
                 dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
@@ -135,7 +135,7 @@ Public Class Neighbor_ImageEdges : Inherits VB_Algorithm
         desc = "Find the cell boundaries at the edge of the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2

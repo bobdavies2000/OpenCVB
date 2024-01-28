@@ -3,7 +3,7 @@ Public Class Extrinsics_Basics : Inherits VB_Algorithm
     Dim addw As New AddWeighted_Basics
     Dim match As New Match_Basics
     Public Sub New()
-        If standalone Then gOptions.dotSizeSlider.Value = 5
+        If standaloneTest() Then gOptions.dotSizeSlider.Value = 5
         desc = "MatchShapes: Show the alignment of the BGR image to the left and right camera images."
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -20,7 +20,7 @@ Public Class Extrinsics_Basics : Inherits VB_Algorithm
         End If
 
         Dim pt = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        If standalone Then
+        If standaloneTest() Then
             dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
             dst3.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
             dst2.Circle(pt, task.dotSize - 2, cv.Scalar.Black, -1, task.lineType)

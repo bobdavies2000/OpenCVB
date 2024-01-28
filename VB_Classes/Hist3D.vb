@@ -48,7 +48,7 @@ Public Class Hist3D_BuildHistogram : Inherits VB_Algorithm
         desc = "Build a guided 3D histogram from the 3D histogram supplied in src."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             gOptions.HistBinSlider.Value = 100
             Static plot As New Histogram_Depth
             plot.Run(src)
@@ -140,7 +140,7 @@ Public Class Hist3D_RedColor : Inherits VB_Algorithm
         If redC.redCells.Count > 0 Then
             dst2(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
         End If
-        If standalone Or showIntermediate() Then identifyCells(redC.redCells)
+        If standaloneTest() Then identifyCells(redC.redCells)
     End Sub
 End Class
 
@@ -157,7 +157,7 @@ Public Class Hist3D_DepthWithMask : Inherits VB_Algorithm
         desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Or showIntermediate() Then
+        If standaloneTest() Then
             Static fore As New Foreground_KMeans2
             fore.Run(src)
             depthMask = fore.dst2 Or task.noDepthMask

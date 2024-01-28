@@ -10,7 +10,7 @@ Public Class FPoly_Basics : Inherits VB_Algorithm
     Public Sub New()
         findSlider("Feature Sample Size").Value = 30
         If dst2.Width >= 640 Then findSlider("Resync if feature moves > X pixels").Value = 15
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
                   "Ordered Feature polygons of best features - white is original, yellow latest"}
         desc = "Build a Feature polygon with the top generation counts of the good features"
@@ -136,7 +136,7 @@ Public Class FPoly_Sides : Inherits VB_Algorithm
         If firstPass Then prevImage = src.Clone
         Options.RunVB()
 
-        If standalone And task.heartBeat Then
+        If standaloneTest() And task.heartBeat Then
             Static random As New Random_Basics
             random.Run(empty)
             currPoly = New List(Of cv.Point2f)(random.pointList)
@@ -247,7 +247,7 @@ Public Class FPoly_BasicsOriginal : Inherits VB_Algorithm
         center = New FPoly_Center ' FPoly_PerpendicularsTest can be used to test the perpendicular method of finding the rotate center.
         findSlider("Feature Sample Size").Value = 30
         If dst2.Width >= 640 Then findSlider("Resync if feature moves > X pixels").Value = 15
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
                   "Ordered Feature polygons of best features - white is original, yellow latest"}
         desc = "Build a Feature polygon with the top generation counts of the good features"
@@ -460,7 +460,7 @@ End Class
 Public Class FPoly_Stablizer : Inherits VB_Algorithm
     Public fGrid As New FPoly_Core
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "Movement amount - dot is current anchor point", "SyncImage aligned to current image - slide camera left or right",
                   "current image with distance map"}
         desc = "Feature Grid: show the accumulated camera movement in X and Y (no rotation)"
@@ -507,7 +507,7 @@ Public Class FPoly_StartPoints : Inherits VB_Algorithm
     Dim fGrid As New FPoly_Core
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 255)
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Track the feature grid points back to the last sync point"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -525,7 +525,7 @@ Public Class FPoly_StartPoints : Inherits VB_Algorithm
         End If
 
         dst0.SetTo(255)
-        If standalone Then dst1.SetTo(0)
+        If standaloneTest() Then dst1.SetTo(0)
         Dim mpList As New List(Of linePoints)
         goodPoints = New List(Of cv.Point2f)(fGrid.goodPoints)
         Dim facet As New List(Of cv.Point)
@@ -538,7 +538,7 @@ Public Class FPoly_StartPoints : Inherits VB_Algorithm
                 usedGood.Add(startPoint)
                 facet = facets(startPoint)
                 dst0.FillConvexPoly(facet, startPoint, cv.LineTypes.Link4)
-                If standalone Then dst1.FillConvexPoly(facet, task.scalarColors(startPoint), task.lineType)
+                If standaloneTest() Then dst1.FillConvexPoly(facet, task.scalarColors(startPoint), task.lineType)
                 mpList.Add(New linePoints(startPoints(startPoint), pt))
             End If
         Next
@@ -702,7 +702,7 @@ Public Class FPoly_RotatePoints : Inherits VB_Algorithm
         Return New cv.Point2f(totalX, totalY)
     End Function
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             setTrueText(traceName + " is meant only to run with FPoly_Basics to validate the translation")
             Exit Sub
         End If
@@ -744,7 +744,7 @@ Public Class FPoly_WarpAffineImage : Inherits VB_Algorithm
     Dim warp As New WarpAffine_BasicsQT
     Dim fPoly As New FPoly_BasicsOriginal
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Use OpenCV's WarpAffine to rotate and translate the starting image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -810,8 +810,8 @@ Public Class FPoly_Perpendiculars : Inherits VB_Algorithm
         Return angle
     End Function
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
-            setTrueText("There is no output for the " + traceName + " algorithm when run standalone.  Use FPoly_")
+        If standaloneTest() Then
+            setTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use FPoly_")
             Exit Sub
         End If
 
@@ -869,7 +869,7 @@ Public Class FPoly_PerpendicularsTest : Inherits VB_Algorithm
     Dim fPoly As New FPoly_BasicsOriginal
     Public Sub New()
         fPoly.center = center
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Test the perpendicular method of finding the rotate center of the Feature Polygon"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -892,7 +892,7 @@ Public Class FPoly_PerpendicularsImage : Inherits VB_Algorithm
     Dim fImage As New FPoly_Image
     Public Sub New()
         fImage.fpoly.center = center
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Rotate the image using the perpendicular method of finding the rotate center"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -916,7 +916,7 @@ Public Class FPoly_Image : Inherits VB_Algorithm
     Dim rotate As New Rotate_BasicsQT
     Public resync As Boolean
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
                   "Resync Image after rotation and translation", "Difference between current image and dst2"}
         desc = "Rotate and shift the image as indicated by FPoly_Basics"
@@ -991,7 +991,7 @@ End Class
 Public Class FPoly_ImageMask : Inherits VB_Algorithm
     Public fImage As New FPoly_Image
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         gOptions.PixelDiffThreshold.Value = 10
         desc = "Build the image mask of the differences between the current frame and resync image"
     End Sub
@@ -1016,7 +1016,7 @@ Public Class FPoly_PointCloud : Inherits VB_Algorithm
     Public fMask As New FPoly_ImageMask
     Public fPolyCloud As cv.Mat
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Update changed point cloud pixels as indicated by the FPoly_ImageMask"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1078,16 +1078,16 @@ Public Class FPoly_Center : Inherits VB_Algorithm
     Public fPD As fPolyData
     Dim newPoly As List(Of cv.Point2f)
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "Layout of feature polygons after just translation - red line is used in sine computation",
                       "Layout of the starting (white) and current (yellow) feature polygons",
                       "Layout of feature polygons after rotation and translation"}
         desc = "Manually rotate and translate the current feature polygon to a previous feature polygon."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             setTrueText(traceName + " is called by FPoly_Basics to get the rotate center and angle." + vbCrLf +
-                        "It does not produce any output when run standalone.")
+                        "It does not produce any output when run standaloneTest().")
             Exit Sub
         End If
 
@@ -1174,7 +1174,7 @@ Public Class FPoly_EdgeRemoval : Inherits VB_Algorithm
     Dim fMask As New FPoly_ImageMask
     Dim edges As New Edge_All
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Remove edges from the FPoly_ImageMask"
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -1206,7 +1206,7 @@ Public Class FPoly_ImageNew : Inherits VB_Algorithm
     Dim rotate As New Rotate_BasicsQT
     Public resync As Boolean
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
                   "Resync Image after rotation and translation", "Difference between current image and dst2"}
         desc = "Rotate and shift the image as indicated by FPoly_Basics"
@@ -1274,8 +1274,8 @@ Public Class FPoly_LeftRight : Inherits VB_Algorithm
     Dim leftPoly As New FPoly_Basics
     Dim rightPoly As New FPoly_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"Left image", "Right image", "FPoly output for left image", "FPoly output for right image"}
         desc = "Measure camera motion through the left and right images using FPoly"
     End Sub

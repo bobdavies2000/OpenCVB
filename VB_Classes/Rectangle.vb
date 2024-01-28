@@ -70,7 +70,7 @@ Public Class Rectangle_Overlap : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Static typeCheckBox = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
         If task.heartBeat = False Then Exit Sub
-        If standalone Then
+        If standaloneTest() Then
             draw.Run(src)
             dst2 = draw.dst2
         End If
@@ -138,7 +138,7 @@ Public Class Rectangle_Intersection : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Static mergeSlider = findSlider("Merge rectangles within X pixels")
 
-        If standalone Then
+        If standaloneTest() Then
             If task.heartBeat Then
                 Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
                 Static countSlider = findSlider("DrawCount")
@@ -199,7 +199,7 @@ Public Class Rectangle_Union : Inherits VB_Algorithm
         desc = "Create a rectangle that contains all the input rectangles"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static countSlider = findSlider("DrawCount")
             Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             rotatedCheck.Enabled = False
@@ -250,7 +250,7 @@ Public Class Rectangle_MultiOverlap : Inherits VB_Algorithm
         desc = "Given a group of rectangles, merge all the rectangles that overlap"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             Static countSlider = findSlider("DrawCount")
             rotatedCheck.Enabled = False
@@ -283,7 +283,7 @@ Public Class Rectangle_MultiOverlap : Inherits VB_Algorithm
             If unionAdded = False Then Exit Do
         Loop
         outputRects = inputRects
-        If standalone Then
+        If standaloneTest() Then
             dst3.SetTo(0)
             For Each r In outputRects
                 dst3.Rectangle(r, cv.Scalar.Yellow, 2)
@@ -308,7 +308,7 @@ Public Class Rectangle_EnclosingPoints : Inherits VB_Algorithm
         desc = "Build an enclosing rectangle for the supplied pointlist"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             pointList = quickRandomPoints(20)
             dst2.SetTo(0)
             For Each pt In pointList

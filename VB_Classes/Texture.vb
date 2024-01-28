@@ -12,7 +12,7 @@ Public Class Texture_Basics : Inherits VB_Algorithm
         desc = "find the best sample 256x256 texture of a mask"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone Or src.Channels <> 1 Then
+        If standaloneTest() Or src.Channels <> 1 Then
             ellipse.Run(src)
             dst2 = ellipse.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst2 = dst2.ConvertScaleAbs(255)
@@ -32,12 +32,12 @@ Public Class Texture_Basics : Inherits VB_Algorithm
             For Each roi In task.gridList
                 sortcounts.Add(dst2(roi).CountNonZero, roi)
             Next
-            If standalone Then dst3.Rectangle(sortcounts.ElementAt(0).Value, cv.Scalar.White, 2)
+            If standaloneTest() Then dst3.Rectangle(sortcounts.ElementAt(0).Value, cv.Scalar.White, 2)
             tRect = sortcounts.ElementAt(0).Value
             texture = task.color(tRect)
             texturePop = dst2(tRect).CountNonZero
         End If
-        If standalone Then dst3.Rectangle(tRect, cv.Scalar.White, 2)
+        If standaloneTest() Then dst3.Rectangle(tRect, cv.Scalar.White, 2)
     End Sub
 End Class
 
@@ -134,7 +134,7 @@ Public Class OpenGL_TextureShuffle : Inherits VB_Algorithm
         desc = "Use random shuffling to homogenize a texture sample of what the floor looks like."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             If dst2.Width = 320 Then
                 setTrueText("Texture_Shuffle is not supported at the 320x240 resolution.  It needs at least 256 rows in the output.")
                 Exit Sub

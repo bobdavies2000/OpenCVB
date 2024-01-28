@@ -61,7 +61,7 @@ Public Class Grid_Basics : Inherits VB_Algorithm
             Next
 
         End If
-        If standalone Then
+        If standaloneTest() Then
             dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U)
             task.color.CopyTo(dst2)
             dst2.SetTo(cv.Scalar.White, task.gridMask)
@@ -79,7 +79,7 @@ End Class
 Public Class Grid_BasicsTest : Inherits VB_Algorithm
     Public Sub New()
         labels = {"", "", "Each grid element is assigned a value below", "The line is the diagonal for each roi.  Bottom might be a shortened roi."}
-        If standalone Then desc = "Validation test for Grid_Basics algorithm"
+        If standaloneTest() Then desc = "Validation test for Grid_Basics algorithm"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim mean = cv.Cv2.Mean(src)
@@ -118,7 +118,7 @@ End Class
 Public Class Grid_List : Inherits VB_Algorithm
     Public Sub New()
         labels(2) = "Adjust grid width/height to increase thread count."
-        If standalone Then desc = "List the active threads"
+        If standaloneTest() Then desc = "List the active threads"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Parallel.ForEach(Of cv.Rect)(task.gridList,
@@ -162,7 +162,7 @@ Public Class Grid_Rectangles : Inherits VB_Algorithm
 
         task.gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         task.gridToRoiIndex = New cv.Mat(dst2.Size(), cv.MatType.CV_32S)
-        If standalone Then desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For"
+        If standaloneTest() Then desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static widthSlider = findSlider("Grid Cell Width")
@@ -201,7 +201,7 @@ Public Class Grid_Rectangles : Inherits VB_Algorithm
                 task.gridToRoiIndex.Rectangle(roi, i, -1)
             Next
         End If
-        If standalone Then
+        If standaloneTest() Then
             task.color.CopyTo(dst2)
             dst2.SetTo(cv.Scalar.White, task.gridMask)
             labels(2) = "Grid_Basics " + CStr(task.gridList.Count) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
@@ -221,7 +221,7 @@ End Class
 Public Class Grid_TrackCenter : Inherits VB_Algorithm
     Dim match As New Match_Basics
     Public Sub New()
-        If standalone Then gOptions.GridSize.Value = dst2.Width / 10
+        If standaloneTest() Then gOptions.GridSize.Value = dst2.Width / 10
         desc = "Track a cell near the center of the grid"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -271,7 +271,7 @@ Public Class Grid_FPS : Inherits VB_Algorithm
         If heartBeat Then
             saveSkip = skipCount
             skipCount = 0
-            If standalone Then dst2 = src
+            If standaloneTest() Then dst2 = src
         Else
             skipCount += 1
         End If
@@ -298,7 +298,7 @@ Public Class Grid_Neighbors : Inherits VB_Algorithm
         End If
 
         dst2 = src
-        If standalone Then
+        If standaloneTest() Then
             If task.heartBeat Then
                 task.mouseClickFlag = True
                 task.clickPoint = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -392,7 +392,7 @@ Public Class Grid_Special : Inherits VB_Algorithm
             Next
 
         End If
-        If standalone Then
+        If standaloneTest() Then
             task.color.CopyTo(dst2)
             dst2.SetTo(cv.Scalar.White, gridMask)
             labels(2) = "Grid_Basics " + CStr(gridList.Count) + " (" + CStr(gridRows) + "X" + CStr(gridCols) + ") " +

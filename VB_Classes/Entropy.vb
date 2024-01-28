@@ -9,7 +9,7 @@ Public Class Entropy_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         entropy.Run(src)
 
-        If standalone Then
+        If standaloneTest() Then
             If task.heartBeat Then strOut = "More histogram bins means higher entropy values" + vbCrLf + vbCrLf + "Total entropy = " + Format(entropy.entropyVal, fmt1) + vbCrLf + entropy.entropyChannels
             setTrueText(strout, 2)
         End If
@@ -26,7 +26,7 @@ Public Class Entropy_Highest : Inherits VB_Algorithm
     Public eMaxRect As cv.Rect
     Dim addw As New AddWeighted_Basics
     Public Sub New()
-        If standalone Then gOptions.GridSize.Value = dst2.Width / 10
+        If standaloneTest() Then gOptions.GridSize.Value = dst2.Width / 10
         labels(2) = "Highest entropy marked with red rectangle"
         desc = "Find the highest entropy section of the color image."
     End Sub
@@ -44,7 +44,7 @@ Public Class Entropy_Highest : Inherits VB_Algorithm
                 eMaxRect = roi
             End If
             If entropy.entropyVal < minEntropy Then minEntropy = entropy.entropyVal
-            If standalone Then
+            If standaloneTest() Then
                 Dim pt = New cv.Point(roi.X, roi.Y)
                 setTrueText(Format(entropy.entropyVal, fmt2), pt, 2)
             End If
@@ -56,7 +56,7 @@ Public Class Entropy_Highest : Inherits VB_Algorithm
         addw.Run(dst2)
         dst2 = addw.dst2
 
-        If standalone Then dst2.Rectangle(eMaxRect, task.highlightColor, task.lineWidth)
+        If standaloneTest() Then dst2.Rectangle(eMaxRect, task.highlightColor, task.lineWidth)
         labels(2) = "Lighter = higher entropy. Range: " + Format(minEntropy, "0.0") + " to " + Format(maxEntropy, "0.0")
     End Sub
 End Class
@@ -94,7 +94,7 @@ Public Class Entropy_DrawRect : Inherits VB_Algorithm
     Public entropyChannels As String = ""
     Public Sub New()
         task.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
-        desc = "Calculate the entropy in the drawRect when run standalone"
+        desc = "Calculate the entropy in the drawRect when run standaloneTest()"
     End Sub
     Public Function channelEntropy(total As Integer, hist As cv.Mat) As Single
         channelEntropy = 0
@@ -109,7 +109,7 @@ Public Class Entropy_DrawRect : Inherits VB_Algorithm
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255)}
 
         entropyVal = 0
-        Dim input = If(standalone, src(task.drawRect), src)
+        Dim input = If(standaloneTest(), src(task.drawRect), src)
         entropyChannels = ""
         For i = 0 To input.Channels - 1
             Dim hist As New cv.Mat
@@ -121,7 +121,7 @@ Public Class Entropy_DrawRect : Inherits VB_Algorithm
             entropyChannels += "Entropy X1000 for " + Choose(i + 1, "Red", "Green", "Blue") + " " + Format(nextEntropy * 1000, fmt1) + vbCrLf
             entropyVal += nextEntropy * 1000
         Next
-        If standalone Then
+        If standaloneTest() Then
             dst2 = src
             setTrueText(entropyChannels, 3)
         End If

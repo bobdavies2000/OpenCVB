@@ -28,7 +28,7 @@ Public Class Gabor_Basics : Inherits VB_Algorithm
         Static gammaSlider = findSlider("Gabor gamma X10")
         Static phaseSlider = findSlider("Gabor Phase offset X100")
         Static thetaSlider = findSlider("Gabor Theta (degrees)")
-        If standalone Then
+        If standaloneTest() Then
             ksize = ksizeSlider.Value * 2 + 1
             Sigma = sigmaSlider.Value
             lambda = lambdaSlider.Value

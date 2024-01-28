@@ -12,8 +12,8 @@ Public Class OpAuto_XRange : Inherits VB_Algorithm
 
         Dim diff = Math.Abs(expectedCount - adjustedCount)
 
-        ' the input is a histogram.  If standalone, go get one...
-        If standalone Then
+        ' the input is a histogram.  If standaloneTest(), go get one...
+        If standaloneTest() Then
             cv.Cv2.CalcHist({task.pointCloud}, task.channelsTop, New cv.Mat, histogram, 2, task.bins2D, task.rangesTop)
             histogram.Row(0).SetTo(0)
             dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
@@ -61,8 +61,8 @@ Public Class OpAuto_YRange : Inherits VB_Algorithm
 
         Dim diff = Math.Abs(expectedCount - adjustedCount)
 
-        ' the input is a histogram.  If standalone, go get one...
-        If standalone Then
+        ' the input is a histogram.  If standaloneTest(), go get one...
+        If standaloneTest() Then
             cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
             histogram.Col(0).SetTo(0)
             dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
@@ -156,7 +156,7 @@ Public Class OpAuto_Valley : Inherits VB_Algorithm
     Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public options As New Options_Boundary
     Public Sub New()
-        If standalone Then gOptions.HistBinSlider.Value = 256
+        If standaloneTest() Then gOptions.HistBinSlider.Value = 256
         desc = "Get the top X highest quality valley points in the histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -164,7 +164,7 @@ Public Class OpAuto_Valley : Inherits VB_Algorithm
         Dim desiredBoundaries = options.desiredBoundaries
 
         ' input should be a histogram.  If not, get one...
-        If standalone Then
+        If standaloneTest() Then
             Static kalmanHist As New Histogram_Kalman
             kalmanHist.Run(src)
             dst2 = kalmanHist.dst2
@@ -201,7 +201,7 @@ Public Class OpAuto_Valley : Inherits VB_Algorithm
             valleyOrder.Add(valleys(desiredBoundaries - 1), 256)
         End If
 
-        If standalone Then
+        If standaloneTest() Then
             For Each entry In valleyOrder
                 Dim col = entry.Value * dst2.Width / task.histogramBins
                 dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White, task.lineWidth)
@@ -219,7 +219,7 @@ Public Class OpAuto_Peaks2D : Inherits VB_Algorithm
     Public options As New Options_Boundary
     Public clusterPoints As New List(Of cv.Point2f)
     Public Sub New()
-        If standalone Then gOptions.HistBinSlider.Value = 256
+        If standaloneTest() Then gOptions.HistBinSlider.Value = 256
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub
@@ -228,8 +228,8 @@ Public Class OpAuto_Peaks2D : Inherits VB_Algorithm
         Dim desiredBoundaries = options.desiredBoundaries
         Dim peakDistance = options.peakDistance
 
-        ' input should be a 2D histogram.  If standalone, get one...
-        If standalone Then
+        ' input should be a 2D histogram.  If standaloneTest(), get one...
+        If standaloneTest() Then
             Static heatmap As New HeatMap_Basics
             heatmap.Run(src)
             dst2 = If(task.toggleOn, heatmap.dst2, heatmap.dst3)
@@ -244,7 +244,7 @@ Public Class OpAuto_Peaks2D : Inherits VB_Algorithm
             src.Circle(mm.maxLoc, peakDistance, 0, -1, task.lineType)
         Next
 
-        If Not standalone Then dst2.SetTo(0)
+        If Not standaloneTest() Then dst2.SetTo(0)
         For i = 0 To clusterPoints.Count - 1
             Dim pt = clusterPoints(i)
             dst2.Circle(pt, task.dotSize * 3, cv.Scalar.White, -1, task.lineType)
@@ -260,7 +260,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits VB_Algorithm
     Public clusterPoints As New List(Of cv.Point2f)
     Dim options As New Options_Boundary
     Public Sub New()
-        If standalone Then gOptions.HistBinSlider.Value = 256
+        If standaloneTest() Then gOptions.HistBinSlider.Value = 256
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub
@@ -268,8 +268,8 @@ Public Class OpAuto_Peaks2DGrid : Inherits VB_Algorithm
         Static boundarySlider = findSlider("Desired boundary count")
         Dim desiredBoundaries = boundarySlider.value
 
-        ' input should be a 2D histogram.  If standalone or src is not a histogram, get one...
-        If standalone Or src.Type = cv.MatType.CV_8UC3 Then
+        ' input should be a 2D histogram.  If standaloneTest() or src is not a histogram, get one...
+        If standaloneTest() Or src.Type = cv.MatType.CV_8UC3 Then
             Static hist2d As New Histogram2D_Basics
             hist2d.Run(src)
             src = hist2d.histogram
@@ -290,7 +290,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits VB_Algorithm
             If desiredBoundaries <= clusterPoints.Count Then Exit For
         Next
 
-        If Not standalone Then dst2.SetTo(0)
+        If Not standaloneTest() Then dst2.SetTo(0)
         For i = 0 To clusterPoints.Count - 1
             Dim pt = clusterPoints(i)
             dst2.Circle(pt, task.dotSize * 3, cv.Scalar.White, -1, task.lineType)
@@ -319,7 +319,7 @@ Public Class OpAuto_PixelDifference : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.heartBeat = False And task.frameCount > 10 Then Exit Sub
-        If standalone Then
+        If standaloneTest() Then
             Static diff As New Diff_Basics
             diff.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             src = diff.dst3
@@ -349,13 +349,13 @@ Public Class OpAuto_MSER : Inherits VB_Algorithm
     Dim mBase As New MSER_Basics
     Public classCount As Integer
     Public Sub New()
-        If standalone Then mBase.useOpAuto = False
+        If standaloneTest() Then mBase.useOpAuto = False
         desc = "Option Automation: find the best MSER max and min area values"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static minSlider = findSlider("MSER Min Area")
         Static maxSlider = findSlider("MSER Max Area")
-        If standalone Then
+        If standaloneTest() Then
             mBase.Run(src)
             src = mBase.dst3
             classCount = mBase.mserCells.Count

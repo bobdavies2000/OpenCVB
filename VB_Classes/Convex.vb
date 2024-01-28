@@ -22,7 +22,7 @@ Public Class Convex_Basics : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src As cv.Mat)
         Dim hullList = task.rc.contour
-        If standalone Then
+        If standaloneTest() Then
             If task.heartBeat = False Then Exit Sub
             hullList = buildRandomHullPoints()
         End If
@@ -114,7 +114,7 @@ Public Class Convex_RedCloudDefects : Inherits VB_Algorithm
     Dim convex As New Convex_RedCloud
     Dim contours As New Contour_Largest
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "", "Hull outline in green, lines show defects.", "Output of RedCloud_Basics"}
         desc = "Find the convexityDefects in the selected RedCloud cell"
     End Sub

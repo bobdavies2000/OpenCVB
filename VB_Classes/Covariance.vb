@@ -9,7 +9,7 @@ Public Class Covariance_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         dst3.SetTo(0)
-        If standalone Then
+        If standaloneTest() Then
             random.Run(empty)
             src = New cv.Mat(random.PointList.Count, 2, cv.MatType.CV_32F, random.PointList.ToArray)
             For i = 0 To random.PointList.Count - 1
@@ -32,7 +32,7 @@ Public Class Covariance_Basics : Inherits VB_Algorithm
         Dim center = New cv.Point2f(overallMean(0), overallMean(1))
         strOut += "Mean (img1, img2) = (" + Format(center.X, fmt0) + ", " + Format(center.Y, fmt0) + ")" + vbCrLf
 
-        If standalone Then
+        If standaloneTest() Then
             Static lastCenter As cv.Point2f = center
             dst3.Circle(center, 5, cv.Scalar.Red, -1, task.lineType)
             dst3.Circle(lastCenter, 5, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)

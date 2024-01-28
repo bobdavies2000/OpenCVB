@@ -82,13 +82,13 @@ Public Class Vignetting_Removal : Inherits VB_Algorithm
         desc = "Demonstrate devignetting"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone And defaultImage Is Nothing Then
+        If standaloneTest() And defaultImage Is Nothing Then
             Dim fileInfo = New FileInfo(task.homeDir + "data/nature.jpg")
             If fileInfo.Exists Then defaultImage = cv.Cv2.ImRead(fileInfo.FullName)
             defaultImage = defaultImage.Resize(dst3.Size)
             dst2 = defaultImage.Clone
         End If
-        If standalone Then basics.Run(defaultImage) Else basics.Run(src)
+        If standaloneTest() Then basics.Run(defaultImage) Else basics.Run(src)
         dst3 = basics.dst2
     End Sub
 End Class

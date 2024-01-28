@@ -3,8 +3,8 @@ Imports  System.IO
 Public Class LaneFinder_Basics : Inherits VB_Algorithm
     Dim lane As New LaneFinder_SlopeIntercept
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "The basics of lane-finding.  A better name than LaneFinder_SlopeIntercept"
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -24,8 +24,8 @@ End Class
 Public Class LaneFinder_Videos : Inherits VB_Algorithm
     Public video As New Video_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("challenge.mp4")

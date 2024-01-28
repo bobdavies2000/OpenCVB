@@ -8,7 +8,7 @@ Public Class Contour_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst2 = src.Clone
-        If standalone Then
+        If standaloneTest() Then
             Static rotatedRect As New Rectangle_Rotated
             If task.heartBeat = False Then Exit Sub
             rotatedRect.Run(src)
@@ -61,7 +61,7 @@ Public Class Contour_BasicsWithOptions : Inherits VB_Algorithm
         options.RunVB()
 
         dst2 = src.Clone
-        If standalone Then
+        If standaloneTest() Then
 
             Static rotatedRect As New Rectangle_Rotated
             If task.heartBeat = False Then Exit Sub
@@ -334,7 +334,7 @@ Public Class Contour_Sorted : Inherits VB_Algorithm
     Dim dilate As New Dilate_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "", "Contours in the detected motion", "Diff output - detected motion"}
         gOptions.PixelDiffThreshold.Value = 25
         desc = "Display the contours from largest to smallest in the motion output"
@@ -418,11 +418,11 @@ End Class
 Public Class Contour_SelfIntersect : Inherits VB_Algorithm
     Public rc As New rcData
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Search the contour points for duplicates indicating the contour is self-intersecting."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
@@ -470,7 +470,7 @@ Public Class Contour_Largest : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        If standalone Then
+        If standaloneTest() Then
             Static rotatedRect As New Rectangle_Rotated
             If task.heartBeat Then
                 rotatedRect.Run(src)
@@ -499,7 +499,7 @@ Public Class Contour_Largest : Inherits VB_Algorithm
             End If
         Next
         bestContour = allContours(maxIndex).ToList
-        If standalone Then
+        If standaloneTest() Then
             dst3.SetTo(0)
             If maxIndex >= 0 And maxCount >= 2 Then
                 cv.Cv2.DrawContours(dst3, allContours, maxIndex, cv.Scalar.White, -1, task.lineType)
@@ -588,7 +588,7 @@ Public Class Contour_RedCloudCorners : Inherits VB_Algorithm
         desc = "Find the point farthest from the center in each cell."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
@@ -634,7 +634,7 @@ Public Class Contour_RedCloudEdges : Inherits VB_Algorithm
     Dim redC As New RedCloud_Cells
     Dim edges As New EdgeDraw_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "EdgeDraw_Basics output", "", "Pixels below are both cell boundaries and edges."}
         desc = "Intersect the cell contours and the edges in the image."
@@ -713,7 +713,7 @@ Public Class Contour_Image : Inherits VB_Algorithm
             If ctr.Length > minLengthContour Then vbDrawContour(dst3, ctr.ToList, cv.Scalar.White)
         Next
 
-        If standalone Or showIntermediate() Then
+        If standaloneTest() Then
             dst2 = vbPalette(dst2 * 255 / colorClass.classCount)
         End If
     End Sub

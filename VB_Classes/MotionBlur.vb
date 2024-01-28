@@ -7,7 +7,7 @@ Public Class MotionBlur_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
-        If standalone Then
+        If standaloneTest() Then
             Static blurSlider = findSlider("Motion Blur Length")
             Static blurAngleSlider = findSlider("Motion Blur Angle")
             blurAngleSlider.Value = If(blurAngleSlider.Value < blurAngleSlider.Maximum, blurAngleSlider.Value + 1, blurAngleSlider.Minimum)

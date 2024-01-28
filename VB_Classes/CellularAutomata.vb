@@ -60,7 +60,7 @@ Public Class CellularAutomata_Basics : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src As cv.Mat)
         Static rotateCheckBox = findCheckBox("Rotate through the different rules")
-        If standalone Then
+        If standaloneTest() Then
             input = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
             input.Set(Of Byte)(0, src.Width / 2, 1)
             If task.frameCount Mod 2 Then dst3 = createCells(combo.Box.Text) Else dst2 = createCells(combo.Box.Text)
@@ -242,7 +242,7 @@ Public Class CellularAutomata_Basics_MT : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static rotateRules = findCheckBox("Rotate through the different rules")
-        If standalone Then
+        If standaloneTest() Then
             cell.input = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
             cell.input.Set(Of Byte)(0, cell.input.Width / 2, 1)
         End If

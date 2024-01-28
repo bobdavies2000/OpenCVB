@@ -10,7 +10,7 @@ Public Class Distance_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If standalone Then src = task.depthRGB
+        If standaloneTest() Then src = task.depthRGB
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim dst0 = src.DistanceTransform(options.distanceType, 0)
@@ -34,7 +34,7 @@ Public Class Distance_Labels : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If standalone Then src = task.depthRGB
+        If standaloneTest() Then src = task.depthRGB
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         'Dim labels As cv.Mat
@@ -115,7 +115,7 @@ Public Class Distance_Point3D : Inherits VB_Algorithm
         desc = "Compute the distance in meters between 3D points in the point cloud"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standalone And task.heartBeat Then
+        If standaloneTest() And task.heartBeat Then
             inPoint1 = New cv.Point3f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, 10000))
             inPoint2 = New cv.Point3f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, 10000))
 
@@ -153,7 +153,7 @@ Public Class Distance_Point4D : Inherits VB_Algorithm
         desc = "Compute the distance between 4D points"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standaloneTest() Then
             inPoint1 = New cv.Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height),
                                     msRNG.Next(0, task.maxZmeters), msRNG.Next(0, task.maxZmeters))
             inPoint2 = New cv.Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height),
@@ -183,7 +183,7 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
     Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         redOptions.UseColor.Checked = True
         redOptions.HistBinSlider.Value = 5
         labels(1) = "3D Histogram distance for each of the cells at left"
@@ -316,7 +316,7 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
         Next
         dst2 = vbPalette(dst3 * 255 / d3Cells.Count)
 
-        If standalone Or showIntermediate() Then identifyCells(redC.redCells)
+        If standaloneTest() Then identifyCells(redC.redCells)
         labels(2) = redC.labels(3)
     End Sub
 End Class
