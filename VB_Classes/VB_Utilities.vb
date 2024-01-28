@@ -82,7 +82,7 @@ Module vbUtilities
 
         task.maxZmeters = gOptions.MaxDepth.Value
         task.metersPerPixel = task.maxZmeters / task.workingRes.Height ' meters per pixel in projections - side and top.
-        task.SyncOutput = gOptions.SyncOutput.Checked
+        task.DebugSyncUI = gOptions.DebugSyncUI.Checked
     End Sub
     Public Function GetWindowImage(ByVal WindowHandle As IntPtr, ByVal rect As cv.Rect) As Bitmap
         Dim b As New Bitmap(rect.Width, rect.Height, Imaging.PixelFormat.Format24bppRgb)

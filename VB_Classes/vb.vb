@@ -254,7 +254,7 @@ Module VB
         cv.Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType)
     End Sub
     Public Function heartBeat() As Boolean
-        If task.heartBeat Or task.SyncOutput Or task.optionsChanged Or task.mouseClickFlag Then Return True
+        If task.heartBeat Or task.DebugSyncUI Or task.optionsChanged Or task.mouseClickFlag Then Return True
         Return False
     End Function
     Public Sub quarterBeat()
