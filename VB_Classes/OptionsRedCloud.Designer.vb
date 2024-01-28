@@ -657,13 +657,13 @@ Partial Class OptionsRedCloud
         'DesiredCellSlider
         '
         Me.DesiredCellSlider.Location = New System.Drawing.Point(156, 31)
-        Me.DesiredCellSlider.Maximum = 200
+        Me.DesiredCellSlider.Maximum = 250
         Me.DesiredCellSlider.Minimum = 1
         Me.DesiredCellSlider.Name = "DesiredCellSlider"
         Me.DesiredCellSlider.Size = New System.Drawing.Size(506, 69)
         Me.DesiredCellSlider.TabIndex = 28
         Me.DesiredCellSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.DesiredCellSlider.Value = 100
+        Me.DesiredCellSlider.Value = 200
         '
         'Label5
         '

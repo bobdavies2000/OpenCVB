@@ -77,9 +77,10 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
             If newCells.Count >= 255 Then Exit For ' we are going to handle only the largest 255 cells - rest are zero.
         Next
 
-        cellMap.SetTo(99)
+        cellMap.SetTo(0)
         dst2.SetTo(0)
         redCells.Clear()
+        redCells.Add(New rcData)
         For Each rc In newCells
             rc.index = redCells.Count
             colorMap.Set(Of cv.Vec3b)(rc.index, 0, rc.color) ' <<<< switch to using colormap.
@@ -87,6 +88,11 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
             cellMap(rc.rect).SetTo(rc.index, rc.mask)
             ' dst2(rc.rect).SetTo(rc.color, rc.mask)  ' <<<< switch to using colormap.
         Next
+
+        Dim rcZero = redCells(0)
+        rcZero.mask = cellMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        rcZero.pixels = rcZero.mask.CountNonZero
+        rcZero.rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
 
         cv.Cv2.ApplyColorMap(cellMap, dst2, colorMap)  ' <<<< switch to using colormap.
         unmatched.redCells = redCells

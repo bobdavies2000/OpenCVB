@@ -39,52 +39,19 @@ End Class
 
 
 
-Public Class History_MaskCopy : Inherits VB_Algorithm
+Public Class History_MotionRect : Inherits VB_Algorithm
     Public Sub New()
-        desc = "Create a frame history that creates a mask for the current frame and copies merges it with the last X frames"
+        desc = "Create an image that is the motionRect applied to the previous image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim input = src.Clone
-        Static countFrames As Integer
-        If task.optionsChanged Or countFrames >= task.frameHistoryCount Then
-            dst2 = input
-            countFrames = 1
-        Else
-            Dim mask = input.ConvertScaleAbs()
-            input.CopyTo(dst2, mask)
-            countFrames += 1
+        If heartBeat() Or task.motionReset Then dst2 = src.Clone
+
+        If task.motionDetected Then
+            src(task.motionRect).CopyTo(dst2(task.motionRect))
         End If
-        If heartBeat() Then labels(2) = "The image below is composed from the last " + CStr(countFrames) + " frames"
-        setTrueText("The image below is composed from the last " + CStr(countFrames) + " frames", 3)
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class History_MaskCopy8U : Inherits VB_Algorithm
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Create a frame history that creates a mask for the current frame and copies merges it with the last X frames"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim input = src.Clone
-        Static countFrames As Integer
-        If task.optionsChanged Or task.frameCount Mod task.frameHistoryCount = 0 Then
-            dst2 = input
-            countFrames = 1
-        Else
-            input.CopyTo(dst2, input)
-            countFrames += 1
-            If heartBeat() Then labels(2) = "The image below is composed from the last " + CStr(countFrames) + " frames"
-        End If
-        setTrueText("The image below is composed from the last " + CStr(countFrames) + " frames", 3)
-    End Sub
-End Class
 
 
 
