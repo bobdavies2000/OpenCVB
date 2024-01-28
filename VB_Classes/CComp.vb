@@ -1,6 +1,4 @@
 Imports cv = OpenCvSharp
-Imports System.Threading
-Imports OpenCvSharp
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
 Public Class CComp_Basics : Inherits VB_Algorithm
     Public connectedComponents As Object

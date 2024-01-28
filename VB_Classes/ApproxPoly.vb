@@ -1,5 +1,4 @@
-﻿Imports OpenCvSharp
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/22132510/opencv-approxpolydp-for-edge-maps-Not-contours
 ' https://docs.opencv.org/4.x/js_contour_features_approxPolyDP.html
 Public Class ApproxPoly_Basics : Inherits VB_Algorithm

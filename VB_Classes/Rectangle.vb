@@ -1,5 +1,4 @@
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Rectangle_Basics : Inherits VB_Algorithm
     Public rectangles As New List(Of cv.Rect)
