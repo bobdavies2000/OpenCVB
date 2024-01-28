@@ -1516,21 +1516,23 @@ End Class
 
 
 
-Public Class OpenGL_StableMinMaxNone : Inherits VB_Algorithm
-    ReadOnly depth As New Depth_MinMaxNone
+Public Class OpenGL_StableMinMax : Inherits VB_Algorithm
+    ReadOnly minmax As New Depth_MinMaxNone
     Public Sub New()
+        gOptions.unFiltered.Checked = True
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         labels = {"", "", "Pointcloud Max", "Pointcloud Min"}
         desc = "display the Pointcloud Min or Max in OpenGL"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        depth.Run(task.pointCloud)
-        dst2 = depth.dst2
+        minmax.Run(task.pointCloud)
+        dst2 = minmax.dst2
 
-        If depth.options.useMax Or depth.options.useMin Then task.ogl.pointCloudInput = dst2 Else task.ogl.pointCloudInput = task.pointCloud
+        If minmax.options.useMax Or minmax.options.useMin Then task.ogl.pointCloudInput = dst2 Else task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(task.color)
+
         If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
-        labels(2) = depth.labels(2)
+        labels(2) = minmax.labels(2)
     End Sub
 End Class
 

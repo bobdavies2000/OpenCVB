@@ -851,164 +851,6 @@ End Class
 
 
 
-'Public Class Depth_StableMin : Inherits VB_Algorithm
-'    Public stableMin As cv.Mat
-'    Public motion As New Motion_Contours
-'    Dim colorize As New Depth_Colorizer_CPP
-'    Public resetAll = True
-'    Public Sub New()
-'        labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
-'        desc = "To reduce z-Jitter, use the closest depth value at each pixel as long as the camera is stable"
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
-
-'        motion.Run(task.gray)
-
-'        If task.motionReset Or resetAll Then
-'            stableMin = src.Clone
-'            resetAll = False
-'            task.motionReset = False
-'            dst3.SetTo(0)
-'        Else
-'            For Each rect In motion.intersect.enclosingRects
-'                If rect.Width And rect.Height Then src(rect).CopyTo(stableMin(rect))
-'                If src.Type <> stableMin.Type Then src.ConvertTo(src, stableMin.Type)
-'                stableMin.CopyTo(src, task.noDepthMask)
-'                cv.Cv2.Min(src, stableMin, stableMin)
-'            Next
-'        End If
-
-'        dst3 = If(motion.dst3.Channels = 1, motion.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR), motion.dst3.Clone)
-'        If motion.intersect.inputRects.Count > 0 Then
-'            If dst3.Channels = 1 Then dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-'            For Each r In motion.intersect.inputRects
-'                dst3.Rectangle(r, cv.Scalar.Yellow, 2)
-'            Next
-'            For Each rect In motion.intersect.enclosingRects
-'                dst3.Rectangle(rect, cv.Scalar.Red, 2)
-'            Next
-'        End If
-
-'        colorize.Run(stableMin)
-'        dst2 = colorize.dst2
-'    End Sub
-'End Class
-
-
-
-
-
-
-'Public Class Depth_StableMax : Inherits VB_Algorithm
-'    Public stableMax As cv.Mat
-'    Public motion As New Motion_Contours
-'    Dim colorize As New Depth_Colorizer_CPP
-'    Public resetAll = True
-'    Public Sub New()
-'        labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
-'        desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
-
-'        motion.Run(task.gray)
-
-'        If task.motionReset Or resetAll Then
-'            stableMax = src.Clone
-'            resetAll = False
-'            task.motionReset = False
-'            dst3.SetTo(0)
-'        Else
-'            If stableMax.Type <> cv.MatType.CV_32FC1 Then
-'                If stableMax.Channels <> 1 Then stableMax = stableMax.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-'                stableMax.ConvertTo(stableMax, cv.MatType.CV_32FC1)
-'            End If
-'            For Each rect In motion.intersect.enclosingRects
-'                If rect.Width And rect.Height Then src(rect).CopyTo(stableMax(rect))
-'                cv.Cv2.Max(src, stableMax, stableMax)
-'            Next
-'        End If
-
-'        dst3 = If(motion.dst3.Channels = 1, motion.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR), motion.dst3.Clone)
-'        If motion.intersect.inputRects.Count > 0 Then
-'            If dst3.Channels = 1 Then dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-'            For Each r In motion.intersect.inputRects
-'                dst3.Rectangle(r, cv.Scalar.Yellow, 2)
-'            Next
-'            For Each rect In motion.intersect.enclosingRects
-'                dst3.Rectangle(rect, cv.Scalar.Red, 2)
-'            Next
-'        End If
-
-'        colorize.Run(stableMax)
-'        dst2 = colorize.dst2
-'    End Sub
-'End Class
-
-
-
-
-
-
-
-'Public Class Depth_StableMinMax : Inherits VB_Algorithm
-'    Dim colorize As New Depth_Colorizer_CPP
-'    Public dMin As New Depth_StableMin
-'    Public dMax As New Depth_StableMax
-'    Public Sub New()
-'        If radio.Setup(traceName) Then
-'            radio.addRadio("Use farthest distance")
-'            radio.addRadio("Use closest distance")
-'            radio.addRadio("Use unchanged depth input")
-'            radio.check(1).Checked = True
-'        End If
-
-'        labels(2) = "Depth map colorized"
-'        labels(3) = "32-bit StableDepth"
-'        desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
-
-'        Dim radioSelection As String
-'        Static frm As OptionsRadioButtons = findfrm(traceName + " Radio Buttons")
-'        For i = 0 To frm.check.Count - 1
-'            If frm.check(i).Checked Then
-'                radioSelection = frm.check(i).Text
-'                Exit For
-'            End If
-'        Next
-
-'        If task.optionsChanged Then
-'            dst3 = task.pcSplit(2)
-'            dMin.resetAll = True
-'            dMax.resetAll = True
-'        End If
-'        Select Case radioSelection
-'            Case "Use farthest distance"
-'                dMax.Run(src)
-'                dst3 = dMax.stableMax
-'                dst2 = dMax.dst2
-'            Case "Use closest distance"
-'                dMin.Run(src)
-'                dst3 = dMin.stableMin
-'                dst2 = dMin.dst2
-'            Case "Use unchanged depth input"
-'                dst3 = task.pcSplit(2)
-'                colorize.Run(dst3)
-'                dst2 = colorize.dst2
-'                task.motionReset = True
-'        End Select
-'    End Sub
-'End Class
-
-
-
-
-
-
-
 
 
 Public Class Depth_Averaging : Inherits VB_Algorithm
@@ -1028,79 +870,6 @@ Public Class Depth_Averaging : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-'Public Class Depth_AveragingStable : Inherits VB_Algorithm
-'    Dim dAvg As New Depth_Averaging
-'    Dim extrema As New Depth_StableMinMax
-'    Public Sub New()
-'        findRadio("Use farthest distance").Checked = True
-'        desc = "Use Depth_StableMax to remove the artifacts from the Depth_Averaging"
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        Static unchangedRadio = findRadio("Use unchanged depth input")
-'        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-'        extrema.Run(src)
-
-'        If unchangedRadio.checked Then
-'            dst2 = extrema.dst2
-'            dst3 = extrema.dst3
-'        Else
-'            dAvg.Run(extrema.dst3)
-'            dst2 = dAvg.dst2
-'            dst3 = dAvg.dst3
-'        End If
-'    End Sub
-'End Class
-
-
-
-
-
-
-
-
-
-
-
-Public Class Depth_MinMaxNone : Inherits VB_Algorithm
-    Public options As New Options_MinMaxNone
-    Public Sub New()
-        desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim split() As cv.Mat
-        If src.Type = cv.MatType.CV_32FC3 Then split = src.Split() Else split = task.pcSplit
-
-        options.RunVB()
-
-        Static filtered As Integer
-        If task.heartBeat Then
-            dst3 = split(2)
-            filtered = 0
-        End If
-        labels(2) = "Point cloud unchanged"
-        If options.useMax Then
-            labels(2) = "Point cloud maximum values at each pixel"
-            cv.Cv2.Max(split(2), dst3, split(2))
-        End If
-        If options.useMin Then
-            labels(2) = "Point cloud minimum values at each pixel"
-            Dim saveMat = split(2).Clone
-            cv.Cv2.Min(split(2), dst3, split(2))
-            Dim mask = split(2).InRange(0, 0.1)
-            saveMat.CopyTo(split(2), mask)
-        End If
-        cv.Cv2.Merge(split, dst2)
-        dst3 = split(2)
-        filtered += 1
-        labels(2) += " after " + CStr(filtered) + " images"
-    End Sub
-End Class
 
 
 
@@ -1649,5 +1418,175 @@ Public Class Depth_MaxMask : Inherits VB_Algorithm
         For Each tour In contour.contourlist
             vbDrawContour(dst2, tour.ToList, 255, -1)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_StableAverage : Inherits VB_Algorithm
+    Dim dAvg As New Depth_Averaging
+    Dim extrema As New Depth_StableMinMax
+    Public Sub New()
+        findRadio("Use farthest distance").Checked = True
+        desc = "Use Depth_StableMax to remove the artifacts from the Depth_Averaging"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static unchangedRadio = findRadio("Use unchanged depth input")
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        extrema.Run(src)
+
+        If unchangedRadio.checked Then
+            dst2 = extrema.dst2
+            dst3 = extrema.dst3
+        Else
+            dAvg.Run(extrema.dst3)
+            dst2 = dAvg.dst2
+            dst3 = dAvg.dst3
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_MinMaxNone : Inherits VB_Algorithm
+    Public options As New Options_MinMaxNone
+    Public Sub New()
+        desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        Dim split() As cv.Mat
+        If src.Type = cv.MatType.CV_32FC3 Then split = src.Split() Else split = task.pcSplit
+
+        Static filtered As Integer
+        If task.heartBeat Then
+            dst3 = split(2)
+            filtered = 0
+        End If
+        labels(2) = "Point cloud unchanged"
+        If options.useMax Then
+            labels(2) = "Point cloud maximum values at each pixel"
+            cv.Cv2.Max(split(2), dst3, split(2))
+        End If
+        If options.useMin Then
+            labels(2) = "Point cloud minimum values at each pixel"
+            Dim saveMat = split(2).Clone
+            cv.Cv2.Min(split(2), dst3, split(2))
+            Dim mask = split(2).InRange(0, 0.1)
+            saveMat.CopyTo(split(2), mask)
+        End If
+        cv.Cv2.Merge(split, dst2)
+        dst3 = split(2)
+        filtered += 1
+        labels(2) += " after " + CStr(filtered) + " images"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Depth_StableMin : Inherits VB_Algorithm
+    Public stableMin As cv.Mat
+    Dim colorize As New Depth_Colorizer_CPP
+    Public Sub New()
+        gOptions.unFiltered.Checked = True
+        labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
+        desc = "To reduce z-Jitter, use the closest depth value at each pixel as long as the camera is stable"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
+
+        If task.motionReset Then
+            stableMin = src.Clone
+            dst3.SetTo(0)
+        ElseIf task.motionDetected Then
+            src(task.motionRect).CopyTo(stableMin(task.motionRect))
+            If src.Type <> stableMin.Type Then src.ConvertTo(src, stableMin.Type)
+            stableMin.CopyTo(src, task.noDepthMask)
+            cv.Cv2.Min(src, stableMin, stableMin)
+        End If
+
+        colorize.Run(stableMin)
+        dst2 = colorize.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_StableMax : Inherits VB_Algorithm
+    Public stableMax As cv.Mat
+    Dim colorize As New Depth_Colorizer_CPP
+    Public Sub New()
+        gOptions.unFiltered.Checked = True
+        labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
+        desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
+
+        If task.motionReset Then
+            stableMax = src.Clone
+            dst3.SetTo(0)
+        ElseIf task.motionDetected Then
+            src(task.motionRect).CopyTo(stableMax(task.motionRect))
+            If src.Type <> stableMax.Type Then src.ConvertTo(src, stableMax.Type)
+            stableMax.CopyTo(src, task.noDepthMask)
+            cv.Cv2.Min(src, stableMax, stableMax)
+        End If
+
+        colorize.Run(stableMax)
+        dst2 = colorize.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Depth_StableMinMax : Inherits VB_Algorithm
+    Dim colorize As New Depth_Colorizer_CPP
+    Public dMin As New Depth_StableMin
+    Public dMax As New Depth_StableMax
+    Dim options As New Options_MinMaxNone
+    Public Sub New()
+        gOptions.unFiltered.Checked = True
+        labels(2) = "Depth map colorized"
+        labels(3) = "32-bit StableDepth"
+        desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
+        If task.optionsChanged Then dst3 = task.pcSplit(2)
+
+        If options.useMax Then
+            dMax.Run(src)
+            dst3 = dMax.stableMax
+            dst2 = dMax.dst2
+        ElseIf options.useMin Then
+            dMin.Run(src)
+            dst3 = dMin.stableMin
+            dst2 = dMin.dst2
+        ElseIf options.useNone Then
+            dst3 = task.pcSplit(2)
+            colorize.Run(dst3)
+            dst2 = colorize.dst2
+            task.motionReset = True
+        End If
     End Sub
 End Class
