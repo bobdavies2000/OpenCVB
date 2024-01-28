@@ -27,9 +27,23 @@ Module UIranking
             End If
         Next
 
-        Dim buildReuseList As String = "<All Reused>"
+        Dim reusedList As New SortedList(Of String, String)
         For Each alg In algorithms
-            buildReuseList += "," + alg.Key
+            Dim nextAlg = alg.Key
+            For Each line In lines
+                If line.Length = 0 Then Continue For
+                If line.StartsWith(nextAlg) Then
+                    Dim callees = line.Split(",")
+                    For Each func In callees
+                        If reusedList.ContainsKey(func) = False Then reusedList.Add(func, func)
+                    Next
+                End If
+            Next
+        Next
+
+        Dim buildReusedList As String = "<All Reused and Callees>"
+        For Each func In reusedList
+            If func.Key.StartsWith("z_") = False Then buildReusedList += "," + func.Key
         Next
 
         Dim algorithmRank As New SortedList(Of String, String)
@@ -63,7 +77,7 @@ Module UIranking
             swAll.WriteLine(lines(saveIndex))
             If lines(saveIndex).Contains("<PyStream>") Then Exit For
             If lines(saveIndex).Contains("<All but Python>") Then
-                swAll.WriteLine(buildReuseList)
+                swAll.WriteLine(buildReusedList)
             End If
         Next
 

@@ -1481,6 +1481,7 @@ if algorithmName = "Rectangle_Rotated" Then return new Rectangle_Rotated
 if algorithmName = "Rectangle_Union" Then return new Rectangle_Union
 if algorithmName = "RecursiveBilateralFilter_CPP" Then return new RecursiveBilateralFilter_CPP
 if algorithmName = "RedCloud_Basics" Then return new RedCloud_Basics
+if algorithmName = "RedCloud_BasicsNew" Then return new RedCloud_BasicsNew
 if algorithmName = "RedCloud_BinarizeColor" Then return new RedCloud_BinarizeColor
 if algorithmName = "RedCloud_Both" Then return new RedCloud_Both
 if algorithmName = "RedCloud_BProject3D" Then return new RedCloud_BProject3D

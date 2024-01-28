@@ -460,7 +460,8 @@ Public Class OpenCVB
         Dim cres = settings.captureRes
         Dim dres = settings.displayRes
         Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", Display " + CStr(dres.Width) + "x" + CStr(dres.Height) +
-                                ", WorkingRes " + CStr(workingRes.Width) + "x" + CStr(workingRes.Height)
+                                ", WorkingRes " + CStr(workingRes.Width) + "x" + CStr(workingRes.Height) +
+                                "  MotionRect is shown - missing means entire image updated."
         If AvailableAlgorithms.Text.StartsWith("Related_") Then resolutionDetails = "" ' The Related algorithms need the space...
         camLabel(0).Text = "RGB"
         If picLabels(0) <> "" Then camLabel(0).Text = picLabels(0)

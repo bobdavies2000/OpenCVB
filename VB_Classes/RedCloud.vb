@@ -2211,49 +2211,6 @@ End Class
 
 
 
-Public Class RedCloud_Both : Inherits VB_Algorithm
-    Public colorC As New RedCloud_Basics
-    Public redC As New RedCloud_Basics
-    Public Sub New()
-        desc = "Run RedCloud for depth and for color at the same time and then combine."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redOptions.UseDepth.Checked = True
-        task.optionsChanged = False
-        redC.Run(src)
-        dst2 = redC.dst2.Clone
-        dst2.SetTo(0, task.noDepthMask)
-        labels(2) = redC.labels(2)
-
-        redOptions.UseColor.Checked = True
-        task.optionsChanged = False
-        colorC.Run(src)
-        dst3 = colorC.dst2.Clone
-        labels(3) = colorC.labels(2)
-
-        Dim cellmap = colorC.cellMap.Clone
-        redC.cellMap.CopyTo(cellmap, task.depthMask)
-
-        Static redCSelected As Integer
-        If task.mouseClickFlag Then
-            redCSelected = If(task.mousePicTag = 2, RESULT_DST2, RESULT_DST3)
-        End If
-
-        If redCSelected = RESULT_DST2 Then
-            setSelectedCell(redC.redCells, redC.cellMap)
-        ElseIf redCSelected = RESULT_DST3 Then
-            setSelectedCell(colorC.redCells, colorC.cellMap)
-        End If
-        dst3(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 
@@ -2367,5 +2324,157 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
             If drawRectOnlyRun Then If task.drawRect.Contains(rc.floodPoint) = False Then Continue For
             combinedCells.Add(rc)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_Both : Inherits VB_Algorithm
+    Public colorC As New RedCloud_Basics
+    Public redC As New RedCloud_Basics
+    Public Sub New()
+        desc = "Run RedCloud for depth and for color at the same time and then combine."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redOptions.UseDepth.Checked = True
+        task.optionsChanged = False
+        redC.Run(src)
+        dst2 = redC.dst2.Clone
+        dst2.SetTo(0, task.noDepthMask)
+        labels(2) = redC.labels(2)
+
+        redOptions.UseColor.Checked = True
+        task.optionsChanged = False
+        colorC.Run(src)
+        dst3 = colorC.dst2.Clone
+        labels(3) = colorC.labels(2)
+
+        Dim cellmap = colorC.cellMap.Clone
+        redC.cellMap.CopyTo(cellmap, task.depthMask)
+
+        Static redCSelected As Integer
+        If task.mouseClickFlag Then
+            redCSelected = If(task.mousePicTag = 2, RESULT_DST2, RESULT_DST3)
+        End If
+
+        If redCSelected = RESULT_DST2 Then
+            setSelectedCell(redC.redCells, redC.cellMap)
+        ElseIf redCSelected = RESULT_DST3 Then
+            setSelectedCell(colorC.redCells, colorC.cellMap)
+        End If
+        dst3(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
+    End Sub
+End Class
+
+
+
+
+Public Class RedCloud_BasicsNew : Inherits VB_Algorithm
+    Public redCells As New List(Of rcData)
+    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public combine As New RedCloud_Combine
+    Dim unmatched As New RedCloud_UnmatchedCount
+    Dim colorMap As New cv.Mat(256, 1, cv.MatType.CV_8UC3, 0)
+    Public Sub New()
+        vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
+                        "It is behind the global options (which affect most algorithms.)")
+        desc = "Match cells from the previous generation"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        combine.Run(src)
+
+        If task.optionsChanged Then cellMap.SetTo(0)
+        Dim lastCells As New List(Of rcData)(redCells), lastCellMap As cv.Mat = cellMap.Clone
+        Dim usedColors As New List(Of cv.Vec3b)({black})
+
+        If dst2.Size <> src.Size Then dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
+
+        task.rcMatchMax = 0
+        Dim minPixels = gOptions.minPixelsSlider.Value
+        Dim newCells As New List(Of rcData)
+        For Each rc In combine.combinedCells
+            rc.maxDStable = rc.maxDist ' assume it has to use the latest.
+            rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If rc.indexLast < lastCells.Count Then
+                Dim lrc = lastCells(rc.indexLast)
+                rc.color = lrc.color
+                rc.matchFlag = True
+
+                Dim stableCheck = lastCellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
+                If stableCheck = rc.indexLast Then
+                    rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+                    rc.matchCount = lrc.matchCount + 1
+                End If
+            End If
+
+            If usedColors.Contains(rc.color) Then
+                rc.color = randomCellColor()
+                rc.matchCount = 0
+                rc.matchFlag = False
+            End If
+
+            usedColors.Add(rc.color)
+
+            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            vbDrawContour(rc.mask, rc.contour, 255, -1)
+
+            rc.depthMask = rc.mask.Clone
+            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
+            rc.depthPixels = rc.depthMask.CountNonZero
+
+            Dim minLoc As cv.Point, maxLoc As cv.Point
+            If rc.depthPixels Then
+                task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.depthMask)
+                task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.depthMask)
+                task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.depthMask)
+
+                Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
+                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.depthMask)
+
+                rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
+                rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
+            End If
+
+            cv.Cv2.MeanStdDev(src(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+
+            rc.pixels = rc.mask.CountNonZero
+            If rc.mask.Size = dst2.Size Or rc.pixels < minPixels Then Continue For
+            If task.heartBeat Then rc.matchCount = 1
+            newCells.Add(rc)
+
+            If task.rcMatchMax < rc.matchCount Then task.rcMatchMax = rc.matchCount
+            If newCells.Count >= 255 Then Exit For ' we are going to handle only the largest 255 cells - rest are zero.
+        Next
+
+        cellMap.SetTo(0)
+        dst2.SetTo(0)
+        redCells.Clear()
+        redCells.Add(New rcData)
+        For Each rc In newCells
+            rc.index = redCells.Count
+            colorMap.Set(Of cv.Vec3b)(rc.index, 0, rc.color) ' <<<< switch to using colormap.
+            redCells.Add(rc)
+            cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            ' dst2(rc.rect).SetTo(rc.color, rc.mask)  ' <<<< switch to using colormap.
+        Next
+
+        Dim rcZero = redCells(0)
+        rcZero.mask = cellMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        rcZero.pixels = rcZero.mask.CountNonZero
+        rcZero.rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+
+        cv.Cv2.ApplyColorMap(cellMap, dst2, colorMap)  ' <<<< switch to using colormap.
+        unmatched.redCells = redCells
+        unmatched.Run(src)
+
+        dst3 = unmatched.dst3
+        labels = unmatched.labels
+
+        setSelectedCell(redCells, cellMap)
     End Sub
 End Class
