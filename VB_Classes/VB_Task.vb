@@ -480,7 +480,12 @@ Public Class VBtask : Implements IDisposable
                 End If
 
                 updateSettings()
-                task.heartBeat = task.heartBeat Or task.debugSyncUI Or task.optionsChanged Or task.mouseClickFlag
+                If gOptions.CreateGif.Checked Then
+                    heartBeat = False
+                    task.optionsChanged = False
+                Else
+                    task.heartBeat = task.heartBeat Or task.debugSyncUI Or task.optionsChanged Or task.mouseClickFlag
+                End If
                 If task.paused = False Then
                     IMUBasics.Run(src)
                     gMat.Run(src)

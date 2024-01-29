@@ -3514,7 +3514,9 @@ Public Class Options_Gif : Inherits VB_Algorithm
         Static frmCheck = findfrm("Options_Gif CheckBoxes")
         Static frmRadio = findfrm("Options_Gif Radio Buttons")
         If firstPass Then
-            firstPass = False
+            Static myFrameCount As Integer = 0
+            If myFrameCount > 5 Then firstPass = False
+            myFrameCount += 1
             frmCheck.Left = gOptions.Width / 2
             frmCheck.top = gOptions.Height / 2
             frmRadio.left = gOptions.Width * 2 / 3
