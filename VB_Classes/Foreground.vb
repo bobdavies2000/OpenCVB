@@ -142,7 +142,7 @@ Public Class Foreground_RedForeground : Inherits VB_Algorithm
         hist3D.depthMask = fore.dst2 Or task.noDepthMask
         hist3D.Run(src)
 
-        redC.combine.redCPP.inputMask = Not hist3D.depthMask
+        redC.combine.redMasks.inputMask = Not hist3D.depthMask
         redC.Run(hist3D.dst2)
 
         dst2 = redC.dst2.Clone
@@ -173,7 +173,7 @@ Public Class Foreground_RedBackground : Inherits VB_Algorithm
         hist3D.depthMask = fore.dst3 Or task.noDepthMask
         hist3D.Run(src)
 
-        redC.combine.redCPP.inputMask = Not hist3D.depthMask
+        redC.combine.redMasks.inputMask = Not hist3D.depthMask
         redC.Run(hist3D.dst2)
 
         dst2 = redC.dst2.Clone

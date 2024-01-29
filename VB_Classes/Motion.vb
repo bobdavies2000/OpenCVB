@@ -3,11 +3,11 @@ Imports System.Threading
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits VB_Algorithm
     Dim bgSub As New BGSubtract_Basics
-    Dim redCPP As New RedCloud_Color
+    Dim redMasks As New RedCloud_Masks
     Public showDiff As Boolean
     Public Sub New()
-        redCPP.imageThresholdPercent = 1.0
-        redCPP.cellMinPercent = 0
+        redMasks.imageThresholdPercent = 1.0
+        redMasks.cellMinPercent = 0
         vbAddAdvice(traceName + ": redOptions are used as well as BGSubtract options.")
         desc = "Use floodfill to find all the real motion in an image."
     End Sub
@@ -18,16 +18,16 @@ Public Class Motion_Basics : Inherits VB_Algorithm
         bgSub.Run(src)
         If standaloneTest() Or showDiff Then dst2 = bgSub.dst2
 
-        redCPP.Run(bgSub.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary))
-        If redCPP.sortedCells.Count < 2 Then
+        redMasks.Run(bgSub.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary))
+        If redMasks.sortedCells.Count < 2 Then
             task.motionReset = False
             task.motionRect = New cv.Rect
             Exit Sub
         End If
 
-        Dim nextRect = redCPP.sortedCells.ElementAt(1).Value.rect
-        For i = 2 To redCPP.sortedCells.Count - 1
-            Dim rc = redCPP.sortedCells.ElementAt(i).Value
+        Dim nextRect = redMasks.sortedCells.ElementAt(1).Value.rect
+        For i = 2 To redMasks.sortedCells.Count - 1
+            Dim rc = redMasks.sortedCells.ElementAt(i).Value
             nextRect = nextRect.Union(rc.rect)
         Next
 
@@ -47,7 +47,7 @@ Public Class Motion_Basics : Inherits VB_Algorithm
         End If
 
         If standaloneTest() Or showDiff Then dst2.Rectangle(task.motionRect, 255, task.lineWidth)
-        labels(2) = CStr(redCPP.sortedCells.Count) + " cells were found with " + CStr(redCPP.classCount) + " flood points"
+        labels(2) = CStr(redMasks.sortedCells.Count) + " cells were found with " + CStr(redMasks.classCount) + " flood points"
     End Sub
 End Class
 
@@ -110,7 +110,7 @@ Public Class Motion_ThruCorrelation : Inherits VB_Algorithm
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Detect motion through the correlation coefficient"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static ccSlider = findSlider("Correlation threshold X1000")
         Static padSlider = findSlider("Pad size in pixels for the search area")
         Static stdevSlider = findSlider("Stdev threshold for using correlation")
@@ -131,7 +131,7 @@ Public Class Motion_ThruCorrelation : Inherits VB_Algorithm
             cv.Cv2.MeanStdDev(input(roi), mean, stdev)
             If stdev > stdevThreshold Then
                 cv.Cv2.MatchTemplate(lastFrame(roi), input(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
-                Dim mm as mmData = vbMinMax(correlation)
+                Dim mm As mmData = vbMinMax(correlation)
                 If mm.maxVal < ccThreshold / 1000 Then
                     If (i Mod task.gridRows) <> 0 Then dst3(task.gridList(i - 1)).SetTo(255)
                     If (i Mod task.gridRows) < task.gridRows And i < task.gridList.Count - 1 Then dst3(task.gridList(i + 1)).SetTo(255)
@@ -165,7 +165,7 @@ Public Class Motion_CCmerge : Inherits VB_Algorithm
     Public Sub New()
         desc = "Use the correlation coefficient to maintain an up-to-date image"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If task.frameCount < 10 Then dst2 = src.Clone
 
         motionCC.Run(src)
@@ -195,7 +195,7 @@ Public Class Motion_PixelDiff : Inherits VB_Algorithm
         desc = "Count the number of changed pixels in the current frame and accumulate them.  If either exceeds thresholds, then set flag = true.  " +
                     "To get the Options Slider, use " + traceName + "QT"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         src = task.gray
 
         Static lastFrame As cv.Mat = src
@@ -234,7 +234,7 @@ Public Class Motion_DepthReconstructed : Inherits VB_Algorithm
         labels(2) = "The yellow rectangle indicates where the motion is and only that portion of the point cloud and depth mask is updated."
         desc = "Rebuild the point cloud based on the BGR motion history."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         motion.Run(src)
         dst2 = src
 
@@ -296,7 +296,7 @@ Public Class Motion_MinRect : Inherits VB_Algorithm
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find the nonzero points of motion and fit an ellipse to them."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         motion.Run(src)
         dst2 = motion.dst2
 
@@ -618,7 +618,7 @@ End Class
 
 
 Public Class Motion_Enclosing : Inherits VB_Algorithm
-    Dim redCPP As New RedCloud_Color
+    Dim redMasks As New RedCloud_Masks
     Public motionRect As New cv.Rect
     Public Sub New()
         cPtr = BGSubtract_BGFG_Open(4)
@@ -634,14 +634,14 @@ Public Class Motion_Enclosing : Inherits VB_Algorithm
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        redCPP.inputMask = Not dst2
-        redCPP.Run(dst2)
+        redMasks.inputMask = Not dst2
+        redMasks.Run(dst2)
 
         motionRect = New cv.Rect
-        If redCPP.sortedCells.Count < 2 Then Exit Sub
-        motionRect = redCPP.sortedCells.ElementAt(1).Value.rect
-        For i = 2 To redCPP.sortedCells.Count - 1
-            Dim cell = redCPP.sortedCells.ElementAt(i).Value
+        If redMasks.sortedCells.Count < 2 Then Exit Sub
+        motionRect = redMasks.sortedCells.ElementAt(1).Value.rect
+        For i = 2 To redMasks.sortedCells.Count - 1
+            Dim cell = redMasks.sortedCells.ElementAt(i).Value
             motionRect = motionRect.Union(cell.rect)
         Next
 

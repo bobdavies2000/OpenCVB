@@ -200,6 +200,7 @@ Module VB
         dst.Circle(rc.maxDStable, task.dotSize, cv.Scalar.White, -1, task.lineType)
     End Sub
     Public Sub setSelectedCell(ByRef redCells As List(Of rcData), ByRef cellMap As cv.Mat)
+        If redCells.Count = 0 Then Exit Sub
         task.rc = New rcData
         Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
         If task.mouseClickFlag Then

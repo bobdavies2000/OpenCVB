@@ -2,8 +2,8 @@
 enum functions
 {
     _CPP_AddWeighted_Basics,
-    _CPP_RedCloud_ColorNative,
-    _CPP_RedCloud_Color,
+    _CPP_RedCloud_MasksNative,
+    _CPP_RedCloud_Masks,
     _CPP_BGSubtract_Basics,
     _CPP_Stable_Basics,
     _CPP_Feature_StableSorted,
