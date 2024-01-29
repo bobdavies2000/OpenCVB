@@ -47,9 +47,6 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
 
             usedColors.Add(rc.color)
 
-            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            vbDrawContour(rc.mask, rc.contour, 255, -1)
-
             rc.depthMask = rc.mask.Clone
             rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
             rc.depthPixels = rc.depthMask.CountNonZero
@@ -2160,7 +2157,7 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
                 dst2 = src
             End If
         Else
-            redCPP.inputMask = task.noDepthMask
+            redMasks.inputMask = task.noDepthMask
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         End If
 
@@ -2301,6 +2298,7 @@ Public Class RedCloud_Masks : Inherits VB_Algorithm
     Public classCount As Integer
     Public imageThresholdPercent As Single = 0.98
     Public cellMinPercent As Single = 0.0001
+    Public buildContours As Boolean = True
     Public Sub New()
         cPtr = RedCloud_Open()
         desc = "Core interface to the C++ code for floodfill."
@@ -2357,11 +2355,16 @@ Public Class RedCloud_Masks : Inherits VB_Algorithm
             rc.pixels = sizeData.Get(Of Integer)(i, 0)
             rc.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
             rc.mask.Rectangle(New cv.Rect(0, 0, rc.mask.Width, rc.mask.Height), 0, 1)
+            rc.color = task.vecColors(i)
             Dim pt = vbGetMaxDist(rc.mask)
             rc.maxDist = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
             Dim val = task.pcSplit(2).Get(Of Single)(rc.floodPoint.Y, rc.floodPoint.X)
             If val = 0 Then rc.depthCell = False Else rc.depthCell = True
 
+            If buildContours Then
+                rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+                vbDrawContour(rc.mask, rc.contour, 255, -1)
+            End If
             sortedCells.Add(rc.pixels, rc)
         Next
 
@@ -2375,28 +2378,65 @@ End Class
 
 
 
-Public Class RedCloud_BasicsNew : Inherits VB_Algorithm
-    Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+Public Class RedCloud_MasksBoth : Inherits VB_Algorithm
+    Public colorCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+    Public cloudCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
     Dim color As New Color_Basics
     Public redMasks As New RedCloud_Masks
     Dim redCore As New RedCloud_Core
+    Dim guided As New GuidedBP_Depth
     Public Sub New()
-        vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
-                        "It is behind the global options (which affect most algorithms.)")
-        desc = "Match cells from the previous generation"
+        desc = "Create the color masks and the pointcloud masks"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         color.Run(src)
-        redMasks.Run(dst2)
+        redMasks.buildContours = False
+        redMasks.Run(color.dst2)
         dst2 = redMasks.dst2.Clone
-        Dim colorCells = New SortedList(Of Integer, rcData)(redMasks.sortedCells)
+        colorCells = New SortedList(Of Integer, rcData)(redMasks.sortedCells)
 
-        redCore.Run(src)
-        redMasks.Run(redCore.dst2)
+        dst3.SetTo(0)
+        redMasks.buildContours = True
+        Select Case redOptions.depthInputIndex
+            Case 0 ' "GuidedBP_Depth"
+                guided.Run(src)
+                guided.dst2.CopyTo(dst3, task.depthMask)
+                redMasks.Run(guided.dst2)
+            Case 1 ' "RedCloud_Core"
+                redCore.Run(task.pointCloud)
+                redCore.dst2.CopyTo(dst3, task.depthMask)
+                redMasks.Run(redCore.dst2)
+        End Select
+
         dst3 = redMasks.dst2
-        Dim cloudCells = New SortedList(Of Integer, rcData)(redMasks.sortedCells)
+        cloudCells = New SortedList(Of Integer, rcData)(redMasks.sortedCells)
+    End Sub
+End Class
 
-        setSelectedCell(redCells, cellMap)
+
+
+
+
+
+
+
+Public Class RedCloud_MasksCombine : Inherits VB_Algorithm
+    Dim masks As New RedCloud_MasksBoth
+    Public Sub New()
+        desc = "Combine the cloud masks using the color masks"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        masks.Run(src)
+
+        dst2.SetTo(0)
+        For Each key In masks.cloudCells
+            Dim rc = key.Value
+            Dim index = masks.dst2.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If index < masks.colorCells.Count Then
+                Dim rcX = masks.colorCells.ElementAt(index).Value
+                rc.color = rcX.color
+                dst2(rc.rect).SetTo(rc.color, rc.mask)
+            End If
+        Next
     End Sub
 End Class

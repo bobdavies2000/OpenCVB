@@ -212,9 +212,7 @@ Public Class Flood_PointList : Inherits VB_Algorithm
             Dim lrc = If(lastCells.Count > 0, lastCells(lastcellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)), New rcData)
             rc.indexLast = lrc.index
             rc.color = lrc.color
-            If usedColors.Contains(rc.color) Then
-                rc.color = randomCellColor()
-            End If
+            If usedColors.Contains(rc.color) Then rc.color = randomCellColor()
 
             vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
             vbDrawContour(cellMap(rc.rect), rc.contour, rc.index, -1)

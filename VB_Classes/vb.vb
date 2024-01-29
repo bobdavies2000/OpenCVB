@@ -744,6 +744,7 @@ Public Class rcData
     Public depthPixels As Integer
 
     Public color As New cv.Vec3b
+    Public colorIndex As Byte ' palette index
     Public colorMean As New cv.Scalar
     Public colorStdev As New cv.Scalar
     Public colorDistance As Integer
