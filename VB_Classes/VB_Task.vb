@@ -521,15 +521,15 @@ Public Class VBtask : Implements IDisposable
                 If task.motionDetected Or heartBeat Or task.motionReset Then
                     task.pcSplit = task.pointCloud.Split
 
-                    'Dim maxD = gOptions.MaxDepth.Value - 0.1 ' why -0.1?  Because histograms are inclusive at boundaries.
-                    'task.maxDepthMask = task.pcSplit(2).Threshold(maxD, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-                    'maxMask.Run(task.maxDepthMask) ' fill in the holes of the maxdepthmask
-                    'task.maxDepthMask = maxMask.dst2 ' Use the contour of the mask
+                    Dim maxD = gOptions.MaxDepth.Value - 0.1 ' why -0.1?  Because histograms are inclusive at boundaries.
+                    task.maxDepthMask = task.pcSplit(2).Threshold(maxD, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+                    maxMask.Run(task.maxDepthMask) ' fill in the holes of the maxdepthmask
+                    task.maxDepthMask = maxMask.dst2 ' Use the contour of the mask
 
-                    'If gOptions.unFilteredCloud.Checked = False Then
-                    '    task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
-                    '    'task.pcSplit(2).SetTo(maxD, task.maxDepthMask)
-                    'End If
+                    If gOptions.unFiltered.Checked = False Then
+                        task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
+                        'task.pcSplit(2).SetTo(maxD, task.maxDepthMask)
+                    End If
 
                     task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
                     task.noDepthMask = Not task.depthMask

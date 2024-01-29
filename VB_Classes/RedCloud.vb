@@ -100,6 +100,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
 
         dst3 = unmatched.dst3
         labels = unmatched.labels
+        dst3(redCells(0).rect).SetTo(0, redCells(0).mask)
 
         setSelectedCell(redCells, cellMap)
     End Sub

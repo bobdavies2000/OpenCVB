@@ -6,7 +6,7 @@ Public Class Depth_Basics : Inherits VB_Algorithm
     Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
         vbAddAdvice(traceName + ": use global option to control 'Max Depth'.")
-        desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU (but quietly)"
+        desc = "Colorize the depth data into task.depthRGB"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst2 = task.pcSplit(2)
