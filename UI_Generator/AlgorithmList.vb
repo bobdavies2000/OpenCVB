@@ -1426,6 +1426,7 @@ if algorithmName = "PointCloud_YRangeTest" Then return new PointCloud_YRangeTest
 if algorithmName = "Polylines_IEnumerableExample" Then return new Polylines_IEnumerableExample
 if algorithmName = "Polylines_Random" Then return new Polylines_Random
 if algorithmName = "PongWars_Basics" Then return new PongWars_Basics
+if algorithmName = "PongWars_Two" Then return new PongWars_Two
 if algorithmName = "ProCon_Basics" Then return new ProCon_Basics
 if algorithmName = "ProCon_Variation" Then return new ProCon_Variation
 if algorithmName = "Profile_Basics" Then return new Profile_Basics

@@ -1,4 +1,5 @@
 ﻿Imports System.Drawing
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 ' https://github.com/vnglst/pong-wars
 Public Class PongWars_Basics : Inherits VB_Algorithm
@@ -7,22 +8,14 @@ Public Class PongWars_Basics : Inherits VB_Algorithm
     Dim numSquaresX As Integer = task.workingRes.Width / sqWidth
     Dim numSquaresY As Integer = task.workingRes.Height / sqHeight
 
-    Dim DAY_COLOR = 1
-    Dim DAY_BALL_COLOR = 2
-    Dim NIGHT_COLOR = 3
-    Dim NIGHT_BALL_COLOR = 4
-
+    Dim DAY_COLOR = 1, DAY_BALL_COLOR = 2, NIGHT_COLOR = 3, NIGHT_BALL_COLOR = 4
     Dim squares(numSquaresX - 1, numSquaresY - 1) As Integer
 
-    Dim x1 As Integer = task.workingRes.Width / 4
-    Dim y1 As Integer = task.workingRes.Height / 2
-    Dim dx1 As Double = 12.5
-    Dim dy1 As Double = -12.5
+    Dim p1 = New cv.Point(task.workingRes.Width / 4, task.workingRes.Height / 2)
+    Dim d1 As cv.Point2f = New cv.Point(12.5, -12.5)
 
-    Dim x2 As Integer = (task.workingRes.Width / 4) * 3
-    Dim y2 As Integer = task.workingRes.Height / 2
-    Dim dx2 As Double = -12.5
-    Dim dy2 As Double = 12.5
+    Dim p2 = New cv.Point((task.workingRes.Width / 4) * 3, task.workingRes.Height / 2)
+    Dim d2 As cv.Point2f = New cv.Point(-12.5, 12.5)
 
     Dim iteration As Integer = 0
     Public Sub New()
@@ -31,17 +24,15 @@ Public Class PongWars_Basics : Inherits VB_Algorithm
                 squares(i, j) = If(i < numSquaresX / 2, DAY_COLOR, NIGHT_COLOR)
             Next
         Next
-
+        p1 = New cv.Point(msRNG.Next(0, dst2.Width / 4), msRNG.Next(0, dst2.Height / 2))
+        p2 = New cv.Point(msRNG.Next(dst2.Width / 2, dst2.Width), msRNG.Next(dst2.Height / 4, dst2.Height))
         vbAddAdvice(traceName + ": <place advice here on any options that are useful>")
         desc = "Pong as war between the forces of light and darkness."
     End Sub
-    Private Function UpdateSquareAndBounce(x As Integer, y As Integer, dx As Double, dy As Double, sqClass As Integer) As (dx As Double, dy As Double)
-        Dim updatedDx As Double = dx
-        Dim updatedDy As Double = dy
-
+    Private Function UpdateSquareAndBounce(pt As cv.Point, dxy As cv.Point2f, sqClass As Integer) As cv.Point2f
         For angle As Double = 0 To Math.PI * 2 Step Math.PI / 4
-            Dim checkX As Double = x + Math.Cos(angle) * (sqWidth / 2)
-            Dim checkY As Double = y + Math.Sin(angle) * (sqHeight / 2)
+            Dim checkX As Double = pt.X + Math.Cos(angle) * (sqWidth / 2)
+            Dim checkY As Double = pt.Y + Math.Sin(angle) * (sqHeight / 2)
             Dim i As Integer = Math.Floor(checkX / sqWidth)
             Dim j As Integer = Math.Floor(checkY / sqHeight)
 
@@ -50,20 +41,20 @@ Public Class PongWars_Basics : Inherits VB_Algorithm
                     squares(i, j) = sqClass
 
                     If Math.Abs(Math.Cos(angle)) > Math.Abs(Math.Sin(angle)) Then
-                        updatedDx = -updatedDx
+                        dxy.X = -dxy.X
                     Else
-                        updatedDy = -updatedDy
+                        dxy.Y = -dxy.Y
                     End If
                 End If
             End If
         Next
 
-        Return (updatedDx, updatedDy)
+        Return dxy
     End Function
-    Private Function CheckBoundaryCollision(x As Integer, y As Integer, dx As Double, dy As Double) As (dx As Double, dy As Double)
-        If x + dx > dst2.Width - sqWidth / 2 OrElse x + dx < sqWidth / 2 Then dx = -dx
-        If y + dy > dst2.Height - sqHeight / 2 OrElse y + dy < sqHeight / 2 Then dy = -dy
-        Return (dx, dy)
+    Private Function CheckBoundaryCollision(pt As cv.Point, dxy As cv.Point2f) As cv.Point2f
+        If pt.X + dxy.X > dst2.Width - sqWidth / 2 OrElse pt.X + dxy.X < sqWidth / 2 Then dxy.X = -dxy.X
+        If pt.Y + dxy.Y > dst2.Height - sqHeight / 2 OrElse pt.Y + dxy.Y < sqHeight / 2 Then dxy.Y = -dxy.Y
+        Return dxy
     End Function
     Private Sub UpdateScoreElement()
         Dim dayScore As Integer = 0
@@ -79,7 +70,7 @@ Public Class PongWars_Basics : Inherits VB_Algorithm
             Next
         Next
 
-        setTrueText($"Pong War: day {dayScore} | night {nightScore}", 3)
+        If task.heartBeat Then labels(2) = $"Pong War: day {dayScore} | night {nightScore}"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         iteration += 1
@@ -87,32 +78,22 @@ Public Class PongWars_Basics : Inherits VB_Algorithm
             Console.WriteLine("iteration " & iteration)
         End If
 
-        Static lastBounce1 = (0, 0)
-        Dim bounce1 = UpdateSquareAndBounce(x1, y1, dx1, dy1, DAY_COLOR)
-        dx1 = bounce1.dx
-        dy1 = bounce1.dy
-        'If lastBounce1 = bounce1 Then bounce1 = (0, 0)
-        'lastBounce1 = bounce1
+        d1 = UpdateSquareAndBounce(p1, d1, DAY_COLOR)
+        d2 = UpdateSquareAndBounce(p2, d2, NIGHT_COLOR)
 
-        Static lastBounce2 = (0, 0)
-        Dim bounce2 = UpdateSquareAndBounce(x2, y2, dx2, dy2, NIGHT_COLOR)
-        dx2 = bounce2.dx
-        dy2 = bounce2.dy
-        'If lastBounce2 = bounce2 Then bounce2 = (0, 0)
-        'lastBounce2 = bounce2
+        d1 = CheckBoundaryCollision(p1, d1)
+        d2 = CheckBoundaryCollision(p2, d2)
 
-        Dim boundary1 = CheckBoundaryCollision(x1, y1, dx1, dy1)
-        dx1 = boundary1.dx
-        dy1 = boundary1.dy
+        p1.x += d1.X
+        p1.y += d1.Y
+        p2.x += d2.X
+        p2.y += d2.Y
 
-        Dim boundary2 = CheckBoundaryCollision(x2, y2, dx2, dy2)
-        dx2 = boundary2.dx
-        dy2 = boundary2.dy
-
-        x1 += dx1
-        y1 += dy1
-        x2 += dx2
-        y2 += dy2
+        Static p1Last As New cv.Point, p2Last As New cv.Point
+        If p1Last = p1 Then p1 = New cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2))
+        p1Last = p1
+        If p2Last = p2 Then p2 = New cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2))
+        p2Last = p2
 
         UpdateScoreElement()
 
@@ -124,10 +105,34 @@ Public Class PongWars_Basics : Inherits VB_Algorithm
             Next
         Next
 
-        Dim pt = New cv.Point(CInt(x1 - sqWidth / 2), CInt(y1 - sqHeight / 2))
+        Dim pt = New cv.Point(CInt(p1.x - sqWidth / 2), CInt(p1.y - sqHeight / 2))
         dst2.Circle(pt, task.dotSize + 5, task.scalarColors(DAY_BALL_COLOR), -1, task.lineType)
 
-        pt = New cv.Point(CInt(x2 - sqWidth / 2), CInt(y2 - sqHeight / 2))
+        pt = New cv.Point(CInt(p2.x - sqWidth / 2), CInt(p2.y - sqHeight / 2))
         dst2.Circle(pt, task.dotSize + 5, task.scalarColors(NIGHT_BALL_COLOR), -1, task.lineType)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class PongWars_Two : Inherits VB_Algorithm
+    Dim pong1 As New PongWars_Basics
+    Dim pong2 As New PongWars_Basics
+    Public Sub New()
+        desc = "Running 2 pong wars at once.  Randomness inserted with starting location."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        pong1.Run(src)
+        dst2 = pong1.dst2.Clone
+        labels(2) = pong1.labels(2)
+
+        pong2.Run(src)
+        dst3 = pong2.dst2.Clone
+        labels(3) = pong2.labels(2)
     End Sub
 End Class
