@@ -2,7 +2,7 @@
 Imports System.IO
 Imports System.Numerics
 Imports OpenCvSharp.ML
-
+Imports System.Drawing
 Public Class Options_Annealing : Inherits VB_Algorithm
     Dim random As New Random_Basics
     Public cityCount As Integer = 25
@@ -4270,7 +4270,3 @@ Public Class Options_BGSubtract : Inherits VB_Algorithm
         MOGlearnRate = learnRateSlider.Value / 1000
     End Sub
 End Class
-
-
-
-
