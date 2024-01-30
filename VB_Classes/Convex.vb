@@ -160,8 +160,12 @@ Public Class Convex_RedCloudDefects : Inherits VB_Algorithm
         dst2.SetTo(0)
         vbDrawContour(dst2, hull.ToList, rc.color, -1)
 
-        Dim defects = cv.Cv2.ConvexityDefects(contours.bestContour, hullIndices.ToList)
-        rc.contour = betterContour(c, defects)
+        Try
+            Dim defects = cv.Cv2.ConvexityDefects(contours.bestContour, hullIndices.ToList)
+            rc.contour = betterContour(c, defects)
+        Catch ex As Exception
+            setTrueText("Convexity defects failed due to self-intersection.", 3)
+        End Try
 
         vbDrawContour(dst2, rc.contour, cv.Scalar.Red)
     End Sub

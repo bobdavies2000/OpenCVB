@@ -47,6 +47,9 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
 
             usedColors.Add(rc.color)
 
+            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            vbDrawContour(rc.mask, rc.contour, 255, -1)
+
             rc.depthMask = rc.mask.Clone
             rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
             rc.depthPixels = rc.depthMask.CountNonZero
@@ -107,85 +110,6 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         setSelectedCell(redCells, cellMap)
     End Sub
 End Class
-
-
-
-
-
-
-
-
-
-Public Class RedCloud_MatchCell : Inherits VB_Algorithm
-    Public rp As New rcData
-    Public rc As New rcData
-    Public lastCellMap As New cv.Mat
-    Public lastCells As New List(Of rcData)
-    Public usedColors As New List(Of cv.Vec3b)
-    Public Sub New()
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        strOut = "RedCloud_MatchCell takes an rcData cell and builds an rcData cell." + vbCrLf +
-                 "When standaloneTest(), it just build a fake rcData cell and displays the rcData equivalent."
-        desc = "Build a RedCloud cell from the rcData input"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standaloneTest() And task.heartBeat Then
-            rp.floodPoint = New cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2))
-            Dim w = msRNG.Next(1, dst2.Width / 2), h = msRNG.Next(1, dst2.Height / 2)
-            rp.rect = New cv.Rect(rp.floodPoint.X, rp.floodPoint.Y, w, h)
-            rp.mask = task.depthRGB(rp.rect).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            lastCellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            dst2.SetTo(0)
-        End If
-
-        rc = New rcData
-        rc.index = rp.index
-        rc.rect = rp.rect
-        rc.mask = rp.mask
-
-        rc.maxDStable = rc.maxDist ' assume it has to use the latest.
-        rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-        If rc.indexLast < lastCells.Count Then
-            Dim lrc = lastCells(rc.indexLast)
-            rc.color = lrc.color
-
-            Dim stableCheck = lastCellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
-            If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
-        End If
-
-        If usedColors.Contains(rc.color) Then
-            rc.color = randomCellColor()
-            If standaloneTest() Then dst2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-            rc.indexLast = 0
-            If task.heartBeat Then dst3.SetTo(0)
-            dst3(rc.rect).SetTo(255, rc.mask)
-        End If
-
-        usedColors.Add(rc.color)
-
-        rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-        vbDrawContour(rc.mask, rc.contour, 255, -1)
-
-        Dim minLoc As cv.Point, maxLoc As cv.Point
-        task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.mask)
-        task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.mask)
-        task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.mask)
-
-        Dim tmp = New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
-        task.depthMask(rc.rect).CopyTo(tmp, rc.mask)
-        If tmp.CountNonZero / rc.pixels > 0.1 Then
-            Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
-            cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.mask)
-
-            rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
-            rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
-        End If
-
-        If standaloneTest() Then setTrueText(strOut, 3)
-    End Sub
-End Class
-
-
 
 
 
@@ -2298,7 +2222,6 @@ Public Class RedCloud_Masks : Inherits VB_Algorithm
     Public classCount As Integer
     Public imageThresholdPercent As Single = 0.98
     Public cellMinPercent As Single = 0.0001
-    Public buildContours As Boolean = True
     Public Sub New()
         cPtr = RedCloud_Open()
         desc = "Core interface to the C++ code for floodfill."
@@ -2355,16 +2278,10 @@ Public Class RedCloud_Masks : Inherits VB_Algorithm
             rc.pixels = sizeData.Get(Of Integer)(i, 0)
             rc.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
             rc.mask.Rectangle(New cv.Rect(0, 0, rc.mask.Width, rc.mask.Height), 0, 1)
-            rc.color = task.vecColors(i)
+
             Dim pt = vbGetMaxDist(rc.mask)
             rc.maxDist = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
-            Dim val = task.pcSplit(2).Get(Of Single)(rc.floodPoint.Y, rc.floodPoint.X)
-            If val = 0 Then rc.depthCell = False Else rc.depthCell = True
 
-            If buildContours Then
-                rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-                vbDrawContour(rc.mask, rc.contour, 255, -1)
-            End If
             sortedCells.Add(rc.pixels, rc)
         Next
 
@@ -2378,38 +2295,135 @@ End Class
 
 
 
+
+
+
+Public Class RedCloud_MatchCell : Inherits VB_Algorithm
+    Public rp As New rcData
+    Public rc As New rcData
+    Public lastCellMap As New cv.Mat
+    Public lastCells As New List(Of rcData)
+    Public usedColors As New List(Of cv.Vec3b)
+    Public Sub New()
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        strOut = "RedCloud_MatchCell takes an rcData cell and builds an rcData cell." + vbCrLf +
+                 "When standaloneTest(), it just build a fake rcData cell and displays the rcData equivalent."
+        desc = "Build a RedCloud cell from the rcData input"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standaloneTest() And task.heartBeat Then
+            rp.floodPoint = New cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2))
+            Dim w = msRNG.Next(1, dst2.Width / 2), h = msRNG.Next(1, dst2.Height / 2)
+            rp.rect = New cv.Rect(rp.floodPoint.X, rp.floodPoint.Y, w, h)
+            rp.mask = task.depthRGB(rp.rect).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            lastCellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            dst2.SetTo(0)
+        End If
+
+        rc = New rcData
+        rc.index = rp.index
+        rc.rect = rp.rect
+        rc.mask = rp.mask
+        rc.maxDist = rp.maxDist
+
+        rc.maxDStable = rc.maxDist ' assume it has to use the latest.
+        rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+        If rc.indexLast < lastCells.Count Then
+            Dim lrc = lastCells(rc.indexLast)
+            rc.color = lrc.color
+
+            Dim stableCheck = lastCellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
+            If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+        End If
+
+        If usedColors.Contains(rc.color) Then
+            rc.color = randomCellColor()
+            If standaloneTest() Then dst2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+            rc.indexLast = 0
+            If task.heartBeat Then dst3.SetTo(0)
+            dst3(rc.rect).SetTo(255, rc.mask)
+        End If
+
+        usedColors.Add(rc.color)
+
+        rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+        vbDrawContour(rc.mask, rc.contour, 255, -1)
+
+        Dim minLoc As cv.Point, maxLoc As cv.Point
+        task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.mask)
+        task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.mask)
+        task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.mask)
+
+        Dim tmp = New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
+        task.depthMask(rc.rect).CopyTo(tmp, rc.mask)
+        If tmp.CountNonZero / rc.pixels > 0.1 Then
+            Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
+            cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.mask)
+
+            rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
+            rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
+            rc.depthCell = True
+        End If
+    End Sub
+End Class
+
+
+
+
+
 Public Class RedCloud_MasksBoth : Inherits VB_Algorithm
-    Public colorCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-    Public cloudCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+    Public colorCells As New List(Of rcData)
+    Public cloudCells As New List(Of rcData)
     Dim color As New Color_Basics
     Public redMasks As New RedCloud_Masks
     Dim redCore As New RedCloud_Core
     Dim guided As New GuidedBP_Depth
+    Dim palette As New Palette_Random
+    Dim matchCell As New RedCloud_MatchCell
     Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Create the color masks and the pointcloud masks"
     End Sub
+    Private Function matchCells(input As cv.Mat, redCells As List(Of rcData)) As cv.Mat
+        matchCell.lastCellMap = input.Clone
+        matchCell.usedColors.Clear()
+        matchCell.usedColors.Add(black)
+        matchCell.lastCells = New List(Of rcData)(redCells)
+        redCells.Clear()
+
+        Dim tmp As New cv.Mat(input.Size, cv.MatType.CV_8U, 0)
+        For Each key In redMasks.sortedCells
+            matchCell.rp = key.Value
+            matchCell.rp.index = redCells.Count
+            matchCell.Run(empty)
+            tmp(matchCell.rc.rect).SetTo(matchCell.rc.index, matchCell.rc.mask)
+            redCells.Add(matchCell.rc)
+        Next
+        Return tmp
+    End Function
     Public Sub RunVB(src As cv.Mat)
         color.Run(src)
-        redMasks.buildContours = False
         redMasks.Run(color.dst2)
-        dst2 = redMasks.dst2.Clone
-        colorCells = New SortedList(Of Integer, rcData)(redMasks.sortedCells)
 
-        dst3.SetTo(0)
-        redMasks.buildContours = True
+        dst0 = matchCells(dst0, colorCells)
+        palette.Run(dst0)
+        dst2 = palette.dst2.Clone
+
         Select Case redOptions.depthInputIndex
-            Case 0 ' "GuidedBP_Depth"
+            Case 0 ' GuidedBP_Depth
                 guided.Run(src)
                 guided.dst2.CopyTo(dst3, task.depthMask)
                 redMasks.Run(guided.dst2)
-            Case 1 ' "RedCloud_Core"
+            Case 1 ' RedCloud_Core
                 redCore.Run(task.pointCloud)
                 redCore.dst2.CopyTo(dst3, task.depthMask)
                 redMasks.Run(redCore.dst2)
         End Select
 
-        dst3 = redMasks.dst2
-        cloudCells = New SortedList(Of Integer, rcData)(redMasks.sortedCells)
+        dst1 = matchCells(dst1, cloudCells)
+        palette.Run(dst1)
+        dst3 = palette.dst2
     End Sub
 End Class
 
@@ -2427,13 +2441,13 @@ Public Class RedCloud_MasksCombine : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         masks.Run(src)
+        dst3 = vbPalette(masks.dst2)
 
         dst2.SetTo(0)
-        For Each key In masks.cloudCells
-            Dim rc = key.Value
+        For Each rc In masks.cloudCells
             Dim index = masks.dst2.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If index < masks.colorCells.Count Then
-                Dim rcX = masks.colorCells.ElementAt(index).Value
+                Dim rcX = masks.colorCells.ElementAt(index)
                 rc.color = rcX.color
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
             End If
