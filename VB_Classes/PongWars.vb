@@ -2,9 +2,10 @@
 Imports cv = OpenCvSharp
 ' https://github.com/vnglst/pong-wars
 Public Class PongWars_Basics : Inherits VB_Algorithm
-    Dim SQUARE_SIZE As Integer = 25
-    Dim numSquaresX As Integer = task.workingRes.Width / SQUARE_SIZE
-    Dim numSquaresY As Integer = task.workingRes.Height / SQUARE_SIZE
+    Dim sqWidth As Integer = 25
+    Dim sqHeight As Integer = 25 * task.workingRes.Height / task.workingRes.Width
+    Dim numSquaresX As Integer = task.workingRes.Width / sqWidth
+    Dim numSquaresY As Integer = task.workingRes.Height / sqHeight
 
     Dim DAY_COLOR = 1
     Dim DAY_BALL_COLOR = 2
@@ -39,10 +40,10 @@ Public Class PongWars_Basics : Inherits VB_Algorithm
         Dim updatedDy As Double = dy
 
         For angle As Double = 0 To Math.PI * 2 Step Math.PI / 4
-            Dim checkX As Double = x + Math.Cos(angle) * (SQUARE_SIZE / 2)
-            Dim checkY As Double = y + Math.Sin(angle) * (SQUARE_SIZE / 2)
-            Dim i As Integer = Math.Floor(checkX / SQUARE_SIZE)
-            Dim j As Integer = Math.Floor(checkY / SQUARE_SIZE)
+            Dim checkX As Double = x + Math.Cos(angle) * (sqWidth / 2)
+            Dim checkY As Double = y + Math.Sin(angle) * (sqHeight / 2)
+            Dim i As Integer = Math.Floor(checkX / sqWidth)
+            Dim j As Integer = Math.Floor(checkY / sqHeight)
 
             If i >= 0 AndAlso i < numSquaresX AndAlso j >= 0 AndAlso j < numSquaresY Then
                 If squares(i, j) <> sqClass Then
@@ -60,13 +61,8 @@ Public Class PongWars_Basics : Inherits VB_Algorithm
         Return (updatedDx, updatedDy)
     End Function
     Private Function CheckBoundaryCollision(x As Integer, y As Integer, dx As Double, dy As Double) As (dx As Double, dy As Double)
-        If x + dx > dst2.Width - SQUARE_SIZE / 2 OrElse x + dx < SQUARE_SIZE / 2 Then
-            dx = -dx
-        End If
-
-        If y + dy > dst2.Height - SQUARE_SIZE / 2 OrElse y + dy < SQUARE_SIZE / 2 Then
-            dy = -dy
-        End If
+        If x + dx > dst2.Width - sqWidth / 2 OrElse x + dx < sqWidth / 2 Then dx = -dx
+        If y + dy > dst2.Height - sqHeight / 2 OrElse y + dy < sqHeight / 2 Then dy = -dy
         Return (dx, dy)
     End Function
     Private Sub UpdateScoreElement()
@@ -122,16 +118,16 @@ Public Class PongWars_Basics : Inherits VB_Algorithm
 
         For i As Integer = 0 To numSquaresX - 1
             For j As Integer = 0 To numSquaresY - 1
-                Dim rect = New cv.Rect(i * SQUARE_SIZE, j * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
+                Dim rect = New cv.Rect(i * sqWidth, j * sqHeight, sqWidth, sqHeight)
                 Dim index = squares(i, j)
                 dst2.Rectangle(rect, task.scalarColors(index), -1, task.lineType)
             Next
         Next
 
-        Dim pt = New cv.Point(CInt(x1 - SQUARE_SIZE / 2), CInt(y1 - SQUARE_SIZE / 2))
+        Dim pt = New cv.Point(CInt(x1 - sqWidth / 2), CInt(y1 - sqHeight / 2))
         dst2.Circle(pt, task.dotSize + 5, task.scalarColors(DAY_BALL_COLOR), -1, task.lineType)
 
-        pt = New cv.Point(CInt(x2 - SQUARE_SIZE / 2), CInt(y2 - SQUARE_SIZE / 2))
+        pt = New cv.Point(CInt(x2 - sqWidth / 2), CInt(y2 - sqHeight / 2))
         dst2.Circle(pt, task.dotSize + 5, task.scalarColors(NIGHT_BALL_COLOR), -1, task.lineType)
     End Sub
 End Class
