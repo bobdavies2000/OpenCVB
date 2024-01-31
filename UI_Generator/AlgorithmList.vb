@@ -1514,7 +1514,6 @@ if algorithmName = "RedCloud_LeftRight" Then return new RedCloud_LeftRight
 if algorithmName = "RedCloud_LikelyFlatSurfaces" Then return new RedCloud_LikelyFlatSurfaces
 if algorithmName = "RedCloud_Masks" Then return new RedCloud_Masks
 if algorithmName = "RedCloud_MasksBoth" Then return new RedCloud_MasksBoth
-if algorithmName = "RedCloud_MasksCombine" Then return new RedCloud_MasksCombine
 if algorithmName = "RedCloud_MasksInDepth" Then return new RedCloud_MasksInDepth
 if algorithmName = "RedCloud_MatchCell" Then return new RedCloud_MatchCell
 if algorithmName = "RedCloud_MeterByMeter" Then return new RedCloud_MeterByMeter

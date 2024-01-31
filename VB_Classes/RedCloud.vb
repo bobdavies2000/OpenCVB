@@ -47,8 +47,8 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
 
             usedColors.Add(rc.color)
 
-            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            vbDrawContour(rc.mask, rc.contour, 255, -1)
+            'rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            'vbDrawContour(rc.mask, rc.contour, 255, -1)
 
             rc.depthMask = rc.mask.Clone
             rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
@@ -2353,26 +2353,8 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
 
         usedColors.Add(rc.color)
 
-        'tour.Run(rc.mask)
-        'rc.contour = tour.contour
-        'rc.mask = tour.dst2
-        'rc.pixels = rc.mask.CountNonZero
-
-        'Dim minLoc As cv.Point, maxLoc As cv.Point
-        'task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.mask)
-        'task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.mask)
-        'task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.mask)
-
-        'Dim tmp = New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
-        'task.depthMask(rc.rect).CopyTo(tmp, rc.mask)
-        'If tmp.CountNonZero / rc.pixels > 0.1 Then
-        '    Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
-        '    cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.mask)
-
-        '    rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
-        '    rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
-        '    rc.depthCell = True
-        'End If
+        'rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone)
+        'rc.maxDist = vbGetMaxDist(rc)
     End Sub
 End Class
 
@@ -2442,43 +2424,6 @@ Public Class RedCloud_MasksBoth : Inherits VB_Algorithm
         dst3.SetTo(0, cloudCells(0).mask)
         dst3.SetTo(0, task.noDepthMask)
 
-        Static redCSelected As Integer
-        If task.mouseClickFlag Then
-            redCSelected = If(task.mousePicTag = 2, RESULT_DST2, RESULT_DST3)
-        End If
-
-        If redCSelected = RESULT_DST2 Then
-            setSelectedCell(colorCells, dst0)
-        ElseIf redCSelected = RESULT_DST3 Then
-            setSelectedCell(cloudCells, dst1)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class RedCloud_MasksCombine : Inherits VB_Algorithm
-    Dim masks As New RedCloud_MasksBoth
-    Public Sub New()
-        desc = "Combine the cloud masks using the color masks"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        masks.Run(src)
-        dst3 = vbPalette(masks.dst2)
-
-        dst2.SetTo(0)
-        For Each rc In masks.cloudCells
-            Dim index = masks.dst2.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            If index < masks.colorCells.Count Then
-                Dim rcX = masks.colorCells.ElementAt(index)
-                rc.color = rcX.color
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
-            End If
-        Next
+        If task.rcPicTag = RESULT_DST2 Then setSelectedCell(colorCells, dst0) Else setSelectedCell(cloudCells, dst1)
     End Sub
 End Class

@@ -207,11 +207,9 @@ Module VB
             task.rc = redCells(index)
         Else
             If task.clickPoint = New cv.Point(0, 0) Or index >= redCells.Count Then
-                If redCells.Count > 0 Then
+                If redCells.Count > 1 Then
                     task.clickPoint = redCells(1).maxDist
                     task.rc = redCells(1)
-                Else
-                    Exit Sub
                 End If
             Else
                 task.rc = redCells(index)

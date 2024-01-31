@@ -228,6 +228,7 @@ Public Class VBtask : Implements IDisposable
     Public redThresholdTop As Integer ' In heatmap top view, this defines the boundary between red and blue
 
     Public rc As New rcData
+    Public rcPicTag As Integer
     Public rcMatchMax As Integer
 
     Public useXYRange As Boolean ' OpenGL applications don't need to adjust the ranges.
