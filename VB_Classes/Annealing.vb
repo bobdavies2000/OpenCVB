@@ -148,13 +148,17 @@ Public Class Annealing_MultiThreaded : Inherits VB_Algorithm
 
 
         ' if the top X are all the same energy, then we are done.
-        Dim successCounter As Integer
+        Dim workingCount As Integer, successCounter As Integer
         For i = 0 To anneal.Count - 1
             Dim index = bestList.ElementAt(i).Value
-            If anneal(index).energy = anneal(index).energyLast Then successCounter += 1 Else anneal(index).energyLast = anneal(index).energy
+            If anneal(index).energy <> anneal(index).energyLast Then
+                anneal(index).energyLast = anneal(index).energy
+                workingCount += 1
+            Else
+                successCounter += 1
+            End If
         Next
-        labels(3) = "There are " + CStr(successCounter) + " threads completed."
-
+        labels(3) = $"There are {workingCount} threads working in parallel."
         If successCounter >= options.successCount Then setup()
     End Sub
 End Class

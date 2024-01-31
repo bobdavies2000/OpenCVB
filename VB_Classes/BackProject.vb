@@ -41,9 +41,8 @@ Public Class BackProject_Basics : Inherits VB_Algorithm
         dst3.SetTo(cv.Scalar.Yellow, dst0)
         Dim count = histK.hist.histogram.Get(Of Single)(CInt(histIndex), 0)
         Dim histMax As mmData = vbMinMax(histK.hist.histogram)
-        labels(3) = "Backprojecting " + CStr(CInt(minRange(0))) + " to " + CStr(CInt(maxRange(0))) + " with " +
-                    CStr(count) + " of " + CStr(totalPixels) + " samples compared to " + " mask pixels = " + CStr(actualCount) +
-                    " Histogram max count = " + CStr(CInt(histMax.maxVal))
+        labels(3) = $"Backprojecting {CInt(minRange(0))} to {CInt(maxRange(0))} with {CInt(count)} of {totalPixels} compared to " +
+                    $"mask pixels = {actualCount}.  Histogram max count = {CInt(histMax.maxVal)}"
         dst2.Rectangle(New cv.Rect(CInt(histIndex) * brickWidth, 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class

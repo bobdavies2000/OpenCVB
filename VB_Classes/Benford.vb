@@ -260,7 +260,7 @@ Public Class Benford_Primes : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If task.optionsChanged Then sieve.Run(src) ' only need to compute this once...
-        setTrueText(CStr(sieve.primes.Count) + " primes were found")
+        setTrueText($"Primes found: {sieve.primes.Count}", 3)
 
         Dim tmp = New cv.Mat(sieve.primes.Count, 1, cv.MatType.CV_32S, sieve.primes.ToArray())
         tmp.ConvertTo(tmp, cv.MatType.CV_32F)

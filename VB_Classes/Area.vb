@@ -145,7 +145,7 @@ Public Class Area_SoloPoints : Inherits VB_Algorithm
             soloPoints.Add(nZero.nonZero.Get(Of cv.Point)(i, 0))
         Next
 
-        labels(2) = CStr(soloPoints.Count) + " points found"
+        If task.heartBeat Then labels(2) = $"There were {soloPoints.Count} points found"
     End Sub
 End Class
 

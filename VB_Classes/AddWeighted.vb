@@ -1,3 +1,4 @@
+Imports CS_Classes
 Imports cv = OpenCvSharp
 Public Class AddWeighted_Basics : Inherits VB_Algorithm
     Public src2 As cv.Mat
@@ -18,7 +19,7 @@ Public Class AddWeighted_Basics : Inherits VB_Algorithm
         End If
         Dim wt = task.AddWeighted
         cv.Cv2.AddWeighted(src, wt, srcPlus, 1.0 - wt, 0, dst2)
-        labels(2) = "depth " + CStr(CInt(1 - wt) * 100) + " BGR " + CStr(CInt(wt * 100))
+        labels(2) = $"Depth %: {100 - wt * 100} BGR %: {CInt(wt * 100)}"
     End Sub
 End Class
 
@@ -34,7 +35,7 @@ Public Class AddWeighted_Edges : Inherits VB_Algorithm
         labels = {"", "", "Edges_BinarizedSobel output", "AddWeighted edges and BGR image"}
         desc = "Add in the edges separating light and dark to the color image"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         edges.Run(src)
         dst2 = edges.dst2
         labels(2) = edges.labels(2)
@@ -57,7 +58,7 @@ Public Class AddWeighted_ImageAccumulate : Inherits VB_Algorithm
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Accumulation weight of each image X100", 1, 100, 10)
         desc = "Update a running average of the image"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static weightSlider = findSlider("Accumulation weight of each image X100")
         If task.optionsChanged Then dst2 = task.pcSplit(2) * 1000
         cv.Cv2.AccumulateWeighted(task.pcSplit(2) * 1000, dst2, weightSlider.Value / 100, New cv.Mat)

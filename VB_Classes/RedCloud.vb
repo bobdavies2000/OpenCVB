@@ -2353,10 +2353,10 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
 
         usedColors.Add(rc.color)
 
-        tour.Run(rc.mask)
-        rc.contour = tour.contour
-        rc.mask = tour.dst2
-        rc.pixels = rc.mask.CountNonZero
+        'tour.Run(rc.mask)
+        'rc.contour = tour.contour
+        'rc.mask = tour.dst2
+        'rc.pixels = rc.mask.CountNonZero
 
         'Dim minLoc As cv.Point, maxLoc As cv.Point
         'task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.mask)
@@ -2423,8 +2423,8 @@ Public Class RedCloud_MasksBoth : Inherits VB_Algorithm
         color.Run(src)
         redMasks.Run(color.dst2)
 
-        'dst0 = matchCells(dst2, dst0, colorCells)
-        'dst2.SetTo(0, colorCells(0).mask)
+        dst0 = matchCells(dst2, dst0, colorCells)
+        dst2.SetTo(0, colorCells(0).mask)
 
         Dim cloudInput As New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         Select Case redOptions.depthInputIndex
@@ -2440,6 +2440,7 @@ Public Class RedCloud_MasksBoth : Inherits VB_Algorithm
 
         dst1 = matchCells(dst3, dst1, cloudCells)
         dst3.SetTo(0, cloudCells(0).mask)
+        dst3.SetTo(0, task.noDepthMask)
 
         Static redCSelected As Integer
         If task.mouseClickFlag Then
