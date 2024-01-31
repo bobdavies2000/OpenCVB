@@ -22,7 +22,7 @@ Public Class Cell_Basics : Inherits VB_Algorithm
         strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbCrLf
         strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
         strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbTab + "rc.color = " + rc.color.ToString() + vbCrLf
-        strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + ", " + CStr(rc.maxDist.Y) + vbCrLf
+        strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + ", " + CStr(rc.maxDist.Y) + vbTab + "Pixels = " + CStr(rc.pixels) + vbCrLf
 
         strOut += "Cell is marked as depthCell = " + CStr(rc.depthCell) + vbCrLf
         If rc.depthPixels > 0 Then

@@ -251,6 +251,7 @@ if algorithmName = "Contour_Foreground" Then return new Contour_Foreground
 if algorithmName = "Contour_Image" Then return new Contour_Image
 if algorithmName = "Contour_Largest" Then return new Contour_Largest
 if algorithmName = "Contour_Outline" Then return new Contour_Outline
+if algorithmName = "Contour_RC_AddContour" Then return new Contour_RC_AddContour
 if algorithmName = "Contour_RedCloud" Then return new Contour_RedCloud
 if algorithmName = "Contour_RedCloudCorners" Then return new Contour_RedCloudCorners
 if algorithmName = "Contour_RedCloudEdges" Then return new Contour_RedCloudEdges

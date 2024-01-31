@@ -544,40 +544,6 @@ End Class
 
 
 
-Public Class Contour_Smoothing : Inherits VB_Algorithm
-    Dim options As New Options_Contours2
-    Dim redC As New RedCloud_FeatureLess
-    Public Sub New()
-        labels(2) = "Use the options to change how the contour is smoothed."
-        desc = "Create a simplified contour of the selected cell"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        redC.Run(src)
-        dst2 = redC.dst2
-
-        Dim rc = task.rc
-
-        dst1.SetTo(0)
-        dst3.SetTo(0)
-
-        Dim poorContour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone)
-        vbDrawContour(dst1(rc.rect), poorContour, cv.Scalar.Yellow)
-
-        Dim newContour = contourBuild(rc.mask, options.ApproximationMode)
-        vbDrawContour(dst3(rc.rect), newContour, cv.Scalar.Yellow)
-
-        If task.heartBeat Then labels(3) = "Contour points count reduced from " + CStr(poorContour.Count) + " to " + CStr(newContour.Count)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 Public Class Contour_RedCloudCorners : Inherits VB_Algorithm
@@ -765,5 +731,75 @@ Public Class Contour_CompareToFeatureless : Inherits VB_Algorithm
 
         fLess.Run(src)
         dst3 = fLess.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Contour_Smoothing : Inherits VB_Algorithm
+    Dim options As New Options_Contours2
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        labels(3) = "The white outline is the truest contour while the red is the selected approximation."
+        desc = "Compare contours of the selected cell. Cells are offset to help comparison."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+
+        Dim rc = task.rc
+
+        dst1.SetTo(0)
+        dst3.SetTo(0)
+
+        Dim bestContour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone)
+        vbDrawContour(dst3(rc.rect), bestContour, cv.Scalar.White, task.lineWidth + 3)
+
+        Dim approxContour = contourBuild(rc.mask, options.ApproximationMode)
+        vbDrawContour(dst3(rc.rect), approxContour, cv.Scalar.Red)
+
+        If task.heartBeat Then labels(2) = "Contour points count reduced from " + CStr(bestContour.Count) +
+                                           " to " + CStr(approxContour.Count)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Contour_RC_AddContour : Inherits VB_Algorithm
+    Public contour As New List(Of cv.Point)
+    Public options As New Options_Contours
+    Public Sub New()
+        desc = "Find the contour for the src."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static myFrameCount As Integer = task.frameCount
+        If myFrameCount <> task.frameCount Then
+            options.RunVB() ' avoid running options more than once per frame.
+            myFrameCount = task.frameCount
+        End If
+
+        Dim allContours As cv.Point()()
+        cv.Cv2.FindContours(src, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
+
+        Dim maxCount As Integer, maxIndex As Integer
+        For i = 0 To allContours.Count - 1
+            Dim len = CInt(allContours(i).Count)
+            If len > maxCount Then
+                maxCount = len
+                maxIndex = i
+            End If
+        Next
+        dst2 = src
+        If allContours.Count = 0 Then Exit Sub
+        Dim contour = New List(Of cv.Point)(allContours(maxIndex).ToList)
+        vbDrawContour(dst2, contour, 255, -1)
     End Sub
 End Class
