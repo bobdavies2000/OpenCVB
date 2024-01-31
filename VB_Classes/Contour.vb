@@ -786,7 +786,14 @@ Public Class Contour_RC_AddContour : Inherits VB_Algorithm
             myFrameCount = task.frameCount
         End If
 
+        If standalone Then
+            Static reduction As New Reduction_Basics
+            reduction.Run(src)
+            src = reduction.dst2
+        End If
+
         Dim allContours As cv.Point()()
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.FindContours(src, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
 
         Dim maxCount As Integer, maxIndex As Integer
@@ -800,6 +807,45 @@ Public Class Contour_RC_AddContour : Inherits VB_Algorithm
         dst2 = src
         If allContours.Count = 0 Then Exit Sub
         Dim contour = New List(Of cv.Point)(allContours(maxIndex).ToList)
-        vbDrawContour(dst2, contour, 255, -1)
+        vbDrawContour(dst2, contour, 255, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Contour_Gray : Inherits VB_Algorithm
+    Public contour As New List(Of cv.Point)
+    Public options As New Options_Contours
+    Public Sub New()
+        desc = "Find the contour for the src."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static myFrameCount As Integer = task.frameCount
+        If myFrameCount <> task.frameCount Then
+            options.RunVB() ' avoid running options more than once per frame.
+            myFrameCount = task.frameCount
+        End If
+
+        If standalone Then
+            Static reduction As New Reduction_Basics
+            redOptions.Reduction_Basics.Checked = True
+            reduction.Run(src)
+            src = reduction.dst2
+        End If
+
+        Dim allContours As cv.Point()()
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.FindContours(src, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
+        If allContours.Count = 0 Then Exit Sub
+
+        dst2 = src
+        For Each tour In allContours
+            vbDrawContour(dst2, tour.ToList, cv.Scalar.White, task.lineWidth)
+        Next
+        labels(2) = $"There were {allContours.Count} contours found."
     End Sub
 End Class

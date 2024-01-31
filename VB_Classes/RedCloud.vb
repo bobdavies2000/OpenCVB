@@ -2302,7 +2302,6 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
     Public rp As New rcData
     Public rc As New rcData
     Public lastCellMap As New cv.Mat
-    Public lastColors As New cv.Mat
     Public lastCells As New List(Of rcData)
     Public usedColors As New List(Of cv.Vec3b)
     Dim tour As New Contour_RC_AddContour
@@ -2348,9 +2347,6 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
             rc.matchCount += 1
         End If
 
-        Dim color = lastColors.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-        If color <> rc.color And rc.pixels > 200 Then Dim k = 0
-
         usedColors.Add(rc.color)
 
         'rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone)
@@ -2377,7 +2373,6 @@ Public Class RedCloud_MasksBoth : Inherits VB_Algorithm
     End Sub
     Private Function matchCells(dst As cv.Mat, input As cv.Mat, redCells As List(Of rcData)) As cv.Mat
         matchCell.lastCellMap = input.Clone
-        matchCell.lastColors = dst.Clone
         matchCell.usedColors.Clear()
         matchCell.usedColors.Add(black)
         matchCell.lastCells = New List(Of rcData)(redCells)

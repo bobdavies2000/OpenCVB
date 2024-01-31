@@ -8,6 +8,7 @@ Public Class Line_Basics : Inherits VB_Algorithm
     Public skipDistanceCheck As Boolean
     Public subsetRect As cv.Rect
     Public tCells As New List(Of tCell)
+    Public lineColor = cv.Scalar.White
     Public Sub New()
         subsetRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
@@ -51,7 +52,7 @@ Public Class Line_Basics : Inherits VB_Algorithm
         dst3.SetTo(0)
         For Each nextLine In sortLength
             Dim mps = mpList(nextLine.Value)
-            dst2.Line(mps.p1, mps.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+            dst2.Line(mps.p1, mps.p2, lineColor, task.lineWidth, task.lineType)
             dst3.Line(mps.p1, mps.p2, 255, task.lineWidth, task.lineType)
         Next
         labels(2) = CStr(mpList.Count) + " lines were detected in the current frame"
@@ -1368,5 +1369,33 @@ Public Class Line_ViewTop : Inherits VB_Algorithm
 
         lines.Run(dst2)
         dst3 = lines.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_FromContours : Inherits VB_Algorithm
+    Dim reduction As New Reduction_Basics
+    Dim lines As New Line_Basics
+    Dim contours As New Contour_Gray
+    Public Sub New()
+        redOptions.Reduction_Basics.Checked = True ' to enable sliders
+        lines.lineColor = cv.Scalar.Red
+        vbAddAdvice("Use the reduction sliders in the redoptions to control contours and subsequent lines found.")
+        desc = "Find the lines in the contours."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        reduction.Run(src)
+        contours.Run(reduction.dst2)
+        dst2 = contours.dst2.Clone
+        lines.Run(dst2)
+
+        dst3.SetTo(0)
+        For Each mp In lines.mpList
+            dst3.Line(mp.p1, mp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+        Next
     End Sub
 End Class

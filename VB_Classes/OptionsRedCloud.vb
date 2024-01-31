@@ -154,6 +154,9 @@ Public Class OptionsRedCloud
                 channelIndex = 2
                 histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
         End Select
+
+        SimpleReductionSlider.Enabled = Not BitwiseReduction.Checked
+        BitwiseReductionSlider.Enabled = BitwiseReduction.Checked
     End Sub
 
 
