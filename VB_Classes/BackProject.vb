@@ -755,7 +755,7 @@ End Class
 
 
 Public Class BackProject_Hue : Inherits VB_Algorithm
-    Dim hue As New OpenCVExample_CalcBackProject_Demo1
+    Dim hue As New OEX_CalcBackProject_Demo1
     Public classCount As Integer
     Public Sub New()
         desc = "Create an 8UC1 image with a backprojection of the hue."

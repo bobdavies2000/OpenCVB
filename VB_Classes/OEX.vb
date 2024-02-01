@@ -1,8 +1,12 @@
 ﻿Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Drawing
+Imports System.Windows.Forms
+Imports System.Windows.Shapes
+Imports System.Drawing.Drawing2D
 ' all examples in this file are from https://github.com/opencv/opencv/tree/4.x/samples
-Public Class OpenCVExample_CalcBackProject_Demo1 : Inherits VB_Algorithm
+Public Class OEX_CalcBackProject_Demo1 : Inherits VB_Algorithm
     Public histogram As New cv.Mat
     Public classCount As Integer
     Public Sub New()
@@ -46,7 +50,7 @@ End Class
 
 
 
-Public Class OpenCVExample_CalcBackProject_Demo2 : Inherits VB_Algorithm
+Public Class OEX_CalcBackProject_Demo2 : Inherits VB_Algorithm
     Public histogram As New cv.Mat
     Public classCount As Integer = 10 ' initial value is just a guess.  It is refined after the first pass.
     Public Sub New()
@@ -92,7 +96,7 @@ End Class
 
 
 
-Public Class OpenCVExample_bgfg_segm : Inherits VB_Algorithm
+Public Class OEX_bgfg_segm : Inherits VB_Algorithm
     Dim bgSub As New BGSubtract_Basics
     Public Sub New()
         desc = "OpenCV example bgfg_segm - existing BGSubtract_Basics is the same."
@@ -110,7 +114,7 @@ End Class
 
 
 
-Public Class OpenCVExample_bgSub : Inherits VB_Algorithm
+Public Class OEX_bgSub : Inherits VB_Algorithm
     Dim pBackSub As cv.BackgroundSubtractor
     Dim options As New Options_BGSubtract
     Public Sub New()
@@ -124,7 +128,7 @@ Public Class OpenCVExample_bgSub : Inherits VB_Algorithm
                 Case "GMG"
                     pBackSub = cv.BackgroundSubtractorGMG.Create()
                 Case "KNN"
-                    pBackSub = cv.BackgroundSubtractorKNN.create()
+                    pBackSub = cv.BackgroundSubtractorKNN.Create()
                 Case "MOG"
                     pBackSub = cv.BackgroundSubtractorMOG.Create()
                 Case Else ' MOG2 is the default.  Other choices map to MOG2 because OpenCVSharp doesn't support them.
@@ -141,12 +145,12 @@ End Class
 
 
 
-Public Class OpenCVExample_BasicLinearTransforms : Inherits VB_Algorithm
+Public Class OEX_BasicLinearTransforms : Inherits VB_Algorithm
     Dim options As New Options_BrightnessContrast
     Public Sub New()
         findSlider("Alpha (contrast)").Value = 2
         findSlider("Beta (brightness)").Value = 40
-        desc = "OpenCV Example BasicLinearTransforms and OpenCV Example BasicLinearTransformTrackBar"
+        desc = "OpenCV Example BasicLinearTransforms - NOTE: much faster than BasicLinearTransformTrackBar"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static alphaSlider = findSlider("Alpha (contrast)")
@@ -161,7 +165,7 @@ End Class
 
 
 
-Public Class OpenCVExample_BasicLinearTransformsTrackBar : Inherits VB_Algorithm
+Public Class OEX_BasicLinearTransformsTrackBar : Inherits VB_Algorithm
     Dim options As New Options_BrightnessContrast
     Public Sub New()
         findSlider("Alpha (contrast)").Value = 2
@@ -182,5 +186,91 @@ Public Class OpenCVExample_BasicLinearTransformsTrackBar : Inherits VB_Algorithm
                 dst2.Set(Of cv.Vec3b)(y, x, vec)
             Next
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class OEX_delaunay2 : Inherits VB_Algorithm
+    Dim active_facet_color As New cv.Scalar(0, 0, 255)
+    Dim delaunay_color As New cv.Scalar(255, 255, 255)
+    Dim points As New List(Of cv.Point2f)
+    Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        labels = {"", "", "Next triangle list being built.  Latest entry is in red.", "The completed voronoi facets"}
+        desc = "OpenCV Example delaunay2"
+    End Sub
+    Public Shared Sub locatePoint(img As cv.Mat, subdiv As cv.Subdiv2D, pt As cv.Point, activeColor As cv.Scalar)
+        Dim e0 As Integer = 0
+        Dim vertex As Integer = 0
+
+        subdiv.Locate(pt, e0, vertex)
+
+        If e0 > 0 Then
+            Dim e As Integer = e0
+            Do
+                Dim org As cv.Point, dst As cv.Point
+                If subdiv.EdgeOrg(e, org) > 0 AndAlso subdiv.EdgeDst(e, dst) > 0 Then
+                    img.Line(org, dst, activeColor, task.lineWidth + 3, task.lineType, 0)
+                End If
+
+                e = subdiv.GetEdge(e, cv.Subdiv2D.NEXT_AROUND_LEFT)
+            Loop While e <> e0
+        End If
+
+        img.Circle(pt, task.dotSize, activeColor, -1, task.lineType)
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.quarterBeat Then
+            If points.Count < 10 Then
+                dst2.SetTo(0)
+                Dim pt = New cv.Point2f(msRNG.Next(0, dst2.Width - 10) + 5, msRNG.Next(0, dst2.Height - 10) + 5)
+                points.Add(pt)
+                locatePoint(dst2, subdiv, pt, active_facet_color)
+                subdiv.Insert(pt)
+
+                Dim triangleList = subdiv.GetTriangleList()
+                Dim pts(3 - 1) As cv.Point
+                For i = 0 To triangleList.Count - 1
+                    Dim t = triangleList(i)
+                    pts(0) = New cv.Point(Math.Round(t(0)), Math.Round(t(1)))
+                    pts(1) = New cv.Point(Math.Round(t(2)), Math.Round(t(3)))
+                    pts(2) = New cv.Point(Math.Round(t(4)), Math.Round(t(5)))
+                    dst2.Line(pts(0), pts(1), delaunay_color, task.lineWidth, task.lineType)
+                    dst2.Line(pts(1), pts(2), delaunay_color, task.lineWidth, task.lineType)
+                    dst2.Line(pts(2), pts(0), delaunay_color, task.lineWidth, task.lineType)
+                Next
+            Else
+                dst1 = dst2.Clone
+
+                Dim facets = New cv.Point2f()() {Nothing}
+                Dim centers() As cv.Point2f
+                subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, centers)
+
+                Dim ifacet As New List(Of cv.Point)
+                Dim ifacets As New List(Of List(Of cv.Point))({ifacet})
+
+                For i = 0 To facets.Count - 1
+                    ifacet.Clear()
+                    ifacet.AddRange(facets(i).Select(Function(p) New cv.Point(p.X, p.Y)))
+
+                    Dim color = task.vecColors(i Mod 255)
+                    dst3.FillConvexPoly(ifacet, color, 8, 0)
+
+                    ifacets(0) = ifacet
+                    cv.Cv2.Polylines(dst3, ifacets, True, New cv.Vec3b, task.lineWidth, task.lineType)
+                    dst3.Circle(centers(i), 3, New cv.Vec3b, -1, task.lineType)
+                Next
+
+                points.Clear()
+                subdiv = New cv.Subdiv2D(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+            End If
+        End If
     End Sub
 End Class

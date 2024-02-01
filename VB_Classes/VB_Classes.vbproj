@@ -120,7 +120,7 @@
     <Compile Include="BGRPattern.vb" />
     <Compile Include="Cell.vb" />
     <Compile Include="Complexity.vb" />
-    <Compile Include="OpenCVExamples.vb" />
+    <Compile Include="OEX.vb" />
     <Compile Include="PongWars.vb" />
     <Compile Include="VB_Externs.vb" />
     <Compile Include="CPPExtract.vb" />
