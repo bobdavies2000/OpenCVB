@@ -759,11 +759,11 @@ public:
 
 
 
-class CPP_Options_LeftRight {
+class CPP_Options_BrightnessContrast {
 public:
 	float alpha = 2000;
 	int beta = -100;
-	CPP_Options_LeftRight() {
+	CPP_Options_BrightnessContrast() {
 	}
 	void RunVB() {}
 };

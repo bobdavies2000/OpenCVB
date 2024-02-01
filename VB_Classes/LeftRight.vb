@@ -1,9 +1,9 @@
 Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Public Class LeftRight_Basics : Inherits VB_Algorithm
-    Dim Options As New Options_LeftRight
+    Dim Options As New Options_BrightnessContrast
     Public Sub New()
-        If task.cameraName = "MYNT-EYE-D1000" Then findSlider("Brightness Alpha (contrast)").Value = 1100
+        If task.cameraName = "MYNT-EYE-D1000" Then findSlider("Alpha (contrast)").Value = 1100
         labels = {"", "", "Left camera image", If(task.cameraName = "Azure Kinect 4K", "No right image", "Right camera image")}
         desc = "Enhance the left/right views with brightness and contrast."
     End Sub

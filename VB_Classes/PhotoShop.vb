@@ -52,12 +52,12 @@ Public Class PhotoShop_AlphaBeta : Inherits VB_Algorithm
     Public Sub New()
         desc = "Use alpha and beta with ConvertScaleAbs."
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Brightness Alpha (contrast)", 0, 500, 300)
+            sliders.setupTrackBar("Alpha (contrast)", 0, 500, 300)
             sliders.setupTrackBar("Brightness Beta", -100, 100, 0)
         End If
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static alphaSlider = findSlider("Brightness Alpha (contrast)")
+        Static alphaSlider = findSlider("Alpha (contrast)")
         Static betaSlider = findSlider("Brightness Beta")
         dst2 = src.ConvertScaleAbs(alphaSlider.Value / 500, betaSlider.Value)
     End Sub

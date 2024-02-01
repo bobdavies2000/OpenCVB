@@ -2485,7 +2485,7 @@ End Class
 
 
 
-Public Class Options_LeftRight : Inherits VB_Algorithm
+Public Class Options_BrightnessContrast : Inherits VB_Algorithm
     Public alpha As Single
     Public beta As Integer
     Public Sub New()
@@ -2501,13 +2501,13 @@ Public Class Options_LeftRight : Inherits VB_Algorithm
         End If
         If task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then alphaDefault = 1500
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Brightness Alpha (contrast)", 0, 10000, alphaDefault)
-            sliders.setupTrackBar("Brightness Beta (brightness)", -255, 255, betaDefault)
+            sliders.setupTrackBar("Alpha (contrast)", 0, 10000, alphaDefault)
+            sliders.setupTrackBar("Beta (brightness)", -255, 255, betaDefault)
         End If
     End Sub
     Public Sub RunVB()
-        Static betaSlider = findSlider("Brightness Beta (brightness)")
-        Static alphaSlider = findSlider("Brightness Alpha (contrast)")
+        Static betaSlider = findSlider("Beta (brightness)")
+        Static alphaSlider = findSlider("Alpha (contrast)")
         alpha = alphaSlider.value / 500
         beta = betaSlider.value
     End Sub

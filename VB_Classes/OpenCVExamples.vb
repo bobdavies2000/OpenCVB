@@ -142,15 +142,45 @@ End Class
 
 
 Public Class OpenCVExample_BasicLinearTransforms : Inherits VB_Algorithm
-    Dim options As New Options_Warp
+    Dim options As New Options_BrightnessContrast
     Public Sub New()
-        findSlider("Alpha").Value = 2
-        findSlider("Beta").Value = 40
-        desc = "OpenCV Example BasicLinearTransforms"
+        findSlider("Alpha (contrast)").Value = 2
+        findSlider("Beta (brightness)").Value = 40
+        desc = "OpenCV Example BasicLinearTransforms and OpenCV Example BasicLinearTransformTrackBar"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static alphaSlider = findSlider("Alpha")
-        Static betaSlider = findSlider("Beta")
+        Static alphaSlider = findSlider("Alpha (contrast)")
+        Static betaSlider = findSlider("Beta (brightness)")
         src.ConvertTo(dst2, -1, alphaSlider.value, betaSlider.value)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OpenCVExample_BasicLinearTransformsTrackBar : Inherits VB_Algorithm
+    Dim options As New Options_BrightnessContrast
+    Public Sub New()
+        findSlider("Alpha (contrast)").Value = 2
+        findSlider("Beta (brightness)").Value = 40
+        desc = "OpenCV Example BasicLinearTransformTrackBar"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static alphaSlider = findSlider("Alpha (contrast)")
+        Static betaSlider = findSlider("Beta (brightness)")
+        Dim alpha = alphaSlider.value
+        Dim beta = betaSlider.value
+        For y As Integer = 0 To src.Rows - 1
+            For x As Integer = 0 To src.Cols - 1
+                Dim vec = src.Get(Of cv.Vec3b)(y, x)
+                vec(0) = Math.Min(vec(0) * alpha + beta, 255)
+                vec(1) = Math.Min(vec(1) * alpha + beta, 255)
+                vec(2) = Math.Min(vec(2) * alpha + beta, 255)
+                dst2.Set(Of cv.Vec3b)(y, x, vec)
+            Next
+        Next
     End Sub
 End Class
