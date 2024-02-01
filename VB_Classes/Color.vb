@@ -26,7 +26,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
                     classifier = lut
                 Case "Reduction_Basics"
                     classifier = reduction
-                Case "3D BackProjection"
+                Case "Hist3DColor_Basics"
                     classifier = hColor
                 Case "Binarize_FourWay"
                     classifier = binarize
