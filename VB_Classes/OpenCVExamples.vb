@@ -134,3 +134,23 @@ Public Class OpenCVExample_bgSub : Inherits VB_Algorithm
         pBackSub.Apply(src, dst2, options.learnRate)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class OpenCVExample_BasicLinearTransforms : Inherits VB_Algorithm
+    Dim options As New Options_Warp
+    Public Sub New()
+        findSlider("Alpha").Value = 2
+        findSlider("Beta").Value = 40
+        desc = "OpenCV Example BasicLinearTransforms"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static alphaSlider = findSlider("Alpha")
+        Static betaSlider = findSlider("Beta")
+        src.ConvertTo(dst2, -1, alphaSlider.value, betaSlider.value)
+    End Sub
+End Class

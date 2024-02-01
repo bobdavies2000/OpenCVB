@@ -1127,6 +1127,7 @@ if algorithmName = "OpAuto_PixelDifference" Then return new OpAuto_PixelDifferen
 if algorithmName = "OpAuto_Valley" Then return new OpAuto_Valley
 if algorithmName = "OpAuto_XRange" Then return new OpAuto_XRange
 if algorithmName = "OpAuto_YRange" Then return new OpAuto_YRange
+if algorithmName = "OpenCVExample_BasicLinearTransforms" Then return new OpenCVExample_BasicLinearTransforms
 if algorithmName = "OpenCVExample_bgfg_segm" Then return new OpenCVExample_bgfg_segm
 if algorithmName = "OpenCVExample_bgSub" Then return new OpenCVExample_bgSub
 if algorithmName = "OpenCVExample_CalcBackProject_Demo1" Then return new OpenCVExample_CalcBackProject_Demo1
