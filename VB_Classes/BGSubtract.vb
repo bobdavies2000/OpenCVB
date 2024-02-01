@@ -102,7 +102,7 @@ Public Class BGSubtract_MOG : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOG.Apply(src, dst2, options.MOGlearnRate)
+        MOG.Apply(src, dst2, options.learnRate)
     End Sub
 End Class
 
@@ -122,7 +122,7 @@ Public Class BGSubtract_MOG2 : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOG2.Apply(src, dst2, options.MOGlearnRate)
+        MOG2.Apply(src, dst2, options.learnRate)
     End Sub
 End Class
 
@@ -149,8 +149,8 @@ Public Class BGSubtract_GMG_KNN : Inherits VB_Algorithm
         End If
 
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        gmg.Apply(dst2, dst2, options.MOGlearnRate)
-        knn.Apply(dst2, dst2, options.MOGlearnRate)
+        gmg.Apply(dst2, dst2, options.learnRate)
+        knn.Apply(dst2, dst2, options.learnRate)
     End Sub
 End Class
 
@@ -173,11 +173,11 @@ Public Class BGSubtract_MOG_RGBDepth : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         gray = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOGDepth.Apply(gray, gray, options.MOGlearnRate)
+        MOGDepth.Apply(gray, gray, options.learnRate)
         dst2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOGRGB.Apply(src, dst3, options.MOGlearnRate)
+        MOGRGB.Apply(src, dst3, options.learnRate)
     End Sub
 End Class
 

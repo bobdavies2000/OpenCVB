@@ -103,3 +103,34 @@ Public Class OpenCVExample_bgfg_segm : Inherits VB_Algorithm
         labels(2) = bgSub.labels(2)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class OpenCVExample_bgSub : Inherits VB_Algorithm
+    Dim pBackSub As cv.BackgroundSubtractor
+    Dim options As New Options_BGSubtract
+    Public Sub New()
+        desc = "OpenCV example bgSub"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If task.optionsChanged Then
+            Select Case options.methodDesc
+                Case "GMG"
+                    pBackSub = cv.BackgroundSubtractorGMG.Create()
+                Case "KNN"
+                    pBackSub = cv.BackgroundSubtractorKNN.create()
+                Case "MOG"
+                    pBackSub = cv.BackgroundSubtractorMOG.Create()
+                Case Else ' MOG2 is the default.  Other choices map to MOG2 because OpenCVSharp doesn't support them.
+                    pBackSub = cv.BackgroundSubtractorMOG2.Create()
+            End Select
+        End If
+        pBackSub.Apply(src, dst2, options.learnRate)
+    End Sub
+End Class

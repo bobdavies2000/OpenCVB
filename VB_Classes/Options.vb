@@ -4232,7 +4232,7 @@ End Class
 
 
 Public Class Options_BGSubtract : Inherits VB_Algorithm
-    Public MOGlearnRate As Single = 1 / 1000
+    Public learnRate As Single = 100 / 1000
     Public methodDesc As String
     Public currMethod As Integer
     Public Sub New()
@@ -4246,7 +4246,7 @@ Public Class Options_BGSubtract : Inherits VB_Algorithm
             radio.addRadio("LSBP")
             radio.check(4).Checked = True ' mog2 appears to be the best...
         End If
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("MOG Learn Rate X1000", 1, 1000, 1)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("MOG Learn Rate X1000", 1, 1000, learnRate * 1000)
     End Sub
     Public Sub RunVB()
         Static learnRateSlider = findSlider("MOG Learn Rate X1000")
@@ -4267,6 +4267,6 @@ Public Class Options_BGSubtract : Inherits VB_Algorithm
                 End If
             End If
         Next
-        MOGlearnRate = learnRateSlider.Value / 1000
+        learnRate = learnRateSlider.Value / 1000
     End Sub
 End Class
