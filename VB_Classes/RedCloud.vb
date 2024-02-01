@@ -1931,7 +1931,7 @@ End Class
 
 
 Public Class RedCloud_MotionBGsubtract : Inherits VB_Algorithm
-    Public motion As New BGSubtract_Basics
+    Public bgSub As New BGSubtract_Basics
     Public redCells As New List(Of rcData)
     Public sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
@@ -1941,8 +1941,8 @@ Public Class RedCloud_MotionBGsubtract : Inherits VB_Algorithm
         desc = "Use absDiff to build a mask of cells that changed."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        motion.Run(src)
-        dst3 = motion.dst2
+        bgSub.Run(src)
+        dst3 = bgSub.dst2
 
         Static redC As New RedCloud_Basics
         redC.Run(src)
@@ -1952,7 +1952,7 @@ Public Class RedCloud_MotionBGsubtract : Inherits VB_Algorithm
         redCells.Clear()
         dst1.SetTo(0)
         For Each rc In redC.redCells
-            Dim tmp As cv.Mat = rc.mask And motion.dst2(rc.rect)
+            Dim tmp As cv.Mat = rc.mask And bgSub.dst2(rc.rect)
             If tmp.CountNonZero Then
                 dst1(rc.rect).SetTo(rc.color, rc.mask)
                 rc.motionFlag = True

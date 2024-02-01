@@ -82,6 +82,24 @@ Public Class OpenCVExample_CalcBackProject_Demo2 : Inherits VB_Algorithm
         dst3 = src
         dst3.SetTo(cv.Scalar.White, dst1)
 
-        setTrueText("Click anywhere to isolate that region.", 3)
+        setTrueText("Click anywhere to isolate that region.", 1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OpenCVExample_bgfg_segm : Inherits VB_Algorithm
+    Dim bgSub As New BGSubtract_Basics
+    Public Sub New()
+        desc = "OpenCV example bgfg_segm - existing BGSubtract_Basics is the same."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        bgSub.Run(src)
+        dst2 = bgSub.dst2
+        labels(2) = bgSub.labels(2)
     End Sub
 End Class

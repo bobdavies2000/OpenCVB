@@ -429,7 +429,7 @@ End Class
 
 
 Public Class Motion_Intersect : Inherits VB_Algorithm
-    Dim motion As New BGSubtract_Basics
+    Dim bgSub As New BGSubtract_Basics
     Dim minCount = 4
     Dim reconstructedRGB As Integer
     Public Sub New()
@@ -477,8 +477,8 @@ Public Class Motion_Intersect : Inherits VB_Algorithm
         If task.heartBeat Or task.motionRect.Width * task.motionRect.Height > src.Total / 2 Or task.optionsChanged Then
             task.motionFlag = True
         Else
-            motion.Run(src)
-            dst1 = motion.dst2
+            bgSub.Run(src)
+            dst1 = bgSub.dst2
             Dim tmp As New cv.Mat
             cv.Cv2.FindNonZero(dst1, tmp)
 
