@@ -150,7 +150,7 @@ Public Class RedCloud_OnlyCoreToo : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Public Sub New()
         redOptions.UseColor.Checked = True
-        redOptions.Reduction_Basics.Checked = True
+        redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
         redOptions.RedCloud_Core.Checked = True
         gOptions.HistBinSlider.Value = 20
         desc = "Identical to RedCloud_OnlyCore but using only RedOptions."
@@ -1516,7 +1516,7 @@ Public Class RedCloud_LeftRight : Inherits VB_Algorithm
     Dim redLeft As New RedCloud_OnlyColor
     Dim redRight As New RedCloud_OnlyColor
     Public Sub New()
-        redOptions.Reduction_Basics.Checked = True
+        redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
         desc = "Floodfill left and right images after RedCloud color input reduction."
     End Sub
     Public Sub RunVB(src As cv.Mat)

@@ -1,8 +1,10 @@
 ﻿Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-' all examples in the file are from https://github.com/opencv/opencv/tree/4.x/samples
+' all examples in this file are from https://github.com/opencv/opencv/tree/4.x/samples
 Public Class OpenCVExample_CalcBackProject_Demo1 : Inherits VB_Algorithm
+    Public histogram As New cv.Mat
+    Public classCount As Integer
     Public Sub New()
         labels = {"", "", "BackProjection of Hue channel", "Plot of Hue histogram"}
         vbAddAdvice(traceName + ": <place advice here on any options that are useful>")
@@ -11,9 +13,10 @@ Public Class OpenCVExample_CalcBackProject_Demo1 : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180)}
 
-        Dim hsv As cv.Mat = src.CvtColor(cv.ColorConversionCodes.BGR2HSV), histogram As New cv.Mat
+        Dim hsv As cv.Mat = task.color.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         cv.Cv2.CalcHist({hsv}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
-        dst0 = histogram.Normalize(0, 255, cv.NormTypes.MinMax) ' for the backprojection.
+        classCount = histogram.CountNonZero
+        dst0 = histogram.Normalize(0, classCount, cv.NormTypes.MinMax) ' for the backprojection.
 
         Dim histArray(histogram.Total - 1) As Single
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)

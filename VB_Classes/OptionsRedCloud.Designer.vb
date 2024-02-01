@@ -35,13 +35,6 @@ Partial Class OptionsRedCloud
         Me.XLabel = New System.Windows.Forms.Label()
         Me.XRangeSlider = New System.Windows.Forms.TrackBar()
         Me.Label2 = New System.Windows.Forms.Label()
-        Me.RGBSource = New System.Windows.Forms.GroupBox()
-        Me.BinarizeRadio = New System.Windows.Forms.RadioButton()
-        Me.BackProject3D = New System.Windows.Forms.RadioButton()
-        Me.KMeans_Basics = New System.Windows.Forms.RadioButton()
-        Me.LUT_Basics = New System.Windows.Forms.RadioButton()
-        Me.Reduction_Basics = New System.Windows.Forms.RadioButton()
-        Me.BackProject_Full = New System.Windows.Forms.RadioButton()
         Me.ReductionTypeGroup = New System.Windows.Forms.GroupBox()
         Me.NoReduction = New System.Windows.Forms.RadioButton()
         Me.BitwiseReduction = New System.Windows.Forms.RadioButton()
@@ -75,12 +68,13 @@ Partial Class OptionsRedCloud
         Me.LabelDesiredCell = New System.Windows.Forms.Label()
         Me.DesiredCellSlider = New System.Windows.Forms.TrackBar()
         Me.Label5 = New System.Windows.Forms.Label()
+        Me.ColorSourceLabel = New System.Windows.Forms.Label()
+        Me.ColorSource = New System.Windows.Forms.ComboBox()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.XRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.RGBSource.SuspendLayout()
         Me.ReductionTypeGroup.SuspendLayout()
         Me.ReductionSliders.SuspendLayout()
         CType(Me.BitwiseReductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -227,95 +221,14 @@ Partial Class OptionsRedCloud
         Me.Label2.TabIndex = 9
         Me.Label2.Text = "X-Range X100"
         '
-        'RGBSource
-        '
-        Me.RGBSource.Controls.Add(Me.BinarizeRadio)
-        Me.RGBSource.Controls.Add(Me.BackProject3D)
-        Me.RGBSource.Controls.Add(Me.KMeans_Basics)
-        Me.RGBSource.Controls.Add(Me.LUT_Basics)
-        Me.RGBSource.Controls.Add(Me.Reduction_Basics)
-        Me.RGBSource.Controls.Add(Me.BackProject_Full)
-        Me.RGBSource.Location = New System.Drawing.Point(1019, 31)
-        Me.RGBSource.Name = "RGBSource"
-        Me.RGBSource.Size = New System.Drawing.Size(250, 266)
-        Me.RGBSource.TabIndex = 3
-        Me.RGBSource.TabStop = False
-        Me.RGBSource.Text = "Color Source"
-        '
-        'BinarizeRadio
-        '
-        Me.BinarizeRadio.AutoSize = True
-        Me.BinarizeRadio.Location = New System.Drawing.Point(29, 204)
-        Me.BinarizeRadio.Name = "BinarizeRadio"
-        Me.BinarizeRadio.Size = New System.Drawing.Size(164, 24)
-        Me.BinarizeRadio.TabIndex = 7
-        Me.BinarizeRadio.TabStop = True
-        Me.BinarizeRadio.Text = "Binarize_FourWay"
-        Me.BinarizeRadio.UseVisualStyleBackColor = True
-        '
-        'BackProject3D
-        '
-        Me.BackProject3D.AutoSize = True
-        Me.BackProject3D.Location = New System.Drawing.Point(28, 29)
-        Me.BackProject3D.Name = "BackProject3D"
-        Me.BackProject3D.Size = New System.Drawing.Size(165, 24)
-        Me.BackProject3D.TabIndex = 5
-        Me.BackProject3D.TabStop = True
-        Me.BackProject3D.Text = "3D BackProjection"
-        Me.BackProject3D.UseVisualStyleBackColor = True
-        '
-        'KMeans_Basics
-        '
-        Me.KMeans_Basics.AutoSize = True
-        Me.KMeans_Basics.Location = New System.Drawing.Point(28, 100)
-        Me.KMeans_Basics.Name = "KMeans_Basics"
-        Me.KMeans_Basics.Size = New System.Drawing.Size(148, 24)
-        Me.KMeans_Basics.TabIndex = 3
-        Me.KMeans_Basics.TabStop = True
-        Me.KMeans_Basics.Text = "KMeans_Basics"
-        Me.KMeans_Basics.UseVisualStyleBackColor = True
-        '
-        'LUT_Basics
-        '
-        Me.LUT_Basics.AutoSize = True
-        Me.LUT_Basics.Location = New System.Drawing.Point(28, 134)
-        Me.LUT_Basics.Name = "LUT_Basics"
-        Me.LUT_Basics.Size = New System.Drawing.Size(120, 24)
-        Me.LUT_Basics.TabIndex = 2
-        Me.LUT_Basics.TabStop = True
-        Me.LUT_Basics.Text = "LUT_Basics"
-        Me.LUT_Basics.UseVisualStyleBackColor = True
-        '
-        'Reduction_Basics
-        '
-        Me.Reduction_Basics.AutoSize = True
-        Me.Reduction_Basics.Location = New System.Drawing.Point(28, 169)
-        Me.Reduction_Basics.Name = "Reduction_Basics"
-        Me.Reduction_Basics.Size = New System.Drawing.Size(163, 24)
-        Me.Reduction_Basics.TabIndex = 1
-        Me.Reduction_Basics.TabStop = True
-        Me.Reduction_Basics.Text = "Reduction_Basics"
-        Me.Reduction_Basics.UseVisualStyleBackColor = True
-        '
-        'BackProject_Full
-        '
-        Me.BackProject_Full.AutoSize = True
-        Me.BackProject_Full.Location = New System.Drawing.Point(28, 64)
-        Me.BackProject_Full.Name = "BackProject_Full"
-        Me.BackProject_Full.Size = New System.Drawing.Size(153, 24)
-        Me.BackProject_Full.TabIndex = 0
-        Me.BackProject_Full.TabStop = True
-        Me.BackProject_Full.Text = "BackProject_Full"
-        Me.BackProject_Full.UseVisualStyleBackColor = True
-        '
         'ReductionTypeGroup
         '
         Me.ReductionTypeGroup.Controls.Add(Me.NoReduction)
         Me.ReductionTypeGroup.Controls.Add(Me.BitwiseReduction)
         Me.ReductionTypeGroup.Controls.Add(Me.SimpleReduction)
-        Me.ReductionTypeGroup.Location = New System.Drawing.Point(1019, 303)
+        Me.ReductionTypeGroup.Location = New System.Drawing.Point(792, 318)
         Me.ReductionTypeGroup.Name = "ReductionTypeGroup"
-        Me.ReductionTypeGroup.Size = New System.Drawing.Size(250, 129)
+        Me.ReductionTypeGroup.Size = New System.Drawing.Size(220, 129)
         Me.ReductionTypeGroup.TabIndex = 5
         Me.ReductionTypeGroup.TabStop = False
         Me.ReductionTypeGroup.Text = "Reduction Options"
@@ -323,7 +236,7 @@ Partial Class OptionsRedCloud
         'NoReduction
         '
         Me.NoReduction.AutoSize = True
-        Me.NoReduction.Location = New System.Drawing.Point(28, 97)
+        Me.NoReduction.Location = New System.Drawing.Point(15, 89)
         Me.NoReduction.Name = "NoReduction"
         Me.NoReduction.Size = New System.Drawing.Size(131, 24)
         Me.NoReduction.TabIndex = 4
@@ -334,7 +247,7 @@ Partial Class OptionsRedCloud
         'BitwiseReduction
         '
         Me.BitwiseReduction.AutoSize = True
-        Me.BitwiseReduction.Location = New System.Drawing.Point(28, 68)
+        Me.BitwiseReduction.Location = New System.Drawing.Point(15, 60)
         Me.BitwiseReduction.Name = "BitwiseReduction"
         Me.BitwiseReduction.Size = New System.Drawing.Size(194, 24)
         Me.BitwiseReduction.TabIndex = 3
@@ -345,7 +258,7 @@ Partial Class OptionsRedCloud
         'SimpleReduction
         '
         Me.SimpleReduction.AutoSize = True
-        Me.SimpleReduction.Location = New System.Drawing.Point(28, 37)
+        Me.SimpleReduction.Location = New System.Drawing.Point(15, 29)
         Me.SimpleReduction.Name = "SimpleReduction"
         Me.SimpleReduction.Size = New System.Drawing.Size(192, 24)
         Me.SimpleReduction.TabIndex = 0
@@ -528,7 +441,7 @@ Partial Class OptionsRedCloud
         '
         Me.GroupBox1.Controls.Add(Me.RedCloud_Core)
         Me.GroupBox1.Controls.Add(Me.GuidedBP_Depth)
-        Me.GroupBox1.Location = New System.Drawing.Point(792, 340)
+        Me.GroupBox1.Location = New System.Drawing.Point(1018, 175)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(220, 112)
         Me.GroupBox1.TabIndex = 5
@@ -562,7 +475,7 @@ Partial Class OptionsRedCloud
         Me.RedCloudType.Controls.Add(Me.UseDepthAndColor)
         Me.RedCloudType.Controls.Add(Me.UseDepth)
         Me.RedCloudType.Controls.Add(Me.UseColor)
-        Me.RedCloudType.Location = New System.Drawing.Point(1297, 38)
+        Me.RedCloudType.Location = New System.Drawing.Point(1020, 34)
         Me.RedCloudType.Name = "RedCloudType"
         Me.RedCloudType.Size = New System.Drawing.Size(220, 135)
         Me.RedCloudType.TabIndex = 8
@@ -673,18 +586,36 @@ Partial Class OptionsRedCloud
         Me.Label5.TabIndex = 27
         Me.Label5.Text = "Desired RedCloud Cells"
         '
+        'ColorSourceLabel
+        '
+        Me.ColorSourceLabel.AutoSize = True
+        Me.ColorSourceLabel.Location = New System.Drawing.Point(20, 515)
+        Me.ColorSourceLabel.Name = "ColorSourceLabel"
+        Me.ColorSourceLabel.Size = New System.Drawing.Size(105, 20)
+        Me.ColorSourceLabel.TabIndex = 10
+        Me.ColorSourceLabel.Text = "Color Source:"
+        '
+        'ColorSource
+        '
+        Me.ColorSource.FormattingEnabled = True
+        Me.ColorSource.Location = New System.Drawing.Point(168, 512)
+        Me.ColorSource.Name = "ColorSource"
+        Me.ColorSource.Size = New System.Drawing.Size(222, 28)
+        Me.ColorSource.TabIndex = 11
+        '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1585, 642)
+        Me.Controls.Add(Me.ColorSource)
+        Me.Controls.Add(Me.ColorSourceLabel)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.RedCloudType)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.RedCloudOnly)
         Me.Controls.Add(Me.ReductionSliders)
         Me.Controls.Add(Me.ReductionTypeGroup)
-        Me.Controls.Add(Me.RGBSource)
         Me.Controls.Add(Me.RedCloudSliders)
         Me.Name = "OptionsRedCloud"
         Me.Text = "OptionsRedCloud"
@@ -694,8 +625,6 @@ Partial Class OptionsRedCloud
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.XRangeSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.RGBSource.ResumeLayout(False)
-        Me.RGBSource.PerformLayout()
         Me.ReductionTypeGroup.ResumeLayout(False)
         Me.ReductionTypeGroup.PerformLayout()
         Me.ReductionSliders.ResumeLayout(False)
@@ -713,14 +642,10 @@ Partial Class OptionsRedCloud
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DesiredCellSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
     Friend WithEvents RedCloudSliders As Windows.Forms.GroupBox
-    Friend WithEvents RGBSource As Windows.Forms.GroupBox
-    Friend WithEvents KMeans_Basics As Windows.Forms.RadioButton
-    Friend WithEvents LUT_Basics As Windows.Forms.RadioButton
-    Friend WithEvents Reduction_Basics As Windows.Forms.RadioButton
-    Friend WithEvents BackProject_Full As Windows.Forms.RadioButton
     Friend WithEvents YLabel As Windows.Forms.Label
     Friend WithEvents YRangeSlider As Windows.Forms.TrackBar
     Friend WithEvents Label4 As Windows.Forms.Label
@@ -755,7 +680,6 @@ Partial Class OptionsRedCloud
     Friend WithEvents GroupBox1 As Windows.Forms.GroupBox
     Friend WithEvents RedCloud_Core As Windows.Forms.RadioButton
     Friend WithEvents GuidedBP_Depth As Windows.Forms.RadioButton
-    Friend WithEvents BackProject3D As Windows.Forms.RadioButton
     Friend WithEvents RedCloudType As Windows.Forms.GroupBox
     Friend WithEvents UseDepth As Windows.Forms.RadioButton
     Friend WithEvents UseColor As Windows.Forms.RadioButton
@@ -767,5 +691,6 @@ Partial Class OptionsRedCloud
     Friend WithEvents LabelHistogramBins As Windows.Forms.Label
     Friend WithEvents HistBinSlider As Windows.Forms.TrackBar
     Friend WithEvents Label7 As Windows.Forms.Label
-    Friend WithEvents BinarizeRadio As Windows.Forms.RadioButton
+    Friend WithEvents ColorSourceLabel As Windows.Forms.Label
+    Friend WithEvents ColorSource As Windows.Forms.ComboBox
 End Class

@@ -746,3 +746,24 @@ Public Class BackProject_MeterByMeter : Inherits VB_Algorithm
         dst3 = vbPalette(dst1)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class BackProject_Hue : Inherits VB_Algorithm
+    Dim hue As New OpenCVExample_CalcBackProject_Demo1
+    Public classCount As Integer
+    Public Sub New()
+        desc = "Create an 8UC1 image with a backprojection of the hue."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hue.Run(src)
+        classCount = hue.classCount
+        dst2 = hue.dst2
+        dst3 = vbPalette(dst2 * 255 / classCount)
+    End Sub
+End Class

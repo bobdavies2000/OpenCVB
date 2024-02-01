@@ -7,6 +7,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Dim binarize As New Binarize_FourWay
+    Dim hue As New BackProject_Hue
     Public classifier As Object = binarize
     Public updateImages As Boolean
     Public Sub New()
@@ -29,6 +30,8 @@ Public Class Color_Basics : Inherits VB_Algorithm
                     classifier = hColor
                 Case "Binarize_FourWay"
                     classifier = binarize
+                Case "BackProject_Hue"
+                    classifier = hue
             End Select
         End If
 

@@ -631,16 +631,13 @@
       <Version>2.2.1</Version>
     </PackageReference>
     <PackageReference Include="OpenCvSharp4">
-      <Version>4.8.0.20230708</Version>
+      <Version>4.9.0.20240103</Version>
     </PackageReference>
     <PackageReference Include="OpenCvSharp4.Extensions">
-      <Version>4.8.0.20230708</Version>
-    </PackageReference>
-    <PackageReference Include="OpenCvSharp4.runtime.win">
-      <Version>4.8.0.20230708</Version>
+      <Version>4.9.0.20240103</Version>
     </PackageReference>
     <PackageReference Include="OpenCvSharp4.Windows">
-      <Version>4.8.0.20230708</Version>
+      <Version>4.9.0.20240103</Version>
     </PackageReference>
     <PackageReference Include="System.Buffers">
       <Version>4.5.1</Version>

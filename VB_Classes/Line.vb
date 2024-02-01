@@ -1382,7 +1382,7 @@ Public Class Line_FromContours : Inherits VB_Algorithm
     Dim lines As New Line_Basics
     Dim contours As New Contour_Gray
     Public Sub New()
-        redOptions.Reduction_Basics.Checked = True ' to enable sliders
+        redOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
         lines.lineColor = cv.Scalar.Red
         vbAddAdvice("Use the reduction sliders in the redoptions to control contours and subsequent lines found.")
         desc = "Find the lines in the contours."

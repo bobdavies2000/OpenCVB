@@ -832,7 +832,7 @@ Public Class Contour_Gray : Inherits VB_Algorithm
 
         If standalone Then
             Static reduction As New Reduction_Basics
-            redOptions.Reduction_Basics.Checked = True
+            redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
             reduction.Run(src)
             src = reduction.dst2
         End If

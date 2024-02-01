@@ -107,6 +107,7 @@ if algorithmName = "BackProject_Full" Then return new BackProject_Full
 if algorithmName = "BackProject_FullEqualized" Then return new BackProject_FullEqualized
 if algorithmName = "BackProject_FullLines" Then return new BackProject_FullLines
 if algorithmName = "BackProject_Horizontal" Then return new BackProject_Horizontal
+if algorithmName = "BackProject_Hue" Then return new BackProject_Hue
 if algorithmName = "BackProject_Image" Then return new BackProject_Image
 if algorithmName = "BackProject_LineSide" Then return new BackProject_LineSide
 if algorithmName = "BackProject_LineTop" Then return new BackProject_LineTop

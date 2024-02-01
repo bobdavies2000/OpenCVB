@@ -553,11 +553,6 @@ Public Class VBtask : Implements IDisposable
                 colorizer.Run(task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc))
                 task.depthRGB = colorizer.dst2
 
-                'If gOptions.DebugCheckBox.Checked Then
-                '    motion.motion.showDiff = True
-                '    cv.Cv2.ImShow("motion.dst2", motion.motion.dst2)
-                'End If
-
                 TaskTimer.Enabled = True
                 task.highlightColor = highlightColors(0) ' task.frameCount Mod highlightColors.Count)
 
