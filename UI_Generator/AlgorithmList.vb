@@ -1123,6 +1123,7 @@ if algorithmName = "OEX_CalcBackProject_Demo1" Then return new OEX_CalcBackProje
 if algorithmName = "OEX_CalcBackProject_Demo2" Then return new OEX_CalcBackProject_Demo2
 if algorithmName = "OEX_delaunay2" Then return new OEX_delaunay2
 if algorithmName = "OEX_MeanShift" Then return new OEX_MeanShift
+if algorithmName = "OEX_PointPolygonTest_demo" Then return new OEX_PointPolygonTest_demo
 if algorithmName = "OilPaint_Cartoon" Then return new OilPaint_Cartoon
 if algorithmName = "OilPaint_Manual" Then return new OilPaint_Manual
 if algorithmName = "OilPaint_ManualVB" Then return new OilPaint_ManualVB

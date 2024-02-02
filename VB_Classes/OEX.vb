@@ -7,6 +7,7 @@ Imports System.Windows.Shapes
 Imports System.Drawing.Drawing2D
 Imports System.Text.RegularExpressions
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement
+Imports OpenCvSharp.Internal.Vectors
 ' all examples in this file are from https://github.com/opencv/opencv/tree/4.x/samples
 Public Class OEX_CalcBackProject_Demo1 : Inherits VB_Algorithm
     Public histogram As New cv.Mat
@@ -306,5 +307,67 @@ Public Class OEX_MeanShift : Inherits VB_Algorithm
             cv.Cv2.MeanShift(dst3, trackWindow, cv.TermCriteria.Both(10, 1))
             src.Rectangle(trackWindow, cv.Scalar.White, task.lineWidth, task.lineType)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OEX_PointPolygonTest_demo : Inherits VB_Algorithm
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "OpenCV Example PointPolygonTest_demo"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim r As Integer = dst2.Height / 4
+        Dim vert As New List(Of cv.Point)
+        vert.Add(New cv.Point2f(3 * r / 2 + dst2.Width / 4, 1.34 * r))
+        vert.Add(New cv.Point2f(1 * r + dst2.Width / 4, 2 * r))
+        vert.Add(New cv.Point2f(3 * r / 2 + dst2.Width / 4, 2.866 * r))
+        vert.Add(New cv.Point2f(5 * r / 2 + dst2.Width / 4, 2.866 * r))
+        vert.Add(New cv.Point2f(3 * r + dst2.Width / 4, 2 * r))
+        vert.Add(New cv.Point2f(5 * r / 2 + dst2.Width / 4, 1.34 * r))
+
+        dst2.SetTo(0)
+        For i As Integer = 0 To vert.Count - 1
+            dst2.Line(vert(i), vert((i + 1) Mod 6), cv.Scalar.White, task.lineWidth, task.lineType)
+        Next
+
+        ' Get the contours
+        Dim contours As cv.Point()()
+        cv.Cv2.FindContours(dst2, contours, Nothing, RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        For i = 0 To dst1.Rows - 1
+            For j = 0 To dst1.Cols - 1
+                Dim distance = cv.Cv2.PointPolygonTest(contours(0), New cv.Point(j, i), True)
+                dst1.Set(Of Single)(i, j, distance)
+            Next
+        Next
+
+        Dim mm = vbMinMax(dst1)
+        mm.minVal = Math.Abs(mm.minVal)
+        mm.maxVal = Math.Abs(mm.maxVal)
+
+        Dim blue As New cv.Vec3b(0, 0, 0)
+        Dim red As New cv.Vec3b(0, 0, 0)
+        For i = 0 To src.Rows - 1
+            For j = 0 To src.Cols - 1
+                Dim val = dst1.Get(Of Single)(i, j)
+                If val < 0 Then
+                    blue(0) = 255 - Math.Abs(val) * 255 / mm.minVal
+                    dst3.Set(Of cv.Vec3b)(i, j, blue)
+                ElseIf val > 0 Then
+                    red(2) = 255 - val * 255 / mm.maxVal
+                    dst3.Set(Of cv.Vec3b)(i, j, red)
+                Else
+                    dst3.Set(Of cv.Vec3b)(i, j, white)
+                End If
+            Next
+        Next
+        dst3.Circle(mm.maxLoc, CInt(mm.maxVal), white, task.lineWidth, task.lineType)
     End Sub
 End Class
