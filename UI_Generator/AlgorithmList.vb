@@ -1193,6 +1193,7 @@ if algorithmName = "OpenGL_ReducedSideView" Then return new OpenGL_ReducedSideVi
 if algorithmName = "OpenGL_ReducedXYZ" Then return new OpenGL_ReducedXYZ
 if algorithmName = "OpenGL_Reduction" Then return new OpenGL_Reduction
 if algorithmName = "OpenGL_Sierpinski" Then return new OpenGL_Sierpinski
+if algorithmName = "OpenGL_SoloPointsRemoved" Then return new OpenGL_SoloPointsRemoved
 if algorithmName = "OpenGL_StableMinMax" Then return new OpenGL_StableMinMax
 if algorithmName = "OpenGL_StructuredCloud" Then return new OpenGL_StructuredCloud
 if algorithmName = "OpenGL_Tessellate" Then return new OpenGL_Tessellate

@@ -90,7 +90,7 @@ Public Class Area_FindNonZero : Inherits VB_Algorithm
         desc = "Use FindNonZero API to get coordinates of non-zero points."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standaloneTest() Then
+        If standalone Then
             src = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
             Dim srcPoints(100 - 1) As cv.Point ' doesn't really matter how many there are.
             For i = 0 To srcPoints.Length - 1

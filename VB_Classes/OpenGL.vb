@@ -2046,3 +2046,30 @@ Public Class OpenGL_HistDepth3D : Inherits VB_Algorithm
         setTrueText("Use the sliders for X/Y/Z histogram bins to add more points")
     End Sub
 End Class
+
+
+
+
+
+
+Public Class OpenGL_SoloPointsRemoved : Inherits VB_Algorithm
+    Dim solos As New Area_SoloPoints
+    Public Sub New()
+        gOptions.unFiltered.Checked = True ' show all the unfiltered points so removing the points is obvious.
+        task.OpenGLTitle = "OpenGL_Functions"
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        desc = "Remove the solo points and display the pointcloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.toggleOn Then
+            solos.Run(src)
+            dst2 = solos.dst2
+            task.pointCloud.SetTo(0, dst2)
+        Else
+            dst2.SetTo(0)
+        End If
+
+        task.ogl.pointCloudInput = task.pointCloud
+        task.ogl.Run(src)
+    End Sub
+End Class
