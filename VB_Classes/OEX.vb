@@ -5,6 +5,8 @@ Imports System.Drawing
 Imports System.Windows.Forms
 Imports System.Windows.Shapes
 Imports System.Drawing.Drawing2D
+Imports System.Text.RegularExpressions
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 ' all examples in this file are from https://github.com/opencv/opencv/tree/4.x/samples
 Public Class OEX_CalcBackProject_Demo1 : Inherits VB_Algorithm
     Public histogram As New cv.Mat
@@ -61,9 +63,7 @@ Public Class OEX_CalcBackProject_Demo2 : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim count As Integer
-
         If task.clickPoint <> New cv.Point Then
-
             Dim connectivity As Integer = 8
             Dim flags = connectivity Or (255 << 8) Or cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.MaskOnly
             Dim mask2 As New Mat(src.Rows + 2, src.Cols + 2, cv.MatType.CV_8U, 0)
@@ -271,6 +271,40 @@ Public Class OEX_delaunay2 : Inherits VB_Algorithm
                 points.Clear()
                 subdiv = New cv.Subdiv2D(New cv.Rect(0, 0, dst2.Width, dst2.Height))
             End If
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OEX_MeanShift : Inherits VB_Algorithm
+    Dim term_crit As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
+    Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180)}
+    Public histogram As New cv.Mat
+    Public Sub New()
+        labels(3) = "Draw a rectangle around the region of interest"
+        desc = "OpenCV Example MeanShift"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static trackWindow As cv.Rect
+        Dim roi = If(task.drawRect.Width > 0, task.drawRect, New cv.Rect(0, 0, dst2.Width, dst2.Height))
+        Dim hsv As cv.Mat = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        dst2 = src
+        If task.optionsChanged Then
+            trackWindow = roi
+            Dim mask As New cv.Mat
+            cv.Cv2.InRange(hsv, New cv.Scalar(0, 60, 32), New cv.Scalar(180, 255, 255), mask)
+            cv.Cv2.CalcHist({hsv(roi)}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
+            histogram = histogram.Normalize(0, 255, cv.NormTypes.MinMax)
+        End If
+        cv.Cv2.CalcBackProject({hsv}, {0}, histogram, dst3, ranges)
+        If trackWindow.Width <> 0 Then
+            cv.Cv2.MeanShift(dst3, trackWindow, cv.TermCriteria.Both(10, 1))
+            src.Rectangle(trackWindow, cv.Scalar.White, task.lineWidth, task.lineType)
         End If
     End Sub
 End Class

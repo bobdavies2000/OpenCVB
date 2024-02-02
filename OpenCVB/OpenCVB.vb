@@ -1451,7 +1451,14 @@ Public Class OpenCVB
                         Dim tmpDrawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio,
                                                       drawRect.Width * ratio, drawRect.Height * ratio)
                         task.drawRect = New cv.Rect
-                        If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then task.drawRect = tmpDrawRect
+                        If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
+                            Static saveDrawRect As cv.Rect
+                            If saveDrawRect <> tmpDrawRect Then
+                                task.optionsChanged = True
+                                saveDrawRect = tmpDrawRect
+                            End If
+                            task.drawRect = tmpDrawRect
+                        End If
                         BothFirstAndLastReady = False
                     End If
 
@@ -1495,7 +1502,7 @@ Public Class OpenCVB
             Dim elapsedWaitTicks = endWaitTime.Ticks - waitTime.Ticks
             Dim spanWait = New TimeSpan(elapsedWaitTicks)
             task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
-            Dim saveDrawRect = task.drawRect
+            Dim updatedDrawRect = task.drawRect
 
             task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
 
@@ -1503,7 +1510,7 @@ Public Class OpenCVB
 
             ' in case the algorithm has changed the mouse location...
             If task.mouseMovePointUpdated Then mousePoint = task.mouseMovePoint
-            If saveDrawRect <> task.drawRect Then
+            If updatedDrawRect <> task.drawRect Then
                 drawRect = task.drawRect
                 ' relative size of algorithm size image to displayed image
                 Dim ratio = camPic(0).Width / task.workingRes.Width

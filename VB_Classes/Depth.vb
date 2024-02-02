@@ -669,7 +669,7 @@ End Class
 
 
 Public Class Depth_ForegroundHead : Inherits VB_Algorithm
-    Dim fgnd As New Depth_ForegroundOld
+    Dim fgnd As New Depth_ForegroundBlob
     Public kalman As New Kalman_Basics
     Public trustedRect As cv.Rect
     Public trustworthy As Boolean
@@ -943,7 +943,7 @@ End Class
 
 
 
-Public Class Depth_ForegroundOld : Inherits VB_Algorithm
+Public Class Depth_ForegroundBlob : Inherits VB_Algorithm
     Dim options As New Options_ForeGround
     Public blobLocation As New List(Of cv.Point)
     Public maxIndex As Integer
@@ -957,7 +957,7 @@ Public Class Depth_ForegroundOld : Inherits VB_Algorithm
         cv.Cv2.InRange(task.pcSplit(2), 0.01, options.maxForegroundDepthInMeters, dst2)
         dst3 = dst2.Clone
 
-        ' find the largest blob and use that define that to be the foreground object.
+        ' find the largest blob and use that to define the foreground object.
         Dim blobSize As New List(Of Integer)
         blobLocation.Clear()
 
