@@ -3332,12 +3332,21 @@ class OEX_PointsClassifier
 {
 private:
 public:
-	vector<Point2f>points;
-	vector<int> markers;
-	Mat dst, img;
-	Ptr<KNearest> KNN = cv::ml::KNearest::create();
+	vector<Point2f>trainedPoints;
+	vector<int> trainedPointsMarkers;
+	Mat dst, img, samples;
+	vector<Vec3b>  classColors{Vec3b(255, 0, 0), Vec3b(0, 255, 0)};
 	Mat inputPoints;
+	Ptr<NormalBayesClassifier> NBC = cv::ml::NormalBayesClassifier::create();
+	Ptr<KNearest> KNN = cv::ml::KNearest::create();
+	Ptr<SVM> SVM = cv::ml::SVM::create();
+	Ptr<DTrees> DTR = cv::ml::DTrees::create();
+	Ptr<Boost> BTR = cv::ml::Boost::create();
+	Ptr<RTrees> RF = cv::ml::RTrees::create();
+	Ptr<ANN_MLP> ANN = cv::ml::ANN_MLP::create();
+	Ptr<EM> EM = cv::ml::EM::create();
 	OEX_PointsClassifier() {}
+
 	void OEX_Setup(int count, int rows, int cols) {
 		inputPoints = Mat(rows * cols, 2, CV_32F);
 		Point2f pt;
@@ -3356,25 +3365,186 @@ public:
 		random->range = Rect(0, 0, cols * 3 / 4, rows * 3 / 4);
 		random->Run(Mat());
 
-		points = random->pointList;
-		markers.clear();
-		for (int i = 0; i < int(points.size()); i++)
-			markers.push_back(0);
+		trainedPoints = random->pointList;
+		trainedPointsMarkers.clear();
+		for (int i = 0; i < int(trainedPoints.size()); i++)
+			trainedPointsMarkers.push_back(0);
 
 		random->range = Rect(cols / 4, rows / 4, cols * 3 / 4, rows * 3 / 4);
 		random->Run(Mat());
 		for (int i = 0; i < int(random->pointList.size()); i++)
 		{
-			points.push_back(random->pointList[i]);
-			markers.push_back(1);
+			trainedPoints.push_back(random->pointList[i]);
+			trainedPointsMarkers.push_back(1);
 		}
 	}
 
-    void RunCPP() {
-		Mat pts = Mat(points).reshape(1, (int)points.size());
-		auto trainInput = TrainData::create(pts, ROW_SAMPLE, Mat(markers));
-		Ptr<NormalBayesClassifier> NBC = StatModel::train<NormalBayesClassifier>(trainInput);
-		NBC->predict(inputPoints, dst);
+    void RunCPP(int methodIndex, int reset) {
+		samples = Mat(trainedPoints).reshape(1, (int)trainedPoints.size());
+		auto trainInput = TrainData::create(samples, ROW_SAMPLE, Mat(trainedPointsMarkers));
+
+		dst.setTo(0);
+
+		switch (methodIndex) {
+		case 0:
+		{
+			if (reset) {
+				NBC->train(trainInput);
+			}
+			NBC->predict(inputPoints, dst);
+			break;
+		}
+		case 1:
+		{
+			if (reset) {
+				KNN->setDefaultK(15);
+				KNN->setIsClassifier(true);
+				KNN = StatModel::train<KNearest>(trainInput);
+			}
+			KNN->predict(inputPoints, dst);
+			break;
+		}
+		case 2:
+		{
+			if (reset) {
+				SVM->setType(SVM::C_SVC);
+				SVM->setKernel(SVM::POLY); //SVM::LINEAR;
+				SVM->setDegree(0.5);
+				SVM->setGamma(1);
+				SVM->setCoef0(1);
+				SVM->setNu(0.5);
+				SVM->setP(0);
+				SVM->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER + TermCriteria::EPS, 1000, 0.01));
+				int C = 1;
+				SVM->setC(C);
+				SVM->train(trainInput);
+			}
+			SVM->predict(inputPoints, dst);
+			break;
+		}
+		case 3:
+		{
+			if (reset) {
+				DTR->setMaxDepth(8);
+				DTR->setMinSampleCount(2);
+				DTR->setUseSurrogates(false);
+				DTR->setCVFolds(0); // the number of cross-validation folds
+				DTR->setUse1SERule(false);
+				DTR->setTruncatePrunedTree(false);
+				DTR->train(trainInput);
+			}
+			DTR->predict(inputPoints, dst);
+			break;
+		}
+		case 4:
+		{
+			if (reset) {
+				BTR->setBoostType(Boost::DISCRETE);
+				BTR->setWeakCount(100);
+				BTR->setWeightTrimRate(0.95);
+				BTR->setMaxDepth(2);
+				BTR->setUseSurrogates(false);
+				BTR->setPriors(Mat());
+				BTR->train(trainInput);
+			}
+			BTR->predict(inputPoints, dst);
+			break;
+		}
+		case 5:
+		{
+			if (reset) {
+				RF->setMaxDepth(4);
+				RF->setMinSampleCount(2);
+				RF->setRegressionAccuracy(0.f);
+				RF->setUseSurrogates(false);
+				RF->setMaxCategories(16);
+				RF->setPriors(Mat());
+				RF->setCalculateVarImportance(false);
+				RF->setActiveVarCount(1);
+				RF->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER, 5, 0));
+				RF->train(trainInput);
+			}
+			RF->predict(inputPoints, dst);
+			break;
+		}
+		case 6:
+		{
+			if (reset)
+			{
+				Mat layer_sizes(1, 3, CV_32SC1, { 2, 5, 2 });
+				Mat trainClasses = Mat::zeros((int)trainedPoints.size(), (int)classColors.size(), CV_32FC1);
+				for (int i = 0; i < trainClasses.rows; i++)
+				{
+					trainClasses.at<float>(i, trainedPointsMarkers[i]) = 1.f;
+				}
+				Ptr<TrainData> tdata = TrainData::create(samples, ROW_SAMPLE, trainClasses);
+
+				ANN->setLayerSizes(layer_sizes);
+				ANN->setActivationFunction(ANN_MLP::SIGMOID_SYM, 1, 1);
+				ANN->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER + TermCriteria::EPS, 300, FLT_EPSILON));
+				ANN->setTrainMethod(ANN_MLP::BACKPROP, 0.001);
+				ANN->train(tdata);
+			}
+
+			ANN->predict(inputPoints, dst);
+			break;
+		}
+		case 7:
+		{
+			if (reset) {
+				int i, j, nmodels = (int)classColors.size();
+				vector<Ptr<cv::ml::EM> > em_models(nmodels);
+				Mat modelSamples;
+
+				for (i = 0; i < nmodels; i++)
+				{
+					const int componentCount = 3;
+
+					modelSamples.release();
+					for (j = 0; j < samples.rows; j++)
+					{
+						if (trainedPointsMarkers[j] == i)
+							modelSamples.push_back(samples.row(j));
+					}
+
+					// learn models
+					if (!modelSamples.empty())
+					{
+						Ptr<cv::ml::EM> em = EM::create();
+						em->setClustersNumber(componentCount);
+						em->setCovarianceMatrixType(EM::COV_MAT_DIAGONAL);
+						em->trainEM(modelSamples, noArray(), noArray(), noArray());
+						em_models[i] = em;
+					}
+				}
+
+				// classify coordinate plane points using the bayes classifier, i.e.
+				// y(x) = arg max_i=1_modelsCount likelihoods_i(x)
+				Mat testSample(1, 2, CV_32FC1);
+				Mat logLikelihoods(1, nmodels, CV_64FC1, Scalar(-DBL_MAX));
+
+				for (int y = 0; y < img.rows; y++)
+				{
+					for (int x = 0; x < img.cols; x++)
+					{
+						testSample.at<float>(0) = (float)x;
+						testSample.at<float>(1) = (float)y;
+
+						for (i = 0; i < nmodels; i++)
+						{
+							if (!em_models[i].empty())
+								logLikelihoods.at<double>(i) = em_models[i]->predict2(testSample, noArray())[0];
+						}
+						Point maxLoc;
+						minMaxLoc(logLikelihoods, 0, 0, 0, &maxLoc);
+						dst.at<Vec3b>(y, x) = classColors[maxLoc.x];
+					}
+				}
+			}
+			break;
+		}
+		}
+
     }
 };
 extern "C" __declspec(dllexport)
@@ -3392,10 +3562,10 @@ int* OEX_ShowPoints(OEX_PointsClassifier * cPtr, int imgRows, int imgCols, int r
 {
 	cPtr->img = Mat(imgRows, imgCols, CV_8UC3);
 	cPtr->img.setTo(0);
-	for (int i = 0; i < cPtr->points.size(); i++)
+	for (int i = 0; i < cPtr->trainedPoints.size(); i++)
 	{
-		auto color = cPtr->markers[i] == 0 ? Scalar(255, 255, 255) : Scalar(0, 255, 255);
-		circle(cPtr->img, cPtr->points[i], radius, color, -1, LINE_AA);
+		auto color = cPtr->trainedPointsMarkers[i] == 0 ? Scalar(255, 255, 255) : Scalar(0, 255, 255);
+		circle(cPtr->img, cPtr->trainedPoints[i], radius, color, -1, LINE_AA);
 	}
 	return (int*)cPtr->img.data;
 }
@@ -3404,6 +3574,6 @@ extern "C" __declspec(dllexport)
 int* OEX_Points_Classifier_RunCPP(OEX_PointsClassifier * cPtr, int count, int methodIndex, int imgRows, int imgCols, int reset)
 {
 	if (reset) cPtr->OEX_Setup(count, imgRows, imgCols);
-	cPtr->RunCPP();
+	cPtr->RunCPP(methodIndex, reset);
 	return (int*)cPtr->dst.data;
 }

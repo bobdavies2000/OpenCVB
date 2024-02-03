@@ -4218,12 +4218,6 @@ Public Class Options_BGSubtract : Inherits VB_Algorithm
     Public Sub RunVB()
         Static learnRateSlider = findSlider("MOG Learn Rate X1000")
         Static frm = findfrm(traceName + " Radio Buttons")
-        'If firstPass Then
-        '    firstPass = False
-        '    frm.Left = gOptions.Width / 2
-        '    frm.top = gOptions.Height / 2 + 25
-        'End If
-
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 If currMethod = i Then
@@ -4247,7 +4241,10 @@ End Class
 Public Class Options_Classifier : Inherits VB_Algorithm
     Public methodIndex As Integer
     Public methodName As String
+    Public sampleCount As Integer
     Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Random Samples", 10, dst2.Total, 200)
+
         If findfrm(traceName + " Radio Options") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Normal Bayes (NBC)")
@@ -4257,10 +4254,12 @@ Public Class Options_Classifier : Inherits VB_Algorithm
             radio.addRadio("Boosted Tree (BTree)")
             radio.addRadio("Random Forest (RF)")
             radio.addRadio("Artificial Neural Net (ANN)")
+            radio.addRadio("Expectation Maximization (EM)")
             radio.check(0).Checked = True
         End If
     End Sub
     Public Sub RunVB()
+        Static inputSlider = findSlider("Random Samples")
         Static frm = findfrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
@@ -4269,5 +4268,12 @@ Public Class Options_Classifier : Inherits VB_Algorithm
                 Exit For
             End If
         Next
+        If firstPass Then
+            firstPass = False
+            frm.Left = gOptions.Width / 2
+            frm.top = gOptions.Height / 2
+        End If
+
+        sampleCount = inputSlider.value
     End Sub
 End Class

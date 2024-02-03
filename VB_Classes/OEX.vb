@@ -448,7 +448,6 @@ End Class
 
 Public Class OEX_Points_Classifier : Inherits VB_Algorithm
     Dim options As New Options_Classifier
-    Dim random As New Random_Basics
     Public Sub New()
         gOptions.DebugCheckBox.Checked = True
         cPtr = OEX_Points_Classifier_Open()
@@ -457,7 +456,8 @@ Public Class OEX_Points_Classifier : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, 20, options.methodIndex, dst2.Rows, dst2.Cols,
+        If task.optionsChanged Then gOptions.DebugCheckBox.Checked = True
+        Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, options.sampleCount, options.methodIndex, dst2.Rows, dst2.Cols,
                                                     If(gOptions.DebugCheckBox.Checked, 1, 0))
         gOptions.DebugCheckBox.Checked = False
         dst1 = New cv.Mat(dst0.Rows, dst0.Cols, cv.MatType.CV_32S, imagePtr)
