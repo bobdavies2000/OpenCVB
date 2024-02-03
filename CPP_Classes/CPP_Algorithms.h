@@ -3300,3 +3300,64 @@ int* xPhoto_Inpaint_Run(xPhoto_Inpaint * cPtr, int* imagePtr, int* maskPtr, int 
 	cPtr->Run(mask, iType);
 	return (int*)cPtr->dst.data;
 }
+
+
+
+
+
+
+class OEX_PointsClassifier
+{
+private:
+public:
+	vector<Point2f>points;
+	vector<int> markers;
+	Mat dst;
+	Ptr<KNearest> KNN = cv::ml::KNearest::create();
+	Mat inputPoints;
+	OEX_PointsClassifier() {}
+	void OEX_Setup(int rows, int cols) {
+		inputPoints = Mat(rows * cols, 2, CV_32F);
+		Point2f pt;
+		int index = 0;
+		for (int y = 0; y < rows; y++) {
+			for (int x = 0; x < cols; x++) {
+				pt.x = (float)x;
+				pt.y = (float)y;
+				inputPoints.at<float>(index++) = pt.x;
+				inputPoints.at<float>(index++) = pt.y;
+			}
+		}
+	}
+
+    void RunCPP() {
+		Mat pts = Mat(points);
+		auto trainInput = TrainData::create(pts, ROW_SAMPLE, Mat(markers));
+		Ptr<NormalBayesClassifier> NBC = StatModel::train<NormalBayesClassifier>(trainInput);
+		NBC->predict(inputPoints, dst);
+		for (int i = 0; i < 10; i++)
+			auto test = dst.at<int>(i);
+    }
+};
+extern "C" __declspec(dllexport)
+OEX_PointsClassifier *OEX_Points_Classifier_Open() {
+    OEX_PointsClassifier *cPtr = new OEX_PointsClassifier();
+    return cPtr;
+}
+extern "C" __declspec(dllexport)
+void OEX_Points_Classifier_Close(OEX_PointsClassifier *cPtr)
+{
+    delete cPtr;
+}
+extern "C" __declspec(dllexport)
+int *OEX_Points_Classifier_RunCPP(OEX_PointsClassifier *cPtr, float * pointsPtr, float* classesPtr, int count, int methodIndex,
+								  int imgRows, int imgCols)
+{
+	Mat points = Mat(count, 2, CV_32F, pointsPtr);
+	Mat markers = Mat(count, 1, CV_32S, classesPtr);
+	cPtr->markers.assign(markers.begin<int>(), markers.end<int>());
+	cPtr->points.assign(points.begin<Point2f>(), points.end<Point2f>());
+	if (cPtr->inputPoints.rows == 0) cPtr->OEX_Setup(imgRows, imgCols);
+	cPtr->RunCPP();
+	return (int *) cPtr->dst.data; 
+}

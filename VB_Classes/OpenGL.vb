@@ -2071,5 +2071,6 @@ Public Class OpenGL_SoloPointsRemoved : Inherits VB_Algorithm
 
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
+        setTrueText("You should see the difference in the OpenGL window as the solo points are toggled on an off.", 3)
     End Sub
 End Class

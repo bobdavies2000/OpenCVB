@@ -3,6 +3,8 @@ Imports System.IO
 Imports System.Numerics
 Imports OpenCvSharp.ML
 Imports System.Drawing
+Imports System.Windows.Forms
+
 Public Class Options_Annealing : Inherits VB_Algorithm
     Dim random As New Random_Basics
     Public cityCount As Integer = 25
@@ -2947,41 +2949,6 @@ End Class
 
 
 
-
-
-
-Public Class Options_Classifier : Inherits VB_Algorithm
-    Public classifierName As String
-    Public Sub New()
-        If findfrm(traceName + " Radio Options") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Normal Bayes (NBC)")
-            radio.addRadio("K Nearest Neighbor (KNN)")
-            radio.addRadio("Support Vector Machine (SVM)")
-            radio.addRadio("Decision Tree (DTree)")
-            radio.addRadio("Boosted Tree (BTree)")
-            radio.addRadio("Random Forest (RF)")
-            radio.addRadio("Artificial Neural Net (ANN)")
-            radio.check(0).Checked = True
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
-        classifierName = findRadioText(frm.check)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
-
 Public Class Options_Blur : Inherits VB_Algorithm
     Public kernelSize As Integer = 3
     Public sigma As Single = 1.5
@@ -4268,5 +4235,39 @@ Public Class Options_BGSubtract : Inherits VB_Algorithm
             End If
         Next
         learnRate = learnRateSlider.Value / 1000
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_Classifier : Inherits VB_Algorithm
+    Public methodIndex As Integer
+    Public methodName As String
+    Public Sub New()
+        If findfrm(traceName + " Radio Options") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Normal Bayes (NBC)")
+            radio.addRadio("K Nearest Neighbor (KNN)")
+            radio.addRadio("Support Vector Machine (SVM)")
+            radio.addRadio("Decision Tree (DTree)")
+            radio.addRadio("Boosted Tree (BTree)")
+            radio.addRadio("Random Forest (RF)")
+            radio.addRadio("Artificial Neural Net (ANN)")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static frm = findfrm(traceName + " Radio Buttons")
+        For i = 0 To frm.check.Count - 1
+            If frm.check(i).Checked Then
+                methodIndex = i
+                methodName = frm.check(i).Text
+                Exit For
+            End If
+        Next
     End Sub
 End Class

@@ -25,6 +25,10 @@ Public Class InsertAlgorithm
             Return False
         End If
         Dim split = AlgorithmName.Text.Split("_")
+        If split.Count > 3 Then
+            MsgBox("It can be changed later but only 3 '_' (underscores) are supported in this interface.")
+            Return False
+        End If
 
         Dim ret As MsgBoxResult
         Select Case algorithmType
@@ -34,12 +38,8 @@ Public Class InsertAlgorithm
                              " to: " + vbCrLf + vbCrLf + "VB File: " + VBoutputName.Name, MsgBoxStyle.OkCancel)
 
             Case algType.addCPP
-                If split.Count <> 3 Then
-                    MsgBox("A new C++ algorithm should have the form like: RedCloud_Test_CPP" + vbCrLf + "Try again...")
-                    Return False
-                End If
                 VBoutputName = New FileInfo("..\..\VB_Classes\" + split(0) + ".vb")
-                CPPoutputName = New FileInfo("..\..\CPP_Classes\" + split(0) + ".cpp")
+                CPPoutputName = New FileInfo("..\..\CPP_Classes\CPP_Algorithms.h")
 
                 ret = MsgBox("Would you like to add the C++ algorithm " + vbCrLf + vbCrLf + AlgorithmName.Text + vbCrLf + vbCrLf +
                              " to: " + vbCrLf + vbCrLf + "VB File: " + VBoutputName.Name + vbCrLf + vbCrLf +
