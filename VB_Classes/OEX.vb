@@ -450,69 +450,23 @@ Public Class OEX_Points_Classifier : Inherits VB_Algorithm
     Dim options As New Options_Classifier
     Dim random As New Random_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
         gOptions.DebugCheckBox.Checked = True
         cPtr = OEX_Points_Classifier_Open()
         desc = "OpenCV Example Points_Classifier"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        Static points As New List(Of cv.Point2f)
-        Static classes As New List(Of Integer)
 
-        If gOptions.DebugCheckBox.Checked Then
-            gOptions.DebugCheckBox.Checked = False
-            Random.range = New cv.Rect(0, 0, dst2.Width * 3 / 4, dst2.Height * 3 / 4)
-            Random.Run(empty)
-            points = New List(Of cv.Point2f)(Random.pointList)
-            For i = 0 To points.Count - 1
-                classes.Add(0)
-            Next
+        Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, 20, options.methodIndex, dst2.Rows, dst2.Cols,
+                                                    If(gOptions.DebugCheckBox.Checked, 1, 0))
+        gOptions.DebugCheckBox.Checked = False
+        dst1 = New cv.Mat(dst0.Rows, dst0.Cols, cv.MatType.CV_32S, imagePtr)
 
-            Random.range = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width * 3 / 4, dst2.Height * 3 / 4)
-            Random.Run(empty)
-            For i = 0 To Random.pointList.Count - 1
-                points.Add(Random.pointList(i))
-                classes.Add(1)
-            Next
-        End If
+        dst1.ConvertTo(dst0, cv.MatType.CV_8U)
+        dst2 = vbPalette(dst0 * 255 / 2)
+        imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.dotSize)
+        dst3 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
 
-        Dim samples As New cv.Mat(2, classes.Count, cv.MatType.CV_32F, points.ToArray)
-        Dim markers As New cv.Mat(1, classes.Count, cv.MatType.CV_32S, classes.ToArray)
-
-        Dim pointData(samples.Total * samples.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, pointData, 0, pointData.Length - 1)
-        Dim hPts = GCHandle.Alloc(pointData, GCHandleType.Pinned)
-
-        Dim markerData(markers.Total * markers.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, markerData, 0, markerData.Length - 1)
-        Dim hMarkers = GCHandle.Alloc(markerData, GCHandleType.Pinned)
-
-        Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, hPts.AddrOfPinnedObject(), hMarkers.AddrOfPinnedObject(),
-                                                    points.Count, options.methodIndex, dst2.Rows, dst2.Cols)
-        hPts.Free()
-        hMarkers.Free()
-        dst0 = New cv.Mat(dst0.Rows, dst0.Cols, cv.MatType.CV_32S, imagePtr)
-
-
-
-        Dim test(dst0.Total - 1) As Integer
-        Marshal.Copy(dst0.Data, test, 0, test.Length)
-
-
-
-
-        dst0.ConvertTo(dst1, cv.MatType.CV_8U)
-        dst3 = vbPalette(dst1)
-
-        dst2.SetTo(0)
-        For i = 0 To points.Count - 1
-            If classes(i) < 0.5 Then
-                dst2.Circle(points(i), task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
-            Else
-                dst2.Circle(points(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
-            End If
-        Next
         setTrueText("Click the global DebugCheckBox to get another set of points.", 3)
     End Sub
     Public Sub Close()
@@ -528,8 +482,10 @@ Module OEX_Points_Classifier_CPP_Module
     Public Sub OEX_Points_Classifier_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OEX_Points_Classifier_RunCPP(cPtr As IntPtr, pointsPtr As IntPtr, classesPtr As IntPtr,
-                                                 count As Integer, methodIndex As Integer,
-                                                 imgRows As Integer, imgCols As Integer) As IntPtr
+    Public Function OEX_ShowPoints(cPtr As IntPtr, imgRows As Integer, imgCols As Integer, dotSize As Integer) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OEX_Points_Classifier_RunCPP(cPtr As IntPtr, count As Integer, methodIndex As Integer,
+                                                 imgRows As Integer, imgCols As Integer, resetInput As Integer) As IntPtr
     End Function
 End Module

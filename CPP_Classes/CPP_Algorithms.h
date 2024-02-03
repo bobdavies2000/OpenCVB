@@ -3305,6 +3305,28 @@ int* xPhoto_Inpaint_Run(xPhoto_Inpaint * cPtr, int* imagePtr, int* maskPtr, int 
 
 
 
+class Random_Basics : public algorithmCPP {
+public:
+    vector<Point2f> pointList;
+    Rect range;
+    int sizeRequest = 10;
+
+	Random_Basics() : algorithmCPP() {
+        traceName = "Random_Basics";
+        desc = "Create a uniform random mask with a specified number of pixels.";
+    }
+
+    void Run(Mat src) {
+        pointList.clear();
+		while (pointList.size() < sizeRequest) {
+			pointList.push_back(Point2f(range.x + float((rand() % range.width)), range.y + float((rand() % range.height))));
+		}
+    }
+};
+
+
+
+
 
 class OEX_PointsClassifier
 {
@@ -3312,11 +3334,11 @@ private:
 public:
 	vector<Point2f>points;
 	vector<int> markers;
-	Mat dst;
+	Mat dst, img;
 	Ptr<KNearest> KNN = cv::ml::KNearest::create();
 	Mat inputPoints;
 	OEX_PointsClassifier() {}
-	void OEX_Setup(int rows, int cols) {
+	void OEX_Setup(int count, int rows, int cols) {
 		inputPoints = Mat(rows * cols, 2, CV_32F);
 		Point2f pt;
 		int index = 0;
@@ -3328,15 +3350,31 @@ public:
 				inputPoints.at<float>(index++) = pt.y;
 			}
 		}
+		Random_Basics* random = new Random_Basics();
+		random->sizeRequest = count;
+
+		random->range = Rect(0, 0, cols * 3 / 4, rows * 3 / 4);
+		random->Run(Mat());
+
+		points = random->pointList;
+		markers.clear();
+		for (int i = 0; i < int(points.size()); i++)
+			markers.push_back(0);
+
+		random->range = Rect(cols / 4, rows / 4, cols * 3 / 4, rows * 3 / 4);
+		random->Run(Mat());
+		for (int i = 0; i < int(random->pointList.size()); i++)
+		{
+			points.push_back(random->pointList[i]);
+			markers.push_back(1);
+		}
 	}
 
     void RunCPP() {
-		Mat pts = Mat(points);
+		Mat pts = Mat(points).reshape(1, (int)points.size());
 		auto trainInput = TrainData::create(pts, ROW_SAMPLE, Mat(markers));
 		Ptr<NormalBayesClassifier> NBC = StatModel::train<NormalBayesClassifier>(trainInput);
 		NBC->predict(inputPoints, dst);
-		for (int i = 0; i < 10; i++)
-			auto test = dst.at<int>(i);
     }
 };
 extern "C" __declspec(dllexport)
@@ -3350,14 +3388,22 @@ void OEX_Points_Classifier_Close(OEX_PointsClassifier *cPtr)
     delete cPtr;
 }
 extern "C" __declspec(dllexport)
-int *OEX_Points_Classifier_RunCPP(OEX_PointsClassifier *cPtr, float * pointsPtr, float* classesPtr, int count, int methodIndex,
-								  int imgRows, int imgCols)
+int* OEX_ShowPoints(OEX_PointsClassifier * cPtr, int imgRows, int imgCols, int radius)
 {
-	Mat points = Mat(count, 2, CV_32F, pointsPtr);
-	Mat markers = Mat(count, 1, CV_32S, classesPtr);
-	cPtr->markers.assign(markers.begin<int>(), markers.end<int>());
-	cPtr->points.assign(points.begin<Point2f>(), points.end<Point2f>());
-	if (cPtr->inputPoints.rows == 0) cPtr->OEX_Setup(imgRows, imgCols);
+	cPtr->img = Mat(imgRows, imgCols, CV_8UC3);
+	cPtr->img.setTo(0);
+	for (int i = 0; i < cPtr->points.size(); i++)
+	{
+		auto color = cPtr->markers[i] == 0 ? Scalar(255, 255, 255) : Scalar(0, 255, 255);
+		circle(cPtr->img, cPtr->points[i], radius, color, -1, LINE_AA);
+	}
+	return (int*)cPtr->img.data;
+}
+
+extern "C" __declspec(dllexport)
+int* OEX_Points_Classifier_RunCPP(OEX_PointsClassifier * cPtr, int count, int methodIndex, int imgRows, int imgCols, int reset)
+{
+	if (reset) cPtr->OEX_Setup(count, imgRows, imgCols);
 	cPtr->RunCPP();
-	return (int *) cPtr->dst.data; 
+	return (int*)cPtr->dst.data;
 }
