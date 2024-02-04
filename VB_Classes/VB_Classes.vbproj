@@ -121,6 +121,7 @@
     <Compile Include="Cell.vb" />
     <Compile Include="Complexity.vb" />
     <Compile Include="OEX.vb" />
+    <Compile Include="PointPolygonTest.vb" />
     <Compile Include="PongWars.vb" />
     <Compile Include="VB_Externs.vb" />
     <Compile Include="CPPExtract.vb" />

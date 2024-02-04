@@ -319,9 +319,10 @@ End Class
 
 
 Public Class OEX_PointPolygonTest_demo : Inherits VB_Algorithm
+    Dim pointPoly As New PointPolygonTest_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "OpenCV Example PointPolygonTest_demo"
+        desc = "OpenCV Example PointPolygonTest_demo - it became PointPolygonTest_Basics."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim r As Integer = dst2.Height / 4
@@ -338,109 +339,11 @@ Public Class OEX_PointPolygonTest_demo : Inherits VB_Algorithm
             dst2.Line(vert(i), vert((i + 1) Mod 6), cv.Scalar.White, task.lineWidth, task.lineType)
         Next
 
-        ' Get the contours
-        Dim contours As cv.Point()()
-        cv.Cv2.FindContours(dst2, contours, Nothing, RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-        For i = 0 To dst1.Rows - 1
-            For j = 0 To dst1.Cols - 1
-                Dim distance = cv.Cv2.PointPolygonTest(contours(0), New cv.Point(j, i), True)
-                dst1.Set(Of Single)(i, j, distance)
-            Next
-        Next
-
-        Dim mm = vbMinMax(dst1)
-        mm.minVal = Math.Abs(mm.minVal)
-        mm.maxVal = Math.Abs(mm.maxVal)
-
-        Dim blue As New cv.Vec3b(0, 0, 0)
-        Dim red As New cv.Vec3b(0, 0, 0)
-        For i = 0 To src.Rows - 1
-            For j = 0 To src.Cols - 1
-                Dim val = dst1.Get(Of Single)(i, j)
-                If val < 0 Then
-                    blue(0) = 255 - Math.Abs(val) * 255 / mm.minVal
-                    dst3.Set(Of cv.Vec3b)(i, j, blue)
-                ElseIf val > 0 Then
-                    red(2) = 255 - val * 255 / mm.maxVal
-                    dst3.Set(Of cv.Vec3b)(i, j, red)
-                Else
-                    dst3.Set(Of cv.Vec3b)(i, j, white)
-                End If
-            Next
-        Next
-        dst3.Circle(mm.maxLoc, CInt(mm.maxVal), white, task.lineWidth, task.lineType)
+        pointPoly.Run(dst2)
+        dst3 = pointPoly.dst3
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class OEX_Points_Classifier1 : Inherits VB_Algorithm
-    Dim options As New Options_Classifier
-    Dim random As New Random_Basics
-    Dim NBC = cv.ML.NormalBayesClassifier.Create()
-    Public Sub New()
-        gOptions.DebugCheckBox.Checked = True
-        vbAddAdvice("Choose which classifier to use in the local options.")
-        desc = "OpenCV Example Points_Classifier"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        Static points As New List(Of cv.Point2f)
-        Static classes As New List(Of Integer)
-
-        If gOptions.DebugCheckBox.Checked Then
-            gOptions.DebugCheckBox.Checked = False
-            random.range = New cv.Rect(0, 0, dst2.Width * 3 / 4, dst2.Height * 3 / 4)
-            random.Run(empty)
-            points = New List(Of cv.Point2f)(random.pointList)
-            For i = 0 To points.Count - 1
-                classes.Add(1)
-            Next
-
-            random.range = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width * 3 / 4, dst2.Height * 3 / 4)
-            random.Run(empty)
-            For i = 0 To random.pointList.Count - 1
-                points.Add(random.pointList(i))
-                classes.Add(2)
-            Next
-        End If
-
-        Dim samples As New cv.Mat(1, classes.Count, cv.MatType.CV_32FC2, points.ToArray)
-        Dim markers As New cv.Mat(1, classes.Count, cv.MatType.CV_32S, classes.ToArray)
-
-        ' NBC.Train.create(samples, markers)
-        'NBC.Train()
-        'cv.ML.StatModel(NormalBayesClassifier)
-        'NBC..Train(trainData, cv.ML.SampleTypes.RowSample, response)
-        Select Case options.methodName
-            Case "Normal Bayes (NBC)"
-                Dim classifier = cv.ML.NormalBayesClassifier.Create()
-            Case "K Nearest Neighbor (KNN)"
-            Case "Support Vector Machine (SVM)"
-            Case "Decision Tree (DTree)"
-            Case "Boosted Tree (BTree)"
-            Case "Random Forest (RF)"
-            Case "Artificial Neural Net (ANN)"
-        End Select
-
-        dst2.SetTo(0)
-        For i = 0 To points.Count - 1
-            If classes(i) = 1 Then
-                dst2.Circle(points(i), task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
-            Else
-                dst2.Circle(points(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
-            End If
-        Next
-        setTrueText("Click the global DebugCheckBox to get another set of points.", 3)
-    End Sub
-End Class
 
 
 

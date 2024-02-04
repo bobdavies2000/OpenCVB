@@ -30,7 +30,7 @@ End Class
 
 
 Public Class Blob_Input : Inherits VB_Algorithm
-    Dim rectangles As New Rectangle_Rotated
+    Dim rotatedRect As New Rectangle_Rotated
     Dim circles As New Draw_Circles
     Dim ellipses As New Draw_Ellipses
     Dim poly As New Draw_Polygon
@@ -47,8 +47,8 @@ Public Class Blob_Input : Inherits VB_Algorithm
         desc = "Generate data to test Blob Detector."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        rectangles.Run(src)
-        Mats.mat(0) = rectangles.dst2
+        rotatedRect.Run(src)
+        Mats.mat(0) = rotatedRect.dst2
 
         circles.Run(src)
         Mats.mat(1) = circles.dst2

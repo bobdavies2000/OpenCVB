@@ -99,6 +99,7 @@ End Class
 Public Class Depth_HolesRect : Inherits VB_Algorithm
     Dim shadow As New Depth_Holes
     Public Sub New()
+        labels(2) = "The 10 largest contours in the depth holes."
         desc = "Identify the minimum rectangles of contours of the depth shadow"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -108,18 +109,17 @@ Public Class Depth_HolesRect : Inherits VB_Algorithm
         If shadow.dst3.Channels = 3 Then shadow.dst3 = shadow.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         contours = cv.Cv2.FindContoursAsArray(shadow.dst3, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
 
-        Dim minEllipse(contours.Length - 1) As cv.RotatedRect
-        Dim minPixels = gOptions.minPixelsSlider.Value
-        For i = 0 To contours.Length - 1
-            Dim minRect = cv.Cv2.MinAreaRect(contours(i))
-            Dim size = minRect.Size.Width * minRect.Size.Height
-            If size > minPixels Then
-                Dim nextColor = New cv.Scalar(task.vecColors(i Mod 256)(0), task.vecColors(i Mod 256)(1), task.vecColors(i Mod 256)(2))
-                drawRotatedRectangle(minRect, dst2, nextColor)
-                If contours(i).Length >= 5 Then
-                    minEllipse(i) = cv.Cv2.FitEllipse(contours(i))
-                End If
-            End If
+        Dim sortContours As New SortedList(Of Integer, List(Of cv.Point))(New compareAllowIdenticalIntegerInverted)
+        For Each c In contours
+            sortContours.Add(c.Length, c.ToList)
+        Next
+        dst3.SetTo(0)
+        For i = 0 To Math.Min(sortContours.Count, 10) - 1
+            Dim contour = sortContours.ElementAt(i).Value
+            Dim minRect = cv.Cv2.MinAreaRect(contour)
+            Dim nextColor = New cv.Scalar(task.vecColors(i Mod 256)(0), task.vecColors(i Mod 256)(1), task.vecColors(i Mod 256)(2))
+            drawRotatedRectangle(minRect, dst2, nextColor)
+            vbDrawContour(dst3, contour.ToList, cv.Scalar.White, task.lineWidth)
         Next
         cv.Cv2.AddWeighted(dst2, 0.5, task.depthRGB, 0.5, 0, dst2)
     End Sub
