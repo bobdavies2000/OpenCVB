@@ -351,77 +351,55 @@ End Class
 
 
 
-
 Public Class GuidedBP_HotPoints : Inherits VB_Algorithm
     Public hotTop As New Histogram2D_Top
     Public hotSide As New Histogram2D_Side
     Public topRects As New List(Of cv.Rect)
     Public sideRects As New List(Of cv.Rect)
-    Dim mask As New cv.Mat, floodRect As cv.Rect
-    Dim ptList As New List(Of cv.Point)
-    Dim rectList As New List(Of cv.Rect)
     Public Sub New()
         task.useXYRange = False
-        mask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        floodRect = New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2)
         desc = "Use floodfill to identify all the objects in both the top and side views."
     End Sub
-    Private Function hotPoints(ByRef view As cv.Mat) As SortedList(Of Integer, Integer)
+    Private Function hotPoints(ByRef view As cv.Mat) As List(Of cv.Rect)
+        Static floodRect As New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2)
+        Static mask As New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U)
         Dim rect As cv.Rect
-        Dim input = view(floodRect).Clone
-        Dim points = input.FindNonZero()
+        Dim points = view.FindNonZero()
 
-        Dim viewList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
-        rectList.Clear()
-        ptList.Clear()
+        Dim viewList As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
         mask.SetTo(0)
-        Dim minPixels = gOptions.minPixelsSlider.Value
+        Dim lastCount As Integer = 0
         For i = 0 To points.Rows - 1
             Dim pt = points.Get(Of cv.Point)(i, 0)
-            Dim count = input.FloodFill(mask, pt, 255, rect, 0, 0, 4 Or cv.FloodFillFlags.MaskOnly Or (255 << 8))
-            If count >= minPixels Then
-                viewList.Add(count, rectList.Count)
-                rectList.Add(New cv.Rect(rect.X + 1, rect.Y + 1, rect.Width + 1, rect.Height + 1))
-                ptList.Add(pt)
-            End If
+            Dim count = view.FloodFill(mask, pt, 0, rect, 0, 0, 4 Or cv.FloodFillFlags.MaskOnly Or (255 << 8))
+            If count > 0 Then viewList.Add(count, pt)
         Next
 
         mask.SetTo(0)
-        Dim viewCount = 1
-        For Each entry In viewList
-            Dim pt = ptList(entry.Value)
-            input.FloodFill(mask, pt, viewCount, rect, 0, 0, 4 Or cv.FloodFillFlags.Link4 Or (255 << 8))
-            viewCount += 1
+        Dim rectList As New List(Of cv.Rect)
+        For i = 0 To Math.Min(viewList.Count, 10) - 1
+            Dim pt = viewList.ElementAt(i).Value
+            view.FloodFill(mask, pt, 0, rect, 0, 0, 4 Or cv.FloodFillFlags.FixedRange Or (i + 1 << 8))
+            rectList.Add(New cv.Rect(rect.X - 1, rect.Y - 1, rect.Width, rect.Height))
         Next
 
-        input.CopyTo(view(floodRect))
-        view = view.SetTo(0, view.InRange(255, 255))
-        Return viewList
+        mask(floodRect).CopyTo(view)
+        Return rectList
     End Function
     Public Sub RunVB(src As cv.Mat)
-        hotTop.Run(src)
-        Dim topList = hotPoints(hotTop.dst3)
-
-        dst2 = vbPalette(hotTop.dst3 * 255 / topList.Count)
-
-        topRects = New List(Of cv.Rect)(rectList)
+        hotTop.Run(src.Clone)
+        topRects = hotPoints(hotTop.dst3)
+        dst2 = vbPalette(hotTop.dst3 * 255 / topRects.Count)
 
         hotSide.Run(src)
-        Dim sideList = hotPoints(hotSide.dst3)
+        sideRects = hotPoints(hotSide.dst3)
+        dst3 = vbPalette(hotSide.dst3 * 255 / sideRects.Count)
 
-        dst3 = vbPalette(hotSide.dst3 * 255 / sideList.Count)
-
-        sideRects = New List(Of cv.Rect)(rectList)
-
-        If topList.Count < 8 And redOptions.TopViewThreshold.Value > redOptions.TopViewThreshold.Minimum Then redOptions.TopViewThreshold.Value -= 1
-        If topList.Count > 15 And redOptions.TopViewThreshold.Value < redOptions.TopViewThreshold.Maximum Then redOptions.TopViewThreshold.Value += 1
-        If sideList.Count < 8 And redOptions.SideViewThreshold.Value > redOptions.SideViewThreshold.Minimum Then redOptions.SideViewThreshold.Value -= 1
-        If sideList.Count > 15 And redOptions.SideViewThreshold.Value < redOptions.SideViewThreshold.Maximum Then redOptions.SideViewThreshold.Value += 1
-
-        If task.heartBeat Then labels(2) = CStr(topList.Count) + " objects were identified in the top view."
-        If task.heartBeat Then labels(3) = CStr(sideList.Count) + " objects were identified in the side view."
+        If task.heartBeat Then labels(2) = "Top " + CStr(topRects.Count) + " objects identified in the top view."
+        If task.heartBeat Then labels(3) = "Top " + CStr(sideRects.Count) + " objects identified in the side view."
     End Sub
 End Class
+
 
 
 

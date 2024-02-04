@@ -296,8 +296,7 @@ Public Class FeatureLess_Density : Inherits VB_Algorithm
         flood.Run(src)
         dst2 = flood.dst2
 
-        labels(2) = CStr(flood.pointList.Count) + " points found " + CStr(flood.redCells.Count) + " regions > " +
-                    CStr(gOptions.minPixelsSlider.Value) + " pixels"
+        labels(2) = CStr(flood.pointList.Count) + " points found " + CStr(flood.redCells.Count) + " regions "
     End Sub
 End Class
 
