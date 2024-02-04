@@ -1384,17 +1384,26 @@ End Class
 Public Class Edge_Sobel : Inherits VB_Algorithm
     Public addw As New AddWeighted_Basics
     Public options As New Options_Sobel
+    Dim blur As New Blur_Gaussian
     Public Sub New()
-        labels = {"", "", "Horizontal derivative", "Vertical derivative"}
-        desc = "Show Sobel edge detection with varying kernel sizes and directions."
+        labels = {"", "", "Horizontal + Vertical derivative - use global 'Add Weighted' slider to see impact.", "Blur output"}
+        desc = "Show Sobel edge detection with varying kernel sizes."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If options.horizontalDerivative Then dst2 = src.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
-        If options.verticalDerivative Then dst3 = src.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
+        options.RunVB()
+
+        blur.Run(src)
+        dst3 = blur.dst2
+
+        dst1 = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If options.horizontalDerivative Then dst2 = dst1.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
+        If options.verticalDerivative Then dst0 = dst1.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
         dst2 = dst2.ConvertScaleAbs()
-        dst3 = dst3.ConvertScaleAbs()
+        dst0 = dst0.ConvertScaleAbs()
+
+        addw.src2 = dst0
+        addw.Run(dst2)
+        dst2 = addw.dst2
     End Sub
 End Class
 

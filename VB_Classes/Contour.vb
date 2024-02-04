@@ -2,40 +2,37 @@ Imports cv = OpenCvSharp
 Public Class Contour_Basics : Inherits VB_Algorithm
     Public contourlist As New List(Of cv.Point())
     Public allContours As cv.Point()()
+    Public options As New Options_Contours
     Public Sub New()
         labels = {"", "", "FindContour input", "Draw contour output"}
         desc = "General purpose contour finder"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst2 = src.Clone
+        dst0 = src.Clone
         If standaloneTest() Then
             Static rotatedRect As New Rectangle_Rotated
             If task.heartBeat = False Then Exit Sub
             rotatedRect.Run(src)
-            dst2 = rotatedRect.dst2
-            If dst2.Channels = 3 Then
-                dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
-            Else
-                dst2 = dst2.ConvertScaleAbs(255)
-            End If
+            dst0 = rotatedRect.dst2
+            dst0 = dst0.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
-            If src.Channels = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels = 3 Then dst0 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
 
-        If dst2.Type = cv.MatType.CV_8U Then
-            cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.External,
+        dst2 = dst0.Clone
+        If dst0.Type = cv.MatType.CV_8U Then
+            cv.Cv2.FindContours(dst0, allContours, Nothing, cv.RetrievalModes.External,
                             cv.ContourApproximationModes.ApproxTC89KCOS)
         Else
-            If dst2.Type <> cv.MatType.CV_32S Then dst2.ConvertTo(dst2, cv.MatType.CV_32S)
+            If dst0.Type <> cv.MatType.CV_32S Then dst0.ConvertTo(dst2, cv.MatType.CV_32S)
             cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.FloodFill,
                             cv.ContourApproximationModes.ApproxTC89KCOS)
         End If
 
         contourlist.Clear()
-        Dim minPixels = gOptions.minPixelsSlider.Value
         For Each c In allContours
             Dim area = cv.Cv2.ContourArea(c)
-            If area >= minPixels And c.Length >= minLengthContour Then contourlist.Add(c)
+            If area >= options.minPixels And c.Length >= minLengthContour Then contourlist.Add(c)
         Next
 
         dst3.SetTo(0)
@@ -80,10 +77,9 @@ Public Class Contour_BasicsWithOptions : Inherits VB_Algorithm
         cv.Cv2.FindContours(dst2, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
 
         contourlist.Clear()
-        Dim minPixels = gOptions.minPixelsSlider.Value
         For Each c In allContours
             Dim area = cv.Cv2.ContourArea(c)
-            If area >= minPixels And c.Length >= minLengthContour Then contourlist.Add(c)
+            If area >= options.minPixels And c.Length >= minLengthContour Then contourlist.Add(c)
         Next
 
         dst3.SetTo(0)
@@ -332,6 +328,7 @@ Public Class Contour_Sorted : Inherits VB_Algorithm
     Dim diff As New Diff_Basics
     Dim erode As New Erode_Basics
     Dim dilate As New Dilate_Basics
+    Dim options As New Options_Contours
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -350,10 +347,9 @@ Public Class Contour_Sorted : Inherits VB_Algorithm
         sortedByArea.Clear()
         sortedContours.Clear()
         dst3.SetTo(0)
-        Dim minPixels = gOptions.minPixelsSlider.Value
         For i = 0 To contours.contourlist.Count - 1
             Dim area = cv.Cv2.ContourArea(contours.contourlist(i))
-            If area > minPixels And contours.contourlist(i).Length > minLengthContour Then
+            If area > options.minPixels And contours.contourlist(i).Length > minLengthContour Then
                 sortedByArea.Add(area, i)
                 sortedContours.Add(area, cv.Cv2.ApproxPolyDP(contours.contourlist(i),
                                                              contours.options.epsilon, True))

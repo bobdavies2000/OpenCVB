@@ -180,12 +180,11 @@ Public Class Flood_PointList : Inherits VB_Algorithm
         Dim SizeSorted As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         Dim maskPlus = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8UC1, 0)
         Dim index = 1
-        Dim minPixels = gOptions.minPixelsSlider.Value
         For Each pt In pointList
             Dim floodFlag = cv.FloodFillFlags.FixedRange Or (index << 8)
             Dim rc = New rcData
             rc.pixels = cv.Cv2.FloodFill(dst0, maskPlus, pt, 255, rc.rect, 0, 0, floodFlag)
-            If rc.pixels >= minPixels And rc.rect.Width < dst2.Width And rc.rect.Height < dst2.Height And
+            If rc.pixels >= options.minPixels And rc.rect.Width < dst2.Width And rc.rect.Height < dst2.Height And
                rc.rect.Width > 0 And rc.rect.Height > 0 Then
                 rc.mask = maskPlus(rc.rect).InRange(index, index)
 

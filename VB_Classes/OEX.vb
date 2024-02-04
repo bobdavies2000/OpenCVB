@@ -489,3 +489,57 @@ Module OEX_Points_Classifier_CPP_Module
                                                  imgRows As Integer, imgCols As Integer, resetInput As Integer) As IntPtr
     End Function
 End Module
+
+
+
+
+
+
+
+Public Class OEX_Remap : Inherits VB_Algorithm
+    Dim remap As New Remap_Basics
+    Public Sub New()
+        desc = "The OpenCV Remap example became the Remap_Basics algorithm."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        remap.Run(src)
+        dst2 = remap.dst2
+        labels(2) = remap.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class OEX_Sobel_Demo : Inherits VB_Algorithm
+    Dim sobel As New Edge_Sobel
+    Public Sub New()
+        desc = "OpenCV Example Sobel_Demo became Edge_Sobel algorithm."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        sobel.Run(src)
+        dst2 = sobel.dst2
+        dst3 = sobel.dst3
+        labels = sobel.labels
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OEX_Threshold : Inherits VB_Algorithm
+    Dim threshold As New Threshold_Basics
+    Public Sub New()
+        desc = "OpenCV Example Threshold became Threshold_Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        threshold.Run(src)
+        dst2 = threshold.dst2
+        dst3 = threshold.dst3
+        labels = threshold.labels
+    End Sub
+End Class

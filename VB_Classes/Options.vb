@@ -166,6 +166,7 @@ Public Class Options_Contours : Inherits VB_Algorithm
     Public retrievalMode = cv.RetrievalModes.External
     Public ApproximationMode = cv.ContourApproximationModes.ApproxTC89KCOS
     Public epsilon As Single = 3 / 100
+    Public minPixels As Integer = 30
     Dim options2 As New Options_Contours2
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -179,11 +180,13 @@ Public Class Options_Contours : Inherits VB_Algorithm
 
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Contour epsilon (arc length percent)", 0, 100, epsilon * 100)
+            sliders.setupTrackBar("Min Pixels", 1, 2000, 30)
         End If
     End Sub
     Public Sub RunVB()
         options2.RunVB()
         Static epsilonSlider = findSlider("Contour epsilon (arc length percent)")
+        Static minSlider = findSlider("Min Pixels")
 
         epsilon = epsilonSlider.Value / 100
 
@@ -197,6 +200,7 @@ Public Class Options_Contours : Inherits VB_Algorithm
             End If
         Next
         ApproximationMode = options2.ApproximationMode
+        minPixels = minSlider.value
     End Sub
 End Class
 
@@ -2901,8 +2905,12 @@ End Class
 Public Class Options_Flood : Inherits VB_Algorithm
     Public floodFlag As cv.FloodFillFlags = 4 Or cv.FloodFillFlags.FixedRange
     Public stepSize As Integer = 30
+    Public minPixels As Integer = 30
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Step Size", 1, dst2.Cols / 2, stepSize)
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Min Pixels", 1, 2000, 30)
+            sliders.setupTrackBar("Step Size", 1, dst2.Cols / 2, stepSize)
+        End If
         If findfrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Use floating range")
@@ -2913,9 +2921,11 @@ Public Class Options_Flood : Inherits VB_Algorithm
         Static floatingCheck = findCheckBox("Use floating range")
         Static connectCheck = findCheckBox("Use connectivity 8 (unchecked in connectivity 4)")
         Static stepSlider = findSlider("Step Size")
+        Static minSlider = findSlider("Min Pixels")
 
         stepSize = stepSlider.Value
         floodFlag = If(connectCheck.checked, 8, 4) Or If(floatingCheck.checked, cv.FloodFillFlags.FixedRange, 0)
+        minPixels = minSlider.value
     End Sub
 End Class
 
