@@ -393,7 +393,6 @@ if algorithmName = "Depth_ColorMap" Then return new Depth_ColorMap
 if algorithmName = "Depth_Contour" Then return new Depth_Contour
 if algorithmName = "Depth_Dilate" Then return new Depth_Dilate
 if algorithmName = "Depth_Display" Then return new Depth_Display
-if algorithmName = "Depth_Far" Then return new Depth_Far
 if algorithmName = "Depth_FirstLastDistance" Then return new Depth_FirstLastDistance
 if algorithmName = "Depth_Flatland" Then return new Depth_Flatland
 if algorithmName = "Depth_Foreground" Then return new Depth_Foreground

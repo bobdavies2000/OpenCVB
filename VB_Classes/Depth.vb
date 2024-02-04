@@ -877,14 +877,15 @@ End Class
 
 
 
-Public Class Depth_Far : Inherits VB_Algorithm
+Public Class Depth_MaxMask : Inherits VB_Algorithm
     Dim contour As New Contour_Basics
     Public Sub New()
         labels = {"", "", "Depth that is too far", "Contour of depth that is too far..."}
-        desc = "Create a mask to show a contour containing depth that is greater than maxdepth (global setting)"
+        desc = "Display the task.maxDepthMask and its contour containing depth that is greater than maxdepth (global setting)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst2 = task.maxDepthMask
+        dst2 = src
+        dst2.SetTo(cv.Scalar.White, task.maxDepthMask)
         contour.Run(task.maxDepthMask)
         dst3.SetTo(0)
         For Each c In contour.allContours
@@ -1394,28 +1395,6 @@ Public Class Depth_Outline : Inherits VB_Algorithm
             If task.heartBeat Then dst3.SetTo(0)
             dst3 = dst3 Or dst2
         End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Depth_MaxMask : Inherits VB_Algorithm
-    Dim contour As New Contour_Basics
-    Public Sub New()
-        labels = {"", "", "task.maxDepthMask", "Contour for task.maxDepthMask"}
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Display the task.maxDepthMask and its contour"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        contour.Run(task.maxDepthMask)
-
-        dst2.SetTo(0)
-        For Each tour In contour.contourlist
-            vbDrawContour(dst2, tour.ToList, 255, -1)
-        Next
     End Sub
 End Class
 
