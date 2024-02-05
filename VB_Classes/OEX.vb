@@ -446,3 +446,38 @@ Public Class OEX_Threshold : Inherits VB_Algorithm
         labels = threshold.labels
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class OEX_Threshold_Inrange : Inherits VB_Algorithm
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Hue low", 0, 180, 90)
+            sliders.setupTrackBar("Hue high", 0, 180, 180)
+            sliders.setupTrackBar("Saturation low", 0, 255, 50)
+            sliders.setupTrackBar("Saturation high", 0, 255, 150)
+            sliders.setupTrackBar("Value low", 0, 255, 50)
+            sliders.setupTrackBar("Value high", 0, 255, 150)
+        End If
+
+        desc = "OpenCV Example Threshold_Inrange"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static hueLowSlider = findSlider("Hue low")
+        Static hueHighSlider = findSlider("Hue high")
+        Static satLowSlider = findSlider("Saturation low")
+        Static satHighSlider = findSlider("Saturation high")
+        Static valLowSlider = findSlider("Value low")
+        Static valHighSlider = findSlider("Value high")
+        Dim lows As New cv.Scalar(hueLowSlider.value, satLowSlider.value, valLowSlider.value)
+        Dim highs As New cv.Scalar(hueHighSlider.value, satHighSlider.value, valHighSlider.value)
+
+        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        dst2 = hsv.InRange(lows, highs)
+    End Sub
+End Class

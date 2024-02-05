@@ -63,7 +63,7 @@ Public Class VBtask : Implements IDisposable
     Public maxMask As Depth_MaxMask
     Public motionCloud As Motion_PointCloud
     Public motionColor As Motion_Color
-    Public motionBasics As Motion_Basics
+    Public motionBasics As Motion_Basics_QT
     Public rgbFilter As Object
 
     Public noDepthMask As New cv.Mat
@@ -367,7 +367,7 @@ Public Class VBtask : Implements IDisposable
         maxMask = New Depth_MaxMask
         motionCloud = New Motion_PointCloud
         motionColor = New Motion_Color
-        motionBasics = New Motion_Basics
+        motionBasics = New Motion_Basics_QT
 
         updateSettings()
         redOptions.Show()

@@ -33,6 +33,71 @@ End Class
 
 
 
+
+' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
+Public Class BGSubtract_Basics_QT : Inherits VB_Algorithm
+    Public Sub New()
+        cPtr = BGSubtract_BGFG_Open(4) ' MOG2 is the default method when running in QT mode.
+        desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+        Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+        Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        handleSrc.Free()
+
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = BGSubtract_BGFG_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class BGSubtract_MOG2 : Inherits VB_Algorithm
+    Public gray As New cv.Mat
+    Dim MOG2 As cv.BackgroundSubtractorMOG2
+    Dim options As New Options_BGSubtract
+    Public Sub New()
+        MOG2 = cv.BackgroundSubtractorMOG2.Create()
+        desc = "Subtract background using a mixture of Gaussians"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        MOG2.Apply(src, dst2, options.learnRate)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class BGSubtract_MOG2_QT : Inherits VB_Algorithm
+    Public gray As New cv.Mat
+    Dim MOG2 As cv.BackgroundSubtractorMOG2
+    Public Sub New()
+        MOG2 = cv.BackgroundSubtractorMOG2.Create()
+        desc = "Subtract background using a mixture of Gaussians - the QT version"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        MOG2.Apply(src, dst2, 0.1F)
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class BGSubtract_MotionDetect : Inherits VB_Algorithm
     Dim radioChoices As cv.Vec3i()
     Public Sub New()
@@ -103,26 +168,6 @@ Public Class BGSubtract_MOG : Inherits VB_Algorithm
         options.RunVB()
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOG.Apply(src, dst2, options.learnRate)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class BGSubtract_MOG2 : Inherits VB_Algorithm
-    Public gray As New cv.Mat
-    Dim MOG2 As cv.BackgroundSubtractorMOG2
-    Dim options As New Options_BGSubtract
-    Public Sub New()
-        MOG2 = cv.BackgroundSubtractorMOG2.Create()
-        desc = "Subtract background using a mixture of Gaussians"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOG2.Apply(src, dst2, options.learnRate)
     End Sub
 End Class
 

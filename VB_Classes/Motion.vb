@@ -2,23 +2,46 @@ Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits VB_Algorithm
-    Dim bgSub As New BGSubtract_Basics
+    Public bgSub As New BGSubtract_MOG2
+    Dim motion As New Motion_Basics_QT
+    Public Sub New()
+        vbAddAdvice(traceName + ": redOptions are used as well as BGSubtract options.")
+        desc = "Use floodfill to find all the real motion in an image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        bgSub.Run(src)
+        motion.Run(bgSub.dst2)
+        dst2 = motion.dst2
+        labels(2) = motion.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Motion_Basics_QT : Inherits VB_Algorithm
     Dim redMasks As New RedCloud_Masks
-    Public showDiff As Boolean
+    Public bgSub As New BGSubtract_Basics_QT
     Public Sub New()
         redMasks.imageThresholdPercent = 1.0
         redMasks.cellMinPercent = 0
-        vbAddAdvice(traceName + ": redOptions are used as well as BGSubtract options.")
-        desc = "Use floodfill to find all the real motion in an image."
+        desc = "The option-free version of Motion_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         task.motionDetected = False
         task.motionReset = True
 
-        bgSub.Run(src)
-        If standaloneTest() Or showDiff Then dst2 = bgSub.dst2
+        If src.Channels <> 1 Then
+            bgSub.Run(src)
+            src = bgSub.dst2
+        End If
 
-        redMasks.Run(bgSub.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary))
+        dst2 = src
+
+        redMasks.Run(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
         If redMasks.sortedCells.Count < 2 Then
             task.motionReset = False
             task.motionRect = New cv.Rect
@@ -46,10 +69,11 @@ Public Class Motion_Basics : Inherits VB_Algorithm
             If task.motionRect.Width <> 0 Or task.motionRect.Height <> 0 Then task.motionDetected = True
         End If
 
-        If standaloneTest() Or showDiff Then dst2.Rectangle(task.motionRect, 255, task.lineWidth)
+        dst2.Rectangle(task.motionRect, 255, task.lineWidth)
         labels(2) = CStr(redMasks.sortedCells.Count) + " cells were found with " + CStr(redMasks.classCount) + " flood points"
     End Sub
 End Class
+
 
 
 
@@ -663,7 +687,6 @@ End Class
 
 
 Public Class Motion_PointCloud : Inherits VB_Algorithm
-    Public diff As New Diff_Depth32f
     Public Sub New()
         labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
         desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat."
@@ -674,6 +697,7 @@ Public Class Motion_PointCloud : Inherits VB_Algorithm
         If task.motionDetected Then task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
 
         If standaloneTest() Then
+            Static diff As New Diff_Depth32f
             If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
             diff.Run(task.pcSplit(2))
             dst3 = diff.dst2
