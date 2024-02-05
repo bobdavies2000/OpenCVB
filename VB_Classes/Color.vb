@@ -1,14 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Color_Basics : Inherits VB_Algorithm
     Public classCount As Integer
-    Dim backP As New BackProject_Full
-    Dim km As New KMeans_Basics
-    Dim lut As New LUT_Basics
-    Dim reduction As New Reduction_Basics
-    Dim hColor As New Hist3Dcolor_Basics
-    Dim binarize As New Binarize_FourWay
-    Dim hue As New BackProject_Hue
-    Public classifier As Object = binarize
+    Public classifier As Object
     Public updateImages As Boolean
     Public Sub New()
         labels(3) = "vbPalette output of dst2 at left"
@@ -19,18 +12,25 @@ Public Class Color_Basics : Inherits VB_Algorithm
         If task.optionsChanged Then
             Select Case redOptions.colorInputName
                 Case "BackProject_Full"
+                    Static backP As New BackProject_Full
                     classifier = backP
                 Case "KMeans_Basics"
+                    Static km As New KMeans_Basics
                     classifier = km
                 Case "LUT_Basics"
+                    Static lut As New LUT_Basics
                     classifier = lut
                 Case "Reduction_Basics"
+                    Static reduction As New Reduction_Basics
                     classifier = reduction
                 Case "Hist3DColor_Basics"
+                    Static hColor As New Hist3Dcolor_Basics
                     classifier = hColor
                 Case "Binarize_FourWay"
+                    Static binarize As New Binarize_FourWay
                     classifier = binarize
                 Case "BackProject_Hue"
+                    Static hue As New BackProject_Hue
                     classifier = hue
             End Select
         End If

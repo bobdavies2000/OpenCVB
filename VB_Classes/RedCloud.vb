@@ -2360,7 +2360,6 @@ Public Class RedCloud_MasksBoth : Inherits VB_Algorithm
     Dim redCore As New RedCloud_Core
     Dim guided As New GuidedBP_Depth
     Dim matchCell As New RedCloud_MatchCell
-    Dim blur As New Blur_Basics
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -2393,8 +2392,7 @@ Public Class RedCloud_MasksBoth : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src As cv.Mat)
         color.Run(src)
-        blur.Run(color.dst2)
-        redMasks.Run(blur.dst2)
+        redMasks.Run(color.dst2)
 
         dst0 = matchCells(dst2, dst0, colorCells)
         dst2.SetTo(0, colorCells(0).mask)
