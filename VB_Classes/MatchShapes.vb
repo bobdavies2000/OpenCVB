@@ -122,6 +122,7 @@ Public Class MatchShapes_Nearby : Inherits VB_Algorithm
     Dim options As New Options_MatchShapes
     Public runStandalone As Boolean = False
     Dim redC As New RedCloud_Basics
+    Dim addTour As New RedCloud_ContourUpdate
     Public Sub New()
         labels = {"Left floodfill image", "Right floodfill image", "Left image of identified cells", "Right image with identified cells"}
         desc = "MatchShapes: Find matches at similar latitude (controlled with slider)"
@@ -135,7 +136,8 @@ Public Class MatchShapes_Nearby : Inherits VB_Algorithm
             redC.Run(task.color)
             If redC.redCells.Count = 0 Then Exit Sub
             dst2 = redC.dst2
-            redCells = New List(Of rcData)(redC.redCells)
+            addTour.redCells = New List(Of rcData)(redC.redCells)
+            addTour.Run(src)
             rc = task.rc
         End If
 
@@ -149,12 +151,9 @@ Public Class MatchShapes_Nearby : Inherits VB_Algorithm
 
         Dim minMatch As Single = Single.MaxValue
         bestCell = -1
-        Dim minPixels = gOptions.minPixelsSlider.Value
-        For i = 0 To redCells.Count - 1
-            Dim rc2 = redCells(i)
+        For i = 0 To addTour.redCells.Count - 1
+            Dim rc2 = addTour.redCells(i)
             If rc2.contour Is Nothing Then Continue For
-            If rc2.pixels < minPixels Then Continue For
-            If Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta And myStandalone = False Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rc.contour, rc2.contour, options.matchOption)
             If matchVal < options.matchThreshold Then
                 If matchVal < minMatch And matchVal > 0 Then
@@ -168,8 +167,8 @@ Public Class MatchShapes_Nearby : Inherits VB_Algorithm
 
         If bestCell >= 0 Then
             Dim rc = similarCells(bestCell)
-            redCells.RemoveAt(bestCell)
             dst3.Circle(rc.maxDist, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            setTrueText("Best match", rc.maxDist, 3)
         End If
         If similarCells.Count = 0 Then setTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
     End Sub

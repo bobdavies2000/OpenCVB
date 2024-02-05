@@ -480,7 +480,6 @@ Public Class MSER_Regions : Inherits VB_Algorithm
             opAuto.classCount = mserCells.Count
             opAuto.Run(src)
         End If
-        Dim mserLast = 255
 
         core.Run(src)
 
@@ -497,7 +496,7 @@ Public Class MSER_Regions : Inherits VB_Algorithm
         Next
 
         If task.optionsChanged Then
-            cellMap.SetTo(mserLast)
+            cellMap.SetTo(0)
             matchCell.lastCells.Clear()
         End If
 
@@ -507,11 +506,10 @@ Public Class MSER_Regions : Inherits VB_Algorithm
         matchCell.usedColors.Add(black)
 
         mserCells.Clear()
-        cellMap.SetTo(mserLast)
+        cellMap.SetTo(0)
         Dim lastDst2 = dst2.Clone
         If task.heartBeat Then dst2.SetTo(0)
         dst3.SetTo(0)
-        Dim minPixels = gOptions.minPixelsSlider.Value
         For Each key In redCells
             Dim rp = key.Value
 
@@ -521,14 +519,13 @@ Public Class MSER_Regions : Inherits VB_Algorithm
 
             Dim rc = matchCell.rc
 
-            If rc.pixels > 0 And rc.pixels < minPixels Then Continue For
             Dim color = lastDst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-            If color <> black Then rc.color = color
+            If color = black Then rc.color = randomCellColor() Else rc.color = color
             mserCells.Add(rc)
 
             cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
-            vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
             If mserCells.Count = 254 Then Exit For
         Next
 

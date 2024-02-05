@@ -2279,8 +2279,8 @@ Public Class RedCloud_Masks : Inherits VB_Algorithm
             rc.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
 
             ' rc.mask.Rectangle(New cv.Rect(0, 0, rc.mask.Width, rc.mask.Height), 0, 1)
-            Dim pt = vbGetMaxDist(rc.mask)
-            rc.maxDist = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
+            Dim pt = vbGetMaxDist(rc)
+            rc.maxDist = New cv.Point(pt.X, pt.Y)
 
             If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
         Next
@@ -2326,7 +2326,7 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
         rc.index = rp.index
         rc.rect = rp.rect
         rc.mask = rp.mask
-        rc.maxDist = rp.maxDist
+        rc.maxDist = vbGetMaxDist(rp)
 
         rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
         If rc.indexLast < lastCells.Count Then
@@ -2422,5 +2422,70 @@ Public Class RedCloud_MasksBoth : Inherits VB_Algorithm
         dst3.SetTo(0, task.noDepthMask)
 
         If task.rcPicTag = RESULT_DST2 Then setSelectedCell(colorCells, dst0) Else setSelectedCell(cloudCells, dst1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_ContourUpdate : Inherits VB_Algorithm
+    Public redCells As New List(Of rcData)
+    Public Sub New()
+        desc = "For each cell, add a contour if its count is zero."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standaloneTest() Then
+            Static redC As New RedCloud_Basics
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels = redC.labels
+            redCells = redC.redCells
+        End If
+
+        dst3.SetTo(0)
+        For i = 1 To redCells.Count - 1
+            Dim rc = redCells(i)
+            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            vbDrawContour(rc.mask, rc.contour, 255, -1)
+            redCells(i) = rc
+            vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_MaxDist : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim addTour As New RedCloud_ContourUpdate
+    Public Sub New()
+        desc = "Show the maxdist before and after updating the mask with the contour."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels = redC.labels
+
+        For Each rc In redC.redCells
+            dst2.Circle(rc.maxDist, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
+
+        addTour.redCells = redC.redCells
+        addTour.Run(src)
+        dst3 = addTour.dst3
+
+        For i = 1 To addTour.redCells.Count - 1
+            Dim rc = addTour.redCells(i)
+            rc.maxDist = vbGetMaxDist(rc)
+            dst3.Circle(rc.maxDist, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
     End Sub
 End Class

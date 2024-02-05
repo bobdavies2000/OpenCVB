@@ -483,7 +483,6 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
         classCount = 0
         Dim count As Integer
         Dim newSamples(histArray.Count - 1) As Single
-        Dim minPixels = gOptions.minPixelsSlider.Value
         Dim maxClassCount = 255 - givenClassCount - 1
         For i = 0 To sortedHist.Count - 1
             Dim index = sortedHist.ElementAt(i).Value
@@ -551,7 +550,7 @@ Public Class GuidedBP_Hulls : Inherits VB_Algorithm
                 vbDrawContour(rc.mask, rc.contour, 255, -1)
                 rc.maxDist = vbHullCenter(rc.hull)
                 Dim validate = rc.mask.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If validate = 0 Then rc.maxDist = vbGetMaxDist(rc.mask)
+                If validate = 0 Then rc.maxDist = vbGetMaxDist(rc)
 
                 Dim mask = rc.mask And task.depthMask
                 rc.mmX = vbMinMax(task.pcSplit(0), mask)

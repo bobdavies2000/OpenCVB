@@ -311,11 +311,6 @@ Module VB
 
         Return mm.maxLoc
     End Function
-    Public Function vbGetMaxDist(mask As cv.Mat) As cv.Point
-        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-        Dim mm As mmData = vbMinMax(distance32f)
-        Return mm.maxLoc
-    End Function
     Public Function vbContourToRect(contour As List(Of cv.Point)) As cv.Rect
         Dim minX As Integer = Integer.MaxValue, minY As Integer = Integer.MaxValue, maxX As Integer, maxY As Integer
         For Each pt In contour
