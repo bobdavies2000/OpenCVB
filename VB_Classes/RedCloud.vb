@@ -2299,7 +2299,6 @@ End Class
 
 
 Public Class RedCloud_MatchCell : Inherits VB_Algorithm
-    Public rp As New rcData
     Public rc As New rcData
     Public lastCellMap As New cv.Mat
     Public lastCells As New List(Of rcData)
@@ -2313,20 +2312,16 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() And task.heartBeat Then
-            rp.floodPoint = New cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2))
+            rc.floodPoint = New cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2))
             Dim w = msRNG.Next(1, dst2.Width / 2), h = msRNG.Next(1, dst2.Height / 2)
-            rp.rect = New cv.Rect(rp.floodPoint.X, rp.floodPoint.Y, w, h)
-            rp.mask = task.depthRGB(rp.rect).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            rc.rect = New cv.Rect(rc.floodPoint.X, rc.floodPoint.Y, w, h)
+            rc.mask = task.depthRGB(rc.rect).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             lastCellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             dst2.SetTo(0)
-            dst2(rp.rect).SetTo(cv.Scalar.White)
+            dst2(rc.rect).SetTo(cv.Scalar.White)
         End If
 
-        rc = New rcData
-        rc.index = rp.index
-        rc.rect = rp.rect
-        rc.mask = rp.mask
-        rc.maxDist = vbGetMaxDist(rp)
+        rc.maxDist = vbGetMaxDist(rc)
 
         rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
         If rc.indexLast < lastCells.Count Then
@@ -2383,7 +2378,7 @@ Public Class RedCloud_MasksBoth : Inherits VB_Algorithm
         dst.SetTo(0)
         Dim tmp As New cv.Mat(input.Size, cv.MatType.CV_8U, 0)
         For Each key In redMasks.sortedCells
-            matchCell.rp = key.Value
+            matchCell.rc = key.Value
             matchCell.Run(empty)
             Dim rc = matchCell.rc
             rc.index = redCells.Count
