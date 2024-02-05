@@ -142,12 +142,6 @@ Public Class OptionsGlobal
                 task.densityMetric = 1700
         End Select
 
-        Dim min = task.workingRes.Width * task.workingRes.Height * 0.0005
-        Dim modVal = If(min > 200, 100, 10)
-        If min < 10 Then min = 10
-        minPixelsSlider.Value = min - (min Mod modVal)
-        MinPixels.Text = CStr(minPixelsSlider.Value)
-
         task.depthThresholdPercent = 0.01
         gOptions.dotSizeSlider.Value = task.dotSize
         gOptions.LineWidth.Value = task.dotSize
@@ -255,14 +249,6 @@ Public Class OptionsGlobal
     End Sub
     Private Sub debugSyncUI_CheckedChanged(sender As Object, e As EventArgs) Handles debugSyncUI.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-    End Sub
-    Private Sub minPixelsSlider_Scroll(sender As Object, e As EventArgs) Handles minPixelsSlider.Scroll
-        If task IsNot Nothing Then task.optionsChanged = True
-        MinPixels.Text = CStr(minPixelsSlider.Value)
-    End Sub
-    Private Sub minPixelsSlider_ValueChanged(sender As Object, e As EventArgs) Handles minPixelsSlider.ValueChanged
-        If task IsNot Nothing Then task.optionsChanged = True
-        MinPixels.Text = CStr(minPixelsSlider.Value)
     End Sub
     Private Sub useCloudHistory_CheckedChanged(sender As Object, e As EventArgs)
         If task IsNot Nothing Then task.optionsChanged = True

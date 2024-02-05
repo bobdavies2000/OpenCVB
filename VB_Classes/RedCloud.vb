@@ -22,7 +22,6 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         If dst2.Size <> src.Size Then dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
 
         task.rcMatchMax = 0
-        Dim minPixels = gOptions.minPixelsSlider.Value
         Dim newCells As New List(Of rcData)
         For Each rc In combine.combinedCells
             rc.maxDStable = rc.maxDist ' assume it has to use the latest.
@@ -70,7 +69,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
             cv.Cv2.MeanStdDev(src(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
 
             rc.pixels = rc.mask.CountNonZero
-            If rc.mask.Size = dst2.Size Or rc.pixels < minPixels Then Continue For
+            If rc.mask.Size = dst2.Size Then Continue For
             If task.heartBeat Then rc.matchCount = 1
             newCells.Add(rc)
 

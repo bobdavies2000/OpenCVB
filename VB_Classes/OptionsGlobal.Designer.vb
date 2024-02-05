@@ -23,9 +23,6 @@ Partial Class OptionsGlobal
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.MinMaxDepth = New System.Windows.Forms.GroupBox()
-        Me.MinPixels = New System.Windows.Forms.Label()
-        Me.minPixelsSlider = New System.Windows.Forms.TrackBar()
-        Me.Label13 = New System.Windows.Forms.Label()
         Me.TempSliderLabel = New System.Windows.Forms.Label()
         Me.DebugSlider = New System.Windows.Forms.TrackBar()
         Me.Label11 = New System.Windows.Forms.Label()
@@ -48,7 +45,6 @@ Partial Class OptionsGlobal
         Me.maxCount = New System.Windows.Forms.Label()
         Me.MaxDepth = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
-        Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.MotionFilteredColorOnly = New System.Windows.Forms.RadioButton()
@@ -82,7 +78,6 @@ Partial Class OptionsGlobal
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
         Me.MinMaxDepth.SuspendLayout()
-        CType(Me.minPixelsSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PixelDiffThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -99,9 +94,6 @@ Partial Class OptionsGlobal
         '
         'MinMaxDepth
         '
-        Me.MinMaxDepth.Controls.Add(Me.MinPixels)
-        Me.MinMaxDepth.Controls.Add(Me.minPixelsSlider)
-        Me.MinMaxDepth.Controls.Add(Me.Label13)
         Me.MinMaxDepth.Controls.Add(Me.TempSliderLabel)
         Me.MinMaxDepth.Controls.Add(Me.DebugSlider)
         Me.MinMaxDepth.Controls.Add(Me.Label11)
@@ -130,35 +122,6 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.TabIndex = 0
         Me.MinMaxDepth.TabStop = False
         Me.MinMaxDepth.Text = "Global Sliders"
-        '
-        'MinPixels
-        '
-        Me.MinPixels.AutoSize = True
-        Me.MinPixels.Location = New System.Drawing.Point(723, 423)
-        Me.MinPixels.Name = "MinPixels"
-        Me.MinPixels.Size = New System.Drawing.Size(74, 20)
-        Me.MinPixels.TabIndex = 59
-        Me.MinPixels.Text = "MinPixels"
-        '
-        'minPixelsSlider
-        '
-        Me.minPixelsSlider.Location = New System.Drawing.Point(212, 423)
-        Me.minPixelsSlider.Maximum = 2000
-        Me.minPixelsSlider.Minimum = 1
-        Me.minPixelsSlider.Name = "minPixelsSlider"
-        Me.minPixelsSlider.Size = New System.Drawing.Size(506, 69)
-        Me.minPixelsSlider.TabIndex = 58
-        Me.minPixelsSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.minPixelsSlider.Value = 5
-        '
-        'Label13
-        '
-        Me.Label13.Location = New System.Drawing.Point(56, 423)
-        Me.Label13.Name = "Label13"
-        Me.Label13.Size = New System.Drawing.Size(136, 55)
-        Me.Label13.TabIndex = 57
-        Me.Label13.Text = "Min Pixels"
-        Me.Label13.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'TempSliderLabel
         '
@@ -369,10 +332,6 @@ Partial Class OptionsGlobal
         Me.InrangeMaxLabel.Size = New System.Drawing.Size(149, 20)
         Me.InrangeMaxLabel.TabIndex = 3
         Me.InrangeMaxLabel.Text = "Max Depth (meters)"
-        '
-        'OpenFileDialog1
-        '
-        Me.OpenFileDialog1.FileName = "OpenFileDialog1"
         '
         'GroupBox2
         '
@@ -730,7 +689,6 @@ Partial Class OptionsGlobal
         Me.Text = "All Algorithm Options - Use gOptions variable to access"
         Me.MinMaxDepth.ResumeLayout(False)
         Me.MinMaxDepth.PerformLayout()
-        CType(Me.minPixelsSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.PixelDiffThreshold, System.ComponentModel.ISupportInitialize).EndInit()
@@ -755,7 +713,6 @@ Partial Class OptionsGlobal
     Friend WithEvents maxCount As Windows.Forms.Label
     Friend WithEvents MaxDepth As Windows.Forms.TrackBar
     Friend WithEvents InrangeMaxLabel As Windows.Forms.Label
-    Friend WithEvents OpenFileDialog1 As Windows.Forms.OpenFileDialog
     Friend WithEvents GroupBox2 As Windows.Forms.GroupBox
     Friend WithEvents UseKalman As Windows.Forms.CheckBox
     Friend WithEvents GeometrySettings As Windows.Forms.GroupBox
@@ -800,9 +757,6 @@ Partial Class OptionsGlobal
     Friend WithEvents DebugSlider As Windows.Forms.TrackBar
     Friend WithEvents Label11 As Windows.Forms.Label
     Friend WithEvents debugSyncUI As Windows.Forms.CheckBox
-    Friend WithEvents MinPixels As Windows.Forms.Label
-    Friend WithEvents minPixelsSlider As Windows.Forms.TrackBar
-    Friend WithEvents Label13 As Windows.Forms.Label
     Friend WithEvents ShowGrid As Windows.Forms.CheckBox
     Friend WithEvents GroupBox1 As Windows.Forms.GroupBox
     Friend WithEvents UseHistoryCloud As Windows.Forms.RadioButton
