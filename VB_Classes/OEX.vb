@@ -1,15 +1,5 @@
-﻿Imports OpenCvSharp
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports System.Drawing
-Imports System.Windows.Forms
-Imports System.Windows.Shapes
-Imports System.Drawing.Drawing2D
-Imports System.Text.RegularExpressions
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement
-Imports OpenCvSharp.Internal.Vectors
-Imports CS_Classes
-Imports OpenCvSharp.ML
 ' all examples in this file are from https://github.com/opencv/opencv/tree/4.x/samples
 Public Class OEX_CalcBackProject_Demo1 : Inherits VB_Algorithm
     Public histogram As New cv.Mat
@@ -69,7 +59,7 @@ Public Class OEX_CalcBackProject_Demo2 : Inherits VB_Algorithm
         If task.clickPoint <> New cv.Point Then
             Dim connectivity As Integer = 8
             Dim flags = connectivity Or (255 << 8) Or cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.MaskOnly
-            Dim mask2 As New Mat(src.Rows + 2, src.Cols + 2, cv.MatType.CV_8U, 0)
+            Dim mask2 As New cv.Mat(src.Rows + 2, src.Cols + 2, cv.MatType.CV_8U, 0)
 
             ' the delta between each regions value is 255 / classcount. no low or high bound needed.
             Dim delta = CInt(255 / classCount) - 1
@@ -349,54 +339,6 @@ End Class
 
 
 
-Public Class OEX_Points_Classifier : Inherits VB_Algorithm
-    Dim options As New Options_Classifier
-    Public Sub New()
-        gOptions.DebugCheckBox.Checked = True
-        cPtr = OEX_Points_Classifier_Open()
-        desc = "OpenCV Example Points_Classifier"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        If task.optionsChanged Then gOptions.DebugCheckBox.Checked = True
-        Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, options.sampleCount, options.methodIndex, dst2.Rows, dst2.Cols,
-                                                    If(gOptions.DebugCheckBox.Checked, 1, 0))
-        gOptions.DebugCheckBox.Checked = False
-        dst1 = New cv.Mat(dst0.Rows, dst0.Cols, cv.MatType.CV_32S, imagePtr)
-
-        dst1.ConvertTo(dst0, cv.MatType.CV_8U)
-        dst2 = vbPalette(dst0 * 255 / 2)
-        imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.dotSize)
-        dst3 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
-
-        setTrueText("Click the global DebugCheckBox to get another set of points.", 3)
-    End Sub
-    Public Sub Close()
-        OEX_Points_Classifier_Close(cPtr)
-    End Sub
-End Class
-
-Module OEX_Points_Classifier_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OEX_Points_Classifier_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub OEX_Points_Classifier_Close(cPtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OEX_ShowPoints(cPtr As IntPtr, imgRows As Integer, imgCols As Integer, dotSize As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OEX_Points_Classifier_RunCPP(cPtr As IntPtr, count As Integer, methodIndex As Integer,
-                                                 imgRows As Integer, imgCols As Integer, resetInput As Integer) As IntPtr
-    End Function
-End Module
-
-
-
-
-
 
 
 Public Class OEX_Remap : Inherits VB_Algorithm
@@ -479,5 +421,25 @@ Public Class OEX_Threshold_Inrange : Inherits VB_Algorithm
 
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         dst2 = hsv.InRange(lows, highs)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OEX_Points_Classifier : Inherits VB_Algorithm
+    Dim basics As New Classifier_Basics
+    Public Sub New()
+        desc = "OpenCV Example Points_Classifier became Classifier_Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        basics.Run(src)
+        dst2 = basics.dst2
+        dst3 = basics.dst3
+        labels = basics.labels
+        setTrueText("Click the global DebugCheckBox to get another set of points.", 2)
     End Sub
 End Class

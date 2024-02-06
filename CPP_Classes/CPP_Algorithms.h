@@ -3379,7 +3379,7 @@ public:
 		}
 	}
 
-    void RunCPP(int methodIndex, int reset) {
+	void RunCPP(int methodIndex, int reset) {
 		samples = Mat(trainedPoints).reshape(1, (int)trainedPoints.size());
 		auto trainInput = TrainData::create(samples, ROW_SAMPLE, Mat(trainedPointsMarkers));
 
@@ -3545,17 +3545,17 @@ public:
 		}
 		}
 
-    }
+	}
 };
 extern "C" __declspec(dllexport)
-OEX_PointsClassifier *OEX_Points_Classifier_Open() {
-    OEX_PointsClassifier *cPtr = new OEX_PointsClassifier();
-    return cPtr;
+OEX_PointsClassifier * OEX_Points_Classifier_Open() {
+	OEX_PointsClassifier* cPtr = new OEX_PointsClassifier();
+	return cPtr;
 }
 extern "C" __declspec(dllexport)
-void OEX_Points_Classifier_Close(OEX_PointsClassifier *cPtr)
+void OEX_Points_Classifier_Close(OEX_PointsClassifier * cPtr)
 {
-    delete cPtr;
+	delete cPtr;
 }
 extern "C" __declspec(dllexport)
 int* OEX_ShowPoints(OEX_PointsClassifier * cPtr, int imgRows, int imgCols, int radius)
@@ -3575,5 +3575,67 @@ int* OEX_Points_Classifier_RunCPP(OEX_PointsClassifier * cPtr, int count, int me
 {
 	if (reset) cPtr->OEX_Setup(count, imgRows, imgCols);
 	cPtr->RunCPP(methodIndex, reset);
+	return (int*)cPtr->dst.data;
+}
+
+
+
+
+
+
+
+
+
+
+
+class Classifier_Bayesian
+{
+private:
+public:
+	vector<Vec3f>trainedPoints;
+	vector<int> trainedPointsMarkers;
+	Mat dst, src, samples;
+	Mat inputPoints;
+	Ptr<NormalBayesClassifier> NBC = cv::ml::NormalBayesClassifier::create();
+	Classifier_Bayesian() {}
+
+	void RunCPP(int reset) {
+		samples = Mat(trainedPoints).reshape(1, (int)trainedPoints.size());
+		auto trainInput = TrainData::create(samples, ROW_SAMPLE, Mat(trainedPointsMarkers));
+
+		dst.setTo(0);
+
+		if (reset) {
+			NBC->train(trainInput);
+		}
+		NBC->predict(src, dst);
+	}
+};
+extern "C" __declspec(dllexport)
+Classifier_Bayesian * Classifier_Bayesian_Open() {
+	Classifier_Bayesian* cPtr = new Classifier_Bayesian();
+	return cPtr;
+}
+extern "C" __declspec(dllexport)
+void Classifier_Bayesian_Close(Classifier_Bayesian * cPtr)
+{
+	delete cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* Classifier_Bayesian_RunCPP(Classifier_Bayesian * cPtr, int *input, int *response, int count, int imgRows, int imgCols, int reset)
+{
+	Mat img = Mat(imgRows, imgCols, CV_8UC3, input);
+	img.convertTo(cPtr->src, CV_32FC3);
+	Vec3f* vecs = (Vec3f*)input;
+	for (int i = 0; i < count; i++)
+	{
+		cPtr->trainedPoints.push_back(vecs[i]);
+		cPtr->trainedPointsMarkers.push_back(response[i]);
+		vecs++;
+		response++;
+	}
+	cPtr->inputPoints = Mat(count, 3, CV_32F, input);
+	cPtr->RunCPP(reset);
 	return (int*)cPtr->dst.data;
 }
