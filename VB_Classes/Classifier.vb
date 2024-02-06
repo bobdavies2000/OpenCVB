@@ -27,6 +27,13 @@ Public Class Classifier_Basics : Inherits VB_Algorithm
     End Sub
 End Class
 
+
+
+
+
+
+
+
 Module OEX_Points_Classifier_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function OEX_Points_Classifier_Open() As IntPtr
@@ -40,6 +47,23 @@ Module OEX_Points_Classifier_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function OEX_Points_Classifier_RunCPP(cPtr As IntPtr, count As Integer, methodIndex As Integer,
                                                  imgRows As Integer, imgCols As Integer, resetInput As Integer) As IntPtr
+    End Function
+
+
+
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Classifier_Bayesian_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Classifier_Bayesian_Close(cPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Classifier_Bayesian_RunCPP(cPtr As IntPtr, count As Integer, methodIndex As Integer,
+                                                 imgRows As Integer, imgCols As Integer, resetInput As Integer) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Classifier_Bayesian_Train(cPtr As IntPtr, trainInput As IntPtr, response As IntPtr, count As Integer) As IntPtr
     End Function
 End Module
 
@@ -89,14 +113,14 @@ Public Class Classifier_BayesianTest : Inherits VB_Algorithm
     Dim redC As New RedCloud_MasksBoth
     Dim bayes As New Classifier_Bayesian
     Public Sub New()
-        desc = "Classify each cloud cell as part of the largest color cell or not."
+        desc = "Classify the neighbor cells to be similar to the selected cell or not."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
         dst2 = redC.dst2
         dst3 = redC.dst3
         labels = redC.labels
-        task.rc = New rcData
+
 
     End Sub
 End Class

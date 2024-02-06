@@ -739,11 +739,9 @@ Public Class rcData
     Public color As New cv.Vec3b
     Public colorMean As New cv.Scalar
     Public colorStdev As New cv.Scalar
-    Public colorDistance As Integer
 
     Public depthMean As cv.Point3f
     Public depthStdev As cv.Point3f
-    Public depthDistance As Single
 
     Public minVec As cv.Point3f
     Public maxVec As cv.Point3f
@@ -770,12 +768,10 @@ Public Class rcData
     Public histList As List(Of Single)
 
     Public floodPoint As cv.Point
-    Public depthCell As Boolean ' true if no depth.
+    Public depthCell As Boolean ' true if cell has depth.
 
     Public eq As cv.Vec4f ' plane equation
     Public pcaVec As cv.Vec3f
-    Public specG As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted) ' the spectrum of grayscale bytes 
-    Public specD As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted) ' the spectrum of the depth values (cm accuracy) 
     Public Sub New()
         index = 0
         mask = New cv.Mat(1, 1, cv.MatType.CV_8U)

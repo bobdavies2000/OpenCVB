@@ -422,23 +422,21 @@ Public Class Cell_Distance : Inherits VB_Algorithm
             labels(2) = redC.labels(2)
 
             redCells.Clear()
-            Dim maxColorDistance As Integer
-            Static maxDistance As Integer
+            Dim depthDistance As New List(Of Single)
+            Dim colorDistance As New List(Of Single)
             For Each rc In redC.redCells
-                rc.colorDistance = CInt(distance3D(task.rc.colorMean, rc.colorMean))
-                rc.depthDistance = distance3D(task.rc.depthMean, rc.depthMean)
+                colorDistance.Add(distance3D(task.rc.colorMean, rc.colorMean))
+                depthDistance.Add(distance3D(task.rc.depthMean, rc.depthMean))
                 redCells.Add(rc)
-                If maxColorDistance < rc.colorDistance Then maxColorDistance = rc.colorDistance
             Next
-
-            If maxDistance < maxColorDistance Then maxDistance = maxColorDistance
-            If task.heartBeat Then maxDistance = maxColorDistance
 
             dst1.SetTo(0)
             dst3.SetTo(0)
-            For Each rc In redCells
-                dst1(rc.rect).SetTo(255 - rc.depthDistance * 255 / task.maxZmeters, rc.mask)
-                dst3(rc.rect).SetTo(255 - rc.colorDistance * 255 / maxDistance, rc.mask)
+            Dim maxColorDistance = colorDistance.Max()
+            For i = 0 To redCells.Count - 1
+                Dim rc = redCells(i)
+                dst1(rc.rect).SetTo(255 - depthDistance(i) * 255 / task.maxZmeters, rc.mask)
+                dst3(rc.rect).SetTo(255 - colorDistance(i) * 255 / maxColorDistance, rc.mask)
             Next
         End If
     End Sub

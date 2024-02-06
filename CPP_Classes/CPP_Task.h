@@ -44,8 +44,6 @@ public:
 
     Vec4f eq;  // plane equation
     Vec3f pcaVec;
-    std::map<int, int> specG;  // Using std::map for key-value pairs
-    std::map<int, int> specD;  // Using std::map for key-value pairs
 
     rcData() : index(0), depthCell(true) {
         mask = Mat(1, 1, CV_8U); 

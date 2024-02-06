@@ -3599,15 +3599,21 @@ public:
 	Ptr<NormalBayesClassifier> NBC = cv::ml::NormalBayesClassifier::create();
 	Classifier_Bayesian() {}
 
-	void RunCPP(int reset) {
-		samples = Mat(trainedPoints).reshape(1, (int)trainedPoints.size());
-		auto trainInput = TrainData::create(samples, ROW_SAMPLE, Mat(trainedPointsMarkers));
-
-		dst.setTo(0);
-
-		if (reset) {
-			NBC->train(trainInput);
+	void trainModel(Vec3f *trainInput, int *response, int count) {
+		for (int i = 0; i < count; i++)
+		{
+			trainedPoints.push_back(trainInput[i]);
+			trainedPointsMarkers.push_back(response[i]);
+			trainInput++;
+			response++;
 		}
+		samples = Mat(trainedPoints).reshape(1, (int)trainedPoints.size());
+		auto inputSamples = TrainData::create(samples, ROW_SAMPLE, Mat(trainedPointsMarkers));
+		NBC->train(inputSamples);
+	}
+
+	void RunCPP(Mat img) {
+		img.convertTo(src, CV_32FC3);
 		NBC->predict(src, dst);
 	}
 };
@@ -3623,19 +3629,17 @@ void Classifier_Bayesian_Close(Classifier_Bayesian * cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int* Classifier_Bayesian_RunCPP(Classifier_Bayesian * cPtr, int *input, int *response, int count, int imgRows, int imgCols, int reset)
+int* Classifier_Bayesian_RunCPP(Classifier_Bayesian * cPtr, int* input, int count, int imgRows, int imgCols)
 {
-	Mat img = Mat(imgRows, imgCols, CV_8UC3, input);
-	img.convertTo(cPtr->src, CV_32FC3);
-	Vec3f* vecs = (Vec3f*)input;
-	for (int i = 0; i < count; i++)
-	{
-		cPtr->trainedPoints.push_back(vecs[i]);
-		cPtr->trainedPointsMarkers.push_back(response[i]);
-		vecs++;
-		response++;
-	}
-	cPtr->inputPoints = Mat(count, 3, CV_32F, input);
-	cPtr->RunCPP(reset);
+	Mat img(imgRows, imgCols, CV_8UC3, input);
+	cPtr->RunCPP(img);
+	return (int*)cPtr->dst.data;
+}
+
+
+extern "C" __declspec(dllexport)
+int* Classifier_Bayesian_Train(Classifier_Bayesian* cPtr, Vec3f* trainInput, int* response, int count)
+{
+	cPtr->trainModel(trainInput, response, count);
 	return (int*)cPtr->dst.data;
 }
