@@ -34,10 +34,10 @@ Public Class Neighbor_Basics : Inherits VB_Algorithm
             Next
             For i = 0 To nabCount - 1
                 Dim pt = nabData.Get(Of cv.Point)(i, 0)
-                If nabList(pt.X).Contains(pt.Y) = False Then nabList(pt.X).Add(pt.Y)
-                If nabList(pt.Y).Contains(pt.X) = False Then nabList(pt.Y).Add(pt.X)
+                If nabList(pt.X).Contains(pt.Y) = False And pt.Y <> 0 Then nabList(pt.X).Add(pt.Y)
+                If nabList(pt.Y).Contains(pt.X) = False And pt.X <> 0 Then nabList(pt.Y).Add(pt.X)
             Next
-            nabList(0).Clear()
+            nabList(0).Clear() ' neighbors to zero are not interesting (yet?)
 
             If task.heartBeat And standaloneTest() Then
                 stats.Run(task.color)

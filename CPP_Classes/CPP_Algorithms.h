@@ -3592,29 +3592,38 @@ class Classifier_Bayesian
 {
 private:
 public:
-	vector<Vec3f>trainedPoints;
-	vector<int> trainedPointsMarkers;
-	Mat dst, src, samples;
+	vector<Vec3f>trainPoints;
+	vector<int> trainMarkers;
 	Mat inputPoints;
+	vector<int> responses;
 	Ptr<NormalBayesClassifier> NBC = cv::ml::NormalBayesClassifier::create();
 	Classifier_Bayesian() {}
 
-	void trainModel(Vec3f *trainInput, int *response, int count) {
+	void trainModel(Scalar* trainInput, int *trainResponse, int count) {
+		trainPoints.clear();
+		trainMarkers.clear();
 		for (int i = 0; i < count; i++)
 		{
-			trainedPoints.push_back(trainInput[i]);
-			trainedPointsMarkers.push_back(response[i]);
-			trainInput++;
-			response++;
+			Vec3f vec(trainInput[i][0], trainInput[i][1], trainInput[i][2]);
+			trainPoints.push_back(vec);
+			trainMarkers.push_back(trainResponse[i]);
 		}
-		samples = Mat(trainedPoints).reshape(1, (int)trainedPoints.size());
-		auto inputSamples = TrainData::create(samples, ROW_SAMPLE, Mat(trainedPointsMarkers));
+		Mat samples = Mat(trainPoints).reshape(1, (int)trainPoints.size());
+		auto inputSamples = TrainData::create(samples, ROW_SAMPLE, Mat(trainMarkers));
 		NBC->train(inputSamples);
 	}
 
-	void RunCPP(Mat img) {
-		img.convertTo(src, CV_32FC3);
-		NBC->predict(src, dst);
+	void RunCPP(Scalar* input, int count) {
+		Mat testSample(1, 3, CV_32FC1);
+		responses.clear();
+		for (int i = 0; i < count; i++)
+		{
+			testSample.at<float>(0) = input[i][0];
+			testSample.at<float>(1) = input[i][1];
+			testSample.at<float>(2) = input[i][2];
+
+			responses.push_back(NBC->predict(testSample));
+		}
 	}
 };
 extern "C" __declspec(dllexport)
@@ -3629,17 +3638,14 @@ void Classifier_Bayesian_Close(Classifier_Bayesian * cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int* Classifier_Bayesian_RunCPP(Classifier_Bayesian * cPtr, int* input, int count, int imgRows, int imgCols)
+void Classifier_Bayesian_Train(Classifier_Bayesian* cPtr, Scalar * trainInput, int* trainResponse, int count)
 {
-	Mat img(imgRows, imgCols, CV_8UC3, input);
-	cPtr->RunCPP(img);
-	return (int*)cPtr->dst.data;
+	cPtr->trainModel(trainInput, trainResponse, count);
 }
 
-
 extern "C" __declspec(dllexport)
-int* Classifier_Bayesian_Train(Classifier_Bayesian* cPtr, Vec3f* trainInput, int* response, int count)
+int* Classifier_Bayesian_RunCPP(Classifier_Bayesian* cPtr, Scalar * input, int count)
 {
-	cPtr->trainModel(trainInput, response, count);
-	return (int*)cPtr->dst.data;
+	cPtr->RunCPP(input, count);
+	return (int*)&cPtr->responses[0];
 }
