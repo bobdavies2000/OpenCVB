@@ -2714,9 +2714,9 @@ Public Class Options_Emax : Inherits VB_Algorithm
         predictionStepSize = stepSlider.value
         covarianceType = cv.EMTypes.CovMatDefault
         consistentcolors = colorCheck.checked
-        Static emaxFrm = findfrm(traceName + " Radio Buttons")
-        For i = 0 To emaxFrm.check.Count - 1
-            If emaxFrm.check(i).Checked = True Then
+        Static frm = findfrm(traceName + " Radio Buttons")
+        For i = 0 To frm.check.Count - 1
+            If frm.check(i).Checked = True Then
                 covarianceType = Choose(i + 1, cv.EMTypes.CovMatSpherical, cv.EMTypes.CovMatDiagonal, cv.EMTypes.CovMatGeneric)
             End If
         Next
@@ -2937,7 +2937,7 @@ End Class
 Public Class Options_ShapeDetect : Inherits VB_Algorithm
     Public fileName As String
     Public Sub New()
-        If findfrm(traceName + " Radio Options") Is Nothing Then
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("coins.jpg")
             radio.addRadio("demo.jpg")
@@ -3026,7 +3026,7 @@ Public Class Options_Wavelet : Inherits VB_Algorithm
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Wavelet Iterations", 1, 5, iterations)
 
-        If findfrm(traceName + " Radio Options") Is Nothing Then
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Haar")
             radio.addRadio("CDF")
@@ -3467,7 +3467,7 @@ Public Class Options_Gif : Inherits VB_Algorithm
             check.addCheckBox("Restart - clear all previous images.")
         End If
 
-        If findfrm(traceName + " Radio Options") Is Nothing Then
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Capture dst0")
             radio.addRadio("Capture dst1")
@@ -3488,8 +3488,8 @@ Public Class Options_Gif : Inherits VB_Algorithm
         OpenGLwindow = findRadio("Capture OpenGL window")
     End Sub
     Public Sub RunVB()
-        Static frmCheck = findfrm("Options_Gif CheckBoxes")
-        Static frmRadio = findfrm("Options_Gif Radio Buttons")
+        Static frmCheck = findfrm(traceName + " CheckBoxes")
+        Static frmRadio = findfrm(traceName + " Radio Buttons")
         If firstPass Then
             Static myFrameCount As Integer = 0
             If myFrameCount > 5 Then firstPass = False
@@ -3624,7 +3624,7 @@ Public Class Options_Features : Inherits VB_Algorithm
             sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
         End If
 
-        If findfrm(traceName + " Radio Options") Is Nothing Then
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Use GoodFeatures")
             radio.addRadio("Use BRISK")
@@ -4055,7 +4055,7 @@ Public Class Options_Complexity : Inherits VB_Algorithm
         filenames = fnames.ToList
         Dim latestFile = Directory.GetFiles(task.homeDir + "Complexity").OrderByDescending(
                      Function(f) New FileInfo(f).LastWriteTime).First()
-        If findfrm(traceName + " Radio Options") Is Nothing Then
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
 
             Dim saveIndex As Integer
@@ -4255,7 +4255,7 @@ Public Class Options_Classifier : Inherits VB_Algorithm
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Random Samples", 10, dst2.Total, 200)
 
-        If findfrm(traceName + " Radio Options") Is Nothing Then
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Normal Bayes (NBC)")
             radio.addRadio("K Nearest Neighbor (KNN)")
@@ -4271,10 +4271,10 @@ Public Class Options_Classifier : Inherits VB_Algorithm
     Public Sub RunVB()
         Static inputSlider = findSlider("Random Samples")
         Static frm = findfrm(traceName + " Radio Buttons")
-        For i = 0 To frm.check.Count - 1
-            If frm.check(i).Checked Then
+        For i = 0 To frm.radio.Count - 1
+            If frm.radio(i).Checked Then
                 methodIndex = i
-                methodName = frm.check(i).Text
+                methodName = frm.radio(i).Text
                 Exit For
             End If
         Next

@@ -317,7 +317,6 @@ Public Class HistValley_Simple : Inherits VB_Algorithm
     Dim trends As New SLR_Trends
     Public kalman As New Kalman_Basics
     Public depthRegions As New List(Of Integer)
-    Public plot As New Plot_Histogram
     Public Sub New()
         desc = "Identify ranges by marking the depth histogram entries from valley to valley"
     End Sub

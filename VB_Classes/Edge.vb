@@ -2,6 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
 Imports System.Windows
+Imports System.Windows.Documents
 
 Public Class Edge_All : Inherits VB_Algorithm
     Dim options As New Options_Edges_All
@@ -1335,9 +1336,42 @@ Public Class Edge_SobelCustomLeftRight : Inherits VB_Algorithm
         dst0 = custom.dst2.Clone
         dst1 = custom.dst3.Clone
 
-        custom.Run(task.rightview)
+        custom.Run(task.rightView)
         dst2 = custom.dst2
         dst3 = custom.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Edge_BackProjection : Inherits VB_Algorithm
+    Dim valley As New HistValley_BasicsOptionAuto
+    Dim canny As New Edge_Canny
+    Public Sub New()
+        labels(3) = "Canny edges in grayscale (red) and edges in back projection (blue)"
+        desc = "Find the edges in the HistValley_Basics backprojection"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        canny.Run(src)
+        dst1 = canny.dst2.Clone
+
+        valley.Run(src)
+        dst2 = valley.dst1
+
+        canny.Run(valley.dst1)
+
+        Dim offset = 1
+        Dim r1 = New cv.Rect(offset, offset, dst2.Width - offset - 1, dst2.Height - offset - 1)
+        Dim r2 = New cv.Rect(0, 0, dst2.Width - offset - 1, dst2.Height - offset - 1)
+        dst3.SetTo(cv.Scalar.White)
+        dst3(r1).SetTo(cv.Scalar.Blue, canny.dst2(r2))
+        dst3.SetTo(cv.Scalar.Red, dst1)
+        labels(2) = valley.labels(3)
     End Sub
 End Class
 
@@ -1356,8 +1390,8 @@ Public Class Edge_Sobel_Old : Inherits VB_Algorithm
     Public Sub New()
         desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst0 = src.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
         If options.horizontalDerivative And options.verticalDerivative Then
@@ -1389,7 +1423,7 @@ Public Class Edge_Sobel : Inherits VB_Algorithm
         labels = {"", "", "Horizontal + Vertical derivative - use global 'Add Weighted' slider to see impact.", "Blur output"}
         desc = "Show Sobel edge detection with varying kernel sizes."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
         blur.Run(src)
@@ -1412,29 +1446,38 @@ End Class
 
 
 
-
-Public Class Edge_BackProjection : Inherits VB_Algorithm
-    Dim valley As New HistValley_BasicsOptionAuto
-    Dim canny As New Edge_Canny
+Public Class Edge_SobelDepth : Inherits VB_Algorithm
+    Public options As New Options_Sobel
+    Dim backp As New BackProject_Image
     Public Sub New()
-        labels(3) = "Canny edges in grayscale (red) and edges in back projection (blue)"
-        desc = "Find the edges in the HistValley_Basics backprojection"
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("X Dimension")
+            radio.addRadio("Y Dimension")
+            radio.addRadio("Z Dimension")
+            radio.check(2).Checked = True
+        End If
+        cv.Cv2.WaitKey(10)
+
+        backp.hist.plot.removeZeroEntry = False
+        gOptions.HistBinSlider.Value = 50
+        labels = {"", "", "Horizontal derivative of selected pointcloud dimension", "Plot of the histogram for the selected pointcloud dimension"}
+        desc = "Display the derivative of the selected depth dimension."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        canny.Run(src)
-        dst1 = canny.dst2.Clone
+        Static frm = findfrm(traceName + " Radio Buttons")
+        Dim channel = 2 ' assume Z Dimension
+        If frm.check(2).checked = False Then
+            If frm.check(0).checked Then channel = 0 Else channel = 1
+        End If
 
-        valley.Run(src)
-        dst2 = valley.dst1
+        dst1 = task.pcSplit(channel).Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
+        Dim mm = vbMinMax(dst1)
+        backp.Run(dst1 + Math.Abs(mm.minVal))
+        dst2 = backp.dst2
 
-        canny.Run(valley.dst1)
+        dst3 = src
+        dst3.SetTo(cv.Scalar.White, backp.mask)
 
-        Dim offset = 1
-        Dim r1 = New cv.Rect(offset, offset, dst2.Width - offset - 1, dst2.Height - offset - 1)
-        Dim r2 = New cv.Rect(0, 0, dst2.Width - offset - 1, dst2.Height - offset - 1)
-        dst3.SetTo(cv.Scalar.White)
-        dst3(r1).SetTo(cv.Scalar.Blue, canny.dst2(r2))
-        dst3.SetTo(cv.Scalar.Red, dst1)
-        labels(2) = valley.labels(3)
     End Sub
 End Class

@@ -5,7 +5,7 @@ Public Class Hist3D_Basics : Inherits VB_Algorithm
     Dim hCloud As New Hist3Dcloud_Basics
     Public classCount As Integer
     Public Sub New()
-        If findfrm(traceName + " Radio Options") Is Nothing Then
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Add color and cloud 8UC1")
             radio.addRadio("Copy cloud into color 8UC1")

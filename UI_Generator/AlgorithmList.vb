@@ -526,6 +526,7 @@ if algorithmName = "Edge_SobelCustom" Then return new Edge_SobelCustom
 if algorithmName = "Edge_SobelCustomH" Then return new Edge_SobelCustomH
 if algorithmName = "Edge_SobelCustomLeftRight" Then return new Edge_SobelCustomLeftRight
 if algorithmName = "Edge_SobelCustomV" Then return new Edge_SobelCustomV
+if algorithmName = "Edge_SobelDepth" Then return new Edge_SobelDepth
 if algorithmName = "Edge_SobelHorizontal" Then return new Edge_SobelHorizontal
 if algorithmName = "Edge_SobelLR" Then return new Edge_SobelLR
 if algorithmName = "Edge_SobelLRBinarized" Then return new Edge_SobelLRBinarized

@@ -34,6 +34,7 @@ End Class
 
 Public Class Plot_Histogram : Inherits VB_Algorithm
     Public histogram As New cv.Mat
+    Public histArray() As Single
     Public minRange As Single = 0
     Public maxRange As Single = 255
     Public backColor As cv.Scalar = cv.Scalar.Red
@@ -61,7 +62,7 @@ Public Class Plot_Histogram : Inherits VB_Algorithm
         barWidth = dst2.Width / histogram.Rows
         plotCenter = barWidth * histogram.Rows / 2 + barWidth / 2
 
-        Dim histArray(histogram.Rows - 1) As Single
+        ReDim histArray(histogram.Rows - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
         Dim mm as mmData = vbMinMax(histogram)
