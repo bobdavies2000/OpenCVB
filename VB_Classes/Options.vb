@@ -2862,46 +2862,6 @@ End Class
 
 
 
-
-Public Class Options_Sobel : Inherits VB_Algorithm
-    Public kernelSize As Integer = 3
-    Public threshold As Integer = 50
-    Public horizontalDerivative As Boolean
-    Public verticalDerivative As Boolean
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Sobel kernel Size", 1, 31, kernelSize)
-            sliders.setupTrackBar("Threshold to zero pixels below this value", 0, 255, threshold)
-        End If
-
-        If findfrm(traceName + " CheckBox Options") Is Nothing Then
-            check.Setup(traceName)
-            check.addCheckBox("Vertical Derivative")
-            check.addCheckBox("Horizontal Derivative")
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
-        Static ksizeSlider = findSlider("Sobel kernel Size")
-        kernelSize = ksizeSlider.Value Or 1
-        threshold = thresholdSlider.value
-        Static vDeriv = findCheckBox("Vertical Derivative")
-        Static hDeriv = findCheckBox("Horizontal Derivative")
-        horizontalDerivative = hDeriv.checked
-        verticalDerivative = vDeriv.checked
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class Options_Flood : Inherits VB_Algorithm
     Public floodFlag As cv.FloodFillFlags = 4 Or cv.FloodFillFlags.FixedRange
     Public stepSize As Integer = 30
@@ -4285,5 +4245,79 @@ Public Class Options_Classifier : Inherits VB_Algorithm
         End If
 
         sampleCount = inputSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_Sobel : Inherits VB_Algorithm
+    Public kernelSize As Integer = 3
+    Public threshold As Integer = 50
+    Public derivativeRange As Single = 0.1
+    Public horizontalDerivative As Boolean
+    Public verticalDerivative As Boolean
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Sobel kernel Size", 1, 31, kernelSize)
+            sliders.setupTrackBar("Threshold to zero pixels below this value", 0, 255, threshold)
+            sliders.setupTrackBar("Range around zero X100", 1, 500, derivativeRange * 100)
+        End If
+
+        If findfrm(traceName + " CheckBox Options") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Vertical Derivative")
+            check.addCheckBox("Horizontal Derivative")
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
+        Static ksizeSlider = findSlider("Sobel kernel Size")
+        Static rangeSlider = findSlider("Range around zero X100")
+        kernelSize = ksizeSlider.Value Or 1
+        threshold = thresholdSlider.value
+        Static vDeriv = findCheckBox("Vertical Derivative")
+        Static hDeriv = findCheckBox("Horizontal Derivative")
+        horizontalDerivative = hDeriv.checked
+        verticalDerivative = vDeriv.checked
+        derivativeRange = rangeSlider.value / 100
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_DepthSobel : Inherits VB_Algorithm
+    Public channel = 0 ' assume X Dimension
+    Public kernelSize As Integer
+    Dim options As New Options_Sobel
+    Public derivativeRange As Single = 0.1
+    Public Sub New()
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("X Dimension")
+            radio.addRadio("Y Dimension")
+            radio.addRadio("Z Dimension")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        options.RunVB()
+
+        Static frm = findfrm(traceName + " Radio Buttons")
+        If frm.check(2).checked = False Then
+            If frm.check(0).checked Then channel = 0 Else channel = 1
+        End If
+
+        kernelSize = options.kernelSize
+        derivativeRange = options.derivativeRange
     End Sub
 End Class

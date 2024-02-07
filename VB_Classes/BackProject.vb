@@ -1,5 +1,4 @@
-﻿Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
 Public Class BackProject_Basics : Inherits VB_Algorithm
     Public histK As New Histogram_Kalman
@@ -7,7 +6,7 @@ Public Class BackProject_Basics : Inherits VB_Algorithm
     Public Sub New()
         labels(2) = "Move mouse to backproject a histogram column"
         vbAddAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.")
-        desc = "Mouse over any bin to see the color histogram backprojected."
+        desc = "Mouse over any bin to see the histogram backprojected."
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Dim input = src.Clone

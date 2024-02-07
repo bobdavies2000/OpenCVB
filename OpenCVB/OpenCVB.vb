@@ -1191,7 +1191,6 @@ Public Class OpenCVB
 
         While 1
             If restartCameraRequest Or settings.workingRes <> saveWorkingRes Then
-                restartCameraRequest = False
                 saveWorkingRes = settings.workingRes
                 If settings.cameraIndex = 3 Then
                     ' special handling for the Oak-D camera as it cannot be restarted.
@@ -1201,7 +1200,7 @@ Public Class OpenCVB
                     ' Oak-D camera cannot be restarted without restarting OpenCVB.
                     ' Leave it alone once it is started...
                     settings.captureRes = New cv.Size(1280, 720)
-                    camera = New CameraOakD(settings.workingRes, settings.captureRes, settings.cameraName)
+                    If camera Is Nothing Then camera = New CameraOakD(settings.workingRes, settings.captureRes, settings.cameraName)
                 Else
                     If camera IsNot Nothing Then camera.stopCamera()
                     camera = getCamera()
@@ -1209,7 +1208,7 @@ Public Class OpenCVB
                 End If
             End If
             If camera Is Nothing Then Continue While ' transition from one camera to another.  Problem showed up once.
-            camera.GetNextFrame(settings.workingRes)
+            If restartCameraRequest = False Then camera.GetNextFrame(settings.workingRes)
 
             ' The first few frames from the camera are junk.  Skip them.
             SyncLock cameraLock
@@ -1233,6 +1232,7 @@ Public Class OpenCVB
 
             Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
             totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
+            restartCameraRequest = False
         End While
     End Sub
     Private Sub setupTestAll()

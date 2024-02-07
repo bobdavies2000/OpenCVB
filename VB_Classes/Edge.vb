@@ -1,9 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
-Imports System.Windows
-Imports System.Windows.Documents
-
 Public Class Edge_All : Inherits VB_Algorithm
     Dim options As New Options_Edges_All
     Public Sub New()
@@ -1446,38 +1443,66 @@ End Class
 
 
 
-Public Class Edge_SobelDepth : Inherits VB_Algorithm
-    Public options As New Options_Sobel
+Public Class Edge_Depth : Inherits VB_Algorithm
+    Public options As New Options_DepthSobel
     Dim backp As New BackProject_Image
+    Public plot As New Plot_Histogram
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("X Dimension")
-            radio.addRadio("Y Dimension")
-            radio.addRadio("Z Dimension")
-            radio.check(2).Checked = True
-        End If
-        cv.Cv2.WaitKey(10)
-
         backp.hist.plot.removeZeroEntry = False
-        gOptions.HistBinSlider.Value = 50
         labels = {"", "", "Horizontal derivative of selected pointcloud dimension", "Plot of the histogram for the selected pointcloud dimension"}
-        desc = "Display the derivative of the selected depth dimension."
+        desc = "Display a first or second derivative of the selected depth dimension and direction."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static frm = findfrm(traceName + " Radio Buttons")
-        Dim channel = 2 ' assume Z Dimension
-        If frm.check(2).checked = False Then
-            If frm.check(0).checked Then channel = 0 Else channel = 1
+        options.RunVB()
+
+        If src.Type <> cv.MatType.CV_32F Then
+            src = task.pcSplit(options.channel).Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
         End If
 
-        dst1 = task.pcSplit(channel).Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
-        Dim mm = vbMinMax(dst1)
-        backp.Run(dst1 + Math.Abs(mm.minVal))
-        dst2 = backp.dst2
+        Dim ranges = {New cv.Rangef(-options.derivativeRange, options.derivativeRange)}
+        Dim histogram As New cv.Mat
+        cv.Cv2.CalcHist({src}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
-        dst3 = src
-        dst3.SetTo(cv.Scalar.White, backp.mask)
+        plot.Run(histogram)
+        histogram = plot.histogram ' reflect any updates to the 0 entry...
+        dst2 = plot.dst2
 
+        Dim index As Integer = 1
+        For i = 0 To plot.histArray.Count - 1
+            If plot.histArray(i) <> 0 Then
+                plot.histArray(i) = index
+                index += 1
+            End If
+        Next
+        histogram = New cv.Mat(plot.histArray.Count, 1, cv.MatType.CV_32F, plot.histArray)
+
+        Dim brickWidth = dst2.Width / task.histogramBins
+        Dim histIndex = Math.Truncate(task.mouseMovePoint.X / brickWidth)
+
+        Dim mask As New cv.Mat
+        cv.Cv2.CalcBackProject({src}, {0}, histogram, mask, ranges)
+        mask.ConvertTo(mask, cv.MatType.CV_8U)
+        mask = mask.InRange(histIndex, histIndex)
+
+        dst3 = task.color
+        dst3.SetTo(cv.Scalar.White, mask)
+        dst3.SetTo(0, task.noDepthMask)
+        dst2.Rectangle(New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Edge_DepthLaPlacian : Inherits VB_Algorithm
+    Public Sub New()
+        labels = {"", "", "Grayscale", "dst3Label"}
+        vbAddAdvice(traceName + ": <place advice here on any options that are useful>")
+        desc = "Display the second derivative of the selected depth dimension."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class
