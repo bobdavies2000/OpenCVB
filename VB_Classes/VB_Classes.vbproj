@@ -121,6 +121,7 @@
     <Compile Include="Cell.vb" />
     <Compile Include="Classifier.vb" />
     <Compile Include="Complexity.vb" />
+    <Compile Include="Derivative.vb" />
     <Compile Include="OEX.vb" />
     <Compile Include="PointPolygonTest.vb" />
     <Compile Include="PongWars.vb" />
@@ -137,7 +138,6 @@
     <Compile Include="Color.vb" />
     <Compile Include="CSV.vb" />
     <Compile Include="Density.vb" />
-    <Compile Include="Derivative.vb" />
     <Compile Include="DisparityInverted.vb" />
     <Compile Include="EdgeDraw.vb" />
     <Compile Include="Erode.vb" />

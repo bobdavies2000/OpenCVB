@@ -191,7 +191,7 @@ Public Class Blur_Detection : Inherits VB_Algorithm
     Dim laplace As New Laplacian_Basics
     Dim blur As New Blur_Basics
     Public Sub New()
-        findSlider("LaPlacian Threshold").Value = 50
+        findSlider("Laplacian Threshold").Value = 50
         findSlider("Blur Kernel Size").Value = 11
         labels = {"", "", "Draw a rectangle to blur a region in alternating frames and test further", "Detected blur in the highlight regions - non-blur is white."}
         desc = "Detect blur in an image"

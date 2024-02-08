@@ -1834,7 +1834,7 @@ Public Class Options_Laplacian : Inherits VB_Algorithm
             sliders.setupTrackBar("Laplacian Kernel size", 1, 21, kernel.Width)
             sliders.setupTrackBar("Laplacian Scale", 0, 100, scale * 100)
             sliders.setupTrackBar("Laplacian Delta", 0, 1000, delta * 100)
-            sliders.setupTrackBar("LaPlacian Threshold", 0, 100, threshold)
+            sliders.setupTrackBar("Laplacian Threshold", 0, 100, threshold)
         End If
 
         If radio.Setup(traceName) Then
@@ -1848,7 +1848,7 @@ Public Class Options_Laplacian : Inherits VB_Algorithm
         Static kernelSlider = findSlider("Laplacian Kernel size")
         Static scaleSlider = findSlider("Laplacian Scale")
         Static deltaSlider = findSlider("Laplacian Delta")
-        Static thresholdSlider = findSlider("LaPlacian Threshold")
+        Static thresholdSlider = findSlider("Laplacian Threshold")
         Static blurCheck = findRadio("Add Gaussian Blur")
         Static boxCheck = findRadio("Add boxfilter Blur")
         Dim kernelSize As Integer = kernelSlider.Value Or 1
@@ -4092,7 +4092,7 @@ Public Class Options_Edges_All : Inherits VB_Algorithm
     Dim binSobel As New Edge_BinarizedSobel
     Dim colorGap As New Edge_ColorGap_CPP
     Dim deriche As New Edge_Deriche_CPP
-    Dim laplacian As New Edge_Laplacian
+    Dim Laplacian As New Edge_Laplacian
     Dim resizeAdd As New Edge_ResizeAdd
     Dim regions As New Edge_Regions
     Public Sub New()
@@ -4143,7 +4143,7 @@ Public Class Options_Edges_All : Inherits VB_Algorithm
                 Case "Deriche"
                     edges = deriche
                 Case "Laplacian"
-                    edges = laplacian
+                    edges = Laplacian
                 Case "Resize And Add"
                     edges = resizeAdd
                 Case "Depth Region Boundaries"
@@ -4317,7 +4317,7 @@ End Class
 
 
 
-Public Class Options_DepthSobel : Inherits VB_Algorithm
+Public Class Options_Derivative : Inherits VB_Algorithm
     Public channel = 0 ' assume X Dimension
     Public kernelSize As Integer
     Dim options As New Options_Sobel
@@ -4335,6 +4335,7 @@ Public Class Options_DepthSobel : Inherits VB_Algorithm
         options.RunVB()
 
         Static frm = findfrm(traceName + " Radio Buttons")
+        channel = 2
         If frm.check(2).checked = False Then
             If frm.check(0).checked Then channel = 0 Else channel = 1
         End If
@@ -4349,9 +4350,9 @@ End Class
 
 
 
-Public Class Options_LaPlacianKernels : Inherits VB_Algorithm
+Public Class Options_LaplacianKernels : Inherits VB_Algorithm
     Public gaussiankernelSize As Integer
-    Public laplaciankernelSize As Integer
+    Public LaplaciankernelSize As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Gaussian Kernel", 1, 32, 1)
@@ -4360,8 +4361,8 @@ Public Class Options_LaPlacianKernels : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB()
         Static gaussSlider = findSlider("Gaussian Kernel")
-        Static laplacianSlider = findSlider("Laplacian Kernel")
+        Static LaplacianSlider = findSlider("Laplacian Kernel")
         gaussiankernelSize = gaussSlider.Value Or 1
-        laplaciankernelSize = laplacianSlider.Value Or 1
+        LaplaciankernelSize = LaplacianSlider.Value Or 1
     End Sub
 End Class

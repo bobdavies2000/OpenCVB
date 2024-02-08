@@ -39,7 +39,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
         pyr[i] *= v
     res = merge_lappyr(pyr)
 
-    cv.imshow('laplacian pyramid filter', res)
+    cv.imshow('Laplacian pyramid filter', res)
     return res, None
 
 if __name__ == '__main__':

@@ -1368,7 +1368,7 @@ Public Class Edge_Sobel : Inherits VB_Algorithm
         blur.Run(src)
         dst3 = blur.dst2
 
-        dst1 = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = If(dst3.Channels = 3, dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst3)
         If options.horizontalDerivative Then dst2 = dst1.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
         If options.verticalDerivative Then dst0 = dst1.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
         dst2 = dst2.ConvertScaleAbs()
@@ -1385,102 +1385,9 @@ End Class
 
 
 
-Public Class Edge_Depth : Inherits VB_Algorithm
-    Public options As New Options_DepthSobel
-    Dim backp As New BackProject_Image
-    Public plot As New Plot_Histogram
-    Public Sub New()
-        backp.hist.plot.removeZeroEntry = False
-        vbAddAdvice(traceName + ": gOptions histogram Bins and several local options are important.")
-        desc = "Display a first or second derivative of the selected depth dimension and direction."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        If src.Type <> cv.MatType.CV_32F Then
-            src = task.pcSplit(options.channel).Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
-        End If
-
-        Dim ranges = {New cv.Rangef(-options.derivativeRange, options.derivativeRange)}
-        Dim histogram As New cv.Mat
-        cv.Cv2.CalcHist({src}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
-
-        plot.Run(histogram)
-        histogram = plot.histogram ' reflect any updates to the 0 entry...
-        dst2 = plot.dst2
-
-        Dim index As Integer = 1
-        For i = 0 To plot.histArray.Count - 1
-            If plot.histArray(i) <> 0 Then
-                plot.histArray(i) = index
-                index += 1
-            End If
-        Next
-        histogram = New cv.Mat(plot.histArray.Count, 1, cv.MatType.CV_32F, plot.histArray)
-
-        Dim brickWidth = dst2.Width / task.histogramBins
-        Dim histIndex = Math.Truncate(task.mouseMovePoint.X / brickWidth)
-
-        Dim mask As New cv.Mat
-        cv.Cv2.CalcBackProject({src}, {0}, histogram, mask, ranges)
-        mask.ConvertTo(mask, cv.MatType.CV_8U)
-        mask = mask.InRange(histIndex, histIndex)
-
-        dst3 = task.color.Clone
-        dst3.SetTo(cv.Scalar.White, mask)
-        dst3.SetTo(0, task.noDepthMask)
-        dst2.Rectangle(New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
-        Dim deriv = Format(options.derivativeRange, fmt2)
-        labels(2) = "Histogram of first or second derivatives.  Range -" + deriv + " to " + deriv
-        labels(3) = "Backprojection into the image for the selected histogram entry - move mouse over dst2."
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Edge_DepthSobel : Inherits VB_Algorithm
-    Dim eDepth As New Edge_Depth
-    Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
-        desc = "Display the derivative of the selected depth dimension."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim channel = eDepth.options.channel
-        Dim chanName As String = "X"
-        If channel <> 0 Then
-            If channel = 1 Then chanName = "Y" Else chanName = "Z"
-        End If
-        Dim kern = eDepth.options.kernelSize
-        src = task.pcSplit(channel).Sobel(cv.MatType.CV_32F, 1, 0, kern)
-        eDepth.Run(src)
-        dst0 = eDepth.dst2.Clone
-        dst1 = eDepth.dst3.Clone
-        labels(0) = "Horizontal derivatives for " + chanName + " dimension of the point cloud"
-        labels(1) = "Backprojection of horizontal derivatives indicated - move mouse in the image at left"
-
-        src = task.pcSplit(channel).Sobel(cv.MatType.CV_32F, 0, 1, kern)
-        eDepth.Run(src)
-        dst2 = eDepth.dst2
-        dst3 = eDepth.dst3
-        labels(2) = "Vertical derivatives for " + chanName + " dimension of the point cloud"
-        labels(3) = "Backprojection of vertical derivatives indicated - move mouse in the image at left"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Edge_Laplacian : Inherits VB_Algorithm
-    Dim options As New Options_LaPlacianKernels
+    Dim options As New Options_LaplacianKernels
     Public Sub New()
         labels(3) = "Laplacian of DepthRGB"
         desc = "Show Laplacian edge detection with varying kernel sizes"
@@ -1489,39 +1396,11 @@ Public Class Edge_Laplacian : Inherits VB_Algorithm
         options.RunVB()
 
         dst2 = src.GaussianBlur(New cv.Size(CInt(options.gaussiankernelSize), CInt(options.gaussiankernelSize)), 0, 0)
-        dst2 = dst2.Laplacian(cv.MatType.CV_8U, options.laplaciankernelSize, 1, 0)
+        dst2 = dst2.Laplacian(cv.MatType.CV_8U, options.LaplaciankernelSize, 1, 0)
         dst2 = dst2.ConvertScaleAbs()
 
         dst3 = task.depthRGB.GaussianBlur(New cv.Size(CInt(options.gaussiankernelSize), CInt(options.gaussiankernelSize)), 0, 0)
-        dst3 = dst3.Laplacian(cv.MatType.CV_8U, options.laplaciankernelSize, 1, 0)
+        dst3 = dst3.Laplacian(cv.MatType.CV_8U, options.LaplaciankernelSize, 1, 0)
         dst3 = dst3.ConvertScaleAbs()
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Edge_DepthLaplacian : Inherits VB_Algorithm
-    Dim options As New Options_LaPlacianKernels
-    Dim eDepth As New Edge_Depth
-    Public Sub New()
-        desc = "Create a histogram and backprojection for the second derivative of depth in the selected dimension."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        Dim channel = eDepth.options.channel
-        Dim gausskern = New cv.Size(CInt(options.gaussiankernelSize), CInt(options.gaussiankernelSize))
-        dst1 = task.pcSplit(channel).GaussianBlur(gausskern, 0, 0)
-        dst1 = dst1.Laplacian(cv.MatType.CV_32F, options.laplaciankernelSize, 1, 0)
-
-        eDepth.Run(dst1)
-        dst2 = eDepth.dst2
-        dst3 = eDepth.dst3
-        labels(2) = eDepth.labels(2)
-        labels(3) = eDepth.labels(3)
     End Sub
 End Class

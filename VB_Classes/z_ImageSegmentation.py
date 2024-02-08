@@ -37,7 +37,7 @@ cv.imshow('Black Background Image', src)
 # an approximation of second derivative, a quite strong kernel
 kernel = np.array([[1, 1, 1], [1, -8, 1], [1, 1, 1]], dtype=np.float32)
 
-# do the laplacian filtering as it is
+# do the Laplacian filtering as it is
 # well, we need to convert everything in something more deeper then CV_8U
 # because the kernel has some negative values,
 # and we can expect in general to have a Laplacian image with negative values

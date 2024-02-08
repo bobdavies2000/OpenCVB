@@ -191,7 +191,7 @@ End Class
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
 Public Class OilPaint_Cartoon : Inherits VB_Algorithm
     Dim oil As New OilPaint_Manual
-    Dim laplacian As New Edge_Laplacian
+    Dim Laplacian As New Edge_Laplacian
     Public Sub New()
         task.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)
         labels(2) = "OilPaint_Cartoon"
@@ -200,8 +200,8 @@ Public Class OilPaint_Cartoon : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Dim roi = task.drawRect
-        laplacian.Run(src)
-        dst3 = laplacian.dst2
+        Laplacian.Run(src)
+        dst3 = Laplacian.dst2
 
         oil.Run(src)
         dst2 = oil.dst2

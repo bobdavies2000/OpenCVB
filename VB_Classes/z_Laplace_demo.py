@@ -39,10 +39,10 @@ def main(argv):
     # Create Window
     cv.namedWindow(window_name, cv.WINDOW_AUTOSIZE)
 
-    # [laplacian]
+    # [Laplacian]
     # Apply Laplace function
     dst2 = cv.Laplacian(src_gray, ddepth, kernel_size)
-    # [laplacian]
+    # [Laplacian]
 
     # [convert]
     # converting back to uint8
