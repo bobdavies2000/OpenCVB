@@ -9,27 +9,27 @@ Public Class Color_Basics : Inherits VB_Algorithm
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.optionsChanged Then
-            Select Case redOptions.colorInputName
-                Case "BackProject_Full"
+        If task.optionsChanged Or classifier Is Nothing Then
+            Select Case redOptions.colorInputIndex
+                Case 0 ' "BackProject_Full"
                     Static backP As New BackProject_Full
                     classifier = backP
-                Case "KMeans_Basics"
+                Case 1 ' "KMeans_Basics"
                     Static km As New KMeans_Basics
                     classifier = km
-                Case "LUT_Basics"
+                Case 2 ' "LUT_Basics"
                     Static lut As New LUT_Basics
                     classifier = lut
-                Case "Reduction_Basics"
+                Case 3 ' "Reduction_Basics"
                     Static reduction As New Reduction_Basics
                     classifier = reduction
-                Case "Hist3DColor_Basics"
+                Case 4 ' "Hist3DColor_Basics"
                     Static hColor As New Hist3Dcolor_Basics
                     classifier = hColor
-                Case "Binarize_FourWay"
+                Case 5 ' "Binarize_FourWay"
                     Static binarize As New Binarize_FourWay
                     classifier = binarize
-                Case "BackProject_Hue"
+                Case 6 ' "BackProject_Hue"
                     Static hue As New BackProject_Hue
                     classifier = hue
             End Select

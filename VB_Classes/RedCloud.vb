@@ -2117,10 +2117,78 @@ End Class
 
 
 
-
-
-
 Public Class RedCloud_Both : Inherits VB_Algorithm
+    Public colorCells As New List(Of rcData)
+    Public cloudCells As New List(Of rcData)
+    Dim colorClass As New Color_Basics
+    Public redMasks As New RedCloud_Masks
+    Dim redCore As New RedCloud_Core
+    Dim guided As New GuidedBP_Depth
+    Dim matchCell As New RedCloud_MatchCell
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Create the color masks and the pointcloud masks"
+    End Sub
+    Private Function matchCells(dst As cv.Mat, input As cv.Mat, redCells As List(Of rcData)) As cv.Mat
+        matchCell.lastCellMap = input.Clone
+        matchCell.usedColors.Clear()
+        matchCell.usedColors.Add(black)
+        matchCell.lastCells = New List(Of rcData)(redCells)
+
+        redCells.Clear()
+        redCells.Add(New rcData)
+        dst.SetTo(0)
+        Dim tmp As New cv.Mat(input.Size, cv.MatType.CV_8U, 0)
+        For Each key In redMasks.sortedCells
+            matchCell.rc = key.Value
+            matchCell.Run(empty)
+            Dim rc = matchCell.rc
+            rc.index = redCells.Count
+            tmp(rc.rect).SetTo(rc.index, rc.mask)
+            dst(rc.rect).SetTo(rc.color, rc.mask)
+            redCells.Add(rc)
+        Next
+
+        redCells(0).mask = input.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        redCells(0).pixels = redCells(0).mask.CountNonZero
+
+        Return tmp
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        colorClass.Run(src)
+        redMasks.Run(colorClass.dst2)
+
+        dst0 = matchCells(dst2, dst0, colorCells)
+        dst2.SetTo(0, colorCells(0).mask)
+
+        Dim cloudInput As New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        Select Case redOptions.depthInputIndex
+            Case 0 ' GuidedBP_Depth
+                guided.Run(src)
+                guided.dst2.CopyTo(cloudInput, task.depthMask)
+                redMasks.Run(guided.dst2)
+            Case 1 ' RedCloud_Core
+                redCore.Run(task.pointCloud)
+                redCore.dst2.CopyTo(cloudInput, task.depthMask)
+                redMasks.Run(redCore.dst2)
+        End Select
+
+        dst1 = matchCells(dst3, dst1, cloudCells)
+        dst3.SetTo(0, cloudCells(0).mask)
+        dst3.SetTo(0, task.noDepthMask)
+
+        If task.rcPicTag = RESULT_DST2 Then setSelectedCell(colorCells, dst0) Else setSelectedCell(cloudCells, dst1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_BothOld : Inherits VB_Algorithm
     Public colorC As New RedCloud_Basics
     Public redC As New RedCloud_Basics
     Public Sub New()
@@ -2348,74 +2416,6 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-Public Class RedCloud_MasksBoth : Inherits VB_Algorithm
-    Public colorCells As New List(Of rcData)
-    Public cloudCells As New List(Of rcData)
-    Dim colorClass As New Color_Basics
-    Public redMasks As New RedCloud_Masks
-    Dim redCore As New RedCloud_Core
-    Dim guided As New GuidedBP_Depth
-    Dim matchCell As New RedCloud_MatchCell
-    Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Create the color masks and the pointcloud masks"
-    End Sub
-    Private Function matchCells(dst As cv.Mat, input As cv.Mat, redCells As List(Of rcData)) As cv.Mat
-        matchCell.lastCellMap = input.Clone
-        matchCell.usedColors.Clear()
-        matchCell.usedColors.Add(black)
-        matchCell.lastCells = New List(Of rcData)(redCells)
-
-        redCells.Clear()
-        redCells.Add(New rcData)
-        dst.SetTo(0)
-        Dim tmp As New cv.Mat(input.Size, cv.MatType.CV_8U, 0)
-        For Each key In redMasks.sortedCells
-            matchCell.rc = key.Value
-            matchCell.Run(empty)
-            Dim rc = matchCell.rc
-            rc.index = redCells.Count
-            tmp(rc.rect).SetTo(rc.index, rc.mask)
-            dst(rc.rect).SetTo(rc.color, rc.mask)
-            redCells.Add(rc)
-        Next
-
-        redCells(0).mask = input.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        redCells(0).pixels = redCells(0).mask.CountNonZero
-
-        Return tmp
-    End Function
-    Public Sub RunVB(src As cv.Mat)
-        colorClass.Run(src)
-        redMasks.Run(colorClass.dst2)
-
-        dst0 = matchCells(dst2, dst0, colorCells)
-        dst2.SetTo(0, colorCells(0).mask)
-
-        Dim cloudInput As New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        Select Case redOptions.depthInputIndex
-            Case 0 ' GuidedBP_Depth
-                guided.Run(src)
-                guided.dst2.CopyTo(cloudInput, task.depthMask)
-                redMasks.Run(guided.dst2)
-            Case 1 ' RedCloud_Core
-                redCore.Run(task.pointCloud)
-                redCore.dst2.CopyTo(cloudInput, task.depthMask)
-                redMasks.Run(redCore.dst2)
-        End Select
-
-        dst1 = matchCells(dst3, dst1, cloudCells)
-        dst3.SetTo(0, cloudCells(0).mask)
-        dst3.SetTo(0, task.noDepthMask)
-
-        If task.rcPicTag = RESULT_DST2 Then setSelectedCell(colorCells, dst0) Else setSelectedCell(cloudCells, dst1)
-    End Sub
-End Class
 
 
 
