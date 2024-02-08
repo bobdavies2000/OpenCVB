@@ -248,7 +248,6 @@ if algorithmName = "Complexity_PlotOpenCV" Then return new Complexity_PlotOpenCV
 if algorithmName = "Concat_4way" Then return new Concat_4way
 if algorithmName = "Concat_Basics" Then return new Concat_Basics
 if algorithmName = "Contour_Basics" Then return new Contour_Basics
-if algorithmName = "Contour_BinarizeFourWay" Then return new Contour_BinarizeFourWay
 if algorithmName = "Contour_Compare" Then return new Contour_Compare
 if algorithmName = "Contour_CompareToFeatureless" Then return new Contour_CompareToFeatureless
 if algorithmName = "Contour_Depth" Then return new Contour_Depth
