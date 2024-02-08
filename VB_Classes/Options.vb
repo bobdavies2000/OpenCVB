@@ -3576,12 +3576,17 @@ Public Class Options_Features : Inherits VB_Algorithm
     Public distanceThreshold As Integer = 16
     Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
     Public matchText As String = ""
+    Public k As Double = 0.04
+    Public useHarrisDetector As Boolean
+    Public blockSize As Integer = 3
     Public fOptions As New Options_FeatureMatch
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Distance threshold (pixels)", 1, 30, distanceThreshold)
             sliders.setupTrackBar("Min Distance to next", 1, 100, minDistance)
             sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
+            sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
+            sliders.setupTrackBar("Blocksize", 1, 21, blockSize)
         End If
 
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
@@ -3590,13 +3595,26 @@ Public Class Options_Features : Inherits VB_Algorithm
             radio.addRadio("Use BRISK")
             radio.check(0).Checked = True
         End If
+
+
+        If findfrm(traceName + " CheckBox Options") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Use HarrisDetector")
+            check.Box(0).Checked = True
+        End If
     End Sub
     Public Sub RunVB()
         Static distanceSlider = findSlider("Distance threshold (pixels)")
         Static qualitySlider = findSlider("Quality Level")
         Static distSlider = findSlider("Min Distance to next")
         Static briskRadio = findRadio("Use BRISK")
+        Static kSlider = findSlider("k X1000")
+        Static blocksizeSlider = findSlider("Blocksize")
+        Static harrisCheck = findCheckBox("Use HarrisDetector")
+        useHarrisDetector = harrisCheck.checked
+        blockSize = blocksizeSlider.value Or 1
         useBRISK = briskRadio.checked
+        k = kSlider.value / 1000
 
         fOptions.RunVB()
         matchOption = fOptions.matchOption

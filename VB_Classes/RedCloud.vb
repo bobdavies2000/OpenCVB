@@ -2481,3 +2481,31 @@ Public Class RedCloud_MaxDist : Inherits VB_Algorithm
         Next
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class RedCloud_Tiers : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim tiers As New Depth_Tiers
+    Dim binarize As New Binarize_FourWay
+    Public Sub New()
+        redOptions.UseColor.Checked = True
+        desc = "Use the Depth_Tiers algorithm to create a color-based RedCloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binarize.Run(src)
+        dst1 = vbPalette((binarize.dst2 * 255 / binarize.classCount).toMat)
+
+        tiers.Run(src)
+        dst3 = tiers.dst3
+
+        dst0 = tiers.dst2 + binarize.dst2
+        redC.Run(dst0)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+    End Sub
+End Class

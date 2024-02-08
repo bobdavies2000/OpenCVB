@@ -443,3 +443,20 @@ Public Class OEX_Points_Classifier : Inherits VB_Algorithm
         setTrueText("Click the global DebugCheckBox to get another set of points.", 2)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class OEX_GoodFeaturesToTrackDemo : Inherits VB_Algorithm
+    Dim feat As New Feature_Basics
+    Public Sub New()
+        desc = "OpenCV Example GoodFeaturesToTrackDemo - now Feature_Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+        dst2 = feat.dst2
+        labels(2) = feat.labels(2)
+    End Sub
+End Class

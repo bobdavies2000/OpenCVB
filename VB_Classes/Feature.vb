@@ -6,6 +6,7 @@ Public Class Feature_Basics : Inherits VB_Algorithm
     Dim Brisk As cv.BRISK
     Public featurePoints As New List(Of cv.Point2f)
     Public options As New Options_Features
+    Public inputMask As New cv.Mat
     Public Sub New()
         Brisk = cv.BRISK.Create()
         findSlider("Feature Sample Size").Value = 400
@@ -25,7 +26,8 @@ Public Class Feature_Basics : Inherits VB_Algorithm
                 If kp.Size >= options.minDistance Then featurePoints.Add(kp.Pt)
             Next
         Else
-            featurePoints = cv.Cv2.GoodFeaturesToTrack(src, sampleSize, options.quality, options.minDistance, Nothing, 7, True, 3).ToList
+            featurePoints = cv.Cv2.GoodFeaturesToTrack(src, sampleSize, options.quality, options.minDistance, inputMask,
+                                                       options.blockSize, options.useHarrisDetector, options.k).ToList
         End If
 
         Dim color = If(dst2.Channels = 3, cv.Scalar.Yellow, cv.Scalar.White)
