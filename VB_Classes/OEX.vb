@@ -460,3 +460,73 @@ Public Class OEX_GoodFeaturesToTrackDemo : Inherits VB_Algorithm
         labels(2) = feat.labels(2)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+
+
+
+Public Class OEX_Reduce : Inherits VB_Algorithm
+    Public Sub New()
+        desc = "Use OpenCV's reduce API to create row/col sums, averages, and min/max."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static m As New cv.Mat(3, 2, cv.MatType.CV_32F, New Single() {1, 2, 3, 4, 5, 6})
+        If task.heartBeat Then
+            Dim col_sum As New cv.Mat, row_sum As New cv.Mat
+            cv.Cv2.Reduce(m, col_sum, 0, cv.ReduceTypes.Sum, cv.MatType.CV_32F)
+            cv.Cv2.Reduce(m, row_sum, 1, cv.ReduceTypes.Sum, cv.MatType.CV_32F)
+
+            strOut = "Original Mat" + vbCrLf
+            For y = 0 To m.Rows - 1
+                For x = 0 To m.Cols - 1
+                    strOut += CStr(m.Get(Of Single)(y, x)) + ", "
+                Next
+                strOut += vbCrLf
+            Next
+
+            strOut += vbCrLf + "col_sum" + vbCrLf
+            For i = 0 To m.Cols - 1
+                strOut += CStr(col_sum.Get(Of Single)(0, i)) + ", "
+            Next
+
+            strOut += vbCrLf + "row_sum" + vbCrLf
+            For i = 0 To m.Rows - 1
+                strOut += CStr(row_sum.Get(Of Single)(0, i)) + ", "
+            Next
+
+            'm =
+            '[  1,   2;
+            '   3,   4;
+            '   5,   6]
+            'col_sum = [9, 12]
+            'row_sum = [3, 7, 11]
+
+            Dim col_average As New cv.Mat, row_average As New cv.Mat, col_min As New cv.Mat
+            Dim col_max As New cv.Mat, row_min As New cv.Mat, row_max As New cv.Mat
+
+            cv.Cv2.Reduce(m, col_average, 0, cv.ReduceTypes.Avg, cv.MatType.CV_32F)
+            cv.Cv2.Reduce(m, row_average, 1, cv.ReduceTypes.Avg, cv.MatType.CV_32F)
+
+            cv.Cv2.Reduce(m, col_min, 0, cv.ReduceTypes.Min, cv.MatType.CV_32F)
+            cv.Cv2.Reduce(m, row_min, 1, cv.ReduceTypes.Min, cv.MatType.CV_32F)
+
+            cv.Cv2.Reduce(m, col_max, 0, cv.ReduceTypes.Max, cv.MatType.CV_32F)
+            cv.Cv2.Reduce(m, row_max, 1, cv.ReduceTypes.Max, cv.MatType.CV_32F)
+
+            'col_average = [3, 4]
+            'row_average = [1.5, 3.5, 5.5]
+            'col_min = [  1,   2]
+            'row_min = [  1,   3,   5]
+            'col_max = [  5,   6]
+            'row_max = [  2,   4,   6]
+        End If
+        setTrueText(strOut, 2)
+    End Sub
+End Class

@@ -1135,6 +1135,7 @@ if algorithmName = "OEX_GoodFeaturesToTrackDemo" Then return new OEX_GoodFeature
 if algorithmName = "OEX_MeanShift" Then return new OEX_MeanShift
 if algorithmName = "OEX_PointPolygonTest_demo" Then return new OEX_PointPolygonTest_demo
 if algorithmName = "OEX_Points_Classifier" Then return new OEX_Points_Classifier
+if algorithmName = "OEX_Reduce" Then return new OEX_Reduce
 if algorithmName = "OEX_Remap" Then return new OEX_Remap
 if algorithmName = "OEX_Sobel_Demo" Then return new OEX_Sobel_Demo
 if algorithmName = "OEX_Threshold" Then return new OEX_Threshold
