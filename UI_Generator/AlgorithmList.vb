@@ -259,6 +259,7 @@ if algorithmName = "Contour_GeneralWithOptions" Then return new Contour_GeneralW
 if algorithmName = "Contour_Gray" Then return new Contour_Gray
 if algorithmName = "Contour_Largest" Then return new Contour_Largest
 if algorithmName = "Contour_Outline" Then return new Contour_Outline
+if algorithmName = "Contour_PrepData" Then return new Contour_PrepData
 if algorithmName = "Contour_RC_AddContour" Then return new Contour_RC_AddContour
 if algorithmName = "Contour_RedCloud" Then return new Contour_RedCloud
 if algorithmName = "Contour_RedCloudCorners" Then return new Contour_RedCloudCorners

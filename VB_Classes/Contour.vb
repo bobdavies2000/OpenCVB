@@ -4,6 +4,7 @@ Public Class Contour_Basics : Inherits VB_Algorithm
     Public contourlist As New List(Of cv.Point())
     Public allContours As cv.Point()()
     Public options As New Options_Contours
+    Public sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         colorClass.updateImages = True
         findRadio("FloodFill").Checked = True
@@ -25,9 +26,11 @@ Public Class Contour_Basics : Inherits VB_Algorithm
         End If
         If allContours.Count <= 1 Then Exit Sub
 
-        Dim sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        sortedList.Clear()
         For i = 0 To allContours.Count - 1
-            sortedList.Add(allContours(i).Length, i)
+            If allContours(i).Length < 4 Then Continue For
+            Dim count = cv.Cv2.ContourArea(allContours(i))
+            If count > 2 Then sortedList.Add(count, i)
         Next
 
         dst3.SetTo(0)
@@ -879,3 +882,59 @@ Public Class Contour_WholeImage : Inherits VB_Algorithm
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Contour_PrepData : Inherits VB_Algorithm
+    Dim contour As New Contour_Basics
+    Dim redCells As New List(Of rcData)
+    Dim cellMap As New cv.Mat
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Prepare redCells and a cellMap using only contours"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        contour.Run(src)
+        dst2 = contour.dst2
+
+        dst1.SetTo(0)
+        dst3.SetTo(0)
+        redCells.Clear()
+        redCells.Add(New rcData)
+        cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        For i = 0 To Math.Min(contour.sortedList.Count, contour.options.maxContourCount) - 1
+            Dim tour = contour.allContours(contour.sortedList.ElementAt(i).Value)
+            Dim rc As New rcData
+            Dim px As New List(Of Integer)
+            Dim py As New List(Of Integer)
+            For Each pt In tour
+                px.Add(pt.X)
+                py.Add(pt.Y)
+            Next
+            Dim xMin = px.Min, yMin = py.Min, xMax = px.Max, yMax = py.Max
+            Dim r = New cv.Rect(xMin, yMin, xMax - xMin, yMax - yMin)
+
+            vbDrawContour(dst1, tour.ToList, 255, -1)
+            Dim mask = dst1(r).Clone
+            dst1(r).SetTo(0)
+
+            rc.rect = r
+            rc.mask = mask
+            rc.pixels = contour.sortedList.ElementAt(i).Key
+            If rc.pixels > 0 Then
+                rc.maxDist = vbGetMaxDist(rc)
+                rc.contour = tour.ToList
+                rc.color = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                rc.index = redCells.Count
+                redCells.Add(rc)
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+                cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            End If
+        Next
+
+        labels(2) = $"{redCells.Count} cells were found"
+        setSelectedCell(redCells, cellMap)
+    End Sub
+End Class

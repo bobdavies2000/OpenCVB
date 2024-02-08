@@ -46,8 +46,8 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
 
             usedColors.Add(rc.color)
 
-            'rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            'vbDrawContour(rc.mask, rc.contour, 255, -1)
+            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            vbDrawContour(rc.mask, rc.contour, 255, -1)
 
             rc.depthMask = rc.mask.Clone
             rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))

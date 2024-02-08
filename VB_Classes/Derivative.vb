@@ -133,6 +133,7 @@ Public Class Derivative_Classes : Inherits VB_Algorithm
         Next
         dst = vbPalette(deriv.dst0 * 255 / derivClassCount)
         dst.SetTo(0, task.noDepthMask)
+        Return derivClassCount
     End Function
     Public Sub RunVB(src As cv.Mat)
         deriv.Run(task.pcSplit(deriv.options.channel).Sobel(cv.MatType.CV_32F, 1, 0, deriv.options.kernelSize))
