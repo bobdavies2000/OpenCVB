@@ -877,3 +877,25 @@ Public Class Contour_WholeImage : Inherits VB_Algorithm
         Next
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class Contour_BinarizeFourWay : Inherits VB_Algorithm
+    Dim colorClass As New Color_Basics
+    Dim contours As New Contour_Basics
+    Public Sub New()
+        colorClass.updateImages = True
+        desc = "Create contours for the output of the Binarize_FourWay algorithm."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        colorClass.Run(src)
+
+        contours.Run(colorClass.dst3)
+        dst2 = contours.dst3
+    End Sub
+End Class

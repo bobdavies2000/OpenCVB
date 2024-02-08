@@ -2063,7 +2063,7 @@ End Class
 
 
 Public Class RedCloud_Combine : Inherits VB_Algorithm
-    Dim color As New Color_Basics
+    Dim colorClass As New Color_Basics
     Public guided As New GuidedBP_Depth
     Public redMasks As New RedCloud_Masks
     Public combinedCells As New List(Of rcData)
@@ -2074,8 +2074,8 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
         If redOptions.UseColor.Checked Or redOptions.UseDepthAndColor.Checked Then
             redMasks.inputMask = Nothing
             If src.Channels = 3 Then
-                color.Run(src)
-                dst2 = color.dst2.Clone
+                colorClass.Run(src)
+                dst2 = colorClass.dst2.Clone
             Else
                 dst2 = src
             End If
@@ -2088,12 +2088,12 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
             Select Case redOptions.depthInputIndex
                 Case 0 ' "GuidedBP_Depth"
                     guided.Run(src)
-                    If color.classCount > 0 Then guided.dst2 += color.classCount
+                    If colorClass.classCount > 0 Then guided.dst2 += colorClass.classCount
                     guided.dst2.CopyTo(dst2, task.depthMask)
                 Case 1 ' "RedCloud_Core"
                     Static prep As New RedCloud_Core
                     prep.Run(task.pointCloud)
-                    If color.classCount > 0 Then prep.dst2 += color.classCount
+                    If colorClass.classCount > 0 Then prep.dst2 += colorClass.classCount
                     prep.dst2.CopyTo(dst2, task.depthMask)
             End Select
         End If
@@ -2355,7 +2355,7 @@ End Class
 Public Class RedCloud_MasksBoth : Inherits VB_Algorithm
     Public colorCells As New List(Of rcData)
     Public cloudCells As New List(Of rcData)
-    Dim color As New Color_Basics
+    Dim colorClass As New Color_Basics
     Public redMasks As New RedCloud_Masks
     Dim redCore As New RedCloud_Core
     Dim guided As New GuidedBP_Depth
@@ -2391,8 +2391,8 @@ Public Class RedCloud_MasksBoth : Inherits VB_Algorithm
         Return tmp
     End Function
     Public Sub RunVB(src As cv.Mat)
-        color.Run(src)
-        redMasks.Run(color.dst2)
+        colorClass.Run(src)
+        redMasks.Run(colorClass.dst2)
 
         dst0 = matchCells(dst2, dst0, colorCells)
         dst2.SetTo(0, colorCells(0).mask)
