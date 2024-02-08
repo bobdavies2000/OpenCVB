@@ -814,64 +814,6 @@ End Class
 
 
 
-
-
-'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-Public Class Edge_Laplacian : Inherits VB_Algorithm
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Gaussian Kernel", 1, 32, 7)
-            sliders.setupTrackBar("Laplacian Kernel", 1, 32, 5)
-        End If
-        labels(3) = "Laplacian of Depth Image"
-        desc = "Show Laplacian edge detection with varying kernel sizes"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static gaussSlider = findSlider("Gaussian Kernel")
-        Static laplacianSlider = findSlider("Laplacian Kernel")
-        Dim gaussiankernelSize = gaussSlider.Value Or 1
-        Dim laplaciankernelSize = laplacianSlider.Value Or 1
-
-        dst2 = src.GaussianBlur(New cv.Size(CInt(gaussiankernelSize), CInt(gaussiankernelSize)), 0, 0)
-        dst2 = dst2.Laplacian(cv.MatType.CV_8U, laplaciankernelSize, 1, 0)
-        dst2 = dst2.ConvertScaleAbs()
-
-        dst3 = task.depthRGB.GaussianBlur(New cv.Size(CInt(gaussiankernelSize), CInt(gaussiankernelSize)), 0, 0)
-        dst3 = dst3.Laplacian(cv.MatType.CV_8U, laplaciankernelSize, 1, 0)
-        dst3 = dst3.ConvertScaleAbs()
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Edge_LaplacianDepth : Inherits VB_Algorithm
-    Dim edges As New Edge_Laplacian
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold for depth difference", 0, 255, 200)
-        desc = "Find edges in depth data"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static diffSlider = findSlider("Threshold for depth difference")
-        edges.Run(src)
-        dst2 = edges.dst3
-        dst3 = edges.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(diffSlider.Value, 255, cv.ThresholdTypes.Binary)
-        dst3.SetTo(cv.Scalar.White, task.noDepthMask)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class Edge_DepthEdgeTest : Inherits VB_Algorithm
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -1081,19 +1023,19 @@ End Class
 
 
 
-Public Class Edge_DepthRegions : Inherits VB_Algorithm
-    Dim regions As New Depth_Regions
+Public Class Edge_Regions : Inherits VB_Algorithm
+    Dim tiers As New Depth_Tiers
     Dim edge As New Edge_Canny
     Public Sub New()
         findSlider("Canny threshold2").Value = 30
         labels = {"", "", "Edge_Canny output for the depth regions", "Identified regions "}
-        desc = "Find the edges for the depth regions."
+        desc = "Find the edges for the depth tiers."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        regions.Run(src)
-        dst3 = regions.dst2
+        tiers.Run(src)
+        dst3 = tiers.dst3
 
-        edge.Run(dst3)
+        edge.Run(dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = edge.dst2
     End Sub
 End Class
@@ -1449,7 +1391,7 @@ Public Class Edge_Depth : Inherits VB_Algorithm
     Public plot As New Plot_Histogram
     Public Sub New()
         backp.hist.plot.removeZeroEntry = False
-        labels = {"", "", "Horizontal derivative of selected pointcloud dimension", "Plot of the histogram for the selected pointcloud dimension"}
+        vbAddAdvice(traceName + ": gOptions histogram Bins and several local options are important.")
         desc = "Display a first or second derivative of the selected depth dimension and direction."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1484,10 +1426,13 @@ Public Class Edge_Depth : Inherits VB_Algorithm
         mask.ConvertTo(mask, cv.MatType.CV_8U)
         mask = mask.InRange(histIndex, histIndex)
 
-        dst3 = task.color
+        dst3 = task.color.Clone
         dst3.SetTo(cv.Scalar.White, mask)
         dst3.SetTo(0, task.noDepthMask)
         dst2.Rectangle(New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+        Dim deriv = Format(options.derivativeRange, fmt2)
+        labels(2) = "Histogram of first or second derivatives.  Range -" + deriv + " to " + deriv
+        labels(3) = "Backprojection into the image for the selected histogram entry - move mouse over dst2."
     End Sub
 End Class
 
@@ -1496,13 +1441,87 @@ End Class
 
 
 
-Public Class Edge_DepthLaPlacian : Inherits VB_Algorithm
+Public Class Edge_DepthSobel : Inherits VB_Algorithm
+    Dim eDepth As New Edge_Depth
     Public Sub New()
-        labels = {"", "", "Grayscale", "dst3Label"}
-        vbAddAdvice(traceName + ": <place advice here on any options that are useful>")
-        desc = "Display the second derivative of the selected depth dimension."
+        If standalone Then gOptions.displayDst0.Checked = True
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Display the derivative of the selected depth dimension."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim channel = eDepth.options.channel
+        Dim chanName As String = "X"
+        If channel <> 0 Then
+            If channel = 1 Then chanName = "Y" Else chanName = "Z"
+        End If
+        Dim kern = eDepth.options.kernelSize
+        src = task.pcSplit(channel).Sobel(cv.MatType.CV_32F, 1, 0, kern)
+        eDepth.Run(src)
+        dst0 = eDepth.dst2.Clone
+        dst1 = eDepth.dst3.Clone
+        labels(0) = "Horizontal derivatives for " + chanName + " dimension of the point cloud"
+        labels(1) = "Backprojection of horizontal derivatives indicated - move mouse in the image at left"
+
+        src = task.pcSplit(channel).Sobel(cv.MatType.CV_32F, 0, 1, kern)
+        eDepth.Run(src)
+        dst2 = eDepth.dst2
+        dst3 = eDepth.dst3
+        labels(2) = "Vertical derivatives for " + chanName + " dimension of the point cloud"
+        labels(3) = "Backprojection of vertical derivatives indicated - move mouse in the image at left"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
+Public Class Edge_Laplacian : Inherits VB_Algorithm
+    Dim options As New Options_LaPlacianKernels
+    Public Sub New()
+        labels(3) = "Laplacian of DepthRGB"
+        desc = "Show Laplacian edge detection with varying kernel sizes"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        dst2 = src.GaussianBlur(New cv.Size(CInt(options.gaussiankernelSize), CInt(options.gaussiankernelSize)), 0, 0)
+        dst2 = dst2.Laplacian(cv.MatType.CV_8U, options.laplaciankernelSize, 1, 0)
+        dst2 = dst2.ConvertScaleAbs()
+
+        dst3 = task.depthRGB.GaussianBlur(New cv.Size(CInt(options.gaussiankernelSize), CInt(options.gaussiankernelSize)), 0, 0)
+        dst3 = dst3.Laplacian(cv.MatType.CV_8U, options.laplaciankernelSize, 1, 0)
+        dst3 = dst3.ConvertScaleAbs()
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Edge_DepthLaplacian : Inherits VB_Algorithm
+    Dim options As New Options_LaPlacianKernels
+    Dim eDepth As New Edge_Depth
+    Public Sub New()
+        desc = "Create a histogram and backprojection for the second derivative of depth in the selected dimension."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        Dim channel = eDepth.options.channel
+        Dim gausskern = New cv.Size(CInt(options.gaussiankernelSize), CInt(options.gaussiankernelSize))
+        dst1 = task.pcSplit(channel).GaussianBlur(gausskern, 0, 0)
+        dst1 = dst1.Laplacian(cv.MatType.CV_32F, options.laplaciankernelSize, 1, 0)
+
+        eDepth.Run(dst1)
+        dst2 = eDepth.dst2
+        dst3 = eDepth.dst3
+        labels(2) = eDepth.labels(2)
+        labels(3) = eDepth.labels(3)
     End Sub
 End Class

@@ -4072,7 +4072,7 @@ Public Class Options_Edges_All : Inherits VB_Algorithm
     Dim deriche As New Edge_Deriche_CPP
     Dim laplacian As New Edge_Laplacian
     Dim resizeAdd As New Edge_ResizeAdd
-    Dim regions As New Edge_DepthRegions
+    Dim regions As New Edge_Regions
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -4319,5 +4319,27 @@ Public Class Options_DepthSobel : Inherits VB_Algorithm
 
         kernelSize = options.kernelSize
         derivativeRange = options.derivativeRange
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_LaPlacianKernels : Inherits VB_Algorithm
+    Public gaussiankernelSize As Integer
+    Public laplaciankernelSize As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Gaussian Kernel", 1, 32, 1)
+            sliders.setupTrackBar("Laplacian Kernel", 1, 32, 3)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static gaussSlider = findSlider("Gaussian Kernel")
+        Static laplacianSlider = findSlider("Laplacian Kernel")
+        gaussiankernelSize = gaussSlider.Value Or 1
+        laplaciankernelSize = laplacianSlider.Value Or 1
     End Sub
 End Class

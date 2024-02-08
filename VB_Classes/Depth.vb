@@ -1151,7 +1151,7 @@ Public Class Depth_Tiers : Inherits VB_Algorithm
         classCount = task.maxZmeters
         dst2.SetTo(0, task.noDepthMask)
 
-        If standaloneTest() Then dst3 = vbPalette(dst2 * 255 / classCount)
+        dst3 = vbPalette(dst2 * 255 / classCount)
     End Sub
 End Class
 

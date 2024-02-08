@@ -60,7 +60,6 @@ Public Class VBtask : Implements IDisposable
     Public gMat As IMU_GMatrix
     Public IMUBasics As IMU_Basics
     Public hCloud As History_Cloud
-    Public maxMask As Depth_MaxMask
     Public motionCloud As Motion_PointCloud
     Public motionColor As Motion_Color
     Public motionBasics As Motion_Basics_QT
@@ -364,7 +363,6 @@ Public Class VBtask : Implements IDisposable
         IMUBasics = New IMU_Basics
         gMat = New IMU_GMatrix
         hCloud = New History_Cloud
-        maxMask = New Depth_MaxMask
         motionCloud = New Motion_PointCloud
         motionColor = New Motion_Color
         motionBasics = New Motion_Basics_QT
@@ -527,14 +525,8 @@ Public Class VBtask : Implements IDisposable
                 If task.motionDetected Or heartBeat Or task.motionReset Then
                     task.pcSplit = task.pointCloud.Split
 
-                    Dim maxD = gOptions.MaxDepth.Value - 0.1 ' why -0.1?  Because histograms are inclusive at boundaries.
-                    task.maxDepthMask = task.pcSplit(2).Threshold(maxD, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-                    maxMask.Run(task.maxDepthMask) ' fill in the holes of the maxdepthmask
-                    task.maxDepthMask = maxMask.dst2 ' Use the contour of the mask
-
                     If gOptions.unFiltered.Checked = False Then
                         task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
-                        'task.pcSplit(2).SetTo(maxD, task.maxDepthMask)
                     End If
 
                     task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
