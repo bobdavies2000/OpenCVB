@@ -2260,7 +2260,7 @@ Public Class RedCloud_Masks : Inherits VB_Algorithm
         If classCount = 0 Then Exit Sub ' no data to process.
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-        If standaloneTest() Then dst3 = vbPalette(dst2 * 255 / classCount)
+        dst3 = vbPalette(dst2 * 255 / classCount)
 
         If task.heartBeat Then labels(3) = CStr(classCount) + " cells found"
 

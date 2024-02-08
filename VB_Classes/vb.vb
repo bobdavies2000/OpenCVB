@@ -252,6 +252,9 @@ Module VB
         listOfPoints.Add(contour)
         cv.Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType)
     End Sub
+    Public Function vecToScalar(vec As cv.Vec3b) As cv.Scalar
+        Return New cv.Scalar(vec(0), vec(1), vec(2))
+    End Function
     Public Sub quarterBeat()
         Static quarter(4) As Boolean
         task.quarterBeat = False

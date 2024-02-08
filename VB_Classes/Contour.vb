@@ -1,5 +1,56 @@
 Imports cv = OpenCvSharp
 Public Class Contour_Basics : Inherits VB_Algorithm
+    Dim colorClass As New Color_Basics
+    Public contourlist As New List(Of cv.Point())
+    Public allContours As cv.Point()()
+    Public options As New Options_Contours
+    Public Sub New()
+        colorClass.updateImages = True
+        findRadio("FloodFill").Checked = True
+        labels = {"", "", "FindContour input", "Draw contour output"}
+        desc = "General purpose contour finder"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        colorClass.Run(src)
+        dst2 = colorClass.dst2
+
+        If options.retrievalMode = cv.RetrievalModes.FloodFill Then
+            dst2.ConvertTo(dst1, cv.MatType.CV_32SC1)
+            cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)
+        Else
+            cv.Cv2.FindContours(dst2, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
+        End If
+        If allContours.Count <= 1 Then Exit Sub
+
+        Dim sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To allContours.Count - 1
+            sortedList.Add(allContours(i).Length, i)
+        Next
+
+        dst3.SetTo(0)
+        contourlist.Clear()
+        dst2 = colorClass.dst3
+        Dim minVal = Math.Min(sortedList.Count, options.maxContourCount)
+        For i = 0 To minVal
+            Dim tour = allContours(sortedList.ElementAt(i).Value)
+            contourlist.Add(tour)
+            Dim color As cv.Scalar = vecToScalar(dst2.Get(Of cv.Vec3b)(tour(0).Y, tour(0).X))
+            vbDrawContour(dst3, tour.ToList, color, -1)
+            vbDrawContour(dst3, tour.ToList, cv.Scalar.White)
+        Next
+        labels(3) = $"Top {minVal} contours found"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Contour_General : Inherits VB_Algorithm
     Public contourlist As New List(Of cv.Point())
     Public allContours As cv.Point()()
     Public options As New Options_Contours
@@ -9,7 +60,7 @@ Public Class Contour_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst0 = src.Clone
-        If standaloneTest() Then
+        If standalone Then
             Static rotatedRect As New Rectangle_Rotated
             If task.heartBeat = False Then Exit Sub
             rotatedRect.Run(src)
@@ -46,7 +97,7 @@ End Class
 
 
 
-Public Class Contour_BasicsWithOptions : Inherits VB_Algorithm
+Public Class Contour_GeneralWithOptions : Inherits VB_Algorithm
     Public contourlist As New List(Of cv.Point())
     Public allContours As cv.Point()()
     Public options As New Options_Contours
@@ -96,7 +147,7 @@ End Class
 
 Public Class Contour_RotatedRects : Inherits VB_Algorithm
     Public rotatedRect As New Rectangle_Rotated
-    Dim basics As New Contour_Basics
+    Dim basics As New Contour_General
     Public Sub New()
         labels(3) = "Find contours of several rotated rects"
         desc = "Demo options on FindContours."
@@ -181,7 +232,7 @@ End Class
 
 Public Class Contour_Edges : Inherits VB_Algorithm
     Dim edges As New Edge_ResizeAdd
-    Dim contour As New Contour_Basics
+    Dim contour As New Contour_General
     Public Sub New()
         desc = "Create contours for Edge_MotionAccum"
     End Sub
@@ -270,7 +321,7 @@ End Class
 
 Public Class Contour_Foreground : Inherits VB_Algorithm
     Dim km As New Foreground_KMeans2
-    Dim contour As New Contour_Basics
+    Dim contour As New Contour_General
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "", "Kmeans foreground output", "Contour of foreground"}
@@ -322,7 +373,7 @@ End Class
 
 
 Public Class Contour_Sorted : Inherits VB_Algorithm
-    Dim contours As New Contour_BasicsWithOptions
+    Dim contours As New Contour_GeneralWithOptions
     Dim sortedContours As New SortedList(Of Integer, cv.Point())(New compareAllowIdenticalIntegerInverted)
     Dim sortedByArea As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Dim diff As New Diff_Basics
@@ -645,75 +696,6 @@ End Class
 
 
 
-Public Class Contour_Image : Inherits VB_Algorithm
-    Dim colorClass As New Color_Basics
-    Public contourlist As New List(Of cv.Point())
-    Public allContours As cv.Point()()
-    Public options As New Options_Contours
-    Public Sub New()
-        findRadio("FloodFill").Checked = True
-        labels = {"", "", "FindContour input", "Draw contour output"}
-        desc = "General purpose contour finder"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        colorClass.Run(src)
-        dst2 = colorClass.dst2.Clone
-
-        If options.retrievalMode = cv.RetrievalModes.FloodFill Then
-            dst2.ConvertTo(dst1, cv.MatType.CV_32SC1)
-            cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)
-            dst1.ConvertTo(dst3, cv.MatType.CV_8UC1)
-        Else
-            cv.Cv2.FindContours(dst2, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
-        End If
-
-        contourlist.Clear()
-        For Each ctr In allContours.ToArray
-            contourlist.Add(ctr)
-            If ctr.Length > minLengthContour Then vbDrawContour(dst3, ctr.ToList, cv.Scalar.White)
-        Next
-
-        If standaloneTest() Then
-            dst2 = vbPalette(dst2 * 255 / colorClass.classCount)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Contour_WholeImage : Inherits VB_Algorithm
-    Dim contour As New Contour_Image
-    Public Sub New()
-        redOptions.DesiredCellSlider.Value = 20
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Find the top X contours by size and display them."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        contour.Run(src)
-        Dim sortedContours As New SortedList(Of Integer, List(Of cv.Point))(New compareAllowIdenticalIntegerInverted)
-        For Each tour In contour.contourlist
-            sortedContours.Add(tour.Length, tour.ToList)
-        Next
-
-        dst2.SetTo(0)
-        For i = 1 To sortedContours.Count - 1 ' toss the contour around whole image - element 0.
-            Dim tour = sortedContours.ElementAt(i).Value
-            vbDrawContour(dst2, tour, 255, task.lineWidth)
-            If i >= redOptions.DesiredCellSlider.Value Then Exit For
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Contour_CompareToFeatureless : Inherits VB_Algorithm
     Dim contour As New Contour_WholeImage
     Dim fLess As New FeatureLess_Basics
@@ -843,5 +825,55 @@ Public Class Contour_Gray : Inherits VB_Algorithm
             vbDrawContour(dst2, tour.ToList, cv.Scalar.White, task.lineWidth)
         Next
         labels(2) = $"There were {allContours.Count} contours found."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Contour_DepthTiers : Inherits VB_Algorithm
+    Dim tiers As New Depth_Tiers
+    Dim contour As New Contour_Basics
+    Public Sub New()
+        desc = "Build contours of the depth tiers"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        tiers.Run(src)
+        dst3 = tiers.dst3.Clone
+
+        contour.Run(tiers.dst3)
+        dst2 = contour.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Contour_WholeImage : Inherits VB_Algorithm
+    Dim contour As New Contour_Basics
+    Public Sub New()
+        findSlider("Max contours").Value = 20
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Find the top X contours by size and display them."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        contour.Run(src)
+        Dim sortedContours As New SortedList(Of Integer, List(Of cv.Point))(New compareAllowIdenticalIntegerInverted)
+        For Each tour In contour.contourlist
+            sortedContours.Add(tour.Length, tour.ToList)
+        Next
+
+        dst2.SetTo(0)
+        For i = 0 To sortedContours.Count - 1 ' toss the contour around whole image - element 0.
+            Dim tour = sortedContours.ElementAt(i).Value
+            vbDrawContour(dst2, tour, 255, task.lineWidth)
+            If i >= contour.options.maxContourCount Then Exit For
+        Next
     End Sub
 End Class

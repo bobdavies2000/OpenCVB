@@ -90,7 +90,7 @@ End Class
 
 Public Class Foreground_Contours : Inherits VB_Algorithm
     Public fore As New Foreground_Hist3D
-    Dim contours As New Contour_Basics
+    Dim contours As New Contour_General
     Public Sub New()
         desc = "Create contours for the foreground mask"
     End Sub

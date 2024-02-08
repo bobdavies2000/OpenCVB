@@ -878,7 +878,7 @@ End Class
 
 
 Public Class Depth_MaxMask : Inherits VB_Algorithm
-    Dim contour As New Contour_Basics
+    Dim contour As New Contour_General
     Public Sub New()
         labels = {"", "", "Depth that is too far", "Contour of depth that is too far..."}
         desc = "Display the task.maxDepthMask and its contour containing depth that is greater than maxdepth (global setting)"
@@ -1274,7 +1274,7 @@ End Class
 Public Class Depth_PunchBlob : Inherits VB_Algorithm
     Dim depthDec As New Depth_PunchDecreasing
     Dim depthInc As New Depth_PunchDecreasing
-    Dim contours As New Contour_Basics
+    Dim contours As New Contour_General
     Public Sub New()
         desc = "Identify the punch with a rectangle around the largest blob"
     End Sub
@@ -1321,7 +1321,7 @@ End Class
 Public Class Depth_PunchBlobNew : Inherits VB_Algorithm
     Dim depthDec As New Depth_PunchDecreasing
     Dim depthInc As New Depth_PunchDecreasing
-    Dim contours As New Contour_Basics
+    Dim contours As New Contour_General
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold for punch", 0, 255, 250)
         desc = "Identify a punch using both depth and color"
@@ -1350,7 +1350,7 @@ End Class
 
 
 Public Class Depth_Contour : Inherits VB_Algorithm
-    Dim contour As New Contour_Basics
+    Dim contour As New Contour_General
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels(2) = "task.depthMask contour"
@@ -1375,7 +1375,7 @@ End Class
 
 
 Public Class Depth_Outline : Inherits VB_Algorithm
-    Dim contour As New Contour_Basics
+    Dim contour As New Contour_General
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)

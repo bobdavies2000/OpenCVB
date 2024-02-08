@@ -44,7 +44,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
             If task.motionReset Then dst2 = classifier.dst2.clone
         End If
 
-        If standaloneTest() Or updateImages Then dst3 = vbPalette(dst2 * 255 / classCount)
+        If updateImages Then dst3 = vbPalette(dst2 * 255 / classCount)
         labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) + " pixel classifications"
     End Sub
 End Class
