@@ -7,6 +7,8 @@ Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Imports System.Management
 Imports System.Runtime.InteropServices
+Imports VB_Classes
+
 Module opencv_module
     ' Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
     Public callTraceLock As New Mutex(True, "callTraceLock")
@@ -692,7 +694,7 @@ Public Class OpenCVB
             While sr.EndOfStream = False
                 infoLine = sr.ReadLine
                 infoLine = UCase(Mid(infoLine, 1, 1)) + Mid(infoLine, 2)
-                If infoLine.StartsWith("Options_") = False Then addNextAlgorithm(infoLine, lastNameSplit)
+                addNextAlgorithm(infoLine, lastNameSplit)
             End While
             sr.Close()
         Else
@@ -703,7 +705,7 @@ Public Class OpenCVB
             AvailableAlgorithms.Items.Clear()
 
             For i = 1 To split.Length - 1
-                If split(i).StartsWith("Options_") = False Then addNextAlgorithm(split(i), lastNameSplit)
+                addNextAlgorithm(split(i), lastNameSplit)
             Next
             AvailableAlgorithms.Enabled = True
         End If
@@ -1545,6 +1547,12 @@ Public Class OpenCVB
                 End SyncLock
             End If
 
+            If task.algName.StartsWith("Options_") Then
+                Dim str As New trueText("Options algorithms have no output", 10, 10, 2)
+                trueData.Add(str)
+                task.labels(2) = "Options algorithms have no output"
+                Continue While
+            End If
             SyncLock cameraLock
                 Try
                     dst(0) = task.dst0.Clone

@@ -167,7 +167,7 @@ Module UI_GeneratorMain
         sw.WriteLine("CodeLineCount = " + CStr(CodeLineCount))
         For i = 0 To cleanNames.Count - 1
             If cleanNames(i) <> "CPP_Basics" Then
-                sw.WriteLine(cleanNames(i))
+                If cleanNames(i).StartsWith("Options_") = False Then sw.WriteLine(cleanNames(i))
             End If
             If cleanNames(i).StartsWith("CPP_Basics") Then
                 For j = 0 To functionNames.Count - 1

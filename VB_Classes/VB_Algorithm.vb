@@ -125,7 +125,9 @@ Public Class VB_Algorithm : Implements IDisposable
         If task.testAllRunning = False Then measureStartRun(traceName)
 
         trueData.Clear()
-        If task.paused = False Then algorithm.RunVB(src)
+        If task.paused = False Then
+            If task.algName.StartsWith("Options_") = False Then algorithm.RunVB(src)
+        End If
         firstPass = False
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub

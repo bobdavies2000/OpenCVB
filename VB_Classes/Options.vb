@@ -753,63 +753,6 @@ End Class
 
 
 
-
-Public Class Options_Threshold : Inherits VB_Algorithm
-    Public thresholdOption As cv.ThresholdTypes
-    Public maxVal As Integer = 255
-    Public threshold As Integer = 100
-    Public gradient As New Gradient_Color
-    Public inputGray As Boolean
-    Public otsuOption As Boolean
-    Dim radioChoices = {cv.ThresholdTypes.Binary, cv.ThresholdTypes.BinaryInv, cv.ThresholdTypes.Tozero,
-                        cv.ThresholdTypes.TozeroInv, cv.ThresholdTypes.Triangle, cv.ThresholdTypes.Trunc}
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Threshold value", 0, 255, threshold)
-            sliders.setupTrackBar("MaxVal setting", 0, 255, maxVal)
-        End If
-
-        If findfrm(traceName + " CheckBoxes") Is Nothing Then
-            check.Setup(traceName)
-            check.addCheckBox("GrayScale Input")
-            check.addCheckBox("Add OTSU Option - a 50/50 split")
-        End If
-
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Binary")
-            radio.addRadio("Binary Inverse")
-            radio.addRadio("ToZero")
-            radio.addRadio("ToZero Inverse")
-            radio.addRadio("Triangle - use maxVal slider to see impact")
-            radio.addRadio("Trunc")
-            radio.check(0).Checked = True
-        End If
-
-        gradient.Run(empty)
-        dst2 = gradient.dst2
-    End Sub
-    Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
-        thresholdOption = radioChoices(findRadioIndex(frm.check))
-
-        Static inputGrayCheck = findCheckBox("GrayScale Input")
-        Static otsuCheck = findCheckBox("Add OTSU Option - a 50/50 split")
-        Static threshSlider = findSlider("Threshold value")
-        Static maxSlider = findSlider("MaxVal setting")
-
-        inputGray = inputGrayCheck.checked
-        otsuOption = otsuCheck.checked
-        threshold = threshSlider.Value
-        maxVal = maxSlider.Value
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Options_WarpModel : Inherits VB_Algorithm
     Public useGradient As Boolean
     Public pkImage As cv.Mat
@@ -1867,33 +1810,6 @@ End Class
 
 
 
-Public Class Options_Colors : Inherits VB_Algorithm
-    Public red As Integer
-    Public green As Integer
-    Public blue As Integer
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.Setup(traceName)
-            sliders.setupTrackBar("Red", 0, 255, CInt(msRNG.Next(0, 255)))
-            sliders.setupTrackBar("Green", 0, 255, CInt(msRNG.Next(0, 255)))
-            sliders.setupTrackBar("Blue", 0, 255, CInt(msRNG.Next(0, 255)))
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static redSlider = findSlider("Red")
-        Static greenSlider = findSlider("Green")
-        Static blueSlider = findSlider("Blue")
-        red = redSlider.Value
-        green = greenSlider.Value
-        blue = blueSlider.Value
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Options_OpticalFlow : Inherits VB_Algorithm
     Public pyrScale As Single = 35 / 100
@@ -2727,46 +2643,6 @@ Public Class Options_Emax : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Options_Threshold_Adaptive : Inherits VB_Algorithm
-    Public method As cv.AdaptiveThresholdTypes
-    Public blockSize As Integer = 5
-    Public constantVal As Integer
-    Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("GaussianC")
-            radio.addRadio("MeanC")
-            radio.check(0).Checked = True
-        End If
-
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("AdaptiveThreshold block size", 3, 21, blockSize)
-            sliders.setupTrackBar("Constant subtracted from mean Or weighted mean", -20, 20, 0)
-        End If
-
-        If standaloneTest() = False Then
-            findRadio("ToZero").Enabled = False
-            findRadio("ToZero Inverse").Enabled = False
-            findRadio("Triangle - use maxVal slider to see impact").Enabled = False
-            findRadio("Trunc").Enabled = False
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static gaussRadio = findRadio("GaussianC")
-        Static constantSlider = findSlider("Constant subtracted from mean Or weighted mean")
-        Static blockSlider = findSlider("AdaptiveThreshold block size")
-
-        method = If(gaussRadio.checked, cv.AdaptiveThresholdTypes.GaussianC, cv.AdaptiveThresholdTypes.MeanC)
-        blockSize = blockSlider.Value Or 1
-        constantVal = constantSlider.value
-    End Sub
-End Class
 
 
 
@@ -4364,5 +4240,218 @@ Public Class Options_LaplacianKernels : Inherits VB_Algorithm
         Static LaplacianSlider = findSlider("Laplacian Kernel")
         gaussiankernelSize = gaussSlider.Value Or 1
         LaplaciankernelSize = LaplacianSlider.Value Or 1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Options_Threshold : Inherits VB_Algorithm
+    Public thresholdMethod As cv.ThresholdTypes = cv.ThresholdTypes.Binary
+    Public thresholdName As String
+    Public threshold As Integer = 255
+    Public gradient As New Gradient_Color
+    Public inputGray As Boolean
+    Public otsuOption As Boolean
+    Dim radioChoices = {cv.ThresholdTypes.Binary, cv.ThresholdTypes.BinaryInv, cv.ThresholdTypes.Tozero,
+                        cv.ThresholdTypes.TozeroInv, cv.ThresholdTypes.Triangle, cv.ThresholdTypes.Trunc}
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold value", 0, 255, threshold)
+
+        If findfrm(traceName + " CheckBoxes") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("GrayScale Input")
+            check.addCheckBox("Add OTSU Option - a 50/50 split")
+        End If
+
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Binary")
+            radio.addRadio("Binary Inverse")
+            radio.addRadio("ToZero")
+            radio.addRadio("ToZero Inverse")
+            radio.addRadio("Trunc")
+            radio.check(0).Checked = True
+        End If
+
+        gradient.Run(empty)
+        dst2 = gradient.dst2
+    End Sub
+    Public Sub RunVB()
+        Static frm = findfrm(traceName + " Radio Buttons")
+        Dim index = findRadioIndex(frm.check)
+        thresholdMethod = radioChoices(index)
+        thresholdName = Choose(index + 1, "Binary", "BinaryInv", "Tozero", "TozeroInv", "Triangle", "Trunc")
+
+        Static inputGrayCheck = findCheckBox("GrayScale Input")
+        Static otsuCheck = findCheckBox("Add OTSU Option - a 50/50 split")
+        Static threshSlider = findSlider("Threshold value")
+        Static maxSlider = findSlider("MaxVal setting")
+
+        inputGray = inputGrayCheck.checked
+        otsuOption = otsuCheck.checked
+        threshold = threshSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Threshold_Adaptive : Inherits VB_Algorithm
+    Public method As cv.AdaptiveThresholdTypes
+    Public blockSize As Integer = 5
+    Public constantVal As Integer
+    Public Sub New()
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("GaussianC")
+            radio.addRadio("MeanC")
+            radio.check(0).Checked = True
+        End If
+
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("AdaptiveThreshold block size", 3, 21, blockSize)
+            sliders.setupTrackBar("Constant subtracted from mean Or weighted mean", -20, 20, 0)
+        End If
+
+        If standaloneTest() = False Then
+            findRadio("ToZero").Enabled = False
+            findRadio("ToZero Inverse").Enabled = False
+            findRadio("Trunc").Enabled = False
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static gaussRadio = findRadio("GaussianC")
+        Static constantSlider = findSlider("Constant subtracted from mean Or weighted mean")
+        Static blockSlider = findSlider("AdaptiveThreshold block size")
+
+        method = If(gaussRadio.checked, cv.AdaptiveThresholdTypes.GaussianC, cv.AdaptiveThresholdTypes.MeanC)
+        blockSize = blockSlider.Value Or 1
+        constantVal = constantSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_Colors : Inherits VB_Algorithm
+    Public red As Integer
+    Public green As Integer
+    Public blue As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.Setup(traceName)
+            sliders.setupTrackBar("Red", 0, 255, 180)
+            sliders.setupTrackBar("Green", 0, 255, 180)
+            sliders.setupTrackBar("Blue", 0, 255, 180)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static redSlider = findSlider("Red")
+        Static greenSlider = findSlider("Green")
+        Static blueSlider = findSlider("Blue")
+        red = redSlider.Value
+        green = greenSlider.Value
+        blue = blueSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Threshold_AdaptiveMin : Inherits VB_Algorithm
+    Public adaptiveMethod As cv.AdaptiveThresholdTypes
+    Public Sub New()
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("GaussianC")
+            radio.addRadio("MeanC")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static gaussRadio = findRadio("GaussianC")
+        adaptiveMethod = If(gaussRadio.checked, cv.AdaptiveThresholdTypes.GaussianC, cv.AdaptiveThresholdTypes.MeanC)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Options_ThresholdAll : Inherits VB_Algorithm
+    Public thresholdMethod As cv.ThresholdTypes = cv.ThresholdTypes.Binary
+    Public blockSize As Integer = 5
+    Public constantVal As Integer
+    Public maxVal As Integer = 255
+    Public threshold As Integer = 100
+    Public gradient As New Gradient_Color
+    Public inputGray As Boolean
+    Public otsuOption As Boolean
+    Public adaptiveMethod As cv.AdaptiveThresholdTypes
+    Dim radioChoices = {cv.ThresholdTypes.Binary, cv.ThresholdTypes.BinaryInv, cv.ThresholdTypes.Tozero,
+                        cv.ThresholdTypes.TozeroInv, cv.ThresholdTypes.Triangle, cv.ThresholdTypes.Trunc}
+    Dim options As New Options_Threshold_AdaptiveMin
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Threshold value", 0, 255, threshold)
+            sliders.setupTrackBar("MaxVal setting", 0, 255, maxVal)
+            sliders.setupTrackBar("AdaptiveThreshold block size", 3, 21, blockSize)
+            sliders.setupTrackBar("Constant subtracted from mean Or weighted mean", -20, 20, 0)
+        End If
+
+        If findfrm(traceName + " CheckBoxes") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("GrayScale Input")
+            check.addCheckBox("Add OTSU Option - a 50/50 split")
+        End If
+
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Binary")
+            radio.addRadio("Binary Inverse")
+            radio.addRadio("ToZero")
+            radio.addRadio("ToZero Inverse")
+            radio.addRadio("Trunc")
+            radio.check(4).Checked = True
+        End If
+
+        gradient.Run(empty)
+        dst2 = gradient.dst2
+    End Sub
+    Public Sub RunVB()
+        options.RunVB()
+        adaptiveMethod = options.adaptiveMethod
+
+        Static frm = findfrm(traceName + " Radio Buttons")
+        thresholdMethod = radioChoices(findRadioIndex(frm.check))
+
+        Static inputGrayCheck = findCheckBox("GrayScale Input")
+        Static otsuCheck = findCheckBox("Add OTSU Option - a 50/50 split")
+
+        Static threshSlider = findSlider("Threshold value")
+        Static maxSlider = findSlider("MaxVal setting")
+        Static constantSlider = findSlider("Constant subtracted from mean Or weighted mean")
+        Static blockSlider = findSlider("AdaptiveThreshold block size")
+
+        inputGray = inputGrayCheck.checked
+        otsuOption = otsuCheck.checked
+        threshold = threshSlider.Value
+        maxVal = maxSlider.Value
+        blockSize = blockSlider.Value Or 1
+        constantVal = constantSlider.value
     End Sub
 End Class

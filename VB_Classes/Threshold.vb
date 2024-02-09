@@ -12,11 +12,11 @@ Public Class Threshold_Basics : Inherits VB_Algorithm
         labels(3) = "Image after thresholding with threshold = " + CStr(options.threshold)
         dst2 = src
         If options.inputGray Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If options.otsuOption Then options.thresholdOption += cv.ThresholdTypes.Otsu
-        If (options.otsuOption Or options.thresholdOption = cv.ThresholdTypes.Triangle) And dst2.Channels <> 1 Then
+        If options.otsuOption Then options.thresholdMethod += cv.ThresholdTypes.Otsu
+        If (options.otsuOption Or options.thresholdMethod = cv.ThresholdTypes.Triangle) And dst2.Channels <> 1 Then
             dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
-        dst3 = dst2.Threshold(options.threshold, options.maxVal, options.thresholdOption)
+        dst3 = dst2.Threshold(options.threshold, 255, options.thresholdMethod)
     End Sub
 End Class
 
@@ -32,17 +32,18 @@ End Class
 ' https://www.tutorialspoint.com/opencv/opencv_adaptive_threshold.htm
 Public Class Threshold_Adaptive : Inherits VB_Algorithm
     Dim options As New Options_Threshold
-    Dim optionsAd As New Options_Threshold_Adaptive
+    Dim optionsAdaptive As New Options_Threshold_Adaptive
     Public Sub New()
         labels = {"", "", "Original input", "Output of AdaptiveThreshold"}
         desc = "Explore what adaptive threshold can do."
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
-        optionsAd.RunVB()
+        optionsAdaptive.RunVB()
 
         If src.Channels <> 1 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src
-        dst3 = dst2.AdaptiveThreshold(options.maxVal, optionsAd.method, options.thresholdOption, optionsAd.blockSize, optionsAd.constantVal)
+        dst3 = dst2.AdaptiveThreshold(255, optionsAdaptive.method, options.thresholdMethod,
+                                      optionsAdaptive.blockSize, optionsAdaptive.constantVal)
     End Sub
 End Class
 
@@ -83,5 +84,66 @@ Public Class Threshold_Definitions : Inherits VB_Algorithm
         setTrueText("ToZero", New cv.Point(10, dst2.Height / 2 + 10), 2)
         setTrueText("ToZeroInv", New cv.Point(dst2.Width / 2 + 5, dst2.Height / 2 + 10), 2)
         setTrueText("Current selection from grid at left", 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Threshold_ByChannels : Inherits VB_Algorithm
+    Dim optionsColor As New Options_Colors
+    Dim options As New Options_Threshold
+    Public Sub New()
+        labels(3) = "Threshold Inverse"
+        vbAddAdvice(traceName + ": see local options.")
+        desc = "Threshold by channel - use red threshold slider to impact grayscale results."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        optionsColor.RunVB()
+
+        If options.inputGray Then
+            src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst2 = src.Threshold(optionsColor.red, 255, options.thresholdMethod)
+        Else
+            Dim split = src.Split()
+            split(0) = split(0).Threshold(optionsColor.blue, 255, options.thresholdMethod)
+            split(1) = split(1).Threshold(optionsColor.green, 255, options.thresholdMethod)
+            split(2) = split(2).Threshold(optionsColor.red, 255, options.thresholdMethod)
+            cv.Cv2.Merge(split, dst2)
+        End If
+        dst3 = Not dst2
+        labels(2) = "Threshold method: " + options.thresholdName
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class Threshold_ColorSource : Inherits VB_Algorithm
+    Dim colorClass As New Color_Basics
+    Dim byChan As New Threshold_ByChannels
+    Public Sub New()
+        colorClass.updateImages = True
+        vbAddAdvice(traceName + ": Use redOptions color source to change the input.  Also, see local options.")
+        desc = "Use all the alternative color sources as input to Threshold_ByChannels."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        colorClass.Run(src)
+        byChan.Run(colorClass.dst3)
+        dst2 = byChan.dst2
+        dst3 = byChan.dst3
+        labels = byChan.labels
     End Sub
 End Class
