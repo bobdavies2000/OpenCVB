@@ -288,18 +288,23 @@ End Class
 
 Public Class Binarize_FourWay : Inherits VB_Algorithm
     Dim binarize As New Binarize_Four
-    Public classCount = 4 ' 4-way split 
+    Public classCount = 5 ' 4-way split + hue
+    Dim hue As New CamShift_RedHue
     Public Sub New()
         dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Add the 4-way split of images to define the different regions."
+        desc = "Add the 4-way split of images to define the different regions.  Now adding hue segments as well."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        hue.Run(task.color)
+
         binarize.Run(src)
 
         dst2.SetTo(1, binarize.mats.mat(0))
         dst2.SetTo(2, binarize.mats.mat(1))
         dst2.SetTo(3, binarize.mats.mat(2))
         dst2.SetTo(4, binarize.mats.mat(3))
+
+        dst2.SetTo(5, hue.dst3) ' hue is a 5th class
 
         If standaloneTest() Then dst3 = vbPalette((dst2 * 255 / classCount).toMat)
     End Sub
