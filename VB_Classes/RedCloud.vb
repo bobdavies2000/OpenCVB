@@ -1,5 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp.Flann
+
 Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -2507,5 +2509,38 @@ Public Class RedCloud_Tiers : Inherits VB_Algorithm
         redC.Run(dst0)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_Hue : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim hue As New CamShift_RedHue
+    Public Sub New()
+        redOptions.UseColor.Checked = True
+        desc = "Run RedCloud on just the red hue regions."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hue.Run(src)
+        dst3 = hue.dst3
+
+        redC.combine.redMasks.inputMask = dst3
+        redC.Run(dst3)
+        dst2 = redC.dst2
+
+        dst2.SetTo(0, Not dst3)
+        labels(2) = redC.labels(2)
+
+        If task.rc.index <= 1 Then
+            If redC.redCells.Count > 2 Then
+                task.clickPoint = redC.redCells(2).maxDist
+                task.rc = redC.redCells(2)
+            End If
+        End If
     End Sub
 End Class
