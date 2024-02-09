@@ -472,13 +472,13 @@ End Class
 
 
 
-Public Class OEX_Reduce : Inherits VB_Algorithm
+Public Class OEX_Core_Reduce : Inherits VB_Algorithm
     Public Sub New()
         desc = "Use OpenCV's reduce API to create row/col sums, averages, and min/max."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static m As New cv.Mat(3, 2, cv.MatType.CV_32F, New Single() {1, 2, 3, 4, 5, 6})
         If task.heartBeat Then
+            Dim m As New cv.Mat(3, 2, cv.MatType.CV_32F, New Single() {1, 2, 3, 4, 5, 6})
             Dim col_sum As New cv.Mat, row_sum As New cv.Mat
             cv.Cv2.Reduce(m, col_sum, 0, cv.ReduceTypes.Sum, cv.MatType.CV_32F)
             cv.Cv2.Reduce(m, row_sum, 1, cv.ReduceTypes.Sum, cv.MatType.CV_32F)
@@ -527,6 +527,43 @@ Public Class OEX_Reduce : Inherits VB_Algorithm
             'col_max = [  5,   6]
             'row_max = [  2,   4,   6]
         End If
+        setTrueText(strOut, 2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OEX_Core_Split : Inherits VB_Algorithm
+    Public Sub New()
+        desc = "OpenCV Example Core_Split"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim d As New cv.Mat(2, 2, cv.MatType.CV_8UC3, New Byte() {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12})
+
+        Dim channels = d.Split()
+
+        Dim samples(d.Total * d.ElemSize - 1) As Byte
+        Marshal.Copy(d.Data, samples, 0, samples.Length)
+
+        strOut = "Original 2x2 Mat"
+        For i = 0 To samples.Count - 1
+            strOut += samples(i).ToString + ", "
+        Next
+        strOut += vbCrLf
+
+        For i = 0 To 2
+            strOut += "Channels " + CStr(i) + vbCrLf
+            For y = 0 To channels(i).Rows - 1
+                For x = 0 To channels(i).Cols - 1
+                    strOut += channels(i).Get(Of Byte)(y, x).ToString + ", "
+                Next
+                strOut += vbCrLf
+            Next
+        Next
+
         setTrueText(strOut, 2)
     End Sub
 End Class
