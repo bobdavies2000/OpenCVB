@@ -236,6 +236,7 @@ if algorithmName = "Color_ComplementaryTest" Then return new Color_Complementary
 if algorithmName = "Color_Denoise" Then return new Color_Denoise
 if algorithmName = "Color_Depth" Then return new Color_Depth
 if algorithmName = "Color_Grayscale" Then return new Color_Grayscale
+if algorithmName = "Color_Hue" Then return new Color_Hue
 if algorithmName = "Color_InRange" Then return new Color_InRange
 if algorithmName = "Color_KMeans" Then return new Color_KMeans
 if algorithmName = "Color_MotionFiltered" Then return new Color_MotionFiltered

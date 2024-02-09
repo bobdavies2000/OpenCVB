@@ -80,15 +80,12 @@ Public Class CamShift_RedHue : Inherits VB_Algorithm
     Dim options As New Options_CamShift
     Public Sub New()
         labels = {"", "Hue", "Image regions with red hue", "Mask for hue regions"}
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Find that portion of the image where red dominates"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
 
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-
-        cv.Cv2.MixChannels({hsv}, {dst1}, {0, 0})
         dst3 = hsv.InRange(options.camSBins, New cv.Scalar(180, 255, options.camMax))
 
         dst2.SetTo(0)

@@ -371,3 +371,21 @@ Public Class Color_MotionFiltered : Inherits VB_Algorithm
         classCount = colorClass.classCount
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Color_Hue : Inherits VB_Algorithm
+    Public Sub New()
+        desc = "Isolate those regions in the image that have a reddish hue."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        Dim loBins As cv.Scalar = New cv.Scalar(0, 40, 32)
+        Dim hiBins As cv.Scalar = New cv.Scalar(180, 255, 255)
+        dst2 = hsv.InRange(loBins, hiBins)
+    End Sub
+End Class

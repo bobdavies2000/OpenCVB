@@ -694,7 +694,7 @@ Public Class OpenCVB
             While sr.EndOfStream = False
                 infoLine = sr.ReadLine
                 infoLine = UCase(Mid(infoLine, 1, 1)) + Mid(infoLine, 2)
-                addNextAlgorithm(infoLine, lastNameSplit)
+                If infoLine.StartsWith("Options_") = False Then addNextAlgorithm(infoLine, lastNameSplit)
             End While
             sr.Close()
         Else
@@ -705,7 +705,7 @@ Public Class OpenCVB
             AvailableAlgorithms.Items.Clear()
 
             For i = 1 To split.Length - 1
-                addNextAlgorithm(split(i), lastNameSplit)
+                If split(i).StartsWith("Options_") = False Then addNextAlgorithm(split(i), lastNameSplit)
             Next
             AvailableAlgorithms.Enabled = True
         End If

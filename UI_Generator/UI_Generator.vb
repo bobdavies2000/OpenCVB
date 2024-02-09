@@ -142,7 +142,6 @@ Module UI_GeneratorMain
         sw.WriteLine(vbTab + "If algorithmName.endsWith("".py"") then return new Python_Run()")
         For i = 0 To cleanNames.Count - 1
             Dim nextName = cleanNames(i)
-            'If nextName.StartsWith("Options_") = False Then
             If nextName.EndsWith(".py") = False Then
                 sw.WriteLine("if algorithmName = """ + nextName + """ Then return new " + nextName)
             End If
@@ -167,7 +166,7 @@ Module UI_GeneratorMain
         sw.WriteLine("CodeLineCount = " + CStr(CodeLineCount))
         For i = 0 To cleanNames.Count - 1
             If cleanNames(i) <> "CPP_Basics" Then
-                If cleanNames(i).StartsWith("Options_") = False Then sw.WriteLine(cleanNames(i))
+                sw.WriteLine(cleanNames(i))
             End If
             If cleanNames(i).StartsWith("CPP_Basics") Then
                 For j = 0 To functionNames.Count - 1

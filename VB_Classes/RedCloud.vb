@@ -2520,14 +2520,14 @@ End Class
 
 Public Class RedCloud_Hue : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
-    Dim hue As New CamShift_RedHue
+    Dim hue As New Color_Hue
     Public Sub New()
         redOptions.UseColor.Checked = True
         desc = "Run RedCloud on just the red hue regions."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         hue.Run(src)
-        dst3 = hue.dst3
+        dst3 = hue.dst2
 
         redC.combine.redMasks.inputMask = dst3
         redC.Run(dst3)
