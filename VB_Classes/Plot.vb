@@ -94,14 +94,19 @@ End Class
 Public Class Plot_Depth : Inherits VB_Algorithm
     Dim plotDepth As New Plot_Basics_CPP
     Dim hist As New Histogram_Basics
+    Dim maxDepth As New Depth_MaxMask
     Public Sub New()
         desc = "Show depth using OpenCV's plot format with variable bins."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        maxDepth.Run(src)
+
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
         src.SetTo(task.maxZmeters, task.maxDepthMask)
 
         hist.Run(src)
+        plotDepth.srcX.Clear()
+        plotDepth.srcY.Clear()
         For i = 0 To task.histogramBins - 1
             plotDepth.srcX.Add(i * task.maxZmeters / task.histogramBins)
             plotDepth.srcY.Add(hist.histogram.Get(Of Single)(i, 0))
@@ -462,7 +467,7 @@ Public Class Plot_Basics_CPP : Inherits VB_Algorithm
     Public srcX As New List(Of Double)
     Public srcY As New List(Of Double)
     Public Sub New()
-        For i = 0 To 50 ' something to plot if standaloneTest().
+        For i = 0 To CInt(task.maxZmeters) ' something to plot if standaloneTest().
             srcX.Add(i)
             srcY.Add(i * i * i)
         Next
