@@ -139,47 +139,6 @@ Public Class Palette_Reduction : Inherits VB_Algorithm
         dst3 = reduction.dst2
 
         dst2 = vbPalette(dst3 * 255 / reduction.classCount)
-
-        'Dim palette As New SortedList(Of Byte, Integer)
-        'For y = 0 To dst2.Height - 1
-        '    For x = 0 To dst2.Width - 1
-        '        Dim nextVal = dst2.Get(Of Byte)(y, x)
-        '        If nextVal <> cv.Scalar.Black Then
-        '            If palette.ContainsKey(nextVal) Then
-        '                palette(nextVal) = palette(nextVal) + 1
-        '            Else
-        '                palette.Add(nextVal, 1)
-        '            End If
-        '        End If
-        '    Next
-        'Next
-
-        'labels(2) = "palette count = " + CStr(palette.Count)
-        'Dim max As Integer
-        'Dim maxIndex As Integer
-        'For i = 0 To palette.Count - 1
-        '    If palette.ElementAt(i).Value > max Then
-        '        max = palette.ElementAt(i).Value
-        '        maxIndex = i
-        '    End If
-        'Next
-
-        'If palette.Count > 0 Then
-        '    Dim nextVal = palette.ElementAt(maxIndex).Key
-        '    Dim loValue = cv.Scalar.All(nextVal - 1)
-        '    Dim hiValue = cv.Scalar.All(nextVal + 1)
-        '    If loValue(0) < 0 Then loValue(0) = 0
-        '    If hiValue(0) > 255 Then hiValue(0) = 255
-
-        '    Dim mask As New cv.Mat
-        '    cv.Cv2.InRange(dst2, loValue, hiValue, mask)
-
-        '    Dim maxCount = cv.Cv2.CountNonZero(mask)
-
-        '    dst3 = src.EmptyClone.SetTo(0)
-        '    dst3.SetTo(cv.Scalar.All(255), mask)
-        '    labels(3) = "Most Common Color +- " + CStr(1) + " count = " + CStr(maxCount)
-        'End If
     End Sub
 End Class
 

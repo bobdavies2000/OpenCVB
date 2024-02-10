@@ -34,7 +34,6 @@ Public Class VBtask : Implements IDisposable
     Public mbIndex As Integer
 
     Public color As cv.Mat
-    Public gray As cv.Mat
     Public leftView As cv.Mat
     Public rightView As cv.Mat
     Public pointCloud As cv.Mat
@@ -464,7 +463,6 @@ Public Class VBtask : Implements IDisposable
                 task.IMU_RawAcceleration = task.IMU_Acceleration
                 task.IMU_RawAngularVelocity = task.IMU_AngularVelocity
                 grid.Run(task.color)
-                task.gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
                 If task.algName.StartsWith("CPP_") = False Then
                     task.motionFlag = True

@@ -220,7 +220,7 @@ Public Class Motion_PixelDiff : Inherits VB_Algorithm
                     "To get the Options Slider, use " + traceName + "QT"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        src = task.gray
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Static lastFrame As cv.Mat = src
         cv.Cv2.Absdiff(src, lastFrame, dst2)

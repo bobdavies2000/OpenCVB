@@ -1,7 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp.Flann
-
 Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -1514,20 +1512,20 @@ End Class
 
 
 Public Class RedCloud_LeftRight : Inherits VB_Algorithm
-    Dim redLeft As New RedCloud_OnlyColor
-    Dim redRight As New RedCloud_OnlyColor
+    Dim redLeft As New RedCloud_Basics
+    Dim redRight As New RedCloud_Basics
     Public Sub New()
-        redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
+        redOptions.UseColor.Checked = True
         desc = "Floodfill left and right images after RedCloud color input reduction."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redLeft.Run(task.leftView)
         dst2 = redLeft.dst2
-        labels(2) = redLeft.redC.labels(3)
+        labels(2) = redLeft.labels(3)
 
         redRight.Run(task.rightView)
         dst3 = redRight.dst2
-        labels(3) = redRight.redC.labels(3)
+        labels(3) = redRight.labels(3)
     End Sub
 End Class
 

@@ -20,7 +20,7 @@ Public Class AsciiArt_Basics : Inherits VB_Algorithm
         Dim wStep = CInt(src.Width / wSlider.value)
         Dim size = New cv.Size(CInt(wSlider.value), CInt(hSlider.value))
 
-        dst3 = task.gray.Resize(size, cv.InterpolationFlags.Nearest)
+        dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(size, cv.InterpolationFlags.Nearest)
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
                 Dim grayValue = dst3.Get(Of Byte)(y, x)
@@ -47,7 +47,7 @@ Public Class AsciiArt_Gray : Inherits VB_Algorithm
         Dim hStep = CInt(src.Height / 31) - 1
         Dim wStep = CInt(src.Width / 55) - 1
         Dim size = New cv.Size(55, 31)
-        dst1 = task.gray.Resize(size, cv.InterpolationFlags.Nearest)
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(size, cv.InterpolationFlags.Nearest)
         Dim grayRatio = 12 / 255
         For y = 0 To dst1.Height - 1
             For x = 0 To dst1.Width - 1

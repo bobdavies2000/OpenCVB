@@ -362,7 +362,7 @@ Public Class KMeans_DepthPlusGray : Inherits VB_Algorithm
         desc = "Cluster the rgb+depth image pixels using kMeans"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        task.gray.ConvertTo(grayPlus(0), cv.MatType.CV_32F)
+        src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertTo(grayPlus(0), cv.MatType.CV_32F)
         grayPlus(0).SetTo(0, task.noDepthMask)
         grayPlus(1) = task.pcSplit(2)
 

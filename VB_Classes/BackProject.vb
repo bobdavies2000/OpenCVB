@@ -61,7 +61,7 @@ Public Class BackProject_Full : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         classCount = task.histogramBins
-        task.gray.ConvertTo(dst1, cv.MatType.CV_32F)
+        src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertTo(dst1, cv.MatType.CV_32F)
         Dim histogram As New cv.Mat
         Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 255)}
         cv.Cv2.CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {classCount}, ranges)

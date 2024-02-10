@@ -1,5 +1,8 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Drawing.Imaging
+Imports System.Globalization
+
 Public Class Pixel_Viewer : Inherits VB_Algorithm
     Dim firstUpdate = True
     Public viewerForm As New PixelViewerForm
@@ -190,7 +193,7 @@ Public Class Pixel_GetSet : Inherits VB_Algorithm
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim rows = src.Height
         Dim cols = src.Width
         Dim output As String = ""
@@ -255,7 +258,7 @@ Public Class Pixel_Measure : Inherits VB_Algorithm
         Dim halfLineInMeters = Math.Tan(0.0174533 * task.hFov / 2) * mmDist
         Return halfLineInMeters * 2 / dst2.Width
     End Function
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static distanceSlider = findSlider("Distance in mm")
         Dim mmPP = Compute(distanceSlider.Value)
         setTrueText("At a distance of " + CStr(distanceSlider.Value) + " mm's the camera's FOV is " +
@@ -280,7 +283,7 @@ Public Class Pixel_Sampler : Inherits VB_Algorithm
     Public Sub New()
         desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
                 If task.drawRect <> New cv.Rect Then
@@ -297,8 +300,8 @@ Public Class Pixel_Sampler : Inherits VB_Algorithm
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim index As New List(Of cv.Point)
         Dim pixels As New List(Of Byte)
-        Dim counts(random.PointList.Count - 1) As Integer
-        For Each pt In random.PointList
+        Dim counts(random.pointList.Count - 1) As Integer
+        For Each pt In random.pointList
             Dim pixel = src.Get(Of Byte)(pt.Y, pt.X)
             If pixel <> 0 Then
                 If pixels.Contains(pixel) Then
@@ -325,7 +328,7 @@ Public Class Pixel_Sampler : Inherits VB_Algorithm
         If standaloneTest() Then
             dst2 = src
             dst2.Rectangle(random.range, cv.Scalar.White, 1)
-            For Each pt In random.PointList
+            For Each pt In random.pointList
                 dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
             Next
             labels(2) = "Dominant gray value = " + CStr(dominantGray)
@@ -347,7 +350,7 @@ Public Class Pixel_SampleColor : Inherits VB_Algorithm
     Public Sub New()
         desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
             If task.heartBeat Then
                 Dim w = 25, h = 25
@@ -383,7 +386,7 @@ Public Class Pixel_SampleColor : Inherits VB_Algorithm
         If standaloneTest() Then
             dst2 = src
             dst2.Rectangle(random.range, cv.Scalar.White, 1)
-            For Each pt In random.PointList
+            For Each pt In random.pointList
                 dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
             Next
             labels(2) = "Dominant color value = " + CStr(maskColor(0)) + ", " + CStr(maskColor(1)) + ", " + CStr(maskColor(2))
@@ -404,7 +407,7 @@ Public Class Pixel_Unstable : Inherits VB_Algorithm
         labels(2) = "KMeans_Basics output"
         desc = "Detect where pixels are unstable"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static kSlider = findSlider("KMeans k")
         Static pixelCounts As New List(Of Integer)
         Static k As Integer = -1
@@ -459,7 +462,7 @@ Public Class Pixel_Zoom : Inherits VB_Algorithm
         zoomSlider = findSlider("Zoom Factor")
         desc = "Zoom into the pixels under the mouse in dst2"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim zoomArray() = {2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16}
         Dim zoomFactor = zoomArray(zoomSlider.Value)
 
@@ -818,5 +821,133 @@ Public Class Pixel_Vectors : Inherits VB_Algorithm
         redCells = redC.redCells
 
         setTrueText("3D color histograms were created for " + CStr(pixelVector.Count) + " cells", 3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Pixel_Mapper : Inherits VB_Algorithm
+    Public colorMap As New cv.Mat(256, 1, cv.MatType.CV_8UC3, 0)
+    Public Sub New()
+        desc = "Resize the input to a small image, convert to gray, and map gray to color"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat Then
+            Dim nSize = New cv.Size(src.Width / 8, src.Height / 8)
+            dst1 = src.Resize(nSize)
+            Dim samples(dst1.Total * dst1.ElemSize - 1) As Byte
+            Marshal.Copy(dst1.Data, samples, 0, samples.Length)
+
+            Dim sorted As New SortedList(Of Integer, cv.Vec3b)(New compareAllowIdenticalIntegerInverted)
+            For i = 0 To samples.Count - 1 Step 3
+                Dim vecA = New cv.Vec3b(samples(i), samples(i + 1), samples(i + 2))
+                Dim gPixel = CInt(vecA(2) * 0.299 + vecA(1) * 0.587 + vecA(0) * 0.114)
+                If sorted.ContainsKey(gPixel) = False Then sorted.Add(gPixel, vecA)
+            Next
+
+            Dim averaged As New SortedList(Of Integer, cv.Vec3b)
+            For i = 0 To sorted.Count - 1
+                Dim ele = sorted.ElementAt(i)
+                Dim index = ele.Key
+                Dim vecA = ele.Value
+                For j = i + 1 To sorted.Count - 1
+                    If ele.Key <> sorted.ElementAt(j).Key Then Exit For
+                    Dim vecB = sorted.ElementAt(j).Value
+                    vecA = New cv.Vec3b(vecA(0) / 2 + vecB(0) / 2, vecA(1) / 2 + vecB(1) / 2, vecA(2) / 2 + vecB(2) / 2)
+                    i = j
+                Next
+                averaged.Add(index, vecA)
+            Next
+
+            Dim vec = averaged.ElementAt(0).Value
+            Dim iAvg = averaged.ElementAt(0).Key
+            For i = 0 To 255
+                If i < averaged.Count Then
+                    If iAvg <> averaged.ElementAt(i).Key Then vec = averaged.ElementAt(i).Value
+                End If
+                colorMap.Set(Of cv.Vec3b)(i, vec)
+            Next
+        End If
+        cv.Cv2.ApplyColorMap(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst2, colorMap)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Pixel_MapLeftRight : Inherits VB_Algorithm
+    Dim mapper As New Pixel_Mapper
+    Public Sub New()
+        labels = {"", "", "Left view with averaged color", "Right view with averaged color"}
+        desc = "Map the left and right grayscale images using the same colormap"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        mapper.Run(src)
+        dst2 = mapper.dst2
+
+        cv.Cv2.ApplyColorMap(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst3, mapper.colorMap)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Pixel_MapDistance : Inherits VB_Algorithm
+    Dim mapper As New Pixel_Mapper
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Distance threshold X100", 1, 100, 50)
+        End If
+        'static firstSlider = findSlider("FirstSlider")
+        'dim testSlider = firstSlider.value
+
+        labels = {"", "", "Left view with averaged color after distance reduction", "Right view with averaged color after distance reduction"}
+        desc = "Map the left and right grayscale images using the same colormap"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        mapper.Run(src)
+        dst2 = mapper.dst2
+
+        Static myColorMap As cv.Mat = mapper.colorMap.Clone
+        If task.heartBeat Then
+            Dim samples(mapper.colorMap.Total * mapper.colorMap.ElemSize - 1) As Byte
+            Marshal.Copy(mapper.colorMap.Data, samples, 0, samples.Length)
+
+            Dim vecs As New List(Of cv.Point3f)
+            Dim vecs3b As New List(Of Byte)
+            For i = 0 To samples.Count - 1 Step 3
+                vecs.Add(New cv.Point3f(samples(i), samples(i + 1), samples(i + 2)))
+                vecs3b.Add(samples(i))
+                vecs3b.Add(samples(i + 1))
+                vecs3b.Add(samples(i + 2))
+            Next
+
+            Dim distances As New List(Of Double)
+            For i = 0 To vecs.Count - 2
+                Dim vecA = vecs(i)
+                Dim vecB = vecs(i + 1)
+                distances.Add(distance3D(vecA, vecB))
+            Next
+
+            Dim avg = distances.Average
+            Dim vec = New cv.Vec3b(vecs3b(0), samples(1), samples(2))
+            For i = 0 To vecs.Count - 1
+                If i < 255 Then If distances(i) > avg Then vec = New cv.Vec3b(vecs3b(i * 3), samples(i * 3 + 1), samples(i * 3 + 2))
+                vecs3b(i * 3) = vec(0)
+                vecs3b(i * 3 + 1) = vec(1)
+                vecs3b(i * 3 + 2) = vec(2)
+            Next
+
+            Marshal.Copy(vecs3b.ToArray, 0, mapper.colorMap.Data, myColorMap.Total * myColorMap.ElemSize)
+        End If
+        cv.Cv2.ApplyColorMap(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst2, myColorMap)
+        cv.Cv2.ApplyColorMap(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst3, myColorMap)
     End Sub
 End Class

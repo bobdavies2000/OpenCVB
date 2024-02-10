@@ -467,9 +467,10 @@ Public Class Cell_Binarize : Inherits VB_Algorithm
             labels(2) = redC.labels(2)
 
             Dim grayMeans As New List(Of Single)
+            Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             For Each rc In redC.redCells
                 Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
-                cv.Cv2.MeanStdDev(task.gray(rc.rect), grayMean, grayStdev, rc.mask)
+                cv.Cv2.MeanStdDev(gray(rc.rect), grayMean, grayStdev, rc.mask)
                 grayMeans.Add(grayMean(0))
             Next
             Dim min = grayMeans.Min
