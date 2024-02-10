@@ -1151,6 +1151,7 @@ Public Class Histogram_Depth : Inherits VB_Algorithm
     Public rc As rcData
     Public mm As mmData
     Public histogram As New cv.Mat
+    Dim maxDepth As New Depth_MaxMask
     Public Sub New()
         desc = "Show depth data as a histogram."
     End Sub
@@ -1184,6 +1185,7 @@ Public Class Histogram_Depth : Inherits VB_Algorithm
             If task.heartBeat Then
                 Dim expected = src.CountNonZero
                 Dim actual = CInt(plot.histogram.Sum(0))
+                maxDepth.Run(src)
                 strOut = "Expected sample count (non-zero task.pcSplit(2) entries):" + vbTab + CStr(expected) + vbCrLf
                 strOut += "Actual sample count from histogram sum:" + vbTab + vbTab + vbTab + CStr(actual) + vbCrLf
                 strOut += "Difference:" + vbTab + vbTab + vbTab + vbTab + vbTab + vbTab + CStr(Math.Abs(actual - expected)) + vbCrLf

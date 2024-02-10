@@ -498,6 +498,12 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
 
         cv.Cv2.CalcBackProject({src}, redOptions.channels, hist.histogram, dst2, redOptions.ranges)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+
+        If task.maxDepthMask.Rows > 0 Then
+            classCount += 1
+            dst2.SetTo(classCount, task.maxDepthMask)
+        End If
+
         If standaloneTest() Then
             labels(3) = "Note that colors are shifting because this is before RedCloud matching."
             dst2 += 1

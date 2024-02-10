@@ -7,6 +7,7 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
     Public classCount As Integer
     Public maskInput As New cv.Mat
     Public simK As New Hist3D_BuildHistogram
+    Dim maxDepth As New Depth_MaxMask
     Public Sub New()
         labels(2) = "dst2 = backprojection of pointcloud (8UC1 format)."
         desc = "Build a 3D histogram from the pointcloud and backproject it to segment the image."
@@ -36,6 +37,7 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
         dst2 = dst2.ConvertScaleAbs
 
         dst2.SetTo(0, task.noDepthMask)
+        maxDepth.Run(src)
         dst2.SetTo(classCount, task.maxDepthMask)
         dst3 = vbPalette(dst2 * 255 / classCount)
 

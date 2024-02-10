@@ -2069,10 +2069,12 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
     Public guided As New GuidedBP_Depth
     Public redMasks As New RedCloud_Masks
     Public combinedCells As New List(Of rcData)
+    Dim maxDepth As New Depth_MaxMask
     Public Sub New()
         desc = "Combined the color and cloud as indicated in the RedOptions panel."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        maxDepth.Run(src)
         If redOptions.UseColor.Checked Or redOptions.UseDepthAndColor.Checked Then
             redMasks.inputMask = Nothing
             If src.Channels = 3 Then
@@ -2158,6 +2160,7 @@ Public Class RedCloud_Both : Inherits VB_Algorithm
         Return tmp
     End Function
     Public Sub RunVB(src As cv.Mat)
+        task.maxDepthMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
         colorClass.Run(src)
         redMasks.Run(colorClass.dst2)
 
@@ -2274,6 +2277,11 @@ Public Class RedCloud_Core : Inherits VB_Algorithm
         dst2 *= classCount / mm.maxVal
         dst2 += givenClassCount + 1
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+
+        If task.maxDepthMask.Rows > 0 Then
+            classCount += 1
+            dst2.SetTo(classCount, task.maxDepthMask)
+        End If
 
         labels(2) = "Reduced Pointcloud - reduction factor = " + CStr(reduceAmt) + " produced " + CStr(classCount) + " regions"
     End Sub

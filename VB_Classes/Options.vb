@@ -4129,10 +4129,10 @@ Public Class Options_Classifier : Inherits VB_Algorithm
     Public Sub RunVB()
         Static inputSlider = findSlider("Random Samples")
         Static frm = findfrm(traceName + " Radio Buttons")
-        For i = 0 To frm.radio.Count - 1
-            If frm.radio(i).Checked Then
+        For i = 0 To frm.check.Count - 1
+            If frm.check(i).Checked Then
                 methodIndex = i
-                methodName = frm.radio(i).Text
+                methodName = frm.check(i).Text
                 Exit For
             End If
         Next

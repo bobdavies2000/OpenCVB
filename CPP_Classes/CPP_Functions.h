@@ -69,7 +69,6 @@ enum functions
     _CPP_ApproxPoly_Hull,
     _CPP_Edge_Segments,
     _CPP_Motion_Basics,
-    _CPP_Edge_MotionAccum,
     _CPP_Edge_MotionFrames,
     _CPP_Edge_Preserving,
     _CPP_EdgeDraw_Basics,

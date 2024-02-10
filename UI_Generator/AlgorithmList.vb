@@ -69,7 +69,6 @@ _CPP_Hull_Basics
 _CPP_ApproxPoly_Hull
 _CPP_Edge_Segments
 _CPP_Motion_Basics
-_CPP_Edge_MotionAccum
 _CPP_Edge_MotionFrames
 _CPP_Edge_Preserving
 _CPP_EdgeDraw_Basics
@@ -320,7 +319,6 @@ if algorithmName = "CPP_Depth_PointCloud_IMU" Then return new CPP_Basics(functio
 if algorithmName = "CPP_Diff_Basics" Then return new CPP_Basics(functionNames._CPP_Diff_Basics)
 if algorithmName = "CPP_Distance_Basics" Then return new CPP_Basics(functionNames._CPP_Distance_Basics)
 if algorithmName = "CPP_Edge_Canny" Then return new CPP_Basics(functionNames._CPP_Edge_Canny)
-if algorithmName = "CPP_Edge_MotionAccum" Then return new CPP_Basics(functionNames._CPP_Edge_MotionAccum)
 if algorithmName = "CPP_Edge_MotionFrames" Then return new CPP_Basics(functionNames._CPP_Edge_MotionFrames)
 if algorithmName = "CPP_Edge_Preserving" Then return new CPP_Basics(functionNames._CPP_Edge_Preserving)
 if algorithmName = "CPP_Edge_Scharr" Then return new CPP_Basics(functionNames._CPP_Edge_Scharr)

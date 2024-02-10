@@ -724,6 +724,7 @@ End Class
 
 Public Class BackProject_MeterByMeter : Inherits VB_Algorithm
     Dim histogram As New cv.Mat
+    Dim maxdepth As New Depth_MaxMask
     Public Sub New()
         desc = "Backproject the depth data at 1 meter intervals WITHOUT A HISTOGRAM."
     End Sub
@@ -740,6 +741,8 @@ Public Class BackProject_MeterByMeter : Inherits VB_Algorithm
         End If
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZmeters)}
         cv.Cv2.CalcBackProject({task.pcSplit(2)}, {0}, histogram, dst1, ranges)
+
+        maxdepth.Run(src)
         dst1.SetTo(task.maxZmeters, task.maxDepthMask)
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
         dst3 = vbPalette(dst1)

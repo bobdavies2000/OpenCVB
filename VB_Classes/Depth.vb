@@ -10,10 +10,13 @@ Public Class Depth_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst2 = task.pcSplit(2)
+
+        task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
+        task.maxDepthMask = task.pcSplit(2).ConvertScaleAbs().InRange(task.maxZmeters, task.maxZmeters)
         dst3 = task.maxDepthMask
         setTrueText(gMatrixToStr(task.gMatrix), 3)
 
-        colorizer.Run(task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc))
+        colorizer.Run(task.pcSplit(2))
         task.depthRGB = colorizer.dst2
     End Sub
 End Class
@@ -885,6 +888,7 @@ Public Class Depth_MaxMask : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst2 = src
+        task.maxDepthMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
         dst2.SetTo(cv.Scalar.White, task.maxDepthMask)
         contour.Run(task.maxDepthMask)
         dst3.SetTo(0)

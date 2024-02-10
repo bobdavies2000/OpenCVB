@@ -44,6 +44,11 @@ Public Class Color_Basics : Inherits VB_Algorithm
             If task.motionReset Then dst2 = classifier.dst2.clone
         End If
 
+        If task.maxDepthMask.Rows > 0 Then
+            classCount += 1
+            dst2.SetTo(classCount, task.maxDepthMask) ' maxdepth area is a 6th class
+        End If
+
         If updateImages Then dst3 = vbPalette(dst2 * 255 / classCount)
         labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) + " pixel classifications"
     End Sub
