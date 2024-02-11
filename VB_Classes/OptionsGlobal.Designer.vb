@@ -439,7 +439,7 @@ Partial Class OptionsGlobal
         Me.ShowGrid.Name = "ShowGrid"
         Me.ShowGrid.Size = New System.Drawing.Size(105, 24)
         Me.ShowGrid.TabIndex = 67
-        Me.ShowGrid.Text = "Show grid"
+        Me.ShowGrid.Text = "Show grid mask overlay"
         Me.ShowGrid.UseVisualStyleBackColor = True
         '
         'debugSyncUI

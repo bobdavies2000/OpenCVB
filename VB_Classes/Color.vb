@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports NAudio.Wave
+Imports cv = OpenCvSharp
 Public Class Color_Basics : Inherits VB_Algorithm
     Public classCount As Integer
     Public classifier As Object
@@ -30,8 +31,8 @@ Public Class Color_Basics : Inherits VB_Algorithm
                     Static binarize As New Binarize_FourWay
                     classifier = binarize
                 Case 6 ' "BackProject_Hue"
-                    Static hue As New BackProject_Hue
-                    classifier = hue
+                    Static backPHue As New BackProject_Hue
+                    classifier = backPHue
             End Select
         End If
 
@@ -48,6 +49,11 @@ Public Class Color_Basics : Inherits VB_Algorithm
             classCount += 1
             dst2.SetTo(classCount, task.maxDepthMask) ' maxdepth area is a 6th class
         End If
+
+        'Static devGrid As New StdevGrid_Sorted
+        'devGrid.Run(task.color)
+        'dst2 += devGrid.dst3
+        'classCount += 1
 
         If updateImages Then dst3 = vbPalette(dst2 * 255 / classCount)
         labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) + " pixel classifications"
@@ -257,7 +263,7 @@ Public Class Color_TopX_VB : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim input = src
-        input = input.Resize(task.minRes, cv.InterpolationFlags.Nearest)
+        input = input.Resize(task.lowRes, cv.InterpolationFlags.Nearest)
 
         Static topXSlider = findSlider("Top X pixels")
         topX.mapTopX = topXSlider.value

@@ -305,6 +305,7 @@ Public Class Binarize_FourWay : Inherits VB_Algorithm
         dst2.SetTo(4, binarize.mats.mat(3))
 
         dst2.SetTo(5, hue.dst2) ' hue is a 5th class
+
         If standaloneTest() Then dst3 = vbPalette((dst2 * 255 / classCount).toMat)
     End Sub
 End Class

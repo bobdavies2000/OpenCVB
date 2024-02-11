@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
-Imports System.Runtime.InteropServices
-Imports System.Collections.Concurrent
 Public Class Grid_Basics : Inherits VB_Algorithm
+    Public gridList As New List(Of cv.Rect)
+    Public updateTaskGridList As Boolean = True
     Public Sub New()
         desc = "Create a grid of squares covering the entire image."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If task.mouseClickFlag And firstPass = False Then
             task.gridROIclicked = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         End If
@@ -14,7 +14,7 @@ Public Class Grid_Basics : Inherits VB_Algorithm
             task.gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8U)
             task.gridToRoiIndex = New cv.Mat(src.Size(), cv.MatType.CV_32S)
 
-            task.gridList.Clear()
+            gridList.Clear()
             task.gridRows = 0
             task.gridCols = 0
             For y = 0 To src.Height - 1 Step gOptions.GridSize.Value
@@ -25,7 +25,7 @@ Public Class Grid_Basics : Inherits VB_Algorithm
                     If roi.Width > 0 And roi.Height > 0 Then
                         If x = 0 Then task.gridRows += 1
                         If y = 0 Then task.gridCols += 1
-                        task.gridList.Add(roi)
+                        gridList.Add(roi)
                     End If
                 Next
             Next
@@ -40,13 +40,13 @@ Public Class Grid_Basics : Inherits VB_Algorithm
                 task.gridMask.Line(p1, p2, 255, task.lineWidth)
             Next
 
-            For i = 0 To task.gridList.Count - 1
-                Dim roi = task.gridList(i)
+            For i = 0 To gridList.Count - 1
+                Dim roi = gridList(i)
                 task.gridToRoiIndex.Rectangle(roi, i, -1)
             Next
 
             task.gridNeighbors.Clear()
-            For Each roi In task.gridList
+            For Each roi In gridList
                 task.gridNeighbors.Add(New List(Of Integer))
                 For i = 0 To 8
                     Dim x = Choose(i + 1, roi.X - 1, roi.X, roi.X + roi.Width + 1,
@@ -65,8 +65,13 @@ Public Class Grid_Basics : Inherits VB_Algorithm
             dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U)
             task.color.CopyTo(dst2)
             dst2.SetTo(cv.Scalar.White, task.gridMask)
-            labels(2) = "Grid_Basics " + CStr(task.gridList.Count) + " (" + CStr(task.gridRows) + "X" + CStr(task.gridCols) + ") " +
+            labels(2) = "Grid_Basics " + CStr(gridList.Count) + " (" + CStr(task.gridRows) + "X" + CStr(task.gridCols) + ") " +
                           CStr(gOptions.GridSize.Value) + "X" + CStr(gOptions.GridSize.Value) + " regions"
+        End If
+
+        If updateTaskGridList Then
+            task.gridList = gridList
+
         End If
     End Sub
 End Class
@@ -398,5 +403,25 @@ Public Class Grid_Special : Inherits VB_Algorithm
             labels(2) = "Grid_Basics " + CStr(gridList.Count) + " (" + CStr(gridRows) + "X" + CStr(gridCols) + ") " +
                           CStr(gridWidth) + "X" + CStr(gridHeight) + " regions"
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Grid_QuarterRes : Inherits VB_Algorithm
+    Public gridList As New List(Of cv.Rect)
+    Dim grid As New Grid_Basics
+    Public Sub New()
+        grid.updateTaskGridList = False
+        desc = "Provide the grid list for the lowest resolution of the current stream."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static inputSrc As New cv.Mat(task.quarterRes, cv.MatType.CV_8U, 0)
+        grid.Run(inputSrc)
+        gridList = grid.gridList
     End Sub
 End Class

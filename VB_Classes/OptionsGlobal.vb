@@ -64,7 +64,7 @@ Public Class OptionsGlobal
                 task.cvFontThickness = 4
                 task.dotSize = 4
                 task.disparityAdjustment = 1.1
-                task.minRes = New cv.Size(240, 135)
+                task.lowRes = New cv.Size(240, 135)
                 task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 40
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
@@ -74,14 +74,14 @@ Public Class OptionsGlobal
                 task.cvFontThickness = 2
                 task.dotSize = 2
                 task.disparityAdjustment = 2.2
-                task.minRes = New cv.Size(240, 135)
+                task.lowRes = New cv.Size(240, 135)
                 task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 200
             Case 480
                 GridSize.Value = 48
                 task.cvFontSize = 1.2
                 task.disparityAdjustment = 4.4
-                task.minRes = New cv.Size(240, 135)
+                task.lowRes = New cv.Size(240, 135)
                 task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 650
             Case 1280
@@ -90,7 +90,7 @@ Public Class OptionsGlobal
                 task.cvFontThickness = 2
                 task.dotSize = 3
                 task.disparityAdjustment = 2.2
-                task.minRes = New cv.Size(320, 180)
+                task.lowRes = New cv.Size(320, 180)
                 task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 150
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
@@ -99,22 +99,22 @@ Public Class OptionsGlobal
                 task.cvFontSize = 1.5
                 task.dotSize = 2
                 task.disparityAdjustment = 4.2
-                task.minRes = New cv.Size(320, task.workingRes.Height / 2)
+                task.lowRes = New cv.Size(320, task.workingRes.Height / 2)
                 task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 200
             Case 320
                 GridSize.Value = 32
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 8.4
-                task.minRes = New cv.Size(320, 180)
+                task.lowRes = New cv.Size(320, 180)
                 task.quarterRes = New cv.Size(320, 180)
-                If task.workingRes.Height = 240 Then task.minRes = New cv.Size(160, 120)
+                If task.workingRes.Height = 240 Then task.lowRes = New cv.Size(160, 120)
                 task.densityMetric = 500
             Case 160
                 GridSize.Value = 16
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 4.4
-                task.minRes = New cv.Size(160, 120)
+                task.lowRes = New cv.Size(160, 120)
                 task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 100
             Case 672
@@ -122,7 +122,7 @@ Public Class OptionsGlobal
                 task.cvFontSize = 1.5
                 task.dotSize = 1
                 task.disparityAdjustment = 4.4
-                task.minRes = New cv.Size(168, 94)
+                task.lowRes = New cv.Size(168, 94)
                 task.quarterRes = New cv.Size(336, 188)
                 task.densityMetric = 300
             Case 336
@@ -130,14 +130,14 @@ Public Class OptionsGlobal
                 task.cvFontSize = 1.0
                 task.dotSize = 1
                 task.disparityAdjustment = 8.8
-                task.minRes = New cv.Size(168, 94)
+                task.lowRes = New cv.Size(168, 94)
                 task.quarterRes = New cv.Size(336, 188)
                 task.densityMetric = 700
             Case 168
                 GridSize.Value = 16
                 task.cvFontSize = 0.5
                 task.disparityAdjustment = 20.0
-                task.minRes = New cv.Size(168, 94)
+                task.lowRes = New cv.Size(168, 94)
                 task.quarterRes = New cv.Size(336, 188)
                 task.densityMetric = 1700
         End Select

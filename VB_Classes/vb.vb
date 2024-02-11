@@ -459,8 +459,8 @@ Module VB
         End If
         Return mm
     End Function
-    Public Function vbMinResize(input As cv.Mat) As cv.Mat
-        Return input.Resize(task.minRes, 0, 0, cv.InterpolationFlags.Nearest)
+    Public Function vblowResize(input As cv.Mat) As cv.Mat
+        Return input.Resize(task.lowRes, 0, 0, cv.InterpolationFlags.Nearest)
     End Function
     Public Function vbPalette(input As cv.Mat) As cv.Mat
         task.palette.Run(input)

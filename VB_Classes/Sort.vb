@@ -279,10 +279,6 @@ Public Class Sort_3Channel : Inherits VB_Algorithm
         Dim tmp = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC4, dst2.Data)
         dst3 = tmp.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
-
-        Dim samples(dst2.Total - 1) As Integer
-        Marshal.Copy(dst2.Data, samples, 0, samples.Length)
-
         'dups.Run(dst2)
         'dst2 = dups.dst2
     End Sub
@@ -297,16 +293,26 @@ End Class
 Public Class Sort_FeatureLess : Inherits VB_Algorithm
     Public devGrid As New StdevGrid_Basics
     Public sort As New Sort_Basics
+    Dim plot As New Plot_Histogram
     Public Sub New()
+        plot.createHistogram = True
+        gOptions.HistBinSlider.Value = 256
+        gOptions.GridSize.Value = 8
         desc = "Sort all the featureless grayscale pixels."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         devGrid.Run(src)
-        dst2 = devGrid.dst3
+        dst2 = devGrid.dst2
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1.SetTo(0, Not dst2)
+        dst1.SetTo(0, Not devGrid.dst3)
 
         sort.Run(dst1)
-        dst3 = sort.dst2
+        ' dst3 = sort.dst2
+
+        Dim samples(sort.dst2.Total - 1) As Byte
+        Marshal.Copy(sort.dst2.Data, samples, 0, samples.Length)
+
+        plot.Run(sort.dst2)
+        dst3 = plot.dst2
     End Sub
 End Class

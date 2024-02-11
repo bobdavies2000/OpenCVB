@@ -50,7 +50,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
                                gOptions.PixelDiffThreshold.Value, gOptions.UseKalman.Checked,
                                task.frameHistoryCount,
                                task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height,
-                               task.lineWidth, task.lineType, task.dotSize, task.minRes.Width, task.minRes.Height,
+                               task.lineWidth, task.lineType, task.dotSize, task.lowRes.Width, task.lowRes.Height,
                                task.maxZmeters, redOptions.PCReduction, task.cvFontSize, task.cvFontThickness,
                                task.clickPoint.X, task.clickPoint.Y, task.mouseClickFlag,
                                task.mousePicTag, task.mouseMovePoint.X, task.mouseMovePoint.Y,

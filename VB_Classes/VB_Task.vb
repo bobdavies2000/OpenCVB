@@ -102,7 +102,7 @@ Public Class VBtask : Implements IDisposable
     Public lineWidth As Integer
     Public lineType As cv.LineTypes
     Public resolutionIndex As Integer
-    Public minRes As cv.Size
+    Public lowRes As cv.Size
     Public quarterRes As cv.Size
     Public displayRes As cv.Size
     Public AddWeighted As Single

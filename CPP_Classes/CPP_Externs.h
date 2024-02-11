@@ -237,7 +237,7 @@ extern "C" __declspec(dllexport)
 void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
                             int histogramBins, int pixelDiffThreshold, bool useKalman,
                             int frameHistory, int rectX, int rectY, int rectWidth, int rectHeight,
-                            int lineWidth, int lineType, int dotSize, int minResWidth, int minResHeight,
+                            int lineWidth, int lineType, int dotSize, int lowResWidth, int lowResHeight,
                             float maxZmeters, int PCReduction, float fontSize, int fontThickness,
                             int clickX, int clickY, bool clickFlag, int picTag, int moveX, int moveY,
                             int paletteIndex, int desiredCells, bool midHeartBeat, bool quarterBeat,
@@ -255,7 +255,7 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
     task->lineWidth = lineWidth;
     task->lineType = lineType;
     task->dotSize = dotSize;
-    task->minRes = Size(minResWidth, minResHeight);
+    task->lowRes = Size(lowResWidth, lowResHeight);
     task->maxZmeters = maxZmeters;
     task->PCReduction = PCReduction;
     task->cvFontSize = fontSize * 0.6;
