@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports System.Drawing.Imaging
-Imports System.Globalization
+Imports System.Windows.Media.Media3D
 
 Public Class Pixel_Viewer : Inherits VB_Algorithm
     Dim firstUpdate = True
@@ -268,74 +267,6 @@ Public Class Pixel_Measure : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class Pixel_Sampler : Inherits VB_Algorithm
-    Public random As New Random_Basics
-    Public dominantGray As Byte
-    Dim width = 25
-    Dim height = 25
-    Public Sub New()
-        desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standaloneTest() Then
-            If task.heartBeat Then
-                If task.drawRect <> New cv.Rect Then
-                    random.range = task.drawRect
-                Else
-                    random.range = New cv.Rect(msRNG.Next(0, src.Width - width), msRNG.Next(0, src.Height - height), width, height)
-                End If
-            End If
-        Else
-            random.range = New cv.Rect(0, 0, src.Width, src.Height)
-        End If
-        random.Run(empty)
-
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim index As New List(Of cv.Point)
-        Dim pixels As New List(Of Byte)
-        Dim counts(random.pointList.Count - 1) As Integer
-        For Each pt In random.pointList
-            Dim pixel = src.Get(Of Byte)(pt.Y, pt.X)
-            If pixel <> 0 Then
-                If pixels.Contains(pixel) Then
-                    counts(pixels.IndexOf(pixel)) += 1
-                Else
-                    pixels.Add(pixel)
-                    counts(pixels.IndexOf(pixel)) = 1
-                End If
-            End If
-        Next
-
-        Dim maxValue = counts.Max
-        If pixels.Count > 0 Then
-            For i = 0 To counts.Count - 1
-                If counts(i) = maxValue Then
-                    dominantGray = pixels.ElementAt(i)
-                    Exit For
-                End If
-            Next
-        Else
-            dominantGray = vbMinMax(src).maxVal
-        End If
-
-        If standaloneTest() Then
-            dst2 = src
-            dst2.Rectangle(random.range, cv.Scalar.White, 1)
-            For Each pt In random.pointList
-                dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
-            Next
-            labels(2) = "Dominant gray value = " + CStr(dominantGray)
-            setTrueText("Draw in the image to select a region for testing.", New cv.Point(10, 200), 3)
-        End If
-    End Sub
-End Class
 
 
 
@@ -902,12 +833,6 @@ End Class
 Public Class Pixel_MapDistance : Inherits VB_Algorithm
     Dim mapper As New Pixel_Mapper
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Distance threshold X100", 1, 100, 50)
-        End If
-        'static firstSlider = findSlider("FirstSlider")
-        'dim testSlider = firstSlider.value
-
         labels = {"", "", "Left view with averaged color after distance reduction", "Right view with averaged color after distance reduction"}
         desc = "Map the left and right grayscale images using the same colormap"
     End Sub
@@ -946,6 +871,159 @@ Public Class Pixel_MapDistance : Inherits VB_Algorithm
             Next
 
             Marshal.Copy(vecs3b.ToArray, 0, mapper.colorMap.Data, myColorMap.Total * myColorMap.ElemSize)
+        End If
+        cv.Cv2.ApplyColorMap(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst2, myColorMap)
+        cv.Cv2.ApplyColorMap(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst3, myColorMap)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Pixel_Sampler : Inherits VB_Algorithm
+    Public random As New Random_Basics
+    Public dominantGray As Byte
+    Dim width = 25
+    Dim height = 25
+    Public Sub New()
+        desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standaloneTest() Then
+            If task.heartBeat Then
+                If task.drawRect <> New cv.Rect Then
+                    random.range = task.drawRect
+                Else
+                    random.range = New cv.Rect(msRNG.Next(0, src.Width - width), msRNG.Next(0, src.Height - height), width, height)
+                End If
+            End If
+        Else
+            random.range = New cv.Rect(0, 0, src.Width, src.Height)
+        End If
+        random.Run(empty)
+
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim index As New List(Of cv.Point)
+        Dim pixels As New List(Of Byte)
+        Dim counts(random.pointList.Count - 1) As Integer
+        For Each pt In random.pointList
+            Dim pixel = src.Get(Of Byte)(pt.Y, pt.X)
+            If pixel <> 0 Then
+                If pixels.Contains(pixel) Then
+                    counts(pixels.IndexOf(pixel)) += 1
+                Else
+                    pixels.Add(pixel)
+                    counts(pixels.IndexOf(pixel)) = 1
+                End If
+            End If
+        Next
+
+        Dim maxValue = counts.Max
+        If pixels.Count > 0 Then
+            For i = 0 To counts.Count - 1
+                If counts(i) = maxValue Then
+                    dominantGray = pixels.ElementAt(i)
+                    Exit For
+                End If
+            Next
+        Else
+            dominantGray = vbMinMax(src).maxVal
+        End If
+
+        If standaloneTest() Then
+            dst2 = src
+            dst2.Rectangle(random.range, cv.Scalar.White, 1)
+            For Each pt In random.pointList
+                dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            Next
+            labels(2) = "Dominant gray value = " + CStr(dominantGray)
+            setTrueText("Draw in the image to select a region for testing.", New cv.Point(10, 200), 3)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Pixel_Display : Inherits VB_Algorithm
+    Public random As New Random_Basics
+    Dim width = 25
+    Dim height = 25
+    Public Sub New()
+        If task.drawRect.Width <> 0 Then
+            random.range = task.drawRect
+        Else
+            random.range = New cv.Rect(msRNG.Next(0, dst2.Width - width), msRNG.Next(0, dst2.Height - height), width, height)
+        End If
+        random.Run(empty)
+        task.drawRect = random.range
+
+        labels(2) = "Draw a rectangle anywhere in the image to see the stats for that region."
+        desc = "Find the pixels within the drawrect and display their stats."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst2 = src
+        If task.heartBeat Then
+            Dim mean As cv.Scalar, stdev As cv.Scalar
+            cv.Cv2.MeanStdDev(src(task.drawRect), mean, stdev)
+            Dim pt = New cv.Vec3i(mean(0), mean(1), mean(2))
+            strOut = "Mean BGR " + pt.ToString() + vbCrLf + "Stdev BGR " + stdev.ToString
+        End If
+        setTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Pixel_ColorGuess : Inherits VB_Algorithm
+    Dim mapper As New Pixel_Mapper
+    Public Sub New()
+        labels = {"", "", "Left view with averaged color after distance reduction", "Right view with averaged color after distance reduction"}
+        desc = "Map the left and right grayscale images using the same colormap"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        mapper.Run(src)
+        dst2 = mapper.dst2
+
+        Static myColorMap As cv.Mat = mapper.colorMap.Clone
+        If task.heartBeat Then
+            Dim samples(mapper.colorMap.Total * mapper.colorMap.ElemSize - 1) As Byte
+            Marshal.Copy(mapper.colorMap.Data, samples, 0, samples.Length)
+
+            Dim vecs As New List(Of Integer)
+            For i = 0 To samples.Count - 1 Step 3
+                vecs.Add(samples(i))
+                vecs.Add(samples(i + 1))
+                vecs.Add(samples(i + 2))
+            Next
+
+            For i = 0 To samples.Count - 1 Step 3
+                If Math.Abs(vecs(i + 1) - vecs(i + 2)) < 10 And vecs(i) < vecs(i + 1) Then
+                    vecs(i) = 0
+                    vecs(i + 1) = 255
+                    vecs(i + 2) = 255
+                    'ElseIf Math.Abs(vecs(i) - vecs(i + 1)) < 10 And vecs(i + 2) < vecs(i + 1) Then
+                    '    vecs(i) = 0
+                    '    vecs(i + 1) = 255
+                    '    vecs(i + 2) = 255
+                End If
+            Next
+
+            For i = 0 To myColorMap.Rows - 1
+                Dim vec = New cv.Vec3b(vecs(i * 3), vecs(i * 3 + 1), vecs(i * 3 + 2))
+                myColorMap.Set(Of cv.Vec3b)(i, 0, vec)
+            Next
         End If
         cv.Cv2.ApplyColorMap(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst2, myColorMap)
         cv.Cv2.ApplyColorMap(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst3, myColorMap)

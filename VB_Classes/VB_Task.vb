@@ -529,6 +529,7 @@ Public Class VBtask : Implements IDisposable
 
                     task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
                     task.noDepthMask = Not task.depthMask
+                    task.maxDepthMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
 
                     If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
                         Dim xRatio = task.xRangeDefault / task.xRange
@@ -577,7 +578,9 @@ Public Class VBtask : Implements IDisposable
 
                 algorithmObject.NextFrame(src)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
-                If task.motionDetected Then task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
+                If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then
+                    task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
+                End If
 
                 Dim rc = task.rc
                 If rc.rect.Width > 1 And rc.rect.Height > 1 Then

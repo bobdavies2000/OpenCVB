@@ -210,9 +210,9 @@ Public Class OptionsGlobal
         If task IsNot Nothing Then task.optionsChanged = True
         labelBinsCount.Text = CStr(HistBinSlider.Value)
     End Sub
-    Private Sub AddWeightedSlider_Scroll_1(sender As Object, e As EventArgs) Handles AddWeightedSlider.Scroll
-        AddWeighted.Text = CStr(AddWeightedSlider.Value)
+    Private Sub AddWeightedSlider_ValueChanged(sender As Object, e As EventArgs) Handles AddWeightedSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
+        AddWeighted.Text = CStr(AddWeightedSlider.Value)
     End Sub
     Private Sub useFilter_CheckedChanged(sender As Object, e As EventArgs) Handles useFilter.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True

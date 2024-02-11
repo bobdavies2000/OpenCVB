@@ -91,43 +91,6 @@ End Class
 
 
 
-Public Class Sort_3Channel : Inherits VB_Algorithm
-    Dim sort As New Sort_Basics
-    Dim dups As New ML_RemoveDups_CPP
-    Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
-        findRadio("Sort all pixels descending").Checked = True
-        labels = {"", "The BGRA input to sort - shown here as 1-channel CV_32S format", "Output of sort - no duplicates", "Input before removing the dups - use slider to increase/decrease the amount of data"}
-        desc = "Take some 3-channel input, convert it to BGRA, sort it as integers, and provide the list of unique elements"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static thresholdSlider = findSlider("Threshold for sort input")
-        Dim inputMask = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If standaloneTest() Then inputMask = inputMask.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
-
-        Static bgra As cv.Mat
-        bgra = src.CvtColor(cv.ColorConversionCodes.BGR2BGRA)
-        dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, bgra.Data)
-
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
-        dst1.CopyTo(dst0, inputMask)
-        sort.Run(dst0)
-        dst2 = sort.dst2.Reshape(1, dst2.Rows)
-        Dim tmp = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC4, dst2.Data)
-        dst3 = tmp.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
-
-        dups.Run(dst2)
-        dst2 = dups.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 
 Public Class Sort_1Channel : Inherits VB_Algorithm
     Dim sort As New Sort_Basics
@@ -185,42 +148,6 @@ Public Class Sort_1Channel : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-'Public Class Sort_FeatureLess : Inherits VB_Algorithm
-'    Public fLess As New FeatureLess_Rects
-'    Public sort As New Sort_1Channel
-'    Public Sub New()
-'        findSlider("Threshold for sort input").Value = 0
-'        desc = "Sort all the featureless grayscale pixels."
-'    End Sub
-'    Public Sub RunVB(src as cv.Mat)
-'        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-'        fLess.Run(src)
-
-'        dst2.SetTo(0)
-'        src += 1 ' pull darkest regions away from zero
-'        src.CopyTo(dst2, fLess.dst2)
-
-'        sort.Run(dst2)
-'        dst3 = sort.dst3
-
-'        dst3(New cv.Rect(0, dst2.Height / 2, dst2.Width, dst2.Height / 2)).SetTo(0)
-'        If task.heartBeat Then
-'            strOut = ""
-'            For i = sort.rangeStart.Count - 1 To 0 Step -1
-'                strOut += "Range " + CStr(sort.rangeStart.Count - i) + " from " + CStr(sort.rangeEnd(i)) + " to " + CStr(sort.rangeStart(i)) + vbCrLf
-'            Next
-'            labels(3) = sort.labels(3)
-'        End If
-'        setTrueText(strOut, New cv.Point(5, dst2.Height / 2 + 5), 3)
-'    End Sub
-'End Class
 
 
 
@@ -317,3 +244,69 @@ End Class
 '        setTrueText(sReduce.sort.strOut, New cv.Point(5, dst2.Height / 2 + 5), 3)
 '    End Sub
 'End Class
+
+
+
+
+
+
+
+
+
+
+Public Class Sort_3Channel : Inherits VB_Algorithm
+    Dim sort As New Sort_Basics
+    Dim dups As New ML_RemoveDups_CPP
+    Public Sub New()
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        findRadio("Sort all pixels descending").Checked = True
+        labels = {"", "The BGRA input to sort - shown here as 1-channel CV_32S format", "Output of sort - no duplicates", "Input before removing the dups - use slider to increase/decrease the amount of data"}
+        desc = "Take some 3-channel input, convert it to BGRA, sort it as integers, and provide the list of unique elements"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static thresholdSlider = findSlider("Threshold for sort input")
+        Dim inputMask = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standaloneTest() Then inputMask = inputMask.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+
+        Static bgra As cv.Mat
+        bgra = src.CvtColor(cv.ColorConversionCodes.BGR2BGRA)
+        dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, bgra.Data)
+
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
+        dst1.CopyTo(dst0, inputMask)
+        sort.Run(dst0)
+        dst2 = sort.dst2.Reshape(1, dst2.Rows)
+        Dim tmp = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC4, dst2.Data)
+        dst3 = tmp.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+
+
+        Dim samples(dst2.Total - 1) As Integer
+        Marshal.Copy(dst2.Data, samples, 0, samples.Length)
+
+        'dups.Run(dst2)
+        'dst2 = dups.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Sort_FeatureLess : Inherits VB_Algorithm
+    Public devGrid As New StdevGrid_Basics
+    Public sort As New Sort_Basics
+    Public Sub New()
+        desc = "Sort all the featureless grayscale pixels."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        devGrid.Run(src)
+        dst2 = devGrid.dst3
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1.SetTo(0, Not dst2)
+
+        sort.Run(dst1)
+        dst3 = sort.dst2
+    End Sub
+End Class

@@ -77,6 +77,7 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
+        Me.ShowMotionRectangle = New System.Windows.Forms.CheckBox()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -335,6 +336,7 @@ Partial Class OptionsGlobal
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.ShowMotionRectangle)
         Me.GroupBox2.Controls.Add(Me.GroupBox1)
         Me.GroupBox2.Controls.Add(Me.ShowGrid)
         Me.GroupBox2.Controls.Add(Me.debugSyncUI)
@@ -513,7 +515,7 @@ Partial Class OptionsGlobal
         'gravityPointCloud
         '
         Me.gravityPointCloud.AutoSize = True
-        Me.gravityPointCloud.Location = New System.Drawing.Point(24, 235)
+        Me.gravityPointCloud.Location = New System.Drawing.Point(24, 262)
         Me.gravityPointCloud.Name = "gravityPointCloud"
         Me.gravityPointCloud.Size = New System.Drawing.Size(294, 24)
         Me.gravityPointCloud.TabIndex = 23
@@ -658,7 +660,7 @@ Partial Class OptionsGlobal
         'UseKalman
         '
         Me.UseKalman.AutoSize = True
-        Me.UseKalman.Location = New System.Drawing.Point(24, 205)
+        Me.UseKalman.Location = New System.Drawing.Point(24, 234)
         Me.UseKalman.Name = "UseKalman"
         Me.UseKalman.Size = New System.Drawing.Size(176, 24)
         Me.UseKalman.TabIndex = 0
@@ -675,6 +677,16 @@ Partial Class OptionsGlobal
         Me.Label8.Text = "All values are restored to their default values at the start of each algorithm.  " &
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
+        '
+        'ShowMotionRectangle
+        '
+        Me.ShowMotionRectangle.AutoSize = True
+        Me.ShowMotionRectangle.Location = New System.Drawing.Point(24, 206)
+        Me.ShowMotionRectangle.Name = "ShowMotionRectangle"
+        Me.ShowMotionRectangle.Size = New System.Drawing.Size(275, 24)
+        Me.ShowMotionRectangle.TabIndex = 70
+        Me.ShowMotionRectangle.Text = "Show the motion rectangle in dst0"
+        Me.ShowMotionRectangle.UseVisualStyleBackColor = True
         '
         'OptionsGlobal
         '
@@ -764,4 +776,5 @@ Partial Class OptionsGlobal
     Friend WithEvents unFiltered As Windows.Forms.RadioButton
     Friend WithEvents MotionFilteredColorOnly As Windows.Forms.RadioButton
     Friend WithEvents MotionFilteredColorAndCloud As Windows.Forms.RadioButton
+    Friend WithEvents ShowMotionRectangle As Windows.Forms.CheckBox
 End Class

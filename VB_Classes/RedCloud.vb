@@ -1516,7 +1516,7 @@ Public Class RedCloud_LeftRight : Inherits VB_Algorithm
     Dim redRight As New RedCloud_Basics
     Public Sub New()
         redOptions.UseColor.Checked = True
-        desc = "Floodfill left and right images after RedCloud color input reduction."
+        desc = "Floodfill left and right images after RedCloud color input reduction.  NOTE: the task.maxDepthMask is wrongly placed in the right view."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redLeft.Run(task.leftView)
@@ -2158,7 +2158,6 @@ Public Class RedCloud_Both : Inherits VB_Algorithm
         Return tmp
     End Function
     Public Sub RunVB(src As cv.Mat)
-        task.maxDepthMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
         colorClass.Run(src)
         redMasks.Run(colorClass.dst2)
 

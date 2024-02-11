@@ -368,3 +368,10 @@ Public Class FeatureLess_RedCloud : Inherits VB_Algorithm
         labels(2) = redC.labels(2)
     End Sub
 End Class
+
+
+
+
+
+
+
