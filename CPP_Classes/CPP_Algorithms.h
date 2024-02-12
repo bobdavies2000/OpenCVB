@@ -2677,7 +2677,7 @@ RedCloud_Run(RedCloud * cPtr, int* dataPtr, unsigned char* maskPtr, int rows, in
 		mask.copyTo(cPtr->mask(r));
 	}
 	cPtr->maskCopy = cPtr->mask.clone();
-	cPtr->RunCPP(maxClassCount, diff, imageThresholdPercent, cellMinPercent);
+	cPtr->RunCPP(maxClassCount - 1, diff, imageThresholdPercent, cellMinPercent); // -1 because the 0th entry is added for the 'other' class
 
 	cPtr->maskCopy(r).copyTo(cPtr->result);
 	return (int*)cPtr->result.data;

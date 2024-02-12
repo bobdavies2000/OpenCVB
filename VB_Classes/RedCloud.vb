@@ -127,6 +127,7 @@ Public Class RedCloud_BasicsColor : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
         identifyCells(redC.redCells)
+        labels(3) = "Method for color source = " + redOptions.colorInputName
     End Sub
 End Class
 
