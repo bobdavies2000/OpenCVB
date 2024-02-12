@@ -723,9 +723,9 @@ End Class
 
 Public Class MSER_Binarize : Inherits VB_Algorithm
     Dim mser As New MSER_Basics
-    Dim binarize As New Binarize_FourWay
+    Dim binarize As New Binarize_Split4
     Public Sub New()
-        desc = "Instead of a BGR src, try using the color output of Binarize_FourWay"
+        desc = "Instead of a BGR src, try using the color output of Binarize_Split4"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binarize.Run(src)

@@ -4,8 +4,6 @@ Public Class Color_Basics : Inherits VB_Algorithm
     Public classCount As Integer
     Public classifier As Object
     Public updateImages As Boolean
-    Dim km As New KMeans_Basics
-    Dim binarize7 As New Binarize_SevenWay
     Public Sub New()
         labels(3) = "vbPalette output of dst2 at left"
         vbAddAdvice(traceName + ": redOptions 'Color Source' control which color source is used.")
@@ -18,6 +16,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
                     Static backP As New BackProject_Full
                     classifier = backP
                 Case 1 ' "KMeans_Basics"
+                    Static km As New KMeans_Basics
                     classifier = km
                 Case 2 ' "LUT_Basics"
                     Static lut As New LUT_Basics
@@ -28,21 +27,26 @@ Public Class Color_Basics : Inherits VB_Algorithm
                 Case 4 ' "Hist3DColor_Basics"
                     Static hColor As New Hist3Dcolor_Basics
                     classifier = hColor
-                Case 5 ' "Binarize_FourWay"
-                    Static binarize4 As New Binarize_FourWay
+                Case 5 ' "Binarize_Split4"
+                    Static binarize4 As New Binarize_Split4
                     classifier = binarize4
-                Case 6 ' "Binarize_FiveWay"
-                    Static binarize5 As New Binarize_FiveWay
+                Case 6 ' "Binarize_Split5"
+                    Static binarize5 As New Binarize_Split5
                     classifier = binarize5
-                Case 7 ' "Binarize_SevenWay"
+                Case 7 ' "Binarize_Split7"
+                    Static binarize7 As New Binarize_Split7
                     classifier = binarize7
-                Case 8 ' "BackProject_Hue"
+                Case 8 ' "Binarize_Split7"
+                    Static binarize12 As New Binarize_Split12
+                    classifier = binarize12
+                Case 9 ' "BackProject_Hue"
                     Static backPHue As New BackProject_Hue
                     classifier = backPHue
             End Select
         End If
 
         dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
+
         classifier.run(dst1)
         If task.motionDetected Then
             classifier.dst2(task.motionRect).copyto(dst2(task.motionRect))

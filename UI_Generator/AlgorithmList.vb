@@ -12,8 +12,8 @@ _CPP_Histogram_RedOptions
 _CPP_Palette_Random
 _CPP_Blur_Basics
 _CPP_Color_Basics
-_CPP_Binarize_FourWayCombine
-_CPP_Binarize_FourWay
+_CPP_Binarize_Split4Combine
+_CPP_Binarize_Split4
 _CPP_Mat_4Click
 _CPP_Area_MinRect
 _CPP_Mesh_Features
@@ -162,17 +162,18 @@ if algorithmName = "BGSubtract_Video" Then return new BGSubtract_Video
 if algorithmName = "Binarize_Basics" Then return new Binarize_Basics
 if algorithmName = "Binarize_Bernson" Then return new Binarize_Bernson
 if algorithmName = "Binarize_Bernson_MT" Then return new Binarize_Bernson_MT
-if algorithmName = "Binarize_FiveWay" Then return new Binarize_FiveWay
 if algorithmName = "Binarize_Four" Then return new Binarize_Four
 if algorithmName = "Binarize_FourPixelFlips" Then return new Binarize_FourPixelFlips
-if algorithmName = "Binarize_FourWay" Then return new Binarize_FourWay
 if algorithmName = "Binarize_KMeansMasks" Then return new Binarize_KMeansMasks
 if algorithmName = "Binarize_KMeansRGB" Then return new Binarize_KMeansRGB
 if algorithmName = "Binarize_Niblack_Nick" Then return new Binarize_Niblack_Nick
 if algorithmName = "Binarize_Niblack_Sauvola" Then return new Binarize_Niblack_Sauvola
 if algorithmName = "Binarize_OTSU" Then return new Binarize_OTSU
-if algorithmName = "Binarize_SevenWay" Then return new Binarize_SevenWay
 if algorithmName = "Binarize_Simple" Then return new Binarize_Simple
+if algorithmName = "Binarize_Split12" Then return new Binarize_Split12
+if algorithmName = "Binarize_Split4" Then return new Binarize_Split4
+if algorithmName = "Binarize_Split5" Then return new Binarize_Split5
+if algorithmName = "Binarize_Split7" Then return new Binarize_Split7
 if algorithmName = "Bitmap_ToMat" Then return new Bitmap_ToMat
 if algorithmName = "Blob_Basics" Then return new Blob_Basics
 if algorithmName = "Blob_Input" Then return new Blob_Input
@@ -306,9 +307,9 @@ if algorithmName = "CPP_Area_MinRect" Then return new CPP_Basics(functionNames._
 if algorithmName = "CPP_BackProject_Basics" Then return new CPP_Basics(functionNames._CPP_BackProject_Basics)
 if algorithmName = "CPP_Bezier_Basics" Then return new CPP_Basics(functionNames._CPP_Bezier_Basics)
 if algorithmName = "CPP_BGSubtract_Basics" Then return new CPP_Basics(functionNames._CPP_BGSubtract_Basics)
-if algorithmName = "CPP_Binarize_FourWay" Then return new CPP_Basics(functionNames._CPP_Binarize_FourWay)
-if algorithmName = "CPP_Binarize_FourWayCombine" Then return new CPP_Basics(functionNames._CPP_Binarize_FourWayCombine)
 if algorithmName = "CPP_Binarize_Simple" Then return new CPP_Basics(functionNames._CPP_Binarize_Simple)
+if algorithmName = "CPP_Binarize_Split4" Then return new CPP_Basics(functionNames._CPP_Binarize_Split4)
+if algorithmName = "CPP_Binarize_Split4Combine" Then return new CPP_Basics(functionNames._CPP_Binarize_Split4Combine)
 if algorithmName = "CPP_Blur_Basics" Then return new CPP_Basics(functionNames._CPP_Blur_Basics)
 if algorithmName = "CPP_Color_Basics" Then return new CPP_Basics(functionNames._CPP_Color_Basics)
 if algorithmName = "CPP_Contour_Largest" Then return new CPP_Basics(functionNames._CPP_Contour_Largest)
@@ -1061,7 +1062,6 @@ if algorithmName = "MeanSubtraction_Basics" Then return new MeanSubtraction_Basi
 if algorithmName = "Mesh_Agast" Then return new Mesh_Agast
 if algorithmName = "Mesh_Basics" Then return new Mesh_Basics
 if algorithmName = "Mesh_Features" Then return new Mesh_Features
-if algorithmName = "MeterMap_Basics" Then return new MeterMap_Basics
 if algorithmName = "MiniCloud_Basics" Then return new MiniCloud_Basics
 if algorithmName = "MiniCloud_Rotate" Then return new MiniCloud_Rotate
 if algorithmName = "MiniCloud_RotateAngle" Then return new MiniCloud_RotateAngle

@@ -53,10 +53,10 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 	{task->alg = new CPP_Blur_Basics(); break; }
 	case _CPP_Color_Basics :
 	{task->alg = new CPP_Color_Basics(); break; }
-	case _CPP_Binarize_FourWayCombine :
-	{task->alg = new CPP_Binarize_FourWayCombine(); break; }
-	case _CPP_Binarize_FourWay :
-	{task->alg = new CPP_Binarize_FourWay(); break; }
+	case _CPP_Binarize_Split4Combine :
+	{task->alg = new CPP_Binarize_Split4Combine(); break; }
+	case _CPP_Binarize_Split4 :
+	{task->alg = new CPP_Binarize_Split4(); break; }
 	case _CPP_Mat_4Click :
 	{task->alg = new CPP_Mat_4Click(); break; }
 	case _CPP_Area_MinRect :
