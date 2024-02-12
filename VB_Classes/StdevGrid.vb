@@ -67,31 +67,43 @@ End Class
 
 Public Class StdevGrid_Sorted : Inherits VB_Algorithm
     Dim addw As New AddWeighted_Basics
-    Dim grid As New Grid_QuarterRes
+    Dim gridLow As New Grid_LowRes
+    Dim gridQuarter As New Grid_QuarterRes
+    Dim myRes = task.lowRes
     Public sortedStd As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingle)
     Public Sub New()
-        If standalone Then gOptions.GridSize.Value = 8
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        gOptions.GridSize.Value = If(task.lowRes = myRes, 4, 8)
         labels(2) = "Use the AddWeighted slider to observe where stdev is above average."
         desc = "Sort the roi's by the sum of their bgr stdev's to find the least volatile regions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.optionsChanged Then grid.Run(src)
+        Static gridList As New List(Of cv.Rect)
+        If task.optionsChanged Then
+            If myRes = task.lowRes Then
+                gridLow.Run(src)
+                gridList = gridLow.gridList
+            Else
+                gridQuarter.Run(src)
+                gridList = gridQuarter.gridList
+            End If
+        End If
 
-        Dim srcSmall = src.Resize(task.quarterRes)
+        Dim srcSmall As cv.Mat = src.Resize(myRes)
         Dim mean As cv.Scalar, stdev As cv.Scalar
         sortedStd.Clear()
-        Dim ratio = CInt(src.Width / task.quarterRes.Width)
-        For Each roi In grid.gridList
-            cv.Cv2.MeanStdDev(srcSmall(roi), mean, stdev)
+        Dim ratio = CInt(src.Width / myRes.Width)
+        For Each roi In gridList
+            Dim tmp As cv.Mat = srcSmall(roi)
+            cv.Cv2.MeanStdDev(tmp, mean, stdev)
             If ratio <> 1 Then roi = New cv.Rect(roi.X * ratio, roi.Y * ratio, roi.Width * ratio, roi.Height * ratio)
             sortedStd.Add(stdev(0) + stdev(1) + stdev(2), roi)
         Next
         Dim avg = sortedStd.Keys.Average
 
-        dst2 = New cv.Mat(srcSmall.Size, cv.MatType.CV_8U, 0)
         Dim count As Integer, maskVal = 255
         If standalone = False Then maskVal = 1
+        dst2.SetTo(0)
         For i = 0 To sortedStd.Count - 1
             Dim nextStdev = sortedStd.ElementAt(i).Key
             If nextStdev < avg Then

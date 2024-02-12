@@ -30,43 +30,44 @@ Public Class Grid_Basics : Inherits VB_Algorithm
                 Next
             Next
 
-            task.gridMask.SetTo(0)
-            For x = gOptions.GridSize.Value To src.Width - 1 Step gOptions.GridSize.Value
-                Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, src.Height)
-                task.gridMask.Line(p1, p2, 255, task.lineWidth)
-            Next
-            For y = gOptions.GridSize.Value To src.Height - 1 Step gOptions.GridSize.Value
-                Dim p1 = New cv.Point(0, y), p2 = New cv.Point(src.Width, y)
-                task.gridMask.Line(p1, p2, 255, task.lineWidth)
-            Next
+            If src.Size = task.color.Size Then
+                task.gridMask.SetTo(0)
+                For x = gOptions.GridSize.Value To src.Width - 1 Step gOptions.GridSize.Value
+                    Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, src.Height)
+                    task.gridMask.Line(p1, p2, 255, task.lineWidth)
+                Next
+                For y = gOptions.GridSize.Value To src.Height - 1 Step gOptions.GridSize.Value
+                    Dim p1 = New cv.Point(0, y), p2 = New cv.Point(src.Width, y)
+                    task.gridMask.Line(p1, p2, 255, task.lineWidth)
+                Next
 
-            For i = 0 To gridList.Count - 1
-                Dim roi = gridList(i)
-                task.gridToRoiIndex.Rectangle(roi, i, -1)
-            Next
+                For i = 0 To gridList.Count - 1
+                    Dim roi = gridList(i)
+                    task.gridToRoiIndex.Rectangle(roi, i, -1)
+                Next
 
-            task.gridNeighbors.Clear()
-            For Each roi In gridList
-                task.gridNeighbors.Add(New List(Of Integer))
-                For i = 0 To 8
-                    Dim x = Choose(i + 1, roi.X - 1, roi.X, roi.X + roi.Width + 1,
+                task.gridNeighbors.Clear()
+                For Each roi In gridList
+                    task.gridNeighbors.Add(New List(Of Integer))
+                    For i = 0 To 8
+                        Dim x = Choose(i + 1, roi.X - 1, roi.X, roi.X + roi.Width + 1,
                                           roi.X - 1, roi.X, roi.X + roi.Width + 1,
                                           roi.X - 1, roi.X, roi.X + roi.Width + 1)
-                    Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
+                        Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
                                           roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
-                    If x >= 0 And x < src.Width And y >= 0 And y < src.Height Then
-                        task.gridNeighbors(task.gridNeighbors.Count - 1).Add(task.gridToRoiIndex.Get(Of Integer)(y, x))
-                    End If
+                        If x >= 0 And x < src.Width And y >= 0 And y < src.Height Then
+                            task.gridNeighbors(task.gridNeighbors.Count - 1).Add(task.gridToRoiIndex.Get(Of Integer)(y, x))
+                        End If
+                    Next
                 Next
-            Next
-
+            End If
         End If
         If standaloneTest() Then
             dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U)
             task.color.CopyTo(dst2)
             dst2.SetTo(cv.Scalar.White, task.gridMask)
             labels(2) = "Grid_Basics " + CStr(gridList.Count) + " (" + CStr(task.gridRows) + "X" + CStr(task.gridCols) + ") " +
-                          CStr(gOptions.GridSize.Value) + "X" + CStr(gOptions.GridSize.Value) + " regions"
+                              CStr(gOptions.GridSize.Value) + "X" + CStr(gOptions.GridSize.Value) + " regions"
         End If
 
         If updateTaskGridList Then
@@ -421,6 +422,26 @@ Public Class Grid_QuarterRes : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static inputSrc As New cv.Mat(task.quarterRes, cv.MatType.CV_8U, 0)
+        grid.Run(inputSrc)
+        gridList = grid.gridList
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Grid_LowRes : Inherits VB_Algorithm
+    Public gridList As New List(Of cv.Rect)
+    Dim grid As New Grid_Basics
+    Public Sub New()
+        grid.updateTaskGridList = False
+        desc = "Provide the grid list for the lowest resolution of the current stream."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static inputSrc As New cv.Mat(task.lowRes, cv.MatType.CV_8U, 0)
         grid.Run(inputSrc)
         gridList = grid.gridList
     End Sub

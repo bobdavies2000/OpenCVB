@@ -704,6 +704,7 @@ if algorithmName = "Grid_Basics" Then return new Grid_Basics
 if algorithmName = "Grid_BasicsTest" Then return new Grid_BasicsTest
 if algorithmName = "Grid_FPS" Then return new Grid_FPS
 if algorithmName = "Grid_List" Then return new Grid_List
+if algorithmName = "Grid_LowRes" Then return new Grid_LowRes
 if algorithmName = "Grid_Neighbors" Then return new Grid_Neighbors
 if algorithmName = "Grid_QuarterRes" Then return new Grid_QuarterRes
 if algorithmName = "Grid_Rectangles" Then return new Grid_Rectangles
