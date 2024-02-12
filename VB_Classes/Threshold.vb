@@ -109,12 +109,12 @@ Public Class Threshold_ByChannels : Inherits VB_Algorithm
 
         If options.inputGray Then
             src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            dst2 = src.Threshold(optionsColor.red, 255, options.thresholdMethod)
+            dst2 = src.Threshold(optionsColor.redS, 255, options.thresholdMethod)
         Else
             Dim split = src.Split()
-            split(0) = split(0).Threshold(optionsColor.blue, 255, options.thresholdMethod)
-            split(1) = split(1).Threshold(optionsColor.green, 255, options.thresholdMethod)
-            split(2) = split(2).Threshold(optionsColor.red, 255, options.thresholdMethod)
+            split(0) = split(0).Threshold(optionsColor.blueS, 255, options.thresholdMethod)
+            split(1) = split(1).Threshold(optionsColor.greenS, 255, options.thresholdMethod)
+            split(2) = split(2).Threshold(optionsColor.redS, 255, options.thresholdMethod)
             cv.Cv2.Merge(split, dst2)
         End If
         dst3 = Not dst2

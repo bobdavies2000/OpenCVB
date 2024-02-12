@@ -11,7 +11,7 @@ Public Class Math_Subtract : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
 
-        Dim bgr = New cv.Scalar(options.blue, options.green, options.red)
+        Dim bgr = New cv.Scalar(options.blueS, options.greenS, options.redS)
         cv.Cv2.Subtract(bgr, src, dst2) ' or dst2 = bgr - src
         dst3 = src - bgr
 

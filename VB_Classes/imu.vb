@@ -683,7 +683,7 @@ End Class
 
 Public Class IMU_Plot : Inherits VB_Algorithm
     Dim plot As New Plot_OverTimeScalar
-    Public blue As Single, green As Single, red As Single
+    Public blueA As Single, greenA As Single, redA As Single
     Public Sub New()
         If findfrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)
@@ -700,9 +700,9 @@ Public Class IMU_Plot : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            blue = task.IMU_AngularVelocity.X * 1000
-            green = task.IMU_AngularVelocity.Y * 1000
-            red = task.IMU_AngularVelocity.Z * 1000
+            blueA = task.IMU_AngularVelocity.X * 1000
+            greenA = task.IMU_AngularVelocity.Y * 1000
+            redA = task.IMU_AngularVelocity.Z * 1000
         End If
 
         Static blueCheck = findCheckBox("Blue Variable")
@@ -711,9 +711,9 @@ Public Class IMU_Plot : Inherits VB_Algorithm
 
         Dim blueX As Single, greenX As Single, redX As Single
 
-        If blueCheck.checked Then blueX = blue
-        If greenCheck.checked Then greenX = green
-        If redCheck.checked Then redX = red
+        If blueCheck.checked Then blueX = blueA
+        If greenCheck.checked Then greenX = greenA
+        If redCheck.checked Then redX = redA
 
         plot.plotData = New cv.Scalar(blueX, greenX, redX)
         plot.Run(empty)

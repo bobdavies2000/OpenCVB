@@ -80,10 +80,11 @@ Public Class Palette_Color : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        dst2.SetTo(New cv.Scalar(options.blue, options.green, options.red))
-        dst3.SetTo(New cv.Scalar(255 - options.blue, 255 - options.green, 255 - options.red))
-        labels(2) = "Color (RGB) = " + CStr(options.blue) + " " + CStr(options.green) + " " + CStr(options.red)
-        labels(3) = "Color (255 - RGB) = " + CStr(255 - options.blue) + " " + CStr(255 - options.green) + " " + CStr(255 - options.red)
+        dst2.SetTo(New cv.Scalar(options.blueS, options.greenS, options.redS))
+        dst3.SetTo(New cv.Scalar(255 - options.blueS, 255 - options.greenS, 255 - options.redS))
+        labels(2) = "Color (RGB) = " + CStr(options.blueS) + " " + CStr(options.greenS) + " " + CStr(options.redS)
+        labels(3) = "Color (255 - RGB) = " + CStr(255 - options.blueS) + " " + CStr(255 - options.greenS) + " " +
+                     CStr(255 - options.redS)
     End Sub
 End Class
 

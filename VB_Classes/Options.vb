@@ -4344,9 +4344,9 @@ End Class
 
 
 Public Class Options_Colors : Inherits VB_Algorithm
-    Public red As Integer
-    Public green As Integer
-    Public blue As Integer
+    Public redS As Integer
+    Public greenS As Integer
+    Public blueS As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.Setup(traceName)
@@ -4359,9 +4359,9 @@ Public Class Options_Colors : Inherits VB_Algorithm
         Static redSlider = findSlider("Red")
         Static greenSlider = findSlider("Green")
         Static blueSlider = findSlider("Blue")
-        red = redSlider.Value
-        green = greenSlider.Value
-        blue = blueSlider.Value
+        redS = redSlider.Value
+        greenS = greenSlider.Value
+        blueS = blueSlider.Value
     End Sub
 End Class
 

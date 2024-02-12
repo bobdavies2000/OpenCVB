@@ -71,6 +71,9 @@ Public Class StdevGrid_Sorted : Inherits VB_Algorithm
     Dim gridQuarter As New Grid_QuarterRes
     Dim myRes = task.lowRes
     Public sortedStd As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingle)
+    Public bgrList As New List(Of cv.Vec3b)
+    Public roiList As New List(Of cv.Rect)
+    Public categories() As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         gOptions.GridSize.Value = If(task.lowRes = myRes, 4, 8)
@@ -90,14 +93,40 @@ Public Class StdevGrid_Sorted : Inherits VB_Algorithm
         End If
 
         Dim srcSmall As cv.Mat = src.Resize(myRes)
-        Dim mean As cv.Scalar, stdev As cv.Scalar
+        Dim meanS As cv.Scalar, stdev As cv.Scalar
         sortedStd.Clear()
-        Dim ratio = CInt(src.Width / myRes.Width)
-        For Each roi In gridList
+        Dim ratio = src.Width / myRes.Width
+        bgrList.Clear()
+        roiList.Clear()
+        ReDim categories(8)
+        For i = 0 To gridList.Count - 1
+            Dim roi = gridList(i)
             Dim tmp As cv.Mat = srcSmall(roi)
-            cv.Cv2.MeanStdDev(tmp, mean, stdev)
+            cv.Cv2.MeanStdDev(tmp, meanS, stdev)
             If ratio <> 1 Then roi = New cv.Rect(roi.X * ratio, roi.Y * ratio, roi.Width * ratio, roi.Height * ratio)
             sortedStd.Add(stdev(0) + stdev(1) + stdev(2), roi)
+            Dim colorIndex As Integer = 1
+            Dim mean As cv.Vec3i = New cv.Vec3i(CInt(meanS(0)), CInt(meanS(1)), CInt(meanS(2)))
+            If mean(1) = mean(2) Then
+                colorIndex = 2
+            ElseIf mean(0) = mean(2) Then
+                colorIndex = 3
+            ElseIf mean(0) = mean(1) Then
+                colorIndex = 4
+            ElseIf mean(0) > mean(1) And mean(0) > mean(2) Then
+                colorIndex = 5
+            ElseIf mean(1) > mean(0) And mean(1) > mean(2) Then
+                colorIndex = 6
+            ElseIf mean(2) > mean(0) And mean(2) > mean(0) Then
+                colorIndex = 7
+            ElseIf mean(0) = mean(1) And mean(1) = mean(2) Then
+                colorIndex = 8
+            End If
+
+            Dim color = Choose(colorIndex, black, yellow, purple, teal, blue, green, red, white)
+            categories(colorIndex) += 1
+            bgrList.Add(color)
+            roiList.Add(roi)
         Next
         Dim avg = sortedStd.Keys.Average
 
@@ -107,7 +136,8 @@ Public Class StdevGrid_Sorted : Inherits VB_Algorithm
         For i = 0 To sortedStd.Count - 1
             Dim nextStdev = sortedStd.ElementAt(i).Key
             If nextStdev < avg Then
-                dst2(sortedStd.ElementAt(i).Value).SetTo(maskVal)
+                Dim roi = sortedStd.ElementAt(i).Value
+                dst2(roi).SetTo(maskVal)
                 count += 1
             End If
         Next
@@ -121,5 +151,34 @@ Public Class StdevGrid_Sorted : Inherits VB_Algorithm
 
         labels(3) = $"{count} roi's or " + Format(count / sortedStd.Count, "0%") + " have an average stdev sum of " +
                     Format(avg, fmt1) + " or less"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class StdevGrid_ColorSplit : Inherits VB_Algorithm
+    Dim devGrid As New StdevGrid_Sorted
+    Public Sub New()
+        desc = "Split each pixel into one of 7 categories - yellow, purple, teal, blue, green, red, black or white "
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        devGrid.Run(src)
+
+        For i = 0 To devGrid.bgrList.Count - 1
+            Dim roi = devGrid.roiList(i)
+            Dim color = devGrid.bgrList(i)
+            dst2(roi).SetTo(color)
+        Next
+
+        strOut = "Categories:" + vbCrLf
+        For i = 1 To devGrid.categories.Count - 1
+            Dim colorName = Choose(i, "black", "yellow", "purple", "teal", "blue", "green", "red", "white")
+            strOut += colorName + vbTab + CStr(devGrid.categories(i)) + vbCrLf
+        Next
+        setTrueText(strOut, 3)
     End Sub
 End Class

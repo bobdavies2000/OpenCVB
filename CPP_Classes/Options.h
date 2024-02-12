@@ -260,9 +260,9 @@ public:
 
 class CPP_Options_Colors {
 public:
-	int red;
-	int green;
-	int blue;
+	int redS;
+	int greenS;
+	int blueS;
 	CPP_Options_Colors() {
 	}
 	void RunVB() {}

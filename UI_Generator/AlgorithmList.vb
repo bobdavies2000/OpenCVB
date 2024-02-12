@@ -1687,6 +1687,7 @@ if algorithmName = "Stable_GoodFeatures" Then return new Stable_GoodFeatures
 if algorithmName = "Stable_Lines" Then return new Stable_Lines
 if algorithmName = "StdevGrid_Basics" Then return new StdevGrid_Basics
 if algorithmName = "StdevGrid_Canny" Then return new StdevGrid_Canny
+if algorithmName = "StdevGrid_ColorSplit" Then return new StdevGrid_ColorSplit
 if algorithmName = "StdevGrid_Sorted" Then return new StdevGrid_Sorted
 if algorithmName = "SteadyCam_Basics" Then return new SteadyCam_Basics
 if algorithmName = "Stitch_Basics" Then return new Stitch_Basics
