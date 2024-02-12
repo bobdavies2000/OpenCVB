@@ -115,6 +115,25 @@ End Class
 
 
 
+
+Public Class RedCloud_BasicsColor : Inherits VB_Algorithm
+    Public redC As New RedCloud_Basics
+    Public Sub New()
+        redOptions.UseColor.Checked = True  ' <<<<<<< this is what is different.
+        desc = "Create RedCloud output using only color."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+        identifyCells(redC.redCells)
+    End Sub
+End Class
+
+
+
+
+
 Public Class RedCloud_OnlyCore : Inherits VB_Algorithm
     Dim prep As New RedCloud_Core
     Public redC As New RedCloud_Basics
@@ -1438,28 +1457,10 @@ End Class
 
 
 
-Public Class RedCloud_OnlyColor : Inherits VB_Algorithm
-    Public redC As New RedCloud_Basics
-    Public Sub New()
-        redOptions.UseColor.Checked = True  ' <<<<<<< this is what is different.
-        desc = "Create RedCloud output using only color."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-    End Sub
-End Class
 
 
 
-
-
-
-
-
-
-Public Class RedCloud_BinarizeColor : Inherits VB_Algorithm
+Public Class RedCloud_FourColor : Inherits VB_Algorithm
     Dim binarize As New Binarize_FourWay
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -1642,10 +1643,10 @@ End Class
 
 
 Public Class RedCloud_OnlyColorHist3D : Inherits VB_Algorithm
-    Dim rMin As New RedCloud_OnlyColor
+    Dim rMin As New RedCloud_BasicsColor
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
-        desc = "Use the backprojection of the 3D RGB histogram as input to RedCloud_OnlyColor."
+        desc = "Use the backprojection of the 3D RGB histogram as input to RedCloud_BasicsColor."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         hColor.Run(src)

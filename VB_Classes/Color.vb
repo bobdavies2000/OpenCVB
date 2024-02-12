@@ -4,6 +4,8 @@ Public Class Color_Basics : Inherits VB_Algorithm
     Public classCount As Integer
     Public classifier As Object
     Public updateImages As Boolean
+    Dim km As New KMeans_Basics
+    Dim binarize7 As New Binarize_SevenWay
     Public Sub New()
         labels(3) = "vbPalette output of dst2 at left"
         vbAddAdvice(traceName + ": redOptions 'Color Source' control which color source is used.")
@@ -16,7 +18,6 @@ Public Class Color_Basics : Inherits VB_Algorithm
                     Static backP As New BackProject_Full
                     classifier = backP
                 Case 1 ' "KMeans_Basics"
-                    Static km As New KMeans_Basics
                     classifier = km
                 Case 2 ' "LUT_Basics"
                     Static lut As New LUT_Basics
@@ -28,9 +29,14 @@ Public Class Color_Basics : Inherits VB_Algorithm
                     Static hColor As New Hist3Dcolor_Basics
                     classifier = hColor
                 Case 5 ' "Binarize_FourWay"
-                    Static binarize As New Binarize_FourWay
-                    classifier = binarize
-                Case 6 ' "BackProject_Hue"
+                    Static binarize4 As New Binarize_FourWay
+                    classifier = binarize4
+                Case 6 ' "Binarize_FiveWay"
+                    Static binarize5 As New Binarize_FiveWay
+                    classifier = binarize5
+                Case 7 ' "Binarize_SevenWay"
+                    classifier = binarize7
+                Case 8 ' "BackProject_Hue"
                     Static backPHue As New BackProject_Hue
                     classifier = backPHue
             End Select
@@ -398,5 +404,26 @@ Public Class Color_Hue : Inherits VB_Algorithm
         Dim loBins As cv.Scalar = New cv.Scalar(0, 40, 32)
         Dim hiBins As cv.Scalar = New cv.Scalar(180, 255, 255)
         dst2 = hsv.InRange(loBins, hiBins)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Color_BlackAndWhite : Inherits VB_Algorithm
+    Dim options As New Options_StdevGrid
+    Public Sub New()
+        labels = {"", "", "Mask to identify all 'black' regions", "Mask identifies all 'white' regions"}
+        desc = "Create masks for black and white"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = dst1.Threshold(options.minThreshold, 255, cv.ThresholdTypes.BinaryInv)
+        dst3 = dst1.Threshold(options.maxThreshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class

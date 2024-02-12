@@ -3,7 +3,7 @@ Imports System.ComponentModel
 Imports System.Windows.Forms
 Imports System.Drawing
 Public Class OptionsContainer
-    Public optionsTitle As New List(Of String)
+    Dim optionsTitle As New List(Of String)
     Public hiddenOptions As New List(Of String)
     Public titlesAdded As Boolean
     Public offset = 30

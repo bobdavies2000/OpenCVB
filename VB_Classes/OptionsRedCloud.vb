@@ -67,12 +67,12 @@ Public Class OptionsRedCloud
         task.channelsTop = {2, 0}
         task.channelsSide = {1, 2}
 
-        For i = 0 To 6
+        For i = 0 To 8
             Dim method = Choose(i + 1, "Hist3DColor_Basics", "BackProject_Full", "KMeans_Basics", "LUT_Basics",
-                                "Reduction_Basics", "Binarize_FourWay", "BackProject_Hue")
+                                "Reduction_Basics", "Binarize_FourWay", "Binarize_FiveWay", "Binarize_SevenWay", "BackProject_Hue")
             ColorSource.Items.Add(method)
         Next
-        ColorSource.SelectedItem() = "Binarize_FourWay"
+        ColorSource.SelectedItem() = "Binarize_FiveWay"
 
         SimpleReduction.Checked = True
         PCReduction = 3
@@ -275,6 +275,8 @@ Public Class OptionsRedCloud
     Private Sub UseColor_CheckedChanged(sender As Object, e As EventArgs) Handles UseColor.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
+
+
 
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ColorSource.SelectedIndexChanged
         If task IsNot Nothing Then task.optionsChanged = True

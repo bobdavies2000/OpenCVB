@@ -44,7 +44,7 @@ Public Class Puzzle_Solver : Inherits VB_Algorithm
     Public puzzle As New Puzzle_Basics
     Dim solution As New List(Of cv.Rect)
     Dim match As New Match_Basics
-    Public gray As cv.Mat
+    Public grayMat As cv.Mat
     Public Sub New()
         If standaloneTest() Then gOptions.GridSize.Value = 8
         If findfrm(traceName + " CheckBoxes") Is Nothing Then
@@ -64,15 +64,15 @@ Public Class Puzzle_Solver : Inherits VB_Algorithm
             puzzle.Run(src)
             dst2 = puzzle.dst2
             dst3.SetTo(0)
-            gray = puzzle.image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            grayMat = puzzle.image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             puzzleIndex = 0
         End If
 
         If puzzle.scrambled.Count > puzzle.unscrambled.Count Then
             ' find one piece of the puzzle on each iteration.
             Dim rect = puzzle.scrambled(puzzleIndex)
-            match.template = gray(rect)
-            match.Run(gray)
+            match.template = grayMat(rect)
+            match.Run(grayMat)
             Dim maxloc = New cv.Point2f(match.drawRect.X, match.drawRect.Y)
             Dim bestRect = New cv.Rect(maxloc.X, maxloc.Y, rect.Width, rect.Height)
             puzzle.unscrambled.Add(bestRect)
@@ -98,7 +98,7 @@ Public Class Puzzle_SolverDynamic : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         puzzle.puzzle.image = src.Clone
-        puzzle.gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        puzzle.grayMat = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         puzzle.Run(src)
         dst2 = puzzle.dst2
         dst3 = puzzle.dst3

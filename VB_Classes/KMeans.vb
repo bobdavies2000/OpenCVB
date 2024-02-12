@@ -198,7 +198,6 @@ End Class
 Public Class KMeans_Simple_CPP : Inherits VB_Algorithm
     Public Sub New()
         cPtr = Kmeans_Simple_Open()
-        gOptions.MaxDepth.Value = 4
         desc = "Split the input into 3 levels - zero (no depth), closer to min, closer to max."
     End Sub
     Public Sub RunVB(src As cv.Mat)

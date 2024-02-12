@@ -36,7 +36,7 @@ Public Class VB_Algorithm : Implements IDisposable
     Dim callStack = ""
     Public nearColor = cv.Scalar.Yellow
     Public farColor = cv.Scalar.Blue
-    Public black As New cv.Vec3b, white As New cv.Vec3b(255, 255, 255)
+    Public black As New cv.Vec3b, white As New cv.Vec3b(255, 255, 255), gray As New cv.Vec3b(127, 127, 127)
     Public yellow = New cv.Vec3b(0, 255, 255), purple = New cv.Vec3b(255, 0, 255), teal = New cv.Vec3b(255, 255, 0)
     Public red = New cv.Vec3b(0, 0, 255), green = New cv.Vec3b(0, 255, 0), blue = New cv.Vec3b(255, 0, 0)
     Public zero3f As New cv.Point3f(0, 0, 0)
@@ -135,9 +135,8 @@ Public Class VB_Algorithm : Implements IDisposable
     Public identifyCount = 20
     Public Sub identifyCells(redCells As List(Of rcData))
         For Each cell In redCells
-            If cell.index <= identifyCount Then
+            If cell.index <= identifyCount And cell.index > 0 Then
                 setTrueText(CStr(cell.index), cell.maxDist, 2)
-                setTrueText(CStr(cell.index), cell.maxDist, 3)
             End If
         Next
     End Sub

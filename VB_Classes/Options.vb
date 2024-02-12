@@ -4455,3 +4455,30 @@ Public Class Options_ThresholdAll : Inherits VB_Algorithm
         constantVal = constantSlider.value
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_StdevGrid : Inherits VB_Algorithm
+    Public minThreshold As Integer
+    Public maxThreshold As Integer
+    Public diffThreshold As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Min color threshold", 0, 50, 30)
+            sliders.setupTrackBar("Max color threshold", 0, 255, 230)
+            sliders.setupTrackBar("Equal diff threshold", 0, 20, 5)
+        End If
+
+        desc = "Options for the StdevGrid algorithms."
+    End Sub
+    Public Sub RunVB()
+        Static minSlider = findSlider("Min color threshold")
+        Static maxSlider = findSlider("Max color threshold")
+        Static diffSlider = findSlider("Equal diff threshold")
+        minThreshold = minSlider.value
+        maxThreshold = maxSlider.value
+        diffThreshold = diffSlider.value
+    End Sub
+End Class

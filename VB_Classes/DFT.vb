@@ -20,7 +20,7 @@ Public Class DFT_Basics : Inherits VB_Algorithm
     Public magnitude As New cv.Mat
     Public spectrum As New cv.Mat
     Public complexImage As New cv.Mat
-    Public gray As cv.Mat
+    Public grayMat As cv.Mat
     Public rows As integer
     Public cols As integer
     Public Sub New()
@@ -31,13 +31,13 @@ Public Class DFT_Basics : Inherits VB_Algorithm
         labels(3) = "DFT_Basics Spectrum Magnitude"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        gray = src
-        If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        grayMat = src
+        If src.Channels = 3 Then grayMat = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        rows = cv.Cv2.GetOptimalDFTSize(gray.Rows)
-        cols = cv.Cv2.GetOptimalDFTSize(gray.Cols)
-        Dim padded = New cv.Mat(gray.Width, gray.Height, cv.MatType.CV_8UC3)
-        cv.Cv2.CopyMakeBorder(gray, padded, 0, rows - gray.Rows, 0, cols - gray.Cols, cv.BorderTypes.Constant, cv.Scalar.All(0))
+        rows = cv.Cv2.GetOptimalDFTSize(grayMat.Rows)
+        cols = cv.Cv2.GetOptimalDFTSize(grayMat.Cols)
+        Dim padded = New cv.Mat(grayMat.Width, grayMat.Height, cv.MatType.CV_8UC3)
+        cv.Cv2.CopyMakeBorder(grayMat, padded, 0, rows - grayMat.Rows, 0, cols - grayMat.Cols, cv.BorderTypes.Constant, cv.Scalar.All(0))
         Dim padded32 As New cv.Mat
         padded.ConvertTo(padded32, cv.MatType.CV_32F)
         Dim planes() = {padded32, New cv.Mat(padded.Size(), cv.MatType.CV_32F, 0)}

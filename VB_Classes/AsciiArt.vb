@@ -67,14 +67,14 @@ End Class
 
 
 Public Class AsciiArt_Diff : Inherits VB_Algorithm
-    Dim gray As New AsciiArt_Gray
+    Dim grayAA As New AsciiArt_Gray
     Dim diff As New Diff_Basics
     Public Sub New()
         desc = "Display the instability in image pixels."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        gray.Run(src)
-        dst2 = gray.dst2
+        grayAA.Run(src)
+        dst2 = grayAA.dst2
 
         Static lastArt As cv.mat = dst2.Clone
 

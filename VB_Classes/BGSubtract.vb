@@ -60,7 +60,6 @@ End Class
 
 
 Public Class BGSubtract_MOG2 : Inherits VB_Algorithm
-    Public gray As New cv.Mat
     Dim MOG2 As cv.BackgroundSubtractorMOG2
     Dim options As New Options_BGSubtract
     Public Sub New()
@@ -80,7 +79,6 @@ End Class
 
 
 Public Class BGSubtract_MOG2_QT : Inherits VB_Algorithm
-    Public gray As New cv.Mat
     Dim MOG2 As cv.BackgroundSubtractorMOG2
     Public Sub New()
         MOG2 = cv.BackgroundSubtractorMOG2.Create()
@@ -205,7 +203,7 @@ End Class
 
 
 Public Class BGSubtract_MOG_RGBDepth : Inherits VB_Algorithm
-    Public gray As New cv.Mat
+    Public grayMat As New cv.Mat
     Dim options As New Options_BGSubtract
     Dim MOGDepth As cv.BackgroundSubtractorMOG
     Dim MOGRGB As cv.BackgroundSubtractorMOG
@@ -217,9 +215,9 @@ Public Class BGSubtract_MOG_RGBDepth : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        gray = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOGDepth.Apply(gray, gray, options.learnRate)
-        dst2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        grayMat = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        MOGDepth.Apply(grayMat, grayMat, options.learnRate)
+        dst2 = grayMat.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOGRGB.Apply(src, dst3, options.learnRate)
