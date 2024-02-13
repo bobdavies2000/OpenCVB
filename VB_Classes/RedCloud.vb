@@ -98,7 +98,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         unmatched.redCells = redCells
         unmatched.Run(src)
 
-        If task.motionReset Then
+        If task.motionRect.Width = dst2.Width Then
             dst3.SetTo(0)
         Else
             dst3 = unmatched.dst3

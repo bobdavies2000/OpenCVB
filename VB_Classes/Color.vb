@@ -36,7 +36,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
                 Case 7 ' "Binarize_Split7"
                     Static binarize7 As New Binarize_Split7
                     classifier = binarize7
-                Case 8 ' "Binarize_Split7"
+                Case 8 ' "Binarize_Split12"
                     Static binarize12 As New Binarize_Split12
                     classifier = binarize12
                 Case 9 ' "BackProject_Hue"
@@ -52,18 +52,13 @@ Public Class Color_Basics : Inherits VB_Algorithm
             classifier.dst2(task.motionRect).copyto(dst2(task.motionRect))
         Else
             classCount = classifier.classCount
-            If task.motionReset Then dst2 = classifier.dst2.clone
+            If task.heartBeat Then dst2 = classifier.dst2.clone
         End If
 
         If task.maxDepthMask.Rows > 0 Then
             classCount += 1
-            dst2.SetTo(classCount, task.maxDepthMask) ' maxdepth area is a 6th class
+            dst2.SetTo(classCount, task.maxDepthMask)
         End If
-
-        'Static devGrid As New StdevGrid_Sorted
-        'devGrid.Run(task.color)
-        'dst2 += devGrid.dst3
-        'classCount += 1
 
         If updateImages Then dst3 = vbPalette(dst2 * 255 / classCount)
         labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) + " pixel classifications"

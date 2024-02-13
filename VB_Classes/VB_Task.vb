@@ -51,7 +51,6 @@ Public Class VBtask : Implements IDisposable
     Public motionRect As cv.Rect
     Public motionFlag As Boolean ' any motion
     Public motionDetected As Boolean ' scene motion only, not camera motion.
-    Public motionReset As Boolean ' thresholds triggered.
 
     ' add any global algorithms here
     Public PixelViewer As Pixel_Viewer
@@ -61,7 +60,7 @@ Public Class VBtask : Implements IDisposable
     Public hCloud As History_Cloud
     Public motionCloud As Motion_PointCloud
     Public motionColor As Motion_Color
-    Public motionBasics As Motion_Basics_QT
+    Public motionBasics As Motion_BasicsQuarterRes
     Public rgbFilter As Object
 
     Public noDepthMask As New cv.Mat
@@ -364,7 +363,7 @@ Public Class VBtask : Implements IDisposable
         hCloud = New History_Cloud
         motionCloud = New Motion_PointCloud
         motionColor = New Motion_Color
-        motionBasics = New Motion_Basics_QT
+        motionBasics = New Motion_BasicsQuarterRes
 
         updateSettings()
         redOptions.Show()
@@ -483,6 +482,7 @@ Public Class VBtask : Implements IDisposable
                 Else
                     task.heartBeat = task.heartBeat Or task.debugSyncUI Or task.optionsChanged Or task.mouseClickFlag
                 End If
+
                 If task.paused = False Then
                     IMUBasics.Run(src)
                     gMat.Run(src)
@@ -514,22 +514,21 @@ Public Class VBtask : Implements IDisposable
                         task.color = motionColor.dst2.Clone
                     End If
 
-                    If task.heartBeat Or gOptions.unFiltered.Checked Then
-                        task.motionReset = True
-                        task.motionDetected = False
-                    End If
+                    If task.heartBeat Or gOptions.unFiltered.Checked Then task.motionDetected = True
                 End If
 
-                If task.motionDetected Or heartBeat Or task.motionReset Then
+                If task.motionDetected Or heartBeat Then
                     task.pcSplit = task.pointCloud.Split
 
-                    If gOptions.unFiltered.Checked = False Then
+                    If gOptions.unFiltered.Checked Then
+                        If task.optionsChanged Then task.maxDepthMask.SetTo(0)
+                    Else
                         task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
+                        task.maxDepthMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
                     End If
 
                     task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
                     task.noDepthMask = Not task.depthMask
-                    task.maxDepthMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
 
                     If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
                         Dim xRatio = task.xRangeDefault / task.xRange
@@ -541,8 +540,10 @@ Public Class VBtask : Implements IDisposable
                     End If
                 End If
 
-                colorizer.Run(task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc))
-                task.depthRGB = colorizer.dst2
+                ' small improvement to speed up colorized depth - make it smaller before colorizing.
+                Dim depthRGBInput = task.pcSplit(2).Resize(task.quarterRes)
+                colorizer.Run(depthRGBInput.Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc))
+                task.depthRGB = colorizer.dst2.Resize(task.color.Size)
 
                 TaskTimer.Enabled = True
                 task.highlightColor = highlightColors(0) ' task.frameCount Mod highlightColors.Count)
@@ -576,25 +577,25 @@ Public Class VBtask : Implements IDisposable
                     End If
                 End If
 
-                algorithmObject.NextFrame(src)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
+                    algorithmObject.NextFrame(src)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
-                If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then
-                    task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
+                    If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then
+                        task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
+                    End If
+
+                    Dim rc = task.rc
+                    If rc.rect.Width > 1 And rc.rect.Height > 1 Then
+                        task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+                        task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+
+                        task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+                        task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+                    End If
+
+                    task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
+                    task.optionsChanged = False
+                    TaskTimer.Enabled = False
                 End If
-
-                Dim rc = task.rc
-                If rc.rect.Width > 1 And rc.rect.Height > 1 Then
-                    task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-                    task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-
-                    task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-                    task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-                End If
-
-                task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
-                task.optionsChanged = False
-                TaskTimer.Enabled = False
-            End If
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try

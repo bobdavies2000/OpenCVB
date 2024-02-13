@@ -61,7 +61,8 @@ Module VB_Externs
     Public Function BGSubtract_BGFG_Close(bgfs As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_BGFG_Run(bgfs As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
+    Public Function BGSubtract_BGFG_Run(bgfs As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer,
+                                        learnRate As Double) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function BGSubtract_Synthetic_Open(bgrPtr As IntPtr, rows As Integer, cols As Integer, fgFilename As String, amplitude As Double,

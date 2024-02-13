@@ -1080,6 +1080,7 @@ if algorithmName = "Moments_Basics" Then return new Moments_Basics
 if algorithmName = "Moments_CentroidKalman" Then return new Moments_CentroidKalman
 if algorithmName = "Motion_Basics" Then return new Motion_Basics
 if algorithmName = "Motion_Basics_QT" Then return new Motion_Basics_QT
+if algorithmName = "Motion_BasicsQuarterRes" Then return new Motion_BasicsQuarterRes
 if algorithmName = "Motion_BasicsTest" Then return new Motion_BasicsTest
 if algorithmName = "Motion_CCmerge" Then return new Motion_CCmerge
 if algorithmName = "Motion_Color" Then return new Motion_Color

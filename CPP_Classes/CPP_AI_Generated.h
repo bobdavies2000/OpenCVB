@@ -1878,9 +1878,12 @@ public:
         if (task->heartBeat) cumulativePixels = 0;
         if (diff->changedPixels > 0 || task->heartBeat) {
             cumulativePixels += diff->changedPixels;
-            task->motionReset = cumulativePixels / src.total() > options_cumulativePercentThreshold ||
-                                diff->changedPixels > options_motionThreshold || task->optionsChanged;
-            if (task->motionReset) {
+            if (cumulativePixels / src.total() > options_cumulativePercentThreshold || diff->changedPixels > options_motionThreshold ||
+                task->optionsChanged)
+            {
+                task->motionRect = Rect(0, 0, dst2.cols, dst2.rows);
+            }
+            if (task->motionRect.width == dst2.cols || task->heartBeat) {
                 dst2.copyTo(dst3);
                 cumulativePixels = 0;
                 saveFrameCount = task->frameCount;
@@ -3206,7 +3209,7 @@ public:
             Close();
             cPtr = BGSubtract_BGFG_Open(options->currMethod);
         }
-        void* imagePtr = BGSubtract_BGFG_Run(cPtr, (int*)src.data, src.rows, src.cols, src.channels());
+        void* imagePtr = BGSubtract_BGFG_Run(cPtr, (int*)src.data, src.rows, src.cols, src.channels(), options->MOGlearnRate);
         if (imagePtr) {
             dst2 = Mat(src.rows, src.cols, CV_8UC1, imagePtr).clone();
             threshold(dst2, dst3, 0, 255, THRESH_BINARY);
@@ -3240,7 +3243,7 @@ public:
             Close();
             cPtr = BGSubtract_BGFG_Open(options->currMethod);
         }
-        void* imagePtr = BGSubtract_BGFG_Run(cPtr, (int *)src.data, src.rows, src.cols, src.channels());
+        void* imagePtr = BGSubtract_BGFG_Run(cPtr, (int *)src.data, src.rows, src.cols, src.channels(), options->MOGlearnRate);
         dst2 = Mat(src.rows, src.cols, CV_8UC1, imagePtr);
         labels[2] = options->methodDesc;
     }

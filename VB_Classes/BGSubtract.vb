@@ -19,7 +19,7 @@ Public Class BGSubtract_Basics : Inherits VB_Algorithm
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-        Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels, options.learnRate)
         handleSrc.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
@@ -36,7 +36,9 @@ End Class
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
 Public Class BGSubtract_Basics_QT : Inherits VB_Algorithm
+    Dim learnRate As Double
     Public Sub New()
+        If dst2.Width >= 1280 Then learnRate = 0.5 Else learnRate = 0.1 ' learn faster with large images (slower frame rate)
         cPtr = BGSubtract_BGFG_Open(4) ' MOG2 is the default method when running in QT mode.
         desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
@@ -44,7 +46,7 @@ Public Class BGSubtract_Basics_QT : Inherits VB_Algorithm
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-        Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels, learnRate)
         handleSrc.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)

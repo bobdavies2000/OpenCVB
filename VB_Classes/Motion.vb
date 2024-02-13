@@ -22,64 +22,6 @@ End Class
 
 
 
-Public Class Motion_Basics_QT : Inherits VB_Algorithm
-    Dim redMasks As New RedCloud_Masks
-    Public bgSub As New BGSubtract_Basics_QT
-    Public Sub New()
-        redMasks.imageThresholdPercent = 1.0
-        redMasks.cellMinPercent = 0
-        desc = "The option-free version of Motion_Basics"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        task.motionDetected = False
-        task.motionReset = True
-
-        If src.Channels <> 1 Then
-            bgSub.Run(src)
-            src = bgSub.dst2
-        End If
-
-        dst2 = src
-
-        redMasks.Run(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
-        If redMasks.sortedCells.Count < 2 Then
-            task.motionReset = False
-            task.motionRect = New cv.Rect
-            Exit Sub
-        End If
-
-        Dim nextRect = redMasks.sortedCells.ElementAt(1).Value.rect
-        For i = 2 To redMasks.sortedCells.Count - 1
-            Dim rc = redMasks.sortedCells.ElementAt(i).Value
-            nextRect = nextRect.Union(rc.rect)
-        Next
-
-        Static rectList As New List(Of cv.Rect)
-        rectList.Add(nextRect)
-        task.motionRect = New cv.Rect
-        For Each r In rectList
-            If task.motionRect.Width = 0 Then task.motionRect = r Else task.motionRect = task.motionRect.Union(r)
-        Next
-        If rectList.Count > gOptions.FrameHistory.Value Then rectList.RemoveAt(0)
-        If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
-            rectList.Clear()
-            task.motionRect = New cv.Rect
-        Else
-            task.motionReset = False
-            If task.motionRect.Width <> 0 Or task.motionRect.Height <> 0 Then task.motionDetected = True
-        End If
-
-        dst2.Rectangle(task.motionRect, 255, task.lineWidth)
-        labels(2) = CStr(redMasks.sortedCells.Count) + " cells were found with " + CStr(redMasks.classCount) + " flood points"
-    End Sub
-End Class
-
-
-
-
-
-
-
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
 Public Class Motion_Simple : Inherits VB_Algorithm
     Public diff As New Diff_Basics
@@ -99,9 +41,11 @@ Public Class Motion_Simple : Inherits VB_Algorithm
         If task.heartBeat Then cumulativePixels = 0
         If diff.changedPixels > 0 Or task.heartBeat Then
             cumulativePixels += diff.changedPixels
-            task.motionReset = cumulativePixels / src.Total > options.cumulativePercentThreshold Or
-                               diff.changedPixels > options.motionThreshold Or task.optionsChanged
-            If task.motionReset Or task.heartBeat Then
+            If cumulativePixels / src.Total > options.cumulativePercentThreshold Or diff.changedPixels > options.motionThreshold Or
+                task.optionsChanged Then
+                task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+            End If
+            If task.motionRect.Width = dst2.Width Or task.heartBeat Then
                 dst2.CopyTo(dst3)
                 cumulativePixels = 0
                 saveFrameCount = task.frameCount
@@ -643,8 +587,10 @@ End Class
 
 Public Class Motion_Enclosing : Inherits VB_Algorithm
     Dim redMasks As New RedCloud_Masks
+    Dim learnRate As Double
     Public motionRect As New cv.Rect
     Public Sub New()
+        If dst2.Width >= 1280 Then learnRate = 0.5 Else learnRate = 0.1 ' learn faster with large images (slower frame rate)
         cPtr = BGSubtract_BGFG_Open(4)
         labels(2) = "MOG2 is the best option.  See BGSubtract_Basics to see more options."
         desc = "Build an enclosing rectangle for the motion"
@@ -653,7 +599,7 @@ Public Class Motion_Enclosing : Inherits VB_Algorithm
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-        Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        Dim imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels, learnRate)
         handleSrc.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -692,10 +638,11 @@ Public Class Motion_PointCloud : Inherits VB_Algorithm
         desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat Or task.motionReset Then dst2 = task.pointCloud.Clone
-
-        If task.motionDetected Then task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
-
+        If task.heartBeat Then
+            dst2 = task.pointCloud.Clone
+        ElseIf task.motionDetected Then
+            task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
+        End If
         If standaloneTest() Then
             Static diff As New Diff_Depth32f
             If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
@@ -720,7 +667,7 @@ Public Class Motion_Depth : Inherits VB_Algorithm
         desc = "Display the depth data after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat Or task.motionReset Then dst2 = task.pcSplit(2).Clone
+        If task.heartBeat Then dst2 = task.pcSplit(2).Clone
 
         If task.motionDetected Then task.pcSplit(2)(task.motionRect).CopyTo(dst2(task.motionRect))
 
@@ -748,7 +695,7 @@ Public Class Motion_Grayscale : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.heartBeat Or task.motionReset Then dst2 = src.Clone
+        If task.heartBeat Then dst2 = src.Clone
         If task.motionDetected Then src(task.motionRect).CopyTo(dst2(task.motionRect))
 
         If standaloneTest() Then
@@ -774,11 +721,146 @@ Public Class Motion_Color : Inherits VB_Algorithm
         desc = "Display the color image after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat Or task.motionReset Then dst2 = src.Clone
+        If task.heartBeat Then dst2 = src.Clone
         If task.motionDetected Then src(task.motionRect).CopyTo(dst2(task.motionRect))
+        If standaloneTest() And task.motionDetected Then dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
+    End Sub
+End Class
 
-        If (standaloneTest()) And task.motionDetected Then
-            dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
+
+
+
+
+
+
+
+
+
+Public Class Motion_Basics_QT : Inherits VB_Algorithm
+    Dim redMasks As New RedCloud_Masks
+    Public bgSub As New BGSubtract_MOG2
+    Dim rectList As New List(Of cv.Rect)
+    Public Sub New()
+        redMasks.imageThresholdPercent = 1.0
+        redMasks.cellMinPercent = 0
+        desc = "The option-free version of Motion_Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        task.motionDetected = True
+        task.motionRect = New cv.Rect
+
+        If src.Channels <> 1 Then
+            bgSub.Run(src)
+            src = bgSub.dst2
+        End If
+
+        dst2 = src
+
+        redMasks.Run(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
+        If redMasks.sortedCells.Count < 2 Then
+            task.motionDetected = False
+            rectList.Clear()
+        Else
+            Dim nextRect = redMasks.sortedCells.ElementAt(1).Value.rect
+            For i = 2 To redMasks.sortedCells.Count - 1
+                Dim rc = redMasks.sortedCells.ElementAt(i).Value
+                nextRect = nextRect.Union(rc.rect)
+            Next
+
+            rectList.Add(nextRect)
+            For Each r In rectList
+                If task.motionRect.Width = 0 Then task.motionRect = r Else task.motionRect = task.motionRect.Union(r)
+            Next
+            If rectList.Count > gOptions.FrameHistory.Value Then rectList.RemoveAt(0)
+            If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
+                task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+            Else
+                If task.motionRect.Width = 0 Or task.motionRect.Height = 0 Then task.motionDetected = False
+            End If
+        End If
+
+        If standaloneTest() Then
+            dst2.Rectangle(task.motionRect, 255, task.lineWidth)
+            If redMasks.sortedCells.Count > 1 Then
+                labels(2) = CStr(redMasks.sortedCells.Count) + " RedMask cells had motion"
+            Else
+                labels(2) = "No motion detected"
+            End If
+            labels(3) = ""
+            If task.motionRect.Width > 0 Then
+                labels(3) = "Rect width = " + CStr(task.motionRect.Width) + ", height = " + CStr(task.motionRect.Height)
+            End If
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
+    Dim redMasks As New RedCloud_Masks
+    Public bgSub As New BGSubtract_MOG2
+    Dim rectList As New List(Of cv.Rect)
+    Public Sub New()
+        redMasks.imageThresholdPercent = 1.0
+        redMasks.cellMinPercent = 0
+        desc = "The option-free version of Motion_Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst2 = src.Resize(task.quarterRes)
+
+        task.motionDetected = True
+        task.motionRect = New cv.Rect
+
+        If dst2.Channels <> 1 Then
+            bgSub.Run(dst2)
+            dst2 = bgSub.dst2
+        End If
+
+        redMasks.Run(dst2.Threshold(0, 255, cv.ThresholdTypes.Binary))
+        If redMasks.sortedCells.Count < 2 Then
+            task.motionDetected = False
+            rectList.Clear()
+        Else
+            Dim nextRect = redMasks.sortedCells.ElementAt(1).Value.rect
+            For i = 2 To redMasks.sortedCells.Count - 1
+                Dim rc = redMasks.sortedCells.ElementAt(i).Value
+                nextRect = nextRect.Union(rc.rect)
+            Next
+
+            rectList.Add(nextRect)
+            For Each r In rectList
+                If task.motionRect.Width = 0 Then task.motionRect = r Else task.motionRect = task.motionRect.Union(r)
+            Next
+            If rectList.Count > gOptions.FrameHistory.Value Then rectList.RemoveAt(0)
+            If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
+                task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+            Else
+                If task.motionRect.Width = 0 Or task.motionRect.Height = 0 Then task.motionDetected = False
+            End If
+        End If
+
+        If standaloneTest() Then
+            dst2.Rectangle(task.motionRect, 255, task.lineWidth)
+            If redMasks.sortedCells.Count > 1 Then
+                labels(2) = CStr(redMasks.sortedCells.Count) + " RedMask cells had motion"
+            Else
+                labels(2) = "No motion detected"
+            End If
+            labels(3) = ""
+            If task.motionRect.Width > 0 Then
+                labels(3) = "Rect width = " + CStr(task.motionRect.Width) + ", height = " + CStr(task.motionRect.Height)
+            End If
+        End If
+
+        If src.Size <> dst2.Size Then
+            Dim ratio = CInt(src.Width / dst2.Width)
+            Dim r = task.motionRect
+            task.motionRect = New cv.Rect(r.X * ratio, r.Y * ratio, r.Width * ratio, r.Height * ratio)
         End If
     End Sub
 End Class

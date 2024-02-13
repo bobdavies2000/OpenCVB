@@ -446,8 +446,8 @@ public:
 	Ptr<BackgroundSubtractor> algo;
 	Mat src, fgMask;
 	BGSubtract_BGFG() {}
-	void Run() {
-		algo->apply(src, fgMask);
+	void Run(double learnRate) {
+		algo->apply(src, fgMask, learnRate);
 	}
 };
 
@@ -472,10 +472,10 @@ int* BGSubtract_BGFG_Close(BGSubtract_BGFG * cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int* BGSubtract_BGFG_Run(BGSubtract_BGFG * cPtr, int* bgrPtr, int rows, int cols, int channels)
+int* BGSubtract_BGFG_Run(BGSubtract_BGFG * cPtr, int* bgrPtr, int rows, int cols, int channels, double learnRate)
 {
 	cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, bgrPtr);
-	cPtr->Run();
+	cPtr->Run(learnRate);
 	return (int*)cPtr->fgMask.data;
 }
 

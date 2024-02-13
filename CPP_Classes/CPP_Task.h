@@ -202,7 +202,7 @@ public:
     int cvFontThickness;
     Scalar fontColor;
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
-    bool motionReset; rcData rcSelect; int desiredCells;
+    Rect motionRect; rcData rcSelect; int desiredCells;
 
     bool heartBeat; bool midHeartBeat; bool quarterBeat; bool debugCheckBox; Size lowRes; 
     

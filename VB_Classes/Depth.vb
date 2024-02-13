@@ -1486,7 +1486,7 @@ Public Class Depth_StableMin : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
 
-        If task.motionReset Then
+        If task.heartBeat Then
             stableMin = src.Clone
             dst3.SetTo(0)
         ElseIf task.motionDetected Then
@@ -1517,7 +1517,7 @@ Public Class Depth_StableMax : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
 
-        If task.motionReset Then
+        If task.heartBeat Then
             stableMax = src.Clone
             dst3.SetTo(0)
         ElseIf task.motionDetected Then
@@ -1565,9 +1565,7 @@ Public Class Depth_StableMinMax : Inherits VB_Algorithm
             dst2 = dMin.dst2
         ElseIf options.useNone Then
             dst3 = task.pcSplit(2)
-            colorize.Run(dst3)
-            dst2 = colorize.dst2
-            task.motionReset = True
+            dst2 = task.depthRGB
         End If
     End Sub
 End Class
