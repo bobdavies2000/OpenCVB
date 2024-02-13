@@ -1989,7 +1989,7 @@ Public Class RedCloud_ContourVsFeatureLess : Inherits VB_Algorithm
         fLess.Run(src)
         dst3 = fLess.dst2
 
-        If task.toggleOn Then redMasks.Run(dst3) Else redMasks.Run(dst1)
+        If task.toggleOnOff Then redMasks.Run(dst3) Else redMasks.Run(dst1)
         dst2 = redMasks.dst3
     End Sub
 End Class

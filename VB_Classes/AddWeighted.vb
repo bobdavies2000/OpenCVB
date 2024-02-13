@@ -79,7 +79,7 @@ Public Class AddWeighted_InfraRed : Inherits VB_Algorithm
         desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image.  Some cameras are not close to aligned."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.toggleOn Then
+        If task.toggleOnOff Then
             dst1 = task.leftView
             labels(2) = "Left view combined with depthRGB"
         Else

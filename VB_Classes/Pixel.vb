@@ -111,7 +111,7 @@ Public Class Pixel_Viewer : Inherits VB_Algorithm
                 For y = 0 To img.Height - 1
                     imgText += "r" + Format(dw.Y + y, "000") + "   "
                     For x = 0 To img.Width - 1
-                        If (task.toggleOn And y = clickPoint.Y) And (x = clickPoint.X - 1 Or x = clickPoint.X) Then
+                        If (task.toggleOnOff And y = clickPoint.Y) And (x = clickPoint.X - 1 Or x = clickPoint.X) Then
                             imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "***", "*")
                         Else
                             imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "   ", " ")

@@ -66,8 +66,7 @@ Module vbUtilities
 
         If (task.msWatch - task.msLast) > 1000 Then
             task.msLast = task.msWatch
-            task.toggleOn = Not task.toggleOn
-            task.toggleFrame = task.frameCount - 1
+            task.toggleOnOff = Not task.toggleOnOff
         End If
 
         If task.paused Then

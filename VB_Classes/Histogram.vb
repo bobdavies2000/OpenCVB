@@ -963,7 +963,7 @@ Public Class Histogram_Gotcha2D : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Dim expected = task.pcSplit(2).CountNonZero
         Dim ranges = task.rangesSide
-        If task.toggleOn Then
+        If task.toggleOnOff Then
             ranges = New cv.Rangef() {New cv.Rangef(-10, +10), New cv.Rangef(-1, 20)}
         End If
         cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)

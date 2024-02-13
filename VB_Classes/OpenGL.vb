@@ -2061,7 +2061,7 @@ Public Class OpenGL_SoloPointsRemoved : Inherits VB_Algorithm
         desc = "Remove the solo points and display the pointcloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.toggleOn Then
+        If task.toggleOnOff Then
             solos.Run(src)
             dst2 = solos.dst2
             task.pointCloud.SetTo(0, dst2)

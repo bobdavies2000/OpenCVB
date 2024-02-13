@@ -19,8 +19,7 @@ Public Class VBtask : Implements IDisposable
     Public msWatch As Integer
     Public msLast As Integer
 
-    Public toggleOn As Boolean ' toggles on the heartbeat.
-    Public toggleFrame As Integer
+    Public toggleOnOff As Boolean ' toggles on the heartbeat.
     Public optionsChanged As Boolean ' global or local options changed.
     Public paused As Boolean
     Public showAllOptions As Boolean ' show all options when initializing the options for all algorithms.
@@ -368,7 +367,6 @@ Public Class VBtask : Implements IDisposable
         updateSettings()
         redOptions.Show()
         gOptions.Show()
-        task.toggleFrame = -1
         palette = New Palette_LoadColorMap
         If algName.StartsWith("OpenGL_") Or algName.EndsWith("_OpenGL") Or algName.StartsWith("Model_") Then
             ogl = New OpenGL_Basics

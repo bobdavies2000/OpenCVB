@@ -862,5 +862,13 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
             Dim r = task.motionRect
             task.motionRect = New cv.Rect(r.X * ratio, r.Y * ratio, r.Width * ratio, r.Height * ratio)
         End If
+
+        If task.motionRect.Width < dst2.Width Then
+            dst2.Rectangle(task.motionRect, 255, task.lineWidth)
+            Dim pad = dst2.Width / 20
+            Dim r = task.motionRect
+            r = New cv.Rect(r.X - pad, r.Y - pad, r.Width + pad * 2, r.Height + pad * 2)
+            task.motionRect = validateRect(r)
+        End If
     End Sub
 End Class

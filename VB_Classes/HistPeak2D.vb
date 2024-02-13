@@ -53,7 +53,7 @@ Public Class HistPeak2D_TopAndSide : Inherits VB_Algorithm
         desc = "Find the top X peaks in the 2D histogram of the top and side views and backproject them."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.toggleOn Then
+        If task.toggleOnOff Then
             histSide.Run(src)
             peak.ranges = task.rangesSide
             redOptions.channels = task.channelsSide

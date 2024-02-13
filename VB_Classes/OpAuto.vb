@@ -232,8 +232,8 @@ Public Class OpAuto_Peaks2D : Inherits VB_Algorithm
         If standaloneTest() Then
             Static heatmap As New HeatMap_Basics
             heatmap.Run(src)
-            dst2 = If(task.toggleOn, heatmap.dst2, heatmap.dst3)
-            src = If(task.toggleOn, heatmap.dst0.Clone, heatmap.dst1.Clone)
+            dst2 = If(task.toggleOnOff, heatmap.dst2, heatmap.dst3)
+            src = If(task.toggleOnOff, heatmap.dst0.Clone, heatmap.dst1.Clone)
         End If
 
         clusterPoints.Clear()

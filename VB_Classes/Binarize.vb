@@ -427,7 +427,7 @@ Public Class Binarize_Split12 : Inherits VB_Algorithm
         dst2.SetTo(6, bnw.dst2) ' black is a 6th class
         dst2.SetTo(7, bnw.dst3) ' white is a 7th class
 
-        If task.toggleOn Then
+        If task.toggleOnOff Then
             tiers.Run(src)
             dst2 += tiers.dst2
             classCount += tiers.classCount ' number of additional classes depends on max depth - usually 5 meters.
