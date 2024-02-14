@@ -2761,10 +2761,9 @@ Public Class RedCloud_FeatureLessReduce : Inherits VB_Algorithm
     Dim redC As New RedCloud_BasicsNew
     Dim devGrid As New StdevGrid_Basics
     Public redCells As New List(Of rcData)
-    'Dim myRes = task.lowRes
+    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim addw As New AddWeighted_Basics
     Public Sub New()
-        ' gOptions.GridSize.Value = If(task.lowRes = myRes, 4, 8)
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent featureLess threshold", 1, 100, 95)
         desc = "Remove any cells which are in a featureless region - they are part of the neighboring (and often surrounding) region."
     End Sub
@@ -2785,7 +2784,9 @@ Public Class RedCloud_FeatureLessReduce : Inherits VB_Algorithm
             Dim count = tmp.CountNonZero
             If count / rc.pixels < threshold Then
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
+                rc.index = redCells.Count
                 redCells.Add(rc)
+                cellMap(rc.rect).SetTo(rc.index, rc.mask)
             End If
         Next
 
@@ -2796,6 +2797,6 @@ Public Class RedCloud_FeatureLessReduce : Inherits VB_Algorithm
         labels(3) = $"{redCells.Count} cells after removing featureless cells that were part of their surrounding.  " +
                     $"{redC.redCells.Count - redCells.Count} were removed."
 
-        'setSelectedCell(redCells, cellMap)
+        setSelectedCell(redCells, cellMap)
     End Sub
 End Class

@@ -369,8 +369,13 @@ Public Class Binarize_TiersCM : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binarize.Run(src)
-
         tiersCM.Run(src)
-        dst2 = tiersCM.dst2 + binarize.dst2
+        dst3 = tiersCM.dst2 + binarize.dst2
+
+        If task.heartBeat Then
+            dst2 = dst3.Clone
+        ElseIf task.motionDetected Then
+            dst3(task.motionRect).CopyTo(dst2(task.motionRect))
+        End If
     End Sub
 End Class
