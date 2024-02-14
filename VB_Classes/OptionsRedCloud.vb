@@ -73,7 +73,7 @@ Public Class OptionsRedCloud
             Dim method = colorMethods(i)
             ColorSource.Items.Add(method)
         Next
-        ColorSource.SelectedItem() = "Binarize_Split5"
+        ColorSource.SelectedItem() = "Binarize_Split4"
 
         SimpleReduction.Checked = True
         PCReduction = 3

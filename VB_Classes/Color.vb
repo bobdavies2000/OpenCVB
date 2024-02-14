@@ -4,7 +4,9 @@ Public Class Color_Basics : Inherits VB_Algorithm
     Public classCount As Integer
     Public classifier As Object
     Public updateImages As Boolean
+    Dim binarize5 As New Binarize_Split5
     Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         labels(3) = "vbPalette output of dst2 at left"
         vbAddAdvice(traceName + ": redOptions 'Color Source' control which color source is used.")
         desc = "Classify pixels by color using a variety of techniques"
@@ -31,7 +33,6 @@ Public Class Color_Basics : Inherits VB_Algorithm
                     Static binarize4 As New Binarize_Split4
                     classifier = binarize4
                 Case 6 ' "Binarize_Split5"
-                    Static binarize5 As New Binarize_Split5
                     classifier = binarize5
                 Case 7 ' "Binarize_Split7"
                     Static binarize7 As New Binarize_Split7
@@ -48,7 +49,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
         dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
 
         classifier.run(dst1)
-        If task.motionDetected Then
+        If task.motionDetected And task.optionsChanged = False Then
             classifier.dst2(task.motionRect).copyto(dst2(task.motionRect))
         Else
             classCount = classifier.classCount

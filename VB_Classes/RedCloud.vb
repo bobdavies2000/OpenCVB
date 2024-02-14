@@ -13,6 +13,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         desc = "Match cells from the previous generation"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        If task.motionDetected = False Then Exit Sub ' no change...
         combine.Run(src)
 
         If task.optionsChanged Then cellMap.SetTo(0)

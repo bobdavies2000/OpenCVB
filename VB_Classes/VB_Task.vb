@@ -459,7 +459,7 @@ Public Class VBtask : Implements IDisposable
 
                 task.IMU_RawAcceleration = task.IMU_Acceleration
                 task.IMU_RawAngularVelocity = task.IMU_AngularVelocity
-                grid.Run(task.color)
+                grid.RunVB(task.color)
 
                 If task.algName.StartsWith("CPP_") = False Then
                     task.motionFlag = True
@@ -468,7 +468,7 @@ Public Class VBtask : Implements IDisposable
                         Dim filterName = gOptions.RGBFilterList.Text
                         If rgbFilter Is Nothing Then rgbFilter = algoList.createAlgorithm(filterName)
                         If rgbFilter.traceName <> filterName Then rgbFilter = algoList.createAlgorithm(filterName)
-                        rgbFilter.Run(src)
+                        rgbFilter.RunVB(src)
                         src = rgbFilter.dst2
                     End If
                 End If
@@ -482,8 +482,8 @@ Public Class VBtask : Implements IDisposable
                 End If
 
                 If task.paused = False Then
-                    IMUBasics.Run(src)
-                    gMat.Run(src)
+                    IMUBasics.RunVB(src)
+                    gMat.RunVB(src)
                     task.gMatrix = gMat.gMatrix
 
                     task.frameHistoryCount = gOptions.FrameHistory.Value
@@ -495,35 +495,36 @@ Public Class VBtask : Implements IDisposable
 
                     If task.pcSplit Is Nothing Then task.pcSplit = task.pointCloud.Split
 
-                    motionBasics.Run(src) ' always set the task.motionRect
-                    motionColor.Run(src)
+                    ' on each heartbeat or when options changed, update the whole image.
+                    If task.heartBeat Or task.optionsChanged Or gOptions.unFiltered.Checked Then
+                        task.motionDetected = True
+                        task.motionRect = New cv.Rect(0, 0, task.workingRes.Width, task.workingRes.Height)
+                    Else
+                        motionBasics.RunVB(src) ' get the latest motionRect
+                        motionColor.RunVB(src)
 
-                    If gOptions.UseHistoryCloud.Checked Then
-                        hCloud.Run(task.pointCloud)
-                        task.pointCloud = hCloud.dst2
-                    ElseIf gOptions.MotionFilteredColorAndCloud.Checked Then
-                        task.color = motionColor.dst2.Clone
-                        motionCloud.Run(src)
-                        task.pointCloud = motionCloud.dst2.Clone
-                    ElseIf gOptions.MotionFilteredCloudOnly.Checked Then
-                        motionCloud.Run(src)
-                        task.pointCloud = motionCloud.dst2.Clone
-                    ElseIf gOptions.MotionFilteredColorOnly.Checked Then
-                        task.color = motionColor.dst2.Clone
+                        If gOptions.UseHistoryCloud.Checked Then
+                            hCloud.RunVB(task.pointCloud)
+                            task.pointCloud = hCloud.dst2
+                        ElseIf gOptions.MotionFilteredColorAndCloud.Checked Then
+                            task.color = motionColor.dst2.Clone
+                            motionCloud.RunVB(src)
+                            task.pointCloud = motionCloud.dst2.Clone
+                        ElseIf gOptions.MotionFilteredCloudOnly.Checked Then
+                            motionCloud.RunVB(src)
+                            task.pointCloud = motionCloud.dst2.Clone
+                        ElseIf gOptions.MotionFilteredColorOnly.Checked Then
+                            task.color = motionColor.dst2.Clone
+                        End If
                     End If
-
-                    If task.heartBeat Or gOptions.unFiltered.Checked Then task.motionDetected = True
                 End If
 
                 If task.motionDetected Or heartBeat Then
                     task.pcSplit = task.pointCloud.Split
 
-                    If gOptions.unFiltered.Checked Then
-                        If task.optionsChanged Then task.maxDepthMask.SetTo(0)
-                    Else
-                        task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
-                        task.maxDepthMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
-                    End If
+                    If task.optionsChanged Then task.maxDepthMask.SetTo(0)
+                    task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
+                    task.maxDepthMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
 
                     task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
                     task.noDepthMask = Not task.depthMask
@@ -540,7 +541,7 @@ Public Class VBtask : Implements IDisposable
 
                 ' small improvement to speed up colorized depth - make it smaller before colorizing.
                 Dim depthRGBInput = task.pcSplit(2).Resize(task.quarterRes)
-                colorizer.Run(depthRGBInput.Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc))
+                colorizer.RunVB(depthRGBInput.Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc))
                 task.depthRGB = colorizer.dst2.Resize(task.color.Size)
 
                 TaskTimer.Enabled = True
@@ -548,7 +549,7 @@ Public Class VBtask : Implements IDisposable
 
                 If gOptions.CreateGif.Checked Then
                     If task.gifCreator Is Nothing Then task.gifCreator = New Gif_OpenCVB
-                    gifCreator.Run(src)
+                    gifCreator.RunVB(src)
                     If task.gifBuild Then
                         task.gifBuild = False
                         If task.gifImages.Count = 0 Then

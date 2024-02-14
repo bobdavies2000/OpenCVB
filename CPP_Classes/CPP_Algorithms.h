@@ -894,7 +894,7 @@ public:
 		output = Mat(depth32f.size(), CV_8UC3);
 		auto rgb = (unsigned char*)output.data;
 		float* depthImage = (float*)depth32f.data;
-		for (int i = 0; i < output.cols * output.rows; i++)
+		for (int i = 0; i < output.total(); i++)
 		{
 			float t = depthImage[i] / maxDepth;
 			if (t > 0 && t <= 1)

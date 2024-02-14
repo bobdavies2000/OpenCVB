@@ -642,6 +642,8 @@ Public Class Motion_PointCloud : Inherits VB_Algorithm
             dst2 = task.pointCloud.Clone
         ElseIf task.motionDetected Then
             task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
+        Else
+            dst2 = task.pointCloud
         End If
         If standaloneTest() Then
             Static diff As New Diff_Depth32f
@@ -695,8 +697,13 @@ Public Class Motion_Grayscale : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.heartBeat Then dst2 = src.Clone
-        If task.motionDetected Then src(task.motionRect).CopyTo(dst2(task.motionRect))
+        If task.heartBeat Then
+            dst2 = src.Clone
+        ElseIf task.motionDetected Then
+            src(task.motionRect).CopyTo(dst2(task.motionRect))
+        Else
+            dst2 = src.Clone
+        End If
 
         If standaloneTest() Then
             Static diff As New Diff_Basics
@@ -721,8 +728,13 @@ Public Class Motion_Color : Inherits VB_Algorithm
         desc = "Display the color image after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat Then dst2 = src.Clone
-        If task.motionDetected Then src(task.motionRect).CopyTo(dst2(task.motionRect))
+        If task.heartBeat Then
+            dst2 = src.Clone
+        ElseIf task.motionDetected Then
+            src(task.motionRect).CopyTo(dst2(task.motionRect))
+        Else
+            dst2 = src
+        End If
         If standaloneTest() And task.motionDetected Then dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
     End Sub
 End Class
@@ -747,6 +759,10 @@ Public Class Motion_Basics_QT : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         task.motionDetected = True
+        If task.heartBeat Then
+            task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+            Exit Sub
+        End If
         task.motionRect = New cv.Rect
 
         If src.Channels <> 1 Then
@@ -811,12 +827,11 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
         desc = "The option-free version of Motion_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst2 = src.Resize(task.quarterRes)
-
         task.motionDetected = True
         task.motionRect = New cv.Rect
+        dst2 = src.Resize(task.quarterRes)
 
-        If dst2.Channels <> 1 Then
+        If src.Channels <> 1 Then
             bgSub.Run(dst2)
             dst2 = bgSub.dst2
         End If
@@ -869,6 +884,11 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
             Dim r = task.motionRect
             r = New cv.Rect(r.X - pad, r.Y - pad, r.Width + pad * 2, r.Height + pad * 2)
             task.motionRect = validateRect(r)
+            dst2.Rectangle(task.motionRect, 255, task.lineWidth + 4)
         End If
+
+
+
+        If task.motionDetected = False Then Dim k = 0
     End Sub
 End Class
