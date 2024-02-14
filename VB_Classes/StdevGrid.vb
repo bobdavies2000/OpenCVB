@@ -115,24 +115,24 @@ Public Class StdevGrid_Sorted : Inherits VB_Algorithm
             If mean(0) < options.minThreshold And mean(1) < options.minThreshold And mean(2) < options.minThreshold Then
                 colorIndex = 1
             ElseIf mean(0) > options.maxThreshold And mean(1) > options.maxThreshold And mean(2) > options.maxThreshold Then
-                colorIndex = 9
-            ElseIf Math.Abs(mean(0) - mean(1)) < options.diffthreshold And Math.Abs(mean(1) - mean(2)) < options.diffthreshold Then
-                colorIndex = 8
-            ElseIf Math.Abs(mean(1) - mean(2)) < options.diffthreshold Then
                 colorIndex = 2
-            ElseIf Math.Abs(mean(0) - mean(2)) < options.diffthreshold Then
+            ElseIf Math.Abs(mean(0) - mean(1)) < options.diffThreshold And Math.Abs(mean(1) - mean(2)) < options.diffThreshold Then
                 colorIndex = 3
-            ElseIf Math.Abs(mean(0) - mean(1)) < options.diffthreshold Then
+            ElseIf Math.Abs(mean(1) - mean(2)) < options.diffThreshold Then
                 colorIndex = 4
-            ElseIf Math.Abs(mean(0) - mean(1)) > options.diffthreshold And Math.Abs(mean(0) - mean(2)) > options.diffthreshold Then
+            ElseIf Math.Abs(mean(0) - mean(2)) < options.diffThreshold Then
                 colorIndex = 5
-            ElseIf Math.Abs(mean(1) - mean(0)) > options.diffthreshold And Math.Abs(mean(1) - mean(2)) > options.diffthreshold Then
+            ElseIf Math.Abs(mean(0) - mean(1)) < options.diffThreshold Then
                 colorIndex = 6
-            ElseIf Math.Abs(mean(2) - mean(0)) > options.diffthreshold And Math.Abs(mean(2) - mean(1)) > options.diffthreshold Then
+            ElseIf Math.Abs(mean(0) - mean(1)) > options.diffThreshold And Math.Abs(mean(0) - mean(2)) > options.diffThreshold Then
                 colorIndex = 7
+            ElseIf Math.Abs(mean(1) - mean(0)) > options.diffThreshold And Math.Abs(mean(1) - mean(2)) > options.diffThreshold Then
+                colorIndex = 8
+            ElseIf Math.Abs(mean(2) - mean(0)) > options.diffThreshold And Math.Abs(mean(2) - mean(1)) > options.diffThreshold Then
+                colorIndex = 9
             End If
 
-            Dim color = Choose(colorIndex, black, yellow, purple, teal, blue, green, red, gray, white)
+            Dim color = Choose(colorIndex, black, white, gray, yellow, purple, teal, blue, green, red)
             categories(colorIndex) += 1
             bgrList.Add(color)
             roiList.Add(roi)
@@ -172,7 +172,7 @@ Public Class StdevGrid_ColorSplit : Inherits VB_Algorithm
     Dim devGrid As New StdevGrid_Sorted
     Public Sub New()
         devGrid.maskVal = 255
-        desc = "Split each pixel into one of 7 categories - yellow, purple, teal, blue, green, red, black or white "
+        desc = "Split each pixel into one of 9 categories - black, white, gray, yellow, purple, teal, blue, green, or red"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         devGrid.Run(src)
@@ -186,7 +186,7 @@ Public Class StdevGrid_ColorSplit : Inherits VB_Algorithm
 
         strOut = "Categories:" + vbCrLf
         For i = 1 To devGrid.categories.Count - 1
-            Dim colorName = Choose(i, "black", "yellow", "purple", "teal", "blue", "green", "red", "gray", "white")
+            Dim colorName = Choose(i, "black", "white", "gray", "yellow", "purple", "teal", "blue", "green", "red")
             strOut += colorName + vbTab + CStr(devGrid.categories(i)) + vbCrLf
         Next
         setTrueText(strOut, 3)

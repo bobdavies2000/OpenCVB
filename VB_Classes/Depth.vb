@@ -1142,31 +1142,6 @@ End Class
 
 
 
-
-Public Class Depth_Tiers : Inherits VB_Algorithm
-    Public classCount As Integer
-    Public Sub New()
-        vbAddAdvice(traceName + ": gOptions 'Max Depth (meters)' determines how many tiers there are.")
-        desc = "Create a reduced image of the depth data to define tiers of similar values"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standalone Or src.Type = cv.MatType.CV_8UC3 Then src = task.pcSplit(2)
-        dst1 = src.Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
-        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
-
-        classCount = task.maxZmeters
-        dst2.SetTo(0, task.noDepthMask)
-
-        dst3 = vbPalette(dst2 * 255 / classCount)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Depth_TierCount : Inherits VB_Algorithm
     Public valley As New HistValley_DepthOld
     Public classCount As Integer
@@ -1569,5 +1544,64 @@ Public Class Depth_StableMinMax : Inherits VB_Algorithm
             dst3 = task.pcSplit(2)
             dst2 = task.depthRGB
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Depth_Tiers : Inherits VB_Algorithm
+    Public classCount As Integer
+    Public Sub New()
+        vbAddAdvice(traceName + ": gOptions 'Max Depth (meters)' determines how many tiers there are.")
+        desc = "Create a reduced image of the depth data to define tiers of similar values"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Or src.Type = cv.MatType.CV_8UC3 Then src = task.pcSplit(2)
+        dst1 = src.Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+
+        classCount = task.maxZmeters
+        dst2.SetTo(0, task.noDepthMask)
+
+        dst3 = vbPalette(dst2 * 255 / classCount)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Depth_TiersCM : Inherits VB_Algorithm
+    Public classCount As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("cm's per tier", 10, 200, 50)
+        vbAddAdvice(traceName + ": gOptions 'Max Depth (meters)' and local options for cm's per tier.")
+        desc = "Create a reduced image of the depth data to define tiers of similar values"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static cmSlider = findSlider("cm's per tier")
+        Dim cmTier = cmSlider.value
+
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        dst1 = (src * 100 / cmTier).toMat
+        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+
+        classCount = task.maxZmeters * 100 / cmTier
+
+        ' This makes the missing depth data its own class.
+        ' This prevents fore/background similar colors from identifying as the same class where depth is undefined.
+        dst2.SetTo(1, task.noDepthMask)
+        classCount += 1
+
+        dst3 = vbPalette(dst2 * 255 / classCount)
     End Sub
 End Class

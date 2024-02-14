@@ -355,3 +355,22 @@ Public Class Binarize_SplitDepth : Inherits VB_Algorithm
         If standaloneTest() Then dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
     End Sub
 End Class
+
+
+
+
+
+Public Class Binarize_TiersCM : Inherits VB_Algorithm
+    Dim tiersCM As New Depth_TiersCM
+    Dim binarize As New Binarize_Split4
+    Public Sub New()
+        redOptions.UseColor.Checked = True
+        desc = "Add the Depth_TiersCM and binarize_Split4 output in preparation for RedCloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binarize.Run(src)
+
+        tiersCM.Run(src)
+        dst2 = tiersCM.dst2 + binarize.dst2
+    End Sub
+End Class

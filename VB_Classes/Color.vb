@@ -4,7 +4,6 @@ Public Class Color_Basics : Inherits VB_Algorithm
     Public classCount As Integer
     Public classifier As Object
     Public updateImages As Boolean
-    Dim hue As New Color_Hue
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         labels(3) = "vbPalette output of dst2 at left"
@@ -12,7 +11,6 @@ Public Class Color_Basics : Inherits VB_Algorithm
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        hue.Run(src)
         If task.optionsChanged Or classifier Is Nothing Then
             Select Case redOptions.colorInputIndex
                 Case 0 ' "BackProject_Full"
@@ -50,9 +48,6 @@ Public Class Color_Basics : Inherits VB_Algorithm
         End If
 
         classCount = classifier.classCount
-
-        dst2 += hue.dst2
-        classCount += 1 ' hue adds just one more class but may create several more distinct regions.
 
         If task.maxDepthMask.Rows > 0 Then
             classCount += 1
