@@ -335,103 +335,22 @@ End Class
 
 
 
-Public Class Binarize_Split5 : Inherits VB_Algorithm
+
+
+Public Class Binarize_SplitDepth : Inherits VB_Algorithm
     Dim binarize As New Binarize_Four
-    Public classCount = 5 ' 4-way split + hue 
-    Dim hue As New Color_Hue
+    Public classCount = 4 ' 4-way split
     Public Sub New()
         dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Define 5 regions in the image: binarize 4-way and the add hue."
+        desc = "Add the 4-way split of images to define the different regions.  Now adding hue segments as well."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        hue.Run(task.color)
-
         binarize.Run(src)
 
         dst2.SetTo(1, binarize.mats.mat(0))
         dst2.SetTo(2, binarize.mats.mat(1))
         dst2.SetTo(3, binarize.mats.mat(2))
         dst2.SetTo(4, binarize.mats.mat(3))
-
-        dst2.SetTo(5, hue.dst2) ' hue is a 5th class
-
-        If standaloneTest() Then dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Binarize_Split7 : Inherits VB_Algorithm
-    Dim binarize As New Binarize_Four
-    Public classCount = 7 ' 4-way split + hue + black + white
-    Dim hue As New Color_Hue
-    Dim bnw As New Color_BlackAndWhite
-    Public Sub New()
-        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Define 7 regions in the image: binarize 4-way, hue, black and white."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        hue.Run(task.color)
-
-        binarize.Run(src)
-
-        dst2.SetTo(1, binarize.mats.mat(0))
-        dst2.SetTo(2, binarize.mats.mat(1))
-        dst2.SetTo(3, binarize.mats.mat(2))
-        dst2.SetTo(4, binarize.mats.mat(3))
-
-        dst2.SetTo(5, hue.dst2) ' hue is a 5th class
-
-        bnw.Run(task.color)
-        dst2.SetTo(6, bnw.dst2) ' black is a 6th class
-        dst2.SetTo(7, bnw.dst3) ' white is a 7th class
-
-        If standaloneTest() Then dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Binarize_Split12 : Inherits VB_Algorithm
-    Dim binarize As New Binarize_Four
-    Public classCount = 12 ' 4-way split + hue + black + white + 5 classes from 5 meter distance levels
-    Dim hue As New Color_Hue
-    Dim bnw As New Color_BlackAndWhite
-    Dim tiers As New Depth_Tiers
-    Public Sub New()
-        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Define a dozen regions in the image: binarize 4-way, hue, black, white, plus meter-by-meter map."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        hue.Run(task.color)
-
-        binarize.Run(src)
-
-        dst2.SetTo(1, binarize.mats.mat(0))
-        dst2.SetTo(2, binarize.mats.mat(1))
-        dst2.SetTo(3, binarize.mats.mat(2))
-        dst2.SetTo(4, binarize.mats.mat(3))
-
-        dst2.SetTo(5, hue.dst2) ' hue is a 5th class
-
-        bnw.Run(task.color)
-        dst2.SetTo(6, bnw.dst2) ' black is a 6th class
-        dst2.SetTo(7, bnw.dst3) ' white is a 7th class
-
-        If task.toggleOnOff Then
-            tiers.Run(src)
-            dst2 += tiers.dst2
-            classCount += tiers.classCount ' number of additional classes depends on max depth - usually 5 meters.
-        End If
 
         If standaloneTest() Then dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
     End Sub

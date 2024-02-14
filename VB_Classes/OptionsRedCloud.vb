@@ -17,7 +17,7 @@ Public Class OptionsRedCloud
     Public bins3D As Integer
     Public imageThresholdPercent As Single = 0.95
     Dim colorMethods() As String = {"Hist3DColor_Basics", "BackProject_Full", "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
-                                    "Binarize_Split4", "Binarize_Split5", "Binarize_Split7", "Binarize_Split12", "BackProject_Hue"}
+                                    "Binarize_Split4", "Binarize_SplitDepth"}
     Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
         Me.Text = "Options mostly for RedCloud_Basics but other related algorithms too."

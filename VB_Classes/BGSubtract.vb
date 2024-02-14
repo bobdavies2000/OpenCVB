@@ -38,7 +38,7 @@ End Class
 Public Class BGSubtract_Basics_QT : Inherits VB_Algorithm
     Dim learnRate As Double
     Public Sub New()
-        If dst2.Width >= 1280 Then learnRate = 0.5 Else learnRate = 0.1 ' learn faster with large images (slower frame rate)
+        Dim learnRate = If(dst2.Width >= 1280, 0.5, 0.1) ' learn faster with large images (slower frame rate)
         cPtr = BGSubtract_BGFG_Open(4) ' MOG2 is the default method when running in QT mode.
         desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
@@ -88,7 +88,8 @@ Public Class BGSubtract_MOG2_QT : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOG2.Apply(src, dst2, 0.1F)
+        Dim learnRate = If(dst2.Width >= 1280, 0.5, 0.1) ' learn faster with large images (slower frame rate)
+        MOG2.Apply(src, dst2, learnRate)
     End Sub
 End Class
 

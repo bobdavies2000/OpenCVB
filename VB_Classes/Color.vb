@@ -4,7 +4,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
     Public classCount As Integer
     Public classifier As Object
     Public updateImages As Boolean
-    Dim binarize5 As New Binarize_Split5
+    Dim hue As New Color_Hue
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         labels(3) = "vbPalette output of dst2 at left"
@@ -12,6 +12,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        hue.Run(src)
         If task.optionsChanged Or classifier Is Nothing Then
             Select Case redOptions.colorInputIndex
                 Case 0 ' "BackProject_Full"
@@ -32,29 +33,26 @@ Public Class Color_Basics : Inherits VB_Algorithm
                 Case 5 ' "Binarize_Split4"
                     Static binarize4 As New Binarize_Split4
                     classifier = binarize4
-                Case 6 ' "Binarize_Split5"
-                    classifier = binarize5
-                Case 7 ' "Binarize_Split7"
-                    Static binarize7 As New Binarize_Split7
-                    classifier = binarize7
-                Case 8 ' "Binarize_Split12"
-                    Static binarize12 As New Binarize_Split12
-                    classifier = binarize12
-                Case 9 ' "BackProject_Hue"
-                    Static backPHue As New BackProject_Hue
-                    classifier = backPHue
+                Case 6 ' "Binarize_SplitDepth"
+                    Static binarizeDepth As New Binarize_SplitDepth
+                    classifier = binarizeDepth
             End Select
         End If
 
         dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
 
         classifier.run(dst1)
-        If task.motionDetected And task.optionsChanged = False Then
+
+        If task.heartBeat Then
+            dst2 = classifier.dst2.clone
+        ElseIf task.motionDetected Then
             classifier.dst2(task.motionRect).copyto(dst2(task.motionRect))
-        Else
-            classCount = classifier.classCount
-            If task.heartBeat Then dst2 = classifier.dst2.clone
         End If
+
+        classCount = classifier.classCount
+
+        dst2 += hue.dst2
+        classCount += 1 ' hue adds just one more class but may create several more distinct regions.
 
         If task.maxDepthMask.Rows > 0 Then
             classCount += 1

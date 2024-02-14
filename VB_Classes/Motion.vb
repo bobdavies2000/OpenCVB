@@ -819,7 +819,7 @@ End Class
 
 Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
     Dim redMasks As New RedCloud_Masks
-    Public bgSub As New BGSubtract_MOG2
+    Public bgSub As New BGSubtract_MOG2_QT
     Dim rectList As New List(Of cv.Rect)
     Public Sub New()
         redMasks.imageThresholdPercent = 1.0

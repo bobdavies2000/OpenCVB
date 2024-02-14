@@ -454,72 +454,6 @@ End Class
 
 
 
-Public Class GuidedBP_Depth : Inherits VB_Algorithm
-    Public hist As New PointCloud_Histograms
-    Dim myPalette As New Palette_Random
-    Public classCount As Integer
-    Public givenClassCount As Integer
-    Public Sub New()
-        gOptions.HistBinSlider.Value = 16
-        desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-
-        hist.Run(src)
-
-        Dim histArray(hist.histogram.Total - 1) As Single
-        Marshal.Copy(hist.histogram.Data, histArray, 0, histArray.Length)
-
-        Dim histList = histArray.ToList
-        histArray(histList.IndexOf(histList.Max)) = 0
-
-        Dim sortedHist As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
-
-        For i = 0 To histArray.Count - 1
-            sortedHist.Add(histArray(i), i)
-        Next
-
-        classCount = 0
-        Dim count As Integer
-        Dim newSamples(histArray.Count - 1) As Single
-        Dim maxClassCount = 255 - givenClassCount - 1
-        For i = 0 To sortedHist.Count - 1
-            Dim index = sortedHist.ElementAt(i).Value
-            count += sortedHist.ElementAt(i).Key
-            newSamples(index) = classCount
-            classCount += 1
-            ' if we have 95% of the pixels, good enough...
-            ' But leave room for the color classcount (usually < 10)
-            If count / src.Total > redOptions.imageThresholdPercent Or classCount >= maxClassCount Then Exit For
-        Next
-
-        Marshal.Copy(newSamples, 0, hist.histogram.Data, newSamples.Length)
-
-        cv.Cv2.CalcBackProject({src}, redOptions.channels, hist.histogram, dst2, redOptions.ranges)
-        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-
-        If task.maxDepthMask.Rows > 0 Then
-            classCount += 1
-            dst2.SetTo(classCount, task.maxDepthMask)
-        End If
-
-        If standaloneTest() Then
-            labels(3) = "Note that colors are shifting because this is before RedCloud matching."
-            dst2 += 1
-            dst2.SetTo(0, task.noDepthMask)
-            myPalette.Run(dst2)
-            dst3 = myPalette.dst2
-        End If
-
-        labels(2) = CStr(classCount) + " regions detected in the backprojection - " + Format(count / src.Total, "0%")
-    End Sub
-End Class
-
-
-
-
-
 Public Class GuidedBP_Hulls : Inherits VB_Algorithm
     Dim bpDoctor As New GuidedBP_Points
     Public redCells As New List(Of rcData)
@@ -786,5 +720,73 @@ Public Class GuidedBP_Points : Inherits VB_Algorithm
         If task.mouseClickFlag Then selectedPoint = task.clickPoint
         If task.heartBeat Then labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
         If task.heartBeat Then labels(3) = CStr(sideRects.Count) + " objects were identified in the side view."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class GuidedBP_Depth : Inherits VB_Algorithm
+    Public hist As New PointCloud_Histograms
+    Dim myPalette As New Palette_Random
+    Public classCount As Integer
+    Public givenClassCount As Integer
+    Public Sub New()
+        gOptions.HistBinSlider.Value = 16
+        desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+
+        hist.Run(src)
+
+        Dim histArray(hist.histogram.Total - 1) As Single
+        Marshal.Copy(hist.histogram.Data, histArray, 0, histArray.Length)
+
+        Dim histList = histArray.ToList
+        histArray(histList.IndexOf(histList.Max)) = 0
+
+        Dim sortedHist As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
+
+        For i = 0 To histArray.Count - 1
+            sortedHist.Add(histArray(i), i)
+        Next
+
+        classCount = 0
+        Dim count As Integer
+        Dim newSamples(histArray.Count - 1) As Single
+        Dim maxClassCount = 255 - givenClassCount - 1
+        For i = 0 To sortedHist.Count - 1
+            Dim index = sortedHist.ElementAt(i).Value
+            count += sortedHist.ElementAt(i).Key
+            newSamples(index) = classCount
+            classCount += 1
+            ' if we have 95% of the pixels, good enough...
+            ' But leave room for the color classcount (usually < 10)
+            If count / src.Total > redOptions.imageThresholdPercent Or classCount >= maxClassCount Then Exit For
+        Next
+
+        Marshal.Copy(newSamples, 0, hist.histogram.Data, newSamples.Length)
+
+        cv.Cv2.CalcBackProject({src}, redOptions.channels, hist.histogram, dst2, redOptions.ranges)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+
+        If task.maxDepthMask.Rows > 0 Then
+            classCount += 1
+            dst2.SetTo(classCount, task.maxDepthMask)
+        End If
+
+        If standaloneTest() Then
+            labels(3) = "Note that colors are shifting because this is before RedCloud matching."
+            dst2 += 1
+            dst2.SetTo(0, task.noDepthMask)
+            myPalette.Run(dst2)
+            dst3 = myPalette.dst2
+        End If
+
+        labels(2) = CStr(classCount) + " regions detected in the backprojection - " + Format(count / src.Total, "0%")
     End Sub
 End Class
