@@ -513,7 +513,7 @@ Public Class Motion_RectTest : Inherits VB_Algorithm
                 Next
                 src(r).CopyTo(dst2(r))
                 lastRects.Add(r)
-                If lastRects.Count > gOptions.FrameHistory.Value Then lastRects.RemoveAt(0)
+                If lastRects.Count > task.frameHistoryCount Then lastRects.RemoveAt(0)
             Else
                 lastRects.Clear()
             End If
@@ -631,38 +631,6 @@ End Class
 
 
 
-
-Public Class Motion_PointCloud : Inherits VB_Algorithm
-    Public Sub New()
-        labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
-        desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat Then
-            dst2 = task.pointCloud.Clone
-        ElseIf task.motionDetected Then
-            task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
-        Else
-            dst2 = task.pointCloud
-        End If
-        If standaloneTest() Then
-            Static diff As New Diff_Depth32f
-            If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
-            diff.Run(task.pcSplit(2))
-            dst3 = diff.dst2
-            dst3.Rectangle(task.motionRect, 255, task.lineWidth)
-            diff.lastDepth32f = task.pcSplit(2)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Motion_Depth : Inherits VB_Algorithm
     Public Sub New()
         labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
@@ -721,33 +689,6 @@ End Class
 
 
 
-Public Class Motion_Color : Inherits VB_Algorithm
-    Public Sub New()
-        labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated color image",
-                  "Diff of input and latest accumulated color image"}
-        desc = "Display the color image after updating only the motion rectangle.  Resync every heartbeat."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat Then
-            dst2 = src.Clone
-        ElseIf task.motionDetected Then
-            src(task.motionRect).CopyTo(dst2(task.motionRect))
-        Else
-            dst2 = src
-        End If
-        If standaloneTest() And task.motionDetected Then dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
 Public Class Motion_Basics_QT : Inherits VB_Algorithm
     Dim redMasks As New RedCloud_Masks
     Public bgSub As New BGSubtract_MOG2
@@ -787,7 +728,7 @@ Public Class Motion_Basics_QT : Inherits VB_Algorithm
             For Each r In rectList
                 If task.motionRect.Width = 0 Then task.motionRect = r Else task.motionRect = task.motionRect.Union(r)
             Next
-            If rectList.Count > gOptions.FrameHistory.Value Then rectList.RemoveAt(0)
+            If rectList.Count > task.frameHistoryCount Then rectList.RemoveAt(0)
             If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
                 task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
             Else
@@ -851,7 +792,7 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
             For Each r In rectList
                 If task.motionRect.Width = 0 Then task.motionRect = r Else task.motionRect = task.motionRect.Union(r)
             Next
-            If rectList.Count > gOptions.FrameHistory.Value Then rectList.RemoveAt(0)
+            If rectList.Count > task.frameHistoryCount Then rectList.RemoveAt(0)
             If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
                 task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
             Else
@@ -890,5 +831,60 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
 
 
         If task.motionDetected = False Then Dim k = 0
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Motion_PointCloud : Inherits VB_Algorithm
+    Public Sub New()
+        labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
+        desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat Then
+            dst2 = task.pointCloud.Clone
+        ElseIf task.motionDetected Then
+            task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
+        Else
+            dst2 = task.pointCloud
+        End If
+        If standaloneTest() Then
+            Static diff As New Diff_Depth32f
+            If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
+            diff.Run(task.pcSplit(2))
+            dst3 = diff.dst2
+            dst3.Rectangle(task.motionRect, 255, task.lineWidth)
+            diff.lastDepth32f = task.pcSplit(2)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Motion_Color : Inherits VB_Algorithm
+    Public Sub New()
+        labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated color image",
+                  "Diff of input and latest accumulated color image"}
+        desc = "Display the color image after updating only the motion rectangle.  Resync every heartbeat."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat Then
+            dst2 = src.Clone
+        ElseIf task.motionDetected Then
+            src(task.motionRect).CopyTo(dst2(task.motionRect))
+        Else
+            dst2 = src
+        End If
+        If standaloneTest() And task.motionDetected Then dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
     End Sub
 End Class

@@ -441,7 +441,6 @@ Public Class VBtask : Implements IDisposable
 
             redOptions.Sync()
             task.bins2D = {task.workingRes.Height, task.workingRes.Width}
-
             If task.pointCloud.Width > 0 Then
                 ' If the workingRes changes, the previous generation of images needs to be reset.
                 If task.pointCloud.Size <> task.workingRes Or task.color.Size <> task.workingRes Then
@@ -496,7 +495,7 @@ Public Class VBtask : Implements IDisposable
                     If task.pcSplit Is Nothing Then task.pcSplit = task.pointCloud.Split
 
                     ' on each heartbeat or when options changed, update the whole image.
-                    If task.heartBeat Or task.optionsChanged Or gOptions.unFiltered.Checked Then
+                    If task.heartBeat Or gOptions.unFiltered.Checked Then
                         task.motionDetected = True
                         task.motionRect = New cv.Rect(0, 0, task.workingRes.Width, task.workingRes.Height)
                     Else
@@ -508,10 +507,10 @@ Public Class VBtask : Implements IDisposable
                             task.pointCloud = hCloud.dst2
                         ElseIf gOptions.MotionFilteredColorAndCloud.Checked Then
                             task.color = motionColor.dst2.Clone
-                            motionCloud.RunVB(src)
+                            motionCloud.RunVB(task.pointCloud)
                             task.pointCloud = motionCloud.dst2.Clone
                         ElseIf gOptions.MotionFilteredCloudOnly.Checked Then
-                            motionCloud.RunVB(src)
+                            motionCloud.RunVB(task.pointCloud)
                             task.pointCloud = motionCloud.dst2.Clone
                         ElseIf gOptions.MotionFilteredColorOnly.Checked Then
                             task.color = motionColor.dst2.Clone
@@ -538,6 +537,13 @@ Public Class VBtask : Implements IDisposable
                         cv.Cv2.Merge(task.pcSplit, task.pointCloud)
                     End If
                 End If
+
+
+
+                If task.pcSplit(0).Type <> cv.MatType.CV_32F Then Dim k = 0
+
+
+
 
                 ' small improvement to speed up colorized depth - make it smaller before colorizing.
                 Dim depthRGBInput = task.pcSplit(2).Resize(task.quarterRes)
@@ -576,25 +582,25 @@ Public Class VBtask : Implements IDisposable
                     End If
                 End If
 
-                    algorithmObject.NextFrame(src)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
+                algorithmObject.NextFrame(src)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
-                    If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then
-                        task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
-                    End If
-
-                    Dim rc = task.rc
-                    If rc.rect.Width > 1 And rc.rect.Height > 1 Then
-                        task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-                        task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-
-                        task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-                        task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-                    End If
-
-                    task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
-                    task.optionsChanged = False
-                    TaskTimer.Enabled = False
+                If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then
+                    task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
                 End If
+
+                Dim rc = task.rc
+                If rc.rect.Width > 1 And rc.rect.Height > 1 Then
+                    task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+                    task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+
+                    task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+                    task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+                End If
+
+                task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
+                task.optionsChanged = False
+                TaskTimer.Enabled = False
+            End If
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try

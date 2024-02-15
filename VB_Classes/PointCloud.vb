@@ -648,34 +648,6 @@ End Class
 
 
 
-
-
-Public Class PointCloud_ReducedTopView : Inherits VB_Algorithm
-    Dim reduction As New Reduction_Basics
-    Dim histOutput As New cv.Mat
-    Public Sub New()
-        desc = "Create a stable side view of the point cloud"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        src = task.pcSplit(2) * 1000
-        src.ConvertTo(src, cv.MatType.CV_32S)
-        reduction.Run(src)
-        reduction.dst2.ConvertTo(task.pcSplit(2), cv.MatType.CV_32F)
-        task.pcSplit(2) *= 0.001
-        cv.Cv2.Merge(task.pcSplit, dst3)
-
-        cv.Cv2.CalcHist({dst3}, task.channelsTop, New cv.Mat, histOutput, 2, task.bins2D, task.rangesTop)
-
-        histOutput = histOutput.Flip(cv.FlipMode.X)
-        dst2 = histOutput.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
-    End Sub
-End Class
-
-
-
-
-
 Public Class PointCloud_Visualize : Inherits VB_Algorithm
     Public Sub New()
         labels = {"", "", "Pointcloud visualized", ""}
@@ -914,31 +886,6 @@ End Class
 
 
 
-Public Class PointCloud_ReducedSideView : Inherits VB_Algorithm
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        desc = "Show where vertical neighbor depth values are within X mm's"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        src = task.pcSplit(2) * 1000
-        src.ConvertTo(src, cv.MatType.CV_32S)
-        reduction.Run(src)
-        reduction.dst2.ConvertTo(task.pcSplit(2), cv.MatType.CV_32F)
-        task.pcSplit(2) *= 0.001
-        cv.Cv2.Merge(task.pcSplit, dst3)
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.maxZmeters)}
-        cv.Cv2.CalcHist({dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
-
-        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class PointCloud_YRangeTest : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
@@ -1028,5 +975,60 @@ Public Class PointCloud_Histograms : Inherits VB_Algorithm
 
         Dim mm as mmData = vbMinMax(dst2)
         dst3 = vbPalette(dst2 * 255 / mm.maxVal)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class PointCloud_ReducedTopView : Inherits VB_Algorithm
+    Dim reduction As New Reduction_Basics
+    Dim histOutput As New cv.Mat
+    Public Sub New()
+        desc = "Create a stable side view of the point cloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst1 = task.pcSplit(2) * 1000
+        dst1.ConvertTo(dst1, cv.MatType.CV_32S)
+        reduction.Run(dst1)
+        reduction.dst2.ConvertTo(dst0, cv.MatType.CV_32F)
+        dst0 *= 0.001
+        cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), dst0}, dst3)
+
+        cv.Cv2.CalcHist({dst3}, task.channelsTop, New cv.Mat, histOutput, 2, task.bins2D, task.rangesTop)
+
+        histOutput = histOutput.Flip(cv.FlipMode.X)
+        dst2 = histOutput.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
+    End Sub
+End Class
+
+
+
+
+
+Public Class PointCloud_ReducedSideView : Inherits VB_Algorithm
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        desc = "Show where vertical neighbor depth values are within X mm's"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst1 = task.pcSplit(2) * 1000
+        dst1.ConvertTo(dst1, cv.MatType.CV_32S)
+        reduction.Run(dst1)
+        reduction.dst2.ConvertTo(dst0, cv.MatType.CV_32F)
+        dst0 *= 0.001
+        cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), dst0}, dst3)
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.maxZmeters)}
+        cv.Cv2.CalcHist({dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
+
+        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
     End Sub
 End Class
