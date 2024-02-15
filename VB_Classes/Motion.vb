@@ -827,10 +827,6 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
             task.motionRect = validateRect(r)
             dst2.Rectangle(task.motionRect, 255, task.lineWidth + 4)
         End If
-
-
-
-        If task.motionDetected = False Then Dim k = 0
     End Sub
 End Class
 

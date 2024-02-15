@@ -538,13 +538,6 @@ Public Class VBtask : Implements IDisposable
                     End If
                 End If
 
-
-
-                If task.pcSplit(0).Type <> cv.MatType.CV_32F Then Dim k = 0
-
-
-
-
                 ' small improvement to speed up colorized depth - make it smaller before colorizing.
                 Dim depthRGBInput = task.pcSplit(2).Resize(task.quarterRes)
                 colorizer.RunVB(depthRGBInput.Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc))
