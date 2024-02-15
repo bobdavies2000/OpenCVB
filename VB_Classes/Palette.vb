@@ -38,33 +38,27 @@ Public Class Palette_LoadColorMap : Inherits VB_Algorithm
     Public gradientColorMap As New cv.Mat
     Dim cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
     Public Sub New()
-        buildColorMap()
         desc = "Apply the different color maps in OpenCV"
-    End Sub
-    Private Sub buildColorMap()
-        Dim str = cMapDir.FullName + "/colorscale_" + gOptions.Palettes.Text + ".jpg"
-        Dim mapFile As New FileInfo(str)
-        gradientColorMap = cv.Cv2.ImRead(mapFile.FullName)
-        gradientColorMap.Col(0).SetTo(If(whitebackground, cv.Scalar.White, cv.Scalar.Black))
     End Sub
     Public Sub RunVB(src As cv.Mat)
         labels(2) = "ColorMap = " + gOptions.Palettes.Text
 
-        If task.optionsChanged Then buildColorMap()
+        If task.optionsChanged Then
+            Dim str = cMapDir.FullName + "/colorscale_" + gOptions.Palettes.Text + ".jpg"
+            Dim mapFile As New FileInfo(str)
+            Dim colorMap = cv.Cv2.ImRead(mapFile.FullName)
+
+            colorMap.Col(0).SetTo(If(whitebackground, cv.Scalar.White, cv.Scalar.Black))
+            colorMap = colorMap.Row(0)
+            gradientColorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, colorMap.Data).Clone
+        End If
 
         If src.Type = cv.MatType.CV_32F Then
             src = vbNormalize32f(src)
             src.ConvertTo(src, cv.MatType.CV_8U)
         End If
-        Dim mapIndex = Choose(task.paletteIndex + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone,
-                              cv.ColormapTypes.Cividis, cv.ColormapTypes.Cool, cv.ColormapTypes.Hot,
-                              cv.ColormapTypes.Hsv, cv.ColormapTypes.Inferno, cv.ColormapTypes.Jet,
-                              cv.ColormapTypes.Magma, cv.ColormapTypes.Ocean, cv.ColormapTypes.Parula,
-                              cv.ColormapTypes.Pink, cv.ColormapTypes.Plasma, cv.ColormapTypes.Rainbow,
-                              cv.ColormapTypes.Spring, cv.ColormapTypes.Summer, cv.ColormapTypes.Twilight,
-                              cv.ColormapTypes.TwilightShifted, cv.ColormapTypes.Viridis, cv.ColormapTypes.Winter)
-        cv.Cv2.ApplyColorMap(src, dst2, mapIndex)
-        dst3 = gradientColorMap.Resize(dst3.Size)
+        cv.Cv2.ApplyColorMap(src, dst2, gradientColorMap)
+        If standalone Then dst3 = gradientColorMap.Resize(dst3.Size)
     End Sub
 End Class
 
