@@ -1460,6 +1460,7 @@ if algorithmName = "PointCloud_Raw" Then return new PointCloud_Raw
 if algorithmName = "PointCloud_Raw_CPP" Then return new PointCloud_Raw_CPP
 if algorithmName = "PointCloud_ReducedSideView" Then return new PointCloud_ReducedSideView
 if algorithmName = "PointCloud_ReducedTopView" Then return new PointCloud_ReducedTopView
+if algorithmName = "PointCloud_ReduceSplit2" Then return new PointCloud_ReduceSplit2
 if algorithmName = "PointCloud_SetupSide" Then return new PointCloud_SetupSide
 if algorithmName = "PointCloud_SetupTop" Then return new PointCloud_SetupTop
 if algorithmName = "PointCloud_Solo" Then return new PointCloud_Solo

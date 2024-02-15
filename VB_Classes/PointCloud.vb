@@ -1,5 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp.ML.DTrees
+
 Public Class PointCloud_Basics : Inherits VB_Algorithm
     Public actualCount As Integer
     Dim deltaThreshold As Single
@@ -82,7 +84,7 @@ Public Class PointCloud_Basics : Inherits VB_Algorithm
         Return ptlist
     End Function
 
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static deltaSlider = findSlider("Delta Z threshold (cm)")
         deltaThreshold = deltaSlider.value / 100
 
@@ -124,7 +126,7 @@ Public Class PointCloud_Point3f : Inherits VB_Algorithm
     Public Sub New()
         desc = "Display the point cloud CV_32FC3 format"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         dst2 = task.pointCloud
     End Sub
 End Class
@@ -226,7 +228,7 @@ Public Class PointCloud_Continuous_VB : Inherits VB_Algorithm
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Show where the pointcloud is continuous"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static thresholdSlider = findSlider("Threshold of continuity in mm")
         Dim threshold = thresholdSlider.Value / 1000
 
@@ -267,7 +269,7 @@ Public Class PointCloud_SetupSide : Inherits VB_Algorithm
         labels(2) = "Layout markers for side view"
         desc = "Create the colorized mat used for side projections"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim distanceRatio As Single = 1
         If src.Channels <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -346,7 +348,7 @@ Public Class PointCloud_SetupTop : Inherits VB_Algorithm
         labels(2) = "Layout markers for top view"
         desc = "Create the colorize the mat for a topdown projections"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim distanceRatio As Single = 1
         If src.Channels <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -412,7 +414,7 @@ Public Class PointCloud_Raw_CPP : Inherits VB_Algorithm
         desc = "Project the depth data onto a top view And side view."
         cPtr = SimpleProjectionOpen()
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If firstPass Then ReDim depthBytes(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1)
 
         Marshal.Copy(task.pcSplit(2).Data, depthBytes, 0, depthBytes.Length)
@@ -444,7 +446,7 @@ Public Class PointCloud_Raw : Inherits VB_Algorithm
         desc = "Project the depth data onto a top view And side view - Using only VB code (too slow.)"
         cPtr = SimpleProjectionOpen()
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim range As Single = task.maxZmeters
 
         ' this VB.Net version is much slower than the optimized C++ version below.
@@ -508,7 +510,7 @@ Public Class PointCloud_SoloRegions : Inherits VB_Algorithm
         labels(3) = "Histogram after filtering For Single-only histogram bins"
         desc = "Find floor And ceiling Using gravity aligned top-down view And selecting bins With exactly 1 sample"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         solo.Run(src)
         dst2 = solo.dst2
         dst3 = solo.dst3
@@ -533,7 +535,7 @@ Public Class PointCloud_SurfaceH_CPP : Inherits VB_Algorithm
     Public Sub New()
         desc = "Find the horizontal surfaces With a projects Of the SideView histogram."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         heat.Run(src)
         dst2 = heat.dst3
 
@@ -578,7 +580,7 @@ Public Class PointCloud_SurfaceH : Inherits VB_Algorithm
         labels(3) = "Histogram Of Each Of " + CStr(task.histogramBins) + " bins aligned With the sideview"
         desc = "Find the horizontal surfaces With a projects Of the SideView histogram."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         heat.Run(src)
         dst2 = heat.dst2
         Dim hist = New cv.Mat(dst2.Height, 1, cv.MatType.CV_32F, 0)
@@ -627,8 +629,8 @@ Public Class PointCloud_NeighborV : Inherits VB_Algorithm
     Public Sub New()
         desc = "Show where vertical neighbor depth values are within Y mm's"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
         Dim tmp32f = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
@@ -887,33 +889,6 @@ End Class
 
 
 
-Public Class PointCloud_YRangeTest : Inherits VB_Algorithm
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        desc = "Test adjusting the Y-Range value to squeeze a histogram into dst2."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        dst0 = task.pcSplit(2) * 1000
-        dst0.ConvertTo(dst0, cv.MatType.CV_32S)
-        reduction.Run(dst0)
-        reduction.dst2.ConvertTo(task.pcSplit(2), cv.MatType.CV_32F)
-        task.pcSplit(2) *= 0.001
-        cv.Cv2.Merge(task.pcSplit, dst3)
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange),
-                                        New cv.Rangef(0, task.maxZmeters)}
-        cv.Cv2.CalcHist({dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
-
-        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class PointCloud_Histograms : Inherits VB_Algorithm
     Dim plot2D As New Plot_Histogram2D
@@ -984,23 +959,68 @@ End Class
 
 
 
+Public Class PointCloud_ReduceSplit2 : Inherits VB_Algorithm
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        vbAddAdvice(traceName + ": redOptions 'X/Y-Range X100' sliders to test further.")
+        desc = "Reduce the task.pcSplit(2) for use in several algorithms."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst2 = task.pcSplit(2) * 1000
+        dst2.ConvertTo(dst2, cv.MatType.CV_32S)
+        reduction.Run(dst2)
+        reduction.dst2.ConvertTo(dst1, cv.MatType.CV_32F)
+        dst1 *= 0.001
+        If standaloneTest() Then
+            dst3 = task.pointCloud
+        Else
+            Dim mm = vbMinMax(dst1)
+            dst1 *= task.maxZmeters / mm.maxVal
+            cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), dst1}, dst3)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_YRangeTest : Inherits VB_Algorithm
+    Dim split2 As New PointCloud_ReduceSplit2
+    Public Sub New()
+
+        desc = "Test adjusting the Y-Range value to squeeze a histogram into dst2."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        split2.Run(src)
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange),
+                                        New cv.Rangef(0, task.maxZmeters)}
+        cv.Cv2.CalcHist({split2.dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
+
+        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
+    End Sub
+End Class
+
+
+
+
+
 
 
 Public Class PointCloud_ReducedTopView : Inherits VB_Algorithm
-    Dim reduction As New Reduction_Basics
+    Dim split2 As New PointCloud_ReduceSplit2
     Dim histOutput As New cv.Mat
     Public Sub New()
         desc = "Create a stable side view of the point cloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst1 = task.pcSplit(2) * 1000
-        dst1.ConvertTo(dst1, cv.MatType.CV_32S)
-        reduction.Run(dst1)
-        reduction.dst2.ConvertTo(dst0, cv.MatType.CV_32F)
-        dst0 *= 0.001
-        cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), dst0}, dst3)
+        split2.Run(src)
 
-        cv.Cv2.CalcHist({dst3}, task.channelsTop, New cv.Mat, histOutput, 2, task.bins2D, task.rangesTop)
+        cv.Cv2.CalcHist({split2.dst3}, task.channelsTop, New cv.Mat, histOutput, 2, task.bins2D, task.rangesTop)
 
         histOutput = histOutput.Flip(cv.FlipMode.X)
         dst2 = histOutput.Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -1013,17 +1033,12 @@ End Class
 
 
 Public Class PointCloud_ReducedSideView : Inherits VB_Algorithm
-    Dim reduction As New Reduction_Basics
+    Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
         desc = "Show where vertical neighbor depth values are within X mm's"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst1 = task.pcSplit(2) * 1000
-        dst1.ConvertTo(dst1, cv.MatType.CV_32S)
-        reduction.Run(dst1)
-        reduction.dst2.ConvertTo(dst0, cv.MatType.CV_32F)
-        dst0 *= 0.001
-        cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), dst0}, dst3)
+        split2.Run(src)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.maxZmeters)}
         cv.Cv2.CalcHist({dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
