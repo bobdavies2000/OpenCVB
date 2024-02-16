@@ -128,7 +128,7 @@ Public Class DCT_FeatureLess : Inherits VB_Algorithm
         Else
             dst2 = dst2.Threshold(1, 255, cv.ThresholdTypes.Binary)
         End If
-        src.CopyTo(dst3, dst2)
+        src.CopyTo(dst3, Not dst2)
         labels(2) = "Mask of DCT with highest frequency removed"
     End Sub
 End Class
