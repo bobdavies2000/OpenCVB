@@ -104,7 +104,7 @@ Partial Class InsertAlgorithm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(824, 475)
+        Me.ClientSize = New System.Drawing.Size(824, 348)
         Me.Controls.Add(Me.AddPyStream)
         Me.Controls.Add(Me.AddCPP)
         Me.Controls.Add(Me.AddOpenGL)

@@ -196,9 +196,11 @@ The ability to create subsets from the hundreds of algorithms makes it easier to
 
 # Regression Testing All Experiments
 
-Testing is integrated into OpenCVB. Clicking the icon below runs all the algorithms on all the attached depth cameras on the system at all the supported resolutions. The duration of each test can be selected in the Global Options dialog.
+Testing is integrated into OpenCVB. Clicking the ![](media/0e389b18960d55862708fe0bb6011cc8.png) button runs all the algorithms on all the attached depth cameras on the system at all the supported resolutions. The duration of each test can be selected in the OpenCVB Options dialog – use the ![](media/a2316a26371b257dd82180d3c120ad18.png) button.
 
-![](media/f54f2d71170e1f23b640f4e07cf295d5.png)
+![](media/3935db6a9c06ec926e80dfefbf8fe383.png)
+
+**OpenCVB Combo Boxes**: *The first combo box shows the name of the currently running algorithm – here “SLR_Trends”. The second combo box shows the name of the current group of algorithms selected.*
 
 When using a subset of the algorithms, the “Test All” button will test only the algorithms in the subset. This can be useful when changing an algorithm that is reused by other OpenCVB algorithms. For instance, if the Edges_Sobel algorithm is changed, select “Edges_Sobel” in the Subset Combo Box, then click the regression test button to visually review each algorithm using the updated Edges_Sobel.
 
@@ -220,13 +222,13 @@ OpenCVB also includes the ability to translate VB.Net algorithms to C++. A new i
 
 All the camera code is organized with the “camera” class – see cameraRS2.vb, cameraKinect.vb, cameraMynt.vb, cameraOakD.vb, or cameraZed2.vb. There are no references to camera interfaces anywhere in the code except for the main user interface form – OpenCVB.vb. Isolating the camera support from the algorithms strips the algorithm code to just the essential OpenCV API’s needed.
 
-For example, the Kinect for Azure camera support is in the cameraKinect.vb class. The C++ interface to the Kinect for Azure camera is in a supporting Kinect4Azure DLL. Since there is likely to be little interest in debugging the Kinect4Azure DLL, the Release version is used even in the Debug configuration. If it is necessary to debug the camera interface, open the Build/Configuration Manager menu and modify the desired camera entry to use the Debug version. Using Release versions naturally enables a higher framerate and as a result, the VB.Net code – which is in Debug mode - is almost as fast as the Release configuration.
+For example, the Kinect for Azure camera support is in the cameraKinect.vb class. The C++ interface to the Kinect for Azure camera is in a supporting Kinect4Azure DLL. Since there is likely to be little interest in debugging the Kinect4Azure DLL, the Release version is used even in the Debug configuration. If it is necessary to debug the camera interface, open the Build/Configuration Manager menu and modify the desired camera entry to use the Debug version. Using Release versions naturally enables a higher framerate and as a result, the VB.Net code – which is usually in Debug mode - is almost as fast as the Release configuration.
 
 # OpenGL Interface
 
-There have been several attempts to provide OpenGL interfaces into managed code, but none is used here. OpenGL is simply run in a separate process. To accommodate running separately, a named-pipe moves the image data to the separate process and a memory-mapped file provides a control interface. The result is both robust and economical leaving the OpenGL C++ code independent of camera hardware specifics. The VB.Net code for the OpenGL interface is less than a page and does not require much memory or CPU usage.
+There have been several attempts to provide OpenGL interfaces into managed code, but none is used here. OpenGL is simply run in a separate process. To accommodate running separately, a named-pipe moves the image data to the separate process and a memory-mapped file provides a control interface. The result is both robust and economical while making the OpenGL code independent of camera hardware specifics. The VB.Net code for the OpenGL interface is less than a page and does not require much memory or CPU usage.
 
-To accommodate building new OpenGL experiments, OpenCVB includes an interface shown below in the section on creating new C++ “IncludeOnly” algorithms. The interface is triggered with one of the “Blue Plus” icon in the OpenCVB main form. The interface can add a variety of algorithms as indicated below.
+To accommodate building new OpenGL experiments, OpenCVB includes an interface shown below in the section on creating new C++ “IncludeOnly” algorithms. The interface is triggered with one of the ![](media/0dede74f225b8e19e8f4fd5a50ba9f28.png) button in the OpenCVB toolbar. The interface can add a variety of algorithms as indicated below.
 
 # Python Interface
 
@@ -242,36 +244,35 @@ If any of the Python scripts fail, open a command line window and run the script
 
 Python scripts are run in a separate address space when invoked by OpenCVB just like OpenGL. Visual Studio’s Python debugging environment is not available directly when running OpenCVB. When a Python script fails in OpenCVB, it will disappear, but it may be tested in a command line window to reveal the error messages.
 
-# Creating C++ “IncludeOnly” Algorithms
+# Creating C++ “AI_Generated” Algorithms
 
 There are some tools included with OpenCVB which make it a lot easier to add C++ algorithms. The toolbar includes 2 icons for this purpose:
 
 ![](media/6ea4526065a1fa32388a4a5305706527.png)
 
-**Toolbar additions:** *The “Blue Plus” sign is used to add new algorithms. The yellow “*T*” is an interface to the translator to move the current algorithm from VB.Net to C++. The translator is OpenCVB-specific and relies on the patterns and structure of the VB.Net algorithms.*
+**Toolbar additions:** *The ![](media/0dede74f225b8e19e8f4fd5a50ba9f28.png) button is used to add new algorithms. The ![](media/8b48ec3d1b9bd1ac4814aa20cb031b96.png) button is an interface to Microsoft’s ChatGPT or Google’s Bard to move the current algorithm from VB.Net to C++.*
 
-Adding a new algorithms to OpenCVB can take any of the several forms outlined in the figure below. The last button at the bottom of the dialog box is labeled “Add ‘IncludeOnly’ C++ algorithm”. It use is to incorporate the results of any C++ algorithm translated from VB.Net.
+Adding a new algorithms to OpenCVB can take one of the several forms outlined in the figure below.
 
-![Graphical user interface, text, application Description automatically generated](media/9fa333328191857e1ec6f8a25e821970.png)
+![A screenshot of a computer Description automatically generated](media/2e5935027deb91c182c989b526074bf1.png)
 
-**Building New OpenCVB algorithms:** *The form above is accessed by clicking on the “Blue Plus” sign in the main toolbar for OpenCVB. The bottom button is the most recent addition. It assists in creating the necessary entries to start a new C++ “IncludeOnly” algorithm. All the “IncludeOnly” algorithms can be moved to any C++ application outside of OpenCVB just by adding one include file from OpenCVB – “CPP_IncludeOnly.h”. An imgui application using the include-only file is available in the OpenCVB solution.*
+**Building New OpenCVB algorithms:** *The form above is accessed by clicking on the ![](media/0dede74f225b8e19e8f4fd5a50ba9f28.png) button in the main toolbar for OpenCVB. Once a name is decided on, clicking on one of the buttons will add the new algorithm to OpenCVB.*
 
 # The quickest way to add a new C++ algorithm is to use the “VB_to_CPP” project included in the “OpenCVB.sln” file.
 
--   Run OpenCVB, click the “Blue Plus” icon, and click the “Add ‘IncludeOnly’ C++ algorithm” button in the figure above.
 -   Set the “Startup Project” in OpenCVB’s Visual Studio solution to “VB_to_CPP”.
     -   The output of “VB_to_CPP” includes the VB.Net version on one side and the C++ equivalent on the other side.
--   Copy the C++ output text to the “CPP_IncludeOnly.h” file included in “CPP_Classes” project in the OpenCVB solution.
+-   Following the step-by-step instructions for the translator will automatically insert the new C++ algorithm into the “CPP_AI_Generated.h” file – an ‘Include Only’ style .h file which can be included into a C++ project. No library or link update is required.
 -   The algorithm is translated into C++ but there are usually errors. To fix these errors, there are 2 methods:
     -   Tweak the VB_to_CPP.vb code to update this and all future VB.Net translations.
-    -   Or: tweak the C++ code in “CPP_IncludeOnly.h” to update only the current algorithm.
+    -   Or: tweak the C++ code in “CPP_AI_Generated.h” to update only the current algorithm.
 -   Rerun the “VB_to_CPP” application until the C++ code compiles and works.
 -   Currently, there is no support for options for C++ IncludeOnly algorithms.
     -   Options are dependent on the user interface.
-    -   Variables that are typically options will be marked with “options_\<option_name\>” at the start of the variable name.
-    -   The option values in the VB.Net algorithm can be used to fine-tune and placed in hard-coded values in the C++ code.
+    -   Variables that are typically options will be marked with “options_” at the start of the variable name.
+    -   All of the currently available Options.vb entries are already translated into the C++ interface.
 
-There are over 1000 VB.Net algorithms included in OpenCVB and there are currently less than 100 C++ translated algorithms. It is expected that future releases of OpenCVB will include more C++ editions of VB.Net algorithms. Translating any of the VB.Net algorithms to C++ provides an excellent code review of both the VB.Net and C++ code.
+There are nearly 2000 VB.Net algorithms included in OpenCVB and there are currently hundreds of C++ translated algorithms. It is expected that future releases of OpenCVB will include more C++ editions of VB.Net algorithms. Translating any of the VB.Net algorithms to C++ provides an excellent code review of both the VB.Net and C++ code.
 
 # Visual Studio C++ Debugging
 
@@ -302,11 +303,11 @@ The Mynt D SDK creates a system environmental variable MYNTEYED_SDK_ROOT that al
 
 # TreeView
 
-The TreeView shows the different layers of the algorithm and how it was built from other OpenCVB algorithms. Here is a simple algorithm tree view that shows how the KNN_PointTracker algorithm was built:
+The TreeView shows the different layers of the algorithm and how it was built from other OpenCVB algorithms. Here is a simple algorithm tree view that shows how the “KNN_TrackEach” algorithm was built:
 
-![Graphical user interface, text, application, email Description automatically generated](media/5f4b6c13e3d0e852b0705339f893603e.png)
+![A screenshot of a computer program Description automatically generated](media/c844902ab4d892dcf51d5a2d24c676f0.png)
 
-*The tree above describes how the algorithm calls KNN_1_to_1 and how KNN_1_to_1 calls KNN_BasicsQT and so on. Clicking on any of the tree entries will show the output of the selected algorithm in OpenCVB’s output (if that algorithm is active.) This is useful to understanding the various steps needed to build the output.*
+**KNN_TrackEach:** *The tree above describes how the algorithm calls KNN_Basics and how KNN_Basics calls KNN_Core on. Clicking on any of the tree entries will show the output of the selected algorithm in OpenCVB’s output (if that algorithm is active.) This is useful to understanding the various steps needed to build the output.*
 
 *Play with this when running OpenCVB. It is a fun feature and helps increase understanding of the composition of increasingly complex algorithms.*
 
@@ -1003,7 +1004,7 @@ The heat map is a well-known method to display populations – blue is cool or l
     -   Example below captures the entire application window.
 -   A log of the monthly changes is included at the bottom of this document.
 
-![A picture containing screenshot, cartoon, purple Description automatically generated](media/18af30fc5898ad34f3817c06087bb161.gif)**RedCloud_ColorCloud:** *An example of using the new GIF interface to capture an OpenCVB algorithm. The top right image is the RedCloud_Basics using the point cloud data, the lower left image is the RedColor_Basics using color instead of the point cloud, and the lower right assigns the RedCloud_Basics cell color from the RedColor_Basics. The result is a fusion of the point cloud and color data.*
+![](media/62ec1d7073fbf71e996e7ada7bec557b.gif)**RedCloud_BasicsColor:** *An example of using the GIF interface to capture an OpenCVB algorithm. The bottom left image is the RedCloud_BasicsColor output that uses both color and cloud data..*
 
 # Recent Changes – July 2023
 
@@ -1023,9 +1024,9 @@ The heat map is a well-known method to display populations – blue is cool or l
     -   RedCommon algorithms can be by either RedCloud or RedColor.
 -   A log of the monthly changes is included at the bottom of this document.
 
-    ![A screenshot of a computer Description automatically generated](media/633cf4eac674ceedd2621d2764796460.gif)
+    ![](media/6cba27c1ec97a5d241d60e43951855c1.gif)
 
-**RedCC_Motion:** *The GIF above shows another way to detect motion in an image. The upper right shows the conventional difference between images – a standard way to detect changes in pixel values by comparing images. The lower left image is the RedColor_Basics output with cells for each reduced color segment. The lower right image shows the RedColor cells that contain pixels that changed. When run with the StereoLabs 2i camera, the algorithm is able to run at 65 FPS with the new 336x188 resolution.*
+**RedCloud_MotionBGSubtract:** *The GIF above shows another way to detect motion in an image. The lower right shows the conventional difference between images – a standard way to detect changes in pixel values by comparing images. The lower left image is the RedCloud_Basics output with cells for each reduced color segment. The upper right image shows the RedCloud cells that contain pixels that changed.*
 
 # Recent Changes – July 2023
 
@@ -1248,7 +1249,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 -   But every translation requires a few touch-ups to get the C++ version working.
 -   A tutorial shows how to create a C++ version of an OpenCVB algorithm.
     -   All translated algorithms are in an “include only” format – no library needed.
-    -   Just add the CPP_IncludeOnly.cpp file in your (non-OpenCVB) C++ applications.
+    -   Just add the CPP_AI_Generated.cpp file in your (non-OpenCVB) C++ applications.
     -   See the tutorial titled “(7) AI Generated C++” in the OpenCVB tree.
 -   The review of the C++ algorithms prompted a reorganization of the C++ code.
     -   The reduced number of files should make it easier to reuse the code elsewhere.

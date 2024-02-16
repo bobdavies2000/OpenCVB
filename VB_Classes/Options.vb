@@ -3315,7 +3315,7 @@ Public Class Options_Gif : Inherits VB_Algorithm
             radio.addRadio("Capture dst3")
             radio.addRadio("Capture entire OpenCVB window")
             radio.addRadio("Capture OpenGL window")
-            radio.check(2).Checked = True
+            radio.check(4).Checked = True
         End If
         buildCheck = findCheckBox("Build GIF file in <OpenCVB Home Directory>\Temp\myGIF.gif")
         restartCheck = findCheckBox("Restart - clear all previous images.")
