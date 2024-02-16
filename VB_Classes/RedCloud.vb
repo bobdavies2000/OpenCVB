@@ -556,9 +556,10 @@ Public Class RedCloud_PlaneColor : Inherits VB_Algorithm
         desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        If task.motionDetected = False Then Exit Sub
         options.RunVB()
 
-        redC.Run(src)
+            redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
