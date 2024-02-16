@@ -30,6 +30,8 @@ Public Class Grid_Basics : Inherits VB_Algorithm
                 Next
             Next
 
+            If task.color Is Nothing Then Exit Sub ' startup condition.
+
             If src.Size = task.color.Size Then
                 task.gridMask.SetTo(0)
                 For x = gOptions.GridSize.Value To src.Width - 1 Step gOptions.GridSize.Value
