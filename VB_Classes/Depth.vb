@@ -293,7 +293,6 @@ Public Class Depth_Colorizer_CPP : Inherits VB_Algorithm
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, depthData, 0, depthData.Length)
-        Console.WriteLine("Depth.width = " + CStr(src.Width))
         Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.maxZmeters)
         handleSrc.Free()
 

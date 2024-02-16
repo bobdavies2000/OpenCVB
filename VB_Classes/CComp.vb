@@ -151,7 +151,6 @@ Public Class CComp_Stats : Inherits VB_Algorithm
     Public rects As New List(Of cv.Rect)
     Public areas As New List(Of Integer)
     Public centroids As New List(Of cv.Point)
-    Dim colorMap As cv.Mat
     Public numberOfLabels As Integer
     Public options As New Options_CComp
     Public Sub New()
@@ -159,11 +158,7 @@ Public Class CComp_Stats : Inherits VB_Algorithm
         desc = "Use a threshold slider on the CComp input"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If firstPass Then
-            task.palette.Run(src)
-            colorMap = task.palette.gradientColorMap.Row(0).Clone
-        End If
-
+        dst2 = src
         options.RunVB()
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -171,7 +166,6 @@ Public Class CComp_Stats : Inherits VB_Algorithm
 
         Dim stats As New cv.Mat
         Dim centroidRaw As New cv.Mat
-        dst2 = src
         numberOfLabels = src.ConnectedComponentsWithStats(dst1, stats, centroidRaw)
 
         rects.Clear()
@@ -179,7 +173,7 @@ Public Class CComp_Stats : Inherits VB_Algorithm
         centroids.Clear()
 
         Dim colors As New List(Of cv.Vec3b)
-        Dim maskOrder As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
+        Dim maskOrder As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
         Dim unsortedMasks As New List(Of cv.Mat)
         Dim unsortedRects As New List(Of cv.Rect)
         Dim unsortedCentroids As New List(Of cv.Point)
@@ -187,11 +181,13 @@ Public Class CComp_Stats : Inherits VB_Algorithm
 
         For i = 0 To Math.Min(256, stats.Rows) - 1
             Dim area = stats.Get(Of Integer)(i, 4)
+            If area < 10 Then Continue For
             Dim r1 = validateRect(stats.Get(Of cv.Rect)(i, 0))
             Dim r = validateRect(New cv.Rect(r1.X, r1.Y, r1.Width, r1.Height))
             If (r.Width = dst2.Width And r.Height = dst2.Height) Or (r.Width = 1 And r.Height = 1) Then Continue For
             areas.Add(area)
             unsortedRects.Add(r)
+            dst2.Rectangle(r, task.highlightColor, task.lineWidth)
             index.Add(i)
             colors.Add(task.vecColors(colors.Count))
             maskOrder.Add(area, unsortedMasks.Count)
@@ -208,14 +204,8 @@ Public Class CComp_Stats : Inherits VB_Algorithm
             centroids.Add(unsortedCentroids(mIndex))
         Next
 
-        ' this does not fix the color flashing problem but if the component count is the same (for the same areas) the colors will be stable.
-        task.palette.gradientColorMap = colorMap.Clone
-        For i = 0 To colors.Count - 1
-            task.palette.gradientColorMap.Set(Of cv.Vec3b)(0, index(i), colors(i))
-        Next
-
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
-        dst3 = vbPalette(dst0)
+        dst3 = vbPalette(dst0 * 255 / centroids.Count)
         labels(3) = CStr(masks.Count) + " Connected Components"
     End Sub
 End Class

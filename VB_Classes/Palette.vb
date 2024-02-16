@@ -41,9 +41,9 @@ Public Class Palette_LoadColorMap : Inherits VB_Algorithm
         desc = "Apply the different color maps in OpenCV"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        labels(2) = "ColorMap = " + gOptions.Palettes.Text
 
-        If task.optionsChanged Or gradientColorMap.Width = 0 Then
+        If task.optionsChanged Or gradientColorMap.Rows <> 256 Then
+            labels(2) = "ColorMap = " + gOptions.Palettes.Text
             Dim str = cMapDir.FullName + "/colorscale_" + gOptions.Palettes.Text + ".jpg"
             Dim mapFile As New FileInfo(str)
             Dim colorMap = cv.Cv2.ImRead(mapFile.FullName)
