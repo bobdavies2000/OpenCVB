@@ -1,41 +1,36 @@
-# Recent Changes – January 2024 (Part 2)
+# Recent Changes – February 2024
 
--   Over 1800 algorithms are included, averaging 29 lines of code per algorithm.
--   The jump in the algorithm count is due to the AI generated C++ copies.
--   See “CPP_AI_Generated.h” for the examples of the AI generated C++ versions.
-    -   Any VB.Net algorithm can be translated to C++ using AI.
-    -   A step-by-step method is available in OpenCVB to translate VB.Net code.
-    -   The OpenCVB translator has been rewritten to use Google’s Bard AI engine.
-    -   The “T” for translate button is available in OpenCVB’s main toolbar:
-
-![](media/86bab3338bba640ac3c8fa4505296c86.png)
-
--   OpenCVB’s short algorithms are ideal tests for Bard’s translator.
-    -   Bard is aware of OpenCV and the differences in the API’s from VB.Net to C++.
--   But every translation requires a few touch-ups to get the C++ version working.
--   A tutorial shows how to create a C++ version of an OpenCVB algorithm.
-    -   All translated algorithms are in an “include only” format – no library needed.
-    -   Just add the CPP_IncludeOnly.cpp file in your (non-OpenCVB) C++ applications.
-    -   See the tutorial titled “(7) AI Generated C++” in the OpenCVB tree.
--   The review of the C++ algorithms prompted a reorganization of the C++ code.
-    -   The reduced number of files should make it easier to reuse the code elsewhere.
--   Why not put everything in C++? Answer: Bard is not that good and it is real work!
-    -   Translators make assumptions and short algorithms make fewer of them.
--   Translating an algorithm is an excellent way to review the code.
-    -   Often improvements become clear when implementing the C++ version.
-    -   Translation back to VB.Net keeps the 2 trees in sync (Bard can do that too.)
--   This version also introduces another RedCloud color source: Binarize_FourWay.
-    -   Binarize an image and binarize each half to classify each pixel.
-    -   Below is an example of the output from RedCloud_BinarizeColor.
+-   Over 1800 algorithms are included, averaging 32 lines of code per algorithm.
+    -   Average went up because counting didn’t include some of the new C++ code.
+-   A new group name “\<All Reused and Callees\>” shows algorithms reuse.
+    -   Removes one-off experiments and cleans up the list of algorithms.
+    -   It is a further refinement of the user interface to help active development.
+    -   It also provides a useful way for beginners to find the better algorithms.
+-   Motion-filtered color and cloud images are controlled through a global option.
+    -   Example below shows the improvements to the RedCloud output that result.
+-   Microsoft’s Copilot can provide VB.Net to C++ translation as well.
+    -   It costs to get the Pro version with full translation support.
+    -   The free version limits the number of characters for translation.
+-   Both Bard and Microsoft use EMGU when C++ is translated to VB.Net.
+    -   OpenCVB doesn’t need EMGU – and there are OpenCVSharp conflicts.
+    -   Use the OpenCVSharp equivalent instead of the EMGU API.
+-   OpenCV 4.9 was available and OpenCVB has switched to using it by default.
+-   OpenCVSharp 4.9 similarly is now the default for use in OpenCVB.
+-   The OpenCV Samples provide an excellent resource but may be hard to run.
+    -   Too often parameters are required which make it challenging to use.
+    -   OpenCVB has started migrating the OpenCV samples to VB.Net.
+    -   As with all OpenCVB algorithms, each will work when clicked.
+-   A new GroupName “\<All Reused and Callees\>” shows all the reused algorithms.
+    -   A reused algorithm is likely to be more useful than unreused algorithms.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/9b95f50d8a35d8ee7156f9fb857f4557.jpeg)
+![](media/da280b898b238ab7490bfca8fc4abbfa.gif)
 
-**RedCloud_BinarizeFourWay:** *Each pixel in the image can be separated into 4 categories using just the color data. The grayscale brightness is binarized and then each half is binarized again to produce 4 classifications of pixels. Each resulting region is found with RedCloud to produce the typical cells shown in the lower left image. The lower right shows the output of the Binarize_FourWay algorithm which is then input to a RedCloud color-only analysis.*
+**RedCloud_BasicsColor:** *The color input for RedCloud_BasicsColor and any other OpenCVB algorithm can be motion-filtered using a global option. The frame is only processed if there is scene motion. The objective is to improve the consistency of the cells produced which can be seen in the cells away from the motion – look to the right side of the image. There is little benefit to capturing cell perturbations when there is no motion in the color image for that cell. Motion-filtered color images often display artifacts from a previous frame but when the image data is already so variable from frame to frame, there is little downside to motion-filtering for image segmentation. A new global option allows the motion rectangle to be displayed in the upper left image (in white.)*
 
 # Introduction
 
-There is no better documentation of an algorithm than a working example. This is especially true for computer vision where the output is visual and often self-explanatory. Now imagine well over 1000 OpenCV examples in a single app where each algorithm is less than a page of code and in a familiar language. And each algorithm is *just the algorithm* without baggage from a user interface or environment. Each algorithm is designed to be reused in other algorithms so variations can be easily built.
+There is no better documentation of an algorithm than a working example, especially in computer vision where the output is often self-explanatory. Imagine having access to over 1000 OpenCV examples in a single app, where each algorithm is less than a page of code and written in a familiar language. Each algorithm is designed to be reused in other algorithms, so variations can be easily built. [Moreover, each algorithm is free from any baggage from a user interface or environment.](https://microsoft.github.io/computervision-recipes/)
 
 A full installation can take about 30-50 minutes using the 1-step “Update_All.bat” file discussed in the “Installation” section below. But there is no obligation to install needed libraries just to read the code for an algorithm. Open the OpenCVB.sln file after downloading and inspect the code in the C++, C\#, VB.Net or Python. Each algorithm gets a standardized presentation of all the data from any of the RGBZ cameras listed below.
 
@@ -43,7 +38,37 @@ However, a full installation is recommended. An algorithm may fit in one page of
 
 The basic layout of OpenCVB is shown below. Any of the algorithms can be selected from the first combo box at the top of the form. The second combo box is used to select an algorithm group. The default grouping is “\<All\>”. There are a variety of other special groupings that select, for example, all Python or all C++ algorithms.
 
-![](media/0094dd80a047099af3fa5ecf92dee723.png)
+![A screenshot of a computer Description automatically generated](media/5bfa7d36d0713e88db4510ae57d5bac9.png)
+
+**OpenCVB Layout:** *The layout of the OpenCVB application shows the RGB camera output in the upper left, the colorized depth data in the upper right, and the algorithm outputs in the bottom left and right. This algorithm (Segmented Linear Regression or SLR_Trends) has only one output in the lower left.*
+
+![](media/3935db6a9c06ec926e80dfefbf8fe383.png)
+
+**OpenCVB ToolBar:** *The first combo box selects the algorithm – here “SLR_Trends” while the second combo box selects the group of algorithms – here “\<All but Python\>” which controls what algorithms are available in the first combo box. The “\<All but Python\>” group includes all the C\#, C++, and VB.Net algorithms and excludes the Python algorithms.*
+
+![](media/3935db6a9c06ec926e80dfefbf8fe383.png)
+
+**Navigation Buttons:** *The ![](media/015b3a399d0988a17ea3e25e416a4fdd.png)buttons navigate between algorithms. Use these arrows to jump between algorithms. The “File” menu entry will present a list of previous algorithms to allow jumping to algorithms other than the previous or next.*
+
+**Run and Pause:** *The ![](media/8a0dfa720460a53afbcd56d30b78e238.png)button will start and pause the algorithm.*
+
+**OpenCVB Settings:** *The ![](media/c0fffa733107b84431631ffe783c61b4.png)button will start and pause the algorithm.*
+
+**OpenCVB Settings:** *The ![](media/729c6b5490c1be7552df7fc056af136b.png) button will start and stop the overnight testing of each algorithm at various resolutions.*
+
+**Tree View:** *The ![](media/c8d6a2148f4de451bb6ddfca853a28ad.png) button shows the tree view of the current algorithm. Since many algorithms create a stack of inputs and outputs the tree view shows all them and allows any entry in the stack to be selected. Selecting an entry will show the output of that algorithm. Also shown in the Tree View is the percent utilization of each contributing algorithm.*
+
+**Pixel Viewer:** *The ![](media/b5c54b9b31c1c9e4aabb65640ba92463.png) button will display a separate form showing the pixel values for any of the 4 images. The pixel viewer is aware of the image type so if the image is 32 bit, it will show the floating point values.*
+
+**Create Algorithm:** *The ![](media/850a870af3b7ca340674f12fb84dd90e.png) button will open a dialog box that guides the user to create a new algorithm. The different types of algorithms that may be created are VB.Net, C++, OpenGL, C\#, or Python.*
+
+**Complexity Evaluation:** *The ![](media/a5052fbe863b1a080812ce60d9b4644f.png) button will run the current algorithm across a variety of resolutions to evaluate the complexity of the algorithm. Complexity if often designated as O(n), hence the O.*
+
+**Algorithm Translation:** *The ![](media/8b48ec3d1b9bd1ac4814aa20cb031b96.png) button will guide the user through the translation of the VB.Net algorithm to C++ using Google’s Bard or Microsoft’s ChatGPT AI interfaces. Once translated to C++, the algorithm may be moved to any environment or operating system.*
+
+**Advice/Info Button:** *The ![](media/e895e394551ce117375db85115ea6cd5.png) button will display any advice about how to use the algorithm. With so many global and local options, this advice will highlight which sliders or check boxes are most relevant to impacting the current algorithm.*
+
+**OpenCVB Caption:** *The caption at the top requires some further explanation. The number of lines of code in OpenCVB and the number of algorithms are shown. Using these, the average number of lines per algorithm is computed. Also, the name of the current camera is shown next to the frame rate for the camera and the frame rate for the algorithm. The camera is in its own thread so its frame rate may be higher than the rate at which the frames are processed in the algorithm thread.*
 
 # The Objective
 
@@ -159,9 +184,9 @@ Code “snippets” are provided to accelerate development of new VB.Net, OpenGL
 
 To see the complete list of algorithm types that can be added to OpenCVB, click on the “Blue Plus” button in the user interface. A dialog box will guide the selection of the type of algorithm to be added.
 
-# Experimental Subsets
+# Algorithm Groups
 
-The complete list of algorithms may be grouped into smaller subsets to study some shared API. Algorithm subsets are selected through the Subset Combo Box in the toolbar (indicated below.) The list of subsets is built from all the OpenCVB algorithm names and all the OpenCV API’s referenced. For instance, selecting “Threshold” in the Subset Combo Box, will update the Algorithm Combo Box with all the algorithms that use the OpenCV “Threshold” API.
+The complete list of algorithms may be grouped into smaller subsets to study some shared API. Algorithm subsets are selected through the Subset Combo Box in the toolbar (indicated below.) The list of subsets is built from all the OpenCVB algorithm names and the OpenCV API’s. For instance, selecting “Threshold” in the Subset Combo Box, will update the Algorithm Combo Box with all the algorithms that use the OpenCV “Threshold” API.
 
 ![](media/f9431efec6cb8ae1599689669c57c1db.png)
 
@@ -388,19 +413,13 @@ The list of people who have made OpenCVB possible is long but starts with the Op
 
 # New Feature Highlight – TreeView
 
-![Graphical user interface, text, application Description automatically generated](media/3eb7294b2237579c05882b17d6784b88.png)
+![A screenshot of a computer Description automatically generated](media/80ad200f3aea31fd66d4a388697cded6.png)
 
-The TreeView now shows the cost of each component in the algorithm, including global algorithms, in the right side of the TreeView. In the list of component costs above, the “Non-Algorithm” time is the largest individual item. Non-Algorithm refers to all the other costs in the OpenCVB application which includes the user interface and the cost of obtaining the camera images and IMU data.
+The Tree View shows the cost of each component of the structure of the algorithm on the left side and the cost of each component on the right side. The active algorithm here was “RedCloud_BasicsColor” – also the top entry in the tree view at the left. The frame rate for the algorithm is shown at the top right.
 
-The active algorithm at the time this TreeView was captured was “TimeView_Basics” – also the top entry in the tree view at the left of the image above. TimeView_Basics is the active algorithm, but it obtains the histogram of both the Side and Top Views (see Histogram_TopView2D and Histogram_SideView2D costs) which are projections of the point cloud (see Depth_PointCloud_IMU cost.) The point cloud was rotated using the gravity vector in the IMU_GVector algorithm at a cost of only 1%.
+The ‘waitingForInput’ entry is important to understanding performance. The percentage is often near zero and would indicate that the algorithm is processor-bound. If the value is significantly far from 0, it would indicate that the algorithm is I/O bound.
 
-Some of the algorithms above are executed for all algorithms and will be present in every cost analysis. The IMU_IsCameraLevel and IMU_IsCameraStable are low-cost algorithms that make global variables available that can determine if the camera is level or if the camera is moving. OptionsCommon_Depth operates on the depth using the maximum specified range (a global setting in the user interface.) It is run on every frame regardless of the algorithm because depth data is commonly used and an important component in OpenCVB.
-
-At the bottom of the new TreeView form is a checkbox that allows the time to accumulate or be refreshed with only the latest time interval (approximately 1 second.) If the algorithm contains a variety of different approaches, leaving this item unchecked will allow quick review of the cost of each algorithm variation. Leaving the box checked will accumulate all the time used since starting the algorithm.
-
-With this new TreeView, the cost analysis is available for every algorithm in OpenCVB – automatically.
-
-All previous features of the TreeView are still fully supported in the new edition. The tree view controls what output is shown in the user interface. The default output is always the main algorithm – in this case “TimeView_Basics”. Clicking on “Histogram_SideView2D” will show the intermediate output from the Histogram_SideView2D component. When building a new algorithm, clicking through the TreeView can determine which step in the process did not provide the expected output.
+The Tree View provides a structure and performance analysis for every algorithm in OpenCVB – automatically.
 
 # Recent Changes – September 2021
 
@@ -412,16 +431,6 @@ All previous features of the TreeView are still fully supported in the new editi
 -   First example of using low resolution internally while displaying full resolution
 -   RGB Depth can be displayed with numerous different palettes. You can create your own.
 
-# New Feature Highlight – Is my Algorithm Processor-bound?
-
-![Graphical user interface, text, application Description automatically generated](media/86cfe66d9c20f7affbe58f7c35f0d564.png)
-
-*Example 1: Room to grow (at left)*
-
-*Example 2: Saturated processor (at right)*
-
-The key to understanding whether an algorithm is processor-bound is provided in the images above. **Example 1** shows the algorithm spent over 88% of its time in the “inputSyncWait” algorithm. This is the algorithm task function that waits for additional input from the camera task. Note that the frame rate is 66 FPS. In **Example 2**, the “inputSyncWait” algorithm is way down the list at 1.0% indicating that whenever the algorithm task finished a set of buffers, a new set of buffers is almost immediately available. Note that the frame rate is only 20 FPS in Example 2. The second algorithm is processor-bound while the first is not.
-
 # Recent Changes –November 2021
 
 -   Almost 1100 algorithms – almost all less than a page of code. Average algorithm is 31 lines of code
@@ -432,7 +441,7 @@ The key to understanding whether an algorithm is processor-bound is provided in 
 
 ![Graphical user interface Description automatically generated](media/68cd4fbfec6491a47bd5299edef1a617.png)
 
-*New to OpenCVB: start with the Algorithm Ranks*
+**New to OpenCVB?***: start with the Algorithm Ranks*
 
 With over a thousand algorithms in OpenCVB, it can be overwhelming for a new user to explore. To help, there are 2 kinds of rankings inside OpenCVB. The “Reuse Rank” shows how often algorithms reuse another algorithms. This is a useful measure of how general or useful the algorithm is. The “Value Rank”, on the other hand, is manually inserted in each algorithm. The snippet code automatically assigns a value of 1 to a new algorithm since this is the lowest ranking. There is no upper limit on the Value Rank.
 
@@ -1221,3 +1230,38 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A screen shot of a computer Description automatically generated](media/bf94edf2ee5f261622a2e31f34db3d51.png)
 
 **Complexity_Basics:** *To collect complexity data, select any OpenCVB algorithm and click the ‘O’ button in the toolbar. This will run the algorithm for 30 seconds at each of the available resolutions – click the same button to stop data collection. After the data has been collected, use the “Complexity_Basics” algorithm to review the data. The right side of the image above shows all the algorithms that have data in the directory. The plot on the left side shows the plot for the algorithm selected in the options using the same scale. By default, the selected algorithm is the last one collected but a set of radio buttons in the options allows the data for other algorithms to be selected.*
+
+# Recent Changes – January 2024 (Part 2)
+
+-   Over 1800 algorithms are included, averaging 29 lines of code per algorithm.
+-   The jump in the algorithm count is due to the AI generated C++ copies.
+-   See “CPP_AI_Generated.h” for the examples of the AI generated C++ versions.
+    -   Any VB.Net algorithm can be translated to C++ using AI.
+    -   A step-by-step method is available in OpenCVB to translate VB.Net code.
+    -   The OpenCVB translator has been rewritten to use Google’s Bard AI engine.
+    -   The “T” for translate button is available in OpenCVB’s main toolbar:
+
+![A screen shot of a computer Description automatically generated](media/86bab3338bba640ac3c8fa4505296c86.png)
+
+-   OpenCVB’s short algorithms are ideal tests for Bard’s translator.
+    -   Bard is aware of OpenCV and the differences in the API’s from VB.Net to C++.
+-   But every translation requires a few touch-ups to get the C++ version working.
+-   A tutorial shows how to create a C++ version of an OpenCVB algorithm.
+    -   All translated algorithms are in an “include only” format – no library needed.
+    -   Just add the CPP_IncludeOnly.cpp file in your (non-OpenCVB) C++ applications.
+    -   See the tutorial titled “(7) AI Generated C++” in the OpenCVB tree.
+-   The review of the C++ algorithms prompted a reorganization of the C++ code.
+    -   The reduced number of files should make it easier to reuse the code elsewhere.
+-   Why not put everything in C++? Answer: Bard is not that good and it is real work!
+    -   Translators make assumptions and short algorithms make fewer of them.
+-   Translating an algorithm is an excellent way to review the code.
+    -   Often improvements become clear when implementing the C++ version.
+    -   Translation back to VB.Net keeps the 2 trees in sync (Bard can do that too.)
+-   This version also introduces another RedCloud color source: Binarize_FourWay.
+    -   Binarize an image and binarize each half to classify each pixel.
+    -   Below is an example of the output from RedCloud_BinarizeColor.
+-   A log of previous changes is included at the bottom of this document.
+
+![A collage of images of people in different colors Description automatically generated](media/9b95f50d8a35d8ee7156f9fb857f4557.jpeg)
+
+**RedCloud_BinarizeFourWay:** *The image pixels are classified into four categories based on their brightness. The grayscale image is binarized, and each half is binarized again to produce four classifications of pixels. The image in the lower right is the colorized version of the pixels after classification with the Binarize_FourWay algorithm. RedCloud is then used to identify each resulting regions and produce the image in the lower left image.*

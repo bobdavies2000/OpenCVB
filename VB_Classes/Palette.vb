@@ -43,7 +43,7 @@ Public Class Palette_LoadColorMap : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         labels(2) = "ColorMap = " + gOptions.Palettes.Text
 
-        If task.optionsChanged Then
+        If task.optionsChanged Or gradientColorMap.Width = 0 Then
             Dim str = cMapDir.FullName + "/colorscale_" + gOptions.Palettes.Text + ".jpg"
             Dim mapFile As New FileInfo(str)
             Dim colorMap = cv.Cv2.ImRead(mapFile.FullName)
