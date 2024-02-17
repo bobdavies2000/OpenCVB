@@ -62,6 +62,10 @@ Public Class VBtask : Implements IDisposable
     Public motionBasics As Motion_BasicsQuarterRes
     Public rgbFilter As Object
 
+    Public imuStabilityTest As Stabilizer_VerticalIMU
+    Public cameraStable As Boolean
+    Public cameraStableString As String
+
     Public noDepthMask As New cv.Mat
     Public depthMask As New cv.Mat
 
@@ -72,8 +76,6 @@ Public Class VBtask : Implements IDisposable
     Public activateTaskRequest As Boolean
 
     Public histogramBins As Integer
-
-    Public cameraStable As Boolean
 
     Public grid As Grid_Basics
     Public gridRows As Integer
@@ -364,6 +366,7 @@ Public Class VBtask : Implements IDisposable
         motionCloud = New Motion_PointCloud
         motionColor = New Motion_Color
         motionBasics = New Motion_BasicsQuarterRes
+        imuStabilityTest = New Stabilizer_VerticalIMU
 
         updateSettings()
         redOptions.Show()
@@ -474,6 +477,10 @@ Public Class VBtask : Implements IDisposable
                 End If
 
                 updateSettings()
+                imuStabilityTest.RunVB(src)
+                task.cameraStable = imuStabilityTest.stableTest
+                task.cameraStableString = imuStabilityTest.stableStr
+
                 If gOptions.CreateGif.Checked Then
                     heartBeat = False
                     task.optionsChanged = False

@@ -279,96 +279,13 @@ End Class
 
 
 
-'Public Class Stabilizer_MotionDetect : Inherits VB_Algorithm
-'    Dim motion As New Motion_Contours
-'    Dim stable As New Stabilizer_Basics
-'    Public Sub New()
-'        If sliders.Setup(traceName) Then
-'            sliders.setupTrackBar("Offset of stable rectangle from each side in pixels", 0, 100, 30)
-'        End If
-
-'        desc = "Detect motion in the stabilizer output"
-'    End Sub
-'    Public Sub RunVB(src as cv.Mat)
-'        Static offsetSlider = findSlider("Offset of stable rectangle from each side in pixels")
-'        Dim offset = offsetSlider.Value
-
-'        stable.Run(src)
-
-'        motion.Run(stable.dst3(stable.templateRect))
-'        dst2 = stable.dst3
-'        dst2.Rectangle(stable.templateRect, cv.Scalar.White, 1)
-'        dst3 = motion.dst3
-'    End Sub
-'End Class
-
-
-
-
-
-
-
-
-
-
-Public Class Stabilizer_VerticalIMUKalman : Inherits VB_Algorithm
-    Dim rotate As New Rotate_Basics
-    Dim kalman As New Kalman_Basics
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Use last X values for IMU", 1, 100, 20)
-
-        desc = "Stabilize the vertical orientation of the image using only the IMU."
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static angleSlider = findSlider("Rotation Angle in degrees")
-        Static lastXSlider = findSlider("Use last X values for IMU")
-        Dim xFrames = lastXSlider.Value
-
-        Static angleXValue As New List(Of Single)
-        Static angleYValue As New List(Of Single)
-
-        angleXValue.Add(task.accRadians.X)
-        angleYValue.Add(task.accRadians.Y)
-
-        kalman.kInput = {angleXValue.Average, angleYValue.Average}
-        kalman.Run(empty)
-
-        strOut = "IMU X" + vbTab + "IMU Y" + vbTab + "IMU Z" + vbCrLf
-        strOut += Format(task.accRadians.X * 57.2958, fmt1) + vbTab + Format(task.accRadians.Y * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbCrLf
-        strOut += "Angle X" + vbTab + "Angle Y" + vbCrLf
-        strOut += Format(kalman.kInput(0), fmt3) + vbTab + Format(kalman.kInput(1), fmt3) + vbCrLf
-
-        strOut += "Angle X" + vbTab + "Angle Y (after Kalman filter" + vbCrLf
-        strOut += Format(kalman.kOutput(0), fmt3) + vbTab + Format(kalman.kOutput(1), fmt3) + vbCrLf
-
-        Dim angle = 90 - kalman.kOutput(1) * 57.2958
-        If kalman.kOutput(0) < 0 Then angle *= -1
-        angleSlider.Value = angle
-        labels(2) = "stabilizer_Vertical Angle = " + Format(angle, fmt1)
-
-        rotate.Run(src)
-        dst2 = rotate.dst2
-        setTrueText(strOut, 3)
-
-        If angleXValue.Count >= xFrames Then angleXValue.RemoveAt(0)
-        If angleYValue.Count >= xFrames Then angleYValue.RemoveAt(0)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Stabilizer_VerticalIMU : Inherits VB_Algorithm
-    Dim rotate As New Rotate_Basics
+    Public stableTest As Boolean
+    Public stableStr As String
     Public Sub New()
-        desc = "Stabilize the vertical orientation of the image using only the IMU."
+        desc = "Use the IMU angular velocity to determine if the camera is moving or stable."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static angleSlider = findSlider("Rotation Angle in degrees")
         Static angleXValue As New List(Of Single)
         Static angleYValue As New List(Of Single)
         Static stableCount As New List(Of Integer)
@@ -386,23 +303,20 @@ Public Class Stabilizer_VerticalIMU : Inherits VB_Algorithm
 
         Dim angle = 90 - avgY * 57.2958
         If avgX < 0 Then angle *= -1
-        angleSlider.Value = angle
         labels(2) = "stabilizer_Vertical Angle = " + Format(angle, fmt1)
 
-        Static lastAngleX = avgX, lastAngleY = avgY, stableTest As Single = 0
-        stableCount.Add(If(Math.Abs(lastAngleX - avgX) > 0.001 Or Math.Abs(lastAngleY - avgY) > 0.01, 0, 1))
+        Static lastAngleX = avgX, lastAngleY = avgY
+        stableTest = Math.Abs(lastAngleX - avgX) < 0.001 And Math.Abs(lastAngleY - avgY) < 0.01
+        stableCount.Add(If(stableTest, 1, 0))
         If task.heartBeat Then
-            stableTest = stableCount.Average
+            Dim avgStable = stableCount.Average
+            stableStr = "IMU stable = " + Format(avgStable, "0.0%") + " of the time"
             stableCount.Clear()
         End If
-        strOut += vbCrLf + "IMU stable = " + Format(stableTest, "0%") + " of the time"
+        setTrueText(strOut + vbCrLf + stableStr, 2)
 
-        rotate.Run(src)
-        dst2 = rotate.dst2
-        setTrueText(strOut, 3)
-
-        lastAngleX = avgX
-        lastAngleY = avgY
+        lastAngleX = task.accRadians.X
+        lastAngleY = task.accRadians.Y
 
         If angleXValue.Count >= gOptions.FrameHistory.Value Then angleXValue.RemoveAt(0)
         If angleYValue.Count >= gOptions.FrameHistory.Value Then angleYValue.RemoveAt(0)

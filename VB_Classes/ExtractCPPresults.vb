@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class CPPExtract_FeatureLess : Inherits VB_Algorithm
+Public Class ExtractCPPresults_FeatureLess : Inherits VB_Algorithm
     Dim cpp As New CPP_Basics
     Public Sub New()
         cpp.updateFunction(algorithmList.functionNames._CPP_RedColor_FeatureLess)
@@ -17,7 +17,7 @@ End Class
 
 
 
-Public Class CPPExtract_EdgeDrawing : Inherits VB_Algorithm
+Public Class ExtractCPPresults_EdgeDrawing : Inherits VB_Algorithm
     Dim cpp As New CPP_Basics
     Public Sub New()
         cpp.updateFunction(algorithmList.functionNames._CPP_EdgeDraw_Basics)
