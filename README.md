@@ -1,11 +1,7 @@
 # Recent Changes – February 2024
 
 -   Over 1800 algorithms are included, averaging 32 lines of code per algorithm.
-    -   Average went up because counting didn’t include some of the new C++ code.
--   A new group name “\<All Reused and Callees\>” shows algorithms reuse.
-    -   Removes one-off experiments and cleans up the list of algorithms.
-    -   It is a further refinement of the user interface to help active development.
-    -   It also provides a useful way for beginners to find the better algorithms.
+    -   Average went up because counting hadn’t included some of the new C++ code.
 -   Motion-filtered color and cloud images are controlled through a global option.
     -   Example below shows the improvements to the RedCloud output that result.
 -   Microsoft’s Copilot can provide VB.Net to C++ translation as well.
@@ -20,8 +16,10 @@
     -   Too often parameters are required which make it challenging to use.
     -   OpenCVB has started migrating the OpenCV samples to VB.Net.
     -   As with all OpenCVB algorithms, each will work when clicked.
--   A new GroupName “\<All Reused and Callees\>” shows all the reused algorithms.
-    -   A reused algorithm is likely to be more useful than unreused algorithms.
+-   A new group name “\<All Reused and Callees\>” shows algorithms reuse.
+    -   Removes one-off experiments and cleans up the list of algorithms.
+    -   It is a further refinement of the user interface to help active development.
+    -   It also provides a useful way for beginners to find the better algorithms.
 -   A log of previous changes is included at the bottom of this document.
 
 ![](media/da280b898b238ab7490bfca8fc4abbfa.gif)
