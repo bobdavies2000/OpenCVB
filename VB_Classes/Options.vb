@@ -1140,14 +1140,14 @@ Public Class Options_OilPaint : Inherits VB_Algorithm
             sliders.setupTrackBar("Kernel Size", 2, 10, kernelSize)
             sliders.setupTrackBar("Intensity", 1, 250, intensity)
             sliders.setupTrackBar("Filter Size", 3, 15, filterSize)
-            sliders.setupTrackBar("Threshold", 0, 200, threshold)
+            sliders.setupTrackBar("OilPaint Threshold", 0, 200, threshold)
         End If
     End Sub
     Public Sub RunVB()
         Static kernelSlider = findSlider("Kernel Size")
         Static intensitySlider = findSlider("Intensity")
-        Static thresholdSlider = findSlider("Threshold")
         Static filterSlider = findSlider("Filter Size")
+        Static thresholdSlider = findSlider("OilPaint Threshold")
         kernelSize = kernelSlider.Value Or 1
 
         intensity = intensitySlider.Value

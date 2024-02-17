@@ -172,6 +172,7 @@ Public Class VBtask : Implements IDisposable
     Public homeDir As String
     Public fpsRate As Integer
     Public densityMetric As Integer ' how dense is the pointcloud in z - heuristic.
+    Public FASTthreshold As Integer
 
     Public externalPythonInvocation As Boolean
     Public useRecordedData As Boolean
@@ -454,7 +455,7 @@ Public Class VBtask : Implements IDisposable
                 Application.DoEvents()
 
                 ' run any universal algorithms here - if not a C++ algorithm!
-                Dim src = task.color.Clone
+                Dim src = task.color
 
                 task.IMU_RawAcceleration = task.IMU_Acceleration
                 task.IMU_RawAngularVelocity = task.IMU_AngularVelocity
@@ -575,7 +576,7 @@ Public Class VBtask : Implements IDisposable
                     End If
                 End If
 
-                algorithmObject.NextFrame(src)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
+                algorithmObject.NextFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
                 If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then
                     task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)

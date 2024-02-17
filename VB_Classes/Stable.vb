@@ -33,15 +33,15 @@ Public Class Stable_Basics : Inherits VB_Algorithm
         If index < facetGen.facet.facetList.Count Then
             Dim bestFacet = facetGen.facet.facetList(index)
             dst2.FillConvexPoly(bestFacet, cv.Scalar.Black, task.lineType)
-            vbDrawContour(dst2, bestFacet, cv.Scalar.Yellow)
+            vbDrawContour(dst2, bestFacet, task.highlightColor)
         End If
 
         dst2 = facetGen.dst2
         dst3 = src.Clone
         For i = 0 To ptList.Count - 1
             Dim pt = ptList(i)
-            dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-            dst3.Circle(pt, task.dotSize, 255, task.lineWidth, task.lineType)
+            dst2.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
+            dst3.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
         Next
         labels(2) = CStr(ptList.Count) + " stable points were identified with " + CStr(maxGens) + " generations at the anchor point"
     End Sub
@@ -59,7 +59,7 @@ End Class
 
 Public Class Stable_BasicsCount : Inherits VB_Algorithm
     Public basics As New Stable_Basics
-    Public feat As New Feature_BasicsKNN
+    Public feat As New Feature_Basics
     Public goodCounts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         desc = "Track the stable good features found in the BGR image."
@@ -131,14 +131,11 @@ End Class
 
 
 
-
-
-
 Public Class Stable_FAST : Inherits VB_Algorithm
     Public basics As New Stable_Basics
     ReadOnly fast As New Corners_FAST
     Public Sub New()
-        findSlider("Threshold").Value = 150
+        findSlider("FAST Threshold").Value = 100
         desc = "Track the FAST feature points found in the BGR image and track those that appear stable."
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -173,13 +170,13 @@ End Class
 
 Public Class Stable_GoodFeatures : Inherits VB_Algorithm
     Public basics As New Stable_Basics
-    Public feat As New Feature_BasicsKNN
+    Public feat As New Feature_Basics
     Public genSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Track the stable good features found in the BGR image."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         feat.Run(src)
         dst3 = basics.dst3
         If feat.featurePoints.Count = 0 Then Exit Sub ' nothing to work on...

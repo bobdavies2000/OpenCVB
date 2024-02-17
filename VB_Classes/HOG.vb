@@ -5,9 +5,9 @@ Public Class HOG_Basics : Inherits VB_Algorithm
     Dim staticImageProcessed As Boolean
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Threshold", 0, 100, 0)
-            sliders.setupTrackBar("Stride", 1, 100, 1)
-            sliders.setupTrackBar("Scale", 0, 2000, 300)
+            sliders.setupTrackBar("HOG Threshold", 0, 100, 0)
+            sliders.setupTrackBar("HOG Stride", 1, 100, 1)
+            sliders.setupTrackBar("HOG Scale", 0, 2000, 300)
         End If
         desc = "Find people with Histogram of Gradients (HOG) 2D feature"
         staticImage = cv.Cv2.ImRead(task.homeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
@@ -28,9 +28,9 @@ Public Class HOG_Basics : Inherits VB_Algorithm
         Next rect
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Threshold")
-        Static strideSlider = findSlider("Stride")
-        Static scaleSlider = findSlider("Scale")
+        Static thresholdSlider = findSlider("HOG Threshold")
+        Static strideSlider = findSlider("HOG Stride")
+        Static scaleSlider = findSlider("HOG Scale")
 
         Dim hog As New cv.HOGDescriptor()
         hog.SetSVMDetector(cv.HOGDescriptor.GetDefaultPeopleDetector())

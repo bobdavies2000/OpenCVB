@@ -476,7 +476,7 @@ Public Class PhotoShop_UnsharpMask : Inherits VB_Algorithm
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("sigma", 1, 2000, 100)
-            sliders.setupTrackBar("threshold", 0, 255, 5)
+            sliders.setupTrackBar("Photoshop Threshold", 0, 255, 5)
             sliders.setupTrackBar("Shift Amount", 0, 5000, 1000)
         End If
         desc = "Sharpen an image"
@@ -484,7 +484,7 @@ Public Class PhotoShop_UnsharpMask : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static sigmaSlider = findSlider("sigma")
-        Static thresholdSlider = findSlider("threshold")
+        Static thresholdSlider = findSlider("Photoshop Threshold")
         Static shiftSlider = findSlider("Shift Amount")
 
         Dim blurred As New cv.Mat

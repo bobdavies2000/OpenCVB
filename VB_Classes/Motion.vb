@@ -813,8 +813,8 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
             End If
         End If
 
+        Dim ratio = CInt(src.Width / dst2.Width)
         If src.Size <> dst2.Size Then
-            Dim ratio = CInt(src.Width / dst2.Width)
             Dim r = task.motionRect
             task.motionRect = New cv.Rect(r.X * ratio, r.Y * ratio, r.Width * ratio, r.Height * ratio)
         End If
@@ -824,7 +824,7 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
             Dim pad = dst2.Width / 20
             Dim r = task.motionRect
             r = New cv.Rect(r.X - pad, r.Y - pad, r.Width + pad * 2, r.Height + pad * 2)
-            task.motionRect = validateRect(r)
+            task.motionRect = validateRect(r, ratio)
             dst2.Rectangle(task.motionRect, 255, task.lineWidth + 4)
         End If
     End Sub

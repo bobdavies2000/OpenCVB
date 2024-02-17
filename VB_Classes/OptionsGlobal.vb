@@ -67,6 +67,7 @@ Public Class OptionsGlobal
                 task.lowRes = New cv.Size(240, 135)
                 task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 40
+                task.FASTthreshold = 25
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
             Case 960
                 GridSize.Value = 96
@@ -77,6 +78,7 @@ Public Class OptionsGlobal
                 task.lowRes = New cv.Size(240, 135)
                 task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 200
+                task.FASTthreshold = 20
             Case 480
                 GridSize.Value = 48
                 task.cvFontSize = 1.2
@@ -84,6 +86,7 @@ Public Class OptionsGlobal
                 task.lowRes = New cv.Size(240, 135)
                 task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 650
+                task.FASTthreshold = 10
             Case 1280
                 GridSize.Value = 128
                 task.cvFontSize = 2.5
@@ -93,6 +96,7 @@ Public Class OptionsGlobal
                 task.lowRes = New cv.Size(320, 180)
                 task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 150
+                task.FASTthreshold = 20
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
             Case 640
                 GridSize.Value = 64
@@ -102,6 +106,7 @@ Public Class OptionsGlobal
                 task.lowRes = New cv.Size(320, task.workingRes.Height / 2)
                 task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 200
+                task.FASTthreshold = 10
             Case 320
                 GridSize.Value = 32
                 task.cvFontSize = 1.0
@@ -110,6 +115,7 @@ Public Class OptionsGlobal
                 task.quarterRes = New cv.Size(320, 180)
                 If task.workingRes.Height = 240 Then task.lowRes = New cv.Size(160, 120)
                 task.densityMetric = 500
+                task.FASTthreshold = 5
             Case 160
                 GridSize.Value = 16
                 task.cvFontSize = 1.0
@@ -117,6 +123,7 @@ Public Class OptionsGlobal
                 task.lowRes = New cv.Size(160, 120)
                 task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 100
+                task.FASTthreshold = 1
             Case 672
                 GridSize.Value = 64
                 task.cvFontSize = 1.5
@@ -125,6 +132,7 @@ Public Class OptionsGlobal
                 task.lowRes = New cv.Size(168, 94)
                 task.quarterRes = New cv.Size(336, 188)
                 task.densityMetric = 300
+                task.FASTthreshold = 10
             Case 336
                 GridSize.Value = 32
                 task.cvFontSize = 1.0
@@ -133,6 +141,7 @@ Public Class OptionsGlobal
                 task.lowRes = New cv.Size(168, 94)
                 task.quarterRes = New cv.Size(336, 188)
                 task.densityMetric = 700
+                task.FASTthreshold = 5
             Case 168
                 GridSize.Value = 16
                 task.cvFontSize = 0.5
@@ -140,6 +149,7 @@ Public Class OptionsGlobal
                 task.lowRes = New cv.Size(168, 94)
                 task.quarterRes = New cv.Size(336, 188)
                 task.densityMetric = 1700
+                task.FASTthreshold = 1
         End Select
 
         task.depthThresholdPercent = 0.01

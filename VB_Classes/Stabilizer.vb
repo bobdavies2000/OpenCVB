@@ -365,23 +365,20 @@ End Class
 Public Class Stabilizer_VerticalIMU : Inherits VB_Algorithm
     Dim rotate As New Rotate_Basics
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Use last X values for IMU", 1, 100, 20)
         desc = "Stabilize the vertical orientation of the image using only the IMU."
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static angleSlider = findSlider("Rotation Angle in degrees")
-        Static lastXSlider = findSlider("Use last X values for IMU")
-        Dim xFrames = lastXSlider.Value
-
         Static angleXValue As New List(Of Single)
         Static angleYValue As New List(Of Single)
+        Static stableCount As New List(Of Integer)
 
         angleXValue.Add(task.accRadians.X)
         angleYValue.Add(task.accRadians.Y)
 
         strOut = "IMU X" + vbTab + "IMU Y" + vbTab + "IMU Z" + vbCrLf
-        strOut += Format(task.accRadians.X * 57.2958, fmt1) + vbTab + Format(task.accRadians.Y * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbCrLf
-
+        strOut += Format(task.accRadians.X * 57.2958, fmt3) + vbTab + Format(task.accRadians.Y * 57.2958, fmt3) + vbTab +
+                  Format(task.accRadians.Z * 57.2958, fmt3) + vbCrLf
         Dim avgX = angleXValue.Average
         Dim avgY = angleYValue.Average
         strOut += "Angle X" + vbTab + "Angle Y" + vbCrLf
@@ -392,11 +389,69 @@ Public Class Stabilizer_VerticalIMU : Inherits VB_Algorithm
         angleSlider.Value = angle
         labels(2) = "stabilizer_Vertical Angle = " + Format(angle, fmt1)
 
+        Static lastAngleX = avgX, lastAngleY = avgY, stableTest As Single = 0
+        stableCount.Add(If(Math.Abs(lastAngleX - avgX) > 0.001 Or Math.Abs(lastAngleY - avgY) > 0.01, 0, 1))
+        If task.heartBeat Then
+            stableTest = stableCount.Average
+            stableCount.Clear()
+        End If
+        strOut += vbCrLf + "IMU stable = " + Format(stableTest, "0%") + " of the time"
+
         rotate.Run(src)
         dst2 = rotate.dst2
         setTrueText(strOut, 3)
 
-        If angleXValue.Count >= xFrames Then angleXValue.RemoveAt(0)
-        If angleYValue.Count >= xFrames Then angleYValue.RemoveAt(0)
+        lastAngleX = avgX
+        lastAngleY = avgY
+
+        If angleXValue.Count >= gOptions.FrameHistory.Value Then angleXValue.RemoveAt(0)
+        If angleYValue.Count >= gOptions.FrameHistory.Value Then angleYValue.RemoveAt(0)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Stabilizer_CornerPoints : Inherits VB_Algorithm
+    Public basics As New Stable_Basics
+    Public features As New List(Of cv.Point2f)
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
+        desc = "Track the FAST feature points found in the BGR image and track those that appear stable."
+    End Sub
+    Private Sub getKeyPoints(src As cv.Mat, r As cv.Rect)
+        Static thresholdSlider = findSlider("FAST Threshold")
+        Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(src(r), thresholdSlider.value, True)
+        For Each kp In kpoints
+            features.Add(New cv.Point2f(kp.Pt.X + r.X, kp.Pt.Y + r.Y))
+        Next
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static ul As cv.Rect, ur As cv.Rect, ll As cv.Rect, lr As cv.Rect
+        If task.optionsChanged Then
+            Dim size = gOptions.GridSize.Value
+            ul = New cv.Rect(0, 0, size, size)
+            ur = New cv.Rect(dst2.Width - size, 0, size, size)
+            ll = New cv.Rect(0, dst2.Height - size, size, size)
+            lr = New cv.Rect(dst2.Width - size, dst2.Height - size, size, size)
+        End If
+
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        features.Clear()
+        getKeyPoints(src, ul)
+        getKeyPoints(src, ur)
+        getKeyPoints(src, ll)
+        getKeyPoints(src, lr)
+
+        dst2.SetTo(0)
+        For Each pt In features
+            dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType, 0)
+        Next
+        labels(2) = "There were " + CStr(features.Count) + " key points detected"
     End Sub
 End Class

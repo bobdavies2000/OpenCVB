@@ -235,19 +235,19 @@ Public Class VB_Algorithm : Implements IDisposable
         If r.X <= pt.X And r.X + r.Width > pt.X And r.Y <= pt.Y And r.Y + r.Height > pt.Y Then Return True
         Return False
     End Function
-    Public Function validateRect(ByVal r As cv.Rect) As cv.Rect
+    Public Function validateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
         If r.Width <= 0 Then r.Width = 1
         If r.Height <= 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X > dst2.Width Then r.X = dst2.Width - 1
-        If r.Y > dst2.Height Then r.Y = dst2.Height - 1
-        If r.X + r.Width >= dst2.Width Then r.Width = dst2.Width - r.X - 1
-        If r.Y + r.Height >= dst2.Height Then r.Height = dst2.Height - r.Y - 1
+        If r.X > dst2.Width * ratio Then r.X = dst2.Width * ratio - 1
+        If r.Y > dst2.Height * ratio Then r.Y = dst2.Height * ratio - 1
+        If r.X + r.Width >= dst2.Width * ratio Then r.Width = dst2.Width * ratio - r.X - 1
+        If r.Y + r.Height >= dst2.Height * ratio Then r.Height = dst2.Height * ratio - r.Y - 1
         If r.Width <= 0 Then r.Width = 1 ' check again (it might have changed.)
         If r.Height <= 0 Then r.Height = 1
-        If r.X = dst2.Width Then r.X = r.X - 1
-        If r.Y = dst2.Height Then r.Y = r.Y - 1
+        If r.X = dst2.Width * ratio Then r.X = r.X - 1
+        If r.Y = dst2.Height * ratio Then r.Y = r.Y - 1
         Return r
     End Function
     Public Function validatePoint2f(p As cv.Point2f) As cv.Point2f

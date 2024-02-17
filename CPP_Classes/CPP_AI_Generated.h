@@ -302,12 +302,12 @@ public:
     vector<Point2f> inputPoints;
     CPP_Random_Basics* random;
     CPP_Delaunay_Basics* facet;
-
+    Mat generationMap;
     CPP_Delaunay_GenerationsNoKNN() : algorithmCPP() {
         traceName = "CPP_Delaunay_GenerationsNoKNN";
         facet = new CPP_Delaunay_Basics();
         random = new CPP_Random_Basics();
-        dst3 = Mat::zeros(dst3.size(), CV_32S);
+        generationMap = Mat::zeros(dst3.size(), CV_32S);
         labels = { "", "Mask of unmatched regions - generation set to 0", "Facet Image with index of each region", "Generation counts for each region." };
         desc = "Create a region in an image for each point provided with KNN.";
     }
@@ -322,9 +322,7 @@ public:
         facet->Run(src);
         dst2 = facet->dst2;
 
-        Mat generationMap = dst3.clone();
         if (task->heartBeat) generationMap.setTo(0);
-        dst3.setTo(0);
         vector<int> usedG;
         int g;
         for (const auto& pt : inputPoints) {
@@ -342,11 +340,11 @@ public:
                     g++;
                 }
             }
-            fillConvexPoly(dst3, nextFacet, g, task->lineType);
+            fillConvexPoly(generationMap, nextFacet, g, task->lineType);
             usedG.push_back(g);
             task->setTrueText(to_string(g), dst2, pt);   
         }
-        generationMap = dst3.clone();
+        dst3 = generationMap.clone();
     }
 };
 
@@ -633,6 +631,8 @@ public:
 
 
 
+
+
 class CPP_Delaunay_Generations : public algorithmCPP
 {
 private:
@@ -641,11 +641,12 @@ public:
     CPP_Delaunay_Basics* facet;
     CPP_KNN_Basics* knn;
     CPP_Random_Basics* random;
+    Mat generationMap;
 
     CPP_Delaunay_Generations() : algorithmCPP()
     {
         traceName = "CPP_Delaunay_Generations";
-        dst3 = Mat::zeros(dst3.size(), CV_32S);
+        generationMap = Mat::zeros(dst3.size(), CV_32S);
         knn = new CPP_KNN_Basics();
         facet = new CPP_Delaunay_Basics();
         random = new CPP_Random_Basics();
@@ -667,8 +668,6 @@ public:
         facet->Run(src);
         dst2 = facet->dst2;
 
-        Mat generationMap = dst3.clone();
-        dst3.setTo(0);
         vector<int> usedG;
         int g;
         for (const linePoints& mp : knn->matches) {
@@ -687,10 +686,11 @@ public:
                 }
             }
 
-            fillConvexPoly(dst3, nextFacet, g, task->lineType);
+            fillConvexPoly(generationMap, nextFacet, g, task->lineType);
             usedG.push_back(g);
             task->setTrueText(to_string(g), dst2, mp.p2);
         }
+        dst3 = generationMap.clone();
     }
 };
 

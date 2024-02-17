@@ -150,7 +150,7 @@ End Class
 Public Class Corners_FAST : Inherits VB_Algorithm
     Public features As New List(Of cv.Point2f)
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold", 0, 200, 50)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
         If check.Setup(traceName) Then
             check.addCheckBox("Use Non-Max = True")
             check.Box(0).Checked = True
@@ -159,7 +159,7 @@ Public Class Corners_FAST : Inherits VB_Algorithm
         desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static thresholdSlider = findSlider("Threshold")
+        Static thresholdSlider = findSlider("FAST Threshold")
         Static nonMaxCheck = findCheckBox("Use Non-Max = True")
 
         dst2 = src

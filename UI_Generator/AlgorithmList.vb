@@ -1687,6 +1687,7 @@ if algorithmName = "Spectrum_Z" Then return new Spectrum_Z
 if algorithmName = "Stabilizer_Basics" Then return new Stabilizer_Basics
 if algorithmName = "Stabilizer_BasicsRandomInput" Then return new Stabilizer_BasicsRandomInput
 if algorithmName = "Stabilizer_BasicsTest" Then return new Stabilizer_BasicsTest
+if algorithmName = "Stabilizer_CornerPoints" Then return new Stabilizer_CornerPoints
 if algorithmName = "Stabilizer_OpticalFlow" Then return new Stabilizer_OpticalFlow
 if algorithmName = "Stabilizer_VerticalIMU" Then return new Stabilizer_VerticalIMU
 if algorithmName = "Stabilizer_VerticalIMUKalman" Then return new Stabilizer_VerticalIMUKalman

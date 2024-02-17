@@ -164,6 +164,7 @@ Public Class VB_to_CPP
             line = line.Replace("RunVB", "Run")
             line = line.Replace("CPP_CPP_", "CPP_")
             line = line.Replace("randomCellColor", "task->randomCellColor")
+            line = line.Replace("standaloneTest()", "standalone")
             If line.Contains(" options;") Then
                 line = line.Replace("Options_", "CPP_Options_")
                 Dim tokens = Trim(line).Split(" ")
