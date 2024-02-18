@@ -4482,3 +4482,35 @@ Public Class Options_StdevGrid : Inherits VB_Algorithm
         diffThreshold = diffSlider.value
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_SURF : Inherits VB_Algorithm
+    Public surfThreshold As Integer
+    Public useBFMatch As Boolean
+    Public verticalRange As Integer
+    Public Sub New()
+        If radio.Setup(traceName) Then
+            radio.addRadio("Use BF Matcher")
+            radio.addRadio("Use Flann Matcher")
+            radio.check(0).Checked = True
+        End If
+
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Hessian threshold", 1, 5000, 2000)
+            sliders.setupTrackBar("Surf Vertical Range to Search", 0, 50, 1)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static thresholdSlider = findSlider("Hessian threshold")
+        Static BFRadio = findRadio("Use BF Matcher")
+        Static rangeSlider = findSlider("Surf Vertical Range to Search")
+
+        useBFMatch = BFRadio.checked
+        surfThreshold = thresholdSlider.value
+        verticalRange = rangeSlider.value
+    End Sub
+End Class

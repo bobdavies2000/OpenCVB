@@ -1,7 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports CS_Classes
-
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
 Public Class Corners_Harris : Inherits VB_Algorithm
     Public Sub New()
@@ -13,7 +11,7 @@ Public Class Corners_Harris : Inherits VB_Algorithm
         desc = "Find corners using Eigen values and vectors"
         labels(3) = "Corner Eigen values"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static blockSlider = findSlider("Corner block size")
         Static apertureSlider = findSlider("Corner aperture size")
         Static qualitySlider = findSlider("Corner quality level")
@@ -64,7 +62,7 @@ Public Class Corners_SubPix : Inherits VB_Algorithm
         labels(2) = "Output of GoodFeatures"
         desc = "Use PreCornerDetect to find features in the image."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static kernelSlider = findSlider("SubPix kernel Size")
         feat.Run(src)
         If feat.featurePoints.Count = 0 Then Exit Sub ' no good features right now...
@@ -91,7 +89,7 @@ Public Class Corners_PreCornerDetect : Inherits VB_Algorithm
         If sliders.Setup(traceName) Then sliders.setupTrackBar("kernel Size", 1, 20, 19)
         desc = "Use PreCornerDetect to find features in the image."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static kernelSlider = findSlider("kernel Size")
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim prob As New cv.Mat
@@ -120,7 +118,7 @@ Public Class Corners_ShiTomasi_CPP : Inherits VB_Algorithm
         desc = "Find corners using Eigen values and vectors"
         labels(3) = "Corner Eigen values"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static blockSlider = findSlider("Corner block size")
         Static apertureSlider = findSlider("Corner aperture size")
         Static thresholdSlider = findSlider("Corner normalize threshold")
@@ -158,7 +156,7 @@ Public Class Corners_FAST : Inherits VB_Algorithm
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static thresholdSlider = findSlider("FAST Threshold")
         Static nonMaxCheck = findCheckBox("Use Non-Max = True")
 
@@ -188,7 +186,7 @@ Public Class Corners_FASTCentroid : Inherits VB_Algorithm
         ReDim kalman.kInput(1) ' 2 elements - cv.point
         desc = "Find interesting points with the FAST and smooth the centroid with kalman"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         fast.Run(src)
         dst2 = fast.dst2
         dst3.SetTo(0)
@@ -219,7 +217,7 @@ Public Class Corners_FASTStablePoints : Inherits VB_Algorithm
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find and save only the stable points in the FAST output"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         fast.Run(src)
 
         If task.motionFlag Or task.optionsChanged Then
@@ -257,7 +255,7 @@ Public Class Corners_FASTCentroids : Inherits VB_Algorithm
         If standaloneTest() Then gOptions.GridSize.Value = 16
         desc = "Use a thread grid to find the centroids in each grid element"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         dst2 = src.Clone
 
         fast.Run(src)
@@ -296,8 +294,8 @@ Public Class Corners_Harris_CPP : Inherits VB_Algorithm
         cPtr = Harris_Features_Open()
         desc = "Use Harris feature detectors to identify interesting points."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
@@ -359,87 +357,6 @@ Public Class Corners_HarrisDetector : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Corners_Surf : Inherits VB_Algorithm
-    Public CS_SurfBasics As New CS_SurfBasics
-    Public srcLeft As New cv.Mat
-    Public srcRight As New cv.Mat
-    Public Sub New()
-        If radio.Setup(traceName) Then
-            radio.addRadio("Use BF Matcher")
-            radio.addRadio("Use Flann Matcher")
-            radio.check(0).Checked = True
-        End If
-
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Hessian threshold", 1, 5000, 2000)
-        desc = "Compare 2 images to get a homography.  We will use left and right images."
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static thresholdSlider = findSlider("Hessian threshold")
-        Static useBFRadio = findRadio("Use BF Matcher")
-
-        srcLeft = task.leftview
-        srcRight = task.rightview
-        Dim doubleSize As New cv.Mat
-        CS_SurfBasics.RunCS(srcLeft, srcRight, doubleSize, thresholdSlider.Value, useBFRadio.Checked)
-
-        doubleSize(New cv.Rect(0, 0, src.Width, src.Height)).CopyTo(dst2)
-        doubleSize(New cv.Rect(src.Width, 0, src.Width, src.Height)).CopyTo(dst3)
-        labels(2) = If(useBFRadio.Checked, "BF Matcher output", "Flann Matcher output")
-        If CS_SurfBasics.keypoints1 IsNot Nothing Then labels(2) += " " + CStr(CS_SurfBasics.keypoints1.Count)
-    End Sub
-End Class
-
-
-
-
-
-' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Corners_SurfDraw : Inherits VB_Algorithm
-    Dim surf As New Corners_Surf
-    Public Sub New()
-        surf.CS_SurfBasics.drawPoints = False
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Surf Vertical Range to Search", 0, 50, 10)
-        desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static rangeSlider = findSlider("Surf Vertical Range to Search")
-        surf.Run(src)
-
-        dst2 = If(surf.srcLeft.Channels = 1, surf.srcLeft.CvtColor(cv.ColorConversionCodes.GRAY2BGR), surf.srcLeft)
-        dst3 = If(surf.srcRight.Channels = 1, surf.srcRight.CvtColor(cv.ColorConversionCodes.GRAY2BGR), surf.srcRight)
-
-        Dim keys1 = surf.CS_SurfBasics.keypoints1
-        Dim keys2 = surf.CS_SurfBasics.keypoints2
-
-        For i = 0 To keys1.Count - 1
-            dst2.Circle(keys1(i).Pt, task.dotSize + 3, cv.Scalar.Red, -1, task.lineType)
-        Next
-
-        Dim matchCount As Integer
-        For i = 0 To keys1.Count - 1
-            Dim pt = keys1(i).Pt
-            For j = 0 To keys2.Count - 1
-                If Math.Abs(keys2(j).Pt.X - pt.X) < rangeSlider.Value And Math.Abs(keys2(j).Pt.Y - pt.Y) < rangeSlider.Value Then
-                    dst3.Circle(keys2(j).Pt, task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
-                    keys2(j).Pt.Y = -1 ' so we don't match it again.
-                    matchCount += 1
-                End If
-            Next
-        Next
-        ' mark those that were not
-        For i = 0 To keys2.Count - 1
-            Dim pt = keys2(i).Pt
-            If pt.Y <> -1 Then dst3.Circle(keys2(i).Pt, task.dotSize + 3, cv.Scalar.Red, -1, task.lineType)
-        Next
-        labels(3) = "Yellow matched left to right = " + CStr(matchCount) + ". Red is unmatched."
-    End Sub
-End Class
 
 
 

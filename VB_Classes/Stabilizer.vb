@@ -315,8 +315,8 @@ Public Class Stabilizer_VerticalIMU : Inherits VB_Algorithm
         End If
         setTrueText(strOut + vbCrLf + stableStr, 2)
 
-        lastAngleX = task.accRadians.X
-        lastAngleY = task.accRadians.Y
+        lastAngleX = avgX
+        lastAngleY = avgY
 
         If angleXValue.Count >= gOptions.FrameHistory.Value Then angleXValue.RemoveAt(0)
         If angleYValue.Count >= gOptions.FrameHistory.Value Then angleYValue.RemoveAt(0)
@@ -336,7 +336,7 @@ Public Class Stabilizer_CornerPoints : Inherits VB_Algorithm
     Public features As New List(Of cv.Point2f)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
-        desc = "Track the FAST feature points found in the BGR image and track those that appear stable."
+        desc = "Track the FAST feature points found in the corners of the BGR image."
     End Sub
     Private Sub getKeyPoints(src As cv.Mat, r As cv.Rect)
         Static thresholdSlider = findSlider("FAST Threshold")

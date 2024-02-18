@@ -126,6 +126,7 @@
     <Compile Include="PointPolygonTest.vb" />
     <Compile Include="PongWars.vb" />
     <Compile Include="StdevGrid.vb" />
+    <Compile Include="Surf.vb" />
     <Compile Include="VB_Externs.vb" />
     <Compile Include="ExtractCPPresults.vb" />
     <Compile Include="Foreground.vb" />

@@ -73,7 +73,7 @@ Public Class CameraZED2 : Inherits Camera
                                              Zed2Color(cPtr)).Clone
             mbuf(mbIndex).rightView = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_8UC3,
                                                  Zed2RightView(cPtr)).Clone
-            mbuf(mbIndex).leftView = mbuf(mbIndex).color
+            mbuf(mbIndex).leftView = mbuf(mbIndex).color.Clone
 
             mbuf(mbIndex).pointCloud = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_32FC3,
                                                   Zed2PointCloud(cPtr)).Clone
