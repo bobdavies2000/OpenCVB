@@ -2924,6 +2924,7 @@ End Class
 Public Class Options_Sift : Inherits VB_Algorithm
     Public useBFMatcher As Boolean
     Public pointCount As Integer = 200
+    Public stepSize As Integer = 10
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("Use BF Matcher")
@@ -2931,14 +2932,19 @@ Public Class Options_Sift : Inherits VB_Algorithm
             radio.check(0).Checked = True
         End If
 
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Points to Match", 1, 1000, pointCount)
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Points to Match", 1, 1000, pointCount)
+            sliders.setupTrackBar("Sift StepSize", 1, 50, stepSize)
+        End If
     End Sub
     Public Sub RunVB()
         Static bfRadio = findRadio("Use BF Matcher")
         Static countSlider = findSlider("Points to Match")
+        Static stepSlider = findSlider("Sift StepSize")
 
         useBFMatcher = bfRadio.checked
         pointCount = countSlider.value
+        stepSize = stepSlider.value
     End Sub
 End Class
 
