@@ -50,9 +50,9 @@ The basic layout of OpenCVB is shown below. Any of the algorithms can be selecte
 
 **Run and Pause:** *The ![](media/8a0dfa720460a53afbcd56d30b78e238.png)button will start and pause the algorithm.*
 
-**OpenCVB Settings:** *The ![](media/c0fffa733107b84431631ffe783c61b4.png)button will start and pause the algorithm.*
+**OpenCVB Settings:** *The ![](media/0def428cb54dbed05a6172556f0be44f.png)button will start and pause the algorithm.*
 
-**OpenCVB Settings:** *The ![](media/729c6b5490c1be7552df7fc056af136b.png) button will start and stop the overnight testing of each algorithm at various resolutions.*
+**Regression Testing:** *The ![](media/f604bfdff224ebf4eadac1d9379a3b91.png) button will start and stop the overnight testing of each algorithm at various resolutions.*
 
 **Tree View:** *The ![](media/c8d6a2148f4de451bb6ddfca853a28ad.png) button shows the tree view of the current algorithm. Since many algorithms create a stack of inputs and outputs the tree view shows all them and allows any entry in the stack to be selected. Selecting an entry will show the output of that algorithm. Also shown in the Tree View is the percent utilization of each contributing algorithm.*
 
