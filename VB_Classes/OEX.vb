@@ -595,25 +595,25 @@ End Class
 
 Public Class OEX_FitEllipse : Inherits VB_Algorithm
     Dim img As cv.Mat
+    Dim options As New Options_FitEllipse
     Public Sub New()
         Dim fileInputName As New FileInfo(task.homeDir + "opencv/samples/data/ellipses.jpg")
         img = cv.Cv2.ImRead(fileInputName.FullName).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("FitEllipse threshold", 0, 255, 70)
         cPtr = OEX_FitEllipse_Open()
         desc = "OEX Example fitellipse"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("FitEllipse threshold")
-        Dim threshold = thresholdSlider.value
+        options.RunVB()
 
         Dim cppData(img.Total * img.ElemSize - 1) As Byte
         Marshal.Copy(img.Data, cppData, 0, cppData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = OEX_FitEllipse_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), img.Rows, img.Cols, img.Channels)
+        Dim imagePtr = OEX_FitEllipse_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), img.Rows, img.Cols,
+                                             options.threshold, options.fitType)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(img.Rows, img.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+        dst2 = New cv.Mat(img.Rows + 4, img.Cols + 4, cv.MatType.CV_8UC3, imagePtr).Clone
     End Sub
     Public Sub Close()
         OEX_FitEllipse_Close(cPtr)
@@ -628,6 +628,7 @@ Module OEX_FitEllipse_CPP_Module
     Public Sub OEX_FitEllipse_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OEX_FitEllipse_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
+    Public Function OEX_FitEllipse_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer,
+                                          threshold As Integer, fitType As Integer) As IntPtr
     End Function
 End Module

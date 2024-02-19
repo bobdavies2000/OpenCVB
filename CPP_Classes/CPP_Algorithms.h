@@ -3774,20 +3774,12 @@ public:
 		};
 	}
 
-	void drawLabels(std::vector<std::string> text, std::vector<cv::Scalar> colors)
+	void drawLabels()
 	{
-		if (img.empty()) {
+		if (img.empty()) 
 			img = cv::Mat::zeros(rows, cols, CV_8UC3);
-		}
-		int vPos = 0;
-		for (size_t i = 0; i < text.size(); i++) {
-			cv::Scalar color = colors[i];
-			std::string txt = text[i];
-			Size textsize = getTextSize(txt, FONT_HERSHEY_COMPLEX, 1, 1, 0);
-			vPos += (int)(1.3 * textsize.height);
-			Point org((img.cols - textsize.width), vPos);
-			cv::putText(img, txt, org, FONT_HERSHEY_COMPLEX, 1, color, 1, LINE_8);
-		}
+		else
+			img.setTo(0);
 	}
 
 };
@@ -3805,42 +3797,23 @@ class OEX_FitEllipse
 {
 private:
 public:
-    Mat src, dst;
+    Mat src;
     OEX_FitEllipse(){}
+	canvas paper;
 
-	bool fitEllipseQ, fitEllipseAMSQ, fitEllipseDirectQ;
-	cv::Scalar fitEllipseColor = Scalar(255, 0, 0);
-	cv::Scalar fitEllipseAMSColor = Scalar(0, 255, 0);
-	cv::Scalar fitEllipseDirectColor = Scalar(0, 0, 255);
-	cv::Scalar fitEllipseTrueColor = Scalar(255, 255, 255);
+	cv::Scalar white = Scalar(255, 255, 255);
 
-    void RunCPP(int threshold) {
-		RotatedRect box, boxAMS, boxDirect;
+    void RunCPP(int threshold, int fitType) {
+		RotatedRect box;
 		vector<vector<Point> > contours;
-		dst = src >= threshold;
+		Mat bimage = src >= threshold;
 
-		findContours(dst, contours, RETR_LIST, CHAIN_APPROX_NONE);
+		findContours(bimage, contours, RETR_LIST, CHAIN_APPROX_NONE);
 
-		canvas paper;
-		paper.init(int(0.8 * MIN(dst.rows, dst.cols)), int(1.2 * MAX(dst.rows, dst.cols)));
-		paper.stretch(cv::Point2f(0.0f, 0.0f), cv::Point2f((float)(dst.cols + 2.0), (float)(dst.rows + 2.0)));
+		paper.init(int(0.8 * MIN(bimage.rows, bimage.cols)), int(1.2 * MAX(bimage.rows, bimage.cols)));
+		paper.stretch(cv::Point2f(0.0f, 0.0f), cv::Point2f((float)(bimage.cols + 2.0), (float)(bimage.rows + 2.0)));
 
-		std::vector<std::string> text;
-		std::vector<cv::Scalar> color;
-
-		if (fitEllipseQ) {
-			text.push_back("OpenCV");
-			color.push_back(fitEllipseColor);
-		}
-		if (fitEllipseAMSQ) {
-			text.push_back("AMS");
-			color.push_back(fitEllipseAMSColor);
-		}
-		if (fitEllipseDirectQ) {
-			text.push_back("Direct");
-			color.push_back(fitEllipseDirectColor);
-		}
-		paper.drawLabels(text, color);
+		paper.drawLabels();
 
 		int margin = 2;
 		vector< vector<Point2f> > points;
@@ -3856,7 +3829,7 @@ public:
 			vector<Point2f>pts;
 			for (int j = 0; j < pointsf.rows; j++) {
 				Point2f pnt = Point2f(pointsf.at<float>(j, 0), pointsf.at<float>(j, 1));
-				if ((pnt.x > margin && pnt.y > margin && pnt.x < dst.cols - margin && pnt.y < dst.rows - margin)) {
+				if ((pnt.x > margin && pnt.y > margin && pnt.x < bimage.cols - margin && pnt.y < bimage.rows - margin)) {
 					if (j % 20 == 0) {
 						pts.push_back(pnt);
 					}
@@ -3873,26 +3846,24 @@ public:
 			if (pts.size() < 5) {
 				continue;
 			}
-			if (fitEllipseQ) {
-				box = fitEllipse(pts);
-				if (isGoodBox(box)) {
-					paper.drawEllipseWithBox(box, fitEllipseColor, 3);
-				}
-			}
-			if (fitEllipseAMSQ) {
-				boxAMS = fitEllipseAMS(pts);
-				if (isGoodBox(boxAMS)) {
-					paper.drawEllipseWithBox(boxAMS, fitEllipseAMSColor, 2);
-				}
-			}
-			if (fitEllipseDirectQ) {
-				boxDirect = fitEllipseDirect(pts);
-				if (isGoodBox(boxDirect)) {
-					paper.drawEllipseWithBox(boxDirect, fitEllipseDirectColor, 1);
-				}
-			}
 
-			paper.drawPoints(pts, fitEllipseTrueColor);
+			Scalar color;
+			switch (fitType) {
+				case 0: //fitEllipseQ) {
+					box = fitEllipse(pts);
+					color = Scalar(255, 0, 0);
+					break;
+				case 1: // fitEllipseAMSQ) {
+					box = fitEllipseAMS(pts);
+					color = Scalar(0, 255, 0);
+					break;
+				case 2:  // fitEllipseDirectQ) {
+					box = fitEllipseDirect(pts);
+					color = Scalar(0, 0, 255);
+					break;
+			}
+			if (isGoodBox(box)) paper.drawEllipseWithBox(box, color, 3);
+			paper.drawPoints(pts, white);
 		}
 	}
 };
@@ -3907,9 +3878,9 @@ void OEX_FitEllipse_Close(OEX_FitEllipse *cPtr)
     delete cPtr;
 }
 extern "C" __declspec(dllexport)
-int *OEX_FitEllipse_RunCPP(OEX_FitEllipse *cPtr, int *dataPtr, int rows, int cols, int threshold)
+int *OEX_FitEllipse_RunCPP(OEX_FitEllipse *cPtr, int *dataPtr, int rows, int cols, int threshold, int fitType)
 {
 		cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
-		cPtr->RunCPP(threshold);
-		return (int *) cPtr->dst.data;
+		cPtr->RunCPP(threshold, fitType);
+		return (int *) cPtr->paper.img.data;
 }

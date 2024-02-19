@@ -4543,3 +4543,35 @@ Public Class Options_DFTShape : Inherits VB_Algorithm
     Public Sub RunVB()
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_FitEllipse : Inherits VB_Algorithm
+    Public fitType As Integer
+    Public threshold As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("FitEllipse threshold", 0, 255, 70)
+
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("fitEllipseQ")
+            radio.addRadio("fitEllipseAMS")
+            radio.addRadio("fitEllipseDirect")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static thresholdSlider = findSlider("FitEllipse threshold")
+        Static qRadio = findRadio("fitEllipseQ")
+        Static amsRadio = findRadio("fitEllipseAMS")
+        Static directRadio = findRadio("fitEllipseDirect")
+        fitType = 0
+        If amsRadio.checked Then fitType = 1
+        If directRadio.checked Then fitType = 2
+
+        threshold = thresholdSlider.value
+    End Sub
+End Class

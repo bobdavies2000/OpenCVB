@@ -1270,6 +1270,7 @@ if algorithmName = "Options_FeatureMatch" Then return new Options_FeatureMatch
 if algorithmName = "Options_Features" Then return new Options_Features
 if algorithmName = "Options_Filter" Then return new Options_Filter
 if algorithmName = "Options_FilterNorm" Then return new Options_FilterNorm
+if algorithmName = "Options_FitEllipse" Then return new Options_FitEllipse
 if algorithmName = "Options_FitLine" Then return new Options_FitLine
 if algorithmName = "Options_Flood" Then return new Options_Flood
 if algorithmName = "Options_ForeGround" Then return new Options_ForeGround
