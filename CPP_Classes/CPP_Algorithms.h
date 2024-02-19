@@ -3649,3 +3649,35 @@ int* Classifier_Bayesian_RunCPP(Classifier_Bayesian* cPtr, Scalar * input, int c
 	cPtr->RunCPP(input, count);
 	return (int*)&cPtr->responses[0];
 }
+
+
+
+
+
+class OEX_FitEllipse
+{
+private:
+public:
+    Mat src, dst;
+    OEX_FitEllipse(){}
+    void RunCPP() {
+        dst = src.clone();
+    }
+};
+extern "C" __declspec(dllexport)
+OEX_FitEllipse *OEX_FitEllipse_Open() {
+    OEX_FitEllipse *cPtr = new OEX_FitEllipse();
+    return cPtr;
+}
+extern "C" __declspec(dllexport)
+void OEX_FitEllipse_Close(OEX_FitEllipse *cPtr)
+{
+    delete cPtr;
+}
+extern "C" __declspec(dllexport)
+int *OEX_FitEllipse_RunCPP(OEX_FitEllipse *cPtr, int *dataPtr, int rows, int cols, int channels)
+{
+		cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, dataPtr);
+		cPtr->RunCPP();
+		return (int *) cPtr->dst.data; 
+}

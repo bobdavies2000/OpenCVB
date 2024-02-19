@@ -161,7 +161,7 @@ Public Class Filter_Median : Inherits VB_Algorithm
     Public Sub New()
         desc = "Implement the Median Filter - use median value in kernel"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         Dim kernelSize As Integer = If(standaloneTest(), (task.frameCount Mod 20) + 1, options.kernelSize)
         If kernelSize Mod 2 = 0 Then kernelSize += 1

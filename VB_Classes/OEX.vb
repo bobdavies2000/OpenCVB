@@ -1,5 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.IO
 ' all examples in this file are from https://github.com/opencv/opencv/tree/4.x/samples
 Public Class OEX_CalcBackProject_Demo1 : Inherits VB_Algorithm
     Public histogram As New cv.Mat
@@ -567,3 +568,66 @@ Public Class OEX_Core_Split : Inherits VB_Algorithm
         setTrueText(strOut, 2)
     End Sub
 End Class
+
+
+
+
+
+Public Class OEX_Filter2D : Inherits VB_Algorithm
+    Public Sub New()
+        desc = "OpenCV Example Filter2D demo - Use a varying kernel to show the impact."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static ddepth As cv.MatType = -1, anchor = New cv.Point(-1, -1), kernelSize As Integer = 3, ind = 0
+
+        If task.heartBeat Then ind += 1
+        kernelSize = 3 + 2 * (ind Mod 5)
+        Dim kernel As cv.Mat = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F, 1 / (kernelSize * kernelSize))
+
+        dst2 = src.Filter2D(ddepth, kernel, anchor, 0, cv.BorderTypes.Default)
+        setTrueText("Kernel size = " + CStr(kernelSize), 3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class OEX_FitEllipse : Inherits VB_Algorithm
+    Dim img As cv.Mat
+    Public Sub New()
+        Dim fileInputName As New FileInfo(task.homeDir + "opencv/samples/data/ellipses.jpg")
+        img = cv.Cv2.ImRead(fileInputName.FullName)
+
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("FitEllipse threshold", 0, 100, 50)
+        cPtr = OEX_FitEllipse_Open()
+        desc = "OEX Example fitellipse"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static thresholdSlider = findSlider("FitEllipse threshold")
+        Dim threshold = thresholdSlider.value
+
+        Dim cppData(img.Total * img.ElemSize - 1) As Byte
+        Marshal.Copy(img.Data, cppData, 0, cppData.Length - 1)
+        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+        Dim imagePtr = OEX_FitEllipse_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), img.Rows, img.Cols, img.Channels)
+        handleSrc.Free()
+
+        dst2 = New cv.Mat(img.Rows, img.Cols, If(img.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr).Clone
+    End Sub
+    Public Sub Close()
+        OEX_FitEllipse_Close(cPtr)
+    End Sub
+End Class
+
+Module OEX_FitEllipse_CPP_Module
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OEX_FitEllipse_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub OEX_FitEllipse_Close(cPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OEX_FitEllipse_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
+    End Function
+End Module
