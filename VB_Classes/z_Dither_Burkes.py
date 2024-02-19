@@ -69,7 +69,7 @@ class Burkes:
 if __name__ == "__main__":
     # create Burke's instances with original images in greyscale
     burkes_instances = [
-        Burkes(imread('../Data/Blox.jpg', 1), threshold)
+        Burkes(imread('../opencv/Samples/Data/Blox.jpg', 1), threshold)
         for threshold in (126, 130)  #for threshold in (1, 126, 130, 140)
     ]
 

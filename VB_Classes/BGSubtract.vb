@@ -271,7 +271,7 @@ Public Class BGSubtract_Video : Inherits VB_Algorithm
     Dim bgSub As New BGSubtract_Basics
     Dim video As New Video_Basics
     Public Sub New()
-        video.srcVideo = task.homeDir + "Data/vtest.avi"
+        video.srcVideo = task.homeDir + "opencv/Samples/Data/vtest.avi"
         desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
     End Sub
     Public Sub RunVB(src As cv.Mat)

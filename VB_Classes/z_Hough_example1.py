@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 titleWindow = 'z_Hough_example1.py'
 
-img = cv.imread(cv.samples.findFile('../Data/sudoku.png'))
+img = cv.imread(cv.samples.findFile('../opencv/Samples/Data/sudoku.png'))
 gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)
 edges = cv.Canny(gray,50,150,apertureSize = 3)
 

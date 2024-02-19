@@ -4,7 +4,7 @@ import imutils
 import cv2
  
 # load the image from disk
-image = cv2.imread('../Data/pic1.png')
+image = cv2.imread('../opencv/Samples/Data/pic1.png')
  
 # loop over the rotation angles
 #for angle in np.arange(0, 360, 15):

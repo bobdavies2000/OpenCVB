@@ -33,8 +33,8 @@ parser = argparse.ArgumentParser(description='Code for Remapping tutorial.')
 parser.add_argument('--input', help='Path to input image.', default='../opencv/Samples/Data/chicky_512.png')
 args = parser.parse_args()
 
-src = cv.imread("../Data/starry_night.jpg")
-
+src = cv.imread("../opencv/Samples/Data/starry_night.jpg")
+                    opencv/Samples/
 map_x = np.zeros((src.shape[0], src.shape[1]), dtype=np.float32)
 map_y = np.zeros((src.shape[0], src.shape[1]), dtype=np.float32)
 

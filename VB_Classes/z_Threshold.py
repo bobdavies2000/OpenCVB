@@ -22,7 +22,7 @@ def Threshold_Demo(val):
 ## [Threshold_Demo]
 
 parser = argparse.ArgumentParser(description='Code for Basic Thresholding Operations tutorial.')
-parser.add_argument('--input', help='Path to input image.', default='../Data/stuff.jpg')
+parser.add_argument('--input', help='Path to input image.', default='../opencv/Samples/Data/stuff.jpg')
 args = parser.parse_args()
 
 ## [load]

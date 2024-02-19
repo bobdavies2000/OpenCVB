@@ -10,7 +10,7 @@ titleWindow = 'z_Hough_example3.py'
 
 def main(argv):
     ## [load]
-    default_file = '../Data/sudoku.png'
+    default_file = '../opencv/Samples/Data/sudoku.png'
     filename = argv[0] if len(argv) > 0 else default_file
 
     # Loads an image

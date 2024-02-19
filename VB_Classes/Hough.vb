@@ -329,7 +329,7 @@ Public Class Hough_Sudoku : Inherits VB_Algorithm
         desc = "Successful use of Hough to find lines in Sudoku grid."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        dst2 = cv.Cv2.ImRead(task.homeDir + "Data/sudoku.png").Resize(dst2.Size)
+        dst2 = cv.Cv2.ImRead(task.homeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
         dst3 = dst2.Clone
         hough.Run(dst2)
         houghShowLines(dst3, hough.segments, hough.options.lineCount)

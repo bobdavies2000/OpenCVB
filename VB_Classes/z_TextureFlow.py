@@ -16,8 +16,8 @@ def main():
     try:
         fn = sys.argv[1]
     except:
-        fn = '../Data/starry_night.jpg'
-
+        fn = '../opencv/Samples/Data/starry_night.jpg'
+                 opencv/Samples/
     img = cv.imread(cv.samples.findFile(fn))
     if img is None:
         print('Failed to load image file:', fn)

@@ -60,7 +60,7 @@ def getOrientation(pts, img):
 # Load image
 parser = argparse.ArgumentParser(description='Code for Introduction to Principal Component Analysis (PCA) tutorial.\
                                               This program demonstrates how to use OpenCV PCA to extract the orientation of an object.')
-parser.add_argument('--input', help='Path to input image.', default='../Data/pca_test1.jpg')
+parser.add_argument('--input', help='Path to input image.', default='../opencv/Samples/Data/pca_test1.jpg')
 args = parser.parse_args()
 
 src = cv.imread(cv.samples.findFile(args.input))

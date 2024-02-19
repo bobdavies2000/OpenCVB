@@ -12,8 +12,8 @@ Public Class MatchShapes_Basics : Inherits VB_Algorithm
         findRadio("FloodFill").Enabled = False
         findRadio("ApproxNone").Checked = True
 
-        dst0 = cv.Cv2.ImRead(task.homeDir + "Data\star1.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = cv.Cv2.ImRead(task.homeDir + "Data\star2.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst0 = cv.Cv2.ImRead(task.homeDir + "Data/star1.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = cv.Cv2.ImRead(task.homeDir + "Data/star2.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         desc = "MatchShapes compares single hull to single hull - pretty tricky"
     End Sub
     Public Function findBiggestHull(hull As cv.Point()(), maxLen As Integer, maxIndex As Integer, dst As cv.Mat) As Integer
