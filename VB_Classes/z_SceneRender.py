@@ -99,7 +99,7 @@ class TestSceneRender():
 
 if __name__ == '__main__':
 
-    backGr = cv.imread('../Data/lena.jpg')
+    backGr = cv.imread('../opencv/Samples/Data/lena.jpg')
 
     render = TestSceneRender(backGr, noise = 0.5)
 

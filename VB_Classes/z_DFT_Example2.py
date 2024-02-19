@@ -9,14 +9,14 @@ def print_help():
     This program demonstrated the use of the discrete Fourier transform (DFT).
     The dft of an image is taken and it's power spectrum is displayed.
     Usage:
-    discrete_fourier_transform.py [image_name -- default lena.jpg]''')
+    discrete_fourier_transform.py [image_name -- default opencv/Samples/Data/lena.jpg]''')
 
 
 def main(argv):
 
     print_help()
 
-    filename = argv[0] if len(argv) > 0 else '../Data/lena.jpg'
+    filename = argv[0] if len(argv) > 0 else '../opencv/Samples/Data/lena.jpg'
 
     I = cv.imread(cv.samples.findFile(filename), cv.IMREAD_GRAYSCALE)
     if I is None:

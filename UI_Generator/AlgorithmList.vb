@@ -1253,6 +1253,7 @@ if algorithmName = "Options_DCT" Then return new Options_DCT
 if algorithmName = "Options_Denoise" Then return new Options_Denoise
 if algorithmName = "Options_Derivative" Then return new Options_Derivative
 if algorithmName = "Options_DFT" Then return new Options_DFT
+if algorithmName = "Options_DFTShape" Then return new Options_DFTShape
 if algorithmName = "Options_Dilate" Then return new Options_Dilate
 if algorithmName = "Options_Distance" Then return new Options_Distance
 if algorithmName = "Options_Dither" Then return new Options_Dither

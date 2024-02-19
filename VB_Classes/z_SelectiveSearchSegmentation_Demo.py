@@ -13,7 +13,7 @@ import sys
 
 if __name__ == '__main__':
     print(__doc__)
-    img = cv.imread('../Data/chicky_512.png')
+    img = cv.imread('../opencv/Samples/Data/chicky_512.png')
 
     cv.setUseOptimized(True)
     cv.setNumThreads(8)

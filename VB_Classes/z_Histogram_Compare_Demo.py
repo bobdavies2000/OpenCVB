@@ -8,9 +8,9 @@ def Mbox(title, text, style):
 
 ## [Load three images with different environment settings]
 parser = argparse.ArgumentParser(description='Code for Histogram Comparison tutorial.')
-parser.add_argument('--input1', help='Path to input image 1.', default='../Data/baboon.jpg')
-parser.add_argument('--input2', help='Path to input image 2.', default='../Data/apple.jpg')
-parser.add_argument('--input3', help='Path to input image 3.', default='../Data/butterfly.jpg')
+parser.add_argument('--input1', help='Path to input image 1.', default='../opencv/Samples/Data/baboon.jpg')
+parser.add_argument('--input2', help='Path to input image 2.', default='../opencv/Samples/Data/apple.jpg')
+parser.add_argument('--input3', help='Path to input image 3.', default='../opencv/Samples/Data/butterfly.jpg')
 args = parser.parse_args()
 
 src_base = cv.imread(args.input1)

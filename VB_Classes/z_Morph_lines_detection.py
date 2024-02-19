@@ -23,7 +23,7 @@ def main(argv):
     #    return -1
 
     # Load the image
-    src = cv.imread('../Data/home.jpg', cv.IMREAD_COLOR)
+    src = cv.imread('../opencv/Samples/Data/home.jpg', cv.IMREAD_COLOR)
 
     # Check if image is loaded fine
     if src is None:

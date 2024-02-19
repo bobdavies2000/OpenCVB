@@ -306,7 +306,7 @@ Public Class BGSubtract_Synthetic_CPP : Inherits VB_Algorithm
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
 
             cPtr = BGSubtract_Synthetic_Open(handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                             task.homeDir + "Data/baboon.jpg",
+                                             task.homeDir + "opencv/Samples/Data/baboon.jpg",
                                              options.amplitude / 100, options.magnitude, options.waveSpeed / 100, options.objectSpeed)
             handleSrc.Free()
         End If

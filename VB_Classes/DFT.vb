@@ -196,26 +196,17 @@ Public Class DFT_Shapes : Inherits VB_Algorithm
     Dim lines As New Draw_Lines
     Dim symShapes As New Draw_SymmetricalShapes
     Dim options As New Options_Draw
+    Dim optionsDFT As New Options_DFTShape
     Public Sub New()
         findSlider("DrawCount").Value = 1
         If standaloneTest() Then gOptions.displayDst0.Checked = True
-        If radio.Setup(traceName) Then
-            radio.addRadio("Draw Circle")
-            radio.addRadio("Draw Ellipse")
-            radio.addRadio("Draw Rectangle")
-            radio.addRadio("Draw Polygon")
-            radio.addRadio("Draw Line")
-            radio.addRadio("Draw Symmetrical Shapes")
-            radio.addRadio("Draw Point")
-            radio.check(0).Checked = True
-        End If
         labels = {"Inverse of the DFT - the same grayscale input.", "", "Input to the DFT", "Discrete Fourier Transform Output"}
         desc = "Show the spectrum magnitude for some standard shapes"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+        options.RunVB()
 
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = findfrm("Options_DFTShape Radio Buttons")
         Select Case findRadioText(frm.check)
             Case "Draw Circle"
                 circle.Run(src)
@@ -249,7 +240,8 @@ Public Class DFT_Shapes : Inherits VB_Algorithm
         dft.Run(dst2)
         dst3 = dft.dst3
 
-        ' the following line to view the inverse of the DFT transform.  It is the grayscale image of the input - no surprise.  It works!
+        ' the following line to view the inverse of the DFT transform.
+        ' It is the grayscale image of the input - no surprise.  It works!
         dst0 = inverseDFT(dft.complexImage)
     End Sub
 End Class

@@ -4,7 +4,7 @@ import numpy as np
 titleWindow = 'z_EqualizedHist_Demo.py'
 
 parser = argparse.ArgumentParser(description='Code for Histogram Equalization tutorial.')
-parser.add_argument('--input', help='Path to input image.', default='../Data/lena.jpg')
+parser.add_argument('--input', help='Path to input image.', default='../opencv/Samples/Data/lena.jpg')
 args = parser.parse_args()
 
 src = cv.imread(cv.samples.findFile(args.input))

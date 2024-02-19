@@ -14,7 +14,7 @@ titleWindow = 'z_Gabor_Filter.py'
 
 g_kernel = cv2.getGaborKernel((31, 31), 4.0, np.pi/4, 10.0, 0.5, 0, ktype=cv2.CV_32F)
 
-img = cv2.imread('../Data/baboon.jpg')
+img = cv2.imread('../opencv/Samples/Data/baboon.jpg')
 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 filtered_img = cv2.filter2D(img, cv2.CV_8UC3, g_kernel)
 

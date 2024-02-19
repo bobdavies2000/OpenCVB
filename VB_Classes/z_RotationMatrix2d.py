@@ -32,7 +32,7 @@ class App(object):
         cv.imshow("src", src)
 
     def Open(self):
-        src = cv.imread('../Data/baboon.jpg')
+        src = cv.imread('../opencv/Samples/Data/baboon.jpg')
         self.test1(src)
         cv.waitKey()
 

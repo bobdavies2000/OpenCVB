@@ -18,7 +18,7 @@ def main():
     try:
         fn = sys.argv[1]
     except IndexError:
-        fn = '../Data/fruits.jpg'
+        fn = '../opencv/Samples/Data/fruits.jpg'
 
     img = cv.imread(cv.samples.findFile(fn))
     if img is None:

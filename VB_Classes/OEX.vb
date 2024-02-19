@@ -597,9 +597,9 @@ Public Class OEX_FitEllipse : Inherits VB_Algorithm
     Dim img As cv.Mat
     Public Sub New()
         Dim fileInputName As New FileInfo(task.homeDir + "opencv/samples/data/ellipses.jpg")
-        img = cv.Cv2.ImRead(fileInputName.FullName)
+        img = cv.Cv2.ImRead(fileInputName.FullName).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("FitEllipse threshold", 0, 100, 50)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("FitEllipse threshold", 0, 255, 70)
         cPtr = OEX_FitEllipse_Open()
         desc = "OEX Example fitellipse"
     End Sub
@@ -613,7 +613,7 @@ Public Class OEX_FitEllipse : Inherits VB_Algorithm
         Dim imagePtr = OEX_FitEllipse_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), img.Rows, img.Cols, img.Channels)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(img.Rows, img.Cols, If(img.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr).Clone
+        dst2 = New cv.Mat(img.Rows, img.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
     End Sub
     Public Sub Close()
         OEX_FitEllipse_Close(cPtr)

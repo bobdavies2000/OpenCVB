@@ -102,9 +102,9 @@ class App():
         if len(sys.argv) == 2:
             filename = sys.argv[1] # for drawing purposes
         else:
-            print("No input image given, so loading default image, lena.jpg \n")
+            print("No input image given, so loading default image, opencv/Samples/Data/lena.jpg \n")
             print("Correct Usage: python grabcut.py <filename> \n")
-            filename = '../Data/lena.jpg'
+            filename = '../opencv/Samples/Data/lena.jpg'
 
         self.img = cv.imread(cv.samples.findFile(filename))
         self.img2 = self.img.copy()                               # a copy of original image

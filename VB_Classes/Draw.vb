@@ -203,27 +203,29 @@ Public Class Draw_SymmetricalShapes : Inherits VB_Algorithm
         desc = "Generate shapes programmatically"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
-        dst2.SetTo(cv.Scalar.Black)
-        Dim pt As New cv.Point
-        Dim center As New cv.Point(src.Width / 2, src.Height / 2)
-        Dim points As New List(Of cv.Point)
+        options.RunVB()
+        If task.heartBeat Then
+            dst2.SetTo(cv.Scalar.Black)
+            Dim pt As New cv.Point
+            Dim center As New cv.Point(src.Width / 2, src.Height / 2)
+            Dim points As New List(Of cv.Point)
 
-        For i = 0 To options.numPoints - 1
-            Dim theta = i * options.dTheta
-            Dim ripple = options.radius2 * Math.Cos(options.nGenPer * theta)
-            If options.symmetricRipple = False Then ripple = Math.Abs(ripple)
-            If options.reverseInOut Then ripple = -ripple
-            pt.X = Math.Truncate(center.X + (options.radius1 + ripple) * Math.Cos(theta + options.rotateAngle) + 0.5)
-            pt.Y = Math.Truncate(center.Y - (options.radius1 + ripple) * Math.Sin(theta + options.rotateAngle) + 0.5)
-            points.Add(pt)
-        Next
+            For i = 0 To options.numPoints - 1
+                Dim theta = i * options.dTheta
+                Dim ripple = options.radius2 * Math.Cos(options.nGenPer * theta)
+                If options.symmetricRipple = False Then ripple = Math.Abs(ripple)
+                If options.reverseInOut Then ripple = -ripple
+                pt.X = Math.Truncate(center.X + (options.radius1 + ripple) * Math.Cos(theta + options.rotateAngle) + 0.5)
+                pt.Y = Math.Truncate(center.Y - (options.radius1 + ripple) * Math.Sin(theta + options.rotateAngle) + 0.5)
+                points.Add(pt)
+            Next
 
-        For i = 0 To options.numPoints - 1
-            dst2.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod options.numPoints), task.scalarColors(i Mod task.scalarColors.Count), task.lineWidth + 1, task.lineType)
-        Next
+            For i = 0 To options.numPoints - 1
+                dst2.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod options.numPoints), task.scalarColors(i Mod task.scalarColors.Count), task.lineWidth + 1, task.lineType)
+            Next
 
-        If options.fillRequest Then dst2.FloodFill(center, options.fillColor)
+            If options.fillRequest Then dst2.FloodFill(center, options.fillColor)
+        End If
     End Sub
 End Class
 

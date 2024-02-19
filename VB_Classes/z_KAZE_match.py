@@ -7,8 +7,8 @@ from math import sqrt
 
 ## [load]
 parser = argparse.ArgumentParser(description='Code for AKAZE local features matching tutorial.')
-parser.add_argument('--input1', help='Path to input image 1.', default='../Data/graf1.png')
-parser.add_argument('--input2', help='Path to input image 2.', default='../Data/graf3.png')
+parser.add_argument('--input1', help='Path to input image 1.', default='../opencv/Samples/Data/graf1.png')
+parser.add_argument('--input2', help='Path to input image 2.', default='../opencv/Samples/Data/graf3.png')
 parser.add_argument('--homography', help='Path to the homography matrix.', default='../Data/H1to3p.xml')
 args = parser.parse_args()
 

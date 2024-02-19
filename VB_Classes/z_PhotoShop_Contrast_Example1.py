@@ -4,7 +4,7 @@ import numpy as np
 import argparse
 
 parser = argparse.ArgumentParser(description='Code for Changing the contrast and brightness of an image! tutorial.')
-parser.add_argument('--input', help='Path to input image.', default='../Data/lena.jpg')
+parser.add_argument('--input', help='Path to input image.', default='../opencv/Samples/Data/lena.jpg')
 args = parser.parse_args()
 
 image = cv.imread(cv.samples.findFile(args.input))

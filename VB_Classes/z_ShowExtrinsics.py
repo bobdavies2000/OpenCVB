@@ -165,7 +165,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Plot camera calibration extrinsics.',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--calibration', type=str, default='../Data/left_intrinsics.yml',
+    parser.add_argument('--calibration', type=str, default='../opencv/Samples/Data/left_intrinsics.yml',
                         help='YAML camera calibration file.')
     parser.add_argument('--cam_width', type=float, default=0.064/2,
                         help='Width/2 of the displayed camera.')

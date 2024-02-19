@@ -15,7 +15,7 @@ def main(argv):
     window_name = "copyMakeBorder Demo"
     ## [variables]
     ## [load]
-    imageName = argv[0] if len(argv) > 0 else '../Data/lena.jpg'
+    imageName = argv[0] if len(argv) > 0 else '../opencv/Samples/Data/lena.jpg'
 
     # Loads an image
     src = cv.imread(cv.samples.findFile(imageName), cv.IMREAD_COLOR)
@@ -23,7 +23,7 @@ def main(argv):
     # Check if image is loaded fine
     if src is None:
         print ('Error opening image!')
-        print ('Usage: copy_make_border.py [image_name -- default lena.jpg] \n')
+        print ('Usage: copy_make_border.py [image_name -- default opencv/Samples/Data/lena.jpg] \n')
         return -1
     ## [load]
     # Brief how-to for this program

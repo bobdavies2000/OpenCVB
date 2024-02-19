@@ -8,7 +8,7 @@ usage:
 default values:
     --debug:    ./output/
     --square_size: 1.0
-    <image mask> defaults to ../data/left*.jpg
+    <image mask> defaults to ../opencv/Samples/data/left*.jpg
 '''
 
 import numpy as np
@@ -35,7 +35,7 @@ def main():
     args.setdefault('--square_size', 1.0)
     args.setdefault('--threads', 4)
     if not img_mask:
-        img_mask = '../Data/left??.jpg'  # default
+        img_mask = '../opencv/Samples/Data/left??.jpg'  # default
     else:
         img_mask = img_mask[0]
 

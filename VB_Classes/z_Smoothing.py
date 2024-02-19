@@ -16,13 +16,13 @@ def main(argv):
     cv.namedWindow(titleWindow, cv.WINDOW_AUTOSIZE)
 
     # Load the source image
-    imageName = argv[0] if len(argv) > 0 else '../Data/lena.jpg'
+    imageName = argv[0] if len(argv) > 0 else '../opencv/Samples/Data/lena.jpg'
 
     global src
     src = cv.imread(cv.samples.findFile(imageName))
     if src is None:
         print ('Error opening image')
-        print ('Usage: smoothing.py [image_name -- default ../data/lena.jpg] \n')
+        print ('Usage: smoothing.py [image_name -- default ../opencv/Samples/Data/lena.jpg] \n')
         return -1
 
     if display_caption('Original Image') != 0:

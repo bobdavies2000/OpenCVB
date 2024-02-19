@@ -41,8 +41,8 @@ Public Class KAZE_Sample_CS : Inherits VB_Algorithm
     Dim box_in_scene As New cv.Mat
     Dim CS_Kaze As New CS_Classes.Kaze_Sample
     Public Sub New()
-        box = cv.Cv2.ImRead(task.homeDir + "Data/box.png", cv.ImreadModes.Color)
-        box_in_scene = cv.Cv2.ImRead(task.homeDir + "Data/box_in_scene.png", cv.ImreadModes.Color)
+        box = cv.Cv2.ImRead(task.homeDir + "opencv/Samples/Data/box.png", cv.ImreadModes.Color)
+        box_in_scene = cv.Cv2.ImRead(task.homeDir + "opencv/Samples/Data/box_in_scene.png", cv.ImreadModes.Color)
         desc = "Match keypoints in 2 photos."
     End Sub
     Public Sub RunVB(src as cv.Mat)

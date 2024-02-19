@@ -24,7 +24,7 @@ def main():
     try:
         fn = sys.argv[1]
     except:
-        fn = '../Data/fruits.jpg'
+        fn = '../opencv/Samples/Data/fruits.jpg'
 
     fn = cv.samples.findFile(fn)
     img = cv.imread(fn, cv.IMREAD_GRAYSCALE)

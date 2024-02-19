@@ -54,7 +54,7 @@ def main():
     if len(sys.argv)>1:
         fname = sys.argv[1]
     else :
-        fname = '../Data/lena.jpg'
+        fname = '../opencv/Samples/Data/lena.jpg'
         print("usage : python hist.py <image_file>")
 
     im = cv.imread(cv.samples.findFile(fname))

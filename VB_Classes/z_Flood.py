@@ -39,7 +39,7 @@ class App():
             self.update()
 
     def run(self):
-        self.img = cv.imread('../Data/fruits.jpg')
+        self.img = cv.imread('../opencv/Samples/Data/fruits.jpg')
         h, w = self.img.shape[:2]
         self.mask = np.zeros((h+2, w+2), np.uint8)
         self.seed_pt = None

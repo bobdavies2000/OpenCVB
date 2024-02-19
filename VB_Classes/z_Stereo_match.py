@@ -30,8 +30,8 @@ def write_ply(fn, verts, colors):
 
 def main():
     print('loading images...')
-    imgL = cv.pyrDown(cv.imread(cv.samples.findFile('../Data/aloeL.jpg')))  # downscale images for faster processing
-    imgR = cv.pyrDown(cv.imread(cv.samples.findFile('../Data/aloeR.jpg')))
+    imgL = cv.pyrDown(cv.imread(cv.samples.findFile('../opencv/Samples/Data/aloeL.jpg')))  # downscale images for faster processing
+    imgR = cv.pyrDown(cv.imread(cv.samples.findFile('../opencv/Samples/Data/aloeR.jpg')))
 
     # disparity range is tuned for 'aloe' image pair
     window_size = 3

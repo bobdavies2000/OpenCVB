@@ -1363,46 +1363,6 @@ End Class
 
 
 
-Public Class Options_DFT : Inherits VB_Algorithm
-    Public radius As Integer = dst2.Rows
-    Public order As Integer = 2
-    Public butterworthFilter(1) As cv.Mat
-    Public dftFlag As cv.DctFlags
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("DFT B Filter - Radius", 1, dst2.Rows, radius)
-            sliders.setupTrackBar("DFT B Filter - Order", 1, dst2.Rows, order)
-        End If
-        If radio.Setup(traceName) Then
-            radio.addRadio("DFT Flags ComplexOutput")
-            radio.addRadio("DFT Flags Inverse")
-            radio.addRadio("DFT Flags None")
-            radio.addRadio("DFT Flags RealOutput")
-            radio.addRadio("DFT Flags Rows")
-            radio.addRadio("DFT Flags Scale")
-            radio.check(0).Checked = True
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static radiusSlider = findSlider("DFT B Filter - Radius")
-        Static orderSlider = findSlider("DFT B Filter - Order")
-        radius = radiusSlider.Value
-        order = orderSlider.Value
-
-        Static frm = findfrm(traceName + " Radio Buttons")
-        For i = 0 To frm.check.Count - 1
-            If frm.check(i).Checked Then
-                dftFlag = Choose(i + 1, cv.DftFlags.ComplexOutput, cv.DftFlags.Inverse, cv.DftFlags.None,
-                                        cv.DftFlags.RealOutput, cv.DftFlags.Rows, cv.DftFlags.Scale)
-                Exit For
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
 
 Public Class Options_Dither : Inherits VB_Algorithm
     Public radioIndex As Integer
@@ -4518,5 +4478,68 @@ Public Class Options_SURF : Inherits VB_Algorithm
         useBFMatch = BFRadio.checked
         surfThreshold = thresholdSlider.value
         verticalRange = rangeSlider.value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_DFT : Inherits VB_Algorithm
+    Public radius As Integer = dst2.Rows
+    Public order As Integer = 2
+    Public butterworthFilter(1) As cv.Mat
+    Public dftFlag As cv.DctFlags
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("DFT B Filter - Radius", 1, dst2.Rows, radius)
+            sliders.setupTrackBar("DFT B Filter - Order", 1, dst2.Rows, order)
+        End If
+        If radio.Setup(traceName) Then
+            radio.addRadio("DFT Flags ComplexOutput")
+            radio.addRadio("DFT Flags Inverse")
+            radio.addRadio("DFT Flags None")
+            radio.addRadio("DFT Flags RealOutput")
+            radio.addRadio("DFT Flags Rows")
+            radio.addRadio("DFT Flags Scale")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static radiusSlider = findSlider("DFT B Filter - Radius")
+        Static orderSlider = findSlider("DFT B Filter - Order")
+        radius = radiusSlider.Value
+        order = orderSlider.Value
+
+        Static frm = findfrm(traceName + " Radio Buttons")
+        For i = 0 To frm.check.Count - 1
+            If frm.check(i).Checked Then
+                dftFlag = Choose(i + 1, cv.DftFlags.ComplexOutput, cv.DftFlags.Inverse, cv.DftFlags.None,
+                                        cv.DftFlags.RealOutput, cv.DftFlags.Rows, cv.DftFlags.Scale)
+                Exit For
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_DFTShape : Inherits VB_Algorithm
+    Public dftShape As String
+    Public Sub New()
+        If radio.Setup(traceName) Then
+            radio.addRadio("Draw Circle")
+            radio.addRadio("Draw Ellipse")
+            radio.addRadio("Draw Rectangle")
+            radio.addRadio("Draw Polygon")
+            radio.addRadio("Draw Line")
+            radio.addRadio("Draw Symmetrical Shapes")
+            radio.addRadio("Draw Point")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
     End Sub
 End Class

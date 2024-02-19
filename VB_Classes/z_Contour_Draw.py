@@ -12,7 +12,7 @@ ap.add_argument("-i", "--image", help = "path to the image file")
 args = vars(ap.parse_args())
 
 # load the image
-image = cv.imread('../Data/lena.jpg') # args["image"])
+image = cv.imread('../opencv/Samples/Data/lena.jpg') # args["image"])
 lower = np.array([20,0,155])
 upper = np.array([255,120,250])
 shapeMask = cv.inRange(image, lower, upper)

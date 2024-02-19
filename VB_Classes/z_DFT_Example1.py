@@ -60,7 +60,7 @@ def main():
     if len(sys.argv) > 1:
         fname = sys.argv[1]
     else:
-        fname = '../Data/baboon.jpg'
+        fname = '../opencv/Samples/Data/baboon.jpg'
         print("usage : python dft.py <image_file>")
 
     im = cv.imread(cv.samples.findFile(fname))

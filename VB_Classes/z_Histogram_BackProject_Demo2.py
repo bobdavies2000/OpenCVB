@@ -57,7 +57,7 @@ def Hist_and_Backproj(mask):
 
 # Read the image
 parser = argparse.ArgumentParser(description='Code for Back Projection tutorial.')
-parser.add_argument('--input', help='Path to input image.', default='../Data/graf1.png')
+parser.add_argument('--input', help='Path to input image.', default='../opencv/Samples/Data/graf1.png')
 args = parser.parse_args()
 
 src = cv.imread(args.input)

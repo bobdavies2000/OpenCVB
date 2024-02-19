@@ -5,7 +5,7 @@ import ctypes
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
-img1 = cv.imread("../Data/lena.jpg")
+img1 = cv.imread("../opencv/Samples/Data/lena.jpg")
 cv.imshow("img1", img1)
 img1 = img1.astype(np.float32)
 shift = np.array([5., 5.])
