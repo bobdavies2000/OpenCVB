@@ -1551,6 +1551,7 @@ if algorithmName = "RedCloud_DelaunayGuidedFeatures" Then return new RedCloud_De
 if algorithmName = "RedCloud_DepthBW" Then return new RedCloud_DepthBW
 if algorithmName = "RedCloud_DepthOutline" Then return new RedCloud_DepthOutline
 if algorithmName = "RedCloud_Diff" Then return new RedCloud_Diff
+if algorithmName = "RedCloud_EdgeFreeContours" Then return new RedCloud_EdgeFreeContours
 if algorithmName = "RedCloud_Equations" Then return new RedCloud_Equations
 if algorithmName = "RedCloud_FeatureLess" Then return new RedCloud_FeatureLess
 if algorithmName = "RedCloud_FeatureLessReduce" Then return new RedCloud_FeatureLessReduce

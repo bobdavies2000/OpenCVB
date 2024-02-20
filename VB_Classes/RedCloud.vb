@@ -2805,3 +2805,25 @@ Public Class RedCloud_FeatureLessReduce : Inherits VB_Algorithm
         setSelectedCell(redCells, cellMap)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class RedCloud_EdgeFreeContours : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim feat As New FeatureLess_Basics
+    Public Sub New()
+        desc = "Identify the edge-free contours in the RedCloud output."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels = redC.labels
+
+        feat.Run(src)
+        dst3 = feat.dst2
+    End Sub
+End Class
