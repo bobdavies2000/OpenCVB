@@ -1,6 +1,29 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits VB_Algorithm
+    Public redC As New RedCloud_BasicsFull
+    Public redCells As New List(Of rcData)
+    Public cellMap As New cv.Mat
+    Public Sub New()
+        redOptions.UseColor.Checked = True  ' <<<<<<< this is what is different.
+        desc = "Create RedCloud output using only color."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+        identifyCells(redC.redCells)
+        labels(3) = "Method for color source = " + redOptions.colorInputName
+        redCells = redC.redCells
+        cellMap = redC.cellMap
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCloud_BasicsFull : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public combine As New RedCloud_Combine
@@ -112,25 +135,6 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
 End Class
 
 
-
-
-
-
-
-Public Class RedCloud_BasicsColor : Inherits VB_Algorithm
-    Public redC As New RedCloud_Basics
-    Public Sub New()
-        redOptions.UseColor.Checked = True  ' <<<<<<< this is what is different.
-        desc = "Create RedCloud output using only color."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-        identifyCells(redC.redCells)
-        labels(3) = "Method for color source = " + redOptions.colorInputName
-    End Sub
-End Class
 
 
 
@@ -559,7 +563,7 @@ Public Class RedCloud_PlaneColor : Inherits VB_Algorithm
         If task.motionDetected = False Then Exit Sub
         options.RunVB()
 
-            redC.Run(src)
+        redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
@@ -727,7 +731,7 @@ End Class
 
 
 Public Class RedCloud_World : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_BasicsFull
     Dim world As New Depth_World
     Public Sub New()
         labels(3) = "Generated pointcloud"
@@ -1261,8 +1265,8 @@ End Class
 
 
 Public Class RedCloud_Combine2Pass : Inherits VB_Algorithm
-    Dim redC1 As New RedCloud_Basics
-    Dim redC2 As New RedCloud_Basics
+    Dim redC1 As New RedCloud_BasicsFull
+    Dim redC2 As New RedCloud_BasicsFull
     Dim mats As New Mat_4Click
     Public Sub New()
         desc = "Run RedCloud_Basics and then combine the unstable pixels into the input for RedCloud."
@@ -1646,10 +1650,10 @@ End Class
 
 
 Public Class RedCloud_OnlyColorHist3D : Inherits VB_Algorithm
-    Dim rMin As New RedCloud_BasicsColor
+    Dim rMin As New RedCloud_BasicsFull
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
-        desc = "Use the backprojection of the 3D RGB histogram as input to RedCloud_BasicsColor."
+        desc = "Use the backprojection of the 3D RGB histogram as input to RedCloud_Basics."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         hColor.Run(src)
@@ -1657,7 +1661,7 @@ Public Class RedCloud_OnlyColorHist3D : Inherits VB_Algorithm
         labels(2) = hColor.labels(3)
 
         rMin.Run(dst2)
-        dst3 = rMin.redC.cellMap
+        dst3 = rMin.cellMap
         dst3.SetTo(0, task.noDepthMask)
         labels(3) = rMin.labels(2)
     End Sub
@@ -2361,7 +2365,7 @@ End Class
 
 
 Public Class RedCloud_Hue : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_BasicsFull
     Dim hue As New Color_Hue
     Public Sub New()
         redOptions.UseColor.Checked = True

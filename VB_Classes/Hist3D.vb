@@ -275,7 +275,7 @@ End Class
 
 Public Class Hist3D_PixelDiffMask : Inherits VB_Algorithm
     Dim pixel As New Hist3D_Pixel
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_BasicsFull
     Public Sub New()
         redOptions.UseColor.Checked = True
         desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection"
