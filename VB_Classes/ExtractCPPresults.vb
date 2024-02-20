@@ -26,5 +26,6 @@ Public Class ExtractCPPresults_EdgeDrawing : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         cpp.Run(src)
         dst2 = cpp.dst2
+        dst3 = cpp.dst3
     End Sub
 End Class
