@@ -221,7 +221,7 @@ Public Class BackProject2D_Top : Inherits VB_Algorithm
         heat.Run(src)
         dst2 = heat.dst2
 
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, heat.dst0, dst3, task.rangesTop)
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, heat.histogramTop, dst3, task.rangesTop)
 
         dst3 = vbNormalize32f(dst3)
 
@@ -242,7 +242,7 @@ Public Class BackProject2D_Side : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         heat.Run(src)
         dst2 = heat.dst3
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, heat.dst1, dst3, task.rangesSide)
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, heat.histogramSide, dst3, task.rangesSide)
 
         dst3 = vbNormalize32f(dst3)
 
