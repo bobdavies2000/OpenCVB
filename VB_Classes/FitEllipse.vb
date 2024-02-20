@@ -144,6 +144,7 @@ Public Class FitEllipse_RedCloud : Inherits VB_Algorithm
         Next
         fitE.Run(empty)
         dst3.SetTo(0)
+        dst3(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
         dst3.Rectangle(task.rc.rect, cv.Scalar.White, task.lineWidth, task.lineType)
         dst3(task.rc.rect).Ellipse(fitE.box, cv.Scalar.Yellow, task.lineWidth, task.lineType)
     End Sub

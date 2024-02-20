@@ -115,7 +115,7 @@ Public Class Classifier_BayesianTest : Inherits VB_Algorithm
     Public Sub New()
         redOptions.UseColor.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        labels = {"", "Mask of the neighbors to the selected cell", "RedCloud_BasicsColor output", "Classifier_Bayesian output"}
+        labels = {"", "Mask of the neighbors to the selected cell", "RedCloud_Basics output", "Classifier_Bayesian output"}
         If standalone Then gOptions.displayDst1.Checked = True
         cPtr = Classifier_Bayesian_Open()
         desc = "Classify the neighbor cells to be similar to the selected cell or not."
