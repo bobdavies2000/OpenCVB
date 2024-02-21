@@ -1,13 +1,57 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Neighbor_Basics : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim knn As New KNN_Core
+    Public Sub New()
+        desc = "Find all the neighbors with KNN"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels = redC.labels
+
+        knn.queries.Clear()
+        For Each rc In redC.redCells
+            knn.queries.Add(rc.maxDStable)
+        Next
+        knn.Run(src)
+
+        For i = 0 To redC.redCells.Count - 1
+            Dim rc = redC.redCells(i)
+            rc.neighbors = knn.resultList(i)
+        Next
+
+        setSelectedCell(redC.redCells, redC.cellMap)
+
+        dst3.SetTo(0)
+        Dim ptCount As Integer
+        For Each pt In task.rc.neighbors
+            If pt <> task.rc.maxDStable Then
+                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+                ptCount += 1
+                If ptCount > 20 Then Exit For
+            End If
+        Next
+
+        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Neighbor_Mask : Inherits VB_Algorithm
     Public nabList As New List(Of List(Of Byte))
     Dim stats As New Cell_Basics
     Public redCells As List(Of rcData)
     Public Sub New()
         cPtr = Neighbor_Map_Open()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
-        desc = "Find all the neighbors in a RedCloud cellmap"
+        desc = "Find the neighbors in a selected RedCloud cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
@@ -70,9 +114,9 @@ End Class
 
 
 
-Public Class Neighbor_Corners : Inherits VB_Algorithm
+Public Class Neighbor_Intersects : Inherits VB_Algorithm
     Public nPoints As New List(Of cv.Point)
-    Dim ePoints As New Neighbor_ImageEdges
+    Dim ePoints As New Neighbor_IntersectsImageEdge
     Public Sub New()
         desc = "Find the corner points where multiple cells intersect."
     End Sub
@@ -129,7 +173,7 @@ End Class
 
 
 
-Public Class Neighbor_ImageEdges : Inherits VB_Algorithm
+Public Class Neighbor_IntersectsImageEdge : Inherits VB_Algorithm
     Public nPoints As New List(Of cv.Point)
     Public Sub New()
         desc = "Find the cell boundaries at the edge of the image."
@@ -177,7 +221,7 @@ End Class
 
 
 Public Class Neighbor_ColorOnly : Inherits VB_Algorithm
-    Dim corners As New Neighbor_Corners
+    Dim corners As New Neighbor_Intersects
     Dim redC As New RedCloud_Cells
     Public Sub New()
         desc = "Find neighbors in a color only RedCloud cellMap"
@@ -205,7 +249,7 @@ End Class
 
 Public Class Neighbor_StableMax : Inherits VB_Algorithm
     Dim stable As New Cell_StableMax
-    Dim corners As New Neighbor_Corners
+    Dim corners As New Neighbor_Intersects
     Public Sub New()
         desc = "Find neighbors in the RedCloud_StableMax redCloud cells."
     End Sub
@@ -232,33 +276,9 @@ End Class
 
 
 
-Public Class Neighbor_Flood : Inherits VB_Algorithm
+Public Class Neighbor_MaskTest : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
-    Public Sub New()
-        desc = "Identify the floodPoint Neighbor of the selected cell - NOTE: this does not provide a consistent neighbor"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        Dim rc = task.rc
-        If rc.floodPoint.X > 0 Then
-            Dim rcNeighbor = redC.redCells(redC.cellMap.Get(Of Byte)(rc.floodPoint.Y, rc.floodPoint.X - 1))
-            vbDrawContour(dst2(rcNeighbor.rect), rcNeighbor.contour, cv.Scalar.White, task.lineWidth)
-        End If
-        setTrueText("This does not provide a consistent neighbor value.  See Neighbor_Map_CPP", 3)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Neighbor_BasicsTest : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
-    Dim nabs As New Neighbor_Basics
+    Dim nabs As New Neighbor_Mask
     Public Sub New()
         desc = "Test Neighbor_Basics to show how to use it."
     End Sub
