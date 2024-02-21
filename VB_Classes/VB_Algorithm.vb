@@ -91,6 +91,7 @@ Public Class VB_Algorithm : Implements IDisposable
         Return False
     End Function
     Public Function checkIntermediateResults() As VB_Algorithm
+        If task.algName.StartsWith("CPP_") Then Return Nothing ' we don't currently support intermediate results for CPP_ algorithms.
         For Each obj In task.activeObjects
             If obj.traceName = task.intermediateName And obj.firstPass = False Then Return obj
         Next
@@ -328,15 +329,16 @@ Public Class VB_Algorithm : Implements IDisposable
             If task.PixelViewer IsNot Nothing Then If task.PixelViewer.viewerForm.Visible Then task.PixelViewer.viewerForm.Hide()
         End If
 
-        task.intermediateObject = checkIntermediateResults()
+        Dim obj = checkIntermediateResults()
+        task.intermediateObject = obj
         task.trueData = New List(Of trueText)(trueData)
-        If task.intermediateObject IsNot Nothing Then
-            If gOptions.displayDst0.Checked Then task.dst0 = MakeSureImage8uC3(task.intermediateObject.dst0) Else task.dst0 = task.color
-            If gOptions.displayDst1.Checked Then task.dst1 = MakeSureImage8uC3(task.intermediateObject.dst1) Else task.dst1 = task.depthRGB
-            task.dst2 = MakeSureImage8uC3(task.intermediateObject.dst2)
-            task.dst3 = MakeSureImage8uC3(task.intermediateObject.dst3)
-            task.labels = task.intermediateObject.labels
-            task.trueData = New List(Of trueText)(task.intermediateObject.trueData)
+        If obj IsNot Nothing Then
+            If gOptions.displayDst0.Checked Then task.dst0 = MakeSureImage8uC3(obj.dst0) Else task.dst0 = task.color
+            If gOptions.displayDst1.Checked Then task.dst1 = MakeSureImage8uC3(obj.dst1) Else task.dst1 = task.depthRGB
+            task.dst2 = If(obj.dst2.Type = cv.MatType.CV_8UC3, obj.dst2, MakeSureImage8uC3(obj.dst2))
+            task.dst3 = If(obj.dst3.Type = cv.MatType.CV_8UC3, obj.dst3, MakeSureImage8uC3(obj.dst3))
+            task.labels = obj.labels
+            task.trueData = New List(Of trueText)(obj.trueData)
         Else
             If gOptions.displayDst0.Checked Then task.dst0 = MakeSureImage8uC3(dst0) Else task.dst0 = task.color
             If gOptions.displayDst1.Checked Then task.dst1 = MakeSureImage8uC3(dst1) Else task.dst1 = task.depthRGB

@@ -1577,6 +1577,7 @@ if algorithmName = "RedCloud_MostlyColor" Then return new RedCloud_MostlyColor
 if algorithmName = "RedCloud_MotionBasics" Then return new RedCloud_MotionBasics
 if algorithmName = "RedCloud_MotionBGsubtract" Then return new RedCloud_MotionBGsubtract
 if algorithmName = "RedCloud_NearestStableCell" Then return new RedCloud_NearestStableCell
+if algorithmName = "RedCloud_NeighborsKNN" Then return new RedCloud_NeighborsKNN
 if algorithmName = "RedCloud_NoDepth" Then return new RedCloud_NoDepth
 if algorithmName = "RedCloud_OnlyColorAlt" Then return new RedCloud_OnlyColorAlt
 if algorithmName = "RedCloud_OnlyColorHist3D" Then return new RedCloud_OnlyColorHist3D
