@@ -34,8 +34,8 @@ Public Class Color_Basics : Inherits VB_Algorithm
                 Case 6 ' "Binarize_SplitDepth"
                     Static binarizeDepth As New Binarize_SplitDepth
                     classifier = binarizeDepth
-                Case 7 ' "Binarize_TiersCM"
-                    Static binarizeTiersCM As New Binarize_TiersCM
+                Case 7 ' "Binarize_DepthTiers"
+                    Static binarizeTiersCM As New Binarize_DepthTiers
                     classifier = binarizeTiersCM
             End Select
         End If

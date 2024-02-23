@@ -84,7 +84,6 @@ Public Class KNN_Core : Inherits VB_Algorithm
     Public queries As New List(Of cv.Point2f) ' put Query data here
     Public neighbors As New List(Of List(Of Integer))
     Public result(,) As Integer ' Get results here...
-    Public resultList As New List(Of List(Of cv.Point))
     Public desiredMatches As Integer = -1 ' -1 indicates it is to use the number of queries.
     Public Sub New()
         knn = cv.ML.KNearest.Create()
@@ -148,23 +147,19 @@ Public Class KNN_Core : Inherits VB_Algorithm
         Next
 
         ReDim result(queryMat.Rows - 1, dm - 1)
-        resultList.Clear()
         neighbors = New List(Of List(Of Integer))
         For i = 0 To queryMat.Rows - 1
             Dim pt = queries(i)
             Dim res = New List(Of Integer)
-            Dim ptList = New List(Of cv.Point)
             For j = 0 To dm - 1
                 Dim test = nData(i * dm + j)
                 If test < nData.Length And test >= 0 Then
                     result(i, j) = CInt(nData(i * dm + j))
                     Dim index = nData(i * dm + j)
                     res.Add(index)
-                    ptList.Add(trainInput(index))
                 End If
             Next
             neighbors.Add(res)
-            resultList.Add(ptList)
         Next
         If standaloneTest() Then displayResults()
     End Sub

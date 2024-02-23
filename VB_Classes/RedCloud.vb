@@ -2600,7 +2600,7 @@ Public Class RedCloud_DepthBW : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            Static tiers As New Binarize_TiersCM
+            Static tiers As New Binarize_DepthTiers
             tiers.Run(src)
             src = tiers.dst2
         End If
@@ -2825,5 +2825,31 @@ Public Class RedCloud_EdgeFreeContours : Inherits VB_Algorithm
 
         feat.Run(src)
         dst3 = feat.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_TopX : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Show the top X cells", 1, 255, 20)
+        desc = "Show only the top X cells"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static topXSlider = findSlider("Show the top X cells")
+        Dim topX = topXSlider.value
+        redC.Run(src)
+
+        dst2.SetTo(0)
+        For Each rc In redC.redCells
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            If rc.index > topX Then Exit For
+        Next
+        labels(2) = $"The top {topX} RedCloud cells by size."
     End Sub
 End Class

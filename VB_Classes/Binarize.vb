@@ -360,7 +360,7 @@ End Class
 
 
 
-Public Class Binarize_TiersCM : Inherits VB_Algorithm
+Public Class Binarize_DepthTiers : Inherits VB_Algorithm
     Dim tiersCM As New Depth_TiersCM
     Dim binarize As New Binarize_Split4
     Public classCount = 200 ' 4-way split with 50 depth levels at 10 cm's each.

@@ -661,19 +661,19 @@ Module VB_Externs
     Public removeZeroNeighbors As Boolean = True
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbors_Open() As IntPtr
+    Public Function Neighbors1_Open() As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Neighbors_Close(cPtr As IntPtr)
+    Public Sub Neighbors1_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbors_CellData(cPtr As IntPtr) As IntPtr
+    Public Function Neighbors1_CellData(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbors_Points(cPtr As IntPtr) As IntPtr
+    Public Function Neighbors1_Points(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbors_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As Integer
+    Public Function Neighbors1_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As Integer
     End Function
 
 
@@ -916,13 +916,13 @@ Module VB_Externs
 
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbor_Map_Open() As IntPtr
+    Public Function Neighbors_Open() As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Neighbor_Map_Close(cPtr As IntPtr)
+    Public Sub Neighbors_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbor_Map_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As Integer
+    Public Function Neighbors_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As Integer
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Neighbor_NabList(cPtr As IntPtr) As IntPtr

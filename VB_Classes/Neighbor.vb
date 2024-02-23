@@ -19,15 +19,18 @@ Public Class Neighbor_Basics : Inherits VB_Algorithm
 
         For i = 0 To redC.redCells.Count - 1
             Dim rc = redC.redCells(i)
-            rc.neighbors = knn.resultList(i)
+            rc.neighbors = knn.neighbors(i)
         Next
 
         setSelectedCell(redC.redCells, redC.cellMap)
 
         dst3.SetTo(0)
         Dim ptCount As Integer
-        For Each pt In task.rc.neighbors
-            If pt <> task.rc.maxDStable Then
+        For Each index In task.rc.neighbors
+            Dim pt = redC.redCells(index).maxDStable
+            If pt = task.rc.maxDStable Then
+                dst2.Circle(pt, task.dotSize, black, -1, task.lineType)
+            Else
                 dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
                 ptCount += 1
                 If ptCount > 20 Then Exit For
@@ -44,21 +47,22 @@ End Class
 
 
 
-Public Class Neighbor_Mask : Inherits VB_Algorithm
-    Public nabList As New List(Of List(Of Byte))
+Public Class Neighbor_Core : Inherits VB_Algorithm
+    Public nabList As New List(Of List(Of Integer))
     Dim stats As New Cell_Basics
     Public redCells As List(Of rcData)
+    Public runRedCloud As Boolean = False
     Public Sub New()
-        cPtr = Neighbor_Map_Open()
+        cPtr = Neighbors_Open()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Find the neighbors in a selected RedCloud cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standaloneTest() Then
+        If standaloneTest() Or runRedCloud Then
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            labels = redC.labels
 
             src = redC.cellMap
             redCells = redC.redCells
@@ -67,14 +71,14 @@ Public Class Neighbor_Mask : Inherits VB_Algorithm
         Dim mapData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, mapData, 0, mapData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(mapData, GCHandleType.Pinned)
-        Dim nabCount = Neighbor_Map_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
+        Dim nabCount = Neighbors_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()
 
         If nabCount > 0 Then
             Dim nabData = New cv.Mat(nabCount, 1, cv.MatType.CV_32SC2, Neighbor_NabList(cPtr))
             nabList.Clear()
             For i = 0 To redCells.Count - 1
-                nabList.Add(New List(Of Byte))
+                nabList.Add(New List(Of Integer))
             Next
             For i = 0 To nabCount - 1
                 Dim pt = nabData.Get(Of cv.Point)(i, 0)
@@ -105,7 +109,7 @@ Public Class Neighbor_Mask : Inherits VB_Algorithm
         labels(3) = CStr(nabCount) + " neighbor pairs were found."
     End Sub
     Public Sub Close()
-        Neighbor_Map_Close(cPtr)
+        Neighbors_Close(cPtr)
     End Sub
 End Class
 
@@ -276,9 +280,9 @@ End Class
 
 
 
-Public Class Neighbor_MaskTest : Inherits VB_Algorithm
+Public Class Neighbor_CoreTest : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
-    Dim nabs As New Neighbor_Mask
+    Dim nabs As New Neighbor_Core
     Public Sub New()
         desc = "Test Neighbor_Basics to show how to use it."
     End Sub
@@ -300,3 +304,57 @@ Public Class Neighbor_MaskTest : Inherits VB_Algorithm
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class Neighbor_Precise : Inherits VB_Algorithm
+    Dim nabs As New Neighbor_Core
+    Public cellMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public redCells As New List(Of rcData)
+    Public Sub New()
+        nabs.runRedCloud = True
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Given a cell, find all the cells that touch it."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        nabs.Run(src)
+        dst1 = nabs.dst2
+        labels(1) = nabs.labels(2)
+
+        For Each index In nabs.nabList(task.rc.index)
+            Dim rc = nabs.redCells(index)
+            dst2.Circle(rc.maxDStable, task.dotSize, task.highlightColor, -1, task.lineType)
+            strOut += CStr(index) + ","
+        Next
+
+        cellMap.SetTo(0)
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        redCells.Clear()
+        Dim count As Integer
+        For Each rc In nabs.redCells
+            rc.index = redCells.Count
+            If nabs.nabList(rc.index).Count = 1 Then
+                Dim r = rc.rect
+                If r.X <> 0 And r.Y <> 0 And r.X + r.Width < dst2.Width - 1 And r.Y + r.Height < dst2.Height - 1 Then
+                    count += 1
+                    dst3(rc.rect).SetTo(rc.color, rc.mask)
+                    cellMap(rc.rect).SetTo(rc.index, rc.mask)
+                    Continue For
+                End If
+            End If
+            rc.neighbors = New List(Of Integer)(nabs.nabList(rc.index))
+            redCells.Add(rc)
+
+            cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+        Next
+
+        setSelectedCell(redCells, cellMap)
+        labels(2) = $"{redCells.Count} cells were identified."
+        labels(3) = $"{count} cells had only one neighbor and were merged with that neighbor."
+    End Sub
+End Class
