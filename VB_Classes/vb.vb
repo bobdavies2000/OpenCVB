@@ -760,7 +760,7 @@ Public Class rcData
     Public indexLast As Integer
     Public matchCount As Integer
     Public matchFlag As Boolean
-    Public neighbors As New List(Of Integer)
+    Public nabs As New List(Of Integer)
 
     Public contour As New List(Of cv.Point)
     Public corners As New List(Of cv.Point)

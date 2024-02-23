@@ -111,7 +111,7 @@ End Class
 
 Public Class Classifier_BayesianTest : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
-    Dim nabs As New Neighbors_Core
+    Dim nabs As New Neighbors_Precise
     Public Sub New()
         redOptions.UseColor.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

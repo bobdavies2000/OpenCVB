@@ -2815,21 +2815,21 @@ End Class
 
 Public Class RedCloud_TopX : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
+    Dim options As New Options_TopX
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Show the top X cells", 1, 255, 20)
         desc = "Show only the top X cells"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static topXSlider = findSlider("Show the top X cells")
-        Dim topX = topXSlider.value
+        options.RunVB()
+
         redC.Run(src)
 
         dst2.SetTo(0)
         For Each rc In redC.redCells
             dst2(rc.rect).SetTo(rc.color, rc.mask)
-            If rc.index > topX Then Exit For
+            If rc.index > options.topX Then Exit For
         Next
-        labels(2) = $"The top {topX} RedCloud cells by size."
+        labels(2) = $"The top {options.topX} RedCloud cells by size."
     End Sub
 End Class
 
@@ -2840,16 +2840,48 @@ End Class
 
 
 Public Class RedCloud_TopXNeighbors : Inherits VB_Algorithm
-    Dim redC As New RedCloud_TopX
-    Dim nab As New Neighbors_Basics
+    Dim options As New Options_TopX
+    Dim nab As New Neighbors_Precise
+    Public redCells As New List(Of rcData)
+    Public cellMap As New cv.Mat
     Public Sub New()
-        labels = {"", "", "Grayscale", "dst3Label"}
-        vbAddAdvice(traceName + ": <place advice here on any options that are useful>")
-        desc = "description"
+        nab.runRedCloud = True
+        cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Add unused neighbors to each of the top X cells"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels = redC.labels
+        options.RunVB()
+
+        nab.Run(src)
+
+        dst2.SetTo(0)
+        cellMap.SetTo(0)
+        Dim tmpMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        redCells.Clear()
+        redCells.Add(nab.redCells(0)) ' placeholder for zero.
+        For i = 1 To options.topX - 1
+            Dim rc = nab.redCells(i)
+            tmpMap.SetTo(0)
+            tmpMap(rc.rect).SetTo(rc.index, rc.mask)
+            Dim count = 0
+            For Each index In rc.nabs
+                Dim rcX = nab.redCells(index)
+                If rcX.index > options.topX And rcX.depthPixels > 0 Then
+                    Dim val = cellMap.Get(Of Byte)(rcX.maxDStable.Y, rcX.maxDStable.X)
+                    If val = 0 Then
+                        rc.rect = rc.rect.Union(rcX.rect)
+                        tmpMap(rcX.rect).SetTo(rc.index, rcX.mask)
+                        count += 1
+                    End If
+                End If
+            Next
+            rc.mask = New cv.Mat(rc.rect.Height, rc.rect.Width, cv.MatType.CV_8U, 0)
+            rc.mask = tmpMap(rc.rect).InRange(rc.index, rc.index)
+            cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            redCells.Add(rc)
+        Next
+        setSelectedCell(redCells, cellMap)
+        labels(2) = $"The top {options.topX} RedCloud cells by size."
     End Sub
 End Class

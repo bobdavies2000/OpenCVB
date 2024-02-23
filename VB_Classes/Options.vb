@@ -4575,3 +4575,38 @@ Public Class Options_FitEllipse : Inherits VB_Algorithm
         threshold = thresholdSlider.value
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Options_TopX : Inherits VB_Algorithm
+    Public topX As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Show the top X cells", 1, 255, 10)
+    End Sub
+    Public Sub RunVB()
+        Static topXSlider = findSlider("Show the top X cells")
+        topX = topXSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Options_XNeighbors : Inherits VB_Algorithm
+    Public xNeighbors As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("X neighbors", 1, 255, 5)
+    End Sub
+    Public Sub RunVB()
+        Static topXSlider = findSlider("X neighbors")
+        xNeighbors = topXSlider.value
+    End Sub
+End Class
