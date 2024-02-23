@@ -366,7 +366,7 @@ End Class
 
 Public Class Corners_RedCloud : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
-    Dim corners As New Neighbor_Intersects
+    Dim corners As New Neighbors_Intersects
     Public Sub New()
         labels = {"", "", "Grayscale", "dst3Label"}
         desc = "Find the corners for each RedCloud cell."

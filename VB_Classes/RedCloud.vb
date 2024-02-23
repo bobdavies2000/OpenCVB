@@ -731,7 +731,7 @@ End Class
 
 
 Public Class RedCloud_World : Inherits VB_Algorithm
-    Dim redC As New RedCloud_BasicsFull
+    Dim redC As New RedCloud_Core
     Dim world As New Depth_World
     Public Sub New()
         labels(3) = "Generated pointcloud"

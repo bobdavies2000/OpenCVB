@@ -3877,7 +3877,7 @@ public:
 };
 extern "C" __declspec(dllexport) Neighbors * Neighbors_Open() { Neighbors* cPtr = new Neighbors(); return cPtr; }
 extern "C" __declspec(dllexport) void Neighbors_Close(Neighbors * cPtr) { delete cPtr; }
-extern "C" __declspec(dllexport) int* Neighbor_NabList(Neighbors * cPtr) { return (int*)&cPtr->nabList[0]; }
+extern "C" __declspec(dllexport) int* Neighbors_NabList(Neighbors * cPtr) { return (int*)&cPtr->nabList[0]; }
 extern "C" __declspec(dllexport)
 int Neighbors_RunCPP(Neighbors * cPtr, int* dataPtr, int rows, int cols)
 {

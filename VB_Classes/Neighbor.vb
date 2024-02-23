@@ -1,6 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class Neighbor_Basics : Inherits VB_Algorithm
+Public Class Neighbors_Basics : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Dim knn As New KNN_Core
     Public Sub New()
@@ -47,7 +47,7 @@ End Class
 
 
 
-Public Class Neighbor_Core : Inherits VB_Algorithm
+Public Class Neighbors_Core : Inherits VB_Algorithm
     Public nabList As New List(Of List(Of Integer))
     Dim stats As New Cell_Basics
     Public redCells As List(Of rcData)
@@ -75,7 +75,7 @@ Public Class Neighbor_Core : Inherits VB_Algorithm
         handleSrc.Free()
 
         If nabCount > 0 Then
-            Dim nabData = New cv.Mat(nabCount, 1, cv.MatType.CV_32SC2, Neighbor_NabList(cPtr))
+            Dim nabData = New cv.Mat(nabCount, 1, cv.MatType.CV_32SC2, Neighbors_NabList(cPtr))
             nabList.Clear()
             For i = 0 To redCells.Count - 1
                 nabList.Add(New List(Of Integer))
@@ -118,9 +118,9 @@ End Class
 
 
 
-Public Class Neighbor_Intersects : Inherits VB_Algorithm
+Public Class Neighbors_Intersects : Inherits VB_Algorithm
     Public nPoints As New List(Of cv.Point)
-    Dim ePoints As New Neighbor_IntersectsImageEdge
+    Dim ePoints As New Neighbors_IntersectsImageEdge
     Public Sub New()
         desc = "Find the corner points where multiple cells intersect."
     End Sub
@@ -177,7 +177,7 @@ End Class
 
 
 
-Public Class Neighbor_IntersectsImageEdge : Inherits VB_Algorithm
+Public Class Neighbors_IntersectsImageEdge : Inherits VB_Algorithm
     Public nPoints As New List(Of cv.Point)
     Public Sub New()
         desc = "Find the cell boundaries at the edge of the image."
@@ -224,8 +224,8 @@ End Class
 
 
 
-Public Class Neighbor_ColorOnly : Inherits VB_Algorithm
-    Dim corners As New Neighbor_Intersects
+Public Class Neighbors_ColorOnly : Inherits VB_Algorithm
+    Dim corners As New Neighbors_Intersects
     Dim redC As New RedCloud_Cells
     Public Sub New()
         desc = "Find neighbors in a color only RedCloud cellMap"
@@ -251,9 +251,9 @@ End Class
 
 
 
-Public Class Neighbor_StableMax : Inherits VB_Algorithm
+Public Class Neighbors_StableMax : Inherits VB_Algorithm
     Dim stable As New Cell_StableMax
-    Dim corners As New Neighbor_Intersects
+    Dim corners As New Neighbors_Intersects
     Public Sub New()
         desc = "Find neighbors in the RedCloud_StableMax redCloud cells."
     End Sub
@@ -280,11 +280,11 @@ End Class
 
 
 
-Public Class Neighbor_CoreTest : Inherits VB_Algorithm
+Public Class Neighbors_CoreTest : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
-    Dim nabs As New Neighbor_Core
+    Dim nabs As New Neighbors_Core
     Public Sub New()
-        desc = "Test Neighbor_Basics to show how to use it."
+        desc = "Test Neighbors_Basics to show how to use it."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
@@ -310,8 +310,8 @@ End Class
 
 
 
-Public Class Neighbor_Precise : Inherits VB_Algorithm
-    Dim nabs As New Neighbor_Core
+Public Class Neighbors_Precise : Inherits VB_Algorithm
+    Dim nabs As New Neighbors_Core
     Public cellMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public redCells As New List(Of rcData)
     Public Sub New()

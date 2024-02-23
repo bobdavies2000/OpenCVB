@@ -925,7 +925,7 @@ Module VB_Externs
     Public Function Neighbors_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As Integer
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbor_NabList(cPtr As IntPtr) As IntPtr
+    Public Function Neighbors_NabList(cPtr As IntPtr) As IntPtr
     End Function
 
 
