@@ -1,43 +1,50 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Neighbors_Basics : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
     Dim knn As New KNN_Core
+    Public redCells As New List(Of rcData)
+    Public cellMap As New cv.Mat
+    Public runRedCloud As Boolean = False
     Public Sub New()
         desc = "Find all the neighbors with KNN"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels = redC.labels
+        If standalone Or runRedCloud Then
+            Static redC As New RedCloud_Basics
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels = redC.labels
+            redCells = redC.redCells
+            cellMap = redC.cellMap
+        End If
 
         knn.queries.Clear()
-        For Each rc In redC.redCells
+        For Each rc In redCells
             knn.queries.Add(rc.maxDStable)
         Next
+        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         knn.Run(src)
 
-        For i = 0 To redC.redCells.Count - 1
-            Dim rc = redC.redCells(i)
+        For i = 0 To redCells.Count - 1
+            Dim rc = redCells(i)
             rc.neighbors = knn.neighbors(i)
         Next
 
-        setSelectedCell(redC.redCells, redC.cellMap)
-
-        dst3.SetTo(0)
-        Dim ptCount As Integer
-        For Each index In task.rc.neighbors
-            Dim pt = redC.redCells(index).maxDStable
-            If pt = task.rc.maxDStable Then
-                dst2.Circle(pt, task.dotSize, black, -1, task.lineType)
-            Else
-                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-                ptCount += 1
-                If ptCount > 20 Then Exit For
-            End If
-        Next
-
-        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        If standalone Then
+            setSelectedCell(redCells, cellMap)
+            dst3.SetTo(0)
+            Dim ptCount As Integer
+            For Each index In task.rc.neighbors
+                Dim pt = redCells(index).maxDStable
+                If pt = task.rc.maxDStable Then
+                    dst2.Circle(pt, task.dotSize, black, -1, task.lineType)
+                Else
+                    dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+                    ptCount += 1
+                    If ptCount > 20 Then Exit For
+                End If
+            Next
+        End If
     End Sub
 End Class
 
