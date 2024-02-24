@@ -34,7 +34,7 @@ Public Class Neighbors_Basics : Inherits VB_Algorithm
         Next
 
         If standalone Then
-            setSelectedCell(redCells, cellMap)
+            setSelectedContour(redCells, cellMap)
             dst3.SetTo(0)
             Dim ptCount As Integer
             For Each index In task.rc.nabs
@@ -262,7 +262,7 @@ Public Class Neighbors_Contained : Inherits VB_Algorithm
             dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
-        setSelectedCell(redCells, cellMap)
+        setSelectedContour(redCells, cellMap)
         labels(2) = $"{redCells.Count} cells were identified."
         labels(3) = $"{count} cells had only one neighbor and were merged with that neighbor."
     End Sub

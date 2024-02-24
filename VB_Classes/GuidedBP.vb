@@ -144,7 +144,7 @@ Public Class GuidedBP_Cells : Inherits VB_Algorithm
 
         Dim rc As New rcData
         If gpbWare.redCells.Count > 1 Then
-            setSelectedCell(gpbWare.redCells, gpbWare.kMap)
+            setSelectedContour(gpbWare.redCells, gpbWare.kMap)
             rc = task.rc
             vbDrawContour(dst2, rc.contour, rc.color)
         End If
@@ -554,7 +554,7 @@ Public Class GuidedBP_Hulls : Inherits VB_Algorithm
         End If
 
         If redCells.Count > 1 Then
-            setSelectedCell(redCells, kMap)
+            setSelectedContour(redCells, kMap)
             vbDrawContour(dst2, task.rc.contour, task.rc.color)
         End If
 
@@ -592,7 +592,7 @@ Public Class GuidedBP_Objects : Inherits VB_Algorithm
         Next
 
         If kHist.gpbWare.redCells.Count > 1 Then
-            setSelectedCell(kHist.gpbWare.redCells, kHist.gpbWare.kMap)
+            setSelectedContour(kHist.gpbWare.redCells, kHist.gpbWare.kMap)
             vbDrawContour(dst2, task.rc.hull, cv.Scalar.White, task.lineWidth)
         End If
 
@@ -671,7 +671,7 @@ Public Class GuidedBP_History : Inherits VB_Algorithm
         setTrueText(gpbWare.strOut, 3)
 
         If redCells.Count > 1 Then
-            setSelectedCell(redCells, kMap)
+            setSelectedContour(redCells, kMap)
             vbDrawContour(dst2, task.rc.hull, cv.Scalar.White, task.lineWidth)
             vbDrawContour(task.color, task.rc.contour, cv.Scalar.Yellow)
         End If

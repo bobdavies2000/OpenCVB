@@ -130,7 +130,7 @@ Public Class RedCloud_BasicsFull : Inherits VB_Algorithm
             dst3(redCells(0).rect).SetTo(0, redCells(0).mask)
         End If
 
-        setSelectedCell(redCells, cellMap)
+        setSelectedContour(redCells, cellMap)
     End Sub
 End Class
 
@@ -2129,7 +2129,7 @@ Public Class RedCloud_Both : Inherits VB_Algorithm
         dst3.SetTo(0, cloudCells(0).mask)
         dst3.SetTo(0, task.noDepthMask)
 
-        If task.rcPicTag = RESULT_DST2 Then setSelectedCell(colorCells, dst0) Else setSelectedCell(cloudCells, dst1)
+        If task.rcPicTag = RESULT_DST2 Then setSelectedContour(colorCells, dst0) Else setSelectedContour(cloudCells, dst1)
     End Sub
 End Class
 
@@ -2168,9 +2168,9 @@ Public Class RedCloud_BothOld : Inherits VB_Algorithm
         End If
 
         If redCSelected = RESULT_DST2 Then
-            setSelectedCell(redC.redCells, redC.cellMap)
+            setSelectedContour(redC.redCells, redC.cellMap)
         ElseIf redCSelected = RESULT_DST3 Then
-            setSelectedCell(colorC.redCells, colorC.cellMap)
+            setSelectedContour(colorC.redCells, colorC.cellMap)
         End If
         dst3(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
     End Sub
@@ -2750,7 +2750,7 @@ Public Class RedCloud_BasicsNew : Inherits VB_Algorithm
         rcZero.rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
 
         cv.Cv2.ApplyColorMap(cellMap, dst2, colorMap)  ' <<<< switch to using colormap.
-        setSelectedCell(redCells, cellMap)
+        setSelectedContour(redCells, cellMap)
         labels(2) = $"{redCells.Count} cells found and {matchCount} were matched to the previous generation."
     End Sub
 End Class
@@ -2802,7 +2802,7 @@ Public Class RedCloud_FeatureLessReduce : Inherits VB_Algorithm
         labels(3) = $"{redCells.Count} cells after removing featureless cells that were part of their surrounding.  " +
                     $"{redC.redCells.Count - redCells.Count} were removed."
 
-        setSelectedCell(redCells, cellMap)
+        setSelectedContour(redCells, cellMap)
     End Sub
 End Class
 
@@ -2814,8 +2814,8 @@ End Class
 
 
 Public Class RedCloud_TopX : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
-    Dim options As New Options_TopX
+    Public redC As New RedCloud_Basics
+    Public options As New Options_TopX
     Public Sub New()
         desc = "Show only the top X cells"
     End Sub
@@ -2883,8 +2883,79 @@ Public Class RedCloud_TopXNeighbors : Inherits VB_Algorithm
         Next
         redCells(0).mask = cellMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
 
-        setSelectedCell(redCells, cellMap)
+        setSelectedContour(redCells, cellMap)
         If task.rc.index = 0 Then task.rc = redCells(redCells.Count - 1)
         labels(2) = $"The top {options.topX} RedCloud cells by size."
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_TopXHulls : Inherits VB_Algorithm
+    Dim topX As New RedCloud_TopX
+    Public redCells As New List(Of rcData)
+    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public Sub New()
+        desc = "Build the hulls for the top X RedCloud cells"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        topX.Run(src)
+        labels = topX.redC.labels
+
+        redCells.Clear()
+        cellMap.SetTo(0)
+        dst2.SetTo(0)
+        For Each rc In topX.redC.redCells
+            If rc.contour.Count >= 5 Then
+                rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
+                vbDrawContour(dst2(rc.rect), rc.hull, rc.color, -1)
+                vbDrawContour(rc.mask, rc.hull, 255, -1)
+                cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            End If
+            redCells.Add(rc)
+            If rc.index > topX.options.topX Then Exit For
+        Next
+        setSelectedContour(redCells, cellMap)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_TopXEMax : Inherits VB_Algorithm
+    Dim topX As New RedCloud_TopXHulls
+    Dim eMax As New EMax_Basics
+    Public Sub New()
+        desc = "Use the Top X RedCloud hulls as input to EMax"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        topX.Run(src)
+        dst2 = topX.dst3
+        labels = topX.labels
+
+        eMax.eLabels.Clear()
+        eMax.eSamples.Clear()
+        For Each rc In topX.redCells
+            For Each pt In rc.hull
+                eMax.eSamples.Add(New cv.Point2f(pt.X + rc.rect.X, pt.Y + rc.rect.Y))
+                eMax.eLabels.Add(rc.index)
+            Next
+        Next
+
+        eMax.regionCount = topX.redCells.Count
+        eMax.Run(src)
+        dst3 = eMax.dst2
+
+        setSelectedContour(topX.redCells, topX.cellMap)
     End Sub
 End Class

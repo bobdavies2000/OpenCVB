@@ -935,6 +935,6 @@ Public Class Contour_PrepData : Inherits VB_Algorithm
         Next
 
         labels(2) = $"{redCells.Count} cells were found"
-        setSelectedCell(redCells, cellMap)
+        setSelectedContour(redCells, cellMap)
     End Sub
 End Class
