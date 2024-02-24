@@ -2854,7 +2854,7 @@ Public Class RedCloud_TopXNeighbors : Inherits VB_Algorithm
 
         nab.Run(src)
 
-        dst2.SetTo(0)
+        If task.heartBeat Then dst2.SetTo(0)
         cellMap.SetTo(0)
         Dim tmpMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         redCells.Clear()
@@ -2881,7 +2881,10 @@ Public Class RedCloud_TopXNeighbors : Inherits VB_Algorithm
             dst2(rc.rect).SetTo(rc.color, rc.mask)
             redCells.Add(rc)
         Next
+        redCells(0).mask = cellMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+
         setSelectedCell(redCells, cellMap)
+        If task.rc.index = 0 Then task.rc = redCells(redCells.Count - 1)
         labels(2) = $"The top {options.topX} RedCloud cells by size."
     End Sub
 End Class
