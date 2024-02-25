@@ -410,7 +410,7 @@ End Class
 
 
 Public Class Plane_Histogram : Inherits VB_Algorithm
-    Dim solo As New Plane_SoloPoints
+    Dim solo As New PointCloud_Solo
     Dim hist As New Histogram_Basics
     Public peakCeiling As Single
     Public peakFloor As Single
@@ -527,32 +527,6 @@ Public Class Plane_Horizontals : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Plane_SoloPoints : Inherits VB_Algorithm
-    Dim solo As New PointCloud_Solo
-    Dim frames As New History_Basics
-    Public Sub New()
-        labels = {"", "", "Solo points in top view", "Solo points in side view"}
-        desc = "Backproject the points in the PointCloud_Solo output into the src view - incomplete!"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        solo.Run(src)
-        dst2 = solo.dst2
-        dst3 = solo.dst3
-
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, dst0, task.rangesTop)
-
-        frames.Run(dst0)
-        'frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        'dst2 = dst2.Threshold(task.frameHistoryCount, 255, cv.ThresholdTypes.Binary)
-        'task.color.SetTo(cv.Scalar.White, dst2)
-    End Sub
-End Class
 
 
 

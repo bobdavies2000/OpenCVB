@@ -84,28 +84,16 @@ End Class
 Public Class Feature_ShiTomasi : Inherits VB_Algorithm
     Dim harris As New Corners_HarrisDetector
     Dim shiTomasi As New Corners_ShiTomasi_CPP
+    Dim options As New Options_ShiTomasi
     Public Sub New()
         findSlider("Corner normalize threshold").Value = 15
-
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Harris features")
-            radio.addRadio("Shi-Tomasi features")
-            radio.check(1).Checked = True
-        End If
-
         labels = {"", "", "Features in the left camera image", "Features in the right camera image"}
         desc = "Identify feature points in the left And right views"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static typeRadio = findRadio("Harris features")
-        If typeRadio.checked Then
-            harris.Run(task.leftView)
-            dst2 = harris.dst2.Clone
+        options.RunVB()
 
-            harris.Run(task.rightView)
-            dst3 = harris.dst2
-        Else
+        If options.useShiTomasi Then
             dst2 = task.leftView
             dst3 = task.rightView
             shiTomasi.Run(task.leftView)
@@ -113,6 +101,11 @@ Public Class Feature_ShiTomasi : Inherits VB_Algorithm
 
             shiTomasi.Run(task.rightView)
             dst3.SetTo(cv.Scalar.White, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        Else
+            harris.Run(task.leftView)
+            dst2 = harris.dst2.Clone
+            harris.Run(task.rightView)
+            dst3 = harris.dst2
         End If
     End Sub
 End Class

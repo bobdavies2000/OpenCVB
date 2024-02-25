@@ -4632,3 +4632,24 @@ Public Class Options_Agast : Inherits VB_Algorithm
         desiredCount = countSlider.value
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_ShiTomasi : Inherits VB_Algorithm
+    Public useShiTomasi As Boolean = True
+    Public Sub New()
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Harris features")
+            radio.addRadio("Shi-Tomasi features")
+            radio.check(1).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static typeRadio = findRadio("Shi-Tomasi features")
+        useShiTomasi = typeRadio.checked
+    End Sub
+End Class
