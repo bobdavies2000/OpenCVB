@@ -2598,6 +2598,7 @@ public:
         knn->queries = pointList;
         knn->trainInput = knn->queries;
         knn->Run(empty);
+        dst2.setTo(0);
         for (int i = 0; i < knn->queries.size(); i++) {
             Point2f p0 = knn->queries[i];
             Point2f p1 = knn->queries[knn->result.at<int>(i, 1)];
@@ -2706,8 +2707,8 @@ public:
             return;
         }
         mesh->dst2 = src;
-        dst2 = mesh->showMesh(agast->stablePoints);
-        imshow("mesh", dst2);
+        // there are some problems here...
+        //dst2 = mesh->showMesh(agast->stablePoints);
         labels[3] = agast->labels[2];
     }
 };

@@ -343,7 +343,7 @@ Public Class Pixel_Unstable : Inherits VB_Algorithm
         Static pixelCounts As New List(Of Integer)
         Static k As Integer = -1
         Static unstable As New List(Of cv.Mat)
-        If task.optionsChanged Then
+        If task.heartBeat Then
             pixelCounts.Clear()
             unstable.Clear()
             k = kSlider.Value
