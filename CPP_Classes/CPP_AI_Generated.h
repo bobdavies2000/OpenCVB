@@ -2701,11 +2701,13 @@ public:
     }
     void Run(Mat src) {
         agast->Run(src);
-        if (agast->stablePoints.size() < 3) {
+        if (agast->stablePoints.size() <= 3) {
+            dst3 = agast->dst2;
             return;
         }
         mesh->dst2 = src;
         dst2 = mesh->showMesh(agast->stablePoints);
+        imshow("mesh", dst2);
         labels[3] = agast->labels[2];
     }
 };

@@ -4610,3 +4610,25 @@ Public Class Options_XNeighbors : Inherits VB_Algorithm
         xNeighbors = topXSlider.value
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_Agast : Inherits VB_Algorithm
+    Public agastThreshold As Integer
+    Public desiredCount As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Agast Threshold", 1, 100, 20)
+            sliders.setupTrackBar("Desired Count", 1, 500, 200)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static agastSlider = findSlider("Agast Threshold")
+        Static countSlider = findSlider("Desired Count")
+        agastThreshold = agastSlider.value
+        desiredCount = countSlider.value
+    End Sub
+End Class

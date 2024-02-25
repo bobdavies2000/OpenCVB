@@ -409,10 +409,7 @@ Module VB
     End Function
     Public Function MakeSureImage8uC3(ByVal input As cv.Mat) As cv.Mat
         Dim outMat As New cv.Mat
-        If input.Type = cv.MatType.CV_8UC3 Then
-            outMat = input.Clone
-            Return outMat
-        End If
+        If input.Type = cv.MatType.CV_8UC3 Then Return input
         If input.Type = cv.MatType.CV_32F Then
             outMat = vbNormalize32f(input)
         ElseIf input.Type = cv.MatType.CV_32SC1 Then

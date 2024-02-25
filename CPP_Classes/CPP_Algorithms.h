@@ -272,7 +272,63 @@ int* Agast_Run(Agast * cPtr, int* bgrPtr, int rows, int cols, int* count, int th
 	cPtr->Run(threshold);
 	count[0] = int(cPtr->points.size());
 	if (count[0] == 0) return 0;
-	return (int*) &cPtr->points[0];
+	return (int*)&cPtr->points[0];
+}
+
+
+
+
+
+
+class AgastNew
+{
+private:
+public:
+	Mat src, dst;
+	std::vector<Point2f> points;
+	Ptr<AgastFeatureDetector> agastFD;
+	int lastThreshold = 0;
+
+	AgastNew() {}
+	void Run(int threshold) {
+		if (lastThreshold != threshold)
+		{
+			agastFD = AgastFeatureDetector::create(threshold, true, AgastFeatureDetector::OAST_9_16);
+			lastThreshold = threshold;
+		}
+
+		std::vector<KeyPoint> keypoints;
+		agastFD->detect(src, keypoints);
+		points.clear();
+		for (KeyPoint kpt : keypoints)
+		{
+			points.push_back(Point2f(round(kpt.pt.x), round(kpt.pt.y)));
+		}
+	}
+};
+
+extern "C" __declspec(dllexport)
+AgastNew * AgastNew_Open()
+{
+	AgastNew* cPtr = new AgastNew();
+	return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* AgastNew_Close(AgastNew * cPtr)
+{
+	delete cPtr;
+	return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* AgastNew_Run(AgastNew * cPtr, int* bgrPtr, int rows, int cols, int* count, int threshold)
+{
+	cPtr->src = Mat(rows, cols, CV_8UC3, bgrPtr);
+	cPtr->Run(threshold);
+	count[0] = int(cPtr->points.size());
+	if (count[0] == 0) return 0;
+	return (int*)&cPtr->points[0];
 }
 
 
