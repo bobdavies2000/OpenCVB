@@ -1595,11 +1595,6 @@ Public Class Depth_TiersCM : Inherits VB_Algorithm
 
         classCount = task.maxZmeters * 100 / cmTier
 
-        ' This makes the missing depth data its own class.
-        ' This prevents fore/background similar colors from identifying as the same class where depth is undefined.
-        dst2.SetTo(1, task.noDepthMask)
-        classCount += 1
-
         dst3 = vbPalette(dst2 * 255 / classCount)
     End Sub
 End Class

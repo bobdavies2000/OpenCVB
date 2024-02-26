@@ -732,6 +732,7 @@ Public Class rcData
     Public rect As cv.Rect
     Public mask As cv.Mat
     Public depthMask As cv.Mat
+    Public tier As Integer
 
     Public pixels As Integer
     Public depthPixels As Integer

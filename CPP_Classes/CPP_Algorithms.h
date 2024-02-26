@@ -2489,7 +2489,7 @@ extern "C" __declspec(dllexport) int* RedCloud_Sizes(RedCloud * cPtr)
 extern "C" __declspec(dllexport) int* RedCloud_Close(RedCloud * cPtr) { delete cPtr; return (int*)0; }
 extern "C" __declspec(dllexport) int*
 RedCloud_Run(RedCloud * cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols, int type,
-	int maxClassCount, int diff, float imageThresholdPercent, float cellMinPercent)
+			 int maxClassCount, int diff, float imageThresholdPercent, float cellMinPercent)
 {
 	cPtr->src = Mat(rows, cols, type, dataPtr);
 	cPtr->mask = Mat::zeros(rows + 2, cols + 2, CV_8U);

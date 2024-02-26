@@ -1,5 +1,95 @@
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Algorithm
+    Public classCount As Integer
+    Dim palette As New Palette_MyColorMap
+    Public redCells As New List(Of rcData)
+    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public Sub New()
+        palette.colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, task.vecColors)
+        redOptions.ColorSource.SelectedText = "Binarize_Split4"
+        cPtr = RedCloud_Open()
+        redOptions.DesiredCellSlider.Value = 50
+        vbAddAdvice(traceName + ": redOptions 'Desired RedCloud Cells' determines how many regions will be found.")
+        labels(3) = "FloodFill regions displayed with a custom palette (task.vecColors)"
+        desc = "Simple Floodfill each region but prepare the mask, rect, floodpoints, and pixel counts."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        src = task.color.Clone
+        If src.Channels <> 1 Then
+            Static colorClass As New Color_Basics
+            colorClass.Run(src)
+            src = colorClass.dst2
+        End If
+
+        Dim inputData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+        Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols, src.Type,
+                                    redOptions.DesiredCellSlider.Value, 0, 1, 0)
+        handleInput.Free()
+
+        classCount = RedCloud_Count(cPtr)
+        If classCount = 0 Then Exit Sub ' no data to process.
+        dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+
+        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+        Dim floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
+        redCells.Clear()
+        redCells.Add(New rcData)
+        cellMap.SetTo(0)
+        For i = 0 To classCount - 1
+            Dim rc As New rcData
+            rc.index = redCells.Count
+            rc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
+            rc.mask = dst1(rc.rect).InRange(rc.index, rc.index).Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            vbDrawContour(rc.mask, rc.contour, 255, -1)
+
+            rc.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
+
+            rc.maxDist = vbGetMaxDist(rc)
+
+            Dim index = cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If index = 0 Then
+                cellMap(rc.rect).SetTo(rc.index, rc.mask)
+                rc.color = dst3.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                If rc.color = black Then rc.color = palette.colorMap.Get(Of cv.Vec3b)(rc.index, 0)
+
+                rc.pixels = rc.mask.CountNonZero
+                redCells.Add(rc)
+            Else
+                Dim k = 0
+                '    cellMap(rc.rect).SetTo(redCells(index).index, rc.mask)
+                '    dst1(rc.rect).SetTo(index, rc.mask)
+
+                '    Dim r = redCells(index).rect.Union(rc.rect)
+                '    redCells(index).mask = dst1(r).InRange(index, index).Threshold(0, 255, cv.ThresholdTypes.Binary)
+                '    redCells(index).contour = contourBuild(redCells(index).mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+                '    vbDrawContour(redCells(index).mask, redCells(index).contour, 255, -1)
+
+                '    redCells(index).pixels = redCells(index).mask.CountNonZero
+            End If
+        Next
+
+        palette.Run(cellMap)
+        dst3 = palette.dst2
+        setSelectedContour(redCells, cellMap)
+        labels(2) = $"FloodFill results with values varying from 0 to {classCount}"
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Flood_BasicsOld : Inherits VB_Algorithm
     Public classCount As Integer
     Public redC As New RedCloud_Basics
     Public Sub New()
@@ -262,3 +352,4 @@ Public Class Flood_FeaturelessHulls : Inherits VB_Algorithm
         dst3 = vbPalette(dst2 * 255 / redCells.Count)
     End Sub
 End Class
+
