@@ -2701,15 +2701,15 @@ public:
         desc = "Build triangles from Agast points";
     }
     void Run(Mat src) {
-        agast->Run(src);
-        if (agast->stablePoints.size() <= 3) {
-            dst3 = agast->dst2;
-            return;
-        }
-        mesh->dst2 = src;
-        // there are some problems here...
-        //dst2 = mesh->showMesh(agast->stablePoints);
-        labels[3] = agast->labels[2];
+        //agast->Run(src);
+        //if (agast->stablePoints.size() <= 3) {
+        //    dst3 = agast->dst2;
+        //    return;
+        //}
+        //mesh->dst2 = src;
+        //// there are some problems here...
+        ////dst2 = mesh->showMesh(agast->stablePoints);
+        //labels[3] = agast->labels[2];
     }
 };
 

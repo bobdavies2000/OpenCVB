@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class Color_Basics : Inherits VB_Algorithm
     Public classCount As Integer
     Public classifier As Object
-    Public updateImages As Boolean
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         labels(3) = "vbPalette output of dst2 at left"
@@ -57,7 +56,8 @@ Public Class Color_Basics : Inherits VB_Algorithm
             dst2.SetTo(classCount, task.maxDepthMask)
         End If
 
-        If updateImages Then dst3 = vbPalette(dst2 * 255 / classCount)
+        ' dst3 = vbPalette(dst2 * 255 / classCount)
+        dst3 = classifier.dst3
         labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) + " pixel classifications"
     End Sub
 End Class
@@ -374,7 +374,6 @@ Public Class Color_MotionFiltered : Inherits VB_Algorithm
     Dim colorClass As New Color_Basics
     Public classCount As Integer
     Public Sub New()
-        colorClass.updateImages = True
         desc = "Prepare a Color_Basics image using the task.motionRect"
     End Sub
     Public Sub RunVB(src As cv.Mat)

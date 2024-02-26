@@ -6,7 +6,6 @@ Public Class Contour_Basics : Inherits VB_Algorithm
     Public options As New Options_Contours
     Public sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
-        colorClass.updateImages = True
         findRadio("FloodFill").Checked = True
         vbAddAdvice(traceName + ": redOptions color class determines the input.  Use local options in 'Options_Contours' to further control output.")
         labels = {"", "", "FindContour input", "Draw contour output"}

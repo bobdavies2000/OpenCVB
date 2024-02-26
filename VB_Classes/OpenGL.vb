@@ -1983,7 +1983,6 @@ Public Class OpenGL_ColorReduced3D : Inherits VB_Algorithm
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
-        colorClass.updateImages = True
         findSlider("OpenGL Point Size").Value = 20
         desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)"
     End Sub

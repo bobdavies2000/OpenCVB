@@ -371,12 +371,14 @@ Public Class Binarize_DepthTiers : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         binarize.Run(src)
         tiersCM.Run(src)
-        dst3 = tiersCM.dst2 + binarize.dst2
+        dst0 = tiersCM.dst2 + binarize.dst2
 
         If task.heartBeat Then
-            dst2 = dst3.Clone
+            dst2 = dst0.Clone
         ElseIf task.motionDetected Then
-            dst3(task.motionRect).CopyTo(dst2(task.motionRect))
+            dst0(task.motionRect).CopyTo(dst2(task.motionRect))
         End If
+        dst3 = vbPalette(dst2)
+        classCount = binarize.classCount + tiersCM.classCount
     End Sub
 End Class
