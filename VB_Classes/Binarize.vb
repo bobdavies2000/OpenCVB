@@ -325,7 +325,7 @@ Public Class Binarize_Split4 : Inherits VB_Algorithm
         dst2.SetTo(3, binarize.mats.mat(2))
         dst2.SetTo(4, binarize.mats.mat(3))
 
-        If standaloneTest() Then dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
+        dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
     End Sub
 End Class
 

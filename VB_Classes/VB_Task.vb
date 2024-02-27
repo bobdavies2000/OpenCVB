@@ -458,7 +458,7 @@ Public Class VBtask : Implements IDisposable
                 Application.DoEvents()
 
                 ' run any universal algorithms here - if not a C++ algorithm!
-                Dim src = task.color.Clone
+                Dim src = task.color
 
                 task.IMU_RawAcceleration = task.IMU_Acceleration
                 task.IMU_RawAngularVelocity = task.IMU_AngularVelocity
@@ -583,8 +583,7 @@ Public Class VBtask : Implements IDisposable
                     End If
                 End If
 
-                ' NOTE: clone is done above and no longer needed here.
-                algorithmObject.NextFrame(src)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
+                algorithmObject.NextFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
                 If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then
                     task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)

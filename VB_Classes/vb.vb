@@ -206,7 +206,7 @@ Module VB
         If task.mouseClickFlag Then
             task.rc = redCells(index)
         Else
-            If task.clickPoint = New cv.Point(0, 0) Or index >= redCells.Count Then
+            If index = 0 Or index >= redCells.Count Then
                 If redCells.Count > 1 Then
                     task.clickPoint = redCells(1).maxDist
                     task.rc = redCells(1)
