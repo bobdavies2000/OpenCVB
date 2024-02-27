@@ -583,7 +583,7 @@ Public Class VBtask : Implements IDisposable
                     End If
                 End If
 
-                algorithmObject.NextFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
+                algorithmObject.NextFrame(task.color.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
                 If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then
                     task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)

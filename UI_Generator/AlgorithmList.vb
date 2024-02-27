@@ -631,7 +631,6 @@ if algorithmName = "FLANN_Basics" Then return new FLANN_Basics
 if algorithmName = "FLANN_Test" Then return new FLANN_Test
 if algorithmName = "Flood_Basics" Then return new Flood_Basics
 if algorithmName = "Flood_BasicsOld" Then return new Flood_BasicsOld
-if algorithmName = "Flood_BasicsTest" Then return new Flood_BasicsTest
 if algorithmName = "Flood_Click" Then return new Flood_Click
 if algorithmName = "Flood_FeaturelessHulls" Then return new Flood_FeaturelessHulls
 if algorithmName = "Flood_Point" Then return new Flood_Point
