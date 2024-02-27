@@ -1,4 +1,5 @@
 Imports System.Runtime.InteropServices
+Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
@@ -341,5 +342,54 @@ Public Class Flood_FeaturelessHulls : Inherits VB_Algorithm
 
         labels(2) = "Hulls were added for each of the " + CStr(redCells.Count) + " cells identified"
         dst3 = vbPalette(dst2 * 255 / redCells.Count)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Flood_Tiers : Inherits VB_Algorithm
+    Dim flood As New Flood_Basics
+    Dim tiers As New Depth_TiersCM
+    Dim plot As New Plot_Histogram
+    Public redCells As New List(Of rcData)
+    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public Sub New()
+        plot.removeZeroEntry = False
+        desc = "Divide the Flood_Basics cells using depth tiers."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        flood.Run(src)
+        dst2 = flood.dst3
+
+        tiers.Run(src)
+
+        redCells.Clear()
+        cellMap.SetTo(0)
+        Dim ranges = {New cv.Rangef(-1, tiers.classCount + 1)}
+        For Each rc In flood.redCells
+            rc.depthMask = rc.mask And task.depthMask(rc.rect)
+            If rc.depthMask.CountNonZero Then
+                cv.Cv2.CalcHist({tiers.dst2(rc.rect)}, {0}, New cv.Mat, rc.tierHist, 1, {tiers.classCount}, ranges)
+
+                ReDim rc.tierHistArray(tiers.classCount - 1)
+                Dim samples(rc.tierHist.Total - 1) As Single
+                Marshal.Copy(rc.tierHist.Data, rc.tierHistArray, 0, rc.tierHistArray.Length)
+            End If
+            cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            redCells.Add(rc)
+        Next
+
+        setSelectedContour(redCells, cellMap)
+
+        If task.rc.tierHist.Rows > 0 Then
+            plot.Run(task.rc.tierHist)
+            dst3 = plot.dst2
+        End If
+        identifyCells(redCells)
     End Sub
 End Class

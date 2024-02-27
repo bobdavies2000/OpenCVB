@@ -635,6 +635,7 @@ if algorithmName = "Flood_Click" Then return new Flood_Click
 if algorithmName = "Flood_FeaturelessHulls" Then return new Flood_FeaturelessHulls
 if algorithmName = "Flood_Point" Then return new Flood_Point
 if algorithmName = "Flood_PointList" Then return new Flood_PointList
+if algorithmName = "Flood_Tiers" Then return new Flood_Tiers
 if algorithmName = "Flood_TopX" Then return new Flood_TopX
 if algorithmName = "Font_FlowText" Then return new Font_FlowText
 if algorithmName = "Font_OpenCV" Then return new Font_OpenCV
