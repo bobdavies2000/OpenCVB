@@ -8,7 +8,7 @@ Public Class Diff_Basics : Inherits VB_Algorithm
         desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
         If firstPass Then lastFrame = dst2.Clone
         If task.optionsChanged Or lastFrame.Size <> dst2.Size Then lastFrame = dst2.Clone
 

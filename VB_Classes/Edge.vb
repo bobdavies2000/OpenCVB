@@ -337,36 +337,6 @@ End Class
 
 
 
-
-
-
-'Public Class Edge_Features : Inherits VB_Algorithm
-'    Dim featLess As New FeatureLess_MotionAccum
-'    Dim edges As New Edge_All
-'    Public Sub New()
-'        findRadio("Binarized Sobel").Checked = True
-'        labels(2) = "Output of Edge_BinarizedSobel"
-'        labels(3) = "dst2 with featureless areas removed."
-'        desc = "Removing the featureless regions after a binarized sobel"
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        task.mouseClickFlag = False ' edges calls a mat_4clicks algorithm.
-'        edges.Run(src)
-'        dst2 = edges.dst2
-'        labels(2) = edges.labels(2)
-
-'        featLess.Run(src)
-'        dst3 = dst2.Clone
-'        dst3.SetTo(0, featLess.dst2)
-'    End Sub
-'End Class
-
-
-
-
-
-
-
 Public Class Edge_Consistent : Inherits VB_Algorithm
     Dim edges As New Edge_BinarizedSobel
     Public Sub New()
@@ -611,45 +581,6 @@ Public Class Edge_Matching : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-Public Class Edge_MotionOverlay : Inherits VB_Algorithm
-    Dim diff As New Diff_Basics
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Displacement in the X direction (in pixels)", 0, 100, 7)
-            sliders.setupTrackBar("Displacement in the Y direction (in pixels)", 0, 100, 11)
-        End If
-
-        labels(3) = "AbsDiff output of offset with original"
-        desc = "Find edges by displacing the current BGR image in any direction and diff it with the original."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static xSlider = findSlider("Displacement in the X direction (in pixels)")
-        Static ySlider = findSlider("Displacement in the Y direction (in pixels)")
-        Dim xDisp = xSlider.Value
-        Dim yDisp = ySlider.Value
-
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        Static lastGray = src.Clone
-        Dim rect1 = New cv.Rect(xDisp, yDisp, dst2.Width - xDisp - 1, dst2.Height - yDisp - 1)
-        Dim rect2 = New cv.Rect(0, 0, dst2.Width - xDisp - 1, dst2.Height - yDisp - 1)
-        lastGray(rect2) = src(rect1).Clone
-
-        diff.Run(lastGray)
-        dst2 = diff.dst2
-        dst3 = diff.dst3
-        dst3.SetTo(0, task.noDepthMask)
-        labels(2) = "Src offset (x,y) = (" + CStr(xDisp) + "," + CStr(yDisp) + ")"
-    End Sub
-End Class
 
 
 
@@ -929,27 +860,6 @@ End Class
 
 
 
-Public Class Edge_MotionFrames : Inherits VB_Algorithm
-    Dim edges As New Edge_Canny
-    Dim frames As New History_Basics
-    Public Sub New()
-        labels = {"", "", "The multi-frame edges output", "The Edge_Canny output for the last frame only"}
-        findSlider("Canny threshold1").Value = 50
-        findSlider("Canny threshold2").Value = 50
-        desc = "Collect edges over several frames controlled with global frame history"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        edges.Run(src)
-        dst3 = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-        frames.Run(edges.dst2)
-        dst2 = frames.dst2
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -1148,32 +1058,6 @@ End Class
 
 
 
-
-
-
-
-
-'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edge_SobelHorizontal : Inherits VB_Algorithm
-    Dim edges As New Edge_Sobel_Old
-    Public Sub New()
-        findCheckBox("Vertical Derivative").Checked = False
-        findCheckBox("Horizontal Derivative").Checked = True
-        desc = "Find edges with Sobel only in the horizontal direction"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
-        edges.Run(src)
-
-        dst2 = edges.dst2.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Edge_SobelCustomV : Inherits VB_Algorithm
     Public Sub New()
         labels = {"", "", "Sobel Custom 1", "Sobel Custom 2"}
@@ -1353,38 +1237,6 @@ End Class
 
 
 
-'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edge_Sobel : Inherits VB_Algorithm
-    Public addw As New AddWeighted_Basics
-    Public options As New Options_Sobel
-    Dim blur As New Blur_Gaussian
-    Public Sub New()
-        labels = {"", "", "Horizontal + Vertical derivative - use global 'Add Weighted' slider to see impact.", "Blur output"}
-        desc = "Show Sobel edge detection with varying kernel sizes."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        blur.Run(src)
-        dst3 = blur.dst2
-
-        dst1 = If(dst3.Channels = 3, dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst3)
-        If options.horizontalDerivative Then dst2 = dst1.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
-        If options.verticalDerivative Then dst0 = dst1.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
-        dst2 = dst2.ConvertScaleAbs()
-        dst0 = dst0.ConvertScaleAbs()
-
-        addw.src2 = dst0
-        addw.Run(dst2)
-        dst2 = addw.dst2
-    End Sub
-End Class
-
-
-
-
-
-
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Edge_Laplacian : Inherits VB_Algorithm
     Dim options As New Options_LaplacianKernels
@@ -1402,5 +1254,137 @@ Public Class Edge_Laplacian : Inherits VB_Algorithm
         dst3 = task.depthRGB.GaussianBlur(New cv.Size(CInt(options.gaussiankernelSize), CInt(options.gaussiankernelSize)), 0, 0)
         dst3 = dst3.Laplacian(cv.MatType.CV_8U, options.LaplaciankernelSize, 1, 0)
         dst3 = dst3.ConvertScaleAbs()
+    End Sub
+End Class
+
+
+
+
+
+'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
+Public Class Edge_SobelHorizontal : Inherits VB_Algorithm
+    Dim edges As New Edge_Sobel_Old
+    Public Sub New()
+        findCheckBox("Vertical Derivative").Checked = False
+        findCheckBox("Horizontal Derivative").Checked = True
+        desc = "Find edges with Sobel only in the horizontal direction"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
+        edges.Run(src)
+
+        dst2 = edges.dst2.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+
+'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
+Public Class Edge_Sobel : Inherits VB_Algorithm
+    Public addw As New AddWeighted_Basics
+    Public options As New Options_Sobel
+    Dim blur As New Blur_Gaussian
+    Public Sub New()
+        labels = {"", "", "Horizontal + Vertical derivative - use global 'Add Weighted' slider to see impact.", "Blur output"}
+        desc = "Show Sobel edge detection with varying kernel sizes."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If options.useBlur Then
+            blur.Run(src)
+            dst3 = blur.dst2
+        Else
+            dst3 = src
+        End If
+
+        dst1 = If(dst3.Channels = 3, dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst3)
+        If options.horizontalDerivative Then dst2 = dst1.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
+        If options.verticalDerivative Then dst0 = dst1.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
+        dst2 = dst2.ConvertScaleAbs()
+        dst0 = dst0.ConvertScaleAbs()
+
+        addw.src2 = dst0
+        addw.Run(dst2)
+        dst2 = addw.dst2
+    End Sub
+End Class
+
+
+
+
+
+Public Class Edge_MotionFrames : Inherits VB_Algorithm
+    Dim edges As New Edge_Canny
+    Dim frames As New History_Basics
+    Public Sub New()
+        labels = {"", "", "The multi-frame edges output", "The Edge_Canny output for the last frame only"}
+        findSlider("Canny threshold1").Value = 50
+        findSlider("Canny threshold2").Value = 50
+        desc = "Collect edges over several frames controlled with global frame history"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        edges.Run(src)
+        dst3 = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        frames.Run(edges.dst2)
+        dst2 = frames.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Edge_MotionOverlay : Inherits VB_Algorithm
+    Dim diff As New Diff_Basics
+    Dim options As New Options_EdgeOverlay
+    Public Sub New()
+        labels(3) = "AbsDiff output of offset with original"
+        desc = "Find edges by displacing the current BGR image in any direction and diff it with the original."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Static lastGray = src.Clone
+        Dim rect1 = New cv.Rect(options.xDisp, options.yDisp, dst2.Width - options.xDisp - 1, dst2.Height - options.yDisp - 1)
+        Dim rect2 = New cv.Rect(0, 0, dst2.Width - options.xDisp - 1, dst2.Height - options.yDisp - 1)
+        lastGray(rect2) = src(rect1).Clone
+
+        diff.Run(lastGray)
+        dst2 = diff.dst2
+        dst3 = diff.dst3
+        dst3.SetTo(0, task.noDepthMask)
+        labels(2) = "Src offset (x,y) = (" + CStr(options.xDisp) + "," + CStr(options.yDisp) + ")"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Edge_Motion : Inherits VB_Algorithm
+    Dim diff As New Diff_Basics
+    Dim edges As New Edge_Sobel
+    Public Sub New()
+        desc = "Measure camera motion using Sobel and Diff from last frame."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        edges.Run(src)
+        diff.Run(edges.dst2)
+
+        dst2 = diff.dst3
+        dst3 = dst2 And edges.dst2
+        If task.quarterBeat Then labels(3) = $"{dst3.CountNonZero} pixels overlap between Sobel edges and diff with last Sobel edges."
     End Sub
 End Class

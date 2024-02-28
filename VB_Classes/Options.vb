@@ -4118,46 +4118,6 @@ End Class
 
 
 
-Public Class Options_Sobel : Inherits VB_Algorithm
-    Public kernelSize As Integer = 3
-    Public threshold As Integer = 50
-    Public derivativeRange As Single = 0.1
-    Public horizontalDerivative As Boolean
-    Public verticalDerivative As Boolean
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Sobel kernel Size", 1, 31, kernelSize)
-            sliders.setupTrackBar("Threshold to zero pixels below this value", 0, 255, threshold)
-            sliders.setupTrackBar("Range around zero X100", 1, 500, derivativeRange * 100)
-        End If
-
-        If findfrm(traceName + " CheckBox Options") Is Nothing Then
-            check.Setup(traceName)
-            check.addCheckBox("Vertical Derivative")
-            check.addCheckBox("Horizontal Derivative")
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
-        Static ksizeSlider = findSlider("Sobel kernel Size")
-        Static rangeSlider = findSlider("Range around zero X100")
-        kernelSize = ksizeSlider.Value Or 1
-        threshold = thresholdSlider.value
-        Static vDeriv = findCheckBox("Vertical Derivative")
-        Static hDeriv = findCheckBox("Horizontal Derivative")
-        horizontalDerivative = hDeriv.checked
-        verticalDerivative = vDeriv.checked
-        derivativeRange = rangeSlider.value / 100
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Options_Derivative : Inherits VB_Algorithm
     Public channel = 0 ' assume X Dimension
@@ -4651,5 +4611,71 @@ Public Class Options_ShiTomasi : Inherits VB_Algorithm
     Public Sub RunVB()
         Static typeRadio = findRadio("Shi-Tomasi features")
         useShiTomasi = typeRadio.checked
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_Sobel : Inherits VB_Algorithm
+    Public kernelSize As Integer = 3
+    Public threshold As Integer = 50
+    Public derivativeRange As Single = 0.1
+    Public horizontalDerivative As Boolean
+    Public verticalDerivative As Boolean
+    Public useBlur As Boolean
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Sobel kernel Size", 1, 31, kernelSize)
+            sliders.setupTrackBar("Threshold to zero pixels below this value", 0, 255, threshold)
+            sliders.setupTrackBar("Range around zero X100", 1, 500, derivativeRange * 100)
+        End If
+
+        If findfrm(traceName + " CheckBox Options") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Vertical Derivative")
+            check.addCheckBox("Horizontal Derivative")
+            check.addCheckBox("Blur input before Sobel")
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
+        Static ksizeSlider = findSlider("Sobel kernel Size")
+        Static rangeSlider = findSlider("Range around zero X100")
+        kernelSize = ksizeSlider.Value Or 1
+        threshold = thresholdSlider.value
+        Static vDeriv = findCheckBox("Vertical Derivative")
+        Static hDeriv = findCheckBox("Horizontal Derivative")
+        Static checkBlur = findCheckBox("Blur input before Sobel")
+        horizontalDerivative = hDeriv.checked
+        verticalDerivative = vDeriv.checked
+        useBlur = checkBlur.checked
+        derivativeRange = rangeSlider.value / 100
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_EdgeOverlay : Inherits VB_Algorithm
+    Public xDisp As Integer = 7
+    Public yDisp As Integer = 11
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Displacement in the X direction (in pixels)", 0, 100, xDisp)
+            sliders.setupTrackBar("Displacement in the Y direction (in pixels)", 0, 100, yDisp)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static xSlider = findSlider("Displacement in the X direction (in pixels)")
+        Static ySlider = findSlider("Displacement in the Y direction (in pixels)")
+        xDisp = xSlider.Value
+        yDisp = ySlider.Value
     End Sub
 End Class
