@@ -723,13 +723,13 @@ End Class
 
 Public Class MSER_Binarize : Inherits VB_Algorithm
     Dim mser As New MSER_Basics
-    Dim binarize As New Binarize_Split4
+    Dim binar4 As New Binarize_Split4
     Public Sub New()
         desc = "Instead of a BGR src, try using the color output of Binarize_Split4"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        binarize.Run(src)
-        dst2 = vbPalette(binarize.dst2 * 255 / 4)
+        binar4.Run(src)
+        dst2 = vbPalette(binar4.dst2 * 255 / 4)
 
         mser.Run(dst2)
         dst3 = mser.dst3

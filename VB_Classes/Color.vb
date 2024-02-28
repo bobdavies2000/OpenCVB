@@ -28,14 +28,14 @@ Public Class Color_Basics : Inherits VB_Algorithm
                     Static hColor As New Hist3Dcolor_Basics
                     classifier = hColor
                 Case 5 ' "Binarize_Split4"
-                    Static binarize4 As New Binarize_Split4
-                    classifier = binarize4
+                    Static binar4 As New Binarize_Split4
+                    classifier = binar4
                 Case 6 ' "Binarize_SplitDepth"
-                    Static binarizeDepth As New Binarize_SplitDepth
-                    classifier = binarizeDepth
+                    Static binar As New Binarize_SplitDepth
+                    classifier = binar
                 Case 7 ' "Binarize_DepthTiers"
-                    Static binarizeTiersCM As New Binarize_DepthTiers
-                    classifier = binarizeTiersCM
+                    Static binarTiers As New Binarize_DepthTiers
+                    classifier = binarTiers
             End Select
         End If
 

@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Dim binarize4 As New Binarize_Split4
+    Dim binar4 As New Binarize_Split4
     Public Sub New()
         redOptions.ColorSource.SelectedItem() = "Binarize_Split4"
         cPtr = RedCloud_Open()
@@ -18,14 +18,14 @@ Public Class Flood_Basics : Inherits VB_Algorithm
             Exit Sub ' nothing has changed.
         End If
 
-        binarize4.Run(task.color) ' always run split4 to get colors below...
-        If src.Channels = 1 Then src += binarize4.dst2
+        binar4.Run(task.color) ' always run split4 to get colors below...
+        If src.Channels = 1 Then src += binar4.dst2 Else src = binar4.dst2
 
         Dim inputData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols, binarize4.dst2.Type,
+        Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols, binar4.dst2.Type,
                                     redOptions.DesiredCellSlider.Value, 0, 1, 0)
         handleInput.Free()
 
@@ -48,7 +48,7 @@ Public Class Flood_Basics : Inherits VB_Algorithm
             rc.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
             rc.maxDist = vbGetMaxDist(rc)
 
-            rc.color = binarize4.dst3.Get(Of cv.Vec3b)(rc.floodPoint.Y, rc.floodPoint.X)
+            rc.color = binar4.dst3.Get(Of cv.Vec3b)(rc.floodPoint.Y, rc.floodPoint.X)
             rc.pixels = rc.mask.CountNonZero
             sortedCells.Add(rc.pixels, rc)
         Next

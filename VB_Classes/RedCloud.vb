@@ -1479,7 +1479,7 @@ End Class
 
 
 Public Class RedCloud_FourColor : Inherits VB_Algorithm
-    Dim binarize As New Binarize_Split4
+    Dim binar4 As New Binarize_Split4
     Dim redC As New RedCloud_Basics
     Public Sub New()
         redOptions.UseColor.Checked = True
@@ -1487,10 +1487,10 @@ Public Class RedCloud_FourColor : Inherits VB_Algorithm
         desc = "Use RedCloud on a 4-way split based on light to dark in the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        binarize.Run(src)
-        dst3 = vbPalette(binarize.dst2 * 255 / 5)
+        binar4.Run(src)
+        dst3 = vbPalette(binar4.dst2 * 255 / 5)
 
-        redC.Run(binarize.dst2)
+        redC.Run(binar4.dst2)
         dst2 = redC.dst2
         If standaloneTest() Then identifyCells(redC.redCells)
         labels(2) = redC.labels(3)
@@ -2410,19 +2410,19 @@ End Class
 Public Class RedCloud_Tiers : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Dim tiers As New Depth_Tiers
-    Dim binarize As New Binarize_Split4
+    Dim binar4 As New Binarize_Split4
     Public Sub New()
         redOptions.UseColor.Checked = True
         desc = "Use the Depth_Tiers algorithm to create a color-based RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        binarize.Run(src)
-        dst1 = vbPalette((binarize.dst2 * 255 / binarize.classCount).toMat)
+        binar4.Run(src)
+        dst1 = vbPalette((binar4.dst2 * 255 / binar4.classCount).toMat)
 
         tiers.Run(src)
         dst3 = tiers.dst3
 
-        dst0 = tiers.dst2 + binarize.dst2
+        dst0 = tiers.dst2 + binar4.dst2
         redC.Run(dst0)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
@@ -2435,16 +2435,16 @@ End Class
 Public Class RedCloud_TiersBinarize : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Dim tiersCM As New Depth_TiersCM
-    Dim binarize As New Binarize_Split4
+    Dim binar4 As New Binarize_Split4
     Public Sub New()
         redOptions.UseColor.Checked = True
         desc = "Use the Depth_TiersCM with binarize_Split4 algorithm to create a color-based RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        binarize.Run(src)
+        binar4.Run(src)
 
         tiersCM.Run(src)
-        dst2 = tiersCM.dst2 + binarize.dst2
+        dst2 = tiersCM.dst2 + binar4.dst2
 
         redC.Run(dst2)
         dst2 = redC.dst2
@@ -2621,7 +2621,7 @@ Public Class RedCloud_DepthBW : Inherits VB_Algorithm
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
         Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols,
-                                     src.Type, 254, 0, imageThresholdPercent, cellMinPercent)
+                                     src.Type, redOptions.DesiredCellSlider.Value, 0, imageThresholdPercent, cellMinPercent)
         handleInput.Free()
 
         classCount = RedCloud_Count(cPtr)
@@ -3086,3 +3086,4 @@ Public Class RedCloud_BasicsFullNew : Inherits VB_Algorithm
         setSelectedContour(redCells, cellMap)
     End Sub
 End Class
+

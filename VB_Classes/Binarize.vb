@@ -252,7 +252,7 @@ End Class
 
 
 Public Class Binarize_Four : Inherits VB_Algorithm
-    Dim binarize As New Binarize_Simple
+    Dim binar As New Binarize_Simple
     Public mats As New Mat_4Click
     Public Sub New()
         labels(2) = "A 4-way split - lightest (upper left) to darkest (lower right)"
@@ -261,10 +261,10 @@ Public Class Binarize_Four : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
-        binarize.Run(gray)
-        Dim mask = binarize.dst2.Clone
+        binar.Run(gray)
+        Dim mask = binar.dst2.Clone
 
-        Dim midColor = binarize.meanScalar(0)
+        Dim midColor = binar.meanScalar(0)
         Dim topColor = cv.Cv2.Mean(gray, mask)(0)
         Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
         mats.mat(0) = gray.InRange(topColor, 255)
@@ -288,18 +288,18 @@ End Class
 
 
 Public Class Binarize_FourPixelFlips : Inherits VB_Algorithm
-    Dim binarize As New Binarize_Split4
+    Dim binar4 As New Binarize_Split4
     Public Sub New()
         desc = "Identify the marginal regions that flip between subdivisions based on brightness."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        binarize.Run(src)
-        dst2 = vbPalette(binarize.dst2 * 255 / 5)
+        binar4.Run(src)
+        dst2 = vbPalette(binar4.dst2 * 255 / 5)
 
-        Static lastSubD As cv.Mat = binarize.dst2.Clone
-        dst3 = lastSubD - binarize.dst2
+        Static lastSubD As cv.Mat = binar4.dst2.Clone
+        dst3 = lastSubD - binar4.dst2
         dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        lastSubD = binarize.dst2.Clone
+        lastSubD = binar4.dst2.Clone
     End Sub
 End Class
 
@@ -311,19 +311,19 @@ End Class
 
 
 Public Class Binarize_Split4 : Inherits VB_Algorithm
-    Dim binarize As New Binarize_Four
+    Dim binar As New Binarize_Four
     Public classCount = 4 ' 4-way split
     Public Sub New()
         dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Add the 4-way split of images to define the different regions.  Now adding hue segments as well."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        binarize.Run(src)
+        binar.Run(src)
 
-        dst2.SetTo(1, binarize.mats.mat(0))
-        dst2.SetTo(2, binarize.mats.mat(1))
-        dst2.SetTo(3, binarize.mats.mat(2))
-        dst2.SetTo(4, binarize.mats.mat(3))
+        dst2.SetTo(1, binar.mats.mat(0))
+        dst2.SetTo(2, binar.mats.mat(1))
+        dst2.SetTo(3, binar.mats.mat(2))
+        dst2.SetTo(4, binar.mats.mat(3))
 
         dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
     End Sub
@@ -338,19 +338,19 @@ End Class
 
 
 Public Class Binarize_SplitDepth : Inherits VB_Algorithm
-    Dim binarize As New Binarize_Four
+    Dim binar As New Binarize_Four
     Public classCount = 4 ' 4-way split
     Public Sub New()
         dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Add the 4-way split of images to define the different regions.  Now adding hue segments as well."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        binarize.Run(src)
+        binar.Run(src)
 
-        dst2.SetTo(1, binarize.mats.mat(0))
-        dst2.SetTo(2, binarize.mats.mat(1))
-        dst2.SetTo(3, binarize.mats.mat(2))
-        dst2.SetTo(4, binarize.mats.mat(3))
+        dst2.SetTo(1, binar.mats.mat(0))
+        dst2.SetTo(2, binar.mats.mat(1))
+        dst2.SetTo(3, binar.mats.mat(2))
+        dst2.SetTo(4, binar.mats.mat(3))
 
         If standaloneTest() Then dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
     End Sub
@@ -362,24 +362,24 @@ End Class
 
 Public Class Binarize_DepthTiers : Inherits VB_Algorithm
     Dim tiersCM As New Depth_TiersCM
-    Dim binarize As New Binarize_Split4
+    Dim binar4 As New Binarize_Split4
     Public classCount = 200 ' 4-way split with 50 depth levels at 10 cm's each.
     Public Sub New()
         redOptions.UseColor.Checked = True
         desc = "Add the Depth_TiersCM and binarize_Split4 output in preparation for RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        binarize.Run(src)
+        binar4.Run(src)
         tiersCM.Run(src)
         dst3 = tiersCM.dst3
 
-        dst0 = tiersCM.dst2 + binarize.dst2
+        dst0 = tiersCM.dst2 + binar4.dst2
 
         If task.heartBeat Then
             dst2 = dst0.Clone
         ElseIf task.motionDetected Then
             dst0(task.motionRect).CopyTo(dst2(task.motionRect))
         End If
-        classCount = binarize.classCount + tiersCM.classCount
+        classCount = binar4.classCount + tiersCM.classCount
     End Sub
 End Class
