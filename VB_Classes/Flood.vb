@@ -1,5 +1,4 @@
 Imports System.Runtime.InteropServices
-Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
@@ -18,10 +17,12 @@ Public Class Flood_Basics : Inherits VB_Algorithm
             identifyCells(redCells)
             Exit Sub ' nothing has changed.
         End If
-        binarize4.Run(src)
 
-        Dim inputData(binarize4.dst2.Total - 1) As Byte
-        Marshal.Copy(binarize4.dst2.Data, inputData, 0, inputData.Length)
+        binarize4.Run(task.color) ' always run split4 to get colors below...
+        If src.Channels = 1 Then src += binarize4.dst2
+
+        Dim inputData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
         Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols, binarize4.dst2.Type,
@@ -391,5 +392,29 @@ Public Class Flood_Tiers : Inherits VB_Algorithm
             dst3 = plot.dst2
         End If
         identifyCells(redCells)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Flood_TierTest : Inherits VB_Algorithm
+    Dim flood As New Flood_Basics
+    Dim tiers As New Depth_Tiers
+    Public Sub New()
+        desc = "Add depth tiers to the 8uc1 input to flood_basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        tiers.Run(src)
+
+        dst1 = tiers.dst2
+        dst1.SetTo(0, task.noDepthMask)
+
+        flood.Run(dst1)
+        dst2 = flood.dst2
+        dst3 = flood.dst3
+        labels = flood.labels
     End Sub
 End Class
