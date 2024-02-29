@@ -901,30 +901,10 @@ End Class
 
 
 
-
-
 Public Class Contour_DepthTiers : Inherits VB_Algorithm
-    Dim tiers As New Depth_Tiers
-    Dim contour As New Contour_Basics
-    Public Sub New()
-        desc = "Build contours of the depth tiers"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        tiers.Run(src)
-        dst3 = tiers.dst3.Clone
-
-        contour.Run(tiers.dst3)
-        dst2 = contour.dst3
-    End Sub
-End Class
-
-
-
-
-Public Class Contour_Depth : Inherits VB_Algorithm
     Public options As New Options_Contours
     Public contourlist As New List(Of cv.Point())
-    Dim palette As New Palette_ColorMap
+    Public classCount As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         findRadio("FloodFill").Checked = True
@@ -961,12 +941,9 @@ Public Class Contour_Depth : Inherits VB_Algorithm
         Next
 
         dst2.SetTo(1, dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)) ' no zeros...
+        classCount = contourlist.Count
 
-        If standaloneTest() Then
-            palette.Run(dst2 * 255 / contourlist.Count)
-            dst3 = palette.dst2
-        End If
-
-        labels(3) = $"All depth pixels are assigned a tier with {contourlist.Count} contours."
+        If standaloneTest() Then dst3 = vbPalette(dst2 * 255 / classCount)
+        labels(3) = $"All depth pixels are assigned a tier with {classCount} contours."
     End Sub
 End Class

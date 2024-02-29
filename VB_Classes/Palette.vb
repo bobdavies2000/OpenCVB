@@ -109,7 +109,6 @@ End Class
 Public Class Palette_DrawTest : Inherits VB_Algorithm
     Dim draw As New Draw_Shapes
     Public Sub New()
-        task.palette.whitebackground = True
         desc = "Experiment With palette Using a drawn image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -458,41 +457,41 @@ End Class
 
 
 
+'Public Class Palette_LoadColorMap : Inherits VB_Algorithm
+'    Public whitebackground As Boolean
+'    Public colorMap As New cv.Mat
+'    Dim cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
+'    Public Sub New()
+'        desc = "Apply the different color maps in OpenCV"
+'    End Sub
+'    Public Sub RunVB(src As cv.Mat)
+'        If task.optionsChanged Or colorMap.Rows <> 256 Then
+'            labels(2) = "ColorMap = " + gOptions.Palettes.Text
+'            Dim str = cMapDir.FullName + "/colorscale_" + gOptions.Palettes.Text + ".jpg"
+'            Dim mapFile As New FileInfo(str)
+'            Dim tmp = cv.Cv2.ImRead(mapFile.FullName)
+
+'            tmp.Col(0).SetTo(If(whitebackground, cv.Scalar.White, cv.Scalar.Black))
+'            tmp = tmp.Row(0)
+'            colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, tmp.Data).Clone
+'        End If
+
+'        If src.Type = cv.MatType.CV_32F Then
+'            src = vbNormalize32f(src)
+'            src.ConvertTo(src, cv.MatType.CV_8U)
+'        End If
+'        cv.Cv2.ApplyColorMap(src, dst2, colorMap)
+'        If standalone Then dst3 = colorMap.Resize(dst3.Size)
+'    End Sub
+'End Class
+
+
+
+
+
+
+
 Public Class Palette_LoadColorMap : Inherits VB_Algorithm
-    Public whitebackground As Boolean
-    Public colorMap As New cv.Mat
-    Dim cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
-    Public Sub New()
-        desc = "Apply the different color maps in OpenCV"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If task.optionsChanged Or colorMap.Rows <> 256 Then
-            labels(2) = "ColorMap = " + gOptions.Palettes.Text
-            Dim str = cMapDir.FullName + "/colorscale_" + gOptions.Palettes.Text + ".jpg"
-            Dim mapFile As New FileInfo(str)
-            Dim tmp = cv.Cv2.ImRead(mapFile.FullName)
-
-            tmp.Col(0).SetTo(If(whitebackground, cv.Scalar.White, cv.Scalar.Black))
-            tmp = tmp.Row(0)
-            colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, tmp.Data).Clone
-        End If
-
-        If src.Type = cv.MatType.CV_32F Then
-            src = vbNormalize32f(src)
-            src.ConvertTo(src, cv.MatType.CV_8U)
-        End If
-        cv.Cv2.ApplyColorMap(src, dst2, colorMap)
-        If standalone Then dst3 = colorMap.Resize(dst3.Size)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Palette_ColorMap : Inherits VB_Algorithm
     Public colorMap As New cv.Mat
     Public Sub New()
         labels(2) = "ColorMap = " + gOptions.Palettes.Text
