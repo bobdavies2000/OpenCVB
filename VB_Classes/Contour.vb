@@ -36,12 +36,11 @@ Public Class Contour_Basics : Inherits VB_Algorithm
         contourlist.Clear()
         dst2 = colorClass.dst3
         Dim minVal = Math.Min(sortedList.Count, options.maxContourCount)
-        For i = 0 To minVal
+        For i = 0 To minVal - 1
             Dim tour = allContours(sortedList.ElementAt(i).Value)
             contourlist.Add(tour)
             Dim color As cv.Scalar = vecToScalar(dst2.Get(Of cv.Vec3b)(tour(0).Y, tour(0).X))
             vbDrawContour(dst3, tour.ToList, color, -1)
-            vbDrawContour(dst3, tour.ToList, cv.Scalar.White)
         Next
         labels(3) = $"Top {minVal} contours found"
     End Sub
@@ -339,27 +338,6 @@ Public Class Contour_Foreground : Inherits VB_Algorithm
         For Each ctr In contour.contourlist
             vbDrawContour(dst3, New List(Of cv.Point)(ctr), 255, -1)
         Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class Contour_Depth : Inherits VB_Algorithm
-    Dim depth As New Depth_InRange
-    Public Sub New()
-        desc = "Find and draw the contours of each depth segment."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        depth.Run(src)
-        dst2 = vbPalette(depth.dst2 * 255 / depth.classCount)
-        dst3 = depth.dst3
-        labels = depth.labels
     End Sub
 End Class
 
@@ -836,25 +814,6 @@ End Class
 
 
 
-Public Class Contour_DepthTiers : Inherits VB_Algorithm
-    Dim tiers As New Depth_Tiers
-    Dim contour As New Contour_Basics
-    Public Sub New()
-        desc = "Build contours of the depth tiers"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        tiers.Run(src)
-        dst3 = tiers.dst3.Clone
-
-        contour.Run(tiers.dst3)
-        dst2 = contour.dst3
-    End Sub
-End Class
-
-
-
-
-
 
 
 
@@ -935,5 +894,79 @@ Public Class Contour_PrepData : Inherits VB_Algorithm
 
         labels(2) = $"{redCells.Count} cells were found"
         setSelectedContour(redCells, cellMap)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Contour_DepthTiers : Inherits VB_Algorithm
+    Dim tiers As New Depth_Tiers
+    Dim contour As New Contour_Basics
+    Public Sub New()
+        desc = "Build contours of the depth tiers"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        tiers.Run(src)
+        dst3 = tiers.dst3.Clone
+
+        contour.Run(tiers.dst3)
+        dst2 = contour.dst3
+    End Sub
+End Class
+
+
+
+
+Public Class Contour_Depth : Inherits VB_Algorithm
+    Public options As New Options_Contours
+    Public contourlist As New List(Of cv.Point())
+    Dim palette As New Palette_ColorMap
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        findRadio("FloodFill").Checked = True
+        vbAddAdvice(traceName + ": redOptions color class determines the input.  Use local options in 'Options_Contours' to further control output.")
+        labels = {"", "", "FindContour input", "Draw contour output"}
+        desc = "General purpose contour finder"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        task.pcSplit(2).ConvertTo(dst1, cv.MatType.CV_32S, 100 / options.cmPerTier, 1)
+
+        Dim allContours As cv.Point()()
+        cv.Cv2.FindContours(dst1, allContours, Nothing, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)
+        If allContours.Count <= 1 Then Exit Sub
+
+        Dim sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To allContours.Count - 1
+            If allContours(i).Length < 4 Then Continue For
+            Dim count = cv.Cv2.ContourArea(allContours(i))
+            If count < options.minPixels Then Continue For
+            If count > 2 Then sortedList.Add(count, i)
+        Next
+
+        dst2.SetTo(0)
+        contourlist.Clear()
+        For i = 0 To sortedList.Count - 1
+            Dim tour = allContours(sortedList.ElementAt(i).Value)
+            Dim val = dst2.Get(Of Byte)(tour(0).Y, tour(0).X)
+            If val = 0 Then
+                contourlist.Add(tour)
+                vbDrawContour(dst2, tour.ToList, i + 1, -1)
+            End If
+        Next
+
+        dst2.SetTo(1, dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)) ' no zeros...
+
+        If standaloneTest() Then
+            palette.Run(dst2 * 255 / contourlist.Count)
+            dst3 = palette.dst2
+        End If
+
+        labels(3) = $"All depth pixels are assigned a tier with {contourlist.Count} contours."
     End Sub
 End Class

@@ -1553,8 +1553,8 @@ End Class
 
 Public Class Depth_Tiers : Inherits VB_Algorithm
     Public classCount As Integer
+    Dim options As New Options_Contours
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("cm's per tier", 10, 200, 50)
         vbAddAdvice(traceName + ": gOptions 'Max Depth (meters)' and local options for cm's per tier.")
         desc = "Create a reduced image of the depth data to define tiers of similar values"
     End Sub

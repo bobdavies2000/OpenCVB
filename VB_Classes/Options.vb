@@ -167,6 +167,7 @@ Public Class Options_Contours : Inherits VB_Algorithm
     Public ApproximationMode = cv.ContourApproximationModes.ApproxTC89KCOS
     Public epsilon As Single = 3 / 100
     Public minPixels As Integer = 30
+    Public cmPerTier As Integer = 50
     Public maxContourCount As Integer = 50
     Dim options2 As New Options_Contours2
     Public Sub New()
@@ -180,6 +181,7 @@ Public Class Options_Contours : Inherits VB_Algorithm
         End If
 
         If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("cm's per tier", 10, 200, cmPerTier)
             sliders.setupTrackBar("Contour epsilon (arc length percent)", 0, 100, epsilon * 100)
             sliders.setupTrackBar("Min Pixels", 1, 2000, minPixels)
             sliders.setupTrackBar("Max contours", 1, 200, maxContourCount)
@@ -187,6 +189,7 @@ Public Class Options_Contours : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB()
         options2.RunVB()
+        Static cmSlider = findSlider("cm's per tier")
         Static epsilonSlider = findSlider("Contour epsilon (arc length percent)")
         Static minSlider = findSlider("Min Pixels")
         Static countSlider = findSlider("Max contours")
@@ -205,6 +208,7 @@ Public Class Options_Contours : Inherits VB_Algorithm
         Next
         ApproximationMode = options2.ApproximationMode
         minPixels = minSlider.value
+        cmPerTier = cmSlider.value
     End Sub
 End Class
 

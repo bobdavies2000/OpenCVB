@@ -536,6 +536,5 @@ Public Class Flood_Cell : Inherits VB_Algorithm
         Next
         labels(3) = $"{floodMin.redCells.Count} were identified within the selected cell."
         If standalone Then identifyCells(flood.redCells)
-        'setSelectedContour(redCells, cellMap)
     End Sub
 End Class

@@ -466,7 +466,6 @@ Public Class Palette_LoadColorMap : Inherits VB_Algorithm
         desc = "Apply the different color maps in OpenCV"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-
         If task.optionsChanged Or colorMap.Rows <> 256 Then
             labels(2) = "ColorMap = " + gOptions.Palettes.Text
             Dim str = cMapDir.FullName + "/colorscale_" + gOptions.Palettes.Text + ".jpg"
@@ -493,8 +492,7 @@ End Class
 
 
 
-Public Class Palette_MyColorMap : Inherits VB_Algorithm
-    Public whitebackground As Boolean
+Public Class Palette_ColorMap : Inherits VB_Algorithm
     Public colorMap As New cv.Mat
     Public Sub New()
         labels(2) = "ColorMap = " + gOptions.Palettes.Text
@@ -503,8 +501,6 @@ Public Class Palette_MyColorMap : Inherits VB_Algorithm
         Dim mapFile As New FileInfo(str)
         Dim tmp = cv.Cv2.ImRead(mapFile.FullName)
 
-        tmp.Col(0).SetTo(If(whitebackground, cv.Scalar.White, cv.Scalar.Black))
-        tmp = tmp.Row(0)
         colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, tmp.Data).Clone
         desc = "Apply only the requested color map - which should be provided."
     End Sub
