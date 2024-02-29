@@ -4,7 +4,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public redC As New RedCloud_BasicsFull
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat
-    Dim tiers As New Depth_TiersCM
+    Dim tiers As New Depth_Tiers
     Public Sub New()
         redOptions.UseColor.Checked = True  ' <<<<<<< this is what is different.
         desc = "Create RedCloud output using only color."
@@ -2434,11 +2434,11 @@ End Class
 
 Public Class RedCloud_TiersBinarize : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
-    Dim tiersCM As New Depth_TiersCM
+    Dim tiersCM As New Depth_Tiers
     Dim binar4 As New Binarize_Split4
     Public Sub New()
         redOptions.UseColor.Checked = True
-        desc = "Use the Depth_TiersCM with binarize_Split4 algorithm to create a color-based RedCloud"
+        desc = "Use the Depth_Tiers with binarize_Split4 algorithm to create a color-based RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binar4.Run(src)

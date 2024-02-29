@@ -361,12 +361,12 @@ End Class
 
 
 Public Class Binarize_DepthTiers : Inherits VB_Algorithm
-    Dim tiersCM As New Depth_TiersCM
+    Dim tiersCM As New Depth_Tiers
     Dim binar4 As New Binarize_Split4
     Public classCount = 200 ' 4-way split with 50 depth levels at 10 cm's each.
     Public Sub New()
         redOptions.UseColor.Checked = True
-        desc = "Add the Depth_TiersCM and binarize_Split4 output in preparation for RedCloud"
+        desc = "Add the Depth_Tiers and binarize_Split4 output in preparation for RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binar4.Run(src)

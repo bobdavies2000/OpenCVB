@@ -1551,34 +1551,7 @@ End Class
 
 
 
-
 Public Class Depth_Tiers : Inherits VB_Algorithm
-    Public classCount As Integer
-    Public Sub New()
-        vbAddAdvice(traceName + ": gOptions 'Max Depth (meters)' determines how many tiers there are.")
-        desc = "Create a reduced image of the depth data to define tiers of similar values"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standalone Or src.Type = cv.MatType.CV_8UC3 Then src = task.pcSplit(2)
-        dst1 = src.Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
-        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
-
-        classCount = task.maxZmeters
-        dst2.SetTo(0, task.noDepthMask)
-
-        dst3 = vbPalette(dst2 * 255 / classCount)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class Depth_TiersCM : Inherits VB_Algorithm
     Public classCount As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("cm's per tier", 10, 200, 50)

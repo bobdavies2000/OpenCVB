@@ -732,7 +732,7 @@ Public Class rcData
     Public rect As cv.Rect
     Public mask As cv.Mat
     Public depthMask As cv.Mat
-    Public tier As Integer
+    Public tier As Single
     Public tierHist As New cv.Mat
     Public tierHistArray() As Single
 
