@@ -1361,6 +1361,7 @@ if algorithmName = "ORB_Match" Then return new ORB_Match
 if algorithmName = "Palette_Basics" Then return new Palette_Basics
 if algorithmName = "Palette_Color" Then return new Palette_Color
 if algorithmName = "Palette_Create" Then return new Palette_Create
+if algorithmName = "Palette_CustomColorMap" Then return new Palette_CustomColorMap
 if algorithmName = "Palette_DepthColorMap" Then return new Palette_DepthColorMap
 if algorithmName = "Palette_DrawTest" Then return new Palette_DrawTest
 if algorithmName = "Palette_Gradient" Then return new Palette_Gradient

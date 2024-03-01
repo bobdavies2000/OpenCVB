@@ -590,7 +590,7 @@ Public Class VBtask : Implements IDisposable
                 End If
 
                 Dim rc = task.rc
-                If rc.rect.Width > 1 And rc.rect.Height > 1 And rc.index > 0 Then
+                If rc.index > 0 Then
                     task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
                     task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
 

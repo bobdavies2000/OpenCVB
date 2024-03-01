@@ -1370,7 +1370,6 @@ Public Class OpenCVB
         picLabels = {"", "", "", ""}
         task.labels = {"", "", "", ""}
         mousePoint = New cv.Point(task.workingRes.Width / 2, task.workingRes.Height / 2) ' mouse click point default = center of the image
-        task.mouseClickFlag = True
 
         task.calibData.ppx = camera.cameraInfo.ppx
         task.calibData.ppy = camera.cameraInfo.ppy
