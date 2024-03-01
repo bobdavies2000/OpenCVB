@@ -9,9 +9,9 @@ Public Class Tessallate_Basics : Inherits VB_Algorithm
         desc = "Prepare the list of 2D triangles"
     End Sub
     Private Function addTriangle(c1 As cv.Point, c2 As cv.Point, center As cv.Point, rc As rcData, shift As cv.Point3f) As List(Of cv.Point)
-        Dim pt1 = getWorldCoordinates(New cv.Point3f(c1.X, c1.Y, rc.depthMean.Z))
-        Dim ptCenter = getWorldCoordinates(New cv.Point3f(center.X, center.Y, rc.depthMean.Z))
-        Dim pt2 = getWorldCoordinates(New cv.Point3f(c2.X, c2.Y, rc.depthMean.Z))
+        Dim pt1 = getWorldCoordinates(New cv.Point3f(c1.X, c1.Y, rc.depthMean(2)))
+        Dim ptCenter = getWorldCoordinates(New cv.Point3f(center.X, center.Y, rc.depthMean(2)))
+        Dim pt2 = getWorldCoordinates(New cv.Point3f(c2.X, c2.Y, rc.depthMean(2)))
 
         colors.Add(rc.color)
         points.Add(New cv.Point3f(pt1.X + shift.X, pt1.Y + shift.Y, pt1.Z + shift.Z))
@@ -124,16 +124,16 @@ Public Class Tessallate_QuadSimple : Inherits VB_Algorithm
             Dim rc = redC.redCells(index)
 
             dst3(roi).SetTo(rc.color)
-            setTrueText(Format(rc.depthMean.Z, fmt1), New cv.Point(roi.X, roi.Y))
+            setTrueText(Format(rc.depthMean(2), fmt1), New cv.Point(roi.X, roi.Y))
 
-            Dim topLeft = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, rc.depthMean.Z))
-            Dim botRight = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, rc.depthMean.Z))
+            Dim topLeft = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, rc.depthMean(2)))
+            Dim botRight = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, rc.depthMean(2)))
 
             oglData.Add(New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255))
-            oglData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, rc.depthMean.Z + shift.Z))
-            oglData.Add(New cv.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, rc.depthMean.Z + shift.Z))
-            oglData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, rc.depthMean.Z + shift.Z))
-            oglData.Add(New cv.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, rc.depthMean.Z + shift.Z))
+            oglData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, rc.depthMean(2) + shift.Z))
+            oglData.Add(New cv.Point3f(botRight.X + shift.X, topLeft.Y + shift.Y, rc.depthMean(2) + shift.Z))
+            oglData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, rc.depthMean(2) + shift.Z))
+            oglData.Add(New cv.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, rc.depthMean(2) + shift.Z))
         Next
         labels = {"", "", traceName + " completed with " + Format(oglData.Count / 5, fmt0) + " quad sets (with a 5th element for color)", "Output of Tessallate_QuadSimple"}
     End Sub
@@ -185,11 +185,11 @@ Public Class Tessallate_QuadHulls : Inherits VB_Algorithm
             End If
 
             Dim rc = hulls.redC.redCells(index)
-            If rc.depthMean.Z = 0 Then Continue For
+            If rc.depthMean(2) = 0 Then Continue For
 
             If colorList(i) <> rc.color Then depthList(i).Clear()
 
-            depthList(i).Add(rc.depthMean.Z)
+            depthList(i).Add(rc.depthMean(2))
             colorList(i) = rc.color
 
             If depthList(i).Count > 0 Then
@@ -265,7 +265,7 @@ Public Class Tessallate_QuadMinMax : Inherits VB_Algorithm
             End If
 
             Dim rc = redC.redCells(index)
-            If rc.depthMean.Z = 0 Then Continue For
+            If rc.depthMean(2) = 0 Then Continue For
 
             If colorList(i) <> rc.color Then
                 depthList1(i).Clear()
@@ -276,7 +276,7 @@ Public Class Tessallate_QuadMinMax : Inherits VB_Algorithm
             depth32s(roi).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, task.depthMask(roi))
             depthMax /= 1000
             depthMin /= 1000
-            If depthMax > rc.depthMean.Z + rc.depthStdev.Z * 3 Then depthMax = rc.depthMean.Z + 3 * rc.depthStdev.Z
+            If depthMax > rc.depthMean(2) + rc.depthStdev(2) * 3 Then depthMax = rc.depthMean(2) + 3 * rc.depthStdev(2)
             depthList1(i).Add(depthMin)
             depthList2(i).Add(depthMax)
             colorList(i) = rc.color
@@ -352,8 +352,8 @@ Public Class Tessallate_Bricks : Inherits VB_Algorithm
             If index >= 0 Then
                 task.pcSplit(2)(roi).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, task.depthMask(roi))
                 Dim rc = hulls.redC.redCells(index)
-                depthMin = If(depthMax > rc.depthMean.Z, rc.depthMean.Z, depthMin)
-                Dim test = depthMin + rc.depthStdev.Z * 3
+                depthMin = If(depthMax > rc.depthMean(2), rc.depthMean(2), depthMin)
+                Dim test = depthMin + rc.depthStdev(2) * 3
                 If test < depthMax Then depthMax = test
 
                 If depthMin > 0 And depthMax > 0 And depthMax < task.maxZmeters Then

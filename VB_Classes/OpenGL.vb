@@ -1015,7 +1015,7 @@ Public Class OpenGL_Contours : Inherits VB_Algorithm
         Dim lastDepth As cv.Scalar
         oglData.Add(New cv.Point3f)
         For Each rc In redC.redCells
-            Dim d = rc.depthMean.Z
+            Dim d = rc.depthMean(2)
             If d = 0 Then Continue For
 
             Dim dataIndex = oglData.Count

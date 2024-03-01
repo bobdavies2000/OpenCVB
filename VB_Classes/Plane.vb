@@ -87,7 +87,7 @@ Public Class Plane_FlatSurfaces : Inherits VB_Algorithm
 
         Dim flatCount = 0
         For Each rc In plane.redC.redCells
-            If rc.depthMean.Z < 1.0 Then Continue For ' close objects look like planes.
+            If rc.depthMean(2) < 1.0 Then Continue For ' close objects look like planes.
             Dim RMSerror As Double = 0
             Dim pixelCount = 0
             For y = 0 To rc.rect.Height - 1

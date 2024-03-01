@@ -88,17 +88,12 @@ Public Class RedCloud_BasicsFull : Inherits VB_Algorithm
             rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
             rc.depthPixels = rc.depthMask.CountNonZero
 
-            Dim minLoc As cv.Point, maxLoc As cv.Point
             If rc.depthPixels Then
-                task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.depthMask)
-                task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.depthMask)
-                task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.depthMask)
+                task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
+                task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
+                task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
 
-                Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
-                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.depthMask)
-
-                rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
-                rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
+                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
             End If
 
             cv.Cv2.MeanStdDev(src(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
@@ -399,8 +394,8 @@ Public Class RedCloud_CellsAtDepth : Inherits VB_Algorithm
         Dim hist(histBins - 1) As Single
         For Each rc In redC.redCells
             Dim slot As Integer
-            If rc.depthMean.Z > task.maxZmeters Then rc.depthMean.Z = task.maxZmeters
-            slot = CInt((rc.depthMean.Z / task.maxZmeters) * histBins)
+            If rc.depthMean(2) > task.maxZmeters Then rc.depthMean(2) = task.maxZmeters
+            slot = CInt((rc.depthMean(2) / task.maxZmeters) * histBins)
             If slot >= hist.Length Then slot = hist.Length - 1
             slotList(slot).Add(rc.index)
             hist(slot) += rc.pixels
@@ -472,9 +467,9 @@ Public Class RedCloud_Features : Inherits VB_Algorithm
                 labels(3) += "maxDist Is at (" + CStr(pt.X) + ", " + CStr(pt.Y) + ")"
                 dst2.Circle(pt, task.dotSize, task.highlightColor, -1, cv.LineTypes.AntiAlias)
             Case 1
-                dst3(rc.rect).SetTo(vbNearFar((rc.depthMean.Z) / task.maxZmeters), rc.mask)
-                labels(3) = "rc.depthMean.Z Is highlighted in dst2"
-                labels(3) = "Mean depth for the cell Is " + Format(rc.depthMean.Z, fmt3)
+                dst3(rc.rect).SetTo(vbNearFar((rc.depthMean(2)) / task.maxZmeters), rc.mask)
+                labels(3) = "rc.depthMean(2) Is highlighted in dst2"
+                labels(3) = "Mean depth for the cell Is " + Format(rc.depthMean(2), fmt3)
             Case 2
                 cv.Cv2.MatchTemplate(task.pcSplit(0)(rc.rect), task.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
                 correlationXtoZ = correlationMat.Get(Of Single)(0, 0)
@@ -933,7 +928,7 @@ Public Class RedCloud_LikelyFlatSurfaces : Inherits VB_Algorithm
         vCells.Clear()
         hCells.Clear()
         For Each rc In redC.redCells
-            If rc.depthMean.Z >= task.maxZmeters Then Continue For
+            If rc.depthMean(2) >= task.maxZmeters Then Continue For
             Dim tmp As cv.Mat = verts.dst2(rc.rect) And rc.mask
             If tmp.CountNonZero / rc.pixels > 0.5 Then
                 vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
@@ -948,7 +943,7 @@ Public Class RedCloud_LikelyFlatSurfaces : Inherits VB_Algorithm
         Next
 
         Dim rcX = task.rc
-        setTrueText("mean depth = " + Format(rcX.depthMean.Z, "0.0"), 3)
+        setTrueText("mean depth = " + Format(rcX.depthMean(2), "0.0"), 3)
         labels(2) = redC.labels(2)
     End Sub
 End Class
@@ -2724,11 +2719,7 @@ Public Class RedCloud_BasicsNew : Inherits VB_Algorithm
                 task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.depthMask)
                 task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.depthMask)
 
-                Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
-                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.depthMask)
-
-                rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
-                rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
+                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
             End If
 
             cv.Cv2.MeanStdDev(src(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
@@ -3036,11 +3027,7 @@ Public Class RedCloud_BasicsFullNew : Inherits VB_Algorithm
                 task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.depthMask)
                 task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.depthMask)
 
-                Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
-                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.depthMask)
-
-                rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
-                rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
+                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
             End If
 
             cv.Cv2.MeanStdDev(src(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)

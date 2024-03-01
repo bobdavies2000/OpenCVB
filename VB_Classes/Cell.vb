@@ -41,10 +41,10 @@ Public Class Cell_Basics : Inherits VB_Algorithm
         strOut += "Z = " + Format(rc.minVec.Z, fmt2) + "/" + Format(rc.maxVec.Z, fmt2)
         strOut += "/" + Format(rc.maxVec.Z - rc.minVec.Z, fmt2) + vbCrLf + vbCrLf
 
-        strOut += "Cell Mean in 3D: x/y/z = " + vbTab + Format(rc.depthMean.X, fmt2) + vbTab
-        strOut += Format(rc.depthMean.Y, fmt2) + vbTab + Format(rc.depthMean.Z, fmt2) + vbCrLf
+        strOut += "Cell Mean in 3D: x/y/z = " + vbTab + Format(rc.depthMean(0), fmt2) + vbTab
+        strOut += Format(rc.depthMean(1), fmt2) + vbTab + Format(rc.depthMean(2), fmt2) + vbCrLf
 
-        If rc.depthMean.Z = 0 Then
+        If rc.depthMean(2) = 0 Then
             strOut += vbCrLf + "No depth data is available for that cell. "
         Else
             eq.rc = rc

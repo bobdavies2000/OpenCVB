@@ -200,15 +200,16 @@ Module VB
         dst.Circle(rc.maxDStable, task.dotSize, cv.Scalar.White, -1, task.lineType)
     End Sub
     Public Sub setSelectedContour(ByRef redCells As List(Of rcData), ByRef cellMap As cv.Mat)
-        If redCells.Count = 0 Or task.mouseClickFlag = False Then Exit Sub
+        If redCells.Count = 0 Then Exit Sub
         Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+        task.rc = redCells(index)
+        If task.mouseClickFlag = False Then Exit Sub
         If index = 0 Or index >= redCells.Count Then
             If redCells.Count > 1 Then
                 task.clickPoint = redCells(1).maxDist
                 task.rc = redCells(1)
             End If
         Else
-            task.rc = redCells(index)
         End If
     End Sub
     Public Function contourBuild(mask As cv.Mat, approxMode As cv.ContourApproximationModes) As List(Of cv.Point)
@@ -738,11 +739,16 @@ Public Class rcData
     Public colorMean As New cv.Scalar
     Public colorStdev As New cv.Scalar
 
-    Public depthMean As cv.Point3f
-    Public depthStdev As cv.Point3f
+    'Public depthMean As cv.Point3f
+    'Public depthStdev As cv.Point3f
+    Public depthMean As cv.Scalar
+    Public depthStdev As cv.Scalar
+
 
     Public minVec As cv.Point3f
     Public maxVec As cv.Point3f
+    Public minLoc As cv.Point
+    Public maxLoc As cv.Point
 
     Public mmX As mmData
     Public mmY As mmData

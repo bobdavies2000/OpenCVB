@@ -467,6 +467,17 @@ Public Class Flood_Minimal : Inherits VB_Algorithm
             rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             vbDrawContour(rc.mask, rc.contour, 255, -1)
 
+            rc.depthMask = rc.mask.Clone
+            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
+            rc.depthPixels = rc.depthMask.CountNonZero
+
+            If rc.depthPixels Then
+                task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
+                task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
+                task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
+
+                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
+            End If
             rc.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
             rc.maxDist = vbGetMaxDist(rc)
             rc.tier = src(rc.rect).Mean(rc.mask)
@@ -522,14 +533,16 @@ Public Class Flood_Cell : Inherits VB_Algorithm
 
         redCells.Clear()
         cellMap.SetTo(0)
+        Dim offset As Integer = 40
+        If task.rc.maxDist.X > dst2.Width / 2 Then offset *= -1
         For Each rc In floodMin.redCells
             If rc.pixels >= tiers.options.minPixels Then
                 rc.rect = New cv.Rect(rc.rect.X + task.rc.rect.X, rc.rect.Y + task.rc.rect.Y, rc.rect.Width, rc.rect.Height)
                 redCells.Add(rc)
                 cellMap(rc.rect).SetTo(rc.index, rc.mask)
                 If rc.index <= identifyCount And rc.index > 0 Then
-                    Dim pt = New cv.Point(rc.maxDist.X + task.rc.rect.X + 20, rc.maxDist.Y + task.rc.rect.Y)
-                    setTrueText(CStr(CInt(rc.tier)), pt, 3)
+                    Dim pt = New cv.Point(rc.maxDist.X + task.rc.rect.X + offset, rc.maxDist.Y + task.rc.rect.Y)
+                    setTrueText(Format(rc.depthMean(2), fmt1), pt, 3)
                 End If
             End If
         Next
@@ -538,8 +551,8 @@ Public Class Flood_Cell : Inherits VB_Algorithm
         dst3(task.rc.rect) = vbPalette(cellMap(task.rc.rect) * 255 / redCells.Count)
         vbDrawContour(dst3(task.rc.rect), task.rc.contour, cv.Scalar.White)
 
-        labels(3) = $"{redCells.Count} were identified within the selected cell."
-        If standalone Then identifyCells(redCells)
+        labels(3) = $"{redCells.Count} {If(redCells.Count = 1, "cell", "cells")} were identified within the selected cell."
+        If standalone Then identifyCells(flood.redCells)
     End Sub
 End Class
 
@@ -556,7 +569,7 @@ Public Class Flood_Cells : Inherits VB_Algorithm
     Dim redCells As New List(Of rcData)
     Dim cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
-        redOptions.DesiredCellSlider.Value = 255
+        redOptions.DesiredCellSlider.Value = 250
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Run RedCloud on an individual cell with limited count of desired cells."
     End Sub
