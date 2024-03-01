@@ -424,7 +424,6 @@ End Class
 
 Public Class Flood_Minimal : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat
     Public rcX As rcData
     Public Sub New()
         cPtr = RedCloud_Open()
@@ -450,7 +449,6 @@ Public Class Flood_Minimal : Inherits VB_Algorithm
         handleMask.Free()
         handleInput.Free()
 
-        cellMap = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
         Dim classCount = RedCloud_Count(cPtr)
         If classCount = 0 Then Exit Sub ' no data to process.
         dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
@@ -461,11 +459,16 @@ Public Class Flood_Minimal : Inherits VB_Algorithm
         For i = 0 To classCount - 1
             Dim rc As New rcData
             rc.index = sortedCells.Count + 1
-            rc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
+            rc.rect = rectData.Get(Of cv.Rect)(i, 0)
             rc.mask = dst1(rc.rect).InRange(rc.index, rc.index).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
             rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             vbDrawContour(rc.mask, rc.contour, 255, -1)
+            rc.tier = src(rc.rect).Mean(rc.mask)
+
+            rc.rect.X += rcX.rect.X
+            rc.rect.Y += rcX.rect.Y
+            rc.rect = validateRect(rc.rect)
 
             rc.depthMask = rc.mask.Clone
             rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
@@ -479,8 +482,11 @@ Public Class Flood_Minimal : Inherits VB_Algorithm
                 cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
             End If
             rc.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
+            rc.floodPoint.X += rcX.rect.X
+            rc.floodPoint.Y += rcX.rect.Y
             rc.maxDist = vbGetMaxDist(rc)
-            rc.tier = src(rc.rect).Mean(rc.mask)
+            rc.maxDist.X += rcX.rect.X
+            rc.maxDist.Y += rcX.rect.Y
             rc.pixels = rc.mask.CountNonZero
             sortedCells.Add(rc.pixels, rc)
         Next
@@ -492,7 +498,6 @@ Public Class Flood_Minimal : Inherits VB_Algorithm
             Dim rc = ele.Value
             rc.index = redCells.Count
             redCells.Add(rc)
-            cellMap(rc.rect).SetTo(rc.index, rc.mask)
             dst2.Circle(rc.maxDist, task.dotSize, task.highlightColor, -1, task.lineType)
         Next
     End Sub
@@ -537,11 +542,10 @@ Public Class Flood_Cell : Inherits VB_Algorithm
         If task.rc.maxDist.X > dst2.Width / 2 Then offset *= -1
         For Each rc In floodMin.redCells
             If rc.pixels >= tiers.options.minPixels Then
-                rc.rect = New cv.Rect(rc.rect.X + task.rc.rect.X, rc.rect.Y + task.rc.rect.Y, rc.rect.Width, rc.rect.Height)
                 redCells.Add(rc)
                 cellMap(rc.rect).SetTo(rc.index, rc.mask)
                 If rc.index <= identifyCount And rc.index > 0 Then
-                    Dim pt = New cv.Point(rc.maxDist.X + task.rc.rect.X + offset, rc.maxDist.Y + task.rc.rect.Y)
+                    Dim pt = New cv.Point(rc.floodPoint.X + offset, rc.floodPoint.Y)
                     setTrueText(Format(rc.depthMean(2), fmt1), pt, 3)
                 End If
             End If
@@ -551,7 +555,7 @@ Public Class Flood_Cell : Inherits VB_Algorithm
         dst3(task.rc.rect) = vbPalette(cellMap(task.rc.rect) * 255 / redCells.Count)
         vbDrawContour(dst3(task.rc.rect), task.rc.contour, cv.Scalar.White)
 
-        labels(3) = $"{redCells.Count} {If(redCells.Count = 1, "cell", "cells")} were identified within the selected cell."
+        labels(3) = $"{redCells.Count} {If(redCells.Count = 1, "cell was ", "cells were ")} identified within the selected cell."
         If standalone Then identifyCells(flood.redCells)
     End Sub
 End Class

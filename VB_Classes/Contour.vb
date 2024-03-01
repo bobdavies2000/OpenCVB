@@ -35,14 +35,13 @@ Public Class Contour_Basics : Inherits VB_Algorithm
         dst3.SetTo(0)
         contourlist.Clear()
         dst2 = colorClass.dst3
-        Dim minVal = Math.Min(sortedList.Count, options.maxContourCount)
-        For i = 0 To minVal - 1
+        For i = 0 To sortedList.Count - 1
             Dim tour = allContours(sortedList.ElementAt(i).Value)
             contourlist.Add(tour)
             Dim color As cv.Scalar = vecToScalar(dst2.Get(Of cv.Vec3b)(tour(0).Y, tour(0).X))
             vbDrawContour(dst3, tour.ToList, color, -1)
         Next
-        labels(3) = $"Top {minVal} contours found"
+        labels(3) = $"Top {sortedList.Count} contours found"
     End Sub
 End Class
 
@@ -832,10 +831,9 @@ Public Class Contour_WholeImage : Inherits VB_Algorithm
         Next
 
         dst2.SetTo(0)
-        For i = 0 To sortedContours.Count - 1 ' toss the contour around whole image - element 0.
+        For i = 0 To sortedContours.Count - 1
             Dim tour = sortedContours.ElementAt(i).Value
             vbDrawContour(dst2, tour, 255, task.lineWidth)
-            If i >= contour.options.maxContourCount Then Exit For
         Next
     End Sub
 End Class
@@ -862,7 +860,7 @@ Public Class Contour_PrepData : Inherits VB_Algorithm
         redCells.Clear()
         redCells.Add(New rcData)
         cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        For i = 0 To Math.Min(contour.sortedList.Count, contour.options.maxContourCount) - 1
+        For i = 0 To contour.sortedList.Count - 1
             Dim tour = contour.allContours(contour.sortedList.ElementAt(i).Value)
             Dim rc As New rcData
             Dim px As New List(Of Integer)

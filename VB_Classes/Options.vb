@@ -168,7 +168,7 @@ Public Class Options_Contours : Inherits VB_Algorithm
     Public epsilon As Single = 3 / 100
     Public minPixels As Integer = 30
     Public cmPerTier As Integer = 50
-    Public maxContourCount As Integer = 50
+    Dim maxContourCount As Integer = 50
     Dim options2 As New Options_Contours2
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -182,7 +182,7 @@ Public Class Options_Contours : Inherits VB_Algorithm
 
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("cm's per tier", 10, 200, cmPerTier)
-            sliders.setupTrackBar("Contour epsilon (arc length percent)", 0, 100, epsilon * 100)
+            ' sliders.setupTrackBar("Contour epsilon (arc length percent)", 0, 100, epsilon * 100)
             sliders.setupTrackBar("Min Pixels", 1, 2000, minPixels)
             sliders.setupTrackBar("Max contours", 1, 200, maxContourCount)
         End If
@@ -190,12 +190,12 @@ Public Class Options_Contours : Inherits VB_Algorithm
     Public Sub RunVB()
         options2.RunVB()
         Static cmSlider = findSlider("cm's per tier")
-        Static epsilonSlider = findSlider("Contour epsilon (arc length percent)")
+        ' Static epsilonSlider = findSlider("Contour epsilon (arc length percent)")
         Static minSlider = findSlider("Min Pixels")
         Static countSlider = findSlider("Max contours")
         maxContourCount = countSlider.value
 
-        epsilon = epsilonSlider.Value / 100
+        ' epsilon = epsilonSlider.Value / 100
 
         Static frm = findfrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1

@@ -595,7 +595,7 @@ Public Class VBtask : Implements IDisposable
                     task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
 
                     task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-                    task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+                    'task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
                 End If
 
                 task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
