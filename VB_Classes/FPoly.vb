@@ -107,13 +107,13 @@ Public Class FPoly_Sides : Inherits VB_Algorithm
     Public currSideIndex As Integer
     Public currLengths As New List(Of Single)
     Public currFLineLen As Single
-    Public mpCurr As linePoints
+    Public mpCurr As linePoint
 
     Public prevPoly As New List(Of cv.Point2f)
     Public prevSideIndex As Integer
     Public prevLengths As New List(Of Single)
     Public prevFLineLen As Single
-    Public mpPrev As linePoints
+    Public mpPrev As linePoint
 
     Public prevImage As cv.Mat
 
@@ -155,8 +155,8 @@ Public Class FPoly_Sides : Inherits VB_Algorithm
             prevSideIndex = prevLengths.IndexOf(prevLengths.Max)
         End If
 
-        mpPrev = New linePoints(prevPoly(prevSideIndex), prevPoly((prevSideIndex + 1) Mod task.polyCount))
-        mpCurr = New linePoints(currPoly(currSideIndex), currPoly((currSideIndex + 1) Mod task.polyCount))
+        mpPrev = New linePoint(prevPoly(prevSideIndex), prevPoly((prevSideIndex + 1) Mod task.polyCount))
+        mpCurr = New linePoint(currPoly(currSideIndex), currPoly((currSideIndex + 1) Mod task.polyCount))
 
         prevFLineLen = mpPrev.p1.DistanceTo(mpPrev.p2)
         currFLineLen = mpCurr.p1.DistanceTo(mpCurr.p2)
@@ -164,15 +164,15 @@ Public Class FPoly_Sides : Inherits VB_Algorithm
         Dim d1 = mpPrev.p1.DistanceTo(mpCurr.p1)
         Dim d2 = mpPrev.p2.DistanceTo(mpCurr.p2)
 
-        Dim newNear As linePoints
+        Dim newNear As linePoint
         If d1 < d2 Then
             centerShift = New cv.Point2f(mpPrev.p1.X - mpCurr.p1.X, mpPrev.p1.Y - mpCurr.p1.Y)
             rotateCenter = mpPrev.p1
-            newNear = New linePoints(mpPrev.p2, mpCurr.p2)
+            newNear = New linePoint(mpPrev.p2, mpCurr.p2)
         Else
             centerShift = New cv.Point2f(mpPrev.p2.X - mpCurr.p2.X, mpPrev.p2.Y - mpCurr.p2.Y)
             rotateCenter = mpPrev.p2
-            newNear = New linePoints(mpPrev.p1, mpCurr.p1)
+            newNear = New linePoint(mpPrev.p1, mpCurr.p1)
         End If
 
         Dim transPoly As New List(Of cv.Point2f)
@@ -526,7 +526,7 @@ Public Class FPoly_StartPoints : Inherits VB_Algorithm
 
         dst0.SetTo(255)
         If standaloneTest() Then dst1.SetTo(0)
-        Dim mpList As New List(Of linePoints)
+        Dim mpList As New List(Of linePoint)
         goodPoints = New List(Of cv.Point2f)(fGrid.goodPoints)
         Dim facet As New List(Of cv.Point)
         Dim usedGood As New List(Of Integer)
@@ -539,7 +539,7 @@ Public Class FPoly_StartPoints : Inherits VB_Algorithm
                 facet = facets(startPoint)
                 dst0.FillConvexPoly(facet, startPoint, cv.LineTypes.Link4)
                 If standaloneTest() Then dst1.FillConvexPoly(facet, task.scalarColors(startPoint), task.lineType)
-                mpList.Add(New linePoints(startPoints(startPoint), pt))
+                mpList.Add(New linePoint(startPoints(startPoint), pt))
             End If
         Next
 
@@ -1101,15 +1101,15 @@ Public Class FPoly_Center : Inherits VB_Algorithm
         Dim mp2 = fPD.prevmp()
         Dim d1 = mp1.p1.DistanceTo(mp2.p1)
         Dim d2 = mp1.p2.DistanceTo(mp2.p2)
-        Dim newNear As linePoints
+        Dim newNear As linePoint
         If d1 < d2 Then
             fPD.centerShift = New cv.Point2f(mp1.p1.X - mp2.p1.X, mp1.p1.Y - mp2.p1.Y)
             fPD.rotateCenter = mp1.p1
-            newNear = New linePoints(mp1.p2, mp2.p2)
+            newNear = New linePoint(mp1.p2, mp2.p2)
         Else
             fPD.centerShift = New cv.Point2f(mp1.p2.X - mp2.p2.X, mp1.p2.Y - mp2.p2.Y)
             fPD.rotateCenter = mp1.p2
-            newNear = New linePoints(mp1.p1, mp2.p1)
+            newNear = New linePoint(mp1.p1, mp2.p1)
         End If
 
         Dim transPoly As New List(Of cv.Point2f)

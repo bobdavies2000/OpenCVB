@@ -250,7 +250,7 @@ Public Class Match_Lines : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         lines.Run(src)
         dst2 = lines.dst2
-        Static lastPt As New List(Of linePoints)(lines.mpList)
+        Static lastPt As New List(Of linePoint)(lines.mpList)
 
         knn.queries.Clear()
         For Each mps In lines.mpList
@@ -273,7 +273,7 @@ Public Class Match_Lines : Inherits VB_Algorithm
         Next
 
         knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
-        lastPt = New List(Of linePoints)(lines.mpList)
+        lastPt = New List(Of linePoint)(lines.mpList)
     End Sub
 End Class
 

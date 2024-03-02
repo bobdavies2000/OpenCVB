@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class KNN_Basics : Inherits VB_Algorithm
-    Public matches As New List(Of linePoints)
+    Public matches As New List(Of linePoint)
     Public noMatch As New List(Of cv.Point)
     Public knn As New KNN_Core
     Public queries As New List(Of cv.Point2f)
@@ -65,7 +65,7 @@ Public Class KNN_Basics : Inherits VB_Algorithm
                 noMatch.Add(pt)
             Else
                 Dim nn = knn.trainInput(neighbors(i))
-                matches.Add(New linePoints(pt, nn))
+                matches.Add(New linePoint(pt, nn))
                 dst3.Line(nn, pt, cv.Scalar.White, task.lineWidth, task.lineType)
             End If
         Next
@@ -725,7 +725,7 @@ End Class
 
 Public Class KNN_ClosestTracker : Inherits VB_Algorithm
     Public lines As New Line_Basics
-    Public lastPair As New linePoints
+    Public lastPair As New linePoint
     Public trainInput As New List(Of cv.Point2f)
     Public Sub New()
         labels = {"", "", "Highlight the tracked line", "Candidate lines - standaloneTest() only"}
@@ -758,7 +758,7 @@ Public Class KNN_ClosestTracker : Inherits VB_Algorithm
             Exit Sub
         End If
 
-        If lastPair.compare(New linePoints) Then lastPair = New linePoints(p1, p2)
+        If lastPair.compare(New linePoint) Then lastPair = New linePoint(p1, p2)
         Dim distances As New List(Of Single)
         For i = 0 To trainInput.Count - 1 Step 2
             Dim pt1 = trainInput(i)
@@ -776,12 +776,12 @@ Public Class KNN_ClosestTracker : Inherits VB_Algorithm
             If minDist > minDistances.Max * 2 Then
                 Console.WriteLine("Overriding KNN min Distance Rule = " + Format(minDist, fmt0) + " max = " + Format(minDistances.Max, fmt0))
                 myHighLightColor = If(myHighLightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
-                lastPair = New linePoints(trainInput(0), trainInput(1))
+                lastPair = New linePoint(trainInput(0), trainInput(1))
             Else
-                lastPair = New linePoints(p1, p2)
+                lastPair = New linePoint(p1, p2)
             End If
         Else
-            lastPair = New linePoints(p1, p2)
+            lastPair = New linePoint(p1, p2)
         End If
 
         If minDist > 0 Then minDistances.Add(minDist)
@@ -903,7 +903,7 @@ End Class
 
 
 Public Class KNN_BasicsOld : Inherits VB_Algorithm
-    Public matches As New List(Of linePoints)
+    Public matches As New List(Of linePoint)
     Public noMatch As New List(Of cv.Point)
     Public knn As New KNN_Core
     Public queries As New List(Of cv.Point2f)
@@ -981,7 +981,7 @@ Public Class KNN_BasicsOld : Inherits VB_Algorithm
             Else
                 If nearest(i) < knn.trainInput.Count Then ' there seems like a boundary condition when there is only 1 traininput...
                     Dim nn = knn.trainInput(nearest(i))
-                    matches.Add(New linePoints(pt, nn))
+                    matches.Add(New linePoint(pt, nn))
                     dst3.Line(nn, pt, cv.Scalar.White, task.lineWidth, task.lineType)
                 End If
             End If
@@ -1017,11 +1017,11 @@ Public Class KNN_Farthest : Inherits VB_Algorithm
 
         dst2.SetTo(0)
         dst3.SetTo(0)
-        Dim farthest = New List(Of linePoints)
+        Dim farthest = New List(Of linePoint)
         Dim distances As New List(Of Single)
         For i = 0 To knn.result.GetUpperBound(0) - 1
             Dim farIndex = knn.result(i, knn.result.GetUpperBound(1))
-            Dim mp = New linePoints(knn.queries(i), knn.trainInput(farIndex))
+            Dim mp = New linePoint(knn.queries(i), knn.trainInput(farIndex))
             dst2.Circle(mp.p1, task.dotSize + 4, cv.Scalar.Yellow, -1, task.lineType)
             dst2.Circle(mp.p2, task.dotSize + 4, cv.Scalar.Yellow, -1, task.lineType)
             dst2.Line(mp.p1, mp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
@@ -1050,7 +1050,7 @@ End Class
 Public Class KNN_TrackEach : Inherits VB_Algorithm
     Dim knn As New KNN_Basics
     Dim feat As New Feature_Basics
-    Dim trackAll As New List(Of List(Of linePoints))
+    Dim trackAll As New List(Of List(Of linePoint))
     Public Sub New()
         desc = "Track each good feature with KNN and match the goodFeatures from frame to frame"
     End Sub
@@ -1064,7 +1064,7 @@ Public Class KNN_TrackEach : Inherits VB_Algorithm
         knn.queries = New List(Of cv.Point2f)(feat.featurePoints)
         knn.Run(src)
 
-        Dim tracker As New List(Of linePoints)
+        Dim tracker As New List(Of linePoint)
         dst2 = src.Clone
         For Each mp In knn.matches
             If mp.p1.DistanceTo(mp.p2) < minDistance Then tracker.Add(mp)

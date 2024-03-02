@@ -123,7 +123,7 @@ struct sortInt
     }
 };
 
-class linePoints {
+class linePoint {
 public:
     Point2f p1;
     Point2f p2;
@@ -131,14 +131,14 @@ public:
     float yIntercept;
     static constexpr float verticalSlope = 1000000.0f;  // Using constexpr for constant
 
-    linePoints(const Point2f& _p1, const Point2f& _p2) : p1(_p1), p2(_p2) {
+    linePoint(const Point2f& _p1, const Point2f& _p2) : p1(_p1), p2(_p2) {
         slope = (p1.x != p2.x) ? (p1.y - p2.y) / (p1.x - p2.x) : verticalSlope;
         yIntercept = p1.y - slope * p1.x;
     }
 
-    linePoints() : p1(), p2() {}  // Default constructor
+    linePoint() : p1(), p2() {}  // Default constructor
 
-    bool compare(const linePoints& mp) const {  // Using const for non-modifying methods
+    bool compare(const linePoint& mp) const {  // Using const for non-modifying methods
         return mp.p1 == p1 && mp.p2 == p2;
     }
 };

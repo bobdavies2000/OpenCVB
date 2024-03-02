@@ -531,7 +531,7 @@ End Structure
 
 
 
-Public Class linePoints
+Public Class linePoint
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
     Public slope As Single
@@ -548,7 +548,7 @@ Public Class linePoints
         p1 = New cv.Point2f()
         p2 = New cv.Point2f()
     End Sub
-    Public Function compare(mp As linePoints) As Boolean
+    Public Function compare(mp As linePoint) As Boolean
         If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
         Return False
     End Function
@@ -652,12 +652,12 @@ Public Class fPolyData
         prevPoly = New List(Of cv.Point2f)(currPoly)
         jitterCheck.SetTo(0)
     End Sub
-    Public Function prevmp() As linePoints
-        Return New linePoints(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod task.polyCount))
+    Public Function prevmp() As linePoint
+        Return New linePoint(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod task.polyCount))
     End Function
-    Public Function currmp() As linePoints
+    Public Function currmp() As linePoint
         If polyPrevSideIndex >= currPoly.Count - 1 Then polyPrevSideIndex = 0
-        Return New linePoints(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount))
+        Return New linePoint(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount))
     End Function
     Public Sub drawPolys(dst As cv.Mat, currPoly As List(Of cv.Point2f))
         vbDrawFPoly(dst, prevPoly, cv.Scalar.White)

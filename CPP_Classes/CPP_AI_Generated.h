@@ -544,7 +544,7 @@ class CPP_KNN_Basics : public algorithmCPP
 {
 private:
 public:
-    vector<linePoints> matches;
+    vector<linePoint> matches;
     vector<Point> noMatch;
     CPP_KNN_Core* basics;
     vector<Point2f> queries;
@@ -670,7 +670,7 @@ public:
 
         vector<int> usedG;
         int g;
-        for (const linePoints& mp : knn->matches) {
+        for (const linePoint& mp : knn->matches) {
             int index = facet->facet32s.at<int>(mp.p2.y, mp.p2.x);
             if (index >= facet->facetlist.size()) continue;
             const vector<Point>& nextFacet = facet->facetlist[index];
@@ -2120,7 +2120,7 @@ class CPP_Line_Basics : public algorithmCPP {
 public: 
     Ptr<ximgproc::FastLineDetector> ld;
     map<float, int> sortLength;
-    vector<linePoints> mpList;
+    vector<linePoint> mpList;
     vector<Point2f> ptList;
     Rect subsetRect;
     int options_lineLengthThreshold = 20;
@@ -2155,7 +2155,7 @@ public:
                 0 <= x2 && x2 < dst2.cols && 0 <= y2 && y2 < dst2.rows) {
                 Point p1(x1, y1), p2(x2, y2);
                 if (norm(p1 - p2) >= options_lineLengthThreshold) {
-                    linePoints mps(p1, p2);
+                    linePoint mps(p1, p2);
                     mpList.push_back(mps);
                     ptList.push_back(p1);
                     ptList.push_back(p2);
@@ -2168,7 +2168,7 @@ public:
         dst2 = src.clone();
         dst3.setTo(0);
         for (const auto& nextLine : sortLength) {
-            const linePoints& mps = mpList[nextLine.second];
+            const linePoint& mps = mpList[nextLine.second];
             line(dst2, mps.p1, mps.p2, Scalar(255, 255, 255), task->lineWidth, task->lineType);
             line(dst3, mps.p1, mps.p2, 255, task->lineWidth, task->lineType);
         }

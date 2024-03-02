@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits VB_Algorithm
     Dim ld As cv.XImgProc.FastLineDetector
     Public sortLength As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
-    Public mpList As New List(Of linePoints)
+    Public mpList As New List(Of linePoint)
     Public ptList As New List(Of cv.Point2f)
     Public options As New Options_Line
     Public skipDistanceCheck As Boolean
@@ -34,7 +34,7 @@ Public Class Line_Basics : Inherits VB_Algorithm
                 Dim p1 = New cv.Point(v(0) + subsetRect.X, v(1) + subsetRect.Y)
                 Dim p2 = New cv.Point(v(2) + subsetRect.X, v(3) + subsetRect.Y)
                 If p1.DistanceTo(p2) >= options.lineLengthThreshold Or skipDistanceCheck Then
-                    Dim mps = New linePoints(p1, p2)
+                    Dim mps = New linePoint(p1, p2)
                     mpList.Add(mps)
                     ptList.Add(p1)
                     ptList.Add(p2)
@@ -282,19 +282,19 @@ Public Class Line_LeftRightImages : Inherits VB_Algorithm
 
         If task.cameraStable = False Then dst2.SetTo(cv.Scalar.White)
 
-        leftLines.Run(task.leftview)
+        leftLines.Run(task.leftView)
         dst2.SetTo(cv.Scalar.White)
         dst2.SetTo(cv.Scalar.Red, leftLines.dst3)
 
-        rightLines.Run(task.rightview)
+        rightLines.Run(task.rightView)
         dst2.SetTo(cv.Scalar.Blue, rightLines.dst3)
 
         If rgbCheck.checked Then
             rgbLines.Run(src)
             dst2.SetTo(cv.Scalar.Green, rgbLines.dst3)
         End If
-        dst0 = task.leftview
-        dst1 = task.rightview
+        dst0 = task.leftView
+        dst1 = task.rightView
     End Sub
 End Class
 
@@ -512,7 +512,7 @@ Public Class Line_PointSlope : Inherits VB_Algorithm
     Dim extend As New LongLine_Extend
     Dim lines As New Line_Basics
     Dim knn As New KNN_CoreN
-    Public bestLines As New List(Of linePoints)
+    Public bestLines As New List(Of linePoint)
     Const lineCount As Integer = 3
     Const searchCount As Integer = 100
     Public Sub New()
@@ -525,7 +525,7 @@ Public Class Line_PointSlope : Inherits VB_Algorithm
         lines.Run(src)
         dst2 = src
 
-        Dim bestInput = New List(Of linePoints)
+        Dim bestInput = New List(Of linePoint)
         Dim index As Integer
         For i = 0 To Math.Min(searchCount, lines.sortLength.Count) - 1
             index = lines.sortLength.ElementAt(i).Value
@@ -562,7 +562,7 @@ Public Class Line_PointSlope : Inherits VB_Algorithm
 
         knn.Run(empty)
 
-        Dim nextLines As New List(Of linePoints)
+        Dim nextLines As New List(Of linePoint)
         Dim usedBest As New List(Of Integer)
         For i = 0 To knn.result.GetUpperBound(0)
             For j = 0 To knn.result.GetUpperBound(1)
@@ -572,14 +572,14 @@ Public Class Line_PointSlope : Inherits VB_Algorithm
             usedBest.Add(index)
 
             If index * knn.knnDimension < knn.trainInput.Count Then
-                Dim mps = New linePoints(New cv.Point2f(knn.trainInput(index * knn.knnDimension + 1), knn.trainInput(index * knn.knnDimension + 2)),
+                Dim mps = New linePoint(New cv.Point2f(knn.trainInput(index * knn.knnDimension + 1), knn.trainInput(index * knn.knnDimension + 2)),
                           New cv.Point2f(knn.trainInput(index * knn.knnDimension + 3), knn.trainInput(index * knn.knnDimension + 4)))
                 mps.slope = knn.trainInput(index * knn.knnDimension)
                 nextLines.Add(mps)
             End If
         Next
 
-        bestLines = New List(Of linePoints)(nextLines)
+        bestLines = New List(Of linePoint)(nextLines)
         For Each ptS In bestLines
             dst2.Line(ptS.p1, ptS.p2, task.highlightColor, task.lineWidth, task.lineType)
             dst1.Line(ptS.p1, ptS.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
@@ -599,7 +599,7 @@ End Class
 
 Public Class Line_TimeViewLines : Inherits VB_Algorithm
     Dim lines As New Line_TimeView
-    Public mpList As New List(Of linePoints)
+    Public mpList As New List(Of linePoint)
     Public Sub New()
         labels(2) = "Lines from the latest Line_TimeLine"
         labels(3) = "Lines (green) Vertical (blue) Horizontal (Red)"
@@ -618,7 +618,7 @@ Public Class Line_TimeViewLines : Inherits VB_Algorithm
             Dim mps = lines.lines.mpList(sl.Value)
             dst3.Line(mps.p1, mps.p2, cv.Scalar.Green, task.lineWidth, task.lineType)
             mpList.Add(mps)
-            If mps.slope = linePoints.verticalSlope Then
+            If mps.slope = linePoint.verticalSlope Then
                 dst3.Line(mps.p1, mps.p2, cv.Scalar.Blue, task.lineWidth + task.lineWidth, task.lineType)
             Else
                 If mps.slope = 0 Then
@@ -636,10 +636,10 @@ End Class
 
 
 Public Class Line_TimeView : Inherits VB_Algorithm
-    Public frameList As New List(Of List(Of linePoints))
+    Public frameList As New List(Of List(Of linePoint))
     Public lines As New Line_Basics
     Public pixelcount As Integer
-    Public mpList As New List(Of linePoints)
+    Public mpList As New List(Of linePoint)
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines over time"
@@ -648,7 +648,7 @@ Public Class Line_TimeView : Inherits VB_Algorithm
         lines.Run(src)
 
         If task.optionsChanged Or task.motionFlag Then frameList.Clear()
-        Dim nextMpList = New List(Of linePoints)(lines.mpList)
+        Dim nextMpList = New List(Of linePoint)(lines.mpList)
         frameList.Add(nextMpList)
 
         dst2 = src

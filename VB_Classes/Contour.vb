@@ -937,7 +937,8 @@ Public Class Contour_DepthTiers : Inherits VB_Algorithm
             End If
         Next
 
-        dst2.SetTo(1, dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)) ' no zeros...
+        dst2.SetTo(1, dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
+
         classCount = task.maxZmeters * 100 / options.cmPerTier
 
         If standaloneTest() Then dst3 = vbPalette(dst2 * 255 / classCount)
