@@ -2531,19 +2531,13 @@ Public Class RedCloud_Masks : Inherits VB_Algorithm
         End If
 
         Dim imagePtr As IntPtr
+        Dim inputData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
         If inputMask Is Nothing Then
-            Dim inputData(src.Total - 1) As Byte
-            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
             imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols,
                                      src.Type, redOptions.DesiredCellSlider.Value, 0, imageThresholdPercent, cellMinPercent)
-            handleInput.Free()
         Else
-            Dim inputData(src.Total - 1) As Byte
-            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
             Dim maskData(inputMask.Total - 1) As Byte
             Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
             Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
@@ -2551,8 +2545,8 @@ Public Class RedCloud_Masks : Inherits VB_Algorithm
             imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols,
                                     src.Type, redOptions.DesiredCellSlider.Value, 0, imageThresholdPercent, cellMinPercent)
             handleMask.Free()
-            handleInput.Free()
         End If
+        handleInput.Free()
 
         classCount = RedCloud_Count(cPtr)
         If classCount = 0 Then Exit Sub ' no data to process.

@@ -168,6 +168,7 @@ Public Class Options_Contours : Inherits VB_Algorithm
     Public epsilon As Single = 3 / 100
     Public minPixels As Integer = 30
     Public cmPerTier As Integer = 50
+    Public trueTextOffset As Integer = 80
     Dim maxContourCount As Integer = 50
     Dim options2 As New Options_Contours2
     Public Sub New()
@@ -185,6 +186,7 @@ Public Class Options_Contours : Inherits VB_Algorithm
             ' sliders.setupTrackBar("Contour epsilon (arc length percent)", 0, 100, epsilon * 100)
             sliders.setupTrackBar("Min Pixels", 1, 2000, minPixels)
             sliders.setupTrackBar("Max contours", 1, 200, maxContourCount)
+            sliders.setupTrackBar("TrueText offset", 1, dst2.Width / 3, trueTextOffset)
         End If
     End Sub
     Public Sub RunVB()
@@ -193,6 +195,7 @@ Public Class Options_Contours : Inherits VB_Algorithm
         ' Static epsilonSlider = findSlider("Contour epsilon (arc length percent)")
         Static minSlider = findSlider("Min Pixels")
         Static countSlider = findSlider("Max contours")
+        Static offsetSlider = findSlider("TrueText offset")
         maxContourCount = countSlider.value
 
         ' epsilon = epsilonSlider.Value / 100
@@ -209,6 +212,7 @@ Public Class Options_Contours : Inherits VB_Algorithm
         ApproximationMode = options2.ApproximationMode
         minPixels = minSlider.value
         cmPerTier = cmSlider.value
+        trueTextOffset = offsetSlider.value
     End Sub
 End Class
 
