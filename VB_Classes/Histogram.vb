@@ -1167,9 +1167,7 @@ Public Class Histogram_Depth : Inherits VB_Algorithm
             plot.maxRange = mm.maxVal
         End If
 
-        cv.Cv2.CalcHist({src}, {0}, New cv.Mat, histogram, 1, {task.histogramBins},
-                        {New cv.Rangef(plot.minRange, plot.maxRange)})
-        ' plot.histogram.Row(0).Set(Of Single)(0, 0, 0)
+        cv.Cv2.CalcHist({src}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, {New cv.Rangef(plot.minRange, plot.maxRange)})
 
         plot.histogram = histogram
         plot.Run(plot.histogram)

@@ -934,7 +934,7 @@ End Class
 
 
 Public Class Edge_Regions : Inherits VB_Algorithm
-    Dim tiers As New Depth_Tiers
+    Dim tiers As New Depth_TiersZ
     Dim edge As New Edge_Canny
     Public Sub New()
         findSlider("Canny threshold2").Value = 30
@@ -1386,5 +1386,29 @@ Public Class Edge_Motion : Inherits VB_Algorithm
         dst2 = diff.dst3
         dst3 = dst2 And edges.dst2
         If task.quarterBeat Then labels(3) = $"{dst3.CountNonZero} pixels overlap between Sobel edges and diff with last Sobel edges."
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Edge_NoDepth : Inherits VB_Algorithm
+    Dim edges As New Edge_Sobel
+    Dim blur As New Blur_Basics
+    Public Sub New()
+        desc = "Find the edges in regions without depth."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        src = vbPalette(src)
+        edges.Run(src)
+
+        dst2.SetTo(0)
+        blur.Run(task.noDepthMask)
+        edges.dst2.CopyTo(dst2, blur.dst2)
+        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class

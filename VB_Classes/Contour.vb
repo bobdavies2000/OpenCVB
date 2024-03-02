@@ -897,9 +897,9 @@ End Class
 
 
 
+
 Public Class Contour_DepthTiers : Inherits VB_Algorithm
     Public options As New Options_Contours
-    Public contourlist As New List(Of cv.Point())
     Public classCount As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -926,18 +926,19 @@ Public Class Contour_DepthTiers : Inherits VB_Algorithm
         Next
 
         dst2.SetTo(0)
-        contourlist.Clear()
+        Dim contourlist As New List(Of cv.Point())
         For i = 0 To sortedList.Count - 1
             Dim tour = allContours(sortedList.ElementAt(i).Value)
             Dim val = dst2.Get(Of Byte)(tour(0).Y, tour(0).X)
             If val = 0 Then
+                Dim index = dst1.Get(Of Integer)(tour(0).Y, tour(0).X)
                 contourlist.Add(tour)
-                vbDrawContour(dst2, tour.ToList, i + 1, -1)
+                vbDrawContour(dst2, tour.ToList, index, -1)
             End If
         Next
 
         dst2.SetTo(1, dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)) ' no zeros...
-        classCount = contourlist.Count
+        classCount = task.maxZmeters * 100 / options.cmPerTier
 
         If standaloneTest() Then dst3 = vbPalette(dst2 * 255 / classCount)
         labels(3) = $"All depth pixels are assigned a tier with {classCount} contours."

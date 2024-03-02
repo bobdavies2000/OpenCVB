@@ -1399,3 +1399,28 @@ Public Class Line_FromContours : Inherits VB_Algorithm
         Next
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Line_NoDepth : Inherits VB_Algorithm
+    Dim lines As New Line_Basics
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Find any lines in regions without depth."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        lines.Run(src)
+        dst3 = lines.dst3
+        dst2.SetTo(0)
+        For Each mp In lines.mpList
+            Dim p1 = task.noDepthMask.Get(Of Byte)(mp.p1.Y, mp.p1.X)
+            If p1 > 0 Then
+                dst2.Line(mp.p1, mp.p2, 255, task.lineWidth, task.lineType)
+            End If
+        Next
+
+    End Sub
+End Class

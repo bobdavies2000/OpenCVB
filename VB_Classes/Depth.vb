@@ -1551,7 +1551,7 @@ End Class
 
 
 
-Public Class Depth_Tiers : Inherits VB_Algorithm
+Public Class Depth_TiersZ : Inherits VB_Algorithm
     Public classCount As Integer
     Dim options As New Options_Contours
     Public Sub New()
@@ -1569,5 +1569,6 @@ Public Class Depth_Tiers : Inherits VB_Algorithm
         classCount = task.maxZmeters * 100 / cmTier
 
         dst3 = vbPalette(dst2 * 255 / classCount)
+        labels(2) = $"{classCount} regions found."
     End Sub
 End Class

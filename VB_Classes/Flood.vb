@@ -352,7 +352,7 @@ End Class
 
 Public Class Flood_TierTest : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
-    Dim tiers As New Depth_Tiers
+    Dim tiers As New Depth_TiersZ
     Public Sub New()
         desc = "Add depth tiers to the 8uc1 input to flood_basics"
     End Sub

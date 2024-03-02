@@ -361,25 +361,25 @@ End Class
 
 
 Public Class Binarize_DepthTiers : Inherits VB_Algorithm
-    Dim tiersCM As New Depth_Tiers
+    Dim tiers As New Depth_TiersZ
     Dim binar4 As New Binarize_Split4
     Public classCount = 200 ' 4-way split with 50 depth levels at 10 cm's each.
     Public Sub New()
         redOptions.UseColor.Checked = True
-        desc = "Add the Depth_Tiers and binarize_Split4 output in preparation for RedCloud"
+        desc = "Add the Depth_TiersZ and binarize_Split4 output in preparation for RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binar4.Run(src)
-        tiersCM.Run(src)
-        dst3 = tiersCM.dst3
+        tiers.Run(src)
+        dst3 = tiers.dst3
 
-        dst0 = tiersCM.dst2 + binar4.dst2
+        dst0 = tiers.dst2 + binar4.dst2
 
         If task.heartBeat Then
             dst2 = dst0.Clone
         ElseIf task.motionDetected Then
             dst0(task.motionRect).CopyTo(dst2(task.motionRect))
         End If
-        classCount = binar4.classCount + tiersCM.classCount
+        classCount = binar4.classCount + tiers.classCount
     End Sub
 End Class
