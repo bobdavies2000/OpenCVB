@@ -142,7 +142,7 @@ Public Class Line_Intercepts : Inherits VB_Algorithm
     Public lines As New Line_Basics
     Public p1List As New List(Of cv.Point2f)
     Public p2List As New List(Of cv.Point2f)
-    Dim extend As New LongLine_Extend
+    Dim longLine As New LongLine_Basics
     Public options As New Options_Intercepts
     Public intercept As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public topIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
@@ -206,7 +206,7 @@ Public Class Line_Intercepts : Inherits VB_Algorithm
 
             Dim saveP1 = mps.p1, saveP2 = mps.p2
 
-            Dim emps = extend.buildELine(mps, dst2.Width, dst2.Height)
+            Dim emps = longLine.buildELine(mps, dst2.Width, dst2.Height)
             If emps.p1.X = 0 Then leftIntercepts.Add(saveP1.Y, i)
             If emps.p1.Y = 0 Then topIntercepts.Add(saveP1.X, i)
             If emps.p1.X = dst2.Width Then rightIntercepts.Add(saveP1.Y, i)
@@ -1397,30 +1397,5 @@ Public Class Line_FromContours : Inherits VB_Algorithm
         For Each mp In lines.mpList
             dst3.Line(mp.p1, mp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
         Next
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Line_NoDepth : Inherits VB_Algorithm
-    Dim lines As New Line_Basics
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Find any lines in regions without depth."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        lines.Run(src)
-        dst3 = lines.dst3
-        dst2.SetTo(0)
-        For Each mp In lines.mpList
-            Dim p1 = task.noDepthMask.Get(Of Byte)(mp.p1.Y, mp.p1.X)
-            If p1 > 0 Then
-                dst2.Line(mp.p1, mp.p2, 255, task.lineWidth, task.lineType)
-            End If
-        Next
-
     End Sub
 End Class
