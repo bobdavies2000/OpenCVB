@@ -60,23 +60,21 @@ Public Class Contour_General : Inherits VB_Algorithm
         desc = "General purpose contour finder"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst0 = src.Clone
         If standalone Then
             Static rotatedRect As New Rectangle_Rotated
             If task.heartBeat = False Then Exit Sub
             rotatedRect.Run(src)
-            dst0 = rotatedRect.dst2
-            dst0 = dst0.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst2 = rotatedRect.dst2
+            dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
-            If src.Channels = 3 Then dst0 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src
         End If
 
-        dst2 = dst0.Clone
-        If dst0.Type = cv.MatType.CV_8U Then
-            cv.Cv2.FindContours(dst0, allContours, Nothing, cv.RetrievalModes.External,
+        If dst2.Type = cv.MatType.CV_8U Then
+            cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.External,
                             cv.ContourApproximationModes.ApproxTC89KCOS)
         Else
-            If dst0.Type <> cv.MatType.CV_32S Then dst0.ConvertTo(dst2, cv.MatType.CV_32S)
+            If dst2.Type <> cv.MatType.CV_32S Then dst2.ConvertTo(dst2, cv.MatType.CV_32S)
             cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.FloodFill,
                             cv.ContourApproximationModes.ApproxTC89KCOS)
         End If
