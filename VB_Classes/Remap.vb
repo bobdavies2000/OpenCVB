@@ -76,3 +76,17 @@ End Class
 
 
 
+
+
+
+Public Class Flip_Basics : Inherits VB_Algorithm
+    Dim flip As New Remap_Flip
+    Public Sub New()
+        desc = "Placeholder to make it easy to remember 'Remap'."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        flip.Run(src)
+        dst2 = flip.dst2
+        labels = flip.labels
+    End Sub
+End Class

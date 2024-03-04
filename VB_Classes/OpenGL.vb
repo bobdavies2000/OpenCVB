@@ -326,40 +326,6 @@ End Class
 
 
 
-Public Class OpenGL_World : Inherits VB_Algorithm
-    ReadOnly world As New Depth_World
-    Public Sub New()
-        task.ogl.oglFunction = oCase.pointCloudAndRGB
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Use Generated Pointcloud")
-            radio.addRadio("Use Pointcloud from camera")
-            radio.check(0).Checked = True
-        End If
-
-        labels = {"", "", "Generated Pointcloud", ""}
-        desc = "Display the generated point cloud in OpenGL"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static generatedRadio = findRadio("Use Generated Pointcloud")
-
-        If generatedRadio.checked Then
-            world.Run(src)
-            task.ogl.pointCloudInput = world.dst2
-        Else
-            task.ogl.pointCloudInput = If(src.Type = cv.MatType.CV_32FC3, src, task.pointCloud)
-        End If
-
-        task.ogl.Run(task.color)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class OpenGL_VerticalSingle : Inherits VB_Algorithm
     ReadOnly vLine As New Feature_LongestV_Tutorial2
@@ -2071,5 +2037,61 @@ Public Class OpenGL_SoloPointsRemoved : Inherits VB_Algorithm
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
         setTrueText("You should see the difference in the OpenGL window as the solo points are toggled on an off.", 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpenGL_AverageInColor : Inherits VB_Algorithm
+    Dim cloud As New Depth_AverageInColor
+    Public Sub New()
+        desc = "Show what the point cloud looks like with a complete depth image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        cloud.Run(src)
+        dst2 = cloud.dst2
+        dst3 = cloud.dst3
+
+        task.ogl.pointCloudInput = dst3
+        src(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
+        task.ogl.Run(src)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OpenGL_World : Inherits VB_Algorithm
+    ReadOnly world As New Depth_World
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Use Generated Pointcloud")
+            radio.addRadio("Use Pointcloud from camera")
+            radio.check(0).Checked = True
+        End If
+
+        labels = {"", "", "Generated Pointcloud", ""}
+        desc = "Display the generated point cloud in OpenGL"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static generatedRadio = findRadio("Use Generated Pointcloud")
+
+        If generatedRadio.checked Then
+            world.Run(src)
+            task.ogl.pointCloudInput = world.dst2
+        Else
+            task.ogl.pointCloudInput = If(src.Type = cv.MatType.CV_32FC3, src, task.pointCloud)
+        End If
+
+        task.ogl.Run(task.color)
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class

@@ -1,6 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Imports System.Threading
+Imports VB_Classes
 
 Module OakD_Module_CPP
     <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDOpen(width As Integer, height As Integer) As IntPtr
@@ -75,6 +76,9 @@ Public Class CameraOakD : Inherits Camera
                 templateY.Set(Of Single)(i, 0, i)
             Next
 
+            For i = 0 To templateX.Height - 1
+            Next
+
             For i = 1 To templateY.Width - 1
                 templateY.Col(0).CopyTo(templateY.Col(i))
             Next
@@ -115,6 +119,7 @@ Public Class CameraOakD : Inherits Camera
                 mbuf(mbIndex).leftView = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_8U, OakDLeftImage(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 mbuf(mbIndex).rightView = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_8U, OakDRightImage(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             End If
+
             ' the Oak-D cameras do not produce a point cloud - update if that changes.
             Dim d32f As cv.Mat = depth32f * 0.001
             Dim worldX As New cv.Mat, worldY As New cv.Mat
@@ -128,7 +133,7 @@ Public Class CameraOakD : Inherits Camera
             Dim pc As New cv.Mat
             cv.Cv2.Merge({worldX, worldY, d32f}, pc)
             If workingRes = captureRes Then
-                mbuf(mbIndex).pointCloud = pc.Clone
+                mbuf(mbIndex).pointCloud = pc
             Else
                 mbuf(mbIndex).pointCloud = pc.Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If

@@ -901,6 +901,7 @@ End Class
 Public Class Contour_DepthTiers : Inherits VB_Algorithm
     Public options As New Options_Contours
     Public classCount As Integer
+    Public contourlist As New List(Of cv.Point())
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         findRadio("FloodFill").Checked = True
@@ -926,7 +927,7 @@ Public Class Contour_DepthTiers : Inherits VB_Algorithm
         Next
 
         dst2.SetTo(0)
-        Dim contourlist As New List(Of cv.Point())
+        contourlist.Clear()
         For i = 0 To sortedList.Count - 1
             Dim tour = allContours(sortedList.ElementAt(i).Value)
             Dim val = dst2.Get(Of Byte)(tour(0).Y, tour(0).X)
@@ -938,7 +939,6 @@ Public Class Contour_DepthTiers : Inherits VB_Algorithm
         Next
 
         dst2.SetTo(1, dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
-
         classCount = task.maxZmeters * 100 / options.cmPerTier
 
         If standaloneTest() Then dst3 = vbPalette(dst2 * 255 / classCount)

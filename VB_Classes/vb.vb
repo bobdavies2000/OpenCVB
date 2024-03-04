@@ -727,20 +727,18 @@ End Structure
 Public Class rcData
     Public rect As cv.Rect
     Public mask As cv.Mat
-    Public depthMask As cv.Mat
     Public tier As Single
     Public tierHist As New cv.Mat
     Public tierHistArray() As Single
 
     Public pixels As Integer
-    Public depthPixels As Integer
 
     Public color As New cv.Vec3b
     Public colorMean As New cv.Scalar
     Public colorStdev As New cv.Scalar
 
-    'Public depthMean As cv.Point3f
-    'Public depthStdev As cv.Point3f
+    Public depthPixels As Integer
+    Public depthMask As cv.Mat
     Public depthMean As cv.Scalar
     Public depthStdev As cv.Scalar
 

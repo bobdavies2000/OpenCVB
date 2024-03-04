@@ -260,27 +260,28 @@ End Class
 
 Public Class Math_Template : Inherits VB_Algorithm
     Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
         labels = {"", "", "Input Template showing columns", "Input Template showing rows"}
         desc = "Build a template for use with computing the point cloud"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Dim inputRes = New cv.Size(1280, 720)
-        If task.workingRes.Height = 320 Or task.workingRes.Height = 160 Then inputRes = New cv.Size(640, 480)
-
-        dst2 = New cv.Mat(inputRes, cv.MatType.CV_32F, 0)
-        dst3 = New cv.Mat(inputRes, cv.MatType.CV_32F, 0)
+    Public Sub RunVB(src As cv.Mat)
         For i = 0 To dst2.Width - 1
             dst2.Set(Of Single)(0, i, i)
         Next
 
         For i = 1 To dst2.Height - 1
             dst2.Row(0).CopyTo(dst2.Row(i))
+        Next
+
+        For i = 0 To dst2.Height - 1
             dst3.Set(Of Single)(i, 0, i)
         Next
 
         For i = 1 To dst2.Width - 1
             dst3.Col(0).CopyTo(dst3.Col(i))
         Next
+
         dst2 -= task.calibData.ppx
         dst3 -= task.calibData.ppy
     End Sub

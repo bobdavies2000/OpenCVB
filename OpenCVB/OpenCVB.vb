@@ -1371,17 +1371,6 @@ Public Class OpenCVB
         task.labels = {"", "", "", ""}
         mousePoint = New cv.Point(task.workingRes.Width / 2, task.workingRes.Height / 2) ' mouse click point default = center of the image
 
-        task.calibData.ppx = camera.cameraInfo.ppx
-        task.calibData.ppy = camera.cameraInfo.ppy
-        task.calibData.fx = camera.cameraInfo.fx
-        task.calibData.fy = camera.cameraInfo.fy
-        task.calibData.v_fov = camera.cameraInfo.v_fov
-        task.calibData.h_fov = camera.cameraInfo.h_fov
-        task.calibData.d_fov = camera.cameraInfo.d_fov
-
-        task.pointCloud = mbuf(0).pointCloud
-        task.color = mbuf(0).color
-
         While 1
             Dim waitTime = Now
             ' relative size of displayed image and algorithm size image.
@@ -1412,6 +1401,16 @@ Public Class OpenCVB
                     task.rightView = mbuf(mbIndex).rightView
                     task.pointCloud = mbuf(mbIndex).pointCloud
 
+                    If frameCount < 10 Then
+                        Dim sizeRatio = settings.captureRes.Width / saveWorkingRes.Width
+                        task.calibData.ppx = task.workingRes.Width / 2 ' camera.cameraInfo.ppx / sizeRatio
+                        task.calibData.ppy = task.workingRes.Height / 2 ' camera.cameraInfo.ppy / sizeRatio
+                        task.calibData.fx = camera.cameraInfo.fx
+                        task.calibData.fy = camera.cameraInfo.fy
+                        task.calibData.v_fov = camera.cameraInfo.v_fov
+                        task.calibData.h_fov = camera.cameraInfo.h_fov
+                        task.calibData.d_fov = camera.cameraInfo.d_fov
+                    End If
                     SyncLock cameraLock
                         task.mbuf(mbIndex) = mbuf(mbIndex)
                         task.mbIndex = mbIndex
@@ -1450,7 +1449,7 @@ Public Class OpenCVB
                         ' relative size of algorithm size image to displayed image
                         Dim ratio = task.workingRes.Width / camPic(0).Width
                         Dim tmpDrawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio,
-                                                      drawRect.Width * ratio, drawRect.Height * ratio)
+                                                          drawRect.Width * ratio, drawRect.Height * ratio)
                         task.drawRect = New cv.Rect
                         If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
                             Static saveDrawRect As cv.Rect

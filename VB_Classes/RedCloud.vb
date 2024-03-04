@@ -4,29 +4,17 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public redC As New RedCloud_BasicsFull
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat
-    Dim tiers As New Depth_TiersZ
     Public Sub New()
         redOptions.UseColor.Checked = True  ' <<<<<<< this is what is different.
         desc = "Create RedCloud output using only color."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        tiers.Run(src)
-
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
         identifyCells(redC.redCells)
-        labels(3) = "Method for color source = " + redOptions.colorInputName
         redCells = redC.redCells
         cellMap = redC.cellMap
-
-        dst3.SetTo(0)
-        For i = 0 To redCells.Count - 1
-            Dim color = tiers.dst3.Get(Of cv.Vec3b)(redCells(i).maxDist.Y, redCells(i).maxDist.X)
-            If color = black Then color = redCells(i).color
-            dst3(redCells(i).rect).SetTo(color, redCells(i).mask)
-            ' redCells(i).tier = 
-        Next
     End Sub
 End Class
 
@@ -3068,3 +3056,21 @@ Public Class RedCloud_BasicsFullNew : Inherits VB_Algorithm
     End Sub
 End Class
 
+
+
+
+
+
+Public Class RedCloud_Color : Inherits VB_Algorithm
+    Public redC As New RedCloud_Basics
+    Public Sub New()
+        redOptions.UseColor.Checked = True  ' <<<<<<< this is what is different.
+        desc = "This is just a placeholder to help find the color only output of RedCloud."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+        identifyCells(redC.redCells)
+    End Sub
+End Class

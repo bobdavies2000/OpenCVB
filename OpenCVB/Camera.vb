@@ -1,5 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Numerics
+Imports VB_Classes
+
 Public Class Camera
     Public transformationMatrix() As Single
     Public IMU_TimeStamp As Double
@@ -71,6 +73,15 @@ Public Class Camera
         Dim cam As VB_Classes.VBtask.cameraInfo
         cameraInfo = cam
     End Sub
+    Public Function vbMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
+        Dim mm As mmData
+        If mask Is Nothing Then
+            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
+        Else
+            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
+        End If
+        Return mm
+    End Function
     Public Sub GetNextFrameCounts(frameTime As Double)
         Static lastFrameTime = IMU_TimeStamp
         Static imuStartTime = IMU_TimeStamp

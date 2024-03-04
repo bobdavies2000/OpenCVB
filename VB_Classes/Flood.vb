@@ -43,6 +43,18 @@ Public Class Flood_Basics : Inherits VB_Algorithm
             rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             vbDrawContour(rc.mask, rc.contour, 255, -1)
 
+            rc.depthMask = rc.mask.Clone
+            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
+            rc.depthPixels = rc.depthMask.CountNonZero
+
+            If rc.depthPixels Then
+                task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
+                task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
+                task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
+
+                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
+            End If
+
             rc.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
             rc.maxDist = vbGetMaxDist(rc)
 
@@ -61,8 +73,8 @@ Public Class Flood_Basics : Inherits VB_Algorithm
             rc.index = redCells.Count
             redCells.Add(rc)
             cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            dst3(rc.rect).SetTo(rc.color, rc.mask)
-            dst2.Circle(rc.maxDist, task.dotSize, task.highlightColor, -1, task.lineType)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            If standalone Then dst3.Circle(rc.maxDist, task.dotSize, task.highlightColor, -1, task.lineType)
         Next
 
         setSelectedContour(redCells, cellMap)
@@ -350,30 +362,6 @@ End Class
 
 
 
-Public Class Flood_TierTest : Inherits VB_Algorithm
-    Dim flood As New Flood_Basics
-    Dim tiers As New Depth_TiersZ
-    Public Sub New()
-        desc = "Add depth tiers to the 8uc1 input to flood_basics"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        tiers.Run(src)
-
-        dst1 = tiers.dst2
-        dst1.SetTo(0, task.noDepthMask)
-
-        flood.Run(dst1)
-        dst2 = flood.dst2
-        dst3 = flood.dst3
-        labels = flood.labels
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Flood_Tiers : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
     Dim tiers As New Contour_DepthTiers
@@ -386,7 +374,7 @@ Public Class Flood_Tiers : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         flood.Run(src)
-        dst2 = flood.dst3
+        dst3 = flood.dst3
 
         tiers.Run(src)
 
@@ -410,7 +398,7 @@ Public Class Flood_Tiers : Inherits VB_Algorithm
 
         If task.rc.tierHist.Rows > 0 Then
             plot.Run(task.rc.tierHist)
-            dst3 = plot.dst2
+            dst2 = plot.dst2
         End If
         identifyCells(redCells)
     End Sub
@@ -524,7 +512,7 @@ Public Class Flood_Cell : Inherits VB_Algorithm
         Dim ttOffset = tiers.options.trueTextOffset
         If standalone Then
             flood.Run(src)
-            dst2 = flood.dst3
+            dst2 = flood.dst2
             labels = flood.labels
         End If
 
@@ -579,7 +567,7 @@ Public Class Flood_Cells : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
             flood.Run(src)
-            dst2 = flood.dst3
+            dst2 = flood.dst2
             labels = flood.labels
         End If
 
@@ -700,7 +688,7 @@ Public Class Flood_ColorByTier : Inherits VB_Algorithm
 
         flood.binarizedImage = binar4.dst3
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        For i = 1 To tiers.classCount - 1
+        For i = 1 To tiers.contourlist.Count - 1
             dst1 = tiers.dst2.InRange(i, i)
             flood.inputMask = Not dst1
             dst0.SetTo(0)

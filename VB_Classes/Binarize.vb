@@ -310,31 +310,6 @@ End Class
 
 
 
-Public Class Binarize_Split4 : Inherits VB_Algorithm
-    Dim binar As New Binarize_Four
-    Public classCount = 4 ' 4-way split
-    Public Sub New()
-        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Add the 4-way split of images to define the different regions.  Now adding hue segments as well."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        binar.Run(src)
-
-        dst2.SetTo(1, binar.mats.mat(0))
-        dst2.SetTo(2, binar.mats.mat(1))
-        dst2.SetTo(3, binar.mats.mat(2))
-        dst2.SetTo(4, binar.mats.mat(3))
-
-        dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 Public Class Binarize_SplitDepth : Inherits VB_Algorithm
@@ -381,5 +356,81 @@ Public Class Binarize_DepthTiers : Inherits VB_Algorithm
             dst0(task.motionRect).CopyTo(dst2(task.motionRect))
         End If
         classCount = binar4.classCount + tiers.classCount
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Binarize_Split4 : Inherits VB_Algorithm
+    Dim binar As New Binarize_Four
+    Public classCount = 5 ' 4-way split plus maxDepthMask
+    Public Sub New()
+        If findfrm(traceName + " CheckBox Options") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Binarize_Split4: maxDepthMask should be black (a 5th class)")
+            check.Box(0).Checked = True
+        End If
+
+        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Add the 4-way split of images to define the different regions.  Now adding hue segments as well."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static depthCheck = findCheckBox("Binarize_Split4: maxDepthMask should be black (a 5th class)")
+        If depthCheck.checked Then
+            src = src.Clone
+            src = src.SetTo(0, task.maxDepthMask)
+            classCount = 4
+        End If
+
+        binar.Run(src)
+
+        dst2.SetTo(1, binar.mats.mat(0))
+        dst2.SetTo(2, binar.mats.mat(1))
+        dst2.SetTo(3, binar.mats.mat(2))
+        dst2.SetTo(4, binar.mats.mat(3))
+
+        dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Binarize_Split4LeftRight : Inherits VB_Algorithm
+    Dim binar As New Binarize_Four
+    Public classCount = 4 ' 4-way split
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Add the 4-way split of left and right views."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static depthCheck = findCheckBox("Map color data  maxDepthMask in color")
+
+        binar.Run(src)
+
+        dst0.SetTo(1, binar.mats.mat(0))
+        dst0.SetTo(2, binar.mats.mat(1))
+        dst0.SetTo(3, binar.mats.mat(2))
+        dst0.SetTo(4, binar.mats.mat(3))
+
+        dst2 = vbPalette((dst0 * 255 / classCount).ToMat)
+
+        binar.Run(task.rightView)
+
+        dst1.SetTo(1, binar.mats.mat(0))
+        dst1.SetTo(2, binar.mats.mat(1))
+        dst1.SetTo(3, binar.mats.mat(2))
+        dst1.SetTo(4, binar.mats.mat(3))
+
+        dst3 = vbPalette((dst1 * 255 / classCount).ToMat)
     End Sub
 End Class
