@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Reduction_Basics : Inherits VB_Algorithm
     Public classCount As Integer
+    Public showOutput As Boolean
     Public Sub New()
         desc = "Reduction: a simpler way to KMeans by reducing color resolution"
     End Sub
@@ -24,7 +25,7 @@ Public Class Reduction_Basics : Inherits VB_Algorithm
             labels(2) = "No reduction requested"
         End If
 
-        If standaloneTest() Then dst3 = vbPalette(dst2 * 255 / classCount)
+        If standaloneTest() Or showOutput Then dst3 = vbPalette(dst2 * 255 / classCount)
         labels(2) = CStr(classCount) + " colors after reduction"
     End Sub
 End Class

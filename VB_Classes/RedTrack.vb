@@ -38,10 +38,11 @@ Public Class RedTrack_Lines : Inherits VB_Algorithm
         lines.Run(src)
 
         If task.heartBeat Or task.motionFlag Then dst3.SetTo(0)
-        For i = 0 To Math.Min(lines.sortLength.Count - 1, 10)
-            Dim line = lines.sortLength.ElementAt(i)
-            Dim mps = lines.mpList(line.Value)
-            dst3.Line(mps.p1, mps.p2, 255, task.lineWidth, task.lineType)
+        Dim index As Integer
+        For Each lp In lines.sortByLen.Values
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            index += 1
+            If index > 10 Then Exit For
         Next
 
         track.Run(dst3.Clone)
@@ -273,11 +274,12 @@ Public Class RedTrack_Points : Inherits VB_Algorithm
         lines.Run(src)
 
         dst3.SetTo(0)
-        For i = 0 To Math.Min(lines.sortLength.Count - 1, 10)
-            Dim line = lines.sortLength.ElementAt(i)
-            Dim mps = lines.mpList(line.Value)
-            dst3.Circle(mps.p1, task.dotSize, 255, -1)
-            dst3.Circle(mps.p2, task.dotSize, 255, -1)
+        Dim index As Integer
+        For Each lp In lines.sortByLen.Values
+            dst3.Circle(lp.p1, task.dotSize, 255, -1)
+            dst3.Circle(lp.p2, task.dotSize, 255, -1)
+            index += 1
+            If index >= 10 Then Exit For
         Next
 
         track.Run(dst3)

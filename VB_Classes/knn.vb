@@ -743,14 +743,14 @@ Public Class KNN_ClosestTracker : Inherits VB_Algorithm
             p2 = lastPair.p2
         End If
 
-        For i = 0 To Math.Min(lines.sortLength.Count, 10) - 1
-            Dim mp = lines.mpList(lines.sortLength.ElementAt(i).Value)
+        For Each lp In lines.sortByLen.Values
             If trainInput.Count = 0 Then
-                p1 = mp.p1
-                p2 = mp.p2
+                p1 = lp.p1
+                p2 = lp.p2
             End If
-            trainInput.Add(mp.p1)
-            trainInput.Add(mp.p2)
+            trainInput.Add(lp.p1)
+            trainInput.Add(lp.p2)
+            If trainInput.Count >= 10 Then Exit For
         Next
 
         If trainInput.Count = 0 Then
@@ -810,8 +810,10 @@ Public Class KNN_ClosestLine : Inherits VB_Algorithm
         dst2 = src.Clone
 
         If lastP1 = New cv.Point2f Then
-            setTrueText("lastP1 and lastP2 missing or lost.  Initialize with a pair of points to track a line. ", 3)
-            Exit Sub ' nothing to do...
+            setTrueText("KNN_ClosestLine is only run with other KNN algorithms" + vbCrLf +
+                        "lastP1 and lastP2 need to be initialized by the other algorithm." + vbCrLf +
+                        "Initialize with a pair of points to track a line. ", 3)
+            Exit Sub
         End If
 
         Dim distances As New List(Of Single)

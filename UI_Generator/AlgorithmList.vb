@@ -116,7 +116,6 @@ if algorithmName = "BackProject_MeterByMeter" Then return new BackProject_MeterB
 if algorithmName = "BackProject_Mouse" Then return new BackProject_Mouse
 if algorithmName = "BackProject_PointCloud" Then return new BackProject_PointCloud
 if algorithmName = "BackProject_Reduction" Then return new BackProject_Reduction
-if algorithmName = "BackProject_ReductionLines" Then return new BackProject_ReductionLines
 if algorithmName = "BackProject_Side" Then return new BackProject_Side
 if algorithmName = "BackProject_SoloSide" Then return new BackProject_SoloSide
 if algorithmName = "BackProject_SoloTop" Then return new BackProject_SoloTop

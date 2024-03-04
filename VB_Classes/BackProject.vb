@@ -177,38 +177,6 @@ End Class
 
 
 
-
-Public Class BackProject_ReductionLines : Inherits VB_Algorithm
-    Dim reduction As New Reduction_Basics
-    Dim lines As New Line_Basics
-    Public Sub New()
-        redOptions.BitwiseReduction.Checked = True
-
-        labels(3) = "Backprojection of highlighted histogram bin"
-        desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        reduction.Run(src)
-        dst2 = reduction.dst2
-
-        lines.Run(dst2)
-
-        dst3 = src
-        For i = 0 To lines.sortLength.Count - 1
-            Dim mps = lines.mpList(lines.sortLength.ElementAt(i).Value)
-            dst3.Line(mps.p1, mps.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-        Next
-        labels(3) = CStr(lines.mpList.Count) + " lines were found"
-
-        labels(2) = "Reduction = " + CStr(redOptions.SimpleReductionSlider.Value) + " and bins = " + CStr(task.histogramBins)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class BackProject_FullLines : Inherits VB_Algorithm
     Dim backP As New BackProject_Full
     Dim lines As New Line_Basics

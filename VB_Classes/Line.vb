@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits VB_Algorithm
     Dim ld As cv.XImgProc.FastLineDetector
-    Public sortLength As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
     Public sortByLen As New SortedList(Of Single, pointPair)(New compareAllowIdenticalSingleInverted)
     Public mpList As New List(Of pointPair)
     Public ptList As New List(Of cv.Point2f)
@@ -24,7 +23,7 @@ Public Class Line_Basics : Inherits VB_Algorithm
 
         Dim lines = ld.Detect(dst2(subsetRect))
 
-        sortLength.Clear()
+        sortByLen.Clear()
         mpList.Clear()
         ptList.Clear()
         tCells.Clear()
@@ -38,7 +37,6 @@ Public Class Line_Basics : Inherits VB_Algorithm
                     mpList.Add(lp)
                     ptList.Add(p1)
                     ptList.Add(p2)
-                    sortLength.Add(lp.length, mpList.Count - 1)
                     sortByLen.Add(lp.length, lp)
                     Dim tc As tCell
                     tc.center = p1
@@ -51,10 +49,9 @@ Public Class Line_Basics : Inherits VB_Algorithm
 
         dst2 = src
         dst3.SetTo(0)
-        For Each nextLine In sortLength
-            Dim mps = mpList(nextLine.Value)
-            dst2.Line(mps.p1, mps.p2, lineColor, task.lineWidth, task.lineType)
-            dst3.Line(mps.p1, mps.p2, 255, task.lineWidth, task.lineType)
+        For Each lp In sortByLen.Values
+            dst2.Line(lp.p1, lp.p2, lineColor, task.lineWidth, task.lineType)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
         labels(2) = CStr(mpList.Count) + " lines were detected in the current frame"
     End Sub
@@ -191,32 +188,32 @@ Public Class Line_Intercepts : Inherits VB_Algorithm
         botIntercepts.Clear()
         leftIntercepts.Clear()
         rightIntercepts.Clear()
-        For i = 0 To lines.mpList.Count - 1
-            Dim mps = lines.mpList(lines.sortLength.ElementAt(i).Value)
-
-            Dim minXX = Math.Min(mps.p1.X, mps.p2.X)
-            If mps.p1.X <> minXX Then ' leftmost point is always in p1
-                Dim tmp = mps.p1
-                mps.p1 = mps.p2
-                mps.p2 = tmp
+        Dim index As Integer
+        For Each lp In lines.sortByLen.Values
+            Dim minXX = Math.Min(lp.p1.X, lp.p2.X)
+            If lp.p1.X <> minXX Then ' leftmost point is always in p1
+                Dim tmp = lp.p1
+                lp.p1 = lp.p2
+                lp.p2 = tmp
             End If
 
-            p1List.Add(mps.p1)
-            p2List.Add(mps.p2)
-            dst2.Line(mps.p1, mps.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            p1List.Add(lp.p1)
+            p2List.Add(lp.p2)
+            dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
 
-            Dim saveP1 = mps.p1, saveP2 = mps.p2
+            Dim saveP1 = lp.p1, saveP2 = lp.p2
 
-            Dim emps = longLine.buildELine(mps, dst2.Width, dst2.Height)
-            If emps.p1.X = 0 Then leftIntercepts.Add(saveP1.Y, i)
-            If emps.p1.Y = 0 Then topIntercepts.Add(saveP1.X, i)
-            If emps.p1.X = dst2.Width Then rightIntercepts.Add(saveP1.Y, i)
-            If emps.p1.Y = dst2.Height Then botIntercepts.Add(saveP1.X, i)
+            Dim emps = longLine.buildELine(lp, dst2.Width, dst2.Height)
+            If emps.p1.X = 0 Then leftIntercepts.Add(saveP1.Y, index)
+            If emps.p1.Y = 0 Then topIntercepts.Add(saveP1.X, index)
+            If emps.p1.X = dst2.Width Then rightIntercepts.Add(saveP1.Y, index)
+            If emps.p1.Y = dst2.Height Then botIntercepts.Add(saveP1.X, index)
 
-            If emps.p2.X = 0 Then leftIntercepts.Add(saveP2.Y, i)
-            If emps.p2.Y = 0 Then topIntercepts.Add(saveP2.X, i)
-            If emps.p2.X = dst2.Width Then rightIntercepts.Add(saveP2.Y, i)
-            If emps.p2.Y = dst2.Height Then botIntercepts.Add(saveP2.X, i)
+            If emps.p2.X = 0 Then leftIntercepts.Add(saveP2.Y, index)
+            If emps.p2.Y = 0 Then topIntercepts.Add(saveP2.X, index)
+            If emps.p2.X = dst2.Width Then rightIntercepts.Add(saveP2.Y, index)
+            If emps.p2.Y = dst2.Height Then botIntercepts.Add(saveP2.X, index)
+            index += 1
         Next
 
         If standaloneTest() Then hightLightIntercept(dst2)
@@ -229,35 +226,26 @@ End Class
 
 
 
-
-
-
 Public Class Line_Reduction : Inherits VB_Algorithm
-    Dim lines As New Line_Basics
     Dim reduction As New Reduction_Basics
+    Dim lines As New Line_Basics
     Public Sub New()
-        'redOptions.SimpleReduction.Checked = True
-
-        labels(2) = "Yellow > length threshold, red < length threshold"
-        labels(3) = "Input image after reduction"
-        desc = "Use the reduced BGR image as input to the line detector"
+        redOptions.BitwiseReduction.Checked = True
+        reduction.showOutput = True
+        redOptions.ReductionSliders.Enabled = True
+        labels(3) = "Backprojection of highlighted histogram bin"
+        desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
 
-        lines.Run(reduction.dst2)
-        dst2 = lines.dst2
+        lines.Run(reduction.dst3)
+        dst2 = reduction.dst3
 
-        If task.motionFlag Or task.optionsChanged Then dst3.SetTo(0)
-        For i = 0 To lines.sortLength.Count - 1
-            Dim index = lines.sortLength.ElementAt(i).Value
-            Dim mps = lines.mpList(index)
-            dst3.Line(mps.p1, mps.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-        Next
+        labels(2) = "Reduction = " + CStr(redOptions.SimpleReductionSlider.Value)
+        labels(3) = CStr(lines.mpList.Count) + " lines were found"
     End Sub
 End Class
-
-
 
 
 
@@ -447,16 +435,14 @@ Public Class Line_InDepthAndBGR : Inherits VB_Algorithm
         p2List.Clear()
         z1List.Clear()
         z2List.Clear()
-        For Each line In lines.sortLength
-            Dim mps = lines.mpList(line.Value)
-
-            Dim minXX = Math.Min(mps.p1.X, mps.p2.X)
-            Dim minYY = Math.Min(mps.p1.Y, mps.p2.Y)
-            Dim w = Math.Abs(mps.p1.X - mps.p2.X)
-            Dim h = Math.Abs(mps.p1.Y - mps.p2.Y)
+        For Each lp In lines.sortByLen.Values
+            Dim minXX = Math.Min(lp.p1.X, lp.p2.X)
+            Dim minYY = Math.Min(lp.p1.Y, lp.p2.Y)
+            Dim w = Math.Abs(lp.p1.X - lp.p2.X)
+            Dim h = Math.Abs(lp.p1.Y - lp.p2.Y)
             Dim r = New cv.Rect(minXX, minYY, If(w > 0, w, 2), If(h > 0, h, 2))
             Dim mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, 0)
-            mask.Line(New cv.Point(CInt(mps.p1.X - r.X), CInt(mps.p1.Y - r.Y)), New cv.Point(CInt(mps.p2.X - r.X), CInt(mps.p2.Y - r.Y)), 255, task.lineWidth, cv.LineTypes.Link4)
+            mask.Line(New cv.Point(CInt(lp.p1.X - r.X), CInt(lp.p1.Y - r.Y)), New cv.Point(CInt(lp.p2.X - r.X), CInt(lp.p2.Y - r.Y)), 255, task.lineWidth, cv.LineTypes.Link4)
             Dim mean = task.pointCloud(r).Mean(mask)
 
             If mean <> New cv.Scalar Then
@@ -465,18 +451,18 @@ Public Class Line_InDepthAndBGR : Inherits VB_Algorithm
                 Dim len1 = mmX.minLoc.DistanceTo(mmX.maxLoc)
                 Dim len2 = mmY.minLoc.DistanceTo(mmY.maxLoc)
                 If len1 > len2 Then
-                    mps.p1 = New cv.Point(mmX.minLoc.X + r.X, mmX.minLoc.Y + r.Y)
-                    mps.p2 = New cv.Point(mmX.maxLoc.X + r.X, mmX.maxLoc.Y + r.Y)
+                    lp.p1 = New cv.Point(mmX.minLoc.X + r.X, mmX.minLoc.Y + r.Y)
+                    lp.p2 = New cv.Point(mmX.maxLoc.X + r.X, mmX.maxLoc.Y + r.Y)
                 Else
-                    mps.p1 = New cv.Point(mmY.minLoc.X + r.X, mmY.minLoc.Y + r.Y)
-                    mps.p2 = New cv.Point(mmY.maxLoc.X + r.X, mmY.maxLoc.Y + r.Y)
+                    lp.p1 = New cv.Point(mmY.minLoc.X + r.X, mmY.minLoc.Y + r.Y)
+                    lp.p2 = New cv.Point(mmY.maxLoc.X + r.X, mmY.maxLoc.Y + r.Y)
                 End If
-                If mps.p1.DistanceTo(mps.p2) > 1 Then
-                    dst3.Line(mps.p1, mps.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-                    p1List.Add(mps.p1)
-                    p2List.Add(mps.p2)
-                    z1List.Add(task.pointCloud.Get(Of cv.Point3f)(mps.p1.Y, mps.p1.X))
-                    z2List.Add(task.pointCloud.Get(Of cv.Point3f)(mps.p2.Y, mps.p2.X))
+                If lp.p1.DistanceTo(lp.p2) > 1 Then
+                    dst3.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+                    p1List.Add(lp.p1)
+                    p2List.Add(lp.p2)
+                    z1List.Add(task.pointCloud.Get(Of cv.Point3f)(lp.p1.Y, lp.p1.X))
+                    z2List.Add(task.pointCloud.Get(Of cv.Point3f)(lp.p2.Y, lp.p2.X))
                 End If
             End If
         Next
@@ -527,11 +513,8 @@ Public Class Line_PointSlope : Inherits VB_Algorithm
         dst2 = src
 
         Dim bestInput = New List(Of pointPair)
-        Dim index As Integer
-        For i = 0 To Math.Min(searchCount, lines.sortLength.Count) - 1
-            index = lines.sortLength.ElementAt(i).Value
-            Dim mps = lines.mpList(index)
-            bestInput.Add(mps)
+        For Each lp In lines.sortByLen.Values
+            bestInput.Add(lp)
         Next
 
         If bestLines.Count < lineCount Or task.heartBeat Then
@@ -565,6 +548,7 @@ Public Class Line_PointSlope : Inherits VB_Algorithm
 
         Dim nextLines As New List(Of pointPair)
         Dim usedBest As New List(Of Integer)
+        Dim index As Integer
         For i = 0 To knn.result.GetUpperBound(0)
             For j = 0 To knn.result.GetUpperBound(1)
                 index = knn.result(i, j)
@@ -615,15 +599,14 @@ Public Class Line_TimeViewLines : Inherits VB_Algorithm
         dst2 = lines.dst3
         dst3.SetTo(cv.Scalar.White)
         Dim index = lines.frameList.Count - 1 ' the most recent.
-        For Each sl In lines.lines.sortLength
-            Dim mps = lines.lines.mpList(sl.Value)
-            dst3.Line(mps.p1, mps.p2, cv.Scalar.Green, task.lineWidth, task.lineType)
-            mpList.Add(mps)
-            If mps.slope = pointPair.verticalSlope Then
-                dst3.Line(mps.p1, mps.p2, cv.Scalar.Blue, task.lineWidth + task.lineWidth, task.lineType)
+        For Each lp In lines.lines.sortByLen.Values
+            dst3.Line(lp.p1, lp.p2, cv.Scalar.Green, task.lineWidth, task.lineType)
+            mpList.Add(lp)
+            If lp.slope = pointPair.verticalSlope Then
+                dst3.Line(lp.p1, lp.p2, cv.Scalar.Blue, task.lineWidth + task.lineWidth, task.lineType)
             Else
-                If mps.slope = 0 Then
-                    dst3.Line(mps.p1, mps.p2, cv.Scalar.Red, task.lineWidth + task.lineWidth, task.lineType)
+                If lp.slope = 0 Then
+                    dst3.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth + task.lineWidth, task.lineType)
                 End If
             End If
         Next

@@ -31,17 +31,16 @@ Public Class LongLine_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         lines.Run(src)
         dst2 = lines.dst2
-        If lines.sortLength.Count = 0 Then Exit Sub
+        If lines.sortByLen.Count = 0 Then Exit Sub
 
         dst2 = src
         p1List.Clear()
         p2List.Clear()
-        For i = 0 To Math.Min(lineCount, lines.sortLength.Count) - 1
-            Dim index = lines.sortLength.ElementAt(i).Value
-            Dim mps = lines.mpList(index)
-            dst2.Line(mps.p1, mps.p2, task.highlightColor, task.lineWidth, task.lineType)
-            p1List.Add(mps.p1)
-            p2List.Add(mps.p2)
+        For Each lp In lines.sortByLen.Values
+            dst2.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
+            p1List.Add(lp.p1)
+            p2List.Add(lp.p2)
+            If p1List.Count >= lineCount Then Exit For
         Next
     End Sub
 End Class

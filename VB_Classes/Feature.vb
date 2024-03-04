@@ -360,10 +360,10 @@ Public Class Feature_Line : Inherits VB_Algorithm
                 setTrueText("No lines found.", 3)
                 Exit Sub
             End If
-            Dim mp = lines.mpList(lines.sortLength.ElementAt(0).Value)
+            Dim lp = lines.sortByLen.ElementAt(0).Value
 
-            tcells(0) = match.createCell(src, 0, mp.p1)
-            tcells(1) = match.createCell(src, 0, mp.p2)
+            tcells(0) = match.createCell(src, 0, lp.p1)
+            tcells(1) = match.createCell(src, 0, lp.p2)
         End If
 
         dst2 = src.Clone
