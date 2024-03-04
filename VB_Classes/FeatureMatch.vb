@@ -2,7 +2,7 @@
 Imports cv = OpenCvSharp
 Public Class FeatureMatch_Basics : Inherits VB_Algorithm
     Public feat As New FeatureMatch_LeftRight
-    Public mpList As New List(Of linePoint)
+    Public mpList As New List(Of pointPair)
     Public vecList As New List(Of cv.Point3f)
     Public corrList As New List(Of Single)
     Dim addw As New AddWeighted_Basics
@@ -14,12 +14,12 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
         dst2X = New cv.Mat(dst2.Height, dst2.Width * 2, cv.MatType.CV_8U)
         desc = "Pair left/right features using correlation coefficients"
     End Sub
-    Private Sub highlight(mp As linePoint)
+    Private Sub highlight(mp As pointPair)
         dst2X.Line(mp.p1, New cv.Point2f(mp.p2.X + dst2.Width, mp.p2.Y), cv.Scalar.White, task.lineWidth, task.lineType)
         labels = {"", "The AddWeighted_Basics output showing both the left and right images with corresponding points",
                   "Draw a rectangle anywhere to isolate specific good features", ""}
     End Sub
-    Public Function showMatches(mplist As List(Of linePoint), corrlist As List(Of Single)) As Integer
+    Public Function showMatches(mplist As List(Of pointPair), corrlist As List(Of Single)) As Integer
         Dim r1 As New cv.Rect(0, 0, dst2.Width, dst2.Height)
         Dim r2 As New cv.Rect(dst2.Width, 0, dst2.Width, dst2.Height)
         leftView.CopyTo(dst2X(r1))
@@ -52,12 +52,12 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
         Return matchCount
     End Function
     Public Sub RunVB(src As cv.Mat)
-        If task.leftview.Channels = 3 Then
-            leftView = task.leftview.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            rightView = task.rightview.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.leftView.Channels = 3 Then
+            leftView = task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
-            leftView = task.leftview.Clone
-            rightView = task.rightview.Clone
+            leftView = task.leftView.Clone
+            rightView = task.rightView.Clone
         End If
 
         feat.Run(empty)
@@ -97,7 +97,7 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
                 Dim vec3d = task.pointCloud.Get(Of cv.Point3f)(p1.Y, p1.X)
                 If vec3d.Z > 0 Then
                     vecList.Add(vec3d)
-                    mpList.Add(New linePoint(p1, p2))
+                    mpList.Add(New pointPair(p1, p2))
                     corrList.Add(maxCorrelation)
                     dst1.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
                 End If
@@ -181,7 +181,7 @@ End Class
 
 Public Class FeatureMatch_History : Inherits VB_Algorithm
     Public feat As New FeatureMatch_Basics
-    Public mpList As New List(Of linePoint)
+    Public mpList As New List(Of pointPair)
     Public corrList As New List(Of Single)
     Dim matchCount As Integer
     Public Sub New()
@@ -193,7 +193,7 @@ Public Class FeatureMatch_History : Inherits VB_Algorithm
         Static thresholdSlider = findSlider("Feature Correlation Threshold")
         Dim minCorr = thresholdSlider.value / 100
 
-        Static allLists As New List(Of List(Of linePoint))
+        Static allLists As New List(Of List(Of pointPair))
         Static allCorrs As New List(Of List(Of Single))
         If task.optionsChanged Then
             allLists.Clear()
@@ -202,7 +202,7 @@ Public Class FeatureMatch_History : Inherits VB_Algorithm
 
         feat.Run(empty)
 
-        allLists.Add(New List(Of linePoint)(feat.mpList))
+        allLists.Add(New List(Of pointPair)(feat.mpList))
         allCorrs.Add(New List(Of Single)(feat.corrList))
 
         If allLists.Count > task.frameHistoryCount Then

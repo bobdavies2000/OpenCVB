@@ -594,7 +594,7 @@ Public Class Feature_LongestVerticalKNN : Inherits VB_Algorithm
         labels(3) = "All vertical lines.  The numbers: index and Arc-Y for the longest X vertical lines."
         desc = "Find all the vertical lines and then track the longest one with a lightweight KNN."
     End Sub
-    Private Function testLastPair(lastPair As linePoint, gc As gravityLine) As Boolean
+    Private Function testLastPair(lastPair As pointPair, gc As gravityLine) As Boolean
         Dim distance1 = lastPair.p1.DistanceTo(lastPair.p2)
         Dim p1 = gc.tc1.center
         Dim p2 = gc.tc2.center
@@ -611,14 +611,14 @@ Public Class Feature_LongestVerticalKNN : Inherits VB_Algorithm
         dst3 = src.Clone
         Dim index As Integer
 
-        If testLastPair(longest.knn.lastPair, gLines.sortedVerticals.ElementAt(0).Value) Then longest.knn.lastPair = New linePoint
+        If testLastPair(longest.knn.lastPair, gLines.sortedVerticals.ElementAt(0).Value) Then longest.knn.lastPair = New pointPair
         For Each gl In gLines.sortedVerticals
             If index >= 10 Then Exit For
 
             Dim gc = gl.Value
             Dim p1 = gc.tc1.center
             Dim p2 = gc.tc2.center
-            If longest.knn.lastPair.compare(New linePoint) Then longest.knn.lastPair = New linePoint(p1, p2)
+            If longest.knn.lastPair.compare(New pointPair) Then longest.knn.lastPair = New pointPair(p1, p2)
             Dim pt = New cv.Point((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
             setTrueText(CStr(index) + vbCrLf + Format(gc.arcY, fmt1), pt, 3)
             index += 1
@@ -672,7 +672,7 @@ Public Class Feature_Longest : Inherits VB_Algorithm
             match.template = src(rect).Clone
         Else
             myHighLightColor = If(myHighLightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
-            knn.lastPair = New linePoint(New cv.Point2f, New cv.Point2f)
+            knn.lastPair = New pointPair(New cv.Point2f, New cv.Point2f)
         End If
         labels(2) = "Longest line end points had correlation of " + Format(match.correlation, fmt3) + " with the original longest line."
     End Sub
@@ -1323,7 +1323,7 @@ End Class
 Public Class Feature_TraceKNN : Inherits VB_Algorithm
     Dim knn As New KNN_Core
     Dim feat As New Feature_Basics
-    Public mpList As New List(Of linePoint)
+    Public mpList As New List(Of pointPair)
     Public Sub New()
         findSlider("Feature Sample Size").Value = 200
         findSlider("Distance threshold (pixels)").Value = 20
@@ -1352,7 +1352,7 @@ Public Class Feature_TraceKNN : Inherits VB_Algorithm
             Dim qPt = knn.queries(i)
             If pt.DistanceTo(qPt) > distanceThreshold Then Continue For
             dst2.Line(pt, qPt, cv.Scalar.White, task.lineWidth, task.lineType)
-            mpList.Add(New linePoint(pt, qPt))
+            mpList.Add(New pointPair(pt, qPt))
         Next
         strOut = CStr(mpList.Count) + " points were matched from the first to the " + CStr(lastIndex) + "th  (last) set of corners."
         setTrueText(strOut, 3)

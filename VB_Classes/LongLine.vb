@@ -1,5 +1,4 @@
-﻿Imports System.Windows.Forms.VisualStyles.VisualStyleElement.Window
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class LongLine_Basics : Inherits VB_Algorithm
     Public lines As New Line_Basics
     Public lineCount As Integer = 1 ' How many of the longest lines...
@@ -8,11 +7,11 @@ Public Class LongLine_Basics : Inherits VB_Algorithm
     Public Sub New()
         desc = "Isolate the longest X lines."
     End Sub
-    Public Function buildELine(mps As linePoint, width As Integer, height As Integer) As linePoint
+    Public Function buildELine(mps As pointPair, width As Integer, height As Integer) As pointPair
         If mps.p1.X <> mps.p2.X Then
             Dim b = mps.p1.Y - mps.p1.X * mps.slope
             If mps.p1.Y = mps.p2.Y Then
-                Return New linePoint(New cv.Point(0, mps.p1.Y), New cv.Point(width, mps.p1.Y))
+                Return New pointPair(New cv.Point(0, mps.p1.Y), New cv.Point(width, mps.p1.Y))
             Else
                 Dim xint1 = CInt(-b / mps.slope)
                 Dim xint2 = CInt((height - b) / mps.slope)
@@ -24,10 +23,10 @@ Public Class LongLine_Basics : Inherits VB_Algorithm
                 If xint2 >= 0 And xint2 <= width Then points.Add(New cv.Point(xint2, height))
                 If yint1 >= 0 And yint1 <= height Then points.Add(New cv.Point(0, yint1))
                 If yint2 >= 0 And yint2 <= height Then points.Add(New cv.Point(width, yint2))
-                Return New linePoint(points(0), points(1))
+                Return New pointPair(points(0), points(1))
             End If
         End If
-        Return New linePoint(New cv.Point(mps.p1.X, 0), New cv.Point(mps.p1.X, height))
+        Return New pointPair(New cv.Point(mps.p1.X, 0), New cv.Point(mps.p1.X, height))
     End Function
     Public Sub RunVB(src As cv.Mat)
         lines.Run(src)
@@ -224,7 +223,7 @@ Public Class LongLine_ExtendTest : Inherits VB_Algorithm
     Dim longLine As New LongLine_Basics
     Public Sub New()
         labels = {"", "", "Random Line drawn", ""}
-        desc = "Test linePoint constructor with random values to make sure lines are extended properly"
+        desc = "Test pointPair constructor with random values to make sure lines are extended properly"
     End Sub
 
     Public Sub RunVB(src As cv.Mat)
@@ -232,7 +231,7 @@ Public Class LongLine_ExtendTest : Inherits VB_Algorithm
             Dim p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             Dim p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
 
-            Dim mps = New linePoint(p1, p2)
+            Dim mps = New pointPair(p1, p2)
             Dim emps = longLine.buildELine(mps, dst2.Width, dst2.Height)
             dst2 = src
             dst2.Line(emps.p1, emps.p2, task.highlightColor, task.lineWidth, task.lineType)
@@ -421,7 +420,7 @@ Public Class LongLine_Extend : Inherits VB_Algorithm
             saveP2 = p2
         End If
 
-        Dim mps = New linePoint(p1, p2)
+        Dim mps = New pointPair(p1, p2)
         Dim emps = lines.buildELine(mps, dst2.Width, dst2.Height)
 
         If standaloneTest() Then
@@ -441,7 +440,7 @@ End Class
 
 
 Public Class LongLine_NoDepth : Inherits VB_Algorithm
-    Dim lineHist As New LongLine_HistoryIntercept
+    Dim lineHist As New LineCoin_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find any lines in regions without depth."
@@ -460,53 +459,37 @@ End Class
 
 
 Public Class LongLine_HistoryIntercept : Inherits VB_Algorithm
-    Dim longLines As New LongLine_Basics
-    Public lpList As New List(Of linePoint)
+    Dim coin As New LineCoin_Basics
+    Public lpList As New List(Of pointPair)
     Public Sub New()
         dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines over time"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static mpLists As New List(Of List(Of linePoint))
+        Static mpLists As New List(Of List(Of pointPair))
         If task.optionsChanged Then mpLists.Clear()
 
-        longLines.Run(src)
+        coin.longLines.Run(src)
 
-        mpLists.Add(longLines.lines.mpList)
+        mpLists.Add(coin.longLines.lines.mpList)
 
-        Dim p1List As New List(Of cv.Point)
-        Dim p2List As New List(Of cv.Point)
-        Dim ptCounts As New List(Of Integer)
-        Dim lp As linePoint
+        coin.p1List.Clear()
+        coin.p2List.Clear()
+        coin.ptCounts.Clear()
         For Each mplist In mpLists
-            For Each mp In mplist
-                mp.slope = CInt(mp.slope * 10) / 10
-                If mp.slope = 0 Then
-                    lp = New linePoint(New cv.Point(mp.p1.X, 0), New cv.Point(mp.p1.X, dst2.Height))
-                Else
-                    lp = longLines.buildELine(mp, dst2.Width, dst2.Height)
-                End If
-                Dim index = p1List.IndexOf(lp.p1)
-                If index >= 0 Then
-                    ptCounts(index) += 1
-                Else
-                    p1List.Add(lp.p1)
-                    p2List.Add(lp.p2)
-                    ptCounts.Add(1)
-                End If
-            Next
+            coin.findLines(mplist)
         Next
 
         Dim historyCount = gOptions.FrameHistory.Value
         dst2.SetTo(0)
         Dim highlight As Integer
         lpList.Clear()
-        For i = 0 To p1List.Count - 1
+        For i = 0 To coin.p1List.Count - 1
             highlight = 128
-            If ptCounts(i) > historyCount Then highlight = 255
-            If ptCounts(i) >= historyCount Then
-                dst2.Line(p1List(i), p2List(i), highlight, task.lineWidth, task.lineType)
-                lpList.Add(New linePoint(p1List(i), p2List(i)))
+            If coin.ptCounts(i) > historyCount Then highlight = 255
+            If coin.ptCounts(i) >= historyCount Then
+                dst2.Line(coin.p1List(i), coin.p2List(i), highlight, task.lineWidth, task.lineType)
+                lpList.Add(New pointPair(coin.p1List(i), coin.p2List(i)))
             End If
         Next
 
@@ -525,5 +508,38 @@ Public Class LongLine_HistoryIntercept : Inherits VB_Algorithm
         End If
 
         labels(2) = $"The {lpList.Count} lines below were present in each of the last " + CStr(historyCount) + " frames"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class LongLine_Length : Inherits VB_Algorithm
+    Dim lines As New Line_Basics
+    Public lpList As New List(Of pointPair)
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of lines to display", 0, 100, 25)
+        findSlider("Line length threshold in pixels").Value = 1
+        desc = "Identify the longest lines"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static countSlider = findSlider("Number of lines to display")
+        Dim maxCount = countSlider.value
+
+        lines.Run(src)
+
+        dst2.SetTo(0)
+        lpList.Clear()
+        For Each ele In lines.sortByLen
+            Dim lp = ele.Value
+            dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+            lpList.Add(lp)
+            If lpList.Count >= maxCount Then Exit For
+        Next
+
+        labels(2) = $"{lines.sortByLen.Count} lines found, longest {lpList.Count} displayed."
     End Sub
 End Class

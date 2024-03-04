@@ -212,7 +212,7 @@ Public Class MatchShapes_LeftRight : Inherits VB_Algorithm
         '    dst3.SetTo(0)
         'End If
 
-        'Dim lines As New List(Of linePoint)
+        'Dim lines As New List(Of pointPair)
         'For Each rc In rightCells
         '    If rc.pixels < minSize Then Continue For
         '    match.rcX = rc
@@ -224,7 +224,7 @@ Public Class MatchShapes_LeftRight : Inherits VB_Algorithm
         '        vbDrawContour(dst0(best.rect), best.contour, best.color, -1)
         '        vbDrawContour(dst2(best.rect), best.contour, best.color, -1)
         '        Dim pt = New cv.Point(rc.maxDist.X + dst2.Width, rc.maxDist.Y)
-        '        lines.Add(New linePoint(pt, best.maxDist))
+        '        lines.Add(New pointPair(pt, best.maxDist))
         '    End If
         '    If lines.Count > 3 Then Exit For
         'Next

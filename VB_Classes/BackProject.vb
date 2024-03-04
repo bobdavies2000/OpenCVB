@@ -592,7 +592,7 @@ End Class
 
 Public Class BackProject_LineSide : Inherits VB_Algorithm
     Dim line As New Line_ViewSide
-    Public mpList As New List(Of linePoint)
+    Public mpList As New List(Of pointPair)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Backproject the lines found in the side view."

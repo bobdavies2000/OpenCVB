@@ -1030,12 +1030,12 @@ Public Class Options_Eigen : Inherits VB_Algorithm
     Public highlight As Boolean
     Public recompute As Boolean
     Public randomCount As Integer = 100
-    Public linePointCount As Integer = 20
+    Public linePairCount As Integer = 20
     Public noiseOffset As Integer = 10
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Random point count", 0, 500, randomCount)
-            sliders.setupTrackBar("Line Point Count", 0, 500, linePointCount)
+            sliders.setupTrackBar("Line Point Count", 0, 500, linePairCount)
             sliders.setupTrackBar("Line Noise", 1, 100, noiseOffset)
         End If
         If check.Setup(traceName) Then
@@ -1049,10 +1049,10 @@ Public Class Options_Eigen : Inherits VB_Algorithm
         Static recomputeBox = findCheckBox("Recompute with new random data")
         Static highlightBox = findCheckBox("Highlight Line Data")
         Static randomSlider = findSlider("Random point count")
-        Static linePointSlider = findSlider("Random point count")
+        Static linePairSlider = findSlider("Random point count")
         Static noiseSlider = findSlider("Line Noise")
         randomCount = randomSlider.Value
-        linePointCount = linePointSlider.Value
+        linePairCount = linePairSlider.Value
         highlight = highlightBox.checked
         recompute = recomputeBox.checked
         noiseOffset = noiseSlider.Value

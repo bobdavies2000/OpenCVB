@@ -937,7 +937,7 @@ End Class
 Public Class Depth_Grid : Inherits VB_Algorithm
     Public Sub New()
         gOptions.GridSize.Value = 4
-        labels = {"", "", "", ""}
+        labels = {"", "", "White regions below are likely depth edges where depth changes rapidly", "Depth 32f display"}
         desc = "Find boundaries in depth to separate featureless regions."
     End Sub
     Public Sub RunVB(src As cv.Mat)

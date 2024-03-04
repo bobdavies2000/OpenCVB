@@ -94,12 +94,12 @@ Public Class Eigen_FitLineInput : Inherits VB_Algorithm
             m = (p2.Y - p1.Y) / (p2.X - p1.X)
             bb = p2.Y - p2.X * m
             Dim startx = Math.Min(p1.X, p2.X)
-            Dim incr = (Math.Max(p1.X, p2.X) - startx) / options.linePointCount
+            Dim incr = (Math.Max(p1.X, p2.X) - startx) / options.linePairCount
             Dim highLight = cv.Scalar.White
             If options.highlight Then
                 highLight = cv.Scalar.Gray
             End If
-            For i = 0 To options.linePointCount - 1
+            For i = 0 To options.linePairCount - 1
                 Dim noiseOffsetX = (Rnd() * 2 - 1) * options.noiseOffset
                 Dim noiseOffsetY = (Rnd() * 2 - 1) * options.noiseOffset
                 Dim pt = New cv.Point(startx + i * incr + noiseOffsetX, Math.Max(0, Math.Min(m * (startx + i * incr) + bb + noiseOffsetY, height)))

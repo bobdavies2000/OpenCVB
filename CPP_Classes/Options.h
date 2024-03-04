@@ -428,7 +428,7 @@ public:
 	bool highlight;
 	bool recompute;
 	int randomCount = 100;
-	int linePointCount = 20;
+	int linePairCount = 20;
 	int noiseOffset = 10;
 	CPP_Options_Eigen() {
 	}

@@ -531,11 +531,12 @@ End Structure
 
 
 
-Public Class linePoint
+Public Class pointPair
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
     Public slope As Single
     Public yIntercept As Single
+    Public length As Single
     Public Const verticalSlope As Single = 1000000
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
         p1 = _p1
@@ -543,12 +544,13 @@ Public Class linePoint
 
         slope = If((p1.X <> p2.X), (p1.Y - p2.Y) / (p1.X - p2.X), verticalSlope)
         yIntercept = p1.Y - slope * p1.X
+        length = p1.DistanceTo(p2)
     End Sub
     Sub New()
         p1 = New cv.Point2f()
         p2 = New cv.Point2f()
     End Sub
-    Public Function compare(mp As linePoint) As Boolean
+    Public Function compare(mp As pointPair) As Boolean
         If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
         Return False
     End Function
@@ -652,12 +654,12 @@ Public Class fPolyData
         prevPoly = New List(Of cv.Point2f)(currPoly)
         jitterCheck.SetTo(0)
     End Sub
-    Public Function prevmp() As linePoint
-        Return New linePoint(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod task.polyCount))
+    Public Function prevmp() As pointPair
+        Return New pointPair(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod task.polyCount))
     End Function
-    Public Function currmp() As linePoint
+    Public Function currmp() As pointPair
         If polyPrevSideIndex >= currPoly.Count - 1 Then polyPrevSideIndex = 0
-        Return New linePoint(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount))
+        Return New pointPair(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount))
     End Function
     Public Sub drawPolys(dst As cv.Mat, currPoly As List(Of cv.Point2f))
         vbDrawFPoly(dst, prevPoly, cv.Scalar.White)

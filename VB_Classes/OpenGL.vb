@@ -340,8 +340,8 @@ Public Class OpenGL_VerticalSingle : Inherits VB_Algorithm
 
         Dim pt1 = vLine.pt1
         Dim pt2 = vLine.pt2
-        Dim linePoints3D As New List(Of cv.Point3f)({New cv.Point3f((pt1.X + pt2.X) / 2, pt1.Y, (pt1.Z + pt2.Z) / 2), New cv.Point3f(pt1.X, pt2.Y, pt1.Z)})
-        task.ogl.dataInput = New cv.Mat(linePoints3D.Count, 1, cv.MatType.CV_32FC3, linePoints3D.ToArray)
+        Dim linePairs3D As New List(Of cv.Point3f)({New cv.Point3f((pt1.X + pt2.X) / 2, pt1.Y, (pt1.Z + pt2.Z) / 2), New cv.Point3f(pt1.X, pt2.Y, pt1.Z)})
+        task.ogl.dataInput = New cv.Mat(linePairs3D.Count, 1, cv.MatType.CV_32FC3, linePairs3D.ToArray)
 
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(task.color)
