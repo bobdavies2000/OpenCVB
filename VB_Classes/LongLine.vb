@@ -2,31 +2,30 @@
 Public Class LongLine_Basics : Inherits VB_Algorithm
     Public lines As New Line_Basics
     Public lineCount As Integer = 1 ' How many of the longest lines...
-    Public p1List As New List(Of cv.Point) ' p1 is always the leftmost of the matching p2 (from line_basics)
-    Public p2List As New List(Of cv.Point)
+    Public lpList As New List(Of pointPair) ' this will be sorted by length - longest first and p1 is always the leftmost of the matching p2 (from line_basics)
     Public Sub New()
         desc = "Isolate the longest X lines."
     End Sub
-    Public Function buildELine(mps As pointPair, width As Integer, height As Integer) As pointPair
-        If mps.p1.X <> mps.p2.X Then
-            Dim b = mps.p1.Y - mps.p1.X * mps.slope
-            If mps.p1.Y = mps.p2.Y Then
-                Return New pointPair(New cv.Point(0, mps.p1.Y), New cv.Point(width, mps.p1.Y))
+    Public Function buildELine(lp As pointPair) As pointPair
+        If lp.p1.X <> lp.p2.X Then
+            Dim b = lp.p1.Y - lp.p1.X * lp.slope
+            If lp.p1.Y = lp.p2.Y Then
+                Return New pointPair(New cv.Point(0, lp.p1.Y), New cv.Point(dst2.Width, lp.p1.Y))
             Else
-                Dim xint1 = CInt(-b / mps.slope)
-                Dim xint2 = CInt((height - b) / mps.slope)
+                Dim xint1 = CInt(-b / lp.slope)
+                Dim xint2 = CInt((dst2.Height - b) / lp.slope)
                 Dim yint1 = CInt(b)
-                Dim yint2 = CInt(mps.slope * width + b)
+                Dim yint2 = CInt(lp.slope * dst2.Width + b)
 
                 Dim points As New List(Of cv.Point)
-                If xint1 >= 0 And xint1 <= width Then points.Add(New cv.Point(xint1, 0))
-                If xint2 >= 0 And xint2 <= width Then points.Add(New cv.Point(xint2, height))
-                If yint1 >= 0 And yint1 <= height Then points.Add(New cv.Point(0, yint1))
-                If yint2 >= 0 And yint2 <= height Then points.Add(New cv.Point(width, yint2))
+                If xint1 >= 0 And xint1 <= dst2.Width Then points.Add(New cv.Point(xint1, 0))
+                If xint2 >= 0 And xint2 <= dst2.Width Then points.Add(New cv.Point(xint2, dst2.Height))
+                If yint1 >= 0 And yint1 <= dst2.Height Then points.Add(New cv.Point(0, yint1))
+                If yint2 >= 0 And yint2 <= dst2.Height Then points.Add(New cv.Point(dst2.Width, yint2))
                 Return New pointPair(points(0), points(1))
             End If
         End If
-        Return New pointPair(New cv.Point(mps.p1.X, 0), New cv.Point(mps.p1.X, height))
+        Return New pointPair(New cv.Point(lp.p1.X, 0), New cv.Point(lp.p1.X, dst2.height))
     End Function
     Public Sub RunVB(src As cv.Mat)
         lines.Run(src)
@@ -34,13 +33,11 @@ Public Class LongLine_Basics : Inherits VB_Algorithm
         If lines.sortByLen.Count = 0 Then Exit Sub
 
         dst2 = src
-        p1List.Clear()
-        p2List.Clear()
+        lpList.Clear()
         For Each lp In lines.sortByLen.Values
+            lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
-            p1List.Add(lp.p1)
-            p2List.Add(lp.p2)
-            If p1List.Count >= lineCount Then Exit For
+            If lpList.Count >= lineCount Then Exit For
         Next
     End Sub
 End Class
@@ -63,10 +60,10 @@ Public Class LongLine_Depth : Inherits VB_Algorithm
         longLine.Run(src.Clone)
         dst1 = src
 
-        dst1.Line(longLine.longP1, longLine.longP2, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+        dst1.Line(longLine.ptLong.p1, longLine.ptLong.p2, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
 
         dst0.SetTo(0)
-        dst0.Line(longLine.longP1, longLine.longP2, 255, 3, task.lineType)
+        dst0.Line(longLine.ptLong.p1, longLine.ptLong.p2, 255, 3, task.lineType)
         dst0.SetTo(0, task.noDepthMask)
 
         Dim mm As mmData = vbMinMax(task.pcSplit(2), dst0)
@@ -83,8 +80,8 @@ Public Class LongLine_Depth : Inherits VB_Algorithm
 
         Dim depth = task.pcSplit(2).Mean(dst0)(0)
 
-        setTrueText("Average Depth = " + Format(depth, fmt1) + "m", New cv.Point((longLine.longP1.X + longLine.longP2.X) / 2 + 30,
-                                                                                 (longLine.longP1.Y + longLine.longP2.Y) / 2), 1)
+        setTrueText("Average Depth = " + Format(depth, fmt1) + "m", New cv.Point((longLine.ptLong.p1.X + longLine.ptLong.p2.X) / 2 + 30,
+                                                                                 (longLine.ptLong.p1.Y + longLine.ptLong.p2.Y) / 2), 1)
 
         labels(3) = "Mean (blue)/Min (green)/Max (red) = " + Format(depth, fmt1) + "/" + Format(mm.minVal, fmt1) + "/" +
                     Format(mm.maxVal, fmt1) + " meters "
@@ -106,8 +103,7 @@ End Class
 
 Public Class LongLine_Consistent : Inherits VB_Algorithm
     Dim longest As New LongLine_Basics
-    Public longP1 As cv.Point
-    Public longP2 As cv.Point
+    Public ptLong As pointPair
     Public Sub New()
         longest.lineCount = 4
         desc = "Isolate the line that is consistently among the longest lines present in the image."
@@ -115,27 +111,22 @@ Public Class LongLine_Consistent : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         dst2 = src.Clone
         longest.Run(src)
-        If longest.p1List.Count = 0 Then Exit Sub
-        If longP1 = New cv.Point Then longP1 = longest.p1List(0)
-        If longP2 = New cv.Point Then longP2 = longest.p2List(0)
+        If longest.lpList.Count = 0 Then Exit Sub
+        If ptLong Is Nothing Then ptLong = longest.lpList(0)
 
         Dim minDistance = Single.MaxValue
-        Dim minIndex As Integer
-        For i = 0 To longest.p1List.Count - 1
-            Dim p1 = longest.p1List(i)
-            Dim p2 = longest.p2List(i)
-
-            Dim distance = p1.DistanceTo(longP1) + p2.DistanceTo(longP2)
+        Dim lpMin As pointPair
+        For Each lp In longest.lpList
+            Dim distance = lp.p1.DistanceTo(ptLong.p1) + lp.p2.DistanceTo(ptLong.p2)
             If distance < minDistance Then
                 minDistance = distance
-                minIndex = i
+                lpMin = lp
             End If
         Next
 
         labels(2) = "minDistance = " + Format(minDistance, fmt1)
-        dst2.Line(longP1, longP2, task.highlightColor, task.lineWidth, task.lineType)
-        longP1 = longest.p1List(minIndex)
-        longP2 = longest.p2List(minIndex)
+        dst2.Line(ptLong.p1, ptLong.p2, task.highlightColor, task.lineWidth, task.lineType)
+        ptLong = lpMin
     End Sub
 End Class
 
@@ -158,13 +149,12 @@ Public Class LongLine_Point : Inherits VB_Algorithm
         longLine.Run(src)
         dst2 = longLine.dst2
 
-        Dim p1 = longLine.longP1
-        Dim p2 = longLine.longP2
-        kalman.kInput = {p1.X, p1.Y, p2.X, p2.Y}
+        Dim lp = longLine.ptLong
+        kalman.kInput = {lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y}
         kalman.Run(empty)
-        p1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
-        p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
-        longPt = New cv.Point((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
+        lp.p1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
+        lp.p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
+        longPt = New cv.Point((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
 
         dst2.Circle(longPt, task.dotSize, cv.Scalar.Red, -1, task.lineType)
     End Sub
@@ -188,11 +178,10 @@ Public Class LongLine_Match : Inherits VB_Algorithm
         longest.Run(src)
         dst2 = longest.dst2
 
-        Dim p1 = longest.longP1
-        Dim p2 = longest.longP2
+        Dim lp = longest.ptLong
 
-        Dim x1 = Math.Min(p1.X - pad, p2.X - pad), x2 = Math.Max(p1.X + pad, p2.X + pad)
-        Dim y1 = Math.Min(p1.Y - pad, p2.Y - pad), y2 = Math.Max(p1.Y + pad, p2.Y + pad)
+        Dim x1 = Math.Min(lp.p1.X - pad, lp.p2.X - pad), x2 = Math.Max(lp.p1.X + pad, lp.p2.X + pad)
+        Dim y1 = Math.Min(lp.p1.Y - pad, lp.p2.Y - pad), y2 = Math.Max(lp.p1.Y + pad, lp.p2.Y + pad)
         Dim rect = validateRect(New cv.Rect(Math.Min(x1, x2), Math.Min(y1, y2), Math.Abs(x1 - x2), Math.Abs(y1 - y2)))
         dst2.Rectangle(rect, task.highlightColor, task.lineWidth)
 
@@ -231,7 +220,7 @@ Public Class LongLine_ExtendTest : Inherits VB_Algorithm
             Dim p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
 
             Dim mps = New pointPair(p1, p2)
-            Dim emps = longLine.buildELine(mps, dst2.Width, dst2.Height)
+            Dim emps = longLine.buildELine(mps)
             dst2 = src
             dst2.Line(emps.p1, emps.p2, task.highlightColor, task.lineWidth, task.lineType)
             dst2.Circle(p1, task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
@@ -420,7 +409,7 @@ Public Class LongLine_Extend : Inherits VB_Algorithm
         End If
 
         Dim mps = New pointPair(p1, p2)
-        Dim emps = lines.buildELine(mps, dst2.Width, dst2.Height)
+        Dim emps = lines.buildELine(mps)
 
         If standaloneTest() Then
             labels(2) = emps.p1.ToString + " and " + emps.p2.ToString + " started with " + saveP1.ToString + " and " + saveP2.ToString
@@ -517,11 +506,12 @@ End Class
 
 
 Public Class LongLine_Length : Inherits VB_Algorithm
-    Dim lines As New Line_Basics
+    Dim lines As New LongLine_Basics
     Public lpList As New List(Of pointPair)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of lines to display", 0, 100, 25)
         findSlider("Line length threshold in pixels").Value = 1
+        lines.lineCount = 1000
         desc = "Identify the longest lines"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -532,13 +522,13 @@ Public Class LongLine_Length : Inherits VB_Algorithm
 
         dst2.SetTo(0)
         lpList.Clear()
-        For Each ele In lines.sortByLen
-            Dim lp = ele.Value
+        For Each lp In lines.lpList
+            lp = lines.buildELine(lp)
             dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
             lpList.Add(lp)
             If lpList.Count >= maxCount Then Exit For
         Next
 
-        labels(2) = $"{lines.sortByLen.Count} lines found, longest {lpList.Count} displayed."
+        labels(2) = $"{lines.lpList.Count} lines found, longest {lpList.Count} displayed."
     End Sub
 End Class

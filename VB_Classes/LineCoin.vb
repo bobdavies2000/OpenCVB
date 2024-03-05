@@ -17,7 +17,7 @@ Public Class LineCoin_Basics : Inherits VB_Algorithm
             If mp.slope = 0 Then
                 lp = New pointPair(New cv.Point(mp.p1.X, 0), New cv.Point(mp.p1.X, dst2.Height))
             Else
-                lp = longLines.buildELine(mp, dst2.Width, dst2.Height)
+                lp = longLines.buildELine(mp)
             End If
             Dim index = p1List.IndexOf(lp.p1)
             If index >= 0 Then
