@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class LineCoin_Basics : Inherits VB_Algorithm
-    Public longLines As New LongLine_Length
+    Public longLines As New LongLine_Basics
     Public lpList As New List(Of pointPair)
     Public p1List As New List(Of cv.Point)
     Public p2List As New List(Of cv.Point)
@@ -17,7 +17,7 @@ Public Class LineCoin_Basics : Inherits VB_Algorithm
             If mp.slope = 0 Then
                 lp = New pointPair(New cv.Point(mp.p1.X, 0), New cv.Point(mp.p1.X, dst2.Height))
             Else
-                lp = longLines.lines.buildELine(mp)
+                lp = longLines.buildLongLine(mp)
             End If
             Dim index = p1List.IndexOf(lp.p1)
             If index >= 0 Then
@@ -87,5 +87,48 @@ Public Class LineCoin_HistoryIntercept : Inherits VB_Algorithm
         dst2 = coin.dst2
 
         labels(2) = $"The {lpList.Count} lines below were present in each of the last " + CStr(gOptions.FrameHistory.Value) + " frames"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LineCoin_Parallel : Inherits VB_Algorithm
+    Dim parallel As New LongLine_ExtendParallel
+    Dim near As New Line_Nearest
+    Public coinList As New List(Of cPoints)
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Max Distance to qualify as coincident", 0, 20, 10)
+        desc = "Find the lines that are coincident in the parallel lines"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static distSlider = findSlider("Max Distance to qualify as coincident")
+        Dim maxDistance = distSlider.Value
+        parallel.Run(src)
+
+        coinList.Clear()
+
+        For Each cp In parallel.parList
+            near.p1 = cp.p1
+            near.p2 = cp.p2
+            near.pt = cp.p3
+            near.Run(empty)
+            If near.distance1 < maxDistance Or near.distance2 < maxDistance Then
+                coinList.Add(cp)
+            Else
+                near.pt = cp.p4
+                near.Run(empty)
+                If near.distance1 < maxDistance Or near.distance2 < maxDistance Then coinList.Add(cp)
+            End If
+        Next
+
+        dst2 = src.Clone
+        For Each cp In coinList
+            dst2.Line(cp.p3, cp.p4, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
+            dst2.Line(cp.p1, cp.p2, task.highlightColor, task.lineWidth + 1, task.lineType)
+        Next
+        labels(2) = CStr(coinList.Count) + " coincident lines were detected"
     End Sub
 End Class

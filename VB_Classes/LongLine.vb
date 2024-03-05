@@ -1,12 +1,14 @@
 ﻿Imports cv = OpenCvSharp
 Public Class LongLine_Basics : Inherits VB_Algorithm
-    Public lines As New Line_Basics
-    Public lineCount As Integer = 1 ' How many of the longest lines...
-    Public lpList As New List(Of pointPair) ' this will be sorted by length - longest first and p1 is always the leftmost of the matching p2 (from line_basics)
+    Public lines As New LongLine_Core
+    Public lpList As New List(Of pointPair)
     Public Sub New()
-        desc = "Isolate the longest X lines."
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of lines to display", 0, 100, 25)
+        findSlider("Line length threshold in pixels").Value = 1
+        lines.lineCount = 1000
+        desc = "Identify the longest lines"
     End Sub
-    Public Function buildELine(lp As pointPair) As pointPair
+    Public Function buildLongLine(lp As pointPair) As pointPair
         If lp.p1.X <> lp.p2.X Then
             Dim b = lp.p1.Y - lp.p1.X * lp.slope
             If lp.p1.Y = lp.p2.Y Then
@@ -25,8 +27,40 @@ Public Class LongLine_Basics : Inherits VB_Algorithm
                 Return New pointPair(points(0), points(1))
             End If
         End If
-        Return New pointPair(New cv.Point(lp.p1.X, 0), New cv.Point(lp.p1.X, dst2.height))
+        Return New pointPair(New cv.Point(lp.p1.X, 0), New cv.Point(lp.p1.X, dst2.Height))
     End Function
+    Public Sub RunVB(src As cv.Mat)
+        Static countSlider = findSlider("Number of lines to display")
+        Dim maxCount = countSlider.value
+
+        dst2 = src.Clone
+        lines.Run(src)
+
+        lpList.Clear()
+        For Each lp In lines.lpList
+            lp = buildLongLine(lp)
+            dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+            lpList.Add(lp)
+            If lpList.Count >= maxCount Then Exit For
+        Next
+
+        labels(2) = $"{lines.lpList.Count} lines found, longest {lpList.Count} displayed."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class LongLine_Core : Inherits VB_Algorithm
+    Public lines As New Line_Basics
+    Public lineCount As Integer = 1 ' How many of the longest lines...
+    Public lpList As New List(Of pointPair) ' this will be sorted by length - longest first and p1 is always the leftmost of the matching p2 (from line_basics)
+    Public Sub New()
+        desc = "Isolate the longest X lines."
+    End Sub
     Public Sub RunVB(src As cv.Mat)
         lines.Run(src)
         dst2 = lines.dst2
@@ -102,7 +136,7 @@ End Class
 
 
 Public Class LongLine_Consistent : Inherits VB_Algorithm
-    Dim longest As New LongLine_Basics
+    Dim longest As New LongLine_Core
     Public ptLong As pointPair
     Public Sub New()
         longest.lineCount = 4
@@ -220,7 +254,7 @@ Public Class LongLine_ExtendTest : Inherits VB_Algorithm
             Dim p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
 
             Dim mps = New pointPair(p1, p2)
-            Dim emps = longLine.buildELine(mps)
+            Dim emps = longLine.buildLongLine(mps)
             dst2 = src
             dst2.Line(emps.p1, emps.p2, task.highlightColor, task.lineWidth, task.lineType)
             dst2.Circle(p1, task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
@@ -348,51 +382,6 @@ End Class
 
 
 
-
-Public Class LongLine_Coincident : Inherits VB_Algorithm
-    Dim parallel As New LongLine_ExtendParallel
-    Dim near As New Line_Nearest
-    Public coinList As New List(Of cPoints)
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Max Distance to qualify as coincident", 0, 20, 10)
-        desc = "Find the lines that are coincident in the parallel lines"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static distSlider = findSlider("Max Distance to qualify as coincident")
-        Dim maxDistance = distSlider.Value
-        parallel.Run(src)
-
-        coinList.Clear()
-
-        For Each cp In parallel.parList
-            near.p1 = cp.p1
-            near.p2 = cp.p2
-            near.pt = cp.p3
-            near.Run(empty)
-            If near.distance1 < maxDistance Or near.distance2 < maxDistance Then
-                coinList.Add(cp)
-            Else
-                near.pt = cp.p4
-                near.Run(empty)
-                If near.distance1 < maxDistance Or near.distance2 < maxDistance Then coinList.Add(cp)
-            End If
-        Next
-
-        dst2 = src.Clone
-        For Each cp In coinList
-            dst2.Line(cp.p3, cp.p4, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
-            dst2.Line(cp.p1, cp.p2, task.highlightColor, task.lineWidth + 1, task.lineType)
-        Next
-        labels(2) = CStr(coinList.Count) + " coincident lines were detected"
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class LongLine_Extend : Inherits VB_Algorithm
     Dim lines As New LongLine_Basics
     Public Sub New()
@@ -409,7 +398,7 @@ Public Class LongLine_Extend : Inherits VB_Algorithm
         End If
 
         Dim mps = New pointPair(p1, p2)
-        Dim emps = lines.buildELine(mps)
+        Dim emps = lines.buildLongLine(mps)
 
         If standaloneTest() Then
             labels(2) = emps.p1.ToString + " and " + emps.p2.ToString + " started with " + saveP1.ToString + " and " + saveP2.ToString
@@ -505,44 +494,10 @@ End Class
 
 
 
-Public Class LongLine_Length : Inherits VB_Algorithm
-    Public lines As New LongLine_Basics
-    Public lpList As New List(Of pointPair)
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of lines to display", 0, 100, 25)
-        findSlider("Line length threshold in pixels").Value = 1
-        lines.lineCount = 1000
-        desc = "Identify the longest lines"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static countSlider = findSlider("Number of lines to display")
-        Dim maxCount = countSlider.value
-
-        dst2 = src.Clone
-        lines.Run(src)
-
-        lpList.Clear()
-        For Each lp In lines.lpList
-            lp = lines.buildELine(lp)
-            dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
-            lpList.Add(lp)
-            If lpList.Count >= maxCount Then Exit For
-        Next
-
-        labels(2) = $"{lines.lpList.Count} lines found, longest {lpList.Count} displayed."
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 Public Class LongLine_History : Inherits VB_Algorithm
-    Dim lines As New LongLine_Length
+    Dim lines As New LongLine_Basics
     Public lpList As New List(Of pointPair)
     Public Sub New()
         desc = "Find the longest lines and toss any that are intermittant."
