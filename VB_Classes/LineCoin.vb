@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class LineCoin_Basics : Inherits VB_Algorithm
-    Public longLines As New LongLine_Basics
+    Public longLines As New LongLine_Length
     Public lpList As New List(Of pointPair)
     Public p1List As New List(Of cv.Point)
     Public p2List As New List(Of cv.Point)
@@ -17,7 +17,7 @@ Public Class LineCoin_Basics : Inherits VB_Algorithm
             If mp.slope = 0 Then
                 lp = New pointPair(New cv.Point(mp.p1.X, 0), New cv.Point(mp.p1.X, dst2.Height))
             Else
-                lp = longLines.buildELine(mp)
+                lp = longLines.lines.buildELine(mp)
             End If
             Dim index = p1List.IndexOf(lp.p1)
             If index >= 0 Then
@@ -35,7 +35,7 @@ Public Class LineCoin_Basics : Inherits VB_Algorithm
 
         longLines.Run(src)
 
-        mpLists.Add(longLines.lines.mpList)
+        mpLists.Add(longLines.lines.lines.mpList)
 
         p1List.Clear()
         p2List.Clear()

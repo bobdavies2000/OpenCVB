@@ -1005,6 +1005,7 @@ if algorithmName = "LongLine_Extend" Then return new LongLine_Extend
 if algorithmName = "LongLine_ExtendAll" Then return new LongLine_ExtendAll
 if algorithmName = "LongLine_ExtendParallel" Then return new LongLine_ExtendParallel
 if algorithmName = "LongLine_ExtendTest" Then return new LongLine_ExtendTest
+if algorithmName = "LongLine_History" Then return new LongLine_History
 if algorithmName = "LongLine_HistoryIntercept" Then return new LongLine_HistoryIntercept
 if algorithmName = "LongLine_Length" Then return new LongLine_Length
 if algorithmName = "LongLine_Match" Then return new LongLine_Match

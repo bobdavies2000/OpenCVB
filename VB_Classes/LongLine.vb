@@ -459,7 +459,7 @@ Public Class LongLine_HistoryIntercept : Inherits VB_Algorithm
 
         coin.longLines.Run(src)
 
-        mpLists.Add(coin.longLines.lines.mpList)
+        mpLists.Add(coin.longLines.lpList)
 
         coin.p1List.Clear()
         coin.p2List.Clear()
@@ -506,7 +506,7 @@ End Class
 
 
 Public Class LongLine_Length : Inherits VB_Algorithm
-    Dim lines As New LongLine_Basics
+    Public lines As New LongLine_Basics
     Public lpList As New List(Of pointPair)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of lines to display", 0, 100, 25)
@@ -518,9 +518,9 @@ Public Class LongLine_Length : Inherits VB_Algorithm
         Static countSlider = findSlider("Number of lines to display")
         Dim maxCount = countSlider.value
 
+        dst2 = src.Clone
         lines.Run(src)
 
-        dst2.SetTo(0)
         lpList.Clear()
         For Each lp In lines.lpList
             lp = lines.buildELine(lp)
@@ -530,5 +530,56 @@ Public Class LongLine_Length : Inherits VB_Algorithm
         Next
 
         labels(2) = $"{lines.lpList.Count} lines found, longest {lpList.Count} displayed."
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class LongLine_History : Inherits VB_Algorithm
+    Dim lines As New LongLine_Length
+    Public lpList As New List(Of pointPair)
+    Public Sub New()
+        desc = "Find the longest lines and toss any that are intermittant."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        lines.Run(src)
+        dst2 = lines.dst2
+
+        Static mpList As New List(Of List(Of pointPair))
+        mpList.Add(lines.lpList)
+
+        Dim tmplist As New List(Of pointPair)
+        Dim lpCount As New List(Of Integer)
+        For Each list In mpList
+            For Each lp In list
+                Dim index = tmplist.IndexOf(lp)
+                If index < 0 Then
+                    tmplist.Add(lp)
+                    lpCount.Add(1)
+                Else
+                    lpCount(index) += 1
+                End If
+            Next
+        Next
+
+        lpList.clear
+        Dim histCount = gOptions.FrameHistory.Value
+        For i = 0 To lpCount.Count - 1
+            Dim count = lpCount(i)
+            If count >= histCount Then lpList.Add(tmplist(i))
+        Next
+
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+        Next
+        If mpList.Count > gOptions.FrameHistory.Value Then mpList.RemoveAt(0)
+
+        labels(2) = $"{lpList.Count} were found that were present for every one of the last {histCount} frames."
     End Sub
 End Class
