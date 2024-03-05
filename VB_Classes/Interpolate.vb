@@ -194,10 +194,10 @@ Public Class Interpolate_Lines : Inherits VB_Algorithm
         lines.Run(dst1)
         dst2 = lines.dst2
         dst3 = src
-        For Each mps In lines.mpList
-            dst3.Line(mps.p1, mps.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        For Each lp In lines.lpList
+            dst3.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
         Next
-        labels(3) = "There were " + CStr(lines.mpList.Count) + " lines found"
+        labels(3) = "There were " + CStr(lines.lpList.Count) + " lines found"
         labels(2) = inter.labels(2)
     End Sub
 End Class

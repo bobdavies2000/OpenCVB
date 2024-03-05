@@ -349,9 +349,7 @@ End Class
 Public Class Options_Line : Inherits VB_Algorithm
     Public lineLengthThreshold As Integer = 20
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Line length threshold in pixels", 1, 400, lineLengthThreshold)
-        End If
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Line length threshold in pixels", 1, 400, lineLengthThreshold)
     End Sub
     Public Sub RunVB()
         Static lenSlider = findSlider("Line length threshold in pixels")

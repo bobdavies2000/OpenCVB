@@ -125,12 +125,12 @@ Public Class OpAuto_FloorCeiling : Inherits VB_Algorithm
         dst2 = src.Clone
         bpLine.Run(src)
 
-        If bpLine.mpList.Count > 0 Then
+        If bpLine.lpList.Count > 0 Then
             strOut = "Y range = " + Format(task.yRange, fmt3) + vbCrLf + vbCrLf
             If task.heartBeat Then yList.Clear()
             If task.heartBeat Then dst1.SetTo(0)
             Dim h = dst2.Height / 2
-            For Each mp In bpLine.mpList
+            For Each mp In bpLine.lpList
                 Dim nextY = task.yRange * (mp.p1.Y - h) / h
                 If Math.Abs(nextY) > task.yRange / 4 Then yList.Add(nextY)
             Next

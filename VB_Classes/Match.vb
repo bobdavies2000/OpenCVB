@@ -250,11 +250,11 @@ Public Class Match_Lines : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         lines.Run(src)
         dst2 = lines.dst2
-        Static lastPt As New List(Of pointPair)(lines.mpList)
+        Static lastPt As New List(Of pointPair)(lines.lpList)
 
         knn.queries.Clear()
-        For Each mps In lines.mpList
-            knn.queries.Add(New cv.Vec4f(mps.p1.X, mps.p1.Y, mps.p2.X, mps.p2.Y))
+        For Each lp In lines.lpList
+            knn.queries.Add(New cv.Vec4f(lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
         Next
         If task.optionsChanged Then knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
         knn.Run(empty)
@@ -262,18 +262,18 @@ Public Class Match_Lines : Inherits VB_Algorithm
         If knn.queries.Count = 0 Then Exit Sub
 
         For Each i In knn.result
-            If i >= lines.mpList.Count Then Continue For
-            Dim mps = lines.mpList(i)
+            If i >= lines.lpList.Count Then Continue For
+            Dim lp = lines.lpList(i)
 
             Dim index = knn.result(i, 0)
             If index >= 0 And index < lastPt.Count Then
                 Dim lastMP = lastPt(index)
-                dst2.Line(mps.p1, lastMP.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+                dst2.Line(lp.p1, lastMP.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
             End If
         Next
 
         knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
-        lastPt = New List(Of pointPair)(lines.mpList)
+        lastPt = New List(Of pointPair)(lines.lpList)
     End Sub
 End Class
 

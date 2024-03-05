@@ -23,7 +23,7 @@ enum functions
     _CPP_RedColor_FeatureLessCore,
     _CPP_Palette_Basics,
     _CPP_FeatureLess_History,
-    _CPP_Line_Basics,
+    _CPP_Line_BasicsOld,
     _CPP_Convex_Basics,
     _CPP_Resize_Preserve,
     _CPP_History_Basics,

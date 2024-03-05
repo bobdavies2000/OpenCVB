@@ -2116,7 +2116,7 @@ public:
 
 
 
-class CPP_Line_Basics : public algorithmCPP {
+class CPP_Line_BasicsOld : public algorithmCPP {
 public: 
     Ptr<ximgproc::FastLineDetector> ld;
     map<float, int> sortLength;
@@ -2125,9 +2125,9 @@ public:
     Rect subsetRect;
     int options_lineLengthThreshold = 20;
     // vector<tCell> tCells;
-    CPP_Line_Basics() : algorithmCPP() {
+    CPP_Line_BasicsOld() : algorithmCPP() {
         subsetRect = Rect(0, 0, dst2.cols, dst2.rows);
-        traceName = "CPP_Line_Basics";
+        traceName = "CPP_Line_BasicsOld";
         dst3 = Mat::zeros(dst3.size(), CV_8U);
         ld = ximgproc::createFastLineDetector();
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present.";

@@ -331,7 +331,7 @@ End Class
 
 
 Public Class Feature_Line : Inherits VB_Algorithm
-    Dim lines As New Line_Basics
+    Dim lines As New Line_BasicsOld
     Dim lineDisp As New Line_DisplayInfo
     Dim options As New Options_Features
     Dim match As New Match_tCell
@@ -428,7 +428,7 @@ Public Class Feature_LinesVH : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         Dim rsize = options.fOptions.matchCellSize
-        gLines.lines.subsetRect = New cv.Rect(rsize * 3, rsize * 3, src.Width - rsize * 6, src.Height - rsize * 6)
+        ' gLines.lines.subsetRect = New cv.Rect(rsize * 3, rsize * 3, src.Width - rsize * 6, src.Height - rsize * 6)
         gLines.Run(src)
 
         Static vertRadio = findRadio("Vertical lines")
@@ -495,32 +495,29 @@ End Class
 Public Class Feature_Lines_Tutorial1 : Inherits VB_Algorithm
     Dim lines As New Line_Basics
     Public Sub New()
-        desc = "Find all the lines in the image and determine which are vertical and horizontal"
+        labels(3) = "The highlighted lines are also lines in 3D."
+        desc = "Find all the lines in the image and determine which are in the depth data."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         lines.Run(src)
         dst2 = lines.dst2
 
-        Dim raw2D As New List(Of cv.Point2f)
+        Dim raw2D As New List(Of pointPair)
         Dim raw3D As New List(Of cv.Point3f)
-        For i = 0 To lines.ptList.Count - 1 Step 2
-            Dim p1 = lines.ptList(i)
-            Dim p2 = lines.ptList(i + 1)
-
-            If task.pcSplit(2).Get(Of Single)(p1.Y, p1.X) > 0 And task.pcSplit(2).Get(Of Single)(p2.Y, p2.X) > 0 Then
-                raw2D.Add(p1)
-                raw2D.Add(p2)
-                raw3D.Add(task.pointCloud.Get(Of cv.Point3f)(p1.Y, p1.X))
-                raw3D.Add(task.pointCloud.Get(Of cv.Point3f)(p2.Y, p2.X))
+        For Each lp In lines.lpList
+            If task.pcSplit(2).Get(Of Single)(lp.p1.Y, lp.p1.X) > 0 And task.pcSplit(2).Get(Of Single)(lp.p2.Y, lp.p2.X) > 0 Then
+                raw2D.Add(lp)
+                raw3D.Add(task.pointCloud.Get(Of cv.Point3f)(lp.p1.Y, lp.p1.X))
+                raw3D.Add(task.pointCloud.Get(Of cv.Point3f)(lp.p2.Y, lp.p2.X))
             End If
         Next
 
         dst3 = src
         For i = 0 To raw2D.Count - 2 Step 2
-            dst3.Line(raw2D(i), raw2D(i + 1), task.highlightColor, task.lineWidth, task.lineType)
+            dst3.Line(raw2D(i).p1, raw2D(i).p2, task.highlightColor, task.lineWidth, task.lineType)
         Next
-        labels(2) = "Starting with " + Format(lines.ptList.Count / 2, "000") + " lines, there are " +
-                                       Format(raw3D.Count / 2, "000") + " with depth data."
+        If task.heartBeat Then labels(2) = "Starting with " + Format(lines.lpList.Count, "000") + " lines, there are " +
+                                           Format(raw3D.Count / 2, "000") + " with depth data."
     End Sub
 End Class
 
@@ -545,31 +542,29 @@ Public Class Feature_Lines_Tutorial2 : Inherits VB_Algorithm
         lines.Run(src)
         dst2 = lines.dst2
 
-        Dim raw2D As New List(Of cv.Point2f)
+        Dim raw2D As New List(Of pointPair)
         Dim raw3D As New List(Of cv.Point3f)
-        For i = 0 To lines.ptList.Count - 1 Step 2
-            Dim p1 = lines.ptList(i), p2 = lines.ptList(i + 1)
+        For Each lp In lines.lpList
             Dim pt1 As cv.Point3f, pt2 As cv.Point3f
             For j = 0 To 1
-                Dim pt = Choose(j + 1, p1, p2)
+                Dim pt = Choose(j + 1, lp.p1, lp.p2)
                 Dim rect = validateRect(New cv.Rect(pt.x - k, pt.y - k, kernel, kernel))
                 Dim val = task.pointCloud(rect).Mean(task.depthMask(rect))
                 If j = 0 Then pt1 = New cv.Point3f(val(0), val(1), val(2)) Else pt2 = New cv.Point3f(val(0), val(1), val(2))
             Next
             If pt1.Z > 0 And pt2.Z > 0 Then
-                raw2D.Add(p1)
-                raw2D.Add(p2)
-                raw3D.Add(task.pointCloud.Get(Of cv.Point3f)(p1.Y, p1.X))
-                raw3D.Add(task.pointCloud.Get(Of cv.Point3f)(p2.Y, p2.X))
+                raw2D.Add(lp)
+                raw3D.Add(task.pointCloud.Get(Of cv.Point3f)(lp.p1.Y, lp.p1.X))
+                raw3D.Add(task.pointCloud.Get(Of cv.Point3f)(lp.p2.Y, lp.p2.X))
             End If
         Next
 
         dst3 = src
         For i = 0 To raw2D.Count - 2 Step 2
-            dst3.Line(raw2D(i), raw2D(i + 1), task.highlightColor, task.lineWidth, task.lineType)
+            dst3.Line(raw2D(i).p1, raw2D(i).p2, task.highlightColor, task.lineWidth, task.lineType)
         Next
-        labels(2) = "Starting with " + Format(lines.ptList.Count / 2, "000") + " lines, there are " +
-                                       Format(raw3D.Count / 2, "000") + " with depth data."
+        If task.heartBeat Then labels(2) = "Starting with " + Format(lines.lpList.Count, "000") + " lines, there are " +
+                                           Format(raw3D.Count, "000") + " with depth data."
         If raw3D.Count = 0 Then
             setTrueText("No vertical or horizontal lines were found")
         Else
@@ -927,21 +922,19 @@ Public Class Feature_Lines : Inherits VB_Algorithm
         lines.Run(src)
         dst2 = lines.dst2
 
-        Dim raw2D As New List(Of cv.Point2f)
+        Dim raw2D As New List(Of pointPair)
         Dim raw3D As New List(Of cv.Point3f)
-        For i = 0 To lines.ptList.Count - 1 Step 2
-            Dim p1 = lines.ptList(i), p2 = lines.ptList(i + 1)
+        For Each lp In lines.lpList
             Dim pt1 As cv.Point3f, pt2 As cv.Point3f
             For j = 0 To 1
-                Dim pt = Choose(j + 1, p1, p2)
+                Dim pt = Choose(j + 1, lp.p1, lp.p2)
                 Dim rect = validateRect(New cv.Rect(pt.x - k, pt.y - k, kernel, kernel))
                 Dim val = task.pointCloud(rect).Mean(task.depthMask(rect))
                 If j = 0 Then pt1 = New cv.Point3f(val(0), val(1), val(2)) Else pt2 = New cv.Point3f(val(0), val(1), val(2))
             Next
 
             If pt1.Z > 0 And pt2.Z > 0 And pt1.Z < 4 And pt2.Z < 4 Then ' points more than X meters away are not accurate...
-                raw2D.Add(p1)
-                raw2D.Add(p2)
+                raw2D.Add(lp)
                 raw3D.Add(pt1)
                 raw3D.Add(pt2)
             End If
@@ -958,39 +951,39 @@ Public Class Feature_Lines : Inherits VB_Algorithm
                 Dim len3D = distance3D(pt1, pt2)
                 Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
                 If Math.Abs(arcY - 90) < tolerance Then
-                    dst3.Line(raw2D(i), raw2D(i + 1), cv.Scalar.Blue, task.lineWidth, task.lineType)
+                    dst3.Line(raw2D(i).p1, raw2D(i).p2, cv.Scalar.Blue, task.lineWidth, task.lineType)
                     sortedVerticals.Add(len3D, lines3D.Count)
-                    sorted2DV.Add(raw2D(i).DistanceTo(raw2D(i + 1)), lines2D.Count)
+                    sorted2DV.Add(raw2D(i).p1.DistanceTo(raw2D(i).p2), lines2D.Count)
                     If pt1.Y > pt2.Y Then
                         lines3D.Add(pt1)
                         lines3D.Add(pt2)
-                        lines2D.Add(raw2D(i))
-                        lines2D.Add(raw2D(i + 1))
+                        lines2D.Add(raw2D(i).p1)
+                        lines2D.Add(raw2D(i).p2)
                     Else
                         lines3D.Add(pt2)
                         lines3D.Add(pt1)
-                        lines2D.Add(raw2D(i + 1))
-                        lines2D.Add(raw2D(i))
+                        lines2D.Add(raw2D(i).p2)
+                        lines2D.Add(raw2D(i).p1)
                     End If
                 End If
                 If Math.Abs(arcY) < tolerance Then
-                    dst3.Line(raw2D(i), raw2D(i + 1), cv.Scalar.Yellow, task.lineWidth, task.lineType)
+                    dst3.Line(raw2D(i).p1, raw2D(i).p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
                     sortedHorizontals.Add(len3D, lines3D.Count)
                     If pt1.X < pt2.X Then
                         lines3D.Add(pt1)
                         lines3D.Add(pt2)
-                        lines2D.Add(raw2D(i))
-                        lines2D.Add(raw2D(i + 1))
+                        lines2D.Add(raw2D(i).p1)
+                        lines2D.Add(raw2D(i).p2)
                     Else
                         lines3D.Add(pt2)
                         lines3D.Add(pt1)
-                        lines2D.Add(raw2D(i + 1))
-                        lines2D.Add(raw2D(i))
+                        lines2D.Add(raw2D(i).p2)
+                        lines2D.Add(raw2D(i).p1)
                     End If
                 End If
             Next
         End If
-        labels(2) = "Starting with " + Format(lines.ptList.Count / 2, "000") + " lines, there are " +
+        labels(2) = "Starting with " + Format(lines.lpList.Count, "000") + " lines, there are " +
                                        Format(lines3D.Count / 2, "000") + " with depth data."
         labels(3) = "There were " + CStr(sortedVerticals.Count) + " vertical lines (blue) and " + CStr(sortedHorizontals.Count) + " horizontal lines (yellow)"
     End Sub

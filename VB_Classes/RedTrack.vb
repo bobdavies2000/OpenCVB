@@ -39,7 +39,7 @@ Public Class RedTrack_Lines : Inherits VB_Algorithm
 
         If task.heartBeat Or task.motionFlag Then dst3.SetTo(0)
         Dim index As Integer
-        For Each lp In lines.sortByLen.Values
+        For Each lp In lines.lpList
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             index += 1
             If index > 10 Then Exit For
@@ -275,7 +275,7 @@ Public Class RedTrack_Points : Inherits VB_Algorithm
 
         dst3.SetTo(0)
         Dim index As Integer
-        For Each lp In lines.sortByLen.Values
+        For Each lp In lines.lpList
             dst3.Circle(lp.p1, task.dotSize, 255, -1)
             dst3.Circle(lp.p2, task.dotSize, 255, -1)
             index += 1

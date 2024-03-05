@@ -2,59 +2,52 @@
 Public Class LineCoin_Basics : Inherits VB_Algorithm
     Public longLines As New LongLine_Basics
     Public lpList As New List(Of pointPair)
-    Public p1List As New List(Of cv.Point)
-    Public p2List As New List(Of cv.Point)
-    Public ptCounts As New List(Of Integer)
     Public Sub New()
-        findSlider("Line length threshold in pixels").Value = 1
         dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find the coincident lines in the image and measure their value."
     End Sub
-    Public Sub findLines(mplist As List(Of pointPair))
+    Public Function findLines(lpLists As List(Of List(Of pointPair))) As List(Of pointPair)
+        Dim p1List As New List(Of cv.Point)
+        Dim p2List As New List(Of cv.Point)
+        Dim ptCounts As New List(Of Integer)
         Dim lp As pointPair
-        For Each mp In mplist
-            mp.slope = CInt(mp.slope * 10) / 10
-            If mp.slope = 0 Then
-                lp = New pointPair(New cv.Point(mp.p1.X, 0), New cv.Point(mp.p1.X, dst2.Height))
-            Else
-                lp = longLines.buildLongLine(mp)
-            End If
-            Dim index = p1List.IndexOf(lp.p1)
-            If index >= 0 Then
-                ptCounts(index) += 1
-            Else
-                p1List.Add(lp.p1)
-                p2List.Add(lp.p2)
-                ptCounts.Add(1)
-            End If
+        For Each lpList In lpLists
+            For Each mp In lpList
+                mp.slope = CInt(mp.slope * 10) / 10
+                If mp.slope = 0 Then
+                    lp = New pointPair(New cv.Point(mp.p1.X, 0), New cv.Point(mp.p1.X, dst2.Height))
+                Else
+                    lp = longLines.buildLongLine(mp)
+                End If
+                Dim index = p1List.IndexOf(lp.p1)
+                If index >= 0 Then
+                    ptCounts(index) += 1
+                Else
+                    p1List.Add(lp.p1)
+                    p2List.Add(lp.p2)
+                    ptCounts.Add(1)
+                End If
+            Next
         Next
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static mpLists As New List(Of List(Of pointPair))
-        If task.optionsChanged Then mpLists.Clear()
-
-        longLines.Run(src)
-
-        mpLists.Add(longLines.lines.lines.mpList)
-
-        p1List.Clear()
-        p2List.Clear()
-        ptCounts.Clear()
-        For Each mplist In mpLists
-            findLines(mplist)
-        Next
-
-        Dim historyCount = gOptions.FrameHistory.Value
-        dst2.SetTo(0)
         lpList.Clear()
+        dst2.SetTo(0)
+        Dim historyCount = gOptions.FrameHistory.Value
         For i = 0 To p1List.Count - 1
-            If ptCounts(i) > historyCount Then
+            If ptCounts(i) >= historyCount Then
                 dst2.Line(p1List(i), p2List(i), 255, task.lineWidth, task.lineType)
                 lpList.Add(New pointPair(p1List(i), p2List(i)))
             End If
         Next
+        If lpLists.Count >= historyCount Then lpLists.RemoveAt(0)
+        Return lpList
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        Static lpLists As New List(Of List(Of pointPair))
+        If task.optionsChanged Then lpLists.Clear()
 
-        If mpLists.Count >= historyCount Then mpLists.RemoveAt(0)
+        longLines.Run(src)
+        lpLists.Add(longLines.lpList)
+        lpList = findLines(lpLists)
 
         If standaloneTest() Then
             dst3 = src
@@ -63,10 +56,9 @@ Public Class LineCoin_Basics : Inherits VB_Algorithm
             Next
         End If
 
-        labels(2) = $"The {lpList.Count} lines below were present in each of the last " + CStr(historyCount) + " frames"
+        labels(2) = $"The {lpList.Count} lines below were present in each of the last " + CStr(gOptions.FrameHistory.Value) + " frames"
     End Sub
 End Class
-
 
 
 

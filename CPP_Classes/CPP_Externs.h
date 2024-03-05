@@ -75,8 +75,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 	{task->alg = new CPP_Palette_Basics(); break; }
 	case _CPP_FeatureLess_History :
 	{task->alg = new CPP_FeatureLess_History(); break; }
-	case _CPP_Line_Basics :
-	{task->alg = new CPP_Line_Basics(); break; }
+	case _CPP_Line_BasicsOld :
+	{task->alg = new CPP_Line_BasicsOld(); break; }
 	case _CPP_Convex_Basics :
 	{task->alg = new CPP_Convex_Basics(); break; }
 	case _CPP_Resize_Preserve :

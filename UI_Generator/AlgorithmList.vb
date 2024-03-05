@@ -23,7 +23,7 @@ _CPP_RedColor_FeatureLess
 _CPP_RedColor_FeatureLessCore
 _CPP_Palette_Basics
 _CPP_FeatureLess_History
-_CPP_Line_Basics
+_CPP_Line_BasicsOld
 _CPP_Convex_Basics
 _CPP_Resize_Preserve
 _CPP_History_Basics
@@ -343,7 +343,7 @@ if algorithmName = "CPP_IMU_GMatrix_QT" Then return new CPP_Basics(functionNames
 if algorithmName = "CPP_Kalman_Basics" Then return new CPP_Basics(functionNames._CPP_Kalman_Basics)
 if algorithmName = "CPP_KNN_Basics" Then return new CPP_Basics(functionNames._CPP_KNN_Basics)
 if algorithmName = "CPP_KNN_Core" Then return new CPP_Basics(functionNames._CPP_KNN_Core)
-if algorithmName = "CPP_Line_Basics" Then return new CPP_Basics(functionNames._CPP_Line_Basics)
+if algorithmName = "CPP_Line_BasicsOld" Then return new CPP_Basics(functionNames._CPP_Line_BasicsOld)
 if algorithmName = "CPP_Mat_4Click" Then return new CPP_Basics(functionNames._CPP_Mat_4Click)
 if algorithmName = "CPP_Mat_4to1" Then return new CPP_Basics(functionNames._CPP_Mat_4to1)
 if algorithmName = "CPP_Mesh_Agast" Then return new CPP_Basics(functionNames._CPP_Mesh_Agast)
@@ -627,7 +627,7 @@ if algorithmName = "FitEllipse_Basics" Then return new FitEllipse_Basics
 if algorithmName = "FitEllipse_Direct_CPP" Then return new FitEllipse_Direct_CPP
 if algorithmName = "FitEllipse_RedCloud" Then return new FitEllipse_RedCloud
 if algorithmName = "Fitline_3DBasics_MT" Then return new Fitline_3DBasics_MT
-if algorithmName = "Fitline_Basics" Then return new Fitline_Basics
+if algorithmName = "FitLine_Basics" Then return new FitLine_Basics
 if algorithmName = "FLANN_Basics" Then return new FLANN_Basics
 if algorithmName = "FLANN_Test" Then return new FLANN_Test
 if algorithmName = "Flip_Basics" Then return new Flip_Basics
@@ -964,6 +964,7 @@ if algorithmName = "LeftRight_RedCloudLeft" Then return new LeftRight_RedCloudLe
 if algorithmName = "LeftRight_RedCloudRight" Then return new LeftRight_RedCloudRight
 if algorithmName = "LeftRight_Reduction" Then return new LeftRight_Reduction
 if algorithmName = "Line_Basics" Then return new Line_Basics
+if algorithmName = "Line_BasicsOld" Then return new Line_BasicsOld
 if algorithmName = "Line_Canny" Then return new Line_Canny
 if algorithmName = "Line_Cells" Then return new Line_Cells
 if algorithmName = "Line_CellsVertHoriz" Then return new Line_CellsVertHoriz
@@ -977,18 +978,14 @@ if algorithmName = "Line_InDepthAndBGR" Then return new Line_InDepthAndBGR
 if algorithmName = "Line_Intercepts" Then return new Line_Intercepts
 if algorithmName = "Line_InterceptsUI" Then return new Line_InterceptsUI
 if algorithmName = "Line_Intersection" Then return new Line_Intersection
-if algorithmName = "Line_KMeans" Then return new Line_KMeans
 if algorithmName = "Line_LeftRightImages" Then return new Line_LeftRightImages
-if algorithmName = "Line_LUT" Then return new Line_LUT
 if algorithmName = "Line_Movement" Then return new Line_Movement
 if algorithmName = "Line_Nearest" Then return new Line_Nearest
 if algorithmName = "Line_Perpendicular" Then return new Line_Perpendicular
 if algorithmName = "Line_PointSlope" Then return new Line_PointSlope
-if algorithmName = "Line_Reduction" Then return new Line_Reduction
 if algorithmName = "Line_RegionsVB" Then return new Line_RegionsVB
 if algorithmName = "Line_TimeView" Then return new Line_TimeView
 if algorithmName = "Line_TimeViewLines" Then return new Line_TimeViewLines
-if algorithmName = "Line_Verify" Then return new Line_Verify
 if algorithmName = "Line_ViewSide" Then return new Line_ViewSide
 if algorithmName = "Line_ViewTop" Then return new Line_ViewTop
 if algorithmName = "Line3D_CandidatesAll" Then return new Line3D_CandidatesAll
@@ -1007,7 +1004,6 @@ if algorithmName = "LongLine_ExtendAll" Then return new LongLine_ExtendAll
 if algorithmName = "LongLine_ExtendParallel" Then return new LongLine_ExtendParallel
 if algorithmName = "LongLine_ExtendTest" Then return new LongLine_ExtendTest
 if algorithmName = "LongLine_History" Then return new LongLine_History
-if algorithmName = "LongLine_HistoryIntercept" Then return new LongLine_HistoryIntercept
 if algorithmName = "LongLine_Match" Then return new LongLine_Match
 if algorithmName = "LongLine_NoDepth" Then return new LongLine_NoDepth
 if algorithmName = "LongLine_Point" Then return new LongLine_Point

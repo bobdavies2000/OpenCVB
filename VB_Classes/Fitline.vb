@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/js_contour_features_fitLine.html
-Public Class Fitline_Basics : Inherits VB_Algorithm
+Public Class FitLine_Basics : Inherits VB_Algorithm
     Dim options As New Options_FitLine
     Public draw As New Draw_Lines
     Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
@@ -10,7 +10,7 @@ Public Class Fitline_Basics : Inherits VB_Algorithm
         labels(3) = "FitLine_Basics input"
         desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If task.heartBeat = False Then Exit Sub
         options.RunVB()
 

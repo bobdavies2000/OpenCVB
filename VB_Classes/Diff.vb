@@ -107,7 +107,7 @@ Public Class Diff_Lines : Inherits VB_Algorithm
     Dim diff As New Diff_RGBAccum
     Dim lines As New Line_Basics
     Public Sub New()
-        labels = {"", "", "Diff output, lines input", "Lines output"}
+        labels = {"", "", "Add motion to see Diff output and lines input", "Lines output"}
         desc = "identify lines in the diff output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -116,8 +116,8 @@ Public Class Diff_Lines : Inherits VB_Algorithm
 
         lines.Run(dst2)
         dst3 = src
-        For Each mp In lines.mpList
-            dst3.Line(mp.p1, mp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        For Each lp In lines.lpList
+            dst3.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class

@@ -957,14 +957,14 @@ Public Class Structured_MouseSlice : Inherits VB_Algorithm
         Dim bots As New List(Of Integer)
         Dim topsList As New List(Of cv.Point)
         Dim botsList As New List(Of cv.Point)
-        If lines.mpList.Count > 0 Then
+        If lines.lpList.Count > 0 Then
             dst3 = lines.dst2
-            For Each mps In lines.mpList
-                dst3.Line(mps.p1, mps.p2, task.highlightColor, task.lineWidth + 3, task.lineType)
-                tops.Add(If(mps.p1.Y < mps.p2.Y, mps.p1.Y, mps.p2.Y))
-                bots.Add(If(mps.p1.Y > mps.p2.Y, mps.p1.Y, mps.p2.Y))
-                topsList.Add(mps.p1)
-                botsList.Add(mps.p2)
+            For Each lp In lines.lpList
+                dst3.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth + 3, task.lineType)
+                tops.Add(If(lp.p1.Y < lp.p2.Y, lp.p1.Y, lp.p2.Y))
+                bots.Add(If(lp.p1.Y > lp.p2.Y, lp.p1.Y, lp.p2.Y))
+                topsList.Add(lp.p1)
+                botsList.Add(lp.p2)
             Next
 
             'Dim topPt = topsList(tops.IndexOf(tops.Min))

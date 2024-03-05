@@ -104,10 +104,10 @@ Public Class Stable_Lines : Inherits VB_Algorithm
 
         basics.facetGen.inputPoints.Clear()
         dst1 = src.Clone
-        For Each mps In lines.mpList
-            basics.facetGen.inputPoints.Add(mps.p1)
-            basics.facetGen.inputPoints.Add(mps.p2)
-            dst1.Line(mps.p1, mps.p2, task.highlightColor, task.lineWidth, task.lineType)
+        For Each lp In lines.lpList
+            basics.facetGen.inputPoints.Add(lp.p1)
+            basics.facetGen.inputPoints.Add(lp.p2)
+            dst1.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
         Next
         basics.Run(src)
         dst2 = basics.dst2
@@ -120,7 +120,7 @@ Public Class Stable_Lines : Inherits VB_Algorithm
             End If
         Next
         labels(2) = basics.labels(2)
-        labels(3) = CStr(lines.mpList.Count) + " line end points were found and " + CStr(basics.ptList.Count) + " were stable"
+        labels(3) = CStr(lines.lpList.Count) + " line end points were found and " + CStr(basics.ptList.Count) + " were stable"
     End Sub
 End Class
 

@@ -71,7 +71,7 @@ Public Class BackProject_Full : Inherits VB_Algorithm
         cv.Cv2.CalcBackProject({dst1}, {0}, histogram, dst2, ranges)
 
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        If standaloneTest() Then dst3 = vbPalette(dst2 * 255 / classCount)
+        dst3 = vbPalette(dst2 * 255 / classCount)
     End Sub
 End Class
 
@@ -181,13 +181,17 @@ Public Class BackProject_FullLines : Inherits VB_Algorithm
     Dim backP As New BackProject_Full
     Dim lines As New Line_Basics
     Public Sub New()
+        gOptions.useFilter.Checked = False
+        labels = {"", "", "Lines found in the back projection", "Backprojection results"}
         desc = "Find lines in the back projection"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         backP.Run(src)
+        dst3 = backP.dst3
+
         lines.Run(backP.dst2)
         dst2 = lines.dst2
-        labels(3) = CStr(lines.mpList.Count) + " lines were found"
+        labels(3) = CStr(lines.lpList.Count) + " lines were found"
     End Sub
 End Class
 
@@ -326,7 +330,7 @@ Public Class BackProject_MaskLines : Inherits VB_Algorithm
         If task.heartBeat Then dst1.SetTo(0)
 
         lines.Run(masks.mask)
-        For Each mp In lines.mpList
+        For Each mp In lines.lpList
             Dim val = masks.dst3.Get(Of Byte)(mp.p1.Y, mp.p1.X)
             If val = 255 Then dst1.Line(mp.p1, mp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
         Next
@@ -538,9 +542,9 @@ Public Class BackProject_LineTop : Inherits VB_Algorithm
 
         dst2.SetTo(0)
         Dim w = task.lineWidth + 5
-        For Each mp In line.lines.mpList
-            Dim p1 = New cv.Point(0, mp.yIntercept)
-            Dim p2 = New cv.Point(dst2.Width, dst2.Width * mp.slope + mp.yIntercept)
+        For Each lp In line.lines.lpList
+            Dim p1 = New cv.Point(0, lp.yIntercept)
+            Dim p2 = New cv.Point(dst2.Width, dst2.Width * lp.slope + lp.yIntercept)
             dst2.Line(p1, p2, 255, w, task.lineType)
         Next
 
@@ -560,7 +564,7 @@ End Class
 
 Public Class BackProject_LineSide : Inherits VB_Algorithm
     Dim line As New Line_ViewSide
-    Public mpList As New List(Of pointPair)
+    Public lpList As New List(Of pointPair)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Backproject the lines found in the side view."
@@ -570,13 +574,13 @@ Public Class BackProject_LineSide : Inherits VB_Algorithm
 
         dst2.SetTo(0)
         Dim w = task.lineWidth + 5
-        mpList.Clear()
-        For Each mp In line.lines.mpList
-            If Math.Abs(mp.slope) < 0.1 Then
-                Dim p1 = New cv.Point(0, mp.yIntercept)
-                Dim p2 = New cv.Point(dst2.Width, dst2.Width * mp.slope + mp.yIntercept)
+        lpList.Clear()
+        For Each lp In line.lines.lpList
+            If Math.Abs(lp.slope) < 0.1 Then
+                Dim p1 = New cv.Point(0, lp.yIntercept)
+                Dim p2 = New cv.Point(dst2.Width, dst2.Width * lp.slope + lp.yIntercept)
                 dst2.Line(p1, p2, 255, w, task.lineType)
-                mpList.Add(mp)
+                lpList.Add(lp)
             End If
         Next
 

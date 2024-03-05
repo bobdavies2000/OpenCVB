@@ -4,7 +4,6 @@ Public Class LongLine_Basics : Inherits VB_Algorithm
     Public lpList As New List(Of pointPair)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of lines to display", 0, 100, 25)
-        findSlider("Line length threshold in pixels").Value = 1
         lines.lineCount = 1000
         desc = "Identify the longest lines"
     End Sub
@@ -40,6 +39,7 @@ Public Class LongLine_Basics : Inherits VB_Algorithm
         For Each lp In lines.lpList
             lp = buildLongLine(lp)
             dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+            If lp.p1.X > lp.p2.X Then lp = New pointPair(lp.p2, lp.p1)
             lpList.Add(lp)
             If lpList.Count >= maxCount Then Exit For
         Next
@@ -57,18 +57,18 @@ End Class
 Public Class LongLine_Core : Inherits VB_Algorithm
     Public lines As New Line_Basics
     Public lineCount As Integer = 1 ' How many of the longest lines...
-    Public lpList As New List(Of pointPair) ' this will be sorted by length - longest first and p1 is always the leftmost of the matching p2 (from line_basics)
+    Public lpList As New List(Of pointPair) ' this will be sorted by length - longest first
     Public Sub New()
         desc = "Isolate the longest X lines."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         lines.Run(src)
         dst2 = lines.dst2
-        If lines.sortByLen.Count = 0 Then Exit Sub
+        If lines.lpList.Count = 0 Then Exit Sub
 
         dst2 = src
         lpList.Clear()
-        For Each lp In lines.sortByLen.Values
+        For Each lp In lines.lpList
             lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
             If lpList.Count >= lineCount Then Exit For
@@ -272,9 +272,7 @@ End Class
 
 Public Class LongLine_ExtendAll : Inherits VB_Algorithm
     Public lines As New Line_Basics
-    Dim extend As New LongLine_Extend
-    Public p1List As New List(Of cv.Point)
-    Public p2List As New List(Of cv.Point)
+    Public lpList As New List(Of pointPair)
     Public Sub New()
         labels = {"", "", "Image output from Line_Basics", "The extended line for each line found in Line_Basics"}
         desc = "Create a list of all the extended lines in an image"
@@ -284,12 +282,10 @@ Public Class LongLine_ExtendAll : Inherits VB_Algorithm
         dst2 = lines.dst2
 
         dst3 = src.Clone
-        p1List.Clear()
-        p2List.Clear()
-        For Each mps In lines.mpList
-            p1List.Add(mps.p1)
-            p2List.Add(mps.p2)
-            dst3.Line(mps.p1, mps.p2, task.highlightColor, task.lineWidth, task.lineType)
+        lpList.Clear()
+        For Each lp In lines.lpList
+            lpList.Add(lp)
+            dst3.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class
@@ -313,10 +309,8 @@ Public Class LongLine_ExtendParallel : Inherits VB_Algorithm
         dst3 = extendAll.dst2
 
         knn.queries.Clear()
-        For i = 0 To extendAll.p1List.Count - 1
-            Dim p1 = extendAll.p1List(i)
-            Dim p2 = extendAll.p2List(i)
-            knn.queries.Add(New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2))
+        For Each lp In extendAll.lpList
+            knn.queries.Add(New cv.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2))
         Next
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
 
@@ -329,28 +323,26 @@ Public Class LongLine_ExtendParallel : Inherits VB_Algorithm
         For i = 0 To knn.result.GetUpperBound(0) - 1
             For j = 0 To knn.queries.Count - 1
                 Dim index = knn.result(i, j)
-                If index >= extendAll.p1List.Count Or index < 0 Then Continue For
-                Dim p1 = extendAll.p1List(index)
-                Dim p2 = extendAll.p2List(index)
-                Dim e1 = extendAll.p1List(i)
-                Dim e2 = extendAll.p2List(i)
+                If index >= extendAll.lpList.Count Or index < 0 Then Continue For
+                Dim lp = extendAll.lpList(index)
+                Dim elp = extendAll.lpList(i)
                 Dim mid = knn.queries(i)
                 Dim near = knn.trainInput(index)
                 Dim distanceMid = mid.DistanceTo(near)
-                Dim distance1 = p1.DistanceTo(e1)
-                Dim distance2 = p2.DistanceTo(e2)
+                Dim distance1 = lp.p1.DistanceTo(elp.p1)
+                Dim distance2 = lp.p2.DistanceTo(elp.p2)
                 If distance1 > distanceMid * 2 Then
-                    distance1 = p1.DistanceTo(e2)
-                    distance2 = p2.DistanceTo(e1)
+                    distance1 = lp.p1.DistanceTo(elp.p2)
+                    distance2 = lp.p2.DistanceTo(elp.p1)
                 End If
                 If distance1 < distanceMid * 2 And distance2 < distanceMid * 2 Then
                     Dim cp As cPoints
 
-                    Dim mps = extendAll.lines.mpList(index)
+                    Dim mps = extendAll.lines.lpList(index)
                     cp.p1 = mps.p1
                     cp.p2 = mps.p2
 
-                    mps = extendAll.lines.mpList(i)
+                    mps = extendAll.lines.lpList(i)
                     cp.p3 = mps.p1
                     cp.p4 = mps.p2
 
@@ -371,7 +363,7 @@ Public Class LongLine_ExtendParallel : Inherits VB_Algorithm
             Next
         Next
         labels(2) = CStr(parList.Count) + " parallel lines were found in the image"
-        labels(3) = CStr(extendAll.p1List.Count) + " lines were found in the image before finding the parallel lines"
+        labels(3) = CStr(extendAll.lpList.Count) + " lines were found in the image before finding the parallel lines"
     End Sub
 End Class
 
@@ -429,64 +421,6 @@ Public Class LongLine_NoDepth : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class LongLine_HistoryIntercept : Inherits VB_Algorithm
-    Dim coin As New LineCoin_Basics
-    Public lpList As New List(Of pointPair)
-    Public Sub New()
-        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Collect lines over time"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static mpLists As New List(Of List(Of pointPair))
-        If task.optionsChanged Then mpLists.Clear()
-
-        coin.longLines.Run(src)
-
-        mpLists.Add(coin.longLines.lpList)
-
-        coin.p1List.Clear()
-        coin.p2List.Clear()
-        coin.ptCounts.Clear()
-        For Each mplist In mpLists
-            coin.findLines(mplist)
-        Next
-
-        Dim historyCount = gOptions.FrameHistory.Value
-        dst2.SetTo(0)
-        Dim highlight As Integer
-        lpList.Clear()
-        For i = 0 To coin.p1List.Count - 1
-            highlight = 128
-            If coin.ptCounts(i) > historyCount Then highlight = 255
-            If coin.ptCounts(i) >= historyCount Then
-                dst2.Line(coin.p1List(i), coin.p2List(i), highlight, task.lineWidth, task.lineType)
-                lpList.Add(New pointPair(coin.p1List(i), coin.p2List(i)))
-            End If
-        Next
-
-        If mpLists.Count >= historyCount Then mpLists.RemoveAt(0)
-
-        ' this is an OpAuto algorithm.
-        Static llSlider = findSlider("Line length threshold in pixels")
-        If lpList.Count > 50 Then llSlider.value += 1
-        If lpList.Count < 30 And llSlider.value > 10 Then llSlider.value -= 1
-
-        If standaloneTest() Then
-            dst3 = src
-            For Each lp In lpList
-                dst3.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
-            Next
-        End If
-
-        labels(2) = $"The {lpList.Count} lines below were present in each of the last " + CStr(historyCount) + " frames"
-    End Sub
-End Class
 
 
 

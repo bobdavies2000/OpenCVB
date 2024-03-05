@@ -728,7 +728,7 @@ Public Class KNN_ClosestTracker : Inherits VB_Algorithm
     Public lastPair As New pointPair
     Public trainInput As New List(Of cv.Point2f)
     Public Sub New()
-        labels = {"", "", "Highlight the tracked line", "Candidate lines - standaloneTest() only"}
+        labels = {"", "", "Highlight the tracked line (move camera to see track results)", "Candidate lines - standaloneTest() only"}
         desc = "Find the longest line and keep finding it among the list of lines using a minimized KNN test."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -743,7 +743,7 @@ Public Class KNN_ClosestTracker : Inherits VB_Algorithm
             p2 = lastPair.p2
         End If
 
-        For Each lp In lines.sortByLen.Values
+        For Each lp In lines.lpList
             If trainInput.Count = 0 Then
                 p1 = lp.p1
                 p2 = lp.p2
@@ -798,7 +798,6 @@ End Class
 
 
 Public Class KNN_ClosestLine : Inherits VB_Algorithm
-    Public lines As New Line_Basics
     Public lastP1 As cv.Point2f
     Public lastP2 As cv.Point2f
     Public lastIndex As Integer
