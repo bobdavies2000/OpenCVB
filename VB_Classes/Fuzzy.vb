@@ -227,8 +227,8 @@ Public Class Fuzzy_TrackerDepth : Inherits VB_Algorithm
         Dim minY As Double, maxY As Double
         Dim minRectSize = minRectSizeSlider.Value
         Dim displayRect = displayCheck.checked
-        For Each c In fuzzy.sortContours
-            Dim contours = fuzzy.contours(c.Value(0))
+        For Each vec In fuzzy.sortContours.Values
+            Dim contours = fuzzy.contours(vec(0))
             Dim points = New cv.Mat(contours.Length, 1, cv.MatType.CV_32SC2, contours.ToArray)
             Dim center = points.Sum()
             points = New cv.Mat(contours.Length, 2, cv.MatType.CV_32S, contours.ToArray)
@@ -240,7 +240,7 @@ Public Class Fuzzy_TrackerDepth : Inherits VB_Algorithm
                 Dim centroid = New cv.Point2f(center(0) / contours.Length, center(1) / contours.Length)
                 centroids.Add(centroid)
                 rects.Add(rect)
-                layoutColor.Add(c.Value(1))
+                layoutColor.Add(vec(1))
                 If displayRect Then
                     dst2.Circle(centroid, task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
                     dst2.Circle(centroid, task.dotSize, cv.Scalar.Red, -1, task.lineType)

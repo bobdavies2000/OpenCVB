@@ -331,7 +331,7 @@ End Class
 
 
 Public Class Feature_Line : Inherits VB_Algorithm
-    Dim lines As New Line_BasicsOld
+    Dim lines As New Line_SubsetRect
     Dim lineDisp As New Line_DisplayInfo
     Dim options As New Options_Features
     Dim match As New Match_tCell
@@ -607,10 +607,9 @@ Public Class Feature_LongestVerticalKNN : Inherits VB_Algorithm
         Dim index As Integer
 
         If testLastPair(longest.knn.lastPair, gLines.sortedVerticals.ElementAt(0).Value) Then longest.knn.lastPair = New pointPair
-        For Each gl In gLines.sortedVerticals
+        For Each gc In gLines.sortedVerticals.Values
             If index >= 10 Then Exit For
 
-            Dim gc = gl.Value
             Dim p1 = gc.tc1.center
             Dim p2 = gc.tc2.center
             If longest.knn.lastPair.compare(New pointPair) Then longest.knn.lastPair = New pointPair(p1, p2)
@@ -1687,10 +1686,9 @@ Public Class Feature_AgastNew : Inherits VB_Algorithm
             features.Clear()
             gens.Clear()
         End If
-        For Each ele In newfeatures
-            features.Add(ele.Value)
-            gens.Add(ele.Key)
-        Next
+
+        features = New List(Of cv.Point)(newfeatures.Values)
+        gens = New List(Of Integer)(newfeatures.Keys)
 
         dst2 = src
         For i = 0 To Math.Min(options.desiredCount, features.Count) - 1
@@ -1738,10 +1736,9 @@ Public Class Feature_Stable : Inherits VB_Algorithm
             features.Clear()
             gens.Clear()
         End If
-        For Each ele In newfeatures
-            features.Add(ele.Value)
-            gens.Add(ele.Key)
-        Next
+
+        features = New List(Of cv.Point)(newfeatures.Values)
+        gens = New List(Of Integer)(newfeatures.Keys)
 
         dst2 = src
         For i = 0 To features.Count - 1

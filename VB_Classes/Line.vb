@@ -42,13 +42,11 @@ End Class
 
 
 
-Public Class Line_BasicsOld : Inherits VB_Algorithm
+Public Class Line_SubsetRect : Inherits VB_Algorithm
     Dim ld As cv.XImgProc.FastLineDetector
     Public sortByLen As New SortedList(Of Single, pointPair)(New compareAllowIdenticalSingleInverted)
     Public mpList As New List(Of pointPair)
     Public ptList As New List(Of cv.Point2f)
-    Public options As New Options_Line
-    Public skipDistanceCheck As Boolean
     Public subsetRect As cv.Rect
     Public lineColor = cv.Scalar.White
     Public Sub New()
@@ -58,8 +56,6 @@ Public Class Line_BasicsOld : Inherits VB_Algorithm
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
         If src.Channels = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src.Clone
         If dst2.Type <> cv.MatType.CV_8U Then dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
@@ -73,13 +69,11 @@ Public Class Line_BasicsOld : Inherits VB_Algorithm
                v(2) >= 0 And v(2) <= dst2.Cols And v(3) >= 0 And v(3) <= dst2.Rows Then
                 Dim p1 = New cv.Point(v(0) + subsetRect.X, v(1) + subsetRect.Y)
                 Dim p2 = New cv.Point(v(2) + subsetRect.X, v(3) + subsetRect.Y)
-                If p1.DistanceTo(p2) >= options.lineLengthThreshold Or skipDistanceCheck Then
-                    Dim lp = New pointPair(p1, p2)
-                    mpList.Add(lp)
-                    ptList.Add(p1)
-                    ptList.Add(p2)
-                    sortByLen.Add(lp.length, lp)
-                End If
+                Dim lp = New pointPair(p1, p2)
+                mpList.Add(lp)
+                ptList.Add(p1)
+                ptList.Add(p2)
+                sortByLen.Add(lp.length, lp)
             End If
         Next
 
@@ -263,7 +257,6 @@ Public Class Line_LeftRightImages : Inherits VB_Algorithm
     Public leftLines As New Line_TimeView
     Public rightLines As New Line_TimeView
     Public rgbLines As New Line_TimeView
-    Dim options As New Options_Line
     Public Sub New()
         If check.Setup(traceName) Then check.addCheckBox("Show lines from BGR in green")
 
@@ -912,7 +905,7 @@ End Class
 '        Dim thresholdPercentage = percentSlider.Value / 100
 
 '        If standaloneTest() And task.heartBeat Then
-'            Static lines As New Line_BasicsOld
+'            Static lines As New Line_SubsetRect
 '            lines.Run(src.Clone)
 '            tcells = lines.tCells
 '            dst2 = src

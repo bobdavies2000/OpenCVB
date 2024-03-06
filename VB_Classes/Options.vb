@@ -346,25 +346,6 @@ End Class
 
 
 
-Public Class Options_Line : Inherits VB_Algorithm
-    Public lineLengthThreshold As Integer = 20
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Line length threshold in pixels", 1, 400, lineLengthThreshold)
-    End Sub
-    Public Sub RunVB()
-        Static lenSlider = findSlider("Line length threshold in pixels")
-        lineLengthThreshold = lenSlider.Value
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 
 Public Class Options_MatchShapes : Inherits VB_Algorithm
     Public matchOption = cv.ShapeMatchModes.I1

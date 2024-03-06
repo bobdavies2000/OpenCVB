@@ -68,8 +68,7 @@ Public Class Flood_Basics : Inherits VB_Algorithm
         cellMap.SetTo(0)
         redCells.Clear()
         redCells.Add(New rcData)
-        For Each ele In sortedCells
-            Dim rc = ele.Value
+        For Each rc In sortedCells.Values
             rc.index = redCells.Count
             redCells.Add(rc)
             cellMap(rc.rect).SetTo(rc.index, rc.mask)
@@ -480,8 +479,7 @@ Public Class Flood_Minimal : Inherits VB_Algorithm
         dst2.SetTo(0)
         redCells.Clear()
         redCells.Add(New rcData)
-        For Each ele In sortedCells
-            Dim rc = ele.Value
+        For Each rc In sortedCells.Values
             rc.index = redCells.Count
             redCells.Add(rc)
             dst2.Circle(rc.maxDist, task.dotSize, task.highlightColor, -1, task.lineType)
@@ -655,8 +653,7 @@ Public Class Flood_BasicsTier : Inherits VB_Algorithm
         Next
 
         redCells.Clear()
-        For Each ele In sortedCells
-            Dim rc = ele.Value
+        For Each rc In sortedCells.Values
             rc.index = redCells.Count
             redCells.Add(rc)
         Next
@@ -703,8 +700,7 @@ Public Class Flood_ColorByTier : Inherits VB_Algorithm
         cellMap.SetTo(0)
         redCells.Clear()
         redCells.Add(New rcData)
-        For Each ele In sortedCells
-            Dim rc = ele.Value
+        For Each rc In sortedCells.Values
             Dim val = cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If val = 0 Then
                 rc.index = redCells.Count

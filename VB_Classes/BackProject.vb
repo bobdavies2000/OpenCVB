@@ -330,9 +330,9 @@ Public Class BackProject_MaskLines : Inherits VB_Algorithm
         If task.heartBeat Then dst1.SetTo(0)
 
         lines.Run(masks.mask)
-        For Each mp In lines.lpList
-            Dim val = masks.dst3.Get(Of Byte)(mp.p1.Y, mp.p1.X)
-            If val = 255 Then dst1.Line(mp.p1, mp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+        For Each lp In lines.lpList
+            Dim val = masks.dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+            If val = 255 Then dst1.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
         Next
         dst3.SetTo(cv.Scalar.Yellow, masks.mask)
         dst3.SetTo(task.highlightColor, dst1)

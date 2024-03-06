@@ -1685,8 +1685,7 @@ Public Class RedCloud_OnlyColorAlt : Inherits VB_Algorithm
         dst3.SetTo(0)
         Dim usedColors = New List(Of cv.Vec3b)({black})
         Dim unmatched As Integer
-        For Each key In redMasks.sortedCells
-            Dim cell = key.Value
+        For Each cell In redMasks.sortedCells.Values
             Dim index = lastMap.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X)
             If index < lastCells.Count Then
                 cell.color = lastColors.Get(Of cv.Vec3b)(cell.maxDist.Y, cell.maxDist.X)
@@ -2085,8 +2084,7 @@ Public Class RedCloud_Both : Inherits VB_Algorithm
         redCells.Add(New rcData)
         dst.SetTo(0)
         Dim tmp As New cv.Mat(input.Size, cv.MatType.CV_8U, 0)
-        For Each key In redMasks.sortedCells
-            matchCell.rc = key.Value
+        For Each matchCell.rc In redMasks.sortedCells.Values
             matchCell.Run(empty)
             Dim rc = matchCell.rc
             rc.index = redCells.Count
@@ -2487,8 +2485,7 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
         combinedCells.Clear()
         Dim drawRectOnlyRun As Boolean
         If task.drawRect.Width * task.drawRect.Height > 10 Then drawRectOnlyRun = True
-        For Each key In redMasks.sortedCells
-            Dim rc = key.Value
+        For Each rc In redMasks.sortedCells.Values
             If drawRectOnlyRun Then If task.drawRect.Contains(rc.floodPoint) = False Then Continue For
             combinedCells.Add(rc)
         Next
@@ -2664,8 +2661,7 @@ Public Class RedCloud_BasicsNew : Inherits VB_Algorithm
         If dst2.Size <> src.Size Then dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
 
         Dim newCells As New List(Of rcData)
-        For Each key In depthBW.sortedCells
-            Dim rc = key.Value
+        For Each rc In depthBW.sortedCells.Values
             rc.maxDStable = rc.maxDist ' assume it has to use the latest.
             rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If rc.indexLast < lastCells.Count Then

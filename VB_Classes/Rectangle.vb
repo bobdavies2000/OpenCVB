@@ -161,10 +161,7 @@ Public Class Rectangle_Intersection : Inherits VB_Algorithm
             sortedRect.Add(r.Width * r.Height, r)
         Next
 
-        otherRects.Clear()
-        For Each r In sortedRect
-            otherRects.Add(r.Value)
-        Next
+        otherRects = New List(Of cv.Rect)(sortedRect.Values)
 
         Dim proximity = mergeSlider.Value
         enclosingRects.Clear()

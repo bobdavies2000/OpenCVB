@@ -24,14 +24,13 @@ Public Class Foreground_Basics : Inherits VB_Algorithm
         Next
 
         fgDepth = 0
-        For Each el In sortedMats
-            fgDepth = el.Key
+        For Each fgDepth In sortedMats.Keys
             If fgDepth >= 1 Then Exit For ' find all the regions closer than a meter (inclusive)
         Next
 
-        For Each el In sortedMats
-            Dim tmp = depthMats(el.Value)
-            dst1.SetTo(el.Value + 1, tmp)
+        For Each index In sortedMats.Values
+            Dim tmp = depthMats(index)
+            dst1.SetTo(index + 1, tmp)
         Next
         dst2 = vbPalette(dst1 * 255 / depthMats.Count)
         fg = task.pcSplit(2).Threshold(fgDepth, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()

@@ -16,8 +16,7 @@ Public Class GuidedBP_Basics : Inherits VB_Algorithm
 
         Dim ptList As New List(Of cv.Point)
         Dim indices As New List(Of Integer)
-        For Each entry In sortRects
-            Dim r = entry.Value
+        For Each r In sortRects.Values
             Dim pt = New cv.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
             Dim index = map.Get(Of Byte)(pt.Y, pt.X)
             If index = 0 Or indices.Contains(index) Then
@@ -28,8 +27,7 @@ Public Class GuidedBP_Basics : Inherits VB_Algorithm
         Next
 
         map.SetTo(0)
-        For Each entry In sortRects
-            Dim r = entry.Value
+        For Each r In sortRects.Values
             Dim pt = New cv.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
             Dim index = indices(ptList.IndexOf(pt))
             map.Rectangle(r, index, -1)
@@ -646,8 +644,7 @@ Public Class GuidedBP_History : Inherits VB_Algorithm
         redCells.Add(New rcData)
         Dim lastDst2 = dst2.Clone
         Dim usedColors As New List(Of cv.Vec3b)({black})
-        For Each entry In sortCells
-            Dim rc = entry.Value
+        For Each rc In sortCells.Values
             Dim index = kMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             Dim lrc = redCells(index)
             If Math.Abs((rc.mmZ.minVal + rc.mmZ.maxVal) / 2 - (lrc.mmZ.minVal + lrc.mmZ.maxVal) / 2) > distanceMin Then
