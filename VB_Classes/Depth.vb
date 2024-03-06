@@ -1580,7 +1580,7 @@ End Class
 
 
 
-Public Class Depth_AverageInColor : Inherits VB_Algorithm
+Public Class Depth_ByColorInTier : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
     Dim world As New Depth_World
     Public Sub New()
@@ -1593,7 +1593,6 @@ Public Class Depth_AverageInColor : Inherits VB_Algorithm
 
         Dim depth32f As cv.Mat = task.pcSplit(2).Clone
         Dim minPixels = CInt(src.Total / 100)
-        If gOptions.DebugCheckBox.Checked Then minPixels = 0
         For Each rc In flood.redCells
             If rc.pixels >= minPixels Then depth32f(rc.rect).SetTo(rc.depthMean(2), rc.mask)
         Next

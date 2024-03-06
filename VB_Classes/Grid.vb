@@ -1,5 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
+Imports OpenCvSharp
+
 Public Class Grid_Basics : Inherits VB_Algorithm
     Public gridList As New List(Of cv.Rect)
     Public updateTaskGridList As Boolean = True
@@ -273,7 +275,7 @@ Public Class Grid_FPS : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Dim fps = CInt(task.fpsRate / fpsSlider.Value)
         If fps = 0 Then fps = 1
-        HeartBeat = (task.frameCount Mod fps) = 0
+        heartBeat = (task.frameCount Mod fps) = 0
         Static skipCount As Integer
         Static saveSkip As Integer
         If heartBeat Then
@@ -283,7 +285,7 @@ Public Class Grid_FPS : Inherits VB_Algorithm
         Else
             skipCount += 1
         End If
-        strOut = "Grid heartbeat set to " + CStr(fpsSlider.value) + " times per second.  " + CStr(saveSkip) + " frames skipped"
+        strOut = "Grid heartbeat set to " + CStr(fpsSlider.Value) + " times per second.  " + CStr(saveSkip) + " frames skipped"
     End Sub
 End Class
 
@@ -446,5 +448,40 @@ Public Class Grid_LowRes : Inherits VB_Algorithm
         Static inputSrc As New cv.Mat(task.lowRes, cv.MatType.CV_8U, 0)
         grid.Run(inputSrc)
         gridList = grid.gridList
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Grid_MinMaxDepth : Inherits VB_Algorithm
+    Public minMaxLocs As New List(Of pointPair)
+    Public minMaxVals As New List(Of cv.Vec2f)
+    Public Sub New()
+        vbAddAdvice(traceName + "goptions 'Grid Square Size' has direct impact.")
+        desc = "Find the min and max depth within each grid roi."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim mm As mmData
+        minMaxLocs.Clear()
+        minMaxVals.Clear()
+        For Each roi In task.gridList
+            task.pcSplit(2)(roi).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthMask(roi))
+            minMaxLocs.Add(New pointPair(mm.minLoc, mm.maxLoc))
+            minMaxVals.Add(New cv.Vec2f(mm.minVal, mm.maxVal))
+        Next
+
+        If standaloneTest() Then
+            dst3.SetTo(0)
+            For i = 0 To minMaxLocs.Count - 1
+                Dim lp = minMaxLocs(i)
+                dst3(task.gridList(i)).Circle(lp.p2, task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
+                dst3(task.gridList(i)).Circle(lp.p1, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            Next
+            dst3.SetTo(cv.Scalar.White, task.gridMask)
+        End If
     End Sub
 End Class
