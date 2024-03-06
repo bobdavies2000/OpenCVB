@@ -11,32 +11,10 @@ Public Class Color_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.optionsChanged Or classifier Is Nothing Then
-            Select Case redOptions.colorInputIndex
-                Case 0 ' "BackProject_Full"
-                    Static backP As New BackProject_Full
-                    classifier = backP
-                Case 1 ' "KMeans_Basics"
-                    Static km As New KMeans_Basics
-                    classifier = km
-                Case 2 ' "LUT_Basics"
-                    Static lut As New LUT_Basics
-                    classifier = lut
-                Case 3 ' "Reduction_Basics"
-                    Static reduction As New Reduction_Basics
-                    classifier = reduction
-                Case 4 ' "Hist3DColor_Basics"
-                    Static hColor As New Hist3Dcolor_Basics
-                    classifier = hColor
-                Case 5 ' "Binarize_Split4"
-                    Static binar4 As New Binarize_Split4
-                    classifier = binar4
-                Case 6 ' "Binarize_SplitDepth"
-                    Static binar As New Binarize_SplitDepth
-                    classifier = binar
-                Case 7 ' "Binarize_DepthTiers"
-                    Static binarTiers As New Binarize_DepthTiers
-                    classifier = binarTiers
-            End Select
+            Static colorMethods() As Object = {New BackProject_Full, New Binarize_Split4, New Binarize_SplitDepth,
+                                               New Binarize_DepthTiers, New Hist3Dcolor_Basics, New KMeans_Basics,
+                                               New LUT_Basics, New Reduction_Basics}
+            classifier = colorMethods(redOptions.colorInputIndex)
         End If
 
         dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)

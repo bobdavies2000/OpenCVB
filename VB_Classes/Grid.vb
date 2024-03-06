@@ -17,8 +17,10 @@ Public Class Grid_Basics : Inherits VB_Algorithm
             task.gridToRoiIndex = New cv.Mat(src.Size(), cv.MatType.CV_32S)
 
             gridList.Clear()
+            task.gridIndex.Clear()
             task.gridRows = 0
             task.gridCols = 0
+            Dim index As Integer
             For y = 0 To src.Height - 1 Step gOptions.GridSize.Value
                 For x = 0 To src.Width - 1 Step gOptions.GridSize.Value
                     Dim roi = New cv.Rect(x, y, gOptions.GridSize.Value, gOptions.GridSize.Value)
@@ -28,6 +30,8 @@ Public Class Grid_Basics : Inherits VB_Algorithm
                         If x = 0 Then task.gridRows += 1
                         If y = 0 Then task.gridCols += 1
                         gridList.Add(roi)
+                        task.gridIndex.Add(index)
+                        index += 1
                     End If
                 Next
             Next
@@ -74,10 +78,7 @@ Public Class Grid_Basics : Inherits VB_Algorithm
                               CStr(gOptions.GridSize.Value) + "X" + CStr(gOptions.GridSize.Value) + " regions"
         End If
 
-        If updateTaskGridList Then
-            task.gridList = gridList
-
-        End If
+        If updateTaskGridList Then task.gridList = gridList
     End Sub
 End Class
 
@@ -458,30 +459,32 @@ End Class
 
 
 Public Class Grid_MinMaxDepth : Inherits VB_Algorithm
-    Public minMaxLocs As New List(Of pointPair)
-    Public minMaxVals As New List(Of cv.Vec2f)
+    Public minMaxLocs(0) As pointPair
+    Public minMaxVals(0) As cv.Vec2f
     Public Sub New()
-        vbAddAdvice(traceName + "goptions 'Grid Square Size' has direct impact.")
+        gOptions.GridSize.Value = 8
+        vbAddAdvice(traceName + ": goptions 'Grid Square Size' has direct impact.")
         desc = "Find the min and max depth within each grid roi."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        If minMaxLocs.Count <> task.gridList.Count Then ReDim minMaxLocs(task.gridList.Count - 1)
+        If minMaxVals.Count <> task.gridList.Count Then ReDim minMaxVals(task.gridList.Count - 1)
         Dim mm As mmData
-        minMaxLocs.Clear()
-        minMaxVals.Clear()
-        For Each roi In task.gridList
+        For i = 0 To minMaxLocs.Count - 1
+            Dim roi = task.gridList(i)
             task.pcSplit(2)(roi).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthMask(roi))
-            minMaxLocs.Add(New pointPair(mm.minLoc, mm.maxLoc))
-            minMaxVals.Add(New cv.Vec2f(mm.minVal, mm.maxVal))
+            minMaxLocs(i) = New pointPair(mm.minLoc, mm.maxLoc)
+            minMaxVals(i) = New cv.Vec2f(mm.minVal, mm.maxVal)
         Next
 
         If standaloneTest() Then
-            dst3.SetTo(0)
+            dst2.SetTo(0)
             For i = 0 To minMaxLocs.Count - 1
                 Dim lp = minMaxLocs(i)
-                dst3(task.gridList(i)).Circle(lp.p2, task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
-                dst3(task.gridList(i)).Circle(lp.p1, task.dotSize, cv.Scalar.White, -1, task.lineType)
+                dst2(task.gridList(i)).Circle(lp.p2, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+                dst2(task.gridList(i)).Circle(lp.p1, task.dotSize, cv.Scalar.White, -1, task.lineType)
             Next
-            dst3.SetTo(cv.Scalar.White, task.gridMask)
+            dst2.SetTo(cv.Scalar.White, task.gridMask)
         End If
     End Sub
 End Class

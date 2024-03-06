@@ -335,7 +335,7 @@ Public Class ML_RemoveDups_CPP : Inherits VB_Algorithm
         labels = {"", "", "BGR input below is converted to BGRA and sorted as integers - use slider to adjust", ""}
         desc = "The input is BGR, convert to BGRA, and sorted as an integer.  The output is a sorted BGR Mat file with duplicates removed."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static thresholdSlider = findSlider("Threshold for sort input")
         If src.Type = cv.MatType.CV_8UC3 Then
             dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32S, src.CvtColor(cv.ColorConversionCodes.BGR2BGRA).Data)
@@ -362,5 +362,41 @@ Public Class ML_RemoveDups_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = ML_RemoveDups_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class ML_DepthGrid : Inherits VB_Algorithm
+    Dim minMax As New Grid_MinMaxDepth
+    Public Sub New()
+        desc = "Predict the depth for each grid element"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class ML_SourceData : Inherits VB_Algorithm
+    Dim minMax As New Grid_MinMaxDepth
+    Dim colorClass As New Color_Basics
+    Public Sub New()
+        desc = "Prepare a grid of color and depth data."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        colorClass.Run(src)
+        dst2 = colorClass.dst3
+        labels(2) = "Output of Color_Basics running " + redOptions.colorInputName
     End Sub
 End Class

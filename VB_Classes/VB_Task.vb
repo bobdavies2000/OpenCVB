@@ -80,6 +80,7 @@ Public Class VBtask : Implements IDisposable
     Public grid As Grid_Basics
     Public gridRows As Integer
     Public gridCols As Integer
+    Public gridIndex As New List(Of Integer)
     Public gridList As List(Of cv.Rect)
     Public gridMask As cv.Mat
     Public gridToRoiIndex As New cv.Mat
