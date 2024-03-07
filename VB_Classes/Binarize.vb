@@ -368,12 +368,11 @@ End Class
 
 Public Class Binarize_Split4 : Inherits VB_Algorithm
     Dim binar As New Binarize_Four
-    Public classCount = 5 ' 4-way split plus maxDepthMask
+    Public classCount = 4 ' 4-way split plus maxDepthMask
     Public Sub New()
         If findfrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Binarize_Split4: maxDepthMask should be black (a 5th class)")
-            check.Box(0).Checked = True
         End If
 
         dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -384,7 +383,7 @@ Public Class Binarize_Split4 : Inherits VB_Algorithm
         If depthCheck.checked Then
             src = src.Clone
             src = src.SetTo(0, task.maxDepthMask)
-            classCount = 4
+            classCount = 5
         End If
 
         binar.Run(src)

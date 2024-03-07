@@ -12,10 +12,10 @@ Public Class Flood_Basics : Inherits VB_Algorithm
         desc = "Simple Floodfill each region but prepare the mask, rect, floodpoints, and pixel counts."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.motionDetected = False Then
-            identifyCells(redCells)
-            Exit Sub ' nothing has changed.
-        End If
+        'If task.motionDetected = False Then
+        '    identifyCells(redCells)
+        '    Exit Sub ' nothing has changed.
+        'End If
 
         binar4.Run(task.color) ' always run split4 to get colors for redgen.
         If src.Channels = 1 Then src += binar4.dst2 Else src = binar4.dst2
@@ -336,7 +336,7 @@ Public Class Flood_Tiers : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         flood.Run(src)
-        dst3 = flood.dst3
+        dst2 = flood.dst2
 
         tiers.Run(src)
 
@@ -360,7 +360,7 @@ Public Class Flood_Tiers : Inherits VB_Algorithm
 
         If task.rc.tierHist.Rows > 0 Then
             plot.Run(task.rc.tierHist)
-            dst2 = plot.dst2
+            dst3 = plot.dst3
         End If
         identifyCells(redCells)
     End Sub
@@ -565,7 +565,7 @@ End Class
 
 
 
-Public Class Flood_BasicsTier : Inherits VB_Algorithm
+Public Class Flood_BasicsMask : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public binarizedImage As cv.Mat
@@ -615,7 +615,7 @@ End Class
 
 Public Class Flood_ByColorInTier : Inherits VB_Algorithm
     Dim tiers As New Contour_DepthTiers
-    Dim flood As New Flood_BasicsTier
+    Dim flood As New Flood_BasicsMask
     Dim binar4 As New Binarize_Split4
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -624,6 +624,11 @@ Public Class Flood_ByColorInTier : Inherits VB_Algorithm
         desc = "Flood the color image by tiers"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        'If task.motionDetected = False Then
+        '    identifyCells(redCells)
+        '    Exit Sub ' nothing has changed.
+        'End If
+
         binar4.Run(src)
 
         tiers.Run(src)
@@ -658,5 +663,27 @@ Public Class Flood_ByColorInTier : Inherits VB_Algorithm
         dst3 = vbPalette(cellMap)
         labels(2) = $"{redCells.Count} cells were identified."
         setSelectedContour(redCells, cellMap)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Flood_Stats : Inherits VB_Algorithm
+    Dim flood As New Flood_Basics
+    Dim stats As New Cell_Basics
+    Public Sub New()
+        desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        flood.Run(src)
+
+        stats.Run(src)
+        dst0 = stats.dst0
+        dst1 = stats.dst1
+        dst2 = flood.dst2
+        setTrueText(stats.strOut, 3)
     End Sub
 End Class

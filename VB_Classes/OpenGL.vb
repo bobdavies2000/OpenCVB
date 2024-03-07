@@ -2056,7 +2056,7 @@ Public Class OpenGL_ByColorInTier : Inherits VB_Algorithm
         dst3 = cloud.dst3
 
         task.ogl.pointCloudInput = dst3
-        src(task.rc.rect).SetTo(cv.Scalar.White, task.rc.depthMask)
+        src(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
         task.ogl.Run(src)
     End Sub
 End Class

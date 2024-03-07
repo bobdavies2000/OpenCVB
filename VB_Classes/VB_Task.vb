@@ -446,163 +446,162 @@ Public Class VBtask : Implements IDisposable
 
             redOptions.Sync()
             task.bins2D = {task.workingRes.Height, task.workingRes.Width}
-            If task.pointCloud.Width > 0 Then
-                ' If the workingRes changes, the previous generation of images needs to be reset.
-                If task.pointCloud.Size <> task.workingRes Or task.color.Size <> task.workingRes Then
-                    task.color = New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
-                    task.pointCloud = New cv.Mat(task.workingRes, cv.MatType.CV_32FC3, 0)
-                    task.noDepthMask = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
-                    task.depthMask = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
-                End If
+            Dim src = task.color
 
-                allOptions.TopMost = task.activateTaskRequest
-                Application.DoEvents()
-
-                ' run any universal algorithms here - if not a C++ algorithm!
-                Dim src = task.color
-
-                task.IMU_RawAcceleration = task.IMU_Acceleration
-                task.IMU_RawAngularVelocity = task.IMU_AngularVelocity
-                grid.RunVB(task.color)
-
-                If task.algName.StartsWith("CPP_") = False Then
-                    task.motionFlag = True
-
-                    If gOptions.useFilter.Checked Then
-                        Dim filterName = gOptions.RGBFilterList.Text
-                        If rgbFilter Is Nothing Then rgbFilter = algoList.createAlgorithm(filterName)
-                        If rgbFilter.traceName <> filterName Then rgbFilter = algoList.createAlgorithm(filterName)
-                        rgbFilter.RunVB(src)
-                        src = rgbFilter.dst2
-                    End If
-                End If
-
-                updateSettings()
-                imuStabilityTest.RunVB(src)
-                task.cameraStable = imuStabilityTest.stableTest
-                task.cameraStableString = imuStabilityTest.stableStr
-
-                If gOptions.CreateGif.Checked Then
-                    heartBeat = False
-                    task.optionsChanged = False
-                Else
-                    task.heartBeat = task.heartBeat Or task.debugSyncUI Or task.optionsChanged Or task.mouseClickFlag
-                End If
-
-                If task.paused = False Then
-                    IMUBasics.RunVB(src)
-                    gMat.RunVB(src)
-                    task.gMatrix = gMat.gMatrix
-
-                    task.frameHistoryCount = gOptions.FrameHistory.Value
-
-                    If gOptions.gravityPointCloud.Checked Then
-                        '******* this is the rotation *******
-                        task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).ToMat.Reshape(3, src.Rows)
-                    End If
-
-                    If task.pcSplit Is Nothing Then task.pcSplit = task.pointCloud.Split
-
-                    ' on each heartbeat or when options changed, update the whole image.
-                    If task.heartBeat Or gOptions.unFiltered.Checked Then
-                        task.motionDetected = True
-                        task.motionRect = New cv.Rect(0, 0, task.workingRes.Width, task.workingRes.Height)
-                    Else
-                        motionBasics.RunVB(src) ' get the latest motionRect
-                        motionColor.RunVB(src)
-
-                        If gOptions.UseHistoryCloud.Checked Then
-                            hCloud.RunVB(task.pointCloud)
-                            task.pointCloud = hCloud.dst2
-                        ElseIf gOptions.MotionFilteredColorAndCloud.Checked Then
-                            task.color = motionColor.dst2.Clone
-                            motionCloud.RunVB(task.pointCloud)
-                            task.pointCloud = motionCloud.dst2.Clone
-                        ElseIf gOptions.MotionFilteredCloudOnly.Checked Then
-                            motionCloud.RunVB(task.pointCloud)
-                            task.pointCloud = motionCloud.dst2.Clone
-                        ElseIf gOptions.MotionFilteredColorOnly.Checked Then
-                            task.color = motionColor.dst2.Clone
-                        End If
-                    End If
-                End If
-
-                If task.motionDetected Or heartBeat Then
-                    task.pcSplit = task.pointCloud.Split
-
-                    If task.optionsChanged Then task.maxDepthMask.SetTo(0)
-                    task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
-                    task.maxDepthMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
-
-                    task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-                    task.noDepthMask = Not task.depthMask
-
-                    If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
-                        Dim xRatio = task.xRangeDefault / task.xRange
-                        Dim yRatio = task.yRangeDefault / task.yRange
-                        task.pcSplit(0) *= xRatio
-                        task.pcSplit(1) *= yRatio
-
-                        cv.Cv2.Merge(task.pcSplit, task.pointCloud)
-                    End If
-                End If
-
-                ' small improvement to speed up colorized depth - make it smaller before colorizing.
-                Dim depthRGBInput = task.pcSplit(2).Resize(task.quarterRes)
-                colorizer.RunVB(depthRGBInput.Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc))
-                task.depthRGB = colorizer.dst2.Resize(task.color.Size)
-
-                TaskTimer.Enabled = True
-                task.highlightColor = highlightColors(0) ' task.frameCount Mod highlightColors.Count)
-
-                If gOptions.CreateGif.Checked Then
-                    If task.gifCreator Is Nothing Then task.gifCreator = New Gif_OpenCVB
-                    gifCreator.RunVB(src)
-                    If task.gifBuild Then
-                        task.gifBuild = False
-                        If task.gifImages.Count = 0 Then
-                            MsgBox("Collect images first and then click 'Build GIF...'")
-                        Else
-                            For i = 0 To task.gifImages.Count - 1
-                                Dim fileName As New FileInfo(task.homeDir + "Temp/image" + Format(i, "000") + ".bmp")
-                                task.gifImages(i).Save(fileName.FullName)
-                            Next
-
-                            task.gifImages.Clear()
-                            Dim dirInfo As New DirectoryInfo(task.homeDir + "\GifBuilder\bin\Release\")
-                            Dim dirData = dirInfo.GetDirectories()
-                            Dim gifExe As New FileInfo(dirInfo.FullName + "\" + dirData(0).ToString + "\GifBuilder.exe")
-                            If gifExe.Exists = False Then
-                                MsgBox("GifBuilder.exe was not found!")
-                            Else
-                                Dim gifProcess As New Process
-                                gifProcess.StartInfo.FileName = gifExe.FullName
-                                gifProcess.StartInfo.WorkingDirectory = task.homeDir + "Temp/"
-                                gifProcess.Start()
-                            End If
-                        End If
-                    End If
-                End If
-
-                algorithmObject.NextFrame(task.color.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
-
-                If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then
-                    task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
-                End If
-
-                Dim rc = task.rc
-                If rc.index > 0 Then
-                    task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-                    task.color(rc.rect).SetTo(cv.Scalar.White, rc.depthMask)
-
-                    task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-                    'task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-                End If
-
-                task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
-                task.optionsChanged = False
-                TaskTimer.Enabled = False
+            ' If the workingRes changes, the previous generation of images needs to be reset.
+            If task.pointCloud.Size <> task.workingRes Or task.color.Size <> task.workingRes Then
+                task.pointCloud = New cv.Mat(task.workingRes, cv.MatType.CV_32FC3, 0)
+                task.noDepthMask = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
+                task.depthMask = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
             End If
+
+            allOptions.TopMost = task.activateTaskRequest
+            Application.DoEvents()
+
+            ' run any universal algorithms here
+            task.IMU_RawAcceleration = task.IMU_Acceleration
+            task.IMU_RawAngularVelocity = task.IMU_AngularVelocity
+            grid.RunVB(task.color)
+
+            If task.algName.StartsWith("CPP_") = False Then
+                task.motionFlag = True
+
+                If gOptions.useFilter.Checked Then
+                    Dim filterName = gOptions.RGBFilterList.Text
+                    If rgbFilter Is Nothing Then rgbFilter = algoList.createAlgorithm(filterName)
+                    If rgbFilter.traceName <> filterName Then rgbFilter = algoList.createAlgorithm(filterName)
+                    rgbFilter.RunVB(src)
+                    src = rgbFilter.dst2
+                End If
+            End If
+
+            updateSettings()
+            imuStabilityTest.RunVB(src)
+            task.cameraStable = imuStabilityTest.stableTest
+            task.cameraStableString = imuStabilityTest.stableStr
+
+            If gOptions.CreateGif.Checked Then
+                heartBeat = False
+                task.optionsChanged = False
+            Else
+                task.heartBeat = task.heartBeat Or task.debugSyncUI Or task.optionsChanged Or task.mouseClickFlag
+            End If
+
+            If task.paused = False Then
+                IMUBasics.RunVB(src)
+                gMat.RunVB(src)
+                task.gMatrix = gMat.gMatrix
+
+                task.frameHistoryCount = gOptions.FrameHistory.Value
+
+                If gOptions.gravityPointCloud.Checked Then
+                    '******* this is the rotation *******
+                    task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).ToMat.Reshape(3, src.Rows)
+                End If
+
+                If task.pcSplit Is Nothing Then task.pcSplit = task.pointCloud.Split
+
+                ' on each heartbeat or when options changed, update the whole image.
+                If task.heartBeat Or gOptions.unFiltered.Checked Then
+                    task.motionDetected = True
+                    task.motionRect = New cv.Rect(0, 0, task.workingRes.Width, task.workingRes.Height)
+                    motionColor.dst2 = src.Clone
+                    motionCloud.dst2 = task.pointCloud.Clone
+                Else
+                    motionBasics.RunVB(src) ' get the latest motionRect
+                    If gOptions.UseHistoryCloud.Checked Then
+                        hCloud.RunVB(task.pointCloud)
+                        task.pointCloud = hCloud.dst2
+                    ElseIf gOptions.MotionFilteredColorAndCloud.Checked Then
+                        motionColor.RunVB(src)
+                        task.color = motionColor.dst2.Clone
+                        motionCloud.RunVB(task.pointCloud)
+                        task.pointCloud = motionCloud.dst2.Clone
+                    ElseIf gOptions.MotionFilteredCloudOnly.Checked Then
+                        motionCloud.RunVB(task.pointCloud)
+                        task.pointCloud = motionCloud.dst2.Clone
+                    ElseIf gOptions.MotionFilteredColorOnly.Checked Then
+                        motionColor.RunVB(src)
+                        task.color = motionColor.dst2.Clone
+                    End If
+                End If
+                End If
+
+            If task.motionDetected Or heartBeat Then
+                task.pcSplit = task.pointCloud.Split
+
+                If task.optionsChanged Then task.maxDepthMask.SetTo(0)
+                task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
+                task.maxDepthMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
+
+                task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+                task.noDepthMask = Not task.depthMask
+
+                If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
+                    Dim xRatio = task.xRangeDefault / task.xRange
+                    Dim yRatio = task.yRangeDefault / task.yRange
+                    task.pcSplit(0) *= xRatio
+                    task.pcSplit(1) *= yRatio
+
+                    cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+                End If
+            End If
+
+            ' small improvement to speed up colorized depth - make it smaller before colorizing.
+            Dim depthRGBInput = task.pcSplit(2).Resize(task.quarterRes)
+            colorizer.RunVB(depthRGBInput.Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc))
+            task.depthRGB = colorizer.dst2.Resize(task.color.Size)
+
+            TaskTimer.Enabled = True
+            task.highlightColor = highlightColors(0) ' task.frameCount Mod highlightColors.Count)
+
+            If gOptions.CreateGif.Checked Then
+                If task.gifCreator Is Nothing Then task.gifCreator = New Gif_OpenCVB
+                gifCreator.RunVB(src)
+                If task.gifBuild Then
+                    task.gifBuild = False
+                    If task.gifImages.Count = 0 Then
+                        MsgBox("Collect images first and then click 'Build GIF...'")
+                    Else
+                        For i = 0 To task.gifImages.Count - 1
+                            Dim fileName As New FileInfo(task.homeDir + "Temp/image" + Format(i, "000") + ".bmp")
+                            task.gifImages(i).Save(fileName.FullName)
+                        Next
+
+                        task.gifImages.Clear()
+                        Dim dirInfo As New DirectoryInfo(task.homeDir + "\GifBuilder\bin\Release\")
+                        Dim dirData = dirInfo.GetDirectories()
+                        Dim gifExe As New FileInfo(dirInfo.FullName + "\" + dirData(0).ToString + "\GifBuilder.exe")
+                        If gifExe.Exists = False Then
+                            MsgBox("GifBuilder.exe was not found!")
+                        Else
+                            Dim gifProcess As New Process
+                            gifProcess.StartInfo.FileName = gifExe.FullName
+                            gifProcess.StartInfo.WorkingDirectory = task.homeDir + "Temp/"
+                            gifProcess.Start()
+                        End If
+                    End If
+                End If
+            End If
+
+            algorithmObject.NextFrame(task.color.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
+
+            If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then
+                task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
+            End If
+
+            Dim rc = task.rc
+            If rc.index > 0 Then
+                task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+                task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+
+                task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+                'task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+            End If
+
+            task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
+            task.optionsChanged = False
+            TaskTimer.Enabled = False
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try

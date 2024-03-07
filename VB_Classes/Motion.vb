@@ -844,13 +844,7 @@ Public Class Motion_PointCloud : Inherits VB_Algorithm
         desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat Then
-            dst2 = task.pointCloud.Clone
-        ElseIf task.motionDetected Then
-            task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
-        Else
-            dst2 = task.pointCloud
-        End If
+        If task.motionDetected Then task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
         If standaloneTest() Then
             Static diff As New Diff_Depth32f
             If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
@@ -874,13 +868,7 @@ Public Class Motion_Color : Inherits VB_Algorithm
         desc = "Display the color image after updating only the motion rectangle.  Resync every heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat Then
-            dst2 = src.Clone
-        ElseIf task.motionDetected Then
-            src(task.motionRect).CopyTo(dst2(task.motionRect))
-        Else
-            dst2 = src
-        End If
+        If task.motionDetected Then src(task.motionRect).CopyTo(dst2(task.motionRect))
         If standaloneTest() And task.motionDetected Then dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
     End Sub
 End Class
