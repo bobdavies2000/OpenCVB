@@ -593,7 +593,7 @@ Public Class VBtask : Implements IDisposable
                 Dim rc = task.rc
                 If rc.index > 0 Then
                     task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-                    task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+                    task.color(rc.rect).SetTo(cv.Scalar.White, rc.depthMask)
 
                     task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
                     'task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)

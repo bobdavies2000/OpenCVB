@@ -3092,7 +3092,6 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
             Exit Sub
         End If
 
-        cv.Cv2.ImShow("dst3)", src)
         ' sorted again because the contoured rc.mask may be larger than before.
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To classCount - 1
