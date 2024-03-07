@@ -1581,7 +1581,7 @@ End Class
 
 
 Public Class Depth_ByColorInTier : Inherits VB_Algorithm
-    Dim flood As New Flood_ByColorByTier
+    Dim flood As New Flood_ByColorInTier
     Dim world As New Depth_World
     Public Sub New()
         desc = "Approximate depth for the entire image using color from Binarize_Split4 and cell average depth."
