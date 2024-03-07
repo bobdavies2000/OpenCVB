@@ -4,6 +4,7 @@ Public Class Flood_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim binar4 As New Binarize_Split4
+    Dim redGen As New RedCloud_GenCells
     Public Sub New()
         cPtr = RedCloud_Open()
         vbAddAdvice(traceName + ": redOptions 'Desired RedCloud Cells' determines how many regions are isolated.")
@@ -40,12 +41,12 @@ Public Class Flood_Basics : Inherits VB_Algorithm
             rc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
             rc.mask = dst1(rc.rect).InRange(rc.index, rc.index).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            vbDrawContour(rc.mask, rc.contour, 255, -1)
-
             rc.depthMask = rc.mask.Clone
             rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
             rc.depthPixels = rc.depthMask.CountNonZero
+
+            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            vbDrawContour(rc.mask, rc.contour, 255, -1)
 
             If rc.depthPixels Then
                 task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
@@ -668,7 +669,7 @@ End Class
 
 
 
-Public Class Flood_ColorByTier : Inherits VB_Algorithm
+Public Class Flood_ByColorByTier : Inherits VB_Algorithm
     Dim tiers As New Contour_DepthTiers
     Dim flood As New Flood_BasicsTier
     Dim binar4 As New Binarize_Split4

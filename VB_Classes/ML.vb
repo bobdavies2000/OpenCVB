@@ -386,17 +386,133 @@ End Class
 
 
 
+Public Structure mlColor
+    Dim colorIndex As Single
+    Dim x As Single
+    Dim y As Single
+End Structure
 
 
-Public Class ML_SourceData : Inherits VB_Algorithm
+Public Class ML_Color2Depth : Inherits VB_Algorithm
     Dim minMax As New Grid_MinMaxDepth
     Dim colorClass As New Color_Basics
     Public Sub New()
+        redOptions.ColorSource.SelectedItem() = "Binarize_Split4"
         desc = "Prepare a grid of color and depth data."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         colorClass.Run(src)
         dst2 = colorClass.dst3
         labels(2) = "Output of Color_Basics running " + redOptions.colorInputName
+
+        Dim rtree = cv.ML.RTrees.Create()
+        Dim mlInput As New List(Of mlColor)
+        Dim mResponse As New List(Of Single)
+        Dim predictList As New List(Of mlColor)
+        Dim roiPredict As New List(Of cv.Rect)
+        For i = 0 To task.gridList.Count - 1
+            Dim roi = task.gridList(i)
+            Dim mls As mlColor
+            mls.colorIndex = colorClass.dst2.Get(Of Byte)(roi.Y, roi.X)
+            mls.x = roi.X
+            mls.y = roi.Y
+
+            If task.noDepthMask(roi).CountNonZero > 0 Then
+                roiPredict.Add(roi)
+                predictList.Add(mls)
+            Else
+                mlInput.Add(mls)
+                mResponse.Add(task.pcSplit(2)(roi).Mean())
+            End If
+        Next
+
+        If mlInput.Count = 0 Then
+            setTrueText("No learning data was found or provided.  Exit...", 3)
+            Exit Sub
+        End If
+
+        Dim mLearn As cv.Mat = New cv.Mat(mlInput.Count, 3, cv.MatType.CV_32F, mlInput.ToArray)
+        Dim response As cv.Mat = New cv.Mat(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
+        rtree.Train(mLearn, cv.ML.SampleTypes.RowSample, response)
+
+        Dim predMat = New cv.Mat(predictList.Count, 3, cv.MatType.CV_32F, predictList.ToArray)
+        Dim output = New cv.Mat(predictList.Count, cv.MatType.CV_32FC1, 0)
+        rtree.Predict(predMat, output)
+
+        dst3 = task.pcSplit(2).Clone
+        For i = 0 To predictList.Count - 1
+            Dim mls = predictList(i)
+            Dim roi = roiPredict(i)
+            Dim depth = output.Get(Of Single)(i, 0)
+            dst3(roi).SetTo(depth, task.noDepthMask(roi))
+        Next
+
+    End Sub
+End Class
+
+
+
+
+
+Public Structure mlColorInTier
+    Dim colorIndex As Single
+    Dim x As Single
+    Dim y As Single
+End Structure
+Public Class ML_ColorInTier2Depth : Inherits VB_Algorithm
+    Dim minMax As New Grid_MinMaxDepth
+    Dim colorClass As New Color_Basics
+    Dim tiers As New Contour_DepthTiers
+    Public Sub New()
+        redOptions.ColorSource.SelectedItem() = "Binarize_Split4"
+        desc = "Prepare a grid of color and depth data."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        colorClass.Run(src)
+        dst2 = colorClass.dst3
+        labels(2) = "Output of Color_Basics running " + redOptions.colorInputName
+
+        Dim rtree = cv.ML.RTrees.Create()
+        Dim mlInput As New List(Of mlColorInTier)
+        Dim mResponse As New List(Of Single)
+        Dim predictList As New List(Of mlColorInTier)
+        Dim roiPredict As New List(Of cv.Rect)
+        For i = 0 To task.gridList.Count - 1
+            Dim roi = task.gridList(i)
+            Dim mls As mlColorInTier
+            mls.colorIndex = colorClass.dst2.Get(Of Byte)(roi.Y, roi.X)
+            mls.x = roi.X
+            mls.y = roi.Y
+
+            If task.noDepthMask(roi).CountNonZero > 0 Then
+                roiPredict.Add(roi)
+                predictList.Add(mls)
+            Else
+                mlInput.Add(mls)
+                mResponse.Add(task.pcSplit(2)(roi).Mean())
+            End If
+        Next
+
+        If mlInput.Count = 0 Then
+            setTrueText("No learning data was found or provided.  Exit...", 3)
+            Exit Sub
+        End If
+
+        Dim mLearn As cv.Mat = New cv.Mat(mlInput.Count, 3, cv.MatType.CV_32F, mlInput.ToArray)
+        Dim response As cv.Mat = New cv.Mat(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
+        rtree.Train(mLearn, cv.ML.SampleTypes.RowSample, response)
+
+        Dim predMat = New cv.Mat(predictList.Count, 3, cv.MatType.CV_32F, predictList.ToArray)
+        Dim output = New cv.Mat(predictList.Count, cv.MatType.CV_32FC1, 0)
+        rtree.Predict(predMat, output)
+
+        dst3 = task.pcSplit(2).Clone
+        For i = 0 To predictList.Count - 1
+            Dim mls = predictList(i)
+            Dim roi = roiPredict(i)
+            Dim depth = output.Get(Of Single)(i, 0)
+            dst3(roi).SetTo(depth, task.noDepthMask(roi))
+        Next
+
     End Sub
 End Class

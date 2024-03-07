@@ -518,3 +518,24 @@ Public Class Cell_DistanceDepth : Inherits VB_Algorithm
         End If
     End Sub
 End Class
+
+
+
+
+
+Public Class Cell_Floodfill : Inherits VB_Algorithm
+    Dim flood As New Flood_Basics
+    Dim stats As New Cell_Basics
+    Public Sub New()
+        desc = "Provide cell stats on the flood_basics cells."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        flood.Run(src)
+
+        stats.Run(src)
+        dst0 = stats.dst0
+        dst1 = stats.dst1
+        dst2 = flood.dst2
+        setTrueText(stats.strOut, 3)
+    End Sub
+End Class

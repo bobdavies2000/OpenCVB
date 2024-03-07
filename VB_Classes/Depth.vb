@@ -1581,7 +1581,7 @@ End Class
 
 
 Public Class Depth_ByColorInTier : Inherits VB_Algorithm
-    Dim flood As New Flood_Basics
+    Dim flood As New Flood_ByColorByTier
     Dim world As New Depth_World
     Public Sub New()
         desc = "Approximate depth for the entire image using color from Binarize_Split4 and cell average depth."
@@ -1594,7 +1594,7 @@ Public Class Depth_ByColorInTier : Inherits VB_Algorithm
         Dim depth32f As cv.Mat = task.pcSplit(2).Clone
         Dim minPixels = CInt(src.Total / 100)
         For Each rc In flood.redCells
-            If rc.pixels >= minPixels Then depth32f(rc.rect).SetTo(rc.depthMean(2), rc.mask)
+            If rc.pixels >= minPixels Then depth32f(rc.rect).SetTo(rc.depthMean(2), rc.mask) Else Dim k = 0
         Next
 
         world.Run(depth32f)

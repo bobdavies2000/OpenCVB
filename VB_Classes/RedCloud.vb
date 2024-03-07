@@ -3061,12 +3061,31 @@ Public Class RedCloud_Color : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Public Sub New()
         redOptions.UseColor.Checked = True  ' <<<<<<< this is what is different.
-        desc = "This is just a placeholder to help find the color only output of RedCloud."
+        desc = "This is just a placeholder to help find the color only output of RedCloud.  Alternative is Flood_Basics/Flood_ByColorInTiers"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
         identifyCells(redC.redCells)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_GenCells : Inherits VB_Algorithm
+    Public classCount As Integer
+    Public classMask As cv.Mat
+    Public colorMask As cv.Mat
+    Public rectData As cv.Mat
+    Public floodPointData As cv.Mat
+    Public Sub New()
+        desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
     End Sub
 End Class
