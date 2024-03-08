@@ -54,6 +54,55 @@ End Class
 
 
 
+
+Public Class Flood_BasicsMask : Inherits VB_Algorithm
+    Public redCells As New List(Of rcData)
+    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public binarizedImage As cv.Mat
+    Public inputMask As cv.Mat
+    Dim redGen As New RedCloud_GenCells
+    Public Sub New()
+        cPtr = RedCloud_Open()
+        If standalone Then labels(2) = "When run standalone, there is no output"
+        desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then Exit Sub
+
+        Dim imagePtr As IntPtr
+        Dim inputData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+        Dim maskData(inputMask.Total - 1) As Byte
+        Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
+        Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
+
+        imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(),
+                                src.Rows, src.Cols, src.Type, 255, 0, 1, 0)
+        handleMask.Free()
+        handleInput.Free()
+
+        redGen.classCount = RedCloud_Count(cPtr)
+        If redGen.classCount = 0 Then Exit Sub ' no data to process.
+        redGen.classMask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        redGen.rectData = New cv.Mat(redGen.classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+        redGen.floodPointData = New cv.Mat(redGen.classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
+        redGen.Run(binarizedImage)
+
+        dst2 = redGen.dst2
+        cellMap = redGen.dst3
+        redCells = redGen.redCells
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
 Public Class Flood_BasicsOld : Inherits VB_Algorithm
     Public classCount As Integer
     Public redC As New RedCloud_Basics
@@ -390,55 +439,6 @@ Public Class Flood_Stats : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Flood_BasicsMask : Inherits VB_Algorithm
-    Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public binarizedImage As cv.Mat
-    Public inputMask As cv.Mat
-    Dim redGen As New RedCloud_GenCells
-    Public Sub New()
-        cPtr = RedCloud_Open()
-        If standalone Then labels(2) = "When run standalone, there is no output"
-        desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standalone Then Exit Sub
-
-        Dim imagePtr As IntPtr
-        Dim inputData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-        Dim maskData(inputMask.Total - 1) As Byte
-        Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
-        Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
-
-        imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(),
-                                src.Rows, src.Cols, src.Type, 255, 0, 1, 0)
-        handleMask.Free()
-        handleInput.Free()
-
-        redGen.classCount = RedCloud_Count(cPtr)
-        If redGen.classCount = 0 Then Exit Sub ' no data to process.
-        redGen.classMask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-        redGen.rectData = New cv.Mat(redGen.classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
-        redGen.floodPointData = New cv.Mat(redGen.classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
-        redGen.Run(binarizedImage)
-
-        dst2 = redGen.dst2
-        cellMap = redGen.dst3
-        redCells = redGen.redCells
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
-    End Sub
-End Class
 
 
 

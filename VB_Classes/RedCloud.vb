@@ -1685,7 +1685,7 @@ Public Class RedCloud_OnlyColorAlt : Inherits VB_Algorithm
         dst3.SetTo(0)
         Dim usedColors = New List(Of cv.Vec3b)({black})
         Dim unmatched As Integer
-        For Each cell In redMasks.sortedCells.Values
+        For Each cell In redMasks.redGen.redCells
             Dim index = lastMap.Get(Of Byte)(cell.maxDist.Y, cell.maxDist.X)
             If index < lastCells.Count Then
                 cell.color = lastColors.Get(Of cv.Vec3b)(cell.maxDist.Y, cell.maxDist.X)
@@ -1880,7 +1880,6 @@ Public Class RedCloud_MotionBasics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         redMasks.Run(src)
 
-        rMotion.sortedCells = redMasks.sortedCells
         rMotion.Run(task.color.Clone)
 
         Dim lastCells As New List(Of rcData)(redCells)
@@ -1933,7 +1932,6 @@ End Class
 Public Class RedCloud_MotionBGsubtract : Inherits VB_Algorithm
     Public bgSub As New BGSubtract_Basics
     Public redCells As New List(Of rcData)
-    Public sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         gOptions.PixelDiffThreshold.Value = 25
@@ -2084,7 +2082,7 @@ Public Class RedCloud_Both : Inherits VB_Algorithm
         redCells.Add(New rcData)
         dst.SetTo(0)
         Dim tmp As New cv.Mat(input.Size, cv.MatType.CV_8U, 0)
-        For Each matchCell.rc In redMasks.sortedCells.Values
+        For Each matchCell.rc In redMasks.redGen.redCells
             matchCell.Run(empty)
             Dim rc = matchCell.rc
             rc.index = redCells.Count
@@ -2485,7 +2483,7 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
         combinedCells.Clear()
         Dim drawRectOnlyRun As Boolean
         If task.drawRect.Width * task.drawRect.Height > 10 Then drawRectOnlyRun = True
-        For Each rc In redMasks.sortedCells.Values
+        For Each rc In redMasks.redGen.redCells
             If drawRectOnlyRun Then If task.drawRect.Contains(rc.floodPoint) = False Then Continue For
             combinedCells.Add(rc)
         Next
@@ -2499,14 +2497,14 @@ End Class
 
 
 Public Class RedCloud_Masks : Inherits VB_Algorithm
-    Public sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
     Public inputMask As cv.Mat
     Public classCount As Integer
     Public imageThresholdPercent As Single = 0.98
     Public cellMinPercent As Single = 0.0001
+    Public redGen As New RedCloud_GenCells 
     Public Sub New()
         cPtr = RedCloud_Open()
-        desc = "Core interface to the C++ code for floodfill."
+        desc = "Core interface to the C++ code for RedCloud."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
@@ -2532,34 +2530,20 @@ Public Class RedCloud_Masks : Inherits VB_Algorithm
             handleMask.Free()
         End If
         handleInput.Free()
+        dst0 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
 
-        classCount = RedCloud_Count(cPtr)
+        redGen.classCount = RedCloud_Count(cPtr)
+        classCount = redGen.classCount
         If classCount = 0 Then Exit Sub ' no data to process.
+        redGen.classMask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        redGen.rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+        redGen.floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
+        redGen.Run(dst0)
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-        dst3 = vbPalette(dst2 * 255 / classCount)
+        dst2 = redGen.dst2
+        dst3 = vbPalette(redGen.dst3 * 255 / classCount)
 
         If task.heartBeat Then labels(3) = CStr(classCount) + " cells found"
-
-        Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, RedCloud_Sizes(cPtr))
-        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
-        Dim floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
-        sortedCells.Clear()
-        For i = 0 To classCount - 1
-            Dim rc As New rcData
-            rc.index = sortedCells.Count + 1
-            rc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
-            rc.mask = dst2(rc.rect).InRange(rc.index, rc.index).Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-            rc.pixels = sizeData.Get(Of Integer)(i, 0)
-            rc.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
-
-            ' rc.mask.Rectangle(New cv.Rect(0, 0, rc.mask.Width, rc.mask.Height), 0, 1)
-            Dim pt = vbGetMaxDist(rc)
-            rc.maxDist = New cv.Point(pt.X, pt.Y)
-
-            If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
-        Next
 
         If task.heartBeat Then labels(2) = "CV_8U format - " + CStr(classCount) + " cells were identified."
     End Sub

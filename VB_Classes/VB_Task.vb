@@ -525,7 +525,7 @@ Public Class VBtask : Implements IDisposable
                         task.color = motionColor.dst2.Clone
                     End If
                 End If
-                End If
+            End If
 
             If task.motionDetected Or heartBeat Then
                 task.pcSplit = task.pointCloud.Split

@@ -257,46 +257,6 @@ End Class
 
 
 
-Public Class Motion_MinRect : Inherits VB_Algorithm
-    Public motion As New Motion_BasicsTest
-    Dim mRect As New Area_MinRect
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Find the nonzero points of motion and fit an ellipse to them."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        motion.Run(src)
-        dst2 = motion.dst2
-
-        Dim nonzeros = dst2.FindNonZero()
-        If task.heartBeat Then dst3.SetTo(0)
-        If nonzeros.Rows > 5 Then
-            Dim ptx As New List(Of Integer)
-            Dim pty As New List(Of Integer)
-            Dim inputPoints As New List(Of cv.Point)
-            For i = 0 To nonzeros.Rows - 1
-                Dim pt = nonzeros.Get(Of cv.Point)(i, 0)
-                inputPoints.Add(pt)
-                ptx.Add(pt.X)
-                pty.Add(pt.Y)
-            Next
-            Dim p1 = inputPoints(ptx.IndexOf(ptx.Max))
-            Dim p2 = inputPoints(ptx.IndexOf(ptx.Min))
-            Dim p3 = inputPoints(pty.IndexOf(pty.Max))
-            Dim p4 = inputPoints(pty.IndexOf(pty.Min))
-
-            mRect.inputPoints = New List(Of cv.Point2f)({p1, p2, p3, p4})
-            mRect.Run(empty)
-            drawRotatedRectangle(mRect.minRect, dst3, cv.Scalar.White)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 
@@ -608,10 +568,10 @@ Public Class Motion_Enclosing : Inherits VB_Algorithm
         redMasks.Run(dst2)
 
         motionRect = New cv.Rect
-        If redMasks.sortedCells.Count < 2 Then Exit Sub
-        motionRect = redMasks.sortedCells.ElementAt(1).Value.rect
-        For i = 2 To redMasks.sortedCells.Count - 1
-            Dim cell = redMasks.sortedCells.ElementAt(i).Value
+        If redMasks.redGen.redCells.Count < 2 Then Exit Sub
+        motionRect = redMasks.redGen.redCells.ElementAt(1).rect
+        For i = 2 To redMasks.redGen.redCells.Count - 1
+            Dim cell = redMasks.redGen.redCells.ElementAt(i)
             motionRect = motionRect.Union(cell.rect)
         Next
 
@@ -714,13 +674,13 @@ Public Class Motion_Basics_QT : Inherits VB_Algorithm
         dst2 = src
 
         redMasks.Run(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
-        If redMasks.sortedCells.Count < 2 Then
+        If redMasks.redGen.redCells.Count < 2 Then
             task.motionDetected = False
             rectList.Clear()
         Else
-            Dim nextRect = redMasks.sortedCells.ElementAt(1).Value.rect
-            For i = 2 To redMasks.sortedCells.Count - 1
-                Dim rc = redMasks.sortedCells.ElementAt(i).Value
+            Dim nextRect = redMasks.redGen.redCells.ElementAt(1).rect
+            For i = 2 To redMasks.redGen.redCells.Count - 1
+                Dim rc = redMasks.redGen.redCells.ElementAt(i)
                 nextRect = nextRect.Union(rc.rect)
             Next
 
@@ -738,8 +698,8 @@ Public Class Motion_Basics_QT : Inherits VB_Algorithm
 
         If standaloneTest() Then
             dst2.Rectangle(task.motionRect, 255, task.lineWidth)
-            If redMasks.sortedCells.Count > 1 Then
-                labels(2) = CStr(redMasks.sortedCells.Count) + " RedMask cells had motion"
+            If redMasks.redGen.redCells.Count > 1 Then
+                labels(2) = CStr(redMasks.redGen.redCells.Count) + " RedMask cells had motion"
             Else
                 labels(2) = "No motion detected"
             End If
@@ -747,85 +707,6 @@ Public Class Motion_Basics_QT : Inherits VB_Algorithm
             If task.motionRect.Width > 0 Then
                 labels(3) = "Rect width = " + CStr(task.motionRect.Width) + ", height = " + CStr(task.motionRect.Height)
             End If
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
-    Dim redMasks As New RedCloud_Masks
-    Public bgSub As New BGSubtract_MOG2_QT
-    Dim rectList As New List(Of cv.Rect)
-    Public Sub New()
-        redMasks.imageThresholdPercent = 1.0
-        redMasks.cellMinPercent = 0
-        desc = "The option-free version of Motion_Basics"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        task.motionDetected = True
-        task.motionRect = New cv.Rect
-        dst2 = src.Resize(task.quarterRes)
-
-        If src.Channels <> 1 Then
-            bgSub.Run(dst2)
-            dst2 = bgSub.dst2
-        End If
-
-        redMasks.Run(dst2.Threshold(0, 255, cv.ThresholdTypes.Binary))
-        If redMasks.sortedCells.Count < 2 Then
-            task.motionDetected = False
-            rectList.Clear()
-        Else
-            Dim nextRect = redMasks.sortedCells.ElementAt(1).Value.rect
-            For i = 2 To redMasks.sortedCells.Count - 1
-                Dim rc = redMasks.sortedCells.ElementAt(i).Value
-                nextRect = nextRect.Union(rc.rect)
-            Next
-
-            rectList.Add(nextRect)
-            For Each r In rectList
-                If task.motionRect.Width = 0 Then task.motionRect = r Else task.motionRect = task.motionRect.Union(r)
-            Next
-            If rectList.Count > task.frameHistoryCount Then rectList.RemoveAt(0)
-            If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
-                task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-            Else
-                If task.motionRect.Width = 0 Or task.motionRect.Height = 0 Then task.motionDetected = False
-            End If
-        End If
-
-        If standaloneTest() Then
-            dst2.Rectangle(task.motionRect, 255, task.lineWidth)
-            If redMasks.sortedCells.Count > 1 Then
-                labels(2) = CStr(redMasks.sortedCells.Count) + " RedMask cells had motion"
-            Else
-                labels(2) = "No motion detected"
-            End If
-            labels(3) = ""
-            If task.motionRect.Width > 0 Then
-                labels(3) = "Rect width = " + CStr(task.motionRect.Width) + ", height = " + CStr(task.motionRect.Height)
-            End If
-        End If
-
-        Dim ratio = CInt(src.Width / dst2.Width)
-        If src.Size <> dst2.Size Then
-            Dim r = task.motionRect
-            task.motionRect = New cv.Rect(r.X * ratio, r.Y * ratio, r.Width * ratio, r.Height * ratio)
-        End If
-
-        If task.motionRect.Width < dst2.Width Then
-            dst2.Rectangle(task.motionRect, 255, task.lineWidth)
-            Dim pad = dst2.Width / 20
-            Dim r = task.motionRect
-            r = New cv.Rect(r.X - pad, r.Y - pad, r.Width + pad * 2, r.Height + pad * 2)
-            task.motionRect = validateRect(r, ratio)
-            dst2.Rectangle(task.motionRect, 255, task.lineWidth + 4)
         End If
     End Sub
 End Class
@@ -870,5 +751,124 @@ Public Class Motion_Color : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If task.motionDetected Then src(task.motionRect).CopyTo(dst2(task.motionRect))
         If standaloneTest() And task.motionDetected Then dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Motion_MinRect : Inherits VB_Algorithm
+    Public motion As New Motion_BasicsTest
+    Dim mRect As New Area_MinRect
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Find the nonzero points of motion and fit an ellipse to them."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        motion.Run(src)
+        dst2 = motion.dst2
+
+        Dim nonzeros = dst2.FindNonZero()
+        If task.heartBeat Then dst3.SetTo(0)
+        If nonzeros.Rows > 5 Then
+            Dim ptx As New List(Of Integer)
+            Dim pty As New List(Of Integer)
+            Dim inputPoints As New List(Of cv.Point)
+            For i = 0 To nonzeros.Rows - 1
+                Dim pt = nonzeros.Get(Of cv.Point)(i, 0)
+                inputPoints.Add(pt)
+                ptx.Add(pt.X)
+                pty.Add(pt.Y)
+            Next
+            Dim p1 = inputPoints(ptx.IndexOf(ptx.Max))
+            Dim p2 = inputPoints(ptx.IndexOf(ptx.Min))
+            Dim p3 = inputPoints(pty.IndexOf(pty.Max))
+            Dim p4 = inputPoints(pty.IndexOf(pty.Min))
+
+            mRect.inputPoints = New List(Of cv.Point2f)({p1, p2, p3, p4})
+            mRect.Run(empty)
+            drawRotatedRectangle(mRect.minRect, dst3, cv.Scalar.White)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
+    Dim redMasks As New RedCloud_Masks
+    Public bgSub As New BGSubtract_MOG2_QT
+    Dim rectList As New List(Of cv.Rect)
+    Public Sub New()
+        redMasks.imageThresholdPercent = 1.0
+        redMasks.cellMinPercent = 0
+        desc = "The option-free version of Motion_Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        task.motionDetected = True
+        task.motionRect = New cv.Rect
+        dst2 = src.Resize(task.quarterRes)
+
+        If src.Channels <> 1 Then
+            bgSub.Run(dst2)
+            dst2 = bgSub.dst2
+        End If
+
+        redMasks.Run(dst2.Threshold(0, 255, cv.ThresholdTypes.Binary))
+        If redMasks.redGen.redCells.Count < 2 Then
+            task.motionDetected = False
+            rectList.Clear()
+        Else
+            Dim nextRect = redMasks.redGen.redCells.ElementAt(1).rect
+            For i = 2 To redMasks.redGen.redCells.Count - 1
+                Dim rc = redMasks.redGen.redCells.ElementAt(i)
+                nextRect = nextRect.Union(rc.rect)
+            Next
+
+            rectList.Add(nextRect)
+            For Each r In rectList
+                If task.motionRect.Width = 0 Then task.motionRect = r Else task.motionRect = task.motionRect.Union(r)
+            Next
+            If rectList.Count > task.frameHistoryCount Then rectList.RemoveAt(0)
+            If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
+                task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+            Else
+                If task.motionRect.Width = 0 Or task.motionRect.Height = 0 Then task.motionDetected = False
+            End If
+        End If
+
+        If standaloneTest() Then
+            dst2.Rectangle(task.motionRect, 255, task.lineWidth)
+            If redMasks.redGen.redCells.Count > 1 Then
+                labels(2) = CStr(redMasks.redGen.redCells.Count) + " RedMask cells had motion"
+            Else
+                labels(2) = "No motion detected"
+            End If
+            labels(3) = ""
+            If task.motionRect.Width > 0 Then
+                labels(3) = "Rect width = " + CStr(task.motionRect.Width) + ", height = " + CStr(task.motionRect.Height)
+            End If
+        End If
+
+        Dim ratio = CInt(src.Width / dst2.Width)
+        If src.Size <> dst2.Size Then
+            Dim r = task.motionRect
+            task.motionRect = New cv.Rect(r.X * ratio, r.Y * ratio, r.Width * ratio, r.Height * ratio)
+        End If
+
+        If task.motionRect.Width < dst2.Width Then
+            dst2.Rectangle(task.motionRect, 255, task.lineWidth)
+            Dim pad = dst2.Width / 20
+            Dim r = task.motionRect
+            r = New cv.Rect(r.X - pad, r.Y - pad, r.Width + pad * 2, r.Height + pad * 2)
+            task.motionRect = validateRect(r, ratio)
+            dst2.Rectangle(task.motionRect, 255, task.lineWidth + 4)
+        End If
     End Sub
 End Class
