@@ -813,17 +813,20 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         task.motionDetected = True
         task.motionRect = New cv.Rect
-        dst2 = src.Resize(task.quarterRes)
 
         If src.Channels <> 1 Then
-            bgSub.Run(dst2)
+            bgSub.Run(src)
             dst2 = bgSub.dst2
+        Else
+            dst2 = src
         End If
+        dst2 = dst2.Resize(task.quarterRes).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        redMasks.Run(dst2.Threshold(0, 255, cv.ThresholdTypes.Binary))
-        If redMasks.redGen.redCells.Count < 2 Then
+        redMasks.inputMask = Not dst2
+        redMasks.Run(dst2)
+        If redMasks.redGen.redCells.Count <= 2 Then
             task.motionDetected = False
-            rectList.Clear()
+            task.motionRect = New cv.Rect
         Else
             Dim nextRect = redMasks.redGen.redCells.ElementAt(1).rect
             For i = 2 To redMasks.redGen.redCells.Count - 1
@@ -868,7 +871,7 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
             Dim r = task.motionRect
             r = New cv.Rect(r.X - pad, r.Y - pad, r.Width + pad * 2, r.Height + pad * 2)
             task.motionRect = validateRect(r, ratio)
-            dst2.Rectangle(task.motionRect, 255, task.lineWidth + 4)
+            dst2.Rectangle(task.motionRect, 255, task.lineWidth + 1)
         End If
     End Sub
 End Class
