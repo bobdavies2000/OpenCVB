@@ -1582,8 +1582,11 @@ End Class
 
 Public Class Depth_ByColorInTier : Inherits VB_Algorithm
     Dim flood As New Flood_ByColorInTier
-    Dim world As New Depth_World
+    Public world As New Depth_World
     Public Sub New()
+        gOptions.DebugCheckBox.Checked = True
+        findSlider("OpenGL shift fwd/back (Z-axis)").Value = 240
+        gOptions.unFiltered.Checked = True
         desc = "Approximate depth for the entire image using color from Binarize_Split4 and cell average depth."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1591,13 +1594,19 @@ Public Class Depth_ByColorInTier : Inherits VB_Algorithm
         dst2 = flood.dst2
         labels(2) = $"{flood.redCells.Count} cells"
 
-        Dim depth32f As cv.Mat = task.pcSplit(2).Clone
-        Dim minPixels = CInt(src.Total / 100)
-        For Each rc In flood.redCells
-            If rc.pixels >= minPixels Then depth32f(rc.rect).SetTo(rc.depthMean(2), rc.mask) Else Dim k = 0
-        Next
-
-        world.Run(depth32f)
-        dst3 = world.dst2
+        If gOptions.DebugCheckBox.Checked = False Then
+            Dim depth32f As cv.Mat = task.pcSplit(2).Clone
+            Dim minPixels = CInt(src.Total / 100)
+            For Each rc In flood.redCells
+                If rc.pixels = 0 Then Continue For
+                Dim percentDepth = rc.depthPixels / rc.pixels
+                If percentDepth < gOptions.DebugSlider.Value / 10 Then Continue For
+                depth32f(rc.rect).SetTo(rc.depthMean(2), rc.mask)
+            Next
+            world.Run(depth32f)
+            dst3 = world.dst2
+        Else
+            dst3 = task.pointCloud
+        End If
     End Sub
 End Class
