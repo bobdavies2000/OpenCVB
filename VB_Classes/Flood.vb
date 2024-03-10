@@ -423,7 +423,7 @@ End Class
 
 
 Public Class Flood_Stats : Inherits VB_Algorithm
-    Dim flood As New Flood_ByColorInTier
+    Dim flood As New Flood_ByColorWithinDepth
     Dim stats As New Cell_Basics
     Public Sub New()
         desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"
@@ -445,7 +445,7 @@ End Class
 
 
 
-Public Class Flood_ByColorInTier : Inherits VB_Algorithm
+Public Class Flood_ByColorWithinDepth : Inherits VB_Algorithm
     Dim tiers As New Contour_DepthTiers
     Dim floodMask As New Flood_BasicsMask
     Dim binar4 As New Binarize_Split4
@@ -519,7 +519,7 @@ Public Class Flood_Cell : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Dim ttOffset = tiers.options.trueTextOffset
         If standalone Then
-            Static flood As New Flood_Basics  ' <<<<<< switch to Flood_ByColorInTier to see the difference.
+            Static flood As New Flood_Basics  ' <<<<<< switch to Flood_ByColorWithinDepth to see the difference.
             flood.Run(src)
             dst2 = flood.dst2
             labels = flood.labels

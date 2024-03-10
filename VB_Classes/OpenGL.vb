@@ -2045,8 +2045,8 @@ End Class
 
 
 
-Public Class OpenGL_ByColorInTier : Inherits VB_Algorithm
-    Dim cloud As New Depth_ByColorInTier
+Public Class OpenGL_ByColorWithinDepth : Inherits VB_Algorithm
+    Dim cloud As New Depth_ByColorWithinDepth
     Public Sub New()
         desc = "Show what the point cloud looks like with a complete depth image."
     End Sub

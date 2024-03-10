@@ -2984,7 +2984,7 @@ Public Class RedCloud_Color : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Public Sub New()
         redOptions.UseColor.Checked = True  ' <<<<<<< this is what is different.
-        desc = "This is just a placeholder to help find the color only output of RedCloud.  Alternative is Flood_Basics/Flood_ByColorInTiers"
+        desc = "This is just a placeholder to help find the color only output of RedCloud.  Alternative is Flood_Basics/Flood_ByColorWithinDepths"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)

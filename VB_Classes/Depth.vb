@@ -1580,8 +1580,8 @@ End Class
 
 
 
-Public Class Depth_ByColorInTier : Inherits VB_Algorithm
-    Dim flood As New Flood_ByColorInTier
+Public Class Depth_ByColorWithinDepth : Inherits VB_Algorithm
+    Dim flood As New Flood_ByColorWithinDepth
     Public world As New Depth_World
     Public Sub New()
         gOptions.DebugCheckBox.Checked = True
