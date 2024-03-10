@@ -1556,7 +1556,6 @@ if algorithmName = "RecursiveBilateralFilter_CPP" Then return new RecursiveBilat
 if algorithmName = "RedCloud_Basics" Then return new RedCloud_Basics
 if algorithmName = "RedCloud_BasicsFull" Then return new RedCloud_BasicsFull
 if algorithmName = "RedCloud_BasicsFullNew" Then return new RedCloud_BasicsFullNew
-if algorithmName = "RedCloud_BasicsNew" Then return new RedCloud_BasicsNew
 if algorithmName = "RedCloud_BasicsOld" Then return new RedCloud_BasicsOld
 if algorithmName = "RedCloud_Both" Then return new RedCloud_Both
 if algorithmName = "RedCloud_BothOld" Then return new RedCloud_BothOld

@@ -1,5 +1,80 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Public Class RedCloud_Basics : Inherits VB_Algorithm
+    Public redCells As New List(Of rcData)
+    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Dim byColor As New RedCloud_ByColorWithinDepth
+    Dim colorMap As New cv.Mat(256, 1, cv.MatType.CV_8UC3, 0)
+    Public Sub New()
+        vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
+                        "It is behind the global options (which affect most algorithms.)")
+        desc = "Find cells and then match them to the previous generation"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.motionDetected = False Then Exit Sub ' no change...
+        byColor.Run(src)
+
+        If task.optionsChanged Then
+            cellMap.SetTo(0)
+            colorMap.SetTo(0)
+        End If
+        Dim lastCells As New List(Of rcData)(redCells), lastCellMap As cv.Mat = cellMap.Clone
+        Dim usedColors As New List(Of cv.Vec3b)({black})
+
+        If dst2.Size <> src.Size Then dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
+
+        cellMap.SetTo(0)
+        dst2.SetTo(0)
+        redCells.Clear()
+        Dim matchCount As Integer
+        For Each rc In byColor.redGen.redCells
+            rc.maxDStable = rc.maxDist ' assume it has to use the latest.
+            rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If rc.indexLast < lastCells.Count Then
+                Dim lrc = lastCells(rc.indexLast)
+                rc.color = lrc.color
+                rc.matchFlag = True
+
+                Dim stableCheck = lastCellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
+                If stableCheck = rc.indexLast Then
+                    rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+                    rc.matchCount = lrc.matchCount + 1
+                End If
+            End If
+
+            If usedColors.Contains(rc.color) Then
+                rc.color = randomCellColor()
+                rc.matchCount = 0
+                rc.matchFlag = False
+            End If
+
+            usedColors.Add(rc.color)
+
+            If task.heartBeat Then rc.matchCount = 1
+            rc.index = redCells.Count
+            If rc.matchFlag Then matchCount += 1
+            redCells.Add(rc)
+
+            cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)  ' <<<< switch to using colormap.
+            If redCells.Count >= 255 Then Exit For ' we are going to handle only the largest 255 cells - rest are too small.
+        Next
+
+        Dim rcZero = redCells(0)
+        rcZero.mask = cellMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        rcZero.pixels = rcZero.mask.CountNonZero
+        rcZero.rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+
+        setSelectedContour(redCells, cellMap)
+        labels(2) = $"{redCells.Count} cells found and {matchCount} were matched to the previous generation."
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class RedCloud_BasicsOld : Inherits VB_Algorithm
     Public redC As New RedCloud_BasicsFull
     Public redCells As New List(Of rcData)
@@ -1259,8 +1334,8 @@ End Class
 
 
 Public Class RedCloud_Combine2Pass : Inherits VB_Algorithm
-    Dim redC1 As New RedCloud_BasicsFull
-    Dim redC2 As New RedCloud_BasicsFull
+    Dim redC1 As New RedCloud_Basics
+    Dim redC2 As New RedCloud_Basics
     Dim mats As New Mat_4Click
     Public Sub New()
         desc = "Run RedCloud_Basics and then combine the unstable pixels into the input for RedCloud."
@@ -2493,73 +2568,6 @@ End Class
 
 
 
-
-Public Class RedCloud_ByColorWithinDepth : Inherits VB_Algorithm
-    Public sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-    Public classCount As Integer
-    Public imageThresholdPercent As Single = 0.98
-    Public cellMinPercent As Single = 0.0001
-    Public Sub New()
-        cPtr = RedCloud_Open()
-        desc = "FloodFill the classes defined by adding binarize_FourWay and tiered depth in cm's."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static tiers As New Binarize_DepthTiers
-            tiers.Run(src)
-            src = tiers.dst2
-        End If
-
-        Dim inputData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-        Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols,
-                                     src.Type, redOptions.DesiredCellSlider.Value, 0, imageThresholdPercent, cellMinPercent)
-        handleInput.Free()
-
-        classCount = RedCloud_Count(cPtr)
-        If classCount = 0 Then Exit Sub ' no data to process.
-
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-        dst3 = vbPalette(dst2 * 255 / classCount)
-
-        If task.heartBeat Then labels(3) = CStr(classCount) + " cells found"
-
-        Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, RedCloud_Sizes(cPtr))
-        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
-        Dim floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
-        sortedCells.Clear()
-        For i = 0 To classCount - 1
-            Dim rc As New rcData
-            rc.index = sortedCells.Count + 1
-            rc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
-            rc.mask = dst2(rc.rect).InRange(rc.index, rc.index).Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-            rc.pixels = sizeData.Get(Of Integer)(i, 0)
-            rc.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
-
-            Dim pt = vbGetMaxDist(rc)
-            rc.maxDist = New cv.Point(pt.X, pt.Y)
-
-            If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
-        Next
-
-        If task.heartBeat Then labels(2) = "CV_8U format - " + CStr(classCount) + " cells were identified."
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class RedCloud_FeatureLessReduce : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Dim devGrid As New StdevGrid_Basics
@@ -2958,109 +2966,6 @@ End Class
 
 
 
-Public Class RedCloud_Basics : Inherits VB_Algorithm
-    Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Dim depthBW As New RedCloud_ByColorWithinDepth
-    Dim colorMap As New cv.Mat(256, 1, cv.MatType.CV_8UC3, 0)
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
-                        "It is behind the global options (which affect most algorithms.)")
-        desc = "Match cells defined by Binarize_FourWay and Depth_TierCM to the previous generation"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If task.motionDetected = False Then Exit Sub ' no change...
-        depthBW.Run(src)
-
-        If task.optionsChanged Then
-            cellMap.SetTo(0)
-            colorMap.SetTo(0)
-        End If
-        Dim lastCells As New List(Of rcData)(redCells), lastCellMap As cv.Mat = cellMap.Clone
-        Dim usedColors As New List(Of cv.Vec3b)({black})
-
-        If dst2.Size <> src.Size Then dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
-
-        Dim newCells As New List(Of rcData)
-        For Each rc In depthBW.sortedCells.Values
-            rc.maxDStable = rc.maxDist ' assume it has to use the latest.
-            rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            If rc.indexLast < lastCells.Count Then
-                Dim lrc = lastCells(rc.indexLast)
-                rc.color = lrc.color
-                rc.matchFlag = True
-
-                Dim stableCheck = lastCellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
-                If stableCheck = rc.indexLast Then
-                    rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
-                    rc.matchCount = lrc.matchCount + 1
-                End If
-            End If
-
-            If usedColors.Contains(rc.color) Then
-                rc.color = randomCellColor()
-                rc.matchCount = 0
-                rc.matchFlag = False
-            End If
-
-            usedColors.Add(rc.color)
-
-            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            vbDrawContour(rc.mask, rc.contour, 255, -1)
-
-            rc.depthMask = rc.mask.Clone
-            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
-            rc.depthPixels = rc.depthMask.CountNonZero
-
-            If rc.depthPixels Then
-                Dim minLoc As cv.Point, maxLoc As cv.Point
-                task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.depthMask)
-                task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.depthMask)
-                task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.depthMask)
-
-                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
-            End If
-
-            cv.Cv2.MeanStdDev(src(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-
-            rc.pixels = rc.mask.CountNonZero
-            If rc.mask.Size = dst2.Size Then Continue For
-            If task.heartBeat Then rc.matchCount = 1
-            newCells.Add(rc)
-
-            If newCells.Count >= 255 Then Exit For ' we are going to handle only the largest 255 cells - rest are too small.
-        Next
-
-        cellMap.SetTo(0)
-        dst2.SetTo(0)
-        redCells.Clear()
-        redCells.Add(New rcData)
-        Dim matchCount As Integer
-        For Each rc In newCells
-            rc.index = redCells.Count
-            colorMap.Set(Of cv.Vec3b)(rc.index, 0, rc.color) ' <<<< switch to using colormap.
-            redCells.Add(rc)
-            cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            If rc.matchFlag Then matchCount += 1
-            ' dst2(rc.rect).SetTo(rc.color, rc.mask)  ' <<<< switch to using colormap.
-        Next
-
-        Dim rcZero = redCells(0)
-        rcZero.mask = cellMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        rcZero.pixels = rcZero.mask.CountNonZero
-        rcZero.rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-
-        cv.Cv2.ApplyColorMap(cellMap, dst2, colorMap)  ' <<<< switch to using colormap.
-        setSelectedContour(redCells, cellMap)
-        labels(2) = $"{redCells.Count} cells found and {matchCount} were matched to the previous generation."
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class RedCloud_GenCells : Inherits VB_Algorithm
     Public classCount As Integer
@@ -3127,101 +3032,46 @@ End Class
 
 
 
-Public Class RedCloud_BasicsNew : Inherits VB_Algorithm
-    Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Dim depthBW As New RedCloud_ByColorWithinDepth
-    Dim colorMap As New cv.Mat(256, 1, cv.MatType.CV_8UC3, 0)
+
+Public Class RedCloud_ByColorWithinDepth : Inherits VB_Algorithm
+    Public classCount As Integer
+    Public imageThresholdPercent As Single = 0.98
+    Public cellMinPercent As Single = 0.0001
+    Public redGen As New RedCloud_GenCells
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
-                        "It is behind the global options (which affect most algorithms.)")
-        desc = "Match cells defined by Binarize_FourWay and Depth_TierCM to the previous generation"
+        cPtr = RedCloud_Open()
+        desc = "FloodFill the classes defined by adding binarize_FourWay and tiered depth in cm's."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.motionDetected = False Then Exit Sub ' no change...
-        depthBW.Run(src)
-
-        If task.optionsChanged Then
-            cellMap.SetTo(0)
-            colorMap.SetTo(0)
+        If src.Channels <> 1 Then
+            Static tiers As New Binarize_DepthTiers
+            tiers.Run(src)
+            src = tiers.dst2
         End If
-        Dim lastCells As New List(Of rcData)(redCells), lastCellMap As cv.Mat = cellMap.Clone
-        Dim usedColors As New List(Of cv.Vec3b)({black})
 
-        If dst2.Size <> src.Size Then dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
+        Dim inputData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        Dim newCells As New List(Of rcData)
-        For Each rc In depthBW.sortedCells.Values
-            rc.maxDStable = rc.maxDist ' assume it has to use the latest.
-            rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            If rc.indexLast < lastCells.Count Then
-                Dim lrc = lastCells(rc.indexLast)
-                rc.color = lrc.color
-                rc.matchFlag = True
+        Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols,
+                                     src.Type, redOptions.DesiredCellSlider.Value, 0, imageThresholdPercent, cellMinPercent)
+        handleInput.Free()
 
-                Dim stableCheck = lastCellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
-                If stableCheck = rc.indexLast Then
-                    rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
-                    rc.matchCount = lrc.matchCount + 1
-                End If
-            End If
+        redGen.classCount = RedCloud_Count(cPtr)
+        classCount = redGen.classCount
+        If classCount = 0 Then Exit Sub ' no data to process.
+        redGen.classMask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        redGen.rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+        redGen.floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
+        redGen.Run(dst0)
 
-            If usedColors.Contains(rc.color) Then
-                rc.color = randomCellColor()
-                rc.matchCount = 0
-                rc.matchFlag = False
-            End If
+        dst2 = redGen.dst3
+        dst3 = vbPalette(redGen.dst3 * 255 / classCount)
 
-            usedColors.Add(rc.color)
-
-            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            vbDrawContour(rc.mask, rc.contour, 255, -1)
-
-            rc.depthMask = rc.mask.Clone
-            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
-            rc.depthPixels = rc.depthMask.CountNonZero
-
-            If rc.depthPixels Then
-                Dim minLoc As cv.Point, maxLoc As cv.Point
-                task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.depthMask)
-                task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.depthMask)
-                task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.depthMask)
-
-                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
-            End If
-
-            cv.Cv2.MeanStdDev(src(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-
-            rc.pixels = rc.mask.CountNonZero
-            If rc.mask.Size = dst2.Size Then Continue For
-            If task.heartBeat Then rc.matchCount = 1
-            newCells.Add(rc)
-
-            If newCells.Count >= 255 Then Exit For ' we are going to handle only the largest 255 cells - rest are too small.
-        Next
-
-        cellMap.SetTo(0)
-        dst2.SetTo(0)
-        redCells.Clear()
-        redCells.Add(New rcData)
-        Dim matchCount As Integer
-        For Each rc In newCells
-            rc.index = redCells.Count
-            colorMap.Set(Of cv.Vec3b)(rc.index, 0, rc.color) ' <<<< switch to using colormap.
-            redCells.Add(rc)
-            cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            If rc.matchFlag Then matchCount += 1
-            ' dst2(rc.rect).SetTo(rc.color, rc.mask)  ' <<<< switch to using colormap.
-        Next
-
-        Dim rcZero = redCells(0)
-        rcZero.mask = cellMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        rcZero.pixels = rcZero.mask.CountNonZero
-        rcZero.rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-
-        cv.Cv2.ApplyColorMap(cellMap, dst2, colorMap)  ' <<<< switch to using colormap.
-        setSelectedContour(redCells, cellMap)
-        labels(2) = $"{redCells.Count} cells found and {matchCount} were matched to the previous generation."
+        If task.heartBeat Then labels(3) = CStr(classCount) + " cells found"
+        If task.heartBeat Then labels(2) = "CV_8U format - " + CStr(classCount) + " cells were identified."
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
     End Sub
 End Class
