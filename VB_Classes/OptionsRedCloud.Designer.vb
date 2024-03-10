@@ -576,7 +576,7 @@ Partial Class OptionsRedCloud
         Me.DesiredCellSlider.Size = New System.Drawing.Size(506, 69)
         Me.DesiredCellSlider.TabIndex = 28
         Me.DesiredCellSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.DesiredCellSlider.Value = 100
+        Me.DesiredCellSlider.Value = 199
         '
         'Label5
         '

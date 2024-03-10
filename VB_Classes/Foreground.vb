@@ -126,73 +126,10 @@ End Class
 
 
 
-Public Class Foreground_RedForeground : Inherits VB_Algorithm
-    Dim fore As New Foreground_Hist3D
-    Public redC As New RedCloud_BasicsOld
-    Dim hist3D As New Hist3D_DepthWithMask
-    Public redCells As New List(Of rcData)
-    Public Sub New()
-        redOptions.UseColor.Checked = True
-        desc = "Run the foreground through RedCloud_Basics "
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        fore.Run(src)
-
-        hist3D.depthMask = fore.dst2 Or task.noDepthMask
-        hist3D.Run(src)
-
-        redC.redC.combine.redMasks.inputMask = Not hist3D.depthMask
-        redC.Run(hist3D.dst2)
-
-        dst2 = redC.dst2.Clone
-        labels(2) = redC.labels(3)
-        If redC.redCells.Count > 0 Then
-            dst2(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
-        End If
-        ' dst2.SetTo(0, fore.dst3)
-        If standaloneTest() Then identifyCells(redC.redCells)
-    End Sub
-End Class
-
-
-
-
-
-Public Class Foreground_RedBackground : Inherits VB_Algorithm
-    Dim fore As New Foreground_Hist3D
-    Public redC As New RedCloud_BasicsOld
-    Dim hist3D As New Hist3D_DepthWithMask
-    Public Sub New()
-        redOptions.UseColor.Checked = True
-        desc = "Run the foreground through RedCloud_Basics "
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        fore.Run(src)
-
-        hist3D.depthMask = fore.dst3 Or task.noDepthMask
-        hist3D.Run(src)
-
-        redC.redC.combine.redMasks.inputMask = Not hist3D.depthMask
-        redC.Run(hist3D.dst2)
-
-        dst2 = redC.dst2.Clone
-        dst2.SetTo(0, fore.dst2)
-
-        labels(2) = redC.labels(3)
-        If redC.redCells.Count > 0 Then
-            dst2(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
-        End If
-        If standaloneTest() Then identifyCells(redC.redCells)
-    End Sub
-End Class
-
-
-
-
 
 Public Class Foreground_RedCloud : Inherits VB_Algorithm
-    Dim fore As New Foreground_RedForeground
-    Dim back As New Foreground_RedBackground
+    Dim fore As New Foreground_CellsFore
+    Dim back As New Foreground_CellsBack
     Public Sub New()
         desc = "Isolate foreground from background, then segment each with RedCloud"
     End Sub
@@ -210,3 +147,57 @@ Public Class Foreground_RedCloud : Inherits VB_Algorithm
     End Sub
 End Class
 
+
+
+
+
+Public Class Foreground_CellsFore : Inherits VB_Algorithm
+    Dim fore As New Foreground_Hist3D
+    Public redC As New RedCloud_Basics
+    Public redCells As New List(Of rcData)
+    Public Sub New()
+        redOptions.UseColor.Checked = True
+        desc = "Get the foreground cells"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+
+        fore.Run(src)
+        dst3 = fore.dst2 And task.depthMask
+
+        For Each rc In redC.redCells
+            If rc.pixels = 0 Then Continue For
+            Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
+            If tmp.CountNonZero / rc.pixels > 0.5 Then dst2(rc.rect).SetTo(rc.color, rc.mask) Else Dim k = 0
+        Next
+
+        If standaloneTest() Then identifyCells(redC.redCells)
+    End Sub
+End Class
+
+
+
+
+Public Class Foreground_CellsBack : Inherits VB_Algorithm
+    Dim fore As New Foreground_Hist3D
+    Public redC As New RedCloud_Basics
+    Public redCells As New List(Of rcData)
+    Public Sub New()
+        redOptions.UseColor.Checked = True
+        desc = "Get the background cells"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+
+        fore.Run(src)
+        dst3 = Not fore.dst2 And task.depthMask
+
+        For Each rc In redC.redCells
+            If rc.pixels = 0 Then Continue For
+            Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
+            If tmp.CountNonZero / rc.pixels > 0.5 Then dst2(rc.rect).SetTo(rc.color, rc.mask) Else Dim k = 0
+        Next
+
+        If standaloneTest() Then identifyCells(redC.redCells)
+    End Sub
+End Class

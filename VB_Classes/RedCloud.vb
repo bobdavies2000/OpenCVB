@@ -60,10 +60,10 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
             If redCells.Count >= 255 Then Exit For ' we are going to handle only the largest 255 cells - rest are too small.
         Next
 
-        Dim rcZero = redCells(0)
-        rcZero.mask = cellMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        rcZero.pixels = rcZero.mask.CountNonZero
-        rcZero.rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+        'Dim rcZero = redCells(0)
+        'rcZero.mask = cellMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        'rcZero.pixels = rcZero.mask.CountNonZero
+        'rcZero.rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
 
         setSelectedContour(redCells, cellMap)
         labels(2) = $"{redCells.Count} cells found and {matchCount} were matched to the previous generation."
@@ -1330,42 +1330,6 @@ End Class
 
 
 
-
-
-
-Public Class RedCloud_Combine2Pass : Inherits VB_Algorithm
-    Dim redC1 As New RedCloud_Basics
-    Dim redC2 As New RedCloud_Basics
-    Dim mats As New Mat_4Click
-    Public Sub New()
-        desc = "Run RedCloud_Basics and then combine the unstable pixels into the input for RedCloud."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC1.Run(src)
-        dst0 = redC1.dst0
-        dst1 = redC1.dst1
-        mats.mat(0) = redC1.dst2.Clone
-        mats.mat(1) = redC1.dst3.Clone
-
-        Dim tmp = redC1.cellMap.Clone
-        tmp.SetTo(1, redC1.dst3)
-        redC2.Run(tmp)
-        labels(2) = redC2.labels(2)
-        mats.mat(2) = redC2.dst2.Clone
-        mats.mat(3) = redC2.dst3.Clone
-        mats.Run(empty)
-        dst2 = mats.dst2
-        dst3 = mats.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class RedCloud_CellStats : Inherits VB_Algorithm
     Dim cells As New Cell_Basics
     Public Sub New()
@@ -1390,8 +1354,8 @@ End Class
 Public Class RedCloud_MostlyColor : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Public Sub New()
-        labels(3) = "Cells that are mostly color - < 50% depth."
-        desc = "Create RedCloud output using only color"
+        labels(3) = "Cells that have no depth data."
+        desc = "Identify cells that have no depth"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
@@ -2994,6 +2958,7 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
             rc.depthMask = rc.mask.Clone
             rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
             rc.depthPixels = rc.depthMask.CountNonZero
+            rc.depthCell = rc.depthPixels > 0
 
             rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             vbDrawContour(rc.mask, rc.contour, 255, -1)

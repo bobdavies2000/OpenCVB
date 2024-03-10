@@ -204,7 +204,8 @@ Module VB
         Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
         task.rc = redCells(index)
         If task.mouseClickFlag = False Then Exit Sub
-        If index = 0 Or index >= redCells.Count Then
+        'If index = 0 Or index >= redCells.Count Then
+        If index >= redCells.Count Then
             If redCells.Count > 1 Then
                 task.clickPoint = redCells(1).maxDist
                 task.rc = redCells(1)
