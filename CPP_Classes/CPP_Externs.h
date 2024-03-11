@@ -35,10 +35,10 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     {
     case _CPP_AddWeighted_Basics :
     {task->alg = new CPP_AddWeighted_Basics(); break; } 
-    case _CPP_RedCloud_MasksNative:
-    {task->alg = new CPP_RedCloud_MasksNative(); break; }
-    case _CPP_RedCloud_Masks:
-    {task->alg = new CPP_RedCloud_Masks(); break; }
+    case _CPP_RedCloud_BasicsNative:
+    {task->alg = new CPP_RedCloud_BasicsNative(); break; }
+    case _CPP_RedCloud_Basics:
+    {task->alg = new CPP_RedCloud_Basics(); break; }
     case _CPP_BGSubtract_Basics :
 	{task->alg = new CPP_BGSubtract_Basics(); break; }
 	case _CPP_Feature_StableSorted :
@@ -89,8 +89,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 	{task->alg = new CPP_Histogram_Kalman(); break; }
 	case _CPP_Kalman_Basics :
 	{task->alg = new CPP_Kalman_Basics(); break; }
-	case _CPP_RedCloud_Core :
-	{task->alg = new CPP_RedCloud_Core(); break; }
+	case _CPP_RedCloud_Reduce :
+	{task->alg = new CPP_RedCloud_Reduce(); break; }
 	case _CPP_FPoly_TopFeatures :
 	{task->alg = new CPP_FPoly_TopFeatures(); break; }
 	case _CPP_Random_Enumerable :

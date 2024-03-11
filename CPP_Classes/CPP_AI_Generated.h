@@ -923,15 +923,15 @@ public:
 
 
 
-class CPP_RedCloud_Core : public algorithmCPP {
+class CPP_RedCloud_Reduce : public algorithmCPP {
 public:
     int classCount;
     int givenClassCount = 0;
     int reduceAmt = 250;
-    CPP_RedCloud_Core() : algorithmCPP() {
-        traceName = "CPP_RedCloud_Core";
+    CPP_RedCloud_Reduce() : algorithmCPP() {
+        traceName = "CPP_RedCloud_Reduce";
         //if (standalone) {
-        //    redOptions.RedCloud_Core.Checked = true;
+        //    redOptions.RedCloud_Reduce.Checked = true;
         //}
         desc = "Reduction transform for the point cloud";
     }
@@ -1785,7 +1785,7 @@ class CPP_RedCloud_Flood : public algorithmCPP
 private:
 public:
     Mat inputMask;
-    CPP_RedCloud_Core* prepData;
+    CPP_RedCloud_Reduce* prepData;
     int option_loDiff = 0;
     int option_hiDiff = 0;
     int option_minSizeCell = 75;
@@ -1796,7 +1796,7 @@ public:
     vector<int> sizes;
     CPP_RedCloud_Flood() : algorithmCPP() {
         traceName = "CPP_RedCloud_Flood";
-        prepData = new CPP_RedCloud_Core();
+        prepData = new CPP_RedCloud_Reduce();
         desc = "Perform the RedCloud low level FloodFill";
     }
     rcData buildZeroEntry() {
@@ -3263,7 +3263,7 @@ public:
 
 
 
-class CPP_RedCloud_Masks : public algorithmCPP {
+class CPP_RedCloud_Basics : public algorithmCPP {
 public:
     map<int, rcData, compareAllowIdenticalIntegerInverted> sortedCells;
     Mat inputMask;
@@ -3272,8 +3272,8 @@ public:
     float cellMinPercent = 0.0001f;
     CPP_Color_Basics* colorClass = new CPP_Color_Basics();
     RedCloud* cPtr;
-    CPP_RedCloud_Masks() : algorithmCPP() {
-        traceName = "CPP_RedCloud_Masks";
+    CPP_RedCloud_Basics() : algorithmCPP() {
+        traceName = "CPP_RedCloud_Basics";
         cPtr = new RedCloud;
         desc = "Core interface to the C++ code for floodfill.";
     }
@@ -3336,7 +3336,7 @@ public:
 
 
 
-class CPP_RedCloud_MasksNative : public algorithmCPP {
+class CPP_RedCloud_BasicsNative : public algorithmCPP {
 public:
     map<int, rcData, compareAllowIdenticalIntegerInverted> sortedCells;
     int classCount;
@@ -3347,10 +3347,10 @@ public:
     float imageThresholdPercent = 0.98f;
     float cellMinPercent = 0.0001f;
     CPP_Color_Basics* colorClass = new CPP_Color_Basics();
-    CPP_RedCloud_MasksNative() : algorithmCPP() {
-        traceName = "CPP_RedCloud_MasksNative";
+    CPP_RedCloud_BasicsNative() : algorithmCPP() {
+        traceName = "CPP_RedCloud_BasicsNative";
         dst2 = Mat(dst2.size(), CV_8U);
-        desc = "This algorithm is the same as CPP_RedCloud_Masks.  It was meant only to test if it could be faster by eliminating some moves.";
+        desc = "This algorithm is the same as CPP_RedCloud_Basics.  It was meant only to test if it could be faster by eliminating some moves.";
     }
     void Run(Mat src) {
         if (src.channels() != 1) {
@@ -3439,7 +3439,7 @@ public:
 //class CPP_MotionRect_Basics : public algorithmCPP {
 //public:
 //    CPP_BGSubtract_Basics* bgSub;
-//    RedCloud_Masks redCPP;
+//    RedCloud_Basics redCPP;
 //    dst = Mat2;
 //    bool showDiff;
 //    CPP_MotionRect_Basics() : algorithmCPP() {

@@ -14,6 +14,7 @@ Public Class OptionsRedCloud
     Public ranges() As cv.Rangef
     Public channelCount As Integer
     Public histBinList() As Integer
+    Public identifyCount As Integer
     Public bins3D As Integer
     Public imageThresholdPercent As Single = 0.95
     Dim colorMethods() As String = {"BackProject_Full", "Binarize_Split4", "Binarize_SplitDepth", "Binarize_DepthTiers",
@@ -181,6 +182,11 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         TopLabel.Text = CStr(TopViewThreshold.Value)
     End Sub
+    Private Sub IdentifyCountSlider_ValueChanged(sender As Object, e As EventArgs) Handles IdentifyCountSlider.ValueChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        LabelIdentify.Text = CStr(IdentifyCountSlider.Value)
+        identifyCount = IdentifyCountSlider.Value
+    End Sub
 
 
 
@@ -253,7 +259,7 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         depthInputIndex = 0
     End Sub
-    Private Sub RedCloud_Core_CheckedChanged(sender As Object, e As EventArgs) Handles RedCloud_Core.CheckedChanged
+    Private Sub RedCloud_Reduce_CheckedChanged(sender As Object, e As EventArgs) Handles RedCloud_Reduce.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         depthInputIndex = 1
     End Sub

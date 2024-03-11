@@ -164,7 +164,7 @@ Public Class Foreground_CellsFore : Inherits VB_Algorithm
 
         fore.Run(src)
         dst3 = fore.dst2 And task.depthMask
-
+        dst2.SetTo(0)
         For Each rc In redC.redCells
             If rc.pixels = 0 Then Continue For
             Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
@@ -191,7 +191,7 @@ Public Class Foreground_CellsBack : Inherits VB_Algorithm
 
         fore.Run(src)
         dst3 = Not fore.dst2 And task.depthMask
-
+        dst2.SetTo(0)
         For Each rc In redC.redCells
             If rc.pixels = 0 Then Continue For
             Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask

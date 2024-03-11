@@ -2,8 +2,8 @@
 Public Class algorithmList
 Public Enum functionNames
 _CPP_AddWeighted_Basics
-_CPP_RedCloud_MasksNative
-_CPP_RedCloud_Masks
+_CPP_RedCloud_BasicsNative
+_CPP_RedCloud_Basics
 _CPP_BGSubtract_Basics
 _CPP_Stable_Basics
 _CPP_Feature_StableSorted
@@ -30,7 +30,7 @@ _CPP_History_Basics
 _CPP_Motion_Simple
 _CPP_Histogram_Kalman
 _CPP_Kalman_Basics
-_CPP_RedCloud_Core
+_CPP_RedCloud_Reduce
 _CPP_FPoly_TopFeatures
 _CPP_Random_Enumerable
 _CPP_Bezier_Basics
@@ -360,10 +360,10 @@ if algorithmName = "CPP_Random_Basics" Then return new CPP_Basics(functionNames.
 if algorithmName = "CPP_Random_Enumerable" Then return new CPP_Basics(functionNames._CPP_Random_Enumerable)
 if algorithmName = "CPP_Rectangle_Basics" Then return new CPP_Basics(functionNames._CPP_Rectangle_Basics)
 if algorithmName = "CPP_Rectangle_Rotated" Then return new CPP_Basics(functionNames._CPP_Rectangle_Rotated)
-if algorithmName = "CPP_RedCloud_Core" Then return new CPP_Basics(functionNames._CPP_RedCloud_Core)
+if algorithmName = "CPP_RedCloud_Basics" Then return new CPP_Basics(functionNames._CPP_RedCloud_Basics)
+if algorithmName = "CPP_RedCloud_BasicsNative" Then return new CPP_Basics(functionNames._CPP_RedCloud_BasicsNative)
 if algorithmName = "CPP_RedCloud_Flood" Then return new CPP_Basics(functionNames._CPP_RedCloud_Flood)
-if algorithmName = "CPP_RedCloud_Masks" Then return new CPP_Basics(functionNames._CPP_RedCloud_Masks)
-if algorithmName = "CPP_RedCloud_MasksNative" Then return new CPP_Basics(functionNames._CPP_RedCloud_MasksNative)
+if algorithmName = "CPP_RedCloud_Reduce" Then return new CPP_Basics(functionNames._CPP_RedCloud_Reduce)
 if algorithmName = "CPP_RedColor_FeatureLess" Then return new CPP_Basics(functionNames._CPP_RedColor_FeatureLess)
 if algorithmName = "CPP_RedColor_FeatureLessCore" Then return new CPP_Basics(functionNames._CPP_RedColor_FeatureLessCore)
 if algorithmName = "CPP_Remap_Basics" Then return new CPP_Basics(functionNames._CPP_Remap_Basics)
@@ -1554,13 +1554,10 @@ if algorithmName = "Rectangle_Rotated" Then return new Rectangle_Rotated
 if algorithmName = "Rectangle_Union" Then return new Rectangle_Union
 if algorithmName = "RecursiveBilateralFilter_CPP" Then return new RecursiveBilateralFilter_CPP
 if algorithmName = "RedCloud_Basics" Then return new RedCloud_Basics
-if algorithmName = "RedCloud_BasicsFull" Then return new RedCloud_BasicsFull
-if algorithmName = "RedCloud_BasicsFullNew" Then return new RedCloud_BasicsFullNew
-if algorithmName = "RedCloud_BasicsOld" Then return new RedCloud_BasicsOld
+if algorithmName = "RedCloud_BasicsInDepth" Then return new RedCloud_BasicsInDepth
 if algorithmName = "RedCloud_Both" Then return new RedCloud_Both
 if algorithmName = "RedCloud_BothOld" Then return new RedCloud_BothOld
 if algorithmName = "RedCloud_BProject3D" Then return new RedCloud_BProject3D
-if algorithmName = "RedCloud_ByColorWithinDepth" Then return new RedCloud_ByColorWithinDepth
 if algorithmName = "RedCloud_CCompColor" Then return new RedCloud_CCompColor
 if algorithmName = "RedCloud_CellChanges" Then return new RedCloud_CellChanges
 if algorithmName = "RedCloud_Cells" Then return new RedCloud_Cells
@@ -1570,7 +1567,6 @@ if algorithmName = "RedCloud_Color" Then return new RedCloud_Color
 if algorithmName = "RedCloud_Combine" Then return new RedCloud_Combine
 if algorithmName = "RedCloud_ContourUpdate" Then return new RedCloud_ContourUpdate
 if algorithmName = "RedCloud_ContourVsFeatureLess" Then return new RedCloud_ContourVsFeatureLess
-if algorithmName = "RedCloud_Core" Then return new RedCloud_Core
 if algorithmName = "RedCloud_DelaunayGuidedFeatures" Then return new RedCloud_DelaunayGuidedFeatures
 if algorithmName = "RedCloud_DepthOutline" Then return new RedCloud_DepthOutline
 if algorithmName = "RedCloud_Diff" Then return new RedCloud_Diff
@@ -1591,8 +1587,6 @@ if algorithmName = "RedCloud_JoinCells" Then return new RedCloud_JoinCells
 if algorithmName = "RedCloud_KMeans" Then return new RedCloud_KMeans
 if algorithmName = "RedCloud_LeftRight" Then return new RedCloud_LeftRight
 if algorithmName = "RedCloud_LikelyFlatSurfaces" Then return new RedCloud_LikelyFlatSurfaces
-if algorithmName = "RedCloud_Masks" Then return new RedCloud_Masks
-if algorithmName = "RedCloud_MasksInDepth" Then return new RedCloud_MasksInDepth
 if algorithmName = "RedCloud_MatchCell" Then return new RedCloud_MatchCell
 if algorithmName = "RedCloud_MaxDist" Then return new RedCloud_MaxDist
 if algorithmName = "RedCloud_MeterByMeter" Then return new RedCloud_MeterByMeter
@@ -1603,8 +1597,6 @@ if algorithmName = "RedCloud_NearestStableCell" Then return new RedCloud_Nearest
 if algorithmName = "RedCloud_NoDepth" Then return new RedCloud_NoDepth
 if algorithmName = "RedCloud_OnlyColorAlt" Then return new RedCloud_OnlyColorAlt
 if algorithmName = "RedCloud_OnlyColorHist3D" Then return new RedCloud_OnlyColorHist3D
-if algorithmName = "RedCloud_OnlyCore" Then return new RedCloud_OnlyCore
-if algorithmName = "RedCloud_OnlyCoreToo" Then return new RedCloud_OnlyCoreToo
 if algorithmName = "RedCloud_OnlyDepth" Then return new RedCloud_OnlyDepth
 if algorithmName = "RedCloud_OutlineColor" Then return new RedCloud_OutlineColor
 if algorithmName = "RedCloud_Overlaps" Then return new RedCloud_Overlaps
@@ -1614,6 +1606,8 @@ if algorithmName = "RedCloud_PlaneFromContour" Then return new RedCloud_PlaneFro
 if algorithmName = "RedCloud_PlaneFromMask" Then return new RedCloud_PlaneFromMask
 if algorithmName = "RedCloud_Planes" Then return new RedCloud_Planes
 if algorithmName = "RedCloud_ProjectCell" Then return new RedCloud_ProjectCell
+if algorithmName = "RedCloud_Reduce" Then return new RedCloud_Reduce
+if algorithmName = "RedCloud_Reduction" Then return new RedCloud_Reduction
 if algorithmName = "RedCloud_ShapeCorrelation" Then return new RedCloud_ShapeCorrelation
 if algorithmName = "RedCloud_SizeOrder" Then return new RedCloud_SizeOrder
 if algorithmName = "RedCloud_StructuredH" Then return new RedCloud_StructuredH

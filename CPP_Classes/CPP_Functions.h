@@ -2,8 +2,8 @@
 enum functions
 {
     _CPP_AddWeighted_Basics,
-    _CPP_RedCloud_MasksNative,
-    _CPP_RedCloud_Masks,
+    _CPP_RedCloud_BasicsNative,
+    _CPP_RedCloud_Basics,
     _CPP_BGSubtract_Basics,
     _CPP_Stable_Basics,
     _CPP_Feature_StableSorted,
@@ -30,7 +30,7 @@ enum functions
     _CPP_Motion_Simple,
     _CPP_Histogram_Kalman,
     _CPP_Kalman_Basics,
-    _CPP_RedCloud_Core,
+    _CPP_RedCloud_Reduce,
     _CPP_FPoly_TopFeatures,
     _CPP_Random_Enumerable,
     _CPP_Bezier_Basics,

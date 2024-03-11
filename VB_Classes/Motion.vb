@@ -546,7 +546,7 @@ End Class
 
 
 Public Class Motion_Enclosing : Inherits VB_Algorithm
-    Dim redMasks As New RedCloud_Masks
+    Dim redMasks As New RedCloud_Basics
     Dim learnRate As Double
     Public motionRect As New cv.Rect
     Public Sub New()
@@ -568,10 +568,10 @@ Public Class Motion_Enclosing : Inherits VB_Algorithm
         redMasks.Run(dst2)
 
         motionRect = New cv.Rect
-        If redMasks.redGen.redCells.Count < 2 Then Exit Sub
-        motionRect = redMasks.redGen.redCells.ElementAt(1).rect
-        For i = 2 To redMasks.redGen.redCells.Count - 1
-            Dim cell = redMasks.redGen.redCells.ElementAt(i)
+        If redMasks.genCells.redCells.Count < 2 Then Exit Sub
+        motionRect = redMasks.genCells.redCells.ElementAt(1).rect
+        For i = 2 To redMasks.genCells.redCells.Count - 1
+            Dim cell = redMasks.genCells.redCells.ElementAt(i)
             motionRect = motionRect.Union(cell.rect)
         Next
 
@@ -650,7 +650,7 @@ End Class
 
 
 Public Class Motion_Basics_QT : Inherits VB_Algorithm
-    Dim redMasks As New RedCloud_Masks
+    Dim redMasks As New RedCloud_Basics
     Public bgSub As New BGSubtract_MOG2
     Dim rectList As New List(Of cv.Rect)
     Public Sub New()
@@ -674,13 +674,13 @@ Public Class Motion_Basics_QT : Inherits VB_Algorithm
         dst2 = src
 
         redMasks.Run(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
-        If redMasks.redGen.redCells.Count < 2 Then
+        If redMasks.genCells.redCells.Count < 2 Then
             task.motionDetected = False
             rectList.Clear()
         Else
-            Dim nextRect = redMasks.redGen.redCells.ElementAt(1).rect
-            For i = 2 To redMasks.redGen.redCells.Count - 1
-                Dim rc = redMasks.redGen.redCells.ElementAt(i)
+            Dim nextRect = redMasks.genCells.redCells.ElementAt(1).rect
+            For i = 2 To redMasks.genCells.redCells.Count - 1
+                Dim rc = redMasks.genCells.redCells.ElementAt(i)
                 nextRect = nextRect.Union(rc.rect)
             Next
 
@@ -698,8 +698,8 @@ Public Class Motion_Basics_QT : Inherits VB_Algorithm
 
         If standaloneTest() Then
             dst2.Rectangle(task.motionRect, 255, task.lineWidth)
-            If redMasks.redGen.redCells.Count > 1 Then
-                labels(2) = CStr(redMasks.redGen.redCells.Count) + " RedMask cells had motion"
+            If redMasks.genCells.redCells.Count > 1 Then
+                labels(2) = CStr(redMasks.genCells.redCells.Count) + " RedMask cells had motion"
             Else
                 labels(2) = "No motion detected"
             End If
@@ -802,7 +802,7 @@ End Class
 
 
 Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
-    Dim redMasks As New RedCloud_Masks
+    Dim redMasks As New RedCloud_Basics
     Public bgSub As New BGSubtract_MOG2_QT
     Dim rectList As New List(Of cv.Rect)
     Public Sub New()
@@ -812,7 +812,7 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         task.motionDetected = True
-        task.motionRect = New cv.Rect
+        task.motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
 
         If src.Channels <> 1 Then
             bgSub.Run(src)
@@ -824,19 +824,19 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
 
         redMasks.inputMask = Not dst2
         redMasks.Run(dst2)
-        If redMasks.redGen.redCells.Count <= 2 Then
+        If redMasks.genCells.redCells.Count <= 2 Then
             task.motionDetected = False
-            task.motionRect = New cv.Rect
         Else
-            Dim nextRect = redMasks.redGen.redCells.ElementAt(1).rect
-            For i = 2 To redMasks.redGen.redCells.Count - 1
-                Dim rc = redMasks.redGen.redCells.ElementAt(i)
+            Dim nextRect = redMasks.genCells.redCells.ElementAt(1).rect
+            For i = 2 To redMasks.genCells.redCells.Count - 1
+                Dim rc = redMasks.genCells.redCells.ElementAt(i)
                 nextRect = nextRect.Union(rc.rect)
             Next
 
             rectList.Add(nextRect)
-            For Each r In rectList
-                If task.motionRect.Width = 0 Then task.motionRect = r Else task.motionRect = task.motionRect.Union(r)
+            task.motionRect = rectList(0)
+            For i = 1 To rectList.Count - 1
+                task.motionRect = task.motionRect.Union(rectList(i))
             Next
             If rectList.Count > task.frameHistoryCount Then rectList.RemoveAt(0)
             If task.motionRect.Width > dst2.Width / 2 And task.motionRect.Height > dst2.Height / 2 Then
@@ -848,8 +848,8 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
 
         If standaloneTest() Then
             dst2.Rectangle(task.motionRect, 255, task.lineWidth)
-            If redMasks.redGen.redCells.Count > 1 Then
-                labels(2) = CStr(redMasks.redGen.redCells.Count) + " RedMask cells had motion"
+            If redMasks.genCells.redCells.Count > 1 Then
+                labels(2) = CStr(redMasks.genCells.redCells.Count) + " RedMask cells had motion"
             Else
                 labels(2) = "No motion detected"
             End If

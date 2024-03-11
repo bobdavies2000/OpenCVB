@@ -4,7 +4,7 @@ Public Class Flood_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim binar4 As New Binarize_Split4
-    Dim redGen As New RedCloud_GenCells
+    Dim genCells As New RedCloud_GenCells
     Public Sub New()
         cPtr = RedCloud_Open()
         vbAddAdvice(traceName + ": redOptions 'Desired RedCloud Cells' determines how many regions are isolated.")
@@ -12,12 +12,7 @@ Public Class Flood_Basics : Inherits VB_Algorithm
         desc = "Simple Floodfill each region but prepare the mask, rect, floodpoints, and pixel counts."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        'If task.motionDetected = False Then
-        '    identifyCells(redCells)
-        '    Exit Sub ' nothing has changed.
-        'End If
-
-        binar4.Run(task.color) ' always run split4 to get colors for redgen.
+        binar4.Run(task.color) ' always run split4 to get colors for genCells.
         If src.Channels = 1 Then src += binar4.dst2 Else src = binar4.dst2
 
         Dim inputData(src.Total - 1) As Byte
@@ -28,21 +23,21 @@ Public Class Flood_Basics : Inherits VB_Algorithm
                                     redOptions.DesiredCellSlider.Value, 0, 1, 0)
         handleInput.Free()
 
-        redGen.classCount = RedCloud_Count(cPtr)
-        If redGen.classCount = 0 Then Exit Sub ' no data to process.
-        redGen.classMask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-        redGen.rectData = New cv.Mat(redGen.classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
-        redGen.floodPointData = New cv.Mat(redGen.classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
-        redGen.Run(binar4.dst3)
+        genCells.classCount = RedCloud_Count(cPtr)
+        If genCells.classCount = 0 Then Exit Sub ' no data to process.
+        genCells.classMask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        genCells.rectData = New cv.Mat(genCells.classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+        genCells.floodPointData = New cv.Mat(genCells.classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
+        genCells.Run(binar4.dst3)
 
-        dst2 = redGen.dst2
-        cellMap = redGen.dst3
-        redCells = redGen.redCells
+        dst2 = genCells.dst2
+        cellMap = genCells.dst3
+        redCells = genCells.redCells
 
         setSelectedContour(redCells, cellMap)
         identifyCells(redCells)
 
-        labels(2) = $"FloodFill results vary from 0 to {redGen.classCount}.  The largest {identifyCount} are identified."
+        labels(2) = $"FloodFill results vary from 0 to {genCells.classCount}.  The largest {redOptions.identifyCount} are identified."
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
@@ -60,7 +55,7 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public binarizedImage As cv.Mat
     Public inputMask As cv.Mat
-    Dim redGen As New RedCloud_GenCells
+    Dim genCells As New RedCloud_GenCells
     Public Sub New()
         cPtr = RedCloud_Open()
         If standalone Then labels(2) = "When run standalone, there is no output"
@@ -83,16 +78,16 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
         handleMask.Free()
         handleInput.Free()
 
-        redGen.classCount = RedCloud_Count(cPtr)
-        If redGen.classCount = 0 Then Exit Sub ' no data to process.
-        redGen.classMask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-        redGen.rectData = New cv.Mat(redGen.classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
-        redGen.floodPointData = New cv.Mat(redGen.classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
-        redGen.Run(binarizedImage)
+        genCells.classCount = RedCloud_Count(cPtr)
+        If genCells.classCount = 0 Then Exit Sub ' no data to process.
+        genCells.classMask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        genCells.rectData = New cv.Mat(genCells.classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+        genCells.floodPointData = New cv.Mat(genCells.classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
+        genCells.Run(binarizedImage)
 
-        dst2 = redGen.dst2
-        cellMap = redGen.dst3
-        redCells = redGen.redCells
+        dst2 = genCells.dst2
+        cellMap = genCells.dst3
+        redCells = genCells.redCells
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
@@ -547,7 +542,7 @@ Public Class Flood_Cell : Inherits VB_Algorithm
                 rc.maxDist.Y += task.rc.rect.Y
                 redCells.Add(rc)
                 cellMap(rc.rect).SetTo(rc.index, rc.mask)
-                If rc.index <= identifyCount And rc.index > 0 Then
+                If rc.index <= redOptions.identifyCount And rc.index > 0 Then
                     Dim pt = New cv.Point(rc.floodPoint.X + offset, rc.floodPoint.Y)
                     setTrueText(Format(rc.depthMean(2), fmt1), pt, 3)
                 End If

@@ -206,11 +206,10 @@ Module VB
         If task.mouseClickFlag = False Then Exit Sub
         'If index = 0 Or index >= redCells.Count Then
         If index >= redCells.Count Then
-            If redCells.Count > 1 Then
-                task.clickPoint = redCells(1).maxDist
-                task.rc = redCells(1)
+            If redCells.Count > 0 Then
+                task.clickPoint = redCells(0).maxDist
+                task.rc = redCells(0)
             End If
-        Else
         End If
     End Sub
     Public Function contourBuild(mask As cv.Mat, approxMode As cv.ContourApproximationModes) As List(Of cv.Point)
@@ -457,6 +456,7 @@ Module VB
         Return input.Resize(task.lowRes, 0, 0, cv.InterpolationFlags.Nearest)
     End Function
     Public Function vbPalette(input As cv.Mat) As cv.Mat
+        If input.Type = cv.MatType.CV_32SC1 Then input.ConvertTo(input, cv.MatType.CV_8U)
         task.palette.Run(input)
         Return task.palette.dst2.Clone
     End Function
@@ -730,7 +730,7 @@ End Structure
 Public Class rcData
     Public rect As cv.Rect
     Public mask As cv.Mat
-    Public tier As Single
+    Public tier As Integer
     Public tierHist As New cv.Mat
     Public tierHistArray() As Single
 

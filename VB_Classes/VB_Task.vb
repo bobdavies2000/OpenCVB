@@ -504,7 +504,7 @@ Public Class VBtask : Implements IDisposable
                 ' on each heartbeat or when options changed, update the whole image.
                 If task.heartBeat Or gOptions.unFiltered.Checked Then
                     task.motionDetected = True
-                    ' task.motionRect = New cv.Rect(0, 0, task.workingRes.Width, task.workingRes.Height)
+                    task.motionRect = New cv.Rect(0, 0, src.Width, src.Height)
                     motionColor.dst2 = src.Clone
                     motionCloud.dst2 = task.pointCloud.Clone
                 Else
