@@ -60,6 +60,7 @@ Public Class OptionsRedCloud
 
         XRangeSlider.Value = task.xRange * 100
         YRangeSlider.Value = task.yRange * 100
+        IdentifyCountSlider.Value = 20
 
         task.xRangeDefault = task.xRange
         task.yRangeDefault = task.yRange
@@ -185,7 +186,6 @@ Public Class OptionsRedCloud
     Private Sub IdentifyCountSlider_ValueChanged(sender As Object, e As EventArgs) Handles IdentifyCountSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
         LabelIdentify.Text = CStr(IdentifyCountSlider.Value)
-        identifyCount = IdentifyCountSlider.Value
     End Sub
 
 

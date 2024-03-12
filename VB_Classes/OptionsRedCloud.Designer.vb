@@ -23,9 +23,6 @@ Partial Class OptionsRedCloud
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.RedCloudSliders = New System.Windows.Forms.GroupBox()
-        Me.LabelIdentify = New System.Windows.Forms.Label()
-        Me.IdentifyCountSlider = New System.Windows.Forms.TrackBar()
-        Me.IdentifyCountLabel = New System.Windows.Forms.Label()
         Me.TopLabel = New System.Windows.Forms.Label()
         Me.TopViewThreshold = New System.Windows.Forms.TrackBar()
         Me.Label6 = New System.Windows.Forms.Label()
@@ -73,8 +70,10 @@ Partial Class OptionsRedCloud
         Me.Label5 = New System.Windows.Forms.Label()
         Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.ColorSource = New System.Windows.Forms.ComboBox()
+        Me.LabelIdentify = New System.Windows.Forms.Label()
+        Me.IdentifyCountSlider = New System.Windows.Forms.TrackBar()
+        Me.IdentifyCountLabel = New System.Windows.Forms.Label()
         Me.RedCloudSliders.SuspendLayout()
-        CType(Me.IdentifyCountSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -89,13 +88,14 @@ Partial Class OptionsRedCloud
         Me.GroupBox2.SuspendLayout()
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DesiredCellSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.IdentifyCountSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'RedCloudSliders
         '
-        Me.RedCloudSliders.Controls.Add(Me.LabelIdentify)
-        Me.RedCloudSliders.Controls.Add(Me.IdentifyCountSlider)
-        Me.RedCloudSliders.Controls.Add(Me.IdentifyCountLabel)
+        Me.RedCloudSliders.Controls.Add(Me.LabelHistogramBins)
+        Me.RedCloudSliders.Controls.Add(Me.HistBinSlider)
+        Me.RedCloudSliders.Controls.Add(Me.Label7)
         Me.RedCloudSliders.Controls.Add(Me.TopLabel)
         Me.RedCloudSliders.Controls.Add(Me.TopViewThreshold)
         Me.RedCloudSliders.Controls.Add(Me.Label6)
@@ -113,35 +113,6 @@ Partial Class OptionsRedCloud
         Me.RedCloudSliders.Size = New System.Drawing.Size(763, 385)
         Me.RedCloudSliders.TabIndex = 2
         Me.RedCloudSliders.TabStop = False
-        '
-        'LabelIdentify
-        '
-        Me.LabelIdentify.AutoSize = True
-        Me.LabelIdentify.Location = New System.Drawing.Point(668, 21)
-        Me.LabelIdentify.Name = "LabelIdentify"
-        Me.LabelIdentify.Size = New System.Drawing.Size(57, 20)
-        Me.LabelIdentify.TabIndex = 23
-        Me.LabelIdentify.Text = "Label1"
-        '
-        'IdentifyCountSlider
-        '
-        Me.IdentifyCountSlider.Location = New System.Drawing.Point(156, 15)
-        Me.IdentifyCountSlider.Maximum = 255
-        Me.IdentifyCountSlider.Minimum = 1
-        Me.IdentifyCountSlider.Name = "IdentifyCountSlider"
-        Me.IdentifyCountSlider.Size = New System.Drawing.Size(506, 69)
-        Me.IdentifyCountSlider.TabIndex = 22
-        Me.IdentifyCountSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.IdentifyCountSlider.Value = 5
-        '
-        'IdentifyCountLabel
-        '
-        Me.IdentifyCountLabel.AutoSize = True
-        Me.IdentifyCountLabel.Location = New System.Drawing.Point(8, 21)
-        Me.IdentifyCountLabel.Name = "IdentifyCountLabel"
-        Me.IdentifyCountLabel.Size = New System.Drawing.Size(104, 20)
-        Me.IdentifyCountLabel.TabIndex = 21
-        Me.IdentifyCountLabel.Text = "IdentifyCount"
         '
         'TopLabel
         '
@@ -310,7 +281,7 @@ Partial Class OptionsRedCloud
         Me.ReductionSliders.Controls.Add(Me.ColorLabel)
         Me.ReductionSliders.Controls.Add(Me.SimpleReductionSlider)
         Me.ReductionSliders.Controls.Add(Me.ColorReduce)
-        Me.ReductionSliders.Location = New System.Drawing.Point(792, 490)
+        Me.ReductionSliders.Location = New System.Drawing.Point(792, 453)
         Me.ReductionSliders.Name = "ReductionSliders"
         Me.ReductionSliders.Size = New System.Drawing.Size(779, 140)
         Me.ReductionSliders.TabIndex = 6
@@ -553,23 +524,23 @@ Partial Class OptionsRedCloud
         '
         'GroupBox2
         '
-        Me.GroupBox2.Controls.Add(Me.LabelHistogramBins)
-        Me.GroupBox2.Controls.Add(Me.HistBinSlider)
-        Me.GroupBox2.Controls.Add(Me.Label7)
+        Me.GroupBox2.Controls.Add(Me.LabelIdentify)
+        Me.GroupBox2.Controls.Add(Me.IdentifyCountSlider)
+        Me.GroupBox2.Controls.Add(Me.IdentifyCountLabel)
         Me.GroupBox2.Controls.Add(Me.LabelDesiredCell)
         Me.GroupBox2.Controls.Add(Me.DesiredCellSlider)
         Me.GroupBox2.Controls.Add(Me.Label5)
         Me.GroupBox2.Location = New System.Drawing.Point(12, 4)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(763, 158)
+        Me.GroupBox2.Size = New System.Drawing.Size(763, 180)
         Me.GroupBox2.TabIndex = 9
         Me.GroupBox2.TabStop = False
-        Me.GroupBox2.Text = "Histogram 3D Options"
+        Me.GroupBox2.Text = "RedCloud Options"
         '
         'LabelHistogramBins
         '
         Me.LabelHistogramBins.AutoSize = True
-        Me.LabelHistogramBins.Location = New System.Drawing.Point(668, 103)
+        Me.LabelHistogramBins.Location = New System.Drawing.Point(668, 22)
         Me.LabelHistogramBins.Name = "LabelHistogramBins"
         Me.LabelHistogramBins.Size = New System.Drawing.Size(57, 20)
         Me.LabelHistogramBins.TabIndex = 32
@@ -577,7 +548,7 @@ Partial Class OptionsRedCloud
         '
         'HistBinSlider
         '
-        Me.HistBinSlider.Location = New System.Drawing.Point(156, 96)
+        Me.HistBinSlider.Location = New System.Drawing.Point(156, 15)
         Me.HistBinSlider.Maximum = 16
         Me.HistBinSlider.Minimum = 2
         Me.HistBinSlider.Name = "HistBinSlider"
@@ -588,7 +559,7 @@ Partial Class OptionsRedCloud
         '
         'Label7
         '
-        Me.Label7.Location = New System.Drawing.Point(8, 103)
+        Me.Label7.Location = New System.Drawing.Point(8, 22)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(152, 48)
         Me.Label7.TabIndex = 30
@@ -625,7 +596,7 @@ Partial Class OptionsRedCloud
         'ColorSourceLabel
         '
         Me.ColorSourceLabel.AutoSize = True
-        Me.ColorSourceLabel.Location = New System.Drawing.Point(20, 597)
+        Me.ColorSourceLabel.Location = New System.Drawing.Point(1042, 318)
         Me.ColorSourceLabel.Name = "ColorSourceLabel"
         Me.ColorSourceLabel.Size = New System.Drawing.Size(105, 20)
         Me.ColorSourceLabel.TabIndex = 10
@@ -634,16 +605,45 @@ Partial Class OptionsRedCloud
         'ColorSource
         '
         Me.ColorSource.FormattingEnabled = True
-        Me.ColorSource.Location = New System.Drawing.Point(168, 594)
+        Me.ColorSource.Location = New System.Drawing.Point(1170, 318)
         Me.ColorSource.Name = "ColorSource"
         Me.ColorSource.Size = New System.Drawing.Size(222, 28)
         Me.ColorSource.TabIndex = 11
+        '
+        'LabelIdentify
+        '
+        Me.LabelIdentify.AutoSize = True
+        Me.LabelIdentify.Location = New System.Drawing.Point(668, 97)
+        Me.LabelIdentify.Name = "LabelIdentify"
+        Me.LabelIdentify.Size = New System.Drawing.Size(57, 20)
+        Me.LabelIdentify.TabIndex = 32
+        Me.LabelIdentify.Text = "Label1"
+        '
+        'IdentifyCountSlider
+        '
+        Me.IdentifyCountSlider.Location = New System.Drawing.Point(156, 91)
+        Me.IdentifyCountSlider.Maximum = 255
+        Me.IdentifyCountSlider.Minimum = 1
+        Me.IdentifyCountSlider.Name = "IdentifyCountSlider"
+        Me.IdentifyCountSlider.Size = New System.Drawing.Size(506, 69)
+        Me.IdentifyCountSlider.TabIndex = 31
+        Me.IdentifyCountSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.IdentifyCountSlider.Value = 20
+        '
+        'IdentifyCountLabel
+        '
+        Me.IdentifyCountLabel.AutoSize = True
+        Me.IdentifyCountLabel.Location = New System.Drawing.Point(8, 97)
+        Me.IdentifyCountLabel.Name = "IdentifyCountLabel"
+        Me.IdentifyCountLabel.Size = New System.Drawing.Size(104, 20)
+        Me.IdentifyCountLabel.TabIndex = 30
+        Me.IdentifyCountLabel.Text = "IdentifyCount"
         '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1585, 638)
+        Me.ClientSize = New System.Drawing.Size(1585, 604)
         Me.Controls.Add(Me.ColorSource)
         Me.Controls.Add(Me.ColorSourceLabel)
         Me.Controls.Add(Me.GroupBox2)
@@ -657,7 +657,6 @@ Partial Class OptionsRedCloud
         Me.Text = "OptionsRedCloud"
         Me.RedCloudSliders.ResumeLayout(False)
         Me.RedCloudSliders.PerformLayout()
-        CType(Me.IdentifyCountSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).EndInit()
@@ -678,6 +677,7 @@ Partial Class OptionsRedCloud
         Me.GroupBox2.PerformLayout()
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DesiredCellSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.IdentifyCountSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
