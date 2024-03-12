@@ -55,14 +55,34 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public binarizedImage As cv.Mat
     Public inputMask As cv.Mat
-    Dim genCells As New RedCloud_GenCells
+    Dim genCells As New RedCloud_GenCellsNew
     Public Sub New()
         cPtr = RedCloud_Open()
-        If standalone Then labels(2) = "When run standalone, there is no output"
         desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then Exit Sub
+        If standalone Then
+            Static tiers As New Depth_TiersZ
+            tiers.Run(src)
+            Dim tier = gOptions.DebugSlider.Value
+            If tier >= tiers.classCount Then tier = 0
+
+            If tier = 0 Then
+                inputMask = Not tiers.dst2.InRange(0, 1)
+            Else
+                inputMask = Not tiers.dst2.InRange(tier, tier)
+            End If
+
+            genCells.tierMap = tiers.dst2
+            labels(2) = tiers.labels(2)
+
+            redOptions.ColorSource.SelectedItem() = "Binarize_Split4"
+            Static colorC As New Color_Basics
+            colorC.Run(src)
+            src = colorC.dst2
+            dst3 = colorC.dst3
+            labels(3) = "Color source = " + redOptions.colorInputName
+        End If
 
         Dim imagePtr As IntPtr
         Dim inputData(src.Total - 1) As Byte
@@ -80,13 +100,16 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
 
         genCells.classCount = RedCloud_Count(cPtr)
         If genCells.classCount = 0 Then Exit Sub ' no data to process.
-        genCells.classMask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
         genCells.rectData = New cv.Mat(genCells.classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
         genCells.floodPointData = New cv.Mat(genCells.classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
+        genCells.Run(New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone)
 
         dst2 = genCells.dst2
         cellMap = genCells.dst3
         redCells = genCells.redCells
+
+        setSelectedContour(redCells, cellMap)
+        identifyCells(redCells)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)

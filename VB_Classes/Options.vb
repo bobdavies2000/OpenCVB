@@ -167,7 +167,7 @@ Public Class Options_Contours : Inherits VB_Algorithm
     Public ApproximationMode = cv.ContourApproximationModes.ApproxTC89KCOS
     Public epsilon As Single = 3 / 100
     Public minPixels As Integer = 30
-    Public cmPerTier As Integer = 50
+    Public cmPerTier As Integer = 100
     Public trueTextOffset As Integer = 80
     Dim maxContourCount As Integer = 50
     Dim options2 As New Options_Contours2

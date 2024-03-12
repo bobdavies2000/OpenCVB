@@ -1580,6 +1580,7 @@ if algorithmName = "RedCloud_FourColor" Then return new RedCloud_FourColor
 if algorithmName = "RedCloud_FPS" Then return new RedCloud_FPS
 if algorithmName = "RedCloud_Gaps" Then return new RedCloud_Gaps
 if algorithmName = "RedCloud_GenCells" Then return new RedCloud_GenCells
+if algorithmName = "RedCloud_GenCellsNew" Then return new RedCloud_GenCellsNew
 if algorithmName = "RedCloud_Hue" Then return new RedCloud_Hue
 if algorithmName = "RedCloud_Hulls" Then return new RedCloud_Hulls
 if algorithmName = "RedCloud_JoinCells" Then return new RedCloud_JoinCells

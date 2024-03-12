@@ -714,7 +714,7 @@ Public Class BackProject_MeterByMeter : Inherits VB_Algorithm
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZmeters)}
         cv.Cv2.CalcBackProject({task.pcSplit(2)}, {0}, histogram, dst1, ranges)
 
-        dst1.SetTo(task.maxZmeters, task.maxDepthMask)
+        'dst1.SetTo(task.maxZmeters, task.maxDepthMask)
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
         dst3 = vbPalette(dst1)
     End Sub

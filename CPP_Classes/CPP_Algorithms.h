@@ -2436,7 +2436,9 @@ public:
 				{
 					pt = Point(x, y);
 					int count = floodFill(src, mask, pt, 255, &rect, diff, diff, floodFlag | (255 << 8));
-					if (count >= cellSizeThreshold) sizeSorted.insert(make_pair(count, pt));
+					if (count >= src.total() - 10) continue;
+					if (count >= cellSizeThreshold && rect.width > 1 && rect.height > 1)
+						sizeSorted.insert(make_pair(count, pt));
 				}
 			}
 		}
@@ -2494,11 +2496,11 @@ RedCloud_Run(RedCloud * cPtr, int* dataPtr, unsigned char* maskPtr, int rows, in
 	cPtr->src = Mat(rows, cols, type, dataPtr);
 	cPtr->mask = Mat::zeros(rows + 2, cols + 2, CV_8U);
 	Rect r = Rect(1, 1, cols, rows);
-	Mat mask;
 	if (maskPtr != 0)
 	{
-		mask = Mat(rows, cols, type, maskPtr);
-		mask.copyTo(cPtr->mask(r));
+		Mat inputMask;
+		inputMask = Mat(rows, cols, type, maskPtr);
+		inputMask.copyTo(cPtr->mask(r));
 	}
 	cPtr->maskCopy = cPtr->mask.clone();
 	cPtr->RunCPP(maxClassCount, diff, imageThresholdPercent, cellMinPercent); 

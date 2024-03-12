@@ -782,6 +782,7 @@ Public Class rcData
         index = 0
         mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
         rect = New cv.Rect(0, 0, 1, 1)
+        depthMask = mask
         depthCell = True
     End Sub
 End Class

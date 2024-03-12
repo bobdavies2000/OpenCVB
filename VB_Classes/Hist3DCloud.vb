@@ -36,7 +36,7 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
         dst2 = dst2.ConvertScaleAbs
 
         dst2.SetTo(0, task.noDepthMask)
-        dst2.SetTo(classCount, task.maxDepthMask)
+        'dst2.SetTo(classCount, task.maxDepthMask)
         dst3 = vbPalette(dst2 * 255 / classCount)
 
         labels(2) = simK.labels(2) + " with " + CStr(redOptions.bins3D) + " histogram bins"

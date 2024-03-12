@@ -29,10 +29,10 @@ Public Class Color_Basics : Inherits VB_Algorithm
 
         classCount = classifier.classCount
 
-        If task.maxDepthMask.Rows > 0 Then
-            classCount += 1
-            dst2.SetTo(classCount, task.maxDepthMask)
-        End If
+        'If task.maxDepthMask.Rows > 0 Then
+        '    classCount += 1
+        '    dst2.SetTo(classCount, task.maxDepthMask)
+        'End If
 
         dst3 = classifier.dst3
         labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) + " pixel classifications"

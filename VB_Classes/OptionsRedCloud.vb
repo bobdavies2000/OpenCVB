@@ -114,6 +114,7 @@ Public Class OptionsRedCloud
 
         task.redThresholdSide = SideViewThreshold.Value
         task.redThresholdTop = TopViewThreshold.Value
+        identifyCount = IdentifyCountSlider.Value
 
         Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
         Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)

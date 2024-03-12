@@ -99,7 +99,7 @@ Public Class Plot_Depth : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-        src.SetTo(task.maxZmeters, task.maxDepthMask)
+        'src.SetTo(task.maxZmeters, task.maxDepthMask)
 
         hist.Run(src)
         plotDepth.srcX.Clear()

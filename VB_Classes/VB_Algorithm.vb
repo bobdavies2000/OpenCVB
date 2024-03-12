@@ -134,8 +134,8 @@ Public Class VB_Algorithm : Implements IDisposable
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
     Public Sub identifyCells(redCells As List(Of rcData))
-        For Each cell In redCells
-            If cell.index <= redOptions.identifyCount And cell.index > 0 Then setTrueText(CStr(cell.index), cell.maxDist, 2)
+        For Each rc In redCells
+            If rc.index <= redOptions.identifyCount Then setTrueText(CStr(rc.index), rc.maxDist, 2)
         Next
     End Sub
     Public Sub setTrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)

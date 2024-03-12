@@ -530,9 +530,9 @@ Public Class VBtask : Implements IDisposable
             If task.motionDetected Or heartBeat Then
                 task.pcSplit = task.pointCloud.Split
 
-                If task.optionsChanged Then task.maxDepthMask.SetTo(0)
-                task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
-                task.maxDepthMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
+                'If task.optionsChanged Then task.maxDepthMask.SetTo(0)
+                'task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
+                ' task.maxDepthMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
 
                 task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
                 task.noDepthMask = Not task.depthMask
@@ -591,14 +591,14 @@ Public Class VBtask : Implements IDisposable
                 task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
             End If
 
-            Dim rc = task.rc
-            If rc.index > 0 Then
-                task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-                task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+            'Dim rc = task.rc
+            'If rc.index > 0 Then
+            '    task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+            '    task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
 
-                task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-                'task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-            End If
+            '    task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+            '    'task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+            'End If
 
             task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
             task.optionsChanged = False
