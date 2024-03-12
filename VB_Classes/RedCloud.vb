@@ -73,6 +73,69 @@ End Class
 
 
 
+Public Class RedCloud_BasicsNew : Inherits VB_Algorithm
+    Public classCount As Integer
+    Public imageThresholdPercent As Single = 0.98
+    Public cellMinPercent As Single = 0.0001
+    Public genCells As New RedCloud_GenCellsNew
+    Public inputMask As cv.Mat
+    Public redCells As New List(Of rcData)
+    Public cellMap As cv.Mat
+    Public Sub New()
+        cPtr = RedCloud_Open()
+        vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
+                        "It is behind the global options (which affect most algorithms.)")
+        desc = "Find cells and then match them to the previous generation"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 1 Then
+            Static colorC As New Color_Basics
+            colorC.Run(src)
+            src = colorC.dst2
+        End If
+
+        Dim imagePtr As IntPtr
+        Dim inputData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+        If inputMask Is Nothing Then
+            imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols,
+                                     src.Type, redOptions.DesiredCellSlider.Value, 0, imageThresholdPercent, cellMinPercent)
+        Else
+            Dim maskData(inputMask.Total - 1) As Byte
+            Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
+            Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
+
+            imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                    src.Type, redOptions.DesiredCellSlider.Value, 0, imageThresholdPercent, cellMinPercent)
+            handleMask.Free()
+        End If
+        handleInput.Free()
+
+        genCells.classCount = RedCloud_Count(cPtr)
+        classCount = genCells.classCount
+        If classCount = 0 Then Exit Sub ' no data to process.
+        genCells.rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+        genCells.floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
+        genCells.Run(New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone)
+
+        redCells = New List(Of rcData)(genCells.redCells)
+        cellMap = genCells.dst3
+        dst2 = genCells.dst2
+
+        setSelectedContour(redCells, cellMap)
+        identifyCells(redCells)
+        If task.heartBeat Then labels(2) = $"{redCells.Count} cells found.  The largest {redOptions.identifyCount} are identified"
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
 
 
 Public Class RedCloud_Reduction : Inherits VB_Algorithm
@@ -2689,7 +2752,6 @@ Public Class RedCloud_GenCellsNew : Inherits VB_Algorithm
     Public rectData As cv.Mat
     Public floodPointData As cv.Mat
     Public redCells As New List(Of rcData)
-    Public tierMap As cv.Mat
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0) ' this will be the cellmap
         desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
@@ -2701,8 +2763,8 @@ Public Class RedCloud_GenCellsNew : Inherits VB_Algorithm
 
         rc.maxDist = vbGetMaxDist(rc)
 
-        rc.maxDStable = rc.maxDist ' assume it has to use the latest.
         If rc.color = black Then
+            rc.maxDStable = rc.maxDist ' assume it has to use the latest.
             Dim indexLast = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If indexLast > 0 And indexLast < redCells.Count Then
                 Dim lrc = redCells(indexLast)
@@ -2715,7 +2777,6 @@ Public Class RedCloud_GenCellsNew : Inherits VB_Algorithm
             End If
         End If
 
-        rc.tier = tierMap.Get(Of Byte)(rc.floodPoint.Y, rc.floodPoint.X)
         rc.pixels = rc.mask.CountNonZero
         Return rc
     End Function
@@ -2724,12 +2785,6 @@ Public Class RedCloud_GenCellsNew : Inherits VB_Algorithm
             setTrueText("Several algorithms use this algorithm to generate the redCells.  It has no output when run standalone.")
             Exit Sub
         End If
-
-        'If redOptions.colorInputName <> "Binarize_DepthTiers" Then
-        '    Static tiers As New Binarize_DepthTiers
-        '    tiers.Run(task.color)
-        '    tierMap = tiers.dst2
-        'End If
 
         Dim newCells As New List(Of rcData)({New rcData})
         Dim usedColors As New List(Of cv.Vec3b)({white})
@@ -2754,7 +2809,6 @@ Public Class RedCloud_GenCellsNew : Inherits VB_Algorithm
 
             usedColors.Add(rc.color)
             newCells.Add(rc)
-            If newCells.Count >= redOptions.identifyCount Then Exit For
         Next
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
@@ -2778,10 +2832,41 @@ Public Class RedCloud_GenCellsNew : Inherits VB_Algorithm
         redCells.Clear()
         redCells.Add(New rcData)
         For Each rc In sortedCells.Values
+            If rc.pixels = 0 Then Continue For
             rc.index = redCells.Count
             redCells.Add(rc)
             dst3(rc.rect).SetTo(rc.index, rc.mask)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_Mask : Inherits VB_Algorithm
+    Public Sub New()
+        cPtr = RedCloud_Open()
+        desc = "Run the C++ RedCloud interface with a mask"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim imagePtr As IntPtr
+        Dim inputData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+        Dim maskData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, maskData, 0, maskData.Length)
+        Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
+
+        imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(),
+                                src.Rows, src.Cols, src.Type, 255, 0, 1, 0)
+        handleMask.Free()
+        handleInput.Free()
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
     End Sub
 End Class

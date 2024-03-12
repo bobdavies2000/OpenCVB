@@ -135,7 +135,7 @@ Public Class VB_Algorithm : Implements IDisposable
     End Sub
     Public Sub identifyCells(redCells As List(Of rcData))
         For Each rc In redCells
-            If rc.index <= redOptions.identifyCount Then setTrueText(CStr(rc.index), rc.maxDist, 2)
+            If rc.index > 0 And rc.index <= redOptions.identifyCount Then setTrueText(CStr(rc.index), rc.maxDStable, 2)
         Next
     End Sub
     Public Sub setTrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)

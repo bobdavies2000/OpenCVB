@@ -4,7 +4,7 @@ Public Class Flood_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim binar4 As New Binarize_Split4
-    Dim genCells As New RedCloud_GenCells
+    Dim genCells As New RedCloud_GenCellsNew
     Public Sub New()
         cPtr = RedCloud_Open()
         vbAddAdvice(traceName + ": redOptions 'Desired RedCloud Cells' determines how many regions are isolated.")
@@ -25,10 +25,9 @@ Public Class Flood_Basics : Inherits VB_Algorithm
 
         genCells.classCount = RedCloud_Count(cPtr)
         If genCells.classCount = 0 Then Exit Sub ' no data to process.
-        genCells.classMask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
         genCells.rectData = New cv.Mat(genCells.classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
         genCells.floodPointData = New cv.Mat(genCells.classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
-        genCells.Run(binar4.dst3)
+        genCells.Run(New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone)
 
         dst2 = genCells.dst2
         cellMap = genCells.dst3
@@ -62,25 +61,12 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
-            Static tiers As New Depth_TiersZ
-            tiers.Run(src)
-            Dim tier = gOptions.DebugSlider.Value
-            If tier >= tiers.classCount Then tier = 0
-
-            If tier = 0 Then
-                inputMask = Not tiers.dst2.InRange(0, 1)
-            Else
-                inputMask = Not tiers.dst2.InRange(tier, tier)
-            End If
-
-            genCells.tierMap = tiers.dst2
-            labels(2) = tiers.labels(2)
-
-            redOptions.ColorSource.SelectedItem() = "Binarize_Split4"
-            Static colorC As New Color_Basics
-            colorC.Run(src)
-            src = colorC.dst2
-            dst3 = colorC.dst3
+            Static floodInput As New Flood_ColorAndTiers
+            floodInput.Run(src)
+            inputMask = floodInput.dst2
+            src = floodInput.colorC.dst2
+            dst3 = floodInput.dst3
+            labels(2) = floodInput.tiers.labels(2)
             labels(3) = "Color source = " + redOptions.colorInputName
         End If
 
@@ -556,5 +542,37 @@ Public Class Flood_Cell : Inherits VB_Algorithm
 
         labels(3) = $"{redCells.Count} {If(redCells.Count = 1, "cell was ", "cells were ")} identified within the selected cell."
         If standalone Then identifyCells(floodMask.redCells)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Flood_ColorAndTiers : Inherits VB_Algorithm
+    Public tiers As New Depth_TiersZ
+    Public colorC As New Color_Basics
+    Public Sub New()
+        labels = {"", "", "Mask for the selected tier.  Use debugslider to select other tiers.", "Color source input"}
+        desc = "Build the tiers output and the color source output for use with other flood algorithms."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        tiers.Run(src)
+        Dim tier = gOptions.DebugSlider.Value
+        If tier >= tiers.classCount Then tier = 0
+
+        If tier = 0 Then
+            dst2 = Not tiers.dst2.InRange(0, 1)
+        Else
+            dst2 = Not tiers.dst2.InRange(tier, tier)
+        End If
+
+        labels(2) = tiers.labels(2)
+
+        redOptions.ColorSource.SelectedItem() = "Binarize_Split4"
+        colorC.Run(src)
+        dst3 = colorC.dst3
     End Sub
 End Class

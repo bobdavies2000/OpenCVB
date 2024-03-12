@@ -501,6 +501,14 @@ Public Class VBtask : Implements IDisposable
 
                 If task.pcSplit Is Nothing Then task.pcSplit = task.pointCloud.Split
 
+
+
+
+                gOptions.unFiltered.Checked = True ' until the motion rectangle problems are resolved.
+
+
+
+
                 ' on each heartbeat or when options changed, update the whole image.
                 If task.heartBeat Or gOptions.unFiltered.Checked Then
                     task.motionDetected = True
@@ -591,14 +599,14 @@ Public Class VBtask : Implements IDisposable
                 task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
             End If
 
-            'Dim rc = task.rc
-            'If rc.index > 0 Then
-            '    task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-            '    task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+            Dim rc = task.rc
+            If rc.index > 0 Then
+                task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+                task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
 
-            '    task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-            '    'task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-            'End If
+                task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+                'task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+            End If
 
             task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
             task.optionsChanged = False

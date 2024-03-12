@@ -2436,7 +2436,7 @@ public:
 				{
 					pt = Point(x, y);
 					int count = floodFill(src, mask, pt, 255, &rect, diff, diff, floodFlag | (255 << 8));
-					if (count >= src.total() - 10) continue;
+					if (count >= src.total() * 0.99) continue;
 					if (count >= cellSizeThreshold && rect.width > 1 && rect.height > 1)
 						sizeSorted.insert(make_pair(count, pt));
 				}
