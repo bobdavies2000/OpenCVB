@@ -83,7 +83,6 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
         genCells.classMask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
         genCells.rectData = New cv.Mat(genCells.classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
         genCells.floodPointData = New cv.Mat(genCells.classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
-        genCells.Run(binarizedImage)
 
         dst2 = genCells.dst2
         cellMap = genCells.dst3
@@ -94,27 +93,6 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-Public Class Flood_BasicsOld : Inherits VB_Algorithm
-    Public classCount As Integer
-    Public redC As New RedCloud_Basics
-    Public Sub New()
-        redOptions.UseColor.Checked = True
-        labels(2) = "The flooded cells numbered from largest to smallast"
-        desc = "FloodFill the input and paint it"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.cellMap
-        dst3 = redC.dst2
-        labels(3) = redC.labels(2)
-        If standaloneTest() Then identifyCells(redC.redCells)
-        classCount = redC.redCells.Count
-    End Sub
-End Class
 
 
 

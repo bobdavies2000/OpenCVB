@@ -353,7 +353,6 @@ Public Class VB_Algorithm : Implements IDisposable
             If task.dst3.Width <> task.workingRes.Width Or task.dst3.Height <> task.workingRes.Height Then
                 task.dst3 = task.dst3.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
             End If
-            task.frameCount += 1
         End If
     End Sub
 End Class

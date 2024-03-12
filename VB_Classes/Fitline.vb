@@ -11,7 +11,7 @@ Public Class FitLine_Basics : Inherits VB_Algorithm
         desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat = False Then Exit Sub
+        If not task.heartBeat Then Exit Sub
         options.RunVB()
 
         If standaloneTest() Then
@@ -50,7 +50,7 @@ Public Class Fitline_3DBasics_MT : Inherits VB_Algorithm
         labels(3) = "White is featureless RGB, blue depth shadow"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If task.heartBeat = False Then Exit Sub
+        If not task.heartBeat Then Exit Sub
         hlines.Run(src)
         dst3 = hlines.dst3
         Dim mask = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)

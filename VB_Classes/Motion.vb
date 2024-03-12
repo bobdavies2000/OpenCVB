@@ -261,8 +261,7 @@ End Class
 
 
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
-Public Class Motion_BasicsTest : Inherits VB_Algorithm
-    Public cumulativePixels As Integer
+Public Class Motion_Diff : Inherits VB_Algorithm
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "", "Unstable mask", "Pixel difference"}
@@ -276,7 +275,6 @@ Public Class Motion_BasicsTest : Inherits VB_Algorithm
         End If
 
         cv.Cv2.Absdiff(src, dst1, dst3)
-        cumulativePixels = dst3.CountNonZero
         dst2 = dst3.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
@@ -761,8 +759,53 @@ End Class
 
 
 
+
+Public Class Motion_PointCloudMask : Inherits VB_Algorithm
+    Public Sub New()
+        labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
+        desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.motionDetected Then task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
+        If standaloneTest() Then
+            Static diff As New Diff_Depth32f
+            If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
+            diff.Run(task.pcSplit(2))
+            dst3 = diff.dst2
+            dst3.Rectangle(task.motionRect, 255, task.lineWidth)
+            diff.lastDepth32f = task.pcSplit(2)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Motion_ColorMask : Inherits VB_Algorithm
+    Public Sub New()
+        labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated color image",
+                  "Diff of input and latest accumulated color image"}
+        desc = "Display the color image after updating only the motion rectangle.  Resync every heartbeat."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.motionDetected Then src.CopyTo(dst2, task.motionMask)
+        If standaloneTest() And task.motionDetected Then
+            dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
 Public Class Motion_MinRect : Inherits VB_Algorithm
-    Public motion As New Motion_BasicsTest
+    Public motion As New Motion_Diff
     Dim mRect As New Area_MinRect
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)

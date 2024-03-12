@@ -2558,6 +2558,27 @@ End Class
 
 
 
+Public Class RedCloud_Hue : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim hue As New Color_Hue
+    Public Sub New()
+        redOptions.UseColor.Checked = True
+        desc = "Run RedCloud on just the red hue regions."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hue.Run(src)
+        dst3 = hue.dst2
+
+        redC.inputMask = Not dst3
+        redC.Run(src)
+        dst2 = redC.dst2
+    End Sub
+End Class
+
+
+
+
+
 
 Public Class RedCloud_GenCells : Inherits VB_Algorithm
     Public classCount As Integer
@@ -2576,7 +2597,6 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
             setTrueText("Several algorithms use this algorithm to generate the redCells.  It has no output when run standalone.")
             Exit Sub
         End If
-
 
         If redOptions.colorInputName <> "Binarize_DepthTiers" Then
             Static tiers As New Binarize_DepthTiers
@@ -2627,9 +2647,9 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
                 End If
             End If
 
-            rc.tier = tierMap.Get(Of Byte)(rc.floodPoint.Y, rc.floodPoint.X)
+            If tierMap IsNot Nothing Then rc.tier = tierMap.Get(Of Byte)(rc.floodPoint.Y, rc.floodPoint.X)
             If rc.index > redOptions.identifyCount Then
-                If rc.tier = 1 Then rc.color = black Else rc.color = task.vecColors(task.vecColors.Count - 1 - rc.tier)
+                If rc.tier <= 1 Then rc.color = black Else rc.color = task.vecColors(task.vecColors.Count - 1 - rc.tier)
             Else
                 If usedColors.Contains(rc.color) Then
                     rc.color = task.vecColors(rc.index)
@@ -2656,29 +2676,5 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
             dst3(rc.rect).SetTo(rc.index, rc.mask)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class RedCloud_Hue : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
-    Dim hue As New Color_Hue
-    Public Sub New()
-        redOptions.UseColor.Checked = True
-        desc = "Run RedCloud on just the red hue regions."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        hue.Run(src)
-        dst3 = hue.dst2
-
-        redC.inputMask = Not dst3
-        redC.Run(src)
-        dst2 = redC.dst2
-
-
     End Sub
 End Class

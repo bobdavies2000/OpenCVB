@@ -67,7 +67,7 @@ Public Class Rectangle_Overlap : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static typeCheckBox = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-        If task.heartBeat = False Then Exit Sub
+        If not task.heartBeat Then Exit Sub
         If standaloneTest() Then
             draw.Run(src)
             dst2 = draw.dst2

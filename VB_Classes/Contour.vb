@@ -62,7 +62,7 @@ Public Class Contour_General : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
             Static rotatedRect As New Rectangle_Rotated
-            If task.heartBeat = False Then Exit Sub
+            If Not task.heartBeat Then Exit Sub
             rotatedRect.Run(src)
             dst2 = rotatedRect.dst2
             dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -107,11 +107,9 @@ Public Class Contour_GeneralWithOptions : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        dst2 = src.Clone
         If standaloneTest() Then
-
             Static rotatedRect As New Rectangle_Rotated
-            If task.heartBeat = False Then Exit Sub
+            If Not task.heartBeat Then Exit Sub
             rotatedRect.Run(src)
             dst2 = rotatedRect.dst2
             If dst2.Channels = 3 Then

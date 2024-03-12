@@ -318,7 +318,7 @@ Public Class OpAuto_PixelDifference : Inherits VB_Algorithm
         desc = "Find the peaks in a 2D histogram"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat = False And task.frameCount > 10 Then Exit Sub
+        If not task.heartBeat And task.frameCount > 10 Then Exit Sub
         If standaloneTest() Then
             Static diff As New Diff_Basics
             diff.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))

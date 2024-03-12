@@ -23,7 +23,7 @@ Public Class Convex_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Dim hullList = task.rc.contour
         If standaloneTest() Then
-            If task.heartBeat = False Then Exit Sub
+            If not task.heartBeat Then Exit Sub
             hullList = buildRandomHullPoints()
         End If
 

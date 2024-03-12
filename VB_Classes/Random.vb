@@ -655,7 +655,7 @@ Public Class Random_Clusters : Inherits VB_Algorithm
         desc = "Use OpenCV's randN API to create a cluster around a random mean with a requested stdev"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If task.heartBeat = False Then Exit Sub
+        If not task.heartBeat Then Exit Sub
 
         Static clustSlider = findSlider("Number of Clusters")
         Static numSlider = findSlider("Number of points per cluster")

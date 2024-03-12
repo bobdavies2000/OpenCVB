@@ -121,7 +121,7 @@ Public Class Draw_Polygon : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
 
-        If task.heartBeat = False Then Exit Sub
+        If not task.heartBeat Then Exit Sub
         Dim height = src.Height / 8
         Dim width = src.Width / 8
         Dim polyColor = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))

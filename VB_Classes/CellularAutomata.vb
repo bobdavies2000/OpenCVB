@@ -292,7 +292,7 @@ Public Class CellularAutomata_All256 : Inherits VB_Algorithm
         Static rotateRules = findCheckBox("Rotate through the different rules")
         Dim index = ruleSlider.Value
 
-        If task.heartBeat = False Then Exit Sub
+        If not task.heartBeat Then Exit Sub
 
         cell.input = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
         cell.input.Set(Of Byte)(0, cell.input.Width / 2, 1)

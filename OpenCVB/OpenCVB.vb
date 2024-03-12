@@ -36,7 +36,6 @@ Public Class OpenCVB
 
     Dim saveAlgorithmName As String
     Dim shuttingDown As Boolean
-    Const minFrames = 2 ' must have this many frames before algorithm or camera can be changed...
 
     Dim BothFirstAndLastReady As Boolean
 
@@ -1379,11 +1378,9 @@ Public Class OpenCVB
                 ' camera has exited or resolution is changed.
                 If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or
                     saveWorkingRes <> settings.workingRes Then Exit While
-                If frameCount > minFrames Then
-                    If saveAlgorithmName <> task.algName Then Exit While
-                    ' switching camera resolution means stopping the current algorithm
-                    If saveWorkingRes <> settings.workingRes Then Exit While
-                End If
+                If saveAlgorithmName <> task.algName Then Exit While
+                ' switching camera resolution means stopping the current algorithm
+                If saveWorkingRes <> settings.workingRes Then Exit While
 
                 If pauseAlgorithmThread Then
                     Thread.Sleep(300)
@@ -1470,11 +1467,6 @@ Public Class OpenCVB
 
             ' camera has exited or resolution is changed.
             If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or saveWorkingRes <> settings.workingRes Then Exit While
-            If frameCount > minFrames Then
-                If saveAlgorithmName <> task.algName Then Exit While
-                ' switching camera resolution means stopping the current algorithm
-                If saveWorkingRes <> settings.workingRes Then Exit While
-            End If
 
             If activeMouseDown = False Then
                 SyncLock mouseLock
@@ -1575,7 +1567,7 @@ Public Class OpenCVB
             task.returnCopyTime = span.Ticks / TimeSpan.TicksPerMillisecond
 
             task.mouseClickFlag = False
-            frameCount += 1
+            frameCount = task.frameCount
             ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
             ' Each image will represent the one just finished by the algorithm.
             If task.debugSyncUI Then Thread.Sleep(100)

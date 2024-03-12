@@ -4,7 +4,7 @@ Public Class Font_OpenCV : Inherits VB_Algorithm
         desc = "Display different font options available in OpenCV"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If task.heartBeat = False Then Exit Sub
+        If not task.heartBeat Then Exit Sub
         Dim hersheyFont = Choose(task.frameCount Mod 7 + 1, cv.HersheyFonts.HersheyComplex, cv.HersheyFonts.HersheyComplexSmall, cv.HersheyFonts.HersheyDuplex,
                                  cv.HersheyFonts.HersheyPlain, cv.HersheyFonts.HersheyScriptComplex, cv.HersheyFonts.HersheyScriptSimplex, cv.HersheyFonts.HersheySimplex,
                                  cv.HersheyFonts.HersheyTriplex, cv.HersheyFonts.Italic)

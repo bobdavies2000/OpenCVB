@@ -163,7 +163,7 @@ Public Class Area_MinRect : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            If task.heartBeat = False Then Exit Sub
+            If Not task.heartBeat Then Exit Sub
             options.RunVB()
             inputPoints = quickRandomPoints(options.numPoints)
         End If
