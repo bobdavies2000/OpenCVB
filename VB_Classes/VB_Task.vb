@@ -48,7 +48,6 @@ Public Class VBtask : Implements IDisposable
     Public disparityAdjustment As Single ' adjusts for resolution and some hidden elements.
 
     Public motionRect As cv.Rect
-    Public motionMask As cv.Mat
     Public motionFlag As Boolean ' any motion
     Public motionDetected As Boolean ' scene motion only, not camera motion.
 
@@ -61,7 +60,6 @@ Public Class VBtask : Implements IDisposable
     Public motionCloud As Motion_PointCloud
     Public motionColor As Motion_Color
     Public motionBasics As Motion_BasicsQuarterRes
-    Public motion As Motion_MinRect
     Public rgbFilter As Object
 
     Public imuStabilityTest As Stabilizer_VerticalIMU
@@ -369,7 +367,6 @@ Public Class VBtask : Implements IDisposable
         motionCloud = New Motion_PointCloud
         motionColor = New Motion_Color
         motionBasics = New Motion_BasicsQuarterRes
-        motion = New Motion_MinRect
         imuStabilityTest = New Stabilizer_VerticalIMU
 
         updateSettings()
@@ -487,8 +484,7 @@ Public Class VBtask : Implements IDisposable
                 heartBeat = False
                 task.optionsChanged = False
             Else
-                task.heartBeat = heartBeat Or task.debugSyncUI Or task.optionsChanged Or task.mouseClickFlag
-                If task.frameCount = 0 Then task.heartBeat = True
+                task.heartBeat = task.heartBeat Or task.debugSyncUI Or task.optionsChanged Or task.mouseClickFlag
             End If
 
             If task.paused = False Then
@@ -504,7 +500,6 @@ Public Class VBtask : Implements IDisposable
                 End If
 
                 If task.pcSplit Is Nothing Then task.pcSplit = task.pointCloud.Split
-                motion.RunVB(src) ' alternative to motionRect.
 
                 ' on each heartbeat or when options changed, update the whole image.
                 If task.heartBeat Or gOptions.unFiltered.Checked Then
@@ -589,6 +584,7 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
+            If task.heartBeat Then Dim k = 0
             algorithmObject.NextFrame(task.color.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
             If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then

@@ -256,33 +256,6 @@ End Class
 
 
 
-
-
-
-
-'  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
-Public Class Motion_Diff : Inherits VB_Algorithm
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels = {"", "", "Unstable mask", "Pixel difference"}
-        desc = "Capture an image and use absDiff/threshold to compare it to the last snapshot"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.heartBeat Then
-            dst1 = src.Clone
-            dst2.SetTo(0)
-        End If
-
-        cv.Cv2.Absdiff(src, dst1, dst3)
-        dst2 = dst3.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-
 Public Class Motion_Grid_MP : Inherits VB_Algorithm
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 990)
@@ -756,94 +729,6 @@ End Class
 
 
 
-
-
-
-
-Public Class Motion_PointCloudMask : Inherits VB_Algorithm
-    Public Sub New()
-        labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
-        desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If task.motionDetected Then task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
-        If standaloneTest() Then
-            Static diff As New Diff_Depth32f
-            If diff.lastDepth32f.Width = 0 Then diff.lastDepth32f = task.pcSplit(2).Clone
-            diff.Run(task.pcSplit(2))
-            dst3 = diff.dst2
-            dst3.Rectangle(task.motionRect, 255, task.lineWidth)
-            diff.lastDepth32f = task.pcSplit(2)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Motion_ColorMask : Inherits VB_Algorithm
-    Public Sub New()
-        labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated color image",
-                  "Diff of input and latest accumulated color image"}
-        desc = "Display the color image after updating only the motion rectangle.  Resync every heartbeat."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If task.motionDetected Then src.CopyTo(dst2, task.motionMask)
-        If standaloneTest() And task.motionDetected Then
-            dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Motion_MinRect : Inherits VB_Algorithm
-    Public motion As New Motion_Diff
-    Dim mRect As New Area_MinRect
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Find the nonzero points of motion and fit an ellipse to them."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        motion.Run(src)
-        dst2 = motion.dst2
-
-        Dim nonzeros = dst2.FindNonZero()
-        If task.heartBeat Then dst3.SetTo(0)
-        If nonzeros.Rows > 5 Then
-            Dim ptx As New List(Of Integer)
-            Dim pty As New List(Of Integer)
-            Dim inputPoints As New List(Of cv.Point)
-            For i = 0 To nonzeros.Rows - 1
-                Dim pt = nonzeros.Get(Of cv.Point)(i, 0)
-                inputPoints.Add(pt)
-                ptx.Add(pt.X)
-                pty.Add(pt.Y)
-            Next
-            Dim p1 = inputPoints(ptx.IndexOf(ptx.Max))
-            Dim p2 = inputPoints(ptx.IndexOf(ptx.Min))
-            Dim p3 = inputPoints(pty.IndexOf(pty.Max))
-            Dim p4 = inputPoints(pty.IndexOf(pty.Min))
-
-            mRect.inputPoints = New List(Of cv.Point2f)({p1, p2, p3, p4})
-            mRect.Run(empty)
-            drawRotatedRectangle(mRect.minRect, dst3, cv.Scalar.White)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
     Dim redMasks As New RedCloud_Basics
     Public bgSub As New BGSubtract_MOG2_QT
@@ -863,7 +748,12 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
         Else
             dst2 = src
         End If
-        dst2 = dst2.Resize(task.quarterRes).Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        If dst2.Size <> task.quarterRes Then
+            dst2 = dst2.Resize(task.quarterRes).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        Else
+            dst2 = src.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        End If
 
         redMasks.inputMask = Not dst2
         redMasks.Run(dst2)
@@ -915,6 +805,75 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
             r = New cv.Rect(r.X - pad, r.Y - pad, r.Width + pad * 2, r.Height + pad * 2)
             task.motionRect = validateRect(r, ratio)
             dst2.Rectangle(task.motionRect, 255, task.lineWidth + 1)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+'  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
+Public Class Motion_Diff : Inherits VB_Algorithm
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels = {"", "", "Unstable mask", "Pixel difference"}
+        desc = "Capture an image and use absDiff/threshold to compare it to the last snapshot"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.heartBeat Then
+            dst1 = src.Clone
+            dst2.SetTo(0)
+        End If
+
+        cv.Cv2.Absdiff(src, dst1, dst3)
+        dst2 = dst3.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class Motion_MinRect : Inherits VB_Algorithm
+    Public motion As New Motion_Diff
+    Dim mRect As New Area_MinRect
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Find the nonzero points of motion and fit an rotated rectangle to them."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        motion.Run(src)
+        dst2 = motion.dst2
+
+        Dim nonzeros = dst2.FindNonZero()
+        If task.heartBeat Then dst3.SetTo(0)
+        If nonzeros.Rows > 5 Then
+            Dim ptx As New List(Of Integer)
+            Dim pty As New List(Of Integer)
+            Dim inputPoints As New List(Of cv.Point)
+            For i = 0 To nonzeros.Rows - 1
+                Dim pt = nonzeros.Get(Of cv.Point)(i, 0)
+                inputPoints.Add(pt)
+                ptx.Add(pt.X)
+                pty.Add(pt.Y)
+            Next
+            Dim p1 = inputPoints(ptx.IndexOf(ptx.Max))
+            Dim p2 = inputPoints(ptx.IndexOf(ptx.Min))
+            Dim p3 = inputPoints(pty.IndexOf(pty.Max))
+            Dim p4 = inputPoints(pty.IndexOf(pty.Min))
+
+            mRect.inputPoints = New List(Of cv.Point2f)({p1, p2, p3, p4})
+            mRect.Run(empty)
+            drawRotatedRectangle(mRect.minRect, dst3, cv.Scalar.White)
         End If
     End Sub
 End Class
