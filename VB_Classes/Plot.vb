@@ -290,7 +290,7 @@ Public Class Plot_OverTime : Inherits VB_Algorithm
 
         ' if enough points are off the charted area or if manually requested, then redo the scale.
         If (offChartCount > plotTriggerRescale And lastXdelta.Count >= plotSeriesCount And controlScale = False) Then
-            If firstPass = False Then
+            If Not firstPass Then
                 maxScale = Integer.MinValue
                 minScale = Integer.MaxValue
                 For i = 0 To lastXdelta.Count - 1
@@ -377,7 +377,7 @@ Public Class Plot_OverTimeFixedScale : Inherits VB_Algorithm
         If fixedScale = False Then
             ' if enough points are off the charted area or if manually requested, then redo the scale.
             If (offChartCount > plotTriggerRescale And lastXdelta.Count >= plotSeriesCount And controlScale = False) Then
-                If firstPass = False Then
+                If Not firstPass Then
                     maxScale = Integer.MinValue
                     minScale = Integer.MaxValue
                     For i = 0 To lastXdelta.Count - 1

@@ -9,7 +9,7 @@ Public Class Grid_Basics : Inherits VB_Algorithm
         desc = "Create a grid of squares covering the entire image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.mouseClickFlag And firstPass = False Then
+        If task.mouseClickFlag And Not firstPass Then
             task.gridROIclicked = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         End If
         If task.optionsChanged Then
