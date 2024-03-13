@@ -118,6 +118,7 @@
     <Compile Include="AsciiArt.vb" />
     <Compile Include="Bezier.vb" />
     <Compile Include="BGRPattern.vb" />
+    <Compile Include="Boundary.vb" />
     <Compile Include="Cell.vb" />
     <Compile Include="Classifier.vb" />
     <Compile Include="Complexity.vb" />
