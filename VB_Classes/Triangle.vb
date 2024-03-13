@@ -77,7 +77,7 @@ End Class
 
 
 Public Class Triangle_RedCloud : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Tight
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
         labels = {"", "", "RedCloud_Basics output", "Selected contour - each pixel has depth"}

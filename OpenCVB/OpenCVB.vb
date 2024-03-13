@@ -1543,16 +1543,15 @@ Public Class OpenCVB
                 task.labels(2) = "Options algorithms have no output"
                 Continue While
             End If
-            SyncLock cameraLock
-                Try
+            If task.dst0 IsNot Nothing Then
+                SyncLock cameraLock
                     dst(0) = task.dst0.Clone
                     dst(1) = task.dst1.Clone
                     dst(2) = task.dst2.Clone
                     dst(3) = task.dst3.Clone
-                Catch ex As Exception
-                End Try
-            End SyncLock
-            algorithmRefresh = True
+                End SyncLock
+                algorithmRefresh = True
+            End If
 
             If frameCount Mod task.fpsRate = 0 Then
                 SyncLock callTraceLock

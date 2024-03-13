@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedTrack_Basics : Inherits VB_Algorithm
     Dim stats As New Cell_Basics
-    Public redC As New RedCloud_Basics
+    Public redC As New RedCloud_Tight
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         If task.workingRes <> New cv.Size(168, 94) Then task.frameHistoryCount = 1

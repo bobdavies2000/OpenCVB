@@ -1174,7 +1174,7 @@ End Class
 
 
 Public Class OpenGL_PlaneClusters3D : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Tight
     Dim eq As New Plane_Equation
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints

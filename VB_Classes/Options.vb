@@ -167,7 +167,7 @@ Public Class Options_Contours : Inherits VB_Algorithm
     Public ApproximationMode = cv.ContourApproximationModes.ApproxTC89KCOS
     Public epsilon As Single = 3 / 100
     Public minPixels As Integer = 30
-    Public cmPerTier As Integer = 100
+    Public cmPerTier As Integer = 50
     Public trueTextOffset As Integer = 80
     Dim maxContourCount As Integer = 50
     Dim options2 As New Options_Contours2
@@ -3647,7 +3647,7 @@ Public Class Options_Spectrum : Inherits VB_Algorithm
     Public gapDepth As Integer
     Public gapGray As Integer
     Public sampleThreshold As Integer
-    Public redC As New RedCloud_Basics
+    Public redC As New RedCloud_Tight
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Gap in depth spectrum (cm's)", 1, 50, 1)

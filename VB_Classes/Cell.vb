@@ -118,7 +118,7 @@ End Class
 
 
 Public Class Cell_Stable : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Tight
     Public rcUnstableList As New List(Of rcDataOld)
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -169,7 +169,7 @@ End Class
 
 
 Public Class Cell_StableMax : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Tight
     Public redCells As New List(Of rcDataOld)
     Public cellMap As New cv.Mat
     Public Sub New()
@@ -279,7 +279,7 @@ End Class
 
 
 Public Class Cell_JumpUp : Inherits VB_Algorithm
-    Public redC As New RedCloud_Basics
+    Public redC As New RedCloud_Tight
     Public jumpCells As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent jump in size", 1, 100, 25)
@@ -321,7 +321,7 @@ End Class
 
 
 Public Class Cell_JumpDown : Inherits VB_Algorithm
-    Public redC As New RedCloud_Basics
+    Public redC As New RedCloud_Tight
     Public jumpCells As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent jump in size", 1, 100, 25)
@@ -363,7 +363,7 @@ End Class
 
 
 Public Class Cell_JumpUnstable : Inherits VB_Algorithm
-    Public redC As New RedCloud_Basics
+    Public redC As New RedCloud_Tight
     Public jumpCells As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent jump in size", 1, 100, 25)
@@ -402,7 +402,7 @@ End Class
 
 
 Public Class Cell_Distance : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Tight
     Public redCells As New List(Of rcDataOld)
     Public cellMap As cv.Mat
     Public Sub New()

@@ -4,7 +4,7 @@ Public Class Flood_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcDataNew)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim binar4 As New Binarize_Split4
-    Dim genCells As New RedCloud_GenCellsNew
+    Dim genCells As New RedCloud_GenCells
     Dim redCPP As New RedCloud_MaskNone
     Public Sub New()
         vbAddAdvice(traceName + ": redOptions 'Desired RedCloud Cells' determines how many regions are isolated.")
@@ -46,7 +46,7 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public binarizedImage As cv.Mat
     Public inputMask As cv.Mat
-    Dim genCells As New RedCloud_GenCellsNew
+    Dim genCells As New RedCloud_GenCells
     Dim redCPP As New RedCloud_Mask
     Public buildInputMask As Boolean
     Public Sub New()
@@ -297,7 +297,7 @@ End Class
 
 Public Class Flood_FeaturelessHulls : Inherits VB_Algorithm
     Public classCount As Integer
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Tight
     Dim redCells As New List(Of rcDataOld)
     Public Sub New()
         redOptions.UseColor.Checked = True
@@ -560,36 +560,36 @@ End Class
 
 
 
-Public Class Flood_Neighbors : Inherits VB_Algorithm
+Public Class Flood_NeighborContains : Inherits VB_Algorithm
     Dim flood As New Flood_BasicsMask
+    Public redCells As New List(Of rcDataNew)
     Public Sub New()
         flood.buildInputMask = True
         desc = "Attach smaller cells to the largest X cells or classify them as other."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        flood.Run(src)
-        dst3 = flood.dst2
-        labels = flood.labels
-        identifyCells(flood.redCells)
+        If standalone Then
+            flood.Run(src)
+            dst2 = flood.dst2
+            redCells = flood.redCells
+            labels = flood.labels
+        End If
 
-        For i = flood.redCells.Count - 1 To redOptions.identifyCount Step -1
-            Dim rc = flood.redCells(i)
-            For j = 0 To redOptions.identifyCount - 1
-                Dim rcBig = flood.redCells(j)
-                If rcBig.rect.IntersectsWith(rc.rect) Then rc.nabs.Add(rcBig.index)
-                If rcBig.rect.Contains(rc.rect) Then rc.contains.Add(rcBig.index)
+        For i = redCells.Count - 1 To redOptions.identifyCount Step -1
+            Dim rc = redCells(i)
+            Dim nabs As New List(Of Integer)
+            Dim contains As New List(Of Integer)
+            Dim count = Math.Min(redOptions.identifyCount, redCells.Count)
+            For j = 0 To count - 1
+                Dim rcBig = redCells(j)
+                If rcBig.rect.IntersectsWith(rc.rect) Then nabs.Add(rcBig.index)
+                If rcBig.rect.Contains(rc.rect) Then contains.Add(rcBig.index)
             Next
-            If rc.contains.Count > 0 Then
-                rc.color = flood.redCells(rc.contains.Min()).color
-            End If
-            flood.redCells(i) = rc
+            If nabs.Count > 0 Then rc.nab = nabs.Min()
+            If contains.Count > 0 Then rc.container = contains.Min()
+            redCells(i) = rc
         Next
 
-        dst2.SetTo(0)
-        For i = 0 To redOptions.identifyCount - 1
-            Dim rc = flood.redCells(i)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-            dst2.Rectangle(rc.rect, task.highlightColor, task.lineWidth)
-        Next
+        identifyCells(redCells)
     End Sub
 End Class

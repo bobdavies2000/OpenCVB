@@ -837,8 +837,8 @@ Public Class rcDataNew
     Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
 
     Public index As Integer
-    Public nabs As New List(Of Integer)
-    Public contains As New List(Of Integer)
+    Public nab As Integer
+    Public container As Integer
 
     Public contour As New List(Of cv.Point)
 
