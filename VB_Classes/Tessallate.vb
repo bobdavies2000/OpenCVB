@@ -8,7 +8,7 @@ Public Class Tessallate_Basics : Inherits VB_Algorithm
         gOptions.GridSize.Value = 30
         desc = "Prepare the list of 2D triangles"
     End Sub
-    Private Function addTriangle(c1 As cv.Point, c2 As cv.Point, center As cv.Point, rc As rcData, shift As cv.Point3f) As List(Of cv.Point)
+    Private Function addTriangle(c1 As cv.Point, c2 As cv.Point, center As cv.Point, rc As rcDataOld, shift As cv.Point3f) As List(Of cv.Point)
         Dim pt1 = getWorldCoordinates(New cv.Point3f(c1.X, c1.Y, rc.depthMean(2)))
         Dim ptCenter = getWorldCoordinates(New cv.Point3f(center.X, center.Y, rc.depthMean(2)))
         Dim pt2 = getWorldCoordinates(New cv.Point3f(c2.X, c2.Y, rc.depthMean(2)))

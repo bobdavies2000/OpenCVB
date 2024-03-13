@@ -70,7 +70,7 @@ Public Class GuidedBP_CellHistograms : Inherits VB_Algorithm
         gpbWare.Run(src)
         dst3 = gpbWare.dst2
 
-        Dim rc As New rcData
+        Dim rc As New rcDataOld
         If gpbWare.redCells.Count > 1 Then
             vbDrawContour(dst3, rc.contour, rc.color)
         End If
@@ -140,7 +140,7 @@ Public Class GuidedBP_Cells : Inherits VB_Algorithm
         gpbWare.Run(src)
         dst2 = gpbWare.dst2
 
-        Dim rc As New rcData
+        Dim rc As New rcDataOld
         If gpbWare.redCells.Count > 1 Then
             setSelectedContour(gpbWare.redCells, gpbWare.kMap)
             rc = task.rc
@@ -454,8 +454,8 @@ End Class
 
 Public Class GuidedBP_Hulls : Inherits VB_Algorithm
     Dim bpDoctor As New GuidedBP_Points
-    Public redCells As New List(Of rcData)
-    Public redCellsLast As New List(Of rcData)
+    Public redCells As New List(Of rcDataOld)
+    Public redCellsLast As New List(Of rcDataOld)
     Public kMap As New cv.Mat
     Dim contours As New Contour_Largest
     Dim plot As New Histogram_Depth
@@ -471,14 +471,14 @@ Public Class GuidedBP_Hulls : Inherits VB_Algorithm
         ' Use the DebugCheckBox box and it will rerun the exact same input.
         If gOptions.DebugCheckBox.Checked = False Then bpDoctor.Run(src)
 
-        Dim newCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim newCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
         Dim kMapLast = kMap.Clone
         If task.heartBeat Then
             kMap.SetTo(0)
             dst2.SetTo(0)
             Dim sizes As New List(Of Integer)
             For i = 1 To bpDoctor.classCount
-                Dim rc As New rcData
+                Dim rc As New rcDataOld
                 rc.mask = bpDoctor.backP.InRange(i, i).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
                 contours.Run(rc.mask)
@@ -503,19 +503,19 @@ Public Class GuidedBP_Hulls : Inherits VB_Algorithm
                 vbDrawContour(dst2, rc.contour, rc.color, -1)
             Next
             dst0 = task.color.Clone
-            redCellsLast = New List(Of rcData)(redCells)
+            redCellsLast = New List(Of rcDataOld)(redCells)
             redCells.Clear()
-            redCells.Add(New rcData)
+            redCells.Add(New rcDataOld)
 
-            Dim cellUpdates As New List(Of rcData)
+            Dim cellUpdates As New List(Of rcDataOld)
             Dim usedColors As New List(Of cv.Vec3b)({black})
             For Each entry In newCells
-                Dim rc As New rcData
+                Dim rc As New rcDataOld
                 rc = entry.Value
 
                 rc.index = redCells.Count
                 Dim index = kMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                Dim lrc As rcData
+                Dim lrc As rcDataOld
                 If index <> 0 Then
                     lrc = redCellsLast(index)
                     rc.indexLast = lrc.index
@@ -608,8 +608,8 @@ End Class
 
 Public Class GuidedBP_History : Inherits VB_Algorithm
     Public gpbWare As New GuidedBP_Hulls
-    Dim kCellList As New List(Of List(Of rcData))
-    Public redCells As New List(Of rcData)
+    Dim kCellList As New List(Of List(Of rcDataOld))
+    Public redCells As New List(Of rcDataOld)
     Public kMap As New cv.Mat
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -630,9 +630,9 @@ Public Class GuidedBP_History : Inherits VB_Algorithm
 
         gpbWare.Run(src)
 
-        kCellList.Add(New List(Of rcData)(gpbWare.redCells))
+        kCellList.Add(New List(Of rcDataOld)(gpbWare.redCells))
 
-        Dim sortCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim sortCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
         For Each cellList In kCellList
             For i = 1 To cellList.Count - 1
                 sortCells.Add(cellList(i).pixels, cellList(i))
@@ -641,7 +641,7 @@ Public Class GuidedBP_History : Inherits VB_Algorithm
 
         kMap.SetTo(0)
         redCells.Clear()
-        redCells.Add(New rcData)
+        redCells.Add(New rcDataOld)
         Dim lastDst2 = dst2.Clone
         Dim usedColors As New List(Of cv.Vec3b)({black})
         For Each rc In sortCells.Values

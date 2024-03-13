@@ -2447,7 +2447,6 @@ public:
 		cellSizes.clear();
 		floodPoints.clear();
 		int fill = 1;
-		int totalCount = 0;
 		int threshold = int(imageThresholdPercent * src.total());
 		for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
 		{
@@ -2457,13 +2456,36 @@ public:
 				cellRects.push_back(rect);
 				cellSizes.push_back(count);
 				floodPoints.push_back(it->second);
-				totalCount += count;
 
 				if (count > threshold || fill >= maxClassCount)
 					break; // just taking up to the top X largest objects found.
 				fill++;
 			}
 		}
+
+
+
+
+
+
+
+		//Rect r = Rect(1, 1, src.cols, src.rows);
+		//Mat inputMat = maskCopy(r).clone();
+		//for (size_t i = 1; i < cellSizes.size(); i++)
+		//{
+		//	Mat testMat;
+		//	inRange(inputMat, i, i, testMat);
+		//	Rect rect = cellRects[i - 1];
+		//	int testCount = countNonZero(testMat(rect));
+		//	int nextSize = cellSizes[i - 1];
+		//	if (testCount != nextSize)
+		//		int k = 0;
+		//}
+
+
+
+
+
 	}
 };
 
@@ -2504,7 +2526,6 @@ RedCloud_Run(RedCloud * cPtr, int* dataPtr, unsigned char* maskPtr, int rows, in
 	}
 	cPtr->maskCopy = cPtr->mask.clone();
 	cPtr->RunCPP(maxClassCount, diff, imageThresholdPercent, cellMinPercent); 
-
 	cPtr->maskCopy(r).copyTo(cPtr->result);
 	return (int*)cPtr->result.data;
 }

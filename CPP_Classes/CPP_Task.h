@@ -3,7 +3,7 @@
 #include <cmath>
 #include <list>
 
-class rcData {
+class rcDataOld {
 public:
     cv::Rect rect;
     Mat mask;
@@ -45,7 +45,7 @@ public:
     Vec4f eq;  // plane equation
     Vec3f pcaVec;
 
-    rcData() : index(0), depthCell(true) {
+    rcDataOld() : index(0), depthCell(true) {
         mask = Mat(1, 1, CV_8U); 
         rect = Rect(0, 0, 1, 1);
     }
@@ -202,7 +202,7 @@ public:
     int cvFontThickness;
     Scalar fontColor;
     int frameCount;  Point3f accRadians; vector<Rect> roiList;
-    Rect motionRect; rcData rcSelect; int desiredCells;
+    Rect motionRect; rcDataOld rcSelect; int desiredCells;
 
     bool heartBeat; bool midHeartBeat; bool quarterBeat; bool debugCheckBox; Size lowRes; 
     

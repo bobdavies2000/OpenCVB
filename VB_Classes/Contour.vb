@@ -402,7 +402,7 @@ End Class
 
 
 Public Class Contour_Outline : Inherits VB_Algorithm
-    Public rc As New rcData
+    Public rc As New rcDataOld
     Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Create a simplified contour of the selected cell"
@@ -439,7 +439,7 @@ End Class
 
 
 Public Class Contour_SelfIntersect : Inherits VB_Algorithm
-    Public rc As New rcData
+    Public rc As New rcDataOld
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Search the contour points for duplicates indicating the contour is self-intersecting."
@@ -571,7 +571,7 @@ End Class
 
 Public Class Contour_RedCloudCorners : Inherits VB_Algorithm
     Public corners(4 - 1) As cv.Point
-    Public rc As New rcData
+    Public rc As New rcDataOld
     Public Sub New()
         labels(2) = "The RedCloud Output with the highlighted contour to smooth"
         desc = "Find the point farthest from the center in each cell."
@@ -841,7 +841,7 @@ End Class
 
 Public Class Contour_PrepData : Inherits VB_Algorithm
     Dim contour As New Contour_Basics
-    Dim redCells As New List(Of rcData)
+    Dim redCells As New List(Of rcDataOld)
     Dim cellMap As New cv.Mat
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -854,11 +854,11 @@ Public Class Contour_PrepData : Inherits VB_Algorithm
         dst1.SetTo(0)
         dst3.SetTo(0)
         redCells.Clear()
-        redCells.Add(New rcData)
+        redCells.Add(New rcDataOld)
         cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         For i = 0 To contour.sortedList.Count - 1
             Dim tour = contour.allContours(contour.sortedList.ElementAt(i).Value)
-            Dim rc As New rcData
+            Dim rc As New rcDataOld
             Dim px As New List(Of Integer)
             Dim py As New List(Of Integer)
             For Each pt In tour

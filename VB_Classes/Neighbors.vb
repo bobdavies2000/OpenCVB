@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Neighbors_Basics : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Dim knn As New KNN_Core
-    Public redCells As New List(Of rcData)
+    Public redCells As New List(Of rcDataOld)
     Public cellMap As New cv.Mat
     Public runRedCloud As Boolean = False
     Public options As New Options_XNeighbors
@@ -222,7 +222,7 @@ End Class
 Public Class Neighbors_Contained : Inherits VB_Algorithm
     Dim nabs As New Neighbors_Precise
     Public cellMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public redCells As New List(Of rcData)
+    Public redCells As New List(Of rcDataOld)
     Public Sub New()
         nabs.runRedCloud = True
         If standalone Then gOptions.displayDst1.Checked = True
@@ -304,7 +304,7 @@ End Class
 Public Class Neighbors_Precise : Inherits VB_Algorithm
     Public nabList As New List(Of List(Of Integer))
     Dim stats As New Cell_Basics
-    Public redCells As List(Of rcData)
+    Public redCells As List(Of rcDataOld)
     Public runRedCloud As Boolean = False
     Public Sub New()
         cPtr = Neighbors_Open()

@@ -1590,6 +1590,7 @@ if algorithmName = "RedCloud_KMeans" Then return new RedCloud_KMeans
 if algorithmName = "RedCloud_LeftRight" Then return new RedCloud_LeftRight
 if algorithmName = "RedCloud_LikelyFlatSurfaces" Then return new RedCloud_LikelyFlatSurfaces
 if algorithmName = "RedCloud_Mask" Then return new RedCloud_Mask
+if algorithmName = "RedCloud_MaskNone" Then return new RedCloud_MaskNone
 if algorithmName = "RedCloud_MatchCell" Then return new RedCloud_MatchCell
 if algorithmName = "RedCloud_MaxDist" Then return new RedCloud_MaxDist
 if algorithmName = "RedCloud_MeterByMeter" Then return new RedCloud_MeterByMeter

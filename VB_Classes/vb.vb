@@ -15,7 +15,7 @@ Module VB
         Next
         Return New cv.Point2f(xsum / clist.Count, ysum / clist.Count)
     End Function
-    Public Function validContourPoint(rc As rcData, pt As cv.Point, offset As Integer) As cv.Point
+    Public Function validContourPoint(rc As rcDataOld, pt As cv.Point, offset As Integer) As cv.Point
         If pt.X < rc.rect.Width And pt.Y < rc.rect.Height Then Return pt
         Dim count = rc.contour.Count
         For i = offset + 1 To rc.contour.Count - 1
@@ -24,7 +24,7 @@ Module VB
         Next
         Return New cv.Point
     End Function
-    Public Function build3PointEquation(rc As rcData) As cv.Vec4f
+    Public Function build3PointEquation(rc As rcDataOld) As cv.Vec4f
         If rc.contour.Count < 3 Then Return New cv.Vec4f
         Dim offset = rc.contour.Count / 3
         Dim p1 = validContourPoint(rc, rc.contour(offset * 0), offset * 0)
@@ -179,7 +179,7 @@ Module VB
             gOptions.GridSize.Value = 32
         End If
     End Sub
-    Public Function separateMasks(rc As rcData, lrc As rcData) As cv.Mat
+    Public Function separateMasks(rc As rcDataOld, lrc As rcDataOld) As cv.Mat
         Dim x = Math.Min(rc.rect.X, lrc.rect.X)
         Dim y = Math.Min(rc.rect.Y, lrc.rect.Y)
         Dim w = Math.Max(rc.rect.X + rc.rect.Width, lrc.rect.X + lrc.rect.Width)
@@ -199,7 +199,7 @@ Module VB
         dst.Circle(rc.maxDStable, task.dotSize + 2, cv.Scalar.Black, -1, task.lineType)
         dst.Circle(rc.maxDStable, task.dotSize, cv.Scalar.White, -1, task.lineType)
     End Sub
-    Public Sub setSelectedContour(ByRef redCells As List(Of rcData), ByRef cellMap As cv.Mat)
+    Public Sub setSelectedContour(ByRef redCells As List(Of rcDataOld), ByRef cellMap As cv.Mat)
         If redCells.Count = 0 Then Exit Sub
         Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
         task.rc = redCells(index)
@@ -209,6 +209,18 @@ Module VB
             If redCells.Count > 0 Then
                 task.clickPoint = redCells(0).maxDist
                 task.rc = redCells(0)
+            End If
+        End If
+    End Sub
+    Public Sub setSelectedContour(ByRef redCells As List(Of rcDataNew), ByRef cellMap As cv.Mat)
+        If redCells.Count = 0 Then Exit Sub
+        Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+        task.rcNew = redCells(index)
+        If task.mouseClickFlag = False Then Exit Sub
+        If index >= redCells.Count Then
+            If redCells.Count > 0 Then
+                task.clickPoint = redCells(0).maxDist
+                task.rcNew = redCells(0)
             End If
         End If
     End Sub
@@ -300,7 +312,7 @@ Module VB
     Public Function convertVec3bToScalar(vec As cv.Vec3b) As cv.Scalar
         Return New cv.Scalar(vec(0), vec(1), vec(2))
     End Function
-    Public Function vbGetMaxDist(ByRef rc As rcData) As cv.Point
+    Public Function vbGetMaxDist(ByRef rc As rcDataOld) As cv.Point
         Dim mask = rc.mask.Clone
         mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
         Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
@@ -727,7 +739,7 @@ End Structure
 
 
 
-Public Class rcData
+Public Class rcDataOld
     Public rect As cv.Rect
     Public mask As cv.Mat
     Public tier As Integer
@@ -784,6 +796,42 @@ Public Class rcData
         rect = New cv.Rect(0, 0, 1, 1)
         depthMask = mask
         depthCell = True
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class rcDataNew
+    Public rect As cv.Rect
+    Public mask As cv.Mat
+    Public pixels As Integer
+    Public floodPoint As cv.Point
+
+    Public color As New cv.Vec3b
+
+    Public depthPixels As Integer
+    Public depthMask As cv.Mat
+    Public depthMean As cv.Scalar
+    Public depthStdev As cv.Scalar
+
+    Public maxDist As cv.Point
+    Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
+
+    Public index As Integer
+    Public nabs As New List(Of Integer)
+
+    Public contour As New List(Of cv.Point)
+
+    Public motionFlag As Boolean
+    Public Sub New()
+        index = 0
+        mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
+        depthMask = mask
+        rect = New cv.Rect(0, 0, 1, 1)
     End Sub
 End Class
 

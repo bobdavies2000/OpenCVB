@@ -1,12 +1,12 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Algorithm
-    Public redCells As New List(Of rcData)
+    Public redCells As New List(Of rcDataOld)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim binar4 As New Binarize_Split4
     Dim genCells As New RedCloud_GenCellsNew
+    Dim redCPP As New RedCloud_MaskNone
     Public Sub New()
-        cPtr = RedCloud_Open()
         vbAddAdvice(traceName + ": redOptions 'Desired RedCloud Cells' determines how many regions are isolated.")
         labels(3) = "FloodFill regions - click to isolate a cell."
         desc = "Simple Floodfill each region but prepare the mask, rect, floodpoints, and pixel counts."
@@ -15,19 +15,14 @@ Public Class Flood_Basics : Inherits VB_Algorithm
         binar4.Run(task.color) ' always run split4 to get colors for genCells.
         If src.Channels = 1 Then src += binar4.dst2 Else src = binar4.dst2
 
-        Dim inputData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+        redCPP.Run(src)
 
-        Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols, src.Type,
-                                    redOptions.DesiredCellSlider.Value, 0, 1, 0)
-        handleInput.Free()
-
-        genCells.classCount = RedCloud_Count(cPtr)
-        If genCells.classCount = 0 Then Exit Sub ' no data to process.
-        genCells.rectData = New cv.Mat(genCells.classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
-        genCells.floodPointData = New cv.Mat(genCells.classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
-        genCells.Run(New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone)
+        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
+        genCells.classCount = redCPP.classCount
+        genCells.rectData = redCPP.rectData
+        genCells.floodPointData = redCPP.floodPointData
+        genCells.sizeData = redCPP.sizeData
+        genCells.Run(redCPP.dst2)
 
         dst2 = genCells.dst2
         cellMap = genCells.dst3
@@ -36,10 +31,8 @@ Public Class Flood_Basics : Inherits VB_Algorithm
         setSelectedContour(redCells, cellMap)
         identifyCells(redCells)
 
-        labels(2) = $"FloodFill results vary from 0 to {genCells.classCount}.  The largest {redOptions.identifyCount} are identified."
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+        Dim cellCount = Math.Min(redOptions.identifyCount, redCells.Count)
+        If task.heartBeat Then labels(2) = $"{redCells.Count} cells identified and the largest {cellCount} are numbered below."
     End Sub
 End Class
 
@@ -50,13 +43,13 @@ End Class
 
 
 Public Class Flood_BasicsMask : Inherits VB_Algorithm
-    Public redCells As New List(Of rcData)
+    Public redCells As New List(Of rcDataOld)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public binarizedImage As cv.Mat
     Public inputMask As cv.Mat
     Dim genCells As New RedCloud_GenCellsNew
+    Dim redCPP As New RedCloud_Mask
     Public Sub New()
-        cPtr = RedCloud_Open()
         desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -66,39 +59,26 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
             inputMask = floodInput.dst2
             src = floodInput.colorC.dst2
             dst3 = floodInput.dst3
-            labels(2) = floodInput.tiers.labels(2)
-            labels(3) = "Color source = " + redOptions.colorInputName
+            labels = floodInput.labels
         End If
 
-        Dim imagePtr As IntPtr
-        Dim inputData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+        redCPP.inputmask = inputMask
+        redCPP.Run(src)
 
-        Dim maskData(inputMask.Total - 1) As Byte
-        Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
-        Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
-
-        imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(),
-                                src.Rows, src.Cols, src.Type, 255, 0, 1, 0)
-        handleMask.Free()
-        handleInput.Free()
-
-        genCells.classCount = RedCloud_Count(cPtr)
-        If genCells.classCount = 0 Then Exit Sub ' no data to process.
-        genCells.rectData = New cv.Mat(genCells.classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
-        genCells.floodPointData = New cv.Mat(genCells.classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
-        genCells.Run(New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone)
+        genCells.classCount = redCPP.classCount
+        genCells.rectData = redCPP.rectData
+        genCells.floodPointData = redCPP.floodPointData
+        genCells.sizeData = redCPP.sizeData
+        genCells.Run(redCPP.dst2)
 
         dst2 = genCells.dst2
         cellMap = genCells.dst3
         redCells = genCells.redCells
 
+        Dim cellCount = Math.Min(redOptions.identifyCount, redCells.Count)
+        If task.heartBeat Then labels(2) = $"{redCells.Count} cells identified and the largest {cellCount} are numbered below."
         setSelectedContour(redCells, cellMap)
         identifyCells(redCells)
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
     End Sub
 End Class
 
@@ -203,7 +183,7 @@ Public Class Flood_TopX : Inherits VB_Algorithm
         flood.Run(src)
         dst3 = flood.dst2
 
-        Dim rc As New rcData
+        Dim rc As New rcDataOld
         If task.motionFlag Or task.optionsChanged Then dst2.SetTo(0)
         Dim rcCount = Math.Min(flood.redCells.Count, topXslider.Value)
 
@@ -228,7 +208,7 @@ End Class
 
 Public Class Flood_PointList : Inherits VB_Algorithm
     Public pointList As New List(Of cv.Point)
-    Public redCells As New List(Of rcData)
+    Public redCells As New List(Of rcDataOld)
     Public cellMap As cv.Mat
     Public options As New Options_Flood
     Dim reduction As New Reduction_Basics
@@ -263,12 +243,12 @@ Public Class Flood_PointList : Inherits VB_Algorithm
         Dim rect As New cv.Rect
 
         Dim totalPixels As Integer
-        Dim SizeSorted As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim SizeSorted As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
         Dim maskPlus = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8UC1, 0)
         Dim index = 1
         For Each pt In pointList
             Dim floodFlag = cv.FloodFillFlags.FixedRange Or (index << 8)
-            Dim rc = New rcData
+            Dim rc = New rcDataOld
             rc.pixels = cv.Cv2.FloodFill(dst0, maskPlus, pt, 255, rc.rect, 0, 0, floodFlag)
             If rc.pixels >= options.minPixels And rc.rect.Width < dst2.Width And rc.rect.Height < dst2.Height And
                rc.rect.Width > 0 And rc.rect.Height > 0 Then
@@ -284,17 +264,17 @@ Public Class Flood_PointList : Inherits VB_Algorithm
         labels(2) = CStr(SizeSorted.Count) + " regions were found with " + Format(totalPixels / dst0.Total, "0%") + " pixels flooded"
 
         Dim lastcellMap = cellMap.Clone
-        Dim lastCells = New List(Of rcData)(redCells)
+        Dim lastCells = New List(Of rcDataOld)(redCells)
         cellMap.SetTo(0)
         redCells.Clear()
-        redCells.Add(New rcData) ' stay away from 0...
+        redCells.Add(New rcDataOld) ' stay away from 0...
 
         dst2.SetTo(0)
         Dim usedColors As New List(Of cv.Vec3b)({black})
         For i = 0 To SizeSorted.Count - 1
             Dim rc = SizeSorted.ElementAt(i).Value
             rc.index = redCells.Count
-            Dim lrc = If(lastCells.Count > 0, lastCells(lastcellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)), New rcData)
+            Dim lrc = If(lastCells.Count > 0, lastCells(lastcellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)), New rcDataOld)
             rc.indexLast = lrc.index
             rc.color = lrc.color
             If usedColors.Contains(rc.color) Then rc.color = randomCellColor()
@@ -318,7 +298,7 @@ End Class
 Public Class Flood_FeaturelessHulls : Inherits VB_Algorithm
     Public classCount As Integer
     Dim redC As New RedCloud_Basics
-    Dim redCells As New List(Of rcData)
+    Dim redCells As New List(Of rcDataOld)
     Public Sub New()
         redOptions.UseColor.Checked = True
         labels = {"", "", "", "Palette output of image at left"}
@@ -359,7 +339,7 @@ Public Class Flood_Tiers : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
     Dim tiers As New Contour_DepthTiers
     Dim plot As New Plot_Histogram
-    Public redCells As New List(Of rcData)
+    Public redCells As New List(Of rcDataOld)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         plot.removeZeroEntry = False
@@ -431,7 +411,7 @@ Public Class Flood_ByColorWithinDepth : Inherits VB_Algorithm
     Dim tiers As New Contour_DepthTiers
     Dim floodMask As New Flood_BasicsMask
     Dim binar4 As New Binarize_Split4
-    Public redCells As New List(Of rcData)
+    Public redCells As New List(Of rcDataOld)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -448,7 +428,7 @@ Public Class Flood_ByColorWithinDepth : Inherits VB_Algorithm
         tiers.Run(src)
 
         floodMask.binarizedImage = binar4.dst3
-        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim sortedCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
         For i = 1 To tiers.contourlist.Count - 1
             dst1 = tiers.dst2.InRange(i, i)
             floodMask.inputMask = Not dst1
@@ -463,7 +443,7 @@ Public Class Flood_ByColorWithinDepth : Inherits VB_Algorithm
         dst2.SetTo(0)
         cellMap.SetTo(0)
         redCells.Clear()
-        redCells.Add(New rcData)
+        redCells.Add(New rcDataOld)
         For Each rc In sortedCells.Values
             Dim val = cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If val = 0 Then
@@ -491,7 +471,7 @@ End Class
 Public Class Flood_Cell : Inherits VB_Algorithm
     Dim tiers As New Contour_DepthTiers
     Dim floodMask As New Flood_BasicsMask
-    Dim redCells As New List(Of rcData)
+    Dim redCells As New List(Of rcDataOld)
     Dim cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         redOptions.DesiredCellSlider.Value = 250
@@ -555,7 +535,7 @@ Public Class Flood_ColorAndTiers : Inherits VB_Algorithm
     Public tiers As New Depth_TiersZ
     Public colorC As New Color_Basics
     Public Sub New()
-        labels = {"", "", "Mask for the selected tier.  Use debugslider to select other tiers.", "Color source input"}
+        redOptions.ColorSource.SelectedItem() = "Binarize_Split4"
         desc = "Build the tiers output and the color source output for use with other flood algorithms."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -571,8 +551,10 @@ Public Class Flood_ColorAndTiers : Inherits VB_Algorithm
 
         labels(2) = tiers.labels(2)
 
-        redOptions.ColorSource.SelectedItem() = "Binarize_Split4"
         colorC.Run(src)
         dst3 = colorC.dst3
+
+        labels(2) = "Depth_TiersZ output for tier " + CStr(gOptions.DebugSlider.Value)
+        labels(3) = "Color source selected = " + redOptions.colorInputName
     End Sub
 End Class

@@ -201,7 +201,7 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
 
         Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
         Static lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
-        Static lastredCells As New List(Of rcData)
+        Static lastredCells As New List(Of rcDataOld)
         pixelVector.Clear()
         distances.Clear()
         For i = 0 To redC.redCells.Count - 1
@@ -264,7 +264,7 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
             lastDistances.Add(el.Key, el.Value)
         Next
 
-        lastredCells = New List(Of rcData)(redC.redCells)
+        lastredCells = New List(Of rcDataOld)(redC.redCells)
     End Sub
 End Class
 
@@ -275,7 +275,7 @@ End Class
 Public Class Distance_D3Cells : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
-    Public d3Cells As New List(Of rcData)
+    Public d3Cells As New List(Of rcDataOld)
     Public Sub New()
         redOptions.UseColor.Checked = True
         redOptions.HistBinSlider.Value = 5
@@ -289,7 +289,7 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
 
         d3Cells.Clear()
         For i = 0 To redC.redCells.Count - 1
-            Dim rm As New rcData
+            Dim rm As New rcDataOld
             Dim rc = redC.redCells(i)
             rm.mask = rc.mask
             rm.rect = rc.rect

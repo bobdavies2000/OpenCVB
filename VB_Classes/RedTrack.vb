@@ -12,7 +12,7 @@ Public Class RedTrack_Basics : Inherits VB_Algorithm
         stats.Run(src)
         labels = stats.labels
         dst2.SetTo(0)
-        For Each rc As rcData In redC.redCells
+        For Each rc As rcDataOld In redC.redCells
             vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
             If rc.index = task.rc.index Then vbDrawContour(dst2(rc.rect), rc.contour, cv.Scalar.White, -1)
         Next
@@ -202,7 +202,7 @@ Public Class RedTrack_GoodCells : Inherits VB_Algorithm
         good.Run(src)
         dst3.SetTo(0)
         dst0 = src
-        Dim trackCells As New List(Of rcData)
+        Dim trackCells As New List(Of rcDataOld)
         Dim trackIndex As New List(Of Integer)
         For Each pt In good.featureList
             Dim index = hulls.redC.cellMap.Get(Of Byte)(pt.Y, pt.X)
