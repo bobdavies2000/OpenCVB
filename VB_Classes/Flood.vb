@@ -384,83 +384,6 @@ End Class
 
 
 
-Public Class Flood_Stats : Inherits VB_Algorithm
-    Dim flood As New Flood_ByColorWithinDepth
-    Dim stats As New Cell_Basics
-    Public Sub New()
-        desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        flood.Run(src)
-
-        stats.Run(src)
-        dst0 = stats.dst0
-        dst1 = stats.dst1
-        dst2 = flood.dst2
-        setTrueText(stats.strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Flood_ByColorWithinDepth : Inherits VB_Algorithm
-    Dim tiers As New Contour_DepthTiers
-    Dim floodMask As New Flood_BasicsMask
-    Dim binar4 As New Binarize_Split4
-    Public redCells As New List(Of rcDataNew)
-    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        desc = "Flood the color image by tiers"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        binar4.Run(src)
-
-        tiers.Run(src)
-
-        floodMask.binarizedImage = binar4.dst3
-        Dim sortedCells As New SortedList(Of Integer, rcDataNew)(New compareAllowIdenticalIntegerInverted)
-        For i = 1 To tiers.contourlist.Count - 1
-            dst1 = tiers.dst2.InRange(i, i)
-            floodMask.inputMask = Not dst1
-            dst0.SetTo(0)
-            binar4.dst2.CopyTo(dst0, dst1)
-            floodMask.Run(dst0)
-            For Each rc In floodMask.redCells
-                sortedCells.Add(rc.pixels, rc)
-            Next
-        Next
-
-        dst2.SetTo(0)
-        cellMap.SetTo(0)
-        redCells.Clear()
-        redCells.Add(New rcDataNew)
-        For Each rc In sortedCells.Values
-            Dim val = cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            If val = 0 Then
-                rc.index = redCells.Count
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
-                cellMap(rc.rect).SetTo(rc.index, rc.mask)
-                redCells.Add(rc)
-                If redCells.Count >= 250 Then Exit For
-            End If
-        Next
-        dst3 = vbPalette(cellMap)
-        labels(2) = $"{redCells.Count} cells were identified."
-        setSelectedContour(redCells, cellMap)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 Public Class Flood_Cell : Inherits VB_Algorithm
@@ -591,5 +514,83 @@ Public Class Flood_NeighborContains : Inherits VB_Algorithm
         Next
 
         identifyCells(redCells)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Flood_Stats : Inherits VB_Algorithm
+    Dim flood As New Flood_ByColorWithinDepth
+    Dim stats As New Cell_Basics
+    Public Sub New()
+        desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        flood.Run(src)
+
+        stats.Run(src)
+        dst0 = stats.dst0
+        dst1 = stats.dst1
+        dst2 = flood.dst2
+        setTrueText(stats.strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Flood_ByColorWithinDepth : Inherits VB_Algorithm
+    Dim tiers As New Depth_TiersZ
+    Dim floodMask As New Flood_BasicsMask
+    Dim binar4 As New Binarize_Split4
+    Public redCells As New List(Of rcDataNew)
+    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        desc = "Flood the color image by tiers"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binar4.Run(src)
+
+        tiers.Run(src)
+
+        floodMask.binarizedImage = binar4.dst3
+        Dim sortedCells As New SortedList(Of Integer, rcDataNew)(New compareAllowIdenticalIntegerInverted)
+        For i = 1 To tiers.classCount - 1
+            If i = 1 Then
+                dst1 = tiers.dst2.InRange(0, 1)
+            Else
+                dst1 = tiers.dst2.InRange(i, i)
+            End If
+            floodMask.inputMask = Not dst1
+            dst0.SetTo(0)
+            binar4.dst2.CopyTo(dst0, dst1)
+            floodMask.Run(dst0)
+            For Each rc In floodMask.redCells
+                sortedCells.Add(rc.pixels, rc)
+            Next
+        Next
+
+        dst2.SetTo(0)
+        cellMap.SetTo(0)
+        redCells.Clear()
+        redCells.Add(New rcDataNew)
+        For Each rc In sortedCells.Values
+            rc.index = redCells.Count
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            redCells.Add(rc)
+            If redCells.Count >= 250 Then Exit For
+        Next
+        labels(2) = $"{redCells.Count} cells were identified."
+        setSelectedContour(redCells, cellMap)
     End Sub
 End Class

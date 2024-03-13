@@ -12,8 +12,8 @@ Public Class Depth_Basics : Inherits VB_Algorithm
         dst2 = task.pcSplit(2)
 
         task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
-        'task.maxDepthMask = task.pcSplit(2).ConvertScaleAbs().InRange(task.maxZmeters, task.maxZmeters)
-        'dst3 = task.maxDepthMask
+        task.maxDepthMask = task.pcSplit(2).ConvertScaleAbs().InRange(task.maxZmeters, task.maxZmeters)
+        If standalone Then dst3 = task.maxDepthMask
         setTrueText(gMatrixToStr(task.gMatrix), 3)
 
         colorizer.Run(task.pcSplit(2))
@@ -786,7 +786,7 @@ Public Class Depth_MaxMask : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst2 = src
-        task.maxDepthMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
+
         dst2.SetTo(cv.Scalar.White, task.maxDepthMask)
         contour.Run(task.maxDepthMask)
         dst3.SetTo(0)
@@ -1449,33 +1449,6 @@ End Class
 
 
 
-Public Class Depth_TiersZ : Inherits VB_Algorithm
-    Public classCount As Integer
-    Dim options As New Options_Contours
-    Public Sub New()
-        vbAddAdvice(traceName + ": gOptions 'Max Depth (meters)' and local options for cm's per tier.")
-        desc = "Create a reduced image of the depth data to define tiers of similar values"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static cmSlider = findSlider("cm's per tier")
-        Dim cmTier = cmSlider.value
-
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-        dst1 = (src * 100 / cmTier).toMat
-        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
-
-        classCount = task.maxZmeters * 100 / cmTier
-
-        dst3 = vbPalette(dst2 * 255 / classCount)
-        labels(2) = $"{classCount} regions found."
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class Depth_WorldXYZ_MT : Inherits VB_Algorithm
@@ -1608,5 +1581,34 @@ Public Class Depth_ByColorWithinDepth : Inherits VB_Algorithm
         Else
             dst3 = task.pointCloud
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Depth_TiersZ : Inherits VB_Algorithm
+    Public classCount As Integer
+    Dim options As New Options_Contours
+    Public Sub New()
+        vbAddAdvice(traceName + ": gOptions 'Max Depth (meters)' and local options for cm's per tier.")
+        desc = "Create a reduced image of the depth data to define tiers of similar values"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static cmSlider = findSlider("cm's per tier")
+        Dim cmTier = cmSlider.value
+
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        dst1 = (src * 100 / cmTier).toMat
+        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+
+        classCount = task.maxZmeters * 100 / cmTier + 1
+
+        dst3 = vbPalette(dst2 * 255 / classCount)
+        labels(2) = $"{classCount} regions found."
     End Sub
 End Class

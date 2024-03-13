@@ -48,8 +48,8 @@ Public Class VBtask : Implements IDisposable
     Public disparityAdjustment As Single ' adjusts for resolution and some hidden elements.
 
     Public motionRect As cv.Rect
-    Public motionFlag As Boolean ' any motion
-    Public motionDetected As Boolean ' scene motion only, not camera motion.
+    Public motionFlag As Boolean
+    Public motionDetected As Boolean
 
     ' add any global algorithms here
     Public PixelViewer As Pixel_Viewer
@@ -539,9 +539,9 @@ Public Class VBtask : Implements IDisposable
             If task.motionDetected Or heartBeat Then
                 task.pcSplit = task.pointCloud.Split
 
-                'If task.optionsChanged Then task.maxDepthMask.SetTo(0)
-                'task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
-                ' task.maxDepthMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
+                If task.optionsChanged Then task.maxDepthMask.SetTo(0)
+                task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
+                task.maxDepthMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
 
                 task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
                 task.noDepthMask = Not task.depthMask
