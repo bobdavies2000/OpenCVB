@@ -2747,120 +2747,6 @@ End Class
 
 
 
-Public Class RedCloud_GenCellsNew : Inherits VB_Algorithm
-    Public classCount As Integer
-    Public rectData As cv.Mat
-    Public floodPointData As cv.Mat
-    Public sizeData As cv.Mat
-    Public redCells As New List(Of rcDataOld)
-    Public Sub New()
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0) ' this will be the cellmap
-        desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
-    End Sub
-    Private Function rcCreate(rc As rcDataOld) As rcDataOld
-        rc.depthMask = rc.mask.Clone
-        rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-        vbDrawContour(rc.mask, rc.contour, 255, -1)
-
-        rc.maxDist = vbGetMaxDist(rc)
-
-        If rc.color = black Then
-            rc.maxDStable = rc.maxDist ' assume it has to use the latest.
-            Dim indexLast = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            If indexLast > 0 And indexLast < redCells.Count Then
-                Dim lrc = redCells(indexLast)
-                rc.color = lrc.color
-
-                Dim stableCheck = dst3.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
-                If stableCheck = indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
-            Else
-                rc.color = randomCellColor()
-            End If
-        End If
-
-        rc.pixels = rc.mask.CountNonZero
-        Return rc
-    End Function
-    Public Sub RunVB(src As cv.Mat)
-        If standalone Then
-            setTrueText("Several algorithms use this algorithm to generate the redCells.  It has no output when run standalone.")
-            Exit Sub
-        End If
-
-        Dim newCells As New List(Of rcDataOld)
-        Dim usedColors As New List(Of cv.Vec3b)
-        Dim rebuildCount As Integer
-        For i = 1 To classCount - 1
-            Dim rc As New rcDataOld
-            rc.index = newCells.Count + 1
-            rc.rect = rectData.Get(Of cv.Rect)(i - 1, 0)
-            rc.mask = src(rc.rect).InRange(i, i)
-            rc.floodPoint = floodPointData.Get(Of cv.Point)(i - 1, 0)
-
-
-
-
-            'Dim size = sizeData.Get(Of Integer)(i - 1, 0)
-            'Dim testMat = src.InRange(i, i)
-            'Dim testCount = testMat.CountNonZero
-            'If testCount <> size Then Dim k = 0
-            'rc.pixels = rc.mask.CountNonZero
-            'If rc.pixels <> size Then Dim k = 0
-
-
-
-
-            rc = rcCreate(rc)
-
-            If usedColors.Contains(rc.color) Then
-                Dim index = usedColors.IndexOf(rc.color)
-                Dim rcPrev = newCells(index)
-                rcPrev.rect = rcPrev.rect.Union(rc.rect)
-                src(rc.rect).SetTo(rcPrev.index, rc.mask)
-                rcPrev.mask = src(rcPrev.rect).InRange(rcPrev.index, rcPrev.index)
-                newCells(index) = rcCreate(rcPrev)
-                rebuildCount += 1
-                Continue For
-            End If
-
-            usedColors.Add(rc.color)
-            newCells.Add(rc)
-        Next
-
-        Dim sortedCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
-        For Each rc In newCells
-            If rc.pixels = 0 Then Continue For
-            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
-            rc.depthPixels = rc.depthMask.CountNonZero
-            rc.depthCell = rc.depthPixels > 0
-
-            If rc.depthPixels Then
-                task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
-                task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
-                task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
-
-                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
-            End If
-            sortedCells.Add(rc.pixels, rc)
-        Next
-
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        redCells.Clear()
-        redCells.Add(New rcDataOld)
-        For Each rc In sortedCells.Values
-            rc.index = redCells.Count
-            redCells.Add(rc)
-            dst3(rc.rect).SetTo(rc.index, rc.mask)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-        Next
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class RedCloud_Mask : Inherits VB_Algorithm
     Public inputMask As cv.Mat
@@ -2933,5 +2819,291 @@ Public Class RedCloud_MaskNone : Inherits VB_Algorithm
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_GenCellsNew1 : Inherits VB_Algorithm
+    Public classCount As Integer
+    Public rectData As cv.Mat
+    Public floodPointData As cv.Mat
+    Public sizeData As cv.Mat
+    Public redCells As New List(Of rcDataNew)
+    Public Sub New()
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0) ' this will be the cellmap
+        desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
+    End Sub
+    Private Function rcCreate(rc As rcDataNew) As rcDataNew
+        rc.depthMask = rc.mask.Clone
+        rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+        vbDrawContour(rc.mask, rc.contour, 255, -1)
+
+        rc.maxDist = vbGetMaxDist(rc)
+
+        If rc.color = black Then
+            rc.maxDStable = rc.maxDist ' assume it has to use the latest.
+            Dim indexLast = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If indexLast > 0 And indexLast < redCells.Count Then
+                Dim lrc = redCells(indexLast)
+                rc.color = lrc.color
+
+                Dim stableCheck = dst3.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
+                If stableCheck = indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+            Else
+                rc.color = randomCellColor()
+            End If
+        End If
+
+        rc.pixels = rc.mask.CountNonZero
+        Return rc
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then
+            setTrueText("Several algorithms use this algorithm to generate the redCells.  It has no output when run standalone.")
+            Exit Sub
+        End If
+
+        Dim newCells As New List(Of rcDataNew)
+        Dim usedColors As New List(Of cv.Vec3b)
+        Dim rebuildCount As Integer
+        For i = 1 To classCount - 1
+            Dim rc As New rcDataNew
+            rc.index = newCells.Count + 1
+            rc.rect = rectData.Get(Of cv.Rect)(i - 1, 0)
+            rc.mask = src(rc.rect).InRange(i, i)
+            rc.floodPoint = floodPointData.Get(Of cv.Point)(i - 1, 0)
+
+            rc = rcCreate(rc)
+
+            If usedColors.Contains(rc.color) Then
+                Dim index = usedColors.IndexOf(rc.color)
+                Dim rcPrev = newCells(index)
+                rcPrev.rect = rcPrev.rect.Union(rc.rect)
+                src(rc.rect).SetTo(rcPrev.index, rc.mask)
+                rcPrev.mask = src(rcPrev.rect).InRange(rcPrev.index, rcPrev.index)
+                newCells(index) = rcCreate(rcPrev)
+                rebuildCount += 1
+                Continue For
+            End If
+
+            usedColors.Add(rc.color)
+            newCells.Add(rc)
+        Next
+
+        Dim sortedCells As New SortedList(Of Integer, rcDataNew)(New compareAllowIdenticalIntegerInverted)
+        For Each rc In newCells
+            If rc.pixels = 0 Then Continue For
+            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
+            rc.depthPixels = rc.depthMask.CountNonZero
+            rc.depthCell = rc.depthPixels > 0
+
+            If rc.depthPixels Then
+                task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
+                task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
+                task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
+
+                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
+            End If
+            sortedCells.Add(rc.pixels, rc)
+        Next
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        redCells.Clear()
+        redCells.Add(New rcDataNew)
+        For Each rc In sortedCells.Values
+            rc.index = redCells.Count
+            redCells.Add(rc)
+            dst3(rc.rect).SetTo(rc.index, rc.mask)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_GenCellsNew2 : Inherits VB_Algorithm
+    Public classCount As Integer
+    Public rectData As cv.Mat
+    Public floodPointData As cv.Mat
+    Public sizeData As cv.Mat
+    Public redCells As New List(Of rcDataNew)
+    Public Sub New()
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0) ' this will be the cellmap
+        desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then
+            setTrueText("Several algorithms use this algorithm to generate the redCells.  It has no output when run standalone.")
+            Exit Sub
+        End If
+
+        Dim sortedCells As New SortedList(Of Integer, rcDataNew)(New compareAllowIdenticalIntegerInverted)
+        For i = 1 To classCount - 1
+            Dim rc As New rcDataNew
+            rc.index = sortedCells.Count + 1
+            rc.rect = rectData.Get(Of cv.Rect)(i - 1, 0)
+            rc.mask = src(rc.rect).InRange(i, i)
+            rc.floodPoint = floodPointData.Get(Of cv.Point)(i - 1, 0)
+
+            rc.depthMask = rc.mask.Clone
+            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            vbDrawContour(rc.mask, rc.contour, 255, -1)
+
+            rc.maxDist = vbGetMaxDist(rc)
+
+            If rc.color = black Then
+                rc.maxDStable = rc.maxDist ' assume it has to use the latest.
+                Dim indexLast = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If indexLast > 0 And indexLast < redCells.Count Then
+                    Dim lrc = redCells(indexLast)
+                    rc.color = lrc.color
+
+                    Dim stableCheck = dst3.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
+                    If stableCheck = indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+                Else
+                    rc.color = randomCellColor()
+                End If
+            End If
+
+            rc.pixels = rc.mask.CountNonZero
+            If rc.pixels = 0 Then Continue For
+            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
+            rc.depthPixels = rc.depthMask.CountNonZero
+            rc.depthCell = rc.depthPixels > 0
+
+            If rc.depthPixels Then
+                task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
+                task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
+                task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
+
+                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
+            End If
+            sortedCells.Add(rc.pixels, rc)
+        Next
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        redCells.Clear()
+        redCells.Add(New rcDataNew)
+        For Each rc In sortedCells.Values
+            rc.index = redCells.Count
+            redCells.Add(rc)
+            dst3(rc.rect).SetTo(rc.index, rc.mask)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_GenCellsNew : Inherits VB_Algorithm
+    Public classCount As Integer
+    Public rectData As cv.Mat
+    Public floodPointData As cv.Mat
+    Public sizeData As cv.Mat
+    Public redCells As New List(Of rcDataNew)
+    Public Sub New()
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0) ' this will be the cellmap
+        desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
+    End Sub
+    Private Function rcCreate(rc As rcDataNew) As rcDataNew
+        rc.depthMask = rc.mask.Clone
+        rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+        vbDrawContour(rc.mask, rc.contour, 255, -1)
+
+        rc.maxDist = vbGetMaxDist(rc)
+
+        If rc.color = black Then
+            rc.maxDStable = rc.maxDist ' assume it has to use the latest.
+            Dim indexLast = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If indexLast > 0 And indexLast < redCells.Count Then
+                Dim lrc = redCells(indexLast)
+                rc.color = lrc.color
+
+                Dim stableCheck = dst3.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
+                If stableCheck = indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+            Else
+                rc.color = randomCellColor()
+            End If
+        End If
+
+        rc.pixels = rc.mask.CountNonZero
+        Return rc
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then
+            setTrueText("Several algorithms use this algorithm to generate the redCells.  It has no output when run standalone.")
+            Exit Sub
+        End If
+
+        Dim newCells As New List(Of rcDataNew)
+        Dim usedColors As New List(Of cv.Vec3b)
+        Dim rebuildCount As Integer
+        For i = 1 To classCount - 1
+            Dim rc As New rcDataNew
+            rc.index = newCells.Count + 1
+            rc.rect = rectData.Get(Of cv.Rect)(i - 1, 0)
+            rc.mask = src(rc.rect).InRange(i, i)
+            rc.floodPoint = floodPointData.Get(Of cv.Point)(i - 1, 0)
+
+            rc = rcCreate(rc)
+
+            If usedColors.Contains(rc.color) Then
+                Dim index = usedColors.IndexOf(rc.color)
+                Dim rcPrev = newCells(index)
+                rcPrev.rect = rcPrev.rect.Union(rc.rect)
+                src(rc.rect).SetTo(rcPrev.index, rc.mask)
+                rcPrev.mask = src(rcPrev.rect).InRange(rcPrev.index, rcPrev.index)
+                newCells(index) = rcCreate(rcPrev)
+                rebuildCount += 1
+                Continue For
+            End If
+
+            usedColors.Add(rc.color)
+            newCells.Add(rc)
+        Next
+
+        Dim sortedCells As New SortedList(Of Integer, rcDataNew)(New compareAllowIdenticalIntegerInverted)
+        For Each rc In newCells
+            If rc.pixels = 0 Then Continue For
+            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
+            rc.depthPixels = rc.depthMask.CountNonZero
+            rc.depthCell = rc.depthPixels > 0
+
+            If rc.depthPixels Then
+                task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
+                task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
+                task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
+
+                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
+            End If
+            sortedCells.Add(rc.pixels, rc)
+        Next
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        redCells.Clear()
+        redCells.Add(New rcDataNew)
+        For Each rc In sortedCells.Values
+            rc.index = redCells.Count
+            redCells.Add(rc)
+            dst3(rc.rect).SetTo(rc.index, rc.mask)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+        Next
     End Sub
 End Class

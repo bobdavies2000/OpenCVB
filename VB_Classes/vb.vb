@@ -322,6 +322,16 @@ Module VB
 
         Return mm.maxLoc
     End Function
+    Public Function vbGetMaxDist(ByRef rc As rcDataNew) As cv.Point
+        Dim mask = rc.mask.Clone
+        mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+        Dim mm As mmData = vbMinMax(distance32f)
+        mm.maxLoc.X += rc.rect.X
+        mm.maxLoc.Y += rc.rect.Y
+
+        Return mm.maxLoc
+    End Function
     Public Function vbContourToRect(contour As List(Of cv.Point)) As cv.Rect
         Dim minX As Integer = Integer.MaxValue, minY As Integer = Integer.MaxValue, maxX As Integer, maxY As Integer
         For Each pt In contour
@@ -756,7 +766,7 @@ Public Class rcDataOld
     Public depthMask As cv.Mat
     Public depthMean As cv.Scalar
     Public depthStdev As cv.Scalar
-
+    Public depthCell As Boolean ' true if cell has depth.
 
     Public minVec As cv.Point3f
     Public maxVec As cv.Point3f
@@ -786,7 +796,6 @@ Public Class rcDataOld
     Public histList As List(Of Single)
 
     Public floodPoint As cv.Point
-    Public depthCell As Boolean ' true if cell has depth.
 
     Public eq As cv.Vec4f ' plane equation
     Public pcaVec As cv.Vec3f
@@ -817,12 +826,19 @@ Public Class rcDataNew
     Public depthMask As cv.Mat
     Public depthMean As cv.Scalar
     Public depthStdev As cv.Scalar
+    Public depthCell As Boolean
+
+    Public minVec As cv.Point3f
+    Public maxVec As cv.Point3f
+    Public minLoc As cv.Point
+    Public maxLoc As cv.Point
 
     Public maxDist As cv.Point
     Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
 
     Public index As Integer
     Public nabs As New List(Of Integer)
+    Public contains As New List(Of Integer)
 
     Public contour As New List(Of cv.Point)
 

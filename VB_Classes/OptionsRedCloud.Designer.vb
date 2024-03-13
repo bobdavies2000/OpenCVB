@@ -584,7 +584,7 @@ Partial Class OptionsRedCloud
         Me.IdentifyCountSlider.Size = New System.Drawing.Size(506, 69)
         Me.IdentifyCountSlider.TabIndex = 31
         Me.IdentifyCountSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.IdentifyCountSlider.Value = 20
+        Me.IdentifyCountSlider.Value = 10
         '
         'IdentifyCountLabel
         '
