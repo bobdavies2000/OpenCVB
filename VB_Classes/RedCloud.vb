@@ -2470,26 +2470,6 @@ End Class
 
 
 
-
-Public Class RedCloud_Color : Inherits VB_Algorithm
-    Public redC As New RedCloud_Basics
-    Public Sub New()
-        redOptions.UseColor.Checked = True  ' <<<<<<< this is what is different.
-        desc = "This is just a placeholder to help find the color only output of RedCloud.  Alternative is Flood_Basics/Flood_ByColorWithinDepths"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-        identifyCells(redC.redCells)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class RedCloud_Hue : Inherits VB_Algorithm
     Dim redC As New RedCloud_BasicsMask
     Dim hue As New Color_Hue
@@ -2826,7 +2806,7 @@ End Class
 
 Public Class RedCloud_GenCellContains : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
-    Dim contains As New Flood_NeighborContains
+    Dim contains As New Flood_ContainedCells
     Public redCells As New List(Of rcDataNew)
     Public Sub New()
         desc = "Merge cells contained in the top X cells and remove all other cells."
@@ -2999,7 +2979,7 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
     Public cellLimit As Integer = 255
     Public matchCount As Integer
     Public Sub New()
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0) ' this will be the cellmap
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0) ' this will be the cellmap
         desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -3018,6 +2998,7 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
             rc.rect = rectData.Get(Of cv.Rect)(i - 1, 0)
             rc.mask = src(rc.rect).InRange(i, i)
             rc.floodPoint = floodPointData.Get(Of cv.Point)(i - 1, 0)
+            rc.pixels = sizeData.Get(Of Integer)(i - 1, 0)
 
             rc.depthMask = rc.mask.Clone
             rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
@@ -3029,6 +3010,9 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
             If rc.color = black Then
                 rc.maxDStable = rc.maxDist ' assume it has to use the latest.
                 Dim indexLast = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                'If indexLast = 0 And rc.pixels > 20 Then
+                '    indexLast = vbMinMax((dst3(rc.rect) And rc.mask).ToMat).maxVal
+                'End If
                 If indexLast > 0 And indexLast < redCells.Count Then
                     Dim lrc = redCells(indexLast)
                     rc.color = lrc.color

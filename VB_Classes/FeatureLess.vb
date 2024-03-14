@@ -279,36 +279,6 @@ End Class
 
 
 
-Public Class FeatureLess_Density : Inherits VB_Algorithm
-    Dim edgeD As New EdgeDraw_Basics
-    Dim density As New Density_Mask
-    Dim flood As New Flood_PointList
-    Public Sub New()
-        desc = "Use density regions as input points to floodfill"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        edgeD.Run(src)
-
-        density.Run(edgeD.dst2)
-        dst3 = density.dst3
-
-        flood.pointList = New List(Of cv.Point)(density.pointList)
-        flood.Run(src)
-        dst2 = flood.dst2
-
-        labels(2) = CStr(flood.pointList.Count) + " points found " + CStr(flood.redCells.Count) + " regions "
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
 Public Class FeatureLess_Edge_CPP : Inherits VB_Algorithm
     Dim cpp As New CPP_Basics
     Public Sub New()

@@ -157,7 +157,7 @@ End Class
 
 Public Class Boundary_RedCloud : Inherits VB_Algorithm
     Dim bestBound As New Boundary_RemovedRects
-    Dim flood As New Flood_Basics
+    Dim flood As New Flood_Split4
     Public Sub New()
         desc = "Build the RedCloud cells with the best boundaries"
     End Sub

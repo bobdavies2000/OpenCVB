@@ -45,36 +45,6 @@ End Class
 
 
 
-' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
-Public Class CamShift_Foreground : Inherits VB_Algorithm
-    Dim camshift As New CamShift_Basics
-    Dim fore As New Depth_Foreground
-    Dim flood As New Flood_PointList
-    Public Sub New()
-        labels(2) = "Draw anywhere to start Camshift"
-        labels(3) = "The foreground BGR from depth data"
-        desc = "Use depth to isolate foreground for use with camshift demo."
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        dst0.SetTo(cv.Scalar.All(1))
-        fore.Run(src)
-        src.CopyTo(dst0, fore.dst2)
-        flood.Run(dst0)
-        If flood.redCells.Count > 1 Then
-            Dim rc = flood.redCells(1)
-            If camshift.trackBox.Size.Width / dst2.Width < 0.5 Then task.drawRect = rc.rect
-            camshift.Run(src)
-            dst2 = camshift.dst2
-            dst3 = camshift.dst3
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class CamShift_RedHue : Inherits VB_Algorithm
     Dim options As New Options_CamShift

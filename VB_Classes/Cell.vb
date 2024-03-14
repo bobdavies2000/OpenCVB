@@ -544,3 +544,59 @@ End Class
 
 
 
+
+Public Class Cell_BasicsNew : Inherits VB_Algorithm
+    Dim plot As New Histogram_DepthNew
+    Public runRedCloud As Boolean
+    Public Sub New()
+        If standaloneTest() Then gOptions.HistBinSlider.Value = 20
+        desc = "Display the statistics for the selected cell."
+    End Sub
+    Public Sub statsString(src As cv.Mat)
+        Dim tmp = New cv.Mat(task.rcNew.mask.Rows, task.rcNew.mask.Cols, cv.MatType.CV_32F, 0)
+        task.pcSplit(2)(task.rcNew.rect).CopyTo(tmp, task.rcNew.mask)
+        plot.rc = task.rcNew
+        plot.Run(tmp)
+        dst1 = plot.dst2
+
+        Dim rc = task.rcNew
+
+        Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+        strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbCrLf
+        strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
+        strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbTab + "rc.color = " + rc.color.ToString() + vbCrLf
+        strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + ", " + CStr(rc.maxDist.Y) + vbTab + "Pixels = " + CStr(rc.pixels) + vbCrLf
+
+        strOut += "Cell is marked as depthCell = " + CStr(rc.depthCell) + vbCrLf
+        If rc.depthPixels > 0 Then
+            strOut += "rc.pixels " + CStr(rc.pixels) + vbTab + "rc.depthPixels = " + CStr(rc.depthPixels) +
+                  " or " + Format(rc.depthPixels / rc.pixels, "0%") + " depth " + vbCrLf
+        Else
+            strOut += "rc.pixels " + CStr(rc.pixels) + " - no depth data" + vbCrLf
+        End If
+
+        strOut += "Min/Max/Range: X = " + Format(rc.minVec.X, fmt1) + "/" + Format(rc.maxVec.X, fmt1)
+        strOut += "/" + Format(rc.maxVec.X - rc.minVec.X, fmt1) + vbTab
+
+        strOut += "Y = " + Format(rc.minVec.Y, fmt1) + "/" + Format(rc.maxVec.Y, fmt1)
+        strOut += "/" + Format(rc.maxVec.Y - rc.minVec.Y, fmt1) + vbTab
+
+        strOut += "Z = " + Format(rc.minVec.Z, fmt2) + "/" + Format(rc.maxVec.Z, fmt2)
+        strOut += "/" + Format(rc.maxVec.Z - rc.minVec.Z, fmt2) + vbCrLf + vbCrLf
+
+        strOut += "Cell Mean in 3D: x/y/z = " + vbTab + Format(rc.depthMean(0), fmt2) + vbTab
+        strOut += Format(rc.depthMean(1), fmt2) + vbTab + Format(rc.depthMean(2), fmt2) + vbCrLf
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standaloneTest() Or runRedCloud Then
+            Static redC As New RedCloud_Basics
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+        End If
+        If task.heartBeat Then statsString(src)
+
+        setTrueText(strOut, 3)
+        labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.maxZmeters)) + " meters"
+    End Sub
+End Class
