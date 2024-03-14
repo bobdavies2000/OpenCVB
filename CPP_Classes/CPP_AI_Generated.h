@@ -2464,12 +2464,12 @@ public:
         Mat* srcPtr = &src;
         if (inputMask.empty()) {
             imagePtr = RedCloud_Run(cPtr, (int *)srcPtr->data, 0, src.rows, src.cols, src.type(), 
-                                     task->desiredCells, 0, 0.98f, 0.0001f);
+                                     task->desiredCells, 0);
         }
         else {
             Mat* maskPtr = &inputMask;
             imagePtr = RedCloud_Run(cPtr, (int *)srcPtr->data, (uchar *)maskPtr->data, src.rows, src.cols,
-                                     src.type(), task->desiredCells, 0, 0.98f, 0.0001f);
+                                     src.type(), task->desiredCells, 0);
         }
         int classCount = RedCloud_Count(cPtr);
 
@@ -3268,8 +3268,6 @@ public:
     map<int, rcDataOld, compareAllowIdenticalIntegerInverted> sortedCells;
     Mat inputMask;
     int classCount;
-    float imageThresholdPercent = 0.98f;
-    float cellMinPercent = 0.0001f;
     CPP_Color_Basics* colorClass = new CPP_Color_Basics();
     RedCloud* cPtr;
     CPP_RedCloud_Basics() : algorithmCPP() {
@@ -3286,11 +3284,11 @@ public:
         int* imagePtr;
         if (!inputMask.empty()) {
             imagePtr = RedCloud_Run(cPtr, (int*)src.data, inputMask.data, src.rows, src.cols,
-                src.type(), task->desiredCells, 0, imageThresholdPercent, cellMinPercent);
+                src.type(), task->desiredCells, 0);
         }
         else {
             imagePtr = RedCloud_Run(cPtr, (int*)src.data, nullptr, src.rows, src.cols,
-                src.type(), task->desiredCells, 0, imageThresholdPercent, cellMinPercent);
+                src.type(), task->desiredCells, 0);
         }
         classCount = RedCloud_Count(cPtr);
         if (classCount == 0) return;

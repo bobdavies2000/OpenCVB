@@ -948,8 +948,7 @@ Module VB_Externs
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloud_Run(
                 cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr, rows As Integer, cols As Integer,
-                type As Integer, maxClassCount As Integer, diff As Integer, imageThresholdPercent As Single,
-                cellMinPercent As Single) As IntPtr
+                type As Integer, maxClassCount As Integer, diff As Integer) As IntPtr
     End Function
 
 
@@ -970,22 +969,6 @@ Module VB_Externs
     Public Function PlotOpenCV_Run(cPtr As IntPtr, inX As IntPtr, inY As IntPtr, inLen As Integer,
                                      rows As Integer, cols As Integer) As IntPtr
     End Function
-
-
-
-
-    '<DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloud_Open() As IntPtr
-    'End Function
-    '<DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    'Public Function RedCloud_Close(cPtr As IntPtr) As IntPtr
-    'End Function
-    '<DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    'Public Function RedCloud_Run(cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr, rows As Integer,
-    '                             cols As Integer, maxClassCount As Integer) As Integer
-    'End Function
-    '<DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    'Public Function RedCloud_FloodPointList(cPtr As IntPtr) As IntPtr
-    'End Function
 
 
 
