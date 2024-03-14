@@ -191,7 +191,6 @@ if algorithmName = "BlurMotion_Basics" Then return new BlurMotion_Basics
 if algorithmName = "BlurMotion_Deblur" Then return new BlurMotion_Deblur
 if algorithmName = "Boundary_Basics" Then return new Boundary_Basics
 if algorithmName = "Boundary_Rectangles" Then return new Boundary_Rectangles
-if algorithmName = "Boundary_RedCloud" Then return new Boundary_RedCloud
 if algorithmName = "Boundary_RemovedRects" Then return new Boundary_RemovedRects
 if algorithmName = "Boundary_Tiers" Then return new Boundary_Tiers
 if algorithmName = "BRISK_Basics" Then return new BRISK_Basics

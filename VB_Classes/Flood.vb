@@ -37,52 +37,6 @@ End Class
 
 
 
-Public Class Flood_BasicsMask : Inherits VB_Algorithm
-    Public redCells As New List(Of rcDataNew)
-    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public binarizedImage As cv.Mat
-    Public inputMask As cv.Mat
-    Dim genCells As New RedCloud_GenCells
-    Dim redCPP As New RedCloud_Mask_CPP
-    Public buildInputMask As Boolean
-    Public Sub New()
-        labels(3) = "The inputMask used to limit how much of the image is processed."
-        desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standalone Or buildInputMask Then
-            Static colorC As New Color_Basics
-            colorC.Run(src)
-            inputMask = task.maxDepthMask
-            src = colorC.dst2
-        End If
-        dst3 = inputMask
-        redCPP.inputMask = inputMask
-        redCPP.Run(src)
-
-        genCells.classCount = redCPP.classCount
-        genCells.rectData = redCPP.rectData
-        genCells.floodPointData = redCPP.floodPointData
-        genCells.sizeData = redCPP.sizeData
-        genCells.Run(redCPP.dst2)
-
-        dst2 = genCells.dst2
-        cellMap = genCells.dst3
-        redCells = genCells.redCells
-
-        Dim cellCount = Math.Min(redOptions.identifyCount, redCells.Count)
-        If task.heartBeat Then labels(2) = $"{redCells.Count} cells identified and the largest {cellCount} are numbered below.  " +
-                                            "Use the DebugSlider to show different depth tiers."
-        setSelectedContour(redCells, cellMap)
-        identifyCells(redCells)
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class Flood_Split4 : Inherits VB_Algorithm
@@ -93,11 +47,13 @@ Public Class Flood_Split4 : Inherits VB_Algorithm
     Dim redCPP As New RedCloud_MaskNone_CPP
     Public Sub New()
         vbAddAdvice(traceName + ": redOptions 'Desired RedCloud Cells' determines how many regions are isolated.")
-        desc = "Simple Floodfill each region but prepare the mask, rect, floodpoints, and pixel counts."
+        desc = "Floodfill each region and prepare redCells."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        binar4.Run(task.color) ' always run split4 to get colors for genCells.
-        If src.Channels = 1 Then src += binar4.dst2 Else src = binar4.dst2
+        If standalone Then
+            binar4.Run(task.color) ' always run split4 to get colors for genCells.
+            If src.Channels = 1 Then src += binar4.dst2 Else src = binar4.dst2
+        End If
 
         redCPP.Run(src)
 
@@ -196,44 +152,83 @@ End Class
 
 
 
-Public Class Flood_Tiers : Inherits VB_Algorithm
-    Dim flood As New Flood_Basics
-    Dim tiers As New Contour_DepthTiers
-    Dim plot As New Plot_Histogram
-    Public redCells As New List(Of rcDataOld)
+
+
+Public Class Flood_BasicsMask : Inherits VB_Algorithm
+    Public redCells As New List(Of rcDataNew)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public binarizedImage As cv.Mat
+    Public inputMask As cv.Mat
+    Dim genCells As New RedCloud_GenCells
+    Dim redCPP As New RedCloud_Mask_CPP
+    Public buildInputMask As Boolean
     Public Sub New()
-        plot.removeZeroEntry = False
-        desc = "Subdivide the Flood_Basics cells using depth tiers."
+        labels(3) = "The inputMask used to limit how much of the image is processed."
+        desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        flood.Run(src)
-        dst2 = flood.dst2
-
-        tiers.Run(src)
-
-        redCells.Clear()
-        cellMap.SetTo(0)
-        Dim ranges = {New cv.Rangef(-1, tiers.classCount + 1)}
-        For Each rc In flood.redCells
-            'rc.depthMask = rc.mask And task.depthMask(rc.rect)
-            'If rc.depthMask.CountNonZero Then
-            '    cv.Cv2.CalcHist({tiers.dst2(rc.rect)}, {0}, New cv.Mat, rc.tierHist, 1, {tiers.classCount}, ranges)
-
-            '    ReDim rc.tierHistArray(tiers.classCount - 1)
-            '    Dim samples(rc.tierHist.Total - 1) As Single
-            '    Marshal.Copy(rc.tierHist.Data, rc.tierHistArray, 0, rc.tierHistArray.Length)
-            'End If
-            'cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            'redCells.Add(rc)
-        Next
-
-        If task.rc.tierHist.Rows > 0 Then
-            plot.Run(task.rc.tierHist)
-            dst3 = plot.dst3
+        If standalone Or buildInputMask Then
+            Static colorC As New Color_Basics
+            colorC.Run(src)
+            inputMask = task.maxDepthMask
+            src = colorC.dst2
         End If
+        dst3 = inputMask
+        redCPP.inputMask = inputMask
+        redCPP.Run(src)
+
+        genCells.classCount = redCPP.classCount
+        genCells.rectData = redCPP.rectData
+        genCells.floodPointData = redCPP.floodPointData
+        genCells.sizeData = redCPP.sizeData
+        genCells.Run(redCPP.dst2)
+
+        dst2 = genCells.dst2
+        cellMap = genCells.dst3
+        redCells = genCells.redCells
+
+        Dim cellCount = Math.Min(redOptions.identifyCount, redCells.Count)
+        If task.heartBeat Then labels(2) = $"{redCells.Count} cells identified and the largest {cellCount} are numbered below."
 
         setSelectedContour(redCells, cellMap)
         identifyCells(redCells)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Flood_Tiers : Inherits VB_Algorithm
+    Dim flood As New Flood_BasicsMask
+    Dim tiers As New Depth_TiersZ
+    Dim colorC As New Color_Basics
+    Public Sub New()
+        desc = "Subdivide the Flood_Basics cells using depth tiers."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim tier = gOptions.DebugSlider.Value
+
+        tiers.Run(src)
+        If tier >= tiers.classCount Then tier = 0
+
+        If tier = 0 Then
+            dst1 = Not tiers.dst2.InRange(0, 1)
+        Else
+            dst1 = Not tiers.dst2.InRange(tier, tier)
+        End If
+
+        labels(2) = tiers.labels(2)
+
+        colorC.Run(src)
+
+        flood.inputMask = dst1
+        flood.Run(colorC.dst2)
+
+        dst2 = flood.dst2
+        dst3 = flood.dst3
+
+        setSelectedContour(flood.redCells, flood.cellMap)
+        identifyCells(flood.redCells)
     End Sub
 End Class
