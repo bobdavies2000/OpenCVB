@@ -5,7 +5,7 @@ Public Class Flood_Basics : Inherits VB_Algorithm
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim binar4 As New Binarize_Split4
     Public genCells As New RedCloud_GenCells
-    Dim redCPP As New RedCloud_MaskNone
+    Dim redCPP As New RedCloud_MaskNone_CPP
     Public Sub New()
         vbAddAdvice(traceName + ": redOptions 'Desired RedCloud Cells' determines how many regions are isolated.")
         desc = "Simple Floodfill each region but prepare the mask, rect, floodpoints, and pixel counts."
@@ -47,7 +47,7 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
     Public binarizedImage As cv.Mat
     Public inputMask As cv.Mat
     Dim genCells As New RedCloud_GenCells
-    Dim redCPP As New RedCloud_Mask
+    Dim redCPP As New RedCloud_Mask_CPP
     Public buildInputMask As Boolean
     Public Sub New()
         desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
