@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Basics : Inherits VB_Algorithm
     Dim detect As New MSER_CPP
-    Dim matchCell As New RedCloud_MatchCell
+    'Dim matchCell As New RedCloud_MatchCell
     Public cellMap As cv.Mat
     Public mserCells As New List(Of rcDataOld)
     Public boxes As New List(Of cv.Rect)
@@ -14,73 +14,73 @@ Public Class MSER_Basics : Inherits VB_Algorithm
         desc = "Create cells for each region in MSER output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If useOpAuto Then
-            Static opAuto As New OpAuto_MSER
-            opAuto.classCount = mserCells.Count
-            opAuto.Run(src)
-        End If
+        'If useOpAuto Then
+        '    Static opAuto As New OpAuto_MSER
+        '    opAuto.classCount = mserCells.Count
+        '    opAuto.Run(src)
+        'End If
 
-        detect.Run(src)
-        dst2 = detect.dst2
-        boxes = New List(Of cv.Rect)(detect.boxes)
-        floodPoints = New List(Of cv.Point)(detect.floodPoints)
+        'detect.Run(src)
+        'dst2 = detect.dst2
+        'boxes = New List(Of cv.Rect)(detect.boxes)
+        'floodPoints = New List(Of cv.Point)(detect.floodPoints)
 
-        Dim redCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To detect.boxes.Count - 1
-            Dim rc As New rcDataOld
-            rc.rect = detect.boxes(i)
-            rc.mask = detect.dst0(rc.rect).InRange(i, i)
-            rc.floodPoint = floodPoints(i)
-            redCells.Add(detect.maskCounts(i), rc)
-        Next
+        'Dim redCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
+        'For i = 0 To detect.boxes.Count - 1
+        '    Dim rc As New rcDataOld
+        '    rc.rect = detect.boxes(i)
+        '    rc.mask = detect.dst0(rc.rect).InRange(i, i)
+        '    rc.floodPoint = floodPoints(i)
+        '    redCells.Add(detect.maskCounts(i), rc)
+        'Next
 
-        If task.optionsChanged Then
-            cellMap.SetTo(0)
-            matchCell.lastCells.Clear()
-        End If
+        'If task.optionsChanged Then
+        '    cellMap.SetTo(0)
+        '    matchCell.lastCells.Clear()
+        'End If
 
-        matchCell.lastCellMap = cellMap.Clone
-        matchCell.usedColors.Clear()
-        matchCell.usedColors.Add(black)
-        matchCell.lastCells = New List(Of rcDataOld)(mserCells)
+        'matchCell.lastCellMap = cellMap.Clone
+        'matchCell.usedColors.Clear()
+        'matchCell.usedColors.Add(black)
+        'matchCell.lastCells = New List(Of rcDataOld)(mserCells)
 
-        mserCells.Clear()
-        mserCells.Add(New rcDataOld) ' "Other"
+        'mserCells.Clear()
+        'mserCells.Add(New rcDataOld) ' "Other"
 
-        cellMap.SetTo(0)
-        For Each key In redCells
-            matchCell.rc = key.Value
-            matchCell.rc.index = mserCells.Count
-            matchCell.Run(empty)
+        'cellMap.SetTo(0)
+        'For Each key In redCells
+        '    matchCell.rc = key.Value
+        '    matchCell.rc.index = mserCells.Count
+        '    matchCell.Run(empty)
 
-            Dim rc = matchCell.rc
+        '    Dim rc = matchCell.rc
 
-            mserCells.Add(rc)
+        '    mserCells.Add(rc)
 
-            If mserCells.Count = 255 Then Exit For
-        Next
+        '    If mserCells.Count = 255 Then Exit For
+        'Next
 
-        If task.paused = False Then
-            For Each rc In matchCell.lastCells
-                Dim val = detect.dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If val = 0 Then
-                    rc.index = mserCells.Count
-                    mserCells.Add(rc)
-                End If
-            Next
-        End If
+        'If task.paused = False Then
+        '    For Each rc In matchCell.lastCells
+        '        Dim val = detect.dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+        '        If val = 0 Then
+        '            rc.index = mserCells.Count
+        '            mserCells.Add(rc)
+        '        End If
+        '    Next
+        'End If
 
-        For Each rc In mserCells
-            cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            setTrueText(CStr(rc.index), rc.maxDist)
-        Next
+        'For Each rc In mserCells
+        '    cellMap(rc.rect).SetTo(rc.index, rc.mask)
+        '    setTrueText(CStr(rc.index), rc.maxDist)
+        'Next
 
-        If src.Channels = 3 Then dst3 = src.Clone Else dst3 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        For Each r In boxes
-            dst3.Rectangle(r, task.highlightColor, task.lineWidth)
-        Next
+        'If src.Channels = 3 Then dst3 = src.Clone Else dst3 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        'For Each r In boxes
+        '    dst3.Rectangle(r, task.highlightColor, task.lineWidth)
+        'Next
 
-        If task.heartBeat Then labels(2) = CStr(mserCells.Count) + " Cells identified"
+        'If task.heartBeat Then labels(2) = CStr(mserCells.Count) + " Cells identified"
     End Sub
 End Class
 
@@ -92,7 +92,7 @@ End Class
 Public Class MSER_Regions : Inherits VB_Algorithm
     Dim detect As New MSER_Detect
     Public mserCells As New List(Of rcDataOld)
-    Dim matchCell As New RedCloud_MatchCell
+    'Dim matchCell As New RedCloud_MatchCell
     Public cellMap As cv.Mat
     Public useOpAuto As Boolean = True
     Public Sub New()
@@ -101,59 +101,59 @@ Public Class MSER_Regions : Inherits VB_Algorithm
         desc = "Tag and track the MSER (Maximally Stable Extremal Region) regions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If useOpAuto Then
-            Static opAuto As New OpAuto_MSER
-            opAuto.classCount = mserCells.Count
-            opAuto.Run(src)
-        End If
+        'If useOpAuto Then
+        '    Static opAuto As New OpAuto_MSER
+        '    opAuto.classCount = mserCells.Count
+        '    opAuto.Run(src)
+        'End If
 
-        detect.Run(src)
+        'detect.Run(src)
 
-        Dim redCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To detect.boxes.Count - 1
-            Dim rc As New rcDataOld
-            rc.rect = detect.boxes(i)
-            rc.mask = New cv.Mat(rc.rect.Height, rc.rect.Width, cv.MatType.CV_8U, 0)
-            rc.floodPoint = detect.regions(i)(0)
-            For Each pt In detect.regions(i)
-                rc.mask.Set(Of Byte)(pt.Y - rc.rect.Y, pt.X - rc.rect.X, i Mod 255)
-            Next
-            redCells.Add(detect.regions(i).Count, rc)
-        Next
+        'Dim redCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
+        'For i = 0 To detect.boxes.Count - 1
+        '    Dim rc As New rcDataOld
+        '    rc.rect = detect.boxes(i)
+        '    rc.mask = New cv.Mat(rc.rect.Height, rc.rect.Width, cv.MatType.CV_8U, 0)
+        '    rc.floodPoint = detect.regions(i)(0)
+        '    For Each pt In detect.regions(i)
+        '        rc.mask.Set(Of Byte)(pt.Y - rc.rect.Y, pt.X - rc.rect.X, i Mod 255)
+        '    Next
+        '    redCells.Add(detect.regions(i).Count, rc)
+        'Next
 
-        If task.optionsChanged Then
-            cellMap.SetTo(0)
-            matchCell.lastCells.Clear()
-        End If
+        'If task.optionsChanged Then
+        '    cellMap.SetTo(0)
+        '    matchCell.lastCells.Clear()
+        'End If
 
-        matchCell.lastCellMap = cellMap.Clone
-        matchCell.lastCells = New List(Of rcDataOld)(mserCells)
-        matchCell.usedColors.Clear()
-        matchCell.usedColors.Add(black)
+        'matchCell.lastCellMap = cellMap.Clone
+        'matchCell.lastCells = New List(Of rcDataOld)(mserCells)
+        'matchCell.usedColors.Clear()
+        'matchCell.usedColors.Add(black)
 
-        mserCells.Clear()
-        cellMap.SetTo(0)
-        Dim lastDst2 = dst2.Clone
-        If task.heartBeat Then dst2.SetTo(0)
-        dst3.SetTo(0)
-        For Each key In redCells
-            matchCell.rc = key.Value
-            matchCell.rc.index = mserCells.Count
-            matchCell.Run(empty)
+        'mserCells.Clear()
+        'cellMap.SetTo(0)
+        'Dim lastDst2 = dst2.Clone
+        'If task.heartBeat Then dst2.SetTo(0)
+        'dst3.SetTo(0)
+        'For Each key In redCells
+        '    matchCell.rc = key.Value
+        '    matchCell.rc.index = mserCells.Count
+        '    matchCell.Run(empty)
 
-            Dim rc = matchCell.rc
+        '    Dim rc = matchCell.rc
 
-            Dim color = lastDst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-            If color = black Then rc.color = randomCellColor() Else rc.color = color
-            mserCells.Add(rc)
+        '    Dim color = lastDst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+        '    If color = black Then rc.color = randomCellColor() Else rc.color = color
+        '    mserCells.Add(rc)
 
-            cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-            dst3(rc.rect).SetTo(rc.color, rc.mask)
-            If mserCells.Count = 255 Then Exit For
-        Next
+        '    cellMap(rc.rect).SetTo(rc.index, rc.mask)
+        '    dst2(rc.rect).SetTo(rc.color, rc.mask)
+        '    dst3(rc.rect).SetTo(rc.color, rc.mask)
+        '    If mserCells.Count = 255 Then Exit For
+        'Next
 
-        labels(2) = "Cells identified " + CStr(mserCells.Count)
+        'labels(2) = "Cells identified " + CStr(mserCells.Count)
     End Sub
 End Class
 
