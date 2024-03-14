@@ -3081,6 +3081,8 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
     Public floodPointData As cv.Mat
     Public sizeData As cv.Mat
     Public redCells As New List(Of rcDataNew)
+    Public removeContour As Boolean = True
+    Public cellLimit As Integer
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0) ' this will be the cellmap
         desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
@@ -3093,7 +3095,8 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
 
         Dim sortedCells As New SortedList(Of Integer, rcDataNew)(New compareAllowIdenticalIntegerInverted)
         Dim usedColors As New List(Of cv.Vec3b)
-        For i = 1 To classCount - 1
+        Dim cellCount = Math.Min(cellLimit, classCount)
+        For i = 1 To cellCount - 1
             Dim rc As New rcDataNew
             rc.index = sortedCells.Count + 1
             rc.rect = rectData.Get(Of cv.Rect)(i - 1, 0)
@@ -3103,7 +3106,7 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
             rc.depthMask = rc.mask.Clone
             rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             vbDrawContour(rc.mask, rc.contour, 255, -1)
-            vbDrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
+            If removeContour Then vbDrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
 
             rc.maxDist = vbGetMaxDist(rc)
 
@@ -3146,6 +3149,8 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
         redCells.Clear()
         redCells.Add(New rcDataNew)
         For Each rc In sortedCells.Values
+            Dim val = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If val <> 0 Then Continue For ' already occupied.
             rc.index = redCells.Count
             redCells.Add(rc)
 

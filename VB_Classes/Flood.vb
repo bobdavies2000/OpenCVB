@@ -4,7 +4,7 @@ Public Class Flood_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcDataNew)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim binar4 As New Binarize_Split4
-    Dim genCells As New RedCloud_GenCells
+    Public genCells As New RedCloud_GenCells
     Dim redCPP As New RedCloud_MaskNone
     Public Sub New()
         vbAddAdvice(traceName + ": redOptions 'Desired RedCloud Cells' determines how many regions are isolated.")
