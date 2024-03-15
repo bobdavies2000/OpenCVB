@@ -222,7 +222,7 @@ End Class
 Public Class Neighbors_Contained : Inherits VB_Algorithm
     Dim nabs As New Neighbors_Precise
     Public cellMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public redCells As New List(Of rcDataOld)
+    Public redCells As New List(Of rcDataNew)
     Public Sub New()
         nabs.runRedCloud = True
         If standalone Then gOptions.displayDst1.Checked = True
@@ -230,41 +230,42 @@ Public Class Neighbors_Contained : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         nabs.Run(src)
-        dst1 = nabs.dst2
-        labels(1) = nabs.labels(2)
+        setTrueText("Review the neighbors_Precise algorithm")
+        'dst1 = nabs.dst2
+        'labels(1) = nabs.labels(2)
 
-        For Each index In nabs.nabList(task.rc.index)
-            Dim rc = nabs.redCells(index)
-            dst2.Circle(rc.maxDStable, task.dotSize, task.highlightColor, -1, task.lineType)
-            strOut += CStr(index) + ","
-        Next
+        'For Each index In nabs.nabList(task.rc.index)
+        '    Dim rc = nabs.redCells(index)
+        '    dst2.Circle(rc.maxDStable, task.dotSize, task.highlightColor, -1, task.lineType)
+        '    strOut += CStr(index) + ","
+        'Next
 
-        cellMap.SetTo(0)
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        redCells.Clear()
-        Dim count As Integer
-        For Each rc In nabs.redCells
-            rc.index = redCells.Count
-            If nabs.nabList(rc.index).Count = 1 Then
-                Dim r = rc.rect
-                If r.X <> 0 And r.Y <> 0 And r.X + r.Width < dst2.Width - 1 And r.Y + r.Height < dst2.Height - 1 Then
-                    count += 1
-                    dst3(rc.rect).SetTo(rc.color, rc.mask)
-                    cellMap(rc.rect).SetTo(rc.index, rc.mask)
-                    Continue For
-                End If
-            End If
-            rc.nabs = New List(Of Integer)(nabs.nabList(rc.index))
-            redCells.Add(rc)
+        'cellMap.SetTo(0)
+        'dst2.SetTo(0)
+        'dst3.SetTo(0)
+        'redCells.Clear()
+        'Dim count As Integer
+        'For Each rc In nabs.redCells
+        '    rc.index = redCells.Count
+        '    If nabs.nabList(rc.index).Count = 1 Then
+        '        Dim r = rc.rect
+        '        If r.X <> 0 And r.Y <> 0 And r.X + r.Width < dst2.Width - 1 And r.Y + r.Height < dst2.Height - 1 Then
+        '            count += 1
+        '            dst3(rc.rect).SetTo(rc.color, rc.mask)
+        '            cellMap(rc.rect).SetTo(rc.index, rc.mask)
+        '            Continue For
+        '        End If
+        '    End If
+        '    rc.nab = nabs.nabList(rc.index).Min()
+        '    redCells.Add(rc)
 
-            cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-        Next
+        '    cellMap(rc.rect).SetTo(rc.index, rc.mask)
+        '    dst2(rc.rect).SetTo(rc.color, rc.mask)
+        'Next
 
-        setSelectedContour(redCells, cellMap)
-        labels(2) = $"{redCells.Count} cells were identified."
-        labels(3) = $"{count} cells had only one neighbor and were merged with that neighbor."
+        'setSelectedContour(redCells, cellMap)
+        'labels(2) = $"{redCells.Count} cells were identified."
+        'labels(3) = $"{count} cells had only one neighbor and were merged with that neighbor."
     End Sub
 End Class
 
@@ -281,17 +282,18 @@ Public Class Neighbors_PreciseTest : Inherits VB_Algorithm
         desc = "Test Neighbors_Precise to show how to use it."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        nabs.Run(src)
-        dst2 = nabs.dst2
-        labels(2) = nabs.labels(2)
-        If nabs.redCells.Count <= 1 Then Exit Sub
+        setTrueText("Review the neighbors_Precise algorithm")
+        'nabs.Run(src)
+        'dst2 = nabs.dst2
+        'labels(2) = nabs.labels(2)
+        'If nabs.redCells.Count <= 1 Then Exit Sub
 
-        dst3.SetTo(0)
-        dst3(task.rc.rect).SetTo(task.rc.color, task.rc.mask)
-        For Each index In nabs.nabList(task.rc.index)
-            Dim rc = nabs.redCells(index)
-            dst3(rc.rect).SetTo(rc.color, rc.mask)
-        Next
+        'dst3.SetTo(0)
+        'dst3(task.rc.rect).SetTo(task.rc.color, task.rc.mask)
+        'For Each index In nabs.nabList(task.rc.index)
+        '    Dim rc = nabs.redCells(index)
+        '    dst3(rc.rect).SetTo(rc.color, rc.mask)
+        'Next
     End Sub
 End Class
 
@@ -304,7 +306,7 @@ End Class
 Public Class Neighbors_Precise : Inherits VB_Algorithm
     Public nabList As New List(Of List(Of Integer))
     Dim stats As New Cell_Basics
-    Public redCells As List(Of rcDataOld)
+    Public redCells As List(Of rcDataNew)
     Public runRedCloud As Boolean = False
     Public Sub New()
         cPtr = Neighbors_Open()
@@ -313,7 +315,7 @@ Public Class Neighbors_Precise : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
-            Static redC As New RedCloud_Tight
+            Static redC As New RedCloud_TightNew
             redC.Run(src)
             dst2 = redC.dst2
             labels = redC.labels
@@ -327,46 +329,47 @@ Public Class Neighbors_Precise : Inherits VB_Algorithm
         Dim handleSrc = GCHandle.Alloc(mapData, GCHandleType.Pinned)
         Dim nabCount = Neighbors_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()
+        setTrueText("Review the neighbors_Precise algorithm")
 
-        If nabCount > 0 Then
-            Dim nabData = New cv.Mat(nabCount, 1, cv.MatType.CV_32SC2, Neighbors_NabList(cPtr))
-            nabList.Clear()
-            For i = 0 To redCells.Count - 1
-                nabList.Add(New List(Of Integer))
-                redCells(i).nabs = New List(Of Integer)
-            Next
-            For i = 0 To nabCount - 1
-                Dim pt = nabData.Get(Of cv.Point)(i, 0)
-                If nabList(pt.X).Contains(pt.Y) = False And pt.Y <> 0 Then
-                    nabList(pt.X).Add(pt.Y)
-                    redCells(pt.X).nabs.Add(pt.Y)
-                End If
-                If nabList(pt.Y).Contains(pt.X) = False And pt.X <> 0 Then
-                    nabList(pt.Y).Add(pt.X)
-                    redCells(pt.Y).nabs.Add(pt.X)
-                End If
-            Next
-            nabList(0).Clear() ' neighbors to zero are not interesting (yet?)
-            redCells(0).nabs.Clear() ' not interesting.
+        'If nabCount > 0 Then
+        '    Dim nabData = New cv.Mat(nabCount, 1, cv.MatType.CV_32SC2, Neighbors_NabList(cPtr))
+        '    nabList.Clear()
+        '    For i = 0 To redCells.Count - 1
+        '        nabList.Add(New List(Of Integer))
+        '    Next
+        '    redCells(i).nab = nabList.Min()
+        '    For i = 0 To nabCount - 1
+        '        Dim pt = nabData.Get(Of cv.Point)(i, 0)
+        '        If nabList(pt.X).Contains(pt.Y) = False And pt.Y <> 0 Then
+        '            nabList(pt.X).Add(pt.Y)
+        '            redCells(pt.X).nabs.Add(pt.Y)
+        '        End If
+        '        If nabList(pt.Y).Contains(pt.X) = False And pt.X <> 0 Then
+        '            nabList(pt.Y).Add(pt.X)
+        '            redCells(pt.Y).nabs.Add(pt.X)
+        '        End If
+        '    Next
+        '    nabList(0).Clear() ' neighbors to zero are not interesting (yet?)
+        '    redCells(0).nabs.Clear() ' not interesting.
 
-            If task.heartBeat And standaloneTest() Then
-                stats.Run(task.color)
+        '    If task.heartBeat And standaloneTest() Then
+        '        stats.Run(task.color)
 
-                strOut = stats.strOut
-                If nabList(task.rc.index).Count > 0 Then
-                    strOut += "Neighbors: "
-                    dst1.SetTo(0)
-                    dst1(task.rc.rect).SetTo(task.rc.color, task.rc.mask)
-                    For Each index In nabList(task.rc.index)
-                        Dim rc = redCells(index)
-                        dst1(rc.rect).SetTo(rc.color, rc.mask)
-                        strOut += CStr(index) + ","
-                    Next
-                    strOut += vbCrLf
-                End If
-            End If
-            setTrueText(strOut, 3)
-        End If
+        '        strOut = stats.strOut
+        '        If nabList(task.rc.index).Count > 0 Then
+        '            strOut += "Neighbors: "
+        '            dst1.SetTo(0)
+        '            dst1(task.rc.rect).SetTo(task.rc.color, task.rc.mask)
+        '            For Each index In nabList(task.rc.index)
+        '                Dim rc = redCells(index)
+        '                dst1(rc.rect).SetTo(rc.color, rc.mask)
+        '                strOut += CStr(index) + ","
+        '            Next
+        '            strOut += vbCrLf
+        '        End If
+        '    End If
+        '    setTrueText(strOut, 3)
+        'End If
 
         labels(3) = CStr(nabCount) + " neighbor pairs were found."
     End Sub

@@ -838,6 +838,8 @@ Public Class rcDataNew
 
     Public index As Integer
     Public indexLast As Integer
+    Public matchCount As Integer
+
     Public nab As Integer
     Public container As Integer
 

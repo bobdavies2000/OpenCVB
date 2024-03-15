@@ -110,7 +110,7 @@ End Class
 
 
 Public Class Classifier_BayesianTest : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Tight
+    Dim redC As New RedCloud_TightNew
     Dim nabs As New Neighbors_Precise
     Public Sub New()
         redOptions.UseColor.Checked = True
@@ -124,64 +124,65 @@ Public Class Classifier_BayesianTest : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
 
-        nabs.redCells = redC.redCells
-        nabs.Run(redC.cellMap)
+        setTrueText("Review the neighbors_Precise algorithm")
+        'nabs.redCells = redC.redCells
+        'nabs.Run(redC.cellMap)
 
-        Dim trainList As New List(Of cv.Scalar)
-        Dim responseList As New List(Of Integer)
-        For Each rc In redC.redCells
-            trainList.Add(rc.colorMean)
-            responseList.Add(0)
-        Next
+        'Dim trainList As New List(Of cv.Scalar)
+        'Dim responseList As New List(Of Integer)
+        'For Each rc In redC.redCells
+        '    trainList.Add(rc.depthMean)
+        '    responseList.Add(0)
+        'Next
 
-        dst1.SetTo(0)
-        For Each index In nabs.nabList(task.rc.index)
-            Dim rc = redC.redCells(index)
-            dst1(rc.rect).SetTo(255, rc.mask)
-            strOut += CStr(index) + ","
-            responseList(index) = -1
-        Next
+        'dst1.SetTo(0)
+        'For Each index In nabs.nabList(task.rc.index)
+        '    Dim rc = redC.redCells(index)
+        '    dst1(rc.rect).SetTo(255, rc.mask)
+        '    strOut += CStr(index) + ","
+        '    responseList(index) = -1
+        'Next
 
-        responseList(task.rc.index) = 1
+        'responseList(task.rc.index) = 1
 
-        Dim queryList As New List(Of cv.Scalar)
-        Dim maskList As New List(Of Integer)
-        For i = responseList.Count - 1 To 0 Step -1
-            If responseList(i) = -1 Then
-                responseList.RemoveAt(i)
-                queryList.Add(trainList(i))
-                trainList.RemoveAt(i)
-                maskList.Add(i)
-            End If
-        Next
+        'Dim queryList As New List(Of cv.Scalar)
+        'Dim maskList As New List(Of Integer)
+        'For i = responseList.Count - 1 To 0 Step -1
+        '    If responseList(i) = -1 Then
+        '        responseList.RemoveAt(i)
+        '        queryList.Add(trainList(i))
+        '        trainList.RemoveAt(i)
+        '        maskList.Add(i)
+        '    End If
+        'Next
 
-        Dim vecs = trainList.ToArray
-        Dim resp = responseList.ToArray
-        Dim handleTrainInput = GCHandle.Alloc(vecs, GCHandleType.Pinned)
-        Dim handleResponse = GCHandle.Alloc(resp, GCHandleType.Pinned)
-        Classifier_Bayesian_Train(cPtr, handleTrainInput.AddrOfPinnedObject(), handleResponse.AddrOfPinnedObject(), responseList.Count)
-        handleResponse.Free()
-        handleTrainInput.Free()
+        'Dim vecs = trainList.ToArray
+        'Dim resp = responseList.ToArray
+        'Dim handleTrainInput = GCHandle.Alloc(vecs, GCHandleType.Pinned)
+        'Dim handleResponse = GCHandle.Alloc(resp, GCHandleType.Pinned)
+        'Classifier_Bayesian_Train(cPtr, handleTrainInput.AddrOfPinnedObject(), handleResponse.AddrOfPinnedObject(), responseList.Count)
+        'handleResponse.Free()
+        'handleTrainInput.Free()
 
-        Dim results(queryList.Count - 1) As Integer
-        If queryList.Count > 0 Then
-            Dim queries = queryList.ToArray
-            Dim handleQueryInput = GCHandle.Alloc(queries, GCHandleType.Pinned)
-            Dim resultsPtr = Classifier_Bayesian_RunCPP(cPtr, handleQueryInput.AddrOfPinnedObject(), queries.Count)
-            handleQueryInput.Free()
+        'Dim results(queryList.Count - 1) As Integer
+        'If queryList.Count > 0 Then
+        '    Dim queries = queryList.ToArray
+        '    Dim handleQueryInput = GCHandle.Alloc(queries, GCHandleType.Pinned)
+        '    Dim resultsPtr = Classifier_Bayesian_RunCPP(cPtr, handleQueryInput.AddrOfPinnedObject(), queries.Count)
+        '    handleQueryInput.Free()
 
-            Marshal.Copy(resultsPtr, results, 0, results.Length)
-        End If
-        dst3.SetTo(0)
-        Dim zeroOutput As Boolean = True
-        For i = 0 To maskList.Count - 1
-            If results(i) > 0 Then
-                Dim rc = redC.redCells(maskList(i))
-                dst3(rc.rect).SetTo(rc.color, rc.mask)
-                zeroOutput = False
-            End If
-        Next
-        If zeroOutput Then setTrueText("None of the neighbors were as similar to the selected cell.", 3)
+        '    Marshal.Copy(resultsPtr, results, 0, results.Length)
+        'End If
+        'dst3.SetTo(0)
+        'Dim zeroOutput As Boolean = True
+        'For i = 0 To maskList.Count - 1
+        '    If results(i) > 0 Then
+        '        Dim rc = redC.redCells(maskList(i))
+        '        dst3(rc.rect).SetTo(rc.color, rc.mask)
+        '        zeroOutput = False
+        '    End If
+        'Next
+        'If zeroOutput Then setTrueText("None of the neighbors were as similar to the selected cell.", 3)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then Classifier_Bayesian_Close(cPtr)

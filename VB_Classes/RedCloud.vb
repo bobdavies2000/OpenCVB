@@ -40,6 +40,48 @@ End Class
 
 
 
+Public Class RedCloud_BasicsMask : Inherits VB_Algorithm
+    Public genCells As New RedCloud_GenCells
+    Public redCells As New List(Of rcDataNew)
+    Public inputMask As cv.Mat
+    Public cellMap As cv.Mat
+    Dim redCPP As New RedCloud_Mask_CPP
+    Public Sub New()
+        genCells.removeContour = False
+        vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
+                        "It is behind the global options (which affect most algorithms.)")
+        desc = "Find cells and then match them to the previous generation"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 1 Then
+            Static colorC As New Color_Basics
+            colorC.Run(src)
+            src = colorC.dst2
+            inputMask = If(gOptions.DebugCheckBox.Checked, task.maxDepthMask, (Not task.maxDepthMask).ToMat)
+        End If
+
+        redCPP.inputMask = inputMask
+        redCPP.Run(src)
+
+        genCells.classCount = redCPP.classCount
+        genCells.rectData = redCPP.rectData
+        genCells.floodPointData = redCPP.floodPointData
+        genCells.sizeData = redCPP.sizeData
+        genCells.Run(redCPP.dst2)
+
+        redCells = New List(Of rcDataNew)(genCells.redCells)
+        cellMap = genCells.dst3
+        dst2 = genCells.dst2
+
+        setSelectedContour(redCells, cellMap)
+        identifyCells(redCells)
+        If task.heartBeat Then labels(2) = $"{redCells.Count} cells found.  The largest {redOptions.identifyCount} are identified"
+    End Sub
+End Class
+
+
+
+
 
 
 Public Class RedCloud_Tight : Inherits VB_Algorithm
@@ -69,6 +111,46 @@ Public Class RedCloud_Tight : Inherits VB_Algorithm
         genCells.Run(redCPP.dst2)
 
         redCells = New List(Of rcDataOld)(genCells.redCells)
+        cellMap = genCells.dst3
+        dst2 = genCells.dst2
+
+        setSelectedContour(redCells, cellMap)
+        identifyCells(redCells)
+        labels(2) = genCells.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCloud_TightNew : Inherits VB_Algorithm
+    Public genCells As New RedCloud_GenCells
+    Public redCells As New List(Of rcDataNew)
+    Public cellMap As cv.Mat
+    Dim redCPP As New RedCloud_MaskNone_CPP
+    Public Sub New()
+        vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
+                        "It is behind the global options (which affect most algorithms.)")
+        desc = "Find cells and then match them to the previous generation with minimum boundary"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 1 Then
+            Static colorC As New Color_Basics
+            colorC.Run(src)
+            src = colorC.dst2
+        End If
+
+        redCPP.Run(src)
+
+        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
+        genCells.classCount = redCPP.classCount
+        genCells.rectData = redCPP.rectData
+        genCells.floodPointData = redCPP.floodPointData
+        genCells.sizeData = redCPP.sizeData
+        genCells.Run(redCPP.dst2)
+
+        redCells = New List(Of rcDataNew)(genCells.redCells)
         cellMap = genCells.dst3
         dst2 = genCells.dst2
 
@@ -2356,39 +2438,40 @@ Public Class RedCloud_TopXNeighbors : Inherits VB_Algorithm
         options.RunVB()
 
         nab.Run(src)
+        setTrueText("Review the neighbors_Precise algorithm")
 
-        If task.heartBeat Then dst2.SetTo(0)
-        cellMap.SetTo(0)
-        Dim tmpMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        redCells.Clear()
-        redCells.Add(nab.redCells(0)) ' placeholder for zero.
-        For i = 1 To options.topX - 1
-            Dim rc = nab.redCells(i)
-            tmpMap.SetTo(0)
-            tmpMap(rc.rect).SetTo(rc.index, rc.mask)
-            Dim count = 0
-            For Each index In rc.nabs
-                Dim rcX = nab.redCells(index)
-                If rcX.index > options.topX And rcX.depthPixels > 0 Then
-                    Dim val = cellMap.Get(Of Byte)(rcX.maxDStable.Y, rcX.maxDStable.X)
-                    If val = 0 Then
-                        rc.rect = rc.rect.Union(rcX.rect)
-                        tmpMap(rcX.rect).SetTo(rc.index, rcX.mask)
-                        count += 1
-                    End If
-                End If
-            Next
-            rc.mask = New cv.Mat(rc.rect.Height, rc.rect.Width, cv.MatType.CV_8U, 0)
-            rc.mask = tmpMap(rc.rect).InRange(rc.index, rc.index)
-            cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-            redCells.Add(rc)
-        Next
-        redCells(0).mask = cellMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        'If task.heartBeat Then dst2.SetTo(0)
+        'cellMap.SetTo(0)
+        'Dim tmpMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        'redCells.Clear()
+        'redCells.Add(nab.redCells(0)) ' placeholder for zero.
+        'For i = 1 To options.topX - 1
+        '    Dim rc = nab.redCells(i)
+        '    tmpMap.SetTo(0)
+        '    tmpMap(rc.rect).SetTo(rc.index, rc.mask)
+        '    Dim count = 0
+        '    For Each index In rc.nabs
+        '        Dim rcX = nab.redCells(index)
+        '        If rcX.index > options.topX And rcX.depthPixels > 0 Then
+        '            Dim val = cellMap.Get(Of Byte)(rcX.maxDStable.Y, rcX.maxDStable.X)
+        '            If val = 0 Then
+        '                rc.rect = rc.rect.Union(rcX.rect)
+        '                tmpMap(rcX.rect).SetTo(rc.index, rcX.mask)
+        '                count += 1
+        '            End If
+        '        End If
+        '    Next
+        '    rc.mask = New cv.Mat(rc.rect.Height, rc.rect.Width, cv.MatType.CV_8U, 0)
+        '    rc.mask = tmpMap(rc.rect).InRange(rc.index, rc.index)
+        '    cellMap(rc.rect).SetTo(rc.index, rc.mask)
+        '    dst2(rc.rect).SetTo(rc.color, rc.mask)
+        '    redCells.Add(rc)
+        'Next
+        'redCells(0).mask = cellMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
 
-        setSelectedContour(redCells, cellMap)
-        If task.rc.index = 0 Then task.rc = redCells(redCells.Count - 1)
-        labels(2) = $"The top {options.topX} RedCloud cells by size."
+        'setSelectedContour(redCells, cellMap)
+        'If task.rc.index = 0 Then task.rc = redCells(redCells.Count - 1)
+        'labels(2) = $"The top {options.topX} RedCloud cells by size."
     End Sub
 End Class
 
@@ -2702,50 +2785,6 @@ End Class
 
 
 
-Public Class RedCloud_BasicsMask : Inherits VB_Algorithm
-    Public genCells As New RedCloud_GenCells
-    Public redCells As New List(Of rcDataNew)
-    Public inputMask As cv.Mat
-    Public cellMap As cv.Mat
-    Dim redCPP As New RedCloud_Mask_CPP
-    Public Sub New()
-        genCells.removeContour = False
-        vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
-                        "It is behind the global options (which affect most algorithms.)")
-        desc = "Find cells and then match them to the previous generation"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static colorC As New Color_Basics
-            colorC.Run(src)
-            src = colorC.dst2
-            inputMask = task.maxDepthMask
-        End If
-
-        redCPP.inputMask = inputMask
-        redCPP.Run(src)
-
-        genCells.classCount = redCPP.classCount
-        genCells.rectData = redCPP.rectData
-        genCells.floodPointData = redCPP.floodPointData
-        genCells.sizeData = redCPP.sizeData
-        genCells.Run(redCPP.dst2)
-
-        redCells = New List(Of rcDataNew)(genCells.redCells)
-        cellMap = genCells.dst3
-        dst2 = genCells.dst2
-
-        setSelectedContour(redCells, cellMap)
-        identifyCells(redCells)
-        If task.heartBeat Then labels(2) = $"{redCells.Count} cells found.  The largest {redOptions.identifyCount} are identified"
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class RedCloud_GenCells : Inherits VB_Algorithm
@@ -2793,6 +2832,7 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
                     rc.color = lrc.color
                     Dim stableCheck = dst3.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
                     If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+                    rc.matchCount += 1
                 Else
                     rc.color = task.vecColors(rc.index)
                 End If
@@ -2862,3 +2902,14 @@ End Class
 
 
 
+
+
+Public Class RedCloud_Both : Inherits VB_Algorithm
+    Dim flood As New Flood_Basics
+    Public Sub New()
+        desc = "Run Flood_Basics and use the cells to map the depth cells"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    End Sub
+End Class

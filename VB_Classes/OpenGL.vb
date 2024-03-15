@@ -1217,14 +1217,14 @@ End Class
 
 
 Public Class OpenGL_KWhere : Inherits VB_Algorithm
-    Dim gpbWare As New GuidedBP_Hulls
+    Dim guided As New GuidedBP_Hulls
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Show the KWhere output in OpenGL"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        gpbWare.Run(src)
-        dst2 = gpbWare.dst2
+        guided.Run(src)
+        dst2 = guided.dst2
 
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(dst2)

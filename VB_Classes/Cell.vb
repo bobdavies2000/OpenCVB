@@ -117,8 +117,8 @@ End Class
 
 
 Public Class Cell_Stable : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Tight
-    Public rcUnstableList As New List(Of rcDataOld)
+    Dim redC As New RedCloud_TightNew
+    Public rcUnstableList As New List(Of rcDataNew)
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Use maxDStable to identify stable cells - cells which were NOT present in the previous generation."
@@ -138,7 +138,7 @@ Public Class Cell_Stable : Inherits VB_Algorithm
             Next
         End If
 
-        Dim unstableList As New List(Of rcDataOld)
+        Dim unstableList As New List(Of rcDataNew)
         For Each rc In redC.redCells
             If prevList.Contains(rc.maxDStable) = False Then
                 vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.White, -1)
@@ -148,7 +148,7 @@ Public Class Cell_Stable : Inherits VB_Algorithm
         Next
 
         If task.almostHeartBeat Then
-            rcUnstableList = New List(Of rcDataOld)(unstableList)
+            rcUnstableList = New List(Of rcDataNew)(unstableList)
             labels(1) = CStr(rcUnstableList.Count) + " found before the heartbeat."
         End If
         dst1.SetTo(0)
@@ -168,8 +168,8 @@ End Class
 
 
 Public Class Cell_StableMax : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Tight
-    Public redCells As New List(Of rcDataOld)
+    Dim redC As New RedCloud_TightNew
+    Public redCells As New List(Of rcDataNew)
     Public cellMap As New cv.Mat
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -278,7 +278,7 @@ End Class
 
 
 Public Class Cell_JumpUp : Inherits VB_Algorithm
-    Public redC As New RedCloud_Tight
+    Public redC As New RedCloud_TightNew
     Public jumpCells As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent jump in size", 1, 100, 25)
@@ -288,7 +288,7 @@ Public Class Cell_JumpUp : Inherits VB_Algorithm
         Static percentSlider = findSlider("Percent jump in size")
         Dim percentJump = percentSlider.value / 100
 
-        Dim lastCells = New List(Of rcDataOld)(redC.redCells)
+        Dim lastCells = New List(Of rcDataNew)(redC.redCells)
         redC.Run(src)
         dst2 = redC.dst2
         If task.heartBeat Then dst3.SetTo(0)
@@ -296,7 +296,7 @@ Public Class Cell_JumpUp : Inherits VB_Algorithm
 
         jumpCells.Clear()
         For Each rc In redC.redCells
-            If rc.matchFlag Then
+            If rc.indexLast > 0 Then
                 Dim lrc = lastCells(rc.indexLast)
                 If (rc.pixels - lrc.pixels) / rc.pixels >= percentJump Then
                     dst3(lrc.rect).SetTo(cv.Scalar.White, lrc.mask)
@@ -320,7 +320,7 @@ End Class
 
 
 Public Class Cell_JumpDown : Inherits VB_Algorithm
-    Public redC As New RedCloud_Tight
+    Public redC As New RedCloud_TightNew
     Public jumpCells As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent jump in size", 1, 100, 25)
@@ -330,7 +330,7 @@ Public Class Cell_JumpDown : Inherits VB_Algorithm
         Static percentSlider = findSlider("Percent jump in size")
         Dim percentJump = percentSlider.value / 100
 
-        Dim lastCells = New List(Of rcDataOld)(redC.redCells)
+        Dim lastCells = New List(Of rcDataNew)(redC.redCells)
         redC.Run(src)
         dst2 = redC.dst2
         If task.heartBeat Then dst3.SetTo(0)
@@ -338,7 +338,7 @@ Public Class Cell_JumpDown : Inherits VB_Algorithm
 
         jumpCells.Clear()
         For Each rc In redC.redCells
-            If rc.matchFlag Then
+            If rc.indexLast > 0 Then
                 Dim lrc = lastCells(rc.indexLast)
                 If (lrc.pixels - rc.pixels) / rc.pixels >= percentJump Then
                     dst3(lrc.rect).SetTo(cv.Scalar.White, lrc.mask)
@@ -362,7 +362,7 @@ End Class
 
 
 Public Class Cell_JumpUnstable : Inherits VB_Algorithm
-    Public redC As New RedCloud_Tight
+    Public redC As New RedCloud_TightNew
     Public jumpCells As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent jump in size", 1, 100, 25)
@@ -373,7 +373,7 @@ Public Class Cell_JumpUnstable : Inherits VB_Algorithm
         Dim percentJump = percentSlider.value / 100
 
         If task.heartBeat Or task.midHeartBeat Then
-            Dim lastCells As New List(Of rcDataOld)(redC.redCells)
+            Dim lastCells As New List(Of rcDataNew)(redC.redCells)
             redC.Run(src)
             dst2 = redC.dst2
             dst3 = dst1.Clone
@@ -382,7 +382,7 @@ Public Class Cell_JumpUnstable : Inherits VB_Algorithm
 
             jumpCells.Clear()
             For Each rc In redC.redCells
-                If rc.matchFlag Then
+                If rc.indexLast > 0 Then
                     Dim lrc = lastCells(rc.indexLast)
                     If Math.Abs(lrc.pixels - rc.pixels) / rc.pixels >= percentJump Then
                         dst1(lrc.rect).SetTo(cv.Scalar.White, lrc.mask)
@@ -401,8 +401,8 @@ End Class
 
 
 Public Class Cell_Distance : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Tight
-    Public redCells As New List(Of rcDataOld)
+    Dim redC As New RedCloud_TightNew
+    Public redCells As New List(Of rcDataNew)
     Public cellMap As cv.Mat
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
@@ -423,8 +423,9 @@ Public Class Cell_Distance : Inherits VB_Algorithm
             redCells.Clear()
             Dim depthDistance As New List(Of Single)
             Dim colorDistance As New List(Of Single)
+            Dim selectedMean As cv.Scalar = src(task.rcNew.rect).Mean(task.rcNew.mask)
             For Each rc In redC.redCells
-                colorDistance.Add(distance3D(task.rc.colorMean, rc.colorMean))
+                colorDistance.Add(distance3D(selectedMean, src(rc.rect).Mean(rc.mask)))
                 depthDistance.Add(distance3D(task.rc.depthMean, rc.depthMean))
                 redCells.Add(rc)
             Next

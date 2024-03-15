@@ -905,8 +905,8 @@ Public Class PointCloud_Histograms : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         redOptions.Sync() ' make sure settings are consistent
 
-        cv.Cv2.CalcHist({task.pointCloud}, redOptions.channels, New cv.Mat(),
-                        histogram, redOptions.channelCount, redOptions.histBinList, redOptions.ranges)
+        cv.Cv2.CalcHist({task.pointCloud}, redOptions.channels, New cv.Mat(), histogram, redOptions.channelCount,
+                        redOptions.histBinList, redOptions.ranges)
 
         Select Case redOptions.PCReduction
             Case 0, 1, 2 ' "X Reduction", "Y Reduction", "Z Reduction"
@@ -941,9 +941,12 @@ Public Class PointCloud_Histograms : Inherits VB_Algorithm
 
                 Dim maxVal = histData.ToList.Max
                 For i = 0 To task.gridList.Count - 1
-                    If i >= histData.Length Then Exit For
                     Dim roi = task.gridList(i)
-                    dst2(roi).SetTo(255 * histData(i) / maxVal)
+                    If i >= histData.Length Then
+                        dst2(roi).SetTo(0)
+                    Else
+                        dst2(roi).SetTo(255 * histData(i) / maxVal)
+                    End If
                 Next
                 labels(2) = "2D plot of the resulting 3D histogram."
         End Select

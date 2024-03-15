@@ -2,7 +2,8 @@
 Imports cv = OpenCvSharp
 Public Class GuidedBP_Basics : Inherits VB_Algorithm
     Public ptHot As New GuidedBP_HotPoints
-    Dim topMap As New cv.Mat, sideMap As New cv.Mat
+    Dim topMap As New cv.Mat
+    Dim sideMap As New cv.Mat
     Public Sub New()
         topMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         sideMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -56,19 +57,19 @@ End Class
 
 
 Public Class GuidedBP_Cells : Inherits VB_Algorithm
-    Dim gpbWare As New GuidedBP_Hulls
+    Dim guided As New GuidedBP_Hulls
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "", "Output of GuidedBP_Hulls", "Ranges for the point cloud data"}
         desc = "Display ranges for X, Y, and Z for the selected KWhere cell."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        gpbWare.Run(src)
-        dst2 = gpbWare.dst2
+        guided.Run(src)
+        dst2 = guided.dst2
 
         Dim rc As New rcDataOld
-        If gpbWare.redCells.Count > 1 Then
-            setSelectedContour(gpbWare.redCells, gpbWare.kMap)
+        If guided.redCells.Count > 1 Then
+            setSelectedContour(guided.redCells, guided.kMap)
             rc = task.rc
             vbDrawContour(dst2, rc.contour, rc.color)
         End If
@@ -394,7 +395,7 @@ Public Class GuidedBP_Objects : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         kHist.Run(src)
-        dst2 = kHist.gpbWare.dst2
+        dst2 = kHist.guided.dst2
         setTrueText(kHist.strOut, 3)
 
         reduction.Run(src)
@@ -406,8 +407,8 @@ Public Class GuidedBP_Objects : Inherits VB_Algorithm
             setTrueText(CStr(rc.index), rc.maxDist, 2)
         Next
 
-        If kHist.gpbWare.redCells.Count > 1 Then
-            setSelectedContour(kHist.gpbWare.redCells, kHist.gpbWare.kMap)
+        If kHist.guided.redCells.Count > 1 Then
+            setSelectedContour(kHist.guided.redCells, kHist.guided.kMap)
             vbDrawContour(dst2, task.rc.hull, cv.Scalar.White, task.lineWidth)
         End If
 
@@ -424,7 +425,7 @@ End Class
 
 
 Public Class GuidedBP_History : Inherits VB_Algorithm
-    Public gpbWare As New GuidedBP_Hulls
+    Public guided As New GuidedBP_Hulls
     Dim kCellList As New List(Of List(Of rcDataOld))
     Public redCells As New List(Of rcDataOld)
     Public kMap As New cv.Mat
@@ -445,9 +446,9 @@ Public Class GuidedBP_History : Inherits VB_Algorithm
 
         If task.optionsChanged Then kCellList.Clear()
 
-        gpbWare.Run(src)
+        guided.Run(src)
 
-        kCellList.Add(New List(Of rcDataOld)(gpbWare.redCells))
+        kCellList.Add(New List(Of rcDataOld)(guided.redCells))
 
         Dim sortCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
         For Each cellList In kCellList
@@ -482,7 +483,7 @@ Public Class GuidedBP_History : Inherits VB_Algorithm
             setTrueText(CStr(rc.index), rc.maxDist, 2)
         Next
 
-        setTrueText(gpbWare.strOut, 3)
+        setTrueText(guided.strOut, 3)
 
         If redCells.Count > 1 Then
             setSelectedContour(redCells, kMap)
@@ -547,7 +548,6 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
     Public hist As New PointCloud_Histograms
     Dim myPalette As New Palette_Random
     Public classCount As Integer
-    Public givenClassCount As Integer
     Public Sub New()
         gOptions.HistBinSlider.Value = 16
         desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
@@ -572,15 +572,12 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
         classCount = 0
         Dim count As Integer
         Dim newSamples(histArray.Count - 1) As Single
-        Dim maxClassCount = 255 - givenClassCount - 1
         For i = 0 To sortedHist.Count - 1
             Dim index = sortedHist.ElementAt(i).Value
             count += sortedHist.ElementAt(i).Key
             newSamples(index) = classCount
             classCount += 1
-            ' if we have 95% of the pixels, good enough...
-            ' But leave room for the color classcount (usually < 10)
-            If count / src.Total > redOptions.imageThresholdPercent Or classCount >= maxClassCount Then Exit For
+            If classCount >= 255 Then Exit For
         Next
 
         Marshal.Copy(newSamples, 0, hist.histogram.Data, newSamples.Length)
@@ -588,19 +585,35 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
         cv.Cv2.CalcBackProject({src}, redOptions.channels, hist.histogram, dst2, redOptions.ranges)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        'If task.maxDepthMask.Rows > 0 Then
-        '    classCount += 1
-        '    dst2.SetTo(classCount, task.maxDepthMask)
-        'End If
-
         If standaloneTest() Then
-            labels(3) = "Note that colors are shifting because this is before RedCloud matching."
+            labels(3) = "Note that colors are shifting because this is before any matching."
             dst2 += 1
             dst2.SetTo(0, task.noDepthMask)
             myPalette.Run(dst2)
             dst3 = myPalette.dst2
         End If
 
-        labels(2) = CStr(classCount) + " regions detected in the backprojection - " + Format(count / src.Total, "0%")
+        Dim depthCount = task.depthMask.CountNonZero
+        labels(2) = CStr(classCount) + " regions detected in the backprojection - " + Format(count / depthCount, "0%") + " of depth data"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GuidedBP_Lookup : Inherits VB_Algorithm
+    Dim guided As New GuidedBP_Basics
+    Public Sub New()
+        task.clickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
+        desc = "Given a point cloud pixel, look up which object it is in.  Click in the Depth RGB image to test."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        guided.Run(src)
+        dst2 = guided.dst2
+        labels(2) = guided.labels(2)
+
+
     End Sub
 End Class
