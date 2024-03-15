@@ -51,7 +51,7 @@ Public Class Flood_Split4 : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
-            binar4.Run(task.color) ' always run split4 to get colors for genCells.
+            binar4.Run(task.color)
             If src.Channels = 1 Then src += binar4.dst2 Else src = binar4.dst2
         End If
 

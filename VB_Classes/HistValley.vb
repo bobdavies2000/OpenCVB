@@ -3,26 +3,26 @@ Imports System.Runtime.InteropServices
 Public Class HistValley_Basics : Inherits VB_Algorithm
     Public peak As New HistValley_Peaks
     Public peaks As New List(Of Integer)
-    Public valleys As New List(Of Integer)
+    Public valleyIndex As New List(Of Single)
+    Public avgValley() As Single
     Public histList As New List(Of Single)
     Public Sub New()
-        findSlider("Desired boundary count").Value = 5
+        findSlider("Desired boundary count").Value = 10
         desc = "Use the peaks identified in HistValley_Peaks to find the valleys between the peaks."
     End Sub
-    Public Function updatePlot(dst As cv.Mat, bins As Integer) As cv.Mat
-        For Each valley In valleys
+    Public Sub updatePlot(dst As cv.Mat, bins As Integer)
+        For Each valley In valleyIndex
             Dim col = dst.Width * valley / bins
             dst.Line(New cv.Point(col, dst.Height), New cv.Point(col, dst.Height * 9 / 10), cv.Scalar.White, task.lineWidth)
         Next
-        Return dst
-    End Function
+    End Sub
     Public Sub RunVB(src As cv.Mat)
         peak.Run(src)
         dst2 = peak.hist.dst2
-        labels(2) = peak.labels(2) + " and " + CStr(valleys.Count) + " valleys (marked at bottom)"
+
         histList = peak.histArray.ToList
-        valleys.Clear()
         peaks = New List(Of Integer)(peak.peaks)
+        valleyIndex.Clear()
         For i = 0 To peaks.Count - 2
             Dim start = peaks(i)
             Dim finish = peaks(i + 1)
@@ -32,13 +32,21 @@ Public Class HistValley_Basics : Inherits VB_Algorithm
                 testList.Add(histList(j))
             Next
 
-            Dim nextVal = start + testList.IndexOf(testList.Min)
-            valleys.Add(nextVal)
+            valleyIndex.Add(start + testList.IndexOf(testList.Min))
         Next
+
+        If task.optionsChanged Then ReDim avgValley(valleyIndex.Count - 1)
+
+        Dim depthPerBin = task.maxZmeters / histList.Count
+        For i = 0 To avgValley.Count - 1
+            avgValley(i) = (avgValley(i) + valleyIndex(i) * depthPerBin) / 2
+        Next
+
         If standaloneTest() Then
             updatePlot(dst2, task.histogramBins)
             setTrueText("Input data used by default is the color image", 3)
         End If
+        labels(2) = peak.labels(2) + " and " + CStr(valleyIndex.Count) + " valleys (marked at bottom)"
     End Sub
 End Class
 
@@ -50,9 +58,8 @@ End Class
 
 Public Class HistValley_Depth : Inherits VB_Algorithm
     Public valley As New HistValley_Basics
-    Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public Sub New()
-        labels = {"", "", "Top markerstop = peaks, bottom markers = valleys", "Guided backprojection of kalmanized depth valleys"}
+        labels(2) = "Top markerstop = peaks, bottom markers = valleys"
         desc = "Find the valleys in the depth histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -61,7 +68,7 @@ Public Class HistValley_Depth : Inherits VB_Algorithm
             valley.Run(src)
             dst2 = valley.dst2
 
-            Dim vList = New List(Of Integer)(valley.valleys)
+            Dim vList = New List(Of Single)(valley.valleyIndex)
 
             Dim histArray(valley.histList.Count - 1) As Single
             For i = 0 To vList.Count - 2
@@ -77,12 +84,7 @@ Public Class HistValley_Depth : Inherits VB_Algorithm
             Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
             histogram += 1 ' shift away from 0
         End If
-        cv.Cv2.CalcBackProject({src}, {0}, histogram, dst1, valley.peak.hist.ranges)
-        If dst1.Type <> cv.MatType.CV_8U Then
-            dst1.SetTo(0, task.noDepthMask)
-            dst1.ConvertTo(dst1, cv.MatType.CV_8U)
-            dst3 = vbPalette(dst1 * 255 / valley.valleys.Count)
-        End If
+
         If standaloneTest() Then valley.updatePlot(dst2, task.histogramBins)
     End Sub
 End Class
@@ -438,3 +440,31 @@ Public Class HistValley_Peaks : Inherits VB_Algorithm
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class HistValley_Tiers : Inherits VB_Algorithm
+    Dim valleys As New HistValley_Basics
+    Public Sub New()
+        labels = {"", "", "CV_8U tier map with values ranging from 0 to the desired valley count", "vbPalette output of dst2."}
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Display the depth as tiers defined by the depth valleys in the histogram of depth."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat = False Then Exit Sub
+        valleys.Run(src)
+
+        dst2.SetTo(0)
+        Dim marks = valleys.avgValley
+        marks(0) = 0
+        For i = 1 To marks.Count - 1
+            dst2.SetTo(i + 1, task.pcSplit(2).InRange(marks(i - 1), marks(i)))
+        Next
+        dst2.SetTo(marks.Count, task.pcSplit(2).InRange(marks(marks.Count - 1), 100))
+
+        dst3 = vbPalette(dst2 * 255 / (marks.Count + 1))
+    End Sub
+End Class

@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Cell_Basics : Inherits VB_Algorithm
-    Dim plot As New Histogram_Depth
+    Dim plot As New Histogram_DepthNew
     Dim pca As New PCA_Basics
     Dim eq As New Plane_Equation
     Public runRedCloud As Boolean
@@ -9,13 +9,13 @@ Public Class Cell_Basics : Inherits VB_Algorithm
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString(src As cv.Mat)
-        Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, 0)
-        task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
-        plot.rc = task.rc
+        Dim tmp = New cv.Mat(task.rcNew.mask.Rows, task.rcNew.mask.Cols, cv.MatType.CV_32F, 0)
+        task.pcSplit(2)(task.rcNew.rect).CopyTo(tmp, task.rcNew.mask)
+        plot.rc = task.rcNew
         plot.Run(tmp)
         dst1 = plot.dst2
 
-        Dim rc = task.rc
+        Dim rc = task.rcNew
 
         Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
         strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbCrLf
@@ -43,17 +43,17 @@ Public Class Cell_Basics : Inherits VB_Algorithm
         strOut += "Cell Mean in 3D: x/y/z = " + vbTab + Format(rc.depthMean(0), fmt2) + vbTab
         strOut += Format(rc.depthMean(1), fmt2) + vbTab + Format(rc.depthMean(2), fmt2) + vbCrLf
 
-        If rc.depthMean(2) = 0 Then
-            strOut += vbCrLf + "No depth data is available for that cell. "
-        Else
-            eq.rc = rc
-            eq.Run(src)
-            rc = eq.rc
-            strOut += vbCrLf + eq.strOut + vbCrLf
+        'If rc.depthMean(2) = 0 Then
+        '    strOut += vbCrLf + "No depth data is available for that cell. "
+        'Else
+        '    eq.rc = rc
+        '    eq.Run(src)
+        '    rc = eq.rc
+        '    strOut += vbCrLf + eq.strOut + vbCrLf
 
-            pca.Run(empty)
-            strOut += vbCrLf + pca.strOut
-        End If
+        '    pca.Run(empty)
+        '    strOut += vbCrLf + pca.strOut
+        'End If
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then

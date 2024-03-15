@@ -837,6 +837,7 @@ Public Class rcDataNew
     Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
 
     Public index As Integer
+    Public indexLast As Integer
     Public nab As Integer
     Public container As Integer
 
