@@ -150,6 +150,7 @@ End Class
 
 
 
+
 Public Class Boundary_RemovedRects : Inherits VB_Algorithm
     Public bRects As New Boundary_Rectangles
     Public Sub New()
@@ -168,43 +169,5 @@ Public Class Boundary_RemovedRects : Inherits VB_Algorithm
         Next
         labels(1) = labels(2)
         labels(2) = $"{bRects.bounds.rects.Count - bRects.smallRects.Count} cells after contain test"
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Boundary_GuidedBP : Inherits VB_Algorithm
-    Dim bounds As New Boundary_Basics
-    Public Sub New()
-        findRadio("Use guided backprojection input").Checked = True
-        desc = "Get boundaries for the guided backprojection data."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        bounds.Run(src)
-        dst2 = bounds.dst2
-        labels(2) = bounds.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Boundary_Depth : Inherits VB_Algorithm
-    Dim bounds As New Boundary_Basics
-    Public Sub New()
-        findRadio("Use reduced pointcloud input").Checked = True
-        desc = "Get boundaries for the reduced point cloud data."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        bounds.Run(src)
-        dst2 = bounds.dst2
-        labels(2) = bounds.labels(2)
     End Sub
 End Class

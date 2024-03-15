@@ -2832,19 +2832,15 @@ End Class
 
 
 Public Class RedCloud_Depth : Inherits VB_Algorithm
-    Dim guided As New GuidedBP_Depth
-    Dim redC As New RedCloud_Basics
+    Dim flood As New Flood_Basics
     Public Sub New()
         desc = "Create RedCloud output using only depth."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        guided.Run(src)
-
-        redC.Run(guided.dst2)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        setSelectedContour(redC.redCells, redC.cellMap)
+        redOptions.UseDepth.Checked = True
+        flood.Run(src)
+        dst2 = flood.dst2
+        labels(2) = flood.labels(2)
     End Sub
 End Class
 
