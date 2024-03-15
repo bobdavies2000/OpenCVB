@@ -57,20 +57,14 @@ Partial Class OptionsRedCloud
         Me.ZReduction = New System.Windows.Forms.RadioButton()
         Me.YReduction = New System.Windows.Forms.RadioButton()
         Me.XReduction = New System.Windows.Forms.RadioButton()
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
-        Me.RedCloud_Reduce = New System.Windows.Forms.RadioButton()
-        Me.GuidedBP_Depth = New System.Windows.Forms.RadioButton()
         Me.RedCloudType = New System.Windows.Forms.GroupBox()
-        Me.UseDepthAndColor = New System.Windows.Forms.RadioButton()
+        Me.UseGuidedProjection = New System.Windows.Forms.RadioButton()
         Me.UseDepth = New System.Windows.Forms.RadioButton()
         Me.UseColor = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.LabelIdentify = New System.Windows.Forms.Label()
         Me.IdentifyCountSlider = New System.Windows.Forms.TrackBar()
         Me.IdentifyCountLabel = New System.Windows.Forms.Label()
-        Me.LabelDesiredCell = New System.Windows.Forms.Label()
-        Me.DesiredCellSlider = New System.Windows.Forms.TrackBar()
-        Me.Label5 = New System.Windows.Forms.Label()
         Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.ColorSource = New System.Windows.Forms.ComboBox()
         Me.RedCloudSliders.SuspendLayout()
@@ -84,11 +78,9 @@ Partial Class OptionsRedCloud
         CType(Me.BitwiseReductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SimpleReductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.RedCloudOnly.SuspendLayout()
-        Me.GroupBox1.SuspendLayout()
         Me.RedCloudType.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.IdentifyCountSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.DesiredCellSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'RedCloudSliders
@@ -473,71 +465,38 @@ Partial Class OptionsRedCloud
         Me.XReduction.Text = "X Reduction"
         Me.XReduction.UseVisualStyleBackColor = True
         '
-        'GroupBox1
-        '
-        Me.GroupBox1.Controls.Add(Me.RedCloud_Reduce)
-        Me.GroupBox1.Controls.Add(Me.GuidedBP_Depth)
-        Me.GroupBox1.Location = New System.Drawing.Point(1018, 175)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(220, 112)
-        Me.GroupBox1.TabIndex = 5
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "RedCloud Data Source"
-        '
-        'RedCloud_Reduce
-        '
-        Me.RedCloud_Reduce.AutoSize = True
-        Me.RedCloud_Reduce.Location = New System.Drawing.Point(28, 68)
-        Me.RedCloud_Reduce.Name = "RedCloud_Reduce"
-        Me.RedCloud_Reduce.Size = New System.Drawing.Size(170, 24)
-        Me.RedCloud_Reduce.TabIndex = 3
-        Me.RedCloud_Reduce.TabStop = True
-        Me.RedCloud_Reduce.Text = "RedCloud_Reduce"
-        Me.RedCloud_Reduce.UseVisualStyleBackColor = True
-        '
-        'GuidedBP_Depth
-        '
-        Me.GuidedBP_Depth.AutoSize = True
-        Me.GuidedBP_Depth.Location = New System.Drawing.Point(28, 37)
-        Me.GuidedBP_Depth.Name = "GuidedBP_Depth"
-        Me.GuidedBP_Depth.Size = New System.Drawing.Size(160, 24)
-        Me.GuidedBP_Depth.TabIndex = 0
-        Me.GuidedBP_Depth.TabStop = True
-        Me.GuidedBP_Depth.Text = "GuidedBP_Depth"
-        Me.GuidedBP_Depth.UseVisualStyleBackColor = True
-        '
         'RedCloudType
         '
-        Me.RedCloudType.Controls.Add(Me.UseDepthAndColor)
+        Me.RedCloudType.Controls.Add(Me.UseGuidedProjection)
         Me.RedCloudType.Controls.Add(Me.UseDepth)
         Me.RedCloudType.Controls.Add(Me.UseColor)
         Me.RedCloudType.Location = New System.Drawing.Point(1020, 34)
         Me.RedCloudType.Name = "RedCloudType"
-        Me.RedCloudType.Size = New System.Drawing.Size(220, 135)
+        Me.RedCloudType.Size = New System.Drawing.Size(302, 135)
         Me.RedCloudType.TabIndex = 8
         Me.RedCloudType.TabStop = False
         Me.RedCloudType.Text = "RedCloud Run Type"
         '
-        'UseDepthAndColor
+        'UseGuidedProjection
         '
-        Me.UseDepthAndColor.AutoSize = True
-        Me.UseDepthAndColor.Location = New System.Drawing.Point(28, 100)
-        Me.UseDepthAndColor.Name = "UseDepthAndColor"
-        Me.UseDepthAndColor.Size = New System.Drawing.Size(183, 24)
-        Me.UseDepthAndColor.TabIndex = 4
-        Me.UseDepthAndColor.TabStop = True
-        Me.UseDepthAndColor.Text = "Use Depth and Color"
-        Me.UseDepthAndColor.UseVisualStyleBackColor = True
+        Me.UseGuidedProjection.AutoSize = True
+        Me.UseGuidedProjection.Location = New System.Drawing.Point(28, 100)
+        Me.UseGuidedProjection.Name = "UseGuidedProjection"
+        Me.UseGuidedProjection.Size = New System.Drawing.Size(261, 24)
+        Me.UseGuidedProjection.TabIndex = 4
+        Me.UseGuidedProjection.TabStop = True
+        Me.UseGuidedProjection.Text = "Use guided backprojection input"
+        Me.UseGuidedProjection.UseVisualStyleBackColor = True
         '
         'UseDepth
         '
         Me.UseDepth.AutoSize = True
         Me.UseDepth.Location = New System.Drawing.Point(28, 68)
         Me.UseDepth.Name = "UseDepth"
-        Me.UseDepth.Size = New System.Drawing.Size(152, 24)
+        Me.UseDepth.Size = New System.Drawing.Size(241, 24)
         Me.UseDepth.TabIndex = 3
         Me.UseDepth.TabStop = True
-        Me.UseDepth.Text = "Use Depth Input"
+        Me.UseDepth.Text = "Use reduced pointcloud input"
         Me.UseDepth.UseVisualStyleBackColor = True
         '
         'UseColor
@@ -556,9 +515,6 @@ Partial Class OptionsRedCloud
         Me.GroupBox2.Controls.Add(Me.LabelIdentify)
         Me.GroupBox2.Controls.Add(Me.IdentifyCountSlider)
         Me.GroupBox2.Controls.Add(Me.IdentifyCountLabel)
-        Me.GroupBox2.Controls.Add(Me.LabelDesiredCell)
-        Me.GroupBox2.Controls.Add(Me.DesiredCellSlider)
-        Me.GroupBox2.Controls.Add(Me.Label5)
         Me.GroupBox2.Location = New System.Drawing.Point(12, 4)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(763, 180)
@@ -569,7 +525,7 @@ Partial Class OptionsRedCloud
         'LabelIdentify
         '
         Me.LabelIdentify.AutoSize = True
-        Me.LabelIdentify.Location = New System.Drawing.Point(668, 97)
+        Me.LabelIdentify.Location = New System.Drawing.Point(668, 44)
         Me.LabelIdentify.Name = "LabelIdentify"
         Me.LabelIdentify.Size = New System.Drawing.Size(57, 20)
         Me.LabelIdentify.TabIndex = 32
@@ -577,7 +533,7 @@ Partial Class OptionsRedCloud
         '
         'IdentifyCountSlider
         '
-        Me.IdentifyCountSlider.Location = New System.Drawing.Point(156, 91)
+        Me.IdentifyCountSlider.Location = New System.Drawing.Point(156, 38)
         Me.IdentifyCountSlider.Maximum = 255
         Me.IdentifyCountSlider.Minimum = 1
         Me.IdentifyCountSlider.Name = "IdentifyCountSlider"
@@ -589,44 +545,16 @@ Partial Class OptionsRedCloud
         'IdentifyCountLabel
         '
         Me.IdentifyCountLabel.AutoSize = True
-        Me.IdentifyCountLabel.Location = New System.Drawing.Point(8, 97)
+        Me.IdentifyCountLabel.Location = New System.Drawing.Point(8, 44)
         Me.IdentifyCountLabel.Name = "IdentifyCountLabel"
         Me.IdentifyCountLabel.Size = New System.Drawing.Size(104, 20)
         Me.IdentifyCountLabel.TabIndex = 30
         Me.IdentifyCountLabel.Text = "IdentifyCount"
         '
-        'LabelDesiredCell
-        '
-        Me.LabelDesiredCell.AutoSize = True
-        Me.LabelDesiredCell.Location = New System.Drawing.Point(668, 38)
-        Me.LabelDesiredCell.Name = "LabelDesiredCell"
-        Me.LabelDesiredCell.Size = New System.Drawing.Size(57, 20)
-        Me.LabelDesiredCell.TabIndex = 29
-        Me.LabelDesiredCell.Text = "Label5"
-        '
-        'DesiredCellSlider
-        '
-        Me.DesiredCellSlider.Location = New System.Drawing.Point(156, 31)
-        Me.DesiredCellSlider.Maximum = 250
-        Me.DesiredCellSlider.Minimum = 1
-        Me.DesiredCellSlider.Name = "DesiredCellSlider"
-        Me.DesiredCellSlider.Size = New System.Drawing.Size(506, 69)
-        Me.DesiredCellSlider.TabIndex = 28
-        Me.DesiredCellSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.DesiredCellSlider.Value = 199
-        '
-        'Label5
-        '
-        Me.Label5.Location = New System.Drawing.Point(8, 38)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(152, 48)
-        Me.Label5.TabIndex = 27
-        Me.Label5.Text = "Desired RedCloud Cells"
-        '
         'ColorSourceLabel
         '
         Me.ColorSourceLabel.AutoSize = True
-        Me.ColorSourceLabel.Location = New System.Drawing.Point(1042, 318)
+        Me.ColorSourceLabel.Location = New System.Drawing.Point(1042, 198)
         Me.ColorSourceLabel.Name = "ColorSourceLabel"
         Me.ColorSourceLabel.Size = New System.Drawing.Size(105, 20)
         Me.ColorSourceLabel.TabIndex = 10
@@ -635,7 +563,7 @@ Partial Class OptionsRedCloud
         'ColorSource
         '
         Me.ColorSource.FormattingEnabled = True
-        Me.ColorSource.Location = New System.Drawing.Point(1170, 318)
+        Me.ColorSource.Location = New System.Drawing.Point(1170, 198)
         Me.ColorSource.Name = "ColorSource"
         Me.ColorSource.Size = New System.Drawing.Size(222, 28)
         Me.ColorSource.TabIndex = 11
@@ -649,7 +577,6 @@ Partial Class OptionsRedCloud
         Me.Controls.Add(Me.ColorSourceLabel)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.RedCloudType)
-        Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.RedCloudOnly)
         Me.Controls.Add(Me.ReductionSliders)
         Me.Controls.Add(Me.ReductionTypeGroup)
@@ -671,14 +598,11 @@ Partial Class OptionsRedCloud
         CType(Me.SimpleReductionSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.RedCloudOnly.ResumeLayout(False)
         Me.RedCloudOnly.PerformLayout()
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
         Me.RedCloudType.ResumeLayout(False)
         Me.RedCloudType.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         CType(Me.IdentifyCountSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.DesiredCellSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -715,17 +639,11 @@ Partial Class OptionsRedCloud
     Friend WithEvents XYZReduction As Windows.Forms.RadioButton
     Friend WithEvents YZReduction As Windows.Forms.RadioButton
     Friend WithEvents NoReduction As Windows.Forms.RadioButton
-    Friend WithEvents GroupBox1 As Windows.Forms.GroupBox
-    Friend WithEvents RedCloud_Reduce As Windows.Forms.RadioButton
-    Friend WithEvents GuidedBP_Depth As Windows.Forms.RadioButton
     Friend WithEvents RedCloudType As Windows.Forms.GroupBox
     Friend WithEvents UseDepth As Windows.Forms.RadioButton
     Friend WithEvents UseColor As Windows.Forms.RadioButton
-    Friend WithEvents UseDepthAndColor As Windows.Forms.RadioButton
+    Friend WithEvents UseGuidedProjection As Windows.Forms.RadioButton
     Friend WithEvents GroupBox2 As Windows.Forms.GroupBox
-    Friend WithEvents LabelDesiredCell As Windows.Forms.Label
-    Friend WithEvents DesiredCellSlider As Windows.Forms.TrackBar
-    Friend WithEvents Label5 As Windows.Forms.Label
     Friend WithEvents LabelHistogramBins As Windows.Forms.Label
     Friend WithEvents HistBinSlider As Windows.Forms.TrackBar
     Friend WithEvents Label7 As Windows.Forms.Label

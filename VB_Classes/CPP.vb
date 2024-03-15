@@ -54,7 +54,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
                                task.maxZmeters, redOptions.PCReduction, task.cvFontSize, task.cvFontThickness,
                                task.clickPoint.X, task.clickPoint.Y, task.mouseClickFlag,
                                task.mousePicTag, task.mouseMovePoint.X, task.mouseMovePoint.Y,
-                               task.paletteIndex, redOptions.DesiredCellSlider.Value, task.midHeartBeat,
+                               task.paletteIndex, 255, task.midHeartBeat,
                                task.quarterBeat, redOptions.colorInputIndex, redOptions.depthInputIndex,
                                task.xRangeDefault, task.yRangeDefault)
 

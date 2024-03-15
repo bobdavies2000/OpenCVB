@@ -214,7 +214,6 @@ Public Class RedCloud_Reduction : Inherits VB_Algorithm
     Public Sub New()
         redOptions.UseColor.Checked = True
         redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
-        redOptions.RedCloud_Reduce.Checked = True
         gOptions.HistBinSlider.Value = 20
         desc = "Segment the image based on both the reduced color"
     End Sub
@@ -774,7 +773,6 @@ Public Class RedCloud_World : Inherits VB_Algorithm
     Dim world As New Depth_World
     Public Sub New()
         labels(3) = "Generated pointcloud"
-        redOptions.RedCloud_Reduce.Checked = True
         desc = "Display the output of a generated pointcloud as RedCloud cells"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1448,26 +1446,6 @@ End Class
 
 
 
-Public Class RedCloud_OnlyDepth : Inherits VB_Algorithm
-    Public redC As New RedCloud_Basics
-    Public Sub New()
-        redOptions.UseDepth.Checked = True  ' <<<<<<< this is what is different.
-        desc = "Create RedCloud output using only depth."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 
 
 Public Class RedCloud_FourColor : Inherits VB_Algorithm
@@ -2070,107 +2048,6 @@ End Class
 
 
 
-Public Class RedCloud_BothOld : Inherits VB_Algorithm
-    Public colorC As New RedCloud_Basics
-    Public redC As New RedCloud_Basics
-    Public Sub New()
-        desc = "Run RedCloud for depth and for color at the same time and then combine."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redOptions.UseDepth.Checked = True
-        task.optionsChanged = False
-        redC.Run(src)
-        dst2 = redC.dst2.Clone
-        dst2.SetTo(0, task.noDepthMask)
-        labels(2) = redC.labels(2)
-
-        redOptions.UseColor.Checked = True
-        task.optionsChanged = False
-        colorC.Run(src)
-        dst3 = colorC.dst2.Clone
-        labels(3) = colorC.labels(2)
-
-        Dim cellmap = colorC.cellMap.Clone
-        redC.cellMap.CopyTo(cellmap, task.depthMask)
-
-        Static redCSelected As Integer
-        If task.mouseClickFlag Then
-            redCSelected = If(task.mousePicTag = 2, RESULT_DST2, RESULT_DST3)
-        End If
-
-        If redCSelected = RESULT_DST2 Then
-            setSelectedContour(redC.redCells, redC.cellMap)
-        ElseIf redCSelected = RESULT_DST3 Then
-            setSelectedContour(colorC.redCells, colorC.cellMap)
-        End If
-        dst3(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class RedCloud_Reduce : Inherits VB_Algorithm
-    Public classCount As Integer
-    Public givenClassCount As Integer
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("RedCloud_Reduce Reduction", 1, 2500, 250)
-        If standaloneTest() Then redOptions.RedCloud_Reduce.Checked = True
-        desc = "Reduction transform for the point cloud"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static reductionSlider = findSlider("RedCloud_Reduce Reduction")
-        Dim reduceAmt = reductionSlider.value
-        task.pointCloud.ConvertTo(dst0, cv.MatType.CV_32S, 1000 / reduceAmt)
-
-        Dim split = dst0.Split()
-
-        Select Case redOptions.PCReduction
-            Case 0 ' "X Reduction"
-                dst0 = (split(0) * reduceAmt).toMat
-            Case 1 ' "Y Reduction"
-                dst0 = (split(1) * reduceAmt).toMat
-            Case 2 ' "Z Reduction"
-                dst0 = (split(2) * reduceAmt).toMat
-            Case 3 ' "XY Reduction"
-                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt).toMat
-            Case 4 ' "XZ Reduction"
-                dst0 = (split(0) * reduceAmt + split(2) * reduceAmt).toMat
-            Case 5 ' "YZ Reduction"
-                dst0 = (split(1) * reduceAmt + split(2) * reduceAmt).toMat
-            Case 6 ' "XYZ Reduction"
-                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt).toMat
-        End Select
-
-        Dim mm As mmData = vbMinMax(dst0)
-        dst2 = (dst0 - mm.minVal)
-
-        ' dst2.SetTo(mm.maxVal - mm.minVal, task.maxDepthMask)
-        mm = vbMinMax(dst2)
-        classCount = 255 - givenClassCount - 1
-        dst2 *= classCount / mm.maxVal
-        dst2 += givenClassCount + 1
-        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-
-        'If task.maxDepthMask.Rows > 0 Then
-        '    classCount += 1
-        '    dst2.SetTo(classCount, task.maxDepthMask)
-        'End If
-
-        labels(2) = "Reduced Pointcloud - reduction factor = " + CStr(reduceAmt) + " produced " + CStr(classCount) + " regions"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 
 Public Class RedCloud_ContourUpdate : Inherits VB_Algorithm
     Public redCells As New List(Of rcDataOld)
@@ -2300,7 +2177,7 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         maxDepth.Run(src)
-        If redOptions.UseColor.Checked Or redOptions.UseDepthAndColor.Checked Then
+        If redOptions.UseColor.Checked Or redOptions.UseGuidedProjection.Checked Then
             redMasks.inputMask = Nothing
             If src.Channels = 3 Then
                 colorClass.Run(src)
@@ -2313,7 +2190,7 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         End If
 
-        If redOptions.UseDepth.Checked Or redOptions.UseDepthAndColor.Checked Then
+        If redOptions.UseDepth.Checked Or redOptions.UseGuidedProjection.Checked Then
             Select Case redOptions.depthInputIndex
                 Case 0 ' "GuidedBP_Depth"
                     guided.Run(src)
@@ -2723,8 +2600,12 @@ Public Class RedCloud_Mask_CPP : Inherits VB_Algorithm
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        Dim maskData(inputMask.Total - 1) As Byte
-        Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
+        Dim maskData(dst2.Total - 1) As Byte
+        If inputMask Is Nothing Then
+            Marshal.Copy(task.maxDepthMask.Data, maskData, 0, maskData.Length)
+        Else
+            Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
+        End If
         Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
 
         imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(),
@@ -2904,12 +2785,107 @@ End Class
 
 
 
+
+Public Class RedCloud_Reduce : Inherits VB_Algorithm
+    Public classCount As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("RedCloud_Reduce Reduction", 1, 2500, 250)
+        desc = "Reduction transform for the point cloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static reductionSlider = findSlider("RedCloud_Reduce Reduction")
+        Dim reduceAmt = reductionSlider.value
+        task.pointCloud.ConvertTo(dst0, cv.MatType.CV_32S, 1000 / reduceAmt)
+
+        Dim split = dst0.Split()
+
+        Select Case redOptions.PCReduction
+            Case 0 ' "X Reduction"
+                dst0 = (split(0) * reduceAmt).toMat
+            Case 1 ' "Y Reduction"
+                dst0 = (split(1) * reduceAmt).toMat
+            Case 2 ' "Z Reduction"
+                dst0 = (split(2) * reduceAmt).toMat
+            Case 3 ' "XY Reduction"
+                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt).toMat
+            Case 4 ' "XZ Reduction"
+                dst0 = (split(0) * reduceAmt + split(2) * reduceAmt).toMat
+            Case 5 ' "YZ Reduction"
+                dst0 = (split(1) * reduceAmt + split(2) * reduceAmt).toMat
+            Case 6 ' "XYZ Reduction"
+                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt).toMat
+        End Select
+
+        Dim mm As mmData = vbMinMax(dst0)
+        dst2 = (dst0 - mm.minVal)
+        dst2 = dst2 * 255 / (mm.maxVal - mm.minVal)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+
+        labels(2) = "Reduced Pointcloud - reduction factor = " + CStr(reduceAmt) + " produced " + CStr(classCount) + " regions"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_Depth : Inherits VB_Algorithm
+    Dim guided As New GuidedBP_Depth
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        desc = "Create RedCloud output using only depth."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        guided.Run(src)
+
+        redC.Run(guided.dst2)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        setSelectedContour(redC.redCells, redC.cellMap)
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class RedCloud_Both : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
+    Dim floodPC As New Flood_Basics
+    ' Dim floodGBP As New Flood_Basics
     Public Sub New()
         desc = "Run Flood_Basics and use the cells to map the depth cells"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        'redOptions.UseGuidedProjection.Checked = True
+        'floodGBP.Run(src)
+        'dst1 = floodGBP.dst2
+        'labels(1) = floodGBP.labels(2)
+
+        redOptions.UseColor.Checked = True
+        flood.Run(src)
+        dst2 = flood.dst2
+        labels(2) = flood.labels(2)
+
+        redOptions.UseDepth.Checked = True
+        floodPC.Run(src)
+        dst3 = floodPC.dst2
+        labels(3) = floodPC.labels(2)
+
+        Static mousePicTag = task.mousePicTag
+        If task.mouseClickFlag Then mousePicTag = task.mousePicTag
+        Select Case mousePicTag
+            Case 1
+                ' setSelectedContour(floodGBP.redCells, floodGBP.cellMap)
+            Case 2
+                setSelectedContour(flood.redCells, flood.cellMap)
+            Case 3
+                setSelectedContour(floodPC.redCells, floodPC.cellMap)
+        End Select
+        dst2.Rectangle(task.rcNew.rect, task.highlightColor, task.lineWidth)
     End Sub
 End Class

@@ -3,21 +3,21 @@ Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcDataNew)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Dim bestBound As New Boundary_RemovedRects
+    Dim bounds As New Boundary_RemovedRects
     Dim flood As New Flood_Split4
     Public Sub New()
         labels(3) = "Contour boundaries - input to Flood_Split4"
         desc = "Build the RedCloud cells with the best boundaries"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        bestBound.Run(src)
-        dst1 = bestBound.dst2
+        bounds.Run(src)
+        dst1 = bounds.dst2
 
-        dst3 = bestBound.bRects.bounds.colorC.dst2
+        dst3 = bounds.bRects.bounds.dst2
         dst3 = dst3 Or dst1
 
         flood.genCells.removeContour = False
-        flood.genCells.cellLimit = bestBound.bRects.bounds.rects.Count - bestBound.bRects.smallRects.Count
+        flood.genCells.cellLimit = bounds.bRects.bounds.rects.Count - bounds.bRects.smallRects.Count
         flood.Run(dst3)
 
         redCells = flood.redCells

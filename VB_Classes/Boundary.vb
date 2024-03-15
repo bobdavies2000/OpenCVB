@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Boundary_Basics : Inherits VB_Algorithm
-    Public colorC As New Color_Basics
     Dim redCPP As New RedCloud_MaskNone_CPP
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
@@ -11,9 +10,25 @@ Public Class Boundary_Basics : Inherits VB_Algorithm
         desc = "Create a mask of the RedCloud cell boundaries"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        colorC.Run(src)
-        dst3 = colorC.dst3
-        redCPP.Run(colorC.dst2)
+        If src.Channels <> 1 Then
+            Static colorRadio = findRadio("Use color input")
+            Static redCloudRadio = findRadio("Use reduced pointcloud input")
+            If redOptions.UseColor.Checked Then
+                Static colorC As New Color_Basics
+                colorC.Run(src)
+                dst1 = colorC.dst2
+            ElseIf redOptions.UseDepth.checked Then
+                Static prep As New RedCloud_Reduce
+                prep.Run(src)
+                dst1 = prep.dst2
+            Else
+                Static guided As New GuidedBP_Depth
+                guided.Run(src)
+                dst1 = guided.dst2
+            End If
+        End If
+
+        redCPP.Run(dst1)
 
         dst2.SetTo(0)
         rects.Clear()
@@ -77,10 +92,16 @@ Public Class Boundary_Rectangles : Inherits VB_Algorithm
     Public smallRects As New List(Of cv.Rect)
     Public smallContours As New List(Of List(Of cv.Point))
     Public Sub New()
-        labels = {"", "Rectangles before contain test", "", ""}
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Desired percent of rectangles", 0, 100, 25)
+        End If
+
         desc = "Build the boundaries for redCells and remove interior rectangles"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        Static percentSlider = findSlider("Desired percent of rectangles")
+        Dim percentRect = percentSlider.value / 100
+
         bounds.Run(src)
 
         dst2.SetTo(0)
@@ -92,10 +113,10 @@ Public Class Boundary_Rectangles : Inherits VB_Algorithm
         rects.Clear()
         smallRects.Clear()
         smallContours.Clear()
-        For i = 0 To bounds.rects.Count / 4 - 1
+        For i = 0 To bounds.rects.Count * percentRect - 1
             rects.Add(bounds.rects(i))
         Next
-        For i = bounds.rects.Count - 1 To bounds.rects.Count / 4 Step -1
+        For i = bounds.rects.Count - 1 To CInt(bounds.rects.Count * percentRect) Step -1
             Dim r = bounds.rects(i)
             Dim contained As Boolean = False
             For Each rect In bounds.rects
@@ -133,7 +154,6 @@ Public Class Boundary_RemovedRects : Inherits VB_Algorithm
     Public bRects As New Boundary_Rectangles
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        labels = {"", "Rectangles before contain test", "", ""}
         desc = "Build the boundaries for redCells and remove interior rectangles"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -146,7 +166,45 @@ Public Class Boundary_RemovedRects : Inherits VB_Algorithm
         For i = 0 To bRects.smallRects.Count - 1
             vbDrawContour(dst2(bRects.smallRects(i)), bRects.smallContours(i), cv.Scalar.Black, task.lineWidth)
         Next
+        labels(1) = labels(2)
         labels(2) = $"{bRects.bounds.rects.Count - bRects.smallRects.Count} cells after contain test"
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class Boundary_GuidedBP : Inherits VB_Algorithm
+    Dim bounds As New Boundary_Basics
+    Public Sub New()
+        findRadio("Use guided backprojection input").Checked = True
+        desc = "Get boundaries for the guided backprojection data."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        bounds.Run(src)
+        dst2 = bounds.dst2
+        labels(2) = bounds.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Boundary_Depth : Inherits VB_Algorithm
+    Dim bounds As New Boundary_Basics
+    Public Sub New()
+        findRadio("Use reduced pointcloud input").Checked = True
+        desc = "Get boundaries for the reduced point cloud data."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        bounds.Run(src)
+        dst2 = bounds.dst2
+        labels(2) = bounds.labels(2)
+    End Sub
+End Class

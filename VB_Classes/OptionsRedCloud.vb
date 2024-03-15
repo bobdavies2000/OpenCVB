@@ -71,18 +71,17 @@ Public Class OptionsRedCloud
         task.channelsTop = {2, 0}
         task.channelsSide = {1, 2}
 
+        SimpleReduction.Checked = True
+        PCReduction = 3
+        XYReduction.Checked = True
+        histBinList = {task.histogramBins, task.histogramBins}
+        UseColor.Checked = True
+
         For i = 0 To colorMethods.Count - 1
             Dim method = colorMethods(i)
             ColorSource.Items.Add(method)
         Next
         ColorSource.SelectedItem() = "Binarize_Split4"
-
-        SimpleReduction.Checked = True
-        PCReduction = 3
-        XYReduction.Checked = True
-        GuidedBP_Depth.Checked = True
-        histBinList = {task.histogramBins, task.histogramBins}
-        UseDepthAndColor.Checked = True
 
         redOptions.SimpleReductionSlider.Value = 40
         Select Case task.cameraName
@@ -256,17 +255,13 @@ Public Class OptionsRedCloud
 
 
 
-    Private Sub GuidedBP_Depth_CheckedChanged(sender As Object, e As EventArgs) Handles GuidedBP_Depth.CheckedChanged
+    Private Sub GuidedBP_Depth_CheckedChanged(sender As Object, e As EventArgs)
         If task IsNot Nothing Then task.optionsChanged = True
         depthInputIndex = 0
     End Sub
-    Private Sub RedCloud_Reduce_CheckedChanged(sender As Object, e As EventArgs) Handles RedCloud_Reduce.CheckedChanged
+    Private Sub RedCloud_Reduce_CheckedChanged(sender As Object, e As EventArgs)
         If task IsNot Nothing Then task.optionsChanged = True
         depthInputIndex = 1
-    End Sub
-    Private Sub desiredCellSlider_ValueChanged(sender As Object, e As EventArgs) Handles DesiredCellSlider.ValueChanged
-        If task IsNot Nothing Then task.optionsChanged = True
-        LabelDesiredCell.Text = CStr(DesiredCellSlider.Value)
     End Sub
     Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
@@ -274,7 +269,7 @@ Public Class OptionsRedCloud
         bins3D = HistBinSlider.Value * HistBinSlider.Value * HistBinSlider.Value
     End Sub
 
-    Private Sub UseDepthAndColor_CheckedChanged(sender As Object, e As EventArgs) Handles UseDepthAndColor.CheckedChanged
+    Private Sub UseGuidedProjection_CheckedChanged(sender As Object, e As EventArgs) Handles UseGuidedProjection.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
     Private Sub UseDepth_CheckedChanged(sender As Object, e As EventArgs) Handles UseDepth.CheckedChanged
