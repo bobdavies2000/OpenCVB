@@ -190,6 +190,7 @@ if algorithmName = "Blur_TopoMap" Then return new Blur_TopoMap
 if algorithmName = "BlurMotion_Basics" Then return new BlurMotion_Basics
 if algorithmName = "BlurMotion_Deblur" Then return new BlurMotion_Deblur
 if algorithmName = "Boundary_Basics" Then return new Boundary_Basics
+if algorithmName = "Boundary_Overlap" Then return new Boundary_Overlap
 if algorithmName = "Boundary_Rectangles" Then return new Boundary_Rectangles
 if algorithmName = "Boundary_RemovedRects" Then return new Boundary_RemovedRects
 if algorithmName = "Boundary_Tiers" Then return new Boundary_Tiers

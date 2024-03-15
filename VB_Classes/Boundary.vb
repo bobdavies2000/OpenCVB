@@ -171,3 +171,42 @@ Public Class Boundary_RemovedRects : Inherits VB_Algorithm
         labels(2) = $"{bRects.bounds.rects.Count - bRects.smallRects.Count} cells after contain test"
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Boundary_Overlap : Inherits VB_Algorithm
+    Dim bounds As New Boundary_Basics
+    Public Sub New()
+        dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Determine if 2 contours overlap"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        bounds.Run(src)
+        dst3 = bounds.dst2
+        Dim overlapping As Boolean
+        For i = 0 To bounds.contours.Count - 1
+            Dim tour = bounds.contours(i)
+            Dim rect = bounds.rects(i)
+            For j = i + 1 To bounds.contours.Count - 1
+                Dim r = bounds.rects(j)
+                If r.IntersectsWith(rect) Then
+                    dst2.SetTo(0)
+                    Dim c1 = tour.Count
+                    Dim c2 = bounds.contours(j).Count
+                    vbDrawContour(dst2(rect), tour, 127, task.lineWidth)
+                    vbDrawContour(dst2(r), bounds.contours(j), 255, task.lineWidth)
+                    Dim count = dst2.CountNonZero
+                    If count <> c1 + c2 Then
+                        overlapping = True
+                        Exit For
+                    End If
+                End If
+            Next
+            If overlapping Then Exit For
+        Next
+    End Sub
+End Class
