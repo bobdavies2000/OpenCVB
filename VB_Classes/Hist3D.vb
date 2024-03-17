@@ -138,7 +138,7 @@ Public Class Hist3D_RedColor : Inherits VB_Algorithm
         labels(2) = redC.labels(3)
 
         If redC.redCells.Count > 0 Then
-            dst2(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
+            dst2(task.rcOld.rect).SetTo(cv.Scalar.White, task.rcOld.mask)
         End If
         If standaloneTest() Then identifyCells(redC.redCells)
     End Sub
@@ -263,7 +263,7 @@ Public Class Hist3D_PixelClassify : Inherits VB_Algorithm
         labels(2) = redC.labels(3)
 
         If redC.redCells.Count > 0 Then
-            dst2(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
+            dst2(task.rcOld.rect).SetTo(cv.Scalar.White, task.rcOld.mask)
         End If
     End Sub
 End Class

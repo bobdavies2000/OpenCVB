@@ -192,7 +192,7 @@ Module VB
         dst.Circle(pt, task.dotSize, cv.Scalar.Black, -1, task.lineType)
     End Sub
     Public Sub showSelectedCell(dst As cv.Mat)
-        Dim rc = task.rc
+        Dim rc = task.rcOld
         dst(rc.rect).SetTo(cv.Scalar.White, rc.mask)
         dst.Circle(rc.maxDist, task.dotSize, cv.Scalar.Black, -1, task.lineType)
 
@@ -202,25 +202,25 @@ Module VB
     Public Sub setSelectedContour(ByRef redCells As List(Of rcDataOld), ByRef cellMap As cv.Mat)
         If redCells.Count = 0 Then Exit Sub
         Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        task.rc = redCells(index)
+        task.rcOld = redCells(index)
         If task.mouseClickFlag = False Then Exit Sub
         'If index = 0 Or index >= redCells.Count Then
         If index >= redCells.Count Then
             If redCells.Count > 0 Then
                 task.clickPoint = redCells(0).maxDist
-                task.rc = redCells(0)
+                task.rcOld = redCells(0)
             End If
         End If
     End Sub
     Public Sub setSelectedContour(ByRef redCells As List(Of rcDataNew), ByRef cellMap As cv.Mat)
         If redCells.Count = 0 Then Exit Sub
         Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        task.rcNew = redCells(index)
+        task.rc = redCells(index)
         If task.mouseClickFlag = False Then Exit Sub
         If index >= redCells.Count Then
             If redCells.Count > 0 Then
                 task.clickPoint = redCells(0).maxDist
-                task.rcNew = redCells(0)
+                task.rc = redCells(0)
             End If
         End If
     End Sub

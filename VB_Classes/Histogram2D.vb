@@ -106,7 +106,6 @@ End Class
 
 
 Public Class Histogram2D_Side : Inherits VB_Algorithm
-    Dim autoY As New OpAuto_YRange
     Public histogram As New cv.Mat
     Public Sub New()
         labels(2) = "ZY (Side View)"
@@ -129,7 +128,6 @@ End Class
 
 
 Public Class Histogram2D_Top : Inherits VB_Algorithm
-    Dim autoX As New OpAuto_XRange
     Public histogram As New cv.Mat
     Public Sub New()
         labels(2) = "XZ (Top View)"

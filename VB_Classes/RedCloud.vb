@@ -488,7 +488,7 @@ Public Class RedCloud_Features : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
 
-        Dim rc = task.rc
+        Dim rc = task.rcOld
 
         dst0 = task.color
         Dim correlationMat As New cv.Mat, correlationXtoZ As Single, correlationYtoZ As Single
@@ -537,7 +537,7 @@ Public Class RedCloud_ShapeCorrelation : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Dim rc = task.rc
+        Dim rc = task.rcOld
         If rc.contour.Count > 0 Then
             Dim shape = shapeCorrelation(rc.contour)
             strOut = "Contour correlation for selected cell contour X to Y = " + Format(shape, fmt3) + vbCrLf + vbCrLf +
@@ -643,7 +643,7 @@ Public Class RedCloud_PlaneFromContour : Inherits VB_Algorithm
             labels(2) = redC.labels(2)
         End If
 
-        Dim rc = task.rc
+        Dim rc = task.rcOld
         Dim fitPoints As New List(Of cv.Point3f)
         For Each pt In rc.contour
             If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
@@ -679,7 +679,7 @@ Public Class RedCloud_PlaneFromMask : Inherits VB_Algorithm
             labels(2) = redC.labels(2)
         End If
 
-        Dim rc = task.rc
+        Dim rc = task.rcOld
         Dim fitPoints As New List(Of cv.Point3f)
         For y = 0 To rc.rect.Height - 1
             For x = 0 To rc.rect.Width - 1
@@ -861,7 +861,7 @@ Public Class RedCloud_ProjectCell : Inherits VB_Algorithm
 
         'labels(2) = redC.labels(2)
 
-        'Dim rc = task.rc
+        'Dim rc = task.rcOld
 
         'Dim pc = New cv.Mat(rc.rect.Height, rc.rect.Width, cv.MatType.CV_32FC3, 0)
         'task.pointCloud(rc.rect).CopyTo(pc, rc.mask)
@@ -973,7 +973,7 @@ Public Class RedCloud_LikelyFlatSurfaces : Inherits VB_Algorithm
             End If
         Next
 
-        Dim rcX = task.rc
+        Dim rcX = task.rcOld
         setTrueText("mean depth = " + Format(rcX.depthMean(2), "0.0"), 3)
         labels(2) = redC.labels(2)
     End Sub
@@ -997,7 +997,7 @@ Public Class RedCloud_PlaneEq3D : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Dim rc = task.rc
+        Dim rc = task.rcOld
         If rc.maxVec.Z Then
             eq.rc = rc
             eq.Run(empty)
@@ -1728,7 +1728,7 @@ Public Class RedCloud_Gaps : Inherits VB_Algorithm
         dst3 = frames.dst2
 
         If redC.redCells.Count > 0 Then
-            dst2(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
+            dst2(task.rcOld.rect).SetTo(cv.Scalar.White, task.rcOld.mask)
         End If
 
         If redC.redCells.Count > 0 Then
@@ -2347,7 +2347,7 @@ Public Class RedCloud_TopXNeighbors : Inherits VB_Algorithm
         'redCells(0).mask = cellMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
 
         'setSelectedContour(redCells, cellMap)
-        'If task.rc.index = 0 Then task.rc = redCells(redCells.Count - 1)
+        'If task.rcOld.index = 0 Then task.rcOld = redCells(redCells.Count - 1)
         'labels(2) = $"The top {options.topX} RedCloud cells by size."
     End Sub
 End Class
@@ -2750,7 +2750,7 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
             rc.index = redCells.Count
             redCells.Add(rc)
 
-            If rc.indexlast <> 0 Then matchCount += 1
+            If rc.indexLast <> 0 Then matchCount += 1
 
             dst3(rc.rect).SetTo(rc.index, rc.mask)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
@@ -2882,7 +2882,7 @@ Public Class RedCloud_Both : Inherits VB_Algorithm
             Case 3
                 setSelectedContour(floodPC.redCells, floodPC.cellMap)
         End Select
-        dst2.Rectangle(task.rcNew.rect, task.highlightColor, task.lineWidth)
-        dst3(task.rcNew.rect).SetTo(cv.Scalar.White, task.rcNew.mask)
+        dst2.Rectangle(task.rc.rect, task.highlightColor, task.lineWidth)
+        dst3(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
     End Sub
 End Class

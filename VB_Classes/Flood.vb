@@ -10,11 +10,14 @@ Public Class Flood_Basics : Inherits VB_Algorithm
         desc = "Build the RedCloud cells with the best boundaries"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        bounds.Run(src)
-        dst1 = bounds.dst2
-
-        dst3 = bounds.bRects.bounds.dst2
-        dst3 = dst3 Or dst1
+        If src.Channels <> 1 Then
+            bounds.Run(src)
+            dst1 = bounds.dst2
+            dst3 = bounds.bRects.bounds.dst2
+            dst3 = dst3 Or dst1
+        Else
+            dst3 = src
+        End If
 
         flood.genCells.removeContour = False
         flood.genCells.cellLimit = bounds.bRects.bounds.rects.Count - bounds.bRects.smallRects.Count

@@ -44,7 +44,7 @@ Public Class Hull_Contour : Inherits VB_Algorithm
         labels(2) = redC.labels(2)
 
         dst3.SetTo(0)
-        Dim rc = task.rc
+        Dim rc = task.rcOld
 
         Dim jumpList As New List(Of cv.Point)
         For i = 1 To rc.contour.Count - 1

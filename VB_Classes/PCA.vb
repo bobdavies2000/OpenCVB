@@ -65,7 +65,7 @@ Public Class PCA_Basics : Inherits VB_Algorithm
             labels(2) = redC.labels(2)
         End If
 
-        Dim rc = task.rc
+        Dim rc = task.rcOld
         Dim inputPoints As New List(Of cv.Point3f)
         For Each pt In rc.contour
             Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
@@ -104,7 +104,7 @@ Public Class PCA_CellMask : Inherits VB_Algorithm
         dst2 = pca.dst2
         labels(2) = pca.labels(2)
 
-        Dim rc = task.rc
+        Dim rc = task.rcOld
         If rc.maxVec.Z > 0 Then
             pcaPrep.Run(task.pointCloud(rc.rect).Clone)
 

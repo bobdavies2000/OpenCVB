@@ -204,7 +204,7 @@ Public Class Plane_OnlyPlanes : Inherits VB_Algorithm
         Next
         If plane.options.reuseRawDepthData Then dst3 = task.pointCloud
 
-        Dim rcX = task.rc
+        Dim rcX = task.rcOld
     End Sub
 End Class
 
@@ -314,7 +314,7 @@ Public Class Plane_CellColor : Inherits VB_Algorithm
 
         dst3.SetTo(0)
         Dim newCells As New List(Of rcDataOld)
-        Dim rcX = task.rc
+        Dim rcX = task.rcOld
         For Each rc In redC.redCells
             rc.eq = New cv.Vec4f
             If options.useMaskPoints Then
@@ -354,7 +354,7 @@ Public Class Plane_Points : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
 
-        Dim rc = task.rc
+        Dim rc = task.rcOld
         labels(2) = "Selected cell has " + CStr(rc.contour.Count) + " points."
 
         ' this contour will have more depth data behind it.  Simplified contours will lose lots of depth data.
@@ -441,7 +441,7 @@ Public Class Plane_Histogram : Inherits VB_Algorithm
         Dim rangePerBin = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
 
         Dim midHist = task.histogramBins / 2
-        Dim mm as mmData = vbMinMax(hist.histogram(New cv.Rect(0, midHist, 1, midHist)))
+        Dim mm As mmData = vbMinMax(hist.histogram(New cv.Rect(0, midHist, 1, midHist)))
         floorPop = mm.maxVal
         Dim peak = hist.mm.minVal + (midHist + mm.maxLoc.Y + 1) * rangePerBin
         Dim rX As Integer = (midHist + mm.maxLoc.Y) * binWidth
@@ -546,7 +546,7 @@ Public Class Plane_Equation : Inherits VB_Algorithm
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
-            rc = task.rc
+            rc = task.rcOld
             If rc.index = 0 Then setTrueText("Select a cell in the image at left.")
         End If
 

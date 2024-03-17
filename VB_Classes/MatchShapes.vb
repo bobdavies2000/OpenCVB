@@ -80,7 +80,7 @@ Public Class MatchShapes_NearbyHull : Inherits VB_Algorithm
             hulls.Run(task.color)
             If hulls.redC.redCells.Count = 0 Then Exit Sub
             dst2 = hulls.dst2
-            rc = task.rc
+            rc = task.rcOld
         End If
 
         dst3.SetTo(0)
@@ -138,7 +138,7 @@ Public Class MatchShapes_Nearby : Inherits VB_Algorithm
             dst2 = redC.dst2
             addTour.redCells = New List(Of rcDataOld)(redC.redCells)
             addTour.Run(src)
-            rc = task.rc
+            rc = task.rcOld
         End If
 
         If task.heartBeat And myStandalone Then dst3.SetTo(0)
@@ -266,7 +266,7 @@ Public Class MatchShapes_Hulls : Inherits VB_Algorithm
         dst2 = hulls.dst2
         If task.heartBeat Then dst3.SetTo(0)
 
-        Dim rcX = task.rc
+        Dim rcX = task.rcOld
 
         For Each rc In hulls.redC.redCells
             If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
@@ -301,7 +301,7 @@ Public Class MatchShapes_Contours : Inherits VB_Algorithm
         dst2 = redC.dst2
         If task.heartBeat Then dst3.SetTo(0)
 
-        Dim rcX = task.rc
+        Dim rcX = task.rcOld
 
         For Each rc In redC.redCells
             If rc.contour Is Nothing Then Continue For

@@ -88,7 +88,7 @@ Public Class Resize_Proportional : Inherits VB_Algorithm
             Static options As New Options_Spectrum
             options.RunVB()
             dst3 = options.runRedCloud(labels(2))
-            src = src(task.rc.rect)
+            src = src(task.rcOld.rect)
         End If
 
         Dim newSize As cv.Size

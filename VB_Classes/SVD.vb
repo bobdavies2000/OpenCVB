@@ -51,7 +51,7 @@ Public Class SVD_Example2 : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
 
-        Dim rc = task.rc
+        Dim rc = task.rcOld
 
         If task.heartBeat Then
             Dim m = cv.Cv2.Moments(rc.mask, True)

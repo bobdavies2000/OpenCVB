@@ -9,13 +9,13 @@ Public Class Cell_Basics : Inherits VB_Algorithm
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString(src As cv.Mat)
-        Dim tmp = New cv.Mat(task.rcNew.mask.Rows, task.rcNew.mask.Cols, cv.MatType.CV_32F, 0)
-        task.pcSplit(2)(task.rcNew.rect).CopyTo(tmp, task.rcNew.mask)
-        plot.rc = task.rcNew
+        Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, 0)
+        task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
+        plot.rc = task.rc
         plot.Run(tmp)
         dst1 = plot.dst2
 
-        Dim rc = task.rcNew
+        Dim rc = task.rc
 
         Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
         strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbCrLf
@@ -127,7 +127,7 @@ Public Class Cell_Stable : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
         dst3 = dst2.Clone
-        dst3(task.rc.rect).SetTo(task.rc.color, task.rc.mask)
+        dst3(task.rcOld.rect).SetTo(task.rcOld.color, task.rcOld.mask)
         labels(2) = redC.labels(2)
 
         Static prevList As New List(Of cv.Point)
@@ -423,10 +423,10 @@ Public Class Cell_Distance : Inherits VB_Algorithm
             redCells.Clear()
             Dim depthDistance As New List(Of Single)
             Dim colorDistance As New List(Of Single)
-            Dim selectedMean As cv.Scalar = src(task.rcNew.rect).Mean(task.rcNew.mask)
+            Dim selectedMean As cv.Scalar = src(task.rc.rect).Mean(task.rc.mask)
             For Each rc In redC.redCells
                 colorDistance.Add(distance3D(selectedMean, src(rc.rect).Mean(rc.mask)))
-                depthDistance.Add(distance3D(task.rc.depthMean, rc.depthMean))
+                depthDistance.Add(distance3D(task.rcOld.depthMean, rc.depthMean))
                 redCells.Add(rc)
             Next
 
@@ -554,13 +554,13 @@ Public Class Cell_BasicsNew : Inherits VB_Algorithm
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString(src As cv.Mat)
-        Dim tmp = New cv.Mat(task.rcNew.mask.Rows, task.rcNew.mask.Cols, cv.MatType.CV_32F, 0)
-        task.pcSplit(2)(task.rcNew.rect).CopyTo(tmp, task.rcNew.mask)
-        plot.rc = task.rcNew
+        Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, 0)
+        task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
+        plot.rc = task.rc
         plot.Run(tmp)
         dst1 = plot.dst2
 
-        Dim rc = task.rcNew
+        Dim rc = task.rc
 
         Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
         strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbCrLf

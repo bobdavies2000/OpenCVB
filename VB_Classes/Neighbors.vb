@@ -37,9 +37,9 @@ Public Class Neighbors_Basics : Inherits VB_Algorithm
             setSelectedContour(redCells, cellMap)
             dst3.SetTo(0)
             Dim ptCount As Integer
-            For Each index In task.rc.nabs
+            For Each index In task.rcOld.nabs
                 Dim pt = redCells(index).maxDStable
-                If pt = task.rc.maxDStable Then
+                If pt = task.rcOld.maxDStable Then
                     dst2.Circle(pt, task.dotSize, black, -1, task.lineType)
                 Else
                     dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
@@ -234,7 +234,7 @@ Public Class Neighbors_Contained : Inherits VB_Algorithm
         'dst1 = nabs.dst2
         'labels(1) = nabs.labels(2)
 
-        'For Each index In nabs.nabList(task.rc.index)
+        'For Each index In nabs.nabList(task.rcOld.index)
         '    Dim rc = nabs.redCells(index)
         '    dst2.Circle(rc.maxDStable, task.dotSize, task.highlightColor, -1, task.lineType)
         '    strOut += CStr(index) + ","
@@ -289,8 +289,8 @@ Public Class Neighbors_PreciseTest : Inherits VB_Algorithm
         'If nabs.redCells.Count <= 1 Then Exit Sub
 
         'dst3.SetTo(0)
-        'dst3(task.rc.rect).SetTo(task.rc.color, task.rc.mask)
-        'For Each index In nabs.nabList(task.rc.index)
+        'dst3(task.rcOld.rect).SetTo(task.rcOld.color, task.rcOld.mask)
+        'For Each index In nabs.nabList(task.rcOld.index)
         '    Dim rc = nabs.redCells(index)
         '    dst3(rc.rect).SetTo(rc.color, rc.mask)
         'Next
@@ -356,11 +356,11 @@ Public Class Neighbors_Precise : Inherits VB_Algorithm
         '        stats.Run(task.color)
 
         '        strOut = stats.strOut
-        '        If nabList(task.rc.index).Count > 0 Then
+        '        If nabList(task.rcOld.index).Count > 0 Then
         '            strOut += "Neighbors: "
         '            dst1.SetTo(0)
-        '            dst1(task.rc.rect).SetTo(task.rc.color, task.rc.mask)
-        '            For Each index In nabList(task.rc.index)
+        '            dst1(task.rcOld.rect).SetTo(task.rcOld.color, task.rcOld.mask)
+        '            For Each index In nabList(task.rcOld.index)
         '                Dim rc = redCells(index)
         '                dst1(rc.rect).SetTo(rc.color, rc.mask)
         '                strOut += CStr(index) + ","

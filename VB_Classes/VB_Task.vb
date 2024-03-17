@@ -226,8 +226,8 @@ Public Class VBtask : Implements IDisposable
 
     Public projectionThreshold As Integer ' In heatmap views, this defines what is hot in a heatmap.
 
-    Public rc As New rcDataOld
-    Public rcNew As New rcDataNew
+    Public rcOld As New rcDataOld
+    Public rc As New rcDataNew
     Public rcPicTag As Integer
     Public rcMatchMax As Integer
 
@@ -599,7 +599,7 @@ Public Class VBtask : Implements IDisposable
                 task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
             End If
 
-            Dim rc = task.rc
+            Dim rc = task.rcOld
             If rc.index > 0 Then
                 task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
                 task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
@@ -608,7 +608,7 @@ Public Class VBtask : Implements IDisposable
                 'task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
             End If
 
-            Dim rcNew = task.rcNew
+            Dim rcNew = task.rc
             If rcNew.index > 0 Then
                 task.color.Rectangle(rcNew.rect, cv.Scalar.Yellow, task.lineWidth)
                 task.color(rcNew.rect).SetTo(cv.Scalar.White, rcNew.mask)

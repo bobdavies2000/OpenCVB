@@ -136,14 +136,14 @@ Public Class Classifier_BayesianTest : Inherits VB_Algorithm
         'Next
 
         'dst1.SetTo(0)
-        'For Each index In nabs.nabList(task.rc.index)
+        'For Each index In nabs.nabList(task.rcOld.index)
         '    Dim rc = redC.redCells(index)
         '    dst1(rc.rect).SetTo(255, rc.mask)
         '    strOut += CStr(index) + ","
         '    responseList(index) = -1
         'Next
 
-        'responseList(task.rc.index) = 1
+        'responseList(task.rcOld.index) = 1
 
         'Dim queryList As New List(Of cv.Scalar)
         'Dim maskList As New List(Of Integer)

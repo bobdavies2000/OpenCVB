@@ -161,7 +161,7 @@ Public Class HeatMap_Cell : Inherits VB_Algorithm
         labels(2) = flood.labels(2)
 
         dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        task.pointCloud(task.rcNew.rect).CopyTo(dst0(task.rcNew.rect), task.rcNew.mask)
+        task.pointCloud(task.rc.rect).CopyTo(dst0(task.rc.rect), task.rc.mask)
 
         heat.Run(dst0)
         dst1 = heat.dst2
@@ -203,6 +203,7 @@ End Class
 
 Public Class HeatMap_Top : Inherits VB_Algorithm
     Dim histTop As New Histogram2D_Top
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         redOptions.ProjectionThreshold.Value = 1
         desc = "Find all the masks, rects, and counts in the top down view."
@@ -212,5 +213,9 @@ Public Class HeatMap_Top : Inherits VB_Algorithm
         dst2 = histTop.dst2
         dst3 = histTop.dst3
         labels = histTop.labels
+
+        redC.Run(dst2)
+        dst3 = redC.dst2
+        labels(3) = redC.labels(2)
     End Sub
 End Class
