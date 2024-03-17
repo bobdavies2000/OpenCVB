@@ -11,7 +11,7 @@ Public Class Plane_Basics : Inherits VB_Algorithm
         cv.Cv2.CalcHist({task.pointCloud}, task.channelsTop, New cv.Mat, topHist, 2,
                         {dst2.Height, dst2.Width}, task.rangesTop)
         topHist.Row(0).SetTo(0)
-        cv.Cv2.InRange(topHist, task.redThresholdTop, topHist.Total, dst1)
+        cv.Cv2.InRange(topHist, task.projectionThreshold, topHist.Total, dst1)
         dst1.ConvertTo(dst1, cv.MatType.CV_32F)
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, topBackP, task.rangesTop)
 
@@ -476,7 +476,7 @@ Public Class Plane_Verticals : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         solo.Run(src)
-        dst3 = solo.heat.topframes.dst2.InRange(task.redThresholdTop * task.frameHistoryCount, dst2.Total)
+        dst3 = solo.heat.topframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total)
 
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, 0)
         solo.heat.dst0.CopyTo(dst1, dst3)
@@ -510,7 +510,7 @@ Public Class Plane_Horizontals : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         solo.Run(src)
-        dst3 = solo.heat.sideframes.dst2.InRange(task.redThresholdSide * task.frameHistoryCount, dst2.Total)
+        dst3 = solo.heat.sideframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total)
 
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, 0)
         solo.heat.dst1.CopyTo(dst1, dst3)

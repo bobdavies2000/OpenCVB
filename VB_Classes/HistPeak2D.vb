@@ -115,7 +115,7 @@ Public Class HistPeak2D_Edges : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         hist2d.Run(src)
 
-        dst3 = hist2d.histogram.Threshold(task.redThresholdTop, 255, cv.ThresholdTypes.Binary)
+        dst3 = hist2d.histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary)
         peak.histogram = hist2d.histogram
         peak.Run(task.pointCloud)
         dst2 = peak.dst2

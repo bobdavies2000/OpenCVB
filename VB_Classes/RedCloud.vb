@@ -2834,10 +2834,10 @@ End Class
 Public Class RedCloud_Depth : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
     Public Sub New()
+        redOptions.UseDepth.Checked = True
         desc = "Create RedCloud output using only depth."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        redOptions.UseDepth.Checked = True
         flood.Run(src)
         dst2 = flood.dst2
         labels(2) = flood.labels(2)
@@ -2883,5 +2883,6 @@ Public Class RedCloud_Both : Inherits VB_Algorithm
                 setSelectedContour(floodPC.redCells, floodPC.cellMap)
         End Select
         dst2.Rectangle(task.rcNew.rect, task.highlightColor, task.lineWidth)
+        dst3(task.rcNew.rect).SetTo(cv.Scalar.White, task.rcNew.mask)
     End Sub
 End Class

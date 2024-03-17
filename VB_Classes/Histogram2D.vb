@@ -71,7 +71,7 @@ Public Class Histogram2D_Depth : Inherits VB_Algorithm
         channels = redOptions.channels
 
         dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        dst3 = histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
 
         labels = {"", "", "Mask of the 2D histogram for selected channels", "Mask of 2D histogram after thresholding"}
     End Sub
@@ -113,13 +113,12 @@ Public Class Histogram2D_Side : Inherits VB_Algorithm
         desc = "Create a 2D side view for ZY histogram of depth"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
         histogram.Col(0).SetTo(0)
 
-        ' If task.useXYRange Then autoY.Run(histogram)
-
         dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        dst3 = histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         labels(3) = "Y-range = " + Format(task.yRange, fmt2)
     End Sub
 End Class
@@ -137,13 +136,12 @@ Public Class Histogram2D_Top : Inherits VB_Algorithm
         desc = "Create a 2D top view for XZ histogram of depth"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        cv.Cv2.CalcHist({task.pointCloud}, task.channelsTop, New cv.Mat, histogram, 2, task.bins2D, task.rangesTop)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        cv.Cv2.CalcHist({src}, task.channelsTop, New cv.Mat, histogram, 2, task.bins2D, task.rangesTop)
         histogram.Row(0).SetTo(0)
 
-        'If task.useXYRange Then autoX.Run(histogram)
-
         dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        dst3 = histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         labels(3) = "X-range = " + Format(task.xRange, fmt2)
     End Sub
 End Class

@@ -457,11 +457,10 @@ Public Class LongLine_History : Inherits VB_Algorithm
             Next
         Next
 
-        lpList.clear
-        Dim histCount = gOptions.FrameHistory.Value
+        lpList.Clear
         For i = 0 To lpCount.Count - 1
             Dim count = lpCount(i)
-            If count >= histCount Then lpList.Add(tmplist(i))
+            If count >= task.frameHistoryCount Then lpList.Add(tmplist(i))
         Next
 
         For Each lp In lpList
@@ -469,6 +468,6 @@ Public Class LongLine_History : Inherits VB_Algorithm
         Next
         If mpList.Count > gOptions.FrameHistory.Value Then mpList.RemoveAt(0)
 
-        labels(2) = $"{lpList.Count} were found that were present for every one of the last {histCount} frames."
+        labels(2) = $"{lpList.Count} were found that were present for every one of the last {task.frameHistoryCount} frames."
     End Sub
 End Class

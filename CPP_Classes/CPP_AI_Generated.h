@@ -2439,7 +2439,6 @@ public:
     Mat inputMask;
     CPP_FeatureLess_Basics* fLess;
     RedCloud* cPtr;
-    float redOptions_imageThresholdPercent = 0.95f;
     CPP_RedColor_FeatureLessCore() : algorithmCPP() {
         traceName = "CPP_RedColor_FeatureLessCore";
         vbPalette(dst2);
@@ -3342,8 +3341,6 @@ public:
     vector<Rect>cellRects;
     vector<int> cellSizes;
     vector<Point> floodPoints;
-    float imageThresholdPercent = 0.98f;
-    float cellMinPercent = 0.0001f;
     CPP_Color_Basics* colorClass = new CPP_Color_Basics();
     CPP_RedCloud_BasicsNative() : algorithmCPP() {
         traceName = "CPP_RedCloud_BasicsNative";
@@ -3363,8 +3360,6 @@ public:
         multimap<int, Point, greater<int>> sizeSorted;
         int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
         int count; Point pt;
-        int cellSizeThreshold = int(src.total() * cellMinPercent); // if the cell is smaller than this, skip it.
-        if (cellSizeThreshold < 1) cellSizeThreshold = 1;
         for (int y = 0; y < src.rows; y++)
         {
             for (int x = 0; x < src.cols; x++)
@@ -3373,7 +3368,7 @@ public:
                 {
                     pt = Point(x, y);
                     int count = floodFill(src, mask, pt, 255, &rect, 0, 0, floodFlag | (255 << 8));
-                    if (count >= cellSizeThreshold) sizeSorted.insert(make_pair(count, pt));
+                    sizeSorted.insert(make_pair(count, pt));
                 }
             }
         }
@@ -3383,7 +3378,6 @@ public:
         floodPoints.clear();
         int fill = 1;
         int totalCount = 0;
-        int threshold = int(imageThresholdPercent * src.total());
         mask.setTo(0);
         for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
         {
@@ -3395,7 +3389,7 @@ public:
                 floodPoints.push_back(it->second);
                 totalCount += count;
 
-                if (count > threshold || fill >= maxClassCount)
+                if (fill >= maxClassCount)
                     break; // just taking up to the top X largest objects found.
                 fill++;
             }

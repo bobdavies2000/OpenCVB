@@ -224,8 +224,7 @@ Public Class VBtask : Implements IDisposable
     Public frameHistoryCount As Integer ' count of how much history to use for the point cloud.
     Public depthThresholdPercent As Single
 
-    Public redThresholdSide As Integer ' In heatmap side view, this defines the boundary between red and blue
-    Public redThresholdTop As Integer ' In heatmap top view, this defines the boundary between red and blue
+    Public projectionThreshold As Integer ' In heatmap views, this defines what is hot in a heatmap.
 
     Public rc As New rcDataOld
     Public rcNew As New rcDataNew

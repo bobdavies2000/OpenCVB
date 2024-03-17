@@ -318,8 +318,8 @@ Public Class Stabilizer_VerticalIMU : Inherits VB_Algorithm
         lastAngleX = avgX
         lastAngleY = avgY
 
-        If angleXValue.Count >= gOptions.FrameHistory.Value Then angleXValue.RemoveAt(0)
-        If angleYValue.Count >= gOptions.FrameHistory.Value Then angleYValue.RemoveAt(0)
+        If angleXValue.Count >= task.frameHistoryCount Then angleXValue.RemoveAt(0)
+        If angleYValue.Count >= task.frameHistoryCount Then angleYValue.RemoveAt(0)
     End Sub
 End Class
 

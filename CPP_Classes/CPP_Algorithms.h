@@ -2409,127 +2409,6 @@ int* Random_DiscreteDistribution_Run(Random_DiscreteDistribution * cPtr, int row
 
 
 
-
-class RedCloud
-{
-private:
-public:
-	Mat src, mask, maskCopy, result;
-	vector<Rect>cellRects;
-	vector<int> cellSizes;
-	vector<Point> floodPoints;
-
-	RedCloud() {}
-	void RunCPP(int maxClassCount, int diff) {
-		Rect rect;
-
-		multimap<int, Point, greater<int>> sizeSorted;
-		int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
-		int count; Point pt;
-		for (int y = 0; y < src.rows; y++)
-		{
-			for (int x = 0; x < src.cols; x++)
-			{
-				if (mask.at<unsigned char>(y, x) == 0)
-				{
-					pt = Point(x, y);
-					int count = floodFill(src, mask, pt, 255, &rect, diff, diff, floodFlag | (255 << 8));
-					if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
-				}
-			}
-		}
-
-		cellRects.clear();
-		cellSizes.clear();
-		floodPoints.clear();
-		int fill = 1;
-		for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
-		{
-			count = floodFill(src, maskCopy, it->second, fill, &rect, diff, diff, floodFlag | (fill << 8));
-			if (count >= 1)
-			{
-				cellRects.push_back(rect);
-				cellSizes.push_back(count);
-				floodPoints.push_back(it->second);
-
-				if (fill >= maxClassCount)
-					break; // just taking up to the top X largest objects found.
-				fill++;
-			}
-		}
-
-
-
-
-
-
-
-		//Rect r = Rect(1, 1, src.cols, src.rows);
-		//Mat inputMat = maskCopy(r).clone();
-		//for (size_t i = 1; i < cellSizes.size(); i++)
-		//{
-		//	Mat testMat;
-		//	inRange(inputMat, i, i, testMat);
-		//	Rect rect = cellRects[i - 1];
-		//	int testCount = countNonZero(testMat(rect));
-		//	int nextSize = cellSizes[i - 1];
-		//	if (testCount != nextSize)
-		//		int k = 0;
-		//}
-
-
-
-
-
-	}
-};
-
-extern "C" __declspec(dllexport) RedCloud * RedCloud_Open() { return new RedCloud(); }
-extern "C" __declspec(dllexport) int RedCloud_Count(RedCloud * cPtr)
-{
-	return (int)cPtr->cellRects.size();
-}
-
-extern "C" __declspec(dllexport) int* RedCloud_Rects(RedCloud * cPtr)
-{
-	return (int*)&cPtr->cellRects[0];
-}
-
-extern "C" __declspec(dllexport) int* RedCloud_FloodPoints(RedCloud * cPtr)
-{
-	return (int*)&cPtr->floodPoints[0];
-}
-
-extern "C" __declspec(dllexport) int* RedCloud_Sizes(RedCloud * cPtr)
-{
-	return (int*)&cPtr->cellSizes[0];
-}
-
-extern "C" __declspec(dllexport) int* RedCloud_Close(RedCloud * cPtr) { delete cPtr; return (int*)0; }
-extern "C" __declspec(dllexport) int*
-RedCloud_Run(RedCloud * cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols, int type,
-			 int maxClassCount, int diff)
-{
-	cPtr->src = Mat(rows, cols, type, dataPtr);
-	cPtr->mask = Mat::zeros(rows + 2, cols + 2, CV_8U);
-	Rect r = Rect(1, 1, cols, rows);
-	if (maskPtr != 0)
-	{
-		Mat inputMask;
-		inputMask = Mat(rows, cols, type, maskPtr);
-		inputMask.copyTo(cPtr->mask(r));
-	}
-	cPtr->maskCopy = cPtr->mask.clone();
-	cPtr->RunCPP(maxClassCount, diff); 
-	cPtr->maskCopy(r).copyTo(cPtr->result);
-	return (int*)cPtr->result.data;
-}
-
-
-
-
-
-
 class RedCloud_FindCells
 {
 private:
@@ -3903,4 +3782,222 @@ int Neighbors_RunCPP(Neighbors * cPtr, int* dataPtr, int rows, int cols)
 	cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
 	cPtr->RunCPP();
 	return (int)cPtr->nabList.size();
+}
+
+
+
+
+
+
+
+
+
+class RedCloud
+{
+private:
+public:
+	Mat src, mask, maskCopy, result;
+	vector<Rect>cellRects;
+	vector<int> cellSizes;
+	vector<Point> floodPoints;
+
+	RedCloud() {}
+	void RunCPP(int maxClassCount, int diff) {
+		Rect rect;
+
+		multimap<int, Point, greater<int>> sizeSorted;
+		int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
+		int count; Point pt;
+		for (int y = 0; y < src.rows; y++)
+		{
+			for (int x = 0; x < src.cols; x++)
+			{
+				if (mask.at<unsigned char>(y, x) == 0)
+				{
+					pt = Point(x, y);
+					int count = floodFill(src, mask, pt, 255, &rect, diff, diff, floodFlag | (255 << 8));
+					if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
+				}
+			}
+		}
+
+		cellRects.clear();
+		cellSizes.clear();
+		floodPoints.clear();
+		int fill = 1;
+		for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
+		{
+			count = floodFill(src, maskCopy, it->second, fill, &rect, diff, diff, floodFlag | (fill << 8));
+			if (count >= 1)
+			{
+				cellRects.push_back(rect);
+				cellSizes.push_back(count);
+				floodPoints.push_back(it->second);
+
+				if (fill >= maxClassCount)
+					break; // just taking up to the top X largest objects found.
+				fill++;
+			}
+		}
+
+
+
+
+
+
+
+		//Rect r = Rect(1, 1, src.cols, src.rows);
+		//Mat inputMat = maskCopy(r).clone();
+		//for (size_t i = 1; i < cellSizes.size(); i++)
+		//{
+		//	Mat testMat;
+		//	inRange(inputMat, i, i, testMat);
+		//	Rect rect = cellRects[i - 1];
+		//	int testCount = countNonZero(testMat(rect));
+		//	int nextSize = cellSizes[i - 1];
+		//	if (testCount != nextSize)
+		//		int k = 0;
+		//}
+
+
+
+
+
+	}
+};
+
+extern "C" __declspec(dllexport) RedCloud * RedCloud_Open() { return new RedCloud(); }
+extern "C" __declspec(dllexport) int RedCloud_Count(RedCloud * cPtr)
+{
+	return (int)cPtr->cellRects.size();
+}
+
+extern "C" __declspec(dllexport) int* RedCloud_Rects(RedCloud * cPtr)
+{
+	return (int*)&cPtr->cellRects[0];
+}
+
+extern "C" __declspec(dllexport) int* RedCloud_FloodPoints(RedCloud * cPtr)
+{
+	return (int*)&cPtr->floodPoints[0];
+}
+
+extern "C" __declspec(dllexport) int* RedCloud_Sizes(RedCloud * cPtr)
+{
+	return (int*)&cPtr->cellSizes[0];
+}
+
+extern "C" __declspec(dllexport) int* RedCloud_Close(RedCloud * cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int*
+RedCloud_Run(RedCloud * cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols, int type,
+	int maxClassCount, int diff)
+{
+	cPtr->src = Mat(rows, cols, type, dataPtr);
+	cPtr->mask = Mat::zeros(rows + 2, cols + 2, CV_8U);
+	Rect r = Rect(1, 1, cols, rows);
+	if (maskPtr != 0)
+	{
+		Mat inputMask;
+		inputMask = Mat(rows, cols, type, maskPtr);
+		inputMask.copyTo(cPtr->mask(r));
+	}
+	cPtr->maskCopy = cPtr->mask.clone();
+	cPtr->RunCPP(maxClassCount, diff);
+	cPtr->maskCopy(r).copyTo(cPtr->result);
+	return (int*)cPtr->result.data;
+}
+
+
+
+
+
+class RedCloudNew
+{
+private:
+public:
+	Mat src, mask, maskCopy, result;
+	vector<Rect>cellRects;
+	vector<int> cellSizes;
+	vector<Point> floodPoints;
+
+	RedCloudNew() {}
+	void RunCPP(int maxClassCount, int diff) {
+		Rect rect;
+
+		multimap<int, Point, greater<int>> sizeSorted;
+		int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
+		int count; Point pt;
+		for (int y = 0; y < src.rows; y++)
+		{
+			for (int x = 0; x < src.cols; x++)
+			{
+				if (mask.at<unsigned char>(y, x) == 0)
+				{
+					pt = Point(x, y);
+					int count = floodFill(src, mask, pt, 255, &rect, diff, diff, floodFlag | (255 << 8));
+					if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
+				}
+			}
+		}
+
+		cellRects.clear();
+		cellSizes.clear();
+		floodPoints.clear();
+		int fill = 1;
+		for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
+		{
+			count = floodFill(src, maskCopy, it->second, fill, &rect, diff, diff, floodFlag | (fill << 8));
+			if (count >= 1)
+			{
+				cellRects.push_back(rect);
+				cellSizes.push_back(count);
+				floodPoints.push_back(it->second);
+
+				if (fill >= maxClassCount)
+					break; // just taking up to the top X largest objects found.
+				fill++;
+			}
+		}
+	}
+};
+
+extern "C" __declspec(dllexport) RedCloudNew * RedCloudNew_Open() { return new RedCloudNew(); }
+extern "C" __declspec(dllexport) int RedCloudNew_Count(RedCloudNew * cPtr)
+{
+	return (int)cPtr->cellRects.size();
+}
+
+extern "C" __declspec(dllexport) int* RedCloudNew_Rects(RedCloudNew * cPtr)
+{
+	return (int*)&cPtr->cellRects[0];
+}
+
+extern "C" __declspec(dllexport) int* RedCloudNew_FloodPoints(RedCloudNew * cPtr)
+{
+	return (int*)&cPtr->floodPoints[0];
+}
+
+extern "C" __declspec(dllexport) int* RedCloudNew_Sizes(RedCloudNew * cPtr)
+{
+	return (int*)&cPtr->cellSizes[0];
+}
+
+extern "C" __declspec(dllexport) int* RedCloudNew_Close(RedCloudNew * cPtr) { delete cPtr; return (int*)0; }
+extern "C" __declspec(dllexport) int*
+RedCloudNew_Run(RedCloudNew * cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols, int type,
+	int maxClassCount, int diff)
+{
+	cPtr->src = Mat(rows, cols, type, dataPtr);
+	cPtr->mask = Mat::zeros(rows + 2, cols + 2, CV_8U);
+	Rect r = Rect(1, 1, cols, rows);
+	if (maskPtr != 0)
+	{
+		Mat inputMask;
+		inputMask = Mat(rows, cols, type, maskPtr);
+		inputMask.copyTo(cPtr->mask(r));
+	}
+	cPtr->maskCopy = cPtr->mask.clone();
+	cPtr->RunCPP(maxClassCount, diff);
+	cPtr->maskCopy(r).copyTo(cPtr->result);
+	return (int*)cPtr->result.data;
 }

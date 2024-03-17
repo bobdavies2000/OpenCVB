@@ -404,7 +404,7 @@ Public Class BackProject_Side : Inherits VB_Algorithm
         hist2d.Run(src)
         autoY.Run(hist2d.histogram)
 
-        dst2 = autoY.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        dst2 = autoY.histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         Dim histogram = autoY.histogram.SetTo(0, Not dst2)
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogram, dst3, task.rangesSide)
         dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs

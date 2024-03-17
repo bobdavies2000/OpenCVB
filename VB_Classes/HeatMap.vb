@@ -100,10 +100,10 @@ End Class
 
 
 
-Public Class HeatMap_NotHotSpots : Inherits VB_Algorithm
-    Public heat As New HeatMap_Hotspots
+Public Class HeatMap_HotNot : Inherits VB_Algorithm
+    Dim heat As New HeatMap_Hot
     Public Sub New()
-        labels = {"", "", "Mask of red in heat map for the Top View", ""}
+        labels = {"", "", "Mask of cool areas in the heat map - top view", "Mask of cool areas in the heat map - side view"}
         desc = "Isolate points with low histogram values in side and top views"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -120,21 +120,53 @@ End Class
 
 
 
-Public Class HeatMap_Hotspots : Inherits VB_Algorithm
-    Public heatTop As New Histogram2D_Top
-    Public heatSide As New Histogram2D_Side
+Public Class HeatMap_Hot : Inherits VB_Algorithm
+    Dim heatTop As New Histogram2D_Top
+    Dim heatSide As New Histogram2D_Side
     Public Sub New()
-        labels = {"", "", "Threshold'd heat map for the Top View", "Threshold'd heat map for the Side View"}
-        desc = "Isolate just the hotspots in the heat map"
+        labels = {"", "", "Mask of hotter areas for the Top View", "Mask of hotter areas for the Side View"}
+        desc = "Isolate masks for just the hotspots in the heat map"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         heatTop.Run(src)
-        dst0 = heatTop.histogram
+        dst2 = heatTop.histogram
 
         heatSide.Run(src)
-        dst1 = heatSide.histogram
+        dst3 = heatSide.histogram
+    End Sub
+End Class
 
-        dst2 = dst0.Threshold(task.redThresholdTop, 255, cv.ThresholdTypes.Binary)
-        dst3 = dst1.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary)
+
+
+
+
+
+
+
+Public Class HeatMap_Cell : Inherits VB_Algorithm
+    Dim flood As New Flood_Basics
+    Dim heat As New HeatMap_Hot
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Display the heat map for the selected cell"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        flood.Run(src)
+        dst2 = flood.dst2
+        labels(2) = flood.labels(2)
+
+        dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        task.pointCloud(task.rcNew.rect).CopyTo(dst0(task.rcNew.rect), task.rcNew.mask)
+
+        heat.Run(dst0)
+        dst1 = heat.dst2
+        dst3 = heat.dst3
+
+        Dim mmTop = vbMinMax(dst1)
+        Dim mmSide = vbMinMax(dst3)
+        If task.heartBeat Then labels(1) = CStr(mmTop.maxVal) + " max count " + CStr(dst1.CountNonZero) + " pixels in the top down view"
+        If task.heartBeat Then labels(3) = CStr(mmSide.maxVal) + " max count " + CStr(dst3.CountNonZero) + " pixels in the side view"
+
+        identifyCells(flood.redCells)
     End Sub
 End Class

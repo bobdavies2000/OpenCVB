@@ -31,14 +31,13 @@ Public Class LineCoin_Basics : Inherits VB_Algorithm
         Next
         lpList.Clear()
         dst2.SetTo(0)
-        Dim historyCount = gOptions.FrameHistory.Value
         For i = 0 To p1List.Count - 1
-            If ptCounts(i) >= historyCount Then
+            If ptCounts(i) >= task.frameHistoryCount Then
                 dst2.Line(p1List(i), p2List(i), 255, task.lineWidth, task.lineType)
                 lpList.Add(New pointPair(p1List(i), p2List(i)))
             End If
         Next
-        If lpLists.Count >= historyCount Then lpLists.RemoveAt(0)
+        If lpLists.Count >= task.frameHistoryCount Then lpLists.RemoveAt(0)
         Return lpList
     End Function
     Public Sub RunVB(src As cv.Mat)
@@ -56,7 +55,7 @@ Public Class LineCoin_Basics : Inherits VB_Algorithm
             Next
         End If
 
-        labels(2) = $"The {lpList.Count} lines below were present in each of the last " + CStr(gOptions.FrameHistory.Value) + " frames"
+        labels(2) = $"The {lpList.Count} lines below were present in each of the last " + CStr(task.frameHistoryCount) + " frames"
     End Sub
 End Class
 
@@ -78,7 +77,7 @@ Public Class LineCoin_HistoryIntercept : Inherits VB_Algorithm
         coin.Run(src)
         dst2 = coin.dst2
 
-        labels(2) = $"The {lpList.Count} lines below were present in each of the last " + CStr(gOptions.FrameHistory.Value) + " frames"
+        labels(2) = $"The {lpList.Count} lines below were present in each of the last " + CStr(task.frameHistoryCount) + " frames"
     End Sub
 End Class
 

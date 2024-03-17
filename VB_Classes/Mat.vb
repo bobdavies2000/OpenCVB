@@ -500,7 +500,7 @@ Public Class Mat_ToList : Inherits VB_Algorithm
         hist2d.Run(src)
 
         autoX.Run(hist2d.histogram)
-        dst2 = hist2d.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        dst2 = hist2d.histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
 
         Dim ptList As New List(Of cv.Point)
         If gOptions.DebugCheckBox.Checked Then

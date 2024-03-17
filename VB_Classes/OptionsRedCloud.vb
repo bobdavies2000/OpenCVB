@@ -16,7 +16,6 @@ Public Class OptionsRedCloud
     Public histBinList() As Integer
     Public identifyCount As Integer
     Public bins3D As Integer
-    Public imageThresholdPercent As Single = 0.95
     Dim colorMethods() As String = {"BackProject_Full", "Binarize_Split4", "Binarize_DepthTiers",
                                     "Hist3DColor_Basics", "KMeans_Basics", "LUT_Basics", "Reduction_Basics"}
     Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -111,8 +110,7 @@ Public Class OptionsRedCloud
         task.xRange = XRangeSlider.Value / 100
         task.yRange = YRangeSlider.Value / 100
 
-        task.redThresholdSide = SideViewThreshold.Value
-        task.redThresholdTop = TopViewThreshold.Value
+        task.projectionThreshold = ProjectionThreshold.Value
         identifyCount = IdentifyCountSlider.Value
 
         Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
@@ -175,13 +173,9 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         YLabel.Text = CStr(YRangeSlider.Value)
     End Sub
-    Private Sub SideViewThreshold_ValueChanged(sender As Object, e As EventArgs) Handles SideViewThreshold.ValueChanged
+    Private Sub ProjectionThreshold_ValueChanged(sender As Object, e As EventArgs) Handles ProjectionThreshold.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        SideLabel.Text = CStr(SideViewThreshold.Value)
-    End Sub
-    Private Sub TopViewThreshold_ValueChanged(sender As Object, e As EventArgs) Handles TopViewThreshold.ValueChanged
-        If task IsNot Nothing Then task.optionsChanged = True
-        TopLabel.Text = CStr(TopViewThreshold.Value)
+        SideLabel.Text = CStr(ProjectionThreshold.Value)
     End Sub
     Private Sub IdentifyCountSlider_ValueChanged(sender As Object, e As EventArgs) Handles IdentifyCountSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
