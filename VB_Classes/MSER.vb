@@ -5,7 +5,7 @@ Public Class MSER_Basics : Inherits VB_Algorithm
     Dim detect As New MSER_CPP
     'Dim matchCell As New RedCloud_MatchCell
     Public cellMap As cv.Mat
-    Public mserCells As New List(Of rcDataOld)
+    Public mserCells As New List(Of rcData)
     Public boxes As New List(Of cv.Rect)
     Public floodPoints As New List(Of cv.Point)
     Public useOpAuto As Boolean = True
@@ -25,9 +25,9 @@ Public Class MSER_Basics : Inherits VB_Algorithm
         'boxes = New List(Of cv.Rect)(detect.boxes)
         'floodPoints = New List(Of cv.Point)(detect.floodPoints)
 
-        'Dim redCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
+        'Dim redCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         'For i = 0 To detect.boxes.Count - 1
-        '    Dim rc As New rcDataOld
+        '    Dim rc As New rcData
         '    rc.rect = detect.boxes(i)
         '    rc.mask = detect.dst0(rc.rect).InRange(i, i)
         '    rc.floodPoint = floodPoints(i)
@@ -42,10 +42,10 @@ Public Class MSER_Basics : Inherits VB_Algorithm
         'matchCell.lastCellMap = cellMap.Clone
         'matchCell.usedColors.Clear()
         'matchCell.usedColors.Add(black)
-        'matchCell.lastCells = New List(Of rcDataOld)(mserCells)
+        'matchCell.lastCells = New List(Of rcData)(mserCells)
 
         'mserCells.Clear()
-        'mserCells.Add(New rcDataOld) ' "Other"
+        'mserCells.Add(New rcData) ' "Other"
 
         'cellMap.SetTo(0)
         'For Each key In redCells
@@ -91,7 +91,7 @@ End Class
 
 Public Class MSER_Regions : Inherits VB_Algorithm
     Dim detect As New MSER_Detect
-    Public mserCells As New List(Of rcDataOld)
+    Public mserCells As New List(Of rcData)
     'Dim matchCell As New RedCloud_MatchCell
     Public cellMap As cv.Mat
     Public useOpAuto As Boolean = True
@@ -109,9 +109,9 @@ Public Class MSER_Regions : Inherits VB_Algorithm
 
         'detect.Run(src)
 
-        'Dim redCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
+        'Dim redCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         'For i = 0 To detect.boxes.Count - 1
-        '    Dim rc As New rcDataOld
+        '    Dim rc As New rcData
         '    rc.rect = detect.boxes(i)
         '    rc.mask = New cv.Mat(rc.rect.Height, rc.rect.Width, cv.MatType.CV_8U, 0)
         '    rc.floodPoint = detect.regions(i)(0)
@@ -127,7 +127,7 @@ Public Class MSER_Regions : Inherits VB_Algorithm
         'End If
 
         'matchCell.lastCellMap = cellMap.Clone
-        'matchCell.lastCells = New List(Of rcDataOld)(mserCells)
+        'matchCell.lastCells = New List(Of rcData)(mserCells)
         'matchCell.usedColors.Clear()
         'matchCell.usedColors.Add(black)
 

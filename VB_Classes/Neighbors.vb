@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Neighbors_Basics : Inherits VB_Algorithm
     Public redC As New RedCloud_Tight
     Dim knn As New KNN_Core
-    Public redCells As New List(Of rcDataOld)
+    Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat
     Public runRedCloud As Boolean = False
     Public options As New Options_XNeighbors
@@ -37,9 +37,9 @@ Public Class Neighbors_Basics : Inherits VB_Algorithm
             setSelectedContour(redCells, cellMap)
             dst3.SetTo(0)
             Dim ptCount As Integer
-            For Each index In task.rcOld.nabs
+            For Each index In task.rc.nabs
                 Dim pt = redCells(index).maxDStable
-                If pt = task.rcOld.maxDStable Then
+                If pt = task.rc.maxDStable Then
                     dst2.Circle(pt, task.dotSize, black, -1, task.lineType)
                 Else
                     dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
@@ -222,7 +222,7 @@ End Class
 Public Class Neighbors_Contained : Inherits VB_Algorithm
     Dim nabs As New Neighbors_Precise
     Public cellMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public redCells As New List(Of rcDataNew)
+    Public redCells As New List(Of rcData)
     Public Sub New()
         nabs.runRedCloud = True
         If standalone Then gOptions.displayDst1.Checked = True
@@ -306,7 +306,7 @@ End Class
 Public Class Neighbors_Precise : Inherits VB_Algorithm
     Public nabList As New List(Of List(Of Integer))
     Dim stats As New Cell_Basics
-    Public redCells As List(Of rcDataNew)
+    Public redCells As List(Of rcData)
     Public runRedCloud As Boolean = False
     Public Sub New()
         cPtr = Neighbors_Open()

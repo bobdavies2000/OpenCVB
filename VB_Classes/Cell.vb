@@ -118,7 +118,7 @@ End Class
 
 Public Class Cell_Stable : Inherits VB_Algorithm
     Dim redC As New RedCloud_TightNew
-    Public rcUnstableList As New List(Of rcDataNew)
+    Public rcUnstableList As New List(Of rcData)
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Use maxDStable to identify stable cells - cells which were NOT present in the previous generation."
@@ -138,7 +138,7 @@ Public Class Cell_Stable : Inherits VB_Algorithm
             Next
         End If
 
-        Dim unstableList As New List(Of rcDataNew)
+        Dim unstableList As New List(Of rcData)
         For Each rc In redC.redCells
             If prevList.Contains(rc.maxDStable) = False Then
                 vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.White, -1)
@@ -148,7 +148,7 @@ Public Class Cell_Stable : Inherits VB_Algorithm
         Next
 
         If task.almostHeartBeat Then
-            rcUnstableList = New List(Of rcDataNew)(unstableList)
+            rcUnstableList = New List(Of rcData)(unstableList)
             labels(1) = CStr(rcUnstableList.Count) + " found before the heartbeat."
         End If
         dst1.SetTo(0)
@@ -169,7 +169,7 @@ End Class
 
 Public Class Cell_StableMax : Inherits VB_Algorithm
     Dim redC As New RedCloud_TightNew
-    Public redCells As New List(Of rcDataNew)
+    Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -288,7 +288,7 @@ Public Class Cell_JumpUp : Inherits VB_Algorithm
         Static percentSlider = findSlider("Percent jump in size")
         Dim percentJump = percentSlider.value / 100
 
-        Dim lastCells = New List(Of rcDataNew)(redC.redCells)
+        Dim lastCells = New List(Of rcData)(redC.redCells)
         redC.Run(src)
         dst2 = redC.dst2
         If task.heartBeat Then dst3.SetTo(0)
@@ -330,7 +330,7 @@ Public Class Cell_JumpDown : Inherits VB_Algorithm
         Static percentSlider = findSlider("Percent jump in size")
         Dim percentJump = percentSlider.value / 100
 
-        Dim lastCells = New List(Of rcDataNew)(redC.redCells)
+        Dim lastCells = New List(Of rcData)(redC.redCells)
         redC.Run(src)
         dst2 = redC.dst2
         If task.heartBeat Then dst3.SetTo(0)
@@ -373,7 +373,7 @@ Public Class Cell_JumpUnstable : Inherits VB_Algorithm
         Dim percentJump = percentSlider.value / 100
 
         If task.heartBeat Or task.midHeartBeat Then
-            Dim lastCells As New List(Of rcDataNew)(redC.redCells)
+            Dim lastCells As New List(Of rcData)(redC.redCells)
             redC.Run(src)
             dst2 = redC.dst2
             dst3 = dst1.Clone
@@ -402,7 +402,7 @@ End Class
 
 Public Class Cell_Distance : Inherits VB_Algorithm
     Dim redC As New RedCloud_TightNew
-    Public redCells As New List(Of rcDataNew)
+    Public redCells As New List(Of rcData)
     Public cellMap As cv.Mat
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True

@@ -154,7 +154,7 @@ End Class
 Public Class Foreground_CellsFore : Inherits VB_Algorithm
     Dim fore As New Foreground_Hist3D
     Public redC As New RedCloud_Basics
-    Public redCells As New List(Of rcDataOld)
+    Public redCells As New List(Of rcData)
     Public Sub New()
         redOptions.UseColor.Checked = True
         desc = "Get the foreground cells"
@@ -181,7 +181,7 @@ End Class
 Public Class Foreground_CellsBack : Inherits VB_Algorithm
     Dim fore As New Foreground_Hist3D
     Public redC As New RedCloud_Basics
-    Public redCells As New List(Of rcDataOld)
+    Public redCells As New List(Of rcData)
     Public Sub New()
         redOptions.UseColor.Checked = True
         desc = "Get the background cells"

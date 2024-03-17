@@ -1799,8 +1799,8 @@ public:
         prepData = new CPP_RedCloud_Reduce();
         desc = "Perform the RedCloud low level FloodFill";
     }
-    rcDataOld buildZeroEntry() {
-        rcDataOld rc;
+    rcData buildZeroEntry() {
+        rcData rc;
         Point pt;
         rc.contour = vector<Point>({ pt, pt, pt, pt });
         rc.hull = vector<Point>({ pt, pt, pt, pt });
@@ -2435,7 +2435,7 @@ Mat vbPalette(Mat input)
 
 class CPP_RedColor_FeatureLessCore : public algorithmCPP {
 public:
-    map<int, rcDataOld, compareAllowIdenticalIntegerInverted> sortedCells;
+    map<int, rcData, compareAllowIdenticalIntegerInverted> sortedCells;
     Mat inputMask;
     CPP_FeatureLess_Basics* fLess;
     RedCloud* cPtr;
@@ -2488,7 +2488,7 @@ public:
         sortedCells.clear();
 
         for (int i = 0; i < classCount; i++) {
-            rcDataOld cell;
+            rcData cell;
             cell.index = int(sortedCells.size()) + 1;
             cell.rect = task->validateRect(rectData.at<cv::Rect>(i, 0), dst2.cols, dst2.rows);
             inRange(dst2(cell.rect), cell.index, cell.index, cell.mask);
@@ -2520,7 +2520,7 @@ public:
 class CPP_RedColor_FeatureLess : public algorithmCPP {
 public:
     CPP_RedColor_FeatureLessCore* minCore;
-    vector<rcDataOld> redCells;
+    vector<rcData> redCells;
     Mat lastColors;
     Mat lastMap = dst2.clone();
     CPP_RedColor_FeatureLess() : algorithmCPP() {
@@ -2533,14 +2533,14 @@ public:
     }
     void Run(Mat src) {
         minCore->Run(src);
-        vector<rcDataOld> lastCells = redCells;
+        vector<rcData> lastCells = redCells;
         if (task->firstPass) lastColors = dst3.clone();
         redCells.clear();
         dst2.setTo(0);
         dst3.setTo(0);
         vector<Vec3b> usedColors = { Vec3b(0, 0, 0) };
         for (const auto ele : minCore->sortedCells) {
-            rcDataOld cell = ele.second;
+            rcData cell = ele.second;
             uchar index = lastMap.at<uchar>(cell.maxDist.y, cell.maxDist.x);
             if (index > 0 && index < lastCells.size()) {
                 cell.color = lastColors.at<Vec3b>(cell.maxDist.y, cell.maxDist.x);
@@ -2559,7 +2559,7 @@ public:
             }
         }
         labels[3] = to_string(redCells.size()) + " cells were identified.";
-        task->rcSelect = rcDataOld();
+        task->rcSelect = rcData();
         if (task->clickPoint == Point(0, 0)) {
             if (redCells.size() > 2) {
                 task->clickPoint = redCells[0].maxDist;
@@ -3264,7 +3264,7 @@ public:
 
 class CPP_RedCloud_Basics : public algorithmCPP {
 public:
-    map<int, rcDataOld, compareAllowIdenticalIntegerInverted> sortedCells;
+    map<int, rcData, compareAllowIdenticalIntegerInverted> sortedCells;
     Mat inputMask;
     int classCount;
     CPP_Color_Basics* colorClass = new CPP_Color_Basics();
@@ -3301,7 +3301,7 @@ public:
         Mat floodPointData(classCount, 1, CV_32SC2, RedCloud_FloodPoints(cPtr));
         sortedCells.clear();
         for (int i = 0; i < classCount; ++i) {
-            rcDataOld rc;
+            rcData rc;
             rc.index = i + 1;
             Rect r = rectData.at<Rect>(i, 0);
             rc.rect = task->validateRect(r, dst2.cols, dst2.rows);
@@ -3335,7 +3335,7 @@ public:
 
 class CPP_RedCloud_BasicsNative : public algorithmCPP {
 public:
-    map<int, rcDataOld, compareAllowIdenticalIntegerInverted> sortedCells;
+    map<int, rcData, compareAllowIdenticalIntegerInverted> sortedCells;
     int classCount;
     int maxClassCount = 255;
     vector<Rect>cellRects;
@@ -3404,7 +3404,7 @@ public:
 
         sortedCells.clear();
         for (int i = 0; i < classCount; ++i) {
-            rcDataOld rc;
+            rcData rc;
             rc.index = i + 1;
             Rect r = cellRects[i];
             rc.rect = task->validateRect(r, dst2.cols, dst2.rows);

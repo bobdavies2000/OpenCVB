@@ -226,8 +226,8 @@ Public Class VBtask : Implements IDisposable
 
     Public projectionThreshold As Integer ' In heatmap views, this defines what is hot in a heatmap.
 
-    Public rcOld As New rcDataOld
-    Public rc As New rcDataNew
+    Public rcOld As New rcData
+    Public rc As New rcData
     Public rcPicTag As Integer
     Public rcMatchMax As Integer
 

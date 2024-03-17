@@ -182,7 +182,7 @@ Public Class Plane_OnlyPlanes : Inherits VB_Algorithm
         labels = {"", "", "RedCloud Cells", "gCloud reworked with planes instead of depth data"}
         desc = "Replace the gCloud with planes in every RedCloud cell"
     End Sub
-    Public Sub buildCloudPlane(rc As rcDataOld)
+    Public Sub buildCloudPlane(rc As rcData)
         For y = 0 To rc.rect.Height - 1
             For x = 0 To rc.rect.Width - 1
                 If rc.mask.Get(Of Byte)(y, x) > 0 Then
@@ -288,7 +288,7 @@ Public Class Plane_CellColor : Inherits VB_Algorithm
         labels = {"", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"}
         desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
     End Sub
-    Public Function buildContourPoints(rc As rcDataOld) As List(Of cv.Point3f)
+    Public Function buildContourPoints(rc As rcData) As List(Of cv.Point3f)
         Dim fitPoints As New List(Of cv.Point3f)
         For Each pt In rc.contour
             If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
@@ -297,7 +297,7 @@ Public Class Plane_CellColor : Inherits VB_Algorithm
         Next
         Return fitPoints
     End Function
-    Public Function buildMaskPointEq(rc As rcDataOld) As List(Of cv.Point3f)
+    Public Function buildMaskPointEq(rc As rcData) As List(Of cv.Point3f)
         Dim fitPoints As New List(Of cv.Point3f)
         For y = 0 To rc.rect.Height - 1
             For x = 0 To rc.rect.Width - 1
@@ -313,7 +313,7 @@ Public Class Plane_CellColor : Inherits VB_Algorithm
         dst2 = redC.dst2
 
         dst3.SetTo(0)
-        Dim newCells As New List(Of rcDataOld)
+        Dim newCells As New List(Of rcData)
         Dim rcX = task.rcOld
         For Each rc In redC.redCells
             rc.eq = New cv.Vec4f
@@ -329,7 +329,7 @@ Public Class Plane_CellColor : Inherits VB_Algorithm
                                               Math.Abs(255 * rc.eq(1)),
                                               Math.Abs(255 * rc.eq(2))), rc.mask)
         Next
-        redC.redCells = New List(Of rcDataOld)(newCells)
+        redC.redCells = New List(Of rcData)(newCells)
     End Sub
 End Class
 
@@ -536,7 +536,7 @@ End Class
 
 ' https://stackoverflow.com/questions/33997220/plane-construction-from-3d-points-in-opencv
 Public Class Plane_Equation : Inherits VB_Algorithm
-    Public rc As New rcDataOld
+    Public rc As New rcData
     Public justEquation As String
     Public Sub New()
         desc = "Compute the coefficients for an estimated plane equation given the rc contour"
@@ -546,7 +546,7 @@ Public Class Plane_Equation : Inherits VB_Algorithm
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
-            rc = task.rcOld
+            rc = task.rc
             If rc.index = 0 Then setTrueText("Select a cell in the image at left.")
         End If
 

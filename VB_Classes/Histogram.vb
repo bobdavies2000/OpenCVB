@@ -895,7 +895,7 @@ End Class
 
 
 Public Class Histogram_ShapeSide : Inherits VB_Algorithm
-    Public rc As New rcDataOld
+    Public rc As New rcData
     Public Sub New()
         gOptions.HistBinSlider.Value = 60
         labels = {"", "", "ZY Side View", "ZY Side View Mask"}
@@ -924,7 +924,7 @@ End Class
 
 
 Public Class Histogram_ShapeTop : Inherits VB_Algorithm
-    Public rc As New rcDataOld
+    Public rc As New rcData
     Public Sub New()
         gOptions.HistBinSlider.Value = 60
         labels = {"", "", "ZY Side View", "ZY Side View Mask"}
@@ -1148,7 +1148,7 @@ End Class
 
 Public Class Histogram_Depth : Inherits VB_Algorithm
     Public plot As New Plot_Histogram
-    Public rc As rcDataOld
+    Public rc As rcData
     Public mm As mmData
     Public histogram As New cv.Mat
     Public Sub New()
@@ -1200,7 +1200,7 @@ End Class
 
 Public Class Histogram_DepthNew : Inherits VB_Algorithm
     Public plot As New Plot_Histogram
-    Public rc As rcDataNew
+    Public rc As rcData
     Public mm As mmData
     Public histogram As New cv.Mat
     Public Sub New()

@@ -300,7 +300,7 @@ End Class
 
 Public Class Spectrum_RedCloud : Inherits VB_Algorithm
     Dim breakdown As New Spectrum_Breakdown
-    Public redCells As New List(Of rcDataOld)
+    Public redCells As New List(Of rcData)
     Public Sub New()
         desc = "Breakdown each cell in redCells."
     End Sub

@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Algorithm
-    Public redCells As New List(Of rcDataNew)
+    Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim bounds As New Boundary_RemovedRects
     Dim flood As New Flood_Split4
@@ -43,7 +43,7 @@ End Class
 
 
 Public Class Flood_Split4 : Inherits VB_Algorithm
-    Public redCells As New List(Of rcDataNew)
+    Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim binar4 As New Binarize_Split4
     Public genCells As New RedCloud_GenCells
@@ -114,7 +114,7 @@ End Class
 
 Public Class Flood_ContainedCells : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
-    Public redCells As New List(Of rcDataNew)
+    Public redCells As New List(Of rcData)
     Public Sub New()
         desc = "Find cells that have only one neighbor.  They are likely to be completely contained in another cell."
     End Sub
@@ -158,7 +158,7 @@ End Class
 
 
 Public Class Flood_BasicsMask : Inherits VB_Algorithm
-    Public redCells As New List(Of rcDataNew)
+    Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public binarizedImage As cv.Mat
     Public inputMask As cv.Mat

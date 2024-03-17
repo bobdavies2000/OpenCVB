@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Windows.Markup
+Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/d3/dc0/group__imgproc__shape.html
 ' https://docs.opencv.org/3.4/d5/d45/tutorial_py_contours_more_functions.html
 ' https://stackoverflow.com/questions/55529371/opencv-shape-matching-between-two-similar-shapes
@@ -64,9 +65,9 @@ End Class
 
 
 Public Class MatchShapes_NearbyHull : Inherits VB_Algorithm
-    Public similarCells As New List(Of rcDataOld)
+    Public similarCells As New List(Of rcData)
     Public bestCell As Integer
-    Dim rc As New rcDataOld
+    Dim rc As New rcData
     Dim options As New Options_MatchShapes
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
@@ -80,7 +81,7 @@ Public Class MatchShapes_NearbyHull : Inherits VB_Algorithm
             hulls.Run(task.color)
             If hulls.redC.redCells.Count = 0 Then Exit Sub
             dst2 = hulls.dst2
-            rc = task.rcOld
+            rc = task.rc
         End If
 
         dst3.SetTo(0)
@@ -115,10 +116,10 @@ End Class
 
 
 Public Class MatchShapes_Nearby : Inherits VB_Algorithm
-    Public redCells As New List(Of rcDataOld)
-    Public similarCells As New List(Of rcDataOld)
+    Public redCells As New List(Of rcData)
+    Public similarCells As New List(Of rcData)
     Public bestCell As Integer
-    Public rc As New rcDataOld
+    Public rc As New rcData
     Dim options As New Options_MatchShapes
     Public runStandalone As Boolean = False
     Dim redC As New RedCloud_Basics
@@ -136,9 +137,9 @@ Public Class MatchShapes_Nearby : Inherits VB_Algorithm
             redC.Run(task.color)
             If redC.redCells.Count = 0 Then Exit Sub
             dst2 = redC.dst2
-            addTour.redCells = New List(Of rcDataOld)(redC.redCells)
+            addTour.redCells = New List(Of rcData)(redC.redCells)
             addTour.Run(src)
-            rc = task.rcOld
+            rc = task.rc
         End If
 
         If task.heartBeat And myStandalone Then dst3.SetTo(0)
@@ -181,8 +182,8 @@ End Class
 
 Public Class MatchShapes_LeftRight : Inherits VB_Algorithm
     Dim match As New MatchShapes_Nearby
-    Public leftCells As New List(Of rcDataOld)
-    Public rightCells As New List(Of rcDataOld)
+    Public leftCells As New List(Of rcData)
+    Public rightCells As New List(Of rcData)
     Dim doubleSize As cv.Mat
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
@@ -202,8 +203,8 @@ Public Class MatchShapes_LeftRight : Inherits VB_Algorithm
         '    dst0 = lrRed.dst2
         '    dst1 = lrRed.dst3
 
-        '    leftCells = New List(Of rcDataOld)(lrRed.redLeft.fKnn.redCells)
-        '    rightCells = New List(Of rcDataOld)(lrRed.redRight.fKnn.redCells)
+        '    leftCells = New List(Of rcData)(lrRed.redLeft.fKnn.redCells)
+        '    rightCells = New List(Of rcData)(lrRed.redRight.fKnn.redCells)
         'End If
 
         'match.redCells = leftCells

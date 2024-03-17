@@ -201,7 +201,7 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
 
         Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
         Static lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
-        Static lastredCells As New List(Of rcDataOld)
+        Static lastredCells As New List(Of rcData)
         pixelVector.Clear()
         distances.Clear()
         For i = 0 To redC.redCells.Count - 1
@@ -264,7 +264,7 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
             lastDistances.Add(el.Key, el.Value)
         Next
 
-        lastredCells = New List(Of rcDataOld)(redC.redCells)
+        lastredCells = New List(Of rcData)(redC.redCells)
     End Sub
 End Class
 
@@ -275,7 +275,7 @@ End Class
 Public Class Distance_D3Cells : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
-    Public d3Cells As New List(Of rcDataOld)
+    Public d3Cells As New List(Of rcData)
     Public Sub New()
         redOptions.UseColor.Checked = True
         redOptions.HistBinSlider.Value = 5
@@ -287,36 +287,36 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
 
-        d3Cells.Clear()
-        For i = 0 To redC.redCells.Count - 1
-            Dim rm As New rcDataOld
-            Dim rc = redC.redCells(i)
-            rm.mask = rc.mask
-            rm.rect = rc.rect
-            rm.index = i + 1
+        'd3Cells.Clear()
+        'For i = 0 To redC.redCells.Count - 1
+        '    Dim rm As New rcData
+        '    Dim rc = redC.redCells(i)
+        '    rm.mask = rc.mask
+        '    rm.rect = rc.rect
+        '    rm.index = i + 1
 
-            hColor.inputMask = rc.mask
-            hColor.Run(src(rc.rect))
-            rm.histogram = hColor.histogram.Clone
-            rm.histList = hColor.histArray.ToList
+        '    hColor.inputMask = rc.mask
+        '    hColor.Run(src(rc.rect))
+        '    rm.histogram = hColor.histogram.Clone
+        '    rm.histList = hColor.histArray.ToList
 
-            d3Cells.Add(rm)
-        Next
+        '    d3Cells.Add(rm)
+        'Next
 
-        Dim tmp As New cv.Mat
-        dst3.SetTo(0)
-        For Each rm In d3Cells
-            For i = 0 To rm.histList.Count - 1
-                If rm.histList(i) <> 0 Then rm.histList(i) = rm.index
-            Next
-            Marshal.Copy(rm.histList.ToArray, 0, rm.histogram.Data, rm.histList.Count)
+        'Dim tmp As New cv.Mat
+        'dst3.SetTo(0)
+        'For Each rm In d3Cells
+        '    For i = 0 To rm.histList.Count - 1
+        '        If rm.histList(i) <> 0 Then rm.histList(i) = rm.index
+        '    Next
+        '    Marshal.Copy(rm.histList.ToArray, 0, rm.histogram.Data, rm.histList.Count)
 
-            cv.Cv2.CalcBackProject({src(rm.rect)}, {0, 1, 2}, rm.histogram, tmp, redOptions.rangesBGR)
-            tmp.CopyTo(dst3(rm.rect), rm.mask)
-        Next
-        dst2 = vbPalette(dst3 * 255 / d3Cells.Count)
+        '    cv.Cv2.CalcBackProject({src(rm.rect)}, {0, 1, 2}, rm.histogram, tmp, redOptions.rangesBGR)
+        '    tmp.CopyTo(dst3(rm.rect), rm.mask)
+        'Next
+        'dst2 = vbPalette(dst3 * 255 / d3Cells.Count)
 
-        If standaloneTest() Then identifyCells(redC.redCells)
-        labels(2) = redC.labels(3)
+        'If standaloneTest() Then identifyCells(redC.redCells)
+        'labels(2) = redC.labels(3)
     End Sub
 End Class

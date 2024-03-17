@@ -133,12 +133,7 @@ Public Class VB_Algorithm : Implements IDisposable
         firstPass = False
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
-    Public Sub identifyCells(redCells As List(Of rcDataOld))
-        For Each rc In redCells
-            If rc.index > 0 And rc.index <= redOptions.identifyCount Then setTrueText(CStr(rc.index), rc.maxDist, 2)
-        Next
-    End Sub
-    Public Sub identifyCells(redCells As List(Of rcDataNew))
+    Public Sub identifyCells(redCells As List(Of rcData))
         For Each rc In redCells
             If rc.index > 0 And rc.index <= redOptions.identifyCount Then setTrueText(CStr(rc.index), rc.maxDist, 2)
         Next
