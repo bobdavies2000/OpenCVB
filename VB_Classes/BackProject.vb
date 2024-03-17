@@ -395,14 +395,14 @@ End Class
 
 Public Class BackProject_Side : Inherits VB_Algorithm
     Dim autoY As New OpAuto_YRange
-    Dim hist2d As New Histogram2D_Side
+    Dim histSide As New Histogram2D_Side
     Public Sub New()
         labels = {"", "", "Hotspots in the Side View", "Back projection of the hotspots in the Side View"}
         desc = "Display the back projection of the hotspots in the Side View"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        hist2d.Run(src)
-        autoY.Run(hist2d.histogram)
+        histSide.Run(src)
+        autoY.Run(histSide.histogram)
 
         dst2 = autoY.histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         Dim histogram = autoY.histogram.SetTo(0, Not dst2)
@@ -417,16 +417,16 @@ End Class
 
 
 Public Class BackProject_Top : Inherits VB_Algorithm
-    Dim hist2d As New Histogram2D_Top
+    Dim histTop As New Histogram2D_Top
     Public Sub New()
         labels = {"", "", "Hotspots in the Top View", "Back projection of the hotspots in the Top View"}
         desc = "Display the back projection of the hotspots in the Top View"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        hist2d.Run(src)
-        dst2 = hist2d.dst2
+        histTop.Run(src)
+        dst2 = histTop.dst2
 
-        Dim histogram = hist2d.histogram.SetTo(0, Not dst2)
+        Dim histogram = histTop.histogram.SetTo(0, Not dst2)
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogram, dst3, task.rangesTop)
         dst3 = vbPalette(dst3.ConvertScaleAbs)
     End Sub
@@ -486,19 +486,19 @@ End Class
 
 
 Public Class BackProject_SoloSide : Inherits VB_Algorithm
-    Dim hist2d As New Histogram2D_Side
+    Dim histSide As New Histogram2D_Side
     Public Sub New()
         labels = {"", "", "Solo samples in the Side View", "Back projection of the solo samples in the Side View"}
         desc = "Display the back projection of the solo samples in the Side View"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        hist2d.Run(src)
+        histSide.Run(src)
 
-        dst3 = hist2d.histogram.Threshold(1, 255, cv.ThresholdTypes.TozeroInv)
+        dst3 = histSide.histogram.Threshold(1, 255, cv.ThresholdTypes.TozeroInv)
         dst2 = dst3.ConvertScaleAbs(255)
 
-        hist2d.histogram.SetTo(0, Not dst2)
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, hist2d.histogram, dst3, task.rangesSide)
+        histSide.histogram.SetTo(0, Not dst2)
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histSide.histogram, dst3, task.rangesSide)
         dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
     End Sub
 End Class
@@ -509,19 +509,19 @@ End Class
 
 
 Public Class BackProject_SoloTop : Inherits VB_Algorithm
-    Dim hist2d As New Histogram2D_Top
+    Dim histTop As New Histogram2D_Top
     Public Sub New()
         labels = {"", "", "Solo samples in the Top View", "Back projection of the solo samples in the Top View"}
         desc = "Display the back projection of the solo samples in the Top View"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        hist2d.Run(src)
+        histTop.Run(src)
 
-        dst3 = hist2d.histogram.Threshold(1, 255, cv.ThresholdTypes.TozeroInv)
+        dst3 = histTop.histogram.Threshold(1, 255, cv.ThresholdTypes.TozeroInv)
         dst2 = dst3.ConvertScaleAbs(255)
 
-        hist2d.histogram.SetTo(0, Not dst2)
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, hist2d.histogram, dst3, task.rangesTop)
+        histTop.histogram.SetTo(0, Not dst2)
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst3, task.rangesTop)
         dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
     End Sub
 End Class

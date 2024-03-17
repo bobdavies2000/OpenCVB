@@ -121,18 +121,23 @@ End Class
 
 
 Public Class HeatMap_Hot : Inherits VB_Algorithm
-    Dim heatTop As New Histogram2D_Top
-    Dim heatSide As New Histogram2D_Side
+    Dim histTop As New Histogram2D_Top
+    Dim histSide As New Histogram2D_Side
     Public Sub New()
         labels = {"", "", "Mask of hotter areas for the Top View", "Mask of hotter areas for the Side View"}
         desc = "Isolate masks for just the hotspots in the heat map"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        heatTop.Run(src)
-        dst2 = heatTop.histogram
+        histTop.Run(src)
+        dst2 = histTop.histogram
 
-        heatSide.Run(src)
-        dst3 = heatSide.histogram
+        histSide.Run(src)
+        dst3 = histSide.histogram
+
+        Dim mmTop = vbMinMax(dst2)
+        Dim mmSide = vbMinMax(dst3)
+        If task.heartBeat Then labels(2) = CStr(mmTop.maxVal) + " max count " + CStr(dst2.CountNonZero) + " pixels in the top down view"
+        If task.heartBeat Then labels(3) = CStr(mmSide.maxVal) + " max count " + CStr(dst3.CountNonZero) + " pixels in the side view"
     End Sub
 End Class
 
@@ -162,11 +167,50 @@ Public Class HeatMap_Cell : Inherits VB_Algorithm
         dst1 = heat.dst2
         dst3 = heat.dst3
 
-        Dim mmTop = vbMinMax(dst1)
-        Dim mmSide = vbMinMax(dst3)
-        If task.heartBeat Then labels(1) = CStr(mmTop.maxVal) + " max count " + CStr(dst1.CountNonZero) + " pixels in the top down view"
-        If task.heartBeat Then labels(3) = CStr(mmSide.maxVal) + " max count " + CStr(dst3.CountNonZero) + " pixels in the side view"
+        labels(1) = heat.labels(2)
+        labels(3) = heat.labels(3)
 
         identifyCells(flood.redCells)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class HeatMap_Objects : Inherits VB_Algorithm
+    Dim guided As New GuidedBP_Basics
+    Public Sub New()
+        redOptions.ProjectionThreshold.Value = 1
+        desc = "This is just a placeholder to make it easy to find the GuidedBP_Basics which shows objects in top/side views."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        guided.Run(src)
+        dst2 = guided.dst2
+        dst3 = guided.dst3
+        labels = guided.labels
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class HeatMap_Top : Inherits VB_Algorithm
+    Dim histTop As New Histogram2D_Top
+    Public Sub New()
+        redOptions.ProjectionThreshold.Value = 1
+        desc = "Find all the masks, rects, and counts in the top down view."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        histTop.Run(src)
+        dst2 = histTop.dst2
+        dst3 = histTop.dst3
+        labels = histTop.labels
     End Sub
 End Class

@@ -3815,7 +3815,7 @@ public:
 				if (mask.at<unsigned char>(y, x) == 0)
 				{
 					pt = Point(x, y);
-					int count = floodFill(src, mask, pt, 255, &rect, diff, diff, floodFlag | (255 << 8));
+					int count = floodFill(src, mask, pt, 255, &rect, diff, diff, 4 | floodFlag | (255 << 8));
 					if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
 				}
 			}
@@ -3827,7 +3827,7 @@ public:
 		int fill = 1;
 		for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
 		{
-			count = floodFill(src, maskCopy, it->second, fill, &rect, diff, diff, floodFlag | (fill << 8));
+			count = floodFill(src, maskCopy, it->second, fill, &rect, diff, diff, 4 | floodFlag | (fill << 8));
 			if (count >= 1)
 			{
 				cellRects.push_back(rect);
@@ -3934,7 +3934,7 @@ public:
 				if (mask.at<unsigned char>(y, x) == 0)
 				{
 					pt = Point(x, y);
-					int count = floodFill(src, mask, pt, 255, &rect, diff, diff, floodFlag | (255 << 8));
+					int count = floodFill(src, mask, pt, 255, &rect, diff, diff, 4 | floodFlag | (255 << 8));
 					if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
 				}
 			}
@@ -3946,7 +3946,7 @@ public:
 		int fill = 1;
 		for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
 		{
-			count = floodFill(src, maskCopy, it->second, fill, &rect, diff, diff, floodFlag | (fill << 8));
+			count = floodFill(src, maskCopy, it->second, fill, &rect, diff, diff, 4 | floodFlag | (fill << 8));
 			if (count >= 1)
 			{
 				cellRects.push_back(rect);

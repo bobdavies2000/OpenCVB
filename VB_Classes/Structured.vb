@@ -1101,7 +1101,7 @@ End Class
 
 Public Class Structured_TransformH : Inherits VB_Algorithm
     Dim options As New Options_Structured
-    Dim topView As New Histogram2D_Top
+    Dim histTop As New Histogram2D_Top
     Public Sub New()
         labels(3) = "Top down view of the slice of the point cloud"
         desc = "Find and isolate planes (floor and ceiling) in a TopView or SideView histogram."
@@ -1129,8 +1129,8 @@ Public Class Structured_TransformH : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Dim sliceMask = createSliceMaskH()
 
-        topView.Run(task.pointCloud.SetTo(0, Not sliceMask))
-        dst3 = topView.dst2
+        histTop.Run(task.pointCloud.SetTo(0, Not sliceMask))
+        dst3 = histTop.dst2
 
         If standaloneTest() Then
             dst2 = src
@@ -1146,7 +1146,7 @@ End Class
 
 Public Class Structured_TransformV : Inherits VB_Algorithm
     Dim options As New Options_Structured
-    Dim sideView As New Histogram2D_Side
+    Dim histSide As New Histogram2D_Side
     Public Sub New()
         labels(3) = "Side view of the slice of the point cloud"
         desc = "Find and isolate planes using the top view histogram data"
@@ -1176,8 +1176,8 @@ Public Class Structured_TransformV : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Dim sliceMask = createSliceMaskV()
 
-        sideView.Run(task.pointCloud.SetTo(0, Not sliceMask))
-        dst3 = sideView.dst2
+        histSide.Run(task.pointCloud.SetTo(0, Not sliceMask))
+        dst3 = histSide.dst2
 
         If standaloneTest() Then
             dst2 = src

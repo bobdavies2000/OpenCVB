@@ -168,8 +168,8 @@ End Class
 
 
 Public Class GuidedBP_HotPoints : Inherits VB_Algorithm
-    Public hotTop As New Histogram2D_Top
-    Public hotSide As New Histogram2D_Side
+    Public histTop As New Histogram2D_Top
+    Public histSide As New Histogram2D_Side
     Public topRects As New List(Of cv.Rect)
     Public sideRects As New List(Of cv.Rect)
     Public Sub New()
@@ -203,13 +203,13 @@ Public Class GuidedBP_HotPoints : Inherits VB_Algorithm
         Return rectList
     End Function
     Public Sub RunVB(src As cv.Mat)
-        hotTop.Run(src.Clone)
-        topRects = hotPoints(hotTop.dst3)
-        dst2 = vbPalette(hotTop.dst3 * 255 / topRects.Count)
+        histTop.Run(src.Clone)
+        topRects = hotPoints(histTop.dst3)
+        dst2 = vbPalette(histTop.dst3 * 255 / topRects.Count)
 
-        hotSide.Run(src)
-        sideRects = hotPoints(hotSide.dst3)
-        dst3 = vbPalette(hotSide.dst3 * 255 / sideRects.Count)
+        histSide.Run(src)
+        sideRects = hotPoints(histSide.dst3)
+        dst3 = vbPalette(histSide.dst3 * 255 / sideRects.Count)
 
         If task.heartBeat Then labels(2) = "Top " + CStr(topRects.Count) + " objects identified in the top view."
         If task.heartBeat Then labels(3) = "Top " + CStr(sideRects.Count) + " objects identified in the side view."
@@ -225,14 +225,14 @@ End Class
 
 
 Public Class GuidedBP_PlanesPlot : Inherits VB_Algorithm
-    Dim hotSide As New Histogram2D_Side
+    Dim histSide As New Histogram2D_Side
     Public Sub New()
         labels = {"", "", "Side view", "Plot of nonzero rows in the side view"}
         desc = "Plot the likely floor or ceiling areas."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        hotSide.Run(src)
-        dst2 = hotSide.dst3
+        histSide.Run(src)
+        dst2 = histSide.dst3
 
         Dim sumList As New List(Of Integer)
         dst3.SetTo(0)
@@ -517,7 +517,7 @@ Public Class GuidedBP_Points : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         hotPoints.Run(src)
 
-        hotPoints.ptHot.hotTop.dst3.ConvertTo(histogramTop, cv.MatType.CV_32F)
+        hotPoints.ptHot.histTop.dst3.ConvertTo(histogramTop, cv.MatType.CV_32F)
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogramTop, backP, task.rangesTop)
 
         topRects = New List(Of cv.Rect)(hotPoints.ptHot.topRects)
@@ -525,7 +525,7 @@ Public Class GuidedBP_Points : Inherits VB_Algorithm
 
         dst2 = vbPalette(backP * 255 / topRects.Count)
 
-        hotPoints.ptHot.hotSide.dst3.ConvertTo(histogramSide, cv.MatType.CV_32F)
+        hotPoints.ptHot.histSide.dst3.ConvertTo(histogramSide, cv.MatType.CV_32F)
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogramSide, dst3, task.rangesSide)
 
         dst3 = vbPalette(dst3 * 255 / sideRects.Count)

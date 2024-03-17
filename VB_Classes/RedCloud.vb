@@ -1777,7 +1777,7 @@ End Class
 Public Class RedCloud_StructuredH : Inherits VB_Algorithm
     Dim motion As New RedCloud_MotionBGsubtract
     Dim transform As New Structured_TransformH
-    Dim topView As New Histogram2D_Top
+    Dim histTop As New Histogram2D_Top
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -1800,8 +1800,8 @@ Public Class RedCloud_StructuredH : Inherits VB_Algorithm
 
         Dim pc As New cv.Mat(task.pointCloud.Size, cv.MatType.CV_32FC3, 0)
         task.pointCloud.CopyTo(pc, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        topView.Run(pc)
-        dst3 = topView.dst2
+        histTop.Run(pc)
+        dst3 = histTop.dst2
 
         dst2.SetTo(cv.Scalar.White, sliceMask)
         dst0.SetTo(cv.Scalar.White, sliceMask)
@@ -1816,7 +1816,7 @@ End Class
 Public Class RedCloud_StructuredV : Inherits VB_Algorithm
     Dim motion As New RedCloud_MotionBGsubtract
     Dim transform As New Structured_TransformV
-    Dim sideView As New Histogram2D_Side
+    Dim histSide As New Histogram2D_Side
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -1840,8 +1840,8 @@ Public Class RedCloud_StructuredV : Inherits VB_Algorithm
 
         Dim pc As New cv.Mat(task.pointCloud.Size, cv.MatType.CV_32FC3, 0)
         task.pointCloud.CopyTo(pc, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        sideView.Run(pc)
-        dst3 = sideView.dst2
+        histSide.Run(pc)
+        dst3 = histSide.dst2
 
         dst2.SetTo(cv.Scalar.White, sliceMask)
         dst0.SetTo(cv.Scalar.White, sliceMask)
