@@ -213,20 +213,61 @@ Public Class HeatMap_Top : Inherits VB_Algorithm
         If task.heartBeat Then
             histTop.Run(src)
 
-            redC.inputMask = Not histTop.dst2
-            redC.Run(histTop.dst2)
+            redC.inputMask = Not histTop.dst3
+            redC.Run(histTop.dst3)
             redCells.Clear()
             For Each rc In redC.redCells
                 For i = 0 To redC.redCells.Count - 1
                     Dim rcBig = redC.redCells(i)
-                    If rcBig.rect.IntersectsWith(rc.rect) Then
+                    If rcBig.rect.Contains(rc.rect) Then
                         rcBig.rect = rcBig.rect.Union(rc.rect)
                         redCells.Add(rcBig)
                         Exit For
                     End If
                 Next
             Next
+        End If
 
+        dst2 = redC.dst2
+        For Each rc In redCells
+            dst2.Rectangle(rc.rect, task.highlightColor, task.lineWidth)
+            If rc.index < redOptions.identifyCount Then setTrueText(CStr(rc.index), New cv.Point(rc.rect.X - 10, rc.rect.Y))
+        Next
+        labels(2) = CStr(redCells.Count) + " objects were found in the top view."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class HeatMap_Side : Inherits VB_Algorithm
+    Dim histSide As New Histogram2D_Side
+    Dim redC As New RedCloud_BasicsMask
+    Dim redCells As New List(Of rcData)
+    Public Sub New()
+        redOptions.ProjectionThreshold.Value = 1
+        desc = "Find all the masks, rects, and counts in the top down view."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat Then
+            histSide.Run(src)
+
+            redC.inputMask = Not histSide.dst3
+            redC.Run(histSide.dst3)
+            redCells.Clear()
+            For Each rc In redC.redCells
+                For i = 0 To redC.redCells.Count - 1
+                    Dim rcBig = redC.redCells(i)
+                    If rcBig.rect.Contains(rc.rect) Then
+                        rcBig.rect = rcBig.rect.Union(rc.rect)
+                        redCells.Add(rcBig)
+                        Exit For
+                    End If
+                Next
+            Next
         End If
 
         dst2 = redC.dst2

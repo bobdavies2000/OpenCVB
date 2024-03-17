@@ -731,6 +731,7 @@ if algorithmName = "HeatMap_Grid" Then return new HeatMap_Grid
 if algorithmName = "HeatMap_Hot" Then return new HeatMap_Hot
 if algorithmName = "HeatMap_HotNot" Then return new HeatMap_HotNot
 if algorithmName = "HeatMap_Objects" Then return new HeatMap_Objects
+if algorithmName = "HeatMap_Side" Then return new HeatMap_Side
 if algorithmName = "HeatMap_Top" Then return new HeatMap_Top
 if algorithmName = "Hist3D_Basics" Then return new Hist3D_Basics
 if algorithmName = "Hist3D_BuildHistogram" Then return new Hist3D_BuildHistogram
