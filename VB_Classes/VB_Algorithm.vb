@@ -138,6 +138,11 @@ Public Class VB_Algorithm : Implements IDisposable
             If rc.index > 0 And rc.index <= redOptions.identifyCount Then setTrueText(CStr(rc.index), rc.maxDist, 2)
         Next
     End Sub
+    Public Sub identifyCellRects(redCells As List(Of rcData), Optional dstSetting As Integer = 2)
+        For Each rc In redCells
+            If rc.index > 0 And rc.index <= redOptions.identifyCount Then setTrueText(CStr(rc.index), New cv.Point(rc.rect.X - 5, rc.rect.Y - 5), dstSetting)
+        Next
+    End Sub
     Public Sub setTrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
         Dim str As New trueText(text, pt.X, pt.Y, picTag)
         trueData.Add(str)

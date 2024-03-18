@@ -1,5 +1,253 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Projection_Basics : Inherits VB_Algorithm
+    Public redCellInput As New List(Of rcData)
+    Public redCells As New List(Of rcData)
+    Public viewType As String = "Top"
+    Public objectList As New List(Of cv.Vec4f)
+    Public Sub New()
+        redOptions.ProjectionThreshold.Value = 0
+        desc = "Find all the masks, rects, and counts in the input"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then
+            Static histTop As New Projection_HistTop
+            histTop.Run(src)
+            src = histTop.dst2
+
+            Static redc As New RedCloud_BasicsMask
+            redc.inputMask = Not histTop.dst3
+            redc.Run(histTop.dst3)
+            redCellInput = redc.redCells
+            dst2 = redc.dst2
+            labels(2) = redc.labels(2)
+        End If
+
+        For i = 0 To redCellInput.Count - 1
+            Dim rc = redCellInput(i)
+            Dim tmp = New cv.Mat(rc.rect.Size, cv.MatType.CV_32F, 0)
+            src(rc.rect).CopyTo(tmp, rc.mask)
+            redCellInput(i).pixels = tmp.Sum()
+        Next
+
+        For i = 0 To redCellInput.Count - 1
+            Dim rcBig = redCellInput(i)
+            For j = i + 1 To redCellInput.Count - 1
+                Dim rc = redCellInput(j)
+                If rc.pixels = 0 Then Continue For
+                If rcBig.rect.Contains(rc.rect) Then
+                    rcBig.rect = rcBig.rect.Union(rc.rect)
+                    redCellInput(i).pixels += rc.pixels
+                    redCellInput(j).pixels = 0
+                End If
+            Next
+        Next
+
+        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim check2 As Integer
+        For Each rc In redCellInput
+            sortedCells.Add(rc.pixels, rc)
+            check2 += rc.pixels
+        Next
+
+        redCells.Clear()
+        redCells.Add(New rcData)
+        For Each rc In sortedCells.Values
+            rc.index = redCells.Count
+            redCells.Add(rc)
+        Next
+
+        Dim otherCount As Integer
+        Dim meterDesc = "tall"
+        Dim ranges = task.rangesSide
+        If viewType = "Top" Then
+            meterDesc = "wide"
+            ranges = task.rangesTop
+        End If
+        objectList.Clear()
+        Dim xy1 As Single, xy2 As Single, z1 As Single, z2 As Single
+        If task.heartBeat Then strOut = ""
+        For Each rc In redCells
+            If rc.index = 0 Then Continue For
+            If rc.index <= redOptions.identifyCount Then
+                If viewType = "Side" Then
+                    xy1 = (ranges(0).End - ranges(0).Start) * rc.rect.Y / dst2.Height + ranges(0).Start
+                    xy2 = (ranges(0).End - ranges(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height + ranges(0).Start
+                    z1 = (ranges(1).End - ranges(1).Start) * rc.rect.X / dst2.Width
+                    z2 = (ranges(1).End - ranges(1).Start) * (rc.rect.X + rc.rect.Width) / dst2.Width
+                Else
+                    xy1 = (ranges(1).End - ranges(1).Start) * rc.rect.X / dst2.Width + ranges(1).Start
+                    xy2 = (ranges(1).End - ranges(1).Start) * (rc.rect.X + rc.rect.Width) / dst2.Width + ranges(1).Start
+                    z1 = (ranges(0).End - ranges(0).Start) * rc.rect.Y / dst2.Height
+                    z2 = (ranges(0).End - ranges(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height
+                End If
+                objectList.Add(New cv.Vec4f(xy1, xy2, z1, z2))
+                If task.heartBeat Then
+                    strOut += "Object " + vbTab + CStr(rc.index) + vbTab + Format(xy2 - xy1, fmt3) + " m " + meterDesc + vbTab +
+                               Format(z1, fmt1) + "m " + " to " + Format(z2, fmt1) + "m from camera" + vbTab + CStr(rc.pixels) + " pixels" + vbCrLf
+                End If
+            Else
+                otherCount += rc.pixels
+            End If
+        Next
+
+        If task.heartBeat Then
+            Dim check1 = src.Sum()(0)
+            Dim depthCount = task.pcSplit(2).CountNonZero
+            strOut += CStr(redCells.Count - redOptions.identifyCount - 1) + " other objects " + vbTab + CStr(otherCount) + " pixels" + vbCrLf
+            strOut += "Sum above   " + vbTab + CStr(check2) + " pixels" + " (losses from histogram ranges?)" + vbCrLf
+            strOut += "Sum of src  " + vbTab + CStr(check1) + " pixels" + " (losses from RedCloud.)" + vbCrLf
+            strOut += "Actual count" + vbTab + CStr(depthCount) + " pixels" + vbCrLf
+        End If
+        setTrueText(strOut, 3)
+        For i = 0 To Math.Min(redCells.Count, redOptions.identifyCount) - 1
+            dst2.Rectangle(redCells(i).rect, task.highlightColor, task.lineWidth)
+        Next
+        labels(2) = CStr(redCells.Count) + " objects were found in the " + viewType + " view."
+        If standalone Then identifyCellRects(redCells)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Projection_Top : Inherits VB_Algorithm
+    Dim histTop As New Projection_HistTop
+    Dim redC As New RedCloud_BasicsMask
+    Public objects As New Projection_Basics
+    Public Sub New()
+        desc = "Find all the masks, rects, and counts in the top down view."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        histTop.Run(src)
+
+        redC.inputMask = Not histTop.dst3
+        redC.Run(histTop.dst3)
+
+        objects.redCellInput = redC.redCells
+        objects.dst2 = redC.dst2
+        objects.labels(2) = redC.labels(2)
+        objects.Run(histTop.dst2)
+
+        dst2 = objects.dst2
+        labels(2) = redC.labels(2)
+        setTrueText(objects.strOut, 3)
+
+        If standalone Then identifyCellRects(objects.redCells)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Projection_Side : Inherits VB_Algorithm
+    Dim histSide As New Projection_HistSide
+    Dim redC As New RedCloud_BasicsMask
+    Public objects As New Projection_Basics
+    Public Sub New()
+        objects.viewType = "Side"
+        desc = "Find all the masks, rects, and counts in the side view."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        histSide.Run(src)
+
+        redC.inputMask = Not histSide.dst3
+        redC.Run(histSide.dst3)
+
+        objects.redCellInput = redC.redCells
+        objects.dst2 = redC.dst2
+        objects.labels(2) = redC.labels(2)
+        objects.Run(histSide.dst2)
+
+        dst2 = objects.dst2
+        labels(2) = redC.labels(2)
+        setTrueText(objects.strOut, 3)
+
+        If standalone Then identifyCellRects(objects.redCells)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Projection_Both : Inherits VB_Algorithm
+    Dim side As New Projection_Side
+    Dim top As New Projection_Top
+    Public Sub New()
+        desc = "Project both the top and side views of the input."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        top.Run(src)
+        dst2 = top.dst2
+        labels(2) = top.labels(2)
+        identifyCellRects(top.objects.redCells)
+
+        side.Run(src)
+        dst3 = side.dst2
+        labels(3) = side.labels(2)
+        identifyCellRects(side.objects.redCells, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Projection_HistSide : Inherits VB_Algorithm
+    Public histogram As New cv.Mat
+    Public Sub New()
+        labels = {"", "", "Top view with histogram counts", "ZY (Side View) - mask"}
+        vbAddAdvice(traceName + ": redOptions 'Project threshold' affects how many regions are isolated.")
+        desc = "Create a 2D side view for ZY histogram of depth"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
+        histogram.Col(0).SetTo(0)
+
+        dst2 = histogram.ConvertScaleAbs
+        dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Projection_HistTop : Inherits VB_Algorithm
+    Public histogram As New cv.Mat
+    Public Sub New()
+        labels = {"", "", "Top view with histogram counts", "XZ (Top View) - mask"}
+        vbAddAdvice(traceName + ": redOptions 'Project threshold' affects how many regions are isolated.")
+        desc = "Create a 2D top view for XZ histogram of depth"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        cv.Cv2.CalcHist({src}, task.channelsTop, New cv.Mat, histogram, 2, task.bins2D, task.rangesTop)
+        histogram.Row(0).SetTo(0)
+
+        dst2 = histogram.ConvertScaleAbs
+        dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Projection_Cell : Inherits VB_Algorithm
     Dim heat As New HeatMap_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -63,3 +311,4 @@ Public Class Projection_Lines : Inherits VB_Algorithm
         dst3 += lines.dst3
     End Sub
 End Class
+

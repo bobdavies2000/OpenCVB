@@ -1101,7 +1101,7 @@ End Class
 
 Public Class Structured_TransformH : Inherits VB_Algorithm
     Dim options As New Options_Structured
-    Dim histTop As New Histogram2D_Top
+    Dim histTop As New Projection_HistTop
     Public Sub New()
         labels(3) = "Top down view of the slice of the point cloud"
         desc = "Find and isolate planes (floor and ceiling) in a TopView or SideView histogram."
@@ -1146,7 +1146,7 @@ End Class
 
 Public Class Structured_TransformV : Inherits VB_Algorithm
     Dim options As New Options_Structured
-    Dim histSide As New Histogram2D_Side
+    Dim histSide As New Projection_HistSide
     Public Sub New()
         labels(3) = "Side view of the slice of the point cloud"
         desc = "Find and isolate planes using the top view histogram data"

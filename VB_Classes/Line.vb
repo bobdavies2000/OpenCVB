@@ -1211,7 +1211,7 @@ End Class
 Public Class Line_ViewSide : Inherits VB_Algorithm
     Public autoY As New OpAuto_YRange
     Public lines As New Line_Basics
-    Dim histSide As New Histogram2D_Side
+    Dim histSide As New Projection_HistSide
     Public Sub New()
         labels = {"", "", "Hotspots in the Side View", "Lines found in the hotspots of the Side View."}
         desc = "Find lines in the hotspots for the side view."
@@ -1235,7 +1235,7 @@ End Class
 Public Class Line_ViewTop : Inherits VB_Algorithm
     Public autoX As New OpAuto_XRange
     Public lines As New Line_Basics
-    Dim histTop As New Histogram2D_Top
+    Dim histTop As New Projection_HistTop
     Public Sub New()
         labels = {"", "", "Hotspots in the Top View", "Lines found in the hotspots of the Top View."}
         desc = "Find lines in the hotspots for the Top View."

@@ -395,7 +395,7 @@ End Class
 
 Public Class BackProject_Side : Inherits VB_Algorithm
     Dim autoY As New OpAuto_YRange
-    Dim histSide As New Histogram2D_Side
+    Dim histSide As New Projection_HistSide
     Public Sub New()
         labels = {"", "", "Hotspots in the Side View", "Back projection of the hotspots in the Side View"}
         desc = "Display the back projection of the hotspots in the Side View"
@@ -417,7 +417,7 @@ End Class
 
 
 Public Class BackProject_Top : Inherits VB_Algorithm
-    Dim histTop As New Histogram2D_Top
+    Dim histTop As New Projection_HistTop
     Public Sub New()
         labels = {"", "", "Hotspots in the Top View", "Back projection of the hotspots in the Top View"}
         desc = "Display the back projection of the hotspots in the Top View"
@@ -486,7 +486,7 @@ End Class
 
 
 Public Class BackProject_SoloSide : Inherits VB_Algorithm
-    Dim histSide As New Histogram2D_Side
+    Dim histSide As New Projection_HistSide
     Public Sub New()
         labels = {"", "", "Solo samples in the Side View", "Back projection of the solo samples in the Side View"}
         desc = "Display the back projection of the solo samples in the Side View"
@@ -509,7 +509,7 @@ End Class
 
 
 Public Class BackProject_SoloTop : Inherits VB_Algorithm
-    Dim histTop As New Histogram2D_Top
+    Dim histTop As New Projection_HistTop
     Public Sub New()
         labels = {"", "", "Solo samples in the Top View", "Back projection of the solo samples in the Top View"}
         desc = "Display the back projection of the solo samples in the Top View"

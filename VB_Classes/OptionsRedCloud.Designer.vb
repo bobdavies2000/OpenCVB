@@ -196,7 +196,6 @@ Partial Class OptionsRedCloud
         '
         Me.ProjectionThreshold.Location = New System.Drawing.Point(180, 96)
         Me.ProjectionThreshold.Maximum = 200
-        Me.ProjectionThreshold.Minimum = 1
         Me.ProjectionThreshold.Name = "ProjectionThreshold"
         Me.ProjectionThreshold.Size = New System.Drawing.Size(482, 69)
         Me.ProjectionThreshold.TabIndex = 16

@@ -492,7 +492,7 @@ End Class
 
 Public Class Mat_ToList : Inherits VB_Algorithm
     Dim autoX As New OpAuto_XRange
-    Dim histTop As New Histogram2D_Top
+    Dim histTop As New Projection_HistTop
     Public Sub New()
         desc = "Convert a Mat to List of points in 2 ways to measure which is better"
     End Sub

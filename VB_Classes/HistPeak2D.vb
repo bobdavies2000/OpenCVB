@@ -47,8 +47,8 @@ End Class
 
 Public Class HistPeak2D_TopAndSide : Inherits VB_Algorithm
     Dim peak As New HistPeak2D_Basics
-    Dim histSide As New Histogram2D_Side
-    Dim histTop As New Histogram2D_Top
+    Dim histSide As New Projection_HistSide
+    Dim histTop As New Projection_HistTop
     Public Sub New()
         desc = "Find the top X peaks in the 2D histogram of the top and side views and backproject them."
     End Sub
@@ -79,7 +79,7 @@ End Class
 
 
 Public Class HistPeak2D_NotHotTop : Inherits VB_Algorithm
-    Public histTop As New Histogram2D_Top
+    Public histTop As New Projection_HistTop
     Dim peak As New HistPeak2D_Basics
     Public Sub New()
         desc = "Find the regions with the non-zero (low) samples in the top view"
@@ -107,7 +107,7 @@ End Class
 
 Public Class HistPeak2D_Edges : Inherits VB_Algorithm
     Dim peak As New HistPeak2D_Basics
-    Dim histTop As New Histogram2D_Top
+    Dim histTop As New Projection_HistTop
     Dim edges As New Edge_Canny
     Public Sub New()
         desc = "Display the HistPeak2D_Basics edges in the RGB image"
@@ -200,7 +200,7 @@ End Class
 
 Public Class HistPeak2D_HotSide : Inherits VB_Algorithm
     Dim peak As New HistPeak2D_Basics
-    Dim histSide As New Histogram2D_Side
+    Dim histSide As New Projection_HistSide
     Public Sub New()
         labels = {"", "", "Backprojection of Side View hotspots", "Side view with highlighted hot spots"}
         desc = "Find the top X peaks in the 2D histogram of the side view and backproject it."
@@ -230,7 +230,7 @@ End Class
 
 Public Class HistPeak2D_HotTop : Inherits VB_Algorithm
     Dim peak As New HistPeak2D_Basics
-    Dim histTop As New Histogram2D_Top
+    Dim histTop As New Projection_HistTop
     Public Sub New()
         labels = {"", "", "Backprojection of Top View hotspots", "Top view with highlighted hot spots"}
         desc = "Find the top X peaks in the 2D histogram of the top view and backproject it."

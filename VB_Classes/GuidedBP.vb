@@ -168,8 +168,8 @@ End Class
 
 
 Public Class GuidedBP_HotPoints : Inherits VB_Algorithm
-    Public histTop As New Histogram2D_Top
-    Public histSide As New Histogram2D_Side
+    Public histTop As New Projection_HistTop
+    Public histSide As New Projection_HistSide
     Public topRects As New List(Of cv.Rect)
     Public sideRects As New List(Of cv.Rect)
     Public Sub New()
@@ -225,7 +225,7 @@ End Class
 
 
 Public Class GuidedBP_PlanesPlot : Inherits VB_Algorithm
-    Dim histSide As New Histogram2D_Side
+    Dim histSide As New Projection_HistSide
     Public Sub New()
         labels = {"", "", "Side view", "Plot of nonzero rows in the side view"}
         desc = "Plot the likely floor or ceiling areas."

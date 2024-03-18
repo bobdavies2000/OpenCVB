@@ -1755,7 +1755,7 @@ End Class
 Public Class RedCloud_StructuredH : Inherits VB_Algorithm
     Dim motion As New RedCloud_MotionBGsubtract
     Dim transform As New Structured_TransformH
-    Dim histTop As New Histogram2D_Top
+    Dim histTop As New Projection_HistTop
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -1794,7 +1794,7 @@ End Class
 Public Class RedCloud_StructuredV : Inherits VB_Algorithm
     Dim motion As New RedCloud_MotionBGsubtract
     Dim transform As New Structured_TransformV
-    Dim histSide As New Histogram2D_Side
+    Dim histSide As New Projection_HistSide
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
         If standaloneTest() Then gOptions.displayDst1.Checked = True
