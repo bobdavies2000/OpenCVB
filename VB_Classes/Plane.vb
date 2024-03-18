@@ -204,7 +204,7 @@ Public Class Plane_OnlyPlanes : Inherits VB_Algorithm
         Next
         If plane.options.reuseRawDepthData Then dst3 = task.pointCloud
 
-        Dim rcX = task.rcOld
+        Dim rcX = task.rc
     End Sub
 End Class
 
@@ -314,7 +314,7 @@ Public Class Plane_CellColor : Inherits VB_Algorithm
 
         dst3.SetTo(0)
         Dim newCells As New List(Of rcData)
-        Dim rcX = task.rcOld
+        Dim rcX = task.rc
         For Each rc In redC.redCells
             rc.eq = New cv.Vec4f
             If options.useMaskPoints Then
@@ -354,7 +354,7 @@ Public Class Plane_Points : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
 
-        Dim rc = task.rcOld
+        Dim rc = task.rc
         labels(2) = "Selected cell has " + CStr(rc.contour.Count) + " points."
 
         ' this contour will have more depth data behind it.  Simplified contours will lose lots of depth data.

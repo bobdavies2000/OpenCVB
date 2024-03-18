@@ -818,7 +818,7 @@ Public Class OpenGL_DrawHull : Inherits VB_Algorithm
         dst2 = hulls.dst2
         Dim oglData As New List(Of cv.Point3f)
 
-        Dim rc = task.rcOld
+        Dim rc = task.rc
         Dim hull As New List(Of cv.Point3f)
         If rc.hull IsNot Nothing Then
             For Each pt In rc.hull
@@ -913,7 +913,7 @@ Public Class OpenGL_DrawHulls : Inherits VB_Algorithm
 
         hulls.Run(src)
         dst2 = hulls.dst2
-        Dim rcx = task.rcOld
+        Dim rcx = task.rc
 
         Dim oglData As New List(Of cv.Point3f)
         oglData.Add(New cv.Point3f)
@@ -974,7 +974,7 @@ Public Class OpenGL_Contours : Inherits VB_Algorithm
 
         redC.Run(src)
         dst2 = redC.dst2
-        Dim rcx = task.rcOld
+        Dim rcx = task.rc
 
         Dim polygonCount As Integer
         Dim oglData As New List(Of cv.Point3f)
@@ -1255,7 +1255,7 @@ Public Class OpenGL_Profile : Inherits VB_Algorithm
         sides.Run(src)
         dst2 = sides.dst2
 
-        Dim rc = task.rcOld
+        Dim rc = task.rc
         Dim contourMat As New cv.Mat(rc.contour.Count, 1, cv.MatType.CV_32SC2, rc.contour.ToArray)
         If rc.contour.Count = 0 Then Exit Sub
 
@@ -1817,7 +1817,7 @@ Public Class OpenGL_RedCloudCell : Inherits VB_Algorithm
 
         task.ogl.pointCloudInput.SetTo(0)
 
-        task.pointCloud(task.rcOld.rect).CopyTo(task.ogl.pointCloudInput(task.rcOld.rect), task.rcOld.mask)
+        task.pointCloud(task.rc.rect).CopyTo(task.ogl.pointCloudInput(task.rc.rect), task.rc.mask)
         task.ogl.Run(dst2)
         If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub

@@ -230,13 +230,13 @@ Public Class Fractal_Dimension : Inherits VB_Algorithm
         dst2 = redC.dst2
         dst3.SetTo(0)
 
-        Static rect = New cv.Rect(0, 0, task.rcOld.rect.Width, task.rcOld.rect.Height)
+        Static rect = New cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)
         If task.optionsChanged Or task.mouseClickFlag Then
-            rect = New cv.Rect(0, 0, task.rcOld.rect.Width, task.rcOld.rect.Height)
+            rect = New cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)
         End If
 
-        If task.rcOld.rect.Width = 0 Or task.rcOld.rect.Height = 0 Then Exit Sub
-        task.rcOld.mask.CopyTo(dst3(New cv.Rect(0, 0, task.rcOld.rect.Width, task.rcOld.rect.Height)))
+        If task.rc.rect.Width = 0 Or task.rc.rect.Height = 0 Then Exit Sub
+        task.rc.mask.CopyTo(dst3(New cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height)))
         If rect.Width < rect.Height Then rect.Width = rect.Height Else rect.Height = rect.Width
         dst3.Rectangle(rect, cv.Scalar.White, task.lineWidth, task.lineType)
     End Sub

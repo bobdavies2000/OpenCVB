@@ -277,7 +277,7 @@ Public Class Contour_SidePoints : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         sides.Run(src)
         dst2 = sides.dst2
-        Dim rc = task.rcOld
+        Dim rc = task.rc
 
         If sides.corners.Count > 0 And task.heartBeat Then
             ptLeft = sides.corners(1)
@@ -415,7 +415,7 @@ Public Class Contour_Outline : Inherits VB_Algorithm
         dst3.SetTo(0)
 
         Dim newContour As New List(Of cv.Point)
-        rc = task.rcOld
+        rc = task.rc
         If rc.contour.Count = 0 Then Exit Sub
         Dim p1 As cv.Point, p2 As cv.Point
         newContour.Add(p1)
@@ -449,7 +449,7 @@ Public Class Contour_SelfIntersect : Inherits VB_Algorithm
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
-            rc = task.rcOld
+            rc = task.rc
             vbDrawContour(dst2(rc.rect), rc.contour, cv.Scalar.White, -1)
             labels(2) = redC.labels(2)
         End If
@@ -550,14 +550,14 @@ Public Class Contour_Compare : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Dim tmp = task.rcOld.mask.Clone
+        Dim tmp = task.rc.mask.Clone
 
         Dim allContours As cv.Point()()
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then tmp.ConvertTo(tmp, cv.MatType.CV_32SC1)
         cv.Cv2.FindContours(tmp, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
 
         dst3.SetTo(0)
-        cv.Cv2.DrawContours(dst3(task.rcOld.rect), allContours, -1, cv.Scalar.Yellow, -1, task.lineType)
+        cv.Cv2.DrawContours(dst3(task.rc.rect), allContours, -1, cv.Scalar.Yellow, -1, task.lineType)
     End Sub
 End Class
 
@@ -582,7 +582,7 @@ Public Class Contour_RedCloudCorners : Inherits VB_Algorithm
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            rc = task.rcOld
+            rc = task.rc
         End If
 
         dst3.SetTo(0)
@@ -705,7 +705,7 @@ Public Class Contour_Smoothing : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
 
-        Dim rc = task.rcOld
+        Dim rc = task.rc
 
         dst1.SetTo(0)
         dst3.SetTo(0)

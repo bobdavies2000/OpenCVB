@@ -267,7 +267,7 @@ Public Class MatchShapes_Hulls : Inherits VB_Algorithm
         dst2 = hulls.dst2
         If task.heartBeat Then dst3.SetTo(0)
 
-        Dim rcX = task.rcOld
+        Dim rcX = task.rc
 
         For Each rc In hulls.redC.redCells
             If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
@@ -302,7 +302,7 @@ Public Class MatchShapes_Contours : Inherits VB_Algorithm
         dst2 = redC.dst2
         If task.heartBeat Then dst3.SetTo(0)
 
-        Dim rcX = task.rcOld
+        Dim rcX = task.rc
 
         For Each rc In redC.redCells
             If rc.contour Is Nothing Then Continue For

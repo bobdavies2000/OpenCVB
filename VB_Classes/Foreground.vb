@@ -142,7 +142,7 @@ Public Class Foreground_RedCloud : Inherits VB_Algorithm
         dst3 = back.dst2
         labels(3) = back.labels(2)
         If fore.redC.redCells.Count > 0 Then
-            dst2(task.rcOld.rect).SetTo(cv.Scalar.White, task.rcOld.mask)
+            dst2(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
         End If
     End Sub
 End Class

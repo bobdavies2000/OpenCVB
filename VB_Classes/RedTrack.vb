@@ -14,7 +14,7 @@ Public Class RedTrack_Basics : Inherits VB_Algorithm
         dst2.SetTo(0)
         For Each rc As rcData In redC.redCells
             vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
-            If rc.index = task.rcOld.index Then vbDrawContour(dst2(rc.rect), rc.contour, cv.Scalar.White, -1)
+            If rc.index = task.rc.index Then vbDrawContour(dst2(rc.rect), rc.contour, cv.Scalar.White, -1)
         Next
         strOut = stats.strOut
         setTrueText(strOut, 3)

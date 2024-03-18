@@ -16,7 +16,7 @@ Public Class Profile_Basics : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
-        Dim rc = task.rcOld
+        Dim rc = task.rc
         If rc.depthPixels = 0 Then
             strOut = "There is no depth data for that cell."
             Exit Sub
@@ -145,7 +145,7 @@ Public Class Profile_Derivative : Inherits VB_Algorithm
         Static saveTrueText As New List(Of trueText)
         sides.Run(src)
         dst2 = sides.dst2
-        Dim rc = task.rcOld
+        Dim rc = task.rc
 
         Dim offset As Integer = 30
         Dim rsizeX = (dst2.Width - offset * 2) / rc.rect.Width
@@ -245,7 +245,7 @@ Public Class Profile_ConcentrationTop : Inherits VB_Algorithm
 
         sides.Run(src)
         dst2 = sides.dst2
-        Dim rc = task.rcOld
+        Dim rc = task.rc
         If rc.contour3D.Count = 0 Then
             setTrueText("The selected cell has no 3D data.  The 3D data can only be computed from cells with depth data.", 1)
             Exit Sub
@@ -305,7 +305,7 @@ Public Class Profile_OpenGL : Inherits VB_Algorithm
         sides.Run(src)
         dst2 = sides.dst2
         dst3 = sides.dst3
-        Dim rc = task.rcOld
+        Dim rc = task.rc
 
         If rc.contour3D.Count > 0 Then
             Dim vecMat As New cv.Mat(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
@@ -344,7 +344,7 @@ Public Class Profile_Kalman : Inherits VB_Algorithm
         dst0 = sides.redC.dst0
         dst1 = sides.dst2
         dst2 = sides.dst3
-        Dim rc = task.rcOld
+        Dim rc = task.rc
 
         If kalman.kInput.Count <> sides.corners.Count * 2 Then ReDim kalman.kInput(sides.corners.Count * 2 - 1)
         For i = 0 To sides.corners.Count - 1

@@ -127,7 +127,7 @@ Public Class Cell_Stable : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
         dst3 = dst2.Clone
-        dst3(task.rcOld.rect).SetTo(task.rcOld.color, task.rcOld.mask)
+        dst3(task.rc.rect).SetTo(task.rc.color, task.rc.mask)
         labels(2) = redC.labels(2)
 
         Static prevList As New List(Of cv.Point)
@@ -426,7 +426,7 @@ Public Class Cell_Distance : Inherits VB_Algorithm
             Dim selectedMean As cv.Scalar = src(task.rc.rect).Mean(task.rc.mask)
             For Each rc In redC.redCells
                 colorDistance.Add(distance3D(selectedMean, src(rc.rect).Mean(rc.mask)))
-                depthDistance.Add(distance3D(task.rcOld.depthMean, rc.depthMean))
+                depthDistance.Add(distance3D(task.rc.depthMean, rc.depthMean))
                 redCells.Add(rc)
             Next
 

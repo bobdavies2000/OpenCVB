@@ -598,7 +598,7 @@ Public Class VBtask : Implements IDisposable
                 task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
             End If
 
-            Dim rc = task.rcOld
+            Dim rc = task.rc
             If rc.index > 0 Then
                 task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
                 task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)

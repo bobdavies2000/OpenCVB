@@ -1263,7 +1263,7 @@ Public Class Histogram_Cell : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
         dst2 = redC.dst2
-        hist.rc = task.rcOld
+        hist.rc = task.rc
         If hist.rc.index = 0 Or hist.rc.maxVec.Z = 0 Then Exit Sub
 
         dst1.SetTo(0)

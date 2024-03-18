@@ -21,7 +21,7 @@ Public Class Convex_Basics : Inherits VB_Algorithm
         Return hullList
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Dim hullList = task.rcOld.contour
+        Dim hullList = task.rc.contour
         If standaloneTest() Then
             If not task.heartBeat Then Exit Sub
             hullList = buildRandomHullPoints()
@@ -62,12 +62,12 @@ Public Class Convex_RedCloud : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
 
-        If task.rcOld.contour IsNot Nothing Then
+        If task.rc.contour IsNot Nothing Then
             convex.Run(src)
 
             dst3.SetTo(0)
-            dst3(task.rcOld.rect) = convex.dst2(New cv.Rect(0, 0, task.rcOld.rect.Width, task.rcOld.rect.Height))
-            dst3.Circle(task.rcOld.maxDist, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            dst3(task.rc.rect) = convex.dst2(New cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height))
+            dst3.Circle(task.rc.maxDist, task.dotSize, cv.Scalar.White, -1, task.lineType)
         End If
     End Sub
 End Class
@@ -148,7 +148,7 @@ Public Class Convex_RedCloudDefects : Inherits VB_Algorithm
         labels(1) = convex.redC.labels(2)
         dst3 = convex.dst3
 
-        Dim rc = task.rcOld
+        Dim rc = task.rc
         If rc.mask Is Nothing Then Exit Sub
 
         dst2 = rc.mask.Resize(dst2.Size, cv.InterpolationFlags.Nearest)

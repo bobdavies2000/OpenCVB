@@ -70,7 +70,7 @@ End Class
 '        Dim rc As New rcData
 '        If guided.redCells.Count > 1 Then
 '            setSelectedContour(guided.redCells, guided.kMap)
-'            rc = task.rcOld
+'            rc = task.rc
 '            vbDrawContour(dst2, rc.contour, rc.color)
 '        End If
 
@@ -371,7 +371,7 @@ End Class
 
 '        If redCells.Count > 1 Then
 '            setSelectedContour(redCells, kMap)
-'            vbDrawContour(dst2, task.rcOld.contour, task.rcOld.color)
+'            vbDrawContour(dst2, task.rc.contour, task.rc.color)
 '        End If
 
 '        plot.Run(task.pcSplit(2))
@@ -409,7 +409,7 @@ End Class
 
 '        If kHist.guided.redCells.Count > 1 Then
 '            setSelectedContour(kHist.guided.redCells, kHist.guided.kMap)
-'            vbDrawContour(dst2, task.rcOld.hull, cv.Scalar.White, task.lineWidth)
+'            vbDrawContour(dst2, task.rc.hull, cv.Scalar.White, task.lineWidth)
 '        End If
 
 '        reduction.dst2.SetTo(0, dst1)
@@ -487,8 +487,8 @@ End Class
 
 '        If redCells.Count > 1 Then
 '            setSelectedContour(redCells, kMap)
-'            vbDrawContour(dst2, task.rcOld.hull, cv.Scalar.White, task.lineWidth)
-'            vbDrawContour(task.color, task.rcOld.contour, cv.Scalar.Yellow)
+'            vbDrawContour(dst2, task.rc.hull, cv.Scalar.White, task.lineWidth)
+'            vbDrawContour(task.color, task.rc.contour, cv.Scalar.Yellow)
 '        End If
 
 

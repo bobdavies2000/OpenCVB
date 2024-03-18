@@ -10,7 +10,7 @@ Public Class Thickness_Basics : Inherits VB_Algorithm
         If standaloneTest() Then
             redC.Run(src)
             dst2 = redC.dst2
-            rc = task.rcOld
+            rc = task.rc
         End If
 
         volZ.rc = rc

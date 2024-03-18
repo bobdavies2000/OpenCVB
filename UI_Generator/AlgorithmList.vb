@@ -1501,6 +1501,7 @@ if algorithmName = "Projection_Cell" Then return new Projection_Cell
 if algorithmName = "Projection_HistSide" Then return new Projection_HistSide
 if algorithmName = "Projection_HistTop" Then return new Projection_HistTop
 if algorithmName = "Projection_Lines" Then return new Projection_Lines
+if algorithmName = "Projection_Object" Then return new Projection_Object
 if algorithmName = "Projection_Side" Then return new Projection_Side
 if algorithmName = "Projection_Top" Then return new Projection_Top
 if algorithmName = "Puzzle_Basics" Then return new Puzzle_Basics
