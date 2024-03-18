@@ -254,26 +254,53 @@ Public Class HeatMap_Side : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If task.heartBeat Then
             histSide.Run(src)
+            dst3 = histSide.dst2
 
             redC.inputMask = Not histSide.dst3
             redC.Run(histSide.dst3)
-            redCells.Clear()
+            Dim cells As New List(Of rcData)(redC.redCells)
             For Each rc In redC.redCells
-                For i = 0 To redC.redCells.Count - 1
-                    Dim rcBig = redC.redCells(i)
+                For i = 0 To cells.Count - 1
+                    Dim rcBig = cells(i)
                     If rcBig.rect.Contains(rc.rect) Then
                         rcBig.rect = rcBig.rect.Union(rc.rect)
-                        redCells.Add(rcBig)
+                        Dim sum1 = dst3(rcBig.rect).Sum()
+                        Dim sum2 = dst3(rc.rect).Sum()
+                        rcBig.pixels = sum1(0) + sum2(0)
+                        cells(i) = rcBig
                         Exit For
                     End If
                 Next
             Next
+
+            Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            For Each rc In cells
+                sortedCells.Add(rc.pixels, rc)
+            Next
+
+            redCells.Clear()
+            redCells.Add(New rcData)
+            For Each rc In sortedCells.Values
+                rc.index = redCells.Count
+                redCells.Add(rc)
+            Next
         End If
 
         dst2 = redC.dst2
+        Dim ttY As Integer = 10
         For Each rc In redCells
+            If rc.index = 0 Then Continue For
             dst2.Rectangle(rc.rect, task.highlightColor, task.lineWidth)
             If rc.index < redOptions.identifyCount Then setTrueText(CStr(rc.index), New cv.Point(rc.rect.X - 10, rc.rect.Y))
+            Dim y1 = (task.rangesSide(0).End - task.rangesSide(0).Start) * rc.rect.Y / dst2.Height
+            Dim y2 = (task.rangesSide(0).End - task.rangesSide(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height
+            Dim z1 = (task.rangesSide(1).End - task.rangesSide(1).Start) * rc.rect.X / dst2.Width
+            Dim z2 = (task.rangesSide(1).End - task.rangesSide(1).Start) * (rc.rect.X + rc.rect.Width) / dst2.Width
+            setTrueText("Object " + vbTab + CStr(rc.index) + vbTab + Format(y2 - y1, fmt1) + "m wide " + vbTab +
+                        Format(z1, fmt1) + "m to " + Format(z2, fmt1) + "m from camera" + vbTab + CStr(rc.pixels) + " pixels",
+                        New cv.Point(10, ttY), 3)
+            ttY += 10
+            If rc.index >= redOptions.identifyCount Then Exit For
         Next
         labels(2) = CStr(redCells.Count) + " objects were found in the top view."
     End Sub
