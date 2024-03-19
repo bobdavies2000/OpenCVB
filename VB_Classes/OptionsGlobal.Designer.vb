@@ -46,6 +46,7 @@ Partial Class OptionsGlobal
         Me.MaxDepth = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.ShowMotionRectangle = New System.Windows.Forms.CheckBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.MotionFilteredColorOnly = New System.Windows.Forms.RadioButton()
         Me.MotionFilteredColorAndCloud = New System.Windows.Forms.RadioButton()
@@ -77,7 +78,6 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.ShowMotionRectangle = New System.Windows.Forms.CheckBox()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -136,6 +136,7 @@ Partial Class OptionsGlobal
         'DebugSlider
         '
         Me.DebugSlider.Location = New System.Drawing.Point(212, 504)
+        Me.DebugSlider.Maximum = 9
         Me.DebugSlider.Name = "DebugSlider"
         Me.DebugSlider.Size = New System.Drawing.Size(506, 69)
         Me.DebugSlider.TabIndex = 55
@@ -363,6 +364,16 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
         '
+        'ShowMotionRectangle
+        '
+        Me.ShowMotionRectangle.AutoSize = True
+        Me.ShowMotionRectangle.Location = New System.Drawing.Point(24, 206)
+        Me.ShowMotionRectangle.Name = "ShowMotionRectangle"
+        Me.ShowMotionRectangle.Size = New System.Drawing.Size(275, 24)
+        Me.ShowMotionRectangle.TabIndex = 70
+        Me.ShowMotionRectangle.Text = "Show the motion rectangle in dst0"
+        Me.ShowMotionRectangle.UseVisualStyleBackColor = True
+        '
         'GroupBox1
         '
         Me.GroupBox1.Controls.Add(Me.MotionFilteredColorOnly)
@@ -437,7 +448,7 @@ Partial Class OptionsGlobal
         Me.ShowGrid.AutoSize = True
         Me.ShowGrid.Location = New System.Drawing.Point(24, 118)
         Me.ShowGrid.Name = "ShowGrid"
-        Me.ShowGrid.Size = New System.Drawing.Size(105, 24)
+        Me.ShowGrid.Size = New System.Drawing.Size(200, 24)
         Me.ShowGrid.TabIndex = 67
         Me.ShowGrid.Text = "Show grid mask overlay"
         Me.ShowGrid.UseVisualStyleBackColor = True
@@ -677,16 +688,6 @@ Partial Class OptionsGlobal
         Me.Label8.Text = "All values are restored to their default values at the start of each algorithm.  " &
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
-        '
-        'ShowMotionRectangle
-        '
-        Me.ShowMotionRectangle.AutoSize = True
-        Me.ShowMotionRectangle.Location = New System.Drawing.Point(24, 206)
-        Me.ShowMotionRectangle.Name = "ShowMotionRectangle"
-        Me.ShowMotionRectangle.Size = New System.Drawing.Size(275, 24)
-        Me.ShowMotionRectangle.TabIndex = 70
-        Me.ShowMotionRectangle.Text = "Show the motion rectangle in dst0"
-        Me.ShowMotionRectangle.UseVisualStyleBackColor = True
         '
         'OptionsGlobal
         '

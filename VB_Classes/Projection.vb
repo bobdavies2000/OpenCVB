@@ -113,72 +113,6 @@ End Class
 
 
 
-Public Class Projection_Top : Inherits VB_Algorithm
-    Dim histTop As New Projection_HistTop
-    Dim redC As New RedCloud_BasicsMask
-    Public objects As New Projection_Basics
-    Public Sub New()
-        desc = "Find all the masks, rects, and counts in the top down view."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        histTop.Run(src)
-
-        redC.inputMask = Not histTop.dst3
-        redC.Run(histTop.dst3)
-
-        objects.redCellInput = redC.redCells
-        objects.dst2 = redC.dst2
-        objects.labels(2) = redC.labels(2)
-        objects.Run(histTop.dst2)
-
-        dst2 = objects.dst2
-        labels(2) = redC.labels(2)
-        setTrueText(objects.strOut, 3)
-
-        If standalone Then identifyCellRects(objects.redCells)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Projection_Side : Inherits VB_Algorithm
-    Dim histSide As New Projection_HistSide
-    Dim redC As New RedCloud_BasicsMask
-    Public objects As New Projection_Basics
-    Public Sub New()
-        objects.viewType = "Side"
-        desc = "Find all the masks, rects, and counts in the side view."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        histSide.Run(src)
-
-        redC.inputMask = Not histSide.dst3
-        redC.Run(histSide.dst3)
-
-        objects.redCellInput = redC.redCells
-        objects.dst2 = redC.dst2
-        objects.labels(2) = redC.labels(2)
-        objects.Run(histSide.dst2)
-
-        dst2 = objects.dst2
-        labels(2) = redC.labels(2)
-        setTrueText(objects.strOut, 3)
-
-        If standalone Then identifyCellRects(objects.redCells)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Projection_Both : Inherits VB_Algorithm
     Dim side As New Projection_Side
     Dim top As New Projection_Top
@@ -309,8 +243,6 @@ Public Class Projection_Cell : Inherits VB_Algorithm
         dst0.SetTo(0)
         task.pointCloud(rc.rect).CopyTo(dst0(rc.rect), rc.mask)
 
-        cv.Cv2.ImShow("dst0", dst0)
-
         heatCell.Run(dst0)
         Dim maskTop = heatCell.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
         Dim maskSide = heatCell.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -327,29 +259,95 @@ End Class
 
 
 
-Public Class Projection_Object : Inherits VB_Algorithm
-    Dim both As New Projection_Both
+Public Class Projection_Top : Inherits VB_Algorithm
+    Dim histTop As New Projection_HistTop
+    Dim redC As New RedCloud_BasicsMask
+    Public objects As New Projection_Basics
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
-        desc = "Create a top and side projection of the selected cell"
+        desc = "Find all the masks, rects, and counts in the top down view."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        both.Run(src)
-        dst1 = both.dst2
-        labels(1) = both.labels(2)
-        dst3 = both.dst3
-        labels(3) = both.labels(2)
+        histTop.Run(src)
 
-        'Dim rc = task.rc
+        redC.inputMask = Not histTop.dst3
+        redC.Run(histTop.dst3)
 
-        'dst0.SetTo(0)
-        'task.pointCloud(rc.rect).CopyTo(dst0(rc.rect), rc.mask)
+        objects.redCellInput = redC.redCells
+        objects.dst2 = redC.dst2
+        objects.labels(2) = redC.labels(2)
+        objects.Run(histTop.dst2)
 
-        'heat.Run(dst0)
-        'Dim maskTop = heat.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
-        'Dim maskSide = heat.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
-        'If maskTop.CountNonZero = 0 And maskSide.CountNonZero = 0 Then setTrueText("The selected cell has no depth data.", 3)
-        'dst1.SetTo(cv.Scalar.White, maskTop)
-        'dst3.SetTo(cv.Scalar.White, maskSide)
+        dst2 = objects.dst2
+        labels(2) = redC.labels(2)
+        setTrueText(objects.strOut, 3)
+
+        If standalone Then identifyCellRects(objects.redCells)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Projection_Side : Inherits VB_Algorithm
+    Dim histSide As New Projection_HistSide
+    Dim redC As New RedCloud_BasicsMask
+    Public objects As New Projection_Basics
+    Public Sub New()
+        objects.viewType = "Side"
+        desc = "Find all the masks, rects, and counts in the side view."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        histSide.Run(src)
+
+        redC.inputMask = Not histSide.dst3
+        redC.Run(histSide.dst3)
+
+        objects.redCellInput = redC.redCells
+        objects.dst2 = redC.dst2
+        objects.labels(2) = redC.labels(2)
+        objects.Run(histSide.dst2)
+
+        dst2 = objects.dst2
+        labels(2) = redC.labels(2)
+        setTrueText(objects.strOut, 3)
+
+        If standalone Then identifyCellRects(objects.redCells)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Projection_Object : Inherits VB_Algorithm
+    Dim top As New Projection_Top
+    Dim side As New Projection_Side
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
+        desc = "Using the top down view, create a histogram for Y-values of the largest object."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        top.Run(src)
+        dst3 = top.dst2
+        labels(3) = top.labels(2)
+
+        Dim index = gOptions.DebugSlider.Value
+        If index < top.objects.objectList.Count Then
+            Dim lower = New cv.Scalar(top.objects.objectList(index)(0), -100, top.objects.objectList(index)(2))
+            Dim upper = New cv.Scalar(top.objects.objectList(index)(1), +100, top.objects.objectList(index)(3))
+            Dim mask = task.pointCloud.InRange(lower, upper)
+
+            dst1.SetTo(0)
+            task.pointCloud.CopyTo(dst1, mask)
+            side.Run(dst1)
+            dst2 = side.dst2
+            labels(2) = side.labels(2)
+        End If
     End Sub
 End Class
