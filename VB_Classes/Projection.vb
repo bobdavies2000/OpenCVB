@@ -4,8 +4,8 @@ Public Class Projection_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public viewType As String = "Top"
     Public objectList As New List(Of cv.Vec4f)
+    Public showRectangles As Boolean = True
     Public Sub New()
-        redOptions.ProjectionThreshold.Value = 0
         desc = "Find all the masks, rects, and counts in the input"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -22,29 +22,13 @@ Public Class Projection_Basics : Inherits VB_Algorithm
             labels(2) = redc.labels(2)
         End If
 
+        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim check2 As Integer
         For i = 0 To redCellInput.Count - 1
             Dim rc = redCellInput(i)
             Dim tmp = New cv.Mat(rc.rect.Size, cv.MatType.CV_32F, 0)
             src(rc.rect).CopyTo(tmp, rc.mask)
-            redCellInput(i).pixels = tmp.Sum()
-        Next
-
-        For i = 0 To redCellInput.Count - 1
-            Dim rcBig = redCellInput(i)
-            For j = i + 1 To redCellInput.Count - 1
-                Dim rc = redCellInput(j)
-                If rc.pixels = 0 Then Continue For
-                If rcBig.rect.Contains(rc.rect) Then
-                    rcBig.rect = rcBig.rect.Union(rc.rect)
-                    redCellInput(i).pixels += rc.pixels
-                    redCellInput(j).pixels = 0
-                End If
-            Next
-        Next
-
-        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        Dim check2 As Integer
-        For Each rc In redCellInput
+            rc.pixels = tmp.Sum()
             sortedCells.Add(rc.pixels, rc)
             check2 += rc.pixels
         Next
@@ -99,9 +83,11 @@ Public Class Projection_Basics : Inherits VB_Algorithm
             strOut += "Actual count" + vbTab + CStr(depthCount) + " pixels" + vbCrLf
         End If
         setTrueText(strOut, 3)
-        For i = 0 To Math.Min(redCells.Count, redOptions.identifyCount) - 1
-            dst2.Rectangle(redCells(i).rect, task.highlightColor, task.lineWidth)
-        Next
+        If showRectangles Then
+            For i = 0 To Math.Min(redCells.Count, redOptions.identifyCount) - 1
+                dst2.Rectangle(redCells(i).rect, task.highlightColor, task.lineWidth)
+            Next
+        End If
         labels(2) = CStr(redCells.Count) + " objects were found in the " + viewType + " view."
         If standalone Then identifyCellRects(redCells)
     End Sub
@@ -260,7 +246,7 @@ End Class
 
 
 Public Class Projection_Top : Inherits VB_Algorithm
-    Dim histTop As New Projection_HistTop
+    Public histTop As New Projection_HistTop
     Dim redC As New RedCloud_BasicsMask
     Public objects As New Projection_Basics
     Public Sub New()
@@ -293,7 +279,7 @@ End Class
 
 
 Public Class Projection_Side : Inherits VB_Algorithm
-    Dim histSide As New Projection_HistSide
+    Public histSide As New Projection_HistSide
     Dim redC As New RedCloud_BasicsMask
     Public objects As New Projection_Basics
     Public Sub New()
@@ -325,11 +311,53 @@ End Class
 
 
 
+Public Class Projection_ObjectIsolate : Inherits VB_Algorithm
+    Public top As New Projection_Top
+    Public side As New Projection_Side
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Index of object", 0, 100, 0) ' zero is the largest object present.
+
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
+        side.objects.showRectangles = False
+        desc = "Using the top down view, create a histogram for Y-values of the largest object."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static objSlider = findSlider("Index of object")
+        Dim index = objSlider.value
+
+        top.Run(src)
+        dst3 = top.dst2
+        labels(3) = top.labels(2)
+
+        If index < top.objects.objectList.Count Then
+            Dim lower = New cv.Scalar(top.objects.objectList(index)(0), -100, top.objects.objectList(index)(2))
+            Dim upper = New cv.Scalar(top.objects.objectList(index)(1), +100, top.objects.objectList(index)(3))
+            dst0 = task.pointCloud.InRange(lower, upper)
+
+            dst1.SetTo(0)
+            task.pointCloud.CopyTo(dst1, dst0)
+            side.Run(dst1)
+            dst2 = side.histSide.dst3
+            labels(2) = side.labels(2)
+
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class Projection_Object : Inherits VB_Algorithm
     Dim top As New Projection_Top
     Dim side As New Projection_Side
     Public Sub New()
+        gOptions.DebugSlider.Value = 0 ' pick the biggest object...
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
+        top.objects.showRectangles = False
         desc = "Using the top down view, create a histogram for Y-values of the largest object."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -343,11 +371,47 @@ Public Class Projection_Object : Inherits VB_Algorithm
             Dim upper = New cv.Scalar(top.objects.objectList(index)(1), +100, top.objects.objectList(index)(3))
             Dim mask = task.pointCloud.InRange(lower, upper)
 
+            Dim rc = top.objects.redCells(gOptions.DebugSlider.Value + 1) ' the biggest by default...
+            dst0.SetTo(0)
+            dst0(rc.rect) = top.histTop.dst2(rc.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
+            dst0.SetTo(0, dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
             dst1.SetTo(0)
             task.pointCloud.CopyTo(dst1, mask)
             side.Run(dst1)
             dst2 = side.dst2
             labels(2) = side.labels(2)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Projection_Floor : Inherits VB_Algorithm
+    Dim isolate As New Projection_ObjectIsolate
+    Public Sub New()
+        desc = "Isolate just the floor."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static objSlider = findSlider("Index of object")
+        isolate.Run(src)
+        dst2 = isolate.dst2
+        dst3 = isolate.dst3
+        labels(2) = isolate.labels(2)
+        labels(3) = isolate.labels(3)
+
+        If objSlider.value + 1 >= isolate.side.objects.redCells.Count Then Exit Sub
+        Dim rc = isolate.top.objects.redCells(objSlider.Value + 1) ' the biggest by default...
+        Dim rowList As New List(Of Integer)
+        For y = 0 To rc.rect.Height - 1
+            rowList.Add(dst2(rc.rect).Row(y).CountNonZero() + rc.rect.Y)
+        Next
+
+        Dim maxRow = rowList.Max
+        Dim ranges = task.rangesSide
+        Dim floor = (ranges(0).End - ranges(0).Start) * maxRow / dst2.Height + ranges(0).Start
     End Sub
 End Class

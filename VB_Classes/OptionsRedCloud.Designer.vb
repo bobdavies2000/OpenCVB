@@ -95,7 +95,6 @@ Partial Class OptionsRedCloud
         Me.RedCloudSliders.Size = New System.Drawing.Size(763, 242)
         Me.RedCloudSliders.TabIndex = 2
         Me.RedCloudSliders.TabStop = False
-        Me.RedCloudSliders.Visible = False
         '
         'LabelHistogramBins
         '

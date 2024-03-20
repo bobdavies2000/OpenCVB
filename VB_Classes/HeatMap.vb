@@ -110,8 +110,8 @@ Public Class HeatMap_HotNot : Inherits VB_Algorithm
         heat.Run(src)
         dst0 = heat.dst2.ConvertScaleAbs
         dst1 = heat.dst3.ConvertScaleAbs
-        dst2 = heat.dst0.SetTo(0, dst0)
-        dst3 = heat.dst1.SetTo(0, dst1)
+        dst2 = dst0.Threshold(redOptions.ProjectionThreshold.Value, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst1.Threshold(redOptions.ProjectionThreshold.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 

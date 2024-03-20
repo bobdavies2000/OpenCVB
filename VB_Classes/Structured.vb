@@ -1,4 +1,3 @@
-Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 Public Class Structured_LinearizeFloor : Inherits VB_Algorithm
     Public floor As New Structured_FloorCeiling
@@ -29,7 +28,7 @@ Public Class Structured_LinearizeFloor : Inherits VB_Algorithm
         If sliceMask.CountNonZero > 0 Then
             Dim split = imuPC.Split()
             If xCheck.Checked Then
-                Dim mm as mmData = vbMinMax(split(0), sliceMask)
+                Dim mm As mmData = vbMinMax(split(0), sliceMask)
 
                 Dim firstCol As Integer, lastCol As Integer
                 For firstCol = 0 To sliceMask.Width - 1
@@ -47,7 +46,7 @@ Public Class Structured_LinearizeFloor : Inherits VB_Algorithm
             End If
 
             If yCheck.Checked Then
-                Dim mm as mmData = vbMinMax(split(1), sliceMask)
+                Dim mm As mmData = vbMinMax(split(1), sliceMask)
                 kalman.kInput = (mm.minVal + mm.maxVal) / 2
                 kalman.Run(src)
                 floorYPlane = kalman.kAverage
@@ -1191,53 +1190,6 @@ End Class
 
 
 
-
-
-Public Class Structured_SliceH : Inherits VB_Algorithm
-    Public heat As New HeatMap_Basics
-    Public sliceMask As New cv.Mat
-    Public options As New Options_Structured
-    Public ycoordinate As Integer
-    Public Sub New()
-        desc = "Find and isolate planes (floor and ceiling) in a TopView or SideView histogram."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        heat.Run(src)
-
-        If standaloneTest() Then ycoordinate = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
-
-        Dim planeY = -task.yRange * (task.sideCameraPoint.Y - ycoordinate) / task.sideCameraPoint.Y
-        If ycoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (ycoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
-
-        Dim thicknessMeters = options.sliceSize * task.metersPerPixel
-        Dim minVal = planeY - thicknessMeters
-        Dim maxVal = planeY + thicknessMeters
-        cv.Cv2.InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
-
-        labels(2) = "At offset " + CStr(ycoordinate) + " y = " + Format((maxVal + minVal) / 2, fmt2) +
-                    " with " + Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
-        If minVal <= 0 And maxVal >= 0 Then sliceMask.SetTo(0, task.noDepthMask)
-        labels(3) = heat.labels(2)
-
-        dst3 = heat.dst3
-        Dim yPlaneOffset = If(ycoordinate < dst3.Height - options.sliceSize, CInt(ycoordinate),
-                              dst3.Height - options.sliceSize - 1)
-        dst3.Circle(New cv.Point(0, task.sideCameraPoint.Y), task.dotSize, task.highlightColor, -1, task.lineType)
-        dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.highlightColor,
-                  options.sliceSize)
-        If standaloneTest() Then
-            dst2 = src
-            dst2.SetTo(cv.Scalar.White, sliceMask)
-        End If
-    End Sub
-End Class
-
-
-
-
-
 Public Class Structured_CountSide : Inherits VB_Algorithm
     Dim slice As New Structured_SliceH
     Dim plot As New Plot_Histogram
@@ -1338,6 +1290,94 @@ Public Class Structured_CountSideSum : Inherits VB_Algorithm
         For i = 0 To counts.Count - 1
             Dim w = dst2.Width * counts(i) / max
             cv.Cv2.Rectangle(dst3, New cv.Rect(0, i * barHeight, w, barHeight), cv.Scalar.Black, -1)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Structured_SliceH : Inherits VB_Algorithm
+    Public heat As New HeatMap_Basics
+    Public sliceMask As New cv.Mat
+    Public options As New Options_Structured
+    Public ycoordinate As Integer
+    Public Sub New()
+        desc = "Find and isolate planes (floor and ceiling) in a TopView or SideView histogram."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        heat.Run(src)
+
+        If standaloneTest() Then ycoordinate = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
+
+        Dim sliceY = -task.yRange * (task.sideCameraPoint.Y - ycoordinate) / task.sideCameraPoint.Y
+        If ycoordinate > task.sideCameraPoint.Y Then sliceY = task.yRange * (ycoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
+
+        Dim thicknessMeters = options.sliceSize * task.metersPerPixel
+        Dim minVal = sliceY - thicknessMeters
+        Dim maxVal = sliceY + thicknessMeters
+        cv.Cv2.InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
+
+        labels(2) = "At offset " + CStr(ycoordinate) + " y = " + Format((maxVal + minVal) / 2, fmt2) +
+                    " with " + Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
+        If minVal <= 0 And maxVal >= 0 Then sliceMask.SetTo(0, task.noDepthMask)
+        labels(3) = heat.labels(2)
+
+        dst3 = heat.dst3
+        Dim yPlaneOffset = If(ycoordinate < dst3.Height - options.sliceSize, CInt(ycoordinate),
+                              dst3.Height - options.sliceSize - 1)
+        dst3.Circle(New cv.Point(0, task.sideCameraPoint.Y), task.dotSize, task.highlightColor, -1, task.lineType)
+        dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.highlightColor,
+                  options.sliceSize)
+        If standaloneTest() Then
+            dst2 = src
+            dst2.SetTo(cv.Scalar.White, sliceMask)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Structured_SurveyH : Inherits VB_Algorithm
+    Public Sub New()
+        redOptions.YRangeSlider.Value = 300
+        desc = "Create a mask of the surv"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+
+        cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, dst3, 2, task.bins2D, task.rangesSide)
+        dst3.Col(0).SetTo(0)
+        dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst3.ConvertTo(dst3, cv.MatType.CV_8U)
+
+        Dim topRow As Integer
+        For topRow = 0 To dst2.Height - 1
+            If dst3.Row(topRow).CountNonZero Then Exit For
+        Next
+
+        Dim index As Integer
+        dst2.SetTo(0)
+        For y = topRow To dst2.Height - 1
+            If dst3.Row(y).CountNonZero = 0 Then Exit For
+            Dim sliceY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y
+            If y > task.sideCameraPoint.Y Then sliceY = task.yRange * (y - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
+            Dim minVal = sliceY - task.metersPerPixel
+            Dim maxVal = sliceY + task.metersPerPixel
+            If minVal < 0 And maxVal > 0 Then Continue For
+            dst0 = task.pcSplit(1).InRange(minVal, maxVal)
+            dst2.SetTo(task.scalarColors(index), dst0)
+            index += 1
         Next
     End Sub
 End Class
