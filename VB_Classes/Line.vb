@@ -293,102 +293,6 @@ End Class
 
 
 
-Public Class Line_RegionsVB : Inherits VB_Algorithm
-    Dim lines As New Line_TimeView
-    Dim reduction As New Reduction_Basics
-    Const lineMatch = 254
-    Public Sub New()
-        redOptions.BitwiseReduction.Checked = True
-        redOptions.BitwiseReductionSlider.Value = 6
-
-        If findfrm(traceName + " CheckBoxes") Is Nothing Then
-            check.Setup(traceName)
-            check.addCheckBox("Show intermediate vertical step results.")
-            check.addCheckBox("Run horizontal without vertical step")
-        End If
-
-        desc = "Use the reduction values between lines to identify regions."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static noVertCheck = findCheckBox("Run horizontal without vertical step")
-        Static verticalCheck = findCheckBox("Show intermediate vertical step results.")
-        reduction.Run(src)
-        dst2 = reduction.dst2
-        dst3 = dst2.Clone
-
-        lines.Run(src)
-
-        Dim lineMask = lines.dst3
-        dst2.SetTo(lineMatch, lineMask)
-        dst3.SetTo(lineMatch, lineMask)
-
-        Dim nextB As Byte
-        Dim region As Integer = -1
-        Dim indexer1 = dst2.GetGenericIndexer(Of Byte)()
-        Dim indexer2 = dst3.GetGenericIndexer(Of Byte)()
-        If noVertCheck.checked = False Then
-            For x = 0 To dst2.Width - 1
-                region = -1
-                For y = 0 To dst2.Height - 1
-                    nextB = indexer1(y, x)
-                    If nextB = lineMatch Then
-                        region = -1
-                    Else
-                        If region = -1 Then
-                            region = nextB
-                        Else
-                            indexer1(y, x) = region
-                        End If
-                    End If
-                Next
-            Next
-        End If
-
-        For y = 0 To dst3.Height - 1
-            region = -1
-            For x = 0 To dst3.Width - 1
-                nextB = indexer2(y, x)
-                If nextB = lineMatch Then
-                    region = -1
-                Else
-                    If region = -1 Then
-                        If y = 0 Then
-                            region = indexer1(y, x)
-                        Else
-                            Dim vals As New List(Of Integer)
-                            Dim counts As New List(Of Integer)
-                            For i = x To dst3.Width - 1
-                                Dim nextVal = indexer1(y - 1, i)
-                                If nextVal = lineMatch Then Exit For
-                                If vals.Contains(nextVal) Then
-                                    counts(vals.IndexOf(nextVal)) += 1
-                                Else
-                                    vals.Add(nextVal)
-                                    counts.Add(1)
-                                End If
-                                Dim maxVal = counts.Max
-                                region = vals(counts.IndexOf(maxVal))
-                            Next
-                        End If
-                    Else
-                        indexer2(y, x) = region
-                    End If
-                End If
-            Next
-        Next
-        labels(2) = If(verticalCheck.checked, "Intermediate result of vertical step", "Lines detected (below) Regions detected (right image)")
-        If noVertCheck.checked And verticalCheck.checked Then labels(2) = "Input to vertical step"
-        If verticalCheck.checked = False Then dst2 = lines.dst2.Clone
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 
 
 Public Class Line_InDepthAndBGR : Inherits VB_Algorithm
@@ -533,89 +437,6 @@ End Class
 
 
 
-
-
-
-Public Class Line_TimeViewLines : Inherits VB_Algorithm
-    Dim lines As New Line_TimeView
-    Public lpList As New List(Of pointPair)
-    Public Sub New()
-        labels(2) = "Lines from the latest Line_TimeLine"
-        labels(3) = "Vertical (blue) Horizontal (Red) Other (Green)"
-        desc = "Find slope and y-intercept of lines over time."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        lines.Run(src)
-        If lines.pixelcount = 0 Then Exit Sub
-
-        lpList.Clear()
-
-        dst2 = lines.dst3
-        dst3.SetTo(cv.Scalar.White)
-        Dim index = lines.frameList.Count - 1 ' the most recent.
-        For Each lp In lines.lines.lpList
-            dst3.Line(lp.p1, lp.p2, cv.Scalar.Green, task.lineWidth, task.lineType)
-            lpList.Add(lp)
-            If lp.slope = pointPair.verticalSlope Then
-                dst3.Line(lp.p1, lp.p2, cv.Scalar.Blue, task.lineWidth * 2, task.lineType)
-            Else
-                If lp.slope = 0 Then
-                    dst3.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth * 2 + 1, task.lineType)
-                End If
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Line_TimeView : Inherits VB_Algorithm
-    Public frameList As New List(Of List(Of pointPair))
-    Public lines As New Line_Basics
-    Public pixelcount As Integer
-    Public mpList As New List(Of pointPair)
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Collect lines over time"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        lines.Run(src)
-
-        If task.optionsChanged Or task.motionFlag Then frameList.Clear()
-        Dim nextMpList = New List(Of pointPair)(lines.lpList)
-        frameList.Add(nextMpList)
-
-        dst2 = src
-        dst3.SetTo(0)
-        mpList.Clear()
-        Dim lineTotal As Integer
-        For i = 0 To frameList.Count - 1
-            lineTotal += frameList(i).Count
-            For Each lp In frameList(i)
-                dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-                dst3.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
-                mpList.Add(lp)
-            Next
-        Next
-
-        If frameList.Count >= task.frameHistoryCount Then frameList.RemoveAt(0)
-        pixelcount = dst3.CountNonZero
-        labels(3) = "There were " + CStr(lineTotal) + " lines detected using " + Format(pixelcount / 1000, "#.0") + "k pixels"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class Line_Movement : Inherits VB_Algorithm
     Public p1 As cv.Point
     Public p2 As cv.Point
@@ -651,159 +472,6 @@ Public Class Line_Movement : Inherits VB_Algorithm
         End If
         frameCount += 1
         dst2.Line(p1, p2, gradientColors(frameCount Mod gradientColors.Count), task.lineWidth, task.lineType)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class Line_IMUVerticals : Inherits VB_Algorithm
-    Public lines As New Line_Basics
-    Public options As New Options_Features
-    Public verticals As New List(Of gravityLine)
-    Public maxAngleX As Integer
-    Public maxAngleZ As Integer
-    Dim gMat As New IMU_GMatrix
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("X angle tolerance in degrees", 0, 10, 2)
-            sliders.setupTrackBar("Z angle tolerance in degrees", 0, 10, 7)
-        End If
-        desc = "Capture all vertical and horizontal lines."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        Static cellSlider = findSlider("MatchTemplate Cell Size")
-        Static angleXSlider = findSlider("X angle tolerance in degrees")
-        Static angleZSlider = findSlider("Z angle tolerance in degrees")
-        maxAngleX = angleXSlider.Value
-        maxAngleZ = angleZSlider.Value
-        Dim radius = CInt(cellSlider.Value / 2)
-        Dim rSize = options.fOptions.matchCellSize
-
-        ' lines.subsetRect = New cv.Rect(rSize * 3, rSize * 3, src.Width - rSize * 6, src.Height - rSize * 6)
-        lines.Run(src.Clone)
-
-        If lines.lpList.Count = 0 Then Exit Sub ' nothing to work with...
-        Dim lines2 As New List(Of cv.Point2f)
-        Dim lines3 As New List(Of cv.Point3f)
-        For Each lp In lines.lpList
-            lines2.Add(New cv.Point2f(lp.p1.X, lp.p1.Y))
-            lines2.Add(New cv.Point2f(lp.p2.X, lp.p2.Y))
-            For j = 0 To 2 - 1
-                Dim pt = Choose(j + 1, lp.p1, lp.p2)
-                lines3.Add(task.pointCloud.Get(Of cv.Point3f)(pt.y, pt.x))
-            Next
-        Next
-
-        dst2 = src.Clone
-
-        gMat.Run(empty)
-
-        Dim points As New cv.Mat(lines3.Count, 3, cv.MatType.CV_32F, lines3.ToArray)
-        Dim gPoints As cv.Mat = (points * gMat.gMatrix).ToMat
-
-        verticals.Clear()
-        For i = 0 To gPoints.Rows - 1 Step 2
-            Dim vert As gravityLine
-            vert.tc1.center = lines2(i)
-            vert.tc2.center = lines2(i + 1)
-            vert.pt1 = gPoints.Get(Of cv.Point3f)(i + 0, 0)
-            vert.pt2 = gPoints.Get(Of cv.Point3f)(i + 1, 0)
-            vert.len3D = distance3D(vert.pt1, vert.pt2)
-            Dim arcX = Math.Asin((vert.pt1.X - vert.pt2.X) / vert.len3D) * 57.2958
-            Dim arcZ = Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958
-            If Math.Abs(arcX) <= maxAngleX And Math.Abs(arcZ) <= maxAngleZ Then
-                setTrueText(Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z", lines2(i), 2)
-                setTrueText(Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z", lines2(i), 3)
-                dst2.Line(lines2(i), lines2(i + 1), task.highlightColor, task.lineWidth, task.lineType)
-                verticals.Add(vert)
-            End If
-        Next
-        labels(2) = CStr(verticals.Count) + " vertical lines were found.  Total lines found = " + CStr(lines.lpList.Count)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Line_IMUVerts : Inherits VB_Algorithm
-    Dim verts As New Line_IMUVerticals
-    Dim match As New Match_tCell
-    Public verticals As New List(Of gravityLine)
-    Dim gMat As New IMU_GMatrix
-    Public Sub New()
-        labels(3) = "Numbers below are: correlation coefficient, distance in meters, angle from vertical in the X-direction, angle from vertical in the Z-direction"
-        desc = "Find the list of vertical lines and track them until most are lost, then recapture the vertical lines again."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-
-        If verticals.Count < 2 Or verticals.Count < verts.verticals.Count / 3 Or task.optionsChanged Then
-            verts.Run(src)
-            For Each vert In verts.verticals
-                vert.tc1 = match.createCell(src, 0, vert.tc1.center)
-                vert.tc2 = match.createCell(src, 0, vert.tc2.center)
-                verticals.Add(vert)
-            Next
-        End If
-
-        dst2 = src.Clone
-        Dim lines2 As New List(Of cv.Point2f)
-        Dim lines3 As New List(Of cv.Point3f)
-        Dim newVerts As New List(Of gravityLine)
-        For i = 0 To verticals.Count - 1
-            Dim vert = verticals(i)
-
-            match.tCells.Clear()
-            match.tCells.Add(vert.tc1)
-            match.tCells.Add(vert.tc2)
-            match.Run(src)
-            vert.tc1 = match.tCells(0)
-            vert.tc2 = match.tCells(1)
-
-            Dim threshold = verts.options.fOptions.correlationThreshold
-            If vert.tc1.correlation >= threshold And vert.tc2.correlation >= threshold Then
-                lines2.Add(vert.tc1.center)
-                lines2.Add(vert.tc2.center)
-                lines3.Add(task.pointCloud.Get(Of cv.Point3f)(vert.tc1.center.Y, vert.tc1.center.X))
-                lines3.Add(task.pointCloud.Get(Of cv.Point3f)(vert.tc2.center.Y, vert.tc2.center.X))
-            End If
-
-            newVerts.Add(vert)
-        Next
-        If lines3.Count Then
-            gMat.Run(empty)
-
-            Dim points As New cv.Mat(lines3.Count, 3, cv.MatType.CV_32F, lines3.ToArray)
-            Dim gPoints As cv.Mat = (points * gMat.gMatrix).ToMat
-
-            verticals.Clear()
-            For i = 0 To gPoints.Rows - 1 Step 2
-                Dim vert = newVerts(i / 2)
-                vert.pt1 = gPoints.Get(Of cv.Point3f)(i + 0, 0)
-                vert.pt2 = gPoints.Get(Of cv.Point3f)(i + 1, 0)
-                vert.len3D = distance3D(vert.pt1, vert.pt2)
-                Dim arcX = Math.Asin((vert.pt1.X - vert.pt2.X) / vert.len3D) * 57.2958
-                Dim arcZ = Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958
-                If Math.Abs(arcX) <= verts.maxAngleX And Math.Abs(arcZ) <= verts.maxAngleZ Then
-                    setTrueText(vert.tc1.strOut, New cv.Point(vert.tc1.rect.X, vert.tc1.rect.Y))
-                    setTrueText(vert.tc1.strOut + vbCrLf + Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z",
-                                New cv.Point(vert.tc1.rect.X, vert.tc1.rect.Y), 3)
-                    dst2.Line(vert.tc1.center, vert.tc2.center, task.highlightColor, task.lineWidth, task.lineType)
-                    verticals.Add(vert)
-                End If
-            Next
-        End If
-        labels(2) = "Starting with " + CStr(verts.verticals.Count) + " there are " + CStr(verticals.Count) + " lines remaining"
     End Sub
 End Class
 
@@ -1327,5 +995,395 @@ Public Class Line_Canny : Inherits VB_Algorithm
 
         lines.Run(canny.dst2)
         dst2 = lines.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+
+Public Class Line_TimeViewLines : Inherits VB_Algorithm
+    Dim lines As New Line_TimeView
+    Public lpList As New List(Of pointPair)
+    Public Sub New()
+        labels(2) = "Lines from the latest Line_TimeLine"
+        labels(3) = "Vertical (blue) Horizontal (Red) Other (Green)"
+        desc = "Find slope and y-intercept of lines over time."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        lines.Run(src)
+        If lines.pixelcount = 0 Then Exit Sub
+
+        lpList.Clear()
+
+        dst2 = lines.dst3
+        dst3.SetTo(cv.Scalar.White)
+        Dim index = lines.frameList.Count - 1 ' the most recent.
+        For Each lp In lines.lines.lpList
+            dst3.Line(lp.p1, lp.p2, cv.Scalar.Green, task.lineWidth, task.lineType)
+            lpList.Add(lp)
+            If lp.slope = pointPair.verticalSlope Then
+                dst3.Line(lp.p1, lp.p2, cv.Scalar.Blue, task.lineWidth * 2, task.lineType)
+            Else
+                If lp.slope = 0 Then
+                    dst3.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth * 2 + 1, task.lineType)
+                End If
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_TimeView : Inherits VB_Algorithm
+    Public frameList As New List(Of List(Of pointPair))
+    Public lines As New Line_Basics
+    Public pixelcount As Integer
+    Public mpList As New List(Of pointPair)
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Collect lines over time"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        lines.Run(src)
+
+        If task.optionsChanged Or task.motionFlag Then frameList.Clear()
+        Dim nextMpList = New List(Of pointPair)(lines.lpList)
+        frameList.Add(nextMpList)
+
+        dst2 = src
+        dst3.SetTo(0)
+        mpList.Clear()
+        Dim lineTotal As Integer
+        For i = 0 To frameList.Count - 1
+            lineTotal += frameList(i).Count
+            For Each lp In frameList(i)
+                dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+                dst3.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+                mpList.Add(lp)
+            Next
+        Next
+
+        If frameList.Count >= task.frameHistoryCount Then frameList.RemoveAt(0)
+        pixelcount = dst3.CountNonZero
+        labels(3) = "There were " + CStr(lineTotal) + " lines detected using " + Format(pixelcount / 1000, "#.0") + "k pixels"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Line_RegionsVB : Inherits VB_Algorithm
+    Dim lines As New Line_TimeView
+    Dim reduction As New Reduction_Basics
+    Const lineMatch = 254
+    Public Sub New()
+        redOptions.BitwiseReduction.Checked = True
+        redOptions.BitwiseReductionSlider.Value = 6
+
+        If findfrm(traceName + " CheckBoxes") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Show intermediate vertical step results.")
+            check.addCheckBox("Run horizontal without vertical step")
+        End If
+
+        desc = "Use the reduction values between lines to identify regions."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static noVertCheck = findCheckBox("Run horizontal without vertical step")
+        Static verticalCheck = findCheckBox("Show intermediate vertical step results.")
+        reduction.Run(src)
+        dst2 = reduction.dst2
+        dst3 = dst2.Clone
+
+        lines.Run(src)
+
+        Dim lineMask = lines.dst3
+        dst2.SetTo(lineMatch, lineMask)
+        dst3.SetTo(lineMatch, lineMask)
+
+        Dim nextB As Byte
+        Dim region As Integer = -1
+        Dim indexer1 = dst2.GetGenericIndexer(Of Byte)()
+        Dim indexer2 = dst3.GetGenericIndexer(Of Byte)()
+        If noVertCheck.checked = False Then
+            For x = 0 To dst2.Width - 1
+                region = -1
+                For y = 0 To dst2.Height - 1
+                    nextB = indexer1(y, x)
+                    If nextB = lineMatch Then
+                        region = -1
+                    Else
+                        If region = -1 Then
+                            region = nextB
+                        Else
+                            indexer1(y, x) = region
+                        End If
+                    End If
+                Next
+            Next
+        End If
+
+        For y = 0 To dst3.Height - 1
+            region = -1
+            For x = 0 To dst3.Width - 1
+                nextB = indexer2(y, x)
+                If nextB = lineMatch Then
+                    region = -1
+                Else
+                    If region = -1 Then
+                        If y = 0 Then
+                            region = indexer1(y, x)
+                        Else
+                            Dim vals As New List(Of Integer)
+                            Dim counts As New List(Of Integer)
+                            For i = x To dst3.Width - 1
+                                Dim nextVal = indexer1(y - 1, i)
+                                If nextVal = lineMatch Then Exit For
+                                If vals.Contains(nextVal) Then
+                                    counts(vals.IndexOf(nextVal)) += 1
+                                Else
+                                    vals.Add(nextVal)
+                                    counts.Add(1)
+                                End If
+                                Dim maxVal = counts.Max
+                                region = vals(counts.IndexOf(maxVal))
+                            Next
+                        End If
+                    Else
+                        indexer2(y, x) = region
+                    End If
+                End If
+            Next
+        Next
+        labels(2) = If(verticalCheck.checked, "Intermediate result of vertical step", "Lines detected (below) Regions detected (right image)")
+        If noVertCheck.checked And verticalCheck.checked Then labels(2) = "Input to vertical step"
+        If verticalCheck.checked = False Then dst2 = lines.dst2.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class Line_Verticals : Inherits VB_Algorithm
+    Public lines As New Line_Basics
+    Public options As New Options_Features
+    Public verticals As New List(Of gravityLine)
+    Public maxAngleX As Integer
+    Public maxAngleZ As Integer
+    Dim gMat As New IMU_GMatrix
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("X angle tolerance in degrees", 0, 10, 2)
+            sliders.setupTrackBar("Z angle tolerance in degrees", 0, 10, 7)
+        End If
+        desc = "Capture all vertical and horizontal lines."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        Static cellSlider = findSlider("MatchTemplate Cell Size")
+        Static angleXSlider = findSlider("X angle tolerance in degrees")
+        Static angleZSlider = findSlider("Z angle tolerance in degrees")
+        maxAngleX = angleXSlider.Value
+        maxAngleZ = angleZSlider.Value
+        Dim radius = CInt(cellSlider.Value / 2)
+        Dim rSize = options.fOptions.matchCellSize
+
+        ' lines.subsetRect = New cv.Rect(rSize * 3, rSize * 3, src.Width - rSize * 6, src.Height - rSize * 6)
+        lines.Run(src.Clone)
+
+        If lines.lpList.Count = 0 Then Exit Sub ' nothing to work with...
+        Dim lines2 As New List(Of cv.Point2f)
+        Dim lines3 As New List(Of cv.Point3f)
+        For Each lp In lines.lpList
+            lines2.Add(New cv.Point2f(lp.p1.X, lp.p1.Y))
+            lines2.Add(New cv.Point2f(lp.p2.X, lp.p2.Y))
+            For j = 0 To 2 - 1
+                Dim pt = Choose(j + 1, lp.p1, lp.p2)
+                lines3.Add(task.pointCloud.Get(Of cv.Point3f)(pt.y, pt.x))
+            Next
+        Next
+
+        dst2 = src.Clone
+
+        gMat.Run(empty)
+
+        Dim points As New cv.Mat(lines3.Count, 3, cv.MatType.CV_32F, lines3.ToArray)
+        Dim gPoints As cv.Mat = (points * gMat.gMatrix).ToMat
+
+        verticals.Clear()
+        For i = 0 To gPoints.Rows - 1 Step 2
+            Dim vert As gravityLine
+            vert.tc1.center = lines2(i)
+            vert.tc2.center = lines2(i + 1)
+            vert.pt1 = gPoints.Get(Of cv.Point3f)(i + 0, 0)
+            vert.pt2 = gPoints.Get(Of cv.Point3f)(i + 1, 0)
+            vert.len3D = distance3D(vert.pt1, vert.pt2)
+            Dim arcX = Math.Asin((vert.pt1.X - vert.pt2.X) / vert.len3D) * 57.2958
+            Dim arcZ = Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958
+            If Math.Abs(arcX) <= maxAngleX And Math.Abs(arcZ) <= maxAngleZ Then
+                setTrueText(Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z", lines2(i), 2)
+                setTrueText(Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z", lines2(i), 3)
+                dst2.Line(lines2(i), lines2(i + 1), task.highlightColor, task.lineWidth, task.lineType)
+                verticals.Add(vert)
+            End If
+        Next
+        labels(2) = CStr(verticals.Count) + " vertical lines were found.  Total lines found = " + CStr(lines.lpList.Count)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_Verts : Inherits VB_Algorithm
+    Dim verts As New Line_Verticals
+    Dim match As New Match_tCell
+    Public verticals As New List(Of gravityLine)
+    Dim gMat As New IMU_GMatrix
+    Public Sub New()
+        labels(3) = "Numbers below are: correlation coefficient, distance in meters, angle from vertical in the X-direction, angle from vertical in the Z-direction"
+        desc = "Find the list of vertical lines and track them until most are lost, then recapture the vertical lines again."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+
+        If verticals.Count < 2 Or verticals.Count < verts.verticals.Count / 3 Or task.optionsChanged Then
+            verts.Run(src)
+            For Each vert In verts.verticals
+                vert.tc1 = match.createCell(src, 0, vert.tc1.center)
+                vert.tc2 = match.createCell(src, 0, vert.tc2.center)
+                verticals.Add(vert)
+            Next
+        End If
+
+        dst2 = src.Clone
+        Dim lines2 As New List(Of cv.Point2f)
+        Dim lines3 As New List(Of cv.Point3f)
+        Dim newVerts As New List(Of gravityLine)
+        For i = 0 To verticals.Count - 1
+            Dim vert = verticals(i)
+
+            match.tCells.Clear()
+            match.tCells.Add(vert.tc1)
+            match.tCells.Add(vert.tc2)
+            match.Run(src)
+            vert.tc1 = match.tCells(0)
+            vert.tc2 = match.tCells(1)
+
+            Dim threshold = verts.options.fOptions.correlationThreshold
+            If vert.tc1.correlation >= threshold And vert.tc2.correlation >= threshold Then
+                lines2.Add(vert.tc1.center)
+                lines2.Add(vert.tc2.center)
+                lines3.Add(task.pointCloud.Get(Of cv.Point3f)(vert.tc1.center.Y, vert.tc1.center.X))
+                lines3.Add(task.pointCloud.Get(Of cv.Point3f)(vert.tc2.center.Y, vert.tc2.center.X))
+            End If
+
+            newVerts.Add(vert)
+        Next
+        If lines3.Count Then
+            gMat.Run(empty)
+
+            Dim points As New cv.Mat(lines3.Count, 3, cv.MatType.CV_32F, lines3.ToArray)
+            Dim gPoints As cv.Mat = (points * gMat.gMatrix).ToMat
+
+            verticals.Clear()
+            For i = 0 To gPoints.Rows - 1 Step 2
+                Dim vert = newVerts(i / 2)
+                vert.pt1 = gPoints.Get(Of cv.Point3f)(i + 0, 0)
+                vert.pt2 = gPoints.Get(Of cv.Point3f)(i + 1, 0)
+                vert.len3D = distance3D(vert.pt1, vert.pt2)
+                Dim arcX = Math.Asin((vert.pt1.X - vert.pt2.X) / vert.len3D) * 57.2958
+                Dim arcZ = Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958
+                If Math.Abs(arcX) <= verts.maxAngleX And Math.Abs(arcZ) <= verts.maxAngleZ Then
+                    setTrueText(vert.tc1.strOut, New cv.Point(vert.tc1.rect.X, vert.tc1.rect.Y))
+                    setTrueText(vert.tc1.strOut + vbCrLf + Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z",
+                                New cv.Point(vert.tc1.rect.X, vert.tc1.rect.Y), 3)
+                    dst2.Line(vert.tc1.center, vert.tc2.center, task.highlightColor, task.lineWidth, task.lineType)
+                    verticals.Add(vert)
+                End If
+            Next
+        End If
+        labels(2) = "Starting with " + CStr(verts.verticals.Count) + " there are " + CStr(verticals.Count) + " lines remaining"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Line_Gravity : Inherits VB_Algorithm
+    Dim lines As New Line_Basics
+    Dim cross As New Horizon_Basics
+    Public Sub New()
+        desc = "Find all the lines in the color image that are parallel to gravity."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst2 = src.Clone
+        If gOptions.gravityPointCloud.Checked = False Then
+            setTrueText("To find lines parallel to gravity with this algorithm, it is necessary to turn on the gravity transform." + vbCrLf +
+                        "Check the box labeled 'Apply gravity transform to point cloud' and try again.", 3)
+            Exit Sub
+        End If
+
+        lines.Run(src)
+        cross.Run(src)
+
+        Dim vSlope = cross.vertical.slope
+        Dim hSlope = cross.horizontal.slope
+        Dim nearZero As Boolean, nearVert As Boolean
+        If Math.Abs(hSlope) < 0.1 Then nearZero = True
+        If Math.Abs(vSlope) > 5000 Then nearVert = True
+        labels(2) = "Slope for gravity is " + Format(vSlope, fmt1) + " in this image"
+        labels(3) = "Slope for horizontal lines is " + Format(hSlope, fmt1) + " in this image"
+        For Each lp In lines.lpList
+            If nearVert Then
+                If Math.Abs(lp.p1.X - lp.p2.X) < 2 Then
+                    dst2.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
+                End If
+            Else
+                Dim test = lp.slope / vSlope
+                If test > 0.9 And test < 1.1 Then
+                    dst2.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
+                End If
+            End If
+
+            If nearZero Then
+                If Math.Abs(lp.p1.Y - lp.p2.Y) < 2 Then
+                    dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+                End If
+            Else
+                Dim test = lp.slope / hSlope
+                If test > 0.9 And test < 1.1 Then
+                    dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+                End If
+            End If
+        Next
     End Sub
 End Class

@@ -78,6 +78,7 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
+        Me.CrossHairs = New System.Windows.Forms.CheckBox()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -337,6 +338,7 @@ Partial Class OptionsGlobal
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.CrossHairs)
         Me.GroupBox2.Controls.Add(Me.ShowMotionRectangle)
         Me.GroupBox2.Controls.Add(Me.GroupBox1)
         Me.GroupBox2.Controls.Add(Me.ShowGrid)
@@ -526,7 +528,7 @@ Partial Class OptionsGlobal
         'gravityPointCloud
         '
         Me.gravityPointCloud.AutoSize = True
-        Me.gravityPointCloud.Location = New System.Drawing.Point(24, 262)
+        Me.gravityPointCloud.Location = New System.Drawing.Point(24, 288)
         Me.gravityPointCloud.Name = "gravityPointCloud"
         Me.gravityPointCloud.Size = New System.Drawing.Size(294, 24)
         Me.gravityPointCloud.TabIndex = 23
@@ -671,7 +673,7 @@ Partial Class OptionsGlobal
         'UseKalman
         '
         Me.UseKalman.AutoSize = True
-        Me.UseKalman.Location = New System.Drawing.Point(24, 234)
+        Me.UseKalman.Location = New System.Drawing.Point(24, 260)
         Me.UseKalman.Name = "UseKalman"
         Me.UseKalman.Size = New System.Drawing.Size(176, 24)
         Me.UseKalman.TabIndex = 0
@@ -688,6 +690,18 @@ Partial Class OptionsGlobal
         Me.Label8.Text = "All values are restored to their default values at the start of each algorithm.  " &
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
+        '
+        'CrossHairs
+        '
+        Me.CrossHairs.AutoSize = True
+        Me.CrossHairs.Checked = True
+        Me.CrossHairs.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CrossHairs.Location = New System.Drawing.Point(24, 235)
+        Me.CrossHairs.Name = "CrossHairs"
+        Me.CrossHairs.Size = New System.Drawing.Size(151, 24)
+        Me.CrossHairs.TabIndex = 71
+        Me.CrossHairs.Text = "Show crosshairs"
+        Me.CrossHairs.UseVisualStyleBackColor = True
         '
         'OptionsGlobal
         '
@@ -778,4 +792,5 @@ Partial Class OptionsGlobal
     Friend WithEvents MotionFilteredColorOnly As Windows.Forms.RadioButton
     Friend WithEvents MotionFilteredColorAndCloud As Windows.Forms.RadioButton
     Friend WithEvents ShowMotionRectangle As Windows.Forms.CheckBox
+    Friend WithEvents CrossHairs As Windows.Forms.CheckBox
 End Class

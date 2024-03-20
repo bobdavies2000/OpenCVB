@@ -543,9 +543,8 @@ Public Class BackProject_LineTop : Inherits VB_Algorithm
         dst2.SetTo(0)
         Dim w = task.lineWidth + 5
         For Each lp In line.lines.lpList
-            Dim p1 = New cv.Point(0, lp.yIntercept)
-            Dim p2 = New cv.Point(dst2.Width, dst2.Width * lp.slope + lp.yIntercept)
-            dst2.Line(p1, p2, 255, w, task.lineType)
+            Dim lpNew = lp.edgeToEdgeLine(dst2.Size)
+            dst2.Line(lpNew.p1, lpNew.p2, 255, w, task.lineType)
         Next
 
         Dim histogram = line.autoX.histogram
@@ -577,9 +576,8 @@ Public Class BackProject_LineSide : Inherits VB_Algorithm
         lpList.Clear()
         For Each lp In line.lines.lpList
             If Math.Abs(lp.slope) < 0.1 Then
-                Dim p1 = New cv.Point(0, lp.yIntercept)
-                Dim p2 = New cv.Point(dst2.Width, dst2.Width * lp.slope + lp.yIntercept)
-                dst2.Line(p1, p2, 255, w, task.lineType)
+                Dim lpNew = lp.edgeToEdgeLine(dst2.Size)
+                dst2.Line(lpNew.p1, lpNew.p2, 255, w, task.lineType)
                 lpList.Add(lp)
             End If
         Next

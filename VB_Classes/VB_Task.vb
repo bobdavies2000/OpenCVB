@@ -616,6 +616,13 @@ Public Class VBtask : Implements IDisposable
                 'task.depthRGB(rcNew.rect).SetTo(cv.Scalar.White, rcNew.mask)
             End If
 
+            If gOptions.CrossHairs.Checked Then
+                Static cross As New Horizon_Basics
+                cross.Run(src)
+                task.color.Line(cross.horizontal.p1, cross.horizontal.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+                task.color.Line(cross.vertical.p1, cross.vertical.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+            End If
+
             task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
             task.optionsChanged = False
             TaskTimer.Enabled = False

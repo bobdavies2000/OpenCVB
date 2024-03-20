@@ -528,6 +528,7 @@ Public Class pointPair
     Public p2 As cv.Point2f
     Public slope As Single
     Public yIntercept As Single
+    Public xIntercept As Single
     Public length As Single
     Public Const verticalSlope As Single = 1000000
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
@@ -542,6 +543,23 @@ Public Class pointPair
         p1 = New cv.Point2f()
         p2 = New cv.Point2f()
     End Sub
+    Public Function edgeToEdgeLine(size As cv.Size) As pointPair
+        Dim lp As New pointPair
+        lp.p1 = New cv.Point2f(0, yIntercept)
+        lp.p2 = New cv.Point2f(size.Width, size.Width * slope + yIntercept)
+        xIntercept = -yIntercept / slope
+        If lp.p2.Y > size.Height Then
+            lp.p2.X = (size.Height - yIntercept) / slope
+            lp.p2.Y = size.Height
+        End If
+        If lp.p2.Y < 0 Then
+            lp.p2.X = xIntercept
+            lp.p2.Y = 0
+        End If
+        lp.slope = slope
+        lp.yIntercept = yIntercept
+        Return lp
+    End Function
     Public Function compare(mp As pointPair) As Boolean
         If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
         Return False
