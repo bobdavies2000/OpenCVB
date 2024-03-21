@@ -60,6 +60,7 @@ Public Class VBtask : Implements IDisposable
     Public motionCloud As Motion_PointCloud
     Public motionColor As Motion_Color
     Public motionBasics As Motion_BasicsQuarterRes
+    Public cross As Horizon_Basics
     Public rgbFilter As Object
 
     Public imuStabilityTest As Stabilizer_VerticalIMU
@@ -366,6 +367,7 @@ Public Class VBtask : Implements IDisposable
         motionCloud = New Motion_PointCloud
         motionColor = New Motion_Color
         motionBasics = New Motion_BasicsQuarterRes
+        cross = New Horizon_Basics
         imuStabilityTest = New Stabilizer_VerticalIMU
 
         updateSettings()
@@ -591,7 +593,7 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            If task.heartBeat Then Dim k = 0
+            cross.Run(src)
             algorithmObject.NextFrame(task.color.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
             If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then
@@ -616,11 +618,9 @@ Public Class VBtask : Implements IDisposable
                 'task.depthRGB(rcNew.rect).SetTo(cv.Scalar.White, rcNew.mask)
             End If
 
-            If gOptions.CrossHairs.Checked Then
-                Static cross As New Horizon_Basics
-                cross.Run(src)
-                task.color.Line(cross.horizontal.p1, cross.horizontal.p2, cv.Scalar.White, task.lineWidth, task.lineType)
-                task.color.Line(cross.vertical.p1, cross.vertical.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+            If gOptions.CrossHairs.Checked And cross.horizonVec IsNot Nothing And cross.gravityVec IsNot Nothing Then
+                task.color.Line(cross.horizonVec.p1, cross.horizonVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+                task.color.Line(cross.gravityVec.p1, cross.gravityVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
             End If
 
             task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.

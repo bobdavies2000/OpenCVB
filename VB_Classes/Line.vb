@@ -1340,7 +1340,6 @@ End Class
 
 Public Class Line_Gravity : Inherits VB_Algorithm
     Dim lines As New Line_Basics
-    Dim cross As New Horizon_Basics
     Public Sub New()
         desc = "Find all the lines in the color image that are parallel to gravity."
     End Sub
@@ -1353,33 +1352,25 @@ Public Class Line_Gravity : Inherits VB_Algorithm
         End If
 
         lines.Run(src)
-        cross.Run(src)
 
-        Dim vSlope = cross.vertical.slope
-        Dim hSlope = cross.horizontal.slope
-        Dim nearZero As Boolean, nearVert As Boolean
-        If Math.Abs(hSlope) < 0.1 Then nearZero = True
-        If Math.Abs(vSlope) > 5000 Then nearVert = True
+        Dim vSlope = task.cross.gravityVec.slope
+        Dim hSlope = task.cross.horizonVec.slope
         labels(2) = "Slope for gravity is " + Format(vSlope, fmt1) + " in this image"
-        labels(3) = "Slope for horizontal lines is " + Format(hSlope, fmt1) + " in this image"
+        labels(3) = "Slope for horizon is " + Format(hSlope, fmt1) + " in this image"
         For Each lp In lines.lpList
-            If nearVert Then
-                If Math.Abs(lp.p1.X - lp.p2.X) < 2 Then
-                    dst2.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
-                End If
+            If lp.nearHorizontal Then
+                dst2.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
             Else
-                Dim test = lp.slope / vSlope
+                Dim test = lp.slope / hSlope
                 If test > 0.9 And test < 1.1 Then
                     dst2.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
                 End If
             End If
 
-            If nearZero Then
-                If Math.Abs(lp.p1.Y - lp.p2.Y) < 2 Then
-                    dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
-                End If
+            If lp.nearVertical Then
+                dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
             Else
-                Dim test = lp.slope / hSlope
+                Dim test = lp.slope / vSlope
                 If test > 0.9 And test < 1.1 Then
                     dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
                 End If

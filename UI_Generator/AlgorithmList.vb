@@ -831,6 +831,7 @@ if algorithmName = "HOG_Basics" Then return new HOG_Basics
 if algorithmName = "Homography_Basics" Then return new Homography_Basics
 if algorithmName = "Homography_FPoly" Then return new Homography_FPoly
 if algorithmName = "Horizon_Basics" Then return new Horizon_Basics
+if algorithmName = "Horizon_BasicsOld" Then return new Horizon_BasicsOld
 if algorithmName = "Horizon_UnstableResults" Then return new Horizon_UnstableResults
 if algorithmName = "Hough_Basics" Then return new Hough_Basics
 if algorithmName = "Hough_Circles" Then return new Hough_Circles
