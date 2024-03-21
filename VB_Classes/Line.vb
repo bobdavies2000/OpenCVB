@@ -686,10 +686,10 @@ End Class
 
 
 Public Class Line_Perpendicular : Inherits VB_Algorithm
-    Public p1 As cv.Point2f
-    Public p2 As cv.Point2f
-    Public r1 As cv.Point2f
-    Public r2 As cv.Point2f
+    Public p1 As cv.Point2f ' first input point
+    Public p2 As cv.Point2f ' second input point
+    Public r1 As cv.Point2f ' first output point (perpendicalar to input)
+    Public r2 As cv.Point2f ' second output point (perpendicalar to input) 
     Public Sub New()
         labels = {"", "", "White is the original line, red dot is midpoint, yellow is perpendicular line", ""}
         desc = "Find the line perpendicular to the line created by the points provided."
@@ -1353,8 +1353,8 @@ Public Class Line_Gravity : Inherits VB_Algorithm
 
         lines.Run(src)
 
-        Dim vSlope = task.cross.gravityVec.slope
-        Dim hSlope = task.cross.horizonVec.slope
+        Dim vSlope = task.gravityVec.slope
+        Dim hSlope = task.horizonVec.slope
         labels(2) = "Slope for gravity is " + Format(vSlope, fmt1) + " in this image"
         labels(3) = "Slope for horizon is " + Format(hSlope, fmt1) + " in this image"
         For Each lp In lines.lpList

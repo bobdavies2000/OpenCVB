@@ -51,6 +51,9 @@ Public Class VBtask : Implements IDisposable
     Public motionFlag As Boolean
     Public motionDetected As Boolean
 
+    Public gravityVec As pointPair
+    Public horizonVec As pointPair
+
     ' add any global algorithms here
     Public PixelViewer As Pixel_Viewer
     Public colorizer As Depth_Colorizer_CPP
@@ -618,9 +621,9 @@ Public Class VBtask : Implements IDisposable
                 'task.depthRGB(rcNew.rect).SetTo(cv.Scalar.White, rcNew.mask)
             End If
 
-            If gOptions.CrossHairs.Checked And cross.horizonVec IsNot Nothing And cross.gravityVec IsNot Nothing Then
-                task.color.Line(cross.horizonVec.p1, cross.horizonVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
-                task.color.Line(cross.gravityVec.p1, cross.gravityVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+            If gOptions.CrossHairs.Checked Then
+                task.color.Line(task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+                task.color.Line(task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
             End If
 
             task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
