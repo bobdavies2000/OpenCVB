@@ -76,7 +76,7 @@ Public Class CameraZED2 : Inherits Camera
             mbuf(mbIndex).leftView = mbuf(mbIndex).color.Clone
 
             mbuf(mbIndex).pointCloud = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_32FC3,
-                                                  Zed2PointCloud(cPtr)).Clone
+                                                      Zed2PointCloud(cPtr)).Clone
             Dim acc = Zed2Acceleration(cPtr)
             IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
             IMU_Acceleration.Y *= -1 ' make it consistent with the other cameras.

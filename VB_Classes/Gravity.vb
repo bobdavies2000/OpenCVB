@@ -90,6 +90,7 @@ End Class
 
 
 Public Class Gravity_Horizon : Inherits VB_Algorithm
+    Dim perp As New Line_Perpendicular
     Dim gravity As New Gravity_Basics
     Dim horizon As New Horizon_Basics
     Public Sub New()
