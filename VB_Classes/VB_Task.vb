@@ -276,8 +276,6 @@ Public Class VBtask : Implements IDisposable
         Public testAllRunning As Boolean
         Public RotationMatrix() As Single
         Public RotationVector As cv.Point3f
-        Public VTK_Present As Boolean
-        Public IMU_Present As Boolean
         Public pixelViewerOn As Boolean
 
         Public mainFormLocation As cv.Rect
@@ -483,6 +481,8 @@ Public Class VBtask : Implements IDisposable
             imuStabilityTest.RunVB(src)
             task.cameraStable = imuStabilityTest.stableTest
             task.cameraStableString = imuStabilityTest.stableStr
+            IMUBasics.RunVB(src)
+            gMat.RunVB(src)
 
             If gOptions.CreateGif.Checked Then
                 heartBeat = False
@@ -492,10 +492,6 @@ Public Class VBtask : Implements IDisposable
             End If
 
             If task.paused = False Then
-                IMUBasics.RunVB(src)
-                gMat.RunVB(src)
-                task.gMatrix = gMat.gMatrix
-
                 task.frameHistoryCount = gOptions.FrameHistory.Value
 
                 If gOptions.gravityPointCloud.Checked Then

@@ -139,7 +139,8 @@ Public Class OpenGL_Basics : Inherits VB_Algorithm
         Catch ex As Exception
             ' OpenGL window was likely closed.  
         End Try
-        If standaloneTest() Then setTrueText(gMatrixToStr(task.gMatrix), 3)
+        ' If standaloneTest() Then setTrueText(task.gMat.strout, 3)
+        If standaloneTest() Then setTrueText(task.gMat.strOut, 3)
     End Sub
 End Class
 

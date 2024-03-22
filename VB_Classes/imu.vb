@@ -68,7 +68,7 @@ Public Class IMU_GMatrix : Inherits VB_Algorithm
     Public Sub New()
         desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
-    Private Function buildGmatrix() As cv.Mat
+    Private Sub buildGmatrix()
         '[cx -sx    0]  [1  0   0 ] 
         '[sx  cx    0]  [0  cz -sz]
         '[0   0     1]  [0  sz  cz]
@@ -76,7 +76,7 @@ Public Class IMU_GMatrix : Inherits VB_Algorithm
                                    {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                                    {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
-        Dim tmpGMatrix = New cv.Mat(3, 3, cv.MatType.CV_32F, {
+        gMatrix = New cv.Mat(3, 3, cv.MatType.CV_32F, {
                   {gArray(0, 0) * cy + gArray(0, 1) * 0 + gArray(0, 2) * sy},
                   {gArray(0, 0) * 0 + gArray(0, 1) * 1 + gArray(0, 2) * 0},
                   {gArray(0, 0) * -sy + gArray(0, 1) * 0 + gArray(0, 2) * cy},
@@ -86,9 +86,7 @@ Public Class IMU_GMatrix : Inherits VB_Algorithm
                   {gArray(2, 0) * cy + gArray(2, 1) * 0 + gArray(2, 2) * sy},
                   {gArray(2, 0) * 0 + gArray(2, 1) * 1 + gArray(2, 2) * 0},
                   {gArray(2, 0) * -sy + gArray(2, 1) * 0 + gArray(2, 2) * cy}})
-
-        Return tmpGMatrix
-    End Function
+    End Sub
     Public Sub RunVB(src As cv.Mat)
         '[cos(a) -sin(a)    0]
         '[sin(a)  cos(a)    0]
@@ -101,23 +99,22 @@ Public Class IMU_GMatrix : Inherits VB_Algorithm
         '[0       sin(a)    cos(a) ]
         cx = Math.Cos(task.accRadians.X)
         sx = Math.Sin(task.accRadians.X)
+        Console.WriteLine("Radians X: " + Format(task.accRadians.X, fmt3) + " cx = " + Format(cx, fmt3))
 
-        gMatrix = buildGmatrix()
+        buildGmatrix()
 
-        If standaloneTest() Then
-            Dim g = task.IMU_Acceleration
-            strOut = "IMU Acceleration in X-direction = " + vbTab + vbTab + Format(g.X, fmt4) + vbCrLf
-            strOut += "IMU Acceleration in Y-direction = " + vbTab + vbTab + Format(g.Y, fmt4) + vbCrLf
-            strOut += "IMU Acceleration in Z-direction = " + vbTab + vbTab + Format(g.Z, fmt4) + vbCrLf + vbCrLf
-            strOut += vbCrLf + "sqrt (" + vbTab + Format(g.X, fmt4) + "*" + Format(g.X, fmt4) + vbTab +
-                      vbTab + Format(g.Y, fmt4) + "*" + Format(g.Y, fmt4) + vbTab +
-                      vbTab + Format(g.Z, fmt4) + "*" + Format(g.Z, fmt4) + " ) = " + vbTab +
-                      vbTab + Format(Math.Sqrt(g.X * g.X + g.Y * g.Y + g.Z * g.Z), fmt4) + vbCrLf +
-                      "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
+        Dim g = task.IMU_Acceleration
+        Dim fmt = fmt3
+        strOut = "IMU Acceleration in X-direction = " + vbTab + Format(g.X, fmt) + vbCrLf
+        strOut += "IMU Acceleration in Y-direction = " + vbTab + Format(g.Y, fmt) + vbCrLf
+        strOut += "IMU Acceleration in Z-direction = " + vbTab + Format(g.Z, fmt) + vbCrLf + vbCrLf
+        strOut += vbCrLf + "sqrt (" + vbTab + Format(g.X, fmt) + "*" + Format(g.X, fmt) + vbTab +
+                  Format(g.Y, fmt) + "*" + Format(g.Y, fmt) + vbTab +
+                  Format(g.Z, fmt) + "*" + Format(g.Z, fmt) + " ) = " + vbTab +
+                  Format(Math.Sqrt(g.X * g.X + g.Y * g.Y + g.Z * g.Z), fmt) + vbCrLf +
+                  "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
 
-            Dim tmpGMat1 = buildGmatrix()
-            strOut += vbCrLf + "Gravity-oriented gMatrix - move camera to test this:" + vbCrLf + gMatrixToStr(tmpGMat1)
-        End If
+        strOut += vbCrLf + "Gravity-oriented gMatrix - move camera to test this:" + vbCrLf + gMatrixToStr(gMatrix)
         setTrueText(strOut)
         task.gMatrix = gMatrix
     End Sub

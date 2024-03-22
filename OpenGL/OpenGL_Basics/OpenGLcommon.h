@@ -160,7 +160,6 @@ static float3 gyro_data;
 static float3 accel_data;
 static double timestamp;
 static float timeConversionUnits = 1000.0f;
-static int IMU_Present = false;
 static int imageLabelBufferSize = 0;
 static int pointcloudWidth;
 static int pointcloudHeight;
@@ -270,7 +269,6 @@ static void readPipeAndMemMap()
 	accel_data.z = (float)sharedMem[19];
 
 	timestamp = sharedMem[20];
-	IMU_Present = true; // always present
 
 	Eye.x = (float)sharedMem[22];
 	Eye.y = (float)sharedMem[23];

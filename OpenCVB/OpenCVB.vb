@@ -999,7 +999,6 @@ Public Class OpenCVB
 
         Dim parms As New VB_Classes.VBtask.algParms
         parms.fpsRate = settings.desiredFPS
-        parms.IMU_Present = True ' always present!
 
         parms.useRecordedData = GroupName.Text = "<All using recorded data>"
         parms.testAllRunning = testAllRunning
