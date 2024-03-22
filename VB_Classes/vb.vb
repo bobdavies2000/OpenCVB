@@ -530,20 +530,13 @@ Public Class pointPair
     Public yIntercept As Single
     Public xIntercept As Single
     Public length As Single
-    Public originalLength As Single
-    Public nearVertical As Boolean
-    Public nearHorizontal As Boolean
-    Public Const verticalSlope As Single = 1000000
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
         p1 = _p1
         p2 = _p2
-        slope = If((CInt(p1.X) <> CInt(p2.X)), (p1.Y - p2.Y) / (p1.X - p2.X), verticalSlope)
+        If CInt(p1.X) = CInt(p2.X) Then If p1.X < p2.X Then p2.X += 1 Else p1.X += 1 ' shift it so we can be sane.
+        slope = (p1.Y - p2.Y) / (p1.X - p2.X)
         yIntercept = p1.Y - slope * p1.X
-
-        nearHorizontal = CInt(p1.Y) = CInt(p2.Y)
-        nearVertical = CInt(p1.X) = CInt(p2.X)
         length = p1.DistanceTo(p2)
-        originalLength = length
     End Sub
     Sub New()
         p1 = New cv.Point2f()
@@ -554,6 +547,15 @@ Public Class pointPair
         lp.p1 = New cv.Point2f(0, yIntercept)
         lp.p2 = New cv.Point2f(size.Width, size.Width * slope + yIntercept)
         xIntercept = -yIntercept / slope
+        If lp.p1.Y > size.Height Then
+            lp.p1.X = (size.Height - yIntercept) / slope
+            lp.p1.Y = size.Height
+        End If
+        If lp.p1.Y < 0 Then
+            lp.p1.X = xIntercept
+            lp.p1.Y = 0
+        End If
+
         If lp.p2.Y > size.Height Then
             lp.p2.X = (size.Height - yIntercept) / slope
             lp.p2.Y = size.Height
@@ -562,6 +564,7 @@ Public Class pointPair
             lp.p2.X = xIntercept
             lp.p2.Y = 0
         End If
+
         Return lp
     End Function
     Public Function compare(mp As pointPair) As Boolean

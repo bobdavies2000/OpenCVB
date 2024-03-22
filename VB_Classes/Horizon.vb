@@ -1,21 +1,19 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Horizon_Basics : Inherits VB_Algorithm
     Dim perp As New Line_Perpendicular
-    Dim pc As cv.Mat
+    Dim yData As cv.Mat
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Search for the transition from positive to negative to find the horizon."
     End Sub
     Private Function findTransition(startCol As Integer, stopCol As Integer, stepCol As Integer) As cv.Point
-        Dim val As cv.Vec3f, lastVal As cv.Vec3f
+        Dim val As Single, lastVal As Single
         For x = startCol To stopCol Step stepCol
-            Dim tmp = pc.Col(x)
-            For y = 0 To tmp.Rows - 1
+            For y = 0 To yData.Rows - 1
                 lastVal = val
-                val = tmp.Get(Of cv.Vec3f)(y, 0)
-                If val(1) > 0 And lastVal(1) < 0 Then
+                val = yData.Get(Of Single)(y, x)
+                If val > 0 And lastVal < 0 Then
                     Dim pt = New cv.Point2f(x, y)
-                    If pt.X < 0 And pt.X > dst2.Width Then Dim k = 0
                     Return pt
                 End If
             Next
@@ -24,13 +22,15 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src As cv.Mat)
         If gOptions.gravityPointCloud.Checked Then
-            pc = task.pointCloud
+            yData = task.pcSplit(1)
         Else
-            pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)
+            Dim pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)
+            Dim split = pc.Split()
+            yData = split(1)
         End If
 
-        Dim p1 = findTransition(0, pc.Width - 1, 1)
-        Dim p2 = findTransition(pc.Width - 1, 0, -1)
+        Dim p1 = findTransition(0, yData.Width - 1, 1)
+        Dim p2 = findTransition(yData.Width - 1, 0, -1)
         Dim lp = New pointPair(p1, p2)
         task.horizonVec = lp.edgeToEdgeLine(dst2.Size)
 
@@ -233,9 +233,9 @@ Public Class Horizon_FindNonZeroOld : Inherits VB_Algorithm
             dst2.Line(task.horizonVec.p1, task.horizonVec.p2, 255, task.lineWidth, task.lineType)
         End If
 
-        If task.horizonVec.originalLength < dst2.Width / 2 And redOptions.YRangeSlider.Value < redOptions.YRangeSlider.Maximum Or pointsMat.Rows = 0 Then
-            redOptions.YRangeSlider.Value += 1
-        End If
+        'If task.horizonVec.originalLength < dst2.Width / 2 And redOptions.YRangeSlider.Value < redOptions.YRangeSlider.Maximum Or pointsMat.Rows = 0 Then
+        '    redOptions.YRangeSlider.Value += 1
+        'End If
 
         dst3 = splitX.InRange(-0.01, 0.01)
         dst3.SetTo(0, noDepth)
@@ -260,8 +260,8 @@ Public Class Horizon_FindNonZeroOld : Inherits VB_Algorithm
             dst2.Line(task.gravityVec.p1, task.gravityVec.p2, 255, task.lineWidth, task.lineType)
         End If
 
-        If task.gravityVec.originalLength < dst2.Height / 2 And redOptions.XRangeSlider.Value < redOptions.XRangeSlider.Maximum Or pointsMat.Rows = 0 Then
-            redOptions.XRangeSlider.Value += 1
-        End If
+        'If task.gravityVec.originalLength < dst2.Height / 2 And redOptions.XRangeSlider.Value < redOptions.XRangeSlider.Maximum Or pointsMat.Rows = 0 Then
+        '    redOptions.XRangeSlider.Value += 1
+        'End If
     End Sub
 End Class

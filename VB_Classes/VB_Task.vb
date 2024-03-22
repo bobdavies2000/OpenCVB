@@ -51,8 +51,8 @@ Public Class VBtask : Implements IDisposable
     Public motionFlag As Boolean
     Public motionDetected As Boolean
 
-    Public gravityVec As pointPair
-    Public horizonVec As pointPair
+    Public gravityVec As New pointPair
+    Public horizonVec As New pointPair
 
     ' add any global algorithms here
     Public PixelViewer As Pixel_Viewer
@@ -63,7 +63,7 @@ Public Class VBtask : Implements IDisposable
     Public motionCloud As Motion_PointCloud
     Public motionColor As Motion_Color
     Public motionBasics As Motion_BasicsQuarterRes
-    Public cross As Horizon_Basics
+    Public cross As Gravity_Horizon
     Public rgbFilter As Object
 
     Public imuStabilityTest As Stabilizer_VerticalIMU
@@ -370,7 +370,7 @@ Public Class VBtask : Implements IDisposable
         motionCloud = New Motion_PointCloud
         motionColor = New Motion_Color
         motionBasics = New Motion_BasicsQuarterRes
-        cross = New Horizon_Basics
+        cross = New Gravity_Horizon
         imuStabilityTest = New Stabilizer_VerticalIMU
 
         updateSettings()
@@ -596,7 +596,7 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            cross.Run(src)
+            ' cross.Run(src)
             algorithmObject.NextFrame(task.color.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
             If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then

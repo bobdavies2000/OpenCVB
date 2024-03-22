@@ -932,12 +932,8 @@ Public Class Line_TimeViewLines : Inherits VB_Algorithm
         For Each lp In lines.lines.lpList
             dst3.Line(lp.p1, lp.p2, cv.Scalar.Green, task.lineWidth, task.lineType)
             lpList.Add(lp)
-            If lp.slope = pointPair.verticalSlope Then
-                dst3.Line(lp.p1, lp.p2, cv.Scalar.Blue, task.lineWidth * 2, task.lineType)
-            Else
-                If lp.slope = 0 Then
-                    dst3.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth * 2 + 1, task.lineType)
-                End If
+            If lp.slope = 0 Then
+                dst3.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth * 2 + 1, task.lineType)
             End If
         Next
     End Sub
@@ -1234,55 +1230,6 @@ Public Class Line_Verts : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class Line_GravityOld : Inherits VB_Algorithm
-    Dim lines As New Line_Basics
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Slope Difference Tolerance (%)", 1, 25, 10)
-        desc = "Find all the lines in the color image that are parallel to gravity or horizon vectors."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static slopeSlider = findSlider("Slope Difference Tolerance (%)")
-        Dim diffPercent = slopeSlider.value / 100
-
-        dst2 = src.Clone
-        If gOptions.gravityPointCloud.Checked = False Then
-            setTrueText("To find lines parallel to gravity with this algorithm, it is necessary to turn on the gravity transform." + vbCrLf +
-                        "Check the box labeled 'Apply gravity transform to point cloud' and try again.", 3)
-            Exit Sub
-        End If
-
-        lines.Run(src)
-        If standaloneTest() Then dst3 = lines.dst2
-
-        For Each lp In lines.lpList
-            If (lp.nearVertical And task.horizonVec.nearVertical) Or (lp.nearHorizontal And task.horizonVec.nearHorizontal) Then
-                dst2.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
-            Else
-                Dim test = lp.slope / task.horizonVec.slope
-                If test > 1 - diffPercent And test < 1 + diffPercent Then
-                    dst2.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
-                End If
-            End If
-
-            If (lp.nearVertical And task.gravityVec.nearVertical) Or (lp.nearHorizontal And task.gravityVec.nearHorizontal) Then
-                dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
-            Else
-                Dim test = lp.slope / task.gravityVec.slope
-                If test > 1 - diffPercent And test < 1 + diffPercent Then
-                    dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
-                End If
-            End If
-        Next
-        labels(2) = "Slope for gravity is " + Format(task.gravityVec.slope, fmt1) + ".  Slope for horizon is " + Format(task.horizonVec.slope, fmt1)
-    End Sub
-End Class
 
 
 
