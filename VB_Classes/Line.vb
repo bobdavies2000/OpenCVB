@@ -725,103 +725,6 @@ End Class
 
 
 
-Public Class Line_Nearest : Inherits VB_Algorithm
-    Public pt As cv.Point2f ' set these and Run...
-    Public p1 As cv.Point2f
-    Public p2 As cv.Point2f
-    Public nearPoint As cv.Point2f
-    Public onTheLine As Boolean
-    Public distance1 As Single
-    Public distance2 As Single
-    Public Sub New()
-        labels(2) = "Yellow line is input line, white dot is the input point, and the white line is the nearest path to the input line."
-        desc = "Find the nearest point on a line"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standaloneTest() And task.heartBeat Then
-            p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            pt = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-        End If
-
-        Dim minX = Math.Min(p1.X, p2.X)
-        Dim minY = Math.Min(p1.Y, p2.Y)
-        Dim maxX = Math.Max(p1.X, p2.X)
-        Dim maxY = Math.Max(p1.Y, p2.Y)
-
-        onTheLine = True
-        If p1.X = p2.X Then
-            nearPoint = New cv.Point2f(p1.X, pt.Y)
-            If pt.Y < minY Or pt.Y > maxY Then onTheLine = False
-        Else
-            Dim m = (p1.Y - p2.Y) / (p1.X - p2.X)
-            If m = 0 Then
-                nearPoint = New cv.Point2f(pt.X, p1.Y)
-                If pt.X < minX Or pt.X > maxX Then onTheLine = False
-            Else
-                Dim b1 = p1.Y - p1.X * m
-
-                Dim b2 = pt.Y + pt.X / m
-                Dim a1 = New cv.Point2f(0, b2)
-                Dim a2 = New cv.Point2f(dst2.Width, b2 + dst2.Width / m)
-                Dim x = m * (b2 - b1) / (m * m + 1)
-                nearPoint = New cv.Point2f(x, m * x + b1)
-
-                If nearPoint.X < minX Or nearPoint.X > maxX Or nearPoint.Y < minY Or nearPoint.Y > maxY Then onTheLine = False
-            End If
-        End If
-
-        distance1 = pt.DistanceTo(p1)
-        distance2 = pt.DistanceTo(p2)
-        If onTheLine = False Then nearPoint = If(distance1 < distance2, p1, p2)
-        If standaloneTest() Then
-            dst2.SetTo(0)
-            dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-            dst2.Line(pt, nearPoint, cv.Scalar.White, task.lineWidth, task.lineType)
-            dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
-        End If
-    End Sub
-End Class
-
-
-
-
-' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
-Public Class Line_Intersection : Inherits VB_Algorithm
-    Public Sub New()
-        desc = "Determine if 2 lines intersect, where the point is, and if that point is in the image."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f
-        If task.heartBeat Then
-            p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            p3 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            p4 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-        End If
-
-        Dim intersectionpoint = vbIntersectTest(p1, p2, p3, p4, New cv.Rect(0, 0, src.Width, src.Height))
-
-        dst2.SetTo(0)
-        dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
-        dst2.Line(p3, p4, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
-        If intersectionpoint <> New cv.Point2f Then
-            dst2.Circle(intersectionpoint, task.dotSize + 4, cv.Scalar.White, -1, task.lineType)
-            labels(2) = "Intersection point = " + CStr(CInt(intersectionpoint.X)) + " x " + CStr(CInt(intersectionpoint.Y))
-        Else
-            labels(2) = "Parallel!!!"
-        End If
-        If intersectionpoint.X < 0 Or intersectionpoint.X > dst2.Width Or intersectionpoint.Y < 0 Or intersectionpoint.Y > dst2.Height Then
-            labels(2) += " (off screen)"
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class Line_CellsVertHoriz : Inherits VB_Algorithm
@@ -1338,12 +1241,16 @@ End Class
 
 
 
-Public Class Line_Gravity : Inherits VB_Algorithm
+Public Class Line_GravityOld : Inherits VB_Algorithm
     Dim lines As New Line_Basics
     Public Sub New()
-        desc = "Find all the lines in the color image that are parallel to gravity."
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Slope Difference Tolerance (%)", 1, 25, 10)
+        desc = "Find all the lines in the color image that are parallel to gravity or horizon vectors."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        Static slopeSlider = findSlider("Slope Difference Tolerance (%)")
+        Dim diffPercent = slopeSlider.value / 100
+
         dst2 = src.Clone
         If gOptions.gravityPointCloud.Checked = False Then
             setTrueText("To find lines parallel to gravity with this algorithm, it is necessary to turn on the gravity transform." + vbCrLf +
@@ -1352,29 +1259,255 @@ Public Class Line_Gravity : Inherits VB_Algorithm
         End If
 
         lines.Run(src)
+        If standaloneTest() Then dst3 = lines.dst2
 
-        Dim vSlope = task.gravityVec.slope
-        Dim hSlope = task.horizonVec.slope
-        labels(2) = "Slope for gravity is " + Format(vSlope, fmt1) + " in this image"
-        labels(3) = "Slope for horizon is " + Format(hSlope, fmt1) + " in this image"
         For Each lp In lines.lpList
-            If lp.nearHorizontal Then
+            If (lp.nearVertical And task.horizonVec.nearVertical) Or (lp.nearHorizontal And task.horizonVec.nearHorizontal) Then
                 dst2.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
             Else
-                Dim test = lp.slope / hSlope
-                If test > 0.9 And test < 1.1 Then
+                Dim test = lp.slope / task.horizonVec.slope
+                If test > 1 - diffPercent And test < 1 + diffPercent Then
                     dst2.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
                 End If
             End If
 
-            If lp.nearVertical Then
+            If (lp.nearVertical And task.gravityVec.nearVertical) Or (lp.nearHorizontal And task.gravityVec.nearHorizontal) Then
                 dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
             Else
-                Dim test = lp.slope / vSlope
-                If test > 0.9 And test < 1.1 Then
+                Dim test = lp.slope / task.gravityVec.slope
+                If test > 1 - diffPercent And test < 1 + diffPercent Then
                     dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
                 End If
             End If
         Next
+        labels(2) = "Slope for gravity is " + Format(task.gravityVec.slope, fmt1) + ".  Slope for horizon is " + Format(task.horizonVec.slope, fmt1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_Nearest : Inherits VB_Algorithm
+    Public pt As cv.Point2f ' How close is this point to the input line?
+    Public lp As pointPair ' the input line.
+    Public nearPoint As cv.Point2f
+    Public onTheLine As Boolean
+    Public distance As Single
+    Public Sub New()
+        labels(2) = "Yellow line is input line, white dot is the input point, and the white line is the nearest path to the input line."
+        desc = "Find the nearest point on a line"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standaloneTest() And task.heartBeat Then
+            lp.p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            lp.p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            pt = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+        End If
+
+        Dim minX = Math.Min(lp.p1.X, lp.p2.X)
+        Dim minY = Math.Min(lp.p1.Y, lp.p2.Y)
+        Dim maxX = Math.Max(lp.p1.X, lp.p2.X)
+        Dim maxY = Math.Max(lp.p1.Y, lp.p2.Y)
+
+        onTheLine = True
+        If lp.p1.X = lp.p2.X Then
+            nearPoint = New cv.Point2f(lp.p1.X, pt.Y)
+            If pt.Y < minY Or pt.Y > maxY Then onTheLine = False
+        Else
+            Dim m = (lp.p1.Y - lp.p2.Y) / (lp.p1.X - lp.p2.X)
+            If m = 0 Then
+                nearPoint = New cv.Point2f(pt.X, lp.p1.Y)
+                If pt.X < minX Or pt.X > maxX Then onTheLine = False
+            Else
+                Dim b1 = lp.p1.Y - lp.p1.X * m
+
+                Dim b2 = pt.Y + pt.X / m
+                Dim a1 = New cv.Point2f(0, b2)
+                Dim a2 = New cv.Point2f(dst2.Width, b2 + dst2.Width / m)
+                Dim x = m * (b2 - b1) / (m * m + 1)
+                nearPoint = New cv.Point2f(x, m * x + b1)
+
+                If nearPoint.X < minX Or nearPoint.X > maxX Or nearPoint.Y < minY Or nearPoint.Y > maxY Then onTheLine = False
+            End If
+        End If
+
+        Dim distance1 = Math.Sqrt(Math.Pow(pt.X - lp.p1.X, 2) + Math.Pow(pt.Y - lp.p1.Y, 2))
+        Dim distance2 = Math.Sqrt(Math.Pow(pt.X - lp.p2.X, 2) + Math.Pow(pt.Y - lp.p2.Y, 2))
+        If onTheLine = False Then nearPoint = If(distance1 < distance2, lp.p1, lp.p2)
+        If standaloneTest() Then
+            dst2.SetTo(0)
+            dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            dst2.Line(pt, nearPoint, cv.Scalar.White, task.lineWidth, task.lineType)
+            dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+        End If
+        distance = Math.Sqrt(Math.Pow(pt.X - nearPoint.X, 2) + Math.Pow(pt.Y - nearPoint.Y, 2))
+    End Sub
+End Class
+
+
+
+
+
+' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
+Public Class Line_Intersection : Inherits VB_Algorithm
+    Public p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f
+    Public intersectionPoint As cv.Point2f
+    Public Sub New()
+        desc = "Determine if 2 lines intersect, where the point is, and if that point is in the image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat Then
+            p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            p3 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            p4 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+        End If
+
+        intersectionPoint = vbIntersectTest(p1, p2, p3, p4, New cv.Rect(0, 0, src.Width, src.Height))
+
+        dst2.SetTo(0)
+        dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        dst2.Line(p3, p4, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        If intersectionpoint <> New cv.Point2f Then
+            dst2.Circle(intersectionpoint, task.dotSize + 4, cv.Scalar.White, -1, task.lineType)
+            labels(2) = "Intersection point = " + CStr(CInt(intersectionpoint.X)) + " x " + CStr(CInt(intersectionpoint.Y))
+        Else
+            labels(2) = "Parallel!!!"
+        End If
+        If intersectionpoint.X < 0 Or intersectionpoint.X > dst2.Width Or intersectionpoint.Y < 0 Or intersectionpoint.Y > dst2.Height Then
+            labels(2) += " (off screen)"
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_Gravity : Inherits VB_Algorithm
+    Dim lines As New Line_Basics
+    Dim nearest As New Line_Nearest
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Pixel difference threshold", 1, 20, 5)
+        gOptions.LineWidth.Value = 2
+        desc = "Find all the lines in the color image that are parallel to gravity or the horizon using distance to the line instead of slope."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static diffSlider = findSlider("Pixel difference threshold")
+        Dim pixelDiff = diffSlider.value
+
+        dst2 = src.Clone
+        lines.Run(src)
+        If standaloneTest() Then dst3 = lines.dst2
+
+        nearest.lp = task.gravityVec
+        dst2.Line(task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+        For Each lp In lines.lpList
+            Dim ptInter = vbIntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
+            If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
+
+            nearest.pt = lp.p1
+            nearest.Run(Nothing)
+            Dim d1 = nearest.distance
+            'dst2.Line(nearest.nearPoint, lp.p1, cv.Scalar.Red, task.lineWidth, task.lineType)
+
+            nearest.pt = lp.p2
+            nearest.Run(Nothing)
+            Dim d2 = nearest.distance
+            'dst2.Line(nearest.nearPoint, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+
+            If Math.Abs(d1 - d2) <= pixelDiff Then
+                dst2.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
+            End If
+        Next
+
+        dst2.Line(task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+        nearest.lp = task.horizonVec
+        For Each lp In lines.lpList
+            Dim ptInter = vbIntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
+            If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
+
+            nearest.pt = lp.p1
+            nearest.Run(Nothing)
+            Dim d1 = nearest.distance
+
+            nearest.pt = lp.p2
+            nearest.Run(Nothing)
+            Dim d2 = nearest.distance
+
+            If Math.Abs(d1 - d2) <= pixelDiff Then
+                dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+            End If
+        Next
+        labels(2) = "Slope for gravity is " + Format(task.gravityVec.slope, fmt1) + ".  Slope for horizon is " + Format(task.horizonVec.slope, fmt1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_GravityIntersect : Inherits VB_Algorithm
+    Dim lines As New Line_Basics
+    Dim nearest As New Line_Nearest
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Min distance to intersection (X1000)", 1, 20, 2)
+        gOptions.LineWidth.Value = 2
+        desc = "Find all the lines in the color image that don't intersect the gravity and horizon vectors (indicating they are parallel."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        'Static distSlider = findSlider("Min distance to intersection (X1000)")
+        'Dim minDistance = distSlider.value
+
+        'dst2 = src.Clone
+        'lines.Run(src)
+        'If standaloneTest() Then dst3 = lines.dst2
+
+        'nearest.lp = task.gravityVec
+        'dst2.Line(task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+        'For Each lp In lines.lpList
+        '    Dim ptInter = vbIntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
+        '    If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
+
+        '    nearest.pt = lp.p1
+        '    nearest.Run(Nothing)
+        '    Dim d1 = nearest.distance
+        '    'dst2.Line(nearest.nearPoint, lp.p1, cv.Scalar.Red, task.lineWidth, task.lineType)
+
+        '    nearest.pt = lp.p2
+        '    nearest.Run(Nothing)
+        '    Dim d2 = nearest.distance
+        '    'dst2.Line(nearest.nearPoint, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+
+        '    If Math.Abs(d1 - d2) <= pixelDiff Then
+        '        dst2.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
+        '    End If
+        'Next
+
+        'dst2.Line(task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+        'nearest.lp = task.horizonVec
+        'For Each lp In lines.lpList
+        '    Dim ptInter = vbIntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
+        '    If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
+
+        '    nearest.pt = lp.p1
+        '    nearest.Run(Nothing)
+        '    Dim d1 = nearest.distance
+
+        '    nearest.pt = lp.p2
+        '    nearest.Run(Nothing)
+        '    Dim d2 = nearest.distance
+
+        '    If Math.Abs(d1 - d2) <= pixelDiff Then
+        '        dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+        '    End If
+        'Next
+        'labels(2) = "Slope for gravity is " + Format(task.gravityVec.slope, fmt1) + ".  Slope for horizon is " + Format(task.horizonVec.slope, fmt1)
     End Sub
 End Class

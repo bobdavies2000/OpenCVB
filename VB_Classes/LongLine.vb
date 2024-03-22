@@ -299,7 +299,7 @@ Public Class LongLine_ExtendParallel : Inherits VB_Algorithm
     Dim extendAll As New LongLine_ExtendAll
     Dim knn As New KNN_Core
     Dim near As New Line_Nearest
-    Public parList As New List(Of cPoints)
+    Public parList As New List(Of coinPoints)
     Public Sub New()
         labels = {"", "", "Image output from Line_Basics", "Parallel extended lines"}
         desc = "Use KNN to find which lines are near each other and parallel"
@@ -336,7 +336,7 @@ Public Class LongLine_ExtendParallel : Inherits VB_Algorithm
                     distance2 = lp.p2.DistanceTo(elp.p1)
                 End If
                 If distance1 < distanceMid * 2 And distance2 < distanceMid * 2 Then
-                    Dim cp As cPoints
+                    Dim cp As coinPoints
 
                     Dim mps = extendAll.lines.lpList(index)
                     cp.p1 = mps.p1

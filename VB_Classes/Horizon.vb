@@ -7,8 +7,6 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
         desc = "Search for the transition from positive to negative to find the horizon."
     End Sub
     Private Function findTransition(startCol As Integer, stopCol As Integer, stepCol As Integer) As cv.Point
-        Dim xRatio = dst0.Width / task.quarterRes.Width
-        Dim yRatio = dst0.Height / task.quarterRes.Height
         Dim val As cv.Vec3f, lastVal As cv.Vec3f
         For x = startCol To stopCol Step stepCol
             Dim tmp = pc.Col(x)
@@ -16,7 +14,8 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
                 lastVal = val
                 val = tmp.Get(Of cv.Vec3f)(y, 0)
                 If val(1) > 0 And lastVal(1) < 0 Then
-                    Dim pt = New cv.Point2f(x * xRatio, y * yRatio)
+                    Dim pt = New cv.Point2f(x, y)
+                    If pt.X < 0 And pt.X > dst2.Width Then Dim k = 0
                     Return pt
                 End If
             Next
@@ -29,9 +28,8 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
         Else
             pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)
         End If
-        pc = pc.Resize(task.quarterRes, cv.InterpolationFlags.Nearest)
 
-        Dim p1 = findTransition(0, pc.Width, 1)
+        Dim p1 = findTransition(0, pc.Width - 1, 1)
         Dim p2 = findTransition(pc.Width - 1, 0, -1)
         Dim lp = New pointPair(p1, p2)
         task.horizonVec = lp.edgeToEdgeLine(dst2.Size)

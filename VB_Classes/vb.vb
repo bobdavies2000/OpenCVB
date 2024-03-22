@@ -575,16 +575,12 @@ End Class
 
 
 
-
-
-Public Structure cPoints
+Public Structure coinPoints
     Dim p1 As cv.Point
     Dim p2 As cv.Point
     Dim p3 As cv.Point
     Dim p4 As cv.Point
 End Structure
-
-
 
 
 

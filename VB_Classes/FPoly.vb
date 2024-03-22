@@ -187,8 +187,7 @@ Public Class FPoly_Sides : Inherits VB_Algorithm
         rotateAngle = 0
         If d1 <> d2 Then
             If newNear.p1.DistanceTo(newNear.p2) > threshold Then
-                near.p1 = mpPrev.p1
-                near.p2 = mpPrev.p2
+                near.lp = mpPrev
                 near.pt = newNear.p1
                 near.Run(empty)
                 dst1.Line(near.pt, near.nearPoint, cv.Scalar.Red, task.lineWidth + 5, task.lineType)
@@ -798,8 +797,7 @@ Public Class FPoly_Perpendiculars : Inherits VB_Algorithm
         desc = "Find the center of rotation using the perpendicular lines from polymp and FLine (feature line) in FPoly_Basics"
     End Sub
     Private Function findrotateAngle(p1 As cv.Point2f, p2 As cv.Point2f, pt As cv.Point2f) As Single
-        near.p1 = p1
-        near.p2 = p2
+        near.lp = New pointPair(p1, p2)
         near.pt = pt
         near.Run(empty)
         dst2.Line(pt, near.nearPoint, cv.Scalar.Red, task.lineWidth, task.lineType)
@@ -1128,8 +1126,7 @@ Public Class FPoly_Center : Inherits VB_Algorithm
         fPD.rotateAngle = 0
         If d1 <> d2 Then
             If newNear.p1.DistanceTo(newNear.p2) > threshold Then
-                near.p1 = fPD.prevPoly(sindex1)
-                near.p2 = fPD.prevPoly(sIndex2)
+                near.lp = New pointPair(fPD.prevPoly(sindex1), fPD.prevPoly(sIndex2))
                 near.pt = newNear.p1
                 near.Run(empty)
                 dst1.Line(near.pt, near.nearPoint, cv.Scalar.Red, task.lineWidth + 5, task.lineType)
