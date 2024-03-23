@@ -57,14 +57,37 @@ Public Class VBtask : Implements IDisposable
     ' add any global algorithms here
     Public PixelViewer As Pixel_Viewer
     Public colorizer As Depth_Colorizer_CPP
-    Public gMat As IMU_GMatrix
-    Public IMUBasics As IMU_Basics
     Public hCloud As History_Cloud
     Public motionCloud As Motion_PointCloud
     Public motionColor As Motion_Color
     Public motionBasics As Motion_BasicsQuarterRes
     Public cross As Gravity_Horizon
     Public rgbFilter As Object
+
+    Public gMat As IMU_GMatrix
+    Public IMUBasics As IMU_Basics
+    Public IMU_RawAcceleration As cv.Point3f
+    Public IMU_Acceleration As cv.Point3f
+    Public IMU_AverageAcceleration As cv.Point3f
+    Public IMU_RawAngularVelocity As cv.Point3f
+    Public IMU_AngularVelocity As cv.Point3f
+    Public kalmanIMUacc As cv.Point3f
+    Public kalmanIMUvelocity As cv.Point3f
+    Public IMU_TimeStamp As Double
+    Public IMU_Rotation As System.Numerics.Quaternion
+    Public IMU_Translation As cv.Point3f
+    Public IMU_AngularAcceleration As cv.Point3f
+    Public IMU_FrameTime As Double
+    Public IMU_AlphaFilter As Single = 0.9 ' high pass and low pass filter of the IMU acceleration data.
+
+    Public accRadians As cv.Point3f  ' rotation angles around x/y/z-axis to align with gravity
+    Public theta As cv.Point3f ' velocity-filtered angles around x/y/z-axis to align with gravity
+
+    Public pitch As Single
+    Public yaw As Single
+    Public roll As Single
+
+    Public gMatrix As cv.Mat ' transformation matrix to convert point cloud to be vertical according to gravity.
 
     Public imuStabilityTest As Stabilizer_VerticalIMU
     Public cameraStable As Boolean
@@ -112,11 +135,6 @@ Public Class VBtask : Implements IDisposable
     Public displayRes As cv.Size
     Public AddWeighted As Single
 
-    Public IMU_TimeStamp As Double
-    Public IMU_Rotation As System.Numerics.Quaternion
-    Public IMU_Translation As cv.Point3f
-    Public IMU_AngularAcceleration As cv.Point3f
-    Public IMU_FrameTime As Double
     Public CPU_TimeStamp As Double
     Public CPU_FrameTime As Double
 
@@ -155,23 +173,6 @@ Public Class VBtask : Implements IDisposable
     Public vFov As Single
     Public focalLength As Single ' distance between cameras
     Public baseline As Single ' in meters
-
-    Public IMU_RawAcceleration As cv.Point3f
-    Public IMU_Acceleration As cv.Point3f
-    Public IMU_AverageAcceleration As cv.Point3f
-    Public IMU_RawAngularVelocity As cv.Point3f
-    Public IMU_AngularVelocity As cv.Point3f
-    Public kalmanIMUacc As cv.Point3f
-    Public kalmanIMUvelocity As cv.Point3f
-
-    Public accRadians As cv.Point3f  ' rotation angles around x/y/z-axis to align with gravity
-    Public theta As cv.Point3f ' velocity-filtered angles around x/y/z-axis to align with gravity
-
-    Public pitch As Single
-    Public yaw As Single
-    Public roll As Single
-
-    Public gMatrix As cv.Mat ' transformation matrix to convert point cloud to be vertical according to gravity.
 
     Public algName As String
     Public cameraName As String
@@ -606,15 +607,16 @@ Public Class VBtask : Implements IDisposable
 
                 task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
                 'task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-            End If
-
-            Dim rcNew = task.rc
-            If rcNew.index > 0 Then
-                task.color.Rectangle(rcNew.rect, cv.Scalar.Yellow, task.lineWidth)
-                task.color(rcNew.rect).SetTo(cv.Scalar.White, rcNew.mask)
-
-                task.depthRGB.Rectangle(rcNew.rect, cv.Scalar.Yellow, task.lineWidth)
-                'task.depthRGB(rcNew.rect).SetTo(cv.Scalar.White, rcNew.mask)
+                If gOptions.DisplayCellStats.Checked Then
+                    If task.optionsChanged Then
+                        gOptions.displayDst1.Checked = True
+                        dst1.SetTo(0)
+                    End If
+                    Static cellStats As New Cell_Basics
+                    cellStats.statsString()
+                    Dim str As New trueText(cellStats.strOut, 0, 0, 1)
+                    trueData.Add(str)
+                End If
             End If
 
             If gOptions.CrossHairs.Checked Then

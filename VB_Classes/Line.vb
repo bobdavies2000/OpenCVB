@@ -1339,7 +1339,7 @@ Public Class Line_Gravity : Inherits VB_Algorithm
     Dim lines As New Line_Basics
     Dim nearest As New Line_Nearest
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Pixel difference threshold", 1, 20, 5)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Pixel difference threshold", 1, 20, 2)
         gOptions.LineWidth.Value = 2
         desc = "Find all the lines in the color image that are parallel to gravity or the horizon using distance to the line instead of slope."
     End Sub

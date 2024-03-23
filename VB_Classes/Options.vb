@@ -3319,14 +3319,13 @@ Public Class Options_IMU : Inherits VB_Algorithm
     Public rotateX As Integer
     Public rotateY As Integer
     Public rotateZ As Integer
-    Public alpha As Single = 0.98
     Public stableThreshold As Single = 0.02
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Rotate pointcloud around X-axis (degrees)", -90, 90, rotateX)
             sliders.setupTrackBar("Rotate pointcloud around Y-axis (degrees)", -90, 90, rotateY)
             sliders.setupTrackBar("Rotate pointcloud around Z-axis (degrees)", -90, 90, rotateZ)
-            sliders.setupTrackBar("IMU_Basics: Alpha X100", 0, 100, alpha * 100)
+            sliders.setupTrackBar("IMU_Basics: Alpha X100", 0, 100, task.IMU_AlphaFilter * 100)
             sliders.setupTrackBar("IMU Stability Threshold (radians) X100", 0, 100, stableThreshold * 100)
         End If
     End Sub
@@ -3334,12 +3333,12 @@ Public Class Options_IMU : Inherits VB_Algorithm
         Static xRotateSlider = findSlider("Rotate pointcloud around X-axis (degrees)")
         Static yRotateSlider = findSlider("Rotate pointcloud around Y-axis (degrees)")
         Static zRotateSlider = findSlider("Rotate pointcloud around Z-axis (degrees)")
-        Static alphaSlider = findSlider("Rotate pointcloud around Z-axis (degrees)")
-        Static stabilitySlider = findSlider("Rotate pointcloud around Z-axis (degrees)")
+        Static alphaSlider = findSlider("IMU_Basics: Alpha X100")
+        Static stabilitySlider = findSlider("IMU Stability Threshold (radians) X100")
         rotateX = xRotateSlider.value
         rotateY = yRotateSlider.value
         rotateZ = zRotateSlider.value
-        alpha = alphaSlider.value / 100
+        task.IMU_AlphaFilter = alphaSlider.value / 100
         stableThreshold = stabilitySlider.value / 100
     End Sub
 End Class

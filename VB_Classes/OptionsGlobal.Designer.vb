@@ -46,6 +46,7 @@ Partial Class OptionsGlobal
         Me.MaxDepth = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.CrossHairs = New System.Windows.Forms.CheckBox()
         Me.ShowMotionRectangle = New System.Windows.Forms.CheckBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.MotionFilteredColorOnly = New System.Windows.Forms.RadioButton()
@@ -78,7 +79,7 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.CrossHairs = New System.Windows.Forms.CheckBox()
+        Me.DisplayCellStats = New System.Windows.Forms.CheckBox()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -338,6 +339,7 @@ Partial Class OptionsGlobal
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.DisplayCellStats)
         Me.GroupBox2.Controls.Add(Me.CrossHairs)
         Me.GroupBox2.Controls.Add(Me.ShowMotionRectangle)
         Me.GroupBox2.Controls.Add(Me.GroupBox1)
@@ -365,6 +367,18 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabIndex = 3
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
+        '
+        'CrossHairs
+        '
+        Me.CrossHairs.AutoSize = True
+        Me.CrossHairs.Checked = True
+        Me.CrossHairs.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CrossHairs.Location = New System.Drawing.Point(24, 235)
+        Me.CrossHairs.Name = "CrossHairs"
+        Me.CrossHairs.Size = New System.Drawing.Size(151, 24)
+        Me.CrossHairs.TabIndex = 71
+        Me.CrossHairs.Text = "Show crosshairs"
+        Me.CrossHairs.UseVisualStyleBackColor = True
         '
         'ShowMotionRectangle
         '
@@ -691,17 +705,15 @@ Partial Class OptionsGlobal
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
-        'CrossHairs
+        'DisplayCellStats
         '
-        Me.CrossHairs.AutoSize = True
-        Me.CrossHairs.Checked = True
-        Me.CrossHairs.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CrossHairs.Location = New System.Drawing.Point(24, 235)
-        Me.CrossHairs.Name = "CrossHairs"
-        Me.CrossHairs.Size = New System.Drawing.Size(151, 24)
-        Me.CrossHairs.TabIndex = 71
-        Me.CrossHairs.Text = "Show crosshairs"
-        Me.CrossHairs.UseVisualStyleBackColor = True
+        Me.DisplayCellStats.AutoSize = True
+        Me.DisplayCellStats.Location = New System.Drawing.Point(24, 317)
+        Me.DisplayCellStats.Name = "DisplayCellStats"
+        Me.DisplayCellStats.Size = New System.Drawing.Size(158, 24)
+        Me.DisplayCellStats.TabIndex = 72
+        Me.DisplayCellStats.Text = "Display Cell Stats"
+        Me.DisplayCellStats.UseVisualStyleBackColor = True
         '
         'OptionsGlobal
         '
@@ -793,4 +805,5 @@ Partial Class OptionsGlobal
     Friend WithEvents MotionFilteredColorAndCloud As Windows.Forms.RadioButton
     Friend WithEvents ShowMotionRectangle As Windows.Forms.CheckBox
     Friend WithEvents CrossHairs As Windows.Forms.CheckBox
+    Friend WithEvents DisplayCellStats As Windows.Forms.CheckBox
 End Class

@@ -171,7 +171,7 @@ Public Class Image_CellStats : Inherits VB_Algorithm
         dst1 = images.dst1
         dst2 = images.dst2
 
-        stats.statsString(src)
+        stats.statsString()
 
         setTrueText(stats.strOut, 3)
     End Sub

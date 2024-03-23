@@ -6,8 +6,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Dim redCPP As New RedCloud_MaskNone_CPP
     Public genCells As New RedCloud_GenCells
     Public Sub New()
-        vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
-                        "It is behind the global options (which affect most algorithms.)")
+        vbAddAdvice(traceName + ": use the RedCloud algorithm panel." + vbCrLf + "(Behind the global options)")
         desc = "Find cells and then match them to the previous generation"
     End Sub
     Public Sub RunVB(src As cv.Mat)

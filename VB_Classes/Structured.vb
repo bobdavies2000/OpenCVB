@@ -1348,7 +1348,10 @@ End Class
 Public Class Structured_SurveyH : Inherits VB_Algorithm
     Public Sub New()
         redOptions.YRangeSlider.Value = 300
-        desc = "Create a mask of the surv"
+        vbAddAdvice(traceName + ": use Y-Range slider in RedCloud options.")
+        labels(2) = "Each slice represents point cloud pixels with the same Y-Range"
+        labels(3) = "Y-Range - compressed to increase the size of each slice.  Use Y-range slider to adjust the size of each slice."
+        desc = "Mark each horizontal slice with a separate color.  Y-Range determines how thick the slice is."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
@@ -1366,14 +1369,55 @@ Public Class Structured_SurveyH : Inherits VB_Algorithm
         Dim index As Integer
         dst2.SetTo(0)
         For y = topRow To dst2.Height - 1
-            If dst3.Row(y).CountNonZero = 0 Then Exit For
             Dim sliceY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y
             If y > task.sideCameraPoint.Y Then sliceY = task.yRange * (y - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
             Dim minVal = sliceY - task.metersPerPixel
             Dim maxVal = sliceY + task.metersPerPixel
             If minVal < 0 And maxVal > 0 Then Continue For
             dst0 = task.pcSplit(1).InRange(minVal, maxVal)
-            dst2.SetTo(task.scalarColors(index), dst0)
+            dst2.SetTo(task.scalarColors(index Mod 255), dst0)
+            index += 1
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Structured_SurveyV : Inherits VB_Algorithm
+    Public Sub New()
+        redOptions.XRangeSlider.Value = 300
+        vbAddAdvice(traceName + ": use X-Range slider in RedCloud options.")
+        labels(2) = "Each slice represents point cloud pixels with the same X-Range"
+        labels(3) = "X-Range - compressed to increase the size of each slice.  Use X-range slider to adjust the size of each slice."
+        desc = "Mark each vertical slice with a separate color.  X-Range determines how thick the slice is."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+
+        cv.Cv2.CalcHist({src}, task.channelsTop, New cv.Mat, dst3, 2, task.bins2D, task.rangesTop)
+        dst3.Col(0).SetTo(0)
+        dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst3.ConvertTo(dst3, cv.MatType.CV_8U)
+
+        Dim column As Integer
+        For column = 0 To dst2.Width - 1
+            If dst3.Row(column).CountNonZero Then Exit For
+        Next
+
+        Dim index As Integer
+        dst2.SetTo(0)
+        For x = column To dst2.Width - 1
+            Dim sliceX = -task.xRange * (task.topCameraPoint.X - x) / task.sideCameraPoint.X
+            If x > task.topCameraPoint.X Then sliceX = task.xRange * (x - task.sideCameraPoint.X) / (dst3.Height - task.sideCameraPoint.X)
+            Dim minVal = sliceX - task.metersPerPixel
+            Dim maxVal = sliceX + task.metersPerPixel
+            If minVal < 0 And maxVal > 0 Then Continue For
+            dst0 = task.pcSplit(0).InRange(minVal, maxVal)
+            dst2.SetTo(task.scalarColors(index Mod 255), dst0)
             index += 1
         Next
     End Sub
