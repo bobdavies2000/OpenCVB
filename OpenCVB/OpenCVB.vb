@@ -460,8 +460,8 @@ Public Class OpenCVB
         Dim workingRes = settings.workingRes
         Dim cres = settings.captureRes
         Dim dres = settings.displayRes
-        Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", Display " + CStr(dres.Width) + "x" +
-                                CStr(dres.Height) + ", WorkingRes " + CStr(workingRes.Width) + "x" + CStr(workingRes.Height)
+        Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", WorkingRes " +
+            CStr(workingRes.Width) + "x" + CStr(workingRes.Height)
         If AvailableAlgorithms.Text.StartsWith("Related_") Then resolutionDetails = "" ' The Related algorithms need the space...
         camLabel(0).Text = "RGB"
         If picLabels(0) <> "" Then camLabel(0).Text = picLabels(0)
@@ -1411,6 +1411,15 @@ Public Class OpenCVB
                         task.mbIndex = mbIndex
                         mbIndex += 1
                         If mbIndex >= mbuf.Count Then mbIndex = 0
+
+                        task.transformationMatrix = camera.transformationMatrix
+                        task.IMU_TimeStamp = camera.IMU_TimeStamp
+                        task.IMU_Acceleration = camera.IMU_Acceleration
+                        task.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
+                        task.IMU_AngularVelocity = camera.IMU_AngularVelocity
+                        task.IMU_FrameTime = camera.IMU_FrameTime
+                        task.CPU_TimeStamp = camera.CPU_TimeStamp
+                        task.CPU_FrameTime = camera.CPU_FrameTime
                     End SyncLock
 
                     task.activateTaskRequest = activateTaskRequest
@@ -1421,14 +1430,6 @@ Public Class OpenCVB
                     Dim spanCopy = New TimeSpan(elapsedCopyTicks)
                     task.inputBufferCopy = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
 
-                    task.transformationMatrix = camera.transformationMatrix
-                    task.IMU_TimeStamp = camera.IMU_TimeStamp
-                    task.IMU_Acceleration = camera.IMU_Acceleration
-                    task.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
-                    task.IMU_AngularVelocity = camera.IMU_AngularVelocity
-                    task.IMU_FrameTime = camera.IMU_FrameTime
-                    task.CPU_TimeStamp = camera.CPU_TimeStamp
-                    task.CPU_FrameTime = camera.CPU_FrameTime
                     If intermediateReview = task.algName Then
                         task.intermediateName = ""
                         intermediateReview = ""

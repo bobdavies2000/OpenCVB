@@ -138,21 +138,24 @@ public:
 			depthBuffer = (int*)k4a_image_get_buffer(depthInColor);
 		}
 
-		k4a_transformation_depth_image_to_point_cloud(transformation, depthInColor, 
-													  K4A_CALIBRATION_TYPE_COLOR, point_cloud_image);
+		k4a_transformation_depth_image_to_point_cloud(transformation, depthInColor, K4A_CALIBRATION_TYPE_COLOR, point_cloud_image);
 		
 		pointcloud = Mat(height, width, CV_16UC3, (int*)point_cloud_image);
 
-		k4a_device_get_imu_sample(device, &imu_sample, 2000);
+		for (int i = 0; i < 1000; i++)
+		{
+			auto test = k4a_device_get_imu_sample(device, &imu_sample, 0); // get the latest sample
+			if (test == K4A_WAIT_RESULT_TIMEOUT) break;
+		}
 
 		if (depthImage) k4a_image_release(depthImage);
 
 		k4a_capture_release(capture);
 
-		auto now = std::chrono::system_clock::now().time_since_epoch();
-		double now_ms = static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(now).count());
-		static double hostStartTime = now_ms;
-		double timeStamp = static_cast<double>(imu_sample.acc_timestamp_usec) / 1000;
+		//auto now = std::chrono::system_clock::now().time_since_epoch();
+		//double now_ms = static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(now).count());
+		//static double hostStartTime = now_ms;
+		//double timeStamp = static_cast<double>(imu_sample.acc_timestamp_usec) / 1000;
 
 		return (int*)&imu_sample;
 	}
@@ -170,9 +173,8 @@ int* K4AWaitFrame(K4Acamera* cPtr, int w, int h)
 	int* imuFrame = cPtr->waitForFrame();
 	if (cPtr->colorBuffer == 0) return 0;
 	Mat tmp = Mat(cPtr->height, cPtr->width, CV_8UC4, (int*)cPtr->colorBuffer);
-
-	cvtColor(tmp, tmp, COLOR_BGRA2BGR);
-	resize(tmp, cPtr->colorMat, Size(w, h), INTER_NEAREST);
+	resize(tmp, tmp, Size(w, h), INTER_NEAREST);
+	cvtColor(tmp, cPtr->colorMat, COLOR_BGRA2BGR);
 
 	tmp = Mat(cPtr->height, cPtr->width, CV_16U, cPtr->depthBuffer);
 	resize(tmp, cPtr->leftView, Size(w, h), INTER_NEAREST);

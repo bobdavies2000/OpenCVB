@@ -1049,53 +1049,6 @@ End Class
 
 
 
-Public Class Structured_SliceV : Inherits VB_Algorithm
-    Public heat As New HeatMap_Basics
-    Public sliceMask As New cv.Mat
-    Public options As New Options_Structured
-    Public Sub New()
-        findCheckBox("Top View (Unchecked Side View)").Checked = True
-        desc = "Find and isolate planes using the top view histogram data"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        If task.mouseMovePoint = New cv.Point Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
-        Dim xCoordinate = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
-
-        heat.Run(src)
-
-        Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
-        If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
-
-        Dim thicknessMeters = options.sliceSize * task.metersPerPixel
-        Dim minVal = planeX - thicknessMeters
-        Dim maxVal = planeX + thicknessMeters
-        cv.Cv2.InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
-        If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
-
-        labels(2) = "At offset " + CStr(xCoordinate) + " x = " + Format((maxVal + minVal) / 2, fmt2) +
-                    " with " + Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
-
-        labels(3) = heat.labels(3)
-
-        dst3 = heat.dst2
-        dst3.Circle(New cv.Point(task.topCameraPoint.X, dst3.Height), task.dotSize, task.highlightColor, -1, task.lineType)
-        dst3.Line(New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), task.highlightColor,
-                  options.sliceSize)
-        If standaloneTest() Then
-            dst2 = src
-            dst2.SetTo(cv.Scalar.White, sliceMask)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 Public Class Structured_TransformH : Inherits VB_Algorithm
@@ -1301,6 +1254,52 @@ End Class
 
 
 
+Public Class Structured_SliceV : Inherits VB_Algorithm
+    Public heat As New HeatMap_Basics
+    Public sliceMask As New cv.Mat
+    Public options As New Options_Structured
+    Public Sub New()
+        findCheckBox("Top View (Unchecked Side View)").Checked = True
+        desc = "Find and isolate planes using the top view histogram data"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If task.mouseMovePoint = New cv.Point Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
+        Dim xCoordinate = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
+
+        heat.Run(src)
+
+        Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+        If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
+
+        Dim thicknessMeters = options.sliceSize * task.metersPerPixel
+        Dim minVal = planeX - thicknessMeters
+        Dim maxVal = planeX + thicknessMeters
+        cv.Cv2.InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
+        If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
+
+        labels(2) = "At offset " + CStr(xCoordinate) + " x = " + Format((maxVal + minVal) / 2, fmt2) +
+                    " with " + Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
+
+        labels(3) = heat.labels(3)
+
+        dst3 = heat.dst2
+        dst3.Circle(New cv.Point(task.topCameraPoint.X, 0), task.dotSize, task.highlightColor, -1, task.lineType)
+        dst3.Line(New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), task.highlightColor, options.sliceSize)
+        If standaloneTest() Then
+            dst2 = src
+            dst2.SetTo(cv.Scalar.White, sliceMask)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class Structured_SliceH : Inherits VB_Algorithm
     Public heat As New HeatMap_Basics
     Public sliceMask As New cv.Mat
@@ -1330,11 +1329,9 @@ Public Class Structured_SliceH : Inherits VB_Algorithm
         labels(3) = heat.labels(2)
 
         dst3 = heat.dst3
-        Dim yPlaneOffset = If(ycoordinate < dst3.Height - options.sliceSize, CInt(ycoordinate),
-                              dst3.Height - options.sliceSize - 1)
+        Dim yPlaneOffset = If(ycoordinate < dst3.Height - options.sliceSize, CInt(ycoordinate), dst3.Height - options.sliceSize - 1)
         dst3.Circle(New cv.Point(0, task.sideCameraPoint.Y), task.dotSize, task.highlightColor, -1, task.lineType)
-        dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.highlightColor,
-                  options.sliceSize)
+        dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.highlightColor, options.sliceSize)
         If standaloneTest() Then
             dst2 = src
             dst2.SetTo(cv.Scalar.White, sliceMask)

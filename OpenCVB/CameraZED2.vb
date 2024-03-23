@@ -98,6 +98,7 @@ Public Class CameraZED2 : Inherits Camera
             Static imuStartTime = IMU_TimeStamp
             IMU_TimeStamp -= imuStartTime
         End SyncLock
+
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()

@@ -1,7 +1,7 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Windows.Markup
+Imports cv = OpenCvSharp
 Public Class Gravity_Basics : Inherits VB_Algorithm
-    Dim perp As New Line_Perpendicular
-    Dim xData As cv.Mat
+    Public xData As cv.Mat
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Search for the transition from positive to negative to find the gravity vector."
@@ -34,12 +34,9 @@ Public Class Gravity_Basics : Inherits VB_Algorithm
         Dim lp = New pointPair(p1, p2)
         task.gravityVec = lp.edgeToEdgeLine(dst2.Size)
 
-        perp.p1 = task.gravityVec.p1
-        perp.p2 = task.gravityVec.p2
-        perp.Run(Nothing)
-
-        lp = New pointPair(perp.r1, perp.r2)
-        task.horizonVec = lp.edgeToEdgeLine(dst2.Size)
+        strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " + Format(xData.Get(Of Single)(p1.Y, p1.X)) +
+                      vbCrLf + "lastVal = " + Format(xData.Get(Of Single)(p1.Y, p1.X - 1))
+        setTrueText(strOut, 3)
 
         If standaloneTest() Then
             dst2.SetTo(0)
@@ -72,6 +69,8 @@ Public Class Gravity_HorizonCompare : Inherits VB_Algorithm
         Dim h2 = task.horizonVec
 
         If standaloneTest() Then
+            setTrueText(strOut, 3)
+
             dst2.SetTo(0)
             dst2.Line(g1.p1, g1.p2, task.highlightColor, task.lineWidth, task.lineType)
             dst2.Line(g2.p1, g2.p2, task.highlightColor, task.lineWidth, task.lineType)
@@ -105,6 +104,7 @@ Public Class Gravity_Horizon : Inherits VB_Algorithm
         task.gravityVec = g1
 
         If standaloneTest() Then
+            setTrueText("Gravity vector:" + vbCrLf + gravity.strOut + vbCrLf + vbCrLf + "Horizon Vector: " + vbCrLf + horizon.strOut, 3)
             dst2.SetTo(0)
             dst2.Line(task.gravityVec.p1, task.gravityVec.p2, task.highlightColor, task.lineWidth, task.lineType)
             dst2.Line(task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red, task.lineWidth, task.lineType)

@@ -76,7 +76,7 @@ Public Class CameraKinect : Inherits Camera
                 IMU_AngularVelocity = imuOutput.imu_Gyro
                 IMU_Acceleration = imuOutput.imuAccel
 
-                ' make the imu data consistent with the Intel IMU...
+                ' make the imu data consistent with the other IMU's...
                 Dim tmpVal = IMU_Acceleration.Z
                 IMU_Acceleration.Z = IMU_Acceleration.X
                 IMU_Acceleration.X = -IMU_Acceleration.Y

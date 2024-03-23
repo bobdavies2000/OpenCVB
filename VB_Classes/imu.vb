@@ -3,11 +3,12 @@ Imports cv = OpenCvSharp
 Public Class IMU_Basics : Inherits VB_Algorithm
     Dim lastTimeStamp As Double
     Public alpha As Double = 0.5
+    Dim kalman As New Kalman_Basics
     Public Sub New()
         desc = "Read and display the IMU coordinates"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim optionsAlpha As Single = 0.98 ' use options_IMU to get flexible values - here we want to avoid options.
+        Dim optionsAlpha As Single = 0.98 ' use IMU_GMatrixWithOptions to get flexible values - here we want to avoid options.
         Dim gyroAngle As cv.Point3f
         If task.optionsChanged Then
             lastTimeStamp = task.IMU_TimeStamp
@@ -25,16 +26,20 @@ Public Class IMU_Basics : Inherits VB_Algorithm
         task.accRadians = New cv.Point3f(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
                                          Math.Abs(Math.Atan2(g.X, g.Y)), Math.Atan2(g.Y, g.Z))
 
-        If task.optionsChanged Then
-            task.theta = task.accRadians
-        Else
-            ' Apply the Complementary Filter:
-            '  - high-pass filter = theta * alpha: allows short-duration signals to pass while filtering steady signals (trying to cancel drift)
-            '  - low-pass filter = accel * (1 - alpha): lets the long-term changes through, filtering out short term fluctuations
-            task.theta.X = task.theta.X * optionsAlpha + task.accRadians.X * (1 - optionsAlpha)
-            task.theta.Y = task.accRadians.Y
-            task.theta.Z = task.theta.Z * optionsAlpha + task.accRadians.Z * (1 - optionsAlpha)
-        End If
+        kalman.kInput = {task.accRadians.X, task.accRadians.Y, task.accRadians.Z}
+        kalman.Run(Nothing)
+
+        task.theta = New cv.Point3f(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2))
+        'If task.optionsChanged Then
+        '    task.theta = task.accRadians
+        'Else
+        '    ' Apply the Complementary Filter:
+        '    '  - high-pass filter = theta * alpha: allows short-duration signals to pass while filtering steady signals (trying to cancel drift)
+        '    '  - low-pass filter = accel * (1 - alpha): lets the long-term changes through, filtering out short term fluctuations
+        '    task.theta.X = task.theta.X * optionsAlpha + task.accRadians.X * (1 - optionsAlpha)
+        '    task.theta.Y = task.accRadians.Y
+        '    task.theta.Z = task.theta.Z * optionsAlpha + task.accRadians.Z * (1 - optionsAlpha)
+        'End If
 
         Dim x1 = -(90 + task.accRadians.X * 57.2958)
         Dim x2 = -(90 + task.theta.X * 57.2958)
@@ -44,9 +49,9 @@ Public Class IMU_Basics : Inherits VB_Algorithm
                  Format(x1, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbCrLf +
                  "Velocity-Filtered Angles to gravity in degrees" + vbCrLf +
                  Format(x2, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.theta.Z * 57.2958, fmt1) + vbCrLf
-        strOut += "cx = " + Format(task.gMat.cx, fmt1) + " sx = " + Format(task.gMat.sx, fmt1) + vbCrLf +
-                  "cy = " + Format(task.gMat.cy, fmt1) + " sy = " + Format(task.gMat.sy, fmt1) + vbCrLf +
-                  "cz = " + Format(task.gMat.cz, fmt1) + " sz = " + Format(task.gMat.sz, fmt1)
+        strOut += "cx = " + Format(task.gMat.cx, fmt3) + " sx = " + Format(task.gMat.sx, fmt3) + vbCrLf +
+                  "cy = " + Format(task.gMat.cy, fmt3) + " sy = " + Format(task.gMat.sy, fmt3) + vbCrLf +
+                  "cz = " + Format(task.gMat.cz, fmt3) + " sz = " + Format(task.gMat.sz, fmt3)
 
         task.accRadians = task.theta
         If task.accRadians.Y > cv.Cv2.PI / 2 Then task.accRadians.Y -= cv.Cv2.PI / 2
@@ -99,7 +104,6 @@ Public Class IMU_GMatrix : Inherits VB_Algorithm
         '[0       sin(a)    cos(a) ]
         cx = Math.Cos(task.accRadians.X)
         sx = Math.Sin(task.accRadians.X)
-        Console.WriteLine("Radians X: " + Format(task.accRadians.X, fmt3) + " cx = " + Format(cx, fmt3))
 
         buildGmatrix()
 

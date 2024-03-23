@@ -1,7 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Horizon_Basics : Inherits VB_Algorithm
-    Dim perp As New Line_Perpendicular
-    Dim yData As cv.Mat
+    Public yData As cv.Mat
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Search for the transition from positive to negative to find the horizon."
@@ -31,15 +30,13 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
 
         Dim p1 = findTransition(0, yData.Width - 1, 1)
         Dim p2 = findTransition(yData.Width - 1, 0, -1)
+        If p1 = New cv.Point2f Or p2 = New cv.Point2f Then Exit Sub
         Dim lp = New pointPair(p1, p2)
         task.horizonVec = lp.edgeToEdgeLine(dst2.Size)
 
-        perp.p1 = task.horizonVec.p1
-        perp.p2 = task.horizonVec.p2
-        perp.Run(Nothing)
-
-        lp = New pointPair(perp.r1, perp.r2)
-        task.gravityVec = lp.edgeToEdgeLine(dst2.Size)
+        strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " + Format(yData.Get(Of Single)(p1.Y, p1.X)) +
+                      vbCrLf + "lastVal = " + Format(yData.Get(Of Single)(p1.Y - 1, p1.X))
+        setTrueText(strOut, 3)
 
         If standaloneTest() Then
             dst2.SetTo(0)
