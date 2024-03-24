@@ -99,7 +99,7 @@ Public Class Hist3D_RedCloud : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Dim hist3D As New Hist3D_Basics
     Public Sub New()
-        redOptions.UseColor.Checked = True
+        redOptions.UseColorOnly.Checked = True
         labels = {"", "", "Grayscale", "dst3Label"}
         desc = "Run RedCloud_Basics on the combined Hist3D color/cloud output."
     End Sub
@@ -125,7 +125,7 @@ Public Class Hist3D_RedColor : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
-        redOptions.UseColor.Checked = True
+        redOptions.UseColorOnly.Checked = True
         desc = "Use the Hist3D color classes to segment the image with RedCloud_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -220,7 +220,7 @@ Public Class Hist3D_PixelCells : Inherits VB_Algorithm
     Dim pixel As New Hist3D_Pixel
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        redOptions.UseColor.Checked = True
+        redOptions.UseColorOnly.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         desc = "After classifying each pixel, backproject each redCell using the same 3D histogram."
@@ -277,7 +277,7 @@ Public Class Hist3D_PixelDiffMask : Inherits VB_Algorithm
     Dim pixel As New Hist3D_Pixel
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        redOptions.UseColor.Checked = True
+        redOptions.UseColorOnly.Checked = True
         desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)

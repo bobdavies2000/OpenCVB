@@ -11,13 +11,13 @@ Public Class Boundary_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            Static colorRadio = findRadio("Use color input")
+            Static colorRadio = findRadio("Use color only")
             Static redCloudRadio = findRadio("Use reduced pointcloud input")
-            If redOptions.UseColor.Checked Then
+            If redOptions.UseColorOnly.Checked Then
                 Static colorC As New Color_Basics
                 colorC.Run(src)
                 dst1 = colorC.dst2
-            ElseIf redOptions.UseDepth.checked Then
+            ElseIf redOptions.UseDepth.Checked Then
                 Static prep As New RedCloud_Reduce
                 prep.Run(src)
                 dst1 = prep.dst2

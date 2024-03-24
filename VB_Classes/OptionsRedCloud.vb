@@ -74,7 +74,7 @@ Public Class OptionsRedCloud
         PCReduction = 3
         XYReduction.Checked = True
         histBinList = {task.histogramBins, task.histogramBins}
-        UseColor.Checked = True
+        UseColorOnly.Checked = True
 
         For i = 0 To colorMethods.Count - 1
             Dim method = colorMethods(i)
@@ -160,6 +160,7 @@ Public Class OptionsRedCloud
 
         SimpleReductionSlider.Enabled = Not BitwiseReduction.Checked
         BitwiseReductionSlider.Enabled = BitwiseReduction.Checked
+        RedCloudOnly.Enabled = Not UseColorOnly.Checked
     End Sub
 
 
@@ -269,7 +270,7 @@ Public Class OptionsRedCloud
     Private Sub UseDepth_CheckedChanged(sender As Object, e As EventArgs) Handles UseDepth.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
-    Private Sub UseColor_CheckedChanged(sender As Object, e As EventArgs) Handles UseColor.CheckedChanged
+    Private Sub UseColor_CheckedChanged(sender As Object, e As EventArgs) Handles UseColorOnly.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
 

@@ -159,7 +159,7 @@ Public Class Image_CellStats : Inherits VB_Algorithm
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
         If standaloneTest() Then gOptions.displayDst1.Checked = True
-        redOptions.UseColor.Checked = True
+        redOptions.UseColorOnly.Checked = True
         desc = "Display the statistics for the selected cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)

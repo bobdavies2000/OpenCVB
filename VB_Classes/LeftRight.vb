@@ -250,7 +250,7 @@ End Class
 Public Class LeftRight_RedCloudRight : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        redOptions.UseColor.Checked = True
+        redOptions.UseColorOnly.Checked = True
         desc = "Segment the right view image with RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -269,7 +269,7 @@ End Class
 Public Class LeftRight_RedCloudLeft : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        redOptions.UseColor.Checked = True
+        redOptions.UseColorOnly.Checked = True
         desc = "Segment the left view image with RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)

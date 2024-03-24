@@ -676,7 +676,7 @@ Public Class MSER_Mask_CPP : Inherits VB_Algorithm
     Dim redC As New RedCloud_Cells
     Public classCount As Integer
     Public Sub New()
-        redOptions.UseColor.Checked = True
+        redOptions.UseColorOnly.Checked = True
         findCheckBox("Use grayscale input").Checked = False
         options.RunVB()
         cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,

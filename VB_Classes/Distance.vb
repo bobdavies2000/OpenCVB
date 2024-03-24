@@ -184,7 +184,7 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
-        redOptions.UseColor.Checked = True
+        redOptions.UseColorOnly.Checked = True
         redOptions.HistBinSlider.Value = 5
         labels(1) = "3D Histogram distance for each of the cells at left"
         desc = "Identify RedCloud cells using the cell's 3D histogram distance from zero"
@@ -277,7 +277,7 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
     Dim hColor As New Hist3Dcolor_Basics
     Public d3Cells As New List(Of rcData)
     Public Sub New()
-        redOptions.UseColor.Checked = True
+        redOptions.UseColorOnly.Checked = True
         redOptions.HistBinSlider.Value = 5
         hColor.alwaysRun = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)

@@ -208,7 +208,7 @@ Public Class Cell_StableColors : Inherits VB_Algorithm
     Dim stable As New Cell_StableMax
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
-        redOptions.UseColor.Checked = True
+        redOptions.UseColorOnly.Checked = True
         desc = "Identify cells using only color and find the cells that are stable."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -512,7 +512,7 @@ Public Class Cell_DistanceDepth : Inherits VB_Algorithm
             dst2 = redC.dst2.Clone
             labels(2) = redC.labels(2)
 
-            redOptions.UseColor.Checked = True
+            redOptions.UseColorOnly.Checked = True
             colorOnly.Run(src)
             dst3 = colorOnly.dst2.Clone
             labels(3) = colorOnly.labels(2)

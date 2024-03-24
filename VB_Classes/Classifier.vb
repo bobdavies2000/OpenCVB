@@ -113,7 +113,7 @@ Public Class Classifier_BayesianTest : Inherits VB_Algorithm
     Dim redC As New RedCloud_TightNew
     Dim nabs As New Neighbors_Precise
     Public Sub New()
-        redOptions.UseColor.Checked = True
+        redOptions.UseColorOnly.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels = {"", "Mask of the neighbors to the selected cell", "RedCloud_Tight output", "Classifier_Bayesian output"}
         If standalone Then gOptions.displayDst1.Checked = True

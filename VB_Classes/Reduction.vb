@@ -37,7 +37,7 @@ Public Class Reduction_Floodfill : Inherits VB_Algorithm
     Public reduction As New Reduction_Basics
     Public redC As New RedCloud_Basics
     Public Sub New()
-        redOptions.UseColor.Checked = True
+        redOptions.UseColorOnly.Checked = True
         labels(2) = "Reduced input to floodfill"
         redOptions.SimpleReductionSlider.Value = 32
         desc = "Use the reduction output as input to floodfill to get masks of cells."

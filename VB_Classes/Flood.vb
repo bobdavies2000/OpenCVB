@@ -4,9 +4,9 @@ Public Class Flood_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim bounds As New Boundary_RemovedRects
-    Dim flood As New Flood_Split4
+    Dim redC As New RedCloud_Basics
     Public Sub New()
-        labels(3) = "Contour boundaries - input to Flood_Split4"
+        labels(3) = "Contour boundaries - input to RedCloud_Basics"
         desc = "Build the RedCloud cells with the best boundaries"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -14,71 +14,23 @@ Public Class Flood_Basics : Inherits VB_Algorithm
             bounds.Run(src)
             dst1 = bounds.dst2
             dst3 = bounds.bRects.bounds.dst2
-            dst3 = dst3 Or dst1
-        Else
-            dst3 = src
+            src = dst3 Or dst1
         End If
 
-        flood.genCells.removeContour = False
-        flood.genCells.cellLimit = bounds.bRects.bounds.rects.Count - bounds.bRects.smallRects.Count
-        flood.Run(dst3)
+        redC.genCells.removeContour = False
+        redC.genCells.cellLimit = bounds.bRects.bounds.rects.Count - bounds.bRects.smallRects.Count
+        redC.Run(src)
 
-        redCells = flood.redCells
-        cellMap = flood.cellMap
-        dst2 = flood.dst2
+        redCells = redC.redCells
+        cellMap = redC.cellMap
+        dst2 = redC.dst2
 
         setSelectedContour(redCells, cellMap)
         identifyCells(redCells)
 
-        labels(2) = flood.labels(2)
+        labels(2) = redC.labels(2)
     End Sub
 End Class
-
-
-
-
-
-
-
-
-
-Public Class Flood_Split4 : Inherits VB_Algorithm
-    Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Dim binar4 As New Binarize_Split4
-    Public genCells As New RedCloud_GenCells
-    Dim redCPP As New RedCloud_MaskNone_CPP
-    Public Sub New()
-        vbAddAdvice(traceName + ": redOptions 'Desired RedCloud Cells' determines how many regions are isolated.")
-        desc = "Floodfill each region and prepare redCells."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standalone Then
-            binar4.Run(task.color)
-            If src.Channels = 1 Then src += binar4.dst2 Else src = binar4.dst2
-        End If
-
-        redCPP.Run(src)
-
-        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
-        genCells.classCount = redCPP.classCount
-        genCells.rectData = redCPP.rectData
-        genCells.floodPointData = redCPP.floodPointData
-        genCells.sizeData = redCPP.sizeData
-        genCells.Run(redCPP.dst2)
-
-        dst2 = genCells.dst2
-        cellMap = genCells.dst3
-        redCells = genCells.redCells
-
-        Dim cellCount = Math.Min(redOptions.identifyCount, redCells.Count)
-        If task.heartBeat Then labels(2) = $"{redCells.Count} cells identified and the largest {cellCount} are numbered below."
-
-        setSelectedContour(redCells, cellMap)
-        identifyCells(redCells)
-    End Sub
-End Class
-
 
 
 

@@ -657,7 +657,7 @@ Public Class Pixel_Vector3D : Inherits VB_Algorithm
     Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
-        redOptions.UseColor.Checked = True
+        redOptions.UseColorOnly.Checked = True
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         redOptions.HistBinSlider.Value = 3
         labels = {"", "RedCloud_Basics output", "3D Histogram counts for each of the cells at left", ""}
@@ -702,7 +702,7 @@ End Class
 
 Public Class Pixel_Unique_CPP : Inherits VB_Algorithm
     Public Sub New()
-        redOptions.UseColor.Checked = True
+        redOptions.UseColorOnly.Checked = True
         cPtr = Pixels_Vector_Open()
         desc = "Create the list of pixels in a RedCloud Cell"
     End Sub

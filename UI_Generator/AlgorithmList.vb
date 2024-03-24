@@ -637,7 +637,6 @@ if algorithmName = "Flip_Basics" Then return new Flip_Basics
 if algorithmName = "Flood_Basics" Then return new Flood_Basics
 if algorithmName = "Flood_BasicsMask" Then return new Flood_BasicsMask
 if algorithmName = "Flood_ContainedCells" Then return new Flood_ContainedCells
-if algorithmName = "Flood_Split4" Then return new Flood_Split4
 if algorithmName = "Flood_Stats" Then return new Flood_Stats
 if algorithmName = "Flood_Tiers" Then return new Flood_Tiers
 if algorithmName = "Font_FlowText" Then return new Font_FlowText

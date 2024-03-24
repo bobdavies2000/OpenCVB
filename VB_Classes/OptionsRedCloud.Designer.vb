@@ -57,7 +57,7 @@ Partial Class OptionsRedCloud
         Me.RedCloudType = New System.Windows.Forms.GroupBox()
         Me.UseGuidedProjection = New System.Windows.Forms.RadioButton()
         Me.UseDepth = New System.Windows.Forms.RadioButton()
-        Me.UseColor = New System.Windows.Forms.RadioButton()
+        Me.UseColorOnly = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.LabelIdentify = New System.Windows.Forms.Label()
         Me.IdentifyCountSlider = New System.Windows.Forms.TrackBar()
@@ -340,7 +340,7 @@ Partial Class OptionsRedCloud
         Me.RedCloudOnly.Size = New System.Drawing.Size(220, 289)
         Me.RedCloudOnly.TabIndex = 7
         Me.RedCloudOnly.TabStop = False
-        Me.RedCloudOnly.Text = "Histogram Channels"
+        Me.RedCloudOnly.Text = "RedCloud Reduction"
         '
         'XYZReduction
         '
@@ -430,7 +430,7 @@ Partial Class OptionsRedCloud
         '
         Me.RedCloudType.Controls.Add(Me.UseGuidedProjection)
         Me.RedCloudType.Controls.Add(Me.UseDepth)
-        Me.RedCloudType.Controls.Add(Me.UseColor)
+        Me.RedCloudType.Controls.Add(Me.UseColorOnly)
         Me.RedCloudType.Location = New System.Drawing.Point(1020, 34)
         Me.RedCloudType.Name = "RedCloudType"
         Me.RedCloudType.Size = New System.Drawing.Size(302, 135)
@@ -460,16 +460,16 @@ Partial Class OptionsRedCloud
         Me.UseDepth.Text = "Use reduced pointcloud input"
         Me.UseDepth.UseVisualStyleBackColor = True
         '
-        'UseColor
+        'UseColorOnly
         '
-        Me.UseColor.AutoSize = True
-        Me.UseColor.Location = New System.Drawing.Point(28, 37)
-        Me.UseColor.Name = "UseColor"
-        Me.UseColor.Size = New System.Drawing.Size(145, 24)
-        Me.UseColor.TabIndex = 0
-        Me.UseColor.TabStop = True
-        Me.UseColor.Text = "Use Color Input"
-        Me.UseColor.UseVisualStyleBackColor = True
+        Me.UseColorOnly.AutoSize = True
+        Me.UseColorOnly.Location = New System.Drawing.Point(28, 37)
+        Me.UseColorOnly.Name = "UseColorOnly"
+        Me.UseColorOnly.Size = New System.Drawing.Size(136, 24)
+        Me.UseColorOnly.TabIndex = 0
+        Me.UseColorOnly.TabStop = True
+        Me.UseColorOnly.Text = "Use Color only"
+        Me.UseColorOnly.UseVisualStyleBackColor = True
         '
         'GroupBox2
         '
@@ -601,7 +601,7 @@ Partial Class OptionsRedCloud
     Friend WithEvents NoReduction As Windows.Forms.RadioButton
     Friend WithEvents RedCloudType As Windows.Forms.GroupBox
     Friend WithEvents UseDepth As Windows.Forms.RadioButton
-    Friend WithEvents UseColor As Windows.Forms.RadioButton
+    Friend WithEvents UseColorOnly As Windows.Forms.RadioButton
     Friend WithEvents UseGuidedProjection As Windows.Forms.RadioButton
     Friend WithEvents GroupBox2 As Windows.Forms.GroupBox
     Friend WithEvents LabelHistogramBins As Windows.Forms.Label
