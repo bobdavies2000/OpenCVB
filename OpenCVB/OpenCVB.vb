@@ -8,6 +8,7 @@ Imports cvext = OpenCvSharp.Extensions
 Imports System.Management
 Imports System.Runtime.InteropServices
 Imports VB_Classes
+Imports System.Buffers
 
 Module opencv_module
     ' Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
@@ -486,7 +487,7 @@ Public Class OpenCVB
             MsgBox("That algorithm was not found" + vbCrLf + vbCrLf + "The name may have changed or " + vbCrLf +
                    "The currently selected group does not contain " + item.Name + vbCrLf + "Change the group to <All> to guarantee access.")
         Else
-            jumpToAlgorithm(item.Name)
+            recentAlgorithm(item.Text)
         End If
     End Sub
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
@@ -507,15 +508,17 @@ Public Class OpenCVB
             jumpToAlgorithm(arrowList.ElementAt(arrowIndex))
         End If
     End Sub
+    Private Sub recentAlgorithm(algName As String)
+        AvailableAlgorithms.SelectedItem = algName
+    End Sub
     Private Sub setupAlgorithmHistory()
         For i = 0 To MAX_RECENT - 1
             Dim nextA = GetSetting("OpenCVB1", "algHistory" + CStr(i), "algHistory" + CStr(i), "recent algorithm " + CStr(i))
             If nextA = "" Then Exit For
             If algHistory.Contains(nextA) = False Then
                 algHistory.Add(nextA)
-                recentMenu(i) = New ToolStripMenuItem() With {.Text = nextA, .Name = nextA}
-                AddHandler recentMenu(i).Click, AddressOf algHistory_Clicked
-                MainMenu.DropDownItems.Add(recentMenu(i))
+                RecentList.DropDownItems.Add(nextA)
+                AddHandler RecentList.DropDownItems(RecentList.DropDownItems.Count - 1).Click, AddressOf algHistory_Clicked
             End If
         Next
     End Sub
@@ -539,21 +542,16 @@ Public Class OpenCVB
                 If algHistory.Contains(copyList(i)) = False Then algHistory.Add(copyList(i))
             Next
         End If
+        RecentList.DropDownItems.Clear()
         For i = 0 To algHistory.Count - 1
-            If algHistory(i) <> "" Then
-                If recentMenu(i) Is Nothing Then
-                    recentMenu(i) = New ToolStripMenuItem() With {.Text = algHistory(i), .Name = algHistory(i)}
-                    AddHandler recentMenu(i).Click, AddressOf algHistory_Clicked
-                End If
-                recentMenu(i).Text = algHistory(i)
-                recentMenu(i).Name = algHistory(i)
-                SaveSetting("OpenCVB1", "algHistory" + CStr(i), "algHistory" + CStr(i), algHistory(i))
-            End If
+            RecentList.DropDownItems.Add(algHistory(i))
+            AddHandler RecentList.DropDownItems(i).Click, AddressOf algHistory_Clicked
+            SaveSetting("OpenCVB1", "algHistory" + CStr(i), "algHistory" + CStr(i), algHistory(i))
         Next
     End Sub
     Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
         MsgBox("The objective is to solve many small computer vision problems " + vbCrLf +
-                   "and do so in a way that enables any of the solutions to be reused." + vbCrLf +
+               "and do so in a way that enables any of the solutions to be reused." + vbCrLf +
                "The result is a toolkit for solving ever bigger and more difficult" + vbCrLf +
                "problems.  The hypothesis behind this approach is that human vision" + vbCrLf +
                "is not computationally intensive but is built on many almost trivial" + vbCrLf +
@@ -925,11 +923,9 @@ Public Class OpenCVB
         Static saveKeyLeft = GroupName.Left
         If AvailableAlgorithms.Left + AvailableAlgorithms.Width + GroupName.Width > Me.Width Then
             AvailableAlgorithms.Width = (Me.Width - AvailableAlgorithms.Left) / 2
-            GroupName.Width = AvailableAlgorithms.Width - 20
             GroupName.Left = AvailableAlgorithms.Left + AvailableAlgorithms.Width + 1
         ElseIf Me.Width > AvailableAlgorithms.Left + AvailableAlgorithms.Width * 2 Then
             AvailableAlgorithms.Width = saveAAwidth
-            GroupName.Width = saveAAwidth
             GroupName.Left = saveKeyLeft
         End If
 
@@ -1615,7 +1611,6 @@ Public Class OpenCVB
     Private Sub Advice_Click(sender As Object, e As EventArgs) Handles Advice.Click
         MsgBox(textAdvice)
     End Sub
-
     Private Sub ToolStripButton5_Click(sender As Object, e As EventArgs) Handles ComplexityButton.Click
         If ComplexityTimer.Enabled = False Then
             Dim ret = MsgBox("Do you want to test the complexity of the current algorithm?" + vbCrLf +
