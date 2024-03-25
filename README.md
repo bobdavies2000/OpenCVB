@@ -3,7 +3,7 @@
 -   Over 1900 algorithms are included, averaging 31 lines of code per algorithm.
 -   Gravity and horizon vectors are now available in the image coordinates.
     -   See example below to see what it looks like.
-    -   The IMU code is now more simplified and responsive.
+    -   The IMU code is now simplified and more responsive.
 -   RedCloud_Basics and Flood_Basics are now more stable and accurate.
     -   Removing contours before flooding helped isolate cells better.
     -   RedCloud cell statistics can now be shown any time.
