@@ -1,30 +1,27 @@
-# Recent Changes – February 2024
+# Recent Changes – March 2024
 
--   Over 1800 algorithms are included, averaging 32 lines of code per algorithm.
-    -   Average went up because counting hadn’t included some of the new C++ code.
--   Motion-filtered color and cloud images are controlled through a global option.
-    -   Example below shows the improvements to the RedCloud output that result.
--   Microsoft’s Copilot can provide VB.Net to C++ translation as well.
-    -   It costs to get the Pro version with full translation support.
-    -   The free version limits the number of characters for translation.
--   Both Bard and Microsoft use EMGU when C++ is translated to VB.Net.
-    -   OpenCVB doesn’t need EMGU – and there are OpenCVSharp conflicts.
-    -   Use the OpenCVSharp equivalent instead of the EMGU API.
--   OpenCV 4.9 was available and OpenCVB has switched to using it by default.
--   OpenCVSharp 4.9 similarly is now the default for use in OpenCVB.
--   The OpenCV Samples provide an excellent resource but may be hard to run.
-    -   Too often parameters are required which make it challenging to use.
-    -   OpenCVB has started migrating the OpenCV samples to VB.Net.
-    -   As with all OpenCVB algorithms, each will work when clicked.
--   A new group name “\<All Reused and Callees\>” shows algorithms reuse.
-    -   Removes one-off experiments and cleans up the list of algorithms.
-    -   It is a further refinement of the user interface to help active development.
-    -   It also provides a useful way for beginners to find the better algorithms.
+-   Over 1900 algorithms are included, averaging 31 lines of code per algorithm.
+-   Gravity and horizon vectors are now available in the image coordinates.
+    -   See example below to see what it looks like.
+    -   The IMU code is now more simplified and responsive.
+-   RedCloud_Basics and Flood_Basics are now more stable and accurate.
+    -   Removing contours before flooding helped isolate cells better.
+    -   RedCloud cell statistics can now be shown any time.
+        -   See global option labelled ‘Display Cell stats’.
+    -   The rcData structure has been stripped of many low-use variables.
+-   Projection_Basics provides the distance to each object in the image.
+    -   Top X objects are found without thresholds – sorted by size.
+    -   See Projection_Top/Side for distance and size of objects.
+-   Flood.vb algorithms were improved and some algorithms were removed.
+-   Several methods to identify peaks and valleys in histograms were tested.
+    -   See any algorithms starting with ‘HistValley’.
+-   EdgeToEdgeLine function in pointPair structure was added.
+    -   Line is defined in terms of an edge-to-edge pair of points.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/da280b898b238ab7490bfca8fc4abbfa.gif)
+![A collage of images of a room Description automatically generated](media/36150778314078d8e16dfcde622cec21.png)
 
-**RedCloud_BasicsColor:** *The color input for RedCloud_BasicsColor and any other OpenCVB algorithm can be motion-filtered using a global option. The frame is only processed if there is scene motion. The objective is to improve the consistency of the cells produced which can be seen in the cells away from the motion – look to the right side of the image. Cells without motion are updated on a heartbeat (once a second.) There is little benefit to capturing cell perturbations when there is no motion in the color image for that cell. Motion-filtered color images often display artifacts from a previous frame but when the image data is already so variable from frame to frame, there is little downside to motion-filtering for image segmentation using depth and color. A new global option allows the motion rectangle to be displayed in the upper left image (in white.)*
+**Line_Gravity:** *The bottom right image shows all the lines detected in the image. The bottom left image shows the vertical lines in yellow and the horizontal lines in red. The vertical lines are aligned to the gravity vector and the horizontal lines are aligned with the horizon vector. The method to find the gravity vector is to locate two points where the X-values in the point cloud transition from negative to positive. Similarly, the horizon vector is defined by 2 points where the Y-values in the point cloud transition from negative to positive. Because the point cloud is aligned with the color image, the horizon and gravity vectors are defined in the image coordinate system. The camera is deliberately tilted for this example but both vectors move as the camera moves.*
 
 # Introduction
 
@@ -1264,3 +1261,31 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A collage of images of people in different colors Description automatically generated](media/9b95f50d8a35d8ee7156f9fb857f4557.jpeg)
 
 **RedCloud_BinarizeFourWay:** *The image pixels are classified into four categories based on their brightness. The grayscale image is binarized, and each half is binarized again to produce four classifications of pixels. The image in the lower right is the colorized version of the pixels after classification with the Binarize_FourWay algorithm. RedCloud is then used to identify each resulting regions and produce the image in the lower left image.*
+
+# Recent Changes – February 2024
+
+-   Over 1800 algorithms are included, averaging 32 lines of code per algorithm.
+    -   Average went up because counting hadn’t included some of the new C++ code.
+-   Motion-filtered color and cloud images are controlled through a global option.
+    -   Example below shows the improvements to the RedCloud output that result.
+-   Microsoft’s Copilot can provide VB.Net to C++ translation as well.
+    -   It costs to get the Pro version with full translation support.
+    -   The free version limits the number of characters for translation.
+-   Both Bard and Microsoft use EMGU when C++ is translated to VB.Net.
+    -   OpenCVB doesn’t need EMGU – and there are OpenCVSharp conflicts.
+    -   Use the OpenCVSharp equivalent instead of the EMGU API.
+-   OpenCV 4.9 was available and OpenCVB has switched to using it by default.
+-   OpenCVSharp 4.9 similarly is now the default for use in OpenCVB.
+-   The OpenCV Samples provide an excellent resource but may be hard to run.
+    -   Too often parameters are required which make it challenging to use.
+    -   OpenCVB has started migrating the OpenCV samples to VB.Net.
+    -   As with all OpenCVB algorithms, each will work when clicked.
+-   A new group name “\<All Reused and Callees\>” shows algorithms reuse.
+    -   Removes one-off experiments and cleans up the list of algorithms.
+    -   It is a further refinement of the user interface to help active development.
+    -   It also provides a useful way for beginners to find the better algorithms.
+-   A log of previous changes is included at the bottom of this document.
+
+![A screenshot of a computer screen Description automatically generated](media/da280b898b238ab7490bfca8fc4abbfa.gif)
+
+**RedCloud_BasicsColor:** *The color input for RedCloud_BasicsColor and any other OpenCVB algorithm can be motion-filtered using a global option. The frame is only processed if there is scene motion. The objective is to improve the consistency of the cells produced which can be seen in the cells away from the motion – look to the right side of the image. Cells without motion are updated on a heartbeat (once a second.) There is little benefit to capturing cell perturbations when there is no motion in the color image for that cell. Motion-filtered color images often display artifacts from a previous frame but when the image data is already so variable from frame to frame, there is little downside to motion-filtering for image segmentation using depth and color. A new global option allows the motion rectangle to be displayed in the upper left image (in white.)*
