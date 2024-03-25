@@ -92,7 +92,6 @@ Public Class Gravity_Horizon : Inherits VB_Algorithm
     Dim perp As New Line_Perpendicular
     Dim gravity As New Gravity_Basics
     Dim horizon As New Horizon_Basics
-    Public vectorsReady As Boolean
     Public Sub New()
         desc = "Compute the gravity vector and the horizon vector separately"
     End Sub
@@ -103,7 +102,7 @@ Public Class Gravity_Horizon : Inherits VB_Algorithm
         horizon.Run(src)
         Dim h2 = task.horizonVec
         task.gravityVec = g1
-        vectorsReady = True
+
         If standaloneTest() Then
             setTrueText("Gravity vector:" + vbCrLf + gravity.strOut + vbCrLf + vbCrLf + "Horizon Vector: " + vbCrLf + horizon.strOut, 3)
             dst2.SetTo(0)

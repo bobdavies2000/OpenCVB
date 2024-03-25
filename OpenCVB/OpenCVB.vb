@@ -1377,7 +1377,6 @@ Public Class OpenCVB
                 If saveWorkingRes <> settings.workingRes Then Exit While
 
                 If pauseAlgorithmThread Then
-                    Thread.Sleep(300)
                     task.paused = True
                     Exit While ' this is useful because the pixelviewer can be used if paused.
                 Else
@@ -1461,7 +1460,10 @@ Public Class OpenCVB
             End While
 
             ' camera has exited or resolution is changed.
-            If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or saveWorkingRes <> settings.workingRes Then Exit While
+            If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or saveWorkingRes <> settings.workingRes Or
+                saveAlgorithmName <> task.algName Then
+                Exit While
+            End If
 
             If activeMouseDown = False Then
                 SyncLock mouseLock

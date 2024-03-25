@@ -46,6 +46,7 @@ Partial Class OptionsGlobal
         Me.MaxDepth = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.DisplayCellStats = New System.Windows.Forms.CheckBox()
         Me.CrossHairs = New System.Windows.Forms.CheckBox()
         Me.ShowMotionRectangle = New System.Windows.Forms.CheckBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
@@ -79,7 +80,6 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.DisplayCellStats = New System.Windows.Forms.CheckBox()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -367,6 +367,16 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabIndex = 3
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
+        '
+        'DisplayCellStats
+        '
+        Me.DisplayCellStats.AutoSize = True
+        Me.DisplayCellStats.Location = New System.Drawing.Point(24, 317)
+        Me.DisplayCellStats.Name = "DisplayCellStats"
+        Me.DisplayCellStats.Size = New System.Drawing.Size(158, 24)
+        Me.DisplayCellStats.TabIndex = 72
+        Me.DisplayCellStats.Text = "Display Cell Stats"
+        Me.DisplayCellStats.UseVisualStyleBackColor = True
         '
         'CrossHairs
         '
@@ -704,16 +714,6 @@ Partial Class OptionsGlobal
         Me.Label8.Text = "All values are restored to their default values at the start of each algorithm.  " &
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
-        '
-        'DisplayCellStats
-        '
-        Me.DisplayCellStats.AutoSize = True
-        Me.DisplayCellStats.Location = New System.Drawing.Point(24, 317)
-        Me.DisplayCellStats.Name = "DisplayCellStats"
-        Me.DisplayCellStats.Size = New System.Drawing.Size(158, 24)
-        Me.DisplayCellStats.TabIndex = 72
-        Me.DisplayCellStats.Text = "Display Cell Stats"
-        Me.DisplayCellStats.UseVisualStyleBackColor = True
         '
         'OptionsGlobal
         '

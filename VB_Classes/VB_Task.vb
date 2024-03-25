@@ -619,9 +619,11 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            If gOptions.CrossHairs.Checked And cross.vectorsReady Then
-                task.color.Line(task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
-                task.color.Line(task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+            If gOptions.CrossHairs.Checked Then
+                If task.paused = False Then
+                    task.color.Line(task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+                    task.color.Line(task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+                End If
             End If
 
             task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
