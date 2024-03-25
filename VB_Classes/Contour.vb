@@ -118,7 +118,7 @@ Public Class Contour_GeneralWithOptions : Inherits VB_Algorithm
                 dst2 = dst2.ConvertScaleAbs(255)
             End If
         Else
-            If src.Channels = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src
         End If
 
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then dst2.ConvertTo(dst2, cv.MatType.CV_32SC1)

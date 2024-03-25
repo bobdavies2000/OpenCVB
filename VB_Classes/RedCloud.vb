@@ -2587,7 +2587,7 @@ Public Class RedCloud_Mask_CPP : Inherits VB_Algorithm
         Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
 
         imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(),
-                                src.Rows, src.Cols, src.Type, 255, 0)
+                                src.Rows, src.Cols, cv.MatType.CV_8U, 255, 0)
         handleMask.Free()
         handleInput.Free()
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
@@ -2624,7 +2624,7 @@ Public Class RedCloud_MaskNone_CPP : Inherits VB_Algorithm
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols, src.Type, 255, 0)
+        imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols, cv.MatType.CV_8U, 255, 0)
         handleInput.Free()
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
 

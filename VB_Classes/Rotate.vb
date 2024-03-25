@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
-
+Imports System.Math
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
 Public Class Rotate_Basics : Inherits VB_Algorithm
     Public M As cv.Mat
@@ -14,16 +13,14 @@ Public Class Rotate_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static angleSlider = findSlider("Rotation Angle in degrees")
-        If rotateAngle = 1000 Then
-            rotateCenter = New cv.Point2f(src.Width / 2, src.Height / 2)
-            rotateAngle = angleSlider.Value
-        End If
+        rotateCenter = New cv.Point2f(src.Width / 2, src.Height / 2)
+        rotateAngle = angleSlider.Value
         options.RunVB()
 
-        M = cv.Cv2.GetRotationMatrix2D(rotateCenter, rotateAngle, 1)
+        M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
         dst2 = src.WarpAffine(M, src.Size(), options.warpFlag)
         If options.warpFlag = cv.InterpolationFlags.WarpInverseMap Then
-            Mflip = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), -rotateAngle, 1)
+            Mflip = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), rotateAngle, 1)
         End If
     End Sub
 End Class
@@ -47,7 +44,7 @@ Public Class Rotate_BasicsQT : Inherits VB_Algorithm
             Exit Sub
         End If
 
-        Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, rotateAngle * 57.2958, 1)
+        Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle * 57.2958, 1)
         dst2 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Linear)
     End Sub
 End Class
@@ -205,5 +202,56 @@ Public Class Rotate_Example : Inherits VB_Algorithm
         dst2(r) = src.Resize(New cv.Size(src.Height, src.Height))
         rotate.Run(dst2)
         dst3(r) = rotate.dst2(New cv.Rect(0, 0, src.Height, src.Height))
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Rotate_Horizon : Inherits VB_Algorithm
+    Dim rotate As New Rotate_Basics
+    Dim edges As New Edge_CameraMotion
+    Public Sub New()
+        findSlider("Rotation Angle in degrees").Value = 3
+        labels(2) = "White is the current horizon vector of the camera.  Highlighted color is the rotated horizon vector."
+        desc = "Rotate the horizon independently from the rotation of the image to validate the Edge_CameraMotion algorithm."
+    End Sub
+    Function RotatePoint(point As cv.Point2f, center As cv.Point2f, angle As Double) As cv.Point2f
+        Dim radians As Double = angle * (PI / 180.0)
+
+        Dim sinAngle As Double = Sin(radians)
+        Dim cosAngle As Double = Cos(radians)
+
+        Dim x As Double = point.X - center.X
+        Dim y As Double = point.Y - center.Y
+
+        Dim xNew As Double = x * cosAngle - y * sinAngle
+        Dim yNew As Double = x * sinAngle + y * cosAngle
+
+        xNew += center.X
+        yNew += center.Y
+
+        Return New cv.Point2f(xNew, yNew)
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        rotate.Run(src)
+        dst2 = rotate.dst2
+
+        Dim horizonVec = New pointPair(task.horizonVec.p1, task.horizonVec.p2)
+
+        horizonVec.p1 = RotatePoint(task.horizonVec.p1, rotate.rotateCenter, -rotate.rotateAngle)
+        horizonVec.p2 = RotatePoint(task.horizonVec.p2, rotate.rotateCenter, -rotate.rotateAngle)
+
+        dst2.Line(horizonVec.p1, horizonVec.p2, task.highlightColor, task.lineWidth, task.lineType)
+        dst2.Line(task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+
+        Dim y1 = horizonVec.p1.Y - task.horizonVec.p1.Y
+        Dim y2 = horizonVec.p2.y - task.horizonVec.p2.Y
+
+        strOut = "Translation = " + Format(edges.translation) + " rotation = " + Format(edges.rotation * 57.2958, fmt1) +
+                 " center of rotation = " + edges.center.ToString()
+
     End Sub
 End Class

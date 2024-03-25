@@ -173,7 +173,7 @@ Public Class Flood_Tiers : Inherits VB_Algorithm
             dst1 = Not tiers.dst2.InRange(tier, tier)
         End If
 
-        labels(2) = tiers.labels(2)
+        labels(2) = tiers.labels(2) + " in tier " + CStr(tier) + ".  Use the global options 'DebugSlider' to select different tiers."
 
         colorC.Run(src)
 

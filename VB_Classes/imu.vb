@@ -538,6 +538,7 @@ Public Class IMU_VerticalVerify : Inherits VB_Algorithm
         desc = "Use the Y-Arc to confirm which vertical lines are valid"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+
         dst2 = src.Clone
 
         If standaloneTest() Then

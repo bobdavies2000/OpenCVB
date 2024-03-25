@@ -1239,7 +1239,7 @@ End Class
 
 Public Class Line_Nearest : Inherits VB_Algorithm
     Public pt As cv.Point2f ' How close is this point to the input line?
-    Public lp As pointPair ' the input line.
+    Public lp As New pointPair ' the input line.
     Public nearPoint As cv.Point2f
     Public onTheLine As Boolean
     Public distance As Single

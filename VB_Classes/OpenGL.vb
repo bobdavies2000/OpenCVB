@@ -1814,6 +1814,11 @@ Public Class OpenGL_RedCloudCell : Inherits VB_Algorithm
         specZ.Run(src)
         setTrueText(specZ.strOut, 3)
 
+        If task.clickPoint = New cv.Point And specZ.options.redC.redCells.Count > 1 Then
+            task.rc = specZ.options.redC.redCells(1) ' pick the largest cell
+            task.clickPoint = task.rc.maxDist
+        End If
+
         breakdown.Run(src)
 
         task.ogl.pointCloudInput.SetTo(0)

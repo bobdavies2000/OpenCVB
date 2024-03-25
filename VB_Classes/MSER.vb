@@ -331,7 +331,8 @@ Public Class MSER_Hulls : Inherits VB_Algorithm
             vbDrawContour(dst3(rc.rect), rc.hull, rc.color, -1)
         Next
 
-        If task.heartBeat Then labels(2) = CStr(mBase.mserCells.Count) + " Regions with average size " + CStr(CInt(pixels / mBase.mserCells.Count))
+        If task.heartBeat Then labels(2) = CStr(mBase.mserCells.Count) + " Regions with average size " + If(mBase.mserCells.Count > 0,
+                                          CStr(CInt(pixels / mBase.mserCells.Count)), "0")
     End Sub
 End Class
 
