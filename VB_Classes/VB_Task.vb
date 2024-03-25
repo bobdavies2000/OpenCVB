@@ -619,7 +619,7 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            If gOptions.CrossHairs.Checked And task.frameCount > 100 Then
+            If gOptions.CrossHairs.Checked And cross.vectorsReady Then
                 task.color.Line(task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
                 task.color.Line(task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
             End If
