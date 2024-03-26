@@ -2578,7 +2578,7 @@ Public Class RedCloud_Mask_CPP : Inherits VB_Algorithm
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        Dim maskData(dst2.Total - 1) As Byte
+        Dim maskData(src.Total - 1) As Byte
         If inputMask Is Nothing Then
             Marshal.Copy(task.maxDepthMask.Data, maskData, 0, maskData.Length)
         Else

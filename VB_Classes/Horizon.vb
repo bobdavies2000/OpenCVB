@@ -66,13 +66,12 @@ Public Class Horizon_FindNonZero : Inherits VB_Algorithm
         Dim xRatio = dst0.Width / task.quarterRes.Width
         Dim yRatio = dst0.Height / task.quarterRes.Height
 
-        Dim pc = task.pointCloud.Clone
+        Dim pc = task.pointCloud.Resize(task.quarterRes)
         Dim split = pc.Split()
         split(2).SetTo(task.maxZmeters)
         cv.Cv2.Merge(split, pc)
 
         pc = (pc.Reshape(1, pc.Rows * pc.Cols) * task.gMatrix).ToMat.Reshape(3, pc.Rows)
-        pc = pc.Resize(task.quarterRes, cv.InterpolationFlags.Nearest)
 
         dst1 = split(1).InRange(-0.05, 0.05)
         Dim noDepth = task.noDepthMask.Resize(task.quarterRes)

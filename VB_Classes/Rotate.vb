@@ -1,5 +1,8 @@
 Imports cv = OpenCvSharp
 Imports System.Math
+Imports System.Transactions
+Imports System.Windows
+Imports System.Windows.Media.Imaging
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
 Public Class Rotate_Basics : Inherits VB_Algorithm
     Public M As cv.Mat
@@ -8,19 +11,19 @@ Public Class Rotate_Basics : Inherits VB_Algorithm
     Public rotateAngle As Single = 1000
     Public rotateCenter As cv.Point
     Public Sub New()
+        rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Rotation Angle in degrees", -180, 180, 24)
         desc = "Rotate a rectangle by a specified angle"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static angleSlider = findSlider("Rotation Angle in degrees")
-        rotateCenter = New cv.Point2f(src.Width / 2, src.Height / 2)
         rotateAngle = angleSlider.Value
         options.RunVB()
 
         M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
         dst2 = src.WarpAffine(M, src.Size(), options.warpFlag)
         If options.warpFlag = cv.InterpolationFlags.WarpInverseMap Then
-            Mflip = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), rotateAngle, 1)
+            Mflip = cv.Cv2.GetRotationMatrix2D(rotateCenter, rotateAngle, 1)
         End If
     End Sub
 End Class
@@ -33,19 +36,15 @@ End Class
 
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
 Public Class Rotate_BasicsQT : Inherits VB_Algorithm
-    Public rotateAngle As Single = 1000
+    Public rotateAngle As Single = 24
     Public rotateCenter As cv.Point2f
     Public Sub New()
+        rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
         desc = "Rotate a rectangle by a specified angle"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        If standaloneTest() Then
-            setTrueText(traceName + " has no output when run standaloneTest()")
-            Exit Sub
-        End If
-
-        Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle * 57.2958, 1)
-        dst2 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Linear)
+    Public Sub RunVB(src As cv.Mat)
+        Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
+        dst2 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Nearest)
     End Sub
 End Class
 
@@ -62,7 +61,7 @@ Public Class Rotate_Box : Inherits VB_Algorithm
         labels(3) = "Same Rectangle in the new warped perspective"
         desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         rotation.Run(src)
         dst3 = dst2.Clone()
 
@@ -144,7 +143,7 @@ Public Class Rotate_PolyQT : Inherits VB_Algorithm
         labels = {"", "", "Polygon before rotation", ""}
         desc = "Rotate a triangle around a center of rotation"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If task.heartBeat Then
             dst2.SetTo(0)
             dst3.SetTo(0)
@@ -212,7 +211,7 @@ End Class
 
 Public Class Rotate_Horizon : Inherits VB_Algorithm
     Dim rotate As New Rotate_Basics
-    Dim edges As New Edge_CameraMotion
+    Dim edges As New CameraMotion_Basics
     Public Sub New()
         findSlider("Rotation Angle in degrees").Value = 3
         labels(2) = "White is the current horizon vector of the camera.  Highlighted color is the rotated horizon vector."
@@ -236,8 +235,12 @@ Public Class Rotate_Horizon : Inherits VB_Algorithm
         Return New cv.Point2f(xNew, yNew)
     End Function
     Public Sub RunVB(src As cv.Mat)
+        Static angleSlider = findSlider("Rotation Angle in degrees")
+        rotate.rotateAngle = angleSlider.Value
+
         rotate.Run(src)
-        dst2 = rotate.dst2
+        dst2 = rotate.dst2.Clone
+        dst1 = dst2.Clone
 
         Dim horizonVec = New pointPair(task.horizonVec.p1, task.horizonVec.p2)
 
@@ -248,10 +251,14 @@ Public Class Rotate_Horizon : Inherits VB_Algorithm
         dst2.Line(task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
 
         Dim y1 = horizonVec.p1.Y - task.horizonVec.p1.Y
-        Dim y2 = horizonVec.p2.y - task.horizonVec.p2.Y
+        Dim y2 = horizonVec.p2.Y - task.horizonVec.p2.Y
+        edges.translateRotateY(y1, y2)
 
-        strOut = "Translation = " + Format(edges.translation) + " rotation = " + Format(edges.rotation * 57.2958, fmt1) +
-                 " center of rotation = " + edges.center.ToString()
+        rotate.rotateAngle = edges.rotationY
+        rotate.rotateCenter = edges.centerY
+        rotate.Run(dst1)
+        dst3 = rotate.dst2.Clone
 
+        strOut = edges.strOut
     End Sub
 End Class
