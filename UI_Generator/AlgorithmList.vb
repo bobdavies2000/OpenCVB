@@ -196,6 +196,7 @@ if algorithmName = "Boundary_RemovedRects" Then return new Boundary_RemovedRects
 if algorithmName = "Boundary_Tiers" Then return new Boundary_Tiers
 if algorithmName = "BRISK_Basics" Then return new BRISK_Basics
 if algorithmName = "CameraMotion_Basics" Then return new CameraMotion_Basics
+if algorithmName = "CameraMotion_SceneMotion" Then return new CameraMotion_SceneMotion
 if algorithmName = "CamShift_Basics" Then return new CamShift_Basics
 if algorithmName = "CamShift_RedHue" Then return new CamShift_RedHue
 if algorithmName = "Cartoonify_Basics" Then return new Cartoonify_Basics

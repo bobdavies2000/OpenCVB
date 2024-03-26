@@ -55,14 +55,14 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
         Dim y1 = horizonVec.p1.Y - task.horizonVec.p1.Y
         Dim y2 = horizonVec.p2.Y - task.horizonVec.p2.Y
 
-        If Math.Abs(x1 - x2) > 0 Then translateRotateX(x1, x2)
-        If Math.Abs(y1 - y2) > 0 Then translateRotateY(y1, y2)
+        translateRotateX(x1, x2)
+        translateRotateY(y1, y2)
 
-        Dim r1 = New cv.Rect(translationX, translationY, dst2.Width - translationX, dst2.Height - translationY)
-        Dim r2 = New cv.Rect(0, 0, r1.Width, r1.Height)
         dst1.SetTo(0)
         dst3.SetTo(0)
         If Math.Abs(x1 - x2) > 0.5 Or Math.Abs(y1 - y2) > 0.5 Then
+            Dim r1 = New cv.Rect(translationX, translationY, dst2.Width - translationX, dst2.Height - translationY)
+            Dim r2 = New cv.Rect(0, 0, r1.Width, r1.Height)
             dst1(r2) = src(r1)
             rotate.rotateAngle = rotationY
             rotate.rotateCenter = centerY
@@ -76,9 +76,36 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
         gravityVec = task.gravityVec
         horizonVec = task.horizonVec
 
-        labels(2) = "Translation X = " + Format(translationX) + " rotation X = " + Format(rotationX * 57.2958, fmt1) + " degrees " +
-                    " center of rotation X = " + Format(centerX.X, fmt0) + "," + Format(centerX.Y, fmt0)
-        labels(3) = "Translation Y = " + Format(translationY, fmt1) + " rotation Y = " + Format(rotationY * 57.2958, fmt1) + " degrees " +
-                    " center of rotation Y = " + Format(centerY.X, fmt0) + "," + Format(centerY.Y, fmt0)
+        labels(2) = "Translation X = " + Format(translationX) + " rotation X = " + Format(rotationX, fmt1) + " degrees " +
+                    " center of rotation X = " + Format(centerX.X, fmt0) + ", " + Format(centerX.Y, fmt0)
+        labels(3) = "Translation Y = " + Format(translationY, fmt1) + " rotation Y = " + Format(rotationY, fmt1) + " degrees " +
+                    " center of rotation Y = " + Format(centerY.X, fmt0) + ", " + Format(centerY.Y, fmt0)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class CameraMotion_SceneMotion : Inherits VB_Algorithm
+    Dim cMotion As New CameraMotion_Basics
+    Dim edges As New Edge_Sobel
+    Public Sub New()
+        labels = {"", "Camera motion", "Edges from Sobel", "Camera motion subtracted from Sobel edges"}
+        desc = "Remove camera motion to isolate scene motion."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        edges.Run(src)
+        dst2 = edges.dst2
+
+        cMotion.Run(src)
+        dst1 = cMotion.dst3
+
+        dst3 = dst2.Clone
+        dst3.SetTo(0, dst1)
     End Sub
 End Class

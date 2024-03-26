@@ -13,7 +13,8 @@ Public Class Gravity_Basics : Inherits VB_Algorithm
                 lastVal = val
                 val = xData.Get(Of Single)(y, x)
                 If val > 0 And lastVal < 0 Then
-                    Dim pt = New cv.Point2f(x, y)
+                    ' insert sub-pixel accuracy here.
+                    Dim pt = New cv.Point2f(x + Math.Abs(val) / Math.Abs(val - lastVal), y)
                     Return pt
                 End If
             Next
@@ -34,8 +35,10 @@ Public Class Gravity_Basics : Inherits VB_Algorithm
         Dim lp = New pointPair(p1, p2)
         task.gravityVec = lp.edgeToEdgeLine(dst2.Size)
 
-        strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " + Format(xData.Get(Of Single)(p1.Y, p1.X)) +
-                      vbCrLf + "lastVal = " + Format(xData.Get(Of Single)(p1.Y, p1.X - 1))
+        If p1.X > 0 Then
+            strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +
+                      Format(xData.Get(Of Single)(p1.Y, p1.X)) + vbCrLf + "lastVal = " + Format(xData.Get(Of Single)(p1.Y, p1.X - 1))
+        End If
         setTrueText(strOut, 3)
 
         If standaloneTest() Then
