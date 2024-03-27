@@ -211,7 +211,7 @@ End Class
 
 Public Class Rotate_Horizon : Inherits VB_Algorithm
     Dim rotate As New Rotate_Basics
-    Dim edges As New CameraMotion_Basics
+    Dim edges As New CameraMotion_WithRotation
     Public Sub New()
         findSlider("Rotation Angle in degrees").Value = 3
         labels(2) = "White is the current horizon vector of the camera.  Highlighted color is the rotated horizon vector."
