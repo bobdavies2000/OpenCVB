@@ -27,7 +27,6 @@ Public Class Motion_Simple : Inherits VB_Algorithm
     Public diff As New Diff_Basics
     Public cumulativePixels As Integer
     Public options As New Options_Motion
-    Dim saveFrameCount As Integer
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Accumulated changed pixels from the last heartbeat"
@@ -48,7 +47,6 @@ Public Class Motion_Simple : Inherits VB_Algorithm
             If task.motionRect.Width = dst2.Width Or task.heartBeat Then
                 dst2.CopyTo(dst3)
                 cumulativePixels = 0
-                saveFrameCount = task.frameCount
             Else
                 dst3.SetTo(255, dst2)
             End If

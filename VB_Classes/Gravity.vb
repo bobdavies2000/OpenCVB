@@ -13,8 +13,9 @@ Public Class Gravity_Basics : Inherits VB_Algorithm
                 lastVal = val
                 val = xData.Get(Of Single)(y, x)
                 If val > 0 And lastVal < 0 Then
-                    ' insert sub-pixel accuracy here.
+                    ' insert sub-pixel accuracy here but we might want to avoid it.
                     Dim pt = New cv.Point2f(x + Math.Abs(val) / Math.Abs(val - lastVal), y)
+                    'Dim pt = New cv.Point2f(CInt(x + Math.Abs(val) / Math.Abs(val - lastVal)), y)
                     Return pt
                 End If
             Next

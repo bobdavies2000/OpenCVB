@@ -93,19 +93,17 @@ End Class
 
 Public Class CameraMotion_SceneMotion : Inherits VB_Algorithm
     Dim cMotion As New CameraMotion_Basics
-    Dim edges As New Edge_Sobel
+    Dim motion As New Motion_Basics
     Public Sub New()
-        labels = {"", "Camera motion", "Edges from Sobel", "Camera motion subtracted from Sobel edges"}
+        labels(2) = "Image after adjusting for camera motion."
         desc = "Remove camera motion to isolate scene motion."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        edges.Run(src)
-        dst2 = edges.dst2
-
         cMotion.Run(src)
-        dst1 = cMotion.dst3
+        dst2 = cMotion.dst2
 
-        dst3 = dst2.Clone
-        dst3.SetTo(0, dst1)
+        motion.Run(dst2.Clone)
+        dst3 = motion.dst2
+        dst3.SetTo(0, cMotion.dst3)
     End Sub
 End Class
