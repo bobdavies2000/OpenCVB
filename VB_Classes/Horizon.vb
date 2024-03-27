@@ -5,7 +5,7 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Search for the transition from positive to negative to find the horizon."
     End Sub
-    Private Function findTransition(startCol As Integer, stopCol As Integer, stepCol As Integer) As cv.Point
+    Private Function findTransition(startCol As Integer, stopCol As Integer, stepCol As Integer) As cv.Point2f
         Dim val As Single, lastVal As Single
         For x = startCol To stopCol Step stepCol
             For y = 0 To yData.Rows - 1

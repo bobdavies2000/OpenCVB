@@ -57,7 +57,6 @@ Public Class OptionsGlobal
 
         task.dotSize = 1
         task.cvFontThickness = 1
-        task.IMU_AlphaFilter = 0.9 ' most working res configurations will use this.
         Select Case task.workingRes.Width
             Case 1920
                 GridSize.Value = 192
@@ -69,7 +68,6 @@ Public Class OptionsGlobal
                 task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 40
                 task.FASTthreshold = 25
-                task.IMU_AlphaFilter = 0.7
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
             Case 960
                 GridSize.Value = 96
@@ -99,7 +97,6 @@ Public Class OptionsGlobal
                 task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 150
                 task.FASTthreshold = 20
-                task.IMU_AlphaFilter = 0.8
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
             Case 640
                 GridSize.Value = 64
@@ -136,7 +133,6 @@ Public Class OptionsGlobal
                 task.quarterRes = New cv.Size(336, 188)
                 task.densityMetric = 300
                 task.FASTthreshold = 10
-                task.IMU_AlphaFilter = 0.8
             Case 336
                 GridSize.Value = 32
                 task.cvFontSize = 1.0
@@ -243,6 +239,10 @@ Public Class OptionsGlobal
     End Sub
     Private Sub FrameHistory_ValueChanged(sender As Object, e As EventArgs) Handles FrameHistory.ValueChanged
         fHist.Text = CStr(FrameHistory.Value)
+        If task IsNot Nothing Then task.optionsChanged = True
+    End Sub
+    Private Sub IMU_Alpha_ValueChanged(sender As Object, e As EventArgs) Handles IMU_Alpha.ValueChanged
+        IMU_Label.Text = CStr(IMU_Alpha.Value)
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
     Private Sub Palettes_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles Palettes.SelectedIndexChanged

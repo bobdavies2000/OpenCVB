@@ -78,7 +78,7 @@ Public Class VBtask : Implements IDisposable
     Public IMU_Translation As cv.Point3f
     Public IMU_AngularAcceleration As cv.Point3f
     Public IMU_FrameTime As Double
-    Public IMU_AlphaFilter As Single = 0.9 ' high pass and low pass filter of the IMU acceleration data.
+    Public IMU_AlphaFilter As Single ' high pass and low pass filter of the IMU acceleration data.
 
     Public accRadians As cv.Point3f  ' rotation angles around x/y/z-axis to align with gravity
     Public theta As cv.Point3f ' velocity-filtered angles around x/y/z-axis to align with gravity
@@ -464,6 +464,7 @@ Public Class VBtask : Implements IDisposable
             ' run any universal algorithms here
             task.IMU_RawAcceleration = task.IMU_Acceleration
             task.IMU_RawAngularVelocity = task.IMU_AngularVelocity
+            task.IMU_AlphaFilter = gOptions.IMU_Alpha.Value / 100
             grid.RunVB(task.color)
 
             If task.algName.StartsWith("CPP_") = False Then

@@ -6,7 +6,7 @@ Public Class Gravity_Basics : Inherits VB_Algorithm
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Search for the transition from positive to negative to find the gravity vector."
     End Sub
-    Private Function findTransition(startRow As Integer, stopRow As Integer, stepRow As Integer) As cv.Point
+    Private Function findTransition(startRow As Integer, stopRow As Integer, stepRow As Integer) As cv.Point2f
         Dim val As Single, lastVal As Single
         For y = startRow To stopRow Step stepRow
             For x = 0 To xData.Cols - 1
@@ -97,6 +97,7 @@ Public Class Gravity_Horizon : Inherits VB_Algorithm
     Dim gravity As New Gravity_Basics
     Dim horizon As New Horizon_Basics
     Public Sub New()
+        labels(2) = "Gravity vector Integer yellow and Horizon vector in red."
         desc = "Compute the gravity vector and the horizon vector separately"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -108,7 +109,7 @@ Public Class Gravity_Horizon : Inherits VB_Algorithm
         task.gravityVec = g1
 
         If standaloneTest() Then
-            setTrueText("Gravity vector:" + vbCrLf + gravity.strOut + vbCrLf + vbCrLf + "Horizon Vector: " + vbCrLf + horizon.strOut, 3)
+            setTrueText("Gravity vector (yellow):" + vbCrLf + gravity.strOut + vbCrLf + vbCrLf + "Horizon Vector (red): " + vbCrLf + horizon.strOut, 3)
             dst2.SetTo(0)
             dst2.Line(task.gravityVec.p1, task.gravityVec.p2, task.highlightColor, task.lineWidth, task.lineType)
             dst2.Line(task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
