@@ -31,11 +31,10 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
 
         Dim p1 = findTransition(0, yData.Width - 1, 1)
         Dim p2 = findTransition(yData.Width - 1, 0, -1)
-        If p1 = New cv.Point2f Or p2 = New cv.Point2f Then Exit Sub
         Dim lp = New pointPair(p1, p2)
         task.horizonVec = lp.edgeToEdgeLine(dst2.Size)
 
-        If p1.Y > 0 Then
+        If p1.Y >= 1 Then
             strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +
                       Format(yData.Get(Of Single)(p1.Y, p1.X)) + vbCrLf + "lastVal = " + Format(yData.Get(Of Single)(p1.Y - 1, p1.X))
         End If

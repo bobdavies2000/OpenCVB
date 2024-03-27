@@ -35,7 +35,7 @@ Public Class Gravity_Basics : Inherits VB_Algorithm
         Dim lp = New pointPair(p1, p2)
         task.gravityVec = lp.edgeToEdgeLine(dst2.Size)
 
-        If p1.X > 0 Then
+        If p1.X >= 1 Then
             strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +
                       Format(xData.Get(Of Single)(p1.Y, p1.X)) + vbCrLf + "lastVal = " + Format(xData.Get(Of Single)(p1.Y, p1.X - 1))
         End If

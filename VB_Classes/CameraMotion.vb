@@ -19,9 +19,7 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
         Dim y1 = horizonVec.p1.Y - task.horizonVec.p1.Y
         Dim y2 = horizonVec.p2.Y - task.horizonVec.p2.Y
 
-        If y1 > 0 And y2 > 0 Then Dim k = 0
-
-        translationX = Math.Round(Math.Max((x1 + x2) / 2, 0))
+        translationX = Math.Round(Math.Max(Math.Abs(x1) + Math.Abs(x2) / 2, 0))
         translationY = Math.Round(Math.Max((y1 + y2) / 2, 0))
 
         dst3.SetTo(0)
@@ -31,8 +29,7 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
             dst2.SetTo(0)
             Dim r1 = New cv.Rect(translationX, translationY, Math.Min(dst2.Width - translationX, dst2.Width),
                                                              Math.Min(dst2.Height - translationY, dst2.Height))
-            Dim r2 = New cv.Rect(0, 0, r1.Width, r1.Height)
-            Console.WriteLine("translation x = " + CStr(translationX) + " translation y = " + CStr(translationY))
+            Dim r2 = New cv.Rect(Math.Max(-translationX, 0), Math.Max(-translationY, 0), r1.Width, r1.Height)
             src(r1).CopyTo(dst2(r2))
             dst3 = (src - dst2).ToMat.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
         End If
@@ -40,7 +37,8 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
         gravityVec = task.gravityVec
         horizonVec = task.horizonVec
 
-        labels(2) = "Translation (X, Y) = (" + CStr(translationX) + ", " + CStr(translationY) + ")"
+        labels(2) = "Translation (X, Y) = (" + CStr(translationX) + ", " + CStr(translationY) + ")" +
+                    If(horizonVec.p1.Y = 0 And horizonVec.p2.Y = 0, " there is no horizon present", "")
     End Sub
 End Class
 
