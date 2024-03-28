@@ -809,7 +809,7 @@ Public Class FPoly_Perpendiculars : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            setTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use FPoly_")
+            setTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().")
             Exit Sub
         End If
 

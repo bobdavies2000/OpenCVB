@@ -646,6 +646,7 @@ Public Class Line_DisplayInfo : Inherits VB_Algorithm
                 tcells.Add(tc)
             Next
         End If
+        If tcells.Count < 2 Then Exit Sub
 
         Static myCurrentFrame As Integer = -1
         If myCurrentFrame < task.frameCount Then

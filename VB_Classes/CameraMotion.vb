@@ -23,6 +23,7 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
         translationY = Math.Round(Math.Max((y1 + y2) / 2, 0))
 
         dst3.SetTo(0)
+        Static lastImage As cv.Mat = src.Clone
         If translationX = 0 And translationY = 0 Then
             dst2 = src
         Else
@@ -31,9 +32,12 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
                                                              Math.Min(dst2.Height - translationY, dst2.Height))
             Dim r2 = New cv.Rect(Math.Max(-translationX, 0), Math.Max(-translationY, 0), r1.Width, r1.Height)
             src(r1).CopyTo(dst2(r2))
-            dst3 = (src - dst2).ToMat.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
+            dst3 = (lastImage - dst2).ToMat.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
+            'dst3 = (src - dst2).ToMat.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
+            Console.WriteLine("Translation X, Y = (" + CStr(translationX) + ", " + CStr(translationY) + ")")
         End If
 
+        lastImage = dst2.Clone
         gravityVec = task.gravityVec
         horizonVec = task.horizonVec
 
@@ -57,6 +61,8 @@ Public Class CameraMotion_WithRotation : Inherits VB_Algorithm
     Public centerY As cv.Point2f
     Public rotate As New Rotate_BasicsQT
     Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Merge with previous image using rotation AND translation of the camera motion - not as good as translation alone."
     End Sub
     Public Sub translateRotateX(x1 As Integer, x2 As Integer)
@@ -135,7 +141,7 @@ End Class
 
 
 
-Public Class CameraMotion_SceneMotion : Inherits VB_Algorithm
+Public Class CameraMotion_SceneMotion1 : Inherits VB_Algorithm
     Dim cMotion As New CameraMotion_Basics
     Dim motion As New Motion_Basics
     Public Sub New()
@@ -144,10 +150,31 @@ Public Class CameraMotion_SceneMotion : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         cMotion.Run(src)
-        dst2 = cMotion.dst2
+        dst2 = cMotion.dst3
 
         motion.Run(dst2.Clone)
         dst3 = motion.dst2
         dst3.SetTo(0, cMotion.dst3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class CameraMotion_FeatureTracker : Inherits VB_Algorithm
+    Dim cMotion As New CameraMotion_Basics
+    Dim feat As New Feature_Basics
+    Public Sub New()
+        desc = "Confirm any changes from CameraMotion_Basics using imagefeatures."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        cMotion.Run(src)
+        dst2 = cMotion.dst2
+
+        feat.Run(src)
+        dst3 = feat.dst2
+        labels(2) = "Translation (X, Y) = (" + CStr(cMotion.translationX) + ", " + CStr(cMotion.translationY) + ")"
     End Sub
 End Class

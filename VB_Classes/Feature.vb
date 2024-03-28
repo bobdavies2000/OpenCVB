@@ -100,7 +100,7 @@ Public Class Feature_ShiTomasi : Inherits VB_Algorithm
             dst2.SetTo(cv.Scalar.White, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
             shiTomasi.Run(task.rightView)
-            dst3.SetTo(cv.Scalar.White, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            dst3.SetTo(task.highlightColor, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         Else
             harris.Run(task.leftView)
             dst2 = harris.dst2.Clone
@@ -1430,7 +1430,7 @@ Public Class Feature_Points : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         feat.Run(src)
         dst2 = feat.dst2
-        dst3.SetTo(0)
+        If task.heartBeat Then dst3.SetTo(0)
 
         For Each pt In feat.featurePoints
             dst2.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
