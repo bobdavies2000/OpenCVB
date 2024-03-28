@@ -256,33 +256,6 @@ End Class
 
 
 
-Public Class Feature_PointsKNN : Inherits VB_Algorithm
-    Public feat As New Feature_Basics
-    Public knn As New KNN_Basics
-    Public Sub New()
-        findSlider("Distance").Value = 30
-        labels(2) = "Track Good features 1:1 using KNN_One_to_One"
-        desc = "Find good features and track them from one image to the next using KNN 1:1 correspondence."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        feat.Run(src)
-        dst2 = feat.dst2
-
-        knn.queries.Clear()
-        For Each pt In feat.featurePoints
-            knn.queries.Add(pt)
-        Next
-
-        knn.Run(src)
-        dst2 = src
-        dst2 += knn.dst2
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class Feature_PointsDelaunay : Inherits VB_Algorithm
@@ -1301,63 +1274,6 @@ End Class
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-Public Class Feature_TraceKNN : Inherits VB_Algorithm
-    Dim knn As New KNN_Core
-    Dim feat As New Feature_Basics
-    Public mpList As New List(Of pointPair)
-    Public Sub New()
-        findSlider("Feature Sample Size").Value = 200
-        findSlider("Distance threshold (pixels)").Value = 20
-        desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        feat.Run(src)
-
-        Static cornerHistory As New List(Of List(Of cv.Point2f))
-        If task.optionsChanged Then cornerHistory.Clear()
-
-        Dim histCount = task.frameHistoryCount
-        cornerHistory.Add(New List(Of cv.Point2f)(feat.featurePoints))
-
-        Dim lastIndex = cornerHistory.Count - 1
-        knn.trainInput = New List(Of cv.Point2f)(cornerHistory.ElementAt(0))
-        knn.queries = New List(Of cv.Point2f)(cornerHistory.ElementAt(lastIndex))
-        knn.Run(empty)
-
-        dst2.SetTo(0)
-        mpList.Clear()
-        Dim distanceThreshold = feat.options.distanceThreshold
-        For i = 0 To knn.neighbors.Count - 1
-            Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
-            Dim pt = knn.trainInput(trainIndex)
-            Dim qPt = knn.queries(i)
-            If pt.DistanceTo(qPt) > distanceThreshold Then Continue For
-            dst2.Line(pt, qPt, cv.Scalar.White, task.lineWidth, task.lineType)
-            mpList.Add(New pointPair(pt, qPt))
-        Next
-        strOut = CStr(mpList.Count) + " points were matched from the first to the " + CStr(lastIndex) + "th  (last) set of corners."
-        setTrueText(strOut, 3)
-        If cornerHistory.Count >= histCount Then cornerHistory.RemoveAt(0)
-    End Sub
-End Class
-
-
-
-
-
-
-
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_History : Inherits VB_Algorithm
     Public corners As New List(Of cv.Point2f)
@@ -1750,5 +1666,79 @@ Public Class Feature_Stable : Inherits VB_Algorithm
         If task.heartBeat Then
             labels(2) = CStr(features.Count) + " features found with up to " + CStr(gens(0)) + " generations."
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_KNNSimple : Inherits VB_Algorithm
+    Public feat As New Feature_Basics
+    Public knn As New KNN_Basics
+    Public Sub New()
+        findSlider("Distance").Value = 30
+        labels(2) = "Track Good features using KNN"
+        desc = "Find good features and track them from one image to the next using KNN."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+        dst3 = feat.dst2
+
+        knn.queries.Clear()
+        For Each pt In feat.featurePoints
+            knn.queries.Add(pt)
+        Next
+
+        knn.Run(src)
+        dst2 = src
+        dst2 += knn.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Feature_KNN : Inherits VB_Algorithm
+    Dim knn As New KNN_Core
+    Dim feat As New Feature_Basics
+    Public mpList As New List(Of pointPair)
+    Public Sub New()
+        findSlider("Feature Sample Size").Value = 200
+        findSlider("Distance threshold (pixels)").Value = 20
+        desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+        dst3 = feat.dst2
+
+        Static cornerHistory As New List(Of List(Of cv.Point2f))
+        If task.optionsChanged Then cornerHistory.Clear()
+
+        Dim histCount = task.frameHistoryCount
+        cornerHistory.Add(New List(Of cv.Point2f)(feat.featurePoints))
+
+        Dim lastIndex = cornerHistory.Count - 1
+        knn.trainInput = New List(Of cv.Point2f)(cornerHistory.ElementAt(0))
+        knn.queries = New List(Of cv.Point2f)(cornerHistory.ElementAt(lastIndex))
+        knn.Run(empty)
+
+        dst2.SetTo(0)
+        mpList.Clear()
+        Dim distanceThreshold = feat.options.distanceThreshold
+        For i = 0 To knn.neighbors.Count - 1
+            Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
+            Dim pt = knn.trainInput(trainIndex)
+            Dim qPt = knn.queries(i)
+            If pt.DistanceTo(qPt) > distanceThreshold Then Continue For
+            dst2.Line(pt, qPt, cv.Scalar.White, task.lineWidth, task.lineType)
+            mpList.Add(New pointPair(pt, qPt))
+        Next
+        labels(3) = CStr(mpList.Count) + " points were matched from the first to the previous set of features."
+        If cornerHistory.Count >= histCount Then cornerHistory.RemoveAt(0)
     End Sub
 End Class

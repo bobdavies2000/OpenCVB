@@ -7,6 +7,8 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
     End Sub
     Private Function findTransition(startCol As Integer, stopCol As Integer, stepCol As Integer) As cv.Point2f
         Dim val As Single, lastVal As Single
+        Dim ptX As New List(Of Single)
+        Dim ptY As New List(Of Single)
         For x = startCol To stopCol Step stepCol
             For y = 0 To yData.Rows - 1
                 lastVal = val
@@ -14,7 +16,9 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
                 If val > 0 And lastVal < 0 Then
                     ' sub-pixel accuracy change here 
                     Dim pt = New cv.Point2f(x, y + Math.Abs(val) / Math.Abs(val - lastVal))
-                    Return pt
+                    ptX.Add(pt.X)
+                    ptY.Add(pt.Y)
+                    If ptX.Count >= gOptions.FrameHistory.Value Then Return New cv.Point2f(ptX.Average, ptY.Average)
                 End If
             Next
         Next

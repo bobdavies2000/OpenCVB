@@ -2,13 +2,15 @@
 Public Class CameraMotion_Basics : Inherits VB_Algorithm
     Public translationX As Integer
     Public translationY As Integer
-    Public rotate As New Rotate_BasicsQT
+    Dim gravity As New Gravity_Horizon
     Public Sub New()
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Merge with previous image using just translation of the gravity vector and horizon vector (if present)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        gravity.Run(Nothing)
+
         Static gravityVec As pointPair = task.gravityVec
         Static horizonVec As pointPair = task.horizonVec
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -19,22 +21,42 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
         Dim y1 = horizonVec.p1.Y - task.horizonVec.p1.Y
         Dim y2 = horizonVec.p2.Y - task.horizonVec.p2.Y
 
-        translationX = Math.Round(Math.Max(Math.Abs(x1) + Math.Abs(x2) / 2, 0))
-        translationY = Math.Round(Math.Max((y1 + y2) / 2, 0))
+        translationX = Math.Round((x1 + x2) / 2)
+        translationY = Math.Round((y1 + y2) / 2)
 
         dst3.SetTo(0)
         Static lastImage As cv.Mat = src.Clone
+        Dim r1 As cv.Rect, r2 As cv.Rect
         If translationX = 0 And translationY = 0 Then
             dst2 = src
+            task.cameraMotion = 0
+            task.cameraDirection = 0
         Else
             dst2.SetTo(0)
-            Dim r1 = New cv.Rect(translationX, translationY, Math.Min(dst2.Width - translationX, dst2.Width),
-                                                             Math.Min(dst2.Height - translationY, dst2.Height))
-            Dim r2 = New cv.Rect(Math.Max(-translationX, 0), Math.Max(-translationY, 0), r1.Width, r1.Height)
+            r1 = New cv.Rect(translationX, translationY, Math.Min(dst2.Width - translationX, dst2.Width),
+                                                         Math.Min(dst2.Height - translationY, dst2.Height))
+            If r1.X < 0 Then
+                r1.X = -r1.X
+                r1.Width += translationX
+            End If
+            If r1.Y < 0 Then
+                r1.Y = -r1.Y
+                r1.Height += translationY
+            End If
+            r2 = New cv.Rect(Math.Max(-translationX, 0), Math.Max(-translationY, 0), r1.Width, r1.Height)
+
+            If y1 < 0 Then Dim k = 0
+
+
             src(r1).CopyTo(dst2(r2))
             dst3 = (lastImage - dst2).ToMat.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
             'dst3 = (src - dst2).ToMat.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
-            Console.WriteLine("Translation X, Y = (" + CStr(translationX) + ", " + CStr(translationY) + ")")
+            task.cameraMotion = Math.Sqrt(translationX * translationX + translationY * translationY)
+            If translationX = 0 Then
+                If translationY < 0 Then task.cameraDirection = Math.PI / 4 Else task.cameraDirection = Math.PI * 3 / 4
+            Else
+                task.cameraDirection = Math.Atan(translationY / translationX)
+            End If
         End If
 
         lastImage = dst2.Clone
@@ -43,6 +65,7 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
 
         labels(2) = "Translation (X, Y) = (" + CStr(translationX) + ", " + CStr(translationY) + ")" +
                     If(horizonVec.p1.Y = 0 And horizonVec.p2.Y = 0, " there is no horizon present", "")
+        labels(3) = "Camera direction (radians) = " + Format(task.cameraDirection, fmt1) + " with distance = " + Format(task.cameraMotion, fmt1)
     End Sub
 End Class
 
