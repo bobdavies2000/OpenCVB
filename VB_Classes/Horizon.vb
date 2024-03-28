@@ -14,7 +14,7 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
                 lastVal = val
                 val = yData.Get(Of Single)(y, x)
                 If val > 0 And lastVal < 0 Then
-                    ' sub-pixel accuracy change here 
+                    ' change sub-pixel accuracy here 
                     Dim pt = New cv.Point2f(x, y + Math.Abs(val) / Math.Abs(val - lastVal))
                     ptX.Add(pt.X)
                     ptY.Add(pt.Y)

@@ -8,14 +8,18 @@ Public Class Gravity_Basics : Inherits VB_Algorithm
     End Sub
     Private Function findTransition(startRow As Integer, stopRow As Integer, stepRow As Integer) As cv.Point2f
         Dim val As Single, lastVal As Single
+        Dim ptX As New List(Of Single)
+        Dim ptY As New List(Of Single)
         For y = startRow To stopRow Step stepRow
             For x = 0 To xData.Cols - 1
                 lastVal = val
                 val = xData.Get(Of Single)(y, x)
                 If val > 0 And lastVal < 0 Then
-                    ' sub-pixel accuracy change here 
+                    ' change sub-pixel accuracy here 
                     Dim pt = New cv.Point2f(x + Math.Abs(val) / Math.Abs(val - lastVal), y)
-                    Return pt
+                    ptX.Add(pt.X)
+                    ptY.Add(pt.Y)
+                    If ptX.Count >= gOptions.FrameHistory.Value Then Return New cv.Point2f(ptX.Average, ptY.Average)
                 End If
             Next
         Next

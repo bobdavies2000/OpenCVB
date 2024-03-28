@@ -15,13 +15,12 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
         Static horizonVec As pointPair = task.horizonVec
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim x1 = gravityVec.p1.X - task.gravityVec.p1.X
-        Dim x2 = gravityVec.p2.X - task.gravityVec.p2.X
+        Dim x = gravityVec.p1.X - task.gravityVec.p1.X
 
         Dim y1 = horizonVec.p1.Y - task.horizonVec.p1.Y
         Dim y2 = horizonVec.p2.Y - task.horizonVec.p2.Y
 
-        translationX = Math.Round((x1 + x2) / 2)
+        translationX = Math.Round(x)
         translationY = Math.Round((y1 + y2) / 2)
 
         dst3.SetTo(0)
@@ -44,9 +43,6 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
                 r1.Height += translationY
             End If
             r2 = New cv.Rect(Math.Max(-translationX, 0), Math.Max(-translationY, 0), r1.Width, r1.Height)
-
-            If y1 < 0 Then Dim k = 0
-
 
             src(r1).CopyTo(dst2(r2))
             dst3 = (lastImage - dst2).ToMat.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
