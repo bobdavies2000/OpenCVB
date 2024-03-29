@@ -56,7 +56,7 @@ End Class
 
 
 Public Class Corners_SubPix : Inherits VB_Algorithm
-    Public feat As New Feature_BasicsKNN
+    Public feat As New Feature_KNNBasics
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("SubPix kernel Size", 1, 20, 3)
         labels(2) = "Output of GoodFeatures"

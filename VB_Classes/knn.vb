@@ -109,7 +109,7 @@ Public Class KNN_Core : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Dim KNNdimension = 2
 
-        If standaloneTest() Then
+        If standalone Then
             Static random As New Random_Basics
             If task.heartBeat Then
                 random.Run(empty)

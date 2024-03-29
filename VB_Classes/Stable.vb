@@ -8,7 +8,7 @@ Public Class Stable_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If standaloneTest() Then
-            Static good As New Feature_BasicsKNN
+            Static good As New Feature_KNNBasics
             good.Run(src)
             facetGen.inputPoints = New List(Of cv.Point2f)(good.featurePoints)
         End If

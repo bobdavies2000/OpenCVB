@@ -133,6 +133,7 @@
     <Compile Include="Sift.vb" />
     <Compile Include="StdevGrid.vb" />
     <Compile Include="Surf.vb" />
+    <Compile Include="Swarm.vb" />
     <Compile Include="VB_Externs.vb" />
     <Compile Include="ExtractCPPresults.vb" />
     <Compile Include="Foreground.vb" />

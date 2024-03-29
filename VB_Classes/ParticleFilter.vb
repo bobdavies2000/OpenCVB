@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports  System.IO
 Public Class ParticleFilter_Basics : Inherits VB_Algorithm
-    Dim trace As New Feature_KNN
+    Dim trace As New Swarm_Basics
     Dim plot1D As New Plot_Histogram2D
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -84,7 +84,7 @@ End Class
 
 
 Public Class ParticleFilter_Net : Inherits VB_Algorithm
-    Dim trace As New Feature_KNN
+    Dim trace As New Swarm_Basics
     Public Sub New()
         labels = {"", "", "Particle traffic", "Net movement of all the particles"}
         desc = "Use the good features of an image to create a set of particles that can estimate camera motion"

@@ -69,7 +69,7 @@ Partial Class OptionsGlobal
         Me.gravityPointCloud = New System.Windows.Forms.CheckBox()
         Me.Label10 = New System.Windows.Forms.Label()
         Me.RGBFilterList = New System.Windows.Forms.ComboBox()
-        Me.useFilter = New System.Windows.Forms.CheckBox()
+        Me.RGBFilterActive = New System.Windows.Forms.CheckBox()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.LineType = New System.Windows.Forms.ComboBox()
         Me.displayDst1 = New System.Windows.Forms.CheckBox()
@@ -389,7 +389,7 @@ Partial Class OptionsGlobal
         Me.GroupBox2.Controls.Add(Me.gravityPointCloud)
         Me.GroupBox2.Controls.Add(Me.Label10)
         Me.GroupBox2.Controls.Add(Me.RGBFilterList)
-        Me.GroupBox2.Controls.Add(Me.useFilter)
+        Me.GroupBox2.Controls.Add(Me.RGBFilterActive)
         Me.GroupBox2.Controls.Add(Me.Label5)
         Me.GroupBox2.Controls.Add(Me.LineType)
         Me.GroupBox2.Controls.Add(Me.displayDst1)
@@ -611,15 +611,15 @@ Partial Class OptionsGlobal
         Me.RGBFilterList.Size = New System.Drawing.Size(288, 28)
         Me.RGBFilterList.TabIndex = 19
         '
-        'useFilter
+        'RGBFilterActive
         '
-        Me.useFilter.AutoSize = True
-        Me.useFilter.Location = New System.Drawing.Point(366, 54)
-        Me.useFilter.Name = "useFilter"
-        Me.useFilter.Size = New System.Drawing.Size(138, 24)
-        Me.useFilter.TabIndex = 16
-        Me.useFilter.Text = "Use RGB filter"
-        Me.useFilter.UseVisualStyleBackColor = True
+        Me.RGBFilterActive.AutoSize = True
+        Me.RGBFilterActive.Location = New System.Drawing.Point(366, 54)
+        Me.RGBFilterActive.Name = "RGBFilterActive"
+        Me.RGBFilterActive.Size = New System.Drawing.Size(138, 24)
+        Me.RGBFilterActive.TabIndex = 16
+        Me.RGBFilterActive.Text = "Use RGB filter"
+        Me.RGBFilterActive.UseVisualStyleBackColor = True
         '
         'Label5
         '
@@ -811,7 +811,7 @@ Partial Class OptionsGlobal
     Friend WithEvents GridSize As Windows.Forms.TrackBar
     Friend WithEvents Label9 As Windows.Forms.Label
     Friend WithEvents Label8 As Windows.Forms.Label
-    Friend WithEvents useFilter As Windows.Forms.CheckBox
+    Friend WithEvents RGBFilterActive As Windows.Forms.CheckBox
     Friend WithEvents Label10 As Windows.Forms.Label
     Friend WithEvents RGBFilterList As Windows.Forms.ComboBox
     Friend WithEvents gravityPointCloud As Windows.Forms.CheckBox

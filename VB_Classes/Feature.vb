@@ -156,7 +156,7 @@ End Class
 
 
 Public Class Feature_CellGrid : Inherits VB_Algorithm
-    Dim feat As New Feature_BasicsKNN
+    Dim feat As New Feature_KNNBasics
     Public cellPopulation As New List(Of Integer) ' count the feature population of each roi
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -1073,7 +1073,7 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
     Dim templates As New List(Of cv.Mat)
     Dim drawRects As New List(Of cv.Rect)
     Dim match As New Match_Basics
-    Dim feat As New Feature_BasicsKNN
+    Dim feat As New Feature_KNNBasics
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Correlation threshold X100", 0, 100, 70)
@@ -1137,7 +1137,7 @@ End Class
 
 
 Public Class Feature_GoodFeatureTrace : Inherits VB_Algorithm
-    Dim feat As New Feature_BasicsKNN
+    Dim feat As New Feature_KNNBasics
     Public Sub New()
         findSlider("Distance threshold (pixels)").Value = 1
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -1607,7 +1607,7 @@ Public Class Feature_Grid : Inherits VB_Algorithm
             Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
             Dim pt = knn.trainInput(trainIndex)
             Dim qPt = corners(i)
-            If pt.DistanceTo(qPt) > options.distanceThreshold Then knn.trainInput(trainIndex) = corners(i)
+            If pt.DistanceTo(qPt) > options.minDistance Then knn.trainInput(trainIndex) = corners(i)
         Next
 
         src.CopyTo(dst2)
@@ -1655,7 +1655,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_BasicsKNN : Inherits VB_Algorithm
+Public Class Feature_KNNBasics : Inherits VB_Algorithm
     Dim knn As New KNN_Core
     Public featurePoints As New List(Of cv.Point2f)
     Public feat As New Feature_Basics
@@ -1674,7 +1674,7 @@ Public Class Feature_BasicsKNN : Inherits VB_Algorithm
             Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
             Dim pt = knn.trainInput(trainIndex)
             Dim qPt = feat.featurePoints(i)
-            If pt.DistanceTo(qPt) > feat.options.distanceThreshold Then knn.trainInput(trainIndex) = feat.featurePoints(i)
+            If pt.DistanceTo(qPt) > feat.options.minDistance Then knn.trainInput(trainIndex) = feat.featurePoints(i)
         Next
         featurePoints = New List(Of cv.Point2f)(knn.trainInput)
 
@@ -1687,59 +1687,5 @@ Public Class Feature_BasicsKNN : Inherits VB_Algorithm
 
         labels(2) = feat.labels(2)
         labels(3) = feat.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Feature_KNN : Inherits VB_Algorithm
-    Dim knn As New KNN_Core
-    Dim feat As New Feature_Basics
-    Public mpList As New List(Of pointPair)
-    Public swarmDistance As Single
-    Public swarmDirection As Single
-    Public Sub New()
-        findSlider("Feature Sample Size").Value = 200
-        findSlider("Distance threshold (pixels)").Value = 20
-        desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        feat.Run(src)
-        dst3 = feat.dst2
-
-        Static cornerHistory As New List(Of List(Of cv.Point2f))
-        If task.optionsChanged Then cornerHistory.Clear()
-
-        Dim histCount = task.frameHistoryCount
-        cornerHistory.Add(New List(Of cv.Point2f)(feat.featurePoints))
-
-        Dim lastIndex = cornerHistory.Count - 1
-        knn.trainInput = New List(Of cv.Point2f)(cornerHistory.ElementAt(0))
-        knn.queries = New List(Of cv.Point2f)(cornerHistory.ElementAt(lastIndex))
-        knn.Run(empty)
-
-        dst2.SetTo(0)
-        mpList.Clear()
-        Dim distanceList As New List(Of Single)
-        For i = 0 To knn.neighbors.Count - 1
-            Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
-            Dim pt = knn.trainInput(trainIndex)
-            Dim ptNew = knn.queries(i)
-            Dim distance = pt.DistanceTo(ptNew)
-            If distance > task.camMotionPixels Then Continue For
-            distanceList.Add(distance)
-            dst2.Line(pt, ptNew, cv.Scalar.White, task.lineWidth, task.lineType)
-            mpList.Add(New pointPair(pt, ptNew))
-        Next
-        labels(3) = CStr(mpList.Count) + " points were matched to the previous set of features."
-        swarmDistance = 0
-        If distanceList.Count > 10 Then
-            swarmDistance = task.camMotionPixels ' distanceList.Average
-            labels(2) = Format(swarmDistance, fmt1) + " average distance with max = " + Format(distanceList.Max, fmt1) + " (all units in pixels.)"
-        End If
-        If cornerHistory.Count >= histCount Then cornerHistory.RemoveAt(0)
     End Sub
 End Class

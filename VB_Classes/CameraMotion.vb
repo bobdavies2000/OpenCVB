@@ -3,10 +3,11 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
     Public translationX As Integer
     Public translationY As Integer
     Dim gravity As New Gravity_Horizon
-    Dim feat As New Feature_KNN
+    Dim feat As New Swarm_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        gOptions.DebugSlider.Value = 3
         desc = "Merge with previous image using just translation of the gravity vector and horizon vector (if present)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -32,7 +33,7 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
             task.camMotionPixels = 0
             task.camDirection = 0
         Else
-            dst2.SetTo(0)
+            ' dst2.SetTo(0)
             r1 = New cv.Rect(translationX, translationY, Math.Min(dst2.Width - translationX * 2, dst2.Width),
                                                          Math.Min(dst2.Height - translationY * 2, dst2.Height))
             If r1.X < 0 Then
@@ -55,13 +56,10 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
 
             ' the point cloud contribute one set of camera motion distance and direction.  Now confirm it with feature points
             feat.Run(src)
-            strOut = "Swarm distance = " + Format(feat.swarmDistance, fmt1) + " when camMotionPixels = " + Format(task.camMotionPixels, fmt1)
-            If task.heartBeat Then src.CopyTo(dst2)
-            If feat.swarmDistance < task.camMotionPixels / 2 Then
+            strOut = "Swarm distance = " + Format(feat.distance, fmt1) + " when camMotionPixels = " + Format(task.camMotionPixels, fmt1)
+            If (feat.distance < task.camMotionPixels / 2) Or task.heartBeat Then
                 task.camMotionPixels = 0
                 src.CopyTo(dst2)
-            Else
-                src(r1).CopyTo(dst2(r2))
             End If
             dst3 = (src - dst2).ToMat.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
         End If
@@ -167,4 +165,24 @@ Public Class CameraMotion_WithRotation : Inherits VB_Algorithm
 End Class
 
 
+
+
+
+
+
+Public Class CameraMotion_SceneMotion : Inherits VB_Algorithm
+    Dim cMotion As New CameraMotion_Basics
+    Dim motion As New Motion_Basics
+    Public Sub New()
+        labels(2) = "Image after adjusting for camera motion."
+        desc = "Display both camera motion (on heartbeats) and scene motion."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        cMotion.Run(src)
+        dst2 = cMotion.dst3
+
+        motion.Run(src)
+        dst3 = motion.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
 

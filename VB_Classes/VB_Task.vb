@@ -469,17 +469,7 @@ Public Class VBtask : Implements IDisposable
             task.IMU_AlphaFilter = gOptions.IMU_Alpha.Value / 100
             grid.RunVB(task.color)
 
-            If task.algName.StartsWith("CPP_") = False Then
-                task.motionFlag = True
-
-                If gOptions.useFilter.Checked Then
-                    Dim filterName = gOptions.RGBFilterList.Text
-                    If rgbFilter Is Nothing Then rgbFilter = algoList.createAlgorithm(filterName)
-                    If rgbFilter.traceName <> filterName Then rgbFilter = algoList.createAlgorithm(filterName)
-                    rgbFilter.RunVB(src)
-                    src = rgbFilter.dst2
-                End If
-            End If
+            If task.algName.StartsWith("CPP_") = False Then task.motionFlag = True
 
             updateSettings()
             imuStabilityTest.RunVB(src)
@@ -596,8 +586,16 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
+            If gOptions.RGBFilterActive.Checked Then
+                Dim filterName = gOptions.RGBFilterList.Text
+                If rgbFilter Is Nothing Then rgbFilter = algoList.createAlgorithm(filterName)
+                If rgbFilter.traceName <> filterName Then rgbFilter = algoList.createAlgorithm(filterName)
+                rgbFilter.RunVB(src)
+                src = rgbFilter.dst2
+            End If
+
             cMotion.Run(src)
-            algorithmObject.NextFrame(task.color.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
+            algorithmObject.NextFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
             If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then
                 task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)

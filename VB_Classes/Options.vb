@@ -3405,7 +3405,6 @@ Public Class Options_Features : Inherits VB_Algorithm
     Public quality As Double = 0.01
     Public minDistance As Double = 10
     Public roi As cv.Rect
-    Public distanceThreshold As Integer = 16
     Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
     Public matchText As String = ""
     Public k As Double = 0.04
@@ -3414,7 +3413,6 @@ Public Class Options_Features : Inherits VB_Algorithm
     Public fOptions As New Options_FeatureMatch
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Distance threshold (pixels)", 1, 30, distanceThreshold)
             sliders.setupTrackBar("Min Distance to next", 1, 100, minDistance)
             sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
             sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
@@ -3436,7 +3434,6 @@ Public Class Options_Features : Inherits VB_Algorithm
         End If
     End Sub
     Public Sub RunVB()
-        Static distanceSlider = findSlider("Distance threshold (pixels)")
         Static qualitySlider = findSlider("Quality Level")
         Static distSlider = findSlider("Min Distance to next")
         Static briskRadio = findRadio("Use BRISK")
@@ -3453,7 +3450,6 @@ Public Class Options_Features : Inherits VB_Algorithm
         matchText = fOptions.matchText
 
         If task.optionsChanged Then
-            distanceThreshold = distanceSlider.value
             quality = qualitySlider.Value / 100
             minDistance = distSlider.Value
             roi = New cv.Rect(0, 0, fOptions.matchCellSize * 2, fOptions.matchCellSize * 2)

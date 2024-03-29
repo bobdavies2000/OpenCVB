@@ -181,7 +181,7 @@ Public Class BackProject_FullLines : Inherits VB_Algorithm
     Dim backP As New BackProject_Full
     Dim lines As New Line_Basics
     Public Sub New()
-        gOptions.useFilter.Checked = False
+        gOptions.RGBFilterActive.Checked = False
         labels = {"", "", "Lines found in the back projection", "Backprojection results"}
         desc = "Find lines in the back projection"
     End Sub

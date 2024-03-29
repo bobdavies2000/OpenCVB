@@ -225,7 +225,7 @@ Public Class OptionsGlobal
         If task IsNot Nothing Then task.optionsChanged = True
         AddWeighted.Text = CStr(AddWeightedSlider.Value)
     End Sub
-    Private Sub useFilter_CheckedChanged(sender As Object, e As EventArgs) Handles useFilter.CheckedChanged
+    Private Sub useFilter_CheckedChanged(sender As Object, e As EventArgs) Handles RGBFilterActive.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
