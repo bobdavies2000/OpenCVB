@@ -53,8 +53,8 @@ Public Class VBtask : Implements IDisposable
 
     Public gravityVec As New pointPair
     Public horizonVec As New pointPair
-    Public cameraMotion As Single ' distance in pixels that the camera has moved.
-    Public cameraDirection As Single ' camera direction in radians.
+    Public camMotionPixels As Single ' distance in pixels that the camera has moved.
+    Public camDirection As Single ' camera direction in radians.
     Public cMotion As CameraMotion_Basics
 
     ' add any global algorithms here

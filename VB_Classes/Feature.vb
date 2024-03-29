@@ -1068,47 +1068,6 @@ End Class
 
 
 
-' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_BasicsKNN : Inherits VB_Algorithm
-    Dim knn As New KNN_Core
-    Public featurePoints As New List(Of cv.Point2f)
-    Public feat As New Feature_Basics
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Find good features to track in a BGR image but use the same point if closer than a threshold"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        feat.Run(src)
-
-        knn.queries = New List(Of cv.Point2f)(feat.featurePoints)
-        If firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
-        knn.Run(empty)
-
-        For i = 0 To knn.neighbors.Count - 1
-            Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
-            Dim pt = knn.trainInput(trainIndex)
-            Dim qPt = feat.featurePoints(i)
-            If pt.DistanceTo(qPt) > feat.options.distanceThreshold Then knn.trainInput(trainIndex) = feat.featurePoints(i)
-        Next
-        featurePoints = New List(Of cv.Point2f)(knn.trainInput)
-
-        src.CopyTo(dst2)
-        dst3.SetTo(0)
-        For Each pt In featurePoints
-            dst2.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
-            dst3.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
-        Next
-
-        labels(2) = feat.labels(2)
-        labels(3) = feat.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Feature_BasicsValidated : Inherits VB_Algorithm
     Public centers As New List(Of cv.Point2f)
     Dim templates As New List(Of cv.Mat)
@@ -1169,65 +1128,6 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
         labels(2) = feat.labels(2)
     End Sub
 End Class
-
-
-
-
-
-
-
-
-
-
-
-' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_Grid : Inherits VB_Algorithm
-    Dim knn As New KNN_Core
-    Public corners As New List(Of cv.Point2f)
-    Public options As New Options_Features
-    Public Sub New()
-        findSlider("Feature Sample Size").Value = 1
-        desc = "Find good features to track in each roi of the task.gridList"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        corners.Clear()
-
-        For Each roi In task.gridList
-            Dim sampleSize = options.fOptions.featurePoints
-            Dim features = cv.Cv2.GoodFeaturesToTrack(src(roi), sampleSize, options.quality, options.minDistance, Nothing, 7, True, 3)
-            For Each pt In features
-                corners.Add(New cv.Point2f(roi.X + pt.X, roi.Y + pt.Y))
-            Next
-        Next
-
-        knn.queries = New List(Of cv.Point2f)(corners)
-        If firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
-        knn.Run(empty)
-
-        For i = 0 To knn.neighbors.Count - 1
-            Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
-            Dim pt = knn.trainInput(trainIndex)
-            Dim qPt = corners(i)
-            If pt.DistanceTo(qPt) > options.distanceThreshold Then knn.trainInput(trainIndex) = corners(i)
-        Next
-
-        src.CopyTo(dst2)
-        dst3.SetTo(0)
-        For Each pt In corners
-            dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
-            dst3.Set(Of Byte)(pt.Y, pt.X, 255)
-        Next
-        labels(2) = "Found " + CStr(corners.Count) + " points with quality = " + CStr(options.quality) +
-                    " and minimum distance = " + CStr(options.minDistance)
-    End Sub
-End Class
-
-
-
 
 
 
@@ -1674,6 +1574,57 @@ End Class
 
 
 
+
+' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
+Public Class Feature_Grid : Inherits VB_Algorithm
+    Dim knn As New KNN_Core
+    Public corners As New List(Of cv.Point2f)
+    Public options As New Options_Features
+    Public Sub New()
+        findSlider("Feature Sample Size").Value = 1
+        desc = "Find good features to track in each roi of the task.gridList"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        corners.Clear()
+
+        For Each roi In task.gridList
+            Dim sampleSize = options.fOptions.featurePoints
+            Dim features = cv.Cv2.GoodFeaturesToTrack(src(roi), sampleSize, options.quality, options.minDistance, Nothing, 7, True, 3)
+            For Each pt In features
+                corners.Add(New cv.Point2f(roi.X + pt.X, roi.Y + pt.Y))
+            Next
+        Next
+
+        knn.queries = New List(Of cv.Point2f)(corners)
+        If firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        knn.Run(empty)
+
+        For i = 0 To knn.neighbors.Count - 1
+            Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
+            Dim pt = knn.trainInput(trainIndex)
+            Dim qPt = corners(i)
+            If pt.DistanceTo(qPt) > options.distanceThreshold Then knn.trainInput(trainIndex) = corners(i)
+        Next
+
+        src.CopyTo(dst2)
+        dst3.SetTo(0)
+        For Each pt In corners
+            dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            dst3.Set(Of Byte)(pt.Y, pt.X, 255)
+        Next
+        labels(2) = "Found " + CStr(corners.Count) + " points with quality = " + CStr(options.quality) +
+                    " and minimum distance = " + CStr(options.minDistance)
+    End Sub
+End Class
+
+
+
+
+
 Public Class Feature_KNNSimple : Inherits VB_Algorithm
     Public feat As New Feature_Basics
     Public knn As New KNN_Basics
@@ -1703,10 +1654,53 @@ End Class
 
 
 
+' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
+Public Class Feature_BasicsKNN : Inherits VB_Algorithm
+    Dim knn As New KNN_Core
+    Public featurePoints As New List(Of cv.Point2f)
+    Public feat As New Feature_Basics
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Find good features to track in a BGR image but use the same point if closer than a threshold"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+
+        knn.queries = New List(Of cv.Point2f)(feat.featurePoints)
+        If firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        knn.Run(empty)
+
+        For i = 0 To knn.neighbors.Count - 1
+            Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
+            Dim pt = knn.trainInput(trainIndex)
+            Dim qPt = feat.featurePoints(i)
+            If pt.DistanceTo(qPt) > feat.options.distanceThreshold Then knn.trainInput(trainIndex) = feat.featurePoints(i)
+        Next
+        featurePoints = New List(Of cv.Point2f)(knn.trainInput)
+
+        src.CopyTo(dst2)
+        dst3.SetTo(0)
+        For Each pt In featurePoints
+            dst2.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
+            dst3.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
+        Next
+
+        labels(2) = feat.labels(2)
+        labels(3) = feat.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class Feature_KNN : Inherits VB_Algorithm
     Dim knn As New KNN_Core
     Dim feat As New Feature_Basics
     Public mpList As New List(Of pointPair)
+    Public swarmDistance As Single
+    Public swarmDirection As Single
     Public Sub New()
         findSlider("Feature Sample Size").Value = 200
         findSlider("Distance threshold (pixels)").Value = 20
@@ -1729,16 +1723,23 @@ Public Class Feature_KNN : Inherits VB_Algorithm
 
         dst2.SetTo(0)
         mpList.Clear()
-        Dim distanceThreshold = feat.options.distanceThreshold
+        Dim distanceList As New List(Of Single)
         For i = 0 To knn.neighbors.Count - 1
             Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
             Dim pt = knn.trainInput(trainIndex)
-            Dim qPt = knn.queries(i)
-            If pt.DistanceTo(qPt) > distanceThreshold Then Continue For
-            dst2.Line(pt, qPt, cv.Scalar.White, task.lineWidth, task.lineType)
-            mpList.Add(New pointPair(pt, qPt))
+            Dim ptNew = knn.queries(i)
+            Dim distance = pt.DistanceTo(ptNew)
+            If distance > task.camMotionPixels Then Continue For
+            distanceList.Add(distance)
+            dst2.Line(pt, ptNew, cv.Scalar.White, task.lineWidth, task.lineType)
+            mpList.Add(New pointPair(pt, ptNew))
         Next
-        labels(3) = CStr(mpList.Count) + " points were matched from the first to the previous set of features."
+        labels(3) = CStr(mpList.Count) + " points were matched to the previous set of features."
+        swarmDistance = 0
+        If distanceList.Count > 10 Then
+            swarmDistance = task.camMotionPixels ' distanceList.Average
+            labels(2) = Format(swarmDistance, fmt1) + " average distance with max = " + Format(distanceList.Max, fmt1) + " (all units in pixels.)"
+        End If
         If cornerHistory.Count >= histCount Then cornerHistory.RemoveAt(0)
     End Sub
 End Class

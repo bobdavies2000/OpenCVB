@@ -3,6 +3,7 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
     Public translationX As Integer
     Public translationY As Integer
     Dim gravity As New Gravity_Horizon
+    Dim feat As New Feature_KNN
     Public Sub New()
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -11,57 +12,67 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         gravity.Run(Nothing)
 
-        Static gravityVec As pointPair = task.gravityVec
-        Static horizonVec As pointPair = task.horizonVec
+        Static gravityVec As pointPair = New pointPair(task.gravityVec.p1, task.gravityVec.p2)
+        Static horizonVec As pointPair = New pointPair(task.horizonVec.p1, task.horizonVec.p2)
+
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim x = gravityVec.p1.X - task.gravityVec.p1.X
-
-        Dim y1 = horizonVec.p1.Y - task.horizonVec.p1.Y
-        Dim y2 = horizonVec.p2.Y - task.horizonVec.p2.Y
-
-        translationX = Math.Round(x)
-        translationY = Math.Round((y1 + y2) / 2)
+        translationX = gOptions.DebugSlider.Value ' Math.Round(gravityVec.p1.X - task.gravityVec.p1.X)
+        translationY = gOptions.DebugSlider.Value ' Math.Round(horizonVec.p1.Y - task.horizonVec.p1.Y)
+        If Math.Abs(translationX) >= dst2.Width / 2 Then translationX = 0
+        If horizonVec.p1.Y >= dst2.Height Or horizonVec.p2.Y >= dst2.Height Or Math.Abs(translationY) >= dst2.Height / 2 Then
+            horizonVec = New pointPair(New cv.Point2f, New cv.Point2f(336, 0))
+            translationY = 0
+        End If
 
         dst3.SetTo(0)
-        Static lastImage As cv.Mat = src.Clone
         Dim r1 As cv.Rect, r2 As cv.Rect
         If translationX = 0 And translationY = 0 Then
             dst2 = src
-            task.cameraMotion = 0
-            task.cameraDirection = 0
+            task.camMotionPixels = 0
+            task.camDirection = 0
         Else
             dst2.SetTo(0)
-            r1 = New cv.Rect(translationX, translationY, Math.Min(dst2.Width - translationX, dst2.Width),
-                                                         Math.Min(dst2.Height - translationY, dst2.Height))
+            r1 = New cv.Rect(translationX, translationY, Math.Min(dst2.Width - translationX * 2, dst2.Width),
+                                                         Math.Min(dst2.Height - translationY * 2, dst2.Height))
             If r1.X < 0 Then
                 r1.X = -r1.X
-                r1.Width += translationX
+                r1.Width += translationX * 2
             End If
             If r1.Y < 0 Then
                 r1.Y = -r1.Y
-                r1.Height += translationY
+                r1.Height += translationY * 2
             End If
-            r2 = New cv.Rect(Math.Max(-translationX, 0), Math.Max(-translationY, 0), r1.Width, r1.Height)
 
-            src(r1).CopyTo(dst2(r2))
-            dst3 = (lastImage - dst2).ToMat.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
-            'dst3 = (src - dst2).ToMat.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
-            task.cameraMotion = Math.Sqrt(translationX * translationX + translationY * translationY)
+            r2 = New cv.Rect(Math.Abs(translationX), Math.Abs(translationY), r1.Width, r1.Height)
+
+            task.camMotionPixels = Math.Sqrt(translationX * translationX + translationY * translationY)
             If translationX = 0 Then
-                If translationY < 0 Then task.cameraDirection = Math.PI / 4 Else task.cameraDirection = Math.PI * 3 / 4
+                If translationY < 0 Then task.camDirection = Math.PI / 4 Else task.camDirection = Math.PI * 3 / 4
             Else
-                task.cameraDirection = Math.Atan(translationY / translationX)
+                task.camDirection = Math.Atan(translationY / translationX)
             End If
+
+            ' the point cloud contribute one set of camera motion distance and direction.  Now confirm it with feature points
+            feat.Run(src)
+            strOut = "Swarm distance = " + Format(feat.swarmDistance, fmt1) + " when camMotionPixels = " + Format(task.camMotionPixels, fmt1)
+            If task.heartBeat Then src.CopyTo(dst2)
+            If feat.swarmDistance < task.camMotionPixels / 2 Then
+                task.camMotionPixels = 0
+                src.CopyTo(dst2)
+            Else
+                src(r1).CopyTo(dst2(r2))
+            End If
+            dst3 = (src - dst2).ToMat.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
         End If
 
-        lastImage = dst2.Clone
-        gravityVec = task.gravityVec
-        horizonVec = task.horizonVec
+        gravityVec = New pointPair(task.gravityVec.p1, task.gravityVec.p2)
+        horizonVec = New pointPair(task.horizonVec.p1, task.horizonVec.p2)
+        setTrueText(strOut, 3)
 
         labels(2) = "Translation (X, Y) = (" + CStr(translationX) + ", " + CStr(translationY) + ")" +
                     If(horizonVec.p1.Y = 0 And horizonVec.p2.Y = 0, " there is no horizon present", "")
-        labels(3) = "Camera direction (radians) = " + Format(task.cameraDirection, fmt1) + " with distance = " + Format(task.cameraMotion, fmt1)
+        labels(3) = "Camera direction (radians) = " + Format(task.camDirection, fmt1) + " with distance = " + Format(task.camMotionPixels, fmt1)
     End Sub
 End Class
 
@@ -157,43 +168,3 @@ End Class
 
 
 
-
-
-
-Public Class CameraMotion_SceneMotion1 : Inherits VB_Algorithm
-    Dim cMotion As New CameraMotion_Basics
-    Dim motion As New Motion_Basics
-    Public Sub New()
-        labels(2) = "Image after adjusting for camera motion."
-        desc = "Remove camera motion to isolate scene motion."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        cMotion.Run(src)
-        dst2 = cMotion.dst3
-
-        motion.Run(dst2.Clone)
-        dst3 = motion.dst2
-        dst3.SetTo(0, cMotion.dst3)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class CameraMotion_FeatureTracker : Inherits VB_Algorithm
-    Dim cMotion As New CameraMotion_Basics
-    Dim feat As New Feature_Basics
-    Public Sub New()
-        desc = "Confirm any changes from CameraMotion_Basics using imagefeatures."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        cMotion.Run(src)
-        dst2 = cMotion.dst2
-
-        feat.Run(src)
-        dst3 = feat.dst2
-        labels(2) = "Translation (X, Y) = (" + CStr(cMotion.translationX) + ", " + CStr(cMotion.translationY) + ")"
-    End Sub
-End Class

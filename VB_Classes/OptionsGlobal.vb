@@ -29,6 +29,7 @@ Public Class OptionsGlobal
         LineThicknessAmount.Text = CStr(LineWidth.Value)
         DotSizeLabel.Text = CStr(dotSizeSlider.Value)
         AddWeighted.Text = CStr(AddWeightedSlider.Value)
+        TempSliderLabel.Text = CStr(DebugSlider.Value)
 
         UseKalman.Checked = True
         UseMultiThreading.Checked = False ' too many times it is just not faster.

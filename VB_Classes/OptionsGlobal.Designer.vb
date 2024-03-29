@@ -174,11 +174,11 @@ Partial Class OptionsGlobal
         '
         Me.DebugSlider.Location = New System.Drawing.Point(212, 511)
         Me.DebugSlider.Maximum = 9
+        Me.DebugSlider.Minimum = -10
         Me.DebugSlider.Name = "DebugSlider"
         Me.DebugSlider.Size = New System.Drawing.Size(506, 69)
         Me.DebugSlider.TabIndex = 55
         Me.DebugSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.DebugSlider.Value = 5
         '
         'Label11
         '
