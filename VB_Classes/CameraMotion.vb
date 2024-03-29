@@ -56,8 +56,8 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
 
             ' the point cloud contribute one set of camera motion distance and direction.  Now confirm it with feature points
             feat.Run(src)
-            strOut = "Swarm distance = " + Format(feat.distance, fmt1) + " when camMotionPixels = " + Format(task.camMotionPixels, fmt1)
-            If (feat.distance < task.camMotionPixels / 2) Or task.heartBeat Then
+            strOut = "Swarm distance = " + Format(feat.distanceAvg, fmt1) + " when camMotionPixels = " + Format(task.camMotionPixels, fmt1)
+            If (feat.distanceAvg < task.camMotionPixels / 2) Or task.heartBeat Then
                 task.camMotionPixels = 0
                 src.CopyTo(dst2)
             End If

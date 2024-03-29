@@ -1,10 +1,14 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Windows.Controls
+Imports CS_Classes
+Imports cv = OpenCvSharp
 Public Class Swarm_Basics : Inherits VB_Algorithm
-    Dim knn As New KNN_Core
+    Public knn As New KNN_Core
     Dim feat As New Feature_Basics
     Public mpList As New List(Of pointPair)
-    Public distance As Single
-    Public direction As Single
+    Public distanceAvg As Single
+    Public directionAvg As Single
+    Public distanceMax As Single
+    Public options As New Options_Swarm
     Public Sub New()
         findSlider("Feature Sample Size").Value = 1000
         findSlider("Blocksize").Value = 1
@@ -12,7 +16,26 @@ Public Class Swarm_Basics : Inherits VB_Algorithm
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."
     End Sub
+    Public Sub drawLines(dst As cv.Mat)
+        Dim queries = knn.queries
+        Dim trainInput = knn.trainInput
+        Dim neighbors = knn.neighbors
+        For i = 0 To queries.Count - 1
+            Dim nabList = neighbors(i)
+            Dim pt = queries(i)
+            For j = 0 To Math.Min(nabList.Count, options.ptCount)
+                Dim ptNew = trainInput(nabList(j))
+                dst.Line(pt, ptNew, cv.Scalar.White, task.lineWidth, task.lineType)
+                If ptNew.X < options.border Then dst.Line(New cv.Point2f(0, ptNew.Y), ptNew, cv.Scalar.White, task.lineWidth, task.lineType)
+                If ptNew.Y < options.border Then dst.Line(New cv.Point2f(ptNew.X, 0), ptNew, cv.Scalar.White, task.lineWidth, task.lineType)
+                If ptNew.X > dst.Width - options.border Then dst.Line(New cv.Point2f(dst.Width, ptNew.Y), ptNew, cv.Scalar.White, task.lineWidth, task.lineType)
+                If ptNew.Y > dst.Height - options.border Then dst.Line(New cv.Point2f(ptNew.X, dst.Height), ptNew, cv.Scalar.White, task.lineWidth, task.lineType)
+            Next
+        Next
+    End Sub
     Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         feat.Run(src)
         dst3 = feat.dst2
 
@@ -25,37 +48,41 @@ Public Class Swarm_Basics : Inherits VB_Algorithm
         Dim lastIndex = cornerHistory.Count - 1
         knn.trainInput = New List(Of cv.Point2f)(cornerHistory.ElementAt(0))
         knn.queries = New List(Of cv.Point2f)(cornerHistory.ElementAt(lastIndex))
-        If knn.queries.Count = 0 Then Exit Sub
         knn.Run(empty)
 
         dst2.SetTo(0)
         mpList.Clear()
-        Dim distanceList As New List(Of Single)
-        Dim directionList As New List(Of Single) ' angle in radians
-        For i = 0 To Math.Min(knn.neighbors.Count, knn.trainInput.Count) - 1
-            Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
-            Dim pt = knn.trainInput(trainIndex)
-            Dim ptNew = knn.queries(i)
+        Dim disList As New List(Of Single)
+        Dim dirList As New List(Of Single) ' angle in radians
+        For i = 0 To knn.queries.Count - 1
+            Dim nabList = knn.neighbors(i)
+            Dim trainIndex = nabList(0) ' index of the matched train input
+            Dim pt = knn.queries(i)
+            Dim ptNew = knn.trainInput(trainIndex)
             Dim nextDist = pt.DistanceTo(ptNew)
-            distanceList.Add(nextDist)
-            dst2.Line(pt, ptNew, 255, task.lineWidth, task.lineType)
-            If distance > 0 Then
+            dst2.Line(pt, ptNew, cv.Scalar.White, task.lineWidth, task.lineType)
+            disList.Add(nextDist)
+            mpList.Add(New pointPair(pt, ptNew))
+            If nextDist > 0 Then
                 If pt.Y <> ptNew.Y Then
                     Dim nextDirection = Math.Atan((pt.X - ptNew.X) / (pt.Y - ptNew.Y))
-                    directionList.Add(nextDirection)
+                    dirList.Add(nextDirection)
                 End If
             End If
-            mpList.Add(New pointPair(pt, ptNew))
         Next
+        drawLines(dst2)
+
         labels(3) = CStr(mpList.Count) + " points were matched to the previous set of features."
-        distance = 0
-        If distanceList.Count > 10 Then
-            distance = distanceList.Average
-            labels(2) = Format(distance, fmt1) + " average distance with max = " + Format(distanceList.Max, fmt1) + " (all units in pixels.)"
+        distanceAvg = 0
+        If task.heartBeat Then distanceMax = 0
+        If disList.Count > 10 Then
+            distanceAvg = disList.Average
+            distanceMax = Math.Max(distanceMax, disList.Max)
+            labels(2) = "Avg distance = " + Format(distanceAvg, fmt1) + vbCrLf + "Max Distance = " + Format(distanceMax, fmt1) + " (all units in pixels) "
         End If
-        If directionList.Count > 0 Then
-            direction = directionList.Average
-            labels(3) = Format(direction, fmt1) + " average direction (radians) with max = " + Format(directionList.Max, fmt1)
+        If dirList.Count > 0 Then
+            directionAvg = dirList.Average
+            labels(3) = Format(directionAvg, fmt1) + " average direction (radians)"
         End If
         If cornerHistory.Count >= histCount Then cornerHistory.RemoveAt(0)
     End Sub
@@ -93,26 +120,52 @@ End Class
 Public Class Swarm_LeftRight : Inherits VB_Algorithm
     Public leftDistance As Single
     Public leftDirection As Single
+    Public leftMax As Single
     Public rightDistance As Single
     Public rightDirection As Single
+    Public rightMax As Single
     Dim swarm As New Swarm_Basics
     Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Get direction and distance from the left and right images."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         swarm.Run(task.leftView)
-        leftDistance = swarm.distance
-        leftdirection = swarm.direction
-        dst2 = swarm.dst2.Clone
+        leftDistance = swarm.distanceAvg
+        leftDirection = swarm.directionAvg
+        leftMax = swarm.distanceMax
+        dst2 = task.leftView
+        swarm.drawLines(dst2)
 
         swarm.Run(task.rightView)
-        rightDistance = swarm.distance
-        rightDirection = swarm.direction
-        dst3 = swarm.dst2
+        rightDistance = swarm.distanceAvg
+        rightDirection = swarm.directionAvg
+        rightMax = swarm.distanceMax
+        dst3 = task.rightView
+        swarm.drawLines(dst3)
 
-        strOut = "Left distance/direction = " + Format(leftDistance, fmt1) + "/" + Format(leftDirection, fmt1) + vbCrLf
-        strOut += "Right distance/direction = " + Format(rightDistance, fmt1) + "/" + Format(rightDirection, fmt1)
-        setTrueText(strOut, 3)
+        strOut = swarm.labels(2) + vbCrLf + swarm.labels(3)
+        setTrueText(strOut, 1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Swarm_Flood : Inherits VB_Algorithm
+    Dim swarm As New Swarm_Basics
+    Dim flood As New Flood_BasicsMask
+    Public Sub New()
+        desc = "Floodfill the color image using the swarm outline as a mask"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        swarm.Run(src)
+
+        flood.inputMask = swarm.dst2
+
     End Sub
 End Class

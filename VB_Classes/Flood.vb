@@ -128,6 +128,7 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
             inputMask = task.maxDepthMask
             src = colorC.dst2
         End If
+
         dst3 = inputMask
         redCPP.inputMask = inputMask
         redCPP.Run(src)

@@ -4661,3 +4661,24 @@ Public Class Options_EdgeOverlay : Inherits VB_Algorithm
         yDisp = ySlider.Value
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_Swarm : Inherits VB_Algorithm
+    Public ptCount As Integer
+    Public border As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Connect X KNN points", 1, 10, 2)
+            sliders.setupTrackBar("Distance to image border", 1, 10, 5)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static ptSlider = findSlider("Connect X KNN points")
+        Static borderSlider = findSlider("Distance to image border")
+        ptCount = ptSlider.value
+        border = borderSlider.value
+    End Sub
+End Class
