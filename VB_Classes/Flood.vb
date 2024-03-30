@@ -114,7 +114,7 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public binarizedImage As cv.Mat
     Public inputMask As cv.Mat
-    Dim genCells As New RedCloud_GenCells
+    Public genCells As New RedCloud_GenCells
     Dim redCPP As New RedCloud_Mask_CPP
     Public buildInputMask As Boolean
     Public Sub New()

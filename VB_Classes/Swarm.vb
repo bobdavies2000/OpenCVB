@@ -159,13 +159,20 @@ End Class
 Public Class Swarm_Flood : Inherits VB_Algorithm
     Dim swarm As New Swarm_Basics
     Dim flood As New Flood_BasicsMask
+    Dim colorC As New Color_Basics
     Public Sub New()
         desc = "Floodfill the color image using the swarm outline as a mask"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         swarm.Run(src)
 
-        flood.inputMask = swarm.dst2
+        colorC.Run(src)
 
+        flood.genCells.removeContour = False
+        flood.inputMask = swarm.dst2
+        flood.Run(colorC.dst2)
+        dst2 = flood.dst2
+        identifyCells(flood.redCells)
+        labels(2) = flood.genCells.labels(2)
     End Sub
 End Class
