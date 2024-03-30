@@ -3959,25 +3959,49 @@ public:
 			}
 		}
 	}
+
+
 	void RunMaxList() {
 		Rect rect;
+
+		int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
+		int count;
+		multimap<int, Point, greater<int>> sizeSorted;
+		for (size_t i = 0; i < maxList.size(); i++)
+		{
+			int count = floodFill(src, mask, maxList[i], 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
+			if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, maxList[i]));
+		}
+
+		Point pt;
+		for (int y = 0; y < src.rows; y++)
+		{
+			for (int x = 0; x < src.cols; x++)
+			{
+				if (mask.at<unsigned char>(y, x) == 0)
+				{
+					pt = Point(x, y);
+					int count = floodFill(src, mask, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
+					if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
+				}
+			}
+		}
 
 		cellRects.clear();
 		cellSizes.clear();
 		floodPoints.clear();
 		int fill = 1;
-		int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
-		int count;
-		for (size_t i = 0; i < maxList.size(); i++)
+		for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
 		{
-			count = floodFill(src, maskCopy, maxList[i], fill, &rect, 0, 0, 4 | floodFlag | (fill << 8));
+			count = floodFill(src, maskCopy, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8));
 			if (count >= 1)
 			{
 				cellRects.push_back(rect);
 				cellSizes.push_back(count);
-				floodPoints.push_back(maxList[i]);
+				floodPoints.push_back(it->second);
 
-				if (fill >= 255) break;
+				if (fill >= 255)
+					break; // just taking up to the top X largest objects found.
 				fill++;
 			}
 		}
