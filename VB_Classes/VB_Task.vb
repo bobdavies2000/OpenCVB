@@ -609,10 +609,7 @@ Public Class VBtask : Implements IDisposable
                 task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
                 'task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
                 If gOptions.DisplayCellStats.Checked Then
-                    If task.optionsChanged Then
-                        gOptions.displayDst1.Checked = True
-                        dst1.SetTo(0)
-                    End If
+                    dst1.SetTo(0)
                     Static cellStats As New Cell_Basics
                     cellStats.statsString()
                     Dim str As New trueText(cellStats.strOut, 0, 0, 1)

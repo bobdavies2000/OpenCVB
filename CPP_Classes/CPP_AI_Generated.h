@@ -2462,13 +2462,11 @@ public:
         void* imagePtr;
         Mat* srcPtr = &src;
         if (inputMask.empty()) {
-            imagePtr = RedCloud_Run(cPtr, (int *)srcPtr->data, 0, src.rows, src.cols, src.type(), 
-                                     task->desiredCells, 0);
+            imagePtr = RedCloud_Run(cPtr, (int *)srcPtr->data, 0, src.rows, src.cols);
         }
         else {
             Mat* maskPtr = &inputMask;
-            imagePtr = RedCloud_Run(cPtr, (int *)srcPtr->data, (uchar *)maskPtr->data, src.rows, src.cols,
-                                     src.type(), task->desiredCells, 0);
+            imagePtr = RedCloud_Run(cPtr, (int *)srcPtr->data, (uchar *)maskPtr->data, src.rows, src.cols);
         }
         int classCount = RedCloud_Count(cPtr);
 
@@ -3282,12 +3280,10 @@ public:
 
         int* imagePtr;
         if (!inputMask.empty()) {
-            imagePtr = RedCloud_Run(cPtr, (int*)src.data, inputMask.data, src.rows, src.cols,
-                src.type(), task->desiredCells, 0);
+            imagePtr = RedCloud_Run(cPtr, (int*)src.data, inputMask.data, src.rows, src.cols);
         }
         else {
-            imagePtr = RedCloud_Run(cPtr, (int*)src.data, nullptr, src.rows, src.cols,
-                src.type(), task->desiredCells, 0);
+            imagePtr = RedCloud_Run(cPtr, (int*)src.data, nullptr, src.rows, src.cols);
         }
         classCount = RedCloud_Count(cPtr);
         if (classCount == 0) return;

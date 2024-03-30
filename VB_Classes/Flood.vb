@@ -4,7 +4,8 @@ Public Class Flood_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim bounds As New Boundary_RemovedRects
-    Dim redC As New RedCloud_Basics
+    Dim redCPP As New RedCloud_MaskNone_CPP
+    Public genCells As New RedCloud_GenCells
     Public Sub New()
         labels(3) = "Contour boundaries - input to RedCloud_Basics"
         desc = "Build the RedCloud cells with the best boundaries"
@@ -17,18 +18,24 @@ Public Class Flood_Basics : Inherits VB_Algorithm
             src = dst3 Or dst1
         End If
 
-        redC.genCells.removeContour = False
-        redC.genCells.cellLimit = bounds.bRects.bounds.rects.Count - bounds.bRects.smallRects.Count
-        redC.Run(src)
+        redCPP.Run(src)
+        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
 
-        redCells = redC.redCells
-        cellMap = redC.cellMap
-        dst2 = redC.dst2
+        genCells.classCount = redCPP.classCount
+        genCells.rectData = redCPP.rectData
+        genCells.floodPointData = redCPP.floodPointData
+        genCells.removeContour = False
+        genCells.cellLimit = bounds.bRects.bounds.rects.Count - bounds.bRects.smallRects.Count
+        genCells.Run(redCPP.dst2)
+
+        redCells = genCells.redCells
+        cellMap = genCells.dst3
+        dst2 = genCells.dst2
 
         setSelectedContour(redCells, cellMap)
         identifyCells(redCells)
 
-        labels(2) = redC.labels(2)
+        labels(2) = genCells.labels(2)
     End Sub
 End Class
 
@@ -136,7 +143,6 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
         genCells.classCount = redCPP.classCount
         genCells.rectData = redCPP.rectData
         genCells.floodPointData = redCPP.floodPointData
-        genCells.sizeData = redCPP.sizeData
         genCells.Run(redCPP.dst2)
 
         dst2 = genCells.dst2
@@ -186,5 +192,54 @@ Public Class Flood_Tiers : Inherits VB_Algorithm
 
         setSelectedContour(flood.redCells, flood.cellMap)
         identifyCells(flood.redCells)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Flood_MaxDistPoints : Inherits VB_Algorithm
+    Public redCells As New List(Of rcData)
+    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Dim bounds As New Boundary_RemovedRects
+    Dim redCPP As New RedCloud_MaxDist_CPP
+    Public genCells As New RedCloud_GenCells
+    Public Sub New()
+        labels(3) = "Contour boundaries - input to RedCloud_Basics"
+        desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 1 Then
+            bounds.Run(src)
+            dst1 = bounds.dst2
+            dst3 = bounds.bRects.bounds.dst2
+            src = dst3 Or dst1
+        End If
+
+        redCPP.Run(src)
+        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
+
+        genCells.classCount = redCPP.classCount
+        genCells.rectData = redCPP.rectData
+        genCells.floodPointData = redCPP.floodPointData
+        genCells.removeContour = False
+        genCells.cellLimit = bounds.bRects.bounds.rects.Count - bounds.bRects.smallRects.Count
+        genCells.Run(redCPP.dst2)
+
+        redCells = genCells.redCells
+        cellMap = genCells.dst3
+        dst2 = genCells.dst2
+
+        redCPP.maxList.Clear()
+        For i = 1 To redCells.Count - 1
+            redCPP.maxList.Add(redCells(i).maxDist.X)
+            redCPP.maxList.Add(redCells(i).maxDist.Y)
+        Next
+
+        setSelectedContour(redCells, cellMap)
+        identifyCells(redCells)
+
+        labels(2) = genCells.labels(2)
     End Sub
 End Class

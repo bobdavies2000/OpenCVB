@@ -232,6 +232,7 @@ Public Class OptionsGlobal
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
     Private Sub DisplayCellStats_CheckedChanged(sender As Object, e As EventArgs) Handles DisplayCellStats.CheckedChanged
+        displayDst1.Checked = DisplayCellStats.Checked
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
     Private Sub PixelDiffThreshold_ValueChanged(sender As Object, e As EventArgs) Handles PixelDiffThreshold.ValueChanged
