@@ -625,6 +625,7 @@ Public Class VBtask : Implements IDisposable
                     End If
                     Static cellStats As New Cell_Basics
                     cellStats.statsString()
+                    dst1 = cellStats.dst1
                     Dim str As New trueText(cellStats.strOut, 0, 0, 3)
                     trueData.Add(str)
                 End If

@@ -1,8 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Algorithm
-    Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim bounds As New Boundary_RemovedRects
     Dim redCPP As New RedCloud_MaskNone_CPP
     Public genCells As New RedCloud_GenCells
@@ -28,14 +26,12 @@ Public Class Flood_Basics : Inherits VB_Algorithm
         genCells.cellLimit = bounds.bRects.bounds.rects.Count - bounds.bRects.smallRects.Count
         genCells.Run(redCPP.dst2)
 
-        redCells = genCells.redCells
-        cellMap = genCells.dst3
         task.redCells = genCells.redCells
         task.cellMap = genCells.dst3
         dst2 = genCells.dst2
 
-        setSelectedContour(redCells, cellMap)
-        identifyCells(redCells)
+        setSelectedContour(task.redCells, task.cellMap)
+        identifyCells(task.redCells)
 
         labels(2) = genCells.labels(2)
     End Sub
@@ -65,12 +61,12 @@ Public Class Flood_CellStatsPlot : Inherits VB_Algorithm
         setTrueText(stats.strOut, 3)
 
         If task.clickPoint = New cv.Point Then
-            If flood.redCells.Count > 1 Then
-                task.rc = flood.redCells(1)
+            If task.redCells.Count > 1 Then
+                task.rc = task.redCells(1)
                 task.clickPoint = task.rc.maxDist
             End If
         End If
-        identifyCells(flood.redCells)
+        identifyCells(task.redCells)
     End Sub
 End Class
 
@@ -91,7 +87,7 @@ Public Class Flood_ContainedCells : Inherits VB_Algorithm
         If standalone Then
             flood.Run(src)
             dst2 = flood.dst2
-            redCells = flood.redCells
+            redCells = task.redCells
             labels = flood.labels
         End If
 

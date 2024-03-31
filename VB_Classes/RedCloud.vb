@@ -2532,7 +2532,7 @@ Public Class RedCloud_GenCellContains : Inherits VB_Algorithm
         If task.heartBeat Then Exit Sub
         labels(2) = flood.labels(2)
 
-        contains.redCells = flood.redCells
+        contains.redCells = task.redCells
         contains.Run(src)
         redCells = contains.redCells
 
@@ -2646,20 +2646,16 @@ End Class
 Public Class RedCloud_Both : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
     Dim floodPC As New Flood_Basics
-    ' Dim floodGBP As New Flood_Basics
     Public Sub New()
         desc = "Run Flood_Basics and use the cells to map the depth cells"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        'redOptions.UseGuidedProjection.Checked = True
-        'floodGBP.Run(src)
-        'dst1 = floodGBP.dst2
-        'labels(1) = floodGBP.labels(2)
-
         redOptions.UseColorOnly.Checked = True
         flood.Run(src)
         dst2 = flood.dst2
         labels(2) = flood.labels(2)
+        Dim colorCells = New List(Of rcData)(task.redCells)
+        Dim colorMap = task.cellMap.Clone
 
         redOptions.UseDepth.Checked = True
         floodPC.Run(src)
@@ -2672,9 +2668,9 @@ Public Class RedCloud_Both : Inherits VB_Algorithm
             Case 1
                 ' setSelectedContour(floodGBP.redCells, floodGBP.cellMap)
             Case 2
-                setSelectedContour(flood.redCells, flood.cellMap)
+                setSelectedContour(colorCells, colorMap)
             Case 3
-                setSelectedContour(floodPC.redCells, floodPC.cellMap)
+                setSelectedContour(task.redCells, task.cellMap)
         End Select
         dst2.Rectangle(task.rc.rect, task.highlightColor, task.lineWidth)
         dst3(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)

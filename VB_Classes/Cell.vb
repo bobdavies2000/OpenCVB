@@ -40,22 +40,12 @@ Public Class Cell_Basics : Inherits VB_Algorithm
             strOut += Format(rc.colorMean(2), fmt1) + vbCrLf
             strOut += "Color Stdev RGB: " + vbTab + Format(rc.colorStdev(0), fmt1) + vbTab + Format(rc.colorStdev(1), fmt1) + vbTab
             strOut += Format(rc.colorStdev(2), fmt1) + vbCrLf
-        End If
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standaloneTest() Or runRedCloud Then
-            Static redC As New RedCloud_Basics
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-        End If
-        If task.heartBeat Then
+
             Dim tmp = New cv.Mat(task.rc.mask.Rows, task.rc.mask.Cols, cv.MatType.CV_32F, 0)
             task.pcSplit(2)(task.rc.rect).CopyTo(tmp, task.rc.mask)
             plot.rc = task.rc
             plot.Run(tmp)
             dst1 = plot.dst2
-            statsString()
 
             'If rc.depthMean(2) = 0 Then
             '    strOut += vbCrLf + "No depth data is available for that cell. "
@@ -68,6 +58,14 @@ Public Class Cell_Basics : Inherits VB_Algorithm
             '    pca.Run(empty)
             '    strOut += vbCrLf + pca.strOut
             'End If
+        End If
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standaloneTest() Or runRedCloud Then
+            Static redC As New RedCloud_Basics
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
         End If
 
         setTrueText(strOut, 3)
