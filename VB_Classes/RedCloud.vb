@@ -4,7 +4,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim redCPP As New RedCloud_MaskNone_CPP
-    Public genCells As New RedCloud_GenCells
+    Public genCells As New Cell_Generate
     Public Sub New()
         vbAddAdvice(traceName + ": use the RedCloud algorithm panel." + vbCrLf + "(Behind the global options)")
         desc = "Find cells and then match them to the previous generation"
@@ -42,7 +42,7 @@ End Class
 
 
 Public Class RedCloud_BasicsMask : Inherits VB_Algorithm
-    Public genCells As New RedCloud_GenCells
+    Public genCells As New Cell_Generate
     Public redCells As New List(Of rcData)
     Public inputMask As cv.Mat
     Public cellMap As cv.Mat
@@ -85,7 +85,7 @@ End Class
 
 
 Public Class RedCloud_Tight : Inherits VB_Algorithm
-    Public genCells As New RedCloud_GenCells
+    Public genCells As New Cell_Generate
     Public redCells As New List(Of rcData)
     Public cellMap As cv.Mat
     Dim redCPP As New RedCloud_MaskNone_CPP
@@ -124,9 +124,7 @@ End Class
 
 
 Public Class RedCloud_TightNew : Inherits VB_Algorithm
-    Public genCells As New RedCloud_GenCells
-    Public redCells As New List(Of rcData)
-    Public cellMap As cv.Mat
+    Public genCells As New Cell_Generate
     Dim redCPP As New RedCloud_MaskNone_CPP
     Public Sub New()
         vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
@@ -148,12 +146,12 @@ Public Class RedCloud_TightNew : Inherits VB_Algorithm
         genCells.floodPointData = redCPP.floodPointData
         genCells.Run(redCPP.dst2)
 
-        redCells = New List(Of rcData)(genCells.redCells)
-        cellMap = genCells.dst3
+        task.redCells = New List(Of rcData)(genCells.redCells)
+        task.cellMap = genCells.dst3
         dst2 = genCells.dst2
 
-        setSelectedContour(redCells, cellMap)
-        identifyCells(redCells)
+        setSelectedContour(task.redCells, task.cellMap)
+        identifyCells(task.redCells)
         labels(2) = genCells.labels(2)
     End Sub
 End Class
@@ -165,7 +163,7 @@ End Class
 
 
 Public Class RedCloud_TightMask : Inherits VB_Algorithm
-    Public genCells As New RedCloud_GenCells
+    Public genCells As New Cell_Generate
     Public redCells As New List(Of rcData)
     Public inputMask As cv.Mat
     Public cellMap As cv.Mat
@@ -1240,7 +1238,7 @@ Public Class RedCloud_NearestStableCell : Inherits VB_Algorithm
         knn.queries.Clear()
         Dim redCells As New List(Of rcData)
         For Each rc In redC.redCells
-            If rc.matchCount = task.rcMatchMax Then
+            If rc.matchCount = task.rcMatchAvg Then
                 knn.queries.Add(New cv.Point2f(rc.maxDStable.X, rc.maxDStable.Y))
                 redCells.Add(rc)
             End If
@@ -2428,7 +2426,7 @@ End Class
 
 
 
-Public Class RedCloud_GenCellsTight : Inherits VB_Algorithm
+Public Class Cell_GenerateTight : Inherits VB_Algorithm
     Public classCount As Integer
     Public matchCount As Integer
     Public classMask As cv.Mat
@@ -2522,7 +2520,6 @@ End Class
 Public Class RedCloud_GenCellContains : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
     Dim contains As New Flood_ContainedCells
-    Public redCells As New List(Of rcData)
     Public Sub New()
         desc = "Merge cells contained in the top X cells and remove all other cells."
     End Sub
@@ -2532,23 +2529,21 @@ Public Class RedCloud_GenCellContains : Inherits VB_Algorithm
         If task.heartBeat Then Exit Sub
         labels(2) = flood.labels(2)
 
-        contains.redCells = task.redCells
         contains.Run(src)
-        redCells = contains.redCells
 
         dst2.SetTo(0)
-        Dim count = Math.Min(redOptions.identifyCount, redCells.Count)
+        Dim count = Math.Min(redOptions.identifyCount, task.redCells.Count)
         For i = 0 To count - 1
-            Dim rc = redCells(i)
+            Dim rc = task.redCells(i)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
             dst2.Rectangle(rc.rect, task.highlightColor, task.lineWidth)
         Next
 
-        For i = redOptions.identifyCount To redCells.Count - 1
-            Dim rc = redCells(i)
-            dst2(rc.rect).SetTo(redCells(rc.container).color, rc.mask)
+        For i = redOptions.identifyCount To task.redCells.Count - 1
+            Dim rc = task.redCells(i)
+            dst2(rc.rect).SetTo(task.redCells(rc.container).color, rc.mask)
         Next
-        identifyCells(redCells)
+        identifyCells(task.redCells)
     End Sub
 End Class
 

@@ -137,13 +137,13 @@ Public Class Cell_Stable : Inherits VB_Algorithm
         Static prevList As New List(Of cv.Point)
         If task.heartBeat Or task.frameCount = 2 Then
             prevList.Clear()
-            For Each rc In redC.redCells
+            For Each rc In task.redCells
                 prevList.Add(rc.maxDStable)
             Next
         End If
 
         Dim unstableList As New List(Of rcData)
-        For Each rc In redC.redCells
+        For Each rc In task.redCells
             If prevList.Contains(rc.maxDStable) = False Then
                 vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.White, -1)
                 vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Black)
@@ -171,14 +171,12 @@ End Class
 
 
 
-Public Class Cell_StableMax : Inherits VB_Algorithm
+Public Class Cell_StableAboveAverage : Inherits VB_Algorithm
     Dim redC As New RedCloud_TightNew
-    Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
-        cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels(1) = "Black rectangles outline cells that were matched less than the average matchCount."
         desc = "Highligh cells that were present the max number of match counts."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -186,42 +184,23 @@ Public Class Cell_StableMax : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        redCells.Clear()
+        Dim cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3.SetTo(0)
-        cellMap.SetTo(0)
         dst1.SetTo(255) ' the unstable mask 
-        For Each rc In redC.redCells
-            If rc.matchCount = task.rcMatchMax Then
+        Dim unmatched As Integer
+        For Each rc In task.redCells
+            If rc.matchCount < task.rcMatchAvg Then
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
                 dst1(rc.rect).SetTo(0)
-                cellMap(rc.rect).SetTo(rc.index, rc.mask)
-                redCells.Add(rc)
+            Else
+                unmatched += 1
             End If
         Next
-        labels(3) = CStr(redCells.Count) + " cells were stable - present since the last heartbeat."
+
+        labels(3) = CStr(unmatched) + " cells had matchCounts that were above average."
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Cell_StableColors : Inherits VB_Algorithm
-    Dim stable As New Cell_StableMax
-    Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
-        redOptions.UseColorOnly.Checked = True
-        desc = "Identify cells using only color and find the cells that are stable."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        stable.Run(src)
-        dst2 = stable.dst2
-        dst3 = stable.dst3
-        labels(2) = stable.labels(2)
-        labels(3) = stable.labels(3)
-    End Sub
-End Class
 
 
 
@@ -292,14 +271,14 @@ Public Class Cell_JumpUp : Inherits VB_Algorithm
         Static percentSlider = findSlider("Percent jump in size")
         Dim percentJump = percentSlider.value / 100
 
-        Dim lastCells = New List(Of rcData)(redC.redCells)
+        Dim lastCells = New List(Of rcData)(task.redCells)
         redC.Run(src)
         dst2 = redC.dst2
         If task.heartBeat Then dst3.SetTo(0)
         labels(2) = redC.labels(2)
 
         jumpCells.Clear()
-        For Each rc In redC.redCells
+        For Each rc In task.redCells
             If rc.indexLast > 0 Then
                 Dim lrc = lastCells(rc.indexLast)
                 If (rc.pixels - lrc.pixels) / rc.pixels >= percentJump Then
@@ -334,14 +313,14 @@ Public Class Cell_JumpDown : Inherits VB_Algorithm
         Static percentSlider = findSlider("Percent jump in size")
         Dim percentJump = percentSlider.value / 100
 
-        Dim lastCells = New List(Of rcData)(redC.redCells)
+        Dim lastCells = New List(Of rcData)(task.redCells)
         redC.Run(src)
         dst2 = redC.dst2
         If task.heartBeat Then dst3.SetTo(0)
         labels(2) = redC.labels(2)
 
         jumpCells.Clear()
-        For Each rc In redC.redCells
+        For Each rc In task.redCells
             If rc.indexLast > 0 Then
                 Dim lrc = lastCells(rc.indexLast)
                 If (lrc.pixels - rc.pixels) / rc.pixels >= percentJump Then
@@ -377,7 +356,7 @@ Public Class Cell_JumpUnstable : Inherits VB_Algorithm
         Dim percentJump = percentSlider.value / 100
 
         If task.heartBeat Or task.midHeartBeat Then
-            Dim lastCells As New List(Of rcData)(redC.redCells)
+            Dim lastCells As New List(Of rcData)(task.redCells)
             redC.Run(src)
             dst2 = redC.dst2
             dst3 = dst1.Clone
@@ -385,7 +364,7 @@ Public Class Cell_JumpUnstable : Inherits VB_Algorithm
             labels(2) = redC.labels(2)
 
             jumpCells.Clear()
-            For Each rc In redC.redCells
+            For Each rc In task.redCells
                 If rc.indexLast > 0 Then
                     Dim lrc = lastCells(rc.indexLast)
                     If Math.Abs(lrc.pixels - rc.pixels) / rc.pixels >= percentJump Then
@@ -420,7 +399,7 @@ Public Class Cell_Distance : Inherits VB_Algorithm
         If task.heartBeat Or task.quarterBeat Then
             redC.Run(src)
             dst0 = task.color
-            cellMap = redC.cellMap
+            cellMap = task.cellMap
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
@@ -428,7 +407,7 @@ Public Class Cell_Distance : Inherits VB_Algorithm
             Dim depthDistance As New List(Of Single)
             Dim colorDistance As New List(Of Single)
             Dim selectedMean As cv.Scalar = src(task.rc.rect).Mean(task.rc.mask)
-            For Each rc In redC.redCells
+            For Each rc In task.redCells
                 colorDistance.Add(distance3D(selectedMean, src(rc.rect).Mean(rc.mask)))
                 depthDistance.Add(distance3D(task.rc.depthMean, rc.depthMean))
                 redCells.Add(rc)
@@ -596,7 +575,7 @@ End Class
 
 
 
-Public Class RedCloud_GenCells : Inherits VB_Algorithm
+Public Class Cell_Generate : Inherits VB_Algorithm
     Public classCount As Integer
     Public rectData As cv.Mat
     Public floodPointData As cv.Mat
@@ -653,7 +632,7 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
                     rc.color = lrc.color
                     Dim stableCheck = dst3.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
                     If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
-                    rc.matchCount += 1
+                    rc.matchCount = If(lrc.matchCount > 100, lrc.matchCount, lrc.matchCount + 1)
                 Else
                     rc.color = task.vecColors(rc.index)
                 End If
@@ -685,6 +664,7 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
         redCells.Clear()
         redCells.Add(New rcData)
         matchCount = 0
+        Dim matches As New List(Of Integer)
         For Each rc In sortedCells.Values
             Dim val = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If val <> 0 Then Continue For ' already occupied.
@@ -692,11 +672,13 @@ Public Class RedCloud_GenCells : Inherits VB_Algorithm
             redCells.Add(rc)
 
             If rc.indexLast <> 0 Then matchCount += 1
+            matches.Add(rc.matchCount)
 
             dst3(rc.rect).SetTo(rc.index, rc.mask)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
+        task.rcMatchAvg = matches.Average()
         If task.heartBeat Then labels(2) = $"{redCells.Count} cells and {matchCount} were matched to the previous gen."
     End Sub
 End Class

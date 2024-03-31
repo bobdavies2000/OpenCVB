@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Algorithm
     Dim bounds As New Boundary_RemovedRects
     Dim redCPP As New RedCloud_MaskNone_CPP
-    Public genCells As New RedCloud_GenCells
+    Public genCells As New Cell_Generate
     Public Sub New()
         labels(3) = "Contour boundaries - input to RedCloud_Basics"
         desc = "Build the RedCloud cells with the best boundaries"
@@ -79,7 +79,6 @@ End Class
 
 Public Class Flood_ContainedCells : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
-    Public redCells As New List(Of rcData)
     Public Sub New()
         desc = "Find cells that have only one neighbor.  They are likely to be completely contained in another cell."
     End Sub
@@ -87,18 +86,17 @@ Public Class Flood_ContainedCells : Inherits VB_Algorithm
         If standalone Then
             flood.Run(src)
             dst2 = flood.dst2
-            redCells = task.redCells
             labels = flood.labels
         End If
 
         Dim removeCells As New List(Of Integer)
-        For i = redCells.Count - 1 To redOptions.identifyCount Step -1
-            Dim rc = redCells(i)
+        For i = task.redCells.Count - 1 To redOptions.identifyCount Step -1
+            Dim rc = task.redCells(i)
             Dim nabs As New List(Of Integer)
             Dim contains As New List(Of Integer)
-            Dim count = Math.Min(redOptions.identifyCount, redCells.Count)
+            Dim count = Math.Min(redOptions.identifyCount, task.redCells.Count)
             For j = 0 To count - 1
-                Dim rcBig = redCells(j)
+                Dim rcBig = task.redCells(j)
                 If rcBig.rect.IntersectsWith(rc.rect) Then nabs.Add(rcBig.index)
                 If rcBig.rect.Contains(rc.rect) Then contains.Add(rcBig.index)
             Next
@@ -107,10 +105,10 @@ Public Class Flood_ContainedCells : Inherits VB_Algorithm
 
         dst3.SetTo(0)
         For Each index In removeCells
-            Dim rc = redCells(index)
+            Dim rc = task.redCells(index)
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
-        identifyCells(redCells)
+        identifyCells(task.redCells)
 
         If task.heartBeat Then labels(3) = CStr(removeCells.Count) + " cells were completely contained in exactly one other cell's rect"
     End Sub
@@ -127,7 +125,7 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public binarizedImage As cv.Mat
     Public inputMask As cv.Mat
-    Public genCells As New RedCloud_GenCells
+    Public genCells As New Cell_Generate
     Dim redCPP As New RedCloud_Mask_CPP
     Public buildInputMask As Boolean
     Public Sub New()
@@ -210,7 +208,7 @@ Public Class Flood_MaxDistPoints : Inherits VB_Algorithm
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim bounds As New Boundary_RemovedRects
     Dim redCPP As New RedCloud_MaxDist_CPP
-    Public genCells As New RedCloud_GenCells
+    Public genCells As New Cell_Generate
     Public Sub New()
         labels(3) = "Contour boundaries - input to RedCloud_Basics"
         desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code."

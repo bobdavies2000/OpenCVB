@@ -141,7 +141,7 @@ End Class
 
 
 Public Class Neighbors_StableMax : Inherits VB_Algorithm
-    Dim stable As New Cell_StableMax
+    Dim stable As New Cell_StableAboveAverage
     Dim corners As New Neighbors_Intersects
     Public Sub New()
         desc = "Find neighbors in the RedCloud_StableMax redCloud cells."
@@ -151,7 +151,7 @@ Public Class Neighbors_StableMax : Inherits VB_Algorithm
         dst2 = stable.dst2
         labels(2) = stable.labels(2)
 
-        corners.Run(stable.cellMap)
+        corners.Run(task.cellMap)
 
         dst3 = task.color.Clone
         For Each pt In corners.nPoints
@@ -270,8 +270,8 @@ Public Class Neighbors_Precise : Inherits VB_Algorithm
             dst2 = redC.dst2
             labels = redC.labels
 
-            src = redC.cellMap
-            redCells = redC.redCells
+            src = task.cellMap
+            redCells = task.redCells
         End If
 
         Dim mapData(src.Total - 1) As Byte
