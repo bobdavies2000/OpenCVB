@@ -1629,7 +1629,6 @@ Public Class Feature_KNNSimple : Inherits VB_Algorithm
     Public feat As New Feature_Basics
     Public knn As New KNN_Basics
     Public Sub New()
-        findSlider("Distance").Value = 30
         labels(2) = "Track Good features using KNN"
         desc = "Find good features and track them from one image to the next using KNN."
     End Sub
@@ -1687,5 +1686,46 @@ Public Class Feature_KNNBasics : Inherits VB_Algorithm
 
         labels(2) = feat.labels(2)
         labels(3) = feat.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Feature_MultiPass : Inherits VB_Algorithm
+    Dim feat As New Feature_Basics
+    Public featurePoints As New List(Of cv.Point2f)
+    Dim sharpen As New PhotoShop_SharpenDetail
+    Public Sub New()
+        gOptions.RGBFilterActive.Checked = True
+        gOptions.RGBFilterList.SelectedIndex = gOptions.RGBFilterList.Items.IndexOf("Filter_Laplacian")
+        desc = "Run Feature_Basics twice and compare results."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(task.color)
+        dst2 = feat.dst2
+        featurePoints = New List(Of cv.Point2f)(feat.featurePoints)
+        Dim firstPassCount = featurePoints.Count
+
+        feat.Run(src)
+        For Each pt In feat.featurePoints
+            featurePoints.Add(pt)
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
+
+        sharpen.Run(task.color)
+        feat.Run(sharpen.dst2)
+        For Each pt In feat.featurePoints
+            featurePoints.Add(pt)
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
+
+        If task.heartBeat Then
+            labels(2) = "Total features = " + CStr(featurePoints.Count) + ", first pass/second pass = " + CStr(firstPassCount) + "/" + CStr(feat.featurePoints.Count)
+        End If
     End Sub
 End Class

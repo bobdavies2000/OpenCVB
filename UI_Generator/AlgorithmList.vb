@@ -592,6 +592,7 @@ if algorithmName = "Feature_Longest" Then return new Feature_Longest
 if algorithmName = "Feature_LongestV_Tutorial1" Then return new Feature_LongestV_Tutorial1
 if algorithmName = "Feature_LongestV_Tutorial2" Then return new Feature_LongestV_Tutorial2
 if algorithmName = "Feature_LongestVerticalKNN" Then return new Feature_LongestVerticalKNN
+if algorithmName = "Feature_MultiPass" Then return new Feature_MultiPass
 if algorithmName = "Feature_Points" Then return new Feature_Points
 if algorithmName = "Feature_PointsDelaunay" Then return new Feature_PointsDelaunay
 if algorithmName = "Feature_PointTracker" Then return new Feature_PointTracker
