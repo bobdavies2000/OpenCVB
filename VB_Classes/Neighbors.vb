@@ -59,7 +59,6 @@ End Class
 
 Public Class Neighbors_Intersects : Inherits VB_Algorithm
     Public nPoints As New List(Of cv.Point)
-    Dim ePoints As New Neighbors_IntersectsImageEdge
     Public Sub New()
         desc = "Find the corner points where multiple cells intersect."
     End Sub
@@ -94,11 +93,6 @@ Public Class Neighbors_Intersects : Inherits VB_Algorithm
             Next
         Next
 
-        ePoints.Run(src)
-        For Each pt In ePoints.nPoints
-            nPoints.Add(pt)
-        Next
-
         If standaloneTest() Then
             dst3 = task.color.Clone
             For Each pt In nPoints
@@ -111,50 +105,6 @@ Public Class Neighbors_Intersects : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Neighbors_IntersectsImageEdge : Inherits VB_Algorithm
-    Public nPoints As New List(Of cv.Point)
-    Public Sub New()
-        desc = "Find the cell boundaries at the edge of the image."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standaloneTest() Then
-            Static redC As New RedCloud_Basics
-            redC.Run(src)
-            dst2 = redC.dst2
-            src = redC.cellMap
-            labels(2) = redC.labels(2)
-        End If
-
-        nPoints.Clear()
-        For i = 0 To 3
-            Dim rowCol As cv.Mat = Choose(i + 1, src.Row(0).Clone, src.Row(dst2.Height - 1).Clone, src.Col(0).Clone, src.Col(dst2.Width - 1).Clone)
-            Dim data(rowCol.Total - 1) As Byte
-            Marshal.Copy(rowCol.Data, data, 0, data.Length)
-
-            Dim ptBase As cv.Point, pt As cv.Point
-            ptBase.X = Choose(i + 1, -1, -1, 0, dst2.Width - 1)
-            ptBase.Y = Choose(i + 1, 0, dst2.Height - 1, -1, -1)
-            For j = 1 To data.Count - 1
-                If (data(j) = 0 Or data(j - 1) = 0) And removeZeroNeighbors Then Continue For
-                If data(j) <> data(j - 1) Then
-                    pt.X = If(ptBase.X = -1, j, ptBase.X)
-                    pt.Y = If(ptBase.Y = -1, j, ptBase.Y)
-                    nPoints.Add(pt)
-                End If
-            Next
-        Next
-
-        dst2.SetTo(0)
-        For Each pt In nPoints
-            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-        Next
-    End Sub
-End Class
 
 
 

@@ -158,7 +158,7 @@ End Class
 
 Public Class Swarm_Flood : Inherits VB_Algorithm
     Dim swarm As New Swarm_Basics
-    Dim flood As New Flood_BasicsMask
+    Public flood As New Flood_BasicsMask
     Dim colorC As New Color_Basics
     Public Sub New()
         desc = "Floodfill the color image using the swarm outline as a mask"
@@ -174,5 +174,34 @@ Public Class Swarm_Flood : Inherits VB_Algorithm
         dst2 = flood.dst2
         identifyCells(flood.redCells)
         labels(2) = flood.genCells.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Swarm_Percentage : Inherits VB_Algorithm
+    Dim swarm As New Swarm_Flood
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Cells map X percent", 1, 100, 50)
+        desc = "Use features to segment a percentage of the image then use RedCloud with a mask for the rest of the image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static percentSlider = findSlider("Cells map X percent")
+        Dim percent = percentSlider.value / 100
+
+        swarm.Run(src)
+        dst2 = swarm.dst2
+
+        dst3.SetTo(0)
+        Dim pixels As Integer
+        For Each rc In swarm.flood.redCells
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
+            pixels += rc.pixels
+            If pixels / src.Total >= percent Then Exit For
+        Next
     End Sub
 End Class

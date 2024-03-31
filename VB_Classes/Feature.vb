@@ -1174,42 +1174,6 @@ End Class
 
 
 
-' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_History : Inherits VB_Algorithm
-    Public corners As New List(Of cv.Point2f)
-    Public feat As New Feature_Basics
-    Public Sub New()
-        findSlider("Feature Sample Size").Value = 200
-        findSlider("Min Distance to next").Value = 1
-        desc = "Find good features across multiple frames."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        feat.Run(src)
-        dst2 = src.Clone
-
-        Static cornerHistory As New List(Of List(Of cv.Point2f))
-
-        cornerHistory.Add(New List(Of cv.Point2f)(feat.featurePoints))
-        If cornerHistory.Count > task.frameHistoryCount Then cornerHistory.RemoveAt(0)
-
-        corners.Clear()
-        For Each cList In cornerHistory
-            For Each pt In cList
-                corners.Add(New cv.Point(pt.X, pt.Y))
-                dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
-            Next
-        Next
-
-        labels(2) = "Found " + CStr(corners.Count) + " points with quality = " + CStr(feat.options.quality) +
-                    " and minimum distance = " + CStr(feat.options.minDistance)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Feature_Reduction : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Dim feat As New Feature_Basics
@@ -1727,5 +1691,41 @@ Public Class Feature_MultiPass : Inherits VB_Algorithm
         If task.heartBeat Then
             labels(2) = "Total features = " + CStr(featurePoints.Count) + ", first pass/second pass = " + CStr(firstPassCount) + "/" + CStr(feat.featurePoints.Count)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
+Public Class Feature_History : Inherits VB_Algorithm
+    Public corners As New List(Of cv.Point2f)
+    Public feat As New Feature_Basics
+    Public Sub New()
+        desc = "Find good features across multiple frames."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+        dst2 = src.Clone
+
+        Static cornerHistory As New List(Of List(Of cv.Point2f))
+
+        cornerHistory.Add(New List(Of cv.Point2f)(feat.featurePoints))
+        If cornerHistory.Count > task.frameHistoryCount Then cornerHistory.RemoveAt(0)
+
+        corners.Clear()
+        For Each cList In cornerHistory
+            For Each pt In cList
+                corners.Add(New cv.Point(pt.X, pt.Y))
+                dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+            Next
+        Next
+
+        labels(2) = "Found " + CStr(corners.Count) + " points with quality = " + CStr(feat.options.quality) +
+                    " and minimum distance = " + CStr(feat.options.minDistance)
     End Sub
 End Class
