@@ -39,9 +39,6 @@ Partial Class OptionsGlobal
         Me.labelBinsCount = New System.Windows.Forms.Label()
         Me.HistBinSlider = New System.Windows.Forms.TrackBar()
         Me.labelbins = New System.Windows.Forms.Label()
-        Me.AddWeighted = New System.Windows.Forms.Label()
-        Me.AddWeightedSlider = New System.Windows.Forms.TrackBar()
-        Me.Label6 = New System.Windows.Forms.Label()
         Me.ThreadGridSize = New System.Windows.Forms.Label()
         Me.GridSize = New System.Windows.Forms.TrackBar()
         Me.Label9 = New System.Windows.Forms.Label()
@@ -89,7 +86,6 @@ Partial Class OptionsGlobal
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PixelDiffThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.AddWeightedSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.GridSize, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MaxDepth, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
@@ -117,9 +113,6 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.Controls.Add(Me.labelBinsCount)
         Me.MinMaxDepth.Controls.Add(Me.HistBinSlider)
         Me.MinMaxDepth.Controls.Add(Me.labelbins)
-        Me.MinMaxDepth.Controls.Add(Me.AddWeighted)
-        Me.MinMaxDepth.Controls.Add(Me.AddWeightedSlider)
-        Me.MinMaxDepth.Controls.Add(Me.Label6)
         Me.MinMaxDepth.Controls.Add(Me.ThreadGridSize)
         Me.MinMaxDepth.Controls.Add(Me.GridSize)
         Me.MinMaxDepth.Controls.Add(Me.Label9)
@@ -136,7 +129,7 @@ Partial Class OptionsGlobal
         'IMU_Label
         '
         Me.IMU_Label.AutoSize = True
-        Me.IMU_Label.Location = New System.Drawing.Point(723, 381)
+        Me.IMU_Label.Location = New System.Drawing.Point(723, 328)
         Me.IMU_Label.Name = "IMU_Label"
         Me.IMU_Label.Size = New System.Drawing.Size(89, 20)
         Me.IMU_Label.TabIndex = 59
@@ -144,7 +137,7 @@ Partial Class OptionsGlobal
         '
         'IMU_Alpha
         '
-        Me.IMU_Alpha.Location = New System.Drawing.Point(212, 381)
+        Me.IMU_Alpha.Location = New System.Drawing.Point(212, 328)
         Me.IMU_Alpha.Maximum = 100
         Me.IMU_Alpha.Name = "IMU_Alpha"
         Me.IMU_Alpha.Size = New System.Drawing.Size(506, 69)
@@ -154,11 +147,11 @@ Partial Class OptionsGlobal
         '
         'CameraMotionLabel
         '
-        Me.CameraMotionLabel.Location = New System.Drawing.Point(6, 381)
+        Me.CameraMotionLabel.Location = New System.Drawing.Point(7, 308)
         Me.CameraMotionLabel.Name = "CameraMotionLabel"
-        Me.CameraMotionLabel.Size = New System.Drawing.Size(186, 55)
+        Me.CameraMotionLabel.Size = New System.Drawing.Size(186, 69)
         Me.CameraMotionLabel.TabIndex = 57
-        Me.CameraMotionLabel.Text = "IMU Alpha Factor"
+        Me.CameraMotionLabel.Text = "IMU Alpha Factor - high-pass and low-pass filter of IMU acceleration"
         Me.CameraMotionLabel.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'TempSliderLabel
@@ -192,7 +185,7 @@ Partial Class OptionsGlobal
         'fHist
         '
         Me.fHist.AutoSize = True
-        Me.fHist.Location = New System.Drawing.Point(723, 318)
+        Me.fHist.Location = New System.Drawing.Point(723, 265)
         Me.fHist.Name = "fHist"
         Me.fHist.Size = New System.Drawing.Size(47, 20)
         Me.fHist.TabIndex = 53
@@ -200,7 +193,7 @@ Partial Class OptionsGlobal
         '
         'FrameHistory
         '
-        Me.FrameHistory.Location = New System.Drawing.Point(212, 318)
+        Me.FrameHistory.Location = New System.Drawing.Point(212, 265)
         Me.FrameHistory.Maximum = 30
         Me.FrameHistory.Minimum = 1
         Me.FrameHistory.Name = "FrameHistory"
@@ -211,7 +204,7 @@ Partial Class OptionsGlobal
         '
         'Label12
         '
-        Me.Label12.Location = New System.Drawing.Point(56, 318)
+        Me.Label12.Location = New System.Drawing.Point(56, 265)
         Me.Label12.Name = "Label12"
         Me.Label12.Size = New System.Drawing.Size(136, 55)
         Me.Label12.TabIndex = 51
@@ -221,7 +214,7 @@ Partial Class OptionsGlobal
         'PixelDiff
         '
         Me.PixelDiff.AutoSize = True
-        Me.PixelDiff.Location = New System.Drawing.Point(723, 256)
+        Me.PixelDiff.Location = New System.Drawing.Point(723, 203)
         Me.PixelDiff.Name = "PixelDiff"
         Me.PixelDiff.Size = New System.Drawing.Size(59, 20)
         Me.PixelDiff.TabIndex = 50
@@ -229,7 +222,7 @@ Partial Class OptionsGlobal
         '
         'PixelDiffThreshold
         '
-        Me.PixelDiffThreshold.Location = New System.Drawing.Point(212, 256)
+        Me.PixelDiffThreshold.Location = New System.Drawing.Point(212, 203)
         Me.PixelDiffThreshold.Maximum = 50
         Me.PixelDiffThreshold.Name = "PixelDiffThreshold"
         Me.PixelDiffThreshold.Size = New System.Drawing.Size(506, 69)
@@ -239,7 +232,7 @@ Partial Class OptionsGlobal
         '
         'Label7
         '
-        Me.Label7.Location = New System.Drawing.Point(56, 256)
+        Me.Label7.Location = New System.Drawing.Point(56, 203)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(136, 55)
         Me.Label7.TabIndex = 48
@@ -258,7 +251,7 @@ Partial Class OptionsGlobal
         'labelBinsCount
         '
         Me.labelBinsCount.AutoSize = True
-        Me.labelBinsCount.Location = New System.Drawing.Point(723, 194)
+        Me.labelBinsCount.Location = New System.Drawing.Point(723, 141)
         Me.labelBinsCount.Name = "labelBinsCount"
         Me.labelBinsCount.Size = New System.Drawing.Size(68, 20)
         Me.labelBinsCount.TabIndex = 44
@@ -266,7 +259,7 @@ Partial Class OptionsGlobal
         '
         'HistBinSlider
         '
-        Me.HistBinSlider.Location = New System.Drawing.Point(212, 194)
+        Me.HistBinSlider.Location = New System.Drawing.Point(212, 141)
         Me.HistBinSlider.Maximum = 1000
         Me.HistBinSlider.Minimum = 3
         Me.HistBinSlider.Name = "HistBinSlider"
@@ -278,40 +271,12 @@ Partial Class OptionsGlobal
         'labelbins
         '
         Me.labelbins.AutoSize = True
-        Me.labelbins.Location = New System.Drawing.Point(76, 194)
+        Me.labelbins.Location = New System.Drawing.Point(76, 141)
         Me.labelbins.Name = "labelbins"
         Me.labelbins.Size = New System.Drawing.Size(117, 20)
         Me.labelbins.TabIndex = 42
         Me.labelbins.Text = "Histogram Bins"
         Me.labelbins.TextAlign = System.Drawing.ContentAlignment.TopRight
-        '
-        'AddWeighted
-        '
-        Me.AddWeighted.AutoSize = True
-        Me.AddWeighted.Location = New System.Drawing.Point(723, 152)
-        Me.AddWeighted.Name = "AddWeighted"
-        Me.AddWeighted.Size = New System.Drawing.Size(88, 20)
-        Me.AddWeighted.TabIndex = 41
-        Me.AddWeighted.Text = "AddWeight"
-        '
-        'AddWeightedSlider
-        '
-        Me.AddWeightedSlider.Location = New System.Drawing.Point(212, 136)
-        Me.AddWeightedSlider.Maximum = 100
-        Me.AddWeightedSlider.Name = "AddWeightedSlider"
-        Me.AddWeightedSlider.Size = New System.Drawing.Size(506, 69)
-        Me.AddWeightedSlider.TabIndex = 40
-        Me.AddWeightedSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.AddWeightedSlider.Value = 100
-        '
-        'Label6
-        '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(64, 136)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(128, 20)
-        Me.Label6.TabIndex = 39
-        Me.Label6.Text = "Add Weighted %"
         '
         'ThreadGridSize
         '
@@ -768,7 +733,6 @@ Partial Class OptionsGlobal
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.PixelDiffThreshold, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.AddWeightedSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.GridSize, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.MaxDepth, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox2.ResumeLayout(False)
@@ -804,9 +768,6 @@ Partial Class OptionsGlobal
     Friend WithEvents labelBinsCount As Windows.Forms.Label
     Friend WithEvents HistBinSlider As Windows.Forms.TrackBar
     Friend WithEvents labelbins As Windows.Forms.Label
-    Friend WithEvents AddWeighted As Windows.Forms.Label
-    Friend WithEvents AddWeightedSlider As Windows.Forms.TrackBar
-    Friend WithEvents Label6 As Windows.Forms.Label
     Friend WithEvents ThreadGridSize As Windows.Forms.Label
     Friend WithEvents GridSize As Windows.Forms.TrackBar
     Friend WithEvents Label9 As Windows.Forms.Label

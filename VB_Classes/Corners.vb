@@ -309,7 +309,7 @@ Public Class Corners_Harris_CPP : Inherits VB_Algorithm
         addw.src2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         addw.Run(task.color)
         dst3 = addw.dst2
-        labels(3) = "RGB overlaid with Harris result. Weight = " + Format(task.AddWeighted, "0%")
+        labels(3) = "RGB overlaid with Harris result. "
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Harris_Features_Close(cPtr)

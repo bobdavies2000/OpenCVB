@@ -77,7 +77,6 @@ Module vbUtilities
         task.histogramBins = gOptions.HistBinSlider.Value
         task.lineWidth = gOptions.LineWidth.Value
         task.dotSize = gOptions.dotSizeSlider.Value
-        task.AddWeighted = gOptions.AddWeightedSlider.Value / 100
 
         task.maxZmeters = gOptions.MaxDepth.Value
         task.metersPerPixel = task.maxZmeters / task.workingRes.Height ' meters per pixel in projections - side and top.

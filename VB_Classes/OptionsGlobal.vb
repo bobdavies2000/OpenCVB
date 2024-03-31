@@ -17,7 +17,6 @@ Public Class OptionsGlobal
             dotSizeSlider.Value = 2
             LineWidth.Value = 2
         End If
-        AddWeightedSlider.Value = 50
         FrameHistory.Value = 3
         MotionFilteredColorAndCloud.Checked = True
         gravityPointCloud.Checked = True
@@ -28,7 +27,6 @@ Public Class OptionsGlobal
         fHist.Text = CStr(FrameHistory.Value)
         LineThicknessAmount.Text = CStr(LineWidth.Value)
         DotSizeLabel.Text = CStr(dotSizeSlider.Value)
-        AddWeighted.Text = CStr(AddWeightedSlider.Value)
         TempSliderLabel.Text = CStr(DebugSlider.Value)
 
         UseKalman.Checked = True
@@ -220,10 +218,6 @@ Public Class OptionsGlobal
     Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
         labelBinsCount.Text = CStr(HistBinSlider.Value)
-    End Sub
-    Private Sub AddWeightedSlider_ValueChanged(sender As Object, e As EventArgs) Handles AddWeightedSlider.ValueChanged
-        If task IsNot Nothing Then task.optionsChanged = True
-        AddWeighted.Text = CStr(AddWeightedSlider.Value)
     End Sub
     Private Sub useFilter_CheckedChanged(sender As Object, e As EventArgs) Handles RGBFilterActive.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True

@@ -135,7 +135,6 @@ Public Class VBtask : Implements IDisposable
     Public lowRes As cv.Size
     Public quarterRes As cv.Size
     Public displayRes As cv.Size
-    Public AddWeighted As Single
 
     Public CPU_TimeStamp As Double
     Public CPU_FrameTime As Double

@@ -2,7 +2,7 @@
 Public Class StdevGrid_Basics : Inherits VB_Algorithm
     Dim addw As New AddWeighted_Basics
     Public Sub New()
-        gOptions.AddWeightedSlider.Value = 70
+        findSlider("Add Weighted %").Value = 70
         gOptions.GridSize.Value = If(task.workingRes.Width >= 1280, 8, 4)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Use the task.gridList roi's to compute the stdev for each roi.  If small (<10), mark as featureLess."

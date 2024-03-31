@@ -1155,6 +1155,7 @@ Public Class Histogram_Depth : Inherits VB_Algorithm
         desc = "Show depth data as a histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        If src.Rows <= 0 Then Exit Sub
         plot.minRange = 0
         plot.maxRange = task.maxZmeters
         If rc IsNot Nothing Then

@@ -82,7 +82,9 @@ Public Class Benford_Basics : Inherits VB_Algorithm
         addW.Run(dst3)
         dst2 = addW.dst2
 
-        labels(2) = "AddWeighted: " + Format(task.AddWeighted, "%0.0") + " actual vs. " + Format(1 - task.AddWeighted, "%0.0") + " Benford distribution"
+        Static weightSlider = findSlider("Add Weighted %")
+        Dim wt = weightSlider.value
+        labels(2) = "AddWeighted: " + Format(wt, "%0.0") + " actual vs. " + Format(1 - wt, "%0.0") + " Benford distribution"
     End Sub
 End Class
 

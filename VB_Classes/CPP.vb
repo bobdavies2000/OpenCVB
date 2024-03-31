@@ -17,7 +17,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
         labels(2) = "Running CPP_Basics, Output from " + task.algName
 
         cPtr = cppTask_Open(cppFunction, task.workingRes.Height, task.workingRes.Width,
-                            task.heartBeat, task.AddWeighted, task.lineWidth, task.lineType, task.dotSize,
+                            task.heartBeat, 0.5, task.lineWidth, task.lineType, task.dotSize,
                             gOptions.GridSize.Value, task.histogramBins,
                             gOptions.gravityPointCloud.Checked, gOptions.PixelDiffThreshold.Value,
                             gOptions.UseKalman.Checked, gOptions.Palettes.SelectedIndex, task.optionsChanged,
@@ -91,8 +91,7 @@ Public Class CPP_Basics : Inherits VB_Algorithm
         Dim handleInput = GCHandle.Alloc(inputImage, GCHandleType.Pinned)
         cppTask_RunCPP(cPtr, handleInput.AddrOfPinnedObject(), src.Channels, task.frameCount, dst2.Rows, dst2.Cols,
                        task.accRadians.X, task.accRadians.Y, task.accRadians.Z, task.optionsChanged, task.heartBeat,
-                       gOptions.displayDst0.Checked, gOptions.displayDst1.Checked, task.AddWeighted,
-                       gOptions.DebugCheckBox.Checked)
+                       gOptions.displayDst0.Checked, gOptions.displayDst1.Checked, gOptions.DebugCheckBox.Checked)
         handleInput.Free()
         getOptions()
 

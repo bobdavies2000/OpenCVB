@@ -19,9 +19,9 @@ Public Class Hist3Dcolor_Basics : Inherits VB_Algorithm
 
             ReDim histArray(histogram.Total - 1)
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
-            histogram1D = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, histArray)
+            histogram1D = New cv.Mat(histogram.Total, 1, cv.MatType.CV_32F, histArray)
 
-            simK.Run(histogram)
+            simK.Run(histogram1D)
             histogram = simK.dst2
             classCount = simK.classCount
         End If

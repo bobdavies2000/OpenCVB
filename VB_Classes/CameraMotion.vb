@@ -3,7 +3,7 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
     Public translationX As Integer
     Public translationY As Integer
     Dim gravity As New Gravity_Horizon
-    Dim feat As New Swarm_Basics
+    Public secondOpinion As Boolean
     Public Sub New()
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -26,7 +26,6 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
             translationY = 0
         End If
 
-        dst3.SetTo(0)
         Dim r1 As cv.Rect, r2 As cv.Rect
         If translationX = 0 And translationY = 0 Then
             dst2 = src
@@ -54,14 +53,19 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
                 task.camDirection = Math.Atan(translationY / translationX)
             End If
 
-            ' the point cloud contribute one set of camera motion distance and direction.  Now confirm it with feature points
-            feat.Run(src)
-            strOut = "Swarm distance = " + Format(feat.distanceAvg, fmt1) + " when camMotionPixels = " + Format(task.camMotionPixels, fmt1)
-            If (feat.distanceAvg < task.camMotionPixels / 2) Or task.heartBeat Then
-                task.camMotionPixels = 0
-                src.CopyTo(dst2)
+            If secondOpinion Then
+                Static feat As New Swarm_Basics
+
+                dst3.SetTo(0)
+                ' the point cloud contributes one set of camera motion distance and direction.  Now confirm it with feature points
+                feat.Run(src)
+                strOut = "Swarm distance = " + Format(feat.distanceAvg, fmt1) + " when camMotionPixels = " + Format(task.camMotionPixels, fmt1)
+                If (feat.distanceAvg < task.camMotionPixels / 2) Or task.heartBeat Then
+                    task.camMotionPixels = 0
+                    src.CopyTo(dst2)
+                End If
+                dst3 = (src - dst2).ToMat.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
             End If
-            dst3 = (src - dst2).ToMat.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
         End If
 
         gravityVec = New pointPair(task.gravityVec.p1, task.gravityVec.p2)

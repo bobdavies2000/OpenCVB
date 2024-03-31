@@ -391,12 +391,11 @@ Mat MakeSureImage8uC3(const Mat& input) {
 
 extern "C" __declspec(dllexport)
 int* cppTask_RunCPP(cppTask * task, int* dataPtr, int channels, int frameCount, int rows, int cols, float x, float y, float z,
-                    bool optionsChanged, bool heartBeat, bool displayDst0, bool displayDst1, float AddWeighted,
-                    bool debugCheckBox)
+                    bool optionsChanged, bool heartBeat, bool displayDst0, bool displayDst1, bool debugCheckBox)
 {
     task->optionsChanged = optionsChanged;
     task->heartBeat = heartBeat;
-    task->AddWeighted = double(AddWeighted);
+    task->AddWeighted = double(0.5);
     task->displayDst0 = displayDst0;
     task->displayDst1 = displayDst1;
     task->accRadians = Point3f(x, y, z);

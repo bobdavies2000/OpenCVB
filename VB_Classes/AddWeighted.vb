@@ -3,10 +3,12 @@ Imports cv = OpenCvSharp
 Public Class AddWeighted_Basics : Inherits VB_Algorithm
     Public src2 As cv.Mat
     Public Sub New()
-        vbAddAdvice(traceName + ": use the global option slider 'Add Weighted %'")
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Add Weighted %", 0, 100, 50)
+        vbAddAdvice(traceName + ": use the local option slider 'Add Weighted %'")
         desc = "Add 2 images with specified weights."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        Static weightSlider = findSlider("Add Weighted %")
         Dim srcPlus = src2
         ' algorithm user normally provides src2! 
         If standaloneTest() Or src2 Is Nothing Then srcPlus = task.depthRGB
@@ -18,7 +20,7 @@ Public Class AddWeighted_Basics : Inherits VB_Algorithm
                 If srcPlus.Type <> cv.MatType.CV_8UC3 Then srcPlus = srcPlus.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             End If
         End If
-        Dim wt = task.AddWeighted
+        Dim wt = weightSlider.value / 100
         cv.Cv2.AddWeighted(src, wt, srcPlus, 1.0 - wt, 0, dst2)
         labels(2) = $"Depth %: {100 - wt * 100} BGR %: {CInt(wt * 100)}"
     End Sub

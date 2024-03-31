@@ -1,6 +1,4 @@
-﻿Imports System.Windows.Controls
-Imports CS_Classes
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Swarm_Basics : Inherits VB_Algorithm
     Public knn As New KNN_Core
     Dim feat As New Feature_Basics
