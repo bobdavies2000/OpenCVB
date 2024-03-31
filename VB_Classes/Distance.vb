@@ -204,8 +204,8 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
         Static lastredCells As New List(Of rcData)
         pixelVector.Clear()
         distances.Clear()
-        For i = 0 To redC.redCells.Count - 1
-            Dim rc = redC.redCells(i)
+        For i = 0 To task.redCells.Count - 1
+            Dim rc = task.redCells(i)
             hColor.inputMask = rc.mask
             hColor.Run(src(rc.rect))
 
@@ -222,7 +222,7 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
                 If index Mod 6 = 5 Then strOut += vbCrLf
                 index += 1
 
-                Dim rc = redC.redCells(el.Value)
+                Dim rc = task.redCells(el.Value)
                 setTrueText(CStr(el.Value), rc.maxDist)
             Next
 
@@ -238,7 +238,7 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
             Next
 
             For Each el In distances
-                Dim rc = redC.redCells(el.Value)
+                Dim rc = task.redCells(el.Value)
                 setTrueText(CStr(el.Value), rc.maxDist)
             Next
         End If
@@ -253,7 +253,7 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
         dst2.SetTo(0)
         dst3.SetTo(0)
         For i = 0 To distances.Count - 1
-            Dim rp = redC.redCells(distances.ElementAt(i).Value)
+            Dim rp = task.redCells(distances.ElementAt(i).Value)
             task.color(rp.rect).CopyTo(dst2(rp.rect), rp.mask)
             dst3(rp.rect).SetTo(task.scalarColors(i), rp.mask)
         Next
@@ -264,7 +264,7 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
             lastDistances.Add(el.Key, el.Value)
         Next
 
-        lastredCells = New List(Of rcData)(redC.redCells)
+        lastredCells = New List(Of rcData)(task.redCells)
     End Sub
 End Class
 
@@ -288,9 +288,9 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
         redC.Run(src)
 
         'd3Cells.Clear()
-        'For i = 0 To redC.redCells.Count - 1
+        'For i = 0 To task.redCells.Count - 1
         '    Dim rm As New rcData
-        '    Dim rc = redC.redCells(i)
+        '    Dim rc = task.redCells(i)
         '    rm.mask = rc.mask
         '    rm.rect = rc.rect
         '    rm.index = i + 1
@@ -316,7 +316,7 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
         'Next
         'dst2 = vbPalette(dst3 * 255 / d3Cells.Count)
 
-        'If standaloneTest() Then identifyCells(redC.redCells)
+        'If standaloneTest() Then identifyCells(task.redCells)
         'labels(2) = redC.labels(3)
     End Sub
 End Class

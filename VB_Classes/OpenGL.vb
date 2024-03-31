@@ -919,7 +919,7 @@ Public Class OpenGL_DrawHulls : Inherits VB_Algorithm
         Dim oglData As New List(Of cv.Point3f)
         oglData.Add(New cv.Point3f)
         Dim polygonCount As Integer
-        For Each rc In hulls.redC.redCells
+        For Each rc In task.redCells
             If rc.hull Is Nothing Then Continue For
             Dim hullIndex = oglData.Count
             oglData.Add(New cv.Point3f(rc.hull.Count, 0, 0))
@@ -981,7 +981,7 @@ Public Class OpenGL_Contours : Inherits VB_Algorithm
         Dim oglData As New List(Of cv.Point3f)
         Dim lastDepth As cv.Scalar
         oglData.Add(New cv.Point3f)
-        For Each rc In redC.redCells
+        For Each rc In task.redCells
             Dim d = rc.depthMean(2)
             If d = 0 Then Continue For
 
@@ -1190,7 +1190,7 @@ Public Class OpenGL_PlaneClusters3D : Inherits VB_Algorithm
 
         Dim pcPoints As New List(Of cv.Point3f)
         Dim blue As New cv.Point3f(0, 0, 1), red As New cv.Point3f(1, 0, 0), green As New cv.Point3f(0, 1, 0) ' NOTE: RGB, not BGR...
-        For Each rc In redC.redCells
+        For Each rc In task.redCells
             If rc.maxVec.Z > 0 Then
                 eq.rc = rc
                 eq.Run(src)
@@ -1814,8 +1814,8 @@ Public Class OpenGL_RedCloudCell : Inherits VB_Algorithm
         specZ.Run(src)
         setTrueText(specZ.strOut, 3)
 
-        If task.clickPoint = New cv.Point And specZ.options.redC.redCells.Count > 1 Then
-            task.rc = specZ.options.redC.redCells(1) ' pick the largest cell
+        If task.clickPoint = New cv.Point And task.redCells.Count > 1 Then
+            task.rc = task.redCells(1) ' pick the largest cell
             task.clickPoint = task.rc.maxDist
         End If
 

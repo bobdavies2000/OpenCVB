@@ -170,7 +170,7 @@ Public Class Swarm_Flood : Inherits VB_Algorithm
         flood.inputMask = swarm.dst2
         flood.Run(colorC.dst2)
         dst2 = flood.dst2
-        identifyCells(flood.redCells)
+        identifyCells(task.redCells)
         labels(2) = flood.genCells.labels(2)
     End Sub
 End Class
@@ -196,7 +196,7 @@ Public Class Swarm_Percentage : Inherits VB_Algorithm
 
         dst3.SetTo(0)
         Dim pixels As Integer
-        For Each rc In swarm.flood.redCells
+        For Each rc In task.redCells
             dst3(rc.rect).SetTo(rc.color, rc.mask)
             pixels += rc.pixels
             If pixels / src.Total >= percent Then Exit For

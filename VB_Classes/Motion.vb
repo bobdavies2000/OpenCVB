@@ -537,10 +537,10 @@ Public Class Motion_Enclosing : Inherits VB_Algorithm
         redMasks.Run(dst2)
 
         motionRect = New cv.Rect
-        If redMasks.genCells.redCells.Count < 2 Then Exit Sub
-        motionRect = redMasks.genCells.redCells.ElementAt(1).rect
-        For i = 2 To redMasks.genCells.redCells.Count - 1
-            Dim cell = redMasks.genCells.redCells.ElementAt(i)
+        If task.redCells.Count < 2 Then Exit Sub
+        motionRect = task.redCells.ElementAt(1).rect
+        For i = 2 To task.redCells.Count - 1
+            Dim cell = task.redCells.ElementAt(i)
             motionRect = motionRect.Union(cell.rect)
         Next
 
@@ -641,13 +641,13 @@ Public Class Motion_Basics_QT : Inherits VB_Algorithm
         dst2 = src
 
         redMasks.Run(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
-        If redMasks.genCells.redCells.Count < 2 Then
+        If task.redCells.Count < 2 Then
             task.motionDetected = False
             rectList.Clear()
         Else
-            Dim nextRect = redMasks.genCells.redCells.ElementAt(1).rect
-            For i = 2 To redMasks.genCells.redCells.Count - 1
-                Dim rc = redMasks.genCells.redCells.ElementAt(i)
+            Dim nextRect = task.redCells.ElementAt(1).rect
+            For i = 2 To task.redCells.Count - 1
+                Dim rc = task.redCells.ElementAt(i)
                 nextRect = nextRect.Union(rc.rect)
             Next
 
@@ -665,8 +665,8 @@ Public Class Motion_Basics_QT : Inherits VB_Algorithm
 
         If standaloneTest() Then
             dst2.Rectangle(task.motionRect, 255, task.lineWidth)
-            If redMasks.genCells.redCells.Count > 1 Then
-                labels(2) = CStr(redMasks.genCells.redCells.Count) + " RedMask cells had motion"
+            If task.redCells.Count > 1 Then
+                labels(2) = CStr(task.redCells.Count) + " RedMask cells had motion"
             Else
                 labels(2) = "No motion detected"
             End If
@@ -751,12 +751,12 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
 
         redMasks.inputMask = Not dst2
         redMasks.Run(dst2)
-        If redMasks.genCells.redCells.Count <= 2 Then
+        If task.redCells.Count <= 2 Then
             task.motionDetected = False
         Else
-            Dim nextRect = redMasks.genCells.redCells.ElementAt(1).rect
-            For i = 2 To redMasks.genCells.redCells.Count - 1
-                Dim rc = redMasks.genCells.redCells.ElementAt(i)
+            Dim nextRect = task.redCells.ElementAt(1).rect
+            For i = 2 To task.redCells.Count - 1
+                Dim rc = task.redCells.ElementAt(i)
                 nextRect = nextRect.Union(rc.rect)
             Next
 
@@ -775,8 +775,8 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
 
         If standaloneTest() Then
             dst2.Rectangle(task.motionRect, 255, task.lineWidth)
-            If redMasks.genCells.redCells.Count > 1 Then
-                labels(2) = CStr(redMasks.genCells.redCells.Count) + " RedMask cells had motion"
+            If task.redCells.Count > 1 Then
+                labels(2) = CStr(task.redCells.Count) + " RedMask cells had motion"
             Else
                 labels(2) = "No motion detected"
             End If

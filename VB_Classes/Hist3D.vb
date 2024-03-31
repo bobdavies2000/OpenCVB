@@ -137,10 +137,10 @@ Public Class Hist3D_RedColor : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(3)
 
-        If redC.redCells.Count > 0 Then
+        If task.redCells.Count > 0 Then
             dst2(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
         End If
-        If standaloneTest() Then identifyCells(redC.redCells)
+        If standaloneTest() Then identifyCells(task.redCells)
     End Sub
 End Class
 
@@ -227,13 +227,13 @@ Public Class Hist3D_PixelCells : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
-        dst2 = redC.cellMap
+        dst2 = task.cellMap
         labels(2) = redC.labels(3)
 
         pixel.Run(src)
 
         dst0.SetTo(0)
-        For Each cell In redC.redCells
+        For Each cell In task.redCells
             cv.Cv2.CalcBackProject({src(cell.rect)}, {0, 1, 2}, pixel.histogram, dst1(cell.rect), redOptions.rangesBGR)
             dst1(cell.rect).CopyTo(dst0(cell.rect), cell.mask)
         Next
@@ -262,7 +262,7 @@ Public Class Hist3D_PixelClassify : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(3)
 
-        If redC.redCells.Count > 0 Then
+        If task.redCells.Count > 0 Then
             dst2(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
         End If
     End Sub
@@ -309,11 +309,11 @@ Public Class Hist3D_RedCloudGrid : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         pixels.Run(src)
-        dst2 = pixels.redC.cellMap
+        dst2 = task.cellMap
         dst3 = dst2.InRange(0, 0)
         If pixels.pixelVector.Count = 0 Then Exit Sub
         dst1.SetTo(0)
-        dst0 = pixels.redC.cellMap
+        dst0 = task.cellMap
         For Each roi In task.gridList
             If dst3(roi).CountNonZero Then
                 Dim candidates As New List(Of Integer)

@@ -633,7 +633,7 @@ Public Class Contour_RedCloudEdges : Inherits VB_Algorithm
         labels(2) = redC.redC.labels(2) + " - Contours only.  Click anywhere to select a cell"
 
         dst2.SetTo(0)
-        For Each rc In redC.redC.redCells
+        For Each rc In task.redCells
             vbDrawContour(dst2(rc.rect), rc.contour, 255, task.lineWidth)
         Next
 
@@ -660,7 +660,7 @@ Public Class Contour_RedCloud : Inherits VB_Algorithm
         dst2 = redC.dst2
 
         dst3.SetTo(0)
-        For Each rc In redC.redCells
+        For Each rc In task.redCells
             vbDrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
         Next
     End Sub

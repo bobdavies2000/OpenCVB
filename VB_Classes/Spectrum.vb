@@ -310,7 +310,7 @@ Public Class Spectrum_RedCloud : Inherits VB_Algorithm
 
         redCells.Clear()
         dst3.SetTo(0)
-        For Each rc In breakdown.options.redC.redCells
+        For Each rc In task.redCells
             task.rc = rc
             breakdown.Run(src)
             rc = task.rc

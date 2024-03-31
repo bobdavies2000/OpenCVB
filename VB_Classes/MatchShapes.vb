@@ -79,7 +79,7 @@ Public Class MatchShapes_NearbyHull : Inherits VB_Algorithm
 
         If standaloneTest() Then
             hulls.Run(task.color)
-            If hulls.redC.redCells.Count = 0 Then Exit Sub
+            If task.redCells.Count = 0 Then Exit Sub
             dst2 = hulls.dst2
             rc = task.rc
         End If
@@ -88,7 +88,7 @@ Public Class MatchShapes_NearbyHull : Inherits VB_Algorithm
         similarCells.Clear()
 
         Dim minMatch As Single = Single.MaxValue
-        For Each rc2 In hulls.redC.redCells
+        For Each rc2 In task.redCells
             If rc2.hull Is Nothing Or rc.hull Is Nothing Then Continue For
             If Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rc.hull, rc2.hull, options.matchOption)
@@ -135,9 +135,9 @@ Public Class MatchShapes_Nearby : Inherits VB_Algorithm
 
         If myStandalone Then
             redC.Run(task.color)
-            If redC.redCells.Count = 0 Then Exit Sub
+            If task.redCells.Count = 0 Then Exit Sub
             dst2 = redC.dst2
-            addTour.redCells = New List(Of rcData)(redC.redCells)
+            addTour.redCells = New List(Of rcData)(task.redCells)
             addTour.Run(src)
             rc = task.rc
         End If
@@ -269,7 +269,7 @@ Public Class MatchShapes_Hulls : Inherits VB_Algorithm
 
         Dim rcX = task.rc
 
-        For Each rc In hulls.redC.redCells
+        For Each rc In task.redCells
             If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rcX.hull, rc.hull, options.matchOption)
             If matchVal < options.matchThreshold Then vbDrawContour(dst3(rc.rect), rc.hull, cv.Scalar.White, -1)
@@ -304,7 +304,7 @@ Public Class MatchShapes_Contours : Inherits VB_Algorithm
 
         Dim rcX = task.rc
 
-        For Each rc In redC.redCells
+        For Each rc In task.redCells
             If rc.contour Is Nothing Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rcX.contour, rc.contour, options.matchOption)
             If matchVal < options.matchThreshold Then vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.White, -1)

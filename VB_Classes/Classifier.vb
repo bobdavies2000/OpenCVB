@@ -125,19 +125,19 @@ Public Class Classifier_BayesianTest : Inherits VB_Algorithm
         dst2 = redC.dst2
 
         setTrueText("Review the neighbors_Precise algorithm")
-        'nabs.redCells = redC.redCells
-        'nabs.Run(redC.cellMap)
+        'nabs.redCells = task.redCells
+        'nabs.Run(task.cellMap)
 
         'Dim trainList As New List(Of cv.Scalar)
         'Dim responseList As New List(Of Integer)
-        'For Each rc In redC.redCells
+        'For Each rc In task.redCells
         '    trainList.Add(rc.depthMean)
         '    responseList.Add(0)
         'Next
 
         'dst1.SetTo(0)
         'For Each index In nabs.nabList(task.rc.index)
-        '    Dim rc = redC.redCells(index)
+        '    Dim rc = task.redCells(index)
         '    dst1(rc.rect).SetTo(255, rc.mask)
         '    strOut += CStr(index) + ","
         '    responseList(index) = -1
@@ -177,7 +177,7 @@ Public Class Classifier_BayesianTest : Inherits VB_Algorithm
         'Dim zeroOutput As Boolean = True
         'For i = 0 To maskList.Count - 1
         '    If results(i) > 0 Then
-        '        Dim rc = redC.redCells(maskList(i))
+        '        Dim rc = task.redCells(maskList(i))
         '        dst3(rc.rect).SetTo(rc.color, rc.mask)
         '        zeroOutput = False
         '    End If

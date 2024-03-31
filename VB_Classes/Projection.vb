@@ -17,7 +17,7 @@ Public Class Projection_Basics : Inherits VB_Algorithm
             Static redc As New RedCloud_BasicsMask
             redc.inputMask = Not histTop.dst3
             redc.Run(histTop.dst3)
-            redCellInput = redc.redCells
+            redCellInput = task.redCells
             dst2 = redc.dst2
             labels(2) = redc.labels(2)
         End If
@@ -258,7 +258,7 @@ Public Class Projection_Top : Inherits VB_Algorithm
         redC.inputMask = Not histTop.dst3
         redC.Run(histTop.dst3)
 
-        objects.redCellInput = redC.redCells
+        objects.redCellInput = task.redCells
         objects.dst2 = redC.dst2
         objects.labels(2) = redC.labels(2)
         objects.Run(histTop.dst2)
@@ -292,7 +292,7 @@ Public Class Projection_Side : Inherits VB_Algorithm
         redC.inputMask = Not histSide.dst3
         redC.Run(histSide.dst3)
 
-        objects.redCellInput = redC.redCells
+        objects.redCellInput = task.redCells
         objects.dst2 = redC.dst2
         objects.labels(2) = redC.labels(2)
         objects.Run(histSide.dst2)

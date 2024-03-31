@@ -671,7 +671,7 @@ Public Class Pixel_Vector3D : Inherits VB_Algorithm
         If task.heartBeat Then
             pixelVector.Clear()
             strOut = "3D histogram counts for each cell - " + CStr(maxRegion) + " largest only for readability..." + vbCrLf
-            For Each cell In redC.redCells
+            For Each cell In task.redCells
                 hColor.inputMask = cell.mask
                 hColor.Run(src(cell.rect))
                 pixelVector.Add(hColor.histArray.ToList)
@@ -687,7 +687,7 @@ Public Class Pixel_Vector3D : Inherits VB_Algorithm
 
         dst1.SetTo(0)
         dst2.SetTo(0)
-        For Each cell In redC.redCells
+        For Each cell In task.redCells
             task.color(cell.rect).CopyTo(dst2(cell.rect), cell.mask)
             dst1(cell.rect).SetTo(cell.color, cell.mask)
             If cell.index <= maxRegion Then setTrueText(CStr(cell.index), cell.maxDist, 2)
@@ -744,12 +744,12 @@ Public Class Pixel_Vectors : Inherits VB_Algorithm
 
         Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
         pixelVector.Clear()
-        For Each cell In redC.redCells
+        For Each cell In task.redCells
             hVector.inputMask = cell.mask
             hVector.Run(src(cell.rect))
             pixelVector.Add(hVector.histArray)
         Next
-        redCells = redC.redCells
+        redCells = task.redCells
 
         setTrueText("3D color histograms were created for " + CStr(pixelVector.Count) + " cells", 3)
     End Sub

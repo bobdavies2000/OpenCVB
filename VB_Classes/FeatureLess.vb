@@ -333,7 +333,7 @@ Public Class FeatureLess_RedCloud : Inherits VB_Algorithm
         fless.Run(src)
         redC.Run(fless.dst2)
 
-        dst2 = redC.cellMap
+        dst2 = task.cellMap
         dst3 = redC.dst2
         labels(2) = redC.labels(2)
     End Sub

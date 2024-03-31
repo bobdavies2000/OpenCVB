@@ -17,8 +17,8 @@ Public Class Neighbors_Basics : Inherits VB_Algorithm
             redC.Run(src)
             dst2 = redC.dst2
             labels = redC.labels
-            redCells = redC.redCells
-            cellMap = redC.cellMap
+            redCells = task.redCells
+            cellMap = task.cellMap
         End If
 
         knn.queries.Clear()
@@ -67,7 +67,7 @@ Public Class Neighbors_Intersects : Inherits VB_Algorithm
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
-            src = redC.cellMap
+            src = task.cellMap
             labels(2) = redC.labels(2)
         End If
 
@@ -123,7 +123,7 @@ Public Class Neighbors_ColorOnly : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
 
-        corners.Run(redC.redC.cellMap.Clone())
+        corners.Run(task.cellMap.Clone())
         For Each pt In corners.nPoints
             dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
         Next

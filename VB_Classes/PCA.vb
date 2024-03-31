@@ -285,7 +285,7 @@ End Class
 '            Dim blue As New cv.Scalar(255, 0, 0), red As New cv.Scalar(0, 0, 255), green As New cv.Scalar(0, 255, 0)
 '            dst3.SetTo(0)
 '            Dim color As cv.Scalar
-'            For Each rc In stats.redC.redCells
+'            For Each rc In stats.task.redCells
 '                If rc.eq(0) > rc.eq(1) And rc.eq(0) > rc.eq(2) Then color = red
 '                If rc.eq(1) > rc.eq(0) And rc.eq(1) > rc.eq(2) Then color = blue
 '                If rc.eq(2) > rc.eq(0) And rc.eq(2) > rc.eq(1) Then color = green

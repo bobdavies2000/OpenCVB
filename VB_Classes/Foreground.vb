@@ -141,7 +141,7 @@ Public Class Foreground_RedCloud : Inherits VB_Algorithm
         back.Run(src)
         dst3 = back.dst2
         labels(3) = back.labels(2)
-        If fore.redC.redCells.Count > 0 Then
+        If task.redCells.Count > 0 Then
             dst2(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
         End If
     End Sub
@@ -165,13 +165,13 @@ Public Class Foreground_CellsFore : Inherits VB_Algorithm
         fore.Run(src)
         dst3 = fore.dst2 And task.depthMask
         dst2.SetTo(0)
-        For Each rc In redC.redCells
+        For Each rc In task.redCells
             If rc.pixels = 0 Then Continue For
             Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
             If tmp.CountNonZero / rc.pixels > 0.5 Then dst2(rc.rect).SetTo(rc.color, rc.mask) Else Dim k = 0
         Next
 
-        If standaloneTest() Then identifyCells(redC.redCells)
+        If standaloneTest() Then identifyCells(task.redCells)
     End Sub
 End Class
 
@@ -192,12 +192,12 @@ Public Class Foreground_CellsBack : Inherits VB_Algorithm
         fore.Run(src)
         dst3 = Not fore.dst2 And task.depthMask
         dst2.SetTo(0)
-        For Each rc In redC.redCells
+        For Each rc In task.redCells
             If rc.pixels = 0 Then Continue For
             Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
             If tmp.CountNonZero / rc.pixels > 0.5 Then dst2(rc.rect).SetTo(rc.color, rc.mask) Else Dim k = 0
         Next
 
-        If standaloneTest() Then identifyCells(redC.redCells)
+        If standaloneTest() Then identifyCells(task.redCells)
     End Sub
 End Class

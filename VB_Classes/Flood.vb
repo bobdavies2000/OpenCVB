@@ -26,8 +26,6 @@ Public Class Flood_Basics : Inherits VB_Algorithm
         genCells.cellLimit = bounds.bRects.bounds.rects.Count - bounds.bRects.smallRects.Count
         genCells.Run(redCPP.dst2)
 
-        task.redCells = genCells.redCells
-        task.cellMap = genCells.dst3
         dst2 = genCells.dst2
 
         setSelectedContour(task.redCells, task.cellMap)
@@ -121,8 +119,6 @@ End Class
 
 
 Public Class Flood_BasicsMask : Inherits VB_Algorithm
-    Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public binarizedImage As cv.Mat
     Public inputMask As cv.Mat
     Public genCells As New Cell_Generate
@@ -150,14 +146,12 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
         genCells.Run(redCPP.dst2)
 
         dst2 = genCells.dst2
-        cellMap = genCells.dst3
-        redCells = genCells.redCells
 
-        Dim cellCount = Math.Min(redOptions.identifyCount, redCells.Count)
-        If task.heartBeat Then labels(2) = $"{redCells.Count} cells identified and the largest {cellCount} are numbered below."
+        Dim cellCount = Math.Min(redOptions.identifyCount, task.redCells.Count)
+        If task.heartBeat Then labels(2) = $"{task.redCells.Count} cells identified and the largest {cellCount} are numbered below."
 
-        setSelectedContour(redCells, cellMap)
-        identifyCells(redCells)
+        setSelectedContour(task.redCells, task.cellMap)
+        identifyCells(task.redCells)
     End Sub
 End Class
 
@@ -194,8 +188,8 @@ Public Class Flood_Tiers : Inherits VB_Algorithm
         dst2 = flood.dst2
         dst3 = flood.dst3
 
-        setSelectedContour(flood.redCells, flood.cellMap)
-        identifyCells(flood.redCells)
+        setSelectedContour(task.redCells, task.cellMap)
+        identifyCells(task.redCells)
     End Sub
 End Class
 
@@ -204,8 +198,6 @@ End Class
 
 
 Public Class Flood_MaxDistPoints : Inherits VB_Algorithm
-    Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim bounds As New Boundary_RemovedRects
     Dim redCPP As New RedCloud_MaxDist_CPP
     Public genCells As New Cell_Generate
@@ -231,18 +223,16 @@ Public Class Flood_MaxDistPoints : Inherits VB_Algorithm
         genCells.cellLimit = bounds.bRects.bounds.rects.Count - bounds.bRects.smallRects.Count
         genCells.Run(redCPP.dst2)
 
-        redCells = genCells.redCells
-        cellMap = genCells.dst3
         dst2 = genCells.dst2
 
         redCPP.maxList.Clear()
-        For i = 1 To redCells.Count - 1
-            redCPP.maxList.Add(redCells(i).maxDist.X)
-            redCPP.maxList.Add(redCells(i).maxDist.Y)
+        For i = 1 To task.redCells.Count - 1
+            redCPP.maxList.Add(task.redCells(i).maxDist.X)
+            redCPP.maxList.Add(task.redCells(i).maxDist.Y)
         Next
 
-        setSelectedContour(redCells, cellMap)
-        identifyCells(redCells)
+        setSelectedContour(task.redCells, task.cellMap)
+        identifyCells(task.redCells)
 
         labels(2) = genCells.labels(2)
     End Sub

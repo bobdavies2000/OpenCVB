@@ -92,7 +92,7 @@ Public Class Cell_PixelCountCompare : Inherits VB_Algorithm
 
         dst3.SetTo(0)
         Dim missCount As Integer
-        For Each rc In redC.redCells
+        For Each rc In task.redCells
             If rc.depthPixels <> 0 Then
                 If rc.pixels <> rc.depthPixels Then
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
@@ -223,7 +223,7 @@ Public Class Cell_ValidateColorCells : Inherits VB_Algorithm
         dst1.SetTo(0)
         dst3.SetTo(0)
         Dim percentDepth As New List(Of Single)
-        For Each rc In redC.redCells
+        For Each rc In task.redCells
             If rc.depthCell = False Then dst1(rc.rect).SetTo(255, rc.mask)
             If rc.depthCell And rc.index > 0 Then
                 Dim pc = rc.depthPixels / rc.pixels
@@ -385,8 +385,6 @@ End Class
 
 Public Class Cell_Distance : Inherits VB_Algorithm
     Dim redC As New RedCloud_TightNew
-    Public redCells As New List(Of rcData)
-    Public cellMap As cv.Mat
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -399,25 +397,22 @@ Public Class Cell_Distance : Inherits VB_Algorithm
         If task.heartBeat Or task.quarterBeat Then
             redC.Run(src)
             dst0 = task.color
-            cellMap = task.cellMap
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            redCells.Clear()
             Dim depthDistance As New List(Of Single)
             Dim colorDistance As New List(Of Single)
             Dim selectedMean As cv.Scalar = src(task.rc.rect).Mean(task.rc.mask)
             For Each rc In task.redCells
                 colorDistance.Add(distance3D(selectedMean, src(rc.rect).Mean(rc.mask)))
                 depthDistance.Add(distance3D(task.rc.depthMean, rc.depthMean))
-                redCells.Add(rc)
             Next
 
             dst1.SetTo(0)
             dst3.SetTo(0)
             Dim maxColorDistance = colorDistance.Max()
-            For i = 0 To redCells.Count - 1
-                Dim rc = redCells(i)
+            For i = 0 To task.redCells.Count - 1
+                Dim rc = task.redCells(i)
                 dst1(rc.rect).SetTo(255 - depthDistance(i) * 255 / task.maxZmeters, rc.mask)
                 dst3(rc.rect).SetTo(255 - colorDistance(i) * 255 / maxColorDistance, rc.mask)
             Next
@@ -451,7 +446,7 @@ Public Class Cell_Binarize : Inherits VB_Algorithm
 
             Dim grayMeans As New List(Of Single)
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            For Each rc In redC.redCells
+            For Each rc In task.redCells
                 Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
                 cv.Cv2.MeanStdDev(gray(rc.rect), grayMean, grayStdev, rc.mask)
                 grayMeans.Add(grayMean(0))
@@ -461,7 +456,7 @@ Public Class Cell_Binarize : Inherits VB_Algorithm
             Dim avg = grayMeans.Average
 
             dst3.SetTo(0)
-            For Each rc In redC.redCells
+            For Each rc In task.redCells
                 Dim color = (grayMeans(rc.index) - min) * 255 / (max - min)
                 dst3(rc.rect).SetTo(color, rc.mask)
                 dst1(rc.rect).SetTo(If(grayMeans(rc.index) > avg, 255, 0), rc.mask)
@@ -554,12 +549,12 @@ Public Class Cell_BasicsPlot : Inherits VB_Algorithm
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
             If task.clickPoint = New cv.Point Then
-                If redC.redCells.Count > 1 Then
-                    task.rc = redC.redCells(1)
+                If task.redCells.Count > 1 Then
+                    task.rc = task.redCells(1)
                     task.clickPoint = task.rc.maxDist
                 End If
             End If
-            identifyCells(redC.redCells)
+            identifyCells(task.redCells)
         End If
         If task.heartBeat Then statsString(src)
 
@@ -579,12 +574,12 @@ Public Class Cell_Generate : Inherits VB_Algorithm
     Public classCount As Integer
     Public rectData As cv.Mat
     Public floodPointData As cv.Mat
-    Public redCells As New List(Of rcData)
     Public removeContour As Boolean = True
     Public cellLimit As Integer = 255
     Public matchCount As Integer
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0) ' this will be the cellmap
+        task.cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        task.redCells = New List(Of rcData)
         desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -592,8 +587,8 @@ Public Class Cell_Generate : Inherits VB_Algorithm
             Static bounds As New Boundary_RemovedRects
             bounds.Run(src)
             dst1 = bounds.dst2
-            dst3 = bounds.bRects.bounds.dst2
-            src = dst3 Or dst1
+            task.cellMap = bounds.bRects.bounds.dst2
+            src = task.cellMap Or dst1
 
             Static redCPP As New RedCloud_MaskNone_CPP
             redCPP.Run(src)
@@ -605,6 +600,8 @@ Public Class Cell_Generate : Inherits VB_Algorithm
             removeContour = False
             src = redCPP.dst2
         End If
+
+        Dim redCells = task.redCells
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         Dim usedColors As New List(Of cv.Vec3b)
@@ -626,11 +623,11 @@ Public Class Cell_Generate : Inherits VB_Algorithm
 
             If rc.color = black Then
                 rc.maxDStable = rc.maxDist ' assume it has to use the latest.
-                rc.indexLast = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rc.indexLast = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If rc.indexLast > 0 And rc.indexLast < redCells.Count Then
                     Dim lrc = redCells(rc.indexLast)
                     rc.color = lrc.color
-                    Dim stableCheck = dst3.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
+                    Dim stableCheck = task.cellMap.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
                     If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
                     rc.matchCount = If(lrc.matchCount > 100, lrc.matchCount, lrc.matchCount + 1)
                 Else
@@ -660,25 +657,25 @@ Public Class Cell_Generate : Inherits VB_Algorithm
         Next
 
         dst2.SetTo(0)
-        dst3.SetTo(0)
-        redCells.Clear()
-        redCells.Add(New rcData)
+        task.cellMap.SetTo(0)
+        task.redCells.Clear()
+        task.redCells.Add(New rcData)
         matchCount = 0
         Dim matches As New List(Of Integer)
         For Each rc In sortedCells.Values
-            Dim val = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            Dim val = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If val <> 0 Then Continue For ' already occupied.
-            rc.index = redCells.Count
-            redCells.Add(rc)
+            rc.index = task.redCells.Count
+            task.redCells.Add(rc)
 
             If rc.indexLast <> 0 Then matchCount += 1
             matches.Add(rc.matchCount)
 
-            dst3(rc.rect).SetTo(rc.index, rc.mask)
+            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
-        task.rcMatchAvg = matches.Average()
-        If task.heartBeat Then labels(2) = $"{redCells.Count} cells and {matchCount} were matched to the previous gen."
+        If matches.Count > 0 Then task.rcMatchAvg = matches.Average() Else task.rcMatchAvg = 0
+        If task.heartBeat Then labels(2) = $"{task.redCells.Count} cells and {matchCount} were matched to the previous gen."
     End Sub
 End Class

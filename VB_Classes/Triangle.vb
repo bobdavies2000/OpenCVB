@@ -10,7 +10,7 @@ Public Class Triangle_Basics : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
 
-        If redC.redCells.Count <= 1 Then Exit Sub
+        If task.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rc
         If rc.index = 0 Then Exit Sub
 
@@ -51,7 +51,7 @@ Public Class Triangle_HullContour : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         hulls.Run(src)
         dst2 = hulls.dst2
-        If hulls.redC.redCells.Count <= 1 Then Exit Sub
+        If task.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rc
 
         rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxTC89L1)
@@ -89,12 +89,12 @@ Public Class Triangle_RedCloud : Inherits VB_Algorithm
         dst1 = redC.dst1
         dst2 = redC.dst2
 
-        If redC.redCells.Count <= 1 Then Exit Sub
+        If task.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rc
         If rc.index = 0 Then Exit Sub
 
         triangles.Clear()
-        For Each rc In redC.redCells
+        For Each rc In task.redCells
             Dim pt3D As New List(Of cv.Point3f)
             For Each pt In rc.contour
                 pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
@@ -130,7 +130,7 @@ Public Class Triangle_Cell : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
         dst2 = redC.dst2
-        If redC.redCells.Count <= 1 Then Exit Sub
+        If task.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rc
         If rc.index = 0 Then Exit Sub
 
@@ -186,7 +186,7 @@ Public Class Triangle_Mask : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
         dst2 = redC.dst2
-        If redC.redCells.Count <= 1 Then Exit Sub
+        If task.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rc
         If rc.index = 0 Then Exit Sub
 

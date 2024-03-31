@@ -376,7 +376,7 @@ Public Class Corners_RedCloud : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        corners.Run(redC.cellMap)
+        corners.Run(task.cellMap)
 
         dst3 = task.color.Clone
         For Each pt In corners.nPoints

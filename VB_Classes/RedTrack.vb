@@ -12,7 +12,7 @@ Public Class RedTrack_Basics : Inherits VB_Algorithm
         stats.Run(src)
         labels = stats.labels
         dst2.SetTo(0)
-        For Each rc As rcData In redC.redCells
+        For Each rc As rcData In task.redCells
             vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
             If rc.index = task.rc.index Then vbDrawContour(dst2(rc.rect), rc.contour, cv.Scalar.White, -1)
         Next
@@ -69,7 +69,7 @@ Public Class RedTrack_LineSingle : Inherits VB_Algorithm
     Private Function findNearest(pt As cv.Point) As Integer
         Dim bestDistance As Single = Single.MaxValue
         Dim bestIndex As Integer
-        For Each rc In track.redC.redCells
+        For Each rc In task.redCells
             Dim d = pt.DistanceTo(rc.maxDist)
             If d < bestDistance Then
                 bestDistance = d
@@ -83,12 +83,12 @@ Public Class RedTrack_LineSingle : Inherits VB_Algorithm
         dst0 = track.redC.dst0
         dst1 = track.redC.dst1
         dst2 = track.dst2
-        If track.redC.redCells.Count = 0 Then
+        If task.redCells.Count = 0 Then
             setTrueText("No lines found to track.", 3)
             Exit Sub
         End If
         Dim xList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        For Each rc In track.redC.redCells
+        For Each rc In task.redCells
             If rc.index = 0 Then Continue For
             xList.Add(rc.rect.X, rc.index)
         Next
@@ -104,18 +104,18 @@ Public Class RedTrack_LineSingle : Inherits VB_Algorithm
             While leftCenter.DistanceTo(rightCenter) < dst2.Width / 4
                 leftMost = msRNG.Next(minLeft, minRight)
                 rightmost = msRNG.Next(minLeft, minRight)
-                leftCenter = track.redC.redCells(leftMost).maxDist
-                rightCenter = track.redC.redCells(rightmost).maxDist
+                leftCenter = task.redCells(leftMost).maxDist
+                rightCenter = task.redCells(rightmost).maxDist
                 iterations += 1
                 If iterations > 10 Then Exit Sub
             End While
         End If
 
         leftMost = findNearest(leftCenter)
-        leftCenter = track.redC.redCells(leftMost).maxDist
+        leftCenter = task.redCells(leftMost).maxDist
 
         rightmost = findNearest(rightCenter)
-        rightCenter = track.redC.redCells(rightmost).maxDist
+        rightCenter = task.redCells(rightmost).maxDist
 
         dst2.Line(leftCenter, rightCenter, cv.Scalar.White, task.lineWidth, task.lineType)
         labels(2) = track.redC.labels(2)
@@ -205,9 +205,9 @@ Public Class RedTrack_GoodCells : Inherits VB_Algorithm
         Dim trackCells As New List(Of rcData)
         Dim trackIndex As New List(Of Integer)
         For Each pt In good.featureList
-            Dim index = hulls.redC.cellMap.Get(Of Byte)(pt.Y, pt.X)
+            Dim index = task.cellMap.Get(Of Byte)(pt.Y, pt.X)
             If trackIndex.Contains(index) = False Then
-                Dim rc = hulls.redC.redCells(index)
+                Dim rc = task.redCells(index)
                 If rc.hull Is Nothing Then Continue For
                 vbDrawContour(dst2(rc.rect), rc.hull, cv.Scalar.White, -1)
                 trackIndex.Add(index)
@@ -315,7 +315,7 @@ Public Class RedTrack_Features : Inherits VB_Algorithm
 
         redC.Run(dst2)
         dst3.SetTo(0)
-        For Each rc In redC.redCells
+        For Each rc In task.redCells
             If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For
             vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
             If rc.contour.Count > 0 Then setTrueText(Format(shapeCorrelation(rc.contour), fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
