@@ -30,6 +30,8 @@ Public Class Flood_Basics : Inherits VB_Algorithm
 
         redCells = genCells.redCells
         cellMap = genCells.dst3
+        task.redCells = genCells.redCells
+        task.cellMap = genCells.dst3
         dst2 = genCells.dst2
 
         setSelectedContour(redCells, cellMap)
@@ -47,20 +49,28 @@ End Class
 
 
 
-Public Class Flood_Stats : Inherits VB_Algorithm
+Public Class Flood_CellStatsPlot : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
-    Dim stats As New Cell_BasicsNew
+    Dim stats As New Cell_BasicsPlot
     Public Sub New()
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         flood.Run(src)
 
         stats.Run(src)
-        dst0 = stats.dst0
         dst1 = stats.dst1
         dst2 = flood.dst2
         setTrueText(stats.strOut, 3)
+
+        If task.clickPoint = New cv.Point Then
+            If flood.redCells.Count > 1 Then
+                task.rc = flood.redCells(1)
+                task.clickPoint = task.rc.maxDist
+            End If
+        End If
+        identifyCells(flood.redCells)
     End Sub
 End Class
 

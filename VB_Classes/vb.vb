@@ -818,6 +818,9 @@ Public Class rcData
     Public depthStdev As cv.Scalar
     Public depthCell As Boolean
 
+    Public colorMean As cv.Scalar
+    Public colorStdev As cv.Scalar
+
     Public minVec As cv.Point3f
     Public maxVec As cv.Point3f
     Public minLoc As cv.Point

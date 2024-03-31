@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Cell_Basics : Inherits VB_Algorithm
-    Dim plot As New Histogram_DepthNew
+    Dim plot As New Histogram_Depth
     Dim pca As New PCA_Basics
     Dim eq As New Plane_Equation
     Public runRedCloud As Boolean
@@ -9,33 +9,38 @@ Public Class Cell_Basics : Inherits VB_Algorithm
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString()
-        Dim rc = task.rc
+        If task.heartBeat Then
+            Dim rc = task.rc
 
-        Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-        strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbCrLf
-        strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
-        strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbTab + "rc.color = " + rc.color.ToString() + vbCrLf
-        strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + ", " + CStr(rc.maxDist.Y) + vbTab + "Pixels = " + CStr(rc.pixels) + vbCrLf
+            Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+            strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbCrLf
+            strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
+            strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbCrLf + "rc.color = " + rc.color.ToString() + vbCrLf
+            strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + "," + CStr(rc.maxDist.Y) + vbCrLf
 
-        strOut += "Cell is marked as depthCell = " + CStr(rc.depthCell) + vbCrLf
-        If rc.depthPixels > 0 Then
-            strOut += "rc.pixels " + CStr(rc.pixels) + vbTab + "rc.depthPixels = " + CStr(rc.depthPixels) +
-                  " or " + Format(rc.depthPixels / rc.pixels, "0%") + " depth " + vbCrLf
-        Else
-            strOut += "rc.pixels " + CStr(rc.pixels) + " - no depth data" + vbCrLf
+            strOut += If(rc.depthCell, "Cell is marked as depthCell " + vbCrLf, "")
+            If rc.depthPixels > 0 Then
+                strOut += "depth pixels " + CStr(rc.pixels) + vbCrLf + "rc.depthPixels = " + CStr(rc.depthPixels) +
+                      " or " + Format(rc.depthPixels / rc.pixels, "0%") + " depth " + vbCrLf
+            Else
+                strOut += "depth pixels " + CStr(rc.pixels) + " - no depth data" + vbCrLf
+            End If
+
+            strOut += "Depth Min/Max/Range: X = " + Format(rc.minVec.X, fmt1) + "/" + Format(rc.maxVec.X, fmt1)
+            strOut += "/" + Format(rc.maxVec.X - rc.minVec.X, fmt1) + vbTab
+            strOut += "Y = " + Format(rc.minVec.Y, fmt1) + "/" + Format(rc.maxVec.Y, fmt1)
+            strOut += "/" + Format(rc.maxVec.Y - rc.minVec.Y, fmt1) + vbTab
+            strOut += "Z = " + Format(rc.minVec.Z, fmt2) + "/" + Format(rc.maxVec.Z, fmt2)
+            strOut += "/" + Format(rc.maxVec.Z - rc.minVec.Z, fmt2) + vbCrLf + vbCrLf
+
+            strOut += "Cell Mean in 3D: x/y/z = " + vbTab + Format(rc.depthMean(0), fmt2) + vbTab
+            strOut += Format(rc.depthMean(1), fmt2) + vbTab + Format(rc.depthMean(2), fmt2) + vbCrLf
+
+            strOut += "Color Mean  RGB: " + vbTab + Format(rc.colorMean(0), fmt1) + vbTab + Format(rc.colorMean(1), fmt1) + vbTab
+            strOut += Format(rc.colorMean(2), fmt1) + vbCrLf
+            strOut += "Color Stdev RGB: " + vbTab + Format(rc.colorStdev(0), fmt1) + vbTab + Format(rc.colorStdev(1), fmt1) + vbTab
+            strOut += Format(rc.colorStdev(2), fmt1) + vbCrLf
         End If
-
-        strOut += "Min/Max/Range: X = " + Format(rc.minVec.X, fmt1) + "/" + Format(rc.maxVec.X, fmt1)
-        strOut += "/" + Format(rc.maxVec.X - rc.minVec.X, fmt1) + vbTab
-
-        strOut += "Y = " + Format(rc.minVec.Y, fmt1) + "/" + Format(rc.maxVec.Y, fmt1)
-        strOut += "/" + Format(rc.maxVec.Y - rc.minVec.Y, fmt1) + vbTab
-
-        strOut += "Z = " + Format(rc.minVec.Z, fmt2) + "/" + Format(rc.maxVec.Z, fmt2)
-        strOut += "/" + Format(rc.maxVec.Z - rc.minVec.Z, fmt2) + vbCrLf + vbCrLf
-
-        strOut += "Cell Mean in 3D: x/y/z = " + vbTab + Format(rc.depthMean(0), fmt2) + vbTab
-        strOut += Format(rc.depthMean(1), fmt2) + vbTab + Format(rc.depthMean(2), fmt2) + vbCrLf
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
@@ -547,9 +552,10 @@ End Class
 
 
 
-Public Class Cell_BasicsNew : Inherits VB_Algorithm
-    Dim plot As New Histogram_DepthNew
+Public Class Cell_BasicsPlot : Inherits VB_Algorithm
+    Dim plot As New Histogram_Depth
     Public runRedCloud As Boolean
+    Dim stats As New Cell_Basics
     Public Sub New()
         If standaloneTest() Then gOptions.HistBinSlider.Value = 20
         desc = "Display the statistics for the selected cell."
@@ -561,33 +567,8 @@ Public Class Cell_BasicsNew : Inherits VB_Algorithm
         plot.Run(tmp)
         dst1 = plot.dst2
 
-        Dim rc = task.rc
-
-        Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-        strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbCrLf
-        strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
-        strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbTab + "rc.color = " + rc.color.ToString() + vbCrLf
-        strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + ", " + CStr(rc.maxDist.Y) + vbTab + "Pixels = " + CStr(rc.pixels) + vbCrLf
-
-        strOut += "Cell is marked as depthCell = " + CStr(rc.depthCell) + vbCrLf
-        If rc.depthPixels > 0 Then
-            strOut += "rc.pixels " + CStr(rc.pixels) + vbTab + "rc.depthPixels = " + CStr(rc.depthPixels) +
-                  " or " + Format(rc.depthPixels / rc.pixels, "0%") + " depth " + vbCrLf
-        Else
-            strOut += "rc.pixels " + CStr(rc.pixels) + " - no depth data" + vbCrLf
-        End If
-
-        strOut += "Min/Max/Range: X = " + Format(rc.minVec.X, fmt1) + "/" + Format(rc.maxVec.X, fmt1)
-        strOut += "/" + Format(rc.maxVec.X - rc.minVec.X, fmt1) + vbTab
-
-        strOut += "Y = " + Format(rc.minVec.Y, fmt1) + "/" + Format(rc.maxVec.Y, fmt1)
-        strOut += "/" + Format(rc.maxVec.Y - rc.minVec.Y, fmt1) + vbTab
-
-        strOut += "Z = " + Format(rc.minVec.Z, fmt2) + "/" + Format(rc.maxVec.Z, fmt2)
-        strOut += "/" + Format(rc.maxVec.Z - rc.minVec.Z, fmt2) + vbCrLf + vbCrLf
-
-        strOut += "Cell Mean in 3D: x/y/z = " + vbTab + Format(rc.depthMean(0), fmt2) + vbTab
-        strOut += Format(rc.depthMean(1), fmt2) + vbTab + Format(rc.depthMean(2), fmt2) + vbCrLf
+        stats.statsString()
+        strOut = stats.strOut
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
@@ -595,10 +576,129 @@ Public Class Cell_BasicsNew : Inherits VB_Algorithm
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
+            If task.clickPoint = New cv.Point Then
+                If redC.redCells.Count > 1 Then
+                    task.rc = redC.redCells(1)
+                    task.clickPoint = task.rc.maxDist
+                End If
+            End If
+            identifyCells(redC.redCells)
         End If
         If task.heartBeat Then statsString(src)
 
         setTrueText(strOut, 3)
         labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.maxZmeters)) + " meters"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_GenCells : Inherits VB_Algorithm
+    Public classCount As Integer
+    Public rectData As cv.Mat
+    Public floodPointData As cv.Mat
+    Public redCells As New List(Of rcData)
+    Public removeContour As Boolean = True
+    Public cellLimit As Integer = 255
+    Public matchCount As Integer
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0) ' this will be the cellmap
+        desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then
+            Static bounds As New Boundary_RemovedRects
+            bounds.Run(src)
+            dst1 = bounds.dst2
+            dst3 = bounds.bRects.bounds.dst2
+            src = dst3 Or dst1
+
+            Static redCPP As New RedCloud_MaskNone_CPP
+            redCPP.Run(src)
+
+            If redCPP.classCount = 0 Then Exit Sub ' no data to process.
+            classCount = redCPP.classCount
+            rectData = redCPP.rectData
+            floodPointData = redCPP.floodPointData
+            removeContour = False
+            src = redCPP.dst2
+        End If
+
+        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim usedColors As New List(Of cv.Vec3b)
+        Dim cellCount = Math.Min(cellLimit, classCount)
+        For i = 1 To cellCount - 1
+            Dim rc As New rcData
+            rc.index = sortedCells.Count + 1
+            rc.rect = rectData.Get(Of cv.Rect)(i - 1, 0)
+            If rc.rect.Size = dst2.Size Then Continue For
+            rc.mask = src(rc.rect).InRange(i, i)
+            rc.floodPoint = floodPointData.Get(Of cv.Point)(i - 1, 0)
+
+            rc.depthMask = rc.mask.Clone
+            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            vbDrawContour(rc.mask, rc.contour, 255, -1)
+            If removeContour Then vbDrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
+
+            rc.maxDist = vbGetMaxDist(rc)
+
+            If rc.color = black Then
+                rc.maxDStable = rc.maxDist ' assume it has to use the latest.
+                rc.indexLast = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If rc.indexLast > 0 And rc.indexLast < redCells.Count Then
+                    Dim lrc = redCells(rc.indexLast)
+                    rc.color = lrc.color
+                    Dim stableCheck = dst3.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
+                    If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+                    rc.matchCount += 1
+                Else
+                    rc.color = task.vecColors(rc.index)
+                End If
+            End If
+
+            rc.pixels = rc.mask.CountNonZero
+            If rc.pixels = 0 Then Continue For
+            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
+            rc.depthPixels = rc.depthMask.CountNonZero
+            rc.depthCell = rc.depthPixels > 0
+
+            If rc.depthPixels Then
+                task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
+                task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
+                task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
+
+                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
+            End If
+            cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+
+            If usedColors.Contains(rc.color) Then rc.color = task.vecColors(rc.index)
+            usedColors.Add(rc.color)
+
+            sortedCells.Add(rc.pixels, rc)
+        Next
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        redCells.Clear()
+        redCells.Add(New rcData)
+        matchCount = 0
+        For Each rc In sortedCells.Values
+            Dim val = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If val <> 0 Then Continue For ' already occupied.
+            rc.index = redCells.Count
+            redCells.Add(rc)
+
+            If rc.indexLast <> 0 Then matchCount += 1
+
+            dst3(rc.rect).SetTo(rc.index, rc.mask)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+        Next
+
+        If task.heartBeat Then labels(2) = $"{redCells.Count} cells and {matchCount} were matched to the previous gen."
     End Sub
 End Class

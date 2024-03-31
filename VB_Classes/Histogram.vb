@@ -1199,58 +1199,6 @@ End Class
 
 
 
-Public Class Histogram_DepthNew : Inherits VB_Algorithm
-    Public plot As New Plot_Histogram
-    Public rc As rcData
-    Public mm As mmData
-    Public histogram As New cv.Mat
-    Public Sub New()
-        desc = "Show depth data as a histogram."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        plot.minRange = 0
-        plot.maxRange = task.maxZmeters
-        If rc IsNot Nothing Then
-            If rc.index = 0 Then Exit Sub
-            src = task.pcSplit(2)(rc.rect).Clone
-        Else
-            If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-            mm = vbMinMax(src)
-            plot.minRange = mm.minVal ' because OpenCV's histogram makes the ranges exclusive.
-            plot.maxRange = mm.maxVal
-        End If
-
-        cv.Cv2.CalcHist({src}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, {New cv.Rangef(plot.minRange, plot.maxRange)})
-
-        plot.histogram = histogram
-        plot.Run(plot.histogram)
-        dst2 = plot.dst2
-
-        Dim stepsize = dst2.Width / task.maxZmeters
-        For i = 1 To CInt(task.maxZmeters) - 1
-            dst2.Line(New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), cv.Scalar.White, task.cvFontThickness)
-        Next
-
-        If standaloneTest() Then
-            Dim expected = src.CountNonZero
-            Dim actual = CInt(plot.histogram.Sum(0))
-            strOut = "Expected sample count (non-zero task.pcSplit(2) entries):" + vbTab + CStr(expected) + vbCrLf
-            strOut += "Histogram sum (ranges can reduce):" + vbTab + vbTab + vbTab + CStr(actual) + vbCrLf
-            strOut += "Difference:" + vbTab + vbTab + vbTab + vbTab + vbTab + vbTab + CStr(Math.Abs(actual - expected)) + vbCrLf
-            'strOut += "Count nonzero entries in task.maxDepthMask: " + vbTab + vbTab + CStr(task.maxDepthMask.CountNonZero)
-        End If
-        setTrueText(strOut, 3)
-        labels(2) = "Histogram Depth to " + Format(task.maxZmeters, "0.0") + " m"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 
 
 Public Class Histogram_Cell : Inherits VB_Algorithm

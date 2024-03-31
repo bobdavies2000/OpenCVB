@@ -235,6 +235,8 @@ Public Class VBtask : Implements IDisposable
     Public rc As New rcData
     Public rcPicTag As Integer
     Public rcMatchMax As Integer
+    Public redCells As List(Of rcData)
+    Public cellMap As cv.Mat
 
     Public useXYRange As Boolean ' OpenGL applications don't need to adjust the ranges.
     Public xRange As Single
@@ -601,17 +603,29 @@ Public Class VBtask : Implements IDisposable
             End If
 
             Dim rc = task.rc
+            If gOptions.DisplayCellStats.Checked And task.clickPoint = New cv.Point Then
+                If task.redCells.Count > 1 Then
+                    task.rc = task.redCells(1)
+                    task.clickPoint = task.rc.maxDist
+                End If
+            End If
+
             If rc.index > 0 Then
                 task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
                 task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
 
                 task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-                'task.depthRGB(rc.rect).SetTo(cv.Scalar.White, rc.mask)
                 If gOptions.DisplayCellStats.Checked Then
-                    dst1.SetTo(0)
+                    dst3.SetTo(0)
+                    If task.clickPoint = New cv.Point Then
+                        If task.redCells.Count > 1 Then
+                            task.rc = task.redCells(1)
+                            task.clickPoint = task.rc.maxDist
+                        End If
+                    End If
                     Static cellStats As New Cell_Basics
                     cellStats.statsString()
-                    Dim str As New trueText(cellStats.strOut, 0, 0, 1)
+                    Dim str As New trueText(cellStats.strOut, 0, 0, 3)
                     trueData.Add(str)
                 End If
             End If
