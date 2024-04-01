@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Module VB
+Module VB_Basics
     Public Const fmt0 = "0"
     Public Const fmt1 = "0.0"
     Public Const fmt2 = "0.00"
@@ -850,6 +850,8 @@ Public Class rcData
 
     Public contour As New List(Of cv.Point)
     Public motionFlag As Boolean
+
+    Public features As New List(Of cv.Point)
 
     ' transition these...
     Public nabs As New List(Of Integer)

@@ -579,6 +579,7 @@ if algorithmName = "Feature_BasicsOld" Then return new Feature_BasicsOld
 if algorithmName = "Feature_BasicsValidated" Then return new Feature_BasicsValidated
 if algorithmName = "Feature_CellFinder" Then return new Feature_CellFinder
 if algorithmName = "Feature_CellGrid" Then return new Feature_CellGrid
+if algorithmName = "Feature_Flood" Then return new Feature_Flood
 if algorithmName = "Feature_GoodFeatureTrace" Then return new Feature_GoodFeatureTrace
 if algorithmName = "Feature_Grid" Then return new Feature_Grid
 if algorithmName = "Feature_History" Then return new Feature_History

@@ -167,7 +167,6 @@ Public Class RedTrack_GoodCell : Inherits VB_Algorithm
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
         findSlider("Feature Sample Size").Value = 100
-        findSlider("Distance").Value = 3
         desc = "Track the cells that have good features"
     End Sub
     Public Sub RunVB(src As cv.Mat)

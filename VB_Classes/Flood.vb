@@ -2,7 +2,7 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Algorithm
     Dim bounds As New Boundary_RemovedRects
-    Dim redCPP As New RedCloud_MaskNone_CPP
+    Dim redCPP As New RedCloud_Mask_CPP
     Public genCells As New Cell_Generate
     Public Sub New()
         labels(3) = "Contour boundaries - input to RedCloud_Basics"
@@ -16,6 +16,7 @@ Public Class Flood_Basics : Inherits VB_Algorithm
             src = dst3 Or dst1
         End If
 
+        If src.Channels = 1 Then redCPP.inputMask = src Else redCPP.inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         redCPP.Run(src)
         If redCPP.classCount = 0 Then Exit Sub ' no data to process.
 

@@ -134,6 +134,7 @@
     <Compile Include="StdevGrid.vb" />
     <Compile Include="Surf.vb" />
     <Compile Include="Swarm.vb" />
+    <Compile Include="VB_Basics.vb" />
     <Compile Include="VB_Externs.vb" />
     <Compile Include="ExtractCPPresults.vb" />
     <Compile Include="Foreground.vb" />
@@ -217,7 +218,6 @@
     <Compile Include="Stable.vb" />
     <Compile Include="Puzzle.vb" />
     <Compile Include="SteadyCam.vb" />
-    <Compile Include="VB.vb" />
     <Compile Include="OptionsCombo.Designer.vb">
       <DependentUpon>OptionsCombo.vb</DependentUpon>
     </Compile>

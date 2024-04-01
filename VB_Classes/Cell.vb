@@ -574,7 +574,7 @@ Public Class Cell_Generate : Inherits VB_Algorithm
     Public classCount As Integer
     Public rectData As cv.Mat
     Public floodPointData As cv.Mat
-    Public removeContour As Boolean = True
+    Public removeContour As Boolean
     Public cellLimit As Integer = 255
     Public matchCount As Integer
     Public Sub New()
@@ -671,8 +671,10 @@ Public Class Cell_Generate : Inherits VB_Algorithm
             If rc.indexLast <> 0 Then matchCount += 1
             matches.Add(rc.matchCount)
 
+            vbDrawContour(task.cellMap(rc.rect), rc.contour, rc.color, task.lineWidth)
             task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
+            vbDrawContour(dst2(rc.rect), rc.contour, rc.color, task.lineWidth)
         Next
 
         If matches.Count > 0 Then task.rcMatchAvg = matches.Average() Else task.rcMatchAvg = 0

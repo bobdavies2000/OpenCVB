@@ -1139,7 +1139,6 @@ End Class
 Public Class Feature_GoodFeatureTrace : Inherits VB_Algorithm
     Dim feat As New Feature_KNNBasics
     Public Sub New()
-        findSlider("Distance threshold (pixels)").Value = 1
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Track the GoodFeatures"
@@ -1153,7 +1152,7 @@ Public Class Feature_GoodFeatureTrace : Inherits VB_Algorithm
         dst0.SetTo(0)
         For Each pt In feat.featurePoints
             dst0.Set(Of Byte)(pt.Y, pt.X, 1)
-            task.color.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            ' task.color.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
         Next
         frameList.Add(dst0.Clone)
         If frameList.Count >= task.frameHistoryCount Then
@@ -1671,25 +1670,28 @@ Public Class Feature_MultiPass : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         feat.Run(task.color)
-        dst2 = feat.dst2
+        dst2 = src.Clone
         featurePoints = New List(Of cv.Point2f)(feat.featurePoints)
-        Dim firstPassCount = featurePoints.Count
+        Dim passCounts As String = CStr(featurePoints.Count) + "/"
 
         feat.Run(src)
         For Each pt In feat.featurePoints
             featurePoints.Add(pt)
-            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
         Next
+        passCounts += CStr(feat.featurePoints.Count) + "/"
 
         sharpen.Run(task.color)
         feat.Run(sharpen.dst2)
         For Each pt In feat.featurePoints
             featurePoints.Add(pt)
+        Next
+        passCounts += CStr(feat.featurePoints.Count)
+
+        For Each pt In featurePoints
             dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
         Next
-
         If task.heartBeat Then
-            labels(2) = "Total features = " + CStr(featurePoints.Count) + ", first pass/second pass = " + CStr(firstPassCount) + "/" + CStr(feat.featurePoints.Count)
+            labels(2) = "Total features = " + CStr(featurePoints.Count) + ", pass counts = " + passCounts
         End If
     End Sub
 End Class
@@ -1727,5 +1729,39 @@ Public Class Feature_History : Inherits VB_Algorithm
 
         labels(2) = "Found " + CStr(corners.Count) + " points with quality = " + CStr(feat.options.quality) +
                     " and minimum distance = " + CStr(feat.options.minDistance)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_Flood : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim feat As New Feature_Basics
+    Public Sub New()
+        findSlider("Feature Sample Size").Value = 1000
+        desc = "Find features within each cell and track the cell with them."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+        dst2 = feat.dst2
+
+        redC.Run(src)
+        dst2 = redC.dst2
+
+        Dim hitCount As Integer
+        For Each pt In feat.featurePoints
+            Dim index = task.cellMap.Get(Of Byte)(pt.Y, pt.X)
+            If index > 0 Then
+                Dim rc = task.redCells(index)
+                rc.features.Add(pt)
+                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+                hitCount += 1
+            End If
+        Next
+        If task.heartBeat Then labels(2) = "Of the " + CStr(feat.featurePoints.Count) + " features, " + CStr(hitCount) + " landed inside a cell " +
+                                           "(" + Format(hitCount / feat.featurePoints.Count, "0%") + ")"
     End Sub
 End Class
