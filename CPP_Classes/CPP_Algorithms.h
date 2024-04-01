@@ -3796,13 +3796,14 @@ class RedCloud
 {
 private:
 public:
-	Mat src, mask, maskCopy, result;
+	Mat src, result;
 	vector<Rect>cellRects;
 	vector<int> cellSizes;
 	vector<Point> floodPoints;
 
 	RedCloud() {}
-	void RunCPP() {
+	void RunCPP(Mat inputMask) {
+		Mat maskCopy = inputMask.clone();
 		Rect rect;
 
 		multimap<int, Point, greater<int>> sizeSorted;
@@ -3812,10 +3813,10 @@ public:
 		{
 			for (int x = 0; x < src.cols; x++)
 			{
-				if (mask.at<unsigned char>(y, x) == 0)
+				if (inputMask.at<unsigned char>(y, x) == 0)
 				{
 					pt = Point(x, y);
-					int count = floodFill(src, mask, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
+					int count = floodFill(src, inputMask, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
 					if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
 				}
 			}
@@ -3839,30 +3840,8 @@ public:
 				fill++;
 			}
 		}
-
-
-
-
-
-
-
-		//Rect r = Rect(1, 1, src.cols, src.rows);
-		//Mat inputMat = maskCopy(r).clone();
-		//for (size_t i = 1; i < cellSizes.size(); i++)
-		//{
-		//	Mat testMat;
-		//	inRange(inputMat, i, i, testMat);
-		//	Rect rect = cellRects[i - 1];
-		//	int testCount = countNonZero(testMat(rect));
-		//	int nextSize = cellSizes[i - 1];
-		//	if (testCount != nextSize)
-		//		int k = 0;
-		//}
-
-
-
-
-
+		Rect r = Rect(1, 1, inputMask.cols - 2, inputMask.rows - 2);
+		maskCopy(r).copyTo(result);
 	}
 };
 
@@ -3892,17 +3871,12 @@ extern "C" __declspec(dllexport) int*
 RedCloud_Run(RedCloud * cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols)
 {
 	cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
-	cPtr->mask = Mat::zeros(rows + 2, cols + 2, CV_8U);
-	Rect r = Rect(1, 1, cols, rows);
-	if (maskPtr != 0)
-	{
-		Mat inputMask;
-		inputMask = Mat(rows, cols, CV_8U, maskPtr);
-		inputMask.copyTo(cPtr->mask(r));
-	}
-	cPtr->maskCopy = cPtr->mask.clone();
-	cPtr->RunCPP();
-	cPtr->maskCopy(r).copyTo(cPtr->result);
+
+	Mat inputMask = Mat(rows, cols, CV_8U, maskPtr);
+
+	copyMakeBorder(inputMask, inputMask, 1, 1, 1, 1, BORDER_CONSTANT, 0);
+	cPtr->RunCPP(inputMask);
+
 	return (int*)cPtr->result.data;
 }
 

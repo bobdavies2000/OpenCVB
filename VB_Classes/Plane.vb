@@ -283,7 +283,7 @@ End Class
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
 Public Class Plane_CellColor : Inherits VB_Algorithm
     Public options As New Options_Plane
-    Public redC As New RedCloud_Tight
+    Public redC As New RedCloud_Basics
     Public Sub New()
         labels = {"", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"}
         desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"

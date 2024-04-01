@@ -1,47 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits VB_Algorithm
-    Dim redCPP As New RedCloud_CPP
-    Public genCells As New Cell_Generate
-    Public inputMask As cv.Mat
-    Public Sub New()
-        inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        vbAddAdvice(traceName + ": use the RedCloud algorithm panel." + vbCrLf + "(Behind the global options)")
-        desc = "Find cells and then match them to the previous generation"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static bounds As New Boundary_RemovedRects
-            bounds.Run(src)
-            dst1 = bounds.dst2
-            dst3 = bounds.bRects.bounds.dst2
-            src = dst3 Or dst1
-            redCPP.inputMask = src
-        End If
-
-        redCPP.inputMask = inputMask
-        redCPP.Run(src)
-        If task.redCells.Count = 0 Then Exit Sub ' no data to process.
-
-        genCells.classCount = redCPP.classCount
-        genCells.rectData = redCPP.rectData
-        genCells.floodPointData = redCPP.floodPointData
-        genCells.removeContour = False
-        genCells.Run(redCPP.dst2)
-
-        dst2 = genCells.dst2
-
-        setSelectedContour()
-        identifyCells()
-        labels(2) = genCells.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-Public Class RedCloud_Tight : Inherits VB_Algorithm
     Public genCells As New Cell_Generate
     Dim redCPP As New RedCloud_CPP
     Public inputMask As New cv.Mat
@@ -80,6 +39,45 @@ End Class
 
 
 
+Public Class RedCloud_BasicsTest : Inherits VB_Algorithm
+    Dim redCPP As New RedCloud_CPP
+    Public genCells As New Cell_Generate
+    Public inputMask As cv.Mat
+    Public Sub New()
+        inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        vbAddAdvice(traceName + ": use the RedCloud algorithm panel." + vbCrLf + "(Behind the global options)")
+        desc = "Find cells and then match them to the previous generation"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 1 Then
+            Static bounds As New Boundary_RemovedRects
+            bounds.Run(src)
+            dst1 = bounds.dst2
+            dst3 = bounds.bRects.bounds.dst2
+            redCPP.inputMask = dst3 Or dst1
+        End If
+
+        redCPP.inputMask = inputMask
+        redCPP.Run(src)
+        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
+
+        genCells.classCount = redCPP.classCount
+        genCells.rectData = redCPP.rectData
+        genCells.floodPointData = redCPP.floodPointData
+        genCells.removeContour = False
+        genCells.Run(redCPP.dst2)
+
+        dst2 = genCells.dst2
+
+        setSelectedContour()
+        identifyCells()
+        labels(2) = genCells.labels(2)
+    End Sub
+End Class
+
+
+
+
 Public Class RedCloud_Reduction : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Public Sub New()
@@ -104,7 +102,7 @@ End Class
 
 Public Class RedCloud_Hulls : Inherits VB_Algorithm
     Dim convex As New Convex_RedCloudDefects
-    Public redC As New RedCloud_Tight
+    Public redC As New RedCloud_Basics
     Public Sub New()
         labels = {"", "Cells where convexity defects failed", "", "Improved contour results using OpenCV's ConvexityDefects"}
         desc = "Add hulls and improved contours using ConvexityDefects to each RedCloud cell"
@@ -460,7 +458,7 @@ End Class
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
 Public Class RedCloud_PlaneColor : Inherits VB_Algorithm
     Public options As New Options_Plane
-    Public redC As New RedCloud_Tight
+    Public redC As New RedCloud_Basics
     Dim planeMask As New RedCloud_PlaneFromMask
     Dim planeContour As New RedCloud_PlaneFromContour
     Dim planeCells As New Plane_CellColor
@@ -768,7 +766,7 @@ End Class
 
 
 Public Class RedCloud_NoDepth : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Tight
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Minimum pixels %", 0, 100, 25)
 
@@ -813,7 +811,7 @@ End Class
 
 Public Class RedCloud_LikelyFlatSurfaces : Inherits VB_Algorithm
     Dim verts As New Plane_Basics
-    Dim redC As New RedCloud_Tight
+    Dim redC As New RedCloud_Basics
     Public vCells As New List(Of rcData)
     Public hCells As New List(Of rcData)
     Public Sub New()
@@ -1023,7 +1021,7 @@ End Class
 
 
 Public Class RedCloud_UnstableHulls : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Tight
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels = {"", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing"}
         desc = "Use maxDStable to identify unstable cells - cells which were NOT present in the previous generation."
@@ -1100,7 +1098,7 @@ End Class
 
 Public Class RedCloud_NearestStableCell : Inherits VB_Algorithm
     Public knn As New KNN_Core
-    Dim redC As New RedCloud_Tight
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Line connects current maxDStable point to nearest neighbor using KNN."
         desc = "Find the nearest stable cell and connect them with a line."
@@ -1379,7 +1377,7 @@ End Class
 
 
 Public Class RedCloud_Cells : Inherits VB_Algorithm
-    Public redC As New RedCloud_Tight
+    Public redC As New RedCloud_Basics
     Public cellmap As New cv.Mat
     Public redCells As New List(Of rcData)
     Public Sub New()
@@ -1447,7 +1445,7 @@ End Class
 Public Class RedCloud_Overlaps : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Dim redC As New RedCloud_Tight
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Remove the overlapping cells.  Keep the largest."
     End Sub
@@ -1506,7 +1504,7 @@ End Class
 
 
 Public Class RedCloud_OnlyColorAlt : Inherits VB_Algorithm
-    Public redMasks As New RedCloud_Tight
+    Public redMasks As New RedCloud_Basics
     Public Sub New()
         desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
     End Sub
@@ -1776,7 +1774,7 @@ Public Class RedCloud_MotionBGsubtract : Inherits VB_Algorithm
         bgSub.Run(src)
         dst3 = bgSub.dst2
 
-        Static redC As New RedCloud_Tight
+        Static redC As New RedCloud_Basics
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(3)
@@ -1903,7 +1901,7 @@ Public Class RedCloud_ContourUpdate : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            Static redC As New RedCloud_Tight
+            Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             labels = redC.labels
@@ -1929,7 +1927,7 @@ End Class
 
 
 Public Class RedCloud_MaxDist : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Tight
+    Dim redC As New RedCloud_Basics
     Dim addTour As New RedCloud_ContourUpdate
     Public Sub New()
         desc = "Show the maxdist before and after updating the mask with the contour."
@@ -2016,7 +2014,7 @@ End Class
 Public Class RedCloud_Combine : Inherits VB_Algorithm
     Public colorClass As New Color_Basics
     Public guided As New GuidedBP_Depth
-    Public redMasks As New RedCloud_Tight
+    Public redMasks As New RedCloud_Basics
     Public combinedCells As New List(Of rcData)
     Dim maxDepth As New Depth_MaxMask
     Public Sub New()
@@ -2072,7 +2070,7 @@ End Class
 
 
 Public Class RedCloud_FeatureLessReduce : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Tight
+    Dim redC As New RedCloud_Basics
     Dim devGrid As New StdevGrid_Basics
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -2123,7 +2121,7 @@ End Class
 
 
 Public Class RedCloud_TopX : Inherits VB_Algorithm
-    Public redC As New RedCloud_Tight
+    Public redC As New RedCloud_Basics
     Public options As New Options_TopX
     Public Sub New()
         desc = "Show only the top X cells"
@@ -2559,11 +2557,6 @@ Public Class RedCloud_MaxDist_CPP : Inherits VB_Algorithm
         If cPtr <> 0 Then cPtr = RedCloudMaxDist_Close(cPtr)
     End Sub
 End Class
-
-
-
-
-
 
 
 

@@ -729,7 +729,7 @@ End Class
 
 
 Public Class Pixel_Vectors : Inherits VB_Algorithm
-    Public redC As New RedCloud_Tight
+    Public redC As New RedCloud_Basics
     Dim hVector As New Hist3Dcolor_Vector
     Public pixelVector As New List(Of Single())
     Public redCells As New List(Of rcData)

@@ -3642,7 +3642,7 @@ Public Class Options_Spectrum : Inherits VB_Algorithm
     Public gapDepth As Integer
     Public gapGray As Integer
     Public sampleThreshold As Integer
-    Public redC As New RedCloud_Tight
+    Public redC As New RedCloud_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Gap in depth spectrum (cm's)", 1, 50, 1)

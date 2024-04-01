@@ -1,7 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Neighbors_Basics : Inherits VB_Algorithm
-    Public redC As New RedCloud_Tight
+    Public redC As New RedCloud_Basics
     Dim knn As New KNN_Core
     Public runRedCloud As Boolean = False
     Public options As New Options_XNeighbors
@@ -206,7 +206,7 @@ Public Class Neighbors_Precise : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
-            Static redC As New RedCloud_Tight
+            Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             labels = redC.labels

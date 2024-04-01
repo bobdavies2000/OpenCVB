@@ -83,6 +83,7 @@ End Class
 Public Class Cell_PixelCountCompare : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public Sub New()
+        gOptions.DebugCheckBox.Checked = True
         desc = "The rc.mask is filled and may completely contain depth pixels.  This alg finds cells that contain depth islands."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -121,46 +122,29 @@ End Class
 
 
 Public Class Cell_Stable : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Tight
+    Dim redC As New RedCloud_Basics
     Public rcUnstableList As New List(Of rcData)
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
-        desc = "Use maxDStable to identify stable cells - cells which were NOT present in the previous generation."
+        desc = "Identify cells which were NOT present in the previous generation."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
         dst2 = redC.dst2
-        dst3 = dst2.Clone
-        dst3(task.rc.rect).SetTo(task.rc.color, task.rc.mask)
         labels(2) = redC.labels(2)
 
-        Static prevList As New List(Of cv.Point)
-        If task.heartBeat Or task.frameCount = 2 Then
-            prevList.Clear()
-            For Each rc In task.redCells
-                prevList.Add(rc.maxDStable)
-            Next
+        Static unmatchedCount As Integer
+        If task.heartBeat Then
+            dst3.SetTo(0)
+            unmatchedCount = 0
         End If
-
-        Dim unstableList As New List(Of rcData)
         For Each rc In task.redCells
-            If prevList.Contains(rc.maxDStable) = False Then
-                vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.White, -1)
-                vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Black)
-                unstableList.Add(rc)
+            If rc.matchCount = 0 Then
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+                unmatchedCount += 1
             End If
         Next
 
-        If task.almostHeartBeat Then
-            rcUnstableList = New List(Of rcData)(unstableList)
-            labels(1) = CStr(rcUnstableList.Count) + " found before the heartbeat."
-        End If
-        dst1.SetTo(0)
-        For Each rc In rcUnstableList
-            dst1(rc.rect).SetTo(rc.color, rc.mask)
-        Next
-
-        labels(3) = CStr(unstableList.Count) + " cells weren't present in the previous generation."
+        labels(3) = CStr(unmatchedCount) + " cells weren't present in the previous generation - cumulative since the last heartbeat"
     End Sub
 End Class
 
@@ -172,7 +156,7 @@ End Class
 
 
 Public Class Cell_StableAboveAverage : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Tight
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -192,12 +176,11 @@ Public Class Cell_StableAboveAverage : Inherits VB_Algorithm
             If rc.matchCount < task.rcMatchAvg Then
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
                 dst1(rc.rect).SetTo(0)
-            Else
                 unmatched += 1
             End If
         Next
 
-        labels(3) = CStr(unmatched) + " cells had matchCounts that were above average."
+        labels(3) = CStr(unmatched) + " cells below were unmatched."
     End Sub
 End Class
 
@@ -256,135 +239,8 @@ End Class
 
 
 
-
-
-
-
-Public Class Cell_JumpUp : Inherits VB_Algorithm
-    Public redC As New RedCloud_Tight
-    Public jumpCells As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent jump in size", 1, 100, 25)
-        desc = "Identify cells that have jumped up in size since the last frame."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static percentSlider = findSlider("Percent jump in size")
-        Dim percentJump = percentSlider.value / 100
-
-        Dim lastCells = New List(Of rcData)(task.redCells)
-        redC.Run(src)
-        dst2 = redC.dst2
-        If task.heartBeat Then dst3.SetTo(0)
-        labels(2) = redC.labels(2)
-
-        jumpCells.Clear()
-        For Each rc In task.redCells
-            If rc.indexLast > 0 Then
-                Dim lrc = lastCells(rc.indexLast)
-                If (rc.pixels - lrc.pixels) / rc.pixels >= percentJump Then
-                    dst3(lrc.rect).SetTo(cv.Scalar.White, lrc.mask)
-                    jumpCells.Add(rc.index, New cv.Vec2i(lrc.index, rc.index))
-                End If
-            End If
-        Next
-        If task.heartBeat Then labels(3) = "There were " + CStr(jumpCells.Count) + " cells jumped up more than " +
-                                         Format(percentJump, "0%")
-        If task.almostHeartBeat Then dst1 = dst3.Clone
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-Public Class Cell_JumpDown : Inherits VB_Algorithm
-    Public redC As New RedCloud_Tight
-    Public jumpCells As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent jump in size", 1, 100, 25)
-        desc = "Identify cells that have jumped down in size since the last frame."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static percentSlider = findSlider("Percent jump in size")
-        Dim percentJump = percentSlider.value / 100
-
-        Dim lastCells = New List(Of rcData)(task.redCells)
-        redC.Run(src)
-        dst2 = redC.dst2
-        If task.heartBeat Then dst3.SetTo(0)
-        labels(2) = redC.labels(2)
-
-        jumpCells.Clear()
-        For Each rc In task.redCells
-            If rc.indexLast > 0 Then
-                Dim lrc = lastCells(rc.indexLast)
-                If (lrc.pixels - rc.pixels) / rc.pixels >= percentJump Then
-                    dst3(lrc.rect).SetTo(cv.Scalar.White, lrc.mask)
-                    jumpCells.Add(rc.index, New cv.Vec2i(lrc.index, rc.index))
-                End If
-            End If
-        Next
-        If task.heartBeat Then labels(3) = "There were " + CStr(jumpCells.Count) + " cells jumped down more than " +
-                                         Format(percentJump, "0%")
-        If task.almostHeartBeat Then dst1 = dst3.Clone
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-Public Class Cell_JumpUnstable : Inherits VB_Algorithm
-    Public redC As New RedCloud_Tight
-    Public jumpCells As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent jump in size", 1, 100, 25)
-        desc = "Identify cells that have changed size more than X% since the last frame."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static percentSlider = findSlider("Percent jump in size")
-        Dim percentJump = percentSlider.value / 100
-
-        If task.heartBeat Or task.midHeartBeat Then
-            Dim lastCells As New List(Of rcData)(task.redCells)
-            redC.Run(src)
-            dst2 = redC.dst2
-            dst3 = dst1.Clone
-            dst1.SetTo(0)
-            labels(2) = redC.labels(2)
-
-            jumpCells.Clear()
-            For Each rc In task.redCells
-                If rc.indexLast > 0 Then
-                    Dim lrc = lastCells(rc.indexLast)
-                    If Math.Abs(lrc.pixels - rc.pixels) / rc.pixels >= percentJump Then
-                        dst1(lrc.rect).SetTo(cv.Scalar.White, lrc.mask)
-                        jumpCells.Add(rc.index, New cv.Vec2i(lrc.index, rc.index))
-                    End If
-                End If
-            Next
-            labels(3) = "There were " + CStr(jumpCells.Count) + " cells changed more than " + Format(percentJump, "0%") + " up or down"
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Cell_Distance : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Tight
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -469,38 +325,6 @@ End Class
 
 
 
-
-
-
-
-
-
-Public Class Cell_DistanceDepth : Inherits VB_Algorithm
-    Public redC As New RedCloud_Basics
-    Public colorOnly As New RedCloud_Cells
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Measure color distance from black for both color and depth cells."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat Or task.quarterBeat Then
-            redOptions.UseDepth.Checked = True
-            redC.Run(src)
-            dst2 = redC.dst2.Clone
-            labels(2) = redC.labels(2)
-
-            redOptions.UseColorOnly.Checked = True
-            colorOnly.Run(src)
-            dst3 = colorOnly.dst2.Clone
-            labels(3) = colorOnly.labels(2)
-        End If
-    End Sub
-End Class
-
-
-
-
-
 Public Class Cell_Floodfill : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
     Dim stats As New Cell_Basics
@@ -529,7 +353,8 @@ Public Class Cell_BasicsPlot : Inherits VB_Algorithm
     Public runRedCloud As Boolean
     Dim stats As New Cell_Basics
     Public Sub New()
-        If standaloneTest() Then gOptions.HistBinSlider.Value = 20
+        If standalone Then gOptions.displayDst1.Checked = True
+        If standalone Then gOptions.HistBinSlider.Value = 20
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString(src As cv.Mat)

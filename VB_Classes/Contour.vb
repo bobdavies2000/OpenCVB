@@ -457,6 +457,7 @@ Public Class Contour_SelfIntersect : Inherits VB_Algorithm
         Dim selfInt As Boolean
         Dim ptList As New List(Of String)
         If task.heartBeat Then dst1.SetTo(0)
+        dst3 = rc.mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each pt In rc.contour
             Dim ptStr = Format(pt.X, "0000") + Format(pt.Y, "0000")
             If ptList.Contains(ptStr) Then
@@ -464,13 +465,12 @@ Public Class Contour_SelfIntersect : Inherits VB_Algorithm
                 If pct > 0.1 And pct < 0.9 Then
                     selfInt = True
                     dst1(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-                    dst3 = rc.mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     dst3.Circle(pt, task.dotSize, cv.Scalar.Red, -1, task.lineType)
                 End If
             End If
             ptList.Add(ptStr)
         Next
-        labels(3) = If(selfInt, "Self intersecting", "Not self-intersecting")
+        labels(3) = If(selfInt, "Self intersecting - red shows where", "Not self-intersecting")
     End Sub
 End Class
 
