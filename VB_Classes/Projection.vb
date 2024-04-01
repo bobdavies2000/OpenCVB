@@ -14,12 +14,12 @@ Public Class Projection_Basics : Inherits VB_Algorithm
             histTop.Run(src)
             src = histTop.dst2
 
-            Static redc As New RedCloud_BasicsMask
-            redc.inputMask = Not histTop.dst3
-            redc.Run(histTop.dst3)
+            Static redC As New RedCloud_Basics
+            redC.inputMask = Not histTop.dst3
+            redC.Run(histTop.dst3)
             redCellInput = task.redCells
-            dst2 = redc.dst2
-            labels(2) = redc.labels(2)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
         End If
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
@@ -247,7 +247,7 @@ End Class
 
 Public Class Projection_Top : Inherits VB_Algorithm
     Public histTop As New Projection_HistTop
-    Dim redC As New RedCloud_BasicsMask
+    Dim redC As New RedCloud_Basics
     Public objects As New Projection_Basics
     Public Sub New()
         desc = "Find all the masks, rects, and counts in the top down view."
@@ -280,7 +280,7 @@ End Class
 
 Public Class Projection_Side : Inherits VB_Algorithm
     Public histSide As New Projection_HistSide
-    Dim redC As New RedCloud_BasicsMask
+    Dim redC As New RedCloud_Basics
     Public objects As New Projection_Basics
     Public Sub New()
         objects.viewType = "Side"

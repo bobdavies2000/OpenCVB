@@ -121,7 +121,7 @@ End Class
 
 
 Public Class Cell_Stable : Inherits VB_Algorithm
-    Dim redC As New RedCloud_TightNew
+    Dim redC As New RedCloud_Tight
     Public rcUnstableList As New List(Of rcData)
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -172,7 +172,7 @@ End Class
 
 
 Public Class Cell_StableAboveAverage : Inherits VB_Algorithm
-    Dim redC As New RedCloud_TightNew
+    Dim redC As New RedCloud_Tight
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -261,7 +261,7 @@ End Class
 
 
 Public Class Cell_JumpUp : Inherits VB_Algorithm
-    Public redC As New RedCloud_TightNew
+    Public redC As New RedCloud_Tight
     Public jumpCells As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent jump in size", 1, 100, 25)
@@ -303,7 +303,7 @@ End Class
 
 
 Public Class Cell_JumpDown : Inherits VB_Algorithm
-    Public redC As New RedCloud_TightNew
+    Public redC As New RedCloud_Tight
     Public jumpCells As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent jump in size", 1, 100, 25)
@@ -345,7 +345,7 @@ End Class
 
 
 Public Class Cell_JumpUnstable : Inherits VB_Algorithm
-    Public redC As New RedCloud_TightNew
+    Public redC As New RedCloud_Tight
     Public jumpCells As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent jump in size", 1, 100, 25)
@@ -384,7 +384,7 @@ End Class
 
 
 Public Class Cell_Distance : Inherits VB_Algorithm
-    Dim redC As New RedCloud_TightNew
+    Dim redC As New RedCloud_Tight
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -590,7 +590,7 @@ Public Class Cell_Generate : Inherits VB_Algorithm
             task.cellMap = bounds.bRects.bounds.dst2
             src = task.cellMap Or dst1
 
-            Static redCPP As New RedCloud_MaskNone_CPP
+            Static redCPP As New RedCloud_CPP
             redCPP.Run(src)
 
             If redCPP.classCount = 0 Then Exit Sub ' no data to process.

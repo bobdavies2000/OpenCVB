@@ -110,7 +110,7 @@ End Class
 
 
 Public Class Classifier_BayesianTest : Inherits VB_Algorithm
-    Dim redC As New RedCloud_TightNew
+    Dim redC As New RedCloud_Tight
     Dim nabs As New Neighbors_Precise
     Public Sub New()
         redOptions.UseColorOnly.Checked = True

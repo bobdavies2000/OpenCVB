@@ -1,9 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits VB_Algorithm
-    Dim redCPP As New RedCloud_Mask_CPP
+    Dim redCPP As New RedCloud_CPP
     Public genCells As New Cell_Generate
+    Public inputMask As cv.Mat
     Public Sub New()
+        inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         vbAddAdvice(traceName + ": use the RedCloud algorithm panel." + vbCrLf + "(Behind the global options)")
         desc = "Find cells and then match them to the previous generation"
     End Sub
@@ -17,6 +19,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
             redCPP.inputMask = src
         End If
 
+        redCPP.inputMask = inputMask
         redCPP.Run(src)
         If task.redCells.Count = 0 Then Exit Sub ' no data to process.
 
@@ -38,49 +41,12 @@ End Class
 
 
 
-Public Class RedCloud_BasicsMask : Inherits VB_Algorithm
-    Public genCells As New Cell_Generate
-    Public inputMask As cv.Mat
-    Dim redCPP As New RedCloud_Mask_CPP
-    Public Sub New()
-        genCells.removeContour = False
-        vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
-                        "It is behind the global options (which affect most algorithms.)")
-        desc = "Find cells and then match them to the previous generation"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static colorC As New Color_Basics
-            colorC.Run(src)
-            src = colorC.dst2
-            inputMask = If(gOptions.DebugCheckBox.Checked, task.maxDepthMask, (Not task.maxDepthMask).ToMat)
-        End If
-
-        redCPP.inputMask = inputMask
-        redCPP.Run(src)
-
-        genCells.classCount = redCPP.classCount
-        genCells.rectData = redCPP.rectData
-        genCells.floodPointData = redCPP.floodPointData
-        genCells.Run(redCPP.dst2)
-
-        dst2 = genCells.dst2
-
-        setSelectedContour()
-        identifyCells()
-        If task.heartBeat Then labels(2) = $"{task.redCells.Count} cells found.  The largest {redOptions.identifyCount} are identified"
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class RedCloud_Tight : Inherits VB_Algorithm
     Public genCells As New Cell_Generate
-    Dim redCPP As New RedCloud_MaskNone_CPP
+    Dim redCPP As New RedCloud_CPP
+    Public inputMask As New cv.Mat
     Public Sub New()
+        inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
                         "It is behind the global options (which affect most algorithms.)")
         desc = "Find cells and then match them to the previous generation with minimum boundary"
@@ -90,86 +56,12 @@ Public Class RedCloud_Tight : Inherits VB_Algorithm
             Static colorC As New Color_Basics
             colorC.Run(src)
             src = colorC.dst2
-        End If
-
-        redCPP.Run(src)
-
-        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
-        genCells.classCount = redCPP.classCount
-        genCells.rectData = redCPP.rectData
-        genCells.floodPointData = redCPP.floodPointData
-        genCells.Run(redCPP.dst2)
-
-        dst2 = genCells.dst2
-
-        setSelectedContour()
-        identifyCells()
-        labels(2) = genCells.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-Public Class RedCloud_TightNew : Inherits VB_Algorithm
-    Public genCells As New Cell_Generate
-    Dim redCPP As New RedCloud_MaskNone_CPP
-    Public Sub New()
-        vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
-                        "It is behind the global options (which affect most algorithms.)")
-        desc = "Find cells and then match them to the previous generation with minimum boundary"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static colorC As New Color_Basics
-            colorC.Run(src)
-            src = colorC.dst2
-        End If
-
-        redCPP.Run(src)
-
-        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
-        genCells.classCount = redCPP.classCount
-        genCells.rectData = redCPP.rectData
-        genCells.floodPointData = redCPP.floodPointData
-        genCells.Run(redCPP.dst2)
-
-        dst2 = genCells.dst2
-
-        setSelectedContour()
-        identifyCells()
-        labels(2) = genCells.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class RedCloud_TightMask : Inherits VB_Algorithm
-    Public genCells As New Cell_Generate
-    Public inputMask As cv.Mat
-    Dim redCPP As New RedCloud_Mask_CPP
-    Public Sub New()
-        genCells.removeContour = False
-        vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
-                        "It is behind the global options (which affect most algorithms.)")
-        desc = "Find cells and then match them to the previous generation with minimum boundary"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static colorC As New Color_Basics
-            colorC.Run(src)
-            src = colorC.dst2
-            inputMask = task.maxDepthMask
         End If
 
         redCPP.inputMask = inputMask
         redCPP.Run(src)
 
+        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
         genCells.classCount = redCPP.classCount
         genCells.rectData = redCPP.rectData
         genCells.floodPointData = redCPP.floodPointData
@@ -182,6 +74,7 @@ Public Class RedCloud_TightMask : Inherits VB_Algorithm
         labels(2) = genCells.labels(2)
     End Sub
 End Class
+
 
 
 
@@ -2123,7 +2016,7 @@ End Class
 Public Class RedCloud_Combine : Inherits VB_Algorithm
     Public colorClass As New Color_Basics
     Public guided As New GuidedBP_Depth
-    Public redMasks As New RedCloud_TightMask
+    Public redMasks As New RedCloud_Tight
     Public combinedCells As New List(Of rcData)
     Dim maxDepth As New Depth_MaxMask
     Public Sub New()
@@ -2345,7 +2238,7 @@ End Class
 
 
 Public Class RedCloud_Hue : Inherits VB_Algorithm
-    Dim redC As New RedCloud_BasicsMask
+    Dim redC As New RedCloud_Basics
     Dim hue As New Color_Hue
     Public Sub New()
         redOptions.UseColorOnly.Checked = True
@@ -2590,7 +2483,7 @@ Public Class RedCloud_Both : Inherits VB_Algorithm
 
         redOptions.UseColorOnly.Checked = True
         task.redCells = New List(Of rcData)(colorCells)
-        task.cellMap = colorMap.clone
+        task.cellMap = colorMap.Clone
         flood.Run(src)
         dst2 = flood.dst2
         colorCells = New List(Of rcData)(task.redCells)
@@ -2624,87 +2517,6 @@ Public Class RedCloud_Both : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-
-Public Class RedCloud_Mask_CPP : Inherits VB_Algorithm
-    Public inputMask As cv.Mat
-    Public classCount As Integer
-    Public rectData As cv.Mat
-    Public floodPointData As cv.Mat
-    Public Sub New()
-        cPtr = RedCloud_Open()
-        desc = "Run the C++ RedCloud interface with a mask"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim imagePtr As IntPtr
-        Dim inputData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-        Dim maskData(src.Total - 1) As Byte
-        If inputMask Is Nothing Then
-            Marshal.Copy(task.maxDepthMask.Data, maskData, 0, maskData.Length)
-        Else
-            Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
-        End If
-        Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
-
-        imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols)
-        handleMask.Free()
-        handleInput.Free()
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-
-        classCount = RedCloud_Count(cPtr)
-
-        If classCount = 0 Then Exit Sub ' no data to process.
-        rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
-        floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class RedCloud_MaskNone_CPP : Inherits VB_Algorithm
-    Public classCount As Integer
-    Public rectData As cv.Mat
-    Public floodPointData As cv.Mat
-    Public Sub New()
-        cPtr = RedCloud_Open()
-        desc = "Run the C++ RedCloud interface without a mask"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim imagePtr As IntPtr
-        Dim inputData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-        imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols)
-        handleInput.Free()
-        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-
-        classCount = RedCloud_Count(cPtr)
-
-        If classCount = 0 Then Exit Sub ' no data to process.
-        rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
-        floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
-    End Sub
-End Class
 
 
 
@@ -2745,5 +2557,51 @@ Public Class RedCloud_MaxDist_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedCloudMaxDist_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_CPP : Inherits VB_Algorithm
+    Public inputMask As cv.Mat
+    Public classCount As Integer
+    Public rectData As cv.Mat
+    Public floodPointData As cv.Mat
+    Public Sub New()
+        inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        cPtr = RedCloud_Open()
+        desc = "Run the C++ RedCloud interface with or without a mask"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim imagePtr As IntPtr
+        Dim inputData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+        Dim maskData(src.Total - 1) As Byte
+        Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
+        Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
+
+        imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols)
+        handleMask.Free()
+        handleInput.Free()
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+
+        classCount = RedCloud_Count(cPtr)
+
+        If classCount = 0 Then Exit Sub ' no data to process.
+        rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+        floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
     End Sub
 End Class

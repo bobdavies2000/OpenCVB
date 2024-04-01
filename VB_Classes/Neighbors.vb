@@ -206,7 +206,7 @@ Public Class Neighbors_Precise : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
-            Static redC As New RedCloud_TightNew
+            Static redC As New RedCloud_Tight
             redC.Run(src)
             dst2 = redC.dst2
             labels = redC.labels

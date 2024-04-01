@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Algorithm
     Dim bounds As New Boundary_RemovedRects
-    Dim redCPP As New RedCloud_Mask_CPP
+    Dim redCPP As New RedCloud_CPP
     Public genCells As New Cell_Generate
     Public Sub New()
         labels(3) = "Contour boundaries - input to RedCloud_Basics"
@@ -122,7 +122,7 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
     Public binarizedImage As cv.Mat
     Public inputMask As cv.Mat
     Public genCells As New Cell_Generate
-    Dim redCPP As New RedCloud_Mask_CPP
+    Dim redCPP As New RedCloud_CPP
     Public buildInputMask As Boolean
     Public Sub New()
         labels(3) = "The inputMask used to limit how much of the image is processed."

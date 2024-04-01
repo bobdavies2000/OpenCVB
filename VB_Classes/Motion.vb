@@ -515,7 +515,7 @@ End Class
 
 
 Public Class Motion_Enclosing : Inherits VB_Algorithm
-    Dim redMasks As New RedCloud_BasicsMask
+    Dim redMasks As New RedCloud_Basics
     Dim learnRate As Double
     Public motionRect As New cv.Rect
     Public Sub New()
@@ -726,7 +726,7 @@ End Class
 
 
 Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
-    Dim redMasks As New RedCloud_BasicsMask
+    Dim redMasks As New RedCloud_Basics
     Public bgSub As New BGSubtract_MOG2_QT
     Dim rectList As New List(Of cv.Rect)
     Public Sub New()
