@@ -1,4 +1,3 @@
-Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Algorithm
     Dim bounds As New Boundary_RemovedRects
@@ -29,8 +28,8 @@ Public Class Flood_Basics : Inherits VB_Algorithm
 
         dst2 = genCells.dst2
 
-        setSelectedContour(task.redCells, task.cellMap)
-        identifyCells(task.redCells)
+        setSelectedContour()
+        identifyCells()
 
         labels(2) = genCells.labels(2)
     End Sub
@@ -65,7 +64,7 @@ Public Class Flood_CellStatsPlot : Inherits VB_Algorithm
                 task.clickPoint = task.rc.maxDist
             End If
         End If
-        identifyCells(task.redCells)
+        identifyCells()
     End Sub
 End Class
 
@@ -107,7 +106,7 @@ Public Class Flood_ContainedCells : Inherits VB_Algorithm
             Dim rc = task.redCells(index)
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
-        identifyCells(task.redCells)
+        identifyCells()
 
         If task.heartBeat Then labels(3) = CStr(removeCells.Count) + " cells were completely contained in exactly one other cell's rect"
     End Sub
@@ -151,8 +150,8 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
         Dim cellCount = Math.Min(redOptions.identifyCount, task.redCells.Count)
         If task.heartBeat Then labels(2) = $"{task.redCells.Count} cells identified and the largest {cellCount} are numbered below."
 
-        setSelectedContour(task.redCells, task.cellMap)
-        identifyCells(task.redCells)
+        setSelectedContour()
+        identifyCells()
     End Sub
 End Class
 
@@ -189,8 +188,8 @@ Public Class Flood_Tiers : Inherits VB_Algorithm
         dst2 = flood.dst2
         dst3 = flood.dst3
 
-        setSelectedContour(task.redCells, task.cellMap)
-        identifyCells(task.redCells)
+        setSelectedContour()
+        identifyCells()
     End Sub
 End Class
 
@@ -232,8 +231,8 @@ Public Class Flood_MaxDistPoints : Inherits VB_Algorithm
             redCPP.maxList.Add(task.redCells(i).maxDist.Y)
         Next
 
-        setSelectedContour(task.redCells, task.cellMap)
-        identifyCells(task.redCells)
+        setSelectedContour()
+        identifyCells()
 
         labels(2) = genCells.labels(2)
     End Sub

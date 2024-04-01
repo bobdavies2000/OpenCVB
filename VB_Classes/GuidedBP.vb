@@ -53,69 +53,6 @@ End Class
 
 
 
-
-
-
-'Public Class GuidedBP_Cells : Inherits VB_Algorithm
-'    Dim guided As New GuidedBP_Hulls
-'    Public Sub New()
-'        If standaloneTest() Then gOptions.displayDst1.Checked = True
-'        labels = {"", "", "Output of GuidedBP_Hulls", "Ranges for the point cloud data"}
-'        desc = "Display ranges for X, Y, and Z for the selected KWhere cell."
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        guided.Run(src)
-'        dst2 = guided.dst2
-
-'        Dim rc As New rcData
-'        If guided.redCells.Count > 1 Then
-'            setSelectedContour(guided.redCells, guided.kMap)
-'            rc = task.rc
-'            vbDrawContour(dst2, rc.contour, rc.color)
-'        End If
-
-'        Static strOut As String
-'        If task.heartBeat Then
-'            strOut = "Range for X min/max" + vbTab + Format(rc.mmX.minVal, fmt1) + "/" + Format(rc.mmX.maxVal, fmt1) + vbCrLf
-'            strOut += "Range for Y min/max" + vbTab + Format(rc.mmY.minVal, fmt1) + "/" + Format(rc.mmY.maxVal, fmt1) + vbCrLf
-'            strOut += "Range for Z min/max" + vbTab + Format(rc.mmZ.minVal, fmt1) + "/" + Format(rc.mmZ.maxVal, fmt1) + vbCrLf
-
-'            dst1 = rc.mask
-'        End If
-'        setTrueText(strOut, 3)
-'    End Sub
-'End Class
-
-
-
-
-
-
-'Public Class GuidedBP_Stats : Inherits VB_Algorithm
-'    Dim kObj As New GuidedBP_Objects
-'    Dim stats As New Cell_Basics
-'    Public Sub New()
-'        stats.runRedCloud = True
-'        labels(1) = "Compartments for each object"
-'        desc = "Compartmentalize the RedCloud_Basics cells so they stay near the objects detected."
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        kObj.Run(src)
-'        dst2 = kObj.dst2
-
-'        stats.Run(kObj.dst1)
-'        dst0 = stats.dst0
-'        dst1 = stats.dst1
-'        labels(2) = stats.labels(2)
-'        setTrueText(stats.strOut, 3)
-'    End Sub
-'End Class
-
-
-
-
-
-
 Public Class GuidedBP_HotPointsKNN : Inherits VB_Algorithm
     Dim ptHot As New GuidedBP_HotPoints
     Dim knnSide As New KNN_Core

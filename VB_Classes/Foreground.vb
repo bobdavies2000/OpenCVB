@@ -171,7 +171,7 @@ Public Class Foreground_CellsFore : Inherits VB_Algorithm
             If tmp.CountNonZero / rc.pixels > 0.5 Then dst2(rc.rect).SetTo(rc.color, rc.mask) Else Dim k = 0
         Next
 
-        If standaloneTest() Then identifyCells(task.redCells)
+        If standaloneTest() Then identifyCells()
     End Sub
 End Class
 
@@ -198,6 +198,6 @@ Public Class Foreground_CellsBack : Inherits VB_Algorithm
             If tmp.CountNonZero / rc.pixels > 0.5 Then dst2(rc.rect).SetTo(rc.color, rc.mask) Else Dim k = 0
         Next
 
-        If standaloneTest() Then identifyCells(task.redCells)
+        If standaloneTest() Then identifyCells()
     End Sub
 End Class

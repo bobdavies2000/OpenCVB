@@ -841,8 +841,6 @@ End Class
 
 Public Class Contour_PrepData : Inherits VB_Algorithm
     Dim contour As New Contour_Basics
-    Dim redCells As New List(Of rcData)
-    Dim cellMap As New cv.Mat
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Prepare redCells and a cellMap using only contours"
@@ -853,9 +851,8 @@ Public Class Contour_PrepData : Inherits VB_Algorithm
 
         dst1.SetTo(0)
         dst3.SetTo(0)
-        redCells.Clear()
-        redCells.Add(New rcData)
-        cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim redCells As New List(Of rcData)
+        Dim cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         For i = 0 To contour.sortedList.Count - 1
             Dim tour = contour.allContours(contour.sortedList.ElementAt(i).Value)
             Dim rc As New rcData
@@ -887,7 +884,7 @@ Public Class Contour_PrepData : Inherits VB_Algorithm
         Next
 
         labels(2) = $"{redCells.Count} cells were found"
-        setSelectedContour(redCells, cellMap)
+        setSelectedContour()
     End Sub
 End Class
 

@@ -192,27 +192,25 @@ Module VB_Basics
         dst.Circle(pt, task.dotSize, cv.Scalar.Black, -1, task.lineType)
     End Sub
     Public Sub setSelectedContour()
+        Static ptNew As New cv.Point
         If task.redCells.Count = 0 Then Exit Sub
+        If task.clickPoint = ptNew And task.redCells.Count > 1 Then task.clickPoint = task.redCells(1).maxDist
         Dim index = task.cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
         task.rc = task.redCells(index)
-        If task.mouseClickFlag = False Then Exit Sub
-        If index >= task.redCells.Count Then
-            If task.redCells.Count > 1 Then
-                task.clickPoint = task.redCells(1).maxDist
-                task.rc = task.redCells(1)
-            End If
+        If index > 0 Then
+            task.clickPoint = task.redCells(index).maxDist
+            task.rc = task.redCells(index)
         End If
     End Sub
     Public Sub setSelectedContour(ByRef redCells As List(Of rcData), ByRef cellMap As cv.Mat)
+        Static ptNew As New cv.Point
         If redCells.Count = 0 Then Exit Sub
+        If task.clickPoint = ptNew And redCells.Count > 1 Then task.clickPoint = redCells(1).maxDist
         Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
         task.rc = redCells(index)
-        If task.mouseClickFlag = False Then Exit Sub
-        If index >= redCells.Count Then
-            If redCells.Count > 0 Then
-                task.clickPoint = redCells(0).maxDist
-                task.rc = redCells(0)
-            End If
+        If index > 0 Then
+            task.clickPoint = redCells(index).maxDist
+            task.rc = redCells(index)
         End If
     End Sub
     Public Function contourBuild(mask As cv.Mat, approxMode As cv.ContourApproximationModes) As List(Of cv.Point)

@@ -170,7 +170,9 @@ Public Class Swarm_Flood : Inherits VB_Algorithm
         flood.inputMask = swarm.dst2
         flood.Run(colorC.dst2)
         dst2 = flood.dst2
-        identifyCells(task.redCells)
+
+        setSelectedContour()
+        identifyCells()
         labels(2) = flood.genCells.labels(2)
     End Sub
 End Class

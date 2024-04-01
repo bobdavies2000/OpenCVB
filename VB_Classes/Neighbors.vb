@@ -3,8 +3,6 @@ Imports cv = OpenCvSharp
 Public Class Neighbors_Basics : Inherits VB_Algorithm
     Public redC As New RedCloud_Tight
     Dim knn As New KNN_Core
-    Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat
     Public runRedCloud As Boolean = False
     Public options As New Options_XNeighbors
     Public Sub New()
@@ -17,28 +15,26 @@ Public Class Neighbors_Basics : Inherits VB_Algorithm
             redC.Run(src)
             dst2 = redC.dst2
             labels = redC.labels
-            redCells = task.redCells
-            cellMap = task.cellMap
         End If
 
         knn.queries.Clear()
-        For Each rc In redCells
+        For Each rc In task.redCells
             knn.queries.Add(rc.maxDStable)
         Next
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         knn.Run(src)
 
-        For i = 0 To redCells.Count - 1
-            Dim rc = redCells(i)
+        For i = 0 To task.redCells.Count - 1
+            Dim rc = task.redCells(i)
             rc.nabs = knn.neighbors(i)
         Next
 
         If standalone Then
-            setSelectedContour(redCells, cellMap)
+            setSelectedContour()
             dst3.SetTo(0)
             Dim ptCount As Integer
             For Each index In task.rc.nabs
-                Dim pt = redCells(index).maxDStable
+                Dim pt = task.redCells(index).maxDStable
                 If pt = task.rc.maxDStable Then
                     dst2.Circle(pt, task.dotSize, black, -1, task.lineType)
                 Else
@@ -163,61 +159,6 @@ Public Class Neighbors_StableMax : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Neighbors_Contained : Inherits VB_Algorithm
-    Dim nabs As New Neighbors_Precise
-    Public cellMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public redCells As New List(Of rcData)
-    Public Sub New()
-        nabs.runRedCloud = True
-        If standalone Then gOptions.displayDst1.Checked = True
-        desc = "Identify cells that are completely contained in another cell - neighbors count = 1"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        nabs.Run(src)
-        setTrueText("Review the neighbors_Precise algorithm")
-        'dst1 = nabs.dst2
-        'labels(1) = nabs.labels(2)
-
-        'For Each index In nabs.nabList(task.rc.index)
-        '    Dim rc = nabs.redCells(index)
-        '    dst2.Circle(rc.maxDStable, task.dotSize, task.highlightColor, -1, task.lineType)
-        '    strOut += CStr(index) + ","
-        'Next
-
-        'cellMap.SetTo(0)
-        'dst2.SetTo(0)
-        'dst3.SetTo(0)
-        'redCells.Clear()
-        'Dim count As Integer
-        'For Each rc In nabs.redCells
-        '    rc.index = redCells.Count
-        '    If nabs.nabList(rc.index).Count = 1 Then
-        '        Dim r = rc.rect
-        '        If r.X <> 0 And r.Y <> 0 And r.X + r.Width < dst2.Width - 1 And r.Y + r.Height < dst2.Height - 1 Then
-        '            count += 1
-        '            dst3(rc.rect).SetTo(rc.color, rc.mask)
-        '            cellMap(rc.rect).SetTo(rc.index, rc.mask)
-        '            Continue For
-        '        End If
-        '    End If
-        '    rc.nab = nabs.nabList(rc.index).Min()
-        '    redCells.Add(rc)
-
-        '    cellMap(rc.rect).SetTo(rc.index, rc.mask)
-        '    dst2(rc.rect).SetTo(rc.color, rc.mask)
-        'Next
-
-        'setSelectedContour(redCells, cellMap)
-        'labels(2) = $"{redCells.Count} cells were identified."
-        'labels(3) = $"{count} cells had only one neighbor and were merged with that neighbor."
-    End Sub
-End Class
 
 
 

@@ -170,7 +170,7 @@ Public Class HeatMap_Cell : Inherits VB_Algorithm
         labels(1) = heat.labels(2)
         labels(3) = heat.labels(3)
 
-        identifyCells(task.redCells)
+        identifyCells()
     End Sub
 End Class
 

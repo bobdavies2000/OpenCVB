@@ -554,7 +554,7 @@ Public Class Cell_BasicsPlot : Inherits VB_Algorithm
                     task.clickPoint = task.rc.maxDist
                 End If
             End If
-            identifyCells(task.redCells)
+            identifyCells()
         End If
         If task.heartBeat Then statsString(src)
 
