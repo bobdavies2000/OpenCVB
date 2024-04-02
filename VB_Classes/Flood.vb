@@ -237,3 +237,94 @@ Public Class Flood_MaxDistPoints : Inherits VB_Algorithm
         labels(2) = genCells.labels(2)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Flood_Motion : Inherits VB_Algorithm
+    Dim flood As New Flood_Basics
+    Dim redCells As New List(Of rcData)
+    Dim cellMap As New cv.Mat
+    Dim maxDists As New List(Of cv.Point2f)
+    Dim maxIndex As New List(Of Integer)
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat Then
+            flood.Run(src)
+            redCells = New List(Of rcData)(task.redCells)
+            cellMap = task.cellMap.Clone
+            dst2 = flood.dst2.Clone
+            dst3 = flood.dst2.Clone
+            labels(2) = flood.labels(2)
+            labels(3) = flood.labels(2)
+
+            maxDists.Clear()
+            For Each rc In redCells
+                maxDists.Add(rc.maxDist)
+                maxIndex.Add(rc.index)
+            Next
+        Else
+            flood.Run(src)
+            dst1.SetTo(0)
+            For i = 0 To task.redCells.Count - 1
+                Dim rc = task.redCells(i)
+                If maxDists.Contains(rc.maxDist) Then
+                    Dim lrc = redCells(maxIndex(maxDists.IndexOf(rc.maxDist)))
+                    dst1(lrc.rect).SetTo(lrc.color, lrc.mask)
+                End If
+            Next
+            dst3 = flood.dst2
+            labels(3) = flood.labels(2)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Flood_Motion1 : Inherits VB_Algorithm
+    Dim flood As New Flood_Basics
+    Dim motion As New Motion_Basics
+    Dim redCells As New List(Of rcData)
+    Dim maxDists As New List(Of cv.Point2f)
+    Dim maxIndex As New List(Of Integer)
+    Public Sub New()
+        desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat Then
+            flood.Run(src)
+            redCells = New List(Of rcData)(task.redCells)
+            dst2 = flood.dst2.Clone
+            dst3 = flood.dst2.Clone
+            labels(2) = flood.labels(2)
+            labels(3) = flood.labels(2)
+
+            maxDists.Clear()
+            For Each rc In redCells
+                maxDists.Add(rc.maxDist)
+                maxIndex.Add(rc.index)
+            Next
+        Else
+            flood.Run(src)
+            motion.Run(flood.dst2)
+
+            For i = 0 To task.redCells.Count - 1
+                Dim rc = task.redCells(i)
+                If maxDists.Contains(rc.maxDist) Then
+                    Dim lrc = redCells(maxIndex(maxDists.IndexOf(rc.maxDist)))
+                    dst1(lrc.rect).SetTo(lrc.color, lrc.mask)
+                End If
+            Next
+            dst3 = flood.dst2
+            labels(3) = flood.labels(2)
+        End If
+    End Sub
+End Class

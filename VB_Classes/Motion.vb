@@ -726,7 +726,7 @@ End Class
 
 
 Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
-    Dim redMasks As New RedCloud_Basics
+    Dim redC As New RedCloud_Basics
     Public bgSub As New BGSubtract_MOG2_QT
     Dim rectList As New List(Of cv.Rect)
     Public Sub New()
@@ -749,8 +749,8 @@ Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
             dst2 = src.Threshold(0, 255, cv.ThresholdTypes.Binary)
         End If
 
-        redMasks.inputMask = Not dst2
-        redMasks.Run(dst2)
+        redC.inputMask = Not dst2
+        redC.Run(dst2)
         If task.redCells.Count <= 2 Then
             task.motionDetected = False
         Else

@@ -154,6 +154,36 @@ End Class
 
 
 
+
+Public Class Swarm_Percentage : Inherits VB_Algorithm
+    Dim swarm As New Swarm_Flood
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Cells map X percent", 1, 100, 50)
+        desc = "Use features to segment a percentage of the image then use RedCloud with a mask for the rest of the image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static percentSlider = findSlider("Cells map X percent")
+        Dim percent = percentSlider.value / 100
+
+        swarm.Run(src)
+        dst2 = swarm.dst2
+
+        dst3.SetTo(0)
+        Dim pixels As Integer
+        For Each rc In task.redCells
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
+            pixels += rc.pixels
+            If pixels / src.Total >= percent Then Exit For
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class Swarm_Flood : Inherits VB_Algorithm
     Dim swarm As New Swarm_Basics
     Public flood As New Flood_BasicsMask
@@ -183,25 +213,52 @@ End Class
 
 
 
-Public Class Swarm_Percentage : Inherits VB_Algorithm
-    Dim swarm As New Swarm_Flood
+Public Class Swarm_Flood2 : Inherits VB_Algorithm
+    Public lines As New Line_KNN
+    Public flood As New Flood_BasicsMask
+    Public colorC As New Color_Basics
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Cells map X percent", 1, 100, 50)
-        desc = "Use features to segment a percentage of the image then use RedCloud with a mask for the rest of the image."
+        flood.genCells.removeContour = False
+        desc = "Floodfill the color image using the swarm outline as a mask"
+    End Sub
+    Public Function runRedCloud(src As cv.Mat) As cv.Mat
+        lines.Run(src)
+        colorC.Run(src)
+
+        flood.inputMask = lines.dst3
+        flood.Run(colorC.dst2)
+        Return flood.dst2
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat = False Then Exit Sub
+
+        dst2 = runRedCloud(src).Clone()
+        dst3 = lines.dst3.Clone
+
+        setSelectedContour()
+        identifyCells()
+        labels(2) = flood.genCells.labels(2)
+        labels(3) = lines.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Swarm_Flood3 : Inherits VB_Algorithm
+    Dim swarm As New Swarm_Flood2
+    Public Sub New()
+        desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static percentSlider = findSlider("Cells map X percent")
-        Dim percent = percentSlider.value / 100
-
         swarm.Run(src)
         dst2 = swarm.dst2
+        labels(2) = swarm.labels(2)
 
-        dst3.SetTo(0)
-        Dim pixels As Integer
-        For Each rc In task.redCells
-            dst3(rc.rect).SetTo(rc.color, rc.mask)
-            pixels += rc.pixels
-            If pixels / src.Total >= percent Then Exit For
-        Next
+        dst3 = swarm.runRedCloud(src)
+        labels(3) = swarm.labels(2)
     End Sub
 End Class

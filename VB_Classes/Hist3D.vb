@@ -100,7 +100,6 @@ Public Class Hist3D_RedCloud : Inherits VB_Algorithm
     Dim hist3D As New Hist3D_Basics
     Public Sub New()
         redOptions.UseColorOnly.Checked = True
-        labels = {"", "", "Grayscale", "dst3Label"}
         desc = "Run RedCloud_Basics on the combined Hist3D color/cloud output."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -218,27 +217,22 @@ End Class
 
 Public Class Hist3D_PixelCells : Inherits VB_Algorithm
     Dim pixel As New Hist3D_Pixel
-    Dim redC As New RedCloud_Basics
+    Dim redC As New Flood_Basics
     Public Sub New()
-        redOptions.UseColorOnly.Checked = True
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels = {"", "", "Cell-by-cell backprojection of the Hist3D_Pixel algorithm", "Palette version of dst2"}
         desc = "After classifying each pixel, backproject each redCell using the same 3D histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
-        dst2 = task.cellMap
-        labels(2) = redC.labels(3)
 
         pixel.Run(src)
 
-        dst0.SetTo(0)
         For Each cell In task.redCells
-            cv.Cv2.CalcBackProject({src(cell.rect)}, {0, 1, 2}, pixel.histogram, dst1(cell.rect), redOptions.rangesBGR)
-            dst1(cell.rect).CopyTo(dst0(cell.rect), cell.mask)
+            cv.Cv2.CalcBackProject({src(cell.rect)}, {0, 1, 2}, pixel.histogram, dst2(cell.rect), redOptions.rangesBGR)
         Next
 
-        dst3 = vbPalette(dst0 * 255 / redOptions.bins3D)
+        dst3 = vbPalette(dst2 * 255 / redOptions.bins3D)
     End Sub
 End Class
 
@@ -260,7 +254,7 @@ Public Class Hist3D_PixelClassify : Inherits VB_Algorithm
 
         redC.Run(pixel.dst2)
         dst2 = redC.dst2
-        labels(2) = redC.labels(3)
+        labels(2) = redC.labels(2)
 
         If task.redCells.Count > 0 Then
             dst2(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)

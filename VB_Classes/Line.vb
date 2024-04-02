@@ -1459,3 +1459,36 @@ Public Class Line_GravityIntersect : Inherits VB_Algorithm
         'labels(2) = "Slope for gravity is " + Format(task.gravityVec.slope, fmt1) + ".  Slope for horizon is " + Format(task.horizonVec.slope, fmt1)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Line_KNN : Inherits VB_Algorithm
+    Dim lines As New Line_Basics
+    Dim swarm As New Swarm_Basics
+    Public Sub New()
+        findSlider("Connect X KNN points").Value = 1
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Use KNN to find the other line end points nearest to each endpoint and connect them with a line."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        swarm.options.RunVB()
+        lines.Run(src)
+        dst2 = lines.dst2
+
+        dst3.SetTo(0)
+        swarm.knn.queries.Clear()
+        For Each lp In lines.lpList
+            swarm.knn.queries.Add(lp.p1)
+            swarm.knn.queries.Add(lp.p2)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+        swarm.knn.trainInput = New List(Of cv.Point2f)(swarm.knn.queries)
+        swarm.knn.Run(empty)
+
+        swarm.drawLines(dst3)
+        labels(2) = lines.labels(2)
+    End Sub
+End Class

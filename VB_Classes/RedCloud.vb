@@ -12,9 +12,13 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            Static colorC As New Color_Basics
-            colorC.Run(src)
-            src = colorC.dst2
+            'Static colorC As New Color_Basics
+            'colorC.Run(src)
+            'src = colorC.dst2
+            redOptions.UseColorOnly.Checked = True
+            Static fLess As New FeatureLess_RedCloud
+            fLess.Run(src)
+            src = fLess.dst2
         End If
 
         redCPP.inputMask = inputMask
@@ -2023,7 +2027,7 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         maxDepth.Run(src)
         If redOptions.UseColorOnly.Checked Or redOptions.UseGuidedProjection.Checked Then
-            redMasks.inputMask = Nothing
+            redMasks.inputMask.SetTo(0)
             If src.Channels = 3 Then
                 colorClass.Run(src)
                 dst2 = colorClass.dst2.Clone

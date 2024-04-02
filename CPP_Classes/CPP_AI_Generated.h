@@ -2445,6 +2445,8 @@ public:
         fLess = new CPP_FeatureLess_Basics();
         cPtr = new RedCloud();
         advice = "In redOptions the 'Desired RedCloud Cells' slider has a big impact.";
+        inputMask = Mat(dst2.size(), CV_8U);
+        inputMask.setTo(0);
         desc = "Another minimalist approach to building RedCloud color-based cells.";
     }
     ~CPP_RedColor_FeatureLessCore() {
