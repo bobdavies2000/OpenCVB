@@ -7,21 +7,21 @@ Public Class PixelViewerForm
     Public saveText As String
     Dim secondCount As Integer
     Private Sub PixelShow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Left = GetSetting("OpenCVB1", "PixelViewerLeft", "PixelViewerLeft", Me.Left)
-        Me.Top = GetSetting("OpenCVB1", "PixelViewerTop", "PixelViewerTop", Me.Top)
+        Me.Left = GetSetting("OpenCVB", "PixelViewerLeft", "PixelViewerLeft", Me.Left)
+        Me.Top = GetSetting("OpenCVB", "PixelViewerTop", "PixelViewerTop", Me.Top)
 
-        Me.Width = GetSetting("OpenCVB1", "PixelViewerWidth", "PixelViewerWidth", 1280)
-        Me.Height = GetSetting("OpenCVB1", "PixelViewerHeight", "PixelViewerHeight", 720)
+        Me.Width = GetSetting("OpenCVB", "PixelViewerWidth", "PixelViewerWidth", 1280)
+        Me.Height = GetSetting("OpenCVB", "PixelViewerHeight", "PixelViewerHeight", 720)
         PixelViewerForm_ResizeEnd(sender, e)
         Timer1.Enabled = True
     End Sub
     Private Sub PixelViewerForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         rtb.Width = Me.Width - 40
         rtb.Height = Me.Height - 80
-        SaveSetting("OpenCVB1", "PixelViewerLeft", "PixelViewerLeft", Me.Left)
-        SaveSetting("OpenCVB1", "PixelViewerTop", "PixelViewerTop", Me.Top)
-        SaveSetting("OpenCVB1", "PixelViewerWidth", "PixelViewerWidth", Me.Width)
-        SaveSetting("OpenCVB1", "PixelViewerHeight", "PixelViewerHeight", Me.Height)
+        SaveSetting("OpenCVB", "PixelViewerLeft", "PixelViewerLeft", Me.Left)
+        SaveSetting("OpenCVB", "PixelViewerTop", "PixelViewerTop", Me.Top)
+        SaveSetting("OpenCVB", "PixelViewerWidth", "PixelViewerWidth", Me.Width)
+        SaveSetting("OpenCVB", "PixelViewerHeight", "PixelViewerHeight", Me.Height)
     End Sub
 
     Private Sub PixelViewerForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown

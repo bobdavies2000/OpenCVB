@@ -78,8 +78,8 @@ Public Class OpenGL_Basics : Inherits VB_Algorithm
             openGL_hwnd = FindWindow(Nothing, task.OpenGLTitle)
             If openGL_hwnd Then Exit While
         End While
-        Dim Left = CInt(GetSetting("OpenCVB1", "OpenGLtaskX", "OpenGLtaskX", task.mainFormLocation.X))
-        Dim Top = CInt(GetSetting("OpenCVB1", "OpenGLtaskY", "OpenGLtaskY", task.mainFormLocation.Y))
+        Dim Left = CInt(GetSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", task.mainFormLocation.X))
+        Dim Top = CInt(GetSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", task.mainFormLocation.Y))
         task.oglRect = New cv.Rect(Left, Top, windowWidth, windowHeight)
         MoveWindow(openGL_hwnd, Left, Top, task.oglRect.Width, task.oglRect.Height, True)
     End Sub

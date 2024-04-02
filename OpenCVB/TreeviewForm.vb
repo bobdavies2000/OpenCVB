@@ -19,10 +19,10 @@ Public Class TreeviewForm
         PercentTime.Height = TreeView1.Height
     End Sub
     Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles Me.Load
-        Me.Left = GetSetting("OpenCVB1", "treeViewLeft", "treeViewLeft", Me.Left)
-        Me.Top = GetSetting("OpenCVB1", "treeViewTop", "treeViewTop", Me.Top)
-        Me.Width = GetSetting("OpenCVB1", "treeViewWidth", "treeViewWidth", Me.Width)
-        Me.Height = GetSetting("OpenCVB1", "treeViewHeight", "treeViewHeight", Me.Height)
+        Me.Left = GetSetting("OpenCVB", "treeViewLeft", "treeViewLeft", Me.Left)
+        Me.Top = GetSetting("OpenCVB", "treeViewTop", "treeViewTop", Me.Top)
+        Me.Width = GetSetting("OpenCVB", "treeViewWidth", "treeViewWidth", Me.Width)
+        Me.Height = GetSetting("OpenCVB", "treeViewHeight", "treeViewHeight", Me.Height)
     End Sub
     Private Function FindRecursive(ByVal tNode As TreeNode, name As String) As TreeNode
         Dim tn As TreeNode
@@ -34,10 +34,10 @@ Public Class TreeviewForm
         Return Nothing
     End Function
     Private Sub Options_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        SaveSetting("OpenCVB1", "treeViewLeft", "treeViewLeft", Me.Left)
-        SaveSetting("OpenCVB1", "treeViewTop", "treeViewTop", Me.Top)
-        SaveSetting("OpenCVB1", "treeViewWidth", "treeViewWidth", Me.Width)
-        SaveSetting("OpenCVB1", "treeViewHeight", "treeViewHeight", Me.Height)
+        SaveSetting("OpenCVB", "treeViewLeft", "treeViewLeft", Me.Left)
+        SaveSetting("OpenCVB", "treeViewTop", "treeViewTop", Me.Top)
+        SaveSetting("OpenCVB", "treeViewWidth", "treeViewWidth", Me.Width)
+        SaveSetting("OpenCVB", "treeViewHeight", "treeViewHeight", Me.Height)
     End Sub
     Private Function getNode(tv As TreeView, name As String) As TreeNode
         For Each n In tv.Nodes

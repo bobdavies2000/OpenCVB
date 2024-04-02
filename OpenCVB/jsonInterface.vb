@@ -76,13 +76,13 @@ Namespace jsonClass
             emptyApp.showConsoleLog = False
             emptyApp.treeButton = True
             emptyApp.algorithmGroup = "<All but Python>"
-            SaveSetting("OpenCVB1", "PixelViewerLeft", "PixelViewerLeft", 0)
-            SaveSetting("OpenCVB1", "PixelViewerTop", "PixelViewerTop", 0)
-            SaveSetting("OpenCVB1", "PixelViewerWidth", "PixelViewerWidth", 1280)
-            SaveSetting("OpenCVB1", "PixelViewerHeight", "PixelViewerHeight", 720)
-            SaveSetting("OpenCVB1", "OpenGLtaskX", "OpenGLtaskX", 0)
-            SaveSetting("OpenCVB1", "OpenGLtaskY", "OpenGLtaskY", 0)
-            SaveSetting("OpenCVB1", "OpenGLtaskWidth", "OpenGLtaskWidth", 512)
+            SaveSetting("OpenCVB", "PixelViewerLeft", "PixelViewerLeft", 0)
+            SaveSetting("OpenCVB", "PixelViewerTop", "PixelViewerTop", 0)
+            SaveSetting("OpenCVB", "PixelViewerWidth", "PixelViewerWidth", 1280)
+            SaveSetting("OpenCVB", "PixelViewerHeight", "PixelViewerHeight", 720)
+            SaveSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", 0)
+            SaveSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", 0)
+            SaveSetting("OpenCVB", "OpenGLtaskWidth", "OpenGLtaskWidth", 512)
 
             empty.Add(emptyApp)
             Return empty

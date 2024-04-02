@@ -241,7 +241,7 @@ Public Class GeneticDrawing_Photo : Inherits VB_Algorithm
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("OpenCVB1", "PhotoFileName", "PhotoFileName", task.homeDir + "Data/GeneticDrawingExample.jpg")
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "PhotoFileName", "PhotoFileName", task.homeDir + "Data/GeneticDrawingExample.jpg")
         fileNameForm.Text = "Select an image file to create a paint version"
         fileNameForm.FileNameLabel.Text = "Select a file for use with the Sound_Basics algorithm."
         fileNameForm.PlayButton.Hide()
@@ -278,7 +278,7 @@ Public Class GeneticDrawing_Photo : Inherits VB_Algorithm
             Else
                 src = fullsizeImage
             End If
-            SaveSetting("OpenCVB1", "PhotoFileName", "PhotoFileName", fileInputName.FullName)
+            SaveSetting("OpenCVB", "PhotoFileName", "PhotoFileName", fileInputName.FullName)
         End If
 
         gDraw.Run(src)

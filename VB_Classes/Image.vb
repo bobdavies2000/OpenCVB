@@ -11,7 +11,7 @@ Public Class Image_Basics : Inherits VB_Algorithm
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("OpenCVB1", "Image_Basics_Name", "Image_Basics_Name", task.homeDir + "Images/train/2092.jpg")
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "Image_Basics_Name", "Image_Basics_Name", task.homeDir + "Images/train/2092.jpg")
         fileNameForm.Text = "Select an image file for use in OpenCVB"
         fileNameForm.FileNameLabel.Text = "Select a file."
         fileNameForm.PlayButton.Hide()
@@ -43,7 +43,7 @@ Public Class Image_Basics : Inherits VB_Algorithm
                 dst2 = fullsizeImage
             End If
 
-            ' SaveSetting("OpenCVB1", "Image_Basics_Name", "Image_Basics_Name", fileInputName.FullName)
+            ' SaveSetting("OpenCVB", "Image_Basics_Name", "Image_Basics_Name", fileInputName.FullName)
         End If
     End Sub
 End Class

@@ -513,7 +513,7 @@ Public Class OpenCVB
     End Sub
     Private Sub setupAlgorithmHistory()
         For i = 0 To MAX_RECENT - 1
-            Dim nextA = GetSetting("OpenCVB1", "algHistory" + CStr(i), "algHistory" + CStr(i), "recent algorithm " + CStr(i))
+            Dim nextA = GetSetting("OpenCVB", "algHistory" + CStr(i), "algHistory" + CStr(i), "recent algorithm " + CStr(i))
             If nextA = "" Then Exit For
             If algHistory.Contains(nextA) = False Then
                 algHistory.Add(nextA)
@@ -546,7 +546,7 @@ Public Class OpenCVB
         For i = 0 To algHistory.Count - 1
             RecentList.DropDownItems.Add(algHistory(i))
             AddHandler RecentList.DropDownItems(i).Click, AddressOf algHistory_Clicked
-            SaveSetting("OpenCVB1", "algHistory" + CStr(i), "algHistory" + CStr(i), algHistory(i))
+            SaveSetting("OpenCVB", "algHistory" + CStr(i), "algHistory" + CStr(i), algHistory(i))
         Next
     End Sub
     Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
@@ -601,9 +601,9 @@ Public Class OpenCVB
     End Sub
     Private Sub PixelViewerButton_Click(sender As Object, e As EventArgs) Handles PixelViewerButton.Click
         If fpsTimer.Enabled Then
-            SaveSetting("OpenCVB1", "PixelViewerLeft", "PixelViewerLeft", Me.Left)
-            SaveSetting("OpenCVB1", "PixelViewerTop", "PixelViewerTop", Me.Height)
-            SaveSetting("OpenCVB1", "PixelViewerWidth", "PixelViewerWidth", Me.Width)
+            SaveSetting("OpenCVB", "PixelViewerLeft", "PixelViewerLeft", Me.Left)
+            SaveSetting("OpenCVB", "PixelViewerTop", "PixelViewerTop", Me.Height)
+            SaveSetting("OpenCVB", "PixelViewerWidth", "PixelViewerWidth", Me.Width)
         End If
         PixelViewerButton.Checked = Not PixelViewerButton.Checked
         settings.PixelViewerButton = PixelViewerButton.Checked

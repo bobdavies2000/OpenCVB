@@ -44,7 +44,7 @@ Public Class Sound_Basics : Inherits VB_Algorithm
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "m4a (*.m4a)|*.m4a|mp3 (*.mp3)|*.mp3|mp4 (*.mp4)|*.mp4|wav (*.wav)|*.wav|aac (*.aac)|*.aac|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("OpenCVB1", "AudioFileName", "AudioFileName", task.homeDir + "Data/01 I Let the Music Speak.m4a")
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "AudioFileName", "AudioFileName", task.homeDir + "Data/01 I Let the Music Speak.m4a")
         fileNameForm.Text = "Select an audio file to analyze"
         fileNameForm.FileNameLabel.Text = "Select a file for use with the Sound_Basics algorithm."
         fileNameForm.PlayButton.Hide()
@@ -63,7 +63,7 @@ Public Class Sound_Basics : Inherits VB_Algorithm
             reader = New MediaFoundationReader(fileinfo.FullName)
             LoadSoundData()
             reader = New MediaFoundationReader(fileinfo.FullName)
-            SaveSetting("OpenCVB1", "AudioFileName", "AudioFileName", fileinfo.FullName)
+            SaveSetting("OpenCVB", "AudioFileName", "AudioFileName", fileinfo.FullName)
 
             player = New WaveOut
             player.Init(reader)

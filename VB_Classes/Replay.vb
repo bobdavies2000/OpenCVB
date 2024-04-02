@@ -81,7 +81,7 @@ Public Class Replay_Record : Inherits VB_Algorithm
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "ocvb (*.ocvb)|*.ocvb"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("OpenCVB1", "ReplayFileName", "ReplayFileName", task.homeDir + "Recording.ocvb")
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", task.homeDir + "Recording.ocvb")
         fileNameForm.Text = "Select an OpenCVB bag file to create"
         fileNameForm.FileNameLabel.Text = "Select a file to record all the image data."
         fileNameForm.Setup(traceName)
@@ -144,7 +144,7 @@ Public Class Replay_Record : Inherits VB_Algorithm
         End If
     End Sub
     Public Sub Close()
-        If recordingFilename IsNot Nothing Then SaveSetting("OpenCVB1", "ReplayFileName", "ReplayFileName", recordingFilename.FullName)
+        If recordingFilename IsNot Nothing Then SaveSetting("OpenCVB", "ReplayFileName", "ReplayFileName", recordingFilename.FullName)
         If recordingActive Then binWrite.Close()
     End Sub
 End Class
@@ -171,7 +171,7 @@ Public Class Replay_Play : Inherits VB_Algorithm
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "ocvb (*.ocvb)|*.ocvb"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("OpenCVB1", "ReplayFileName", "ReplayFileName", task.homeDir + "Recording.ocvb")
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", task.homeDir + "Recording.ocvb")
         fileNameForm.Text = "Select an OpenCVB bag file to create"
         fileNameForm.FileNameLabel.Text = "Select an OpenCVB bag file to read"
         fileNameForm.Setup(traceName)
@@ -237,7 +237,7 @@ Public Class Replay_Play : Inherits VB_Algorithm
         End If
     End Sub
     Public Sub Close()
-        If recordingFilename IsNot Nothing Then SaveSetting("OpenCVB1", "ReplayFileName", "ReplayFileName", recordingFilename.FullName)
+        If recordingFilename IsNot Nothing Then SaveSetting("OpenCVB", "ReplayFileName", "ReplayFileName", recordingFilename.FullName)
         If playbackActive Then binRead.Close()
     End Sub
 End Class

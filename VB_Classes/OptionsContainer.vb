@@ -8,20 +8,20 @@ Public Class OptionsContainer
     Public titlesAdded As Boolean
     Public offset = 30
     Private Sub allOptionsFrm_Load(sender As Object, e As EventArgs) Handles Me.Load
-        Me.Left = GetSetting("OpenCVB1", "gOptionsLeft", "gOptionsLeft", task.mainFormLocation.X - offset)
-        Me.Top = GetSetting("OpenCVB1", "gOptionsTop", "gOptionsTop", task.mainFormLocation.Y - offset)
-        Me.Width = GetSetting("OpenCVB1", "gOptionsWidth", "gOptionsWidth", task.mainFormLocation.Width)
-        Me.Height = GetSetting("OpenCVB1", "gOptionsHeight", "gOptionsHeight", task.mainFormLocation.Height)
+        Me.Left = GetSetting("OpenCVB", "gOptionsLeft", "gOptionsLeft", task.mainFormLocation.X - offset)
+        Me.Top = GetSetting("OpenCVB", "gOptionsTop", "gOptionsTop", task.mainFormLocation.Y - offset)
+        Me.Width = GetSetting("OpenCVB", "gOptionsWidth", "gOptionsWidth", task.mainFormLocation.Width)
+        Me.Height = GetSetting("OpenCVB", "gOptionsHeight", "gOptionsHeight", task.mainFormLocation.Height)
 
         Dim goodPoint = Screen.GetWorkingArea(New Point(Me.Left, Me.Top)) ' when they change the main screen, old coordinates can go way off the screen.
         If goodPoint.X > Me.Left Then Me.Left = goodPoint.X
         If goodPoint.Y > Me.Top Then Me.Top = goodPoint.Y
     End Sub
     Private Sub Options_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        SaveSetting("OpenCVB1", "gOptionsLeft", "gOptionsLeft", Me.Left)
-        SaveSetting("OpenCVB1", "gOptionsTop", "gOptionsTop", Me.Top)
-        SaveSetting("OpenCVB1", "gOptionsWidth", "gOptionsWidth", Me.Width)
-        SaveSetting("OpenCVB1", "gOptionsHeight", "gOptionsHeight", Me.Height)
+        SaveSetting("OpenCVB", "gOptionsLeft", "gOptionsLeft", Me.Left)
+        SaveSetting("OpenCVB", "gOptionsTop", "gOptionsTop", Me.Top)
+        SaveSetting("OpenCVB", "gOptionsWidth", "gOptionsWidth", Me.Width)
+        SaveSetting("OpenCVB", "gOptionsHeight", "gOptionsHeight", Me.Height)
     End Sub
     Public Sub addTitle(frm As Object)
         If optionsTitle.Contains(frm.Text) = False Then
@@ -33,7 +33,7 @@ Public Class OptionsContainer
         titlesAdded = True
     End Sub
     Public Sub layoutOptions(normalRequest As Boolean)
-        Dim w = GetSetting("OpenCVB1", "gOptionsWidth", "gOptionsWidth", task.mainFormLocation.Width)
+        Dim w = GetSetting("OpenCVB", "gOptionsWidth", "gOptionsWidth", task.mainFormLocation.Width)
         Dim radioCheckOffset = New cv.Point(w / 2, 0)
 
         Dim sliderOffset As New cv.Point(0, 0)
@@ -47,7 +47,7 @@ Public Class OptionsContainer
             Next
         Next
 
-        Dim showAllOptions = GetSetting("OpenCVB1", "ShowAllOptions", "ShowAllOptions", False)
+        Dim showAllOptions = GetSetting("OpenCVB", "ShowAllOptions", "ShowAllOptions", False)
         Try
             Dim indexS = 1
             Dim indexO = 1

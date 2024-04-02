@@ -13,7 +13,7 @@ Public Class Video_Basics : Inherits VB_Algorithm
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("OpenCVB1", "VideoFileName", "VideoFileName", task.homeDir + "Data\CarsDrivingUnderBridge.mp4")
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", task.homeDir + "Data\CarsDrivingUnderBridge.mp4")
         fileNameForm.Text = "Select a video file for input"
         fileNameForm.FileNameLabel.Text = "Select a video file for input"
         fileNameForm.PlayButton.Hide()

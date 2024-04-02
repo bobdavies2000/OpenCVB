@@ -19,10 +19,10 @@ Public Class VB_to_CPP
             vbList.Items.Add(line)
             lastGroup = tokens(0)
         Next
-        vbList.Text = GetSetting("OpenCVB1", "TranslateToCPP", "TranslateToCPP", "Addweighted_Basics")
+        vbList.Text = GetSetting("OpenCVB", "TranslateToCPP", "TranslateToCPP", "Addweighted_Basics")
     End Sub
     Private Sub vbList_SelectedValueChanged(sender As Object, e As EventArgs) Handles vbList.SelectedValueChanged
-        SaveSetting("OpenCVB1", "TranslateToCPP", "TranslateToCPP", vbList.Text)
+        SaveSetting("OpenCVB", "TranslateToCPP", "TranslateToCPP", vbList.Text)
         algorithmVBName = vbList.Text
         fIndexName = "CPP_" + algorithmVBName + "_"
         CPPName = "CPP_" + algorithmVBName

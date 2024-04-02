@@ -320,9 +320,9 @@ Public Class VBtask : Implements IDisposable
             Dim r As RECT
             GetWindowRect(openGL_hwnd, r)
             Dim wRect = New cv.Rect(r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top)
-            SaveSetting("OpenCVB1", "OpenGLtaskX", "OpenGLtaskX", wRect.X)
-            SaveSetting("OpenCVB1", "OpenGLtaskY", "OpenGLtaskY", wRect.Y)
-            SaveSetting("OpenCVB1", "OpenGLtaskWidth", "OpenGLtaskWidth", wRect.Width)
+            SaveSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", wRect.X)
+            SaveSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", wRect.Y)
+            SaveSetting("OpenCVB", "OpenGLtaskWidth", "OpenGLtaskWidth", wRect.Width)
             openGLPipe.Close()
             openGL_hwnd = 0
         End If

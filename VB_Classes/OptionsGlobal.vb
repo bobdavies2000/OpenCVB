@@ -52,7 +52,7 @@ Public Class OptionsGlobal
         RGBFilterList.Items.Add("PhotoShop_WhiteBalance")
         RGBFilterList.SelectedIndex = 0
 
-        ShowAllOptions.Checked = GetSetting("OpenCVB1", "ShowAllOptions", "ShowAllOptions", False)
+        ShowAllOptions.Checked = GetSetting("OpenCVB", "ShowAllOptions", "ShowAllOptions", False)
 
         task.dotSize = 1
         task.cvFontThickness = 1
@@ -255,7 +255,7 @@ Public Class OptionsGlobal
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
     Private Sub ShowAllByDefault_CheckedChanged(sender As Object, e As EventArgs) Handles ShowAllOptions.CheckedChanged
-        SaveSetting("OpenCVB1", "showAllOptions", "showAllOptions", ShowAllOptions.Checked)
+        SaveSetting("OpenCVB", "showAllOptions", "showAllOptions", ShowAllOptions.Checked)
     End Sub
     Private Sub tempSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
         TempSliderLabel.Text = CStr(DebugSlider.Value)

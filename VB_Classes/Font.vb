@@ -31,8 +31,8 @@ Public Class Font_TrueType : Inherits VB_Algorithm
         desc = "Display different TrueType fonts"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Dim gfontSize = GetSetting("OpenCVB1", "FontSize", "FontSize", 12)
-        Dim fontName = GetSetting("OpenCVB1", "FontName", "FontName", "Tahoma")
+        Dim gfontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
+        Dim fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
         ' get the font on every iteration because it could have changed.  This should be done in any algorithm using OptionsFont.
         setTrueText("TrueType Font is currently set to " + fontName + " with size = " + CStr(gfontSize) + vbCrLf +
                     "Use the Settings button above to change the font name and size.")
