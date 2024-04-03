@@ -66,6 +66,9 @@ Public Class VBtask : Implements IDisposable
     Public motionBasics As Motion_BasicsQuarterRes
     Public rgbFilter As Object
 
+    Public addWeighted As Single
+    Public options_AddWeight As Options_AddWeighted
+
     Public gMat As IMU_GMatrix
     Public IMUBasics As IMU_Basics
     Public IMU_RawAcceleration As cv.Point3f
@@ -238,6 +241,8 @@ Public Class VBtask : Implements IDisposable
     Public redCells As List(Of rcData)
     Public cellMap As cv.Mat
 
+    Public fList As New List(Of cv.Point2f)
+
     Public useXYRange As Boolean ' OpenGL applications don't need to adjust the ranges.
     Public xRange As Single
     Public yRange As Single
@@ -374,6 +379,7 @@ Public Class VBtask : Implements IDisposable
         motionBasics = New Motion_BasicsQuarterRes
         cMotion = New CameraMotion_Basics
         imuStabilityTest = New Stabilizer_VerticalIMU
+        options_AddWeight = New Options_AddWeighted
 
         updateSettings()
         redOptions.Show()
@@ -451,6 +457,8 @@ Public Class VBtask : Implements IDisposable
             If task.useRecordedData Then recordedData.Run(task.color.Clone)
 
             redOptions.Sync()
+            options_AddWeight.RunVB()
+
             task.bins2D = {task.workingRes.Height, task.workingRes.Width}
             Dim src = task.color
 

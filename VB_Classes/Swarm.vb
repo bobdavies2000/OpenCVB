@@ -41,7 +41,7 @@ Public Class Swarm_Basics : Inherits VB_Algorithm
         If task.optionsChanged Then cornerHistory.Clear()
 
         Dim histCount = task.frameHistoryCount
-        cornerHistory.Add(New List(Of cv.Point2f)(feat.featurePoints))
+        cornerHistory.Add(New List(Of cv.Point2f)(task.fList))
 
         Dim lastIndex = cornerHistory.Count - 1
         knn.trainInput = New List(Of cv.Point2f)(cornerHistory.ElementAt(0))
@@ -101,11 +101,11 @@ Public Class Swarm_LeftRightFeatures : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         feat.Run(task.leftView)
-        leftList = New List(Of cv.Point2f)(feat.featurePoints)
+        leftList = New List(Of cv.Point2f)(task.fList)
         dst2 = feat.dst2.Clone
 
         feat.Run(task.rightView)
-        rightList = New List(Of cv.Point2f)(feat.featurePoints)
+        rightList = New List(Of cv.Point2f)(task.fList)
         dst3 = feat.dst2.Clone
     End Sub
 End Class

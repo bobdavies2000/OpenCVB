@@ -3272,6 +3272,8 @@ public:
     CPP_RedCloud_Basics() : algorithmCPP() {
         traceName = "CPP_RedCloud_Basics";
         cPtr = new RedCloud;
+        inputMask = Mat(dst2.size(), CV_8U);
+        inputMask.setTo(0);
         desc = "Core interface to the C++ code for floodfill.";
     }
     void Run(Mat src) {

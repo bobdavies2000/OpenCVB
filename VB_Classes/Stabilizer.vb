@@ -195,7 +195,7 @@ Public Class Stabilizer_OpticalFlow : Inherits VB_Algorithm
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         feat.Run(src)
-        inputFeat = New List(Of cv.Point2f)(feat.featurePoints)
+        inputFeat = New List(Of cv.Point2f)(task.fList)
         features1 = New cv.Mat(inputFeat.Count, 1, cv.MatType.CV_32FC2, inputFeat.ToArray)
 
         Static lastFrame As cv.Mat = src.Clone()

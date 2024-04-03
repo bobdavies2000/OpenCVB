@@ -3,7 +3,6 @@ Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_Basics : Inherits VB_Algorithm
     Dim Brisk As cv.BRISK
-    Public featurePoints As New List(Of cv.Point2f)
     Public options As New Options_Features
     Public inputMask As New cv.Mat
     Public Sub New()
@@ -17,24 +16,24 @@ Public Class Feature_Basics : Inherits VB_Algorithm
         dst2 = src.Clone
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        featurePoints.Clear()
+        task.fList.Clear()
         Dim sampleSize = options.fOptions.featurePoints
         If options.useBRISK Then
             Dim keyPoints = Brisk.Detect(src).ToList
             For Each kp In keyPoints
-                If kp.Size >= options.minDistance Then featurePoints.Add(kp.Pt)
+                If kp.Size >= options.minDistance Then task.fList.Add(kp.Pt)
             Next
         Else
-            featurePoints = cv.Cv2.GoodFeaturesToTrack(src, sampleSize, options.quality, options.minDistance, inputMask,
+            task.fList = cv.Cv2.GoodFeaturesToTrack(src, sampleSize, options.quality, options.minDistance, inputMask,
                                                        options.blockSize, options.useHarrisDetector, options.k).ToList
         End If
 
         Dim color = If(dst2.Channels = 3, cv.Scalar.Yellow, cv.Scalar.White)
-        For Each pt In featurePoints
+        For Each pt In task.fList
             dst2.Circle(pt, task.dotSize, color, -1, task.lineType)
         Next
 
-        labels(2) = "Found " + CStr(featurePoints.Count) + " points with quality = " + CStr(options.quality) +
+        labels(2) = "Found " + CStr(task.fList.Count) + " points with quality = " + CStr(options.quality) +
                     " and minimum distance = " + CStr(options.minDistance)
     End Sub
 End Class
@@ -117,7 +116,7 @@ End Class
 
 
 
-Public Class Feature_Tracer : Inherits VB_Algorithm
+Public Class Feature_TraceDelaunay : Inherits VB_Algorithm
     Dim features As New Feature_PointsDelaunay
     Public goodList As New List(Of List(Of cv.Point2f)) ' stable points only
     Public Sub New()
@@ -130,7 +129,7 @@ Public Class Feature_Tracer : Inherits VB_Algorithm
 
         If task.optionsChanged Then goodList.Clear()
 
-        Dim ptList As New List(Of cv.Point2f)(features.feat.featurePoints)
+        Dim ptList As New List(Of cv.Point2f)(task.fList)
         goodList.Add(ptList)
 
         If goodList.Count >= task.frameHistoryCount Then goodList.RemoveAt(0)
@@ -143,7 +142,7 @@ Public Class Feature_Tracer : Inherits VB_Algorithm
                 dst2.Circle(pt, task.dotSize + 1, c, -1, task.lineType)
             Next
         Next
-        labels(2) = CStr(features.feat.featurePoints.Count) + " features were identified in the image."
+        labels(2) = CStr(task.fList.Count) + " features were identified in the image."
     End Sub
 End Class
 
@@ -168,7 +167,7 @@ Public Class Feature_CellGrid : Inherits VB_Algorithm
         dst2 = src
 
         feat.Run(dst2)
-        For Each pt In feat.featurePoints
+        For Each pt In task.fList
             Dim val = dst0.Get(Of Byte)(pt.Y, pt.X)
             dst0.Set(Of Byte)(pt.Y, pt.X, If(val = 255, val, val + 1))
             dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
@@ -270,7 +269,7 @@ Public Class Feature_PointsDelaunay : Inherits VB_Algorithm
         feat.Run(src)
 
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, src.Width, src.Height))
-        For Each pt In feat.featurePoints
+        For Each pt In task.fList
             subdiv.Insert(pt)
         Next
 
@@ -286,12 +285,12 @@ Public Class Feature_PointsDelaunay : Inherits VB_Algorithm
                 ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
             Next
 
-            Dim index = If(task.heartBeat, i * incr, dst3.Get(Of Byte)(feat.featurePoints(i).Y, feat.featurePoints(i).X))
+            Dim index = If(task.heartBeat, i * incr, dst3.Get(Of Byte)(task.fList(i).Y, task.fList(i).X))
             vbDrawContour(dst3, ifacet.ToList, index, -1)
         Next
 
         dst2 = vbPalette(dst3)
-        labels(2) = CStr(feat.featurePoints.Count) + " features were identified in the image."
+        labels(2) = CStr(task.fList.Count) + " features were identified in the image."
     End Sub
 End Class
 
@@ -671,11 +670,11 @@ Public Class Feature_tCellTracker : Inherits VB_Algorithm
         Dim minCorrelation = options.fOptions.correlationThreshold
 
         strOut = ""
-        If tcells.Count < tracker.feat.featurePoints.Count / 3 Or tcells.Count < 2 Or task.optionsChanged Then
+        If tcells.Count < task.fList.Count / 3 Or tcells.Count < 2 Or task.optionsChanged Then
             myHighLightColor = If(myHighLightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
             tracker.Run(src)
             tcells.Clear()
-            For Each pt In tracker.feat.featurePoints
+            For Each pt In task.fList
                 tcells.Add(match.createCell(src, 0, pt))
             Next
             strOut += "------------------" + vbCrLf + vbCrLf
@@ -703,7 +702,7 @@ Public Class Feature_tCellTracker : Inherits VB_Algorithm
         End If
 
         tcells = New List(Of tCell)(newCells)
-        labels(2) = "Of the " + CStr(tracker.feat.featurePoints.Count) + " input cells " + CStr(newCells.Count) + " cells were tracked with correlation above " +
+        labels(2) = "Of the " + CStr(task.fList.Count) + " input cells " + CStr(newCells.Count) + " cells were tracked with correlation above " +
                     Format(minCorrelation, fmt1)
     End Sub
 End Class
@@ -737,7 +736,7 @@ Public Class Feature_PointTracker : Inherits VB_Algorithm
             myHighLightColor = If(myHighLightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
             mPoints.ptx.Clear()
             feat.Run(src)
-            For Each pt In feat.featurePoints
+            For Each pt In task.fList
                 mPoints.ptx.Add(pt)
                 Dim rect = validateRect(New cv.Rect(pt.X - radius, pt.Y - radius, rSize, rSize))
             Next
@@ -759,7 +758,7 @@ Public Class Feature_PointTracker : Inherits VB_Algorithm
             flow.Run(empty)
         End If
 
-        labels(2) = "Of the " + CStr(feat.featurePoints.Count) + " input points, " + CStr(mPoints.ptx.Count) +
+        labels(2) = "Of the " + CStr(task.fList.Count) + " input points, " + CStr(mPoints.ptx.Count) +
                     " points were tracked with correlation above " + Format(minCorrelation, fmt2)
     End Sub
 End Class
@@ -1096,8 +1095,8 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
         Dim nextTemplates As New List(Of cv.Mat)
         Dim nextRects As New List(Of cv.Rect)
         If templates.Count < minPoints Then
-            For i = 0 To feat.featurePoints.Count - 1
-                Dim pt = feat.featurePoints(i)
+            For i = 0 To task.fList.Count - 1
+                Dim pt = task.fList(i)
                 dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
                 Dim r = validateRect(New cv.Rect(pt.X - rSize, pt.Y - rSize, rSize * 2, rSize * 2))
                 nextTemplates.Add(src(r).Clone)
@@ -1136,34 +1135,15 @@ End Class
 
 
 
-Public Class Feature_GoodFeatureTrace : Inherits VB_Algorithm
-    Dim feat As New Feature_KNNBasics
+Public Class Feature_Trace : Inherits VB_Algorithm
+    Dim track As New RedTrack_Features
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Track the GoodFeatures"
+        desc = "Placeholder to help find RedTrack_Features"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        feat.Run(src)
-
-        Static frameList As New List(Of cv.Mat)
-        If task.optionsChanged Then frameList.Clear()
-
-        dst0.SetTo(0)
-        For Each pt In feat.featurePoints
-            dst0.Set(Of Byte)(pt.Y, pt.X, 1)
-            ' task.color.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-        Next
-        frameList.Add(dst0.Clone)
-        If frameList.Count >= task.frameHistoryCount Then
-            dst1 = dst1.Subtract(frameList(0))
-            frameList.RemoveAt(0)
-        End If
-        dst1 = dst1.Add(dst0)
-        dst2 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-        dst3 = src
-        dst3.SetTo(task.highlightColor, dst2)
+        track.Run(src)
+        dst2 = track.dst2
+        labels = track.labels
     End Sub
 End Class
 
@@ -1186,7 +1166,7 @@ Public Class Feature_Reduction : Inherits VB_Algorithm
 
         feat.Run(reduction.dst2)
         If task.heartBeat Then dst3.SetTo(0)
-        For Each pt In feat.featurePoints
+        For Each pt In task.fList
             dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
             dst3.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
         Next
@@ -1211,11 +1191,11 @@ Public Class Feature_Points : Inherits VB_Algorithm
         dst2 = feat.dst2
         If task.heartBeat Then dst3.SetTo(0)
 
-        For Each pt In feat.featurePoints
+        For Each pt In task.fList
             dst2.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
             dst3.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
         Next
-        labels(2) = CStr(feat.featurePoints.Count) + " targets were present with " + CStr(feat.options.fOptions.featurePoints) + " requested."
+        labels(2) = CStr(task.fList.Count) + " targets were present with " + CStr(feat.options.fOptions.featurePoints) + " requested."
     End Sub
 End Class
 
@@ -1245,8 +1225,8 @@ Public Class Feature_StableSorted : Inherits VB_Algorithm
             generations.Clear()
         End If
 
-        For i = 0 To feat.featurePoints.Count - 1
-            Dim pt = New cv.Point2f(Math.Round(feat.featurePoints(i).X), Math.Round(feat.featurePoints(i).Y))
+        For i = 0 To task.fList.Count - 1
+            Dim pt = New cv.Point2f(Math.Round(task.fList(i).X), Math.Round(task.fList(i).Y))
             If stablePoints.Contains(pt) Then
                 generations(i) += 1
             Else
@@ -1274,7 +1254,7 @@ Public Class Feature_StableSorted : Inherits VB_Algorithm
             generations.Add(ele.Key)
         Next
         labels(2) = "The most stable " + CStr(displayCount) + " points are highlighted below"
-        labels(3) = "Output of Feature_Basics" + CStr(feat.featurePoints.Count) + " points found"
+        labels(3) = "Output of Feature_Basics" + CStr(task.fList.Count) + " points found"
     End Sub
 End Class
 
@@ -1415,7 +1395,7 @@ End Class
 '        dst3 = feat.dst2
 '        dst2 = src
 
-'        Dim candidates = stable.ageGenerations(feat.featurePoints)
+'        Dim candidates = stable.ageGenerations(task.flist)
 
 '        stablePoints.Clear()
 '        generations.Clear()
@@ -1498,11 +1478,11 @@ Public Class Feature_Stable : Inherits VB_Algorithm
         options.RunVB()
 
         feat.Run(src)
-        If feat.featurePoints.Count = 0 Then Exit Sub ' nothing came back!
+        If task.fList.Count = 0 Then Exit Sub ' nothing came back!
 
         Dim newfeatures As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To feat.featurePoints.Count - 1 Step 2
-            Dim pt = New cv.Point(feat.featurePoints(i).X, feat.featurePoints(i).Y)
+        For i = 0 To task.fList.Count - 1 Step 2
+            Dim pt = New cv.Point(task.fList(i).X, task.fList(i).Y)
             Dim index = features.IndexOf(pt)
             If index >= 0 Then
                 newfeatures.Add(gens(index) + 1, pt)
@@ -1600,7 +1580,7 @@ Public Class Feature_KNNSimple : Inherits VB_Algorithm
         dst3 = feat.dst2
 
         knn.queries.Clear()
-        For Each pt In feat.featurePoints
+        For Each pt In task.fList
             knn.queries.Add(pt)
         Next
 
@@ -1628,15 +1608,15 @@ Public Class Feature_KNNBasics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         feat.Run(src)
 
-        knn.queries = New List(Of cv.Point2f)(feat.featurePoints)
+        knn.queries = New List(Of cv.Point2f)(task.fList)
         If firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         knn.Run(empty)
 
         For i = 0 To knn.neighbors.Count - 1
             Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
             Dim pt = knn.trainInput(trainIndex)
-            Dim qPt = feat.featurePoints(i)
-            If pt.DistanceTo(qPt) > feat.options.minDistance Then knn.trainInput(trainIndex) = feat.featurePoints(i)
+            Dim qPt = task.fList(i)
+            If pt.DistanceTo(qPt) > feat.options.minDistance Then knn.trainInput(trainIndex) = task.fList(i)
         Next
         featurePoints = New List(Of cv.Point2f)(knn.trainInput)
 
@@ -1671,21 +1651,21 @@ Public Class Feature_MultiPass : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         feat.Run(task.color)
         dst2 = src.Clone
-        featurePoints = New List(Of cv.Point2f)(feat.featurePoints)
+        featurePoints = New List(Of cv.Point2f)(task.fList)
         Dim passCounts As String = CStr(featurePoints.Count) + "/"
 
         feat.Run(src)
-        For Each pt In feat.featurePoints
+        For Each pt In task.fList
             featurePoints.Add(pt)
         Next
-        passCounts += CStr(feat.featurePoints.Count) + "/"
+        passCounts += CStr(task.fList.Count) + "/"
 
         sharpen.Run(task.color)
         feat.Run(sharpen.dst2)
-        For Each pt In feat.featurePoints
+        For Each pt In task.fList
             featurePoints.Add(pt)
         Next
-        passCounts += CStr(feat.featurePoints.Count)
+        passCounts += CStr(task.fList.Count)
 
         For Each pt In featurePoints
             dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
@@ -1716,7 +1696,7 @@ Public Class Feature_History : Inherits VB_Algorithm
 
         Static cornerHistory As New List(Of List(Of cv.Point2f))
 
-        cornerHistory.Add(New List(Of cv.Point2f)(feat.featurePoints))
+        cornerHistory.Add(New List(Of cv.Point2f)(task.fList))
         If cornerHistory.Count > task.frameHistoryCount Then cornerHistory.RemoveAt(0)
 
         corners.Clear()
@@ -1752,7 +1732,7 @@ Public Class Feature_Flood : Inherits VB_Algorithm
         dst2 = redC.dst2
 
         Dim hitCount As Integer
-        For Each pt In feat.featurePoints
+        For Each pt In task.fList
             Dim index = task.cellMap.Get(Of Byte)(pt.Y, pt.X)
             If index > 0 Then
                 Dim rc = task.redCells(index)
@@ -1761,7 +1741,7 @@ Public Class Feature_Flood : Inherits VB_Algorithm
                 hitCount += 1
             End If
         Next
-        If task.heartBeat Then labels(2) = "Of the " + CStr(feat.featurePoints.Count) + " features, " + CStr(hitCount) + " landed inside a cell " +
-                                           "(" + Format(hitCount / feat.featurePoints.Count, "0%") + ")"
+        If task.heartBeat Then labels(2) = "Of the " + CStr(task.fList.Count) + " features, " + CStr(hitCount) + " landed inside a cell " +
+                                           "(" + Format(hitCount / task.fList.Count, "0%") + ")"
     End Sub
 End Class

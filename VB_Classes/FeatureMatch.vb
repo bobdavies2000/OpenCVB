@@ -1,4 +1,4 @@
-﻿Imports OpenCvSharp.Flann
+﻿Imports System.Web.UI
 Imports cv = OpenCvSharp
 Public Class FeatureMatch_Basics : Inherits VB_Algorithm
     Public feat As New FeatureMatch_LeftRight
@@ -12,12 +12,12 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
         findSlider("MatchTemplate Cell Size").Value = 6
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         dst2X = New cv.Mat(dst2.Height, dst2.Width * 2, cv.MatType.CV_8U)
+        labels = {"", "The AddWeighted_Basics output showing both the left and right images with corresponding points",
+                  "Draw a rectangle anywhere to isolate specific good features", ""}
         desc = "Pair left/right features using correlation coefficients"
     End Sub
     Private Sub highlight(mp As pointPair)
         dst2X.Line(mp.p1, New cv.Point2f(mp.p2.X + dst2.Width, mp.p2.Y), cv.Scalar.White, task.lineWidth, task.lineType)
-        labels = {"", "The AddWeighted_Basics output showing both the left and right images with corresponding points",
-                  "Draw a rectangle anywhere to isolate specific good features", ""}
     End Sub
     Public Function showMatches(mplist As List(Of pointPair), corrlist As List(Of Single)) As Integer
         Dim r1 As New cv.Rect(0, 0, dst2.Width, dst2.Height)
@@ -131,7 +131,7 @@ Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
         feat.Run(task.rightView)
         Dim tmpRight As New List(Of cv.Point2f)
         Dim ptRight As New List(Of Integer)
-        For Each pt In feat.featurePoints
+        For Each pt In task.fList
             tmpRight.Add(pt)
             ptRight.Add(CInt(pt.Y))
         Next
@@ -140,7 +140,7 @@ Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
         feat.Run(task.leftView)
 
         Dim tmpLeft As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
-        For Each pt In feat.featurePoints
+        For Each pt In task.fList
             tmpLeft.Add(pt.Y, pt)
         Next
         dst2 = feat.dst2
@@ -230,5 +230,212 @@ Public Class FeatureMatch_History : Inherits VB_Algorithm
         If task.heartBeat Then
             labels(3) = CStr(mpList.Count) + " points were matched with a minimum " + Format(minCorr, fmt1) + " correlation"
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FeatureMatch_Validate1 : Inherits VB_Algorithm
+    Public feat As New Feature_Basics
+    Dim ptList As New List(Of cv.Point)
+    Dim ptCount As New List(Of Integer)
+    Public Sub New()
+        desc = "Isolate only the features present on the current frame and the previous"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+
+        Dim fList As New List(Of cv.Point)
+        For Each pt In task.fList
+            fList.Add(New cv.Point(pt.X, pt.Y))
+        Next
+
+        Dim lastCounts As New List(Of Integer)
+        For Each count In ptCount
+            lastCounts.Add(count - 1)
+        Next
+
+        dst2 = src
+        For i = 0 To fList.Count - 1
+            Dim pt = fList(i)
+            Dim index = ptList.IndexOf(pt)
+            If index >= 0 Then
+                ptCount(index) += 1
+                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            Else
+                ptList.Add(pt)
+                ptCount.Add(1)
+            End If
+        Next
+
+        For i = lastCounts.Count - 1 To 0 Step -1
+            If ptCount(i) = lastCounts(i) Then
+                ptList.RemoveAt(i)
+                ptCount.RemoveAt(i)
+            End If
+        Next
+
+        labels(2) = CStr(ptList.Count) + " points were the same as in previous frames."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FeatureMatch_Validate2 : Inherits VB_Algorithm
+    Public feat As New Feature_Basics
+    Dim ptList As New List(Of cv.Point)
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32S, 0)
+        desc = "Isolate only the features present on the current frame and the previous"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+
+        If task.optionsChanged Then dst1.SetTo(0)
+
+        If task.heartBeat Then
+            dst0 = dst1.InRange(1, 255)
+            dst1.SetTo(0, Not dst0)
+        End If
+
+        dst2 = src
+        For Each pt In task.fList
+            Dim count = dst1.Get(Of Byte)(CInt(pt.Y), CInt(pt.X))
+            If count < 0 Then count = 0
+            dst1.Set(Of Integer)(CInt(pt.Y), CInt(pt.X), count + 2)
+        Next
+
+        dst1 -= 1
+        dst1.ConvertTo(dst0, cv.MatType.CV_8U)
+        dst3 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        Dim tmp = dst3.FindNonZero()
+        ptList.Clear()
+        For i = 0 To tmp.Rows - 1
+            Dim pt = tmp.Get(Of cv.Point)(i, 0)
+            ptList.Add(pt)
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
+
+        labels(2) = CStr(ptList.Count) + " points were the same as in previous frames."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FeatureMatch_Validate3 : Inherits VB_Algorithm
+    Public feat As New Feature_Basics
+    Dim ptList As New List(Of cv.Point)
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32S, 0)
+        desc = "Isolate only the features present on the current frame and the previous"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static ptLists As New List(Of List(Of cv.Point))
+
+        feat.Run(src)
+        Dim fList As New List(Of cv.Point)
+        For Each pt In task.fList
+            fList.Add(New cv.Point(pt.X, pt.Y))
+        Next
+        ptLists.Add(fList)
+
+        dst2 = src
+        ptList.Clear()
+        Dim ptCount As New List(Of Integer)
+        For Each ptSet In ptLists
+            For Each pt In ptSet
+                Dim index = ptList.IndexOf(pt)
+                If index >= 0 Then
+                    ptCount(index) += 1
+                Else
+                    ptList.Add(pt)
+                    ptCount.Add(1)
+                End If
+            Next
+        Next
+
+        Dim minCount = gOptions.FrameHistory.Value
+        For i = 0 To ptList.Count - 1
+            Dim pt = ptList(i)
+            If ptCount(i) > minCount Then dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
+
+        If ptLists.Count > gOptions.FrameHistory.Value Then ptLists.RemoveAt(0)
+        labels(2) = CStr(ptList.Count) + " points were the same as in previous frames."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FeatureMatch_Validate : Inherits VB_Algorithm
+    Public feat As New Feature_Basics
+    Dim ptList As New List(Of cv.Point)
+    Public Sub New()
+        gOptions.DebugSlider.Value = 95
+        If standalone Then gOptions.displayDst1.Checked = True
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32S, 0)
+        desc = "Isolate only the features present on the current frame and the previous"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static correlationSlider = findSlider("Feature Correlation Threshold")
+        Static cellSizeSlider = findSlider("MatchTemplate Cell Size")
+        Dim minCorrelation = correlationSlider.value / 100
+        Dim boxSize = cellSizeSlider.value
+        Static lastImage As cv.Mat = src.Clone
+        feat.Run(src)
+
+        Dim newList As New List(Of cv.Point)
+        For Each pt In task.fList
+            Dim iPt = New cv.Point(pt.X, pt.Y)
+            newList.Add(iPt)
+
+            Dim index = ptList.IndexOf(iPt)
+            If index >= 0 Then ptList.RemoveAt(index)
+        Next
+
+        dst2 = src
+        For Each pt In ptList
+
+
+
+            If pt = task.clickPoint Then Dim k = 0
+
+
+
+
+            If pt.X >= dst2.Width - boxSize Then Continue For
+            If pt.Y >= dst2.Height - boxSize Then Continue For
+            Dim r = New cv.Rect(pt.X, pt.Y, boxSize, boxSize)
+            cv.Cv2.MatchTemplate(src(r), lastImage(r), dst0, cv.TemplateMatchModes.CCoeffNormed)
+            Dim correlation = vbMinMax(dst0).maxVal
+            If correlation >= minCorrelation Then newList.Add(pt)
+        Next
+
+        ptList = New List(Of cv.Point)(newList)
+
+        For Each pt In ptList
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
+        lastImage = src.Clone
+        labels(2) = CStr(ptList.Count) + " points were the same as in previous frames."
     End Sub
 End Class

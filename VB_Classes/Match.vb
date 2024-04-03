@@ -1,7 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
-Imports System.Text.RegularExpressions
-
 Public Class Match_Basics : Inherits VB_Algorithm
     Public drawRect As cv.Rect
     Public template As cv.Mat
@@ -662,7 +660,7 @@ Public Class Match_GoodFeatureKNN : Inherits VB_Algorithm
 
         feat.Run(src)
 
-        knn.queries = New List(Of cv.Point2f)(feat.featurePoints)
+        knn.queries = New List(Of cv.Point2f)(task.fList)
         knn.Run(empty)
 
         Static frameList As New List(Of cv.Mat)
@@ -750,7 +748,7 @@ Public Class Match_Points : Inherits VB_Algorithm
 
         If standaloneTest() Then
             feat.Run(src)
-            ptx = New List(Of cv.Point2f)(feat.featurePoints)
+            ptx = New List(Of cv.Point2f)(task.fList)
             setTrueText("Move camera around to watch the point being tracked", 3)
         End If
 

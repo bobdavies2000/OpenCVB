@@ -68,14 +68,14 @@ Public Class LeftRight_GoodFeatures : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         feat.Run(task.leftView)
         task.rightview.CopyTo(dst3)
-        For i = 0 To feat.featurePoints.Count - 1
-            dst3.Circle(feat.featurePoints(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
+        For i = 0 To task.fList.Count - 1
+            dst3.Circle(task.fList(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
         Next
 
         feat.Run(task.leftView)
         task.leftview.CopyTo(dst2)
-        For i = 0 To feat.featurePoints.Count - 1
-            dst2.Circle(feat.featurePoints(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
+        For i = 0 To task.fList.Count - 1
+            dst2.Circle(task.fList(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
         Next
     End Sub
 End Class

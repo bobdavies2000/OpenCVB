@@ -1,52 +1,51 @@
 Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
-Imports  System.IO
-Public Class ParticleFilter_Basics : Inherits VB_Algorithm
-    Dim trace As New Swarm_Basics
-    Dim plot1D As New Plot_Histogram2D
-    Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
-        labels = {"", "", "Particle traffic", "Largest count in 2D Histogram"}
-        desc = "Use the good features of an image to create a histogram of particle motion. Peak histogram is net movement of the camera."
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static distanceSlider = findSlider("Distance threshold (pixels)")
-        Static histogram As New cv.Mat
-        Dim matSize = 2 * distanceSlider.value Or 1 ' must be odd
-        Dim halfsize = distanceSlider.value
-        If histogram.Rows <> matSize Then
-            histogram = New cv.Mat(matSize, matSize, cv.MatType.CV_32F, 0)
-            gOptions.HistBinSlider.Value = matSize
-        End If
+Imports System.IO
+'Public Class ParticleFilter_Basics : Inherits VB_Algorithm
+'    Dim trace As New Swarm_Basics
+'    Dim plot1D As New Plot_Histogram2D
+'    Public Sub New()
+'        If standaloneTest() Then gOptions.displayDst1.Checked = True
+'        labels = {"", "", "Particle traffic", "Largest count in 2D Histogram"}
+'        desc = "Use the good features of an image to create a histogram of particle motion. Peak histogram is net movement of the camera."
+'    End Sub
+'    Public Sub RunVB(src as cv.Mat)
+'        Static distanceSlider = findSlider("Distance threshold (pixels)")
+'        Static histogram As New cv.Mat
+'        Dim matSize = 21 ' must be odd
+'        Dim halfsize = 10
+'        If histogram.Rows <> matSize Then
+'            histogram = New cv.Mat(matSize, matSize, cv.MatType.CV_32F, 0)
+'            gOptions.HistBinSlider.Value = matSize
+'        End If
 
-        trace.Run(src)
-        dst2 = trace.dst2
-        If firstPass Then Exit Sub ' all entries are identical on the first pass.
+'        trace.Run(src)
+'        dst2 = trace.dst2
+'        If firstPass Then Exit Sub ' all entries are identical on the first pass.
 
-        histogram.SetTo(0)
-        For Each mp In trace.mpList
-            Dim x = mp.p1.X - mp.p2.X + halfsize
-            Dim y = mp.p1.Y - mp.p2.Y + halfsize
-            If x > matSize Or x < 0 Then Continue For
-            If y > matSize Or y < 0 Then Continue For
-            Dim val = histogram.Get(Of Single)(y, x)
-            histogram.Set(Of Single)(y, x, val + 1)
-        Next
-        plot1D.Run(histogram)
-        dst3 = plot1D.dst2
+'        histogram.SetTo(0)
+'        For Each mp In trace.mpList
+'            Dim x = mp.p1.X - mp.p2.X + halfsize
+'            Dim y = mp.p1.Y - mp.p2.Y + halfsize
+'            If x > matSize Or x < 0 Then Continue For
+'            If y > matSize Or y < 0 Then Continue For
+'            Dim val = histogram.Get(Of Single)(y, x)
+'            histogram.Set(Of Single)(y, x, val + 1)
+'        Next
+'        plot1D.Run(histogram)
+'        dst3 = plot1D.dst2
 
-        Dim mm as mmData = vbMinMax(histogram)
+'        Dim mm as mmData = vbMinMax(histogram)
 
-        Dim w = CInt(dst2.Width / matSize)
-        Dim h = CInt(dst2.Height / matSize)
-        Dim maxLoc = New cv.Point2f(w * mm.maxLoc.X, h * mm.maxLoc.Y)
-        dst1.SetTo(0)
-        dst1.Rectangle(New cv.Rect(maxLoc.X, maxLoc.Y, w, h), cv.Scalar.White, task.lineWidth, task.lineType)
+'        Dim w = CInt(dst2.Width / matSize)
+'        Dim h = CInt(dst2.Height / matSize)
+'        Dim maxLoc = New cv.Point2f(w * mm.maxLoc.X, h * mm.maxLoc.Y)
+'        dst1.SetTo(0)
+'        dst1.Rectangle(New cv.Rect(maxLoc.X, maxLoc.Y, w, h), cv.Scalar.White, task.lineWidth, task.lineType)
 
-        Dim center = New cv.Point2f(mm.maxLoc.X - halfsize, mm.maxLoc.Y - halfsize)
-        setTrueText("Histogram peak is at " + center.ToString, 1)
-    End Sub
-End Class
+'        Dim center = New cv.Point2f(mm.maxLoc.X - halfsize, mm.maxLoc.Y - halfsize)
+'        setTrueText("Histogram peak is at " + center.ToString, 1)
+'    End Sub
+'End Class
 
 
 
@@ -60,7 +59,7 @@ Public Class ParticleFilter_Example : Inherits VB_Algorithm
         cPtr = ParticleFilterTest_Open(task.homeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols)
         desc = "Particle Filter example downloaded from github - hyperlink in the code shows URL."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static imageFrame = 12
         imageFrame += 1
         If imageFrame Mod 45 = 0 Then
@@ -83,25 +82,25 @@ End Class
 
 
 
-Public Class ParticleFilter_Net : Inherits VB_Algorithm
-    Dim trace As New Swarm_Basics
-    Public Sub New()
-        labels = {"", "", "Particle traffic", "Net movement of all the particles"}
-        desc = "Use the good features of an image to create a set of particles that can estimate camera motion"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        trace.Run(src)
-        dst2 = trace.dst2
+'Public Class ParticleFilter_Net : Inherits VB_Algorithm
+'    Dim trace As New Swarm_Basics
+'    Public Sub New()
+'        labels = {"", "", "Particle traffic", "Net movement of all the particles"}
+'        desc = "Use the good features of an image to create a set of particles that can estimate camera motion"
+'    End Sub
+'    Public Sub RunVB(src as cv.Mat)
+'        trace.Run(src)
+'        dst2 = trace.dst2
 
-        Dim net As cv.Point2f
-        For Each mp In trace.mpList
-            net.X += mp.p1.X - mp.p2.X
-            net.Y += mp.p1.Y - mp.p2.Y
-        Next
-        net.X = dst2.Width / 2 + net.X / trace.mpList.Count
-        net.Y = dst2.Height / 2 + net.Y / trace.mpList.Count
-        dst3.SetTo(0)
-        dst3.Line(New cv.Point2f(dst2.Width / 2, dst2.Height / 2), net, cv.Scalar.White, task.lineWidth, task.lineType)
-        setTrueText(trace.strOut, 3)
-    End Sub
-End Class
+'        Dim net As cv.Point2f
+'        For Each mp In trace.mpList
+'            net.X += mp.p1.X - mp.p2.X
+'            net.Y += mp.p1.Y - mp.p2.Y
+'        Next
+'        net.X = dst2.Width / 2 + net.X / trace.mpList.Count
+'        net.Y = dst2.Height / 2 + net.Y / trace.mpList.Count
+'        dst3.SetTo(0)
+'        dst3.Line(New cv.Point2f(dst2.Width / 2, dst2.Height / 2), net, cv.Scalar.White, task.lineWidth, task.lineType)
+'        setTrueText(trace.strOut, 3)
+'    End Sub
+'End Class

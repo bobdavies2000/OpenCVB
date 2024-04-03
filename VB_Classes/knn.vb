@@ -673,7 +673,7 @@ Public Class KNN_TrackMean : Inherits VB_Algorithm
 
         feat.Run(src)
 
-        knn.queries = New List(Of cv.Point2f)(feat.featurePoints)
+        knn.queries = New List(Of cv.Point2f)(task.fList)
         knn.Run(src)
 
         Dim diffX As New List(Of Integer)
@@ -1062,7 +1062,7 @@ Public Class KNN_TrackEach : Inherits VB_Algorithm
 
         feat.Run(src)
 
-        knn.queries = New List(Of cv.Point2f)(feat.featurePoints)
+        knn.queries = New List(Of cv.Point2f)(task.fList)
         knn.Run(src)
 
         Dim tracker As New List(Of pointPair)
@@ -1082,7 +1082,7 @@ Public Class KNN_TrackEach : Inherits VB_Algorithm
             Next
         Next
 
-        labels(2) = CStr(feat.featurePoints.Count) + " good features were tracked across " + CStr(task.frameHistoryCount) + " frames."
+        labels(2) = CStr(task.fList.Count) + " good features were tracked across " + CStr(task.frameHistoryCount) + " frames."
         setTrueText(labels(2) + vbCrLf + "The highlighted dots are the good feature points", 3)
 
         If trackAll.Count > task.frameHistoryCount Then trackAll.RemoveAt(0)

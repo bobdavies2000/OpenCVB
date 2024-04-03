@@ -166,8 +166,8 @@ Partial Class OptionsGlobal
         'DebugSlider
         '
         Me.DebugSlider.Location = New System.Drawing.Point(212, 511)
-        Me.DebugSlider.Maximum = 9
-        Me.DebugSlider.Minimum = -10
+        Me.DebugSlider.Maximum = 100
+        Me.DebugSlider.Minimum = -100
         Me.DebugSlider.Name = "DebugSlider"
         Me.DebugSlider.Size = New System.Drawing.Size(506, 69)
         Me.DebugSlider.TabIndex = 55
