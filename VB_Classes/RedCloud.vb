@@ -911,7 +911,7 @@ Public Class RedCloud_DelaunayGuidedFeatures : Inherits VB_Algorithm
         Static goodList As New List(Of List(Of cv.Point2f))
         If task.heartBeat Then goodList.Clear()
 
-        Dim nextGood As New List(Of cv.Point2f)(task.fList)
+        Dim nextGood As New List(Of cv.Point2f)(task.features)
         goodList.Add(nextGood)
 
         If goodList.Count >= task.frameHistoryCount Then goodList.RemoveAt(0)

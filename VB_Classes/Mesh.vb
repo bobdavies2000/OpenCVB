@@ -53,9 +53,9 @@ Public Class Mesh_Features : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         feat.Run(src)
-        If task.fList.Count < 3 Then Exit Sub
+        If task.features.Count < 3 Then Exit Sub
         mesh.dst2 = src
-        dst2 = mesh.showMesh(task.fList)
+        dst2 = mesh.showMesh(task.features)
     End Sub
 End Class
 
