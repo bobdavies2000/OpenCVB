@@ -31,10 +31,27 @@ Public Class Grid_Basics : Inherits VB_Algorithm
                         If y = 0 Then task.gridCols += 1
                         gridList.Add(roi)
                         task.gridIndex.Add(index)
+                        If roi.Y < dst2.Height / 3 Then
+                            If roi.X < dst2.Width / 3 Then task.subDivisions.Add(0)
+                            If roi.X >= dst2.Width / 3 And roi.X < dst2.Width * 2 / 3 Then task.subDivisions.Add(1)
+                            If roi.X >= dst2.Width * 2 / 3 Then task.subDivisions.Add(2)
+                        End If
+                        If roi.Y >= dst2.Height / 3 And roi.Y < dst2.Height * 2 / 3 Then
+                            If roi.X < dst2.Width / 3 Then task.subDivisions.Add(3)
+                            If roi.X >= dst2.Width / 3 And roi.X < dst2.Width * 2 / 3 Then task.subDivisions.Add(4)
+                            If roi.X >= dst2.Width * 2 / 3 Then task.subDivisions.Add(5)
+                        End If
+                        If roi.Y >= dst2.Height * 2 / 3 Then
+                            If roi.X < dst2.Width / 3 Then task.subDivisions.Add(6)
+                            If roi.X >= dst2.Width / 3 And roi.X < dst2.Width * 2 / 3 Then task.subDivisions.Add(7)
+                            If roi.X >= dst2.Width * 2 / 3 Then task.subDivisions.Add(8)
+                        End If
                         index += 1
                     End If
                 Next
             Next
+            task.subDivisionCount = 9
+
 
             If task.color Is Nothing Then Exit Sub ' startup condition.
 
