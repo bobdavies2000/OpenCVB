@@ -99,8 +99,6 @@ End Class
 
 Public Class Entropy_Rectangle : Inherits VB_Algorithm
     Public entropyVal As Single
-    Public histRaw(3 - 1) As cv.Mat
-    Public histNormalized(3 - 1) As cv.Mat
     Public Sub New()
         desc = "Calculate the entropy in the drawRect when run standaloneTest()"
     End Sub
@@ -116,26 +114,18 @@ Public Class Entropy_Rectangle : Inherits VB_Algorithm
         Dim dimensions() = New Integer() {task.histogramBins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255)}
 
-        If standalone And (task.drawRect.Width = 0 Or task.drawRect.Height = 0) Then
-            task.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
-        End If
-        entropyVal = 0
-        Dim input = src
-        strOut = ""
-        For i = 0 To src.Channels - 1
-            Dim hist As New cv.Mat
-            cv.Cv2.CalcHist({src}, {i}, New cv.Mat(), hist, 1, dimensions, ranges)
-            histRaw(i) = hist.Clone()
-            histNormalized(i) = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
-
-            Dim nextEntropy = channelEntropy(src.Total, histNormalized(i))
-            If src.Channels = 1 Then
-                strOut += "Entropy X1000 for gray channel " + Format(nextEntropy * 1000, fmt1) + vbCrLf
-            Else
-                strOut += "Entropy X1000 for " + Choose(i + 1, "Red", "Green", "Blue") + " " + Format(nextEntropy * 1000, fmt1) + vbCrLf
+        If standalone Then
+            If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then
+                task.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
             End If
-            entropyVal += nextEntropy * 1000
-        Next
+            src = src(task.drawRect)
+        End If
+        Dim hist As New cv.Mat
+        cv.Cv2.CalcHist({src}, {0}, New cv.Mat(), hist, 1, dimensions, ranges)
+        Dim histNormalized = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
+
+        entropyVal = channelEntropy(src.Total, histNormalized) * 1000
+        strOut = "Entropy X1000 " + Format(entropyVal, fmt1) + vbCrLf
         If standaloneTest() Then
             dst2 = src
             setTrueText(strOut, 3)
@@ -150,8 +140,8 @@ End Class
 
 Public Class Entropy_SubDivisions : Inherits VB_Algorithm
     Dim entropy As New Entropy_Rectangle
-    Public entropies As New List(Of List(Of Single))
-    Public eROI As New List(Of List(Of cv.Rect))
+    Dim entropies As New List(Of List(Of Single))
+    Dim eROI As New List(Of List(Of cv.Rect))
     Public Sub New()
         labels(2) = "The top entropy values in each subdivision"
         For i = 0 To task.subDivisionCount - 1
@@ -168,17 +158,16 @@ Public Class Entropy_SubDivisions : Inherits VB_Algorithm
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim dimensions() = New Integer() {task.histogramBins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255)}
+        Dim hist As New cv.Mat
         For i = 0 To task.gridList.Count - 1
             Dim roi = task.gridList(i)
-            Dim hist As New cv.Mat
             cv.Cv2.CalcHist({dst2(roi)}, {0}, New cv.Mat(), hist, 1, dimensions, ranges)
             hist = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
 
-            Dim nextEntropy = entropy.channelEntropy(dst2.Total, hist) * 1000
+            Dim nextEntropy = entropy.channelEntropy(dst2(roi).Total, hist) * 1000
 
-            Dim quad = task.subDivisions(i)
-            entropies(quad).Add(nextEntropy)
-            eROI(quad).Add(roi)
+            entropies(task.subDivisions(i)).Add(nextEntropy)
+            eROI(task.subDivisions(i)).Add(roi)
             If standaloneTest() Then setTrueText(Format(nextEntropy, fmt2), New cv.Point(roi.X, roi.Y), 3)
         Next
 
@@ -188,5 +177,20 @@ Public Class Entropy_SubDivisions : Inherits VB_Algorithm
             Dim roi = eROI(i)(eList.IndexOf(maxEntropy))
             dst2.Rectangle(roi, cv.Scalar.White, task.lineWidth, task.lineType)
         Next
+
+        If standaloneTest() Then
+            Dim p1 = New cv.Point(0, dst2.Height / 3)
+            Dim p2 = New cv.Point(dst2.Width, dst2.Height / 3)
+            dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
+            p1 = New cv.Point(0, dst2.Height * 2 / 3)
+            p2 = New cv.Point(dst2.Width, dst2.Height * 2 / 3)
+            dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
+            p1 = New cv.Point(dst2.Width / 3, 0)
+            p2 = New cv.Point(dst2.Width / 3, dst2.Height)
+            dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
+            p1 = New cv.Point(dst2.Width * 2 / 3, 0)
+            p2 = New cv.Point(dst2.Width * 2 / 3, dst2.Height)
+            dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
+        End If
     End Sub
 End Class
