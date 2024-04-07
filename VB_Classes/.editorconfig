@@ -1,0 +1,13 @@
+
+# All files
+[*]
+indent_style = space
+
+# Xml files
+[*.xml]
+indent_size = 2
+
+[*.{vb}]
+dotnet_diagnostic.IDE004.severity = none
+dotnet_diagnostic.IDE006.severity = none
+

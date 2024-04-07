@@ -244,10 +244,8 @@ Public Class Grid_TrackCenter : Inherits VB_Algorithm
             match.template = lastImage(match.drawRect).Clone
         End If
 
-        ' If task.motionFlag = False Then
         match.Run(src)
         dst3 = match.displayResults()
-        ' End If
         Static lastPoint As cv.Point = match.matchCenter
 
         dst2 = src

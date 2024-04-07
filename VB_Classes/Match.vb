@@ -743,7 +743,7 @@ Public Class Match_Points : Inherits VB_Algorithm
         labels(2) = "Rectangle shown is the search rectangle."
         desc = "Track the selected points"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If firstPass Then mPoint.target = src.Clone
 
         If standaloneTest() Then
@@ -760,7 +760,6 @@ Public Class Match_Points : Inherits VB_Algorithm
             correlation.Add(mPoint.correlation)
             ptx(i) = mPoint.pt
             drawPolkaDot(ptx(i), dst2)
-            dst2.Rectangle(mPoint.searchRect, cv.Scalar.Yellow, 1)
         Next
         mPoint.target = src.Clone
     End Sub
