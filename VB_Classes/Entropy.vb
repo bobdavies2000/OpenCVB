@@ -142,6 +142,7 @@ Public Class Entropy_SubDivisions : Inherits VB_Algorithm
     Dim entropy As New Entropy_Rectangle
     Dim entropies As New List(Of List(Of Single))
     Dim eROI As New List(Of List(Of cv.Rect))
+    Public roiList As New List(Of cv.Rect)
     Public Sub New()
         labels(2) = "The top entropy values in each subdivision"
         For i = 0 To task.subDivisionCount - 1
@@ -151,46 +152,48 @@ Public Class Entropy_SubDivisions : Inherits VB_Algorithm
         desc = "Find the highest entropy in each quadrant"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        dst2 = task.color.Clone
         For i = 0 To task.subDivisionCount - 1
             entropies(i).Clear()
             eROI(i).Clear()
         Next
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        dst1 = If(src.Channels = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         Dim dimensions() = New Integer() {task.histogramBins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255)}
         Dim hist As New cv.Mat
         For i = 0 To task.gridList.Count - 1
             Dim roi = task.gridList(i)
-            cv.Cv2.CalcHist({dst2(roi)}, {0}, New cv.Mat(), hist, 1, dimensions, ranges)
+            cv.Cv2.CalcHist({dst1(roi)}, {0}, New cv.Mat(), hist, 1, dimensions, ranges)
             hist = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
 
-            Dim nextEntropy = entropy.channelEntropy(dst2(roi).Total, hist) * 1000
+            Dim nextEntropy = entropy.channelEntropy(dst1(roi).Total, hist) * 1000
 
             entropies(task.subDivisions(i)).Add(nextEntropy)
             eROI(task.subDivisions(i)).Add(roi)
             If standaloneTest() Then setTrueText(Format(nextEntropy, fmt2), New cv.Point(roi.X, roi.Y), 3)
         Next
 
+        roiList.Clear()
         For i = 0 To task.subDivisionCount - 1
             Dim eList = entropies(i)
             Dim maxEntropy = eList.Max
             Dim roi = eROI(i)(eList.IndexOf(maxEntropy))
+            roiList.Add(roi)
             dst2.Rectangle(roi, cv.Scalar.White, task.lineWidth, task.lineType)
         Next
 
-        If standaloneTest() Then
-            Dim p1 = New cv.Point(0, dst2.Height / 3)
-            Dim p2 = New cv.Point(dst2.Width, dst2.Height / 3)
-            dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
-            p1 = New cv.Point(0, dst2.Height * 2 / 3)
-            p2 = New cv.Point(dst2.Width, dst2.Height * 2 / 3)
-            dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
-            p1 = New cv.Point(dst2.Width / 3, 0)
-            p2 = New cv.Point(dst2.Width / 3, dst2.Height)
-            dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
-            p1 = New cv.Point(dst2.Width * 2 / 3, 0)
-            p2 = New cv.Point(dst2.Width * 2 / 3, dst2.Height)
-            dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
-        End If
+        Dim p1 = New cv.Point(0, dst2.Height / 3)
+        Dim p2 = New cv.Point(dst2.Width, dst2.Height / 3)
+        dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
+        p1 = New cv.Point(0, dst2.Height * 2 / 3)
+        p2 = New cv.Point(dst2.Width, dst2.Height * 2 / 3)
+        dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
+        p1 = New cv.Point(dst2.Width / 3, 0)
+        p2 = New cv.Point(dst2.Width / 3, dst2.Height)
+        dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
+        p1 = New cv.Point(dst2.Width * 2 / 3, 0)
+        p2 = New cv.Point(dst2.Width * 2 / 3, dst2.Height)
+        dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
     End Sub
 End Class

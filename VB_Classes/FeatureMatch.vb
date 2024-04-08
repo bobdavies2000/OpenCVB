@@ -629,8 +629,7 @@ Public Class FeatureMatch_Validate : Inherits VB_Algorithm
             match.template = dst3(match.drawRect)
             'r = New cv.Rect(pt.X - boxSize, pt.Y - boxSize, boxSize * 2, boxSize * 2)
             match.Run(src)
-            Dim ptNew = New cv.Point(r.X + match.mmData.maxLoc.X + halfSize, r.Y + match.mmData.maxLoc.Y + halfSize)
-            ptSort.Add(match.mmData.maxVal, ptNew)
+            ptSort.Add(match.mmData.maxVal, match.matchCenter)
         Next
 
         dst2 = src
@@ -649,5 +648,92 @@ Public Class FeatureMatch_Validate : Inherits VB_Algorithm
         Next
         'dst3 = src.Clone
         labels(2) = CStr(task.features.Count) + " points from Feature_Basics were whittled to " + CStr(ptList.Count)
+    End Sub
+End Class
+
+
+
+
+Public Class FeatureMatch_Entropy1 : Inherits VB_Algorithm
+    Dim match As New Match_Basics
+    Dim roiList As New List(Of cv.Rect)
+    Dim entropy As New Entropy_SubDivisions
+    Public roiNewList As New List(Of cv.Rect)
+    Dim roiCorr As New List(Of Single)
+    Public Sub New()
+        desc = "Isolate only the features present on the current frame and the previous - Not working."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static correlationSlider = findSlider("Feature Correlation Threshold")
+        Dim minCorrelation = correlationSlider.value / 100
+
+        Dim roiList = New List(Of cv.Rect)(entropy.roiList)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Static lastImage = src.Clone
+        dst2 = src
+        If task.heartBeat Then
+            If entropy.roiList.Count = 0 Then entropy.Run(src)
+            For Each roi In entropy.roiList
+                dst2.Rectangle(roi, cv.Scalar.White, task.lineWidth, task.lineType)
+            Next
+
+            roiNewList.Clear()
+            roiCorr.Clear()
+            For Each roi In roiList
+                match.drawRect = roi
+                match.template = lastImage(roi)
+                match.Run(src)
+                Dim pt = New cv.Point(match.mmData.maxLoc.X, match.mmData.maxLoc.Y)
+                Dim r = New cv.Rect(pt.X, pt.Y, roi.Width, roi.Height)
+                roiNewList.Add(r)
+                roiCorr.Add(match.correlation)
+                setTrueText(Format(match.correlation, fmt3), New cv.Point(r.X, r.Y), 3)
+            Next
+            lastImage = src.Clone
+        End If
+        dst3.SetTo(0)
+        For i = 0 To roiNewList.Count - 1
+            'If roiCorr(i) > minCorrelation Then
+            dst2.Rectangle(roiList(i), cv.Scalar.White, task.lineWidth + 2, task.lineType)
+            dst2.Rectangle(roiNewList(i), task.highlightColor, task.lineWidth, task.lineType)
+            setTrueText(Format(roiCorr(i), fmt3), New cv.Point(roiNewList(i).X, roiNewList(i).Y), 3)
+            'End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureMatch_Entropy : Inherits VB_Algorithm
+    Dim test As New Match_BasicsTest
+    Dim roiList As New List(Of cv.Rect)
+    Dim entropy As New Entropy_SubDivisions
+    Dim roiCorr As New List(Of Single)
+    Public matchCenters As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Isolate only the features present on the current frame and the previous - Not working."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static correlationSlider = findSlider("Feature Correlation Threshold")
+        Dim minCorrelation = correlationSlider.value / 100
+
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Static lastImage = src.Clone
+        dst2 = src.Clone
+        If gOptions.DebugCheckBox.Checked Then
+            gOptions.DebugCheckBox.Checked = False
+            entropy.Run(src)
+            lastImage = src.Clone
+        End If
+
+        For Each roi In entropy.roiList
+            task.drawRect = roi
+            test.match.template = lastImage(roi)
+            test.Run(src)
+            dst2.Circle(test.match.matchCenter, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            setTrueText(Format(test.match.correlation, fmt3), test.match.matchCenter, 3)
+        Next
     End Sub
 End Class

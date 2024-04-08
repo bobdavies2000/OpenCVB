@@ -7,6 +7,7 @@ Public Class Match_Basics : Inherits VB_Algorithm
     Public correlation As Single
     Public options As New Options_FeatureMatch
     Public matchCenter As cv.Point
+    Public matchRect As New cv.Rect
     Public Sub New()
         labels(2) = If(standaloneTest(), "Draw anywhere to define a new target", "Both drawRect must be provided by the caller.")
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
@@ -40,6 +41,7 @@ Public Class Match_Basics : Inherits VB_Algorithm
         correlation = mmData.maxVal
         labels(2) = "Correlation = " + Format(correlation, "#,##0.000")
         matchCenter = New cv.Point(mmData.maxLoc.X + drawRect.Width / 2, mmData.maxLoc.Y + drawRect.Height / 2)
+        matchRect = New cv.Rect(mmData.maxLoc.X, mmData.maxLoc.Y, drawRect.Width, drawRect.Height)
         drawRect = validateRect(New cv.Rect(matchCenter.X - drawRect.Width / 2, matchCenter.Y - drawRect.Height / 2, drawRect.Width, drawRect.Height))
     End Sub
 End Class
@@ -53,7 +55,7 @@ End Class
 
 
 Public Class Match_BasicsTest : Inherits VB_Algorithm
-    Dim match As New Match_Basics
+    Public match As New Match_Basics
     Public Sub New()
         labels = {"", "", "Draw a rectangle to be tracked", "Highest probability of a match at the brightest point below"}
         desc = "Test the Match_Basics algorithm"
