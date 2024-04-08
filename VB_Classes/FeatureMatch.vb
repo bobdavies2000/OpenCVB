@@ -1,4 +1,5 @@
-﻿Imports System.Web.UI
+﻿Imports System.Text.RegularExpressions
+Imports System.Web.UI
 Imports cv = OpenCvSharp
 Public Class FeatureMatch_Basics : Inherits VB_Algorithm
     Public feat As New FeatureMatch_LeftRight
@@ -581,6 +582,115 @@ End Class
 
 
 
+Public Class FeatureMatch_Entropy1 : Inherits VB_Algorithm
+    Dim match As New Match_Basics
+    Dim roiList As New List(Of cv.Rect)
+    Dim entropy As New Entropy_SubDivisions
+    Public roiNewList As New List(Of cv.Rect)
+    Dim roiCorr As New List(Of Single)
+    Public Sub New()
+        desc = "Isolate only the features present on the current frame and the previous - Not working."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static correlationSlider = findSlider("Feature Correlation Threshold")
+        Dim minCorrelation = correlationSlider.value / 100
+
+        Dim roiList = New List(Of cv.Rect)(entropy.roiList)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Static lastImage = src.Clone
+        dst2 = src
+        If task.heartBeat Then
+            If entropy.roiList.Count = 0 Then entropy.Run(src)
+            For Each roi In entropy.roiList
+                dst2.Rectangle(roi, cv.Scalar.White, task.lineWidth, task.lineType)
+            Next
+
+            roiNewList.Clear()
+            roiCorr.Clear()
+            For Each roi In roiList
+                match.inputRect = roi
+                match.template = lastImage(roi)
+                match.Run(src)
+                Dim pt = New cv.Point(match.mmData.maxLoc.X, match.mmData.maxLoc.Y)
+                Dim r = New cv.Rect(pt.X, pt.Y, roi.Width, roi.Height)
+                roiNewList.Add(r)
+                roiCorr.Add(match.correlation)
+                setTrueText(Format(match.correlation, fmt3), New cv.Point(r.X, r.Y), 3)
+            Next
+            lastImage = src.Clone
+        End If
+        dst3.SetTo(0)
+        For i = 0 To roiNewList.Count - 1
+            'If roiCorr(i) > minCorrelation Then
+            dst2.Rectangle(roiList(i), cv.Scalar.White, task.lineWidth + 2, task.lineType)
+            dst2.Rectangle(roiNewList(i), task.highlightColor, task.lineWidth, task.lineType)
+            setTrueText(Format(roiCorr(i), fmt3), New cv.Point(roiNewList(i).X, roiNewList(i).Y), 3)
+            'End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureMatch_Entropy2 : Inherits VB_Algorithm
+    Dim test As New Match_BasicsTest
+    Dim entropy As New Entropy_SubDivisions
+    Public Sub New()
+        gOptions.DebugCheckBox.Checked = True
+        desc = "Isolate only the features present on the current frame and the previous - Not working."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Static lastImage = src.Clone
+        dst2 = src.Clone
+        If gOptions.DebugCheckBox.Checked Then
+            gOptions.DebugCheckBox.Checked = False
+            entropy.Run(src)
+            lastImage = src.Clone
+        End If
+
+        For Each roi In entropy.roiList
+            task.drawRect = roi
+            test.match.template = lastImage(roi)
+            test.Run(src)
+            dst2.Circle(test.match.matchCenter, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            setTrueText(Format(test.match.correlation, fmt3), test.match.matchCenter, 3)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureMatch_Entropy : Inherits VB_Algorithm
+    Dim match As New Match_Basics
+    Dim entropy As New Entropy_SubDivisions
+    Public Sub New()
+        gOptions.DebugCheckBox.Checked = True
+        desc = "Isolate only the features present on the current frame and the previous - Not working."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Static lastImage = src.Clone
+        dst2 = src.Clone
+        If gOptions.DebugCheckBox.Checked Then
+            gOptions.DebugCheckBox.Checked = False
+            entropy.Run(src)
+            lastImage = src.Clone
+        End If
+
+        For Each roi In entropy.roiList
+            match.inputRect = roi
+            match.template = lastImage(roi)
+            match.Run(src)
+            dst2.Circle(match.matchCenter, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            setTrueText(Format(match.correlation, fmt3), match.matchCenter, 3)
+        Next
+    End Sub
+End Class
 Public Class FeatureMatch_Validate : Inherits VB_Algorithm
     Public feat As New Feature_Basics
     Dim match As New Match_Basics
@@ -625,8 +735,8 @@ Public Class FeatureMatch_Validate : Inherits VB_Algorithm
         Dim r As New cv.Rect
         For i = 0 To ptList.Count - 1
             Dim pt = ptList(i)
-            match.drawRect = rectList(i)
-            match.template = dst3(match.drawRect)
+            match.inputRect = rectList(i)
+            match.template = dst3(match.inputRect)
             'r = New cv.Rect(pt.X - boxSize, pt.Y - boxSize, boxSize * 2, boxSize * 2)
             match.Run(src)
             ptSort.Add(match.mmData.maxVal, match.matchCenter)
@@ -654,86 +764,75 @@ End Class
 
 
 
-Public Class FeatureMatch_Entropy1 : Inherits VB_Algorithm
+
+Public Class FeatureMatch_GridPoints : Inherits VB_Algorithm
+    Dim features As New Feature_Basics
     Dim match As New Match_Basics
-    Dim roiList As New List(Of cv.Rect)
-    Dim entropy As New Entropy_SubDivisions
-    Public roiNewList As New List(Of cv.Rect)
-    Dim roiCorr As New List(Of Single)
     Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        gOptions.GridSize.Value = 64
+        findSlider("Feature Correlation Threshold").Value = 70
+        gOptions.ShowGrid.Checked = True
         desc = "Isolate only the features present on the current frame and the previous - Not working."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static correlationSlider = findSlider("Feature Correlation Threshold")
         Dim minCorrelation = correlationSlider.value / 100
-
-        Dim roiList = New List(Of cv.Rect)(entropy.roiList)
+        Static cellSizeSlider = findSlider("MatchTemplate Cell Size")
+        Dim boxSize = cellSizeSlider.value
+        Dim halfSize As Integer = boxSize / 2
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Static lastImage = src.Clone
         dst2 = src
-        If task.heartBeat Then
-            If entropy.roiList.Count = 0 Then entropy.Run(src)
-            For Each roi In entropy.roiList
-                dst2.Rectangle(roi, cv.Scalar.White, task.lineWidth, task.lineType)
-            Next
-
-            roiNewList.Clear()
-            roiCorr.Clear()
-            For Each roi In roiList
-                match.drawRect = roi
-                match.template = lastImage(roi)
-                match.Run(src)
-                Dim pt = New cv.Point(match.mmData.maxLoc.X, match.mmData.maxLoc.Y)
-                Dim r = New cv.Rect(pt.X, pt.Y, roi.Width, roi.Height)
-                roiNewList.Add(r)
-                roiCorr.Add(match.correlation)
-                setTrueText(Format(match.correlation, fmt3), New cv.Point(r.X, r.Y), 3)
-            Next
-            lastImage = src.Clone
+        Static gridPoints(task.gridList.Count - 1) As cv.Point2f
+        Static correlations(task.gridList.Count - 1) As Single
+        Static templates(task.gridList.Count - 1) As cv.Mat
+        If task.optionsChanged Then
+            ReDim gridPoints(task.gridList.Count - 1)
+            ReDim correlations(task.gridList.Count - 1)
+            ReDim templates(task.gridList.Count - 1)
+            Exit Sub
         End If
-        dst3.SetTo(0)
-        For i = 0 To roiNewList.Count - 1
-            'If roiCorr(i) > minCorrelation Then
-            dst2.Rectangle(roiList(i), cv.Scalar.White, task.lineWidth + 2, task.lineType)
-            dst2.Rectangle(roiNewList(i), task.highlightColor, task.lineWidth, task.lineType)
-            setTrueText(Format(roiCorr(i), fmt3), New cv.Point(roiNewList(i).X, roiNewList(i).Y), 3)
-            'End If
+        Dim gridSize = gOptions.GridSize.Value
+        For i = 0 To task.gridList.Count - 1
+            Dim roi = task.gridList(i)
+            If roi.X < gridSize Then Continue For
+            If roi.X > dst2.Width - gridSize * 2 Then Continue For
+            If roi.Y < gridSize Then Continue For
+            If roi.Y > dst2.Height - gridSize Then Continue For
+            If correlations(i) < minCorrelation Then
+                features.Run(src(roi))
+                If task.features.Count = 0 Then
+                    gridPoints(i) = New cv.Point2f
+                    templates(i) = Nothing
+                Else
+                    gridPoints(i) = New cv.Point2f(roi.X + task.features(0).X, roi.Y + task.features(0).Y)
+                    templates(i) = src(roi)
+                End If
+            End If
         Next
-    End Sub
-End Class
 
+        For i = 0 To gridPoints.Count - 1
+            Dim pt = gridPoints(i)
+            If pt = New cv.Point2f Then Continue For
 
+            Match.inputRect = New cv.Rect(pt.X - halfSize, pt.Y - halfSize, boxSize, boxSize)
+            match.template = templates(i)
+            match.Run(src)
+            dst2.Circle(match.matchCenter, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            correlations(i) = match.correlation
+            setTrueText(Format(match.correlation, fmt3), match.matchCenter, 1)
+        Next
 
+        For i = 0 To gridPoints.Count - 1
+            Dim pt = gridPoints(i)
+            If pt = New cv.Point2f Then Continue For
+            'dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            'setTrueText(Format(correlations(i), fmt3), pt, 2)
+        Next
 
-
-Public Class FeatureMatch_Entropy : Inherits VB_Algorithm
-    Dim test As New Match_BasicsTest
-    Dim roiList As New List(Of cv.Rect)
-    Dim entropy As New Entropy_SubDivisions
-    Dim roiCorr As New List(Of Single)
-    Public matchCenters As New List(Of cv.Point)
-    Public Sub New()
-        desc = "Isolate only the features present on the current frame and the previous - Not working."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static correlationSlider = findSlider("Feature Correlation Threshold")
-        Dim minCorrelation = correlationSlider.value / 100
-
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Static lastImage = src.Clone
-        dst2 = src.Clone
-        If gOptions.DebugCheckBox.Checked Then
-            gOptions.DebugCheckBox.Checked = False
-            entropy.Run(src)
-            lastImage = src.Clone
+        If standalone Then
+            match.dst2 = src
+            dst3 = match.displayResults()
         End If
-
-        For Each roi In entropy.roiList
-            task.drawRect = roi
-            test.match.template = lastImage(roi)
-            test.Run(src)
-            dst2.Circle(test.match.matchCenter, task.dotSize, cv.Scalar.White, -1, task.lineType)
-            setTrueText(Format(test.match.correlation, fmt3), test.match.matchCenter, 3)
-        Next
     End Sub
 End Class

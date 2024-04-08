@@ -1113,7 +1113,7 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
         dst1.SetTo(0)
         For i = 0 To nextTemplates.Count - 1
             match.template = nextTemplates(i)
-            match.drawRect = nextRects(i)
+            match.inputRect = nextRects(i)
             match.Run(src)
             If match.correlation > minCorrelation Then
                 templates.Add(nextTemplates(i))

@@ -259,8 +259,8 @@ Public Class Grid_TrackCenter : Inherits VB_Algorithm
 
         If match.correlation < 0.8 Then
             Dim index = task.gridCols * (task.gridRows / 2) + task.gridCols / 2
-            match.drawRect = task.gridList(index)
-            match.template = lastImage(match.drawRect).Clone
+            match.inputRect = task.gridList(index)
+            match.template = lastImage(match.inputRect).Clone
         End If
 
         match.Run(src)
@@ -268,7 +268,7 @@ Public Class Grid_TrackCenter : Inherits VB_Algorithm
         Static lastPoint As cv.Point = match.matchCenter
 
         dst2 = src
-        dst2.Rectangle(match.drawRect, task.highlightColor, task.lineWidth, task.lineType)
+        dst2.Rectangle(match.inputRect, task.highlightColor, task.lineWidth, task.lineType)
 
         lastImage = src.Clone
         lastPoint = match.matchCenter

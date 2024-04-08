@@ -1,7 +1,9 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
+Imports System.Text.RegularExpressions
+
 Public Class Match_Basics : Inherits VB_Algorithm
-    Public drawRect As cv.Rect
+    Public inputRect As cv.Rect
     Public template As cv.Mat
     Public mmData As mmData
     Public correlation As Single
@@ -9,19 +11,20 @@ Public Class Match_Basics : Inherits VB_Algorithm
     Public matchCenter As cv.Point
     Public matchRect As New cv.Rect
     Public Sub New()
+        If standalone Then gOptions.DebugCheckBox.Checked = True
         labels(2) = If(standaloneTest(), "Draw anywhere to define a new target", "Both drawRect must be provided by the caller.")
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
         desc = "Find the requested template in an image.  Managing template is responsibility of caller (allows multiple targets per image.)"
     End Sub
     Public Function displayResults() As cv.Mat
         dst0 = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
-        Static lastRect As cv.Rect = drawRect
-        If lastRect <> drawRect Then
+        Static lastRect As cv.Rect = inputRect
+        If lastRect <> inputRect Then
             dst3.SetTo(0)
-            lastRect = drawRect
+            lastRect = inputRect
         End If
-        dst0.CopyTo(dst3(New cv.Rect(drawRect.Width / 2, drawRect.Height / 2, dst0.Width, dst0.Height)))
-        dst3.Rectangle(drawRect, cv.Scalar.White, task.lineWidth, task.lineType)
+        dst0.CopyTo(dst3(New cv.Rect(inputRect.Width / 2, inputRect.Height / 2, dst0.Width, dst0.Height)))
+        dst3.Rectangle(inputRect, cv.Scalar.White, task.lineWidth, task.lineType)
 
         dst2.Circle(matchCenter, task.dotSize, cv.Scalar.White, -1, task.lineType)
         dst3.Circle(matchCenter, task.dotSize, cv.Scalar.White, -1, task.lineType)
@@ -29,10 +32,12 @@ Public Class Match_Basics : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-
-        If standaloneTest() Then
-            setTrueText("This algorithm has no output when run standaloneTest()")
-            Exit Sub
+        If standalone Then
+            If gOptions.DebugCheckBox.Checked Then
+                gOptions.DebugCheckBox.Checked = False
+                inputRect = If(firstPass, New cv.Rect(25, 25, 25, 25), validateRect(task.drawRect))
+                template = src(inputRect)
+            End If
         End If
 
         cv.Cv2.MatchTemplate(template, src, dst0, options.matchOption)
@@ -40,9 +45,14 @@ Public Class Match_Basics : Inherits VB_Algorithm
 
         correlation = mmData.maxVal
         labels(2) = "Correlation = " + Format(correlation, "#,##0.000")
-        matchCenter = New cv.Point(mmData.maxLoc.X + drawRect.Width / 2, mmData.maxLoc.Y + drawRect.Height / 2)
-        matchRect = New cv.Rect(mmData.maxLoc.X, mmData.maxLoc.Y, drawRect.Width, drawRect.Height)
-        drawRect = validateRect(New cv.Rect(matchCenter.X - drawRect.Width / 2, matchCenter.Y - drawRect.Height / 2, drawRect.Width, drawRect.Height))
+        matchCenter = New cv.Point(mmData.maxLoc.X + inputRect.Width / 2, mmData.maxLoc.Y + inputRect.Height / 2)
+        matchRect = New cv.Rect(mmData.maxLoc.X, mmData.maxLoc.Y, inputRect.Width, inputRect.Height)
+        inputRect = validateRect(New cv.Rect(matchCenter.X - inputRect.Width / 2, matchCenter.Y - inputRect.Height / 2,
+                                             inputRect.Width, inputRect.Height))
+        If standalone Then
+            dst2 = src
+            dst3 = displayResults()
+        End If
     End Sub
 End Class
 
@@ -60,10 +70,10 @@ Public Class Match_BasicsTest : Inherits VB_Algorithm
         labels = {"", "", "Draw a rectangle to be tracked", "Highest probability of a match at the brightest point below"}
         desc = "Test the Match_Basics algorithm"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If (firstPass Or (task.mouseClickFlag And task.drawRect.Width <> 0)) And standaloneTest() Then
-            match.drawRect = If(firstPass, New cv.Rect(25, 25, 25, 25), validateRect(task.drawRect))
-            match.template = src(match.drawRect)
+            match.inputRect = If(firstPass, New cv.Rect(25, 25, 25, 25), validateRect(task.drawRect))
+            match.template = src(match.inputRect)
             task.drawRectClear = True
         End If
 
@@ -97,8 +107,8 @@ Public Class Match_RandomTest : Inherits VB_Algorithm
     Public Sub New()
         desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
         If standaloneTest() Then
             Dim sampleSize = options.fOptions.featurePoints
             Static saveSampleCount = sampleSize
@@ -426,10 +436,10 @@ End Class
 
 Public Class Match_DrawRect : Inherits VB_Algorithm
     Dim match As New Match_Basics
-    Public drawRect As cv.Rect
+    Public inputRect As cv.Rect
     Public showOutput As Boolean
     Public Sub New()
-        drawRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40) ' arbitrary template to match
+        inputRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40) ' arbitrary template to match
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
         If standaloneTest() Then labels(3) = "Probabilities (draw rectangle to test again)"
         labels(2) = "Red dot marks best match for the selected region.  Draw a rectangle anywhere to test again. "
@@ -438,10 +448,10 @@ Public Class Match_DrawRect : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         Static lastImage As cv.Mat = src.Clone
         If task.mouseClickFlag And task.drawRect.Width <> 0 Then
-            drawRect = validateRect(task.drawRect)
-            match.template = src(drawRect).Clone()
+            inputRect = validateRect(task.drawRect)
+            match.template = src(inputRect).Clone()
         Else
-            If firstPass Then match.template = lastImage(drawRect).Clone()
+            If firstPass Then match.template = lastImage(inputRect).Clone()
         End If
 
         match.Run(src)
@@ -449,14 +459,15 @@ Public Class Match_DrawRect : Inherits VB_Algorithm
         If standaloneTest() Or showOutput Then
             dst0 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
             dst3.SetTo(0)
-            dst0.CopyTo(dst3(New cv.Rect(drawRect.Width / 2, drawRect.Height / 2, dst0.Width, dst0.Height)))
-            dst3.Rectangle(drawRect, cv.Scalar.White, task.lineWidth, task.lineType)
+            dst0.CopyTo(dst3(New cv.Rect(inputRect.Width / 2, inputRect.Height / 2, dst0.Width, dst0.Height)))
+            dst3.Rectangle(inputRect, cv.Scalar.White, task.lineWidth, task.lineType)
             dst2 = src
         End If
 
-        Dim maxLoc = New cv.Point(match.drawRect.X + drawRect.Width / 2, match.drawRect.Y + drawRect.Height / 2)
+        Dim maxLoc = New cv.Point(match.inputRect.X + inputRect.Width / 2, match.inputRect.Y + inputRect.Height / 2)
         setTrueText("maxLoc = " + CStr(maxLoc.X) + ", " + CStr(maxLoc.Y), New cv.Point(1, 1), 3)
-        drawRect = validateRect(New cv.Rect(maxLoc.X - drawRect.Width / 2, maxLoc.Y - drawRect.Height / 2, drawRect.Width, drawRect.Height))
+        inputRect = validateRect(New cv.Rect(maxLoc.X - inputRect.Width / 2, maxLoc.Y - inputRect.Height / 2,
+                                            inputRect.Width, inputRect.Height))
 
         If standaloneTest() Then
             dst2.Circle(maxLoc.X, maxLoc.Y, task.dotSize, cv.Scalar.Red, -1, task.lineType)

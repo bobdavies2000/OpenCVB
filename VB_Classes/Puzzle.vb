@@ -73,7 +73,7 @@ Public Class Puzzle_Solver : Inherits VB_Algorithm
             Dim rect = puzzle.scrambled(puzzleIndex)
             match.template = grayMat(rect)
             match.Run(grayMat)
-            Dim maxloc = New cv.Point2f(match.drawRect.X, match.drawRect.Y)
+            Dim maxloc = New cv.Point2f(match.inputRect.X, match.inputRect.Y)
             Dim bestRect = New cv.Rect(maxloc.X, maxloc.Y, rect.Width, rect.Height)
             puzzle.unscrambled.Add(bestRect)
             puzzleIndex += 1
