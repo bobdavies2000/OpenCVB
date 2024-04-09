@@ -3351,7 +3351,7 @@ Public Class Options_FeatureMatch : Inherits VB_Algorithm
     Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
     Public matchText As String = ""
     Public featurePoints As Integer = 16
-    Public correlationThreshold As Single = 0.9
+    Public correlationThreshold As Single = 0.75
     Public matchCellSize As Integer = 10
     Public Sub New()
         If radio.Setup(traceName) Then
