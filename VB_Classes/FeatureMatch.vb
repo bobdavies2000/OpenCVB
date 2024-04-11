@@ -833,3 +833,75 @@ Public Class FeatureMatch_Validate1 : Inherits VB_Algorithm
         labels(2) = CStr(ptList.Count) + " points were the same as in previous frames."
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+
+
+Public Class FeatureMatch_Validate8 : Inherits VB_Algorithm
+    Public feat As New Feature_Basics
+    Public ptList As New List(Of cv.Point2f)
+    Dim ptCount As New List(Of Integer)
+    Public Sub New()
+        desc = "Isolate only the features present on the current frame and the previous"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+
+        Dim ptNewList As New List(Of cv.Point2f)
+        Dim fList As New List(Of cv.Point)
+        For Each pt In task.features
+            fList.Add(New cv.Point(pt.X, pt.Y))
+        Next
+
+        dst2 = src
+        Dim removeList As New List(Of Integer)
+        For Each pt In ptList
+            Dim ptInt = New cv.Point(CInt(pt.X), CInt(pt.Y))
+            If fList.Contains(ptInt) Then
+                dst2.Circle(pt, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+                ptNewList.Add(pt)
+                removeList.Add(ptList.IndexOf(pt))
+            Else
+                dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+            End If
+        Next
+
+        For i = removeList.Count - 1 To 0 Step -1
+            ptList.RemoveAt(removeList(i))
+        Next
+
+        For Each pt In task.features
+            ptNewList.Add(pt)
+        Next
+
+        ptList = New List(Of cv.Point2f)(ptNewList)
+
+        'For i = 0 To fList.Count - 1
+        '    Dim pt = fList(i)
+        '    Dim index = ptList.IndexOf(pt)
+        '    If index >= 0 Then
+        '        ptCount(index) += 1
+        '        dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        '    Else
+        '        ptList.Add(pt)
+        '        ptCount.Add(1)
+        '    End If
+        'Next
+
+        'For i = lastCounts.Count - 1 To 0 Step -1
+        '    If ptCount(i) = lastCounts(i) Then
+        '        ptList.RemoveAt(i)
+        '        ptCount.RemoveAt(i)
+        '    End If
+        'Next
+
+        labels(2) = CStr(ptList.Count) + " points were the same as in previous frames."
+    End Sub
+End Class

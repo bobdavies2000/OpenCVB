@@ -627,6 +627,7 @@ if algorithmName = "FeatureMatch_Validate3" Then return new FeatureMatch_Validat
 if algorithmName = "FeatureMatch_Validate4" Then return new FeatureMatch_Validate4
 if algorithmName = "FeatureMatch_Validate5" Then return new FeatureMatch_Validate5
 if algorithmName = "FeatureMatch_Validate6" Then return new FeatureMatch_Validate6
+if algorithmName = "FeatureMatch_Validate8" Then return new FeatureMatch_Validate8
 if algorithmName = "Fibonacci_Basics" Then return new Fibonacci_Basics
 if algorithmName = "Fibonacci_Yield" Then return new Fibonacci_Yield
 if algorithmName = "Filter_Laplacian" Then return new Filter_Laplacian
