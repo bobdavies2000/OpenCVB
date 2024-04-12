@@ -714,61 +714,6 @@ End Class
 
 
 
-
-
-Public Class Feature_PointTracker : Inherits VB_Algorithm
-    Dim flow As New Font_FlowText
-    Public feat As New Feature_Basics
-    Dim mPoints As New Match_Points
-    Dim options As New Options_Features
-    Public Sub New()
-        flow.dst = RESULT_DST3
-        labels(3) = "Correlation coefficients for each remaining cell"
-        desc = "Use the top X goodFeatures and then use matchTemplate to find track them."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        Dim minCorrelation = options.fOptions.correlationThreshold
-        Dim rSize = options.fOptions.boxSize
-        Dim radius = rSize / 2
-
-        strOut = ""
-        If mPoints.ptx.Count <= 3 Then
-            myHighLightColor = If(myHighLightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
-            mPoints.ptx.Clear()
-            feat.Run(src)
-            For Each pt In task.features
-                mPoints.ptx.Add(pt)
-                Dim rect = validateRect(New cv.Rect(pt.X - radius, pt.Y - radius, rSize, rSize))
-            Next
-            strOut = "Restart tracking -----------------------------------------------------------------------------" + vbCrLf
-        End If
-        mPoints.Run(src)
-
-        dst2 = src.Clone
-        For i = mPoints.ptx.Count - 1 To 0 Step -1
-            If mPoints.correlation(i) > minCorrelation Then
-                dst2.Circle(mPoints.ptx(i), task.dotSize, myHighLightColor, -1, task.lineType)
-                strOut += Format(mPoints.correlation(i), fmt3) + ", "
-            Else
-                mPoints.ptx.RemoveAt(i)
-            End If
-        Next
-        If standaloneTest() Then
-            flow.msgs.Add(strOut)
-            flow.Run(empty)
-        End If
-
-        labels(2) = "Of the " + CStr(task.features.Count) + " input points, " + CStr(mPoints.ptx.Count) +
-                    " points were tracked with correlation above " + Format(minCorrelation, fmt2)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Feature_LongestV_Tutorial1 : Inherits VB_Algorithm
     Dim lines As New Feature_Lines
     Public Sub New()
@@ -1686,6 +1631,60 @@ End Class
 
 
 
+
+Public Class Feature_PointTracker : Inherits VB_Algorithm
+    Dim flow As New Font_FlowText
+    Public feat As New Feature_Basics
+    Dim mPoints As New Match_Points
+    Dim options As New Options_Features
+    Public Sub New()
+        flow.dst = RESULT_DST3
+        labels(3) = "Correlation coefficients for each remaining cell"
+        desc = "Use the top X goodFeatures and then use matchTemplate to find track them."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        Dim minCorrelation = options.fOptions.correlationThreshold
+        Dim rSize = options.fOptions.boxSize
+        Dim radius = rSize / 2
+
+        strOut = ""
+        If mPoints.ptx.Count <= 3 Then
+            myHighLightColor = If(myHighLightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
+            mPoints.ptx.Clear()
+            feat.Run(src)
+            For Each pt In task.features
+                mPoints.ptx.Add(pt)
+                Dim rect = validateRect(New cv.Rect(pt.X - radius, pt.Y - radius, rSize, rSize))
+            Next
+            strOut = "Restart tracking -----------------------------------------------------------------------------" + vbCrLf
+        End If
+        mPoints.Run(src)
+
+        dst2 = src.Clone
+        For i = mPoints.ptx.Count - 1 To 0 Step -1
+            If mPoints.correlation(i) > minCorrelation Then
+                dst2.Circle(mPoints.ptx(i), task.dotSize, myHighLightColor, -1, task.lineType)
+                strOut += Format(mPoints.correlation(i), fmt3) + ", "
+            Else
+                mPoints.ptx.RemoveAt(i)
+            End If
+        Next
+        If standaloneTest() Then
+            flow.msgs.Add(strOut)
+            flow.Run(empty)
+        End If
+
+        labels(2) = "Of the " + CStr(task.features.Count) + " input points, " + CStr(mPoints.ptx.Count) +
+                    " points were tracked with correlation above " + Format(minCorrelation, fmt2)
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class Feature_BasicsValidated : Inherits VB_Algorithm
     Public centers As New List(Of cv.Point2f)
     Dim templates As New List(Of cv.Mat)
@@ -1697,7 +1696,7 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
             sliders.setupTrackBar("Minimum number of points", 1, 20, 10)
         End If
 
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standalone Then gOptions.displayDst1.Checked = True
         desc = "Find good features and track them with matchTemplate."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1706,7 +1705,7 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
         Dim minCorrelation = match.options.correlationThreshold
 
         feat.Run(src)
-        Dim rSize = match.options.boxSize
+        Dim boxSize = match.options.boxSize
 
         src.CopyTo(dst2)
         Dim nextTemplates As New List(Of cv.Mat)
@@ -1715,7 +1714,7 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
             For Each pt In task.features
                 dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
 
-                Dim r = validateRect(New cv.Rect(pt.X - rSize, pt.Y - rSize, rSize * 2, rSize * 2))
+                Dim r = validateRect(New cv.Rect(pt.X - boxSize, pt.Y - boxSize, boxSize * 2, boxSize * 2))
                 nextTemplates.Add(src(r).Clone)
                 nextRects.Add(r)
             Next
@@ -1728,14 +1727,13 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
         rects.Clear()
         dst3 = src.Clone
         dst1.SetTo(0)
-        Dim boxSize = match.options.boxSize
         For i = 0 To nextTemplates.Count - 1
             match.template = nextTemplates(i)
             Dim r = nextRects(i)
-            Dim searchRect = validateRect(New cv.Rect(r.X - boxSize, r.Y - boxSize, boxSize * 2, boxSize * 2))
-            match.Run(src(searchRect))
+            match.searchRect = validateRect(New cv.Rect(r.X - boxSize, r.Y - boxSize, boxSize * 2, boxSize * 2))
+            match.Run(src)
             If match.correlation > minCorrelation Then
-                Dim center = New cv.Point(searchRect.X + match.matchCenter.X, searchRect.Y + match.matchCenter.Y)
+                Dim center = match.matchCenter
                 templates.Add(nextTemplates(i))
                 rects.Add(nextRects(i))
                 dst1.Circle(center, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)

@@ -495,15 +495,13 @@ Public Class Grid_TrackCenter : Inherits VB_Algorithm
         End If
 
         Dim boxSize = match.options.boxSize
-        Dim searchRect = validateRect(New cv.Rect(center.X - boxSize, center.Y - boxSize, boxSize * 2, boxSize * 2))
-        match.Run(src(searchRect))
-        center = New cv.Point(match.matchCenter.X + searchRect.X, match.matchCenter.Y + searchRect.Y)
+        match.searchRect = validateRect(New cv.Rect(center.X - boxSize, center.Y - boxSize, boxSize * 2, boxSize * 2))
+        match.Run(src)
+        center = match.matchCenter
 
         If standaloneTest() Then
             dst2 = src
-            Dim matchRect = New cv.Rect(match.matchRect.X + searchRect.X, match.matchRect.Y + searchRect.Y,
-                                        match.matchRect.Width, match.matchRect.Height)
-            dst2.Rectangle(matchRect, task.highlightColor, task.lineWidth, task.lineType)
+            dst2.Rectangle(match.matchRect, task.highlightColor, task.lineWidth, task.lineType)
             dst2.Circle(center, task.dotSize, cv.Scalar.White, -1, task.lineType)
 
             If task.heartBeat Then dst3.SetTo(0)

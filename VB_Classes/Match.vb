@@ -740,7 +740,6 @@ Public Class Match_Points : Inherits VB_Algorithm
     Public ptx As New List(Of cv.Point2f)
     Public correlation As New List(Of Single)
     Public mPoint As New Match_Point
-    Dim options As New Options_Features
     Dim feat As New Feature_Basics
     Public Sub New()
         labels(2) = "Rectangle shown is the search rectangle."
