@@ -3352,7 +3352,7 @@ Public Class Options_FeatureMatch : Inherits VB_Algorithm
     Public matchText As String = ""
     Public featurePoints As Integer = 16
     Public correlationThreshold As Single = 0.75
-    Public boxSize As Integer = 10 Or 1
+    Public boxSize As Integer = 20 Or 1
     Public halfSize As Integer = boxSize / 2
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -3368,7 +3368,7 @@ Public Class Options_FeatureMatch : Inherits VB_Algorithm
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
             sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, correlationThreshold * 100)
-            sliders.setupTrackBar("MatchTemplate Cell Size", 2, 60, If(task.workingRes.Height >= 480, 20, boxSize Or 1))
+            sliders.setupTrackBar("MatchTemplate Cell Size", 2, 100, task.matchTemplateCellSize Or 1)
         End If
     End Sub
     Public Sub RunVB()

@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Windows
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_Basics : Inherits VB_Algorithm
     Dim Brisk As cv.BRISK
@@ -1067,71 +1068,6 @@ End Class
 
 
 
-Public Class Feature_BasicsValidated : Inherits VB_Algorithm
-    Public centers As New List(Of cv.Point2f)
-    Dim templates As New List(Of cv.Mat)
-    Dim drawRects As New List(Of cv.Rect)
-    Dim match As New Match_Basics
-    Dim feat As New Feature_KNNBasics
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Correlation threshold X100", 0, 100, 70)
-            sliders.setupTrackBar("Minimum number of points (or resync with good features.)", 1, 20, 10)
-        End If
-
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
-        desc = "Find good features and track them with matchTemplate."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Correlation threshold X100")
-        Static minSlider = findSlider("Minimum number of points (or resync with good features.)")
-        Dim minCorrelation = thresholdSlider.Value / 100
-        Dim minPoints = minSlider.Value
-
-        feat.Run(src)
-        Dim rSize = feat.feat.options.fOptions.boxSize
-
-        src.CopyTo(dst2)
-        Dim nextTemplates As New List(Of cv.Mat)
-        Dim nextRects As New List(Of cv.Rect)
-        If templates.Count < minPoints Then
-            For i = 0 To task.features.Count - 1
-                Dim pt = task.features(i)
-                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-                Dim r = validateRect(New cv.Rect(pt.X - rSize, pt.Y - rSize, rSize * 2, rSize * 2))
-                nextTemplates.Add(src(r).Clone)
-                nextRects.Add(r)
-            Next
-        Else
-            nextTemplates = New List(Of cv.Mat)(templates)
-            nextRects = New List(Of cv.Rect)(drawRects)
-        End If
-
-        templates.Clear()
-        drawRects.Clear()
-        dst3 = src.Clone
-        dst1.SetTo(0)
-        For i = 0 To nextTemplates.Count - 1
-            match.template = nextTemplates(i)
-            match.Run(src)
-            If match.correlation > minCorrelation Then
-                templates.Add(nextTemplates(i))
-                drawRects.Add(nextRects(i))
-                dst1.Circle(match.matchCenter, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
-                setTrueText(Format(match.correlation, fmt3), match.matchCenter, 1)
-                dst3.Circle(match.matchCenter, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
-                setTrueText(Format(match.correlation, fmt3), match.matchCenter, 3)
-            End If
-        Next
-        labels(2) = feat.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class Feature_Trace : Inherits VB_Algorithm
@@ -1742,5 +1678,72 @@ Public Class Feature_Flood : Inherits VB_Algorithm
         Next
         If task.heartBeat Then labels(2) = "Of the " + CStr(task.features.Count) + " features, " + CStr(hitCount) + " landed inside a cell " +
                                            "(" + Format(hitCount / task.features.Count, "0%") + ")"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_BasicsValidated : Inherits VB_Algorithm
+    Public centers As New List(Of cv.Point2f)
+    Dim templates As New List(Of cv.Mat)
+    Dim rects As New List(Of cv.Rect)
+    Dim match As New Match_Basics
+    Dim feat As New Feature_KNNBasics
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Minimum number of points", 1, 20, 10)
+        End If
+
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        desc = "Find good features and track them with matchTemplate."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static minSlider = findSlider("Minimum number of points")
+        Dim minPoints = minSlider.Value
+        Dim minCorrelation = match.options.correlationThreshold
+
+        feat.Run(src)
+        Dim rSize = match.options.boxSize
+
+        src.CopyTo(dst2)
+        Dim nextTemplates As New List(Of cv.Mat)
+        Dim nextRects As New List(Of cv.Rect)
+        If templates.Count < minPoints Then
+            For Each pt In task.features
+                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+
+                Dim r = validateRect(New cv.Rect(pt.X - rSize, pt.Y - rSize, rSize * 2, rSize * 2))
+                nextTemplates.Add(src(r).Clone)
+                nextRects.Add(r)
+            Next
+        Else
+            nextTemplates = New List(Of cv.Mat)(templates)
+            nextRects = New List(Of cv.Rect)(rects)
+        End If
+
+        templates.Clear()
+        rects.Clear()
+        dst3 = src.Clone
+        dst1.SetTo(0)
+        Dim boxSize = match.options.boxSize
+        For i = 0 To nextTemplates.Count - 1
+            match.template = nextTemplates(i)
+            Dim r = nextRects(i)
+            Dim searchRect = validateRect(New cv.Rect(r.X - boxSize, r.Y - boxSize, boxSize * 2, boxSize * 2))
+            match.Run(src(searchRect))
+            If match.correlation > minCorrelation Then
+                Dim center = New cv.Point(searchRect.X + match.matchCenter.X, searchRect.Y + match.matchCenter.Y)
+                templates.Add(nextTemplates(i))
+                rects.Add(nextRects(i))
+                dst1.Circle(center, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+                setTrueText(Format(match.correlation, fmt3), center, 1)
+                dst3.Circle(center, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+                setTrueText(Format(match.correlation, fmt3), center, 3)
+            End If
+        Next
+        labels(2) = feat.labels(2)
     End Sub
 End Class

@@ -242,6 +242,13 @@ Module VB_Basics
         Next
         Return Math.Sqrt(accum)
     End Function
+    Public Function vbEdgeTest(pt As cv.Point, distance As Integer) As Boolean
+        If pt.X < distance Then Return False
+        If pt.Y < distance Then Return False
+        If pt.X >= task.workingRes.Width - distance Then Return False
+        If pt.Y >= task.workingRes.Height - distance Then Return False
+        Return True
+    End Function
     Public Sub vbDrawContour(ByRef dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -10)
         If lineWidth = -10 Then lineWidth = task.lineWidth ' VB.Net only allows constants for optional parameter.
         If contour.Count < 3 Then Exit Sub ' this is not enough to draw.

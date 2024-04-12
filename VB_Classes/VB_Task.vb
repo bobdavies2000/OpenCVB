@@ -120,7 +120,7 @@ Public Class VBtask : Implements IDisposable
     Public gridToRoiIndex As New cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridROIclicked As Integer
-
+    Public matchTemplateCellSize As Integer
     Public ogl As OpenGL_Basics
 
     Public palette As Palette_LoadColorMap

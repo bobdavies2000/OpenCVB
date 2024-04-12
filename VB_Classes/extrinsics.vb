@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class Extrinsics_Basics : Inherits VB_Algorithm
     Dim addw As New AddWeighted_Basics
-    Dim match As New Match_Basics
     Public Sub New()
         If standaloneTest() Then gOptions.dotSizeSlider.Value = 5
         desc = "MatchShapes: Show the alignment of the BGR image to the left and right camera images."
