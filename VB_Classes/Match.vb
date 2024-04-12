@@ -7,6 +7,7 @@ Public Class Match_Basics : Inherits VB_Algorithm
     Public options As New Options_FeatureMatch
     Public matchCenter As cv.Point
     Public matchRect As New cv.Rect
+    Public searchRect As New cv.Rect
     Public Sub New()
         If standalone Then gOptions.DebugCheckBox.Checked = True
         labels(2) = If(standaloneTest(), "Draw anywhere to define a new target", "Both drawRect must be provided by the caller.")
@@ -23,14 +24,23 @@ Public Class Match_Basics : Inherits VB_Algorithm
             End If
         End If
 
-        cv.Cv2.MatchTemplate(template, src, dst0, options.matchOption)
+        If searchRect.Width = 0 Then
+            cv.Cv2.MatchTemplate(template, src, dst0, options.matchOption)
+        Else
+            cv.Cv2.MatchTemplate(template, src(searchRect), dst0, options.matchOption)
+        End If
         mmData = vbMinMax(dst0)
 
         correlation = mmData.maxVal
         labels(2) = "Correlation = " + Format(correlation, "#,##0.000")
         Dim w = template.Width, h = template.Height
-        matchCenter = New cv.Point(mmData.maxLoc.X + w / 2, mmData.maxLoc.Y + h / 2)
-        matchRect = New cv.Rect(mmData.maxLoc.X, mmData.maxLoc.Y, w, h)
+        If searchRect.Width = 0 Then
+            matchCenter = New cv.Point(mmData.maxLoc.X + w / 2, mmData.maxLoc.Y + h / 2)
+            matchRect = New cv.Rect(mmData.maxLoc.X, mmData.maxLoc.Y, w, h)
+        Else
+            matchCenter = New cv.Point(searchRect.X + mmData.maxLoc.X + w / 2, searchRect.Y + mmData.maxLoc.Y + h / 2)
+            matchRect = New cv.Rect(searchRect.X + mmData.maxLoc.X, searchRect.Y + mmData.maxLoc.Y, w, h)
+        End If
         If standalone Then
             dst2 = src
             dst2.Circle(matchCenter, task.dotSize, cv.Scalar.White, -1, task.lineType)
