@@ -1,6 +1,8 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
 Imports OpenCvSharp
+Imports OpenCvSharp.Flann
+Imports System.Windows
 
 Public Class Grid_Basics : Inherits VB_Algorithm
     Public gridList As New List(Of cv.Rect)
@@ -245,43 +247,6 @@ End Class
 
 
 
-
-
-
-Public Class Grid_TrackCenter : Inherits VB_Algorithm
-    Dim match As New Match_Basics
-    Public Sub New()
-        If standaloneTest() Then gOptions.GridSize.Value = dst2.Width / 10
-        desc = "Track a cell near the center of the grid"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static lastImage As cv.Mat = src.Clone
-
-        If match.correlation < 0.8 Then
-            Dim index = task.gridCols * (task.gridRows / 2) + task.gridCols / 2
-            match.inputRect = task.gridList(index)
-            match.template = lastImage(match.inputRect).Clone
-        End If
-
-        match.Run(src)
-        dst3 = match.displayResults()
-        Static lastPoint As cv.Point = match.matchCenter
-
-        dst2 = src
-        dst2.Rectangle(match.inputRect, task.highlightColor, task.lineWidth, task.lineType)
-
-        lastImage = src.Clone
-        lastPoint = match.matchCenter
-        dst2.SetTo(cv.Scalar.White, task.gridMask)
-        labels(3) = "Match correlation = " + Format(match.correlation, fmt3)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Grid_FPS : Inherits VB_Algorithm
     Public heartBeat As Boolean
     Public fpsSlider As Windows.Forms.TrackBar
@@ -502,6 +467,48 @@ Public Class Grid_MinMaxDepth : Inherits VB_Algorithm
                 dst2(task.gridList(i)).Circle(lp.p1, task.dotSize, cv.Scalar.White, -1, task.lineType)
             Next
             dst2.SetTo(cv.Scalar.White, task.gridMask)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Grid_TrackCenter : Inherits VB_Algorithm
+    Public center As cv.Point
+    Dim match As New Match_Basics
+    Public Sub New()
+        If standalone Then gOptions.ShowGrid.Checked = True
+        desc = "Track a cell near the center of the grid"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If match.correlation < match.options.correlationThreshold Then
+            Dim index = task.gridCols * (task.gridRows / 2) + task.gridCols / 2
+            Dim roi = task.gridList(index)
+            match.template = src(roi).Clone
+            center = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
+        End If
+
+        Dim boxSize = match.options.boxSize
+        Dim searchRect = validateRect(New cv.Rect(center.X - boxSize * 2, center.Y - boxSize * 2, boxSize * 4, boxSize * 4))
+        match.Run(src(searchRect))
+        center = New cv.Point(match.matchCenter.X + searchRect.X, match.matchCenter.Y + searchRect.Y)
+
+        If standaloneTest() Then
+            dst2 = src
+            Dim matchRect = New cv.Rect(match.matchRect.X + searchRect.X, match.matchRect.Y + searchRect.Y,
+                                        match.matchRect.Width, match.matchRect.Height)
+            dst2.Rectangle(matchRect, task.highlightColor, task.lineWidth, task.lineType)
+            dst2.Circle(center, task.dotSize, cv.Scalar.White, -1, task.lineType)
+
+            If task.heartBeat Then dst3.SetTo(0)
+            dst3.Circle(center, task.dotSize, task.highlightColor, -1, task.lineType)
+            setTrueText(Format(match.correlation, fmt3), center, 3)
+
+            labels(3) = "Match correlation = " + Format(match.correlation, fmt3)
         End If
     End Sub
 End Class

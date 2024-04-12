@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Horizon_Basics : Inherits VB_Algorithm
-    Public yData As cv.Mat
+    Public cloudY As cv.Mat
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Search for the transition from positive to negative to find the horizon."
@@ -10,9 +10,9 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
         Dim ptX As New List(Of Single)
         Dim ptY As New List(Of Single)
         For x = startCol To stopCol Step stepCol
-            For y = 0 To yData.Rows - 1
+            For y = 0 To cloudY.Rows - 1
                 lastVal = val
-                val = yData.Get(Of Single)(y, x)
+                val = cloudY.Get(Of Single)(y, x)
                 If val > 0 And lastVal < 0 Then
                     ' change sub-pixel accuracy here 
                     Dim pt = New cv.Point2f(x, y + Math.Abs(val) / Math.Abs(val - lastVal))
@@ -26,21 +26,22 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src As cv.Mat)
         If gOptions.gravityPointCloud.Checked Then
-            yData = task.pcSplit(1)
+            cloudY = task.pcSplit(1) ' already oriented to gravity
         Else
+            ' rebuild the pointcloud so it is oriented to gravity.
             Dim pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)
             Dim split = pc.Split()
-            yData = split(1)
+            cloudY = split(1)
         End If
 
-        Dim p1 = findTransition(0, yData.Width - 1, 1)
-        Dim p2 = findTransition(yData.Width - 1, 0, -1)
+        Dim p1 = findTransition(0, cloudY.Width - 1, 1)
+        Dim p2 = findTransition(cloudY.Width - 1, 0, -1)
         Dim lp = New pointPair(p1, p2)
         task.horizonVec = lp.edgeToEdgeLine(dst2.Size)
 
         If p1.Y >= 1 And p1.Y <= dst2.Height - 1 Then
             strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +
-                      Format(yData.Get(Of Single)(p1.Y, p1.X)) + vbCrLf + "lastVal = " + Format(yData.Get(Of Single)(p1.Y - 1, p1.X))
+                      Format(cloudY.Get(Of Single)(p1.Y, p1.X)) + vbCrLf + "lastVal = " + Format(cloudY.Get(Of Single)(p1.Y - 1, p1.X))
         End If
         setTrueText(strOut, 3)
 
@@ -265,5 +266,47 @@ Public Class Horizon_FindNonZeroOld : Inherits VB_Algorithm
         'If task.gravityVec.originalLength < dst2.Height / 2 And redOptions.XRangeSlider.Value < redOptions.XRangeSlider.Maximum Or pointsMat.Rows = 0 Then
         '    redOptions.XRangeSlider.Value += 1
         'End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Horizon_Validate : Inherits VB_Algorithm
+    Dim match As New Match_Basics
+    Public Sub New()
+        desc = "Validate the horizon points using Match_Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static correlationSlider = findSlider("Feature Correlation Threshold")
+        Static cellSizeSlider = findSlider("MatchTemplate Cell Size")
+        Dim minCorrelation = correlationSlider.value / 100
+        Dim boxSize = cellSizeSlider.value Or 1
+        Dim halfSize As Integer = boxSize / 2
+
+        Static ptLeft As New cv.Point2f, ptRight As New cv.Point2f
+        Static leftTemplate As cv.Mat, rightTemplate As cv.Mat
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.heartBeat Then
+            ptLeft = task.gravityVec.p1
+            ptRight = task.gravityVec.p2
+            Dim r = validateRect(New cv.Rect(ptLeft.X - halfSize, ptLeft.Y - halfSize, boxSize, boxSize))
+            leftTemplate = src(r)
+
+            r = validateRect(New cv.Rect(ptRight.X - halfSize, ptRight.Y - halfSize, boxSize, boxSize))
+            rightTemplate = src(r)
+        Else
+            Dim r = validateRect(New cv.Rect(ptLeft.X - boxSize, ptLeft.Y - boxSize, boxSize * 2, boxSize * 2))
+            match.template = leftTemplate
+            match.Run(src)
+            ptLeft = match.matchCenter
+
+            r = validateRect(New cv.Rect(ptRight.X - boxSize, ptRight.Y - boxSize, boxSize * 2, boxSize * 2))
+            match.template = leftTemplate
+            match.Run(src)
+            ptLeft = match.matchCenter
+        End If
     End Sub
 End Class

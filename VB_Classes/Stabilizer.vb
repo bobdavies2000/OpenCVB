@@ -51,7 +51,7 @@ Public Class Stabilizer_Basics : Inherits VB_Algorithm
             match.Run(input(templateRect))
 
             If match.correlation > thresholdSlider.Value / thresholdSlider.maximum Then
-                Dim maxLoc = New cv.Point(match.inputRect.X + match.inputRect.Width / 2, match.inputRect.Y + match.inputRect.Height / 2)
+                Dim maxLoc = New cv.Point(match.matchCenter.X, match.matchCenter.Y)
                 shiftX = templateRect.X - maxLoc.X - searchRect.X
                 shiftY = templateRect.Y - maxLoc.Y - searchRect.Y
                 Dim x1 = If(shiftX < 0, Math.Abs(shiftX), 0)

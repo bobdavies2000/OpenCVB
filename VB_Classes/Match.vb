@@ -1,9 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
-Imports System.Text.RegularExpressions
-
 Public Class Match_Basics : Inherits VB_Algorithm
-    Public inputRect As cv.Rect
     Public template As cv.Mat
     Public mmData As mmData
     Public correlation As Single
@@ -16,26 +13,12 @@ Public Class Match_Basics : Inherits VB_Algorithm
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
         desc = "Find the requested template in an image.  Managing template is responsibility of caller (allows multiple targets per image.)"
     End Sub
-    Public Function displayResults() As cv.Mat
-        dst0 = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
-        Static lastRect As cv.Rect = inputRect
-        If lastRect <> inputRect Then
-            dst3.SetTo(0)
-            lastRect = inputRect
-        End If
-        dst0.CopyTo(dst3(New cv.Rect(inputRect.Width / 2, inputRect.Height / 2, dst0.Width, dst0.Height)))
-        dst3.Rectangle(inputRect, cv.Scalar.White, task.lineWidth, task.lineType)
-
-        dst2.Circle(matchCenter, task.dotSize, cv.Scalar.White, -1, task.lineType)
-        dst3.Circle(matchCenter, task.dotSize, cv.Scalar.White, -1, task.lineType)
-        Return dst3
-    End Function
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         If standalone Then
             If gOptions.DebugCheckBox.Checked Then
                 gOptions.DebugCheckBox.Checked = False
-                inputRect = If(firstPass, New cv.Rect(25, 25, 25, 25), validateRect(task.drawRect))
+                Dim inputRect = If(firstPass, New cv.Rect(25, 25, 25, 25), validateRect(task.drawRect))
                 template = src(inputRect)
             End If
         End If
@@ -45,13 +28,13 @@ Public Class Match_Basics : Inherits VB_Algorithm
 
         correlation = mmData.maxVal
         labels(2) = "Correlation = " + Format(correlation, "#,##0.000")
-        matchCenter = New cv.Point(mmData.maxLoc.X + inputRect.Width / 2, mmData.maxLoc.Y + inputRect.Height / 2)
-        matchRect = New cv.Rect(mmData.maxLoc.X, mmData.maxLoc.Y, inputRect.Width, inputRect.Height)
-        inputRect = validateRect(New cv.Rect(matchCenter.X - inputRect.Width / 2, matchCenter.Y - inputRect.Height / 2,
-                                             inputRect.Width, inputRect.Height))
+        Dim w = template.Width, h = template.Height
+        matchCenter = New cv.Point(mmData.maxLoc.X + w / 2, mmData.maxLoc.Y + h / 2)
+        matchRect = New cv.Rect(mmData.maxLoc.X, mmData.maxLoc.Y, w, h)
         If standalone Then
             dst2 = src
-            dst3 = displayResults()
+            dst2.Circle(matchCenter, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            dst3 = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
         End If
     End Sub
 End Class
@@ -72,17 +55,17 @@ Public Class Match_BasicsTest : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If (firstPass Or (task.mouseClickFlag And task.drawRect.Width <> 0)) And standaloneTest() Then
-            match.inputRect = If(firstPass, New cv.Rect(25, 25, 25, 25), validateRect(task.drawRect))
-            match.template = src(match.inputRect)
+            Dim r = If(firstPass, New cv.Rect(25, 25, 25, 25), validateRect(task.drawRect))
+            match.template = src(r)
             task.drawRectClear = True
         End If
 
         match.Run(src)
 
         If standaloneTest() Then
-            match.dst2 = src
-            dst3 = match.displayResults()
-            dst2 = match.dst2
+            dst2 = src
+            dst2.Circle(match.matchCenter, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            dst3 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
             setTrueText(Format(match.correlation, fmt3), match.matchCenter)
         End If
     End Sub
@@ -464,14 +447,11 @@ Public Class Match_DrawRect : Inherits VB_Algorithm
             dst2 = src
         End If
 
-        Dim maxLoc = New cv.Point(match.inputRect.X + inputRect.Width / 2, match.inputRect.Y + inputRect.Height / 2)
-        setTrueText("maxLoc = " + CStr(maxLoc.X) + ", " + CStr(maxLoc.Y), New cv.Point(1, 1), 3)
-        inputRect = validateRect(New cv.Rect(maxLoc.X - inputRect.Width / 2, maxLoc.Y - inputRect.Height / 2,
-                                            inputRect.Width, inputRect.Height))
+        setTrueText("maxLoc = " + CStr(match.matchCenter.X) + ", " + CStr(match.matchCenter.Y), New cv.Point(1, 1), 3)
 
         If standaloneTest() Then
-            dst2.Circle(maxLoc.X, maxLoc.Y, task.dotSize, cv.Scalar.Red, -1, task.lineType)
-            setTrueText(Format(match.correlation, fmt3), maxLoc, 2)
+            dst2.Circle(match.matchCenter, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+            setTrueText(Format(match.correlation, fmt3), match.matchCenter, 2)
         End If
         lastImage = src
     End Sub

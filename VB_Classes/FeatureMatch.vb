@@ -68,7 +68,7 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
             Exit Sub ' nothing found?  Pretty extreme but can happen in darkness.
         End If
 
-        Dim correlationmat As New cv.Mat, rSize = feat.feat.options.fOptions.matchCellSize, roi = feat.feat.options.roi
+        Dim correlationmat As New cv.Mat, rSize = feat.feat.options.fOptions.boxSize, roi = feat.feat.options.roi
         Dim rightIndex As Integer = 0, rectL = roi, rectR = roi, lastKey = feat.leftCorners.ElementAt(0).Key
         Dim correlations As New List(Of Single)
         mpList.Clear()
@@ -149,7 +149,7 @@ Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
         leftCorners.Clear()
         rightCorners.Clear()
         Dim rowList As New List(Of Integer)
-        Dim rSize = feat.options.fOptions.matchCellSize
+        Dim rSize = feat.options.fOptions.boxSize
         For Each entry In tmpLeft
             Dim row = entry.Key
             Dim index = ptRight.IndexOf(row)
@@ -559,7 +559,6 @@ Public Class FeatureMatch_Entropy1 : Inherits VB_Algorithm
             roiNewList.Clear()
             roiCorr.Clear()
             For Each roi In roiList
-                match.inputRect = roi
                 match.template = lastImage(roi)
                 match.Run(src)
                 Dim pt = New cv.Point(match.mmData.maxLoc.X, match.mmData.maxLoc.Y)
@@ -603,7 +602,6 @@ Public Class FeatureMatch_Entropy2 : Inherits VB_Algorithm
         End If
 
         For Each roi In entropy.roiList
-            match.inputRect = roi
             match.template = lastImage(roi)
             match.Run(src)
             dst2.Circle(match.matchCenter, task.dotSize, cv.Scalar.White, -1, task.lineType)
@@ -662,9 +660,8 @@ Public Class FeatureMatch_Validate : Inherits VB_Algorithm
         Dim r As New cv.Rect
         For i = 0 To ptList.Count - 1
             Dim pt = ptList(i)
-            match.inputRect = rectList(i)
-            match.template = dst3(match.inputRect)
-            'r = New cv.Rect(pt.X - boxSize, pt.Y - boxSize, boxSize * 2, boxSize * 2)
+            r = New cv.Rect(pt.X - boxSize, pt.Y - boxSize, boxSize * 2, boxSize * 2)
+            match.template = dst3(r)
             match.Run(src)
             ptSort.Add(match.mmData.maxVal, match.matchCenter)
         Next
@@ -701,8 +698,8 @@ Public Class FeatureMatch_GridPoints : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static correlationSlider = findSlider("Feature Correlation Threshold")
-        Dim minCorrelation = correlationSlider.value / 100
         Static cellSizeSlider = findSlider("MatchTemplate Cell Size")
+        Dim minCorrelation = correlationSlider.value / 100
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src
         Static correlations(task.gridList.Count - 1) As Single
@@ -739,7 +736,6 @@ Public Class FeatureMatch_GridPoints : Inherits VB_Algorithm
             Dim pt = matchCenters(i)
             If pt = New cv.Point2f Then Continue For
 
-            match.inputRect = New cv.Rect(pt.X - halfSize, pt.Y - halfSize, boxSize, boxSize)
             match.template = templates(i)
             match.Run(src)
             matchCenters(i) = match.matchCenter
@@ -777,7 +773,6 @@ Public Class FeatureMatch_Entropy : Inherits VB_Algorithm
         End If
 
         For Each roi In entropy.roiList
-            match.inputRect = roi
             match.template = lastImage(roi)
             match.Run(src)
             dst2.Circle(match.matchCenter, task.dotSize, cv.Scalar.White, -1, task.lineType)

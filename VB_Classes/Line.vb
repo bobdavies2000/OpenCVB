@@ -1109,7 +1109,7 @@ Public Class Line_Verticals : Inherits VB_Algorithm
         maxAngleX = angleXSlider.Value
         maxAngleZ = angleZSlider.Value
         Dim radius = CInt(cellSlider.Value / 2)
-        Dim rSize = options.fOptions.matchCellSize
+        Dim rSize = options.fOptions.boxSize
 
         ' lines.subsetRect = New cv.Rect(rSize * 3, rSize * 3, src.Width - rSize * 6, src.Height - rSize * 6)
         lines.Run(src.Clone)

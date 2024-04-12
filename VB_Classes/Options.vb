@@ -3352,7 +3352,8 @@ Public Class Options_FeatureMatch : Inherits VB_Algorithm
     Public matchText As String = ""
     Public featurePoints As Integer = 16
     Public correlationThreshold As Single = 0.75
-    Public matchCellSize As Integer = 10
+    Public boxSize As Integer = 10 Or 1
+    Public halfSize As Integer = boxSize / 2
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("CCoeff")
@@ -3367,7 +3368,7 @@ Public Class Options_FeatureMatch : Inherits VB_Algorithm
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
             sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, correlationThreshold * 100)
-            sliders.setupTrackBar("MatchTemplate Cell Size", 2, 60, If(task.workingRes.Height >= 480, 20, matchCellSize * 2))
+            sliders.setupTrackBar("MatchTemplate Cell Size", 2, 60, If(task.workingRes.Height >= 480, 20, boxSize Or 1))
         End If
     End Sub
     Public Sub RunVB()
@@ -3388,7 +3389,7 @@ Public Class Options_FeatureMatch : Inherits VB_Algorithm
         correlationThreshold = corrSlider.value / 100
 
         Static cellSlider = findSlider("MatchTemplate Cell Size")
-        matchCellSize = cellSlider.value / 2
+        boxSize = cellSlider.value
     End Sub
 End Class
 
@@ -3452,7 +3453,7 @@ Public Class Options_Features : Inherits VB_Algorithm
         If task.optionsChanged Then
             quality = qualitySlider.Value / 100
             minDistance = distSlider.Value
-            roi = New cv.Rect(0, 0, fOptions.matchCellSize * 2, fOptions.matchCellSize * 2)
+            roi = New cv.Rect(0, 0, fOptions.boxSize, fOptions.boxSize)
         End If
     End Sub
 End Class

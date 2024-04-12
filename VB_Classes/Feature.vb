@@ -324,7 +324,7 @@ Public Class Feature_Line : Inherits VB_Algorithm
         lineDisp.distance = tcells(0).center.DistanceTo(tcells(1).center)
         If task.optionsChanged Or correlationTest Or lineDisp.maskCount / lineDisp.distance < linePercentThreshold Or lineDisp.distance < distanceThreshold Then
             lineDisp.myHighLightColor = If(lineDisp.myHighLightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
-            Dim rSize = options.fOptions.matchCellSize
+            Dim rSize = options.fOptions.boxSize
             lines.subsetRect = New cv.Rect(rSize * 3, rSize * 3, src.Width - rSize * 6, src.Height - rSize * 6)
             lines.Run(src.Clone)
 
@@ -399,7 +399,7 @@ Public Class Feature_LinesVH : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        Dim rsize = options.fOptions.matchCellSize
+        Dim rsize = options.fOptions.boxSize
         ' gLines.lines.subsetRect = New cv.Rect(rsize * 3, rsize * 3, src.Width - rsize * 6, src.Height - rsize * 6)
         gLines.Run(src)
 
@@ -728,7 +728,7 @@ Public Class Feature_PointTracker : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         Dim minCorrelation = options.fOptions.correlationThreshold
-        Dim rSize = options.fOptions.matchCellSize
+        Dim rSize = options.fOptions.boxSize
         Dim radius = rSize / 2
 
         strOut = ""
@@ -1089,7 +1089,7 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
         Dim minPoints = minSlider.Value
 
         feat.Run(src)
-        Dim rSize = feat.feat.options.fOptions.matchCellSize
+        Dim rSize = feat.feat.options.fOptions.boxSize
 
         src.CopyTo(dst2)
         Dim nextTemplates As New List(Of cv.Mat)
@@ -1113,7 +1113,6 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
         dst1.SetTo(0)
         For i = 0 To nextTemplates.Count - 1
             match.template = nextTemplates(i)
-            match.inputRect = nextRects(i)
             match.Run(src)
             If match.correlation > minCorrelation Then
                 templates.Add(nextTemplates(i))

@@ -536,7 +536,7 @@ Public Class Edge_Matching : Inherits VB_Algorithm
             match.template = dst3(roi)
             match.Run(dst2(searchROI))
 
-            maxLocs(i) = match.inputRect.X
+            maxLocs(i) = match.matchRect.X
             If match.correlation > threshold Or redRects.Contains(i) Then
                 highlights.Add(i)
                 setTrueText(Format(match.correlation, fmt2), New cv.Point(roi.X, roi.Y), 3)

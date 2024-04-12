@@ -1,7 +1,7 @@
 ﻿Imports System.Windows.Markup
 Imports cv = OpenCvSharp
-Public Class Gravity_Basics : Inherits VB_Algorithm
-    Public xData As cv.Mat
+Public Class Gravity_Core : Inherits VB_Algorithm
+    Public cloudX As cv.Mat
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Search for the transition from positive to negative to find the gravity vector."
@@ -11,11 +11,11 @@ Public Class Gravity_Basics : Inherits VB_Algorithm
         Dim ptX As New List(Of Single)
         Dim ptY As New List(Of Single)
         For y = startRow To stopRow Step stepRow
-            For x = 0 To xData.Cols - 1
+            For x = 0 To cloudX.Cols - 1
                 lastVal = val
-                val = xData.Get(Of Single)(y, x)
+                val = cloudX.Get(Of Single)(y, x)
                 If val > 0 And lastVal < 0 Then
-                    ' change sub-pixel accuracy here 
+                    ' change to sub-pixel accuracy here 
                     Dim pt = New cv.Point2f(x + Math.Abs(val) / Math.Abs(val - lastVal), y)
                     ptX.Add(pt.X)
                     ptY.Add(pt.Y)
@@ -27,21 +27,22 @@ Public Class Gravity_Basics : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src As cv.Mat)
         If gOptions.gravityPointCloud.Checked Then
-            xData = task.pcSplit(0)
+            cloudX = task.pcSplit(0) ' already oriented to gravity
         Else
+            ' rebuild the pointcloud so it is oriented to gravity.
             Dim pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)
             Dim split = pc.Split()
-            xData = split(0)
+            cloudX = split(0)
         End If
 
-        Dim p1 = findTransition(0, xData.Height - 1, 1)
-        Dim p2 = findTransition(xData.Height - 1, 0, -1)
+        Dim p1 = findTransition(0, cloudX.Height - 1, 1)
+        Dim p2 = findTransition(cloudX.Height - 1, 0, -1)
         Dim lp = New pointPair(p1, p2)
         task.gravityVec = lp.edgeToEdgeLine(dst2.Size)
 
         If p1.X >= 1 Then
             strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +
-                      Format(xData.Get(Of Single)(p1.Y, p1.X)) + vbCrLf + "lastVal = " + Format(xData.Get(Of Single)(p1.Y, p1.X - 1))
+                      Format(cloudX.Get(Of Single)(p1.Y, p1.X)) + vbCrLf + "lastVal = " + Format(cloudX.Get(Of Single)(p1.Y, p1.X - 1))
         End If
         setTrueText(strOut, 3)
 
@@ -61,10 +62,10 @@ End Class
 
 
 Public Class Gravity_HorizonCompare : Inherits VB_Algorithm
-    Dim gravity As New Gravity_Basics
+    Dim gravity As New Gravity_Core
     Dim horizon As New Horizon_Basics
     Public Sub New()
-        desc = "Compare the results of Horizon_Basics with Gravity_Basics"
+        desc = "Compare the results of Horizon_Basics with Gravity_Core"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         gravity.Run(src)
@@ -96,8 +97,7 @@ End Class
 
 
 Public Class Gravity_Horizon : Inherits VB_Algorithm
-    Dim perp As New Line_Perpendicular
-    Dim gravity As New Gravity_Basics
+    Dim gravity As New Gravity_Core
     Dim horizon As New Horizon_Basics
     Public Sub New()
         labels(2) = "Gravity vector Integer yellow and Horizon vector in red."
