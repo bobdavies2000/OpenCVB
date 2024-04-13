@@ -1703,20 +1703,18 @@ Public Class Feature_Longest1 : Inherits VB_Algorithm
     Public Sub New()
         desc = "Find and track the longest line in the BGR image with a lightweight KNN."
     End Sub
-
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        dst2 = src.Clone
+        dst2 = src
 
-        knn.Run(src.Clone)
         Static p1 As cv.Point, p2 As cv.Point
+        knn.Run(src.Clone)
         p1 = knn.lastPair.p1
         p2 = knn.lastPair.p2
-
         gline = glines.updateGLine(src, gline, p1, p2)
 
         Dim rect = validateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
-        match.template = src(rect).Clone
+        match.template = src(rect)
         match.Run(src)
         If match.correlation >= options.fOptions.correlationThreshold Then
             dst3 = match.dst0.Resize(dst3.Size)
