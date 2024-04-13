@@ -1067,6 +1067,7 @@ if algorithmName = "MatchLine_Basics" Then return new MatchLine_Basics
 if algorithmName = "MatchLine_Gravity" Then return new MatchLine_Gravity
 if algorithmName = "MatchLine_Horizon" Then return new MatchLine_Horizon
 if algorithmName = "MatchLine_Longest" Then return new MatchLine_Longest
+if algorithmName = "MatchRect_Basics" Then return new MatchRect_Basics
 if algorithmName = "MatchShapes_Basics" Then return new MatchShapes_Basics
 if algorithmName = "MatchShapes_Contours" Then return new MatchShapes_Contours
 if algorithmName = "MatchShapes_Hulls" Then return new MatchShapes_Hulls
