@@ -1064,6 +1064,7 @@ if algorithmName = "Match_RandomTest" Then return new Match_RandomTest
 if algorithmName = "Match_tCell" Then return new Match_tCell
 if algorithmName = "Match_TraceRedC" Then return new Match_TraceRedC
 if algorithmName = "MatchLine_Basics" Then return new MatchLine_Basics
+if algorithmName = "MatchLine_Gravity" Then return new MatchLine_Gravity
 if algorithmName = "MatchLine_Horizon" Then return new MatchLine_Horizon
 if algorithmName = "MatchLine_Longest" Then return new MatchLine_Longest
 if algorithmName = "MatchShapes_Basics" Then return new MatchShapes_Basics
