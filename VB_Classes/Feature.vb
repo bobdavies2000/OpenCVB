@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports System.Windows
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_Basics : Inherits VB_Algorithm
     Dim Brisk As cv.BRISK
@@ -324,7 +323,6 @@ Public Class Feature_Line : Inherits VB_Algorithm
         Dim correlationTest = tcells(0).correlation <= threshold Or tcells(1).correlation <= threshold
         lineDisp.distance = tcells(0).center.DistanceTo(tcells(1).center)
         If task.optionsChanged Or correlationTest Or lineDisp.maskCount / lineDisp.distance < linePercentThreshold Or lineDisp.distance < distanceThreshold Then
-            lineDisp.myHighLightColor = If(lineDisp.myHighLightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
             Dim rSize = options.fOptions.boxSize
             lines.subsetRect = New cv.Rect(rSize * 3, rSize * 3, src.Width - rSize * 6, src.Height - rSize * 6)
             lines.Run(src.Clone)
@@ -450,8 +448,8 @@ Public Class Feature_LinesVH : Inherits VB_Algorithm
             setTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gc.arcY, fmt1), gc.tc1.center, 2)
             setTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gc.arcY, fmt1), gc.tc1.center, 3)
 
-            dst2.Line(p1, p2, myHighLightColor, task.lineWidth, task.lineType)
-            dst3.Line(p1, p2, myHighLightColor, task.lineWidth, task.lineType)
+            dst2.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
+            dst3.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class
@@ -605,55 +603,6 @@ End Class
 
 
 
-
-Public Class Feature_Longest : Inherits VB_Algorithm
-    Dim glines As New Line_GCloud
-    Public knn As New KNN_ClosestTracker
-    Public options As New Options_Features
-    Public gline As gravityLine
-    Public match As New Match_Basics
-    Public Sub New()
-        desc = "Find and track the longest line in the BGR image with a lightweight KNN."
-    End Sub
-
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        dst2 = src.Clone
-
-        knn.Run(src.Clone)
-        Static p1 As cv.Point, p2 As cv.Point
-        p1 = knn.lastPair.p1
-        p2 = knn.lastPair.p2
-
-        gline = glines.updateGLine(src, gline, p1, p2)
-
-        Dim rect = validateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
-        match.template = src(rect).Clone
-        match.Run(src)
-        If match.correlation >= options.fOptions.correlationThreshold Then
-            dst3 = match.dst0.Resize(dst3.Size)
-            dst2.Line(p1, p2, myHighLightColor, task.lineWidth, task.lineType)
-            dst2.Circle(p1, task.dotSize, task.highlightColor, -1, task.lineType)
-            dst2.Circle(p2, task.dotSize, task.highlightColor, -1, task.lineType)
-            rect = validateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
-            match.template = src(rect).Clone
-        Else
-            myHighLightColor = If(myHighLightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
-            knn.lastPair = New pointPair(New cv.Point2f, New cv.Point2f)
-        End If
-        labels(2) = "Longest line end points had correlation of " + Format(match.correlation, fmt3) + " with the original longest line."
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
 Public Class Feature_tCellTracker : Inherits VB_Algorithm
     Dim flow As New Font_FlowText
     Dim tracker As New Feature_Points
@@ -672,7 +621,6 @@ Public Class Feature_tCellTracker : Inherits VB_Algorithm
 
         strOut = ""
         If tcells.Count < task.features.Count / 3 Or tcells.Count < 2 Or task.optionsChanged Then
-            myHighLightColor = If(myHighLightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
             tracker.Run(src)
             tcells.Clear()
             For Each pt In task.features
@@ -691,8 +639,8 @@ Public Class Feature_tCellTracker : Inherits VB_Algorithm
                 tc = match.tCells(0)
                 setTrueText(Format(tc.correlation, fmt3), tc.center)
                 If standaloneTest() Then strOut += Format(tc.correlation, fmt3) + ", "
-                dst2.Circle(tc.center, task.dotSize, myHighLightColor, -1, task.lineType)
-                dst2.Rectangle(tc.rect, myHighLightColor, task.lineWidth, task.lineType)
+                dst2.Circle(tc.center, task.dotSize, task.highlightColor, -1, task.lineType)
+                dst2.Rectangle(tc.rect, task.highlightColor, task.lineWidth, task.lineType)
                 newCells.Add(tc)
             End If
         Next
@@ -767,10 +715,7 @@ Public Class Feature_LongestV_Tutorial2 : Inherits VB_Algorithm
             Dim x1 = lines.lines2D(sIndex)
             Dim x2 = lines.lines2D(sIndex + 1)
             Dim vec = If(x1.Y < x2.Y, New cv.Vec4f(x1.X, x1.Y, x2.X, x2.Y), New cv.Vec4f(x2.X, x2.Y, x1.X, x1.Y))
-            If knn.queries.Count = 0 Then
-                myHighLightColor = If(myHighLightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
-                knn.queries.Add(vec)
-            End If
+            If knn.queries.Count = 0 Then knn.queries.Add(vec)
             knn.trainInput.Add(vec)
             match3D.Add(lines.lines3D(sIndex))
             match3D.Add(lines.lines3D(sIndex + 1))
@@ -1650,7 +1595,6 @@ Public Class Feature_PointTracker : Inherits VB_Algorithm
 
         strOut = ""
         If mPoints.ptx.Count <= 3 Then
-            myHighLightColor = If(myHighLightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
             mPoints.ptx.Clear()
             feat.Run(src)
             For Each pt In task.features
@@ -1664,7 +1608,7 @@ Public Class Feature_PointTracker : Inherits VB_Algorithm
         dst2 = src.Clone
         For i = mPoints.ptx.Count - 1 To 0 Step -1
             If mPoints.correlation(i) > minCorrelation Then
-                dst2.Circle(mPoints.ptx(i), task.dotSize, myHighLightColor, -1, task.lineType)
+                dst2.Circle(mPoints.ptx(i), task.dotSize, task.highlightColor, -1, task.lineType)
                 strOut += Format(mPoints.correlation(i), fmt3) + ", "
             Else
                 mPoints.ptx.RemoveAt(i)
@@ -1714,7 +1658,7 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
             For Each pt In task.features
                 dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
 
-                Dim r = validateRect(New cv.Rect(pt.X - boxSize, pt.Y - boxSize, boxSize * 2, boxSize * 2))
+                Dim r = validateRect(New cv.Rect(pt.X - boxSize / 2, pt.Y - boxSize / 2, boxSize, boxSize))
                 nextTemplates.Add(src(r).Clone)
                 nextRects.Add(r)
             Next
@@ -1743,5 +1687,98 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
             End If
         Next
         labels(2) = feat.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Feature_Longest1 : Inherits VB_Algorithm
+    Dim glines As New Line_GCloud
+    Public knn As New KNN_ClosestTracker
+    Public options As New Options_Features
+    Public gline As gravityLine
+    Public match As New Match_Basics
+    Public Sub New()
+        desc = "Find and track the longest line in the BGR image with a lightweight KNN."
+    End Sub
+
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        dst2 = src.Clone
+
+        knn.Run(src.Clone)
+        Static p1 As cv.Point, p2 As cv.Point
+        p1 = knn.lastPair.p1
+        p2 = knn.lastPair.p2
+
+        gline = glines.updateGLine(src, gline, p1, p2)
+
+        Dim rect = validateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
+        match.template = src(rect).Clone
+        match.Run(src)
+        If match.correlation >= options.fOptions.correlationThreshold Then
+            dst3 = match.dst0.Resize(dst3.Size)
+            dst2.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
+            dst2.Circle(p1, task.dotSize, task.highlightColor, -1, task.lineType)
+            dst2.Circle(p2, task.dotSize, task.highlightColor, -1, task.lineType)
+            rect = validateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
+            match.template = src(rect).Clone
+        Else
+            task.highlightColor = If(task.highlightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
+            knn.lastPair = New pointPair(New cv.Point2f, New cv.Point2f)
+        End If
+        labels(2) = "Longest line end points had correlation of " + Format(match.correlation, fmt3) + " with the original longest line."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_Longest : Inherits VB_Algorithm
+    Dim glines As New Line_GCloud
+    Public knn As New KNN_ClosestTracker
+    Public options As New Options_Features
+    Public gline As gravityLine
+    Public match1 As New Match_Basics
+    Public match2 As New Match_Basics
+    Public Sub New()
+        labels(2) = "Longest line end points are highlighted "
+        desc = "Find and track the longest line in the BGR image with a lightweight KNN."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        dst2 = src.Clone
+        Dim minC = match1.options.correlationThreshold
+        Dim boxSize = match1.options.boxSize, halfSize = match1.options.halfSize
+
+        Static p1 As cv.Point, p2 As cv.Point
+        If task.heartBeat Or match1.correlation < minC And match2.correlation < minC Then
+            knn.Run(src.Clone)
+
+            p1 = knn.lastPair.p1
+            Dim r1 = validateRect(New cv.Rect(p1.X - halfSize, p1.Y - halfSize, boxSize, boxSize))
+            match1.template = src(r1).Clone
+
+            p2 = knn.lastPair.p2
+            Dim r2 = validateRect(New cv.Rect(p2.X - halfSize, p2.Y - halfSize, boxSize, boxSize))
+            match2.template = src(r2).Clone
+        End If
+
+        match1.Run(src)
+        p1 = match1.matchCenter
+
+        match2.Run(src)
+        p2 = match2.matchCenter
+
+        gline = glines.updateGLine(src, gline, p1, p2)
+        dst2.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
+        dst2.Circle(p1, task.dotSize, task.highlightColor, -1, task.lineType)
+        dst2.Circle(p2, task.dotSize, task.highlightColor, -1, task.lineType)
+        setTrueText(Format(match1.correlation, fmt3), p1)
+        setTrueText(Format(match2.correlation, fmt3), p2)
     End Sub
 End Class

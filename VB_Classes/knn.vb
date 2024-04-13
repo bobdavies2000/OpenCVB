@@ -775,7 +775,6 @@ Public Class KNN_ClosestTracker : Inherits VB_Algorithm
         If minDistances.Count > 0 Then
             If minDist > minDistances.Max * 2 Then
                 Console.WriteLine("Overriding KNN min Distance Rule = " + Format(minDist, fmt0) + " max = " + Format(minDistances.Max, fmt0))
-                myHighLightColor = If(myHighLightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
                 lastPair = New pointPair(trainInput(0), trainInput(1))
             Else
                 lastPair = New pointPair(p1, p2)
@@ -787,7 +786,7 @@ Public Class KNN_ClosestTracker : Inherits VB_Algorithm
         If minDist > 0 Then minDistances.Add(minDist)
         If minDistances.Count > 100 Then minDistances.RemoveAt(0)
 
-        dst2.Line(p1, p2, myHighLightColor, task.lineWidth, task.lineType)
+        dst2.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
         trainInput.Clear()
     End Sub
 End Class
@@ -830,7 +829,6 @@ Public Class KNN_ClosestLine : Inherits VB_Algorithm
         Static minDistances As New List(Of Single)({distances(0)})
         If minDist > minDistances.Max * 4 Then
             Console.WriteLine("Overriding KNN min Distance Rule = " + Format(minDist, fmt0) + " max = " + Format(minDistances.Max, fmt0))
-            myHighLightColor = If(myHighLightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
             lastP1 = trainInput(0)
             lastP2 = trainInput(1)
         End If
@@ -839,7 +837,7 @@ Public Class KNN_ClosestLine : Inherits VB_Algorithm
         If minDist > 0 Then minDistances.Add(minDist)
         If minDistances.Count > 100 Then minDistances.RemoveAt(0)
 
-        dst2.Line(lastP1, lastP2, myHighLightColor, task.lineWidth, task.lineType)
+        dst2.Line(lastP1, lastP2, task.highlightColor, task.lineWidth, task.lineType)
         trainInput.Clear()
     End Sub
 End Class
@@ -874,7 +872,6 @@ Public Class KNN_ClosestVertical : Inherits VB_Algorithm
         Dim lastDistance = knn.lastP1.DistanceTo(knn.lastP2)
         Dim bestDistance = lines.lines2D(index).DistanceTo(lines.lines2D(index + 1))
         If knn.lastP1 = New cv.Point2f Or lastDistance < 0.75 * bestDistance Then
-            myHighLightColor = If(myHighLightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
             knn.lastP1 = lines.lines2D(index)
             knn.lastP2 = lines.lines2D(index + 1)
         End If
@@ -892,7 +889,7 @@ Public Class KNN_ClosestVertical : Inherits VB_Algorithm
         pt2 = lines.lines3D(knn.lastIndex + 1)
 
         dst3 = lines.dst3
-        dst2.Line(knn.lastP1, knn.lastP2, myHighLightColor, task.lineWidth, task.lineType)
+        dst2.Line(knn.lastP1, knn.lastP2, task.highlightColor, task.lineWidth, task.lineType)
     End Sub
 End Class
 
@@ -1000,6 +997,7 @@ End Class
 
 Public Class KNN_Farthest : Inherits VB_Algorithm
     Dim knn As New KNN_Core
+    Public mpFar As pointPair
     Public Sub New()
         labels = {"", "", "Lines connecting pairs that are farthest.", "Training Input which is also query input and longest line"}
         desc = "Use KNN to find the farthest point from each query point."
@@ -1035,7 +1033,7 @@ Public Class KNN_Farthest : Inherits VB_Algorithm
         Next
 
         Dim maxIndex = distances.IndexOf(distances.Max())
-        Dim mpFar = farthest(maxIndex)
+        mpFar = farthest(maxIndex)
         dst3.Line(mpFar.p1, mpFar.p2, cv.Scalar.White, task.lineWidth, task.lineType)
     End Sub
 End Class

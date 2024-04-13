@@ -586,6 +586,7 @@ if algorithmName = "Feature_Lines_Tutorial1" Then return new Feature_Lines_Tutor
 if algorithmName = "Feature_Lines_Tutorial2" Then return new Feature_Lines_Tutorial2
 if algorithmName = "Feature_LinesVH" Then return new Feature_LinesVH
 if algorithmName = "Feature_Longest" Then return new Feature_Longest
+if algorithmName = "Feature_Longest1" Then return new Feature_Longest1
 if algorithmName = "Feature_LongestV_Tutorial1" Then return new Feature_LongestV_Tutorial1
 if algorithmName = "Feature_LongestV_Tutorial2" Then return new Feature_LongestV_Tutorial2
 if algorithmName = "Feature_LongestVerticalKNN" Then return new Feature_LongestVerticalKNN

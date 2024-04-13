@@ -501,7 +501,7 @@ Public Class Grid_TrackCenter : Inherits VB_Algorithm
 
         If standaloneTest() Then
             dst2 = src
-            dst2.Rectangle(match.matchRect, task.highlightColor, task.lineWidth, task.lineType)
+            dst2.Rectangle(match.matchRect, task.highlightColor, task.lineWidth + 1, task.lineType)
             dst2.Circle(center, task.dotSize, cv.Scalar.White, -1, task.lineType)
 
             If task.heartBeat Then dst3.SetTo(0)

@@ -671,7 +671,7 @@ Public Class Line_DisplayInfo : Inherits VB_Algorithm
         Next
 
         strOut = "Mask count = " + CStr(maskCount) + ", Expected count = " + CStr(distance) + " or " + Format(maskCount / distance, "0%") + vbCrLf
-        dst2.Line(p1, p2, myHighLightColor, task.lineWidth, task.lineType)
+        dst2.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
 
         strOut += "Color changes when correlation falls below threshold and new line is detected." + vbCrLf +
                   "Correlation coefficient is shown with the depth in meters."

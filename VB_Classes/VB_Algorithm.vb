@@ -26,7 +26,6 @@ Public Class VB_Algorithm : Implements IDisposable
     Public sliders As New OptionsSliders
     Public standalone As Boolean
     Public firstPass As Boolean
-    Public myHighLightColor = cv.Scalar.Yellow
     Public dst0 As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat, empty As cv.Mat
     Public labels(4 - 1) As String
     Public msRNG As New System.Random
