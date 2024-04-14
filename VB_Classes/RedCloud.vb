@@ -12,13 +12,9 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            'Static colorC As New Color_Basics
-            'colorC.Run(src)
-            'src = colorC.dst2
-            redOptions.UseColorOnly.Checked = True
-            Static fLess As New FeatureLess_RedCloud
-            fLess.Run(src)
-            src = fLess.dst2
+            Static colorC As New Color_Basics
+            colorC.Run(src)
+            src = colorC.dst2
         End If
 
         redCPP.inputMask = inputMask
@@ -760,52 +756,6 @@ Public Class RedCloud_ProjectCell : Inherits VB_Algorithm
         'setTrueText("Select a RedCloud cell above to project it into the top and side views at left.", 3)
     End Sub
 End Class
-
-
-
-
-
-
-
-
-
-Public Class RedCloud_NoDepth : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Minimum pixels %", 0, 100, 25)
-
-        labels = {"", "", "", "Cells with depth percentage that is less than the threshold specified."}
-        desc = "Find RedColor cells only for areas with insufficient depth"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static minSlider = findSlider("Minimum pixels %")
-        Dim minPixelPercent = minSlider.value
-
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        Dim redCells As New List(Of rcData)
-        For Each rc In task.redCells
-            rc.mask.SetTo(0, task.depthMask(rc.rect))
-            If rc.mask.CountNonZero / rc.pixels > minPixelPercent Then
-                rc.mask.SetTo(0)
-            Else
-                rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxTC89L1)
-                If rc.contour.Count > 0 Then vbDrawContour(rc.mask, rc.contour, 255, -1)
-            End If
-            redCells.Add(rc)
-        Next
-
-        task.redCells = New List(Of rcData)(redCells)
-
-        dst3.SetTo(0)
-        For Each rc In redCells
-            vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
-        Next
-    End Sub
-End Class
-
 
 
 
