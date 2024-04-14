@@ -12,7 +12,10 @@ Public Class Depth_Basics : Inherits VB_Algorithm
         dst2 = task.pcSplit(2)
 
         task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
-        task.maxDepthMask = task.pcSplit(2).ConvertScaleAbs().InRange(task.maxZmeters, task.maxZmeters)
+        If firstPass Then
+            task.maxDepthMask = task.pcSplit(2).ConvertScaleAbs().InRange(task.maxZmeters, task.maxZmeters)
+            task.maxDepthMask.SetTo(0)
+        End If
         If standalone Then dst3 = task.maxDepthMask
         setTrueText(task.gMat.strOut, 3)
 
