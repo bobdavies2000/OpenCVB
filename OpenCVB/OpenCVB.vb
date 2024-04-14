@@ -96,6 +96,7 @@ Public Class OpenCVB
 
     Public intermediateReview As String
     Dim activateTaskRequest As Boolean
+    Dim activateTreeView As Boolean
     Dim pixelViewerRect As cv.Rect
     Dim pixelViewTag As Integer
 
@@ -935,6 +936,12 @@ Public Class OpenCVB
         Static lastAlgorithmFrame As Integer
         Static lastCameraFrame As Integer
 
+        If TreeButton.Checked And activateTreeView Then
+            TreeViewDialog.Activate()
+            Me.Activate()
+            activateTreeView = False
+        End If
+
         If camera Is Nothing Then Exit Sub
         If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
         If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
@@ -964,7 +971,10 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
-        activateTaskRequest = True
+        If activateTreeView = False Then
+            activateTaskRequest = True
+            activateTreeView = True
+        End If
     End Sub
     Private Sub ToolStripButton3_Click(sender As Object, e As EventArgs) Handles ToolStripButton3.Click
         Dim OKcancel = InsertAlgorithm.ShowDialog()
