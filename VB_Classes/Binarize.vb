@@ -251,41 +251,6 @@ End Class
 
 
 
-Public Class Binarize_Four : Inherits VB_Algorithm
-    Dim binar As New Binarize_Simple
-    Public mats As New Mat_4Click
-    Public Sub New()
-        labels(2) = "A 4-way split - lightest (upper left) to darkest (lower right)"
-        desc = "Binarize an image twice using masks"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-        binar.Run(gray)
-        Dim mask = binar.dst2.Clone
-
-        Dim midColor = binar.meanScalar(0)
-        Dim topColor = cv.Cv2.Mean(gray, mask)(0)
-        Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
-        mats.mat(0) = gray.InRange(topColor, 255)
-        mats.mat(1) = gray.InRange(midColor, topColor)
-        mats.mat(2) = gray.InRange(botColor, midColor)
-        mats.mat(3) = gray.InRange(0, botColor)
-
-        If standaloneTest() Then
-            mats.Run(empty)
-            dst2 = mats.dst2
-            dst3 = mats.dst3
-            labels(3) = mats.labels(3)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Binarize_FourPixelFlips : Inherits VB_Algorithm
     Dim binar4 As New Binarize_Split4
@@ -390,5 +355,77 @@ Public Class Binarize_Split4LeftRight : Inherits VB_Algorithm
         dst1.SetTo(4, binar.mats.mat(3))
 
         dst3 = vbPalette((dst1 * 255 / classCount).ToMat)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Binarize_Four : Inherits VB_Algorithm
+    Dim binar As New Binarize_Simple
+    Public mats As New Mat_4Click
+    Public Sub New()
+        labels(2) = "A 4-way split - lightest (upper left) to darkest (lower right)"
+        desc = "Binarize an image twice using masks"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        binar.Run(gray)
+        Dim mask = binar.dst2.Clone
+
+        Dim midColor = binar.meanScalar(0)
+        Dim topColor = cv.Cv2.Mean(gray, mask)(0)
+        Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
+        mats.mat(0) = gray.InRange(topColor, 255)
+        mats.mat(1) = gray.InRange(midColor, topColor)
+        mats.mat(2) = gray.InRange(botColor, midColor)
+        mats.mat(3) = gray.InRange(0, botColor)
+
+        If standaloneTest() Then
+            mats.Run(empty)
+            dst2 = mats.dst2
+            dst3 = mats.dst3
+            labels(3) = mats.labels(3)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Binarize_FourGrid : Inherits VB_Algorithm
+    Dim binar As New Binarize_Simple
+    Public mats As New Mat_4Click
+    Public Sub New()
+        labels(2) = "A 4-way split - lightest (upper left) to darkest (lower right)"
+        desc = "Binarize an image twice using masks"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        binar.Run(gray)
+        Dim mask = binar.dst2.Clone
+
+        Dim midColor = binar.meanScalar(0)
+        Dim topColor = cv.Cv2.Mean(gray, mask)(0)
+        Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
+        mats.mat(0) = gray.InRange(topColor, 255)
+        mats.mat(1) = gray.InRange(midColor, topColor)
+        mats.mat(2) = gray.InRange(botColor, midColor)
+        mats.mat(3) = gray.InRange(0, botColor)
+
+        If standaloneTest() Then
+            mats.Run(empty)
+            dst2 = mats.dst2
+            dst3 = mats.dst3
+            labels(3) = mats.labels(3)
+        End If
     End Sub
 End Class

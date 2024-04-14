@@ -163,6 +163,7 @@ if algorithmName = "Binarize_Bernson" Then return new Binarize_Bernson
 if algorithmName = "Binarize_Bernson_MT" Then return new Binarize_Bernson_MT
 if algorithmName = "Binarize_DepthTiers" Then return new Binarize_DepthTiers
 if algorithmName = "Binarize_Four" Then return new Binarize_Four
+if algorithmName = "Binarize_FourGrid" Then return new Binarize_FourGrid
 if algorithmName = "Binarize_FourPixelFlips" Then return new Binarize_FourPixelFlips
 if algorithmName = "Binarize_KMeansMasks" Then return new Binarize_KMeansMasks
 if algorithmName = "Binarize_KMeansRGB" Then return new Binarize_KMeansRGB
