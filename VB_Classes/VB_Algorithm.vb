@@ -242,14 +242,23 @@ Public Class VB_Algorithm : Implements IDisposable
         If r.Height <= 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X > dst2.Width * ratio Then r.X = dst2.Width * ratio - 1
-        If r.Y > dst2.Height * ratio Then r.Y = dst2.Height * ratio - 1
-        If r.X + r.Width >= dst2.Width * ratio Then r.Width = dst2.Width * ratio - r.X - 1
-        If r.Y + r.Height >= dst2.Height * ratio Then r.Height = dst2.Height * ratio - r.Y - 1
+        If r.X > task.workingRes.Width * ratio Then r.X = task.workingRes.Width * ratio - 1
+        If r.Y > task.workingRes.Height * ratio Then r.Y = task.workingRes.Height * ratio - 1
+        If r.X + r.Width >= task.workingRes.Width * ratio Then r.Width = task.workingRes.Width * ratio - r.X - 1
+        If r.Y + r.Height >= task.workingRes.Height * ratio Then r.Height = task.workingRes.Height * ratio - r.Y - 1
         If r.Width <= 0 Then r.Width = 1 ' check again (it might have changed.)
         If r.Height <= 0 Then r.Height = 1
-        If r.X = dst2.Width * ratio Then r.X = r.X - 1
-        If r.Y = dst2.Height * ratio Then r.Y = r.Y - 1
+        If r.X = task.workingRes.Width * ratio Then r.X = r.X - 1
+        If r.Y = task.workingRes.Height * ratio Then r.Y = r.Y - 1
+        Return r
+    End Function
+    Public Function validatePreserve(ByVal r As cv.Rect) As cv.Rect
+        If r.Width <= 0 Then r.Width = 1
+        If r.Height <= 0 Then r.Height = 1
+        If r.X < 0 Then r.X = 0
+        If r.Y < 0 Then r.Y = 0
+        If r.X + r.Width >= task.workingRes.Width Then r.X = dst2.Width - r.Width - 1
+        If r.Y + r.Height >= task.workingRes.Height Then r.Y = task.workingRes.Height - r.Height - 1
         Return r
     End Function
     Public Function validatePoint2f(p As cv.Point2f) As cv.Point2f
@@ -301,7 +310,7 @@ Public Class VB_Algorithm : Implements IDisposable
         combo.Dispose()
     End Sub
     Public Sub NextFrame(src As cv.Mat)
-        If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
+        'If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
         algorithm.Run(src)
 
         task.labels = labels

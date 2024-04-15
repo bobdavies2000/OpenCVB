@@ -13,7 +13,7 @@ Public Class Distance_Basics : Inherits VB_Algorithm
         If standaloneTest() Then src = task.depthRGB
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim dst0 = src.DistanceTransform(options.distanceType, 0)
+        dst0 = src.DistanceTransform(options.distanceType, 0)
         dst1 = vbNormalize32f(dst0)
         dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
     End Sub
@@ -265,5 +265,31 @@ Public Class Distance_RedCloud : Inherits VB_Algorithm
         Next
 
         lastredCells = New List(Of rcData)(task.redCells)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Distance_BinaryImage : Inherits VB_Algorithm
+    Dim binar As New Binarize_Simple
+    Dim distance As New Distance_Basics
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Measure the fragmentation of a binary image by using the distance transform"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binar.Run(src)
+        dst2 = binar.dst2
+        labels(2) = binar.labels(2) + " Draw a rectangle to measure specific area."
+
+        If task.drawRect.Width > 0 Then
+            distance.Run(dst2(task.drawRect))
+        Else
+            distance.Run(dst2)
+        End If
+        dst3 = distance.dst2
+        dst1 = dst3.Threshold(gOptions.DebugSlider.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class

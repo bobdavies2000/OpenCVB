@@ -940,3 +940,49 @@ Public Class Contour_DepthTiers : Inherits VB_Algorithm
         labels(3) = $"All depth pixels are assigned a tier with {classCount} contours."
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Contour_BinaryImage : Inherits VB_Algorithm
+    Dim binar As New Binarize_Four
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Select a quartile for review", 0, 3, 0)
+        labels(2) = "Contour counts for each roi in gridList.  Click on any roi to display in dst1"
+        desc = "Highlight the contours for each grid element."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static quartileSlider = findSlider("Select a quartile for review")
+        Dim index = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+        Dim roiSave = task.gridList(index)
+
+        binar.Run(src)
+        Dim quartile = binar.mats.mat(quartileSlider.value)
+        dst3 = quartile(roiSave)
+        labels(3) = CStr(dst3.CountNonZero) + " pixels in this quartile"
+        dst2 = quartile * 0.5
+
+        Dim counts(3, task.gridList.Count) As Integer
+        For i = 0 To counts.GetUpperBound(0)
+            For j = 0 To task.gridList.Count - 1
+                Dim roi = task.gridList(j)
+                Dim allContours As cv.Point()()
+                cv.Cv2.FindContours(quartile(roi), allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
+                setTrueText(CStr(allContours.Count), roi.TopLeft, 2)
+                counts(i, j) = allContours.Count
+            Next
+        Next
+
+        'For i = 0 To counts.GetUpperBound(0)
+        '    For j = 0 To task.gridList.Count - 1
+        '        If counts(i, j) > 1 Then
+        '        End If
+        '    Next
+        'Next
+        dst2.Rectangle(roiSave, cv.Scalar.White, task.lineWidth)
+        task.color.Rectangle(roiSave, cv.Scalar.White, task.lineWidth)
+    End Sub
+End Class

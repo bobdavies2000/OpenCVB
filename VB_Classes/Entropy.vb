@@ -7,16 +7,24 @@ Public Class Entropy_Basics : Inherits VB_Algorithm
         desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.drawRect.Width = 0 Then
-            entropy.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        Else
+        Dim stdSize = 50
+        If task.drawRect = New cv.Rect Then
+            task.drawRect = New cv.Rect(50, 50, stdSize, stdSize) ' arbitrary rectangle
+        End If
+        If task.mouseClickFlag Then
+            task.drawRect = validatePreserve(New cv.Rect(task.clickPoint.X, task.clickPoint.Y, stdSize, stdSize))
+        End If
+        If src.Channels = 3 Then
             entropy.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)(task.drawRect))
+        Else
+            entropy.Run(src(task.drawRect))
         End If
-        If standaloneTest() Then
-            If task.heartBeat Then strOut = "More histogram bins means higher entropy values" + vbCrLf + vbCrLf + "Total entropy = " +
-                                             Format(entropy.entropyVal, fmt1) + vbCrLf + entropy.strOut
-            setTrueText(strOut, 2)
-        End If
+        dst2 = entropy.dst2
+        dst2.Rectangle(task.drawRect, cv.Scalar.White, task.lineWidth)
+        If task.heartBeat Then strOut = "Click anywhere to measure the entropy with rect(pt.x, pt.y, " +
+                                         CStr(stdSize) + ", " + CStr(stdSize) + ")" + vbCrLf + vbCrLf + "Total entropy = " +
+                                         Format(entropy.entropyVal, fmt1) + vbCrLf + entropy.strOut
+        setTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -112,7 +120,8 @@ Public Class Entropy_Rectangle : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src As cv.Mat)
         Dim dimensions() = New Integer() {task.histogramBins}
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255)}
+        Dim mm = vbMinMax(src)
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(mm.minVal, mm.maxVal)}
 
         If standalone Then
             If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then
@@ -126,10 +135,10 @@ Public Class Entropy_Rectangle : Inherits VB_Algorithm
 
         entropyVal = channelEntropy(src.Total, histNormalized) * 1000
         strOut = "Entropy X1000 " + Format(entropyVal, fmt1) + vbCrLf
-        If standaloneTest() Then
-            dst2 = src
-            setTrueText(strOut, 3)
-        End If
+        dst2 = src
+        dst2.Rectangle(task.drawRect, cv.Scalar.White, task.lineWidth)
+        dst3 = src
+        setTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -195,5 +204,26 @@ Public Class Entropy_SubDivisions : Inherits VB_Algorithm
         p1 = New cv.Point(dst2.Width * 2 / 3, 0)
         p2 = New cv.Point(dst2.Width * 2 / 3, dst2.Height)
         dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Entropy_BinaryImage : Inherits VB_Algorithm
+    Dim binar As New Binarize_Simple
+    Dim entropy As New Entropy_Basics
+    Public Sub New()
+        desc = "Measure entropy in a binary image"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binar.Run(src)
+        dst2 = binar.dst2
+        labels(2) = binar.labels(2)
+
+        entropy.Run(dst2)
+        setTrueText(entropy.strOut, 3)
     End Sub
 End Class

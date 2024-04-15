@@ -55,7 +55,6 @@ Public Class OptionsContainer
             For Each title In optionsTitle
                 Dim frm = findfrm(title)
                 If frm IsNot Nothing Then
-                    frm.BringToFront()
                     Dim sidelineOptions As Boolean = True
                     Dim displayTheseOptions As New List(Of String)({"Image_Basics OpenFile Options"})
                     If displayTheseOptions.Contains(frm.Text) Then sidelineOptions = False
