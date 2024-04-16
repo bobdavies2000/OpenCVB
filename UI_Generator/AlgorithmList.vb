@@ -257,6 +257,7 @@ if algorithmName = "Concat_4way" Then return new Concat_4way
 if algorithmName = "Concat_Basics" Then return new Concat_Basics
 if algorithmName = "Contour_Basics" Then return new Contour_Basics
 if algorithmName = "Contour_BinaryImage" Then return new Contour_BinaryImage
+if algorithmName = "Contour_BinaryImage1" Then return new Contour_BinaryImage1
 if algorithmName = "Contour_Compare" Then return new Contour_Compare
 if algorithmName = "Contour_CompareToFeatureless" Then return new Contour_CompareToFeatureless
 if algorithmName = "Contour_DepthTiers" Then return new Contour_DepthTiers

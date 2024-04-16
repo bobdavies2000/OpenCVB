@@ -947,42 +947,98 @@ End Class
 
 
 
-Public Class Contour_BinaryImage : Inherits VB_Algorithm
+Public Class Contour_BinaryImage1 : Inherits VB_Algorithm
     Dim binar As New Binarize_Four
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Select a quartile for review", 0, 3, 0)
-        labels(2) = "Contour counts for each roi in gridList.  Click on any roi to display in dst1"
+        If standalone Then gOptions.displayDst1.Checked = True
+        labels(1) = "Contour counts for each roi in gridList.  Click on any roi to display all 4 quartiles"
         desc = "Highlight the contours for each grid element."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static quartileSlider = findSlider("Select a quartile for review")
         Dim index = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         Dim roiSave = task.gridList(index)
 
         binar.Run(src)
-        Dim quartile = binar.mats.mat(quartileSlider.value)
-        dst3 = quartile(roiSave)
+        binar.mats.Run(empty)
+        dst2 = binar.mats.dst2
+        dst3 = binar.mats.dst3
         labels(3) = CStr(dst3.CountNonZero) + " pixels in this quartile"
-        dst2 = quartile * 0.5
+        dst1 = dst3 * 0.5
 
         Dim counts(3, task.gridList.Count) As Integer
         For i = 0 To counts.GetUpperBound(0)
             For j = 0 To task.gridList.Count - 1
                 Dim roi = task.gridList(j)
                 Dim allContours As cv.Point()()
-                cv.Cv2.FindContours(quartile(roi), allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
-                setTrueText(CStr(allContours.Count), roi.TopLeft, 2)
+                cv.Cv2.FindContours(dst3(roi), allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
+                setTrueText(CStr(allContours.Count), roi.TopLeft, 1)
                 counts(i, j) = allContours.Count
             Next
         Next
 
-        'For i = 0 To counts.GetUpperBound(0)
-        '    For j = 0 To task.gridList.Count - 1
-        '        If counts(i, j) > 1 Then
-        '        End If
-        '    Next
-        'Next
-        dst2.Rectangle(roiSave, cv.Scalar.White, task.lineWidth)
+        dst1.Rectangle(roiSave, cv.Scalar.White, task.lineWidth)
+        task.color.Rectangle(roiSave, cv.Scalar.White, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Contour_BinaryImage : Inherits VB_Algorithm
+    Dim binar As New Binarize_Four
+    Dim mats As New Mat_4to1
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        labels(1) = "Contour counts for each roi in gridList.  Click on any roi to display all 4 quartiles"
+        desc = "Highlight the contours for each grid element."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static index = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+        If task.mousePicTag = 1 Then index = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+        Dim roiSave = task.gridList(index)
+
+        binar.Run(src)
+        binar.mats.Run(empty)
+        dst2 = binar.mats.dst2
+        dst1 = binar.mats.dst3 * 0.5
+
+        Dim counts(3, task.gridList.Count) As Integer
+        Dim contourCounts As New List(Of List(Of Integer))
+        For i = 0 To counts.GetUpperBound(0)
+            For j = 0 To task.gridList.Count - 1
+                Dim roi = task.gridList(j)
+                Dim allContours As cv.Point()()
+                cv.Cv2.FindContours(binar.mats.mat(i)(roi), allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
+                If i = 0 Then contourCounts.Add(New List(Of Integer))
+                contourCounts(j).Add(allContours.Count)
+                If i = binar.mats.quadrant Then setTrueText(CStr(allContours.Count), roi.TopLeft, 1)
+                counts(i, j) = allContours.Count
+            Next
+        Next
+
+        Static labelStr(3) As String, points(3) As cv.Point
+        Dim bump = 3
+        For i = 0 To mats.mat.Count - 1
+            mats.mat(i) = binar.mats.mat(i)(roiSave) * 0.5
+            If task.heartBeat Then
+                points(i) = Choose(i + 1, New cv.Point(bump, bump), New cv.Point(bump + dst2.Width / 2, bump),
+                                          New cv.Point(bump, bump + dst2.Height / 2),
+                                          New cv.Point(bump + dst2.Width / 2, bump + dst2.Height / 2))
+                labelStr(i) = (CStr(mats.mat(i).CountNonZero) + " pixels" + vbCrLf + CStr(contourCounts(index)(i)) + " contours")
+            End If
+        Next
+
+        For i = 0 To labelStr.Count - 1
+            setTrueText(labelStr(i), points(i), 3)
+        Next
+
+        mats.Run(src)
+        dst3 = mats.dst2
+
+        dst1.Rectangle(roiSave, cv.Scalar.White, task.lineWidth)
         task.color.Rectangle(roiSave, cv.Scalar.White, task.lineWidth)
     End Sub
 End Class
