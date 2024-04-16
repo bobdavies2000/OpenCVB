@@ -305,19 +305,19 @@ End Class
 
 
 Public Class Binarize_Split4 : Inherits VB_Algorithm
-    Dim binar As New Binarize_Four
+    Dim binary As New Binarize_Four
     Public classCount = 4 ' 4-way split 
     Public Sub New()
         dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Add the 4-way split of images to define the different regions."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        binar.Run(src)
+        binary.Run(src)
 
-        dst2.SetTo(1, binar.mats.mat(0))
-        dst2.SetTo(2, binar.mats.mat(1))
-        dst2.SetTo(3, binar.mats.mat(2))
-        dst2.SetTo(4, binar.mats.mat(3))
+        dst2.SetTo(1, binary.mats.mat(0))
+        dst2.SetTo(2, binary.mats.mat(1))
+        dst2.SetTo(3, binary.mats.mat(2))
+        dst2.SetTo(4, binary.mats.mat(3))
 
         dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
     End Sub
@@ -330,7 +330,7 @@ End Class
 
 
 Public Class Binarize_Split4LeftRight : Inherits VB_Algorithm
-    Dim binar As New Binarize_Four
+    Dim binary As New Binarize_Four
     Public classCount = 4 ' 4-way split
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -338,21 +338,21 @@ Public Class Binarize_Split4LeftRight : Inherits VB_Algorithm
         desc = "Add the 4-way split of left and right views."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        binar.Run(src)
+        binary.Run(src)
 
-        dst0.SetTo(1, binar.mats.mat(0))
-        dst0.SetTo(2, binar.mats.mat(1))
-        dst0.SetTo(3, binar.mats.mat(2))
-        dst0.SetTo(4, binar.mats.mat(3))
+        dst0.SetTo(1, binary.mats.mat(0))
+        dst0.SetTo(2, binary.mats.mat(1))
+        dst0.SetTo(3, binary.mats.mat(2))
+        dst0.SetTo(4, binary.mats.mat(3))
 
         dst2 = vbPalette((dst0 * 255 / classCount).ToMat)
 
-        binar.Run(task.rightView)
+        binary.Run(task.rightView)
 
-        dst1.SetTo(1, binar.mats.mat(0))
-        dst1.SetTo(2, binar.mats.mat(1))
-        dst1.SetTo(3, binar.mats.mat(2))
-        dst1.SetTo(4, binar.mats.mat(3))
+        dst1.SetTo(1, binary.mats.mat(0))
+        dst1.SetTo(2, binary.mats.mat(1))
+        dst1.SetTo(3, binary.mats.mat(2))
+        dst1.SetTo(4, binary.mats.mat(3))
 
         dst3 = vbPalette((dst1 * 255 / classCount).ToMat)
     End Sub
@@ -365,7 +365,7 @@ End Class
 
 
 Public Class Binarize_Four : Inherits VB_Algorithm
-    Dim binar As New Binarize_Simple
+    Dim binary As New Binarize_Simple
     Public mats As New Mat_4Click
     Public Sub New()
         labels(2) = "A 4-way split - lightest (upper left) to darkest (lower right)"
@@ -374,10 +374,10 @@ Public Class Binarize_Four : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
-        binar.Run(gray)
-        Dim mask = binar.dst2.Clone
+        binary.Run(gray)
+        Dim mask = binary.dst2.Clone
 
-        Dim midColor = binar.meanScalar(0)
+        Dim midColor = binary.meanScalar(0)
         Dim topColor = cv.Cv2.Mean(gray, mask)(0)
         Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
         mats.mat(0) = gray.InRange(topColor, 255)

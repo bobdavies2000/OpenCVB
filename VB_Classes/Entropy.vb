@@ -213,15 +213,15 @@ End Class
 
 
 Public Class Entropy_BinaryImage : Inherits VB_Algorithm
-    Dim binar As New Binarize_Simple
+    Dim binary As New Binarize_Simple
     Dim entropy As New Entropy_Basics
     Public Sub New()
         desc = "Measure entropy in a binary image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        binar.Run(src)
-        dst2 = binar.dst2
-        labels(2) = binar.labels(2)
+        binary.Run(src)
+        dst2 = binary.dst2
+        labels(2) = binary.labels(2)
 
         entropy.Run(dst2)
         setTrueText(entropy.strOut, 3)

@@ -948,7 +948,7 @@ End Class
 
 
 Public Class Contour_BinaryImage1 : Inherits VB_Algorithm
-    Dim binar As New Binarize_Four
+    Dim binary As New Binarize_Four
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         labels(1) = "Contour counts for each roi in gridList.  Click on any roi to display all 4 quartiles"
@@ -958,10 +958,10 @@ Public Class Contour_BinaryImage1 : Inherits VB_Algorithm
         Dim index = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         Dim roiSave = task.gridList(index)
 
-        binar.Run(src)
-        binar.mats.Run(empty)
-        dst2 = binar.mats.dst2
-        dst3 = binar.mats.dst3
+        binary.Run(src)
+        binary.mats.Run(empty)
+        dst2 = binary.mats.dst2
+        dst3 = binary.mats.dst3
         labels(3) = CStr(dst3.CountNonZero) + " pixels in this quartile"
         dst1 = dst3 * 0.5
 
@@ -988,7 +988,7 @@ End Class
 
 
 Public Class Contour_BinaryImage : Inherits VB_Algorithm
-    Dim binar As New Binarize_Four
+    Dim binary As New Binarize_Four
     Dim mats As New Mat_4to1
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
@@ -1000,10 +1000,10 @@ Public Class Contour_BinaryImage : Inherits VB_Algorithm
         If task.mousePicTag = 1 Then index = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         Dim roiSave = task.gridList(index)
 
-        binar.Run(src)
-        binar.mats.Run(empty)
-        dst2 = binar.mats.dst2
-        dst1 = binar.mats.dst3 * 0.5
+        binary.Run(src)
+        binary.mats.Run(empty)
+        dst2 = binary.mats.dst2
+        dst1 = binary.mats.dst3 * 0.5
 
         Dim counts(3, task.gridList.Count) As Integer
         Dim contourCounts As New List(Of List(Of Integer))
@@ -1011,10 +1011,10 @@ Public Class Contour_BinaryImage : Inherits VB_Algorithm
             For j = 0 To task.gridList.Count - 1
                 Dim roi = task.gridList(j)
                 Dim allContours As cv.Point()()
-                cv.Cv2.FindContours(binar.mats.mat(i)(roi), allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
+                cv.Cv2.FindContours(binary.mats.mat(i)(roi), allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
                 If i = 0 Then contourCounts.Add(New List(Of Integer))
                 contourCounts(j).Add(allContours.Count)
-                If i = binar.mats.quadrant Then setTrueText(CStr(allContours.Count), roi.TopLeft, 1)
+                If i = binary.mats.quadrant Then setTrueText(CStr(allContours.Count), roi.TopLeft, 1)
                 counts(i, j) = allContours.Count
             Next
         Next
@@ -1022,7 +1022,7 @@ Public Class Contour_BinaryImage : Inherits VB_Algorithm
         Static labelStr(3) As String, points(3) As cv.Point
         Dim bump = 3
         For i = 0 To mats.mat.Count - 1
-            mats.mat(i) = binar.mats.mat(i)(roiSave) * 0.5
+            mats.mat(i) = binary.mats.mat(i)(roiSave) * 0.5
             If task.heartBeat Then
                 points(i) = Choose(i + 1, New cv.Point(bump, bump), New cv.Point(bump + dst2.Width / 2, bump),
                                           New cv.Point(bump, bump + dst2.Height / 2),

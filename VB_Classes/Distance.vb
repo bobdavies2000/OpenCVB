@@ -273,16 +273,16 @@ End Class
 
 
 Public Class Distance_BinaryImage : Inherits VB_Algorithm
-    Dim binar As New Binarize_Simple
+    Dim binary As New Binarize_Simple
     Dim distance As New Distance_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         desc = "Measure the fragmentation of a binary image by using the distance transform"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        binar.Run(src)
-        dst2 = binar.dst2
-        labels(2) = binar.labels(2) + " Draw a rectangle to measure specific area."
+        binary.Run(src)
+        dst2 = binary.dst2
+        labels(2) = binary.labels(2) + " Draw a rectangle to measure specific area."
 
         If task.drawRect.Width > 0 Then
             distance.Run(dst2(task.drawRect))
