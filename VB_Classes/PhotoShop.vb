@@ -395,7 +395,7 @@ Public Class PhotoShop_DuoTone : Inherits VB_Algorithm
 
         desc = "Create a DuoTone image"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static duoCheck = findCheckBox("DuoTone Dark if checked, Light otherwise")
         options.RunVB()
         Static expSlider = findSlider("DuoTone Exponent")
@@ -426,45 +426,6 @@ Public Class PhotoShop_DuoTone : Inherits VB_Algorithm
         Next
 
         cv.Cv2.Merge(split, dst2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-' https://github.com/spmallick/learnopencv/tree/master/
-Public Class PhotoShop_Brightness : Inherits VB_Algorithm
-    Public Sub New()
-
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Brightness Value", 0, 255, 100)
-        End If
-
-        labels(2) = "RGB straight to HSV"
-        desc = "Implement the traditional brightness effect"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static brightnessSlider = findSlider("Brightness Value")
-        Dim brightness As Single = brightnessSlider.Value / 100
-
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-        Dim hsv64 As New cv.Mat
-        dst2.ConvertTo(hsv64, cv.MatType.CV_64F)
-        Dim split = hsv64.Split()
-
-        split(1) *= brightness
-        split(1) = split(1).Threshold(255, 255, cv.ThresholdTypes.Trunc)
-
-        split(2) *= brightness
-        split(2) = split(2).Threshold(255, 255, cv.ThresholdTypes.Trunc)
-
-        cv.Cv2.Merge(split, hsv64)
-        hsv64.ConvertTo(dst3, cv.MatType.CV_8UC3)
-        dst3 = dst3.CvtColor(cv.ColorConversionCodes.HSV2BGR)
-        labels(3) = "Brightness level = " + CStr(brightnessSlider.Value)
     End Sub
 End Class
 

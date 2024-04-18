@@ -2375,7 +2375,7 @@ Public Class Options_BrightnessContrast : Inherits VB_Algorithm
         If task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then alphaDefault = 1500
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Alpha (contrast)", 0, 10000, alphaDefault)
-            sliders.setupTrackBar("Beta (brightness)", -255, 255, betaDefault)
+            sliders.setupTrackBar("Beta (brightness)", -127, 127, betaDefault)
         End If
     End Sub
     Public Sub RunVB()
@@ -3914,7 +3914,7 @@ Public Class Options_Edges_All : Inherits VB_Algorithm
     Dim scharr As New Edge_Scharr
     Dim binRed As New Edge_BinarizedReduction
     Dim sobel = New Edge_Sobel
-    Dim binSobel As New Edge_BinarizedSobel
+    Dim binSobel As New Quartile_Sobel
     Dim colorGap As New Edge_ColorGap_CPP
     Dim deriche As New Edge_Deriche_CPP
     Dim Laplacian As New Edge_Laplacian

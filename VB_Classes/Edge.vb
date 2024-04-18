@@ -256,10 +256,10 @@ End Class
 
 Public Class Edge_BinarizedBrightness : Inherits VB_Algorithm
     Dim edges As New Edge_All
-    Dim bright As New PhotoShop_Brightness
+    Dim bright As New Brightness_Basics
     Public Sub New()
         findRadio("Binarized Sobel").Checked = True
-        desc = "Visualize the impact of brightness on Edge_BinarizeSobel"
+        desc = "Visualize the impact of brightness on Quartile_Sobel"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         bright.Run(src)
@@ -276,113 +276,11 @@ End Class
 
 
 
-Public Class Edge_BinarizedReduction : Inherits VB_Algorithm
-    Dim edges As New Edge_BinarizedSobel
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        desc = "Visualize the impact of reduction on Edge_BinarizeSobel"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        reduction.Run(src)
-        dst3 = reduction.dst2
-        edges.Run(dst3)
-        dst2 = edges.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Edge_Consistent : Inherits VB_Algorithm
-    Dim edges As New Edge_BinarizedSobel
-    Public Sub New()
-        findSlider("Sobel kernel Size").Value = 5
-        desc = "Edges that are consistent for x number of frames"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static saveFrames As New List(Of cv.Mat)
-        If task.optionsChanged Then saveFrames = New List(Of cv.Mat)
-
-        edges.Run(src)
-
-        Dim tmp = If(edges.dst2.Channels = 1, edges.dst2.Clone, edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        saveFrames.Add(tmp)
-        If saveFrames.Count > task.frameHistoryCount Then saveFrames.RemoveAt(0)
-
-        dst2 = saveFrames(0)
-        For i = 1 To saveFrames.Count - 1
-            dst2 = saveFrames(i) And dst2
-        Next
-
-        dst3.SetTo(0)
-        src.CopyTo(dst3, Not edges.dst3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Edge_Stdev : Inherits VB_Algorithm
-    Dim stdev As New Math_Stdev
-    Dim edges As New Edge_BinarizedSobel
-    Public Sub New()
-        findSlider("Sobel kernel Size").Value = 14
-
-        labels(2) = "Edges in High Stdev areas"
-        labels(3) = "Mask of low stdev areas"
-        desc = "Edges where stdev is above a threshold"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        stdev.Run(src)
-        edges.Run(src)
-        dst2 = edges.dst3
-        dst2.SetTo(0, stdev.lowStdevMask)
-        dst3 = stdev.lowStdevMask
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Edge_Combo : Inherits VB_Algorithm
-    Dim edges1 As New Edge_BinarizedCanny
-    Dim edges2 As New Edge_BinarizedSobel
-    Public Sub New()
-        labels(2) = "Sobel = red, Canny = yellow - they are identical"
-        desc = "Combine the results of binarized canny and sobel"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-
-        edges1.Run(src)
-        edges2.Run(src)
-
-        dst2 = task.color.Clone
-        dst2.SetTo(cv.Scalar.Red, edges2.dst3)
-        dst2.SetTo(cv.Scalar.Yellow, edges1.dst3)
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 
 Public Class Edge_SobelLRBinarized : Inherits VB_Algorithm
-    Dim edges As New Edge_BinarizedSobel
+    Dim edges As New Quartile_Sobel
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         labels = {"", "", "Horizontal Sobel - Left View", "Horizontal Sobel - Right View"}

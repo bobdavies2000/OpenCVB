@@ -10,13 +10,8 @@ Public Class LeftRight_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Options.RunVB()
 
-        If task.cameraName = "StereoLabs ZED 2/2i" Then
-            dst2 = task.leftview
-            dst3 = task.rightview
-        Else
-            dst2 = (task.leftview * cv.Scalar.All(Options.alpha) + Options.beta).ToMat
-            dst3 = (task.rightview * cv.Scalar.All(Options.alpha) + Options.beta).ToMat
-        End If
+        dst2 = (task.leftview * cv.Scalar.All(Options.alpha) + Options.beta).ToMat
+        dst3 = (task.rightview * cv.Scalar.All(Options.alpha) + Options.beta).ToMat
     End Sub
 End Class
 

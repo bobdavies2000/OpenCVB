@@ -44,6 +44,7 @@ Public Class OptionsGlobal
         LineType.SelectedIndex = 0
 
         RGBFilterList.Items.Add("Blur_Basics")
+        RGBFilterList.Items.Add("Brightness_Basics")
         RGBFilterList.Items.Add("Contrast_Basics")
         RGBFilterList.Items.Add("Dilate_Basics")
         RGBFilterList.Items.Add("Erode_Basics")
