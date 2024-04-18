@@ -21,16 +21,16 @@ End Class
 Public Class Brightness_HSV : Inherits VB_Algorithm
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Brightness Value", 0, 150, 100)
-        labels(2) = "RGB straight to HSV"
+        labels(3) = "HSV image"
         desc = "Implement the brightness effect for HSV images"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static brightnessSlider = findSlider("Brightness Value")
         Dim brightness As Single = brightnessSlider.Value / 100
 
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim hsv64 As New cv.Mat
-        dst2.ConvertTo(hsv64, cv.MatType.CV_64F)
+        dst3.ConvertTo(hsv64, cv.MatType.CV_64F)
         Dim split = hsv64.Split()
 
         split(1) *= brightness
@@ -40,8 +40,8 @@ Public Class Brightness_HSV : Inherits VB_Algorithm
         split(2) = split(2).Threshold(255, 255, cv.ThresholdTypes.Trunc)
 
         cv.Cv2.Merge(split, hsv64)
-        hsv64.ConvertTo(dst3, cv.MatType.CV_8UC3)
-        dst3 = dst3.CvtColor(cv.ColorConversionCodes.HSV2BGR)
-        labels(3) = "Brightness level = " + CStr(brightnessSlider.Value)
+        hsv64.ConvertTo(dst2, cv.MatType.CV_8UC3)
+        dst2 = dst2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
+        labels(2) = "Brightness level = " + CStr(brightnessSlider.Value)
     End Sub
 End Class
