@@ -5,7 +5,7 @@ Public Class Boundary_Basics : Inherits VB_Algorithm
     Public masks As New List(Of cv.Mat)
     Public contours As New List(Of List(Of cv.Point))
     Public Sub New()
-        redOptions.ColorSource.SelectedItem() = "Binarize_Split4"
+        redOptions.ColorSource.SelectedItem() = "Quartile_Regions"
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Create a mask of the RedCloud cell boundaries"
     End Sub

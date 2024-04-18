@@ -95,6 +95,7 @@ Public Class OpenCVB
     Dim arrowIndex As Integer
 
     Public intermediateReview As String
+    Dim activateBlocked As Boolean
     Dim activateTaskRequest As Boolean
     Dim activateTreeView As Boolean
     Dim pixelViewerRect As cv.Rect
@@ -936,7 +937,7 @@ Public Class OpenCVB
         Static lastAlgorithmFrame As Integer
         Static lastCameraFrame As Integer
 
-        If TreeButton.Checked And activateTreeView Then
+        If TreeButton.Checked And activateTreeView And activateBlocked = False Then
             TreeViewDialog.Activate()
             Me.Activate()
             activateTreeView = False
@@ -971,7 +972,7 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
-        If activateTreeView = False Then
+        If activateTreeView = False And activateblocked = False Then
             activateTaskRequest = True
             activateTreeView = True
         End If
@@ -1268,6 +1269,18 @@ Public Class OpenCVB
             TestAllTimer.Enabled = False
             TestAllButton.Text = "Test All"
         End If
+    End Sub
+    Private Sub AvailableAlgorithms_DropDown(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDown
+        activateBlocked = True
+    End Sub
+    Private Sub AvailableAlgorithms_DropDownClosed(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDownClosed
+        activateBlocked = False
+    End Sub
+    Private Sub GroupName_DropDown(sender As Object, e As EventArgs) Handles GroupName.DropDown
+        activateBlocked = True
+    End Sub
+    Private Sub GroupName_DropDownClosed(sender As Object, e As EventArgs) Handles GroupName.DropDownClosed
+        activateBlocked = False
     End Sub
     Private Sub setWorkingRes()
         Select Case settings.workingResIndex

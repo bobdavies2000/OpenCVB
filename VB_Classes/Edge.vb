@@ -253,46 +253,6 @@ End Class
 
 
 
-Public Class Edge_BinarizedCanny : Inherits VB_Algorithm
-    Dim edges As New Edge_Canny
-    Dim binary As New Binarize_Four
-    Dim mats As New Mat_4Click
-    Public Sub New()
-        labels(2) = "Edges between halves, lightest, darkest, and the combo"
-        desc = "Collect edges from binarized images"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-
-        binary.Run(src)
-
-        edges.Run(binary.mats.mat(0))  ' the light and dark halves
-        mats.mat(0) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        mats.mat(3) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-        edges.Run(binary.mats.mat(1))  ' the lightest of the light half
-        mats.mat(1) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        mats.mat(3) = mats.mat(1) Or mats.mat(3)
-
-        edges.Run(binary.mats.mat(3))  ' the darkest of the dark half
-        mats.mat(2) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        mats.mat(3) = mats.mat(2) Or mats.mat(3)
-        mats.Run(empty)
-        dst2 = mats.dst2
-        If mats.dst3.Channels = 3 Then
-            labels(3) = "Combo of first 3 below.  Click quadrants in dst2."
-            dst3 = mats.mat(3)
-        Else
-            dst3 = mats.dst3
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class Edge_BinarizedBrightness : Inherits VB_Algorithm
     Dim edges As New Edge_All
@@ -450,46 +410,6 @@ Public Class Edge_SobelLRBinarized : Inherits VB_Algorithm
         End If
     End Sub
 End Class
-
-
-
-
-
-
-
-
-Public Class Edge_BinarizedSobel : Inherits VB_Algorithm
-    Dim edges As New Edge_Sobel_Old
-    Dim binary As New Binarize_Four
-    Public mats As New Mat_4Click
-    Public Sub New()
-        findSlider("Sobel kernel Size").Value = 5
-        labels(2) = "Edges between halves, lightest, darkest, and the combo"
-        labels(3) = "Click any quadrant in dst3 to enlarge it in dst2"
-        desc = "Collect Sobel edges from binarized images"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        binary.Run(src)
-
-        edges.Run(binary.mats.mat(0)) ' the light and dark halves
-        mats.mat(0) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        mats.mat(3) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-        edges.Run(binary.mats.mat(1)) ' the lightest of the light half
-        mats.mat(1) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        mats.mat(3) = mats.mat(1) Or mats.mat(3)
-
-        edges.Run(binary.mats.mat(3))  ' the darkest of the dark half
-        mats.mat(2) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        mats.mat(3) = mats.mat(2) Or mats.mat(3)
-
-        mats.Run(empty)
-        dst2 = mats.dst2
-        dst3 = mats.dst3
-    End Sub
-End Class
-
-
 
 
 

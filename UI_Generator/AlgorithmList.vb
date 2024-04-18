@@ -12,8 +12,8 @@ _CPP_Histogram_RedOptions
 _CPP_Palette_Random
 _CPP_Blur_Basics
 _CPP_Color_Basics
-_CPP_Binarize_Split4Combine
-_CPP_Binarize_Split4
+_CPP_Quartile_RegionsCombine
+_CPP_Quartile_Regions
 _CPP_Mat_4Click
 _CPP_Area_MinRect
 _CPP_Mesh_Features
@@ -162,7 +162,6 @@ if algorithmName = "Binarize_Basics" Then return new Binarize_Basics
 if algorithmName = "Binarize_Bernson" Then return new Binarize_Bernson
 if algorithmName = "Binarize_Bernson_MT" Then return new Binarize_Bernson_MT
 if algorithmName = "Binarize_DepthTiers" Then return new Binarize_DepthTiers
-if algorithmName = "Binarize_Four" Then return new Binarize_Four
 if algorithmName = "Binarize_FourPixelFlips" Then return new Binarize_FourPixelFlips
 if algorithmName = "Binarize_KMeansMasks" Then return new Binarize_KMeansMasks
 if algorithmName = "Binarize_KMeansRGB" Then return new Binarize_KMeansRGB
@@ -170,8 +169,6 @@ if algorithmName = "Binarize_Niblack_Nick" Then return new Binarize_Niblack_Nick
 if algorithmName = "Binarize_Niblack_Sauvola" Then return new Binarize_Niblack_Sauvola
 if algorithmName = "Binarize_OTSU" Then return new Binarize_OTSU
 if algorithmName = "Binarize_Simple" Then return new Binarize_Simple
-if algorithmName = "Binarize_Split4" Then return new Binarize_Split4
-if algorithmName = "Binarize_Split4LeftRight" Then return new Binarize_Split4LeftRight
 if algorithmName = "Bitmap_ToMat" Then return new Bitmap_ToMat
 if algorithmName = "Blob_Basics" Then return new Blob_Basics
 if algorithmName = "Blob_Input" Then return new Blob_Input
@@ -256,8 +253,6 @@ if algorithmName = "Complexity_PlotOpenCV" Then return new Complexity_PlotOpenCV
 if algorithmName = "Concat_4way" Then return new Concat_4way
 if algorithmName = "Concat_Basics" Then return new Concat_Basics
 if algorithmName = "Contour_Basics" Then return new Contour_Basics
-if algorithmName = "Contour_BinaryImage" Then return new Contour_BinaryImage
-if algorithmName = "Contour_BinaryImage1" Then return new Contour_BinaryImage1
 if algorithmName = "Contour_Compare" Then return new Contour_Compare
 if algorithmName = "Contour_CompareToFeatureless" Then return new Contour_CompareToFeatureless
 if algorithmName = "Contour_DepthTiers" Then return new Contour_DepthTiers
@@ -311,8 +306,6 @@ if algorithmName = "CPP_BackProject_Basics" Then return new CPP_Basics(functionN
 if algorithmName = "CPP_Bezier_Basics" Then return new CPP_Basics(functionNames._CPP_Bezier_Basics)
 if algorithmName = "CPP_BGSubtract_Basics" Then return new CPP_Basics(functionNames._CPP_BGSubtract_Basics)
 if algorithmName = "CPP_Binarize_Simple" Then return new CPP_Basics(functionNames._CPP_Binarize_Simple)
-if algorithmName = "CPP_Binarize_Split4" Then return new CPP_Basics(functionNames._CPP_Binarize_Split4)
-if algorithmName = "CPP_Binarize_Split4Combine" Then return new CPP_Basics(functionNames._CPP_Binarize_Split4Combine)
 if algorithmName = "CPP_Blur_Basics" Then return new CPP_Basics(functionNames._CPP_Blur_Basics)
 if algorithmName = "CPP_Color_Basics" Then return new CPP_Basics(functionNames._CPP_Color_Basics)
 if algorithmName = "CPP_Contour_Largest" Then return new CPP_Basics(functionNames._CPP_Contour_Largest)
@@ -362,6 +355,8 @@ if algorithmName = "CPP_Palette_Basics" Then return new CPP_Basics(functionNames
 if algorithmName = "CPP_Palette_Random" Then return new CPP_Basics(functionNames._CPP_Palette_Random)
 if algorithmName = "CPP_Plot_Histogram" Then return new CPP_Basics(functionNames._CPP_Plot_Histogram)
 if algorithmName = "CPP_Plot_Histogram2D" Then return new CPP_Basics(functionNames._CPP_Plot_Histogram2D)
+if algorithmName = "CPP_Quartile_Regions" Then return new CPP_Basics(functionNames._CPP_Quartile_Regions)
+if algorithmName = "CPP_Quartile_RegionsCombine" Then return new CPP_Basics(functionNames._CPP_Quartile_RegionsCombine)
 if algorithmName = "CPP_Random_Basics" Then return new CPP_Basics(functionNames._CPP_Random_Basics)
 if algorithmName = "CPP_Random_Enumerable" Then return new CPP_Basics(functionNames._CPP_Random_Enumerable)
 if algorithmName = "CPP_Rectangle_Basics" Then return new CPP_Basics(functionNames._CPP_Rectangle_Basics)
@@ -1554,6 +1549,12 @@ if algorithmName = "Python_MemMap" Then return new Python_MemMap
 if algorithmName = "Python_Run" Then return new Python_Run
 if algorithmName = "Python_Stream" Then return new Python_Stream
 if algorithmName = "QRcode_Basics" Then return new QRcode_Basics
+if algorithmName = "Quartile_Basics" Then return new Quartile_Basics
+if algorithmName = "Quartile_Basics1" Then return new Quartile_Basics1
+if algorithmName = "Quartile_Input" Then return new Quartile_Input
+if algorithmName = "Quartile_Regions" Then return new Quartile_Regions
+if algorithmName = "Quartile_RegionsLeftRight" Then return new Quartile_RegionsLeftRight
+if algorithmName = "Quartile_SplitMean" Then return new Quartile_SplitMean
 if algorithmName = "Quaterion_Basics" Then return new Quaterion_Basics
 if algorithmName = "Quaterion_IMUPrediction" Then return new Quaterion_IMUPrediction
 if algorithmName = "Random_Basics" Then return new Random_Basics

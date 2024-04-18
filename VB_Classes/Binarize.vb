@@ -253,7 +253,7 @@ End Class
 
 
 Public Class Binarize_FourPixelFlips : Inherits VB_Algorithm
-    Dim binar4 As New Binarize_Split4
+    Dim binar4 As New Quartile_Regions
     Public Sub New()
         desc = "Identify the marginal regions that flip between subdivisions based on brightness."
     End Sub
@@ -275,11 +275,11 @@ End Class
 
 Public Class Binarize_DepthTiers : Inherits VB_Algorithm
     Dim tiers As New Depth_TiersZ
-    Dim binar4 As New Binarize_Split4
+    Dim binar4 As New Quartile_Regions
     Public classCount = 200 ' 4-way split with 50 depth levels at 10 cm's each.
     Public Sub New()
         redOptions.UseColorOnly.Checked = True
-        desc = "Add the Depth_TiersZ and binarize_Split4 output in preparation for RedCloud"
+        desc = "Add the Depth_TiersZ and Quartile_Regions output in preparation for RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binar4.Run(src)
@@ -304,33 +304,8 @@ End Class
 
 
 
-Public Class Binarize_Split4 : Inherits VB_Algorithm
-    Dim binary As New Binarize_Four
-    Public classCount = 4 ' 4-way split 
-    Public Sub New()
-        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Add the 4-way split of images to define the different regions."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        binary.Run(src)
-
-        dst2.SetTo(1, binary.mats.mat(0))
-        dst2.SetTo(2, binary.mats.mat(1))
-        dst2.SetTo(3, binary.mats.mat(2))
-        dst2.SetTo(4, binary.mats.mat(3))
-
-        dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Binarize_Split4LeftRight : Inherits VB_Algorithm
-    Dim binary As New Binarize_Four
+Public Class Quartile_RegionsLeftRight : Inherits VB_Algorithm
+    Dim binary As New Quartile_SplitMean
     Public classCount = 4 ' 4-way split
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -364,32 +339,37 @@ End Class
 
 
 
-Public Class Binarize_Four : Inherits VB_Algorithm
-    Dim binary As New Binarize_Simple
-    Public mats As New Mat_4Click
+
+Public Class Edge_BinarizedCanny : Inherits VB_Algorithm
+    Dim edges As New Edge_Canny
+    Dim binary As New Quartile_SplitMean
+    Dim mats As New Mat_4Click
     Public Sub New()
-        labels(2) = "A 4-way split - lightest (upper left) to darkest (lower right)"
-        desc = "Binarize an image twice using masks"
+        labels(2) = "Edges between halves, lightest, darkest, and the combo"
+        desc = "Collect edges from binarized images"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
-        binary.Run(gray)
-        Dim mask = binary.dst2.Clone
+        binary.Run(src)
 
-        Dim midColor = binary.meanScalar(0)
-        Dim topColor = cv.Cv2.Mean(gray, mask)(0)
-        Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
-        mats.mat(0) = gray.InRange(topColor, 255)
-        mats.mat(1) = gray.InRange(midColor, topColor)
-        mats.mat(2) = gray.InRange(botColor, midColor)
-        mats.mat(3) = gray.InRange(0, botColor)
+        edges.Run(binary.mats.mat(0))  ' the light and dark halves
+        mats.mat(0) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        mats.mat(3) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        If standaloneTest() Then
-            mats.Run(empty)
-            dst2 = mats.dst2
+        edges.Run(binary.mats.mat(1))  ' the lightest of the light half
+        mats.mat(1) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        mats.mat(3) = mats.mat(1) Or mats.mat(3)
+
+        edges.Run(binary.mats.mat(3))  ' the darkest of the dark half
+        mats.mat(2) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        mats.mat(3) = mats.mat(2) Or mats.mat(3)
+        mats.Run(empty)
+        dst2 = mats.dst2
+        If mats.dst3.Channels = 3 Then
+            labels(3) = "Combo of first 3 below.  Click quadrants in dst2."
+            dst3 = mats.mat(3)
+        Else
             dst3 = mats.dst3
-            labels(3) = mats.labels(3)
         End If
     End Sub
 End Class

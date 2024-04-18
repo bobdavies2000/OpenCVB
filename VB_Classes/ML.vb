@@ -397,7 +397,7 @@ Public Class ML_Color2Depth : Inherits VB_Algorithm
     Dim minMax As New Grid_MinMaxDepth
     Dim colorClass As New Color_Basics
     Public Sub New()
-        redOptions.ColorSource.SelectedItem() = "Binarize_Split4"
+        redOptions.ColorSource.SelectedItem() = "Quartile_Regions"
         desc = "Prepare a grid of color and depth data."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -464,7 +464,7 @@ Public Class ML_ColorInTier2Depth : Inherits VB_Algorithm
     Dim colorClass As New Color_Basics
     Dim tiers As New Contour_DepthTiers
     Public Sub New()
-        redOptions.ColorSource.SelectedItem() = "Binarize_Split4"
+        redOptions.ColorSource.SelectedItem() = "Quartile_Regions"
         desc = "Prepare a grid of color and depth data."
     End Sub
     Public Sub RunVB(src As cv.Mat)

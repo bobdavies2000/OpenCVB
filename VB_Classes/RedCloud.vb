@@ -1253,7 +1253,7 @@ End Class
 
 
 Public Class RedCloud_FourColor : Inherits VB_Algorithm
-    Dim binar4 As New Binarize_Split4
+    Dim binar4 As New Quartile_Regions
     Dim redC As New RedCloud_Basics
     Public Sub New()
         redOptions.UseColorOnly.Checked = True
@@ -1916,7 +1916,7 @@ End Class
 Public Class RedCloud_Tiers : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Dim tiers As New Depth_TiersZ
-    Dim binar4 As New Binarize_Split4
+    Dim binar4 As New Quartile_Regions
     Public Sub New()
         redOptions.UseColorOnly.Checked = True
         desc = "Use the Depth_TiersZ algorithm to create a color-based RedCloud"
@@ -1941,10 +1941,10 @@ End Class
 Public Class RedCloud_TiersBinarize : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Dim tiers As New Depth_TiersZ
-    Dim binar4 As New Binarize_Split4
+    Dim binar4 As New Quartile_Regions
     Public Sub New()
         redOptions.UseColorOnly.Checked = True
-        desc = "Use the Depth_TiersZ with binarize_Split4 algorithm to create a color-based RedCloud"
+        desc = "Use the Depth_TiersZ with Quartile_Regions algorithm to create a color-based RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binar4.Run(src)
@@ -2340,7 +2340,7 @@ End Class
 
 Public Class RedCloud_PlusTiers : Inherits VB_Algorithm
     Dim tiers As New Depth_TiersZ
-    Dim binar4 As New Binarize_Split4
+    Dim binar4 As New Quartile_Regions
     Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Add the depth tiers to the input for RedCloud_Basics."

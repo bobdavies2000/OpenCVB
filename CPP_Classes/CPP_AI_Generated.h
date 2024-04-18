@@ -2865,12 +2865,12 @@ public:
 
 
 
-class CPP_Binarize_Split4 : public algorithmCPP {
+class CPP_Quartile_Regions : public algorithmCPP {
 public:
     CPP_Binarize_Simple* binarize;
     CPP_Mat_4Click* mats;
-    CPP_Binarize_Split4() : algorithmCPP() {
-        traceName = "CPP_Binarize_Split4";
+    CPP_Quartile_Regions() : algorithmCPP() {
+        traceName = "CPP_Quartile_Regions";
         binarize = new CPP_Binarize_Simple();
         mats = new CPP_Mat_4Click();
         labels[2] = "A 4-way split - lightest (upper left) to darkest (lower right)";
@@ -2906,13 +2906,13 @@ public:
 
 
 
-class CPP_Binarize_Split4Combine : public algorithmCPP {
+class CPP_Quartile_RegionsCombine : public algorithmCPP {
 public:
-    CPP_Binarize_Split4* binarize;
+    CPP_Quartile_Regions* binarize;
     int classCount = 4;
-    CPP_Binarize_Split4Combine() : algorithmCPP() {
-        binarize = new CPP_Binarize_Split4();
-        traceName = "CPP_Binarize_Split4Combine";
+    CPP_Quartile_RegionsCombine() : algorithmCPP() {
+        binarize = new CPP_Quartile_Regions();
+        traceName = "CPP_Quartile_RegionsCombine";
         dst1 = Mat::zeros(dst3.size(), CV_8U);
         desc = "Add the 4-way split of images to define the different regions.";
     }
@@ -2944,10 +2944,10 @@ public:
     //Reduction_Basics* reduction;
     //Hist3Dcolor_Basics* hColor;
     String colorInput; 
-    CPP_Binarize_Split4Combine* binarize;
+    CPP_Quartile_RegionsCombine* binarize;
     CPP_Color_Basics() : algorithmCPP() {
         traceName = "CPP_Color_Basics";
-        binarize = new CPP_Binarize_Split4Combine();
+        binarize = new CPP_Quartile_RegionsCombine();
         desc = "Classify pixels by color using a variety of techniques";
     }
     void Run(Mat src) {

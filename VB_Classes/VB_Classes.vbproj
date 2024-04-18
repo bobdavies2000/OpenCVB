@@ -132,6 +132,7 @@
     <Compile Include="OEX.vb" />
     <Compile Include="PointPolygonTest.vb" />
     <Compile Include="PongWars.vb" />
+    <Compile Include="Quartile.vb" />
     <Compile Include="Sift.vb" />
     <Compile Include="StdevGrid.vb" />
     <Compile Include="Surf.vb" />
