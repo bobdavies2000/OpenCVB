@@ -993,13 +993,15 @@ Public Class Contour_BinaryImage : Inherits VB_Algorithm
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         labels(1) = "Contour counts for each roi in gridList.  Click on any roi to display all 4 quartiles"
+        labels(3) = "Quartiles for the selected grid element - brightest, less bright, less dark, darkest"
         desc = "Highlight the contours for each grid element."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static index = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         If task.mousePicTag = 1 Then index = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-        Dim roiSave = task.gridList(index)
+        Dim roiSave = If(index < task.gridList.Count, task.gridList(index), New cv.Rect)
 
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         binary.Run(src)
         binary.mats.Run(empty)
         dst2 = binary.mats.dst2
@@ -1007,13 +1009,19 @@ Public Class Contour_BinaryImage : Inherits VB_Algorithm
 
         Dim counts(3, task.gridList.Count) As Integer
         Dim contourCounts As New List(Of List(Of Integer))
+        Dim means As New List(Of List(Of Single))
         For i = 0 To counts.GetUpperBound(0)
             For j = 0 To task.gridList.Count - 1
                 Dim roi = task.gridList(j)
                 Dim allContours As cv.Point()()
-                cv.Cv2.FindContours(binary.mats.mat(i)(roi), allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
-                If i = 0 Then contourCounts.Add(New List(Of Integer))
+                Dim tmp = binary.mats.mat(i)(roi)
+                cv.Cv2.FindContours(tmp, allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
+                If i = 0 Then
+                    contourCounts.Add(New List(Of Integer))
+                    means.Add(New List(Of Single))
+                End If
                 contourCounts(j).Add(allContours.Count)
+                means(j).Add(src(roi).Mean(tmp).Item(0))
                 If i = binary.mats.quadrant Then setTrueText(CStr(allContours.Count), roi.TopLeft, 1)
                 counts(i, j) = allContours.Count
             Next
@@ -1027,7 +1035,8 @@ Public Class Contour_BinaryImage : Inherits VB_Algorithm
                 points(i) = Choose(i + 1, New cv.Point(bump, bump), New cv.Point(bump + dst2.Width / 2, bump),
                                           New cv.Point(bump, bump + dst2.Height / 2),
                                           New cv.Point(bump + dst2.Width / 2, bump + dst2.Height / 2))
-                labelStr(i) = (CStr(mats.mat(i).CountNonZero) + " pixels" + vbCrLf + CStr(contourCounts(index)(i)) + " contours")
+                labelStr(i) = (CStr(mats.mat(i).CountNonZero) + " pixels" + vbCrLf + CStr(contourCounts(index)(i)) + " contours" + vbCrLf +
+                               Format(means(index)(i), fmt0) + " mean")
             End If
         Next
 

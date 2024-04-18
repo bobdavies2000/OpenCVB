@@ -39,6 +39,25 @@ End Class
 
 
 
+Public Class Histogram_Grayscale : Inherits VB_Algorithm
+    Public hist As New Histogram_Basics
+    Public Sub New()
+        If standaloneTest() Then gOptions.HistBinSlider.Value = 255
+        desc = "Create a histogram of the grayscale image"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hist.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst2 = hist.dst2
+        dst3 = hist.dst3
+        labels = hist.labels
+    End Sub
+End Class
+
+
+
+
+
+
 
 ' https://github.com/opencv/opencv/blob/master/samples/python/hist.py
 Public Class Histogram_Graph : Inherits VB_Algorithm
@@ -1303,25 +1322,5 @@ Public Class Histogram_PointCloud : Inherits VB_Algorithm
         Dim sizesY() As Integer = {ybins, zbins}
         cv.Cv2.CalcHist({src}, {1, 2}, New cv.Mat(), dst3, 2, sizesY, rangesY)
         dst3.Set(Of cv.Point3f)(dst3.Height / 2, 0, New cv.Point3f)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Histogram_Gray : Inherits VB_Algorithm
-    Public histogram As New cv.Mat
-    Public plot As New Plot_Histogram
-    Public Sub New()
-        gOptions.HistBinSlider.Value = 255
-        plot.createHistogram = True
-        desc = "Create a histogram of the grayscale image"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        plot.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst2 = plot.dst2
     End Sub
 End Class
