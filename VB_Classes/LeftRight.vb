@@ -141,7 +141,7 @@ End Class
 
 
 Public Class LeftRight_Reduction : Inherits VB_Algorithm
-    Dim reduction As New Reduction_Basics
+    Public reduction As New Reduction_Basics
     Public Sub New()
         labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
         desc = "Reduce both the left and right color images"
@@ -160,9 +160,6 @@ End Class
 
 
 
-
-
-
 Public Class LeftRight_Markers : Inherits VB_Algorithm
     Dim redView As New LeftRight_Reduction
     Public Sub New()
@@ -175,17 +172,20 @@ Public Class LeftRight_Markers : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redView.Run(src)
-        dst2 = redView.dst2
-        dst3 = redView.dst3
+        dst2 = redView.reduction.dst3.Clone
+        dst3 = redView.reduction.dst3.Clone
+
+        Dim left = redView.dst2
+        Dim right = redView.dst3
 
         ' find combinations in the left image - they are markers.
         Dim impList As New List(Of List(Of Integer))
         Dim lineLen = gOptions.DebugSlider.Value
-        For y = 0 To dst2.Height - 1
+        For y = 0 To left.Height - 1
             Dim important As New List(Of Integer)
             Dim impCounts As New List(Of Integer)
-            For x = 0 To dst2.Width - 1
-                Dim m1 = dst2.Get(Of Byte)(y, x)
+            For x = 0 To left.Width - 1
+                Dim m1 = left.Get(Of Byte)(y, x)
                 If important.Contains(m1) = False Then
                     important.Add(m1)
                     impCounts.Add(1)
@@ -200,16 +200,72 @@ Public Class LeftRight_Markers : Inherits VB_Algorithm
         dst0.SetTo(0)
         dst1.SetTo(0)
 
+        For i = 0 To left.Rows - 1
+            Dim important = impList(i * 2)
+            Dim impcounts = impList(i * 2 + 1)
+            Dim maxVal = important(impcounts.IndexOf(impcounts.Max))
+
+            Dim tmp = left.Row(i).InRange(maxVal, maxVal)
+            dst0.Row(i).SetTo(255, tmp)
+
+            tmp = right.Row(i).InRange(maxVal, maxVal)
+            dst1.Row(i).SetTo(255, tmp)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class LeftRight_Markers1 : Inherits VB_Algorithm
+    Dim redView As New LeftRight_Reduction
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
+        desc = "Use the left/right reductions to find markers - neighboring pixels of identical values"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redView.Run(src)
+        dst0 = redView.dst2
+        dst1 = redView.dst3
+
+        ' find combinations in the left image - they are markers.
+        Dim impList As New List(Of List(Of Integer))
+        Dim lineLen = gOptions.DebugSlider.Value
+        For y = 0 To dst2.Height - 1
+            Dim important As New List(Of Integer)
+            Dim impCounts As New List(Of Integer)
+            For x = 0 To dst0.Width - 1
+                Dim m1 = dst0.Get(Of Byte)(y, x)
+                If important.Contains(m1) = False Then
+                    important.Add(m1)
+                    impCounts.Add(1)
+                Else
+                    impCounts(important.IndexOf(m1)) += 1
+                End If
+            Next
+            impList.Add(important)
+            impList.Add(impCounts)
+        Next
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+
         For i = 0 To dst2.Rows - 1
             Dim important = impList(i * 2)
             Dim impcounts = impList(i * 2 + 1)
             Dim maxVal = important(impcounts.IndexOf(impcounts.Max))
 
-            Dim tmp = dst2.Row(i).InRange(maxVal, maxVal)
-            dst0.Row(i).SetTo(255, tmp)
+            Dim tmp = dst0.Row(i).InRange(maxVal, maxVal)
+            dst2.Row(i).SetTo(255, tmp)
 
-            tmp = dst3.Row(i).InRange(maxVal, maxVal)
-            dst1.Row(i).SetTo(255, tmp)
+            tmp = dst1.Row(i).InRange(maxVal, maxVal)
+            dst3.Row(i).SetTo(255, tmp)
         Next
     End Sub
 End Class

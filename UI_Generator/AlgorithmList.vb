@@ -970,6 +970,7 @@ if algorithmName = "LeftRight_Edges" Then return new LeftRight_Edges
 if algorithmName = "LeftRight_GoodFeatures" Then return new LeftRight_GoodFeatures
 if algorithmName = "LeftRight_Lines" Then return new LeftRight_Lines
 if algorithmName = "LeftRight_Markers" Then return new LeftRight_Markers
+if algorithmName = "LeftRight_Markers1" Then return new LeftRight_Markers1
 if algorithmName = "LeftRight_Palettized" Then return new LeftRight_Palettized
 if algorithmName = "LeftRight_RedCloudBoth" Then return new LeftRight_RedCloudBoth
 if algorithmName = "LeftRight_RedCloudLeft" Then return new LeftRight_RedCloudLeft
