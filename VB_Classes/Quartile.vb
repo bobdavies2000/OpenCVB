@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Windows.Input
+Imports cv = OpenCvSharp
 Public Class Quartile_Basics : Inherits VB_Algorithm
     Dim binary As New Quartile_SplitMean
     Dim mats As New Mat_4to1
@@ -6,12 +7,14 @@ Public Class Quartile_Basics : Inherits VB_Algorithm
         If standalone Then gOptions.displayDst1.Checked = True
         labels(1) = "Contour counts for each roi in gridList.  Click on any roi to display all 4 quartiles"
         labels(3) = "Quartiles for the selected grid element - brightest, less bright, less dark, darkest"
-        desc = "Highlight the contours for each grid element."
+        desc = "Highlight the contours for each grid element with stats for each."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static index = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         If task.mousePicTag = 1 Then index = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         Dim roiSave = If(index < task.gridList.Count, task.gridList(index), New cv.Rect)
+
+        If task.optionsChanged Then index = 0
 
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         binary.Run(src)
@@ -22,6 +25,9 @@ Public Class Quartile_Basics : Inherits VB_Algorithm
         Dim counts(3, task.gridList.Count) As Integer
         Dim contourCounts As New List(Of List(Of Integer))
         Dim means As New List(Of List(Of Single))
+        For i = 0 To mats.mat.Count - 1
+            mats.mat(i) = New cv.Mat(mats.mat(i).Size, cv.MatType.CV_8U, 0)
+        Next
         For i = 0 To counts.GetUpperBound(0)
             For j = 0 To task.gridList.Count - 1
                 Dim roi = task.gridList(j)
@@ -41,13 +47,18 @@ Public Class Quartile_Basics : Inherits VB_Algorithm
 
         Static labelStr(3) As String, points(3) As cv.Point
         Dim bump = 3
+        Dim ratio = dst2.Height / task.gridList(0).Height
         For i = 0 To mats.mat.Count - 1
-            mats.mat(i) = binary.mats.mat(i)(roiSave) * 0.5
+            Dim tmp = binary.mats.mat(i)(roiSave)
+            Dim nextCount = tmp.CountNonZero
+            Dim r = New cv.Rect(0, 0, tmp.Width * ratio, tmp.Height * ratio)
+            mats.mat(i)(r) = tmp.Resize(New cv.Size(r.Width, r.Height))
             If task.heartBeat Then
-                points(i) = Choose(i + 1, New cv.Point(bump, bump), New cv.Point(bump + dst2.Width / 2, bump),
-                                          New cv.Point(bump, bump + dst2.Height / 2),
-                                          New cv.Point(bump + dst2.Width / 2, bump + dst2.Height / 2))
-                labelStr(i) = (CStr(mats.mat(i).CountNonZero) + " pixels" + vbCrLf + CStr(contourCounts(index)(i)) + " contours" + vbCrLf +
+                Dim plus = mats.mat(i)(r).Width / 2
+                points(i) = Choose(i + 1, New cv.Point(bump + plus, bump), New cv.Point(bump + dst2.Width / 2 + plus, bump),
+                                          New cv.Point(bump + plus, bump + dst2.Height / 2),
+                                          New cv.Point(bump + dst2.Width / 2 + plus, bump + dst2.Height / 2))
+                labelStr(i) = (CStr(nextCount) + " pixels" + vbCrLf + CStr(contourCounts(index)(i)) + " contours" + vbCrLf +
                                Format(means(index)(i), fmt0) + " mean")
             End If
         Next
@@ -64,79 +75,6 @@ Public Class Quartile_Basics : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-Public Class Quartile_Basics1 : Inherits VB_Algorithm
-    Dim binary As New Quartile_SplitMean
-    Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        labels(1) = "Contour counts for each roi in gridList.  Click on any roi to display all 4 quartiles"
-        desc = "Highlight the contours for each grid element."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim index = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-        Dim roiSave = task.gridList(index)
-
-        binary.Run(src)
-        binary.mats.Run(empty)
-        dst2 = binary.mats.dst2
-        dst3 = binary.mats.dst3
-        labels(3) = CStr(dst3.CountNonZero) + " pixels in this quartile"
-        dst1 = dst3 * 0.5
-
-        Dim counts(3, task.gridList.Count) As Integer
-        For i = 0 To counts.GetUpperBound(0)
-            For j = 0 To task.gridList.Count - 1
-                Dim roi = task.gridList(j)
-                Dim allContours As cv.Point()()
-                cv.Cv2.FindContours(dst3(roi), allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
-                setTrueText(CStr(allContours.Count), roi.TopLeft, 1)
-                counts(i, j) = allContours.Count
-            Next
-        Next
-
-        dst1.Rectangle(roiSave, cv.Scalar.White, task.lineWidth)
-        task.color.Rectangle(roiSave, cv.Scalar.White, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Quartile_SplitMean : Inherits VB_Algorithm
-    Dim binary As New Binarize_Simple
-    Public mats As New Mat_4Click
-    Public Sub New()
-        labels(2) = "A 4-way split - lightest (upper left) to darkest (lower right)"
-        desc = "Binarize an image twice using masks"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-        binary.Run(gray)
-        Dim mask = binary.dst2.Clone
-
-        Dim midColor = binary.meanScalar(0)
-        Dim topColor = cv.Cv2.Mean(gray, mask)(0)
-        Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
-        mats.mat(0) = gray.InRange(topColor, 255)
-        mats.mat(1) = gray.InRange(midColor, topColor)
-        mats.mat(2) = gray.InRange(botColor, midColor)
-        mats.mat(3) = gray.InRange(0, botColor)
-
-        If standaloneTest() Then
-            mats.Run(empty)
-            dst2 = mats.dst2
-            dst3 = mats.dst3
-            labels(3) = mats.labels(3)
-        End If
-    End Sub
-End Class
 
 
 
@@ -328,5 +266,75 @@ Public Class Edge_Consistent : Inherits VB_Algorithm
 
         dst3.SetTo(0)
         src.CopyTo(dst3, Not edges.dst3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Quartile_SplitMean : Inherits VB_Algorithm
+    Dim binary As New Binarize_Simple
+    Public mats As New Mat_4Click
+    Public Sub New()
+        labels(2) = "A 4-way split - lightest (upper left) to darkest (lower right)"
+        desc = "Binarize an image twice using masks"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        binary.Run(gray)
+        Dim mask = binary.dst2.Clone
+
+        Dim midColor = binary.meanScalar(0)
+        Dim topColor = cv.Cv2.Mean(gray, mask)(0)
+        Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
+        mats.mat(0) = gray.InRange(topColor, 255)
+        mats.mat(1) = gray.InRange(midColor, topColor)
+        mats.mat(2) = gray.InRange(botColor, midColor)
+        mats.mat(3) = gray.InRange(0, botColor)
+
+        If standaloneTest() Then
+            mats.Run(empty)
+            dst2 = mats.dst2
+            dst3 = mats.dst3
+            labels(3) = mats.labels(3)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Quartile_SplitValley : Inherits VB_Algorithm
+    Dim binary As New Binarize_Simple
+    Public mats As New Mat_4Click
+    Public Sub New()
+        labels(2) = "A 4-way split - lightest (upper left) to darkest (lower right)"
+        desc = "Binarize an image twice using masks"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        binary.Run(gray)
+        Dim mask = binary.dst2.Clone
+
+        Dim midColor = binary.meanScalar(0)
+        Dim topColor = cv.Cv2.Mean(gray, mask)(0)
+        Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
+        mats.mat(0) = gray.InRange(topColor, 255)
+        mats.mat(1) = gray.InRange(midColor, topColor)
+        mats.mat(2) = gray.InRange(botColor, midColor)
+        mats.mat(3) = gray.InRange(0, botColor)
+
+        If standaloneTest() Then
+            mats.Run(empty)
+            dst2 = mats.dst2
+            dst3 = mats.dst3
+            labels(3) = mats.labels(3)
+        End If
     End Sub
 End Class

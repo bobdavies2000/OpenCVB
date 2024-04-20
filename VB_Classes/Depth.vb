@@ -1042,7 +1042,7 @@ End Class
 
 
 Public Class Depth_TierCount : Inherits VB_Algorithm
-    Public valley As New HistValley_DepthOld
+    Public valley As New HistValley_Depth1
     Public classCount As Integer
     Public Sub New()
         labels = {"", "Histogram of the depth data with instantaneous valley lines", "", ""}

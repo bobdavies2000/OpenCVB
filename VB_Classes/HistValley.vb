@@ -94,7 +94,7 @@ End Class
 
 
 
-Public Class HistValley_DepthOld : Inherits VB_Algorithm
+Public Class HistValley_Depth1 : Inherits VB_Algorithm
     Public valley As New HistValley_BasicsOptionAuto
     Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public Sub New()
@@ -277,42 +277,6 @@ End Class
 
 
 
-Public Class HistValley_Colors : Inherits VB_Algorithm
-    Dim hist As New Histogram_Kalman
-    Dim auto As New OpAuto_Valley
-    Public Sub New()
-        If standaloneTest() Then gOptions.HistBinSlider.Value = 256
-        If standaloneTest() Then findSlider("Desired boundary count").Value = 10
-        desc = "Find the histogram valleys for each of the colors."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static splitIndex As Integer
-        If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
-        src = src.ExtractChannel(splitIndex)
-        hist.hist.plot.backColor = Choose(splitIndex + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
-
-        hist.Run(src)
-        dst2 = hist.dst2
-
-        auto.Run(hist.hist.histogram)
-
-        For i = 0 To auto.valleyOrder.Count - 1
-            Dim entry = auto.valleyOrder.ElementAt(i)
-            Dim cClass = CSng(CInt(255 / (i + 1)))
-            Dim index = If(i Mod 2, cClass, 255 - cClass)
-            For j = entry.Key To entry.Value
-                hist.hist.histogram.Set(Of Single)(j, 0, index)
-            Next
-            Dim col = dst2.Width * entry.Value / task.histogramBins
-            dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White, task.lineWidth)
-        Next
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class HistValley_Simple : Inherits VB_Algorithm
@@ -466,5 +430,128 @@ Public Class HistValley_Tiers : Inherits VB_Algorithm
         dst2.SetTo(marks.Count, task.pcSplit(2).InRange(marks(marks.Count - 1), 100))
 
         dst3 = vbPalette(dst2 * 255 / (marks.Count + 1))
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class HistValley_Colors : Inherits VB_Algorithm
+    Dim hist As New Histogram_Kalman
+    Dim auto As New OpAuto_Valley
+    Public Sub New()
+        If standaloneTest() Then gOptions.HistBinSlider.Value = 256
+        If standaloneTest() Then findSlider("Desired boundary count").Value = 10
+        desc = "Find the histogram valleys for each of the colors."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static splitIndex As Integer
+        If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
+        src = src.ExtractChannel(splitIndex)
+        hist.hist.plot.backColor = Choose(splitIndex + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
+
+        hist.Run(src)
+        dst2 = hist.dst2
+
+        auto.Run(hist.hist.histogram)
+
+        For i = 0 To auto.valleyOrder.Count - 1
+            Dim entry = auto.valleyOrder.ElementAt(i)
+            Dim cClass = CSng(CInt(255 / (i + 1)))
+            Dim index = If(i Mod 2, cClass, 255 - cClass)
+            For j = entry.Key To entry.Value
+                hist.hist.histogram.Set(Of Single)(j, 0, index)
+            Next
+            Dim col = dst2.Width * entry.Value / task.histogramBins
+            dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White, task.lineWidth)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class HistValley_GrayKalman : Inherits VB_Algorithm
+    Dim hist As New Histogram_Kalman
+    Dim auto As New OpAuto_Valley
+    Dim kalman As New Kalman_Basics
+    Public Sub New()
+        If standaloneTest() Then gOptions.HistBinSlider.Value = 256
+        If standaloneTest() Then findSlider("Desired boundary count").Value = 4
+        desc = "Find the histogram valleys for a grayscale image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        hist.Run(src)
+        dst2 = hist.dst2
+
+        auto.Run(hist.hist.histogram)
+
+        ReDim kalman.kInput(auto.valleyOrder.Count - 1)
+        For i = 0 To auto.valleyOrder.Count - 1
+            kalman.kInput(i) = auto.valleyOrder.ElementAt(i).Value
+        Next
+        kalman.Run(src)
+
+        Dim lastEntry As Integer
+        For i = 0 To kalman.kOutput.Count - 1
+            Dim entry = auto.valleyOrder.ElementAt(i).Value
+            For j = lastEntry To entry
+                hist.hist.histogram.Set(Of Single)(j, 0, i)
+            Next
+            Dim col = dst2.Width * entry / task.histogramBins
+            dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White, task.lineWidth)
+            lastEntry = entry
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class HistValley_GrayScale : Inherits VB_Algorithm
+    Dim hist As New Histogram_Basics
+    Public Sub New()
+        If standaloneTest() Then gOptions.HistBinSlider.Value = 256
+        desc = "Find the histogram valleys for a grayscale image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        hist.Run(src)
+        dst2 = hist.dst2
+
+        Dim quartile As Integer = CInt(hist.histogram.Rows / 4)
+        Dim lowEntries As New List(Of List(Of Single))
+        For i = 0 To 4 - 1
+            lowEntries.Add(New List(Of Single))
+            For j = quartile * i To quartile * (i + 1) - 1
+                lowEntries(i).Add(hist.histogram.Get(Of Single)(j, 0))
+            Next
+        Next
+
+        Dim minEntries(3) As Integer
+        For i = 0 To lowEntries.Count - 1
+            Dim index = lowEntries(i).IndexOf(lowEntries(i).Min)
+        Next
+
+        'For i = 0 To minEntries.Count - 1
+
+        '    Dim entry = auto.valleyOrder.ElementAt(i).Value
+        '    For j = lastEntry To entry
+        '        hist.hist.histogram.Set(Of Single)(j, 0, i)
+        '    Next
+        '    Dim col = dst2.Width * entry / task.histogramBins
+        '    dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White, task.lineWidth)
+        '    lastEntry = entry
+        'Next
     End Sub
 End Class
