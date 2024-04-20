@@ -44,7 +44,7 @@ Public Class HistValley_Basics : Inherits VB_Algorithm
 
         If standaloneTest() Then
             updatePlot(dst2, task.histogramBins)
-            setTrueText("Input data used by default is the color image", 3)
+            setTrueText("Input data used by default is the depth data", 3)
         End If
         labels(2) = peak.labels(2) + " and " + CStr(valleyIndex.Count) + " valleys (marked at bottom)"
     End Sub
@@ -529,29 +529,41 @@ Public Class HistValley_GrayScale : Inherits VB_Algorithm
         hist.Run(src)
         dst2 = hist.dst2
 
-        Dim quartile As Integer = CInt(hist.histogram.Rows / 4)
-        Dim lowEntries As New List(Of List(Of Single))
-        For i = 0 To 4 - 1
-            lowEntries.Add(New List(Of Single))
+        Dim wquartile = dst2.Width / 4
+        For i = 0 To 2
+            Dim col = wquartile * (i + 1)
+            dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.Yellow, task.lineWidth + 2)
+        Next
+
+        Dim start As Integer
+        Dim lastentry As Integer
+        Dim minEntries(3) As Integer
+        For i = 0 To hist.histArray.Count - 1
+            If hist.histArray(i) <> 0 And hist.histArray(i) > 10 Then
+                lastentry = hist.histArray(i)
+                minEntries(0) = i
+                start = i
+                Exit For
+            End If
+        Next
+
+        For i = start To hist.histArray.Count - 1
+            If hist.histArray(i) = 0 Then hist.histArray(i) = lastEntry
+            lastEntry = hist.histArray(i)
+        Next
+
+        Dim quartile = Math.Floor(hist.histogram.Rows / 4)
+        For i = 0 To minEntries.Count - 1
+            minEntries(i) = quartile * i
             For j = quartile * i To quartile * (i + 1) - 1
-                lowEntries(i).Add(hist.histogram.Get(Of Single)(j, 0))
+                If hist.histArray(minEntries(i)) >= hist.histArray(j) Then minEntries(i) = j
             Next
         Next
 
-        Dim minEntries(3) As Integer
-        For i = 0 To lowEntries.Count - 1
-            Dim index = lowEntries(i).IndexOf(lowEntries(i).Min)
+        Dim wPlot = dst2.Width / task.histogramBins
+        For i = 0 To minEntries.Count - 1
+            Dim col = minEntries(i) * wPlot
+            dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White, task.lineWidth + 1)
         Next
-
-        'For i = 0 To minEntries.Count - 1
-
-        '    Dim entry = auto.valleyOrder.ElementAt(i).Value
-        '    For j = lastEntry To entry
-        '        hist.hist.histogram.Set(Of Single)(j, 0, i)
-        '    Next
-        '    Dim col = dst2.Width * entry / task.histogramBins
-        '    dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White, task.lineWidth)
-        '    lastEntry = entry
-        'Next
     End Sub
 End Class

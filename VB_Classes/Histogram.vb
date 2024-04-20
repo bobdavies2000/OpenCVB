@@ -1,7 +1,9 @@
 Imports System.Runtime.InteropServices
+Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Public Class Histogram_Basics : Inherits VB_Algorithm
     Public histogram As New cv.Mat
+    Public histArray() As Single
     Public mm As mmData
     Public plot As New Plot_Histogram
     Public ranges() As cv.Rangef
@@ -23,6 +25,9 @@ Public Class Histogram_Basics : Inherits VB_Algorithm
 
         ' ranges are exclusive in OpenCV!!!
         cv.Cv2.CalcHist({src}, {splitIndex}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
+
+        ReDim histArray(histogram.Total - 1)
+        Marshal.Copy(histogram.Data, histArray, 0, histArray.Length - 1)
 
         plot.Run(histogram)
         histogram = plot.histogram ' reflect any updates to the 0 entry...
@@ -72,7 +77,7 @@ Public Class Histogram_Graph : Inherits VB_Algorithm
     Public Sub New()
         desc = "Plot histograms for up to 3 channels."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim dimensions() = {task.histogramBins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
 
@@ -268,7 +273,7 @@ Public Class Histogram_PeakMax : Inherits VB_Algorithm
         hist.Run(src)
         dst3 = hist.dst2
 
-        Dim mm as mmData = vbMinMax(hist.histogram)
+        Dim mm As mmData = vbMinMax(hist.histogram)
         Dim brickWidth = dst2.Width / task.histogramBins
         Dim brickRange = 255 / task.histogramBins
         Dim histindex = mm.maxLoc.Y
