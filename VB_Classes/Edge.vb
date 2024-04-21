@@ -991,11 +991,11 @@ End Class
 
 
 Public Class Edge_BackProjection : Inherits VB_Algorithm
-    Dim valley As New HistValley_BasicsOptionAuto
+    Dim valley As New HistValley_OptionsAuto
     Dim canny As New Edge_Canny
     Public Sub New()
         labels(3) = "Canny edges in grayscale (red) and edges in back projection (blue)"
-        desc = "Find the edges in the HistValley_Basics backprojection"
+        desc = "Find the edges in the HistValley_FromPeaks backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         canny.Run(src)

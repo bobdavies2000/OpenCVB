@@ -45,6 +45,7 @@ Public Class Plot_Histogram : Inherits VB_Algorithm
     Public addLabels As Boolean = True
     Public removeZeroEntry As Boolean = True
     Public createHistogram As Boolean = False
+    Public mm As mmData
     Public Sub New()
         desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
@@ -65,7 +66,7 @@ Public Class Plot_Histogram : Inherits VB_Algorithm
         ReDim histArray(histogram.Rows - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
-        Dim mm as mmData = vbMinMax(histogram)
+        mm = vbMinMax(histogram)
 
         If mm.maxVal > 0 And histogram.Rows > 0 Then
             Dim incr = 255 / histogram.Rows
