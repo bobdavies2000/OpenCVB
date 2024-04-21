@@ -1,7 +1,6 @@
 ﻿Imports System.Windows.Input
 Imports cv = OpenCvSharp
 Public Class Quartile_Basics : Inherits VB_Algorithm
-    Dim binary As New Quartile_SplitMean
     Dim mats As New Mat_4to1
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
@@ -17,22 +16,39 @@ Public Class Quartile_Basics : Inherits VB_Algorithm
         If task.optionsChanged Then index = 0
 
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        binary.Run(src)
-        binary.mats.Run(empty)
-        dst2 = binary.mats.dst2
-        dst1 = binary.mats.dst3 * 0.5
+        Dim matList(3) As cv.Mat
+        For i = 0 To matList.Count - 1
+            mats.mat(i) = New cv.Mat(mats.mat(i).Size, cv.MatType.CV_8U, 0)
+        Next
+
+        Dim quadrant As Integer
+        If gOptions.DebugCheckBox.Checked Then
+            Static binaryV As New Quartile_SplitValley
+            binaryV.Run(src)
+            binaryV.mats.Run(empty)
+            dst2 = binaryV.mats.dst2
+            dst1 = binaryV.mats.dst3 * 0.5
+            matList = binaryV.mats.mat
+            quadrant = binaryV.mats.quadrant
+        Else
+            Static binary As New Quartile_SplitMean
+            binary.Run(src)
+            binary.mats.Run(empty)
+            dst2 = binary.mats.dst2
+            dst1 = binary.mats.dst3 * 0.5
+            matList = binary.mats.mat
+            quadrant = binary.mats.quadrant
+        End If
 
         Dim counts(3, task.gridList.Count) As Integer
         Dim contourCounts As New List(Of List(Of Integer))
         Dim means As New List(Of List(Of Single))
-        For i = 0 To mats.mat.Count - 1
-            mats.mat(i) = New cv.Mat(mats.mat(i).Size, cv.MatType.CV_8U, 0)
-        Next
+
+        Dim allContours As cv.Point()()
         For i = 0 To counts.GetUpperBound(0)
             For j = 0 To task.gridList.Count - 1
                 Dim roi = task.gridList(j)
-                Dim allContours As cv.Point()()
-                Dim tmp = binary.mats.mat(i)(roi)
+                Dim tmp = matList(i)(roi)
                 cv.Cv2.FindContours(tmp, allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
                 If i = 0 Then
                     contourCounts.Add(New List(Of Integer))
@@ -40,7 +56,7 @@ Public Class Quartile_Basics : Inherits VB_Algorithm
                 End If
                 contourCounts(j).Add(allContours.Count)
                 means(j).Add(src(roi).Mean(tmp).Item(0))
-                If i = binary.mats.quadrant Then setTrueText(CStr(allContours.Count), roi.TopLeft, 1)
+                If i = quadrant Then setTrueText(CStr(allContours.Count), roi.TopLeft, 1)
                 counts(i, j) = allContours.Count
             Next
         Next
@@ -48,8 +64,8 @@ Public Class Quartile_Basics : Inherits VB_Algorithm
         Static labelStr(3) As String, points(3) As cv.Point
         Dim bump = 3
         Dim ratio = dst2.Height / task.gridList(0).Height
-        For i = 0 To mats.mat.Count - 1
-            Dim tmp = binary.mats.mat(i)(roiSave)
+        For i = 0 To matList.Count - 1
+            Dim tmp = matList(i)(roiSave)
             Dim nextCount = tmp.CountNonZero
             Dim r = New cv.Rect(0, 0, tmp.Width * ratio, tmp.Height * ratio)
             mats.mat(i)(r) = tmp.Resize(New cv.Size(r.Width, r.Height))
@@ -279,7 +295,7 @@ Public Class Quartile_SplitMean : Inherits VB_Algorithm
     Public mats As New Mat_4Click
     Public Sub New()
         labels(2) = "A 4-way split - lightest (upper left) to darkest (lower right)"
-        desc = "Binarize an image twice using masks"
+        desc = "Binarize an image and split it into quartiles using peaks."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -311,10 +327,11 @@ End Class
 
 Public Class Quartile_SplitValley : Inherits VB_Algorithm
     Dim binary As New Binarize_Simple
+    Dim valley As New HistValley_Basics
     Public mats As New Mat_4Click
     Public Sub New()
         labels(2) = "A 4-way split - lightest (upper left) to darkest (lower right)"
-        desc = "Binarize an image twice using masks"
+        desc = "Binarize an image using the valleys provided by HistValley_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -322,13 +339,12 @@ Public Class Quartile_SplitValley : Inherits VB_Algorithm
         binary.Run(gray)
         Dim mask = binary.dst2.Clone
 
-        Dim midColor = binary.meanScalar(0)
-        Dim topColor = cv.Cv2.Mean(gray, mask)(0)
-        Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
-        mats.mat(0) = gray.InRange(topColor, 255)
-        mats.mat(1) = gray.InRange(midColor, topColor)
-        mats.mat(2) = gray.InRange(botColor, midColor)
-        mats.mat(3) = gray.InRange(0, botColor)
+        If task.heartBeat Then valley.Run(gray)
+
+        mats.mat(0) = gray.InRange(valley.valleys(3), 255)
+        mats.mat(1) = gray.InRange(valley.valleys(2), valley.valleys(3) - 1)
+        mats.mat(2) = gray.InRange(valley.valleys(1), valley.valleys(2) - 1)
+        mats.mat(3) = gray.InRange(0, valley.valleys(1) - 1)
 
         If standaloneTest() Then
             mats.Run(empty)

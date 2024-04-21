@@ -15,7 +15,7 @@ Public Class HistValley_Basics : Inherits VB_Algorithm
         Dim vCount = options.desiredBoundaries
         Dim minDistance = options.peakDistance
 
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         hist.Run(src)
         dst2 = hist.dst2
