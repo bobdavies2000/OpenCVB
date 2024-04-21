@@ -55,7 +55,7 @@ Public Class Denoise_Pixels : Inherits VB_Algorithm
 
         If options.removeSinglePixels Then
             Dim cppData(src.Total - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+            Marshal.Copy(src.Data, cppData, 0, cppData.Length)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = Denoise_Pixels_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
             handleSrc.Free()

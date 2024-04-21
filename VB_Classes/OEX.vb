@@ -607,7 +607,7 @@ Public Class OEX_FitEllipse : Inherits VB_Algorithm
         options.RunVB()
 
         Dim cppData(img.Total * img.ElemSize - 1) As Byte
-        Marshal.Copy(img.Data, cppData, 0, cppData.Length - 1)
+        Marshal.Copy(img.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim imagePtr = OEX_FitEllipse_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), img.Rows, img.Cols,
                                              options.threshold, options.fitType)

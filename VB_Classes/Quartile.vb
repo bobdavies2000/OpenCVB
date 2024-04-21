@@ -1,4 +1,4 @@
-﻿Imports System.Windows.Input
+﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Quartile_Basics : Inherits VB_Algorithm
     Dim mats As New Mat_4to1
@@ -238,58 +238,6 @@ End Class
 
 
 
-Public Class Edge_BinarizedReduction : Inherits VB_Algorithm
-    Dim edges As New Quartile_Sobel
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        desc = "Visualize the impact of reduction on Edge_BinarizeSobel"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        reduction.Run(src)
-        dst3 = reduction.dst2
-        edges.Run(dst3)
-        dst2 = edges.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Edge_Consistent : Inherits VB_Algorithm
-    Dim edges As New Quartile_Sobel
-    Public Sub New()
-        findSlider("Sobel kernel Size").Value = 5
-        desc = "Edges that are consistent for x number of frames"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static saveFrames As New List(Of cv.Mat)
-        If task.optionsChanged Then saveFrames = New List(Of cv.Mat)
-
-        edges.Run(src)
-
-        Dim tmp = If(edges.dst2.Channels = 1, edges.dst2.Clone, edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        saveFrames.Add(tmp)
-        If saveFrames.Count > task.frameHistoryCount Then saveFrames.RemoveAt(0)
-
-        dst2 = saveFrames(0)
-        For i = 1 To saveFrames.Count - 1
-            dst2 = saveFrames(i) And dst2
-        Next
-
-        dst3.SetTo(0)
-        src.CopyTo(dst3, Not edges.dst3)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Quartile_SplitMean : Inherits VB_Algorithm
     Dim binary As New Binarize_Simple
     Public mats As New Mat_4Click
@@ -311,12 +259,10 @@ Public Class Quartile_SplitMean : Inherits VB_Algorithm
         mats.mat(2) = gray.InRange(botColor, midColor)
         mats.mat(3) = gray.InRange(0, botColor)
 
-        If standaloneTest() Then
-            mats.Run(empty)
-            dst2 = mats.dst2
-            dst3 = mats.dst3
-            labels(3) = mats.labels(3)
-        End If
+        mats.Run(empty)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
+        labels(3) = mats.labels(3)
     End Sub
 End Class
 
@@ -352,5 +298,105 @@ Public Class Quartile_SplitValley : Inherits VB_Algorithm
             dst3 = mats.dst3
             labels(3) = mats.labels(3)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Quartile_Unstable : Inherits VB_Algorithm
+    Dim binary As New Quartile_SplitMean
+    Dim diff(3) As Diff_Basics
+    Public Sub New()
+        For i = 0 To diff.Count - 1
+            diff(i) = New Diff_Basics
+        Next
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Find the unstable pixels in the binary image"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binary.Run(src)
+        dst2 = binary.dst2
+        dst3.SetTo(0)
+        For i = 0 To diff.Count - 1
+            diff(i).Run(binary.mats.mat(i))
+            dst3 = dst3 Or diff(i).dst3
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Quartile_Unstable1 : Inherits VB_Algorithm
+    Dim binary As New Quartile_SplitMean
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        desc = "Find the unstable pixels in the binary image"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binary.Run(src)
+        dst2 = binary.dst2
+        diff.Run(binary.dst3)
+        dst3 = diff.dst3
+        labels(3) = binary.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Quartile_UnstableEdges : Inherits VB_Algorithm
+    Dim canny As New Edge_Canny
+    Dim blur As New Blur_Basics
+    Dim unstable As New Quartile_Unstable
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Find unstable pixels but remove those that are also edges."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        canny.Run(src)
+        blur.Run(canny.dst2)
+        dst1 = blur.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        unstable.Run(src)
+        dst2 = unstable.dst2
+        dst3 = unstable.dst3
+
+        If gOptions.DebugCheckBox.Checked = False Then dst3.SetTo(0, dst1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Quartile_UnstablePixelValues : Inherits VB_Algorithm
+    Dim unstable As New Quartile_UnstableEdges
+    Public Sub New()
+        desc = "Identify the unstable grayscale pixel values "
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim pixels As New List(Of Byte)
+
+        unstable.Run(src)
+        dst2 = unstable.dst3
+
+        Dim points = dst2.FindNonZero()
+        Dim pts(points.Rows * 2 - 1) As Integer
+        Marshal.Copy(points.Data, pts, 0, pts.Length)
     End Sub
 End Class

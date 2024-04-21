@@ -15,7 +15,7 @@ Public Class Vignetting_Basics : Inherits VB_Algorithm
         If task.clickPoint <> New cv.Point Then center = task.clickPoint
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+        Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim imagePtr = Vignetting_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, radiusSlider.Value / 100, center.X, center.Y, removeVig)
         handleSrc.Free()

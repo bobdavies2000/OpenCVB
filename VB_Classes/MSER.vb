@@ -630,7 +630,7 @@ Public Class MSER_CPP : Inherits VB_Algorithm
 
         If Options.graySetting And src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+        Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim imagePtr = MSER_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()
@@ -696,7 +696,7 @@ Public Class MSER_Mask_CPP : Inherits VB_Algorithm
 
         If task.heartBeat Then
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+            Marshal.Copy(src.Data, cppData, 0, cppData.Length)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = MSER_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
             handleSrc.Free()

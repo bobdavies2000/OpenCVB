@@ -59,7 +59,7 @@ Public Class CameraOakD : Inherits Camera
             captureRes = New cv.Size(1280, 720)
             Dim intrin = OakDintrinsics(cPtr)
             Dim intrinsicsArray(9 - 1) As Single
-            Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length - 1)
+            Marshal.Copy(intrin, intrinsicsArray, 0, intrinsicsArray.Length)
             cameraInfo.ppx = intrinsicsArray(2)
             cameraInfo.ppy = intrinsicsArray(5)
             cameraInfo.fx = intrinsicsArray(0)

@@ -216,7 +216,7 @@ Public Class Neighbors_Precise : Inherits VB_Algorithm
         End If
 
         Dim mapData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, mapData, 0, mapData.Length - 1)
+        Marshal.Copy(src.Data, mapData, 0, mapData.Length)
         Dim handleSrc = GCHandle.Alloc(mapData, GCHandleType.Pinned)
         Dim nabCount = Neighbors_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()

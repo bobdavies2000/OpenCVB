@@ -14,7 +14,7 @@ Public Class Density_Basics : Inherits VB_Algorithm
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+        Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim imagePtr = Density_2D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, distance)
         handleSrc.Free()
@@ -64,7 +64,7 @@ Public Class Density_Count_CPP : Inherits VB_Algorithm
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+        Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim imagePtr = Density_Count_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, zCount)
         handleSrc.Free()

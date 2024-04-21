@@ -924,7 +924,7 @@ Public Class PointCloud_Histograms : Inherits VB_Algorithm
 
                 histogram = hcloud.histogram
                 Dim histData(histogram.Total - 1) As Single
-                Marshal.Copy(histogram.Data, histData, 0, histData.Length - 1)
+                Marshal.Copy(histogram.Data, histData, 0, histData.Length)
 
                 If histData.Count > 255 And gOptions.HistBinSlider.Value > 3 Then
                     gOptions.HistBinSlider.Value -= 1

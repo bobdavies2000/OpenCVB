@@ -14,7 +14,7 @@ Public Class BGRPattern_Basics : Inherits VB_Algorithm
         src = options.dst2
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+        Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim imagePtr = BGRPattern_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(),
                                          src.Rows, src.Cols)

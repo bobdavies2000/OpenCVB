@@ -163,7 +163,7 @@ Public Class RedCloud_FindCells : Inherits VB_Algorithm
         If task.motionDetected Then
             dst1 = task.cellMap(task.motionRect).Clone
             Dim cppData(dst1.Total - 1) As Byte
-            Marshal.Copy(dst1.Data, cppData, 0, cppData.Length - 1)
+            Marshal.Copy(dst1.Data, cppData, 0, cppData.Length)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = RedCloud_FindCells_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
             handleSrc.Free()

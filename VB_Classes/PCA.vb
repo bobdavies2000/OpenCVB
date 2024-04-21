@@ -255,7 +255,7 @@ Public Class PCA_Prep_CPP : Inherits VB_Algorithm
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+        Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim imagePtr = PCA_Prep_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()

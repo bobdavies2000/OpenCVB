@@ -709,7 +709,7 @@ Public Class Pixel_Unique_CPP : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If task.drawRect <> New cv.Rect Then src = src(task.drawRect)
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+        Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim classCount = Pixels_Vector_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()

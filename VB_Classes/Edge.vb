@@ -252,6 +252,56 @@ End Class
 
 
 
+Public Class Edge_Consistent : Inherits VB_Algorithm
+    Dim edges As New Quartile_Sobel
+    Public Sub New()
+        findSlider("Sobel kernel Size").Value = 5
+        desc = "Edges that are consistent for x number of frames"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static saveFrames As New List(Of cv.Mat)
+        If task.optionsChanged Then saveFrames = New List(Of cv.Mat)
+
+        edges.Run(src)
+
+        Dim tmp = If(edges.dst2.Channels = 1, edges.dst2.Clone, edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        saveFrames.Add(tmp)
+        If saveFrames.Count > task.frameHistoryCount Then saveFrames.RemoveAt(0)
+
+        dst2 = saveFrames(0)
+        For i = 1 To saveFrames.Count - 1
+            dst2 = saveFrames(i) And dst2
+        Next
+
+        dst3.SetTo(0)
+        src.CopyTo(dst3, Not edges.dst3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Edge_BinarizedReduction : Inherits VB_Algorithm
+    Dim edges As New Quartile_Sobel
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        desc = "Visualize the impact of reduction on Edge_BinarizeSobel"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        reduction.Run(src)
+        dst3 = reduction.dst2
+        edges.Run(dst3)
+        dst2 = edges.dst2
+    End Sub
+End Class
+
+
+
+
+
+
 
 
 Public Class Edge_BinarizedBrightness : Inherits VB_Algorithm

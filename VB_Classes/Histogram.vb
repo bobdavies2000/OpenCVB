@@ -27,7 +27,7 @@ Public Class Histogram_Basics : Inherits VB_Algorithm
         cv.Cv2.CalcHist({src}, {splitIndex}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
 
         ReDim histArray(histogram.Total - 1)
-        Marshal.Copy(histogram.Data, histArray, 0, histArray.Length - 1)
+        Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
         plot.Run(histogram)
         histogram = plot.histogram ' reflect any updates to the 0 entry...
