@@ -390,13 +390,24 @@ Public Class Quartile_UnstablePixelValues : Inherits VB_Algorithm
         desc = "Identify the unstable grayscale pixel values "
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim pixels As New List(Of Byte)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         unstable.Run(src)
         dst2 = unstable.dst3
 
         Dim points = dst2.FindNonZero()
+        If points.Rows = 0 Then Exit Sub
         Dim pts(points.Rows * 2 - 1) As Integer
         Marshal.Copy(points.Data, pts, 0, pts.Length)
+
+        Dim pixels As New List(Of Byte)
+        Dim pixelSort As New SortedList(Of Byte, Integer)(New compareByte)
+        For i = 0 To pts.Count - 1 Step 2
+            Dim val = src.Get(Of Byte)(pts(i + 1), pts(i))
+            If pixels.Contains(val) = False Then
+                pixelSort.Add(val, 1)
+                pixels.Add(val)
+            End If
+        Next
     End Sub
 End Class

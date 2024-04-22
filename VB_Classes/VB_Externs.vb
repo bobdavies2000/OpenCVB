@@ -846,6 +846,12 @@ Module VB_Externs
             Return -1
         End Function
     End Class
+    Public Class compareByte : Implements IComparer(Of Byte)
+        Public Function Compare(ByVal a As Byte, ByVal b As Byte) As Integer Implements IComparer(Of Byte).Compare
+            If a <= b Then Return -1
+            Return 1
+        End Function
+    End Class
     Public Class compareAllowIdenticalInteger : Implements IComparer(Of Integer)
         Public Function Compare(ByVal a As Integer, ByVal b As Integer) As Integer Implements IComparer(Of Integer).Compare
             ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
