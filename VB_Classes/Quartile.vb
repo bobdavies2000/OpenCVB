@@ -98,43 +98,6 @@ End Class
 
 
 
-
-Public Class Quartile_RegionsLeftRight : Inherits VB_Algorithm
-    Dim binary As New Quartile_SplitMean
-    Public classCount = 4 ' 4-way split
-    Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Add the 4-way split of left and right views."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        binary.Run(src)
-
-        dst0.SetTo(1, binary.mats.mat(0))
-        dst0.SetTo(2, binary.mats.mat(1))
-        dst0.SetTo(3, binary.mats.mat(2))
-        dst0.SetTo(4, binary.mats.mat(3))
-
-        dst2 = vbPalette((dst0 * 255 / classCount).ToMat)
-
-        binary.Run(task.rightView)
-
-        dst1.SetTo(1, binary.mats.mat(0))
-        dst1.SetTo(2, binary.mats.mat(1))
-        dst1.SetTo(3, binary.mats.mat(2))
-        dst1.SetTo(4, binary.mats.mat(3))
-
-        dst3 = vbPalette((dst1 * 255 / classCount).ToMat)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Quartile_Canny : Inherits VB_Algorithm
     Dim edges As New Edge_Canny
     Dim binary As New Quartile_SplitMean
@@ -168,33 +131,6 @@ Public Class Quartile_Canny : Inherits VB_Algorithm
         End If
     End Sub
 End Class
-
-
-
-
-
-
-
-Public Class Quartile_Regions : Inherits VB_Algorithm
-    Dim binary As New Quartile_SplitMean
-    Public classCount = 4 ' 4-way split 
-    Public Sub New()
-        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Add the 4-way split of images to define the different regions."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        binary.Run(src)
-
-        dst2.SetTo(1, binary.mats.mat(0))
-        dst2.SetTo(2, binary.mats.mat(1))
-        dst2.SetTo(3, binary.mats.mat(2))
-        dst2.SetTo(4, binary.mats.mat(3))
-
-        dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
-    End Sub
-End Class
-
-
 
 
 
@@ -238,74 +174,6 @@ End Class
 
 
 
-Public Class Quartile_SplitMean : Inherits VB_Algorithm
-    Dim binary As New Binarize_Simple
-    Public mats As New Mat_4Click
-    Public Sub New()
-        labels(2) = "A 4-way split - lightest (upper left) to darkest (lower right)"
-        desc = "Binarize an image and split it into quartiles using peaks."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-        binary.Run(gray)
-        Dim mask = binary.dst2.Clone
-
-        Dim midColor = binary.meanScalar(0)
-        Dim topColor = cv.Cv2.Mean(gray, mask)(0)
-        Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
-        mats.mat(0) = gray.InRange(topColor, 255)
-        mats.mat(1) = gray.InRange(midColor, topColor)
-        mats.mat(2) = gray.InRange(botColor, midColor)
-        mats.mat(3) = gray.InRange(0, botColor)
-
-        mats.Run(empty)
-        dst2 = mats.dst2
-        dst3 = mats.dst3
-        labels(3) = mats.labels(3)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Quartile_SplitValley : Inherits VB_Algorithm
-    Dim binary As New Binarize_Simple
-    Dim valley As New HistValley_Basics
-    Public mats As New Mat_4Click
-    Public Sub New()
-        labels(2) = "A 4-way split - lightest (upper left) to darkest (lower right)"
-        desc = "Binarize an image using the valleys provided by HistValley_Basics"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-        binary.Run(gray)
-        Dim mask = binary.dst2.Clone
-
-        If task.heartBeat Then valley.Run(gray)
-
-        mats.mat(0) = gray.InRange(valley.valleys(3), 255)
-        mats.mat(1) = gray.InRange(valley.valleys(2), valley.valleys(3) - 1)
-        mats.mat(2) = gray.InRange(valley.valleys(1), valley.valleys(2) - 1)
-        mats.mat(3) = gray.InRange(0, valley.valleys(1) - 1)
-
-        If standaloneTest() Then
-            mats.Run(empty)
-            dst2 = mats.dst2
-            dst3 = mats.dst3
-            labels(3) = mats.labels(3)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class Quartile_Unstable : Inherits VB_Algorithm
@@ -326,6 +194,7 @@ Public Class Quartile_Unstable : Inherits VB_Algorithm
             diff(i).Run(binary.mats.mat(i))
             dst3 = dst3 Or diff(i).dst3
         Next
+        If task.heartBeat Then labels(3) = "There are " + CStr(dst3.CountNonZero) + " unstable pixels"
     End Sub
 End Class
 
@@ -347,7 +216,7 @@ Public Class Quartile_Unstable1 : Inherits VB_Algorithm
         dst2 = binary.dst2
         diff.Run(binary.dst3)
         dst3 = diff.dst3
-        labels(3) = binary.labels(3)
+        If task.heartBeat Then labels(3) = "There are " + CStr(dst3.CountNonZero) + " unstable pixels"
     End Sub
 End Class
 
@@ -384,8 +253,9 @@ End Class
 
 
 
-Public Class Quartile_UnstablePixelValues : Inherits VB_Algorithm
+Public Class Quartile_UnstablePixels : Inherits VB_Algorithm
     Dim unstable As New Quartile_UnstableEdges
+    Public gapValues As New List(Of Byte)
     Public Sub New()
         desc = "Identify the unstable grayscale pixel values "
     End Sub
@@ -409,5 +279,323 @@ Public Class Quartile_UnstablePixelValues : Inherits VB_Algorithm
                 pixels.Add(val)
             End If
         Next
+
+        Dim gapThreshold = 2
+        gapValues.Clear()
+        strOut = "These are the ranges of grayscale bytes where there is fuzziness." + vbCrLf
+        Dim lastIndex As Integer, lastGap As Integer
+        For Each index In pixelSort.Keys
+            If Math.Abs(lastIndex - index) > gapThreshold Then
+                strOut += vbCrLf
+                gapValues.Add((index + lastGap) / 2)
+                lastGap = index
+                For i = index + 1 To pixelSort.Keys.Count - 1
+                    If pixelSort.Keys.ElementAt(i) - lastGap > gapThreshold Then Exit For
+                    lastGap = i
+                Next
+            End If
+            strOut += CStr(index) + vbTab
+            lastIndex = index
+        Next
+        Console.WriteLine("gapvalue count = " + CStr(gapValues.Count))
+        If gapValues.Count < 4 Then
+            gapValues.Add((255 + lastGap) / 2)
+        End If
+
+        strOut += vbCrLf + vbCrLf + "The best thresholds for this image to avoid fuzziness are: " + vbCrLf
+        For Each index In gapValues
+            strOut += CStr(index) + vbTab
+        Next
+        setTrueText(strOut, 3)
+        If task.heartBeat Then labels(3) = "There are " + CStr(dst2.CountNonZero) + " unstable pixels"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Quartile_SplitValley : Inherits VB_Algorithm
+    Dim binary As New Binarize_Simple
+    Dim valley As New HistValley_Basics
+    Public mats As New Mat_4Click
+    Public Sub New()
+        labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
+        desc = "Binarize an image using the valleys provided by HistValley_Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        binary.Run(gray)
+        Dim mask = binary.dst2.Clone
+
+        If task.heartBeat Then valley.Run(gray)
+
+        mats.mat(0) = gray.InRange(0, valley.valleys(1) - 1)
+        mats.mat(1) = gray.InRange(valley.valleys(1), valley.valleys(2) - 1)
+        mats.mat(2) = gray.InRange(valley.valleys(2), valley.valleys(3) - 1)
+        mats.mat(3) = gray.InRange(valley.valleys(3), 255)
+
+        mats.Run(empty)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
+        labels(3) = mats.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Quartile_UnstablePixels1 : Inherits VB_Algorithm
+    Dim hist As New Histogram_Basics
+    Dim unstable As New Quartile_UnstableEdges
+    Public gapValues As New List(Of Byte)
+    Public Sub New()
+        gOptions.HistBinSlider.Value = 256
+        desc = "Identify the unstable grayscale pixel values "
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        hist.Run(src)
+
+        unstable.Run(src)
+        dst2 = unstable.dst3
+
+        Dim points = dst2.FindNonZero()
+        If points.Rows = 0 Then Exit Sub
+        Dim pts(points.Rows * 2 - 1) As Integer
+        Marshal.Copy(points.Data, pts, 0, pts.Length)
+
+        Dim pixels As New List(Of Byte)
+        Dim pixelSort As New SortedList(Of Byte, Integer)(New compareByte)
+        For i = 0 To pts.Count - 1 Step 2
+            Dim val = src.Get(Of Byte)(pts(i + 1), pts(i))
+            If pixels.Contains(val) = False Then
+                pixelSort.Add(val, 1)
+                pixels.Add(val)
+            End If
+        Next
+
+        Static boundaries(4) As Byte
+        boundaries(0) = 0 * 255 / 4
+        boundaries(1) = 1 * 255 / 4
+        boundaries(2) = 2 * 255 / 4
+        boundaries(3) = 3 * 255 / 4
+        boundaries(4) = 255
+        Dim gapThreshold = 2, lastIndex As Integer, bIndex As Integer = 1
+        strOut = "These are the ranges of grayscale bytes where there is fuzziness." + vbCrLf
+        For i = 0 To pixelSort.Keys.Count - 1
+            Dim index = pixelSort.ElementAt(i).Key
+            If Math.Abs(lastIndex - index) > gapThreshold Then
+                strOut += vbCrLf
+                If bIndex < boundaries.Count Then
+                    boundaries(bIndex) = index
+                    bIndex += 1
+                End If
+            End If
+            strOut += CStr(index) + vbTab
+            lastIndex = index
+        Next
+
+        gapValues.Clear()
+        For i = 1 To boundaries.Count - 1
+            Dim minVal = Byte.MaxValue
+            Dim minIndex = 0
+            For j = boundaries(i - 1) To boundaries(i) - 1
+                If hist.histArray(j) < minVal Then
+                    minVal = hist.histArray(j)
+                    minIndex = j
+                End If
+            Next
+            gapValues.Add(minIndex)
+        Next
+        strOut += vbCrLf + vbCrLf + "The best thresholds for this image to avoid fuzziness are: " + vbCrLf
+        For Each index In gapValues
+            strOut += CStr(index) + vbTab
+        Next
+        setTrueText(strOut, 3)
+        If task.heartBeat Then labels(3) = "There are " + CStr(dst2.CountNonZero) + " unstable pixels"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Quartile_SplitGaps : Inherits VB_Algorithm
+    Dim unstable As New Quartile_UnstablePixels
+    Public mats As New Mat_4Click
+    Dim diff(3) As Diff_Basics
+    Public Sub New()
+        For i = 0 To diff.Count - 1
+            diff(i) = New Diff_Basics
+            mats.mat(i) = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Next
+        If standalone Then gOptions.displayDst1.Checked = True
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
+        desc = "Separate the quartiles of the image using the fuzzy grayscale pixel values"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        unstable.Run(gray)
+
+        Dim lastVal As Integer = 255
+        For i = Math.Min(mats.mat.Count, unstable.gapValues.Count) - 1 To 0 Step -1
+            mats.mat(i) = gray.InRange(unstable.gapValues(i), lastVal)
+            lastVal = unstable.gapValues(i)
+        Next
+
+        dst1.SetTo(0)
+        For i = 0 To diff.Count - 1
+            diff(i).Run(mats.mat(i))
+            dst1 = dst1 Or diff(i).dst3
+        Next
+        mats.Run(empty)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
+        If task.heartBeat Then labels(1) = "There are " + CStr(dst1.CountNonZero) + " unstable pixels"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Quartile_RegionsLeftRight : Inherits VB_Algorithm
+    Dim binaryLeft As New Quartile_SplitGaps
+    Dim binaryRight As New Quartile_SplitGaps
+    Public classCount = 4 ' 4-way split
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels = {"", "", "Left in in 4 colors", "Right image in 4 colors"}
+        desc = "Add the 4-way split of left and right views."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binaryLeft.Run(src)
+
+        dst0.SetTo(1, binaryLeft.mats.mat(0))
+        dst0.SetTo(2, binaryLeft.mats.mat(1))
+        dst0.SetTo(3, binaryLeft.mats.mat(2))
+        dst0.SetTo(4, binaryLeft.mats.mat(3))
+
+        dst2 = vbPalette((dst0 * 255 / classCount).ToMat)
+
+        binaryRight.Run(task.rightView)
+
+        dst1.SetTo(1, binaryRight.mats.mat(0))
+        dst1.SetTo(2, binaryRight.mats.mat(1))
+        dst1.SetTo(3, binaryRight.mats.mat(2))
+        dst1.SetTo(4, binaryRight.mats.mat(3))
+
+        dst3 = vbPalette((dst1 * 255 / classCount).ToMat)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Quartile_Regions1 : Inherits VB_Algorithm
+    Dim binary As New Quartile_SplitGaps
+    Public classCount = 4 ' 4-way split 
+    Public Sub New()
+        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        labels = {"", "", "CV_8U version of dst3 with values ranging from 1 to 4", "Palettized version of dst2"}
+        desc = "Add the 4-way split of images to define the different regions."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binary.Run(src)
+
+        dst2.SetTo(1, binary.mats.mat(0))
+        dst2.SetTo(2, binary.mats.mat(1))
+        dst2.SetTo(3, binary.mats.mat(2))
+        dst2.SetTo(4, binary.mats.mat(3))
+
+        dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Quartile_Regions : Inherits VB_Algorithm
+    Dim binary As New Binarize_Simple
+    Public mats As New Mat_4Click
+    Public classCount = 4 ' 4-way split 
+    Public Sub New()
+        labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
+        desc = "Binarize an image and split it into quartiles using peaks."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        binary.Run(gray)
+        Dim mask = binary.dst2.Clone
+
+        Dim midColor = binary.meanScalar(0)
+        Dim topColor = cv.Cv2.Mean(gray, mask)(0)
+        Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
+        mats.mat(0) = gray.InRange(0, botColor)
+        mats.mat(1) = gray.InRange(botColor, midColor)
+        mats.mat(2) = gray.InRange(midColor, topColor)
+        mats.mat(3) = gray.InRange(topColor, 255)
+
+        mats.Run(empty)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
+        labels(3) = mats.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Quartile_SplitMean : Inherits VB_Algorithm
+    Dim binary As New Binarize_Simple
+    Public mats As New Mat_4Click
+    Public Sub New()
+        labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
+        desc = "Binarize an image and split it into quartiles using peaks."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        binary.Run(gray)
+        Dim mask = binary.dst2.Clone
+
+        Dim midColor = binary.meanScalar(0)
+        Dim topColor = cv.Cv2.Mean(gray, mask)(0)
+        Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
+        mats.mat(0) = gray.InRange(0, botColor)
+        mats.mat(1) = gray.InRange(botColor, midColor)
+        mats.mat(2) = gray.InRange(midColor, topColor)
+        mats.mat(3) = gray.InRange(topColor, 255)
+
+        mats.Run(empty)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
+        labels(3) = mats.labels(3)
     End Sub
 End Class
