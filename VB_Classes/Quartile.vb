@@ -510,8 +510,8 @@ End Class
 
 
 
-Public Class Quartile_Regions1 : Inherits VB_Algorithm
-    Dim binary As New Quartile_SplitGaps
+Public Class Quartile_Regions : Inherits VB_Algorithm
+    Dim binary As New Quartile_SplitMean
     Public classCount = 4 ' 4-way split 
     Public Sub New()
         dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -537,7 +537,7 @@ End Class
 
 
 
-Public Class Quartile_Regions : Inherits VB_Algorithm
+Public Class Quartile_Regions1 : Inherits VB_Algorithm
     Dim binary As New Binarize_Simple
     Public mats As New Mat_4Click
     Public classCount = 4 ' 4-way split 
@@ -585,13 +585,109 @@ Public Class Quartile_SplitMean : Inherits VB_Algorithm
         binary.Run(gray)
         Dim mask = binary.dst2.Clone
 
-        Dim midColor = binary.meanScalar(0)
-        Dim topColor = cv.Cv2.Mean(gray, mask)(0)
-        Dim botColor = cv.Cv2.Mean(gray, Not mask)(0)
+        Static botColor As cv.Scalar, midColor As cv.Scalar, topColor As cv.Scalar
+        If task.heartBeat Then
+            midColor = binary.meanScalar(0)
+            topColor = cv.Cv2.Mean(gray, mask)(0)
+            botColor = cv.Cv2.Mean(gray, Not mask)(0)
+        End If
+
         mats.mat(0) = gray.InRange(0, botColor)
         mats.mat(1) = gray.InRange(botColor, midColor)
         mats.mat(2) = gray.InRange(midColor, topColor)
         mats.mat(3) = gray.InRange(topColor, 255)
+
+        mats.Run(empty)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
+        labels(3) = mats.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Quartile_SplitMean1 : Inherits VB_Algorithm
+    Dim binary As New Binarize_Simple
+    Public mats As New Mat_4Click
+    Public Sub New()
+        labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
+        desc = "Binarize an image and split it into quartiles using peaks."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        binary.Run(gray)
+        Dim mask = binary.dst2.Clone
+
+        Static botColor As cv.Scalar, midColor As cv.Scalar, topColor As cv.Scalar
+        If task.heartBeat Then
+            midColor = binary.meanScalar(0)
+            topColor = cv.Cv2.Mean(gray, mask)(0)
+            botColor = cv.Cv2.Mean(gray, Not mask)(0)
+        End If
+        mats.mat(0) = gray.InRange(0, botColor(0) / 2)
+        mats.mat(1) = gray.InRange(botColor(0) / 2, (botColor(0) + midColor(0)) / 2)
+        mats.mat(2) = gray.InRange((botColor(0) + midColor(0)) / 2, (midColor(0) + topColor(0)) / 2)
+        mats.mat(3) = gray.InRange((midColor(0) + topColor(0)) / 2, 255)
+
+        mats.Run(empty)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
+        labels(3) = mats.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Quartile_SplitMean2 : Inherits VB_Algorithm
+    Dim binary As New Binarize_Simple
+    Dim hist As New Histogram_Basics
+    Public mats As New Mat_4Click
+    Public Sub New()
+        gOptions.HistBinSlider.Value = 256
+        labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
+        desc = "Binarize an image and split it into quartiles finding the minimum between peaks."
+    End Sub
+    Private Function findMin(start As Integer, finish As Integer) As Integer
+        Dim minIndex As Integer
+        Dim minVal As Integer = Integer.MaxValue
+        For i = start To finish - 1
+            If hist.histArray(i) < minVal Then
+                minVal = hist.histArray(i)
+                minIndex = i
+            End If
+        Next
+        Return minIndex
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        hist.Run(gray)
+
+        binary.Run(gray)
+        Dim mask = binary.dst2.Clone
+
+        Static botColor As cv.Scalar, midColor As cv.Scalar, topColor As cv.Scalar
+        If task.heartBeat Then
+            midColor = binary.meanScalar(0)
+            topColor = cv.Cv2.Mean(gray, mask)(0)
+            botColor = cv.Cv2.Mean(gray, Not mask)(0)
+        End If
+        Dim botmin = findMin(5, botColor(0))
+        mats.mat(0) = gray.InRange(0, botmin)
+
+        Dim midMin = findMin(botColor(0), midColor(0))
+        mats.mat(1) = gray.InRange(botmin, midMin)
+
+        Dim topMin = findMin(midColor(0), topColor(0))
+        mats.mat(2) = gray.InRange(midMin, topMin)
+        mats.mat(3) = gray.InRange(topMin, 255)
 
         mats.Run(empty)
         dst2 = mats.dst2
