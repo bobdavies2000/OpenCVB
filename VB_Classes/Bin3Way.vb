@@ -181,17 +181,23 @@ Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
     Dim flood As New Flood_BasicsMask
     Dim color As New Color_Basics
     Dim cellMaps(2) As cv.Mat, redCells(2) As List(Of rcData)
+    Dim options As New Options_Bin3WayRedCloud
     Public Sub New()
-        For i = 0 To redCells.Count - 1
-            redCells(i) = New List(Of rcData)
-            cellMaps(i) = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Next
         desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If task.optionsChanged Then
+            For i = 0 To redCells.Count - 1
+                redCells(i) = New List(Of rcData)
+                cellMaps(i) = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            Next
+        End If
+
         bin3.Run(src)
 
-        For i = 0 To 2
+        For i = options.startRegion To options.endRegion
             task.cellMap = cellMaps(i)
             task.redCells = redCells(i)
             If i = 0 Or i = 2 Then
@@ -209,7 +215,7 @@ Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
         Next
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        Dim maxOther = (redCells(0).Count + redCells(2).Count) / 2
+        Dim maxOther = If(options.startRegion = 0, (redCells(0).Count + redCells(2).Count) / 2, 255)
         For i = 0 To 2
             Dim count As Integer
             For Each rc In redCells(i)

@@ -4698,3 +4698,39 @@ Public Class Options_AddWeighted : Inherits VB_Algorithm
         task.addWeighted = weightSlider.value / 100
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_Bin3WayRedCloud : Inherits VB_Algorithm
+    Public startRegion As Integer
+    Public endRegion As Integer
+    Public Sub New()
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Review All Regions")
+            radio.addRadio("Review Darkest Regions")
+            radio.addRadio("Review Lightest Regions")
+            radio.addRadio("Review Other Regions")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static frm = findfrm(traceName + " Radio Buttons")
+        Select Case findRadioIndex(frm.check)
+            Case 0
+                startRegion = 0
+                endRegion = 2
+            Case 1
+                startRegion = 0
+                endRegion = 0
+            Case 2
+                startRegion = 2
+                endRegion = 2
+            Case 3
+                startRegion = 1
+                endRegion = 1
+        End Select
+    End Sub
+End Class

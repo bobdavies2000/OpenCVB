@@ -1280,6 +1280,7 @@ if algorithmName = "Options_Annealing" Then return new Options_Annealing
 if algorithmName = "Options_Bernson" Then return new Options_Bernson
 if algorithmName = "Options_BGSubtract" Then return new Options_BGSubtract
 if algorithmName = "Options_BGSubtractSynthetic" Then return new Options_BGSubtractSynthetic
+if algorithmName = "Options_Bin3WayRedCloud" Then return new Options_Bin3WayRedCloud
 if algorithmName = "Options_BinarizeNiBlack" Then return new Options_BinarizeNiBlack
 if algorithmName = "Options_Blob" Then return new Options_Blob
 if algorithmName = "Options_BlockMatching" Then return new Options_BlockMatching
