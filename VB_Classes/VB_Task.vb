@@ -240,6 +240,7 @@ Public Class VBtask : Implements IDisposable
     Public rc As New rcData
     Public rcPicTag As Integer
     Public rcMatchAvg As Integer
+    Public rcMatchThreshold As Integer
     Public redCells As List(Of rcData)
     Public cellMap As cv.Mat
 

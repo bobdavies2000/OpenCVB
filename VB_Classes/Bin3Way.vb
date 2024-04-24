@@ -176,6 +176,7 @@ Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
     Dim cellMaps(2) As cv.Mat, redCells(2) As List(Of rcData)
     Dim options As New Options_Bin3WayRedCloud
     Public Sub New()
+        redOptions.identifyCount = 100
         desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -206,13 +207,9 @@ Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
         Next
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        Dim maxOther = If(options.startRegion = 0, Math.Max(redCells(0).Count, redCells(2).Count), 255)
         For i = 0 To 2
-            Dim count As Integer
             For Each rc In redCells(i)
                 sortedCells.Add(rc.pixels, rc)
-                count += 1
-                If i = 1 And maxOther <= count Then Exit For
             Next
         Next
 
@@ -220,14 +217,22 @@ Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
         task.redCells.Add(New rcData)
         task.cellMap.SetTo(0)
         dst2.SetTo(0)
+        Static lastImage = dst2.Clone
         For Each rc In sortedCells.Values
-            rc.index = task.redCells.Count
-            task.redCells.Add(rc)
-            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-            If rc.index >= 255 Then Exit For
+            If rc.matchCount >= task.rcMatchThreshold Then
+                rc.index = task.redCells.Count
+                task.redCells.Add(rc)
+                task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+
+
+
+                dst2(rc.rect).SetTo(rc.color, rc.mask)
+                If rc.index >= 255 Then Exit For
+            End If
         Next
 
-        labels(2) = CStr(task.redCells.Count) + " cells were identified using darkest, lightest and other."
+        identifyCellRects(task.redCells)
+        If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " cells were identified and matched to the previous image"
+        lastImage = dst2.Clone
     End Sub
 End Class

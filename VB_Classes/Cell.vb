@@ -430,7 +430,9 @@ Public Class Cell_Generate : Inherits VB_Algorithm
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         Dim usedColors As New List(Of cv.Vec3b)
+        usedColors.Add(black)
         Dim cellCount = Math.Min(cellLimit, classCount)
+        task.rcMatchThreshold = If(task.frameCount < task.fpsRate, task.frameCount - 1, task.fpsRate)
         For i = 1 To cellCount - 1
             Dim rc As New rcData
             rc.index = sortedCells.Count + 1
@@ -454,7 +456,7 @@ Public Class Cell_Generate : Inherits VB_Algorithm
                     rc.color = lrc.color
                     Dim stableCheck = task.cellMap.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
                     If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
-                    rc.matchCount = If(lrc.matchCount > 100, lrc.matchCount, lrc.matchCount + 1)
+                    rc.matchCount = If(lrc.matchCount > task.rcMatchThreshold, lrc.matchCount, lrc.matchCount + 1)
                 Else
                     rc.color = task.vecColors(rc.index)
                 End If
