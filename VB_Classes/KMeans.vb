@@ -398,7 +398,11 @@ Public Class KMeans_Dimensions : Inherits VB_Algorithm
         Dim merge As New cv.Mat
         Select Case dimSlider.value
             Case 1 ' grayscale
-                src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertTo(merge, cv.MatType.CV_32F)
+                If src.Channels = 1 Then
+                    src.ConvertTo(merge, cv.MatType.CV_32F)
+                Else
+                    src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertTo(merge, cv.MatType.CV_32F)
+                End If
             Case 2 ' pointcloud x and y
                 cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1)}, merge)
             Case 3 ' pointcloud dimensions

@@ -2,10 +2,16 @@
 Imports cv = OpenCvSharp
 Public Class Quartile_Basics : Inherits VB_Algorithm
     Dim mats As New Mat_4to1
+    Dim binary As New Quartile_SplitMean
+    Dim diff(3) As Diff_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        labels(1) = "Contour counts for each roi in gridList.  Click on any roi to display all 4 quartiles"
-        labels(3) = "Quartiles for the selected grid element - brightest, less bright, less dark, darkest"
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        For i = 0 To diff.Count - 1
+            diff(i) = New Diff_Basics
+        Next
+        labels = {"", "Quartiles for selected roi.  Click in dst1 to see different roi.", "4 brightness levels - darkest to lightest",
+                      "Quartiles for the selected grid element, darkest to lightest"}
         desc = "Highlight the contours for each grid element with stats for each."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -15,30 +21,26 @@ Public Class Quartile_Basics : Inherits VB_Algorithm
 
         If task.optionsChanged Then index = 0
 
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim matList(3) As cv.Mat
         For i = 0 To matList.Count - 1
             mats.mat(i) = New cv.Mat(mats.mat(i).Size, cv.MatType.CV_8U, 0)
+            binary.mats.mat(i) = New cv.Mat(binary.mats.mat(i).Size, cv.MatType.CV_8U, 0)
         Next
 
         Dim quadrant As Integer
-        If gOptions.DebugCheckBox.Checked Then
-            Static binaryV As New Quartile_SplitValley
-            binaryV.Run(src)
-            binaryV.mats.Run(empty)
-            dst2 = binaryV.mats.dst2
-            dst1 = binaryV.mats.dst3 * 0.5
-            matList = binaryV.mats.mat
-            quadrant = binaryV.mats.quadrant
-        Else
-            Static binary As New Quartile_SplitMean
-            binary.Run(src)
-            binary.mats.Run(empty)
-            dst2 = binary.mats.dst2
-            dst1 = binary.mats.dst3 * 0.5
-            matList = binary.mats.mat
-            quadrant = binary.mats.quadrant
-        End If
+        binary.Run(src)
+        binary.mats.Run(empty)
+        dst2 = binary.mats.dst2
+        dst1 = binary.mats.dst3 * 0.5
+        matList = binary.mats.mat
+        quadrant = binary.mats.quadrant
+
+        dst0.SetTo(0)
+        For i = 0 To diff.Count - 1
+            diff(i).Run(binary.mats.mat(i))
+            dst0 = dst0 Or diff(i).dst3
+        Next
 
         Dim counts(3, task.gridList.Count) As Integer
         Dim contourCounts As New List(Of List(Of Integer))
@@ -65,17 +67,21 @@ Public Class Quartile_Basics : Inherits VB_Algorithm
         Dim bump = 3
         Dim ratio = dst2.Height / task.gridList(0).Height
         For i = 0 To matList.Count - 1
-            Dim tmp = matList(i)(roiSave)
+            Dim tmp As cv.Mat = matList(i)(roiSave) * 0.5
             Dim nextCount = tmp.CountNonZero
+            Dim tmpVolatile As cv.Mat = dst0(roiSave) And tmp
+            tmp.SetTo(255, tmpVolatile)
+            dst0(roiSave).CopyTo(tmp, tmpVolatile)
             Dim r = New cv.Rect(0, 0, tmp.Width * ratio, tmp.Height * ratio)
             mats.mat(i)(r) = tmp.Resize(New cv.Size(r.Width, r.Height))
+
             If task.heartBeat Then
                 Dim plus = mats.mat(i)(r).Width / 2
                 points(i) = Choose(i + 1, New cv.Point(bump + plus, bump), New cv.Point(bump + dst2.Width / 2 + plus, bump),
                                           New cv.Point(bump + plus, bump + dst2.Height / 2),
                                           New cv.Point(bump + dst2.Width / 2 + plus, bump + dst2.Height / 2))
                 labelStr(i) = (CStr(nextCount) + " pixels" + vbCrLf + CStr(contourCounts(index)(i)) + " contours" + vbCrLf +
-                               Format(means(index)(i), fmt0) + " mean")
+                               Format(means(index)(i), fmt0) + " mean" + vbCrLf + CStr(tmpVolatile.CountNonZero) + " volatile")
             End If
         Next
 
@@ -104,7 +110,7 @@ Public Class Quartile_Canny : Inherits VB_Algorithm
     Dim mats As New Mat_4Click
     Public Sub New()
         labels(2) = "Edges between halves, lightest, darkest, and the combo"
-        desc = "Collect edges from binarized images"
+        desc = "Find edges from each of the binarized images"
     End Sub
     Public Sub RunVB(src As cv.Mat)
 
@@ -165,36 +171,6 @@ Public Class Quartile_Sobel : Inherits VB_Algorithm
         mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class Quartile_Unstable : Inherits VB_Algorithm
-    Dim binary As New Quartile_SplitMean
-    Dim diff(3) As Diff_Basics
-    Public Sub New()
-        For i = 0 To diff.Count - 1
-            diff(i) = New Diff_Basics
-        Next
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Find the unstable pixels in the binary image"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        binary.Run(src)
-        dst2 = binary.dst2
-        dst3.SetTo(0)
-        For i = 0 To diff.Count - 1
-            diff(i).Run(binary.mats.mat(i))
-            dst3 = dst3 Or diff(i).dst3
-        Next
-        If task.heartBeat Then labels(3) = "There are " + CStr(dst3.CountNonZero) + " unstable pixels"
     End Sub
 End Class
 
@@ -297,7 +273,6 @@ Public Class Quartile_UnstablePixels : Inherits VB_Algorithm
             strOut += CStr(index) + vbTab
             lastIndex = index
         Next
-        Console.WriteLine("gapvalue count = " + CStr(gapValues.Count))
         If gapValues.Count < 4 Then
             gapValues.Add((255 + lastGap) / 2)
         End If
@@ -693,5 +668,54 @@ Public Class Quartile_SplitMean2 : Inherits VB_Algorithm
         dst2 = mats.dst2
         dst3 = mats.dst3
         labels(3) = mats.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Quartile_BasicsColors : Inherits VB_Algorithm
+    Dim quart As New Quartile_Basics
+    Dim color As New Color_Basics
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Test Quartile_Basics with different src inputs."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        color.Run(src)
+        quart.Run(color.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst1 = quart.dst1
+        dst2 = quart.dst2
+        dst3 = quart.dst3
+        labels = quart.labels
+        trueData = quart.trueData
+    End Sub
+End Class
+
+
+
+
+
+Public Class Quartile_Unstable : Inherits VB_Algorithm
+    Dim binary As New Quartile_SplitMean
+    Dim diff(3) As Diff_Basics
+    Public Sub New()
+        For i = 0 To diff.Count - 1
+            diff(i) = New Diff_Basics
+        Next
+        labels(2) = "Image separated into 4 levels - darkest to lightest"
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Find the unstable pixels in the binary image"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binary.Run(src)
+        dst2 = binary.dst2
+        dst3.SetTo(0)
+        For i = 0 To diff.Count - 1
+            diff(i).Run(binary.mats.mat(i))
+            dst3 = dst3 Or diff(i).dst3
+        Next
+        If task.heartBeat Then labels(3) = "There are " + CStr(dst3.CountNonZero) + " unstable pixels"
     End Sub
 End Class

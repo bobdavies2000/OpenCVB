@@ -118,6 +118,7 @@
     <Compile Include="AsciiArt.vb" />
     <Compile Include="Bezier.vb" />
     <Compile Include="BGRPattern.vb" />
+    <Compile Include="Bin3Way.vb" />
     <Compile Include="Boundary.vb" />
     <Compile Include="Brightness.vb" />
     <Compile Include="CameraMotion.vb" />
