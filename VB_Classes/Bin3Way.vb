@@ -108,16 +108,13 @@ Public Class Bin3Way_RedCloudDark : Inherits VB_Algorithm
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Use RedCloud with the darkest regions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then bin3.Run(src)
 
-        dst1.SetTo(0)
-        dst1.SetTo(1, bin3.bin3.mats.mat(0))
         flood.inputMask = Not bin3.bin3.mats.mat(0)
-        flood.Run(dst1)
+        flood.Run(bin3.bin3.mats.mat(0))
         dst2 = flood.dst2
     End Sub
 End Class
@@ -132,16 +129,13 @@ Public Class Bin3Way_RedCloudLite : Inherits VB_Algorithm
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Use RedCloud with the lightest regions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then bin3.Run(src)
 
-        dst1.SetTo(0)
-        dst1.SetTo(1, bin3.bin3.mats.mat(2))
         flood.inputMask = Not bin3.bin3.mats.mat(2)
-        flood.Run(dst1)
+        flood.Run(bin3.bin3.mats.mat(2))
         dst2 = flood.dst2
     End Sub
 End Class
@@ -155,7 +149,6 @@ Public Class Bin3Way_RedCloudOther : Inherits VB_Algorithm
     Dim flood As New Flood_BasicsMask
     Dim color As New Color_Basics
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         flood.inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Use RedCloud with the regions that are neither lightest or darkest"
     End Sub
@@ -201,10 +194,8 @@ Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
             task.cellMap = cellMaps(i)
             task.redCells = redCells(i)
             If i = 0 Or i = 2 Then
-                dst1.SetTo(0)
-                dst1.SetTo(1, bin3.bin3.mats.mat(i))
                 flood.inputMask = Not bin3.bin3.mats.mat(i)
-                flood.Run(dst1)
+                flood.Run(bin3.bin3.mats.mat(i))
             Else
                 flood.inputMask = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(2)
                 color.Run(src)
@@ -215,7 +206,7 @@ Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
         Next
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        Dim maxOther = If(options.startRegion = 0, (redCells(0).Count + redCells(2).Count) / 2, 255)
+        Dim maxOther = If(options.startRegion = 0, Math.Max(redCells(0).Count, redCells(2).Count), 255)
         For i = 0 To 2
             Dim count As Integer
             For Each rc In redCells(i)
