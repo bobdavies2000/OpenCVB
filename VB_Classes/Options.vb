@@ -4690,12 +4690,13 @@ End Class
 
 
 Public Class Options_AddWeighted : Inherits VB_Algorithm
+    Public addWeighted As Single
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Add Weighted %", 0, 100, 50)
     End Sub
     Public Sub RunVB()
         Static weightSlider = findSlider("Add Weighted %")
-        task.addWeighted = weightSlider.value / 100
+        addWeighted = weightSlider.value / 100
     End Sub
 End Class
 
