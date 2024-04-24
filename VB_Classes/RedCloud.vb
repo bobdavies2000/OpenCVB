@@ -5,6 +5,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Dim redCPP As New RedCloud_CPP
     Public inputMask As New cv.Mat
     Public Sub New()
+        gOptions.IdentifyCells.Checked = True
         inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
                         "It is behind the global options (which affect most algorithms.)")
@@ -29,7 +30,6 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         dst2 = genCells.dst2
 
         setSelectedContour()
-        identifyCells()
         labels(2) = genCells.labels(2)
     End Sub
 End Class
@@ -44,6 +44,7 @@ Public Class RedCloud_BasicsTest : Inherits VB_Algorithm
     Public genCells As New Cell_Generate
     Public inputMask As cv.Mat
     Public Sub New()
+        gOptions.IdentifyCells.Checked = True
         inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         vbAddAdvice(traceName + ": use the RedCloud algorithm panel." + vbCrLf + "(Behind the global options)")
         desc = "Find cells and then match them to the previous generation"
@@ -70,7 +71,6 @@ Public Class RedCloud_BasicsTest : Inherits VB_Algorithm
         dst2 = genCells.dst2
 
         setSelectedContour()
-        identifyCells()
         labels(2) = genCells.labels(2)
     End Sub
 End Class
@@ -147,6 +147,7 @@ Public Class RedCloud_FindCells : Inherits VB_Algorithm
     Public cellList As New List(Of Integer)
     Dim redC As New RedCloud_Basics
     Public Sub New()
+        gOptions.IdentifyCells.Checked = True
         gOptions.PixelDiffThreshold.Value = 25
         cPtr = RedCloud_FindCells_Open()
         desc = "Find all the RedCloud cells touched by the mask created by the Motion_History rectangle"
@@ -184,7 +185,6 @@ Public Class RedCloud_FindCells : Inherits VB_Algorithm
             Next
             dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
         End If
-        identifyCells()
         labels(3) = CStr(count) + " cells were found using the motion mask"
     End Sub
     Public Sub Close()
@@ -1124,6 +1124,7 @@ End Class
 Public Class RedCloud_CellStatsPlot : Inherits VB_Algorithm
     Dim cells As New Cell_BasicsPlot
     Public Sub New()
+        gOptions.IdentifyCells.Checked = True
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         cells.runRedCloud = True
         desc = "Display the stats for the requested cell"
@@ -1135,7 +1136,6 @@ Public Class RedCloud_CellStatsPlot : Inherits VB_Algorithm
         labels(2) = cells.labels(2)
 
         setTrueText(cells.strOut, 3)
-        identifyCells()
     End Sub
 End Class
 
@@ -1256,6 +1256,7 @@ Public Class RedCloud_FourColor : Inherits VB_Algorithm
     Dim binar4 As New Quartile_Regions
     Dim redC As New RedCloud_Basics
     Public Sub New()
+        gOptions.IdentifyCells.Checked = True
         redOptions.UseColorOnly.Checked = True
         labels(3) = "A 4-way split of the input grayscale image based on brightness"
         desc = "Use RedCloud on a 4-way split based on light to dark in the image."
@@ -1266,7 +1267,6 @@ Public Class RedCloud_FourColor : Inherits VB_Algorithm
 
         redC.Run(binar4.dst2)
         dst2 = redC.dst2
-        If standaloneTest() Then identifyCells()
         labels(2) = redC.labels(3)
     End Sub
 End Class
@@ -1359,6 +1359,7 @@ End Class
 Public Class RedCloud_Flippers : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public Sub New()
+        gOptions.IdentifyCells.Checked = True
         redOptions.UseColorOnly.Checked = True
         labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
         desc = "Identify the 4-way split cells that are flipping between brightness boundaries."
@@ -1381,8 +1382,6 @@ Public Class RedCloud_Flippers : Inherits VB_Algorithm
             End If
         Next
         lastMap = redC.dst3.Clone
-
-        If (standaloneTest()) And task.redCells.Count > 1 Then identifyCells()
 
         If task.heartBeat Then
             labels(3) = "Unmatched to previous frame: " + CStr(unMatched) + " totaling " + CStr(unMatchedPixels) + " pixels."
@@ -1495,9 +1494,6 @@ Public Class RedCloud_OnlyColorAlt : Inherits VB_Algorithm
         Next
 
         task.redCells = New List(Of rcData)(newCells)
-
-        If standaloneTest() Then identifyCells()
-
         labels(3) = CStr(task.redCells.Count) + " cells were identified.  The top " + CStr(redOptions.identifyCount) + " are numbered"
         labels(2) = redMasks.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
 
@@ -2306,6 +2302,7 @@ Public Class RedCloud_GenCellContains : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
     Dim contains As New Flood_ContainedCells
     Public Sub New()
+        gOptions.IdentifyCells.Checked = True
         desc = "Merge cells contained in the top X cells and remove all other cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -2328,7 +2325,6 @@ Public Class RedCloud_GenCellContains : Inherits VB_Algorithm
             Dim rc = task.redCells(i)
             dst2(rc.rect).SetTo(task.redCells(rc.container).color, rc.mask)
         Next
-        identifyCells()
     End Sub
 End Class
 

@@ -1,4 +1,6 @@
-﻿Imports OpenCvSharp
+﻿Imports System.Security.Cryptography
+Imports OpenCvSharp
+Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 
 Public Class Bin3Way_Basics : Inherits VB_Algorithm
@@ -217,21 +219,23 @@ Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
         task.redCells.Add(New rcData)
         task.cellMap.SetTo(0)
         dst2.SetTo(0)
-        Static lastImage = dst2.Clone
+        Static lastImage As cv.Mat = dst2.Clone
+        Dim ptMarks As New List(Of cv.Point)
         For Each rc In sortedCells.Values
-            If rc.matchCount >= task.rcMatchThreshold Then
-                rc.index = task.redCells.Count
-                task.redCells.Add(rc)
-                task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
-
-
-
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
-                If rc.index >= 255 Then Exit For
+            If rc.index = 0 Then Continue For
+            If ptMarks.Contains(rc.maxDStable) Then
+                Dim index = ptMarks.IndexOf(rc.maxDStable)
+                rc.color = task.redCells(index).color
             End If
+            rc.index = task.redCells.Count
+            task.redCells.Add(rc)
+            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            ptMarks.Add(rc.maxDStable)
+            If rc.index >= 255 Then Exit For
         Next
 
-        identifyCellRects(task.redCells)
         If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " cells were identified and matched to the previous image"
         lastImage = dst2.Clone
     End Sub

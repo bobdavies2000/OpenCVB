@@ -1536,7 +1536,6 @@ if algorithmName = "Profile_Kalman" Then return new Profile_Kalman
 if algorithmName = "Profile_OpenGL" Then return new Profile_OpenGL
 if algorithmName = "Profile_Rotation" Then return new Profile_Rotation
 if algorithmName = "Projection_Basics" Then return new Projection_Basics
-if algorithmName = "Projection_Both" Then return new Projection_Both
 if algorithmName = "Projection_Cell" Then return new Projection_Cell
 if algorithmName = "Projection_Floor" Then return new Projection_Floor
 if algorithmName = "Projection_HistSide" Then return new Projection_HistSide

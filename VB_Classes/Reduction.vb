@@ -37,6 +37,7 @@ Public Class Reduction_Floodfill : Inherits VB_Algorithm
     Public reduction As New Reduction_Basics
     Public redC As New RedCloud_Basics
     Public Sub New()
+        gOptions.IdentifyCells.Checked = True
         redOptions.UseColorOnly.Checked = True
         labels(2) = "Reduced input to floodfill"
         redOptions.SimpleReductionSlider.Value = 32
@@ -46,7 +47,6 @@ Public Class Reduction_Floodfill : Inherits VB_Algorithm
         reduction.Run(src)
         dst2 = vbPalette(reduction.dst2 * 255 / reduction.classCount)
         redC.Run(reduction.dst2)
-        If standaloneTest() Then identifyCells()
         dst3 = redC.dst2
         labels(3) = redC.labels(3)
     End Sub

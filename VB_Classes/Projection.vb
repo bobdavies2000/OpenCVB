@@ -89,34 +89,9 @@ Public Class Projection_Basics : Inherits VB_Algorithm
             Next
         End If
         labels(2) = CStr(redCells.Count) + " objects were found in the " + viewType + " view."
-        If standalone Then identifyCellRects(redCells)
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Projection_Both : Inherits VB_Algorithm
-    Dim side As New Projection_Side
-    Dim top As New Projection_Top
-    Public Sub New()
-        desc = "Project both the top and side views of the input."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        top.Run(src)
-        dst2 = top.dst2
-        labels(2) = top.labels(2)
-        identifyCellRects(top.objects.redCells)
-
-        side.Run(src)
-        dst3 = side.dst2
-        labels(3) = side.labels(2)
-        identifyCellRects(side.objects.redCells, 3)
-    End Sub
-End Class
 
 
 
@@ -250,6 +225,7 @@ Public Class Projection_Top : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public objects As New Projection_Basics
     Public Sub New()
+        gOptions.IdentifyCells.Checked = True
         desc = "Find all the masks, rects, and counts in the top down view."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -266,8 +242,6 @@ Public Class Projection_Top : Inherits VB_Algorithm
         dst2 = objects.dst2
         labels(2) = redC.labels(2)
         setTrueText(objects.strOut, 3)
-
-        If standalone Then identifyCellRects(objects.redCells)
     End Sub
 End Class
 
@@ -283,6 +257,7 @@ Public Class Projection_Side : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public objects As New Projection_Basics
     Public Sub New()
+        gOptions.IdentifyCells.Checked = True
         objects.viewType = "Side"
         desc = "Find all the masks, rects, and counts in the side view."
     End Sub
@@ -300,8 +275,6 @@ Public Class Projection_Side : Inherits VB_Algorithm
         dst2 = objects.dst2
         labels(2) = redC.labels(2)
         setTrueText(objects.strOut, 3)
-
-        If standalone Then identifyCellRects(objects.redCells)
     End Sub
 End Class
 

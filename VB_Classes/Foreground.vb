@@ -156,6 +156,7 @@ Public Class Foreground_CellsFore : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Public redCells As New List(Of rcData)
     Public Sub New()
+        gOptions.IdentifyCells.Checked = True
         redOptions.UseColorOnly.Checked = True
         desc = "Get the foreground cells"
     End Sub
@@ -170,8 +171,6 @@ Public Class Foreground_CellsFore : Inherits VB_Algorithm
             Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
             If tmp.CountNonZero / rc.pixels > 0.5 Then dst2(rc.rect).SetTo(rc.color, rc.mask) Else Dim k = 0
         Next
-
-        If standaloneTest() Then identifyCells()
     End Sub
 End Class
 
@@ -183,6 +182,7 @@ Public Class Foreground_CellsBack : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Public redCells As New List(Of rcData)
     Public Sub New()
+        gOptions.IdentifyCells.Checked = True
         redOptions.UseColorOnly.Checked = True
         desc = "Get the background cells"
     End Sub
@@ -197,7 +197,5 @@ Public Class Foreground_CellsBack : Inherits VB_Algorithm
             Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
             If tmp.CountNonZero / rc.pixels > 0.5 Then dst2(rc.rect).SetTo(rc.color, rc.mask) Else Dim k = 0
         Next
-
-        If standaloneTest() Then identifyCells()
     End Sub
 End Class

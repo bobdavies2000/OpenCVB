@@ -124,6 +124,7 @@ Public Class Hist3D_RedColor : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
+        gOptions.IdentifyCells.Checked = True
         redOptions.UseColorOnly.Checked = True
         desc = "Use the Hist3D color classes to segment the image with RedCloud_Basics"
     End Sub
@@ -139,7 +140,6 @@ Public Class Hist3D_RedColor : Inherits VB_Algorithm
         If task.redCells.Count > 0 Then
             dst2(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
         End If
-        If standaloneTest() Then identifyCells()
     End Sub
 End Class
 

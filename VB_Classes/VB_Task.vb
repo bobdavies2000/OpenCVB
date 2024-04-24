@@ -609,6 +609,24 @@ Public Class VBtask : Implements IDisposable
             cMotion.Run(src)
             algorithmObject.NextFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
+            If gOptions.IdentifyCells.Checked Then
+                Dim ptNew As New cv.Point
+                'Dim ptMarks As New List(Of cv.Point)
+                For Each rcX In redCells
+                    '  If rcX.index > 0 And rcX.index <= redOptions.identifyCount Then
+                    'If ptMarks.Contains(rcX.maxDStable) Then
+                    '    dst2.Rectangle(rcX.rect, task.highlightColor, task.lineWidth)
+                    '    Dim index = ptMarks.IndexOf(rcX.maxDStable)
+                    '    dst2.Rectangle(task.redCells(index + 1).rect, task.highlightColor, task.lineWidth + 1)
+                    'End If
+                    If rcX.index > 0 And rcX.maxDStable <> ptNew Then
+                        Dim str As New trueText(CStr(rcX.index), rcX.maxDStable.X, rcX.maxDStable.Y, 2)
+                        trueData.Add(str)
+                        'ptMarks.Add(rcX.maxDStable)
+                    End If
+                Next
+            End If
+
             If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then
                 task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
             End If
