@@ -132,7 +132,7 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
         If standalone Or buildInputMask Then
             Static colorC As New Color_Basics
             colorC.Run(src)
-            inputMask = task.maxDepthMask
+            inputMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
             src = colorC.dst2
         End If
 

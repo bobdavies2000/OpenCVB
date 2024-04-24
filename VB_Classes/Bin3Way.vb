@@ -52,7 +52,7 @@ End Class
 
 
 Public Class Bin3Way_KMeans : Inherits VB_Algorithm
-    Dim bin3 As New Bin3Way_Basics
+    Public bin3 As New Bin3Way_Basics
     Dim kmeans As New KMeans_Dimensions
     Dim mats As New Mat_4Click
     Public Sub New()
@@ -73,5 +73,164 @@ Public Class Bin3Way_KMeans : Inherits VB_Algorithm
         mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Bin3Way_Color : Inherits VB_Algorithm
+    Dim bin3 As New Bin3Way_KMeans
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Build the palette input that best separates the light and dark regions of an image"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        bin3.Run(src)
+        dst2.SetTo(4)
+        dst2.SetTo(1, bin3.bin3.mats.mat(0))
+        dst2.SetTo(2, bin3.bin3.mats.mat(1))
+        dst2.SetTo(3, bin3.bin3.mats.mat(2))
+        dst3 = vbPalette(dst2 * 255 / 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Bin3Way_RedCloudDark : Inherits VB_Algorithm
+    Dim bin3 As New Bin3Way_KMeans
+    Dim flood As New Flood_BasicsMask
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Use RedCloud with the darkest regions"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then bin3.Run(src)
+
+        dst1.SetTo(0)
+        dst1.SetTo(1, bin3.bin3.mats.mat(0))
+        flood.inputMask = Not bin3.bin3.mats.mat(0)
+        flood.Run(dst1)
+        dst2 = flood.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Bin3Way_RedCloudLite : Inherits VB_Algorithm
+    Dim bin3 As New Bin3Way_KMeans
+    Dim flood As New Flood_BasicsMask
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Use RedCloud with the lightest regions"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then bin3.Run(src)
+
+        dst1.SetTo(0)
+        dst1.SetTo(1, bin3.bin3.mats.mat(2))
+        flood.inputMask = Not bin3.bin3.mats.mat(2)
+        flood.Run(dst1)
+        dst2 = flood.dst2
+    End Sub
+End Class
+
+
+
+
+
+Public Class Bin3Way_RedCloudOther : Inherits VB_Algorithm
+    Dim bin3 As New Bin3Way_KMeans
+    Dim flood As New Flood_BasicsMask
+    Dim color As New Color_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        flood.inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Use RedCloud with the regions that are neither lightest or darkest"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then bin3.Run(src)
+
+        flood.inputMask = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(2)
+
+        color.Run(src)
+        flood.Run(color.dst2)
+        dst2 = flood.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
+    Dim bin3 As New Bin3Way_KMeans
+    Dim flood As New Flood_BasicsMask
+    Dim color As New Color_Basics
+    Dim cellMaps(2) As cv.Mat, redCells(2) As List(Of rcData)
+    Public Sub New()
+        For i = 0 To redCells.Count - 1
+            redCells(i) = New List(Of rcData)
+            cellMaps(i) = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Next
+        desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        bin3.Run(src)
+
+        For i = 0 To 2
+            task.cellMap = cellMaps(i)
+            task.redCells = redCells(i)
+            If i = 0 Or i = 2 Then
+                dst1.SetTo(0)
+                dst1.SetTo(1, bin3.bin3.mats.mat(i))
+                flood.inputMask = Not bin3.bin3.mats.mat(i)
+                flood.Run(dst1)
+            Else
+                flood.inputMask = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(2)
+                color.Run(src)
+                flood.Run(color.dst2)
+            End If
+            cellMaps(i) = task.cellMap.Clone
+            redCells(i) = New List(Of rcData)(task.redCells)
+        Next
+
+        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim maxOther = (redCells(0).Count + redCells(2).Count) / 2
+        For i = 0 To 2
+            Dim count As Integer
+            For Each rc In redCells(i)
+                sortedCells.Add(rc.pixels, rc)
+                count += 1
+                If i = 1 And maxOther <= count Then Exit For
+            Next
+        Next
+
+        task.redCells.Clear()
+        task.redCells.Add(New rcData)
+        task.cellMap.SetTo(0)
+        dst2.SetTo(0)
+        For Each rc In sortedCells.Values
+            rc.index = task.redCells.Count
+            task.redCells.Add(rc)
+            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            If rc.index >= 255 Then Exit For
+        Next
+
+        labels(2) = CStr(task.redCells.Count) + " cells were identified using darkest, lightest and other."
     End Sub
 End Class
