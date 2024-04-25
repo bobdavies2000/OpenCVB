@@ -606,7 +606,6 @@ Public Class VBtask : Implements IDisposable
 
             If gOptions.IdentifyCells.Checked Then
                 Dim ptNew As New cv.Point
-                'Dim ptMarks As New List(Of cv.Point)
                 For Each rcX In redCells
                     '  If rcX.index > 0 And rcX.index <= redOptions.identifyCount Then
                     'If ptMarks.Contains(rcX.maxDStable) Then
@@ -614,10 +613,9 @@ Public Class VBtask : Implements IDisposable
                     '    Dim index = ptMarks.IndexOf(rcX.maxDStable)
                     '    dst2.Rectangle(task.redCells(index + 1).rect, task.highlightColor, task.lineWidth + 1)
                     'End If
-                    If rcX.index > 0 And rcX.maxDStable <> ptNew Then
+                    If rcX.maxDStable <> ptNew And rcX.index <= redOptions.identifyCount Then
                         Dim str As New trueText(CStr(rcX.index), rcX.maxDStable.X, rcX.maxDStable.Y, 2)
                         trueData.Add(str)
-                        'ptMarks.Add(rcX.maxDStable)
                     End If
                 Next
             End If

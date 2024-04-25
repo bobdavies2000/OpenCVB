@@ -221,10 +221,11 @@ Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
         dst2.SetTo(0)
         Static lastImage As cv.Mat = dst2.Clone
         Dim ptMarks As New List(Of cv.Point)
+        Dim rcSave As New List(Of Integer)
         For Each rc In sortedCells.Values
             If rc.index = 0 Then Continue For
             If ptMarks.Contains(rc.maxDStable) Then
-                Dim index = ptMarks.IndexOf(rc.maxDStable)
+                Dim index = rcSave(ptMarks.IndexOf(rc.maxDStable))
                 rc.color = task.redCells(index).color
             End If
             rc.index = task.redCells.Count
@@ -233,6 +234,7 @@ Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
 
             dst2(rc.rect).SetTo(rc.color, rc.mask)
             ptMarks.Add(rc.maxDStable)
+            rcSave.Add(rc.index)
             If rc.index >= 255 Then Exit For
         Next
 
