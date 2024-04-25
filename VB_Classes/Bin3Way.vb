@@ -238,6 +238,9 @@ Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
             If rc.index >= 255 Then Exit For
         Next
 
+
+
+
         If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " cells were identified and matched to the previous image"
         lastImage = dst2.Clone
     End Sub

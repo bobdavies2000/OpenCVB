@@ -452,7 +452,7 @@ Public Class OpenCVB
                     ' campic(2) has both dst2 and dst3 to assure they are in sync.
                     If tt.text.Length > 0 And tt.picTag = pic.Tag Then
                         g.DrawString(tt.text, settings.fontInfo, New SolidBrush(Color.White),
-                                     tt.x * ratio, tt.y * ratio)
+                                     tt.pt.X * ratio, tt.pt.Y * ratio)
                     End If
                 Next
             Catch ex As Exception
@@ -1558,7 +1558,7 @@ Public Class OpenCVB
             End If
 
             If task.algName.StartsWith("Options_") Then
-                Dim str As New trueText("Options algorithms have no output", 10, 10, 2)
+                Dim str As New trueText("Options algorithms have no output", New cv.Point(10, 10), 2)
                 trueData.Add(str)
                 task.labels(2) = "Options algorithms have no output"
                 Continue While

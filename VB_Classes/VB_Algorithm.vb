@@ -4,19 +4,17 @@ Imports System.Drawing
 Public Class trueText
     Public text As String
     Public picTag = 2
-    Public x As Integer
-    Public y As Integer
-    Private Sub setup(_text As String, _x As Integer, _y As Integer, camPicIndex As Integer)
+    Public pt As cv.Point
+    Private Sub setup(_text As String, _pt As cv.Point, camPicIndex As Integer)
         text = _text
-        x = _x
-        y = _y
+        pt = _pt
         picTag = camPicIndex
     End Sub
-    Public Sub New(_text As String, _x As Integer, _y As Integer, camPicIndex As Integer)
-        setup(_text, _x, _y, camPicIndex)
+    Public Sub New(_text As String, _pt As cv.Point, camPicIndex As Integer)
+        setup(_text, _pt, camPicIndex)
     End Sub
-    Public Sub New(_text As String, _x As Integer, _y As Integer)
-        setup(_text, _x, _y, 2)
+    Public Sub New(_text As String, _pt As cv.Point)
+        setup(_text, _pt, 2)
     End Sub
 End Class
 Public Class VB_Algorithm : Implements IDisposable
@@ -133,18 +131,18 @@ Public Class VB_Algorithm : Implements IDisposable
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
     Public Sub setTrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
-        Dim str As New trueText(text, pt.X, pt.Y, picTag)
+        Dim str As New trueText(text, pt, picTag)
         trueData.Add(str)
     End Sub
     Public Sub setTrueText(text As String)
         Dim pt = New cv.Point(0, 0)
         Dim picTag = 2
-        Dim str As New trueText(text, pt.X, pt.Y, picTag)
+        Dim str As New trueText(text, pt, picTag)
         trueData.Add(str)
     End Sub
     Public Sub setTrueText(text As String, picTag As Integer)
         Dim pt = New cv.Point(0, 0)
-        Dim str As New trueText(text, pt.X, pt.Y, picTag)
+        Dim str As New trueText(text, pt, picTag)
         trueData.Add(str)
     End Sub
     Public Function showIntermediate() As Boolean
@@ -154,7 +152,7 @@ Public Class VB_Algorithm : Implements IDisposable
     End Function
     Public Sub setFlowText(text As String, picTag As Integer)
         Dim pt = New cv.Point(0, 0)
-        Dim str As New trueText(text, pt.X, pt.Y, picTag)
+        Dim str As New trueText(text, pt, picTag)
         task.flowData.Add(str)
     End Sub
     Public Function initRandomRect(margin As Integer) As cv.Rect

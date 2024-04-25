@@ -614,7 +614,7 @@ Public Class VBtask : Implements IDisposable
                     '    dst2.Rectangle(task.redCells(index + 1).rect, task.highlightColor, task.lineWidth + 1)
                     'End If
                     If rcX.maxDStable <> ptNew And rcX.index <= redOptions.identifyCount Then
-                        Dim str As New trueText(CStr(rcX.index), rcX.maxDStable.X, rcX.maxDStable.Y, 2)
+                        Dim str As New trueText(CStr(rcX.index), rcX.maxDStable, 2)
                         trueData.Add(str)
                     End If
                 Next
@@ -648,7 +648,7 @@ Public Class VBtask : Implements IDisposable
                     Static cellStats As New Cell_Basics
                     cellStats.statsString()
                     dst1 = cellStats.dst1
-                    Dim str As New trueText(cellStats.strOut, 0, 0, 3)
+                    Dim str As New trueText(cellStats.strOut, New cv.Point, 3)
                     trueData.Add(str)
                 End If
             End If
@@ -678,7 +678,7 @@ Public Class VBtask : Implements IDisposable
         If algorithmObject IsNot Nothing Then algorithmObject.Dispose()
     End Sub
     Public Sub trueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
-        Dim str As New trueText(text, pt.X, pt.Y, picTag)
+        Dim str As New trueText(text, pt, picTag)
         task.trueData.Add(str)
     End Sub
 End Class
