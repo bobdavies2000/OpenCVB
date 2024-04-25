@@ -8,6 +8,7 @@ Public Class Histogram_Basics : Inherits VB_Algorithm
     Public plot As New Plot_Histogram
     Public ranges() As cv.Rangef
     Dim splitIndex As Integer
+    Public inputMask As New cv.Mat
     Public Sub New()
         If standaloneTest() Then gOptions.HistBinSlider.Value = 255
         desc = "Create a histogram (no Kalman)"
@@ -24,7 +25,7 @@ Public Class Histogram_Basics : Inherits VB_Algorithm
         ranges = {New cv.Rangef(mm.minVal - histDelta, mm.maxVal + histDelta)}
 
         ' ranges are exclusive in OpenCV!!!
-        cv.Cv2.CalcHist({src}, {splitIndex}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
+        cv.Cv2.CalcHist({src}, {splitIndex}, inputMask, histogram, 1, {task.histogramBins}, ranges)
 
         ReDim histArray(histogram.Total - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)

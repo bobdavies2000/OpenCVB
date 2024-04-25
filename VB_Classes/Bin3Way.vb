@@ -263,6 +263,7 @@ Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
 
         bin3.Run(src)
 
+        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = options.startRegion To options.endRegion
             task.cellMap = cellMaps(i)
             task.redCells = redCells(i)
@@ -270,10 +271,6 @@ Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
             flood.Run(bin3.bin3.mats.mat(i))
             cellMaps(i) = task.cellMap.Clone
             redCells(i) = New List(Of rcData)(task.redCells)
-        Next
-
-        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To 2
             For Each rc In redCells(i)
                 If rc.index = 0 Then Continue For
                 sortedCells.Add(rc.pixels, rc)

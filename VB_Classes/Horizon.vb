@@ -1,5 +1,68 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Horizon_Basics : Inherits VB_Algorithm
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Search for the transition from positive to negative to find the horizon."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If gOptions.gravityPointCloud.Checked Then
+            dst0 = task.pcSplit(1).Abs() ' already oriented to gravity
+        Else
+            ' rebuild the pointcloud so it is oriented to gravity.
+            Dim pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)
+            Dim split = pc.Split()
+            dst0 = split(1).Abs()
+        End If
+
+        dst1 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        dst0.SetTo(task.maxZmeters, Not dst1)
+
+        Dim points As New List(Of cv.Point)
+        Dim badPointCount As Integer, totalSampled As Integer = 1 ' avoid divide failure below...
+        For i = dst2.Width - 1 To 0 Step -1
+            Dim mm = vbMinMax(dst0.Col(i))
+            If mm.minVal > 0 And mm.minVal < 0.001 Then
+                If mm.minLoc.Y = 0 Or mm.minLoc.Y = dst2.Height - 1 Then badPointCount += 1
+                points.Add(New cv.Point(i, mm.minLoc.Y))
+                totalSampled += 1
+            End If
+        Next
+
+        If points.Count < 10 Or badPointCount / totalSampled > 0.2 Then
+            task.horizonPresent = False
+            task.horizonVec = New pointPair(New cv.Point, New cv.Point)
+            strOut = "Horizon not found "
+        Else
+            task.horizonPresent = True
+            Dim p1 = points(0)
+            Dim p2 = points(points.Count - 1)
+            Dim lp = New pointPair(p1, p2)
+            task.horizonVec = lp.edgeToEdgeLine(dst2.Size)
+
+            If standaloneTest() Then
+                If task.heartBeat Then
+                    If p1.Y >= 1 And p1.Y <= dst2.Height - 1 Then strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf
+                End If
+
+                dst2.SetTo(0)
+                For Each pt In points
+                    dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+                Next
+
+                dst2.Line(task.horizonVec.p1, task.horizonVec.p2, 255, task.lineWidth, task.lineType)
+                dst2.Line(task.gravityVec.p1, task.gravityVec.p2, 255, task.lineWidth, task.lineType)
+            End If
+        End If
+        setTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Horizon_Basics1 : Inherits VB_Algorithm
     Public cloudY As cv.Mat
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -310,3 +373,8 @@ Public Class Horizon_Validate : Inherits VB_Algorithm
         End If
     End Sub
 End Class
+
+
+
+
+
