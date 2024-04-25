@@ -109,7 +109,7 @@ End Class
 
 
 
-Public Class Bin3Way_RedCloudDark : Inherits VB_Algorithm
+Public Class Bin3Way_RedCloudDarkest : Inherits VB_Algorithm
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
     Public Sub New()
@@ -130,7 +130,7 @@ End Class
 
 
 
-Public Class Bin3Way_RedCloudLite : Inherits VB_Algorithm
+Public Class Bin3Way_RedCloudLightest : Inherits VB_Algorithm
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
     Public Sub New()
@@ -181,8 +181,7 @@ Public Class Bin3Way_RedCloud1 : Inherits VB_Algorithm
     Dim cellMaps(2) As cv.Mat, redCells(2) As List(Of rcData)
     Dim options As New Options_Bin3WayRedCloud
     Public Sub New()
-        redOptions.identifyCount = 100
-        desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
+        desc = "Identify the lightest, darkest, and 'Other' regions separately and then combine the rcData."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
@@ -199,13 +198,13 @@ Public Class Bin3Way_RedCloud1 : Inherits VB_Algorithm
         For i = options.startRegion To options.endRegion
             task.cellMap = cellMaps(i)
             task.redCells = redCells(i)
-            If i = 0 Or i = 2 Then
-                flood.inputMask = Not bin3.bin3.mats.mat(i)
-                flood.Run(bin3.bin3.mats.mat(i))
-            Else
-                flood.inputMask = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(2)
+            If i = 2 Then
+                flood.inputMask = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(1)
                 color.Run(src)
                 flood.Run(color.dst2)
+            Else
+                flood.inputMask = Not bin3.bin3.mats.mat(i)
+                flood.Run(bin3.bin3.mats.mat(i))
             End If
             cellMaps(i) = task.cellMap.Clone
             redCells(i) = New List(Of rcData)(task.redCells)
@@ -222,30 +221,17 @@ Public Class Bin3Way_RedCloud1 : Inherits VB_Algorithm
         task.redCells.Add(New rcData)
         task.cellMap.SetTo(0)
         dst2.SetTo(0)
-        Static lastImage As cv.Mat = dst2.Clone
-        Dim ptMarks As New List(Of cv.Point)
-        Dim rcSave As New List(Of Integer)
         For Each rc In sortedCells.Values
             If rc.index = 0 Then Continue For
-
-            If ptMarks.Contains(rc.maxDStable) Then
-                Dim index = rcSave(ptMarks.IndexOf(rc.maxDStable))
-                rc.color = task.redCells(index).color
-            End If
 
             rc.index = task.redCells.Count
             task.redCells.Add(rc)
             task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
-
-            ptMarks.Add(rc.maxDStable)
-            rcSave.Add(rc.index)
-
             If rc.index >= 255 Then Exit For
         Next
 
         If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " cells were identified and matched to the previous image"
-        lastImage = dst2.Clone
     End Sub
 End Class
 
@@ -263,7 +249,6 @@ Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
     Dim cellMaps(2) As cv.Mat, redCells(2) As List(Of rcData)
     Dim options As New Options_Bin3WayRedCloud
     Public Sub New()
-        redOptions.identifyCount = 100
         desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
     End Sub
     Public Sub RunVB(src As cv.Mat)

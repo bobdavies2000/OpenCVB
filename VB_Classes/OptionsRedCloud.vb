@@ -59,7 +59,7 @@ Public Class OptionsRedCloud
 
         XRangeSlider.Value = task.xRange * 100
         YRangeSlider.Value = task.yRange * 100
-        IdentifyCountSlider.Value = 10
+        IdentifyCountSlider.Value = 20
 
         task.xRangeDefault = task.xRange
         task.yRangeDefault = task.yRange
