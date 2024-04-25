@@ -4711,10 +4711,11 @@ Public Class Options_Bin3WayRedCloud : Inherits VB_Algorithm
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Review All Regions")
+            radio.addRadio("Review Darkest and Lightest")
             radio.addRadio("Review Darkest Regions")
             radio.addRadio("Review Lightest Regions")
-            radio.addRadio("Review Other Regions")
-            radio.check(0).Checked = True
+            radio.addRadio("Review 'Other' Regions")
+            radio.check(1).Checked = True
         End If
     End Sub
     Public Sub RunVB()
@@ -4725,13 +4726,16 @@ Public Class Options_Bin3WayRedCloud : Inherits VB_Algorithm
                 endRegion = 2
             Case 1
                 startRegion = 0
-                endRegion = 0
+                endRegion = 1
             Case 2
-                startRegion = 2
-                endRegion = 2
+                startRegion = 0
+                endRegion = 0
             Case 3
                 startRegion = 1
                 endRegion = 1
+            Case 4
+                startRegion = 2
+                endRegion = 2
         End Select
     End Sub
 End Class

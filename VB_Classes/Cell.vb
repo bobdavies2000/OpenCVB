@@ -458,7 +458,8 @@ Public Class Cell_Generate : Inherits VB_Algorithm
                     If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
                     rc.matchCount = If(lrc.matchCount > task.rcMatchThreshold, lrc.matchCount, lrc.matchCount + 1)
                 Else
-                    rc.color = task.vecColors(rc.index)
+                    'rc.color = task.vecColors(rc.index)
+                    rc.color = New cv.Vec3b(msRNG.Next(40, 220), msRNG.Next(40, 220), msRNG.Next(40, 220))
                 End If
             End If
 

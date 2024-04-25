@@ -162,6 +162,7 @@ if algorithmName = "Bin3Way_Basics" Then return new Bin3Way_Basics
 if algorithmName = "Bin3Way_Color" Then return new Bin3Way_Color
 if algorithmName = "Bin3Way_KMeans" Then return new Bin3Way_KMeans
 if algorithmName = "Bin3Way_RedCloud" Then return new Bin3Way_RedCloud
+if algorithmName = "Bin3Way_RedCloud1" Then return new Bin3Way_RedCloud1
 if algorithmName = "Bin3Way_RedCloudDark" Then return new Bin3Way_RedCloudDark
 if algorithmName = "Bin3Way_RedCloudLite" Then return new Bin3Way_RedCloudLite
 if algorithmName = "Bin3Way_RedCloudOther" Then return new Bin3Way_RedCloudOther
