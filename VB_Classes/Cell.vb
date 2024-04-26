@@ -456,6 +456,8 @@ Public Class Cell_Generate : Inherits VB_Algorithm
                     rc.color = lrc.color
                     Dim stableCheck = task.cellMap.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
                     If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+                    Dim val = task.cellMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                    If val <> rc.indexLast Then rc.maxDStable = rc.maxDist ' maxDist has finally hit the edges of the cell.
                     rc.matchCount = If(lrc.matchCount > task.rcMatchThreshold, lrc.matchCount, lrc.matchCount + 1)
                 Else
                     'rc.color = task.vecColors(rc.index)

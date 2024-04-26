@@ -611,12 +611,12 @@ Public Class VBtask : Implements IDisposable
                 Dim ptNew As New cv.Point
                 Dim ptCells As New List(Of cv.Point)
                 For Each rcX In redCells
-                    If ptCells.Contains(rcX.maxDist) = False Then
-                        If rcX.maxDist <> ptNew And rcX.index <= redOptions.identifyCount Then
-                            Dim str As New trueText(CStr(rcX.index), rcX.maxDist, 2)
+                    If ptCells.Contains(rcX.maxDStable) = False Then
+                        If rcX.maxDStable <> ptNew And rcX.index <= redOptions.identifyCount Then
+                            Dim str As New trueText(CStr(rcX.index), rcX.maxDStable, 2)
                             trueData.Add(str)
                         End If
-                        ptCells.Add(rcX.maxDist)
+                        ptCells.Add(rcX.maxDStable)
                     Else
                         Dim k = 0
                     End If

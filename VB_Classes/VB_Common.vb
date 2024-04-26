@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Module VB_Basics
+Module VB_Common
     Public Const fmt0 = "0"
     Public Const fmt1 = "0.0"
     Public Const fmt2 = "0.00"
@@ -748,71 +748,6 @@ Public Structure vec8f
         f8 = _f8
     End Sub
 End Structure
-
-
-
-
-
-
-'Public Class rcData
-'    Public rect As cv.Rect
-'    Public mask As cv.Mat
-'    Public tier As Integer
-'    Public tierHist As New cv.Mat
-'    Public tierHistArray() As Single
-
-'    Public pixels As Integer
-
-'    Public color As New cv.Vec3b
-'    Public colorMean As New cv.Scalar
-'    Public colorStdev As New cv.Scalar
-
-'    Public depthPixels As Integer
-'    Public depthMask As cv.Mat
-'    Public depthMean As cv.Scalar
-'    Public depthStdev As cv.Scalar
-'    Public depthCell As Boolean ' true if cell has depth.
-
-'    Public minVec As cv.Point3f
-'    Public maxVec As cv.Point3f
-'    Public minLoc As cv.Point
-'    Public maxLoc As cv.Point
-
-'    Public mmX As mmData
-'    Public mmY As mmData
-'    Public mmZ As mmData
-
-'    Public maxDist As cv.Point
-'    Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
-
-'    Public index As Integer
-'    Public indexLast As Integer
-'    Public matchCount As Integer
-'    Public matchFlag As Boolean
-'    Public nabs As New List(Of Integer)
-
-'    Public contour As New List(Of cv.Point)
-'    Public corners As New List(Of cv.Point)
-'    Public contour3D As New List(Of cv.Point3f)
-'    Public hull As New List(Of cv.Point)
-
-'    Public motionFlag As Boolean
-'    Public histogram As cv.Mat
-'    Public histList As List(Of Single)
-
-'    Public floodPoint As cv.Point
-
-'    Public eq As cv.Vec4f ' plane equation
-'    Public pcaVec As cv.Vec3f
-'    Public Sub New()
-'        index = 0
-'        mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
-'        rect = New cv.Rect(0, 0, 1, 1)
-'        depthMask = mask
-'        depthCell = True
-'    End Sub
-'End Class
-
 
 
 
