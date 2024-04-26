@@ -3914,7 +3914,7 @@ Public Class Options_Edges_All : Inherits VB_Algorithm
     Dim scharr As New Edge_Scharr
     Dim binRed As New Edge_BinarizedReduction
     Dim sobel = New Edge_Sobel
-    Dim binSobel As New Quartile_Sobel
+    Dim binSobel As New Bin4Way_Sobel
     Dim colorGap As New Edge_ColorGap_CPP
     Dim deriche As New Edge_Deriche_CPP
     Dim Laplacian As New Edge_Laplacian

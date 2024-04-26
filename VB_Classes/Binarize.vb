@@ -253,7 +253,7 @@ End Class
 
 
 Public Class Binarize_FourPixelFlips : Inherits VB_Algorithm
-    Dim binar4 As New Quartile_Regions
+    Dim binar4 As New Bin4Way_Regions
     Public Sub New()
         desc = "Identify the marginal regions that flip between subdivisions based on brightness."
     End Sub
@@ -275,11 +275,11 @@ End Class
 
 Public Class Binarize_DepthTiers : Inherits VB_Algorithm
     Dim tiers As New Depth_TiersZ
-    Dim binar4 As New Quartile_Regions
+    Dim binar4 As New Bin4Way_Regions
     Public classCount = 200 ' 4-way split with 50 depth levels at 10 cm's each.
     Public Sub New()
         redOptions.UseColorOnly.Checked = True
-        desc = "Add the Depth_TiersZ and Quartile_Regions output in preparation for RedCloud"
+        desc = "Add the Depth_TiersZ and Bin4Way_Regions output in preparation for RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binar4.Run(src)

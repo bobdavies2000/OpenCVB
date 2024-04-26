@@ -253,7 +253,7 @@ End Class
 
 
 Public Class Edge_Consistent : Inherits VB_Algorithm
-    Dim edges As New Quartile_Sobel
+    Dim edges As New Bin4Way_Sobel
     Public Sub New()
         findSlider("Sobel kernel Size").Value = 5
         desc = "Edges that are consistent for x number of frames"
@@ -284,7 +284,7 @@ End Class
 
 
 Public Class Edge_BinarizedReduction : Inherits VB_Algorithm
-    Dim edges As New Quartile_Sobel
+    Dim edges As New Bin4Way_Sobel
     Dim reduction As New Reduction_Basics
     Public Sub New()
         desc = "Visualize the impact of reduction on Edge_BinarizeSobel"
@@ -309,7 +309,7 @@ Public Class Edge_BinarizedBrightness : Inherits VB_Algorithm
     Dim bright As New Brightness_Basics
     Public Sub New()
         findRadio("Binarized Sobel").Checked = True
-        desc = "Visualize the impact of brightness on Quartile_Sobel"
+        desc = "Visualize the impact of brightness on Bin4Way_Sobel"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         bright.Run(src)
@@ -330,7 +330,7 @@ End Class
 
 
 Public Class Edge_SobelLRBinarized : Inherits VB_Algorithm
-    Dim edges As New Quartile_Sobel
+    Dim edges As New Bin4Way_Sobel
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         labels = {"", "", "Horizontal Sobel - Left View", "Horizontal Sobel - Right View"}

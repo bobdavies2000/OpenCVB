@@ -1,8 +1,10 @@
 ﻿Imports System.Runtime.InteropServices
+Imports System.Windows.Documents
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
-Public Class Quartile_Basics : Inherits VB_Algorithm
+Public Class Bin4Way_Basics : Inherits VB_Algorithm
     Dim mats As New Mat_4to1
-    Dim binary As New Quartile_SplitMean
+    Dim binary As New Bin4Way_SplitMean
     Dim diff(3) As Diff_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
@@ -104,9 +106,9 @@ End Class
 
 
 
-Public Class Quartile_Canny : Inherits VB_Algorithm
+Public Class Bin4Way_Canny : Inherits VB_Algorithm
     Dim edges As New Edge_Canny
-    Dim binary As New Quartile_SplitMean
+    Dim binary As New Bin4Way_SplitMean
     Dim mats As New Mat_4Click
     Public Sub New()
         labels(2) = "Edges between halves, lightest, darkest, and the combo"
@@ -143,9 +145,9 @@ End Class
 
 
 
-Public Class Quartile_Sobel : Inherits VB_Algorithm
+Public Class Bin4Way_Sobel : Inherits VB_Algorithm
     Dim edges As New Edge_Sobel_Old
-    Dim binary As New Quartile_SplitMean
+    Dim binary As New Bin4Way_SplitMean
     Public mats As New Mat_4Click
     Public Sub New()
         findSlider("Sobel kernel Size").Value = 5
@@ -181,8 +183,8 @@ End Class
 
 
 
-Public Class Quartile_Unstable1 : Inherits VB_Algorithm
-    Dim binary As New Quartile_SplitMean
+Public Class Bin4Way_Unstable1 : Inherits VB_Algorithm
+    Dim binary As New Bin4Way_SplitMean
     Dim diff As New Diff_Basics
     Public Sub New()
         desc = "Find the unstable pixels in the binary image"
@@ -202,10 +204,10 @@ End Class
 
 
 
-Public Class Quartile_UnstableEdges : Inherits VB_Algorithm
+Public Class Bin4Way_UnstableEdges : Inherits VB_Algorithm
     Dim canny As New Edge_Canny
     Dim blur As New Blur_Basics
-    Dim unstable As New Quartile_Unstable
+    Dim unstable As New Bin4Way_Unstable
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         desc = "Find unstable pixels but remove those that are also edges."
@@ -229,8 +231,8 @@ End Class
 
 
 
-Public Class Quartile_UnstablePixels : Inherits VB_Algorithm
-    Dim unstable As New Quartile_UnstableEdges
+Public Class Bin4Way_UnstablePixels : Inherits VB_Algorithm
+    Dim unstable As New Bin4Way_UnstableEdges
     Public gapValues As New List(Of Byte)
     Public Sub New()
         desc = "Identify the unstable grayscale pixel values "
@@ -292,7 +294,7 @@ End Class
 
 
 
-Public Class Quartile_SplitValley : Inherits VB_Algorithm
+Public Class Bin4Way_SplitValley : Inherits VB_Algorithm
     Dim binary As New Binarize_Simple
     Dim valley As New HistValley_Basics
     Public mats As New Mat_4Click
@@ -326,9 +328,9 @@ End Class
 
 
 
-Public Class Quartile_UnstablePixels1 : Inherits VB_Algorithm
+Public Class Bin4Way_UnstablePixels1 : Inherits VB_Algorithm
     Dim hist As New Histogram_Basics
-    Dim unstable As New Quartile_UnstableEdges
+    Dim unstable As New Bin4Way_UnstableEdges
     Public gapValues As New List(Of Byte)
     Public Sub New()
         gOptions.HistBinSlider.Value = 256
@@ -404,8 +406,8 @@ End Class
 
 
 
-Public Class Quartile_SplitGaps : Inherits VB_Algorithm
-    Dim unstable As New Quartile_UnstablePixels
+Public Class Bin4Way_SplitGaps : Inherits VB_Algorithm
+    Dim unstable As New Bin4Way_UnstablePixels
     Public mats As New Mat_4Click
     Dim diff(3) As Diff_Basics
     Public Sub New()
@@ -448,9 +450,9 @@ End Class
 
 
 
-Public Class Quartile_RegionsLeftRight : Inherits VB_Algorithm
-    Dim binaryLeft As New Quartile_SplitGaps
-    Dim binaryRight As New Quartile_SplitGaps
+Public Class Bin4Way_RegionsLeftRight : Inherits VB_Algorithm
+    Dim binaryLeft As New Bin4Way_SplitGaps
+    Dim binaryRight As New Bin4Way_SplitGaps
     Public classCount = 4 ' 4-way split
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -485,8 +487,8 @@ End Class
 
 
 
-Public Class Quartile_Regions : Inherits VB_Algorithm
-    Dim binary As New Quartile_SplitMean
+Public Class Bin4Way_Regions : Inherits VB_Algorithm
+    Dim binary As New Bin4Way_SplitMean
     Public classCount = 4 ' 4-way split 
     Public Sub New()
         dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -512,7 +514,7 @@ End Class
 
 
 
-Public Class Quartile_Regions1 : Inherits VB_Algorithm
+Public Class Bin4Way_Regions1 : Inherits VB_Algorithm
     Dim binary As New Binarize_Simple
     Public mats As New Mat_4Click
     Public classCount = 4 ' 4-way split 
@@ -547,7 +549,7 @@ End Class
 
 
 
-Public Class Quartile_SplitMean : Inherits VB_Algorithm
+Public Class Bin4Way_SplitMean : Inherits VB_Algorithm
     Dim binary As New Binarize_Simple
     Public mats As New Mat_4Click
     Public Sub New()
@@ -584,7 +586,7 @@ End Class
 
 
 
-Public Class Quartile_SplitMean1 : Inherits VB_Algorithm
+Public Class Bin4Way_SplitMean1 : Inherits VB_Algorithm
     Dim binary As New Binarize_Simple
     Public mats As New Mat_4Click
     Public Sub New()
@@ -620,7 +622,7 @@ End Class
 
 
 
-Public Class Quartile_SplitMean2 : Inherits VB_Algorithm
+Public Class Bin4Way_SplitMean2 : Inherits VB_Algorithm
     Dim binary As New Binarize_Simple
     Dim hist As New Histogram_Basics
     Public mats As New Mat_4Click
@@ -675,12 +677,12 @@ End Class
 
 
 
-Public Class Quartile_BasicsColors : Inherits VB_Algorithm
-    Dim quart As New Quartile_Basics
+Public Class Bin4Way_BasicsColors : Inherits VB_Algorithm
+    Dim quart As New Bin4Way_Basics
     Dim color As New Color_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        desc = "Test Quartile_Basics with different src inputs."
+        desc = "Test Bin4Way_Basics with different src inputs."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         color.Run(src)
@@ -697,8 +699,8 @@ End Class
 
 
 
-Public Class Quartile_Unstable : Inherits VB_Algorithm
-    Dim binary As New Quartile_SplitMean
+Public Class Bin4Way_Unstable : Inherits VB_Algorithm
+    Dim binary As New Bin4Way_SplitMean
     Dim diff(3) As Diff_Basics
     Public Sub New()
         For i = 0 To diff.Count - 1
@@ -717,5 +719,116 @@ Public Class Quartile_Unstable : Inherits VB_Algorithm
             dst3 = dst3 Or diff(i).dst3
         Next
         If task.heartBeat Then labels(3) = "There are " + CStr(dst3.CountNonZero) + " unstable pixels"
+    End Sub
+End Class
+
+
+
+
+
+Public Class Bin4Way_BasicsNew : Inherits VB_Algorithm
+    Public mats As New Mat_4to1
+    Dim bin4 As New Bin4Way_Basics
+    Dim hist As New Histogram_Basics
+    Public Sub New()
+        gOptions.HistBinSlider.Value = 255
+        labels(3) = "Grayscale histogram of the image with markers showing where each quarter of the samples are."
+        desc = "Implement a 4-way split similar to the Bin3Way_Basics algorithm."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static fraction As Integer = src.Total / 4
+        Static quartiles As New List(Of Integer)
+        Dim bins = gOptions.HistBinSlider.Value
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        hist.Run(src)
+        dst3 = hist.dst2
+
+        Dim histArray = hist.histArray
+        quartiles.Clear()
+        Dim accum As Single
+        For i = 0 To histArray.Count - 1
+            accum += histArray(i)
+            If accum > fraction Then
+                quartiles.Add(i)
+                accum = 0
+            End If
+        Next
+
+        For i = 0 To quartiles.Count - 1
+            Dim offset = quartiles(i) / bins * dst3.Width
+            dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), cv.Scalar.White, task.lineWidth)
+        Next
+
+        mats.mat(0) = src.InRange(0, quartiles(0) - 1)
+        mats.mat(1) = src.InRange(quartiles(0), quartiles(1) - 1)
+        mats.mat(2) = src.InRange(quartiles(1), quartiles(2) - 1)
+        mats.mat(3) = src.InRange(quartiles(2), 255)
+
+        If standaloneTest() Then
+            mats.Run(empty)
+            dst2 = mats.dst2
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Bin4Way_RedCloud : Inherits VB_Algorithm
+    Dim bin2 As New Bin4Way_BasicsNew
+    Dim flood As New Flood_BasicsMask
+    Dim cellMaps(3) As cv.Mat, redCells(3) As List(Of rcData)
+    Dim options As New Options_Bin2WayRedCloud
+    Public Sub New()
+        desc = "Identify the lightest and darkest regions separately and then combine the rcData."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If task.optionsChanged Then
+            For i = 0 To redCells.Count - 1
+                redCells(i) = New List(Of rcData)
+                cellMaps(i) = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            Next
+        End If
+
+        bin2.Run(src)
+
+        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        For i = options.startRegion To options.endRegion
+            task.cellMap = cellMaps(i)
+            task.redCells = redCells(i)
+            flood.inputMask = Not bin2.mats.mat(i)
+            flood.Run(bin2.mats.mat(i))
+            cellMaps(i) = task.cellMap.Clone
+            redCells(i) = New List(Of rcData)(task.redCells)
+            For Each rc In task.redCells
+                If rc.index = 0 Then Continue For
+                sortedCells.Add(rc.pixels, rc)
+            Next
+        Next
+
+        dst2.SetTo(0)
+        Dim newCells As New List(Of rcData)
+        newCells.Add(New rcData)
+        Dim newMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        For Each rc In sortedCells.Values
+            rc.index = newCells.Count
+            newCells.Add(rc)
+            newMap(rc.rect).SetTo(rc.index, rc.mask)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+
+            If rc.index >= 255 Then Exit For
+        Next
+
+        task.redCells = New List(Of rcData)(newCells)
+        task.cellMap = newMap.Clone
+
+        If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " cells were identified and matched to the previous image"
     End Sub
 End Class

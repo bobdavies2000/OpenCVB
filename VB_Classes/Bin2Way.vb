@@ -183,12 +183,10 @@ Public Class Bin2Way_RedCloud : Inherits VB_Algorithm
             flood.Run(bin2.mats.mat(i))
             cellMaps(i) = task.cellMap.Clone
             redCells(i) = New List(Of rcData)(task.redCells)
-            If i = 0 Or i = 3 Then
-                For Each rc In task.redCells
-                    If rc.index = 0 Then Continue For
-                    sortedCells.Add(rc.pixels, rc)
-                Next
-            End If
+            For Each rc In task.redCells
+                If rc.index = 0 Then Continue For
+                sortedCells.Add(rc.pixels, rc)
+            Next
         Next
 
         dst2.SetTo(0)

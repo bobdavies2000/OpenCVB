@@ -6,36 +6,50 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If gOptions.gravityPointCloud.Checked Then
-            dst0 = task.pcSplit(1).Abs() ' already oriented to gravity
+            dst0 = task.pcSplit(1) ' already oriented to gravity
         Else
             ' rebuild the pointcloud so it is oriented to gravity.
             Dim pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)
             Dim split = pc.Split()
-            dst0 = split(1).Abs()
+            dst0 = split(1)
         End If
 
+        Dim resizeRatio As Integer = 1
+        Dim resolution = task.quarterRes
+        If dst0.Size <> resolution Then
+            dst0 = dst0.Resize(resolution, cv.InterpolationFlags.Nearest)
+            resizeRatio = CInt(dst2.Height / resolution.Height)
+        End If
+
+        dst0 = dst0.Abs()
         dst1 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         dst0.SetTo(task.maxZmeters, Not dst1)
 
         Dim points As New List(Of cv.Point)
-        Dim badPointCount As Integer, totalSampled As Integer = 1 ' avoid divide failure below...
-        For i = dst2.Width - 1 To 0 Step -1
-            Dim mm = vbMinMax(dst0.Col(i))
-            If mm.minVal > 0 And mm.minVal < 0.001 Then
-                If mm.minLoc.Y = 0 Or mm.minLoc.Y = dst2.Height - 1 Then badPointCount += 1
-                points.Add(New cv.Point(i, mm.minLoc.Y))
-                totalSampled += 1
+        For i = 0 To dst0.Width - 1
+            Dim mm1 = vbMinMax(dst0.Col(i))
+            If mm1.minVal > 0 And mm1.minVal < 0.005 Then
+                dst0.Col(i).Set(Of Single)(mm1.minLoc.Y, mm1.minLoc.X, 10)
+                Dim mm2 = vbMinMax(dst0.Col(i))
+                If mm2.minVal > 0 And Math.Abs(mm1.minLoc.Y - mm2.minLoc.Y) <= 1 Then points.Add(New cv.Point(i, mm1.minLoc.Y))
             End If
         Next
 
-        If points.Count < 10 Or badPointCount / totalSampled > 0.2 Then
+        labels(2) = CStr(points.Count) + " points found. "
+        Dim p1 As cv.Point
+        Dim p2 As cv.Point
+        If points.Count >= 2 Then
+            p1 = New cv.Point(resizeRatio * points(points.Count - 1).X, resizeRatio * points(points.Count - 1).Y)
+            p2 = New cv.Point(resizeRatio * points(0).X, resizeRatio * points(0).Y)
+        End If
+
+        Dim distance = p1.DistanceTo(p2)
+        If distance < 10 Then ' enough to get a line with some credibility
             task.horizonPresent = False
             task.horizonVec = New pointPair(New cv.Point, New cv.Point)
-            strOut = "Horizon not found "
+            strOut = "Horizon not found " + vbCrLf + "The distance of p1 to p2 is " + CStr(CInt(distance)) + " pixels."
         Else
             task.horizonPresent = True
-            Dim p1 = points(0)
-            Dim p2 = points(points.Count - 1)
             Dim lp = New pointPair(p1, p2)
             task.horizonVec = lp.edgeToEdgeLine(dst2.Size)
 
@@ -46,6 +60,7 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
 
                 dst2.SetTo(0)
                 For Each pt In points
+                    pt = New cv.Point(pt.X * resizeRatio, pt.Y * resizeRatio)
                     dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
                 Next
 
