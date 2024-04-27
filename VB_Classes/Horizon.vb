@@ -1,20 +1,29 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Horizon_Basics : Inherits VB_Algorithm
+    Public points As New List(Of cv.Point)
+    Dim resizeRatio As Integer = 1
+    Public vec As New pointPair
+    Public vecPresent As Boolean
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Search for the transition from positive to negative to find the horizon."
+        desc = "Find all the points where depth Y-component transitions from positive to negative"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If gOptions.gravityPointCloud.Checked Then
-            dst0 = task.pcSplit(1) ' already oriented to gravity
-        Else
-            ' rebuild the pointcloud so it is oriented to gravity.
-            Dim pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)
-            Dim split = pc.Split()
-            dst0 = split(1)
+    Public Sub displayResults(p1 As cv.Point, p2 As cv.Point)
+        If task.heartBeat Then
+            If p1.Y >= 1 And p1.Y <= dst2.Height - 1 Then strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf
         End If
 
-        Dim resizeRatio As Integer = 1
+        dst2.SetTo(0)
+        For Each pt In points
+            pt = New cv.Point(pt.X * resizeRatio, pt.Y * resizeRatio)
+            dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+        Next
+
+        dst2.Line(vec.p1, vec.p2, 255, task.lineWidth, task.lineType)
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32F Then dst0 = vbPrepareDepthInput(1) Else dst0 = src
+
         Dim resolution = task.quarterRes
         If dst0.Size <> resolution Then
             dst0 = dst0.Resize(resolution, cv.InterpolationFlags.Nearest)
@@ -25,7 +34,7 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
         dst1 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         dst0.SetTo(task.maxZmeters, Not dst1)
 
-        Dim points As New List(Of cv.Point)
+        points.Clear()
         For i = 0 To dst0.Width - 1
             Dim mm1 = vbMinMax(dst0.Col(i))
             If mm1.minVal > 0 And mm1.minVal < 0.005 Then
@@ -45,28 +54,15 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
 
         Dim distance = p1.DistanceTo(p2)
         If distance < 10 Then ' enough to get a line with some credibility
-            task.horizonPresent = False
-            task.horizonVec = New pointPair(New cv.Point, New cv.Point)
+            points.Clear()
+            vecPresent = False
+            vec = New pointPair
             strOut = "Horizon not found " + vbCrLf + "The distance of p1 to p2 is " + CStr(CInt(distance)) + " pixels."
         Else
-            task.horizonPresent = True
             Dim lp = New pointPair(p1, p2)
-            task.horizonVec = lp.edgeToEdgeLine(dst2.Size)
-
-            If standaloneTest() Then
-                If task.heartBeat Then
-                    If p1.Y >= 1 And p1.Y <= dst2.Height - 1 Then strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf
-                End If
-
-                dst2.SetTo(0)
-                For Each pt In points
-                    pt = New cv.Point(pt.X * resizeRatio, pt.Y * resizeRatio)
-                    dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
-                Next
-
-                dst2.Line(task.horizonVec.p1, task.horizonVec.p2, 255, task.lineWidth, task.lineType)
-                dst2.Line(task.gravityVec.p1, task.gravityVec.p2, 255, task.lineWidth, task.lineType)
-            End If
+            vec = lp.edgeToEdgeLine(dst2.Size)
+            vecPresent = True
+            If standaloneTest() Then displayResults(p1, p2)
         End If
         setTrueText(strOut, 3)
     End Sub
@@ -393,3 +389,39 @@ End Class
 
 
 
+
+Public Class Horizon_Regress : Inherits VB_Algorithm
+    Dim horizon As New Horizon_Basics
+    Dim regress As New LinearRegression_Basics
+    Public Sub New()
+        desc = "Collect the horizon points and run a linear regression on all the points."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        horizon.Run(src)
+
+        For i = 0 To horizon.points.Count - 1
+            regress.x.Add(horizon.points(i).X)
+            regress.y.Add(horizon.points(i).Y)
+        Next
+
+        regress.Run(Nothing)
+        horizon.displayResults(regress.p1, regress.p2)
+        dst2 = horizon.dst2
+    End Sub
+End Class
+
+
+
+
+
+Public Class Horizon_ExternalTest : Inherits VB_Algorithm
+    Dim horizon As New Horizon_Basics
+    Public Sub New()
+        desc = "Supply the point cloud input to Horizon_Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst0 = vbPrepareDepthInput(1)
+        horizon.Run(dst0)
+        dst2 = horizon.dst2
+    End Sub
+End Class

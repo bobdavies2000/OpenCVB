@@ -11,7 +11,7 @@ Public Class CameraMotion_Basics : Inherits VB_Algorithm
         desc = "Merge with previous image using just translation of the gravity vector and horizon vector (if present)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        gravity.Run(Nothing)
+        gravity.Run(src)
 
         Static gravityVec As pointPair = New pointPair(task.gravityVec.p1, task.gravityVec.p2)
         Static horizonVec As pointPair = New pointPair(task.horizonVec.p1, task.horizonVec.p2)

@@ -449,6 +449,14 @@ Module VB_Common
         If task.advice.Contains(split(0) + ":") Then Return
         task.advice += advice + vbCrLf + vbCrLf
     End Sub
+    Public Function vbPrepareDepthInput(index As Integer) As cv.Mat
+        If gOptions.gravityPointCloud.Checked Then Return task.pcSplit(index) ' already oriented to gravity
+
+        ' rebuild the pointcloud so it is oriented to gravity.
+        Dim pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)
+        Dim split = pc.Split()
+        Return split(index)
+    End Function
     Public Function vbMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData
         If mask Is Nothing Then
