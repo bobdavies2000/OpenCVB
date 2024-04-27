@@ -46,6 +46,7 @@ Partial Class OptionsGlobal
         Me.MaxDepth = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.IdentifyCells = New System.Windows.Forms.CheckBox()
         Me.DisplayCellStats = New System.Windows.Forms.CheckBox()
         Me.CrossHairs = New System.Windows.Forms.CheckBox()
         Me.ShowMotionRectangle = New System.Windows.Forms.CheckBox()
@@ -80,7 +81,6 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.IdentifyCells = New System.Windows.Forms.CheckBox()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.IMU_Alpha, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -370,6 +370,16 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
         '
+        'IdentifyCells
+        '
+        Me.IdentifyCells.AutoSize = True
+        Me.IdentifyCells.Location = New System.Drawing.Point(25, 347)
+        Me.IdentifyCells.Name = "IdentifyCells"
+        Me.IdentifyCells.Size = New System.Drawing.Size(200, 24)
+        Me.IdentifyCells.TabIndex = 73
+        Me.IdentifyCells.Text = "Identify RedCloud Cells"
+        Me.IdentifyCells.UseVisualStyleBackColor = True
+        '
         'DisplayCellStats
         '
         Me.DisplayCellStats.AutoSize = True
@@ -383,6 +393,8 @@ Partial Class OptionsGlobal
         'CrossHairs
         '
         Me.CrossHairs.AutoSize = True
+        Me.CrossHairs.Checked = True
+        Me.CrossHairs.CheckState = System.Windows.Forms.CheckState.Checked
         Me.CrossHairs.Location = New System.Drawing.Point(24, 235)
         Me.CrossHairs.Name = "CrossHairs"
         Me.CrossHairs.Size = New System.Drawing.Size(151, 24)
@@ -714,16 +726,6 @@ Partial Class OptionsGlobal
         Me.Label8.Text = "All values are restored to their default values at the start of each algorithm.  " &
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
-        '
-        'IdentifyCells
-        '
-        Me.IdentifyCells.AutoSize = True
-        Me.IdentifyCells.Location = New System.Drawing.Point(25, 347)
-        Me.IdentifyCells.Name = "IdentifyCells"
-        Me.IdentifyCells.Size = New System.Drawing.Size(200, 24)
-        Me.IdentifyCells.TabIndex = 73
-        Me.IdentifyCells.Text = "Identify RedCloud Cells"
-        Me.IdentifyCells.UseVisualStyleBackColor = True
         '
         'OptionsGlobal
         '

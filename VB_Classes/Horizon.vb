@@ -35,7 +35,7 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
         dst0.SetTo(task.maxZmeters, Not dst1)
 
         points.Clear()
-        For i = 0 To dst0.Width - 1
+        For i = dst0.Width / 3 To dst0.Width * 2 / 3 - 1
             Dim mm1 = vbMinMax(dst0.Col(i))
             If mm1.minVal > 0 And mm1.minVal < 0.005 Then
                 dst0.Col(i).Set(Of Single)(mm1.minLoc.Y, mm1.minLoc.X, 10)
