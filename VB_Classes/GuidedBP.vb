@@ -481,7 +481,28 @@ End Class
 
 
 
-Public Class GuidedBP_Depth : Inherits VB_Algorithm
+Public Class GuidedBP_Lookup : Inherits VB_Algorithm
+    Dim guided As New GuidedBP_Basics
+    Public Sub New()
+        task.clickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
+        desc = "Given a point cloud pixel, look up which object it is in.  Click in the Depth RGB image to test."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        guided.Run(src)
+        dst2 = guided.dst2
+        labels(2) = guided.labels(2)
+
+
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class GuidedBP_Depth1 : Inherits VB_Algorithm
     Public hist As New PointCloud_Histograms
     Dim myPalette As New Palette_Random
     Public classCount As Integer
@@ -538,19 +559,57 @@ End Class
 
 
 
-
-
-Public Class GuidedBP_Lookup : Inherits VB_Algorithm
-    Dim guided As New GuidedBP_Basics
+Public Class GuidedBP_Depth : Inherits VB_Algorithm
+    Dim hist As New Histogram_Basics
+    Public classCount As Integer
     Public Sub New()
-        task.clickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        desc = "Given a point cloud pixel, look up which object it is in.  Click in the Depth RGB image to test."
+        gOptions.HistBinSlider.Value = 1000
+        desc = "Build a histogram that finds the minimal clusters of depth data"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        guided.Run(src)
-        dst2 = guided.dst2
-        labels(2) = guided.labels(2)
+        Dim depth32f = task.pcSplit(2)
+        task.maxDepthMask = depth32f.InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
+        depth32f.SetTo(task.maxZmeters, task.maxDepthMask)
 
+        hist.Run(depth32f)
+        labels(2) = hist.labels(2)
 
+        Dim histArray = hist.histArray
+
+        Dim start As Integer
+        Dim clusters As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
+        Dim lastEntry As Single
+        Dim sampleCount As Integer
+        histArray(0) = 0 ' remove sample counts for 0 depth pixels.
+        For i = 0 To histArray.Count - 1
+            If histArray(i) > 0 And lastEntry = 0 Then start = i
+            If histArray(i) = 0 And lastEntry > 0 Then
+                clusters.Add(sampleCount, New cv.Vec2i(start, i))
+                sampleCount = 0
+            End If
+            lastEntry = histArray(i)
+            sampleCount += histArray(i)
+        Next
+
+        Dim incr = task.maxZmeters / gOptions.HistBinSlider.Value
+        Dim minSamples = src.Total * 0.001 ' one tenth of one-percent samples is a threshold
+        classCount = 0
+        ReDim histArray(hist.histArray.Count - 1)
+        For i = 0 To clusters.Count - 1
+            If clusters.ElementAt(i).Key < minSamples Then Continue For
+            Dim vec = clusters.ElementAt(i).Value
+            classCount += 1
+            For j = vec(0) To vec(1)
+                histArray(j) = classCount
+            Next
+        Next
+
+        Marshal.Copy(histArray, 0, hist.histogram.Data, histArray.Length)
+        cv.Cv2.CalcBackProject({depth32f}, {0}, hist.histogram, dst1, hist.ranges)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+
+        Static maxClassCount As Integer = classCount
+        If maxClassCount < classCount Then maxClassCount = classCount
+        dst3 = vbPalette(dst2 * 255 / maxClassCount)
     End Sub
 End Class

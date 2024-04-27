@@ -771,6 +771,7 @@ if algorithmName = "Guess_Depth_CPP" Then return new Guess_Depth_CPP
 if algorithmName = "Guess_ImageEdges_CPP" Then return new Guess_ImageEdges_CPP
 if algorithmName = "GuidedBP_Basics" Then return new GuidedBP_Basics
 if algorithmName = "GuidedBP_Depth" Then return new GuidedBP_Depth
+if algorithmName = "GuidedBP_Depth1" Then return new GuidedBP_Depth1
 if algorithmName = "GuidedBP_HotPoints" Then return new GuidedBP_HotPoints
 if algorithmName = "GuidedBP_HotPointsKNN" Then return new GuidedBP_HotPointsKNN
 if algorithmName = "GuidedBP_Lookup" Then return new GuidedBP_Lookup

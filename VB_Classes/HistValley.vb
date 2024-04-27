@@ -203,7 +203,7 @@ Public Class HistValley_Depth : Inherits VB_Algorithm
             valley.Run(src)
             dst2 = valley.dst2
 
-            Dim vList = New List(Of Single)(valley.valleyIndex)
+            Dim vList = New List(Of Integer)(valley.valleyIndex)
 
             Dim histArray(valley.histList.Count - 1) As Single
             For i = 0 To vList.Count - 2

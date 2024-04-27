@@ -625,34 +625,6 @@ End Class
 
 
 
-'Public Class Depth_Fusion : Inherits VB_Algorithm
-'    Dim dMax As New Depth_StableMax
-'    Public Sub New()
-'        desc = "Fuse the depth from the previous x frames."
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        Static fuseFrames As New List(Of cv.Mat)
-
-'        If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
-
-'        If task.optionsChanged Then fuseFrames = New List(Of cv.Mat)
-
-'        fuseFrames.Add(src.Clone)
-'        If fuseFrames.Count > task.frameHistoryCount Then fuseFrames.RemoveAt(0)
-
-'        If fuseFrames.Count = 0 Then Exit Sub
-'        dst2 = fuseFrames(0).Clone
-'        For i = 1 To fuseFrames.Count - 1
-'            cv.Cv2.Max(fuseFrames(i), dst2, dst2)
-'        Next
-'    End Sub
-'End Class
-
-
-
-
-
-
 
 
 
@@ -1034,35 +1006,6 @@ Public Class Depth_Regions : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class Depth_TierCount : Inherits VB_Algorithm
-    Public valley As New HistValley_Depth1
-    Public classCount As Integer
-    Public Sub New()
-        labels = {"", "Histogram of the depth data with instantaneous valley lines", "", ""}
-        desc = "Determine the 'K' value for the best number of clusters for the depth"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        valley.Run(src)
-        dst2 = valley.dst2
-
-        Static kValues As New List(Of Integer)
-        kValues.Add(valley.valleyOrder.Count)
-
-        classCount = CInt(kValues.Average)
-        If kValues.Count > task.frameHistoryCount * 10 Then kValues.RemoveAt(0)
-
-        setTrueText("'K' value = " + CStr(classCount) + " after averaging.  Instanteous value = " +
-                    CStr(valley.valleyOrder.Count), 3)
-        labels(2) = "There are " + CStr(classCount)
-    End Sub
-End Class
 
 
 
@@ -1579,5 +1522,34 @@ Public Class Depth_TiersZ : Inherits VB_Algorithm
 
         dst3 = vbPalette(dst2 * 255 / classCount)
         labels(2) = $"{classCount} regions found."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Depth_TierCount : Inherits VB_Algorithm
+    Public valley As New HistValley_Depth1
+    Public classCount As Integer
+    Public Sub New()
+        labels = {"", "Histogram of the depth data with instantaneous valley lines", "", ""}
+        desc = "Determine the 'K' value for the best number of clusters for the depth"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        valley.Run(src)
+        dst2 = valley.dst2
+
+        Static kValues As New List(Of Integer)
+        kValues.Add(valley.valleyOrder.Count)
+
+        classCount = CInt(kValues.Average)
+        If kValues.Count > task.frameHistoryCount * 10 Then kValues.RemoveAt(0)
+
+        setTrueText("'K' value = " + CStr(classCount) + " after averaging.  Instanteous value = " +
+                    CStr(valley.valleyOrder.Count), 3)
+        labels(2) = "There are " + CStr(classCount)
     End Sub
 End Class

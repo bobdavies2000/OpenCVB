@@ -14,7 +14,7 @@ Public Class Histogram_Basics : Inherits VB_Algorithm
         desc = "Create a histogram (no Kalman)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standaloneTest() Then
+        If standalone Then
             If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
             mm = vbMinMax(src.ExtractChannel(splitIndex))
             plot.backColor = Choose(splitIndex + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)

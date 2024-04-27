@@ -661,8 +661,6 @@ Public Class VBtask : Implements IDisposable
                     task.color.Line(task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
                     task.color.Line(task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
                 End If
-                'Console.WriteLine(task.gravityVec.p1.ToString + " and " + task.gravityVec.p2.ToString + " and " +
-                '                  Format((gravityVec.p1.X + gravityVec.p2.X) / 2, fmt1))
             End If
 
             task.activateTaskRequest = False ' let the task see the activate request so it can activate any OpenGL or Python app running externally.
