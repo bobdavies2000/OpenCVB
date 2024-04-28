@@ -15,6 +15,9 @@ Public Class Duster_Basics : Inherits VB_Algorithm
         Next
 
         cv.Cv2.Merge(task.pcSplit, dst2)
+        dst2.SetTo(0, Not dust.dst0)
+        dst2.SetTo(0, task.maxDepthMask)
+
         dst3 = dust.dst3
     End Sub
 End Class
@@ -85,10 +88,41 @@ Public Class Duster_Mask : Inherits VB_Algorithm
         dst3 = vbPalette(dst2 * 255 / classCount)
         If task.heartBeat Then labels(2) = "dst2 = CV_8U version of depth segmented into " + CStr(classCount) + " clusters."
 
-        If gOptions.Duster.Checked Then
-            dst0 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            task.pointCloud.SetTo(0, Not dst0)
-            task.pointCloud.SetTo(0, task.maxDepthMask)
-        End If
+        If gOptions.Duster.Checked Then dst0 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+Public Class Duster_Kalman : Inherits VB_Algorithm
+    Dim dust As New Duster_Mask
+    Dim kalman As New Kalman_Basics
+    Public Sub New()
+        desc = "Removed blowback in the pointcloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dust.Run(src)
+
+        If task.optionsChanged Then ReDim kalman.kInput(dust.classCount)
+
+        Dim distanceMean As New List(Of Single)
+        Dim maskList As New List(Of cv.Mat)
+        For i = 1 To dust.classCount
+            maskList.Add(dust.dst2.InRange(i, i))
+            kalman.kInput(i) = task.pcSplit(2).Mean(maskList(i - 1))
+        Next
+
+        kalman.Run(Nothing)
+
+        For i = 1 To dust.classCount
+            task.pcSplit(2).SetTo(kalman.kOutput(i - 1), maskList(i - 1))
+        Next
+
+        cv.Cv2.Merge(task.pcSplit, dst2)
+        dst2.SetTo(0, Not dust.dst0)
+        dst2.SetTo(0, task.maxDepthMask)
+
+        dst3 = dust.dst3
     End Sub
 End Class
