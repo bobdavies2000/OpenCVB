@@ -127,6 +127,7 @@
     <Compile Include="Classifier.vb" />
     <Compile Include="Complexity.vb" />
     <Compile Include="Derivative.vb" />
+    <Compile Include="Duster.vb" />
     <Compile Include="Gravity.vb" />
     <Compile Include="Horizon.vb" />
     <Compile Include="LinearRegression.vb" />

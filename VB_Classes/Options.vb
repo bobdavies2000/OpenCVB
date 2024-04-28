@@ -4780,3 +4780,25 @@ Public Class Options_Bin2WayRedCloud : Inherits VB_Algorithm
         End Select
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_GuidedBPDepth : Inherits VB_Algorithm
+    Public bins As Integer
+    Public maxClusters As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Histogram Bins for depth data", 3, 5000, 1000)
+            sliders.setupTrackBar("Maximum number of clusters", 1, 50, 5)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static binSlider = findSlider("Histogram Bins for depth data")
+        Static clusterSlider = findSlider("Maximum number of clusters")
+        bins = binSlider.value
+        maxClusters = clusterSlider.value
+    End Sub
+End Class

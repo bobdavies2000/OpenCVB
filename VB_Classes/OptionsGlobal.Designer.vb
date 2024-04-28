@@ -46,6 +46,7 @@ Partial Class OptionsGlobal
         Me.MaxDepth = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.Duster = New System.Windows.Forms.CheckBox()
         Me.IdentifyCells = New System.Windows.Forms.CheckBox()
         Me.DisplayCellStats = New System.Windows.Forms.CheckBox()
         Me.CrossHairs = New System.Windows.Forms.CheckBox()
@@ -340,6 +341,7 @@ Partial Class OptionsGlobal
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.Duster)
         Me.GroupBox2.Controls.Add(Me.IdentifyCells)
         Me.GroupBox2.Controls.Add(Me.DisplayCellStats)
         Me.GroupBox2.Controls.Add(Me.CrossHairs)
@@ -369,6 +371,18 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabIndex = 3
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
+        '
+        'Duster
+        '
+        Me.Duster.AutoSize = True
+        Me.Duster.Checked = True
+        Me.Duster.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.Duster.Location = New System.Drawing.Point(25, 377)
+        Me.Duster.Name = "Duster"
+        Me.Duster.Size = New System.Drawing.Size(207, 24)
+        Me.Duster.TabIndex = 74
+        Me.Duster.Text = "Build Dusted PointCloud"
+        Me.Duster.UseVisualStyleBackColor = True
         '
         'IdentifyCells
         '
@@ -819,4 +833,5 @@ Partial Class OptionsGlobal
     Friend WithEvents IMU_Alpha As Windows.Forms.TrackBar
     Friend WithEvents CameraMotionLabel As Windows.Forms.Label
     Friend WithEvents IdentifyCells As Windows.Forms.CheckBox
+    Friend WithEvents Duster As Windows.Forms.CheckBox
 End Class

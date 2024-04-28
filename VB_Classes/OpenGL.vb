@@ -4,6 +4,8 @@ Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 Imports System.Drawing
 Imports cvext = OpenCvSharp.Extensions
+Imports System.Windows.Documents
+
 Public Class OpenGL_Basics : Inherits VB_Algorithm
     Dim memMapWriter As MemoryMappedViewAccessor
     ReadOnly startInfo As New ProcessStartInfo
@@ -1259,9 +1261,8 @@ Public Class OpenGL_Profile : Inherits VB_Algorithm
         Dim rc = task.rc
         Dim contourMat As New cv.Mat(rc.contour.Count, 1, cv.MatType.CV_32SC2, rc.contour.ToArray)
         If rc.contour.Count = 0 Then Exit Sub
-
         Dim split = contourMat.Split()
-        Dim mm as mmData = vbMinMax(split(0))
+        Dim mm As mmData = vbMinMax(split(0))
         Dim p1 = rc.contour.ElementAt(mm.minLoc.Y)
         Dim p2 = rc.contour.ElementAt(mm.maxLoc.Y)
 
@@ -2079,5 +2080,22 @@ Public Class OpenGL_World : Inherits VB_Algorithm
 
         task.ogl.Run(task.color)
         If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpenGL_DustFree : Inherits VB_Algorithm
+    Public Sub New()
+        desc = "Show a dust-free point cloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If gOptions.Duster.Checked Then dst2 = Not task.duster.dst0
+
+        task.ogl.pointCloudInput = task.pointCloud
+        task.ogl.Run(task.color)
     End Sub
 End Class

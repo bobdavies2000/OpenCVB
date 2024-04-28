@@ -68,6 +68,7 @@ Public Class VBtask : Implements IDisposable
     Public motionColor As Motion_Color
     Public motionBasics As Motion_BasicsQuarterRes
     Public rgbFilter As Object
+    Public duster As Duster_Basics
 
     Public gMat As IMU_GMatrix
     Public IMUBasics As IMU_Basics
@@ -382,6 +383,7 @@ Public Class VBtask : Implements IDisposable
         motionBasics = New Motion_BasicsQuarterRes
         cMotion = New CameraMotion_Basics
         imuStabilityTest = New Stabilizer_VerticalIMU
+        duster = New Duster_Basics
 
         updateSettings()
         redOptions.Show()
@@ -604,6 +606,7 @@ Public Class VBtask : Implements IDisposable
                 src = rgbFilter.dst2
             End If
 
+            If gOptions.Duster.Checked Then duster.Run(src)
             cMotion.Run(src)
             algorithmObject.NextFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
