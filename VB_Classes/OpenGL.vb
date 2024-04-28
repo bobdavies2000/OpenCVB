@@ -2088,14 +2088,13 @@ End Class
 
 
 
-Public Class OpenGL_DustFree : Inherits VB_Algorithm
+Public Class OpenGL_Duster : Inherits VB_Algorithm
     Public Sub New()
-        desc = "Show a dust-free point cloud"
+        desc = "Show a dusted version point cloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If gOptions.Duster.Checked Then dst2 = Not task.duster.dst0
-
-        task.ogl.pointCloudInput = task.pointCloud
-        task.ogl.Run(task.color)
+        If gOptions.Duster.Checked Then task.ogl.pointCloudInput = task.duster.dst2 Else task.ogl.pointCloudInput = task.pointCloud
+        dst2 = task.duster.dst3
+        If gOptions.DebugCheckBox.Checked Then task.ogl.Run(dst2) Else task.ogl.Run(task.color)
     End Sub
 End Class

@@ -1,10 +1,21 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Duster_Basics : Inherits VB_Algorithm
+    Dim dust As New Duster_Mask
     Public Sub New()
         desc = "Removed blowback in the pointcloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        dust.Run(src)
+
+        For i = 1 To dust.classCount
+            Dim mask = dust.dst2.InRange(i, i)
+            Dim depth = task.pcSplit(2).Mean(mask)
+            task.pcSplit(2).SetTo(depth(0), mask)
+        Next
+
+        cv.Cv2.Merge(task.pcSplit, dst2)
+        dst3 = dust.dst3
     End Sub
 End Class
 
