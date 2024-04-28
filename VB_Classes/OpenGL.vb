@@ -2098,21 +2098,3 @@ Public Class OpenGL_Duster : Inherits VB_Algorithm
         If gOptions.DebugCheckBox.Checked Then task.ogl.Run(dst2) Else task.ogl.Run(task.color)
     End Sub
 End Class
-
-
-
-
-
-
-Public Class OpenGL_DusterKalman : Inherits VB_Algorithm
-    Dim dust As New Duster_Kalman
-    Public Sub New()
-        desc = "Show a dusted version point cloud that has smoothed distances"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        dust.Run(src)
-        If gOptions.Duster.Checked Then task.ogl.pointCloudInput = task.duster.dst2 Else task.ogl.pointCloudInput = task.pointCloud
-        dst2 = task.duster.dst3
-        If gOptions.DebugCheckBox.Checked Then task.ogl.Run(dst2) Else task.ogl.Run(task.color)
-    End Sub
-End Class
