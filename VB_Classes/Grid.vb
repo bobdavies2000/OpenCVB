@@ -1,9 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
-Imports OpenCvSharp
-Imports OpenCvSharp.Flann
-Imports System.Windows
-
 Public Class Grid_Basics : Inherits VB_Algorithm
     Public gridList As New List(Of cv.Rect)
     Public updateTaskGridList As Boolean = True
@@ -25,7 +21,7 @@ Public Class Grid_Basics : Inherits VB_Algorithm
             Dim index As Integer
             For y = 0 To src.Height - 1 Step gOptions.GridSize.Value
                 For x = 0 To src.Width - 1 Step gOptions.GridSize.Value
-                    Dim roi = New cv.Rect(x, y, gOptions.GridSize.Value, gOptions.GridSize.Value)
+                    Dim roi = validateRect(New cv.Rect(x, y, gOptions.GridSize.Value, gOptions.GridSize.Value))
                     If x + roi.Width >= src.Width Then roi.Width = src.Width - x
                     If y + roi.Height >= src.Height Then roi.Height = src.Height - y
                     If roi.Width > 0 And roi.Height > 0 Then
