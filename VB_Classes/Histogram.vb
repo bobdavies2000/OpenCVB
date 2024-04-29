@@ -3,18 +3,21 @@ Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Public Class Histogram_Basics : Inherits VB_Algorithm
     Public histogram As New cv.Mat
-    Public histArray() As Single
     Public mm As mmData
     Public plot As New Plot_Histogram
     Public ranges() As cv.Rangef
-    Dim splitIndex As Integer
+
+    Public histArray() As Single
     Public inputMask As New cv.Mat
+    Public fixedRanges() As cv.Rangef
     Public bins As Integer
+    Public removeMax As Boolean
     Public Sub New()
         If standaloneTest() Then gOptions.HistBinSlider.Value = 255
         desc = "Create a histogram (no Kalman)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        Static splitIndex As Integer
         If standalone Then
             If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
             mm = vbMinMax(src.ExtractChannel(splitIndex))
@@ -23,7 +26,11 @@ Public Class Histogram_Basics : Inherits VB_Algorithm
             If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             mm = vbMinMax(src)
         End If
-        ranges = {New cv.Rangef(mm.minVal - histDelta, mm.maxVal + histDelta)}
+        If fixedRanges Is Nothing Then
+            ranges = {New cv.Rangef(mm.minVal - histDelta, mm.maxVal + histDelta)}
+        Else
+            ranges = fixedRanges
+        End If
 
         ' ranges are exclusive in OpenCV!!!
         If bins = 0 Then
@@ -32,16 +39,27 @@ Public Class Histogram_Basics : Inherits VB_Algorithm
             cv.Cv2.CalcHist({src}, {splitIndex}, inputMask, histogram, 1, {bins}, ranges)
         End If
 
+        If removeMax Then
+            Dim mmMax = vbMinMax(histogram)
+            histogram.Set(Of Single)(mmMax.maxLoc.Y, mmMax.maxLoc.X, 0)
+        End If
+
         ReDim histArray(histogram.Total - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
-        plot.Run(histogram)
-        histogram = plot.histogram ' reflect any updates to the 0 entry...
+        If standaloneTest() Then
+            plot.Run(histogram)
+            histogram = plot.histogram ' reflect any updates to the 0 entry...  
+            dst2 = plot.dst2
+        End If
 
-        dst2 = plot.dst2
-        labels(2) = Choose(splitIndex + 1, "Blue", "Green", "Red") + " histogram, bins = " +
-                    CStr(task.histogramBins) + ", X ranges from " + Format(mm.minVal, "0.0") + " to " +
-                    Format(mm.maxVal, "0.0") + ", y is sample count"
+        If standalone Then
+            labels(2) = Choose(splitIndex + 1, "Blue", "Green", "Red") + " histogram, bins = " +
+                               CStr(task.histogramBins) + ", X ranges from " + Format(mm.minVal, "0.0") + " to " +
+                               Format(mm.maxVal, "0.0") + ", y is sample count"
+        Else
+            labels(2) = "Range = " + Format(ranges(0).Start, fmt3) + " To " + Format(ranges(0).End, fmt3)
+        End If
     End Sub
 End Class
 

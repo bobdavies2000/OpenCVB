@@ -291,7 +291,7 @@ Public Class OptionsGlobal
     Private Sub UseHistoryCloud_CheckedChanged(sender As Object, e As EventArgs) Handles UseHistoryCloud.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
-    Private Sub DustFree_CheckedChanged(sender As Object, e As EventArgs) Handles Duster.CheckedChanged
+    Private Sub DustFree_CheckedChanged(sender As Object, e As EventArgs)
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
 End Class

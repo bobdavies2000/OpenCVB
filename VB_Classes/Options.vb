@@ -4802,3 +4802,27 @@ Public Class Options_GuidedBPDepth : Inherits VB_Algorithm
         maxClusters = clusterSlider.value
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Options_OpenGL_Duster : Inherits VB_Algorithm
+    Public useClusterColors As Boolean
+    Public useTaskPointCloud As Boolean
+    Public Sub New()
+        If findfrm(traceName + " CheckBox Options") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Display cluster colors")
+            check.addCheckBox("Use task.pointCloud")
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static colorCheck = findCheckBox("Display cluster colors")
+        Static cloudCheck = findCheckBox("Use task.pointCloud")
+        useClusterColors = colorCheck.checked
+        useTaskPointCloud = cloudCheck.checked
+    End Sub
+End Class

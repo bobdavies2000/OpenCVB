@@ -5,6 +5,7 @@ Imports System.IO.Pipes
 Imports System.Drawing
 Imports cvext = OpenCvSharp.Extensions
 Imports System.Windows.Documents
+Imports Microsoft.VisualBasic.ApplicationServices
 
 Public Class OpenGL_Basics : Inherits VB_Algorithm
     Dim memMapWriter As MemoryMappedViewAccessor
@@ -2089,12 +2090,40 @@ End Class
 
 
 Public Class OpenGL_Duster : Inherits VB_Algorithm
+    Dim duster As New Duster_Basics
+    Dim options As New Options_OpenGL_Duster
     Public Sub New()
         desc = "Show a dusted version point cloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If gOptions.Duster.Checked Then task.ogl.pointCloudInput = task.duster.dst2 Else task.ogl.pointCloudInput = task.pointCloud
-        dst2 = task.duster.dst3
-        If gOptions.DebugCheckBox.Checked Then task.ogl.Run(dst2) Else task.ogl.Run(task.color)
+        options.RunVB()
+
+        duster.Run(src)
+        dst2 = duster.dst3
+
+        task.ogl.pointCloudInput = If(options.useTaskPointCloud, task.pointCloud, duster.dst2)
+        task.ogl.Run(If(options.useClusterColors = False, task.color, dst2))
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpenGL_DusterY : Inherits VB_Algorithm
+    Dim duster As New Duster_BasicsY
+    Dim options As New Options_OpenGL_Duster
+    Public Sub New()
+        desc = "Show a dusted version point cloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        duster.Run(src)
+        dst2 = duster.dst3
+
+        task.ogl.pointCloudInput = If(options.useTaskPointCloud, task.pointCloud, duster.dst2)
+        task.ogl.Run(If(options.useClusterColors = False, task.color, dst2))
     End Sub
 End Class
