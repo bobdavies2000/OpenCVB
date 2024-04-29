@@ -29,23 +29,6 @@ Public Class Grid_Basics : Inherits VB_Algorithm
                         If y = 0 Then task.gridCols += 1
                         gridList.Add(roi)
                         task.gridIndex.Add(index)
-                        Dim xSub = roi.X + roi.Width
-                        Dim ySub = roi.Y + roi.Height
-                        If ySub <= dst2.Height / 3 Then
-                            If xSub <= dst2.Width / 3 Then task.subDivisions.Add(0)
-                            If xSub >= dst2.Width / 3 And xSub < dst2.Width * 2 / 3 Then task.subDivisions.Add(1)
-                            If xSub > dst2.Width * 2 / 3 Then task.subDivisions.Add(2)
-                        End If
-                        If ySub > dst2.Height / 3 And ySub <= dst2.Height * 2 / 3 Then
-                            If xSub <= dst2.Width / 3 Then task.subDivisions.Add(3)
-                            If xSub >= dst2.Width / 3 And xSub < dst2.Width * 2 / 3 Then task.subDivisions.Add(4)
-                            If xSub > dst2.Width * 2 / 3 Then task.subDivisions.Add(5)
-                        End If
-                        If ySub > dst2.Height * 2 / 3 Then
-                            If xSub <= dst2.Width / 3 Then task.subDivisions.Add(6)
-                            If xSub >= dst2.Width / 3 And xSub < dst2.Width * 2 / 3 Then task.subDivisions.Add(7)
-                            If xSub > dst2.Width * 2 / 3 Then task.subDivisions.Add(8)
-                        End If
                         index += 1
                     End If
                 Next
@@ -86,6 +69,27 @@ Public Class Grid_Basics : Inherits VB_Algorithm
                     Next
                 Next
             End If
+
+            For Each roi In gridList
+                Dim xSub = roi.X + roi.Width
+                Dim ySub = roi.Y + roi.Height
+                If ySub <= dst2.Height / 3 Then
+                    If xSub <= dst2.Width / 3 Then task.subDivisions.Add(0)
+                    If xSub >= dst2.Width / 3 And xSub <= dst2.Width * 2 / 3 Then task.subDivisions.Add(1)
+                    If xSub > dst2.Width * 2 / 3 Then task.subDivisions.Add(2)
+                End If
+                If ySub > dst2.Height / 3 And ySub <= dst2.Height * 2 / 3 Then
+                    If xSub <= dst2.Width / 3 Then task.subDivisions.Add(3)
+                    If xSub >= dst2.Width / 3 And xSub <= dst2.Width * 2 / 3 Then task.subDivisions.Add(4)
+                    If xSub > dst2.Width * 2 / 3 Then task.subDivisions.Add(5)
+                End If
+                If ySub > dst2.Height * 2 / 3 Then
+                    If xSub <= dst2.Width / 3 Then task.subDivisions.Add(6)
+                    If xSub >= dst2.Width / 3 And xSub <= dst2.Width * 2 / 3 Then task.subDivisions.Add(7)
+                    If xSub > dst2.Width * 2 / 3 Then task.subDivisions.Add(8)
+                End If
+            Next
+
         End If
         If standaloneTest() Then
             dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U)

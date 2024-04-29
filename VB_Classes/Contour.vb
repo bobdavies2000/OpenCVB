@@ -863,7 +863,7 @@ Public Class Contour_PrepData : Inherits VB_Algorithm
                 py.Add(pt.Y)
             Next
             Dim xMin = px.Min, yMin = py.Min, xMax = px.Max, yMax = py.Max
-            Dim r = New cv.Rect(xMin, yMin, xMax - xMin, yMax - yMin)
+            Dim r = validateRect(New cv.Rect(xMin, yMin, xMax - xMin, yMax - yMin))
 
             vbDrawContour(dst1, tour.ToList, 255, -1)
             Dim mask = dst1(r).Clone
