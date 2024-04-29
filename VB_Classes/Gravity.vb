@@ -3,6 +3,7 @@ Public Class Gravity_Basics : Inherits VB_Algorithm
     Public points As New List(Of cv.Point)
     Dim resizeRatio As Integer = 1
     Public vec As New pointPair
+    Public autoDisplay As Boolean
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find all the points where depth X-component transitions from positive to negative"
@@ -61,8 +62,9 @@ Public Class Gravity_Basics : Inherits VB_Algorithm
         Else
             Dim lp = New pointPair(p1, p2)
             vec = lp.edgeToEdgeLine(dst2.Size)
-            If standaloneTest() Then displayResults(p1, p2)
+            If standaloneTest() Or autoDisplay Then displayResults(p1, p2)
         End If
+
         setTrueText(strOut, 3)
     End Sub
 End Class

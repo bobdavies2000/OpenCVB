@@ -4,6 +4,7 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
     Dim resizeRatio As Integer = 1
     Public vec As New pointPair
     Public vecPresent As Boolean
+    Public autoDisplay As Boolean
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find all the points where depth Y-component transitions from positive to negative"
@@ -62,7 +63,7 @@ Public Class Horizon_Basics : Inherits VB_Algorithm
             Dim lp = New pointPair(p1, p2)
             vec = lp.edgeToEdgeLine(dst2.Size)
             vecPresent = True
-            If standaloneTest() Then displayResults(p1, p2)
+            If standaloneTest() Or autoDisplay Then displayResults(p1, p2)
         End If
         setTrueText(strOut, 3)
     End Sub

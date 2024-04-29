@@ -33,7 +33,7 @@ Public Class Sort_RectAndMask : Inherits VB_Algorithm
     Public rect As cv.Rect
     Public Sub New()
         labels(3) = "Original input to sort"
-        If standaloneTest() Then task.drawRect = New cv.Rect(100, 100, 100, 100)
+        If standaloneTest() Then task.drawRect = New cv.Rect(100, 100, 50, 5)
         desc = "Sort the grayscale image portion in a rect while allowing for a mask."
     End Sub
     Public Sub RunVB(src as cv.Mat)

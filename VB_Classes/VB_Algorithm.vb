@@ -58,28 +58,30 @@ Public Class VB_Algorithm : Implements IDisposable
         dst3 = New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
         task.activeObjects.Add(Me)
 
-        If standalone And task.testAllRunning = False Then
-            task.algorithmNames.Add("waitingForInput")
-            algorithmTimes.Add(Now)
-            task.algorithm_ms.Add(0)
+        If task.recordTimings Then
+            If standalone And task.testAllRunning = False Then
+                task.algorithmNames.Add("waitingForInput")
+                algorithmTimes.Add(Now)
+                task.algorithm_ms.Add(0)
 
-            task.algorithmNames.Add("inputBufferCopy")
-            algorithmTimes.Add(Now)
-            task.algorithm_ms.Add(0)
+                task.algorithmNames.Add("inputBufferCopy")
+                algorithmTimes.Add(Now)
+                task.algorithm_ms.Add(0)
 
-            task.algorithmNames.Add("ReturnCopyTime")
-            algorithmTimes.Add(Now)
-            task.algorithm_ms.Add(0)
+                task.algorithmNames.Add("ReturnCopyTime")
+                algorithmTimes.Add(Now)
+                task.algorithm_ms.Add(0)
 
-            task.algorithmNames.Add(traceName)
-            algorithmTimes.Add(Now)
-            task.algorithm_ms.Add(0)
+                task.algorithmNames.Add(traceName)
+                algorithmTimes.Add(Now)
+                task.algorithm_ms.Add(0)
 
-            algorithmStack = New Stack()
-            algorithmStack.Push(0)
-            algorithmStack.Push(1)
-            algorithmStack.Push(2)
-            algorithmStack.Push(3)
+                algorithmStack = New Stack()
+                algorithmStack.Push(0)
+                algorithmStack.Push(1)
+                algorithmStack.Push(2)
+                algorithmStack.Push(3)
+            End If
         End If
         firstPass = True
     End Sub
@@ -95,6 +97,7 @@ Public Class VB_Algorithm : Implements IDisposable
         Return Nothing
     End Function
     Public Sub measureStartRun(name As String)
+        If task.recordTimings = False Then Exit Sub
         Dim nextTime = Now
         If task.algorithmNames.Contains(name) = False Then
             task.algorithmNames.Add(name)
@@ -112,6 +115,7 @@ Public Class VB_Algorithm : Implements IDisposable
         algorithmStack.Push(index)
     End Sub
     Public Sub measureEndRun(name As String)
+        If task.recordTimings = False Then Exit Sub
         Dim nextTime = Now
         Dim index = algorithmStack.Peek
         Dim elapsedTicks = nextTime.Ticks - algorithmTimes(index).Ticks

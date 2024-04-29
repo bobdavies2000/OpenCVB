@@ -103,7 +103,10 @@ Public Class VBtask : Implements IDisposable
 
     Public maxDepthMask As New cv.Mat
     Public depthRGB As New cv.Mat
+
     Public srcThread As cv.Mat
+    Public recordTimings As Boolean = True
+
     Public highlightColor As cv.Scalar ' color to use to highlight objects in an image.
     Public activateTaskRequest As Boolean
 
