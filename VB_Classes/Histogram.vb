@@ -12,6 +12,7 @@ Public Class Histogram_Basics : Inherits VB_Algorithm
     Public fixedRanges() As cv.Rangef
     Public bins As Integer
     Public removeMax As Boolean
+    Public autoDisplay As Boolean
     Public Sub New()
         If standaloneTest() Then gOptions.HistBinSlider.Value = 255
         desc = "Create a histogram (no Kalman)"
@@ -47,7 +48,7 @@ Public Class Histogram_Basics : Inherits VB_Algorithm
         ReDim histArray(histogram.Total - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
-        If standaloneTest() Then
+        If standaloneTest() Or autoDisplay Then
             plot.Run(histogram)
             histogram = plot.histogram ' reflect any updates to the 0 entry...  
             dst2 = plot.dst2

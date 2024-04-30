@@ -3,6 +3,7 @@ Public Class Bin3Way_Basics : Inherits VB_Algorithm
     Dim hist As New Histogram_Basics
     Public mats As New Mat_4Click
     Public Sub New()
+        hist.autoDisplay = True
         gOptions.HistBinSlider.Value = 256
         labels = {"", "", "Image separated into three segments from darkest to lightest and 'Other' (between)", "Histogram Of grayscale image"}
         desc = "Split an image into 3 parts - darkest, lightest, and in-between the 2"
@@ -11,10 +12,10 @@ Public Class Bin3Way_Basics : Inherits VB_Algorithm
         Static firstThird As Integer, lastThird As Integer
         Dim bins = gOptions.HistBinSlider.Value
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
         If task.heartBeat Then
             firstThird = 0
             lastThird = 0
-
             hist.Run(src)
             dst3 = hist.dst2
 
@@ -296,3 +297,4 @@ Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
         If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " cells were identified and matched to the previous image"
     End Sub
 End Class
+

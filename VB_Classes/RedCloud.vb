@@ -179,6 +179,7 @@ Public Class RedCloud_FindCells : Inherits VB_Algorithm
             dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
             For Each index In cellList
+                If task.redCells.Count <= index Then Continue For
                 Dim rc = task.redCells(index)
                 vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
                 dst3(rc.rect).SetTo(cv.Scalar.White, dst0(rc.rect))
@@ -2546,5 +2547,38 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_Consistent : Inherits VB_Algorithm
+    Dim redC As New Bin3Way_RedCloud
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        gOptions.PixelDiffThreshold.Value = 1
+        desc = "Remove RedCloud results that are inconsistent with the previous frame."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+
+        Static lastImage As cv.Mat = dst2
+        diff.Run(task.cellMap)
+        dst1 = diff.dst3
+
+        Static history As New List(Of cv.Mat)
+        history.Add(dst1)
+
+        For Each mat In history
+            dst2.SetTo(0, mat)
+        Next
+
+        If history.Count > gOptions.FrameHistory.Value Then history.RemoveAt(0)
     End Sub
 End Class
