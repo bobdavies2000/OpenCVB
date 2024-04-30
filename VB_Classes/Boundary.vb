@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Boundary_Basics : Inherits VB_Algorithm
-    Dim redCPP As New RedCloud_CPP
+    Public redCPP As New RedCloud_CPP
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public contours As New List(Of List(Of cv.Point))

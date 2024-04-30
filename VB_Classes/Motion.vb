@@ -20,6 +20,22 @@ End Class
 
 
 
+Public Class Motion_BasicsNew : Inherits VB_Algorithm
+    Public bgSub As New BGSubtract_MOG2
+    Dim motion As New Motion_Basics_QT
+    Public Sub New()
+        desc = "Track motion through the previous X frames."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        bgSub.Run(src)
+
+        dst2 = motion.dst2
+        labels(2) = motion.labels(2)
+    End Sub
+End Class
+
+
+
 
 
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py

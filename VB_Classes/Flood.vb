@@ -14,10 +14,11 @@ Public Class Flood_Basics : Inherits VB_Algorithm
             dst1 = bounds.dst2
             dst3 = bounds.bRects.bounds.dst2
             src = dst3 Or dst1
+            redCPP = bounds.bRects.bounds.redCPP
         End If
 
         If src.Channels = 1 Then redCPP.inputMask = src Else redCPP.inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        redCPP.Run(src)
+        If standalone = False Then redCPP.Run(src)
         If redCPP.classCount = 0 Then Exit Sub ' no data to process.
 
         genCells.classCount = redCPP.classCount
@@ -326,5 +327,35 @@ Public Class Flood_Motion1 : Inherits VB_Algorithm
             dst3 = flood.dst2
             labels(3) = flood.labels(2)
         End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Flood_HistoryImage : Inherits VB_Algorithm
+    Dim frames As New History_Basics
+    Dim redCPP As New RedCloud_CPP
+    Dim genCells As New Cell_Generate
+    Public Sub New()
+        redCPP.inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Floodfill the image after accumulation in History_Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        frames.Run(src)
+
+        redCPP.inputMask.SetTo(0)
+        redCPP.Run(src)
+        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
+
+        genCells.classCount = redCPP.classCount
+        genCells.rectData = redCPP.rectData
+        genCells.floodPointData = redCPP.floodPointData
+        genCells.removeContour = False
+        genCells.Run(redCPP.dst2)
+
+        dst2 = genCells.dst2
+        labels(2) = genCells.labels(2)
     End Sub
 End Class

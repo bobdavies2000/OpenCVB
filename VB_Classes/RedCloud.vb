@@ -2556,6 +2556,74 @@ End Class
 
 
 
+Public Class RedCloud_Consistent1 : Inherits VB_Algorithm
+    Dim redC As New Bin3Way_RedCloud
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        gOptions.PixelDiffThreshold.Value = 1
+        desc = "Remove RedCloud results that are inconsistent with the previous frame."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+
+        diff.Run(task.cellMap)
+        dst1 = diff.dst3
+
+        Static cellmaps As New List(Of cv.Mat)
+        Static cellLists As New List(Of List(Of rcData))
+        Static diffs As New List(Of cv.Mat)
+        cellLists.Add(New List(Of rcData)(task.redCells))
+        cellmaps.Add(task.cellMap And Not dst1)
+        diffs.Add(dst1.Clone)
+
+        task.redCells.Clear()
+        task.redCells.Add(New rcData)
+        For i = 0 To cellLists.Count - 1
+            For Each rc In cellLists(i)
+                Dim present As Boolean = True
+                For j = 0 To cellmaps.Count - 1
+                    Dim val = cellmaps(i).Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                    If val = 0 Then
+                        present = False
+                        Exit For
+                    End If
+                Next
+                If present Then
+                    rc.index = task.redCells.Count
+                    task.redCells.Add(rc)
+                End If
+            Next
+        Next
+
+        dst2.SetTo(0)
+        task.cellMap.SetTo(0)
+        For Each rc In task.redCells
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+        Next
+
+        For Each mat In diffs
+            dst2.SetTo(0, mat)
+        Next
+
+        If cellmaps.Count > gOptions.FrameHistory.Value Then
+            cellmaps.RemoveAt(0)
+            cellLists.RemoveAt(0)
+            diffs.RemoveAt(0)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
 Public Class RedCloud_Consistent : Inherits VB_Algorithm
     Dim redC As New Bin3Way_RedCloud
     Dim diff As New Diff_Basics
@@ -2568,17 +2636,50 @@ Public Class RedCloud_Consistent : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
 
-        Static lastImage As cv.Mat = dst2
         diff.Run(task.cellMap)
         dst1 = diff.dst3
 
-        Static history As New List(Of cv.Mat)
-        history.Add(dst1)
+        Static cellmaps As New List(Of cv.Mat)
+        Static cellLists As New List(Of List(Of rcData))
+        Static diffs As New List(Of cv.Mat)
+        cellLists.Add(New List(Of rcData)(task.redCells))
+        cellmaps.Add(task.cellMap And Not dst1)
+        diffs.Add(dst1.Clone)
 
-        For Each mat In history
+        task.redCells.Clear()
+        task.redCells.Add(New rcData)
+        For i = 0 To cellLists.Count - 1
+            For Each rc In cellLists(i)
+                Dim present As Boolean = True
+                For j = 0 To cellmaps.Count - 1
+                    Dim val = cellmaps(i).Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                    If val = 0 Then
+                        present = False
+                        Exit For
+                    End If
+                Next
+                If present Then
+                    rc.index = task.redCells.Count
+                    task.redCells.Add(rc)
+                End If
+            Next
+        Next
+
+        dst2.SetTo(0)
+        task.cellMap.SetTo(0)
+        For Each rc In task.redCells
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+        Next
+
+        For Each mat In diffs
             dst2.SetTo(0, mat)
         Next
 
-        If history.Count > gOptions.FrameHistory.Value Then history.RemoveAt(0)
+        If cellmaps.Count > gOptions.FrameHistory.Value Then
+            cellmaps.RemoveAt(0)
+            cellLists.RemoveAt(0)
+            diffs.RemoveAt(0)
+        End If
     End Sub
 End Class
