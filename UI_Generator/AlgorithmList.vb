@@ -1645,6 +1645,7 @@ if algorithmName = "RedCloud_CellStatsPlot" Then return new RedCloud_CellStatsPl
 if algorithmName = "RedCloud_Combine" Then return new RedCloud_Combine
 if algorithmName = "RedCloud_Consistent" Then return new RedCloud_Consistent
 if algorithmName = "RedCloud_Consistent1" Then return new RedCloud_Consistent1
+if algorithmName = "RedCloud_Consistent2" Then return new RedCloud_Consistent2
 if algorithmName = "RedCloud_ContourUpdate" Then return new RedCloud_ContourUpdate
 if algorithmName = "RedCloud_ContourVsFeatureLess" Then return new RedCloud_ContourVsFeatureLess
 if algorithmName = "RedCloud_CPP" Then return new RedCloud_CPP

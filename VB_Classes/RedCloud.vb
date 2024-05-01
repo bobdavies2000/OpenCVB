@@ -2632,7 +2632,7 @@ End Class
 
 
 
-Public Class RedCloud_Consistent : Inherits VB_Algorithm
+Public Class RedCloud_Consistent2 : Inherits VB_Algorithm
     Dim redC As New Bin3Way_RedCloud
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -2688,6 +2688,69 @@ Public Class RedCloud_Consistent : Inherits VB_Algorithm
             cellmaps.RemoveAt(0)
             cellLists.RemoveAt(0)
             diffs.RemoveAt(0)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_Consistent : Inherits VB_Algorithm
+    Dim redC As New Bin3Way_RedCloud
+    Public Sub New()
+        desc = "Remove RedCloud results that are inconsistent with the previous frame(s)."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst3 = redC.dst2
+
+        Static cellmaps As New List(Of cv.Mat)
+        Static cellLists As New List(Of List(Of rcData))
+
+        cellLists.Add(New List(Of rcData)(task.redCells))
+        cellmaps.Add(task.cellMap.Clone)
+
+        Dim newCells As New List(Of rcData)
+        newCells.Add(New rcData)
+        For Each rc In task.redCells
+            Dim maxDStable = rc.maxDStable
+            Dim count As Integer = 0
+            Dim sizes As New List(Of Integer)
+            Dim redData As New List(Of rcData)
+            For i = 0 To cellmaps.Count - 1
+                Dim index = cellmaps(i).Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                If cellLists(i)(index).maxDStable = maxDStable Then
+                    count = count + 1
+                    sizes.Add(cellLists(i)(index).pixels)
+                    redData.Add(cellLists(i)(index))
+                Else
+                    Exit For
+                End If
+            Next
+            If count = cellmaps.Count Then
+                Dim index = sizes.IndexOf(sizes.Max)
+                rc = redData(index)
+                rc.index = newCells.Count
+                newCells.Add(rc)
+            End If
+        Next
+
+        dst2.SetTo(0)
+        task.cellMap.SetTo(0)
+        For Each rc In newCells
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+        Next
+        task.redCells = New List(Of rcData)(newCells)
+
+        If cellmaps.Count > gOptions.FrameHistory.Value Then
+            cellmaps.RemoveAt(0)
+            cellLists.RemoveAt(0)
         End If
     End Sub
 End Class
