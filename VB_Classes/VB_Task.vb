@@ -610,6 +610,7 @@ Public Class VBtask : Implements IDisposable
             cMotion.Run(src)
             algorithmObject.NextFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
+            Dim rc = task.rc
             If gOptions.IdentifyCells.Checked Then
                 Dim ptNew As New cv.Point
                 Dim ptCells As New List(Of cv.Point)
@@ -624,13 +625,29 @@ Public Class VBtask : Implements IDisposable
                         Dim k = 0
                     End If
                 Next
+
+                If rc.index > 0 Then
+                    task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+                    task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+
+                    task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+                    If gOptions.DisplayCellStats.Checked Then
+                        dst3.SetTo(0)
+                        If task.clickPoint = New cv.Point Then
+                            If task.redCells.Count > 1 Then
+                                task.rc = task.redCells(1)
+                                task.clickPoint = task.rc.maxDist
+                            End If
+                        End If
+                        Static cellStats As New Cell_Basics
+                        cellStats.statsString()
+                        dst1 = cellStats.dst1
+                        Dim str As New trueText(cellStats.strOut, New cv.Point, 3)
+                        trueData.Add(str)
+                    End If
+                End If
             End If
 
-            If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then
-                task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
-            End If
-
-            Dim rc = task.rc
             If gOptions.DisplayCellStats.Checked And task.clickPoint = New cv.Point Then
                 If task.redCells.Count > 1 Then
                     task.rc = task.redCells(1)
@@ -638,25 +655,8 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            If rc.index > 0 Then
-                task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-                task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-
-                task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-                If gOptions.DisplayCellStats.Checked Then
-                    dst3.SetTo(0)
-                    If task.clickPoint = New cv.Point Then
-                        If task.redCells.Count > 1 Then
-                            task.rc = task.redCells(1)
-                            task.clickPoint = task.rc.maxDist
-                        End If
-                    End If
-                    Static cellStats As New Cell_Basics
-                    cellStats.statsString()
-                    dst1 = cellStats.dst1
-                    Dim str As New trueText(cellStats.strOut, New cv.Point, 3)
-                    trueData.Add(str)
-                End If
+            If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then
+                task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
             End If
 
             If gOptions.CrossHairs.Checked Then

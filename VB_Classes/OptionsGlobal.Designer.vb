@@ -496,9 +496,9 @@ Partial Class OptionsGlobal
         Me.debugSyncUI.AutoSize = True
         Me.debugSyncUI.Location = New System.Drawing.Point(24, 148)
         Me.debugSyncUI.Name = "debugSyncUI"
-        Me.debugSyncUI.Size = New System.Drawing.Size(259, 24)
+        Me.debugSyncUI.Size = New System.Drawing.Size(261, 24)
         Me.debugSyncUI.TabIndex = 66
-        Me.debugSyncUI.Text = "Synchronize Debug with Output"
+        Me.debugSyncUI.Text = "Synchronize Debug with Display"
         Me.debugSyncUI.UseVisualStyleBackColor = True
         '
         'UseMultiThreading

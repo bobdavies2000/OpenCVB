@@ -53,9 +53,8 @@ Public Class RedCloud_BasicsTest : Inherits VB_Algorithm
         If src.Channels <> 1 Then
             Static bounds As New Boundary_RemovedRects
             bounds.Run(src)
-            dst1 = bounds.dst2
-            dst3 = bounds.bRects.bounds.dst2
-            redCPP.inputMask = dst3 Or dst1
+            If firstPass Then redCPP = bounds.bRects.bounds.redCPP
+            inputMask = bounds.bRects.bounds.dst2 Or bounds.dst2
         End If
 
         redCPP.inputMask = inputMask
@@ -2482,6 +2481,12 @@ Public Class RedCloud_MaxDist_CPP : Inherits VB_Algorithm
         desc = "Run the C++ RedCloudMaxDist interface without a mask"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 1 Then
+            Static colorC As New Color_Basics
+            colorC.Run(src)
+            src = colorC.dst2
+        End If
+
         If task.heartBeat Then maxList.Clear() ' reevaluate all cells.
         Dim maxArray = maxList.ToArray
         Dim handleMaxList = GCHandle.Alloc(maxArray, GCHandleType.Pinned)
@@ -2496,9 +2501,10 @@ Public Class RedCloud_MaxDist_CPP : Inherits VB_Algorithm
         imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols)
         handleInput.Free()
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst3 = vbPalette(dst2)
 
         classCount = RedCloudMaxDist_Count(cPtr)
-        Console.WriteLine("classcount = " + CStr(classCount))
+        labels(2) = "CV_8U version with " + CStr(classCount) + " cells."
 
         If classCount = 0 Then Exit Sub ' no data to process.
         rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloudMaxDist_Rects(cPtr))

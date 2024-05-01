@@ -639,6 +639,7 @@ Public Class Motion_Basics_QT : Inherits VB_Algorithm
     Public bgSub As New BGSubtract_MOG2
     Dim rectList As New List(Of cv.Rect)
     Public Sub New()
+        gOptions.IdentifyCells.Checked = False
         desc = "The option-free version of Motion_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)

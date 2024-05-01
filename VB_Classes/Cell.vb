@@ -400,7 +400,6 @@ Public Class Cell_Generate : Inherits VB_Algorithm
     Public rectData As cv.Mat
     Public floodPointData As cv.Mat
     Public removeContour As Boolean
-    Public cellLimit As Integer = 255
     Public matchCount As Integer
     Public Sub New()
         task.cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -411,12 +410,12 @@ Public Class Cell_Generate : Inherits VB_Algorithm
         If standalone Then
             Static bounds As New Boundary_RemovedRects
             bounds.Run(src)
-            dst1 = bounds.dst2
             task.cellMap = bounds.bRects.bounds.dst2
-            src = task.cellMap Or dst1
+            src = task.cellMap Or bounds.dst2
 
-            Static redCPP As New RedCloud_CPP
-            redCPP.Run(src)
+
+            Static redCPP As RedCloud_CPP
+            redCPP = bounds.bRects.bounds.redCPP
 
             If redCPP.classCount = 0 Then Exit Sub ' no data to process.
             classCount = redCPP.classCount
@@ -431,9 +430,8 @@ Public Class Cell_Generate : Inherits VB_Algorithm
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         Dim usedColors As New List(Of cv.Vec3b)
         usedColors.Add(black)
-        Dim cellCount = Math.Min(cellLimit, classCount)
         task.rcMatchThreshold = If(task.frameCount < task.fpsRate, task.frameCount - 1, task.fpsRate)
-        For i = 1 To cellCount - 1
+        For i = 1 To classCount - 1
             Dim rc As New rcData
             rc.index = sortedCells.Count + 1
             rc.rect = rectData.Get(Of cv.Rect)(i - 1, 0)

@@ -4020,6 +4020,7 @@ RedCloudMaxDist_Run(RedCloudMaxDist * cPtr, int* dataPtr, unsigned char* maskPtr
 {
 	cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
 	cPtr->mask = Mat::zeros(rows + 2, cols + 2, CV_8U);
+	cPtr->mask.setTo(0);
 	Rect r = Rect(1, 1, cols, rows);
 	if (maskPtr != 0)
 	{

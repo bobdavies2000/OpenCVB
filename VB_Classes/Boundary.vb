@@ -4,6 +4,7 @@ Public Class Boundary_Basics : Inherits VB_Algorithm
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public contours As New List(Of List(Of cv.Point))
+    Public runRedCPP As Boolean = True
     Public Sub New()
         redOptions.ColorSource.SelectedItem() = "Quartile_Regions"
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -26,28 +27,30 @@ Public Class Boundary_Basics : Inherits VB_Algorithm
             End If
         End If
 
-        redCPP.Run(dst1)
+        If runRedCPP Then
+            redCPP.Run(dst1)
 
-        dst2.SetTo(0)
-        rects.Clear()
-        masks.Clear()
-        contours.Clear()
-        For i = 1 To redCPP.classCount - 1
-            Dim rect = redCPP.rectData.Get(Of cv.Rect)(i - 1, 0)
-            Dim mask = redCPP.dst2(rect).InRange(i, i)
-            Dim contour = contourBuild(mask, cv.ContourApproximationModes.ApproxNone)
-            vbDrawContour(dst2(rect), contour, 255, task.lineWidth)
-            rects.Add(rect)
-            masks.Add(mask)
-            contours.Add(contour)
-        Next
+            dst2.SetTo(0)
+            rects.Clear()
+            masks.Clear()
+            contours.Clear()
+            For i = 1 To redCPP.classCount - 1
+                Dim rect = redCPP.rectData.Get(Of cv.Rect)(i - 1, 0)
+                Dim mask = redCPP.dst2(rect).InRange(i, i)
+                Dim contour = contourBuild(mask, cv.ContourApproximationModes.ApproxNone)
+                vbDrawContour(dst2(rect), contour, 255, task.lineWidth)
+                rects.Add(rect)
+                masks.Add(mask)
+                contours.Add(contour)
+            Next
 
-        Dim maxDepthContour = contourBuild(task.maxDepthMask, cv.ContourApproximationModes.ApproxNone)
-        vbDrawContour(task.maxDepthMask, maxDepthContour, 255, -1)
-        dst2.SetTo(0, task.maxDepthMask)
-        vbDrawContour(dst2, maxDepthContour, 255, task.lineWidth)
+            Dim maxDepthContour = contourBuild(task.maxDepthMask, cv.ContourApproximationModes.ApproxNone)
+            vbDrawContour(task.maxDepthMask, maxDepthContour, 255, -1)
+            dst2.SetTo(0, task.maxDepthMask)
+            vbDrawContour(dst2, maxDepthContour, 255, task.lineWidth)
 
-        labels(2) = $"{redCPP.classCount} cells were found."
+            labels(2) = $"{redCPP.classCount} cells were found."
+        End If
     End Sub
 End Class
 
@@ -90,10 +93,7 @@ Public Class Boundary_Rectangles : Inherits VB_Algorithm
     Public smallRects As New List(Of cv.Rect)
     Public smallContours As New List(Of List(Of cv.Point))
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Desired percent of rectangles", 0, 100, 25)
-        End If
-
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired percent of rectangles", 0, 100, 25)
         desc = "Build the boundaries for redCells and remove interior rectangles"
     End Sub
     Public Sub RunVB(src As cv.Mat)

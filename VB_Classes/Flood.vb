@@ -11,21 +11,19 @@ Public Class Flood_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
             bounds.Run(src)
-            dst1 = bounds.dst2
             dst3 = bounds.bRects.bounds.dst2
-            src = dst3 Or dst1
             redCPP = bounds.bRects.bounds.redCPP
+        Else
+            redCPP.inputMask = src
+            If standalone = False Then redCPP.Run(src)
         End If
 
-        If src.Channels = 1 Then redCPP.inputMask = src Else redCPP.inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        If standalone = False Then redCPP.Run(src)
         If redCPP.classCount = 0 Then Exit Sub ' no data to process.
 
         genCells.classCount = redCPP.classCount
         genCells.rectData = redCPP.rectData
         genCells.floodPointData = redCPP.floodPointData
         genCells.removeContour = False
-        genCells.cellLimit = bounds.bRects.bounds.rects.Count - bounds.bRects.smallRects.Count
         genCells.Run(redCPP.dst2)
 
         dst2 = genCells.dst2
@@ -50,6 +48,8 @@ Public Class Flood_CellStatsPlot : Inherits VB_Algorithm
     Public Sub New()
         gOptions.IdentifyCells.Checked = True
         If standaloneTest() Then gOptions.displayDst1.Checked = True
+        gOptions.HistBinSlider.Value = 1000
+        labels(1) = "Histogram of the depth for the selected cell.  Click any cell in the lower left."
         desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -198,50 +198,6 @@ End Class
 
 
 
-Public Class Flood_MaxDistPoints : Inherits VB_Algorithm
-    Dim bounds As New Boundary_RemovedRects
-    Dim redCPP As New RedCloud_MaxDist_CPP
-    Public genCells As New Cell_Generate
-    Public Sub New()
-        gOptions.IdentifyCells.Checked = True
-        labels(3) = "Contour boundaries - input to RedCloud_Basics"
-        desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            bounds.Run(src)
-            dst1 = bounds.dst2
-            dst3 = bounds.bRects.bounds.dst2
-            src = dst3 Or dst1
-        End If
-
-        redCPP.Run(src)
-        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
-
-        genCells.classCount = redCPP.classCount
-        genCells.rectData = redCPP.rectData
-        genCells.floodPointData = redCPP.floodPointData
-        genCells.removeContour = False
-        genCells.cellLimit = bounds.bRects.bounds.rects.Count - bounds.bRects.smallRects.Count
-        genCells.Run(redCPP.dst2)
-
-        dst2 = genCells.dst2
-
-        redCPP.maxList.Clear()
-        For i = 1 To task.redCells.Count - 1
-            redCPP.maxList.Add(task.redCells(i).maxDist.X)
-            redCPP.maxList.Add(task.redCells(i).maxDist.Y)
-        Next
-
-        setSelectedContour()
-
-        labels(2) = genCells.labels(2)
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class Flood_Motion : Inherits VB_Algorithm
@@ -345,7 +301,6 @@ Public Class Flood_HistoryImage : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         frames.Run(src)
 
-        redCPP.inputMask.SetTo(0)
         redCPP.Run(src)
         If redCPP.classCount = 0 Then Exit Sub ' no data to process.
 
@@ -356,6 +311,46 @@ Public Class Flood_HistoryImage : Inherits VB_Algorithm
         genCells.Run(redCPP.dst2)
 
         dst2 = genCells.dst2
+        labels(2) = genCells.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Flood_MaxDistPoints : Inherits VB_Algorithm
+    Dim bounds As New Boundary_RemovedRects
+    Dim redCPP As New RedCloud_MaxDist_CPP
+    Public genCells As New Cell_Generate
+    Public Sub New()
+        gOptions.IdentifyCells.Checked = True
+        labels(3) = "Contour boundaries - input to RedCloud_Basics"
+        desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static colorC As New Color_Basics
+        colorC.Run(src)
+        redCPP.Run(colorC.dst2)
+        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
+
+        genCells.classCount = redCPP.classCount
+        genCells.rectData = redCPP.rectData
+        genCells.floodPointData = redCPP.floodPointData
+        genCells.removeContour = False
+        genCells.Run(redCPP.dst2)
+
+        dst2 = genCells.dst2
+
+        redCPP.maxList.Clear()
+        For i = 1 To task.redCells.Count - 1
+            redCPP.maxList.Add(task.redCells(i).maxDist.X)
+            redCPP.maxList.Add(task.redCells(i).maxDist.Y)
+        Next
+
+        setSelectedContour()
+
         labels(2) = genCells.labels(2)
     End Sub
 End Class
