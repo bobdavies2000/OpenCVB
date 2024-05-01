@@ -686,7 +686,6 @@ if algorithmName = "Flood_Basics" Then return new Flood_Basics
 if algorithmName = "Flood_BasicsMask" Then return new Flood_BasicsMask
 if algorithmName = "Flood_CellStatsPlot" Then return new Flood_CellStatsPlot
 if algorithmName = "Flood_ContainedCells" Then return new Flood_ContainedCells
-if algorithmName = "Flood_HistoryImage" Then return new Flood_HistoryImage
 if algorithmName = "Flood_MaxDistPoints" Then return new Flood_MaxDistPoints
 if algorithmName = "Flood_Motion" Then return new Flood_Motion
 if algorithmName = "Flood_Motion1" Then return new Flood_Motion1

@@ -2531,6 +2531,11 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
         desc = "Run the C++ RedCloud interface with or without a mask"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 1 Then
+            Static bounds As New Boundary_RemovedRects
+            bounds.Run(src)
+            src = bounds.bRects.bounds.dst2
+        End If
         Dim imagePtr As IntPtr
         Dim inputData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)

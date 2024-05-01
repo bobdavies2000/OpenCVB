@@ -290,34 +290,6 @@ End Class
 
 
 
-Public Class Flood_HistoryImage : Inherits VB_Algorithm
-    Dim frames As New History_Basics
-    Dim redCPP As New RedCloud_CPP
-    Dim genCells As New Cell_Generate
-    Public Sub New()
-        redCPP.inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Floodfill the image after accumulation in History_Basics"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        frames.Run(src)
-
-        redCPP.Run(src)
-        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
-
-        genCells.classCount = redCPP.classCount
-        genCells.rectData = redCPP.rectData
-        genCells.floodPointData = redCPP.floodPointData
-        genCells.removeContour = False
-        genCells.Run(redCPP.dst2)
-
-        dst2 = genCells.dst2
-        labels(2) = genCells.labels(2)
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class Flood_MaxDistPoints : Inherits VB_Algorithm

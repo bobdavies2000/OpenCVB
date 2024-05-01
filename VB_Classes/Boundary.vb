@@ -44,11 +44,6 @@ Public Class Boundary_Basics : Inherits VB_Algorithm
                 contours.Add(contour)
             Next
 
-            Dim maxDepthContour = contourBuild(task.maxDepthMask, cv.ContourApproximationModes.ApproxNone)
-            vbDrawContour(task.maxDepthMask, maxDepthContour, 255, -1)
-            dst2.SetTo(0, task.maxDepthMask)
-            vbDrawContour(dst2, maxDepthContour, 255, task.lineWidth)
-
             labels(2) = $"{redCPP.classCount} cells were found."
         End If
     End Sub

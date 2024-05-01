@@ -22,7 +22,7 @@ Public Class History_Basics : Inherits VB_Algorithm
         For Each m In saveFrames
             dst1 += m
         Next
-        dst1 *= 1 / saveFrames.Count
+        dst1 *= 1 / (saveFrames.Count + 1)
         If src.Channels = 1 Then
             dst1.ConvertTo(dst2, cv.MatType.CV_8U)
         Else
