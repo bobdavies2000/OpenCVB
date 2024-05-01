@@ -50,12 +50,9 @@ Public Class RedCloud_BasicsTest : Inherits VB_Algorithm
         desc = "Find cells and then match them to the previous generation"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static bounds As New Boundary_RemovedRects
-            bounds.Run(src)
-            If firstPass Then redCPP = bounds.bRects.bounds.redCPP
-            inputMask = bounds.bRects.bounds.dst2 Or bounds.dst2
-        End If
+        Static colorC As New Color_Basics
+        colorC.Run(src)
+        src = colorC.dst2
 
         redCPP.inputMask = inputMask
         redCPP.Run(src)
