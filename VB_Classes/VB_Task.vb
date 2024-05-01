@@ -611,6 +611,8 @@ Public Class VBtask : Implements IDisposable
             algorithmObject.NextFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
             Dim rc = task.rc
+            If task.redCells.Count > 0 Then setSelectedContour()
+
             If gOptions.IdentifyCells.Checked Then
                 Dim ptNew As New cv.Point
                 Dim ptCells As New List(Of cv.Point)

@@ -29,7 +29,6 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
 
         dst2 = genCells.dst2
 
-        setSelectedContour()
         labels(2) = genCells.labels(2)
     End Sub
 End Class
@@ -2711,6 +2710,7 @@ Public Class RedCloud_Consistent : Inherits VB_Algorithm
 
         Static cellmaps As New List(Of cv.Mat)
         Static cellLists As New List(Of List(Of rcData))
+        Static lastImage As cv.Mat = dst3.Clone
 
         cellLists.Add(New List(Of rcData)(task.redCells))
         cellmaps.Add(task.cellMap.Clone)
@@ -2735,9 +2735,11 @@ Public Class RedCloud_Consistent : Inherits VB_Algorithm
             If count = cellmaps.Count Then
                 Dim index = sizes.IndexOf(sizes.Max)
                 rc = redData(index)
+                Dim color = lastImage.Get(Of cv.Vec3b)(rc.maxDStable.Y, rc.maxDStable.X)
+                If color <> black Then rc.color = color
                 rc.index = newCells.Count
-                newCells.Add(rc)
-            End If
+                    newCells.Add(rc)
+                End If
         Next
 
         dst2.SetTo(0)
@@ -2747,6 +2749,7 @@ Public Class RedCloud_Consistent : Inherits VB_Algorithm
             task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
         Next
         task.redCells = New List(Of rcData)(newCells)
+        lastImage = dst2.Clone
 
         If cellmaps.Count > gOptions.FrameHistory.Value Then
             cellmaps.RemoveAt(0)
