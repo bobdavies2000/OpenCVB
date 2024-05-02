@@ -163,7 +163,7 @@
     <Compile Include="History.vb" />
     <Compile Include="GuidedBP.vb" />
     <Compile Include="Guess.vb" />
-    <Compile Include="Histogram2D.vb" />
+    <Compile Include="Hist2D.vb" />
     <Compile Include="Hist3Dcolor.vb" />
     <Compile Include="HistPeak2D.vb" />
     <Compile Include="HistValley.vb" />
@@ -335,7 +335,7 @@
     <Compile Include="Keyboard.vb" />
     <Compile Include="Line.vb" />
     <Compile Include="Gradient.vb" />
-    <Compile Include="Histogram.vb" />
+    <Compile Include="Hist.vb" />
     <Compile Include="HOG.vb" />
     <Compile Include="Hough.vb" />
     <Compile Include="IMU.vb" />

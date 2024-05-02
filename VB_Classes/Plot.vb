@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
 Public Class Plot_Basics : Inherits VB_Algorithm
     Dim plot As New Plot_Basics_CPP
-    Dim hist As New Histogram_Graph
+    Dim hist As New Hist_Graph
     Public plotCount As Integer = 3
     Public Sub New()
         hist.plotRequested = True
@@ -94,7 +94,7 @@ End Class
 
 Public Class Plot_Depth : Inherits VB_Algorithm
     Dim plotDepth As New Plot_Basics_CPP
-    Dim hist As New Histogram_Basics
+    Dim hist As New Hist_Basics
     Public Sub New()
         desc = "Show depth using OpenCV's plot format with variable bins."
     End Sub

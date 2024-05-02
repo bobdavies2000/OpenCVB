@@ -107,7 +107,7 @@ End Class
 Public Class Blur_PlusHistogram : Inherits VB_Algorithm
     Dim mat2to1 As New Mat_2to1
     Dim blur As New Blur_Bilateral
-    Dim myhist As New Histogram_EqualizeGray
+    Dim myhist As New Hist_EqualizeGray
     Public Sub New()
         labels(2) = "Use Blur slider to see impact on histogram peak values"
         labels(3) = "Top is before equalize, Bottom is after Equalize"

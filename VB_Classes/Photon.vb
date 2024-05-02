@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 'https://security.stackexchange.com/questions/42428/Is-generating-random-numbers-using-a-smartphone-camera-a-good-idea
 Public Class Photon_Basics : Inherits VB_Algorithm
-    Dim hist As New Histogram_Basics
+    Dim hist As New Hist_Basics
     Public Sub New()
         labels = {"", "", "Points where B, G, or R differ from the previous image", "Histogram showing distribution of absolute value of differences"}
         desc = "With no motion the camera values will show the random photon differences.  Are they random?"
@@ -89,7 +89,7 @@ End Class
 
 'https://security.stackexchange.com/questions/42428/Is-generating-random-numbers-using-a-smartphone-camera-a-good-idea
 Public Class Photon_Subtraction : Inherits VB_Algorithm
-    Dim hist As New Histogram_Basics
+    Dim hist As New Hist_Basics
     Public Sub New()
         labels = {"", "", "Points where B, G, or R differ", "Histogram showing distribution of differences"}
         desc = "Same as Photon_Basics but without ignoring sign."

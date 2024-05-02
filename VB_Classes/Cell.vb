@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Cell_Basics : Inherits VB_Algorithm
-    Dim plot As New Histogram_Depth
+    Dim plot As New Hist_Depth
     Dim pca As New PCA_Basics
     Dim eq As New Plane_Equation
     Public runRedCloud As Boolean
@@ -439,7 +439,7 @@ End Class
 
 
 Public Class Cell_BasicsPlot : Inherits VB_Algorithm
-    Dim plot As New Histogram_Depth
+    Dim plot As New Hist_Depth
     Public runRedCloud As Boolean
     Dim stats As New Cell_Basics
     Public Sub New()

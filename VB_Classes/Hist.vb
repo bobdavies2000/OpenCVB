@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports System.Windows.Documents
 Imports cv = OpenCvSharp
-Public Class Histogram_Basics : Inherits VB_Algorithm
+Public Class Hist_Basics : Inherits VB_Algorithm
     Public histogram As New cv.Mat
     Public mm As mmData
     Public plot As New Plot_Histogram
@@ -67,8 +67,8 @@ End Class
 
 
 
-Public Class Histogram_Grayscale : Inherits VB_Algorithm
-    Public hist As New Histogram_Basics
+Public Class Hist_Grayscale : Inherits VB_Algorithm
+    Public hist As New Hist_Basics
     Public Sub New()
         If standaloneTest() Then gOptions.HistBinSlider.Value = 255
         desc = "Create a histogram of the grayscale image"
@@ -88,7 +88,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/python/hist.py
-Public Class Histogram_Graph : Inherits VB_Algorithm
+Public Class Hist_Graph : Inherits VB_Algorithm
     Public histRaw(3 - 1) As cv.Mat
     Public histNormalized(3 - 1) As cv.Mat
     Public minRange As Single = 0
@@ -138,8 +138,8 @@ End Class
 
 
 
-Public Class Histogram_NormalizeGray : Inherits VB_Algorithm
-    Public histogram As New Histogram_Basics
+Public Class Hist_NormalizeGray : Inherits VB_Algorithm
+    Public histogram As New Hist_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Min Gray", 0, 255, 50)
@@ -167,10 +167,10 @@ End Class
 
 
 
-'https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
-Public Class Histogram_EqualizeGray : Inherits VB_Algorithm
-    Public histogramEQ As New Histogram_Basics
-    Public histogram As New Histogram_Basics
+'https://docs.opencv.org/master/d1/db7/tutorial_py_Hist_begins.html
+Public Class Hist_EqualizeGray : Inherits VB_Algorithm
+    Public histogramEQ As New Hist_Basics
+    Public histogram As New Hist_Basics
     Dim mats As New Mat_4to1
     Public Sub New()
         histogramEQ.plot.addLabels = False
@@ -198,7 +198,7 @@ End Class
 
 
 
-Public Class Histogram_Simple : Inherits VB_Algorithm
+Public Class Hist_Simple : Inherits VB_Algorithm
     Public plot As New Plot_Histogram
     Public Sub New()
         labels(2) = "Histogram of the grayscale video stream"
@@ -224,8 +224,8 @@ End Class
 
 
 
-Public Class Histogram_ColorsAndGray : Inherits VB_Algorithm
-    Dim histogram As New Histogram_Basics
+Public Class Hist_ColorsAndGray : Inherits VB_Algorithm
+    Dim histogram As New Hist_Basics
     Dim mats As New Mat_4Click
     Public Sub New()
         labels(2) = "Click any quadrant at right to view it below"
@@ -255,7 +255,7 @@ End Class
 
 
 
-Public Class Histogram_Frustrum : Inherits VB_Algorithm
+Public Class Hist_Frustrum : Inherits VB_Algorithm
     Dim heat As New HeatMap_Basics
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -284,8 +284,8 @@ End Class
 
 
 
-Public Class Histogram_PeakMax : Inherits VB_Algorithm
-    Dim hist As New Histogram_Basics
+Public Class Hist_PeakMax : Inherits VB_Algorithm
+    Dim hist As New Hist_Basics
     Public Sub New()
         desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
         labels(3) = "Grayscale Histogram"
@@ -322,8 +322,8 @@ End Class
 
 
 
-Public Class Histogram_PeakFinder : Inherits VB_Algorithm
-    Public hist As New Histogram_Basics
+Public Class Hist_PeakFinder : Inherits VB_Algorithm
+    Public hist As New Hist_Basics
     Public peakCount As Integer
     Public resetPeaks As Boolean
     Public histogramPeaks As New List(Of Integer)
@@ -390,7 +390,7 @@ Public Class Histogram_PeakFinder : Inherits VB_Algorithm
             sortedPeaks.Add(peakCounts(i), i)
         Next
 
-        Dim mm as mmData = vbMinMax(histogram)
+        Dim mm As mmData = vbMinMax(histogram)
         If mm.maxVal = 0 Then Exit Sub ' entries are all zero?  Likely camera trouble.
         Dim brickWidth = dst2.Width / histogram.Rows
         histogramPeaks.Clear()
@@ -420,8 +420,8 @@ End Class
 
 
 
-Public Class Histogram_PeaksDepth : Inherits VB_Algorithm
-    Dim peaks As New Histogram_PeakFinder
+Public Class Hist_PeaksDepth : Inherits VB_Algorithm
+    Dim peaks As New Hist_PeakFinder
     Public Sub New()
         desc = "Find the peaks - columns taller that both neighbors - in the histogram"
     End Sub
@@ -442,13 +442,13 @@ End Class
 
 
 
-Public Class Histogram_PeaksRGB : Inherits VB_Algorithm
+Public Class Hist_PeaksRGB : Inherits VB_Algorithm
     Public mats As New Mat_4Click
-    Dim peaks(2) As Histogram_PeakFinder
+    Dim peaks(2) As Hist_PeakFinder
     Public Sub New()
-        peaks(0) = New Histogram_PeakFinder
-        peaks(1) = New Histogram_PeakFinder
-        peaks(2) = New Histogram_PeakFinder
+        peaks(0) = New Hist_PeakFinder
+        peaks(1) = New Hist_PeakFinder
+        peaks(2) = New Hist_PeakFinder
         labels(2) = "Upper left is Blue, upper right is Green, bottom left is Red"
         desc = "Find the peaks and valleys for each of the BGR channels."
     End Sub
@@ -479,9 +479,9 @@ End Class
 
 
 
-Public Class Histogram_SLR : Inherits VB_Algorithm
+Public Class Hist_SLR : Inherits VB_Algorithm
     Public slr As New SLR_Basics
-    Public hist As New Histogram_Basics
+    Public hist As New Hist_Basics
     Public Sub New()
         labels = {"", "", "Original data", "Segmented Linear Regression (SLR) version of the same data.  Red line is zero."}
         desc = "Run Segmented Linear Regression on depth data"
@@ -505,7 +505,7 @@ End Class
 
 
 
-Public Class Histogram_Color : Inherits VB_Algorithm
+Public Class Hist_Color : Inherits VB_Algorithm
     Public histogram As New cv.Mat
     Public plot As New Plot_Histogram
     Public ranges() As cv.Rangef
@@ -523,7 +523,7 @@ Public Class Histogram_Color : Inherits VB_Algorithm
         Dim mask As New cv.Mat
         cv.Cv2.CalcBackProject({input}, {1, 2}, histogram, mask, ranges)
 
-        Dim mm as mmData = vbMinMax(mask)
+        Dim mm As mmData = vbMinMax(mask)
 
         plot.Run(test)
         dst2 = plot.dst2
@@ -537,7 +537,7 @@ End Class
 
 
 
-Public Class Histogram_KalmanAuto : Inherits VB_Algorithm
+Public Class Hist_KalmanAuto : Inherits VB_Algorithm
     Public histogram As New cv.Mat
     Public kalman As New Kalman_Basics
     Public plot As New Plot_Histogram
@@ -594,10 +594,10 @@ End Class
 
 
 
-' https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
-Public Class Histogram_EqualizeColor : Inherits VB_Algorithm
-    Public kalmanEq As New Histogram_Basics
-    Public kalman As New Histogram_Basics
+' https://docs.opencv.org/master/d1/db7/tutorial_py_Hist_begins.html
+Public Class Hist_EqualizeColor : Inherits VB_Algorithm
+    Public kalmanEq As New Hist_Basics
+    Public kalman As New Hist_Basics
     Dim mats As New Mat_2to1
     Public displayHist As Boolean = False
     Public channel = 2
@@ -642,8 +642,8 @@ End Class
 
 
 
-Public Class Histogram_CompareGray : Inherits VB_Algorithm
-    Public histK As New Histogram_Kalman
+Public Class Hist_CompareGray : Inherits VB_Algorithm
+    Public histK As New Hist_Kalman
     Dim options As New Options_HistCompare
     Public histDiff As New cv.Mat
     Public histDiffAbs As New cv.Mat
@@ -695,8 +695,8 @@ End Class
 
 
 
-Public Class Histogram_ComparePlot : Inherits VB_Algorithm
-    Dim comp As New Histogram_CompareGray
+Public Class Hist_ComparePlot : Inherits VB_Algorithm
+    Dim comp As New Hist_CompareGray
     Public Sub New()
         labels(3) = "Differences have been multiplied by 1000 to build scale at the left"
         desc = "Compare grayscale histograms for successive frames and plot the difference as a histogram."
@@ -712,7 +712,7 @@ Public Class Histogram_ComparePlot : Inherits VB_Algorithm
             comp.histK.hist.plot.Run(histX)
             dst3 = comp.histK.hist.plot.dst2.Clone
 
-            Dim mm as mmData = vbMinMax(histX)
+            Dim mm As mmData = vbMinMax(histX)
             AddPlotScale(dst2, 0, mm.maxVal)
         End If
         trueData = New List(Of trueText)(ttLabels)
@@ -725,8 +725,8 @@ End Class
 
 
 
-Public Class Histogram_CompareNumber : Inherits VB_Algorithm
-    Dim comp As New Histogram_CompareGray
+Public Class Hist_CompareNumber : Inherits VB_Algorithm
+    Dim comp As New Hist_CompareGray
     Dim plot As New Plot_OverTimeScalar
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -756,8 +756,8 @@ End Class
 
 
 ' https://study.marearts.com/2014/11/opencv-emdearth-mover-distance-example.html
-Public Class Histogram_CompareEMD_hsv : Inherits VB_Algorithm
-    Dim hist As New Histogram_Basics
+Public Class Hist_CompareEMD_hsv : Inherits VB_Algorithm
+    Dim hist As New Hist_Basics
     Public Sub New()
         labels = {"", "", "Kalman-smoothed normalized histogram output", "Plot of the sum of the differences between recent normalized histograms"}
         desc = "Use OpenCV's Earth Mover Distance to compare 2 images."
@@ -804,7 +804,7 @@ End Class
 
 
 
-Public Class Histogram_Peaks : Inherits VB_Algorithm
+Public Class Hist_Peaks : Inherits VB_Algorithm
     Dim masks As New BackProject_Masks
     Public Sub New()
         desc = "Interactive Histogram"
@@ -822,8 +822,8 @@ End Class
 
 
 
-Public Class Histogram_Lab : Inherits VB_Algorithm
-    Dim hist As New Histogram_Basics
+Public Class Hist_Lab : Inherits VB_Algorithm
+    Dim hist As New Hist_Basics
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -852,7 +852,7 @@ End Class
 
 
 
-Public Class Histogram_PointCloudXYZ : Inherits VB_Algorithm
+Public Class Hist_PointCloudXYZ : Inherits VB_Algorithm
     Public plot As New Plot_Histogram
     Public Sub New()
         plot.createHistogram = True
@@ -864,7 +864,7 @@ Public Class Histogram_PointCloudXYZ : Inherits VB_Algorithm
         Static ttlists As New List(Of List(Of trueText))({New List(Of trueText), New List(Of trueText), New List(Of trueText)})
         For i = 0 To 2
             dst0 = task.pcSplit(i)
-            Dim mm as mmData = vbMinMax(dst0)
+            Dim mm As mmData = vbMinMax(dst0)
 
             Select Case i
                 Case 0
@@ -902,7 +902,7 @@ End Class
 
 
 
-Public Class Histogram_FlatSurfaces : Inherits VB_Algorithm
+Public Class Hist_FlatSurfaces : Inherits VB_Algorithm
     Dim masks As New BackProject_Masks
     Public Sub New()
         desc = "Find flat surfaces with the histogram"
@@ -910,7 +910,7 @@ Public Class Histogram_FlatSurfaces : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Dim maxRange = 4
         Dim cloudY = task.pcSplit(1).Clone
-        Dim mm as mmData = vbMinMax(cloudY)
+        Dim mm As mmData = vbMinMax(cloudY)
         cloudY = cloudY.Threshold(maxRange, mm.maxVal, cv.ThresholdTypes.Trunc)
         Static saveMinVal = mm.minVal, saveMaxVal = mm.maxVal
         If task.heartBeat Then
@@ -941,7 +941,7 @@ End Class
 
 
 
-Public Class Histogram_ShapeSide : Inherits VB_Algorithm
+Public Class Hist_ShapeSide : Inherits VB_Algorithm
     Public rc As New rcData
     Public Sub New()
         gOptions.HistBinSlider.Value = 60
@@ -970,7 +970,7 @@ End Class
 
 
 
-Public Class Histogram_ShapeTop : Inherits VB_Algorithm
+Public Class Hist_ShapeTop : Inherits VB_Algorithm
     Public rc As New rcData
     Public Sub New()
         gOptions.HistBinSlider.Value = 60
@@ -1001,7 +1001,7 @@ End Class
 
 
 
-Public Class Histogram_Gotcha2D : Inherits VB_Algorithm
+Public Class Hist_Gotcha2D : Inherits VB_Algorithm
     Public histogram As New cv.Mat
     Public Sub New()
         labels(2) = "ZY (Side View)"
@@ -1036,9 +1036,9 @@ End Class
 
 
 
-Public Class Histogram_Gotcha : Inherits VB_Algorithm
+Public Class Hist_Gotcha : Inherits VB_Algorithm
     Public histogram As New cv.Mat
-    Dim hist As New Histogram_Basics
+    Dim hist As New Hist_Basics
     Public Sub New()
         labels(2) = "Grayscale histogram"
         desc = "Simple test: input samples should equal histogram samples.  What is wrong?  Exclusive ranges!"
@@ -1068,9 +1068,9 @@ End Class
 
 
 
-Public Class Histogram_GotchaFixed_CPP : Inherits VB_Algorithm
+Public Class Hist_GotchaFixed_CPP : Inherits VB_Algorithm
     Public Sub New()
-        cPtr = Histogram_1D_Open()
+        cPtr = Hist_1D_Open()
         desc = "Testing the C++ CalcHist to investigate gotcha with sample counts"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1079,11 +1079,11 @@ Public Class Histogram_GotchaFixed_CPP : Inherits VB_Algorithm
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = Histogram_1D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.histogramBins)
+        Dim imagePtr = Hist_1D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.histogramBins)
         handleSrc.Free()
 
         If task.heartBeat Then
-            Dim actual = CInt(Histogram_1D_Sum(cPtr))
+            Dim actual = CInt(Hist_1D_Sum(cPtr))
             strOut = "Expected sample count:" + vbTab + CStr(dst2.Total) + vbCrLf +
                      "Actual sample count:" + vbTab + CStr(actual) + vbCrLf +
                      "Difference:" + vbTab + vbTab + CStr(Math.Abs(actual - dst2.Total)) + vbCrLf +
@@ -1094,17 +1094,17 @@ Public Class Histogram_GotchaFixed_CPP : Inherits VB_Algorithm
         setTrueText(strOut, 2)
     End Sub
     Public Sub Close()
-        Histogram_1D_Close(cPtr)
+        Hist_1D_Close(cPtr)
     End Sub
 End Class
 
 
 
 
-Public Class Histogram_Byte_CPP : Inherits VB_Algorithm
+Public Class Hist_Byte_CPP : Inherits VB_Algorithm
     Public plot As New Plot_Histogram
     Public Sub New()
-        cPtr = Histogram_1D_Open()
+        cPtr = Hist_1D_Open()
         desc = "For Byte histograms, the C++ code works but the .Net interface doesn't honor exclusive ranges."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1113,7 +1113,7 @@ Public Class Histogram_Byte_CPP : Inherits VB_Algorithm
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = Histogram_1D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.histogramBins)
+        Dim imagePtr = Hist_1D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.histogramBins)
         handleSrc.Free()
 
         Dim histogram = New cv.Mat(task.histogramBins, 1, cv.MatType.CV_32F, imagePtr)
@@ -1123,7 +1123,7 @@ Public Class Histogram_Byte_CPP : Inherits VB_Algorithm
         setTrueText(strOut, 2)
     End Sub
     Public Sub Close()
-        Histogram_1D_Close(cPtr)
+        Hist_1D_Close(cPtr)
     End Sub
 End Class
 
@@ -1133,8 +1133,8 @@ End Class
 
 
 
-Public Class Histogram_Xdimension : Inherits VB_Algorithm
-    Dim plot As New Histogram_Depth
+Public Class Hist_Xdimension : Inherits VB_Algorithm
+    Dim plot As New Hist_Depth
     Public Sub New()
         desc = "Plot the histogram of the X layer of the point cloud"
     End Sub
@@ -1153,8 +1153,8 @@ End Class
 
 
 
-Public Class Histogram_Ydimension : Inherits VB_Algorithm
-    Dim plot As New Histogram_Depth
+Public Class Hist_Ydimension : Inherits VB_Algorithm
+    Dim plot As New Hist_Depth
     Public Sub New()
         desc = "Plot the histogram of the X layer of the point cloud"
     End Sub
@@ -1173,8 +1173,8 @@ End Class
 
 
 
-Public Class Histogram_Zdimension : Inherits VB_Algorithm
-    Dim plot As New Histogram_Depth
+Public Class Hist_Zdimension : Inherits VB_Algorithm
+    Dim plot As New Hist_Depth
     Public Sub New()
         desc = "Plot the histogram of the X layer of the point cloud"
     End Sub
@@ -1193,7 +1193,7 @@ End Class
 
 
 
-Public Class Histogram_Depth : Inherits VB_Algorithm
+Public Class Hist_Depth : Inherits VB_Algorithm
     Public plot As New Plot_Histogram
     Public rc As rcData
     Public mm As mmData
@@ -1248,8 +1248,8 @@ End Class
 
 
 
-Public Class Histogram_Cell : Inherits VB_Algorithm
-    Dim hist As New Histogram_Depth
+Public Class Hist_Cell : Inherits VB_Algorithm
+    Dim hist As New Hist_Depth
     Dim redC As New RedCloud_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
@@ -1275,8 +1275,8 @@ End Class
 
 
 
-Public Class Histogram_Kalman : Inherits VB_Algorithm
-    Public hist As New Histogram_Basics
+Public Class Hist_Kalman : Inherits VB_Algorithm
+    Public hist As New Hist_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()
         labels = {"", "", "With Kalman", "Without Kalman"}
@@ -1307,7 +1307,7 @@ End Class
 
 
 
-Public Class Histogram_PointCloud : Inherits VB_Algorithm
+Public Class Hist_PointCloud : Inherits VB_Algorithm
     Public rangesX() As cv.Rangef
     Public rangesY() As cv.Rangef
     Public thresholdSlider As Windows.Forms.TrackBar

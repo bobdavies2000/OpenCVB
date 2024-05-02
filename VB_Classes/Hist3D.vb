@@ -50,7 +50,7 @@ Public Class Hist3D_BuildHistogram : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
             gOptions.HistBinSlider.Value = 100
-            Static plot As New Histogram_Depth
+            Static plot As New Hist_Depth
             plot.Run(src)
             src = plot.histogram
         End If

@@ -165,7 +165,7 @@ Public Class OpAuto_Valley : Inherits VB_Algorithm
 
         ' input should be a histogram.  If not, get one...
         If standaloneTest() Then
-            Static kalmanHist As New Histogram_Kalman
+            Static kalmanHist As New Hist_Kalman
             kalmanHist.Run(src)
             dst2 = kalmanHist.dst2
             src = kalmanHist.hist.histogram.Clone
@@ -270,7 +270,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits VB_Algorithm
 
         ' input should be a 2D histogram.  If standaloneTest() or src is not a histogram, get one...
         If standaloneTest() Or src.Type = cv.MatType.CV_8UC3 Then
-            Static hist2d As New Histogram2D_Basics
+            Static hist2d As New Hist2D_Basics
             hist2d.Run(src)
             src = hist2d.histogram
             dst2.SetTo(0)

@@ -1,7 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/2.4/modules/imgproc/doc/histograms.html
-Public Class Histogram2D_Basics : Inherits VB_Algorithm
+Public Class Hist2D_Basics : Inherits VB_Algorithm
     Public histRowsCols() As Integer
     Public ranges() As cv.Rangef
     Public histogram As New cv.Mat
@@ -22,7 +22,7 @@ End Class
 
 
 
-Public Class Histogram2D_Cloud : Inherits VB_Algorithm
+Public Class Hist2D_Cloud : Inherits VB_Algorithm
     Dim plot1D As New Plot_Histogram2D
     Dim channels() As Integer
     Public ranges() As cv.Rangef
@@ -55,8 +55,8 @@ End Class
 
 
 
-Public Class Histogram2D_Depth : Inherits VB_Algorithm
-    Dim hist2d As New Histogram2D_Cloud
+Public Class Hist2D_Depth : Inherits VB_Algorithm
+    Dim hist2d As New Hist2D_Cloud
     Public channels() As Integer
     Public ranges() As cv.Rangef
     Public histogram As New cv.Mat
@@ -85,8 +85,8 @@ End Class
 
 
 
-Public Class Histogram2D_Zoom : Inherits VB_Algorithm
-    Dim hist2d As New Histogram2D_Basics
+Public Class Hist2D_Zoom : Inherits VB_Algorithm
+    Dim hist2d As New Hist2D_Basics
     Dim zoom As New Magnify_Basics
     Public Sub New()
         labels = {"", "", "Mask of histogram", "DrawRect area from the histogram"}
@@ -110,7 +110,7 @@ End Class
 
 
 ' https://docs.opencv.org/2.4/modules/imgproc/doc/histograms.html
-Public Class Histogram2D_HSV : Inherits VB_Algorithm
+Public Class Hist2D_HSV : Inherits VB_Algorithm
     Public histogram01 As New cv.Mat
     Public histogram02 As New cv.Mat
     Public Sub New()
@@ -137,7 +137,7 @@ End Class
 
 
 
-Public Class Histogram2D_BGR : Inherits VB_Algorithm
+Public Class Hist2D_BGR : Inherits VB_Algorithm
     Public histogram01 As New cv.Mat
     Public histogram02 As New cv.Mat
     Public Sub New()
@@ -162,13 +162,13 @@ End Class
 
 
 
-Public Class Histogram2D_PlotHistogram1D : Inherits VB_Algorithm
+Public Class Hist2D_PlotHistogram1D : Inherits VB_Algorithm
     Dim histogram As New cv.Mat
     Dim plot As New Plot_Histogram
     Public histArray() As Single
     Public Sub New()
         plot.removeZeroEntry = False
-        labels(2) = "Histogram2D_PlotHistogram1D output shown with plot_histogram"
+        labels(2) = "Hist2D_PlotHistogram1D output shown with plot_histogram"
         desc = "Create a 2D histogram for blue to red and blue to green."
     End Sub
     Public Sub RunVB(src As cv.Mat)

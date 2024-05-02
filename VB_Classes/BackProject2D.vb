@@ -1,9 +1,9 @@
 ﻿Imports System.Runtime.InteropServices
 Imports OpenCvSharp.XImgProc
 Imports cv = OpenCvSharp
-' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
+' https://docs.opencv.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
 Public Class BackProject2D_Basics : Inherits VB_Algorithm
-    Public hist2d As New Histogram2D_Basics
+    Public hist2d As New Hist2D_Basics
     Public histogram As New cv.Mat
     Public xRange As Integer = 255
     Public yRange As Integer = 255
@@ -69,7 +69,7 @@ Public Class BackProject2D_Compare : Inherits VB_Algorithm
     Public Sub New()
         labels(2) = "Hue (upper left), sat (upper right), highlighted backprojection (bottom left)"
         If standaloneTest() Then gOptions.GridSize.Value = 10
-        desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
+        desc = "Compare the hue and brightness images and the results of the Hist_backprojection2d"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         hueSat.Run(src.Clone)

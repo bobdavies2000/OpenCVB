@@ -213,7 +213,7 @@ End Class
 '    Public redCellsLast As New List(Of rcData)
 '    Public kMap As New cv.Mat
 '    Dim contours As New Contour_Largest
-'    Dim plot As New Histogram_Depth
+'    Dim plot As New Hist_Depth
 '    Public Sub New()
 '        kMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
 '        labels(3) = "Top X identified objects."

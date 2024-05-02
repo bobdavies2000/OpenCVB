@@ -242,7 +242,7 @@ End Class
 
 
 Public Class Random_CheckUniformSmoothed : Inherits VB_Algorithm
-    Dim histogram As New Histogram_Basics
+    Dim histogram As New Hist_Basics
     Dim rUniform As New Random_UniformDist
     Public Sub New()
         desc = "Display the smoothed histogram for a uniform distribution."
@@ -262,7 +262,7 @@ End Class
 
 
 Public Class Random_CheckUniformDist : Inherits VB_Algorithm
-    Dim histogram As New Histogram_Graph
+    Dim histogram As New Hist_Graph
     Dim rUniform As New Random_UniformDist
     Public Sub New()
         desc = "Display the histogram for a uniform distribution."
@@ -282,7 +282,7 @@ End Class
 
 
 Public Class Random_CheckNormalDist : Inherits VB_Algorithm
-    Dim histogram As New Histogram_Graph
+    Dim histogram As New Hist_Graph
     Dim normalDist As New Random_NormalDist
     Public Sub New()
         desc = "Display the histogram for a Normal distribution."
@@ -301,7 +301,7 @@ End Class
 
 
 Public Class Random_CheckNormalDistSmoothed : Inherits VB_Algorithm
-    Dim histogram As New Histogram_Basics
+    Dim histogram As New Hist_Basics
     Dim normalDist As New Random_NormalDist
     Public Sub New()
         histogram.plot.minRange = 1
@@ -426,7 +426,7 @@ End Class
 
 Public Class Random_CustomHistogram : Inherits VB_Algorithm
     Public random As New Random_CustomDistribution
-    Public hist As New Histogram_Simple
+    Public hist As New Hist_Simple
     Public saveHist As cv.Mat
     Public Sub New()
         random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, 0)

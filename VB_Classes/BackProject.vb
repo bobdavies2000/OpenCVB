@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
-' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
+' https://docs.opencv.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
 Public Class BackProject_Basics : Inherits VB_Algorithm
-    Public histK As New Histogram_Kalman
+    Public histK As New Hist_Kalman
     Public minRange As cv.Scalar, maxRange As cv.Scalar
     Public Sub New()
         labels(2) = "Move mouse to backproject a histogram column"
@@ -204,7 +204,7 @@ End Class
 
 
 Public Class BackProject_PointCloud : Inherits VB_Algorithm
-    Public hist As New Histogram_PointCloud
+    Public hist As New Hist_PointCloud
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         labels = {"", "", "Backprojection after histogram binning X and Z values", "Backprojection after histogram binning Y and Z values"}
@@ -287,7 +287,7 @@ End Class
 
 Public Class BackProject_FullEqualized : Inherits VB_Algorithm
     Dim backP As New BackProject_Full
-    Dim equalize As New Histogram_EqualizeColor
+    Dim equalize As New Hist_EqualizeColor
     Public Sub New()
         labels = {"", "", "BackProject_Full output without equalization", "BackProject_Full with equalization"}
         desc = "Create a histogram from the equalized color and then backproject it."
@@ -346,7 +346,7 @@ End Class
 
 
 Public Class BackProject_Masks : Inherits VB_Algorithm
-    Public hist As New Histogram_Basics
+    Public hist As New Hist_Basics
     Public histIndex As Integer
     Public mask As New cv.Mat
     Public Sub New()
@@ -595,9 +595,9 @@ End Class
 
 
 
-' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
+' https://docs.opencv.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
 Public Class BackProject_Image : Inherits VB_Algorithm
-    Public hist As New Histogram_Basics
+    Public hist As New Hist_Basics
     Public mask As New cv.Mat
     Dim kalman As New Kalman_Basics
     Public useInrange As Boolean

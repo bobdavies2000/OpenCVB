@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class HistPeak2D_Basics : Inherits VB_Algorithm
     Public auto As New OpAuto_Peaks2DGrid
-    Dim bgr As New Histogram2D_BGR
+    Dim bgr As New Hist2D_BGR
     Dim delaunay As New Delaunay_Basics
     Public histogram As New cv.Mat
     Public ranges() As cv.Rangef
@@ -133,7 +133,7 @@ End Class
 
 
 Public Class HistPeak2D_HSV : Inherits VB_Algorithm
-    Dim hsv As New Histogram2D_HSV
+    Dim hsv As New Hist2D_HSV
     Dim peak As New HistPeak2D_Basics
     Public Sub New()
         desc = "Find the peaks in the 2D plot of the HSV image"
@@ -155,7 +155,7 @@ End Class
 
 
 Public Class HistPeak2D_BGR : Inherits VB_Algorithm
-    Dim bgr As New Histogram2D_BGR
+    Dim bgr As New Hist2D_BGR
     Dim peak As New HistPeak2D_Basics
     Public Sub New()
         desc = "Find the peaks in the 2D plot of the BGR image"

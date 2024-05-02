@@ -411,7 +411,7 @@ End Class
 
 Public Class Plane_Histogram : Inherits VB_Algorithm
     Dim solo As New PointCloud_Solo
-    Dim hist As New Histogram_Basics
+    Dim hist As New Hist_Basics
     Public peakCeiling As Single
     Public peakFloor As Single
     Public ceilingPop As Single

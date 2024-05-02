@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Bin2Way_Basics : Inherits VB_Algorithm
-    Public hist As New Histogram_Basics
+    Public hist As New Hist_Basics
     Public mats As New Mat_4Click
     Public fraction As Single = dst2.Total / 2
     Public Sub New()

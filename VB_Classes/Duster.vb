@@ -28,7 +28,7 @@ End Class
 
 
 Public Class Duster_MaskZ : Inherits VB_Algorithm
-    Public hist As New Histogram_Basics
+    Public hist As New Hist_Basics
     Public classCount As Integer
     Public options As New Options_GuidedBPDepth
     Public Sub New()

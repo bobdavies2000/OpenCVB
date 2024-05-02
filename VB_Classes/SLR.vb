@@ -92,7 +92,7 @@ End Class
 
 Public Class SLR_Image : Inherits VB_Algorithm
     Public slr As New SLR_Basics
-    Public hist As New Histogram_Basics
+    Public hist As New Hist_Basics
     Public Sub New()
         labels(2) = "Original data"
         desc = "Run Segmented Linear Regression on grayscale image data - just an experiment"
@@ -243,7 +243,7 @@ End Class
 
 
 Public Class SLR_Trends : Inherits VB_Algorithm
-    Public hist As New Histogram_KalmanAuto
+    Public hist As New Hist_KalmanAuto
     Dim valList As New List(Of Single)
     Dim barMidPoint As Single
     Dim lastPoint As cv.Point2f

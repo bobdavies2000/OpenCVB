@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Bin3Way_Basics : Inherits VB_Algorithm
-    Dim hist As New Histogram_Basics
+    Dim hist As New Hist_Basics
     Public mats As New Mat_4Click
     Public Sub New()
         gOptions.HistBinSlider.Value = 256

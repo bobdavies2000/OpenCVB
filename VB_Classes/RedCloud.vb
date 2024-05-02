@@ -712,8 +712,8 @@ End Class
 
 
 Public Class RedCloud_ProjectCell : Inherits VB_Algorithm
-    Dim topView As New Histogram_ShapeTop
-    Dim sideView As New Histogram_ShapeSide
+    Dim topView As New Hist_ShapeTop
+    Dim sideView As New Hist_ShapeSide
     Dim mats As New Mat_4Click
     Dim redC As New RedCloud_Basics
     Public Sub New()

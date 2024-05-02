@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class HistValley_Basics : Inherits VB_Algorithm
-    Dim hist As New Histogram_Basics
+    Dim hist As New Hist_Basics
     Dim options As New Options_Boundary
     Public valleys(3) As Integer ' grayscale values for low points in the histogram.
     Public Sub New()
@@ -115,7 +115,7 @@ End Class
 
 
 Public Class HistValley_Peaks : Inherits VB_Algorithm
-    Public hist As New Histogram_Basics
+    Public hist As New Hist_Basics
     Public options As New Options_Boundary
     Public peaks As New List(Of Integer)
     Public histArray() As Single
@@ -264,7 +264,7 @@ Public Class HistValley_Test : Inherits VB_Algorithm
 
         ' input should be a histogram.  If not, get one...
         If standaloneTest() Then
-            Static kalmanHist As New Histogram_Kalman
+            Static kalmanHist As New Hist_Kalman
             kalmanHist.Run(src)
             dst2 = kalmanHist.dst2
             src = kalmanHist.hist.histogram.Clone
@@ -317,7 +317,7 @@ End Class
 
 
 Public Class HistValley_OptionsAuto : Inherits VB_Algorithm
-    Dim kalman As New Histogram_Kalman
+    Dim kalman As New Hist_Kalman
     Public histogram As New cv.Mat
     Public auto As New OpAuto_Valley
     Public Sub New()
@@ -495,7 +495,7 @@ End Class
 
 
 Public Class HistValley_Colors : Inherits VB_Algorithm
-    Dim hist As New Histogram_Kalman
+    Dim hist As New Hist_Kalman
     Dim auto As New OpAuto_Valley
     Public Sub New()
         If standaloneTest() Then gOptions.HistBinSlider.Value = 256
@@ -532,7 +532,7 @@ End Class
 
 
 Public Class HistValley_GrayKalman : Inherits VB_Algorithm
-    Dim hist As New Histogram_Kalman
+    Dim hist As New Hist_Kalman
     Dim auto As New OpAuto_Valley
     Dim kalman As New Kalman_Basics
     Public Sub New()
@@ -573,7 +573,7 @@ End Class
 
 
 Public Class HistValley_GrayScale1 : Inherits VB_Algorithm
-    Dim hist As New Histogram_Basics
+    Dim hist As New Hist_Basics
     Public Sub New()
         If standaloneTest() Then gOptions.HistBinSlider.Value = 256
         desc = "Find the histogram valleys for a grayscale image."

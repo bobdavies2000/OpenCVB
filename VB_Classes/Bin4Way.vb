@@ -329,7 +329,7 @@ End Class
 
 
 Public Class Bin4Way_UnstablePixels1 : Inherits VB_Algorithm
-    Dim hist As New Histogram_Basics
+    Dim hist As New Hist_Basics
     Dim unstable As New Bin4Way_UnstableEdges
     Public gapValues As New List(Of Byte)
     Public Sub New()
@@ -624,7 +624,7 @@ End Class
 
 Public Class Bin4Way_SplitMean2 : Inherits VB_Algorithm
     Dim binary As New Binarize_Simple
-    Dim hist As New Histogram_Basics
+    Dim hist As New Hist_Basics
     Public mats As New Mat_4Click
     Public Sub New()
         gOptions.HistBinSlider.Value = 256
@@ -729,7 +729,7 @@ End Class
 Public Class Bin4Way_BasicsNew : Inherits VB_Algorithm
     Public mats As New Mat_4to1
     Dim bin4 As New Bin4Way_Basics
-    Dim hist As New Histogram_Basics
+    Dim hist As New Hist_Basics
     Public Sub New()
         gOptions.HistBinSlider.Value = 255
         labels(3) = "Grayscale histogram of the image with markers showing where each quarter of the samples are."
