@@ -298,7 +298,7 @@ Public Class VBtask : Implements IDisposable
 
         Public fpsRate As Integer
         Public workingRes As cv.Size
-        Public captureRes As cv.Size ' DisparityInverted_Basics needs the full resolution to compute disparity.
+        Public captureRes As cv.Size ' DisparityIn-verted_Basics needs the full resolution to compute disparity.
         Public displayRes As cv.Size
 
         Public algName As String

@@ -501,3 +501,41 @@ Public Class ML_RemoveDups_CPP : Inherits VB_Algorithm
         If cPtr <> 0 Then cPtr = ML_RemoveDups_Close(cPtr)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+Public Class ML_RemoveDups_CPP1 : Inherits VB_Algorithm
+    Dim sort3 As New Sort_1Channel
+    Public Sub New()
+        desc = "The input is BGR, convert to BGRA, sort as integers, and then remove duplicates."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32S, src.CvtColor(cv.ColorConversionCodes.BGR2BGRA).Data)
+
+        Dim dataSrc(dst2.Total * dst2.ElemSize) As Byte
+        Marshal.Copy(dst2.Data, dataSrc, 0, dataSrc.Length)
+        Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+        Dim imagePtr = ML_RemoveDups_Run(cPtr, handleSrc.AddrOfPinnedObject(), dst2.Rows, dst2.Cols, dst2.Type)
+        handleSrc.Free()
+
+        Dim compressedCount = ML_RemoveDups_GetCount(cPtr)
+        If src.Type = cv.MatType.CV_32S Then
+            dst3 = New cv.Mat(dst2.Rows, dst2.Cols, dst2.Type, imagePtr).Clone
+            Dim tmp = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC4, dst3.Data)
+            dst3 = tmp.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+        Else
+            dst3 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        End If
+
+        labels(3) = "The BGR data in dst2 after removing duplicate BGR entries.  Input count = " + CStr(dst2.Total) + " output = " + CStr(compressedCount)
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = ML_RemoveDups_Close(cPtr)
+    End Sub
+End Class
