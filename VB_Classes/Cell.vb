@@ -476,7 +476,12 @@ Public Class Cell_Generate : Inherits VB_Algorithm
 
                 cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
             End If
-            cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+
+            If task.heartBeat Or rc.indexLast = 0 Then
+                cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+            Else
+                rc.colorMean = redCells(rc.indexLast).colorMean
+            End If
 
             If usedColors.Contains(rc.color) Then rc.color = task.vecColors(rc.index)
             usedColors.Add(rc.color)

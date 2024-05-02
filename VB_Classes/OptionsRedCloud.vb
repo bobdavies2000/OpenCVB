@@ -17,7 +17,7 @@ Public Class OptionsRedCloud
     Public identifyCount As Integer
     Public bins3D As Integer
     Dim colorMethods() As String = {"BackProject_Full", "Binarize_DepthTiers", "Hist3DColor_Basics", "KMeans_Basics",
-                                    "LUT_Basics", "Quartile_Regions", "Reduction_Basics"}
+                                    "LUT_Basics", "Bin4Way_Regions", "Reduction_Basics"}
     Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
         Me.Text = "Options mostly for RedCloud_Basics but other related algorithms too."
@@ -80,7 +80,7 @@ Public Class OptionsRedCloud
             Dim method = colorMethods(i)
             ColorSource.Items.Add(method)
         Next
-        ColorSource.SelectedItem() = "Quartile_Regions"
+        ColorSource.SelectedItem() = "Bin4Way_Regions"
 
         redOptions.SimpleReductionSlider.Value = 40
         Select Case task.cameraName

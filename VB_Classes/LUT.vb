@@ -189,7 +189,7 @@ End Class
 
 
 
-Public Class LUT_CustomColor : Inherits VB_Algorithm
+Public Class LUT_Custom : Inherits VB_Algorithm
     Dim gradMap As New Palette_RandomColorMap
     Public colorMap As cv.Mat
     Public Sub New()
@@ -208,5 +208,31 @@ Public Class LUT_CustomColor : Inherits VB_Algorithm
         End If
         dst2 = src.LUT(colorMap)
         dst3 = colorMap.Resize(src.Size())
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LUT_RedCloud : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim sort3 As New Sort_3Channel
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Use LUT on the grayscale image after masking with rc.mask"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        dst3.SetTo(0)
+        Dim rc = task.rc
+        src(rc.rect).CopyTo(dst3(rc.rect), rc.mask)
+
+        sort3.Run(dst3)
+        dst1 = sort3.dst2
     End Sub
 End Class

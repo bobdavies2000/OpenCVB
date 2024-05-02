@@ -12,8 +12,8 @@ _CPP_Histogram_RedOptions
 _CPP_Palette_Random
 _CPP_Blur_Basics
 _CPP_Color_Basics
-_CPP_Quartile_RegionsCombine
-_CPP_Quartile_Regions
+_CPP_Bin4Way_RegionsCombine
+_CPP_Bin4Way_Regions
 _CPP_Mat_4Click
 _CPP_Area_MinRect
 _CPP_Mesh_Features
@@ -340,6 +340,8 @@ if algorithmName = "CPP_Area_MinRect" Then return new CPP_Basics(functionNames._
 if algorithmName = "CPP_BackProject_Basics" Then return new CPP_Basics(functionNames._CPP_BackProject_Basics)
 if algorithmName = "CPP_Bezier_Basics" Then return new CPP_Basics(functionNames._CPP_Bezier_Basics)
 if algorithmName = "CPP_BGSubtract_Basics" Then return new CPP_Basics(functionNames._CPP_BGSubtract_Basics)
+if algorithmName = "CPP_Bin4Way_Regions" Then return new CPP_Basics(functionNames._CPP_Bin4Way_Regions)
+if algorithmName = "CPP_Bin4Way_RegionsCombine" Then return new CPP_Basics(functionNames._CPP_Bin4Way_RegionsCombine)
 if algorithmName = "CPP_Binarize_Simple" Then return new CPP_Basics(functionNames._CPP_Binarize_Simple)
 if algorithmName = "CPP_Blur_Basics" Then return new CPP_Basics(functionNames._CPP_Blur_Basics)
 if algorithmName = "CPP_Color_Basics" Then return new CPP_Basics(functionNames._CPP_Color_Basics)
@@ -390,8 +392,6 @@ if algorithmName = "CPP_Palette_Basics" Then return new CPP_Basics(functionNames
 if algorithmName = "CPP_Palette_Random" Then return new CPP_Basics(functionNames._CPP_Palette_Random)
 if algorithmName = "CPP_Plot_Histogram" Then return new CPP_Basics(functionNames._CPP_Plot_Histogram)
 if algorithmName = "CPP_Plot_Histogram2D" Then return new CPP_Basics(functionNames._CPP_Plot_Histogram2D)
-if algorithmName = "CPP_Quartile_Regions" Then return new CPP_Basics(functionNames._CPP_Quartile_Regions)
-if algorithmName = "CPP_Quartile_RegionsCombine" Then return new CPP_Basics(functionNames._CPP_Quartile_RegionsCombine)
 if algorithmName = "CPP_Random_Basics" Then return new CPP_Basics(functionNames._CPP_Random_Basics)
 if algorithmName = "CPP_Random_Enumerable" Then return new CPP_Basics(functionNames._CPP_Random_Enumerable)
 if algorithmName = "CPP_Rectangle_Basics" Then return new CPP_Basics(functionNames._CPP_Rectangle_Basics)
@@ -1072,9 +1072,10 @@ if algorithmName = "LongLine_Match" Then return new LongLine_Match
 if algorithmName = "LongLine_NoDepth" Then return new LongLine_NoDepth
 if algorithmName = "LongLine_Point" Then return new LongLine_Point
 if algorithmName = "LUT_Basics" Then return new LUT_Basics
-if algorithmName = "LUT_CustomColor" Then return new LUT_CustomColor
+if algorithmName = "LUT_Custom" Then return new LUT_Custom
 if algorithmName = "LUT_Depth32f" Then return new LUT_Depth32f
 if algorithmName = "LUT_Equalized" Then return new LUT_Equalized
+if algorithmName = "LUT_RedCloud" Then return new LUT_RedCloud
 if algorithmName = "LUT_Reduction" Then return new LUT_Reduction
 if algorithmName = "LUT_RGBDepth" Then return new LUT_RGBDepth
 if algorithmName = "LUT_Sliders" Then return new LUT_Sliders
@@ -1148,7 +1149,6 @@ if algorithmName = "ML_Color2Depth" Then return new ML_Color2Depth
 if algorithmName = "ML_ColorInTier2Depth" Then return new ML_ColorInTier2Depth
 if algorithmName = "ML_DepthFromColor" Then return new ML_DepthFromColor
 if algorithmName = "ML_DepthFromXYColor" Then return new ML_DepthFromXYColor
-if algorithmName = "ML_DepthGrid" Then return new ML_DepthGrid
 if algorithmName = "ML_FillRGBDepth_MT" Then return new ML_FillRGBDepth_MT
 if algorithmName = "ML_RemoveDups_CPP" Then return new ML_RemoveDups_CPP
 if algorithmName = "Model_Basics" Then return new Model_Basics
@@ -1249,6 +1249,8 @@ if algorithmName = "OpenGL_Bricks" Then return new OpenGL_Bricks
 if algorithmName = "OpenGL_CloudHistory" Then return new OpenGL_CloudHistory
 if algorithmName = "OpenGL_CloudMisses" Then return new OpenGL_CloudMisses
 if algorithmName = "OpenGL_Color3D" Then return new OpenGL_Color3D
+if algorithmName = "OpenGL_ColorBin4Way" Then return new OpenGL_ColorBin4Way
+if algorithmName = "OpenGL_ColorRaw" Then return new OpenGL_ColorRaw
 if algorithmName = "OpenGL_ColorReduced3D" Then return new OpenGL_ColorReduced3D
 if algorithmName = "OpenGL_Contours" Then return new OpenGL_Contours
 if algorithmName = "OpenGL_Density2D" Then return new OpenGL_Density2D
@@ -1676,6 +1678,7 @@ if algorithmName = "RedCloud_MeterByMeter" Then return new RedCloud_MeterByMeter
 if algorithmName = "RedCloud_MostlyColor" Then return new RedCloud_MostlyColor
 if algorithmName = "RedCloud_MotionBasics" Then return new RedCloud_MotionBasics
 if algorithmName = "RedCloud_MotionBGsubtract" Then return new RedCloud_MotionBGsubtract
+if algorithmName = "RedCloud_NaturalColor" Then return new RedCloud_NaturalColor
 if algorithmName = "RedCloud_NearestStableCell" Then return new RedCloud_NearestStableCell
 if algorithmName = "RedCloud_OnlyColorAlt" Then return new RedCloud_OnlyColorAlt
 if algorithmName = "RedCloud_OnlyColorHist3D" Then return new RedCloud_OnlyColorHist3D

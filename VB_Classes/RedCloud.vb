@@ -29,6 +29,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
 
         dst2 = genCells.dst2
 
+        If gOptions.IdentifyCells.Checked Then setSelectedContour()
         labels(2) = genCells.labels(2)
     End Sub
 End Class
@@ -69,6 +70,7 @@ Public Class RedCloud_BasicsTest : Inherits VB_Algorithm
         labels(2) = genCells.labels(2)
     End Sub
 End Class
+
 
 
 
@@ -2738,8 +2740,8 @@ Public Class RedCloud_Consistent : Inherits VB_Algorithm
                 Dim color = lastImage.Get(Of cv.Vec3b)(rc.maxDStable.Y, rc.maxDStable.X)
                 If color <> black Then rc.color = color
                 rc.index = newCells.Count
-                    newCells.Add(rc)
-                End If
+                newCells.Add(rc)
+            End If
         Next
 
         dst2.SetTo(0)
@@ -2755,5 +2757,26 @@ Public Class RedCloud_Consistent : Inherits VB_Algorithm
             cellmaps.RemoveAt(0)
             cellLists.RemoveAt(0)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_NaturalColor : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        desc = "Display the RedCloud results with the mean color of the cell"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2.SetTo(0)
+        For Each rc In task.redCells
+            Dim color = New cv.Vec3b(CInt(rc.colorMean(0)), CInt(rc.colorMean(1)), CInt(rc.colorMean(2)))
+            dst2(rc.rect).SetTo(color, rc.mask)
+        Next
     End Sub
 End Class

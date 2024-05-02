@@ -36,6 +36,7 @@ Partial Class OpenCVB
         Me.ComplexityButton = New System.Windows.Forms.ToolStripButton()
         Me.TranslateButton = New System.Windows.Forms.ToolStripButton()
         Me.Advice = New System.Windows.Forms.ToolStripButton()
+        Me.RecentList = New System.Windows.Forms.ToolStripDropDownButton()
         Me.TestAllTimer = New System.Windows.Forms.Timer(Me.components)
         Me.fpsTimer = New System.Windows.Forms.Timer(Me.components)
         Me.AlgorithmDesc = New System.Windows.Forms.Label()
@@ -51,7 +52,6 @@ Partial Class OpenCVB
         Me.ValidateTreeView = New System.Windows.Forms.Timer(Me.components)
         Me.XYloc = New System.Windows.Forms.Label()
         Me.ComplexityTimer = New System.Windows.Forms.Timer(Me.components)
-        Me.RecentList = New System.Windows.Forms.ToolStripDropDownButton()
         Me.ToolStrip1.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -177,6 +177,16 @@ Partial Class OpenCVB
         Me.Advice.Text = "ToolStripButton4"
         Me.Advice.ToolTipText = "Get advice on adjustments available for this algorithm."
         '
+        'RecentList
+        '
+        Me.RecentList.AutoToolTip = False
+        Me.RecentList.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
+        Me.RecentList.Image = CType(resources.GetObject("RecentList.Image"), System.Drawing.Image)
+        Me.RecentList.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.RecentList.Name = "RecentList"
+        Me.RecentList.Size = New System.Drawing.Size(82, 54)
+        Me.RecentList.Text = "Recent"
+        '
         'TestAllTimer
         '
         Me.TestAllTimer.Interval = 5000
@@ -276,15 +286,6 @@ Partial Class OpenCVB
         'ComplexityTimer
         '
         Me.ComplexityTimer.Interval = 30000
-        '
-        'RecentList
-        '
-        Me.RecentList.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
-        Me.RecentList.Image = CType(resources.GetObject("RecentList.Image"), System.Drawing.Image)
-        Me.RecentList.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.RecentList.Name = "RecentList"
-        Me.RecentList.Size = New System.Drawing.Size(82, 54)
-        Me.RecentList.Text = "Recent"
         '
         'OpenCVB
         '
