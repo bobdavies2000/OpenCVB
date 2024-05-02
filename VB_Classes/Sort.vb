@@ -328,29 +328,30 @@ End Class
 
 Public Class Sort_Integer : Inherits VB_Algorithm
     Dim sort As New Sort_Basics
+    Public data(dst2.Total - 1) As Integer
+    Public vecList As New List(Of Integer)
     Public Sub New()
         findRadio("Sort all pixels ascending").Checked = True
         labels = {"", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates"}
         desc = "Take some 1-channel input, sort it, and provide the list of unique elements"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim input(src.Total - 1) As Integer
         If standalone Then
             Dim split = src.Split()
             Dim zero As New cv.Mat(split(0).Size, cv.MatType.CV_8U, 0)
             cv.Cv2.Merge({split(0), split(1), split(2), zero}, src)
-            Marshal.Copy(src.Data, input, 0, input.Length)
+            Marshal.Copy(src.Data, data, 0, data.Length)
             src = New cv.Mat(src.Size, cv.MatType.CV_32S, 0)
-            Marshal.Copy(input, 0, src.Data, input.Length)
+            Marshal.Copy(data, 0, src.Data, data.Length)
         End If
 
         sort.Run(src)
-        Marshal.Copy(sort.dst2.Data, Input, 0, Input.Length)
+        Marshal.Copy(sort.dst2.Data, data, 0, data.Length)
 
-        Dim vecList As New List(Of Integer)
-        vecList.Add(input(0))
-        For i = 1 To input.Count - 1
-            If input(i - 1) <> input(i) Then vecList.Add(input(i))
+        vecList.Clear()
+        vecList.Add(data(0))
+        For i = 1 To data.Count - 1
+            If data(i - 1) <> data(i) Then vecList.Add(data(i))
         Next
         labels(2) = "There were " + CStr(vecList.Count) + " unique 8UC3 pixels in the input."
     End Sub
@@ -361,41 +362,69 @@ End Class
 
 
 
-Public Class Sort_GrayScale : Inherits VB_Algorithm
+Public Class Sort_GrayScale1 : Inherits VB_Algorithm
+    Dim sort As New Sort_Integer
     Public Sub New()
         desc = "Sort the grayscale image but keep the 8uc3 pixels with each gray entry."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim grayRaw(src.Total - 1) As Byte
-        Marshal.Copy(dst1.Data, grayraw, 0, grayRaw.Length)
+        Dim gray(src.Total - 1) As Byte
+        Marshal.Copy(dst1.Data, gray, 0, gray.Length)
 
         Dim split = src.Split()
-        Dim splitB(src.Total - 1) As Byte
-        Dim splitG(src.Total - 1) As Byte
-        Dim splitR(src.Total - 1) As Byte
-        Marshal.Copy(split(0).Data, splitB, 0, splitB.Length)
-        Marshal.Copy(split(1).Data, splitB, 0, splitG.Length)
-        Marshal.Copy(split(2).Data, splitB, 0, splitR.Length)
-
-        Dim sorted As New SortedList(Of Byte, Integer)(New compareByte)
-        For i = 0 To grayRaw.Length - 1
-            sorted.Add(grayRaw(i), splitB(i) * 65536 + splitG(i) * 256 + splitR(i))
+        Static pixels(2)() As Byte
+        For i = 0 To 2
+            If firstPass Then ReDim pixels(i)(src.Total - 1)
+            Marshal.Copy(split(i).Data, pixels(i), 0, pixels(i).Length)
         Next
 
-        Dim input(sorted.Count - 1) As UInteger
-        For i = 0 To sorted.Count - 1
-            Dim key As UInteger = sorted.ElementAt(i).Key
-            input(i) = key * 16777216 + sorted.ElementAt(i).Value
+        Dim input(gray.Count - 1) As UInteger
+        For i = 0 To gray.Length - 1
+            input(i) = pixels(0)(i) * 65536 + pixels(1)(i) * 256 + pixels(2)(i)
         Next
 
-        Dim unique As New List(Of UInteger)(input(0))
-        For i = 1 To input.Count - 1
-            If input(i - 1) <> input(i) Then unique.Add(input(i))
+        sort.Run(New cv.Mat(gray.Length, 1, cv.MatType.CV_32S, input))
+
+        Dim sorted(gray.Length - 1) As UInteger
+
+        Dim unique As New List(Of UInteger)
+        unique.Add(sort.data(0))
+        For i = 1 To sort.data.Count - 1
+            If sort.data(i - 1) <> sort.data(i) Then unique.Add(sort.data(i))
         Next
-        Dim k = 0
-        For Each entry In unique
+        labels(2) = "There were " + CStr(unique.Count) + " distinct pixels in the image."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Sort_GrayScale : Inherits VB_Algorithm
+    Dim plot As New Plot_Histogram
+    Public Sub New()
+        desc = "Sort the grayscale image but keep the 8uc3 pixels with each gray entry."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim split = src.Split()
+        Static pixels(2)() As Byte
+        For i = 0 To 2
+            If firstPass Then ReDim pixels(i)(src.Total - 1)
+            Marshal.Copy(split(i).Data, pixels(i), 0, pixels(i).Length)
         Next
 
+        Dim totals(255) As Single
+        Dim lut(255) As cv.Vec3b
+        For i = 0 To src.Total - 1
+            Dim index = CInt(0.299 * pixels(2)(i) + 0.587 * pixels(1)(i) + 0.114 * pixels(0)(i))
+            totals(index) += 1
+            If totals(index) = 1 Then lut(index) = New cv.Vec3b(pixels(0)(i), pixels(1)(i), pixels(2)(i))
+        Next
+
+        Dim histogram As New cv.Mat(256, 1, cv.MatType.CV_32F, totals)
+        plot.Run(histogram)
+        dst2 = plot.dst2
     End Sub
 End Class

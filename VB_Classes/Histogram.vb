@@ -48,11 +48,9 @@ Public Class Histogram_Basics : Inherits VB_Algorithm
         ReDim histArray(histogram.Total - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
-        If standaloneTest() Or autoDisplay Then
-            plot.Run(histogram)
-            histogram = plot.histogram ' reflect any updates to the 0 entry...  
-            dst2 = plot.dst2
-        End If
+        plot.Run(histogram)
+        histogram = plot.histogram ' reflect any updates to the 0 entry...  
+        dst2 = plot.dst2
 
         If standalone Then
             labels(2) = Choose(splitIndex + 1, "Blue", "Green", "Red") + " histogram, bins = " +

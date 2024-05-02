@@ -1,3 +1,4 @@
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 ' https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
@@ -234,5 +235,58 @@ Public Class LUT_RedCloud : Inherits VB_Algorithm
 
         sort3.Run(dst3)
         dst1 = sort3.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LUT_Create : Inherits VB_Algorithm
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("LUT entry diff threshold", 1, 100, 10)
+        desc = "Create a LUT table that can map similar pixels to the same exact pixel."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static diffSlider = findSlider("LUT entry diff threshold")
+        Dim threshold = diffSlider.value
+
+        Dim split = src.Split()
+        Static pixels(2)() As Byte
+        For i = 0 To 2
+            If firstPass Then ReDim pixels(i)(src.Total - 1)
+            Marshal.Copy(split(i).Data, pixels(i), 0, pixels(i).Length)
+        Next
+
+        Dim totals(255) As Single
+        Dim lutI(255) As cv.Vec3i
+        For i = 0 To src.Total - 1
+            Dim index = CInt(0.299 * pixels(2)(i) + 0.587 * pixels(1)(i) + 0.114 * pixels(0)(i))
+            totals(index) += 1
+            Dim v1 = lutI(index)
+            Dim v2 = New cv.Vec3i(pixels(0)(i), pixels(1)(i), pixels(2)(i))
+            lutI(index) = New cv.Vec3i((v1(0) + v2(0)) / 2, (v1(1) + v2(1)) / 2, (v1(2) + v2(2)) / 2)
+        Next
+
+        Dim lastVec = lutI(0)
+        For i = 1 To lutI.Count - 1
+            Dim vec = lutI(i)
+            Dim diff = Math.Abs(vec(0) - lastVec(0)) + Math.Abs(vec(1) - lastVec(1)) + Math.Abs(vec(2) - lastVec(2))
+            If diff < threshold Then
+                lutI(i) = lastVec
+            Else
+                lastVec = vec
+            End If
+        Next
+
+        Dim lut(255) As cv.Vec3b
+        For i = 0 To lutI.Count - 1
+            lut(i) = New cv.Vec3b(lutI(i)(0), lutI(i)(1), lutI(i)(2))
+        Next
+
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim myLut As New cv.Mat(1, 256, cv.MatType.CV_8U, lut)
+        dst3 = dst2.LUT(myLut)
     End Sub
 End Class
