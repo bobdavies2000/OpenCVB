@@ -2690,3 +2690,36 @@ Public Class RedCloud_NaturalColor : Inherits VB_Algorithm
         Next
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_NaturalGray : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Grayscale range around mean", 0, 100, 5)
+        desc = "Display the RedCloud results with the mean grayscale value of the cell +- delta"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static rangeSlider = findSlider("Grayscale range around mean")
+        Dim range = rangeSlider.value
+
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        Dim rc = task.rc
+        Dim val = CInt(0.299 * rc.colorMean(0) + 0.587 * rc.colorMean(1) + 0.114 * rc.colorMean(2))
+
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst0 = dst1.InRange(val - range, val + range)
+
+        Dim color = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
+        dst3.SetTo(0)
+        dst3.SetTo(color, dst0)
+    End Sub
+End Class
