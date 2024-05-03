@@ -244,7 +244,6 @@ if algorithmName = "Cell_Binarize" Then return new Cell_Binarize
 if algorithmName = "Cell_Distance" Then return new Cell_Distance
 if algorithmName = "Cell_Floodfill" Then return new Cell_Floodfill
 if algorithmName = "Cell_Generate" Then return new Cell_Generate
-if algorithmName = "Cell_GenerateTight" Then return new Cell_GenerateTight
 if algorithmName = "Cell_PixelCountCompare" Then return new Cell_PixelCountCompare
 if algorithmName = "Cell_Stable" Then return new Cell_Stable
 if algorithmName = "Cell_StableAboveAverage" Then return new Cell_StableAboveAverage

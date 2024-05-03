@@ -217,19 +217,7 @@ Public Class Bin3Way_RedCloud1 : Inherits VB_Algorithm
             Next
         Next
 
-        task.redCells.Clear()
-        task.redCells.Add(New rcData)
-        task.cellMap.SetTo(0)
-        dst2.SetTo(0)
-        For Each rc In sortedCells.Values
-            If rc.index = 0 Then Continue For
-
-            rc.index = task.redCells.Count
-            task.redCells.Add(rc)
-            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-            If rc.index >= 255 Then Exit For
-        Next
+        dst2 = vbRebuildCells(sortedCells)
 
         If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " cells were identified and matched to the previous image"
     End Sub
@@ -277,21 +265,7 @@ Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
             Next
         Next
 
-        dst2.SetTo(0)
-        Dim newCells As New List(Of rcData)
-        newCells.Add(New rcData)
-        Dim newMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        For Each rc In sortedCells.Values
-            rc.index = newCells.Count
-            newCells.Add(rc)
-            newMap(rc.rect).SetTo(rc.index, rc.mask)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-
-            If rc.index >= 255 Then Exit For
-        Next
-
-        task.redCells = New List(Of rcData)(newCells)
-        task.cellMap = newMap.Clone
+        dst2 = vbRebuildCells(sortedCells)
 
         If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " cells were identified and matched to the previous image"
     End Sub

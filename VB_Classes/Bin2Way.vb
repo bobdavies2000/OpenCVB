@@ -189,16 +189,7 @@ Public Class Bin2Way_RedCloud : Inherits VB_Algorithm
             Next
         Next
 
-        Dim newCells As New List(Of rcData)
-        task.redCells.Clear()
-        task.redCells.Add(New rcData)
-        For Each rc In sortedCells.Values
-            rc.index = task.redCells.Count
-            task.redCells.Add(rc)
-            If rc.index >= 255 Then Exit For
-        Next
-
-        dst2 = vbDisplayCells()
+        dst2 = vbRebuildCells(sortedCells)
 
         If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " cells were identified and matched to the previous image"
     End Sub
