@@ -8,7 +8,7 @@ _CPP_BGSubtract_Basics
 _CPP_Stable_Basics
 _CPP_Feature_StableSorted
 _CPP_Plot_Histogram2D
-_CPP_Histogram_RedOptions
+_CPP_Hist_RedOptions
 _CPP_Palette_Random
 _CPP_Blur_Basics
 _CPP_Color_Basics
@@ -28,7 +28,7 @@ _CPP_Convex_Basics
 _CPP_Resize_Preserve
 _CPP_History_Basics
 _CPP_Motion_Simple
-_CPP_Histogram_Kalman
+_CPP_Hist_Kalman
 _CPP_Kalman_Basics
 _CPP_RedCloud_Reduce
 _CPP_FPoly_TopFeatures
@@ -57,7 +57,7 @@ _CPP_IMU_GMatrix_QT
 _CPP_Depth_PointCloud_IMU
 _CPP_Binarize_Simple
 _CPP_Plot_Histogram
-_CPP_Histogram_Basics
+_CPP_Hist_Basics
 _CPP_BackProject_Basics
 _CPP_Rectangle_Basics
 _CPP_Rectangle_Rotated
@@ -297,7 +297,6 @@ if algorithmName = "Contour_GeneralWithOptions" Then return new Contour_GeneralW
 if algorithmName = "Contour_Gray" Then return new Contour_Gray
 if algorithmName = "Contour_Largest" Then return new Contour_Largest
 if algorithmName = "Contour_Outline" Then return new Contour_Outline
-if algorithmName = "Contour_PrepData" Then return new Contour_PrepData
 if algorithmName = "Contour_RC_AddContour" Then return new Contour_RC_AddContour
 if algorithmName = "Contour_RedCloud" Then return new Contour_RedCloud
 if algorithmName = "Contour_RedCloudCorners" Then return new Contour_RedCloudCorners
@@ -369,9 +368,9 @@ if algorithmName = "CPP_FeatureLess_Edge" Then return new CPP_Basics(functionNam
 if algorithmName = "CPP_FeatureLess_History" Then return new CPP_Basics(functionNames._CPP_FeatureLess_History)
 if algorithmName = "CPP_FPoly_TopFeatures" Then return new CPP_Basics(functionNames._CPP_FPoly_TopFeatures)
 if algorithmName = "CPP_Grid_Basics" Then return new CPP_Basics(functionNames._CPP_Grid_Basics)
-if algorithmName = "CPP_Histogram_Basics" Then return new CPP_Basics(functionNames._CPP_Histogram_Basics)
-if algorithmName = "CPP_Histogram_Kalman" Then return new CPP_Basics(functionNames._CPP_Histogram_Kalman)
-if algorithmName = "CPP_Histogram_RedOptions" Then return new CPP_Basics(functionNames._CPP_Histogram_RedOptions)
+if algorithmName = "CPP_Hist_Basics" Then return new CPP_Basics(functionNames._CPP_Hist_Basics)
+if algorithmName = "CPP_Hist_Kalman" Then return new CPP_Basics(functionNames._CPP_Hist_Kalman)
+if algorithmName = "CPP_Hist_RedOptions" Then return new CPP_Basics(functionNames._CPP_Hist_RedOptions)
 if algorithmName = "CPP_History_Basics" Then return new CPP_Basics(functionNames._CPP_History_Basics)
 if algorithmName = "CPP_Hull_Basics" Then return new CPP_Basics(functionNames._CPP_Hull_Basics)
 if algorithmName = "CPP_IMU_GMatrix" Then return new CPP_Basics(functionNames._CPP_IMU_GMatrix)
@@ -1151,7 +1150,6 @@ if algorithmName = "ML_DepthFromColor" Then return new ML_DepthFromColor
 if algorithmName = "ML_DepthFromXYColor" Then return new ML_DepthFromXYColor
 if algorithmName = "ML_FillRGBDepth_MT" Then return new ML_FillRGBDepth_MT
 if algorithmName = "ML_RemoveDups_CPP" Then return new ML_RemoveDups_CPP
-if algorithmName = "ML_RemoveDups_CPP1" Then return new ML_RemoveDups_CPP1
 if algorithmName = "Model_Basics" Then return new Model_Basics
 if algorithmName = "Model_CellZoom" Then return new Model_CellZoom
 if algorithmName = "Model_FlatSurfaces" Then return new Model_FlatSurfaces

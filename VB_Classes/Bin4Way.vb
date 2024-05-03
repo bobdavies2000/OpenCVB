@@ -785,6 +785,7 @@ Public Class Bin4Way_RedCloud : Inherits VB_Algorithm
     Dim cellMaps(3) As cv.Mat, redCells(3) As List(Of rcData)
     Dim options As New Options_Bin2WayRedCloud
     Public Sub New()
+        flood.showSelected = False
         desc = "Identify the lightest and darkest regions separately and then combine the rcData."
     End Sub
     Public Sub RunVB(src As cv.Mat)

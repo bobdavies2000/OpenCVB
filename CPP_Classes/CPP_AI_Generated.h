@@ -1242,7 +1242,7 @@ public:
 
 
 
-class CPP_Histogram_Basics : public algorithmCPP 
+class CPP_Hist_Basics : public algorithmCPP 
 {
 public:
     Mat histogram;
@@ -1250,10 +1250,10 @@ public:
     CPP_Plot_Histogram* plot;
     vector<Range> ranges;
     int splitIndex = 0;
-    CPP_Histogram_Basics() : algorithmCPP() 
+    CPP_Hist_Basics() : algorithmCPP() 
     {
         plot = new CPP_Plot_Histogram();
-        traceName = "CPP_Histogram_Basics";
+        traceName = "CPP_Hist_Basics";
         desc = "Create a histogram (no Kalman)";
     }
 
@@ -1395,15 +1395,15 @@ public:
 
 
 
-class CPP_Histogram_Kalman : public algorithmCPP {
+class CPP_Hist_Kalman : public algorithmCPP {
 public:
-    CPP_Histogram_Basics* hist;
+    CPP_Hist_Basics* hist;
     CPP_Kalman_Basics* kalman;
 
-    CPP_Histogram_Kalman() : algorithmCPP() {
-        traceName = "CPP_Histogram_Kalman";
+    CPP_Hist_Kalman() : algorithmCPP() {
+        traceName = "CPP_Hist_Kalman";
         kalman = new CPP_Kalman_Basics();
-        hist = new CPP_Histogram_Basics();
+        hist = new CPP_Hist_Basics();
         labels = { "", "", "With Kalman", "Without Kalman" };
         desc = "Use Kalman to smooth the histogram results.";
     }
@@ -1437,11 +1437,11 @@ public:
 
 class CPP_BackProject_Basics : public algorithmCPP {
 public:
-    CPP_Histogram_Kalman* histK;
+    CPP_Hist_Kalman* histK;
     Scalar minRange, maxRange;
 
     CPP_BackProject_Basics() : algorithmCPP() {
-        histK = new CPP_Histogram_Kalman();
+        histK = new CPP_Hist_Kalman();
         traceName = "CPP_BackProject_Basics";
         labels[2] = "Move mouse to backproject a histogram column";
         desc = "Mouse over any bin to see the color histogram backprojected.";
@@ -3043,11 +3043,11 @@ public:
 
 
 
-class CPP_Histogram_RedOptions : public algorithmCPP {
+class CPP_Hist_RedOptions : public algorithmCPP {
 public:
     std::vector<cv::Range> ranges;
     std::vector<cv::Range> rangesCloud;
-    CPP_Histogram_RedOptions() : algorithmCPP() {
+    CPP_Hist_RedOptions() : algorithmCPP() {
         advice = "See redOption 'Histogram Channels' to control the settings here.";
         desc = "Build the channels, channel count, and ranges based on the PointCloud Reduction setting.";
     }

@@ -1855,13 +1855,13 @@ uchar * BackProjectCloud_Run(int* inputPtr, int rows, int cols, int bins, float 
 
 
 
-class Histogram_1D
+class Hist_1D
 {
 private:
 public:
 	Mat src;
 	Mat histogram;
-	Histogram_1D() {}
+	Hist_1D() {}
 	void RunCPP(int bins) {
 		float hRange[] = { 0, 256 };
 		int hbins[] = { bins };
@@ -1870,22 +1870,22 @@ public:
 	}
 };
 extern "C" __declspec(dllexport)
-Histogram_1D * Histogram_1D_Open() {
-	Histogram_1D* cPtr = new Histogram_1D();
+Hist_1D * Hist_1D_Open() {
+	Hist_1D* cPtr = new Hist_1D();
 	return cPtr;
 }
 extern "C" __declspec(dllexport)
-float Histogram_1D_Sum(Histogram_1D * cPtr) {
+float Hist_1D_Sum(Hist_1D * cPtr) {
 	Scalar count = sum(cPtr->histogram);
 	return count[0];
 }
 extern "C" __declspec(dllexport)
-void Histogram_1D_Close(Histogram_1D * cPtr)
+void Hist_1D_Close(Hist_1D * cPtr)
 {
 	delete cPtr;
 }
 extern "C" __declspec(dllexport)
-int* Histogram_1D_RunCPP(Histogram_1D * cPtr, int* dataPtr, int rows, int cols, int bins)
+int* Hist_1D_RunCPP(Hist_1D * cPtr, int* dataPtr, int rows, int cols, int bins)
 {
 	cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
 	cPtr->RunCPP(bins);

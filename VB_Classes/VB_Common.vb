@@ -191,6 +191,48 @@ Module VB_Common
         dst.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
         dst.Circle(pt, task.dotSize, cv.Scalar.Black, -1, task.lineType)
     End Sub
+    Public Function vbRebuildCells(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
+        Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
+        task.redCells.Clear()
+        task.redCells.Add(New rcData)
+        For Each rc In sortedCells.Values
+            rc.index = task.redCells.Count
+            task.redCells.Add(rc)
+            If rc.index >= 255 Then Exit For
+        Next
+
+        If redOptions.UseMeanColor.Checked Then
+            For Each rc In task.redCells
+                dst(rc.rect).SetTo(New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2)), rc.mask)
+                task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            Next
+        Else
+            task.cellMap.SetTo(0)
+            For Each rc In task.redCells
+                dst(rc.rect).SetTo(rc.color, rc.mask)
+                task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            Next
+        End If
+        Return dst
+    End Function
+    Public Function vbDisplayCells() As cv.Mat
+        Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
+
+        If redOptions.UseMeanColor.Checked Then
+            For Each rc In task.redCells
+                dst(rc.rect).SetTo(New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2)), rc.mask)
+                task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            Next
+        Else
+            task.cellMap.SetTo(0)
+            For Each rc In task.redCells
+                dst(rc.rect).SetTo(rc.color, rc.mask)
+                task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            Next
+        End If
+
+        Return dst
+    End Function
     Public Sub setSelectedContour()
         If task.redCells.Count = 0 Then Exit Sub
         If task.clickPoint = New cv.Point And task.redCells.Count > 1 Then task.clickPoint = task.redCells(1).maxDist
@@ -246,48 +288,6 @@ Module VB_Common
         If pt.X >= task.workingRes.Width - distance Then Return False
         If pt.Y >= task.workingRes.Height - distance Then Return False
         Return True
-    End Function
-    Public Function vbRebuildCells(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
-        Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
-        task.redCells.Clear()
-        task.redCells.Add(New rcData)
-        For Each rc In sortedCells.Values
-            rc.index = task.redCells.Count
-            task.redCells.Add(rc)
-            If rc.index >= 255 Then Exit For
-        Next
-
-        If redOptions.UseMeanColor.Checked Then
-            For Each rc In task.redCells
-                dst(rc.rect).SetTo(New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2)), rc.mask)
-                task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            Next
-        Else
-            task.cellMap.SetTo(0)
-            For Each rc In task.redCells
-                dst(rc.rect).SetTo(rc.color, rc.mask)
-                task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            Next
-        End If
-        Return dst
-    End Function
-    Public Function vbDisplayCells() As cv.Mat
-        Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
-
-        If redOptions.UseMeanColor.Checked Then
-            For Each rc In task.redCells
-                dst(rc.rect).SetTo(New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2)), rc.mask)
-                task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            Next
-        Else
-            task.cellMap.SetTo(0)
-            For Each rc In task.redCells
-                dst(rc.rect).SetTo(rc.color, rc.mask)
-                task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            Next
-        End If
-
-        Return dst
     End Function
     Public Sub vbDrawContour(ByRef dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -10)
         If lineWidth = -10 Then lineWidth = task.lineWidth ' VB.Net only allows constants for optional parameter.

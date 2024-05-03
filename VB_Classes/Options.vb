@@ -3603,7 +3603,6 @@ Public Class Options_MSER : Inherits VB_Algorithm
         If check.Setup(traceName) Then
             check.addCheckBox("Pass2Only")
             check.addCheckBox("Use grayscale input")
-            check.Box(1).Checked = True
         End If
     End Sub
     Public Sub RunVB()

@@ -125,6 +125,7 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
     Public genCells As New Cell_Generate
     Dim redCPP As New RedCloud_CPP
     Public buildInputMask As Boolean
+    Public showSelected As Boolean = True
     Public Sub New()
         redOptions.IdentifyCells.Checked = True
         labels(3) = "The inputMask used to limit how much of the image is processed."
@@ -152,7 +153,7 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
         Dim cellCount = Math.Min(redOptions.identifyCount, task.redCells.Count)
         If task.heartBeat Then labels(2) = $"{task.redCells.Count} cells identified and the largest {cellCount} are numbered below."
 
-        setSelectedContour()
+        If showSelected Then setSelectedContour()
     End Sub
 End Class
 

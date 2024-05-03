@@ -399,7 +399,6 @@ Public Class Cell_Generate : Inherits VB_Algorithm
     Public rectData As cv.Mat
     Public floodPointData As cv.Mat
     Public removeContour As Boolean
-    Public matchCount As Integer
     Public Sub New()
         task.cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         task.redCells = New List(Of rcData)
@@ -489,28 +488,12 @@ Public Class Cell_Generate : Inherits VB_Algorithm
             sortedCells.Add(rc.pixels, rc)
         Next
 
-        dst2.SetTo(0)
-        task.cellMap.SetTo(0)
-        task.redCells.Clear()
-        task.redCells.Add(New rcData)
-        matchCount = 0
-        Dim matches As New List(Of Integer)
-        For Each rc In sortedCells.Values
-            Dim val = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            If val <> 0 Then Continue For ' already occupied.
-            rc.index = task.redCells.Count
-            task.redCells.Add(rc)
+        dst2 = vbRebuildCells(sortedCells)
 
+        Dim matchCount As Integer
+        For Each rc In task.redCells
             If rc.indexLast <> 0 Then matchCount += 1
-            matches.Add(rc.matchCount)
-
-            vbDrawContour(task.cellMap(rc.rect), rc.contour, rc.color, task.lineWidth)
-            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-            vbDrawContour(dst2(rc.rect), rc.contour, rc.color, task.lineWidth)
         Next
-
-        If matches.Count > 0 Then task.rcMatchAvg = matches.Average() Else task.rcMatchAvg = 0
         If task.heartBeat Then labels(2) = $"{task.redCells.Count} cells and {matchCount} were matched to the previous gen."
     End Sub
 End Class

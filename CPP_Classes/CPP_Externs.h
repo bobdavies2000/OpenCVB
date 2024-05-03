@@ -2,7 +2,7 @@
 #include "CPP_AI_Generated.h"
 
 CPP_Grid_Basics* gridBasics;
-CPP_Histogram_RedOptions* redOptions;
+CPP_Hist_RedOptions* redOptions;
 
 extern "C" __declspec(dllexport)
 int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWeighted, 
@@ -45,8 +45,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 	{task->alg = new CPP_Feature_StableSorted(); break; }
     case _CPP_Plot_Histogram2D:
     {task->alg = new CPP_Plot_Histogram2D(); break; }
-    case _CPP_Histogram_RedOptions:
-    {task->alg = new CPP_Histogram_RedOptions(); break; }
+    case _CPP_Hist_RedOptions:
+    {task->alg = new CPP_Hist_RedOptions(); break; }
     case _CPP_Palette_Random :
 	{task->alg = new CPP_Palette_Random(); break; }
 	case _CPP_Blur_Basics :
@@ -85,8 +85,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 	{task->alg = new CPP_History_Basics(); break; }
 	case _CPP_Motion_Simple :
 	{task->alg = new CPP_Motion_Simple(); break; }
-	case _CPP_Histogram_Kalman :
-	{task->alg = new CPP_Histogram_Kalman(); break; }
+	case _CPP_Hist_Kalman :
+	{task->alg = new CPP_Hist_Kalman(); break; }
 	case _CPP_Kalman_Basics :
 	{task->alg = new CPP_Kalman_Basics(); break; }
 	case _CPP_RedCloud_Reduce :
@@ -147,8 +147,8 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
 	{task->alg = new CPP_Binarize_Simple();break;}
 	case _CPP_Plot_Histogram :
 	{task->alg = new CPP_Plot_Histogram();break;}
-	case _CPP_Histogram_Basics :
-	{task->alg = new CPP_Histogram_Basics();break;}
+	case _CPP_Hist_Basics :
+	{task->alg = new CPP_Hist_Basics();break;}
 	case _CPP_BackProject_Basics :
 	{task->alg = new CPP_BackProject_Basics();break;}
 	case _CPP_Rectangle_Basics :
@@ -191,7 +191,7 @@ int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWe
     task->fontColor = Scalar(255, 255, 255);
     task->cppFunction = function;
     gridBasics = new CPP_Grid_Basics();
-    redOptions = new CPP_Histogram_RedOptions();
+    redOptions = new CPP_Hist_RedOptions();
 
     return (int *) task;
 }
