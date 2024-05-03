@@ -287,4 +287,17 @@ Public Class OptionsRedCloud
             BitwiseReductionSlider.Enabled = reductionType = "Use Bitwise Reduction"
         End If
     End Sub
+
+
+    Private Sub DisplayCellStats_CheckedChanged(sender As Object, e As EventArgs) Handles DisplayCellStats.CheckedChanged
+        gOptions.displayDst1.Checked = DisplayCellStats.Checked
+        redOptions.IdentifyCells.Checked = True
+        If task IsNot Nothing Then task.optionsChanged = True
+    End Sub
+    Private Sub IdentifyCells_CheckedChanged(sender As Object, e As EventArgs) Handles IdentifyCells.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+    End Sub
+    Private Sub UseMeanColor_CheckedChanged(sender As Object, e As EventArgs) Handles UseMeanColor.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+    End Sub
 End Class

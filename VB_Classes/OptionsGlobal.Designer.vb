@@ -46,8 +46,6 @@ Partial Class OptionsGlobal
         Me.MaxDepth = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.IdentifyCells = New System.Windows.Forms.CheckBox()
-        Me.DisplayCellStats = New System.Windows.Forms.CheckBox()
         Me.CrossHairs = New System.Windows.Forms.CheckBox()
         Me.ShowMotionRectangle = New System.Windows.Forms.CheckBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
@@ -340,8 +338,6 @@ Partial Class OptionsGlobal
         '
         'GroupBox2
         '
-        Me.GroupBox2.Controls.Add(Me.IdentifyCells)
-        Me.GroupBox2.Controls.Add(Me.DisplayCellStats)
         Me.GroupBox2.Controls.Add(Me.CrossHairs)
         Me.GroupBox2.Controls.Add(Me.ShowMotionRectangle)
         Me.GroupBox2.Controls.Add(Me.GroupBox1)
@@ -369,26 +365,6 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabIndex = 3
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
-        '
-        'IdentifyCells
-        '
-        Me.IdentifyCells.AutoSize = True
-        Me.IdentifyCells.Location = New System.Drawing.Point(25, 347)
-        Me.IdentifyCells.Name = "IdentifyCells"
-        Me.IdentifyCells.Size = New System.Drawing.Size(200, 24)
-        Me.IdentifyCells.TabIndex = 73
-        Me.IdentifyCells.Text = "Identify RedCloud Cells"
-        Me.IdentifyCells.UseVisualStyleBackColor = True
-        '
-        'DisplayCellStats
-        '
-        Me.DisplayCellStats.AutoSize = True
-        Me.DisplayCellStats.Location = New System.Drawing.Point(24, 317)
-        Me.DisplayCellStats.Name = "DisplayCellStats"
-        Me.DisplayCellStats.Size = New System.Drawing.Size(158, 24)
-        Me.DisplayCellStats.TabIndex = 72
-        Me.DisplayCellStats.Text = "Display Cell Stats"
-        Me.DisplayCellStats.UseVisualStyleBackColor = True
         '
         'CrossHairs
         '
@@ -814,9 +790,7 @@ Partial Class OptionsGlobal
     Friend WithEvents MotionFilteredColorAndCloud As Windows.Forms.RadioButton
     Friend WithEvents ShowMotionRectangle As Windows.Forms.CheckBox
     Friend WithEvents CrossHairs As Windows.Forms.CheckBox
-    Friend WithEvents DisplayCellStats As Windows.Forms.CheckBox
     Friend WithEvents IMU_Label As Windows.Forms.Label
     Friend WithEvents IMU_Alpha As Windows.Forms.TrackBar
     Friend WithEvents CameraMotionLabel As Windows.Forms.Label
-    Friend WithEvents IdentifyCells As Windows.Forms.CheckBox
 End Class

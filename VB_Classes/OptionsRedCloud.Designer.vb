@@ -64,6 +64,9 @@ Partial Class OptionsRedCloud
         Me.IdentifyCountLabel = New System.Windows.Forms.Label()
         Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.ColorSource = New System.Windows.Forms.ComboBox()
+        Me.IdentifyCells = New System.Windows.Forms.CheckBox()
+        Me.DisplayCellStats = New System.Windows.Forms.CheckBox()
+        Me.UseMeanColor = New System.Windows.Forms.CheckBox()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -532,11 +535,46 @@ Partial Class OptionsRedCloud
         Me.ColorSource.Size = New System.Drawing.Size(222, 28)
         Me.ColorSource.TabIndex = 11
         '
+        'IdentifyCells
+        '
+        Me.IdentifyCells.AutoSize = True
+        Me.IdentifyCells.Location = New System.Drawing.Point(1049, 277)
+        Me.IdentifyCells.Name = "IdentifyCells"
+        Me.IdentifyCells.Size = New System.Drawing.Size(200, 24)
+        Me.IdentifyCells.TabIndex = 75
+        Me.IdentifyCells.Text = "Identify RedCloud Cells"
+        Me.IdentifyCells.UseVisualStyleBackColor = True
+        '
+        'DisplayCellStats
+        '
+        Me.DisplayCellStats.AutoSize = True
+        Me.DisplayCellStats.Location = New System.Drawing.Point(1048, 247)
+        Me.DisplayCellStats.Name = "DisplayCellStats"
+        Me.DisplayCellStats.Size = New System.Drawing.Size(158, 24)
+        Me.DisplayCellStats.TabIndex = 74
+        Me.DisplayCellStats.Text = "Display Cell Stats"
+        Me.DisplayCellStats.UseVisualStyleBackColor = True
+        '
+        'UseMeanColor
+        '
+        Me.UseMeanColor.AutoSize = True
+        Me.UseMeanColor.Checked = True
+        Me.UseMeanColor.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.UseMeanColor.Location = New System.Drawing.Point(1049, 307)
+        Me.UseMeanColor.Name = "UseMeanColor"
+        Me.UseMeanColor.Size = New System.Drawing.Size(210, 24)
+        Me.UseMeanColor.TabIndex = 76
+        Me.UseMeanColor.Text = "Use Mean Color for Cells"
+        Me.UseMeanColor.UseVisualStyleBackColor = True
+        '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1585, 604)
+        Me.Controls.Add(Me.UseMeanColor)
+        Me.Controls.Add(Me.IdentifyCells)
+        Me.Controls.Add(Me.DisplayCellStats)
         Me.Controls.Add(Me.ColorSource)
         Me.Controls.Add(Me.ColorSourceLabel)
         Me.Controls.Add(Me.GroupBox2)
@@ -612,4 +650,7 @@ Partial Class OptionsRedCloud
     Friend WithEvents LabelIdentify As Windows.Forms.Label
     Friend WithEvents IdentifyCountSlider As Windows.Forms.TrackBar
     Friend WithEvents IdentifyCountLabel As Windows.Forms.Label
+    Friend WithEvents IdentifyCells As Windows.Forms.CheckBox
+    Friend WithEvents DisplayCellStats As Windows.Forms.CheckBox
+    Friend WithEvents UseMeanColor As Windows.Forms.CheckBox
 End Class

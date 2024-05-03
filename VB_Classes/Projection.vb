@@ -225,7 +225,7 @@ Public Class Projection_Top : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public objects As New Projection_Basics
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         desc = "Find all the masks, rects, and counts in the top down view."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -257,7 +257,7 @@ Public Class Projection_Side : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public objects As New Projection_Basics
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         objects.viewType = "Side"
         desc = "Find all the masks, rects, and counts in the side view."
     End Sub

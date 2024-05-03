@@ -189,7 +189,7 @@ Public Class Swarm_Flood : Inherits VB_Algorithm
     Public flood As New Flood_BasicsMask
     Dim colorC As New Color_Basics
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         desc = "Floodfill the color image using the swarm outline as a mask"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -218,7 +218,7 @@ Public Class Swarm_Flood2 : Inherits VB_Algorithm
     Public flood As New Flood_BasicsMask
     Public colorC As New Color_Basics
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         flood.genCells.removeContour = False
         desc = "Floodfill the color image using the swarm outline as a mask"
     End Sub

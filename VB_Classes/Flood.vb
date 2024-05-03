@@ -4,7 +4,7 @@ Public Class Flood_Basics : Inherits VB_Algorithm
     Dim redCPP As New RedCloud_CPP
     Public genCells As New Cell_Generate
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         labels(3) = "Contour boundaries - input to RedCloud_Basics"
         desc = "Build the RedCloud cells with the best boundaries"
     End Sub
@@ -46,7 +46,7 @@ Public Class Flood_CellStatsPlot : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
     Dim stats As New Cell_BasicsPlot
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         gOptions.HistBinSlider.Value = 1000
         labels(1) = "Histogram of the depth for the selected cell.  Click any cell in the lower left."
@@ -79,7 +79,7 @@ End Class
 Public Class Flood_ContainedCells : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         desc = "Find cells that have only one neighbor.  They are likely to be completely contained in another cell."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -126,7 +126,7 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
     Dim redCPP As New RedCloud_CPP
     Public buildInputMask As Boolean
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         labels(3) = "The inputMask used to limit how much of the image is processed."
         desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
     End Sub
@@ -165,7 +165,7 @@ Public Class Flood_Tiers : Inherits VB_Algorithm
     Dim tiers As New Depth_TiersZ
     Dim colorC As New Color_Basics
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         desc = "Subdivide the Flood_Basics cells using depth tiers."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -297,7 +297,7 @@ Public Class Flood_MaxDistPoints : Inherits VB_Algorithm
     Dim redCPP As New RedCloud_MaxDist_CPP
     Public genCells As New Cell_Generate
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         labels(3) = "Contour boundaries - input to RedCloud_Basics"
         desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code."
     End Sub

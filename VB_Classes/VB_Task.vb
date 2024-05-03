@@ -613,7 +613,7 @@ Public Class VBtask : Implements IDisposable
             Dim rc = task.rc
             If task.redCells.Count > 0 Then setSelectedContour()
 
-            If gOptions.IdentifyCells.Checked Then
+            If redOptions.IdentifyCells.Checked Then
                 Dim ptNew As New cv.Point
                 Dim ptCells As New List(Of cv.Point)
                 For Each rcX In redCells
@@ -633,7 +633,7 @@ Public Class VBtask : Implements IDisposable
                     task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
 
                     task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-                    If gOptions.DisplayCellStats.Checked Then
+                    If redOptions.DisplayCellStats.Checked Then
                         dst3.SetTo(0)
                         If task.clickPoint = New cv.Point Then
                             If task.redCells.Count > 1 Then
@@ -650,7 +650,7 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            If gOptions.DisplayCellStats.Checked And task.clickPoint = New cv.Point Then
+            If redOptions.DisplayCellStats.Checked And task.clickPoint = New cv.Point Then
                 If task.redCells.Count > 1 Then
                     task.rc = task.redCells(1)
                     task.clickPoint = task.rc.maxDist

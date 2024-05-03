@@ -156,7 +156,7 @@ Public Class Foreground_CellsFore : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Public redCells As New List(Of rcData)
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         redOptions.UseColorOnly.Checked = True
         desc = "Get the foreground cells"
     End Sub
@@ -182,7 +182,7 @@ Public Class Foreground_CellsBack : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Public redCells As New List(Of rcData)
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         redOptions.UseColorOnly.Checked = True
         desc = "Get the background cells"
     End Sub

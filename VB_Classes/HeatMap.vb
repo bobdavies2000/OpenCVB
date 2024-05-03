@@ -152,7 +152,7 @@ Public Class HeatMap_Cell : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
     Dim heat As New HeatMap_Hot
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         If standalone Then gOptions.displayDst1.Checked = True
         desc = "Display the heat map for the selected cell"
     End Sub

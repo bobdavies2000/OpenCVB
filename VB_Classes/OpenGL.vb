@@ -2089,6 +2089,7 @@ Public Class OpenGL_Color3D : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         hColor.Run(src)
         dst2 = hColor.dst3
+        labels(2) = hColor.labels(2)
 
         dst2.ConvertTo(dst1, cv.MatType.CV_32FC3)
         dst1 = dst1.Normalize(0, 1, cv.NormTypes.MinMax)

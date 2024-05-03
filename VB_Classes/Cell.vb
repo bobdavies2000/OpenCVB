@@ -443,7 +443,7 @@ Public Class Cell_BasicsPlot : Inherits VB_Algorithm
     Public runRedCloud As Boolean
     Dim stats As New Cell_Basics
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         If standalone Then gOptions.displayDst1.Checked = True
         If standalone Then gOptions.HistBinSlider.Value = 20
         desc = "Display the statistics for the selected cell."

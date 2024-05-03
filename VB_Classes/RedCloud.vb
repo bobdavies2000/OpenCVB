@@ -5,7 +5,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Dim redCPP As New RedCloud_CPP
     Public inputMask As New cv.Mat
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
                         "It is behind the global options (which affect most algorithms.)")
@@ -29,7 +29,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
 
         dst2 = genCells.dst2
 
-        If gOptions.IdentifyCells.Checked Then setSelectedContour()
+        If redOptions.IdentifyCells.Checked Then setSelectedContour()
         labels(2) = genCells.labels(2)
     End Sub
 End Class
@@ -44,7 +44,7 @@ Public Class RedCloud_BasicsTest : Inherits VB_Algorithm
     Public genCells As New Cell_Generate
     Public inputMask As cv.Mat
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         vbAddAdvice(traceName + ": use the RedCloud algorithm panel." + vbCrLf + "(Behind the global options)")
         desc = "Find cells and then match them to the previous generation"
@@ -144,7 +144,7 @@ Public Class RedCloud_FindCells : Inherits VB_Algorithm
     Public cellList As New List(Of Integer)
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         gOptions.PixelDiffThreshold.Value = 25
         cPtr = RedCloud_FindCells_Open()
         desc = "Find all the RedCloud cells touched by the mask created by the Motion_History rectangle"
@@ -1122,7 +1122,7 @@ End Class
 Public Class RedCloud_CellStatsPlot : Inherits VB_Algorithm
     Dim cells As New Cell_BasicsPlot
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         cells.runRedCloud = True
         desc = "Display the stats for the requested cell"
@@ -1254,7 +1254,7 @@ Public Class RedCloud_FourColor : Inherits VB_Algorithm
     Dim binar4 As New Bin4Way_Regions
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         redOptions.UseColorOnly.Checked = True
         labels(3) = "A 4-way split of the input grayscale image based on brightness"
         desc = "Use RedCloud on a 4-way split based on light to dark in the image."
@@ -1357,7 +1357,7 @@ End Class
 Public Class RedCloud_Flippers : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         redOptions.UseColorOnly.Checked = True
         labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
         desc = "Identify the 4-way split cells that are flipping between brightness boundaries."
@@ -2210,7 +2210,7 @@ Public Class RedCloud_GenCellContains : Inherits VB_Algorithm
     Dim flood As New Flood_Basics
     Dim contains As New Flood_ContainedCells
     Public Sub New()
-        gOptions.IdentifyCells.Checked = True
+        redOptions.IdentifyCells.Checked = True
         desc = "Merge cells contained in the top X cells and remove all other cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -2618,11 +2618,10 @@ Public Class RedCloud_Consistent : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
-        dst3 = redC.dst2
 
         Static cellmaps As New List(Of cv.Mat)
         Static cellLists As New List(Of List(Of rcData))
-        Static lastImage As cv.Mat = dst3.Clone
+        Static lastImage As cv.Mat = redC.dst2.Clone
 
         cellLists.Add(New List(Of rcData)(task.redCells))
         cellmaps.Add(task.cellMap.Clone)
@@ -2654,13 +2653,14 @@ Public Class RedCloud_Consistent : Inherits VB_Algorithm
             End If
         Next
 
-        dst2.SetTo(0)
-        task.cellMap.SetTo(0)
-        For Each rc In newCells
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
-        Next
         task.redCells = New List(Of rcData)(newCells)
+        dst2 = vbDisplayCells()
+        'dst2.SetTo(0)
+        'task.cellMap.SetTo(0)
+        'For Each rc In task.redCells
+        '    dst2(rc.rect).SetTo(rc.color, rc.mask)
+        '    task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+        'Next
         lastImage = dst2.Clone
 
         If cellmaps.Count > gOptions.FrameHistory.Value Then
@@ -2683,11 +2683,8 @@ Public Class RedCloud_NaturalColor : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
-        dst2.SetTo(0)
-        For Each rc In task.redCells
-            Dim color = New cv.Vec3b(CInt(rc.colorMean(0)), CInt(rc.colorMean(1)), CInt(rc.colorMean(2)))
-            dst2(rc.rect).SetTo(color, rc.mask)
-        Next
+        labels(2) = redC.labels(2)
+        dst2 = vbDisplayCells()
     End Sub
 End Class
 
@@ -2699,9 +2696,9 @@ End Class
 
 
 Public Class RedCloud_NaturalGray : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_Consistent
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Grayscale range around mean", 0, 100, 5)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Grayscale range around mean", 0, 100, 30)
         desc = "Display the RedCloud results with the mean grayscale value of the cell +- delta"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -2720,6 +2717,6 @@ Public Class RedCloud_NaturalGray : Inherits VB_Algorithm
 
         Dim color = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
         dst3.SetTo(0)
-        dst3.SetTo(color, dst0)
+        dst3.SetTo(cv.Scalar.White, dst0)
     End Sub
 End Class
