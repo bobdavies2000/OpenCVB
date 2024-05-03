@@ -2655,12 +2655,6 @@ Public Class RedCloud_Consistent : Inherits VB_Algorithm
 
         task.redCells = New List(Of rcData)(newCells)
         dst2 = vbDisplayCells()
-        'dst2.SetTo(0)
-        'task.cellMap.SetTo(0)
-        'For Each rc In task.redCells
-        '    dst2(rc.rect).SetTo(rc.color, rc.mask)
-        '    task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
-        'Next
         lastImage = dst2.Clone
 
         If cellmaps.Count > gOptions.FrameHistory.Value Then

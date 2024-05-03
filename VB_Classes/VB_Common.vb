@@ -806,6 +806,7 @@ Public Class rcData
     Public index As Integer
     Public indexLast As Integer
     Public matchCount As Integer
+    Public newCell As Boolean
 
     Public nab As Integer
     Public container As Integer

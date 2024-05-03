@@ -553,6 +553,8 @@ Public Class Cell_Generate : Inherits VB_Algorithm
                 End If
             End If
 
+            If rc.maxDStable = New cv.Point Then rc.newCell = True
+
             rc.pixels = rc.mask.CountNonZero
             If rc.pixels = 0 Then Continue For
             rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
