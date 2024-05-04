@@ -1206,40 +1206,6 @@ End Class
 
 
 
-'Public Class Feature_StableGood : Inherits VB_Algorithm
-'    Dim feat As New Feature_Basics
-'    Dim stable As New Feature_StableAgast
-'    Public stablePoints As New List(Of cv.Point2f)
-'    Public generations As New List(Of Integer)
-'    Public Sub New()
-'        labels(3) = "The raw Feature_Basics output"
-'        desc = "Age out the unstable feature points."
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        feat.Run(src.Clone)
-'        dst3 = feat.dst2
-'        dst2 = src
-
-'        Dim candidates = stable.ageGenerations(task.features)
-
-'        stablePoints.Clear()
-'        generations.Clear()
-'        For i = 0 To Math.Min(candidates.Count, stable.options.desiredCount) - 1
-'            If stable.generations(i) >= stable.options.threshold Then
-'                stablePoints.Add(candidates(i))
-'                generations.Add(stable.generations(i))
-'                dst2.Circle(candidates(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
-'            End If
-'        Next
-'        labels(2) = CStr(stablePoints.Count) + " stable points were present at least " +
-'                    CStr(CInt(stable.options.threshold)) + " generations"
-'    End Sub
-'End Class
-
-
-
-
-
 Public Class Feature_AgastNew : Inherits VB_Algorithm
     Dim agast As New Feature_Agast
     Dim features As New List(Of cv.Point)

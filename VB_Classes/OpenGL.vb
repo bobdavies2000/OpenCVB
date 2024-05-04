@@ -1218,31 +1218,6 @@ End Class
 
 
 
-
-
-'Public Class OpenGL_KWhere : Inherits VB_Algorithm
-'    Dim guided As New GuidedBP_Hulls
-'    Public Sub New()
-'        task.ogl.oglFunction = oCase.pointCloudAndRGB
-'        desc = "Show the KWhere output in OpenGL"
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        guided.Run(src)
-'        dst2 = guided.dst2
-
-'        task.ogl.pointCloudInput = task.pointCloud
-'        task.ogl.Run(dst2)
-'    End Sub
-'End Class
-
-
-
-
-
-
-
-
-
 Public Class OpenGL_Profile : Inherits VB_Algorithm
     Public sides As New Profile_Basics
     Public rotate As New Profile_Rotation

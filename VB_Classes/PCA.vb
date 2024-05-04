@@ -267,36 +267,3 @@ Public Class PCA_Prep_CPP : Inherits VB_Algorithm
         PCA_Prep_Close(cPtr)
     End Sub
 End Class
-
-
-
-
-
-
-
-'Public Class PCA_Plane : Inherits VB_Algorithm
-'    Dim stats As New Cell_Basics
-'    Public Sub New()
-'        stats.runRedCloud = True
-'        desc = "Identify cells with similar plane equations"
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        If task.heartBeat Then
-'            Dim blue As New cv.Scalar(255, 0, 0), red As New cv.Scalar(0, 0, 255), green As New cv.Scalar(0, 255, 0)
-'            dst3.SetTo(0)
-'            Dim color As cv.Scalar
-'            For Each rc In stats.task.redCells
-'                If rc.eq(0) > rc.eq(1) And rc.eq(0) > rc.eq(2) Then color = red
-'                If rc.eq(1) > rc.eq(0) And rc.eq(1) > rc.eq(2) Then color = blue
-'                If rc.eq(2) > rc.eq(0) And rc.eq(2) > rc.eq(1) Then color = green
-'                vbDrawContour(dst3(rc.rect), rc.contour, color, -1)
-'            Next
-'        End If
-'        stats.Run(src)
-'        dst0 = stats.dst0
-'        dst1 = stats.dst1
-'        dst2 = stats.dst2
-'        labels(2) = stats.labels(2)
-'        setTrueText(stats.strOut, 3)
-'    End Sub
-'End Class

@@ -358,41 +358,6 @@ End Class
 
 
 
-
-
-'Public Class Cell_StableAboveAverage : Inherits VB_Algorithm
-'    Dim redC As New RedCloud_Basics
-'    Public Sub New()
-'        If standaloneTest() Then gOptions.displayDst1.Checked = True
-'        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-'        labels(1) = "Black rectangles outline cells that were matched less than the average matchCount."
-'        desc = "Highligh cells that were present the max number of match counts."
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        redC.Run(src)
-'        dst2 = redC.dst2
-'        labels(2) = redC.labels(2)
-
-'        Dim cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-'        dst3.SetTo(0)
-'        dst1.SetTo(255) ' the unstable mask 
-'        Dim unmatched As Integer
-'        For Each rc In task.redCells
-'            If rc.matchCount < task.rcMatchAvg Then
-'                dst3(rc.rect).SetTo(rc.color, rc.mask)
-'                dst1(rc.rect).SetTo(0)
-'                unmatched += 1
-'            End If
-'        Next
-
-'        labels(3) = CStr(unmatched) + " cells below were unmatched."
-'    End Sub
-'End Class
-
-
-
-
-
 Public Class Cell_Generate : Inherits VB_Algorithm
     Public classCount As Integer
     Public rectData As cv.Mat

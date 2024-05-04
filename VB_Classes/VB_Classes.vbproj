@@ -202,7 +202,6 @@
     <Compile Include="Model.vb" />
     <Compile Include="Options.vb" />
     <Compile Include="Profile.vb" />
-    <Compile Include="ShapeDetect.vb" />
     <Compile Include="Sides.vb" />
     <Compile Include="Spectrum.vb" />
     <Compile Include="Tessallate.vb" />
@@ -427,7 +426,6 @@
     <Compile Include="Voronoi.vb" />
     <Compile Include="WarpModel.vb" />
     <Compile Include="WarpPerspective.vb" />
-    <Compile Include="Wavelet.vb" />
     <Compile Include="XFeatures.vb" />
     <Compile Include="SVM.vb" />
     <Compile Include="Grid.vb" />

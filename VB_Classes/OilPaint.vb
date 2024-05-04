@@ -70,41 +70,6 @@ End Class
 
 
 
-'Public Class OilPaint_ColorProbability : Inherits VB_Algorithm
-'    Public color_probability(0) As Single
-'    Public km As New KMeans_BasicsFast
-'    Dim kSlider As Windows.Forms.TrackBar
-'    Public Sub New()
-'        kSlider = findSlider("KMeans k")
-'        kSlider.Value = 12 ' we would like a dozen colors or so in the color image.
-'        labels(3) = "Color probabilities"
-'        desc = "Determine color probabilities on the output of kMeans"
-'    End Sub
-'    Public Sub RunVB(src as cv.Mat)
-'        km.Run(src)
-'        dst2 = km.dst2
-'        If color_probability.Count <> kSlider.Value Then ReDim color_probability(kSlider.Value - 1)
-
-'        For i = 0 To km.km.masks.Count - 1
-'            color_probability(i) = km.km.masks(i).CountNonZero
-'        Next
-
-'        Dim str = ""
-'        Dim total = 0.0
-'        For i = 0 To color_probability.Length - 1
-'            color_probability(i) /= km.km.masks(0).Total
-'            str += Format(color_probability(i), "0.0%") + vbCrLf
-'            total += color_probability(i)
-'        Next
-
-'        setTrueText(str + "Total = " + Format(total, "#0.0%"), 3)
-'    End Sub
-'End Class
-
-
-
-
-
 
 
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
