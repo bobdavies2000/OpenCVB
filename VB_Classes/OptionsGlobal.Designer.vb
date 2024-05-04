@@ -470,8 +470,6 @@ Partial Class OptionsGlobal
         'debugSyncUI
         '
         Me.debugSyncUI.AutoSize = True
-        Me.debugSyncUI.Checked = True
-        Me.debugSyncUI.CheckState = System.Windows.Forms.CheckState.Checked
         Me.debugSyncUI.Location = New System.Drawing.Point(24, 148)
         Me.debugSyncUI.Name = "debugSyncUI"
         Me.debugSyncUI.Size = New System.Drawing.Size(261, 24)

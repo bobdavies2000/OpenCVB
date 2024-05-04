@@ -1380,7 +1380,7 @@ Public Class Structured_SurveyH : Inherits VB_Algorithm
             Dim maxVal = sliceY + task.metersPerPixel
             If minVal < 0 And maxVal > 0 Then Continue For
             dst0 = task.pcSplit(1).InRange(minVal, maxVal)
-            dst2.SetTo(task.scalarColors(index Mod 255), dst0)
+            dst2.SetTo(task.scalarColors(index Mod 256), dst0)
             index += 1
         Next
     End Sub
@@ -1427,7 +1427,7 @@ Public Class Structured_SurveyV : Inherits VB_Algorithm
             Dim maxVal = sliceX + task.metersPerPixel
             If minVal < 0 And maxVal > 0 Then Continue For
             dst0 = task.pcSplit(0).InRange(minVal, maxVal)
-            dst2.SetTo(task.scalarColors(index Mod 255), dst0)
+            dst2.SetTo(task.scalarColors(index Mod 256), dst0)
             index += 1
         Next
     End Sub

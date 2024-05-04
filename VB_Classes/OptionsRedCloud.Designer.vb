@@ -67,6 +67,7 @@ Partial Class OptionsRedCloud
         Me.IdentifyCells = New System.Windows.Forms.CheckBox()
         Me.DisplayCellStats = New System.Windows.Forms.CheckBox()
         Me.UseMeanColor = New System.Windows.Forms.CheckBox()
+        Me.CheckBox1 = New System.Windows.Forms.CheckBox()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -567,11 +568,24 @@ Partial Class OptionsRedCloud
         Me.UseMeanColor.Text = "Use Mean Color for Cells"
         Me.UseMeanColor.UseVisualStyleBackColor = True
         '
+        'CheckBox1
+        '
+        Me.CheckBox1.AutoSize = True
+        Me.CheckBox1.Checked = True
+        Me.CheckBox1.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBox1.Location = New System.Drawing.Point(1050, 340)
+        Me.CheckBox1.Name = "CheckBox1"
+        Me.CheckBox1.Size = New System.Drawing.Size(172, 24)
+        Me.CheckBox1.TabIndex = 77
+        Me.CheckBox1.Text = "Exact matches only"
+        Me.CheckBox1.UseVisualStyleBackColor = True
+        '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1585, 604)
+        Me.Controls.Add(Me.CheckBox1)
         Me.Controls.Add(Me.UseMeanColor)
         Me.Controls.Add(Me.IdentifyCells)
         Me.Controls.Add(Me.DisplayCellStats)
@@ -653,4 +667,5 @@ Partial Class OptionsRedCloud
     Friend WithEvents IdentifyCells As Windows.Forms.CheckBox
     Friend WithEvents DisplayCellStats As Windows.Forms.CheckBox
     Friend WithEvents UseMeanColor As Windows.Forms.CheckBox
+    Friend WithEvents CheckBox1 As Windows.Forms.CheckBox
 End Class

@@ -118,79 +118,6 @@ End Class
 
 
 
-
-
-
-Public Class Cell_Stable : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
-    Public rcUnstableList As New List(Of rcData)
-    Public Sub New()
-        desc = "Identify cells which were NOT present in the previous generation."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        Static unmatchedCount As Integer
-        If task.heartBeat Then
-            dst3.SetTo(0)
-            unmatchedCount = 0
-        End If
-        For Each rc In task.redCells
-            If rc.matchCount = 0 Then
-                dst3(rc.rect).SetTo(rc.color, rc.mask)
-                unmatchedCount += 1
-            End If
-        Next
-
-        labels(3) = CStr(unmatchedCount) + " cells weren't present in the previous generation - cumulative since the last heartbeat"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Cell_StableAboveAverage : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels(1) = "Black rectangles outline cells that were matched less than the average matchCount."
-        desc = "Highligh cells that were present the max number of match counts."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        Dim cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3.SetTo(0)
-        dst1.SetTo(255) ' the unstable mask 
-        Dim unmatched As Integer
-        For Each rc In task.redCells
-            If rc.matchCount < task.rcMatchAvg Then
-                dst3(rc.rect).SetTo(rc.color, rc.mask)
-                dst1(rc.rect).SetTo(0)
-                unmatched += 1
-            End If
-        Next
-
-        labels(3) = CStr(unmatched) + " cells below were unmatched."
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Cell_ValidateColorCells : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -394,6 +321,78 @@ End Class
 
 
 
+
+
+
+
+
+
+Public Class Cell_Stable : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        labels(3) = "Below are cells that were not exact matches."
+        desc = "Identify cells which were NOT present in the previous generation."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+        If task.heartBeat Then Exit Sub
+
+        Dim retained As Integer
+        dst3.SetTo(0)
+        For Each rc In task.redCells
+            If rc.exactMatch Then
+                retained += 1
+            Else
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+                'task.cellMap(rc.rect).SetTo(0, rc.mask)
+            End If
+        Next
+        labels(3) = CStr(task.redCells.Count - retained) + " were not exact matches (shown below)"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+'Public Class Cell_StableAboveAverage : Inherits VB_Algorithm
+'    Dim redC As New RedCloud_Basics
+'    Public Sub New()
+'        If standaloneTest() Then gOptions.displayDst1.Checked = True
+'        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+'        labels(1) = "Black rectangles outline cells that were matched less than the average matchCount."
+'        desc = "Highligh cells that were present the max number of match counts."
+'    End Sub
+'    Public Sub RunVB(src As cv.Mat)
+'        redC.Run(src)
+'        dst2 = redC.dst2
+'        labels(2) = redC.labels(2)
+
+'        Dim cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+'        dst3.SetTo(0)
+'        dst1.SetTo(255) ' the unstable mask 
+'        Dim unmatched As Integer
+'        For Each rc In task.redCells
+'            If rc.matchCount < task.rcMatchAvg Then
+'                dst3(rc.rect).SetTo(rc.color, rc.mask)
+'                dst1(rc.rect).SetTo(0)
+'                unmatched += 1
+'            End If
+'        Next
+
+'        labels(3) = CStr(unmatched) + " cells below were unmatched."
+'    End Sub
+'End Class
+
+
+
+
+
 Public Class Cell_Generate : Inherits VB_Algorithm
     Public classCount As Integer
     Public rectData As cv.Mat
@@ -428,6 +427,7 @@ Public Class Cell_Generate : Inherits VB_Algorithm
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         Dim usedColors As New List(Of cv.Vec3b)({black})
         task.rcMatchThreshold = If(task.frameCount < task.fpsRate, task.frameCount - 1, task.fpsRate)
+        Dim retained As Integer
         For i = 1 To classCount - 1
             Dim rc As New rcData
             rc.index = sortedCells.Count + 1
@@ -441,29 +441,49 @@ Public Class Cell_Generate : Inherits VB_Algorithm
             vbDrawContour(rc.mask, rc.contour, 255, -1)
             If removeContour Then vbDrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
 
+            If task.heartBeat Or rc.indexLast = 0 Or rc.indexLast >= redCells.Count Then
+                cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+            Else
+                rc.colorMean = redCells(rc.indexLast).colorMean
+            End If
+
+            rc.naturalColor = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
+            rc.naturalGray = CInt(rc.colorMean(2) * 0.299 + rc.colorMean(1) * 0.587 + rc.colorMean(0) * 0.114)
+
             rc.maxDist = vbGetMaxDist(rc)
 
-            If rc.color = black Then
-                rc.maxDStable = rc.maxDist ' assume it has to use the latest.
-                rc.indexLast = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If rc.indexLast > 0 And rc.indexLast < redCells.Count Then
-                    Dim lrc = redCells(rc.indexLast)
+            rc.maxDStable = rc.maxDist ' assume it has to use the latest.
+            rc.indexLast = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+
+            If rc.indexLast >= redCells.Count And firstPass = False Then Console.WriteLine("Should never happen!")
+
+            If rc.indexLast > 0 Then
+                Dim lrc = redCells(rc.indexLast)
+                If task.heartBeat = False And Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 Then
+                    rc = lrc
+                    rc.exactMatch = True
+                    retained += 1
+                Else
                     rc.color = lrc.color
                     Dim stableCheck = task.cellMap.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
                     If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
                     Dim val = task.cellMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
                     If val <> rc.indexLast Then rc.maxDStable = rc.maxDist ' maxDist has finally hit the edges of the cell.
-                    rc.matchCount = If(lrc.matchCount > task.rcMatchThreshold, lrc.matchCount, lrc.matchCount + 1)
-                Else
-                    'rc.color = task.vecColors(rc.index)
-                    rc.color = New cv.Vec3b(msRNG.Next(40, 220), msRNG.Next(40, 220), msRNG.Next(40, 220))
+                    rc.pointMatch = True
                 End If
             End If
 
-            If rc.maxDStable = New cv.Point Then rc.newCell = True
+            If rc.pointMatch = False And rc.exactMatch = False Then
+                'rc.color = task.vecColors(rc.index)
+                rc.color = New cv.Vec3b(msRNG.Next(40, 220), msRNG.Next(40, 220), msRNG.Next(40, 220))
+            End If
 
-            rc.pixels = rc.mask.CountNonZero
+            If usedColors.Contains(rc.color) Then rc.color = task.vecColors(rc.index)
+            usedColors.Add(rc.color)
+
+            rc.pixels = rc.mask.CountNonZero ' the number of pixels may have changed with the infill or contour.
             If rc.pixels = 0 Then Continue For
+
             rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
             rc.depthPixels = rc.depthMask.CountNonZero
             rc.depthCell = rc.depthPixels > 0
@@ -476,24 +496,13 @@ Public Class Cell_Generate : Inherits VB_Algorithm
                 cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
             End If
 
-            If task.heartBeat Or rc.indexLast = 0 Or rc.indexLast >= redCells.Count Then
-                cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-            Else
-                rc.colorMean = redCells(rc.indexLast).colorMean
-            End If
-
-            If usedColors.Contains(rc.color) Then rc.color = task.vecColors(rc.index)
-            usedColors.Add(rc.color)
-
             sortedCells.Add(rc.pixels, rc)
         Next
 
         dst2 = vbRebuildCells(sortedCells)
 
-        Dim matchCount As Integer
-        For Each rc In task.redCells
-            If rc.indexLast <> 0 Then matchCount += 1
-        Next
-        If task.heartBeat Then labels(2) = $"{task.redCells.Count} cells and {matchCount} were matched to the previous gen."
+        Static saveRetained As Integer = retained
+        If task.midHeartBeat Then saveRetained = retained
+        If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " total cells with " + CStr(saveRetained) + " exact matches"
     End Sub
 End Class

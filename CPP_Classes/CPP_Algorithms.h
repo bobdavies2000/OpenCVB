@@ -2182,10 +2182,10 @@ public:
 		for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
 		{
 			Rect box = boxes[it->second];
-			Point center = Point(box.x + box.width / 2, box.y + box.height / 2);
-			int val = dst.at<uchar>(center.y, center.x);
-			if (val == 255)
-			{
+			//Point center = Point(box.x + box.width / 2, box.y + box.height / 2);
+			//int val = dst.at<uchar>(center.y, center.x);
+			//if (val == 255)
+			//{
 				floodPoints.push_back(regions[it->second][0]);
 				maskCounts.push_back((int)regions[it->second].size());
 				for (Point pt : regions[it->second])
@@ -2194,7 +2194,7 @@ public:
 				}
 				index++;
 				containers.push_back(box);
-			}
+			//}
 		}
 	}
 };

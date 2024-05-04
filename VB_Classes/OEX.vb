@@ -254,7 +254,7 @@ Public Class OEX_delaunay2 : Inherits VB_Algorithm
                     ifacet.Clear()
                     ifacet.AddRange(facets(i).Select(Function(p) New cv.Point(p.X, p.Y)))
 
-                    Dim color = task.vecColors(i Mod 255)
+                    Dim color = task.vecColors(i Mod 256)
                     dst3.FillConvexPoly(ifacet, color, 8, 0)
 
                     ifacets(0) = ifacet

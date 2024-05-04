@@ -137,7 +137,7 @@ Public Class Fractal_Julia : Inherits VB_Algorithm
     End Sub
     Private Function julia_point(x As Single, y As Single, r As Integer, depth As Integer, max As Integer, c As Complex, z As Complex)
         If Complex.Abs(z) > r Then
-            Dim mt = (255 * Math.Pow(max - depth, 2) Mod (max * max)) Mod 255
+            Dim mt = (255 * Math.Pow(max - depth, 2) Mod (max * max)) Mod 256
             dst2.Set(Of Byte)(y, x, 255 - mt)
             depth = 0
         End If

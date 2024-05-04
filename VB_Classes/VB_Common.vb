@@ -7,6 +7,7 @@ Module VB_Common
     Public Const fmt3 = "0.000"
     Public Const fmt4 = "0.0000"
     Public Const depthListMaxCount As Integer = 10
+    Public newPoint As New cv.Point
     Public Function findCenter(clist As List(Of cv.Point)) As cv.Point2f
         Dim xsum As Integer, ysum As Integer
         For Each pt In clist
@@ -203,7 +204,7 @@ Module VB_Common
 
         If redOptions.UseMeanColor.Checked Then
             For Each rc In task.redCells
-                dst(rc.rect).SetTo(New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2)), rc.mask)
+                dst(rc.rect).SetTo(rc.naturalColor, rc.mask)
                 task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
         Else
@@ -235,10 +236,10 @@ Module VB_Common
     End Function
     Public Sub setSelectedContour()
         If task.redCells.Count = 0 Then Exit Sub
-        If task.clickPoint = New cv.Point And task.redCells.Count > 1 Then task.clickPoint = task.redCells(1).maxDist
+        If task.clickPoint = newPoint And task.redCells.Count > 1 Then task.clickPoint = task.redCells(1).maxDist
         Dim index = task.cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
         If index > 0 Then
-            task.clickPoint = task.redCells(index).maxDist
+            ' task.clickPoint = task.redCells(index).maxDist
             task.rc = task.redCells(index)
         End If
     End Sub
@@ -249,7 +250,7 @@ Module VB_Common
         Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
         task.rc = redCells(index)
         If index > 0 Then
-            task.clickPoint = redCells(index).maxDist
+            ' task.clickPoint = redCells(index).maxDist
             task.rc = redCells(index)
         End If
     End Sub
@@ -811,6 +812,10 @@ Public Class rcData
     Public floodPoint As cv.Point
 
     Public color As New cv.Vec3b
+    Public naturalColor As New cv.Vec3b
+    Public naturalGray As Integer
+    Public exactMatch As Boolean
+    Public pointMatch As Boolean
 
     Public depthPixels As Integer
     Public depthMask As cv.Mat
@@ -831,8 +836,6 @@ Public Class rcData
 
     Public index As Integer
     Public indexLast As Integer
-    Public matchCount As Integer
-    Public newCell As Boolean
 
     Public nab As Integer
     Public container As Integer

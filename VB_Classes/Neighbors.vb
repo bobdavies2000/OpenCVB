@@ -136,36 +136,6 @@ End Class
 
 
 
-Public Class Neighbors_StableMax : Inherits VB_Algorithm
-    Dim stable As New Cell_StableAboveAverage
-    Dim corners As New Neighbors_Intersects
-    Public Sub New()
-        desc = "Find neighbors in the RedCloud_StableMax redCloud cells."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        stable.Run(src)
-        dst2 = stable.dst2
-        labels(2) = stable.labels(2)
-
-        corners.Run(task.cellMap)
-
-        dst3 = task.color.Clone
-        For Each pt In corners.nPoints
-            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-            dst3.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
-        Next
-
-        labels(3) = corners.labels(3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Neighbors_PreciseTest : Inherits VB_Algorithm
     Dim nabs As New Neighbors_Precise
     Public Sub New()
@@ -268,3 +238,31 @@ Public Class Neighbors_Precise : Inherits VB_Algorithm
         Neighbors_Close(cPtr)
     End Sub
 End Class
+
+
+
+
+
+
+'Public Class Neighbors_StableMax : Inherits VB_Algorithm
+'    Dim stable As New Cell_StableAboveAverage
+'    Dim corners As New Neighbors_Intersects
+'    Public Sub New()
+'        desc = "Find neighbors in the RedCloud_StableMax redCloud cells."
+'    End Sub
+'    Public Sub RunVB(src As cv.Mat)
+'        stable.Run(src)
+'        dst2 = stable.dst2
+'        labels(2) = stable.labels(2)
+
+'        corners.Run(task.cellMap)
+
+'        dst3 = task.color.Clone
+'        For Each pt In corners.nPoints
+'            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+'            dst3.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+'        Next
+
+'        labels(3) = corners.labels(3)
+'    End Sub
+'End Class
