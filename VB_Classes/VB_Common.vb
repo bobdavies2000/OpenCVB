@@ -193,7 +193,6 @@ Module VB_Common
         dst.Circle(pt, task.dotSize, cv.Scalar.Black, -1, task.lineType)
     End Sub
     Public Function vbRebuildCells(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
-        Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
         task.redCells.Clear()
         task.redCells.Add(New rcData)
         For Each rc In sortedCells.Values
@@ -202,19 +201,7 @@ Module VB_Common
             If rc.index >= 255 Then Exit For
         Next
 
-        If redOptions.UseMeanColor.Checked Then
-            For Each rc In task.redCells
-                dst(rc.rect).SetTo(rc.naturalColor, rc.mask)
-                task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            Next
-        Else
-            task.cellMap.SetTo(0)
-            For Each rc In task.redCells
-                dst(rc.rect).SetTo(rc.color, rc.mask)
-                task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            Next
-        End If
-        Return dst
+        Return vbDisplayCells()
     End Function
     Public Function vbDisplayCells() As cv.Mat
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
@@ -842,6 +829,7 @@ Public Class rcData
 
     Public contour As New List(Of cv.Point)
     Public motionFlag As Boolean
+    Public motionPixels As Integer
 
     Public features As New List(Of cv.Point)
 

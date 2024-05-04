@@ -888,3 +888,27 @@ Public Class Motion_MinRect : Inherits VB_Algorithm
         End If
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Motion_RedCloud : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        labels(3) = "Motion detected in the cells below"
+        desc = "Use RedCloud to define where there is motion"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        dst3.SetTo(0)
+        For Each rc In task.redCells
+            If rc.motionPixels > 0 Then dst3(rc.rect).SetTo(rc.naturalColor, rc.mask)
+        Next
+    End Sub
+End Class

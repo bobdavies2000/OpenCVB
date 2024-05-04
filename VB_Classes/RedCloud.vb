@@ -1527,8 +1527,11 @@ Public Class RedCloud_StructuredH : Inherits VB_Algorithm
     Dim transform As New Structured_TransformH
     Dim histTop As New Projection_HistTop
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst0.Checked = True
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standalone Then
+            redOptions.IdentifyCells.Checked = False
+            gOptions.displayDst0.Checked = True
+            gOptions.displayDst1.Checked = True
+        End If
         desc = "Display the RedCloud cells found with a horizontal slice through the cellMap."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1566,8 +1569,11 @@ Public Class RedCloud_StructuredV : Inherits VB_Algorithm
     Dim transform As New Structured_TransformV
     Dim histSide As New Projection_HistSide
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst0.Checked = True
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standalone Then
+            redOptions.IdentifyCells.Checked = False
+            gOptions.displayDst0.Checked = True
+            gOptions.displayDst1.Checked = True
+        End If
         desc = "Display the RedCloud cells found with a vertical slice through the cellMap."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1658,43 +1664,6 @@ Public Class RedCloud_MotionBasics : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class RedCloud_MotionBGsubtract : Inherits VB_Algorithm
-    Public bgSub As New BGSubtract_Basics
-    Public redCells As New List(Of rcData)
-    Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
-        gOptions.PixelDiffThreshold.Value = 25
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Use absDiff to build a mask of cells that changed."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        bgSub.Run(src)
-        dst3 = bgSub.dst2
-
-        Static redC As New RedCloud_Basics
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(3)
-
-        redCells.Clear()
-        dst1.SetTo(0)
-        For Each rc In task.redCells
-            Dim tmp As cv.Mat = rc.mask And bgSub.dst2(rc.rect)
-            If tmp.CountNonZero Then
-                dst1(rc.rect).SetTo(rc.color, rc.mask)
-                rc.motionFlag = True
-            End If
-            redCells.Add(rc)
-        Next
-
-    End Sub
-End Class
 
 
 
@@ -2667,5 +2636,44 @@ Public Class RedCloud_NaturalGray : Inherits VB_Algorithm
         Dim color = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
         dst3.SetTo(0)
         dst3.SetTo(cv.Scalar.White, dst0)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_MotionBGsubtract : Inherits VB_Algorithm
+    Public bgSub As New BGSubtract_Basics
+    Public redCells As New List(Of rcData)
+    Public Sub New()
+        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        gOptions.PixelDiffThreshold.Value = 25
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Use absDiff to build a mask of cells that changed."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        bgSub.Run(src)
+        dst3 = bgSub.dst2
+
+        Static redC As New RedCloud_Basics
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(3)
+
+        redCells.Clear()
+        dst1.SetTo(0)
+        For Each rc In task.redCells
+            Dim tmp As cv.Mat = rc.mask And bgSub.dst2(rc.rect)
+            If tmp.CountNonZero Then
+                dst1(rc.rect).SetTo(rc.color, rc.mask)
+                rc.motionFlag = True
+            End If
+            redCells.Add(rc)
+        Next
+
     End Sub
 End Class

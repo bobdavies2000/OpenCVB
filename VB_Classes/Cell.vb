@@ -423,9 +423,11 @@ Public Class Cell_Generate : Inherits VB_Algorithm
             rc.maxDStable = rc.maxDist ' assume it has to use the latest.
             rc.indexLast = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
 
+            rc.motionPixels = diff.dst2(rc.rect).CountNonZero
+
             If rc.indexLast > 0 And rc.indexLast < redCells.Count Then
                 Dim lrc = redCells(rc.indexLast)
-                If task.heartBeat = False And Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 Then
+                If task.heartBeat = False And Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 And rc.motionPixels = 0 Then
                     rc = lrc
                     rc.exactMatch = True
                     retained += 1

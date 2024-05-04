@@ -1177,6 +1177,7 @@ if algorithmName = "Motion_MinRect" Then return new Motion_MinRect
 if algorithmName = "Motion_PixelDiff" Then return new Motion_PixelDiff
 if algorithmName = "Motion_PointCloud" Then return new Motion_PointCloud
 if algorithmName = "Motion_RectTest" Then return new Motion_RectTest
+if algorithmName = "Motion_RedCloud" Then return new Motion_RedCloud
 if algorithmName = "Motion_Simple" Then return new Motion_Simple
 if algorithmName = "Motion_ThruCorrelation" Then return new Motion_ThruCorrelation
 if algorithmName = "Mouse_Basics" Then return new Mouse_Basics
