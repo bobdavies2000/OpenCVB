@@ -203,6 +203,17 @@ Module VB_Common
 
         Return vbDisplayCells()
     End Function
+    Public Function vbRebuildCells(cells As List(Of rcData)) As cv.Mat
+        task.redCells.Clear()
+        task.redCells.Add(New rcData)
+        For Each rc In cells
+            rc.index = task.redCells.Count
+            task.redCells.Add(rc)
+            If rc.index >= 255 Then Exit For
+        Next
+
+        Return vbDisplayCells()
+    End Function
     Public Function vbDisplayCells() As cv.Mat
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
 
@@ -808,7 +819,6 @@ Public Class rcData
     Public depthMask As cv.Mat
     Public depthMean As cv.Scalar
     Public depthStdev As cv.Scalar
-    Public depthCell As Boolean
 
     Public colorMean As cv.Scalar
     Public colorStdev As cv.Scalar

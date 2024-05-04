@@ -18,7 +18,7 @@ Public Class Cell_Basics : Inherits VB_Algorithm
             strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbCrLf + "rc.color = " + rc.color.ToString() + vbCrLf
             strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + "," + CStr(rc.maxDist.Y) + vbCrLf
 
-            strOut += If(rc.depthCell, "Cell is marked as depthCell " + vbCrLf, "")
+            strOut += If(rc.depthPixels > 0, "Cell is marked as depthCell " + vbCrLf, "")
             If rc.depthPixels > 0 Then
                 strOut += "depth pixels " + CStr(rc.pixels) + vbCrLf + "rc.depthPixels = " + CStr(rc.depthPixels) +
                       " or " + Format(rc.depthPixels / rc.pixels, "0%") + " depth " + vbCrLf
@@ -99,16 +99,16 @@ Public Class Cell_PixelCountCompare : Inherits VB_Algorithm
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
                     Dim pt = New cv.Point(rc.maxDist.X - 10, rc.maxDist.Y)
                     If gOptions.DebugCheckBox.Checked Then
-                        strOut = CStr(rc.pixels) + ", " + CStr(rc.depthPixels)
+                        strOut = CStr(rc.pixels) + "/" + CStr(rc.depthPixels)
                     Else
                         strOut = Format(rc.depthPixels / rc.pixels, "0%")
                     End If
-                    setTrueText(strOut, pt, 3)
+                    If missCount < redOptions.identifyCount Then setTrueText(strOut, pt, 3)
                     missCount += 1
                 End If
             End If
         Next
-        If task.heartBeat Then labels(3) = "There were " + CStr(missCount) + " cells that contained an island of depth pixels - value = (pixels, depthpixels)"
+        If task.heartBeat Then labels(3) = "There were " + CStr(missCount) + " cells containing depth - showing rc.pixels/rc.depthpixels"
     End Sub
 End Class
 
@@ -134,8 +134,8 @@ Public Class Cell_ValidateColorCells : Inherits VB_Algorithm
         dst3.SetTo(0)
         Dim percentDepth As New List(Of Single)
         For Each rc In task.redCells
-            If rc.depthCell = False Then dst1(rc.rect).SetTo(255, rc.mask)
-            If rc.depthCell And rc.index > 0 Then
+            If rc.depthPixels > 0 Then dst1(rc.rect).SetTo(255, rc.mask)
+            If rc.depthPixels > 0 And rc.index > 0 Then
                 Dim pc = rc.depthPixels / rc.pixels
                 percentDepth.Add(pc)
 
@@ -346,7 +346,6 @@ Public Class Cell_Stable : Inherits VB_Algorithm
                 retained += 1
             Else
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
-                'task.cellMap(rc.rect).SetTo(0, rc.mask)
             End If
         Next
         labels(3) = CStr(task.redCells.Count - retained) + " were not exact matches (shown below)"
@@ -393,6 +392,7 @@ Public Class Cell_Generate : Inherits VB_Algorithm
         Dim redCells = task.redCells
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim otherCells As New List(Of rcData) ' the unstable and smaller cells - separated so the sortedcells are more stable.
         Dim usedColors As New List(Of cv.Vec3b)({black})
         task.rcMatchThreshold = If(task.frameCount < task.fpsRate, task.frameCount - 1, task.fpsRate)
         Dim retained As Integer
@@ -442,7 +442,6 @@ Public Class Cell_Generate : Inherits VB_Algorithm
             End If
 
             If rc.pointMatch = False And rc.exactMatch = False Then
-                'rc.color = task.vecColors(rc.index)
                 rc.color = New cv.Vec3b(msRNG.Next(40, 220), msRNG.Next(40, 220), msRNG.Next(40, 220))
             End If
 
@@ -454,7 +453,6 @@ Public Class Cell_Generate : Inherits VB_Algorithm
 
             rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
             rc.depthPixels = rc.depthMask.CountNonZero
-            rc.depthCell = rc.depthPixels > 0
 
             If rc.depthPixels Then
                 task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
@@ -464,10 +462,23 @@ Public Class Cell_Generate : Inherits VB_Algorithm
                 cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
             End If
 
-            sortedCells.Add(rc.pixels, rc)
+            If rc.exactMatch Then sortedCells.Add(rc.pixels, rc) Else otherCells.Add(rc)
         Next
 
-        dst2 = vbRebuildCells(sortedCells)
+        task.redCells.Clear()
+        task.redCells.Add(New rcData)
+        For Each rc In sortedCells.Values
+            rc.index = task.redCells.Count
+            task.redCells.Add(rc)
+        Next
+
+        For Each rc In otherCells
+            rc.index = task.redCells.Count
+            task.redCells.Add(rc)
+            If rc.index >= 255 Then Exit For
+        Next
+
+        dst2 = vbDisplayCells()
 
         Static saveRetained As Integer = retained
         If task.midHeartBeat Then saveRetained = retained

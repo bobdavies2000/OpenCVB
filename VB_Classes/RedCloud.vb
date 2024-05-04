@@ -1111,7 +1111,7 @@ Public Class RedCloud_MostlyColor : Inherits VB_Algorithm
 
         dst3.SetTo(0)
         For Each rc In task.redCells
-            If rc.depthCell = False Then dst3(rc.rect).SetTo(rc.color, rc.mask)
+            If rc.depthPixels > 0 Then dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
     End Sub
 End Class

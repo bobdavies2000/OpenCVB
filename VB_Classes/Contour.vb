@@ -441,7 +441,6 @@ End Class
 Public Class Contour_SelfIntersect : Inherits VB_Algorithm
     Public rc As New rcData
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Search the contour points for duplicates indicating the contour is self-intersecting."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -456,7 +455,6 @@ Public Class Contour_SelfIntersect : Inherits VB_Algorithm
 
         Dim selfInt As Boolean
         Dim ptList As New List(Of String)
-        If task.heartBeat Then dst1.SetTo(0)
         dst3 = rc.mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each pt In rc.contour
             Dim ptStr = Format(pt.X, "0000") + Format(pt.Y, "0000")
@@ -464,7 +462,6 @@ Public Class Contour_SelfIntersect : Inherits VB_Algorithm
                 Dim pct = ptList.Count / rc.contour.Count
                 If pct > 0.1 And pct < 0.9 Then
                     selfInt = True
-                    dst1(rc.rect).SetTo(cv.Scalar.White, rc.mask)
                     dst3.Circle(pt, task.dotSize, cv.Scalar.Red, -1, task.lineType)
                 End If
             End If
