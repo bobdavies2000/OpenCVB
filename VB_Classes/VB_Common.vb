@@ -238,7 +238,7 @@ Module VB_Common
         If task.redCells.Count = 0 Then Exit Sub
         If task.clickPoint = newPoint And task.redCells.Count > 1 Then task.clickPoint = task.redCells(1).maxDist
         Dim index = task.cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        If index > 0 Then
+        If index > 0 And index < task.redCells.Count Then
             ' task.clickPoint = task.redCells(index).maxDist
             task.rc = task.redCells(index)
         End If
@@ -249,7 +249,7 @@ Module VB_Common
         If task.clickPoint = ptNew And redCells.Count > 1 Then task.clickPoint = redCells(1).maxDist
         Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
         task.rc = redCells(index)
-        If index > 0 Then
+        If index > 0 And index < task.redCells.Count Then
             ' task.clickPoint = redCells(index).maxDist
             task.rc = redCells(index)
         End If

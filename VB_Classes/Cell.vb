@@ -398,6 +398,7 @@ Public Class Cell_Generate : Inherits VB_Algorithm
     Public rectData As cv.Mat
     Public floodPointData As cv.Mat
     Public removeContour As Boolean
+    Dim diff As New Diff_Basics
     Public Sub New()
         task.cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         task.redCells = New List(Of rcData)
@@ -409,7 +410,7 @@ Public Class Cell_Generate : Inherits VB_Algorithm
             bounds.Run(src)
             task.cellMap = bounds.bRects.bounds.dst2
             src = task.cellMap Or bounds.dst2
-
+            If firstPass Then task.cellMap.SetTo(0)
 
             Static redCPP As RedCloud_CPP
             redCPP = bounds.bRects.bounds.redCPP
@@ -421,6 +422,8 @@ Public Class Cell_Generate : Inherits VB_Algorithm
             removeContour = False
             src = redCPP.dst2
         End If
+
+        diff.Run(task.color)
 
         Dim redCells = task.redCells
 
@@ -455,9 +458,7 @@ Public Class Cell_Generate : Inherits VB_Algorithm
             rc.maxDStable = rc.maxDist ' assume it has to use the latest.
             rc.indexLast = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
 
-            If rc.indexLast >= redCells.Count And firstPass = False Then Console.WriteLine("Should never happen!")
-
-            If rc.indexLast > 0 Then
+            If rc.indexLast > 0 And rc.indexLast < redCells.Count Then
                 Dim lrc = redCells(rc.indexLast)
                 If task.heartBeat = False And Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 Then
                     rc = lrc

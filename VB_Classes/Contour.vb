@@ -365,9 +365,9 @@ Public Class Contour_Sorted : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         diff.Run(src)
-        erode.Run(diff.dst3) ' remove solo points.
+        erode.Run(diff.dst2) ' remove solo points.
 
-        contours.Run(diff.dst3)
+        contours.Run(diff.dst2)
         dst2 = contours.dst2
         dst1 = contours.dst2.Clone
 

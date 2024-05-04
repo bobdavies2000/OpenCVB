@@ -268,10 +268,10 @@ Public Class BackProject_Unstable : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         backP.Run(src)
-        dst2 = vbPalette(backP.dst2)
+        dst2 = vbPalette(backP.dst2 * 255 / backP.classCount)
 
         diff.Run(dst2)
-        dst3 = diff.dst3
+        dst3 = diff.dst2
     End Sub
 End Class
 

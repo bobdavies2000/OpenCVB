@@ -115,69 +115,6 @@ End Class
 
 
 
-'Public Class Interpolate_KalmanOld : Inherits VB_Algorithm
-'    Dim inter As New Interpolate_Basics
-'    Dim kalman As New Kalman_Basics
-'    Public Sub New()
-'        desc = "Use Kalman to smooth the grayscale results of interpolation"
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        Static updatedFrames As Integer
-
-'        inter.Run(src)
-'        dst2 = inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-'        If task.optionsChanged Then
-'            ReDim kalman.kInput(dst2.Width * dst2.Height - 1)
-'            task.frameCount = 1
-'            updatedFrames = 0
-'        End If
-
-'        Dim i As Integer
-'        For y = 0 To dst2.Height - 1
-'            For x = 0 To dst2.Width - 1
-'                kalman.kInput(i) = dst2.Get(Of Byte)(y, x)
-'                i += 1
-'            Next
-'        Next
-
-'        kalman.Run(empty)
-
-'        i = 0
-'        For y = 0 To dst2.Height - 1
-'            For x = 0 To dst2.Width - 1
-'                Dim val = kalman.kOutput(i)
-'                If val < 0 Then val = 0
-'                If val > 255 Then val = 255
-'                dst2.Set(Of Byte)(y, x, val)
-'                i += 1
-'            Next
-'        Next
-
-'        If gOptions.UseKalman.Checked Then
-'            labels(2) = "Kalman-smoothed output after resizing to " + CStr(dst2.Width) + "x" + CStr(dst2.Height)
-'        Else
-'            labels(2) = "Raw output after resizing to " + CStr(dst2.Width) + "x" + CStr(dst2.Height)
-'        End If
-
-'        Static lastframe As cv.Mat = dst2.Clone
-'        If lastframe.Size <> dst2.Size Then lastframe = dst2.Clone
-'        Dim tmp As cv.Mat = dst2 - lastframe
-'        Dim diffCount = tmp.CountNonZero
-'        If diffCount > 0 Then
-'            lastframe = dst2.Clone
-'            dst3 = src.Clone
-'            updatedFrames += 1
-'        End If
-'        labels(3) = "Total frames = " + CStr(task.frameCount) + " updates=" + CStr(updatedFrames) +
-'                    " savings = " + CStr(task.frameCount - updatedFrames) + " or " +
-'                    Format((task.frameCount - updatedFrames) / task.frameCount, "0%") + " diffCount = " + CStr(diffCount)
-'    End Sub
-'End Class
-
-
-
-
-
 
 Public Class Interpolate_Lines : Inherits VB_Algorithm
     Dim lines As New Line_Basics
@@ -215,12 +152,12 @@ Public Class Interpolate_Difference : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         inter.Run(src)
-        dst2 = inter.dst3
+        dst2 = inter.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         labels(2) = inter.labels(3)
 
         diff.lastFrame = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         diff.Run(dst2)
-        dst3 = diff.dst3
+        dst3 = diff.dst2
     End Sub
 End Class
 
@@ -231,7 +168,7 @@ End Class
 
 
 
-Public Class Interpolate_Fake : Inherits VB_Algorithm
+Public Class Interpolate_QuarterBeat : Inherits VB_Algorithm
     Dim diff As New Diff_Basics
     Public Sub New()
         desc = "Highlight the image differences after every quarter second."
@@ -245,8 +182,8 @@ Public Class Interpolate_Fake : Inherits VB_Algorithm
 
         If task.quarterBeat Then
             diff.Run(src)
-            dst3 = diff.dst3
-            If diff.dst3.CountNonZero > 0 Then
+            dst3 = diff.dst2
+            If diff.dst2.CountNonZero > 0 Then
                 diff.lastFrame = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 dst2 = src
                 updatedFrames += 1

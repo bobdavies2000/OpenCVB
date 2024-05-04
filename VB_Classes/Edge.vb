@@ -1210,7 +1210,6 @@ End Class
 
 
 Public Class Edge_MotionOverlay : Inherits VB_Algorithm
-    Dim diff As New Diff_Basics
     Dim options As New Options_EdgeOverlay
     Public Sub New()
         labels(3) = "AbsDiff output of offset with original"
@@ -1221,15 +1220,13 @@ Public Class Edge_MotionOverlay : Inherits VB_Algorithm
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Static lastGray = src.Clone
+        Static offsetImage As cv.Mat = src.Clone
         Dim rect1 = New cv.Rect(options.xDisp, options.yDisp, dst2.Width - options.xDisp - 1, dst2.Height - options.yDisp - 1)
         Dim rect2 = New cv.Rect(0, 0, dst2.Width - options.xDisp - 1, dst2.Height - options.yDisp - 1)
-        lastGray(rect2) = src(rect1).Clone
+        offsetImage(rect2) = src(rect1).Clone
 
-        diff.Run(lastGray)
-        dst2 = diff.dst2
-        dst3 = diff.dst3
-        dst3.SetTo(0, task.noDepthMask)
+        cv.Cv2.Absdiff(src, offsetImage, dst0)
+        dst2 = dst0.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
         labels(2) = "Src offset (x,y) = (" + CStr(options.xDisp) + "," + CStr(options.yDisp) + ")"
     End Sub
 End Class
@@ -1251,7 +1248,7 @@ Public Class Edge_Motion : Inherits VB_Algorithm
         edges.Run(src)
         diff.Run(edges.dst2)
 
-        dst2 = diff.dst3
+        dst2 = diff.dst2
         dst3 = dst2 And edges.dst2
         If task.quarterBeat Then labels(3) = $"{dst3.CountNonZero} pixels overlap between Sobel edges and diff with last Sobel edges."
     End Sub

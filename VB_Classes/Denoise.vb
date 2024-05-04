@@ -8,20 +8,17 @@ Public Class Denoise_Basics_CPP : Inherits VB_Algorithm
         desc = "Denoise example."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst2 = src
-        If dst2.Channels = 3 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY) - 1
-        Dim dataSrc(dst2.Total - 1) As Byte
-        Marshal.Copy(dst2.Data, dataSrc, 0, dataSrc.Length)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) - 1
+        Dim dataSrc(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-        Dim imagePtr = Denoise_Basics_Run(cPtr, handleSrc.AddrOfPinnedObject(), dst2.Rows, dst2.Cols)
+        Dim imagePtr = Denoise_Basics_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()
 
         If imagePtr <> 0 Then
-            dst3 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
-            diff.lastFrame = dst2
-            diff.Run(dst3)
+            dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+            diff.Run(dst2)
             dst3 = diff.dst2
-            setTrueText("Denoise C++ code does not seem to be working.  More work needed", 3)
         End If
     End Sub
     Public Sub Close()

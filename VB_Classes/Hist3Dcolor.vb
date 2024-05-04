@@ -309,7 +309,7 @@ Public Class Hist3Dcolor_Diff : Inherits VB_Algorithm
         diff.Run(hColor.dst2)
 
         If task.heartBeat Then dst3.SetTo(0)
-        dst3 = dst3 Or diff.dst3
+        dst3 = dst3 Or diff.dst2
     End Sub
 End Class
 

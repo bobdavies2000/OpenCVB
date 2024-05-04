@@ -29,7 +29,6 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
 
         dst2 = genCells.dst2
 
-        If redOptions.IdentifyCells.Checked Then setSelectedContour()
         labels(2) = genCells.labels(2)
     End Sub
 End Class
@@ -2444,7 +2443,7 @@ Public Class RedCloud_Consistent1 : Inherits VB_Algorithm
         dst2 = redC.dst2
 
         diff.Run(task.cellMap)
-        dst1 = diff.dst3
+        dst1 = diff.dst2
 
         Static cellmaps As New List(Of cv.Mat)
         Static cellLists As New List(Of List(Of rcData))
@@ -2512,7 +2511,7 @@ Public Class RedCloud_Consistent2 : Inherits VB_Algorithm
         dst2 = redC.dst2
 
         diff.Run(task.cellMap)
-        dst1 = diff.dst3
+        dst1 = diff.dst2
 
         Static cellmaps As New List(Of cv.Mat)
         Static cellLists As New List(Of List(Of rcData))

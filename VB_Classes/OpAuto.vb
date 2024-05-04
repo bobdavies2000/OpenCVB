@@ -322,7 +322,7 @@ Public Class OpAuto_PixelDifference : Inherits VB_Algorithm
         If standaloneTest() Then
             Static diff As New Diff_Basics
             diff.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            src = diff.dst3
+            src = diff.dst2
         End If
 
         Dim gridCount As Integer

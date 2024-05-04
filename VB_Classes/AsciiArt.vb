@@ -76,11 +76,7 @@ Public Class AsciiArt_Diff : Inherits VB_Algorithm
         grayAA.Run(src)
         dst2 = grayAA.dst2
 
-        Static lastArt As cv.mat = dst2.Clone
-
-        diff.Run(lastArt)
-        dst3 = diff.dst3
-
-        lastArt = dst2.Clone
+        diff.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst3 = diff.dst2
     End Sub
 End Class

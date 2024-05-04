@@ -3,22 +3,19 @@ Public Class Diff_Basics : Inherits VB_Algorithm
     Public changedPixels As Integer
     Public lastFrame As New cv.Mat
     Public Sub New()
-        labels = {"", "", "Stable gray", "Unstable mask"}
+        labels = {"", "", "Unstable mask", ""}
         vbAddAdvice(traceName + ": use local options to control the dilation.")
         desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst2 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
-        If firstPass Then lastFrame = dst2.Clone
-        If task.optionsChanged Or lastFrame.Size <> dst2.Size Then lastFrame = dst2.Clone
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If firstPass Then lastFrame = src.Clone
+        If task.optionsChanged Or lastFrame.Size <> src.Size Then lastFrame = src.Clone
 
-        cv.Cv2.Absdiff(dst2, lastFrame, dst0)
-        dst3 = dst0.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
-        changedPixels = dst3.CountNonZero
-        If changedPixels > 0 Then
-            dst3 = dst0.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
-            lastFrame = dst2.Clone
-        End If
+        cv.Cv2.Absdiff(src, lastFrame, dst0)
+        dst2 = dst0.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
+        changedPixels = dst2.CountNonZero
+        If changedPixels > 0 Then lastFrame = src.Clone
     End Sub
 End Class
 
@@ -36,7 +33,7 @@ Public Class Diff_Color : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If firstPass Then diff.lastFrame = src.Reshape(1, src.Rows * 3)
         diff.Run(src.Reshape(1, src.Rows * 3))
-        dst2 = diff.dst3.Reshape(3, src.Rows)
+        dst2 = diff.dst2.Reshape(3, src.Rows)
         dst3 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class
@@ -54,7 +51,7 @@ Public Class Diff_UnstableDepthAndColor : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         diff.Run(src)
-        Dim unstableGray = diff.dst3.Clone()
+        Dim unstableGray = diff.dst2.Clone()
         depth.Run(task.depthRGB)
         Dim unstableDepth As New cv.Mat
         Dim mask As New cv.Mat
@@ -86,7 +83,7 @@ Public Class Diff_RGBAccum : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         diff.Run(src)
         If task.optionsChanged Then history.Clear()
-        history.Add(diff.dst3)
+        history.Add(diff.dst2)
         If history.Count > task.frameHistoryCount Then history.RemoveAt(0)
 
         dst2.SetTo(0)
@@ -174,7 +171,6 @@ End Class
 
 
 Public Class Diff_Depth32S : Inherits VB_Algorithm
-    Dim diff As New Diff_Basics ' not used but has options...
     Public lastDepth32s As cv.Mat = dst0.Clone
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Depth varies more than X mm's", 1, 100, 50)
@@ -213,7 +209,6 @@ End Class
 
 
 Public Class Diff_Depth32f : Inherits VB_Algorithm
-    Dim diff As New Diff_Basics ' not used but has options...
     Public lastDepth32f As New cv.Mat
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Depth varies more than X mm's", 1, 200, 100)

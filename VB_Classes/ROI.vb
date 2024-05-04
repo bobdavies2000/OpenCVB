@@ -10,9 +10,9 @@ Public Class ROI_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         diff.Run(src)
-        dst2 = diff.dst3
+        dst2 = diff.dst2
 
-        Dim split = diff.dst3.FindNonZero().Split()
+        Dim split = diff.dst2.FindNonZero().Split()
         If split.Length = 0 Then Exit Sub
         Dim mm0 = vbMinMax(split(0))
         Dim mm1 = vbMinMax(split(1))
@@ -42,8 +42,8 @@ Public Class ROI_FindNonZeroNoSingle : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
         diff.Run(src)
-        dst2 = diff.dst3
-        Dim tmp = diff.dst3.FindNonZero()
+        dst2 = diff.dst2
+        Dim tmp = diff.dst2.FindNonZero()
         If tmp.Rows = 0 Then Exit Sub
 
         Dim minX = Integer.MaxValue, maxX = Integer.MinValue, minY = Integer.MaxValue, maxY = Integer.MinValue
@@ -101,7 +101,7 @@ Public Class ROI_AccumulateOld : Inherits VB_Algorithm
         End If
 
         diff.Run(src)
-        dst3 = diff.dst3
+        dst3 = diff.dst2
         cv.Cv2.BitwiseOr(dst3, dst1, dst1)
         Dim tmp = dst3.FindNonZero()
         If aoiRect <> New cv.Rect Then

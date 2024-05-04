@@ -52,7 +52,7 @@ Public Class Motion_Simple : Inherits VB_Algorithm
         options.RunVB()
 
         diff.Run(src)
-        dst2 = diff.dst3
+        dst2 = diff.dst2
         If task.heartBeat Then cumulativePixels = 0
         If diff.changedPixels > 0 Or task.heartBeat Then
             cumulativePixels += diff.changedPixels
@@ -439,6 +439,7 @@ End Class
 
 Public Class Motion_RectTest : Inherits VB_Algorithm
     Dim motion As New Motion_Enclosing
+    Dim diff As New Diff_Basics
     Public Sub New()
         vbAddAdvice(traceName + ": gOptions frame history slider will impact results.")
         labels(3) = "The white spots show the difference of the constructed image from the current image."
@@ -465,10 +466,9 @@ Public Class Motion_RectTest : Inherits VB_Algorithm
         End If
 
         If standaloneTest() Then
-            Static diff As New Diff_Basics
             diff.lastFrame = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             diff.Run(dst2)
-            dst3 = diff.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst3 = diff.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst3.Rectangle(r, task.highlightColor, task.lineWidth, task.lineType)
         End If
     End Sub
@@ -494,7 +494,7 @@ Public Class Motion_HistoryTest : Inherits VB_Algorithm
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         diff.Run(src)
-        dst1 = diff.dst3.Threshold(0, 1, cv.ThresholdTypes.Binary)
+        dst1 = diff.dst2.Threshold(0, 1, cv.ThresholdTypes.Binary)
         frames.Run(dst1)
 
         dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -603,6 +603,7 @@ End Class
 
 
 Public Class Motion_Grayscale : Inherits VB_Algorithm
+    Dim diff As New Diff_Basics
     Public Sub New()
         labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated grayscale image",
                   "Diff of input and latest accumulated grayscale image"}
@@ -619,10 +620,9 @@ Public Class Motion_Grayscale : Inherits VB_Algorithm
         End If
 
         If standaloneTest() Then
-            Static diff As New Diff_Basics
             If diff.lastFrame.Width = 0 Then diff.lastFrame = dst2.Clone
             diff.Run(src)
-            dst3 = diff.dst3
+            dst3 = diff.dst2
             dst3.Rectangle(task.motionRect, 255, task.lineWidth)
             diff.lastFrame = src.Clone
         End If

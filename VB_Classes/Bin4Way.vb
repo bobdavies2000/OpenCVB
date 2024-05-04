@@ -41,7 +41,7 @@ Public Class Bin4Way_Basics : Inherits VB_Algorithm
         dst0.SetTo(0)
         For i = 0 To diff.Count - 1
             diff(i).Run(binary.mats.mat(i))
-            dst0 = dst0 Or diff(i).dst3
+            dst0 = dst0 Or diff(i).dst2
         Next
 
         Dim counts(3, task.gridList.Count) As Integer
@@ -193,7 +193,7 @@ Public Class Bin4Way_Unstable1 : Inherits VB_Algorithm
         binary.Run(src)
         dst2 = binary.dst2
         diff.Run(binary.dst3)
-        dst3 = diff.dst3
+        dst3 = diff.dst2
         If task.heartBeat Then labels(3) = "There are " + CStr(dst3.CountNonZero) + " unstable pixels"
     End Sub
 End Class
@@ -434,7 +434,7 @@ Public Class Bin4Way_SplitGaps : Inherits VB_Algorithm
         dst1.SetTo(0)
         For i = 0 To diff.Count - 1
             diff(i).Run(mats.mat(i))
-            dst1 = dst1 Or diff(i).dst3
+            dst1 = dst1 Or diff(i).dst2
         Next
         mats.Run(empty)
         dst2 = mats.dst2
@@ -716,7 +716,7 @@ Public Class Bin4Way_Unstable : Inherits VB_Algorithm
         dst3.SetTo(0)
         For i = 0 To diff.Count - 1
             diff(i).Run(binary.mats.mat(i))
-            dst3 = dst3 Or diff(i).dst3
+            dst3 = dst3 Or diff(i).dst2
         Next
         If task.heartBeat Then labels(3) = "There are " + CStr(dst3.CountNonZero) + " unstable pixels"
     End Sub

@@ -369,7 +369,6 @@ Public Class HistValley_Diff : Inherits VB_Algorithm
     Dim diff As New Diff_Basics
     Dim valley As New HistValley_FromPeaks
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
         desc = "Compare frame to frame what has changed"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -378,7 +377,6 @@ Public Class HistValley_Diff : Inherits VB_Algorithm
 
         diff.Run(valley.dst2)
         dst3 = diff.dst2
-        dst1 = diff.dst3
     End Sub
 End Class
 
