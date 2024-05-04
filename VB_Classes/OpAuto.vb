@@ -349,7 +349,6 @@ Public Class OpAuto_MSER : Inherits VB_Algorithm
     Dim mBase As New MSER_Basics
     Public classCount As Integer
     Public Sub New()
-        If standaloneTest() Then mBase.useOpAuto = False
         desc = "Option Automation: find the best MSER max and min area values"
     End Sub
     Public Sub RunVB(src As cv.Mat)

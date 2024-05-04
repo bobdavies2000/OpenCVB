@@ -1,57 +1,54 @@
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Basics : Inherits VB_Algorithm
     Dim detect As New MSER_CPP
     Public mserCells As New List(Of rcData)
-    Public boxes As New List(Of cv.Rect)
     Public floodPoints As New List(Of cv.Point)
-    Public useOpAuto As Boolean = True
     Public Sub New()
         desc = "Create cells for each region in MSER output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If useOpAuto Then
-            Static opAuto As New OpAuto_MSER
-            opAuto.classCount = mserCells.Count
-            opAuto.Run(src)
-        End If
-
         detect.Run(src)
-        boxes = New List(Of cv.Rect)(detect.boxes)
+        Dim boxInput = New List(Of cv.Rect)(detect.boxes)
+        Dim boxes As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To boxInput.Count - 1
+            Dim r = boxInput(i)
+            boxes.Add(r.Width * r.Height, i)
+        Next
         floodPoints = New List(Of cv.Point)(detect.floodPoints)
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        Dim cells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        Static cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim lastCellMap = cellMap.Clone
-        Dim lastCells = New List(Of rcData)(cells)
-        cellMap.SetTo(0)
-        dst2.SetTo(0)
+
+        Dim matched As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+
         dst0 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim tossCount As Integer
-        For i = 0 To detect.boxes.Count - 1
+
+        For i = 0 To boxes.Count - 1
+            Dim index = boxes.ElementAt(i).Value
             Dim rc As New rcData
-            rc.rect = detect.boxes(i)
-            Dim val = dst0.Get(Of Byte)(floodPoints(i).Y, floodPoints(i).X)
+            rc.rect = boxInput(index)
+            Dim val = dst0.Get(Of Byte)(floodPoints(index).Y, floodPoints(index).X)
             rc.mask = dst0(rc.rect).InRange(val, val)
+            rc.pixels = detect.maskCounts(index)
 
             rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             vbDrawContour(rc.mask, rc.contour, 255, -1)
 
-            rc.floodPoint = floodPoints(i)
-            rc.index = cells.Count
+            rc.floodPoint = floodPoints(index)
             rc.maxDist = vbGetMaxDist(rc)
 
-            rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            If rc.indexLast <> 0 Then
+            rc.indexLast = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If rc.indexLast <> 0 And rc.indexLast < task.redCells.Count Then
+                Dim lrc = task.redCells(rc.indexLast)
+                rc.maxDStable = lrc.maxDStable
+                rc.matchCount = lrc.matchCount + 1
+                matched.Add(rc.indexLast, rc.indexLast)
+            Else
+                rc.maxDStable = rc.maxDist
+            End If
 
-            End If
-            val = cellMap.Get(Of Byte)(rc.floodPoint.Y, rc.floodPoint.X)
-            If val <> 0 Then
-                tossCount += 1
-                Continue For
-            End If
             cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
             If redOptions.UseMeanColor.Checked Then
                 rc.color = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
@@ -59,61 +56,33 @@ Public Class MSER_Basics : Inherits VB_Algorithm
                 rc.color = New cv.Vec3b(msRNG.Next(40, 220), msRNG.Next(40, 220), msRNG.Next(40, 220))
             End If
 
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-            vbDrawContour(dst2(rc.rect), rc.contour, cv.Scalar.White)
-            cells.Add(detect.maskCounts(i), rc)
-            cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            sortedCells.Add(rc.pixels, rc)
         Next
 
-        labels(2) = CStr(cells.Count) + " cells were identified and " + CStr(tossCount) + " rectangles were tossed (already present)"
+        Dim usedPoints As New List(Of cv.Point)
+        For Each rc In task.redCells
+            If matched.Keys.Contains(rc.index) = False Then
+                cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+                Dim color = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
+                If usedPoints.Contains(rc.maxDStable) Then Continue For
+                usedPoints.Add(rc.maxDStable)
+                If color = rc.color Then sortedCells.Add(rc.pixels, rc)
+            End If
+        Next
 
-        'If task.optionsChanged Then
-        '    cellMap.SetTo(0)
-        '    matchCell.lastCells.Clear()
-        'End If
-
-        'matchCell.lastCellMap = cellMap.Clone
-        'matchCell.usedColors.Clear()
-        'matchCell.usedColors.Add(black)
-        'matchCell.lastCells = New List(Of rcData)(mserCells)
-
-        'mserCells.Clear()
-        'mserCells.Add(New rcData) ' "Other"
-
-        'cellMap.SetTo(0)
-        'For Each key In redCells
-        '    matchCell.rc = key.Value
-        '    matchCell.rc.index = mserCells.Count
-        '    matchCell.Run(empty)
-
-        '    Dim rc = matchCell.rc
-
-        '    mserCells.Add(rc)
-
-        '    If mserCells.Count = 255 Then Exit For
+        'usedPoints.Clear()
+        'For i = sortedCells.Count - 1 To 0 Step -1
+        '    Dim rc = sortedCells.ElementAt(i).Value
+        '    If usedPoints.Contains(rc.maxDStable) Then
+        '        sortedCells.RemoveAt(i)
+        '    Else
+        '        usedPoints.Add(rc.maxDStable)
+        '    End If
         'Next
 
-        'If task.paused = False Then
-        '    For Each rc In matchCell.lastCells
-        '        Dim val = detect.dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-        '        If val = 0 Then
-        '            rc.index = mserCells.Count
-        '            mserCells.Add(rc)
-        '        End If
-        '    Next
-        'End If
+        dst2 = vbRebuildCells(sortedCells)
 
-        'For Each rc In mserCells
-        '    cellMap(rc.rect).SetTo(rc.index, rc.mask)
-        '    setTrueText(CStr(rc.index), rc.maxDist)
-        'Next
-
-        'If src.Channels = 3 Then dst3 = src.Clone Else dst3 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        'For Each r In boxes
-        '    dst3.Rectangle(r, task.highlightColor, task.lineWidth)
-        'Next
-
-        'If task.heartBeat Then labels(2) = CStr(mserCells.Count) + " Cells identified"
+        labels(2) = CStr(task.redCells.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
     End Sub
 End Class
 
@@ -721,8 +690,8 @@ Public Class MSER_Mask_CPP : Inherits VB_Algorithm
         options.RunVB()
         If task.optionsChanged Then
             MSER_Close(cPtr)
-            cPtr = MSER_Open(Options.delta, Options.minArea, Options.maxArea, Options.maxVariation, Options.minDiversity,
-                             Options.maxEvolution, Options.areaThreshold, Options.minMargin, Options.edgeBlurSize, Options.pass2Setting)
+            cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
+                             options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
         End If
 
         If options.graySetting And src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -757,16 +726,126 @@ End Class
 
 Public Class MSER_Binarize : Inherits VB_Algorithm
     Dim mser As New MSER_Basics
-    Dim binar4 As New Bin4Way_Regions
+    Dim bin4 As New Bin4Way_Regions
     Public Sub New()
         desc = "Instead of a BGR src, try using the color output of Bin4Way_Regions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        binar4.Run(src)
-        dst2 = vbPalette(binar4.dst2 * 255 / 4)
+        bin4.Run(src)
+        dst2 = vbPalette(bin4.dst2 * 255 / 4)
 
         mser.Run(dst2)
-        dst3 = mser.dst3
+        dst3 = mser.dst2
         labels(3) = mser.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class MSER_Basics1 : Inherits VB_Algorithm
+    Dim detect As New MSER_CPP
+    Dim flood As New RedCloud_Basics
+    Public Sub New()
+        desc = "Create cells for each region in MSER output"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        detect.Run(src)
+        dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        flood.Run(dst3)
+        dst2 = flood.dst2
+        labels(2) = flood.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class MSER_BasicsNew : Inherits VB_Algorithm
+    Dim detect As New MSER_CPP
+    Public Sub New()
+        desc = "Create cells for each region in MSER output"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        detect.Run(src)
+
+        Dim boxInput = New List(Of cv.Rect)(detect.boxes)
+        Dim boxes As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To boxInput.Count - 1
+            Dim r = boxInput(i)
+            boxes.Add(r.Width * r.Height, r)
+        Next
+
+        Static displaycount As Integer
+        dst3 = src
+        For i = 0 To boxes.Count - 1
+            Dim r = boxes.ElementAt(i).Value
+            dst3.Rectangle(r, task.highlightColor, task.lineWidth)
+            If i >= displayCount Then Exit For
+        Next
+
+        If task.heartBeat Then
+            labels(2) = "Displaying the largest " + CStr(displaycount) + " rectangles out of " + CStr(boxes.Count) + " found"
+            ' displaycount += 1
+            If displaycount >= boxes.Count Then displaycount = 0
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class MSER_Basics2 : Inherits VB_Algorithm
+    Dim detect As New MSER_CPP
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Create cells for each region in MSER output"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+
+        detect.Run(src)
+        dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Dim floodPoints = New List(Of cv.Point)(detect.floodPoints)
+        Dim boxInput = New List(Of cv.Rect)(detect.boxes)
+        Dim boxes As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To boxInput.Count - 1
+            Dim r = boxInput(i)
+            boxes.Add(r.Width * r.Height, i)
+        Next
+
+        Dim redCells As New List(Of rcData)({New rcData})
+        dst1.SetTo(0)
+        dst2.SetTo(0)
+        Dim lastMap = cellMap.Clone
+        cellMap.SetTo(0)
+        Dim matchCount As Integer
+        For i = 0 To floodPoints.Count - 1
+            Dim rc As New rcData
+            rc.index = redCells.Count
+            rc.floodPoint = floodPoints(i)
+            Dim val = dst3.Get(Of Byte)(rc.floodPoint.Y, rc.floodPoint.X)
+            rc.rect = boxInput(boxes.ElementAt(i).Value)
+            rc.mask = dst3(rc.rect).InRange(val, val)
+            dst1(rc.rect).SetTo(rc.index, rc.mask)
+            rc.pixels = detect.maskCounts(i)
+
+            rc.maxDist = vbGetMaxDist(rc)
+            rc.indexLast = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+
+            cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+            rc.color = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
+            If rc.indexLast <> 0 Then matchCount += 1
+
+            redCells.Add(rc)
+            cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+        Next
+
+        If task.heartBeat Then labels(2) = detect.labels(2) + " and " + CStr(matchCount) + " were matched to the previous frame"
     End Sub
 End Class
