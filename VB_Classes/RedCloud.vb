@@ -474,13 +474,15 @@ Public Class RedCloud_PlaneColor : Inherits VB_Algorithm
         dst3.SetTo(0)
         Dim fitPoints As New List(Of cv.Point3f)
         For Each rc In task.redCells
-            rc.eq = New cv.Vec4f
-            If options.useMaskPoints Then
-                rc.eq = fitDepthPlane(planeCells.buildMaskPointEq(rc))
-            ElseIf options.useContourPoints Then
-                rc.eq = fitDepthPlane(planeCells.buildContourPoints(rc))
-            ElseIf options.use3Points Then
-                rc.eq = build3PointEquation(rc)
+            If rc.eq = newVec4f Then
+                rc.eq = New cv.Vec4f
+                If options.useMaskPoints Then
+                    rc.eq = fitDepthPlane(planeCells.buildMaskPointEq(rc))
+                ElseIf options.useContourPoints Then
+                    rc.eq = fitDepthPlane(planeCells.buildContourPoints(rc))
+                ElseIf options.use3Points Then
+                    rc.eq = build3PointEquation(rc)
+                End If
             End If
             dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)),
                                               Math.Abs(255 * rc.eq(1)),

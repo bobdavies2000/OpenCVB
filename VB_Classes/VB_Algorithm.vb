@@ -37,6 +37,7 @@ Public Class VB_Algorithm : Implements IDisposable
     Public yellow = New cv.Vec3b(0, 255, 255), purple = New cv.Vec3b(255, 0, 255), teal = New cv.Vec3b(255, 255, 0)
     Public red = New cv.Vec3b(0, 0, 255), green = New cv.Vec3b(0, 255, 0), blue = New cv.Vec3b(255, 0, 0)
     Public zero3f As New cv.Point3f(0, 0, 0)
+    Public newVec4f As New cv.Vec4f
     Public cPtr As IntPtr
     Public trueData As New List(Of trueText)
     Public strOut As String
