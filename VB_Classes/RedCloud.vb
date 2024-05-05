@@ -178,7 +178,7 @@ Public Class RedCloud_FindCells : Inherits VB_Algorithm
                 If task.redCells.Count <= index Then Continue For
                 Dim rc = task.redCells(index)
                 vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
-                dst3(rc.rect).SetTo(cv.Scalar.White, dst0(rc.rect))
+                dst3(rc.rect).SetTo(If(redOptions.naturalColor.Checked, rc.naturalColor, cv.Scalar.White), rc.mask)
             Next
             dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
         End If
@@ -362,8 +362,8 @@ Public Class RedCloud_Features : Inherits VB_Algorithm
         Select Case selection
             Case 0
                 Dim pt = rc.maxDist
-                labels(3) += "maxDist Is at (" + CStr(pt.X) + ", " + CStr(pt.Y) + ")"
                 dst2.Circle(pt, task.dotSize, task.highlightColor, -1, cv.LineTypes.AntiAlias)
+                labels(3) = "maxDist Is at (" + CStr(pt.X) + ", " + CStr(pt.Y) + ")"
             Case 1
                 dst3(rc.rect).SetTo(vbNearFar((rc.depthMean(2)) / task.maxZmeters), rc.mask)
                 labels(3) = "rc.depthMean(2) Is highlighted in dst2"
@@ -377,8 +377,8 @@ Public Class RedCloud_Features : Inherits VB_Algorithm
                 correlationYtoZ = correlationMat.Get(Of Single)(0, 0)
                 labels(3) = "High correlation Y to Z Is yellow, low correlation Y to Z Is blue"
         End Select
-        If selection = 3 Or selection = 4 Then
-            dst3(rc.rect).SetTo(vbNearFar(If(selection = 3, correlationXtoZ, correlationYtoZ) + 1), rc.mask)
+        If selection = 2 Or selection = 3 Then
+            dst3(rc.rect).SetTo(vbNearFar(If(selection = 2, correlationXtoZ, correlationYtoZ) + 1), rc.mask)
             setTrueText("(" + Format(correlationXtoZ, fmt3) + ", " + Format(correlationYtoZ, fmt3) + ")", New cv.Point(rc.rect.X, rc.rect.Y), 3)
         End If
         vbDrawContour(dst0(rc.rect), rc.contour, cv.Scalar.Yellow)

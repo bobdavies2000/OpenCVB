@@ -297,7 +297,7 @@ Public Class OptionsRedCloud
     Private Sub IdentifyCells_CheckedChanged(sender As Object, e As EventArgs) Handles IdentifyCells.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
-    Private Sub UseMeanColor_CheckedChanged(sender As Object, e As EventArgs) Handles UseMeanColor.CheckedChanged
+    Private Sub naturalColor_CheckedChanged(sender As Object, e As EventArgs) Handles naturalColor.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
 End Class

@@ -217,7 +217,7 @@ Module VB_Common
     Public Function vbDisplayCells() As cv.Mat
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
 
-        If redOptions.UseMeanColor.Checked Then
+        If redOptions.naturalColor.Checked Then
             For Each rc In task.redCells
                 dst(rc.rect).SetTo(New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2)), rc.mask)
                 task.cellMap(rc.rect).SetTo(rc.index, rc.mask)

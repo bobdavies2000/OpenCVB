@@ -49,7 +49,7 @@ Public Class MSER_Basics : Inherits VB_Algorithm
             End If
 
             cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-            If redOptions.UseMeanColor.Checked Then
+            If redOptions.naturalColor.Checked Then
                 rc.color = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
             Else
                 rc.color = New cv.Vec3b(msRNG.Next(40, 220), msRNG.Next(40, 220), msRNG.Next(40, 220))
