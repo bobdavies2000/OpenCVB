@@ -389,98 +389,94 @@ Public Class Cell_Generate : Inherits VB_Algorithm
 
         diff.Run(task.color)
 
-        Dim redCells = task.redCells
-
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        Dim otherCells As New List(Of rcData) ' the unstable and smaller cells - separated so the sortedcells are more stable.
         Dim usedColors As New List(Of cv.Vec3b)({black})
         Dim retained As Integer
+        Dim initList As New List(Of rcData)({New rcData})
         For i = 1 To classCount - 1
             Dim rc As New rcData
-            rc.index = sortedCells.Count + 1
             rc.rect = rectData.Get(Of cv.Rect)(i - 1, 0)
-            If rc.rect.Size = dst2.Size Then Continue For
-            rc.mask = src(rc.rect).InRange(i, i)
             rc.floodPoint = floodPointData.Get(Of cv.Point)(i - 1, 0)
+            rc.mask = src(rc.rect).InRange(i, i)
 
-            rc.depthMask = rc.mask.Clone
-            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            vbDrawContour(rc.mask, rc.contour, 255, -1)
-            If removeContour Then vbDrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
-
-            If task.heartBeat Or rc.indexLast = 0 Or rc.indexLast >= redCells.Count Then
+            If task.heartBeat Or rc.indexLast = 0 Or rc.indexLast >= task.redCells.Count Then
                 cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
             Else
-                rc.colorMean = redCells(rc.indexLast).colorMean
+                rc.colorMean = task.redCells(rc.indexLast).colorMean
             End If
 
             rc.naturalColor = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
             rc.naturalGray = CInt(rc.colorMean(2) * 0.299 + rc.colorMean(1) * 0.587 + rc.colorMean(0) * 0.114)
 
             rc.maxDist = vbGetMaxDist(rc)
-
-            rc.maxDStable = rc.maxDist ' assume it has to use the latest.
             rc.indexLast = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-
             rc.motionPixels = diff.dst2(rc.rect).CountNonZero
-
-            If rc.indexLast > 0 And rc.indexLast < redCells.Count Then
-                Dim lrc = redCells(rc.indexLast)
-                If task.heartBeat = False And Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 And rc.motionPixels = 0 Then
+            If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
+                Dim lrc = task.redCells(rc.indexLast)
+                If (task.heartBeat = False Or firstPass) And Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 And rc.motionPixels = 0 Then
                     rc = lrc
                     rc.exactMatch = True
                     retained += 1
-                Else
-                    rc.color = lrc.color
-                    Dim stableCheck = task.cellMap.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
-                    If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
-                    Dim val = task.cellMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
-                    If val <> rc.indexLast Then rc.maxDStable = rc.maxDist ' maxDist has finally hit the edges of the cell.
-                    rc.pointMatch = True
+                End If
+            End If
+            initList.Add(rc)
+        Next
+
+        For Each rc In initList
+            If rc.exactMatch = False Then
+                rc.depthMask = rc.mask.Clone
+                rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+                vbDrawContour(rc.mask, rc.contour, 255, -1)
+                If removeContour Then vbDrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
+
+                rc.maxDStable = rc.maxDist ' assume it has to use the latest.
+                rc.indexLast = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+
+                If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
+                    Dim lrc = task.redCells(rc.indexLast)
+                    If task.heartBeat = False And Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 And rc.motionPixels = 0 Then
+                        rc = lrc
+                        rc.exactMatch = True
+                    Else
+                        rc.color = lrc.color
+                        Dim stableCheck = task.cellMap.Get(Of Byte)(lrc.maxDist.Y, lrc.maxDist.X)
+                        If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+                        Dim val = task.cellMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                        If val <> rc.indexLast Then rc.maxDStable = rc.maxDist ' maxDist has finally hit the edges of the cell.
+                        rc.pointMatch = True
+                    End If
+                End If
+
+                If rc.pointMatch = False And rc.exactMatch = False Then
+                    rc.color = New cv.Vec3b(msRNG.Next(40, 220), msRNG.Next(40, 220), msRNG.Next(40, 220))
+                End If
+
+                If usedColors.Contains(rc.color) Then rc.color = task.vecColors(sortedCells.Count + 1)
+                usedColors.Add(rc.color)
+
+                rc.pixels = rc.mask.CountNonZero ' the number of pixels may have changed with the infill or contour.
+                If rc.pixels = 0 Then Continue For
+
+                rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
+                rc.depthPixels = rc.depthMask.CountNonZero
+
+                If rc.depthPixels Then
+                    task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
+                    task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
+                    task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
+
+                    cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
                 End If
             End If
 
-            If rc.pointMatch = False And rc.exactMatch = False Then
-                rc.color = New cv.Vec3b(msRNG.Next(40, 220), msRNG.Next(40, 220), msRNG.Next(40, 220))
-            End If
-
-            If usedColors.Contains(rc.color) Then rc.color = task.vecColors(rc.index)
-            usedColors.Add(rc.color)
-
-            rc.pixels = rc.mask.CountNonZero ' the number of pixels may have changed with the infill or contour.
-            If rc.pixels = 0 Then Continue For
-
-            rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
-            rc.depthPixels = rc.depthMask.CountNonZero
-
-            If rc.depthPixels Then
-                task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, rc.minLoc, rc.maxLoc, rc.depthMask)
-                task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, rc.minLoc, rc.maxLoc, rc.depthMask)
-                task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, rc.minLoc, rc.maxLoc, rc.depthMask)
-
-                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.depthMask)
-            End If
-
-            If rc.exactMatch Then sortedCells.Add(rc.pixels, rc) Else otherCells.Add(rc)
+            sortedCells.Add(rc.pixels, rc)
         Next
 
-        task.redCells.Clear()
-        task.redCells.Add(New rcData)
-        For Each rc In sortedCells.Values
-            rc.index = task.redCells.Count
-            task.redCells.Add(rc)
-        Next
-
-        For Each rc In otherCells
-            rc.index = task.redCells.Count
-            task.redCells.Add(rc)
-            If rc.index >= 255 Then Exit For
-        Next
-
-        dst2 = vbDisplayCells()
+        task.redCells = New List(Of rcData)(sortedCells.Values)
+        dst2 = vbRebuildCells(sortedCells)
 
         Static saveRetained As Integer = retained
-        If task.midHeartBeat Then saveRetained = retained
+        If retained > 0 Then saveRetained = retained
         If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " total cells with " + CStr(saveRetained) + " exact matches"
     End Sub
 End Class

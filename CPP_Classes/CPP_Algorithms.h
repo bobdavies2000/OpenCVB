@@ -3798,7 +3798,6 @@ private:
 public:
 	Mat src, result;
 	vector<Rect>cellRects;
-	vector<int> cellSizes;
 	vector<Point> floodPoints;
 
 	RedCloud() {}
@@ -3808,7 +3807,7 @@ public:
 
 		multimap<int, Point, greater<int>> sizeSorted;
 		int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
-		int count; Point pt;
+		Point pt;
 		for (int y = 0; y < src.rows; y++)
 		{
 			for (int x = 0; x < src.cols; x++)
@@ -3823,16 +3822,13 @@ public:
 		}
 
 		cellRects.clear();
-		cellSizes.clear();
 		floodPoints.clear();
 		int fill = 1;
 		for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
 		{
-			count = floodFill(src, maskCopy, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8));
-			if (count >= 1)
+			if (floodFill(src, maskCopy, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
 			{
 				cellRects.push_back(rect);
-				cellSizes.push_back(count);
 				floodPoints.push_back(it->second);
 
 				if (fill >= 255)
@@ -3861,11 +3857,6 @@ extern "C" __declspec(dllexport) int* RedCloud_FloodPoints(RedCloud * cPtr)
 	return (int*)&cPtr->floodPoints[0];
 }
 
-extern "C" __declspec(dllexport) int* RedCloud_Sizes(RedCloud * cPtr)
-{
-	return (int*)&cPtr->cellSizes[0];
-}
-
 extern "C" __declspec(dllexport) int* RedCloud_Close(RedCloud * cPtr) { delete cPtr; return (int*)0; }
 extern "C" __declspec(dllexport) int*
 RedCloud_Run(RedCloud * cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols)
@@ -3890,7 +3881,6 @@ private:
 public:
 	Mat src, mask, maskCopy, result;
 	vector<Rect>cellRects;
-	vector<int> cellSizes;
 	vector<Point> floodPoints;
 	vector<Point> maxList;
 
@@ -3900,7 +3890,7 @@ public:
 
 		multimap<int, Point, greater<int>> sizeSorted;
 		int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
-		int count; Point pt;
+		Point pt;
 		for (int y = 0; y < src.rows; y++)
 		{
 			for (int x = 0; x < src.cols; x++)
@@ -3915,16 +3905,13 @@ public:
 		}
 
 		cellRects.clear();
-		cellSizes.clear();
 		floodPoints.clear();
 		int fill = 1;
 		for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
 		{
-			count = floodFill(src, maskCopy, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8));
-			if (count >= 1)
+			if (floodFill(src, maskCopy, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
 			{
 				cellRects.push_back(rect);
-				cellSizes.push_back(count);
 				floodPoints.push_back(it->second);
 
 				if (fill >= 255)
@@ -3934,12 +3921,10 @@ public:
 		}
 	}
 
-
 	void RunMaxList() {
 		Rect rect;
 
 		int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
-		int count;
 		multimap<int, Point, greater<int>> sizeSorted;
 		for (size_t i = 0; i < maxList.size(); i++)
 		{
@@ -3962,16 +3947,13 @@ public:
 		}
 
 		cellRects.clear();
-		cellSizes.clear();
 		floodPoints.clear();
 		int fill = 1;
 		for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
 		{
-			count = floodFill(src, maskCopy, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8));
-			if (count >= 1)
+			if (floodFill(src, maskCopy, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
 			{
 				cellRects.push_back(rect);
-				cellSizes.push_back(count);
 				floodPoints.push_back(it->second);
 
 				if (fill >= 255)
@@ -3996,11 +3978,6 @@ extern "C" __declspec(dllexport) int* RedCloudMaxDist_Rects(RedCloudMaxDist * cP
 extern "C" __declspec(dllexport) int* RedCloudMaxDist_FloodPoints(RedCloudMaxDist * cPtr)
 {
 	return (int*)&cPtr->floodPoints[0];
-}
-
-extern "C" __declspec(dllexport) int* RedCloudMaxDist_Sizes(RedCloudMaxDist * cPtr)
-{
-	return (int*)&cPtr->cellSizes[0];
 }
 
 extern "C" __declspec(dllexport) void

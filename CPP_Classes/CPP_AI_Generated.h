@@ -2482,7 +2482,6 @@ public:
         if (classCount <= 1) {
             return;
         }
-        Mat sizeData(classCount, 1, CV_32SC1, RedCloud_Sizes(cPtr));
         Mat rectData(classCount, 1, CV_32SC4, RedCloud_Rects(cPtr));
         Mat floodPointData(classCount, 1, CV_32SC2, RedCloud_FloodPoints(cPtr));
         sortedCells.clear();
@@ -2495,7 +2494,6 @@ public:
             //vector<Point> contour = contourBuild(cell.mask, cv::CHAIN_APPROX_NONE); 
             //drawContours(cell.mask, vector<vector<Point>> {contour}, 255, -1);
 
-            cell.pixels = sizeData.at<int>(i, 0);
             cell.floodPoint = floodPointData.at<cv::Point>(i, 0);
             rectangle(cell.mask, cv::Rect(0, 0, cell.mask.cols, cell.mask.rows), 0, 1);
             Point pt = task->vbGetMaxDist(cell.mask); 
@@ -3296,7 +3294,6 @@ public:
         if (standalone) dst3 = vbPalette(dst2 * 255 / classCount);
         if (task->heartBeat) labels[3] = to_string(classCount) + " cells found";
 
-        Mat sizeData(classCount, 1, CV_32S, RedCloud_Sizes(cPtr));
         Mat rectData(classCount, 1, CV_32SC4, RedCloud_Rects(cPtr));
         Mat floodPointData(classCount, 1, CV_32SC2, RedCloud_FloodPoints(cPtr));
         sortedCells.clear();
@@ -3307,7 +3304,6 @@ public:
             rc.rect = task->validateRect(r, dst2.cols, dst2.rows);
             inRange(dst2(rc.rect), rc.index, rc.index, rc.mask);
             threshold(rc.mask, rc.mask, 0, 255, THRESH_BINARY);
-            rc.pixels = sizeData.at<int>(i, 0);
             rc.floodPoint = floodPointData.at<Point>(i, 0);
             rectangle(rc.mask, Rect(0, 0, rc.mask.cols, rc.mask.rows), 0, 1);
             rc.maxDist = rc.rect.tl() + task->vbGetMaxDist(rc.mask);

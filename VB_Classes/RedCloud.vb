@@ -2358,6 +2358,7 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
     Public inputMask As cv.Mat
     Public classCount As Integer
     Public rectData As cv.Mat
+    Public sizeData As cv.Mat
     Public floodPointData As cv.Mat
     Public Sub New()
         inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
