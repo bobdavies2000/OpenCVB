@@ -563,9 +563,9 @@ Partial Class OptionsRedCloud
         Me.naturalColor.CheckState = System.Windows.Forms.CheckState.Checked
         Me.naturalColor.Location = New System.Drawing.Point(1049, 307)
         Me.naturalColor.Name = "naturalColor"
-        Me.naturalColor.Size = New System.Drawing.Size(210, 24)
+        Me.naturalColor.Size = New System.Drawing.Size(168, 24)
         Me.naturalColor.TabIndex = 76
-        Me.naturalColor.Text = "Use Mean Color for Cells"
+        Me.naturalColor.Text = "Use Natural Colors"
         Me.naturalColor.UseVisualStyleBackColor = True
         '
         'CheckBox1

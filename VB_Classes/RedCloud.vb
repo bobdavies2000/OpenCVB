@@ -535,13 +535,13 @@ End Class
 '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
 Public Class RedCloud_PlaneFromMask : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
         desc = "Create a plane equation from the pointcloud samples in a RedCloud cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)

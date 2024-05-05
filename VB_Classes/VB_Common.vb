@@ -216,20 +216,10 @@ Module VB_Common
     End Function
     Public Function vbDisplayCells() As cv.Mat
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
-
-        If redOptions.naturalColor.Checked Then
-            For Each rc In task.redCells
-                dst(rc.rect).SetTo(New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2)), rc.mask)
-                task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            Next
-        Else
-            task.cellMap.SetTo(0)
-            For Each rc In task.redCells
-                dst(rc.rect).SetTo(rc.color, rc.mask)
-                task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            Next
-        End If
-
+        For Each rc In task.redCells
+            dst(rc.rect).SetTo(If(redOptions.naturalColor.Checked, rc.naturalColor, rc.color), rc.mask)
+            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+        Next
         Return dst
     End Function
     Public Sub setSelectedContour()
@@ -239,6 +229,8 @@ Module VB_Common
         If index > 0 And index < task.redCells.Count Then
             ' task.clickPoint = task.redCells(index).maxDist
             task.rc = task.redCells(index)
+        Else
+            task.rc = task.redCells(0)
         End If
     End Sub
     Public Sub setSelectedContour(ByRef redCells As List(Of rcData), ByRef cellMap As cv.Mat)
