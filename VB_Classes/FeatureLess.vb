@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits VB_Algorithm
     Dim edgeD As New EdgeDraw_Basics
+    Public classCount As Integer = 2
     Public Sub New()
         labels = {"", "", "EdgeDraw_Basics output", ""}
         desc = "Access the EdgeDraw_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
@@ -242,15 +243,12 @@ Public Class FeatureLess_RedCloud : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Dim fless As New FeatureLess_Basics
     Public Sub New()
-        redOptions.UseColorOnly.Checked = True
         desc = "Floodfill the FeatureLess output so each cell can be tracked."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         fless.Run(src)
         redC.Run(fless.dst2)
-
-        dst2 = task.cellMap
-        dst3 = redC.dst2
+        dst2 = redC.dst2
         labels(2) = redC.labels(2)
     End Sub
 End Class

@@ -902,34 +902,6 @@ End Class
 
 
 
-Public Class RedCloud_JoinCells : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
-    Dim fLess As New FeatureLess_RedCloud
-    Public Sub New()
-        gOptions.HistBinSlider.Value = 20
-        labels = {"", "FeatureLess_RedCloud output.", "RedCloud_Basics output", "RedCloud_Basics cells joined by using the color from the FeatureLess_RedCloud cellMap"}
-        desc = "Run RedCloud_Basics with depth and use FeatureLess_RedCloud to join cells that are in the same featureless regions."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-
-        fLess.Run(src)
-        dst1 = fLess.dst2
-
-        dst3.SetTo(0)
-        For Each rc In task.redCells
-            Dim color = fLess.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-            dst3(rc.rect).SetTo(color, rc.mask)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 
@@ -2678,5 +2650,56 @@ Public Class RedCloud_MotionBGsubtract : Inherits VB_Algorithm
             redCells.Add(rc)
         Next
 
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_JoinCells : Inherits VB_Algorithm
+    Dim fLess As New FeatureLess_RedCloud
+    Public Sub New()
+        gOptions.HistBinSlider.Value = 20
+        labels = {"", "FeatureLess_RedCloud output.", "RedCloud_Basics output", "RedCloud_Basics cells joined by using the color from the FeatureLess_RedCloud cellMap"}
+        desc = "Run RedCloud_Basics and use FeatureLess_RedCloud to join cells that are in the same featureless regions."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        fLess.Run(src)
+        dst2 = fLess.dst2
+        labels(2) = fLess.labels(2)
+
+        dst3.SetTo(0)
+        For Each rc In task.redCells
+            Dim color = fLess.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+            dst3(rc.rect).SetTo(color, rc.mask)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_FeaturelessGroups : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim fless As New FeatureLess_Basics
+    Public Sub New()
+        desc = "Group RedCloud cells by the value of their featureless maxDist"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        fless.Run(src)
+        redC.Run(fless.dst2)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        Dim newCells As New List(Of rcData)
+        For Each rc In task.redCells
+
+        Next
     End Sub
 End Class

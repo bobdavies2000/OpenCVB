@@ -396,6 +396,7 @@ Public Class Cell_Generate : Inherits VB_Algorithm
         For i = 1 To classCount - 1
             Dim rc As New rcData
             rc.rect = rectData.Get(Of cv.Rect)(i - 1, 0)
+            If rc.rect.Size = dst2.Size Then Continue For ' FeatureLess_RedCloud find a cell this big.  
             rc.floodPoint = floodPointData.Get(Of cv.Point)(i - 1, 0)
             rc.mask = src(rc.rect).InRange(i, i)
 
