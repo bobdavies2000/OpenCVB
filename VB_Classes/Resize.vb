@@ -80,15 +80,15 @@ End Class
 
 Public Class Resize_Proportional : Inherits VB_Algorithm
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Resize the input but keep the results proportional to the original."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
             Static options As New Options_Spectrum
             options.RunVB()
-            dst3 = options.runRedCloud(labels(2))
+            dst2 = options.runRedCloud(labels(2))
             src = src(task.rc.rect)
+            cv.Cv2.ImShow("src", src)
         End If
 
         Dim newSize As cv.Size
@@ -99,7 +99,7 @@ Public Class Resize_Proportional : Inherits VB_Algorithm
         End If
         src = src.Resize(newSize, cv.InterpolationFlags.Nearest)
         Dim newRect = New cv.Rect(0, 0, newSize.Width, newSize.Height)
-        dst2.SetTo(0)
-        src.CopyTo(dst2(newRect))
+        dst3.SetTo(0)
+        src.CopyTo(dst3(newRect))
     End Sub
 End Class

@@ -150,7 +150,7 @@ Public Class ROI_Accumulate : Inherits VB_Algorithm
 
         diff.Run(src)
 
-        Dim split = diff.dst3.FindNonZero().Split()
+        Dim split = diff.dst2.FindNonZero().Split()
         If split.Length > 0 Then
             Dim mm0 = vbMinMax(split(0))
             Dim mm1 = vbMinMax(split(1))
@@ -158,7 +158,7 @@ Public Class ROI_Accumulate : Inherits VB_Algorithm
             Dim motionRect = New cv.Rect(mm0.minVal, mm1.minVal, mm0.maxVal - mm0.minVal, mm1.maxVal - mm1.minVal)
             If motionRect.Width <> 0 And motionRect.Height <> 0 Then
                 If roiRect.X > 0 Or roiRect.Y > 0 Then roiRect = motionRect.Union(roiRect) Else roiRect = motionRect
-                cv.Cv2.BitwiseOr(diff.dst3, dst2, dst2)
+                cv.Cv2.BitwiseOr(diff.dst2, dst2, dst2)
             End If
         End If
         dst2.Rectangle(roiRect, cv.Scalar.White, task.lineWidth)

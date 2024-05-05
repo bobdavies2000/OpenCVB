@@ -394,7 +394,6 @@ Public Class Cell_Generate : Inherits VB_Algorithm
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         Dim otherCells As New List(Of rcData) ' the unstable and smaller cells - separated so the sortedcells are more stable.
         Dim usedColors As New List(Of cv.Vec3b)({black})
-        task.rcMatchThreshold = If(task.frameCount < task.fpsRate, task.frameCount - 1, task.fpsRate)
         Dim retained As Integer
         For i = 1 To classCount - 1
             Dim rc As New rcData
