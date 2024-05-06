@@ -2617,10 +2617,12 @@ End Class
 Public Class RedCloud_LeftRight : Inherits VB_Algorithm
     Dim redC As New Flood_LeftRight
     Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
         desc = "Placeholder to make it easier to find where left and right images are floodfilled."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
+        dst1 = redC.dst1
         dst2 = redC.dst2
         dst3 = redC.dst3
         labels = redC.labels

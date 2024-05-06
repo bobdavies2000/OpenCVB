@@ -216,6 +216,7 @@ Module VB_Common
     End Function
     Public Function vbDisplayCells() As cv.Mat
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
+        task.cellMap.SetTo(0)
         For Each rc In task.redCells
             dst(rc.rect).SetTo(If(redOptions.naturalColor.Checked, rc.naturalColor, rc.color), rc.mask)
             task.cellMap(rc.rect).SetTo(rc.index, rc.mask)

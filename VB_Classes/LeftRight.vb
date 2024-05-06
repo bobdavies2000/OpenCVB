@@ -51,33 +51,6 @@ End Class
 
 
 
-Public Class LeftRight_GoodFeatures : Inherits VB_Algorithm
-    Public feat As New Feature_Basics
-    Public Sub New()
-        findSlider("Feature Sample Size").Value = 200
-        findSlider("Min Distance to next").Value = 10
-        desc = "Find GoodFeatures in the left and right depalettized infrared images"
-        labels(2) = "Left Image"
-        labels(3) = "Right Image"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        feat.Run(task.leftView)
-        task.rightview.CopyTo(dst3)
-        For i = 0 To task.features.Count - 1
-            dst3.Circle(task.features(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
-        Next
-
-        feat.Run(task.leftView)
-        task.leftview.CopyTo(dst2)
-        For i = 0 To task.features.Count - 1
-            dst2.Circle(task.features(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
-        Next
-    End Sub
-End Class
-
-
-
-
 Public Class LeftRight_Palettized : Inherits VB_Algorithm
     Public Sub New()
         desc = "Add color to the 8-bit infrared images."
@@ -351,5 +324,23 @@ Public Class LeftRight_RedCloudBoth : Inherits VB_Algorithm
         stLeft.Run(empty)
         dst3 = stLeft.dst2
         labels(3) = "Right view - " + stLeft.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LeftRight_Features : Inherits VB_Algorithm
+    Dim feat As New Feature_LeftRight
+    Public Sub New()
+        desc = "Placeholder to make it easier to find Feature_LeftRight"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+        dst2 = feat.dst2
+        dst3 = feat.dst3
+        labels = feat.labels
     End Sub
 End Class

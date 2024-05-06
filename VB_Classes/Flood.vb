@@ -339,21 +339,22 @@ End Class
 Public Class Flood_LeftRight : Inherits VB_Algorithm
     Dim redLeft As New RedCloud_Basics
     Dim redRight As New RedCloud_Basics
-    Dim mapLeft As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Dim mapRight As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Dim cellsLeft As New List(Of rcData)
-    Dim cellsRight As New List(Of rcData)
+    Public mapLeft As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public mapRight As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public cellsLeft As New List(Of rcData)
+    Public cellsRight As New List(Of rcData)
     Public Sub New()
         redOptions.IdentifyCells.Checked = False
-        gOptions.displayDst1.Checked = True
+        If standalone Then gOptions.displayDst1.Checked = True
         desc = "Floodfill left and right images."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         task.redCells = New List(Of rcData)(cellsLeft)
         task.cellMap = mapLeft.Clone
 
-        redRight.genCells.useLeftImage = True
+        redLeft.genCells.useLeftImage = True
         redLeft.Run(task.leftView)
+
         dst2 = redLeft.dst2
 
         cellsLeft = New List(Of rcData)(task.redCells)
@@ -366,6 +367,7 @@ Public Class Flood_LeftRight : Inherits VB_Algorithm
 
         redRight.genCells.useLeftImage = False
         redRight.Run(task.rightView)
+
         dst3 = redRight.dst2
 
         cellsRight = New List(Of rcData)(task.redCells)

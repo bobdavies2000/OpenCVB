@@ -1746,3 +1746,74 @@ Public Class Feature_Longest : Inherits VB_Algorithm
         setTrueText(Format(match2.correlation, fmt3), p2)
     End Sub
 End Class
+
+
+
+
+Public Class Feature_LeftRight : Inherits VB_Algorithm
+    Public feat As New Feature_Basics
+    Public featLeft As New List(Of cv.Point2f)
+    Public featRight As New List(Of cv.Point2f)
+    Public Sub New()
+        desc = "Find GoodFeatures in the left and right images"
+        labels(2) = "Left Image"
+        labels(3) = "Right Image"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(task.leftView)
+        dst2 = task.leftView
+        For i = 0 To task.features.Count - 1
+            dst2.Circle(task.features(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
+        Next
+        featLeft = New List(Of cv.Point2f)(task.features)
+
+        feat.Run(task.rightView)
+        dst3 = task.rightView
+        For i = 0 To task.features.Count - 1
+            dst3.Circle(task.features(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
+        Next
+        featRight = New List(Of cv.Point2f)(task.features)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_LeftRightCollect : Inherits VB_Algorithm
+    Public feat As New Feature_LeftRight
+    Dim redC As New Flood_LeftRight
+    Public Sub New()
+        desc = "Match RedCloud cells in left and right images using features"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        dst3 = redC.dst3
+
+        feat.Run(src)
+
+        For Each pt In feat.featLeft
+            Dim index = redC.mapLeft.Get(Of Byte)(pt.Y, pt.X)
+            redC.cellsLeft(index).features.Add(pt)
+        Next
+
+        For Each pt In feat.featRight
+            Dim index = redC.mapRight.Get(Of Byte)(pt.Y, pt.X)
+            redC.cellsRight(index).features.Add(pt)
+        Next
+
+        For Each rc In redC.cellsLeft
+            For Each pt In rc.features
+                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            Next
+        Next
+
+        For Each rc In redC.cellsRight
+            For Each pt In rc.features
+                dst3.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            Next
+        Next
+    End Sub
+End Class
