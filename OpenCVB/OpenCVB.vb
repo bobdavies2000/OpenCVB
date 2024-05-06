@@ -1502,7 +1502,6 @@ Public Class OpenCVB
                     task.mousePicTag = mousePicTag
                     If mouseClickFlag Then
                         task.mouseClickFlag = mouseClickFlag
-                        task.rcPicTag = If(task.mousePicTag = 2, 2, 3)
                         task.clickPoint = mousePoint
                         clickPoint = task.clickPoint
                         mouseClickFlag = False

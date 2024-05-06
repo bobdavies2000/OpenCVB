@@ -27,7 +27,7 @@
 
 # Introduction
 
-There is no better documentation of an algorithm than a working example, especially in computer vision where the output is often self-explanatory. Imagine having access to over 1000 OpenCV examples in a single app, where each algorithm is less than a page of code and written in a familiar language. Each algorithm is designed to be reused in other algorithms, so variations can be easily built. [Moreover, each algorithm is free from any baggage from a user interface or environment.](https://microsoft.github.io/computervision-recipes/)
+There is no better documentation of an algorithm than a working example, especially in computer vision where the output is often self-explanatory. Imagine having access to over 2000 OpenCV examples in a single app, where each algorithm is less than a page of code and written in a familiar language. Each algorithm is designed to be reused in other algorithms, so variations can be easily built. [Moreover, each algorithm is free from any baggage from a user interface or environment.](https://microsoft.github.io/computervision-recipes/)
 
 A full installation can take about 30-50 minutes using the 1-step “Update_All.bat” file discussed in the “Installation” section below. But there is no obligation to install needed libraries just to read the code for an algorithm. Open the OpenCVB.sln file after downloading and inspect the code in the C++, C\#, VB.Net or Python. Each algorithm gets a standardized presentation of all the data from any of the RGBZ cameras listed below.
 
@@ -73,7 +73,7 @@ The objective is to solve many small computer vision problems and do so in a way
 
 OpenCVB is targeting only RGBZ cameras that produce depth and color and have an IMU to detect gravity and motion. These newer cameras have prompted a review of existing vision algorithms to see how they can be improved if depth and gravity are known. To enable revisiting existing algorithms, this software provides a single application that can run OpenCV algorithms on any of the cameras listed below.
 
-Supporting multiple cameras with the same application adds a further level of generalization. Plus, adding more cameras is a multiplier. If there are 1000 algorithms and 6 supported cameras, testing all of them requires 6000 tests which is the reason for the integrated regression testing. If the different resolutions are added, the multiplier and the need for regression testing is even greater.
+Supporting multiple cameras with the same application adds a further level of generalization. Plus, adding more cameras is a multiplier. If there are over 2000 algorithms and 6 supported cameras, testing all of them requires 12,000 tests which is the reason for the integrated regression testing. If the different resolutions are added, the multiplier and the need for regression testing is even greater.
 
 There are many computer vision examples on the web but too often something is missing, or setup is difficult. OpenCVB is designed to collect algorithms into a single application and guarantee that each will build and run. In addition, software automation and aids simplify the process of adding variants and experiments. OpenCVB is more work to install than a typical application but it has been reduced to a few steps using standard (and free) packages.
 

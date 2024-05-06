@@ -1783,25 +1783,34 @@ End Class
 
 Public Class Feature_LeftRightCollect : Inherits VB_Algorithm
     Public feat As New Feature_LeftRight
-    Dim redC As New Flood_LeftRight
+    Public redC As New Flood_LeftRight
     Public Sub New()
         desc = "Match RedCloud cells in left and right images using features"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
+        dst1 = redC.dst1
         dst2 = redC.dst2
         dst3 = redC.dst3
 
         feat.Run(src)
 
+        For i = 0 To redC.cellsLeft.Count - 1
+            redC.cellsLeft(i).features.Clear()
+        Next
+
         For Each pt In feat.featLeft
             Dim index = redC.mapLeft.Get(Of Byte)(pt.Y, pt.X)
-            redC.cellsLeft(index).features.Add(pt)
+            redC.cellsLeft(index).features.Add(New cv.Point(pt.X, pt.Y))
+        Next
+
+        For i = 0 To redC.cellsRight.Count - 1
+            redC.cellsRight(i).features.Clear()
         Next
 
         For Each pt In feat.featRight
             Dim index = redC.mapRight.Get(Of Byte)(pt.Y, pt.X)
-            redC.cellsRight(index).features.Add(pt)
+            redC.cellsRight(index).features.Add(New cv.Point(pt.X, pt.Y))
         Next
 
         For Each rc In redC.cellsLeft
@@ -1827,6 +1836,7 @@ End Class
 Public Class Feature_LeftRightMatch : Inherits VB_Algorithm
     Dim collect As New Feature_LeftRightCollect
     Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
         desc = "Match cells in the left and right images using features"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1834,6 +1844,10 @@ Public Class Feature_LeftRightMatch : Inherits VB_Algorithm
         dst1 = collect.dst1
         dst2 = collect.dst2
         dst3 = collect.dst3
-        labels = collect.labels
+
+        Dim count = If(task.mousePicTag = 2, collect.feat.featLeft.Count, collect.feat.featRight.Count)
+        labels(2) = collect.redC.labels(2) + " with " + CStr(count) + " feature identified"
+
+
     End Sub
 End Class
