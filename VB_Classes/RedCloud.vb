@@ -1231,28 +1231,6 @@ End Class
 
 
 
-Public Class RedCloud_LeftRight : Inherits VB_Algorithm
-    Dim redLeft As New RedCloud_Basics
-    Dim redRight As New RedCloud_Basics
-    Public Sub New()
-        redOptions.UseColorOnly.Checked = True
-        desc = "Floodfill left and right images after RedCloud color input reduction."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redLeft.Run(task.leftView)
-        dst2 = redLeft.dst2
-        labels(2) = redLeft.labels(3)
-
-        redRight.Run(task.rightView)
-        dst3 = redRight.dst2
-        labels(3) = redRight.labels(3)
-    End Sub
-End Class
-
-
-
-
-
 
 
 
@@ -2225,56 +2203,6 @@ End Class
 
 
 
-Public Class RedCloud_Both : Inherits VB_Algorithm
-    Dim flood As New Flood_Basics
-    Dim floodPC As New Flood_Basics
-    Public Sub New()
-        desc = "Run Flood_Basics and use the cells to map the depth cells"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static colorCells As New List(Of rcData)
-        Static colorMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-
-        redOptions.UseColorOnly.Checked = True
-        task.redCells = New List(Of rcData)(colorCells)
-        task.cellMap = colorMap.Clone
-        flood.Run(src)
-        dst2 = flood.dst2
-        colorCells = New List(Of rcData)(task.redCells)
-        colorMap = task.cellMap.Clone
-        labels(2) = flood.labels(2)
-
-        Static depthCells As New List(Of rcData)
-        Static depthMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-
-        redOptions.UseDepth.Checked = True
-        task.redCells = New List(Of rcData)(depthCells)
-        task.cellMap = depthMap.Clone
-        floodPC.Run(src)
-        dst3 = floodPC.dst2
-        depthCells = New List(Of rcData)(task.redCells)
-        depthMap = task.cellMap.Clone
-        labels(3) = floodPC.labels(2)
-
-        Static mousePicTag = task.mousePicTag
-        If task.mouseClickFlag Then mousePicTag = task.mousePicTag
-        Select Case mousePicTag
-            Case 1
-                ' setSelectedContour()
-            Case 2
-                setSelectedContour(colorCells, colorMap)
-            Case 3
-                setSelectedContour(depthCells, depthMap)
-        End Select
-        dst2.Rectangle(task.rc.rect, task.highlightColor, task.lineWidth)
-        dst3(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class RedCloud_MaxDist_CPP : Inherits VB_Algorithm
@@ -2679,3 +2607,74 @@ Public Class RedCloud_JoinCells : Inherits VB_Algorithm
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class RedCloud_LeftRight : Inherits VB_Algorithm
+    Dim redC As New Flood_LeftRight
+    Public Sub New()
+        desc = "Placeholder to make it easier to find where left and right images are floodfilled."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        dst3 = redC.dst3
+        labels = redC.labels
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_ColorAndDepth : Inherits VB_Algorithm
+    Dim flood As New Flood_Basics
+    Dim floodPC As New Flood_Basics
+    Public Sub New()
+        redOptions.IdentifyCells.Checked = False
+        desc = "Run Flood_Basics and use the cells to map the depth cells"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static colorCells As New List(Of rcData)
+        Static colorMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+
+        redOptions.UseColorOnly.Checked = True
+        task.redCells = New List(Of rcData)(colorCells)
+        task.cellMap = colorMap.Clone
+        flood.Run(src)
+        dst2 = flood.dst2
+        colorCells = New List(Of rcData)(task.redCells)
+        colorMap = task.cellMap.Clone
+        labels(2) = flood.labels(2)
+
+        Static depthCells As New List(Of rcData)
+        Static depthMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+
+        redOptions.UseDepth.Checked = True
+        task.redCells = New List(Of rcData)(depthCells)
+        task.cellMap = depthMap.Clone
+        floodPC.Run(src)
+        dst3 = floodPC.dst2
+        depthCells = New List(Of rcData)(task.redCells)
+        depthMap = task.cellMap.Clone
+        labels(3) = floodPC.labels(2)
+
+        Static mousePicTag = task.mousePicTag
+        If task.mouseClickFlag Then mousePicTag = task.mousePicTag
+        Select Case mousePicTag
+            Case 1
+                ' setSelectedContour()
+            Case 2
+                setSelectedContour(colorCells, colorMap)
+            Case 3
+                setSelectedContour(depthCells, depthMap)
+        End Select
+        dst2.Rectangle(task.rc.rect, task.highlightColor, task.lineWidth)
+        dst3(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
+    End Sub
+End Class

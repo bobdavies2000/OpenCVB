@@ -4,7 +4,7 @@ Public Class Diff_Basics : Inherits VB_Algorithm
     Public lastFrame As New cv.Mat
     Public Sub New()
         labels = {"", "", "Unstable mask", ""}
-        vbAddAdvice(traceName + ": use local options to control the dilation.")
+        vbAddAdvice(traceName + ": use goption 'Pixel Difference Threshold' to control changed pixels.")
         desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -15,7 +15,14 @@ Public Class Diff_Basics : Inherits VB_Algorithm
         cv.Cv2.Absdiff(src, lastFrame, dst0)
         dst2 = dst0.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
         changedPixels = dst2.CountNonZero
-        If changedPixels > 0 Then lastFrame = src.Clone
+        If changedPixels > 0 Then
+            lastFrame = src.Clone
+            strOut = "Motion detected - " + CStr(changedPixels) + " pixels changed with threshold " + CStr(gOptions.PixelDiffThreshold.Value)
+            If task.heartBeat Then labels(3) = strOut
+        Else
+            strOut = "No motion detected"
+        End If
+        setTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -63,9 +70,6 @@ Public Class Diff_UnstableDepthAndColor : Inherits VB_Algorithm
         dst3 = mask
     End Sub
 End Class
-
-
-
 
 
 

@@ -990,29 +990,6 @@ End Class
 
 
 
-Public Class PointCloud_YRangeTest : Inherits VB_Algorithm
-    Dim split2 As New PointCloud_ReduceSplit2
-    Public Sub New()
-
-        desc = "Test adjusting the Y-Range value to squeeze a histogram into dst2."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        split2.Run(src)
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange),
-                                        New cv.Rangef(0, task.maxZmeters)}
-        cv.Cv2.CalcHist({split2.dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
-
-        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class PointCloud_ReducedTopView : Inherits VB_Algorithm
     Dim split2 As New PointCloud_ReduceSplit2
@@ -1038,7 +1015,6 @@ End Class
 Public Class PointCloud_ReducedSideView : Inherits VB_Algorithm
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
-        vbAddAdvice(traceName + ": redOptions 'Reduction Sliders' have high impact.")
         desc = "Show where vertical neighbor depth values are within X mm's"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1059,7 +1035,6 @@ End Class
 Public Class PointCloud_ReducedViews : Inherits VB_Algorithm
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
-        vbAddAdvice(traceName + ": redOptions 'Reduction Sliders' have high impact.")
         labels = {"", "", "Reduced side view", "Reduced top view"}
         desc = "Show where vertical neighbor depth values are within X mm's"
     End Sub
@@ -1076,5 +1051,51 @@ Public Class PointCloud_ReducedViews : Inherits VB_Algorithm
         dst1 = dst1.Flip(cv.FlipMode.X)
         dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst3, cv.MatType.CV_8UC1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_XRangeTest : Inherits VB_Algorithm
+    Dim split2 As New PointCloud_ReduceSplit2
+    Public Sub New()
+        vbAddAdvice(traceName + ": redOptions 'X-Range X100' slider has high impact.")
+        desc = "Test adjusting the X-Range value to squeeze a histogram into dst2."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        split2.Run(src)
+
+        cv.Cv2.CalcHist({split2.dst3}, task.channelsTop, New cv.Mat, dst1, 2, task.bins2D, task.rangesTop)
+
+        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1 = dst1.Flip(cv.FlipMode.X)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class PointCloud_YRangeTest : Inherits VB_Algorithm
+    Dim split2 As New PointCloud_ReduceSplit2
+    Public Sub New()
+        vbAddAdvice(traceName + ": redOptions 'Y-Range X100' slider has high impact.")
+        desc = "Test adjusting the Y-Range value to squeeze a histogram into dst2."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        split2.Run(src)
+
+        cv.Cv2.CalcHist({split2.dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
+
+        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
     End Sub
 End Class

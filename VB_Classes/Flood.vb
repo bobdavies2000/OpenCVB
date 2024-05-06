@@ -327,3 +327,49 @@ Public Class Flood_MaxDistPoints : Inherits VB_Algorithm
         labels(2) = genCells.labels(2)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+Public Class Flood_LeftRight : Inherits VB_Algorithm
+    Dim redLeft As New RedCloud_Basics
+    Dim redRight As New RedCloud_Basics
+    Dim mapLeft As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Dim mapRight As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Dim cellsLeft As New List(Of rcData)
+    Dim cellsRight As New List(Of rcData)
+    Public Sub New()
+        redOptions.IdentifyCells.Checked = False
+        gOptions.displayDst1.Checked = True
+        desc = "Floodfill left and right images."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        task.redCells = New List(Of rcData)(cellsLeft)
+        task.cellMap = mapLeft.Clone
+
+        redLeft.Run(task.leftView)
+        dst2 = redLeft.dst2
+
+        cellsLeft = New List(Of rcData)(task.redCells)
+        mapLeft = task.cellMap.Clone
+
+        labels(2) = redLeft.labels(3)
+
+        task.redCells = New List(Of rcData)(cellsRight)
+        task.cellMap = mapRight.Clone
+
+        redRight.Run(task.rightView)
+        dst3 = redRight.dst2
+
+        cellsRight = New List(Of rcData)(task.redCells)
+        mapRight = task.cellMap.Clone
+
+        labels(3) = redRight.labels(3)
+        dst1 = task.rightView
+    End Sub
+End Class
