@@ -363,6 +363,8 @@ Public Class Cell_Generate : Inherits VB_Algorithm
     Public floodPointData As cv.Mat
     Public removeContour As Boolean
     Dim diff As New Diff_Basics
+    Dim diffRight As New Diff_Basics
+    Public useLeftImage As Boolean = True
     Public Sub New()
         task.cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         task.redCells = New List(Of rcData)
@@ -387,7 +389,7 @@ Public Class Cell_Generate : Inherits VB_Algorithm
             src = redCPP.dst2
         End If
 
-        diff.Run(task.color)
+        If useLeftImage Then diff.Run(task.color) Else diffRight.Run(task.rightView)
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         Dim usedColors As New List(Of cv.Vec3b)({black})
@@ -401,7 +403,11 @@ Public Class Cell_Generate : Inherits VB_Algorithm
             rc.mask = src(rc.rect).InRange(i, i)
 
             If task.heartBeat Or rc.indexLast = 0 Or rc.indexLast >= task.redCells.Count Then
-                cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+                If useLeftImage Then
+                    cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+                Else
+                    cv.Cv2.MeanStdDev(task.rightView(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+                End If
             Else
                 rc.colorMean = task.redCells(rc.indexLast).colorMean
             End If
@@ -411,7 +417,7 @@ Public Class Cell_Generate : Inherits VB_Algorithm
 
             rc.maxDist = vbGetMaxDist(rc)
             rc.indexLast = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            rc.motionPixels = diff.dst2(rc.rect).CountNonZero
+            If useLeftImage Then rc.motionPixels = diff.dst2(rc.rect).CountNonZero Else rc.motionPixels = diffRight.dst2(rc.rect).CountNonZero
             If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
                 Dim lrc = task.redCells(rc.indexLast)
                 If (task.heartBeat = False Or firstPass) And Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 And rc.motionPixels = 0 Then

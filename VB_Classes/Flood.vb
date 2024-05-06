@@ -352,6 +352,7 @@ Public Class Flood_LeftRight : Inherits VB_Algorithm
         task.redCells = New List(Of rcData)(cellsLeft)
         task.cellMap = mapLeft.Clone
 
+        redRight.genCells.useLeftImage = True
         redLeft.Run(task.leftView)
         dst2 = redLeft.dst2
 
@@ -363,6 +364,7 @@ Public Class Flood_LeftRight : Inherits VB_Algorithm
         task.redCells = New List(Of rcData)(cellsRight)
         task.cellMap = mapRight.Clone
 
+        redRight.genCells.useLeftImage = False
         redRight.Run(task.rightView)
         dst3 = redRight.dst2
 
