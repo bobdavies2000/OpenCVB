@@ -1,27 +1,28 @@
-# Recent Changes – March 2024
+# Recent Changes – May 2024
 
--   Over 1900 algorithms are included, averaging 31 lines of code per algorithm.
--   Gravity and horizon vectors are now available in the image coordinates.
-    -   See example below to see what it looks like.
-    -   The IMU code is now simplified and more responsive.
--   RedCloud_Basics and Flood_Basics are now more stable and accurate.
-    -   Removing contours before flooding helped isolate cells better.
-    -   RedCloud cell statistics can now be shown any time.
-        -   See global option labelled ‘Display Cell stats’.
-    -   The rcData structure has been stripped of many low-use variables.
--   Projection_Basics provides the distance to each object in the image.
-    -   Top X objects are found without thresholds – sorted by size.
-    -   See Projection_Top/Side for distance and size of objects.
--   Flood.vb algorithms were improved and some algorithms were removed.
--   Several methods to identify peaks and valleys in histograms were tested.
-    -   See any algorithms starting with ‘HistValley’.
--   EdgeToEdgeLine function in pointPair structure was added.
-    -   Line is defined in terms of an edge-to-edge pair of points.
+-   Over 2000 algorithms are included, averaging 32 lines of code per algorithm.
+-   Last month’s horizon and gravity vectors are now faster and more robust.
+    -   See last month’s update at the bottom of this document.
+-   RedCloud cell stats and depth histogram can be displayed at any time.
+    -   See the RedCloud option “Display Cell Stats” whenever RedCloud is active.
+    -   An example of “Display Cell Stats" is shown below in “Bin3Way_RedCloud”.
+-   LinearRegression.vb – simple linear regression – was added with several demos.
+-   RedCloud output can be natural colors – computed from the cell’s RGB data.
+-   RedCloud 3D cell data can be shown in OpenGL – see OpenGL_ColorBin4Way.
+-   Global options control whether RedCloud cells are highlighted and identified.
+-   Features_LeftRight finds features the left and right images.
+-   FeatureLess_Basics was added to the list of possible inputs to RedCloud.
+-   Cell_Generate reused cell features for exact matches – less work, same result.
+-   Cells with motion are now identified providing another way to detect motion.
 -   A log of previous changes is included at the bottom of this document.
 
-![A collage of images of a room Description automatically generated](media/36150778314078d8e16dfcde622cec21.png)
+![A collage of images of a person in a room Description automatically generated](media/a18bd533a52c859d195439cb4fabc6f1.png)
 
-**Line_Gravity:** *The bottom right image shows all the lines detected in the image. The bottom left image shows the vertical lines in yellow and the horizontal lines in red. The vertical lines are aligned to the gravity vector and the horizontal lines are aligned with the horizon vector. The method to find the gravity vector is to locate two points where the X-values in the point cloud transition from negative to positive. Similarly, the horizon vector is defined by 2 points where the Y-values in the point cloud transition from negative to positive. Because the point cloud is aligned with the color image, the horizon and gravity vectors are defined in the image coordinate system. The camera is deliberately tilted for this example but both vectors move as the camera moves.*
+**Bin4Way_Basics:** *The objective of this algorithm is to break down the various brightness levels. The lower left frame shows 4 levels – darkest to lightest. The upper right frame shows a grid layout of the selected brightness – darkest to lightest. The currently selected frame contains all the pixels that are the darkest. The lower right frame breaks down each 4 brightness levels in the selected grid element in the upper right frame. The number of pixels, contours, brightness level, and a measure of volatility are displayed with each breakdown of the grid element in the lower right frame.*
+
+![A collage of images of a room Description automatically generated](media/41d5af9a9a6b649c81cbb837cb95dab4.png)
+
+**Bin3Way_RedCloud:** *RedCloud is run against the darkest and the lightest frames in the Bin3Way_Basics algorithm. The cells identified are more consistent present than in other RedCloud algorithms that attempt to classify each pixel in the image. This algorithm produces fewer cells but they are more robust and stable. This sample output also shows the output for the global options to “Display Cell Stats”. The upper right frame shows the histogram of the depth for the selected cell while the lower right frame shows the statistics that are known for the selected cell.*
 
 # Introduction
 
@@ -1289,3 +1290,38 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A screenshot of a computer screen Description automatically generated](media/da280b898b238ab7490bfca8fc4abbfa.gif)
 
 **RedCloud_BasicsColor:** *The color input for RedCloud_BasicsColor and any other OpenCVB algorithm can be motion-filtered using a global option. The frame is only processed if there is scene motion. The objective is to improve the consistency of the cells produced which can be seen in the cells away from the motion – look to the right side of the image. Cells without motion are updated on a heartbeat (once a second.) There is little benefit to capturing cell perturbations when there is no motion in the color image for that cell. Motion-filtered color images often display artifacts from a previous frame but when the image data is already so variable from frame to frame, there is little downside to motion-filtering for image segmentation using depth and color. A new global option allows the motion rectangle to be displayed in the upper left image (in white.)*
+
+# Recent Changes – March 2024
+
+-   Over 1900 algorithms are included, averaging 31 lines of code per algorithm.
+-   Gravity and horizon vectors are now available in the image coordinates.
+    -   See example below to see what it looks like.
+    -   The IMU code is now simplified and more responsive.
+-   RedCloud_Basics and Flood_Basics are now more stable and accurate.
+    -   Removing contours before flooding helped isolate cells better.
+    -   RedCloud cell statistics can now be shown any time.
+        -   See global option labelled ‘Display Cell stats’.
+    -   The rcData structure has been stripped of many low-use variables.
+-   Projection_Basics provides the distance to each object in the image.
+    -   Top X objects are found without thresholds – sorted by size.
+    -   See Projection_Top/Side for distance and size of objects.
+-   Flood.vb algorithms were improved and some algorithms were removed.
+-   Several methods to identify peaks and valleys in histograms were tested.
+    -   See any algorithms starting with ‘HistValley’.
+-   EdgeToEdgeLine function in pointPair structure was added.
+    -   Line is defined in terms of an edge-to-edge pair of points.
+-   A log of previous changes is included at the bottom of this document.
+
+![A collage of images of a room Description automatically generated](media/36150778314078d8e16dfcde622cec21.png)
+
+**Line_Gravity:** *The bottom right image shows all the lines detected in the image. The bottom left image shows the vertical lines in yellow and the horizontal lines in red. The vertical lines are aligned to the gravity vector and the horizontal lines are aligned with the horizon vector. The method to find the gravity vector is to locate two points where the X-values in the point cloud transition from negative to positive. Similarly, the horizon vector is defined by 2 points where the Y-values in the point cloud transition from negative to positive. Because the point cloud is aligned with the color image, the horizon and gravity vectors are defined in the image coordinate system. The camera is deliberately tilted for this example but both vectors move as the camera moves.*
+
+# Recent Changes – April 2024
+
+-   Over 1900 algorithms are included, averaging 31 lines of code per algorithm.
+-   Recently used algorithms are now accessible with the main toolbar “Recent” button.
+-   A log of previous changes is included at the bottom of this document.
+
+![A collage of images of a room Description automatically generated](media/36150778314078d8e16dfcde622cec21.png)
+
+**Line_Gravity:** *The bottom right image shows all the lines detected in the image. The bottom left image shows the vertical lines in yellow and the horizontal lines in red. The vertical lines are aligned to the gravity vector and the horizontal lines are aligned with the horizon vector. The method to find the gravity vector is to locate two points where the X-values in the point cloud transition from negative to positive. Similarly, the horizon vector is defined by 2 points where the Y-values in the point cloud transition from negative to positive. Because the point cloud is aligned with the color image, the horizon and gravity vectors are defined in the image coordinate system. The camera is deliberately tilted for this example but both vectors move as the camera moves.*
