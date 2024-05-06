@@ -374,6 +374,14 @@ Public Class Flood_LeftRight : Inherits VB_Algorithm
         mapRight = task.cellMap.Clone
 
         labels(3) = redRight.labels(3)
-        dst1 = task.rightView
+
+        If task.mousePicTag = 2 Then
+            setSelectedContour(cellsLeft, mapLeft)
+            task.color(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
+        Else
+            setSelectedContour(cellsRight, mapRight)
+            dst1 = task.rightView
+            dst1(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
+        End If
     End Sub
 End Class

@@ -10,19 +10,20 @@
 -   RedCloud output can be natural colors – computed from the cell’s RGB data.
 -   RedCloud 3D cell data can be shown in OpenGL – see OpenGL_ColorBin4Way.
 -   Global options control whether RedCloud cells are highlighted and identified.
--   Features_LeftRight finds features the left and right images.
+-   Features_LeftRight finds “good” features the left and right images.
 -   FeatureLess_Basics was added to the list of possible inputs to RedCloud.
--   Cell_Generate reused cell features for exact matches – less work, same result.
+    -   Each region without features is isolated and identified to RedCloud.
+-   Cell_Generate reuses cell features for exact matches – less work, same result.
 -   Cells with motion are now identified providing another way to detect motion.
 -   A log of previous changes is included at the bottom of this document.
 
 ![A collage of images of a person in a room Description automatically generated](media/a18bd533a52c859d195439cb4fabc6f1.png)
 
-**Bin4Way_Basics:** *The objective of this algorithm is to break down the various brightness levels. The lower left frame shows 4 levels – darkest to lightest. The upper right frame shows a grid layout of the selected brightness – darkest to lightest. The currently selected frame contains all the pixels that are the darkest. The lower right frame breaks down each 4 brightness levels in the selected grid element in the upper right frame. The number of pixels, contours, brightness level, and a measure of volatility are displayed with each breakdown of the grid element in the lower right frame.*
+**Bin4Way_Basics:** *The objective of this algorithm is to break down the various brightness levels. The lower left frame shows 4 levels – darkest to lightest. The upper right frame shows a grid layout of the selected brightness – darkest to lightest. The currently selected frame contains all the pixels that are the darkest. The lower right frame breaks down each of the 4 brightness levels in the selected grid element (highlighted with a rectangle) in the upper right frame. The number of pixels, contours, brightness level, and a measure of volatility are displayed with each breakdown of the grid element in the lower right frame.*
 
 ![A collage of images of a room Description automatically generated](media/41d5af9a9a6b649c81cbb837cb95dab4.png)
 
-**Bin3Way_RedCloud:** *RedCloud is run against the darkest and the lightest frames in the Bin3Way_Basics algorithm. The cells identified are more consistent present than in other RedCloud algorithms that attempt to classify each pixel in the image. This algorithm produces fewer cells but they are more robust and stable. This sample output also shows the output for the global options to “Display Cell Stats”. The upper right frame shows the histogram of the depth for the selected cell while the lower right frame shows the statistics that are known for the selected cell.*
+**Bin3Way_RedCloud:** *RedCloud is run against the darkest and the lightest frames in the Bin3Way_Basics algorithm. While there is more unclassified space in the lower right image, the cells identified are more consistently present than in other RedCloud algorithms that attempt to classify each pixel in the image. This algorithm produces fewer cells but they are more robust and stable. This sample output also shows the output for the global options to “Display Cell Stats”. The upper right frame shows the histogram of the depth for the selected cell while the lower right frame shows the statistics for the selected cell.*
 
 # Introduction
 

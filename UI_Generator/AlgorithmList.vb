@@ -613,6 +613,7 @@ if algorithmName = "Feature_KNNBasics" Then return new Feature_KNNBasics
 if algorithmName = "Feature_KNNSimple" Then return new Feature_KNNSimple
 if algorithmName = "Feature_LeftRight" Then return new Feature_LeftRight
 if algorithmName = "Feature_LeftRightCollect" Then return new Feature_LeftRightCollect
+if algorithmName = "Feature_LeftRightMatch" Then return new Feature_LeftRightMatch
 if algorithmName = "Feature_Line" Then return new Feature_Line
 if algorithmName = "Feature_Lines" Then return new Feature_Lines
 if algorithmName = "Feature_Lines_Tutorial1" Then return new Feature_Lines_Tutorial1

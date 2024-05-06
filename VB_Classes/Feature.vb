@@ -1817,3 +1817,23 @@ Public Class Feature_LeftRightCollect : Inherits VB_Algorithm
         Next
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Feature_LeftRightMatch : Inherits VB_Algorithm
+    Dim collect As New Feature_LeftRightCollect
+    Public Sub New()
+        desc = "Match cells in the left and right images using features"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        collect.Run(src)
+        dst1 = collect.dst1
+        dst2 = collect.dst2
+        dst3 = collect.dst3
+        labels = collect.labels
+    End Sub
+End Class
