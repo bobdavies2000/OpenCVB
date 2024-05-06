@@ -11,7 +11,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.optionsChanged Or classifier Is Nothing Then
-            Static colorMethods() As Object = {New BackProject_Full, New Bin4Way_Regions, New Binarize_DepthTiers, New FeatureLess_Basics,
+            Static colorMethods() As Object = {New BackProject_Full, New Bin4Way_Regions, New Binarize_DepthTiers, New FeatureLess_Groups,
                                                New Hist3Dcolor_Basics, New KMeans_Basics, New LUT_Basics, New Reduction_Basics}
 
             classifier = colorMethods(redOptions.colorInputIndex)

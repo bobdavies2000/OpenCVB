@@ -1016,18 +1016,18 @@ End Class
 
 Public Class PointCloud_ReducedTopView : Inherits VB_Algorithm
     Dim split2 As New PointCloud_ReduceSplit2
-    Dim histOutput As New cv.Mat
     Public Sub New()
+        vbAddAdvice(traceName + ": redOptions 'Reduction Sliders' have high impact.")
         desc = "Create a stable side view of the point cloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        split2.Run(src)
+        split2.Run(task.pointCloud)
 
-        cv.Cv2.CalcHist({split2.dst3}, task.channelsTop, New cv.Mat, histOutput, 2, task.bins2D, task.rangesTop)
+        cv.Cv2.CalcHist({split2.dst3}, task.channelsTop, New cv.Mat, dst1, 2, task.bins2D, task.rangesTop)
 
-        histOutput = histOutput.Flip(cv.FlipMode.X)
-        dst2 = histOutput.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
+        dst1 = dst1.Flip(cv.FlipMode.X)
+        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
     End Sub
 End Class
 
@@ -1038,15 +1038,43 @@ End Class
 Public Class PointCloud_ReducedSideView : Inherits VB_Algorithm
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
+        vbAddAdvice(traceName + ": redOptions 'Reduction Sliders' have high impact.")
         desc = "Show where vertical neighbor depth values are within X mm's"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        split2.Run(src)
+        split2.Run(Nothing)
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.maxZmeters)}
-        cv.Cv2.CalcHist({dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
+        cv.Cv2.CalcHist({split2.dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
+
+        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
+    End Sub
+End Class
+
+
+
+
+
+Public Class PointCloud_ReducedViews : Inherits VB_Algorithm
+    Dim split2 As New PointCloud_ReduceSplit2
+    Public Sub New()
+        vbAddAdvice(traceName + ": redOptions 'Reduction Sliders' have high impact.")
+        labels = {"", "", "Reduced side view", "Reduced top view"}
+        desc = "Show where vertical neighbor depth values are within X mm's"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        split2.Run(Nothing)
+
+        cv.Cv2.CalcHist({split2.dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
 
         dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
+
+        cv.Cv2.CalcHist({split2.dst3}, task.channelsTop, New cv.Mat, dst1, 2, task.bins2D, task.rangesTop)
+
+        dst1 = dst1.Flip(cv.FlipMode.X)
+        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1.ConvertTo(dst3, cv.MatType.CV_8UC1)
     End Sub
 End Class

@@ -252,3 +252,27 @@ Public Class FeatureLess_RedCloud : Inherits VB_Algorithm
         labels(2) = redC.labels(2)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class FeatureLess_Groups : Inherits VB_Algorithm
+    Dim redCPP As New RedCloud_CPP
+    Dim fless As New FeatureLess_Basics
+    Public classCount As Integer
+    Public Sub New()
+        desc = "Group RedCloud cells by the value of their featureless maxDist"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        fless.Run(src)
+        dst2 = fless.dst2
+        labels(2) = fless.labels(2)
+
+        redCPP.Run(dst2)
+        classCount = redCPP.classCount
+        dst3 = redCPP.dst2
+        labels(3) = CStr(classCount) + " featureless regions were found."
+    End Sub
+End Class

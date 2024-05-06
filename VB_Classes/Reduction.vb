@@ -2,6 +2,8 @@ Imports cv = OpenCvSharp
 Public Class Reduction_Basics : Inherits VB_Algorithm
     Public classCount As Integer
     Public Sub New()
+        redOptions.ReductionTypeGroup.Enabled = True
+        redOptions.ReductionSliders.Enabled = True
         desc = "Reduction: a simpler way to KMeans by reducing color resolution"
     End Sub
     Public Sub RunVB(src As cv.Mat)

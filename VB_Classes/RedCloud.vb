@@ -2679,27 +2679,3 @@ Public Class RedCloud_JoinCells : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class RedCloud_FeaturelessGroups : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
-    Dim fless As New FeatureLess_Basics
-    Public Sub New()
-        desc = "Group RedCloud cells by the value of their featureless maxDist"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        fless.Run(src)
-        redC.Run(fless.dst2)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        Dim newCells As New List(Of rcData)
-        For Each rc In task.redCells
-
-        Next
-    End Sub
-End Class
