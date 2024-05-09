@@ -65,8 +65,6 @@ Partial Class OptionsContainer
         Me.Controls.Add(Me.ToolStrip1)
         Me.IsMdiContainer = True
         Me.Margin = New System.Windows.Forms.Padding(2)
-        Me.MaximizeBox = False
-        Me.MinimizeBox = False
         Me.Name = "OptionsContainer"
         Me.Text = "OpenCVB Algorithm Options"
         Me.ToolStrip1.ResumeLayout(False)
