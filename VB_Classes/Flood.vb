@@ -354,26 +354,24 @@ Public Class Flood_LeftRight : Inherits VB_Algorithm
 
         redLeft.genCells.useLeftImage = True
         redLeft.Run(task.leftView)
+        labels(2) = redLeft.labels(2)
 
         dst2 = redLeft.dst2
 
         cellsLeft = New List(Of rcData)(task.redCells)
         mapLeft = task.cellMap.Clone
 
-        labels(2) = redLeft.labels(3)
-
         task.redCells = New List(Of rcData)(cellsRight)
         task.cellMap = mapRight.Clone
 
         redRight.genCells.useLeftImage = False
         redRight.Run(task.rightView)
+        labels(3) = redRight.labels(2)
 
         dst3 = redRight.dst2
 
         cellsRight = New List(Of rcData)(task.redCells)
         mapRight = task.cellMap.Clone
-
-        labels(3) = redRight.labels(3)
 
         If task.mousePicTag = 2 Then
             setSelectedContour(cellsLeft, mapLeft)

@@ -129,6 +129,7 @@
     <Compile Include="Derivative.vb" />
     <Compile Include="Duster.vb" />
     <Compile Include="Gravity.vb" />
+    <Compile Include="GrayToColor.vb" />
     <Compile Include="Horizon.vb" />
     <Compile Include="LinearRegression.vb" />
     <Compile Include="LineCoin.vb" />

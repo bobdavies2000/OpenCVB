@@ -6,6 +6,7 @@ Public Class LUT_Basics : Inherits VB_Algorithm
     Public classCount As Integer
     Dim options As New Options_LUT
     Public Sub New()
+        labels(3) = "Palettized version of dst2"
         desc = "Divide the image into n-segments controlled with a slider."
     End Sub
     Public Sub RunVB(src As cv.Mat)

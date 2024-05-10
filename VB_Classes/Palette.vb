@@ -1,8 +1,5 @@
 Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
 Imports System.IO
-Imports System.Drawing.Imaging
-
 Public Class Palette_Basics : Inherits VB_Algorithm
     Public whitebackground As Boolean
     Public Sub New()
@@ -510,5 +507,45 @@ Public Class Palette_CustomColorMap : Inherits VB_Algorithm
         End If
         cv.Cv2.ApplyColorMap(src, dst2, colorMap)
         If standalone Then dst3 = colorMap.Resize(dst3.Size)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Palette_GrayToColor : Inherits VB_Algorithm
+    Public Sub New()
+        desc = "Build a palette for the current image using samples from each gray level.  Everything turns out sepia-like."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Dim pixels As New List(Of Byte)
+        Dim colors As New SortedList(Of Byte, cv.Vec3b)
+        For y = 0 To dst2.Height - 1
+            For x = 0 To dst2.Width - 1
+                Dim val = dst2.Get(Of Byte)(y, x)
+                Dim color = src.Get(Of cv.Vec3b)(y, x)
+                If pixels.Contains(val) = False Then
+                    pixels.Add(val)
+                    colors.Add(val, color)
+                Else
+                    Dim sum = CInt(color(0)) + CInt(color(1)) + CInt(color(2))
+                    Dim index = colors.Keys.IndexOf(val)
+                    Dim lastColor = colors.ElementAt(index).Value
+                    Dim lastSum = CInt(lastColor(0)) + CInt(lastColor(1)) + CInt(lastColor(2))
+                    If sum > lastSum Then
+                        colors.RemoveAt(index)
+                        colors.Add(val, color)
+                    End If
+                End If
+            Next
+        Next
+
+        Dim ColorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, colors.Values.ToArray)
+        cv.Cv2.ApplyColorMap(src, dst2, ColorMap)
     End Sub
 End Class

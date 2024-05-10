@@ -362,7 +362,7 @@ Public Class Cell_Generate : Inherits VB_Algorithm
     Public rectData As cv.Mat
     Public floodPointData As cv.Mat
     Public removeContour As Boolean
-    Dim diff As New Diff_Basics
+    Dim diffLeft As New Diff_Basics
     Dim diffRight As New Diff_Basics
     Public useLeftImage As Boolean = True
     Public Sub New()
@@ -389,7 +389,7 @@ Public Class Cell_Generate : Inherits VB_Algorithm
             src = redCPP.dst2
         End If
 
-        If useLeftImage Then diff.Run(task.color) Else diffRight.Run(task.rightView)
+        If useLeftImage Then diffLeft.Run(task.leftView) Else diffRight.Run(task.rightView)
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         Dim usedColors As New List(Of cv.Vec3b)({black})
@@ -417,7 +417,7 @@ Public Class Cell_Generate : Inherits VB_Algorithm
 
             rc.maxDist = vbGetMaxDist(rc)
             rc.indexLast = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            If useLeftImage Then rc.motionPixels = diff.dst2(rc.rect).CountNonZero Else rc.motionPixels = diffRight.dst2(rc.rect).CountNonZero
+            If useLeftImage Then rc.motionPixels = diffLeft.dst2(rc.rect).CountNonZero Else rc.motionPixels = diffRight.dst2(rc.rect).CountNonZero
             If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
                 Dim lrc = task.redCells(rc.indexLast)
                 If (task.heartBeat = False Or firstPass) And Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 And rc.motionPixels = 0 Then

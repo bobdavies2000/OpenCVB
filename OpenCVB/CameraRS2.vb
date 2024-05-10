@@ -73,8 +73,10 @@ Public Class CameraRS2 : Inherits Camera
         SyncLock cameraLock
             Dim cols = workingRes.Width, rows = workingRes.Height
             mbuf(mbIndex).color = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, RS2Color(cPtr)).Clone
-            mbuf(mbIndex).leftView = New cv.Mat(rows, cols, cv.MatType.CV_8U, RS2LeftRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            mbuf(mbIndex).rightView = New cv.Mat(rows, cols, cv.MatType.CV_8U, RS2RightRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            Dim tmp As cv.Mat = New cv.Mat(rows, cols, cv.MatType.CV_8U, RS2LeftRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            mbuf(mbIndex).leftView = tmp * 4 - 35 ' improved brightness specific to RealSense
+            tmp = New cv.Mat(rows, cols, cv.MatType.CV_8U, RS2RightRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            mbuf(mbIndex).rightView = tmp * 4 - 35 ' improved brightness specific to RealSense
             If captureRes <> workingRes Then
                 Dim pc = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, RS2PointCloud(cPtr))
                 mbuf(mbIndex).pointCloud = pc.Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
