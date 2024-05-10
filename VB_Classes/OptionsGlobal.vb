@@ -53,6 +53,12 @@ Public Class OptionsGlobal
         RGBFilterList.Items.Add("PhotoShop_WhiteBalance")
         RGBFilterList.SelectedIndex = 0
 
+        HighlightColor.Items.Add("Yellow")
+        HighlightColor.Items.Add("Black")
+        HighlightColor.Items.Add("White")
+        HighlightColor.Items.Add("Red")
+        HighlightColor.SelectedIndex = 0
+
         ShowAllOptions.Checked = GetSetting("OpenCVB", "ShowAllOptions", "ShowAllOptions", False)
 
         task.dotSize = 1
@@ -226,9 +232,6 @@ Public Class OptionsGlobal
         If task IsNot Nothing Then task.optionsChanged = True
         labelBinsCount.Text = CStr(HistBinSlider.Value)
     End Sub
-    Private Sub useFilter_CheckedChanged(sender As Object, e As EventArgs) Handles RGBFilterActive.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
-    End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
@@ -289,5 +292,20 @@ Public Class OptionsGlobal
     End Sub
     Private Sub DustFree_CheckedChanged(sender As Object, e As EventArgs)
         If task IsNot Nothing Then task.optionsChanged = True
+    End Sub
+    Private Sub useFilter_CheckedChanged(sender As Object, e As EventArgs) Handles RGBFilterActive.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+    End Sub
+    Private Sub HighlightColor_SelectedIndexChanged(sender As Object, e As EventArgs) Handles HighlightColor.SelectedIndexChanged
+        Select Case HighlightColor.Text
+            Case "Yellow"
+                task.highlightColor = cv.Scalar.Yellow
+            Case "Black"
+                task.highlightColor = cv.Scalar.Black
+            Case "White"
+                task.highlightColor = cv.Scalar.White
+            Case "Red"
+                task.highlightColor = cv.Scalar.Red
+        End Select
     End Sub
 End Class

@@ -213,7 +213,6 @@ Public Class VBtask : Implements IDisposable
     Public OpenGLTitle As String
     Public oglRect As cv.Rect
     Public polyCount As Integer
-    Public highlightColors() As cv.Scalar = {cv.Scalar.Yellow, cv.Scalar.White, cv.Scalar.Blue, cv.Scalar.Gray, cv.Scalar.Red, cv.Scalar.Green}
 
     Public gifCreator As Gif_OpenCVB
     Public gifImages As New List(Of Bitmap)
@@ -565,7 +564,6 @@ Public Class VBtask : Implements IDisposable
             task.depthRGB = colorizer.dst2.Resize(task.color.Size)
 
             TaskTimer.Enabled = True
-            task.highlightColor = highlightColors(0)
 
             If gOptions.CreateGif.Checked Then
                 If task.gifCreator Is Nothing Then task.gifCreator = New Gif_OpenCVB

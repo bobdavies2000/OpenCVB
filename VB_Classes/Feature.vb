@@ -1347,7 +1347,7 @@ Public Class Feature_Grid : Inherits VB_Algorithm
         src.CopyTo(dst2)
         dst3.SetTo(0)
         For Each pt In corners
-            dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
             dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
         labels(2) = "Found " + CStr(corners.Count) + " points with quality = " + CStr(options.quality) +
