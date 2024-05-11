@@ -1750,128 +1750,18 @@ End Class
 
 
 
+
+
+
 Public Class Feature_LeftRight : Inherits VB_Algorithm
-    Public feat As New Feature_Basics
-    Public featLeft As New List(Of cv.Point2f)
-    Public featRight As New List(Of cv.Point2f)
+    Dim match As New MatchCells_Features
     Public Sub New()
-        labels(3) = "Right image with matched points"
-        desc = "Find GoodFeatures in the left and right images"
+        desc = "Placeholder to make it easier to find MatchCells_Features"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        feat.Run(task.leftView)
-        dst2 = task.leftView
-        Dim tmpLeft = New List(Of cv.Point2f)(task.features)
-
-        feat.Run(task.rightView)
-        dst3 = task.rightView
-        Dim tmpRight = New List(Of cv.Point2f)(task.features)
-
-        Dim leftY As New List(Of Integer)
-        For Each pt In tmpLeft
-            leftY.Add(pt.Y)
-        Next
-
-        Dim rightY As New List(Of Integer)
-        For Each pt In tmpRight
-            rightY.Add(pt.Y)
-        Next
-
-        featLeft.Clear()
-        featRight.Clear()
-
-        For i = 0 To leftY.Count - 1
-            If rightY.Contains(leftY(i)) Then
-                featLeft.Add(tmpLeft(i))
-                Dim index = rightY.IndexOf(leftY(i))
-                featRight.Add(tmpRight(index))
-            End If
-        Next
-
-        For Each pt In featLeft
-            dst2.Circle(pt, task.dotSize + 1, task.highlightColor, -1, task.lineType)
-        Next
-
-        For Each pt In featRight
-            dst3.Circle(pt, task.dotSize + 1, task.highlightColor, -1, task.lineType)
-        Next
-
-        labels(2) = "Found " + CStr(featLeft.Count) + " features in the left Image with matching points in the right image"
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Feature_LeftRightCollect : Inherits VB_Algorithm
-    Public feat As New Feature_LeftRight
-    Public redC As New Flood_LeftRight
-    Public Sub New()
-        desc = "Match RedCloud cells in left and right images using features"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst1 = redC.dst1
-        dst2 = redC.dst2
-        dst3 = redC.dst3
-
-        feat.Run(src)
-
-        For i = 0 To redC.cellsLeft.Count - 1
-            redC.cellsLeft(i).features.Clear()
-        Next
-
-        For Each pt In feat.featLeft
-            Dim index = redC.mapLeft.Get(Of Byte)(pt.Y, pt.X)
-            redC.cellsLeft(index).features.Add(New cv.Point(pt.X, pt.Y))
-        Next
-
-        For i = 0 To redC.cellsRight.Count - 1
-            redC.cellsRight(i).features.Clear()
-        Next
-
-        For Each pt In feat.featRight
-            Dim index = redC.mapRight.Get(Of Byte)(pt.Y, pt.X)
-            redC.cellsRight(index).features.Add(New cv.Point(pt.X, pt.Y))
-        Next
-
-        For Each rc In redC.cellsLeft
-            For Each pt In rc.features
-                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-            Next
-        Next
-
-        For Each rc In redC.cellsRight
-            For Each pt In rc.features
-                dst3.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-            Next
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Feature_LeftRightMatch : Inherits VB_Algorithm
-    Dim collect As New Feature_LeftRightCollect
-    Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        desc = "Match cells in the left and right images using features"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        collect.Run(src)
-        dst1 = collect.dst1
-        dst2 = collect.dst2
-        dst3 = collect.dst3
-
-        Dim count = If(task.mousePicTag = 2, collect.feat.featLeft.Count, collect.feat.featRight.Count)
-        labels(2) = collect.redC.labels(2) + " with " + CStr(count) + " feature identified"
-
-
+        match.Run(src)
+        dst2 = match.dst2
+        dst3 = match.dst3
+        labels = match.labels
     End Sub
 End Class

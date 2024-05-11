@@ -133,6 +133,7 @@
     <Compile Include="Horizon.vb" />
     <Compile Include="LinearRegression.vb" />
     <Compile Include="LineCoin.vb" />
+    <Compile Include="MatchCells.vb" />
     <Compile Include="MatchLine.vb" />
     <Compile Include="MatchRect.vb" />
     <Compile Include="OEX.vb" />
