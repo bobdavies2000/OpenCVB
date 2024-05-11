@@ -1,20 +1,20 @@
 ﻿Imports cv = OpenCvSharp
 Public Class MatchCells_Basics : Inherits VB_Algorithm
     Public feat As New Feature_Basics
-    Public redC As New Flood_LeftRight
+    Public flood As New Flood_LeftRight
     Public Sub New()
         desc = "Match RedCloud cells in left and right images using features"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        dst3 = redC.dst3
+        flood.Run(src)
+        dst2 = flood.dst2
+        dst3 = flood.dst3
 
         Dim leftY As New List(Of Integer), rightY As New List(Of Integer)
         Dim leftIndex As New List(Of Integer), rightIndex As New List(Of Integer)
         Dim leftPT As New List(Of cv.Point2f), rightPT As New List(Of cv.Point2f)
-        For i = 0 To redC.cellsLeft.Count - 1
-            Dim rc = redC.cellsLeft(i)
+        For i = 0 To flood.cellsLeft.Count - 1
+            Dim rc = flood.cellsLeft(i)
             feat.Run(src(rc.rect))
             For Each pt In task.features
                 If leftPT.Contains(pt) = False Then
@@ -25,8 +25,8 @@ Public Class MatchCells_Basics : Inherits VB_Algorithm
             Next
         Next
 
-        For i = 0 To redC.cellsRight.Count - 1
-            Dim rc = redC.cellsRight(i)
+        For i = 0 To flood.cellsRight.Count - 1
+            Dim rc = flood.cellsRight(i)
             feat.Run(src(rc.rect))
             For Each pt In task.features
                 If rightPT.Contains(pt) = False Then
@@ -35,29 +35,43 @@ Public Class MatchCells_Basics : Inherits VB_Algorithm
                     rightIndex.Add(i)
                 End If
             Next
-            redC.cellsRight(i) = rc
+            flood.cellsRight(i) = rc
         Next
 
         Dim hitCount As Integer
         For i = 0 To leftY.Count - 1
             If rightY.Contains(leftY(i)) Then
-                hitCount += 1
-                Dim rc = redC.cellsLeft(leftIndex(i))
+                Dim rcL = flood.cellsLeft(leftIndex(i))
                 Dim pt = leftPT(leftIndex(i))
-                If rc.features.Contains(pt) = False Then
-                    rc.features.Add(pt)
-                    redC.cellsLeft(leftIndex(i)) = rc
+                If rcL.features.Contains(pt) = False Then
+                    hitCount += 1
+                    rcL.features.Add(pt)
                 End If
 
                 Dim index = rightY.IndexOf(leftY(i))
-                rc = redC.cellsRight(rightIndex(index))
+                Dim rcR = flood.cellsRight(rightIndex(index))
                 pt = rightPT(rightIndex(index))
-                If rc.features.Contains(pt) = False Then
-                    rc.features.Add(pt)
-                    redC.cellsRight(rightIndex(index)) = rc
+                If rcR.features.Contains(pt) = False Then
+                    hitCount += 1
+                    rcR.features.Add(pt)
+                    flood.cellsRight(rightIndex(index)) = rcR
+                    rcL.matchCandidates.Add(rcR.index)
                 End If
+                flood.cellsLeft(leftIndex(i)) = rcL
             End If
         Next
+
+        If task.mousePicTag = 2 Then
+            setSelectedContour(flood.cellsLeft, flood.mapLeft)
+            dst2(task.rc.rect).SetTo(task.highlightColor, task.rc.mask)
+
+            For Each index In task.rc.matchCandidates
+                Dim rc = flood.cellsRight(index)
+                dst3(rc.rect).SetTo(task.highlightColor, rc.mask)
+            Next
+            labels(3) = "There are " + CStr(task.rc.matchCandidates.Count) + " potential matches in the right view."
+        End If
+
         labels(2) = CStr(hitCount) + " features were found in both left and right cells."
     End Sub
 End Class
