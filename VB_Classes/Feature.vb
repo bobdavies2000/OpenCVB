@@ -1315,7 +1315,7 @@ Public Class Feature_Grid : Inherits VB_Algorithm
     Public corners As New List(Of cv.Point2f)
     Public options As New Options_Features
     Public Sub New()
-        findSlider("Feature Sample Size").Value = 1
+        findSlider("Feature Sample Size").Value = 4
         desc = "Find good features to track in each roi of the task.gridList"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1755,24 +1755,48 @@ Public Class Feature_LeftRight : Inherits VB_Algorithm
     Public featLeft As New List(Of cv.Point2f)
     Public featRight As New List(Of cv.Point2f)
     Public Sub New()
+        labels(3) = "Right image with matched points"
         desc = "Find GoodFeatures in the left and right images"
-        labels(2) = "Left Image"
-        labels(3) = "Right Image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         feat.Run(task.leftView)
         dst2 = task.leftView
-        For i = 0 To task.features.Count - 1
-            dst2.Circle(task.features(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
-        Next
-        featLeft = New List(Of cv.Point2f)(task.features)
+        Dim tmpLeft = New List(Of cv.Point2f)(task.features)
 
         feat.Run(task.rightView)
         dst3 = task.rightView
-        For i = 0 To task.features.Count - 1
-            dst3.Circle(task.features(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
+        Dim tmpRight = New List(Of cv.Point2f)(task.features)
+
+        Dim leftY As New List(Of Integer)
+        For Each pt In tmpLeft
+            leftY.Add(pt.Y)
         Next
-        featRight = New List(Of cv.Point2f)(task.features)
+
+        Dim rightY As New List(Of Integer)
+        For Each pt In tmpRight
+            rightY.Add(pt.Y)
+        Next
+
+        featLeft.Clear()
+        featRight.Clear()
+
+        For i = 0 To leftY.Count - 1
+            If rightY.Contains(leftY(i)) Then
+                featLeft.Add(tmpLeft(i))
+                Dim index = rightY.IndexOf(leftY(i))
+                featRight.Add(tmpRight(index))
+            End If
+        Next
+
+        For Each pt In featLeft
+            dst2.Circle(pt, task.dotSize + 1, task.highlightColor, -1, task.lineType)
+        Next
+
+        For Each pt In featRight
+            dst3.Circle(pt, task.dotSize + 1, task.highlightColor, -1, task.lineType)
+        Next
+
+        labels(2) = "Found " + CStr(featLeft.Count) + " features in the left Image with matching points in the right image"
     End Sub
 End Class
 
