@@ -879,6 +879,7 @@ End Class
 
 Public Class FeatureMatch_LeftRightNew : Inherits VB_Algorithm
     Dim feat As New Feature_Basics
+    Dim lrHist As New FeatureMatch_LeftRightHist
     Public leftFeatures As New List(Of List(Of cv.Point))
     Public rightFeatures As New List(Of List(Of cv.Point))
     Public Sub New()
@@ -952,61 +953,65 @@ End Class
 
 
 Public Class FeatureMatch_LeftRightHist : Inherits VB_Algorithm
-    Dim lrFeat As New FeatureMatch_LeftRightNew
-    Public leftFeatures As New List(Of List(Of cv.Point))
-    Public rightFeatures As New List(Of List(Of cv.Point))
+    Dim feat As New Feature_Basics
+    Public leftPoints As New List(Of cv.Point)
+    Public rightPoints As New List(Of cv.Point)
     Public Sub New()
-        desc = "Use a history of features for the left and right images to isolate the consistent features"
+        desc = "Keep only the features that have been around for the specified number of frames."
     End Sub
+    Public Function displayFeatures(dst As cv.Mat, features As List(Of cv.Point)) As cv.Mat
+        For Each pt In features
+            dst.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
+        Return dst
+    End Function
     Public Sub RunVB(src As cv.Mat)
-        lrFeat.Run(src)
-
-        Static leftHist As New List(Of List(Of List(Of cv.Point)))
-        Static rightHist As New List(Of List(Of List(Of cv.Point)))
-
-        leftFeatures.Clear()
-        rightFeatures.Clear()
-
-        Dim leftCount As Integer
-        For Each ptList In lrFeat.leftFeatures
-            Dim keeperList As New List(Of cv.Point)
-            For Each pt In ptList
-                For Each histList In leftHist
-                    For Each ptHist In histList
-                        If ptHist.Contains(pt) Then keeperList.Add(pt)
-                    Next
-                Next
-            Next
-            leftFeatures.Add(keeperList)
-            leftCount += keeperList.Count
+        feat.Run(task.leftView)
+        Dim tmpLeft As New List(Of cv.Point)
+        For Each pt In task.features
+            tmpLeft.Add(New cv.Point(pt.X, pt.Y))
         Next
 
-        leftHist.Add(lrFeat.leftFeatures)
-        If leftHist.Count >= gOptions.FrameHistory.Value Then leftHist.RemoveAt(0)
-
-        Dim rightCount As Integer
-        For Each ptList In lrFeat.rightFeatures
-            Dim keeperList As New List(Of cv.Point)
-            For Each pt In ptList
-                For Each histList In rightHist
-                    For Each ptHist In histList
-                        If ptHist.Contains(pt) Then keeperList.Add(pt)
-                    Next
-                Next
-            Next
-            rightFeatures.Add(keeperList)
-            rightCount += keeperList.Count
+        feat.Run(task.rightView)
+        Dim tmpRight As New List(Of cv.Point)
+        For Each pt In task.features
+            tmpRight.Add(New cv.Point(pt.X, pt.Y))
         Next
 
-        rightHist.Add(lrFeat.rightFeatures)
-        If rightHist.Count >= gOptions.FrameHistory.Value Then rightHist.RemoveAt(0)
+        Static leftHist As New List(Of List(Of cv.Point))({tmpLeft})
+        Static rightHist As New List(Of List(Of cv.Point))({tmpRight})
 
-        dst2 = lrFeat.displayFeatures(task.leftView.Clone, leftFeatures)
-        dst3 = lrFeat.displayFeatures(task.rightView.Clone, rightFeatures)
+        leftPoints.Clear()
+        For Each pt In tmpLeft
+            Dim count As Integer = 0
+            For Each hist In leftHist
+                If hist.Contains(pt) Then count += 1 Else Exit For
+            Next
+            If count = leftHist.Count Then leftPoints.Add(pt)
+        Next
+
+        rightPoints.Clear()
+        For Each pt In tmpRight
+            Dim count As Integer = 0
+            For Each hist In rightHist
+                If hist.Contains(pt) Then count += 1 Else Exit For
+            Next
+            If count = rightHist.Count Then rightPoints.Add(pt)
+        Next
+
+        dst2 = displayFeatures(task.leftView.Clone, leftPoints)
+        dst3 = displayFeatures(task.rightView.Clone, rightPoints)
+
+        leftHist.Add(tmpLeft)
+        rightHist.Add(tmpRight)
+
+        Dim threshold = gOptions.FrameHistory.Value
+        If leftHist.Count >= threshold Then leftHist.RemoveAt(0)
+        If rightHist.Count >= threshold Then rightHist.RemoveAt(0)
 
         If task.heartBeat Then
-            labels(2) = CStr(leftCount) + " detected in the left image that have matches in the right image"
-            labels(3) = CStr(rightCount) + " detected in the right image that have matches in the left image"
+            labels(2) = CStr(leftPoints.Count) + " detected in the left image that have matches in " + CStr(threshold) + " previous frames"
+            labels(3) = CStr(rightPoints.Count) + " detected in the right image that have matches in " + CStr(threshold) + " previous frames"
         End If
     End Sub
 End Class
