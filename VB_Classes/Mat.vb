@@ -413,17 +413,10 @@ Public Class Mat_4Click : Inherits VB_Algorithm
         dst2 = mats.dst2.Clone
         If standaloneTest() Then mats.defaultMats(src)
         If firstPass Then
-            task.mouseClickFlag = True
             task.clickPoint = New cv.Point(0, 0)
             task.mousePicTag = RESULT_DST2
         End If
 
-        If standaloneTest() Then mats.defaultMats(src)
-        If firstPass Then
-            task.mouseClickFlag = True
-            task.clickPoint = New cv.Point(0, 0)
-            task.mousePicTag = RESULT_DST2
-        End If
         If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then
             If task.clickPoint.Y < dst2.Rows / 2 Then
                 quadrant = If(task.clickPoint.X < task.workingRes.Width / 2, RESULT_DST0, RESULT_DST1)

@@ -38,42 +38,6 @@ End Class
 
 
 
-Public Class RedCloud_BasicsTest : Inherits VB_Algorithm
-    Dim redCPP As New RedCloud_CPP
-    Public genCells As New Cell_Generate
-    Public inputMask As cv.Mat
-    Public Sub New()
-        redOptions.IdentifyCells.Checked = True
-        inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        vbAddAdvice(traceName + ": use the RedCloud algorithm panel." + vbCrLf + "(Behind the global options)")
-        desc = "Find cells and then match them to the previous generation"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static colorC As New Color_Basics
-        colorC.Run(src)
-        src = colorC.dst2
-
-        redCPP.inputMask = inputMask
-        redCPP.Run(src)
-        If redCPP.classCount = 0 Then Exit Sub ' no data to process.
-
-        genCells.classCount = redCPP.classCount
-        genCells.rectData = redCPP.rectData
-        genCells.floodPointData = redCPP.floodPointData
-        genCells.removeContour = False
-        genCells.Run(redCPP.dst2)
-
-        dst2 = genCells.dst2
-
-        setSelectedContour()
-        labels(2) = genCells.labels(2)
-    End Sub
-End Class
-
-
-
-
-
 Public Class RedCloud_Reduction : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
     Public Sub New()
