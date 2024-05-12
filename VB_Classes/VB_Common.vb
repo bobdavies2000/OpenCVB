@@ -835,8 +835,9 @@ Public Class rcData
     Public motionPixels As Integer
 
     Public features As New List(Of cv.Point)
-    Public featurePair As New SortedList(Of Integer, pointPair)
-    Public matchCandidates As New SortedList(Of Integer, Integer)
+    Public featurePair As New List(Of pointPair)
+    Public matchCandidatesSorted As New SortedList(Of Integer, Integer)
+    Public matchCandidates As New List(Of Integer)
 
     ' transition these...
     Public nabs As New List(Of Integer)

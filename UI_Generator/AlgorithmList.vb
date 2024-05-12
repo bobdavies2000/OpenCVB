@@ -1115,6 +1115,7 @@ if algorithmName = "Match_TraceRedC" Then return new Match_TraceRedC
 if algorithmName = "MatchCells_Basics" Then return new MatchCells_Basics
 if algorithmName = "MatchCells_Basics1" Then return new MatchCells_Basics1
 if algorithmName = "MatchCells_CellFeatures" Then return new MatchCells_CellFeatures
+if algorithmName = "MatchCells_CellFeaturesBad" Then return new MatchCells_CellFeaturesBad
 if algorithmName = "MatchCells_Features" Then return new MatchCells_Features
 if algorithmName = "MatchLine_Basics" Then return new MatchLine_Basics
 if algorithmName = "MatchLine_Gravity" Then return new MatchLine_Gravity
