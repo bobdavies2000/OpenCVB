@@ -207,7 +207,7 @@ Public Class OptionsGlobal
     Private Sub displayDst1_CheckedChanged(sender As Object, e As EventArgs) Handles displayDst1.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
-    Private Sub MaxRange_Scroll(sender As Object, e As EventArgs) Handles MaxDepth.Scroll
+    Private Sub MaxDepth_ValueChanged(sender As Object, e As EventArgs) Handles MaxDepth.ValueChanged
         maxCount.Text = CStr(MaxDepth.Value)
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub

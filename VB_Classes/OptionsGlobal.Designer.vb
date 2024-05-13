@@ -344,7 +344,7 @@ Partial Class OptionsGlobal
         '
         Me.MaxDepth.Location = New System.Drawing.Point(141, 19)
         Me.MaxDepth.Margin = New System.Windows.Forms.Padding(2)
-        Me.MaxDepth.Maximum = 15
+        Me.MaxDepth.Maximum = 25
         Me.MaxDepth.Minimum = 1
         Me.MaxDepth.Name = "MaxDepth"
         Me.MaxDepth.Size = New System.Drawing.Size(337, 45)

@@ -1309,51 +1309,7 @@ End Class
 
 
 
-' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_Grid : Inherits VB_Algorithm
-    Dim knn As New KNN_Core
-    Public corners As New List(Of cv.Point2f)
-    Public options As New Options_Features
-    Public Sub New()
-        findSlider("Feature Sample Size").Value = 4
-        desc = "Find good features to track in each roi of the task.gridList"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
 
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        corners.Clear()
-
-        For Each roi In task.gridList
-            Dim sampleSize = options.fOptions.featurePoints
-            Dim features = cv.Cv2.GoodFeaturesToTrack(src(roi), sampleSize, options.quality, options.minDistance, Nothing, 7, True, 3)
-            For Each pt In features
-                corners.Add(New cv.Point2f(roi.X + pt.X, roi.Y + pt.Y))
-            Next
-        Next
-
-        knn.queries = New List(Of cv.Point2f)(corners)
-        If firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
-        knn.Run(empty)
-
-        For i = 0 To knn.neighbors.Count - 1
-            Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
-            Dim pt = knn.trainInput(trainIndex)
-            Dim qPt = corners(i)
-            If pt.DistanceTo(qPt) > options.minDistance Then knn.trainInput(trainIndex) = corners(i)
-        Next
-
-        src.CopyTo(dst2)
-        dst3.SetTo(0)
-        For Each pt In corners
-            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-            dst3.Set(Of Byte)(pt.Y, pt.X, 255)
-        Next
-        labels(2) = "Found " + CStr(corners.Count) + " points with quality = " + CStr(options.quality) +
-                    " and minimum distance = " + CStr(options.minDistance)
-    End Sub
-End Class
 
 
 
@@ -1763,5 +1719,91 @@ Public Class Feature_LeftRight : Inherits VB_Algorithm
         dst2 = match.dst2
         dst3 = match.dst3
         labels = match.labels
+    End Sub
+End Class
+
+
+
+
+
+
+' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
+Public Class Feature_GridKNN : Inherits VB_Algorithm
+    Dim knn As New KNN_Core
+    Public corners As New List(Of cv.Point2f)
+    Public options As New Options_Features
+    Public Sub New()
+        findSlider("Feature Sample Size").Value = 4
+        desc = "Find good features to track in each roi of the task.gridList"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        corners.Clear()
+
+        For Each roi In task.gridList
+            Dim sampleSize = options.fOptions.featurePoints
+            Dim features = cv.Cv2.GoodFeaturesToTrack(src(roi), sampleSize, options.quality, options.minDistance, Nothing, 7, True, 3)
+            For Each pt In features
+                corners.Add(New cv.Point2f(roi.X + pt.X, roi.Y + pt.Y))
+            Next
+        Next
+
+        knn.queries = New List(Of cv.Point2f)(corners)
+        If firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        knn.Run(empty)
+
+        For i = 0 To knn.neighbors.Count - 1
+            Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
+            Dim pt = knn.trainInput(trainIndex)
+            Dim qPt = corners(i)
+            If pt.DistanceTo(qPt) > options.minDistance Then knn.trainInput(trainIndex) = corners(i)
+        Next
+
+        src.CopyTo(dst2)
+        dst3.SetTo(0)
+        For Each pt In corners
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            dst3.Set(Of Byte)(pt.Y, pt.X, 255)
+        Next
+        labels(2) = "Found " + CStr(corners.Count) + " points with quality = " + CStr(options.quality) +
+                    " and minimum distance = " + CStr(options.minDistance)
+    End Sub
+End Class
+
+
+
+
+
+' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
+Public Class Feature_Grid : Inherits VB_Algorithm
+    Public options As New Options_Features
+    Public Sub New()
+        findSlider("Feature Sample Size").Value = 4
+        desc = "Find good features to track in each roi of the task.gridList"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        task.features.Clear()
+        For Each roi In task.gridList
+            Dim sampleSize = options.fOptions.featurePoints
+            Dim features = cv.Cv2.GoodFeaturesToTrack(src(roi), sampleSize, options.quality, options.minDistance, Nothing,
+                                                      options.blockSize, True, options.k)
+            For Each pt In features
+                task.features.Add(New cv.Point2f(roi.X + pt.X, roi.Y + pt.Y))
+            Next
+        Next
+
+        src.CopyTo(dst2)
+        For Each pt In task.features
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
+        labels(2) = "Found " + CStr(task.features.Count) + " points with quality = " + CStr(options.quality) +
+                    " and minimum distance = " + CStr(options.minDistance) + " and blocksize " + CStr(options.blockSize)
     End Sub
 End Class

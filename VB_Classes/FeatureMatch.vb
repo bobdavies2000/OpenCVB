@@ -4,6 +4,7 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
     Public mpList As New List(Of pointPair)
     Public mpCorrelation As New List(Of Single)
     Public Sub New()
+        gOptions.MaxDepth.Value = 20
         If standalone Then gOptions.displayDst1.Checked = True
         labels(1) = "NOTE: right point is always to the left of the left point"
         desc = "Identify which feature in the left image corresponds to the feature in the right image."
@@ -77,7 +78,6 @@ End Class
 
 
 Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
-    Dim feat As New Feature_Basics
     Dim lrHist As New FeatureMatch_LeftRightHist
     Public leftFeatures As New List(Of List(Of cv.Point))
     Public rightFeatures As New List(Of List(Of cv.Point))
@@ -153,9 +153,17 @@ End Class
 
 Public Class FeatureMatch_LeftRightHist : Inherits VB_Algorithm
     Dim feat As New Feature_Basics
+    Dim fGrid As New Feature_Grid
     Public leftPoints As New List(Of cv.Point)
     Public rightPoints As New List(Of cv.Point)
     Public Sub New()
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Use image best features")
+            radio.addRadio("Use grid best features")
+            radio.check(0).Checked = True
+        End If
+
         findSlider("Min Distance to next").Value = 1
         gOptions.FrameHistory.Value = 10
         desc = "Keep only the features that have been around for the specified number of frames."
@@ -167,15 +175,17 @@ Public Class FeatureMatch_LeftRightHist : Inherits VB_Algorithm
         Return dst
     End Function
     Public Sub RunVB(src As cv.Mat)
+        Static gridRadio = findRadio("Use grid best features")
+        Dim gridFeatures = gridRadio.checked
         Dim minPoints = 10
 
-        feat.Run(task.leftView)
+        If gridFeatures Then fGrid.Run(task.leftView) Else feat.Run(task.leftView)
         Dim tmpLeft As New List(Of cv.Point)
         For Each pt In task.features
             tmpLeft.Add(New cv.Point(pt.X, pt.Y))
         Next
 
-        feat.Run(task.rightView)
+        If gridFeatures Then fGrid.Run(task.rightView) Else feat.Run(task.rightView)
         Dim tmpRight As New List(Of cv.Point)
         For Each pt In task.features
             tmpRight.Add(New cv.Point(pt.X, pt.Y))
@@ -408,5 +418,26 @@ Public Class FeatureMatch_LeftRightOld : Inherits VB_Algorithm
             labels(3) = "Left image has " + CStr(leftCorners.Count) + " good features and the right camera has " +
                                        CStr(rightCorners.Count) + " good features"
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FeatureMatch_Grid : Inherits VB_Algorithm
+    Dim fGrid As New Feature_Grid
+    Public Sub New()
+        desc = "Gather Feature_Grid points for the left and right images - they will be spread across the entire image"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        fGrid.Run(task.leftView)
+        dst2 = fGrid.dst2.Clone
+        If task.heartBeat Then labels(2) = fGrid.labels(2)
+
+        fGrid.Run(task.rightView)
+        dst3 = fGrid.dst2.Clone
+        If task.heartBeat Then labels(3) = fGrid.labels(2)
     End Sub
 End Class
