@@ -165,7 +165,7 @@ Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
             End If
         Next
         If task.heartBeat Then
-            labels(2) = "There were " + CStr(rowList.Count) + " rows with features in both rows."
+            labels(2) = "There were " + CStr(rowList.Count) + " rows with features in both images."
             labels(3) = "Left image has " + CStr(leftCorners.Count) + " good features and the right camera has " +
                                        CStr(rightCorners.Count) + " good features"
         End If
@@ -894,35 +894,35 @@ Public Class FeatureMatch_LeftRightNew : Inherits VB_Algorithm
         Return dst
     End Function
     Public Sub RunVB(src As cv.Mat)
-        feat.Run(task.leftView)
+        lrHist.Run(src)
+
         Dim tmpLeft As New SortedList(Of Integer, List(Of cv.Point))
         Dim ptlist As List(Of cv.Point)
-        For Each pt In task.features
-            If tmpLeft.Keys.Contains(CInt(pt.Y)) Then
-                Dim index = tmpLeft.Keys.IndexOf(CInt(pt.Y))
+        For Each pt In lrHist.leftPoints
+            If tmpLeft.Keys.Contains(pt.Y) Then
+                Dim index = tmpLeft.Keys.IndexOf(pt.Y)
                 ptlist = tmpLeft.ElementAt(index).Value
-                ptlist.Add(New cv.Point(pt.X, pt.Y))
+                ptlist.Add(pt)
                 tmpLeft.RemoveAt(index)
             Else
                 ptlist = New List(Of cv.Point)
-                ptlist.Add(New cv.Point(pt.X, pt.Y))
+                ptlist.Add(pt)
             End If
-            tmpLeft.Add(CInt(pt.Y), ptlist)
+            tmpLeft.Add(pt.Y, ptlist)
         Next
 
-        feat.Run(task.rightView)
         Dim tmpRight As New SortedList(Of Integer, List(Of cv.Point))
-        For Each pt In task.features
-            If tmpRight.Keys.Contains(CInt(pt.Y)) Then
-                Dim index = tmpRight.Keys.IndexOf(CInt(pt.Y))
+        For Each pt In lrHist.rightPoints
+            If tmpRight.Keys.Contains(pt.Y) Then
+                Dim index = tmpRight.Keys.IndexOf(pt.Y)
                 ptlist = tmpRight.ElementAt(index).Value
-                ptlist.Add(New cv.Point(pt.X, pt.Y))
+                ptlist.Add(pt)
                 tmpRight.RemoveAt(index)
             Else
                 ptlist = New List(Of cv.Point)
-                ptlist.Add(New cv.Point(pt.X, pt.Y))
+                ptlist.Add(pt)
             End If
-            tmpRight.Add(CInt(pt.Y), ptlist)
+            tmpRight.Add(pt.Y, ptlist)
         Next
 
         leftFeatures.Clear()
@@ -957,6 +957,8 @@ Public Class FeatureMatch_LeftRightHist : Inherits VB_Algorithm
     Public leftPoints As New List(Of cv.Point)
     Public rightPoints As New List(Of cv.Point)
     Public Sub New()
+        findSlider("Min Distance to next").Value = 1
+        gOptions.FrameHistory.Value = 10
         desc = "Keep only the features that have been around for the specified number of frames."
     End Sub
     Public Function displayFeatures(dst As cv.Mat, features As List(Of cv.Point)) As cv.Mat
@@ -966,6 +968,8 @@ Public Class FeatureMatch_LeftRightHist : Inherits VB_Algorithm
         Return dst
     End Function
     Public Sub RunVB(src As cv.Mat)
+        Dim minPoints = 10
+
         feat.Run(task.leftView)
         Dim tmpLeft As New List(Of cv.Point)
         For Each pt In task.features
@@ -981,33 +985,49 @@ Public Class FeatureMatch_LeftRightHist : Inherits VB_Algorithm
         Static leftHist As New List(Of List(Of cv.Point))({tmpLeft})
         Static rightHist As New List(Of List(Of cv.Point))({tmpRight})
 
-        leftPoints.Clear()
+        If task.optionsChanged Then
+            leftHist = New List(Of List(Of cv.Point))({tmpLeft})
+            rightHist = New List(Of List(Of cv.Point))({tmpRight})
+        End If
+
+        Dim saveLeft As New List(Of cv.Point)
         For Each pt In tmpLeft
             Dim count As Integer = 0
             For Each hist In leftHist
                 If hist.Contains(pt) Then count += 1 Else Exit For
             Next
-            If count = leftHist.Count Then leftPoints.Add(pt)
+            If count = leftHist.Count Then saveLeft.Add(pt)
         Next
+        If saveLeft.Count < minPoints Then leftPoints.Clear() Else leftPoints = saveLeft
 
-        rightPoints.Clear()
+        Dim saveRight As New List(Of cv.Point)
         For Each pt In tmpRight
             Dim count As Integer = 0
             For Each hist In rightHist
                 If hist.Contains(pt) Then count += 1 Else Exit For
             Next
-            If count = rightHist.Count Then rightPoints.Add(pt)
+            If count = rightHist.Count Then saveRight.Add(pt)
         Next
+        If saveRight.Count < minPoints Then rightPoints.Clear() Else rightPoints = saveRight
+
+        If leftPoints.Count < minPoints Then
+            leftPoints = tmpLeft
+            leftHist = New List(Of List(Of cv.Point))({tmpLeft})
+        End If
+        If rightPoints.Count < 10 Then
+            rightPoints = tmpRight
+            rightHist = New List(Of List(Of cv.Point))({tmpRight})
+        End If
 
         dst2 = displayFeatures(task.leftView.Clone, leftPoints)
         dst3 = displayFeatures(task.rightView.Clone, rightPoints)
 
+        Dim threshold = Math.Min(gOptions.FrameHistory.Value, leftHist.Count)
         leftHist.Add(tmpLeft)
         rightHist.Add(tmpRight)
 
-        Dim threshold = gOptions.FrameHistory.Value
-        If leftHist.Count >= threshold Then leftHist.RemoveAt(0)
-        If rightHist.Count >= threshold Then rightHist.RemoveAt(0)
+        If leftHist.Count >= gOptions.FrameHistory.Value Then leftHist.RemoveAt(0)
+        If rightHist.Count >= gOptions.FrameHistory.Value Then rightHist.RemoveAt(0)
 
         If task.heartBeat Then
             labels(2) = CStr(leftPoints.Count) + " detected in the left image that have matches in " + CStr(threshold) + " previous frames"
@@ -1015,3 +1035,8 @@ Public Class FeatureMatch_LeftRightHist : Inherits VB_Algorithm
         End If
     End Sub
 End Class
+
+
+
+
+
