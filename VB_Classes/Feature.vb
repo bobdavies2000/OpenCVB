@@ -1733,7 +1733,6 @@ Public Class Feature_GridKNN : Inherits VB_Algorithm
     Public corners As New List(Of cv.Point2f)
     Public options As New Options_Features
     Public Sub New()
-        findSlider("Feature Sample Size").Value = 4
         desc = "Find good features to track in each roi of the task.gridList"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1781,7 +1780,6 @@ End Class
 Public Class Feature_Grid : Inherits VB_Algorithm
     Public options As New Options_Features
     Public Sub New()
-        findSlider("Feature Sample Size").Value = 4
         desc = "Find good features to track in each roi of the task.gridList"
     End Sub
     Public Sub RunVB(src As cv.Mat)
