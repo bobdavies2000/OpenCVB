@@ -52,9 +52,7 @@ Public Class VBtask : Implements IDisposable
     Public motionDetected As Boolean
 
     Public gravityVec As New pointPair
-    Public gravityVecPresent As Boolean
     Public horizonVec As New pointPair
-    Public horizonPresent As Boolean
 
     Public camMotionPixels As Single ' distance in pixels that the camera has moved.
     Public camDirection As Single ' camera direction in radians.

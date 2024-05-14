@@ -140,6 +140,7 @@
     <Compile Include="PointPolygonTest.vb" />
     <Compile Include="PongWars.vb" />
     <Compile Include="Bin4Way.vb" />
+    <Compile Include="Quadrant.vb" />
     <Compile Include="Sift.vb" />
     <Compile Include="StdevGrid.vb" />
     <Compile Include="Surf.vb" />

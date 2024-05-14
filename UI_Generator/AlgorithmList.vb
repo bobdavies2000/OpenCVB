@@ -1607,6 +1607,7 @@ if algorithmName = "Python_MemMap" Then return new Python_MemMap
 if algorithmName = "Python_Run" Then return new Python_Run
 if algorithmName = "Python_Stream" Then return new Python_Stream
 if algorithmName = "QRcode_Basics" Then return new QRcode_Basics
+if algorithmName = "Quadrant_Basics" Then return new Quadrant_Basics
 if algorithmName = "Quaterion_Basics" Then return new Quaterion_Basics
 if algorithmName = "Quaterion_IMUPrediction" Then return new Quaterion_IMUPrediction
 if algorithmName = "Random_Basics" Then return new Random_Basics
