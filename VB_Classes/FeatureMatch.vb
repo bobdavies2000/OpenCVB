@@ -441,3 +441,30 @@ Public Class FeatureMatch_Grid : Inherits VB_Algorithm
         If task.heartBeat Then labels(3) = fGrid.labels(2)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class FeatureMatch_Delaunay : Inherits VB_Algorithm
+    Dim facet As New Delaunay_Basics
+    Dim fMatch As New FeatureMatch_Basics
+    Public Sub New()
+        findSlider("Min Distance to next").Value = 10
+        desc = "Divide the image with Delaunay using the features found in Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat = False And facet.inputPoints.Count > 10 Then Exit Sub
+        fMatch.Run(src)
+        dst2 = fMatch.dst2
+        labels(2) = fMatch.labels(2)
+
+        facet.inputPoints.Clear()
+        For Each mp In fMatch.mpList
+            facet.inputPoints.Add(mp.p1)
+        Next
+        facet.Run(src)
+        dst3 = vbPalette(facet.dst3 * 255 / facet.inputPoints.Count)
+    End Sub
+End Class

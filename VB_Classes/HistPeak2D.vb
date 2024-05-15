@@ -2,7 +2,7 @@
 Public Class HistPeak2D_Basics : Inherits VB_Algorithm
     Public auto As New OpAuto_Peaks2DGrid
     Dim bgr As New Hist2D_BGR
-    Dim delaunay As New Delaunay_Basics
+    Dim delaunay As New Delaunay_ConsistentColor
     Public histogram As New cv.Mat
     Public ranges() As cv.Rangef
     Public Sub New()

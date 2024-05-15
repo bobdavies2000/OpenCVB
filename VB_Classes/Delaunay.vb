@@ -7,14 +7,13 @@ Public Class Delaunay_Basics : Inherits VB_Algorithm
     Dim subdiv As New cv.Subdiv2D
     Public Sub New()
         facet32s = New cv.Mat(dst2.Size, cv.MatType.CV_32SC1, 0)
-        vbAddAdvice(traceName + ": use local options to control the number of points")
+        labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat And standaloneTest() Then
+        If task.heartBeat And standalone Then
             randEnum.Run(empty)
             inputPoints = New List(Of cv.Point2f)(randEnum.points)
-            dst3 = randEnum.dst2
         End If
 
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
@@ -23,27 +22,18 @@ Public Class Delaunay_Basics : Inherits VB_Algorithm
         Dim facets = New cv.Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
-        Dim usedColors As New List(Of cv.Vec3b)
         facetList.Clear()
-        Static lastColor = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
         For i = 0 To facets.Length - 1
             Dim nextFacet As New List(Of cv.Point)
             For j = 0 To facets(i).Length - 1
                 nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
             Next
 
-            Dim pt = inputPoints(i)
-            Dim nextColor = lastColor.Get(Of cv.Vec3b)(pt.Y, pt.X)
-            If usedColors.Contains(nextColor) Then nextColor = randomCellColor()
-            usedColors.Add(nextColor)
-
-            dst2.FillConvexPoly(nextFacet, vecToScalar(nextColor))
             facet32s.FillConvexPoly(nextFacet, i, task.lineType)
             facetList.Add(nextFacet)
         Next
-        facet32s.ConvertTo(dst1, cv.MatType.CV_8U)
-
-        lastColor = dst2.Clone
+        facet32s.ConvertTo(dst3, cv.MatType.CV_8U)
+        dst2 = vbPalette(dst3)
         labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
     End Sub
 End Class
@@ -219,12 +209,12 @@ Public Class Delaunay_Generations : Inherits VB_Algorithm
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
         labels = {"", "Mask of unmatched regions - generation set to 0", "Facet Image with count for each region",
                   "Generation counts in CV_32SC1 format"}
+        findSlider("Random Pixel Count").Value = 10
         desc = "Create a region in an image for each point provided"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
             Static random As New Random_Basics
-            If firstPass Then random.options.countSlider.Value = 10
             If task.heartBeat Then random.Run(empty)
             inputPoints = New List(Of cv.Point2f)(random.pointList)
         End If
@@ -256,5 +246,57 @@ Public Class Delaunay_Generations : Inherits VB_Algorithm
             usedG.Add(g)
             setTrueText(CStr(g), mp.p2, 2)
         Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class Delaunay_ConsistentColor : Inherits VB_Algorithm
+    Public inputPoints As New List(Of cv.Point2f)
+    Public facetList As New List(Of List(Of cv.Point))
+    Public facet32s As cv.Mat
+    Dim randEnum As New Random_Enumerable
+    Dim subdiv As New cv.Subdiv2D
+    Public Sub New()
+        facet32s = New cv.Mat(dst2.Size, cv.MatType.CV_32SC1, 0)
+        vbAddAdvice(traceName + ": use local options to control the number of points")
+        desc = "Subdivide an image based on the points provided."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat And standalone Then
+            randEnum.Run(empty)
+            inputPoints = New List(Of cv.Point2f)(randEnum.points)
+        End If
+
+        subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+        subdiv.Insert(inputPoints)
+
+        Dim facets = New cv.Point2f()() {Nothing}
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+        Dim usedColors As New List(Of cv.Vec3b)
+        facetList.Clear()
+        Static lastColor = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
+        For i = 0 To facets.Length - 1
+            Dim nextFacet As New List(Of cv.Point)
+            For j = 0 To facets(i).Length - 1
+                nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
+            Next
+
+            Dim pt = inputPoints(i)
+            Dim nextColor = lastColor.Get(Of cv.Vec3b)(pt.Y, pt.X)
+            If usedColors.Contains(nextColor) Then nextColor = randomCellColor()
+            usedColors.Add(nextColor)
+
+            dst2.FillConvexPoly(nextFacet, vecToScalar(nextColor))
+            facet32s.FillConvexPoly(nextFacet, i, task.lineType)
+            facetList.Add(nextFacet)
+        Next
+        facet32s.ConvertTo(dst1, cv.MatType.CV_8U)
+
+        lastColor = dst2.Clone
+        labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
     End Sub
 End Class
