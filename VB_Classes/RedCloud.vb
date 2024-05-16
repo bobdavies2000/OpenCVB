@@ -2644,3 +2644,8 @@ Public Class RedCloud_ColorAndDepth : Inherits VB_Algorithm
         dst3(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
     End Sub
 End Class
+
+
+
+
+

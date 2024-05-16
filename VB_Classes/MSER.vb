@@ -6,6 +6,7 @@ Public Class MSER_Basics : Inherits VB_Algorithm
     Dim detect As New MSER_CPP
     Public mserCells As New List(Of rcData)
     Public floodPoints As New List(Of cv.Point)
+
     Public Sub New()
         desc = "Create cells for each region in MSER output"
     End Sub
@@ -24,7 +25,6 @@ Public Class MSER_Basics : Inherits VB_Algorithm
         Dim matched As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
 
         dst0 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
         For i = 0 To boxes.Count - 1
             Dim index = boxes.ElementAt(i).Value
             Dim rc As New rcData
@@ -43,41 +43,16 @@ Public Class MSER_Basics : Inherits VB_Algorithm
             If rc.indexLast <> 0 And rc.indexLast < task.redCells.Count Then
                 Dim lrc = task.redCells(rc.indexLast)
                 rc.maxDStable = lrc.maxDStable
+                rc.color = lrc.color
                 matched.Add(rc.indexLast, rc.indexLast)
             Else
                 rc.maxDStable = rc.maxDist
             End If
 
             cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-            If redOptions.naturalColor.Checked Then
-                rc.color = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
-            Else
-                rc.color = New cv.Vec3b(msRNG.Next(40, 220), msRNG.Next(40, 220), msRNG.Next(40, 220))
-            End If
-
-            sortedCells.Add(rc.pixels, rc)
+            rc.naturalColor = New cv.Vec3b(CByte(rc.colorMean(0)), CByte(rc.colorMean(1)), CByte(rc.colorMean(2)))
+            If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
         Next
-
-        Dim usedPoints As New List(Of cv.Point)
-        For Each rc In task.redCells
-            If matched.Keys.Contains(rc.index) = False Then
-                cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-                Dim color = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
-                If usedPoints.Contains(rc.maxDStable) Then Continue For
-                usedPoints.Add(rc.maxDStable)
-                If color = rc.color Then sortedCells.Add(rc.pixels, rc)
-            End If
-        Next
-
-        'usedPoints.Clear()
-        'For i = sortedCells.Count - 1 To 0 Step -1
-        '    Dim rc = sortedCells.ElementAt(i).Value
-        '    If usedPoints.Contains(rc.maxDStable) Then
-        '        sortedCells.RemoveAt(i)
-        '    Else
-        '        usedPoints.Add(rc.maxDStable)
-        '    End If
-        'Next
 
         dst2 = vbRebuildCells(sortedCells)
 

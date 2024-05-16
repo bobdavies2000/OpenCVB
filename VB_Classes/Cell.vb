@@ -431,7 +431,6 @@ Public Class Cell_Generate : Inherits VB_Algorithm
 
         For Each rc In initList
             If rc.exactMatch = False Then
-                rc.depthMask = rc.mask.Clone
                 rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
                 vbDrawContour(rc.mask, rc.contour, 255, -1)
                 If removeContour Then vbDrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
@@ -464,6 +463,7 @@ Public Class Cell_Generate : Inherits VB_Algorithm
                 rc.pixels = rc.mask.CountNonZero ' the number of pixels may have changed with the infill or contour.
                 If rc.pixels = 0 Then Continue For
 
+                rc.depthMask = rc.mask.Clone
                 rc.depthMask.SetTo(0, task.noDepthMask(rc.rect))
                 rc.depthPixels = rc.depthMask.CountNonZero
 
