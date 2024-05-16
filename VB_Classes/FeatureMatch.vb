@@ -448,7 +448,7 @@ End Class
 
 
 Public Class FeatureMatch_Delaunay : Inherits VB_Algorithm
-    Dim facet As New Delaunay_Basics
+    Dim facet As New Delaunay_Contours
     Dim fMatch As New FeatureMatch_Basics
     Public Sub New()
         findSlider("Min Distance to next").Value = 10
@@ -465,6 +465,6 @@ Public Class FeatureMatch_Delaunay : Inherits VB_Algorithm
             facet.inputPoints.Add(mp.p1)
         Next
         facet.Run(src)
-        dst3 = vbPalette(facet.dst3 * 255 / facet.inputPoints.Count)
+        dst3 = facet.dst2
     End Sub
 End Class

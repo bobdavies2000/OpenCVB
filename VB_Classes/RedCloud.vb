@@ -2227,13 +2227,14 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
     Public Sub New()
         inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         cPtr = RedCloud_Open()
+        labels = {"", "", "CV_8UC1 result with ", "Palette version of the data in dst2"}
         desc = "Run the C++ RedCloud interface with or without a mask"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            Static bounds As New Boundary_RemovedRects
-            bounds.Run(src)
-            src = bounds.bRects.bounds.dst2
+            Static bin4 As New Bin4Way_Basics
+            bin4.Run(src)
+            src = bin4.dst1
         End If
         Dim imagePtr As IntPtr
         Dim inputData(src.Total - 1) As Byte
@@ -2250,10 +2251,13 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
 
         classCount = RedCloud_Count(cPtr)
-
         If classCount = 0 Then Exit Sub ' no data to process.
+
+        If standalone Then dst3 = vbPalette(dst2 * 255 / classCount)
+
         rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
         floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, RedCloud_FloodPoints(cPtr))
+        labels(2) = "CV_8U result with " + CStr(classCount) + " regions."
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
@@ -2649,3 +2653,28 @@ End Class
 
 
 
+
+
+Public Class RedCloud_Delaunay : Inherits VB_Algorithm
+    Dim redCPP As New RedCloud_CPP
+    Dim delaunay As New FeatureMatch_Delaunay
+    Public Sub New()
+        desc = "Test FeatureMatch points after Delaunay contour has been added."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        delaunay.Run(src)
+        dst1 = delaunay.dst2
+
+        If src.Channels <> 1 Then
+            Static colorC As New Color_Basics
+            colorC.Run(src)
+            src = colorC.dst2
+        End If
+
+        redCPP.inputMask = dst1
+        redCPP.Run(src)
+
+        dst2 = redCPP.dst2
+        labels(2) = redCPP.labels(2)
+    End Sub
+End Class

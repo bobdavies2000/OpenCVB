@@ -300,3 +300,42 @@ Public Class Delaunay_ConsistentColor : Inherits VB_Algorithm
         labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
     End Sub
 End Class
+
+
+
+
+Public Class Delaunay_Contours : Inherits VB_Algorithm
+    Public inputPoints As New List(Of cv.Point2f)
+    Dim randEnum As New Random_Enumerable
+    Dim subdiv As New cv.Subdiv2D
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "CV_8U map of Delaunay cells"
+        desc = "Subdivide an image based on the points provided."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat And standalone Then
+            randEnum.Run(empty)
+            inputPoints = New List(Of cv.Point2f)(randEnum.points)
+        End If
+
+        subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+        subdiv.Insert(inputPoints)
+
+        Dim facets = New cv.Point2f()() {Nothing}
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+        dst2.SetTo(0)
+        For i = 0 To facets.Length - 1
+            Dim ptList As New List(Of cv.Point)
+            For j = 0 To facets(i).Length - 1
+                ptList.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
+            Next
+
+            Dim listOfPoints = New List(Of List(Of cv.Point))
+            listOfPoints.Add(ptList)
+            cv.Cv2.DrawContours(dst2, listOfPoints, -1, 255, 1, cv.LineTypes.Link8)
+        Next
+        labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
+    End Sub
+End Class
