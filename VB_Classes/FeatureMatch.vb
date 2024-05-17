@@ -2,19 +2,72 @@
 Public Class FeatureMatch_Basics : Inherits VB_Algorithm
     Dim lrFeat As New FeatureMatch_LeftRight
     Public mpList As New List(Of pointPair)
-    Public mpCorrelation As New List(Of Single)
+    Public mpCorrelation As New List(Of Single), pad As Integer, gsize As Integer
+    Dim clickPoint As New cv.Point, picTag As Integer
     Public Sub New()
         gOptions.MaxDepth.Value = 20
         If standalone Then gOptions.displayDst1.Checked = True
         labels(1) = "NOTE: matching right point is always to the left of the left point"
         desc = "Identify which feature in the left image corresponds to the feature in the right image."
     End Sub
+    Public Sub displayResults()
+        dst2 = task.leftView
+        dst3 = task.rightView
+        For Each mp In mpList
+            dst2.Circle(mp.p1, task.dotSize, task.highlightColor, -1, task.lineType)
+            dst3.Circle(mp.p2, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
+
+        If task.mouseClickFlag Then
+            clickPoint = task.clickPoint
+            picTag = task.mousePicTag
+            task.drawRect = New cv.Rect(task.clickPoint.X - pad, task.clickPoint.Y - pad, gsize, gsize)
+            task.drawRectUpdated = True
+        End If
+
+        setTrueText("Click near any feature to find the corresponding pair of features.", 1)
+        If standalone And mpList.Count > 0 And clickPoint <> newPoint Then
+            Static knn As New KNN_Core
+            knn.queries.Clear()
+            knn.queries.Add(task.clickPoint)
+
+            Dim mp As pointPair
+            knn.trainInput.Clear()
+            For Each mp In mpList
+                Dim pt = If(picTag = 2, mp.p1, mp.p2)
+                knn.trainInput.Add(New cv.Point2f(pt.X, pt.Y))
+            Next
+            knn.Run(Nothing)
+
+            dst1.SetTo(0)
+            Dim mpIndex = knn.result(0, 0)
+            mp = mpList(mpIndex)
+            dst2.Circle(mp.p1, task.dotSize + 4, cv.Scalar.Red, -1, task.lineType)
+            dst3.Circle(mp.p2, task.dotSize + 4, cv.Scalar.Red, -1, task.lineType)
+
+            setTrueText(Format(mpCorrelation(mpIndex), fmt3), mp.p1, 2)
+            setTrueText(Format(mpCorrelation(mpIndex), fmt3), mp.p2, 3)
+
+            Dim dspDistance = task.pcSplit(2).Get(Of Single)(mp.p1.Y, mp.p1.X)
+
+            Dim p1 = New cv.Point(mp.p1.X, mpList(mpIndex).p1.Y + 10)
+            Dim offset = mp.p1.X - mp.p2.X
+            setTrueText(Format(mpCorrelation(mpIndex), fmt3) + vbCrLf + Format(dspDistance, fmt3) + "m (from camera)" + vbCrLf +
+                        CStr(offset) + " Pixel difference", p1, 1)
+
+            If task.heartBeat Then dst1.SetTo(0)
+            dst1.Circle(mp.p1, task.dotSize, task.highlightColor, -1, task.lineType)
+            dst1.Circle(mp.p2, task.dotSize, task.highlightColor, -1, task.lineType)
+        End If
+    End Sub
     Public Sub RunVB(src As cv.Mat)
         Static corrSlider = findSlider("Feature Correlation Threshold")
         Static cellSlider = findSlider("MatchTemplate Cell Size")
-        Dim pad = CInt(cellSlider.value / 2)
-        Dim gSize = cellSlider.value
+        pad = CInt(cellSlider.value / 2)
+        gsize = cellSlider.value
         Dim correlationMin = corrSlider.value / 100
+
+        If task.optionsChanged Then clickPoint = newPoint
 
         lrFeat.Run(src)
         labels(3) = lrFeat.labels(3)
@@ -23,10 +76,10 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
         mpList.Clear()
         For i = 0 To lrFeat.leftFeatures.Count - 1
             For Each pt In lrFeat.leftFeatures(i)
-                Dim rect = validateRect(New cv.Rect(pt.X - pad, pt.Y - pad, gSize, gSize))
+                Dim rect = validateRect(New cv.Rect(pt.X - pad, pt.Y - pad, gsize, gsize))
                 Dim correlations As New List(Of Single)
                 For Each ptRight In lrFeat.rightFeatures(i)
-                    Dim r = validateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, gSize, gSize))
+                    Dim r = validateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, gsize, gsize))
                     cv.Cv2.MatchTemplate(task.leftView(rect), task.rightView(r), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
                     correlations.Add(correlationmat.Get(Of Single)(0, 0))
                 Next
@@ -39,35 +92,8 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
             Next
         Next
 
-        dst2 = task.leftView
-        dst3 = task.rightView
-        For Each mp In mpList
-            dst2.Circle(mp.p1, task.dotSize, task.highlightColor, -1, task.lineType)
-            dst3.Circle(mp.p2, task.dotSize, task.highlightColor, -1, task.lineType)
-        Next
+        displayResults()
 
-        If standalone And mpList.Count > 0 Then
-            Dim mpIndex = gOptions.DebugSlider.Value
-            If mpIndex < 0 Then mpIndex = 0
-            If mpIndex >= mpList.Count Then mpIndex = mpList.Count - 1
-            Dim mp = mpList(mpIndex)
-            dst2.Circle(mp.p1, task.dotSize + 4, cv.Scalar.Red, -1, task.lineType)
-            dst3.Circle(mp.p2, task.dotSize + 4, cv.Scalar.Red, -1, task.lineType)
-
-            setTrueText(Format(mpCorrelation(mpIndex), fmt3), mp.p1, 2)
-            setTrueText(Format(mpCorrelation(mpIndex), fmt3), mp.p2, 3)
-
-            Dim dspDistance = task.pcSplit(2).Get(Of Single)(mp.p1.Y, mp.p1.X)
-
-            Dim p1 = New cv.Point(mp.p1.X, mpList(mpIndex).p1.Y + 10)
-            Dim offset = mp.p1.X - mp.p2.X
-            setTrueText(Format(mpCorrelation(mpIndex), fmt3) + vbCrLf + Format(dspDistance, fmt3) + "m (from camera)" + vbCrLf +
-                        CStr(offset) + " Pixel distance", p1, 1)
-
-            If task.heartBeat Then dst1.SetTo(0)
-            dst1.Circle(mp.p1, task.dotSize, task.highlightColor, -1, task.lineType)
-            dst1.Circle(mp.p2, task.dotSize, task.highlightColor, -1, task.lineType)
-        End If
         labels(2) = CStr(mpList.Count) + " features were identified, matched, and confirmed with correlation coefficients in the left and right images"
     End Sub
 End Class
