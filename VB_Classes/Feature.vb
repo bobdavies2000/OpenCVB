@@ -116,42 +116,6 @@ End Class
 
 
 
-Public Class Feature_TraceDelaunay : Inherits VB_Algorithm
-    Dim features As New Feature_PointsDelaunay
-    Public goodList As New List(Of List(Of cv.Point2f)) ' stable points only
-    Public Sub New()
-        labels = {"Stable points highlighted", "", "", "Delaunay map of regions defined by the feature points"}
-        desc = "Trace the GoodFeatures points using only Delaunay - no KNN or RedCloud or Match."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        features.Run(src)
-        dst3 = features.dst2
-
-        If task.optionsChanged Then goodList.Clear()
-
-        Dim ptList As New List(Of cv.Point2f)(task.features)
-        goodList.Add(ptList)
-
-        If goodList.Count >= task.frameHistoryCount Then goodList.RemoveAt(0)
-
-        dst2.SetTo(0)
-        For Each ptList In goodList
-            For Each pt In ptList
-                task.color.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-                Dim c = dst3.Get(Of cv.Vec3b)(pt.Y, pt.X)
-                dst2.Circle(pt, task.dotSize + 1, c, -1, task.lineType)
-            Next
-        Next
-        labels(2) = CStr(task.features.Count) + " features were identified in the image."
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 Public Class Feature_CellGrid : Inherits VB_Algorithm
@@ -251,48 +215,6 @@ Public Class Feature_CellFinder : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Feature_PointsDelaunay : Inherits VB_Algorithm
-    Public feat As New Feature_Basics
-    Public Sub New()
-        labels = {"Good features highlighted", "", "", "Delaunay map of good features - format CV_8U"}
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If task.paused Then Exit Sub
-        feat.Run(src)
-
-        Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, src.Width, src.Height))
-        For Each pt In task.features
-            subdiv.Insert(pt)
-        Next
-
-        Dim facets = New cv.Point2f()() {Nothing}
-        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
-        If facets.Count = 0 Then Exit Sub
-
-        Dim ifacet() As cv.Point
-        Dim incr As Integer = 255 / facets.Count
-        For i = 0 To facets.Length - 1
-            ReDim ifacet(facets(i).Count - 1)
-            For j = 0 To facets(i).Count - 1
-                ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
-            Next
-
-            Dim index = If(task.heartBeat, i * incr, dst3.Get(Of Byte)(task.features(i).Y, task.features(i).X))
-            vbDrawContour(dst3, ifacet.ToList, index, -1)
-        Next
-
-        dst2 = vbPalette(dst3)
-        labels(2) = CStr(task.features.Count) + " features were identified in the image."
-    End Sub
-End Class
 
 
 
@@ -1708,74 +1630,6 @@ End Class
 
 
 
-
-Public Class Feature_LeftRight : Inherits VB_Algorithm
-    Dim match As New MatchCells_Features
-    Public Sub New()
-        desc = "Placeholder to make it easier to find MatchCells_Features"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        match.Run(src)
-        dst2 = match.dst2
-        dst3 = match.dst3
-        labels = match.labels
-    End Sub
-End Class
-
-
-
-
-
-
-' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_GridKNN : Inherits VB_Algorithm
-    Dim knn As New KNN_Core
-    Public corners As New List(Of cv.Point2f)
-    Public options As New Options_Features
-    Public Sub New()
-        desc = "Find good features to track in each roi of the task.gridList"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        corners.Clear()
-
-        For Each roi In task.gridList
-            Dim sampleSize = options.fOptions.featurePoints
-            Dim features = cv.Cv2.GoodFeaturesToTrack(src(roi), sampleSize, options.quality, options.minDistance, Nothing, 7, True, 3)
-            For Each pt In features
-                corners.Add(New cv.Point2f(roi.X + pt.X, roi.Y + pt.Y))
-            Next
-        Next
-
-        knn.queries = New List(Of cv.Point2f)(corners)
-        If firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
-        knn.Run(empty)
-
-        For i = 0 To knn.neighbors.Count - 1
-            Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
-            Dim pt = knn.trainInput(trainIndex)
-            Dim qPt = corners(i)
-            If pt.DistanceTo(qPt) > options.minDistance Then knn.trainInput(trainIndex) = corners(i)
-        Next
-
-        src.CopyTo(dst2)
-        dst3.SetTo(0)
-        For Each pt In corners
-            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-            dst3.Set(Of Byte)(pt.Y, pt.X, 255)
-        Next
-        labels(2) = "Found " + CStr(corners.Count) + " points with quality = " + CStr(options.quality) +
-                    " and minimum distance = " + CStr(options.minDistance)
-    End Sub
-End Class
-
-
-
-
-
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_Grid : Inherits VB_Algorithm
     Public options As New Options_Features
@@ -1803,5 +1657,177 @@ Public Class Feature_Grid : Inherits VB_Algorithm
         Next
         labels(2) = "Found " + CStr(task.features.Count) + " points with quality = " + CStr(options.quality) +
                     " and minimum distance = " + CStr(options.minDistance) + " and blocksize " + CStr(options.blockSize)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Feature_GridPopulation : Inherits VB_Algorithm
+    Public feat As New Feature_Basics
+    Public Sub New()
+        desc = "Find hich concentrations of good features to track in each roi of the task.gridList"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+
+        dst2.SetTo(0)
+        For Each pt In task.features
+            Dim roi = task.gridList(task.gridToRoiIndex.Get(Of Integer)(pt.Y, pt.X))
+            dst2.Circle(New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2), task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
+
+        'task.features.Clear()
+        'For Each roi In task.gridList
+        '    Dim features = cv.Cv2.GoodFeaturesToTrack(src(roi), sampleSize, options.quality, options.minDistance, Nothing,
+        '                                              options.blockSize, True, options.k)
+        '    For Each pt In features
+        '        task.features.Add(New cv.Point2f(roi.X + pt.X, roi.Y + pt.Y))
+        '    Next
+        'Next
+
+        'src.CopyTo(dst2)
+        'For Each pt In task.features
+        '    dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        'Next
+        'labels(2) = "Found " + CStr(task.features.Count) + " points with quality = " + CStr(options.quality) +
+        '            " and minimum distance = " + CStr(options.minDistance) + " and blocksize " + CStr(options.blockSize)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Feature_PointsDelaunay : Inherits VB_Algorithm
+    Public feat As New Feature_Basics
+    Public Sub New()
+        labels = {"Good features highlighted", "", "", "Delaunay map of good features - format CV_8U"}
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+
+        Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, src.Width, src.Height))
+        For Each pt In task.features
+            subdiv.Insert(pt)
+        Next
+
+        Dim facets = New cv.Point2f()() {Nothing}
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+        If facets.Count = 0 Then Exit Sub
+
+        Dim ifacet() As cv.Point
+        Dim incr As Integer = 255 / facets.Count
+        For i = 0 To facets.Length - 1
+            ReDim ifacet(facets(i).Count - 1)
+            For j = 0 To facets(i).Count - 1
+                ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
+            Next
+
+            Dim index = If(task.heartBeat, i * incr, dst3.Get(Of Byte)(task.features(i).Y, task.features(i).X))
+            vbDrawContour(dst3, ifacet.ToList, index, -1)
+        Next
+
+        dst2 = vbPalette(dst3)
+        labels(2) = CStr(task.features.Count) + " features were identified in the image."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Feature_TraceDelaunay : Inherits VB_Algorithm
+    Dim features As New Feature_PointsDelaunay
+    Public goodList As New List(Of List(Of cv.Point2f)) ' stable points only
+    Public Sub New()
+        labels = {"Stable points highlighted", "", "", "Delaunay map of regions defined by the feature points"}
+        desc = "Trace the GoodFeatures points using only Delaunay - no KNN or RedCloud or Matching."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        features.Run(src)
+        dst3 = features.dst2
+
+        If task.optionsChanged Then goodList.Clear()
+
+        Dim ptList As New List(Of cv.Point2f)(task.features)
+        goodList.Add(ptList)
+
+        If goodList.Count >= task.frameHistoryCount Then goodList.RemoveAt(0)
+
+        dst2.SetTo(0)
+        For Each ptList In goodList
+            For Each pt In ptList
+                task.color.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+                Dim c = dst3.Get(Of cv.Vec3b)(pt.Y, pt.X)
+                dst2.Circle(pt, task.dotSize + 1, c, -1, task.lineType)
+            Next
+        Next
+        labels(2) = CStr(task.features.Count) + " features were identified in the image."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Feature_LRMatched : Inherits VB_Algorithm
+    Dim match As New FeatureMatch_Basics
+    Public Sub New()
+        desc = "Placeholder to make it easier to find FeatureMatch_Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        match.Run(src)
+        dst2 = match.dst2
+        dst3 = match.dst3
+        labels = match.labels
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_LucasKanade : Inherits VB_Algorithm
+    Dim pyr As New OpticalFlow_LucasKanade
+    Public ptList As New List(Of cv.Point)
+    Public ptLast As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Provide a trace of the tracked features"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static ptHist As New List(Of List(Of cv.Point))
+        pyr.Run(src)
+        dst2 = src
+        labels(2) = pyr.labels(2)
+
+        If task.heartBeat Then dst3.SetTo(0)
+
+        ptList.Clear()
+        Dim stationary As Integer, motion As Integer
+        For i = 0 To pyr.features.Count - 1
+            Dim pt = New cv.Point(pyr.features(i).X, pyr.features(i).Y)
+            ptList.Add(pt)
+            If ptLast.Contains(pt) Then
+                dst3.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+                stationary += 1
+            Else
+                dst3.Line(pyr.lastFeatures(i), pyr.features(i), cv.Scalar.White, task.lineWidth, task.lineType)
+                motion += 1
+            End If
+        Next
+
+        If task.heartBeat Then labels(3) = CStr(stationary) + " features were stationary and " + CStr(motion) + " features had some motion."
+        ptLast = New List(Of cv.Point)(ptList)
     End Sub
 End Class

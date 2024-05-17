@@ -455,16 +455,24 @@ Public Class FeatureMatch_Delaunay : Inherits VB_Algorithm
         desc = "Divide the image with Delaunay using the features found in Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat = False And facet.inputPoints.Count > 10 Then Exit Sub
-        fMatch.Run(src)
-        dst2 = fMatch.dst2
-        labels(2) = fMatch.labels(2)
+        If task.heartBeat Or facet.inputPoints.Count <= 10 Then
+            fMatch.Run(src)
+            dst2 = fMatch.dst2
+            labels(2) = fMatch.labels(2)
 
-        facet.inputPoints.Clear()
-        For Each mp In fMatch.mpList
-            facet.inputPoints.Add(mp.p1)
-        Next
-        facet.Run(src)
-        dst3 = facet.dst2
+            facet.inputPoints.Clear()
+            For Each mp In fMatch.mpList
+                facet.inputPoints.Add(mp.p1)
+            Next
+
+            facet.Run(src)
+            dst3 = facet.dst2
+        Else
+            dst2 = src
+            For Each pt In facet.inputPoints
+                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            Next
+        End If
+
     End Sub
 End Class

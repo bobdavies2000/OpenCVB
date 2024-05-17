@@ -26,28 +26,19 @@ End Class
 
 
 ' https://www.learnopencv.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
-Public Class OpticalFlow_Sparse : Inherits VB_Algorithm
+Public Class OpticalFlow_LucasKanade : Inherits VB_Algorithm
     Public features As New List(Of cv.Point2f)
+    Public lastFeatures As New List(Of cv.Point2f)
     Dim feat As New Feature_Basics
-    Dim sumScale As cv.Mat, sScale As cv.Mat
-    Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Dim options As New Options_OpticalFlowSparse
     Public Sub New()
         desc = "Show the optical flow of a sparse matrix."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
         dst2 = src.Clone()
         dst3 = src.Clone()
-
-        If task.optionsChanged Then
-            errScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 1)
-            qScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 0.004)
-            rScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 0.5)
-            sumScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 0)
-            sScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 0)
-        End If
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static lastGray As cv.Mat = src.Clone
@@ -56,9 +47,9 @@ Public Class OpticalFlow_Sparse : Inherits VB_Algorithm
         Dim features1 = New cv.Mat(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
         Dim features2 = New cv.Mat
         Dim status As New cv.Mat, err As New cv.Mat, winSize As New cv.Size(3, 3)
-        cv.Cv2.CalcOpticalFlowPyrLK(src, lastgray, features1, features2, status, err, winSize, 3, term, options.OpticalFlowFlag)
+        cv.Cv2.CalcOpticalFlowPyrLK(src, lastGray, features1, features2, status, err, winSize, 3, term, options.OpticalFlowFlag)
         features = New List(Of cv.Point2f)
-        Dim lastFeatures As New List(Of cv.Point2f)
+        lastFeatures.Clear()
         For i = 0 To status.Rows - 1
             If status.Get(Of Byte)(i, 0) Then
                 Dim pt1 = features1.Get(Of cv.Point2f)(i, 0)
@@ -67,7 +58,7 @@ Public Class OpticalFlow_Sparse : Inherits VB_Algorithm
                 If length < 30 Then
                     features.Add(pt1)
                     lastFeatures.Add(pt2)
-                    dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + task.lineWidth + 2, task.lineType)
+                    dst2.Line(pt1, pt2, task.highlightColor, task.lineWidth + task.lineWidth, task.lineType)
                     dst3.Circle(pt1, task.dotSize + 3, cv.Scalar.White, -1, task.lineType)
                     dst3.Circle(pt2, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType)
                 End If
@@ -77,5 +68,80 @@ Public Class OpticalFlow_Sparse : Inherits VB_Algorithm
 
         If task.heartBeat Then lastGray = src.Clone()
         lastGray = src.Clone()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpticalFlow_LeftRight : Inherits VB_Algorithm
+    Dim pyrLeft As New OpticalFlow_LucasKanade
+    Dim pyrRight As New OpticalFlow_LucasKanade
+    Dim ptLeft As New List(Of cv.Point)
+    Dim ptRight As New List(Of cv.Point)
+    Public ptlist As New List(Of cv.Point)
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Find features using optical flow in both the left and right images."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static corrSlider = findSlider("Feature Correlation Threshold")
+        Static cellSlider = findSlider("MatchTemplate Cell Size")
+        Dim pad = CInt(cellSlider.value / 2)
+        Dim gSize = cellSlider.value
+        Dim correlationMin = corrSlider.value / 100
+
+        pyrLeft.Run(task.leftView)
+        pyrRight.Run(task.rightView)
+
+        Dim leftY As New List(Of Integer)
+        ptLeft.Clear()
+        dst2 = task.leftView
+        For Each pt In pyrLeft.features
+            ptLeft.Add(New cv.Point(pt.X, pt.Y))
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            leftY.Add(pt.Y)
+        Next
+
+        Dim rightY As New List(Of Integer)
+        ptRight.Clear()
+        dst3 = task.rightView
+        For Each pt In pyrRight.features
+            ptRight.Add(New cv.Point(pt.X, pt.Y))
+            dst3.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            rightY.Add(pt.Y)
+        Next
+
+        Dim mpList As New List(Of pointPair)
+        ptlist.Clear()
+        For i = 0 To leftY.Count - 1
+            Dim index = rightY.IndexOf(leftY(i))
+            If index >= 0 Then mpList.Add(New pointPair(ptLeft(i), ptRight(index)))
+        Next
+
+        'Dim correlationmat As New cv.Mat
+        'Dim mpCorrelation As New List(Of Single)
+        'For i = 0 To mpList.Count - 1
+        '    Dim rect = validateRect(New cv.Rect(pt.X - pad, pt.Y - pad, gSize, gSize))
+        '    Dim correlations As New List(Of Single)
+        '    For Each ptRight In lrFeat.rightFeatures(i)
+        '        Dim r = validateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, gSize, gSize))
+        '        cv.Cv2.MatchTemplate(task.leftView(rect), task.rightView(r), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
+        '        correlations.Add(correlationmat.Get(Of Single)(0, 0))
+        '    Next
+        '    Dim maxCorrelation = correlations.Max
+        '    If maxCorrelation >= correlationMin Then
+        '        Dim index = correlations.IndexOf(maxCorrelation)
+        '        mpList.Add(New pointPair(pt, lrFeat.rightFeatures(i)(index)))
+        '        mpCorrelation.Add(maxCorrelation)
+        '    End If
+        'Next
+
+        If task.heartBeat Then
+            labels(2) = CStr(ptLeft.Count) + " features found in the left image, " + CStr(ptRight.Count) + " features in the right and " +
+                        CStr(ptlist.Count) + " features are matched."
+        End If
     End Sub
 End Class
