@@ -6,7 +6,7 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
     Public Sub New()
         gOptions.MaxDepth.Value = 20
         If standalone Then gOptions.displayDst1.Checked = True
-        labels(1) = "NOTE: right point is always to the left of the left point"
+        labels(1) = "NOTE: matching right point is always to the left of the left point"
         desc = "Identify which feature in the left image corresponds to the feature in the right image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -68,7 +68,7 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
             dst1.Circle(mp.p1, task.dotSize, task.highlightColor, -1, task.lineType)
             dst1.Circle(mp.p2, task.dotSize, task.highlightColor, -1, task.lineType)
         End If
-        labels(2) = CStr(mpList.Count) + " features were identified and matched in the left and right images"
+        labels(2) = CStr(mpList.Count) + " features were identified, matched, and confirmed with correlation coefficients in the left and right images"
     End Sub
 End Class
 
@@ -104,8 +104,7 @@ Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
                 ptlist.Add(pt)
                 tmpLeft.RemoveAt(index)
             Else
-                ptlist = New List(Of cv.Point)
-                ptlist.Add(pt)
+                ptlist = New List(Of cv.Point)({pt})
             End If
             tmpLeft.Add(pt.Y, ptlist)
         Next
@@ -118,8 +117,7 @@ Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
                 ptlist.Add(pt)
                 tmpRight.RemoveAt(index)
             Else
-                ptlist = New List(Of cv.Point)
-                ptlist.Add(pt)
+                ptlist = New List(Of cv.Point)({pt})
             End If
             tmpRight.Add(pt.Y, ptlist)
         Next
@@ -138,8 +136,8 @@ Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
         dst3 = displayFeatures(task.rightView.Clone, rightFeatures)
 
         If task.heartBeat Then
-            labels(2) = CStr(leftFeatures.Count) + " detected in the left image that have matches in the right image"
-            labels(3) = CStr(rightFeatures.Count) + " detected in the right image that have matches in the left image"
+            labels(2) = CStr(leftFeatures.Count) + " detected in the left image that match one or more Y-coordinates found in the right image"
+            labels(3) = CStr(rightFeatures.Count) + " detected in the right image that match one or more Y-coordinates found in the left image"
         End If
     End Sub
 End Class
@@ -231,16 +229,16 @@ Public Class FeatureMatch_LeftRightHist : Inherits VB_Algorithm
         dst2 = displayFeatures(task.leftView.Clone, leftPoints)
         dst3 = displayFeatures(task.rightView.Clone, rightPoints)
 
-        Dim threshold = Math.Min(gOptions.FrameHistory.Value, leftHist.Count)
         leftHist.Add(tmpLeft)
         rightHist.Add(tmpRight)
+        Dim threshold = Math.Min(gOptions.FrameHistory.Value, leftHist.Count)
 
         If leftHist.Count >= gOptions.FrameHistory.Value Then leftHist.RemoveAt(0)
         If rightHist.Count >= gOptions.FrameHistory.Value Then rightHist.RemoveAt(0)
 
         If task.heartBeat Then
-            labels(2) = CStr(leftPoints.Count) + " detected in the left image that have matches in " + CStr(threshold) + " previous frames"
-            labels(3) = CStr(rightPoints.Count) + " detected in the right image that have matches in " + CStr(threshold) + " previous frames"
+            labels(2) = CStr(leftPoints.Count) + " detected in the left image that have matches in " + CStr(threshold) + " previous left images"
+            labels(3) = CStr(rightPoints.Count) + " detected in the right image that have matches in " + CStr(threshold) + " previous right images"
         End If
     End Sub
 End Class

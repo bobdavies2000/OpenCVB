@@ -76,7 +76,7 @@ End Class
 
 
 
-Public Class OpticalFlow_LeftRight : Inherits VB_Algorithm
+Public Class OpticalFlow_LeftRight1 : Inherits VB_Algorithm
     Dim pyrLeft As New OpticalFlow_LucasKanade
     Dim pyrRight As New OpticalFlow_LucasKanade
     Dim ptLeft As New List(Of cv.Point)
@@ -99,7 +99,13 @@ Public Class OpticalFlow_LeftRight : Inherits VB_Algorithm
         Dim leftY As New List(Of Integer)
         ptLeft.Clear()
         dst2 = task.leftView
-        For Each pt In pyrLeft.features
+        For i = 0 To pyrLeft.features.Count - 1
+            Dim pt = pyrLeft.features(i)
+            ptLeft.Add(New cv.Point(pt.X, pt.Y))
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            leftY.Add(pt.Y)
+
+            pt = pyrLeft.lastFeatures(i)
             ptLeft.Add(New cv.Point(pt.X, pt.Y))
             dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
             leftY.Add(pt.Y)
@@ -108,7 +114,13 @@ Public Class OpticalFlow_LeftRight : Inherits VB_Algorithm
         Dim rightY As New List(Of Integer)
         ptRight.Clear()
         dst3 = task.rightView
-        For Each pt In pyrRight.features
+        For i = 0 To pyrRight.features.Count - 1
+            Dim pt = pyrRight.features(i)
+            ptRight.Add(New cv.Point(pt.X, pt.Y))
+            dst3.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            rightY.Add(pt.Y)
+
+            pt = pyrRight.lastFeatures(i)
             ptRight.Add(New cv.Point(pt.X, pt.Y))
             dst3.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
             rightY.Add(pt.Y)
@@ -142,6 +154,97 @@ Public Class OpticalFlow_LeftRight : Inherits VB_Algorithm
         If task.heartBeat Then
             labels(2) = CStr(ptLeft.Count) + " features found in the left image, " + CStr(ptRight.Count) + " features in the right and " +
                         CStr(ptlist.Count) + " features are matched."
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpticalFlow_LeftRightHist : Inherits VB_Algorithm
+    Dim pyrLeft As New OpticalFlow_LucasKanade
+    Dim pyrRight As New OpticalFlow_LucasKanade
+    Public leftPoints As New List(Of cv.Point)
+    Public rightPoints As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Keep only the features that have been around for the specified number of frames."
+    End Sub
+    Public Function displayFeatures(dst As cv.Mat, features As List(Of cv.Point)) As cv.Mat
+        For Each pt In features
+            dst.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
+        Return dst
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        pyrLeft.Run(task.leftView)
+        Dim tmpLeft As New List(Of cv.Point)
+        For i = 0 To pyrLeft.features.Count - 1
+            Dim pt = New cv.Point(pyrLeft.features(i).X, pyrLeft.features(i).Y)
+            tmpLeft.Add(New cv.Point(pt.X, pt.Y))
+            pt = New cv.Point(pyrLeft.lastFeatures(i).X, pyrLeft.lastFeatures(i).Y)
+            tmpLeft.Add(New cv.Point(pt.X, pt.Y))
+        Next
+
+        pyrRight.Run(task.rightView)
+        Dim tmpRight As New List(Of cv.Point)
+        For i = 0 To pyrRight.features.Count - 1
+            Dim pt = New cv.Point(pyrRight.features(i).X, pyrRight.features(i).Y)
+            tmpRight.Add(New cv.Point(pt.X, pt.Y))
+            pt = New cv.Point(pyrRight.lastFeatures(i).X, pyrRight.lastFeatures(i).Y)
+            tmpRight.Add(New cv.Point(pt.X, pt.Y))
+        Next
+
+        Static leftHist As New List(Of List(Of cv.Point))({tmpLeft})
+        Static rightHist As New List(Of List(Of cv.Point))({tmpRight})
+
+        If task.optionsChanged Then
+            leftHist = New List(Of List(Of cv.Point))({tmpLeft})
+            rightHist = New List(Of List(Of cv.Point))({tmpRight})
+        End If
+
+        leftPoints.Clear()
+        For Each pt In tmpLeft
+            Dim count As Integer = 0
+            For Each hist In leftHist
+                If hist.Contains(pt) Then count += 1 Else Exit For
+            Next
+            If count = leftHist.Count Then leftPoints.Add(pt)
+        Next
+
+        rightPoints.Clear()
+        For Each pt In tmpRight
+            Dim count As Integer = 0
+            For Each hist In rightHist
+                If hist.Contains(pt) Then count += 1 Else Exit For
+            Next
+            If count = rightHist.Count Then rightPoints.Add(pt)
+        Next
+
+        Dim minPoints = 10 ' just a guess - trying to keep things current.
+        If leftPoints.Count < minPoints Then
+            leftPoints = tmpLeft
+            leftHist = New List(Of List(Of cv.Point))({tmpLeft})
+        End If
+        If rightPoints.Count < minPoints Then
+            rightPoints = tmpRight
+            rightHist = New List(Of List(Of cv.Point))({tmpRight})
+        End If
+
+        dst2 = displayFeatures(task.leftView, leftPoints)
+        dst3 = displayFeatures(task.rightView, rightPoints)
+
+        leftHist.Add(tmpLeft)
+        rightHist.Add(tmpRight)
+        Dim threshold = Math.Min(gOptions.FrameHistory.Value, leftHist.Count)
+
+        If leftHist.Count >= gOptions.FrameHistory.Value Then leftHist.RemoveAt(0)
+        If rightHist.Count >= gOptions.FrameHistory.Value Then rightHist.RemoveAt(0)
+
+        If task.heartBeat Then
+            labels(2) = CStr(leftPoints.Count) + " detected in the left image that have matches in " + CStr(threshold) + " previous left images"
+            labels(3) = CStr(rightPoints.Count) + " detected in the right image that have matches in " + CStr(threshold) + " previous right images"
         End If
     End Sub
 End Class
