@@ -1,5 +1,4 @@
-﻿Imports OpenCvSharp.Flann
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class MatchCell_Basics : Inherits VB_Algorithm
     Public lrFeat As New FeatureMatch_Basics
     Public flood As New Flood_LeftRight

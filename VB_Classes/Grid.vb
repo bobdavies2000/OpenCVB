@@ -486,7 +486,7 @@ Public Class Grid_TrackCenter : Inherits VB_Algorithm
         desc = "Track a cell near the center of the grid"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If match.correlation < match.options.correlationThreshold Or gOptions.DebugCheckBox.Checked Then
+        If match.correlation < match.options.correlationMin Or gOptions.DebugCheckBox.Checked Then
             gOptions.DebugCheckBox.Checked = False
             Dim index = task.gridToRoiIndex.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
             Dim roi = task.gridList(index)
@@ -494,8 +494,9 @@ Public Class Grid_TrackCenter : Inherits VB_Algorithm
             center = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
         End If
 
-        Dim boxSize = match.options.boxSize
-        match.searchRect = validateRect(New cv.Rect(center.X - boxSize, center.Y - boxSize, boxSize * 2, boxSize * 2))
+        Dim templatePad = match.options.templatePad
+        Dim templateSize = match.options.templateSize
+        match.searchRect = validateRect(New cv.Rect(center.X - templatePad, center.Y - templatePad, templateSize, templateSize))
         match.Run(src)
         center = match.matchCenter
 

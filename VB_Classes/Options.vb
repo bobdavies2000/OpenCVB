@@ -3351,9 +3351,9 @@ Public Class Options_FeatureMatch : Inherits VB_Algorithm
     Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
     Public matchText As String = ""
     Public featurePoints As Integer = 16
-    Public correlationThreshold As Single = 0.75
-    Public boxSize As Integer = 10 Or 1
-    Public halfSize As Integer = boxSize / 2
+    Public correlationMin As Single = 0.75
+    Public templatePad As Integer = 10
+    Public templateSize As Integer
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("CCoeff")
@@ -3367,8 +3367,8 @@ Public Class Options_FeatureMatch : Inherits VB_Algorithm
 
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
-            sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, correlationThreshold * 100)
-            sliders.setupTrackBar("MatchTemplate Cell Size", 2, 100, boxSize Or 1)
+            sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, correlationMin * 100)
+            sliders.setupTrackBar("MatchTemplate Cell Size", 2, 100, templatePad)
         End If
     End Sub
     Public Sub RunVB()
@@ -3386,10 +3386,11 @@ Public Class Options_FeatureMatch : Inherits VB_Algorithm
         featurePoints = featureSlider.value
 
         Static corrSlider = findSlider("Feature Correlation Threshold")
-        correlationThreshold = corrSlider.value / 100
+        correlationMin = corrSlider.value / 100
 
         Static cellSlider = findSlider("MatchTemplate Cell Size")
-        boxSize = cellSlider.value
+        templatePad = CInt(cellSlider.value / 2)
+        templateSize = cellSlider.value Or 1
     End Sub
 End Class
 
@@ -3405,13 +3406,17 @@ Public Class Options_Features : Inherits VB_Algorithm
     Public useBRISK As Boolean
     Public quality As Double = 0.01
     Public minDistance As Double = 10
-    Public roi As cv.Rect
     Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
     Public matchText As String = ""
     Public k As Double = 0.04
     Public useHarrisDetector As Boolean
     Public blockSize As Integer = 3
-    Public fOptions As New Options_FeatureMatch
+
+    Public featurePoints As Integer = 16
+    Public templatePad As Integer
+    Public templateSize As Integer
+    Public correlationMin As Single
+    Dim fOptions As New Options_FeatureMatch
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Min Distance to next", 1, 100, minDistance)
@@ -3427,7 +3432,6 @@ Public Class Options_Features : Inherits VB_Algorithm
             radio.check(0).Checked = True
         End If
 
-
         If findfrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Use HarrisDetector")
@@ -3441,19 +3445,23 @@ Public Class Options_Features : Inherits VB_Algorithm
         Static kSlider = findSlider("k X1000")
         Static blocksizeSlider = findSlider("Blocksize")
         Static harrisCheck = findCheckBox("Use HarrisDetector")
+
         useHarrisDetector = harrisCheck.checked
         blockSize = blocksizeSlider.value Or 1
         useBRISK = briskRadio.checked
         k = kSlider.value / 1000
 
         fOptions.RunVB()
+        featurePoints = fOptions.featurePoints
         matchOption = fOptions.matchOption
         matchText = fOptions.matchText
+        templatePad = fOptions.templatePad
+        templateSize = fOptions.templateSize
+        correlationMin = fOptions.correlationMin
 
         If task.optionsChanged Then
             quality = qualitySlider.Value / 100
             minDistance = distSlider.Value
-            roi = New cv.Rect(0, 0, fOptions.boxSize, fOptions.boxSize)
         End If
     End Sub
 End Class

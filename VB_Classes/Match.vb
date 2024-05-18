@@ -103,15 +103,14 @@ Public Class Match_RandomTest : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         If standaloneTest() Then
-            Dim sampleSize = options.fOptions.featurePoints
-            Static saveSampleCount = sampleSize
-            If saveSampleCount <> sampleSize Then
-                saveSampleCount = sampleSize
+            Static saveSampleCount = options.featurePoints
+            If saveSampleCount <> options.featurePoints Then
+                saveSampleCount = options.featurePoints
                 maxCorrelation = Single.MinValue
                 minCorrelation = Single.MaxValue
             End If
-            template = New cv.Mat(New cv.Size(CInt(sampleSize), 1), cv.MatType.CV_32FC1)
-            src = New cv.Mat(New cv.Size(CInt(sampleSize), 1), cv.MatType.CV_32FC1)
+            template = New cv.Mat(New cv.Size(options.featurePoints, 1), cv.MatType.CV_32FC1)
+            src = New cv.Mat(New cv.Size(options.featurePoints, 1), cv.MatType.CV_32FC1)
             cv.Cv2.Randn(template, 100, 25)
             cv.Cv2.Randn(src, 0, 25)
         End If

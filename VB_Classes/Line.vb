@@ -1039,9 +1039,6 @@ Public Class Line_Verticals : Inherits VB_Algorithm
         maxAngleX = angleXSlider.Value
         maxAngleZ = angleZSlider.Value
         Dim radius = CInt(cellSlider.Value / 2)
-        Dim rSize = options.fOptions.boxSize
-
-        ' lines.subsetRect = New cv.Rect(rSize * 3, rSize * 3, src.Width - rSize * 6, src.Height - rSize * 6)
         lines.Run(src.Clone)
 
         If lines.lpList.Count = 0 Then Exit Sub ' nothing to work with...
@@ -1124,8 +1121,8 @@ Public Class Line_Verts : Inherits VB_Algorithm
             vert.tc1 = match.tCells(0)
             vert.tc2 = match.tCells(1)
 
-            Dim threshold = verts.options.fOptions.correlationThreshold
-            If vert.tc1.correlation >= threshold And vert.tc2.correlation >= threshold Then
+            Dim correlationMin = verts.options.correlationMin
+            If vert.tc1.correlation >= correlationMin And vert.tc2.correlation >= correlationMin Then
                 lines2.Add(vert.tc1.center)
                 lines2.Add(vert.tc2.center)
                 lines3.Add(task.pointCloud.Get(Of cv.Point3f)(vert.tc1.center.Y, vert.tc1.center.X))

@@ -19,11 +19,11 @@ Public Class MatchLine_Basics : Inherits VB_Algorithm
         Return New cv.Point2f(r.TopLeft.X, r.BottomRight.Y)
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Dim minC = match.options.correlationThreshold
         dst2 = src.Clone
 
         Static lpSave As New pointPair
-        If task.quarterBeat Or match.correlation < minC Or lpSave.p1 <> lpInput.p1 Or lpSave.p2 <> lpInput.p2 Then
+        Dim correlationMin = match.options.correlationMin
+        If task.quarterBeat Or match.correlation < correlationMin Or lpSave.p1 <> lpInput.p1 Or lpSave.p2 <> lpInput.p2 Then
             lpSave = lpInput
             If standalone Then
                 Static knn As New KNN_ClosestTracker
@@ -53,7 +53,8 @@ Public Class MatchLine_Basics : Inherits VB_Algorithm
         End If
 
         match.Run(src)
-        If match.correlation >= minC Then
+        correlationMin = match.options.correlationMin
+        If match.correlation >= correlationMin Then
             If standaloneTest() Then dst3 = match.dst0.Resize(dst3.Size)
             Dim p1 = cornerToPoint(corner1, match.matchRect)
             Dim p2 = cornerToPoint(corner2, match.matchRect)

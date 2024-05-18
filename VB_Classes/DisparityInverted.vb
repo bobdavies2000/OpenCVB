@@ -17,7 +17,7 @@
 ' The Function() relating depth To disparity Is only valid For a calibrated stereo setup.
 ' If the stereo setup Is Not calibrated, then the function will not be accurate.
 Public Class DisparityFunction_Basics : Inherits VB_Algorithm
-    Dim match As New FeatureMatch_BasicsOld
+    Dim match As New FeatureMatch_Basics
     Public Sub New()
         labels = {"", "", "AddWeighted output: lines show disparity between left and right images",
                   "Disparity as a function of depth"}
@@ -39,8 +39,7 @@ Public Class DisparityFunction_Basics : Inherits VB_Algorithm
         Dim disparity As New SortedList(Of Integer, Single)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To match.mpList.Count - 1
             Dim mp = match.mpList(i)
-            Dim corr = match.vecList(i)
-            disparity.Add(mp.p1.X - mp.p2.X, corr.Z)
+            disparity.Add(mp.p1.X - mp.p2.X, match.mpCorrelation(i))
         Next
 
         Static depthStr As String

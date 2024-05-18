@@ -17,14 +17,13 @@ Public Class Feature_Basics : Inherits VB_Algorithm
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         task.features.Clear()
-        Dim sampleSize = options.fOptions.featurePoints
         If options.useBRISK Then
             Dim keyPoints = Brisk.Detect(src).ToList
             For Each kp In keyPoints
                 If kp.Size >= options.minDistance Then task.features.Add(kp.Pt)
             Next
         Else
-            task.features = cv.Cv2.GoodFeaturesToTrack(src, sampleSize, options.quality, options.minDistance, inputMask,
+            task.features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, inputMask,
                                                        options.blockSize, options.useHarrisDetector, options.k).ToList
         End If
 
@@ -59,7 +58,7 @@ Public Class Feature_BasicsOld : Inherits VB_Algorithm
         dst2 = src.Clone
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim sampleSize = options.fOptions.featurePoints
+        Dim sampleSize = options.featurePoints
         Dim features = cv.Cv2.GoodFeaturesToTrack(src, sampleSize, options.quality, options.minDistance, Nothing, 7, True, 3)
 
         featurePoints.Clear()
@@ -241,12 +240,12 @@ Public Class Feature_Line : Inherits VB_Algorithm
         Dim distanceThreshold = 50 ' pixels - arbitrary but realistically needs some value
         Dim linePercentThreshold = 0.7 ' if less than 70% of the pixels in the line are edges, then find a better line.  Again, arbitrary but realistic.
 
-        Dim threshold = options.fOptions.correlationThreshold
-        Dim correlationTest = tcells(0).correlation <= threshold Or tcells(1).correlation <= threshold
+        Dim correlationMin = options.correlationMin
+        Dim correlationTest = tcells(0).correlation <= correlationMin Or tcells(1).correlation <= correlationMin
         lineDisp.distance = tcells(0).center.DistanceTo(tcells(1).center)
         If task.optionsChanged Or correlationTest Or lineDisp.maskCount / lineDisp.distance < linePercentThreshold Or lineDisp.distance < distanceThreshold Then
-            Dim rSize = options.fOptions.boxSize
-            lines.subsetRect = New cv.Rect(rSize * 3, rSize * 3, src.Width - rSize * 6, src.Height - rSize * 6)
+            Dim templatePad = options.templatePad
+            lines.subsetRect = New cv.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6)
             lines.Run(src.Clone)
 
             If lines.mpList.Count = 0 Then
@@ -320,8 +319,8 @@ Public Class Feature_LinesVH : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        Dim rsize = options.fOptions.boxSize
-        ' gLines.lines.subsetRect = New cv.Rect(rsize * 3, rsize * 3, src.Width - rsize * 6, src.Height - rsize * 6)
+        Dim templatePad = options.templatePad
+        ' gLines.lines.subsetRect = New cv.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6)
         gLines.Run(src)
 
         Static vertRadio = findRadio("Vertical lines")
@@ -348,8 +347,8 @@ Public Class Feature_LinesVH : Inherits VB_Algorithm
             match.tCells.Add(gc.tc2)
 
             match.Run(src)
-            Dim threshold = options.fOptions.correlationThreshold
-            If match.tCells(0).correlation >= threshold And match.tCells(1).correlation >= threshold Then
+            Dim correlationMin = options.correlationMin
+            If match.tCells(0).correlation >= correlationMin And match.tCells(1).correlation >= correlationMin Then
                 gc.tc1 = match.tCells(0)
                 gc.tc2 = match.tCells(1)
                 gc = gLines.updateGLine(src, gc, gc.tc1.center, gc.tc2.center)
@@ -538,8 +537,7 @@ Public Class Feature_tCellTracker : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        Dim monitorCount = options.fOptions.featurePoints
-        Dim minCorrelation = options.fOptions.correlationThreshold
+        Dim correlationMin = options.correlationMin
 
         strOut = ""
         If tcells.Count < task.features.Count / 3 Or tcells.Count < 2 Or task.optionsChanged Then
@@ -557,7 +555,7 @@ Public Class Feature_tCellTracker : Inherits VB_Algorithm
         For Each tc In tcells
             match.tCells(0) = tc
             match.Run(src)
-            If match.tCells(0).correlation >= minCorrelation Then
+            If match.tCells(0).correlation >= correlationMin Then
                 tc = match.tCells(0)
                 setTrueText(Format(tc.correlation, fmt3), tc.center)
                 If standaloneTest() Then strOut += Format(tc.correlation, fmt3) + ", "
@@ -574,7 +572,7 @@ Public Class Feature_tCellTracker : Inherits VB_Algorithm
 
         tcells = New List(Of tCell)(newCells)
         labels(2) = "Of the " + CStr(task.features.Count) + " input cells " + CStr(newCells.Count) + " cells were tracked with correlation above " +
-                    Format(minCorrelation, fmt1)
+                    Format(correlationMin, fmt1)
     End Sub
 End Class
 
@@ -942,7 +940,7 @@ Public Class Feature_Points : Inherits VB_Algorithm
             dst2.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
             dst3.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
         Next
-        labels(2) = CStr(task.features.Count) + " targets were present with " + CStr(feat.options.fOptions.featurePoints) + " requested."
+        labels(2) = CStr(task.features.Count) + " targets were present with " + CStr(feat.options.featurePoints) + " requested."
     End Sub
 End Class
 
@@ -1433,9 +1431,9 @@ Public Class Feature_PointTracker : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        Dim minCorrelation = options.fOptions.correlationThreshold
-        Dim rSize = options.fOptions.boxSize
-        Dim radius = rSize / 2
+        Dim correlationMin = options.correlationMin
+        Dim templatePad = options.templatePad
+        Dim templateSize = options.templateSize
 
         strOut = ""
         If mPoints.ptx.Count <= 3 Then
@@ -1443,7 +1441,7 @@ Public Class Feature_PointTracker : Inherits VB_Algorithm
             feat.Run(src)
             For Each pt In task.features
                 mPoints.ptx.Add(pt)
-                Dim rect = validateRect(New cv.Rect(pt.X - radius, pt.Y - radius, rSize, rSize))
+                Dim rect = validateRect(New cv.Rect(pt.X - templatePad, pt.Y - templatePad, templateSize, templateSize))
             Next
             strOut = "Restart tracking -----------------------------------------------------------------------------" + vbCrLf
         End If
@@ -1451,7 +1449,7 @@ Public Class Feature_PointTracker : Inherits VB_Algorithm
 
         dst2 = src.Clone
         For i = mPoints.ptx.Count - 1 To 0 Step -1
-            If mPoints.correlation(i) > minCorrelation Then
+            If mPoints.correlation(i) > correlationMin Then
                 dst2.Circle(mPoints.ptx(i), task.dotSize, task.highlightColor, -1, task.lineType)
                 strOut += Format(mPoints.correlation(i), fmt3) + ", "
             Else
@@ -1464,7 +1462,7 @@ Public Class Feature_PointTracker : Inherits VB_Algorithm
         End If
 
         labels(2) = "Of the " + CStr(task.features.Count) + " input points, " + CStr(mPoints.ptx.Count) +
-                    " points were tracked with correlation above " + Format(minCorrelation, fmt2)
+                    " points were tracked with correlation above " + Format(correlationMin, fmt2)
     End Sub
 End Class
 
@@ -1490,10 +1488,12 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Static minSlider = findSlider("Minimum number of points")
         Dim minPoints = minSlider.Value
-        Dim minCorrelation = match.options.correlationThreshold
 
         feat.Run(src)
-        Dim boxSize = match.options.boxSize
+
+        Dim correlationMin = match.options.correlationMin
+        Dim templatePad = match.options.templatePad
+        Dim templateSize = match.options.templateSize
 
         src.CopyTo(dst2)
         Dim nextTemplates As New List(Of cv.Mat)
@@ -1502,7 +1502,7 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
             For Each pt In task.features
                 dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
 
-                Dim r = validateRect(New cv.Rect(pt.X - boxSize / 2, pt.Y - boxSize / 2, boxSize, boxSize))
+                Dim r = validateRect(New cv.Rect(pt.X - templatePad, pt.Y - templatePad, templateSize, templateSize))
                 nextTemplates.Add(src(r).Clone)
                 nextRects.Add(r)
             Next
@@ -1518,9 +1518,9 @@ Public Class Feature_BasicsValidated : Inherits VB_Algorithm
         For i = 0 To nextTemplates.Count - 1
             match.template = nextTemplates(i)
             Dim r = nextRects(i)
-            match.searchRect = validateRect(New cv.Rect(r.X - boxSize, r.Y - boxSize, boxSize * 2, boxSize * 2))
+            match.searchRect = validateRect(New cv.Rect(r.X - templatePad, r.Y - templatePad, templateSize, templateSize))
             match.Run(src)
-            If match.correlation > minCorrelation Then
+            If match.correlation > correlationMin Then
                 Dim center = match.matchCenter
                 templates.Add(nextTemplates(i))
                 rects.Add(nextRects(i))
@@ -1538,7 +1538,7 @@ End Class
 
 
 
-Public Class Feature_Longest1 : Inherits VB_Algorithm
+Public Class Feature_LongestKNN : Inherits VB_Algorithm
     Dim glines As New Line_GCloud
     Public knn As New KNN_ClosestTracker
     Public options As New Options_Features
@@ -1560,7 +1560,7 @@ Public Class Feature_Longest1 : Inherits VB_Algorithm
         Dim rect = validateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
         match.template = src(rect)
         match.Run(src)
-        If match.correlation >= options.fOptions.correlationThreshold Then
+        If match.correlation >= options.correlationMin Then
             dst3 = match.dst0.Resize(dst3.Size)
             dst2.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
             dst2.Circle(p1, task.dotSize, task.highlightColor, -1, task.lineType)
@@ -1594,19 +1594,20 @@ Public Class Feature_Longest : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         dst2 = src.Clone
-        Dim minC = match1.options.correlationThreshold
-        Dim boxSize = match1.options.boxSize, halfSize = match1.options.halfSize
+        Dim correlationMin = match1.options.correlationMin
+        Dim templatePad = match1.options.templatePad
+        Dim templateSize = match1.options.templateSize
 
         Static p1 As cv.Point, p2 As cv.Point
-        If task.heartBeat Or match1.correlation < minC And match2.correlation < minC Then
+        If task.heartBeat Or match1.correlation < correlationMin And match2.correlation < correlationMin Then
             knn.Run(src.Clone)
 
             p1 = knn.lastPair.p1
-            Dim r1 = validateRect(New cv.Rect(p1.X - halfSize, p1.Y - halfSize, boxSize, boxSize))
+            Dim r1 = validateRect(New cv.Rect(p1.X - templatePad, p1.Y - templatePad, templateSize, templateSize))
             match1.template = src(r1).Clone
 
             p2 = knn.lastPair.p2
-            Dim r2 = validateRect(New cv.Rect(p2.X - halfSize, p2.Y - halfSize, boxSize, boxSize))
+            Dim r2 = validateRect(New cv.Rect(p2.X - templatePad, p2.Y - templatePad, templateSize, templateSize))
             match2.template = src(r2).Clone
         End If
 
@@ -1643,8 +1644,7 @@ Public Class Feature_Grid : Inherits VB_Algorithm
 
         task.features.Clear()
         For Each roi In task.gridList
-            Dim sampleSize = options.fOptions.featurePoints
-            Dim features = cv.Cv2.GoodFeaturesToTrack(src(roi), sampleSize, options.quality, options.minDistance, Nothing,
+            Dim features = cv.Cv2.GoodFeaturesToTrack(src(roi), options.featurePoints, options.quality, options.minDistance, Nothing,
                                                       options.blockSize, True, options.k)
             For Each pt In features
                 task.features.Add(New cv.Point2f(roi.X + pt.X, roi.Y + pt.Y))

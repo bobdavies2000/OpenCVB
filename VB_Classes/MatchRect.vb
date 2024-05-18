@@ -10,7 +10,7 @@ Public Class MatchRect_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Static rectSave As New cv.Rect
         If task.optionsChanged Then match.correlation = 0
-        If match.correlation < match.options.correlationThreshold Or rectSave <> rectInput Or task.mouseClickFlag Then
+        If match.correlation < match.options.correlationMin Or rectSave <> rectInput Or task.mouseClickFlag Then
             If standalone Then
                 Static redC As New RedCloud_Basics
                 redC.Run(src)
@@ -21,8 +21,6 @@ Public Class MatchRect_Basics : Inherits VB_Algorithm
             rectSave = rectInput
             match.template = src(rectInput).Clone
         End If
-
-        'setSelectedContour''()
 
         match.Run(src)
         rectOutput = match.matchRect

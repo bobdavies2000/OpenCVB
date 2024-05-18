@@ -355,11 +355,8 @@ Public Class Horizon_Validate : Inherits VB_Algorithm
         desc = "Validate the horizon points using Match_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static correlationSlider = findSlider("Feature Correlation Threshold")
-        Static cellSizeSlider = findSlider("MatchTemplate Cell Size")
-        Dim minCorrelation = correlationSlider.value / 100
-        Dim boxSize = cellSizeSlider.value Or 1
-        Dim halfSize As Integer = boxSize / 2
+        Dim templatePad = match.options.templatePad
+        Dim templateSize = match.options.templateSize
 
         Static ptLeft As New cv.Point2f, ptRight As New cv.Point2f
         Static leftTemplate As cv.Mat, rightTemplate As cv.Mat
@@ -367,18 +364,18 @@ Public Class Horizon_Validate : Inherits VB_Algorithm
         If task.heartBeat Then
             ptLeft = task.gravityVec.p1
             ptRight = task.gravityVec.p2
-            Dim r = validateRect(New cv.Rect(ptLeft.X - halfSize, ptLeft.Y - halfSize, boxSize, boxSize))
+            Dim r = validateRect(New cv.Rect(ptLeft.X - templatePad, ptLeft.Y - templatePad, templateSize, templateSize))
             leftTemplate = src(r)
 
-            r = validateRect(New cv.Rect(ptRight.X - halfSize, ptRight.Y - halfSize, boxSize, boxSize))
+            r = validateRect(New cv.Rect(ptRight.X - templatePad, ptRight.Y - templatePad, templateSize, templateSize))
             rightTemplate = src(r)
         Else
-            Dim r = validateRect(New cv.Rect(ptLeft.X - boxSize, ptLeft.Y - boxSize, boxSize * 2, boxSize * 2))
+            Dim r = validateRect(New cv.Rect(ptLeft.X - templatePad, ptLeft.Y - templatePad, templateSize, templateSize))
             match.template = leftTemplate
             match.Run(src)
             ptLeft = match.matchCenter
 
-            r = validateRect(New cv.Rect(ptRight.X - boxSize, ptRight.Y - boxSize, boxSize * 2, boxSize * 2))
+            r = validateRect(New cv.Rect(ptRight.X - templatePad, ptRight.Y - templatePad, templateSize, templateSize))
             match.template = leftTemplate
             match.Run(src)
             ptLeft = match.matchCenter
