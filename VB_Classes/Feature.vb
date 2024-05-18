@@ -7,6 +7,7 @@ Public Class Feature_Basics : Inherits VB_Algorithm
     Dim knn As New KNN_Core
     Dim ptLost As New List(Of cv.Point2f)
     Public Sub New()
+        task.features.Clear() ' in case it was previously in use...
         desc = "Identify features with GoodFeaturesToTrack but manage them with MatchTemplate"
     End Sub
     Private Sub matchMat(pt As cv.Point2f, mat As cv.Mat, newMat As cv.Mat)
