@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class OpticalFlow_Basics : Inherits VB_Algorithm
-    Dim lrFeat As New OpticalFlow_LeftRight
-    Public mpList As New List(Of pointPair)
-    Public mpCorrelation As New List(Of Single)
+    Dim lrFlow As New OpticalFlow_LeftRight
+    Dim match As New FeatureMatch_Basics
     Public Sub New()
         gOptions.MaxDepth.Value = 20
         If standalone Then gOptions.displayDst1.Checked = True
@@ -10,84 +9,17 @@ Public Class OpticalFlow_Basics : Inherits VB_Algorithm
         desc = "Identify which feature in the left image corresponds to the feature in the right image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static corrSlider = findSlider("Feature Correlation Threshold")
-        Static cellSlider = findSlider("MatchTemplate Cell Size")
-        Dim pad = CInt(cellSlider.value / 2)
-        Dim gSize = cellSlider.value
-        Dim correlationMin = corrSlider.value / 100
+        lrFlow.Run(src)
+        labels = lrFlow.labels
 
-        lrFeat.Run(src)
-        labels(3) = lrFeat.labels(3)
+        match.buildCorrelations(lrFlow.leftFeatures, lrFlow.rightFeatures)
 
-        Dim correlationmat As New cv.Mat
-        mpList.Clear()
-        For i = 0 To lrFeat.leftFeatures.Count - 1
-            For Each pt In lrFeat.leftFeatures(i)
-                Dim rect = validateRect(New cv.Rect(pt.X - pad, pt.Y - pad, gSize, gSize))
-                Dim correlations As New List(Of Single)
-                For Each ptRight In lrFeat.rightFeatures(i)
-                    Dim r = validateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, gSize, gSize))
-                    cv.Cv2.MatchTemplate(task.leftView(rect), task.rightView(r), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
-                    correlations.Add(correlationmat.Get(Of Single)(0, 0))
-                Next
-                Dim maxCorrelation = correlations.Max
-                If maxCorrelation >= correlationMin Then
-                    Dim index = correlations.IndexOf(maxCorrelation)
-                    mpList.Add(New pointPair(pt, lrFeat.rightFeatures(i)(index)))
-                    mpCorrelation.Add(maxCorrelation)
-                End If
-            Next
-        Next
-
-        dst2 = task.leftView
-        dst3 = task.rightView
-        For Each mp In mpList
-            dst2.Circle(mp.p1, task.dotSize, task.highlightColor, -1, task.lineType)
-            dst3.Circle(mp.p2, task.dotSize, task.highlightColor, -1, task.lineType)
-        Next
-
-        Static clickPoint As New cv.Point, picTag As Integer
-        If task.mouseClickFlag Then
-            clickPoint = task.clickPoint
-            picTag = task.mousePicTag
-            task.drawRect = New cv.Rect(task.clickPoint.X - pad, task.clickPoint.Y - pad, gSize, gSize)
-            task.drawRectUpdated = True
-        End If
-
-        setTrueText("Click near any feature to find the corresponding pair of feature.", 1)
-        If standalone And mpList.Count > 0 And clickPoint <> newPoint Then
-            Static knn As New KNN_Core
-            knn.queries.Clear()
-            knn.queries.Add(task.clickPoint)
-
-            Dim mp As pointPair
-            For Each mp In mpList
-                Dim pt = If(picTag = 2, mp.p1, mp.p2)
-                knn.trainInput.Add(New cv.Point2f(pt.X, pt.Y))
-            Next
-            knn.Run(src)
-
-            dst1.SetTo(0)
-            Dim mpIndex = knn.result(0, 0)
-            mp = mpList(mpIndex)
-            dst2.Circle(mp.p1, task.dotSize + 4, cv.Scalar.Red, -1, task.lineType)
-            dst3.Circle(mp.p2, task.dotSize + 4, cv.Scalar.Red, -1, task.lineType)
-
-            setTrueText(Format(mpCorrelation(mpIndex), fmt3), mp.p1, 2)
-            setTrueText(Format(mpCorrelation(mpIndex), fmt3), mp.p2, 3)
-
-            Dim dspDistance = task.pcSplit(2).Get(Of Single)(mp.p1.Y, mp.p1.X)
-
-            Dim p1 = New cv.Point(mp.p1.X, mpList(mpIndex).p1.Y + 10)
-            Dim offset = mp.p1.X - mp.p2.X
-            setTrueText(Format(mpCorrelation(mpIndex), fmt3) + vbCrLf + Format(dspDistance, fmt3) + "m (from camera)" + vbCrLf +
-                        CStr(offset) + " Pixel difference", p1, 1)
-
-            If task.heartBeat Then dst1.SetTo(0)
-            dst1.Circle(mp.p1, task.dotSize, task.highlightColor, -1, task.lineType)
-            dst1.Circle(mp.p2, task.dotSize, task.highlightColor, -1, task.lineType)
-        End If
-        labels(2) = CStr(mpList.Count) + " features were identified, matched, and confirmed with correlation coefficients in the left and right images"
+        setTrueText("Click near any feature to find the corresponding pair of features.", 1)
+        match.displayResults()
+        dst1 = match.dst1
+        dst2 = match.dst2
+        dst3 = match.dst3
+        setTrueText(match.strOut, match.selectedPoint, 1)
     End Sub
 End Class
 
@@ -174,7 +106,7 @@ End Class
 
 
 Public Class OpticalFlow_LeftRight : Inherits VB_Algorithm
-    Dim lrHist As New OpticalFlow_LeftRightHist
+    Dim flowHist As New OpticalFlow_LeftRightHist
     Public leftFeatures As New List(Of List(Of cv.Point))
     Public rightFeatures As New List(Of List(Of cv.Point))
     Public Sub New()
@@ -189,11 +121,11 @@ Public Class OpticalFlow_LeftRight : Inherits VB_Algorithm
         Return dst
     End Function
     Public Sub RunVB(src As cv.Mat)
-        lrHist.Run(src)
+        flowHist.Run(src)
 
         Dim tmpLeft As New SortedList(Of Integer, List(Of cv.Point))
         Dim ptlist As List(Of cv.Point)
-        For Each pt In lrHist.leftPoints
+        For Each pt In flowHist.leftFeatures
             If tmpLeft.Keys.Contains(pt.Y) Then
                 Dim index = tmpLeft.Keys.IndexOf(pt.Y)
                 ptlist = tmpLeft.ElementAt(index).Value
@@ -206,7 +138,7 @@ Public Class OpticalFlow_LeftRight : Inherits VB_Algorithm
         Next
 
         Dim tmpRight As New SortedList(Of Integer, List(Of cv.Point))
-        For Each pt In lrHist.rightPoints
+        For Each pt In flowHist.rightFeatures
             If tmpRight.Keys.Contains(pt.Y) Then
                 Dim index = tmpRight.Keys.IndexOf(pt.Y)
                 ptlist = tmpRight.ElementAt(index).Value
@@ -265,7 +197,7 @@ Public Class OpticalFlow_LeftRight1 : Inherits VB_Algorithm
 
         Dim leftY As New List(Of Integer)
         ptLeft.Clear()
-        dst2 = task.leftView
+        dst2 = task.leftView.Clone
         For i = 0 To pyrLeft.features.Count - 1
             Dim pt = pyrLeft.features(i)
             ptLeft.Add(New cv.Point(pt.X, pt.Y))
@@ -280,7 +212,7 @@ Public Class OpticalFlow_LeftRight1 : Inherits VB_Algorithm
 
         Dim rightY As New List(Of Integer)
         ptRight.Clear()
-        dst3 = task.rightView
+        dst3 = task.rightView.Clone
         For i = 0 To pyrRight.features.Count - 1
             Dim pt = pyrRight.features(i)
             ptRight.Add(New cv.Point(pt.X, pt.Y))
@@ -300,24 +232,6 @@ Public Class OpticalFlow_LeftRight1 : Inherits VB_Algorithm
             If index >= 0 Then mpList.Add(New pointPair(ptLeft(i), ptRight(index)))
         Next
 
-        'Dim correlationmat As New cv.Mat
-        'Dim mpCorrelation As New List(Of Single)
-        'For i = 0 To mpList.Count - 1
-        '    Dim rect = validateRect(New cv.Rect(pt.X - pad, pt.Y - pad, gSize, gSize))
-        '    Dim correlations As New List(Of Single)
-        '    For Each ptRight In lrFeat.rightFeatures(i)
-        '        Dim r = validateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, gSize, gSize))
-        '        cv.Cv2.MatchTemplate(task.leftView(rect), task.rightView(r), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
-        '        correlations.Add(correlationmat.Get(Of Single)(0, 0))
-        '    Next
-        '    Dim maxCorrelation = correlations.Max
-        '    If maxCorrelation >= correlationMin Then
-        '        Dim index = correlations.IndexOf(maxCorrelation)
-        '        mpList.Add(New pointPair(pt, lrFeat.rightFeatures(i)(index)))
-        '        mpCorrelation.Add(maxCorrelation)
-        '    End If
-        'Next
-
         If task.heartBeat Then
             labels(2) = CStr(ptLeft.Count) + " features found in the left image, " + CStr(ptRight.Count) + " features in the right and " +
                         CStr(ptlist.Count) + " features are matched."
@@ -333,8 +247,8 @@ End Class
 Public Class OpticalFlow_LeftRightHist : Inherits VB_Algorithm
     Dim pyrLeft As New OpticalFlow_LucasKanade
     Dim pyrRight As New OpticalFlow_LucasKanade
-    Public leftPoints As New List(Of cv.Point)
-    Public rightPoints As New List(Of cv.Point)
+    Public leftFeatures As New List(Of cv.Point)
+    Public rightFeatures As New List(Of cv.Point)
     Public Sub New()
         desc = "Keep only the features that have been around for the specified number of frames."
     End Sub
@@ -371,36 +285,36 @@ Public Class OpticalFlow_LeftRightHist : Inherits VB_Algorithm
             rightHist = New List(Of List(Of cv.Point))({tmpRight})
         End If
 
-        leftPoints.Clear()
+        leftFeatures.Clear()
         For Each pt In tmpLeft
             Dim count As Integer = 0
             For Each hist In leftHist
                 If hist.Contains(pt) Then count += 1 Else Exit For
             Next
-            If count = leftHist.Count Then leftPoints.Add(pt)
+            If count = leftHist.Count Then leftFeatures.Add(pt)
         Next
 
-        rightPoints.Clear()
+        rightFeatures.Clear()
         For Each pt In tmpRight
             Dim count As Integer = 0
             For Each hist In rightHist
                 If hist.Contains(pt) Then count += 1 Else Exit For
             Next
-            If count = rightHist.Count Then rightPoints.Add(pt)
+            If count = rightHist.Count Then rightFeatures.Add(pt)
         Next
 
         Dim minPoints = 10 ' just a guess - trying to keep things current.
-        If leftPoints.Count < minPoints Then
-            leftPoints = tmpLeft
+        If leftFeatures.Count < minPoints Then
+            leftFeatures = tmpLeft
             leftHist = New List(Of List(Of cv.Point))({tmpLeft})
         End If
-        If rightPoints.Count < minPoints Then
-            rightPoints = tmpRight
+        If rightFeatures.Count < minPoints Then
+            rightFeatures = tmpRight
             rightHist = New List(Of List(Of cv.Point))({tmpRight})
         End If
 
-        dst2 = displayFeatures(task.leftView, leftPoints)
-        dst3 = displayFeatures(task.rightView, rightPoints)
+        dst2 = displayFeatures(task.leftView.Clone, leftFeatures)
+        dst3 = displayFeatures(task.rightView.Clone, rightFeatures)
 
         leftHist.Add(tmpLeft)
         rightHist.Add(tmpRight)
@@ -410,8 +324,8 @@ Public Class OpticalFlow_LeftRightHist : Inherits VB_Algorithm
         If rightHist.Count >= gOptions.FrameHistory.Value Then rightHist.RemoveAt(0)
 
         If task.heartBeat Then
-            labels(2) = CStr(leftPoints.Count) + " detected in the left image that have matches in " + CStr(threshold) + " previous left images"
-            labels(3) = CStr(rightPoints.Count) + " detected in the right image that have matches in " + CStr(threshold) + " previous right images"
+            labels(2) = CStr(leftFeatures.Count) + " detected in the left image that have matches in " + CStr(threshold) + " previous left images"
+            labels(3) = CStr(rightFeatures.Count) + " detected in the right image that have matches in " + CStr(threshold) + " previous right images"
         End If
     End Sub
 End Class
