@@ -635,7 +635,6 @@ if algorithmName = "Feature_Reduction" Then return new Feature_Reduction
 if algorithmName = "Feature_ShiTomasi" Then return new Feature_ShiTomasi
 if algorithmName = "Feature_Stable" Then return new Feature_Stable
 if algorithmName = "Feature_StableAgast" Then return new Feature_StableAgast
-if algorithmName = "Feature_StableSorted" Then return new Feature_StableSorted
 if algorithmName = "Feature_tCellTracker" Then return new Feature_tCellTracker
 if algorithmName = "Feature_Trace" Then return new Feature_Trace
 if algorithmName = "Feature_TraceDelaunay" Then return new Feature_TraceDelaunay

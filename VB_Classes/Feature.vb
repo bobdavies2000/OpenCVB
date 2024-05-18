@@ -1016,64 +1016,6 @@ End Class
 
 
 
-Public Class Feature_StableSorted : Inherits VB_Algorithm
-    Dim feat As New Feature_Basics
-    Public desiredCount As Integer
-    Public stablePoints As New List(Of cv.Point2f)
-    Public generations As New List(Of Integer)
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired Count", 1, 500, 200)
-        desc = "Display the top X feature points ordered by generations they were present."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static countSlider = findSlider("Desired Count")
-        desiredCount = countSlider.value
-
-        feat.Run(src.Clone)
-        dst3 = feat.dst2
-        dst2 = src
-
-        If task.optionsChanged Then
-            stablePoints.Clear()
-            generations.Clear()
-        End If
-
-        For i = 0 To task.features.Count - 1
-            Dim pt = New cv.Point2f(Math.Round(task.features(i).X), Math.Round(task.features(i).Y))
-            If stablePoints.Contains(pt) Then
-                generations(i) += 1
-            Else
-                stablePoints.Add(pt)
-                generations.Add(1)
-            End If
-        Next
-
-        Dim sortByGen As New SortedList(Of Integer, cv.Point2f)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To stablePoints.Count - 1
-            sortByGen.Add(generations(i), stablePoints(i))
-        Next
-
-        Dim displayCount As Integer
-        stablePoints.Clear()
-        generations.Clear()
-        For i = 0 To Math.Min(sortByGen.Count, desiredCount * 2) - 1
-            Dim ele = sortByGen.ElementAt(i)
-            Dim pt = ele.Value
-            If displayCount < desiredCount Then
-                dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
-                displayCount += 1
-            End If
-            stablePoints.Add(ele.Value)
-            generations.Add(ele.Key)
-        Next
-        labels(2) = "The most stable " + CStr(displayCount) + " points are highlighted below"
-        labels(3) = "Output of Feature_Basics" + CStr(task.features.Count) + " points found"
-    End Sub
-End Class
-
-
-
-
 
 Public Class Feature_StableAgast : Inherits VB_Algorithm
     Dim agast As New Feature_Agast

@@ -129,7 +129,7 @@ End Class
 
 
 Public Class MatchCell_CellFeatures : Inherits VB_Algorithm
-    Public feat As New Feature_Basics
+    Public feat As New Feature_Good
     Public featLeft As New List(Of cv.Point2f)
     Public featRight As New List(Of cv.Point2f)
     Public flood As New Flood_LeftRight
