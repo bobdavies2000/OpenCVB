@@ -2,7 +2,7 @@
 Imports System.Web.UI.WebControls
 Imports cv = OpenCvSharp
 Public Class FeatureMatch_Basics : Inherits VB_Algorithm
-    Dim lrFeat As New FeatureMatch_LeftRight
+    Dim unMatched As New FeatureMatch_LRUnMatched
     Public mpList As New List(Of pointPair)
     Public mpCorrelation As New List(Of Single)
     Public selectedPoint As cv.Point
@@ -103,10 +103,10 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
         End If
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        lrFeat.Run(src)
-        labels(3) = lrFeat.labels(3)
+        unMatched.Run(src)
+        labels(3) = unMatched.labels(3)
 
-        buildCorrelations(lrFeat.leftFeatures, lrFeat.rightFeatures)
+        buildCorrelations(unMatched.leftFeatures, unMatched.rightFeatures)
         displayResults()
     End Sub
 End Class
@@ -119,7 +119,7 @@ End Class
 
 
 
-Public Class FeatureMatch_LeftRightHist : Inherits VB_Algorithm
+Public Class FeatureMatch_LRHist : Inherits VB_Algorithm
     Dim feat As New Feature_Basics
     Dim fGrid As New Feature_Grid
     Public leftPoints As New List(Of cv.Point)
@@ -276,8 +276,8 @@ End Class
 
 
 
-Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
-    Dim lrHist As New FeatureMatch_LeftRightHist
+Public Class FeatureMatch_LRUnMatched : Inherits VB_Algorithm
+    Dim lrHist As New FeatureMatch_LRHist
     Public leftFeatures As New List(Of List(Of cv.Point))
     Public rightFeatures As New List(Of List(Of cv.Point))
     Public Sub New()
@@ -338,85 +338,5 @@ Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
             labels(2) = CStr(leftFeatures.Count) + " detected in the left image that match one or more Y-coordinates found in the right image"
             labels(3) = CStr(rightFeatures.Count) + " detected in the right image that match one or more Y-coordinates found in the left image"
         End If
-    End Sub
-End Class
-
-
-
-
-
-Public Class FeatureMatch_Correlation : Inherits VB_Algorithm
-    Public options As New Options_Features
-    Public features As New List(Of cv.Point2f)
-    Public points As New List(Of cv.Point)
-    Dim matList As New List(Of cv.Mat)
-    Dim ptList As New List(Of cv.Point2f)
-    Dim knn As New KNN_Core
-    Dim ptLost As New List(Of cv.Point2f)
-    Public Sub New()
-        desc = "Identify features with Feature_Basics but manage them with MatchTemplate"
-    End Sub
-    Private Sub matchMat(pt As cv.Point2f, mat As cv.Mat, newMat As cv.Mat)
-        Dim correlationMat As New cv.Mat
-        Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
-        cv.Cv2.MatchTemplate(newMat, mat, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-        If correlationMat.Get(Of Single)(0, 0) > options.correlationMin Then
-            matList.Add(mat)
-            ptList.Add(pt)
-        Else
-            ptLost.Add(pt)
-        End If
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        dst2 = src.Clone
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        Static featureMat As New List(Of cv.Mat)
-
-        matList.Clear()
-        ptList.Clear()
-        ptLost.Clear()
-        For i = 0 To features.Count - 1
-            Dim pt = features(i)
-            Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
-            matchMat(pt, featureMat(i), src(rect))
-        Next
-
-        featureMat = New List(Of cv.Mat)(matList)
-        features = New List(Of cv.Point2f)(ptList)
-
-        task.features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cv.Mat,
-                                                   options.blockSize, True, options.k).ToList
-
-        If features.Count < task.features.Count * options.thresholdPercent Then
-            featureMat.Clear()
-            features.Clear()
-            For Each pt In task.features
-                Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
-                featureMat.Add(src(rect))
-                features.Add(pt)
-            Next
-        Else
-            knn.queries = ptLost
-            knn.trainInput = task.features
-            knn.Run(Nothing)
-
-            For i = 0 To knn.queries.Count - 1
-                Dim pt = knn.queries(i)
-                Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
-                featureMat.Add(src(rect))
-                Dim ptNew = knn.trainInput(knn.result(i, 0))
-                If features.Contains(ptNew) = False Then features.Add(ptNew)
-            Next
-        End If
-
-        points.Clear()
-        For Each pt In features
-            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-            points.Add(New cv.Point(pt.X, pt.Y))
-        Next
-        labels(2) = CStr(features.Count) + " features " + CStr(matList.Count) + " were matched using correlation coefficients and " +
-                    CStr(ptLost.Count) + " features had to be relocated."
     End Sub
 End Class

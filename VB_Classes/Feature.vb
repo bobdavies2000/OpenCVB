@@ -1,12 +1,86 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_Basics : Inherits VB_Algorithm
-    Dim Brisk As cv.BRISK
     Public options As New Options_Features
-    Public inputMask As New cv.Mat
+    Dim matList As New List(Of cv.Mat)
+    Dim ptList As New List(Of cv.Point2f)
+    Dim knn As New KNN_Core
+    Dim ptLost As New List(Of cv.Point2f)
     Public Sub New()
-        Brisk = cv.BRISK.Create()
+        desc = "Identify features with GoodFeaturesToTrack but manage them with MatchTemplate"
+    End Sub
+    Private Sub matchMat(pt As cv.Point2f, mat As cv.Mat, newMat As cv.Mat)
+        Dim correlationMat As New cv.Mat
+        Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
+        cv.Cv2.MatchTemplate(newMat, mat, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+        If correlationMat.Get(Of Single)(0, 0) > options.correlationMin Then
+            matList.Add(mat)
+            ptList.Add(pt)
+        Else
+            ptLost.Add(pt)
+        End If
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        dst2 = src.Clone
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Static featureMat As New List(Of cv.Mat)
+
+        matList.Clear()
+        ptList.Clear()
+        ptLost.Clear()
+        For i = 0 To task.features.Count - 1
+            Dim pt = task.features(i)
+            Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
+            matchMat(pt, featureMat(i), src(rect))
+        Next
+
+        featureMat = New List(Of cv.Mat)(matList)
+        task.features = New List(Of cv.Point2f)(ptList)
+
+        Dim nextFeatures = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cv.Mat,
+                                                      options.blockSize, True, options.k).ToList
+
+        If task.features.Count < nextFeatures.Count * options.thresholdPercent Then
+            featureMat.Clear()
+            task.features.Clear()
+            For Each pt In nextFeatures
+                Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
+                featureMat.Add(src(rect))
+                task.features.Add(pt)
+            Next
+        Else
+            knn.queries = ptLost
+            knn.trainInput = nextFeatures
+            knn.Run(Nothing)
+
+            For i = 0 To knn.queries.Count - 1
+                Dim pt = knn.queries(i)
+                Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
+                featureMat.Add(src(rect))
+                task.features.Add(knn.trainInput(knn.result(i, 0)))
+            Next
+        End If
+
+        task.featurePoints.Clear()
+        For Each pt In task.features
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
+        Next
+        labels(2) = CStr(task.features.Count) + " features " + CStr(matList.Count) + " were matched using correlation coefficients and " +
+                    CStr(ptLost.Count) + " features had to be relocated."
+    End Sub
+End Class
+
+
+
+
+
+' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
+Public Class Feature_Good : Inherits VB_Algorithm
+    Public options As New Options_Features
+    Public Sub New()
         findSlider("Feature Sample Size").Value = 400
         vbAddAdvice(traceName + ": Use 'Options_Features' to control output.")
         desc = "Find good features to track in a BGR image."
@@ -18,7 +92,7 @@ Public Class Feature_Basics : Inherits VB_Algorithm
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         task.features.Clear()
 
-        task.features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, inputMask,
+        task.features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cv.Mat,
                                                    options.blockSize, True, options.k).ToList
 
         Dim color = If(dst2.Channels = 3, cv.Scalar.Yellow, cv.Scalar.White)

@@ -241,6 +241,7 @@ Public Class VBtask : Implements IDisposable
     Public cellMap As cv.Mat
 
     Public features As New List(Of cv.Point2f)
+    Public featurePoints As New List(Of cv.Point)
 
     Public useXYRange As Boolean ' OpenGL applications don't need to adjust the ranges.
     Public xRange As Single
