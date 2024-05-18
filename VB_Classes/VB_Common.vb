@@ -112,13 +112,6 @@ Module VB_Common
         Dim normal = New cv.Point3f(plane(0) / magnitude, plane(1) / magnitude, plane(2) / magnitude)
         Return New cv.Vec4f(normal.X, normal.Y, normal.Z, -(normal.X * centroid.X + normal.Y * centroid.Y + normal.Z * centroid.Z))
     End Function
-    Public Function expandRect(r As cv.Rect) As cv.Rect
-        Dim pad = 5
-        r = New cv.Rect(r.X - pad, r.Y - pad, r.Width + pad * 2, r.Height + pad * 2)
-        If r.X < 0 Then r.X = 0
-        If r.Y < 0 Then r.Y = 0
-        Return r
-    End Function
     ' http://james-ramsden.com/calculate-the-cross-product-c-code/
     Public Function crossProduct(v1 As cv.Point3f, v2 As cv.Point3f) As cv.Point3f
         Dim product As New cv.Point3f

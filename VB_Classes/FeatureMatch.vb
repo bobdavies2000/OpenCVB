@@ -3,9 +3,10 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
     Dim lrFeat As New FeatureMatch_LeftRight
     Public mpList As New List(Of pointPair)
     Public mpCorrelation As New List(Of Single)
-    Public pad As Integer, gsize As Integer, correlationMin As Single
     Public selectedPoint As cv.Point
     Dim clickPoint As cv.Point, picTag As Integer
+    Dim templatePad As Integer, templateSize As Integer
+    Dim options As New Options_Features
     Public Sub New()
         task.mouseClickFlag = True
         task.clickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
@@ -16,21 +17,21 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
         desc = "Identify which feature in the left image corresponds to the feature in the right image."
     End Sub
     Public Sub buildCorrelations(leftFeatures As List(Of List(Of cv.Point)), rightFeatures As List(Of List(Of cv.Point)))
-        Static corrSlider = findSlider("Feature Correlation Threshold")
-        Static cellSlider = findSlider("MatchTemplate Cell Size")
-        pad = CInt(cellSlider.value / 2)
-        gsize = cellSlider.value
-        correlationMin = corrSlider.value / 100
+        options.RunVB()
+
+        templatePad = options.templatePad
+        templateSize = options.templateSize
+        Dim correlationMin = options.correlationMin
 
         Dim correlationmat As New cv.Mat
         mpList.Clear()
         mpCorrelation.Clear()
         For i = 0 To leftFeatures.Count - 1
             For Each pt In leftFeatures(i)
-                Dim rect = validateRect(New cv.Rect(pt.X - pad, pt.Y - pad, gsize, gsize))
+                Dim rect = validateRect(New cv.Rect(pt.X - templatePad, pt.Y - templatePad, templateSize, templateSize))
                 Dim correlations As New List(Of Single)
                 For Each ptRight In rightFeatures(i)
-                    Dim r = validateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, gsize, gsize))
+                    Dim r = validateRect(New cv.Rect(ptRight.X - templatePad, ptRight.Y - templatePad, templateSize, templateSize))
                     cv.Cv2.MatchTemplate(task.leftView(rect), task.rightView(r), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
                     correlations.Add(correlationmat.Get(Of Single)(0, 0))
                 Next
@@ -46,7 +47,7 @@ Public Class FeatureMatch_Basics : Inherits VB_Algorithm
     Private Sub setClickPoint(pt As cv.Point, _pictag As Integer)
         clickPoint = pt
         picTag = _pictag
-        task.drawRect = New cv.Rect(clickPoint.X - pad, clickPoint.Y - pad, gsize, gsize)
+        task.drawRect = New cv.Rect(clickPoint.X - templatePad, clickPoint.Y - templatePad, templateSize, templateSize)
         task.drawRectUpdated = True
     End Sub
     Public Sub displayResults()
@@ -335,5 +336,34 @@ Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
             labels(2) = CStr(leftFeatures.Count) + " detected in the left image that match one or more Y-coordinates found in the right image"
             labels(3) = CStr(rightFeatures.Count) + " detected in the right image that match one or more Y-coordinates found in the left image"
         End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureMatch_Correlation : Inherits VB_Algorithm
+    Dim feat As New Feature_Basics
+    Public options As New Options_Features
+    Dim inputMask As New cv.Mat
+    Public Sub New()
+        desc = "Identify features with Feature_Basics but manage them with MatchTemplate"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        dst2 = src.Clone
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Static features As New List(Of cv.Point2f)(task.features)
+        Static featureMat As New List(Of cv.Mat)
+
+        Dim correlationmat As New cv.Mat
+        For Each mat In featureMat
+            ' cv.Cv2.MatchTemplate(task.leftView(RECT), task.rightView(r), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
+        Next
+        task.features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, inputMask,
+                                                   options.blockSize, options.useHarrisDetector, options.k).ToList
+
     End Sub
 End Class

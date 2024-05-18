@@ -116,12 +116,6 @@ Public Class OpticalFlow_LeftRight1 : Inherits VB_Algorithm
         desc = "Find features using optical flow in both the left and right images."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static corrSlider = findSlider("Feature Correlation Threshold")
-        Static cellSlider = findSlider("MatchTemplate Cell Size")
-        Dim pad = CInt(cellSlider.value / 2)
-        Dim gSize = cellSlider.value
-        Dim correlationMin = corrSlider.value / 100
-
         pyrLeft.Run(task.leftView)
         pyrRight.Run(task.rightView)
 
