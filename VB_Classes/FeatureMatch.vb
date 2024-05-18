@@ -113,75 +113,6 @@ End Class
 
 
 
-Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
-    Dim lrHist As New FeatureMatch_LeftRightHist
-    Public leftFeatures As New List(Of List(Of cv.Point))
-    Public rightFeatures As New List(Of List(Of cv.Point))
-    Public Sub New()
-        desc = "Match features in the left and right images"
-    End Sub
-    Public Function displayFeatures(dst As cv.Mat, features As List(Of List(Of cv.Point))) As cv.Mat
-        For Each ptlist In features
-            For Each pt In ptlist
-                dst.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-            Next
-        Next
-        Return dst
-    End Function
-    Public Sub RunVB(src As cv.Mat)
-        lrHist.Run(src)
-
-        Dim tmpLeft As New SortedList(Of Integer, List(Of cv.Point))
-        Dim ptlist As List(Of cv.Point)
-        For Each pt In lrHist.leftPoints
-            If tmpLeft.Keys.Contains(pt.Y) Then
-                Dim index = tmpLeft.Keys.IndexOf(pt.Y)
-                ptlist = tmpLeft.ElementAt(index).Value
-                ptlist.Add(pt)
-                tmpLeft.RemoveAt(index)
-            Else
-                ptlist = New List(Of cv.Point)({pt})
-            End If
-            tmpLeft.Add(pt.Y, ptlist)
-        Next
-
-        Dim tmpRight As New SortedList(Of Integer, List(Of cv.Point))
-        For Each pt In lrHist.rightPoints
-            If tmpRight.Keys.Contains(pt.Y) Then
-                Dim index = tmpRight.Keys.IndexOf(pt.Y)
-                ptlist = tmpRight.ElementAt(index).Value
-                ptlist.Add(pt)
-                tmpRight.RemoveAt(index)
-            Else
-                ptlist = New List(Of cv.Point)({pt})
-            End If
-            tmpRight.Add(pt.Y, ptlist)
-        Next
-
-        leftFeatures.Clear()
-        rightFeatures.Clear()
-        For Each ele In tmpLeft
-            Dim index = tmpRight.Keys.IndexOf(ele.Key)
-            If index >= 0 Then
-                leftFeatures.Add(ele.Value)
-                rightFeatures.Add(tmpRight.ElementAt(index).Value)
-            End If
-        Next
-
-        dst2 = displayFeatures(task.leftView.Clone, leftFeatures)
-        dst3 = displayFeatures(task.rightView.Clone, rightFeatures)
-
-        If task.heartBeat Then
-            labels(2) = CStr(leftFeatures.Count) + " detected in the left image that match one or more Y-coordinates found in the right image"
-            labels(3) = CStr(rightFeatures.Count) + " detected in the right image that match one or more Y-coordinates found in the left image"
-        End If
-    End Sub
-End Class
-
-
-
-
-
 
 
 
@@ -200,6 +131,7 @@ Public Class FeatureMatch_LeftRightHist : Inherits VB_Algorithm
 
         findSlider("Min Distance to next").Value = 1
         gOptions.FrameHistory.Value = 10
+        If task.workingRes.Width > 336 Then gOptions.FrameHistory.Value = 1
         desc = "Keep only the features that have been around for the specified number of frames."
     End Sub
     Public Function displayFeatures(dst As cv.Mat, features As List(Of cv.Point)) As cv.Mat
@@ -508,5 +440,75 @@ Public Class FeatureMatch_Delaunay : Inherits VB_Algorithm
             Next
         End If
 
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
+    Dim lrHist As New FeatureMatch_LeftRightHist
+    Public leftFeatures As New List(Of List(Of cv.Point))
+    Public rightFeatures As New List(Of List(Of cv.Point))
+    Public Sub New()
+        desc = "Match features in the left and right images"
+    End Sub
+    Public Function displayFeatures(dst As cv.Mat, features As List(Of List(Of cv.Point))) As cv.Mat
+        For Each ptlist In features
+            For Each pt In ptlist
+                dst.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            Next
+        Next
+        Return dst
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        lrHist.Run(src)
+
+        Dim tmpLeft As New SortedList(Of Integer, List(Of cv.Point))
+        Dim ptlist As List(Of cv.Point)
+        For Each pt In lrHist.leftPoints
+            If tmpLeft.Keys.Contains(pt.Y) Then
+                Dim index = tmpLeft.Keys.IndexOf(pt.Y)
+                ptlist = tmpLeft.ElementAt(index).Value
+                ptlist.Add(pt)
+                tmpLeft.RemoveAt(index)
+            Else
+                ptlist = New List(Of cv.Point)({pt})
+            End If
+            tmpLeft.Add(pt.Y, ptlist)
+        Next
+
+        Dim tmpRight As New SortedList(Of Integer, List(Of cv.Point))
+        For Each pt In lrHist.rightPoints
+            If tmpRight.Keys.Contains(pt.Y) Then
+                Dim index = tmpRight.Keys.IndexOf(pt.Y)
+                ptlist = tmpRight.ElementAt(index).Value
+                ptlist.Add(pt)
+                tmpRight.RemoveAt(index)
+            Else
+                ptlist = New List(Of cv.Point)({pt})
+            End If
+            tmpRight.Add(pt.Y, ptlist)
+        Next
+
+        leftFeatures.Clear()
+        rightFeatures.Clear()
+        For Each ele In tmpLeft
+            Dim index = tmpRight.Keys.IndexOf(ele.Key)
+            If index >= 0 Then
+                leftFeatures.Add(ele.Value)
+                rightFeatures.Add(tmpRight.ElementAt(index).Value)
+            End If
+        Next
+
+        dst2 = displayFeatures(task.leftView.Clone, leftFeatures)
+        dst3 = displayFeatures(task.rightView.Clone, rightFeatures)
+
+        If task.heartBeat Then
+            labels(2) = CStr(leftFeatures.Count) + " detected in the left image that match one or more Y-coordinates found in the right image"
+            labels(3) = CStr(rightFeatures.Count) + " detected in the right image that match one or more Y-coordinates found in the left image"
+        End If
     End Sub
 End Class

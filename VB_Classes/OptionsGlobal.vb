@@ -63,7 +63,6 @@ Public Class OptionsGlobal
 
         task.dotSize = 1
         task.cvFontThickness = 1
-        task.matchTemplateCellSize = 20
         Select Case task.workingRes.Width
             Case 1920
                 GridSize.Value = 192
@@ -75,7 +74,6 @@ Public Class OptionsGlobal
                 task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 40
                 task.FASTthreshold = 25
-                task.matchTemplateCellSize = 100
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
             Case 960
                 GridSize.Value = 96
@@ -87,7 +85,6 @@ Public Class OptionsGlobal
                 task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 200
                 task.FASTthreshold = 20
-                task.matchTemplateCellSize = 80
             Case 480
                 GridSize.Value = 48
                 task.cvFontSize = 1.2
@@ -96,7 +93,6 @@ Public Class OptionsGlobal
                 task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 650
                 task.FASTthreshold = 10
-                task.matchTemplateCellSize = 60
             Case 1280
                 GridSize.Value = 128
                 task.cvFontSize = 2.5
@@ -107,7 +103,6 @@ Public Class OptionsGlobal
                 task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 150
                 task.FASTthreshold = 20
-                task.matchTemplateCellSize = 80
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
             Case 640
                 GridSize.Value = 64
@@ -118,7 +113,6 @@ Public Class OptionsGlobal
                 task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 200
                 task.FASTthreshold = 10
-                task.matchTemplateCellSize = 60
             Case 320
                 GridSize.Value = 32
                 task.cvFontSize = 1.0
