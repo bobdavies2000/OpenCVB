@@ -4,7 +4,7 @@ Public Class Match_Basics : Inherits VB_Algorithm
     Public template As cv.Mat
     Public mmData As mmData
     Public correlation As Single
-    Public options As New Options_FeatureMatch
+    Public options As New Options_Features
     Public matchCenter As cv.Point
     Public matchRect As New cv.Rect
     Public searchRect As New cv.Rect

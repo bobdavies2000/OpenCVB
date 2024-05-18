@@ -17,15 +17,9 @@ Public Class Feature_Basics : Inherits VB_Algorithm
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         task.features.Clear()
-        If options.useBRISK Then
-            Dim keyPoints = Brisk.Detect(src).ToList
-            For Each kp In keyPoints
-                If kp.Size >= options.minDistance Then task.features.Add(kp.Pt)
-            Next
-        Else
-            task.features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, inputMask,
-                                                       options.blockSize, options.useHarrisDetector, options.k).ToList
-        End If
+
+        task.features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, inputMask,
+                                                   options.blockSize, True, options.k).ToList
 
         Dim color = If(dst2.Channels = 3, cv.Scalar.Yellow, cv.Scalar.White)
         For Each pt In task.features

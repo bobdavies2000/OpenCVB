@@ -3350,10 +3350,6 @@ End Class
 Public Class Options_FeatureMatch : Inherits VB_Algorithm
     Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
     Public matchText As String = ""
-    Public featurePoints As Integer = 16
-    Public correlationMin As Single = 0.75
-    Public templatePad As Integer = 10
-    Public templateSize As Integer
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("CCoeff")
@@ -3363,12 +3359,6 @@ Public Class Options_FeatureMatch : Inherits VB_Algorithm
             radio.addRadio("SqDiff")
             radio.addRadio("SqDiffNormed")
             radio.check(1).Checked = True
-        End If
-
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
-            sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, correlationMin * 100)
-            sliders.setupTrackBar("MatchTemplate Cell Size", 2, 100, templatePad)
         End If
     End Sub
     Public Sub RunVB()
@@ -3381,16 +3371,6 @@ Public Class Options_FeatureMatch : Inherits VB_Algorithm
                 Exit For
             End If
         Next
-
-        Static featureSlider = findSlider("Feature Sample Size")
-        featurePoints = featureSlider.value
-
-        Static corrSlider = findSlider("Feature Correlation Threshold")
-        correlationMin = corrSlider.value / 100
-
-        Static cellSlider = findSlider("MatchTemplate Cell Size")
-        templatePad = CInt(cellSlider.value / 2)
-        templateSize = cellSlider.value Or 1
     End Sub
 End Class
 
@@ -3403,61 +3383,58 @@ End Class
 
 
 Public Class Options_Features : Inherits VB_Algorithm
-    Public useBRISK As Boolean
     Public quality As Double = 0.01
     Public minDistance As Double = 10
     Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
     Public matchText As String = ""
     Public k As Double = 0.04
-    Public useHarrisDetector As Boolean
     Public blockSize As Integer = 3
 
-    Public featurePoints As Integer = 16
-    Public templatePad As Integer
+    Public featurePoints As Integer = 400
+    Public templatePad As Integer = 10
     Public templateSize As Integer
-    Public correlationMin As Single
+    Public correlationMin As Single = 0.75
+    Public thresholdPercent As Single = 0.9
     Dim fOptions As New Options_FeatureMatch
     Public Sub New()
+        correlationMin = If(dst2.Width > 336, 0.8, 0.9)
+        templatePad = If(dst2.Width > 336, 20, 10)
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Min Distance to next", 1, 100, minDistance)
+
+            sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
+            sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, correlationMin * 100)
+            sliders.setupTrackBar("MatchTemplate Cell Size", 2, 100, templatePad)
+            sliders.setupTrackBar("Threshold Percent for Resync", 1, 100, thresholdPercent * 100)
+
             sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
             sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
             sliders.setupTrackBar("Blocksize", 1, 21, blockSize)
-        End If
-
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Use GoodFeatures")
-            radio.addRadio("Use BRISK")
-            radio.check(0).Checked = True
-        End If
-
-        If findfrm(traceName + " CheckBox Options") Is Nothing Then
-            check.Setup(traceName)
-            check.addCheckBox("Use HarrisDetector")
-            check.Box(0).Checked = True
         End If
     End Sub
     Public Sub RunVB()
         Static qualitySlider = findSlider("Quality Level")
         Static distSlider = findSlider("Min Distance to next")
-        Static briskRadio = findRadio("Use BRISK")
         Static kSlider = findSlider("k X1000")
         Static blocksizeSlider = findSlider("Blocksize")
-        Static harrisCheck = findCheckBox("Use HarrisDetector")
+        Static featureSlider = findSlider("Feature Sample Size")
+        Static corrSlider = findSlider("Feature Correlation Threshold")
+        Static cellSlider = findSlider("MatchTemplate Cell Size")
+        Static percentSlider = findSlider("Threshold Percent for Resync")
 
-        useHarrisDetector = harrisCheck.checked
         blockSize = blocksizeSlider.value Or 1
-        useBRISK = briskRadio.checked
         k = kSlider.value / 1000
 
         fOptions.RunVB()
-        featurePoints = fOptions.featurePoints
+
+        featurePoints = featureSlider.value
+        correlationMin = corrSlider.value / 100
+        templatePad = cellSlider.value
+        templateSize = cellSlider.value Or 1
+        thresholdPercent = percentSlider.value / 100
+
         matchOption = fOptions.matchOption
         matchText = fOptions.matchText
-        templatePad = fOptions.templatePad
-        templateSize = fOptions.templateSize
-        correlationMin = fOptions.correlationMin
 
         If task.optionsChanged Then
             quality = qualitySlider.Value / 100
