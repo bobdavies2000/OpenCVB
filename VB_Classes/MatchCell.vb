@@ -1,51 +1,23 @@
-﻿Imports System.Security.Cryptography
+﻿Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 Public Class MatchCell_Basics : Inherits VB_Algorithm
-    Dim prep As New MatchCell_PrepareData
-    Public redCells As New List(Of rcData)
-    Public cellMap As cv.Mat
+    Public lrFeat As New FeatureMatch_Basics
+    Public flood As New Flood_LeftRight
     Public Sub New()
-        If standalone Then
-            gOptions.displayDst0.Checked = True
-            gOptions.displayDst1.Checked = True
-        End If
-        labels = {"RedCloud output", "Floodfill output ", "Merged RedCloud cells based on BGR cells", ""}
-        desc = "Survey the BGR contour pixels to find the RedCloud cells that can be merged"
+        labels(3) = "Click any cell with a highlighted feature point to see the cell that matches it in the right view."
+        desc = "Match RedCloud cells in left and right images using features"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        prep.Run(src)
-        dst0 = prep.dst2
-        dst1 = prep.dst3
+        flood.Run(src)
+        dst2 = flood.dst2
+        labels(2) = flood.labels(2)
 
-        Dim usedRedCells As New List(Of Integer)
-        Dim rcLists(prep.rgbCells.Count - 1) As List(Of Integer)
-        For Each rc In prep.rgbCells
-            rcLists(rc.index) = New List(Of Integer)
-            For Each pt In rc.contour
-                Dim index = prep.cellMap.Get(Of Byte)(pt.Y, pt.X)
-                If usedRedCells.Contains(index) = False Then
-                    usedRedCells.Add(index)
-                    rcLists(rc.index).Add(index)
-                End If
-            Next
+        lrFeat.Run(src)
+        For Each mp In lrFeat.mpList
+            dst2.Circle(mp.p1, task.dotSize, task.highlightColor, -1, task.lineType)
         Next
 
-        dst2.SetTo(0)
-        cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        redCells = New List(Of rcData)
-        For i = 0 To rcLists.Count - 1
-            Dim rclist = rcLists(i)
-            Dim rc = prep.rgbCells(i)
-            For Each index In rclist
-                Dim rcX = prep.redCells(index)
-                vbDrawContour(dst2(rcX.rect), rcX.contour, rc.color, -1)
-
-                rcX.color = rc.color
-                rcX.index = i
-                redCells.Add(rcX)
-                vbDrawContour(cellMap(rc.rect), rcX.contour, i, -1)
-            Next
-        Next
+        If task.mousePicTag = 2 Then setSelectedContour(flood.cellsLeft, flood.mapLeft)
     End Sub
 End Class
 
@@ -53,39 +25,101 @@ End Class
 
 
 
-
-Public Class MatchCell_PrepareData : Inherits VB_Algorithm
-    'Public flood As New Flood_RedColor
-    Public redCells As New List(Of rcData)
-    Public rgbCells As New List(Of rcData)
-    Public cellMap As cv.Mat
-    Public rgbcellMap As cv.Mat
-    Dim redC As New RedCloud_Basics
+Public Class MatchCell_Basics1 : Inherits VB_Algorithm
+    Public feat As New MatchCell_Features
+    Public redC As New Flood_LeftRight
     Public Sub New()
-        redOptions.noColor_Input.Checked = True
-        cellMap = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
-        rgbcellMap = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
-        labels = {"", "", "RedCloud output for depth", "RedCloud output for BGR"}
-        desc = "Prepare data for use with MatchCells algorithms."
+        desc = "Match RedCloud cells in left and right images using features"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        cellMap.CopyTo(task.cellMap)
-        task.redCells = New List(Of rcData)(redCells)
-
         redC.Run(src)
         dst2 = redC.dst2
+        dst3 = redC.dst3
 
-        redCells = New List(Of rcData)(task.redCells)
-        cellMap = task.cellMap.Clone
+        feat.Run(src)
 
-        task.redCells = New List(Of rcData)(rgbCells)
-        rgbcellMap.CopyTo(task.cellMap)
+        For i = 0 To redC.cellsLeft.Count - 1
+            redC.cellsLeft(i).features.Clear()
+        Next
 
-        'flood.Run(src)
-        'dst3 = flood.dst2
+        For Each pt In feat.featLeft
+            Dim index = redC.mapLeft.Get(Of Byte)(pt.Y, pt.X)
+            redC.cellsLeft(index).features.Add(New cv.Point(pt.X, pt.Y))
+        Next
 
-        rgbCells = New List(Of rcData)(task.redCells)
-        rgbcellMap = task.cellMap.Clone
+        For i = 0 To redC.cellsRight.Count - 1
+            redC.cellsRight(i).features.Clear()
+        Next
+
+        For Each pt In feat.featRight
+            Dim index = redC.mapRight.Get(Of Byte)(pt.Y, pt.X)
+            redC.cellsRight(index).features.Add(New cv.Point(pt.X, pt.Y))
+        Next
+
+        For Each rc In redC.cellsLeft
+            For Each pt In rc.features
+                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            Next
+        Next
+
+        For Each rc In redC.cellsRight
+            For Each pt In rc.features
+                dst3.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            Next
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class MatchCell_Features : Inherits VB_Algorithm
+    Public feat As New Feature_Basics
+    Public featLeft As New List(Of cv.Point2f)
+    Public featRight As New List(Of cv.Point2f)
+    Public Sub New()
+        labels(3) = "Right image with matched points"
+        desc = "Find GoodFeatures in the left and right images"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(task.leftView)
+        dst2 = task.leftView
+        Dim tmpLeft = New List(Of cv.Point2f)(task.features)
+
+        feat.Run(task.rightView)
+        dst3 = task.rightView
+        Dim tmpRight = New List(Of cv.Point2f)(task.features)
+        Dim leftY As New List(Of Integer)
+        For Each pt In tmpLeft
+            leftY.Add(pt.Y)
+        Next
+
+        Dim rightY As New List(Of Integer)
+        For Each pt In tmpRight
+            rightY.Add(pt.Y)
+        Next
+
+        featLeft.Clear()
+        featRight.Clear()
+
+        For i = 0 To leftY.Count - 1
+            If rightY.Contains(leftY(i)) Then
+                featLeft.Add(tmpLeft(i))
+                Dim index = rightY.IndexOf(leftY(i))
+                featRight.Add(tmpRight(index))
+            End If
+        Next
+
+        For Each pt In featLeft
+            dst2.Circle(pt, task.dotSize + 1, task.highlightColor, -1, task.lineType)
+        Next
+
+        For Each pt In featRight
+            dst3.Circle(pt, task.dotSize + 1, task.highlightColor, -1, task.lineType)
+        Next
+
+        labels(2) = "Found " + CStr(featLeft.Count) + " features in the left Image with matching points in the right image"
     End Sub
 End Class
 
@@ -95,40 +129,112 @@ End Class
 
 
 
-
-Public Class MatchCell_Shape : Inherits VB_Algorithm
-    Dim options As New Options_MatchShapes
-    Dim lastHulls As New List(Of rcData)
-    Dim hulls As New RedCloud_Hulls
+Public Class MatchCell_CellFeatures : Inherits VB_Algorithm
+    Public feat As New Feature_Basics
+    Public featLeft As New List(Of cv.Point2f)
+    Public featRight As New List(Of cv.Point2f)
+    Public flood As New Flood_LeftRight
     Public Sub New()
-        labels(2) = "Highlighted cells matched the previous generation cell in the same area."
-        desc = "Use OpenCV's MatchShape API to validate that stable and current contours agree"
+        redOptions.IdentifyCells.Checked = False
+        desc = "Find GoodFeatures in the RedCloud cells of the left and right images"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        dst3 = src.Clone
+        flood.Run(src)
+        dst2 = flood.dst2
+        dst3 = flood.dst3
 
-        hulls.Run(src)
-        dst2 = hulls.dst2
-
-        Dim matchCount As Integer
-        If lastHulls.Count > 0 Then
-            For Each rc In task.redCells
-                If rc.indexLast >= lastHulls.Count Then Continue For
-                Dim rcPrev = lastHulls(rc.indexLast)
-                If rc.hull Is Nothing Or rcPrev.hull Is Nothing Then Continue For
-
-                Dim matchVal = cv.Cv2.MatchShapes(rc.hull, rcPrev.hull, options.matchOption)
-                If matchVal >= options.matchThreshold Then
-                    vbDrawContour(dst3(rcPrev.rect), rcPrev.hull, task.highlightColor)
-                    matchCount += 1
-                Else
-                    vbDrawContour(dst2(rcPrev.rect), rcPrev.hull, task.highlightColor)
+        Dim rightX As New List(Of Integer)
+        Dim rightY As New List(Of Integer)
+        Dim rightIndex As New List(Of Integer)
+        For i = 0 To flood.cellsRight.Count - 1
+            Dim rc = flood.cellsRight(i)
+            Dim tmp = New cv.Mat(rc.rect.Size, task.rightView.Type, 0)
+            task.rightView(rc.rect).CopyTo(tmp, rc.mask)
+            feat.Run(tmp)
+            For Each pt In task.features
+                If rightY.Contains(pt.Y) = False Then
+                    rightX.Add(rc.rect.X + pt.X)
+                    rightY.Add(rc.rect.Y + pt.Y)
+                    rightIndex.Add(i)
                 End If
             Next
-        End If
-        lastHulls = New List(Of rcData)(task.redCells)
+        Next
 
-        labels(3) = CStr(matchCount) + " of " + CStr(task.redCells.Count) + " RedCloud cells below did NOT match the cell shape for the previous generation."
+        For i = 0 To flood.cellsLeft.Count - 1
+            Dim rc = flood.cellsLeft(i)
+            Dim tmp As New cv.Mat(rc.rect.Size, task.leftView.Type, 0)
+            task.leftView(rc.rect).CopyTo(tmp, rc.mask)
+            feat.Run(tmp)
+            Dim rcChanged As Boolean = False
+            For Each p1 In task.features
+                Dim p2 = New cv.Point(p1.X + rc.rect.X, p1.Y + rc.rect.Y)
+                If rightY.Contains(p2.Y) = False Then Continue For
+                For j = 0 To rightY.Count - 1
+                    If rightY(j) = p2.Y Then
+                        rc.featurePair.Add(New pointPair(p2, New cv.Point(rightX(j), rightY(j))))
+                        rc.matchCandidates.Add(rightIndex(j))
+                        rcChanged = True
+                    End If
+                Next
+            Next
+            If rcChanged Then flood.cellsLeft(i) = rc
+        Next
+
+        If task.mouseClickFlag Then redOptions.IdentifyCells.Checked = True
+        If redOptions.IdentifyCells.Checked Then
+            setSelectedContour(flood.cellsLeft, flood.mapLeft)
+            dst2(task.rc.rect).SetTo(task.highlightColor, task.rc.mask)
+
+            For Each index In task.rc.matchCandidates
+                Dim rc = flood.cellsRight(index)
+                dst3(rc.rect).SetTo(task.highlightColor, rc.mask)
+            Next
+
+            For Each mp In task.rc.featurePair
+                dst2.Circle(mp.p1, task.dotSize + 3, cv.Scalar.Black, -1, task.lineType)
+                dst3.Circle(mp.p2, task.dotSize + 3, cv.Scalar.Black, -1, task.lineType)
+            Next
+            labels(2) = "Found " + CStr(task.rc.matchCandidates.Count) + " candidates for matching cells."
+        Else
+            labels(2) = "Click on any cell to see candidate cells with possible matching features"
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class MatchCell_NearestFeature : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim feat As New FeatureMatch_Basics
+    Dim knn As New KNN_Core
+    Public Sub New()
+        desc = "Find hte nearest feature to every cell in task.redCells"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+        redC.Run(src)
+        dst2 = redC.dst2
+        dst3 = redC.dst2.clone
+        labels(2) = redC.labels(2)
+
+        knn.queries.Clear()
+        For Each rc In task.redCells
+            knn.queries.Add(rc.maxDStable)
+        Next
+
+        knn.trainInput.Clear()
+        For Each mp In feat.mpList
+            knn.trainInput.Add(New cv.Point2f(mp.p1.X, mp.p1.Y))
+        Next
+
+        knn.Run(Nothing)
+
+        For i = 0 To task.redCells.Count - 1
+            Dim rc = task.redCells(i)
+            rc.nearestFeature = knn.trainInput(knn.result(i, 0))
+            dst3.Line(rc.nearestFeature, rc.maxDStable, task.highlightColor, task.lineWidth, task.lineType)
+        Next
     End Sub
 End Class

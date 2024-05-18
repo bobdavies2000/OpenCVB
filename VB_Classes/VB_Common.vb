@@ -834,6 +834,7 @@ Public Class rcData
     Public motionFlag As Boolean
     Public motionPixels As Integer
 
+    Public nearestFeature As cv.Point2f
     Public features As New List(Of cv.Point)
     Public featurePair As New List(Of pointPair)
     Public matchCandidatesSorted As New SortedList(Of Integer, Integer)
