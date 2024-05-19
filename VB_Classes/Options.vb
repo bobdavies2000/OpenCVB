@@ -3429,7 +3429,7 @@ Public Class Options_Features : Inherits VB_Algorithm
 
         featurePoints = featureSlider.value
         correlationMin = corrSlider.value / 100
-        templatePad = cellSlider.value
+        templatePad = CInt(cellSlider.value / 2)
         templateSize = cellSlider.value Or 1
         thresholdPercent = percentSlider.value / 100
 
