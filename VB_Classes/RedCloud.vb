@@ -808,7 +808,7 @@ End Class
 
 
 Public Class RedCloud_DelaunayGuidedFeatures : Inherits VB_Algorithm
-    Dim features As New Feature_PointsDelaunay
+    Dim features As New Feature_Delaunay
     Dim redC As New RedCloud_Basics
     Public Sub New()
         labels = {"", "Format CV_8U of Delaunay data", "RedCloud output", "RedCloud Output of GoodFeature points"}
@@ -2657,9 +2657,9 @@ End Class
 
 Public Class RedCloud_Delaunay : Inherits VB_Algorithm
     Dim redCPP As New RedCloud_CPP
-    Dim delaunay As New FeatureMatch_Delaunay
+    Dim delaunay As New Feature_Delaunay
     Public Sub New()
-        desc = "Test FeatureMatch points after Delaunay contour has been added."
+        desc = "Test Feature_Delaunay points after Delaunay contours have been added."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         delaunay.Run(src)

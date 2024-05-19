@@ -237,36 +237,6 @@ End Class
 
 
 
-Public Class FeatureMatch_Delaunay : Inherits VB_Algorithm
-    Dim facet As New Delaunay_Contours
-    Dim feat As New Feature_Basics
-    Public Sub New()
-        findSlider("Min Distance to next").Value = 10
-        desc = "Divide the image with Delaunay using the features found in Feature_Basics"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        feat.Run(src)
-        dst2 = feat.dst2
-        labels(2) = feat.labels(2)
-
-        facet.inputPoints.Clear()
-        For Each pt In task.features
-            facet.inputPoints.Add(pt)
-        Next
-
-        facet.Run(src)
-        dst3 = facet.dst2
-        For Each pt In task.features
-            dst3.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
-        Next
-        labels(3) = "There were " + CStr(task.features.Count) + " Delaunay contours"
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class FeatureMatch_LRUnMatched : Inherits VB_Algorithm
     Dim lrHist As New FeatureMatch_LRHist
@@ -370,7 +340,7 @@ End Class
 
 
 
-Public Class FeatureMatch_LeftRightNew : Inherits VB_Algorithm
+Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
     Dim prep As New FeatureMatch_LeftRightPrep
     Public mpList As New List(Of pointPair)
     Public mpCorrelation As New List(Of Single)

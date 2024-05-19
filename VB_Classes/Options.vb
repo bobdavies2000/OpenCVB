@@ -3384,7 +3384,7 @@ End Class
 
 Public Class Options_Features : Inherits VB_Algorithm
     Public quality As Double = 0.01
-    Public minDistance As Double = 10
+    Public minDistance As Double = 1
     Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
     Public matchText As String = ""
     Public k As Double = 0.04
@@ -3394,8 +3394,7 @@ Public Class Options_Features : Inherits VB_Algorithm
     Public templatePad As Integer = 10
     Public templateSize As Integer
     Public correlationMin As Single = 0.75
-    Public thresholdPercent As Single = 0.9
-    Dim fOptions As New Options_FeatureMatch
+    Public thresholdPercent As Single = 0.95
     Public Sub New()
         correlationMin = If(dst2.Width > 336, 0.8, 0.9)
         templatePad = If(dst2.Width > 336, 20, 10)
@@ -3405,7 +3404,7 @@ Public Class Options_Features : Inherits VB_Algorithm
             sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
             sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, correlationMin * 100)
             sliders.setupTrackBar("MatchTemplate Cell Size", 2, 100, templatePad)
-            sliders.setupTrackBar("Threshold Percent for Resync", 1, 100, thresholdPercent * 100)
+            sliders.setupTrackBar("Threshold Percent for Resync", 1, 99, thresholdPercent * 100)
 
             sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
             sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
@@ -3425,16 +3424,11 @@ Public Class Options_Features : Inherits VB_Algorithm
         blockSize = blocksizeSlider.value Or 1
         k = kSlider.value / 1000
 
-        fOptions.RunVB()
-
         featurePoints = featureSlider.value
         correlationMin = corrSlider.value / 100
         templatePad = CInt(cellSlider.value / 2)
         templateSize = cellSlider.value Or 1
         thresholdPercent = percentSlider.value / 100
-
-        matchOption = fOptions.matchOption
-        matchText = fOptions.matchText
 
         If task.optionsChanged Then
             quality = qualitySlider.Value / 100
@@ -4828,7 +4822,7 @@ Public Class Options_FeatureGather : Inherits VB_Algorithm
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("GoodFeatures full image")
-            radio.addRadio("GoodFeatures grid roi's")
+            radio.addRadio("GoodFeatures grid")
             radio.addRadio("Agast")
             radio.addRadio("BRISK")
             radio.check(0).Checked = True
