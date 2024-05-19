@@ -242,6 +242,7 @@ Public Class VBtask : Implements IDisposable
 
     Public features As New List(Of cv.Point2f)
     Public featurePoints As New List(Of cv.Point)
+    Public featureMotion As Boolean ' false means that none of the features moved.
 
     Public useXYRange As Boolean ' OpenGL applications don't need to adjust the ranges.
     Public xRange As Single

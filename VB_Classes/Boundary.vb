@@ -35,7 +35,7 @@ Public Class Boundary_Basics : Inherits VB_Algorithm
             masks.Clear()
             contours.Clear()
             For i = 1 To redCPP.classCount - 1
-                Dim rect = redCPP.rectData.Get(Of cv.Rect)(i - 1, 0)
+                Dim rect = redCPP.rectList(i - 1)
                 Dim mask = redCPP.dst2(rect).InRange(i, i)
                 Dim contour = contourBuild(mask, cv.ContourApproximationModes.ApproxNone)
                 vbDrawContour(dst2(rect), contour, 255, task.lineWidth)

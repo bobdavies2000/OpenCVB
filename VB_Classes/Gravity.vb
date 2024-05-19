@@ -169,16 +169,17 @@ Public Class Gravity_Horizon : Inherits VB_Algorithm
         desc = "Compute the gravity vector and the horizon vector separately"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        gravity.Run(src)
-        If gravity.vec.p2.Y > 0 Then task.gravityVec = gravity.vec ' don't update if not found
+        If task.featureMotion Then
+            gravity.Run(src)
+            If gravity.vec.p2.Y > 0 Then task.gravityVec = gravity.vec ' don't update if not found
 
-        horizon.Run(src)
-        Static lastVec = horizon.vec
-        If horizon.vec.p1.Y > 0 Then lastVec = horizon.vec
-        If horizon.vec.p1.Y = 0 Then horizon.vec = lastVec
+            horizon.Run(src)
+            Static lastVec = horizon.vec
+            If horizon.vec.p1.Y > 0 Then lastVec = horizon.vec
+            If horizon.vec.p1.Y = 0 Then horizon.vec = lastVec
 
-        task.horizonVec = horizon.vec
-
+            task.horizonVec = horizon.vec
+        End If
         If standaloneTest() Then
             setTrueText("Gravity vector (yellow):" + vbCrLf + gravity.strOut + vbCrLf + vbCrLf + "Horizon Vector (red): " + vbCrLf + horizon.strOut, 3)
             dst2.SetTo(0)

@@ -43,6 +43,7 @@ Public Class Feature_Basics : Inherits VB_Algorithm
         Dim nextFeatures = gather.features
 
         Dim extra = 1 + (1 - options.thresholdPercent)
+        task.featureMotion = True
         If task.features.Count < nextFeatures.Count * options.thresholdPercent Or task.features.Count > extra * nextFeatures.Count Then
             featureMat.Clear()
             task.features.Clear()
@@ -53,16 +54,20 @@ Public Class Feature_Basics : Inherits VB_Algorithm
                 task.features.Add(pt)
             Next
         Else
-            knn.queries = ptLost
-            knn.trainInput = nextFeatures
-            knn.Run(Nothing)
+            If ptLost.Count > 0 Then
+                knn.queries = ptLost
+                knn.trainInput = nextFeatures
+                knn.Run(Nothing)
 
-            For i = 0 To knn.queries.Count - 1
-                Dim pt = knn.queries(i)
-                Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
-                featureMat.Add(src(rect))
-                task.features.Add(knn.trainInput(knn.result(i, 0)))
-            Next
+                For i = 0 To knn.queries.Count - 1
+                    Dim pt = knn.queries(i)
+                    Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
+                    featureMat.Add(src(rect))
+                    task.features.Add(knn.trainInput(knn.result(i, 0)))
+                Next
+            Else
+                task.featureMotion = False
+            End If
         End If
 
         task.featurePoints.Clear()

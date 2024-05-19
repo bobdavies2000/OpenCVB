@@ -270,7 +270,7 @@ Public Class OpenCVB
 
         settings.locationMain = New cv.Vec4f(Me.Left, Me.Top, Me.Width, Me.Height)
         settings.treeButton = TreeButton.Checked
-        settings.PixelViewerButton = PixelViewerButton.Checked
+        settings.PixelViewerButton = False
         settings.displayRes = New cv.Size(camPic(0).Width, camPic(0).Height) ' used only when .snapCustom is true
 
         Dim setlist = New List(Of jsonClass.ApplicationStorage)
@@ -377,7 +377,6 @@ Public Class OpenCVB
         setupCamPics()
 
         If settings.treeButton Then TreeButton_Click(sender, e)
-        If settings.PixelViewerButton Then PixelViewerButton_Click(sender, e)
 
         loadAlgorithmComboBoxes()
 

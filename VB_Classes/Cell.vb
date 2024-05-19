@@ -359,8 +359,8 @@ End Class
 
 Public Class Cell_Generate : Inherits VB_Algorithm
     Public classCount As Integer
-    Public rectData As cv.Mat
-    Public floodPointData As cv.Mat
+    Public rectList As New List(Of cv.Rect)
+    Public floodPoints As New List(Of cv.Point)
     Public removeContour As Boolean
     Dim diffLeft As New Diff_Basics
     Dim diffRight As New Diff_Basics
@@ -383,8 +383,8 @@ Public Class Cell_Generate : Inherits VB_Algorithm
 
             If redCPP.classCount = 0 Then Exit Sub ' no data to process.
             classCount = redCPP.classCount
-            rectData = redCPP.rectData
-            floodPointData = redCPP.floodPointData
+            rectList = redCPP.rectList
+            floodPoints = redCPP.floodPoints
             removeContour = False
             src = redCPP.dst2
         End If
@@ -397,9 +397,9 @@ Public Class Cell_Generate : Inherits VB_Algorithm
         Dim initList As New List(Of rcData)({New rcData})
         For i = 1 To classCount - 1
             Dim rc As New rcData
-            rc.rect = rectData.Get(Of cv.Rect)(i - 1, 0)
+            rc.rect = rectList(i - 1)
             If rc.rect.Size = dst2.Size Then Continue For ' FeatureLess_RedCloud find a cell this big.  
-            rc.floodPoint = floodPointData.Get(Of cv.Point)(i - 1, 0)
+            rc.floodPoint = floodPoints(i - 1)
             rc.mask = src(rc.rect).InRange(i, i)
 
             If task.heartBeat Or rc.indexLast = 0 Or rc.indexLast >= task.redCells.Count Then
