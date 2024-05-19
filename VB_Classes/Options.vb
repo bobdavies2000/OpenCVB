@@ -4810,3 +4810,37 @@ Public Class Options_OpenGL_Duster : Inherits VB_Algorithm
         useTaskPointCloud = cloudCheck.checked
     End Sub
 End Class
+
+
+
+
+Public Enum FeatureSrc
+    goodFeaturesFull = 0
+    goodFeaturesGrid = 1
+    Agast = 2
+    BRISK = 3
+End Enum
+
+
+Public Class Options_FeatureGather : Inherits VB_Algorithm
+    Public featureSource As featureSrc
+    Public Sub New()
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("GoodFeatures full image")
+            radio.addRadio("GoodFeatures grid roi's")
+            radio.addRadio("Agast")
+            radio.addRadio("BRISK")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static frm = findfrm(traceName + " Radio Buttons")
+        For i = 0 To frm.check.Count - 1
+            If frm.check(i).Checked Then
+                featureSource = Choose(i + 1, FeatureSrc.goodFeaturesFull, FeatureSrc.goodfeaturesgrid, FeatureSrc.Agast, FeatureSrc.BRISK)
+                Exit For
+            End If
+        Next
+    End Sub
+End Class
