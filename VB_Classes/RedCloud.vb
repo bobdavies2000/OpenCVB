@@ -13,9 +13,9 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            Static colorC As New Color_Basics
-            colorC.Run(src)
-            src = colorC.dst2
+            Static cvt As New CvtColor_Basics
+            cvt.Run(src)
+            src = cvt.dst2
         End If
 
         redCPP.inputMask = inputMask
@@ -1064,7 +1064,7 @@ End Class
 Public Class RedCloud_OutlineColor : Inherits VB_Algorithm
     Dim outline As New Depth_Outline
     Dim redC As New RedCloud_Basics
-    Dim colorClass As New Color_Basics
+    Dim colorClass As New CvtColor_Basics
     Public Sub New()
         labels(3) = "Color input to RedCloud_Basics with depth boundary blocking color connections."
         desc = "Use the depth outline as input to RedCloud_Basics"
@@ -1800,7 +1800,7 @@ End Class
 
 
 Public Class RedCloud_Combine : Inherits VB_Algorithm
-    Public colorClass As New Color_Basics
+    Public colorClass As New CvtColor_Basics
     Public guided As New GuidedBP_Depth
     Public redMasks As New RedCloud_Basics
     Public combinedCells As New List(Of rcData)
@@ -2025,7 +2025,7 @@ End Class
 
 Public Class RedCloud_Hue : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
-    Dim hue As New Color_Hue
+    Dim hue As New CvtColor_Hue
     Public Sub New()
         redOptions.UseColorOnly.Checked = True
         desc = "Run RedCloud on just the red hue regions."
@@ -2566,9 +2566,9 @@ Public Class RedCloud_Delaunay : Inherits VB_Algorithm
         dst1 = delaunay.dst2
 
         If src.Channels <> 1 Then
-            Static colorC As New Color_Basics
-            colorC.Run(src)
-            src = colorC.dst2
+            Static cvt As New CvtColor_Basics
+            cvt.Run(src)
+            src = cvt.dst2
         End If
 
         redCPP.inputMask = dst1
@@ -2597,9 +2597,9 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            Static bin4 As New Bin4Way_Basics
-            bin4.Run(src)
-            src = bin4.dst1
+            Static cvt As New CvtColor_Basics
+            cvt.Run(src)
+            src = cvt.dst2
         End If
         Dim imagePtr As IntPtr
         Dim inputData(src.Total - 1) As Byte
@@ -2661,9 +2661,9 @@ Public Class RedCloud_MaxDist_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            Static colorC As New Color_Basics
-            colorC.Run(src)
-            src = colorC.dst2
+            Static cvt As New CvtColor_Basics
+            cvt.Run(src)
+            src = cvt.dst2
         End If
 
         If task.heartBeat Then maxList.Clear() ' reevaluate all cells.

@@ -337,7 +337,7 @@ End Structure
 
 Public Class ML_Color2Depth : Inherits VB_Algorithm
     Dim minMax As New Grid_MinMaxDepth
-    Dim colorClass As New Color_Basics
+    Dim colorClass As New CvtColor_Basics
     Public Sub New()
         redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         desc = "Prepare a grid of color and depth data."
@@ -345,7 +345,7 @@ Public Class ML_Color2Depth : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         colorClass.Run(src)
         dst2 = colorClass.dst3
-        labels(2) = "Output of Color_Basics running " + redOptions.colorInputName
+        labels(2) = "Output of CvtColor_Basics running " + redOptions.colorInputName
 
         Dim rtree = cv.ML.RTrees.Create()
         Dim mlInput As New List(Of mlColor)
@@ -403,7 +403,7 @@ Public Structure mlColorInTier
 End Structure
 Public Class ML_ColorInTier2Depth : Inherits VB_Algorithm
     Dim minMax As New Grid_MinMaxDepth
-    Dim colorClass As New Color_Basics
+    Dim colorClass As New CvtColor_Basics
     Dim tiers As New Contour_DepthTiers
     Public Sub New()
         redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
@@ -412,7 +412,7 @@ Public Class ML_ColorInTier2Depth : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         colorClass.Run(src)
         dst2 = colorClass.dst3
-        labels(2) = "Output of Color_Basics running " + redOptions.colorInputName
+        labels(2) = "Output of CvtColor_Basics running " + redOptions.colorInputName
 
         Dim rtree = cv.ML.RTrees.Create()
         Dim mlInput As New List(Of mlColorInTier)

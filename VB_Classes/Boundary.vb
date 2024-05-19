@@ -13,9 +13,9 @@ Public Class Boundary_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
             If redOptions.UseColorOnly.Checked Then
-                Static colorC As New Color_Basics
-                colorC.Run(src)
-                dst1 = colorC.dst2
+                Static cvt As New CvtColor_Basics
+                cvt.Run(src)
+                dst1 = cvt.dst2
             ElseIf redOptions.UseDepth.Checked Then
                 Static prep As New RedCloud_Reduce
                 prep.Run(src)

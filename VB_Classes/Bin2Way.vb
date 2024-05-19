@@ -157,7 +157,7 @@ End Class
 Public Class Bin2Way_RedCloud : Inherits VB_Algorithm
     Dim bin2 As New Bin2Way_RecurseOnce
     Dim flood As New Flood_BasicsMask
-    Dim color As New Color_Basics
+    Dim color As New CvtColor_Basics
     Dim cellMaps(3) As cv.Mat, redCells(3) As List(Of rcData)
     Dim options As New Options_Bin2WayRedCloud
     Public Sub New()

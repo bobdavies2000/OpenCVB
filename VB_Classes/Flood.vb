@@ -133,10 +133,10 @@ Public Class Flood_BasicsMask : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Or buildInputMask Then
-            Static colorC As New Color_Basics
-            colorC.Run(src)
+            Static cvt As New CvtColor_Basics
+            cvt.Run(src)
             inputMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
-            src = colorC.dst2
+            src = cvt.dst2
         End If
 
         dst3 = inputMask
@@ -164,7 +164,7 @@ End Class
 Public Class Flood_Tiers : Inherits VB_Algorithm
     Dim flood As New Flood_BasicsMask
     Dim tiers As New Depth_TiersZ
-    Dim colorC As New Color_Basics
+    Dim cvt As New CvtColor_Basics
     Public Sub New()
         redOptions.IdentifyCells.Checked = True
         desc = "Subdivide the Flood_Basics cells using depth tiers."
@@ -183,10 +183,10 @@ Public Class Flood_Tiers : Inherits VB_Algorithm
 
         labels(2) = tiers.labels(2) + " in tier " + CStr(tier) + ".  Use the global options 'DebugSlider' to select different tiers."
 
-        colorC.Run(src)
+        cvt.Run(src)
 
         flood.inputMask = dst1
-        flood.Run(colorC.dst2)
+        flood.Run(cvt.dst2)
 
         dst2 = flood.dst2
         dst3 = flood.dst3
@@ -359,9 +359,9 @@ Public Class Flood_MaxDistPoints : Inherits VB_Algorithm
         desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static colorC As New Color_Basics
-        colorC.Run(src)
-        redCPP.Run(colorC.dst2)
+        Static cvt As New CvtColor_Basics
+        cvt.Run(src)
+        redCPP.Run(cvt.dst2)
         If redCPP.classCount = 0 Then Exit Sub ' no data to process.
 
         genCells.classCount = redCPP.classCount

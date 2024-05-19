@@ -156,7 +156,7 @@
     <Compile Include="Neighbors.vb" />
     <Compile Include="OpAuto.vb" />
     <Compile Include="BackProject2D.vb" />
-    <Compile Include="Color.vb" />
+    <Compile Include="CvtColor.vb" />
     <Compile Include="CSV.vb" />
     <Compile Include="Density.vb" />
     <Compile Include="DisparityInverted.vb" />
