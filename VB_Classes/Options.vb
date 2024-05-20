@@ -3395,6 +3395,7 @@ Public Class Options_Features : Inherits VB_Algorithm
     Public templateSize As Integer
     Public correlationMin As Single = 0.75
     Public thresholdPercent As Single = 0.95
+    Public agastThreshold As Integer = 20
     Public Sub New()
         correlationMin = If(dst2.Width > 336, 0.8, 0.9)
         templatePad = If(dst2.Width > 336, 20, 10)
@@ -3409,6 +3410,7 @@ Public Class Options_Features : Inherits VB_Algorithm
             sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
             sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
             sliders.setupTrackBar("Blocksize", 1, 21, blockSize)
+            sliders.setupTrackBar("Agast Threshold", 1, 100, agastThreshold)
         End If
     End Sub
     Public Sub RunVB()
@@ -3420,6 +3422,7 @@ Public Class Options_Features : Inherits VB_Algorithm
         Static corrSlider = findSlider("Feature Correlation Threshold")
         Static cellSlider = findSlider("MatchTemplate Cell Size")
         Static percentSlider = findSlider("Threshold Percent for Resync")
+        Static agastslider = findSlider("Agast Threshold")
 
         blockSize = blocksizeSlider.value Or 1
         k = kSlider.value / 1000
@@ -3429,6 +3432,7 @@ Public Class Options_Features : Inherits VB_Algorithm
         templatePad = CInt(cellSlider.value / 2)
         templateSize = cellSlider.value Or 1
         thresholdPercent = percentSlider.value / 100
+        agastThreshold = agastslider.value
 
         If task.optionsChanged Then
             quality = qualitySlider.Value / 100
@@ -4532,27 +4536,6 @@ Public Class Options_XNeighbors : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Options_Agast : Inherits VB_Algorithm
-    Public agastThreshold As Integer
-    Public desiredCount As Integer
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Agast Threshold", 1, 100, 20)
-            sliders.setupTrackBar("Desired Count", 1, 500, 200)
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static agastSlider = findSlider("Agast Threshold")
-        Static countSlider = findSlider("Desired Count")
-        agastThreshold = agastSlider.value
-        desiredCount = countSlider.value
-    End Sub
-End Class
 
 
 

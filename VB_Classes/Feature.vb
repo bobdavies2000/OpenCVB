@@ -44,6 +44,7 @@ Public Class Feature_Basics : Inherits VB_Algorithm
 
         Dim extra = 1 + (1 - options.thresholdPercent)
         task.featureMotion = True
+
         If task.features.Count < nextFeatures.Count * options.thresholdPercent Or task.features.Count > extra * nextFeatures.Count Then
             featureMat.Clear()
             task.features.Clear()
@@ -922,64 +923,6 @@ End Class
 
 
 
-Public Class Feature_Stable : Inherits VB_Algorithm
-    Dim feat As New Feature_Basics
-    Dim features As New List(Of cv.Point)
-    Dim gens As New List(Of Integer)
-    Dim options As New Options_Agast
-    Public Sub New()
-        vbAddAdvice(traceName + ": Local options will determine how many features are present.")
-        desc = "Find the Agast features that are available across generations."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        feat.Run(src)
-        If task.features.Count = 0 Then Exit Sub ' nothing came back!
-
-        Dim newfeatures As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To task.features.Count - 1 Step 2
-            Dim pt = New cv.Point(task.features(i).X, task.features(i).Y)
-            Dim index = features.IndexOf(pt)
-            If index >= 0 Then
-                newfeatures.Add(gens(index) + 1, pt)
-            Else
-                newfeatures.Add(1, pt)
-            End If
-        Next
-
-        If task.heartBeat Then
-            features.Clear()
-            gens.Clear()
-        End If
-
-        features = New List(Of cv.Point)(newfeatures.Values)
-        gens = New List(Of Integer)(newfeatures.Keys)
-
-        dst2 = src
-        For i = 0 To features.Count - 1
-            If gens(i) = 1 Then Exit For
-            Dim pt = features(i)
-            dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
-        Next
-
-        If task.heartBeat Then
-            labels(2) = CStr(features.Count) + " features found with up to " + CStr(gens(0)) + " generations."
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
-
 
 Public Class Feature_KNNSimple : Inherits VB_Algorithm
     Public feat As New Feature_Basics
@@ -1657,7 +1600,6 @@ Public Class Feature_Gather : Inherits VB_Algorithm
     Public features As New List(Of cv.Point2f)
     Dim brisk As New BRISK_Basics
     Public options As New Options_Features
-    Public optionsAgast As New Options_Agast
     Public Sub New()
         cPtr = Agast_Open()
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk."
@@ -1688,13 +1630,12 @@ Public Class Feature_Gather : Inherits VB_Algorithm
                 Next
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
             Case FeatureSrc.Agast
-                optionsAgast.RunVB()
+                src = task.color.Clone
                 Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
                 Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
 
                 Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-                Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                 optionsAgast.agastThreshold)
+                Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
                 handleSrc.Free()
 
                 Dim ptMat = New cv.Mat(Agast_Count(cPtr), 1, cv.MatType.CV_32FC2, imagePtr).Clone
@@ -1829,6 +1770,48 @@ Public Class Feature_LineAngleAll : Inherits VB_Algorithm
         If arcLongAverage.Count > 1000 Then
             arcLongAverage.RemoveAt(0)
             firstAverage.RemoveAt(0)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Feature_Generations : Inherits VB_Algorithm
+    Dim feat As New Feature_Basics
+    Dim features As New List(Of cv.Point)
+    Dim gens As New List(Of Integer)
+    Public Sub New()
+        vbAddAdvice(traceName + ": Local options will determine how many features are present.")
+        desc = "Find feature age maximum and average."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+
+        Dim newfeatures As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
+        For Each pt In task.featurePoints
+            Dim index = features.IndexOf(pt)
+            If index >= 0 Then newfeatures.Add(gens(index) + 1, pt) Else newfeatures.Add(1, pt)
+        Next
+
+        If task.heartBeat Then
+            features.Clear()
+            gens.Clear()
+        End If
+
+        features = New List(Of cv.Point)(newfeatures.Values)
+        gens = New List(Of Integer)(newfeatures.Keys)
+
+        dst2 = src
+        For i = 0 To features.Count - 1
+            If gens(i) = 1 Then Exit For
+            Dim pt = features(i)
+            dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+        Next
+
+        If task.heartBeat Then
+            labels(2) = CStr(features.Count) + " features found with max/average " + CStr(gens(0)) + "/" + Format(gens.Average, fmt0) + " generations"
         End If
     End Sub
 End Class
