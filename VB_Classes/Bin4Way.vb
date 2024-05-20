@@ -679,7 +679,7 @@ End Class
 
 Public Class Bin4Way_BasicsColors : Inherits VB_Algorithm
     Dim quart As New Bin4Way_Basics
-    Dim color As New CvtColor_Basics
+    Dim color As New BGR2Gray_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         desc = "Test Bin4Way_Basics with different src inputs."

@@ -2083,7 +2083,7 @@ End Class
 
 
 Public Class OpenGL_ColorReduced3D : Inherits VB_Algorithm
-    Dim colorClass As New CvtColor_Basics
+    Dim colorClass As New BGR2Gray_Basics
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB

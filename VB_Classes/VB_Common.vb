@@ -276,7 +276,7 @@ Module VB_Common
     End Function
     Public Function bgr2gray(src As cv.Mat) As cv.Mat
         If src.Channels <> 1 Then
-            Static cvt As New CvtColor_Basics
+            Static cvt As New BGR2Gray_Basics
             cvt.Run(src)
             Return cvt.dst2
         End If

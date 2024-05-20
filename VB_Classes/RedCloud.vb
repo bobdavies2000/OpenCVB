@@ -1060,7 +1060,7 @@ End Class
 Public Class RedCloud_OutlineColor : Inherits VB_Algorithm
     Dim outline As New Depth_Outline
     Dim redC As New RedCloud_Basics
-    Dim colorClass As New CvtColor_Basics
+    Dim colorClass As New BGR2Gray_Basics
     Public Sub New()
         labels(3) = "Color input to RedCloud_Basics with depth boundary blocking color connections."
         desc = "Use the depth outline as input to RedCloud_Basics"
@@ -1796,7 +1796,7 @@ End Class
 
 
 Public Class RedCloud_Combine : Inherits VB_Algorithm
-    Public colorClass As New CvtColor_Basics
+    Public colorClass As New BGR2Gray_Basics
     Public guided As New GuidedBP_Depth
     Public redMasks As New RedCloud_Basics
     Public combinedCells As New List(Of rcData)
@@ -2021,7 +2021,7 @@ End Class
 
 Public Class RedCloud_Hue : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
-    Dim hue As New CvtColor_Hue
+    Dim hue As New BGR2Gray_Hue
     Public Sub New()
         redOptions.UseColorOnly.Checked = True
         desc = "Run RedCloud on just the red hue regions."

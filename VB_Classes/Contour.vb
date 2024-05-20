@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class Contour_Basics : Inherits VB_Algorithm
-    Dim colorClass As New CvtColor_Basics
+    Dim colorClass As New BGR2Gray_Basics
     Public contourlist As New List(Of cv.Point())
     Public allContours As cv.Point()()
     Public options As New Options_Contours

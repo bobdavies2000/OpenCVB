@@ -132,7 +132,7 @@ End Class
 
 
 Public Class Threshold_ColorSource : Inherits VB_Algorithm
-    Dim colorClass As New CvtColor_Basics
+    Dim colorClass As New BGR2Gray_Basics
     Dim byChan As New Threshold_ByChannels
     Public Sub New()
         vbAddAdvice(traceName + ": Use redOptions color source to change the input.  Also, see local options.")
