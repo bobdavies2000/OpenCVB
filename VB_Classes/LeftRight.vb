@@ -69,8 +69,9 @@ End Class
 
 Public Class LeftRight_BRISK : Inherits VB_Algorithm
     Dim brisk As New BRISK_Basics
+    Dim options As New Options_Features
     Public Sub New()
-        findSlider("BRISK Radius Threshold").Value = 20
+        findSlider("Min Distance").Value = 20
         labels = {"", "", "Left Image", "Right Image"}
         desc = "Add color to the 8-bit infrared images."
     End Sub

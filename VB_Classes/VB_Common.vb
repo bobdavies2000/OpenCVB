@@ -274,6 +274,14 @@ Module VB_Common
         If pt.Y >= task.workingRes.Height - distance Then Return False
         Return True
     End Function
+    Public Function bgr2gray(src As cv.Mat) As cv.Mat
+        If src.Channels <> 1 Then
+            Static cvt As New CvtColor_Basics
+            cvt.Run(src)
+            Return cvt.dst2
+        End If
+        Return src
+    End Function
     Public Sub vbDrawContour(ByRef dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -10)
         If lineWidth = -10 Then lineWidth = task.lineWidth ' VB.Net only allows constants for optional parameter.
         If contour.Count < 3 Then Exit Sub ' this is not enough to draw.

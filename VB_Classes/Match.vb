@@ -179,7 +179,7 @@ End Class
 
 
 Public Class Match_Motion : Inherits VB_Algorithm
-    Dim options As New Options_FeatureMatch
+    Dim options As New Options_Features
     Public mask As cv.Mat
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Stdev Threshold", 0, 100, 10)
@@ -226,7 +226,7 @@ Public Class Match_Motion : Inherits VB_Algorithm
         dst3.SetTo(0)
         saveFrame.CopyTo(dst3, mask)
         lastFrame = saveFrame
-        Dim corrPercent = Format(correlationSlider.Value / 1000, "0.0%") + " correlation"
+        Dim corrPercent = Format(correlationSlider.Value / 100, "0.0%") + " correlation"
         labels(2) = "Correlation value for each cell is shown. " + CStr(updateCount) + " of " + CStr(task.gridList.Count) + " with < " + corrPercent +
                     " or stdev < " + Format(stdevThreshold, fmt0)
         labels(3) = CStr(task.gridList.Count - updateCount) + " segments out of " + CStr(task.gridList.Count) + " had > " + corrPercent

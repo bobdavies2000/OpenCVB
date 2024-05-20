@@ -12,11 +12,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         desc = "Find cells and then match them to the previous generation with minimum boundary"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static cvt As New CvtColor_Basics
-            cvt.Run(src)
-            src = cvt.dst2
-        End If
+        src = bgr2gray(src)
 
         redCPP.inputMask = inputMask
         redCPP.Run(src)
@@ -2565,11 +2561,7 @@ Public Class RedCloud_Delaunay : Inherits VB_Algorithm
         delaunay.Run(src)
         dst1 = delaunay.dst2
 
-        If src.Channels <> 1 Then
-            Static cvt As New CvtColor_Basics
-            cvt.Run(src)
-            src = cvt.dst2
-        End If
+        src = bgr2gray(src)
 
         redCPP.inputMask = dst1
         redCPP.Run(src)
@@ -2596,11 +2588,7 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
         desc = "Run the C++ RedCloud interface with or without a mask"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static cvt As New CvtColor_Basics
-            cvt.Run(src)
-            src = cvt.dst2
-        End If
+        src = bgr2gray(src)
         Dim imagePtr As IntPtr
         Dim inputData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
@@ -2660,11 +2648,7 @@ Public Class RedCloud_MaxDist_CPP : Inherits VB_Algorithm
         desc = "Run the C++ RedCloudMaxDist interface without a mask"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static cvt As New CvtColor_Basics
-            cvt.Run(src)
-            src = cvt.dst2
-        End If
+        src = bgr2gray(src)
 
         If task.heartBeat Then maxList.Clear() ' reevaluate all cells.
         Dim maxArray = maxList.ToArray

@@ -532,7 +532,7 @@ Public Class FPoly_StartPoints : Inherits VB_Algorithm
         For i = 0 To goodPoints.Count - 1
             Dim pt = goodPoints(i)
             Dim startPoint = lastPoints.Get(Of Byte)(pt.Y, pt.X)
-            If startPoint = 255 Then startPoint = i
+            If startPoint = 255 And i < 256 Then startPoint = i
             If startPoint < startPoints.Count And usedGood.Contains(startPoint) = False Then
                 usedGood.Add(startPoint)
                 facet = facets(startPoint)

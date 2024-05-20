@@ -1,22 +1,14 @@
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Algorithm
-    Dim bounds As New Boundary_RemovedRects
     Dim redCPP As New RedCloud_CPP
     Public genCells As New Cell_Generate
     Public Sub New()
         redOptions.IdentifyCells.Checked = True
-        labels(3) = "Contour boundaries - input to RedCloud_Basics"
-        desc = "Build the RedCloud cells with the best boundaries"
+        desc = "Build the RedCloud cells with the grayscale input."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            bounds.Run(src)
-            dst3 = bounds.bRects.bounds.dst2
-            redCPP = bounds.bRects.bounds.redCPP
-        Else
-            redCPP.inputMask = src
-            If standalone = False Then redCPP.Run(src)
-        End If
+        If src.Channels <> 1 Then src = bgr2gray(src) Else redCPP.inputMask = src
+        redCPP.Run(src)
 
         If redCPP.classCount = 0 Then Exit Sub ' no data to process.
 
