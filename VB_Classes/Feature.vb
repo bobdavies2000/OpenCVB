@@ -84,6 +84,7 @@ End Class
 
 
 
+
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_Good : Inherits VB_Algorithm
     Public options As New Options_Features
@@ -111,9 +112,6 @@ Public Class Feature_Good : Inherits VB_Algorithm
                     " and minimum distance = " + CStr(options.minDistance)
     End Sub
 End Class
-
-
-
 
 
 
