@@ -1618,7 +1618,7 @@ End Class
 
 
 
-Public Class Feature_GridPopulation : Inherits VB_Algorithm
+Public Class Feature_GridPopulation1 : Inherits VB_Algorithm
     Dim floodCells As New Feature_CellGrid
     Public bestCells As New List(Of cv.Rect)
     Public bestLeftCell As cv.Rect
@@ -1673,5 +1673,35 @@ Public Class Feature_GridPopulation : Inherits VB_Algorithm
         dst3.SetTo(0)
         dst3.Rectangle(bestLeftCell, task.highlightColor, task.lineWidth + 1)
         dst3.Rectangle(bestRightCell, task.highlightColor, task.lineWidth + 1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Feature_GridPopulation : Inherits VB_Algorithm
+    Dim feat As New Feature_Basics
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Click 'Show grid mask overlay' to see grid boundaries."
+        desc = "Find the feature population for each cell."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+        dst2 = feat.dst2
+        labels(2) = feat.labels(2)
+
+        dst3.SetTo(0)
+        For Each pt In task.featurePoints
+            dst3.Set(Of Byte)(pt.Y, pt.X, 255)
+        Next
+
+        For Each roi In task.gridList
+            Dim test = dst3(roi).FindNonZero()
+            setTrueText(CStr(test.Rows), roi.TopLeft, 3)
+        Next
     End Sub
 End Class

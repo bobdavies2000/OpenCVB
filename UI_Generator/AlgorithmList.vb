@@ -607,6 +607,7 @@ if algorithmName = "Feature_Gather" Then return new Feature_Gather
 if algorithmName = "Feature_Generations" Then return new Feature_Generations
 if algorithmName = "Feature_Grid" Then return new Feature_Grid
 if algorithmName = "Feature_GridPopulation" Then return new Feature_GridPopulation
+if algorithmName = "Feature_GridPopulation1" Then return new Feature_GridPopulation1
 if algorithmName = "Feature_GridSimple" Then return new Feature_GridSimple
 if algorithmName = "Feature_History" Then return new Feature_History
 if algorithmName = "Feature_KNNBasics" Then return new Feature_KNNBasics
