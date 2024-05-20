@@ -3,8 +3,8 @@ Imports System.Runtime.InteropServices
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FASTSample.vb
 Public Class Corners_Basics : Inherits VB_Algorithm
     Public features As New List(Of cv.Point2f)
+    Dim options As New Options_Features
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
         If check.Setup(traceName) Then
             check.addCheckBox("Use Non-Max = True")
             check.Box(0).Checked = True

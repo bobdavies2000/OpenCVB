@@ -1743,11 +1743,12 @@ End Class
 
 
 Public Class Feature_Gather : Inherits VB_Algorithm
+    Dim harris As New Corners_HarrisDetector
+    Dim FAST As New Corners_Basics
     Dim myOptions As New Options_FeatureGather
     Public features As New List(Of cv.Point2f)
     Dim brisk As New BRISK_Basics
     Public options As New Options_Features
-    Dim harris As New Corners_HarrisDetector
     Public Sub New()
         cPtr = Agast_Open()
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk."
@@ -1804,6 +1805,10 @@ Public Class Feature_Gather : Inherits VB_Algorithm
                 harris.Run(src)
                 features = harris.features
                 labels(2) = "Harris Detector produced " + CStr(features.Count) + " features"
+            Case FeatureSrc.FAST
+                FAST.Run(src)
+                features = FAST.features
+                labels(2) = "FAST produced " + CStr(features.Count) + " features"
         End Select
 
         If standaloneTest() Then

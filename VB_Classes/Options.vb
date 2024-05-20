@@ -3411,6 +3411,7 @@ Public Class Options_Features : Inherits VB_Algorithm
             sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
             sliders.setupTrackBar("Blocksize", 1, 21, blockSize)
             sliders.setupTrackBar("Agast Threshold", 1, 100, agastThreshold)
+            sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
         End If
     End Sub
     Public Sub RunVB()
@@ -4797,6 +4798,7 @@ Public Enum FeatureSrc
     Agast = 2
     BRISK = 3
     Harris = 4
+    FAST = 5
 End Enum
 
 
@@ -4810,6 +4812,7 @@ Public Class Options_FeatureGather : Inherits VB_Algorithm
             radio.addRadio("Agast Features")
             radio.addRadio("BRISK Features")
             radio.addRadio("Harris Features")
+            radio.addRadio("FAST Features")
             radio.check(0).Checked = True
         End If
     End Sub
@@ -4818,7 +4821,7 @@ Public Class Options_FeatureGather : Inherits VB_Algorithm
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 featureSource = Choose(i + 1, FeatureSrc.goodFeaturesFull, FeatureSrc.goodFeaturesGrid, FeatureSrc.Agast,
-                                       FeatureSrc.BRISK, FeatureSrc.Harris)
+                                       FeatureSrc.BRISK, FeatureSrc.Harris, FeatureSrc.FAST)
                 Exit For
             End If
         Next
