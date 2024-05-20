@@ -416,12 +416,14 @@ Module VB_Externs
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Agast_Open() As IntPtr
     End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function Agast_Count(cPtr As IntPtr) As Integer
+    End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Agast_Close(Harris_FeaturesPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Agast_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As Integer, cols As Integer,
-                              count As IntPtr, threshold As Integer) As IntPtr
+                              threshold As Integer) As IntPtr
     End Function
 
 

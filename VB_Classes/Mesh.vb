@@ -22,7 +22,7 @@ Public Class Mesh_Basics : Inherits VB_Algorithm
             dst2.Line(p1, p2, white, task.lineWidth, task.lineType)
         Next
         For i = 0 To knn.queries.Count - 1
-            dst2.Circle(knn.queries(i), task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
+            dst2.Circle(knn.queries(i), task.dotSize, cv.Scalar.Red, -1, task.lineType)
         Next
         Return dst2
     End Function

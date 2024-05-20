@@ -599,7 +599,6 @@ if algorithmName = "Extrinsics_Basics" Then return new Extrinsics_Basics
 if algorithmName = "Extrinsics_Display" Then return new Extrinsics_Display
 if algorithmName = "Face_Haar_Alt" Then return new Face_Haar_Alt
 if algorithmName = "Face_Haar_LBP" Then return new Face_Haar_LBP
-if algorithmName = "Feature_Agast" Then return new Feature_Agast
 if algorithmName = "Feature_ArcY" Then return new Feature_ArcY
 if algorithmName = "Feature_ArcYAll" Then return new Feature_ArcYAll
 if algorithmName = "Feature_Basics" Then return new Feature_Basics
