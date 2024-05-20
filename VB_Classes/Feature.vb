@@ -120,105 +120,41 @@ End Class
 
 
 
-
-Public Class Feature_CellGrid : Inherits VB_Algorithm
-    Dim feat As New Feature_KNNBasics
-    Public cellPopulation As New List(Of Integer) ' count the feature population of each roi
+' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
+Public Class Feature_KNNBasics : Inherits VB_Algorithm
+    Dim knn As New KNN_Core
+    Public featurePoints As New List(Of cv.Point2f)
+    Public feat As New Feature_Basics
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        desc = "Track the GoodFeatures in each Grid_Basics cell"
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Find good features to track in a BGR image but use the same point if closer than a threshold"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat Then dst0.SetTo(0)
+        feat.Run(src)
 
-        dst2 = src
+        knn.queries = New List(Of cv.Point2f)(task.features)
+        If firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        knn.Run(empty)
 
-        feat.Run(dst2)
-        For Each pt In task.features
-            Dim val = dst0.Get(Of Byte)(pt.Y, pt.X)
-            dst0.Set(Of Byte)(pt.Y, pt.X, If(val = 255, val, val + 1))
-            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        For i = 0 To knn.neighbors.Count - 1
+            Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
+            Dim pt = knn.trainInput(trainIndex)
+            Dim qPt = task.features(i)
+            If pt.DistanceTo(qPt) > feat.options.minDistance Then knn.trainInput(trainIndex) = task.features(i)
         Next
+        featurePoints = New List(Of cv.Point2f)(knn.trainInput)
 
-        dst3 = feat.dst2
-
-        cellPopulation.Clear()
-        For i = 0 To task.gridList.Count - 1
-            Dim roi = task.gridList(i)
-            Dim features = dst0(roi).Sum()
-            cellPopulation.Add(features(0))
-        Next
-        dst2.SetTo(cv.Scalar.White, task.gridMask)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class Feature_CellFinder : Inherits VB_Algorithm
-    Dim floodCells As New Feature_CellGrid
-    Public bestCells As New List(Of cv.Rect)
-    Public bestLeftCell As cv.Rect
-    Public bestRightCell As cv.Rect
-    Public Sub New()
-        labels = {"", "", "Input image with marked features - best cells are highlighted", ""}
-        desc = "Find 2 cells with the most features but not on the edge (too likely impacted with camera motion)"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        floodCells.Run(src)
-        dst2 = floodCells.dst2
-
-        Static popSort As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
-        popSort.Clear()
-        For i = 0 To floodCells.cellPopulation.Count - 1
-            Dim roi = task.gridList(i)
-            If roi.X > 0 And (roi.X + roi.Width) < dst2.Width And roi.Y > 0 And (roi.Y + roi.Height) < dst2.Height Then
-                setTrueText(CStr(floodCells.cellPopulation(i)), New cv.Point(roi.X, roi.Y), 3)
-                popSort.Add(floodCells.cellPopulation(i), roi)
-            End If
-        Next
-
-        bestLeftCell = New cv.Rect(-1, -1, 0, 0)
-        bestRightCell = New cv.Rect(-1, -1, 0, 0)
-
-        ' if the current best's are toward the top, then just stick with the current ones'.  
-        For i = 0 To popSort.Count / 2
-            Dim roi = popSort.ElementAt(i).Value
-            For Each best In bestCells
-                If best = roi Then
-                    If roi.X < dst2.Width / 3 Then bestLeftCell = roi ' leftmost cell
-                    If roi.X > dst2.Width * 2 / 3 Then bestRightCell = roi ' rightmost cell...
-                End If
-            Next
-            If bestLeftCell.X <> -1 And bestRightCell.X <> -1 Then Exit For
-        Next
-
-        For i = 0 To popSort.Count - 1
-            If bestLeftCell.X <> -1 And bestRightCell.X <> -1 Then Exit For
-            Dim roi = popSort.ElementAt(i).Value
-            If roi.X < dst2.Width / 3 Then bestLeftCell = roi ' leftmost cell
-            If roi.X > dst2.Width * 2 / 3 Then bestRightCell = roi ' rightmost cell...
-        Next
-
-        bestCells.Clear()
-        bestCells.Add(bestLeftCell)
-        bestCells.Add(bestRightCell)
-
-        dst2.Rectangle(bestLeftCell, task.highlightColor, task.lineWidth + 1)
-        dst2.Rectangle(bestRightCell, task.highlightColor, task.lineWidth + 1)
-
+        src.CopyTo(dst2)
         dst3.SetTo(0)
-        dst3.Rectangle(bestLeftCell, task.highlightColor, task.lineWidth + 1)
-        dst3.Rectangle(bestRightCell, task.highlightColor, task.lineWidth + 1)
+        For Each pt In featurePoints
+            dst2.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
+            dst3.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
+        Next
+
+        labels(2) = feat.labels(2)
+        labels(3) = feat.labels(2)
     End Sub
 End Class
-
-
 
 
 
@@ -807,77 +743,6 @@ End Class
 
 
 
-Public Class Feature_KNNSimple : Inherits VB_Algorithm
-    Public feat As New Feature_Basics
-    Public knn As New KNN_Basics
-    Public Sub New()
-        labels(2) = "Track Good features using KNN"
-        desc = "Find good features and track them from one image to the next using KNN."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        feat.Run(src)
-        dst3 = feat.dst2
-
-        knn.queries.Clear()
-        For Each pt In task.features
-            knn.queries.Add(pt)
-        Next
-
-        knn.Run(src)
-        dst2 = src
-        dst2 += knn.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_KNNBasics : Inherits VB_Algorithm
-    Dim knn As New KNN_Core
-    Public featurePoints As New List(Of cv.Point2f)
-    Public feat As New Feature_Basics
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Find good features to track in a BGR image but use the same point if closer than a threshold"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        feat.Run(src)
-
-        knn.queries = New List(Of cv.Point2f)(task.features)
-        If firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
-        knn.Run(empty)
-
-        For i = 0 To knn.neighbors.Count - 1
-            Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
-            Dim pt = knn.trainInput(trainIndex)
-            Dim qPt = task.features(i)
-            If pt.DistanceTo(qPt) > feat.options.minDistance Then knn.trainInput(trainIndex) = task.features(i)
-        Next
-        featurePoints = New List(Of cv.Point2f)(knn.trainInput)
-
-        src.CopyTo(dst2)
-        dst3.SetTo(0)
-        For Each pt In featurePoints
-            dst2.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
-            dst3.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
-        Next
-
-        labels(2) = feat.labels(2)
-        labels(3) = feat.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Feature_MultiPass : Inherits VB_Algorithm
     Dim feat As New Feature_Basics
     Public featurePoints As New List(Of cv.Point2f)
@@ -915,75 +780,6 @@ Public Class Feature_MultiPass : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-
-' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_History : Inherits VB_Algorithm
-    Public corners As New List(Of cv.Point2f)
-    Public feat As New Feature_Basics
-    Public Sub New()
-        desc = "Find good features across multiple frames."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        feat.Run(src)
-        dst2 = src.Clone
-
-        Static cornerHistory As New List(Of List(Of cv.Point2f))
-
-        cornerHistory.Add(New List(Of cv.Point2f)(task.features))
-        If cornerHistory.Count > task.frameHistoryCount Then cornerHistory.RemoveAt(0)
-
-        corners.Clear()
-        For Each cList In cornerHistory
-            For Each pt In cList
-                corners.Add(New cv.Point(pt.X, pt.Y))
-                dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
-            Next
-        Next
-
-        labels(2) = "Found " + CStr(corners.Count) + " points with quality = " + CStr(feat.options.quality) +
-                    " and minimum distance = " + CStr(feat.options.minDistance)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Feature_Flood : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
-    Dim feat As New Feature_Basics
-    Public Sub New()
-        findSlider("Feature Sample Size").Value = 1000
-        desc = "Find features within each cell and track the cell with them."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        feat.Run(src)
-        dst2 = feat.dst2
-
-        redC.Run(src)
-        dst2 = redC.dst2
-
-        Dim hitCount As Integer
-        For Each pt In task.features
-            Dim index = task.cellMap.Get(Of Byte)(pt.Y, pt.X)
-            If index > 0 Then
-                Dim rc = task.redCells(index)
-                rc.features.Add(pt)
-                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-                hitCount += 1
-            End If
-        Next
-        If task.heartBeat Then labels(2) = "Of the " + CStr(task.features.Count) + " features, " + CStr(hitCount) + " landed inside a cell " +
-                                           "(" + Format(hitCount / task.features.Count, "0%") + ")"
-    End Sub
-End Class
 
 
 
@@ -1038,73 +834,6 @@ Public Class Feature_PointTracker : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Feature_BasicsValidated : Inherits VB_Algorithm
-    Public centers As New List(Of cv.Point2f)
-    Dim templates As New List(Of cv.Mat)
-    Dim rects As New List(Of cv.Rect)
-    Dim match As New Match_Basics
-    Dim feat As New Feature_KNNBasics
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Minimum number of points", 1, 20, 10)
-        End If
-
-        If standalone Then gOptions.displayDst1.Checked = True
-        desc = "Find good features and track them with matchTemplate."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static minSlider = findSlider("Minimum number of points")
-        Dim minPoints = minSlider.Value
-
-        feat.Run(src)
-
-        Dim correlationMin = match.options.correlationMin
-        Dim templatePad = match.options.templatePad
-        Dim templateSize = match.options.templateSize
-
-        src.CopyTo(dst2)
-        Dim nextTemplates As New List(Of cv.Mat)
-        Dim nextRects As New List(Of cv.Rect)
-        If templates.Count < minPoints Then
-            For Each pt In task.features
-                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-
-                Dim r = validateRect(New cv.Rect(pt.X - templatePad, pt.Y - templatePad, templateSize, templateSize))
-                nextTemplates.Add(src(r).Clone)
-                nextRects.Add(r)
-            Next
-        Else
-            nextTemplates = New List(Of cv.Mat)(templates)
-            nextRects = New List(Of cv.Rect)(rects)
-        End If
-
-        templates.Clear()
-        rects.Clear()
-        dst3 = src.Clone
-        dst1.SetTo(0)
-        For i = 0 To nextTemplates.Count - 1
-            match.template = nextTemplates(i)
-            Dim r = nextRects(i)
-            match.searchRect = validateRect(New cv.Rect(r.X - templatePad, r.Y - templatePad, templateSize, templateSize))
-            match.Run(src)
-            If match.correlation > correlationMin Then
-                Dim center = match.matchCenter
-                templates.Add(nextTemplates(i))
-                rects.Add(nextRects(i))
-                dst1.Circle(center, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
-                setTrueText(Format(match.correlation, fmt3), center, 1)
-                dst3.Circle(center, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
-                setTrueText(Format(match.correlation, fmt3), center, 3)
-            End If
-        Next
-        labels(2) = feat.labels(2)
-    End Sub
-End Class
 
 
 
@@ -1198,42 +927,6 @@ Public Class Feature_Longest : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Feature_GridPopulation : Inherits VB_Algorithm
-    Public feat As New Feature_Basics
-    Public Sub New()
-        desc = "Find hich concentrations of good features to track in each roi of the task.gridList"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        feat.Run(src)
-
-        dst2.SetTo(0)
-        For Each pt In task.features
-            Dim roi = task.gridList(task.gridToRoiIndex.Get(Of Integer)(pt.Y, pt.X))
-            dst2.Circle(New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2), task.dotSize, task.highlightColor, -1, task.lineType)
-        Next
-
-        'task.features.Clear()
-        'For Each roi In task.gridList
-        '    Dim features = cv.Cv2.GoodFeaturesToTrack(src(roi), sampleSize, options.quality, options.minDistance, Nothing,
-        '                                              options.blockSize, True, options.k)
-        '    For Each pt In features
-        '        task.features.Add(New cv.Point2f(roi.X + pt.X, roi.Y + pt.Y))
-        '    Next
-        'Next
-
-        'src.CopyTo(dst2)
-        'For Each pt In task.features
-        '    dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-        'Next
-        'labels(2) = "Found " + CStr(task.features.Count) + " points with quality = " + CStr(options.quality) +
-        '            " and minimum distance = " + CStr(options.minDistance) + " and blocksize " + CStr(options.blockSize)
-    End Sub
-End Class
 
 
 
@@ -1372,7 +1065,7 @@ Public Class Feature_Grid : Inherits VB_Algorithm
     Dim ptLost As New List(Of cv.Point2f)
     Dim gather As New Feature_Gather
     Public Sub New()
-        findRadio("GoodFeatures grid").Checked = True
+        findRadio("GoodFeatures (ShiTomasi) grid").Checked = True
         findSlider("Feature Sample Size").Value = 4
         desc = "Find good features to track in each roi of the task.gridList"
     End Sub
@@ -1545,47 +1238,6 @@ Public Class Feature_LineAngleAll : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-Public Class Feature_Generations : Inherits VB_Algorithm
-    Dim feat As New Feature_Basics
-    Dim features As New List(Of cv.Point)
-    Dim gens As New List(Of Integer)
-    Public Sub New()
-        vbAddAdvice(traceName + ": Local options will determine how many features are present.")
-        desc = "Find feature age maximum and average."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        feat.Run(src)
-
-        Dim newfeatures As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
-        For Each pt In task.featurePoints
-            Dim index = features.IndexOf(pt)
-            If index >= 0 Then newfeatures.Add(gens(index) + 1, pt) Else newfeatures.Add(1, pt)
-        Next
-
-        If task.heartBeat Then
-            features.Clear()
-            gens.Clear()
-        End If
-
-        features = New List(Of cv.Point)(newfeatures.Values)
-        gens = New List(Of Integer)(newfeatures.Keys)
-
-        dst2 = src
-        For i = 0 To features.Count - 1
-            If gens(i) = 1 Then Exit For
-            Dim pt = features(i)
-            dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
-        Next
-
-        If task.heartBeat Then
-            labels(2) = CStr(features.Count) + " features found with max/average " + CStr(gens(0)) + "/" + Format(gens.Average, fmt0) + " generations"
-        End If
-    End Sub
-End Class
 
 
 
@@ -1820,5 +1472,206 @@ Public Class Feature_Gather : Inherits VB_Algorithm
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Feature_Generations : Inherits VB_Algorithm
+    Dim feat As New Feature_Basics
+    Dim features As New List(Of cv.Point)
+    Dim gens As New List(Of Integer)
+    Public Sub New()
+        vbAddAdvice(traceName + ": Local options will determine how many features are present.")
+        desc = "Find feature age maximum and average."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+
+        Dim newfeatures As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
+        For Each pt In task.featurePoints
+            Dim index = features.IndexOf(pt)
+            If index >= 0 Then newfeatures.Add(gens(index) + 1, pt) Else newfeatures.Add(1, pt)
+        Next
+
+        If task.heartBeat Then
+            features.Clear()
+            gens.Clear()
+        End If
+
+        features = New List(Of cv.Point)(newfeatures.Values)
+        gens = New List(Of Integer)(newfeatures.Keys)
+
+        dst2 = src
+        For i = 0 To features.Count - 1
+            If gens(i) = 1 Then Exit For
+            Dim pt = features(i)
+            dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+        Next
+
+        If task.heartBeat Then
+            labels(2) = CStr(features.Count) + " features found with max/average " + CStr(gens(0)) + "/" + Format(gens.Average, fmt0) + " generations"
+        End If
+    End Sub
+End Class
+
+
+
+
+' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
+Public Class Feature_History : Inherits VB_Algorithm
+    Public features As New List(Of cv.Point)
+    Public feat As New Feature_Basics
+    Public Sub New()
+        desc = "Find good features across multiple frames."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static featureHistory As New List(Of List(Of cv.Point))
+        Static gens As New List(Of Integer)
+        Dim histCount = gOptions.FrameHistory.Value
+
+        feat.Run(src)
+        dst2 = src.Clone
+
+        featureHistory.Add(New List(Of cv.Point)(task.featurePoints))
+
+        Dim newFeatures As New List(Of cv.Point)
+        gens.Clear()
+        For Each cList In featureHistory
+            For Each pt In cList
+                Dim index = newFeatures.IndexOf(pt)
+                If index >= 0 Then
+                    gens(index) += 1
+                Else
+                    newFeatures.Add(pt)
+                    gens.Add(1)
+                End If
+            Next
+        Next
+
+        Dim threshold = If(histCount = 1, 0, 1)
+        features.Clear()
+        Dim whiteCount As Integer
+        For i = 0 To newFeatures.Count - 1
+            If gens(i) > threshold Then
+                Dim pt = newFeatures(i)
+                features.Add(pt)
+                If gens(i) < histCount Then
+                    dst2.Circle(pt, task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
+                Else
+                    whiteCount += 1
+                    dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+                End If
+            End If
+        Next
+
+        If featureHistory.Count > histCount Then featureHistory.RemoveAt(0)
+        If task.heartBeat Then
+            labels(2) = CStr(features.Count) + "/" + CStr(whiteCount) + " present/present on every frame" +
+                        " Red is a recent addition, yellow is present on previous " + CStr(histCount) + " frames"
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_CellGrid : Inherits VB_Algorithm
+    Dim feat As New Feature_KNNBasics
+    Public cellPopulation As New List(Of Integer) ' count the feature population of each roi
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        desc = "Track the GoodFeatures in each Grid_Basics cell"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat Then dst0.SetTo(0)
+
+        dst2 = src
+
+        feat.Run(dst2)
+        For Each pt In task.features
+            Dim val = dst0.Get(Of Byte)(pt.Y, pt.X)
+            dst0.Set(Of Byte)(pt.Y, pt.X, If(val = 255, val, val + 1))
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
+
+        dst3 = feat.dst2
+
+        cellPopulation.Clear()
+        For i = 0 To task.gridList.Count - 1
+            Dim roi = task.gridList(i)
+            Dim features = dst0(roi).Sum()
+            cellPopulation.Add(features(0))
+        Next
+        dst2.SetTo(cv.Scalar.White, task.gridMask)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Feature_GridPopulation : Inherits VB_Algorithm
+    Dim floodCells As New Feature_CellGrid
+    Public bestCells As New List(Of cv.Rect)
+    Public bestLeftCell As cv.Rect
+    Public bestRightCell As cv.Rect
+    Public Sub New()
+        labels = {"", "", "Input image with marked features - best cells are highlighted", ""}
+        desc = "Find 2 cells with the most features but not on the edge (too likely impacted with camera motion)"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        floodCells.Run(src)
+        dst2 = floodCells.dst2
+
+        Static popSort As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
+        popSort.Clear()
+        For i = 0 To floodCells.cellPopulation.Count - 1
+            Dim roi = task.gridList(i)
+            If roi.X > 0 And (roi.X + roi.Width) < dst2.Width And roi.Y > 0 And (roi.Y + roi.Height) < dst2.Height Then
+                setTrueText(CStr(floodCells.cellPopulation(i)), New cv.Point(roi.X, roi.Y), 3)
+                popSort.Add(floodCells.cellPopulation(i), roi)
+            End If
+        Next
+
+        bestLeftCell = New cv.Rect(-1, -1, 0, 0)
+        bestRightCell = New cv.Rect(-1, -1, 0, 0)
+
+        ' if the current best's are toward the top, then just stick with the current ones'.  
+        For i = 0 To popSort.Count / 2
+            Dim roi = popSort.ElementAt(i).Value
+            For Each best In bestCells
+                If best = roi Then
+                    If roi.X < dst2.Width / 3 Then bestLeftCell = roi ' leftmost cell
+                    If roi.X > dst2.Width * 2 / 3 Then bestRightCell = roi ' rightmost cell...
+                End If
+            Next
+            If bestLeftCell.X <> -1 And bestRightCell.X <> -1 Then Exit For
+        Next
+
+        For i = 0 To popSort.Count - 1
+            If bestLeftCell.X <> -1 And bestRightCell.X <> -1 Then Exit For
+            Dim roi = popSort.ElementAt(i).Value
+            If roi.X < dst2.Width / 3 Then bestLeftCell = roi ' leftmost cell
+            If roi.X > dst2.Width * 2 / 3 Then bestRightCell = roi ' rightmost cell...
+        Next
+
+        bestCells.Clear()
+        bestCells.Add(bestLeftCell)
+        bestCells.Add(bestRightCell)
+
+        dst2.Rectangle(bestLeftCell, task.highlightColor, task.lineWidth + 1)
+        dst2.Rectangle(bestRightCell, task.highlightColor, task.lineWidth + 1)
+
+        dst3.SetTo(0)
+        dst3.Rectangle(bestLeftCell, task.highlightColor, task.lineWidth + 1)
+        dst3.Rectangle(bestRightCell, task.highlightColor, task.lineWidth + 1)
     End Sub
 End Class
