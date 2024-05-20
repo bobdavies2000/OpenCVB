@@ -23,7 +23,7 @@ Public Class Feature_Basics : Inherits VB_Algorithm
         matList.Clear()
         ptList.Clear()
         Dim correlationMat As New cv.Mat
-        For i = 0 To task.features.Count - 1
+        For i = 0 To Math.Min(featureMat.Count, task.features.Count) - 1
             Dim pt = task.features(i)
             Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMat(i).Width, featureMat(i).Height))
             cv.Cv2.MatchTemplate(src(rect), featureMat(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
@@ -1743,9 +1743,9 @@ End Class
 
 
 Public Class Feature_LRMatched : Inherits VB_Algorithm
-    Dim match As New FeatureMatch_Basics
+    Dim match As New FeatureLeftRight_Basics
     Public Sub New()
-        desc = "Placeholder to make it easier to find FeatureMatch_Basics"
+        desc = "Placeholder to make it easier to find FeatureLeftRight_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         match.Run(src)
@@ -1761,7 +1761,7 @@ End Class
 
 
 Public Class Feature_LucasKanade : Inherits VB_Algorithm
-    Dim pyr As New OpticalFlow_LucasKanade
+    Dim pyr As New FeatureFlow_LucasKanade
     Public ptList As New List(Of cv.Point)
     Public ptLast As New List(Of cv.Point)
     Public Sub New()

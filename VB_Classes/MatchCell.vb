@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class MatchCell_Basics : Inherits VB_Algorithm
-    Public lrFeat As New FeatureMatch_Basics
+    Public lrFeat As New FeatureLeftRight_Basics
     Public flood As New Flood_LeftRight
     Public Sub New()
         labels(3) = "Click any cell with a highlighted feature point to see the cell that matches it in the right view."
@@ -206,7 +206,7 @@ End Class
 
 Public Class MatchCell_NearestFeature : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
-    Dim feat As New FeatureMatch_Basics
+    Dim feat As New FeatureLeftRight_Basics
     Dim knn As New KNN_Core
     Public Sub New()
         desc = "Find hte nearest feature to every cell in task.redCells"

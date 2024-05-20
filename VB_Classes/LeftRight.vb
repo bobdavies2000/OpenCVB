@@ -331,9 +331,9 @@ End Class
 
 
 Public Class LeftRight_Features : Inherits VB_Algorithm
-    Dim feat As New FeatureMatch_Basics
+    Dim feat As New FeatureLeftRight_Basics
     Public Sub New()
-        desc = "Placeholder to make it easier to find FeatureMatch_Basics"
+        desc = "Placeholder to make it easier to find FeatureLeftRight_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         feat.Run(src)

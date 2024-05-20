@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
-Public Class FeatureMatch_Basics : Inherits VB_Algorithm
-    Dim prep As New FeatureMatch_LeftRightPrep
+Public Class FeatureLeftRight_Basics : Inherits VB_Algorithm
+    Dim prep As New FeatureLeftRight_LeftRightPrep
     Public mpList As New List(Of pointPair)
     Public mpCorrelation As New List(Of Single)
     Public selectedPoint As cv.Point, mpIndex
@@ -120,8 +120,8 @@ End Class
 
 
 
-Public Class FeatureMatch_Original : Inherits VB_Algorithm
-    Dim unMatched As New FeatureMatch_LRUnMatched
+Public Class FeatureLeftRight_Original : Inherits VB_Algorithm
+    Dim unMatched As New FeatureLeftRight_LRUnMatched
     Public mpList As New List(Of pointPair)
     Public mpCorrelation As New List(Of Single)
     Public selectedPoint As cv.Point
@@ -234,7 +234,7 @@ End Class
 
 
 
-Public Class FeatureMatch_LRHist : Inherits VB_Algorithm
+Public Class FeatureLeftRight_LRHist : Inherits VB_Algorithm
     Dim feat As New Feature_Basics
     Dim fGrid As New Feature_Grid
     Public leftPoints As New List(Of cv.Point)
@@ -328,8 +328,8 @@ End Class
 
 
 
-Public Class FeatureMatch_LRUnMatched : Inherits VB_Algorithm
-    Dim lrHist As New FeatureMatch_LRHist
+Public Class FeatureLeftRight_LRUnMatched : Inherits VB_Algorithm
+    Dim lrHist As New FeatureLeftRight_LRHist
     Public leftFeatures As New List(Of List(Of cv.Point))
     Public rightFeatures As New List(Of List(Of cv.Point))
     Public Sub New()
@@ -397,7 +397,7 @@ End Class
 
 
 
-Public Class FeatureMatch_LeftRightPrep : Inherits VB_Algorithm
+Public Class FeatureLeftRight_LeftRightPrep : Inherits VB_Algorithm
     Dim lFeat As New Feature_Basics
     Dim rFeat As New Feature_Basics
     Public leftFeatures As New List(Of cv.Point)
@@ -430,12 +430,12 @@ End Class
 
 
 
-Public Class FeatureMatch_Grid : Inherits VB_Algorithm
-    Dim match As New FeatureMatch_Basics
+Public Class FeatureLeftRight_Grid : Inherits VB_Algorithm
+    Dim match As New FeatureLeftRight_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         findRadio("GoodFeatures grid").Checked = True
-        desc = "Run FeatureMatch_Basics but with 'GoodFeatures grid' instead of 'GoodFeatures full image'"
+        desc = "Run FeatureLeftRight_Basics but with 'GoodFeatures grid' instead of 'GoodFeatures full image'"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         match.Run(src)

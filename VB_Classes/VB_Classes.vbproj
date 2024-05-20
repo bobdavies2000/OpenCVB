@@ -162,7 +162,7 @@
     <Compile Include="DisparityInverted.vb" />
     <Compile Include="EdgeDraw.vb" />
     <Compile Include="Erode.vb" />
-    <Compile Include="FeatureMatch.vb" />
+    <Compile Include="FeatureLeftRight.vb" />
     <Compile Include="History.vb" />
     <Compile Include="GuidedBP.vb" />
     <Compile Include="Guess.vb" />
@@ -198,7 +198,7 @@
     <Compile Include="CPP.vb" />
     <Compile Include="Crypto.vb" />
     <Compile Include="Denoise.vb" />
-    <Compile Include="FPoly.vb" />
+    <Compile Include="FeaturePoly.vb" />
     <Compile Include="Gif.vb" />
     <Compile Include="Homography.vb" />
     <Compile Include="LDA.vb" />
@@ -379,7 +379,7 @@
     </Compile>
     <Compile Include="OilPaint.vb" />
     <Compile Include="OpenGL.vb" />
-    <Compile Include="OpticalFlow.vb" />
+    <Compile Include="FeatureFlow.vb" />
     <Compile Include="OptionsSliders.Designer.vb">
       <DependentUpon>OptionsSliders.vb</DependentUpon>
     </Compile>
