@@ -2776,7 +2776,7 @@ End Class
 
 Public Class Options_Harris : Inherits VB_Algorithm
     Public threshold As Single = 1 / 10000
-    Public neighborhood As Integer = 21
+    Public neighborhood As Integer = 3
     Public aperture As Integer = 21
     Public harrisParm As Single = 1
     Public Sub New()
@@ -2784,7 +2784,7 @@ Public Class Options_Harris : Inherits VB_Algorithm
             sliders.setupTrackBar("Harris Threshold", 1, 100, threshold * 10000)
             sliders.setupTrackBar("Harris Neighborhood", 1, 41, neighborhood)
             sliders.setupTrackBar("Harris aperture", 1, 31, aperture)
-            sliders.setupTrackBar("Harris Parameter", 1, 100, harrisParm * 100)
+            sliders.setupTrackBar("Harris Parameter", 1, 100, harrisParm)
         End If
     End Sub
     Public Sub RunVB()
@@ -4796,6 +4796,7 @@ Public Enum FeatureSrc
     goodFeaturesGrid = 1
     Agast = 2
     BRISK = 3
+    Harris = 4
 End Enum
 
 
@@ -4804,10 +4805,11 @@ Public Class Options_FeatureGather : Inherits VB_Algorithm
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
-            radio.addRadio("GoodFeatures full image")
-            radio.addRadio("GoodFeatures grid")
+            radio.addRadio("GoodFeatures (ShiTomasi) full image")
+            radio.addRadio("GoodFeatures (ShiTomasi) grid")
             radio.addRadio("Agast Features")
             radio.addRadio("BRISK Features")
+            radio.addRadio("Harris Features")
             radio.check(0).Checked = True
         End If
     End Sub
@@ -4815,7 +4817,8 @@ Public Class Options_FeatureGather : Inherits VB_Algorithm
         Static frm = findfrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
-                featureSource = Choose(i + 1, FeatureSrc.goodFeaturesFull, FeatureSrc.goodfeaturesgrid, FeatureSrc.Agast, FeatureSrc.BRISK)
+                featureSource = Choose(i + 1, FeatureSrc.goodFeaturesFull, FeatureSrc.goodFeaturesGrid, FeatureSrc.Agast,
+                                       FeatureSrc.BRISK, FeatureSrc.Harris)
                 Exit For
             End If
         Next

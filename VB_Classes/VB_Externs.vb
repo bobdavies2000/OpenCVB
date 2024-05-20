@@ -94,6 +94,8 @@ Module VB_Externs
     Public Function Harris_Features_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As Integer, cols As Integer, threshold As Single,
                                         neighborhood As Int16, aperture As Int16, HarrisParm As Single) As IntPtr
     End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function Harris_Detector_Count(cPtr As IntPtr) As Integer
+    End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Harris_Detector_Open() As IntPtr
     End Function
@@ -101,8 +103,7 @@ Module VB_Externs
     Public Function Harris_Detector_Close(Harris_FeaturesPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Harris_Detector_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As Integer, cols As Integer, qualityLevel As Double,
-                                        count As IntPtr) As IntPtr
+    Public Function Harris_Detector_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As Integer, cols As Integer, qualityLevel As Double) As IntPtr
     End Function
 
 

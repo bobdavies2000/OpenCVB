@@ -86,38 +86,6 @@ End Class
 
 
 
-' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_Good : Inherits VB_Algorithm
-    Public options As New Options_Features
-    Public Sub New()
-        findSlider("Feature Sample Size").Value = 400
-        vbAddAdvice(traceName + ": Use 'Options_Features' to control output.")
-        desc = "Find good features to track in a BGR image."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        dst2 = src.Clone
-
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        task.features.Clear()
-
-        task.features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cv.Mat,
-                                                   options.blockSize, True, options.k).ToList
-
-        Dim color = If(dst2.Channels = 3, cv.Scalar.Yellow, cv.Scalar.White)
-        For Each pt In task.features
-            dst2.Circle(pt, task.dotSize, color, -1, task.lineType)
-        Next
-
-        labels(2) = "Found " + CStr(task.features.Count) + " points with quality = " + CStr(options.quality) +
-                    " and minimum distance = " + CStr(options.minDistance)
-    End Sub
-End Class
-
-
-
-
-
 
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Feature_BasicsOld : Inherits VB_Algorithm
@@ -146,44 +114,6 @@ Public Class Feature_BasicsOld : Inherits VB_Algorithm
                     " and minimum distance = " + CStr(options.minDistance)
     End Sub
 End Class
-
-
-
-
-
-
-
-Public Class Feature_ShiTomasi : Inherits VB_Algorithm
-    Dim harris As New Corners_HarrisDetector
-    Dim shiTomasi As New Corners_ShiTomasi_CPP
-    Dim options As New Options_ShiTomasi
-    Public Sub New()
-        findSlider("Corner normalize threshold").Value = 15
-        labels = {"", "", "Features in the left camera image", "Features in the right camera image"}
-        desc = "Identify feature points in the left And right views"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        If options.useShiTomasi Then
-            dst2 = task.leftView
-            dst3 = task.rightView
-            shiTomasi.Run(task.leftView)
-            dst2.SetTo(cv.Scalar.White, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-            shiTomasi.Run(task.rightView)
-            dst3.SetTo(task.highlightColor, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        Else
-            harris.Run(task.leftView)
-            dst2 = harris.dst2.Clone
-            harris.Run(task.rightView)
-            dst3 = harris.dst2
-        End If
-    End Sub
-End Class
-
-
-
 
 
 
@@ -851,27 +781,6 @@ End Class
 
 
 
-
-
-
-Public Class Feature_Trace : Inherits VB_Algorithm
-    Dim track As New RedTrack_Features
-    Public Sub New()
-        desc = "Placeholder to help find RedTrack_Features"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        track.Run(src)
-        dst2 = track.dst2
-        labels = track.labels
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Feature_Reduction : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Dim feat As New Feature_Basics
@@ -889,32 +798,6 @@ Public Class Feature_Reduction : Inherits VB_Algorithm
             dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
             dst3.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
         Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Feature_Points : Inherits VB_Algorithm
-    Public feat As New Feature_Basics
-    Public Sub New()
-        labels(3) = "Features found in the image"
-        desc = "Use the sorted list of Delaunay regions to find the top X points to track."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        feat.Run(src)
-        dst2 = feat.dst2
-        If task.heartBeat Then dst3.SetTo(0)
-
-        For Each pt In task.features
-            dst2.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
-            dst3.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
-        Next
-        labels(2) = CStr(task.features.Count) + " targets were present with " + CStr(feat.options.featurePoints) + " requested."
     End Sub
 End Class
 
@@ -1389,42 +1272,6 @@ End Class
 
 
 
-Public Class Feature_TraceDelaunay : Inherits VB_Algorithm
-    Dim features As New Feature_Delaunay
-    Public goodList As New List(Of List(Of cv.Point2f)) ' stable points only
-    Public Sub New()
-        labels = {"Stable points highlighted", "", "", "Delaunay map of regions defined by the feature points"}
-        desc = "Trace the GoodFeatures points using only Delaunay - no KNN or RedCloud or Matching."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        features.Run(src)
-        dst3 = features.dst2
-
-        If task.optionsChanged Then goodList.Clear()
-
-        Dim ptList As New List(Of cv.Point2f)(task.features)
-        goodList.Add(ptList)
-
-        If goodList.Count >= task.frameHistoryCount Then goodList.RemoveAt(0)
-
-        dst2.SetTo(0)
-        For Each ptList In goodList
-            For Each pt In ptList
-                task.color.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-                Dim c = dst3.Get(Of cv.Vec3b)(pt.Y, pt.X)
-                dst2.Circle(pt, task.dotSize + 1, c, -1, task.lineType)
-            Next
-        Next
-        labels(2) = CStr(task.features.Count) + " features were identified in the image."
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Feature_LRMatched : Inherits VB_Algorithm
     Dim match As New FeatureLeftRight_Basics
     Public Sub New()
@@ -1595,82 +1442,6 @@ End Class
 
 
 
-Public Class Feature_Gather : Inherits VB_Algorithm
-    Dim myOptions As New Options_FeatureGather
-    Public features As New List(Of cv.Point2f)
-    Dim brisk As New BRISK_Basics
-    Public options As New Options_Features
-    Public Sub New()
-        cPtr = Agast_Open()
-        desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        myOptions.RunVB()
-
-        Select Case myOptions.featureSource
-            Case FeatureSrc.goodFeaturesFull
-                Static sampleSlider = findSlider("Feature Sample Size")
-                sampleSlider.value = 400
-                If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cv.Mat,
-                                                      options.blockSize, True, options.k).ToList
-                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
-            Case FeatureSrc.goodFeaturesGrid
-                options.featurePoints = 4
-                If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                features.Clear()
-                For i = 0 To task.gridList.Count - 1
-                    Dim roi = task.gridList(i)
-                    Dim tmpFeatures = cv.Cv2.GoodFeaturesToTrack(src(roi), options.featurePoints, options.quality, options.minDistance, New cv.Mat,
-                                                                 options.blockSize, True, options.k).ToList
-                    For j = 0 To tmpFeatures.Count - 1
-                        features.Add(New cv.Point2f(tmpFeatures(j).X + roi.X, tmpFeatures(j).Y + roi.Y))
-                    Next
-                Next
-                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
-            Case FeatureSrc.Agast
-                src = task.color.Clone
-                Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-                Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
-
-                Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-                Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
-                handleSrc.Free()
-
-                Dim ptMat = New cv.Mat(Agast_Count(cPtr), 1, cv.MatType.CV_32FC2, imagePtr).Clone
-                features.Clear()
-                If standaloneTest() Then dst2 = src
-
-                For i = 0 To ptMat.rows - 1
-                    Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
-                    features.Add(pt)
-                    If standaloneTest() Then dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
-                Next
-
-                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
-            Case FeatureSrc.BRISK
-                brisk.Run(src)
-                features = brisk.features
-                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
-        End Select
-
-        If standaloneTest() Then
-            dst2 = task.color.Clone
-            For Each pt In features
-                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-            Next
-        End If
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Feature_LineAngle : Inherits VB_Algorithm
     Dim lines As New Feature_Lines
@@ -1813,5 +1584,236 @@ Public Class Feature_Generations : Inherits VB_Algorithm
         If task.heartBeat Then
             labels(2) = CStr(features.Count) + " features found with max/average " + CStr(gens(0)) + "/" + Format(gens.Average, fmt0) + " generations"
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_NearestCell : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim feat As New FeatureLeftRight_Basics
+    Dim knn As New KNN_Core
+    Public Sub New()
+        desc = "Find the nearest feature to every cell in task.redCells"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+        redC.Run(src)
+        dst2 = redC.dst2
+        dst3 = redC.dst2.Clone
+        labels(2) = redC.labels(2)
+
+        knn.queries.Clear()
+        For Each rc In task.redCells
+            knn.queries.Add(rc.maxDStable)
+        Next
+
+        knn.trainInput.Clear()
+        For Each mp In feat.mpList
+            knn.trainInput.Add(New cv.Point2f(mp.p1.X, mp.p1.Y))
+        Next
+
+        knn.Run(Nothing)
+
+        For i = 0 To task.redCells.Count - 1
+            Dim rc = task.redCells(i)
+            rc.nearestFeature = knn.trainInput(knn.result(i, 0))
+            dst3.Line(rc.nearestFeature, rc.maxDStable, task.highlightColor, task.lineWidth, task.lineType)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Feature_Points : Inherits VB_Algorithm
+    Public feat As New Feature_Basics
+    Public Sub New()
+        labels(3) = "Features found in the image"
+        desc = "Use the sorted list of Delaunay regions to find the top X points to track."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+        dst2 = feat.dst2
+        If task.heartBeat Then dst3.SetTo(0)
+
+        For Each pt In task.features
+            dst2.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
+            dst3.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
+        Next
+        labels(2) = CStr(task.features.Count) + " targets were present with " + CStr(feat.options.featurePoints) + " requested."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_Trace : Inherits VB_Algorithm
+    Dim track As New RedTrack_Features
+    Public Sub New()
+        desc = "Placeholder to help find RedTrack_Features"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        track.Run(src)
+        dst2 = track.dst2
+        labels = track.labels
+    End Sub
+End Class
+
+
+
+
+
+Public Class Feature_TraceDelaunay : Inherits VB_Algorithm
+    Dim features As New Feature_Delaunay
+    Public goodList As New List(Of List(Of cv.Point2f)) ' stable points only
+    Public Sub New()
+        labels = {"Stable points highlighted", "", "", "Delaunay map of regions defined by the feature points"}
+        desc = "Trace the GoodFeatures points using only Delaunay - no KNN or RedCloud or Matching."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        features.Run(src)
+        dst3 = features.dst2
+
+        If task.optionsChanged Then goodList.Clear()
+
+        Dim ptList As New List(Of cv.Point2f)(task.features)
+        goodList.Add(ptList)
+
+        If goodList.Count >= task.frameHistoryCount Then goodList.RemoveAt(0)
+
+        dst2.SetTo(0)
+        For Each ptList In goodList
+            For Each pt In ptList
+                task.color.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+                Dim c = dst3.Get(Of cv.Vec3b)(pt.Y, pt.X)
+                dst2.Circle(pt, task.dotSize + 1, c, -1, task.lineType)
+            Next
+        Next
+        labels(2) = CStr(task.features.Count) + " features were identified in the image."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_ShiTomasi : Inherits VB_Algorithm
+    Dim harris As New Corners_HarrisDetector
+    Dim shiTomasi As New Corners_ShiTomasi_CPP
+    Dim options As New Options_ShiTomasi
+    Public Sub New()
+        findSlider("Corner normalize threshold").Value = 15
+        labels = {"", "", "Features in the left camera image", "Features in the right camera image"}
+        desc = "Identify feature points in the left And right views"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If options.useShiTomasi Then
+            dst2 = task.leftView
+            dst3 = task.rightView
+            shiTomasi.Run(task.leftView)
+            dst2.SetTo(cv.Scalar.White, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+            shiTomasi.Run(task.rightView)
+            dst3.SetTo(task.highlightColor, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        Else
+            harris.Run(task.leftView)
+            dst2 = harris.dst2.Clone
+            harris.Run(task.rightView)
+            dst3 = harris.dst2
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_Gather : Inherits VB_Algorithm
+    Dim myOptions As New Options_FeatureGather
+    Public features As New List(Of cv.Point2f)
+    Dim brisk As New BRISK_Basics
+    Public options As New Options_Features
+    Dim harris As New Corners_HarrisDetector
+    Public Sub New()
+        cPtr = Agast_Open()
+        desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        myOptions.RunVB()
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Select Case myOptions.featureSource
+            Case FeatureSrc.goodFeaturesFull
+                Static sampleSlider = findSlider("Feature Sample Size")
+                sampleSlider.value = 400
+                features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cv.Mat,
+                                                      options.blockSize, True, options.k).ToList
+                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
+            Case FeatureSrc.goodFeaturesGrid
+                options.featurePoints = 4
+                features.Clear()
+                For i = 0 To task.gridList.Count - 1
+                    Dim roi = task.gridList(i)
+                    Dim tmpFeatures = cv.Cv2.GoodFeaturesToTrack(src(roi), options.featurePoints, options.quality, options.minDistance, New cv.Mat,
+                                                                 options.blockSize, True, options.k).ToList
+                    For j = 0 To tmpFeatures.Count - 1
+                        features.Add(New cv.Point2f(tmpFeatures(j).X + roi.X, tmpFeatures(j).Y + roi.Y))
+                    Next
+                Next
+                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
+            Case FeatureSrc.Agast
+                src = task.color.Clone
+                Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
+                Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+
+                Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+                Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
+                handleSrc.Free()
+
+                Dim ptMat = New cv.Mat(Agast_Count(cPtr), 1, cv.MatType.CV_32FC2, imagePtr).Clone
+                features.Clear()
+                If standaloneTest() Then dst2 = src
+
+                For i = 0 To ptMat.Rows - 1
+                    Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
+                    features.Add(pt)
+                    If standaloneTest() Then dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+                Next
+
+                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
+            Case FeatureSrc.BRISK
+                brisk.Run(src)
+                features = brisk.features
+                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
+            Case FeatureSrc.Harris
+                harris.Run(src)
+                features = harris.features
+                labels(2) = "Harris Detector produced " + CStr(features.Count) + " features"
+        End Select
+
+        If standaloneTest() Then
+            dst2 = task.color.Clone
+            For Each pt In features
+                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            Next
+        End If
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
     End Sub
 End Class

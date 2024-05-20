@@ -85,7 +85,7 @@ End Class
 
 
 Public Class Entropy_FAST : Inherits VB_Algorithm
-    Dim fast As New Corners_FAST
+    Dim fast As New Corners_Basics
     Dim entropy As New Entropy_Highest
     Public Sub New()
         labels = {"", "", "Output of Corners_FAST, input to entropy calculation", "Lighter color is higher entropy, highlight shows highest"}

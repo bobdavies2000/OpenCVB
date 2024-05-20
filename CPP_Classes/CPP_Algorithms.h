@@ -1682,16 +1682,16 @@ class Harris_Detector
 {
 private:
 public:
-	std::vector<Point> pts;
+	std::vector<Point> points;
 	Mat src;
-	double qualityLevel = 0.02;
 	HarrisDetector harris;
 	Harris_Detector() {}
-	void Run()
+	void Run(double qualityLevel)
 	{
+		points.clear();
 		harris.detect(src);
-		harris.getCorners(pts, qualityLevel);
-		harris.drawOnImage(src, pts);
+		harris.getCorners(points, qualityLevel);
+		//harris.drawOnImage(src, points);
 	}
 };
 
@@ -1699,6 +1699,11 @@ extern "C" __declspec(dllexport)
 Harris_Detector * Harris_Detector_Open()
 {
 	return new Harris_Detector();
+}
+
+extern "C" __declspec(dllexport) int Harris_Detector_Count(Harris_Detector * cPtr)
+{
+	return (int)cPtr->points.size();
 }
 
 extern "C" __declspec(dllexport)
@@ -1711,13 +1716,9 @@ int* Harris_Detector_Close(Harris_Detector * cPtr)
 extern "C" __declspec(dllexport)
 int* Harris_Detector_Run(Harris_Detector * cPtr, int* bgrPtr, int rows, int cols, double qualityLevel, int* count)
 {
-	cPtr->qualityLevel = qualityLevel;
 	cPtr->src = Mat(rows, cols, CV_8U, bgrPtr);
-	cPtr->pts.clear();
-	cPtr->Run();
-	count[0] = int(cPtr->pts.size());
-	if (count[0] == 0) return 0;
-	return (int*)&cPtr->pts[0];
+	cPtr->Run(qualityLevel);
+	return (int*)&cPtr->points[0];
 }
 
 
