@@ -434,7 +434,7 @@ Public Class FeatureLeftRight_Grid : Inherits VB_Algorithm
     Dim match As New FeatureLeftRight_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        findRadio("GoodFeatures grid").Checked = True
+        findRadio("GoodFeatures (ShiTomasi) grid").Checked = True
         desc = "Run FeatureLeftRight_Basics but with 'GoodFeatures grid' instead of 'GoodFeatures full image'"
     End Sub
     Public Sub RunVB(src As cv.Mat)

@@ -88,30 +88,28 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_BasicsOld : Inherits VB_Algorithm
-    Public featurePoints As New List(Of cv.Point2f)
+Public Class Feature_BasicsNoFrills : Inherits VB_Algorithm
     Public options As New Options_Features
+    Dim gather As New Feature_Gather
     Public Sub New()
         vbAddAdvice(traceName + ": Use 'Options_Features' to control output.")
-        desc = "Find good features to track in a BGR image."
+        desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         dst2 = src.Clone
 
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim sampleSize = options.featurePoints
-        Dim features = cv.Cv2.GoodFeaturesToTrack(src, sampleSize, options.quality, options.minDistance, Nothing, 7, True, 3)
+        gather.Run(src)
 
-        featurePoints.Clear()
-        For i = 0 To features.Length - 1
-            Dim pt = features(i)
-            featurePoints.Add(pt)
-            dst2.Circle(pt, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
+        task.features.Clear()
+        task.featurePoints.Clear()
+        For Each pt In gather.features
+            task.features.Add(pt)
+            task.featurePoints.Add(New cv.Point(pt.X, pt.X))
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
         Next
 
-        labels(2) = "Found " + CStr(featurePoints.Count) + " points with quality = " + CStr(options.quality) +
-                    " and minimum distance = " + CStr(options.minDistance)
+        labels(2) = gather.labels(2)
     End Sub
 End Class
 
@@ -121,7 +119,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_KNNBasics : Inherits VB_Algorithm
+Public Class Feature_KNN : Inherits VB_Algorithm
     Dim knn As New KNN_Core
     Public featurePoints As New List(Of cv.Point2f)
     Public feat As New Feature_Basics
@@ -1580,108 +1578,6 @@ End Class
 
 
 
-Public Class Feature_CellGrid : Inherits VB_Algorithm
-    Dim feat As New Feature_KNNBasics
-    Public cellPopulation As New List(Of Integer) ' count the feature population of each roi
-    Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        desc = "Track the GoodFeatures in each Grid_Basics cell"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat Then dst0.SetTo(0)
-
-        dst2 = src
-
-        feat.Run(dst2)
-        For Each pt In task.features
-            Dim val = dst0.Get(Of Byte)(pt.Y, pt.X)
-            dst0.Set(Of Byte)(pt.Y, pt.X, If(val = 255, val, val + 1))
-            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-        Next
-
-        dst3 = feat.dst2
-
-        cellPopulation.Clear()
-        For i = 0 To task.gridList.Count - 1
-            Dim roi = task.gridList(i)
-            Dim features = dst0(roi).Sum()
-            cellPopulation.Add(features(0))
-        Next
-        dst2.SetTo(cv.Scalar.White, task.gridMask)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Feature_GridPopulation1 : Inherits VB_Algorithm
-    Dim floodCells As New Feature_CellGrid
-    Public bestCells As New List(Of cv.Rect)
-    Public bestLeftCell As cv.Rect
-    Public bestRightCell As cv.Rect
-    Public Sub New()
-        labels = {"", "", "Input image with marked features - best cells are highlighted", ""}
-        desc = "Find 2 cells with the most features but not on the edge (too likely impacted with camera motion)"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        floodCells.Run(src)
-        dst2 = floodCells.dst2
-
-        Static popSort As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
-        popSort.Clear()
-        For i = 0 To floodCells.cellPopulation.Count - 1
-            Dim roi = task.gridList(i)
-            If roi.X > 0 And (roi.X + roi.Width) < dst2.Width And roi.Y > 0 And (roi.Y + roi.Height) < dst2.Height Then
-                setTrueText(CStr(floodCells.cellPopulation(i)), New cv.Point(roi.X, roi.Y), 3)
-                popSort.Add(floodCells.cellPopulation(i), roi)
-            End If
-        Next
-
-        bestLeftCell = New cv.Rect(-1, -1, 0, 0)
-        bestRightCell = New cv.Rect(-1, -1, 0, 0)
-
-        ' if the current best's are toward the top, then just stick with the current ones'.  
-        For i = 0 To popSort.Count / 2
-            Dim roi = popSort.ElementAt(i).Value
-            For Each best In bestCells
-                If best = roi Then
-                    If roi.X < dst2.Width / 3 Then bestLeftCell = roi ' leftmost cell
-                    If roi.X > dst2.Width * 2 / 3 Then bestRightCell = roi ' rightmost cell...
-                End If
-            Next
-            If bestLeftCell.X <> -1 And bestRightCell.X <> -1 Then Exit For
-        Next
-
-        For i = 0 To popSort.Count - 1
-            If bestLeftCell.X <> -1 And bestRightCell.X <> -1 Then Exit For
-            Dim roi = popSort.ElementAt(i).Value
-            If roi.X < dst2.Width / 3 Then bestLeftCell = roi ' leftmost cell
-            If roi.X > dst2.Width * 2 / 3 Then bestRightCell = roi ' rightmost cell...
-        Next
-
-        bestCells.Clear()
-        bestCells.Add(bestLeftCell)
-        bestCells.Add(bestRightCell)
-
-        dst2.Rectangle(bestLeftCell, task.highlightColor, task.lineWidth + 1)
-        dst2.Rectangle(bestRightCell, task.highlightColor, task.lineWidth + 1)
-
-        dst3.SetTo(0)
-        dst3.Rectangle(bestLeftCell, task.highlightColor, task.lineWidth + 1)
-        dst3.Rectangle(bestRightCell, task.highlightColor, task.lineWidth + 1)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Feature_GridPopulation : Inherits VB_Algorithm
     Dim feat As New Feature_Basics
     Public Sub New()
@@ -1703,5 +1599,38 @@ Public Class Feature_GridPopulation : Inherits VB_Algorithm
             Dim test = dst3(roi).FindNonZero()
             setTrueText(CStr(test.Rows), roi.TopLeft, 3)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class Feature_Compare : Inherits VB_Algorithm
+    Dim feat As New Feature_Basics
+    Dim noFrill As New Feature_BasicsNoFrills
+    Public Sub New()
+        desc = "Prepare features for the left and right views"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static saveLFeatures As New List(Of cv.Point2f)
+        Static saveRFeatures As New List(Of cv.Point2f)
+
+        task.features = New List(Of cv.Point2f)(saveLFeatures)
+        feat.Run(src.Clone)
+        dst2 = feat.dst2
+        labels(2) = feat.labels(2)
+        saveLFeatures = New List(Of cv.Point2f)(task.features)
+
+        task.features = New List(Of cv.Point2f)(saveRFeatures)
+        noFrill.Run(src.Clone)
+        dst3 = noFrill.dst2
+        labels(3) = "With no correlation coefficients " + noFrill.labels(2)
+        saveRFeatures = New List(Of cv.Point2f)(task.features)
     End Sub
 End Class
