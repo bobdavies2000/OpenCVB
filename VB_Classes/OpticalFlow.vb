@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class OpticalFlow_Basics : Inherits VB_Algorithm
     Dim lrFlow As New OpticalFlow_LeftRight
-    Dim match As New FeatureMatch_Basics
+    Dim match As New FeatureMatch_Original
     Public Sub New()
         gOptions.MaxDepth.Value = 20
         If standalone Then gOptions.displayDst1.Checked = True

@@ -1,7 +1,5 @@
-﻿Imports MS.Internal
-Imports System.Web.UI.WebControls
-Imports cv = OpenCvSharp
-Public Class FeatureMatch_Basics : Inherits VB_Algorithm
+﻿Imports cv = OpenCvSharp
+Public Class FeatureMatch_Original : Inherits VB_Algorithm
     Dim unMatched As New FeatureMatch_LRUnMatched
     Public mpList As New List(Of pointPair)
     Public mpCorrelation As New List(Of Single)
@@ -120,14 +118,8 @@ Public Class FeatureMatch_LRHist : Inherits VB_Algorithm
     Dim fGrid As New Feature_Grid
     Public leftPoints As New List(Of cv.Point)
     Public rightPoints As New List(Of cv.Point)
+    Dim gather As New Feature_Gather
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Use image best features")
-            radio.addRadio("Use grid best features")
-            radio.check(0).Checked = True
-        End If
-
         findSlider("Min Distance to next").Value = 1
         gOptions.FrameHistory.Value = 10
         If task.workingRes.Width > 336 Then gOptions.FrameHistory.Value = 1
@@ -140,19 +132,17 @@ Public Class FeatureMatch_LRHist : Inherits VB_Algorithm
         Return dst
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static gridRadio = findRadio("Use grid best features")
-        Dim gridFeatures = gridRadio.checked
         Dim minPoints = 10
 
-        If gridFeatures Then fGrid.Run(task.leftView) Else feat.Run(task.leftView)
+        gather.Run(task.leftView)
         Dim tmpLeft As New List(Of cv.Point)
-        For Each pt In task.features
+        For Each pt In gather.features
             tmpLeft.Add(New cv.Point(pt.X, pt.Y))
         Next
 
-        If gridFeatures Then fGrid.Run(task.rightView) Else feat.Run(task.rightView)
+        gather.Run(task.rightView)
         Dim tmpRight As New List(Of cv.Point)
-        For Each pt In task.features
+        For Each pt In gather.features
             tmpRight.Add(New cv.Point(pt.X, pt.Y))
         Next
 
@@ -340,7 +330,7 @@ End Class
 
 
 
-Public Class FeatureMatch_LeftRight : Inherits VB_Algorithm
+Public Class FeatureMatch_Basics : Inherits VB_Algorithm
     Dim prep As New FeatureMatch_LeftRightPrep
     Public mpList As New List(Of pointPair)
     Public mpCorrelation As New List(Of Single)

@@ -1929,7 +1929,8 @@ Public Class Feature_Gather : Inherits VB_Algorithm
 
         Select Case myOptions.featureSource
             Case FeatureSrc.goodFeaturesFull
-                options.featurePoints = 400
+                Static sampleSlider = findSlider("Feature Sample Size")
+                sampleSlider.value = 400
                 If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cv.Mat,
                                                       options.blockSize, True, options.k).ToList
