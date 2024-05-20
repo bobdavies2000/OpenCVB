@@ -4823,8 +4823,8 @@ Public Class Options_FeatureGather : Inherits VB_Algorithm
             radio.Setup(traceName)
             radio.addRadio("GoodFeatures full image")
             radio.addRadio("GoodFeatures grid")
-            radio.addRadio("Agast")
-            radio.addRadio("BRISK")
+            radio.addRadio("Agast Features")
+            radio.addRadio("BRISK Features")
             radio.check(0).Checked = True
         End If
     End Sub

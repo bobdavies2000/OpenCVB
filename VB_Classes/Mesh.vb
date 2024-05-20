@@ -65,17 +65,18 @@ End Class
 
 
 Public Class Mesh_Agast : Inherits VB_Algorithm
-    Dim agast As New Feature_StableAgast
+    Dim gather As New Feature_Gather
     Dim mesh As New Mesh_Basics
     Public Sub New()
+        findRadio("Agast Features").Checked = True
         labels(2) = "Triangles built with each feature point and its 2 nearest neighbors."
         desc = "Build triangles from Agast points"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        agast.Run(src)
-        If agast.stablePoints.Count < 3 Then Exit Sub
+        gather.Run(src)
+        If gather.features.Count < 3 Then Exit Sub
         mesh.dst2 = src
-        dst2 = mesh.showMesh(agast.stablePoints)
-        labels(3) = agast.labels(2)
+        dst2 = mesh.showMesh(gather.features)
+        labels(3) = gather.labels(2)
     End Sub
 End Class

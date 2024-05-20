@@ -1022,166 +1022,6 @@ End Class
 
 
 
-Public Class Feature_StableAgast : Inherits VB_Algorithm
-    Dim agast As New Feature_Agast
-    Public stablePoints As New List(Of cv.Point2f)
-    Public generations As New List(Of Integer)
-    Public options As New Options_Agast
-    Public Sub New()
-        gOptions.unFiltered.Checked = True
-        desc = "Age out the unstable feature points."
-    End Sub
-    Public Function ageGenerations(inputPoints As List(Of cv.Point2f)) As List(Of cv.Point2f)
-        options.RunVB()
-
-        If task.optionsChanged Then
-            stablePoints.Clear()
-            generations.Clear()
-        End If
-
-        Dim prevGen As New List(Of Integer)(generations)
-        For Each pt In inputPoints
-            If stablePoints.Contains(pt) Then
-                Dim index = stablePoints.IndexOf(pt)
-                generations(index) += 1
-            Else
-                stablePoints.Add(pt)
-                generations.Add(1)
-            End If
-        Next
-
-        Dim removeCount As Integer
-        For i = prevGen.Count - 1 To 0 Step -1
-            If prevGen(i) = generations(i) Then
-                generations.RemoveAt(i)
-                stablePoints.RemoveAt(i)
-                removeCount += 1
-            End If
-        Next
-        Return stablePoints
-    End Function
-    Public Sub RunVB(src As cv.Mat)
-        agast.Run(src.Clone)
-        dst3 = agast.dst2
-        dst2 = src
-
-        ageGenerations(agast.features)
-
-        'Dim displayCount As Integer
-        'For i = 0 To Math.Min(stablePoints.Count, options.desiredCount) - 1
-        '    If generations(i) >= options.threshold Then
-        '        Dim pt = stablePoints(i)
-        '        dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
-        '        displayCount += 1
-        '    End If
-        'Next
-        'labels(2) = CStr(displayCount) + " stable points were present at least " + CStr(CInt(options.threshold)) + " generations"
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Feature_Agast : Inherits VB_Algorithm
-    Dim ptCount(1) As Integer
-    Public features As New List(Of cv.Point2f)
-    Public ptMat As New cv.Mat
-    Public options As New Options_Agast
-    Public Sub New()
-        cPtr = Agast_Open()
-        vbAddAdvice(traceName + ": Agast has no options right now...")
-        desc = "Use the Agast Feature Detector in the OpenCV Contrib"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
-
-        Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-        Dim handleCount = GCHandle.Alloc(ptCount, GCHandleType.Pinned)
-        Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                 handleCount.AddrOfPinnedObject(), options.agastThreshold)
-        handleSrc.Free()
-        handleCount.Free()
-
-        ptMat = New cv.Mat(ptCount(0), 1, cv.MatType.CV_32FC2, imagePtr).Clone
-        features.Clear()
-        If standaloneTest() Then dst2 = src
-
-        For i = 0 To ptMat.Rows - 1
-            Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
-            features.Add(pt)
-            If standaloneTest() Then dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
-        Next
-
-        If task.midHeartBeat Then
-            labels(2) = CStr(features.Count) + " features found"
-        End If
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Feature_AgastNew : Inherits VB_Algorithm
-    Dim agast As New Feature_Agast
-    Dim features As New List(Of cv.Point)
-    Dim gens As New List(Of Integer)
-    Dim options As New Options_Agast
-    Public Sub New()
-        vbAddAdvice(traceName + ": Local options will determine how many features are present.")
-        desc = "Find the Agast features that are available across generations."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        agast.Run(src)
-        If agast.features.Count = 0 Then Exit Sub ' nothing came back!
-
-        Dim newfeatures As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To agast.features.Count - 1 Step 2
-            Dim pt = New cv.Point(agast.features(i).X, agast.features(i).Y)
-            Dim index = features.IndexOf(pt)
-            If index >= 0 Then
-                newfeatures.Add(gens(index) + 1, pt)
-            Else
-                newfeatures.Add(1, pt)
-            End If
-        Next
-
-        If task.heartBeat Then
-            features.Clear()
-            gens.Clear()
-        End If
-
-        features = New List(Of cv.Point)(newfeatures.Values)
-        gens = New List(Of Integer)(newfeatures.Keys)
-
-        dst2 = src
-        For i = 0 To Math.Min(options.desiredCount, features.Count) - 1
-            Dim pt = features(i)
-            dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
-        Next
-
-        If task.heartBeat Then
-            labels(2) = CStr(features.Count) + " features found with up to " + CStr(gens(0)) + " generations."
-        End If
-    End Sub
-End Class
-
-
-
-
-
 Public Class Feature_Stable : Inherits VB_Algorithm
     Dim feat As New Feature_Basics
     Dim features As New List(Of cv.Point)
@@ -1962,5 +1802,54 @@ Public Class Feature_Gather : Inherits VB_Algorithm
                 dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
             Next
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Feature_Agast : Inherits VB_Algorithm
+    Dim ptCount(1) As Integer
+    Public features As New List(Of cv.Point2f)
+    Public ptMat As New cv.Mat
+    Public options As New Options_Agast
+    Public Sub New()
+        cPtr = Agast_Open()
+        vbAddAdvice(traceName + ": Agast has no options right now...")
+        desc = "Use the Agast Feature Detector in the OpenCV Contrib"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+
+        Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+        Dim handleCount = GCHandle.Alloc(ptCount, GCHandleType.Pinned)
+        Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                 handleCount.AddrOfPinnedObject(), options.agastThreshold)
+        handleSrc.Free()
+        handleCount.Free()
+
+        ptMat = New cv.Mat(ptCount(0), 1, cv.MatType.CV_32FC2, imagePtr).Clone
+        features.Clear()
+        If standaloneTest() Then dst2 = src
+
+        For i = 0 To ptMat.Rows - 1
+            Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
+            features.Add(pt)
+            If standaloneTest() Then dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+        Next
+
+        If task.midHeartBeat Then
+            labels(2) = CStr(features.Count) + " features found"
+        End If
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
     End Sub
 End Class
