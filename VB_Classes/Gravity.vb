@@ -73,7 +73,7 @@ End Class
 
 
 
-Public Class Gravity_Basics1 : Inherits VB_Algorithm
+Public Class Gravity_BasicsOriginal : Inherits VB_Algorithm
     Public vec As New pointPair
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -169,17 +169,15 @@ Public Class Gravity_Horizon : Inherits VB_Algorithm
         desc = "Compute the gravity vector and the horizon vector separately"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.featureMotion Then
-            gravity.Run(src)
-            If gravity.vec.p2.Y > 0 Then task.gravityVec = gravity.vec ' don't update if not found
+        gravity.Run(src)
+        If gravity.vec.p2.Y > 0 Or gravity.vec.p1.Y > 0 Then task.gravityVec = gravity.vec ' don't update if not found
 
-            horizon.Run(src)
-            Static lastVec = horizon.vec
-            If horizon.vec.p1.Y > 0 Then lastVec = horizon.vec
-            If horizon.vec.p1.Y = 0 Then horizon.vec = lastVec
+        horizon.Run(src)
+        Static lastVec = horizon.vec
+        If horizon.vec.p1.Y > 0 Then lastVec = horizon.vec
+        If horizon.vec.p1.Y = 0 Then horizon.vec = lastVec
 
-            task.horizonVec = horizon.vec
-        End If
+        task.horizonVec = horizon.vec
         If standaloneTest() Then
             setTrueText("Gravity vector (yellow):" + vbCrLf + gravity.strOut + vbCrLf + vbCrLf + "Horizon Vector (red): " + vbCrLf + horizon.strOut, 3)
             dst2.SetTo(0)
@@ -229,7 +227,6 @@ Public Class Gravity_BasicsFail : Inherits VB_Algorithm
             dst2.SetTo(0)
             dst2.Line(vec.p1, vec.p2, 255, task.lineWidth, task.lineType)
         End If
-
 
         strOut = "p1 = " + vec.p1.ToString + vbCrLf + "p2 = " + vec.p2.ToString
         setTrueText(strOut, 3)

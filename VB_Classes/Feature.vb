@@ -849,106 +849,6 @@ End Class
 
 
 
-Public Class Feature_ArcY : Inherits VB_Algorithm
-    Dim lines As New Feature_Lines
-    Public Sub New()
-        desc = "Use Feature_Lines data to identify the longest lines and show its angle."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        dst2 = src.Clone
-        lines.Run(src)
-
-        If lines.sortedVerticals.Count = 0 Then
-            setTrueText("No vertical lines were found", 3)
-            Exit Sub
-        End If
-
-        Dim index = lines.sortedVerticals.ElementAt(0).Value
-        Dim p1 = lines.lines2D(index)
-        Dim p2 = lines.lines2D(index + 1)
-        dst2.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
-        dst3.SetTo(0)
-        dst3.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
-
-        Dim pt1 = lines.lines3D(index)
-        Dim pt2 = lines.lines3D(index + 1)
-        Dim len3D = distance3D(pt1, pt2)
-        Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
-        setTrueText(Format(arcY, fmt3) + vbCrLf + Format(len3D, fmt3) + "m len" + vbCrLf + Format(pt1.Z, fmt1) + "m dist", p1)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Feature_ArcYAll : Inherits VB_Algorithm
-    Dim lines As New Feature_Lines
-    Dim flow As New Font_FlowText
-    Public Sub New()
-        flow.dst = 3
-        desc = "Use Feature_Lines data to collect vertical lines and measure accuracy of each."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        dst2 = src.Clone
-        lines.Run(src)
-
-        If lines.sortedVerticals.Count = 0 Then
-            setTrueText("No vertical lines were found", 3)
-            Exit Sub
-        End If
-
-        dst3.SetTo(0)
-        Static arcLongAverage As New List(Of Single)
-        Dim arcList As New List(Of Single)
-        flow.msgs.Add("ID" + vbTab + "length" + vbTab + "distance")
-        For i = 0 To Math.Min(10, lines.sortedVerticals.Count) - 1
-            Dim index = lines.sortedVerticals.ElementAt(i).Value
-            Dim p1 = lines.lines2D(index)
-            Dim p2 = lines.lines2D(index + 1)
-            dst2.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
-            setTrueText(CStr(i), If(i Mod 2, p1, p2), 2)
-            dst3.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
-
-            Dim pt1 = lines.lines3D(index)
-            Dim pt2 = lines.lines3D(index + 1)
-            Dim len3D = distance3D(pt1, pt2)
-            If len3D > 0 Then
-                Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
-                arcList.Add(arcY)
-                flow.msgs.Add(Format(arcY, fmt3) + vbTab + Format(len3D, fmt3) + "m " + vbTab + Format(pt1.Z, fmt1) + "m")
-            End If
-        Next
-        If standaloneTest() Then flow.Run(empty)
-
-        Static firstAverage As New List(Of Single)
-        Static firstBest As Integer
-        Dim mostAccurate = arcList(0)
-        firstAverage.Add(mostAccurate)
-        For Each arc In arcList
-            If arc > mostAccurate Then
-                mostAccurate = arc
-                Exit For
-            End If
-        Next
-        If mostAccurate = arcList(0) Then firstBest += 1
-
-        Dim avg = arcList.Average()
-        arcLongAverage.Add(avg)
-        labels(3) = "arcY avg = " + Format(avg, fmt1) + ", long term average = " + Format(arcLongAverage.Average, fmt1) +
-                    ", first was best " + Format(firstBest / task.frameCount, "0%") + " of the time, Avg of longest line " + Format(firstAverage.Average, fmt1)
-        If arcLongAverage.Count > 1000 Then
-            arcLongAverage.RemoveAt(0)
-            firstAverage.RemoveAt(0)
-        End If
-    End Sub
-End Class
-
-
-
-
-
 
 
 
@@ -1831,45 +1731,104 @@ End Class
 
 
 
+Public Class Feature_LineAngle : Inherits VB_Algorithm
+    Dim lines As New Feature_Lines
+    Public Sub New()
+        desc = "Use Feature_Lines data to identify the longest lines and show its angle."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat Then
+            dst2 = src.Clone
+            lines.Run(src)
+
+            If lines.sortedVerticals.Count = 0 Then
+                setTrueText("No vertical lines were found", 3)
+                Exit Sub
+            End If
+        End If
+
+        Dim index = lines.sortedVerticals.ElementAt(0).Value
+        Dim p1 = lines.lines2D(index)
+        Dim p2 = lines.lines2D(index + 1)
+        dst2.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
+        dst3.SetTo(0)
+        dst3.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
+        Dim pt1 = lines.lines3D(index)
+        Dim pt2 = lines.lines3D(index + 1)
+        Dim len3D = distance3D(pt1, pt2)
+        Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
+        setTrueText(Format(arcY, fmt3) + vbCrLf + Format(len3D, fmt3) + "m len" + vbCrLf + Format(pt1.Z, fmt1) + "m dist", p1)
+        setTrueText(Format(arcY, fmt3) + vbCrLf + Format(len3D, fmt3) + "m len" + vbCrLf + Format(pt1.Z, fmt1) + "m distant", p1, 3)
+    End Sub
+End Class
 
 
-'Public Class Feature_Agast : Inherits VB_Algorithm
-'    Dim ptCount(1) As Integer
-'    Public features As New List(Of cv.Point2f)
-'    Public ptMat As New cv.Mat
-'    Public options As New Options_Agast
-'    Public Sub New()
-'        cPtr = Agast_Open()
-'        desc = "Use the Agast Feature Detector in the OpenCV Contrib"
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        options.RunVB()
 
-'        Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-'        Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
 
-'        Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-'        Dim handleCount = GCHandle.Alloc(ptCount, GCHandleType.Pinned)
-'        Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-'                                 handleCount.AddrOfPinnedObject(), options.agastThreshold)
-'        handleSrc.Free()
-'        handleCount.Free()
 
-'        ptMat = New cv.Mat(ptCount(0), 1, cv.MatType.CV_32FC2, imagePtr).Clone
-'        features.Clear()
-'        If standaloneTest() Then dst2 = src
 
-'        For i = 0 To ptMat.Rows - 1
-'            Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
-'            features.Add(pt)
-'            If standaloneTest() Then dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
-'        Next
+Public Class Feature_LineAngleAll : Inherits VB_Algorithm
+    Dim lines As New Feature_Lines
+    Dim flow As New Font_FlowText
+    Dim arcList As New List(Of Single)
+    Dim arcLongAverage As New List(Of Single)
+    Public Sub New()
+        flow.dst = 3
+        desc = "Use Feature_Lines data to collect vertical lines and measure accuracy of each."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat Then
+            dst2 = src.Clone
+            lines.Run(src)
 
-'        If task.midHeartBeat Then
-'            labels(2) = CStr(features.Count) + " features found"
-'        End If
-'    End Sub
-'    Public Sub Close()
-'        If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
-'    End Sub
-'End Class
+            If lines.sortedVerticals.Count = 0 Then
+                setTrueText("No vertical lines were found", 3)
+                Exit Sub
+            End If
+
+            dst3.SetTo(0)
+            arcList.Clear()
+            flow.msgs.Clear()
+            flow.msgs.Add("ID" + vbTab + "length" + vbTab + "distance")
+            For i = 0 To Math.Min(10, lines.sortedVerticals.Count) - 1
+                Dim index = lines.sortedVerticals.ElementAt(i).Value
+                Dim p1 = lines.lines2D(index)
+                Dim p2 = lines.lines2D(index + 1)
+                dst2.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
+                setTrueText(CStr(i), If(i Mod 2, p1, p2), 2)
+                dst3.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
+
+                Dim pt1 = lines.lines3D(index)
+                Dim pt2 = lines.lines3D(index + 1)
+                Dim len3D = distance3D(pt1, pt2)
+                If len3D > 0 Then
+                    Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
+                    arcList.Add(arcY)
+                    flow.msgs.Add(Format(arcY, fmt3) + vbTab + Format(len3D, fmt3) + "m " + vbTab + Format(pt1.Z, fmt1) + "m")
+                End If
+            Next
+        End If
+        flow.Run(Nothing)
+
+        Static firstAverage As New List(Of Single)
+        Static firstBest As Integer
+        Dim mostAccurate = arcList(0)
+        firstAverage.Add(mostAccurate)
+        For Each arc In arcList
+            If arc > mostAccurate Then
+                mostAccurate = arc
+                Exit For
+            End If
+        Next
+        If mostAccurate = arcList(0) Then firstBest += 1
+
+        Dim avg = arcList.Average()
+        arcLongAverage.Add(avg)
+        labels(3) = "arcY avg = " + Format(avg, fmt1) + ", long term average = " + Format(arcLongAverage.Average, fmt1) +
+                    ", first was best " + Format(firstBest / task.frameCount, "0%") + " of the time, Avg of longest line " + Format(firstAverage.Average, fmt1)
+        If arcLongAverage.Count > 1000 Then
+            arcLongAverage.RemoveAt(0)
+            firstAverage.RemoveAt(0)
+        End If
+    End Sub
+End Class
