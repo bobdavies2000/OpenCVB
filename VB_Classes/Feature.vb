@@ -29,6 +29,7 @@ Public Class Feature_Basics : Inherits VB_Algorithm
             cv.Cv2.MatchTemplate(src(rect), featureMat(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
             If correlationMat.Get(Of Single)(0, 0) > options.correlationMin Then
                 matList.Add(featureMat(i))
+                'matList.Add(src(rect))
                 ptList.Add(pt)
             Else
                 Dim ptNew = New cv.Point2f(CInt(pt.X), CInt(pt.Y))

@@ -72,8 +72,11 @@ Public Class FeatureLeftRight_Basics : Inherits VB_Algorithm
 
         If task.mouseClickFlag Then setClickPoint(task.clickPoint, task.mousePicTag)
 
-        setTrueText("Click near any feature to find the corresponding pair of features.", 1)
-        If mpList.Count > 0 And clickPoint <> newPoint Then
+        setTrueText("Click near any feature to find the corresponding pair of features." + vbCrLf +
+                    "The correlation values in the lower left for the correlation of the left to the right views." + vbCrLf +
+                    "The dst2 shows features for the left view, dst3 shows features for the right view.", 1)
+        If clickPoint = newPoint And mpList.Count > 0 Then setClickPoint(mpList(0).p1, 2)
+        If mpList.Count > 0 Then
             Static knn As New KNN_Core
             knn.queries.Clear()
             knn.queries.Add(task.clickPoint)
@@ -90,8 +93,6 @@ Public Class FeatureLeftRight_Basics : Inherits VB_Algorithm
             Dim mpIndex = knn.result(0, 0)
             mp = mpList(mpIndex)
 
-            If firstPass Then setClickPoint(mp.p1, 2)
-
             dst2.Circle(mp.p1, task.dotSize + 4, cv.Scalar.Red, -1, task.lineType)
             dst3.Circle(mp.p2, task.dotSize + 4, cv.Scalar.Red, -1, task.lineType)
 
@@ -99,7 +100,12 @@ Public Class FeatureLeftRight_Basics : Inherits VB_Algorithm
 
             Dim offset = mp.p1.X - mp.p2.X
             strOut = Format(mpCorrelation(mpIndex), fmt3) + vbCrLf + Format(dspDistance, fmt3) + "m (from camera)" + vbCrLf +
-                        CStr(offset) + " Pixel difference"
+                            CStr(offset) + " Pixel difference"
+
+            For i = 0 To mpList.Count - 1
+                Dim pt = mpList(i).p1
+                setTrueText(Format(mpCorrelation(i), "0%"), pt)
+            Next
 
             If task.heartBeat Then dst1.SetTo(0)
             dst1.Circle(mp.p1, task.dotSize, task.highlightColor, -1, task.lineType)
