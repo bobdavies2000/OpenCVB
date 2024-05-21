@@ -125,6 +125,7 @@
     <Compile Include="CameraMotion.vb" />
     <Compile Include="Cell.vb" />
     <Compile Include="Classifier.vb" />
+    <Compile Include="Cluster.vb" />
     <Compile Include="Complexity.vb" />
     <Compile Include="Derivative.vb" />
     <Compile Include="Duster.vb" />
