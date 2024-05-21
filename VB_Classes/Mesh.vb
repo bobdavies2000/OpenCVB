@@ -1,47 +1,51 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Windows.Media.Media3D
+Imports CS_Classes
+Imports cv = OpenCvSharp
 Public Class Mesh_Basics : Inherits VB_Algorithm
     Dim knn As New KNN_Core
+    Public ptList As New List(Of cv.Point2f)
+    Public neighbors As New List(Of List(Of cv.Point2f))
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of nearest neighbors", 0, 10, 2)
-
-        labels(2) = "Triangles built with each random point and its 2 nearest neighbors."
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of nearest neighbors", 1, 10, 2)
         vbAddAdvice(traceName + ": Adjust the number of points with the options_random.")
-        desc = "Build triangles from random points"
+        desc = "Build triangles from the ptList input of points."
     End Sub
-    Public Function showMesh(pointList As List(Of cv.Point2f)) As cv.Mat
+    Public Sub RunVB(src As cv.Mat)
         Static nabeSlider = findSlider("Number of nearest neighbors")
         Dim nabeCount = nabeSlider.value
+        dst2 = src
+        If task.heartBeat And standaloneTest() Then
+            Static random As New Random_Basics
+            random.Run(empty)
+            dst2.SetTo(0)
+            ptList = random.pointList
+        End If
 
-        If pointList.Count <= 3 Then Return dst2 ' Not enough points To draw...
+        If ptList.Count <= 3 Then Exit Sub
 
-        knn.queries = pointList
+        knn.queries = ptList
         knn.trainInput = knn.queries
         knn.Run(empty)
 
+        neighbors.Clear()
         For i = 0 To knn.queries.Count - 1
             Dim ptLast = knn.queries(i)
+            Dim nabes As New List(Of cv.Point2f)({ptLast})
             For j = 1 To nabeCount - 1
                 Dim pt = knn.queries(knn.result(i, j))
                 dst2.Line(ptLast, pt, white, task.lineWidth, task.lineType)
+                nabes.Add(pt)
                 ptLast = pt
             Next
+            neighbors.Add(nabes)
         Next
+
         dst3.SetTo(0)
         For i = 0 To knn.queries.Count - 1
             dst2.Circle(knn.queries(i), task.dotSize, cv.Scalar.Red, -1, task.lineType)
             dst3.Circle(knn.queries(i), task.dotSize, task.highlightColor, -1, task.lineType)
         Next
-        Return dst2
-    End Function
-    Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat Then
-            If standaloneTest() Then
-                Static random As New Random_Basics
-                random.Run(empty)
-                dst2.SetTo(0)
-                showMesh(random.pointList)
-            End If
-        End If
+        labels(2) = "Triangles built with each random point and its " + CStr(nabeCount) + " nearest neighbors."
     End Sub
 End Class
 
@@ -62,8 +66,25 @@ Public Class Mesh_Features : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         feat.Run(src)
         If task.features.Count < 3 Then Exit Sub
-        mesh.dst2 = src
-        dst2 = mesh.showMesh(task.features)
+        mesh.ptList = task.features
+        mesh.Run(src)
+        dst2 = mesh.dst2
         dst3 = mesh.dst3
+
+        Dim pad = feat.options.templatePad
+        Dim size = feat.options.templateSize
+        Dim depthMiss As Integer
+        For Each pt In task.features
+            Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+            If depth = 0 Then
+                Dim r = validateRect(New cv.Rect(pt.X - pad, pt.Y - pad, size, size))
+                depth = task.pcSplit(2)(r).Mean(task.depthMask(r))(0)
+                depthMiss += 1
+            End If
+            ' setTrueText(Format(depth, fmt1) + "m ", pt)
+        Next
+
+        labels(2) = mesh.labels(2)
+        labels(3) = CStr(depthMiss) + " of " + CStr(mesh.ptList.Count) + " features had no depth at that location.  Depth is an average around it for those missing depth."
     End Sub
 End Class

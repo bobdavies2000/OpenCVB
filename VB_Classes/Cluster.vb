@@ -1,5 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-
 Public Class Cluster_Basics : Inherits VB_Algorithm
     Public Sub New()
         labels = {"", "", "Grayscale", "dst3Label"}
