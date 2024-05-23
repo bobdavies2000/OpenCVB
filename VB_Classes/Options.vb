@@ -3394,7 +3394,7 @@ Public Class Options_Features : Inherits VB_Algorithm
     Public templatePad As Integer = 10
     Public templateSize As Integer
     Public correlationMin As Single = 0.75
-    Public thresholdPercent As Single = 0.95
+    Public resyncThreshold As Single = 0.75
     Public agastThreshold As Integer = 20
     Public Sub New()
         correlationMin = If(dst2.Width > 336, 0.8, 0.9)
@@ -3405,7 +3405,7 @@ Public Class Options_Features : Inherits VB_Algorithm
             sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
             sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, correlationMin * 100)
             sliders.setupTrackBar("MatchTemplate Cell Size", 2, 100, templatePad)
-            sliders.setupTrackBar("Threshold Percent for Resync", 1, 99, thresholdPercent * 100)
+            sliders.setupTrackBar("Threshold Percent for Resync", 1, 99, resyncThreshold * 100)
 
             sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
             sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
@@ -3422,7 +3422,7 @@ Public Class Options_Features : Inherits VB_Algorithm
         Static featureSlider = findSlider("Feature Sample Size")
         Static corrSlider = findSlider("Feature Correlation Threshold")
         Static cellSlider = findSlider("MatchTemplate Cell Size")
-        Static percentSlider = findSlider("Threshold Percent for Resync")
+        Static resyncSlider = findSlider("Threshold Percent for Resync")
         Static agastslider = findSlider("Agast Threshold")
 
         blockSize = blocksizeSlider.value Or 1
@@ -3432,7 +3432,7 @@ Public Class Options_Features : Inherits VB_Algorithm
         correlationMin = corrSlider.value / 100
         templatePad = CInt(cellSlider.value / 2)
         templateSize = cellSlider.value Or 1
-        thresholdPercent = percentSlider.value / 100
+        resyncThreshold = resyncSlider.value / 100
         agastThreshold = agastslider.value
 
         If task.optionsChanged Then
