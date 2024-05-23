@@ -884,3 +884,38 @@ Public Class Contour_DepthTiers : Inherits VB_Algorithm
         labels(3) = $"All depth pixels are assigned a tier with {classCount} contours."
     End Sub
 End Class
+
+
+
+
+
+Public Class Contour_FromPoints : Inherits VB_Algorithm
+    Dim contour As New Contour_Basics
+    Dim random As New Random_Basics
+    Public Sub New()
+        random.options.countSlider.Value = 3
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Create a contour from some random points"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.heartBeat Then
+            random.Run(src)
+            dst2.SetTo(0)
+            For Each p1 In random.pointList
+                For Each p2 In random.pointList
+                    dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
+                Next
+            Next
+        End If
+
+        Dim hullPoints = cv.Cv2.ConvexHull(random.pointList.ToArray, True).ToList
+
+        Dim hull As New List(Of cv.Point)
+        For Each pt In hullPoints
+            hull.Add(New cv.Point(pt.X, pt.Y))
+        Next
+
+        dst3.SetTo(0)
+        vbDrawContour(dst3, hull, cv.Scalar.White, -1)
+    End Sub
+End Class

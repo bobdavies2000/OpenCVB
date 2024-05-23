@@ -1,25 +1,51 @@
 Imports cv = OpenCvSharp
 Public Class FeatureFlow_Basics : Inherits VB_Algorithm
-    Dim lrFlow As New FeatureFlow_LeftRight
-    Dim match As New FeatureLeftRight_Original
+    Dim feat As New Feature_Basics
+    Public mpList As New List(Of pointPair)
+    Public mpCorrelation As New List(Of Single)
     Public Sub New()
         gOptions.MaxDepth.Value = 20
         If standalone Then gOptions.displayDst1.Checked = True
         labels(1) = "NOTE: matching right point is always to the left of the left point"
         desc = "Identify which feature in the left image corresponds to the feature in the right image."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        lrFlow.Run(src)
-        labels = lrFlow.labels
+    Public Sub buildCorrelations(prevFeatures As List(Of cv.Point), currFeatures As List(Of cv.Point))
+        Dim correlationMin = feat.options.correlationMin
 
-        match.buildCorrelations(lrFlow.leftFeatures, lrFlow.rightFeatures)
+        Dim correlationmat As New cv.Mat
+        mpList.Clear()
+        mpCorrelation.Clear()
+        Dim pad = feat.options.templatePad, size = feat.options.templateSize
+        For Each p1 In prevFeatures
+            Dim rect = validateRect(New cv.Rect(p1.X - pad, p1.Y - pad, size, size))
+            Dim correlations As New List(Of Single)
+            For Each p2 In currFeatures
+                Dim r = validateRect(New cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, size), Math.Min(size, rect.Height)))
+                cv.Cv2.MatchTemplate(dst2(rect), dst3(r), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
+                correlations.Add(correlationmat.Get(Of Single)(0, 0))
+            Next
+            Dim maxCorrelation = correlations.Max
+            If maxCorrelation >= correlationMin Then
+                Dim index = correlations.IndexOf(maxCorrelation)
+                mpList.Add(New pointPair(p1, currFeatures(index)))
+                mpCorrelation.Add(maxCorrelation)
+            End If
+        Next
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        feat.Run(src)
+        labels = feat.labels
+
+        dst3 = If(firstPass, src.Clone, dst2.Clone)
+        Static prevFeatures As New List(Of cv.Point)(task.featurePoints)
+        buildCorrelations(prevFeatures, task.featurePoints)
 
         setTrueText("Click near any feature to find the corresponding pair of features.", 1)
-        match.displayResults()
-        dst1 = match.dst1
-        dst2 = match.dst2
-        dst3 = match.dst3
-        setTrueText(match.strOut, match.selectedPoint, 1)
+        dst2 = src.Clone
+        For Each pt In task.featurePoints
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
+        prevFeatures = New List(Of cv.Point)(task.featurePoints)
     End Sub
 End Class
 

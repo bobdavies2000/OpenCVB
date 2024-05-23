@@ -18,23 +18,26 @@ Public Class Feature_Basics : Inherits VB_Algorithm
 
         Static featureMat As New List(Of cv.Mat)
 
-        If task.optionsChanged Then task.features.Clear()
+        If task.optionsChanged Then
+            task.features.Clear()
+            featureMat.Clear()
+        End If
 
         matList.Clear()
         ptList.Clear()
         Dim correlationMat As New cv.Mat
-        For i = 0 To Math.Min(featureMat.Count, task.features.Count) - 1
+        For i = 0 To featureMat.Count - 1
             Dim pt = task.features(i)
             Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMat(i).Width, featureMat(i).Height))
             cv.Cv2.MatchTemplate(src(rect), featureMat(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
             If correlationMat.Get(Of Single)(0, 0) > options.correlationMin Then
                 matList.Add(featureMat(i))
-                'matList.Add(src(rect))
                 ptList.Add(pt)
             Else
                 Dim ptNew = New cv.Point2f(CInt(pt.X), CInt(pt.Y))
                 If ptLost.Contains(ptNew) = False Then ptLost.Add(ptNew)
             End If
+            setTrueText(Format(correlationMat.Get(Of Single)(0, 0), fmt1), pt)
         Next
 
         featureMat = New List(Of cv.Mat)(matList)
@@ -49,7 +52,6 @@ Public Class Feature_Basics : Inherits VB_Algorithm
         If task.features.Count < nextFeatures.Count * options.thresholdPercent Or task.features.Count > extra * nextFeatures.Count Then
             featureMat.Clear()
             task.features.Clear()
-            ptLost.Clear()
             For Each pt In nextFeatures
                 Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
                 featureMat.Add(src(rect))
@@ -67,6 +69,7 @@ Public Class Feature_Basics : Inherits VB_Algorithm
                     featureMat.Add(src(rect))
                     task.features.Add(knn.trainInput(knn.result(i, 0)))
                 Next
+                ptLost.Clear()
             Else
                 task.featureMotion = False
             End If
@@ -77,7 +80,7 @@ Public Class Feature_Basics : Inherits VB_Algorithm
             dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
             task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
         Next
-        labels(2) = CStr(task.features.Count) + " features " + CStr(matList.Count) + " were matched using correlation coefficients and " +
+        labels(2) = CStr(task.features.Count) + " features " + CStr(matList.Count) + " were matched to the previous frame using correlation and " +
                     CStr(ptLost.Count) + " features had to be relocated."
     End Sub
 End Class
