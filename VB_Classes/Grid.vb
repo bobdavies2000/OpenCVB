@@ -8,11 +8,11 @@ Public Class Grid_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.mouseClickFlag And Not firstPass Then
-            task.gridROIclicked = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            task.gridROIclicked = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         End If
         If task.optionsChanged Then
             task.gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8U)
-            task.gridToRoiIndex = New cv.Mat(src.Size(), cv.MatType.CV_32S)
+            task.gridMap = New cv.Mat(src.Size(), cv.MatType.CV_32S, 255)
 
             gridList.Clear()
             task.gridIndex.Clear()
@@ -22,8 +22,6 @@ Public Class Grid_Basics : Inherits VB_Algorithm
             For y = 0 To src.Height - 1 Step gOptions.GridSize.Value
                 For x = 0 To src.Width - 1 Step gOptions.GridSize.Value
                     Dim roi = validateRect(New cv.Rect(x, y, gOptions.GridSize.Value, gOptions.GridSize.Value))
-                    If x + roi.Width >= src.Width Then roi.Width = src.Width - x
-                    If y + roi.Height >= src.Height Then roi.Height = src.Height - y
                     If roi.Width > 0 And roi.Height > 0 Then
                         If x = 0 Then task.gridRows += 1
                         If y = 0 Then task.gridCols += 1
@@ -34,7 +32,6 @@ Public Class Grid_Basics : Inherits VB_Algorithm
                 Next
             Next
             task.subDivisionCount = 9
-
 
             If task.color Is Nothing Then Exit Sub ' startup condition.
 
@@ -51,7 +48,7 @@ Public Class Grid_Basics : Inherits VB_Algorithm
 
                 For i = 0 To gridList.Count - 1
                     Dim roi = gridList(i)
-                    task.gridToRoiIndex.Rectangle(roi, i, -1)
+                    task.gridMap.Rectangle(roi, i, -1)
                 Next
 
                 task.gridNeighbors.Clear()
@@ -64,13 +61,13 @@ Public Class Grid_Basics : Inherits VB_Algorithm
                         Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
                                           roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
                         If x >= 0 And x < src.Width And y >= 0 And y < src.Height Then
-                            task.gridNeighbors(task.gridNeighbors.Count - 1).Add(task.gridToRoiIndex.Get(Of Integer)(y, x))
+                            task.gridNeighbors(task.gridNeighbors.Count - 1).Add(task.gridMap.Get(Of Integer)(y, x))
                         End If
                     Next
                 Next
             End If
 
-            For Each roi In gridList
+            For Each roi In task.gridList
                 Dim xSub = roi.X + roi.Width
                 Dim ySub = roi.Y + roi.Height
                 If ySub <= dst2.Height / 3 Then
@@ -193,7 +190,7 @@ Public Class Grid_Rectangles : Inherits VB_Algorithm
         End If
 
         task.gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        task.gridToRoiIndex = New cv.Mat(dst2.Size(), cv.MatType.CV_32S)
+        task.gridMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S)
         If standaloneTest() Then desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -202,7 +199,7 @@ Public Class Grid_Rectangles : Inherits VB_Algorithm
         Dim width = widthSlider.Value
         Dim height = heightSlider.Value
 
-        If task.mouseClickFlag Then task.gridROIclicked = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+        If task.mouseClickFlag Then task.gridROIclicked = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         If task.optionsChanged Then
             task.gridList.Clear()
             For y = 0 To dst2.Height - 1 Step height
@@ -230,7 +227,7 @@ Public Class Grid_Rectangles : Inherits VB_Algorithm
 
             For i = 0 To task.gridList.Count - 1
                 Dim roi = task.gridList(i)
-                task.gridToRoiIndex.Rectangle(roi, i, -1)
+                task.gridMap.Rectangle(roi, i, -1)
             Next
         End If
         If standaloneTest() Then
@@ -304,7 +301,7 @@ Public Class Grid_Neighbors : Inherits VB_Algorithm
 
         If task.mouseClickFlag Then
             mask = task.gridMask.Clone
-            Dim roiIndex = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            Dim roiIndex = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
 
             For Each index In task.gridNeighbors(roiIndex)
                 Dim roi = task.gridList(index)
@@ -329,10 +326,10 @@ Public Class Grid_Special : Inherits VB_Algorithm
     Public gridCols As Integer
     Public gridMask As cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
-    Public gridToRoiIndex As cv.Mat
+    Public gridMap As cv.Mat
     Public Sub New()
         gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        gridToRoiIndex = New cv.Mat(dst2.Size(), cv.MatType.CV_32S)
+        gridMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S)
         desc = "Grids are normally square.  Grid_Special allows grid elements to be rectangles.  Specify the Y size."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -366,7 +363,7 @@ Public Class Grid_Special : Inherits VB_Algorithm
 
             For i = 0 To task.gridList.Count - 1
                 Dim roi = gridList(i)
-                gridToRoiIndex.Rectangle(roi, i, -1)
+                gridMap.Rectangle(roi, i, -1)
             Next
 
             gridNeighbors.Clear()
@@ -379,7 +376,7 @@ Public Class Grid_Special : Inherits VB_Algorithm
                     Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
                                           roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
                     If x >= 0 And x < dst2.Width And y >= 0 And y < dst2.Height Then
-                        gridNeighbors(gridNeighbors.Count - 1).Add(gridToRoiIndex.Get(Of Integer)(y, x))
+                        gridNeighbors(gridNeighbors.Count - 1).Add(gridMap.Get(Of Integer)(y, x))
                     End If
                 Next
             Next
@@ -488,7 +485,7 @@ Public Class Grid_TrackCenter : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If match.correlation < match.options.correlationMin Or gOptions.DebugCheckBox.Checked Then
             gOptions.DebugCheckBox.Checked = False
-            Dim index = task.gridToRoiIndex.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
+            Dim index = task.gridMap.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
             Dim roi = task.gridList(index)
             match.template = src(roi).Clone
             center = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
@@ -511,5 +508,19 @@ Public Class Grid_TrackCenter : Inherits VB_Algorithm
 
             labels(3) = "Match correlation = " + Format(match.correlation, fmt3)
         End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Grid_ShowMap : Inherits VB_Algorithm
+    Public Sub New()
+        desc = "Verify that task.gridMap is laid out correctly"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        task.gridMap.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst3 = vbPalette(dst2)
     End Sub
 End Class

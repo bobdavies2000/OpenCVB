@@ -237,8 +237,8 @@ Public Class VB_Algorithm : Implements IDisposable
         If r.Y < 0 Then r.Y = 0
         If r.X > task.workingRes.Width * ratio Then r.X = task.workingRes.Width * ratio - 1
         If r.Y > task.workingRes.Height * ratio Then r.Y = task.workingRes.Height * ratio - 1
-        If r.X + r.Width >= task.workingRes.Width * ratio Then r.Width = task.workingRes.Width * ratio - r.X - 1
-        If r.Y + r.Height >= task.workingRes.Height * ratio Then r.Height = task.workingRes.Height * ratio - r.Y - 1
+        If r.X + r.Width > task.workingRes.Width * ratio Then r.Width = task.workingRes.Width * ratio - r.X
+        If r.Y + r.Height > task.workingRes.Height * ratio Then r.Height = task.workingRes.Height * ratio - r.Y
         If r.Width <= 0 Then r.Width = 1 ' check again (it might have changed.)
         If r.Height <= 0 Then r.Height = 1
         If r.X = task.workingRes.Width * ratio Then r.X = r.X - 1

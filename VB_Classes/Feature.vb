@@ -69,7 +69,6 @@ Public Class Feature_Basics : Inherits VB_Algorithm
                     featureMat.Add(src(rect))
                     task.features.Add(knn.trainInput(knn.result(i, 0)))
                 Next
-                ptLost.Clear()
             Else
                 task.featureMotion = False
             End If
@@ -82,6 +81,7 @@ Public Class Feature_Basics : Inherits VB_Algorithm
         Next
         labels(2) = CStr(task.features.Count) + " features " + CStr(matList.Count) + " were matched to the previous frame using correlation and " +
                     CStr(ptLost.Count) + " features had to be relocated."
+        ptLost.Clear()
     End Sub
 End Class
 
@@ -1013,5 +1013,99 @@ Public Class Feature_Compare : Inherits VB_Algorithm
         dst3 = noFrill.dst2
         labels(3) = "With no correlation coefficients " + noFrill.labels(2)
         saveRFeatures = New List(Of cv.Point2f)(task.features)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_BasicsGrid : Inherits VB_Algorithm
+    Dim matList As New List(Of cv.Mat)
+    Dim ptList As New List(Of cv.Point2f)
+    Dim knn As New KNN_Core
+    Dim ptLost As New List(Of cv.Point2f)
+    Dim gather As New Feature_Gather
+    Public options As New Options_Features
+    Public Sub New()
+        task.features.Clear() ' in case it was previously in use...
+        desc = "Use the grid to determine which cells should refresh their features"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        dst2 = src.Clone
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Static featureMat As New List(Of cv.Mat)
+
+        If task.optionsChanged Then
+            task.features.Clear()
+            featureMat.Clear()
+        End If
+
+        matList.Clear()
+        ptList.Clear()
+        Dim correlationMat As New cv.Mat
+        Dim gridMisses As New List(Of Integer)
+        For i = 0 To Math.Min(featureMat.Count, task.features.Count) - 1
+            Dim pt = task.features(i)
+            Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMat(i).Width, featureMat(i).Height))
+            cv.Cv2.MatchTemplate(src(rect), featureMat(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            If correlationMat.Get(Of Single)(0, 0) > options.correlationMin Then
+                matList.Add(featureMat(i))
+                ptList.Add(pt)
+            Else
+                gridMisses.Add(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
+            End If
+        Next
+
+        For i = 0 To task.features.Count - 1
+            Dim pt = task.features(i)
+            Dim index = task.gridMap.Get(Of Byte)(pt.Y, pt.X)
+        Next
+
+        featureMat = New List(Of cv.Mat)(matList)
+        task.features = New List(Of cv.Point2f)(ptList)
+
+        gather.Run(src)
+        Dim nextFeatures = gather.features
+
+        Dim extra = 1 + (1 - options.resyncThreshold)
+        task.featureMotion = True
+
+        If task.features.Count < nextFeatures.Count * options.resyncThreshold Or task.features.Count > extra * nextFeatures.Count Then
+            featureMat.Clear()
+            task.features.Clear()
+            For Each pt In nextFeatures
+                Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
+                featureMat.Add(src(rect))
+                task.features.Add(pt)
+            Next
+        Else
+            If ptLost.Count > 0 Then
+                knn.queries = ptLost
+                knn.trainInput = nextFeatures
+                knn.Run(Nothing)
+
+                For i = 0 To knn.queries.Count - 1
+                    Dim pt = knn.queries(i)
+                    Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
+                    featureMat.Add(src(rect))
+                    task.features.Add(knn.trainInput(knn.result(i, 0)))
+                Next
+            Else
+                task.featureMotion = False
+            End If
+        End If
+
+        task.featurePoints.Clear()
+        For Each pt In task.features
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
+        Next
+        labels(2) = CStr(task.features.Count) + " features " + CStr(matList.Count) + " were matched to the previous frame using correlation and " +
+                    CStr(ptLost.Count) + " features had to be relocated."
+        ptLost.Clear()
     End Sub
 End Class

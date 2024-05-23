@@ -118,7 +118,7 @@ Public Class VBtask : Implements IDisposable
     Public subDivisions As New List(Of Integer)
     Public subDivisionCount As Integer = 9
     Public gridMask As cv.Mat
-    Public gridToRoiIndex As New cv.Mat
+    Public gridMap As New cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridROIclicked As Integer
     Public ogl As OpenGL_Basics

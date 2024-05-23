@@ -17,8 +17,8 @@ Public Class Bin4Way_Basics : Inherits VB_Algorithm
         desc = "Highlight the contours for each grid element with stats for each."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static index = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-        If task.mousePicTag = 1 Then index = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+        Static index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+        If task.mousePicTag = 1 Then index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         Dim roiSave = If(index < task.gridList.Count, task.gridList(index), New cv.Rect)
 
         If task.optionsChanged Then index = 0
