@@ -693,7 +693,7 @@ End Class
 
 Public Class Structured_FeatureLines : Inherits VB_Algorithm
     Dim struct As New Structured_MultiSlice
-    Dim lines As New Feature_Lines
+    Dim lines As New FeatureLine_Finder
     Public Sub New()
         desc = "Find the lines in the Structured_MultiSlice algorithm output"
     End Sub

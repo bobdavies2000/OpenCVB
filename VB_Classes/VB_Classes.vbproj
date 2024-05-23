@@ -129,6 +129,7 @@
     <Compile Include="Complexity.vb" />
     <Compile Include="Derivative.vb" />
     <Compile Include="Duster.vb" />
+    <Compile Include="FeatureLine.vb" />
     <Compile Include="Gravity.vb" />
     <Compile Include="GrayToColor.vb" />
     <Compile Include="Horizon.vb" />

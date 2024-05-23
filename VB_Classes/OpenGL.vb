@@ -362,7 +362,7 @@ End Class
 
 
 Public Class OpenGL_VerticalOrHorizontal : Inherits VB_Algorithm
-    ReadOnly vLine As New Feature_Lines
+    ReadOnly vLine As New FeatureLine_Finder
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -372,7 +372,7 @@ Public Class OpenGL_VerticalOrHorizontal : Inherits VB_Algorithm
         End If
 
         task.ogl.oglFunction = oCase.verticalLines
-        desc = "Visualize all the vertical lines found in Feature_Lines"
+        desc = "Visualize all the vertical lines found in FeatureLine_Finder"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static verticalRadio = findRadio("Show Vertical Lines")

@@ -659,7 +659,7 @@ End Class
 
 
 Public Class Line_CellsVertHoriz : Inherits VB_Algorithm
-    Dim lines As New Feature_Lines
+    Dim lines As New FeatureLine_Finder
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
         labels(2) = "RedCloud_Hulls output with lines highlighted"

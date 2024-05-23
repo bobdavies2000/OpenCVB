@@ -851,7 +851,7 @@ End Class
 
 
 Public Class KNN_ClosestVertical : Inherits VB_Algorithm
-    Public lines As New Feature_Lines
+    Public lines As New FeatureLine_Finder
     Public knn As New KNN_ClosestLine
     Public pt1 As New cv.Point3f
     Public pt2 As New cv.Point3f
