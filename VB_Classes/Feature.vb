@@ -17,6 +17,7 @@ Public Class Feature_Basics : Inherits VB_Algorithm
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Static featureMat As New List(Of cv.Mat)
+        gather.Run(src)
 
         If task.optionsChanged Then
             task.features.Clear()
@@ -29,30 +30,29 @@ Public Class Feature_Basics : Inherits VB_Algorithm
         For i = 0 To Math.Min(featureMat.Count, task.features.Count) - 1
             Dim pt = task.features(i)
             Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMat(i).Width, featureMat(i).Height))
-            cv.Cv2.MatchTemplate(src(rect), featureMat(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-            If correlationMat.Get(Of Single)(0, 0) > options.correlationMin Then
-                matList.Add(featureMat(i))
-                ptList.Add(pt)
-            Else
-                Dim ptNew = New cv.Point2f(CInt(pt.X), CInt(pt.Y))
-                If ptLost.Contains(ptNew) = False Then ptLost.Add(ptNew)
+            If gather.ptList.Contains(pt) = false Then
+                cv.Cv2.MatchTemplate(src(rect), featureMat(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                If correlationMat.Get(Of Single)(0, 0) < options.correlationMin Then
+                    Dim ptNew = New cv.Point2f(CInt(pt.X), CInt(pt.Y))
+                    If ptLost.Contains(ptNew) = False Then ptLost.Add(ptNew)
+                    Continue For
+                End If
             End If
+            matList.Add(featureMat(i))
+            ptList.Add(pt)
             ' setTrueText(Format(correlationMat.Get(Of Single)(0, 0), fmt1), pt)
         Next
 
         featureMat = New List(Of cv.Mat)(matList)
         task.features = New List(Of cv.Point2f)(ptList)
 
-        gather.Run(src)
-        Dim nextFeatures = gather.features
-
         Dim extra = 1 + (1 - options.resyncThreshold)
         task.featureMotion = True
 
-        If task.features.Count < nextFeatures.Count * options.resyncThreshold Or task.features.Count > extra * nextFeatures.Count Then
+        If task.features.Count < gather.features.Count * options.resyncThreshold Or task.features.Count > extra * gather.features.Count Then
             featureMat.Clear()
             task.features.Clear()
-            For Each pt In nextFeatures
+            For Each pt In gather.features
                 Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
                 featureMat.Add(src(rect))
                 task.features.Add(pt)
@@ -60,7 +60,7 @@ Public Class Feature_Basics : Inherits VB_Algorithm
         Else
             If ptLost.Count > 0 Then
                 knn.queries = ptLost
-                knn.trainInput = nextFeatures
+                knn.trainInput = gather.features
                 knn.Run(Nothing)
 
                 For i = 0 To knn.queries.Count - 1
@@ -773,91 +773,6 @@ End Class
 
 
 
-Public Class Feature_Gather : Inherits VB_Algorithm
-    Dim harris As New Corners_HarrisDetector
-    Dim FAST As New Corners_Basics
-    Dim myOptions As New Options_FeatureGather
-    Public features As New List(Of cv.Point2f)
-    Dim brisk As New BRISK_Basics
-    Public options As New Options_Features
-    Public Sub New()
-        cPtr = Agast_Open()
-        desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        myOptions.RunVB()
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        Select Case myOptions.featureSource
-            Case FeatureSrc.goodFeaturesFull
-                Static sampleSlider = findSlider("Feature Sample Size")
-                sampleSlider.value = 400
-                features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cv.Mat,
-                                                      options.blockSize, True, options.k).ToList
-                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
-            Case FeatureSrc.goodFeaturesGrid
-                options.featurePoints = 4
-                features.Clear()
-                For i = 0 To task.gridList.Count - 1
-                    Dim roi = task.gridList(i)
-                    Dim tmpFeatures = cv.Cv2.GoodFeaturesToTrack(src(roi), options.featurePoints, options.quality, options.minDistance, New cv.Mat,
-                                                                 options.blockSize, True, options.k).ToList
-                    For j = 0 To tmpFeatures.Count - 1
-                        features.Add(New cv.Point2f(tmpFeatures(j).X + roi.X, tmpFeatures(j).Y + roi.Y))
-                    Next
-                Next
-                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
-            Case FeatureSrc.Agast
-                src = task.color.Clone
-                Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
-                Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
-
-                Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-                Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
-                handleSrc.Free()
-
-                Dim ptMat = New cv.Mat(Agast_Count(cPtr), 1, cv.MatType.CV_32FC2, imagePtr).Clone
-                features.Clear()
-                If standaloneTest() Then dst2 = src
-
-                For i = 0 To ptMat.Rows - 1
-                    Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
-                    features.Add(pt)
-                    If standaloneTest() Then dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
-                Next
-
-                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
-            Case FeatureSrc.BRISK
-                brisk.Run(src)
-                features = brisk.features
-                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
-            Case FeatureSrc.Harris
-                harris.Run(src)
-                features = harris.features
-                labels(2) = "Harris Detector produced " + CStr(features.Count) + " features"
-            Case FeatureSrc.FAST
-                FAST.Run(src)
-                features = FAST.features
-                labels(2) = "FAST produced " + CStr(features.Count) + " features"
-        End Select
-
-        If standaloneTest() Then
-            dst2 = task.color.Clone
-            For Each pt In features
-                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-            Next
-        End If
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
 Public Class Feature_Generations : Inherits VB_Algorithm
     Dim feat As New Feature_Basics
     Dim features As New List(Of cv.Point)
@@ -1021,11 +936,100 @@ End Class
 
 
 
-Public Class Feature_BasicsGrid : Inherits VB_Algorithm
+Public Class Feature_Gather : Inherits VB_Algorithm
+    Dim harris As New Corners_HarrisDetector
+    Dim FAST As New Corners_Basics
+    Dim myOptions As New Options_FeatureGather
+    Public features As New List(Of cv.Point2f)
+    Public ptList As New List(Of cv.Point)
+    Dim brisk As New BRISK_Basics
+    Public options As New Options_Features
+    Public Sub New()
+        cPtr = Agast_Open()
+        desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        myOptions.RunVB()
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Select Case myOptions.featureSource
+            Case FeatureSrc.goodFeaturesFull
+                Static sampleSlider = findSlider("Feature Sample Size")
+                sampleSlider.value = 400
+                features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cv.Mat,
+                                                      options.blockSize, True, options.k).ToList
+                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
+            Case FeatureSrc.goodFeaturesGrid
+                options.featurePoints = 4
+                features.Clear()
+                For i = 0 To task.gridList.Count - 1
+                    Dim roi = task.gridList(i)
+                    Dim tmpFeatures = cv.Cv2.GoodFeaturesToTrack(src(roi), options.featurePoints, options.quality, options.minDistance, New cv.Mat,
+                                                                 options.blockSize, True, options.k).ToList
+                    For j = 0 To tmpFeatures.Count - 1
+                        features.Add(New cv.Point2f(tmpFeatures(j).X + roi.X, tmpFeatures(j).Y + roi.Y))
+                    Next
+                Next
+                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
+            Case FeatureSrc.Agast
+                src = task.color.Clone
+                Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
+                Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
+
+                Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
+                Dim imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold)
+                handleSrc.Free()
+
+                Dim ptMat = New cv.Mat(Agast_Count(cPtr), 1, cv.MatType.CV_32FC2, imagePtr).Clone
+                features.Clear()
+                If standaloneTest() Then dst2 = src
+
+                For i = 0 To ptMat.Rows - 1
+                    Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
+                    features.Add(pt)
+                    If standaloneTest() Then dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+                Next
+
+                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
+            Case FeatureSrc.BRISK
+                brisk.Run(src)
+                features = brisk.features
+                labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
+            Case FeatureSrc.Harris
+                harris.Run(src)
+                features = harris.features
+                labels(2) = "Harris Detector produced " + CStr(features.Count) + " features"
+            Case FeatureSrc.FAST
+                FAST.Run(src)
+                features = FAST.features
+                labels(2) = "FAST produced " + CStr(features.Count) + " features"
+        End Select
+
+        ptList.Clear()
+        For Each pt In features
+            ptList.Add(New cv.Point(pt.X, pt.Y))
+        Next
+        If standaloneTest() Then
+            dst2 = task.color.Clone
+            For Each pt In features
+                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            Next
+        End If
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Feature_BasicsGrid1 : Inherits VB_Algorithm
     Dim matList As New List(Of cv.Mat)
     Dim ptList As New List(Of cv.Point2f)
-    Dim knn As New KNN_Core
-    Dim ptLost As New List(Of cv.Point2f)
     Dim gather As New Feature_Gather
     Public options As New Options_Features
     Public Sub New()
@@ -1047,7 +1051,7 @@ Public Class Feature_BasicsGrid : Inherits VB_Algorithm
         matList.Clear()
         ptList.Clear()
         Dim correlationMat As New cv.Mat
-        Dim gridMisses As New List(Of Integer)
+        Dim roiLosses As New List(Of Integer)
         For i = 0 To Math.Min(featureMat.Count, task.features.Count) - 1
             Dim pt = task.features(i)
             Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMat(i).Width, featureMat(i).Height))
@@ -1056,13 +1060,29 @@ Public Class Feature_BasicsGrid : Inherits VB_Algorithm
                 matList.Add(featureMat(i))
                 ptList.Add(pt)
             Else
-                gridMisses.Add(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
+                roiLosses.Add(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
             End If
         Next
 
-        For i = 0 To task.features.Count - 1
-            Dim pt = task.features(i)
-            Dim index = task.gridMap.Get(Of Byte)(pt.Y, pt.X)
+        Dim featuresByGrid(task.gridList.Count - 1) As List(Of cv.Point)
+        For Each pt In task.featurePoints
+            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            If roiLosses.Contains(index) Then
+                If featuresByGrid(index) Is Nothing Then featuresByGrid(index) = New List(Of cv.Point)
+                featuresByGrid(index).Add(pt)
+            End If
+        Next
+
+        Dim ptLostCount As Integer
+        For i = 0 To featuresByGrid.Count - 1
+            If featuresByGrid(i) Is Nothing Then Continue For
+            If featuresByGrid(i).Count < 10 Then Continue For
+            ptLostCount += featuresByGrid(i).Count
+            For Each pt In featuresByGrid(i)
+                ptList.Add(pt)
+                Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMat(i).Width, featureMat(i).Height))
+                matList.Add(src(rect))
+            Next
         Next
 
         featureMat = New List(Of cv.Mat)(matList)
@@ -1082,10 +1102,83 @@ Public Class Feature_BasicsGrid : Inherits VB_Algorithm
                 featureMat.Add(src(rect))
                 task.features.Add(pt)
             Next
+        End If
+
+        task.featurePoints.Clear()
+        For Each pt In task.features
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
+        Next
+        labels(2) = CStr(task.features.Count) + " features " + CStr(matList.Count) + " were matched to the previous frame using correlation and " +
+                    CStr(ptLostCount) + " features had to be relocated."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Feature_BasicsNew : Inherits VB_Algorithm
+    Dim matList As New List(Of cv.Mat)
+    Dim ptList As New List(Of cv.Point2f)
+    Dim knn As New KNN_Core
+    Dim ptLost As New List(Of cv.Point2f)
+    Dim gather As New Feature_Gather
+    Public options As New Options_Features
+    Public Sub New()
+        task.features.Clear() ' in case it was previously in use...
+        desc = "Identify features with GoodFeaturesToTrack but manage them with MatchTemplate"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        dst2 = src.Clone
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Static featureMat As New List(Of cv.Mat)
+
+        gather.Run(src)
+
+        If task.optionsChanged Then
+            task.features.Clear()
+            featureMat.Clear()
+        End If
+
+        matList.Clear()
+        ptList.Clear()
+        Dim correlationMat As New cv.Mat
+        For i = 0 To Math.Min(featureMat.Count, task.features.Count) - 1
+            Dim pt = task.features(i)
+            Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMat(i).Width, featureMat(i).Height))
+            If gather.ptList.Contains(pt) = False Then
+                cv.Cv2.MatchTemplate(src(rect), featureMat(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                If correlationMat.Get(Of Single)(0, 0) < options.correlationMin Then
+                    Dim ptNew = New cv.Point2f(CInt(pt.X), CInt(pt.Y))
+                    If ptLost.Contains(ptNew) = False Then ptLost.Add(ptNew)
+                    Continue For
+                End If
+            End If
+            matList.Add(featureMat(i))
+            ptList.Add(pt)
+        Next
+
+        featureMat = New List(Of cv.Mat)(matList)
+        task.features = New List(Of cv.Point2f)(ptList)
+
+        task.featureMotion = True
+        If task.features.Count < gather.features.Count * options.resyncThreshold Then
+            featureMat.Clear()
+            task.features.Clear()
+            For Each pt In gather.features
+                Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
+                featureMat.Add(src(rect))
+                task.features.Add(pt)
+            Next
         Else
             If ptLost.Count > 0 Then
                 knn.queries = ptLost
-                knn.trainInput = nextFeatures
+                knn.trainInput = gather.features
                 knn.Run(Nothing)
 
                 For i = 0 To knn.queries.Count - 1
