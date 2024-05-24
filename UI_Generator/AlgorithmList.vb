@@ -603,7 +603,6 @@ if algorithmName = "Extrinsics_Display" Then return new Extrinsics_Display
 if algorithmName = "Face_Haar_Alt" Then return new Face_Haar_Alt
 if algorithmName = "Face_Haar_LBP" Then return new Face_Haar_LBP
 if algorithmName = "Feature_Basics" Then return new Feature_Basics
-if algorithmName = "Feature_BasicsGrid1" Then return new Feature_BasicsGrid1
 if algorithmName = "Feature_BasicsNew" Then return new Feature_BasicsNew
 if algorithmName = "Feature_BasicsNoFrills" Then return new Feature_BasicsNoFrills
 if algorithmName = "Feature_Compare" Then return new Feature_Compare
