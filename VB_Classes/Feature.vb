@@ -1,5 +1,8 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports MS.Internal
+Imports System.Web.UI.WebControls
+
 Public Class Feature_Basics : Inherits VB_Algorithm
     Dim matList As New List(Of cv.Mat)
     Dim ptList As New List(Of cv.Point2f)
@@ -1029,68 +1032,6 @@ End Class
 
 
 
-Public Class Feature_Correlation : Inherits VB_Algorithm
-    Dim featureMat As New List(Of cv.Mat)
-    Dim gather As New Feature_Gather
-    Public featureInput As New List(Of cv.Point)
-    Public featureOutput As New List(Of cv.Point)
-    Public options As New Options_Features
-    Public lossesByGrid(task.gridList.Count - 1) As Integer
-    Public Sub New()
-        desc = "Confirm that the copy of the featureMat has a good correlation to the current image."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        dst2 = src.Clone
-
-        If standalone Then
-            gather.Run(src)
-            featureInput.Clear()
-            For Each pt In gather.features
-                featureInput.Add(New cv.Point(pt.X, pt.Y))
-            Next
-        End If
-
-        Static lastFeatures = New List(Of cv.Point)
-        Static lastGridCounts(task.gridList.Count - 1) As Integer
-        Dim gridCounts(task.gridList.Count - 1) As Integer
-        Dim correlationMat As New cv.Mat
-        ReDim lossesByGrid(task.gridList.Count - 1)
-        Dim ptLostCount As Integer
-        featureOutput.Clear()
-        For i = 0 To featureInput.Count - 1
-            Dim pt = featureInput(i)
-            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-            gridCounts(index) += 1
-            If lastFeatures.Contains(pt) Or i >= featureMat.Count Then
-                featureOutput.Add(pt)
-            Else
-                Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMat(i).Width, featureMat(i).Height))
-                cv.Cv2.MatchTemplate(src(rect), featureMat(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-                If correlationMat.Get(Of Single)(0, 0) >= options.correlationMin Then
-                    featureOutput.Add(pt)
-                Else
-                    lossesByGrid(index) += 1
-                    ptLostCount += 1
-                End If
-            End If
-        Next
-
-        featureMat.Clear()
-        For Each pt In featureOutput
-            Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
-            featureMat.Add(src(rect))
-            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-        Next
-
-        lastFeatures = New List(Of cv.Point)(featureOutput)
-    End Sub
-End Class
-
-
-
-
-
 Public Class Feature_BasicsNew : Inherits VB_Algorithm
     Dim matList As New List(Of cv.Mat)
     Dim ptList As New List(Of cv.Point2f)
@@ -1173,6 +1114,79 @@ Public Class Feature_BasicsNew : Inherits VB_Algorithm
         If task.heartBeat Then
             labels(2) = CStr(task.features.Count) + "/" + CStr(matList.Count) + " features were matched to the previous frame using correlation and " +
                         CStr(ptLost.Count) + " features had to be relocated."
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Feature_Correlation : Inherits VB_Algorithm
+    Dim gather As New Feature_Gather
+    Public featureInput As New List(Of cv.Point)
+    Public features As New List(Of cv.Point)
+    Public correlations As New List(Of Single)
+    Public featuresDropped As New List(Of cv.Point)
+    Public options As New Options_Features
+    Public Sub New()
+        desc = "Confirm that the copy of the featureMat has a good correlation to the current image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        dst2 = src.Clone
+
+        If standalone Then
+            gather.Run(src)
+            featureInput.Clear()
+            For Each pt In gather.features
+                featureInput.Add(New cv.Point(pt.X, pt.Y))
+            Next
+        End If
+
+        Static lastFeatures As New List(Of cv.Point)(featureInput)
+        Static featureMat As New List(Of cv.Mat)
+
+        Dim correlationMat As New cv.Mat
+        features.Clear()
+        featuresDropped.Clear()
+        correlations.Clear()
+        Dim newFeatures As Integer, corrFound As Integer
+        For i = 0 To featureInput.Count - 1
+            Dim pt = featureInput(i)
+            Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
+            If lastFeatures.Contains(pt) Or i >= featureMat.Count Then
+                If i >= featureMat.Count Then newFeatures += 1
+                features.Add(pt)
+                featureMat.Add(src(rect))
+                correlations.Add(1.0F)
+            Else
+                rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMat(i).Width, featureMat(i).Height))
+                cv.Cv2.MatchTemplate(src(rect), featureMat(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                If correlationMat.Get(Of Single)(0, 0) >= options.correlationMin Then
+                    features.Add(pt)
+                    featureMat.Add(featureMat(i))
+                    correlations.Add(correlationMat.Get(Of Single)(0, 0))
+                    corrFound += 1
+                Else
+                    featuresDropped.Add(pt)
+                End If
+            End If
+        Next
+
+        featureMat.Clear()
+        For Each pt In features
+            Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
+            featureMat.Add(src(rect))
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
+
+        lastFeatures = New List(Of cv.Point)(features)
+        If task.heartBeat Then
+            labels(2) = CStr(features.Count) + "/" + CStr(featuresDropped.Count) + " features found/features unmatched with " + CStr(newFeatures) +
+                        " new features added and " + CStr(corrFound) + " found using correlation"
         End If
     End Sub
 End Class
