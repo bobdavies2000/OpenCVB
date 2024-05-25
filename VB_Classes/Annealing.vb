@@ -79,7 +79,7 @@ End Class
 
 
 
-Public Class Annealing_MultiThreaded : Inherits VB_Algorithm
+Public Class Annealing_MultiThreaded_CPP : Inherits VB_Algorithm
     Dim random As New Random_Basics
     Dim anneal() As Annealing_Basics_CPP
     Dim mats As New Mat_4to1

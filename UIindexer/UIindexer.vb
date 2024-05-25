@@ -5,7 +5,7 @@ Module IndexMain
     Dim OpenGLnames As New SortedList(Of String, String)
     Dim PYnames As New SortedList(Of String, String)
     Dim multiThreaded As New SortedList(Of String, String)
-    Dim nonPYnames As New SortedList(Of String, String)
+    Dim VBNames As New SortedList(Of String, String)
     Dim onlyCPP As New SortedList(Of String, String)
     Dim PYStreamNames As New SortedList(Of String, String)
     Dim MatchShapes As New SortedList(Of String, String)
@@ -69,10 +69,13 @@ Module IndexMain
             Else
                 If line <> "" Then
                     If line.Contains("Python_Stream") = False And line.Contains("Python") = False Then
-                        nonPYnames.Add(line, line)
-                        apiList.Add(line)
-                        apiListLCase.Add(LCase(line))
-                        If line.StartsWith("CPP_") Or line.EndsWith("_CPP") Then onlyCPP.Add(line, line)
+                        If line.StartsWith("CPP_") Or line.EndsWith("_CPP") Then
+                            onlyCPP.Add(line, line)
+                        Else
+                            VBNames.Add(line, line)
+                            apiList.Add(line)
+                            apiListLCase.Add(LCase(line))
+                        End If
                     End If
                 End If
             End If
@@ -179,14 +182,14 @@ Module IndexMain
         sw.WriteLine()
 
         sw.Write("<All VB.Net>")
-        For i = 0 To nonPYnames.Count - 1
-            sw.Write("," + nonPYnames.ElementAt(i).Key)
+        For i = 0 To VBNames.Count - 1
+            sw.Write("," + VBNames.ElementAt(i).Key)
         Next
         sw.WriteLine()
 
         'sw.WriteLine("<All using recorded data>")
 
-        sw.Write("<Only C++>")
+        sw.Write("<All C++>")
         For i = 0 To onlyCPP.Count - 1
             sw.Write("," + onlyCPP.ElementAt(i).Key)
         Next

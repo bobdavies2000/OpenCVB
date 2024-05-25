@@ -86,7 +86,7 @@ Module UI_GeneratorMain
         Dim sortedNames As New SortedList(Of String, Integer)
         Dim sIndex As Integer
         For Each fileName In fileNames
-            If fileName.EndsWith(".py") Then
+            If fileName.EndsWith(".py") And fileName.Contains("__init") = False Then
                 Dim fileinfo As New FileInfo(fileName)
                 sortedNames.Add(fileinfo.Name, sIndex)
                 sIndex += 1
