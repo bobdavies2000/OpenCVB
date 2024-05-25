@@ -61,8 +61,6 @@ Public Class Python_Run : Inherits VB_Algorithm
                     "Using another camera is the best option to observe all the Python Stream algorithms.")
     End Sub
     Public Sub New()
-        If task.pythonTaskName = "" Then task.pythonTaskName = task.homeDir + "VB_Classes/PythonPackages.py"
-
         pythonApp = New FileInfo(task.pythonTaskName)
         If pythonApp.Name.EndsWith("_PS.py") Then
             If testPyStreamOakD Then
@@ -165,7 +163,7 @@ Public Class Python_Stream : Inherits VB_Algorithm
 
         ' Was this class invoked standaloneTest()?  Then just run something that works with BGR and depth...
         If task.pythonTaskName.EndsWith("Python_Stream") Then
-            task.pythonTaskName = task.homeDir + "VB_Classes/Python_Stream_PS.py"
+            task.pythonTaskName = task.homeDir + "Python_Classes/Python_Stream_PS.py"
         End If
 
         memMap = New Python_MemMap()

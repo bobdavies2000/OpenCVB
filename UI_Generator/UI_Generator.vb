@@ -11,9 +11,9 @@ Module UI_GeneratorMain
         End If
 
         If CurDir.Contains("CPP_Classes") Then
-            VBcodeDir = New DirectoryInfo(CurDir() + "/../vb_classes/")
+            VBcodeDir = New DirectoryInfo(CurDir() + "/../VB_classes/")
         Else
-            VBcodeDir = New DirectoryInfo(CurDir() + "/../../vb_classes/")
+            VBcodeDir = New DirectoryInfo(CurDir() + "/../../VB_classes/")
         End If
 
         Dim includeOnly = File.ReadAllLines(Input.FullName)
@@ -32,7 +32,6 @@ Module UI_GeneratorMain
             If line.Length = 0 Then Continue For
             cppLines += 1
         Next
-
 
         ' first read all the cpp functions that are present in the project
         Dim functionInput As New FileInfo(VBcodeDir.FullName + "../CPP_Classes/CPP_Functions.h")
@@ -58,34 +57,29 @@ Module UI_GeneratorMain
         Dim fileNames As New List(Of String)
         Dim fileEntries As String() = Directory.GetFiles(VBcodeDir.FullName)
 
-        Dim pythonAppDir As New IO.DirectoryInfo(VBcodeDir.FullName)
+        Dim pythonAppDir As New IO.DirectoryInfo(VBcodeDir.FullName + "/../Python_Classes/")
 
-        ' we only want to review the python files that are included in the VB_Classes Project.  Other Python files may be support modules or just experiments.
-        Dim projFile As New FileInfo(VBcodeDir.FullName + "/Python_Classes.vbproj")
+        Dim projFile As New FileInfo(VBcodeDir.FullName + "/VB_Classes.vbproj")
         Dim readProj = New StreamReader(projFile.FullName)
         While readProj.EndOfStream = False
             Dim line = readProj.ReadLine()
-            If Trim(line).StartsWith("<Content Include=") Then
-                If InStr(line, ".py""") Then
-                    Dim startName = InStr(line, "Include=""")
-                    line = Mid(line, startName + Len("Include="""))
-                    Dim endName = InStr(line, """")
-                    line = Mid(line, 1, endName - 1)
-                    Dim pyFilename = New FileInfo(VBcodeDir.FullName + "/" + line)
-                    fileNames.Add(pyFilename.FullName)
-                End If
-            End If
             If Trim(line).StartsWith("<Compile Include=") Then
                 If InStr(line, ".vb""") Then
                     Dim startname = InStr(line, "=") + 2
                     line = Mid(line, startname)
                     Dim endName = InStr(line, """")
                     line = Mid(line, 1, endName - 1)
-                    If line.Contains("AlgorithmList.vb") = False And line.Contains("My Project") = False Then fileNames.Add(VBcodeDir.FullName + "/" + line)
+                    If line.Contains("AlgorithmList.vb") = False And line.Contains("My Project") = False Then fileNames.Add(VBcodeDir.FullName + line)
                 End If
             End If
         End While
         readProj.Close()
+
+        ' we only want python files that are included in the Python_Classes Project.  Other Python files may be support modules or just experiments.
+        Dim pythonFiles() As String = Directory.GetFiles(pythonAppDir.FullName, "*.py", SearchOption.AllDirectories)
+        For Each pythonFile As String In pythonFiles
+            fileNames.Add(pythonFile)
+        Next
 
         Dim className As String = ""
         Dim CodeLineCount As Integer = cppLines ' now adding in the C++ lines...

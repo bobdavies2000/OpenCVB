@@ -359,7 +359,7 @@ Public Class VBtask : Implements IDisposable
         displayRes = parms.displayRes
 
         buildColors()
-        pythonTaskName = homeDir + "VB_Classes\" + algName
+        pythonTaskName = homeDir + "Python_Classes\" + algName
 
         allOptions = New OptionsContainer
         allOptions.Show()

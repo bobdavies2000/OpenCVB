@@ -25,7 +25,7 @@ Module IndexMain
         Return X.LastWriteTime.CompareTo(Y.LastWriteTime)
     End Function
     Sub Main()
-        Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../../vb_classes/")
+        Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../../VB_classes/")
         Dim dir As New DirectoryInfo(VBcodeDir.FullName)
         Dim fileList As List(Of FileInfo) = dir.GetFiles().ToList()
         fileList.Sort(AddressOf SortByDate)
@@ -166,6 +166,18 @@ Module IndexMain
         Dim sw As New StreamWriter(directoryInfo.FullName + "/../Data/AlgorithmGroupNames.txt")
         sw.WriteLine("<All>")
 
+        sw.Write("<All C#>")
+        For i = 0 To CSnames.Count - 1
+            sw.Write("," + CSnames.ElementAt(i).Key)
+        Next
+        sw.WriteLine()
+
+        sw.Write("<All Python>")
+        For i = 0 To PYnames.Count - 1
+            sw.Write("," + PYnames.ElementAt(i).Key)
+        Next
+        sw.WriteLine()
+
         sw.Write("<All VB.Net>")
         For i = 0 To nonPYnames.Count - 1
             sw.Write("," + nonPYnames.ElementAt(i).Key)
@@ -174,15 +186,9 @@ Module IndexMain
 
         'sw.WriteLine("<All using recorded data>")
 
-        sw.Write("<C++>")
+        sw.Write("<Only C++>")
         For i = 0 To onlyCPP.Count - 1
             sw.Write("," + onlyCPP.ElementAt(i).Key)
-        Next
-        sw.WriteLine()
-
-        sw.Write("<C#>")
-        For i = 0 To CSnames.Count - 1
-            sw.Write("," + CSnames.ElementAt(i).Key)
         Next
         sw.WriteLine()
 
@@ -192,21 +198,9 @@ Module IndexMain
         Next
         sw.WriteLine()
 
-        sw.Write("<MatchShapes>")
-        For i = 0 To MatchShapes.Count - 1
-            sw.Write("," + MatchShapes.ElementAt(i).Key)
-        Next
-        sw.WriteLine()
-
         sw.Write("<OpenGL>")
         For i = 0 To OpenGLnames.Count - 1
             sw.Write("," + OpenGLnames.ElementAt(i).Key)
-        Next
-        sw.WriteLine()
-
-        sw.Write("<Python>")
-        For i = 0 To PYnames.Count - 1
-            sw.Write("," + PYnames.ElementAt(i).Key)
         Next
         sw.WriteLine()
 
