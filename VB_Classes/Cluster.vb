@@ -86,18 +86,22 @@ Public Class Cluster_Hulls : Inherits VB_Algorithm
         feat.Run(src)
         cluster.ptInput = task.featurePoints
         cluster.Run(src)
+        dst2 = cluster.dst2
         dst3 = cluster.dst3
 
         hulls.Clear()
         For Each group In cluster.clusters
             Dim hullPoints = cv.Cv2.ConvexHull(group.Value.ToArray, True).ToList
             Dim hull As New List(Of cv.Point)
-            For Each pt In hullPoints
-                hull.Add(New cv.Point(pt.X, pt.Y))
-            Next
+            If hullPoints.Count > 2 Then
+                For Each pt In hullPoints
+                    hull.Add(New cv.Point(pt.X, pt.Y))
+                Next
+            ElseIf hullPoints.Count = 2 Then
+                dst3.Line(hullPoints(0), hullPoints(1), cv.Scalar.White, task.lineWidth, task.lineType)
+            End If
 
             hulls.Add(hull)
-            vbDrawContour(dst2, hull, cv.Scalar.White, -1)
             vbDrawContour(dst3, hull, cv.Scalar.White, task.lineWidth)
         Next
     End Sub
