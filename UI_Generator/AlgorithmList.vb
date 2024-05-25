@@ -606,6 +606,7 @@ if algorithmName = "Feature_Basics" Then return new Feature_Basics
 if algorithmName = "Feature_BasicsNew" Then return new Feature_BasicsNew
 if algorithmName = "Feature_BasicsNoFrills" Then return new Feature_BasicsNoFrills
 if algorithmName = "Feature_Compare" Then return new Feature_Compare
+if algorithmName = "Feature_Correlation" Then return new Feature_Correlation
 if algorithmName = "Feature_Delaunay" Then return new Feature_Delaunay
 if algorithmName = "Feature_Gather" Then return new Feature_Gather
 if algorithmName = "Feature_Generations" Then return new Feature_Generations

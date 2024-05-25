@@ -30,7 +30,7 @@ Public Class Feature_Basics : Inherits VB_Algorithm
         For i = 0 To Math.Min(featureMat.Count, task.features.Count) - 1
             Dim pt = task.features(i)
             Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMat(i).Width, featureMat(i).Height))
-            If gather.ptList.Contains(pt) = false Then
+            If gather.ptList.Contains(pt) = False Then
                 cv.Cv2.MatchTemplate(src(rect), featureMat(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                 If correlationMat.Get(Of Single)(0, 0) < options.correlationMin Then
                     Dim ptNew = New cv.Point2f(CInt(pt.X), CInt(pt.Y))
@@ -40,7 +40,6 @@ Public Class Feature_Basics : Inherits VB_Algorithm
             End If
             matList.Add(featureMat(i))
             ptList.Add(pt)
-            ' setTrueText(Format(correlationMat.Get(Of Single)(0, 0), fmt1), pt)
         Next
 
         featureMat = New List(Of cv.Mat)(matList)
@@ -50,6 +49,7 @@ Public Class Feature_Basics : Inherits VB_Algorithm
         task.featureMotion = True
 
         If task.features.Count < gather.features.Count * options.resyncThreshold Or task.features.Count > extra * gather.features.Count Then
+            ptLost.Clear()
             featureMat.Clear()
             task.features.Clear()
             For Each pt In gather.features
@@ -79,9 +79,10 @@ Public Class Feature_Basics : Inherits VB_Algorithm
             dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
             task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
         Next
-        labels(2) = CStr(task.features.Count) + " features " + CStr(matList.Count) + " were matched to the previous frame using correlation and " +
-                    CStr(ptLost.Count) + " features had to be relocated."
-        ptLost.Clear()
+        If task.heartBeat Then
+            labels(2) = CStr(task.features.Count) + "/" + CStr(matList.Count) + " features were matched to the previous frame using correlation and " +
+                        CStr(ptLost.Count) + " features had to be relocated."
+        End If
     End Sub
 End Class
 
@@ -1027,90 +1028,74 @@ End Class
 
 
 
-'Public Class Feature_BasicsGrid1 : Inherits VB_Algorithm
-'    Dim matList As New List(Of cv.Mat)
-'    Dim ptList As New List(Of cv.Point2f)
-'    Dim gather As New Feature_Gather
-'    Public options As New Options_Features
-'    Public Sub New()
-'        task.features.Clear() ' in case it was previously in use...
-'        desc = "Use the grid to determine which cells should refresh their features"
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        options.RunVB()
-'        dst2 = src.Clone
-'        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-'        Static featureMat As New List(Of cv.Mat)
+Public Class Feature_Correlation : Inherits VB_Algorithm
+    Dim featureMat As New List(Of cv.Mat)
+    Dim gather As New Feature_Gather
+    Public featureInput As New List(Of cv.Point)
+    Public featureOutput As New List(Of cv.Point)
+    Public options As New Options_Features
+    Public lossesByGrid(task.gridList.Count - 1) As Integer
+    Public Sub New()
+        desc = "Confirm that the copy of the featureMat has a good correlation to the current image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        dst2 = src.Clone
 
-'        If task.optionsChanged Then
-'            task.features.Clear()
-'            featureMat.Clear()
-'        End If
+        If standalone Then
+            gather.Run(src)
+            featureInput.Clear()
+            For Each pt In gather.features
+                featureInput.Add(New cv.Point(pt.X, pt.Y))
+            Next
+        End If
 
-'        matList.Clear()
-'        ptList.Clear()
-'        Dim correlationMat As New cv.Mat
-'        Dim roiLosses As New List(Of Integer)
-'        For i = 0 To Math.Min(featureMat.Count, task.features.Count) - 1
-'            Dim pt = task.features(i)
-'            Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMat(i).Width, featureMat(i).Height))
-'            cv.Cv2.MatchTemplate(src(rect), featureMat(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-'            If correlationMat.Get(Of Single)(0, 0) > options.correlationMin Then
-'                matList.Add(featureMat(i))
-'                ptList.Add(pt)
-'            Else
-'                roiLosses.Add(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
-'            End If
-'        Next
+        Static lastFeatures = New List(Of cv.Point)
+        Static lastGridCounts(task.gridList.Count - 1) As Integer
+        Dim gridCounts(task.gridList.Count - 1) As Integer
+        Dim correlationMat As New cv.Mat
+        ReDim lossesByGrid(task.gridList.Count - 1)
+        Dim ptLostCount As Integer
+        featureOutput.Clear()
+        For i = 0 To featureInput.Count - 1
+            Dim pt = featureInput(i)
+            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            gridCounts(index) += 1
+            If lastFeatures.Contains(pt) Or i >= featureMat.Count Then
+                featureOutput.Add(pt)
+            Else
+                Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMat(i).Width, featureMat(i).Height))
+                cv.Cv2.MatchTemplate(src(rect), featureMat(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                If correlationMat.Get(Of Single)(0, 0) >= options.correlationMin Then
+                    featureOutput.Add(pt)
+                Else
+                    lossesByGrid(index) += 1
+                    ptLostCount += 1
+                End If
+            End If
+        Next
 
-'        Dim featuresByGrid(task.gridList.Count - 1) As List(Of cv.Point)
-'        For Each pt In task.featurePoints
-'            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-'            If roiLosses.Contains(index) Then
-'                If featuresByGrid(index) Is Nothing Then featuresByGrid(index) = New List(Of cv.Point)
-'                featuresByGrid(index).Add(pt)
-'            End If
-'        Next
+        featureMat.Clear()
+        For Each pt In featureOutput
+            Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
+            featureMat.Add(src(rect))
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
 
-
-'        featureMat = New List(Of cv.Mat)(matList)
-'        task.features = New List(Of cv.Point2f)(ptList)
-
-'        gather.Run(src)
-'        Dim nextFeatures = gather.features
-
-'        Dim extra = 1 + (1 - options.resyncThreshold)
-'        task.featureMotion = True
-
-'        If task.features.Count < nextFeatures.Count * options.resyncThreshold Or task.features.Count > extra * nextFeatures.Count Then
-'            featureMat.Clear()
-'            task.features.Clear()
-'            For Each pt In nextFeatures
-'                Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
-'                featureMat.Add(src(rect))
-'                task.features.Add(pt)
-'            Next
-'        End If
-
-'        task.featurePoints.Clear()
-'        For Each pt In task.features
-'            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-'            task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
-'        Next
-'        labels(2) = CStr(task.features.Count) + " features " + CStr(matList.Count) + " were matched to the previous frame using correlation and " +
-'                    CStr(ptLostCount) + " features had to be relocated."
-'    End Sub
-'End Class
-
-
+        lastFeatures = New List(Of cv.Point)(featureOutput)
+    End Sub
+End Class
 
 
 
 
 
 Public Class Feature_BasicsNew : Inherits VB_Algorithm
+    Dim matList As New List(Of cv.Mat)
+    Dim ptList As New List(Of cv.Point2f)
     Dim knn As New KNN_Core
+    Dim ptLost As New List(Of cv.Point2f)
     Dim gather As New Feature_Gather
     Public options As New Options_Features
     Public Sub New()
@@ -1123,22 +1108,18 @@ Public Class Feature_BasicsNew : Inherits VB_Algorithm
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Static featureMat As New List(Of cv.Mat)
-        Static featureGrid(task.gridList.Count - 1) As List(Of cv.Point)
-
         gather.Run(src)
 
         If task.optionsChanged Then
             task.features.Clear()
             featureMat.Clear()
-            ReDim featureGrid(task.gridList.Count - 1)
         End If
 
-        Dim matList As New List(Of cv.Mat)
-        Dim ptList As New List(Of cv.Point2f)
-        Dim ptLost As New List(Of cv.Point2f)
+        matList.Clear()
+        ptList.Clear()
         Dim correlationMat As New cv.Mat
-        For i = 0 To task.featurePoints.Count - 1
-            Dim pt = task.featurePoints(i)
+        For i = 0 To task.features.Count - 1
+            Dim pt = task.features(i)
             Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMat(i).Width, featureMat(i).Height))
             If gather.ptList.Contains(pt) = False Then
                 cv.Cv2.MatchTemplate(src(rect), featureMat(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
@@ -1152,31 +1133,14 @@ Public Class Feature_BasicsNew : Inherits VB_Algorithm
             ptList.Add(pt)
         Next
 
-        'Dim ptLostCount As Integer
-        'Dim gridLosses(task.gridList.Count - 1) As List(Of cv.Point)
-        'For i = 0 To featuresByGrid.Count - 1
-        '    If featuresByGrid(i) Is Nothing Then Continue For
-        '    If featuresByGrid(i).Count < 10 Then Continue For
-        '    ptLostCount += featuresByGrid(i).Count
-        '    For Each pt In featuresByGrid(i)
-        '        ptList.Add(pt)
-        '        Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMat(i).Width, featureMat(i).Height))
-        '        matList.Add(src(rect))
-
-        '    Next
-        'Next
         featureMat = New List(Of cv.Mat)(matList)
         task.features = New List(Of cv.Point2f)(ptList)
 
+        Dim extra = 1 + (1 - options.resyncThreshold)
         task.featureMotion = True
-        If task.features.Count < gather.features.Count * options.resyncThreshold Then
-            ReDim featureGrid(task.gridList.Count - 1)
-            For Each pt In gather.ptList
-                Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                If featureGrid(index) Is Nothing Then featureGrid(index) = New List(Of cv.Point)
-                featureGrid(index).Add(pt)
-            Next
 
+        If task.features.Count < gather.features.Count * options.resyncThreshold Or task.features.Count > extra * gather.features.Count Then
+            ptLost.Clear()
             featureMat.Clear()
             task.features.Clear()
             For Each pt In gather.features
@@ -1206,8 +1170,9 @@ Public Class Feature_BasicsNew : Inherits VB_Algorithm
             dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
             task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
         Next
-        labels(2) = CStr(task.features.Count) + " features " + CStr(matList.Count) + " were matched to the previous frame using correlation and " +
-                    CStr(ptLost.Count) + " features had to be relocated."
-        ptLost.Clear()
+        If task.heartBeat Then
+            labels(2) = CStr(task.features.Count) + "/" + CStr(matList.Count) + " features were matched to the previous frame using correlation and " +
+                        CStr(ptLost.Count) + " features had to be relocated."
+        End If
     End Sub
 End Class
