@@ -61,7 +61,7 @@ Module UI_GeneratorMain
         Dim pythonAppDir As New IO.DirectoryInfo(VBcodeDir.FullName)
 
         ' we only want to review the python files that are included in the VB_Classes Project.  Other Python files may be support modules or just experiments.
-        Dim projFile As New FileInfo(VBcodeDir.FullName + "/VB_Classes.vbproj")
+        Dim projFile As New FileInfo(VBcodeDir.FullName + "/Python_Classes.vbproj")
         Dim readProj = New StreamReader(projFile.FullName)
         While readProj.EndOfStream = False
             Dim line = readProj.ReadLine()

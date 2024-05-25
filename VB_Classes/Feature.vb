@@ -1,8 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports MS.Internal
-Imports System.Web.UI.WebControls
-
 Public Class Feature_Basics : Inherits VB_Algorithm
     Dim matList As New List(Of cv.Mat)
     Dim ptList As New List(Of cv.Point2f)
@@ -1129,7 +1126,6 @@ Public Class Feature_Correlation : Inherits VB_Algorithm
     Public featureInput As New List(Of cv.Point)
     Public features As New List(Of cv.Point)
     Public correlations As New List(Of Single)
-    Public featuresDropped As New List(Of cv.Point)
     Public options As New Options_Features
     Public Sub New()
         desc = "Confirm that the copy of the featureMat has a good correlation to the current image."
@@ -1146,47 +1142,30 @@ Public Class Feature_Correlation : Inherits VB_Algorithm
             Next
         End If
 
-        Static lastFeatures As New List(Of cv.Point)(featureInput)
         Static featureMat As New List(Of cv.Mat)
+        Static rects As New List(Of cv.Rect)
 
         Dim correlationMat As New cv.Mat
         features.Clear()
-        featuresDropped.Clear()
         correlations.Clear()
-        Dim newFeatures As Integer, corrFound As Integer
-        For i = 0 To featureInput.Count - 1
-            Dim pt = featureInput(i)
-            Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
-            If lastFeatures.Contains(pt) Or i >= featureMat.Count Then
-                If i >= featureMat.Count Then newFeatures += 1
-                features.Add(pt)
-                featureMat.Add(src(rect))
-                correlations.Add(1.0F)
-            Else
-                rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMat(i).Width, featureMat(i).Height))
-                cv.Cv2.MatchTemplate(src(rect), featureMat(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-                If correlationMat.Get(Of Single)(0, 0) >= options.correlationMin Then
-                    features.Add(pt)
-                    featureMat.Add(featureMat(i))
-                    correlations.Add(correlationMat.Get(Of Single)(0, 0))
-                    corrFound += 1
-                Else
-                    featuresDropped.Add(pt)
-                End If
-            End If
+        For i = 0 To featureMat.Count - 1
+            Dim rect = rects(i)
+            cv.Cv2.MatchTemplate(src(rect), featureMat(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            correlations.Add(correlationMat.Get(Of Single)(0, 0))
         Next
 
         featureMat.Clear()
+        rects.Clear()
         For Each pt In features
             Dim rect = validateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
             featureMat.Add(src(rect))
+            rects.Add(rect)
             dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
         Next
 
-        lastFeatures = New List(Of cv.Point)(features)
         If task.heartBeat Then
-            labels(2) = CStr(features.Count) + "/" + CStr(featuresDropped.Count) + " features found/features unmatched with " + CStr(newFeatures) +
-                        " new features added and " + CStr(corrFound) + " found using correlation"
+            'labels(2) = CStr(features.Count) + "/" + CStr(featuresDropped.Count) + " features found/features unmatched with " + CStr(newFeatures) +
+            '            " new features added and " + CStr(corrFound) + " found using correlation"
         End If
     End Sub
 End Class

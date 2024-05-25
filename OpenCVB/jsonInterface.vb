@@ -75,7 +75,7 @@ Namespace jsonClass
             emptyApp.testAllDuration = 5
             emptyApp.showConsoleLog = False
             emptyApp.treeButton = True
-            emptyApp.algorithmGroup = "<All but Python>"
+            emptyApp.algorithmGroup = "<All VB.Net>"
             SaveSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", 0)
             SaveSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", 0)
             SaveSetting("OpenCVB", "OpenGLtaskWidth", "OpenGLtaskWidth", 512)

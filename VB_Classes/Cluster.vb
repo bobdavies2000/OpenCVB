@@ -13,7 +13,7 @@ Public Class Cluster_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst2 = src.Clone
-        If standaloneTest() Then
+        If standalone Then
             feat.Run(src)
             ptInput = task.featurePoints
         End If
@@ -86,6 +86,7 @@ Public Class Cluster_Hulls : Inherits VB_Algorithm
         feat.Run(src)
         cluster.ptInput = task.featurePoints
         cluster.Run(src)
+        dst3 = cluster.dst3
 
         hulls.Clear()
         For Each group In cluster.clusters
@@ -97,6 +98,7 @@ Public Class Cluster_Hulls : Inherits VB_Algorithm
 
             hulls.Add(hull)
             vbDrawContour(dst2, hull, cv.Scalar.White, -1)
+            vbDrawContour(dst3, hull, cv.Scalar.White, task.lineWidth)
         Next
     End Sub
 End Class

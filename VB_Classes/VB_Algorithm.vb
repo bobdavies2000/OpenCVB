@@ -1,6 +1,4 @@
 Imports cv = OpenCvSharp
-Imports cvext = OpenCvSharp.Extensions
-Imports System.Drawing
 Public Class trueText
     Public text As String
     Public picTag = 2

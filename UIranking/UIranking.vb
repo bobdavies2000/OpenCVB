@@ -76,7 +76,7 @@ Module UIranking
         For saveIndex = 0 To lines.Count - 1
             swAll.WriteLine(lines(saveIndex))
             If lines(saveIndex).Contains("<PyStream>") Then Exit For
-            If lines(saveIndex).Contains("<All but Python>") Then
+            If lines(saveIndex).Contains("<All VB.Net>") Then
                 swAll.WriteLine(buildReusedList)
             End If
         Next

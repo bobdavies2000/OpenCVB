@@ -166,7 +166,7 @@ Module IndexMain
         Dim sw As New StreamWriter(directoryInfo.FullName + "/../Data/AlgorithmGroupNames.txt")
         sw.WriteLine("<All>")
 
-        sw.Write("<All but Python>")
+        sw.Write("<All VB.Net>")
         For i = 0 To nonPYnames.Count - 1
             sw.Write("," + nonPYnames.ElementAt(i).Key)
         Next

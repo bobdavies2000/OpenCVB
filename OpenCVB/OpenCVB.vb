@@ -241,7 +241,7 @@ Public Class OpenCVB
             End If
 
             If .fontInfo Is Nothing Then .fontInfo = New Font("Tahoma", 9)
-            If settings.algorithmGroup = "" Then settings.algorithmGroup = "<All but Python>"
+            If settings.algorithmGroup = "" Then settings.algorithmGroup = "<All VB.Net>"
 
             If testAllRunning = False Then
                 Dim resStr = CStr(.workingRes.Width) + "x" + CStr(.workingRes.Height)
@@ -381,7 +381,7 @@ Public Class OpenCVB
         loadAlgorithmComboBoxes()
 
         GroupName.Text = settings.algorithmGroup
-        If AvailableAlgorithms.Items.Count = 0 Then GroupName.Text = "<All but Python>"
+        If AvailableAlgorithms.Items.Count = 0 Then GroupName.Text = "<All VB.Net>"
         If settings.algorithm Is Nothing Then
             AvailableAlgorithms.SelectedIndex = 0
             settings.algorithm = AvailableAlgorithms.Text
