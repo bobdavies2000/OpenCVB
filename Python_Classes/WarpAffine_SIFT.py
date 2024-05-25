@@ -26,7 +26,7 @@ from multiprocessing.pool import ThreadPool
 # local modules
 from common import Timer
 from find_obj import init_feature, filter_matches, explore_match
-titleWindow = 'z_WarpAffine_SIFT.py'
+titleWindow = 'WarpAffine_SIFT.py'
 
 def affine_skew(tilt, phi, img, mask=None):
     '''

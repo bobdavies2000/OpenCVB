@@ -3,12 +3,12 @@ import unittest
 import random
 import cProfile
 import time
-from z_kd_tree import *
+from kd_tree import *
 import cv2 as cv
 import ctypes
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)
-titleWindow = 'z_kd_tree_test.py'
+titleWindow = 'kd_tree_test.py'
 
 class KDTreeUnitTest(unittest.TestCase):
 

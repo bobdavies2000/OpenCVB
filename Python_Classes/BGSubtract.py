@@ -1,6 +1,6 @@
 import cv2 as cv
 import argparse
-titleWindow = 'z_BGSubtract.py'
+titleWindow = 'BGSubtract.py'
 
 parser = argparse.ArgumentParser(description='This program shows how to use background subtraction methods provided by \
                                               OpenCV. You can process both videos and images.')

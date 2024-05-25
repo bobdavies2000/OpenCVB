@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import random as rng
-titleWindow = 'z_Non_linear_svms.py'
+titleWindow = 'Non_linear_svms.py'
 
 NTRAINING_SAMPLES = 100 # Number of training samples per class
 FRAC_LINEAR_SEP = 0.9   # Fraction of samples which compose the linear separable part

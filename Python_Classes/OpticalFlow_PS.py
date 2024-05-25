@@ -1,8 +1,8 @@
 import numpy as np
 import cv2 as cv
 import sys
-from z_PyStream import PyStreamRun
-titleWindow = 'z_OpticalFlow_PS.py'
+from PyStream import PyStreamRun
+titleWindow = 'OpticalFlow_PS.py'
 
 def set_ShowHSV(val):
     global show_hsv 

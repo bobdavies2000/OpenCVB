@@ -6,7 +6,7 @@ import random as rng
 source_window = 'Image'
 maxTrackbar = 25
 rng.seed(12345)
-titleWindow = 'z_Corners_Subpix_Demo.py'
+titleWindow = 'Corners_Subpix_Demo.py'
 
 def goodFeaturesToTrack_Demo(val):
     maxCorners = max(val, 1)

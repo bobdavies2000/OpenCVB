@@ -8,7 +8,7 @@ Press any key to continue, ESC to stop.
 '''
 import numpy as np
 import cv2 as cv
-titleWindow = 'z_Peopledetect.py'
+titleWindow = 'Peopledetect.py'
 
 def inside(r, q):
     rx, ry, rw, rh = r

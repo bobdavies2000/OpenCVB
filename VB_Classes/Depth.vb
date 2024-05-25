@@ -1397,7 +1397,7 @@ End Class
 
 
 
-Public Class Depth_WorldXYZ_MT : Inherits VB_Algorithm
+Public Class Depth_WorldXYMT : Inherits VB_Algorithm
     Public depthUnitsMeters = False
     Public Sub New()
         labels(3) = "dst3 = pointcloud"

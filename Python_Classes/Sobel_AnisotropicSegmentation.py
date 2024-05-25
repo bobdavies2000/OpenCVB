@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import argparse
-titleWindow = 'z_Sobel_AnisotropicSegmentation.py'
+titleWindow = 'Sobel_AnisotropicSegmentation.py'
 
 W = 52          # window size is WxW
 C_Thr = 0.43    # threshold for coherency

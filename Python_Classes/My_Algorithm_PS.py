@@ -1,8 +1,8 @@
 import cv2 as cv
-from z_PyStream import PyStreamRun
+from PyStream import PyStreamRun
 
 alpha_slider_max = 100
-titleWindow = 'z_My_Algorithm_PS.py'
+titleWindow = 'My_Algorithm_PS.py'
 saveAlpha = 50
     
 def on_trackbar(val):

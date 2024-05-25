@@ -1,8 +1,8 @@
 import numpy as np
 import cv2 as cv
 import sys
-from z_PyStream import PyStreamRun
-titleWindow = 'z_MSER_PS.py'
+from PyStream import PyStreamRun
+titleWindow = 'MSER_PS.py'
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
     global mser

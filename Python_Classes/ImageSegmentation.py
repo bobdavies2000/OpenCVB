@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 import argparse
 import random as rng
-titleWindow = 'z_ImageSegmentation.py'
+titleWindow = 'ImageSegmentation.py'
 
 rng.seed(12345)
 

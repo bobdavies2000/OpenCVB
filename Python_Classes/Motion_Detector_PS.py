@@ -27,9 +27,9 @@
 
 import cv2 as cv
 import numpy as np
-from z_PyStream import PyStreamRun
+from PyStream import PyStreamRun
 
-titleWindow = 'z_MotionDetector_PS.py'
+titleWindow = 'MotionDetector_PS.py'
 
 cv.namedWindow(titleWindow)
 

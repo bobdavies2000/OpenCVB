@@ -14,7 +14,7 @@ Keys:
 import numpy as np
 import cv2 as cv
 from common import make_cmap
-titleWindow = 'z_Distance_LabeledTransform.py'
+titleWindow = 'Distance_LabeledTransform.py'
 import ctypes
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)

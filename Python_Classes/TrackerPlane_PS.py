@@ -22,8 +22,8 @@ Select a textured planar object to track by drawing a box with a mouse.
 #import sys
 #import numpy as np
 #import cv2 as cv
-#from z_PyStream import PyStreamRun
-#titleWindow = "z_TrackerPlane_PS.py"
+#from PyStream import PyStreamRun
+#titleWindow = "TrackerPlane_PS.py"
 
 ## built-in modules
 #from collections import namedtuple

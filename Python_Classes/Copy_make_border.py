@@ -6,7 +6,7 @@ import sys
 from random import randint
 import cv2 as cv
 
-titleWindow = 'z_Copy_make_border.py'
+titleWindow = 'Copy_make_border.py'
 
 def main(argv):
     ## [variables]

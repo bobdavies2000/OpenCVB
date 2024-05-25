@@ -13,7 +13,7 @@ gabor_threads.py [image filename]
 
 '''
 
-titleWindow = 'z_Gabor_Filter_MT.py'
+titleWindow = 'Gabor_Filter_MT.py'
 
 import numpy as np
 import cv2 as cv

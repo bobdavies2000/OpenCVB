@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 import argparse
 import random as rng
-titleWindow = 'z_ConvexHull_demo.py'
+titleWindow = 'ConvexHull_demo.py'
 
 rng.seed(12345)
 

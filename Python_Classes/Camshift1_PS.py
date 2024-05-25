@@ -28,9 +28,9 @@ import numpy as np
 import cv2 as cv
 import os, time
 from time import sleep
-from z_PyStream import PyStreamRun
-from z_PyStream import getDrawRect
-titleWindow = 'z_Camshift1_PS.py'
+from PyStream import PyStreamRun
+from PyStream import getDrawRect
+titleWindow = 'Camshift1_PS.py'
 
 class App(object):
     def show_hist(self, img):

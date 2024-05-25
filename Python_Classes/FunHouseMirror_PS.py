@@ -2,14 +2,14 @@
 import numpy as np
 import math
 import sys
-from z_PyStream import PyStreamRun
+from PyStream import PyStreamRun
 # https://github.com/spmallick/learnopencv/blob/master/FunnyMirrors/FunnyMirrorsVideo.py
 # https://www.learnopencv.com/funny-mirrors-using-opencv/?ck_subscriber_id=785741175
 
 from vcam import vcam,meshGen
 saveMode=0
 
-titleWindow = 'z_FunnyMirror_PS.py'
+titleWindow = 'FunnyMirror_PS.py'
 def on_trackbar(val):
 	global saveMode 
 	saveMode = val 

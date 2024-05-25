@@ -2,10 +2,10 @@ import cv2 as cv
 import numpy as np
 # https://docs.opencv.org/master/de/dbc/tutorial_py_fourier_transform.html
 from matplotlib import pyplot as plt
-from z_PyStream import PyStreamRun
+from PyStream import PyStreamRun
 import cv2 as cv
 import io
-titleWindow = 'z_MPL_FourierTransforms_PS.py'
+titleWindow = 'MPL_FourierTransforms_PS.py'
 
 # simple averaging filter without scaling parameter
 mean_filter = np.ones((3,3))

@@ -1,8 +1,8 @@
 import cv2 as cv
 import numpy as np
 import sys
-from z_PyStream import PyStreamRun
-titleWindow = 'z_Edge_Canny_PS.py'
+from PyStream import PyStreamRun
+titleWindow = 'Edge_Canny_PS.py'
 
 def nothing(*arg):
     pass

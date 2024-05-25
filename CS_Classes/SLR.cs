@@ -525,10 +525,10 @@ namespace CS_Classes
             int idx_split_local_max = -1;
             double devn_max = 0.0;
             double devn_cur = 0.0;
-            int sz_loc_max = vec_max_ind_in.Count;
+            int sloc_max = vec_max_ind_in.Count;
 
             //  find inside given range local maximum with the largest deviation 
-            for (int k_max = 0; k_max < sz_loc_max; ++k_max)
+            for (int k_max = 0; k_max < sloc_max; ++k_max)
             {
                 int idx_max_cur = vec_max_ind_in[k_max];
 

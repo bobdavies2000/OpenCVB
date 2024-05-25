@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-titleWindow = 'z_Hit_miss.py'
+titleWindow = 'Hit_miss.py'
 
 input_image = np.array((
     [0, 0, 0, 0, 0, 0, 0, 0],

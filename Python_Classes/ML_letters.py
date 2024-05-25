@@ -24,7 +24,7 @@ USAGE:
 '''
 import numpy as np
 import cv2 as cv
-titleWindow = 'z_ML_letters.py'
+titleWindow = 'ML_letters.py'
 
 def load_base(fn):
     a = np.loadtxt(fn, np.float32, delimiter=',', converters={ 0 : lambda ch : ord(ch)-ord('A') })

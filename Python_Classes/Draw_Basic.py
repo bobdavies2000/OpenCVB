@@ -1,7 +1,7 @@
 
 import cv2 as cv
 import numpy as np
-titleWindow = 'z_Draw_Basic.py'
+titleWindow = 'Draw_Basic.py'
 
 W = 400
 ## [my_ellipse]

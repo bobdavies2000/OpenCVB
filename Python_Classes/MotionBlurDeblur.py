@@ -32,7 +32,7 @@ import cv2 as cv
 
 # local module
 from common import nothing
-titleWindow = 'z_MotionBlurDeblur.py'
+titleWindow = 'MotionBlurDeblur.py'
 
 def blur_edge(img, d=31):
     h, w  = img.shape[:2]

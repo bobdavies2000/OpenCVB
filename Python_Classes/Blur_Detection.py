@@ -1,7 +1,7 @@
 # https://github.com/WillBrennan/BlurDetection2/tree/master
 import numpy
 import cv2
-titleWindow = 'z_Blur_Detection.py'
+titleWindow = 'Blur_Detection.py'
 
 def fix_image_size(image: numpy.array, expected_pixels: float = 2E6):
     ratio = numpy.sqrt(expected_pixels / (image.shape[0] * image.shape[1]))

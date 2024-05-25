@@ -14,7 +14,7 @@ Abid Rahman 3/14/12 debug Gary Bradski
 '''
 import numpy as np
 import cv2 as cv
-titleWindow = 'z_Hist.py'
+titleWindow = 'Hist.py'
 
 bins = np.arange(256).reshape(256,1)
 

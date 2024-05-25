@@ -20,7 +20,7 @@ Following preprocessing is applied to the dataset:
 Usage:
    digits.py
 '''
-titleWindow = 'z_Digits_SVM_KNearest_adjust.py'
+titleWindow = 'Digits_SVM_KNearest_adjust.py'
 
 import numpy as np
 import cv2 as cv

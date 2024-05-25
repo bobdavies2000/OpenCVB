@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import argparse
-titleWindow = 'z_Remap_Demo.py'
+titleWindow = 'Remap_Demo.py'
 
 def update_map(ind, map_x, map_y):
     if ind == 0:

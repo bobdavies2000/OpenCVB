@@ -1,8 +1,8 @@
 import sys
 import cv2 as cv
 import numpy as np
-from z_PyStream import PyStreamRun
-titleWindow = 'z_Filter_2D_PS.py'
+from PyStream import PyStreamRun
+titleWindow = 'Filter_2D_PS.py'
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
     ddepth = -1

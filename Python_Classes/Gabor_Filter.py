@@ -1,7 +1,7 @@
 # https://gist.github.com/kendricktan/93f0da88d0b25087d751ed2244cf770c
 import numpy as np
 import cv2
-titleWindow = 'z_Gabor_Filter.py'
+titleWindow = 'Gabor_Filter.py'
 
 # cv2.getGaborKernel(ksize, sigma, theta, lambda, gamma, psi, ktype)
 # ksize - size of gabor filter (n, n)

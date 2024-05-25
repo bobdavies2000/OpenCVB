@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 import argparse
 import os
-titleWindow = 'z_HDR_imaging.py'
+titleWindow = 'HDR_imaging.py'
 
 def loadExposureSeq(path):
     images = []

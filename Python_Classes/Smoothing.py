@@ -10,7 +10,7 @@ MAX_KERNEL_LENGTH = 31
 
 src = None
 dst2 = None
-titleWindow = 'z_Smoothing.py'
+titleWindow = 'Smoothing.py'
 
 def main(argv):
     cv.namedWindow(titleWindow, cv.WINDOW_AUTOSIZE)

@@ -2,9 +2,9 @@ from skimage.color.adapt_rgb import adapt_rgb, each_channel, hsv_value
 from skimage import filters
 from skimage.exposure import rescale_intensity
 import cv2 as cv
-from z_PyStream import PyStreamRun
+from PyStream import PyStreamRun
 import numpy as np
-titleWindow = 'z_Edge_RGBHSV_PS.py'
+titleWindow = 'Edge_RGBHSV_PS.py'
 
 @adapt_rgb(each_channel)
 def sobel_each(image):

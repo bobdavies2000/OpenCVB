@@ -286,7 +286,7 @@ Public Class OpenCVB
 
         ' currently the only commandline arg is the name of the algorithm to run.  Save it and continue...
         If args.Length > 1 Then
-            Dim algorithm As String = "z_AddWeighted_PS.py"
+            Dim algorithm As String = "AddWeighted_PS.py"
             settings.algorithmGroup = "<All>"
             If args.Length > 2 Then ' arguments from python os.spawnv are passed as wide characters.  
                 For i = 0 To args.Length - 1
@@ -296,7 +296,7 @@ Public Class OpenCVB
                 algorithm = args(1)
             End If
             Console.WriteLine("'" + algorithm + "' was provided in the command line arguments to OpenCVB")
-            If algorithm = "z_Pyglet_Image_PS.py" Then End
+            If algorithm = "Pyglet_Image_PS.py" Then End
             externalPythonInvocation = True ' we don't need to start python because it started OpenCVB.
         End If
 

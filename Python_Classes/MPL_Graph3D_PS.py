@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 import numpy as np
-from z_PyStream import PyStreamRun
+from PyStream import PyStreamRun
 import cv2 as cv
 import io
-titleWindow = 'z_MPL_Graph3D_PS.py'
+titleWindow = 'MPL_Graph3D_PS.py'
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
     global df, angle

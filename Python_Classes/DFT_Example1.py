@@ -6,7 +6,7 @@ USAGE:
 '''
 import numpy as np
 import cv2 as cv
-titleWindow = 'z_DFT_Example1.py'
+titleWindow = 'DFT_Example1.py'
 import sys
 
 def shift_dft(src, dst=None):

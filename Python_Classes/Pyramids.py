@@ -1,6 +1,6 @@
 import sys
 import cv2 as cv
-titleWindow = 'z_Pyramids.py'
+titleWindow = 'Pyramids.py'
 
 def main(argv):
     print("""

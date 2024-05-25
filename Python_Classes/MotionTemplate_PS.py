@@ -2,7 +2,7 @@
 import numpy as np
 import cv2 as cv
 import sys
-from z_PyStream import PyStreamRun
+from PyStream import PyStreamRun
 titleWindow = "MotionTemplate_PS.py"
 
 MHI_DURATION = 0.5

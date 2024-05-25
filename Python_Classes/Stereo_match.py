@@ -5,7 +5,7 @@ Resulting .ply file cam be easily viewed using MeshLab ( http://meshlab.sourcefo
 '''
 import numpy as np
 import cv2 as cv
-titleWindow = 'z_stereo_match.py'
+titleWindow = 'stereo_match.py'
 
 ply_header = '''ply
 format ascii 1.0

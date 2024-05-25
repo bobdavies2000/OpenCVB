@@ -6,8 +6,8 @@ Alexander Mordvintsev 6/10/12
 import sys
 import numpy as np
 import cv2 as cv
-from z_PyStream import PyStreamRun
-titleWindow = 'z_Laplacian_PyramidFilter_PS.py'
+from PyStream import PyStreamRun
+titleWindow = 'Laplacian_PyramidFilter_PS.py'
 
 from common import nothing, getsize
 

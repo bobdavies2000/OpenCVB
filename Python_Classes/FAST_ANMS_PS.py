@@ -1,8 +1,8 @@
 from random import shuffle
-from z_PyStream import PyStreamRun
+from PyStream import PyStreamRun
 import cv2  
 import math
-titleWindow = 'z_FAST_ANMS_PS.py'
+titleWindow = 'FAST_ANMS_PS.py'
 
 # https://github.com/BAILOOL/ANMS-Codes
 

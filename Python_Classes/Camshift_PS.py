@@ -28,8 +28,8 @@ import numpy as np
 import cv2 as cv
 import os, time
 from time import sleep
-from z_PyStream import PyStreamRun
-titleWindow = 'z_Camshift1_PS.py'
+from PyStream import PyStreamRun
+titleWindow = 'Camshift1_PS.py'
 
 class App(object):
     def onmouse(self, event, x, y, flags, param):

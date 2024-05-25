@@ -2,7 +2,7 @@
 
 import cv2 as cv
 import numpy as np
-titleWindow = 'z_SVM_HOG.py'
+titleWindow = 'SVM_HOG.py'
 import ctypes
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)

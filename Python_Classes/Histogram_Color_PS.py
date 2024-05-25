@@ -1,7 +1,7 @@
 import numpy as np
 import cv2 as cv
-from z_PyStream import PyStreamRun
-titleWindow = 'z_Histogram_Color_PS.py'
+from PyStream import PyStreamRun
+titleWindow = 'Histogram_Color_PS.py'
  
 # built-in modules
 import sys

@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import argparse
-titleWindow = 'z_Morphology_2.py'
+titleWindow = 'Morphology_2.py'
 
 morph_size = 0
 max_operator = 4

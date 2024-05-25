@@ -26,7 +26,7 @@ import cv2 as cv
 
 from common import Sketcher
 
-titleWindow = 'z_Watershed.py'
+titleWindow = 'Watershed.py'
 
 class App:
     def __init__(self, fn):

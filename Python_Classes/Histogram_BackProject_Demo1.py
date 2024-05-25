@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import argparse
-titleWindow = 'z_Histogram_BackProject_Demo1.py'
+titleWindow = 'Histogram_BackProject_Demo1.py'
 
 def Hist_and_Backproj(val):
     ## [initialize]

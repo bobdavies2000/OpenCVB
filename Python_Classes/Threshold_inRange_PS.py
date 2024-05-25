@@ -1,6 +1,6 @@
 import cv2 as cv
 import argparse
-from z_PyStream import PyStreamRun
+from PyStream import PyStreamRun
 titleWindow = "Threshold_inRange_PS.py"
 
 ## [low]

@@ -4,7 +4,7 @@
 """
 import sys
 import cv2 as cv
-titleWindow = 'z_Laplace_demo.py'
+titleWindow = 'Laplace_demo.py'
 
 def main(argv):
     # [variables]

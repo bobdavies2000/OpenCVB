@@ -18,7 +18,7 @@ import sys
 import glob
 import argparse
 from math import *
-titleWindow = 'z_Mouse_and_match.py'
+titleWindow = 'Mouse_and_match.py'
 
 class App():
     drag_start = None

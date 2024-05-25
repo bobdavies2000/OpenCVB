@@ -8,7 +8,7 @@ A trackbar is put up which controls the contour level from -3 to 3
 '''
 
 import sys
-titleWindow = 'z_Contour.py'
+titleWindow = 'Contour.py'
 import numpy as np
 import cv2 as cv
 

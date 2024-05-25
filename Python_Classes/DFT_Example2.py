@@ -2,7 +2,7 @@ import sys
 
 import cv2 as cv
 import numpy as np
-titleWindow = 'z_DFT_Example2.py'
+titleWindow = 'DFT_Example2.py'
 
 def print_help():
     print('''

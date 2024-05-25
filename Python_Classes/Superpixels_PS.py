@@ -2,7 +2,7 @@ import numpy as np
 import cv2 as cv
 import common
 import sys
-from z_PyStream import PyStreamRun
+from PyStream import PyStreamRun
 titleWindow = "SuperPixels_PS.py"
 
 def OpenCVCode(imgRGB, depth32f, frameCount):

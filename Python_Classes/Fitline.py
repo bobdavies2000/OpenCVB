@@ -28,7 +28,7 @@ import itertools as it
 
 # local modules
 from common import draw_str
-titleWindow = 'z_Fitline.py'
+titleWindow = 'Fitline.py'
 
 width, height = 512, 256
 

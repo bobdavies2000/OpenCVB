@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import argparse
-titleWindow = 'z_Histogram_Bars.py'
+titleWindow = 'Histogram_Bars.py'
 
 ## [Load image]
 parser = argparse.ArgumentParser(description='Code for Histogram Calculation tutorial.')

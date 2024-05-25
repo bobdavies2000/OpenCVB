@@ -1,8 +1,8 @@
 import numpy as np
 import cv2 as cv
 import sys
-from z_PyStream import PyStreamRun
-titleWindow = 'z_OpticalFlow2_PS.py'
+from PyStream import PyStreamRun
+titleWindow = 'OpticalFlow2_PS.py'
 
 def draw_flow(img, flow, step=16):
     height, width = img.shape[:2]

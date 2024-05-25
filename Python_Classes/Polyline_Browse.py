@@ -13,7 +13,7 @@ import sys
 import numpy as np
 import cv2 as cv
 import sys
-titleWindow = 'z_Polyline_Browse.py'
+titleWindow = 'Polyline_Browse.py'
 
 def main():
     if len(sys.argv) > 1:

@@ -22,8 +22,8 @@ r     - toggle RANSAC
 import numpy as np
 import cv2 as cv
 import sys
-from z_PyStream import PyStreamRun
-titleWindow = 'z_KLT_homography_PS.py'
+from PyStream import PyStreamRun
+titleWindow = 'KLT_homography_PS.py'
 
 from common import draw_str
 

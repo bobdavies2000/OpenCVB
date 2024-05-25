@@ -11,9 +11,9 @@ import numpy as np
 from matplotlib import mlab, cm
 import io
 from PIL import Image
-from z_PyStream import PyStreamRun
+from PyStream import PyStreamRun
 import cv2 as cv
-titleWindow = 'z_MPL_PlotContour_PS.py'
+titleWindow = 'MPL_PlotContour_PS.py'
 
 def bivariate_normal(X, Y, sigmax=1.0, sigmay=1.0,
                      mux=0.0, muy=0.0, sigmaxy=0.0):

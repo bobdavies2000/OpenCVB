@@ -43,7 +43,7 @@ Module UIranking
 
         Dim buildReusedList As String = "<All Reused and Callees>"
         For Each func In reusedList
-            If func.Key.StartsWith("z_") = False Then buildReusedList += "," + func.Key
+            If func.Key.StartsWith("") = False Then buildReusedList += "," + func.Key
         Next
 
         Dim algorithmRank As New SortedList(Of String, String)

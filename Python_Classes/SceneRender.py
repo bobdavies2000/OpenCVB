@@ -2,7 +2,7 @@ import numpy as np
 from numpy import pi, sin, cos
 
 import cv2 as cv
-titleWindow = 'z_SceneRender.py'
+titleWindow = 'SceneRender.py'
 
 defaultSize = 512
 

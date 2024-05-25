@@ -18,7 +18,7 @@ import cv2 as cv
 import numpy as np
 import sys
 from TinyEKF import EKF
-titleWindow = 'z_Kalman_TinyEKF.py'
+titleWindow = 'Kalman_TinyEKF.py'
 
 class TrackerEKF(EKF):
     # An EKF for mouse tracking

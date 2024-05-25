@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-titleWindow = 'z_PointPolygonTest_demo.py'
+titleWindow = 'PointPolygonTest_demo.py'
 
 # Create an image
 r = 100

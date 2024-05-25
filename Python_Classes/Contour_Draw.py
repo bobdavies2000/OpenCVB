@@ -4,7 +4,7 @@
 import numpy as np
 import argparse
 import cv2 as cv
-titleWindow = 'z_Contour_Draw.py'
+titleWindow = 'Contour_Draw.py'
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()

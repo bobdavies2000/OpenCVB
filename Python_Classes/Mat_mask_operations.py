@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 import cv2 as cv
-titleWindow = 'z_Mat_mask_operations.py'
+titleWindow = 'Mat_mask_operations.py'
 import ctypes
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)

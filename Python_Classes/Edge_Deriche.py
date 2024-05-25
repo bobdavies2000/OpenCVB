@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 import cv2 as cv
-titleWindow = 'z_Edge_Deriche.py'
+titleWindow = 'Edge_Deriche.py'
 # https://github.com/opencv/opencv_contrib/blob/master/modules/ximgproc/samples/dericheSample.py
 def AddSlider(sliderName,windowName,minSlider,maxSlider,valDefault, update=[]):
     if update is None:

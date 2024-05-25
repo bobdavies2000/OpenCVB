@@ -1,6 +1,6 @@
 # https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
 import sys
-titleWindow = 'z_GetRotationMatrix2D.py'
+titleWindow = 'GetRotationMatrix2D.py'
 import numpy as np
 import cv2 as cv
 import random 

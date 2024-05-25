@@ -1,6 +1,6 @@
 import cv2 as cv
-from z_PyStream import PyStreamRun
-titleWindow = 'z_BGSubtract_MOG2_PS.py'
+from PyStream import PyStreamRun
+titleWindow = 'BGSubtract_MOG2_PS.py'
 fileName = '../opencv/Samples/Data/vtest.avi'
 
 def OpenCVCode(imgRGB, depth32f, frameCount):

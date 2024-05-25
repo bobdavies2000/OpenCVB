@@ -12,7 +12,7 @@ Keys:
 '''
 import numpy as np
 import cv2 as cv
-titleWindow = 'z_Flood.py'
+titleWindow = 'Flood.py'
 
 import sys
 

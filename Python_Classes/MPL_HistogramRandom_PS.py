@@ -3,10 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.path as path
-from z_PyStream import PyStreamRun
+from PyStream import PyStreamRun
 import cv2 as cv
 import io
-titleWindow = 'z_MPL_HistogramRandom_PS.py'
+titleWindow = 'MPL_HistogramRandom_PS.py'
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
     fig, ax = plt.subplots()

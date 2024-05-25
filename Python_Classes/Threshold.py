@@ -6,7 +6,7 @@ max_type = 4
 max_binary_value = 255
 trackbar_type = 'Type: \n 0: Binary \n 1: Binary Inverted \n 2: Truncate \n 3: To Zero \n 4: To Zero Inverted'
 trackbar_value = 'Value'
-titleWindow = 'z_Threshold.py'
+titleWindow = 'Threshold.py'
 
 ## [Threshold_Demo]
 def Threshold_Demo(val):

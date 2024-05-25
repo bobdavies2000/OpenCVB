@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 import argparse
 import random as rng
-titleWindow = 'z_Features_GoodFeatures_Test.py'
+titleWindow = 'Features_GoodFeatures_Test.py'
 
 source_window = 'Image'
 maxTrackbar = 100

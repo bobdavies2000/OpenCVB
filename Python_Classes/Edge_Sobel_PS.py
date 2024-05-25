@@ -1,7 +1,7 @@
 import sys
 import cv2 as cv
-from z_PyStream import PyStreamRun
-titleWindow = 'z_Edge_Sobel_PS.py'
+from PyStream import PyStreamRun
+titleWindow = 'Edge_Sobel_PS.py'
 
 def OpenCVCode(src, depth32f, frameCount):
     scale = 1

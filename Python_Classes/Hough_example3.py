@@ -6,7 +6,7 @@ import sys
 import math
 import cv2 as cv
 import numpy as np
-titleWindow = 'z_Hough_example3.py'
+titleWindow = 'Hough_example3.py'
 
 def main(argv):
     ## [load]

@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 import argparse
 import random as rng
-titleWindow = 'z_Harris_Detector_Demo.py'
+titleWindow = 'Harris_Detector_Demo.py'
 
 myHarris_window = 'My Harris corner detector'
 myShiTomasi_window = 'My Shi Tomasi corner detector'

@@ -16,7 +16,7 @@ import cv2 as cv
 
 # local modules
 from common import splitfn
-titleWindow = 'z_Calibrate.py'
+titleWindow = 'Calibrate.py'
 
 # built-in modules
 import os

@@ -1,9 +1,9 @@
 import numpy as np
 import cv2 as cv
-from z_PyStream import PyStreamRun
+from PyStream import PyStreamRun
 # https://docs.opencv.org/3.4/d4/d70/tutorial_hough_circle.html
 import sys
-titleWindow = 'z_Hough_example4_PS.py'
+titleWindow = 'Hough_example4_PS.py'
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
     global src

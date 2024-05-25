@@ -1,10 +1,10 @@
 ﻿#https://matplotlib.org/2.0.2/examples/animation/animate_decay.html
 import numpy as np
 import matplotlib.pyplot as plt
-from z_PyStream import PyStreamRun
+from PyStream import PyStreamRun
 import cv2 as cv
 import io
-titleWindow = 'z_MPL_PlotFunction_PS.py'
+titleWindow = 'MPL_PlotFunction_PS.py'
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
     global xdata, ydata, line, maxX, myFrameCount

@@ -4,8 +4,8 @@ import sys, getopt
 
 # local modules
 from common import clock, draw_str
-from z_PyStream import PyStreamRun
-titleWindow = 'z_Facedetect_PS.py'
+from PyStream import PyStreamRun
+titleWindow = 'Facedetect_PS.py'
 
 def detect(img, cascade):
     rects = cascade.detectMultiScale(img, scaleFactor=1.1, minNeighbors=10, minSize=(20, 20),

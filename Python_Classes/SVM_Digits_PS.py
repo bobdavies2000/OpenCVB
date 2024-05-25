@@ -4,12 +4,12 @@
 
 import numpy as np
 import cv2 as cv
-from z_PyStream import PyStreamRun
+from PyStream import PyStreamRun
 
 # built-in modules
 import os
 import sys
-titleWindow = 'z_SVM_Digits_PS.py'
+titleWindow = 'SVM_Digits_PS.py'
 
 # local modules
 from common import mosaic

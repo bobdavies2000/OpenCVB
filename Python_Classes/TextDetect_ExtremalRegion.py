@@ -5,7 +5,7 @@ import os
 
 import cv2 as cv
 import numpy as np
-titleWindow = 'z_TextDetect_ExtremalRegion.py'
+titleWindow = 'TextDetect_ExtremalRegion.py'
 
 print(os.path.basename(__file__))
 print('       A simple demo script using the Extremal Region Filter algorithm described in:')

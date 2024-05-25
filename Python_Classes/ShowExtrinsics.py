@@ -8,7 +8,7 @@ from numpy import linspace
 import ctypes
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)
-titleWindow = 'z_Calibrate_ShowExtrinsics.py'
+titleWindow = 'Calibrate_ShowExtrinsics.py'
 
 def inverse_homogeneoux_matrix(M):
     R = M[0:3, 0:3]
@@ -199,13 +199,13 @@ def main():
     X_max = max_values[0]
     Y_min = min_values[1]
     Y_max = max_values[1]
-    Z_min = min_values[2]
-    Z_max = max_values[2]
-    max_range = np.array([X_max-X_min, Y_max-Y_min, Z_max-Z_min]).max() / 2.0
+    min = min_values[2]
+    max = max_values[2]
+    max_range = np.array([X_max-X_min, Y_max-Y_min, max-min]).max() / 2.0
 
     mid_x = (X_max+X_min) * 0.5
     mid_y = (Y_max+Y_min) * 0.5
-    mid_z = (Z_max+Z_min) * 0.5
+    mid_z = (max+min) * 0.5
     ax.set_xlim(mid_x - max_range, mid_x + max_range)
     ax.set_ylim(mid_y - max_range, mid_y + max_range)
     ax.set_zlim(mid_z - max_range, mid_z + max_range)

@@ -12,7 +12,7 @@ Keys:
 import sys
 import numpy as np
 import cv2 as cv
-titleWindow = 'z_Morphology.py'
+titleWindow = 'Morphology.py'
 
 def main():
     import sys

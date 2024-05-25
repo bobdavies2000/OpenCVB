@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-titleWindow = 'z_Hough_example1.py'
+titleWindow = 'Hough_example1.py'
 
 img = cv.imread(cv.samples.findFile('../opencv/Samples/Data/sudoku.png'))
 gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)

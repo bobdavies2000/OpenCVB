@@ -5,7 +5,7 @@
 import numpy as np
 import sys
 import cv2 as cv
-titleWindow = 'z_Morph_lines_detection.py'
+titleWindow = 'Morph_lines_detection.py'
 
 def show_wait_destroy(winname, img):
     cv.imshow(winname, img)

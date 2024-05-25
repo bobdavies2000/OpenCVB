@@ -7,7 +7,7 @@ inspired by
   http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
 '''
 import sys
-titleWindow = 'z_Coherence.py'
+titleWindow = 'Coherence.py'
 import numpy as np
 import cv2 as cv
 def coherence_filter(img, sigma = 11, str_sigma = 11, blend = 0.5, iter_n = 4):

@@ -16,8 +16,8 @@ lk_track.py
 import numpy as np
 import cv2 as cv
 import sys
-from z_PyStream import PyStreamRun
-titleWindow = 'z_KLT_track_PS.py'
+from PyStream import PyStreamRun
+titleWindow = 'KLT_track_PS.py'
 
 from common import anorm2, draw_str
 

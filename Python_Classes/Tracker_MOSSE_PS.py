@@ -21,9 +21,9 @@ Keys:
 import sys
 import numpy as np
 import cv2 as cv
-from z_PyStream import PyStreamRun
+from PyStream import PyStreamRun
 from common import draw_str, RectSelector
-titleWindow = "z_Tracker_MOSSE_PS.py"
+titleWindow = "Tracker_MOSSE_PS.py"
 
 def rnd_warp(a):
     h, w = a.shape[:2]

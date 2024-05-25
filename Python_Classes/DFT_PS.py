@@ -6,8 +6,8 @@ USAGE:
 '''
 import numpy as np
 import cv2 as cv
-from z_PyStream import PyStreamRun
-titleWindow = 'z_DFT_PS.py'
+from PyStream import PyStreamRun
+titleWindow = 'DFT_PS.py'
 import sys
 
 def shift_dft(src, dst=None):

@@ -11,7 +11,7 @@ Keys:
 '''
 import numpy as np
 import cv2 as cv
-titleWindow = 'z_logpolar.py'
+titleWindow = 'logpolar.py'
 
 def main():
     import sys
