@@ -270,7 +270,7 @@ Public Class VB_Algorithm : Implements IDisposable
             Dim offset = InStr(lines(i), "VB_Classes.")
             If offset > 0 Then
                 Dim partLine = Mid(lines(i), offset + 11)
-                If partLine.StartsWith("algorithmList.createAlgorithm") Then Exit For
+                If partLine.StartsWith("cppAlgorithms.createAlgorithm") Then Exit For
                 Dim split() = partLine.Split("\")
                 partLine = Mid(partLine, 1, InStr(partLine, ".") - 1)
                 If Not (partLine.StartsWith("VB_Algorithm") Or partLine.StartsWith("VBtask")) Then

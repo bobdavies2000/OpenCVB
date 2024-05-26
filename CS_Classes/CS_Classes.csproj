@@ -88,6 +88,8 @@
     <Compile Include="Aruco.cs" />
     <Compile Include="Blob.cs" />
     <Compile Include="Blur.cs" />
+    <Compile Include="CS_Algorithm.cs" />
+    <Compile Include="CS_Task.cs" />
     <Compile Include="DNN.cs" />
     <Compile Include="Kaze.cs" />
     <Compile Include="KNN.cs" />
