@@ -225,24 +225,29 @@ End Class
 Public Class FeatureROI_Correlation : Inherits VB_Algorithm
     Dim gather As New FeatureROI_Basics
     Dim correlations As New List(Of Single)
+    Public cameraMotion As Boolean
     Public Sub New()
         desc = "Manage the features using correlation.  Find roi's on the heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         gather.Run(dst1)
-        dst3 = gather.dst2
+        dst2 = gather.dst2
 
         Static lastImage As cv.Mat = dst1.Clone
         Static lastRects As New List(Of cv.Rect)(gather.rects)
 
         Dim correlationMat As New cv.Mat
         correlations.Clear()
+        Dim motionCount As Integer
         For Each roi In gather.rects
             cv.Cv2.MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
             Dim corr = correlationMat.Get(Of Single)(0, 0)
-            If corr < 0.95 Then setTrueText(Format(corr, fmt1), roi.TopLeft, 3)
+            If corr < 0.99 Then setTrueText(Format(corr, fmt1), roi.TopLeft)
+            If corr < 0.99 Then motionCount += 1
         Next
+        cameraMotion = motionCount / gather.rects.Count > 0.9
+        labels(2) = "Camera Motion = " + CStr(cameraMotion)
         lastImage = dst1.Clone
     End Sub
 End Class
