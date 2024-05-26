@@ -67,7 +67,7 @@ Public Class Grid_Basics : Inherits VB_Algorithm
                 Next
             End If
 
-            For Each roi In task.gridList
+            For Each roi In gridList
                 Dim xSub = roi.X + roi.Width
                 Dim ySub = roi.Y + roi.Height
                 If ySub <= dst2.Height / 3 Then

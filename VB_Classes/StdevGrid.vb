@@ -104,8 +104,10 @@ Public Class StdevGrid_Sorted : Inherits VB_Algorithm
         bgrList.Clear()
         roiList.Clear()
         ReDim categories(9)
+        Dim saveSize = task.workingRes
+        task.workingRes = srcSmall.Size
         For i = 0 To gridList.Count - 1
-            Dim roi = gridList(i)
+            Dim roi = validateRect(gridList(i))
             Dim tmp As cv.Mat = srcSmall(roi)
             cv.Cv2.MeanStdDev(tmp, meanS, stdev)
             If ratio <> 1 Then roi = New cv.Rect(roi.X * ratio, roi.Y * ratio, roi.Width * ratio, roi.Height * ratio)
@@ -137,6 +139,7 @@ Public Class StdevGrid_Sorted : Inherits VB_Algorithm
             bgrList.Add(color)
             roiList.Add(roi)
         Next
+        task.workingRes = saveSize
         Dim avg = sortedStd.Keys.Average
 
         Dim count As Integer
