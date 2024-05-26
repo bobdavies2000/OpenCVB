@@ -1,6 +1,6 @@
 ﻿Imports NAudio.Wave
 Imports cv = OpenCvSharp
-Public Class BGR2Gray_Basics : Inherits VB_Algorithm
+Public Class Color8U_Basics : Inherits VB_Algorithm
     Public classCount As Integer
     Public classifier As Object
     Public Sub New()
@@ -44,7 +44,7 @@ End Class
 
 
 
-Public Class BGR2Gray_Grayscale : Inherits VB_Algorithm
+Public Class Color8U_Grayscale : Inherits VB_Algorithm
     Public Sub New()
         If check.Setup(traceName) Then
             check.addCheckBox("Use OpenCV to create grayscale image")
@@ -75,7 +75,7 @@ End Class
 
 
 
-Public Class BGR2Gray_Depth : Inherits VB_Algorithm
+Public Class Color8U_Depth : Inherits VB_Algorithm
     Public reduction As New Reduction_Basics
     Public depth As New Depth_InRange
     Public classCount As Integer
@@ -103,7 +103,7 @@ End Class
 
 
 
-Public Class BGR2Gray_KMeans : Inherits VB_Algorithm
+Public Class Color8U_KMeans : Inherits VB_Algorithm
     Public km0 As New KMeans_Basics
     Public km1 As New KMeans_Basics
     Public km2 As New KMeans_Basics
@@ -143,7 +143,7 @@ End Class
 
 
 
-Public Class BGR2Gray_RedHue : Inherits VB_Algorithm
+Public Class Color8U_RedHue : Inherits VB_Algorithm
     Dim options As New Options_CamShift
     Public Sub New()
         vbAddAdvice(traceName + ": This mask of red hue areas is available for use.")
@@ -168,7 +168,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/40233986/python-is-there-a-function-or-formula-to-find-the-complementary-colour-of-a-rgb
-Public Class BGR2Gray_Complementary : Inherits VB_Algorithm
+Public Class Color8U_Complementary : Inherits VB_Algorithm
     Public Sub New()
         labels = {"", "", "Current image in complementary colors", "HSV version of the current image but hue is flipped to complementary value."}
         desc = "Display the current image in complementary colors"
@@ -190,9 +190,9 @@ End Class
 
 
 ' https://stackoverflow.com/questions/40233986/python-is-there-a-function-or-formula-to-find-the-complementary-colour-of-a-rgb
-Public Class BGR2Gray_ComplementaryTest : Inherits VB_Algorithm
+Public Class Color8U_ComplementaryTest : Inherits VB_Algorithm
     Dim images As New Image_Basics
-    Dim comp As New BGR2Gray_Complementary
+    Dim comp As New Color8U_Complementary
     Public Sub New()
         labels = {"", "", "Original Image", "Color_Complementary version looks identical to the correct version at the link above "}
         desc = "Create the complementary images for Gilles Tran's 'Glasses' image for comparison"
@@ -214,7 +214,7 @@ End Class
 
 
 ' https://github.com/BhanuPrakashNani/Image_Processing/tree/master/Est.%20Transformation
-Public Class BGR2Gray_InRange : Inherits VB_Algorithm
+Public Class Color8U_InRange : Inherits VB_Algorithm
     Public Sub New()
         labels = {"", "", "Original", "After InRange processing"}
         desc = "Use inRange to isolate colors from the background"
@@ -234,7 +234,7 @@ End Class
 
 
 
-Public Class BGR2Gray_TopX_VB : Inherits VB_Algorithm
+Public Class Color8U_TopX_VB : Inherits VB_Algorithm
     Dim topX As New Hist3Dcolor_TopXColors
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Top X pixels", 2, 32, 16)
@@ -276,7 +276,7 @@ End Class
 
 
 ' https://github.com/AjinkyaChavan9/RGB-Color-Classifier-with-Deep-Learning-using-Keras-and-Tensorflow
-Public Class BGR2Gray_Common_VB : Inherits VB_Algorithm
+Public Class Color8U_Common_VB : Inherits VB_Algorithm
     Dim common As New List(Of cv.Vec3b)
     Dim commonScalar As List(Of cv.Scalar) = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.Yellow, cv.Scalar.Pink, cv.Scalar.Purple, cv.Scalar.Brown,
                                               cv.Scalar.Gray, cv.Scalar.Black, cv.Scalar.White}.ToList
@@ -308,7 +308,7 @@ End Class
 
 
 
-Public Class BGR2Gray_Smoothing : Inherits VB_Algorithm
+Public Class Color8U_Smoothing : Inherits VB_Algorithm
     Dim frames As New History_Basics
     Public Sub New()
         labels = {"", "", "Averaged BGR image over the last X frames", ""}
@@ -328,7 +328,7 @@ End Class
 
 
 
-Public Class BGR2Gray_Denoise : Inherits VB_Algorithm
+Public Class Color8U_Denoise : Inherits VB_Algorithm
     Dim denoise As New Denoise_Pixels
     Public Sub New()
         denoise.standalone = True
@@ -347,11 +347,11 @@ End Class
 
 
 
-Public Class BGR2Gray_MotionFiltered : Inherits VB_Algorithm
-    Dim colorClass As New BGR2Gray_Basics
+Public Class Color8U_MotionFiltered : Inherits VB_Algorithm
+    Dim colorClass As New Color8U_Basics
     Public classCount As Integer
     Public Sub New()
-        desc = "Prepare a BGR2Gray_Basics image using the task.motionRect"
+        desc = "Prepare a Color8U_Basics image using the task.motionRect"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst3 = task.motionColor.dst2
@@ -367,7 +367,7 @@ End Class
 
 
 
-Public Class BGR2Gray_Hue : Inherits VB_Algorithm
+Public Class Color8U_Hue : Inherits VB_Algorithm
     Public Sub New()
         desc = "Isolate those regions in the image that have a reddish hue."
     End Sub
@@ -385,7 +385,7 @@ End Class
 
 
 
-Public Class BGR2Gray_BlackAndWhite : Inherits VB_Algorithm
+Public Class Color8U_BlackAndWhite : Inherits VB_Algorithm
     Dim options As New Options_StdevGrid
     Public Sub New()
         labels = {"", "", "Mask to identify all 'black' regions", "Mask identifies all 'white' regions"}

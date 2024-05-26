@@ -1,5 +1,45 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports MS.Internal
+Imports System.Web.UI.WebControls
+Imports cv = OpenCvSharp
 Public Class FeatureROI_Basics : Inherits VB_Algorithm
+    Dim addw As New AddWeighted_Basics
+    Public rects As New List(Of cv.Rect)
+    Public Sub New()
+        findSlider("Add Weighted %").Value = 70
+        gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst1 = If(src.Channels <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
+        Dim stdevList As New List(Of Single), mean As cv.Scalar, stdev As cv.Scalar
+        For Each roi In task.gridList
+            cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)
+            stdevList.Add(stdev(0))
+        Next
+
+        Dim avg = stdevList.Average
+        dst3.SetTo(0)
+        rects.Clear()
+
+        For i = 0 To stdevList.Count - 1
+            Dim roi = task.gridList(i)
+            If stdevList(i) < avg Then dst3.Rectangle(roi, cv.Scalar.White, -1) Else rects.Add(roi)
+        Next
+        If task.heartBeat Then labels = {"", "", CStr(rects.Count) + " roi's had high standard deviation", "Stdev average = " + Format(stdevList.Average, fmt1)}
+
+        addw.src2 = dst3
+        addw.Run(dst1)
+        dst2 = addw.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FeatureROI_Color : Inherits VB_Algorithm
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         findSlider("Add Weighted %").Value = 70
@@ -179,33 +219,30 @@ End Class
 
 
 
-Public Class FeatureROI_Gray1 : Inherits VB_Algorithm
-    Dim addw As New AddWeighted_Basics
+
+
+
+Public Class FeatureROI_Correlation : Inherits VB_Algorithm
+    Dim gather As New FeatureROI_Basics
+    Dim correlations As New List(Of Single)
     Public Sub New()
-        findSlider("Add Weighted %").Value = 70
-        gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
+        desc = "Manage the features using correlation.  Find roi's on the heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim stdevList As New List(Of Single), mean As cv.Scalar, stdev As cv.Scalar
-        For Each roi In task.gridList
-            cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)
-            stdevList.Add(stdev(0))
-        Next
+        gather.Run(dst1)
+        dst3 = gather.dst2
 
-        Dim avg = stdevList.Average
-        dst3.SetTo(0)
-        Dim highCount As Integer
-        For i = 0 To stdevList.Count - 1
-            Dim roi = task.gridList(i)
-            If stdevList(i) < avg Then dst3.Rectangle(roi, cv.Scalar.White, -1) Else highCount += 1
-        Next
-        If task.heartBeat Then labels = {"", "", CStr(highCount) + " roi's had high standard deviation", "Stdev average = " + Format(stdevList.Average, fmt1)}
+        Static lastImage As cv.Mat = dst1.Clone
+        Static lastRects As New List(Of cv.Rect)(gather.rects)
 
-        addw.src2 = dst3
-        addw.Run(dst1)
-        dst2 = addw.dst2
+        Dim correlationMat As New cv.Mat
+        correlations.Clear()
+        For Each roi In gather.rects
+            cv.Cv2.MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            Dim corr = correlationMat.Get(Of Single)(0, 0)
+            If corr < 0.95 Then setTrueText(Format(corr, fmt1), roi.TopLeft, 3)
+        Next
+        lastImage = dst1.Clone
     End Sub
 End Class

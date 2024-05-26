@@ -77,7 +77,7 @@ _CPP_FeatureLess_Basics
 _CPP_FeatureLess_Edge
 _CPP_Stable_BasicsCount
 End Enum
-Public Function createAlgorithm( algorithmName as string) As Object
+Public Function createAlgorithm( algorithmName as string) As VB_Algorithm
 	If algorithmName.endsWith(".py") then return new Python_Run()
 	if algorithmName = "AddWeighted_Basics" Then return new AddWeighted_Basics
 	if algorithmName = "AddWeighted_Edges" Then return new AddWeighted_Edges
@@ -143,21 +143,6 @@ Public Function createAlgorithm( algorithmName as string) As Object
 	if algorithmName = "Benford_Primes" Then return new Benford_Primes
 	if algorithmName = "Bezier_Basics" Then return new Bezier_Basics
 	if algorithmName = "Bezier_Example" Then return new Bezier_Example
-	if algorithmName = "BGR2Gray_Basics" Then return new BGR2Gray_Basics
-	if algorithmName = "BGR2Gray_BlackAndWhite" Then return new BGR2Gray_BlackAndWhite
-	if algorithmName = "BGR2Gray_Common_VB" Then return new BGR2Gray_Common_VB
-	if algorithmName = "BGR2Gray_Complementary" Then return new BGR2Gray_Complementary
-	if algorithmName = "BGR2Gray_ComplementaryTest" Then return new BGR2Gray_ComplementaryTest
-	if algorithmName = "BGR2Gray_Denoise" Then return new BGR2Gray_Denoise
-	if algorithmName = "BGR2Gray_Depth" Then return new BGR2Gray_Depth
-	if algorithmName = "BGR2Gray_Grayscale" Then return new BGR2Gray_Grayscale
-	if algorithmName = "BGR2Gray_Hue" Then return new BGR2Gray_Hue
-	if algorithmName = "BGR2Gray_InRange" Then return new BGR2Gray_InRange
-	if algorithmName = "BGR2Gray_KMeans" Then return new BGR2Gray_KMeans
-	if algorithmName = "BGR2Gray_MotionFiltered" Then return new BGR2Gray_MotionFiltered
-	if algorithmName = "BGR2Gray_RedHue" Then return new BGR2Gray_RedHue
-	if algorithmName = "BGR2Gray_Smoothing" Then return new BGR2Gray_Smoothing
-	if algorithmName = "BGR2Gray_TopX_VB" Then return new BGR2Gray_TopX_VB
 	if algorithmName = "BGRPattern_Basics" Then return new BGRPattern_Basics
 	if algorithmName = "BGSubtract_Basics" Then return new BGSubtract_Basics
 	if algorithmName = "BGSubtract_Basics_QT" Then return new BGSubtract_Basics_QT
@@ -282,6 +267,21 @@ Public Function createAlgorithm( algorithmName as string) As Object
 	if algorithmName = "Cluster_Hulls" Then return new Cluster_Hulls
 	if algorithmName = "Coherence_Basics" Then return new Coherence_Basics
 	if algorithmName = "Coherence_Depth" Then return new Coherence_Depth
+	if algorithmName = "Color8U_Basics" Then return new Color8U_Basics
+	if algorithmName = "Color8U_BlackAndWhite" Then return new Color8U_BlackAndWhite
+	if algorithmName = "Color8U_Common_VB" Then return new Color8U_Common_VB
+	if algorithmName = "Color8U_Complementary" Then return new Color8U_Complementary
+	if algorithmName = "Color8U_ComplementaryTest" Then return new Color8U_ComplementaryTest
+	if algorithmName = "Color8U_Denoise" Then return new Color8U_Denoise
+	if algorithmName = "Color8U_Depth" Then return new Color8U_Depth
+	if algorithmName = "Color8U_Grayscale" Then return new Color8U_Grayscale
+	if algorithmName = "Color8U_Hue" Then return new Color8U_Hue
+	if algorithmName = "Color8U_InRange" Then return new Color8U_InRange
+	if algorithmName = "Color8U_KMeans" Then return new Color8U_KMeans
+	if algorithmName = "Color8U_MotionFiltered" Then return new Color8U_MotionFiltered
+	if algorithmName = "Color8U_RedHue" Then return new Color8U_RedHue
+	if algorithmName = "Color8U_Smoothing" Then return new Color8U_Smoothing
+	if algorithmName = "Color8U_TopX_VB" Then return new Color8U_TopX_VB
 	if algorithmName = "Complexity_Basics" Then return new Complexity_Basics
 	if algorithmName = "Complexity_Dots" Then return new Complexity_Dots
 	if algorithmName = "Complexity_PlotOpenCV" Then return new Complexity_PlotOpenCV
@@ -688,8 +688,9 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(functionN
 	if algorithmName = "FeaturePoly_WarpAffinePoly" Then return new FeaturePoly_WarpAffinePoly
 	if algorithmName = "FeatureROI_Basics" Then return new FeatureROI_Basics
 	if algorithmName = "FeatureROI_Canny" Then return new FeatureROI_Canny
+	if algorithmName = "FeatureROI_Color" Then return new FeatureROI_Color
 	if algorithmName = "FeatureROI_ColorSplit" Then return new FeatureROI_ColorSplit
-	if algorithmName = "FeatureROI_Gray1" Then return new FeatureROI_Gray1
+	if algorithmName = "FeatureROI_Correlation" Then return new FeatureROI_Correlation
 	if algorithmName = "FeatureROI_Sorted" Then return new FeatureROI_Sorted
 	if algorithmName = "Fibonacci_Basics" Then return new Fibonacci_Basics
 	if algorithmName = "Fibonacci_Yield" Then return new Fibonacci_Yield

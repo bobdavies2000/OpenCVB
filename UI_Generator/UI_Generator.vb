@@ -132,7 +132,7 @@ Module UI_GeneratorMain
             sw.WriteLine(unsortedFunctions(i))
         Next
         sw.WriteLine("End Enum")
-        sw.WriteLine("Public Function createAlgorithm( algorithmName as string) As Object")
+        sw.WriteLine("Public Function createAlgorithm( algorithmName as string) As VB_Algorithm")
         sw.WriteLine(vbTab + "If algorithmName.endsWith("".py"") then return new Python_Run()")
         For i = 0 To cleanNames.Count - 1
             Dim nextName = cleanNames(i)

@@ -152,7 +152,7 @@ End Class
 Public Class Bin3Way_RedCloudOther : Inherits VB_Algorithm
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
-    Dim color As New BGR2Gray_Basics
+    Dim color As New Color8U_Basics
     Public Sub New()
         flood.inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Use RedCloud with the regions that are neither lightest or darkest"
@@ -177,7 +177,7 @@ End Class
 Public Class Bin3Way_RedCloud1 : Inherits VB_Algorithm
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
-    Dim color As New BGR2Gray_Basics
+    Dim color As New Color8U_Basics
     Dim cellMaps(2) As cv.Mat, redCells(2) As List(Of rcData)
     Dim options As New Options_Bin3WayRedCloud
     Public Sub New()
@@ -233,7 +233,7 @@ End Class
 Public Class Bin3Way_RedCloud : Inherits VB_Algorithm
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
-    Dim color As New BGR2Gray_Basics
+    Dim color As New Color8U_Basics
     Dim cellMaps(2) As cv.Mat, redCells(2) As List(Of rcData)
     Dim options As New Options_Bin3WayRedCloud
     Public Sub New()

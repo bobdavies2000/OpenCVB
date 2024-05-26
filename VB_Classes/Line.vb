@@ -789,7 +789,7 @@ End Class
 
 
 Public Class Line_ColorClass : Inherits VB_Algorithm
-    Dim colorClass As New BGR2Gray_Basics
+    Dim colorClass As New Color8U_Basics
     Dim lines As New Line_Basics
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
