@@ -137,7 +137,7 @@ Module UI_GeneratorMain
         For i = 0 To cleanNames.Count - 1
             Dim nextName = cleanNames(i)
             If nextName.EndsWith(".py") = False Then
-                sw.WriteLine("if algorithmName = """ + nextName + """ Then return new " + nextName)
+                sw.WriteLine(vbTab + "if algorithmName = """ + nextName + """ Then return new " + nextName)
             End If
             If nextName.StartsWith("CPP_Basics") Then
                 For j = 0 To functionNames.Count - 1

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using cv = OpenCvSharp;
 namespace CS_Classes
 {
-    internal class CS_Algorithm
+    public class CS_Algorithm
     {
     }
 }

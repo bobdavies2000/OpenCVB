@@ -7,6 +7,7 @@ Module IndexMain
     Dim multiThreaded As New SortedList(Of String, String)
     Dim VBNames As New SortedList(Of String, String)
     Dim onlyCPP As New SortedList(Of String, String)
+    Dim allButPython As New SortedList(Of String, String)
     Dim PYStreamNames As New SortedList(Of String, String)
     Dim MatchShapes As New SortedList(Of String, String)
     Dim LastEdits As New SortedList(Of String, String)
@@ -76,6 +77,7 @@ Module IndexMain
                             apiList.Add(line)
                             apiListLCase.Add(LCase(line))
                         End If
+                        allButPython.Add(line, line)
                     End If
                 End If
             End If
@@ -168,6 +170,12 @@ Module IndexMain
 
         Dim sw As New StreamWriter(directoryInfo.FullName + "/../Data/AlgorithmGroupNames.txt")
         sw.WriteLine("<All>")
+
+        sw.Write("<All but Python>")
+        For i = 0 To allButPython.Count - 1
+            sw.Write("," + allButPython.ElementAt(i).Key)
+        Next
+        sw.WriteLine()
 
         sw.Write("<All C#>")
         For i = 0 To CSnames.Count - 1
