@@ -1,9 +1,12 @@
 ﻿Imports MS.Internal
+Imports NAudio.Gui
 Imports System.Web.UI.WebControls
 Imports cv = OpenCvSharp
 Public Class FeatureROI_Basics : Inherits VB_Algorithm
     Dim addw As New AddWeighted_Basics
     Public rects As New List(Of cv.Rect)
+    Public stdevList As New List(Of Single)
+    Public stdevAverage As Single
     Public Sub New()
         findSlider("Add Weighted %").Value = 70
         gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
@@ -12,19 +15,20 @@ Public Class FeatureROI_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst1 = If(src.Channels <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
-        Dim stdevList As New List(Of Single), mean As cv.Scalar, stdev As cv.Scalar
+        stdevList.Clear()
+        Dim mean As cv.Scalar, stdev As cv.Scalar
         For Each roi In task.gridList
             cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)
             stdevList.Add(stdev(0))
         Next
 
-        Dim avg = stdevList.Average
+        stdevAverage = stdevList.Average
         dst3.SetTo(0)
         rects.Clear()
 
         For i = 0 To stdevList.Count - 1
             Dim roi = task.gridList(i)
-            If stdevList(i) < avg Then dst3.Rectangle(roi, cv.Scalar.White, -1) Else rects.Add(roi)
+            If stdevList(i) < stdevAverage Then dst3.Rectangle(roi, cv.Scalar.White, -1) Else rects.Add(roi)
         Next
         If task.heartBeat Then labels = {"", "", CStr(rects.Count) + " roi's had high standard deviation", "Stdev average = " + Format(stdevList.Average, fmt1)}
 
@@ -33,6 +37,8 @@ Public Class FeatureROI_Basics : Inherits VB_Algorithm
         dst2 = addw.dst2
     End Sub
 End Class
+
+
 
 
 
@@ -225,8 +231,140 @@ End Class
 Public Class FeatureROI_Correlation : Inherits VB_Algorithm
     Dim gather As New FeatureROI_Basics
     Dim correlations As New List(Of Single)
+    Dim plot As New Plot_OverTimeSingle
     Public cameraMotion As Boolean
+    Dim options As New Options_Features
     Public Sub New()
+        findSlider("Feature Correlation Threshold").Value = 99
+        desc = "Use the grid-based correlations with the previous image to determine if there was camera motion"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        dst1 = If(src.Channels <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
+        gather.Run(dst1)
+        dst2 = gather.dst2
+
+        Static lastImage As cv.Mat = dst1.Clone
+
+        Dim correlationMat As New cv.Mat
+        correlations.Clear()
+        Dim motionCount As Integer
+        For Each roi In gather.rects
+            cv.Cv2.MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            Dim corr = correlationMat.Get(Of Single)(0, 0)
+            If corr < options.correlationMin Then setTrueText(Format(corr, fmt1), roi.TopLeft)
+            If corr < options.correlationMin Then motionCount += 1
+            correlations.Add(corr)
+        Next
+
+        plot.plotData = New cv.Scalar(motionCount, 0, 0)
+        plot.min = -1
+        plot.Run(empty)
+        dst3 = plot.dst2
+
+        cameraMotion = motionCount / gather.rects.Count > 0.9
+        labels(2) = "Camera Motion = " + CStr(cameraMotion)
+        lastImage = dst1.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FeatureROI_LowStdev : Inherits VB_Algorithm
+    Public rects As New List(Of cv.Rect)
+    Dim gather As New FeatureROI_Basics
+    Public Sub New()
+        desc = "Isolate the roi's with low stdev"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst1 = If(src.Channels <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
+        gather.Run(dst1)
+        dst2 = gather.dst2
+
+        rects.Clear()
+        For i = 0 To gather.stdevList.Count - 1
+            Dim roi = task.gridList(i)
+            If gather.stdevList(i) < gather.stdevAverage Then
+                rects.Add(roi)
+                setTrueText(Format(gather.stdevList(i), fmt1), roi.TopLeft, 3)
+            End If
+        Next
+        If task.heartBeat Then labels = {"", "", CStr(gather.rects.Count) + " roi's had low standard deviation",
+                                         "Stdev average = " + Format(gather.stdevList.Average, fmt1)}
+    End Sub
+End Class
+
+
+
+
+
+Public Class FeatureROI_LowStdevCorrelation : Inherits VB_Algorithm
+    Dim gather As New FeatureROI_LowStdev
+    Dim correlations As New List(Of Single)
+    Dim options As New Options_Features
+    Public Sub New()
+        findSlider("Feature Correlation Threshold").Value = 50
+        desc = "Display the correlation coefficients for roi's with low standard deviation."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        dst1 = If(src.Channels <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
+        gather.Run(dst1)
+        dst2 = gather.dst2
+
+        Static lastImage As cv.Mat = dst1.Clone
+
+        Dim correlationMat As New cv.Mat
+        correlations.Clear()
+        For Each roi In gather.rects
+            cv.Cv2.MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            Dim corr = correlationMat.Get(Of Single)(0, 0)
+            correlations.Add(corr)
+        Next
+
+        Static saveCorrs As New List(Of Single)(correlations)
+        Static saveRects As New List(Of cv.Rect)(gather.rects)
+        Static saveStdev As New List(Of Single)
+        If task.heartBeat Then
+            saveCorrs = New List(Of Single)(correlations)
+            saveRects = New List(Of cv.Rect)(gather.rects)
+
+            saveStdev.Clear()
+            Dim mean As cv.Scalar, stdev As cv.Scalar
+            For i = 0 To saveRects.Count - 1
+                cv.Cv2.MeanStdDev(dst1(saveRects(i)), mean, stdev)
+                saveStdev.Add(stdev(0))
+            Next
+        End If
+        For i = 0 To saveRects.Count - 1
+            If saveCorrs(i) < options.correlationMin Then setTrueText(Format(saveCorrs(i), fmt2), saveRects(i).TopLeft)
+            If saveCorrs(i) < options.correlationMin Then setTrueText(Format(saveStdev(i), fmt2), saveRects(i).TopLeft, 3)
+        Next
+
+        lastImage = dst1.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class FeatureROI_CorrelationSearch : Inherits VB_Algorithm
+    Dim gather As New FeatureROI_Basics
+    Dim correlations As New List(Of Single)
+    Public cameraMotion As Boolean
+    Dim options As New Options_Features
+    Public Sub New()
+        findSlider("Feature Correlation Threshold").Value = 99
         desc = "Manage the features using correlation.  Find roi's on the heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -243,9 +381,10 @@ Public Class FeatureROI_Correlation : Inherits VB_Algorithm
         For Each roi In gather.rects
             cv.Cv2.MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
             Dim corr = correlationMat.Get(Of Single)(0, 0)
-            If corr < 0.99 Then setTrueText(Format(corr, fmt1), roi.TopLeft)
-            If corr < 0.99 Then motionCount += 1
+            If corr < options.correlationMin Then setTrueText(Format(corr, fmt1), roi.TopLeft)
+            If corr < options.correlationMin Then motionCount += 1
         Next
+
         cameraMotion = motionCount / gather.rects.Count > 0.9
         labels(2) = "Camera Motion = " + CStr(cameraMotion)
         lastImage = dst1.Clone
