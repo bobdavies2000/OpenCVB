@@ -3,9 +3,9 @@ Public Class StdevGrid_Basics : Inherits VB_Algorithm
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         findSlider("Add Weighted %").Value = 70
-        gOptions.GridSize.Value = If(task.workingRes.Width >= 1280, 8, 4)
+        gOptions.GridSize.Value = 8
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Use the task.gridList roi's to compute the stdev for each roi.  If small (<10), mark as featureLess."
+        desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim stdevList0 As New List(Of Single)
@@ -68,8 +68,6 @@ End Class
 Public Class StdevGrid_Sorted : Inherits VB_Algorithm
     Dim addw As New AddWeighted_Basics
     Dim gridLow As New Grid_LowRes
-    Dim gridQuarter As New Grid_QuarterRes
-    Dim myRes = task.lowRes
     Public sortedStd As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingle)
     Public bgrList As New List(Of cv.Vec3b)
     Public roiList As New List(Of cv.Rect)
@@ -78,39 +76,21 @@ Public Class StdevGrid_Sorted : Inherits VB_Algorithm
     Public maskVal As Integer = 255
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        gOptions.GridSize.Value = If(task.lowRes = myRes, 4, 8)
+        gOptions.GridSize.Value = 8
         If standalone = False Then maskVal = 1
         labels(2) = "Use the AddWeighted slider to observe where stdev is above average."
         desc = "Sort the roi's by the sum of their bgr stdev's to find the least volatile regions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static gridList As New List(Of cv.Rect)
         options.RunVB()
 
-        If task.optionsChanged Then
-            If myRes = task.lowRes Then
-                gridLow.Run(src)
-                gridList = gridLow.gridList
-            Else
-                gridQuarter.Run(src)
-                gridList = gridQuarter.gridList
-            End If
-        End If
-
-        Dim srcSmall As cv.Mat = src.Resize(myRes)
         Dim meanS As cv.Scalar, stdev As cv.Scalar
         sortedStd.Clear()
-        Dim ratio = src.Width / myRes.Width
         bgrList.Clear()
         roiList.Clear()
         ReDim categories(9)
-        Dim saveSize = task.workingRes
-        task.workingRes = srcSmall.Size
-        For i = 0 To gridList.Count - 1
-            Dim roi = validateRect(gridList(i))
-            Dim tmp As cv.Mat = srcSmall(roi)
-            cv.Cv2.MeanStdDev(tmp, meanS, stdev)
-            If ratio <> 1 Then roi = New cv.Rect(roi.X * ratio, roi.Y * ratio, roi.Width * ratio, roi.Height * ratio)
+        For Each roi In task.gridList
+            cv.Cv2.MeanStdDev(src(roi), meanS, stdev)
             sortedStd.Add(stdev(0) + stdev(1) + stdev(2), roi)
             Dim colorIndex As Integer = 1
             Dim mean As cv.Vec3i = New cv.Vec3i(CInt(meanS(0)), CInt(meanS(1)), CInt(meanS(2)))
@@ -139,7 +119,6 @@ Public Class StdevGrid_Sorted : Inherits VB_Algorithm
             bgrList.Add(color)
             roiList.Add(roi)
         Next
-        task.workingRes = saveSize
         Dim avg = sortedStd.Keys.Average
 
         Dim count As Integer
@@ -152,7 +131,6 @@ Public Class StdevGrid_Sorted : Inherits VB_Algorithm
                 count += 1
             End If
         Next
-        dst2 = dst2.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
 
         If standaloneTest() Then
             addw.src2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -175,7 +153,8 @@ Public Class StdevGrid_ColorSplit : Inherits VB_Algorithm
     Dim devGrid As New StdevGrid_Sorted
     Public Sub New()
         devGrid.maskVal = 255
-        desc = "Split each pixel into one of 9 categories - black, white, gray, yellow, purple, teal, blue, green, or red"
+        gOptions.GridSize.Value = 8
+        desc = "Split each roi into one of 9 categories - black, white, gray, yellow, purple, teal, blue, green, or red - based on the stdev for the roi"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         devGrid.Run(src)
@@ -193,5 +172,39 @@ Public Class StdevGrid_ColorSplit : Inherits VB_Algorithm
             strOut += colorName + vbTab + CStr(devGrid.categories(i)) + vbCrLf
         Next
         setTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+Public Class StdevGrid_Gray : Inherits VB_Algorithm
+    Dim addw As New AddWeighted_Basics
+    Public Sub New()
+        findSlider("Add Weighted %").Value = 70
+        gOptions.GridSize.Value = 8
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim stdevList As New List(Of Single), mean As cv.Scalar, stdev As cv.Scalar
+        For Each roi In task.gridList
+            cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)
+            stdevList.Add(stdev(0))
+        Next
+
+        Dim avg = stdevList.Average
+        dst3.SetTo(0)
+        Dim highCount As Integer
+        For i = 0 To stdevList.Count - 1
+            Dim roi = task.gridList(i)
+            If stdevList(i) < avg Then dst3.Rectangle(roi, cv.Scalar.White, -1) Else highCount += 1
+        Next
+        If task.heartBeat Then labels = {"", "", CStr(highCount) + " roi's had high standard deviation", "Stdev average = " + Format(stdevList.Average, fmt1)}
+
+        addw.src2 = dst3
+        addw.Run(dst1)
+        dst2 = addw.dst2
     End Sub
 End Class

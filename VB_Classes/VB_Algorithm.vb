@@ -301,7 +301,6 @@ Public Class VB_Algorithm : Implements IDisposable
         combo.Dispose()
     End Sub
     Public Sub NextFrame(src As cv.Mat)
-        'If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
         algorithm.Run(src)
 
         task.labels = labels
