@@ -60,7 +60,7 @@ Module IndexMain
         End While
         srAPI.Close()
 
-        Dim apiOCVB = New System.IO.StreamReader(directoryInfo.FullName + "\..\Data\cppAlgorithms.txt")
+        Dim apiOCVB = New System.IO.StreamReader(directoryInfo.FullName + "\..\Data\AlgorithmList.txt")
         line = apiOCVB.ReadLine() ' toss the codeline count...
         While apiOCVB.EndOfStream = False
             line = apiOCVB.ReadLine()

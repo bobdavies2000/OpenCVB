@@ -846,7 +846,7 @@ End Class
 Public Class RedCloud_FeatureLess : Inherits VB_Algorithm
     Dim cpp As New CPP_Basics
     Public Sub New()
-        cpp.updateFunction(cppAlgorithms.functionNames._CPP_RedColor_FeatureLess)
+        cpp.updateFunction(AlgorithmList.functionNames._CPP_RedColor_FeatureLess)
         desc = "This is a duplicate of FeatureLess_RedCloud to make it easier to find."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1855,7 +1855,7 @@ End Class
 
 Public Class RedCloud_FeatureLessReduce : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
-    Dim devGrid As New StdevGrid_Basics
+    Dim devGrid As New FeatureROI_Basics
     Public redCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim addw As New AddWeighted_Basics

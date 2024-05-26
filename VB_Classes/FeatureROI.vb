@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
-Public Class StdevGrid_Basics : Inherits VB_Algorithm
+Public Class FeatureROI_Basics : Inherits VB_Algorithm
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         findSlider("Add Weighted %").Value = 70
-        gOptions.GridSize.Value = 8
+        gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
     End Sub
@@ -43,10 +43,11 @@ End Class
 
 
 
-Public Class StdevGrid_Canny : Inherits VB_Algorithm
+Public Class FeatureROI_Canny : Inherits VB_Algorithm
     Dim canny As New Edge_Canny
-    Dim devGrid As New StdevGrid_Basics
+    Dim devGrid As New FeatureROI_Basics
     Public Sub New()
+        gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         desc = "Create the stdev grid with the input image, then create the stdev grid for the canny output, then combine them."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -65,7 +66,7 @@ End Class
 
 
 
-Public Class StdevGrid_Sorted : Inherits VB_Algorithm
+Public Class FeatureROI_Sorted : Inherits VB_Algorithm
     Dim addw As New AddWeighted_Basics
     Dim gridLow As New Grid_LowRes
     Public sortedStd As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingle)
@@ -76,7 +77,7 @@ Public Class StdevGrid_Sorted : Inherits VB_Algorithm
     Public maskVal As Integer = 255
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        gOptions.GridSize.Value = 8
+        gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         If standalone = False Then maskVal = 1
         labels(2) = "Use the AddWeighted slider to observe where stdev is above average."
         desc = "Sort the roi's by the sum of their bgr stdev's to find the least volatile regions"
@@ -149,11 +150,11 @@ End Class
 
 
 
-Public Class StdevGrid_ColorSplit : Inherits VB_Algorithm
-    Dim devGrid As New StdevGrid_Sorted
+Public Class FeatureROI_ColorSplit : Inherits VB_Algorithm
+    Dim devGrid As New FeatureROI_Sorted
     Public Sub New()
         devGrid.maskVal = 255
-        gOptions.GridSize.Value = 8
+        gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         desc = "Split each roi into one of 9 categories - black, white, gray, yellow, purple, teal, blue, green, or red - based on the stdev for the roi"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -178,11 +179,11 @@ End Class
 
 
 
-Public Class StdevGrid_Gray : Inherits VB_Algorithm
+Public Class FeatureROI_Gray1 : Inherits VB_Algorithm
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         findSlider("Add Weighted %").Value = 70
-        gOptions.GridSize.Value = 8
+        gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
     End Sub

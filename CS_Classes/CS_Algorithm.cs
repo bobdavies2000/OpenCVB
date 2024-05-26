@@ -373,7 +373,7 @@ public class CS_Algorithm : IDisposable
     //            if (offset > 0)
     //            {
     //                var partLine = lines[i].Substring(offset + 11);
-    //                if (partLine.StartsWith("cppAlgorithms.createAlgorithm")) break;
+    //                if (partLine.StartsWith("AlgorithmList.createAlgorithm")) break;
     //                var split = partLine.Split("\\");
     //                partLine = partLine.Substring(0, partLine.IndexOf("."));
     //                if (!(partLine.StartsWith("VB_Algorithm") || partLine.StartsWith("VBtask")))

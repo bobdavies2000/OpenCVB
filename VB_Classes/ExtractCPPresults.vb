@@ -2,7 +2,7 @@
 Public Class ExtractCPPresults_FeatureLess : Inherits VB_Algorithm
     Dim cpp As New CPP_Basics
     Public Sub New()
-        cpp.updateFunction(cppAlgorithms.functionNames._CPP_RedColor_FeatureLess)
+        cpp.updateFunction(AlgorithmList.functionNames._CPP_RedColor_FeatureLess)
         desc = "This shows how to extract the output of a C++ algorithm back into VB.Net"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -20,7 +20,7 @@ End Class
 Public Class ExtractCPPresults_EdgeDrawing : Inherits VB_Algorithm
     Dim cpp As New CPP_Basics
     Public Sub New()
-        cpp.updateFunction(cppAlgorithms.functionNames._CPP_EdgeDraw_Basics)
+        cpp.updateFunction(AlgorithmList.functionNames._CPP_EdgeDraw_Basics)
         desc = "Use EdgeDrawing to define featureless regions."
     End Sub
     Public Sub RunVB(src As cv.Mat)

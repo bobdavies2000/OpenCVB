@@ -9,12 +9,12 @@
 //    public class CS_Task
 //    {
 //        public System.Timers.Timer TaskTimer = setInterval(() => { }, 1000);
-//        public cppAlgorithms algoList;
+//        public AlgorithmList algoList;
 //    }
 //    constructor()
 //    {
 //        this.TaskTimer = setInterval(() => { }, 1000);
-//        this.algoList = new cppAlgorithms();
+//        this.algoList = new AlgorithmList();
 
 //        this.algorithmObject = null;
 //        this.frameCount = 0;

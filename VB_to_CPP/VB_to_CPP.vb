@@ -7,7 +7,7 @@ Module methods
 End Module
 Public Class VB_to_CPP
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim input = New FileInfo("../../data/cppAlgorithms.txt")
+        Dim input = New FileInfo("../../data/AlgorithmList.txt")
         Dim algList = File.ReadAllLines(input.FullName)
         Dim lastGroup As String = ""
         For i = 1 To algList.Count - 1

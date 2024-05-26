@@ -199,7 +199,7 @@ End Class
 Public Class FeatureLess_Edge_CPP : Inherits VB_Algorithm
     Dim cpp As New CPP_Basics
     Public Sub New()
-        cpp.updateFunction(cppAlgorithms.functionNames._CPP_EdgeDraw_Basics)
+        cpp.updateFunction(AlgorithmList.functionNames._CPP_EdgeDraw_Basics)
         desc = "Floodfill the output of the Edge Drawing filter (C++)"
     End Sub
     Public Sub RunVB(src As cv.Mat)

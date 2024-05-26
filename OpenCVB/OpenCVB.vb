@@ -610,13 +610,13 @@ Public Class OpenCVB
         settings.PixelViewerButton = PixelViewerButton.Checked
     End Sub
     Private Sub loadAlgorithmComboBoxes()
-        ' we always need the number of lines from the cppAlgorithms.txt file (and it is not always read when working with a subset of algorithms.)
-        Dim cppAlgorithmsFileInfo = New FileInfo(HomeDir.FullName + "Data/cppAlgorithms.txt")
-        If cppAlgorithmsFileInfo.Exists = False Then
-            MsgBox("The cppAlgorithms.txt file is missing.  It should be in " + cppAlgorithmsFileInfo.FullName + "  Look at UI_Generator project.")
+        ' we always need the number of lines from the AlgorithmList.txt file (and it is not always read when working with a subset of algorithms.)
+        Dim AlgorithmListFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmList.txt")
+        If AlgorithmListFileInfo.Exists = False Then
+            MsgBox("The AlgorithmList.txt file is missing.  It should be in " + AlgorithmListFileInfo.FullName + "  Look at UI_Generator project.")
             End
         End If
-        Dim sr = New StreamReader(cppAlgorithmsFileInfo.FullName)
+        Dim sr = New StreamReader(AlgorithmListFileInfo.FullName)
         Dim infoLine = sr.ReadLine
         Dim Split = Regex.Split(infoLine, "\W+")
         CodeLineCount = Split(1)
@@ -681,8 +681,8 @@ Public Class OpenCVB
 
         Dim lastNameSplit As String = ""
         If GroupName.Text = "<All>" Or GroupName.Text = "<All using recorded data>" Then
-            Dim cppAlgorithmsFileInfo = New FileInfo(HomeDir.FullName + "Data/cppAlgorithms.txt")
-            Dim sr = New StreamReader(cppAlgorithmsFileInfo.FullName)
+            Dim AlgorithmListFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmList.txt")
+            Dim sr = New StreamReader(AlgorithmListFileInfo.FullName)
 
             Dim infoLine = sr.ReadLine
             Dim Split = Regex.Split(infoLine, "\W+")

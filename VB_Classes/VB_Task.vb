@@ -7,7 +7,7 @@ Imports System.IO
 Public Class VBtask : Implements IDisposable
 #Region "VBTask variables"
     Public TaskTimer As New System.Timers.Timer(1000)
-    Public algoList As New cppAlgorithms
+    Public algoList As New AlgorithmList
 
     Public algorithmObject As Object
     Public frameCount As Integer = 0
