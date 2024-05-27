@@ -371,7 +371,7 @@ Public Class OpenCVB
         End If
 
         startCamera()
-        While camera Is Nothing
+        While camera Is Nothing ' wait for camera to start...
         End While
 
         setupCamPics()
@@ -680,7 +680,7 @@ Public Class OpenCVB
         End If
 
         Dim lastNameSplit As String = ""
-        If GroupName.Text = "<All>" Or GroupName.Text = "<All using recorded data>" Then
+        If GroupName.Text.StartsWith("<All (") Or GroupName.Text = "<All using recorded data>" Then
             Dim AlgorithmListFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmList.txt")
             Dim sr = New StreamReader(AlgorithmListFileInfo.FullName)
 

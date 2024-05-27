@@ -169,27 +169,28 @@ Module IndexMain
         Next
 
         Dim sw As New StreamWriter(directoryInfo.FullName + "/../Data/AlgorithmGroupNames.txt")
-        sw.WriteLine("<All>")
+        Dim allCount = allButPython.Count + PYnames.Count
+        sw.WriteLine("<All (" + CStr(allCount) + ")>")
 
-        sw.Write("<All but Python>")
+        sw.Write("<All but Python (" + CStr(allButPython.Count) + ")>")
         For i = 0 To allButPython.Count - 1
             sw.Write("," + allButPython.ElementAt(i).Key)
         Next
         sw.WriteLine()
 
-        sw.Write("<All C#>")
+        sw.Write("<All C# (" + CStr(CSnames.Count) + ")>")
         For i = 0 To CSnames.Count - 1
             sw.Write("," + CSnames.ElementAt(i).Key)
         Next
         sw.WriteLine()
 
-        sw.Write("<All Python>")
+        sw.Write("<All Python (" + CStr(PYnames.Count) + ")>")
         For i = 0 To PYnames.Count - 1
             sw.Write("," + PYnames.ElementAt(i).Key)
         Next
         sw.WriteLine()
 
-        sw.Write("<All VB.Net>")
+        sw.Write("<All VB.Net (" + CStr(VBNames.Count) + ")>")
         For i = 0 To VBNames.Count - 1
             sw.Write("," + VBNames.ElementAt(i).Key)
         Next
@@ -197,7 +198,7 @@ Module IndexMain
 
         'sw.WriteLine("<All using recorded data>")
 
-        sw.Write("<All C++>")
+        sw.Write("<All C++ (" + CStr(onlyCPP.Count) + ")>")
         For i = 0 To onlyCPP.Count - 1
             sw.Write("," + onlyCPP.ElementAt(i).Key)
         Next
