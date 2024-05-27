@@ -512,6 +512,7 @@ Public Class Feature_LineAngle : Inherits VB_Algorithm
             End If
         End If
 
+        If lines.sortedVerticals.Count = 0 Then Exit Sub ' nothing found...
         Dim index = lines.sortedVerticals.ElementAt(0).Value
         Dim p1 = lines.lines2D(index)
         Dim p2 = lines.lines2D(index + 1)
