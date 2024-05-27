@@ -64,7 +64,6 @@ Public Class VBtask : Implements IDisposable
     Public hCloud As History_Cloud
     Public motionCloud As Motion_PointCloud
     Public motionColor As Motion_Color
-    Public motionBasics As Motion_BasicsQuarterRes
     Public rgbFilter As Object
 
     Public gMat As IMU_GMatrix
@@ -237,7 +236,7 @@ Public Class VBtask : Implements IDisposable
     Public projectionThreshold As Integer ' In heatmap views, this defines what is hot in a heatmap.
 
     Public rc As New rcData
-    Public redCells As List(Of rcData)
+    Public redCells As New List(Of rcData)
     Public cellMap As cv.Mat
 
     Public features As New List(Of cv.Point2f)
@@ -374,11 +373,10 @@ Public Class VBtask : Implements IDisposable
         colorizer = New Depth_Colorizer_CPP
         IMUBasics = New IMU_Basics
         gMat = New IMU_GMatrix
-        hCloud = New History_Cloud
-        motionCloud = New Motion_PointCloud
-        motionColor = New Motion_Color
-        motionBasics = New Motion_BasicsQuarterRes
-        cMotion = New CameraMotion_Basics
+        'hCloud = New History_Cloud
+        'motionCloud = New Motion_PointCloud
+        'motionColor = New Motion_Color
+        'cMotion = New CameraMotion_Basics
         imuStabilityTest = New Stabilizer_VerticalIMU
 
         updateSettings()
@@ -515,25 +513,25 @@ Public Class VBtask : Implements IDisposable
                 If task.heartBeat Or gOptions.unFiltered.Checked Then
                     task.motionDetected = True
                     task.motionRect = New cv.Rect(0, 0, src.Width, src.Height)
-                    motionColor.dst2 = src.Clone
-                    motionCloud.dst2 = task.pointCloud.Clone
+                    'motionColor.dst2 = src.Clone
+                    'motionCloud.dst2 = task.pointCloud.Clone
                 Else
-                    motionBasics.RunVB(src) ' get the latest motionRect
-                    If gOptions.UseHistoryCloud.Checked Then
-                        hCloud.RunVB(task.pointCloud)
-                        task.pointCloud = hCloud.dst2
-                    ElseIf gOptions.MotionFilteredColorAndCloud.Checked Then
-                        motionColor.RunVB(src)
-                        task.color = motionColor.dst2.Clone
-                        motionCloud.RunVB(task.pointCloud)
-                        task.pointCloud = motionCloud.dst2.Clone
-                    ElseIf gOptions.MotionFilteredCloudOnly.Checked Then
-                        motionCloud.RunVB(task.pointCloud)
-                        task.pointCloud = motionCloud.dst2.Clone
-                    ElseIf gOptions.MotionFilteredColorOnly.Checked Then
-                        motionColor.RunVB(src)
-                        task.color = motionColor.dst2.Clone
-                    End If
+                    'motionBasics.RunVB(src) ' get the latest motionRect
+                    'If gOptions.UseHistoryCloud.Checked Then
+                    '    hCloud.RunVB(task.pointCloud)
+                    '    task.pointCloud = hCloud.dst2
+                    'ElseIf gOptions.MotionFilteredColorAndCloud.Checked Then
+                    '    motionColor.RunVB(src)
+                    '    task.color = motionColor.dst2.Clone
+                    '    motionCloud.RunVB(task.pointCloud)
+                    '    task.pointCloud = motionCloud.dst2.Clone
+                    'ElseIf gOptions.MotionFilteredCloudOnly.Checked Then
+                    '    motionCloud.RunVB(task.pointCloud)
+                    '    task.pointCloud = motionCloud.dst2.Clone
+                    'ElseIf gOptions.MotionFilteredColorOnly.Checked Then
+                    '    motionColor.RunVB(src)
+                    '    task.color = motionColor.dst2.Clone
+                    'End If
                 End If
             End If
 
@@ -601,7 +599,7 @@ Public Class VBtask : Implements IDisposable
                 src = rgbFilter.dst2
             End If
 
-            cMotion.Run(src)
+            'cMotion.Run(src)
             algorithmObject.NextFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
             Dim rc = task.rc

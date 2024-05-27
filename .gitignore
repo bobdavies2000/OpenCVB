@@ -383,5 +383,6 @@ VB_to_CPP/.vs/
 cmake.db
 OakD/Build
 Mynt
+OrbbecSDK
 zed-sdk/
 *.json
