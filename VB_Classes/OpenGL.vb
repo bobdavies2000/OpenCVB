@@ -332,10 +332,10 @@ End Class
 
 
 Public Class OpenGL_VerticalSingle : Inherits VB_Algorithm
-    ReadOnly vLine As New Feature_LongestV_Tutorial2
+    ReadOnly vLine As New FeatureLine_LongestV_Tutorial2
     Public Sub New()
         task.ogl.oglFunction = oCase.verticalLines
-        desc = "Visualize the vertical line found with Feature_LongestV_Tutorial"
+        desc = "Visualize the vertical line found with FeatureLine_LongestV_Tutorial"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         vLine.Run(src)

@@ -56,7 +56,7 @@ End Class
 
 
 
-Public Class Feature_VerticalVerify : Inherits VB_Algorithm
+Public Class FeatureLine_VerticalVerify : Inherits VB_Algorithm
     Dim linesVH As New Feature_LinesVH
     Public verify As New IMU_VerticalVerify
     Public Sub New()
@@ -250,9 +250,9 @@ End Class
 
 
 
-Public Class Feature_LongestVerticalKNN : Inherits VB_Algorithm
+Public Class FeatureLine_LongestVerticalKNN : Inherits VB_Algorithm
     Dim gLines As New Line_GCloud
-    Dim longest As New Feature_Longest
+    Dim longest As New FeatureLine_Longest
     Public Sub New()
         labels(3) = "All vertical lines.  The numbers: index and Arc-Y for the longest X vertical lines."
         desc = "Find all the vertical lines and then track the longest one with a lightweight KNN."
@@ -301,7 +301,7 @@ End Class
 
 
 
-Public Class Feature_LongestV_Tutorial1 : Inherits VB_Algorithm
+Public Class FeatureLine_LongestV_Tutorial1 : Inherits VB_Algorithm
     Dim lines As New FeatureLine_Finder
     Public Sub New()
         desc = "Use FeatureLine_Finder to find all the vertical lines and show the longest."
@@ -329,7 +329,7 @@ End Class
 
 
 
-Public Class Feature_LongestV_Tutorial2 : Inherits VB_Algorithm
+Public Class FeatureLine_LongestV_Tutorial2 : Inherits VB_Algorithm
     Dim lines As New FeatureLine_Finder
     Dim knn As New KNN_Core4D
     Public pt1 As New cv.Point3f
@@ -595,5 +595,98 @@ Public Class Feature_LineAngleAll : Inherits VB_Algorithm
             arcLongAverage.RemoveAt(0)
             firstAverage.RemoveAt(0)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FeatureLine_LongestKNN : Inherits VB_Algorithm
+    Dim glines As New Line_GCloud
+    Public knn As New KNN_ClosestTracker
+    Public options As New Options_Features
+    Public gline As gravityLine
+    Public match As New Match_Basics
+    Public Sub New()
+        desc = "Find and track the longest line in the BGR image with a lightweight KNN."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        dst2 = src
+
+        Static p1 As cv.Point, p2 As cv.Point
+        knn.Run(src.Clone)
+        p1 = knn.lastPair.p1
+        p2 = knn.lastPair.p2
+        gline = glines.updateGLine(src, gline, p1, p2)
+
+        Dim rect = validateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
+        match.template = src(rect)
+        match.Run(src)
+        If match.correlation >= options.correlationMin Then
+            dst3 = match.dst0.Resize(dst3.Size)
+            dst2.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
+            dst2.Circle(p1, task.dotSize, task.highlightColor, -1, task.lineType)
+            dst2.Circle(p2, task.dotSize, task.highlightColor, -1, task.lineType)
+            rect = validateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
+            match.template = src(rect).Clone
+        Else
+            task.highlightColor = If(task.highlightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
+            knn.lastPair = New pointPair(New cv.Point2f, New cv.Point2f)
+        End If
+        labels(2) = "Longest line end points had correlation of " + Format(match.correlation, fmt3) + " with the original longest line."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FeatureLine_Longest : Inherits VB_Algorithm
+    Dim glines As New Line_GCloud
+    Public knn As New KNN_ClosestTracker
+    Public options As New Options_Features
+    Public gline As gravityLine
+    Public match1 As New Match_Basics
+    Public match2 As New Match_Basics
+    Public Sub New()
+        labels(2) = "Longest line end points are highlighted "
+        desc = "Find and track the longest line in the BGR image with a lightweight KNN."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        dst2 = src.Clone
+        Dim correlationMin = match1.options.correlationMin
+        Dim templatePad = match1.options.templatePad
+        Dim templateSize = match1.options.templateSize
+
+        Static p1 As cv.Point, p2 As cv.Point
+        If task.heartBeat Or match1.correlation < correlationMin And match2.correlation < correlationMin Then
+            knn.Run(src.Clone)
+
+            p1 = knn.lastPair.p1
+            Dim r1 = validateRect(New cv.Rect(p1.X - templatePad, p1.Y - templatePad, templateSize, templateSize))
+            match1.template = src(r1).Clone
+
+            p2 = knn.lastPair.p2
+            Dim r2 = validateRect(New cv.Rect(p2.X - templatePad, p2.Y - templatePad, templateSize, templateSize))
+            match2.template = src(r2).Clone
+        End If
+
+        match1.Run(src)
+        p1 = match1.matchCenter
+
+        match2.Run(src)
+        p2 = match2.matchCenter
+
+        gline = glines.updateGLine(src, gline, p1, p2)
+        dst2.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
+        dst2.Circle(p1, task.dotSize, task.highlightColor, -1, task.lineType)
+        dst2.Circle(p2, task.dotSize, task.highlightColor, -1, task.lineType)
+        setTrueText(Format(match1.correlation, fmt3), p1)
+        setTrueText(Format(match2.correlation, fmt3), p2)
     End Sub
 End Class

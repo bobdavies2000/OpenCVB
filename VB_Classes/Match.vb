@@ -472,50 +472,6 @@ End Class
 
 
 
-
-
-Public Class Match_FeatureLine : Inherits VB_Algorithm
-    Dim finder As New Feature_tCellTracker
-    Public Sub New()
-        labels = {"", "Output of the Feature_CellFinder", "Best cells highlighted", "Line defined by the best cells"}
-        desc = "Find the min and max cells in X and manage a line between them"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        finder.Run(src)
-        dst2 = finder.dst2
-
-        dst3 = src
-        Dim minX = Integer.MaxValue, maxX = Integer.MinValue
-        Dim bestLeft As tCell
-        Dim bestRight As tCell
-        For Each tc In finder.tcells
-            If tc.center.X < minX Then
-                minX = tc.center.X
-                bestLeft = tc
-            End If
-
-            If tc.center.X > maxX Then
-                maxX = tc.center.X
-                bestRight = tc
-            End If
-        Next
-
-        If bestLeft.rect <> New cv.Rect And bestRight.rect <> New cv.Rect Then
-            src(bestLeft.rect).CopyTo(dst3(bestLeft.rect))
-            src(bestRight.rect).CopyTo(dst3(bestRight.rect))
-            dst3.Line(bestLeft.center, bestRight.center, task.highlightColor, task.lineWidth, task.lineType)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class Match_tCell : Inherits VB_Algorithm
     Public tCells As New List(Of tCell)
     Dim cellSlider As Windows.Forms.TrackBar

@@ -1,12 +1,9 @@
-﻿Imports MS.Internal
-Imports NAudio.Gui
-Imports System.Web.UI.WebControls
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class FeatureROI_Basics : Inherits VB_Algorithm
     Dim addw As New AddWeighted_Basics
+    Public rects As New List(Of cv.Rect)
     Public stdevList As New List(Of Single)
     Public stdevAverage As Single
-    Public aboveAverage As Integer
     Public Sub New()
         findSlider("Add Weighted %").Value = 70
         gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
@@ -24,12 +21,17 @@ Public Class FeatureROI_Basics : Inherits VB_Algorithm
 
         stdevAverage = stdevList.Average
         dst3.SetTo(0)
+        rects.Clear()
         For i = 0 To stdevList.Count - 1
             Dim roi = task.gridList(i)
-            If stdevList(i) < stdevAverage Then dst3.Rectangle(roi, cv.Scalar.White, -1) Else aboveAverage += 1
+            If stdevList(i) < stdevAverage Then
+                dst3.Rectangle(roi, cv.Scalar.White, -1)
+            Else
+                rects.Add(roi)
+            End If
         Next
         If task.heartBeat Then
-            labels(2) = CStr(aboveAverage) + " of " + CStr(task.gridList.Count) + " roi's had above average standard deviation (" +
+            labels(2) = CStr(rects.Count) + " of " + CStr(task.gridList.Count) + " roi's had above average standard deviation (" +
                         Format(stdevList.Average, fmt1) + ")"
         End If
 
@@ -234,7 +236,7 @@ Public Class FeatureROI_Correlation : Inherits VB_Algorithm
     Dim plot As New Plot_OverTimeSingle
     Dim options As New Options_Features
     Public Sub New()
-        findSlider("Feature Correlation Threshold").Value = 99
+        findSlider("Feature Correlation Threshold").Value = 90
         desc = "Use the grid-based correlations with the previous image to determine if there was camera motion"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -263,7 +265,7 @@ Public Class FeatureROI_Correlation : Inherits VB_Algorithm
         plot.Run(empty)
         dst3 = plot.dst2
 
-        labels(2) = CStr(gather.aboveAverage) + " of " + CStr(task.gridList.Count) + " roi's had above average standard deviation."
+        labels(2) = CStr(gather.rects.Count) + " of " + CStr(task.gridList.Count) + " roi's had above average standard deviation."
         lastImage = dst1.Clone
     End Sub
 End Class
@@ -292,7 +294,7 @@ Public Class FeatureROI_LowStdev : Inherits VB_Algorithm
                 setTrueText(Format(gather.stdevList(i), fmt1), roi.TopLeft, 3)
             End If
         Next
-        If task.heartBeat Then labels = {"", "", CStr(task.gridList.Count - gather.aboveAverage) + " roi's had low standard deviation",
+        If task.heartBeat Then labels = {"", "", CStr(task.gridList.Count - gather.rects.Count) + " roi's had low standard deviation",
                                          "Stdev average = " + Format(gather.stdevList.Average, fmt1)}
     End Sub
 End Class
@@ -389,3 +391,95 @@ End Class
 '        lastImage = dst1.Clone
 '    End Sub
 'End Class
+
+
+
+
+
+
+Public Class FeatureROI_LeftRight : Inherits VB_Algorithm
+    Public gLeft As New FeatureROI_Basics
+    Public gRight As New FeatureROI_Basics
+    Public Sub New()
+        desc = "Capture the above average standard deviation roi's for the left and right images."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        gLeft.Run(task.leftView)
+        dst2 = gLeft.dst2
+        labels(2) = CStr(gLeft.rects.Count) + " roi's had above average standard deviation in the left image"
+
+        gRight.Run(task.rightView)
+        dst3 = gRight.dst2
+        labels(3) = CStr(gRight.rects.Count) + " roi's had above average standard deviation in the right image"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FeatureROI_LeftRightMatch : Inherits VB_Algorithm
+    Dim fROI As New FeatureROI_LeftRight
+    Dim matchList As New List(Of pointPair)
+    Dim roiMatch As New List(Of cv.Rect)
+    Dim ptList As New List(Of cv.Point)
+    Dim clickPoint As cv.Point, picTag As Integer
+    Dim options As New Options_Features
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Capture the above average standard deviation roi's for the left and right images."
+    End Sub
+    Public Sub setClickPoint(pt As cv.Point, _pictag As Integer)
+        clickPoint = pt
+        picTag = _pictag
+        task.drawRect = task.gridList(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
+        task.drawRectUpdated = True
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        fROI.Run(src)
+        dst2 = fROI.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = fROI.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        labels = fROI.labels
+
+        Dim index As Integer
+        Dim roiList = fROI.gRight.rects
+        Dim correlationMat As New cv.Mat
+        roiMatch.Clear()
+        ptList.Clear()
+        For Each roi In fROI.gLeft.rects
+            Dim correlations As New List(Of Single)
+            Dim pt = roi.TopLeft
+            For index = index To roiList.Count - 1
+                If roiList(index).Y > pt.Y Then Exit For
+                cv.Cv2.MatchTemplate(task.leftView(roi), task.rightView(roiList(index)), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                correlations.Add(correlationMat.Get(Of Single)(0, 0))
+            Next
+            If correlations.Count > 0 Then
+                Dim best = correlations.IndexOf(correlations.Max)
+                If correlations(best) >= options.correlationMin Then
+                    matchList.Add(New pointPair(pt, roiList(best).TopLeft))
+                    roiMatch.Add(roi)
+                    ptList.Add(pt)
+                End If
+            End If
+        Next
+
+        For Each mp In matchList
+            dst2.Circle(mp.p1, task.dotSize, task.highlightColor, -1)
+            dst3.Circle(mp.p1, task.dotSize, task.highlightColor, -1)
+        Next
+
+        If task.mouseClickFlag Then setClickPoint(task.clickPoint, task.mousePicTag)
+        If clickPoint = newPoint And matchList.Count > 0 Then setClickPoint(matchList(0).p1, 2)
+        Dim indexClick = ptList.IndexOf(task.drawRect.TopLeft)
+        dst1.SetTo(0)
+        If indexClick >= 0 Then
+            Dim mp1 = matchList(indexClick)
+            dst1.Circle(mp1.p1, task.dotSize, task.highlightColor, -1, task.lineType)
+            dst1.Circle(mp1.p2, task.dotSize, task.highlightColor, -1, task.lineType)
+        End If
+    End Sub
+End Class
