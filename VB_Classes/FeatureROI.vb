@@ -31,7 +31,7 @@ Public Class FeatureROI_Basics : Inherits VB_Algorithm
             End If
         Next
         If task.heartBeat Then
-            labels(2) = CStr(rects.Count) + " of " + CStr(task.gridList.Count) + " roi's had above average standard deviation (" +
+            labels(2) = CStr(rects.Count) + " of " + CStr(task.gridList.Count) + " roi's had above average standard deviation (average = " +
                         Format(stdevList.Average, fmt1) + ")"
         End If
 

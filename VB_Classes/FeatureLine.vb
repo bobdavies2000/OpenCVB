@@ -496,7 +496,7 @@ End Class
 
 
 
-Public Class Feature_LineAngle : Inherits VB_Algorithm
+Public Class FeatureLine_VerticalLongLine : Inherits VB_Algorithm
     Dim lines As New FeatureLine_Finder
     Public Sub New()
         desc = "Use FeatureLine_Finder data to identify the longest lines and show its angle."
@@ -533,7 +533,7 @@ End Class
 
 
 
-Public Class Feature_LineAngleAll : Inherits VB_Algorithm
+Public Class FeatureLine_DetailsAll : Inherits VB_Algorithm
     Dim lines As New FeatureLine_Finder
     Dim flow As New Font_FlowText
     Dim arcList As New List(Of Single)
