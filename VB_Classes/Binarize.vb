@@ -175,26 +175,6 @@ End Class
 
 
 
-
-
-Public Class Binarize_Simple : Inherits VB_Algorithm
-    Public meanScalar As cv.Scalar
-    Public injectVal As Integer = 255
-    Public Sub New()
-        desc = "Binarize an image using Threshold with OTSU."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        meanScalar = cv.Cv2.Mean(src)
-        dst2 = src.Threshold(meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Binarize_KMeansMasks : Inherits VB_Algorithm
     Dim km As New KMeans_Image
     Dim mats As New Mat_4Click
@@ -294,5 +274,25 @@ Public Class Binarize_DepthTiers : Inherits VB_Algorithm
             dst0(task.motionRect).CopyTo(dst2(task.motionRect))
         End If
         classCount = binar4.classCount + tiers.classCount
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Binarize_Simple : Inherits VB_Algorithm
+    Public meanScalar As cv.Scalar
+    Public injectVal As Integer = 255
+    Public Sub New()
+        desc = "Binarize an image using Threshold with OTSU."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        meanScalar = cv.Cv2.Mean(src)
+        dst2 = src.Threshold(meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
     End Sub
 End Class

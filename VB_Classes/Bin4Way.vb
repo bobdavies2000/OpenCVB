@@ -487,36 +487,6 @@ End Class
 
 
 
-Public Class Bin4Way_Regions : Inherits VB_Algorithm
-    Dim binary As New Bin4Way_SplitMean
-    Public classCount = 4 ' 4-way split 
-    Public Sub New()
-        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        For i = 0 To binary.mats.mat.Count - 1
-            binary.mats.mat(i) = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
-        Next
-        labels = {"", "", "CV_8U version of dst3 with values ranging from 1 to 4", "Palettized version of dst2"}
-        desc = "Add the 4-way split of images to define the different regions."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        binary.Run(src)
-
-        dst2.SetTo(1, binary.mats.mat(0))
-        dst2.SetTo(2, binary.mats.mat(1))
-        dst2.SetTo(3, binary.mats.mat(2))
-        dst2.SetTo(4, binary.mats.mat(3))
-
-        dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Bin4Way_Regions1 : Inherits VB_Algorithm
     Dim binary As New Binarize_Simple
     Public mats As New Mat_4Click
@@ -546,43 +516,6 @@ Public Class Bin4Way_Regions1 : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Bin4Way_SplitMean : Inherits VB_Algorithm
-    Dim binary As New Binarize_Simple
-    Public mats As New Mat_4Click
-    Public Sub New()
-        labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
-        desc = "Binarize an image and split it into quartiles using peaks."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-        binary.Run(gray)
-        Dim mask = binary.dst2.Clone
-
-        Static botColor As cv.Scalar, midColor As cv.Scalar, topColor As cv.Scalar
-        If task.heartBeat Then
-            midColor = binary.meanScalar(0)
-            topColor = cv.Cv2.Mean(gray, mask)(0)
-            botColor = cv.Cv2.Mean(gray, Not mask)(0)
-        End If
-
-        mats.mat(0) = gray.InRange(0, botColor)
-        mats.mat(1) = gray.InRange(botColor, midColor)
-        mats.mat(2) = gray.InRange(midColor, topColor)
-        mats.mat(3) = gray.InRange(topColor, 255)
-
-        mats.Run(empty)
-        dst2 = mats.dst2
-        dst3 = mats.dst3
-        labels(3) = mats.labels(3)
-    End Sub
-End Class
 
 
 
@@ -820,5 +753,77 @@ Public Class Bin4Way_RedCloud : Inherits VB_Algorithm
         dst2 = vbRebuildCells(sortedCells)
 
         If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " cells were identified and matched to the previous image"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Bin4Way_Regions : Inherits VB_Algorithm
+    Dim binary As New Bin4Way_SplitMean
+    Public classCount = 4 ' 4-way split 
+    Public Sub New()
+        rebuildMats()
+        labels = {"", "", "CV_8U version of dst3 with values ranging from 1 to 4", "Palettized version of dst2"}
+        desc = "Add the 4-way split of images to define the different regions."
+    End Sub
+    Private Sub rebuildMats()
+        dst2 = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
+        For i = 0 To binary.mats.mat.Count - 1
+            binary.mats.mat(i) = New cv.Mat(task.workingRes, cv.MatType.CV_8UC1, 0)
+        Next
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binary.Run(src)
+        If dst2.Width <> binary.mats.mat(0).Width Then rebuildMats()
+
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2.SetTo(1, binary.mats.mat(0))
+        dst2.SetTo(2, binary.mats.mat(1))
+        dst2.SetTo(3, binary.mats.mat(2))
+        dst2.SetTo(4, binary.mats.mat(3))
+
+        dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Bin4Way_SplitMean : Inherits VB_Algorithm
+    Public binary As New Binarize_Simple
+    Public mats As New Mat_4Click
+    Public Sub New()
+        labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
+        desc = "Binarize an image and split it into quartiles using peaks."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        binary.Run(gray)
+        Dim mask = binary.dst2.Clone
+
+        Static botColor As cv.Scalar, midColor As cv.Scalar, topColor As cv.Scalar
+        If task.heartBeat Then
+            midColor = binary.meanScalar(0)
+            topColor = cv.Cv2.Mean(gray, mask)(0)
+            botColor = cv.Cv2.Mean(gray, Not mask)(0)
+        End If
+
+        mats.mat(0) = gray.InRange(0, botColor)
+        mats.mat(1) = gray.InRange(botColor, midColor)
+        mats.mat(2) = gray.InRange(midColor, topColor)
+        mats.mat(3) = gray.InRange(topColor, 255)
+
+        mats.Run(empty)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
+        labels(3) = mats.labels(3)
     End Sub
 End Class
