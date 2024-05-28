@@ -205,15 +205,6 @@ Public Class OptionsGlobal
         maxCount.Text = CStr(MaxDepth.Value)
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
-    Private Sub OptionsAllAlgorithm_Click(sender As Object, e As EventArgs) Handles Me.Click
-        Me.BringToFront()
-    End Sub
-    Private Sub MinMaxDepth_Click(sender As Object, e As EventArgs) Handles MinMaxDepth.Click
-        Me.BringToFront()
-    End Sub
-    Private Sub GroupBox2_Click(sender As Object, e As EventArgs) Handles GroupBox2.Click
-        Me.BringToFront()
-    End Sub
     Private Sub GridWidthSlider_Scroll(sender As Object, e As EventArgs) Handles GridSize.Scroll
         If task IsNot Nothing Then task.optionsChanged = True
         ThreadGridSize.Text = CStr(GridSize.Value)

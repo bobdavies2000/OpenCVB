@@ -20,10 +20,4 @@ Public Class OptionsCheckbox
     Private Sub Box_CheckChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
-    Private Sub OptionsCheckbox_Click(sender As Object, e As EventArgs) Handles Me.Click
-        Me.BringToFront()
-    End Sub
-    Private Sub FlowLayoutPanel1_Click(sender As Object, e As EventArgs) Handles FlowLayoutPanel1.Click
-        Me.BringToFront()
-    End Sub
 End Class

@@ -10,7 +10,4 @@ Public Class OptionsCombo
         Next
         Box.SelectedIndex = 0
     End Sub
-    Private Sub OptionsCombo_Click(sender As Object, e As EventArgs) Handles Me.Click
-        Me.BringToFront()
-    End Sub
 End Class

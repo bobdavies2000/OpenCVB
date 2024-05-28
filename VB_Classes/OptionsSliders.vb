@@ -63,10 +63,4 @@ Public Class OptionsSliders
         FlowLayoutPanel1.Height = Me.Height - 65
         FlowLayoutPanel1.Width = Me.Width - 40
     End Sub
-    Private Sub OptionsSliders_Click(sender As Object, e As EventArgs) Handles Me.Click
-        Me.BringToFront()
-    End Sub
-    Private Sub FlowLayoutPanel1_Click(sender As Object, e As EventArgs) Handles FlowLayoutPanel1.Click
-        Me.BringToFront()
-    End Sub
 End Class
