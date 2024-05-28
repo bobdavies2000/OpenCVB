@@ -416,7 +416,7 @@ Public Class FeatureROI_LeftRightMatch : Inherits VB_Algorithm
         matchList.Clear()
         For Each roi In gather.rects
             If roi.X = 0 Then Continue For
-            Dim r = New cv.Rect(0, roi.Y, roi.X, roi.Height)
+            Dim r = New cv.Rect(roi.X, roi.Y, dst2.Width - roi.X, roi.Height)
             cv.Cv2.MatchTemplate(src(roi), task.rightView(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
             Dim mm = vbMinMax(correlationMat)
             If mm.maxVal >= options.correlationMin Then
@@ -459,5 +459,73 @@ Public Class FeatureROI_LeftRightMatch : Inherits VB_Algorithm
             dst1.Circle(mp1.p1, task.dotSize, task.highlightColor, -1, task.lineType)
             dst1.Circle(mp1.p2, task.dotSize, task.highlightColor, -1, task.lineType)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FeatureROI_LeftRightManual : Inherits VB_Algorithm
+    Dim gather As New FeatureROI_Basics
+    Dim matchList As New List(Of pointPair)
+    Dim clickPoint As cv.Point, picTag As Integer
+    Dim options As New Options_Features
+    Dim ptLeft As New List(Of cv.Point)
+    Dim ptRight As New List(Of cv.Point)
+    Public Sub New()
+        gOptions.GridSize.Value = 16
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Capture the above average standard deviation roi's for the left and right images."
+    End Sub
+    Public Sub setClickPoint(pt As cv.Point, _pictag As Integer)
+        clickPoint = pt
+        picTag = _pictag
+    End Sub
+    Private Function showRects(corr As List(Of Single), roi As cv.Rect, i As Integer) As String
+        Dim str As String = ""
+        Dim maxCorr = corr.Max
+        Dim index = corr.IndexOf(maxCorr)
+        str += "CoeffNormed max correlation = " + Format(maxCorr, fmt3) + " at offset " + CStr(index) + vbCrLf
+        dst3.Rectangle(New cv.Rect(index, roi.Y, roi.Width, roi.Height), task.highlightColor, task.lineWidth)
+        Return str
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        dst2 = src.Clone
+        dst3 = If(task.rightView.Channels <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
+
+        options.RunVB()
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.rightView.Channels <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        gather.Run(src)
+        labels = gather.labels
+
+        If gather.rects.Count = 0 Then Exit Sub
+        If task.mouseClickFlag Then setClickPoint(task.clickPoint, task.mousePicTag)
+        If clickPoint = newPoint Then setClickPoint(gather.rects(0).TopLeft, 2)
+        Dim gridIndex = task.gridMap.Get(Of Integer)(clickPoint.Y, clickPoint.X)
+        Dim roi = task.gridList(gridIndex)
+        dst2.Rectangle(roi, cv.Scalar.White, task.lineWidth)
+
+        Dim correlationMat As New cv.Mat
+        Dim corrs As New List(Of List(Of Single))
+        For i = 0 To 2
+            corrs.Add(New List(Of Single))
+        Next
+
+        For i = 0 To corrs.Count - 1
+            Dim corrType = Choose(i + 1, cv.TemplateMatchModes.CCorr, cv.TemplateMatchModes.CCoeff, cv.TemplateMatchModes.CCoeffNormed)
+            For j = 0 To roi.X - 1
+                Dim r = New cv.Rect(j, roi.Y, roi.Width, roi.Height)
+                cv.Cv2.MatchTemplate(src(roi), task.rightView(r), correlationMat, corrType)
+                corrs(i).Add(correlationMat.Get(Of Single)(0, 0))
+            Next
+        Next
+
+        If task.heartBeat Then strOut = showRects(corrs(2), roi, 2) Else showRects(corrs(2), roi, 2)
+
+        setTrueText(strOut, 1)
     End Sub
 End Class

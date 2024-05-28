@@ -685,6 +685,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(functionN
 	if algorithmName = "FeatureROI_ColorSplit" Then return new FeatureROI_ColorSplit
 	if algorithmName = "FeatureROI_Correlation" Then return new FeatureROI_Correlation
 	if algorithmName = "FeatureROI_LeftRight" Then return new FeatureROI_LeftRight
+	if algorithmName = "FeatureROI_LeftRightManual" Then return new FeatureROI_LeftRightManual
 	if algorithmName = "FeatureROI_LeftRightMatch" Then return new FeatureROI_LeftRightMatch
 	if algorithmName = "FeatureROI_LowStdev" Then return new FeatureROI_LowStdev
 	if algorithmName = "FeatureROI_LowStdevCorrelation" Then return new FeatureROI_LowStdevCorrelation
