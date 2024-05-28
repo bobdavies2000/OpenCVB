@@ -366,6 +366,7 @@ Public Class VBtask : Implements IDisposable
         callTrace.Add("Options_XYRanges") ' so calltrace is not nothing on initial call...
         gOptions = New OptionsGlobal
         redOptions = New OptionsRedCloud
+        task.cellMap = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
 
         grid = New Grid_Basics
         PixelViewer = New Pixel_Viewer

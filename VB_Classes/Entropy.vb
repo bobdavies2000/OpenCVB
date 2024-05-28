@@ -7,13 +7,14 @@ Public Class Entropy_Basics : Inherits VB_Algorithm
         desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim stdSize = 50
+        Dim stdSize = 30
         If task.drawRect = New cv.Rect Then
-            task.drawRect = New cv.Rect(50, 50, stdSize, stdSize) ' arbitrary rectangle
+            task.drawRect = New cv.Rect(30, 30, stdSize, stdSize) ' arbitrary rectangle
         End If
         If task.mouseClickFlag Then
             task.drawRect = validatePreserve(New cv.Rect(task.clickPoint.X, task.clickPoint.Y, stdSize, stdSize))
         End If
+        task.drawRect = validateRect(task.drawRect)
         If src.Channels = 3 Then
             entropy.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)(task.drawRect))
         Else
@@ -128,7 +129,7 @@ Public Class Entropy_Rectangle : Inherits VB_Algorithm
 
         If standalone Then
             If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then
-                task.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
+                task.drawRect = New cv.Rect(10, 10, 50, 50) ' arbitrary template to match
             End If
             src = src(task.drawRect)
         End If

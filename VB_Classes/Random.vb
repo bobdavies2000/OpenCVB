@@ -469,7 +469,7 @@ Public Class Random_StaticTV : Inherits VB_Algorithm
             sliders.setupTrackBar("Percentage of pixels to include noise", 0, 100, 20)
         End If
 
-        task.drawRect = New cv.Rect(100, 100, 50, 50)
+        task.drawRect = New cv.Rect(10, 10, 50, 50)
         labels(2) = "Draw anywhere to select a test region"
         labels(3) = "Resized selection rectangle in dst2"
         desc = "Imitate an old TV appearance using randomness."

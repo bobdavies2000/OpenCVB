@@ -492,6 +492,9 @@ Public Class Bin4Way_Regions : Inherits VB_Algorithm
     Public classCount = 4 ' 4-way split 
     Public Sub New()
         dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        For i = 0 To binary.mats.mat.Count - 1
+            binary.mats.mat(i) = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
+        Next
         labels = {"", "", "CV_8U version of dst3 with values ranging from 1 to 4", "Palettized version of dst2"}
         desc = "Add the 4-way split of images to define the different regions."
     End Sub

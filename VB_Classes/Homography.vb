@@ -20,7 +20,7 @@ Public Class Homography_Basics : Inherits VB_Algorithm
         ' cannot find a homography when less than 4...
         If corners1.Count >= 4 Or corners2.Count >= 4 Then
             Dim H = cv.Cv2.FindHomography(corners1, corners2, options.hMethod)
-            dst2 = src.WarpPerspective(H, src.Size)
+            If H.Width > 0 Then dst2 = src.WarpPerspective(H, src.Size)
         End If
     End Sub
 End Class

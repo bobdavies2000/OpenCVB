@@ -11,6 +11,7 @@ Public Class LinearRegression_Basics : Inherits VB_Algorithm
             x = New List(Of Single)({1, 2, 3, 4, 5})
             y = New List(Of Single)({2, 4, 5, 4, 5})
         End If
+        If x.Count = 0 Then Exit Sub ' nothing supplied - happens when the horizon is off the image.
 
         Dim meanX = x.Average()
         Dim meanY = y.Average()

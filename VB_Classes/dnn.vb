@@ -202,7 +202,7 @@ Public Class DNN_SuperRes : Inherits VB_Algorithm
     Public options As New Options_DNN
     Public dnn = New DnnSuperResImpl("fsrcnn", 4)
     Public Sub New()
-        task.drawRect = New cv.Rect(100, 100, 80, 60)
+        task.drawRect = New cv.Rect(10, 10, 20, 20)
         labels(2) = "Output of a resize using OpenCV"
         desc = "Get better super-resolution through a DNN"
     End Sub
