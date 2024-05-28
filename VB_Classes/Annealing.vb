@@ -48,7 +48,7 @@ Public Class Annealing_Basics_CPP : Inherits VB_Algorithm
         Open()
         desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim saveCityOrder = cityOrder.Clone()
         Dim hCityOrder = GCHandle.Alloc(cityOrder, GCHandleType.Pinned)
         Dim out As IntPtr = Annealing_Basics_Run(cPtr, hCityOrder.AddrOfPinnedObject, cityPositions.Length)
@@ -72,6 +72,7 @@ Public Class Annealing_Basics_CPP : Inherits VB_Algorithm
         If cPtr <> 0 Then cPtr = Annealing_Basics_Close(cPtr)
     End Sub
 End Class
+
 
 
 

@@ -628,6 +628,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(functionN
 	if algorithmName = "FeatureFlow_LucasKanade" Then return new FeatureFlow_LucasKanade
 	if algorithmName = "FeatureLeftRight_Basics" Then return new FeatureLeftRight_Basics
 	if algorithmName = "FeatureLeftRight_Grid" Then return new FeatureLeftRight_Grid
+	if algorithmName = "FeatureLeftRight_Input" Then return new FeatureLeftRight_Input
 	if algorithmName = "FeatureLeftRight_LeftRightPrep" Then return new FeatureLeftRight_LeftRightPrep
 	if algorithmName = "FeatureLess_Basics" Then return new FeatureLess_Basics
 	if algorithmName = "FeatureLess_Canny" Then return new FeatureLess_Canny

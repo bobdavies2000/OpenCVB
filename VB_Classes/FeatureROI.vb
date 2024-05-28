@@ -1,7 +1,9 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Runtime.InteropServices
+Imports cv = OpenCvSharp
 Public Class FeatureROI_Basics : Inherits VB_Algorithm
     Dim addw As New AddWeighted_Basics
     Public rects As New List(Of cv.Rect)
+    Public meanList As New List(Of Single)
     Public stdevList As New List(Of Single)
     Public stdevAverage As Single
     Public Sub New()
@@ -13,10 +15,12 @@ Public Class FeatureROI_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         dst1 = If(src.Channels <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
         stdevList.Clear()
+        meanList.Clear()
         Dim mean As cv.Scalar, stdev As cv.Scalar
         For Each roi In task.gridList
             cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)
             stdevList.Add(stdev(0))
+            meanList.Add(mean(0))
         Next
 
         stdevAverage = stdevList.Average
@@ -356,47 +360,6 @@ End Class
 
 
 
-
-
-
-'Public Class FeatureROI_CorrelationSearch : Inherits VB_Algorithm
-'    Dim gather As New FeatureROI_Basics
-'    Dim correlations As New List(Of Single)
-'    Public cameraMotion As Boolean
-'    Dim options As New Options_Features
-'    Public Sub New()
-'        findSlider("Feature Correlation Threshold").Value = 99
-'        desc = "Manage the features using correlation.  Find roi's on the heartbeat."
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-'        gather.Run(dst1)
-'        dst2 = gather.dst2
-
-'        Static lastImage As cv.Mat = dst1.Clone
-'        Static lastRects As New List(Of cv.Rect)(gather.rects)
-
-'        Dim correlationMat As New cv.Mat
-'        correlations.Clear()
-'        Dim motionCount As Integer
-'        For Each roi In gather.rects
-'            cv.Cv2.MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-'            Dim corr = correlationMat.Get(Of Single)(0, 0)
-'            If corr < options.correlationMin Then setTrueText(Format(corr, fmt1), roi.TopLeft)
-'            If corr < options.correlationMin Then motionCount += 1
-'        Next
-
-'        cameraMotion = motionCount / gather.rects.Count > 0.9
-'        labels(2) = "Camera Motion = " + CStr(cameraMotion)
-'        lastImage = dst1.Clone
-'    End Sub
-'End Class
-
-
-
-
-
-
 Public Class FeatureROI_LeftRight : Inherits VB_Algorithm
     Public gLeft As New FeatureROI_Basics
     Public gRight As New FeatureROI_Basics
@@ -422,64 +385,79 @@ End Class
 Public Class FeatureROI_LeftRightMatch : Inherits VB_Algorithm
     Dim gather As New FeatureROI_Basics
     Dim matchList As New List(Of pointPair)
-    Dim roiMatch As New List(Of cv.Rect)
-    Dim ptList As New List(Of cv.Point)
     Dim clickPoint As cv.Point, picTag As Integer
     Dim options As New Options_Features
-    Dim maxDisparity As Integer
+    Dim ptLeft As New List(Of cv.Point)
+    Dim ptRight As New List(Of cv.Point)
     Public Sub New()
+        gOptions.GridSize.Value = 16
         If standalone Then gOptions.displayDst1.Checked = True
         desc = "Capture the above average standard deviation roi's for the left and right images."
     End Sub
     Public Sub setClickPoint(pt As cv.Point, _pictag As Integer)
         clickPoint = pt
         picTag = _pictag
-        task.drawRect = task.gridList(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
-        task.drawRectUpdated = True
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        dst2 = src.Clone
+        dst3 = If(task.rightView.Channels <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
+
         options.RunVB()
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.rightView.Channels <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         gather.Run(src)
-        dst2 = gather.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         labels = gather.labels
 
-        'Dim index As Integer
-        'Dim roiList = gather.gRight.rects
-        'Dim correlationMat As New cv.Mat
-        'roiMatch.Clear()
-        'ptList.Clear()
-        'For Each roi In gather.gLeft.rects
-        '    Dim correlations As New List(Of Single)
-        '    Dim pt = roi.TopLeft
-        '    For index = index To roiList.Count - 1
-        '        If roiList(index).Y > pt.Y Then Exit For
-        '        cv.Cv2.MatchTemplate(task.leftView(roi), task.rightView(roiList(index)), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-        '        correlations.Add(correlationMat.Get(Of Single)(0, 0))
-        '    Next
-        '    If correlations.Count > 0 Then
-        '        Dim best = correlations.IndexOf(correlations.Max)
-        '        If correlations(best) >= options.correlationMin Then
-        '            matchList.Add(New pointPair(pt, roiList(best).TopLeft))
-        '            roiMatch.Add(roi)
-        '            ptList.Add(pt)
-        '        End If
-        '    End If
-        'Next
+        Dim correlationMat As New cv.Mat
+        Dim correlations As New List(Of Single)
+        ptLeft.Clear()
+        ptRight.Clear()
+        matchList.Clear()
+        For Each roi In gather.rects
+            If roi.X = 0 Then Continue For
+            Dim r = New cv.Rect(0, roi.Y, roi.X, roi.Height)
+            cv.Cv2.MatchTemplate(src(roi), task.rightView(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            Dim mm = vbMinMax(correlationMat)
+            If mm.maxVal >= options.correlationMin Then
 
-        'For Each mp In matchList
-        '    dst2.Circle(mp.p1, task.dotSize, task.highlightColor, -1)
-        '    dst3.Circle(mp.p1, task.dotSize, task.highlightColor, -1)
-        'Next
+                Dim matData(correlationMat.Cols) As Single
+                Marshal.Copy(correlationMat.Data, matData, 0, matData.Length)
 
-        'If task.mouseClickFlag Then setClickPoint(task.clickPoint, task.mousePicTag)
-        'If clickPoint = newPoint And matchList.Count > 0 Then setClickPoint(matchList(0).p1, 2)
-        'Dim indexClick = ptList.IndexOf(task.drawRect.TopLeft)
-        'dst1.SetTo(0)
-        'If indexClick >= 0 Then
-        '    Dim mp1 = matchList(indexClick)
-        '    dst1.Circle(mp1.p1, task.dotSize, task.highlightColor, -1, task.lineType)
-        '    dst1.Circle(mp1.p2, task.dotSize, task.highlightColor, -1, task.lineType)
-        'End If
+
+                Dim pt = New cv.Point(mm.minLoc.X, roi.TopLeft.Y)
+                matchList.Add(New pointPair(roi.TopLeft, pt))
+                ptLeft.Add(roi.TopLeft)
+                ptRight.Add(pt)
+                correlations.Add(correlationMat.Get(Of Single)(0, 0))
+            End If
+        Next
+
+        For Each mp In matchList
+            dst2.Circle(mp.p1, task.dotSize, task.highlightColor, -1, task.lineType)
+            Dim r = validateRect(New cv.Rect(mp.p1.X, mp.p1.Y, task.gridList(0).Width, task.gridList(0).Height))
+            dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
+            dst3.Circle(mp.p2, task.dotSize, task.highlightColor, -1, task.lineType)
+            r = validateRect(New cv.Rect(mp.p2.X, mp.p2.Y, task.gridList(0).Width, task.gridList(0).Height))
+            dst3.Rectangle(r, cv.Scalar.White, task.lineWidth)
+        Next
+
+        If matchList.Count = 0 Then Exit Sub
+        If task.mouseClickFlag Then setClickPoint(task.clickPoint, task.mousePicTag)
+        If clickPoint = newPoint Then setClickPoint(matchList(0).p1, 2)
+        Dim gridIndex = task.gridMap.Get(Of Integer)(clickPoint.Y, clickPoint.X)
+        Dim index = ptLeft.IndexOf(task.gridList(gridIndex).TopLeft)
+        If index < 0 Then
+            setTrueText("No corresponding point.  Be sure to click in dst2", 1)
+        Else
+            dst1.SetTo(0)
+            Dim mp1 = matchList(index)
+            Dim roi = task.gridList(gridIndex)
+            dst2(roi).CopyTo(dst1(roi))
+            Dim r = validateRect(New cv.Rect(mp1.p2.X, mp1.p2.Y, roi.Width, roi.Height))
+            dst3(r).CopyTo(dst1(r))
+            dst1.Circle(mp1.p1, task.dotSize, task.highlightColor, -1, task.lineType)
+            dst1.Circle(mp1.p2, task.dotSize, task.highlightColor, -1, task.lineType)
+        End If
     End Sub
 End Class

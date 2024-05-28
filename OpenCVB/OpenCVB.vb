@@ -241,7 +241,7 @@ Public Class OpenCVB
             End If
 
             If .fontInfo Is Nothing Then .fontInfo = New Font("Tahoma", 9)
-            If settings.algorithmGroup = "" Then settings.algorithmGroup = "<All VB.Net>"
+            If settings.algorithmGroup = "" Then settings.algorithmGroup = "<All VB.Net"
 
             If testAllRunning = False Then
                 Dim resStr = CStr(.workingRes.Width) + "x" + CStr(.workingRes.Height)
@@ -380,18 +380,32 @@ Public Class OpenCVB
 
         loadAlgorithmComboBoxes()
 
-        GroupName.Text = settings.algorithmGroup
-        If AvailableAlgorithms.Items.Count = 0 Then GroupName.Text = "<All VB.Net>"
-        If settings.algorithm Is Nothing Then
-            AvailableAlgorithms.SelectedIndex = 0
-            settings.algorithm = AvailableAlgorithms.Text
-        End If
-        If AvailableAlgorithms.Items.Contains(settings.algorithm) Then
-            AvailableAlgorithms.Text = settings.algorithm
+        If settings.algorithmGroup.Contains("<All ") Then
+            Dim searchStr = settings.algorithmGroup.Substring(0, InStr(settings.algorithmGroup, "("))
+            For i = 0 To 20
+                If groupNames(i).StartsWith(searchStr) Then
+                    GroupName.SelectedItem() = groupNames(i).Substring(0, InStr(groupNames(i), ",") - 1)
+                    Exit For
+                End If
+            Next
         Else
-            AvailableAlgorithms.SelectedIndex = 0
+            GroupName.Text = settings.algorithmGroup
         End If
-        jsonWrite()
+        If AvailableAlgorithms.Items.Count = 0 Then
+            MsgBox("There were no algorithms listed for the " + GroupName.Text + vbCrLf +
+                   "This usually indicates something has changed with " + vbCrLf + "UIindexer or UIGenerator")
+        Else
+            If settings.algorithm Is Nothing Then
+                AvailableAlgorithms.SelectedIndex = 0
+                settings.algorithm = AvailableAlgorithms.Text
+            End If
+            If AvailableAlgorithms.Items.Contains(settings.algorithm) Then
+                AvailableAlgorithms.Text = settings.algorithm
+            Else
+                AvailableAlgorithms.SelectedIndex = 0
+            End If
+            jsonWrite()
+        End If
 
         setWindowsVersion()
         fpsTimer.Enabled = True

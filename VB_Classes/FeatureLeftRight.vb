@@ -178,3 +178,132 @@ Public Class FeatureLeftRight_Grid : Inherits VB_Algorithm
         If task.heartBeat Then labels = match.labels
     End Sub
 End Class
+
+
+
+
+
+Public Class FeatureLeftRight_Input : Inherits VB_Algorithm
+    Dim ptLeft As New List(Of cv.Point)
+    Dim ptRight As New List(Of cv.Point)
+    Public mpList As New List(Of pointPair)
+    Public mpCorrelation As New List(Of Single)
+    Public selectedPoint As cv.Point, mpIndex
+    Dim clickPoint As cv.Point, picTag As Integer
+    Dim options As New Options_Features
+    Public Sub New()
+        labels(1) = "NOTE: matching right point is always to the left of the left point"
+        If standalone Then gOptions.displayDst1.Checked = True
+        findSlider("Feature Correlation Threshold").Value = 75
+        findSlider("Min Distance to next").Value = 1
+        gOptions.MaxDepth.Value = 20 ' up to 20 meters...
+        labels(3) = "Click near any feature to get more details on the matched pair of points."
+        desc = "Match the left and right features and allow the user to select a point to get more details."
+    End Sub
+    Public Sub setClickPoint(pt As cv.Point, _pictag As Integer)
+        clickPoint = pt
+        picTag = _pictag
+        task.drawRect = New cv.Rect(clickPoint.X - options.templatePad, clickPoint.Y - options.templatePad, options.templateSize, options.templateSize)
+        task.drawRectUpdated = True
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If ptLeft.Count = 0 Or ptRight.Count = 0 Then
+            setTrueText("Caller provides the ptLeft/ptRight points to use.", 1)
+            Exit Sub
+        End If
+
+        options.RunVB()
+
+        Dim prepList As New List(Of pointPair)
+        For Each p1 In ptLeft
+            For Each p2 In ptRight
+                If p1.Y = p2.Y Then prepList.Add(New pointPair(p1, p2))
+            Next
+        Next
+
+        Dim correlationmat As New cv.Mat
+        mpList.Clear()
+        mpCorrelation.Clear()
+        For i = 0 To prepList.Count - 1
+            Dim mpBase = prepList(i)
+            Dim correlations As New List(Of Single)
+            Dim tmpList As New List(Of pointPair)
+
+            For j = i To prepList.Count - 1
+                Dim mp = prepList(j)
+                If mp.p1.Y <> mpBase.p1.Y Then
+                    i = j
+                    Exit For
+                End If
+                Dim r1 = validateRect(New cv.Rect(mp.p1.X - options.templatePad, mp.p1.Y - options.templatePad,
+                                                      options.templateSize, options.templateSize))
+                Dim r2 = validateRect(New cv.Rect(mp.p2.X - options.templatePad, mp.p2.Y - options.templatePad,
+                                                  options.templateSize, options.templateSize))
+                cv.Cv2.MatchTemplate(task.leftView(r1), task.rightView(r2), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
+                correlations.Add(correlationmat.Get(Of Single)(0, 0))
+                tmpList.Add(mp)
+            Next
+
+            Dim maxCorrelation = correlations.Max
+            If maxCorrelation >= options.correlationMin Then
+                mpList.Add(tmpList(correlations.IndexOf(maxCorrelation)))
+                mpCorrelation.Add(maxCorrelation)
+            End If
+        Next
+
+        For Each mp In mpList
+            dst2.Circle(mp.p1, task.dotSize, task.highlightColor, -1, task.lineType)
+            dst3.Circle(mp.p2, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
+
+        If task.mouseClickFlag Then setClickPoint(task.clickPoint, task.mousePicTag)
+
+        setTrueText("Click near any feature to find the corresponding pair of features." + vbCrLf +
+                    "The correlation values in the lower left for the correlation of the left to the right views." + vbCrLf +
+                    "The dst2 shows features for the left view, dst3 shows features for the right view.", 1)
+        If clickPoint = newPoint And mpList.Count > 0 Then setClickPoint(mpList(0).p1, 2)
+        If mpList.Count > 0 Then
+            Static knn As New KNN_Core
+            knn.queries.Clear()
+            knn.queries.Add(task.clickPoint)
+
+            Dim mp As pointPair
+            knn.trainInput.Clear()
+            For Each mp In mpList
+                Dim pt = If(picTag = 2, mp.p1, mp.p2)
+                knn.trainInput.Add(New cv.Point2f(pt.X, pt.Y))
+            Next
+            knn.Run(Nothing)
+
+            dst1.SetTo(0)
+            Dim mpIndex = knn.result(0, 0)
+            mp = mpList(mpIndex)
+
+            dst2.Circle(mp.p1, task.dotSize + 4, cv.Scalar.Red, -1, task.lineType)
+            dst3.Circle(mp.p2, task.dotSize + 4, cv.Scalar.Red, -1, task.lineType)
+
+            Dim dspDistance = task.pcSplit(2).Get(Of Single)(mp.p1.Y, mp.p1.X)
+
+            Dim offset = mp.p1.X - mp.p2.X
+            strOut = Format(mpCorrelation(mpIndex), fmt3) + vbCrLf + Format(dspDistance, fmt3) + "m (from camera)" + vbCrLf +
+                            CStr(offset) + " Pixel difference"
+
+            For i = 0 To mpList.Count - 1
+                Dim pt = mpList(i).p1
+                setTrueText(Format(mpCorrelation(i), "0%"), pt)
+            Next
+
+            If task.heartBeat Then dst1.SetTo(0)
+            dst1.Circle(mp.p1, task.dotSize, task.highlightColor, -1, task.lineType)
+            dst1.Circle(mp.p2, task.dotSize, task.highlightColor, -1, task.lineType)
+
+            selectedPoint = New cv.Point(mp.p1.X, mpList(mpIndex).p1.Y + 10)
+            setTrueText(strOut, selectedPoint, 1)
+            If task.heartBeat Then
+                labels(2) = CStr(mpList.Count) + " features matched and confirmed with left/right image correlation coefficients"
+            End If
+        End If
+
+        labels(2) = CStr(mpList.Count) + " features were matched using correlation coefficients in the left and right images. White box is cell around click point."
+    End Sub
+End Class
