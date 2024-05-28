@@ -542,7 +542,7 @@ Public Class IMU_VerticalVerify : Inherits VB_Algorithm
         dst2 = src.Clone
 
         If standaloneTest() Then
-            Static linesVH As New Feature_LinesVH
+            Static linesVH As New FeatureLine_VH
             linesVH.Run(src)
             gCells = linesVH.gCells
         End If

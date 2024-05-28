@@ -57,7 +57,7 @@ End Class
 
 
 Public Class FeatureLine_VerticalVerify : Inherits VB_Algorithm
-    Dim linesVH As New Feature_LinesVH
+    Dim linesVH As New FeatureLine_VH
     Public verify As New IMU_VerticalVerify
     Public Sub New()
         desc = "Select a line or group of lines and track the result"
@@ -78,7 +78,7 @@ End Class
 
 
 
-Public Class Feature_LinesVH : Inherits VB_Algorithm
+Public Class FeatureLine_VH : Inherits VB_Algorithm
     Public gCells As New List(Of gravityLine)
     Dim match As New Match_tCell
     Dim gLines As New Line_GCloud
@@ -160,7 +160,7 @@ End Class
 
 
 
-Public Class Feature_Lines_Tutorial1 : Inherits VB_Algorithm
+Public Class FeatureLine_Tutorial1 : Inherits VB_Algorithm
     Dim lines As New Line_Basics
     Public Sub New()
         labels(3) = "The highlighted lines are also lines in 3D."
@@ -195,7 +195,7 @@ End Class
 
 
 
-Public Class Feature_Lines_Tutorial2 : Inherits VB_Algorithm
+Public Class FeatureLine_Tutorial2 : Inherits VB_Algorithm
     Dim lines As New Line_Basics
     Dim gMat As New IMU_GMatrix
     Public Sub New()
