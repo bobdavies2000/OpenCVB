@@ -504,15 +504,17 @@ Public Class Plane_Horizontals : Inherits VB_Algorithm
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"RGB image with highlights for likely floor or ceiling over X frames.",
-                  "Heatmap side view", "Single frame backprojection read areas in the heatmap",
+                  "Heatmap side view", "Single frame backprojection areas in the heatmap",
                   "Thresholded heatmap top view mask - flipped for backprojection"}
-        desc = "Use the solo points to isolate horizont surfaces - floor or ceiling or table tops."
+        desc = "Use the solo points to isolate horizontal surfaces - floor or ceiling or table tops."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         solo.Run(src)
         dst3 = solo.heat.sideframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total)
 
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, 0)
+        Dim tmp32f As New cv.Mat
+        solo.heat.dst1.ConvertTo(tmp32f, cv.MatType.CV_32FC1)
         solo.heat.dst1.CopyTo(dst1, dst3)
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, dst1, dst2, task.rangesSide)
