@@ -467,32 +467,22 @@ End Class
 
 
 
+
 Public Class FeatureROI_LeftRightManual : Inherits VB_Algorithm
     Dim gather As New FeatureROI_Basics
-    Dim matchList As New List(Of pointPair)
     Dim clickPoint As cv.Point, picTag As Integer
     Dim options As New Options_Features
-    Dim ptLeft As New List(Of cv.Point)
-    Dim ptRight As New List(Of cv.Point)
     Public Sub New()
         gOptions.GridSize.Value = 16
         If standalone Then gOptions.displayDst1.Checked = True
+        labels(2) = "Click the above average stdev roi's (the darker regions) to find corresponding roi in the right image."
         desc = "Capture the above average standard deviation roi's for the left and right images."
     End Sub
     Public Sub setClickPoint(pt As cv.Point, _pictag As Integer)
         clickPoint = pt
         picTag = _pictag
     End Sub
-    Private Function showRects(corr As List(Of Single), roi As cv.Rect, i As Integer) As String
-        Dim str As String = ""
-        Dim maxCorr = corr.Max
-        Dim index = corr.IndexOf(maxCorr)
-        str += "CoeffNormed max correlation = " + Format(maxCorr, fmt3) + " at offset " + CStr(index) + vbCrLf
-        dst3.Rectangle(New cv.Rect(index, roi.Y, roi.Width, roi.Height), task.highlightColor, task.lineWidth)
-        Return str
-    End Function
     Public Sub RunVB(src As cv.Mat)
-        dst2 = src.Clone
         dst3 = If(task.rightView.Channels <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
 
         options.RunVB()
@@ -500,6 +490,7 @@ Public Class FeatureROI_LeftRightManual : Inherits VB_Algorithm
         If task.rightView.Channels <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         gather.Run(src)
+        dst2 = gather.dst2
         labels = gather.labels
 
         If gather.rects.Count = 0 Then Exit Sub
@@ -510,22 +501,36 @@ Public Class FeatureROI_LeftRightManual : Inherits VB_Algorithm
         dst2.Rectangle(roi, cv.Scalar.White, task.lineWidth)
 
         Dim correlationMat As New cv.Mat
-        Dim corrs As New List(Of List(Of Single))
-        For i = 0 To 2
-            corrs.Add(New List(Of Single))
+        Dim corr As New List(Of Single)
+        For j = 0 To roi.X - 1
+            Dim r = New cv.Rect(j, roi.Y, roi.Width, roi.Height)
+            cv.Cv2.MatchTemplate(src(roi), task.rightView(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            corr.Add(correlationMat.Get(Of Single)(0, 0))
         Next
 
-        For i = 0 To corrs.Count - 1
-            Dim corrType = Choose(i + 1, cv.TemplateMatchModes.CCorr, cv.TemplateMatchModes.CCoeff, cv.TemplateMatchModes.CCoeffNormed)
-            For j = 0 To roi.X - 1
-                Dim r = New cv.Rect(j, roi.Y, roi.Width, roi.Height)
-                cv.Cv2.MatchTemplate(src(roi), task.rightView(r), correlationMat, corrType)
-                corrs(i).Add(correlationMat.Get(Of Single)(0, 0))
-            Next
-        Next
-
-        If task.heartBeat Then strOut = showRects(corrs(2), roi, 2) Else showRects(corrs(2), roi, 2)
-
-        setTrueText(strOut, 1)
+        If corr.Count = 0 Then
+            setTrueText("No corresponding roi found", 2)
+        Else
+            Dim maxCorr = corr.Max
+            Dim index = corr.IndexOf(maxCorr)
+            Dim rectRight = New cv.Rect(index, roi.Y, roi.Width, roi.Height)
+            Dim offset = roi.TopLeft.X - rectRight.TopLeft.X
+            If task.heartBeat Then
+                strOut = "CoeffNormed max correlation = " + Format(maxCorr, fmt3) + vbCrLf
+                strOut += "Left Mean = " + Format(gather.meanList(gridIndex), fmt3) + " Left stdev = " + Format(gather.stdevList(gridIndex), fmt3) + vbCrLf
+                Dim mean As cv.Scalar, stdev As cv.Scalar
+                cv.Cv2.MeanStdDev(dst3(rectRight), mean, stdev)
+                strOut += "Right Mean = " + Format(mean(0), fmt3) + " Right stdev = " + Format(stdev(0), fmt3) + vbCrLf
+                strOut += "Right rectangle is offset " + CStr(offset) + " pixels from the left image rectangle"
+            End If
+            dst3.Rectangle(rectRight, task.highlightColor, task.lineWidth)
+            dst1.SetTo(0)
+            dst1.Circle(roi.TopLeft, task.dotSize, task.highlightColor, -1, task.lineType)
+            dst1.Circle(rectRight.TopLeft, task.dotSize + 2, task.highlightColor, -1, task.lineType)
+            Dim pt = New cv.Point(rectRight.X, roi.Y + 5)
+            setTrueText(CStr(offset) + " pixel offset" + vbCrLf + "Larger = Right", pt, 1)
+            setTrueText(strOut, 1)
+            labels(3) = "Corresponding roi highlighted in yellow.  Average stdev = " + Format(gather.stdevAverage, fmt3)
+        End If
     End Sub
 End Class
