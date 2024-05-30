@@ -55,6 +55,9 @@ Public Class OptionsRedCloud
             Case "MYNT-EYE-D1000"
                 task.xRange = 3.5
                 task.yRange = 1.5
+            Case "Orbbec Gemini 335L"
+                task.xRange = 3.5
+                task.yRange = 1.5
         End Select
 
         XRangeSlider.Value = task.xRange * 100

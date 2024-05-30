@@ -56,6 +56,9 @@ Public Class OptionsDialog
             Case "MYNT-EYE-D1000"
                 OpenCVB.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                         True, True, True, False, False, False, False, False, False})
+            Case "Orbbec Gemini 335L"
+                OpenCVB.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                                                        True, True, True, False, False, False, False, False, False})
         End Select
     End Sub
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)

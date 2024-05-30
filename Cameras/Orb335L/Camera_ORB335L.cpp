@@ -1,149 +1,164 @@
 #include "../CameraDefines.hpp"
 #ifdef ORB335L
-#pragma warning(disable : 4996)
-#pragma comment(lib, "mynteye_depth.lib")
-#pragma comment(lib, "opencv_world343.lib") 
-#include <iostream>
+//#include "libobsensor/hpp/Pipeline.hpp"
+//#include "libobsensor/hpp/Error.hpp"
+//#include <libobsensor/ObSensor.hpp>
+#include <mutex>
+#include <thread>
 
-#define WITH_OPENCV
-#include <mynteyed\camera.h>
-#include <mynteyed\utils.h>
-#include "util/cam_utils.h"
-#include "util/counter.h"
+extern "C" {
+#include <stdlib.h>
+#include <libobsensor/h/Error.h>
+#include <libobsensor/h/Frame.h>
+#include <libobsensor/h/ObTypes.h>
+#include <libobsensor/h/Pipeline.h>
+#include <libobsensor/h/StreamProfile.h>
+#include <libobsensor/h/Device.h>
+#include <libobsensor/h/Sensor.h>
+}
 
+#include <opencv2/core.hpp>
+#include <opencv2/calib3d.hpp>
+#include "opencv2/imgproc.hpp"
+#include "opencv2/imgcodecs.hpp"
+#include "opencv2/highgui.hpp"
+#include <string>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <cmath>
+#include "PragmaLibs.h" 
 
-MYNTEYE_USE_NAMESPACE
 using namespace  cv;
 using namespace std;
 
-class CameraMyntD
+class CameraOrb335L
 {
-	 
-public:
-	Camera cam;
-	DeviceInfo dev_info;
-	uchar *left_color, *right_color;
-	int width, height;
-	Mat color, leftView, rightView, pointCloud, pcFullSize;
-	StreamIntrinsics intrinsicsBoth;
-private:
-public:
-	~CameraMyntD()
-	{
-		cam.Close();
+	void check_error(ob_error* error) {
+		if (error) {
+			printf("ob_error was raised: \n\tcall: %s(%s)\n", ob_error_function(error), ob_error_args(error));
+			printf("\tmessage: %s\n", ob_error_message(error));
+			printf("\terror type: %d\n", ob_error_exception_type(error));
+			ob_delete_error(error);
+			exit(EXIT_FAILURE);
+		}
 	}
-	CameraMyntD(int _width, int _height)
+public:
+	int width, height;
+	Mat leftColor, rightColor, color;
+	ob_pipeline* pipeline = nullptr;  // pipeline, used to open the color stream after connecting the device
+	ob_device* device = nullptr;  // device, obtained through the pipeline, and the corresponding sensor can be obtained through the device
+	~CameraOrb335L() {  }
+	CameraOrb335L(int _width, int _height)
 	{
 		width = _width;
 		height = _height;
-		DeviceInfo dev_info;
-		if (!util::select(cam, &dev_info))
-			std::cerr << "Error: select failed" << std::endl;
+		leftColor = Mat(Size(width, height), CV_8UC3);
+		rightColor = Mat(Size(width, height), CV_8UC3);
+		leftColor.setTo(0);
+		rightColor.setTo(0);
 
-		util::print_stream_infos(cam, dev_info.index);
+		//std::shared_ptr<ob::Config> config = std::make_shared<ob::Config>();
 
-		OpenParams params(dev_info.index);
-		params.stream_mode = StreamMode::STREAM_2560x720;
-		if (width == 640) params.stream_mode = StreamMode::STREAM_1280x480;
-		params.framerate = 30;
-		params.ir_intensity = 4;
-		params.color_mode = ColorMode::COLOR_RECTIFIED;
-		params.color_stream_format = StreamFormat::STREAM_YUYV;
-		params.depth_mode = DepthMode::DEPTH_RAW;
+		ob_error* error = NULL;     // Used to return SDK interface error information
+		pipeline = ob_create_pipeline(&error);
+		check_error(error);
 
-		cam.Open(params);
+		// Create config to configure the resolution, frame rate, and format of the color stream
+		ob_config* config = ob_create_config(&error);
+		check_error(error);
 
-		intrinsicsBoth = cam.GetStreamIntrinsics(params.stream_mode);
-		pcFullSize = Mat(height, width, CV_32FC3);
+		// Configure the color stream
+		ob_stream_profile* color_profile = nullptr;
+		ob_stream_profile_list* profiles = ob_pipeline_get_stream_profile_list(pipeline, OB_SENSOR_COLOR, &error);
+		if (error) {
+			printf("Current device is not support color sensor!\n");
+			exit(EXIT_FAILURE);
+		}
+
+		// Find the corresponding Profile according to the specified format, and choose the RGB888 format first
+		color_profile = ob_stream_profile_list_get_video_stream_profile(profiles, 1280, 720, OB_FORMAT_BGR, 60, &error);
+		// If the specified format is not found, search for the default Profile to open the stream
+		if (error) {
+			color_profile = ob_stream_profile_list_get_profile(profiles, OB_PROFILE_DEFAULT, &error);
+			ob_delete_error(error);
+			error = nullptr;
+		}
+
+		// enable stream
+		ob_config_enable_stream(config, color_profile, &error);
+		check_error(error);
+
+		// Get Device through Pipeline
+		device = ob_pipeline_get_device(pipeline, &error);
+		check_error(error);
+
+		// Start the pipeline with config
+		ob_pipeline_start_with_config(pipeline, config, &error);
+		check_error(error);
+
+		// Create a rendering display window
+		uint32_t width = ob_video_stream_profile_width(color_profile, &error);
+		check_error(error);
+		uint32_t height = ob_video_stream_profile_height(color_profile, &error);
+		check_error(error);
+
 	}
 
-	void waitForFrame()
+	bool waitForFrame()
 	{
-		left_color = right_color = 0;  // assume we don't get any images.
-		auto left = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
-		if (left.img) left_color = left.img->To(ImageFormat::COLOR_BGR)->ToMat().data;
-		
-		auto right = cam.GetStreamData(ImageType::IMAGE_RIGHT_COLOR);
-		if (right.img) right_color = right.img->To(ImageFormat::COLOR_BGR)->ToMat().data;
-		
-		auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
-		Mat depth;
-		if (image_depth.img) depth = image_depth.img->ToMat();
+		ob_error* error = NULL;     // Used to return SDK interface error information
+		ob_frame* frameset = nullptr;
+		while (frameset == nullptr) {
+			frameset = ob_pipeline_wait_for_frameset(pipeline, 100, &error);
+			check_error(error);
+			if (frameset != nullptr) {
+				// Get the color frame from the frameset
+				ob_frame* color_frame = ob_frameset_color_frame(frameset, &error);
+				check_error(error);
+				if (color_frame == nullptr) {
+					ob_delete_frame(frameset, &error);
+					check_error(error);
+				}
 
-		Point3f p;
-		CameraIntrinsics cam_in_ = intrinsicsBoth.left;
-		for (int m = 0; m < depth.rows; m++) {
-			for (int n = 0; n < depth.cols; n++) {
-				// get depth value at (m, n)
-				std::uint16_t d = depth.ptr<std::uint16_t>(m)[n];
-				// when d is equal 0 or 4096 means no depth
-				if (d == 0 || d == 4096) d = 0;
-
-				p.z = static_cast<float>(d) / 1000.0f;
-				p.x = (n - cam_in_.cx) * p.z / cam_in_.fx;
-				p.y = (m - cam_in_.cy) * p.z / cam_in_.fy;
-
-				pcFullSize.at<Point3f>(m, n) = p;
+				// Get the index of the frame
+				auto index = ob_frame_index(color_frame, &error);
+				check_error(error);
 			}
 		}
+		return true;
 	}
 }; 
+
 
 float acceleration[3];
 float gyro[3];
 double imuTimeStamp;
 
-extern "C" __declspec(dllexport) void MyntDtaskIMU(CameraMyntD * cPtr)
+extern "C" __declspec(dllexport) void ORBtaskIMU(CameraOrb335L * cPtr)
 {
-	if (cPtr->cam.IsMotionDatasSupported()) cPtr->cam.EnableMotionDatas(0);
-	util::Counter counter;
 
-	// Set motion data callback
-	cPtr->cam.SetMotionCallback([&counter](const MotionData& data) {
-		if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
-			counter.IncrAccelCount();
-			acceleration[0] = data.imu->accel[0] * 9.807; 
-			acceleration[1] = data.imu->accel[1] * 9.807;
-			acceleration[2] = data.imu->accel[2] * 9.807;
-			imuTimeStamp = data.imu->timestamp;
-			//imuTemperature = data.imu->temperature;
-		}
-		else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
-			counter.IncrGyroCount();
-			gyro[0] = data.imu->gyro[0];
-			gyro[1] = data.imu->gyro[1];
-			gyro[2] = data.imu->gyro[2];
-		}
-	});
-
-	while (1)
-	{
-		cPtr->cam.WaitForStream();
-		counter.Update();
-	}
 }
 
-extern "C" __declspec(dllexport) int* MyntDWaitFrame(CameraMyntD * cPtr, int w, int h) 
+extern "C" __declspec(dllexport) int* ORBWaitFrame(CameraOrb335L * cPtr, int w, int h) 
 { 
-	cPtr->waitForFrame();
-	if (cPtr->left_color == 0 || cPtr->right_color == 0 || cPtr->pcFullSize.data == 0) return 0;
-	cPtr->color = Mat(cPtr->height, cPtr->width, CV_8UC3, cPtr->left_color);
+	if (cPtr->waitForFrame()) return 0;
 
-	// resize(tmp, cPtr->color, Size(w, h));  // can't get it to link with resize - Mynt is setup with 3.43 version of OpenCV.
+	//// resize(tmp, cPtr->color, Size(w, h));  // can't get it to link with resize - Mynt is setup with 3.43 version of OpenCV.
 
-	cPtr->rightView = Mat(cPtr->height, cPtr->width, CV_8UC3, (int*) cPtr->right_color);
-	// resize(tmp, cPtr->rightView, Size(w, h));
+	//cPtr->rightView = Mat(cPtr->height, cPtr->width, CV_8UC3, (int*) cPtr->right_color);
+	//// resize(tmp, cPtr->rightView, Size(w, h));
 
-	// resize(cPtr->pcFullSize, cPtr->pointCloud, Size(w, h), INTER_NEAREST);
-	cPtr->pointCloud = cPtr->pcFullSize;
+	//// resize(cPtr->pcFullSize, cPtr->pointCloud, Size(w, h), INTER_NEAREST);
+	//cPtr->pointCloud = cPtr->pcFullSize;
 	return (int*)cPtr->color.data;
 }
-extern "C" __declspec(dllexport) int* MyntDOpen(int width, int height, int frameRate) { return (int*) new CameraMyntD(width, height);}
-extern "C" __declspec(dllexport) void MyntDClose(CameraMyntD * cPtr) { delete cPtr; }
-extern "C" __declspec(dllexport) int* MyntDIntrinsicsLeft(CameraMyntD * cPtr) { return (int*)&cPtr->intrinsicsBoth.left; }
-extern "C" __declspec(dllexport) int* MyntDRightImage(CameraMyntD * cPtr) {return (int*)cPtr->rightView.data;}
-extern "C" __declspec(dllexport) int* MyntDPointCloud(CameraMyntD * cPtr) { return (int*)cPtr->pointCloud.data; }
-extern "C" __declspec(dllexport) int* MyntDAcceleration(CameraMyntD * cPtr){return (int*)&acceleration;}
-extern "C" __declspec(dllexport) int* MyntDGyro(CameraMyntD * cPtr){return (int*)&gyro;}
-extern "C" __declspec(dllexport) double MyntDIMU_TimeStamp(CameraMyntD * cPtr){return imuTimeStamp;}
+extern "C" __declspec(dllexport) int* ORBOpen(int width, int height) { return (int*) new CameraOrb335L(width, height);}
+extern "C" __declspec(dllexport) void ORBClose(CameraOrb335L * cPtr) {  delete cPtr; }
+//extern "C" __declspec(dllexport) int* ORBIntrinsicsLeft(CameraOrb335L * cPtr) { return (int*)&cPtr->intrinsicsBoth.left; }
+//extern "C" __declspec(dllexport) int* ORBRightImage(CameraOrb335L * cPtr) {return (int*)cPtr->rightView.data;}
+//extern "C" __declspec(dllexport) int* ORBPointCloud(CameraOrb335L * cPtr) { return (int*)cPtr->pointCloud.data; }
+extern "C" __declspec(dllexport) int* ORBAcceleration(CameraOrb335L * cPtr){return (int*)&acceleration;}
+extern "C" __declspec(dllexport) int* ORBGyro(CameraOrb335L * cPtr){return (int*)&gyro;}
+extern "C" __declspec(dllexport) double ORBIMU_TimeStamp(CameraOrb335L * cPtr){return imuTimeStamp;}
 #endif

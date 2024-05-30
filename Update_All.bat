@@ -17,6 +17,10 @@ if not exist OpenCV (
 	cd ..\
 ) 
 
+if not exist OrbbecSDK (
+	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/orbbec/OrbbecSDK.git"
+) 
+
 if not exist Azure-Kinect-Sensor-SDK (
 	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/microsoft/Azure-Kinect-Sensor-SDK"
 )
@@ -46,6 +50,12 @@ if not exist librealsense\Build (
 	msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Release
 )
 
+if not exist OrbbecSDK\Build (
+	"C:\Program Files\CMake\bin\Cmake.exe" -S OrbbecSDK -B OrbbecSDK/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release; -DOpenCVDir=opencv/Build -DCMAKE_INSTALL_PREFIX=OrbbecSDK/Build
+	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Debug
+	msbuild.exe OrbbecSDK/Build/OrbbecSDK.sln /p:Configuration=Release
+)
+
 if not exist Azure-Kinect-Sensor-SDK\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -DOpenCV_DIR=OpenCV/Build -DCMAKE_BUILD_TYPE=Debug -S Azure-Kinect-Sensor-SDK -B Azure-Kinect-Sensor-SDK/Build
 	msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Debug
@@ -56,6 +66,8 @@ if not exist OakD\Build (
 	"C:\Program Files\CMake\bin\Cmake.exe" -S OakD -B OakD\Build -DOpenCV_DIR='%CD%/opencv/Build/'
 	msbuild.exe OakD/Build/Cam_Oak-D.sln /p:Configuration=Release
 )
+
+echo "Download: https://github.com/orbbec/OrbbecSDK/releases/OrbbecSDK_v1.10.5_win64.exe and install the Orbbec SDK in c:\Program Files\OrbbecSDK 1.10.5"
 
 echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
 echo "StereoLabs SDK install may also download and install CUDA if not already present."

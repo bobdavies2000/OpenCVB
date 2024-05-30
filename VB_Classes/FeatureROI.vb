@@ -463,20 +463,19 @@ End Class
 
 
 
-Public Class FeatureROI_LRClickAll : Inherits VB_Algorithm
+Public Class FeatureROI_LRAll : Inherits VB_Algorithm
     Dim gather As New FeatureROI_Basics
-    Dim clickPoint As cv.Point, picTag As Integer
     Dim options As New Options_Features
+    Public sortedRects As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
     Public Sub New()
         gOptions.GridSize.Value = 16
-        findSlider("Feature Correlation Threshold").Value = 90
+        findSlider("Feature Correlation Threshold").Value = 95
         labels(3) = "The highlighted roi's are those high stdev roi's with the highest correlation between left and right images."
         desc = "Find all the roi's with high stdev and high correlation between left and right images."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        dst0 = src.Clone
         dst3 = If(task.rightView.Channels <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
 
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -484,12 +483,11 @@ Public Class FeatureROI_LRClickAll : Inherits VB_Algorithm
 
         gather.Run(src)
         dst2 = gather.dst2
-        labels = gather.labels
 
         If gather.rects.Count = 0 Then Exit Sub
 
         Dim correlationMat As New cv.Mat
-        Dim sortedRects As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
+        sortedRects.Clear()
         For Each roi In gather.rects
             If roi.X = 0 Then Continue For
             Dim r = New cv.Rect(0, roi.Y, roi.X, roi.Height)

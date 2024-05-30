@@ -119,6 +119,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraOakD.vb" />
+    <Compile Include="CameraOrb.vb" />
     <Compile Include="jsonInterface.vb" />
     <Compile Include="InsertAlgorithm.Designer.vb">
       <DependentUpon>InsertAlgorithm.vb</DependentUpon>

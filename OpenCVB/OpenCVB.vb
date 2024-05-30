@@ -143,6 +143,7 @@ Public Class OpenCVB
             .cameraPresent = New List(Of Boolean)
             For i = 0 To cameraNames.Count - 1
                 Dim present = USBenumeration(cameraNames(i))
+                If cameraNames(i).Contains("Orbbec") Then present = USBenumeration("Orbbec Gemini 335L Depth Camera")
                 If cameraNames(i).Contains("Oak-D") Then present = USBenumeration("Movidius MyriadX")
                 If cameraNames(i).Contains("StereoLabs ZED 2/2i") Then present = USBenumeration("ZED 2i")
                 If present = False And cameraNames(i).Contains("StereoLabs ZED 2/2i") Then present = USBenumeration("ZED 2") ' older edition.
@@ -308,7 +309,7 @@ Public Class OpenCVB
 
         setupAlgorithmHistory()
 
-        Dim libraries = {"Cam_K4A.dll", "Cam_RS2.dll", "CPP_Classes.dll", "Cam_MyntD.dll", "Cam_Zed2.dll"}
+        Dim libraries = {"Cam_K4A.dll", "Cam_RS2.dll", "CPP_Classes.dll", "Cam_MyntD.dll", "Cam_Zed2.dll", "Cam_ORB335L.dll"}
         For i = 0 To libraries.Count - 1
             Dim dllName = libraries(i)
             Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
@@ -353,6 +354,9 @@ Public Class OpenCVB
 
         updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
         updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
+
+        updatePath(HomeDir.FullName + "OrbbecSDK\build\bin\Release\", "OrbbecSDK.dll")
+        updatePath(HomeDir.FullName + "OrbbecSDK\build\bin\Debug\", "OrbbecSDK camera support.")
 
         ' the K4A depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
@@ -1195,6 +1199,8 @@ Public Class OpenCVB
                 Return New CameraZED2(settings.workingRes, settings.captureRes, settings.cameraName)
             Case 5
                 Return New CameraMyntD(settings.workingRes, settings.captureRes, settings.cameraName)
+            Case 6
+                Return New CameraORB(settings.workingRes, settings.captureRes, settings.cameraName)
         End Select
         Return New CameraKinect(settings.workingRes, settings.captureRes, settings.cameraName)
     End Function
