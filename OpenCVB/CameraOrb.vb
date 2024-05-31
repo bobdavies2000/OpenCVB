@@ -64,8 +64,10 @@ Public Class CameraORB : Inherits Camera
             Dim cols = workingRes.Width, rows = workingRes.Height
             If workingRes = captureRes Then
                 mbuf(mbIndex).color = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, colorData).Clone
+                mbuf(mbIndex).pointCloud = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, ORBPointCloud(cPtr)).Clone
             Else
-                mbuf(mbIndex).color = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, colorData).Resize(workingRes)
+                mbuf(mbIndex).color = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, colorData).Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                'mbuf(mbIndex).pointCloud = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, colorData).Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
             'Dim tmp As cv.Mat = New cv.Mat(rows, cols, cv.MatType.CV_8U, ORBLeftRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             'mbuf(mbIndex).leftView = tmp * 4 - 35 ' improved brightness specific to RealSense
@@ -78,9 +80,9 @@ Public Class CameraORB : Inherits Camera
             '    mbuf(mbIndex).pointCloud = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, ORBPointCloud(cPtr)).Clone
             'End If
         End SyncLock
+        mbuf(mbIndex).pointCloud = New cv.Mat(workingRes, cv.MatType.CV_32FC3, 0)
         mbuf(mbIndex).leftView = New cv.Mat(workingRes, cv.MatType.CV_8UC3, 0)
         mbuf(mbIndex).rightView = New cv.Mat(workingRes, cv.MatType.CV_8UC3, 0)
-        mbuf(mbIndex).pointCloud = New cv.Mat(workingRes, cv.MatType.CV_32FC3, 0)
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()

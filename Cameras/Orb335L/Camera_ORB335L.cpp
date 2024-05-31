@@ -32,6 +32,7 @@ public:
 		width = _width;
 		height = _height;
 
+#if 0 
         // Configure which streams to enable or disable for the Pipeline by creating a Config
         std::shared_ptr<ob::Config> config = std::make_shared<ob::Config>();
 
@@ -54,6 +55,54 @@ public:
             exit(EXIT_FAILURE);
         }
 
+        std::shared_ptr<ob::StreamProfileList> depthProfileList;
+        OBAlignMode alignMode = ALIGN_DISABLE;
+        depthProfileList = pipe.getD2CDepthProfileList(colorProfile, ALIGN_D2C_HW_MODE);
+        if (depthProfileList->count() > 0) alignMode = ALIGN_D2C_HW_MODE;
+        pipe.enableFrameSync();
+        config->setAlignMode(alignMode);
+        std::shared_ptr<ob::StreamProfile> depthProfile;
+        try {
+            // Select the profile with the same frame rate as color.
+            if (colorProfile) {
+                depthProfile = depthProfileList->getVideoStreamProfile(width, height, OB_FORMAT_ANY, 60);
+            }
+        }
+        catch (...) {
+            depthProfile = nullptr;
+        }
+
+        if (!depthProfile) {
+            // If no matching profile is found, select the default profile.
+            depthProfile = depthProfileList->getProfile(OB_PROFILE_DEFAULT);
+        }
+#else
+        // Configure which streams to enable or disable for the Pipeline by creating a Config
+        std::shared_ptr<ob::Config> config = std::make_shared<ob::Config>();
+
+        // Get all stream profiles of the color camera, including stream resolution, frame rate, and frame format
+        auto colorProfiles = pipe.getStreamProfileList(OB_SENSOR_COLOR);
+        // Get the default color profile
+        //auto colorProfile = colorProfiles->getProfile(OB_PROFILE_DEFAULT);
+        auto colorProfile = colorProfiles->getVideoStreamProfile(width, height, OB_FORMAT_BGR, 60);
+        // Enable the color stream in the config
+        config->enableStream(colorProfile);
+
+        // Get all stream profiles of the depth camera, including stream resolution, frame rate, and frame format
+        auto depthProfiles = pipe.getStreamProfileList(OB_SENSOR_DEPTH);
+        // Get the default depth profile
+        //auto depthProfile = depthProfiles->getProfile(OB_PROFILE_DEFAULT);
+        auto depthProfile = depthProfiles->getVideoStreamProfile(width, height, OB_FORMAT_Y16, 30);
+        // Enable the depth stream in the config
+        config->enableStream(depthProfile);
+
+        /* Config depth align to color or color align to depth.
+        OBStreamType align_to_stream = OB_STREAM_DEPTH; */
+        OBStreamType align_to_stream = OB_STREAM_COLOR;
+        ob::Align    align(align_to_stream);
+
+#endif
+
         // Start the pipeline with config
         pipe.start(config);
 
@@ -65,8 +114,22 @@ public:
         {
             auto frameSet = pipe.waitForFrames(100);
             if (frameSet == nullptr) continue;
+
+
+
+            int t1 = frameSet->colorFrame()->dataSize();
+            int t2 = frameSet->colorFrame()->width();
+
+            auto dFrame = frameSet->depthFrame();
+            if (dFrame != nullptr)
+            {
+                int t3 = dFrame->dataSize();
+                int t4 = dFrame->width();
+            }
+
+
             colorData = (int *) frameSet->colorFrame()->data();
-            auto _depthFrame = frameSet->depthFrame();
+            //pcData = (int*) frameSet->pointsFrame()->data();
             auto _pcFrame = frameSet->pointsFrame();
             auto _keftFrame = frameSet->pointsFrame();
             auto _rightFrame = frameSet->pointsFrame();
@@ -95,7 +158,7 @@ extern "C" __declspec(dllexport) int* ORBOpen(int width, int height) { return (i
 extern "C" __declspec(dllexport) void ORBClose(CameraOrb335L * cPtr) { cPtr->pipe.stop(); delete cPtr; }
 //extern "C" __declspec(dllexport) int* ORBIntrinsicsLeft(CameraOrb335L * cPtr) { return (int*)&cPtr->intrinsicsBoth.left; }
 extern "C" __declspec(dllexport) int* ORBRightImage(CameraOrb335L * cPtr) {return (int*)cPtr->rightData;}
-extern "C" __declspec(dllexport) int* ORBPointCloud(CameraOrb335L * cPtr) { return (int*)cPtr->pcData; }
+extern "C" __declspec(dllexport) int* ORBPointCloud(CameraOrb335L * cPtr) { return cPtr->pcData; }
 extern "C" __declspec(dllexport) int* ORBAcceleration(CameraOrb335L * cPtr){return (int*)&acceleration;}
 extern "C" __declspec(dllexport) int* ORBGyro(CameraOrb335L * cPtr){return (int*)&gyro;}
 extern "C" __declspec(dllexport) double ORBIMU_TimeStamp(CameraOrb335L * cPtr){return imuTimeStamp;}
