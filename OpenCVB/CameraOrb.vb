@@ -1,8 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Module ORB_Module
-    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBWaitForFrame(cPtr As IntPtr, w As Integer,
-                                                                                                                 h As Integer) As IntPtr
+    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBWaitForFrame(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBRightImage(cPtr As IntPtr) As IntPtr
     End Function
@@ -48,7 +47,7 @@ Public Class CameraORB : Inherits Camera
 
         If cPtr = 0 Then Exit Sub
 
-        Dim colorData = ORBWaitForFrame(cPtr, workingRes.Width, workingRes.Height)
+        Dim colorData = ORBWaitForFrame(cPtr)
 
         'Dim accelFrame = ORBAccel(cPtr)
         'If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
@@ -62,33 +61,40 @@ Public Class CameraORB : Inherits Camera
 
         SyncLock cameraLock
             Dim cols = workingRes.Width, rows = workingRes.Height
-            If workingRes = captureRes Then
-                mbuf(mbIndex).color = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, colorData).Clone
-                mbuf(mbIndex).pointCloud = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, ORBPointCloud(cPtr)).Clone
-            Else
-                If colorData <> 0 Then
-                    mbuf(mbIndex).color = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, colorData).
-                                                     Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
-                End If
+            If colorData <> 0 Then mbuf(mbIndex).color = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, colorData).Clone
 
-                Dim pcData = ORBPointCloud(cPtr)
-                If pcData <> 0 Then
-                    mbuf(mbIndex).pointCloud = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, pcData).
-                                                          Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest) * 0.001
-                End If
+            Dim pcData = ORBPointCloud(cPtr)
+            If pcData <> 0 Then mbuf(mbIndex).pointCloud = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, pcData) * 0.001
 
-                Dim leftData = ORBLeftImage(cPtr)
-                If leftData <> 0 Then
-                    mbuf(mbIndex).leftView = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, leftData).
-                                                          Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
-                End If
+            Dim leftData = ORBLeftImage(cPtr)
+            mbuf(mbIndex).leftView = New cv.Mat(rows, cols, cv.MatType.CV_8U, leftData).Clone
 
-                Dim rightData = ORBRightImage(cPtr)
-                If rightData <> 0 Then
-                    mbuf(mbIndex).rightView = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, rightData).
-                                                         Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
-                End If
-            End If
+            Dim rightData = ORBRightImage(cPtr)
+            mbuf(mbIndex).rightView = New cv.Mat(rows, cols, cv.MatType.CV_8U, rightData).Clone
+            'Else
+            '    If colorData <> 0 Then
+            '        mbuf(mbIndex).color = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, colorData).
+            '                                         Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            '    End If
+
+            '    Dim pcData = ORBPointCloud(cPtr)
+            '    If pcData <> 0 Then
+            '        mbuf(mbIndex).pointCloud = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, pcData).
+            '                                              Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest) * 0.001
+            '    End If
+
+            '    Dim leftData = ORBLeftImage(cPtr)
+            '    If leftData <> 0 Then
+            '        mbuf(mbIndex).leftView = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, leftData).
+            '                                              Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            '    End If
+
+            '    Dim rightData = ORBRightImage(cPtr)
+            '    If rightData <> 0 Then
+            '        mbuf(mbIndex).rightView = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, rightData).
+            '                                             Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            '    End If
+            'End If
             'Dim tmp As cv.Mat = New cv.Mat(rows, cols, cv.MatType.CV_8U, ORBLeftRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             'mbuf(mbIndex).leftView = tmp * 4 - 35 ' improved brightness specific to RealSense
             'tmp = New cv.Mat(rows, cols, cv.MatType.CV_8U, ORBRightRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -101,8 +107,6 @@ Public Class CameraORB : Inherits Camera
             'End If
         End SyncLock
 
-        mbuf(mbIndex).leftView = New cv.Mat(workingRes, cv.MatType.CV_8UC3, 0)
-        mbuf(mbIndex).rightView = New cv.Mat(workingRes, cv.MatType.CV_8UC3, 0)
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()

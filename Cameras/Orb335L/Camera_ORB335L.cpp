@@ -32,47 +32,38 @@ public:
 	{
 		width = _width;
 		height = _height;
+        int fps = 5;
 
         // Configure which streams to enable or disable for the Pipeline by creating a Config
         std::shared_ptr<ob::Config> config = std::make_shared<ob::Config>();
-
-        // Get all stream profiles of the color camera, including stream resolution, frame rate, and frame format
-        auto colorProfiles = pipe.getStreamProfileList(OB_SENSOR_COLOR);
-        // Get the default color profile
-        auto colorProfile = colorProfiles->getVideoStreamProfile(width, height, OB_FORMAT_BGR, 60);
-        // Enable the color stream in the config
+        auto profiles = pipe.getStreamProfileList(OB_SENSOR_COLOR);
+        auto colorProfile = profiles->getVideoStreamProfile(width, height, OB_FORMAT_BGR, fps);
         config->enableStream(colorProfile);
 
-        // Get all stream profiles of the depth camera, including stream resolution, frame rate, and frame format
+
         auto depthProfiles = pipe.getStreamProfileList(OB_SENSOR_DEPTH);
-        // Get the default depth profile
-        auto depthProfile = depthProfiles->getVideoStreamProfile(width, height, OB_FORMAT_Y16, 30);
-        // Enable the depth stream in the config
+        auto depthProfile = depthProfiles->getVideoStreamProfile(width, height, OB_FORMAT_Y16, fps);
         config->enableStream(depthProfile);
 
-        OBStreamType align_to_stream = OB_STREAM_COLOR;
-        ob::Align    align(align_to_stream);
-
-
         // It does not appear that orbbec allows collecting left/right and color.  This is a mistake if true.
-        // 
-        //auto irLeftProfiles = pipe.getStreamProfileList(OB_SENSOR_IR_LEFT);
-        //try {
-        //    auto irLeftProfile = irLeftProfiles->getVideoStreamProfile(width, height, OB_FORMAT_Y8, 30);
-        //    config->enableStream(irLeftProfile->as<ob::VideoStreamProfile>());
-        //}
-        //catch (...) {
-        //    std::cout << "IR(Left) stream not found!" << std::endl;
-        //}
+         
+        auto irLeftProfiles = pipe.getStreamProfileList(OB_SENSOR_IR_LEFT);
+        try {
+            auto irLeftProfile = irLeftProfiles->getVideoStreamProfile(width, height, OB_FORMAT_Y8, fps);
+            config->enableStream(irLeftProfile->as<ob::VideoStreamProfile>());
+        }
+        catch (...) {
+            std::cout << "IR(Left) stream not found!" << std::endl;
+        }
 
-        //auto irRightProfiles = pipe.getStreamProfileList(OB_SENSOR_IR_RIGHT);
-        //try {
-        //    auto irRightProfile = irRightProfiles->getVideoStreamProfile(width, height, OB_FORMAT_Y8, 30);
-        //    config->enableStream(irRightProfile->as<ob::VideoStreamProfile>());
-        //}
-        //catch (...) {
-        //    std::cout << "IR(Right) stream not found!" << std::endl;
-        //}
+        auto irRightProfiles = pipe.getStreamProfileList(OB_SENSOR_IR_RIGHT);
+        try {
+            auto irRightProfile = irRightProfiles->getVideoStreamProfile(width, height, OB_FORMAT_Y8, fps);
+            config->enableStream(irRightProfile->as<ob::VideoStreamProfile>());
+        }
+        catch (...) {
+            std::cout << "IR(Right) stream not found!" << std::endl;
+        }
 
 
 
@@ -102,26 +93,28 @@ public:
             auto frameSet = pipe.waitForFrames(100);
             if (frameSet == nullptr) continue;
 
-            //auto lFrame = frameSet->getFrame(OB_FRAME_IR_LEFT);
-            //auto rFrame = frameSet->getFrame(OB_FRAME_IR_RIGHT);
-            //if (lFrame != nullptr) leftData = (int*)lFrame->data();
-            //if (rFrame != nullptr) rightData = (int*)rFrame->data();
+            auto lFrame = frameSet->getFrame(OB_FRAME_IR_LEFT);
+            auto rFrame = frameSet->getFrame(OB_FRAME_IR_RIGHT);
+            if (lFrame != nullptr) 
+                leftData = (int*)lFrame->data();
+            if (rFrame != nullptr) 
+                rightData = (int*)rFrame->data();
 
             auto cFrame = frameSet->colorFrame();
             auto dFrame = frameSet->depthFrame();
             if (cFrame != nullptr) colorData = (int*)frameSet->colorFrame()->data();
-            //if (dFrame != nullptr)
-            //{
-            //    //auto newFrame = align.process(frameSet);
-            //    //auto newFrameSet = newFrame->as<ob::FrameSet>();
-            //    //cFrame = newFrameSet->colorFrame();
-            //    //dFrame = newFrameSet->depthFrame();
+            if (dFrame != nullptr)
+            {
+                auto newFrame = align.process(frameSet);
+                auto newFrameSet = newFrame->as<ob::FrameSet>();
+                cFrame = newFrameSet->colorFrame();
+                dFrame = newFrameSet->depthFrame();
 
-            //    static float depthValueScale = dFrame->getValueScale();
-            //    pointCloud.setPositionDataScaled(depthValueScale);
-            //    pointCloud.setCreatePointFormat(OB_FORMAT_POINT);
-            //    pcData = (int*)pointCloud.process(frameSet)->data();
-            //}
+                static float depthValueScale = dFrame->getValueScale();
+                pointCloud.setPositionDataScaled(depthValueScale);
+                pointCloud.setCreatePointFormat(OB_FORMAT_POINT);
+                pcData = (int*)pointCloud.process(newFrameSet)->data();
+            }
             break;
         }
 
@@ -137,14 +130,17 @@ extern "C" __declspec(dllexport) void ORBtaskIMU(CameraOrb335L * cPtr)
 
 }
 
-extern "C" __declspec(dllexport) int* ORBWaitForFrame(CameraOrb335L * cPtr, int w, int h)
+extern "C" __declspec(dllexport) int* ORBWaitForFrame(CameraOrb335L * cPtr)
 { 
 	if (cPtr->waitForFrame() == false) return 0;
 
 	return cPtr->colorData;
 }
 extern "C" __declspec(dllexport) int* ORBOpen(int width, int height) { return (int*) new CameraOrb335L(width, height);}
-extern "C" __declspec(dllexport) void ORBClose(CameraOrb335L * cPtr) { cPtr->pipe.stop(); delete cPtr; }
+extern "C" __declspec(dllexport) void ORBClose(CameraOrb335L * cPtr) 
+{ 
+    cPtr->pipe.stop(); delete cPtr; 
+}
 //extern "C" __declspec(dllexport) int* ORBIntrinsicsLeft(CameraOrb335L * cPtr) { return (int*)&cPtr->intrinsicsBoth.left; }
 extern "C" __declspec(dllexport) int* ORBLeftImage(CameraOrb335L * cPtr) { return cPtr->leftData; }
 extern "C" __declspec(dllexport) int* ORBRightImage(CameraOrb335L * cPtr) { return cPtr->rightData; }
