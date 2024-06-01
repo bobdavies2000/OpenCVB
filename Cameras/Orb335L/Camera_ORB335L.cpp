@@ -27,6 +27,7 @@ public:
 	int width, height;
 	int *leftData, *rightData, *colorData, *pcData;
     OBCalibrationParam param;
+    OBCameraParam cameraParam;
     ~CameraOrb335L() {  }
 	CameraOrb335L(int _width, int _height)
 	{
@@ -76,6 +77,8 @@ public:
             pipe.start(config);
         }
         catch (...) {}  param = pipe.getCalibrationParam(config);
+
+        cameraParam = pipe.getCameraParam();
 	}
 
 	bool waitForFrame()
@@ -141,7 +144,10 @@ extern "C" __declspec(dllexport) void ORBClose(CameraOrb335L * cPtr)
 { 
     cPtr->pipe.stop(); delete cPtr; 
 }
-//extern "C" __declspec(dllexport) int* ORBIntrinsicsLeft(CameraOrb335L * cPtr) { return (int*)&cPtr->intrinsicsBoth.left; }
+extern "C" __declspec(dllexport) int* ORBIntrinsics(CameraOrb335L * cPtr) 
+{ 
+    return (int*)&cPtr->cameraParam;
+}
 extern "C" __declspec(dllexport) int* ORBLeftImage(CameraOrb335L * cPtr) { return cPtr->leftData; }
 extern "C" __declspec(dllexport) int* ORBRightImage(CameraOrb335L * cPtr) { return cPtr->rightData; }
 extern "C" __declspec(dllexport) int* ORBPointCloud(CameraOrb335L * cPtr) { return cPtr->pcData; }
