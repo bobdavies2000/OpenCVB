@@ -84,6 +84,9 @@ Public Class OptionsDialog
         If cameraName.StartsWith("Azure Kinect 4K") Then
             workingResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
         End If
+        If cameraName.StartsWith("Orbbec Gemini 335L") Then
+            workingResRadio(resolutionList.IndexOf("640x480 - Full resolution    ")).Checked = True
+        End If
     End Sub
     Public Sub OptionsDialog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Static radioButtonsPresent = False

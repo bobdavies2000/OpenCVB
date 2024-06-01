@@ -46,31 +46,18 @@ public:
         auto depthProfile = depthProfiles->getVideoStreamProfile(width, height, OB_FORMAT_Y16, fps);
         config->enableStream(depthProfile);
 
-        // It does not appear that orbbec allows collecting left/right and color.  This is a mistake if true.
-         
         auto irLeftProfiles = pipe.getStreamProfileList(OB_SENSOR_IR_LEFT);
-        try {
-            auto irLeftProfile = irLeftProfiles->getVideoStreamProfile(width, height, OB_FORMAT_Y8, fps);
-            config->enableStream(irLeftProfile->as<ob::VideoStreamProfile>());
-        }
-        catch (...) {
-            std::cout << "IR(Left) stream not found!" << std::endl;
-        }
+        auto irLeftProfile = irLeftProfiles->getVideoStreamProfile(width, height, OB_FORMAT_Y8, fps);
+        config->enableStream(irLeftProfile->as<ob::VideoStreamProfile>());
 
         auto irRightProfiles = pipe.getStreamProfileList(OB_SENSOR_IR_RIGHT);
-        try {
-            auto irRightProfile = irRightProfiles->getVideoStreamProfile(width, height, OB_FORMAT_Y8, fps);
-            config->enableStream(irRightProfile->as<ob::VideoStreamProfile>());
-        }
-        catch (...) {
-            std::cout << "IR(Right) stream not found!" << std::endl;
-        }
-
+        auto irRightProfile = irRightProfiles->getVideoStreamProfile(width, height, OB_FORMAT_Y8, fps);
+        config->enableStream(irRightProfile->as<ob::VideoStreamProfile>());
 
 
 
         // just hit "Continue" if a break occurs here.  It doesn't happen with the Orbbec examples but running under VB.Net seems to be a problem.
-        // This will happen whenever OpenCVB.exe is compiled with "Native Code debugging" enabled. (Properties/Debug) 
+        // This will happen whenever OpenCVB is compiled with "Native Code debugging" enabled. (See Properties/Debug for OpenCVB project) 
         // It does NOT happen when native code debugging is disabled whether debug or release.
         // Since the default is to turn off native code debugging, it should normally work.
         try {
