@@ -9,7 +9,7 @@ Module ORB_Module
     End Function
     <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBLeftImage(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBintrinsics(cPtr As IntPtr) As IntPtr
+    <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBIntrinsics(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_ORB335L.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function ORBPointCloud(cPtr As IntPtr) As IntPtr
     End Function
@@ -35,13 +35,13 @@ Public Class CameraORB : Inherits Camera
 
         cPtr = ORBOpen(captureRes.Width, captureRes.Height)
 
-        'Dim intrin = ORBintrinsics(cPtr)
-        'Dim intrinInfo(4 - 1) As Single
-        'Marshal.Copy(intrin, intrinInfo, 0, intrinInfo.Length)
-        'cameraInfo.ppx = intrinInfo(0)
-        'cameraInfo.ppy = intrinInfo(1)
-        'cameraInfo.fx = intrinInfo(2)
-        'cameraInfo.fy = intrinInfo(3)
+        Dim intrin = ORBintrinsics(cPtr)
+        Dim intrinInfo(4 - 1) As Single
+        Marshal.Copy(intrin, intrinInfo, 0, intrinInfo.Length)
+        cameraInfo.ppx = intrinInfo(0)
+        cameraInfo.ppy = intrinInfo(1)
+        cameraInfo.fx = intrinInfo(2)
+        cameraInfo.fy = intrinInfo(3)
     End Sub
     Public Sub GetNextFrame(workingRes As cv.Size)
 

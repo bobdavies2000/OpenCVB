@@ -28,12 +28,18 @@ public:
 	int *leftData, *rightData, *colorData, *pcData;
     OBCalibrationParam param;
     OBCameraParam cameraParam;
+    std::shared_ptr<ob::Sensor> gyroSensor = nullptr;
+    std::shared_ptr<ob::Sensor> accelSensor = nullptr;
+    std::mutex printerMutex;
+    ob::Context ctx;
     ~CameraOrb335L() {  }
 	CameraOrb335L(int _width, int _height)
 	{
 		width = _width;
 		height = _height;
         int fps = 5;
+        auto devList = ctx.queryDeviceList();
+        auto dev = devList->getDevice(0);
 
         // Configure which streams to enable or disable for the Pipeline by creating a Config
         std::shared_ptr<ob::Config> config = std::make_shared<ob::Config>();
@@ -53,6 +59,12 @@ public:
         auto irRightProfiles = pipe.getStreamProfileList(OB_SENSOR_IR_RIGHT);
         auto irRightProfile = irRightProfiles->getVideoStreamProfile(width, height, OB_FORMAT_Y8, fps);
         config->enableStream(irRightProfile->as<ob::VideoStreamProfile>());
+
+        gyroSensor = dev->getSensorList()->getSensor(OB_SENSOR_GYRO);
+        auto gyroProfile = profiles->getProfile(OB_PROFILE_DEFAULT);
+        
+        accelSensor = dev->getSensorList()->getSensor(OB_SENSOR_ACCEL);
+        auto imuProfile = profiles->getProfile(OB_PROFILE_DEFAULT);
 
 
 
@@ -115,10 +127,6 @@ public:
 float acceleration[3];
 float gyro[3];
 double imuTimeStamp;
-extern "C" __declspec(dllexport) void ORBtaskIMU(CameraOrb335L * cPtr)
-{
-
-}
 
 extern "C" __declspec(dllexport) int* ORBWaitForFrame(CameraOrb335L * cPtr)
 { 
@@ -138,7 +146,7 @@ extern "C" __declspec(dllexport) int* ORBIntrinsics(CameraOrb335L * cPtr)
 extern "C" __declspec(dllexport) int* ORBLeftImage(CameraOrb335L * cPtr) { return cPtr->leftData; }
 extern "C" __declspec(dllexport) int* ORBRightImage(CameraOrb335L * cPtr) { return cPtr->rightData; }
 extern "C" __declspec(dllexport) int* ORBPointCloud(CameraOrb335L * cPtr) { return cPtr->pcData; }
-extern "C" __declspec(dllexport) int* ORBAcceleration(CameraOrb335L * cPtr){return (int*)&acceleration;}
+extern "C" __declspec(dllexport) int* ORBAccel(CameraOrb335L * cPtr){return (int*)&acceleration;}
 extern "C" __declspec(dllexport) int* ORBGyro(CameraOrb335L * cPtr){return (int*)&gyro;}
 extern "C" __declspec(dllexport) double ORBIMU_TimeStamp(CameraOrb335L * cPtr){return imuTimeStamp;}
 #endif
