@@ -20,13 +20,13 @@
 using namespace  cv;
 using namespace std;
 
-#if 0
+#if 1
 class CameraOrb335L
 {
 public:
-	ob::Pipeline pipe;
-	int width, height;
-	int *leftData, *rightData, *colorData, *pcData;
+    ob::Pipeline pipe;
+    int width, height;
+    int* leftData, * rightData, * colorData, * pcData;
     OBCalibrationParam param;
     OBCameraParam cameraParam;
     std::shared_ptr<ob::Sensor> gyroSensor = nullptr;
@@ -36,11 +36,12 @@ public:
     float gyroVal[3] = { 0, 0, 0 };
     bool firstPass = true;
     ob::Context ctx;
+    std::mutex frameMutex;
     ~CameraOrb335L() {  }
-	CameraOrb335L(int _width, int _height)
-	{
-		width = _width;
-		height = _height;
+    CameraOrb335L(int _width, int _height)
+    {
+        width = _width;
+        height = _height;
         int fps = 5;
         auto devList = ctx.queryDeviceList();
         auto dev = devList->getDevice(0);
@@ -50,7 +51,6 @@ public:
         auto profiles = pipe.getStreamProfileList(OB_SENSOR_COLOR);
         auto colorProfile = profiles->getVideoStreamProfile(width, height, OB_FORMAT_BGR, fps);
         config->enableStream(colorProfile);
-
 
         auto depthProfiles = pipe.getStreamProfileList(OB_SENSOR_DEPTH);
         auto depthProfile = depthProfiles->getVideoStreamProfile(width, height, OB_FORMAT_Y16, fps);
@@ -79,40 +79,38 @@ public:
         catch (...) {}  param = pipe.getCalibrationParam(config);
 
         cameraParam = pipe.getCameraParam();
-	}
+    }
 
-	bool waitForFrame()
-	{
-        static OBStreamType align_to_stream = OB_STREAM_COLOR; 
+    bool waitForFrame()
+    {
+        static OBStreamType align_to_stream = OB_STREAM_COLOR;
         static ob::Align align(align_to_stream);
         static ob::PointCloudFilter pointCloud;
         static OBCameraParam cameraParam = pipe.getCameraParam();
         pointCloud.setCameraParam(cameraParam);
 
+        static std::map<OBFrameType, std::shared_ptr<ob::Frame>> imuFrameMap;
         if (firstPass)
         {
             firstPass = false;
-            auto profiles = gyroSensor->getStreamProfileList();
-            auto profile = profiles->getProfile(OB_PROFILE_DEFAULT);
-            auto gyroFrame = profile->as<ob::GyroFrame>();
-            //auto gyroFrame = (std::shared_ptr<ob::Frame>)profile->as<ob::GyroFrame>();
-            //auto val = gyroFrame->value();
-            //gyroSensor->start(profile, [](std::shared_ptr<ob::Frame> frame) {
-            //    auto timeStamp = frame->timeStamp();
-            //    auto index = frame->index();
-            //    auto gyroFrame = frame->as<ob::GyroFrame>();
-            //    if (gyroFrame != nullptr) {
-            //        gyroFrame->value();
-            //    }
-            //    });
-            //accelSensor->start(profile, [](std::shared_ptr<ob::Frame> frame) {
-            //    auto timeStamp = frame->timeStamp();
-            //    auto index = frame->index();
-            //    auto accelFrame = frame->as<ob::AccelFrame>();
-            //    if (accelFrame != nullptr) {
-            //        auto value = accelFrame->value();
-            //    }
-            //    });
+            auto device = pipe.getDevice();
+            auto imuPipeline = std::make_shared<ob::Pipeline>(device);
+            std::mutex imuFrameMutex;
+            auto accelProfiles = imuPipeline->getStreamProfileList(OB_SENSOR_ACCEL);
+            auto gyroProfiles = imuPipeline->getStreamProfileList(OB_SENSOR_GYRO);
+            auto accelProfile = accelProfiles->getProfile(OB_PROFILE_DEFAULT);
+            auto gyroProfile = gyroProfiles->getProfile(OB_PROFILE_DEFAULT);
+            std::shared_ptr<ob::Config> imuConfig = std::make_shared<ob::Config>();
+            imuConfig->enableStream(accelProfile);
+            imuConfig->enableStream(gyroProfile);
+            imuPipeline->start(imuConfig, [&](std::shared_ptr<ob::FrameSet> frameset) {
+                auto count = frameset->frameCount();
+                for (size_t i = 0; i < count; i++) {
+                    auto                         frame = frameset->getFrame(i);
+                    std::unique_lock<std::mutex> lk(imuFrameMutex);
+                    imuFrameMap[frame->type()] = frame;
+                }
+                });
         }
         pcData = colorData = leftData = rightData = 0;
         while (1)
@@ -145,9 +143,9 @@ public:
             break;
         }
 
-		return true;
-	}
-}; 
+        return true;
+    }
+};
 
 float acceleration[3];
 float gyro[3];
