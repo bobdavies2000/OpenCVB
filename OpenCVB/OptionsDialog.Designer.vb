@@ -55,7 +55,7 @@ Partial Class OptionsDialog
         Me.GroupBox2.Controls.Add(Me.fontInfo)
         Me.GroupBox2.Controls.Add(Me.Button1)
         Me.GroupBox2.Controls.Add(Me.showConsoleLog)
-        Me.GroupBox2.Location = New System.Drawing.Point(24, 510)
+        Me.GroupBox2.Location = New System.Drawing.Point(24, 445)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(962, 165)
         Me.GroupBox2.TabIndex = 5
@@ -149,7 +149,7 @@ Partial Class OptionsDialog
         Me.GroupBox5.Controls.Add(Me.SnapCustom)
         Me.GroupBox5.Controls.Add(Me.Snap320)
         Me.GroupBox5.Controls.Add(Me.Snap640)
-        Me.GroupBox5.Location = New System.Drawing.Point(24, 405)
+        Me.GroupBox5.Location = New System.Drawing.Point(24, 340)
         Me.GroupBox5.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBox5.Name = "GroupBox5"
         Me.GroupBox5.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
@@ -223,7 +223,7 @@ Partial Class OptionsDialog
         Me.Resolutions.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.Resolutions.Location = New System.Drawing.Point(24, 184)
         Me.Resolutions.Name = "Resolutions"
-        Me.Resolutions.Size = New System.Drawing.Size(821, 213)
+        Me.Resolutions.Size = New System.Drawing.Size(821, 148)
         Me.Resolutions.TabIndex = 15
         '
         'Label4
@@ -249,7 +249,7 @@ Partial Class OptionsDialog
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoSize = True
-        Me.ClientSize = New System.Drawing.Size(1008, 698)
+        Me.ClientSize = New System.Drawing.Size(1008, 616)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.Resolutions)

@@ -1,29 +1,36 @@
-# Recent Changes – May 2024
+# Recent Changes – June 2024
 
--   Over 2000 algorithms are included, averaging 32 lines of code per algorithm.
--   Last month’s horizon and gravity vectors are now faster and more robust.
-    -   See last month’s update at the bottom of this document.
--   RedCloud cell stats and depth histogram can be displayed at any time.
-    -   See the RedCloud option “Display Cell Stats” whenever RedCloud is active.
-    -   An example of “Display Cell Stats" is shown below in “Bin3Way_RedCloud”.
--   LinearRegression.vb – simple linear regression – was added with several demos.
--   RedCloud output can be natural colors – computed from the cell’s RGB data.
--   RedCloud 3D cell data can be shown in OpenGL – see OpenGL_ColorBin4Way.
--   Global options control whether RedCloud cells are highlighted and identified.
--   Features_LeftRight finds “good” features the left and right images.
--   FeatureLess_Basics was added to the list of possible inputs to RedCloud.
-    -   Each region without features is isolated and identified to RedCloud.
--   Cell_Generate reuses cell features for exact matches – less work, same result.
--   Cells with motion are now identified providing another way to detect motion.
+-   Over 2000 algorithms are included, averaging 31 lines of code per algorithm.
+-   Support for the Orbbec Gemini 335L camera was added but there are limitations.
+    -   Only 5 frames per second to keep depth in sync with RGB image.
+    -   Supported image sizes are 1280x720 and 640x480.
+        -   Other image sizes are present but not commonly used.
+    -   OpenCVB will work with any camera that has RGB, cloud, left, and right images.
+    -   IMU is needed as well to find gravity and orient the image in 3D.
+    -   There are now 7 cameras supported in OpenCVB.
+
+        ![A screenshot of a computer Description automatically generated](media/87473380f7ef7669aac59b0e2568b664.png)
+
+        **OpenCVB Global Settings:** *There are 7 cameras supported in OpenCVB. Cameras that were not found in initialization are disabled. Switching to another camera will change the resolutions that are available.*
+
+    -   The Orbbec SDK is automatically installed with the Update_All.bat install run.
+    -   It is a small thrill to see all 2000 algorithms suddenly working with the 335L.
+-   Python_Classes added to separate it from the VB_Classes
+    -   Default \<Group Name\> is now \<All VB.Net\> to get all the VB.Net classes
+    -   New group names were added: “\<All Python\>” and “\<All C\#\>” classes.
+-   The code to find and track features was reorganized. New features added for ROI’s.
+    -   Feature_Basics now uses correlation coefficients to track RGB features.
+-   The color8U algorithms is the new name for algorithms converting RGB to CV_8U.
+-   New modules for C\# interface were added but are currently not used.
 -   A log of previous changes is included at the bottom of this document.
 
-![A collage of images of a person in a room Description automatically generated](media/a18bd533a52c859d195439cb4fabc6f1.png)
+![A screenshot of a computer Description automatically generated](media/c8c7bce7087510e62ffc160f82e12e07.png)
 
-**Bin4Way_Basics:** *The objective of this algorithm is to break down the various brightness levels. The lower left frame shows 4 levels – darkest to lightest. The upper right frame shows a grid layout of the selected brightness – darkest to lightest. The currently selected frame contains all the pixels that are the darkest. The lower right frame breaks down each of the 4 brightness levels in the selected grid element (highlighted with a rectangle) in the upper right frame. The number of pixels, contours, brightness level, and a measure of volatility are displayed with each breakdown of the grid element in the lower right frame.*
+**LeftRight_Basics:** *This output shows all 4 images provided by the Orbbec Gemini 335L camera – RGB, depth, left, and right images. The depth image is the 3rd channel of the point cloud data colorized by OpenCVB’s* Depth_Colorizer_CPP *algorithm. The point cloud is shown below.*
 
-![A collage of images of a room Description automatically generated](media/41d5af9a9a6b649c81cbb837cb95dab4.png)
+![](media/0f3868fe21a923bc219e81fb71aaabec.gif)
 
-**Bin3Way_RedCloud:** *RedCloud is run against the darkest and the lightest frames in the Bin3Way_Basics algorithm. While there is more unclassified space in the lower right image, the cells identified are more consistently present than in other RedCloud algorithms that attempt to classify each pixel in the image. This algorithm produces fewer cells but they are more robust and stable. This sample output also shows the output for the global options to “Display Cell Stats”. The upper right frame shows the histogram of the depth for the selected cell while the lower right frame shows the statistics for the selected cell.*
+**OpenGL_Basics:** *This output shows the Orbbec Gemini 335L camera while toggling the checkbox to adjust the 3D point cloud with and without correcting for gravity. The same algorithm to adjust for gravity works with all the cameras supported by OpenCVB. Similarly, all 2000+ algorithms in OpenCVB work for the 335L camera after adding an interface to the Orbbec SDK.*
 
 # Introduction
 
@@ -102,8 +109,9 @@ Here are the pre-install requirements:
     -   Mynt Eye D 1000
     -   Intel RealSense D455 – the latest in the series of Intel RealSense cameras
     -   Luxonis Oak-D Pro or Oak-D Series 2. (Oak-D Lite will work but has no IMU.)
+    -   Orbbec 335L
 
-All of the above cameras have an IMU (Inertial Measurement Unit.) The Microsoft Kinect for Azure has the best depth accuracy but requires more power and is not as portable as StereoLabs or Intel cameras. All the cameras use USB-C to provide data to the host platform. A brief comparison of each camera is provided in Addendum 1.
+All of the above cameras have an IMU (Inertial Measurement Unit.) The Microsoft Kinect for Azure has the best depth accuracy but requires more power and is not as portable as StereoLabs or Intel cameras. All the cameras use USB-C to provide data to the host platform.
 
 Download and install the following software. Each is free and easily downloaded for Windows 10:
 
@@ -123,12 +131,15 @@ Installation is not as simple as opening the OpenCVB.sln file but it is not much
     -   The OpenCVB tree will occupy about 25Gb of disk space – plan accordingly. The process can take 30-50 minutes.
 -   Download the Kinect4Azure proprietary binaries (needed even if you don’t have the Microsoft camera):
     -   <https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md>
+-   Download and install the OrbbecSDK proprietary binaries.
+    -   https://github.com/orbbec/OrbbecSDK/releases
 -   Open the OpenCVB.sln and set the “OpenCVB” project as the “Startup Project” if not already set.
 -   The “Update_All.bat” script can be used to update each component downloaded by OpenCVB:
     -   Remove **“\<OpenCVB Dir\>/OakD/Build”** to update the Oak-D camera support
     -   Remove **“\<OpenCVB Dir\>/librealsense”** to update the Realsense camera support
     -   Remove **“\<OpenCVB Dir\>/Azure-Kinect-Sensor-SDK”** to update Microsoft Kinect for Azure support
     -   Remove **“\<OpenCVB Dir\>/opencv”** to update both OpenCV and OpenCV contributions.
+    -   Remove **“\<OpenCVB Dir\>/OrbbecSDK”** to update the latest Orbbec code.
 
 Why are there no official releases of OpenCVB? The repository is the release. The infrastructure is solid at this point (the exceptions are rare and transitory.) Any problems that arise are easily avoided because they will be confined to an algorithm. OpenCVB regression tests are continuously running so even individual algorithm problems will be apparent shortly. If any problem is encountered, download the latest and if it is still there, submit a pull request.
 
@@ -141,8 +152,10 @@ Support for some optional cameras can be added.
     -   NOTE: StereoLabs requires an NVIDIA card with CUDA.
 -   For the Mynt Eye D 1000 camera, download the SDK from:
     -   <https://mynt-eye-d-sdk.readthedocs.io/en/latest/sdk/install_win_exe.html>
+-   For the Orbbec 335L camera, the Update_All.bat file has downloaded and prepared the SDK but it also necessary to download the proprietary binaries from here:
+    -   https://github.com/orbbec/OrbbecSDK/releases
 
-Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for StereoLabs Zed 2 or Mynt Eye D 1000 support.
+Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for StereoLabs Zed 2 or Mynt Eye D 1000 or Orbbec 335L support.
 
 # Trouble-Shooting a New Install
 
@@ -153,6 +166,7 @@ Some typical problems with new installations:
         -   \<OpenCVB Dir\>/Azure-Kinect-Sensor-SDK/Build/K4A.sln
         -   \<OpenCVB Dir\>/librealsense/Build/librealsense2.sln
         -   \<OpenCVB Dir\>/opencv/Build/opencv.sln
+        -   \<OpenCVB Dir\>/OrbbecSDK/Build/ OrbbecSDK.sln
     -   Review the “Path” – both global and user values – and remove older Visual Studio installations.
     -   Figure out which component is failing:
         -   Review the output of the “Update_All.bat” run. Which component didn’t complete?
@@ -1326,3 +1340,30 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A collage of images of a room Description automatically generated](media/36150778314078d8e16dfcde622cec21.png)
 
 **Line_Gravity:** *The bottom right image shows all the lines detected in the image. The bottom left image shows the vertical lines in yellow and the horizontal lines in red. The vertical lines are aligned to the gravity vector and the horizontal lines are aligned with the horizon vector. The method to find the gravity vector is to locate two points where the X-values in the point cloud transition from negative to positive. Similarly, the horizon vector is defined by 2 points where the Y-values in the point cloud transition from negative to positive. Because the point cloud is aligned with the color image, the horizon and gravity vectors are defined in the image coordinate system. The camera is deliberately tilted for this example but both vectors move as the camera moves.*
+
+# Recent Changes – May 2024
+
+-   Over 2000 algorithms are included, averaging 32 lines of code per algorithm.
+-   Last month’s horizon and gravity vectors are now faster and more robust.
+    -   See last month’s update at the bottom of this document.
+-   RedCloud cell stats and depth histogram can be displayed at any time.
+    -   See the RedCloud option “Display Cell Stats” whenever RedCloud is active.
+    -   An example of “Display Cell Stats" is shown below in “Bin3Way_RedCloud”.
+-   LinearRegression.vb – simple linear regression – was added with several demos.
+-   RedCloud output can be natural colors – computed from the cell’s RGB data.
+-   RedCloud 3D cell data can be shown in OpenGL – see OpenGL_ColorBin4Way.
+-   Global options control whether RedCloud cells are highlighted and identified.
+-   Features_LeftRight finds “good” features the left and right images.
+-   FeatureLess_Basics was added to the list of possible inputs to RedCloud.
+    -   Each region without features is isolated and identified to RedCloud.
+-   Cell_Generate reuses cell features for exact matches – less work, same result.
+-   Cells with motion are now identified providing another way to detect motion.
+-   A log of previous changes is included at the bottom of this document.
+
+![A collage of images of a person in a room Description automatically generated](media/a18bd533a52c859d195439cb4fabc6f1.png)
+
+**Bin4Way_Basics:** *The objective of this algorithm is to break down the various brightness levels. The lower left frame shows 4 levels – darkest to lightest. The upper right frame shows a grid layout of the selected brightness – darkest to lightest. The currently selected frame contains all the pixels that are the darkest. The lower right frame breaks down each of the 4 brightness levels in the selected grid element (highlighted with a rectangle) in the upper right frame. The number of pixels, contours, brightness level, and a measure of volatility are displayed with each breakdown of the grid element in the lower right frame.*
+
+![A collage of images of a room Description automatically generated](media/41d5af9a9a6b649c81cbb837cb95dab4.png)
+
+**Bin3Way_RedCloud:** *RedCloud is run against the darkest and the lightest frames in the Bin3Way_Basics algorithm. While there is more unclassified space in the lower right image, the cells identified are more consistently present than in other RedCloud algorithms that attempt to classify each pixel in the image. This algorithm produces fewer cells but they are more robust and stable. This sample output also shows the output for the global options to “Display Cell Stats”. The upper right frame shows the histogram of the depth for the selected cell while the lower right frame shows the statistics for the selected cell.*
