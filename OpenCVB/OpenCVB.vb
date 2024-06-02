@@ -1199,7 +1199,7 @@ Public Class OpenCVB
             Case 5
                 Return New CameraMyntD(settings.workingRes, settings.captureRes, settings.cameraName)
             Case 6
-                Return New CameraORB(settings.workingRes, settings.workingRes, settings.cameraName)
+                Return New CameraORB(settings.workingRes, settings.captureRes, settings.cameraName)
         End Select
         Return New CameraKinect(settings.workingRes, settings.captureRes, settings.cameraName)
     End Function
