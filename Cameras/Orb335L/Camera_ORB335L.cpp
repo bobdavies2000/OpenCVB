@@ -75,7 +75,6 @@ public:
         // It does NOT happen when native code debugging is disabled whether debug or release.
         // Since the default is to turn off native code debugging, it should normally work.
         pipe.start(config);
-
         cameraParam = pipe.getCameraParam();
     }
 
@@ -87,6 +86,8 @@ public:
         static OBCameraParam cameraParam = pipe.getCameraParam();
         pointCloud.setCameraParam(cameraParam);
 
+        static std::vector<std::shared_ptr<ob::Frame>> gyroFrames;
+        static std::mutex gyroFrameMutex;
         if (firstPass)
         {
             firstPass = false;
@@ -98,6 +99,8 @@ public:
                 auto gyroFrame = frame->as<ob::GyroFrame>();
                 if (gyroFrame != nullptr) {
                     auto value = gyroFrame->value();
+                    std::unique_lock<std::mutex> lk(gyroFrameMutex);
+                    gyroFrames.push_back(frame);
                 }
                 });
         }
@@ -128,6 +131,14 @@ public:
                 pointCloud.setPositionDataScaled(depthValueScale);
                 pointCloud.setCreatePointFormat(OB_FORMAT_POINT);
                 pcData = (int*)pointCloud.process(newFrameSet)->data();
+            }
+            {
+                std::unique_lock<std::mutex> lock(frameMutex);
+                auto val = gyroFrames.back()->as<ob::GyroFrame>()->value();
+                gyroVal[0] = val.x;
+                gyroVal[1] = val.y;
+                gyroVal[2] = val.z;
+                gyroFrames.clear();
             }
             break;
         }
