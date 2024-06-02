@@ -385,16 +385,18 @@ Public Class OpenCVB
 
         If settings.algorithmGroup.Contains("<All ") Then
             Dim searchStr = settings.algorithmGroup.Substring(0, InStr(settings.algorithmGroup, "("))
-            If searchStr = "" Then searchStr = "("
             For i = 0 To Math.Min(20, groupNames.Count)
                 If groupNames(i).StartsWith(searchStr) Then
-                    GroupName.SelectedItem() = groupNames(i).Substring(0, InStr(groupNames(i), ",") - 1)
+                    GroupName.SelectedItem() = groupNames(i).Substring(0, InStr(groupNames(i), ">") - 1) + ">"
                     Exit For
                 End If
             Next
         Else
             GroupName.Text = settings.algorithmGroup
         End If
+
+        If GroupName.SelectedItem() Is Nothing Then GroupName.SelectedItem() = groupNames(0)
+
         If AvailableAlgorithms.Items.Count = 0 Then
             MsgBox("There were no algorithms listed for the " + GroupName.Text + vbCrLf +
                    "This usually indicates something has changed with " + vbCrLf + "UIindexer or UIGenerator")
