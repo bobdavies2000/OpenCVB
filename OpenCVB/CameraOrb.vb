@@ -96,6 +96,8 @@ Public Class CameraORB : Inherits Camera
                                                          Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
             End If
+            mbuf(mbIndex).leftView = mbuf(mbIndex).rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            mbuf(mbIndex).rightView = mbuf(mbIndex).rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End SyncLock
 
         MyBase.GetNextFrameCounts(IMU_FrameTime)
