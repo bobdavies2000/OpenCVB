@@ -29,8 +29,11 @@ public:
     OBCalibrationParam param;
     OBCameraParam cameraParam;
     std::shared_ptr<ob::Sensor> gyroSensor = nullptr;
+    const std::shared_ptr<ob::StreamProfile> gyroProfile;
     std::shared_ptr<ob::Sensor> accelSensor = nullptr;
-    std::mutex printerMutex;
+    float acceleration[3] = { 0, 0, 0 };
+    float gyroVal[3] = { 0, 0, 0 };
+    bool firstPass = true;
     ob::Context ctx;
     ~CameraOrb335L() {  }
 	CameraOrb335L(int _width, int _height)
@@ -61,10 +64,7 @@ public:
         config->enableStream(irRightProfile->as<ob::VideoStreamProfile>());
 
         gyroSensor = dev->getSensorList()->getSensor(OB_SENSOR_GYRO);
-        auto gyroProfile = profiles->getProfile(OB_PROFILE_DEFAULT);
-        
         accelSensor = dev->getSensorList()->getSensor(OB_SENSOR_ACCEL);
-        auto imuProfile = profiles->getProfile(OB_PROFILE_DEFAULT);
 
 
 
@@ -89,6 +89,29 @@ public:
         static OBCameraParam cameraParam = pipe.getCameraParam();
         pointCloud.setCameraParam(cameraParam);
 
+        if (firstPass)
+        {
+            firstPass = false;
+            auto profiles = gyroSensor->getStreamProfileList();
+            auto profile = profiles->getProfile(OB_PROFILE_DEFAULT);
+            gyroSensor->start(profile, [](std::shared_ptr<ob::Frame> frame) {
+                auto timeStamp = frame->timeStamp();
+                auto index = frame->index();
+                auto gyroFrame = frame->as<ob::GyroFrame>();
+                if (gyroFrame != nullptr) {
+                    auto value = gyroFrame->value();
+                    return value;
+                }
+                });
+            //accelSensor->start(profile, [](std::shared_ptr<ob::Frame> frame) {
+            //    auto timeStamp = frame->timeStamp();
+            //    auto index = frame->index();
+            //    auto accelFrame = frame->as<ob::AccelFrame>();
+            //    if (accelFrame != nullptr) {
+            //        auto value = accelFrame->value();
+            //    }
+            //    });
+        }
         pcData = colorData = leftData = rightData = 0;
         while (1)
         {
@@ -97,13 +120,13 @@ public:
 
             auto lFrame = frameSet->getFrame(OB_FRAME_IR_LEFT);
             auto rFrame = frameSet->getFrame(OB_FRAME_IR_RIGHT);
-            if (lFrame != nullptr) 
-                leftData = (int*)lFrame->data();
-            if (rFrame != nullptr) 
-                rightData = (int*)rFrame->data();
+            if (lFrame != nullptr) leftData = (int*)lFrame->data();
+            if (rFrame != nullptr) rightData = (int*)rFrame->data();
 
             auto cFrame = frameSet->colorFrame();
             auto dFrame = frameSet->depthFrame();
+            auto timeStamp = frameSet->timeStamp();
+
             if (cFrame != nullptr) colorData = (int*)frameSet->colorFrame()->data();
             if (dFrame != nullptr)
             {
