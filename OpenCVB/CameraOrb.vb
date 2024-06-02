@@ -67,10 +67,10 @@ Public Class CameraORB : Inherits Camera
             If pcData <> 0 Then mbuf(mbIndex).pointCloud = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, pcData) * 0.001
 
             Dim leftData = ORBLeftImage(cPtr)
-            mbuf(mbIndex).leftView = New cv.Mat(rows, cols, cv.MatType.CV_8U, leftData).Clone
+            If leftData <> 0 Then mbuf(mbIndex).leftView = New cv.Mat(rows, cols, cv.MatType.CV_8U, leftData).Clone
 
             Dim rightData = ORBRightImage(cPtr)
-            mbuf(mbIndex).rightView = New cv.Mat(rows, cols, cv.MatType.CV_8U, rightData).Clone
+            If rightData <> 0 Then mbuf(mbIndex).rightView = New cv.Mat(rows, cols, cv.MatType.CV_8U, rightData).Clone
             'Else
             '    If colorData <> 0 Then
             '        mbuf(mbIndex).color = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, colorData).

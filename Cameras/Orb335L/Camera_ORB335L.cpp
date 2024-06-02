@@ -25,8 +25,9 @@ class CameraOrb335L
 {
 public:
     ob::Pipeline pipe;
+    std::shared_ptr<ob::Config> imuConfig;
     int width, height;
-    int* leftData, * rightData, * colorData, * pcData;
+    int* leftData = 0, * rightData = 0, * colorData = 0, * pcData = 0;
     OBCalibrationParam param;
     OBCameraParam cameraParam;
     std::shared_ptr<ob::Sensor> gyroSensor = nullptr;
@@ -34,9 +35,11 @@ public:
     std::shared_ptr<ob::Sensor> accelSensor = nullptr;
     float acceleration[3] = { 0, 0, 0 };
     float gyroVal[3] = { 0, 0, 0 };
-    bool firstPass = true;
     ob::Context ctx;
+    bool firstPass = true;
     std::mutex frameMutex;
+    std::map<OBFrameType, std::shared_ptr<ob::Frame>> imuFrameMap;
+
     ~CameraOrb335L() {  }
     CameraOrb335L(int _width, int _height)
     {
@@ -67,16 +70,11 @@ public:
         gyroSensor = dev->getSensorList()->getSensor(OB_SENSOR_GYRO);
         accelSensor = dev->getSensorList()->getSensor(OB_SENSOR_ACCEL);
 
-
-
         // just hit "Continue" if a break occurs here.  It doesn't happen with the Orbbec examples but running under VB.Net seems to be a problem.
         // This will happen whenever OpenCVB is compiled with "Native Code debugging" enabled. (See Properties/Debug for OpenCVB project) 
         // It does NOT happen when native code debugging is disabled whether debug or release.
         // Since the default is to turn off native code debugging, it should normally work.
-        try {
-            pipe.start(config);
-        }
-        catch (...) {}  param = pipe.getCalibrationParam(config);
+        pipe.start(config);
 
         cameraParam = pipe.getCameraParam();
     }
@@ -89,26 +87,17 @@ public:
         static OBCameraParam cameraParam = pipe.getCameraParam();
         pointCloud.setCameraParam(cameraParam);
 
-        static std::map<OBFrameType, std::shared_ptr<ob::Frame>> imuFrameMap;
         if (firstPass)
         {
             firstPass = false;
-            auto device = pipe.getDevice();
-            auto imuPipeline = std::make_shared<ob::Pipeline>(device);
-            std::mutex imuFrameMutex;
-            auto accelProfiles = imuPipeline->getStreamProfileList(OB_SENSOR_ACCEL);
-            auto gyroProfiles = imuPipeline->getStreamProfileList(OB_SENSOR_GYRO);
-            auto accelProfile = accelProfiles->getProfile(OB_PROFILE_DEFAULT);
-            auto gyroProfile = gyroProfiles->getProfile(OB_PROFILE_DEFAULT);
-            std::shared_ptr<ob::Config> imuConfig = std::make_shared<ob::Config>();
-            imuConfig->enableStream(accelProfile);
-            imuConfig->enableStream(gyroProfile);
-            imuPipeline->start(imuConfig, [&](std::shared_ptr<ob::FrameSet> frameset) {
-                auto count = frameset->frameCount();
-                for (size_t i = 0; i < count; i++) {
-                    auto                         frame = frameset->getFrame(i);
-                    std::unique_lock<std::mutex> lk(imuFrameMutex);
-                    imuFrameMap[frame->type()] = frame;
+            auto profiles = gyroSensor->getStreamProfileList();
+            auto profile = profiles->getProfile(OB_PROFILE_DEFAULT);
+            gyroSensor->start(profile, [&](std::shared_ptr<ob::Frame> frame) {
+                auto timeStamp = frame->timeStamp();
+                auto index = frame->index();
+                auto gyroFrame = frame->as<ob::GyroFrame>();
+                if (gyroFrame != nullptr) {
+                    auto value = gyroFrame->value();
                 }
                 });
         }
