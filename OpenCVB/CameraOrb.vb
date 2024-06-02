@@ -68,10 +68,12 @@ Public Class CameraORB : Inherits Camera
                 If pcData <> 0 Then mbuf(mbIndex).pointCloud = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, pcData) * 0.001
 
                 Dim leftData = ORBLeftImage(cPtr)
-                If leftData <> 0 Then mbuf(mbIndex).leftView = New cv.Mat(rows, cols, cv.MatType.CV_8U, leftData).Clone
+                If leftData <> 0 Then mbuf(mbIndex).leftView = New cv.Mat(rows, cols, cv.MatType.CV_8U, leftData).
+                    CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
                 Dim rightData = ORBRightImage(cPtr)
-                If rightData <> 0 Then mbuf(mbIndex).rightView = New cv.Mat(rows, cols, cv.MatType.CV_8U, rightData).Clone
+                If rightData <> 0 Then mbuf(mbIndex).rightView = New cv.Mat(rows, cols, cv.MatType.CV_8U, rightData).
+                    CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             Else
                 If colorData <> 0 Then
                     mbuf(mbIndex).color = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, colorData).
@@ -87,17 +89,17 @@ Public Class CameraORB : Inherits Camera
                 Dim leftData = ORBLeftImage(cPtr)
                 If leftData <> 0 Then
                     mbuf(mbIndex).leftView = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, leftData).
-                                                          Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                                                          Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest).
+                                                          CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 End If
 
                 Dim rightData = ORBRightImage(cPtr)
                 If rightData <> 0 Then
                     mbuf(mbIndex).rightView = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, rightData).
-                                                         Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                                                         Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest).
+                                                         CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 End If
             End If
-            mbuf(mbIndex).leftView = mbuf(mbIndex).rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            mbuf(mbIndex).rightView = mbuf(mbIndex).rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End SyncLock
 
         MyBase.GetNextFrameCounts(IMU_FrameTime)
