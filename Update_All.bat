@@ -67,9 +67,23 @@ if not exist OakD\Build (
 	msbuild.exe OakD/Build/Cam_Oak-D.sln /p:Configuration=Release
 )
 
+echo "repeated so you don't miss it!'"
+echo "Download: https://github.com/orbbec/OrbbecSDK/releases/OrbbecSDK_v1.10.5_win64.exe and install the Orbbec SDK in c:\Program Files\OrbbecSDK 1.10.5"
+echo "Download: https://github.com/orbbec/OrbbecSDK/releases/OrbbecSDK_v1.10.5_win64.exe and install the Orbbec SDK in c:\Program Files\OrbbecSDK 1.10.5"
+echo "Download: https://github.com/orbbec/OrbbecSDK/releases/OrbbecSDK_v1.10.5_win64.exe and install the Orbbec SDK in c:\Program Files\OrbbecSDK 1.10.5"
+echo "Download: https://github.com/orbbec/OrbbecSDK/releases/OrbbecSDK_v1.10.5_win64.exe and install the Orbbec SDK in c:\Program Files\OrbbecSDK 1.10.5"
+echo "Download: https://github.com/orbbec/OrbbecSDK/releases/OrbbecSDK_v1.10.5_win64.exe and install the Orbbec SDK in c:\Program Files\OrbbecSDK 1.10.5"
+echo "Download: https://github.com/orbbec/OrbbecSDK/releases/OrbbecSDK_v1.10.5_win64.exe and install the Orbbec SDK in c:\Program Files\OrbbecSDK 1.10.5"
 echo "Download: https://github.com/orbbec/OrbbecSDK/releases/OrbbecSDK_v1.10.5_win64.exe and install the Orbbec SDK in c:\Program Files\OrbbecSDK 1.10.5"
 
 echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
+echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
+echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
+echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
+echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
+echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
+echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
+
 echo "StereoLabs SDK install may also download and install CUDA if not already present."
 echo "Set CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3" <<< or whatever version was downloaded.
 set /p ok="And hit enter after reading the above messages."
