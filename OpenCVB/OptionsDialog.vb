@@ -9,9 +9,9 @@ Public Class OptionsDialog
     Public testDuration As Integer
     Public Shared resolutionList As New List(Of String)(
         {"1920x1080 - Full resolution", "960x540 - Quarter resolution", "480x270 - Small resolution",
-         "1280x720 - Full resolution  ", "640x360 - Quarter resolution", "320x180 - Small resolution",
-         "640x480 - Full resolution    ", "320x240 - Quarter resolution", "160x120 - Small resolution",
-         "672x376 - Full resolution    ", "336x188 - Quarter resolution", "168x94 - Small resolution    "})
+         "1280x720 - Full resolution", "640x360 - Quarter resolution", "320x180 - Small resolution",
+         "640x480 - Full resolution", "320x240 - Quarter resolution", "160x120 - Small resolution",
+         "672x376 - Full resolution", "336x188 - Quarter resolution", "168x94 - Small resolution    "})
 
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
         OpenCVB.settings.showConsoleLog = showConsoleLog.Checked
@@ -85,7 +85,7 @@ Public Class OptionsDialog
             workingResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
         End If
         If cameraName.StartsWith("Orbbec Gemini 335L") Then
-            workingResRadio(resolutionList.IndexOf("640x480 - Full resolution    ")).Checked = True
+            workingResRadio(resolutionList.IndexOf("1280x720 - Full resolution")).Checked = True
         End If
     End Sub
     Public Sub OptionsDialog_Load(sender As Object, e As EventArgs) Handles MyBase.Load

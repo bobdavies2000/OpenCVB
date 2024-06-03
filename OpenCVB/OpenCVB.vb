@@ -151,7 +151,7 @@ Public Class OpenCVB
             Next
 
             For i = 0 To cameraNames.Count - 1
-                If cameraNames(i) = .cameraName Then
+                If cameraNames(i).Contains(.cameraName) Then
                     .cameraIndex = i
                     Exit For
                 End If
@@ -1077,7 +1077,7 @@ Public Class OpenCVB
                 Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " +
                                   parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
 
-                Console.WriteLine(vbTab + "Active camera = " + camera.cameraName + ", Input resolution " +
+                Console.WriteLine(vbTab + "Active camera = " + settings.cameraName + ", Input resolution " +
                                   CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) + " and working resolution of " +
                                   CStr(settings.workingRes.Width) + "x" + CStr(settings.workingRes.Height) + vbCrLf)
             End If
