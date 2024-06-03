@@ -392,13 +392,9 @@ Public Class VBtask : Implements IDisposable
         callTrace.Clear()
         callTrace.Add(algName + "\")
         activeObjects.Clear()
-        If algName.StartsWith("CS_") Then
-            algorithmObject = algoList.createCSAlgorithm(algName)
-            desc = algorithmObject.desc
-        Else
-            algorithmObject = algoList.createVBAlgorithm(algName)
-            desc = algorithmObject.desc
-        End If
+
+        algorithmObject = algoList.createVBAlgorithm(algName)
+        desc = algorithmObject.desc
 
         If task.advice = "" Then
             task.advice = "No advice for " + algName + " yet." + vbCrLf +

@@ -1,23 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Numerics
-Public Class Sieve_Basics : Inherits VB_Parent
-    Dim printer As New Sieve_BasicsVB
-    Dim sieve As New CS_Classes.Sieve
-    Public Sub New()
-        desc = "Implement the Sieve of Eratothenes in C#"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static countSlider = findSlider("Count of desired primes")
-        setTrueText(printer.shareResults(sieve.GetPrimeNumbers(countSlider.Value)))
-    End Sub
-End Class
-
-
-
-
-
-
-
 ' https://github.com/TheAlgorithms/C-Sharp/blob/master/Algorithms/Other/SieveOfEratosthenes.cs'
 Public Class Sieve_BasicsVB : Inherits VB_Parent
     Public primes As New List(Of Integer)

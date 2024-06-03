@@ -144,7 +144,6 @@
     <Compile Include="PongWars.vb" />
     <Compile Include="Bin4Way.vb" />
     <Compile Include="Quadrant.vb" />
-    <Compile Include="Sift.vb" />
     <Compile Include="FeatureROI.vb" />
     <Compile Include="Surf.vb" />
     <Compile Include="Swarm.vb" />
@@ -346,7 +345,6 @@
     <Compile Include="LeftRight.vb" />
     <Compile Include="InPaint.vb" />
     <Compile Include="Kalman.vb" />
-    <Compile Include="KAZE.vb" />
     <Compile Include="KLT.vb" />
     <Compile Include="KMeans.vb" />
     <Compile Include="KNN.vb" />
@@ -428,7 +426,6 @@
     <Compile Include="Video.vb" />
     <Compile Include="Stabilizer.vb" />
     <Compile Include="Volume.vb" />
-    <Compile Include="Voronoi.vb" />
     <Compile Include="WarpModel.vb" />
     <Compile Include="WarpPerspective.vb" />
     <Compile Include="XFeatures.vb" />
@@ -491,12 +488,6 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CS_Classes\CS_Classes.csproj">
-      <Project>{fefe40b6-eb52-45c7-bd10-27968e1d6b2d}</Project>
-      <Name>CS_Classes</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp">

@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-Imports CS_Classes
 Imports OpenCvSharp.Text
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Filter_Laplacian : Inherits VB_Parent

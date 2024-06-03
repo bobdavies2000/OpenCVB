@@ -358,22 +358,6 @@ End Class
 
 
 
-Public Class OEX_Sobel_Demo : Inherits VB_Parent
-    Dim sobel As New Edge_Sobel
-    Public Sub New()
-        desc = "OpenCV Example Sobel_Demo became Edge_Sobel algorithm."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        sobel.Run(src)
-        dst2 = sobel.dst2
-        dst3 = sobel.dst3
-        labels = sobel.labels
-    End Sub
-End Class
-
-
-
-
 
 
 

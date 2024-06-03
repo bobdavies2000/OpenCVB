@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-Imports CS_Classes
 Public Class Blur_Basics : Inherits VB_Parent
     Dim options As New Options_Blur
     Public Sub New()
@@ -12,39 +11,6 @@ Public Class Blur_Basics : Inherits VB_Parent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Blur_Gaussian : Inherits VB_Parent
-    Dim CS_BlurGaussian As New CS_BlurGaussian
-    Dim blur As New Blur_Basics
-    Public Sub New()
-        desc = "Smooth each pixel with a Gaussian kernel of different sizes."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static blurKernelSlider = findSlider("Blur Kernel Size")
-        CS_BlurGaussian.RunCS(src, dst2, blurKernelSlider.Value Or 1)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Blur_Median_CS : Inherits VB_Parent
-    Dim CS_BlurMedian As New CS_BlurMedian
-    Dim blur As New Blur_Basics
-    Public Sub New()
-        desc = "Replace each pixel with the median of neighborhood of varying sizes."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static blurKernelSlider = findSlider("Blur Kernel Size")
-        CS_BlurMedian.RunCS(src, dst2, blurKernelSlider.Value Or 1)
-    End Sub
-End Class
 
 
 

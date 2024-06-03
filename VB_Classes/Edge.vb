@@ -1150,41 +1150,6 @@ End Class
 
 
 
-'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edge_Sobel : Inherits VB_Parent
-    Public addw As New AddWeighted_Basics
-    Public options As New Options_Sobel
-    Dim blur As New Blur_Gaussian
-    Public Sub New()
-        labels = {"", "", "Horizontal + Vertical derivative - use global 'Add Weighted' slider to see impact.", "Blur output"}
-        desc = "Show Sobel edge detection with varying kernel sizes."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        If options.useBlur Then
-            blur.Run(src)
-            dst3 = blur.dst2
-        Else
-            dst3 = src
-        End If
-
-        dst1 = If(dst3.Channels = 3, dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst3)
-        If options.horizontalDerivative Then dst2 = dst1.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
-        If options.verticalDerivative Then dst0 = dst1.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
-        dst2 = dst2.ConvertScaleAbs()
-        dst0 = dst0.ConvertScaleAbs()
-
-        addw.src2 = dst0
-        addw.Run(dst2)
-        dst2 = addw.dst2
-    End Sub
-End Class
-
-
-
-
-
 Public Class Edge_MotionFrames : Inherits VB_Parent
     Dim edges As New Edge_Canny
     Dim frames As New History_Basics
@@ -1228,52 +1193,5 @@ Public Class Edge_MotionOverlay : Inherits VB_Parent
         cv.Cv2.Absdiff(src, offsetImage, dst0)
         dst2 = dst0.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
         labels(2) = "Src offset (x,y) = (" + CStr(options.xDisp) + "," + CStr(options.yDisp) + ")"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Edge_Motion : Inherits VB_Parent
-    Dim diff As New Diff_Basics
-    Dim edges As New Edge_Sobel
-    Public Sub New()
-        desc = "Measure camera motion using Sobel and Diff from last frame."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        edges.Run(src)
-        diff.Run(edges.dst2)
-
-        dst2 = diff.dst2
-        dst3 = dst2 And edges.dst2
-        If task.quarterBeat Then labels(3) = $"{dst3.CountNonZero} pixels overlap between Sobel edges and diff with last Sobel edges."
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Edge_NoDepth : Inherits VB_Parent
-    Dim edges As New Edge_Sobel
-    Dim blur As New Blur_Basics
-    Public Sub New()
-        desc = "Find the edges in regions without depth."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        src = vbPalette(src)
-        edges.Run(src)
-
-        dst2.SetTo(0)
-        blur.Run(task.noDepthMask)
-        edges.dst2.CopyTo(dst2, blur.dst2)
-        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class

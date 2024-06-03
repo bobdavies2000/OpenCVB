@@ -15,15 +15,15 @@ End Class
 
 
 Public Class ImShow_WaitKey : Inherits VB_Parent
-    Dim vDemo As New Voronoi_Basics
+    Dim feat As New Feature_Basics
     Public Sub New()
         desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        vDemo.Run(src)
-        cv.Cv2.ImShow("Hit space bar to advance to the next frame", vDemo.dst2)
-        cv.Cv2.WaitKey(1000) ' It will halt the test all run if 0 but 0 is the useful value for debugging interactively.
-        dst2 = vDemo.dst2
+        feat.Run(src)
+        cv.Cv2.ImShow("Hit space bar to advance to the next frame", feat.dst2)
+        cv.Cv2.WaitKey(1000) ' No need for waitkey with imshow in OpenCVB - finishing a buffer is the same thing so waitkey just delays by 1 second here.
+        dst2 = feat.dst2
     End Sub
 End Class
 

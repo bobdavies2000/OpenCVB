@@ -48,28 +48,6 @@ End Class
 
 
 
-Public Class DNN_Caffe_CS : Inherits VB_Parent
-    Dim caffeCS As New CS_Classes.DNN
-    Public Sub New()
-        labels(3) = "Input Image"
-        desc = "Download and use a Caffe database"
-
-        Dim protoTxt = task.homeDir + "Data/bvlc_googlenet.prototxt"
-        Dim modelFile = task.homeDir + "Data/bvlc_googlenet.caffemodel"
-        Dim synsetWords = task.homeDir + "Data/synset_words.txt"
-        caffeCS.initialize(protoTxt, modelFile, synsetWords)
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Dim image = cv.Cv2.ImRead(task.homeDir + "Data/space_shuttle.jpg")
-        Dim str = caffeCS.RunCS(image)
-        dst3 = image.Resize(dst3.Size())
-        setTrueText(str)
-    End Sub
-End Class
-
-
-
-
 
 ' https://github.com/twMr7/rscvdnn
 Public Class DNN_Basics : Inherits VB_Parent

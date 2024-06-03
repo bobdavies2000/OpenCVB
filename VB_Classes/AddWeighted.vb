@@ -1,4 +1,3 @@
-Imports CS_Classes
 Imports cv = OpenCvSharp
 Public Class AddWeighted_Basics : Inherits VB_Parent
     Public src2 As cv.Mat

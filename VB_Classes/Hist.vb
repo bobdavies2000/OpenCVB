@@ -479,32 +479,6 @@ End Class
 
 
 
-Public Class Hist_SLR : Inherits VB_Parent
-    Public slr As New SLR_Basics
-    Public hist As New Hist_Basics
-    Public Sub New()
-        labels = {"", "", "Original data", "Segmented Linear Regression (SLR) version of the same data.  Red line is zero."}
-        desc = "Run Segmented Linear Regression on depth data"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        hist.Run(src)
-        hist.histogram.Set(Of Single)(0, 0, 0)
-        dst2 = hist.dst2
-        For i = 0 To hist.histogram.Rows - 1
-            slr.input.dataX.Add(i)
-            slr.input.dataY.Add(hist.histogram.Get(Of Single)(i, 0))
-        Next
-        slr.Run(src)
-        dst3 = slr.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Hist_Color : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public plot As New Plot_Histogram

@@ -48,66 +48,6 @@ End Class
 
 
 
-
-
-
-Public Class Options_Blob : Inherits VB_Parent
-    Dim blob As New Blob_Input
-    Dim blobDetector As New CS_Classes.Blob_Basics
-    Public blobParams = New cv.SimpleBlobDetector.Params
-    Public Sub New()
-        blobDetector = New CS_Classes.Blob_Basics
-        If standaloneTest() Then blob.updateFrequency = 30
-
-        If radio.Setup(traceName) Then
-            radio.addRadio("FilterByArea")
-            radio.addRadio("FilterByCircularity")
-            radio.addRadio("FilterByConvexity")
-            radio.addRadio("FilterByInertia")
-            radio.addRadio("FilterByColor")
-            radio.check(1).Checked = True
-        End If
-
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("min Threshold", 0, 255, 100)
-            sliders.setupTrackBar("max Threshold", 0, 255, 255)
-            sliders.setupTrackBar("Threshold Step", 1, 50, 5)
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static minSlider = findSlider("min Threshold")
-        Static maxSlider = findSlider("max Threshold")
-        Static stepSlider = findSlider("Threshold Step")
-        Static areaRadio = findRadio("FilterByArea")
-        Static circRadio = findRadio("FilterByCircularity")
-        Static convexRadio = findRadio("FilterByConvexity")
-        Static inertiaRadio = findRadio("FilterByInertia")
-        Static colorRadio = findRadio("FilterByColor")
-
-        blobParams = New cv.SimpleBlobDetector.Params
-        If areaRadio.Checked Then blobParams.FilterByArea = areaRadio.Checked
-        If circRadio.Checked Then blobParams.FilterByCircularity = circRadio.Checked
-        If convexRadio.Checked Then blobParams.FilterByConvexity = convexRadio.Checked
-        If inertiaRadio.Checked Then blobParams.FilterByInertia = inertiaRadio.Checked
-        If colorRadio.Checked Then blobParams.FilterByColor = colorRadio.Checked
-
-        blobParams.MaxArea = 100
-        blobParams.MinArea = 0.001
-
-        blobParams.MinThreshold = minSlider.Value
-        blobParams.MaxThreshold = maxSlider.Value
-        blobParams.ThresholdStep = stepSlider.Value
-
-        blobParams.MinDistBetweenBlobs = 10
-        blobParams.MinRepeatability = 1
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Options_CamShift : Inherits VB_Parent
     Public camMax As Integer = 255
     Public camSBins As cv.Scalar = New cv.Scalar(0, 40, 32)
@@ -3896,7 +3836,6 @@ Public Class Options_Edges_All : Inherits VB_Parent
     Dim canny As New Edge_Canny
     Dim scharr As New Edge_Scharr
     Dim binRed As New Edge_BinarizedReduction
-    Dim sobel = New Edge_Sobel
     Dim binSobel As New Bin4Way_Sobel
     Dim colorGap As New Edge_ColorGap_CPP
     Dim deriche As New Edge_Deriche_CPP
@@ -3907,7 +3846,6 @@ Public Class Options_Edges_All : Inherits VB_Parent
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Canny")
-            radio.addRadio("Sobel")
             radio.addRadio("Scharr")
             radio.addRadio("Binarized Reduction")
             radio.addRadio("Binarized Sobel")
@@ -3938,8 +3876,6 @@ Public Class Options_Edges_All : Inherits VB_Parent
             Select Case eSelection
                 Case "Canny"
                     edges = canny
-                Case "Sobel"
-                    edges = sobel
                 Case "Scharr"
                     edges = scharr
                 Case "Binarized Reduction"

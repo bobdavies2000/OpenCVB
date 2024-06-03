@@ -1,34 +1,5 @@
 Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/14770756/opencv-simpleblobdetector-filterbyinertia-meaning
-Public Class Blob_Basics : Inherits VB_Parent
-    Dim options As New Options_Blob
-    Dim input As New Blob_Input
-    Dim blobDetector As New CS_Classes.Blob_Basics
-    Public Sub New()
-        blobDetector = New CS_Classes.Blob_Basics
-        vbAddAdvice(traceName + ": click 'Show All' to see all the available options.")
-        desc = "Isolate and list blobs with specified options"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        options.RunVB()
-
-        If standaloneTest() Then
-            input.Run(src)
-            dst2 = input.dst2
-        Else
-            dst2 = src
-        End If
-        blobDetector.RunCS(dst2, dst3, options.blobParams)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Blob_Input : Inherits VB_Parent
     Dim rotatedRect As New Rectangle_Rotated
     Dim circles As New Draw_Circles
@@ -46,7 +17,7 @@ Public Class Blob_Input : Inherits VB_Parent
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Generate data to test Blob Detector."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         rotatedRect.Run(src)
         Mats.mat(0) = rotatedRect.dst2
 
@@ -58,7 +29,7 @@ Public Class Blob_Input : Inherits VB_Parent
 
         poly.Run(src)
         Mats.mat(3) = poly.dst3
-        mats.Run(empty)
+        Mats.Run(empty)
         dst2 = Mats.dst2
         dst3 = Mats.dst3
     End Sub
