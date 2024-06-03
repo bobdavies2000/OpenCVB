@@ -97,7 +97,7 @@ Public Class OptionsGlobal
                 GridSize.Value = 128
                 task.cvFontSize = 2.5
                 task.cvFontThickness = 2
-                task.dotSize = 3
+                task.dotSize = 5
                 task.disparityAdjustment = 2.2
                 task.lowRes = New cv.Size(320, 180)
                 task.quarterRes = New cv.Size(320, 180)
