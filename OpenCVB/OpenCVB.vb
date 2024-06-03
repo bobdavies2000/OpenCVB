@@ -737,22 +737,6 @@ Public Class OpenCVB
             End If
         End If
     End Sub
-    Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
-        If AvailableAlgorithms.Text = "" Then
-            Dim incr = 1
-            If upArrow Then incr = -1
-            upArrow = False
-            downArrow = False
-            AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + incr)
-            Exit Sub
-        End If
-        If AvailableAlgorithms.Enabled Then
-            If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e) ' if paused, then restart.
-            jsonWrite()
-            StartAlgorithmTask()
-            updateAlgorithmHistory()
-        End If
-    End Sub
     Private Sub OpenCVB_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = Keys.Up Then upArrow = True
         If e.KeyValue = Keys.Down Then downArrow = True
@@ -1012,95 +996,21 @@ Public Class OpenCVB
     Private Sub TranslateButton_Click(sender As Object, e As EventArgs) Handles TranslateButton.Click
         Shell(HomeDir.FullName + "bin/Debug/VB_to_CPP.exe", AppWinStyle.NormalFocus)
     End Sub
-    Private Sub StartAlgorithmTask()
-        Console.WriteLine("Starting algorithm " + AvailableAlgorithms.Text)
-        SyncLock callTraceLock
-            If TreeViewDialog IsNot Nothing Then
-                algorithm_ms.Clear()
-                TreeViewDialog.PercentTime.Text = ""
-            End If
-        End SyncLock
-        testAllRunning = TestAllButton.Text = "Stop Test"
-        saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
-
-        Dim parms As New VB_Classes.VBtask.algParms
-        parms.fpsRate = settings.desiredFPS
-
-        parms.useRecordedData = GroupName.Text = "<All using recorded data>"
-        parms.testAllRunning = testAllRunning
-
-        parms.externalPythonInvocation = externalPythonInvocation
-        parms.showConsoleLog = settings.showConsoleLog
-
-        parms.homeDir = HomeDir.FullName
-        parms.cameraName = settings.cameraName
-        parms.cameraIndex = settings.cameraIndex
-        parms.cameraInfo = camera.cameraInfo
-
-        parms.main_hwnd = Me.Handle
-        parms.mainFormLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
-
-        parms.workingRes = settings.workingRes
-        parms.captureRes = settings.captureRes
-        parms.displayRes = settings.displayRes
-        parms.algName = AvailableAlgorithms.Text
-
-        PausePlayButton.Image = PausePlay
-
-        ' If they Then had been Using the treeview feature To click On a tree entry, the timer was disabled.  
-        ' Clicking on availablealgorithms indicates they are done with using the treeview.
-        If TreeViewDialog IsNot Nothing Then TreeViewDialog.TreeViewTimer.Enabled = True
-
-        Thread.CurrentThread.Priority = ThreadPriority.Lowest
-        algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
-        algorithmTaskHandle.Name = AvailableAlgorithms.Text
-        algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
-        algorithmTaskHandle.Start(parms)
-        Console.WriteLine("Start Algorithm completed.")
-    End Sub
-    Private Sub AlgorithmTask(ByVal parms As VB_Classes.VBtask.algParms)
-        If parms.algName = "" Then Exit Sub
-        algorithmQueueCount += 1
-        ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
-        SyncLock algorithmThreadLock
-            algorithmQueueCount -= 1
-            AlgorithmTestAllCount += 1
-            drawRect = New cv.Rect
-            Dim task = New VB_Classes.VBtask(parms)
-            textDesc = task.desc
-            intermediateReview = ""
-
-            If ComplexityTimer.Enabled = False Then
-                Console.WriteLine(CStr(Now))
-                Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.algName + " - " + textDesc + vbCrLf + vbTab +
-                                  CStr(AlgorithmTestAllCount) + vbTab + "Algorithms tested")
-                Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " +
-                                  parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
-
-                Console.WriteLine(vbTab + "Active camera = " + settings.cameraName + ", Input resolution " +
-                                  CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) + " and working resolution of " +
-                                  CStr(settings.workingRes.Width) + "x" + CStr(settings.workingRes.Height) + vbCrLf)
-            End If
-            ' Adjust drawrect for the ratio of the actual size and workingRes.
-            If task.drawRect <> New cv.Rect Then
-                ' relative size of algorithm size image to displayed image
-                Dim ratio = camPic(0).Width / task.workingRes.Width
-                drawRect = New cv.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
-                                       task.drawRect.Width * ratio, task.drawRect.Height * ratio)
-            End If
-
-            SyncLock trueData
-                trueData.Clear()
-            End SyncLock
-
-            BothFirstAndLastReady = False
-            frameCount = 0 ' restart the count...
-
-            RunTask(task)
-            Console.WriteLine(parms.algName + " ending.  Thread closing...")
-            task.Dispose()
-        End SyncLock
-        frameCount = 0
+    Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
+        If AvailableAlgorithms.Text = "" Then
+            Dim incr = 1
+            If upArrow Then incr = -1
+            upArrow = False
+            downArrow = False
+            AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + incr)
+            Exit Sub
+        End If
+        If AvailableAlgorithms.Enabled Then
+            If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e) ' if paused, then restart.
+            jsonWrite()
+            StartAlgorithmTask()
+            updateAlgorithmHistory()
+        End If
     End Sub
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
@@ -1342,6 +1252,76 @@ Public Class OpenCVB
                 settings.workingRes = New cv.Size(168, 94)
                 settings.captureRes = New cv.Size(672, 376)
         End Select
+    End Sub
+
+    Private Sub Advice_Click(sender As Object, e As EventArgs) Handles Advice.Click
+        MsgBox(textAdvice)
+    End Sub
+    Private Sub ToolStripButton5_Click(sender As Object, e As EventArgs) Handles ComplexityButton.Click
+        If ComplexityTimer.Enabled = False Then
+            Dim ret = MsgBox("Do you want to test the complexity of the current algorithm?" + vbCrLf +
+                             "Algorithm will run at all available resolutions until you stop it.", MsgBoxStyle.OkCancel,
+                         "Test algorithm at all resolutions.")
+            If ret = MsgBoxResult.Ok Then
+                complexityResults.Clear()
+                ComplexityTimer.Interval = 30000
+                complexityStartTime = Now
+                ComplexityTimer.Enabled = True
+                settings.workingResIndex = OpenCVB.settings.resolutionsSupported.Count - 1 ' start smallest resolution
+                ComplexityButton.Image = stopTest
+                ComplexityTimer_Tick(sender, e)
+            End If
+        Else
+            Dim sw = New StreamWriter(HomeDir.FullName + "Complexity/" + saveAlgorithmName + ".txt")
+            For Each line In complexityResults
+                sw.WriteLine(line)
+            Next
+            sw.Close()
+
+            ComplexityButton.Image = complexityTest
+            ComplexityTimer.Enabled = False
+            complexityResults.Clear()
+        End If
+    End Sub
+
+    Private Sub ComplexityTimer_Tick(sender As Object, e As EventArgs) Handles ComplexityTimer.Tick
+        While 1
+            If OpenCVB.settings.resolutionsSupported(settings.workingResIndex) Then
+                setWorkingRes()
+                Exit While
+            Else
+                settings.workingResIndex -= 1
+                If settings.workingResIndex < 0 Then
+                    settings.workingResIndex = OpenCVB.settings.resolutionsSupported.Count - 1
+                End If
+            End If
+        End While
+
+        If complexityResults.Count > 0 Then
+            Dim endTime = Now
+            Dim span As TimeSpan = endTime - complexityStartTime
+            complexityResults.Add("Ending " + vbTab + CStr(frameCount) + vbTab +
+                                  Format(span.TotalMilliseconds / 1000, "0.000") + " seconds")
+            complexityStartTime = Now
+        End If
+        complexityResults.Add("-------------------")
+        complexityResults.Add("Image" + vbTab + CStr(settings.workingRes.Width) + vbTab +
+                                      CStr(settings.workingRes.Height))
+        jsonWrite()
+        jsonRead()
+        LineUpCamPics()
+
+        ' when switching resolution, best to reset these as the move from higher to lower res
+        ' could mean the point is no longer valid.
+        clickPoint = New cv.Point
+        mousePoint = New cv.Point
+
+        StartAlgorithmTask()
+
+        settings.workingResIndex -= 1
+        If settings.workingResIndex < 0 Then
+            settings.workingResIndex = OpenCVB.settings.resolutionsSupported.Count - 1
+        End If
     End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         ' don't start another test all algorithm until the current one has finished.
@@ -1612,74 +1592,92 @@ Public Class OpenCVB
             If task.debugSyncUI Then Thread.Sleep(100)
         End While
     End Sub
+    Private Sub AlgorithmTask(ByVal parms As VB_Classes.VBtask.algParms)
+        If parms.algName = "" Then Exit Sub
+        algorithmQueueCount += 1
+        ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
+        SyncLock algorithmThreadLock
+            algorithmQueueCount -= 1
+            AlgorithmTestAllCount += 1
+            drawRect = New cv.Rect
+            Dim task = New VB_Classes.VBtask(parms)
+            textDesc = task.desc
+            intermediateReview = ""
 
-    Private Sub ComplexityTimer_Tick(sender As Object, e As EventArgs) Handles ComplexityTimer.Tick
-        While 1
-            If OpenCVB.settings.resolutionsSupported(settings.workingResIndex) Then
-                setWorkingRes()
-                Exit While
-            Else
-                settings.workingResIndex -= 1
-                If settings.workingResIndex < 0 Then
-                    settings.workingResIndex = OpenCVB.settings.resolutionsSupported.Count - 1
-                End If
+            If ComplexityTimer.Enabled = False Then
+                Console.WriteLine(CStr(Now))
+                Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.algName + " - " + textDesc + vbCrLf + vbTab +
+                                  CStr(AlgorithmTestAllCount) + vbTab + "Algorithms tested")
+                Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " +
+                                  parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
+
+                Console.WriteLine(vbTab + "Active camera = " + settings.cameraName + ", Input resolution " +
+                                  CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) + " and working resolution of " +
+                                  CStr(settings.workingRes.Width) + "x" + CStr(settings.workingRes.Height) + vbCrLf)
             End If
-        End While
-
-        If complexityResults.Count > 0 Then
-            Dim endTime = Now
-            Dim span As TimeSpan = endTime - complexityStartTime
-            complexityResults.Add("Ending " + vbTab + CStr(frameCount) + vbTab +
-                                  Format(span.TotalMilliseconds / 1000, "0.000") + " seconds")
-            complexityStartTime = Now
-        End If
-        complexityResults.Add("-------------------")
-        complexityResults.Add("Image" + vbTab + CStr(settings.workingRes.Width) + vbTab +
-                                      CStr(settings.workingRes.Height))
-        jsonWrite()
-        jsonRead()
-        LineUpCamPics()
-
-        ' when switching resolution, best to reset these as the move from higher to lower res
-        ' could mean the point is no longer valid.
-        clickPoint = New cv.Point
-        mousePoint = New cv.Point
-
-        StartAlgorithmTask()
-
-        settings.workingResIndex -= 1
-        If settings.workingResIndex < 0 Then
-            settings.workingResIndex = OpenCVB.settings.resolutionsSupported.Count - 1
-        End If
-    End Sub
-
-    Private Sub Advice_Click(sender As Object, e As EventArgs) Handles Advice.Click
-        MsgBox(textAdvice)
-    End Sub
-    Private Sub ToolStripButton5_Click(sender As Object, e As EventArgs) Handles ComplexityButton.Click
-        If ComplexityTimer.Enabled = False Then
-            Dim ret = MsgBox("Do you want to test the complexity of the current algorithm?" + vbCrLf +
-                             "Algorithm will run at all available resolutions until you stop it.", MsgBoxStyle.OkCancel,
-                         "Test algorithm at all resolutions.")
-            If ret = MsgBoxResult.Ok Then
-                complexityResults.Clear()
-                ComplexityTimer.Interval = 30000
-                complexityStartTime = Now
-                ComplexityTimer.Enabled = True
-                settings.workingResIndex = OpenCVB.settings.resolutionsSupported.Count - 1 ' start smallest resolution
-                ComplexityButton.Image = stopTest
-                ComplexityTimer_Tick(sender, e)
+            ' Adjust drawrect for the ratio of the actual size and workingRes.
+            If task.drawRect <> New cv.Rect Then
+                ' relative size of algorithm size image to displayed image
+                Dim ratio = camPic(0).Width / task.workingRes.Width
+                drawRect = New cv.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
+                                       task.drawRect.Width * ratio, task.drawRect.Height * ratio)
             End If
-        Else
-            Dim sw = New StreamWriter(HomeDir.FullName + "Complexity/" + saveAlgorithmName + ".txt")
-            For Each line In complexityResults
-                sw.WriteLine(line)
-            Next
-            sw.Close()
 
-            ComplexityButton.Image = complexityTest
-            ComplexityTimer.Enabled = False
-            complexityResults.Clear()
-        End If
+            trueData.Clear()
+            BothFirstAndLastReady = False
+            frameCount = 0 ' restart the count...
+
+            RunTask(task)
+            Console.WriteLine(parms.algName + " ending.  Thread closing...")
+            task.Dispose()
+        End SyncLock
+        frameCount = 0
+    End Sub
+    Private Sub StartAlgorithmTask()
+        Console.WriteLine("Starting algorithm " + AvailableAlgorithms.Text)
+        SyncLock callTraceLock
+            If TreeViewDialog IsNot Nothing Then
+                algorithm_ms.Clear()
+                TreeViewDialog.PercentTime.Text = ""
+            End If
+        End SyncLock
+        testAllRunning = TestAllButton.Text = "Stop Test"
+        saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
+
+        Dim parms As New VB_Classes.VBtask.algParms
+        parms.fpsRate = settings.desiredFPS
+
+        parms.useRecordedData = GroupName.Text = "<All using recorded data>"
+        parms.testAllRunning = testAllRunning
+
+        parms.externalPythonInvocation = externalPythonInvocation
+        parms.showConsoleLog = settings.showConsoleLog
+
+        parms.homeDir = HomeDir.FullName
+        parms.cameraName = settings.cameraName
+        parms.cameraIndex = settings.cameraIndex
+        parms.cameraInfo = camera.cameraInfo
+
+        parms.main_hwnd = Me.Handle
+        parms.mainFormLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
+
+        parms.workingRes = settings.workingRes
+        parms.captureRes = settings.captureRes
+        parms.displayRes = settings.displayRes
+        parms.algName = AvailableAlgorithms.Text
+
+        PausePlayButton.Image = PausePlay
+
+        ' If they Then had been Using the treeview feature To click On a tree entry, the timer was disabled.  
+        ' Clicking on availablealgorithms indicates they are done with using the treeview.
+        If TreeViewDialog IsNot Nothing Then TreeViewDialog.TreeViewTimer.Enabled = True
+
+        Thread.CurrentThread.Priority = ThreadPriority.Lowest
+        algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
+        algorithmTaskHandle.Name = AvailableAlgorithms.Text
+        algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
+        algorithmTaskHandle.Start(parms)
+        Console.WriteLine("Start Algorithm completed.")
     End Sub
 End Class
+

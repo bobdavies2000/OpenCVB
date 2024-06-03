@@ -14,7 +14,7 @@ namespace CS_Classes
             this.desc = "Add 2 images with specified weights.";
         }
 
-        void RunCS(Mat src)
+        void RunCS(Mat src, VB_Classes.VBtask task)
         {
             srcPlus = this.src2;
             // algorithm user normally provides src2! 

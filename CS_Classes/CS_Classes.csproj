@@ -154,6 +154,12 @@
     <EmbeddedResource Include="Shaders/Metal/imgui-vertex.metallib" LogicalName="imgui-vertex.metallib" />
     <EmbeddedResource Include="Shaders/Metal/imgui-frag.metallib" LogicalName="imgui-frag.metallib" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VB_Classes\VB_Classes.vbproj">
+      <Project>{735a2264-8a36-4d0a-ade0-2bfad6734401}</Project>
+      <Name>VB_Classes</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
