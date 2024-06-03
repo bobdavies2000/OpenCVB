@@ -5,8 +5,9 @@
     -   Only 5 frames per second to keep depth in sync with RGB image.
     -   Supported image sizes are 1280x720 and 640x480.
         -   Other image sizes are present but not commonly used.
+    -   The Orbbec Gemini 335L arrived May 2024. Firmware will likely improve.
     -   OpenCVB will work with any camera that has RGB, cloud, left, and right images.
-    -   IMU is needed as well to find gravity and orient the image in 3D.
+        -   IMU is needed as well to find gravity and orient the image in 3D.
     -   There are now 7 cameras supported in OpenCVB.
 
         ![A screenshot of a computer Description automatically generated](media/87473380f7ef7669aac59b0e2568b664.png)
@@ -15,13 +16,13 @@
 
     -   The Orbbec SDK is automatically installed with the Update_All.bat install run.
     -   It is a small thrill to see all 2000 algorithms suddenly working with the 335L.
--   Python_Classes added to separate it from the VB_Classes
-    -   Default \<Group Name\> is now \<All VB.Net\> to get all the VB.Net classes
-    -   New group names were added: “\<All Python\>” and “\<All C\#\>” classes.
+-   Python_Classes added to separate Python algorithms from the VB_Classes
+    -   Default group name is \<All VB.Net\> to get only VB.Net classes
+    -   Other group names added were: “\<All Python\>” and “\<All C\#\>” classes.
 -   The code to find and track features was reorganized. New features added for ROI’s.
     -   Feature_Basics now uses correlation coefficients to track RGB features.
--   The color8U algorithms is the new name for algorithms converting RGB to CV_8U.
--   New modules for C\# interface were added but are currently not used.
+-   Color8U is the new name for algorithms converting RGB to CV_8U format.
+-   New modules for C\# interface were added but are not yet in use.
 -   A log of previous changes is included at the bottom of this document.
 
 ![A screenshot of a computer Description automatically generated](media/c8c7bce7087510e62ffc160f82e12e07.png)
