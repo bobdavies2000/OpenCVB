@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Mesh_Basics : Inherits VB_Algorithm
+Public Class Mesh_Basics : Inherits VB_Parent
     Dim knn As New KNN_Core
     Public ptList As New List(Of cv.Point2f)
     Public Sub New()
@@ -45,7 +45,7 @@ End Class
 
 
 
-Public Class Mesh_Features : Inherits VB_Algorithm
+Public Class Mesh_Features : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Dim mesh As New Mesh_Basics
     Public Sub New()

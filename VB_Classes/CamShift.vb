@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4.1/d2/dc1/camshiftdemo_8cpp-example.html
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
-Public Class CamShift_Basics : Inherits VB_Algorithm
+Public Class CamShift_Basics : Inherits VB_Parent
     Public trackBox As New cv.RotatedRect
     Dim redHue As New CamShift_RedHue
     Public Sub New()
@@ -46,7 +46,7 @@ End Class
 
 
 
-Public Class CamShift_RedHue : Inherits VB_Algorithm
+Public Class CamShift_RedHue : Inherits VB_Parent
     Dim options As New Options_CamShift
     Public Sub New()
         labels = {"", "Hue", "Image regions with red hue", "Mask for hue regions"}

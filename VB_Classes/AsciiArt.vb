@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 ' https://github.com/ncosentino/DevLeader/tree/master/AsciiArtGenerator
-Public Class AsciiArt_Basics : Inherits VB_Algorithm
+Public Class AsciiArt_Basics : Inherits VB_Parent
     Dim asciiChars As String() = {"@", "%", "#", "*", "+", "=", "-", ":", ",", ".", " "}
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -38,7 +38,7 @@ End Class
 
 
 
-Public Class AsciiArt_Gray : Inherits VB_Algorithm
+Public Class AsciiArt_Gray : Inherits VB_Parent
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "A palette'd version of the ascii art data"
@@ -66,7 +66,7 @@ End Class
 
 
 
-Public Class AsciiArt_Diff : Inherits VB_Algorithm
+Public Class AsciiArt_Diff : Inherits VB_Parent
     Dim grayAA As New AsciiArt_Gray
     Dim diff As New Diff_Basics
     Public Sub New()

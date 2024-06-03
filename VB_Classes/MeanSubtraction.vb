@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 'https://www.pyimagesearch.com/2017/11/06/deep-learning-opencvs-blobfromimage-works/
-Public Class MeanSubtraction_Basics : Inherits VB_Algorithm
+Public Class MeanSubtraction_Basics : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Scaling Factor = mean/scaling factor X100", 1, 500, 100)
         desc = "Subtract the mean from the image with a scaling factor"

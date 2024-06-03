@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 Imports cv = OpenCvSharp
 ' https://www.kaggle.com/datasets/balraj98/berkeley-segmentation-dataset-500-bsds500
-Public Class Image_Basics : Inherits VB_Algorithm
+Public Class Image_Basics : Inherits VB_Parent
     Public fileNameForm As OptionsFileName
     Public inputFileName As String
     Public Sub New()
@@ -57,7 +57,7 @@ End Class
 
 
 
-Public Class Image_Series : Inherits VB_Algorithm
+Public Class Image_Series : Inherits VB_Parent
     Dim images As New Image_Basics
     Dim fileIndex As Integer
     Public fileInputName As FileInfo
@@ -99,7 +99,7 @@ End Class
 
 
 
-Public Class Image_RedCloudColor : Inherits VB_Algorithm
+Public Class Image_RedCloudColor : Inherits VB_Parent
     Public images As New Image_Series
     Public redC As New RedCloud_Cells
     Public Sub New()
@@ -131,7 +131,7 @@ End Class
 
 
 
-Public Class Image_RedCloudColorSeries : Inherits VB_Algorithm
+Public Class Image_RedCloudColorSeries : Inherits VB_Parent
     Dim images As New Image_RedCloudColor
     Public Sub New()
         desc = "Use RedCloud on a series of photos instead of the video stream."
@@ -153,7 +153,7 @@ End Class
 
 
 
-Public Class Image_CellStats : Inherits VB_Algorithm
+Public Class Image_CellStats : Inherits VB_Parent
     Dim images As New Image_RedCloudColor
     Dim stats As New Cell_Basics
     Public Sub New()
@@ -191,7 +191,7 @@ End Module
 
 
 
-Public Class Image_MSER : Inherits VB_Algorithm
+Public Class Image_MSER : Inherits VB_Parent
     Public images As New Image_Series
     Dim core As New MSER_Detect
     Public Sub New()

@@ -86,11 +86,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddAlgorithm.cs" />
-    <Compile Include="AddWeighted.cs" />
+    <Compile Include="CS_Algorithms.cs" />
     <Compile Include="Aruco.cs" />
     <Compile Include="Blob.cs" />
     <Compile Include="Blur.cs" />
-    <Compile Include="CS_Algorithm.cs" />
+    <Compile Include="CS_Parent.cs" />
     <Compile Include="CS_Task.cs" />
     <Compile Include="DNN.cs" />
     <Compile Include="Kaze.cs" />

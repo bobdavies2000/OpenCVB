@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
-Public Class CellularAutomata_Basics : Inherits VB_Algorithm
+Public Class CellularAutomata_Basics : Inherits VB_Parent
     Public i18 As New List(Of String)
     Dim inputCombo = "111,110,101,100,011,010,001,000"
     Dim cellInput(,) = {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}, {1, 0, 0}, {0, 1, 1}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}}
@@ -82,7 +82,7 @@ End Class
 
 
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
-Public Class CellularAutomata_Life : Inherits VB_Algorithm
+Public Class CellularAutomata_Life : Inherits VB_Parent
     Dim random As New Random_Basics
     Dim grid As cv.Mat
     Dim nextgrid As cv.Mat
@@ -178,7 +178,7 @@ End Class
 
 
 ' https://natureofcode.com/book/chapter-7-cellular-automata/
-Public Class CellularAutomata_LifeColor : Inherits VB_Algorithm
+Public Class CellularAutomata_LifeColor : Inherits VB_Parent
     Dim game As New CellularAutomata_Life
     Public Sub New()
         game.backColor = cv.Scalar.White
@@ -210,7 +210,7 @@ End Class
 
 
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
-Public Class CellularAutomata_LifePopulation : Inherits VB_Algorithm
+Public Class CellularAutomata_LifePopulation : Inherits VB_Parent
     Dim plot As New Plot_OverTimeSingle
     Dim game As New CellularAutomata_Life
     Public Sub New()
@@ -232,7 +232,7 @@ End Class
 
 
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
-Public Class CellularAutomata_Basics_MT : Inherits VB_Algorithm
+Public Class CellularAutomata_Basics_MT : Inherits VB_Parent
     Dim cell As New CellularAutomata_Basics
     Dim i18 As New List(Of String)
     Dim i18Index As Integer
@@ -272,7 +272,7 @@ End Class
 
 
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
-Public Class CellularAutomata_All256 : Inherits VB_Algorithm
+Public Class CellularAutomata_All256 : Inherits VB_Parent
     Dim cell As New CellularAutomata_Basics
     Public Sub New()
         cell.combo.Visible = False ' won't need this...
@@ -313,7 +313,7 @@ End Class
 
 
 
-Public Class CellularAutomata_MultiPoint : Inherits VB_Algorithm
+Public Class CellularAutomata_MultiPoint : Inherits VB_Parent
     Dim cell As New CellularAutomata_Basics
     Public Sub New()
         cell.combo.Box.SelectedIndex = 4 ' this one is nice...

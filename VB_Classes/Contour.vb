@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Contour_Basics : Inherits VB_Algorithm
+Public Class Contour_Basics : Inherits VB_Parent
     Dim colorClass As New Color8U_Basics
     Public contourlist As New List(Of cv.Point())
     Public allContours As cv.Point()()
@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class Contour_General : Inherits VB_Algorithm
+Public Class Contour_General : Inherits VB_Parent
     Public contourlist As New List(Of cv.Point())
     Public allContours As cv.Point()()
     Public options As New Options_Contours
@@ -96,7 +96,7 @@ End Class
 
 
 
-Public Class Contour_GeneralWithOptions : Inherits VB_Algorithm
+Public Class Contour_GeneralWithOptions : Inherits VB_Parent
     Public contourlist As New List(Of cv.Point())
     Public allContours As cv.Point()()
     Public options As New Options_Contours
@@ -142,7 +142,7 @@ End Class
 
 
 
-Public Class Contour_RotatedRects : Inherits VB_Algorithm
+Public Class Contour_RotatedRects : Inherits VB_Parent
     Public rotatedRect As New Rectangle_Rotated
     Dim basics As New Contour_General
     Public Sub New()
@@ -175,7 +175,7 @@ End Class
 
 
 ' https://github.com/SciSharp/SharpCV/blob/master/src/SharpCV.Examples/Program.cs
-Public Class Contour_RemoveLines : Inherits VB_Algorithm
+Public Class Contour_RemoveLines : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Morphology width/height", 1, 100, 20)
@@ -227,7 +227,7 @@ End Class
 
 
 
-Public Class Contour_Edges : Inherits VB_Algorithm
+Public Class Contour_Edges : Inherits VB_Parent
     Dim edges As New Edge_ResizeAdd
     Dim contour As New Contour_General
     Public Sub New()
@@ -267,7 +267,7 @@ End Class
 
 
 
-Public Class Contour_SidePoints : Inherits VB_Algorithm
+Public Class Contour_SidePoints : Inherits VB_Parent
     Public vecLeft As cv.Vec3f, vecRight As cv.Vec3f, vecTop As cv.Vec3f, vecBot As cv.Vec3f
     Public ptLeft As cv.Point, ptRight As cv.Point, ptTop As cv.Point, ptBot As cv.Point
     Public sides As New Profile_Basics
@@ -316,7 +316,7 @@ End Class
 
 
 
-Public Class Contour_Foreground : Inherits VB_Algorithm
+Public Class Contour_Foreground : Inherits VB_Parent
     Dim km As New Foreground_KMeans2
     Dim contour As New Contour_General
     Public Sub New()
@@ -348,7 +348,7 @@ End Class
 
 
 
-Public Class Contour_Sorted : Inherits VB_Algorithm
+Public Class Contour_Sorted : Inherits VB_Parent
     Dim contours As New Contour_GeneralWithOptions
     Dim sortedContours As New SortedList(Of Integer, cv.Point())(New compareAllowIdenticalIntegerInverted)
     Dim sortedByArea As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
@@ -401,7 +401,7 @@ End Class
 
 
 
-Public Class Contour_Outline : Inherits VB_Algorithm
+Public Class Contour_Outline : Inherits VB_Parent
     Public rc As New rcData
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -438,7 +438,7 @@ End Class
 
 
 
-Public Class Contour_SelfIntersect : Inherits VB_Algorithm
+Public Class Contour_SelfIntersect : Inherits VB_Parent
     Public rc As New rcData
     Public Sub New()
         desc = "Search the contour points for duplicates indicating the contour is self-intersecting."
@@ -479,7 +479,7 @@ End Class
 
 
 
-Public Class Contour_Largest : Inherits VB_Algorithm
+Public Class Contour_Largest : Inherits VB_Parent
     Public bestContour As New List(Of cv.Point)
     Public allContours As cv.Point()()
     Public options As New Options_Contours
@@ -534,7 +534,7 @@ End Class
 
 
 
-Public Class Contour_Compare : Inherits VB_Algorithm
+Public Class Contour_Compare : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public options As New Options_Contours
     Public Sub New()
@@ -566,7 +566,7 @@ End Class
 
 
 
-Public Class Contour_RedCloudCorners : Inherits VB_Algorithm
+Public Class Contour_RedCloudCorners : Inherits VB_Parent
     Public corners(4 - 1) As cv.Point
     Public rc As New rcData
     Public Sub New()
@@ -616,7 +616,7 @@ End Class
 
 
 
-Public Class Contour_RedCloudEdges : Inherits VB_Algorithm
+Public Class Contour_RedCloudEdges : Inherits VB_Parent
     Dim redC As New RedCloud_Cells
     Dim edges As New EdgeDraw_Basics
     Public Sub New()
@@ -646,7 +646,7 @@ End Class
 
 
 
-Public Class Contour_RedCloud : Inherits VB_Algorithm
+Public Class Contour_RedCloud : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -669,7 +669,7 @@ End Class
 
 
 
-Public Class Contour_CompareToFeatureless : Inherits VB_Algorithm
+Public Class Contour_CompareToFeatureless : Inherits VB_Parent
     Dim contour As New Contour_WholeImage
     Dim fLess As New FeatureLess_Basics
     Public Sub New()
@@ -691,7 +691,7 @@ End Class
 
 
 
-Public Class Contour_Smoothing : Inherits VB_Algorithm
+Public Class Contour_Smoothing : Inherits VB_Parent
     Dim options As New Options_Contours2
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -724,7 +724,7 @@ End Class
 
 
 
-Public Class Contour_RC_AddContour : Inherits VB_Algorithm
+Public Class Contour_RC_AddContour : Inherits VB_Parent
     Public contour As New List(Of cv.Point)
     Public options As New Options_Contours
     Public Sub New()
@@ -768,7 +768,7 @@ End Class
 
 
 
-Public Class Contour_Gray : Inherits VB_Algorithm
+Public Class Contour_Gray : Inherits VB_Parent
     Public contour As New List(Of cv.Point)
     Public options As New Options_Contours
     Public Sub New()
@@ -809,7 +809,7 @@ End Class
 
 
 
-Public Class Contour_WholeImage : Inherits VB_Algorithm
+Public Class Contour_WholeImage : Inherits VB_Parent
     Dim contour As New Contour_Basics
     Public Sub New()
         findSlider("Max contours").Value = 20
@@ -837,7 +837,7 @@ End Class
 
 
 
-Public Class Contour_DepthTiers : Inherits VB_Algorithm
+Public Class Contour_DepthTiers : Inherits VB_Parent
     Public options As New Options_Contours
     Public classCount As Integer
     Public contourlist As New List(Of cv.Point())
@@ -889,7 +889,7 @@ End Class
 
 
 
-Public Class Contour_FromPoints : Inherits VB_Algorithm
+Public Class Contour_FromPoints : Inherits VB_Parent
     Dim contour As New Contour_Basics
     Dim random As New Random_Basics
     Public Sub New()

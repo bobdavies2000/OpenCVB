@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class History_Basics : Inherits VB_Algorithm
+Public Class History_Basics : Inherits VB_Parent
     Public saveFrames As New List(Of cv.Mat)
     Public Sub New()
         desc = "Create a frame history to sum the last X frames"
@@ -39,7 +39,7 @@ End Class
 
 
 
-Public Class History_MotionRect : Inherits VB_Algorithm
+Public Class History_MotionRect : Inherits VB_Parent
     Public Sub New()
         desc = "Create an image that is the motionRect applied to the previous image."
     End Sub
@@ -59,7 +59,7 @@ End Class
 
 
 
-Public Class History_Cloud : Inherits VB_Algorithm
+Public Class History_Cloud : Inherits VB_Parent
     Public frames As New History_BasicsNoSaturation
     Public Sub New()
         desc = "Create a frame history and sum the last X task.pointcloud's"
@@ -92,7 +92,7 @@ End Class
 
 
 
-Public Class History_BasicsNoSaturation : Inherits VB_Algorithm
+Public Class History_BasicsNoSaturation : Inherits VB_Parent
     Public saveFrames As New List(Of cv.Mat)
     Public Sub New()
         desc = "Create a frame history and sum the last X frames (without saturation!)"
@@ -127,7 +127,7 @@ End Class
 
 
 
-Public Class History_BasicsDiff : Inherits VB_Algorithm
+Public Class History_BasicsDiff : Inherits VB_Parent
     Dim frames As New History_BasicsNoSaturation
     Dim diff As New Diff_Basics
     Public Sub New()

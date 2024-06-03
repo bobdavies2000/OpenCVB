@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Concat_Basics : Inherits VB_Algorithm
+Public Class Concat_Basics : Inherits VB_Parent
     Public Sub New()
         labels(2) = "Horizontal concatenation"
         labels(3) = "Vertical concatenation"
@@ -17,7 +17,7 @@ End Class
 
 
 
-Public Class Concat_4way : Inherits VB_Algorithm
+Public Class Concat_4way : Inherits VB_Parent
     Public img(3) As cv.Mat
     Public Sub New()
         For i = 0 To img.Length - 1

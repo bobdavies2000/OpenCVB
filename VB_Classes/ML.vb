@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Threading
-Public Class ML_Basics : Inherits VB_Algorithm
+Public Class ML_Basics : Inherits VB_Parent
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "depth32f - 32fc3 format with missing depth filled with predicted depth based on color (brighter is farther)", "", "Color used for roi prediction"}
@@ -154,7 +154,7 @@ End Module
 
 
 
-Public Class ML_FillRGBDepth_MT : Inherits VB_Algorithm
+Public Class ML_FillRGBDepth_MT : Inherits VB_Parent
     Dim shadow As New Depth_Holes
     Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
@@ -182,7 +182,7 @@ End Class
 
 
 
-Public Class ML_DepthFromColor : Inherits VB_Algorithm
+Public Class ML_DepthFromColor : Inherits VB_Parent
     Dim colorizer As New Depth_Colorizer_CPP
     Dim mats As New Mat_4Click
     Dim resizer As New Resize_Smaller
@@ -244,7 +244,7 @@ End Class
 
 
 
-Public Class ML_DepthFromXYColor : Inherits VB_Algorithm
+Public Class ML_DepthFromXYColor : Inherits VB_Parent
     Dim mats As New Mat_4to1
     Dim shadow As New Depth_Holes
     Dim resizer As New Resize_Smaller
@@ -335,7 +335,7 @@ Public Structure mlColor
 End Structure
 
 
-Public Class ML_Color2Depth : Inherits VB_Algorithm
+Public Class ML_Color2Depth : Inherits VB_Parent
     Dim minMax As New Grid_MinMaxDepth
     Dim colorClass As New Color8U_Basics
     Public Sub New()
@@ -401,7 +401,7 @@ Public Structure mlColorInTier
     Dim x As Single
     Dim y As Single
 End Structure
-Public Class ML_ColorInTier2Depth : Inherits VB_Algorithm
+Public Class ML_ColorInTier2Depth : Inherits VB_Parent
     Dim minMax As New Grid_MinMaxDepth
     Dim colorClass As New Color8U_Basics
     Dim tiers As New Contour_DepthTiers
@@ -465,7 +465,7 @@ End Class
 
 
 
-Public Class ML_RemoveDups_CPP : Inherits VB_Algorithm
+Public Class ML_RemoveDups_CPP : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold for sort input", 0, 255, 127)
         cPtr = ML_RemoveDups_Open()

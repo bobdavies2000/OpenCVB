@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://github.com/ufoym
-Public Class RecursiveBilateralFilter_CPP : Inherits VB_Algorithm
+Public Class RecursiveBilateralFilter_CPP : Inherits VB_Parent
     Dim dataSrc(0) As Byte
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("RBF Recursion count", 1, 20, 2)

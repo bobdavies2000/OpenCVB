@@ -1,6 +1,6 @@
 ﻿Imports System.Windows
 Imports cv = OpenCvSharp
-Public Class Cluster_Basics : Inherits VB_Algorithm
+Public Class Cluster_Basics : Inherits VB_Parent
     Dim knn As New KNN_Core
     Public ptInput As New List(Of cv.Point)
     Public ptList As New List(Of cv.Point)
@@ -73,7 +73,7 @@ End Class
 
 
 
-Public Class Cluster_Hulls : Inherits VB_Algorithm
+Public Class Cluster_Hulls : Inherits VB_Parent
     Dim cluster As New Cluster_Basics
     Public hulls As New List(Of List(Of cv.Point))
     Dim feat As New Feature_Basics

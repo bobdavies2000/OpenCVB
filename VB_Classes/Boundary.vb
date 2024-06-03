@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Boundary_Basics : Inherits VB_Algorithm
+Public Class Boundary_Basics : Inherits VB_Parent
     Public redCPP As New RedCloud_CPP
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
@@ -54,7 +54,7 @@ End Class
 
 
 
-Public Class Boundary_Tiers : Inherits VB_Algorithm
+Public Class Boundary_Tiers : Inherits VB_Parent
     Dim cells As New Boundary_Basics
     Dim contours As New Contour_DepthTiers
     Public Sub New()
@@ -82,7 +82,7 @@ End Class
 
 
 
-Public Class Boundary_Rectangles : Inherits VB_Algorithm
+Public Class Boundary_Rectangles : Inherits VB_Parent
     Public bounds As New Boundary_Basics
     Public rects As New List(Of cv.Rect)
     Public smallRects As New List(Of cv.Rect)
@@ -144,7 +144,7 @@ End Class
 
 
 
-Public Class Boundary_RemovedRects : Inherits VB_Algorithm
+Public Class Boundary_RemovedRects : Inherits VB_Parent
     Public bRects As New Boundary_Rectangles
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
@@ -171,7 +171,7 @@ End Class
 
 
 
-Public Class Boundary_Overlap : Inherits VB_Algorithm
+Public Class Boundary_Overlap : Inherits VB_Parent
     Dim bounds As New Boundary_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

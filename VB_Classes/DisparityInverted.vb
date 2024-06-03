@@ -16,7 +16,7 @@
 ' Z = 0.5 * 1000 / 100 = 5 meters
 ' The Function() relating depth To disparity Is only valid For a calibrated stereo setup.
 ' If the stereo setup Is Not calibrated, then the function will not be accurate.
-Public Class DisparityFunction_Basics : Inherits VB_Algorithm
+Public Class DisparityFunction_Basics : Inherits VB_Parent
     Dim match As New FeatureLeftRight_Basics
     Public Sub New()
         labels = {"", "", "AddWeighted output: lines show disparity between left and right images",

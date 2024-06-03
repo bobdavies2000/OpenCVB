@@ -1,6 +1,6 @@
 ﻿Imports System.Windows.Forms
 Imports cv = OpenCvSharp
-Public Class Foreground_Basics : Inherits VB_Algorithm
+Public Class Foreground_Basics : Inherits VB_Parent
     Dim simK As New KMeans_Depth
     Public fgDepth As Single
     Public fg As New cv.Mat, bg As New cv.Mat, classCount As Integer
@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class Foreground_KMeans2 : Inherits VB_Algorithm
+Public Class Foreground_KMeans2 : Inherits VB_Parent
     Dim km As New KMeans_Image
     Public Sub New()
         findSlider("KMeans k").Value = 2
@@ -87,7 +87,7 @@ End Class
 
 
 
-Public Class Foreground_Contours : Inherits VB_Algorithm
+Public Class Foreground_Contours : Inherits VB_Parent
     Public fore As New Foreground_Hist3D
     Dim contours As New Contour_General
     Public Sub New()
@@ -106,7 +106,7 @@ End Class
 
 
 
-Public Class Foreground_Hist3D : Inherits VB_Algorithm
+Public Class Foreground_Hist3D : Inherits VB_Parent
     Dim hcloud As New Hist3Dcloud_Basics
     Public Sub New()
         hcloud.maskInput = task.noDepthMask
@@ -127,7 +127,7 @@ End Class
 
 
 
-Public Class Foreground_RedCloud : Inherits VB_Algorithm
+Public Class Foreground_RedCloud : Inherits VB_Parent
     Dim fore As New Foreground_CellsFore
     Dim back As New Foreground_CellsBack
     Public Sub New()
@@ -151,7 +151,7 @@ End Class
 
 
 
-Public Class Foreground_CellsFore : Inherits VB_Algorithm
+Public Class Foreground_CellsFore : Inherits VB_Parent
     Dim fore As New Foreground_Hist3D
     Public redC As New RedCloud_Basics
     Public redCells As New List(Of rcData)
@@ -176,7 +176,7 @@ End Class
 
 
 
-Public Class Foreground_CellsBack : Inherits VB_Algorithm
+Public Class Foreground_CellsBack : Inherits VB_Parent
     Dim fore As New Foreground_Hist3D
     Public redC As New RedCloud_Basics
     Public redCells As New List(Of rcData)

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Salience_Basics_CPP : Inherits VB_Algorithm
+Public Class Salience_Basics_CPP : Inherits VB_Parent
     Dim grayData(0) As Byte
     Dim numScales As Integer
     Public Sub New()
@@ -26,7 +26,7 @@ End Class
 
 
 
-Public Class Salience_Basics_MT : Inherits VB_Algorithm
+Public Class Salience_Basics_MT : Inherits VB_Parent
     Dim salience As New Salience_Basics_CPP
     Public Sub New()
         findSlider("Salience numScales").Value = 2

@@ -105,7 +105,7 @@ Module IndexMain
                 End If
                 If lcaseLine.Contains("matchshapes: ") And MatchShapes.ContainsKey(classname) = False Then MatchShapes.Add(classname, classname)
                 If line = "" Or Trim(line).StartsWith("'") Or Trim(line).StartsWith("#") Then Continue While
-                If LCase(line).StartsWith("public class") And LCase(line).EndsWith("inherits vb_algorithm") Then
+                If LCase(line).StartsWith("public class") And LCase(line).EndsWith("inherits VB_Parent") Then
                     Dim split As String() = Regex.Split(line, "\W+")
                     classname = split(2) ' public class <classname>
                     If classname.StartsWith("Python_") Then PYnames.Add(classname, classname)

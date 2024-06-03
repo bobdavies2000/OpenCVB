@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Gravity_Basics : Inherits VB_Algorithm
+Public Class Gravity_Basics : Inherits VB_Parent
     Public points As New List(Of cv.Point)
     Dim resizeRatio As Integer = 1
     Public vec As New pointPair
@@ -73,7 +73,7 @@ End Class
 
 
 
-Public Class Gravity_BasicsOriginal : Inherits VB_Algorithm
+Public Class Gravity_BasicsOriginal : Inherits VB_Parent
     Public vec As New pointPair
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -126,7 +126,7 @@ End Class
 
 
 
-Public Class Gravity_HorizonCompare : Inherits VB_Algorithm
+Public Class Gravity_HorizonCompare : Inherits VB_Parent
     Dim gravity As New Gravity_Basics
     Dim horizon As New Horizon_Basics
     Public Sub New()
@@ -161,7 +161,7 @@ End Class
 
 
 
-Public Class Gravity_Horizon : Inherits VB_Algorithm
+Public Class Gravity_Horizon : Inherits VB_Parent
     Dim gravity As New Gravity_Basics
     Dim horizon As New Horizon_Basics
     Public Sub New()
@@ -191,7 +191,7 @@ End Class
 
 
 
-Public Class Gravity_BasicsFail : Inherits VB_Algorithm
+Public Class Gravity_BasicsFail : Inherits VB_Parent
     Dim horizon As New Horizon_Basics
     Public vec As New pointPair
     Dim center As cv.Point

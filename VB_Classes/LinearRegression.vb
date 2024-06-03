@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class LinearRegression_Basics : Inherits VB_Algorithm
+Public Class LinearRegression_Basics : Inherits VB_Parent
     Public x As New List(Of Single)
     Public y As New List(Of Single)
     Public p1 As cv.Point, p2 As cv.Point
@@ -42,7 +42,7 @@ End Class
 
 
 
-Public Class LinearRegression_Test : Inherits VB_Algorithm
+Public Class LinearRegression_Test : Inherits VB_Parent
     Dim regress As New LinearRegression_Basics
     Public Sub New()
         desc = "A simple example of using OpenCV's linear regression."
@@ -69,7 +69,7 @@ End Class
 
 
 
-Public Class LinearRegression_Random : Inherits VB_Algorithm
+Public Class LinearRegression_Random : Inherits VB_Parent
     Dim regress As New LinearRegression_Basics
     Dim random As New Random_Basics
     Public Sub New()

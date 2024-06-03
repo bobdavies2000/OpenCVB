@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports  System.IO
 Imports System.Runtime.InteropServices
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
-Public Class WarpModel_Basics : Inherits VB_Algorithm
+Public Class WarpModel_Basics : Inherits VB_Parent
     ReadOnly ecc As New WarpModel_ECC
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
@@ -47,7 +47,7 @@ End Class
 
 
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
-Public Class WarpModel_ECC : Inherits VB_Algorithm
+Public Class WarpModel_ECC : Inherits VB_Parent
     Public warpInput As New WarpModel_Input
     Public warpMatrix() As Single
     Public src2 As New cv.Mat
@@ -133,7 +133,7 @@ End Class
 
 ' https://github.com/ycui11/-Colorizing-Prokudin-Gorskii-images-of-the-Russian-Empire
 ' https://github.com/petraohlin/Colorizing-the-Prokudin-Gorskii-Collection
-Public Class WarpModel_Input : Inherits VB_Algorithm
+Public Class WarpModel_Input : Inherits VB_Parent
     Public rgb(3 - 1) As cv.Mat
     Public gradient(3 - 1) As cv.Mat
     ReadOnly sobel as new Edge_Sobel_Old

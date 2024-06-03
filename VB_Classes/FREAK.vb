@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports OpenCvSharp.XFeatures2D
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
-Public Class FREAK_Basics : Inherits VB_Algorithm
+Public Class FREAK_Basics : Inherits VB_Parent
     Dim orb As New ORB_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True

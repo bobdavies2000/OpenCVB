@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Font_OpenCV : Inherits VB_Algorithm
+Public Class Font_OpenCV : Inherits VB_Parent
     Public Sub New()
         desc = "Display different font options available in OpenCV"
     End Sub
@@ -26,7 +26,7 @@ End Class
 
 
 
-Public Class Font_TrueType : Inherits VB_Algorithm
+Public Class Font_TrueType : Inherits VB_Parent
     Public Sub New()
         desc = "Display different TrueType fonts"
     End Sub
@@ -42,7 +42,7 @@ End Class
 
 
 
-Public Class Font_FlowText : Inherits VB_Algorithm
+Public Class Font_FlowText : Inherits VB_Parent
     Public msgs As New List(Of String)
     Public dst As Integer = RESULT_DST2
     Public Sub New()

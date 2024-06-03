@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 'https://github.com/omidsakhi/cv-hmm
-Public Class HMM_Example_CPP : Inherits VB_Algorithm
+Public Class HMM_Example_CPP : Inherits VB_Parent
     Public Sub New()
         If task.testAllRunning = False Then cPtr = HMM_Open()
         labels(2) = "Text output with explanation will appear in the Visual Studio output."

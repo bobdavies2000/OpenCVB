@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/d3/dc0/group__imgproc__shape.html
 ' https://docs.opencv.org/3.4/d5/d45/tutorial_py_contours_more_functions.html
 ' https://stackoverflow.com/questions/55529371/opencv-shape-matching-between-two-similar-shapes
-Public Class MatchShapes_Basics : Inherits VB_Algorithm
+Public Class MatchShapes_Basics : Inherits VB_Parent
     Public hull1 As cv.Point()()
     Public hull2 As cv.Point()()
     Dim match As New Options_MatchShapes
@@ -64,7 +64,7 @@ End Class
 
 
 
-Public Class MatchShapes_NearbyHull : Inherits VB_Algorithm
+Public Class MatchShapes_NearbyHull : Inherits VB_Parent
     Public similarCells As New List(Of rcData)
     Public bestCell As Integer
     Dim rc As New rcData
@@ -115,7 +115,7 @@ End Class
 
 
 
-Public Class MatchShapes_Nearby : Inherits VB_Algorithm
+Public Class MatchShapes_Nearby : Inherits VB_Parent
     Public redCells As New List(Of rcData)
     Public similarCells As New List(Of rcData)
     Public bestCell As Integer
@@ -180,7 +180,7 @@ End Class
 
 
 
-Public Class MatchShapes_LeftRight : Inherits VB_Algorithm
+Public Class MatchShapes_LeftRight : Inherits VB_Parent
     Dim match As New MatchShapes_Nearby
     Public leftCells As New List(Of rcData)
     Public rightCells As New List(Of rcData)
@@ -252,7 +252,7 @@ End Class
 
 
 
-Public Class MatchShapes_Hulls : Inherits VB_Algorithm
+Public Class MatchShapes_Hulls : Inherits VB_Parent
     Dim options As New Options_MatchShapes
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
@@ -287,7 +287,7 @@ End Class
 
 
 
-Public Class MatchShapes_Contours : Inherits VB_Algorithm
+Public Class MatchShapes_Contours : Inherits VB_Parent
     Dim options As New Options_MatchShapes
     Dim redC As New RedCloud_Basics
     Public Sub New()

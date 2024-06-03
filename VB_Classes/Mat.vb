@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Mat_Repeat : Inherits VB_Algorithm
+Public Class Mat_Repeat : Inherits VB_Parent
     Public Sub New()
         desc = "Use the repeat method to replicate data."
     End Sub
@@ -19,7 +19,7 @@ End Class
 
 
 
-Public Class Mat_PointToMat : Inherits VB_Algorithm
+Public Class Mat_PointToMat : Inherits VB_Parent
     Dim random As New Random_Basics
     Public Sub New()
         labels(2) = "Random_Basics points (original)"
@@ -49,7 +49,7 @@ End Class
 
 
 
-Public Class Mat_MatToPoint : Inherits VB_Algorithm
+Public Class Mat_MatToPoint : Inherits VB_Parent
     Public Sub New()
         desc = "Convert a mat into a vector of points."
         labels(2) = "Reconstructed BGR Image"
@@ -77,7 +77,7 @@ End Class
 
 
 
-Public Class Mat_Transpose : Inherits VB_Algorithm
+Public Class Mat_Transpose : Inherits VB_Parent
     Public Sub New()
         desc = "Transpose a Mat and show results."
         labels(2) = "Color Image Transposed"
@@ -97,7 +97,7 @@ End Class
 
 
 ' https://csharp.hotexamples.com/examples/OpenCvSharp/Mat/-/php-mat-class-examples.html#0x95f170f4714e3258c220a78eacceeee99591440b9885a2997bbbc6b3aebdcf1c-19,,37,
-Public Class Mat_Tricks : Inherits VB_Algorithm
+Public Class Mat_Tricks : Inherits VB_Parent
     Public Sub New()
         labels(2) = "Image squeezed into square Mat"
         labels(3) = "Mat transposed around the diagonal"
@@ -117,7 +117,7 @@ End Class
 
 ' https://csharp.hotexamples.com/examples/OpenCvSharp/MatExpr/-/php-matexpr-class-examples.html
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/MatOperations.cs
-Public Class Mat_RowColRange : Inherits VB_Algorithm
+Public Class Mat_RowColRange : Inherits VB_Parent
     Public Sub New()
         labels(2) = "BitwiseNot of RowRange and ColRange"
         desc = "Perform operation on a range of cols and/or Rows."
@@ -135,7 +135,7 @@ End Class
 
 
 
-Public Class Mat_Managed : Inherits VB_Algorithm
+Public Class Mat_Managed : Inherits VB_Parent
     Public Sub New()
         labels(2) = "Color change is in the managed cv.vec3b array"
         desc = "There is a limited ability to use Mat data in Managed code directly."
@@ -161,7 +161,7 @@ End Class
 
 
 
-Public Class Mat_MultiplyReview : Inherits VB_Algorithm
+Public Class Mat_MultiplyReview : Inherits VB_Parent
     Dim flow As New Font_FlowText
     Public Sub New()
         desc = "Review matrix multiplication"
@@ -220,7 +220,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/11015119/inverse-matrix-opencv-matrix-inv-not-working-properly
-Public Class Mat_Inverse : Inherits VB_Algorithm
+Public Class Mat_Inverse : Inherits VB_Parent
     Dim flow As New Font_FlowText
     Public matrix(,) As Single = {{1.1688, 0.23, 62.2}, {-0.013, 1.225, -6.29}, {0, 0, 1}}
     Public validateInverse As Boolean
@@ -298,7 +298,7 @@ End Class
 
 
 '' https://github.com/takuya-takeuchi/DlibDotNet/tree/master/examples/3rdparty/OpenCVSharp/MatToArray2D
-'Public Class Mat_2Dlib : Inherits VB_Algorithm
+'Public Class Mat_2Dlib : Inherits VB_Parent
 '    Public dRGB As Array2D(Of BgrPixel)
 '    Public dGray As Array2D(Of Byte)
 '    Public Sub New()
@@ -325,7 +325,7 @@ End Class
 
 
 '' https://github.com/takuya-takeuchi/DlibDotNet/tree/master/examples/3rdparty/OpenCVSharp/MatToArray2D
-'Public Class Mat_Dlib2Mat : Inherits VB_Algorithm
+'Public Class Mat_Dlib2Mat : Inherits VB_Parent
 '    Public dGray As Array2D(Of Byte)
 '    Public dRGB As Array2D(Of BgrPixel)
 '    Public d32f As Array2D(Of Single)
@@ -353,7 +353,7 @@ End Class
 
 
 
-Public Class Mat_2to1 : Inherits VB_Algorithm
+Public Class Mat_2to1 : Inherits VB_Parent
     Dim mat1 As cv.Mat
     Dim mat2 As cv.Mat
     Public mat() As cv.Mat = {mat1, mat2}
@@ -398,7 +398,7 @@ End Class
 
 
 
-Public Class Mat_4Click : Inherits VB_Algorithm
+Public Class Mat_4Click : Inherits VB_Parent
     Public mats As New Mat_4to1
     Public mat() As cv.Mat
     Public quadrant As Integer = RESULT_DST3
@@ -436,7 +436,7 @@ End Class
 
 
 
-Public Class Mat_4to1 : Inherits VB_Algorithm
+Public Class Mat_4to1 : Inherits VB_Parent
     Public mat(3) As cv.Mat
     Public lineSeparators = True ' if they want lines or not...
     Public quadrant As Integer = 0
@@ -483,7 +483,7 @@ End Class
 
 
 
-Public Class Mat_ToList : Inherits VB_Algorithm
+Public Class Mat_ToList : Inherits VB_Parent
     Dim autoX As New OpAuto_XRange
     Dim histTop As New Projection_HistTop
     Public Sub New()

@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class LineCoin_Basics : Inherits VB_Algorithm
+Public Class LineCoin_Basics : Inherits VB_Parent
     Public longLines As New LongLine_Basics
     Public lpList As New List(Of pointPair)
     Public Sub New()
@@ -63,7 +63,7 @@ End Class
 
 
 
-Public Class LineCoin_HistoryIntercept : Inherits VB_Algorithm
+Public Class LineCoin_HistoryIntercept : Inherits VB_Parent
     Dim coin As New LineCoin_Basics
     Public lpList As New List(Of pointPair)
     Public Sub New()
@@ -85,7 +85,7 @@ End Class
 
 
 
-Public Class LineCoin_Parallel : Inherits VB_Algorithm
+Public Class LineCoin_Parallel : Inherits VB_Parent
     Dim parallel As New LongLine_ExtendParallel
     Dim near As New Line_Nearest
     Public coinList As New List(Of coinPoints)

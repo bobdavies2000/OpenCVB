@@ -12,7 +12,7 @@ Module Quaternion_module
     End Function
 End Module
 
-Public Class Quaterion_Basics : Inherits VB_Algorithm
+Public Class Quaterion_Basics : Inherits VB_Parent
     Dim options As New Options_Quaternion
     Public Sub New()
         desc = "Use the quaternion values to multiply and compute conjugate"
@@ -29,7 +29,7 @@ End Class
 
 
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/pose-predict
-Public Class Quaterion_IMUPrediction : Inherits VB_Algorithm
+Public Class Quaterion_IMUPrediction : Inherits VB_Parent
     Dim host As New IMU_PlotHostFrameTimes
     Public Sub New()
         labels(2) = "Quaternion_IMUPrediction"

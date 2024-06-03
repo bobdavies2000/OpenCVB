@@ -4,7 +4,7 @@ Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
 ' https://www.learnopencv.com/otsu-thresholding-with-opencv/?ck_subscriber_id=785741175
 ' https://github.com/spmallick/learnopencv/tree/master/otsu-method?ck_subscriber_id=785741175
-Public Class Binarize_Basics : Inherits VB_Algorithm
+Public Class Binarize_Basics : Inherits VB_Parent
     Public thresholdType = cv.ThresholdTypes.Otsu
     Dim minRange = 0
     Dim maxRange = 255
@@ -38,7 +38,7 @@ End Class
 
 
 'https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
-Public Class Binarize_OTSU : Inherits VB_Algorithm
+Public Class Binarize_OTSU : Inherits VB_Parent
     Dim binarize As Binarize_Basics
     Public Sub New()
         binarize = New Binarize_Basics()
@@ -87,7 +87,7 @@ End Class
 
 
 #Disable Warning BC40000
-Public Class Binarize_Niblack_Sauvola : Inherits VB_Algorithm
+Public Class Binarize_Niblack_Sauvola : Inherits VB_Parent
     Dim options As New Options_BinarizeNiBlack
     Public Sub New()
         desc = "Binarize an image using Niblack and Sauvola"
@@ -109,7 +109,7 @@ End Class
 
 
 
-Public Class Binarize_Niblack_Nick : Inherits VB_Algorithm
+Public Class Binarize_Niblack_Nick : Inherits VB_Parent
     Dim options As New Options_BinarizeNiBlack
     Public Sub New()
         desc = "Binarize an image using Niblack and Nick"
@@ -131,7 +131,7 @@ End Class
 
 
 
-Public Class Binarize_Bernson : Inherits VB_Algorithm
+Public Class Binarize_Bernson : Inherits VB_Parent
     Dim options As New Options_Bernson
     Public Sub New()
         labels(2) = "Binarize Bernson (Draw Enabled)"
@@ -151,7 +151,7 @@ End Class
 
 
 
-Public Class Binarize_Bernson_MT : Inherits VB_Algorithm
+Public Class Binarize_Bernson_MT : Inherits VB_Parent
     Dim options As New Options_Bernson
     Public Sub New()
         gOptions.GridSize.Value = 32
@@ -175,7 +175,7 @@ End Class
 
 
 
-Public Class Binarize_KMeansMasks : Inherits VB_Algorithm
+Public Class Binarize_KMeansMasks : Inherits VB_Parent
     Dim km As New KMeans_Image
     Dim mats As New Mat_4Click
     Public Sub New()
@@ -204,7 +204,7 @@ End Class
 
 
 
-Public Class Binarize_KMeansRGB : Inherits VB_Algorithm
+Public Class Binarize_KMeansRGB : Inherits VB_Parent
     Dim km As New KMeans_Image
     Dim mats As New Mat_4Click
     Public Sub New()
@@ -232,7 +232,7 @@ End Class
 
 
 
-Public Class Binarize_FourPixelFlips : Inherits VB_Algorithm
+Public Class Binarize_FourPixelFlips : Inherits VB_Parent
     Dim binar4 As New Bin4Way_Regions
     Public Sub New()
         desc = "Identify the marginal regions that flip between subdivisions based on brightness."
@@ -253,7 +253,7 @@ End Class
 
 
 
-Public Class Binarize_DepthTiers : Inherits VB_Algorithm
+Public Class Binarize_DepthTiers : Inherits VB_Parent
     Dim tiers As New Depth_TiersZ
     Dim binar4 As New Bin4Way_Regions
     Public classCount = 200 ' 4-way split with 50 depth levels at 10 cm's each.
@@ -284,7 +284,7 @@ End Class
 
 
 
-Public Class Binarize_Simple : Inherits VB_Algorithm
+Public Class Binarize_Simple : Inherits VB_Parent
     Public meanScalar As cv.Scalar
     Public injectVal As Integer = 255
     Public Sub New()

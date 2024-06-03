@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class CameraMotion_Basics : Inherits VB_Algorithm
+Public Class CameraMotion_Basics : Inherits VB_Parent
     Public translationX As Integer
     Public translationY As Integer
     Dim gravity As New Gravity_Horizon
@@ -84,7 +84,7 @@ End Class
 
 
 
-Public Class CameraMotion_WithRotation : Inherits VB_Algorithm
+Public Class CameraMotion_WithRotation : Inherits VB_Parent
     Public translationX As Single
     Public rotationX As Single
     Public centerX As cv.Point2f
@@ -174,7 +174,7 @@ End Class
 
 
 
-Public Class CameraMotion_SceneMotion : Inherits VB_Algorithm
+Public Class CameraMotion_SceneMotion : Inherits VB_Parent
     Dim cMotion As New CameraMotion_Basics
     Dim motion As New Motion_Basics
     Public Sub New()

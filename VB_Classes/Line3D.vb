@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Line3D_Draw : Inherits VB_Algorithm
+Public Class Line3D_Draw : Inherits VB_Parent
     Public p1 As cv.Point, p2 As cv.Point
     Dim plot As New Plot_OverTimeScalar
     Public Sub New()
@@ -68,7 +68,7 @@ End Class
 
 
 
-Public Class Line3D_Checks : Inherits VB_Algorithm
+Public Class Line3D_Checks : Inherits VB_Parent
     Dim pts As New PointCloud_Basics
     Public pcLines As New List(Of cv.Point3f)
     Public Sub New()
@@ -105,7 +105,7 @@ End Class
 
 
 
-Public Class Line3D_CandidatesFirstLast : Inherits VB_Algorithm
+Public Class Line3D_CandidatesFirstLast : Inherits VB_Parent
     Dim pts As New PointCloud_Basics
     Public pcLines As New List(Of cv.Point3f)
     Public pcLinesMat As cv.Mat
@@ -148,7 +148,7 @@ End Class
 
 
 
-Public Class Line3D_CandidatesAll : Inherits VB_Algorithm
+Public Class Line3D_CandidatesAll : Inherits VB_Parent
     Dim pts As New PointCloud_Basics
     Public pcLines As New List(Of cv.Point3f)
     Public pcLinesMat As cv.Mat

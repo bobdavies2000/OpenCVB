@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Quadrant_Basics : Inherits VB_Algorithm
+Public Class Quadrant_Basics : Inherits VB_Parent
     Public Sub New()
 
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

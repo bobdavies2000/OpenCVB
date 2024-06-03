@@ -2,7 +2,7 @@ Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_Basics : Inherits VB_Algorithm
+Public Class MSER_Basics : Inherits VB_Parent
     Dim detect As New MSER_CPP
     Public mserCells As New List(Of rcData)
     Public floodPoints As New List(Of cv.Point)
@@ -65,7 +65,7 @@ End Class
 
 
 
-Public Class MSER_Regions : Inherits VB_Algorithm
+Public Class MSER_Regions : Inherits VB_Parent
     Dim detect As New MSER_Detect
     Public mserCells As New List(Of rcData)
     'Dim matchCell As New RedCloud_MatchCell
@@ -140,7 +140,7 @@ End Class
 
 
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_Detect : Inherits VB_Algorithm
+Public Class MSER_Detect : Inherits VB_Parent
     Public boxes() As cv.Rect
     Public regions()() As cv.Point
     Public mser = cv.MSER.Create
@@ -178,7 +178,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_SyntheticInput : Inherits VB_Algorithm
+Public Class MSER_SyntheticInput : Inherits VB_Parent
     Private Sub addNestedRectangles(img As cv.Mat, p0 As cv.Point, width() As Integer, color() As Integer, n As Integer)
         For i = 0 To n - 1
             img.Rectangle(New cv.Rect(p0.X, p0.Y, width(i), width(i)), color(i), 1)
@@ -221,7 +221,7 @@ End Class
 
 
 
-Public Class MSER_LeftRight : Inherits VB_Algorithm
+Public Class MSER_LeftRight : Inherits VB_Parent
     Dim left As New MSER_Left
     Dim right As New MSER_Right
     Public Sub New()
@@ -245,7 +245,7 @@ End Class
 
 
 
-Public Class MSER_Left : Inherits VB_Algorithm
+Public Class MSER_Left : Inherits VB_Parent
     Dim mBase As New MSER_Basics
     Public Sub New()
         labels = {"", "", "MSER_Basics output for left camera", "MSER_Basics rectangles found"}
@@ -266,7 +266,7 @@ End Class
 
 
 
-Public Class MSER_Right : Inherits VB_Algorithm
+Public Class MSER_Right : Inherits VB_Parent
     Dim mBase As New MSER_Basics
     Public Sub New()
         labels = {"", "", "MSER_Basics output for right camera", "MSER_Basics rectangles found"}
@@ -287,7 +287,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/python/mser.py
-Public Class MSER_Hulls : Inherits VB_Algorithm
+Public Class MSER_Hulls : Inherits VB_Parent
     Dim options As New Options_MSER
     Dim mBase As New MSER_Basics
     Public Sub New()
@@ -319,7 +319,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_TestSynthetic : Inherits VB_Algorithm
+Public Class MSER_TestSynthetic : Inherits VB_Parent
     Dim options As New Options_MSER
     Dim synth As New MSER_SyntheticInput
     Dim mBase As New MSER_Basics
@@ -346,7 +346,7 @@ End Class
 
 
 
-Public Class MSER_Grayscale : Inherits VB_Algorithm
+Public Class MSER_Grayscale : Inherits VB_Parent
     Dim mBase As New MSER_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
@@ -368,7 +368,7 @@ End Class
 
 
 
-Public Class MSER_ReducedRGB : Inherits VB_Algorithm
+Public Class MSER_ReducedRGB : Inherits VB_Parent
     Dim mBase As New MSER_Basics
     Dim reduction As New Reduction_BGR
     Public Sub New()
@@ -392,7 +392,7 @@ End Class
 
 
 
-Public Class MSER_RegionLeft : Inherits VB_Algorithm
+Public Class MSER_RegionLeft : Inherits VB_Parent
     Dim regions As New MSER_Regions
     Public Sub New()
         desc = "Identify the region using the left image"
@@ -411,7 +411,7 @@ End Class
 
 
 
-Public Class MSER_RegionRight : Inherits VB_Algorithm
+Public Class MSER_RegionRight : Inherits VB_Parent
     Dim regions As New MSER_Regions
     Public Sub New()
         desc = "Identify the region using the right image"
@@ -429,7 +429,7 @@ End Class
 
 
 
-Public Class MSER_RegionLeftRight : Inherits VB_Algorithm
+Public Class MSER_RegionLeftRight : Inherits VB_Parent
     Dim left As New MSER_RegionLeft
     Dim right As New MSER_RegionRight
     Public Sub New()
@@ -450,7 +450,7 @@ End Class
 
 
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_ROI : Inherits VB_Algorithm
+Public Class MSER_ROI : Inherits VB_Parent
     Public containers As New List(Of cv.Rect)
     Dim options As New Options_MSER
     Dim core As New MSER_Detect
@@ -512,7 +512,7 @@ End Class
 
 
 ' https://github.com/shimat/opencvsharp/wiki/MSER
-Public Class MSER_TestExample : Inherits VB_Algorithm
+Public Class MSER_TestExample : Inherits VB_Parent
     Dim image As cv.Mat
     Dim mser As cv.MSER
     Dim options As New Options_MSER
@@ -562,7 +562,7 @@ End Class
 
 
 
-Public Class MSER_RedCloud : Inherits VB_Algorithm
+Public Class MSER_RedCloud : Inherits VB_Parent
     Dim mBase As New MSER_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -583,7 +583,7 @@ End Class
 
 
 
-Public Class MSER_Mask_CPP : Inherits VB_Algorithm
+Public Class MSER_Mask_CPP : Inherits VB_Parent
     Dim options As New Options_MSER
     Dim redC As New RedCloud_Cells
     Public classCount As Integer
@@ -633,7 +633,7 @@ End Class
 
 
 
-Public Class MSER_Binarize : Inherits VB_Algorithm
+Public Class MSER_Binarize : Inherits VB_Parent
     Dim mser As New MSER_Basics
     Dim bin4 As New Bin4Way_Regions
     Public Sub New()
@@ -653,7 +653,7 @@ End Class
 
 
 
-Public Class MSER_Basics1 : Inherits VB_Algorithm
+Public Class MSER_Basics1 : Inherits VB_Parent
     Dim detect As New MSER_CPP
     Dim flood As New RedCloud_Basics
     Public Sub New()
@@ -672,7 +672,7 @@ End Class
 
 
 
-Public Class MSER_BasicsNew : Inherits VB_Algorithm
+Public Class MSER_BasicsNew : Inherits VB_Parent
     Dim detect As New MSER_CPP
     Public Sub New()
         desc = "Create cells for each region in MSER output"
@@ -707,7 +707,7 @@ End Class
 
 
 
-Public Class MSER_Basics2 : Inherits VB_Algorithm
+Public Class MSER_Basics2 : Inherits VB_Parent
     Dim detect As New MSER_CPP
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -766,7 +766,7 @@ End Class
 
 
 
-Public Class MSER_CPP : Inherits VB_Algorithm
+Public Class MSER_CPP : Inherits VB_Parent
     Dim options As New Options_MSER
     Public boxes As New List(Of cv.Rect)
     Public floodPoints As New List(Of cv.Point)

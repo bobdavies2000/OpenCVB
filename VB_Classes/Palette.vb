@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.IO
-Public Class Palette_Basics : Inherits VB_Algorithm
+Public Class Palette_Basics : Inherits VB_Parent
     Public whitebackground As Boolean
     Public Sub New()
         desc = "Apply the different color maps in OpenCV"
@@ -30,7 +30,7 @@ End Class
 
 
 
-Public Class Palette_Color : Inherits VB_Algorithm
+Public Class Palette_Color : Inherits VB_Parent
     Dim options As New Options_Colors
     Public Sub New()
         desc = "Define a color Using sliders."
@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class Palette_LinearPolar : Inherits VB_Algorithm
+Public Class Palette_LinearPolar : Inherits VB_Parent
     Public rotateOptions As New Options_Resize
     Public Sub New()
         desc = "Use LinearPolar To create gradient image"
@@ -85,7 +85,7 @@ End Class
 
 
 
-Public Class Palette_Reduction : Inherits VB_Algorithm
+Public Class Palette_Reduction : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Public Sub New()
         vbAddAdvice(traceName + ": redOptions 'Reduction' to control results.")
@@ -103,7 +103,7 @@ End Class
 
 
 
-Public Class Palette_DrawTest : Inherits VB_Algorithm
+Public Class Palette_DrawTest : Inherits VB_Parent
     Dim draw As New Draw_Shapes
     Public Sub New()
         desc = "Experiment With palette Using a drawn image"
@@ -118,7 +118,7 @@ End Class
 
 
 
-Public Class Palette_Gradient : Inherits VB_Algorithm
+Public Class Palette_Gradient : Inherits VB_Parent
     Public color1 As cv.Scalar
     Public color2 As cv.Scalar
     Public Sub New()
@@ -150,7 +150,7 @@ End Class
 
 
 
-Public Class Palette_DepthColorMap : Inherits VB_Algorithm
+Public Class Palette_DepthColorMap : Inherits VB_Parent
     Public gradientColorMap As New cv.Mat
     Dim gColor As New Gradient_Color
     Public Sub New()
@@ -200,7 +200,7 @@ End Class
 
 
 
-Public Class Palette_RGBDepth : Inherits VB_Algorithm
+Public Class Palette_RGBDepth : Inherits VB_Parent
     Dim gradientColorMap As New cv.Mat
     Dim gColor As New Gradient_Color
     Public Sub New()
@@ -237,7 +237,7 @@ End Class
 
 
 
-Public Class Palette_Layout2D : Inherits VB_Algorithm
+Public Class Palette_Layout2D : Inherits VB_Parent
     Public Sub New()
         desc = "Layout the available colors in a 2D grid"
     End Sub
@@ -258,7 +258,7 @@ End Class
 
 
 
-Public Class Palette_LeftRightImages : Inherits VB_Algorithm
+Public Class Palette_LeftRightImages : Inherits VB_Parent
     Public Sub New()
         desc = "Use a palette with the left and right images."
     End Sub
@@ -267,7 +267,7 @@ Public Class Palette_LeftRightImages : Inherits VB_Algorithm
         dst3 = vbPalette(task.rightView.ConvertScaleAbs)
     End Sub
 End Class
-Public Class Palette_TaskColors : Inherits VB_Algorithm
+Public Class Palette_TaskColors : Inherits VB_Parent
     Public Sub New()
         labels = {"", "", "ScalarColors", "VecColors"}
         desc = "Display that task.scalarColors and task.vecColors"
@@ -294,7 +294,7 @@ End Class
 
 
 
-Public Class Palette_Create : Inherits VB_Algorithm
+Public Class Palette_Create : Inherits VB_Parent
     Dim schemes() As FileInfo
     Dim schemeName As String
     Dim colorGrad As New cv.Mat
@@ -369,7 +369,7 @@ End Class
 
 
 
-Public Class Palette_Random : Inherits VB_Algorithm
+Public Class Palette_Random : Inherits VB_Parent
     Public colorMap As cv.Mat
     Public Sub New()
         vbAddAdvice(traceName + ": There are no options" + vbCrLf + "Just produces a colorMap filled with random vec3b's.")
@@ -389,7 +389,7 @@ End Class
 
 
 
-Public Class Palette_Variable : Inherits VB_Algorithm
+Public Class Palette_Variable : Inherits VB_Parent
     Public colorGrad As cv.Mat
     Public originalColorMap As cv.Mat
     Public colors As New List(Of cv.Vec3b)
@@ -414,7 +414,7 @@ End Class
 
 
 
-Public Class Palette_RandomColorMap : Inherits VB_Algorithm
+Public Class Palette_RandomColorMap : Inherits VB_Parent
     Public gradientColorMap As New cv.Mat
     Public transitionCount As Integer = -1
     Dim gColor As New Gradient_Color
@@ -454,7 +454,7 @@ End Class
 
 
 
-Public Class Palette_LoadColorMap : Inherits VB_Algorithm
+Public Class Palette_LoadColorMap : Inherits VB_Parent
     Public whitebackground As Boolean
     Public colorMap As New cv.Mat
     Dim cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
@@ -488,7 +488,7 @@ End Class
 
 
 
-Public Class Palette_CustomColorMap : Inherits VB_Algorithm
+Public Class Palette_CustomColorMap : Inherits VB_Parent
     Public colorMap As New cv.Mat
     Public Sub New()
         labels(2) = "ColorMap = " + gOptions.Palettes.Text
@@ -516,7 +516,7 @@ End Class
 
 
 
-Public Class Palette_GrayToColor : Inherits VB_Algorithm
+Public Class Palette_GrayToColor : Inherits VB_Parent
     Public Sub New()
         desc = "Build a palette for the current image using samples from each gray level.  Everything turns out sepia-like."
     End Sub

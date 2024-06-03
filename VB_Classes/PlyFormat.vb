@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 Imports cv = OpenCvSharp
-Public Class PlyFormat_Basics : Inherits VB_Algorithm
+Public Class PlyFormat_Basics : Inherits VB_Parent
     Public fileNameForm As OptionsFileName
     Public Sub New()
         fileNameForm = New OptionsFileName
@@ -49,7 +49,7 @@ End Class
 
 
 
-Public Class PlyFormat_PlusRGB : Inherits VB_Algorithm
+Public Class PlyFormat_PlusRGB : Inherits VB_Parent
     Dim ply As New PlyFormat_Basics
     Public Sub New()
         desc = "Save the pointcloud in .ply format and include the RGB data."

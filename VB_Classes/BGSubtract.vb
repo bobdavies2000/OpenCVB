@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
-Public Class BGSubtract_Basics : Inherits VB_Algorithm
+Public Class BGSubtract_Basics : Inherits VB_Parent
     Public options As New Options_BGSubtract
     Public Sub New()
         cPtr = BGSubtract_BGFG_Open(options.currMethod)
@@ -35,7 +35,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
-Public Class BGSubtract_Basics_QT : Inherits VB_Algorithm
+Public Class BGSubtract_Basics_QT : Inherits VB_Parent
     Dim learnRate As Double
     Public Sub New()
         Dim learnRate = If(dst2.Width >= 1280, 0.5, 0.1) ' learn faster with large images (slower frame rate)
@@ -61,7 +61,7 @@ End Class
 
 
 
-Public Class BGSubtract_MOG2 : Inherits VB_Algorithm
+Public Class BGSubtract_MOG2 : Inherits VB_Parent
     Dim MOG2 As cv.BackgroundSubtractorMOG2
     Dim options As New Options_BGSubtract
     Public Sub New()
@@ -80,7 +80,7 @@ End Class
 
 
 
-Public Class BGSubtract_MOG2_QT : Inherits VB_Algorithm
+Public Class BGSubtract_MOG2_QT : Inherits VB_Parent
     Dim MOG2 As cv.BackgroundSubtractorMOG2
     Public Sub New()
         MOG2 = cv.BackgroundSubtractorMOG2.Create()
@@ -99,7 +99,7 @@ End Class
 
 
 
-Public Class BGSubtract_MotionDetect : Inherits VB_Algorithm
+Public Class BGSubtract_MotionDetect : Inherits VB_Parent
     Dim radioChoices As cv.Vec3i()
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 0, 1000, 980)
@@ -158,7 +158,7 @@ End Class
 
 
 
-Public Class BGSubtract_MOG : Inherits VB_Algorithm
+Public Class BGSubtract_MOG : Inherits VB_Parent
     Dim MOG As cv.BackgroundSubtractorMOG
     Dim options As New Options_BGSubtract
     Public Sub New()
@@ -177,7 +177,7 @@ End Class
 
 
 
-Public Class BGSubtract_GMG_KNN : Inherits VB_Algorithm
+Public Class BGSubtract_GMG_KNN : Inherits VB_Parent
     Dim gmg As cv.BackgroundSubtractorGMG
     Dim knn As cv.BackgroundSubtractorKNN
     Dim options As New Options_BGSubtract
@@ -205,7 +205,7 @@ End Class
 
 
 
-Public Class BGSubtract_MOG_RGBDepth : Inherits VB_Algorithm
+Public Class BGSubtract_MOG_RGBDepth : Inherits VB_Parent
     Public grayMat As New cv.Mat
     Dim options As New Options_BGSubtract
     Dim MOGDepth As cv.BackgroundSubtractorMOG
@@ -229,7 +229,7 @@ End Class
 
 
 
-Public Class BGSubtract_MOG_Retina : Inherits VB_Algorithm
+Public Class BGSubtract_MOG_Retina : Inherits VB_Parent
     Dim bgSub As New BGSubtract_MOG
     Dim retina As New Retina_Basics_CPP
     Public Sub New()
@@ -247,7 +247,7 @@ End Class
 
 
 
-Public Class BGSubtract_DepthOrColorMotion : Inherits VB_Algorithm
+Public Class BGSubtract_DepthOrColorMotion : Inherits VB_Parent
     Public motion As New Diff_UnstableDepthAndColor
     Public Sub New()
         desc = "Detect motion with both depth and color changes"
@@ -267,7 +267,7 @@ End Class
 
 
 
-Public Class BGSubtract_Video : Inherits VB_Algorithm
+Public Class BGSubtract_Video : Inherits VB_Parent
     Dim bgSub As New BGSubtract_Basics
     Dim video As New Video_Basics
     Public Sub New()
@@ -290,7 +290,7 @@ End Class
 
 
 
-Public Class BGSubtract_Synthetic_CPP : Inherits VB_Algorithm
+Public Class BGSubtract_Synthetic_CPP : Inherits VB_Parent
     Dim options As New Options_BGSubtractSynthetic
     Public Sub New()
         labels(2) = "Synthetic background/foreground image."
@@ -323,7 +323,7 @@ End Class
 
 
 
-Public Class BGSubtract_Synthetic : Inherits VB_Algorithm
+Public Class BGSubtract_Synthetic : Inherits VB_Parent
     Dim bgSub As New BGSubtract_Basics
     Dim synth As New BGSubtract_Synthetic_CPP
     Public Sub New()
@@ -343,7 +343,7 @@ End Class
 
 
 
-Public Class BGSubtract_Reduction : Inherits VB_Algorithm
+Public Class BGSubtract_Reduction : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Dim bgSub As New BGSubtract_Basics
     Public Sub New()

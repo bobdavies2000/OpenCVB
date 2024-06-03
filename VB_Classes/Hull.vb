@@ -1,7 +1,7 @@
 ﻿Imports System.Windows.Media.Media3D
 Imports cv = OpenCvSharp
 
-Public Class Hull_Basics : Inherits VB_Algorithm
+Public Class Hull_Basics : Inherits VB_Parent
     Dim random As New Random_Basics
     Public inputPoints As New List(Of cv.Point2f)
     Public hull As New List(Of cv.Point)
@@ -33,7 +33,7 @@ End Class
 
 
 
-Public Class Hull_Contour : Inherits VB_Algorithm
+Public Class Hull_Contour : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Compare the hull to the contour of a RedCloud cell"

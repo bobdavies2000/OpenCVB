@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/js_contour_features_fitLine.html
-Public Class FitLine_Basics : Inherits VB_Algorithm
+Public Class FitLine_Basics : Inherits VB_Parent
     Dim options As New Options_FitLine
     Public draw As New Draw_Lines
     Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
@@ -43,7 +43,7 @@ End Class
 
 
 
-Public Class Fitline_3DBasics_MT : Inherits VB_Algorithm
+Public Class Fitline_3DBasics_MT : Inherits VB_Parent
     Dim hlines As New Hough_Lines_MT
     Public Sub New()
         desc = "Use visual lines to find 3D lines.  This algorithm is NOT working."

@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Mouse_Basics : Inherits VB_Algorithm
+Public Class Mouse_Basics : Inherits VB_Parent
     Public Sub New()
         labels(2) = "Move the mouse below to show mouse tracking."
         desc = "Test the mousePoint interface"
@@ -20,7 +20,7 @@ End Class
 
 
 
-Public Class Mouse_LeftClickZoom : Inherits VB_Algorithm
+Public Class Mouse_LeftClickZoom : Inherits VB_Parent
     Public Sub New()
         labels(2) = "Left click and drag to draw a rectangle"
         desc = "Demonstrate what the left-click enables"
@@ -42,7 +42,7 @@ End Class
 
 
 
-Public Class Mouse_ClickPointUsage : Inherits VB_Algorithm
+Public Class Mouse_ClickPointUsage : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Public Sub New()
         desc = "This algorithm shows how to use task.clickPoint to dynamically identify what to break on."

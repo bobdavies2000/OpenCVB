@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class ROI_Basics : Inherits VB_Algorithm
+Public Class ROI_Basics : Inherits VB_Parent
     Public diff As New Diff_Basics
     Public aoiRect As cv.Rect
     Public Sub New()
@@ -31,7 +31,7 @@ End Class
 
 
 
-Public Class ROI_FindNonZeroNoSingle : Inherits VB_Algorithm
+Public Class ROI_FindNonZeroNoSingle : Inherits VB_Parent
     Public diff As New Diff_Basics
     Public aoiRect As cv.Rect
     Public Sub New()
@@ -75,7 +75,7 @@ End Class
 
 
 
-Public Class ROI_AccumulateOld : Inherits VB_Algorithm
+Public Class ROI_AccumulateOld : Inherits VB_Parent
     Public diff As New Diff_Basics
     Public aoiRect As cv.Rect
     Public minX = Integer.MaxValue, maxX = Integer.MinValue, minY = Integer.MaxValue, maxY = Integer.MinValue
@@ -129,7 +129,7 @@ End Class
 
 
 
-Public Class ROI_Accumulate : Inherits VB_Algorithm
+Public Class ROI_Accumulate : Inherits VB_Parent
     Public diff As New Diff_Basics
     Dim roiRect As cv.Rect
     Public Sub New()

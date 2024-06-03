@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Line_Basics : Inherits VB_Algorithm
+Public Class Line_Basics : Inherits VB_Parent
     Dim ld As cv.XImgProc.FastLineDetector
     Public lpList As New List(Of pointPair)
     Public lineColor = cv.Scalar.White
@@ -42,7 +42,7 @@ End Class
 
 
 
-Public Class Line_SubsetRect : Inherits VB_Algorithm
+Public Class Line_SubsetRect : Inherits VB_Parent
     Dim ld As cv.XImgProc.FastLineDetector
     Public sortByLen As New SortedList(Of Single, pointPair)(New compareAllowIdenticalSingleInverted)
     Public mpList As New List(Of pointPair)
@@ -92,7 +92,7 @@ End Class
 
 
 
-Public Class Line_InterceptsUI : Inherits VB_Algorithm
+Public Class Line_InterceptsUI : Inherits VB_Parent
     Dim lines As New Line_Intercepts
     Dim interceptColor As Integer
     Public Sub New()
@@ -165,7 +165,7 @@ End Class
 
 
 
-Public Class Line_Intercepts : Inherits VB_Algorithm
+Public Class Line_Intercepts : Inherits VB_Parent
     Public extended As New LongLine_Extend
     Public lines As New Line_Basics
     Public p1List As New List(Of cv.Point2f)
@@ -253,7 +253,7 @@ End Class
 
 
 
-Public Class Line_LeftRightImages : Inherits VB_Algorithm
+Public Class Line_LeftRightImages : Inherits VB_Parent
     Public leftLines As New Line_TimeView
     Public rightLines As New Line_TimeView
     Public rgbLines As New Line_TimeView
@@ -295,7 +295,7 @@ End Class
 
 
 
-Public Class Line_InDepthAndBGR : Inherits VB_Algorithm
+Public Class Line_InDepthAndBGR : Inherits VB_Parent
     Dim lines As New Line_Basics
     Public p1List As New List(Of cv.Point2f)
     Public p2List As New List(Of cv.Point2f)
@@ -358,7 +358,7 @@ End Class
 
 
 
-Public Class Line_PointSlope : Inherits VB_Algorithm
+Public Class Line_PointSlope : Inherits VB_Parent
     Dim extend As New LongLine_Extend
     Dim lines As New Line_Basics
     Dim knn As New KNN_CoreN
@@ -437,7 +437,7 @@ End Class
 
 
 
-Public Class Line_Movement : Inherits VB_Algorithm
+Public Class Line_Movement : Inherits VB_Parent
     Public p1 As cv.Point
     Public p2 As cv.Point
     Dim gradientColors(100) As cv.Scalar
@@ -481,7 +481,7 @@ End Class
 
 
 
-Public Class Line_GCloud : Inherits VB_Algorithm
+Public Class Line_GCloud : Inherits VB_Parent
     Public lines As New Line_Basics
     Public sortedVerticals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public sortedHorizontals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
@@ -554,7 +554,7 @@ End Class
 
 
 
-Public Class Line_DisplayInfo : Inherits VB_Algorithm
+Public Class Line_DisplayInfo : Inherits VB_Parent
     Public tcells As New List(Of tCell)
     Dim canny As New Edge_Canny
     Dim blur As New Blur_Basics
@@ -616,7 +616,7 @@ End Class
 
 
 
-Public Class Line_Perpendicular : Inherits VB_Algorithm
+Public Class Line_Perpendicular : Inherits VB_Parent
     Public p1 As cv.Point2f ' first input point
     Public p2 As cv.Point2f ' second input point
     Public r1 As cv.Point2f ' first output point (perpendicalar to input)
@@ -658,7 +658,7 @@ End Class
 
 
 
-Public Class Line_CellsVertHoriz : Inherits VB_Algorithm
+Public Class Line_CellsVertHoriz : Inherits VB_Parent
     Dim lines As New FeatureLine_Finder
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
@@ -690,7 +690,7 @@ End Class
 
 
 
-Public Class Line_Cells : Inherits VB_Algorithm
+Public Class Line_Cells : Inherits VB_Parent
     Dim lines As New Line_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -710,7 +710,7 @@ End Class
 
 
 
-Public Class Line_ViewSide : Inherits VB_Algorithm
+Public Class Line_ViewSide : Inherits VB_Parent
     Public autoY As New OpAuto_YRange
     Public lines As New Line_Basics
     Dim histSide As New Projection_HistSide
@@ -734,7 +734,7 @@ End Class
 
 
 
-Public Class Line_ViewTop : Inherits VB_Algorithm
+Public Class Line_ViewTop : Inherits VB_Parent
     Public autoX As New OpAuto_XRange
     Public lines As New Line_Basics
     Dim histTop As New Projection_HistTop
@@ -758,7 +758,7 @@ End Class
 
 
 
-Public Class Line_FromContours : Inherits VB_Algorithm
+Public Class Line_FromContours : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Dim lines As New Line_Basics
     Dim contours As New Contour_Gray
@@ -788,7 +788,7 @@ End Class
 
 
 
-Public Class Line_ColorClass : Inherits VB_Algorithm
+Public Class Line_ColorClass : Inherits VB_Parent
     Dim colorClass As New Color8U_Basics
     Dim lines As New Line_Basics
     Public Sub New()
@@ -815,7 +815,7 @@ End Class
 
 
 
-Public Class Line_Canny : Inherits VB_Algorithm
+Public Class Line_Canny : Inherits VB_Parent
     Dim canny As New Edge_Canny
     Dim lines As New Line_Basics
     Public Sub New()
@@ -843,7 +843,7 @@ End Class
 
 
 
-Public Class Line_TimeViewLines : Inherits VB_Algorithm
+Public Class Line_TimeViewLines : Inherits VB_Parent
     Dim lines As New Line_TimeView
     Public lpList As New List(Of pointPair)
     Public Sub New()
@@ -876,7 +876,7 @@ End Class
 
 
 
-Public Class Line_TimeView : Inherits VB_Algorithm
+Public Class Line_TimeView : Inherits VB_Parent
     Public frameList As New List(Of List(Of pointPair))
     Public lines As New Line_Basics
     Public pixelcount As Integer
@@ -918,7 +918,7 @@ End Class
 
 
 
-Public Class Line_RegionsVB : Inherits VB_Algorithm
+Public Class Line_RegionsVB : Inherits VB_Parent
     Dim lines As New Line_TimeView
     Dim reduction As New Reduction_Basics
     Const lineMatch = 254
@@ -1016,7 +1016,7 @@ End Class
 
 
 
-Public Class Line_Verticals : Inherits VB_Algorithm
+Public Class Line_Verticals : Inherits VB_Parent
     Public lines As New Line_Basics
     Public options As New Options_Features
     Public verticals As New List(Of gravityLine)
@@ -1087,7 +1087,7 @@ End Class
 
 
 
-Public Class Line_Verts : Inherits VB_Algorithm
+Public Class Line_Verts : Inherits VB_Parent
     Dim verts As New Line_Verticals
     Dim match As New Match_tCell
     Public verticals As New List(Of gravityLine)
@@ -1165,7 +1165,7 @@ End Class
 
 
 
-Public Class Line_Nearest : Inherits VB_Algorithm
+Public Class Line_Nearest : Inherits VB_Parent
     Public pt As cv.Point2f ' How close is this point to the input line?
     Public lp As New pointPair ' the input line.
     Public nearPoint As cv.Point2f
@@ -1227,7 +1227,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
-Public Class Line_Intersection : Inherits VB_Algorithm
+Public Class Line_Intersection : Inherits VB_Parent
     Public p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f
     Public intersectionPoint As cv.Point2f
     Public Sub New()
@@ -1263,7 +1263,7 @@ End Class
 
 
 
-Public Class Line_Gravity : Inherits VB_Algorithm
+Public Class Line_Gravity : Inherits VB_Parent
     Dim lines As New Line_Basics
     Dim nearest As New Line_Nearest
     Public Sub New()
@@ -1328,7 +1328,7 @@ End Class
 
 
 
-Public Class Line_GravityIntersect : Inherits VB_Algorithm
+Public Class Line_GravityIntersect : Inherits VB_Parent
     Dim lines As New Line_Basics
     Dim nearest As New Line_Nearest
     Public Sub New()
@@ -1392,7 +1392,7 @@ End Class
 
 
 
-Public Class Line_KNN : Inherits VB_Algorithm
+Public Class Line_KNN : Inherits VB_Parent
     Dim lines As New Line_Basics
     Dim swarm As New Swarm_Basics
     Public Sub New()

@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Swarm_Basics : Inherits VB_Algorithm
+Public Class Swarm_Basics : Inherits VB_Parent
     Public knn As New KNN_Core
     Dim feat As New Feature_Basics
     Public mpList As New List(Of pointPair)
@@ -91,7 +91,7 @@ End Class
 
 
 
-Public Class Swarm_LeftRightFeatures : Inherits VB_Algorithm
+Public Class Swarm_LeftRightFeatures : Inherits VB_Parent
     Public leftList As New List(Of cv.Point2f)
     Public rightList As New List(Of cv.Point2f)
     Dim feat As New Feature_Basics
@@ -115,7 +115,7 @@ End Class
 
 
 
-Public Class Swarm_LeftRight : Inherits VB_Algorithm
+Public Class Swarm_LeftRight : Inherits VB_Parent
     Public leftDistance As Single
     Public leftDirection As Single
     Public leftMax As Single
@@ -155,7 +155,7 @@ End Class
 
 
 
-Public Class Swarm_Percentage : Inherits VB_Algorithm
+Public Class Swarm_Percentage : Inherits VB_Parent
     Dim swarm As New Swarm_Flood
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Cells map X percent", 1, 100, 80)
@@ -187,7 +187,7 @@ End Class
 
 
 
-Public Class Swarm_Flood : Inherits VB_Algorithm
+Public Class Swarm_Flood : Inherits VB_Parent
     Dim swarm As New Swarm_Basics
     Public flood As New Flood_BasicsMask
     Dim cvt As New Color8U_Basics
@@ -216,7 +216,7 @@ End Class
 
 
 
-Public Class Swarm_Flood2 : Inherits VB_Algorithm
+Public Class Swarm_Flood2 : Inherits VB_Parent
     Public lines As New Line_KNN
     Public flood As New Flood_BasicsMask
     Public cvt As New Color8U_Basics
@@ -251,7 +251,7 @@ End Class
 
 
 
-Public Class Swarm_Flood3 : Inherits VB_Algorithm
+Public Class Swarm_Flood3 : Inherits VB_Parent
     Dim swarm As New Swarm_Flood2
     Public Sub New()
         desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."

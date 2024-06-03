@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/6606891/opencv-virtually-camera-rotating-translating-for-birds-eye-view/6667784#6667784
-Public Class WarpPerspective_Basics : Inherits VB_Algorithm
+Public Class WarpPerspective_Basics : Inherits VB_Parent
     Public options As New Options_Warp
     Public Sub New()
         desc = "Essentials of the rotation matrix of WarpPerspective"
@@ -20,7 +20,7 @@ End Class
 
 
 ' http://opencvexamples.blogspot.com/
-Public Class WarpPerspective_WidthHeight : Inherits VB_Algorithm
+Public Class WarpPerspective_WidthHeight : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Warped Width", 0, dst2.Cols, dst2.Cols - 50)

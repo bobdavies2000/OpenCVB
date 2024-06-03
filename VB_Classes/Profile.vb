@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Profile_Basics : Inherits VB_Algorithm
+Public Class Profile_Basics : Inherits VB_Parent
     Public ptLeft As cv.Point3f, ptRight As cv.Point3f, ptTop As cv.Point3f, ptBot As cv.Point3f, ptFront As cv.Point3f, ptBack As cv.Point3f
     Public cornerNames As New List(Of String)({"   First (white)", "   Left (light blue)", "   Right (red)", "   Top (green)",
                                                "   Bottom (white)", "   Front (yellow)", "   Back (blue)"})
@@ -94,7 +94,7 @@ End Class
 
 
 
-Public Class Profile_Rotation : Inherits VB_Algorithm
+Public Class Profile_Rotation : Inherits VB_Parent
     Public gMat As New IMU_GMatrix
     Public strMsg As String = "Then use the 'Options_IMU' sliders to rotate the cell" + vbCrLf +
                               "It is a common mistake to the OpenGL sliders to try to move cell but they don't - use 'Options_IMU' sliders"
@@ -134,7 +134,7 @@ End Class
 
 
 
-Public Class Profile_Derivative : Inherits VB_Algorithm
+Public Class Profile_Derivative : Inherits VB_Parent
     Public sides As New Profile_Basics
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -202,7 +202,7 @@ End Class
 
 
 
-Public Class Profile_ConcentrationSide : Inherits VB_Algorithm
+Public Class Profile_ConcentrationSide : Inherits VB_Parent
     Dim profile As New Profile_ConcentrationTop
     Public Sub New()
         findCheckBox("Top View (Unchecked Side View)").Checked = False
@@ -225,7 +225,7 @@ End Class
 
 
 
-Public Class Profile_ConcentrationTop : Inherits VB_Algorithm
+Public Class Profile_ConcentrationTop : Inherits VB_Parent
     Dim plot As New Plot_OverTimeSingle
     Dim rotate As New Profile_Rotation
     Public sides As New Profile_Basics
@@ -290,7 +290,7 @@ End Class
 
 
 
-Public Class Profile_OpenGL : Inherits VB_Algorithm
+Public Class Profile_OpenGL : Inherits VB_Parent
     Dim sides As New Profile_Basics
     Public rotate As New Profile_Rotation
     Dim heat As New HeatMap_Basics
@@ -330,7 +330,7 @@ End Class
 
 
 
-Public Class Profile_Kalman : Inherits VB_Algorithm
+Public Class Profile_Kalman : Inherits VB_Parent
     Dim sides As New Profile_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()

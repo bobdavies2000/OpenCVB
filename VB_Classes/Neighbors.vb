@@ -1,6 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class Neighbors_Basics : Inherits VB_Algorithm
+Public Class Neighbors_Basics : Inherits VB_Parent
     Public redC As New RedCloud_Basics
     Dim knn As New KNN_Core
     Public runRedCloud As Boolean = False
@@ -53,7 +53,7 @@ End Class
 
 
 
-Public Class Neighbors_Intersects : Inherits VB_Algorithm
+Public Class Neighbors_Intersects : Inherits VB_Parent
     Public nPoints As New List(Of cv.Point)
     Public Sub New()
         desc = "Find the corner points where multiple cells intersect."
@@ -109,7 +109,7 @@ End Class
 
 
 
-Public Class Neighbors_ColorOnly : Inherits VB_Algorithm
+Public Class Neighbors_ColorOnly : Inherits VB_Parent
     Dim corners As New Neighbors_Intersects
     Dim redC As New RedCloud_Cells
     Public Sub New()
@@ -136,7 +136,7 @@ End Class
 
 
 
-Public Class Neighbors_PreciseTest : Inherits VB_Algorithm
+Public Class Neighbors_PreciseTest : Inherits VB_Parent
     Dim nabs As New Neighbors_Precise
     Public Sub New()
         nabs.runRedCloud = True
@@ -164,7 +164,7 @@ End Class
 
 
 
-Public Class Neighbors_Precise : Inherits VB_Algorithm
+Public Class Neighbors_Precise : Inherits VB_Parent
     Public nabList As New List(Of List(Of Integer))
     Dim stats As New Cell_Basics
     Public redCells As List(Of rcData)

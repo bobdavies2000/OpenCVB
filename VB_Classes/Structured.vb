@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Structured_LinearizeFloor : Inherits VB_Algorithm
+Public Class Structured_LinearizeFloor : Inherits VB_Parent
     Public floor As New Structured_FloorCeiling
     Dim kalman As New Kalman_VB_Basics
     Public sliceMask As cv.Mat
@@ -91,7 +91,7 @@ End Class
 
 
 
-Public Class Structured_MultiSlice : Inherits VB_Algorithm
+Public Class Structured_MultiSlice : Inherits VB_Parent
     Public heat As New HeatMap_Basics
     Public sliceMask As cv.Mat
     Public split() As cv.Mat
@@ -148,7 +148,7 @@ End Class
 
 
 
-Public Class Structured_MultiSliceLines : Inherits VB_Algorithm
+Public Class Structured_MultiSliceLines : Inherits VB_Parent
     Dim multi As New Structured_MultiSlice
     Public lines As New Line_Basics
     Public Sub New()
@@ -168,7 +168,7 @@ End Class
 
 
 
-Public Class Structured_MultiSlicePolygon : Inherits VB_Algorithm
+Public Class Structured_MultiSlicePolygon : Inherits VB_Parent
     Dim multi As New Structured_MultiSlice
     Public Sub New()
         labels(2) = "Input to FindContours"
@@ -206,7 +206,7 @@ End Class
 
 
 
-Public Class Structured_Depth : Inherits VB_Algorithm
+Public Class Structured_Depth : Inherits VB_Parent
     Dim sliceH As New Structured_SliceH
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
@@ -241,7 +241,7 @@ End Class
 
 
 
-Public Class Structured_Rebuild : Inherits VB_Algorithm
+Public Class Structured_Rebuild : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Dim options As New Options_Structured
     Dim thickness As Single
@@ -333,7 +333,7 @@ End Class
 
 
 
-Public Class Structured_Cloud2 : Inherits VB_Algorithm
+Public Class Structured_Cloud2 : Inherits VB_Parent
     Dim mmPixel As New Pixel_Measure
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -412,7 +412,7 @@ End Class
 
 
 
-Public Class Structured_Crosshairs : Inherits VB_Algorithm
+Public Class Structured_Crosshairs : Inherits VB_Parent
     Dim sCloud As New Structured_Cloud
     Public Sub New()
         desc = "Connect vertical and horizontal dots that are in the same column and row."
@@ -491,7 +491,7 @@ End Class
 
 
 
-Public Class Structured_Cloud : Inherits VB_Algorithm
+Public Class Structured_Cloud : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Number of slices", 0, 200, 35)
@@ -530,7 +530,7 @@ End Class
 
 
 
-Public Class Structured_ROI : Inherits VB_Algorithm
+Public Class Structured_ROI : Inherits VB_Parent
     Public data As New cv.Mat
     Public oglData As New List(Of cv.Point3f)
     Public Sub New()
@@ -557,7 +557,7 @@ End Class
 
 
 
-Public Class Structured_Tiles : Inherits VB_Algorithm
+Public Class Structured_Tiles : Inherits VB_Parent
     Public oglData As New List(Of cv.Vec3f)
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
@@ -590,7 +590,7 @@ End Class
 
 
 
-Public Class Structured_TilesQuad : Inherits VB_Algorithm
+Public Class Structured_TilesQuad : Inherits VB_Parent
     Public oglData As New List(Of cv.Vec3f)
     Dim options As New Options_OpenGLFunctions
     Dim hulls As New RedCloud_Hulls
@@ -640,7 +640,7 @@ End Class
 
 
 
-Public Class Structured_CountTop : Inherits VB_Algorithm
+Public Class Structured_CountTop : Inherits VB_Parent
     Dim slice As New Structured_SliceV
     Dim plot As New Plot_Histogram
     Dim counts As New List(Of Single)
@@ -691,7 +691,7 @@ End Class
 
 
 
-Public Class Structured_FeatureLines : Inherits VB_Algorithm
+Public Class Structured_FeatureLines : Inherits VB_Parent
     Dim struct As New Structured_MultiSlice
     Dim lines As New FeatureLine_Finder
     Public Sub New()
@@ -715,7 +715,7 @@ End Class
 
 
 
-Public Class Structured_FloorCeiling : Inherits VB_Algorithm
+Public Class Structured_FloorCeiling : Inherits VB_Parent
     Public slice As New Structured_SliceEither
     Dim kalman As New Kalman_Basics
     Public Sub New()
@@ -782,7 +782,7 @@ End Class
 
 
 
-Public Class Structured_MultiSliceH : Inherits VB_Algorithm
+Public Class Structured_MultiSliceH : Inherits VB_Parent
     Public heat As New HeatMap_Basics
     Public sliceMask As cv.Mat
     Dim options As New Options_Structured
@@ -821,7 +821,7 @@ End Class
 
 
 
-Public Class Structured_MultiSliceV : Inherits VB_Algorithm
+Public Class Structured_MultiSliceV : Inherits VB_Parent
     Public heat As New HeatMap_Basics
     Dim options As New Options_Structured
     Public Sub New()
@@ -860,7 +860,7 @@ End Class
 
 
 
-Public Class Structured_SliceXPlot : Inherits VB_Algorithm
+Public Class Structured_SliceXPlot : Inherits VB_Parent
     Dim multi As New Structured_MultiSlice
     Dim options As New Options_Structured
     Public Sub New()
@@ -899,7 +899,7 @@ End Class
 
 
 
-Public Class Structured_SliceYPlot : Inherits VB_Algorithm
+Public Class Structured_SliceYPlot : Inherits VB_Parent
     Dim multi As New Structured_MultiSlice
     Dim options As New Options_Structured
     Public Sub New()
@@ -939,7 +939,7 @@ End Class
 
 
 
-Public Class Structured_MouseSlice : Inherits VB_Algorithm
+Public Class Structured_MouseSlice : Inherits VB_Parent
     Dim slice As New Structured_SliceEither
     Dim lines As New Line_Basics
     Public Sub New()
@@ -985,7 +985,7 @@ End Class
 
 
 
-Public Class Structured_SliceEither : Inherits VB_Algorithm
+Public Class Structured_SliceEither : Inherits VB_Parent
     Public heat As New HeatMap_Basics
     Public sliceMask As New cv.Mat
     Dim options As New Options_Structured
@@ -1051,7 +1051,7 @@ End Class
 
 
 
-Public Class Structured_TransformH : Inherits VB_Algorithm
+Public Class Structured_TransformH : Inherits VB_Parent
     Dim options As New Options_Structured
     Dim histTop As New Projection_HistTop
     Public Sub New()
@@ -1096,7 +1096,7 @@ End Class
 
 
 
-Public Class Structured_TransformV : Inherits VB_Algorithm
+Public Class Structured_TransformV : Inherits VB_Parent
     Dim options As New Options_Structured
     Dim histSide As New Projection_HistSide
     Public Sub New()
@@ -1143,7 +1143,7 @@ End Class
 
 
 
-Public Class Structured_CountSide : Inherits VB_Algorithm
+Public Class Structured_CountSide : Inherits VB_Parent
     Dim slice As New Structured_SliceH
     Dim plot As New Plot_Histogram
     Dim rotate As New Rotate_Basics
@@ -1194,7 +1194,7 @@ End Class
 
 
 
-Public Class Structured_CountSideSum : Inherits VB_Algorithm
+Public Class Structured_CountSideSum : Inherits VB_Parent
     Public counts As New List(Of Single)
     Public maxCountIndex As Integer
     Public yValues As New List(Of Single)
@@ -1254,7 +1254,7 @@ End Class
 
 
 
-Public Class Structured_SliceV : Inherits VB_Algorithm
+Public Class Structured_SliceV : Inherits VB_Parent
     Public heat As New HeatMap_Basics
     Public sliceMask As New cv.Mat
     Public options As New Options_Structured
@@ -1300,7 +1300,7 @@ End Class
 
 
 
-Public Class Structured_SliceH : Inherits VB_Algorithm
+Public Class Structured_SliceH : Inherits VB_Parent
     Public heat As New HeatMap_Basics
     Public sliceMask As New cv.Mat
     Public options As New Options_Structured
@@ -1345,7 +1345,7 @@ End Class
 
 
 
-Public Class Structured_SurveyH : Inherits VB_Algorithm
+Public Class Structured_SurveyH : Inherits VB_Parent
     Public Sub New()
         redOptions.YRangeSlider.Value = 300
         vbAddAdvice(traceName + ": use Y-Range slider in RedCloud options.")
@@ -1392,7 +1392,7 @@ End Class
 
 
 
-Public Class Structured_SurveyV : Inherits VB_Algorithm
+Public Class Structured_SurveyV : Inherits VB_Parent
     Public Sub New()
         redOptions.XRangeSlider.Value = 250
         vbAddAdvice(traceName + ": use X-Range slider in RedCloud options.")

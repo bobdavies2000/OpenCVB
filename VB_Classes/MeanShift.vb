@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' http://answers.opencv.org/question/175486/meanshift-sample-code-in-c/
-Public Class MeanShift_Basics : Inherits VB_Algorithm
+Public Class MeanShift_Basics : Inherits VB_Parent
     Public rectangleEdgeWidth As Integer = 2
     Public trackbox As New cv.Rect
     Public Sub New()
@@ -35,7 +35,7 @@ End Class
 
 
 
-Public Class MeanShift_Depth : Inherits VB_Algorithm
+Public Class MeanShift_Depth : Inherits VB_Parent
     Dim meanShift As New MeanShift_Basics
     Public Sub New()
         labels(2) = "Draw anywhere to start mean shift tracking."

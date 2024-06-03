@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Imports System.Security.Cryptography
 Imports  System.IO
 ' https://www.codeproject.com/Tips/5308853/Prefer-using-Stream-to-byte
-Public Class Crypto_Hash : Inherits VB_Algorithm
+Public Class Crypto_Hash : Inherits VB_Parent
     Dim flow As New Font_FlowText
     Public Sub New()
         desc = "Experiment with hashing algorithm and guid"

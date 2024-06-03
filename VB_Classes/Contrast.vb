@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Contrast_POW : Inherits VB_Algorithm
+Public Class Contrast_POW : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Contrast exponent to use X100", 0, 200, 30)
         labels = {"", "", "Original Image", "Contrast reduced with POW function"}
@@ -19,7 +19,7 @@ End Class
 
 
 
-Public Class Contrast_Basics : Inherits VB_Algorithm
+Public Class Contrast_Basics : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Brightness", 1, 100, 1)

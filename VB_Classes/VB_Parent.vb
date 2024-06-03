@@ -15,7 +15,7 @@ Public Class trueText
         setup(_text, _pt, 2)
     End Sub
 End Class
-Public Class VB_Algorithm : Implements IDisposable
+Public Class VB_Parent : Implements IDisposable
     Public check As New OptionsCheckbox
     Public combo As New OptionsCombo
     Public radio As New OptionsRadioButtons
@@ -84,16 +84,39 @@ Public Class VB_Algorithm : Implements IDisposable
         End If
         firstPass = True
     End Sub
+    Public Sub Run(src As cv.Mat)
+        If task.testAllRunning = False Then measureStartRun(traceName)
+
+        trueData.Clear()
+        If task.paused = False Then
+            If task.algName.StartsWith("Options_") = False Then algorithm.RunVB(src)
+        End If
+        firstPass = False
+        If task.testAllRunning = False Then measureEndRun(traceName)
+    End Sub
+    Public Sub setTrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
+        Dim str As New trueText(text, pt, picTag)
+        trueData.Add(str)
+    End Sub
+    Public Sub setTrueText(text As String)
+        Dim pt = New cv.Point(0, 0)
+        Dim picTag = 2
+        Dim str As New trueText(text, pt, picTag)
+        trueData.Add(str)
+    End Sub
+    Public Sub setTrueText(text As String, picTag As Integer)
+        Dim pt = New cv.Point(0, 0)
+        Dim str As New trueText(text, pt, picTag)
+        trueData.Add(str)
+    End Sub
+    Public Sub setFlowText(text As String, picTag As Integer)
+        Dim pt = New cv.Point(0, 0)
+        Dim str As New trueText(text, pt, picTag)
+        task.flowData.Add(str)
+    End Sub
     Public Function standaloneTest() As Boolean
         If standalone Or showIntermediate() Then Return True
         Return False
-    End Function
-    Public Function checkIntermediateResults() As VB_Algorithm
-        If task.algName.StartsWith("CPP_") Then Return Nothing ' we don't currently support intermediate results for CPP_ algorithms.
-        For Each obj In task.activeObjects
-            If obj.traceName = task.intermediateName And obj.firstPass = False Then Return obj
-        Next
-        Return Nothing
     End Function
     Public Sub measureStartRun(name As String)
         If task.recordTimings = False Then Exit Sub
@@ -123,41 +146,11 @@ Public Class VB_Algorithm : Implements IDisposable
         algorithmStack.Pop()
         algorithmTimes(algorithmStack.Peek) = nextTime
     End Sub
-    Public Sub Run(src As cv.Mat)
-        If task.testAllRunning = False Then measureStartRun(traceName)
-
-        trueData.Clear()
-        If task.paused = False Then
-            If task.algName.StartsWith("Options_") = False Then algorithm.RunVB(src)
-        End If
-        firstPass = False
-        If task.testAllRunning = False Then measureEndRun(traceName)
-    End Sub
-    Public Sub setTrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
-        Dim str As New trueText(text, pt, picTag)
-        trueData.Add(str)
-    End Sub
-    Public Sub setTrueText(text As String)
-        Dim pt = New cv.Point(0, 0)
-        Dim picTag = 2
-        Dim str As New trueText(text, pt, picTag)
-        trueData.Add(str)
-    End Sub
-    Public Sub setTrueText(text As String, picTag As Integer)
-        Dim pt = New cv.Point(0, 0)
-        Dim str As New trueText(text, pt, picTag)
-        trueData.Add(str)
-    End Sub
     Public Function showIntermediate() As Boolean
         If task.intermediateObject Is Nothing Then Return False
         If task.intermediateObject.traceName = traceName Then Return True
         Return False
     End Function
-    Public Sub setFlowText(text As String, picTag As Integer)
-        Dim pt = New cv.Point(0, 0)
-        Dim str As New trueText(text, pt, picTag)
-        task.flowData.Add(str)
-    End Sub
     Public Function initRandomRect(margin As Integer) As cv.Rect
         Return New cv.Rect(msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin),
                            msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin))
@@ -270,10 +263,10 @@ Public Class VB_Algorithm : Implements IDisposable
             Dim offset = InStr(lines(i), "VB_Classes.")
             If offset > 0 Then
                 Dim partLine = Mid(lines(i), offset + 11)
-                If partLine.StartsWith("AlgorithmList.createAlgorithm") Then Exit For
+                If partLine.StartsWith("AlgorithmList.createVBAlgorithm") Then Exit For
                 Dim split() = partLine.Split("\")
                 partLine = Mid(partLine, 1, InStr(partLine, ".") - 1)
-                If Not (partLine.StartsWith("VB_Algorithm") Or partLine.StartsWith("VBtask")) Then
+                If Not (partLine.StartsWith("VB_Parent") Or partLine.StartsWith("VBtask")) Then
                     callStack = partLine + "\" + callStack
                 End If
             End If

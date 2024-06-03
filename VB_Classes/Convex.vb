@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Convex_Basics : Inherits VB_Algorithm
+Public Class Convex_Basics : Inherits VB_Parent
     Public hull() As cv.Point
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Hull random points", 4, 20, 10)
@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class Convex_RedCloud : Inherits VB_Algorithm
+Public Class Convex_RedCloud : Inherits VB_Parent
     Dim convex As New Convex_Basics
     Public redC As New RedCloud_Basics
     Public Sub New()
@@ -79,7 +79,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/31354150/opencv-convexity-defects-drawing
-Public Class Convex_Defects : Inherits VB_Algorithm
+Public Class Convex_Defects : Inherits VB_Parent
     Dim contours As New Contour_Largest
     Public Sub New()
         dst2 = cv.Cv2.ImRead(task.homeDir + "Data/star2.png").Threshold(200, 255, cv.ThresholdTypes.Binary).Resize(task.workingRes)
@@ -110,7 +110,7 @@ End Class
 
 
 
-Public Class Convex_RedCloudDefects : Inherits VB_Algorithm
+Public Class Convex_RedCloudDefects : Inherits VB_Parent
     Dim convex As New Convex_RedCloud
     Dim contours As New Contour_Largest
     Public Sub New()

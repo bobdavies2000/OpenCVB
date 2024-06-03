@@ -1,10 +1,8 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text
-Imports System.Windows.Markup
-Imports OpenCvSharp.Extensions
 
-Public Class CPP_Basics : Inherits VB_Algorithm
+Public Class CPP_Basics : Inherits VB_Parent
     Public cppFunction As Integer
     Public result As cv.Mat
     Public neighbors As New List(Of cv.Point2f)

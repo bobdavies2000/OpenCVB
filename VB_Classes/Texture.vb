@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
-Public Class Texture_Basics : Inherits VB_Algorithm
+Public Class Texture_Basics : Inherits VB_Parent
     Dim ellipse As New Draw_Ellipses
     Public texture As New cv.Mat
     Public tRect As cv.Rect
@@ -46,7 +46,7 @@ End Class
 
 
 
-Public Class Texture_Flow : Inherits VB_Algorithm
+Public Class Texture_Flow : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Texture Flow Delta", 2, 100, 30)
@@ -84,7 +84,7 @@ End Class
 
 
 
-Public Class Texture_Flow_Depth : Inherits VB_Algorithm
+Public Class Texture_Flow_Depth : Inherits VB_Parent
     Dim texture As Texture_Flow
     Public Sub New()
         texture = New Texture_Flow()
@@ -101,7 +101,7 @@ End Class
 
 
 
-Public Class Texture_Flow_Reduction : Inherits VB_Algorithm
+Public Class Texture_Flow_Reduction : Inherits VB_Parent
     Dim texture As Texture_Flow
     Dim reduction As New Reduction_Basics
     Public Sub New()
@@ -123,7 +123,7 @@ End Class
 
 
 
-Public Class OpenGL_TextureShuffle : Inherits VB_Algorithm
+Public Class OpenGL_TextureShuffle : Inherits VB_Parent
     Dim shuffle As New Random_Shuffle
     Dim floor As New OpenGL_FlatStudy2
     Dim texture As Texture_Basics

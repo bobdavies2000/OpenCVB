@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports  System.IO
 Imports System.Runtime.InteropServices
-Public Class Vignetting_Basics : Inherits VB_Algorithm
+Public Class Vignetting_Basics : Inherits VB_Parent
     Public removeVig As Boolean
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Vignette radius X100", 1, 300, 80)
@@ -32,7 +32,7 @@ End Class
 
 
 
-Public Class Vignetting_VB : Inherits VB_Algorithm
+Public Class Vignetting_VB : Inherits VB_Parent
     Public removeVig As Boolean
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Vignette radius X100", 1, 300, 80)
@@ -73,7 +73,7 @@ End Class
 
 
 ' https://github.com/dajuric/dot-devignetting
-Public Class Vignetting_Removal : Inherits VB_Algorithm
+Public Class Vignetting_Removal : Inherits VB_Parent
     Dim basics As New Vignetting_Basics
     Dim defaultImage As cv.Mat
     Public Sub New()
@@ -100,7 +100,7 @@ End Class
 
 ' https://github.com/dajuric/dot-devignetting
 ' https://stackoverflow.com/questions/22654770/creating-vignette-filter-in-opencv
-Public Class Vignetting_Devignetting : Inherits VB_Algorithm
+Public Class Vignetting_Devignetting : Inherits VB_Parent
     Dim devignet As New Vignetting_Removal
     Dim basics As New Vignetting_Basics
     Public Sub New()

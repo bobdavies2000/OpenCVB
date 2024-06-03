@@ -11,7 +11,7 @@ Imports System.Text.RegularExpressions
 ' This impact is likely the result of how JPEG compression truncates values as insignificant - a definite manipulation of the data.
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_Basics : Inherits VB_Algorithm
+Public Class Benford_Basics : Inherits VB_Parent
     Public expectedDistribution(10 - 1) As Single
     Public counts(expectedDistribution.Count - 1) As Single
     Dim plot As New Plot_Histogram
@@ -94,7 +94,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_NormalizedImage : Inherits VB_Algorithm
+Public Class Benford_NormalizedImage : Inherits VB_Parent
     Public benford As New Benford_Basics
     Public Sub New()
         desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
@@ -117,7 +117,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_NormalizedImage99 : Inherits VB_Algorithm
+Public Class Benford_NormalizedImage99 : Inherits VB_Parent
     Public benford As New Benford_Basics
     Public Sub New()
         benford.setup99()
@@ -142,7 +142,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_JPEG : Inherits VB_Algorithm
+Public Class Benford_JPEG : Inherits VB_Parent
     Public benford As New Benford_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("JPEG Quality", 1, 100, 90)
@@ -166,7 +166,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_JPEG99 : Inherits VB_Algorithm
+Public Class Benford_JPEG99 : Inherits VB_Parent
     Public benford As New Benford_Basics
     Public Sub New()
         benford.setup99()
@@ -192,7 +192,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_PNG : Inherits VB_Algorithm
+Public Class Benford_PNG : Inherits VB_Parent
     Public benford As New Benford_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("PNG Compression", 1, 100, 90)
@@ -215,7 +215,7 @@ End Class
 
 
 
-Public Class Benford_Depth : Inherits VB_Algorithm
+Public Class Benford_Depth : Inherits VB_Parent
     Public benford As New Benford_Basics
     Public Sub New()
         desc = "Apply Benford to the depth data"
@@ -232,7 +232,7 @@ End Class
 
 
 
-Public Class Benford_DepthRGB : Inherits VB_Algorithm
+Public Class Benford_DepthRGB : Inherits VB_Parent
     Public benford As New Benford_JPEG
     Public Sub New()
         desc = "Apply Benford to the depth BGR image that is compressed with JPEG"
@@ -251,7 +251,7 @@ End Class
 
 
 
-Public Class Benford_Primes : Inherits VB_Algorithm
+Public Class Benford_Primes : Inherits VB_Parent
     Dim sieve As New Sieve_BasicsVB
     Dim benford As New Benford_Basics
     Public Sub New()

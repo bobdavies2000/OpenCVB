@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Erode_Basics : Inherits VB_Algorithm
+Public Class Erode_Basics : Inherits VB_Parent
     Public options As New Options_Erode
     Public Sub New()
         vbAddAdvice(traceName + ": use local options to control erosion.")
@@ -25,7 +25,7 @@ End Class
 
 
 
-Public Class Erode_CloudXY : Inherits VB_Algorithm
+Public Class Erode_CloudXY : Inherits VB_Parent
     Dim erode As New Erode_Basics
     Dim dilate As New Dilate_Basics
     Dim erodeMask As New Erode_Basics
@@ -58,7 +58,7 @@ End Class
 
 
 
-Public Class Erode_DepthSeed : Inherits VB_Algorithm
+Public Class Erode_DepthSeed : Inherits VB_Parent
     Dim erode As New Erode_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("DepthSeed flat depth", 1, 200, 100)
@@ -88,7 +88,7 @@ End Class
 
 
 
-Public Class Erode_Dilate : Inherits VB_Algorithm
+Public Class Erode_Dilate : Inherits VB_Parent
     Dim options As New Options_Dilate
     Public Sub New()
         desc = "Erode and then dilate with MorphologyEx on the input image."

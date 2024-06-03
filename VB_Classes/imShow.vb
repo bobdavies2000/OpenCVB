@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class ImShow_Basics : Inherits VB_Algorithm
+Public Class ImShow_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "This is just a reminder that all HighGUI methods are available in OpenCVB"
     End Sub
@@ -14,7 +14,7 @@ End Class
 
 
 
-Public Class ImShow_WaitKey : Inherits VB_Algorithm
+Public Class ImShow_WaitKey : Inherits VB_Parent
     Dim vDemo As New Voronoi_Basics
     Public Sub New()
         desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time."
@@ -33,7 +33,7 @@ End Class
 
 
 
-Public Class ImShow_CV32FC3 : Inherits VB_Algorithm
+Public Class ImShow_CV32FC3 : Inherits VB_Parent
     Public Sub New()
         desc = "Experimenting with how to show an 32fc3 Mat file."
     End Sub

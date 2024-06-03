@@ -4,7 +4,7 @@ Imports System.Net
 Imports  System.IO
 Imports OpenCvSharp.DnnSuperres
 
-Public Class DNN_Test : Inherits VB_Algorithm
+Public Class DNN_Test : Inherits VB_Parent
     Dim net As Net
     Dim classnames() As String
     Public Sub New()
@@ -48,7 +48,7 @@ End Class
 
 
 
-Public Class DNN_Caffe_CS : Inherits VB_Algorithm
+Public Class DNN_Caffe_CS : Inherits VB_Parent
     Dim caffeCS As New CS_Classes.DNN
     Public Sub New()
         labels(3) = "Input Image"
@@ -72,7 +72,7 @@ End Class
 
 
 ' https://github.com/twMr7/rscvdnn
-Public Class DNN_Basics : Inherits VB_Algorithm
+Public Class DNN_Basics : Inherits VB_Parent
     Dim net As Net
     Dim dnnPrepared As Boolean
     Dim crop As cv.Rect
@@ -198,7 +198,7 @@ End Class
 ' https://github.com/Saafke/FSRCNN_Tensorflow
 ' https://github.com/fannymonori/TF-LapSRN
 ' https//github.com/Saafke/FSRCNN_Tensorflow/tree/master/models
-Public Class DNN_SuperRes : Inherits VB_Algorithm
+Public Class DNN_SuperRes : Inherits VB_Parent
     Public options As New Options_DNN
     Public dnn = New DnnSuperResImpl("fsrcnn", 4)
     Public Sub New()
@@ -241,7 +241,7 @@ End Class
 
 
 
-Public Class DNN_SuperResize : Inherits VB_Algorithm
+Public Class DNN_SuperResize : Inherits VB_Parent
     Dim super = New DNN_SuperRes
     Public Sub New()
         labels(2) = "Super Res resized back to original size"

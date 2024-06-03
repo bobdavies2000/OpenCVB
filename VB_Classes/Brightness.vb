@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Brightness_Basics : Inherits VB_Algorithm
+Public Class Brightness_Basics : Inherits VB_Parent
     Dim Options As New Options_BrightnessContrast
     Public Sub New()
         desc = "Implement a brightness effect"
@@ -18,7 +18,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/blob/master/Photoshop-Filters-in-OpenCV/brightness.cpp
-Public Class Brightness_HSV : Inherits VB_Algorithm
+Public Class Brightness_HSV : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Brightness Value", 0, 150, 100)
         labels(3) = "HSV image"

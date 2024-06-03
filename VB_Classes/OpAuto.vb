@@ -1,6 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class OpAuto_XRange : Inherits VB_Algorithm
+Public Class OpAuto_XRange : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public Sub New()
         labels(2) = "Optimized top view to show as many samples as possible."
@@ -49,7 +49,7 @@ End Class
 
 
 
-Public Class OpAuto_YRange : Inherits VB_Algorithm
+Public Class OpAuto_YRange : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public Sub New()
         labels(2) = "Optimized side view to show as much as possible."
@@ -98,7 +98,7 @@ End Class
 
 
 
-Public Class OpAuto_FloorCeiling : Inherits VB_Algorithm
+Public Class OpAuto_FloorCeiling : Inherits VB_Parent
     Public bpLine As New BackProject_LineSide
     Public yList As New List(Of Single)
     Public floorY As Single
@@ -152,7 +152,7 @@ End Class
 
 
 
-Public Class OpAuto_Valley : Inherits VB_Algorithm
+Public Class OpAuto_Valley : Inherits VB_Parent
     Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public options As New Options_Boundary
     Public Sub New()
@@ -215,7 +215,7 @@ End Class
 
 
 
-Public Class OpAuto_Peaks2D : Inherits VB_Algorithm
+Public Class OpAuto_Peaks2D : Inherits VB_Parent
     Public options As New Options_Boundary
     Public clusterPoints As New List(Of cv.Point2f)
     Public Sub New()
@@ -256,7 +256,7 @@ End Class
 
 
 
-Public Class OpAuto_Peaks2DGrid : Inherits VB_Algorithm
+Public Class OpAuto_Peaks2DGrid : Inherits VB_Parent
     Public clusterPoints As New List(Of cv.Point2f)
     Dim options As New Options_Boundary
     Public Sub New()
@@ -311,7 +311,7 @@ End Class
 
 
 
-Public Class OpAuto_PixelDifference : Inherits VB_Algorithm
+Public Class OpAuto_PixelDifference : Inherits VB_Parent
     Public Sub New()
         gOptions.PixelDiffThreshold.Value = 2 ' set it low so it will move up to the right value.
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
@@ -345,7 +345,7 @@ End Class
 
 
 
-Public Class OpAuto_MSER : Inherits VB_Algorithm
+Public Class OpAuto_MSER : Inherits VB_Parent
     Dim mBase As New MSER_Basics
     Public classCount As Integer
     Public Sub New()

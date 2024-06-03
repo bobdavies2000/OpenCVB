@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Fuzzy_Basics : Inherits VB_Algorithm
+Public Class Fuzzy_Basics : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Dim options As New Options_Contours
     Public contours As cv.Point()()
@@ -73,7 +73,7 @@ End Class
 
 
 
-Public Class Fuzzy_Filter : Inherits VB_Algorithm
+Public Class Fuzzy_Filter : Inherits VB_Parent
     Dim kernel As cv.Mat
     Dim reduction As New Reduction_Basics
     Public contours As cv.Point()()
@@ -138,7 +138,7 @@ End Class
 
 
 
-Public Class Fuzzy_ContoursDepth : Inherits VB_Algorithm
+Public Class Fuzzy_ContoursDepth : Inherits VB_Parent
     Public fuzzyD as New Fuzzy_Basics
     Public Sub New()
         desc = "Use contours to outline solids in the depth data"
@@ -156,7 +156,7 @@ End Class
 
 
 
-Public Class Fuzzy_NeighborProof : Inherits VB_Algorithm
+Public Class Fuzzy_NeighborProof : Inherits VB_Parent
     Dim fuzzy as New Fuzzy_Basics
     Public Sub New()
         desc = "Prove that every contour point has at one and only one neighbor with the mask ID and that the rest are zero"
@@ -197,7 +197,7 @@ End Class
 
 
 
-Public Class Fuzzy_TrackerDepth : Inherits VB_Algorithm
+Public Class Fuzzy_TrackerDepth : Inherits VB_Parent
     Public fuzzy As New Fuzzy_Basics
     Public centroids As New List(Of cv.Point)
     Public rects As New List(Of cv.Rect)
@@ -259,7 +259,7 @@ End Class
 
 
 
-Public Class Fuzzy_TrackerDepthClick : Inherits VB_Algorithm
+Public Class Fuzzy_TrackerDepthClick : Inherits VB_Parent
     Public tracker As New Fuzzy_TrackerDepth
     Public highlightPoint As cv.Point
     Public highlightRect As cv.Rect

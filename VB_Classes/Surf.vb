@@ -2,7 +2,7 @@
 Imports CS_Classes
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Surf_Basics : Inherits VB_Algorithm
+Public Class Surf_Basics : Inherits VB_Parent
     Public CS_SurfBasics As New CS_SurfBasics
     Public options As New Options_SURF
     Public Sub New()
@@ -26,7 +26,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Surf_Draw : Inherits VB_Algorithm
+Public Class Surf_Draw : Inherits VB_Parent
     Dim surf As New Surf_Basics
     Public Sub New()
         surf.CS_SurfBasics.drawPoints = False
@@ -75,7 +75,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Surf_MatchBad : Inherits VB_Algorithm
+Public Class Surf_MatchBad : Inherits VB_Parent
     Dim CS_SurfBasics As New CS_SurfBasics
     Dim ptLeft As New SortedList(Of Integer, cv.Point)
     Dim ptRight As New SortedList(Of Integer, cv.Point)
@@ -150,7 +150,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Surf_Match : Inherits VB_Algorithm
+Public Class Surf_Match : Inherits VB_Parent
     Dim surf As New Surf_Basics
     Public Sub New()
         surf.CS_SurfBasics.drawPoints = False

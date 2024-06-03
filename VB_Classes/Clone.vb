@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
-Public Class Clone_Basics : Inherits VB_Algorithm
+Public Class Clone_Basics : Inherits VB_Parent
     Public colorChangeValues As cv.Vec3f
     Public illuminationChangeValues As cv.Vec2f
     Public textureFlatteningValues As cv.Vec2f
@@ -36,7 +36,7 @@ End Class
 
 
 
-Public Class Clone_ColorChange : Inherits VB_Algorithm
+Public Class Clone_ColorChange : Inherits VB_Parent
     Dim clone As New Clone_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -63,7 +63,7 @@ End Class
 
 
 
-Public Class Clone_IlluminationChange : Inherits VB_Algorithm
+Public Class Clone_IlluminationChange : Inherits VB_Parent
     Dim clone As New Clone_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -89,7 +89,7 @@ End Class
 
 
 
-Public Class Clone_TextureFlattening : Inherits VB_Algorithm
+Public Class Clone_TextureFlattening : Inherits VB_Parent
     Dim clone As New Clone_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -119,7 +119,7 @@ End Class
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
 ' https://www.learnopencv.com/seamless-cloning-using-opencv-python-cpp/
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
-Public Class Clone_Eagle : Inherits VB_Algorithm
+Public Class Clone_Eagle : Inherits VB_Parent
     Dim sourceImage As cv.Mat
     Dim mask As cv.Mat
     Dim srcROI As cv.Rect
@@ -175,7 +175,7 @@ End Class
 
 
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.Cv2.SeamlessClone(OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.Point,%20OpenCvSharp.OutputArray,%20OpenCvSharp.SeamlessCloneMethods)/
-Public Class Clone_Seamless : Inherits VB_Algorithm
+Public Class Clone_Seamless : Inherits VB_Parent
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("Seamless Normal Clone")

@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class RedTrack_Basics : Inherits VB_Algorithm
+Public Class RedTrack_Basics : Inherits VB_Parent
     Dim stats As New Cell_Basics
     Public redC As New RedCloud_Basics
     Public Sub New()
@@ -27,7 +27,7 @@ End Class
 
 
 
-Public Class RedTrack_Lines : Inherits VB_Algorithm
+Public Class RedTrack_Lines : Inherits VB_Parent
     Dim lines As New Line_Basics
     Dim track As New RedTrack_Basics
     Public Sub New()
@@ -61,7 +61,7 @@ End Class
 
 
 
-Public Class RedTrack_LineSingle : Inherits VB_Algorithm
+Public Class RedTrack_LineSingle : Inherits VB_Parent
     Dim track As New RedTrack_Basics
     Public Sub New()
         desc = "Create a line between the rightmost and leftmost good feature to show camera motion"
@@ -128,7 +128,7 @@ End Class
 
 
 
-Public Class RedTrack_FeaturesKNN : Inherits VB_Algorithm
+Public Class RedTrack_FeaturesKNN : Inherits VB_Parent
     Public knn As New KNN_Core
     Public feat As New Feature_Basics
     Public Sub New()
@@ -162,7 +162,7 @@ End Class
 
 
 
-Public Class RedTrack_GoodCell : Inherits VB_Algorithm
+Public Class RedTrack_GoodCell : Inherits VB_Parent
     Dim good As New RedTrack_GoodCellInput
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
@@ -188,7 +188,7 @@ End Class
 
 
 
-Public Class RedTrack_GoodCells : Inherits VB_Algorithm
+Public Class RedTrack_GoodCells : Inherits VB_Parent
     Dim good As New RedTrack_GoodCellInput
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
@@ -226,7 +226,7 @@ End Class
 
 
 
-Public Class RedTrack_GoodCellInput : Inherits VB_Algorithm
+Public Class RedTrack_GoodCellInput : Inherits VB_Parent
     Public knn As New KNN_Core
     Public feat As New Feature_Basics
     Public featureList As New List(Of cv.Point2f)
@@ -261,7 +261,7 @@ End Class
 
 
 
-Public Class RedTrack_Points : Inherits VB_Algorithm
+Public Class RedTrack_Points : Inherits VB_Parent
     Dim lines As New Line_Basics
     Dim track As New RedTrack_Basics
     Public Sub New()
@@ -294,7 +294,7 @@ End Class
 
 
 
-Public Class RedTrack_Features : Inherits VB_Algorithm
+Public Class RedTrack_Features : Inherits VB_Parent
     Dim options As New Options_Flood
     Dim feat As New Feature_Basics
     Dim redC As New RedCloud_Basics

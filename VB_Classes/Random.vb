@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Random_Basics : Inherits VB_Algorithm
+Public Class Random_Basics : Inherits VB_Parent
     Public pointList As New List(Of cv.Point2f)
     Public range As cv.Rect
     Public options As New Options_Random
@@ -30,7 +30,7 @@ End Class
 
 
 
-Public Class Random_Point2d : Inherits VB_Algorithm
+Public Class Random_Point2d : Inherits VB_Parent
     Public PointList As New List(Of cv.Point2d)
     Public range As cv.Rect
     Dim options As New Options_Random
@@ -59,7 +59,7 @@ End Class
 
 
 
-Public Class Random_Enumerable : Inherits VB_Algorithm
+Public Class Random_Enumerable : Inherits VB_Parent
     Public options As New Options_Random
     Public points() As cv.Point2f
     Public Sub New()
@@ -82,7 +82,7 @@ End Class
 
 
 
-Public Class Random_Basics3D : Inherits VB_Algorithm
+Public Class Random_Basics3D : Inherits VB_Parent
     Public Points3f() As cv.Point3f
     Public PointList As New List(Of cv.Point3f)
     Public ranges() As Single = {0, dst2.Width, 0, dst2.Height, 0, task.maxZmeters}
@@ -114,7 +114,7 @@ End Class
 
 
 
-Public Class Random_Basics4D : Inherits VB_Algorithm
+Public Class Random_Basics4D : Inherits VB_Parent
     Public vec4f() As cv.Vec4f
     Public PointList As New List(Of cv.Vec4f)
     Public ranges() As Single = {0, dst2.Width, 0, dst2.Height, 0, task.maxZmeters, 0, task.maxZmeters}
@@ -146,7 +146,7 @@ End Class
 
 
 
-Public Class Random_Shuffle : Inherits VB_Algorithm
+Public Class Random_Shuffle : Inherits VB_Parent
     Dim myRNG As New cv.RNG
     Public Sub New()
         desc = "Use randomShuffle to reorder an image."
@@ -163,7 +163,7 @@ End Class
 
 
 
-Public Class Random_LUTMask : Inherits VB_Algorithm
+Public Class Random_LUTMask : Inherits VB_Parent
     Dim random As New Random_Basics
     Dim km As New KMeans_Image
     Public Sub New()
@@ -195,7 +195,7 @@ End Class
 
 
 
-Public Class Random_UniformDist : Inherits VB_Algorithm
+Public Class Random_UniformDist : Inherits VB_Parent
     Dim minVal As Double = 0, maxVal As Double = 255
     Public Sub New()
         desc = "Create a uniform distribution."
@@ -211,7 +211,7 @@ End Class
 
 
 
-Public Class Random_NormalDist : Inherits VB_Algorithm
+Public Class Random_NormalDist : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Random_NormalDist Blue Mean", 0, 255, 125)
@@ -241,7 +241,7 @@ End Class
 
 
 
-Public Class Random_CheckUniformSmoothed : Inherits VB_Algorithm
+Public Class Random_CheckUniformSmoothed : Inherits VB_Parent
     Dim histogram As New Hist_Basics
     Dim rUniform As New Random_UniformDist
     Public Sub New()
@@ -261,7 +261,7 @@ End Class
 
 
 
-Public Class Random_CheckUniformDist : Inherits VB_Algorithm
+Public Class Random_CheckUniformDist : Inherits VB_Parent
     Dim histogram As New Hist_Graph
     Dim rUniform As New Random_UniformDist
     Public Sub New()
@@ -281,7 +281,7 @@ End Class
 
 
 
-Public Class Random_CheckNormalDist : Inherits VB_Algorithm
+Public Class Random_CheckNormalDist : Inherits VB_Parent
     Dim histogram As New Hist_Graph
     Dim normalDist As New Random_NormalDist
     Public Sub New()
@@ -300,7 +300,7 @@ End Class
 
 
 
-Public Class Random_CheckNormalDistSmoothed : Inherits VB_Algorithm
+Public Class Random_CheckNormalDistSmoothed : Inherits VB_Parent
     Dim histogram As New Hist_Basics
     Dim normalDist As New Random_NormalDist
     Public Sub New()
@@ -321,7 +321,7 @@ End Class
 
 
 
-Public Class Random_PatternGenerator_CPP : Inherits VB_Algorithm
+Public Class Random_PatternGenerator_CPP : Inherits VB_Parent
     Public Sub New()
         cPtr = Random_PatternGenerator_Open()
         desc = "Generate random patterns for use with 'Random Pattern Calibration'"
@@ -344,7 +344,7 @@ End Class
 
 
 
-Public Class Random_CustomDistribution : Inherits VB_Algorithm
+Public Class Random_CustomDistribution : Inherits VB_Parent
     Public inputCDF As cv.Mat ' place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
     Public outputRandom = New cv.Mat(10000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public outputHistogram As cv.Mat
@@ -386,7 +386,7 @@ End Class
 
 
 ' https://www.khanacademy.org/computing/computer-programming/programming-natural-simulations/programming-randomness/a/custom-distribution-of-random-numbers
-Public Class Random_MonteCarlo : Inherits VB_Algorithm
+Public Class Random_MonteCarlo : Inherits VB_Parent
     Public plot As New Plot_Histogram
     Public outputRandom = New cv.Mat(4000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public Sub New()
@@ -424,7 +424,7 @@ End Class
 
 
 
-Public Class Random_CustomHistogram : Inherits VB_Algorithm
+Public Class Random_CustomHistogram : Inherits VB_Parent
     Public random As New Random_CustomDistribution
     Public hist As New Hist_Simple
     Public saveHist As cv.Mat
@@ -461,7 +461,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class Random_StaticTV : Inherits VB_Algorithm
+Public Class Random_StaticTV : Inherits VB_Parent
     Public Sub New()
 
         If sliders.Setup(traceName) Then
@@ -499,7 +499,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class Random_StaticTVFaster : Inherits VB_Algorithm
+Public Class Random_StaticTVFaster : Inherits VB_Parent
     Dim random As New Random_UniformDist
     Dim mats As New Mat_4to1
     Dim options As New Random_StaticTV
@@ -543,7 +543,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class Random_StaticTVFastSimple : Inherits VB_Algorithm
+Public Class Random_StaticTVFastSimple : Inherits VB_Parent
     Dim random As New Random_UniformDist
     Dim options As New Random_StaticTV
     Public Sub New()
@@ -578,7 +578,7 @@ End Class
 
 
 
-Public Class Random_KalmanPoints : Inherits VB_Algorithm
+Public Class Random_KalmanPoints : Inherits VB_Parent
     Dim random As New Random_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()
@@ -635,7 +635,7 @@ End Class
 
 
 
-Public Class Random_Clusters : Inherits VB_Algorithm
+Public Class Random_Clusters : Inherits VB_Parent
     Public numClusters = 3
     Public numPoints
     Public stdev As Single

@@ -2,7 +2,7 @@
 Imports OpenCvSharp.XImgProc
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
-Public Class BackProject2D_Basics : Inherits VB_Algorithm
+Public Class BackProject2D_Basics : Inherits VB_Parent
     Public hist2d As New Hist2D_Basics
     Public histogram As New cv.Mat
     Public xRange As Integer = 255
@@ -62,7 +62,7 @@ End Class
 
 
 
-Public Class BackProject2D_Compare : Inherits VB_Algorithm
+Public Class BackProject2D_Compare : Inherits VB_Parent
     Dim hueSat As New PhotoShop_Hue
     Dim backP As New BackProject2D_Basics
     Dim mats As New Mat_4Click
@@ -100,7 +100,7 @@ End Class
 
 
 
-Public Class BackProject2D_RowCol : Inherits VB_Algorithm
+Public Class BackProject2D_RowCol : Inherits VB_Parent
     Dim backp As New BackProject2D_Basics
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
@@ -158,7 +158,7 @@ End Class
 
 
 
-Public Class BackProject2D_FullImage : Inherits VB_Algorithm
+Public Class BackProject2D_FullImage : Inherits VB_Parent
     Public masks As New List(Of cv.Mat)
     Dim backp As New BackProject2D_Basics
     Public classCount As Integer
@@ -211,7 +211,7 @@ End Class
 
 
 
-Public Class BackProject2D_Top : Inherits VB_Algorithm
+Public Class BackProject2D_Top : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Public Sub New()
         labels = {"", "", "Top Down HeatMap", "BackProject2D for the top-down view"}
@@ -231,7 +231,7 @@ End Class
 
 
 
-Public Class BackProject2D_Side : Inherits VB_Algorithm
+Public Class BackProject2D_Side : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Public Sub New()
         labels = {"", "", "Side View HeatMap", "BackProject2D for the side view"}
@@ -254,7 +254,7 @@ End Class
 
 
 
-Public Class BackProject2D_Filter : Inherits VB_Algorithm
+Public Class BackProject2D_Filter : Inherits VB_Parent
     Public threshold As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
@@ -285,7 +285,7 @@ End Class
 
 
 
-Public Class BackProject2D_FilterSide : Inherits VB_Algorithm
+Public Class BackProject2D_FilterSide : Inherits VB_Parent
     Public filter As New BackProject2D_Filter
     Dim options As New Options_HistXD
     Public Sub New()
@@ -315,7 +315,7 @@ End Class
 
 
 
-Public Class BackProject2D_FilterTop : Inherits VB_Algorithm
+Public Class BackProject2D_FilterTop : Inherits VB_Parent
     Dim filter As New BackProject2D_Filter
     Dim options As New Options_HistXD
     Public Sub New()
@@ -345,7 +345,7 @@ End Class
 
 
 
-Public Class BackProject2D_FilterBoth : Inherits VB_Algorithm
+Public Class BackProject2D_FilterBoth : Inherits VB_Parent
     Dim filterSide As New BackProject2D_FilterSide
     Dim filterTop As New BackProject2D_FilterTop
     Public Sub New()

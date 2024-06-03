@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Bezier_Basics : Inherits VB_Algorithm
+Public Class Bezier_Basics : Inherits VB_Parent
     Public points() As cv.Point
     Public Sub New()
         points = {New cv.Point(100, 100),
@@ -42,7 +42,7 @@ End Class
 
 
 
-Public Class Bezier_Example : Inherits VB_Algorithm
+Public Class Bezier_Example : Inherits VB_Parent
     Dim bezier As New Bezier_Basics
     Public points() As cv.Point = {New cv.Point(task.dotSize, task.dotSize), New cv.Point(dst2.Width / 6, dst2.Width / 6),
                                    New cv.Point(dst2.Width * 3 / 4, dst2.Height / 2),

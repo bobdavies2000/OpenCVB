@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Horizon_Basics : Inherits VB_Algorithm
+Public Class Horizon_Basics : Inherits VB_Parent
     Public points As New List(Of cv.Point)
     Dim resizeRatio As Integer = 1
     Public vec As New pointPair
@@ -74,7 +74,7 @@ End Class
 
 
 
-Public Class Horizon_Basics1 : Inherits VB_Algorithm
+Public Class Horizon_Basics1 : Inherits VB_Parent
     Public cloudY As cv.Mat
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -134,7 +134,7 @@ End Class
 
 
 
-Public Class Horizon_FindNonZero : Inherits VB_Algorithm
+Public Class Horizon_FindNonZero : Inherits VB_Parent
     Public Sub New()
         redOptions.YRangeSlider.Value = 3
         If standalone Then gOptions.displayDst1.Checked = True
@@ -208,7 +208,7 @@ End Class
 
 
 
-Public Class Horizon_UnstableResults : Inherits VB_Algorithm
+Public Class Horizon_UnstableResults : Inherits VB_Parent
     Dim lines As New Line_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -266,7 +266,7 @@ End Class
 
 
 
-Public Class Horizon_FindNonZeroOld : Inherits VB_Algorithm
+Public Class Horizon_FindNonZeroOld : Inherits VB_Parent
     Public Sub New()
         redOptions.YRangeSlider.Value = 3
         If standalone Then gOptions.displayDst1.Checked = True
@@ -349,7 +349,7 @@ End Class
 
 
 
-Public Class Horizon_Validate : Inherits VB_Algorithm
+Public Class Horizon_Validate : Inherits VB_Parent
     Dim match As New Match_Basics
     Public Sub New()
         desc = "Validate the horizon points using Match_Basics"
@@ -388,7 +388,7 @@ End Class
 
 
 
-Public Class Horizon_Regress : Inherits VB_Algorithm
+Public Class Horizon_Regress : Inherits VB_Parent
     Dim horizon As New Horizon_Basics
     Dim regress As New LinearRegression_Basics
     Public Sub New()
@@ -412,7 +412,7 @@ End Class
 
 
 
-Public Class Horizon_ExternalTest : Inherits VB_Algorithm
+Public Class Horizon_ExternalTest : Inherits VB_Parent
     Dim horizon As New Horizon_Basics
     Public Sub New()
         desc = "Supply the point cloud input to Horizon_Basics"

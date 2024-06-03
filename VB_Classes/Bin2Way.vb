@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Bin2Way_Basics : Inherits VB_Algorithm
+Public Class Bin2Way_Basics : Inherits VB_Parent
     Public hist As New Hist_Basics
     Public mats As New Mat_4Click
     Public fraction As Single = dst2.Total / 2
@@ -43,7 +43,7 @@ End Class
 
 
 
-Public Class Bin2Way_KMeans : Inherits VB_Algorithm
+Public Class Bin2Way_KMeans : Inherits VB_Parent
     Public bin2 As New Bin2Way_Basics
     Dim kmeans As New KMeans_Dimensions
     Dim mats As New Mat_4Click
@@ -74,7 +74,7 @@ End Class
 
 
 
-Public Class Bin2Way_RedCloudDarkest : Inherits VB_Algorithm
+Public Class Bin2Way_RedCloudDarkest : Inherits VB_Parent
     Dim bin2 As New Bin2Way_RecurseOnce
     Dim flood As New Flood_BasicsMask
     Public Sub New()
@@ -96,7 +96,7 @@ End Class
 
 
 
-Public Class Bin2Way_RedCloudLightest : Inherits VB_Algorithm
+Public Class Bin2Way_RedCloudLightest : Inherits VB_Parent
     Dim bin2 As New Bin2Way_RecurseOnce
     Dim flood As New Flood_BasicsMask
     Public Sub New()
@@ -115,7 +115,7 @@ End Class
 
 
 
-Public Class Bin2Way_RecurseOnce : Inherits VB_Algorithm
+Public Class Bin2Way_RecurseOnce : Inherits VB_Parent
     Dim bin2 As New Bin2Way_Basics
     Public mats As New Mat_4Click
     Public Sub New()
@@ -154,7 +154,7 @@ End Class
 
 
 
-Public Class Bin2Way_RedCloud : Inherits VB_Algorithm
+Public Class Bin2Way_RedCloud : Inherits VB_Parent
     Dim bin2 As New Bin2Way_RecurseOnce
     Dim flood As New Flood_BasicsMask
     Dim color As New Color8U_Basics

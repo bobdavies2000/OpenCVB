@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/StarDetectorSample.vb
-Public Class XFeatures2D_StarDetector : Inherits VB_Algorithm
+Public Class XFeatures2D_StarDetector : Inherits VB_Parent
     Public Sub New()
         desc = "Basics of the StarDetector - a 2D feature detector.  FAILS IN COMPUTE.  Uncomment to investigate further."
     End Sub

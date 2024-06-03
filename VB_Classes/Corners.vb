@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FASTSample.vb
-Public Class Corners_Basics : Inherits VB_Algorithm
+Public Class Corners_Basics : Inherits VB_Parent
     Public features As New List(Of cv.Point2f)
     Dim options As New Options_Features
     Public Sub New()
@@ -42,7 +42,7 @@ End Class
 
 
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
-Public Class Corners_Harris : Inherits VB_Algorithm
+Public Class Corners_Harris : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Corner block size", 1, 21, 3)
@@ -97,7 +97,7 @@ End Class
 
 
 
-Public Class Corners_PreCornerDetect : Inherits VB_Algorithm
+Public Class Corners_PreCornerDetect : Inherits VB_Parent
     Dim median As New Math_Median_CDF
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("kernel Size", 1, 20, 19)
@@ -122,7 +122,7 @@ End Class
 
 
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
-Public Class Corners_ShiTomasi_CPP : Inherits VB_Algorithm
+Public Class Corners_ShiTomasi_CPP : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Corner block size", 1, 21, 3)
@@ -157,7 +157,7 @@ End Class
 
 
 
-Public Class Corners_BasicsCentroid : Inherits VB_Algorithm
+Public Class Corners_BasicsCentroid : Inherits VB_Parent
     Dim fast As New Corners_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()
@@ -187,7 +187,7 @@ End Class
 
 
 
-Public Class Corners_BasicsStablePoints : Inherits VB_Algorithm
+Public Class Corners_BasicsStablePoints : Inherits VB_Parent
     Public features As New List(Of cv.Point)
     Dim fast As New Corners_Basics
     Public Sub New()
@@ -226,7 +226,7 @@ End Class
 
 
 
-Public Class Corners_BasicsCentroids : Inherits VB_Algorithm
+Public Class Corners_BasicsCentroids : Inherits VB_Parent
     Dim fast As New Corners_Basics
     Dim fastCenters() As cv.Point2f
     Public Sub New()
@@ -263,7 +263,7 @@ End Class
 
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
-Public Class Corners_Harris_CPP : Inherits VB_Algorithm
+Public Class Corners_Harris_CPP : Inherits VB_Parent
     Dim addw As New AddWeighted_Basics
     Dim options As New Options_Harris
     Public Sub New()
@@ -300,7 +300,7 @@ End Class
 
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
-Public Class Corners_HarrisDetector : Inherits VB_Algorithm
+Public Class Corners_HarrisDetector : Inherits VB_Parent
     Public features As New List(Of cv.Point2f)
     Dim options As New Options_Features
     Public Sub New()
@@ -340,7 +340,7 @@ End Class
 
 
 
-Public Class Corners_RedCloud : Inherits VB_Algorithm
+Public Class Corners_RedCloud : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim corners As New Neighbors_Intersects
     Public Sub New()
@@ -365,7 +365,7 @@ End Class
 
 
 
-Public Class Corners_SubPix : Inherits VB_Algorithm
+Public Class Corners_SubPix : Inherits VB_Parent
     Public feat As New Feature_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("SubPix kernel Size", 1, 20, 3)

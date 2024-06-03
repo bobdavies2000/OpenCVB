@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
-Public Class Depth_Basics : Inherits VB_Algorithm
+Public Class Depth_Basics : Inherits VB_Parent
     Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
         vbAddAdvice(traceName + ": use global option to control 'Max Depth'.")
@@ -30,7 +30,7 @@ End Class
 
 
 
-Public Class Depth_Display : Inherits VB_Algorithm
+Public Class Depth_Display : Inherits VB_Parent
     Public Sub New()
         gOptions.displayDst0.Checked = True
         gOptions.displayDst1.Checked = True
@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class Depth_Flatland : Inherits VB_Algorithm
+Public Class Depth_Flatland : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Region Count", 1, 250, 10)
         labels(3) = "Grayscale version"
@@ -72,7 +72,7 @@ End Class
 
 
 
-Public Class Depth_FirstLastDistance : Inherits VB_Algorithm
+Public Class Depth_FirstLastDistance : Inherits VB_Parent
     Public Sub New()
         desc = "Monitor the first and last depth distances"
     End Sub
@@ -102,7 +102,7 @@ End Class
 
 
 
-Public Class Depth_HolesRect : Inherits VB_Algorithm
+Public Class Depth_HolesRect : Inherits VB_Parent
     Dim shadow As New Depth_Holes
     Public Sub New()
         labels(2) = "The 10 largest contours in the depth holes."
@@ -138,7 +138,7 @@ End Class
 
 
 
-Public Class Depth_MeanStdev_MT : Inherits VB_Algorithm
+Public Class Depth_MeanStdev_MT : Inherits VB_Parent
     Dim meanSeries As New cv.Mat
     Public Sub New()
         dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8U, 0)
@@ -212,7 +212,7 @@ End Class
 
 
 
-Public Class Depth_MeanStdevPlot : Inherits VB_Algorithm
+Public Class Depth_MeanStdevPlot : Inherits VB_Parent
     Dim plot1 As New Plot_OverTimeSingle
     Dim plot2 As New Plot_OverTimeSingle
     Public Sub New()
@@ -239,7 +239,7 @@ End Class
 
 
 
-Public Class Depth_Uncertainty : Inherits VB_Algorithm
+Public Class Depth_Uncertainty : Inherits VB_Parent
     Dim retina As New Retina_Basics_CPP
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Uncertainty threshold", 1, 255, 100)
@@ -259,7 +259,7 @@ End Class
 
 
 
-Public Class Depth_Palette : Inherits VB_Algorithm
+Public Class Depth_Palette : Inherits VB_Parent
     Dim customColorMap As New cv.Mat
     Dim gColor As New Gradient_Color
     Public Sub New()
@@ -285,7 +285,7 @@ End Class
 
 
 
-Public Class Depth_Colorizer_CPP : Inherits VB_Algorithm
+Public Class Depth_Colorizer_CPP : Inherits VB_Parent
     Public Sub New()
         cPtr = Depth_Colorizer_Open()
         desc = "Display depth data with InRange.  Higher contrast than others - yellow to blue always present."
@@ -311,7 +311,7 @@ End Class
 
 
 
-Public Class Depth_LocalMinMax_MT : Inherits VB_Algorithm
+Public Class Depth_LocalMinMax_MT : Inherits VB_Parent
     Public minPoint(0) As cv.Point2f
     Public maxPoint(0) As cv.Point2f
     Public Sub New()
@@ -354,7 +354,7 @@ End Class
 
 
 
-Public Class Depth_MinMaxToVoronoi : Inherits VB_Algorithm
+Public Class Depth_MinMaxToVoronoi : Inherits VB_Parent
     Dim kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(task.gridList.Count * 4 - 1)
@@ -417,7 +417,7 @@ End Class
 
 
 
-Public Class Depth_ColorMap : Inherits VB_Algorithm
+Public Class Depth_ColorMap : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Depth ColorMap Alpha X100", 1, 100, 5)
@@ -441,7 +441,7 @@ End Class
 
 
 
-Public Class Depth_NotMissing : Inherits VB_Algorithm
+Public Class Depth_NotMissing : Inherits VB_Parent
     Public bgSub As New BGSubtract_Basics
     Public Sub New()
         labels(3) = "Stable (non-zero) Depth"
@@ -464,7 +464,7 @@ End Class
 
 
 
-Public Class Depth_Median : Inherits VB_Algorithm
+Public Class Depth_Median : Inherits VB_Parent
     Dim median As New Math_Median_CDF
     Public Sub New()
         median.rangeMax = task.maxZmeters
@@ -494,7 +494,7 @@ End Class
 
 
 
-Public Class Depth_SmoothingMat : Inherits VB_Algorithm
+Public Class Depth_SmoothingMat : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold in millimeters", 1, 1000, 10)
         labels(3) = "Depth pixels after smoothing"
@@ -522,7 +522,7 @@ End Class
 
 
 
-Public Class Depth_Smoothing : Inherits VB_Algorithm
+Public Class Depth_Smoothing : Inherits VB_Parent
     Dim smooth As New Depth_SmoothingMat
     Dim reduction As New Reduction_Basics
     Public reducedDepth As New cv.Mat
@@ -557,7 +557,7 @@ End Class
 
 
 
-Public Class Depth_HolesOverTime : Inherits VB_Algorithm
+Public Class Depth_HolesOverTime : Inherits VB_Parent
     Dim images As New List(Of cv.Mat)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of images to retain", 0, 30, 10)
@@ -597,7 +597,7 @@ End Class
 
 
 
-Public Class Depth_Holes : Inherits VB_Algorithm
+Public Class Depth_Holes : Inherits VB_Parent
     Dim element As New cv.Mat
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -628,7 +628,7 @@ End Class
 
 
 
-Public Class Depth_Dilate : Inherits VB_Algorithm
+Public Class Depth_Dilate : Inherits VB_Parent
     Dim dilate As New Dilate_Basics
     Public Sub New()
         desc = "Dilate the depth data to fill holes."
@@ -646,7 +646,7 @@ End Class
 
 
 
-Public Class Depth_ForegroundHead : Inherits VB_Algorithm
+Public Class Depth_ForegroundHead : Inherits VB_Parent
     Dim fgnd As New Depth_ForegroundBlob
     Public kalman As New Kalman_Basics
     Public trustedRect As cv.Rect
@@ -691,7 +691,7 @@ End Class
 
 
 
-Public Class Depth_RGBShadow : Inherits VB_Algorithm
+Public Class Depth_RGBShadow : Inherits VB_Parent
     Public Sub New()
         desc = "Merge the BGR and Depth Shadow"
     End Sub
@@ -707,7 +707,7 @@ End Class
 
 
 
-Public Class Depth_BGSubtract : Inherits VB_Algorithm
+Public Class Depth_BGSubtract : Inherits VB_Parent
     Dim bgSub As New BGSubtract_Basics
     Public Sub New()
         labels = {"", "", "Latest task.noDepthMask", "BGSubtract output for the task.noDepthMask"}
@@ -729,7 +729,7 @@ End Class
 
 
 
-Public Class Depth_Averaging : Inherits VB_Algorithm
+Public Class Depth_Averaging : Inherits VB_Parent
     Public avg As New Math_ImageAverage
     Public colorize As New Depth_Colorizer_CPP
     Public Sub New()
@@ -753,7 +753,7 @@ End Class
 
 
 
-Public Class Depth_MaxMask : Inherits VB_Algorithm
+Public Class Depth_MaxMask : Inherits VB_Parent
     Dim contour As New Contour_General
     Public Sub New()
         labels = {"", "", "Depth that is too far", "Contour of depth that is too far..."}
@@ -778,7 +778,7 @@ End Class
 
 
 
-Public Class Depth_ForegroundOverTime : Inherits VB_Algorithm
+Public Class Depth_ForegroundOverTime : Inherits VB_Parent
     Dim options As New Options_ForeGround
     Dim fore As New Depth_Foreground
     Dim contours As New Contour_Largest
@@ -819,7 +819,7 @@ End Class
 
 
 
-Public Class Depth_ForegroundBlob : Inherits VB_Algorithm
+Public Class Depth_ForegroundBlob : Inherits VB_Parent
     Dim options As New Options_ForeGround
     Public blobLocation As New List(Of cv.Point)
     Public maxIndex As Integer
@@ -873,7 +873,7 @@ End Class
 
 
 
-Public Class Depth_Foreground : Inherits VB_Algorithm
+Public Class Depth_Foreground : Inherits VB_Parent
     Dim options As New Options_ForeGround
     Dim contours As New Contour_Largest
     Public Sub New()
@@ -909,7 +909,7 @@ End Class
 
 
 
-Public Class Depth_Grid : Inherits VB_Algorithm
+Public Class Depth_Grid : Inherits VB_Parent
     Public Sub New()
         gOptions.GridSize.Value = 4
         labels = {"", "", "White regions below are likely depth edges where depth changes rapidly", "Depth 32f display"}
@@ -933,7 +933,7 @@ End Class
 
 
 
-Public Class Depth_InRange : Inherits VB_Algorithm
+Public Class Depth_InRange : Inherits VB_Parent
     Dim options As New Options_ForeGround
     Dim contours As New Contour_Largest
     Public classCount As Integer = 1
@@ -990,7 +990,7 @@ End Class
 
 
 
-Public Class Depth_Regions : Inherits VB_Algorithm
+Public Class Depth_Regions : Inherits VB_Parent
     Public classCount As Integer = 5
     Public Sub New()
         desc = "Separate the scene into a specified number of regions by depth"
@@ -1014,7 +1014,7 @@ End Class
 
 
 
-Public Class Depth_Colorizer_VB : Inherits VB_Algorithm
+Public Class Depth_Colorizer_VB : Inherits VB_Parent
     Public Sub New()
         desc = "Colorize the depth based on the near and far colors."
     End Sub
@@ -1044,7 +1044,7 @@ End Class
 
 
 
-Public Class Depth_PunchIncreasing : Inherits VB_Algorithm
+Public Class Depth_PunchIncreasing : Inherits VB_Parent
     Public depth As New Depth_PunchDecreasing
     Public Sub New()
         depth.Increasing = True
@@ -1063,7 +1063,7 @@ End Class
 
 
 
-Public Class Depth_PunchDecreasing : Inherits VB_Algorithm
+Public Class Depth_PunchDecreasing : Inherits VB_Parent
     Public Increasing As Boolean
     Dim fore As New Depth_Foreground
     Public Sub New()
@@ -1094,7 +1094,7 @@ End Class
 
 
 
-Public Class Depth_PunchBlob : Inherits VB_Algorithm
+Public Class Depth_PunchBlob : Inherits VB_Parent
     Dim depthDec As New Depth_PunchDecreasing
     Dim depthInc As New Depth_PunchDecreasing
     Dim contours As New Contour_General
@@ -1141,7 +1141,7 @@ End Class
 
 
 
-Public Class Depth_PunchBlobNew : Inherits VB_Algorithm
+Public Class Depth_PunchBlobNew : Inherits VB_Parent
     Dim depthDec As New Depth_PunchDecreasing
     Dim depthInc As New Depth_PunchDecreasing
     Dim contours As New Contour_General
@@ -1172,7 +1172,7 @@ End Class
 
 
 
-Public Class Depth_Contour : Inherits VB_Algorithm
+Public Class Depth_Contour : Inherits VB_Parent
     Dim contour As New Contour_General
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -1197,7 +1197,7 @@ End Class
 
 
 
-Public Class Depth_Outline : Inherits VB_Algorithm
+Public Class Depth_Outline : Inherits VB_Parent
     Dim contour As New Contour_General
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -1226,7 +1226,7 @@ End Class
 
 
 
-Public Class Depth_StableAverage : Inherits VB_Algorithm
+Public Class Depth_StableAverage : Inherits VB_Parent
     Dim dAvg As New Depth_Averaging
     Dim extrema As New Depth_StableMinMax
     Public Sub New()
@@ -1254,7 +1254,7 @@ End Class
 
 
 
-Public Class Depth_MinMaxNone : Inherits VB_Algorithm
+Public Class Depth_MinMaxNone : Inherits VB_Parent
     Public options As New Options_MinMaxNone
     Public Sub New()
         desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
@@ -1294,7 +1294,7 @@ End Class
 
 
 
-Public Class Depth_StableMin : Inherits VB_Algorithm
+Public Class Depth_StableMin : Inherits VB_Parent
     Public stableMin As cv.Mat
     Dim colorize As New Depth_Colorizer_CPP
     Public Sub New()
@@ -1325,7 +1325,7 @@ End Class
 
 
 
-Public Class Depth_StableMax : Inherits VB_Algorithm
+Public Class Depth_StableMax : Inherits VB_Parent
     Public stableMax As cv.Mat
     Dim colorize As New Depth_Colorizer_CPP
     Public Sub New()
@@ -1357,7 +1357,7 @@ End Class
 
 
 
-Public Class Depth_StableMinMax : Inherits VB_Algorithm
+Public Class Depth_StableMinMax : Inherits VB_Parent
     Dim colorize As New Depth_Colorizer_CPP
     Public dMin As New Depth_StableMin
     Public dMax As New Depth_StableMax
@@ -1397,7 +1397,7 @@ End Class
 
 
 
-Public Class Depth_WorldXYMT : Inherits VB_Algorithm
+Public Class Depth_WorldXYMT : Inherits VB_Parent
     Public depthUnitsMeters = False
     Public Sub New()
         labels(3) = "dst3 = pointcloud"
@@ -1438,7 +1438,7 @@ End Class
 
 
 
-Public Class Depth_WorldXYZ : Inherits VB_Algorithm
+Public Class Depth_WorldXYZ : Inherits VB_Parent
     Public depthUnitsMeters = False
     Public Sub New()
         labels(3) = "dst3 = pointcloud"
@@ -1469,7 +1469,7 @@ End Class
 
 
 
-Public Class Depth_World : Inherits VB_Algorithm
+Public Class Depth_World : Inherits VB_Parent
     Dim template As New Math_Template
     Public Sub New()
         labels = {"", "", "Merged templates and depth32f - should be similar to upper right image", ""}
@@ -1503,7 +1503,7 @@ End Class
 
 
 
-Public Class Depth_TiersZ : Inherits VB_Algorithm
+Public Class Depth_TiersZ : Inherits VB_Parent
     Public classCount As Integer
     Dim options As New Options_Contours
     Public Sub New()
@@ -1531,7 +1531,7 @@ End Class
 
 
 
-Public Class Depth_TierCount : Inherits VB_Algorithm
+Public Class Depth_TierCount : Inherits VB_Parent
     Public valley As New HistValley_Depth1
     Public classCount As Integer
     Public Sub New()

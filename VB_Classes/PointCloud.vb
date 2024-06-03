@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp.ML.DTrees
 
-Public Class PointCloud_Basics : Inherits VB_Algorithm
+Public Class PointCloud_Basics : Inherits VB_Parent
     Public actualCount As Integer
     Dim deltaThreshold As Single
 
@@ -122,7 +122,7 @@ End Class
 
 
 
-Public Class PointCloud_Point3f : Inherits VB_Algorithm
+Public Class PointCloud_Point3f : Inherits VB_Parent
     Public Sub New()
         desc = "Display the point cloud CV_32FC3 format"
     End Sub
@@ -137,7 +137,7 @@ End Class
 
 
 
-Public Class PointCloud_Spin : Inherits VB_Algorithm
+Public Class PointCloud_Spin : Inherits VB_Parent
     Dim options As New Options_IMU
     Dim gMat As New IMU_GMatrixWithOptions
     Public Sub New()
@@ -194,7 +194,7 @@ End Class
 
 
 
-Public Class PointCloud_Spin2 : Inherits VB_Algorithm
+Public Class PointCloud_Spin2 : Inherits VB_Parent
     Dim spin As New PointCloud_Spin
     Dim redC As New RedCloud_Basics
     Dim redCSpin As New RedCloud_Basics
@@ -218,7 +218,7 @@ End Class
 
 
 
-Public Class PointCloud_Continuous_VB : Inherits VB_Algorithm
+Public Class PointCloud_Continuous_VB : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Threshold of continuity in mm", 0, 1000, 10)
@@ -260,7 +260,7 @@ End Class
 ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
 ' https://www.stereolabs.com/zed/
 ' https://www.mynteye.com/pages/mynt-eye-d
-Public Class PointCloud_SetupSide : Inherits VB_Algorithm
+Public Class PointCloud_SetupSide : Inherits VB_Parent
     Dim arcSize As Integer
     Public xCheckbox As Windows.Forms.CheckBox
     Public zCheckbox As Windows.Forms.CheckBox
@@ -340,7 +340,7 @@ End Class
 ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
 ' https://www.stereolabs.com/zed/
 ' https://www.mynteye.com/pages/mynt-eye-d
-Public Class PointCloud_SetupTop : Inherits VB_Algorithm
+Public Class PointCloud_SetupTop : Inherits VB_Parent
     Dim arcSize As Integer
     Public Sub New()
         arcSize = dst2.Width / 15
@@ -406,7 +406,7 @@ End Class
 
 
 
-Public Class PointCloud_Raw_CPP : Inherits VB_Algorithm
+Public Class PointCloud_Raw_CPP : Inherits VB_Parent
     Dim depthBytes() As Byte
     Public Sub New()
         labels(2) = "Top View"
@@ -438,7 +438,7 @@ End Class
 
 
 
-Public Class PointCloud_Raw : Inherits VB_Algorithm
+Public Class PointCloud_Raw : Inherits VB_Parent
     Dim depthBytes() As Byte
     Public Sub New()
         labels(2) = "Top View"
@@ -482,7 +482,7 @@ End Class
 
 
 
-Public Class PointCloud_Solo : Inherits VB_Algorithm
+Public Class PointCloud_Solo : Inherits VB_Parent
     Public heat As New HeatMap_Basics
     Public Sub New()
         findCheckBox("Top View (Unchecked Side View)").Checked = True
@@ -502,7 +502,7 @@ End Class
 
 
 
-Public Class PointCloud_SoloRegions : Inherits VB_Algorithm
+Public Class PointCloud_SoloRegions : Inherits VB_Parent
     Public solo As New PointCloud_Solo
     Dim dilate As New Dilate_Basics
     Public Sub New()
@@ -526,7 +526,7 @@ End Class
 
 
 
-Public Class PointCloud_SurfaceH_CPP : Inherits VB_Algorithm
+Public Class PointCloud_SurfaceH_CPP : Inherits VB_Parent
     Public heat As New HeatMap_Basics
     Public plot As New Plot_Basics_CPP
     Public topRow As Integer
@@ -569,7 +569,7 @@ End Class
 
 
 
-Public Class PointCloud_SurfaceH : Inherits VB_Algorithm
+Public Class PointCloud_SurfaceH : Inherits VB_Parent
     Public heat As New HeatMap_Basics
     Public plot As New Plot_Histogram
     Public topRow As Integer
@@ -624,7 +624,7 @@ End Class
 
 
 
-Public Class PointCloud_NeighborV : Inherits VB_Algorithm
+Public Class PointCloud_NeighborV : Inherits VB_Parent
     Dim options As New Options_Neighbors
     Public Sub New()
         desc = "Show where vertical neighbor depth values are within Y mm's"
@@ -650,7 +650,7 @@ End Class
 
 
 
-Public Class PointCloud_Visualize : Inherits VB_Algorithm
+Public Class PointCloud_Visualize : Inherits VB_Parent
     Public Sub New()
         labels = {"", "", "Pointcloud visualized", ""}
         desc = "Display the pointcloud as a BGR image."
@@ -667,7 +667,7 @@ End Class
 
 
 
-Public Class PointCloud_PCpointsMask : Inherits VB_Algorithm
+Public Class PointCloud_PCpointsMask : Inherits VB_Parent
     Public pcPoints As cv.Mat
     Public actualCount As Integer
     Public Sub New()
@@ -706,7 +706,7 @@ End Class
 
 
 
-Public Class PointCloud_PCPoints : Inherits VB_Algorithm
+Public Class PointCloud_PCPoints : Inherits VB_Parent
     Public pcPoints As New List(Of cv.Point3f)
     Public Sub New()
         setPointCloudGrid()
@@ -740,7 +740,7 @@ End Class
 
 
 
-Public Class PointCloud_PCPointsPlane : Inherits VB_Algorithm
+Public Class PointCloud_PCPointsPlane : Inherits VB_Parent
     Dim pcBasics As New PointCloud_Basics
     Public pcPoints As New List(Of cv.Point3f)
     Public xyList As New List(Of cv.Point)
@@ -772,7 +772,7 @@ End Class
 
 
 
-Public Class PointCloud_Inspector : Inherits VB_Algorithm
+Public Class PointCloud_Inspector : Inherits VB_Parent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         task.mouseMovePoint.X = dst2.Width / 2
@@ -814,7 +814,7 @@ End Class
 
 
 
-Public Class PointCloud_Average : Inherits VB_Algorithm
+Public Class PointCloud_Average : Inherits VB_Parent
     Dim pcHistory As New List(Of cv.Mat)
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
@@ -837,7 +837,7 @@ End Class
 
 
 
-Public Class PointCloud_FrustrumTop : Inherits VB_Algorithm
+Public Class PointCloud_FrustrumTop : Inherits VB_Parent
     Dim frustrum As New Draw_Frustrum
     Dim heat As New HeatMap_Basics
     Dim setupTop As New PointCloud_SetupTop
@@ -864,7 +864,7 @@ End Class
 
 
 
-Public Class PointCloud_FrustrumSide : Inherits VB_Algorithm
+Public Class PointCloud_FrustrumSide : Inherits VB_Parent
     Dim frustrum As New Draw_Frustrum
     Dim heat As New HeatMap_Basics
     Dim setupSide As New PointCloud_SetupSide
@@ -890,7 +890,7 @@ End Class
 
 
 
-Public Class PointCloud_Histograms : Inherits VB_Algorithm
+Public Class PointCloud_Histograms : Inherits VB_Parent
     Dim plot2D As New Plot_Histogram2D
     Dim plot As New Plot_Histogram
     Dim hcloud As New Hist3Dcloud_Basics
@@ -962,7 +962,7 @@ End Class
 
 
 
-Public Class PointCloud_ReduceSplit2 : Inherits VB_Algorithm
+Public Class PointCloud_ReduceSplit2 : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Public Sub New()
         vbAddAdvice(traceName + ": redOptions 'X/Y-Range X100' sliders to test further.")
@@ -991,7 +991,7 @@ End Class
 
 
 
-Public Class PointCloud_ReducedTopView : Inherits VB_Algorithm
+Public Class PointCloud_ReducedTopView : Inherits VB_Parent
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
         vbAddAdvice(traceName + ": redOptions 'Reduction Sliders' have high impact.")
@@ -1012,7 +1012,7 @@ End Class
 
 
 
-Public Class PointCloud_ReducedSideView : Inherits VB_Algorithm
+Public Class PointCloud_ReducedSideView : Inherits VB_Parent
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
         desc = "Show where vertical neighbor depth values are within X mm's"
@@ -1032,7 +1032,7 @@ End Class
 
 
 
-Public Class PointCloud_ReducedViews : Inherits VB_Algorithm
+Public Class PointCloud_ReducedViews : Inherits VB_Parent
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
         labels = {"", "", "Reduced side view", "Reduced top view"}
@@ -1060,7 +1060,7 @@ End Class
 
 
 
-Public Class PointCloud_XRangeTest : Inherits VB_Algorithm
+Public Class PointCloud_XRangeTest : Inherits VB_Parent
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
         vbAddAdvice(traceName + ": redOptions 'X-Range X100' slider has high impact.")
@@ -1084,7 +1084,7 @@ End Class
 
 
 
-Public Class PointCloud_YRangeTest : Inherits VB_Algorithm
+Public Class PointCloud_YRangeTest : Inherits VB_Parent
     Dim split2 As New PointCloud_ReduceSplit2
     Public Sub New()
         vbAddAdvice(traceName + ": redOptions 'Y-Range X100' slider has high impact.")

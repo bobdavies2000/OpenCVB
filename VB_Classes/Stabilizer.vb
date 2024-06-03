@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Stabilizer_Basics : Inherits VB_Algorithm
+Public Class Stabilizer_Basics : Inherits VB_Parent
     Dim match As New Match_Basics
     Public shiftX As Integer
     Public shiftY As Integer
@@ -96,7 +96,7 @@ End Class
 
 
 
-Public Class Stabilizer_BasicsRandomInput : Inherits VB_Algorithm
+Public Class Stabilizer_BasicsRandomInput : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Range of random motion introduced (absolute value in pixels)", 0, 30, 8)
         labels(2) = "Current frame (before)"
@@ -146,7 +146,7 @@ End Class
 
 
 
-Public Class Stabilizer_BasicsTest : Inherits VB_Algorithm
+Public Class Stabilizer_BasicsTest : Inherits VB_Parent
     Dim random As New Stabilizer_BasicsRandomInput
     Dim stable As New Stabilizer_Basics
     Public Sub New()
@@ -171,7 +171,7 @@ End Class
 
 
 ' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
-Public Class Stabilizer_OpticalFlow : Inherits VB_Algorithm
+Public Class Stabilizer_OpticalFlow : Inherits VB_Parent
     Public feat As New Feature_Basics
     Public inputFeat As New List(Of cv.Point2f)
     Public borderCrop = 30
@@ -279,7 +279,7 @@ End Class
 
 
 
-Public Class Stabilizer_VerticalIMU : Inherits VB_Algorithm
+Public Class Stabilizer_VerticalIMU : Inherits VB_Parent
     Public stableTest As Boolean
     Public stableStr As String
     Public Sub New()
@@ -331,7 +331,7 @@ End Class
 
 
 
-Public Class Stabilizer_CornerPoints : Inherits VB_Algorithm
+Public Class Stabilizer_CornerPoints : Inherits VB_Parent
     Public basics As New Stable_Basics
     Public features As New List(Of cv.Point2f)
     Public Sub New()

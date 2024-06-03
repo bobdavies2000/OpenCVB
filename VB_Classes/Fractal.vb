@@ -1,7 +1,7 @@
 Imports System.Numerics
 Imports cv = OpenCvSharp
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
-Public Class Fractal_Mandelbrot : Inherits VB_Algorithm
+Public Class Fractal_Mandelbrot : Inherits VB_Parent
     Public startX As Single = -2
     Public endX As Single = 2
     Public startY As Single = -1.5
@@ -48,7 +48,7 @@ End Class
 
 
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
-'Public Class Fractal_Mandelbrot_MT : Inherits VB_Algorithm
+'Public Class Fractal_Mandelbrot_MT : Inherits VB_Parent
 '    Dim mandel As New Fractal_Mandelbrot
 '    Public Sub New()
 '        desc = "Run a multi-threaded version of the Mandalbrot algorithm"
@@ -68,7 +68,7 @@ End Class
 
 
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
-Public Class Fractal_MandelbrotZoom : Inherits VB_Algorithm
+Public Class Fractal_MandelbrotZoom : Inherits VB_Parent
     Public mandel As New Fractal_Mandelbrot
     Public Sub New()
         desc = "Run the classic Mandalbrot algorithm and allow zooming in"
@@ -105,7 +105,7 @@ End Class
 
 
 
-Public Class Fractal_MandelbrotZoomColor : Inherits VB_Algorithm
+Public Class Fractal_MandelbrotZoomColor : Inherits VB_Parent
     Public zoom As New Fractal_MandelbrotZoom
     Public Sub New()
         desc = "Classic Mandelbrot in color"
@@ -127,7 +127,7 @@ End Class
 
 ' http://www.malinc.se/m/JuliaSets.php
 ' https://www.geeksforgeeks.org/julia-fractal-set-in-c-c-using-graphics/
-Public Class Fractal_Julia : Inherits VB_Algorithm
+Public Class Fractal_Julia : Inherits VB_Parent
     Dim mandel As New Fractal_MandelbrotZoomColor
     Dim rt As Double = 0.282
     Dim mt As Double = -0.58
@@ -180,7 +180,7 @@ End Class
 
 
 ' https://github.com/brian-xu/FractalDimension/blob/master/FractalDimension.py
-Public Class Fractal_Dimension : Inherits VB_Algorithm
+Public Class Fractal_Dimension : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)

@@ -4,7 +4,7 @@ Imports NAudio.Wave
 Imports NAudio.Wave.SampleProviders.SignalGeneratorType
 ' https://archive.codeplex.com/?p=naudio
 ' http://ismir2002.ismir.net/proceedings/02-FP04-2.pdf
-Public Class Sound_Basics : Inherits VB_Algorithm
+Public Class Sound_Basics : Inherits VB_Parent
     Dim memData As WaveBuffer
     Dim pcmData8() As Short
     Dim pcmData16() As Short
@@ -104,7 +104,7 @@ End Class
 
 
 ' https://github.com/naudio/sinegenerator-sample
-Public Class Sound_SignalGenerator : Inherits VB_Algorithm
+Public Class Sound_SignalGenerator : Inherits VB_Parent
     Dim player As NAudio.Wave.IWavePlayer
     Dim wGen As New NAudio.Wave.SampleProviders.SignalGenerator
     Public pcm32f As New cv.Mat
@@ -201,7 +201,7 @@ End Class
 
 
 
-Public Class Sound_Display : Inherits VB_Algorithm
+Public Class Sound_Display : Inherits VB_Parent
     Public soundSource As Object = New Sound_SignalGenerator
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -317,7 +317,7 @@ End Class
 
 
 
-Public Class Sound_GenWaveDisplay : Inherits VB_Algorithm
+Public Class Sound_GenWaveDisplay : Inherits VB_Parent
     Dim plotSound As New Sound_Display
     Public Sub New()
         desc = "Display the generated sound waves"
@@ -340,7 +340,7 @@ End Class
 
 
 
-Public Class Sound_WaveDisplay : Inherits VB_Algorithm
+Public Class Sound_WaveDisplay : Inherits VB_Parent
     Dim plotSound As New Sound_Display
     Public Sub New()
         plotSound.soundSource = New Sound_Basics

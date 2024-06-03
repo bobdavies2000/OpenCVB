@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Thickness_Basics : Inherits VB_Algorithm
+Public Class Thickness_Basics : Inherits VB_Parent
     Public rc As New rcData
     Public volZ As New Volume_Basics
     Dim redC As New RedCloud_Basics

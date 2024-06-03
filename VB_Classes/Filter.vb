@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports CS_Classes
 Imports OpenCvSharp.Text
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-Public Class Filter_Laplacian : Inherits VB_Algorithm
+Public Class Filter_Laplacian : Inherits VB_Parent
     Public Sub New()
         labels(2) = "Sharpened image using Filter2D output"
         labels(3) = "Output of Filter2D (approximated Laplacian)"
@@ -24,7 +24,7 @@ End Class
 
 
 
-Public Class Filter_NormalizedKernel : Inherits VB_Algorithm
+Public Class Filter_NormalizedKernel : Inherits VB_Parent
     Dim options As New Options_FilterNorm
     Public Sub New()
         desc = "Create a normalized kernel and use it."
@@ -49,7 +49,7 @@ End Class
 
 
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/filter_2d/filter_2d.html
-Public Class Filter_Normalized2D : Inherits VB_Algorithm
+Public Class Filter_Normalized2D : Inherits VB_Parent
     Dim options As New Options_Filter
     Public Sub New()
         desc = "Create and apply a normalized kernel."
@@ -71,7 +71,7 @@ End Class
 
 
 'https://www.cc.gatech.edu/classes/AY2015/cs4475_summer/documents/smoothing_separable.py
-Public Class Filter_SepFilter2D : Inherits VB_Algorithm
+Public Class Filter_SepFilter2D : Inherits VB_Parent
     Dim options As New Options_SepFilter2D
     Public Sub New()
         labels(2) = "Gaussian Blur result"
@@ -99,7 +99,7 @@ End Class
 
 
 ' https://datamahadev.com/filters-in-image-processing-using-opencv/
-Public Class Filter_Minimum : Inherits VB_Algorithm
+Public Class Filter_Minimum : Inherits VB_Parent
     Dim options As New Options_Filter
     Public Sub New()
         desc = "Implement the Minimum Filter - use minimum value in kernel"
@@ -118,7 +118,7 @@ End Class
 
 
 ' https://datamahadev.com/filters-in-image-processing-using-opencv/
-Public Class Filter_Maximum : Inherits VB_Algorithm
+Public Class Filter_Maximum : Inherits VB_Parent
     Dim options As New Options_Filter
     Public Sub New()
         desc = "Implement the Maximum Filter - use maximum value in kernel"
@@ -137,7 +137,7 @@ End Class
 
 
 ' https://datamahadev.com/filters-in-image-processing-using-opencv/
-Public Class Filter_Mean : Inherits VB_Algorithm
+Public Class Filter_Mean : Inherits VB_Parent
     Dim options As New Options_Filter
     Public Sub New()
         desc = "Implement the Mean Filter - use mean value in kernel"
@@ -156,7 +156,7 @@ End Class
 
 
 ' https://datamahadev.com/filters-in-image-processing-using-opencv/
-Public Class Filter_Median : Inherits VB_Algorithm
+Public Class Filter_Median : Inherits VB_Parent
     Dim options As New Options_Filter
     Public Sub New()
         desc = "Implement the Median Filter - use median value in kernel"

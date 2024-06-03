@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
 ' https://github.com/nemanja-m/gaps
-Public Class Puzzle_Basics : Inherits VB_Algorithm
+Public Class Puzzle_Basics : Inherits VB_Parent
     Public scrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public image As New cv.Mat
@@ -40,7 +40,7 @@ End Class
 
 
 
-Public Class Puzzle_Solver : Inherits VB_Algorithm
+Public Class Puzzle_Solver : Inherits VB_Parent
     Public puzzle As New Puzzle_Basics
     Dim solution As New List(Of cv.Rect)
     Dim match As New Match_Basics
@@ -88,7 +88,7 @@ End Class
 
 
 
-Public Class Puzzle_SolverDynamic : Inherits VB_Algorithm
+Public Class Puzzle_SolverDynamic : Inherits VB_Parent
     Dim puzzle As New Puzzle_Solver
     Public Sub New()
         If standaloneTest() Then gOptions.GridSize.Value = 8

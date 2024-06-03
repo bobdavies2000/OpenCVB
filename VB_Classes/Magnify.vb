@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Magnify_Basics : Inherits VB_Algorithm
+Public Class Magnify_Basics : Inherits VB_Parent
     Public Sub New()
         task.drawRect = New cv.Rect(10, 10, 50, 50)
         desc = "Magnify the drawn rectangle on dst2 and put it in dst3."
@@ -16,7 +16,7 @@ End Class
 
 
 
-Public Class Magnify_Example : Inherits VB_Algorithm
+Public Class Magnify_Example : Inherits VB_Parent
     Dim prep As New Neighbors_Intersects
     Dim zoom As New Magnify_Basics
     Public Sub New()

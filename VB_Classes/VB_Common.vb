@@ -520,6 +520,13 @@ Module VB_Common
         ' If pt.X >= rect.Width Or pt.Y >= rect.Height Then Return New cv.Point2f
         Return pt
     End Function
+    Public Function checkIntermediateResults() As VB_Parent
+        If task.algName.StartsWith("CPP_") Then Return Nothing ' we don't currently support intermediate results for CPP_ algorithms.
+        For Each obj In task.activeObjects
+            If obj.traceName = task.intermediateName And obj.firstPass = False Then Return obj
+        Next
+        Return Nothing
+    End Function
 End Module
 
 

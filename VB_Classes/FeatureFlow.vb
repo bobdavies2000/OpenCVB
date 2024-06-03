@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class FeatureFlow_Basics : Inherits VB_Algorithm
+Public Class FeatureFlow_Basics : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Public mpList As New List(Of pointPair)
     Public mpCorrelation As New List(Of Single)
@@ -55,7 +55,7 @@ End Class
 
 
 'https://www.learnopencv.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
-Public Class FeatureFlow_Dense : Inherits VB_Algorithm
+Public Class FeatureFlow_Dense : Inherits VB_Parent
     Dim options As New Options_OpticalFlow
     Public Sub New()
         desc = "Use dense optical flow algorithm  "
@@ -81,7 +81,7 @@ End Class
 
 
 ' https://www.learnopencv.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
-Public Class FeatureFlow_LucasKanade : Inherits VB_Algorithm
+Public Class FeatureFlow_LucasKanade : Inherits VB_Parent
     Public features As New List(Of cv.Point2f)
     Public lastFeatures As New List(Of cv.Point2f)
     Dim feat As New Feature_Basics
@@ -131,7 +131,7 @@ End Class
 
 
 
-Public Class FeatureFlow_LeftRight1 : Inherits VB_Algorithm
+Public Class FeatureFlow_LeftRight1 : Inherits VB_Parent
     Dim pyrLeft As New FeatureFlow_LucasKanade
     Dim pyrRight As New FeatureFlow_LucasKanade
     Dim ptLeft As New List(Of cv.Point)
@@ -194,7 +194,7 @@ End Class
 
 
 
-Public Class FeatureFlow_LeftRightHist : Inherits VB_Algorithm
+Public Class FeatureFlow_LeftRightHist : Inherits VB_Parent
     Dim pyrLeft As New FeatureFlow_LucasKanade
     Dim pyrRight As New FeatureFlow_LucasKanade
     Public leftFeatures As New List(Of cv.Point)
@@ -285,7 +285,7 @@ End Class
 
 
 
-Public Class FeatureFlow_LeftRight : Inherits VB_Algorithm
+Public Class FeatureFlow_LeftRight : Inherits VB_Parent
     Dim flowHist As New FeatureFlow_LeftRightHist
     Public leftFeatures As New List(Of List(Of cv.Point))
     Public rightFeatures As New List(Of List(Of cv.Point))

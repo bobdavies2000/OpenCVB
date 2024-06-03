@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports  System.IO
 ' https://www.codeproject.com/Articles/5282014/Segmented-Linear-Regression
-Public Class SLR_Basics : Inherits VB_Algorithm
+Public Class SLR_Basics : Inherits VB_Parent
     Public input As New SLR_Data
     Dim slr As New CS_Classes.SLR
     Dim plot As New Plot_Basics_CPP
@@ -57,7 +57,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/5282014/Segmented-Linear-Regression
-Public Class SLR_Data : Inherits VB_Algorithm
+Public Class SLR_Data : Inherits VB_Parent
     Dim plot As New Plot_Basics_CPP
     Public dataX As New List(Of Double)
     Public dataY As New List(Of Double)
@@ -90,7 +90,7 @@ End Class
 
 
 
-Public Class SLR_Image : Inherits VB_Algorithm
+Public Class SLR_Image : Inherits VB_Parent
     Public slr As New SLR_Basics
     Public hist As New Hist_Basics
     Public Sub New()
@@ -118,7 +118,7 @@ End Class
 
 
 
-Public Class SLR_TrendCompare : Inherits VB_Algorithm
+Public Class SLR_TrendCompare : Inherits VB_Parent
     Public slr As Object = New SLR_Image
     Dim valList As New List(Of Single)
     Dim barMidPoint As Integer
@@ -168,7 +168,7 @@ End Class
 
 
 
-Public Class SLR_TrendImages : Inherits VB_Algorithm
+Public Class SLR_TrendImages : Inherits VB_Parent
     Dim trends As New SLR_Trends
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
@@ -223,7 +223,7 @@ End Class
 
 
 
-Public Class SLR_SurfaceH : Inherits VB_Algorithm
+Public Class SLR_SurfaceH : Inherits VB_Parent
     Dim surface As New PointCloud_SurfaceH
     Public Sub New()
         desc = "Use the PointCloud_SurfaceH data to indicate valleys and peaks."
@@ -242,7 +242,7 @@ End Class
 
 
 
-Public Class SLR_Trends : Inherits VB_Algorithm
+Public Class SLR_Trends : Inherits VB_Parent
     Public hist As New Hist_KalmanAuto
     Dim valList As New List(Of Single)
     Dim barMidPoint As Single

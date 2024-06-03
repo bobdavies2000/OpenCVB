@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HOGSample.vb
-Public Class HOG_Basics : Inherits VB_Algorithm
+Public Class HOG_Basics : Inherits VB_Parent
     Dim staticImage As cv.Mat
     Dim staticImageProcessed As Boolean
     Public Sub New()

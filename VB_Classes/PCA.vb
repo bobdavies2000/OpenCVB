@@ -18,7 +18,7 @@ Imports System.Runtime.InteropServices
 ' distribution of cities in ‘the United States.
 ' PCA is a powerful tool that can be used to find the main direction of a series of points.
 
-Public Class PCA_Basics : Inherits VB_Algorithm
+Public Class PCA_Basics : Inherits VB_Parent
     Dim prep As New PCA_Prep_CPP
     Public pca_analysis As New cv.PCA
     Public runRedCloud As Boolean
@@ -92,7 +92,7 @@ End Class
 
 
 
-Public Class PCA_CellMask : Inherits VB_Algorithm
+Public Class PCA_CellMask : Inherits VB_Parent
     Dim pca As New PCA_Basics
     Dim pcaPrep As New PCA_Prep_CPP
     Public Sub New()
@@ -129,7 +129,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/pca.cpp
-Public Class PCA_Reconstruct : Inherits VB_Algorithm
+Public Class PCA_Reconstruct : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Retained Variance", 1, 100, 95)
         desc = "Reconstruct a video stream as a composite of X images."
@@ -163,7 +163,7 @@ End Class
 
 
 
-Public Class PCA_Depth : Inherits VB_Algorithm
+Public Class PCA_Depth : Inherits VB_Parent
     Dim pca As New PCA_Reconstruct
     Public Sub New()
         desc = "Reconstruct a depth stream as a composite of X images."
@@ -178,7 +178,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.1.0/d1/dee/tutorial_introduction_to_pca.html
-Public Class PCA_DrawImage : Inherits VB_Algorithm
+Public Class PCA_DrawImage : Inherits VB_Parent
     Dim pca As New PCA_Reconstruct
     Dim image As New cv.Mat
     Public Sub New()
@@ -245,7 +245,7 @@ End Class
 
 
 
-Public Class PCA_Prep_CPP : Inherits VB_Algorithm
+Public Class PCA_Prep_CPP : Inherits VB_Parent
     Public inputData As New cv.Mat
     Public Sub New()
         cPtr = PCA_Prep_Open()

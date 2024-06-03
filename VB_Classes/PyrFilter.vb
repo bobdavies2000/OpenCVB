@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 'http://study.marearts.com/2014/12/opencv-meanshiftfiltering-example.html
-Public Class PyrFilter_Basics : Inherits VB_Algorithm
+Public Class PyrFilter_Basics : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("MeanShift Spatial Radius", 1, 100, 1)
@@ -23,7 +23,7 @@ End Class
 
 
 
-Public Class PyrFilter_RedCloud : Inherits VB_Algorithm
+Public Class PyrFilter_RedCloud : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim reduction As New Reduction_Basics
     Dim pyr As New PyrFilter_Basics

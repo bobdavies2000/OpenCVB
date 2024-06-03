@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Sift_Basics : Inherits VB_Algorithm
+Public Class Sift_Basics : Inherits VB_Parent
     Dim siftCS As New CS_Classes.CS_SiftBasics
     Dim options As New Options_Sift
     Public Sub New()
@@ -27,7 +27,7 @@ End Class
 
 
 
-Public Class Sift_Basics_MT : Inherits VB_Algorithm
+Public Class Sift_Basics_MT : Inherits VB_Parent
     Dim siftCS As New CS_Classes.CS_SiftBasics
     Dim siftBasics As New Sift_Basics
     Dim numPointSlider As System.Windows.Forms.TrackBar
@@ -72,7 +72,7 @@ End Class
 
 
 'https://docs.opencv.org/4.x/da/df5/tutorial_py_sift_intro.html
-Public Class Sift_Points : Inherits VB_Algorithm
+Public Class Sift_Points : Inherits VB_Parent
     Dim sift As New CS_Classes.CS_SiftPoints
     Dim options As New Options_Sift
     Public stablePoints As New List(Of cv.Point)
@@ -121,7 +121,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Sift_Slices : Inherits VB_Algorithm
+Public Class Sift_Slices : Inherits VB_Parent
     Dim siftCS As New CS_Classes.CS_SiftBasics
     Dim options As New Options_Sift
     Public Sub New()

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Drawing
-Public Class Draw_Noise : Inherits VB_Algorithm
+Public Class Draw_Noise : Inherits VB_Parent
     Public maxNoiseWidth As Integer = 3
     Public addRandomColor As Boolean
     Public noiseMask As cv.Mat
@@ -37,7 +37,7 @@ End Class
 
 
 
-Public Class Draw_Ellipses : Inherits VB_Algorithm
+Public Class Draw_Ellipses : Inherits VB_Parent
     Dim options As New Options_Draw
     Public Sub New()
         desc = "Draw the requested number of ellipses."
@@ -61,7 +61,7 @@ End Class
 
 
 
-Public Class Draw_Circles : Inherits VB_Algorithm
+Public Class Draw_Circles : Inherits VB_Parent
     Dim options As New Options_Draw
     Public Sub New()
         desc = "Draw the requested number of circles."
@@ -87,7 +87,7 @@ End Class
 
 
 
-Public Class Draw_Lines : Inherits VB_Algorithm
+Public Class Draw_Lines : Inherits VB_Parent
     ReadOnly options As New Options_Draw
     Public Sub New()
         desc = "Draw the requested number of Lines."
@@ -112,7 +112,7 @@ End Class
 
 
 
-Public Class Draw_Polygon : Inherits VB_Algorithm
+Public Class Draw_Polygon : Inherits VB_Parent
     ReadOnly options As New Options_Draw
     Public Sub New()
         desc = "Draw Polygon figures"
@@ -158,7 +158,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-Public Class Draw_Shapes : Inherits VB_Algorithm
+Public Class Draw_Shapes : Inherits VB_Parent
     Public Sub New()
         desc = "Use RNG to draw the same set of shapes every time"
     End Sub
@@ -197,7 +197,7 @@ End Class
 
 
 
-Public Class Draw_SymmetricalShapes : Inherits VB_Algorithm
+Public Class Draw_SymmetricalShapes : Inherits VB_Parent
     Dim options As New Options_SymmetricalShapes
     Public Sub New()
         desc = "Generate shapes programmatically"
@@ -234,7 +234,7 @@ End Class
 
 
 
-Public Class Draw_Arc : Inherits VB_Algorithm
+Public Class Draw_Arc : Inherits VB_Parent
     ReadOnly kalman As New Kalman_Basics
     ReadOnly saveArcAngle As Integer
     Dim rect As cv.Rect
@@ -290,7 +290,7 @@ End Class
 
 
 
-Public Class Draw_ClipLine : Inherits VB_Algorithm
+Public Class Draw_ClipLine : Inherits VB_Parent
     Dim flow As New Font_FlowText
     Dim kalman As New Kalman_Basics
     Dim lastRect As cv.Rect
@@ -344,7 +344,7 @@ End Class
 
 
 ' http://www3.psych.purdue.edu/~zpizlo/GestaltCube
-Public Class Draw_Hexagon : Inherits VB_Algorithm
+Public Class Draw_Hexagon : Inherits VB_Parent
     Dim alpha As New imageForm
     Public Sub New()
         alpha.imagePic.Image = Image.FromFile(task.homeDir + "Data/GestaltCube.gif")
@@ -364,7 +364,7 @@ End Class
 
 
 
-Public Class Draw_Line : Inherits VB_Algorithm
+Public Class Draw_Line : Inherits VB_Parent
     Public p1 As cv.Point, p2 As cv.Point
     Public externalUse As Boolean
     Public Sub New()
@@ -398,7 +398,7 @@ End Class
 
 
 
-Public Class Draw_LineTest : Inherits VB_Algorithm
+Public Class Draw_LineTest : Inherits VB_Parent
     ReadOnly line As New Draw_Line
     Public Sub New()
         desc = "Test the external use of the Draw_Line algorithm - provide 2 points and draw the line..."
@@ -418,7 +418,7 @@ End Class
 
 
 
-Public Class Draw_Frustrum : Inherits VB_Algorithm
+Public Class Draw_Frustrum : Inherits VB_Parent
     Public xyzDepth As New Depth_WorldXYZ
     Public Sub New()
         xyzDepth.depthUnitsMeters = True

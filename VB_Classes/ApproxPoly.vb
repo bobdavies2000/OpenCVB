@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/22132510/opencv-approxpolydp-for-edge-maps-Not-contours
 ' https://docs.opencv.org/4.x/js_contour_features_approxPolyDP.html
-Public Class ApproxPoly_Basics : Inherits VB_Algorithm
+Public Class ApproxPoly_Basics : Inherits VB_Parent
     Dim contour As New Contour_Largest
     Dim rotatedRect As New Rectangle_Rotated
     Public Sub New()
@@ -49,7 +49,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/22132510/opencv-approxpolydp-for-edge-maps-Not-contours
-Public Class ApproxPoly_FindandDraw : Inherits VB_Algorithm
+Public Class ApproxPoly_FindandDraw : Inherits VB_Parent
     Dim rotatedRect As New Rectangle_Rotated
     Public allContours As cv.Point()()
     Public Sub New()
@@ -84,7 +84,7 @@ End Class
 
 
 
-Public Class ApproxPoly_Hull : Inherits VB_Algorithm
+Public Class ApproxPoly_Hull : Inherits VB_Parent
     Dim hull As New Hull_Basics
     Dim aPoly As New ApproxPoly_Basics
     Public Sub New()

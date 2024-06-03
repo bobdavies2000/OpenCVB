@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/14770756/opencv-simpleblobdetector-filterbyinertia-meaning
-Public Class Blob_Basics : Inherits VB_Algorithm
+Public Class Blob_Basics : Inherits VB_Parent
     Dim options As New Options_Blob
     Dim input As New Blob_Input
     Dim blobDetector As New CS_Classes.Blob_Basics
@@ -29,7 +29,7 @@ End Class
 
 
 
-Public Class Blob_Input : Inherits VB_Algorithm
+Public Class Blob_Input : Inherits VB_Parent
     Dim rotatedRect As New Rectangle_Rotated
     Dim circles As New Draw_Circles
     Dim ellipses As New Draw_Ellipses
@@ -67,7 +67,7 @@ End Class
 
 
 
-Public Class Blob_RenderBlobs : Inherits VB_Algorithm
+Public Class Blob_RenderBlobs : Inherits VB_Parent
     Dim input As New Blob_Input
     Public Sub New()
         labels(2) = "Input blobs"

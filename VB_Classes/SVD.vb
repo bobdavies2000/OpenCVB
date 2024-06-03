@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 ' https://answers.opencv.org/question/200080/parameters-of-cvsvdecomp/
-Public Class SVD_Example : Inherits VB_Algorithm
+Public Class SVD_Example : Inherits VB_Parent
     Public Sub New()
         desc = "SVD example"
     End Sub
@@ -42,7 +42,7 @@ End Class
 
 ' https://www.programcreek.com/python/example/89344/cv2.SVDecomp
 ' https://github.com/mzucker/page_dewarp/blob/master/page_dewarp.py
-Public Class SVD_Example2 : Inherits VB_Algorithm
+Public Class SVD_Example2 : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Compute the mean and tangent of a RedCloud Cell"
@@ -96,7 +96,7 @@ End Class
 
 
 ' https://www.programcreek.com/python/example/89344/cv2.SVDecomp
-Public Class SVD_Gaussian : Inherits VB_Algorithm
+Public Class SVD_Gaussian : Inherits VB_Parent
     Dim covar As New Covariance_Images
     Public Sub New()
         desc = "Compute the SVD for the covariance of 2 images - only close to working..."

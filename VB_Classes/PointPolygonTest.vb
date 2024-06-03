@@ -1,6 +1,6 @@
 ﻿Imports OpenCvSharp
 Imports cv = OpenCvSharp
-Public Class PointPolygonTest_Basics : Inherits VB_Algorithm
+Public Class PointPolygonTest_Basics : Inherits VB_Parent
     Dim rotatedRect As New Rectangle_Rotated
     Public Sub New()
         desc = "PointPolygonTest will decide what is inside and what is outside."

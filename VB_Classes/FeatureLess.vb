@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class FeatureLess_Basics : Inherits VB_Algorithm
+Public Class FeatureLess_Basics : Inherits VB_Parent
     Dim edgeD As New EdgeDraw_Basics
     Public classCount As Integer = 2
     Public Sub New()
@@ -24,7 +24,7 @@ End Class
 
 
 
-Public Class FeatureLess_Canny : Inherits VB_Algorithm
+Public Class FeatureLess_Canny : Inherits VB_Parent
     Dim edges As New Edge_Canny
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold distance", 0, 100, 10)
@@ -44,7 +44,7 @@ End Class
 
 
 
-Public Class FeatureLess_Sobel : Inherits VB_Algorithm
+Public Class FeatureLess_Sobel : Inherits VB_Parent
     Dim edges As New Edge_Sobel_Old
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold distance", 0, 100, 10)
@@ -63,7 +63,7 @@ End Class
 
 
 
-Public Class FeatureLess_UniquePixels : Inherits VB_Algorithm
+Public Class FeatureLess_UniquePixels : Inherits VB_Parent
     Dim fless As New Hough_FeatureLessTopX
     Dim sort As New Sort_1Channel
     Public Sub New()
@@ -85,7 +85,7 @@ End Class
 
 
 
-Public Class FeatureLess_Unique3Pixels : Inherits VB_Algorithm
+Public Class FeatureLess_Unique3Pixels : Inherits VB_Parent
     Dim fless As New Hough_FeatureLessTopX
     Dim sort3 As New Sort_3Channel
     Public Sub New()
@@ -105,7 +105,7 @@ End Class
 
 
 
-Public Class FeatureLess_Histogram : Inherits VB_Algorithm
+Public Class FeatureLess_Histogram : Inherits VB_Parent
     Dim backP As New BackProject_FeatureLess
     Public Sub New()
         desc = "Create a histogram of the featureless regions"
@@ -127,7 +127,7 @@ End Class
 
 
 
-Public Class FeatureLess_DCT : Inherits VB_Algorithm
+Public Class FeatureLess_DCT : Inherits VB_Parent
     Dim dct As New DCT_FeatureLess
     Public Sub New()
         labels(3) = "Largest FeatureLess Region"
@@ -175,7 +175,7 @@ End Class
 
 
 
-Public Class FeatureLess_LeftRight : Inherits VB_Algorithm
+Public Class FeatureLess_LeftRight : Inherits VB_Parent
     Dim fLess As New FeatureLess_Basics
     Public Sub New()
         labels = {"", "", "FeatureLess Left mask", "FeatureLess Right mask"}
@@ -196,7 +196,7 @@ End Class
 
 
 
-Public Class FeatureLess_Edge_CPP : Inherits VB_Algorithm
+Public Class FeatureLess_Edge_CPP : Inherits VB_Parent
     Dim cpp As New CPP_Basics
     Public Sub New()
         cpp.updateFunction(AlgorithmList.functionNames._CPP_EdgeDraw_Basics)
@@ -217,7 +217,7 @@ End Class
 
 
 
-Public Class FeatureLess_History : Inherits VB_Algorithm
+Public Class FeatureLess_History : Inherits VB_Parent
     Dim fLess As New FeatureLess_Basics
     Dim frames As New History_Basics
     Public Sub New()
@@ -239,7 +239,7 @@ End Class
 
 
 
-Public Class FeatureLess_RedCloud : Inherits VB_Algorithm
+Public Class FeatureLess_RedCloud : Inherits VB_Parent
     Public redC As New RedCloud_Basics
     Dim fless As New FeatureLess_Basics
     Public Sub New()
@@ -258,7 +258,7 @@ End Class
 
 
 
-Public Class FeatureLess_Groups : Inherits VB_Algorithm
+Public Class FeatureLess_Groups : Inherits VB_Parent
     Dim redCPP As New RedCloud_CPP
     Dim fless As New FeatureLess_Basics
     Public classCount As Integer

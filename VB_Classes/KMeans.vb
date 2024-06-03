@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class KMeans_Basics : Inherits VB_Algorithm
+Public Class KMeans_Basics : Inherits VB_Parent
     Public options As New Options_KMeans
     Public colors As New cv.Mat
     Public buildPaletteOutput As Boolean = True
@@ -62,7 +62,7 @@ End Class
 
 
 
-Public Class KMeans_MultiChannel : Inherits VB_Algorithm
+Public Class KMeans_MultiChannel : Inherits VB_Parent
     Public colors As New cv.Mat
     Dim km As New KMeans_Basics
     Public Sub New()
@@ -86,7 +86,7 @@ End Class
 
 
 
-Public Class KMeans_k2_to_k8 : Inherits VB_Algorithm
+Public Class KMeans_k2_to_k8 : Inherits VB_Parent
     Dim Mats As New Mat_4Click
     Dim km As New KMeans_Basics
     Public Sub New()
@@ -119,7 +119,7 @@ End Class
 
 
 
-Public Class KMeans_Fuzzy : Inherits VB_Algorithm
+Public Class KMeans_Fuzzy : Inherits VB_Parent
     Dim km As New KMeans_Image
     Public fuzzyD As New Fuzzy_Basics
     Public Sub New()
@@ -140,7 +140,7 @@ End Class
 
 
 ' http://man.hubwiz.com/docset/OpenCV.docset/Contents/Resources/Documents/d9/dde/samples_2cpp_2kmeans_8cpp-example.html
-Public Class KMeans_MultiGaussian_CPP : Inherits VB_Algorithm
+Public Class KMeans_MultiGaussian_CPP : Inherits VB_Parent
     Public Sub New()
         cPtr = KMeans_MultiGaussian_Open()
         desc = "Use KMeans on a random multi-gaussian distribution."
@@ -158,7 +158,7 @@ End Class
 
 
 
-Public Class KMeans_CustomData : Inherits VB_Algorithm
+Public Class KMeans_CustomData : Inherits VB_Parent
     Dim km As New KMeans_Basics
     Public centers = New cv.Mat()
     Public Sub New()
@@ -195,7 +195,7 @@ End Class
 
 
 
-Public Class KMeans_Simple_CPP : Inherits VB_Algorithm
+Public Class KMeans_Simple_CPP : Inherits VB_Parent
     Public Sub New()
         cPtr = Kmeans_Simple_Open()
         desc = "Split the input into 3 levels - zero (no depth), closer to min, closer to max."
@@ -227,7 +227,7 @@ End Class
 
 
 
-Public Class KMeans_Edges : Inherits VB_Algorithm
+Public Class KMeans_Edges : Inherits VB_Parent
     Dim edges As New Edge_Canny
     Public km As New KMeans_Image
     Public classCount As Integer
@@ -259,7 +259,7 @@ End Class
 
 
 
-Public Class KMeans_CompareMulti : Inherits VB_Algorithm
+Public Class KMeans_CompareMulti : Inherits VB_Parent
     Dim km As New KMeans_Image
     Dim multi As New KMeans_MultiChannel
     Public Sub New()
@@ -286,7 +286,7 @@ End Class
 
 
 
-Public Class KMeans_TierCount : Inherits VB_Algorithm
+Public Class KMeans_TierCount : Inherits VB_Parent
     Dim km As New KMeans_Basics
     Dim kCount As New Depth_TierCount
     Public classCount As Integer
@@ -314,7 +314,7 @@ End Class
 
 
 
-Public Class KMeans_Image : Inherits VB_Algorithm
+Public Class KMeans_Image : Inherits VB_Parent
     Public km As New KMeans_Basics
     Public masks As New List(Of cv.Mat)
     Public counts As New List(Of Integer)
@@ -351,7 +351,7 @@ End Class
 
 
 
-Public Class KMeans_DepthPlusGray : Inherits VB_Algorithm
+Public Class KMeans_DepthPlusGray : Inherits VB_Parent
     Dim km As New KMeans_Basics
     Dim grayPlus(2 - 1) As cv.Mat
     Public Sub New()
@@ -386,7 +386,7 @@ End Class
 
 
 
-Public Class KMeans_Dimensions : Inherits VB_Algorithm
+Public Class KMeans_Dimensions : Inherits VB_Parent
     Dim km As New KMeans_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Dimension", 1, 6, 1)
@@ -440,7 +440,7 @@ End Class
 
 
 
-Public Class KMeans_Valleys : Inherits VB_Algorithm
+Public Class KMeans_Valleys : Inherits VB_Parent
     Dim km As New KMeans_Basics
     Dim tiers As New KMeans_TierCount
     Public Sub New()
@@ -469,7 +469,7 @@ End Class
 
 
 
-Public Class KMeans_Depth : Inherits VB_Algorithm
+Public Class KMeans_Depth : Inherits VB_Parent
     Public km As New KMeans_Basics
     Public classCount As Integer
     Public Sub New()
@@ -495,7 +495,7 @@ End Class
 
 
 
-Public Class KMeans_SimKColor : Inherits VB_Algorithm
+Public Class KMeans_SimKColor : Inherits VB_Parent
     Dim plot1D As New Hist3Dcolor_PlotHist1D
     Dim simK As New Hist3D_BuildHistogram
     Public classCount As Integer
@@ -525,7 +525,7 @@ End Class
 
 
 
-Public Class KMeans_SimKDepth : Inherits VB_Algorithm
+Public Class KMeans_SimKDepth : Inherits VB_Parent
     Dim plot1D As New Hist3Dcloud_PlotHist1D
     Dim simK As New Hist3D_BuildHistogram
     Public classCount As Integer

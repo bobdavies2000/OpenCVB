@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Flood_Basics : Inherits VB_Algorithm
+Public Class Flood_Basics : Inherits VB_Parent
     Dim redCPP As New RedCloud_CPP
     Public genCells As New Cell_Generate
     Public Sub New()
@@ -34,7 +34,7 @@ End Class
 
 
 
-Public Class Flood_CellStatsPlot : Inherits VB_Algorithm
+Public Class Flood_CellStatsPlot : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Dim stats As New Cell_BasicsPlot
     Public Sub New()
@@ -68,7 +68,7 @@ End Class
 
 
 
-Public Class Flood_ContainedCells : Inherits VB_Algorithm
+Public Class Flood_ContainedCells : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Public Sub New()
         redOptions.IdentifyCells.Checked = True
@@ -111,7 +111,7 @@ End Class
 
 
 
-Public Class Flood_BasicsMask : Inherits VB_Algorithm
+Public Class Flood_BasicsMask : Inherits VB_Parent
     Public binarizedImage As cv.Mat
     Public inputMask As cv.Mat
     Public genCells As New Cell_Generate
@@ -153,7 +153,7 @@ End Class
 
 
 
-Public Class Flood_Tiers : Inherits VB_Algorithm
+Public Class Flood_Tiers : Inherits VB_Parent
     Dim flood As New Flood_BasicsMask
     Dim tiers As New Depth_TiersZ
     Dim cvt As New Color8U_Basics
@@ -193,7 +193,7 @@ End Class
 
 
 
-Public Class Flood_Motion : Inherits VB_Algorithm
+Public Class Flood_Motion : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Dim redCells As New List(Of rcData)
     Dim cellMap As New cv.Mat
@@ -239,7 +239,7 @@ End Class
 
 
 
-Public Class Flood_Motion1 : Inherits VB_Algorithm
+Public Class Flood_Motion1 : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Dim motion As New Motion_Basics
     Dim redCells As New List(Of rcData)
@@ -285,7 +285,7 @@ End Class
 
 
 
-Public Class Flood_LeftRight : Inherits VB_Algorithm
+Public Class Flood_LeftRight : Inherits VB_Parent
     Dim redLeft As New RedCloud_Basics
     Dim redRight As New RedCloud_Basics
     Public mapLeft As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -341,7 +341,7 @@ End Class
 
 
 
-Public Class Flood_MaxDistPoints : Inherits VB_Algorithm
+Public Class Flood_MaxDistPoints : Inherits VB_Parent
     Dim bounds As New Boundary_RemovedRects
     Dim redCPP As New RedCloud_MaxDist_CPP
     Public genCells As New Cell_Generate

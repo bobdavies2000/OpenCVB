@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Flann
 
-Public Class Interpolate_Basics : Inherits VB_Algorithm
+Public Class Interpolate_Basics : Inherits VB_Parent
     Public options As New Options_Resize
     Public iOptions As New Options_Interpolate
     Public Sub New()
@@ -45,7 +45,7 @@ End Class
 
 
 
-Public Class Interpolate_Kalman : Inherits VB_Algorithm
+Public Class Interpolate_Kalman : Inherits VB_Parent
     Dim inter As New Interpolate_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()
@@ -116,7 +116,7 @@ End Class
 
 
 
-Public Class Interpolate_Lines : Inherits VB_Algorithm
+Public Class Interpolate_Lines : Inherits VB_Parent
     Dim lines As New Line_Basics
     Dim inter As New Interpolate_Basics
     Public Sub New()
@@ -144,7 +144,7 @@ End Class
 
 
 
-Public Class Interpolate_Difference : Inherits VB_Algorithm
+Public Class Interpolate_Difference : Inherits VB_Parent
     Dim inter As New Interpolate_Kalman
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -168,7 +168,7 @@ End Class
 
 
 
-Public Class Interpolate_QuarterBeat : Inherits VB_Algorithm
+Public Class Interpolate_QuarterBeat : Inherits VB_Parent
     Dim diff As New Diff_Basics
     Public Sub New()
         desc = "Highlight the image differences after every quarter second."

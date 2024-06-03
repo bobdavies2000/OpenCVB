@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class FeatureLeftRight_Basics : Inherits VB_Algorithm
+Public Class FeatureLeftRight_Basics : Inherits VB_Parent
     Dim prep As New FeatureLeftRight_LeftRightPrep
     Public mpList As New List(Of pointPair)
     Public mpCorrelation As New List(Of Single)
@@ -128,7 +128,7 @@ End Class
 
 
 
-Public Class FeatureLeftRight_LeftRightPrep : Inherits VB_Algorithm
+Public Class FeatureLeftRight_LeftRightPrep : Inherits VB_Parent
     Dim lFeat As New Feature_Basics
     Dim rFeat As New Feature_Basics
     Public leftFeatures As New List(Of cv.Point)
@@ -161,7 +161,7 @@ End Class
 
 
 
-Public Class FeatureLeftRight_Grid : Inherits VB_Algorithm
+Public Class FeatureLeftRight_Grid : Inherits VB_Parent
     Dim match As New FeatureLeftRight_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
@@ -183,7 +183,7 @@ End Class
 
 
 
-Public Class FeatureLeftRight_Input : Inherits VB_Algorithm
+Public Class FeatureLeftRight_Input : Inherits VB_Parent
     Dim ptLeft As New List(Of cv.Point)
     Dim ptRight As New List(Of cv.Point)
     Public mpList As New List(Of pointPair)

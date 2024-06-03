@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class TransformationMatrix_Basics : Inherits VB_Algorithm
+Public Class TransformationMatrix_Basics : Inherits VB_Parent
     Dim topLocations As New List(Of cv.Point3d)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("TMatrix Top View multiplier", 1, 1000, 500)

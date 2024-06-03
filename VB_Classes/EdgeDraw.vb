@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class EdgeDraw_Basics : Inherits VB_Algorithm
+Public Class EdgeDraw_Basics : Inherits VB_Parent
     Public Sub New()
         cPtr = EdgeDraw_Edges_Open()
         labels = {"", "", "EdgeDraw_Basics output", ""}
@@ -28,7 +28,7 @@ End Class
 
 
 
-Public Class EdgeDraw_Segments : Inherits VB_Algorithm
+Public Class EdgeDraw_Segments : Inherits VB_Parent
     Public segPoints As New List(Of cv.Point2f)
     Public Sub New()
         cPtr = EdgeDraw_Lines_Open()

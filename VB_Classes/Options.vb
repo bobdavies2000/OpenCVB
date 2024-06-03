@@ -5,7 +5,7 @@ Imports OpenCvSharp.ML
 Imports System.Drawing
 Imports System.Windows.Forms
 
-Public Class Options_Annealing : Inherits VB_Algorithm
+Public Class Options_Annealing : Inherits VB_Parent
     Dim random As New Random_Basics
     Public cityCount As Integer = 25
     Public copyBestFlag As Boolean = False
@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class Options_Blob : Inherits VB_Algorithm
+Public Class Options_Blob : Inherits VB_Parent
     Dim blob As New Blob_Input
     Dim blobDetector As New CS_Classes.Blob_Basics
     Public blobParams = New cv.SimpleBlobDetector.Params
@@ -108,7 +108,7 @@ End Class
 
 
 
-Public Class Options_CamShift : Inherits VB_Algorithm
+Public Class Options_CamShift : Inherits VB_Parent
     Public camMax As Integer = 255
     Public camSBins As cv.Scalar = New cv.Scalar(0, 40, 32)
     Public Sub New()
@@ -139,7 +139,7 @@ End Class
 
 
 
-Public Class Options_Contours2 : Inherits VB_Algorithm
+Public Class Options_Contours2 : Inherits VB_Parent
     Public ApproximationMode = cv.ContourApproximationModes.ApproxTC89KCOS
     Dim radioChoices = {cv.ContourApproximationModes.ApproxNone, cv.ContourApproximationModes.ApproxSimple,
                         cv.ContourApproximationModes.ApproxTC89KCOS, cv.ContourApproximationModes.ApproxTC89L1}
@@ -162,7 +162,7 @@ End Class
 
 
 
-Public Class Options_Contours : Inherits VB_Algorithm
+Public Class Options_Contours : Inherits VB_Parent
     Public retrievalMode = cv.RetrievalModes.External
     Public ApproximationMode = cv.ContourApproximationModes.ApproxTC89KCOS
     Public epsilon As Single = 3 / 100
@@ -221,7 +221,7 @@ End Class
 
 
 
-Public Class Options_Draw : Inherits VB_Algorithm
+Public Class Options_Draw : Inherits VB_Parent
     Public drawCount As Integer = 3
     Public drawFilled As Integer = 2
     Public drawRotated As Boolean = False
@@ -247,7 +247,7 @@ End Class
 
 
 ' https://answers.opencv.org/question/31519/encode-image-in-jpg-with-opencv-avoiding-the-artifacts-effect/
-Public Class Options_Encode : Inherits VB_Algorithm
+Public Class Options_Encode : Inherits VB_Parent
     Public qualityLevel As Integer = 1
     Public scalingLevel As Integer = 85
     Public encodeOption = cv.ImwriteFlags.JpegProgressive
@@ -290,7 +290,7 @@ End Class
 
 
 
-Public Class Options_Filter : Inherits VB_Algorithm
+Public Class Options_Filter : Inherits VB_Parent
     Public kernelSize As Integer = 3
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Filter kernel size", 1, 21, kernelSize)
@@ -306,7 +306,7 @@ End Class
 
 
 
-Public Class Options_GeneticDrawing : Inherits VB_Algorithm
+Public Class Options_GeneticDrawing : Inherits VB_Parent
     Public stageTotal = 100
     Public brushPercent = 1.0
     Public strokeCount As Integer = 10
@@ -347,7 +347,7 @@ End Class
 
 
 
-Public Class Options_MatchShapes : Inherits VB_Algorithm
+Public Class Options_MatchShapes : Inherits VB_Parent
     Public matchOption = cv.ShapeMatchModes.I1
     Public matchThreshold As Single = 0.4
     Public maxYdelta As Single = 0.05
@@ -393,7 +393,7 @@ End Class
 
 
 
-Public Class Options_Plane : Inherits VB_Algorithm
+Public Class Options_Plane : Inherits VB_Parent
     Public rmsThreshold As Single = 0.1
     Public useMaskPoints As Boolean
     Public useContourPoints As Boolean
@@ -436,7 +436,7 @@ End Class
 
 
 
-Public Class Options_Neighbors : Inherits VB_Algorithm
+Public Class Options_Neighbors : Inherits VB_Parent
     Public threshold As Single = 0.005
     Public pixels As Integer = 6
     Public patchZ As Boolean
@@ -462,7 +462,7 @@ End Class
 
 
 
-Public Class Options_Interpolate : Inherits VB_Algorithm
+Public Class Options_Interpolate : Inherits VB_Parent
     Public resizePercent As Integer = 2
     Public interpolationThreshold = 4
     Public pixelCountThreshold = 0
@@ -492,7 +492,7 @@ End Class
 
 
 
-Public Class Options_Resize : Inherits VB_Algorithm
+Public Class Options_Resize : Inherits VB_Parent
     Public warpFlag = cv.InterpolationFlags.Nearest
     Public radioIndex As Integer
     Public resizePercent As Single = 0.03
@@ -538,7 +538,7 @@ End Class
 
 
 
-Public Class Options_Smoothing : Inherits VB_Algorithm
+Public Class Options_Smoothing : Inherits VB_Parent
     Public iterations As Integer = 8
     Public interiorTension As Single = 0.5
     Public stepSize As Integer = 30
@@ -563,7 +563,7 @@ End Class
 
 
 
-Public Class Options_Structured : Inherits VB_Algorithm
+Public Class Options_Structured : Inherits VB_Parent
     Public sliceSize As Integer = 1
     Public stepSize As Integer = 20
     Public Sub New()
@@ -589,7 +589,7 @@ End Class
 
 
 
-Public Class Options_SuperRes : Inherits VB_Algorithm
+Public Class Options_SuperRes : Inherits VB_Parent
     Public method As String = "farneback"
     Public iterations As Integer = 10
     Public restartWithNewOptions As Boolean
@@ -624,7 +624,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
-Public Class Options_SVM2 : Inherits VB_Algorithm
+Public Class Options_SVM2 : Inherits VB_Parent
     Public SVMType = cv.ML.SVM.Types.CSvc
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -660,7 +660,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
-Public Class Options_SVM : Inherits VB_Algorithm
+Public Class Options_SVM : Inherits VB_Parent
     Public kernelType = cv.ML.SVM.KernelTypes.Poly
     Public granularity As Integer = 5
     Public svmDegree As Single = 1
@@ -740,7 +740,7 @@ End Class
 
 
 
-Public Class Options_WarpModel : Inherits VB_Algorithm
+Public Class Options_WarpModel : Inherits VB_Parent
     Public useGradient As Boolean
     Public pkImage As cv.Mat
     Public warpMode As Integer
@@ -798,7 +798,7 @@ End Class
 
 
 
-Public Class Options_MinMaxNone : Inherits VB_Algorithm
+Public Class Options_MinMaxNone : Inherits VB_Parent
     Public useMax As Boolean
     Public useMin As Boolean
     Public useNone As Boolean
@@ -824,7 +824,7 @@ End Class
 
 
 
-Public Class Options_OpenGL : Inherits VB_Algorithm
+Public Class Options_OpenGL : Inherits VB_Parent
     Public FOV As Single = 75
     Public yaw As Single = -3
     Public pitch As Single = 3
@@ -897,7 +897,7 @@ End Class
 
 
 
-Public Class Options_OpenGLFunctions : Inherits VB_Algorithm
+Public Class Options_OpenGLFunctions : Inherits VB_Parent
     Public moveAmount As cv.Point3f
     Public FOV As Single = 75
     Public yaw As Single = -3
@@ -936,7 +936,7 @@ End Class
 
 
 
-Public Class Options_MinArea : Inherits VB_Algorithm
+Public Class Options_MinArea : Inherits VB_Parent
     Public srcPoints As New List(Of cv.Point2f)
     Public squareWidth As Integer = 100
     Public numPoints As Integer = 5
@@ -969,7 +969,7 @@ End Class
 
 
 
-Public Class Options_DCT : Inherits VB_Algorithm
+Public Class Options_DCT : Inherits VB_Parent
     Public dctFlag As cv.DctFlags
     Public runLengthMin As Integer = 15
     Public removeFrequency As Integer = 1
@@ -1005,7 +1005,7 @@ End Class
 
 
 
-Public Class Options_Eigen : Inherits VB_Algorithm
+Public Class Options_Eigen : Inherits VB_Parent
     Public highlight As Boolean
     Public recompute As Boolean
     Public randomCount As Integer = 100
@@ -1044,7 +1044,7 @@ End Class
 
 
 
-Public Class Options_FitLine : Inherits VB_Algorithm
+Public Class Options_FitLine : Inherits VB_Parent
     Public radiusAccuracy As Integer = 10
     Public angleAccuracy As Integer = 10
     Public Sub New()
@@ -1067,7 +1067,7 @@ End Class
 
 
 
-Public Class Options_Fractal : Inherits VB_Algorithm
+Public Class Options_Fractal : Inherits VB_Parent
     Public iterations As Integer = 34
     Public resetCheck As Windows.Forms.CheckBox
     Public Sub New()
@@ -1087,7 +1087,7 @@ End Class
 
 
 
-Public Class Options_ProCon : Inherits VB_Algorithm
+Public Class Options_ProCon : Inherits VB_Parent
     Public buffer(10 - 1) As Integer
     Public pduration As Integer = 1
     Public cduration As Integer = 1
@@ -1117,7 +1117,7 @@ End Class
 
 
 
-Public Class Options_OilPaint : Inherits VB_Algorithm
+Public Class Options_OilPaint : Inherits VB_Parent
     Public kernelSize As Integer = 4
     Public intensity As Integer = 20
     Public threshold As Integer = 25
@@ -1153,7 +1153,7 @@ End Class
 
 
 
-Public Class Options_Pointilism : Inherits VB_Algorithm
+Public Class Options_Pointilism : Inherits VB_Parent
     Public smoothingRadius As Integer = 32 * 2 + 1
     Public strokeSize As Integer = 3
     Public useElliptical As Boolean = False
@@ -1184,7 +1184,7 @@ End Class
 
 
 
-Public Class Options_MotionBlur : Inherits VB_Algorithm
+Public Class Options_MotionBlur : Inherits VB_Parent
     Public showDirection As Boolean = True
     Public redoCheckBox As Windows.Forms.CheckBox
     Public kernelSize As Integer = 51
@@ -1233,7 +1233,7 @@ End Class
 
 
 
-Public Class Options_BinarizeNiBlack : Inherits VB_Algorithm
+Public Class Options_BinarizeNiBlack : Inherits VB_Parent
     Public kernelSize As Integer = 51
     Public niBlackK As Single = -200 / 1000
     Public nickK As Single = 100 / 1000
@@ -1267,7 +1267,7 @@ End Class
 
 
 
-Public Class Options_Bernson : Inherits VB_Algorithm
+Public Class Options_Bernson : Inherits VB_Parent
     Public kernelSize As Integer = 51
     Public bgThreshold As Integer = 100
     Public contrastMin As Integer = 50
@@ -1295,7 +1295,7 @@ End Class
 
 
 
-Public Class Options_BlockMatching : Inherits VB_Algorithm
+Public Class Options_BlockMatching : Inherits VB_Parent
     Public numDisparity As Integer = 2 * 16
     Public blockSize As Integer = 15
     Public distance As Integer = 20
@@ -1321,7 +1321,7 @@ End Class
 
 
 
-Public Class Options_Cartoonify : Inherits VB_Algorithm
+Public Class Options_Cartoonify : Inherits VB_Parent
     Public medianBlur As Integer = 7
     Public medianBlur2 As Integer = 3
     Public kernelSize As Integer = 5
@@ -1351,7 +1351,7 @@ End Class
 
 
 
-Public Class Options_Dither : Inherits VB_Algorithm
+Public Class Options_Dither : Inherits VB_Parent
     Public radioIndex As Integer
     Public bppIndex As Integer = 1
     Public Sub New()
@@ -1395,7 +1395,7 @@ End Class
 
 
 
-Public Class Options_SymmetricalShapes : Inherits VB_Algorithm
+Public Class Options_SymmetricalShapes : Inherits VB_Parent
     Public rotateAngle As Single = 0
     Public fillColor = cv.Scalar.Red
     Public numPoints As Integer
@@ -1465,7 +1465,7 @@ End Class
 
 
 
-Public Class Options_DrawArc : Inherits VB_Algorithm
+Public Class Options_DrawArc : Inherits VB_Parent
     Public saveMargin As Integer = task.workingRes.Width / 16
     Public drawFull As Boolean
     Public drawFill As Boolean
@@ -1496,7 +1496,7 @@ End Class
 
 
 
-Public Class Options_FilterNorm : Inherits VB_Algorithm
+Public Class Options_FilterNorm : Inherits VB_Parent
     Public kernel As cv.Mat
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -1532,7 +1532,7 @@ End Class
 
 
 
-Public Class Options_SepFilter2D : Inherits VB_Algorithm
+Public Class Options_SepFilter2D : Inherits VB_Parent
     Public xDim As Integer = 5
     Public yDim As Integer = 11
     Public sigma As Single = 17
@@ -1566,7 +1566,7 @@ End Class
 
 
 
-Public Class Options_IMUFrameTime : Inherits VB_Algorithm
+Public Class Options_IMUFrameTime : Inherits VB_Parent
     Public minDelayIMU As Integer = 4
     Public minDelayHost As Integer = 4
     Public plotLastX As Integer = 20
@@ -1591,7 +1591,7 @@ End Class
 
 
 
-Public Class Options_Kalman_VB : Inherits VB_Algorithm
+Public Class Options_Kalman_VB : Inherits VB_Parent
     Public kalmanInput As Single
     Public matrix As New List(Of Single)
     Public noisyInput As Integer
@@ -1663,7 +1663,7 @@ End Class
 
 
 
-Public Class Options_KLT : Inherits VB_Algorithm
+Public Class Options_KLT : Inherits VB_Parent
     Public inputPoints() As cv.Point2f
     Public maxCorners As Integer = 100
     Public qualityLevel As Single = 0.01
@@ -1712,7 +1712,7 @@ End Class
 
 
 
-Public Class Options_Laplacian : Inherits VB_Algorithm
+Public Class Options_Laplacian : Inherits VB_Parent
     Public kernel As New cv.Size(3, 3)
     Public scale As Single = 1
     Public delta As Single = 0
@@ -1758,7 +1758,7 @@ End Class
 
 
 
-Public Class Options_OpticalFlow : Inherits VB_Algorithm
+Public Class Options_OpticalFlow : Inherits VB_Parent
     Public pyrScale As Single = 35 / 100
     Public levels As Integer = 1
     Public winSize As Integer = 1
@@ -1819,7 +1819,7 @@ End Class
 
 
 
-Public Class Options_OpticalFlowSparse : Inherits VB_Algorithm
+Public Class Options_OpticalFlowSparse : Inherits VB_Parent
     Public OpticalFlowFlag As cv.OpticalFlowFlags
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -1850,7 +1850,7 @@ End Class
 
 
 
-Public Class Options_Quaternion : Inherits VB_Algorithm
+Public Class Options_Quaternion : Inherits VB_Parent
     Public q1 As Quaternion
     Public q2 As Quaternion
     Public Sub New()
@@ -1889,7 +1889,7 @@ End Class
 
 
 
-Public Class Options_XPhoto : Inherits VB_Algorithm
+Public Class Options_XPhoto : Inherits VB_Parent
     Public colorCode As Integer = cv.ColorConversionCodes.BGR2GRAY
     Public dynamicRatio As Integer
     Public blockSize As Integer
@@ -1929,7 +1929,7 @@ End Class
 
 
 
-Public Class Options_InPaint : Inherits VB_Algorithm
+Public Class Options_InPaint : Inherits VB_Parent
     Public telea As Boolean
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -1953,7 +1953,7 @@ End Class
 
 
 
-Public Class Options_RotatePoly : Inherits VB_Algorithm
+Public Class Options_RotatePoly : Inherits VB_Parent
     Public changeCheck As Windows.Forms.CheckBox
     Public angleSlider As Windows.Forms.TrackBar
     Public Sub New()
@@ -1982,7 +1982,7 @@ End Class
 
 
 
-Public Class Options_FPoly : Inherits VB_Algorithm
+Public Class Options_FPoly : Inherits VB_Parent
     Public removeThreshold As Integer = 4
     Public autoResyncAfterX As Integer = 500
     Public Sub New()
@@ -2014,7 +2014,7 @@ End Class
 
 
 
-Public Class Options_Homography : Inherits VB_Algorithm
+Public Class Options_Homography : Inherits VB_Parent
     Public hMethod = cv.HomographyMethods.None
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
@@ -2059,7 +2059,7 @@ End Class
 
 
 
-Public Class Options_Random : Inherits VB_Algorithm
+Public Class Options_Random : Inherits VB_Parent
     Public countSlider As Windows.Forms.TrackBar
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Random Pixel Count", 1, dst2.Cols * dst2.Rows, 20)
@@ -2076,7 +2076,7 @@ End Class
 
 
 
-Public Class Options_Hough : Inherits VB_Algorithm
+Public Class Options_Hough : Inherits VB_Parent
     Public rho As Integer = 1
     Public theta As Single = 1000 * Math.PI / 180
     Public threshold As Integer = 3
@@ -2113,7 +2113,7 @@ End Class
 
 
 
-Public Class Options_Canny : Inherits VB_Algorithm
+Public Class Options_Canny : Inherits VB_Parent
     Public threshold1 As Integer = 100
     Public threshold2 As Integer = 150
     Public aperture As Integer = 3
@@ -2141,7 +2141,7 @@ End Class
 
 
 
-Public Class Options_ColorMatch : Inherits VB_Algorithm
+Public Class Options_ColorMatch : Inherits VB_Parent
     Public maxDistanceCheck As Boolean
     Public Sub New()
         If findfrm(traceName + " CheckBoxes") Is Nothing Then
@@ -2163,7 +2163,7 @@ End Class
 
 
 
-Public Class Options_Sort : Inherits VB_Algorithm
+Public Class Options_Sort : Inherits VB_Parent
     Public sortOption = cv.SortFlags.EveryColumn + cv.SortFlags.Ascending
     Public radio0 As Windows.Forms.RadioButton
     Public radio1 As Windows.Forms.RadioButton
@@ -2201,7 +2201,7 @@ End Class
 
 
 
-Public Class Options_Distance : Inherits VB_Algorithm
+Public Class Options_Distance : Inherits VB_Parent
     Public distanceType As cv.DistanceTypes
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
@@ -2230,7 +2230,7 @@ End Class
 
 
 
-Public Class Options_Warp : Inherits VB_Algorithm
+Public Class Options_Warp : Inherits VB_Parent
     Public alpha As Double
     Public beta As Double
     Public gamma As Double
@@ -2308,7 +2308,7 @@ End Class
 
 
 
-Public Class Options_HistCompare : Inherits VB_Algorithm
+Public Class Options_HistCompare : Inherits VB_Parent
     Public compareMethod As cv.HistCompMethods = cv.HistCompMethods.Correl
     Public compareName As String
     Public Sub New()
@@ -2358,7 +2358,7 @@ End Class
 
 
 
-Public Class Options_BrightnessContrast : Inherits VB_Algorithm
+Public Class Options_BrightnessContrast : Inherits VB_Parent
     Public alpha As Single
     Public beta As Integer
     Public Sub New()
@@ -2396,7 +2396,7 @@ End Class
 
 
 
-Public Class Options_MatchCell : Inherits VB_Algorithm
+Public Class Options_MatchCell : Inherits VB_Parent
     Public overlapPercent As Single = 0.5
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Percent overlap", 0, 100, overlapPercent * 100)
@@ -2414,7 +2414,7 @@ End Class
 
 
 
-Public Class Options_Extrinsics : Inherits VB_Algorithm
+Public Class Options_Extrinsics : Inherits VB_Parent
     Public leftCorner As Integer
     Public rightCorner As Integer
     Public topCorner As Integer
@@ -2454,7 +2454,7 @@ End Class
 
 
 
-Public Class Options_Translation : Inherits VB_Algorithm
+Public Class Options_Translation : Inherits VB_Parent
     Public leftTrans As Integer
     Public rightTrans As Integer
     Public Sub New()
@@ -2488,7 +2488,7 @@ End Class
 
 
 
-Public Class Options_OpenGL_Contours : Inherits VB_Algorithm
+Public Class Options_OpenGL_Contours : Inherits VB_Parent
     Public depthPointStyle As Integer
     Public filterThreshold As Single = 0.3
     Public Sub New()
@@ -2531,7 +2531,7 @@ End Class
 
 
 
-Public Class Options_Motion : Inherits VB_Algorithm
+Public Class Options_Motion : Inherits VB_Parent
     Public motionThreshold As Integer
     Public cumulativePercentThreshold As Single = 0.1
     Public Sub New()
@@ -2555,7 +2555,7 @@ End Class
 
 
 
-Public Class Options_Emax : Inherits VB_Algorithm
+Public Class Options_Emax : Inherits VB_Parent
     Public predictionStepSize As Integer = 5
     Public consistentcolors As Integer
     Public covarianceType = cv.EMTypes.CovMatDefault
@@ -2598,7 +2598,7 @@ End Class
 
 
 
-Public Class Options_Intercepts : Inherits VB_Algorithm
+Public Class Options_Intercepts : Inherits VB_Parent
     Public interceptRange As Integer = 10
     Public mouseMovePoint As Integer
     Public selectedIntercept As Integer
@@ -2635,7 +2635,7 @@ End Class
 
 
 
-Public Class Options_PlaneEstimation : Inherits VB_Algorithm
+Public Class Options_PlaneEstimation : Inherits VB_Parent
     Public useDiagonalLines As Boolean
     Public useContour_SidePoints As Boolean
     Public Sub New()
@@ -2661,7 +2661,7 @@ End Class
 
 
 
-Public Class Options_ForeGround : Inherits VB_Algorithm
+Public Class Options_ForeGround : Inherits VB_Parent
     Public maxForegroundDepthInMeters As Single = 1500 / 1000
     Public minSizeContour As Integer = 100
     Public depthPerRegion As Single
@@ -2689,7 +2689,7 @@ End Class
 
 
 
-Public Class Options_Flood : Inherits VB_Algorithm
+Public Class Options_Flood : Inherits VB_Parent
     Public floodFlag As cv.FloodFillFlags = 4 Or cv.FloodFillFlags.FixedRange
     Public stepSize As Integer = 30
     Public minPixels As Integer = 30
@@ -2721,7 +2721,7 @@ End Class
 
 
 
-Public Class Options_ShapeDetect : Inherits VB_Algorithm
+Public Class Options_ShapeDetect : Inherits VB_Parent
     Public fileName As String
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
@@ -2746,7 +2746,7 @@ End Class
 
 
 
-Public Class Options_Blur : Inherits VB_Algorithm
+Public Class Options_Blur : Inherits VB_Parent
     Public kernelSize As Integer = 3
     Public sigma As Single = 1.5
     Public Sub New()
@@ -2774,7 +2774,7 @@ End Class
 
 
 
-Public Class Options_Harris : Inherits VB_Algorithm
+Public Class Options_Harris : Inherits VB_Parent
     Public threshold As Single = 1 / 10000
     Public neighborhood As Integer = 3
     Public aperture As Integer = 21
@@ -2807,7 +2807,7 @@ End Class
 
 
 
-Public Class Options_Wavelet : Inherits VB_Algorithm
+Public Class Options_Wavelet : Inherits VB_Parent
     Public useHaar As Boolean
     Public iterations As Integer = 3
     Public Sub New()
@@ -2836,7 +2836,7 @@ End Class
 
 
 
-Public Class Options_SOM : Inherits VB_Algorithm
+Public Class Options_SOM : Inherits VB_Parent
     Public iterations As Integer = 3000
     Public learningRate As Single = 0.1
     Public radius As Integer = 15
@@ -2868,7 +2868,7 @@ End Class
 
 
 
-Public Class Options_Sift : Inherits VB_Algorithm
+Public Class Options_Sift : Inherits VB_Parent
     Public useBFMatcher As Boolean
     Public pointCount As Integer = 200
     Public stepSize As Integer = 10
@@ -2902,7 +2902,7 @@ End Class
 
 
 
-Public Class Options_Erode : Inherits VB_Algorithm
+Public Class Options_Erode : Inherits VB_Parent
     Public kernelSize As Integer = 3
     Public iterations As Integer = 1
     Public morphShape As cv.MorphShapes
@@ -2945,7 +2945,7 @@ End Class
 
 
 
-Public Class Options_Dilate : Inherits VB_Algorithm
+Public Class Options_Dilate : Inherits VB_Parent
     Public kernelSize As Integer = 3
     Public iterations As Integer = 1
     Public morphShape As cv.MorphShapes
@@ -2990,7 +2990,7 @@ End Class
 
 
 
-Public Class Options_KMeans : Inherits VB_Algorithm
+Public Class Options_KMeans : Inherits VB_Parent
     Public kMeansFlag As cv.KMeansFlags
     Public kMeansK As Integer = 5
     Public Sub New()
@@ -3026,7 +3026,7 @@ End Class
 
 
 
-Public Class Options_LUT : Inherits VB_Algorithm
+Public Class Options_LUT : Inherits VB_Parent
     Public lutSegments As Integer = 10
     Public splits() As Integer
     Public vals() As Integer
@@ -3061,7 +3061,7 @@ End Class
 
 
 
-Public Class Options_ColorFormat : Inherits VB_Algorithm
+Public Class Options_ColorFormat : Inherits VB_Parent
     Public colorFormat As String
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
@@ -3106,7 +3106,7 @@ End Class
 
 
 
-Public Class Options_CComp : Inherits VB_Algorithm
+Public Class Options_CComp : Inherits VB_Parent
     Public light As Integer = 127
     Public dark As Integer = 50
     Public Sub New()
@@ -3132,7 +3132,7 @@ End Class
 
 
 
-Public Class Options_WarpModel2 : Inherits VB_Algorithm
+Public Class Options_WarpModel2 : Inherits VB_Parent
     Public warpMode As Integer
     Public useWarpAffine As Boolean
     Public useWarpHomography As Boolean
@@ -3168,7 +3168,7 @@ End Class
 
 
 
-Public Class Options_DNN : Inherits VB_Algorithm
+Public Class Options_DNN : Inherits VB_Parent
     Public superResModelFileName As String
     Public shortModelName As String
     Public superResMultiplier As Integer
@@ -3218,7 +3218,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class Options_Photoshop : Inherits VB_Algorithm
+Public Class Options_Photoshop : Inherits VB_Parent
     Public switch As Integer
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -3243,7 +3243,7 @@ End Class
 
 
 
-Public Class Options_Gif : Inherits VB_Algorithm
+Public Class Options_Gif : Inherits VB_Parent
     Public buildCheck As Windows.Forms.CheckBox
     Public restartCheck As Windows.Forms.CheckBox
     Public dst0Radio As Windows.Forms.RadioButton
@@ -3315,7 +3315,7 @@ End Class
 
 
 
-Public Class Options_IMU : Inherits VB_Algorithm
+Public Class Options_IMU : Inherits VB_Parent
     Public rotateX As Integer
     Public rotateY As Integer
     Public rotateZ As Integer
@@ -3347,7 +3347,7 @@ End Class
 
 
 
-Public Class Options_FeatureMatch : Inherits VB_Algorithm
+Public Class Options_FeatureMatch : Inherits VB_Parent
     Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
     Public matchText As String = ""
     Public Sub New()
@@ -3382,7 +3382,7 @@ End Class
 
 
 
-Public Class Options_Features : Inherits VB_Algorithm
+Public Class Options_Features : Inherits VB_Parent
     Public quality As Double = 0.01
     Public minDistance As Double = 1
     Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
@@ -3446,7 +3446,7 @@ End Class
 
 
 
-Public Class Options_HeatMap : Inherits VB_Algorithm
+Public Class Options_HeatMap : Inherits VB_Parent
     Public redThreshold As Integer = 20
     Public viewName As String = "vertical"
     Public showHistory As Boolean
@@ -3481,7 +3481,7 @@ End Class
 
 
 
-Public Class Options_Boundary : Inherits VB_Algorithm
+Public Class Options_Boundary : Inherits VB_Parent
     Public desiredBoundaries As Integer = 15
     Public peakDistance As Integer = task.workingRes.Width / 20
     Public Sub New()
@@ -3506,7 +3506,7 @@ End Class
 
 
 
-Public Class Options_Denoise : Inherits VB_Algorithm
+Public Class Options_Denoise : Inherits VB_Parent
     Public removeSinglePixels As Boolean
     Public Sub New()
         If findfrm(traceName + " CheckBox Options") Is Nothing Then
@@ -3530,7 +3530,7 @@ End Class
 
 
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class Options_MSER : Inherits VB_Algorithm
+Public Class Options_MSER : Inherits VB_Parent
     Public delta As Integer = 9
     Public minArea As Integer
     Public maxArea As Integer
@@ -3622,7 +3622,7 @@ End Class
 
 
 
-Public Class Options_Spectrum : Inherits VB_Algorithm
+Public Class Options_Spectrum : Inherits VB_Parent
     Public gapDepth As Integer
     Public gapGray As Integer
     Public sampleThreshold As Integer
@@ -3808,7 +3808,7 @@ End Class
 
 
 
-Public Class Options_HistXD : Inherits VB_Algorithm
+Public Class Options_HistXD : Inherits VB_Parent
     Public sideThreshold As Integer = 5
     Public topThreshold As Integer = 15
     Public threshold3D As Integer = 40
@@ -3836,7 +3836,7 @@ End Class
 
 
 
-Public Class Options_Complexity : Inherits VB_Algorithm
+Public Class Options_Complexity : Inherits VB_Parent
     Public filename As FileInfo
     Public filenames As List(Of String)
     Public plotColor As cv.Scalar = cv.Scalar.Yellow
@@ -3890,7 +3890,7 @@ End Class
 
 
 
-Public Class Options_Edges_All : Inherits VB_Algorithm
+Public Class Options_Edges_All : Inherits VB_Parent
     Public edges As Object
     Public saveSelection As String
     Dim canny As New Edge_Canny
@@ -3967,7 +3967,7 @@ End Class
 
 
 
-Public Class Options_BGSubtractSynthetic : Inherits VB_Algorithm
+Public Class Options_BGSubtractSynthetic : Inherits VB_Parent
     Public amplitude As Double = 200
     Public magnitude As Double = 20
     Public waveSpeed As Double = 20
@@ -3998,7 +3998,7 @@ End Class
 
 
 
-Public Class Options_BGSubtract : Inherits VB_Algorithm
+Public Class Options_BGSubtract : Inherits VB_Parent
     Public learnRate As Single = 100 / 1000
     Public methodDesc As String
     Public currMethod As Integer
@@ -4038,7 +4038,7 @@ End Class
 
 
 
-Public Class Options_Classifier : Inherits VB_Algorithm
+Public Class Options_Classifier : Inherits VB_Parent
     Public methodIndex As Integer
     Public methodName As String
     Public sampleCount As Integer
@@ -4085,7 +4085,7 @@ End Class
 
 
 
-Public Class Options_Derivative : Inherits VB_Algorithm
+Public Class Options_Derivative : Inherits VB_Parent
     Public channel = 0 ' assume X Dimension
     Public kernelSize As Integer
     Dim options As New Options_Sobel
@@ -4118,7 +4118,7 @@ End Class
 
 
 
-Public Class Options_LaplacianKernels : Inherits VB_Algorithm
+Public Class Options_LaplacianKernels : Inherits VB_Parent
     Public gaussiankernelSize As Integer
     Public LaplaciankernelSize As Integer
     Public Sub New()
@@ -4142,7 +4142,7 @@ End Class
 
 
 
-Public Class Options_Threshold : Inherits VB_Algorithm
+Public Class Options_Threshold : Inherits VB_Parent
     Public thresholdMethod As cv.ThresholdTypes = cv.ThresholdTypes.Binary
     Public thresholdName As String
     Public threshold As Integer = 255
@@ -4195,7 +4195,7 @@ End Class
 
 
 
-Public Class Options_Threshold_Adaptive : Inherits VB_Algorithm
+Public Class Options_Threshold_Adaptive : Inherits VB_Parent
     Public method As cv.AdaptiveThresholdTypes
     Public blockSize As Integer = 5
     Public constantVal As Integer
@@ -4235,7 +4235,7 @@ End Class
 
 
 
-Public Class Options_Colors : Inherits VB_Algorithm
+Public Class Options_Colors : Inherits VB_Parent
     Public redS As Integer
     Public greenS As Integer
     Public blueS As Integer
@@ -4261,7 +4261,7 @@ End Class
 
 
 
-Public Class Options_Threshold_AdaptiveMin : Inherits VB_Algorithm
+Public Class Options_Threshold_AdaptiveMin : Inherits VB_Parent
     Public adaptiveMethod As cv.AdaptiveThresholdTypes
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
@@ -4284,7 +4284,7 @@ End Class
 
 
 
-Public Class Options_ThresholdAll : Inherits VB_Algorithm
+Public Class Options_ThresholdAll : Inherits VB_Parent
     Public thresholdMethod As cv.ThresholdTypes = cv.ThresholdTypes.Binary
     Public blockSize As Integer = 5
     Public constantVal As Integer
@@ -4352,7 +4352,7 @@ End Class
 
 
 
-Public Class Options_StdevGrid : Inherits VB_Algorithm
+Public Class Options_StdevGrid : Inherits VB_Parent
     Public minThreshold As Integer
     Public maxThreshold As Integer
     Public diffThreshold As Integer
@@ -4380,7 +4380,7 @@ End Class
 
 
 
-Public Class Options_SURF : Inherits VB_Algorithm
+Public Class Options_SURF : Inherits VB_Parent
     Public surfThreshold As Integer
     Public useBFMatch As Boolean
     Public verticalRange As Integer
@@ -4411,7 +4411,7 @@ End Class
 
 
 
-Public Class Options_DFT : Inherits VB_Algorithm
+Public Class Options_DFT : Inherits VB_Parent
     Public radius As Integer = dst2.Rows
     Public order As Integer = 2
     Public butterworthFilter(1) As cv.Mat
@@ -4452,7 +4452,7 @@ End Class
 
 
 
-Public Class Options_DFTShape : Inherits VB_Algorithm
+Public Class Options_DFTShape : Inherits VB_Parent
     Public dftShape As String
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -4475,7 +4475,7 @@ End Class
 
 
 
-Public Class Options_FitEllipse : Inherits VB_Algorithm
+Public Class Options_FitEllipse : Inherits VB_Parent
     Public fitType As Integer
     Public threshold As Integer
     Public Sub New()
@@ -4508,7 +4508,7 @@ End Class
 
 
 
-Public Class Options_TopX : Inherits VB_Algorithm
+Public Class Options_TopX : Inherits VB_Parent
     Public topX As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Show the top X cells", 1, 255, 10)
@@ -4526,7 +4526,7 @@ End Class
 
 
 
-Public Class Options_XNeighbors : Inherits VB_Algorithm
+Public Class Options_XNeighbors : Inherits VB_Parent
     Public xNeighbors As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("X neighbors", 1, 255, 5)
@@ -4543,7 +4543,7 @@ End Class
 
 
 
-Public Class Options_ShiTomasi : Inherits VB_Algorithm
+Public Class Options_ShiTomasi : Inherits VB_Parent
     Public useShiTomasi As Boolean = True
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
@@ -4565,7 +4565,7 @@ End Class
 
 
 
-Public Class Options_Sobel : Inherits VB_Algorithm
+Public Class Options_Sobel : Inherits VB_Parent
     Public kernelSize As Integer = 3
     Public threshold As Integer = 50
     Public derivativeRange As Single = 0.1
@@ -4608,7 +4608,7 @@ End Class
 
 
 
-Public Class Options_EdgeOverlay : Inherits VB_Algorithm
+Public Class Options_EdgeOverlay : Inherits VB_Parent
     Public xDisp As Integer = 7
     Public yDisp As Integer = 11
     Public Sub New()
@@ -4629,7 +4629,7 @@ End Class
 
 
 
-Public Class Options_Swarm : Inherits VB_Algorithm
+Public Class Options_Swarm : Inherits VB_Parent
     Public ptCount As Integer
     Public border As Integer
     Public Sub New()
@@ -4651,7 +4651,7 @@ End Class
 
 
 
-Public Class Options_AddWeighted : Inherits VB_Algorithm
+Public Class Options_AddWeighted : Inherits VB_Parent
     Public addWeighted As Single
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Add Weighted %", 0, 100, 50)
@@ -4666,7 +4666,7 @@ End Class
 
 
 
-Public Class Options_Bin3WayRedCloud : Inherits VB_Algorithm
+Public Class Options_Bin3WayRedCloud : Inherits VB_Parent
     Public startRegion As Integer
     Public endRegion As Integer
     Public Sub New()
@@ -4707,7 +4707,7 @@ End Class
 
 
 
-Public Class Options_Bin2WayRedCloud : Inherits VB_Algorithm
+Public Class Options_Bin2WayRedCloud : Inherits VB_Parent
     Public startRegion As Integer
     Public endRegion As Integer
     Public Sub New()
@@ -4748,7 +4748,7 @@ End Class
 
 
 
-Public Class Options_GuidedBPDepth : Inherits VB_Algorithm
+Public Class Options_GuidedBPDepth : Inherits VB_Parent
     Public bins As Integer
     Public maxClusters As Single
     Public Sub New()
@@ -4771,7 +4771,7 @@ End Class
 
 
 
-Public Class Options_OpenGL_Duster : Inherits VB_Algorithm
+Public Class Options_OpenGL_Duster : Inherits VB_Parent
     Public useClusterColors As Boolean
     Public useTaskPointCloud As Boolean
     Public Sub New()
@@ -4802,7 +4802,7 @@ Public Enum FeatureSrc
 End Enum
 
 
-Public Class Options_FeatureGather : Inherits VB_Algorithm
+Public Class Options_FeatureGather : Inherits VB_Parent
     Public featureSource As featureSrc
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
-Public Class Coherence_Basics : Inherits VB_Algorithm
+Public Class Coherence_Basics : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Coherence Sigma", 1, 15, 9)
@@ -88,7 +88,7 @@ End Class
 
 
 
-Public Class Coherence_Depth : Inherits VB_Algorithm
+Public Class Coherence_Depth : Inherits VB_Parent
     Dim coherent As New Coherence_Basics
     Public Sub New()
         desc = "Find coherent lines in the depth image"

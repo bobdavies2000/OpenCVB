@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports CS_Classes
-Public Class Blur_Basics : Inherits VB_Algorithm
+Public Class Blur_Basics : Inherits VB_Parent
     Dim options As New Options_Blur
     Public Sub New()
         vbAddAdvice(traceName + ": use local options to control the kernel size and sigma.")
@@ -17,7 +17,7 @@ End Class
 
 
 
-Public Class Blur_Gaussian : Inherits VB_Algorithm
+Public Class Blur_Gaussian : Inherits VB_Parent
     Dim CS_BlurGaussian As New CS_BlurGaussian
     Dim blur As New Blur_Basics
     Public Sub New()
@@ -34,7 +34,7 @@ End Class
 
 
 
-Public Class Blur_Median_CS : Inherits VB_Algorithm
+Public Class Blur_Median_CS : Inherits VB_Parent
     Dim CS_BlurMedian As New CS_BlurMedian
     Dim blur As New Blur_Basics
     Public Sub New()
@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class Blur_Homogeneous : Inherits VB_Algorithm
+Public Class Blur_Homogeneous : Inherits VB_Parent
     Dim blur As New Blur_Basics
     Public Sub New()
         desc = "Smooth each pixel with a kernel of 1's of different sizes."
@@ -69,7 +69,7 @@ End Class
 
 
 
-Public Class Blur_Median : Inherits VB_Algorithm
+Public Class Blur_Median : Inherits VB_Parent
     Dim blur As New Blur_Basics
     Public Sub New()
         desc = "Replace each pixel with the median of neighborhood of varying sizes."
@@ -87,7 +87,7 @@ End Class
 
 ' https://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html?highlight=bilateralfilter
 ' https://www.tutorialspoint.com/opencv/opencv_bilateral_filter.htm
-Public Class Blur_Bilateral : Inherits VB_Algorithm
+Public Class Blur_Bilateral : Inherits VB_Parent
     Dim blur As New Blur_Basics
     Public Sub New()
         desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
@@ -104,7 +104,7 @@ End Class
 
 
 
-Public Class Blur_PlusHistogram : Inherits VB_Algorithm
+Public Class Blur_PlusHistogram : Inherits VB_Parent
     Dim mat2to1 As New Mat_2to1
     Dim blur As New Blur_Bilateral
     Dim myhist As New Hist_EqualizeGray
@@ -134,7 +134,7 @@ End Class
 
 
 
-Public Class Blur_TopoMap : Inherits VB_Algorithm
+Public Class Blur_TopoMap : Inherits VB_Parent
     Dim gradient As New Gradient_CartToPolar
     Dim addw As New AddWeighted_Basics
     Public Sub New()
@@ -187,7 +187,7 @@ End Class
 
 
 
-Public Class Blur_Detection : Inherits VB_Algorithm
+Public Class Blur_Detection : Inherits VB_Parent
     Dim laplace As New Laplacian_Basics
     Dim blur As New Blur_Basics
     Public Sub New()
@@ -225,7 +225,7 @@ End Class
 
 
 
-Public Class Blur_Depth : Inherits VB_Algorithm
+Public Class Blur_Depth : Inherits VB_Parent
     Dim blur As New Blur_Basics
     Public Sub New()
         desc = "Blur the depth results to help find the boundaries to large depth regions"

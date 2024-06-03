@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using cv = OpenCvSharp;
 namespace CS_Classes
 {
-    public class CS_Algorithm
+    public class CS_Parent
     {
     }
 }
@@ -127,7 +127,7 @@ public class CS_Algorithm : IDisposable
     //        return false;
     //    }
 
-    //    public VB_Algorithm checkIntermediateResults()
+    //    public VB_Parent checkIntermediateResults()
     //    {
     //        if (task.algName.StartsWith("CPP_")) return null; // we don't currently support intermediate results for CPP_ algorithms.
     //        foreach (var obj in task.activeObjects)
@@ -360,7 +360,7 @@ public class CS_Algorithm : IDisposable
     //        return p;
     //    }
 
-    //    public VB_Algorithm()
+    //    public VB_Parent()
     //    {
     //        algorithm = this;
     //        traceName = GetType().Name;
@@ -373,10 +373,10 @@ public class CS_Algorithm : IDisposable
     //            if (offset > 0)
     //            {
     //                var partLine = lines[i].Substring(offset + 11);
-    //                if (partLine.StartsWith("AlgorithmList.createAlgorithm")) break;
+    //                if (partLine.StartsWith("AlgorithmList.createVBAlgorithm")) break;
     //                var split = partLine.Split("\\");
     //                partLine = partLine.Substring(0, partLine.IndexOf("."));
-    //                if (!(partLine.StartsWith("VB_Algorithm") || partLine.StartsWith("VBtask")))
+    //                if (!(partLine.StartsWith("VB_Parent") || partLine.StartsWith("VBtask")))
     //                {
     //                    callStack = partLine + "\\" + callStack;
     //                }

@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Windows.Media.Media3D
 
-Public Class Pixel_Viewer : Inherits VB_Algorithm
+Public Class Pixel_Viewer : Inherits VB_Parent
     Dim firstUpdate = True
     Public viewerForm As New PixelViewerForm
     Enum displayTypes
@@ -185,7 +185,7 @@ End Class
 
 
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/PixelAccess.cs
-Public Class Pixel_GetSet : Inherits VB_Algorithm
+Public Class Pixel_GetSet : Inherits VB_Parent
     Dim mats As New Mat_4Click
     Public Sub New()
         labels(2) = "Time to copy using get/set,Generic Index, Marshal Copy"
@@ -234,7 +234,7 @@ Public Class Pixel_GetSet : Inherits VB_Algorithm
 
         setTrueText(output, New cv.Point(src.Width / 2 + 10, src.Height / 2 + 20))
 
-        mats.Run(empty)
+        mats.Run(Empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
@@ -247,7 +247,7 @@ End Class
 
 
 
-Public Class Pixel_Measure : Inherits VB_Algorithm
+Public Class Pixel_Measure : Inherits VB_Parent
     Public Sub New()
         Dim maxZ = task.maxZmeters * 1000
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Distance in mm", 50, If(maxZ < 1500, 1500, maxZ), maxZ)
@@ -275,7 +275,7 @@ End Class
 
 
 
-Public Class Pixel_SampleColor : Inherits VB_Algorithm
+Public Class Pixel_SampleColor : Inherits VB_Parent
     Public random As New Random_Basics
     Public maskColor As cv.Vec3b
     Public Sub New()
@@ -299,7 +299,7 @@ Public Class Pixel_SampleColor : Inherits VB_Algorithm
         Dim pixels As New List(Of cv.Vec3b)
         Dim counts As New List(Of Integer)
         Dim pixel0 = New cv.Vec3b
-        random.Run(empty)
+        random.Run(Empty)
         For Each pt In random.pointList
             Dim pixel = src.Get(Of cv.Vec3b)(pt.Y, pt.X)
             If pixel <> pixel0 Then
@@ -331,7 +331,7 @@ End Class
 
 
 
-Public Class Pixel_Unstable : Inherits VB_Algorithm
+Public Class Pixel_Unstable : Inherits VB_Parent
     Dim km As New KMeans_Basics
     Public unstablePixels As New cv.Mat
     Public Sub New()
@@ -384,7 +384,7 @@ End Class
 
 
 
-Public Class Pixel_Zoom : Inherits VB_Algorithm
+Public Class Pixel_Zoom : Inherits VB_Parent
     Public mousePoint = New cv.Point(msRNG.Next(0, dst1.Width / 2), msRNG.Next(0, dst1.Height))
     Public zoomSlider As Windows.Forms.TrackBar
     Public Sub New()
@@ -414,7 +414,7 @@ End Class
 
 
 
-Public Class Pixel_SubPixel : Inherits VB_Algorithm
+Public Class Pixel_SubPixel : Inherits VB_Parent
     Public zoom As New Pixel_Zoom
     Public Sub New()
         desc = "Show how to use the GetRectSubPix OpenCV API"
@@ -441,7 +441,7 @@ End Class
 
 
 
-Public Class Pixel_NeighborsHorizontal : Inherits VB_Algorithm
+Public Class Pixel_NeighborsHorizontal : Inherits VB_Parent
     Public options As New Options_Neighbors
     Public pt1 As New List(Of cv.Point)
     Public pt2 As New List(Of cv.Point)
@@ -483,7 +483,7 @@ End Class
 
 
 
-Public Class Pixel_NeighborsVertical : Inherits VB_Algorithm
+Public Class Pixel_NeighborsVertical : Inherits VB_Parent
     Public options As New Options_Neighbors
     Public pt1 As New List(Of cv.Point)
     Public pt2 As New List(Of cv.Point)
@@ -524,7 +524,7 @@ End Class
 
 
 
-Public Class Pixel_NeighborsMaskH : Inherits VB_Algorithm
+Public Class Pixel_NeighborsMaskH : Inherits VB_Parent
     Dim options As New Options_Neighbors
     Public Sub New()
         desc = "Show where horizontal neighbor depth values are within X mm's"
@@ -551,7 +551,7 @@ End Class
 
 
 
-Public Class Pixel_NeighborsMaskV : Inherits VB_Algorithm
+Public Class Pixel_NeighborsMaskV : Inherits VB_Parent
     Dim options As New Options_Neighbors
     Public Sub New()
         desc = "Show where vertical neighbor depth values are within X mm's"
@@ -580,7 +580,7 @@ End Class
 
 
 
-Public Class Pixel_NeighborsMask : Inherits VB_Algorithm
+Public Class Pixel_NeighborsMask : Inherits VB_Parent
     Dim maskH As New Pixel_NeighborsMaskH
     Dim maskV As New Pixel_NeighborsMaskV
     Public Sub New()
@@ -600,7 +600,7 @@ End Class
 
 
 
-Public Class Pixel_NeighborsPatchNeighbors : Inherits VB_Algorithm
+Public Class Pixel_NeighborsPatchNeighbors : Inherits VB_Parent
     Public options As New Options_Neighbors
     Public Sub New()
         findSlider("Minimum offset to neighbor pixel").Value = 1
@@ -652,7 +652,7 @@ End Class
 
 
 
-Public Class Pixel_Vector3D : Inherits VB_Algorithm
+Public Class Pixel_Vector3D : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
@@ -700,7 +700,7 @@ End Class
 
 
 
-Public Class Pixel_Unique_CPP : Inherits VB_Algorithm
+Public Class Pixel_Unique_CPP : Inherits VB_Parent
     Public Sub New()
         redOptions.UseColorOnly.Checked = True
         cPtr = Pixels_Vector_Open()
@@ -728,7 +728,7 @@ End Class
 
 
 
-Public Class Pixel_Vectors : Inherits VB_Algorithm
+Public Class Pixel_Vectors : Inherits VB_Parent
     Public redC As New RedCloud_Basics
     Dim hVector As New Hist3Dcolor_Vector
     Public pixelVector As New List(Of Single())
@@ -759,7 +759,7 @@ End Class
 
 
 
-Public Class Pixel_Mapper : Inherits VB_Algorithm
+Public Class Pixel_Mapper : Inherits VB_Parent
     Public colorMap As New cv.Mat(256, 1, cv.MatType.CV_8UC3, 0)
     Public Sub New()
         desc = "Resize the input to a small image, convert to gray, and map gray to color"
@@ -810,7 +810,7 @@ End Class
 
 
 
-Public Class Pixel_MapLeftRight : Inherits VB_Algorithm
+Public Class Pixel_MapLeftRight : Inherits VB_Parent
     Dim mapper As New Pixel_Mapper
     Public Sub New()
         labels = {"", "", "Left view with averaged color", "Right view with averaged color"}
@@ -830,7 +830,7 @@ End Class
 
 
 
-Public Class Pixel_MapDistance : Inherits VB_Algorithm
+Public Class Pixel_MapDistance : Inherits VB_Parent
     Dim mapper As New Pixel_Mapper
     Public Sub New()
         labels = {"", "", "Left view with averaged color after distance reduction", "Right view with averaged color after distance reduction"}
@@ -884,7 +884,7 @@ End Class
 
 
 
-Public Class Pixel_Sampler : Inherits VB_Algorithm
+Public Class Pixel_Sampler : Inherits VB_Parent
     Public random As New Random_Basics
     Public dominantGray As Byte
     Dim width = 25
@@ -904,7 +904,7 @@ Public Class Pixel_Sampler : Inherits VB_Algorithm
         Else
             random.range = New cv.Rect(0, 0, src.Width, src.Height)
         End If
-        random.Run(empty)
+        random.Run(Empty)
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim index As New List(Of cv.Point)
@@ -951,7 +951,7 @@ End Class
 
 
 
-Public Class Pixel_Display : Inherits VB_Algorithm
+Public Class Pixel_Display : Inherits VB_Parent
     Public random As New Random_Basics
     Dim width = 25
     Dim height = 25
@@ -961,7 +961,7 @@ Public Class Pixel_Display : Inherits VB_Algorithm
         Else
             random.range = New cv.Rect(msRNG.Next(0, dst2.Width - width), msRNG.Next(0, dst2.Height - height), width, height)
         End If
-        random.Run(empty)
+        random.Run(Empty)
         task.drawRect = random.range
 
         labels(2) = "Draw a rectangle anywhere in the image to see the stats for that region."
@@ -986,7 +986,7 @@ End Class
 
 
 
-Public Class Pixel_ColorGuess : Inherits VB_Algorithm
+Public Class Pixel_ColorGuess : Inherits VB_Parent
     Dim mapper As New Pixel_Mapper
     Public Sub New()
         labels = {"", "", "Left view with averaged color after distance reduction", "Right view with averaged color after distance reduction"}

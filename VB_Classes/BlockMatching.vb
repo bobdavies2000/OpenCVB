@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/stereo_match.cpp
-Public Class BlockMatching_Basics : Inherits VB_Algorithm
+Public Class BlockMatching_Basics : Inherits VB_Parent
     Dim colorizer As New Depth_Colorizer_CPP
     Dim options As New Options_BlockMatching
     Public Sub New()

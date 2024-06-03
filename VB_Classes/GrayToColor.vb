@@ -1,6 +1,6 @@
 ﻿Imports System.Windows.Media
 Imports cv = OpenCvSharp
-Public Class GrayToColor_Palette : Inherits VB_Algorithm
+Public Class GrayToColor_Palette : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Public Sub New()
         labels = {"", "Right View", "", "Grayscale left view after palette applied."}

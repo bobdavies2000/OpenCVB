@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Triangle_Basics : Inherits VB_Algorithm
+Public Class Triangle_Basics : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
@@ -41,7 +41,7 @@ End Class
 
 
 
-Public Class Triangle_HullContour : Inherits VB_Algorithm
+Public Class Triangle_HullContour : Inherits VB_Parent
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
         gOptions.displayDst1.Checked = True
@@ -76,7 +76,7 @@ End Class
 
 
 
-Public Class Triangle_RedCloud : Inherits VB_Algorithm
+Public Class Triangle_RedCloud : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
@@ -120,7 +120,7 @@ End Class
 
 
 
-Public Class Triangle_Cell : Inherits VB_Algorithm
+Public Class Triangle_Cell : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
@@ -175,7 +175,7 @@ End Class
 
 
 
-Public Class Triangle_Mask : Inherits VB_Algorithm
+Public Class Triangle_Mask : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
-Public Class ORB_Basics : Inherits VB_Algorithm
+Public Class ORB_Basics : Inherits VB_Parent
     Public keypoints() As cv.KeyPoint
     Dim orb As cv.ORB
     Public Sub New()
@@ -27,7 +27,7 @@ End Class
 
 
 
-Public Class ORB_Match : Inherits VB_Algorithm
+Public Class ORB_Match : Inherits VB_Parent
     Public Sub New()
         desc = "Find ORB keypoints and match with a previous frame"
     End Sub

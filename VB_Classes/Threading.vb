@@ -1,6 +1,6 @@
 ﻿Imports System.Threading
 Imports cv = OpenCvSharp
-Public Class Threading_Test : Inherits VB_Algorithm
+Public Class Threading_Test : Inherits VB_Parent
     Dim thread1 As System.Threading.Thread
     Dim thread2 As System.Threading.Thread
     Dim horizon As New Horizon_Basics
@@ -53,7 +53,7 @@ End Class
 
 
 
-Public Class Threading_Test1 : Inherits VB_Algorithm
+Public Class Threading_Test1 : Inherits VB_Parent
     Dim gravity As New Gravity_Basics
     Dim thread As System.Threading.Thread
     Public Sub New()

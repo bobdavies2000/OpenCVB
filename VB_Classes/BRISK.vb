@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class BRISK_Basics : Inherits VB_Algorithm
+Public Class BRISK_Basics : Inherits VB_Parent
     Dim brisk As cv.BRISK
     Public features As New List(Of cv.Point2f)
     Dim options As New Options_Features

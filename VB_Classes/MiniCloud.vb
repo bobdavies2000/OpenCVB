@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class MiniCloud_Basics : Inherits VB_Algorithm
+Public Class MiniCloud_Basics : Inherits VB_Parent
     ReadOnly resize As Resize_Smaller
     Public rect As cv.Rect
     Public options As New Options_IMU
@@ -30,7 +30,7 @@ End Class
 
 
 
-Public Class MiniCloud_Rotate : Inherits VB_Algorithm
+Public Class MiniCloud_Rotate : Inherits VB_Parent
     Public mini As New MiniCloud_Basics
     Public histogram As New cv.Mat
     Public Sub New()
@@ -83,7 +83,7 @@ End Class
 
 
 
-Public Class MiniCloud_RotateAngle : Inherits VB_Algorithm
+Public Class MiniCloud_RotateAngle : Inherits VB_Parent
     ReadOnly peak As New MiniCloud_Rotate
     Dim mats As New Mat_4to1
     Public plot As New Plot_OverTimeSingle
@@ -132,7 +132,7 @@ End Class
 
 
 
-Public Class MiniCloud_RotateSinglePass : Inherits VB_Algorithm
+Public Class MiniCloud_RotateSinglePass : Inherits VB_Parent
     Dim peak As New MiniCloud_Rotate
     Public Sub New()
         task.accRadians.Y = -cv.Cv2.PI

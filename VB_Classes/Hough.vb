@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HoughLinesSample.vb
-Public Class Hough_Basics : Inherits VB_Algorithm
+Public Class Hough_Basics : Inherits VB_Parent
     Dim edges As New Edge_Canny
     Public segments() As cv.LineSegmentPolar
     Public options As New Options_Hough
@@ -73,7 +73,7 @@ End Module
 
 
 ' https://docs.opencv.org/3.1.0/d6/d10/tutorial_py_houghlines.html
-Public Class Hough_Circles : Inherits VB_Algorithm
+Public Class Hough_Circles : Inherits VB_Parent
     Dim circles As New Draw_Circles
     Public Sub New()
         findSlider("DrawCount").Value = 3
@@ -104,7 +104,7 @@ End Class
 
 
 
-Public Class Hough_Lines_MT : Inherits VB_Algorithm
+Public Class Hough_Lines_MT : Inherits VB_Parent
     Dim edges As New Edge_Canny
     Dim options As New Options_Hough
     Public Sub New()
@@ -145,7 +145,7 @@ End Class
 
 
 
-Public Class Hough_Featureless : Inherits VB_Algorithm
+Public Class Hough_Featureless : Inherits VB_Parent
     Public edges As New Edge_Canny
     Public noDepthCount() As Integer
     Public options As New Options_Hough
@@ -187,7 +187,7 @@ End Class
 
 
 
-Public Class Hough_FeatureLessTopX : Inherits VB_Algorithm
+Public Class Hough_FeatureLessTopX : Inherits VB_Parent
     Public edges As New Edge_Canny
     Public options As New Options_Hough
     Public maskFless As cv.Mat
@@ -242,7 +242,7 @@ End Class
 
 
 
-Public Class Hough_LaneFinder : Inherits VB_Algorithm
+Public Class Hough_LaneFinder : Inherits VB_Parent
     Dim hls As New LaneFinder_HLSColor
     Public segments As cv.LineSegmentPoint()
     Public mask As cv.Mat
@@ -293,7 +293,7 @@ End Class
 
 
 
-Public Class Hough_Sudoku : Inherits VB_Algorithm
+Public Class Hough_Sudoku : Inherits VB_Parent
     Dim hough As New Hough_Basics
     Public Sub New()
         desc = "Successful use of Hough to find lines in Sudoku grid."

@@ -1,6 +1,6 @@
 Imports System.Windows.Documents
 Imports cv = OpenCvSharp
-Public Class LeftRight_Basics : Inherits VB_Algorithm
+Public Class LeftRight_Basics : Inherits VB_Parent
     Public Sub New()
         If task.cameraName = "MYNT-EYE-D1000" Then findSlider("Alpha (contrast)").Value = 1100
         labels = {"", "", "Left camera image", If(task.cameraName = "Azure Kinect 4K", "No right image", "Right camera image")}
@@ -18,7 +18,7 @@ End Class
 
 
 
-Public Class LeftRight_CompareRaw : Inherits VB_Algorithm
+Public Class LeftRight_CompareRaw : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Slice Starting Y", 0, 300, 25)
@@ -48,7 +48,7 @@ End Class
 
 
 
-Public Class LeftRight_Palettized : Inherits VB_Algorithm
+Public Class LeftRight_Palettized : Inherits VB_Parent
     Public Sub New()
         desc = "Add color to the 8-bit infrared images."
         labels(2) = "Left Image"
@@ -67,7 +67,7 @@ End Class
 
 
 
-Public Class LeftRight_BRISK : Inherits VB_Algorithm
+Public Class LeftRight_BRISK : Inherits VB_Parent
     Dim brisk As New BRISK_Basics
     Dim options As New Options_Features
     Public Sub New()
@@ -90,7 +90,7 @@ End Class
 
 
 
-Public Class LeftRight_Edges : Inherits VB_Algorithm
+Public Class LeftRight_Edges : Inherits VB_Parent
     Dim edges As New Edge_Canny
     Public Sub New()
         desc = "Display the edges in the left and right views"
@@ -111,7 +111,7 @@ End Class
 
 
 
-Public Class LeftRight_Reduction : Inherits VB_Algorithm
+Public Class LeftRight_Reduction : Inherits VB_Parent
     Public reduction As New Reduction_Basics
     Public Sub New()
         labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
@@ -131,7 +131,7 @@ End Class
 
 
 
-Public Class LeftRight_Markers : Inherits VB_Algorithm
+Public Class LeftRight_Markers : Inherits VB_Parent
     Dim redView As New LeftRight_Reduction
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
@@ -192,7 +192,7 @@ End Class
 
 
 
-Public Class LeftRight_Markers1 : Inherits VB_Algorithm
+Public Class LeftRight_Markers1 : Inherits VB_Parent
     Dim redView As New LeftRight_Reduction
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -247,7 +247,7 @@ End Class
 
 
 
-Public Class LeftRight_Lines : Inherits VB_Algorithm
+Public Class LeftRight_Lines : Inherits VB_Parent
     Dim lines As New Line_Basics
     Public Sub New()
         labels = {"", "", "Left camera lines", "Right camera lines"}
@@ -269,7 +269,7 @@ End Class
 
 
 
-Public Class LeftRight_RedCloudRight : Inherits VB_Algorithm
+Public Class LeftRight_RedCloudRight : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         redOptions.UseColorOnly.Checked = True
@@ -288,7 +288,7 @@ End Class
 
 
 
-Public Class LeftRight_RedCloudLeft : Inherits VB_Algorithm
+Public Class LeftRight_RedCloudLeft : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         redOptions.UseColorOnly.Checked = True
@@ -308,7 +308,7 @@ End Class
 
 
 
-Public Class LeftRight_RedCloudBoth : Inherits VB_Algorithm
+Public Class LeftRight_RedCloudBoth : Inherits VB_Parent
     Dim stLeft As New LeftRight_RedCloudRight
     Dim stRight As New LeftRight_RedCloudLeft
     Public Sub New()
@@ -330,7 +330,7 @@ End Class
 
 
 
-Public Class LeftRight_Features : Inherits VB_Algorithm
+Public Class LeftRight_Features : Inherits VB_Parent
     Dim feat As New FeatureLeftRight_Basics
     Public Sub New()
         desc = "Placeholder to make it easier to find FeatureLeftRight_Basics"

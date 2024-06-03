@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Diff_Basics : Inherits VB_Algorithm
+Public Class Diff_Basics : Inherits VB_Parent
     Public changedPixels As Integer
     Public lastFrame As New cv.Mat
     Public Sub New()
@@ -31,7 +31,7 @@ End Class
 
 
 
-Public Class Diff_Color : Inherits VB_Algorithm
+Public Class Diff_Color : Inherits VB_Parent
     Public diff As New Diff_Basics
     Public Sub New()
         labels = {"", "", "Each channel displays the channel's difference", "Mask with all differences"}
@@ -49,7 +49,7 @@ End Class
 
 
 
-Public Class Diff_UnstableDepthAndColor : Inherits VB_Algorithm
+Public Class Diff_UnstableDepthAndColor : Inherits VB_Parent
     Public diff As New Diff_Basics
     Public depth As New Depth_NotMissing
     Public Sub New()
@@ -76,7 +76,7 @@ End Class
 
 
 
-Public Class Diff_RGBAccum : Inherits VB_Algorithm
+Public Class Diff_RGBAccum : Inherits VB_Parent
     Dim diff As New Diff_Basics
     Dim history As New List(Of cv.Mat)
     Public Sub New()
@@ -104,7 +104,7 @@ End Class
 
 
 
-Public Class Diff_Lines : Inherits VB_Algorithm
+Public Class Diff_Lines : Inherits VB_Parent
     Dim diff As New Diff_RGBAccum
     Dim lines As New Line_Basics
     Public Sub New()
@@ -128,7 +128,7 @@ End Class
 
 
 
-Public Class Diff_Heartbeat : Inherits VB_Algorithm
+Public Class Diff_Heartbeat : Inherits VB_Parent
     Public cumulativePixels As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -153,7 +153,7 @@ End Class
 
 
 
-Public Class Diff_DepthAccum : Inherits VB_Algorithm
+Public Class Diff_DepthAccum : Inherits VB_Parent
     Dim diff As New Diff_Depth32S
     Dim frames As New History_Basics
     Public Sub New()
@@ -174,7 +174,7 @@ End Class
 
 
 
-Public Class Diff_Depth32S : Inherits VB_Algorithm
+Public Class Diff_Depth32S : Inherits VB_Parent
     Public lastDepth32s As cv.Mat = dst0.Clone
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Depth varies more than X mm's", 1, 100, 50)
@@ -212,7 +212,7 @@ End Class
 
 
 
-Public Class Diff_Depth32f : Inherits VB_Algorithm
+Public Class Diff_Depth32f : Inherits VB_Parent
     Public lastDepth32f As New cv.Mat
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Depth varies more than X mm's", 1, 200, 100)

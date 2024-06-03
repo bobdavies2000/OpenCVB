@@ -1,6 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class Duster_Basics : Inherits VB_Algorithm
+Public Class Duster_Basics : Inherits VB_Parent
     Public dust As New Duster_MaskZ
     Public Sub New()
         desc = "Removed blowback in the pointcloud"
@@ -27,7 +27,7 @@ End Class
 
 
 
-Public Class Duster_MaskZ : Inherits VB_Algorithm
+Public Class Duster_MaskZ : Inherits VB_Parent
     Public hist As New Hist_Basics
     Public classCount As Integer
     Public options As New Options_GuidedBPDepth
@@ -93,7 +93,7 @@ End Class
 
 
 
-Public Class Duster_BasicsY : Inherits VB_Algorithm
+Public Class Duster_BasicsY : Inherits VB_Parent
     Dim dust As New Duster_MaskZ
     Public Sub New()
         desc = "Removed blowback in the pointcloud"
@@ -120,7 +120,7 @@ End Class
 
 
 
-Public Class Duster_RedCloud : Inherits VB_Algorithm
+Public Class Duster_RedCloud : Inherits VB_Parent
     Dim duster As New Duster_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()

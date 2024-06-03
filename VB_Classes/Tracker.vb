@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://learnopencv.com/object-tracking-using-opencv-cpp-python/
-Public Class Tracker_Basics : Inherits VB_Algorithm
+Public Class Tracker_Basics : Inherits VB_Parent
     Public tRect As cv.Rect
     Public Sub New()
         If radio.Setup(traceName) Then

@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
-Public Class Classifier_Basics : Inherits VB_Algorithm
+Public Class Classifier_Basics : Inherits VB_Parent
     Dim options As New Options_Classifier
     Public Sub New()
         cPtr = OEX_Points_Classifier_Open()
@@ -74,7 +74,7 @@ End Module
 
 
 
-Public Class Classifier_Bayesian : Inherits VB_Algorithm
+Public Class Classifier_Bayesian : Inherits VB_Parent
     Public Sub New()
         cPtr = OEX_Points_Classifier_Open()
         desc = "Run the Bayesian classifier with the input."
@@ -109,7 +109,7 @@ End Class
 
 
 
-Public Class Classifier_BayesianTest : Inherits VB_Algorithm
+Public Class Classifier_BayesianTest : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim nabs As New Neighbors_Precise
     Public Sub New()

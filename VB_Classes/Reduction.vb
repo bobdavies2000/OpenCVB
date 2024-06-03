@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Reduction_Basics : Inherits VB_Algorithm
+Public Class Reduction_Basics : Inherits VB_Parent
     Public classCount As Integer
     Public Sub New()
         redOptions.ReductionTypeGroup.Enabled = True
@@ -35,7 +35,7 @@ End Class
 
 
 
-Public Class Reduction_Floodfill : Inherits VB_Algorithm
+Public Class Reduction_Floodfill : Inherits VB_Parent
     Public reduction As New Reduction_Basics
     Public redC As New RedCloud_Basics
     Public Sub New()
@@ -62,7 +62,7 @@ End Class
 
 
 
-Public Class Reduction_HeatMapLines : Inherits VB_Algorithm
+Public Class Reduction_HeatMapLines : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Public lines As New Line_Basics
     Public setupSide As New PointCloud_SetupSide
@@ -94,7 +94,7 @@ End Class
 
 
 
-Public Class Reduction_PointCloud : Inherits VB_Algorithm
+Public Class Reduction_PointCloud : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Public Sub New()
         redOptions.SimpleReduction.Checked = True
@@ -120,7 +120,7 @@ End Class
 
 
 
-Public Class Reduction_XYZ : Inherits VB_Algorithm
+Public Class Reduction_XYZ : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Public Sub New()
         If check.Setup(traceName) Then
@@ -162,7 +162,7 @@ End Class
 
 
 
-Public Class Reduction_Edges : Inherits VB_Algorithm
+Public Class Reduction_Edges : Inherits VB_Parent
     Dim edges As New Edge_Laplacian
     Dim reduction As New Reduction_Basics
     Public Sub New()
@@ -191,7 +191,7 @@ End Class
 
 
 
-Public Class Reduction_Histogram : Inherits VB_Algorithm
+Public Class Reduction_Histogram : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Dim plot As New Plot_Histogram
     Public Sub New()
@@ -215,7 +215,7 @@ End Class
 
 
 
-Public Class Reduction_BGR : Inherits VB_Algorithm
+Public Class Reduction_BGR : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Dim mats As New Mat_4Click
     Public Sub New()

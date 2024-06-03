@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports  System.IO
-Public Class LaneFinder_Basics : Inherits VB_Algorithm
+Public Class LaneFinder_Basics : Inherits VB_Parent
     Dim lane As New LaneFinder_SlopeIntercept
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
@@ -21,7 +21,7 @@ End Class
 
 
 ' https://github.com/mohamedameen93/Lane-lines-detection-using-Python-and-OpenCV
-Public Class LaneFinder_Videos : Inherits VB_Algorithm
+Public Class LaneFinder_Videos : Inherits VB_Parent
     Public video As New Video_Basics
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
@@ -52,7 +52,7 @@ End Class
 
 
 ' https://github.com/mohamedameen93/Lane-lines-detection-using-Python-and-OpenCV
-Public Class LaneFinder_Edges : Inherits VB_Algorithm
+Public Class LaneFinder_Edges : Inherits VB_Parent
     Dim input As New LaneFinder_Videos
     Dim edges As New Edge_All
     Public Sub New()
@@ -74,7 +74,7 @@ End Class
 
 
 ' https://github.com/mohamedameen93/Lane-lines-detection-using-Python-and-OpenCV
-Public Class LaneFinder_HLSColor : Inherits VB_Algorithm
+Public Class LaneFinder_HLSColor : Inherits VB_Parent
     Public input As New LaneFinder_Videos
     Public Sub New()
         labels = {"HLS color conversion", "InRange White", "InRange Yellow", "Combined InRange White and InRange Yellow results"}
@@ -97,7 +97,7 @@ End Class
 
 
 ' https://github.com/mohamedameen93/Lane-lines-detection-using-Python-and-OpenCV
-Public Class LaneFinder_ROI : Inherits VB_Algorithm
+Public Class LaneFinder_ROI : Inherits VB_Parent
     Dim hls As New LaneFinder_HLSColor
     Public Sub New()
         labels = {"Original input", "Mask showing ROI", "HLS version with ROI outline", "HLS Mask with ROI outline"}
@@ -138,7 +138,7 @@ End Class
 
 
 
-Public Class LaneFinder_SlopeIntercept : Inherits VB_Algorithm
+Public Class LaneFinder_SlopeIntercept : Inherits VB_Parent
     Dim hough As New Hough_LaneFinder
     Public leftLaneIntercept As Single
     Public rightLaneIntercept As Single

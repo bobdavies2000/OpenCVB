@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/3.2.0/samples/gpu/super_resolution.cpp
-Public Class SuperRes_Basics : Inherits VB_Algorithm
+Public Class SuperRes_Basics : Inherits VB_Parent
     Dim video As New SuperRes_Input
     Dim options As New Options_SuperRes
     Public Sub New()
@@ -62,7 +62,7 @@ End Class
 
 
 'https://github.com/opencv/opencv/blob/3.2.0/samples/gpu/super_resolution.cpp
-Public Class SuperRes_Input : Inherits VB_Algorithm
+Public Class SuperRes_Input : Inherits VB_Parent
     Public video As New Video_Basics
     Public inputFileName As String
     Public Sub New()
@@ -85,7 +85,7 @@ End Class
 
 
 
-Public Class SuperRes_SubPixelZoom : Inherits VB_Algorithm
+Public Class SuperRes_SubPixelZoom : Inherits VB_Parent
     Dim zoom As New Pixel_SubPixel
     Dim video As New SuperRes_Input
     Public Sub New()

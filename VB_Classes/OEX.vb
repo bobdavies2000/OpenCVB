@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Imports System.IO
 ' all examples in this file are from https://github.com/opencv/opencv/tree/4.x/samples
-Public Class OEX_CalcBackProject_Demo1 : Inherits VB_Algorithm
+Public Class OEX_CalcBackProject_Demo1 : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public classCount As Integer
     Public Sub New()
@@ -46,7 +46,7 @@ End Class
 
 
 
-Public Class OEX_CalcBackProject_Demo2 : Inherits VB_Algorithm
+Public Class OEX_CalcBackProject_Demo2 : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public classCount As Integer = 10 ' initial value is just a guess.  It is refined after the first pass.
     Public Sub New()
@@ -90,7 +90,7 @@ End Class
 
 
 
-Public Class OEX_bgfg_segm : Inherits VB_Algorithm
+Public Class OEX_bgfg_segm : Inherits VB_Parent
     Dim bgSub As New BGSubtract_Basics
     Public Sub New()
         desc = "OpenCV example bgfg_segm - existing BGSubtract_Basics is the same."
@@ -108,7 +108,7 @@ End Class
 
 
 
-Public Class OEX_bgSub : Inherits VB_Algorithm
+Public Class OEX_bgSub : Inherits VB_Parent
     Dim pBackSub As cv.BackgroundSubtractor
     Dim options As New Options_BGSubtract
     Public Sub New()
@@ -139,7 +139,7 @@ End Class
 
 
 
-Public Class OEX_BasicLinearTransforms : Inherits VB_Algorithm
+Public Class OEX_BasicLinearTransforms : Inherits VB_Parent
     Dim options As New Options_BrightnessContrast
     Public Sub New()
         findSlider("Alpha (contrast)").Value = 2
@@ -159,7 +159,7 @@ End Class
 
 
 
-Public Class OEX_BasicLinearTransformsTrackBar : Inherits VB_Algorithm
+Public Class OEX_BasicLinearTransformsTrackBar : Inherits VB_Parent
     Dim options As New Options_BrightnessContrast
     Public Sub New()
         findSlider("Alpha (contrast)").Value = 2
@@ -190,7 +190,7 @@ End Class
 
 
 
-Public Class OEX_delaunay2 : Inherits VB_Algorithm
+Public Class OEX_delaunay2 : Inherits VB_Parent
     Dim active_facet_color As New cv.Scalar(0, 0, 255)
     Dim delaunay_color As New cv.Scalar(255, 255, 255)
     Dim points As New List(Of cv.Point2f)
@@ -275,7 +275,7 @@ End Class
 
 
 
-Public Class OEX_MeanShift : Inherits VB_Algorithm
+Public Class OEX_MeanShift : Inherits VB_Parent
     Dim term_crit As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
     Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180)}
     Public histogram As New cv.Mat
@@ -309,7 +309,7 @@ End Class
 
 
 
-Public Class OEX_PointPolygonTest_demo : Inherits VB_Algorithm
+Public Class OEX_PointPolygonTest_demo : Inherits VB_Parent
     Dim pointPoly As New PointPolygonTest_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -342,7 +342,7 @@ End Class
 
 
 
-Public Class OEX_Remap : Inherits VB_Algorithm
+Public Class OEX_Remap : Inherits VB_Parent
     Dim remap As New Remap_Basics
     Public Sub New()
         desc = "The OpenCV Remap example became the Remap_Basics algorithm."
@@ -358,7 +358,7 @@ End Class
 
 
 
-Public Class OEX_Sobel_Demo : Inherits VB_Algorithm
+Public Class OEX_Sobel_Demo : Inherits VB_Parent
     Dim sobel As New Edge_Sobel
     Public Sub New()
         desc = "OpenCV Example Sobel_Demo became Edge_Sobel algorithm."
@@ -377,7 +377,7 @@ End Class
 
 
 
-Public Class OEX_Threshold : Inherits VB_Algorithm
+Public Class OEX_Threshold : Inherits VB_Parent
     Dim threshold As New Threshold_Basics
     Public Sub New()
         desc = "OpenCV Example Threshold became Threshold_Basics"
@@ -397,7 +397,7 @@ End Class
 
 
 
-Public Class OEX_Threshold_Inrange : Inherits VB_Algorithm
+Public Class OEX_Threshold_Inrange : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Hue low", 0, 180, 90)
@@ -431,7 +431,7 @@ End Class
 
 
 
-Public Class OEX_Points_Classifier : Inherits VB_Algorithm
+Public Class OEX_Points_Classifier : Inherits VB_Parent
     Dim basics As New Classifier_Basics
     Public Sub New()
         desc = "OpenCV Example Points_Classifier became Classifier_Basics"
@@ -450,7 +450,7 @@ End Class
 
 
 
-Public Class OEX_GoodFeaturesToTrackDemo : Inherits VB_Algorithm
+Public Class OEX_GoodFeaturesToTrackDemo : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Public Sub New()
         desc = "OpenCV Example GoodFeaturesToTrackDemo - now Feature_Basics"
@@ -473,7 +473,7 @@ End Class
 
 
 
-Public Class OEX_Core_Reduce : Inherits VB_Algorithm
+Public Class OEX_Core_Reduce : Inherits VB_Parent
     Public Sub New()
         desc = "Use OpenCV's reduce API to create row/col sums, averages, and min/max."
     End Sub
@@ -537,7 +537,7 @@ End Class
 
 
 
-Public Class OEX_Core_Split : Inherits VB_Algorithm
+Public Class OEX_Core_Split : Inherits VB_Parent
     Public Sub New()
         desc = "OpenCV Example Core_Split"
     End Sub
@@ -573,7 +573,7 @@ End Class
 
 
 
-Public Class OEX_Filter2D : Inherits VB_Algorithm
+Public Class OEX_Filter2D : Inherits VB_Parent
     Public Sub New()
         desc = "OpenCV Example Filter2D demo - Use a varying kernel to show the impact."
     End Sub
@@ -593,7 +593,7 @@ End Class
 
 
 
-Public Class OEX_FitEllipse : Inherits VB_Algorithm
+Public Class OEX_FitEllipse : Inherits VB_Parent
     Dim img As cv.Mat
     Dim options As New Options_FitEllipse
     Public Sub New()

@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Resize_Basics : Inherits VB_Algorithm
+Public Class Resize_Basics : Inherits VB_Parent
     Public newSize As cv.Size
     Public options As New Options_Resize
     Public Sub New()
@@ -25,7 +25,7 @@ End Class
 
 
 
-Public Class Resize_Smaller : Inherits VB_Algorithm
+Public Class Resize_Smaller : Inherits VB_Parent
     Public options As New Options_Resize
     Public newSize As cv.Size
     Public Sub New()
@@ -47,7 +47,7 @@ End Class
 
 
 
-Public Class Resize_Preserve : Inherits VB_Algorithm
+Public Class Resize_Preserve : Inherits VB_Parent
     Public options As New Options_Resize
     Public newSize As cv.Size
     Public Sub New()
@@ -78,7 +78,7 @@ End Class
 
 
 
-Public Class Resize_Proportional : Inherits VB_Algorithm
+Public Class Resize_Proportional : Inherits VB_Parent
     Public Sub New()
         desc = "Resize the input but keep the results proportional to the original."
     End Sub

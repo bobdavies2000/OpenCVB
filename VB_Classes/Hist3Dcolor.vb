@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Hist3Dcolor_Basics : Inherits VB_Algorithm
+Public Class Hist3Dcolor_Basics : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public histogram1D As New cv.Mat
     Public classCount As Integer
@@ -40,7 +40,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_UniqueRGBPixels : Inherits VB_Algorithm
+Public Class Hist3Dcolor_UniqueRGBPixels : Inherits VB_Parent
     Dim hColor As New Hist3Dcolor_Basics
     Public pixels As New List(Of cv.Point3f)
     Public counts As New List(Of Integer)
@@ -75,7 +75,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_TopXColors : Inherits VB_Algorithm
+Public Class Hist3Dcolor_TopXColors : Inherits VB_Parent
     Dim unique As New Hist3Dcolor_UniqueRGBPixels
     Public topXPixels As New List(Of cv.Point3i)
     Public mapTopX As Integer = 16
@@ -108,7 +108,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_Reduction : Inherits VB_Algorithm
+Public Class Hist3Dcolor_Reduction : Inherits VB_Parent
     Dim hColor As New Hist3Dcolor_Basics
     Dim reduction As New Reduction_BGR
     Public classCount As Integer
@@ -135,7 +135,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_ZeroGroups : Inherits VB_Algorithm
+Public Class Hist3Dcolor_ZeroGroups : Inherits VB_Parent
     Public maskInput As New cv.Mat
     Public classCount As Integer
     Public histogram As New cv.Mat
@@ -192,7 +192,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_PlotHist1D : Inherits VB_Algorithm
+Public Class Hist3Dcolor_PlotHist1D : Inherits VB_Parent
     Dim hColor As New Hist3Dcolor_Basics
     Dim plot As New Plot_Histogram
     Public histogram1D As cv.Mat
@@ -219,7 +219,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_Select : Inherits VB_Algorithm
+Public Class Hist3Dcolor_Select : Inherits VB_Parent
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         labels(3) = "The highlighted pixels are in the selected bin"
@@ -248,7 +248,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_Basics_CPP : Inherits VB_Algorithm
+Public Class Hist3Dcolor_Basics_CPP : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public prepareImage As Boolean = True
     Public histogram1D As New cv.Mat
@@ -293,7 +293,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_Diff : Inherits VB_Algorithm
+Public Class Hist3Dcolor_Diff : Inherits VB_Parent
     Dim hColor As New Hist3Dcolor_Basics
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -319,7 +319,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_Vector : Inherits VB_Algorithm
+Public Class Hist3Dcolor_Vector : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public inputMask As New cv.Mat
     Public histArray() As Single

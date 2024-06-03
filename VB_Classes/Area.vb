@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Windows.Media.Media3D
 
-Public Class Area_MinTriangle_CPP : Inherits VB_Algorithm
+Public Class Area_MinTriangle_CPP : Inherits VB_Parent
     Public triangle As cv.Mat
     Public options As New Options_MinArea
     Public srcPoints As List(Of cv.Point2f)
@@ -48,7 +48,7 @@ End Class
 
 
 
-Public Class Area_MinMotionRect : Inherits VB_Algorithm
+Public Class Area_MinMotionRect : Inherits VB_Parent
     Dim bgSub As New BGSubtract_Basics
     Public Sub New()
         findSlider("MOG Learn Rate X1000").Value = 100 ' low threshold to maximize motion
@@ -82,7 +82,7 @@ End Class
 
 
 
-Public Class Area_FindNonZero : Inherits VB_Algorithm
+Public Class Area_FindNonZero : Inherits VB_Parent
     Public nonZero As cv.Mat
     Public Sub New()
         labels(2) = "Coordinates of non-zero points"
@@ -124,7 +124,7 @@ End Class
 
 
 
-Public Class Area_SoloPoints : Inherits VB_Algorithm
+Public Class Area_SoloPoints : Inherits VB_Parent
     Dim hotTop As New BackProject_SoloTop
     Dim hotSide As New BackProject_SoloSide
     Dim nZero As New Area_FindNonZero
@@ -154,7 +154,7 @@ End Class
 
 
 
-Public Class Area_MinRect : Inherits VB_Algorithm
+Public Class Area_MinRect : Inherits VB_Parent
     Public minRect As cv.RotatedRect
     Dim options As New Options_MinArea
     Public inputPoints As New List(Of cv.Point2f)

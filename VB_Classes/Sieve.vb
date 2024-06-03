@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Numerics
-Public Class Sieve_Basics : Inherits VB_Algorithm
+Public Class Sieve_Basics : Inherits VB_Parent
     Dim printer As New Sieve_BasicsVB
     Dim sieve As New CS_Classes.Sieve
     Public Sub New()
@@ -19,7 +19,7 @@ End Class
 
 
 ' https://github.com/TheAlgorithms/C-Sharp/blob/master/Algorithms/Other/SieveOfEratosthenes.cs'
-Public Class Sieve_BasicsVB : Inherits VB_Algorithm
+Public Class Sieve_BasicsVB : Inherits VB_Parent
     Public primes As New List(Of Integer)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Count of desired primes", 1, 10000, 400)
@@ -64,7 +64,7 @@ End Class
 
 
 
-Public Class Sieve_Image : Inherits VB_Algorithm
+Public Class Sieve_Image : Inherits VB_Parent
     Dim zoom As New Pixel_Zoom
     Dim numArray() As Byte
     Dim referenceResults = New Dictionary(Of Integer, Integer) From

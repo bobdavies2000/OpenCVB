@@ -167,7 +167,7 @@
 
 
 ' https://blog.krybot.com/a?ID=01350-140eb99b-7a39-4436-b4b9-c60b059480c8
-Public Class LDA_Test : Inherits VB_Algorithm
+Public Class LDA_Test : Inherits VB_Parent
     Public Sub New()
         labels = {"", "", "", ""}
         desc = "Linear Discriminant Analysis test"

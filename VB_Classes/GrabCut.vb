@@ -1,7 +1,7 @@
 Imports System.IO
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.3.1/de/dd0/grabcut_8cpp-example.html
-Public Class GrabCut_Basics : Inherits VB_Algorithm
+Public Class GrabCut_Basics : Inherits VB_Parent
     Public fgFineTune As cv.Mat
     Public bgFineTune As cv.Mat
     Public fore As New Foreground_Basics
@@ -43,7 +43,7 @@ End Class
 
 
 
-Public Class GrabCut_FineTune : Inherits VB_Algorithm
+Public Class GrabCut_FineTune : Inherits VB_Parent
     Dim basics As New GrabCut_Basics
     Dim mats As New Mat_4to1
     Public Sub New()
@@ -101,7 +101,7 @@ End Class
 
 
 
-Public Class GrabCut_ImageRect : Inherits VB_Algorithm
+Public Class GrabCut_ImageRect : Inherits VB_Parent
     Dim image As cv.Mat
     Public Sub New()
         Dim fileInputName = New FileInfo(task.homeDir + "data/cat.jpg")
@@ -144,7 +144,7 @@ End Class
 
 
 
-Public Class GrabCut_ImageMask : Inherits VB_Algorithm
+Public Class GrabCut_ImageMask : Inherits VB_Parent
     Dim image As cv.Mat
     Public Sub New()
         Dim fileInputName = New FileInfo(task.homeDir + "data/cat.jpg")

@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Transform_Resize : Inherits VB_Algorithm
+Public Class Transform_Resize : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Resize Percent", 50, 1000, 50)
         desc = "Resize an image based on the slider value."
@@ -26,7 +26,7 @@ End Class
 
 
 
-Public Class Transform_Affine3D : Inherits VB_Algorithm
+Public Class Transform_Affine3D : Inherits VB_Parent
     Public Sub New()
         If check.Setup(traceName) Then
             check.addCheckBox("Check to snap the first point cloud")
@@ -93,7 +93,7 @@ End Class
 
 
 
-Public Class Transform_Rotate : Inherits VB_Algorithm
+Public Class Transform_Rotate : Inherits VB_Parent
     Public imageCenter As cv.Point2f
     Public angleSlider As Windows.Forms.TrackBar
     Public scaleSlider As Windows.Forms.TrackBar

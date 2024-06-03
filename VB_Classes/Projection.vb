@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Projection_Basics : Inherits VB_Algorithm
+Public Class Projection_Basics : Inherits VB_Parent
     Public redCellInput As New List(Of rcData)
     Public redCells As New List(Of rcData)
     Public viewType As String = "Top"
@@ -98,7 +98,7 @@ End Class
 
 
 
-Public Class Projection_HistSide : Inherits VB_Algorithm
+Public Class Projection_HistSide : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public Sub New()
         labels = {"", "", "Top view with histogram counts", "ZY (Side View) - mask"}
@@ -120,7 +120,7 @@ End Class
 
 
 
-Public Class Projection_HistTop : Inherits VB_Algorithm
+Public Class Projection_HistTop : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public Sub New()
         labels = {"", "", "Top view with histogram counts", "XZ (Top View) - mask"}
@@ -144,7 +144,7 @@ End Class
 
 
 
-Public Class Projection_Lines : Inherits VB_Algorithm
+Public Class Projection_Lines : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Dim lines As New Line_Basics
     Public Sub New()
@@ -179,7 +179,7 @@ End Class
 
 
 
-Public Class Projection_Cell : Inherits VB_Algorithm
+Public Class Projection_Cell : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Dim heatCell As New HeatMap_Basics
     Dim redC As New RedCloud_Basics
@@ -220,7 +220,7 @@ End Class
 
 
 
-Public Class Projection_Top : Inherits VB_Algorithm
+Public Class Projection_Top : Inherits VB_Parent
     Public histTop As New Projection_HistTop
     Dim redC As New RedCloud_Basics
     Public objects As New Projection_Basics
@@ -252,7 +252,7 @@ End Class
 
 
 
-Public Class Projection_Side : Inherits VB_Algorithm
+Public Class Projection_Side : Inherits VB_Parent
     Public histSide As New Projection_HistSide
     Dim redC As New RedCloud_Basics
     Public objects As New Projection_Basics
@@ -284,7 +284,7 @@ End Class
 
 
 
-Public Class Projection_ObjectIsolate : Inherits VB_Algorithm
+Public Class Projection_ObjectIsolate : Inherits VB_Parent
     Public top As New Projection_Top
     Public side As New Projection_Side
     Public Sub New()
@@ -323,7 +323,7 @@ End Class
 
 
 
-Public Class Projection_Object : Inherits VB_Algorithm
+Public Class Projection_Object : Inherits VB_Parent
     Dim top As New Projection_Top
     Dim side As New Projection_Side
     Public Sub New()
@@ -363,7 +363,7 @@ End Class
 
 
 
-Public Class Projection_Floor : Inherits VB_Algorithm
+Public Class Projection_Floor : Inherits VB_Parent
     Dim isolate As New Projection_ObjectIsolate
     Public Sub New()
         desc = "Isolate just the floor."

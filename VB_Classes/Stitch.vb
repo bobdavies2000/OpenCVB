@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp/blob/master/test/OpenCvSharp.Tests/stitching/StitchingTest.cs
-Public Class Stitch_Basics : Inherits VB_Algorithm
+Public Class Stitch_Basics : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Number of random images", 10, 50, 10)

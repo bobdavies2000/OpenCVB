@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Delaunay_Basics : Inherits VB_Algorithm
+Public Class Delaunay_Basics : Inherits VB_Parent
     Public inputPoints As New List(Of cv.Point2f)
     Public facetList As New List(Of List(Of cv.Point))
     Public facet32s As cv.Mat
@@ -45,7 +45,7 @@ End Class
 
 
 ' https://github.com/npinto/opencv/blob/master/samples/c/delaunay.c
-Public Class Delaunay_SubDiv : Inherits VB_Algorithm
+Public Class Delaunay_SubDiv : Inherits VB_Parent
     Dim random As New Random_Basics
     Public Sub New()
         random.options.countSlider.Value = 100
@@ -97,7 +97,7 @@ End Class
 
 
 ' https://github.com/shimat/opencvsharp/wiki/Subdiv2D
-Public Class Delaunay_Subdiv2D : Inherits VB_Algorithm
+Public Class Delaunay_Subdiv2D : Inherits VB_Parent
     Public Sub New()
         labels(3) = "Voronoi facets for the same subdiv2D"
         desc = "Generate random points and divide the image around those points."
@@ -149,7 +149,7 @@ End Class
 
 
 
-Public Class Delaunay_GenerationsNoKNN : Inherits VB_Algorithm
+Public Class Delaunay_GenerationsNoKNN : Inherits VB_Parent
     Public inputPoints As New List(Of cv.Point2f)
     Public facet As New Delaunay_Basics
     Public Sub New()
@@ -201,7 +201,7 @@ End Class
 
 
 
-Public Class Delaunay_Generations : Inherits VB_Algorithm
+Public Class Delaunay_Generations : Inherits VB_Parent
     Public inputPoints As New List(Of cv.Point2f)
     Public facet As New Delaunay_Basics
     Dim knn As New KNN_Basics
@@ -253,7 +253,7 @@ End Class
 
 
 
-Public Class Delaunay_ConsistentColor : Inherits VB_Algorithm
+Public Class Delaunay_ConsistentColor : Inherits VB_Parent
     Public inputPoints As New List(Of cv.Point2f)
     Public facetList As New List(Of List(Of cv.Point))
     Public facet32s As cv.Mat
@@ -304,7 +304,7 @@ End Class
 
 
 
-Public Class Delaunay_Contours : Inherits VB_Algorithm
+Public Class Delaunay_Contours : Inherits VB_Parent
     Public inputPoints As New List(Of cv.Point2f)
     Dim randEnum As New Random_Enumerable
     Dim subdiv As New cv.Subdiv2D

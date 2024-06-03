@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 
 
 ' https://docs.opencv.org/master/df/d3d/tutorial_py_inpainting.html#gsc.tab=0
-Public Class InPaint_Basics : Inherits VB_Algorithm
+Public Class InPaint_Basics : Inherits VB_Parent
     Dim options As New Options_InPaint
     Public Sub New()
         desc = "Create a flaw in an image and then use inPaint to mask it."
@@ -30,7 +30,7 @@ End Class
 
 
 
-Public Class InPaint_Noise : Inherits VB_Algorithm
+Public Class InPaint_Noise : Inherits VB_Parent
     Dim noise as New Draw_Noise
     Dim options As New Options_InPaint
     Public Sub New()
@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class InPaint_Depth : Inherits VB_Algorithm
+Public Class InPaint_Depth : Inherits VB_Parent
     Dim options As New Options_InPaint
     Public Sub New()
         labels(2) = "32-bit representation of original depth"

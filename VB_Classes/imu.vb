@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
-Public Class IMU_Basics : Inherits VB_Algorithm
+Public Class IMU_Basics : Inherits VB_Parent
     Dim lastTimeStamp As Double
     Public Sub New()
         desc = "Read and display the IMU coordinates"
@@ -61,7 +61,7 @@ End Class
 
 
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
-Public Class IMU_BasicsKalman : Inherits VB_Algorithm
+Public Class IMU_BasicsKalman : Inherits VB_Parent
     Dim lastTimeStamp As Double
     Dim kalman As New Kalman_Basics
     Public Sub New()
@@ -112,7 +112,7 @@ End Class
 
 
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
-Public Class IMU_BasicsWithOptions : Inherits VB_Algorithm
+Public Class IMU_BasicsWithOptions : Inherits VB_Parent
     Dim lastTimeStamp As Double
     Dim options As New Options_IMU
     Public Sub New()
@@ -171,7 +171,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/1247960/3D-graphics-engine-with-basic-math-on-CPU
-Public Class IMU_GMatrix : Inherits VB_Algorithm
+Public Class IMU_GMatrix : Inherits VB_Parent
     Public cx As Single = 1, sx As Single = 0, cy As Single = 1, sy As Single = 0, cz As Single = 1, sz As Single = 0
     Public gMatrix As cv.Mat
     Public Sub New()
@@ -234,7 +234,7 @@ End Class
 
 
 
-Public Class IMU_Stabilize : Inherits VB_Algorithm
+Public Class IMU_Stabilize : Inherits VB_Parent
     Dim kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(3 - 1)
@@ -279,7 +279,7 @@ End Class
 
 
 
-Public Class IMU_PlotIMUFrameTime : Inherits VB_Algorithm
+Public Class IMU_PlotIMUFrameTime : Inherits VB_Parent
     Public plot As New Plot_OverTime
     Public CPUInterval As Double
     Public IMUtoCaptureEstimate As Double
@@ -369,7 +369,7 @@ End Class
 
 
 
-Public Class IMU_PlotTotalDelay : Inherits VB_Algorithm
+Public Class IMU_PlotTotalDelay : Inherits VB_Parent
     ReadOnly host As New IMU_PlotHostFrameTimes
     ReadOnly imu As New IMU_PlotIMUFrameTime
     ReadOnly plot As New Plot_OverTime
@@ -438,7 +438,7 @@ End Class
 
 
 
-Public Class IMU_VerticalAngles : Inherits VB_Algorithm
+Public Class IMU_VerticalAngles : Inherits VB_Parent
     ReadOnly vert As New Line_GCloud
     Public Sub New()
         labels = {"", "", "Highlighted vertical lines", "Line details"}
@@ -473,7 +473,7 @@ End Class
 
 
 
-Public Class IMU_PlotGravityAngles : Inherits VB_Algorithm
+Public Class IMU_PlotGravityAngles : Inherits VB_Parent
     ReadOnly plot As New Plot_OverTimeScalar
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -500,7 +500,7 @@ End Class
 
 
 
-Public Class IMU_PlotAngularVelocity : Inherits VB_Algorithm
+Public Class IMU_PlotAngularVelocity : Inherits VB_Parent
     ReadOnly plot As New Plot_OverTimeScalar
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -527,7 +527,7 @@ End Class
 
 
 
-Public Class IMU_VerticalVerify : Inherits VB_Algorithm
+Public Class IMU_VerticalVerify : Inherits VB_Parent
     Public gCells As New List(Of gravityLine)
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -589,7 +589,7 @@ End Class
 
 
 
-Public Class IMU_Lines : Inherits VB_Algorithm
+Public Class IMU_Lines : Inherits VB_Parent
     ReadOnly vert As New Line_GCloud
     ReadOnly kalman As New Kalman_Basics
     Public Sub New()
@@ -641,7 +641,7 @@ End Class
 
 
 
-Public Class IMU_PlotAcceleration : Inherits VB_Algorithm
+Public Class IMU_PlotAcceleration : Inherits VB_Parent
     ReadOnly plot As New Plot_OverTimeScalar
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -666,7 +666,7 @@ End Class
 
 
 
-Public Class IMU_Average : Inherits VB_Algorithm
+Public Class IMU_Average : Inherits VB_Parent
     Public Sub New()
         desc = "Average the IMU Acceleration values over the previous X images."
     End Sub
@@ -689,7 +689,7 @@ End Class
 
 
 
-Public Class IMU_PlotCompareIMU : Inherits VB_Algorithm
+Public Class IMU_PlotCompareIMU : Inherits VB_Parent
     ReadOnly plot(3 - 1) As Plot_OverTimeScalar
     ReadOnly imuAll As New IMU_AllMethods
     Public Sub New()
@@ -736,7 +736,7 @@ End Class
 
 
 
-Public Class IMU_Kalman : Inherits VB_Algorithm
+Public Class IMU_Kalman : Inherits VB_Parent
     ReadOnly kalman As New Kalman_Basics
     Public Sub New()
         desc = "Use Kalman Filter to stabilize the IMU acceleration and velocity"
@@ -765,7 +765,7 @@ End Class
 
 
 
-Public Class IMU_AllMethods : Inherits VB_Algorithm
+Public Class IMU_AllMethods : Inherits VB_Parent
     Dim basics As New IMU_Basics
     ReadOnly imuAvg As New IMU_Average
     Dim kalman As New IMU_Kalman
@@ -789,7 +789,7 @@ End Class
 
 
 
-Public Class IMU_Plot : Inherits VB_Algorithm
+Public Class IMU_Plot : Inherits VB_Parent
     Dim plot As New Plot_OverTimeScalar
     Public blueA As Single, greenA As Single, redA As Single
     Public Sub New()
@@ -836,7 +836,7 @@ End Class
 
 
 
-Public Class IMU_VelocityPlot : Inherits VB_Algorithm
+Public Class IMU_VelocityPlot : Inherits VB_Parent
     Dim plot As New IMU_Plot
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -871,7 +871,7 @@ End Class
 
 
 
-Public Class IMU_IscameraStable : Inherits VB_Algorithm
+Public Class IMU_IscameraStable : Inherits VB_Parent
     Dim plot As New IMU_Plot
     Dim options As New Options_IMU
     Public Sub New()
@@ -896,7 +896,7 @@ End Class
 
 
 
-Public Class IMU_PlotHostFrameTimes : Inherits VB_Algorithm
+Public Class IMU_PlotHostFrameTimes : Inherits VB_Parent
     Public plot As New Plot_OverTime
     Public CPUInterval As Double
     Public HostInterruptDelayEstimate As Double
@@ -978,7 +978,7 @@ End Class
 
 
 
-Public Class IMU_PlotHostFrameScalar : Inherits VB_Algorithm
+Public Class IMU_PlotHostFrameScalar : Inherits VB_Parent
     Public plot As New Plot_OverTimeScalar
     Public CPUInterval As Double
     Public HostInterruptDelayEstimate As Double
@@ -1031,7 +1031,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/1247960/3D-graphics-engine-with-basic-math-on-CPU
-Public Class IMU_GMatrixWithOptions : Inherits VB_Algorithm
+Public Class IMU_GMatrixWithOptions : Inherits VB_Parent
     Public cx As Single = 1, sx As Single = 0, cy As Single = 1, sy As Single = 0, cz As Single = 1, sz As Single = 0
     Public gMatrix As cv.Mat
     Public Sub New()

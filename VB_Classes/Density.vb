@@ -1,6 +1,6 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class Density_Basics : Inherits VB_Algorithm
+Public Class Density_Basics : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Distance in meters X10000", 1, 2000, task.densityMetric)
         cPtr = Density_2D_Open()
@@ -30,7 +30,7 @@ End Class
 
 
 
-Public Class Density_Phase : Inherits VB_Algorithm
+Public Class Density_Phase : Inherits VB_Parent
     Dim dense As New Density_Basics
     Dim gradient As New Gradient_Depth
     Public Sub New()
@@ -51,7 +51,7 @@ End Class
 
 
 
-Public Class Density_Count_CPP : Inherits VB_Algorithm
+Public Class Density_Count_CPP : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Neighboring Z count", 0, 8, 3)
         cPtr = Density_Count_Open()
@@ -82,7 +82,7 @@ End Class
 
 
 
-Public Class Density_Mask : Inherits VB_Algorithm
+Public Class Density_Mask : Inherits VB_Parent
     Public pointList As New List(Of cv.Point)
     Public Sub New()
         desc = "Measure a mask's size in any image and track the biggest regions."

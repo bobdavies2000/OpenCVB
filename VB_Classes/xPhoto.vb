@@ -3,7 +3,7 @@ Imports OpenCvSharp.XPhoto
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
 
-Public Class XPhoto_Bm3dDenoise : Inherits VB_Algorithm
+Public Class XPhoto_Bm3dDenoise : Inherits VB_Parent
     Public Sub New()
         desc = "Denoise image with block matching and filtering."
         labels(2) = "Bm3dDenoising"
@@ -24,7 +24,7 @@ End Class
 
 
 
-Public Class XPhoto_Bm3dDenoiseDepthImage : Inherits VB_Algorithm
+Public Class XPhoto_Bm3dDenoiseDepthImage : Inherits VB_Parent
     Public Sub New()
         desc = "Denoise the depth image with block matching and filtering."
         labels(3) = "Difference from Input"
@@ -48,7 +48,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/xphoto/samples/oil.cpp
-Public Class XPhoto_OilPaint_CPP : Inherits VB_Algorithm
+Public Class XPhoto_OilPaint_CPP : Inherits VB_Parent
     ReadOnly options As New Options_XPhoto
     Public Sub New()
         cPtr = xPhoto_OilPaint_Open()
@@ -77,7 +77,7 @@ End Class
 
 
 
-Public Class XPhoto_Inpaint : Inherits VB_Algorithm
+Public Class XPhoto_Inpaint : Inherits VB_Parent
     Public basics As New InPaint_Basics
     Public Sub New()
         If radio.Setup(traceName) Then
@@ -109,7 +109,7 @@ End Class
 
 
 
-Public Class XPhoto_Inpaint_CPP : Inherits VB_Algorithm
+Public Class XPhoto_Inpaint_CPP : Inherits VB_Parent
     ReadOnly inpVB As New XPhoto_Inpaint
     Public Sub New()
         cPtr = xPhoto_Inpaint_Open()

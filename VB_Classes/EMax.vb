@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/3.0-beta/modules/ml/doc/expectation_maximization.html
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
-Public Class EMax_Basics : Inherits VB_Algorithm
+Public Class EMax_Basics : Inherits VB_Parent
     Public emaxInput As New EMax_InputClusters
     ' algorithms using this must provide the following items.
     Public eLabels As New List(Of Integer)
@@ -77,7 +77,7 @@ End Class
 
 
 
-Public Class EMax_Centers : Inherits VB_Algorithm
+Public Class EMax_Centers : Inherits VB_Parent
     Dim emax As New EMax_Basics
     Public Sub New()
         labels(2) = "Centers are highlighted, Previous centers are black"
@@ -101,7 +101,7 @@ End Class
 
 
 
-Public Class EMax_InputClusters : Inherits VB_Algorithm
+Public Class EMax_InputClusters : Inherits VB_Parent
     Public regionCount As Integer
     Public eLabels() As Integer
     Public eSamples As New List(Of cv.Point2f)
@@ -169,7 +169,7 @@ End Class
 
 ' https://docs.opencv.org/3.0-beta/modules/ml/doc/expectation_maximization.html
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
-Public Class EMax_VB_Failing : Inherits VB_Algorithm
+Public Class EMax_VB_Failing : Inherits VB_Parent
     Public emaxInput As New EMax_InputClusters
     Public eLabels As New List(Of Integer)
     Public eSamples As New List(Of cv.Point2f)
@@ -219,7 +219,7 @@ End Class
 
 
 
-Public Class EMax_PointTracker : Inherits VB_Algorithm
+Public Class EMax_PointTracker : Inherits VB_Parent
     Dim knn As New KNN_Core
     Dim emax As New EMax_Basics
     Public Sub New()
@@ -257,7 +257,7 @@ End Class
 
 
 
-Public Class EMax_RandomClusters : Inherits VB_Algorithm
+Public Class EMax_RandomClusters : Inherits VB_Parent
     Dim clusters As New Random_Clusters
     Dim emax As New EMax_Basics
     Public Sub New()

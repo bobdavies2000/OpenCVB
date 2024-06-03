@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 ' https://github.com/vnglst/pong-wars
 ' https://twitter.com/nicolasdnl/status/1749715070928433161
-Public Class PongWars_Basics : Inherits VB_Algorithm
+Public Class PongWars_Basics : Inherits VB_Parent
     Dim sqWidth As Integer = 25
     Dim sqHeight As Integer = 25 * task.workingRes.Height / task.workingRes.Width
     Dim numSquaresX As Integer = task.workingRes.Width / sqWidth
@@ -119,7 +119,7 @@ End Class
 
 
 
-Public Class PongWars_Two : Inherits VB_Algorithm
+Public Class PongWars_Two : Inherits VB_Parent
     Dim pong1 As New PongWars_Basics
     Dim pong2 As New PongWars_Basics
     Public Sub New()

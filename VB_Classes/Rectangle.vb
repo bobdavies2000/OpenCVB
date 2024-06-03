@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Rectangle_Basics : Inherits VB_Algorithm
+Public Class Rectangle_Basics : Inherits VB_Parent
     Public rectangles As New List(Of cv.Rect)
     Public rotatedRectangles As New List(Of cv.RotatedRect)
     Dim options As New Options_Draw
@@ -37,7 +37,7 @@ End Class
 
 
 
-Public Class Rectangle_Rotated : Inherits VB_Algorithm
+Public Class Rectangle_Rotated : Inherits VB_Parent
     Public rectangle As New Rectangle_Basics
     Public Sub New()
         findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)").Checked = True
@@ -56,7 +56,7 @@ End Class
 
 
 
-Public Class Rectangle_Overlap : Inherits VB_Algorithm
+Public Class Rectangle_Overlap : Inherits VB_Parent
     Public rect1 As cv.Rect
     Public rect2 As cv.Rect
     Public enclosingRect As cv.Rect
@@ -107,7 +107,7 @@ End Class
 
 
 
-Public Class Rectangle_Intersection : Inherits VB_Algorithm
+Public Class Rectangle_Intersection : Inherits VB_Parent
     Public inputRects As New List(Of cv.Rect)
     Dim draw As New Rectangle_Basics
     Public enclosingRects As New List(Of cv.Rect)
@@ -186,7 +186,7 @@ End Class
 
 
 
-Public Class Rectangle_Union : Inherits VB_Algorithm
+Public Class Rectangle_Union : Inherits VB_Parent
     Dim draw As New Rectangle_Basics
     Public inputRects As New List(Of cv.Rect)
     Public allRect As cv.Rect ' a rectangle covering all the input
@@ -237,7 +237,7 @@ End Class
 
 
 
-Public Class Rectangle_MultiOverlap : Inherits VB_Algorithm
+Public Class Rectangle_MultiOverlap : Inherits VB_Parent
     Public inputRects As New List(Of cv.Rect)
     Public outputRects As New List(Of cv.Rect)
     Dim draw As New Rectangle_Basics
@@ -297,7 +297,7 @@ End Class
 
 
 
-Public Class Rectangle_EnclosingPoints : Inherits VB_Algorithm
+Public Class Rectangle_EnclosingPoints : Inherits VB_Parent
     Public pointList As New List(Of cv.Point2f)
     Public Sub New()
         desc = "Build an enclosing rectangle for the supplied pointlist"

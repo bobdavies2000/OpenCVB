@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Sort_Basics : Inherits VB_Algorithm
+Public Class Sort_Basics : Inherits VB_Parent
     Dim options As New Options_Sort
     Public Sub New()
         desc = "Sort the pixels of a grayscale image."
@@ -27,7 +27,7 @@ End Class
 
 
 
-Public Class Sort_RectAndMask : Inherits VB_Algorithm
+Public Class Sort_RectAndMask : Inherits VB_Parent
     Dim sort As New Sort_Basics
     Public mask As cv.Mat
     Public rect As cv.Rect
@@ -55,7 +55,7 @@ End Class
 
 
 
-Public Class Sort_MLPrepTest_CPP : Inherits VB_Algorithm
+Public Class Sort_MLPrepTest_CPP : Inherits VB_Parent
     Public reduction As New Reduction_Basics
     Public MLTestData As New cv.Mat
     Public Sub New()
@@ -92,7 +92,7 @@ End Class
 
 
 
-Public Class Sort_1Channel : Inherits VB_Algorithm
+Public Class Sort_1Channel : Inherits VB_Parent
     Dim sort As New Sort_Basics
     Dim dups As New ML_RemoveDups_CPP
     Public rangeStart As New List(Of Integer)
@@ -153,7 +153,7 @@ End Class
 
 
 
-Public Class Sort_3Channel : Inherits VB_Algorithm
+Public Class Sort_3Channel : Inherits VB_Parent
     Dim sort As New Sort_Basics
     Dim dups As New ML_RemoveDups_CPP
     Public Sub New()
@@ -189,7 +189,7 @@ End Class
 
 
 
-Public Class Sort_FeatureLess : Inherits VB_Algorithm
+Public Class Sort_FeatureLess : Inherits VB_Parent
     Public devGrid As New FeatureROI_Basics
     Public sort As New Sort_Basics
     Dim plot As New Plot_Histogram
@@ -225,7 +225,7 @@ End Class
 
 
 
-Public Class Sort_Integer : Inherits VB_Algorithm
+Public Class Sort_Integer : Inherits VB_Parent
     Dim sort As New Sort_Basics
     Public data(dst2.Total - 1) As Integer
     Public vecList As New List(Of Integer)
@@ -261,7 +261,7 @@ End Class
 
 
 
-Public Class Sort_GrayScale1 : Inherits VB_Algorithm
+Public Class Sort_GrayScale1 : Inherits VB_Parent
     Dim sort As New Sort_Integer
     Public Sub New()
         desc = "Sort the grayscale image but keep the 8uc3 pixels with each gray entry."
@@ -301,7 +301,7 @@ End Class
 
 
 
-Public Class Sort_GrayScale : Inherits VB_Algorithm
+Public Class Sort_GrayScale : Inherits VB_Parent
     Dim plot As New Plot_Histogram
     Public Sub New()
         desc = "Sort the grayscale image but keep the 8uc3 pixels with each gray entry."

@@ -1,13 +1,7 @@
 ﻿using OpenCvSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace CS_Classes
 {
-    class AddWeighted_Basics : CS_Algorithm
+    public class AddWeighted_Basics_CS : CS_Parent
     {
         public Mat dst2 = null;
         public bool standalone = true;
@@ -20,7 +14,7 @@ namespace CS_Classes
             this.desc = "Add 2 images with specified weights.";
         }
 
-        void run(Mat src)
+        void RunCS(Mat src)
         {
             srcPlus = this.src2;
             // algorithm user normally provides src2! 

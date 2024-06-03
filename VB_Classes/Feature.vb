@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Feature_Basics : Inherits VB_Algorithm
+Public Class Feature_Basics : Inherits VB_Parent
     Dim matList As New List(Of cv.Mat)
     Dim ptList As New List(Of cv.Point2f)
     Dim knn As New KNN_Core
@@ -93,7 +93,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_BasicsNoFrills : Inherits VB_Algorithm
+Public Class Feature_BasicsNoFrills : Inherits VB_Parent
     Public options As New Options_Features
     Dim gather As New Feature_Gather
     Public Sub New()
@@ -124,7 +124,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_KNN : Inherits VB_Algorithm
+Public Class Feature_KNN : Inherits VB_Parent
     Dim knn As New KNN_Core
     Public featurePoints As New List(Of cv.Point2f)
     Public feat As New Feature_Basics
@@ -165,7 +165,7 @@ End Class
 
 
 
-Public Class Feature_Reduction : Inherits VB_Algorithm
+Public Class Feature_Reduction : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Dim feat As New Feature_Basics
     Public Sub New()
@@ -191,7 +191,7 @@ End Class
 
 
 
-Public Class Feature_MultiPass : Inherits VB_Algorithm
+Public Class Feature_MultiPass : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Public featurePoints As New List(Of cv.Point2f)
     Dim sharpen As New PhotoShop_SharpenDetail
@@ -235,7 +235,7 @@ End Class
 
 
 
-Public Class Feature_PointTracker : Inherits VB_Algorithm
+Public Class Feature_PointTracker : Inherits VB_Parent
     Dim flow As New Font_FlowText
     Public feat As New Feature_Basics
     Dim mPoints As New Match_Points
@@ -289,7 +289,7 @@ End Class
 
 
 
-Public Class Feature_Delaunay : Inherits VB_Algorithm
+Public Class Feature_Delaunay : Inherits VB_Parent
     Dim facet As New Delaunay_Contours
     Dim feat As New Feature_Basics
     Public Sub New()
@@ -321,7 +321,7 @@ End Class
 
 
 
-Public Class Feature_LucasKanade : Inherits VB_Algorithm
+Public Class Feature_LucasKanade : Inherits VB_Parent
     Dim pyr As New FeatureFlow_LucasKanade
     Public ptList As New List(Of cv.Point)
     Public ptLast As New List(Of cv.Point)
@@ -361,7 +361,7 @@ End Class
 
 
 
-Public Class Feature_NearestCell : Inherits VB_Algorithm
+Public Class Feature_NearestCell : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim feat As New FeatureLeftRight_Basics
     Dim knn As New KNN_Core
@@ -402,7 +402,7 @@ End Class
 
 
 
-Public Class Feature_Points : Inherits VB_Algorithm
+Public Class Feature_Points : Inherits VB_Parent
     Public feat As New Feature_Basics
     Public Sub New()
         labels(3) = "Features found in the image"
@@ -426,7 +426,7 @@ End Class
 
 
 
-Public Class Feature_Trace : Inherits VB_Algorithm
+Public Class Feature_Trace : Inherits VB_Parent
     Dim track As New RedTrack_Features
     Public Sub New()
         desc = "Placeholder to help find RedTrack_Features"
@@ -442,7 +442,7 @@ End Class
 
 
 
-Public Class Feature_TraceDelaunay : Inherits VB_Algorithm
+Public Class Feature_TraceDelaunay : Inherits VB_Parent
     Dim features As New Feature_Delaunay
     Public goodList As New List(Of List(Of cv.Point2f)) ' stable points only
     Public Sub New()
@@ -477,7 +477,7 @@ End Class
 
 
 
-Public Class Feature_ShiTomasi : Inherits VB_Algorithm
+Public Class Feature_ShiTomasi : Inherits VB_Parent
     Dim harris As New Corners_HarrisDetector
     Dim shiTomasi As New Corners_ShiTomasi_CPP
     Dim options As New Options_ShiTomasi
@@ -511,7 +511,7 @@ End Class
 
 
 
-Public Class Feature_Generations : Inherits VB_Algorithm
+Public Class Feature_Generations : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Dim features As New List(Of cv.Point)
     Dim gens As New List(Of Integer)
@@ -553,7 +553,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Feature_History : Inherits VB_Algorithm
+Public Class Feature_History : Inherits VB_Parent
     Public features As New List(Of cv.Point)
     Public feat As New Feature_Basics
     Public Sub New()
@@ -612,7 +612,7 @@ End Class
 
 
 
-Public Class Feature_GridPopulation : Inherits VB_Algorithm
+Public Class Feature_GridPopulation : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -645,7 +645,7 @@ End Class
 
 
 
-Public Class Feature_Compare : Inherits VB_Algorithm
+Public Class Feature_Compare : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Dim noFrill As New Feature_BasicsNoFrills
     Public Sub New()
@@ -674,7 +674,7 @@ End Class
 
 
 
-Public Class Feature_Gather : Inherits VB_Algorithm
+Public Class Feature_Gather : Inherits VB_Parent
     Dim harris As New Corners_HarrisDetector
     Dim FAST As New Corners_Basics
     Dim myOptions As New Options_FeatureGather

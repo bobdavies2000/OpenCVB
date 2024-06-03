@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class FrameRate_Basics : Inherits VB_Algorithm
+Public Class FrameRate_Basics : Inherits VB_Parent
     Dim mats As New Mat_4to1
     Dim frameCounts(4 - 1) As Integer
     Public Sub New()
@@ -35,7 +35,7 @@ End Class
 
 
 
-Public Class FrameRate_BasicsGray : Inherits VB_Algorithm
+Public Class FrameRate_BasicsGray : Inherits VB_Parent
     Dim mats As New Mat_4to1
     Dim frameCounts(4 - 1) As Integer
     Public Sub New()

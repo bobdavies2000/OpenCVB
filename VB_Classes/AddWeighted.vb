@@ -1,6 +1,6 @@
 Imports CS_Classes
 Imports cv = OpenCvSharp
-Public Class AddWeighted_Basics : Inherits VB_Algorithm
+Public Class AddWeighted_Basics : Inherits VB_Parent
     Public src2 As cv.Mat
     Public options As New Options_AddWeighted
     Public Sub New()
@@ -31,7 +31,7 @@ End Class
 
 
 
-Public Class AddWeighted_Edges : Inherits VB_Algorithm
+Public Class AddWeighted_Edges : Inherits VB_Parent
     Dim edges As New Edge_All
     Dim addw As New AddWeighted_Basics
     Public Sub New()
@@ -56,7 +56,7 @@ End Class
 
 
 
-Public Class AddWeighted_ImageAccumulate : Inherits VB_Algorithm
+Public Class AddWeighted_ImageAccumulate : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Accumulation weight of each image X100", 1, 100, 10)
         desc = "Update a running average of the image"
@@ -74,7 +74,7 @@ End Class
 
 
 
-Public Class AddWeighted_InfraRed : Inherits VB_Algorithm
+Public Class AddWeighted_InfraRed : Inherits VB_Parent
     Dim addw As New AddWeighted_Basics
     Dim src2 As New cv.Mat
     Public Sub New()

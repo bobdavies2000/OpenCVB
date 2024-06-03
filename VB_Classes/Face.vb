@@ -13,7 +13,7 @@ End Module
 
 
 ' https://docs.opencv.org/2.4/doc/tutorials/objdetect/cascade_classifier/cascade_classifier.html
-Public Class Face_Haar_LBP : Inherits VB_Algorithm
+Public Class Face_Haar_LBP : Inherits VB_Parent
     Dim haarCascade As cv.CascadeClassifier
     Dim lbpCascade As cv.CascadeClassifier
     Public Sub New()
@@ -35,7 +35,7 @@ End Class
 
 
 
-Public Class Face_Haar_Alt : Inherits VB_Algorithm
+Public Class Face_Haar_Alt : Inherits VB_Parent
     Dim haarCascade As cv.CascadeClassifier
     Public Sub New()
         haarCascade = New cv.CascadeClassifier(task.homeDir + "Data/haarcascade_frontalface_alt.xml")

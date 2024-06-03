@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports cv = OpenCvSharp
-Public Class Motion_Basics : Inherits VB_Algorithm
+Public Class Motion_Basics : Inherits VB_Parent
     Public bgSub As New BGSubtract_MOG2
     Dim motion As New Motion_Basics_QT
     Public Sub New()
@@ -20,7 +20,7 @@ End Class
 
 
 
-Public Class Motion_BasicsNew : Inherits VB_Algorithm
+Public Class Motion_BasicsNew : Inherits VB_Parent
     Public bgSub As New BGSubtract_MOG2
     Dim motion As New Motion_Basics_QT
     Public Sub New()
@@ -39,7 +39,7 @@ End Class
 
 
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
-Public Class Motion_Simple : Inherits VB_Algorithm
+Public Class Motion_Simple : Inherits VB_Parent
     Public diff As New Diff_Basics
     Public cumulativePixels As Integer
     Public options As New Options_Motion
@@ -81,7 +81,7 @@ End Class
 
 
 
-Public Class Motion_ThruCorrelation : Inherits VB_Algorithm
+Public Class Motion_ThruCorrelation : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Correlation threshold X1000", 0, 1000, 900)
@@ -142,7 +142,7 @@ End Class
 
 
 
-Public Class Motion_CCmerge : Inherits VB_Algorithm
+Public Class Motion_CCmerge : Inherits VB_Parent
     Dim motionCC As New Motion_ThruCorrelation
     Public Sub New()
         desc = "Use the correlation coefficient to maintain an up-to-date image"
@@ -171,7 +171,7 @@ End Class
 
 
 
-Public Class Motion_PixelDiff : Inherits VB_Algorithm
+Public Class Motion_PixelDiff : Inherits VB_Parent
     Public changedPixels As Integer
     Public Sub New()
         desc = "Count the number of changed pixels in the current frame and accumulate them.  If either exceeds thresholds, then set flag = true.  " +
@@ -208,7 +208,7 @@ End Class
 
 
 
-Public Class Motion_DepthReconstructed : Inherits VB_Algorithm
+Public Class Motion_DepthReconstructed : Inherits VB_Parent
     Public motion As New Motion_Basics
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -243,7 +243,7 @@ End Class
 
 
 
-Public Class Motion_Contours : Inherits VB_Algorithm
+Public Class Motion_Contours : Inherits VB_Parent
     Public motion As New Motion_MinRect
     Dim contours As New Contour_Largest
     Public cumulativePixels As Integer
@@ -270,7 +270,7 @@ End Class
 
 
 
-Public Class Motion_Grid_MP : Inherits VB_Algorithm
+Public Class Motion_Grid_MP : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 990)
         vbAddAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
@@ -305,7 +305,7 @@ End Class
 
 
 
-Public Class Motion_Grid : Inherits VB_Algorithm
+Public Class Motion_Grid : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 990)
         vbAddAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
@@ -341,7 +341,7 @@ End Class
 
 
 
-Public Class Motion_Intersect : Inherits VB_Algorithm
+Public Class Motion_Intersect : Inherits VB_Parent
     Dim bgSub As New BGSubtract_Basics
     Dim minCount = 4
     Dim reconstructedRGB As Integer
@@ -437,7 +437,7 @@ End Class
 
 
 
-Public Class Motion_RectTest : Inherits VB_Algorithm
+Public Class Motion_RectTest : Inherits VB_Parent
     Dim motion As New Motion_Enclosing
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -482,7 +482,7 @@ End Class
 
 
 
-Public Class Motion_HistoryTest : Inherits VB_Algorithm
+Public Class Motion_HistoryTest : Inherits VB_Parent
     Dim diff As New Diff_Basics
     Dim frames As New History_Basics
     Public Sub New()
@@ -509,7 +509,7 @@ End Class
 
 
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
-Public Class Motion_History : Inherits VB_Algorithm
+Public Class Motion_History : Inherits VB_Parent
     Public motionCore As New Motion_Simple
     Dim frames As New History_Basics
     Public Sub New()
@@ -530,7 +530,7 @@ End Class
 
 
 
-Public Class Motion_Enclosing : Inherits VB_Algorithm
+Public Class Motion_Enclosing : Inherits VB_Parent
     Dim redMasks As New RedCloud_Basics
     Dim learnRate As Double
     Public motionRect As New cv.Rect
@@ -576,7 +576,7 @@ End Class
 
 
 
-Public Class Motion_Depth : Inherits VB_Algorithm
+Public Class Motion_Depth : Inherits VB_Parent
     Public Sub New()
         labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
         desc = "Display the depth data after updating only the motion rectangle.  Resync every heartbeat."
@@ -602,7 +602,7 @@ End Class
 
 
 
-Public Class Motion_Grayscale : Inherits VB_Algorithm
+Public Class Motion_Grayscale : Inherits VB_Parent
     Dim diff As New Diff_Basics
     Public Sub New()
         labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated grayscale image",
@@ -634,7 +634,7 @@ End Class
 
 
 
-Public Class Motion_Basics_QT : Inherits VB_Algorithm
+Public Class Motion_Basics_QT : Inherits VB_Parent
     Dim redMasks As New RedCloud_Basics
     Public bgSub As New BGSubtract_MOG2
     Dim rectList As New List(Of cv.Rect)
@@ -703,7 +703,7 @@ End Class
 
 
 
-Public Class Motion_PointCloud : Inherits VB_Algorithm
+Public Class Motion_PointCloud : Inherits VB_Parent
     Public Sub New()
         labels = {"", "Output of MotionRect_Basics showing motion and enclosing rectangle.", "MotionRect point cloud", "Diff of MotionRect Pointcloud and latest pointcloud"}
         desc = "Display the pointcloud after updating only the motion rectangle.  Resync every heartbeat."
@@ -726,7 +726,7 @@ End Class
 
 
 
-Public Class Motion_Color : Inherits VB_Algorithm
+Public Class Motion_Color : Inherits VB_Parent
     Public Sub New()
         labels = {"", "MotionRect_Basics output showing motion and enclosing rectangle.", "MotionRect accumulated color image",
                   "Diff of input and latest accumulated color image"}
@@ -742,7 +742,7 @@ End Class
 
 
 
-Public Class Motion_BasicsQuarterRes : Inherits VB_Algorithm
+Public Class Motion_BasicsQuarterRes : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public bgSub As New BGSubtract_MOG2_QT
     Dim rectList As New List(Of cv.Rect)
@@ -827,7 +827,7 @@ End Class
 
 
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
-Public Class Motion_Diff : Inherits VB_Algorithm
+Public Class Motion_Diff : Inherits VB_Parent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "", "Unstable mask", "Pixel difference"}
@@ -854,7 +854,7 @@ End Class
 
 
 
-Public Class Motion_MinRect : Inherits VB_Algorithm
+Public Class Motion_MinRect : Inherits VB_Parent
     Public motion As New Motion_Diff
     Dim mRect As New Area_MinRect
     Public Sub New()
@@ -895,7 +895,7 @@ End Class
 
 
 
-Public Class Motion_RedCloud : Inherits VB_Algorithm
+Public Class Motion_RedCloud : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Motion detected in the cells below"

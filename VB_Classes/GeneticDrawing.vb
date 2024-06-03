@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports  System.IO
 ' https://github.com/anopara/genetic-drawing
-Public Class GeneticDrawing_Basics : Inherits VB_Algorithm
+Public Class GeneticDrawing_Basics : Inherits VB_Parent
     Public minBrushRange = New cv.Rangef(0.1, 0.3)
     Public maxBrushRange = New cv.Rangef(0.3, 0.7)
     Dim minSize As Single
@@ -191,7 +191,7 @@ End Class
 
 
 ' https://github.com/anopara/genetic-drawing
-Public Class GeneticDrawing_Color : Inherits VB_Algorithm
+Public Class GeneticDrawing_Color : Inherits VB_Parent
     Dim gDraw(3 - 1) As GeneticDrawing_Basics
     Public Sub New()
 
@@ -230,7 +230,7 @@ End Class
 
 
 
-Public Class GeneticDrawing_Photo : Inherits VB_Algorithm
+Public Class GeneticDrawing_Photo : Inherits VB_Parent
     Dim gDraw As GeneticDrawing_Color
     Dim inputFileName As String
     Dim fileNameForm As OptionsFileName

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
-Public Class Grid_Basics : Inherits VB_Algorithm
+Public Class Grid_Basics : Inherits VB_Parent
     Public gridList As New List(Of cv.Rect)
     Public updateTaskGridList As Boolean = True
     Public Sub New()
@@ -105,7 +105,7 @@ End Class
 
 
 
-Public Class Grid_BasicsTest : Inherits VB_Algorithm
+Public Class Grid_BasicsTest : Inherits VB_Parent
     Public Sub New()
         labels = {"", "", "Each grid element is assigned a value below", "The line is the diagonal for each roi.  Bottom might be a shortened roi."}
         If standaloneTest() Then desc = "Validation test for Grid_Basics algorithm"
@@ -144,7 +144,7 @@ End Class
 
 
 
-Public Class Grid_List : Inherits VB_Algorithm
+Public Class Grid_List : Inherits VB_Parent
     Public Sub New()
         labels(2) = "Adjust grid width/height to increase thread count."
         If standaloneTest() Then desc = "List the active threads"
@@ -180,7 +180,7 @@ End Class
 
 
 
-Public Class Grid_Rectangles : Inherits VB_Algorithm
+Public Class Grid_Rectangles : Inherits VB_Parent
     Public tilesPerRow As Integer
     Public tilesPerCol As Integer
     Public Sub New()
@@ -244,7 +244,7 @@ End Class
 
 
 
-Public Class Grid_FPS : Inherits VB_Algorithm
+Public Class Grid_FPS : Inherits VB_Parent
     Public heartBeat As Boolean
     Public fpsSlider As Windows.Forms.TrackBar
     Public Sub New()
@@ -275,7 +275,7 @@ End Class
 
 
 
-Public Class Grid_Neighbors : Inherits VB_Algorithm
+Public Class Grid_Neighbors : Inherits VB_Parent
     Public Sub New()
         labels = {"", "", "Grid_Basics output", ""}
         desc = "Click any grid element to see its neighbors"
@@ -318,7 +318,7 @@ End Class
 
 
 
-Public Class Grid_Special : Inherits VB_Algorithm
+Public Class Grid_Special : Inherits VB_Parent
     Public gridWidth As Integer = 10
     Public gridHeight As Integer = 10
     Public gridList As New List(Of cv.Rect)
@@ -397,7 +397,7 @@ End Class
 
 
 
-Public Class Grid_QuarterRes : Inherits VB_Algorithm
+Public Class Grid_QuarterRes : Inherits VB_Parent
     Public gridList As New List(Of cv.Rect)
     Dim grid As New Grid_Basics
     Public Sub New()
@@ -417,7 +417,7 @@ End Class
 
 
 
-Public Class Grid_LowRes : Inherits VB_Algorithm
+Public Class Grid_LowRes : Inherits VB_Parent
     Public gridList As New List(Of cv.Rect)
     Dim grid As New Grid_Basics
     Public Sub New()
@@ -437,7 +437,7 @@ End Class
 
 
 
-Public Class Grid_MinMaxDepth : Inherits VB_Algorithm
+Public Class Grid_MinMaxDepth : Inherits VB_Parent
     Public minMaxLocs(0) As pointPair
     Public minMaxVals(0) As cv.Vec2f
     Public Sub New()
@@ -474,7 +474,7 @@ End Class
 
 
 
-Public Class Grid_TrackCenter : Inherits VB_Algorithm
+Public Class Grid_TrackCenter : Inherits VB_Parent
     Public center As cv.Point
     Dim match As New Match_Basics
     Public Sub New()
@@ -515,7 +515,7 @@ End Class
 
 
 
-Public Class Grid_ShowMap : Inherits VB_Algorithm
+Public Class Grid_ShowMap : Inherits VB_Parent
     Public Sub New()
         desc = "Verify that task.gridMap is laid out correctly"
     End Sub

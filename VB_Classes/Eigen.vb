@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://bytefish.de/blog/eigenvalues_in_opencv/
-Public Class Eigen_Basics : Inherits VB_Algorithm
+Public Class Eigen_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Solve system of equations using OpenCV's EigenVV"
         labels(2) = "EigenVec (solution)"
@@ -52,7 +52,7 @@ End Class
 
 
 
-Public Class Eigen_FitLineInput : Inherits VB_Algorithm
+Public Class Eigen_FitLineInput : Inherits VB_Parent
     Public points As New List(Of cv.Point2f)
     Public m As Single
     Public bb As Single
@@ -118,7 +118,7 @@ End Class
 
 
 ' http://www.cs.cmu.edu/~youngwoo/doc/lineFittingTest.cpp
-Public Class Eigen_Fitline : Inherits VB_Algorithm
+Public Class Eigen_Fitline : Inherits VB_Parent
     Dim noisyLine As New Eigen_FitLineInput
     Public Sub New()
         labels(2) = "blue is Ground Truth, red is fitline, yellow is EigenFit"

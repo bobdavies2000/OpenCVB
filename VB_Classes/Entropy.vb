@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' http://areshopencv.blogspot.com/2011/12/computing-entropy-of-image.html
-Public Class Entropy_Basics : Inherits VB_Algorithm
+Public Class Entropy_Basics : Inherits VB_Parent
     Dim entropy As New Entropy_Rectangle
     Public Sub New()
         labels(2) = "Control entropy values with histogram bins slider"
@@ -34,7 +34,7 @@ End Class
 
 
 
-Public Class Entropy_Highest : Inherits VB_Algorithm
+Public Class Entropy_Highest : Inherits VB_Parent
     Dim entropy As New Entropy_Rectangle
     Public eMaxRect As cv.Rect
     Dim addw As New AddWeighted_Basics
@@ -85,7 +85,7 @@ End Class
 
 
 
-Public Class Entropy_FAST : Inherits VB_Algorithm
+Public Class Entropy_FAST : Inherits VB_Parent
     Dim fast As New Corners_Basics
     Dim entropy As New Entropy_Highest
     Public Sub New()
@@ -106,7 +106,7 @@ End Class
 
 
 
-Public Class Entropy_Rectangle : Inherits VB_Algorithm
+Public Class Entropy_Rectangle : Inherits VB_Parent
     Public entropyVal As Single
     Public Sub New()
         desc = "Calculate the entropy in the drawRect when run standalone"
@@ -151,7 +151,7 @@ End Class
 
 
 
-Public Class Entropy_SubDivisions : Inherits VB_Algorithm
+Public Class Entropy_SubDivisions : Inherits VB_Parent
     Dim entropy As New Entropy_Rectangle
     Dim entropies As New List(Of List(Of Single))
     Dim eROI As New List(Of List(Of cv.Rect))
@@ -216,7 +216,7 @@ End Class
 
 
 
-Public Class Entropy_BinaryImage : Inherits VB_Algorithm
+Public Class Entropy_BinaryImage : Inherits VB_Parent
     Dim binary As New Binarize_Simple
     Dim entropy As New Entropy_Basics
     Public Sub New()

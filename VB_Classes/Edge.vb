@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
-Public Class Edge_All : Inherits VB_Algorithm
+Public Class Edge_All : Inherits VB_Parent
     Dim options As New Options_Edges_All
     Public Sub New()
         desc = "Use Radio Buttons to select the different edge algorithms."
@@ -21,7 +21,7 @@ End Class
 
 
 
-Public Class Edge_DepthAndColor : Inherits VB_Algorithm
+Public Class Edge_DepthAndColor : Inherits VB_Parent
     Dim shadow As New Depth_Holes
     Dim canny As New Edge_Canny
     Dim dilate As New Dilate_Basics
@@ -52,7 +52,7 @@ End Class
 
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edge_Scharr : Inherits VB_Algorithm
+Public Class Edge_Scharr : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Scharr multiplier X100", 1, 500, 50)
         labels(3) = "x field + y field in CV_32F format"
@@ -74,7 +74,7 @@ End Class
 
 
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
-Public Class Edge_Preserving : Inherits VB_Algorithm
+Public Class Edge_Preserving : Inherits VB_Parent
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("Edge RecurseFilter")
@@ -115,7 +115,7 @@ End Class
 
 
 '  https://docs.opencv.org/3.1.0/d0/da5/tutorial_ximgproc_prediction.html
-Public Class Edge_RandomForest_CPP : Inherits VB_Algorithm
+Public Class Edge_RandomForest_CPP : Inherits VB_Parent
     Dim rgbData() As Byte
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Edges RF Threshold", 1, 255, 35)
@@ -153,7 +153,7 @@ End Class
 
 
 
-Public Class Edge_DCTfrequency : Inherits VB_Algorithm
+Public Class Edge_DCTfrequency : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Remove Frequencies < x", 0, 100, 32)
@@ -189,7 +189,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/ximgproc/samples/dericheSample.py
-Public Class Edge_Deriche_CPP : Inherits VB_Algorithm
+Public Class Edge_Deriche_CPP : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Deriche Alpha X100", 1, 400, 100)
@@ -226,7 +226,7 @@ End Class
 
 
 
-Public Class Edge_DCTinput : Inherits VB_Algorithm
+Public Class Edge_DCTinput : Inherits VB_Parent
     Dim edges As New Edge_Canny
     Dim dct As New DCT_FeatureLess
     Public Sub New()
@@ -252,7 +252,7 @@ End Class
 
 
 
-Public Class Edge_Consistent : Inherits VB_Algorithm
+Public Class Edge_Consistent : Inherits VB_Parent
     Dim edges As New Bin4Way_Sobel
     Public Sub New()
         findSlider("Sobel kernel Size").Value = 5
@@ -283,7 +283,7 @@ End Class
 
 
 
-Public Class Edge_BinarizedReduction : Inherits VB_Algorithm
+Public Class Edge_BinarizedReduction : Inherits VB_Parent
     Dim edges As New Bin4Way_Sobel
     Dim reduction As New Reduction_Basics
     Public Sub New()
@@ -304,7 +304,7 @@ End Class
 
 
 
-Public Class Edge_BinarizedBrightness : Inherits VB_Algorithm
+Public Class Edge_BinarizedBrightness : Inherits VB_Parent
     Dim edges As New Edge_All
     Dim bright As New Brightness_Basics
     Public Sub New()
@@ -329,7 +329,7 @@ End Class
 
 
 
-Public Class Edge_SobelLRBinarized : Inherits VB_Algorithm
+Public Class Edge_SobelLRBinarized : Inherits VB_Parent
     Dim edges As New Bin4Way_Sobel
     Dim addw As New AddWeighted_Basics
     Public Sub New()
@@ -366,7 +366,7 @@ End Class
 
 
 
-Public Class Edge_Matching : Inherits VB_Algorithm
+Public Class Edge_Matching : Inherits VB_Parent
     Dim match As New Match_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -457,7 +457,7 @@ End Class
 
 
 ' https://scikit-image.org/docs/dev/auto_examples/color_exposure/plot_adapt_rgb.html#sphx-glr-auto-examples-color-exposure-plot-adapt-rgb-py
-Public Class Edge_RGB : Inherits VB_Algorithm
+Public Class Edge_RGB : Inherits VB_Parent
     Dim sobel As New Edge_Sobel_Old
     Public Sub New()
         desc = "Combine the edges from all 3 channels"
@@ -486,7 +486,7 @@ End Class
 
 
 ' https://scikit-image.org/docs/dev/auto_examples/color_exposure/plot_adapt_rgb.html#sphx-glr-auto-examples-color-exposure-plot-adapt-rgb-py
-Public Class Edge_HSV : Inherits VB_Algorithm
+Public Class Edge_HSV : Inherits VB_Parent
     Dim edges As New Edge_RGB
     Public Sub New()
         desc = "Combine the edges from all 3 HSV channels"
@@ -505,7 +505,7 @@ End Class
 
 
 
-Public Class Edge_SobelLR : Inherits VB_Algorithm
+Public Class Edge_SobelLR : Inherits VB_Parent
     Dim sobel As New Edge_Sobel_Old
     Public Sub New()
         findSlider("Sobel kernel Size").Value = 3
@@ -527,7 +527,7 @@ End Class
 
 
 
-Public Class Edge_ColorGap_CPP : Inherits VB_Algorithm
+Public Class Edge_ColorGap_CPP : Inherits VB_Parent
     Dim gap As New Edge_ColorGap_VB
     Public Sub New()
         cPtr = Edge_ColorGap_Open()
@@ -564,7 +564,7 @@ End Class
 
 
 
-Public Class Edge_ColorGap_VB : Inherits VB_Algorithm
+Public Class Edge_ColorGap_VB : Inherits VB_Parent
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         If sliders.Setup(traceName) Then
@@ -613,7 +613,7 @@ End Class
 
 
 
-Public Class Edge_DepthEdgeTest : Inherits VB_Algorithm
+Public Class Edge_DepthEdgeTest : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Threshold for depth difference", 0, 255, 200)
@@ -648,7 +648,7 @@ End Class
 
 
 
-Public Class Edge_DepthGap_VB : Inherits VB_Algorithm
+Public Class Edge_DepthGap_VB : Inherits VB_Parent
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         If sliders.Setup(traceName) Then
@@ -699,7 +699,7 @@ End Class
 
 
 
-Public Class Edge_DepthGap_CPP : Inherits VB_Algorithm
+Public Class Edge_DepthGap_CPP : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Input depth difference in mm's", 0, 1000, 500)
         cPtr = Edge_DepthGap_Open()
@@ -731,7 +731,7 @@ End Class
 
 
 
-Public Class Edge_CannyMin : Inherits VB_Algorithm
+Public Class Edge_CannyMin : Inherits VB_Parent
     Dim canny As New Edge_Canny
     Public Sub New()
         findSlider("Canny threshold1").Value = 200
@@ -755,7 +755,7 @@ End Class
 
 
 
-Public Class Edge_CannyLeftRight : Inherits VB_Algorithm
+Public Class Edge_CannyLeftRight : Inherits VB_Parent
     Dim canny As New Edge_Canny
     Public Sub New()
         findSlider("Canny threshold1").Value = 200
@@ -779,7 +779,7 @@ End Class
 
 
 
-Public Class Edge_Reduction : Inherits VB_Algorithm
+Public Class Edge_Reduction : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Dim edge As New Edge_Canny
     Public Sub New()
@@ -801,7 +801,7 @@ End Class
 
 
 
-Public Class Edge_Regions : Inherits VB_Algorithm
+Public Class Edge_Regions : Inherits VB_Parent
     Dim tiers As New Depth_TiersZ
     Dim edge As New Edge_Canny
     Public Sub New()
@@ -826,7 +826,7 @@ End Class
 
 
 'https://docs.opencv.org/3.1.0/da/d22/tutorial_py_canny.html
-Public Class Edge_Canny : Inherits VB_Algorithm
+Public Class Edge_Canny : Inherits VB_Parent
     Dim options As New Options_Canny
     Public Sub New()
         labels = {"", "", "Canny using L1 Norm", "Canny using L2 Norm"}
@@ -849,7 +849,7 @@ End Class
 
 
 'https://docs.opencv.org/3.1.0/da/d22/tutorial_py_canny.html
-Public Class Edge_CannyHistory : Inherits VB_Algorithm
+Public Class Edge_CannyHistory : Inherits VB_Parent
     Dim options As New Options_Canny
     Public Sub New()
         labels = {"", "", "Canny using L1 Norm", ""}
@@ -878,7 +878,7 @@ End Class
 
 
 
-Public Class Edge_ResizeAdd : Inherits VB_Algorithm
+Public Class Edge_ResizeAdd : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Border Vertical in Pixels", 1, 20, 5)
@@ -908,7 +908,7 @@ End Class
 
 
 
-Public Class Edge_CannyCombined : Inherits VB_Algorithm
+Public Class Edge_CannyCombined : Inherits VB_Parent
     Dim canny As New Edge_CannyHistory
     Dim edges As New Edge_ResizeAdd
     Public Sub New()
@@ -926,7 +926,7 @@ End Class
 
 
 
-Public Class Edge_SobelCustomV : Inherits VB_Algorithm
+Public Class Edge_SobelCustomV : Inherits VB_Parent
     Public Sub New()
         labels = {"", "", "Sobel Custom 1", "Sobel Custom 2"}
         desc = "Show Sobel edge detection a custom vertical kernel"
@@ -945,7 +945,7 @@ End Class
 
 
 
-Public Class Edge_SobelCustomH : Inherits VB_Algorithm
+Public Class Edge_SobelCustomH : Inherits VB_Parent
     Public Sub New()
         labels = {"", "", "Sobel Custom 1", "Sobel Custom 2"}
         desc = "Show Sobel edge detection a custom horizontal kernel"
@@ -965,7 +965,7 @@ End Class
 
 
 
-Public Class Edge_SobelCustom : Inherits VB_Algorithm
+Public Class Edge_SobelCustom : Inherits VB_Parent
     Dim addw As New AddWeighted_Basics
     Dim edgesV As New Edge_SobelCustomV
     Dim edgesH As New Edge_SobelCustomH
@@ -1014,7 +1014,7 @@ End Class
 
 
 
-Public Class Edge_SobelCustomLeftRight : Inherits VB_Algorithm
+Public Class Edge_SobelCustomLeftRight : Inherits VB_Parent
     Dim custom As New Edge_SobelCustom
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst0.Checked = True
@@ -1040,7 +1040,7 @@ End Class
 
 
 
-Public Class Edge_BackProjection : Inherits VB_Algorithm
+Public Class Edge_BackProjection : Inherits VB_Parent
     Dim valley As New HistValley_OptionsAuto
     Dim canny As New Edge_Canny
     Public Sub New()
@@ -1075,7 +1075,7 @@ End Class
 
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edge_Sobel_Old : Inherits VB_Algorithm
+Public Class Edge_Sobel_Old : Inherits VB_Parent
     Public addw As New AddWeighted_Basics
     Dim options As New Options_Sobel
     Public Sub New()
@@ -1106,7 +1106,7 @@ End Class
 
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-Public Class Edge_Laplacian : Inherits VB_Algorithm
+Public Class Edge_Laplacian : Inherits VB_Parent
     Dim options As New Options_LaplacianKernels
     Public Sub New()
         labels(3) = "Laplacian of DepthRGB"
@@ -1130,7 +1130,7 @@ End Class
 
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edge_SobelHorizontal : Inherits VB_Algorithm
+Public Class Edge_SobelHorizontal : Inherits VB_Parent
     Dim edges As New Edge_Sobel_Old
     Public Sub New()
         findCheckBox("Vertical Derivative").Checked = False
@@ -1151,7 +1151,7 @@ End Class
 
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edge_Sobel : Inherits VB_Algorithm
+Public Class Edge_Sobel : Inherits VB_Parent
     Public addw As New AddWeighted_Basics
     Public options As New Options_Sobel
     Dim blur As New Blur_Gaussian
@@ -1185,7 +1185,7 @@ End Class
 
 
 
-Public Class Edge_MotionFrames : Inherits VB_Algorithm
+Public Class Edge_MotionFrames : Inherits VB_Parent
     Dim edges As New Edge_Canny
     Dim frames As New History_Basics
     Public Sub New()
@@ -1209,7 +1209,7 @@ End Class
 
 
 
-Public Class Edge_MotionOverlay : Inherits VB_Algorithm
+Public Class Edge_MotionOverlay : Inherits VB_Parent
     Dim options As New Options_EdgeOverlay
     Public Sub New()
         labels(3) = "AbsDiff output of offset with original"
@@ -1238,7 +1238,7 @@ End Class
 
 
 
-Public Class Edge_Motion : Inherits VB_Algorithm
+Public Class Edge_Motion : Inherits VB_Parent
     Dim diff As New Diff_Basics
     Dim edges As New Edge_Sobel
     Public Sub New()
@@ -1261,7 +1261,7 @@ End Class
 
 
 
-Public Class Edge_NoDepth : Inherits VB_Algorithm
+Public Class Edge_NoDepth : Inherits VB_Parent
     Dim edges As New Edge_Sobel
     Dim blur As New Blur_Basics
     Public Sub New()

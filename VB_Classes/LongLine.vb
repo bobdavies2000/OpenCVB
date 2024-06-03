@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class LongLine_Basics : Inherits VB_Algorithm
+Public Class LongLine_Basics : Inherits VB_Parent
     Public lines As New LongLine_Core
     Public lpList As New List(Of pointPair)
     Public Sub New()
@@ -54,7 +54,7 @@ End Class
 
 
 
-Public Class LongLine_Core : Inherits VB_Algorithm
+Public Class LongLine_Core : Inherits VB_Parent
     Public lines As New Line_Basics
     Public lineCount As Integer = 1 ' How many of the longest lines...
     Public lpList As New List(Of pointPair) ' this will be sorted by length - longest first
@@ -80,7 +80,7 @@ End Class
 
 
 
-Public Class LongLine_Depth : Inherits VB_Algorithm
+Public Class LongLine_Depth : Inherits VB_Parent
     Dim longLine As New LongLine_Consistent
     Dim plot As New Plot_OverTimeScalar
     Dim kalman As New Kalman_Basics
@@ -135,7 +135,7 @@ End Class
 
 
 
-Public Class LongLine_Consistent : Inherits VB_Algorithm
+Public Class LongLine_Consistent : Inherits VB_Parent
     Dim longest As New LongLine_Core
     Public ptLong As pointPair
     Public Sub New()
@@ -172,7 +172,7 @@ End Class
 
 
 
-Public Class LongLine_Point : Inherits VB_Algorithm
+Public Class LongLine_Point : Inherits VB_Parent
     Dim longLine As New LongLine_Consistent
     Dim kalman As New Kalman_Basics
     Public longPt As cv.Point
@@ -198,7 +198,7 @@ End Class
 
 
 
-Public Class LongLine_Match : Inherits VB_Algorithm
+Public Class LongLine_Match : Inherits VB_Parent
     Dim longest As New LongLine_Consistent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Reduction for width/height in pixels", 1, 20, 3)
@@ -241,7 +241,7 @@ End Class
 
 
 
-Public Class LongLine_ExtendTest : Inherits VB_Algorithm
+Public Class LongLine_ExtendTest : Inherits VB_Parent
     Dim longLine As New LongLine_Basics
     Public Sub New()
         labels = {"", "", "Random Line drawn", ""}
@@ -270,7 +270,7 @@ End Class
 
 
 
-Public Class LongLine_ExtendAll : Inherits VB_Algorithm
+Public Class LongLine_ExtendAll : Inherits VB_Parent
     Public lines As New Line_Basics
     Public lpList As New List(Of pointPair)
     Public Sub New()
@@ -295,7 +295,7 @@ End Class
 
 
 
-Public Class LongLine_ExtendParallel : Inherits VB_Algorithm
+Public Class LongLine_ExtendParallel : Inherits VB_Parent
     Dim extendAll As New LongLine_ExtendAll
     Dim knn As New KNN_Core
     Dim near As New Line_Nearest
@@ -374,7 +374,7 @@ End Class
 
 
 
-Public Class LongLine_Extend : Inherits VB_Algorithm
+Public Class LongLine_Extend : Inherits VB_Parent
     Dim lines As New LongLine_Basics
     Public Sub New()
         labels = {"", "", "Original Line", "Original line Extended"}
@@ -408,7 +408,7 @@ End Class
 
 
 
-Public Class LongLine_NoDepth : Inherits VB_Algorithm
+Public Class LongLine_NoDepth : Inherits VB_Parent
     Dim lineHist As New LineCoin_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -430,7 +430,7 @@ End Class
 
 
 
-Public Class LongLine_History : Inherits VB_Algorithm
+Public Class LongLine_History : Inherits VB_Parent
     Dim lines As New LongLine_Basics
     Public lpList As New List(Of pointPair)
     Public Sub New()

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.3.1/d6/d73/Pyramids_8cpp-example.html
-Public Class Pyramid_Basics : Inherits VB_Algorithm
+Public Class Pyramid_Basics : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Zoom in and out", -1, 1, 0)
         desc = "Use pyrup and pyrdown to zoom in and out of an image."
@@ -29,7 +29,7 @@ End Class
 
 
 
-Public Class Pyramid_Filter : Inherits VB_Algorithm
+Public Class Pyramid_Filter : Inherits VB_Parent
     Dim laplace As New Laplacian_PyramidFilter
     Public Sub New()
         desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"

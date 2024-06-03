@@ -4,7 +4,7 @@ Imports System.Transactions
 Imports System.Windows
 Imports System.Windows.Media.Imaging
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
-Public Class Rotate_Basics : Inherits VB_Algorithm
+Public Class Rotate_Basics : Inherits VB_Parent
     Public M As cv.Mat
     Public Mflip As cv.Mat
     Public options As New Options_Resize
@@ -35,7 +35,7 @@ End Class
 
 
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
-Public Class Rotate_BasicsQT : Inherits VB_Algorithm
+Public Class Rotate_BasicsQT : Inherits VB_Parent
     Public rotateAngle As Single = 24
     Public rotateCenter As cv.Point2f
     Public Sub New()
@@ -53,7 +53,7 @@ End Class
 
 
 
-Public Class Rotate_Box : Inherits VB_Algorithm
+Public Class Rotate_Box : Inherits VB_Parent
     ReadOnly rotation As New Rotate_Basics
     Public Sub New()
         task.drawRect = New cv.Rect(100, 100, 100, 100)
@@ -95,7 +95,7 @@ End Class
 
 
 ' https://academo.org/demos/rotation-about-point/
-Public Class Rotate_Poly : Inherits VB_Algorithm
+Public Class Rotate_Poly : Inherits VB_Parent
     Dim optionsFPoly As New Options_FPoly
     Public options As New Options_RotatePoly
     Public rotateQT As New Rotate_PolyQT
@@ -135,7 +135,7 @@ End Class
 
 
 ' https://academo.org/demos/rotation-about-point/
-Public Class Rotate_PolyQT : Inherits VB_Algorithm
+Public Class Rotate_PolyQT : Inherits VB_Parent
     Public poly As New List(Of cv.Point2f)
     Public rotateCenter As cv.Point2f
     Public rotateAngle As Single
@@ -189,7 +189,7 @@ End Class
 
 
 
-Public Class Rotate_Example : Inherits VB_Algorithm
+Public Class Rotate_Example : Inherits VB_Parent
     Dim rotate As New Rotate_Basics
     Public Sub New()
         rotate.rotateCenter = New cv.Point2f(dst2.Height / 2, dst2.Height / 2)
@@ -209,7 +209,7 @@ End Class
 
 
 
-Public Class Rotate_Horizon : Inherits VB_Algorithm
+Public Class Rotate_Horizon : Inherits VB_Parent
     Dim rotate As New Rotate_Basics
     Dim edges As New CameraMotion_WithRotation
     Public Sub New()

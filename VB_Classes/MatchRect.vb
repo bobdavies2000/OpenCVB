@@ -1,6 +1,6 @@
 ﻿Imports System.Windows
 Imports cv = OpenCvSharp
-Public Class MatchRect_Basics : Inherits VB_Algorithm
+Public Class MatchRect_Basics : Inherits VB_Parent
     Public match As New Match_Basics
     Public rectInput As New cv.Rect
     Public rectOutput As New cv.Rect
@@ -35,7 +35,7 @@ End Class
 
 
 
-Public Class MatchRect_RedCloud : Inherits VB_Algorithm
+Public Class MatchRect_RedCloud : Inherits VB_Parent
     Dim matchRect As New MatchRect_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()

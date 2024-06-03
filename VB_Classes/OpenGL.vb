@@ -7,7 +7,7 @@ Imports cvext = OpenCvSharp.Extensions
 Imports System.Windows.Documents
 Imports Microsoft.VisualBasic.ApplicationServices
 
-Public Class OpenGL_Basics : Inherits VB_Algorithm
+Public Class OpenGL_Basics : Inherits VB_Parent
     Dim memMapWriter As MemoryMappedViewAccessor
     ReadOnly startInfo As New ProcessStartInfo
     Dim memMapPtr As IntPtr
@@ -154,7 +154,7 @@ End Class
 
 
 
-Public Class OpenGL_BasicsSliders : Inherits VB_Algorithm
+Public Class OpenGL_BasicsSliders : Inherits VB_Parent
     Dim options As New Options_OpenGL
     Public pointCloudInput As cv.Mat
     Public Sub New()
@@ -190,7 +190,7 @@ End Class
 
 
 
-Public Class OpenGL_BasicsMouse : Inherits VB_Algorithm
+Public Class OpenGL_BasicsMouse : Inherits VB_Parent
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Show the OpenGL point cloud with mouse support."
@@ -211,7 +211,7 @@ End Class
 
 
 
-Public Class OpenGL_ReducedXYZ : Inherits VB_Algorithm
+Public Class OpenGL_ReducedXYZ : Inherits VB_Parent
     ReadOnly reduction As New Reduction_XYZ
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -232,7 +232,7 @@ End Class
 
 
 
-Public Class OpenGL_Reduction : Inherits VB_Algorithm
+Public Class OpenGL_Reduction : Inherits VB_Parent
     ReadOnly reduction As Reduction_PointCloud
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -254,7 +254,7 @@ End Class
 
 
 
-Public Class OpenGL_ReducedSideView : Inherits VB_Algorithm
+Public Class OpenGL_ReducedSideView : Inherits VB_Parent
     ReadOnly sideView As New PointCloud_ReducedSideView
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -310,7 +310,7 @@ End Module
 
 
 
-Public Class OpenGL_Rebuilt : Inherits VB_Algorithm
+Public Class OpenGL_Rebuilt : Inherits VB_Parent
     ReadOnly rebuild As New Structured_Rebuild
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -331,7 +331,7 @@ End Class
 
 
 
-Public Class OpenGL_VerticalSingle : Inherits VB_Algorithm
+Public Class OpenGL_VerticalSingle : Inherits VB_Parent
     ReadOnly vLine As New FeatureLine_LongestV_Tutorial2
     Public Sub New()
         task.ogl.oglFunction = oCase.verticalLines
@@ -361,7 +361,7 @@ End Class
 
 
 
-Public Class OpenGL_VerticalOrHorizontal : Inherits VB_Algorithm
+Public Class OpenGL_VerticalOrHorizontal : Inherits VB_Parent
     ReadOnly vLine As New FeatureLine_Finder
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
@@ -401,7 +401,7 @@ End Class
 
 
 ' https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
-Public Class OpenGL_Pyramid : Inherits VB_Algorithm
+Public Class OpenGL_Pyramid : Inherits VB_Parent
     Public Sub New()
         task.ogl.oglFunction = oCase.drawPyramid ' all the work is done inside the switch statement in OpenGL_Functions.
         task.OpenGLTitle = "OpenGL_Functions"
@@ -419,7 +419,7 @@ End Class
 
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
-Public Class OpenGL_DrawCube : Inherits VB_Algorithm
+Public Class OpenGL_DrawCube : Inherits VB_Parent
     Public Sub New()
         task.ogl.oglFunction = oCase.drawCube
         task.OpenGLTitle = "OpenGL_Functions"
@@ -438,7 +438,7 @@ End Class
 
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
-Public Class OpenGL_QuadSimple : Inherits VB_Algorithm
+Public Class OpenGL_QuadSimple : Inherits VB_Parent
     Dim tess As New Tessallate_QuadSimple
     Public Sub New()
         task.ogl.oglFunction = oCase.simplePlane
@@ -464,7 +464,7 @@ End Class
 
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
-Public Class OpenGL_QuadHulls : Inherits VB_Algorithm
+Public Class OpenGL_QuadHulls : Inherits VB_Parent
     Dim tess As New Tessallate_QuadHulls
     Public Sub New()
         task.ogl.oglFunction = oCase.simplePlane
@@ -490,7 +490,7 @@ End Class
 
 
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
-Public Class OpenGL_QuadMinMax : Inherits VB_Algorithm
+Public Class OpenGL_QuadMinMax : Inherits VB_Parent
     Dim tess As New Tessallate_QuadMinMax
     Public Sub New()
         task.ogl.oglFunction = oCase.simplePlane
@@ -514,7 +514,7 @@ End Class
 
 
 
-Public Class OpenGL_Bricks : Inherits VB_Algorithm
+Public Class OpenGL_Bricks : Inherits VB_Parent
     Dim tess As New Tessallate_Bricks
     Public Sub New()
         task.ogl.oglFunction = oCase.minMaxBlocks
@@ -548,7 +548,7 @@ End Class
 
 
 
-Public Class OpenGL_StructuredCloud : Inherits VB_Algorithm
+Public Class OpenGL_StructuredCloud : Inherits VB_Parent
     Dim sCloud As New Structured_Cloud
     Dim redC As New RedCloud_Basics
     Public Sub New()
@@ -573,7 +573,7 @@ End Class
 
 
 
-Public Class OpenGL_Tiles : Inherits VB_Algorithm
+Public Class OpenGL_Tiles : Inherits VB_Parent
     Dim sCloud As New Structured_Tiles
     Public Sub New()
         task.ogl.oglFunction = oCase.drawTiles
@@ -597,7 +597,7 @@ End Class
 
 
 
-Public Class OpenGL_TilesQuad : Inherits VB_Algorithm
+Public Class OpenGL_TilesQuad : Inherits VB_Parent
     Dim sCloud As New Structured_TilesQuad
     Public Sub New()
         task.ogl.oglFunction = oCase.simplePlane
@@ -625,7 +625,7 @@ End Class
 
 
 
-Public Class OpenGL_OnlyPlanes : Inherits VB_Algorithm
+Public Class OpenGL_OnlyPlanes : Inherits VB_Parent
     ReadOnly planes As New Plane_OnlyPlanes
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -650,7 +650,7 @@ End Class
 
 
 
-Public Class OpenGL_FlatStudy1 : Inherits VB_Algorithm
+Public Class OpenGL_FlatStudy1 : Inherits VB_Parent
     ReadOnly plane As New Structured_LinearizeFloor
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -673,7 +673,7 @@ End Class
 
 
 
-Public Class OpenGL_FlatStudy2 : Inherits VB_Algorithm
+Public Class OpenGL_FlatStudy2 : Inherits VB_Parent
     Public plane As New Structured_LinearizeFloor
     Public Sub New()
         task.ogl.oglFunction = oCase.drawFloor
@@ -701,7 +701,7 @@ End Class
 
 
 
-Public Class OpenGL_FlatStudy3 : Inherits VB_Algorithm
+Public Class OpenGL_FlatStudy3 : Inherits VB_Parent
     Dim plane As New Plane_FloorStudy
     Public Sub New()
         task.ogl.oglFunction = oCase.floorStudy
@@ -728,7 +728,7 @@ End Class
 
 
 
-Public Class OpenGL_FlatFloor : Inherits VB_Algorithm
+Public Class OpenGL_FlatFloor : Inherits VB_Parent
     Dim flatness As New Model_FlatSurfaces
     Public Sub New()
         task.ogl.oglFunction = oCase.floorStudy
@@ -753,7 +753,7 @@ End Class
 
 
 
-Public Class OpenGL_FlatCeiling : Inherits VB_Algorithm
+Public Class OpenGL_FlatCeiling : Inherits VB_Parent
     Dim flatness As New Model_FlatSurfaces
     Public Sub New()
         task.ogl.oglFunction = oCase.floorStudy
@@ -781,7 +781,7 @@ End Class
 
 
 
-Public Class OpenGL_PeakFlat : Inherits VB_Algorithm
+Public Class OpenGL_PeakFlat : Inherits VB_Parent
     Dim peak As New Plane_Histogram
     Dim kalman As New Kalman_Basics
     Public Sub New()
@@ -809,7 +809,7 @@ End Class
 
 
 
-Public Class OpenGL_DrawHull : Inherits VB_Algorithm
+Public Class OpenGL_DrawHull : Inherits VB_Parent
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
         task.ogl.oglFunction = oCase.drawCell
@@ -851,7 +851,7 @@ End Class
 
 
 
-Public Class OpenGL_FPolyCloud : Inherits VB_Algorithm
+Public Class OpenGL_FPolyCloud : Inherits VB_Parent
     Dim fpolyPC As New FeaturePoly_PointCloud
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -881,7 +881,7 @@ End Class
 
 
 ' https://cs.lmu.edu/~ray/notes/openglexamples/
-Public Class OpenGL_Sierpinski : Inherits VB_Algorithm
+Public Class OpenGL_Sierpinski : Inherits VB_Parent
     Public Sub New()
         task.ogl.oglFunction = oCase.sierpinski
         task.OpenGLTitle = "OpenGL_Functions"
@@ -901,7 +901,7 @@ End Class
 
 
 
-Public Class OpenGL_DrawHulls : Inherits VB_Algorithm
+Public Class OpenGL_DrawHulls : Inherits VB_Parent
     Public options As New Options_OpenGLFunctions
     Public hulls As New RedCloud_Hulls
     Dim ogl As New OpenGL_Basics
@@ -959,7 +959,7 @@ End Class
 
 
 
-Public Class OpenGL_Contours : Inherits VB_Algorithm
+Public Class OpenGL_Contours : Inherits VB_Parent
     Dim options2 As New Options_OpenGL_Contours
     Public options As New Options_OpenGLFunctions
     Dim redC As New RedCloud_Basics
@@ -1027,7 +1027,7 @@ End Class
 
 
 
-Public Class OpenGL_PCLineCandidates : Inherits VB_Algorithm
+Public Class OpenGL_PCLineCandidates : Inherits VB_Parent
     Dim pts As New PointCloud_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPointsAlone
@@ -1052,7 +1052,7 @@ End Class
 
 
 
-Public Class OpenGL_PClinesFirstLast : Inherits VB_Algorithm
+Public Class OpenGL_PClinesFirstLast : Inherits VB_Parent
     Dim lines As New Line3D_CandidatesFirstLast
     Public Sub New()
         task.ogl.oglFunction = oCase.pcLines
@@ -1077,7 +1077,7 @@ End Class
 
 
 
-Public Class OpenGL_PClinesAll : Inherits VB_Algorithm
+Public Class OpenGL_PClinesAll : Inherits VB_Parent
     Dim lines As New Line3D_CandidatesAll
     Public Sub New()
         task.ogl.oglFunction = oCase.pcLines
@@ -1103,7 +1103,7 @@ End Class
 
 
 
-Public Class OpenGL_PatchHorizontal : Inherits VB_Algorithm
+Public Class OpenGL_PatchHorizontal : Inherits VB_Parent
     Dim patch As New Pixel_NeighborsPatchNeighbors
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1127,7 +1127,7 @@ End Class
 
 
 
-Public Class OpenGL_PCpoints : Inherits VB_Algorithm
+Public Class OpenGL_PCpoints : Inherits VB_Parent
     Dim pts As New PointCloud_PCPoints
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
@@ -1154,7 +1154,7 @@ End Class
 
 
 
-Public Class OpenGL_PCpointsPlane : Inherits VB_Algorithm
+Public Class OpenGL_PCpointsPlane : Inherits VB_Parent
     Dim pts As New PointCloud_PCPointsPlane
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
@@ -1177,7 +1177,7 @@ End Class
 
 
 
-Public Class OpenGL_PlaneClusters3D : Inherits VB_Algorithm
+Public Class OpenGL_PlaneClusters3D : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim eq As New Plane_Equation
     Public Sub New()
@@ -1218,7 +1218,7 @@ End Class
 
 
 
-Public Class OpenGL_Profile : Inherits VB_Algorithm
+Public Class OpenGL_Profile : Inherits VB_Parent
     Public sides As New Profile_Basics
     Public rotate As New Profile_Rotation
     Dim heat As New HeatMap_Basics
@@ -1269,7 +1269,7 @@ End Class
 
 
 
-Public Class OpenGL_ProfileSweep : Inherits VB_Algorithm
+Public Class OpenGL_ProfileSweep : Inherits VB_Parent
     Dim visuals As New OpenGL_Profile
     Dim options As New Options_IMU
     Public Sub New()
@@ -1322,7 +1322,7 @@ End Class
 
 
 
-Public Class OpenGL_FlatSurfaces : Inherits VB_Algorithm
+Public Class OpenGL_FlatSurfaces : Inherits VB_Parent
     Dim flat As New RedCloud_LikelyFlatSurfaces
     Public Sub New()
         labels(2) = "Display the point cloud pixels that appear to be vertical and horizontal regions."
@@ -1343,7 +1343,7 @@ End Class
 
 
 
-Public Class OpenGL_GradientPhase : Inherits VB_Algorithm
+Public Class OpenGL_GradientPhase : Inherits VB_Parent
     Dim gradient As New Gradient_Depth
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1369,7 +1369,7 @@ End Class
 
 
 
-Public Class OpenGL_GravityTransform : Inherits VB_Algorithm
+Public Class OpenGL_GravityTransform : Inherits VB_Parent
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
@@ -1389,7 +1389,7 @@ End Class
 
 ' https://open.gl/transformations
 ' https://www.codeproject.com/Articles/1247960/Learning-Basic-Math-Used-In-3D-Graphics-Engines
-Public Class OpenGL_GravityAverage : Inherits VB_Algorithm
+Public Class OpenGL_GravityAverage : Inherits VB_Parent
     ReadOnly imuAvg As New IMU_Average
     ReadOnly imu As New IMU_Basics
     Public Sub New()
@@ -1423,7 +1423,7 @@ End Class
 
 ' https://open.gl/transformations
 ' https://www.codeproject.com/Articles/1247960/Learning-Basic-Math-Used-In-3D-Graphics-Engines
-Public Class OpenGL_GravityKalman : Inherits VB_Algorithm
+Public Class OpenGL_GravityKalman : Inherits VB_Parent
     ReadOnly imuKalman As New IMU_Kalman
     ReadOnly imu As New IMU_Basics
     Public Sub New()
@@ -1460,7 +1460,7 @@ End Class
 
 
 
-Public Class OpenGL_StableMinMax : Inherits VB_Algorithm
+Public Class OpenGL_StableMinMax : Inherits VB_Parent
     ReadOnly minmax As New Depth_MinMaxNone
     Public Sub New()
         gOptions.unFiltered.Checked = True
@@ -1487,7 +1487,7 @@ End Class
 
 
 
-Public Class OpenGL_DiffDepth : Inherits VB_Algorithm
+Public Class OpenGL_DiffDepth : Inherits VB_Parent
     Dim diff As New Diff_Depth32S
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1512,7 +1512,7 @@ End Class
 
 
 
-Public Class OpenGL_CloudMisses : Inherits VB_Algorithm
+Public Class OpenGL_CloudMisses : Inherits VB_Parent
     Dim frames As New History_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1537,7 +1537,7 @@ End Class
 
 
 
-Public Class OpenGL_CloudHistory : Inherits VB_Algorithm
+Public Class OpenGL_CloudHistory : Inherits VB_Parent
     Dim hCloud As New History_Cloud
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1559,7 +1559,7 @@ End Class
 
 
 
-Public Class OpenGL_TessellateCell : Inherits VB_Algorithm
+Public Class OpenGL_TessellateCell : Inherits VB_Parent
     Dim tess As New Triangle_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.tessalateTriangles
@@ -1583,7 +1583,7 @@ End Class
 
 
 
-Public Class OpenGL_Tessellate : Inherits VB_Algorithm
+Public Class OpenGL_Tessellate : Inherits VB_Parent
     Dim tess As New Triangle_RedCloud
     Public Sub New()
         task.ogl.oglFunction = oCase.tessalateTriangles
@@ -1607,7 +1607,7 @@ End Class
 
 
 
-Public Class OpenGL_TessellateRGB : Inherits VB_Algorithm
+Public Class OpenGL_TessellateRGB : Inherits VB_Parent
     Dim tess As New Triangle_RedCloud
     Public Sub New()
         task.ogl.oglFunction = oCase.tessalateTriangles
@@ -1631,7 +1631,7 @@ End Class
 
 
 
-Public Class OpenGL_RedTrack : Inherits VB_Algorithm
+Public Class OpenGL_RedTrack : Inherits VB_Parent
     Dim redCC As New RedTrack_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1654,7 +1654,7 @@ End Class
 
 
 
-Public Class OpenGL_Density2D : Inherits VB_Algorithm
+Public Class OpenGL_Density2D : Inherits VB_Parent
     Dim dense As New Density_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1678,7 +1678,7 @@ End Class
 
 
 
-Public Class OpenGL_ViewObjects : Inherits VB_Algorithm
+Public Class OpenGL_ViewObjects : Inherits VB_Parent
     Dim bpDoctor As New GuidedBP_Points
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1704,7 +1704,7 @@ End Class
 
 
 
-Public Class OpenGL_NoSolo : Inherits VB_Algorithm
+Public Class OpenGL_NoSolo : Inherits VB_Parent
     Dim hotTop As New BackProject_SoloTop
     Dim hotSide As New BackProject_SoloSide
     Public Sub New()
@@ -1734,7 +1734,7 @@ End Class
 
 
 
-Public Class OpenGL_RedCloud : Inherits VB_Algorithm
+Public Class OpenGL_RedCloud : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1754,7 +1754,7 @@ End Class
 
 
 
-Public Class OpenGL_RedCloudSpectrum : Inherits VB_Algorithm
+Public Class OpenGL_RedCloudSpectrum : Inherits VB_Parent
     Dim redS As New Spectrum_RedCloud
     Public Sub New()
         redOptions.UseDepth.Checked = True
@@ -1778,7 +1778,7 @@ End Class
 
 
 
-Public Class OpenGL_RedCloudCell : Inherits VB_Algorithm
+Public Class OpenGL_RedCloudCell : Inherits VB_Parent
     Dim specZ As New Spectrum_Z
     Dim breakdown As New Spectrum_Breakdown
     Public Sub New()
@@ -1812,7 +1812,7 @@ End Class
 
 
 
-Public Class OpenGL_FilteredSideView : Inherits VB_Algorithm
+Public Class OpenGL_FilteredSideView : Inherits VB_Parent
     Dim filter As New BackProject2D_FilterSide
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1833,7 +1833,7 @@ End Class
 
 
 
-Public Class OpenGL_FilteredTopView : Inherits VB_Algorithm
+Public Class OpenGL_FilteredTopView : Inherits VB_Parent
     Dim filter As New BackProject2D_FilterTop
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1854,7 +1854,7 @@ End Class
 
 
 
-Public Class OpenGL_FilteredBoth : Inherits VB_Algorithm
+Public Class OpenGL_FilteredBoth : Inherits VB_Parent
     Dim filter As New BackProject2D_FilterBoth
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1875,7 +1875,7 @@ End Class
 
 
 
-Public Class OpenGL_Filtered3D : Inherits VB_Algorithm
+Public Class OpenGL_Filtered3D : Inherits VB_Parent
     Dim filter As New Hist3Dcloud_BP_Filter
     Public Sub New()
         gOptions.OpenGLCapture.Checked = True
@@ -1898,7 +1898,7 @@ End Class
 
 
 
-Public Class OpenGL_HistNorm3D : Inherits VB_Algorithm
+Public Class OpenGL_HistNorm3D : Inherits VB_Parent
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -1919,7 +1919,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d1/d1d/tutorial_histo3D.html
-Public Class OpenGL_HistDepth3D : Inherits VB_Algorithm
+Public Class OpenGL_HistDepth3D : Inherits VB_Parent
     Dim hcloud As New Hist3Dcloud_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.Histogram3D
@@ -1943,7 +1943,7 @@ End Class
 
 
 
-Public Class OpenGL_SoloPointsRemoved : Inherits VB_Algorithm
+Public Class OpenGL_SoloPointsRemoved : Inherits VB_Parent
     Dim solos As New Area_SoloPoints
     Public Sub New()
         gOptions.unFiltered.Checked = True ' show all the unfiltered points so removing the points is obvious.
@@ -1973,7 +1973,7 @@ End Class
 
 
 
-Public Class OpenGL_World : Inherits VB_Algorithm
+Public Class OpenGL_World : Inherits VB_Parent
     ReadOnly world As New Depth_World
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -2007,7 +2007,7 @@ End Class
 
 
 
-Public Class OpenGL_Duster : Inherits VB_Algorithm
+Public Class OpenGL_Duster : Inherits VB_Parent
     Dim duster As New Duster_Basics
     Dim options As New Options_OpenGL_Duster
     Public Sub New()
@@ -2029,7 +2029,7 @@ End Class
 
 
 
-Public Class OpenGL_DusterY : Inherits VB_Algorithm
+Public Class OpenGL_DusterY : Inherits VB_Parent
     Dim duster As New Duster_BasicsY
     Dim options As New Options_OpenGL_Duster
     Public Sub New()
@@ -2053,7 +2053,7 @@ End Class
 
 
 
-Public Class OpenGL_Color3D : Inherits VB_Algorithm
+Public Class OpenGL_Color3D : Inherits VB_Parent
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
@@ -2082,7 +2082,7 @@ End Class
 
 
 
-Public Class OpenGL_ColorReduced3D : Inherits VB_Algorithm
+Public Class OpenGL_ColorReduced3D : Inherits VB_Parent
     Dim colorClass As New Color8U_Basics
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
@@ -2111,7 +2111,7 @@ End Class
 
 
 
-Public Class OpenGL_ColorRaw : Inherits VB_Algorithm
+Public Class OpenGL_ColorRaw : Inherits VB_Parent
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
@@ -2139,7 +2139,7 @@ End Class
 
 
 
-Public Class OpenGL_ColorBin4Way : Inherits VB_Algorithm
+Public Class OpenGL_ColorBin4Way : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"

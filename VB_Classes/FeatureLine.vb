@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class FeatureLine_Basics : Inherits VB_Algorithm
+Public Class FeatureLine_Basics : Inherits VB_Parent
     Dim lines As New Line_SubsetRect
     Dim lineDisp As New Line_DisplayInfo
     Dim options As New Options_Features
@@ -56,7 +56,7 @@ End Class
 
 
 
-Public Class FeatureLine_VerticalVerify : Inherits VB_Algorithm
+Public Class FeatureLine_VerticalVerify : Inherits VB_Parent
     Dim linesVH As New FeatureLine_VH
     Public verify As New IMU_VerticalVerify
     Public Sub New()
@@ -78,7 +78,7 @@ End Class
 
 
 
-Public Class FeatureLine_VH : Inherits VB_Algorithm
+Public Class FeatureLine_VH : Inherits VB_Parent
     Public gCells As New List(Of gravityLine)
     Dim match As New Match_tCell
     Dim gLines As New Line_GCloud
@@ -160,7 +160,7 @@ End Class
 
 
 
-Public Class FeatureLine_Tutorial1 : Inherits VB_Algorithm
+Public Class FeatureLine_Tutorial1 : Inherits VB_Parent
     Dim lines As New Line_Basics
     Public Sub New()
         labels(3) = "The highlighted lines are also lines in 3D."
@@ -195,7 +195,7 @@ End Class
 
 
 
-Public Class FeatureLine_Tutorial2 : Inherits VB_Algorithm
+Public Class FeatureLine_Tutorial2 : Inherits VB_Parent
     Dim lines As New Line_Basics
     Dim gMat As New IMU_GMatrix
     Public Sub New()
@@ -250,7 +250,7 @@ End Class
 
 
 
-Public Class FeatureLine_LongestVerticalKNN : Inherits VB_Algorithm
+Public Class FeatureLine_LongestVerticalKNN : Inherits VB_Parent
     Dim gLines As New Line_GCloud
     Dim longest As New FeatureLine_Longest
     Public Sub New()
@@ -301,7 +301,7 @@ End Class
 
 
 
-Public Class FeatureLine_LongestV_Tutorial1 : Inherits VB_Algorithm
+Public Class FeatureLine_LongestV_Tutorial1 : Inherits VB_Parent
     Dim lines As New FeatureLine_Finder
     Public Sub New()
         desc = "Use FeatureLine_Finder to find all the vertical lines and show the longest."
@@ -329,7 +329,7 @@ End Class
 
 
 
-Public Class FeatureLine_LongestV_Tutorial2 : Inherits VB_Algorithm
+Public Class FeatureLine_LongestV_Tutorial2 : Inherits VB_Parent
     Dim lines As New FeatureLine_Finder
     Dim knn As New KNN_Core4D
     Public pt1 As New cv.Point3f
@@ -392,7 +392,7 @@ End Class
 
 
 
-Public Class FeatureLine_Finder : Inherits VB_Algorithm
+Public Class FeatureLine_Finder : Inherits VB_Parent
     Dim lines As New Line_Basics
     Public lines2D As New List(Of cv.Point2f)
     Public lines3D As New List(Of cv.Point3f)
@@ -496,7 +496,7 @@ End Class
 
 
 
-Public Class FeatureLine_VerticalLongLine : Inherits VB_Algorithm
+Public Class FeatureLine_VerticalLongLine : Inherits VB_Parent
     Dim lines As New FeatureLine_Finder
     Public Sub New()
         desc = "Use FeatureLine_Finder data to identify the longest lines and show its angle."
@@ -533,7 +533,7 @@ End Class
 
 
 
-Public Class FeatureLine_DetailsAll : Inherits VB_Algorithm
+Public Class FeatureLine_DetailsAll : Inherits VB_Parent
     Dim lines As New FeatureLine_Finder
     Dim flow As New Font_FlowText
     Dim arcList As New List(Of Single)
@@ -604,7 +604,7 @@ End Class
 
 
 
-Public Class FeatureLine_LongestKNN : Inherits VB_Algorithm
+Public Class FeatureLine_LongestKNN : Inherits VB_Parent
     Dim glines As New Line_GCloud
     Public knn As New KNN_ClosestTracker
     Public options As New Options_Features
@@ -646,7 +646,7 @@ End Class
 
 
 
-Public Class FeatureLine_Longest : Inherits VB_Algorithm
+Public Class FeatureLine_Longest : Inherits VB_Parent
     Dim glines As New Line_GCloud
     Public knn As New KNN_ClosestTracker
     Public options As New Options_Features

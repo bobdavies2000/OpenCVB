@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Derivative_Basics : Inherits VB_Algorithm
+Public Class Derivative_Basics : Inherits VB_Parent
     Public options As New Options_Derivative
     Dim backp As New BackProject_Image
     Public plot As New Plot_Histogram
@@ -56,7 +56,7 @@ End Class
 
 
 
-Public Class Derivative_Sobel : Inherits VB_Algorithm
+Public Class Derivative_Sobel : Inherits VB_Parent
     Dim deriv As New Derivative_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst0.Checked = True
@@ -93,7 +93,7 @@ End Class
 
 
 
-Public Class Derivative_Laplacian : Inherits VB_Algorithm
+Public Class Derivative_Laplacian : Inherits VB_Parent
     Dim options As New Options_LaplacianKernels
     Dim deriv As New Derivative_Basics
     Public Sub New()
@@ -120,7 +120,7 @@ End Class
 
 
 
-Public Class Derivative_Classes : Inherits VB_Algorithm
+Public Class Derivative_Classes : Inherits VB_Parent
     Dim deriv As New Derivative_Basics
     Public classCountX As Integer
     Public classCountY As Integer

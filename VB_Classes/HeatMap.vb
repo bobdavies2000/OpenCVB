@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class HeatMap_Basics : Inherits VB_Algorithm
+Public Class HeatMap_Basics : Inherits VB_Parent
     Public topframes As New History_Basics
     Public sideframes As New History_Basics
     Public histogramTop As New cv.Mat
@@ -39,7 +39,7 @@ End Class
 
 
 
-Public Class HeatMap_Grid : Inherits VB_Algorithm
+Public Class HeatMap_Grid : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Public Sub New()
         gOptions.GridSize.Value = 5
@@ -100,7 +100,7 @@ End Class
 
 
 
-Public Class HeatMap_HotNot : Inherits VB_Algorithm
+Public Class HeatMap_HotNot : Inherits VB_Parent
     Dim heat As New HeatMap_Hot
     Public Sub New()
         labels = {"", "", "Mask of cool areas in the heat map - top view", "Mask of cool areas in the heat map - side view"}
@@ -120,7 +120,7 @@ End Class
 
 
 
-Public Class HeatMap_Hot : Inherits VB_Algorithm
+Public Class HeatMap_Hot : Inherits VB_Parent
     Dim histTop As New Projection_HistTop
     Dim histSide As New Projection_HistSide
     Public Sub New()
@@ -148,7 +148,7 @@ End Class
 
 
 
-Public Class HeatMap_Cell : Inherits VB_Algorithm
+Public Class HeatMap_Cell : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Dim heat As New HeatMap_Hot
     Public Sub New()
@@ -180,7 +180,7 @@ End Class
 
 
 
-Public Class HeatMap_GuidedBP : Inherits VB_Algorithm
+Public Class HeatMap_GuidedBP : Inherits VB_Parent
     Dim guided As New GuidedBP_Basics
     Public Sub New()
         redOptions.ProjectionThreshold.Value = 1

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
-Public Class Plane_Basics : Inherits VB_Algorithm
+Public Class Plane_Basics : Inherits VB_Parent
     Dim frames As New History_Basics
     Public Sub New()
         labels = {"", "Top down mask after after thresholding heatmap", "Vertical regions", "Horizontal regions"}
@@ -31,7 +31,7 @@ End Class
 
 
 ' http://pi.math.cornell.edu/~froh/231f08e1a.pdf
-Public Class Plane_From3Points : Inherits VB_Algorithm
+Public Class Plane_From3Points : Inherits VB_Parent
     Public input(3 - 1) As cv.Point3f
     Public showWork As Boolean = True
     Public cross As cv.Point3f
@@ -71,7 +71,7 @@ End Class
 
 
 
-Public Class Plane_FlatSurfaces : Inherits VB_Algorithm
+Public Class Plane_FlatSurfaces : Inherits VB_Parent
     Dim addW As New AddWeighted_Basics
     Dim plane As New Plane_CellColor
     Public Sub New()
@@ -125,7 +125,7 @@ End Class
 
 
 
-Public Class Plane_FloorStudy : Inherits VB_Algorithm
+Public Class Plane_FloorStudy : Inherits VB_Parent
     Public slice As New Structured_SliceH
     Public planeY As Single
     Public Sub New()
@@ -174,7 +174,7 @@ End Class
 
 
 '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
-Public Class Plane_OnlyPlanes : Inherits VB_Algorithm
+Public Class Plane_OnlyPlanes : Inherits VB_Parent
     Public plane As New Plane_CellColor
     Public contours As List(Of cv.Point)
     Public Sub New()
@@ -215,7 +215,7 @@ End Class
 
 
 
-Public Class Plane_EqCorrelation : Inherits VB_Algorithm
+Public Class Plane_EqCorrelation : Inherits VB_Parent
     Dim plane As New Plane_Points
     Public correlations As New List(Of Single)
     Public equations As New List(Of cv.Vec4f)
@@ -281,7 +281,7 @@ End Class
 
 '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
-Public Class Plane_CellColor : Inherits VB_Algorithm
+Public Class Plane_CellColor : Inherits VB_Parent
     Public options As New Options_Plane
     Public redC As New RedCloud_Basics
     Public Sub New()
@@ -340,7 +340,7 @@ End Class
 
 
 
-Public Class Plane_Points : Inherits VB_Algorithm
+Public Class Plane_Points : Inherits VB_Parent
     Dim plane As New Plane_From3Points
     Public equations As New List(Of cv.Vec4f)
     Public ptList As New List(Of cv.Point3f)
@@ -409,7 +409,7 @@ End Class
 
 
 
-Public Class Plane_Histogram : Inherits VB_Algorithm
+Public Class Plane_Histogram : Inherits VB_Parent
     Dim solo As New PointCloud_Solo
     Dim hist As New Hist_Basics
     Public peakCeiling As Single
@@ -465,7 +465,7 @@ End Class
 
 
 
-Public Class Plane_Verticals : Inherits VB_Algorithm
+Public Class Plane_Verticals : Inherits VB_Parent
     Dim solo As New PointCloud_Solo
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -498,7 +498,7 @@ End Class
 
 
 
-Public Class Plane_Horizontals : Inherits VB_Algorithm
+Public Class Plane_Horizontals : Inherits VB_Parent
     Dim solo As New PointCloud_Solo
     Dim frames As New History_Basics
     Public Sub New()
@@ -537,7 +537,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/33997220/plane-construction-from-3d-points-in-opencv
-Public Class Plane_Equation : Inherits VB_Algorithm
+Public Class Plane_Equation : Inherits VB_Parent
     Public rc As New rcData
     Public justEquation As String
     Public Sub New()

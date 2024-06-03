@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Imports  System.IO.MemoryMappedFiles
 Imports  System.IO.Pipes
 Imports cv = OpenCvSharp
-Public Class Python_Basics : Inherits VB_Algorithm
+Public Class Python_Basics : Inherits VB_Parent
     Public Function StartPython(arguments As String) As Boolean
         Dim pythonApp = New FileInfo(task.pythonTaskName)
 
@@ -46,7 +46,7 @@ End Class
 
 
 
-Public Class Python_Run : Inherits VB_Algorithm
+Public Class Python_Run : Inherits VB_Parent
     Dim python As New Python_Basics
     Public pyStream As Python_Stream
     Dim pythonApp As FileInfo
@@ -98,7 +98,7 @@ End Class
 
 
 
-Public Class Python_MemMap : Inherits VB_Algorithm
+Public Class Python_MemMap : Inherits VB_Parent
     Dim python As New Python_Basics
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim memMapFile As MemoryMappedFile
@@ -143,7 +143,7 @@ End Class
 
 
 
-Public Class Python_Stream : Inherits VB_Algorithm
+Public Class Python_Stream : Inherits VB_Parent
     Dim python As New Python_Basics
     Dim rgbBuffer(1) As Byte
     Dim depthBuffer(1) As Byte

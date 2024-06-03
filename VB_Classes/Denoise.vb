@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Denoise_Basics_CPP : Inherits VB_Algorithm
+Public Class Denoise_Basics_CPP : Inherits VB_Parent
     Dim diff As New Diff_Basics
     Public Sub New()
         cPtr = Denoise_Basics_Open(3)
@@ -31,7 +31,7 @@ End Class
 
 
 
-Public Class Denoise_Pixels : Inherits VB_Algorithm
+Public Class Denoise_Pixels : Inherits VB_Parent
     Public classCount As Integer
     Dim options As New Options_Denoise
     Public Sub New()

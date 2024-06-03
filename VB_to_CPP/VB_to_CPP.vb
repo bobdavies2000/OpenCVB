@@ -35,7 +35,7 @@ Public Class VB_to_CPP
         Dim vbIndex As Integer
         For vbIndex = 0 To vbInput.Count - 1
             Dim line = vbInput(vbIndex)
-            If line.Contains(algorithmVBName + " : Inherits VB_Algorithm") Then Exit For
+            If line.Contains(algorithmVBName + " : Inherits VB_Parent") Then Exit For
         Next
 
         VBrtb.Text = "Translate this vb.Net code to C++" + vbCrLf
@@ -104,7 +104,7 @@ Public Class VB_to_CPP
             If Trim(line).StartsWith("class") Then
                 Dim tokens = line.Split(" ")
                 functionName = tokens(1)
-                line = line.Replace("VB_Algorithm", "algorithmCPP")
+                line = line.Replace("VB_Parent", "algorithmCPP")
                 line = line.Replace("class ", "class CPP_")
             End If
 

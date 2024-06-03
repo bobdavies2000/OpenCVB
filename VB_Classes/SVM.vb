@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class SVM_Basics : Inherits VB_Algorithm
+Public Class SVM_Basics : Inherits VB_Parent
     Public options As New Options_SVM
     Dim sampleData As New SVM_SampleData
     Public points As New List(Of cv.Point2f)
@@ -55,7 +55,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
-Public Class SVM_SampleData : Inherits VB_Algorithm
+Public Class SVM_SampleData : Inherits VB_Parent
     ReadOnly options As New Options_SVM
     Public points As New List(Of cv.Point2f)
     Public responses As New List(Of Integer)
@@ -93,7 +93,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
-Public Class SVM_TestCase : Inherits VB_Algorithm
+Public Class SVM_TestCase : Inherits VB_Parent
     ReadOnly options As New Options_SVM
     Public Sub New()
         findSlider("Granularity").Value = 15
@@ -157,7 +157,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
-Public Class SVM_ReuseBasics : Inherits VB_Algorithm
+Public Class SVM_ReuseBasics : Inherits VB_Parent
     ReadOnly svm As New SVM_Basics
     Public Sub New()
         findSlider("Granularity").Value = 15
@@ -206,7 +206,7 @@ End Class
 
 
 
-Public Class SVM_ReuseRandom : Inherits VB_Algorithm
+Public Class SVM_ReuseRandom : Inherits VB_Parent
     ReadOnly svm As New SVM_Basics
     Public Sub New()
         findSlider("Granularity").Value = 15

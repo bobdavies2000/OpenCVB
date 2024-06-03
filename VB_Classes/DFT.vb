@@ -15,7 +15,7 @@ End Module
 
 
 ' http://stackoverflow.com/questions/19761526/how-to-do-inverse-dft-in-opencv
-Public Class DFT_Basics : Inherits VB_Algorithm
+Public Class DFT_Basics : Inherits VB_Parent
     Dim mats As New Mat_4to1
     Public magnitude As New cv.Mat
     Public spectrum As New cv.Mat
@@ -77,7 +77,7 @@ End Class
 
 
 ' http://opencvexamples.blogspot.com/
-Public Class DFT_Inverse : Inherits VB_Algorithm
+Public Class DFT_Inverse : Inherits VB_Parent
     Dim mats As New Mat_2to1
     Public Sub New()
         labels(2) = "Image after Inverse DFT"
@@ -115,7 +115,7 @@ End Class
 ' https://www.codeproject.com/Articles/5313198/Customizable-Butterworth-Digital-Filter
 ' http://breckon.eu/toby/teaching/dip/opencv/lecture_demos/c++/butterworth_lowpass.cpp
 ' https://github.com/ruohoruotsi/Butterworth-Filter-Design
-Public Class DFT_ButterworthFilter_MT : Inherits VB_Algorithm
+Public Class DFT_ButterworthFilter_MT : Inherits VB_Parent
     Public dft As New DFT_Basics
     Dim options As New Options_DFT
     Public Sub New()
@@ -162,7 +162,7 @@ End Class
 ' https://www.codeproject.com/Articles/5313198/Customizable-Butterworth-Digital-Filter
 ' http://breckon.eu/toby/teaching/dip/opencv/lecture_demos/c++/butterworth_lowpass.cpp
 ' https://github.com/ruohoruotsi/Butterworth-Filter-Design
-Public Class DFT_ButterworthDepth : Inherits VB_Algorithm
+Public Class DFT_ButterworthDepth : Inherits VB_Parent
     Dim bfilter As New DFT_ButterworthFilter_MT
     Public Sub New()
         desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
@@ -187,7 +187,7 @@ End Class
 
 
 
-Public Class DFT_Shapes : Inherits VB_Algorithm
+Public Class DFT_Shapes : Inherits VB_Parent
     Dim dft As New DFT_Basics
     Dim circle As New Draw_Circles
     Dim ellipse As New Draw_Ellipses

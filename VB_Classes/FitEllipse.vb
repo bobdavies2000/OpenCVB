@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
-Public Class FitEllipse_Basics : Inherits VB_Algorithm
+Public Class FitEllipse_Basics : Inherits VB_Parent
     Dim options As New Options_MinArea
     Public inputPoints As New List(Of cv.Point2f)
     Public box As cv.RotatedRect
@@ -39,7 +39,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
-Public Class FitEllipse_AMS_CPP : Inherits VB_Algorithm
+Public Class FitEllipse_AMS_CPP : Inherits VB_Parent
     Dim options As New Options_MinArea
     Public inputPoints As New List(Of cv.Point2f)
     Public Sub New()
@@ -84,7 +84,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
-Public Class FitEllipse_Direct_CPP : Inherits VB_Algorithm
+Public Class FitEllipse_Direct_CPP : Inherits VB_Parent
     Dim options As New Options_MinArea
     Public Sub New()
         labels(2) = "The FitEllipse_Direct C++ "
@@ -126,7 +126,7 @@ End Class
 
 
 
-Public Class FitEllipse_RedCloud : Inherits VB_Algorithm
+Public Class FitEllipse_RedCloud : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim fitE As New FitEllipse_Basics
     Public Sub New()

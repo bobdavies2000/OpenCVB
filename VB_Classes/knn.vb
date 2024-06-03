@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class KNN_Basics : Inherits VB_Algorithm
+Public Class KNN_Basics : Inherits VB_Parent
     Public matches As New List(Of pointPair)
     Public noMatch As New List(Of cv.Point)
     Public knn As New KNN_Core
@@ -78,7 +78,7 @@ End Class
 
 
 
-Public Class KNN_Core : Inherits VB_Algorithm
+Public Class KNN_Core : Inherits VB_Parent
     Public knn As cv.ML.KNearest
     Public trainInput As New List(Of cv.Point2f) ' put training data here
     Public queries As New List(Of cv.Point2f) ' put Query data here
@@ -170,7 +170,7 @@ End Class
 
 
 
-Public Class KNN_Core2DTest : Inherits VB_Algorithm
+Public Class KNN_Core2DTest : Inherits VB_Parent
     Public knn As New KNN_Core
     Dim random As New Random_Basics
     Public Sub New()
@@ -217,7 +217,7 @@ End Class
 
 
 
-Public Class KNN_Core3D : Inherits VB_Algorithm
+Public Class KNN_Core3D : Inherits VB_Parent
     Public knn As cv.ML.KNearest
     Public trainInput As New List(Of cv.Point3f) ' put training data here
     Public queries As New List(Of cv.Point3f) ' put Query data here
@@ -265,7 +265,7 @@ End Class
 
 
 
-Public Class KNN_Core4D : Inherits VB_Algorithm
+Public Class KNN_Core4D : Inherits VB_Parent
     Public knn As cv.ML.KNearest
     Public trainInput As New List(Of cv.Vec4f) ' put training data here
     Public queries As New List(Of cv.Vec4f) ' put Query data here
@@ -314,7 +314,7 @@ End Class
 
 
 
-Public Class KNN_CoreN : Inherits VB_Algorithm
+Public Class KNN_CoreN : Inherits VB_Parent
     Public knn As cv.ML.KNearest
     Public trainInput As New List(Of Single) ' put training data here
     Public queries As New List(Of Single) ' put Query data here
@@ -373,7 +373,7 @@ End Class
 
 
 
-Public Class KNN_Core3DTest : Inherits VB_Algorithm
+Public Class KNN_Core3DTest : Inherits VB_Parent
     Dim knn As New KNN_Core3D
     Dim dist As New Distance_Point3D
     Dim random As New Random_Basics3D
@@ -434,7 +434,7 @@ End Class
 
 
 
-Public Class KNN_Core4DTest : Inherits VB_Algorithm
+Public Class KNN_Core4DTest : Inherits VB_Parent
     Dim knn As New KNN_Core4D
     Dim dist As New Distance_Point4D
     Dim random As New Random_Basics4D
@@ -484,7 +484,7 @@ End Class
 
 
 
-Public Class KNN_CoreNTest : Inherits VB_Algorithm
+Public Class KNN_CoreNTest : Inherits VB_Parent
     Dim knn As New KNN_CoreN
     Public Sub New()
         labels(2) = "Highlight color (Yellow) is query.  The red dots are the training set."
@@ -538,7 +538,7 @@ End Class
 
 
 
-Public Class KNN_Emax : Inherits VB_Algorithm
+Public Class KNN_Emax : Inherits VB_Parent
     Dim random As New Random_Basics
     Public knn As New KNN_Core
     Dim em As New EMax_Basics
@@ -575,7 +575,7 @@ End Class
 
 
 
-Public Class KNN_Input : Inherits VB_Algorithm
+Public Class KNN_Input : Inherits VB_Parent
     Public trainingPoints As New List(Of cv.Point2f)
     Public queryPoints As New List(Of cv.Point2f)
     Public randomTrain As New Random_Basics
@@ -625,7 +625,7 @@ End Class
 
 
 
-Public Class KNN_TrackMean : Inherits VB_Algorithm
+Public Class KNN_TrackMean : Inherits VB_Parent
     Dim plot As New Plot_Histogram
     Dim knn As New KNN_Basics
     Dim feat As New Feature_Basics
@@ -723,7 +723,7 @@ End Class
 
 
 
-Public Class KNN_ClosestTracker : Inherits VB_Algorithm
+Public Class KNN_ClosestTracker : Inherits VB_Parent
     Public lines As New Line_Basics
     Public lastPair As New pointPair
     Public trainInput As New List(Of cv.Point2f)
@@ -796,7 +796,7 @@ End Class
 
 
 
-Public Class KNN_ClosestLine : Inherits VB_Algorithm
+Public Class KNN_ClosestLine : Inherits VB_Parent
     Public lastP1 As cv.Point2f
     Public lastP2 As cv.Point2f
     Public lastIndex As Integer
@@ -850,7 +850,7 @@ End Class
 
 
 
-Public Class KNN_ClosestVertical : Inherits VB_Algorithm
+Public Class KNN_ClosestVertical : Inherits VB_Parent
     Public lines As New FeatureLine_Finder
     Public knn As New KNN_ClosestLine
     Public pt1 As New cv.Point3f
@@ -900,7 +900,7 @@ End Class
 
 
 
-Public Class KNN_BasicsOld : Inherits VB_Algorithm
+Public Class KNN_BasicsOld : Inherits VB_Parent
     Public matches As New List(Of pointPair)
     Public noMatch As New List(Of cv.Point)
     Public knn As New KNN_Core
@@ -995,7 +995,7 @@ End Class
 
 
 
-Public Class KNN_Farthest : Inherits VB_Algorithm
+Public Class KNN_Farthest : Inherits VB_Parent
     Dim knn As New KNN_Core
     Public mpFar As pointPair
     Public Sub New()
@@ -1046,7 +1046,7 @@ End Class
 
 
 
-Public Class KNN_TrackEach : Inherits VB_Algorithm
+Public Class KNN_TrackEach : Inherits VB_Parent
     Dim knn As New KNN_Basics
     Dim feat As New Feature_Basics
     Dim trackAll As New List(Of List(Of pointPair))

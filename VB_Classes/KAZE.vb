@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Collections.Generic
 
-Public Class KAZE_KeypointsKAZE_CS : Inherits VB_Algorithm
+Public Class KAZE_KeypointsKAZE_CS : Inherits VB_Parent
     Dim CS_Kaze As New CS_Classes.Kaze_Basics
     Public Sub New()
         desc = "Find keypoints using KAZE algorithm."
@@ -19,7 +19,7 @@ End Class
 
 
 
-Public Class KAZE_KeypointsAKAZE_CS : Inherits VB_Algorithm
+Public Class KAZE_KeypointsAKAZE_CS : Inherits VB_Parent
     Dim CS_AKaze As New CS_Classes.AKaze_Basics
     Public Sub New()
         desc = "Find keypoints using AKAZE algorithm."
@@ -36,7 +36,7 @@ End Class
 
 
 
-Public Class KAZE_Sample_CS : Inherits VB_Algorithm
+Public Class KAZE_Sample_CS : Inherits VB_Parent
     Dim box As New cv.Mat
     Dim box_in_scene As New cv.Mat
     Dim CS_Kaze As New CS_Classes.Kaze_Sample
@@ -53,7 +53,7 @@ End Class
 
 
 
-Public Class KAZE_Match_CS : Inherits VB_Algorithm
+Public Class KAZE_Match_CS : Inherits VB_Parent
     Dim CS_Kaze As New CS_Classes.Kaze_Sample
     Public Sub New()
         desc = "Match keypoints in the left and right images."
@@ -68,7 +68,7 @@ End Class
 
 
 
-Public Class KAZE_LeftAligned_CS : Inherits VB_Algorithm
+Public Class KAZE_LeftAligned_CS : Inherits VB_Parent
     Dim CS_KazeLeft As New CS_Classes.Kaze_Basics
     Dim CS_KazeRight As New CS_Classes.Kaze_Basics
     Public Sub New()

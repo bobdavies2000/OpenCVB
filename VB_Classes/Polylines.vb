@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Polylines_IEnumerableExample : Inherits VB_Algorithm
+Public Class Polylines_IEnumerableExample : Inherits VB_Parent
     Public Sub New()
         If check.Setup(traceName) Then
             check.addCheckBox("Polyline closed if checked")
@@ -31,7 +31,7 @@ End Class
 
 ' VB.Net implementation of the browse example in OpenCV.
 ' https://github.com/opencv/opencv/blob/master/samples/python/browse.py
-Public Class Polylines_Random : Inherits VB_Algorithm
+Public Class Polylines_Random : Inherits VB_Parent
     Dim zoom As New Pixel_Zoom
     Public Sub New()
         labels(2) = "To zoom move the mouse over the image"

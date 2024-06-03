@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class FeaturePoly_Basics : Inherits VB_Algorithm
+Public Class FeaturePoly_Basics : Inherits VB_Parent
     Public resync As Boolean
     Public resyncCause As String
     Public resyncFrames As Integer
@@ -102,7 +102,7 @@ End Class
 
 
 
-Public Class FeaturePoly_Sides : Inherits VB_Algorithm
+Public Class FeaturePoly_Sides : Inherits VB_Parent
     Public currPoly As New List(Of cv.Point2f)
     Public currSideIndex As Integer
     Public currLengths As New List(Of Single)
@@ -231,7 +231,7 @@ End Class
 
 
 
-Public Class FeaturePoly_BasicsOriginal : Inherits VB_Algorithm
+Public Class FeaturePoly_BasicsOriginal : Inherits VB_Parent
     Public fPD As New fPolyData
     Public resyncImage As cv.Mat
     Public resync As Boolean
@@ -356,7 +356,7 @@ End Class
 
 
 
-Public Class FeaturePoly_Plot : Inherits VB_Algorithm
+Public Class FeaturePoly_Plot : Inherits VB_Parent
     Public fGrid As New FeaturePoly_Core
     Dim plot As New Plot_Histogram
     Public hist() As Single
@@ -412,7 +412,7 @@ End Class
 
 
 
-Public Class FeaturePoly_PlotWeighted : Inherits VB_Algorithm
+Public Class FeaturePoly_PlotWeighted : Inherits VB_Parent
     Public fPlot As New FeaturePoly_Plot
     Dim plot As New Plot_Histogram
     Dim addw As New AddWeighted_Basics
@@ -456,7 +456,7 @@ End Class
 
 
 
-Public Class FeaturePoly_Stablizer : Inherits VB_Algorithm
+Public Class FeaturePoly_Stablizer : Inherits VB_Parent
     Public fGrid As New FeaturePoly_Core
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -500,7 +500,7 @@ End Class
 
 
 
-Public Class FeaturePoly_StartPoints : Inherits VB_Algorithm
+Public Class FeaturePoly_StartPoints : Inherits VB_Parent
     Public startPoints As New List(Of cv.Point2f)
     Public goodPoints As New List(Of cv.Point2f)
     Dim fGrid As New FeaturePoly_Core
@@ -558,7 +558,7 @@ End Class
 
 
 
-Public Class FeaturePoly_Triangle : Inherits VB_Algorithm
+Public Class FeaturePoly_Triangle : Inherits VB_Parent
     Dim triangle As New Area_MinTriangle_CPP
     Dim fGrid As New FeaturePoly_Core
     Public Sub New()
@@ -580,7 +580,7 @@ End Class
 
 
 
-Public Class FeaturePoly_TopFeatures : Inherits VB_Algorithm
+Public Class FeaturePoly_TopFeatures : Inherits VB_Parent
     Public stable As New Stable_BasicsCount
     Public poly As New List(Of cv.Point2f)
     Public options As New Options_FPoly
@@ -615,7 +615,7 @@ End Class
 
 
 
-Public Class FeaturePoly_WarpAffinePoly : Inherits VB_Algorithm
+Public Class FeaturePoly_WarpAffinePoly : Inherits VB_Parent
     Dim rotatePoly As New Rotate_PolyQT
     Dim warp As New WarpAffine_BasicsQT
     Dim fPoly As New FeaturePoly_BasicsOriginal
@@ -676,7 +676,7 @@ End Class
 
 
 
-Public Class FeaturePoly_RotatePoints : Inherits VB_Algorithm
+Public Class FeaturePoly_RotatePoints : Inherits VB_Parent
     Dim rotatePoly As New Rotate_PolyQT
     Public poly As New List(Of cv.Point2f)
     Public polyPrev As New List(Of cv.Point2f)
@@ -739,7 +739,7 @@ End Class
 
 
 
-Public Class FeaturePoly_WarpAffineImage : Inherits VB_Algorithm
+Public Class FeaturePoly_WarpAffineImage : Inherits VB_Parent
     Dim warp As New WarpAffine_BasicsQT
     Dim fPoly As New FeaturePoly_BasicsOriginal
     Public Sub New()
@@ -787,7 +787,7 @@ End Class
 
 
 ' https://www.google.com/search?q=geometry+find+the+center+of+rotation&rlz=1C1CHBF_enUS838US838&oq=geometry+find+the+center+of+rotation&aqs=chrome..69i57j0i22i30j0i390l3.9576j0j4&sourceid=chrome&ie=UTF-8#kpvalbx=_rgg1Y9rbGM3n0PEP-ae4oAc_34
-Public Class FeaturePoly_Perpendiculars : Inherits VB_Algorithm
+Public Class FeaturePoly_Perpendiculars : Inherits VB_Parent
     Public altCenterShift As cv.Point2f
     Public fPD As fPolyData
     Public rotatePoints As New FeaturePoly_RotatePoints
@@ -862,7 +862,7 @@ End Class
 
 
 
-Public Class FeaturePoly_PerpendicularsTest : Inherits VB_Algorithm
+Public Class FeaturePoly_PerpendicularsTest : Inherits VB_Parent
     Dim center As New FeaturePoly_Perpendiculars
     Dim fPoly As New FeaturePoly_BasicsOriginal
     Public Sub New()
@@ -885,7 +885,7 @@ End Class
 
 
 
-Public Class FeaturePoly_PerpendicularsImage : Inherits VB_Algorithm
+Public Class FeaturePoly_PerpendicularsImage : Inherits VB_Parent
     Dim center As New FeaturePoly_Perpendiculars
     Dim fImage As New FeaturePoly_Image
     Public Sub New()
@@ -909,7 +909,7 @@ End Class
 
 
 
-Public Class FeaturePoly_Image : Inherits VB_Algorithm
+Public Class FeaturePoly_Image : Inherits VB_Parent
     Public fpoly As New FeaturePoly_BasicsOriginal
     Dim rotate As New Rotate_BasicsQT
     Public resync As Boolean
@@ -986,7 +986,7 @@ End Class
 
 
 
-Public Class FeaturePoly_ImageMask : Inherits VB_Algorithm
+Public Class FeaturePoly_ImageMask : Inherits VB_Parent
     Public fImage As New FeaturePoly_Image
     Public Sub New()
         If standaloneTest() Then gOptions.displayDst1.Checked = True
@@ -1010,7 +1010,7 @@ End Class
 
 
 
-Public Class FeaturePoly_PointCloud : Inherits VB_Algorithm
+Public Class FeaturePoly_PointCloud : Inherits VB_Parent
     Public fMask As New FeaturePoly_ImageMask
     Public fPolyCloud As cv.Mat
     Public Sub New()
@@ -1035,7 +1035,7 @@ End Class
 
 
 
-Public Class FeaturePoly_ResyncCheck : Inherits VB_Algorithm
+Public Class FeaturePoly_ResyncCheck : Inherits VB_Parent
     Dim fPoly As New FeaturePoly_BasicsOriginal
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -1070,7 +1070,7 @@ End Class
 
 
 
-Public Class FeaturePoly_Center : Inherits VB_Algorithm
+Public Class FeaturePoly_Center : Inherits VB_Parent
     Public rotatePoly As New Rotate_PolyQT
     Dim near As New Line_Nearest
     Public fPD As fPolyData
@@ -1167,7 +1167,7 @@ End Class
 
 
 
-Public Class FeaturePoly_EdgeRemoval : Inherits VB_Algorithm
+Public Class FeaturePoly_EdgeRemoval : Inherits VB_Parent
     Dim fMask As New FeaturePoly_ImageMask
     Dim edges As New Edge_All
     Public Sub New()
@@ -1198,7 +1198,7 @@ End Class
 
 
 
-Public Class FeaturePoly_ImageNew : Inherits VB_Algorithm
+Public Class FeaturePoly_ImageNew : Inherits VB_Parent
     Public fpoly As New FeaturePoly_Basics
     Dim rotate As New Rotate_BasicsQT
     Public resync As Boolean
@@ -1267,7 +1267,7 @@ End Class
 
 
 
-Public Class FeaturePoly_LeftRight : Inherits VB_Algorithm
+Public Class FeaturePoly_LeftRight : Inherits VB_Parent
     Dim leftPoly As New FeaturePoly_Basics
     Dim rightPoly As New FeaturePoly_Basics
     Public Sub New()
@@ -1296,7 +1296,7 @@ End Class
 
 
 
-Public Class FeaturePoly_Core : Inherits VB_Algorithm
+Public Class FeaturePoly_Core : Inherits VB_Parent
     Public stable As New Stable_GoodFeatures
     Public anchor As cv.Point2f
     Public startAnchor As cv.Point2f

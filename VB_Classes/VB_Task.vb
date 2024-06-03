@@ -162,7 +162,7 @@ Public Class VBtask : Implements IDisposable
     Public desc As String
     Public advice As String = ""
     Public intermediateName As String
-    Public intermediateObject As VB_Algorithm
+    Public intermediateObject As VB_Parent
     Public activeObjects As New List(Of Object)
     Public pixelViewerOn As Boolean
 
@@ -392,10 +392,11 @@ Public Class VBtask : Implements IDisposable
         callTrace.Clear()
         callTrace.Add(algName + "\")
         activeObjects.Clear()
-        algorithmObject = algoList.createAlgorithm(algName)
-        If algorithmObject Is Nothing Then
-            desc = algName
+        If algName.StartsWith("CS_") Then
+            algorithmObject = algoList.createCSAlgorithm(algName)
+            desc = algorithmObject.desc
         Else
+            algorithmObject = algoList.createVBAlgorithm(algName)
             desc = algorithmObject.desc
         End If
 
@@ -596,14 +597,18 @@ Public Class VBtask : Implements IDisposable
 
             If gOptions.RGBFilterActive.Checked Then
                 Dim filterName = gOptions.RGBFilterList.Text
-                If rgbFilter Is Nothing Then rgbFilter = algoList.createAlgorithm(filterName)
-                If rgbFilter.traceName <> filterName Then rgbFilter = algoList.createAlgorithm(filterName)
+                If rgbFilter Is Nothing Then rgbFilter = algoList.createVBAlgorithm(filterName)
+                If rgbFilter.traceName <> filterName Then rgbFilter = algoList.createVBAlgorithm(filterName)
                 rgbFilter.RunVB(src)
                 src = rgbFilter.dst2
             End If
 
             'cMotion.Run(src)
-            algorithmObject.NextFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
+            If task.algName.StartsWith("CS_") = False Then
+                algorithmObject.NextFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
+            Else
+
+            End If
 
             Dim rc = task.rc
             If task.redCells.Count > 0 Then setSelectedContour()

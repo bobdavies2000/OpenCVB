@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
-Public Class Plot_Basics : Inherits VB_Algorithm
+Public Class Plot_Basics : Inherits VB_Parent
     Dim plot As New Plot_Basics_CPP
     Dim hist As New Hist_Graph
     Public plotCount As Integer = 3
@@ -32,7 +32,7 @@ End Class
 
 
 
-Public Class Plot_Histogram : Inherits VB_Algorithm
+Public Class Plot_Histogram : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public histArray() As Single
     Public minRange As Single = 0
@@ -92,7 +92,7 @@ End Class
 
 
 
-Public Class Plot_Depth : Inherits VB_Algorithm
+Public Class Plot_Depth : Inherits VB_Parent
     Dim plotDepth As New Plot_Basics_CPP
     Dim hist As New Hist_Basics
     Public Sub New()
@@ -131,7 +131,7 @@ End Class
 
 
 
-Public Class Plot_Histogram2D : Inherits VB_Algorithm
+Public Class Plot_Histogram2D : Inherits VB_Parent
     Public Sub New()
         labels = {"", "", "2D Histogram", ""}
         desc = "Plot a 2D histgram from the input Mat"
@@ -159,7 +159,7 @@ End Class
 
 
 
-Public Class Plot_OverTimeSingle : Inherits VB_Algorithm
+Public Class Plot_OverTimeSingle : Inherits VB_Parent
     Public plotData As Single
     Public backColor = cv.Scalar.DarkGray
     Public max As Single, min As Single, avg, fmt As String
@@ -211,7 +211,7 @@ End Class
 
 
 
-Public Class Plot_OverTimeScalar : Inherits VB_Algorithm
+Public Class Plot_OverTimeScalar : Inherits VB_Parent
     Public plotData As cv.Scalar
     Public plotCount As Integer = 3
     Public plotList As New List(Of Plot_OverTimeSingle)
@@ -243,7 +243,7 @@ End Class
 
 
 
-Public Class Plot_OverTime : Inherits VB_Algorithm
+Public Class Plot_OverTime : Inherits VB_Parent
     Public plotData As cv.Scalar
     Public plotCount As Integer = 3
     Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.LawnGreen, cv.Scalar.Red, cv.Scalar.White}
@@ -336,7 +336,7 @@ End Class
 
 
 
-Public Class Plot_OverTimeFixedScale : Inherits VB_Algorithm
+Public Class Plot_OverTimeFixedScale : Inherits VB_Parent
     Public plotData As cv.Scalar
     Public plotCount As Integer = 3
     Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.White}
@@ -430,7 +430,7 @@ End Class
 
 
 
-Public Class Plot_Beats : Inherits VB_Algorithm
+Public Class Plot_Beats : Inherits VB_Parent
     Dim plot As New Plot_OverTimeFixedScale
     Public Sub New()
         plot.plotCount = 4
@@ -461,7 +461,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
-Public Class Plot_Basics_CPP : Inherits VB_Algorithm
+Public Class Plot_Basics_CPP : Inherits VB_Parent
     Public srcX As New List(Of Double)
     Public srcY As New List(Of Double)
     Public Sub New()
@@ -497,7 +497,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
-Public Class Plot_Dots : Inherits VB_Algorithm
+Public Class Plot_Dots : Inherits VB_Parent
     Public srcX As New List(Of Double)
     Public srcY As New List(Of Double)
     Public plotColor = cv.Scalar.Yellow

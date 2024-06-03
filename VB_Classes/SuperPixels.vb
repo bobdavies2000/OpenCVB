@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class SuperPixel_Basics : Inherits VB_Algorithm
+Public Class SuperPixel_Basics : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(2) = "Super Pixel cells"
@@ -21,7 +21,7 @@ End Class
 
 
 
-Public Class SuperPixel_Basics_CPP : Inherits VB_Algorithm
+Public Class SuperPixel_Basics_CPP : Inherits VB_Parent
     Public wireGrid As cv.Mat
     Public gridColor = cv.Scalar.White
     Public Sub New()
@@ -78,7 +78,7 @@ End Class
 
 
 
-Public Class SuperPixel_BinarizedImage : Inherits VB_Algorithm
+Public Class SuperPixel_BinarizedImage : Inherits VB_Parent
     ReadOnly pixels As New SuperPixel_Basics_CPP
     ReadOnly binarize As Binarize_Basics
     Public Sub New()
@@ -102,7 +102,7 @@ End Class
 
 
 
-Public Class SuperPixel_Depth : Inherits VB_Algorithm
+Public Class SuperPixel_Depth : Inherits VB_Parent
     Dim pixels As New SuperPixel_Basics_CPP
     Public Sub New()
         desc = "Create SuperPixels using RGBDepth image."
@@ -119,7 +119,7 @@ End Class
 
 
 
-Public Class SuperPixel_WithCanny : Inherits VB_Algorithm
+Public Class SuperPixel_WithCanny : Inherits VB_Parent
     ReadOnly pixels As New SuperPixel_Basics_CPP
     ReadOnly edges As New Edge_Canny
     Public Sub New()
@@ -142,7 +142,7 @@ End Class
 
 
 
-Public Class SuperPixel_WithLineDetector : Inherits VB_Algorithm
+Public Class SuperPixel_WithLineDetector : Inherits VB_Parent
     ReadOnly pixels As New SuperPixel_Basics_CPP
     ReadOnly lines As New Line_Basics
     Public Sub New()

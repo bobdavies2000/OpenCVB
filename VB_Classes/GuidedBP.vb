@@ -1,6 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class GuidedBP_Basics : Inherits VB_Algorithm
+Public Class GuidedBP_Basics : Inherits VB_Parent
     Public ptHot As New GuidedBP_HotPoints
     Dim topMap As New cv.Mat
     Dim sideMap As New cv.Mat
@@ -53,7 +53,7 @@ End Class
 
 
 
-Public Class GuidedBP_HotPointsKNN : Inherits VB_Algorithm
+Public Class GuidedBP_HotPointsKNN : Inherits VB_Parent
     Dim ptHot As New GuidedBP_HotPoints
     Dim knnSide As New KNN_Core
     Dim knnTop As New KNN_Core
@@ -104,7 +104,7 @@ End Class
 
 
 
-Public Class GuidedBP_HotPoints : Inherits VB_Algorithm
+Public Class GuidedBP_HotPoints : Inherits VB_Parent
     Public histTop As New Projection_HistTop
     Public histSide As New Projection_HistSide
     Public topRects As New List(Of cv.Rect)
@@ -161,7 +161,7 @@ End Class
 
 
 
-Public Class GuidedBP_PlanesPlot : Inherits VB_Algorithm
+Public Class GuidedBP_PlanesPlot : Inherits VB_Parent
     Dim histSide As New Projection_HistSide
     Public Sub New()
         labels = {"", "", "Side view", "Plot of nonzero rows in the side view"}
@@ -207,7 +207,7 @@ End Class
 
 
 
-Public Class GuidedBP_Points : Inherits VB_Algorithm
+Public Class GuidedBP_Points : Inherits VB_Parent
     Public hotPoints As New GuidedBP_Basics
     Public classCount As Integer
     Public selectedPoint As cv.Point
@@ -249,7 +249,7 @@ End Class
 
 
 
-Public Class GuidedBP_Lookup : Inherits VB_Algorithm
+Public Class GuidedBP_Lookup : Inherits VB_Parent
     Dim guided As New GuidedBP_Basics
     Public Sub New()
         task.clickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
@@ -270,7 +270,7 @@ End Class
 
 
 
-Public Class GuidedBP_Depth : Inherits VB_Algorithm
+Public Class GuidedBP_Depth : Inherits VB_Parent
     Public hist As New PointCloud_Histograms
     Dim myPalette As New Palette_Random
     Public classCount As Integer

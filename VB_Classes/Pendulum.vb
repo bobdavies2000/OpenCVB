@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 'https://github.com/DinoZ1729/Double-Pendulum/blob/main/pendulum_with_trace.cpp
-Public Class Pendulum_Basics : Inherits VB_Algorithm
+Public Class Pendulum_Basics : Inherits VB_Parent
     Public Sub New()
         If findfrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)

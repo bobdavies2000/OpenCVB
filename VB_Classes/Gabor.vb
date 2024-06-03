@@ -2,7 +2,7 @@
 Imports cv = OpenCvSharp
 'https://gist.github.com/kendricktan/93f0da88d0b25087d751ed2244cf770c
 'https://medium.com/@anuj_shah/through-the-eyes-of-gabor-filter-17d1fdb3ac97
-Public Class Gabor_Basics : Inherits VB_Algorithm
+Public Class Gabor_Basics : Inherits VB_Parent
     Public gKernel As cv.Mat
     Public ksize As Double
     Public Sigma As Double
@@ -47,7 +47,7 @@ End Class
 
 
 
-Public Class Gabor_Basics_MT : Inherits VB_Algorithm
+Public Class Gabor_Basics_MT : Inherits VB_Parent
     Dim gabor(31) As Gabor_Basics
     Dim grid As New Grid_Rectangles
     Public Sub New()

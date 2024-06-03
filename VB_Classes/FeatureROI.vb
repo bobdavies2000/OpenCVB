@@ -1,6 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class FeatureROI_Basics : Inherits VB_Algorithm
+Public Class FeatureROI_Basics : Inherits VB_Parent
     Dim addw As New AddWeighted_Basics
     Public rects As New List(Of cv.Rect)
     Public meanList As New List(Of Single)
@@ -52,7 +52,7 @@ End Class
 
 
 
-Public Class FeatureROI_Color : Inherits VB_Algorithm
+Public Class FeatureROI_Color : Inherits VB_Parent
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         findSlider("Add Weighted %").Value = 70
@@ -96,7 +96,7 @@ End Class
 
 
 
-Public Class FeatureROI_Canny : Inherits VB_Algorithm
+Public Class FeatureROI_Canny : Inherits VB_Parent
     Dim canny As New Edge_Canny
     Dim devGrid As New FeatureROI_Basics
     Public Sub New()
@@ -119,7 +119,7 @@ End Class
 
 
 
-Public Class FeatureROI_Sorted : Inherits VB_Algorithm
+Public Class FeatureROI_Sorted : Inherits VB_Parent
     Dim addw As New AddWeighted_Basics
     Dim gridLow As New Grid_LowRes
     Public sortedStd As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingle)
@@ -203,7 +203,7 @@ End Class
 
 
 
-Public Class FeatureROI_ColorSplit : Inherits VB_Algorithm
+Public Class FeatureROI_ColorSplit : Inherits VB_Parent
     Dim devGrid As New FeatureROI_Sorted
     Public Sub New()
         devGrid.maskVal = 255
@@ -235,7 +235,7 @@ End Class
 
 
 
-Public Class FeatureROI_Correlation : Inherits VB_Algorithm
+Public Class FeatureROI_Correlation : Inherits VB_Parent
     Public gather As New FeatureROI_Basics
     Dim plot As New Plot_OverTimeSingle
     Dim options As New Options_Features
@@ -279,7 +279,7 @@ End Class
 
 
 
-Public Class FeatureROI_LowStdev : Inherits VB_Algorithm
+Public Class FeatureROI_LowStdev : Inherits VB_Parent
     Public rects As New List(Of cv.Rect)
     Dim gather As New FeatureROI_Basics
     Public Sub New()
@@ -307,7 +307,7 @@ End Class
 
 
 
-Public Class FeatureROI_LowStdevCorrelation : Inherits VB_Algorithm
+Public Class FeatureROI_LowStdevCorrelation : Inherits VB_Parent
     Dim gather As New FeatureROI_LowStdev
     Dim correlations As New List(Of Single)
     Dim options As New Options_Features
@@ -360,7 +360,7 @@ End Class
 
 
 
-Public Class FeatureROI_LR : Inherits VB_Algorithm
+Public Class FeatureROI_LR : Inherits VB_Parent
     Public gLeft As New FeatureROI_Basics
     Public gRight As New FeatureROI_Basics
     Public Sub New()
@@ -382,7 +382,7 @@ End Class
 
 
 
-Public Class FeatureROI_LRClick : Inherits VB_Algorithm
+Public Class FeatureROI_LRClick : Inherits VB_Parent
     Dim gather As New FeatureROI_Basics
     Dim clickPoint As cv.Point, picTag As Integer
     Dim options As New Options_Features
@@ -463,7 +463,7 @@ End Class
 
 
 
-Public Class FeatureROI_LRAll : Inherits VB_Algorithm
+Public Class FeatureROI_LRAll : Inherits VB_Parent
     Dim gather As New FeatureROI_Basics
     Dim options As New Options_Features
     Public sortedRects As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)

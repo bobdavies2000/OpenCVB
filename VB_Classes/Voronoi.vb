@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
 'https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
-Public Class Voronoi_Basics : Inherits VB_Algorithm
+Public Class Voronoi_Basics : Inherits VB_Parent
     Public vDemo As New CS_Classes.VoronoiDemo
     Public random As New Random_Basics
     Public Sub New()
@@ -31,7 +31,7 @@ End Class
 
 
 'https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
-Public Class Voronoi_Compare : Inherits VB_Algorithm
+Public Class Voronoi_Compare : Inherits VB_Parent
     Dim basics As New Voronoi_Basics
     Public random As New Random_Basics
     Public Sub New()
@@ -55,7 +55,7 @@ End Class
 
 
 'https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
-Public Class Voronoi_CPP : Inherits VB_Algorithm
+Public Class Voronoi_CPP : Inherits VB_Parent
     Dim vDemo As New Voronoi_Basics
     Public Sub New()
         cPtr = VoronoiDemo_Open(task.homeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols)
