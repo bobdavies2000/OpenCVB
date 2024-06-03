@@ -289,9 +289,6 @@ Module VB_Common
         listOfPoints.Add(contour)
         cv.Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType)
     End Sub
-    Public Function vecToScalar(vec As cv.Vec3b) As cv.Scalar
-        Return New cv.Scalar(vec(0), vec(1), vec(2))
-    End Function
     Public Sub quarterBeat()
         Static quarter(4) As Boolean
         task.quarterBeat = False
@@ -526,6 +523,72 @@ Module VB_Common
             If obj.traceName = task.intermediateName And obj.firstPass = False Then Return obj
         Next
         Return Nothing
+    End Function
+    Public Function validateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
+        If r.Width <= 0 Then r.Width = 1
+        If r.Height <= 0 Then r.Height = 1
+        If r.X < 0 Then r.X = 0
+        If r.Y < 0 Then r.Y = 0
+        If r.X > task.workingRes.Width * ratio Then r.X = task.workingRes.Width * ratio - 1
+        If r.Y > task.workingRes.Height * ratio Then r.Y = task.workingRes.Height * ratio - 1
+        If r.X + r.Width > task.workingRes.Width * ratio Then r.Width = task.workingRes.Width * ratio - r.X
+        If r.Y + r.Height > task.workingRes.Height * ratio Then r.Height = task.workingRes.Height * ratio - r.Y
+        If r.Width <= 0 Then r.Width = 1 ' check again (it might have changed.)
+        If r.Height <= 0 Then r.Height = 1
+        If r.X = task.workingRes.Width * ratio Then r.X = r.X - 1
+        If r.Y = task.workingRes.Height * ratio Then r.Y = r.Y - 1
+        Return r
+    End Function
+    Public Function validatePreserve(ByVal r As cv.Rect) As cv.Rect
+        If r.Width <= 0 Then r.Width = 1
+        If r.Height <= 0 Then r.Height = 1
+        If r.X < 0 Then r.X = 0
+        If r.Y < 0 Then r.Y = 0
+        If r.X + r.Width >= task.workingRes.Width Then r.X = task.workingRes.Width - r.Width - 1
+        If r.Y + r.Height >= task.workingRes.Height Then r.Y = task.workingRes.Height - r.Height - 1
+        Return r
+    End Function
+    Public Sub AddPlotScale(dst As cv.Mat, minVal As Double, maxVal As Double, Optional lineCount As Integer = 3)
+        ' draw a scale along the side
+        Dim spacer = CInt(dst.Height / (lineCount + 1))
+        Dim spaceVal = CInt((maxVal - minVal) / (lineCount + 1))
+        If lineCount > 1 Then If spaceVal < 1 Then spaceVal = 1
+        If spaceVal > 10 Then spaceVal += spaceVal Mod 10
+        For i = 0 To lineCount
+            Dim p1 = New cv.Point(0, spacer * i)
+            Dim p2 = New cv.Point(dst.Width, spacer * i)
+            dst.Line(p1, p2, cv.Scalar.White, task.cvFontThickness)
+            Dim nextVal = (maxVal - spaceVal * i)
+            Dim nextText = If(maxVal > 1000, Format(nextVal / 1000, "###,##0.0") + "k", Format(nextVal, fmt2))
+            cv.Cv2.PutText(dst, nextText, p1, cv.HersheyFonts.HersheyPlain, task.cvFontSize, cv.Scalar.White,
+                           task.cvFontThickness, task.lineType)
+        Next
+    End Sub
+    Public Function findCorrelation(pts1 As cv.Mat, pts2 As cv.Mat) As Single
+        Dim correlationMat As New cv.Mat
+        cv.Cv2.MatchTemplate(pts1, pts2, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+        Return correlationMat.Get(Of Single)(0, 0)
+    End Function
+    Public Sub drawRotatedOutline(rotatedRect As cv.RotatedRect, dst2 As cv.Mat, color As cv.Scalar)
+        Dim pts = rotatedRect.Points()
+        Dim lastPt = pts(0)
+        For i = 1 To pts.Length
+            Dim index = i Mod pts.Length
+            Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
+            dst2.Line(pt, lastPt, task.highlightColor, task.lineWidth, task.lineType)
+            lastPt = pt
+        Next
+    End Sub
+    Public Sub drawRotatedRectangle(rotatedRect As cv.RotatedRect, dst As cv.Mat, color As cv.Scalar)
+        Dim vertices2f = rotatedRect.Points()
+        Dim vertices(vertices2f.Length - 1) As cv.Point
+        For j = 0 To vertices2f.Length - 1
+            vertices(j) = New cv.Point(CInt(vertices2f(j).X), CInt(vertices2f(j).Y))
+        Next
+        dst.FillConvexPoly(vertices, color, task.lineType)
+    End Sub
+    Public Function vecToScalar(v As cv.Vec3b) As cv.Scalar
+        Return New cv.Scalar(v(0), v(1), v(2))
     End Function
 End Module
 

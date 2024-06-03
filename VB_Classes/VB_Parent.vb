@@ -155,27 +155,6 @@ Public Class VB_Parent : Implements IDisposable
         Return New cv.Rect(msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin),
                            msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin))
     End Function
-    Public Function vecToScalar(v As cv.Vec3b) As cv.Scalar
-        Return New cv.Scalar(v(0), v(1), v(2))
-    End Function
-    Public Sub drawRotatedRectangle(rotatedRect As cv.RotatedRect, dst2 As cv.Mat, color As cv.Scalar)
-        Dim vertices2f = rotatedRect.Points()
-        Dim vertices(vertices2f.Length - 1) As cv.Point
-        For j = 0 To vertices2f.Length - 1
-            vertices(j) = New cv.Point(CInt(vertices2f(j).X), CInt(vertices2f(j).Y))
-        Next
-        dst2.FillConvexPoly(vertices, color, task.lineType)
-    End Sub
-    Public Sub drawRotatedOutline(rotatedRect As cv.RotatedRect, dst2 As cv.Mat, color As cv.Scalar)
-        Dim pts = rotatedRect.Points()
-        Dim lastPt = pts(0)
-        For i = 1 To pts.Length
-            Dim index = i Mod pts.Length
-            Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
-            dst2.Line(pt, lastPt, task.highlightColor, task.lineWidth, task.lineType)
-            lastPt = pt
-        Next
-    End Sub
     Public Function quickRandomPoints(howMany As Integer) As List(Of cv.Point2f)
         Dim srcPoints As New List(Of cv.Point2f)
         Dim w = task.workingRes.Width
@@ -185,72 +164,6 @@ Public Class VB_Parent : Implements IDisposable
             srcPoints.Add(pt)
         Next
         Return srcPoints
-    End Function
-    Public Function findCorrelation(pts1 As cv.Mat, pts2 As cv.Mat) As Single
-        Dim correlationMat As New cv.Mat
-        cv.Cv2.MatchTemplate(pts1, pts2, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-        Return correlationMat.Get(Of Single)(0, 0)
-    End Function
-    Public Sub AddPlotScale(dst As cv.Mat, minVal As Double, maxVal As Double, Optional lineCount As Integer = 3)
-        ' draw a scale along the side
-        Dim spacer = CInt(dst.Height / (lineCount + 1))
-        Dim spaceVal = CInt((maxVal - minVal) / (lineCount + 1))
-        If lineCount > 1 Then If spaceVal < 1 Then spaceVal = 1
-        If spaceVal > 10 Then spaceVal += spaceVal Mod 10
-        For i = 0 To lineCount
-            Dim p1 = New cv.Point(0, spacer * i)
-            Dim p2 = New cv.Point(dst.Width, spacer * i)
-            dst.Line(p1, p2, cv.Scalar.White, task.cvFontThickness)
-            Dim nextVal = (maxVal - spaceVal * i)
-            Dim nextText = If(maxVal > 1000, Format(nextVal / 1000, "###,##0.0") + "k", Format(nextVal, fmt2))
-            cv.Cv2.PutText(dst, nextText, p1, cv.HersheyFonts.HersheyPlain, task.cvFontSize, cv.Scalar.White,
-                           task.cvFontThickness, task.lineType)
-        Next
-    End Sub
-    Public Sub AddPlotScaleNew(dst As cv.Mat, minVal As Single, maxVal As Single, average As Single)
-        Dim diff = maxVal - minVal
-        Dim fmt = If(diff > 10, fmt0, If(diff > 2, fmt1, If(diff > 0.5, fmt2, fmt3)))
-        For i = 0 To 2
-            Dim nextVal = Choose(i + 1, maxVal, average, minVal)
-            Dim nextText = If(maxVal > 1000, Format(nextVal / 1000, "###,##0.0") + "k", Format(nextVal, fmt))
-            Dim pt = Choose(i + 1, New cv.Point(0, 15), New cv.Point(0, dst2.Height / 2), New cv.Point(0, dst2.Height - 10))
-            cv.Cv2.PutText(dst, nextText, pt, cv.HersheyFonts.HersheyPlain, 1.0, cv.Scalar.White, 1, task.lineType)
-        Next
-    End Sub
-    Public Function rectContainsPt(r As cv.Rect, pt As cv.Point) As Boolean
-        If r.X <= pt.X And r.X + r.Width > pt.X And r.Y <= pt.Y And r.Y + r.Height > pt.Y Then Return True
-        Return False
-    End Function
-    Public Function validateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
-        If r.Width <= 0 Then r.Width = 1
-        If r.Height <= 0 Then r.Height = 1
-        If r.X < 0 Then r.X = 0
-        If r.Y < 0 Then r.Y = 0
-        If r.X > task.workingRes.Width * ratio Then r.X = task.workingRes.Width * ratio - 1
-        If r.Y > task.workingRes.Height * ratio Then r.Y = task.workingRes.Height * ratio - 1
-        If r.X + r.Width > task.workingRes.Width * ratio Then r.Width = task.workingRes.Width * ratio - r.X
-        If r.Y + r.Height > task.workingRes.Height * ratio Then r.Height = task.workingRes.Height * ratio - r.Y
-        If r.Width <= 0 Then r.Width = 1 ' check again (it might have changed.)
-        If r.Height <= 0 Then r.Height = 1
-        If r.X = task.workingRes.Width * ratio Then r.X = r.X - 1
-        If r.Y = task.workingRes.Height * ratio Then r.Y = r.Y - 1
-        Return r
-    End Function
-    Public Function validatePreserve(ByVal r As cv.Rect) As cv.Rect
-        If r.Width <= 0 Then r.Width = 1
-        If r.Height <= 0 Then r.Height = 1
-        If r.X < 0 Then r.X = 0
-        If r.Y < 0 Then r.Y = 0
-        If r.X + r.Width >= task.workingRes.Width Then r.X = dst2.Width - r.Width - 1
-        If r.Y + r.Height >= task.workingRes.Height Then r.Y = task.workingRes.Height - r.Height - 1
-        Return r
-    End Function
-    Public Function validatePoint2f(p As cv.Point2f) As cv.Point2f
-        If p.X < 0 Then p.X = 0
-        If p.Y < 0 Then p.Y = 0
-        If p.X >= dst2.Width Then p.X = dst2.Width - 1
-        If p.Y >= dst2.Height Then p.Y = dst2.Height - 1
-        Return p
     End Function
     Public Sub New()
         algorithm = Me

@@ -2,21 +2,19 @@
 Imports System.Text.RegularExpressions
 Module UI_GeneratorMain
     Sub Main()
+        Console.WriteLine("Starting work to generate the user interface.")
         Dim cppAlgorithmInput = New FileInfo("../CPP_Classes/CPP_Algorithms.h")
-        Dim Input = New FileInfo("../CPP_Classes/CPP_AI_Generated.h")
-        Dim VBcodeDir As New DirectoryInfo(CurDir)
+        Dim CPPInput = New FileInfo("../CPP_Classes/CPP_AI_Generated.h")
+        Dim CSInput = New FileInfo("../CS_Classes/CS_Algorithms.cs")
+        Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../VB_classes/")
         If cppAlgorithmInput.Exists = False Then
             cppAlgorithmInput = New FileInfo("../../CPP_Classes/CPP_Algorithms.h")
-            Input = New FileInfo("../../CPP_Classes/CPP_AI_Generated.h")
-        End If
-
-        If CurDir.Contains("CPP_Classes") Then
-            VBcodeDir = New DirectoryInfo(CurDir() + "/../VB_classes/")
-        Else
+            CPPInput = New FileInfo("../../CPP_Classes/CPP_AI_Generated.h")
+            CSInput = New FileInfo("../../CS_Classes/CS_Algorithms.cs")
             VBcodeDir = New DirectoryInfo(CurDir() + "/../../VB_classes/")
         End If
 
-        Dim includeOnly = File.ReadAllLines(Input.FullName)
+        Dim includeOnly = File.ReadAllLines(CPPInput.FullName)
         Dim cppLines As Integer, csLines As Integer
         For Each line In includeOnly
             line = Trim(line)
@@ -25,7 +23,7 @@ Module UI_GeneratorMain
             cppLines += 1
         Next
 
-        Dim AlgorithmList = File.ReadAllLines(Input.FullName)
+        Dim AlgorithmList = File.ReadAllLines(CPPInput.FullName)
         For Each line In AlgorithmList
             line = Trim(line)
             If line.StartsWith("//") Then Continue For
@@ -33,8 +31,7 @@ Module UI_GeneratorMain
             cppLines += 1
         Next
 
-        Input = New FileInfo("../../CS_Classes/CS_Algorithms.cs")
-        Dim CS_AlgorithmList = File.ReadAllLines(Input.FullName)
+        Dim CS_AlgorithmList = File.ReadAllLines(CSInput.FullName)
         For Each line In CS_AlgorithmList
             line = Trim(line)
             If line.StartsWith("//") Then Continue For

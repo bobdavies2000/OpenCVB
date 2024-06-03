@@ -1,9 +1,11 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Reflection
+Imports cv = OpenCvSharp
 Public Class CSharp_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Invoke the selected C# algorithm"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-
+        Dim version As String = Assembly.GetExecutingAssembly().GetName().Version.ToString()
+        Console.WriteLine($"Version: {version}")
     End Sub
 End Class

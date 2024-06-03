@@ -362,6 +362,13 @@ Public Class Depth_MinMaxToVoronoi : Inherits VB_Parent
         labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min and max points for each cell."}
         desc = "Find min and max depth in each roi and create a voronoi representation using the min and max points."
     End Sub
+    Private Function validatePoint2f(p As cv.Point2f) As cv.Point2f
+        If p.X < 0 Then p.X = 0
+        If p.Y < 0 Then p.Y = 0
+        If p.X >= dst2.Width Then p.X = dst2.Width - 1
+        If p.Y >= dst2.Height Then p.Y = dst2.Height - 1
+        Return p
+    End Function
     Public Sub RunVB(src As cv.Mat)
         If task.optionsChanged Then ReDim kalman.kInput(task.gridList.Count * 4 - 1)
 
