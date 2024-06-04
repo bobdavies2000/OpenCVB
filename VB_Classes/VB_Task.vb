@@ -9,7 +9,8 @@ Public Class VBtask : Implements IDisposable
     Public TaskTimer As New System.Timers.Timer(1000)
     Public algoList As New AlgorithmList
 
-    Public algorithmObject As Object
+    Public algorithmObjectVB As Object
+    Public algorithmObjectCS As Object
     Public frameCount As Integer = 0
     Public heartBeat As Boolean
     Public quarterBeat As Boolean
@@ -393,8 +394,12 @@ Public Class VBtask : Implements IDisposable
         callTrace.Add(algName + "\")
         activeObjects.Clear()
 
-        algorithmObject = algoList.createVBAlgorithm(algName)
-        desc = algorithmObject.desc
+        If task.algName.EndsWith("_CS") = False Then
+            algorithmObjectVB = algoList.createVBAlgorithm(algName)
+            desc = algorithmObjectVB.desc
+        Else
+            desc = algorithmObjectCS.desc
+        End If
 
         If task.advice = "" Then
             task.advice = "No advice for " + algName + " yet." + vbCrLf +
@@ -600,7 +605,7 @@ Public Class VBtask : Implements IDisposable
             End If
 
             'cMotion.Run(src)
-            algorithmObject.NextFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
+            algorithmObjectVB.NextFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
 
             Dim rc = task.rc
             If task.redCells.Count > 0 Then setSelectedContour()
@@ -674,7 +679,7 @@ Public Class VBtask : Implements IDisposable
         End If
         TaskTimer.Enabled = False
         allOptions.Close()
-        If algorithmObject IsNot Nothing Then algorithmObject.Dispose()
+        If algorithmObjectVB IsNot Nothing Then algorithmObjectVB.Dispose()
     End Sub
     Public Sub trueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
         Dim str As New trueText(text, pt, picTag)

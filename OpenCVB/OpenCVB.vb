@@ -1382,6 +1382,53 @@ Public Class OpenCVB
         End If
         StartTask()
     End Sub
+    Private Sub StartTask()
+        Console.WriteLine("Starting algorithm " + AvailableAlgorithms.Text)
+        SyncLock callTraceLock
+            If TreeViewDialog IsNot Nothing Then
+                algorithm_ms.Clear()
+                TreeViewDialog.PercentTime.Text = ""
+            End If
+        End SyncLock
+        testAllRunning = TestAllButton.Text = "Stop Test"
+        saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
+
+        Dim parms As New VB_Classes.VBtask.algParms
+        parms.fpsRate = settings.desiredFPS
+
+        parms.useRecordedData = GroupName.Text = "<All using recorded data>"
+        parms.testAllRunning = testAllRunning
+
+        parms.externalPythonInvocation = externalPythonInvocation
+        parms.showConsoleLog = settings.showConsoleLog
+
+        parms.homeDir = HomeDir.FullName
+        parms.cameraName = settings.cameraName
+        parms.cameraIndex = settings.cameraIndex
+        parms.cameraInfo = camera.cameraInfo
+
+        parms.main_hwnd = Me.Handle
+        parms.mainFormLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
+
+        parms.workingRes = settings.workingRes
+        parms.captureRes = settings.captureRes
+        parms.displayRes = settings.displayRes
+        parms.algName = AvailableAlgorithms.Text
+
+        PausePlayButton.Image = PausePlay
+
+        ' If they Then had been Using the treeview feature To click On a tree entry, the timer was disabled.  
+        ' Clicking on availablealgorithms indicates they are done with using the treeview.
+        If TreeViewDialog IsNot Nothing Then TreeViewDialog.TreeViewTimer.Enabled = True
+
+        Thread.CurrentThread.Priority = ThreadPriority.Lowest
+        algorithmTaskHandle = New Thread(AddressOf AlgorithmTask) ' <<<<<<<<<<<<<<<<<<<<<<<<< This starts the VB_Classes algorithm.
+
+        algorithmTaskHandle.Name = AvailableAlgorithms.Text
+        algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
+        algorithmTaskHandle.Start(parms)
+        Console.WriteLine("Start Algorithm completed.")
+    End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.VBtask.algParms)
         If parms.algName = "" Then Exit Sub
         algorithmQueueCount += 1
@@ -1550,12 +1597,17 @@ Public Class OpenCVB
                 task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
                 Dim updatedDrawRect = task.drawRect
 
-                If parms.algName.StartsWith("CS_") Then
-                    Static test As CS_Classes.AddWeighted_Basics_CS = New CS_Classes.AddWeighted_Basics_CS(task)
-                    test.RunVB(task.color.Clone)
-                Else
-                    task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
-                End If
+
+
+
+
+                If parms.algName.StartsWith("CS_") Then task.algorithmObjectCS = New CS_Classes.AddWeighted_Basics_CS(task)
+
+                task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
+
+
+
+
 
                 Dim returnTime = Now
 
@@ -1633,53 +1685,6 @@ Public Class OpenCVB
             task.Dispose()
         End SyncLock
         frameCount = 0
-    End Sub
-    Private Sub StartTask()
-        Console.WriteLine("Starting algorithm " + AvailableAlgorithms.Text)
-        SyncLock callTraceLock
-            If TreeViewDialog IsNot Nothing Then
-                algorithm_ms.Clear()
-                TreeViewDialog.PercentTime.Text = ""
-            End If
-        End SyncLock
-        testAllRunning = TestAllButton.Text = "Stop Test"
-        saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
-
-        Dim parms As New VB_Classes.VBtask.algParms
-        parms.fpsRate = settings.desiredFPS
-
-        parms.useRecordedData = GroupName.Text = "<All using recorded data>"
-        parms.testAllRunning = testAllRunning
-
-        parms.externalPythonInvocation = externalPythonInvocation
-        parms.showConsoleLog = settings.showConsoleLog
-
-        parms.homeDir = HomeDir.FullName
-        parms.cameraName = settings.cameraName
-        parms.cameraIndex = settings.cameraIndex
-        parms.cameraInfo = camera.cameraInfo
-
-        parms.main_hwnd = Me.Handle
-        parms.mainFormLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
-
-        parms.workingRes = settings.workingRes
-        parms.captureRes = settings.captureRes
-        parms.displayRes = settings.displayRes
-        parms.algName = AvailableAlgorithms.Text
-
-        PausePlayButton.Image = PausePlay
-
-        ' If they Then had been Using the treeview feature To click On a tree entry, the timer was disabled.  
-        ' Clicking on availablealgorithms indicates they are done with using the treeview.
-        If TreeViewDialog IsNot Nothing Then TreeViewDialog.TreeViewTimer.Enabled = True
-
-        Thread.CurrentThread.Priority = ThreadPriority.Lowest
-        algorithmTaskHandle = New Thread(AddressOf AlgorithmTask) ' <<<<<<<<<<<<<<<<<<<<<<<<< This starts the VB_Classes algorithm.
-
-        algorithmTaskHandle.Name = AvailableAlgorithms.Text
-        algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
-        algorithmTaskHandle.Start(parms)
-        Console.WriteLine("Start Algorithm completed.")
     End Sub
 End Class
 
