@@ -86,7 +86,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddAlgorithm.cs" />
-    <Compile Include="CS_Algorithms.cs" />
+    <Compile Include="algorithmList.cs" />
+    <Compile Include="CS_AI_Generated.cs" />
     <Compile Include="Aruco.cs" />
     <Compile Include="Blob.cs" />
     <Compile Include="Blur.cs" />

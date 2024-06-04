@@ -1601,7 +1601,11 @@ Public Class OpenCVB
 
 
 
-                If parms.algName.StartsWith("CS_") Then task.algorithmObjectCS = New CS_Classes.AddWeighted_Basics_CS(task)
+                If parms.algName.StartsWith("CSharp_Basics") Then
+                    If task.algorithmObjectCS Is Nothing Then
+                        task.algorithmObjectCS = New CS_Classes.AddWeighted_Basics_CS(task)
+                    End If
+                End If
 
                 task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
 

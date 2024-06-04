@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Imports System.Security.Cryptography
 Imports cv = OpenCvSharp
-Public Class CS_Basics : Inherits VB_Parent
+Public Class CSharp_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Invoke the selected C# algorithm"
     End Sub

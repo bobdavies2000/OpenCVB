@@ -605,7 +605,12 @@ Public Class VBtask : Implements IDisposable
             End If
 
             'cMotion.Run(src)
-            algorithmObjectVB.NextFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested algorithm begins...
+            If task.algName = "CSharp_Basics" Then
+                algorithmObjectCS.RunCS(src.Clone)
+                algorithmObjectCS.NextFrame(src.Clone)
+            Else
+                algorithmObjectVB.NextFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
+            End If
 
             Dim rc = task.rc
             If task.redCells.Count > 0 Then setSelectedContour()
