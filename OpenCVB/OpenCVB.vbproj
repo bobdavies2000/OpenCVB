@@ -234,6 +234,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CS_Classes\CS_Classes.csproj">
+      <Project>{fefe40b6-eb52-45c7-bd10-27968e1d6b2d}</Project>
+      <Name>CS_Classes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VB_Classes\VB_Classes.vbproj">
       <Project>{735a2264-8a36-4d0a-ade0-2bfad6734401}</Project>
       <Name>VB_Classes</Name>
