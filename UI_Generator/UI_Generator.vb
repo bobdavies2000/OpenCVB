@@ -13,9 +13,10 @@ Module UI_GeneratorMain
             CSInput = New FileInfo("../../CS_Classes/CS_AI_Generated.cs")
             VBcodeDir = New DirectoryInfo(CurDir() + "/../../VB_classes/")
         End If
+        Dim homeDir As New DirectoryInfo(VBcodeDir.FullName + "/../")
 
         Dim includeOnly = File.ReadAllLines(CPPInput.FullName)
-        Dim cppLines As Integer, csLines As Integer
+        Dim cppLines As Integer
         For Each line In includeOnly
             line = Trim(line)
             If line.StartsWith("//") Then Continue For
@@ -31,16 +32,8 @@ Module UI_GeneratorMain
             cppLines += 1
         Next
 
-        Dim CS_AlgorithmList = File.ReadAllLines(CSInput.FullName)
-        For Each line In CS_AlgorithmList
-            line = Trim(line)
-            If line.StartsWith("//") Then Continue For
-            If line.Length = 0 Then Continue For
-            csLines += 1
-        Next
-
         ' first read all the cpp functions that are present in the project
-        Dim functionInput As New FileInfo(VBcodeDir.FullName + "../CPP_Classes/CPP_Functions.h")
+        Dim functionInput As New FileInfo(homeDir.FullName + "/CPP_Classes/CPP_Functions.h")
         Dim srFunctions = New StreamReader(functionInput.FullName)
         Dim functionNames As New SortedList(Of String, String)
         Dim unsortedFunctions As New List(Of String)
@@ -63,12 +56,12 @@ Module UI_GeneratorMain
         Dim fileNames As New List(Of String)
         Dim fileEntries As String() = Directory.GetFiles(VBcodeDir.FullName)
 
-        Dim pythonAppDir As New IO.DirectoryInfo(VBcodeDir.FullName + "/../Python_Classes/")
+        Dim pythonAppDir As New IO.DirectoryInfo(homeDir.FullName + "/Python_Classes/")
 
-        Dim projFile As New FileInfo(VBcodeDir.FullName + "/VB_Classes.vbproj")
-        Dim readProj = New StreamReader(projFile.FullName)
-        While readProj.EndOfStream = False
-            Dim line = readProj.ReadLine()
+        Dim vbProjFile As New FileInfo(homeDir.FullName + "/VB_Classes/VB_Classes.vbproj")
+        Dim readVBProj = New StreamReader(vbProjFile.FullName)
+        While readVBProj.EndOfStream = False
+            Dim line = readVBProj.ReadLine()
             If Trim(line).StartsWith("<Compile Include=") Then
                 If InStr(line, ".vb""") Then
                     Dim startname = InStr(line, "=") + 2
@@ -79,7 +72,7 @@ Module UI_GeneratorMain
                 End If
             End If
         End While
-        readProj.Close()
+        readVBProj.Close()
 
         ' we only want python files that are included in the Python_Classes Project.  Other Python files may be support modules or just experiments.
         Dim pythonFiles() As String = Directory.GetFiles(pythonAppDir.FullName, "*.py", SearchOption.AllDirectories)
@@ -88,7 +81,7 @@ Module UI_GeneratorMain
         Next
 
         Dim className As String = ""
-        Dim CodeLineCount As Integer = cppLines + csLines ' now adding in the C++ and C# lines...
+        Dim CodeLineCount As Integer = cppLines  ' now adding in the C++ and C# lines...
         Dim sortedNames As New SortedList(Of String, Integer)
         Dim sIndex As Integer
         For Each fileName In fileNames
@@ -121,6 +114,34 @@ Module UI_GeneratorMain
             End If
         Next
 
+        Dim csSortedNames As New SortedList(Of String, Integer)
+        Dim csIndex As Integer
+        Dim csFileNames As New List(Of String)({homeDir.FullName + "/CS_Classes/CS_AI_Generated.cs"})
+        For Each fileName In csFileNames
+            If fileName.EndsWith("CS_Parent.cs") = False Then
+                Dim csName As String = ""
+                Dim nextFile As New System.IO.StreamReader(fileName)
+                While nextFile.Peek() <> -1
+                    Dim line = Trim(nextFile.ReadLine())
+                    If line Is Nothing Then Continue While
+                    If line.Length > 1 Then
+                        If line.Substring(0, 2) <> "//" Then
+                            CodeLineCount += 1
+                            If LCase(line).StartsWith("public class ") Then
+                                Dim split As String() = Regex.Split(line, "\W+")
+                                If line.EndsWith(" : CS_Parent") Then csName = split(2)
+                            End If
+                            If LCase(line).StartsWith("public ") And line.Contains(csName) And csSortedNames.ContainsKey(csName) = False Then
+                                csSortedNames.Add(csName, csIndex)
+                                csIndex += 1
+                            End If
+                        End If
+                    End If
+                End While
+            End If
+        Next
+
+
         Dim cleanNames As New List(Of String)
         Dim lastName As String = ""
         For i = 0 To sortedNames.Count - 1
@@ -130,10 +151,8 @@ Module UI_GeneratorMain
         Next
 
 
-
-
         ' CS output
-        Dim CSlistInfo As New FileInfo(VBcodeDir.FullName + "../CS_Classes/algorithmList.cs")
+        Dim CSlistInfo As New FileInfo(homeDir.FullName + "/CS_Classes/algorithmList.cs")
         Dim sw As New StreamWriter(CSlistInfo.FullName)
         sw.WriteLine("// this file is automatically generated in a pre-build step.  Do not waste your time modifying manually.")
         sw.WriteLine("using VB_Classes;")
@@ -144,8 +163,10 @@ Module UI_GeneratorMain
         sw.WriteLine(vbTab + "{")
         sw.WriteLine(vbTab + vbTab + "public CS_Parent createCSAlgorithm( string algorithmName, VB_Classes.VBtask task)")
         sw.WriteLine(vbTab + vbTab + "{")
-        'sw.WriteLine(vbTab + vbTab +vbTab + "If algorithmName = ""AddWeighted_Basics_CS"" Then Return New AddWeighted_Basics_CS")
-        sw.WriteLine(vbTab + vbTab + vbTab + "return new AddWeighted_Basics_CS(task);")
+        For Each csName In csSortedNames.Keys
+            sw.WriteLine(vbTab + vbTab + vbTab + "if (algorithmName == """ + csName + """) return new " + csName + "(task);")
+        Next
+        sw.WriteLine(vbTab + vbTab + vbTab + "return new CSharp_AddWeighted_Basics(task);")
         sw.WriteLine(vbTab + vbTab + "}")
         sw.WriteLine(vbTab + "}")
         sw.WriteLine("}")
@@ -155,7 +176,7 @@ Module UI_GeneratorMain
 
 
 
-        Dim listInfo As New FileInfo(VBcodeDir.FullName + "../UI_Generator/AlgorithmList.vb")
+        Dim listInfo As New FileInfo(homeDir.FullName + "/UI_Generator/AlgorithmList.vb")
         sw = New StreamWriter(listInfo.FullName)
         sw.WriteLine("' this file is automatically generated in a pre-build step.  Do not waste your time modifying manually.")
         sw.WriteLine("Public Class AlgorithmList")
@@ -173,6 +194,7 @@ Module UI_GeneratorMain
             If nextName.EndsWith(".py") = False Then
                 sw.WriteLine(vbTab + "if algorithmName = """ + nextName + """ Then return new " + nextName)
             End If
+
             If nextName.StartsWith("CPP_Basics") Then
                 For j = 0 To functionNames.Count - 1
                     Dim functionText = functionNames.ElementAt(j).Key
@@ -188,23 +210,27 @@ Module UI_GeneratorMain
         sw.WriteLine("End Class")
         sw.Close()
 
-        Dim textInfo As New FileInfo(VBcodeDir.FullName + "/../Data/AlgorithmList.txt")
+        Dim textInfo As New FileInfo(homeDir.FullName + "/Data/AlgorithmList.txt")
         sw = New StreamWriter(textInfo.FullName)
         sw.WriteLine("CodeLineCount = " + CStr(CodeLineCount))
         For i = 0 To cleanNames.Count - 1
-            If cleanNames(i) <> "CPP_Basics" Then
+            If cleanNames(i).StartsWith("CSV_Basics") Then
+                For j = 0 To csSortedNames.Count - 1
+                    sw.WriteLine(csSortedNames.ElementAt(j).Key)
+                Next
                 sw.WriteLine(cleanNames(i))
-            End If
-            If cleanNames(i).StartsWith("CPP_Basics") Then
+            ElseIf cleanNames(i).StartsWith("CPP_Basics") Then
                 For j = 0 To functionNames.Count - 1
                     Dim functionText = functionNames.ElementAt(j).Key
                     sw.WriteLine(functionText.Substring(1))
                 Next
+            Else
+                sw.WriteLine(cleanNames(i))
             End If
         Next
         sw.Close()
 
-        Dim FilesInfo As New FileInfo(VBcodeDir.FullName + "/../Data/FileNames.txt")
+        Dim FilesInfo As New FileInfo(homeDir.FullName + "/Data/FileNames.txt")
         sw = New StreamWriter(FilesInfo.FullName)
         For i = 0 To fileNames.Count - 1
             sw.WriteLine(fileNames(i))

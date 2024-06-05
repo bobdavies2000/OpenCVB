@@ -8,12 +8,12 @@ using OpenCvSharp;
 
 namespace CS_Classes
 { 
-    public class AddWeighted_Basics_CS : CS_Parent
+    public class CSharp_AddWeighted_Basics : CS_Parent
     {
         public Mat src2;
         public Options_AddWeighted options = new Options_AddWeighted();
 
-        public AddWeighted_Basics_CS(VBtask task) : base(task) 
+        public CSharp_AddWeighted_Basics(VBtask task) : base(task) 
         {
             //AddAdvice(traceName + ": use the local option slider 'Add Weighted %'");
             desc = "Add 2 images with specified weights.";
@@ -41,32 +41,29 @@ namespace CS_Classes
         }
     }
 
-    //public class AddWeighted_Edges_CS : CS_Parent
-    //{
-    //    private Edge_All edges = new Edge_All();
-    //    private AddWeighted_Basics addw = new AddWeighted_Basics_CS(task);
+    public class CSharp_AddWeighted_Edges : CS_Parent
+    {
+        private Edge_All edges = new Edge_All();
+        private CSharp_AddWeighted_Basics addw;
 
-    //    public AddWeighted_Edges_CS(VBtask task)
-    //    {
-    //        labels = new string[] { "", "", "Edges_BinarizedSobel output", "AddWeighted edges and BGR image" };
-    //        desc = "Add in the edges separating light and dark to the color image";
-    //    }
+        public CSharp_AddWeighted_Edges(VBtask task) : base(task)
+        {
+            addw = new CSharp_AddWeighted_Basics(task);
+            labels = new string[] { "", "", "Edges_BinarizedSobel output", "AddWeighted edges and BGR image" };
+            desc = "Add in the edges separating light and dark to the color image";
+        }
 
-    //    public void RunVB(Mat src)
-    //    {
-    //        edges.Run(src);
-    //        dst2 = edges.dst2;
-    //        labels[2] = edges.labels[2];
+        public void RunCS(Mat src)
+        {
+            edges.Run(src);
+            dst2 = edges.dst2;
+            labels[2] = edges.labels[2];
 
-    //        addw.src2 = edges.dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
-    //        addw.Run(src);
-    //        dst3 = addw.dst2;
-    //    }
-    //}
-
-
-
-
+            addw.src2 = edges.dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
+            addw.RunCS(src);
+            dst3 = addw.dst2;
+        }
+    }
 }
 
 

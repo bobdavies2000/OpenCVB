@@ -61,6 +61,7 @@ Module vbUtilities
         ' update the time measures
         task.msWatch = task.myStopWatch.ElapsedMilliseconds
         quarterBeat()
+        If task.frameCount = 0 Then task.heartBeat = True
         Dim frameDuration = 1000 / task.fpsRate
         task.almostHeartBeat = If(task.msWatch - task.msLast + frameDuration * 1.5 > 1000, True, False)
 

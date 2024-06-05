@@ -26,9 +26,9 @@ Module IndexMain
         Return X.LastWriteTime.CompareTo(Y.LastWriteTime)
     End Function
     Sub Main()
-        Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../../VB_classes/")
-        Dim dir As New DirectoryInfo(VBcodeDir.FullName)
-        Dim fileList As List(Of FileInfo) = dir.GetFiles().ToList()
+        Dim homeDir As New DirectoryInfo(CurDir() + "/../../")
+        Dim vbDir As New DirectoryInfo(homeDir.FullName + "/VB_Classes/")
+        Dim fileList As List(Of FileInfo) = vbDir.GetFiles().ToList()
         fileList.Sort(AddressOf SortByDate)
         Dim filesByDate As New List(Of String)
         For Each entry In fileList
@@ -37,20 +37,18 @@ Module IndexMain
 
         Dim apiList As New List(Of String)
         Dim apiListLCase As New List(Of String)
-        Dim classNames As New List(Of String) ' the list of all the classnames - including python names 
         Dim line As String
         Dim ExecDir As New DirectoryInfo(My.Application.Info.DirectoryPath)
         ChDir(ExecDir.FullName)
-        Dim directoryInfo As New DirectoryInfo(CurDir() + "/../../vb_classes")
         ' Process the list of files found in the directory. 
-        Dim sr = New System.IO.StreamReader(directoryInfo.FullName + "\..\Data\FileNames.txt")
+        Dim sr = New System.IO.StreamReader(homeDir.FullName + "\Data\FileNames.txt")
         Dim codeFileNames As New List(Of String)
         While sr.EndOfStream = False
             codeFileNames.Add(sr.ReadLine)
         End While
 
         ' read the list of OpenCV API's we will be looking for
-        Dim srAPI = New System.IO.StreamReader(directoryInfo.FullName + "\..\Data\OpenCVapi.txt")
+        Dim srAPI = New System.IO.StreamReader(homeDir.FullName + "\Data\OpenCVapi.txt")
         While srAPI.EndOfStream = False
             line = srAPI.ReadLine()
             If line <> "" Then
@@ -60,7 +58,7 @@ Module IndexMain
         End While
         srAPI.Close()
 
-        Dim apiOCVB = New System.IO.StreamReader(directoryInfo.FullName + "\..\Data\AlgorithmList.txt")
+        Dim apiOCVB = New System.IO.StreamReader(homeDir.FullName + "\Data\AlgorithmList.txt")
         line = apiOCVB.ReadLine() ' toss the codeline count...
         While apiOCVB.EndOfStream = False
             line = apiOCVB.ReadLine()
@@ -119,7 +117,6 @@ Module IndexMain
                     Continue While
                 End If
                 If classname <> "" Then
-                    If line.Contains("CS_Classes.") And CSnames.ContainsKey(classname) = False Then CSnames.Add(classname, classname)
                     If line.Contains("New OpenGL") And classname.StartsWith("OpenGL") = False Then OpenGLnames.Add(classname, classname)
                     For i = 0 To apiList.Count - 1
                         Dim index = InStr(lcaseLine, apiListLCase(i))
@@ -168,7 +165,7 @@ Module IndexMain
             End If
         Next
 
-        Dim sw As New StreamWriter(directoryInfo.FullName + "/../Data/AlgorithmGroupNames.txt")
+        Dim sw As New StreamWriter(homeDir.FullName + "/Data/AlgorithmGroupNames.txt")
         Dim allCount = allButPython.Count + PYnames.Count
         sw.WriteLine("<All (" + CStr(allCount) + ")>")
 
@@ -178,7 +175,7 @@ Module IndexMain
         Next
         sw.WriteLine()
 
-        sw.Write("<All C# (" + CStr(CSnames.Count) + ")>")
+        sw.Write("<All CSharp (" + CStr(CSnames.Count) + ")>")
         For i = 0 To CSnames.Count - 1
             sw.Write("," + CSnames.ElementAt(i).Key)
         Next

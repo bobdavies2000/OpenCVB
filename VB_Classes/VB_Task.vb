@@ -394,11 +394,11 @@ Public Class VBtask : Implements IDisposable
         callTrace.Add(algName + "\")
         activeObjects.Clear()
 
-        If task.algName.EndsWith("_CS") = False Then
+        If task.algName.StartsWith("CSharp_") Then
+            ' desc = algorithmObjectCS.desc
+        Else
             algorithmObjectVB = algoList.createVBAlgorithm(algName)
             desc = algorithmObjectVB.desc
-        Else
-            desc = algorithmObjectCS.desc
         End If
 
         If task.advice = "" Then
@@ -443,7 +443,32 @@ Public Class VBtask : Implements IDisposable
                 allOptions.layoutOptions(normalRequest:=True)
             End If
 
+            updateSettings()
+
             If task.testAllRunning = False Then
+                If algorithm_ms.Count = 0 Then
+                    task.algorithmNames.Add("waitingForInput")
+                    algorithmTimes.Add(Now)
+                    task.algorithm_ms.Add(0)
+
+                    task.algorithmNames.Add("inputBufferCopy")
+                    algorithmTimes.Add(Now)
+                    task.algorithm_ms.Add(0)
+
+                    task.algorithmNames.Add("ReturnCopyTime")
+                    algorithmTimes.Add(Now)
+                    task.algorithm_ms.Add(0)
+
+                    task.algorithmNames.Add(task.algName)
+                    algorithmTimes.Add(Now)
+                    task.algorithm_ms.Add(0)
+
+                    algorithmStack = New Stack()
+                    algorithmStack.Push(0)
+                    algorithmStack.Push(1)
+                    algorithmStack.Push(2)
+                    algorithmStack.Push(3)
+                End If
                 If algorithmAccumulate = False Then
                     If task.heartBeat Then
                         For i = 0 To algorithm_ms.Count - 1
@@ -482,7 +507,6 @@ Public Class VBtask : Implements IDisposable
 
             If task.algName.StartsWith("CPP_") = False Then task.motionFlag = True
 
-            updateSettings()
             imuStabilityTest.RunVB(src)
             task.cameraStable = imuStabilityTest.stableTest
             task.cameraStableString = imuStabilityTest.stableStr
@@ -605,7 +629,7 @@ Public Class VBtask : Implements IDisposable
             End If
 
             'cMotion.Run(src)
-            If task.algName = "CSharp_Basics" Then
+            If task.algName.StartsWith("CSharp_") Then
                 algorithmObjectCS.RunCS(src.Clone)
                 algorithmObjectCS.NextFrame(src.Clone)
             Else

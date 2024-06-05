@@ -7,7 +7,9 @@ namespace CS_Classes
 	{
 		public CS_Parent createCSAlgorithm( string algorithmName, VB_Classes.VBtask task)
 		{
-			return new AddWeighted_Basics_CS(task);
+			if (algorithmName == "CSharp_AddWeighted_Basics") return new CSharp_AddWeighted_Basics(task);
+			if (algorithmName == "CSharp_AddWeighted_Edges") return new CSharp_AddWeighted_Edges(task);
+			return new CSharp_AddWeighted_Basics(task);
 		}
 	}
 }
