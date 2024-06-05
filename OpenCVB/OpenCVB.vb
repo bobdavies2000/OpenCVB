@@ -1350,8 +1350,8 @@ Public Class OpenCVB
             If settings.workingResIndex > testAllEndingRes Then
                 While 1
                     settings.cameraIndex += 1
-                    settings.cameraName = cameraNames(settings.cameraIndex)
                     If settings.cameraIndex >= cameraNames.Count - 1 Then settings.cameraIndex = 0
+                    settings.cameraName = cameraNames(settings.cameraIndex)
                     If settings.cameraPresent(settings.cameraIndex) Then
                         OptionsDialog.defineCameraResolutions(settings.cameraIndex)
                         setupTestAll()
