@@ -63,7 +63,7 @@ Public Class Complexity_PlotOpenCV : Inherits VB_Parent
     Public Sub prepareSortedData(filename As String)
         Dim contents = My.Computer.FileSystem.ReadAllText(filename)
         Dim lines = contents.Split(vbCrLf)
-        Dim split() As String, nextSize As Integer, nextFrameCount As Integer
+        Dim split() As String, nextSize As Integer, myFrameCount As Integer
         Dim times As New List(Of Single)
         sortData.Clear()
         For Each line In lines
@@ -73,13 +73,13 @@ Public Class Complexity_PlotOpenCV : Inherits VB_Parent
                 nextSize = split(2) * split(1)
             ElseIf line.StartsWith("Ending") Then
                 split = line.Split(vbTab)
-                nextFrameCount = split(1)
-                If nextFrameCount > maxFrameCount Then maxFrameCount = nextFrameCount
+                myFrameCount = split(1)
+                If myFrameCount > maxFrameCount Then maxFrameCount = myFrameCount
                 split = split(2).Split()
                 times.Add(split(0))
             End If
             If line.StartsWith("-") And nextSize > 0 Then
-                sortData.Add(nextSize, nextFrameCount)
+                sortData.Add(nextSize, myFrameCount)
             End If
         Next
 
@@ -134,7 +134,7 @@ Public Class Complexity_Dots : Inherits VB_Parent
         Dim lines = contents.Split(vbCrLf)
 
         Dim sortData As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
-        Dim split() As String, nextSize As Integer, nextFrameCount As Integer
+        Dim split() As String, nextSize As Integer, myFrameCount As Integer
         Dim times As New List(Of Single)
         Dim maxFrameCount As Single, srcX As New List(Of Double), srcY As New List(Of Double)
         For Each line In lines
@@ -144,18 +144,18 @@ Public Class Complexity_Dots : Inherits VB_Parent
                 nextSize = split(2) * split(1)
             ElseIf line.StartsWith("Ending") Then
                 split = line.Split(vbTab)
-                nextFrameCount = split(1)
-                If nextFrameCount > maxFrameCount Then maxFrameCount = nextFrameCount
+                myFrameCount = split(1)
+                If myFrameCount > maxFrameCount Then maxFrameCount = myFrameCount
                 split = split(2).Split()
                 times.Add(split(0))
             End If
             If line.StartsWith("-") And nextSize > 0 Then
                 If srcX.Contains(nextSize) Then
                     Dim index = srcX.IndexOf(nextSize)
-                    srcY(index) = (nextFrameCount + srcY(index)) / 2
+                    srcY(index) = (myFrameCount + srcY(index)) / 2
                 Else
                     srcX.Add(nextSize)
-                    srcY.Add(nextFrameCount)
+                    srcY.Add(myFrameCount)
                 End If
             End If
         Next

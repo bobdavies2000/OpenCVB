@@ -631,9 +631,62 @@ Public Class VBtask : Implements IDisposable
             'cMotion.Run(src)
             If task.algName.StartsWith("CSharp_") Then
                 algorithmObjectCS.RunCS(src.Clone)
-                algorithmObjectCS.NextFrame(src.Clone)
+                algorithmObjectCS.processFrame(src.Clone)
             Else
-                algorithmObjectVB.NextFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
+                algorithmObjectVB.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
+            End If
+
+            ' make sure that any outputs from the algorithm are the right size.nearest
+            If dst0.Size <> task.workingRes And dst0.Width > 0 Then dst0 = dst0.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
+            If dst1.Size <> task.workingRes And dst1.Width > 0 Then dst1 = dst1.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
+            If dst2.Size <> task.workingRes And dst2.Width > 0 Then dst2 = dst2.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
+            If dst3.Size <> task.workingRes And dst3.Width > 0 Then dst3 = dst3.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
+
+            If task.pixelViewerOn Then
+                If task.intermediateObject IsNot Nothing Then
+                    task.dst0 = task.intermediateObject.dst0
+                    task.dst1 = task.intermediateObject.dst1
+                    task.dst2 = task.intermediateObject.dst2
+                    task.dst3 = task.intermediateObject.dst3
+                Else
+                    task.dst0 = If(gOptions.displayDst0.Checked, dst0, task.color)
+                    task.dst1 = If(gOptions.displayDst1.Checked, dst1, task.depthRGB)
+                    task.dst2 = dst2
+                    task.dst3 = dst3
+                End If
+                task.PixelViewer.viewerForm.Show()
+                task.PixelViewer.Run(src)
+            Else
+                If task.PixelViewer IsNot Nothing Then If task.PixelViewer.viewerForm.Visible Then task.PixelViewer.viewerForm.Hide()
+            End If
+
+            Dim obj = checkIntermediateResults()
+            task.intermediateObject = obj
+            task.trueData = New List(Of trueText)(trueData)
+            If obj IsNot Nothing Then
+                If gOptions.displayDst0.Checked Then task.dst0 = MakeSureImage8uC3(obj.dst0) Else task.dst0 = task.color
+                If gOptions.displayDst1.Checked Then task.dst1 = MakeSureImage8uC3(obj.dst1) Else task.dst1 = task.depthRGB
+                task.dst2 = If(obj.dst2.Type = cv.MatType.CV_8UC3, obj.dst2, MakeSureImage8uC3(obj.dst2))
+                task.dst3 = If(obj.dst3.Type = cv.MatType.CV_8UC3, obj.dst3, MakeSureImage8uC3(obj.dst3))
+                task.labels = obj.labels
+                task.trueData = New List(Of trueText)(obj.trueData)
+            Else
+                If gOptions.displayDst0.Checked Then task.dst0 = MakeSureImage8uC3(dst0) Else task.dst0 = task.color
+                If gOptions.displayDst1.Checked Then task.dst1 = MakeSureImage8uC3(dst1) Else task.dst1 = task.depthRGB
+                task.dst2 = MakeSureImage8uC3(dst2)
+                task.dst3 = MakeSureImage8uC3(dst3)
+            End If
+
+            If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()
+
+            If task.dst2.Width = task.workingRes.Width And task.dst2.Height = task.workingRes.Height Then
+                If gOptions.ShowGrid.Checked Then task.dst2.SetTo(cv.Scalar.White, task.gridMask)
+                If task.dst2.Width <> task.workingRes.Width Or task.dst2.Height <> task.workingRes.Height Then
+                    task.dst2 = task.dst2.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
+                End If
+                If task.dst3.Width <> task.workingRes.Width Or task.dst3.Height <> task.workingRes.Height Then
+                    task.dst3 = task.dst3.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
+                End If
             End If
 
             Dim rc = task.rc
