@@ -9,6 +9,7 @@ namespace CS_Classes
 		{
 			if (algorithmName == "CSharp_AddWeighted_Basics") return new CSharp_AddWeighted_Basics(task);
 			if (algorithmName == "CSharp_AddWeighted_Edges") return new CSharp_AddWeighted_Edges(task);
+			if (algorithmName == "CSharp_AddWeighted_ImageAccumulate") return new CSharp_AddWeighted_ImageAccumulate(task);
 			return new CSharp_AddWeighted_Basics(task);
 		}
 	}

@@ -56,14 +56,15 @@ End Class
 
 
 Public Class AddWeighted_ImageAccumulate : Inherits VB_Parent
+    Dim options As New Options_AddWeightedAccum()
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Accumulation weight of each image X100", 1, 100, 10)
         desc = "Update a running average of the image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static weightSlider = findSlider("Accumulation weight of each image X100")
+        options.RunVB()
+
         If task.optionsChanged Then dst2 = task.pcSplit(2) * 1000
-        cv.Cv2.AccumulateWeighted(task.pcSplit(2) * 1000, dst2, weightSlider.Value / 100, New cv.Mat)
+        cv.Cv2.AccumulateWeighted(task.pcSplit(2) * 1000, dst2, options.addWeighted, New cv.Mat)
     End Sub
 End Class
 

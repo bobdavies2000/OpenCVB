@@ -41,6 +41,12 @@ namespace CS_Classes
         }
     }
 
+
+
+
+
+
+
     public class CSharp_AddWeighted_Edges : CS_Parent
     {
         private Edge_All edges = new Edge_All();
@@ -64,7 +70,72 @@ namespace CS_Classes
             dst3 = addw.dst2;
         }
     }
+
+
+
+
+
+
+    public class CSharp_AddWeighted_ImageAccumulate : CS_Parent
+    {
+        private Options_AddWeightedAccum options = new Options_AddWeightedAccum();
+        public CSharp_AddWeighted_ImageAccumulate(VBtask task) : base(task)
+        {
+            desc = "Update a running average of the image";
+        }
+        public void RunVB(cv.Mat src)
+        {
+            options.RunVB();
+
+            if (task.optionsChanged)
+            {
+                dst2 = task.pcSplit[2] * 1000;
+            }
+            cv.Cv2.AccumulateWeighted(task.pcSplit[2] * 1000, dst2, options.addWeighted, new cv.Mat());
+        }
+    }
+
+
+
+
+
+
+
+    public class CSharp_AddWeighted_InfraRed : CS_Parent
+    {
+        private AddWeighted_Basics addw = new AddWeighted_Basics();
+        private Mat src2 = new Mat();
+
+        public CSharp_AddWeighted_InfraRed(VBtask task) : base(task)
+        {
+            desc = "Align the depth data with the left or right view. Oak-D is aligned with the right image. Some cameras are not close to aligned.";
+        }
+
+        public void RunVB(Mat src)
+        {
+            if (task.toggleOnOff)
+            {
+                dst1 = task.leftView;
+                labels[2] = "Left view combined with depthRGB";
+            }
+            else
+            {
+                dst1 = task.rightView;
+                labels[2] = "Right view combined with depthRGB";
+            }
+
+            addw.src2 = dst1;
+            addw.Run(task.depthRGB);
+            dst2 = addw.dst2.Clone();
+        }
+    }
+
+
+
+
+
+
+
+
 }
-
-
 

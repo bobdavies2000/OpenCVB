@@ -4587,6 +4587,22 @@ End Class
 
 
 
+Public Class Options_AddWeightedAccum : Inherits VB_Parent
+    Public addWeighted As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Accumulation weight of each image X100", 1, 100, 10)
+    End Sub
+    Public Sub RunVB()
+        Static weightSlider = findSlider("Accumulation weight of each image X100")
+        addWeighted = weightSlider.value / 100
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class Options_AddWeighted : Inherits VB_Parent
     Public addWeighted As Single
     Public Sub New()
