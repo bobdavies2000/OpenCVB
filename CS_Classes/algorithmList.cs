@@ -10,6 +10,11 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_AddWeighted_Basics") return new CSharp_AddWeighted_Basics(task);
 			if (algorithmName == "CSharp_AddWeighted_Edges") return new CSharp_AddWeighted_Edges(task);
 			if (algorithmName == "CSharp_AddWeighted_ImageAccumulate") return new CSharp_AddWeighted_ImageAccumulate(task);
+			if (algorithmName == "CSharp_AddWeighted_InfraRed") return new CSharp_AddWeighted_InfraRed(task);
+			if (algorithmName == "CSharp_AlphaChannel_Basics") return new CSharp_AlphaChannel_Basics(task);
+			if (algorithmName == "CSharp_ApproxPoly_Basics") return new CSharp_ApproxPoly_Basics(task);
+			if (algorithmName == "CSharp_ApproxPoly_FindandDraw") return new CSharp_ApproxPoly_FindandDraw(task);
+			if (algorithmName == "CSharp_ApproxPoly_Hull") return new CSharp_ApproxPoly_Hull(task);
 			return new CSharp_AddWeighted_Basics(task);
 		}
 	}

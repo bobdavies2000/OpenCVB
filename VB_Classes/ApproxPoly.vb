@@ -4,22 +4,13 @@
 Public Class ApproxPoly_Basics : Inherits VB_Parent
     Dim contour As New Contour_Largest
     Dim rotatedRect As New Rectangle_Rotated
+    Dim options As New Options_ApproxPoly
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("epsilon - max distance from original curve", 0, 100, 3)
-
-        If findfrm(traceName + " CheckBoxes") Is Nothing Then
-            check.Setup(traceName)
-            check.addCheckBox("Closed polygon - connect first and last vertices.")
-            check.Box(0).Checked = True
-        End If
-
         labels = {"", "", "Input to the ApproxPolyDP", "Output of ApproxPolyDP"}
         desc = "Using the input contours, create ApproxPoly output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static epsilonSlider = findSlider("epsilon - max distance from original curve")
-        Dim epsilon = epsilonSlider.value
-        Static closedPolyCheck = findCheckBox("Closed polygon - connect first and last vertices.")
+        options.RunVB()
 
         If standaloneTest() Then
             If task.heartBeat Then rotatedRect.Run(src)
@@ -31,11 +22,11 @@ Public Class ApproxPoly_Basics : Inherits VB_Parent
 
         If contour.allContours.Count > 0 Then
             Dim nextContour As cv.Point()
-            nextContour = cv.Cv2.ApproxPolyDP(contour.bestContour, epsilon, closedPolyCheck.checked)
+            nextContour = cv.Cv2.ApproxPolyDP(contour.bestContour, options.epsilon, options.closedPoly)
             dst3.SetTo(0)
             vbDrawContour(dst3, nextContour.ToList, cv.Scalar.Yellow)
         Else
-            setTrueText("No contours found", 2)
+            labels(2) = "No contours found"
         End If
     End Sub
 End Class

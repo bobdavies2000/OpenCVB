@@ -628,6 +628,11 @@ Public Class VBtask : Implements IDisposable
                 src = rgbFilter.dst2
             End If
 
+
+
+
+
+
             'cMotion.Run(src)
             If task.algName.StartsWith("CSharp_") Then
                 algorithmObjectCS.RunCS(src.Clone)
@@ -635,6 +640,11 @@ Public Class VBtask : Implements IDisposable
             Else
                 algorithmObjectVB.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
             End If
+
+
+
+
+
 
             ' make sure that any outputs from the algorithm are the right size.nearest
             If dst0.Size <> task.workingRes And dst0.Width > 0 Then dst0 = dst0.Resize(task.workingRes, cv.InterpolationFlags.Nearest)

@@ -62,6 +62,19 @@ namespace CS_Classes
             task.advice += advice + Environment.NewLine + Environment.NewLine;
         }
 
+        public void vbDrawContour(Mat dst, List<Point> contour, Scalar color, int lineWidth = -10)
+        {
+            if (lineWidth == -10)
+            {
+                lineWidth = task.lineWidth; // Assuming 'task' is a predefined object with 'lineWidth' property
+            }
+            if (contour.Count < 3) return; // this is not enough to draw.
+
+            var listOfPoints = new List<List<Point>>();
+            listOfPoints.Add(contour);
+
+            Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType); // Assuming 'task' has 'lineType' property
+        }
         public void processFrame(Mat src)
         {
             task.labels = labels;

@@ -4618,6 +4618,32 @@ End Class
 
 
 
+
+
+Public Class Options_ApproxPoly : Inherits VB_Parent
+    Public epsilon As Double
+    Public closedPoly As Boolean
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("epsilon - max distance from original curve", 0, 100, 3)
+
+        If findfrm(traceName + " CheckBoxes") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Closed polygon - connect first and last vertices.")
+            check.Box(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static epsilonSlider = findSlider("epsilon - max distance from original curve")
+        Static closedPolyCheck = findCheckBox("Closed polygon - connect first and last vertices.")
+        epsilon = epsilonSlider.value
+        closedPoly = closedPolyCheck.checked
+    End Sub
+End Class
+
+
+
+
+
 Public Class Options_Bin3WayRedCloud : Inherits VB_Parent
     Public startRegion As Integer
     Public endRegion As Integer
