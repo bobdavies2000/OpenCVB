@@ -122,7 +122,7 @@ Public Class Distance_Point3D : Inherits VB_Parent
             dst2.SetTo(0)
             Dim p1 = New cv.Point(inPoint1.X, inPoint1.Y)
             Dim p2 = New cv.Point(inPoint2.X, inPoint2.Y)
-            dst2.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
+            drawLine(dst2, p1, p2, task.highlightColor)
 
             Dim vec1 = task.pointCloud.Get(Of cv.Point3f)(p1.Y, p1.X)
             Dim vec2 = task.pointCloud.Get(Of cv.Point3f)(p2.Y, p2.X)

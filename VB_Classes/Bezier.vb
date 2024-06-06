@@ -28,7 +28,7 @@ Public Class Bezier_Basics : Inherits VB_Parent
         For i = 0 To points.Count - 4 Step 3
             For j = 0 To 100
                 Dim p2 = nextPoint(points, i, j / 100)
-                If j > 0 Then dst2.Line(p1, p2, task.highlightColor, task.lineWidth)
+                If j > 0 Then drawLine(dst2, p1, p2, task.highlightColor)
                 p1 = p2
             Next
         Next
@@ -55,15 +55,15 @@ Public Class Bezier_Example : Inherits VB_Parent
         Dim p1 As cv.Point
         For i = 0 To 100 - 1
             Dim p2 = bezier.nextPoint(points, 0, i / 100)
-            If i > 0 Then dst2.Line(p1, p2, task.highlightColor, task.lineWidth)
+            If i > 0 Then drawLine(dst2, p1, p2, task.highlightColor)
             p1 = p2
         Next
 
         For i = 0 To points.Count - 1
-            dst2.Circle(points(i), task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
+            drawCircle(dst2,points(i), task.dotSize + 2, cv.Scalar.White)
         Next
 
-        dst2.Line(points(0), points(1), cv.Scalar.White, task.lineWidth, task.lineType)
-        dst2.Line(points(2), points(3), cv.Scalar.White, task.lineWidth, task.lineType)
+        drawLine(dst2, points(0), points(1), cv.Scalar.White)
+        drawLine(dst2, points(2), points(3), cv.Scalar.White)
     End Sub
 End Class

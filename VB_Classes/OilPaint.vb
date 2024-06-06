@@ -57,9 +57,9 @@ Public Class OilPaint_Pointilism : Inherits VB_Parent
 
                 Dim rotatedRect = New cv.RotatedRect(nPoint, eSize, angle)
                 If options.useElliptical Then
-                    dst2(saveDrawRect).Ellipse(rotatedRect, nextColor, -1, task.lineType)
+                    dst2(saveDrawRect).Ellipse(rotatedRect, nextColor)
                 Else
-                    dst2(saveDrawRect).Circle(nPoint, slen / 4, nextColor, -1, task.lineType)
+                    drawCircle(dst2(saveDrawRect), nPoint, slen / 4, nextColor)
                 End If
             Next
         Next

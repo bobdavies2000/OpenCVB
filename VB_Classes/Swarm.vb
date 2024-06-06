@@ -58,7 +58,7 @@ Public Class Swarm_Basics : Inherits VB_Parent
             Dim pt = knn.queries(i)
             Dim ptNew = knn.trainInput(trainIndex)
             Dim nextDist = pt.DistanceTo(ptNew)
-            dst2.Line(pt, ptNew, cv.Scalar.White, task.lineWidth, task.lineType)
+            drawLine(dst2, pt, ptNew, cv.Scalar.White)
             disList.Add(nextDist)
             mpList.Add(New pointPair(pt, ptNew))
             If nextDist > 0 Then

@@ -30,7 +30,7 @@ Public Class Mat_PointToMat : Inherits VB_Parent
         random.Run(empty)
         dst2.SetTo(0)
         For Each pt In random.pointList
-            dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType, 0)
+            drawCircle(dst2, pt, task.dotSize, cv.Scalar.Yellow)
         Next
 
         Dim rows = random.pointList.Count
@@ -471,10 +471,8 @@ task.rightView)
             dst2(roi) = tmp.Resize(nSize)
         Next
         If lineSeparators Then
-            dst2.Line(New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2),
-                      cv.Scalar.White, task.lineWidth + 1)
-            dst2.Line(New cv.Point(dst2.Width / 2, 0), New cv.Point(dst2.Width / 2, dst2.Height),
-                      cv.Scalar.White, task.lineWidth + 1)
+            dst2.Line(New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), cv.Scalar.White, task.lineWidth + 1)
+            dst2.Line(New cv.Point(dst2.Width / 2, 0), New cv.Point(dst2.Width / 2, dst2.Height), cv.Scalar.White, task.lineWidth + 1)
         End If
     End Sub
 End Class

@@ -259,8 +259,8 @@ Public Class Sound_Display : Inherits VB_Parent
                     If minVal > 0 Then minVal = 0
                     If maxVal < 0 Then maxVal = 0
 
-                    dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red, task.lineWidth)
-                    dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cv.Scalar.Gray, task.lineWidth)
+                    drawLine(dst2, New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red)
+                    drawLine(dst2, New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cv.Scalar.Gray)
                 Next
                 labels(2) = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Max Absolute Value"
             Case 1
@@ -271,8 +271,8 @@ Public Class Sound_Display : Inherits VB_Parent
                     Dim sum = tmp.sum()
                     Dim nextVal = Math.Sqrt(sum(0) / samplesperLine)
 
-                    dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cv.Scalar.Red, task.lineWidth)
-                    dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cv.Scalar.Gray, task.lineWidth)
+                    drawLine(dst2, New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cv.Scalar.Red)
+                    drawLine(dst2, New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cv.Scalar.Gray)
                 Next
                 labels(2) = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Max RMS Value"
             Case 2
@@ -283,8 +283,8 @@ Public Class Sound_Display : Inherits VB_Parent
                     If minVal > 0 Then minVal = 0
                     If maxVal < 0 Then maxVal = 0
 
-                    dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red, task.lineWidth)
-                    dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cv.Scalar.Gray, task.lineWidth)
+                    drawLine(dst2, New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red)
+                    drawLine(dst2, New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cv.Scalar.Gray)
                 Next
             Case 3
                 pcm = cv.Cv2.Abs(pcm).toMat
@@ -294,8 +294,8 @@ Public Class Sound_Display : Inherits VB_Parent
                     Dim sum = pcm(rect).sum
                     Dim nextVal = sum(0) / samplesperLine
 
-                    dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cv.Scalar.Red, task.lineWidth)
-                    dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cv.Scalar.Gray, task.lineWidth)
+                    drawLine(dst2, New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cv.Scalar.Red)
+                    drawLine(dst2, New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cv.Scalar.Gray)
                 Next
                 labels(2) = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Scaled Average"
         End Select

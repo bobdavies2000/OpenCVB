@@ -127,13 +127,14 @@ Public Class VB_Parent : Implements IDisposable
         cv.Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType)
     End Sub
     Public Sub drawLine(dst As Mat, p1 As Point2f, p2 As Point2f, color As Scalar)
-        Dim pt1 As New Point(p1.X, p1.Y)
-        Dim pt2 As New Point(p2.X, p2.Y)
-        dst.Line(pt1, pt2, color, task.lineWidth, task.lineType)
+        dst.Line(p1, p2, color, task.lineWidth, task.lineType)
     End Sub
-    Public Sub drawCircle(dst As Mat, p1 As Point2f, radius As Integer, color As Scalar)
-        Dim pt As New Point(p1.X, p1.Y)
-        dst.Circle(pt, radius, color, -1, task.lineType)
+    Public Sub drawCircle(dst As Mat, pt As Point2f, radius As Integer, color As Scalar)
+        dst.Circle(pt, radius, color, -1, task.linetype)
+    End Sub
+    Public Sub drawPolkaDot(pt As cv.Point2f, dst As cv.Mat)
+        dst.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
+        drawCircle(dst, pt, task.dotSize, cv.Scalar.Black)
     End Sub
     Public Sub measureStartRun(name As String)
         If task.recordTimings = False Then Exit Sub

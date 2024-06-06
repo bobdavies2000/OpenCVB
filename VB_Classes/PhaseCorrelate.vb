@@ -84,7 +84,7 @@ Public Class PhaseCorrelate_BasicsTest : Inherits VB_Parent
         labels(3) = "Stabilized output from Phase_Correlate_Basics"
         desc = "Test the PhaseCorrelate_Basics with random movement"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         random.Run(src)
 
         stable.Run(random.dst3.Clone)
@@ -108,7 +108,7 @@ Public Class PhaseCorrelate_Depth : Inherits VB_Parent
     Public Sub New()
         desc = "Use phase correlation on the depth data"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static lastFrame = task.pcSplit(2).Clone
         phaseC.Run(task.pcSplit(2))
         dst2 = task.pcSplit(2)

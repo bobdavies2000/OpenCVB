@@ -1244,8 +1244,8 @@ Public Class OpenGL_Profile : Inherits VB_Parent
 
         dst3.SetTo(0)
         drawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
-        dst3.Circle(New cv.Point(p1.X + rc.rect.X, p1.Y + rc.rect.Y), task.dotSize + 2, cv.Scalar.Blue, -1, task.lineType)
-        dst3.Circle(New cv.Point(p2.X + rc.rect.X, p2.Y + rc.rect.Y), task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
+        drawCircle(dst3,New cv.Point(p1.X + rc.rect.X, p1.Y + rc.rect.Y), task.dotSize + 2, cv.Scalar.Blue)
+        drawCircle(dst3,New cv.Point(p2.X + rc.rect.X, p2.Y + rc.rect.Y), task.dotSize + 2, cv.Scalar.Red)
         If rc.contour3D.Count > 0 Then
             Dim vecMat As New cv.Mat(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
 

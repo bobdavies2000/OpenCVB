@@ -200,7 +200,7 @@ Public Class OEX_delaunay2 : Inherits VB_Parent
         labels = {"", "", "Next triangle list being built.  Latest entry is in red.", "The completed voronoi facets"}
         desc = "OpenCV Example delaunay2"
     End Sub
-    Public Shared Sub locatePoint(img As cv.Mat, subdiv As cv.Subdiv2D, pt As cv.Point, activeColor As cv.Scalar)
+    Public Sub locatePoint(img As cv.Mat, subdiv As cv.Subdiv2D, pt As cv.Point, activeColor As cv.Scalar)
         Dim e0 As Integer = 0
         Dim vertex As Integer = 0
 
@@ -218,7 +218,7 @@ Public Class OEX_delaunay2 : Inherits VB_Parent
             Loop While e <> e0
         End If
 
-        img.Circle(pt, task.dotSize, activeColor, -1, task.lineType)
+        drawCircle(img, pt, task.dotSize, activeColor)
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.quarterBeat Then
@@ -236,9 +236,9 @@ Public Class OEX_delaunay2 : Inherits VB_Parent
                     pts(0) = New cv.Point(Math.Round(t(0)), Math.Round(t(1)))
                     pts(1) = New cv.Point(Math.Round(t(2)), Math.Round(t(3)))
                     pts(2) = New cv.Point(Math.Round(t(4)), Math.Round(t(5)))
-                    dst2.Line(pts(0), pts(1), delaunay_color, task.lineWidth, task.lineType)
-                    dst2.Line(pts(1), pts(2), delaunay_color, task.lineWidth, task.lineType)
-                    dst2.Line(pts(2), pts(0), delaunay_color, task.lineWidth, task.lineType)
+                    drawLine(dst2, pts(0), pts(1), delaunay_color)
+                    drawLine(dst2, pts(1), pts(2), delaunay_color)
+                    drawLine(dst2, pts(2), pts(0), delaunay_color)
                 Next
             Else
                 dst1 = dst2.Clone
@@ -259,7 +259,7 @@ Public Class OEX_delaunay2 : Inherits VB_Parent
 
                     ifacets(0) = ifacet
                     cv.Cv2.Polylines(dst3, ifacets, True, New cv.Vec3b, task.lineWidth, task.lineType)
-                    dst3.Circle(centers(i), 3, New cv.Vec3b, -1, task.lineType)
+                    drawCircle(dst3,centers(i), 3, New cv.Vec3b)
                 Next
 
                 points.Clear()
@@ -327,7 +327,7 @@ Public Class OEX_PointPolygonTest_demo : Inherits VB_Parent
 
         dst2.SetTo(0)
         For i As Integer = 0 To vert.Count - 1
-            dst2.Line(vert(i), vert((i + 1) Mod 6), cv.Scalar.White, task.lineWidth, task.lineType)
+            drawLine(dst2, vert(i), vert((i + 1) Mod 6), cv.Scalar.White)
         Next
 
         pointPoly.Run(dst2)

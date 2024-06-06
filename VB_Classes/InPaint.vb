@@ -11,10 +11,10 @@ Public Class InPaint_Basics : Inherits VB_Parent
     Public Function drawRandomLine(dst As cv.Mat)
         Dim p1 = New cv.Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
         Dim p2 = New cv.Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
-        dst2.Line(p1, p2, New cv.Scalar(0, 0, 0), task.lineWidth, task.lineType)
+        drawLine(dst2, p1, p2, New cv.Scalar(0, 0, 0))
         Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1)
         mask.SetTo(0)
-        mask.Line(p1, p2, cv.Scalar.All(255), task.lineWidth, task.lineType)
+        drawLine(mask, p1, p2, cv.Scalar.All(255))
         Return mask
     End Function
     Public Sub RunVB(src as cv.Mat)

@@ -40,7 +40,7 @@ Public Class RedTrack_Lines : Inherits VB_Parent
         If task.heartBeat Or task.motionFlag Then dst3.SetTo(0)
         Dim index As Integer
         For Each lp In lines.lpList
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            drawLine(dst3, lp.p1, lp.p2, 255)
             index += 1
             If index > 10 Then Exit For
         Next
@@ -117,7 +117,7 @@ Public Class RedTrack_LineSingle : Inherits VB_Parent
         rightmost = findNearest(rightCenter)
         rightCenter = task.redCells(rightmost).maxDist
 
-        dst2.Line(leftCenter, rightCenter, cv.Scalar.White, task.lineWidth, task.lineType)
+        drawLine(dst2, leftCenter, rightCenter, cv.Scalar.White)
         labels(2) = track.redC.labels(2)
     End Sub
 End Class
@@ -147,9 +147,9 @@ Public Class RedTrack_FeaturesKNN : Inherits VB_Parent
             Dim p1 = knn.queries(i)
             Dim index = knn.neighbors(i)(knn.neighbors(i).Count - 1)
             Dim p2 = knn.trainInput(index)
-            dst3.Circle(p1, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
-            dst3.Circle(p2, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
-            dst3.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
+            drawCircle(dst3, p1, task.dotSize, cv.Scalar.Yellow)
+            drawCircle(dst3, p2, task.dotSize, cv.Scalar.Yellow)
+            drawLine(dst3, p1, p2, cv.Scalar.White)
         Next
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
     End Sub
@@ -176,7 +176,7 @@ Public Class RedTrack_GoodCell : Inherits VB_Parent
         good.Run(src)
         dst3.SetTo(0)
         For Each pt In good.featureList
-            dst3.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            drawCircle(dst3,pt, task.dotSize, cv.Scalar.White)
         Next
     End Sub
 End Class
@@ -211,8 +211,8 @@ Public Class RedTrack_GoodCells : Inherits VB_Parent
                 drawContour(dst2(rc.rect), rc.hull, cv.Scalar.White, -1)
                 trackIndex.Add(index)
 
-                dst0.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-                dst3.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+                drawCircle(dst0, pt, task.dotSize, task.highlightColor)
+                drawCircle(dst3,pt, task.dotSize, cv.Scalar.White)
                 trackCells.Add(rc)
             End If
         Next
@@ -275,8 +275,8 @@ Public Class RedTrack_Points : Inherits VB_Parent
         dst3.SetTo(0)
         Dim index As Integer
         For Each lp In lines.lpList
-            dst3.Circle(lp.p1, task.dotSize, 255, -1)
-            dst3.Circle(lp.p2, task.dotSize, 255, -1)
+            drawCircle(dst3, lp.p1, task.dotSize, 255)
+            drawCircle(dst3, lp.p2, task.dotSize, 255)
             index += 1
             If index >= 10 Then Exit For
         Next
@@ -309,7 +309,7 @@ Public Class RedTrack_Features : Inherits VB_Parent
 
         If task.heartBeat Then dst2.SetTo(0)
         For Each pt In task.features
-            dst2.Circle(pt, task.dotSize, 255, -1)
+            drawCircle(dst2, pt, task.dotSize, 255)
         Next
 
         redC.Run(dst2)

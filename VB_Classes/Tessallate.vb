@@ -42,10 +42,10 @@ Public Class Tessallate_Basics : Inherits VB_Parent
                 corners(i) = New cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y)
             Next
             Dim center = New cv.Point(rc.rect.X + rc.rect.Width / 2, rc.rect.Y + rc.rect.Height / 2)
-            dst2.Line(corners(0), center, cv.Scalar.White, task.lineWidth, task.lineType)
-            dst2.Line(corners(1), center, cv.Scalar.White, task.lineWidth, task.lineType)
-            dst2.Line(corners(2), center, cv.Scalar.White, task.lineWidth, task.lineType)
-            dst2.Line(corners(3), center, cv.Scalar.White, task.lineWidth, task.lineType)
+            drawLine(dst2, corners(0), center, cv.Scalar.White)
+            drawLine(dst2, corners(1), center, cv.Scalar.White)
+            drawLine(dst2, corners(2), center, cv.Scalar.White)
+            drawLine(dst2, corners(3), center, cv.Scalar.White)
 
             listOfPoints.Add(addTriangle(corners(0), corners(3), center, rc, shift))
             listOfPoints.Add(addTriangle(corners(1), corners(0), center, rc, shift))

@@ -77,7 +77,7 @@ Public Class Eigen_FitLineInput : Inherits VB_Parent
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > height Then pt.Y = height
                 points.Add(pt)
-                dst2.Circle(points(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
+                drawCircle(dst2,points(i), task.dotSize, cv.Scalar.White)
             Next
 
             Dim p1 As cv.Point2f, p2 As cv.Point2f
@@ -108,7 +108,7 @@ Public Class Eigen_FitLineInput : Inherits VB_Parent
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > height Then pt.Y = height
                 points.Add(pt)
-                dst2.Circle(pt, task.dotSize + 1, highLight, -1, task.lineType)
+                drawCircle(dst2,pt, task.dotSize + 1, highLight)
             Next
         End If
     End Sub

@@ -294,8 +294,8 @@ Public Class Contour_SidePoints : Inherits VB_Parent
             If rc.contour.Count > 0 Then
                 dst3.SetTo(0)
                 drawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
-                dst3.Line(ptLeft, ptRight, cv.Scalar.White, task.lineWidth, task.lineType)
-                dst3.Line(ptTop, ptBot, cv.Scalar.White, task.lineWidth, task.lineType)
+                drawLine(dst3, ptLeft, ptRight, cv.Scalar.White)
+                drawLine(dst3, ptTop, ptBot, cv.Scalar.White)
             End If
             If task.heartBeat Then
                 strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + " 3D location (units=meters)" + vbCrLf
@@ -462,7 +462,7 @@ Public Class Contour_SelfIntersect : Inherits VB_Parent
                 Dim pct = ptList.Count / rc.contour.Count
                 If pct > 0.1 And pct < 0.9 Then
                     selfInt = True
-                    dst3.Circle(pt, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+                    drawCircle(dst3,pt, task.dotSize, cv.Scalar.Red)
                 End If
             End If
             ptList.Add(ptStr)
@@ -522,7 +522,7 @@ Public Class Contour_Largest : Inherits VB_Parent
         If standaloneTest() Then
             dst3.SetTo(0)
             If maxIndex >= 0 And maxCount >= 2 Then
-                cv.Cv2.DrawContours(dst3, allContours, maxIndex, cv.Scalar.White, -1, task.lineType)
+                cv.Cv2.DrawContours(dst3, allContours, maxIndex, cv.Scalar.White)
             End If
         End If
     End Sub
@@ -554,7 +554,7 @@ Public Class Contour_Compare : Inherits VB_Parent
         cv.Cv2.FindContours(tmp, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
 
         dst3.SetTo(0)
-        cv.Cv2.DrawContours(dst3(task.rc.rect), allContours, -1, cv.Scalar.Yellow, -1, task.lineType)
+        cv.Cv2.DrawContours(dst3(task.rc.rect), allContours, -1, cv.Scalar.Yellow)
     End Sub
 End Class
 
@@ -583,7 +583,7 @@ Public Class Contour_RedCloudCorners : Inherits VB_Parent
         End If
 
         dst3.SetTo(0)
-        dst3.Circle(rc.maxDist, task.dotSize, cv.Scalar.White, task.lineWidth)
+        drawCircle(dst3, rc.maxDist, task.dotSize, cv.Scalar.White)
         Dim center As New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
         Dim maxDistance(4 - 1) As Single
         For i = 0 To corners.Length - 1
@@ -605,7 +605,7 @@ Public Class Contour_RedCloudCorners : Inherits VB_Parent
 
         drawContour(dst3(rc.rect), rc.contour, cv.Scalar.White)
         For i = 0 To corners.Count - 1
-            dst3(rc.rect).Line(center, corners(i), cv.Scalar.White, task.lineWidth, task.lineType)
+            drawLine(dst3(rc.rect), center, corners(i), cv.Scalar.White)
         Next
     End Sub
 End Class
@@ -903,7 +903,7 @@ Public Class Contour_FromPoints : Inherits VB_Parent
             dst2.SetTo(0)
             For Each p1 In random.pointList
                 For Each p2 In random.pointList
-                    dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
+                    drawLine(dst2, p1, p2, cv.Scalar.White)
                 Next
             Next
         End If

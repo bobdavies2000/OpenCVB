@@ -36,9 +36,9 @@ Public Class Neighbors_Basics : Inherits VB_Parent
             For Each index In task.rc.nabs
                 Dim pt = task.redCells(index).maxDStable
                 If pt = task.rc.maxDStable Then
-                    dst2.Circle(pt, task.dotSize, black, -1, task.lineType)
+                    drawCircle(dst2,pt, task.dotSize, black)
                 Else
-                    dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+                    drawCircle(dst2,pt, task.dotSize, task.highlightColor)
                     ptCount += 1
                     If ptCount > options.xNeighbors Then Exit For
                 End If
@@ -92,8 +92,8 @@ Public Class Neighbors_Intersects : Inherits VB_Parent
         If standaloneTest() Then
             dst3 = task.color.Clone
             For Each pt In nPoints
-                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-                dst3.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+                drawCircle(dst2,pt, task.dotSize, task.highlightColor)
+                drawCircle(dst3,pt, task.dotSize, cv.Scalar.Yellow)
             Next
         End If
 
@@ -121,7 +121,7 @@ Public Class Neighbors_ColorOnly : Inherits VB_Parent
 
         corners.Run(task.cellMap.Clone())
         For Each pt In corners.nPoints
-            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            drawCircle(dst2,pt, task.dotSize, task.highlightColor)
         Next
 
         labels(2) = redC.labels(2) + " and " + CStr(corners.nPoints.Count) + " cell intersections"

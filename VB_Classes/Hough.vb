@@ -81,7 +81,7 @@ Public Class Hough_Circles : Inherits VB_Parent
         labels(3) = "Hough Circles found"
         desc = "Find circles using HoughCircles."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         circles.Run(src)
         dst2 = circles.dst2
         Static Dim method As Integer = 3
@@ -90,7 +90,8 @@ Public Class Hough_Circles : Inherits VB_Parent
         Dim foundColor = New cv.Scalar(0, 0, 255)
         dst2.CopyTo(dst3)
         For i = 0 To cFound.Length - 1
-            dst3.Circle(New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y)), cFound(i).Radius, foundColor, 5, task.lineType)
+            Dim pt = New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y))
+            dst3.Circle(pt, cFound(i).Radius, foundColor, 5, task.lineType)
         Next
         labels(3) = CStr(cFound.Length) + " circles were identified"
     End Sub
@@ -113,8 +114,8 @@ Public Class Hough_Lines_MT : Inherits VB_Parent
         desc = "Multithread Houghlines to find lines in image fragments."
     End Sub
 
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
         edges.Run(src)
         dst2 = edges.dst2
 
@@ -155,8 +156,8 @@ Public Class Hough_Featureless : Inherits VB_Parent
         labels(2) = "Featureless mask"
         desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
         edges.Run(src)
 
@@ -202,8 +203,8 @@ Public Class Hough_FeatureLessTopX : Inherits VB_Parent
         labels = {"", "", "Areas without features", "Areas with features"}
         desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
         Static segSlider = findSlider("Minimum feature pixels")
         Dim minSegments = segSlider.Value
@@ -251,7 +252,7 @@ Public Class Hough_LaneFinder : Inherits VB_Parent
         labels = {"Original video image", "Mask to isolate lane regions", "Combined yellow and white masks", "HoughLines output"}
         desc = "Use Hough to isolate features in the mask of the road."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         hls.Run(empty)
         If task.optionsChanged Then
             Dim w = hls.input.video.dst2.Width
@@ -283,7 +284,7 @@ Public Class Hough_LaneFinder : Inherits VB_Parent
         For i = 0 To segments.Length - 1
             If laneLineMinY > segments(i).P1.Y Then laneLineMinY = segments(i).P1.Y
             If laneLineMinY > segments(i).P2.Y Then laneLineMinY = segments(i).P2.Y
-            dst3.Line(segments(i).P1, segments(i).P2, task.highlightColor, task.lineWidth, task.lineType)
+            drawLine(dst3, segments(i).P1, segments(i).P2, task.highlightColor)
         Next
     End Sub
 End Class

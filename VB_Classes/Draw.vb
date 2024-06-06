@@ -25,8 +25,8 @@ Public Class Draw_Noise : Inherits VB_Parent
             Dim c = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             If addRandomColor = False Then c = cv.Scalar.Black
             Dim noiseWidth = msRNG.Next(1, maxNoiseWidth)
-            dst2.Circle(center, noiseWidth, c, -1, task.lineType)
-            noiseMask.Circle(center, noiseWidth, cv.Scalar.White, -1, task.lineType)
+            drawCircle(dst2, center, noiseWidth, c)
+            drawCircle(noiseMask, center, noiseWidth, cv.Scalar.White)
         Next
     End Sub
 End Class
@@ -167,7 +167,9 @@ Public Class Draw_Shapes : Inherits VB_Parent
 
         dst2.SetTo(0)
         For i = 1 To 256
-            dst2.Line(New cv.Point(thickness * i + offsetX, offsetY), New cv.Point(thickness * i + offsetX, offsetY + lineLength), New cv.Scalar(i, i, i), thickness)
+            Dim p1 = New cv.Point(thickness * i + offsetX, offsetY)
+            Dim p2 = New cv.Point(thickness * i + offsetX, offsetY + lineLength)
+            dst2.Line(p1, p2, New cv.Scalar(i, i, i), thickness)
         Next
         For i = 1 To 256
             Dim color = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
@@ -175,7 +177,7 @@ Public Class Draw_Shapes : Inherits VB_Parent
                 Case 0 ' circle
                     Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
                     Dim radius = msRNG.Next(1, Math.Min(offsetX, offsetY))
-                    dst2.Circle(center, radius, color, -1, cv.LineTypes.Link8)
+                    drawCircle(dst2, center, radius, color)
                 Case 1 ' Rectangle
                     Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
                     Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
@@ -221,7 +223,9 @@ Public Class Draw_SymmetricalShapes : Inherits VB_Parent
             Next
 
             For i = 0 To options.numPoints - 1
-                dst2.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod options.numPoints), task.scalarColors(i Mod task.scalarColors.Count), task.lineWidth + 1, task.lineType)
+                Dim p1 = points.ElementAt(i)
+                Dim p2 = points.ElementAt((i + 1) Mod options.numPoints)
+                dst2.Line(p1, p2, task.scalarColors(i Mod task.scalarColors.Count), task.lineWidth + 1, task.lineType)
             Next
 
             If options.fillRequest Then dst2.FloodFill(center, options.fillColor)
@@ -382,9 +386,9 @@ Public Class Draw_Line : Inherits VB_Parent
             If p1 = New cv.Point Then p1 = task.clickPoint Else p2 = task.clickPoint
         End If
 
-        If p1 <> New cv.Point And p2 = New cv.Point Then dst2.Circle(p1, task.dotSize, task.highlightColor, -1, task.lineType)
+        If p1 <> New cv.Point And p2 = New cv.Point Then drawCircle(dst2,p1, task.dotSize, task.highlightColor)
         If p1 <> New cv.Point And p2 <> New cv.Point Then
-            dst2.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
+            drawLine(dst2, p1, p2, task.highlightColor)
         End If
         setTrueText("Click twice in the image to provide the points below and they will be connected with a line" + vbCrLf +
                     "P1 = " + p1.ToString + vbCrLf + "P2 = " + p2.ToString, 3)

@@ -829,7 +829,7 @@ Public Class RedCloud_DelaunayGuidedFeatures : Inherits VB_Parent
         For Each ptList In goodList
             For Each pt In ptList
                 Dim c = dst2.Get(Of cv.Vec3b)(pt.Y, pt.X)
-                dst3.Circle(pt, task.dotSize, c, -1, task.lineType)
+                drawCircle(dst3,pt, task.dotSize, c)
             Next
         Next
     End Sub
@@ -995,8 +995,8 @@ Public Class RedCloud_FloodPoint : Inherits VB_Parent
 
         dst1 = task.depthRGB
         For Each rc In task.redCells
-            dst1.Circle(rc.floodPoint, task.dotSize, cv.Scalar.White, -1, task.lineType)
-            dst2.Circle(rc.floodPoint, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+            drawCircle(dst1,rc.floodPoint, task.dotSize, cv.Scalar.White)
+            drawCircle(dst2,rc.floodPoint, task.dotSize, cv.Scalar.Yellow)
         Next
         stats.Run(src)
         setTrueText(stats.strOut, 3)
@@ -1722,7 +1722,7 @@ Public Class RedCloud_MaxDist : Inherits VB_Parent
         labels = redC.labels
 
         For Each rc In task.redCells
-            dst2.Circle(rc.maxDist, task.dotSize, task.highlightColor, -1, task.lineType)
+            drawCircle(dst2,rc.maxDist, task.dotSize, task.highlightColor)
         Next
 
         addTour.redCells = task.redCells
@@ -1732,7 +1732,7 @@ Public Class RedCloud_MaxDist : Inherits VB_Parent
         For i = 1 To addTour.redCells.Count - 1
             Dim rc = addTour.redCells(i)
             rc.maxDist = vbGetMaxDist(rc)
-            dst3.Circle(rc.maxDist, task.dotSize, task.highlightColor, -1, task.lineType)
+            drawCircle(dst3,rc.maxDist, task.dotSize, task.highlightColor)
         Next
     End Sub
 End Class

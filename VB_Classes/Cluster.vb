@@ -55,14 +55,14 @@ Public Class Cluster_Basics : Inherits VB_Parent
         For Each group In clusters
             For i = 0 To group.Value.Count - 1
                 For j = 0 To group.Value.Count - 1
-                    dst2.Line(group.Value(i), group.Value(j), cv.Scalar.White, task.lineWidth, task.lineType)
+                    drawLine(dst2, group.Value(i), group.Value(j), cv.Scalar.White)
                 Next
             Next
         Next
         dst3.SetTo(0)
         For i = 0 To knn.queries.Count - 1
-            dst2.Circle(knn.queries(i), task.dotSize, cv.Scalar.Red, -1, task.lineType)
-            dst3.Circle(knn.queries(i), task.dotSize, task.highlightColor, -1, task.lineType)
+            drawCircle(dst2,knn.queries(i), task.dotSize, cv.Scalar.Red)
+            drawCircle(dst3,knn.queries(i), task.dotSize, task.highlightColor)
         Next
         labels(2) = CStr(clusters.Count) + " groups built from " + CStr(ptInput.Count) + " by combining each input point and its nearest neighbor."
     End Sub
@@ -98,7 +98,7 @@ Public Class Cluster_Hulls : Inherits VB_Parent
                     hull.Add(New cv.Point(pt.X, pt.Y))
                 Next
             ElseIf hullPoints.Count = 2 Then
-                dst3.Line(hullPoints(0), hullPoints(1), cv.Scalar.White, task.lineWidth, task.lineType)
+                drawLine(dst3, hullPoints(0), hullPoints(1), cv.Scalar.White)
             End If
 
             hulls.Add(hull)

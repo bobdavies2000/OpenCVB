@@ -142,7 +142,7 @@ Module VB_Common
         Dim pad = 2
         If task.workingRes.Width >= 640 Then pad = 6
         dst.Line(p1, p2, fatColor, task.lineWidth + pad, task.lineType)
-        dst.Line(p1, p2, cv.Scalar.Black, task.lineWidth, task.lineType)
+        drawLine(dst, p1, p2, cv.Scalar.Black)
     End Sub
     Public Sub sampleDrawRect(input As cv.Mat)
         If task.drawRect.Width > 0 Then
@@ -182,10 +182,6 @@ Module VB_Common
         Dim rect = New cv.Rect(x, y, w, h)
         Return rc.mask
     End Function
-    Public Sub drawPolkaDot(pt As cv.Point2f, dst As cv.Mat)
-        dst.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
-        dst.Circle(pt, task.dotSize, cv.Scalar.Black, -1, task.lineType)
-    End Sub
     Public Function vbRebuildCells(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
         task.redCells.Clear()
         task.redCells.Add(New rcData)
@@ -318,7 +314,7 @@ Module VB_Common
     Public Sub vbDrawFPoly(ByRef dst As cv.Mat, poly As List(Of cv.Point2f), color As cv.Scalar)
         Dim minMod = Math.Min(poly.Count, task.polyCount)
         For i = 0 To minMod - 1
-            dst.Line(poly(i), poly((i + 1) Mod minMod), color, task.lineWidth, task.lineType)
+            drawLine(dst, poly(i), poly((i + 1) Mod minMod), color)
         Next
     End Sub
     Public Function vbFormatEquation(eq As cv.Vec4f) As String
@@ -563,13 +559,16 @@ Module VB_Common
         cv.Cv2.MatchTemplate(pts1, pts2, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
         Return correlationMat.Get(Of Single)(0, 0)
     End Function
+    Public Sub drawLine(dst As Mat, p1 As Point2f, p2 As Point2f, color As Scalar)
+        dst.Line(p1, p2, color, task.lineWidth, task.lineType)
+    End Sub
     Public Sub drawRotatedOutline(rotatedRect As cv.RotatedRect, dst2 As cv.Mat, color As cv.Scalar)
         Dim pts = rotatedRect.Points()
         Dim lastPt = pts(0)
         For i = 1 To pts.Length
             Dim index = i Mod pts.Length
             Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
-            dst2.Line(pt, lastPt, task.highlightColor, task.lineWidth, task.lineType)
+            drawLine(dst2, pt, lastPt, task.highlightColor)
             lastPt = pt
         Next
     End Sub
@@ -805,7 +804,7 @@ Public Class fPolyData
     Public Sub jitterTest(dst As cv.Mat) ' return true if there is nothing to change
         If jitterCheck Is Nothing Then jitterCheck = New cv.Mat(dst.Size, cv.MatType.CV_8U, 0)
         Dim polymp = currmp()
-        jitterCheck.Line(polymp.p1, polymp.p2, 255, task.lineWidth, task.lineType)
+        drawLine(jitterCheck, polymp.p1, polymp.p2, 255)
         Dim jitterPixels = jitterCheck.CountNonZero
         If jitterPixels = lastJitterPixels Then featureLineChanged = True Else featureLineChanged = False
         lastJitterPixels = jitterPixels

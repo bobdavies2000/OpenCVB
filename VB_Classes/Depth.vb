@@ -77,10 +77,10 @@ Public Class Depth_FirstLastDistance : Inherits VB_Parent
         desc = "Monitor the first and last depth distances"
     End Sub
     Private Sub identifyMinMax(pt As cv.Point, text As String)
-        dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        drawCircle(dst2,pt, task.dotSize, task.highlightColor)
         setTrueText(text, pt, 2)
 
-        dst3.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        drawCircle(dst3,pt, task.dotSize, task.highlightColor)
         setTrueText(text, pt, 3)
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -339,13 +339,13 @@ Public Class Depth_LocalMinMax_MT : Inherits VB_Parent
             minPoint(i) = New cv.Point(mm.minLoc.X + roi.X, mm.minLoc.Y + roi.Y)
             maxPoint(i) = New cv.Point(mm.maxLoc.X + roi.X, mm.maxLoc.Y + roi.Y)
 
-            dst2(roi).Circle(mm.minLoc, task.dotSize, task.highlightColor, -1, task.lineType)
-            dst2(roi).Circle(mm.maxLoc, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+            drawCircle(dst2(roi), mm.minLoc, task.dotSize, task.highlightColor)
+            drawCircle(dst2(roi), mm.maxLoc, task.dotSize, cv.Scalar.Red)
 
             Dim p1 = New cv.Point(mm.minLoc.X + roi.X, mm.minLoc.Y + roi.Y)
             Dim p2 = New cv.Point(mm.maxLoc.X + roi.X, mm.maxLoc.Y + roi.Y)
-            dst3.Circle(p1, task.dotSize, task.highlightColor, -1, task.lineType)
-            dst3.Circle(p2, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+            drawCircle(dst3,p1, task.dotSize, task.highlightColor)
+            drawCircle(dst3,p2, task.dotSize, cv.Scalar.Red)
         End Sub)
     End Sub
 End Class
@@ -398,8 +398,8 @@ Public Class Depth_MinMaxToVoronoi : Inherits VB_Parent
             ptmin = validatePoint2f(ptmin)
             ptmax = validatePoint2f(ptmax)
             subdiv.Insert(ptmin)
-            dst2.Circle(ptmin, task.dotSize, cv.Scalar.Red, -1, task.lineType)
-            dst2.Circle(ptmax, task.dotSize, cv.Scalar.Blue, -1, task.lineType)
+            drawCircle(dst2,ptmin, task.dotSize, cv.Scalar.Red)
+            drawCircle(dst2,ptmax, task.dotSize, cv.Scalar.Blue)
         Next
         Dim facets = New cv.Point2f()() {Nothing}
         Dim centers() As cv.Point2f

@@ -38,7 +38,7 @@ Public Class LongLine_Basics : Inherits VB_Parent
         lpList.Clear()
         For Each lp In lines.lpList
             lp = buildLongLine(lp)
-            dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+            drawLine(dst2, lp.p1, lp.p2, cv.Scalar.White)
             If lp.p1.X > lp.p2.X Then lp = New pointPair(lp.p2, lp.p1)
             lpList.Add(lp)
             If lpList.Count >= maxCount Then Exit For
@@ -70,7 +70,7 @@ Public Class LongLine_Core : Inherits VB_Parent
         lpList.Clear()
         For Each lp In lines.lpList
             lpList.Add(lp)
-            dst2.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
+            drawLine(dst2, lp.p1, lp.p2, task.highlightColor)
             If lpList.Count >= lineCount Then Exit For
         Next
     End Sub
@@ -107,8 +107,8 @@ Public Class LongLine_Depth : Inherits VB_Parent
         mm.minLoc = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
         mm.maxLoc = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
 
-        dst1.Circle(mm.minLoc, task.dotSize, cv.Scalar.Red, task.lineWidth, task.lineType)
-        dst1.Circle(mm.maxLoc, task.dotSize, cv.Scalar.Blue, task.lineWidth, task.lineType)
+        drawCircle(dst1, mm.minLoc, task.dotSize, cv.Scalar.Red)
+        drawCircle(dst1, mm.maxLoc, task.dotSize, cv.Scalar.Blue)
         setTrueText(Format(mm.minVal, fmt1) + "m", New cv.Point(mm.minLoc.X + 5, mm.minLoc.Y), 1)
         setTrueText(Format(mm.maxVal, fmt1) + "m", New cv.Point(mm.maxLoc.X + 5, mm.maxLoc.Y), 1)
 
@@ -159,7 +159,7 @@ Public Class LongLine_Consistent : Inherits VB_Parent
         Next
 
         labels(2) = "minDistance = " + Format(minDistance, fmt1)
-        dst2.Line(ptLong.p1, ptLong.p2, task.highlightColor, task.lineWidth, task.lineType)
+        drawLine(dst2, ptLong.p1, ptLong.p2, task.highlightColor)
         ptLong = lpMin
     End Sub
 End Class
@@ -190,7 +190,7 @@ Public Class LongLine_Point : Inherits VB_Parent
         lp.p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
         longPt = New cv.Point((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
 
-        dst2.Circle(longPt, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+        drawCircle(dst2,longPt, task.dotSize, cv.Scalar.Red)
     End Sub
 End Class
 
@@ -224,12 +224,12 @@ Public Class LongLine_Match : Inherits VB_Parent
         Dim mm As mmData = vbMinMax(dst0)
 
         mm.maxLoc = New cv.Point(mm.maxLoc.X + rect.Width / 2, mm.maxLoc.Y + rect.Height / 2)
-        dst2.Circle(mm.maxLoc, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+        drawCircle(dst2,mm.maxLoc, task.dotSize, cv.Scalar.Red)
 
         dst3.SetTo(0)
         dst0 = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
         dst0.CopyTo(dst3(New cv.Rect((dst3.Width - dst0.Width) / 2, (dst3.Height - dst0.Height) / 2, dst0.Width, dst0.Height)))
-        dst3.Circle(mm.maxLoc, task.dotSize, 255, -1, task.lineType)
+        drawCircle(dst3,mm.maxLoc, task.dotSize, 255)
 
         template = src(rect).Clone
     End Sub
@@ -256,9 +256,9 @@ Public Class LongLine_ExtendTest : Inherits VB_Parent
             Dim mps = New pointPair(p1, p2)
             Dim emps = longLine.buildLongLine(mps)
             dst2 = src
-            dst2.Line(emps.p1, emps.p2, task.highlightColor, task.lineWidth, task.lineType)
-            dst2.Circle(p1, task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
-            dst2.Circle(p2, task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
+            drawLine(dst2, emps.p1, emps.p2, task.highlightColor)
+            drawCircle(dst2,p1, task.dotSize + 2, cv.Scalar.Red)
+            drawCircle(dst2,p2, task.dotSize + 2, cv.Scalar.Red)
         End If
     End Sub
 End Class
@@ -285,7 +285,7 @@ Public Class LongLine_ExtendAll : Inherits VB_Parent
         lpList.Clear()
         For Each lp In lines.lpList
             lpList.Add(lp)
-            dst3.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
+            drawLine(dst3, lp.p1, lp.p2, task.highlightColor)
         Next
     End Sub
 End Class
@@ -350,8 +350,8 @@ Public Class LongLine_ExtendParallel : Inherits VB_Parent
                         If (cp.p1 = cp.p3 Or cp.p1 = cp.p4) And (cp.p2 = cp.p3 Or cp.p2 = cp.p4) Then
                             ' duplicate points...
                         Else
-                            dst2.Line(cp.p1, cp.p2, task.highlightColor, task.lineWidth, task.lineType)
-                            dst2.Line(cp.p3, cp.p4, cv.Scalar.Red, task.lineWidth, task.lineType)
+                            drawLine(dst2, cp.p1, cp.p2, task.highlightColor)
+                            drawLine(dst2, cp.p3, cp.p4, cv.Scalar.Red)
                             parList.Add(cp)
                             checkList.Add(cp.p1)
                             checkList.Add(cp.p2)
@@ -395,9 +395,9 @@ Public Class LongLine_Extend : Inherits VB_Parent
         If standaloneTest() Then
             labels(2) = emps.p1.ToString + " and " + emps.p2.ToString + " started with " + saveP1.ToString + " and " + saveP2.ToString
             dst2 = src
-            dst2.Line(emps.p1, emps.p2, task.highlightColor, task.lineWidth, task.lineType)
-            dst2.Circle(saveP1, task.dotSize, cv.Scalar.Red, -1, task.lineType)
-            dst2.Circle(saveP2, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+            drawLine(dst2, emps.p1, emps.p2, task.highlightColor)
+            drawCircle(dst2,saveP1, task.dotSize, cv.Scalar.Red)
+            drawCircle(dst2,saveP2, task.dotSize, cv.Scalar.Red)
         End If
     End Sub
 End Class
@@ -464,7 +464,7 @@ Public Class LongLine_History : Inherits VB_Parent
         Next
 
         For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+            drawLine(dst2, lp.p1, lp.p2, cv.Scalar.White)
         Next
         If mpList.Count > gOptions.FrameHistory.Value Then mpList.RemoveAt(0)
 

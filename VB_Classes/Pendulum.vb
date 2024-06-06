@@ -56,10 +56,10 @@ Public Class Pendulum_Basics : Inherits VB_Parent
         p1 = New cv.Point2f(p1.X * 2, p1.Y * 0.5)
         Dim p2 = New cv.Point2f(p1.X + (Math.Sin(o2) * l2 + dw * 0.5) / dw, p1.Y - (Math.Cos(o2) * l2 + dh * 0.5) / dh)
 
-        dst2.Line(center, p1, task.highlightColor, task.lineWidth, task.lineType)
-        dst2.Line(p1, p2, task.highlightColor, task.lineWidth, task.lineType)
+        drawLine(dst2, center, p1, task.highlightColor)
+        drawLine(dst2, p1, p2, task.highlightColor)
 
-        dst3.Circle(p1, task.dotSize, task.highlightColor, -1, task.lineType)
-        dst3.Circle(p2, task.dotSize, task.highlightColor, -1, task.lineType)
+        drawCircle(dst3,p1, task.dotSize, task.highlightColor)
+        drawCircle(dst3,p2, task.dotSize, task.highlightColor)
     End Sub
 End Class

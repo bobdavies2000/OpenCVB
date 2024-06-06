@@ -384,7 +384,7 @@ Public Class FeaturePoly_Plot : Inherits VB_Parent
             If absDiff >= hist.Length Then absDiff = hist.Length - 1
             If absDiff < fGrid.threshold Then
                 hist(CInt(absDiff)) += 1
-                dst3.Line(fGrid.anchor, pt, task.highlightColor, task.lineWidth, task.lineType)
+                drawLine(dst3, fGrid.anchor, pt, task.highlightColor)
                 distDiff.Add(absDiff)
             Else
                 hist(fGrid.threshold) += 1
@@ -544,8 +544,8 @@ Public Class FeaturePoly_StartPoints : Inherits VB_Parent
 
         ' dst3.SetTo(0)
         For Each mp In mpList
-            If mp.p1.DistanceTo(mp.p2) <= maxShift Then dst1.Line(mp.p1, mp.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-            dst1.Circle(mp.p1, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+            If mp.p1.DistanceTo(mp.p2) <= maxShift Then drawLine(dst1, mp.p1, mp.p2, cv.Scalar.Yellow)
+            drawCircle(dst1, mp.p1, task.dotSize, cv.Scalar.Yellow)
         Next
         dst1.Line(fGrid.anchor, fGrid.startAnchor, cv.Scalar.White, task.lineWidth + 1, task.lineType)
     End Sub
@@ -601,7 +601,7 @@ Public Class FeaturePoly_TopFeatures : Inherits VB_Parent
         Next
 
         For i = 0 To poly.Count - 2
-            dst2.Line(poly(i), poly(i + 1), cv.Scalar.White, task.lineWidth, task.lineType)
+            drawLine(dst2, poly(i), poly(i + 1), cv.Scalar.White)
         Next
     End Sub
 End Class
@@ -800,7 +800,7 @@ Public Class FeaturePoly_Perpendiculars : Inherits VB_Parent
         near.lp = New pointPair(p1, p2)
         near.pt = pt
         near.Run(empty)
-        dst2.Line(pt, near.nearPoint, cv.Scalar.Red, task.lineWidth, task.lineType)
+        drawLine(dst2, pt, near.nearPoint, cv.Scalar.Red)
         Dim d1 = fPD.rotateCenter.DistanceTo(pt)
         Dim d2 = fPD.rotateCenter.DistanceTo(near.nearPoint)
         Dim angle = Math.Asin(near.nearPoint.DistanceTo(pt) / If(d1 > d2, d1, d2))
@@ -822,18 +822,18 @@ Public Class FeaturePoly_Perpendiculars : Inherits VB_Parent
         perp1.p2 = fPD.currPoly((fPD.polyPrevSideIndex + 1) Mod task.polyCount)
         perp1.Run(empty)
 
-        dst2.Line(perp1.r1, perp1.r2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        drawLine(dst2, perp1.r1, perp1.r2, cv.Scalar.Yellow)
 
         perp2.p1 = fPD.prevPoly(fPD.polyPrevSideIndex)
         perp2.p2 = fPD.prevPoly((fPD.polyPrevSideIndex + 1) Mod task.polyCount)
         perp2.Run(empty)
-        dst2.Line(perp2.r1, perp2.r2, white, task.lineWidth, task.lineType)
+        drawLine(dst2, perp2.r1, perp2.r2, white)
 
         fPD.rotateCenter = vbIntersectTest(perp2.r1, perp2.r2, perp1.r1, perp1.r2, New cv.Rect(0, 0, src.Width, src.Height))
         If fPD.rotateCenter = New cv.Point2f Then
             fPD.rotateAngle = 0
         Else
-            dst2.Circle(fPD.rotateCenter, task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
+            drawCircle(dst2, fPD.rotateCenter, task.dotSize + 2, cv.Scalar.Red)
             fPD.rotateAngle = findrotateAngle(perp2.r1, perp2.r2, perp1.r1)
         End If
         If fPD.rotateAngle = 0 Then fPD.rotateCenter = New cv.Point2f
@@ -1055,7 +1055,7 @@ Public Class FeaturePoly_ResyncCheck : Inherits VB_Parent
         If fPoly.fPD.currPoly.Count < 2 Then Exit Sub ' polygon not found...
 
         Dim polymp = fPoly.fPD.currmp()
-        dst3.Line(polymp.p1, polymp.p2, 255, task.lineWidth, task.lineType)
+        drawLine(dst3, polymp.p1, polymp.p2, 255)
 
         Dim pixelCount = dst3.CountNonZero
         setTrueText(Format(Math.Abs(lastPixelCount - pixelCount)) + " pixels ", 3)
@@ -1344,7 +1344,7 @@ Public Class FeaturePoly_Core : Inherits VB_Parent
                 goodPoints.Add(pt)
                 goodFacets.Add(facet)
                 setTrueText(Format(absDiff, fmt1), pt, 2)
-                dst3.Line(anchor, pt, task.highlightColor, task.lineWidth, task.lineType)
+                drawLine(dst3, anchor, pt, task.highlightColor)
                 dst2.Set(Of cv.Vec3b)(pt.Y, pt.X, white)
             End If
         Next

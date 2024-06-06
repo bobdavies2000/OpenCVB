@@ -26,7 +26,7 @@ Public Class Bin2Way_Basics : Inherits VB_Parent
         Next
 
         Dim offset = halfSplit / bins * dst3.Width
-        dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), cv.Scalar.White, task.lineWidth)
+        drawLine(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), cv.Scalar.White)
 
         mats.mat(0) = src.InRange(0, halfSplit - 1)         ' darkest
         mats.mat(1) = src.InRange(halfSplit, 255)            ' lightest

@@ -88,9 +88,9 @@ Public Class EMax_Centers : Inherits VB_Parent
         dst2 = emax.dst2
         Static lastCenters As New List(Of cv.Point2f)(emax.centers)
         For i = 0 To emax.centers.Count - 1
-            dst2.Circle(emax.centers(i), task.dotSize + 1, task.highlightColor, -1, task.lineType)
+            drawCircle(dst2,emax.centers(i), task.dotSize + 1, task.highlightColor)
             If i < lastCenters.Count Then
-                dst2.Circle(lastCenters(i), task.dotSize + 2, cv.Scalar.Black, -1, task.lineType)
+                drawCircle(dst2,lastCenters(i), task.dotSize + 2, cv.Scalar.Black)
             End If
         Next
         lastCenters = New List(Of cv.Point2f)(emax.centers)
@@ -154,7 +154,7 @@ Public Class EMax_InputClusters : Inherits VB_Parent
             centers.Add(pt)
             eSamples.Add(New cv.Point2f(CInt(pt.X), CInt(pt.Y))) ' easier to debug with just integers...
             Dim label = eLabelMat.Get(Of Integer)(i)
-            dst2.Circle(pt, task.dotSize + 2, task.highlightColor, -1, task.lineType)
+            drawCircle(dst2,pt, task.dotSize + 2, task.highlightColor)
         Next
 
         ReDim eLabels(eLabelMat.Rows - 1)
@@ -206,7 +206,7 @@ Public Class EMax_VB_Failing : Inherits VB_Parent
                 Dim response = Math.Round(em_model.Predict2(sample)(1))
 
                 Dim c = task.vecColors(response)
-                dst2.Circle(New cv.Point(j, i), task.dotSize, c, -1)
+                drawCircle(dst2, New cv.Point(j, i), task.dotSize, c)
             Next
         Next
     End Sub
@@ -241,9 +241,9 @@ Public Class EMax_PointTracker : Inherits VB_Parent
         For i = 0 To knn.queries.Count - 1
             Dim p1 = knn.queries(i)
             Dim p2 = knn.trainInput(knn.result(i, 0))
-            dst3.Circle(p1, task.dotSize, task.highlightColor, -1, task.lineType)
-            dst3.Circle(p2, task.dotSize, cv.Scalar.Red, -1, task.lineType)
-            dst3.Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType)
+            drawCircle(dst3,p1, task.dotSize, task.highlightColor)
+            drawCircle(dst3,p2, task.dotSize, cv.Scalar.Red)
+            drawLine(dst3, p1, p2, cv.Scalar.White)
         Next
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         dst2 = dst2 Or emax.emaxInput.dst2

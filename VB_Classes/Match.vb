@@ -43,7 +43,7 @@ Public Class Match_Basics : Inherits VB_Parent
         End If
         If standalone Then
             dst2 = src
-            dst2.Circle(matchCenter, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            drawCircle(dst2,matchCenter, task.dotSize, cv.Scalar.White)
             dst3 = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
         End If
     End Sub
@@ -74,7 +74,7 @@ Public Class Match_BasicsTest : Inherits VB_Parent
 
         If standaloneTest() Then
             dst2 = src
-            dst2.Circle(match.matchCenter, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            drawCircle(dst2,match.matchCenter, task.dotSize, cv.Scalar.White)
             dst3 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
             setTrueText(Format(match.correlation, fmt3), match.matchCenter)
         End If
@@ -270,7 +270,7 @@ Public Class Match_Lines : Inherits VB_Parent
             Dim index = knn.result(i, 0)
             If index >= 0 And index < lastPt.Count Then
                 Dim lastMP = lastPt(index)
-                dst2.Line(lp.p1, lastMP.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+                drawLine(dst2, lp.p1, lastMP.p2, cv.Scalar.Red)
             End If
         Next
 
@@ -314,7 +314,7 @@ Public Class Match_PointSlope : Inherits VB_Parent
                 templates.Add(src(rect))
                 dst1.Rectangle(rect, cv.Scalar.White, task.lineWidth)
 
-                dst1.Line(pts.p1, pts.p2, task.highlightColor, task.lineWidth, task.lineType)
+                drawLine(dst1, pts.p1, pts.p2, task.highlightColor)
             Next
         End If
 
@@ -362,9 +362,9 @@ Public Class Match_PointSlope : Inherits VB_Parent
         Dim incorrectCount As Integer
         For Each mr In matches
             If mr.correlation1 < 0.5 Or mr.correlation2 < 0.5 Then incorrectCount += 1
-            dst2.Line(mr.p1, mr.p2, task.highlightColor, task.lineWidth, task.lineType)
-            dst2.Circle(mr.p1, task.dotSize, task.highlightColor, -1, task.lineType)
-            dst2.Circle(mr.p2, task.dotSize, task.highlightColor, -1, task.lineType)
+            drawLine(dst2, mr.p1, mr.p2, task.highlightColor)
+            drawCircle(dst2,mr.p1, task.dotSize, task.highlightColor)
+            drawCircle(dst2,mr.p2, task.dotSize, task.highlightColor)
             If task.heartBeat Then
                 strOut1 = Format(mr.correlation1, fmt3)
                 strOut2 = Format(mr.correlation2, fmt3)
@@ -459,7 +459,7 @@ Public Class Match_DrawRect : Inherits VB_Parent
         setTrueText("maxLoc = " + CStr(match.matchCenter.X) + ", " + CStr(match.matchCenter.Y), New cv.Point(1, 1), 3)
 
         If standaloneTest() Then
-            dst2.Circle(match.matchCenter, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+            drawCircle(dst2,match.matchCenter, task.dotSize, cv.Scalar.Red)
             setTrueText(Format(match.correlation, fmt3), match.matchCenter, 2)
         End If
         lastImage = src
@@ -584,7 +584,7 @@ Public Class Match_LinePairTest : Inherits VB_Parent
                 dst2 = dst2.Threshold(minCorrelation, 255, cv.ThresholdTypes.Binary)
             End If
             ptx(i) = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
-            dst3.Circle(ptx(i), task.dotSize, task.highlightColor, -1, task.lineType)
+            drawCircle(dst3,ptx(i), task.dotSize, task.highlightColor)
             dst3.Rectangle(searchRect, cv.Scalar.Yellow, 1)
             rect = validateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, rSize, rSize))
             target(i) = task.color(rect)
@@ -679,7 +679,7 @@ Public Class Match_Point : Inherits VB_Parent
         Dim mmData = vbMinMax(dst0)
         correlation = mmData.maxVal
         pt = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
-        src.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+        drawCircle(src, pt, task.dotSize, cv.Scalar.White)
         src.Rectangle(searchRect, cv.Scalar.Yellow, 1)
     End Sub
 End Class

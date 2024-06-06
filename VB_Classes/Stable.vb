@@ -40,8 +40,8 @@ Public Class Stable_Basics : Inherits VB_Parent
         dst3 = src.Clone
         For i = 0 To ptList.Count - 1
             Dim pt = ptList(i)
-            dst2.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
-            dst3.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
+            drawCircle(dst2, pt, task.dotSize, task.highlightColor)
+            drawCircle(dst3, pt, task.dotSize, task.highlightColor)
         Next
         labels(2) = CStr(ptList.Count) + " stable points were identified with " + CStr(maxGens) + " generations at the anchor point"
     End Sub
@@ -75,7 +75,7 @@ Public Class Stable_BasicsCount : Inherits VB_Parent
         Dim g As Integer
         For i = 0 To basics.ptList.Count - 1
             Dim pt = basics.ptList(i)
-            dst2.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
+            drawCircle(dst2, pt, task.dotSize, task.highlightColor)
             g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
             goodCounts.Add(g, i)
             setTrueText(CStr(g), pt)
@@ -107,13 +107,13 @@ Public Class Stable_Lines : Inherits VB_Parent
         For Each lp In lines.lpList
             basics.facetGen.inputPoints.Add(lp.p1)
             basics.facetGen.inputPoints.Add(lp.p2)
-            dst1.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth, task.lineType)
+            drawLine(dst1, lp.p1, lp.p2, task.highlightColor)
         Next
         basics.Run(src)
         dst2 = basics.dst2
         dst3 = basics.dst3
         For Each pt In basics.ptList
-            dst2.Circle(pt, task.dotSize + 1, task.highlightColor, -1, task.lineType)
+            drawCircle(dst2,pt, task.dotSize + 1, task.highlightColor)
             If standaloneTest() Then
                 Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 setTrueText(CStr(g), pt)
@@ -147,7 +147,7 @@ Public Class Stable_FAST : Inherits VB_Parent
         dst3 = basics.dst3
         dst2 = basics.dst2
         For Each pt In basics.ptList
-            dst2.Circle(pt, task.dotSize + 1, task.highlightColor, -1, task.lineType)
+            drawCircle(dst2,pt, task.dotSize + 1, task.highlightColor)
             If standaloneTest() Then
                 Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 setTrueText(CStr(g), pt)
@@ -189,13 +189,13 @@ Public Class Stable_GoodFeatures : Inherits VB_Parent
         genSorted.Clear()
         For i = 0 To basics.ptList.Count - 1
             Dim pt = basics.ptList(i)
-            If standaloneTest() Then dst2.Circle(pt, task.dotSize + 1, cv.Scalar.Yellow, -1, task.lineType)
+            If standaloneTest() Then drawCircle(dst2,pt, task.dotSize + 1, cv.Scalar.Yellow)
             dst1.Set(Of Byte)(pt.Y, pt.X, 255)
 
             Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
             genSorted.Add(g, i)
             setTrueText(CStr(g), pt)
-            dst2.Circle(pt, task.dotSize, task.highlightColor, task.lineWidth, task.lineType)
+            drawCircle(dst2, pt, task.dotSize, task.highlightColor)
         Next
         labels(2) = basics.labels(2)
         labels(3) = CStr(task.features.Count) + " good features were found and " + CStr(basics.ptList.Count) + " were stable"

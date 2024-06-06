@@ -307,7 +307,7 @@ Public Class Rectangle_EnclosingPoints : Inherits VB_Parent
             pointList = quickRandomPoints(20)
             dst2.SetTo(0)
             For Each pt In pointList
-                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+                drawCircle(dst2,pt, task.dotSize, task.highlightColor)
             Next
         End If
 

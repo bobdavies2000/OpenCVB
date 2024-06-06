@@ -74,7 +74,7 @@ Public Class WarpAffine_Captcha : Inherits VB_Parent
             Dim j = rng.Next(0, image.Rows - 1)
             Dim center = New cv.Point(i, j)
             Dim c = New cv.Scalar(rng.Next(0, 255), rng.Next(0, 255), rng.Next(0, 255))
-            image.Circle(center, rng.Next(1, 3), c, -1, task.lineType)
+            drawCircle(image, center, rng.Next(1, 3), c)
         Next
     End Sub
     Private Sub addLines(ByRef image As cv.Mat)
@@ -182,15 +182,15 @@ Public Class WarpAffine_3Points : Inherits VB_Parent
                     wideMat.Line(p1, p2, color, task.lineWidth + 3, task.lineType)
                     If j = 0 Then
                         Dim p3 = triangles(j + 1).Get(Of cv.Point2f)(i) + New cv.Point2f(src.Width, 0)
-                        wideMat.Line(p1, p3, cv.Scalar.White, task.lineWidth, task.lineType)
+                        drawLine(wideMat, p1, p3, cv.Scalar.White)
                     End If
                 Next
             Next
 
             Dim corner = triangles(0).Get(Of cv.Point2f)(0)
-            wideMat.Circle(corner, task.dotSize + 5, cv.Scalar.Yellow, -1, task.lineType)
+            drawCircle(wideMat, corner, task.dotSize + 5, cv.Scalar.Yellow)
             corner = New cv.Point2f(M.Get(Of Double)(0, 2) + src.Width, M.Get(Of Double)(1, 2))
-            wideMat.Circle(corner, task.dotSize + 5, cv.Scalar.Yellow, -1, task.lineType)
+            drawCircle(wideMat, corner, task.dotSize + 5, cv.Scalar.Yellow)
 
             dst2 = wideMat(New cv.Rect(0, 0, src.Width, src.Height))
             dst3 = wideMat(New cv.Rect(src.Width, 0, src.Width, src.Height))
@@ -198,9 +198,9 @@ Public Class WarpAffine_3Points : Inherits VB_Parent
             Dim pt As cv.Point
             For i = 0 To srcPoints1.Count - 1
                 pt = New cv.Point(CInt(srcPoints1(i).X), CInt(srcPoints1(i).Y))
-                dst2.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
+                drawCircle(dst2,pt, task.dotSize + 2, cv.Scalar.White)
                 pt = New cv.Point(CInt(srcPoints2(i).X), CInt(srcPoints2(i).Y))
-                dst3.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
+                drawCircle(dst3,pt, task.dotSize + 2, cv.Scalar.White)
             Next
         End If
         setTrueText("M defined as: " + vbCrLf +
@@ -251,7 +251,7 @@ Public Class WarpAffine_4Points : Inherits VB_Parent
                     Dim p2 = rectangles(j).Points((i + 1) Mod rectangles(j).Points.Length)
                     If j = 0 Then
                         Dim p3 = rectangles(1).Points(i)
-                        dst2.Line(p1, p3, cv.Scalar.White, task.lineWidth, task.lineType)
+                        drawLine(dst2, p1, p3, cv.Scalar.White)
                     End If
                     Dim color = Choose(i + 1, cv.Scalar.Red, cv.Scalar.White, cv.Scalar.Yellow, cv.Scalar.Green)
                     dst2.Line(p1, p2, color, task.lineWidth + 3, task.lineType)
@@ -270,9 +270,9 @@ Public Class WarpAffine_4Points : Inherits VB_Parent
                       Format(M.Get(Of Double)(2, 1), fmt2) + vbTab +
                       Format(M.Get(Of Double)(2, 2), fmt2) + vbCrLf)
         Dim center As New cv.Point2f(M.Get(Of Double)(0, 2), M.Get(Of Double)(1, 2))
-        dst2.Circle(center, task.dotSize + 5, cv.Scalar.Yellow, -1, task.lineType)
+        drawCircle(dst2,center, task.dotSize + 5, cv.Scalar.Yellow)
         center = New cv.Point2f(50, src.Height / 2)
-        dst2.Circle(center, task.dotSize + 5, cv.Scalar.Yellow, -1, task.lineType)
+        drawCircle(dst2,center, task.dotSize + 5, cv.Scalar.Yellow)
     End Sub
 End Class
 

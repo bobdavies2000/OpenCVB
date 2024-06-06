@@ -180,7 +180,7 @@ Public Class HistValley_Peaks : Inherits VB_Parent
         For Each index In sortPeaks.Keys
             Dim col = dst2.Width * index / task.histogramBins
             peaks.Add(index)
-            dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height / 10), cv.Scalar.White, task.lineWidth)
+            drawLine(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height / 10), cv.Scalar.White)
         Next
         labels(2) = CStr(peaks.Count - 2) + " peaks (marked at top) were found in the histogram"
     End Sub
@@ -303,7 +303,7 @@ Public Class HistValley_Test : Inherits VB_Parent
         If standaloneTest() Then
             For Each entry In valleyOrder
                 Dim col = entry.Value * dst2.Width / task.histogramBins
-                dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White, task.lineWidth)
+                drawLine(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White)
             Next
             setTrueText(CStr(valleys.Count) + " valleys in histogram", 3)
         End If
@@ -342,7 +342,7 @@ Public Class HistValley_OptionsAuto : Inherits VB_Parent
                     histogram.Set(Of Single)(j, 0, index)
                 Next
                 Dim col = dst2.Width * entry.Value / task.histogramBins
-                dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White, task.lineWidth)
+                drawLine(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White)
             Next
         End If
 
@@ -449,7 +449,7 @@ Public Class HistValley_Simple : Inherits VB_Parent
         Dim lastPoint As cv.Point = trends.resultingPoints(0)
         For i = 1 To trends.resultingPoints.Count - 1
             Dim p1 = trends.resultingPoints(i)
-            dst2.Line(lastPoint, p1, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+            drawLine(dst2, lastPoint, p1, cv.Scalar.Yellow)
             lastPoint = p1
         Next
         labels(2) = "Depth regions between 0 and " + CStr(CInt(task.maxZmeters + 1)) + " meters"
@@ -519,7 +519,7 @@ Public Class HistValley_Colors : Inherits VB_Parent
                 hist.hist.histogram.Set(Of Single)(j, 0, index)
             Next
             Dim col = dst2.Width * entry.Value / task.histogramBins
-            dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White, task.lineWidth)
+            drawLine(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White)
         Next
     End Sub
 End Class
@@ -559,7 +559,7 @@ Public Class HistValley_GrayKalman : Inherits VB_Parent
                 hist.hist.histogram.Set(Of Single)(j, 0, i)
             Next
             Dim col = dst2.Width * entry / task.histogramBins
-            dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White, task.lineWidth)
+            drawLine(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White)
             lastEntry = entry
         Next
     End Sub

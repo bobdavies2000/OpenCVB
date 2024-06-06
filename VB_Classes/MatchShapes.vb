@@ -1,4 +1,5 @@
 ﻿Imports System.Windows.Markup
+Imports NAudio
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/d3/dc0/group__imgproc__shape.html
 ' https://docs.opencv.org/3.4/d5/d45/tutorial_py_contours_more_functions.html
@@ -26,7 +27,7 @@ Public Class MatchShapes_Basics : Inherits VB_Parent
         Next
 
         For Each p In hull(maxIndex)
-            dst.Circle(p, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+            drawCircle(dst, p, task.dotSize, cv.Scalar.Yellow)
         Next
         Return maxIndex
     End Function
@@ -168,7 +169,7 @@ Public Class MatchShapes_Nearby : Inherits VB_Parent
 
         If bestCell >= 0 Then
             Dim rc = similarCells(bestCell)
-            dst3.Circle(rc.maxDist, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            drawCircle(dst3,rc.maxDist, task.dotSize, cv.Scalar.White)
             setTrueText("Best match", rc.maxDist, 3)
         End If
         If similarCells.Count = 0 Then setTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
@@ -234,7 +235,7 @@ Public Class MatchShapes_LeftRight : Inherits VB_Parent
         'dst3.CopyTo(doubleSize(New cv.Rect(dst2.Width, 0, dst2.Width, dst2.Height)))
 
         'For Each line In lines
-        '    doubleSize.Line(line.p1, line.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+        '    drawLine(doubleSize, line.p1, line.p2, cv.Scalar.White)
         'Next
 
         'doubleSize(New cv.Rect(0, 0, dst2.Width, dst2.Height)).CopyTo(dst2)

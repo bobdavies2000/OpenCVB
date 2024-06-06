@@ -16,7 +16,7 @@ Public Class Hull_Basics : Inherits VB_Parent
             random.Run(empty)
             dst2.SetTo(0)
             For Each pt In random.pointList
-                dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType, 0)
+                drawCircle(dst2, pt, task.dotSize, cv.Scalar.White)
             Next
             inputPoints = New List(Of cv.Point2f)(random.pointList)
         End If

@@ -20,11 +20,11 @@ Public Class Extrinsics_Basics : Inherits VB_Parent
 
         Dim pt = New cv.Point(dst2.Width / 2, dst2.Height / 2)
         If standaloneTest() Then
-            dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
-            dst3.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
-            dst2.Circle(pt, task.dotSize - 2, cv.Scalar.Black, -1, task.lineType)
-            dst3.Circle(pt, task.dotSize - 2, cv.Scalar.Black, -1, task.lineType)
-            task.color.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            drawCircle(dst2, pt, task.dotSize, cv.Scalar.White)
+            drawCircle(dst3, pt, task.dotSize, cv.Scalar.White)
+            drawCircle(dst2, pt, task.dotSize - 2, cv.Scalar.Black)
+            drawCircle(dst3, pt, task.dotSize - 2, cv.Scalar.Black)
+            drawCircle(task.color, pt, task.dotSize, cv.Scalar.White)
         End If
     End Sub
 End Class

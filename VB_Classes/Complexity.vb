@@ -175,12 +175,12 @@ Public Class Complexity_Dots : Inherits VB_Parent
         For i = 0 To sortData.Count - 1
             Dim pt = New cv.Point(dst.Width * sortData.ElementAt(i).Key / maxX,
                                   dst.Height - dst.Height * sortData.ElementAt(i).Value / maxTime)
-            dst.Circle(pt, task.dotSize, plotColor, -1, task.lineType)
+            drawCircle(dst, pt, task.dotSize, plotColor)
             pointSet.Add(pt)
         Next
 
         For i = 1 To pointSet.Count - 1
-            dst.Line(pointSet(i - 1), pointSet(i), plotColor, task.lineWidth, task.lineType)
+            drawLine(dst, pointSet(i - 1), pointSet(i), plotColor)
         Next
 
         setTrueText(">>>>>> Increasing input data >>>>>>" + vbCrLf + options.filename.Name,

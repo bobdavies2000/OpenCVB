@@ -100,15 +100,15 @@ Public Class PongWars_Basics : Inherits VB_Parent
             For j As Integer = 0 To numSquaresY - 1
                 Dim rect = New cv.Rect(i * sqWidth, j * sqHeight, sqWidth, sqHeight)
                 Dim index = squares(i, j)
-                dst2.Rectangle(rect, task.scalarColors(index), -1, task.lineType)
+                dst2.Rectangle(rect, task.scalarColors(index))
             Next
         Next
 
         Dim pt = New cv.Point(CInt(p1.x - sqWidth / 2), CInt(p1.y - sqHeight / 2))
-        dst2.Circle(pt, task.dotSize + 5, task.scalarColors(DAY_BALL_COLOR), -1, task.lineType)
+        drawCircle(dst2,pt, task.dotSize + 5, task.scalarColors(DAY_BALL_COLOR))
 
         pt = New cv.Point(CInt(p2.x - sqWidth / 2), CInt(p2.y - sqHeight / 2))
-        dst2.Circle(pt, task.dotSize + 5, task.scalarColors(NIGHT_BALL_COLOR), -1, task.lineType)
+        drawCircle(dst2,pt, task.dotSize + 5, task.scalarColors(NIGHT_BALL_COLOR))
     End Sub
 End Class
 

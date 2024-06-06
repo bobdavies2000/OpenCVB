@@ -12,7 +12,7 @@ Public Class Mouse_Basics : Inherits VB_Parent
         Static colorIndex As Integer
         Dim nextColor = task.scalarColors(colorIndex)
         Dim nextPt = task.mouseMovePoint
-        dst2.Circle(nextPt, task.dotSize + 3, nextColor, -1, task.lineType)
+        drawCircle(dst2,nextPt, task.dotSize + 3, nextColor)
         colorIndex += 1
         If colorIndex >= task.scalarColors.Count Then colorIndex = 0
     End Sub

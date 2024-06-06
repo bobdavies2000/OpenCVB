@@ -17,11 +17,11 @@ Public Class Gravity_Basics : Inherits VB_Parent
         dst3.SetTo(0)
         For Each pt In points
             pt = New cv.Point(pt.X * resizeRatio, pt.Y * resizeRatio)
-            dst2.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            drawCircle(dst2,pt, task.dotSize, cv.Scalar.White)
         Next
 
-        dst2.Line(vec.p1, vec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
-        dst3.Line(vec.p1, vec.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+        drawLine(dst2, vec.p1, vec.p2, cv.Scalar.White)
+        drawLine(dst3, vec.p1, vec.p2, cv.Scalar.White)
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then dst0 = vbPrepareDepthInput(0) Else dst0 = src
@@ -114,7 +114,7 @@ Public Class Gravity_BasicsOriginal : Inherits VB_Parent
 
         If standaloneTest() Then
             dst2.SetTo(0)
-            dst2.Line(vec.p1, vec.p2, 255, task.lineWidth, task.lineType)
+            drawLine(dst2, vec.p1, vec.p2, 255)
         End If
     End Sub
 End Class
@@ -145,11 +145,11 @@ Public Class Gravity_HorizonCompare : Inherits VB_Parent
             setTrueText(strOut, 3)
 
             dst2.SetTo(0)
-            dst2.Line(g1.p1, g1.p2, task.highlightColor, task.lineWidth, task.lineType)
-            dst2.Line(g2.p1, g2.p2, task.highlightColor, task.lineWidth, task.lineType)
+            drawLine(dst2, g1.p1, g1.p2, task.highlightColor)
+            drawLine(dst2, g2.p1, g2.p2, task.highlightColor)
 
-            dst2.Line(h1.p1, h1.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
-            dst2.Line(h2.p1, h2.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+            drawLine(dst2, h1.p1, h1.p2, cv.Scalar.Red)
+            drawLine(dst2, h2.p1, h2.p2, cv.Scalar.Red)
         End If
     End Sub
 End Class
@@ -181,8 +181,8 @@ Public Class Gravity_Horizon : Inherits VB_Parent
         If standaloneTest() Then
             setTrueText("Gravity vector (yellow):" + vbCrLf + gravity.strOut + vbCrLf + vbCrLf + "Horizon Vector (red): " + vbCrLf + horizon.strOut, 3)
             dst2.SetTo(0)
-            dst2.Line(task.gravityVec.p1, task.gravityVec.p2, task.highlightColor, task.lineWidth, task.lineType)
-            dst2.Line(task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+            drawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.highlightColor)
+            drawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
         End If
     End Sub
 End Class
@@ -225,7 +225,7 @@ Public Class Gravity_BasicsFail : Inherits VB_Parent
             dst3 = horizon.dst2
 
             dst2.SetTo(0)
-            dst2.Line(vec.p1, vec.p2, 255, task.lineWidth, task.lineType)
+            drawLine(dst2, vec.p1, vec.p2, 255)
         End If
 
         strOut = "p1 = " + vec.p1.ToString + vbCrLf + "p2 = " + vec.p2.ToString

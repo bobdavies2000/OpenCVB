@@ -16,7 +16,7 @@ Public Class Sides_Basics : Inherits VB_Parent
         For i = 0 To corners.Count - 1
             Dim nextColor = sides.cornerColors(i)
             Dim nextLabel = sides.cornerNames(i)
-            dst3.Line(task.rc.maxDist, corners(i), cv.Scalar.White, task.lineWidth, task.lineType)
+            drawLine(dst3, task.rc.maxDist, corners(i), cv.Scalar.White)
             setTrueText(nextLabel, New cv.Point(corners(i).X, corners(i).Y), 3)
         Next
 

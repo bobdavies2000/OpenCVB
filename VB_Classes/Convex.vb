@@ -41,7 +41,7 @@ Public Class Convex_Basics : Inherits VB_Parent
         drawContour(dst2, hullList, cv.Scalar.White, -1)
 
         For i = 0 To hull.Count - 1
-            dst2.Line(hull(i), hull((i + 1) Mod hull.Count), cv.Scalar.White, task.lineWidth)
+            drawLine(dst2, hull(i), hull((i + 1) Mod hull.Count), cv.Scalar.White)
         Next
     End Sub
 End Class
@@ -67,7 +67,7 @@ Public Class Convex_RedCloud : Inherits VB_Parent
 
             dst3.SetTo(0)
             dst3(task.rc.rect) = convex.dst2(New cv.Rect(0, 0, task.rc.rect.Width, task.rc.rect.Height))
-            dst3.Circle(task.rc.maxDist, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            drawCircle(dst3,task.rc.maxDist, task.dotSize, cv.Scalar.White)
         End If
     End Sub
 End Class
@@ -100,7 +100,7 @@ Public Class Convex_Defects : Inherits VB_Parent
         For Each v In defects
             dst3.Line(c(v(0)), c(v(2)), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
             dst3.Line(c(v(1)), c(v(2)), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
-            dst3.Circle(c(v(2)), task.dotSize + 2, task.highlightColor, -1, task.lineType)
+            drawCircle(dst3,c(v(2)), task.dotSize + 2, task.highlightColor)
         Next
     End Sub
 End Class

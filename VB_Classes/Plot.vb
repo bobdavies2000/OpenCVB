@@ -119,7 +119,7 @@ Public Class Plot_Depth : Inherits VB_Parent
             Dim meterDepth = CInt(src.Width / lineCount)
             For i = 1 To lineCount
                 Dim x = i * meterDepth
-                dst2.Line(New cv.Point(x, 0), New cv.Point(x, src.Height), cv.Scalar.White, task.lineWidth)
+                drawLine(dst2, New cv.Point(x, 0), New cv.Point(x, src.Height), cv.Scalar.White)
                 setTrueText(Format(i, "0") + "m", New cv.Point(x + 4, src.Height - 10))
             Next
         End If
@@ -184,7 +184,7 @@ Public Class Plot_OverTimeSingle : Inherits VB_Parent
             y *= dst2.Height - 1
             Dim c As New cv.Point(i, y)
             If c.X < 1 Then c.X = 1
-            dst2.Circle(c, 1, plotColor, -1, task.lineType)
+            drawCircle(dst2,c, 1, plotColor)
         Next
 
         If inputList.Count > dst2.Width / 8 Then
@@ -314,7 +314,7 @@ Public Class Plot_OverTime : Inherits VB_Parent
             y *= dst2.Height - 1
             Dim c As New cv.Point(columnIndex - task.dotSize, y - task.dotSize)
             If c.X < 1 Then c.X = 1
-            dst2.Circle(c, task.dotSize, plotColors(i), -1, task.lineType)
+            drawCircle(dst2,c, task.dotSize, plotColors(i))
         Next
 
 
@@ -407,7 +407,7 @@ Public Class Plot_OverTimeFixedScale : Inherits VB_Parent
                 y *= plotOutput.Height - 1
                 Dim c As New cv.Point(columnIndex - task.dotSize, y - task.dotSize)
                 If c.X < 1 Then c.X = 1
-                plotOutput.Circle(c, task.dotSize, plotColors(i), -1, task.lineType)
+                drawCircle(plotOutput, c, task.dotSize, plotColors(i))
             End If
         Next
 
@@ -514,7 +514,7 @@ Public Class Plot_Dots : Inherits VB_Parent
         If wipeSlate Then dst2.SetTo(0)
         For i = 0 To srcX.Count - 1
             Dim pt = New cv.Point(dst2.Width * srcX(i) / maxX, dst2.Height - dst2.Height * srcY(i) / maxY)
-            dst2.Circle(pt, task.dotSize, plotColor, -1, task.lineType)
+            drawCircle(dst2,pt, task.dotSize, plotColor)
         Next
         labels(2) = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + ", y-axis: " + CStr(minY) + " to " + CStr(maxY)
     End Sub

@@ -85,7 +85,7 @@ Public Class FLANN_Basics : Inherits VB_Parent
         dst2.SetTo(cv.Scalar.White)
         For i = 0 To features.Rows - 1
             Dim pt = random.PointList(i)
-            dst2.Circle(pt, task.dotSize, cv.Scalar.Blue, -1, task.lineType, 0)
+            drawCircle(dst2, pt, task.dotSize, cv.Scalar.Blue)
         Next
 
         If reuseData = False Or task.optionsChanged Or task.mouseClickFlag Then
@@ -111,10 +111,10 @@ Public Class FLANN_Basics : Inherits VB_Parent
                     Dim index = indices(j)
                     If index >= 0 And index < random.PointList.Count Then
                         Dim pt2 = random.PointList(index)
-                        dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth, task.lineType)
+                        drawLine(dst2, pt1, pt2, cv.Scalar.Red)
                     End If
                 Next
-                dst2.Circle(pt1, task.dotSize, cv.Scalar.Red, -1, task.lineType, 0)
+                drawCircle(dst2, pt1, task.dotSize, cv.Scalar.Red)
             Next
         End Using
 

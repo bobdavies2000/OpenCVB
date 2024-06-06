@@ -130,7 +130,7 @@ Public Class Grid_BasicsTest : Inherits VB_Parent
          Sub(i)
              Dim roi = task.gridList(i)
              cv.Cv2.Subtract(mean, src(roi), dst3(roi))
-             dst3(roi).Line(New cv.Point(0, 0), New cv.Point(roi.Width, roi.Height), cv.Scalar.White, task.lineWidth, task.lineType)
+             drawLine(dst3(roi), New cv.Point(0, 0), New cv.Point(roi.Width, roi.Height), cv.Scalar.White)
          End Sub)
     End Sub
 End Class
@@ -305,7 +305,7 @@ Public Class Grid_Neighbors : Inherits VB_Parent
 
             For Each index In task.gridNeighbors(roiIndex)
                 Dim roi = task.gridList(index)
-                mask.Rectangle(roi, cv.Scalar.White, -1, task.lineType)
+                mask.Rectangle(roi, cv.Scalar.White)
             Next
         End If
         dst2.SetTo(cv.Scalar.White, mask)
@@ -460,8 +460,8 @@ Public Class Grid_MinMaxDepth : Inherits VB_Parent
             dst2.SetTo(0)
             For i = 0 To minMaxLocs.Count - 1
                 Dim lp = minMaxLocs(i)
-                dst2(task.gridList(i)).Circle(lp.p2, task.dotSize, cv.Scalar.Red, -1, task.lineType)
-                dst2(task.gridList(i)).Circle(lp.p1, task.dotSize, cv.Scalar.White, -1, task.lineType)
+                drawCircle(dst2(task.gridList(i)), lp.p2, task.dotSize, cv.Scalar.Red)
+                drawCircle(dst2(task.gridList(i)), lp.p1, task.dotSize, cv.Scalar.White)
             Next
             dst2.SetTo(cv.Scalar.White, task.gridMask)
         End If
@@ -500,10 +500,10 @@ Public Class Grid_TrackCenter : Inherits VB_Parent
         If standaloneTest() Then
             dst2 = src
             dst2.Rectangle(match.matchRect, task.highlightColor, task.lineWidth + 1, task.lineType)
-            dst2.Circle(center, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            drawCircle(dst2, center, task.dotSize, cv.Scalar.White)
 
             If task.heartBeat Then dst3.SetTo(0)
-            dst3.Circle(center, task.dotSize, task.highlightColor, -1, task.lineType)
+            drawCircle(dst3, center, task.dotSize, task.highlightColor)
             setTrueText(Format(match.correlation, fmt3), center, 3)
 
             labels(3) = "Match correlation = " + Format(match.correlation, fmt3)

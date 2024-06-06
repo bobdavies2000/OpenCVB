@@ -33,7 +33,7 @@ Public Class LineCoin_Basics : Inherits VB_Parent
         dst2.SetTo(0)
         For i = 0 To p1List.Count - 1
             If ptCounts(i) >= task.frameHistoryCount Then
-                dst2.Line(p1List(i), p2List(i), 255, task.lineWidth, task.lineType)
+                drawLine(dst2, p1List(i), p2List(i), 255)
                 lpList.Add(New pointPair(p1List(i), p2List(i)))
             End If
         Next
@@ -51,7 +51,7 @@ Public Class LineCoin_Basics : Inherits VB_Parent
         If standaloneTest() Then
             dst3 = src
             For Each lp In lpList
-                dst3.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth, task.lineType)
+                dst3.Line(lp.p1, lp.p2, cv.Scalar.White)
             Next
         End If
 

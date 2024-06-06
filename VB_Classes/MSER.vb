@@ -188,7 +188,7 @@ Public Class MSER_SyntheticInput : Inherits VB_Parent
     End Sub
     Private Sub addNestedCircles(img As cv.Mat, p0 As cv.Point, width() As Integer, color() As Integer, n As Integer)
         For i = 0 To n - 1
-            img.Circle(p0, width(i) / 2, color(i), task.lineWidth, task.lineType)
+            drawCircle(img, p0, width(i) / 2, color(i))
             img.FloodFill(p0, color(i))
         Next
     End Sub

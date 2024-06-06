@@ -35,9 +35,9 @@ Public Class Bin3Way_Basics : Inherits VB_Parent
         End If
 
         Dim offset = firstThird / bins * dst3.Width
-        dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), cv.Scalar.White, task.lineWidth)
+        drawLine(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), cv.Scalar.White)
         offset = lastThird / bins * dst3.Width
-        dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), cv.Scalar.White, task.lineWidth)
+        drawLine(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), cv.Scalar.White)
 
         mats.mat(0) = src.InRange(0, firstThird - 1)         ' darkest
         mats.mat(1) = src.InRange(lastThird, 255)            ' lightest

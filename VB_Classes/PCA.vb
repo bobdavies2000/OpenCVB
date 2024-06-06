@@ -228,7 +228,7 @@ Public Class PCA_DrawImage : Inherits VB_Parent
                 eigen_val(j) = pca_analysis.Eigenvalues.Get(Of Double)(0, j)
             Next
 
-            dst3.Circle(cntr, task.dotSize + 1, cv.Scalar.BlueViolet, -1, task.lineType)
+            drawCircle(dst3,cntr, task.dotSize + 1, cv.Scalar.BlueViolet)
             Dim factor As Single = 0.02 ' scaling factor for the lines depicting the principal components.
             Dim ept1 = New cv.Point(cntr.X + factor * eigen_vecs(0).X * eigen_val(0), cntr.Y + factor * eigen_vecs(0).Y * eigen_val(0))
             Dim ept2 = New cv.Point(cntr.X - factor * eigen_vecs(1).X * eigen_val(1), cntr.Y - factor * eigen_vecs(1).Y * eigen_val(1))

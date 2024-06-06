@@ -204,7 +204,7 @@ Public Class OpAuto_Valley : Inherits VB_Parent
         If standaloneTest() Then
             For Each entry In valleyOrder
                 Dim col = entry.Value * dst2.Width / task.histogramBins
-                dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White, task.lineWidth)
+                drawLine(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White)
             Next
             setTrueText(CStr(valleys.Count) + " valleys in histogram", 3)
         End If
@@ -241,13 +241,13 @@ Public Class OpAuto_Peaks2D : Inherits VB_Parent
         For i = 0 To desiredBoundaries - 1
             Dim mm as mmData = vbMinMax(src)
             If clusterPoints.Contains(mm.maxLoc) = False Then clusterPoints.Add(mm.maxLoc)
-            src.Circle(mm.maxLoc, peakDistance, 0, -1, task.lineType)
+            drawCircle(src, mm.maxLoc, peakDistance, 0)
         Next
 
         If Not standaloneTest() Then dst2.SetTo(0)
         For i = 0 To clusterPoints.Count - 1
             Dim pt = clusterPoints(i)
-            dst2.Circle(pt, task.dotSize * 3, cv.Scalar.White, -1, task.lineType)
+            drawCircle(dst2,pt, task.dotSize * 3, cv.Scalar.White)
         Next
     End Sub
 End Class
@@ -293,7 +293,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits VB_Parent
         If Not standaloneTest() Then dst2.SetTo(0)
         For i = 0 To clusterPoints.Count - 1
             Dim pt = clusterPoints(i)
-            dst2.Circle(pt, task.dotSize * 3, cv.Scalar.White, -1, task.lineType)
+            drawCircle(dst2,pt, task.dotSize * 3, cv.Scalar.White)
         Next
 
         dst2.SetTo(cv.Scalar.White, task.gridMask)

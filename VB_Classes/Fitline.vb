@@ -36,7 +36,7 @@ Public Class FitLine_Basics : Inherits VB_Parent
                 lines.Add(p1)
                 lines.Add(p2)
             End If
-            dst2.Line(p1, p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+            drawLine(dst2, p1, p2, cv.Scalar.Red)
         Next
     End Sub
 End Class
@@ -80,7 +80,7 @@ Public Class Fitline_3DBasics_MT : Inherits VB_Parent
                 ' save the average color for this roi
                 Dim mean = task.depthRGB(roi).Mean()
                 mean(0) = 255 - mean(0)
-                dst3.Rectangle(roi, mean, -1, task.lineType)
+                dst3.Rectangle(roi, mean)
             Else
                 line = cv.Cv2.FitLine(points.ToArray, cv.DistanceTypes.L2, 0, 0, 0.01)
             End If
