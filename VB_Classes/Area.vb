@@ -1,7 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports System.Windows.Media.Media3D
-
 Public Class Area_MinTriangle_CPP : Inherits VB_Parent
     Public triangle As cv.Mat
     Public options As New Options_MinArea
@@ -32,8 +30,10 @@ Public Class Area_MinTriangle_CPP : Inherits VB_Parent
         triangle = New cv.Mat(3, 1, cv.MatType.CV_32FC2, dstData)
 
         For i = 0 To 2
-            Dim p1 = triangle.Get(Of cv.Point2f)(i)
-            Dim p2 = triangle.Get(Of cv.Point2f)((i + 1) Mod 3)
+            Dim pt = triangle.Get(Of cv.Point2f)(i)
+            Dim p1 = New cv.Point(pt.X, pt.Y)
+            pt = triangle.Get(Of cv.Point2f)((i + 1) Mod 3)
+            Dim p2 = New cv.Point(pt.X, pt.Y)
             dst2.Line(p1, p2, cv.Scalar.Black, task.lineWidth, task.lineType)
         Next
 

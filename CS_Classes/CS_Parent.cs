@@ -13,12 +13,18 @@ namespace CS_Classes
     public class CS_Parent
     {
         public VBtask task;
+        public IntPtr cPtr;
         public bool standalone = true;
         public string desc = "";
         public Mat dst0, dst1, dst2, dst3;
         public string traceName;
         public string[] labels = new string[4]; 
-        public CS_Parent(VBtask _task)
+        private List<trueText> trueData = new List<trueText>();
+        public const string fmt0 = "0";
+        public const string fmt1 = "0.0";
+        public const string fmt2 = "0.00";
+        public const string fmt3 = "0.000";
+        public const string fmt4 = "0.0000"; public CS_Parent(VBtask _task)
         {
             this.task = _task;
             traceName = this.GetType().Name;
@@ -34,7 +40,7 @@ namespace CS_Classes
             dst2 = new Mat(task.workingRes, MatType.CV_8UC3, Scalar.All(0));
             dst3 = new Mat(task.workingRes, MatType.CV_8UC3, Scalar.All(0));
         }
-        public bool StandaloneTest()
+        public bool standaloneTest()
         {
             if (standalone || ShowIntermediate()) return true;
             return false;
@@ -84,10 +90,49 @@ namespace CS_Classes
             task.dst2 = dst2;
             task.dst3 = dst3;
         }
+
+        public void setTrueText(string text, Point pt, int picTag = 2)
+        {
+            trueText str = new trueText(text, pt, picTag);
+            trueData.Add(str);
+        }
+
+        public void setTrueText(string text)
+        {
+            Point pt = new Point(0, 0);
+            int picTag = 2;
+            trueText str = new trueText(text, pt, picTag);
+            trueData.Add(str);
+        }
+
+        public void setTrueText(string text, int picTag)
+        {
+            Point pt = new Point(0, 0);
+            trueText str = new trueText(text, pt, picTag);
+            trueData.Add(str);
+        }
+    }
+
+    public class trueText
+    {
+        public string Text { get; set; }
+        public Point Pt { get; set; }
+        public int PicTag { get; set; }
+
+        public trueText(string text, Point pt, int picTag)
+        {
+            Text = text;
+            Pt = pt;
+            PicTag = picTag;
+        }
     }
 
 
-    public class trueText
+
+}
+
+
+public class trueText
     {
         public string text;
         public int picTag = 2;

@@ -1,14 +1,14 @@
 ﻿using cv = OpenCvSharp;
 using System;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using VB_Classes;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System.Linq;
-using System.Windows.Controls;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace CS_Classes
 { 
@@ -29,7 +29,7 @@ namespace CS_Classes
 
             Mat srcPlus = src2;
             // algorithm user normally provides src2! 
-            if (StandaloneTest() || src2 == null) srcPlus = task.depthRGB;
+            if (standaloneTest() || src2 == null) srcPlus = task.depthRGB;
             if (srcPlus.Type() != src.Type())
             {
                 if (src.Type() != MatType.CV_8UC3 || srcPlus.Type() != MatType.CV_8UC3)
@@ -183,7 +183,7 @@ public class CSharp_ApproxPoly_Basics : CS_Parent
         {
             options.RunVB();
 
-            if (StandaloneTest())
+            if (standaloneTest())
             {
                 if (task.heartBeat)
                     rotatedRect.Run(src);
@@ -275,7 +275,175 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 
+    public class CSharp_Area_MinTriangle_CPP : CS_Parent
+    {
+        public Mat triangle;
+        public Options_MinArea options = new Options_MinArea();
+        public List<Point2f> srcPoints;
+
+        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void MinTriangle_Run(IntPtr inputPtr, int numberOfPoints, IntPtr outputTriangle);
+
+        public CSharp_Area_MinTriangle_CPP(VBtask task) : base(task)
+        {
+            desc = "Find minimum containing triangle for a set of points.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (task.heartBeat)
+            {
+                srcPoints = new List<Point2f>(options.srcPoints);
+            }
+            else
+            {
+                if (srcPoints.Count < 3) return; // not enough points
+            }
+
+            float[] dataSrc = new float[srcPoints.Count * Marshal.SizeOf<int>() * 2];
+            float[] dstData = new float[3 * Marshal.SizeOf<int>() * 2];
+
+            dst2.SetTo(Scalar.White);
+
+            Mat input = new Mat(srcPoints.Count, 1, MatType.CV_32FC2, srcPoints.ToArray());
+            Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length);
+            GCHandle srcHandle = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+            GCHandle dstHandle = GCHandle.Alloc(dstData, GCHandleType.Pinned);
+            MinTriangle_Run(srcHandle.AddrOfPinnedObject(), srcPoints.Count, dstHandle.AddrOfPinnedObject());
+            srcHandle.Free();
+            dstHandle.Free();
+            triangle = new Mat(3, 1, MatType.CV_32FC2, dstData);
+
+            for (int i = 0; i <= 2; i++)
+            {
+                Point2f pt = triangle.At<Point2f>(i);
+                Point p1 = new Point(pt.X, pt.Y);
+                pt = triangle.At<Point2f>((i + 1) % 3);
+                Point p2 = new Point(pt.X, pt.Y);
+                dst2.Line(p1, p2, Scalar.Black, task.lineWidth, task.lineType);
+            }
+
+            foreach (var ptSrc in srcPoints)
+            {
+                var pt = new cv.Point(ptSrc.X, ptSrc.Y);
+                dst2.Circle(pt, task.dotSize + 1, Scalar.Red, -1, task.lineType);
+            }
+        }
+    }
+
+
+
+
+
+    public class CSharp_Annealing_Basics_CPP : CS_Parent
+    {
+        public int numberOfCities = 25;
+        public Point2f[] cityPositions;
+        public int[] cityOrder;
+        public float energy;
+        public float energyLast;
+        public bool circularPattern = true;
+
+        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr Annealing_Basics_Open(IntPtr cityPositions, int numberOfCities);
+
+        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr Annealing_Basics_Close(IntPtr saPtr);
+
+        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr Annealing_Basics_Run(IntPtr saPtr, IntPtr cityOrder, int numberOfCities);
+        public void drawMap()
+        {
+            dst2.SetTo(Scalar.Black);
+            for (int i = 0; i < cityOrder.Length; i++)
+            {
+                dst2.Circle(cityPositions[i], task.dotSize, Scalar.White, -1, task.lineType);
+                dst2.Line(cityPositions[i], cityPositions[cityOrder[i]], Scalar.White, task.lineWidth, task.lineType);
+            }
+            setTrueText("Energy" + Environment.NewLine + energy.ToString(fmt0), new Point(10, 100), 2);
+        }
+
+        public void setup()
+        {
+            cityOrder = new int[numberOfCities];
+
+            double radius = dst2.Rows * 0.45;
+            Point center = new Point(dst2.Cols / 2, dst2.Rows / 2);
+            if (circularPattern)
+            {
+                cityPositions = new Point2f[numberOfCities];
+                Random gen = new Random();
+                RNG r = new RNG(gen.Next(0, 100));
+                for (int i = 0; i < cityPositions.Length; i++)
+                {
+                    double theta = r.Uniform(0, 360);
+                    cityPositions[i].X = (float)(radius * Math.Cos(theta) + center.X);
+                    cityPositions[i].Y = (float)(radius * Math.Sin(theta) + center.Y);
+                    cityOrder[i] = (i + 1) % numberOfCities;
+                }
+            }
+            for (int i = 0; i < cityOrder.Length; i++)
+            {
+                cityOrder[i] = (i + 1) % numberOfCities;
+            }
+            dst2 = new Mat(dst2.Size(), MatType.CV_8UC3, Scalar.Black);
+        }
+
+        public void Open()
+        {
+            GCHandle hCityPosition = GCHandle.Alloc(cityPositions, GCHandleType.Pinned);
+            cPtr = Annealing_Basics_Open(hCityPosition.AddrOfPinnedObject(), numberOfCities);
+            hCityPosition.Free();
+        }
+
+        public CSharp_Annealing_Basics_CPP(VBtask task) : base(task)
+        {
+            energy = -1;
+            setup();
+            Open();
+            desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            var saveCityOrder = (int[])cityOrder.Clone();
+            GCHandle hCityOrder = GCHandle.Alloc(cityOrder, GCHandleType.Pinned);
+            IntPtr outPtr = Annealing_Basics_Run(cPtr, hCityOrder.AddrOfPinnedObject(), cityPositions.Length);
+            hCityOrder.Free();
+
+            string msg = Marshal.PtrToStringAnsi(outPtr);
+            string[] split = Regex.Split(msg, @"\W+");
+            energy = float.Parse(split[split.Length - 2] + "." + split[split.Length - 1]);
+            if (standaloneTest())
+            {
+                if (energyLast == energy || task.optionsChanged)
+                {
+                    Annealing_Basics_Close(cPtr);
+                    setup();
+                    Open();
+                }
+                energyLast = energy;
+            }
+
+            drawMap();
+        }
+
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero) cPtr = Annealing_Basics_Close(cPtr);
+        }
+    }
+
+
+
+
+
+
+
+
 
 
 }
+
 
