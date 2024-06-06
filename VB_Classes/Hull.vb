@@ -22,7 +22,7 @@ Public Class Hull_Basics : Inherits VB_Parent
         End If
         Dim hull2f = cv.Cv2.ConvexHull(inputPoints, True)
         hull = vbFloat2Int(hull2f.ToList)
-        vbDrawContour(dst2, hull, cv.Scalar.Yellow)
+        drawContour(dst2, hull, cv.Scalar.Yellow)
     End Sub
 End Class
 
@@ -55,8 +55,8 @@ Public Class Hull_Contour : Inherits VB_Parent
             End If
         Next
         rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
-        vbDrawContour(dst3, rc.contour, cv.Scalar.LightBlue, task.lineWidth)
+        drawContour(dst3, rc.contour, cv.Scalar.LightBlue, task.lineWidth)
         If rc.hull.Count > 0 Then rc.hull.RemoveAt(rc.hull.Count - 1)
-        vbDrawContour(dst3, rc.hull, cv.Scalar.White, task.lineWidth)
+        drawContour(dst3, rc.hull, cv.Scalar.White, task.lineWidth)
     End Sub
 End Class

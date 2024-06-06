@@ -23,10 +23,8 @@ Public Class Annealing_Basics_CPP : Inherits VB_Parent
         Dim center = New cv.Point(dst2.Cols / 2, dst2.Rows / 2)
         If circularPattern Then
             ReDim cityPositions(numberOfCities - 1)
-            Dim gen As New System.Random()
-            Dim r As New cv.RNG(gen.Next(0, 100))
             For i = 0 To cityPositions.Length - 1
-                Dim theta = r.Uniform(0, 360)
+                Dim theta = msRNG.Next(0, 360)
                 cityPositions(i).X = radius * Math.Cos(theta) + center.X
                 cityPositions(i).Y = radius * Math.Sin(theta) + center.Y
                 cityOrder(i) = (i + 1) Mod numberOfCities

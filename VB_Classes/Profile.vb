@@ -24,7 +24,7 @@ Public Class Profile_Basics : Inherits VB_Parent
         If rc.contour.Count < 4 Then Exit Sub
 
         dst3.SetTo(0)
-        vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
+        drawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
 
         Dim sortLeft As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Dim sortTop As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
@@ -356,7 +356,7 @@ Public Class Profile_Kalman : Inherits VB_Parent
 
         If rc.index > 0 Then
             dst3.SetTo(0)
-            vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
+            drawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
             For i = 0 To sides.corners.Count - 1
                 Dim pt = New cv.Point(CInt(kalman.kOutput(i * 2)), CInt(kalman.kOutput(i * 2 + 1)))
                 dst3.Circle(pt, task.dotSize + 2, sides.cornerColors(i), -1, task.lineType)

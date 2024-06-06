@@ -1,5 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Module VB_Common
     Public Const fmt0 = "0"
     Public Const fmt1 = "0.0"
@@ -282,13 +283,6 @@ Module VB_Common
         End If
         Return src
     End Function
-    Public Sub vbDrawContour(ByRef dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -10)
-        If lineWidth = -10 Then lineWidth = task.lineWidth ' VB.Net only allows constants for optional parameter.
-        If contour.Count < 3 Then Exit Sub ' this is not enough to draw.
-        Dim listOfPoints = New List(Of List(Of cv.Point))
-        listOfPoints.Add(contour)
-        cv.Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType)
-    End Sub
     Public Sub quarterBeat()
         Static quarter(4) As Boolean
         task.quarterBeat = False

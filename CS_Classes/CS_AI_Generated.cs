@@ -198,7 +198,7 @@ public class CSharp_ApproxPoly_Basics : CS_Parent
                 Point[] nextContour;
                 nextContour = Cv2.ApproxPolyDP(contour.bestContour, options.epsilon, options.closedPoly);
                 dst3.SetTo(Scalar.Black);
-                vbDrawContour(dst3, new List<Point>(nextContour), Scalar.Yellow);
+                drawContour(dst3, new List<Point>(nextContour), Scalar.Yellow);
             }
             else
             {
@@ -321,13 +321,13 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
                 Point p1 = new Point(pt.X, pt.Y);
                 pt = triangle.At<Point2f>((i + 1) % 3);
                 Point p2 = new Point(pt.X, pt.Y);
-                dst2.Line(p1, p2, Scalar.Black, task.lineWidth, task.lineType);
+                drawLine(dst2, p1, p2, Scalar.Black);
             }
 
             foreach (var ptSrc in srcPoints)
             {
                 var pt = new cv.Point(ptSrc.X, ptSrc.Y);
-                dst2.Circle(pt, task.dotSize + 1, Scalar.Red, -1, task.lineType);
+                drawCircle(dst2, pt, task.dotSize + 1, Scalar.Red);
             }
         }
     }
@@ -358,8 +358,8 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             dst2.SetTo(Scalar.Black);
             for (int i = 0; i < cityOrder.Length; i++)
             {
-                dst2.Circle(cityPositions[i], task.dotSize, Scalar.White, -1, task.lineType);
-                dst2.Line(cityPositions[i], cityPositions[cityOrder[i]], Scalar.White, task.lineWidth, task.lineType);
+                drawCircle(dst2, cityPositions[i], task.dotSize, Scalar.White);
+                drawLine(dst2, cityPositions[i], cityPositions[cityOrder[i]], Scalar.White);
             }
             setTrueText("Energy" + Environment.NewLine + energy.ToString(fmt0), new Point(10, 100), 2);
         }
@@ -373,11 +373,9 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             if (circularPattern)
             {
                 cityPositions = new Point2f[numberOfCities];
-                Random gen = new Random();
-                RNG r = new RNG(gen.Next(0, 100));
                 for (int i = 0; i < cityPositions.Length; i++)
                 {
-                    double theta = r.Uniform(0, 360);
+                    double theta = msRNG.Next(0, 360);
                     cityPositions[i].X = (float)(radius * Math.Cos(theta) + center.X);
                     cityPositions[i].Y = (float)(radius * Math.Sin(theta) + center.Y);
                     cityOrder[i] = (i + 1) % numberOfCities;

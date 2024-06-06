@@ -12,7 +12,7 @@ Public Class SuperPixel_Basics : Inherits VB_Parent
 
         dst3 = src
         For Each rc In task.redCells
-            vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.White, task.lineWidth)
+            drawContour(dst3(rc.rect), rc.contour, cv.Scalar.White, task.lineWidth)
         Next
     End Sub
 End Class

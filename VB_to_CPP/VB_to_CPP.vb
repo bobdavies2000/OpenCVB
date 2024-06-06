@@ -57,7 +57,7 @@ Public Class VB_to_CPP
                 End If
             End If
 
-            vbInput(i) = vbInput(i).Replace("vbDrawContour", "drawContours")
+            vbInput(i) = vbInput(i).Replace("drawContour", "drawContours")
             If marshalCopyInput.Count > 0 Then
                 vbInput(i) = vbInput(i).Replace("handleInput.AddrOfPinnedObject()", marshalCopyInput(0) + ".data()")
                 vbInput(i) = vbInput(i).Replace("handleInput.AddrOfPinnedObject()", marshalCopyInput(0) + ".data()")
@@ -145,7 +145,7 @@ Public Class VB_to_CPP
             line = line.Replace("~" + functionName, "~CPP_" + functionName)
             line = line.Replace(" override", "")
             line = line.Replace(" || showIntermediate()", "")
-            line = line.Replace("vbDrawContour", "task->drawContour")
+            line = line.Replace("drawContour", "task->drawContour")
             line = line.Replace("gOptions.FrameHistory.Value", "task->frameHistoryCount")
             line = line.Replace("gOptions.PixelDiffThreshold.Value", "task->pixelDiffThreshold")
             line = line.Replace("initRandomRect(", "task->initRandomRect(")

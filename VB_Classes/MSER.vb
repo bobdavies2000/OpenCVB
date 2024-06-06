@@ -34,7 +34,7 @@ Public Class MSER_Basics : Inherits VB_Parent
             rc.pixels = detect.maskCounts(index)
 
             rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            vbDrawContour(rc.mask, rc.contour, 255, -1)
+            drawContour(rc.mask, rc.contour, 255, -1)
 
             rc.floodPoint = floodPoints(index)
             rc.maxDist = vbGetMaxDist(rc)
@@ -304,7 +304,7 @@ Public Class MSER_Hulls : Inherits VB_Parent
         For Each rc In mBase.mserCells
             rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             pixels += rc.pixels
-            vbDrawContour(dst3(rc.rect), rc.hull, rc.color, -1)
+            drawContour(dst3(rc.rect), rc.hull, rc.color, -1)
         Next
 
         If task.heartBeat Then labels(2) = CStr(mBase.mserCells.Count) + " Regions with average size " + If(mBase.mserCells.Count > 0,

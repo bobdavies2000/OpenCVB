@@ -125,7 +125,7 @@ Public Class Depth_HolesRect : Inherits VB_Parent
             Dim minRect = cv.Cv2.MinAreaRect(contour)
             Dim nextColor = New cv.Scalar(task.vecColors(i Mod 256)(0), task.vecColors(i Mod 256)(1), task.vecColors(i Mod 256)(2))
             drawRotatedRectangle(minRect, dst2, nextColor)
-            vbDrawContour(dst3, contour.ToList, cv.Scalar.White, task.lineWidth)
+            drawContour(dst3, contour.ToList, cv.Scalar.White, task.lineWidth)
         Next
         cv.Cv2.AddWeighted(dst2, 0.5, task.depthRGB, 0.5, 0, dst2)
     End Sub
@@ -774,7 +774,7 @@ Public Class Depth_MaxMask : Inherits VB_Parent
         dst3.SetTo(0)
         For Each c In contour.allContours
             Dim hull = cv.Cv2.ConvexHull(c, True).ToList
-            vbDrawContour(dst3, hull, cv.Scalar.White, -1)
+            drawContour(dst3, hull, cv.Scalar.White, -1)
         Next
     End Sub
 End Class
@@ -815,8 +815,8 @@ Public Class Depth_ForegroundOverTime : Inherits VB_Parent
         dst3.SetTo(0)
         For Each ctr In contours.allContours
             If ctr.Length >= options.minSizeContour Then
-                vbDrawContour(dst2, ctr.ToList, cv.Scalar.White, -1)
-                vbDrawContour(dst3, ctr.ToList, cv.Scalar.White)
+                drawContour(dst2, ctr.ToList, cv.Scalar.White, -1)
+                drawContour(dst3, ctr.ToList, cv.Scalar.White)
             End If
         Next
     End Sub
@@ -900,8 +900,8 @@ Public Class Depth_Foreground : Inherits VB_Parent
         dst3.SetTo(0)
         For Each ctr In contours.allContours
             If ctr.Length >= options.minSizeContour Then
-                vbDrawContour(dst2, ctr.ToList, cv.Scalar.White, -1)
-                vbDrawContour(dst3, ctr.ToList, cv.Scalar.White)
+                drawContour(dst2, ctr.ToList, cv.Scalar.White, -1)
+                drawContour(dst3, ctr.ToList, cv.Scalar.White)
             End If
         Next
     End Sub
@@ -969,9 +969,9 @@ Public Class Depth_InRange : Inherits VB_Parent
             contours.Run(regMats(i))
             For Each ctr In contours.allContours
                 If ctr.Length >= options.minSizeContour Then
-                    vbDrawContour(dst2, ctr.ToList, classCount, -1)
+                    drawContour(dst2, ctr.ToList, classCount, -1)
                     classCount += 1
-                    vbDrawContour(dst3, ctr.ToList, cv.Scalar.White)
+                    drawContour(dst3, ctr.ToList, cv.Scalar.White)
                 End If
             Next
         Next
@@ -1191,7 +1191,7 @@ Public Class Depth_Contour : Inherits VB_Parent
 
         dst2.SetTo(0)
         For Each tour In contour.contourlist
-            vbDrawContour(dst2, tour.ToList, 255, -1)
+            drawContour(dst2, tour.ToList, 255, -1)
         Next
     End Sub
 End Class
@@ -1218,7 +1218,7 @@ Public Class Depth_Outline : Inherits VB_Parent
 
         dst2.SetTo(0)
         For Each tour In contour.contourlist
-            vbDrawContour(dst2, tour.ToList, 255, task.lineWidth)
+            drawContour(dst2, tour.ToList, 255, task.lineWidth)
         Next
 
         If standaloneTest() Then

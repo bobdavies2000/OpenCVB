@@ -38,7 +38,7 @@ Public Class Convex_Basics : Inherits VB_Parent
 
         Dim pMat As New cv.Mat(hull.Count, 1, cv.MatType.CV_32SC2, hull)
         Dim sum = pMat.Sum()
-        vbDrawContour(dst2, hullList, cv.Scalar.White, -1)
+        drawContour(dst2, hullList, cv.Scalar.White, -1)
 
         For i = 0 To hull.Count - 1
             dst2.Line(hull(i), hull((i + 1) Mod hull.Count), cv.Scalar.White, task.lineWidth)
@@ -94,7 +94,7 @@ Public Class Convex_Defects : Inherits VB_Parent
         dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim hull = cv.Cv2.ConvexHull(c, False)
         Dim hullIndices = cv.Cv2.ConvexHullIndices(c, False)
-        vbDrawContour(dst3, hull.ToList, task.highlightColor)
+        drawContour(dst3, hull.ToList, task.highlightColor)
 
         Dim defects = cv.Cv2.ConvexityDefects(contours.bestContour, hullIndices.ToList)
         For Each v In defects
@@ -158,7 +158,7 @@ Public Class Convex_RedCloudDefects : Inherits VB_Parent
         Dim hull = cv.Cv2.ConvexHull(c, False)
         Dim hullIndices = cv.Cv2.ConvexHullIndices(c, False)
         dst2.SetTo(0)
-        vbDrawContour(dst2, hull.ToList, rc.color, -1)
+        drawContour(dst2, hull.ToList, rc.color, -1)
 
         Try
             Dim defects = cv.Cv2.ConvexityDefects(contours.bestContour, hullIndices.ToList)
@@ -167,7 +167,7 @@ Public Class Convex_RedCloudDefects : Inherits VB_Parent
             setTrueText("Convexity defects failed due to self-intersection.", 3)
         End Try
 
-        vbDrawContour(dst2, rc.contour, cv.Scalar.Red)
+        drawContour(dst2, rc.contour, cv.Scalar.Red)
     End Sub
 End Class
 

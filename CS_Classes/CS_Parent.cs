@@ -24,6 +24,7 @@ namespace CS_Classes
         public const string fmt1 = "0.0";
         public const string fmt2 = "0.00";
         public const string fmt3 = "0.000";
+        public System.Random msRNG = new System.Random();
         public const string fmt4 = "0.0000"; public CS_Parent(VBtask _task)
         {
             this.task = _task;
@@ -68,7 +69,7 @@ namespace CS_Classes
             task.advice += advice + Environment.NewLine + Environment.NewLine;
         }
 
-        public void vbDrawContour(Mat dst, List<Point> contour, Scalar color, int lineWidth = -10)
+        public void drawContour(Mat dst, List<Point> contour, Scalar color, int lineWidth = -10)
         {
             if (lineWidth == -10)
             {
@@ -81,6 +82,20 @@ namespace CS_Classes
 
             Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType); // Assuming 'task' has 'lineType' property
         }
+
+        public void drawLine(Mat dst, Point2f p1, Point2f p2, Scalar color)
+        {
+            var pt1 = new cv.Point(p1.X, p1.Y);
+            var pt2 = new cv.Point(p2.X, p2.Y);
+            dst.Line(pt1, pt2, color, task.lineWidth, task.lineType);
+        }
+
+        public void drawCircle(Mat dst, Point2f p1, int radius, Scalar color)
+        {
+            var pt = new cv.Point(p1.X, p1.Y);
+            dst.Circle(pt, radius, color, -1, task.lineType);
+        }
+
         public void processFrame(Mat src)
         {
             task.labels = labels;
@@ -126,13 +141,10 @@ namespace CS_Classes
             PicTag = picTag;
         }
     }
-
-
-
 }
 
 
-public class trueText
+    public class trueText
     {
         public string text;
         public int picTag = 2;
@@ -155,7 +167,6 @@ public class trueText
             setup(_text, _pt, 2);
         }
     }
-}
 
 
 

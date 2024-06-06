@@ -97,7 +97,7 @@ Public Class MatchShapes_NearbyHull : Inherits VB_Parent
                     minMatch = matchVal
                     bestCell = similarCells.Count
                 End If
-                vbDrawContour(dst3(rc2.rect), rc2.hull, cv.Scalar.White, -1)
+                drawContour(dst3(rc2.rect), rc2.hull, cv.Scalar.White, -1)
                 similarCells.Add(rc2)
             End If
         Next
@@ -147,7 +147,7 @@ Public Class MatchShapes_Nearby : Inherits VB_Parent
 
         If gOptions.displayDst0.Checked Then
             dst0 = task.color.Clone
-            vbDrawContour(dst0(rc.rect), rc.contour, task.highlightColor)
+            drawContour(dst0(rc.rect), rc.contour, task.highlightColor)
         End If
 
         Dim minMatch As Single = Single.MaxValue
@@ -161,7 +161,7 @@ Public Class MatchShapes_Nearby : Inherits VB_Parent
                     minMatch = matchVal
                     bestCell = similarCells.Count
                 End If
-                vbDrawContour(dst3(rc2.rect), rc2.contour, rc2.color, -1)
+                drawContour(dst3(rc2.rect), rc2.contour, rc2.color, -1)
                 similarCells.Add(rc2)
             End If
         Next
@@ -220,10 +220,10 @@ Public Class MatchShapes_LeftRight : Inherits VB_Parent
         '    match.Run()
         '    If match.bestCell >= 0 Then
         '        Dim best = match.similarCells(match.bestCell)
-        '        vbDrawContour(dst1(rc.rect), rc.contour, best.color, -1)
-        '        vbDrawContour(dst3(rc.rect), rc.contour, best.color, -1)
-        '        vbDrawContour(dst0(best.rect), best.contour, best.color, -1)
-        '        vbDrawContour(dst2(best.rect), best.contour, best.color, -1)
+        '        drawContour(dst1(rc.rect), rc.contour, best.color, -1)
+        '        drawContour(dst3(rc.rect), rc.contour, best.color, -1)
+        '        drawContour(dst0(best.rect), best.contour, best.color, -1)
+        '        drawContour(dst2(best.rect), best.contour, best.color, -1)
         '        Dim pt = New cv.Point(rc.maxDist.X + dst2.Width, rc.maxDist.Y)
         '        lines.Add(New pointPair(pt, best.maxDist))
         '    End If
@@ -272,7 +272,7 @@ Public Class MatchShapes_Hulls : Inherits VB_Parent
         For Each rc In task.redCells
             If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rcX.hull, rc.hull, options.matchOption)
-            If matchVal < options.matchThreshold Then vbDrawContour(dst3(rc.rect), rc.hull, cv.Scalar.White, -1)
+            If matchVal < options.matchThreshold Then drawContour(dst3(rc.rect), rc.hull, cv.Scalar.White, -1)
         Next
     End Sub
 End Class
@@ -307,7 +307,7 @@ Public Class MatchShapes_Contours : Inherits VB_Parent
         For Each rc In task.redCells
             If rc.contour Is Nothing Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rcX.contour, rc.contour, options.matchOption)
-            If matchVal < options.matchThreshold Then vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.White, -1)
+            If matchVal < options.matchThreshold Then drawContour(dst3(rc.rect), rc.contour, cv.Scalar.White, -1)
         Next
     End Sub
 End Class

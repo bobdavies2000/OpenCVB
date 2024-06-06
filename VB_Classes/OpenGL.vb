@@ -1243,7 +1243,7 @@ Public Class OpenGL_Profile : Inherits VB_Parent
         Dim p2 = rc.contour.ElementAt(mm.maxLoc.Y)
 
         dst3.SetTo(0)
-        vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
+        drawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
         dst3.Circle(New cv.Point(p1.X + rc.rect.X, p1.Y + rc.rect.Y), task.dotSize + 2, cv.Scalar.Blue, -1, task.lineType)
         dst3.Circle(New cv.Point(p2.X + rc.rect.X, p2.Y + rc.rect.Y), task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
         If rc.contour3D.Count > 0 Then

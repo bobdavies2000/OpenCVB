@@ -260,7 +260,7 @@ Public Class Motion_Contours : Inherits VB_Parent
         If task.heartBeat Then cumulativePixels = changedPixels Else cumulativePixels += changedPixels
         If changedPixels > 0 Then
             contours.Run(dst3)
-            vbDrawContour(dst2, contours.bestContour, cv.Scalar.Yellow)
+            drawContour(dst2, contours.bestContour, cv.Scalar.Yellow)
         End If
     End Sub
 End Class

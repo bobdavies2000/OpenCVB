@@ -1,3 +1,4 @@
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class trueText
     Public text As String
@@ -118,6 +119,22 @@ Public Class VB_Parent : Implements IDisposable
         If standalone Or showIntermediate() Then Return True
         Return False
     End Function
+    Public Sub drawContour(ByRef dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -10)
+        If lineWidth = -10 Then lineWidth = task.lineWidth ' VB.Net only allows constants for optional parameter.
+        If contour.Count < 3 Then Exit Sub ' this is not enough to draw.
+        Dim listOfPoints = New List(Of List(Of cv.Point))
+        listOfPoints.Add(contour)
+        cv.Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType)
+    End Sub
+    Public Sub drawLine(dst As Mat, p1 As Point2f, p2 As Point2f, color As Scalar)
+        Dim pt1 As New Point(p1.X, p1.Y)
+        Dim pt2 As New Point(p2.X, p2.Y)
+        dst.Line(pt1, pt2, color, task.lineWidth, task.lineType)
+    End Sub
+    Public Sub drawCircle(dst As Mat, p1 As Point2f, radius As Integer, color As Scalar)
+        Dim pt As New Point(p1.X, p1.Y)
+        dst.Circle(pt, radius, color, -1, task.lineType)
+    End Sub
     Public Sub measureStartRun(name As String)
         If task.recordTimings = False Then Exit Sub
         Dim nextTime = Now

@@ -33,7 +33,7 @@ Public Class Stable_Basics : Inherits VB_Parent
         If index < facetGen.facet.facetList.Count Then
             Dim bestFacet = facetGen.facet.facetList(index)
             dst2.FillConvexPoly(bestFacet, cv.Scalar.Black, task.lineType)
-            vbDrawContour(dst2, bestFacet, task.highlightColor)
+            drawContour(dst2, bestFacet, task.highlightColor)
         End If
 
         dst2 = facetGen.dst2

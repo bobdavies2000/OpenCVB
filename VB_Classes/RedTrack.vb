@@ -13,8 +13,8 @@ Public Class RedTrack_Basics : Inherits VB_Parent
         labels = stats.labels
         dst2.SetTo(0)
         For Each rc As rcData In task.redCells
-            vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
-            If rc.index = task.rc.index Then vbDrawContour(dst2(rc.rect), rc.contour, cv.Scalar.White, -1)
+            drawContour(dst2(rc.rect), rc.contour, rc.color, -1)
+            If rc.index = task.rc.index Then drawContour(dst2(rc.rect), rc.contour, cv.Scalar.White, -1)
         Next
         strOut = stats.strOut
         setTrueText(strOut, 3)
@@ -208,7 +208,7 @@ Public Class RedTrack_GoodCells : Inherits VB_Parent
             If trackIndex.Contains(index) = False Then
                 Dim rc = task.redCells(index)
                 If rc.hull Is Nothing Then Continue For
-                vbDrawContour(dst2(rc.rect), rc.hull, cv.Scalar.White, -1)
+                drawContour(dst2(rc.rect), rc.hull, cv.Scalar.White, -1)
                 trackIndex.Add(index)
 
                 dst0.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
@@ -316,7 +316,7 @@ Public Class RedTrack_Features : Inherits VB_Parent
         dst3.SetTo(0)
         For Each rc In task.redCells
             If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For
-            vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+            drawContour(dst3(rc.rect), rc.contour, rc.color, -1)
             If rc.contour.Count > 0 Then setTrueText(Format(shapeCorrelation(rc.contour), fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
         Next
         setTrueText("Move camera to see the value of this algorithm", 2)

@@ -102,7 +102,7 @@ Public Class Cluster_Hulls : Inherits VB_Parent
             End If
 
             hulls.Add(hull)
-            vbDrawContour(dst3, hull, cv.Scalar.White, task.lineWidth)
+            drawContour(dst3, hull, cv.Scalar.White, task.lineWidth)
         Next
     End Sub
 End Class
