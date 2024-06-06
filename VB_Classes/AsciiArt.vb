@@ -2,30 +2,21 @@
 ' https://github.com/ncosentino/DevLeader/tree/master/AsciiArtGenerator
 Public Class AsciiArt_Basics : Inherits VB_Parent
     Dim asciiChars As String() = {"@", "%", "#", "*", "+", "=", "-", ":", ",", ".", " "}
+    Dim options As New Options_AsciiArt
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Character height in pixels", 20, 100, 31)
-            sliders.setupTrackBar("Character width in pixels", 20, 200, 55)
-        End If
-
         vbAddAdvice(traceName + ": use the local options for height and width.")
         labels = {"", "", "Ascii version", "Grayscale input to ascii art"}
         desc = "Build an ascii art representation of the input stream."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static hSlider = FindSlider("Character height in pixels")
-        Static wSlider = FindSlider("Character width in pixels")
+        options.RunVB()
 
-        Dim hStep = CInt(src.Height / hSlider.value)
-        Dim wStep = CInt(src.Width / wSlider.value)
-        Dim size = New cv.Size(CInt(wSlider.value), CInt(hSlider.value))
-
-        dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(size, cv.InterpolationFlags.Nearest)
+        dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(options.size, 0, 0, cv.InterpolationFlags.Nearest)
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
                 Dim grayValue = dst3.Get(Of Byte)(y, x)
                 Dim asciiChar = asciiChars(grayValue * (asciiChars.Length - 1) / 255)
-                setTrueText(asciiChar, New cv.Point(x * wStep, y * hStep), 2)
+                setTrueText(asciiChar, New cv.Point(x * options.wStep, y * options.hStep), 2)
             Next
         Next
         labels(2) = "Ascii version using " + Format(dst3.Height * dst3.Width, fmt0) + " characters"
@@ -47,7 +38,7 @@ Public Class AsciiArt_Gray : Inherits VB_Parent
         Dim hStep = CInt(src.Height / 31) - 1
         Dim wStep = CInt(src.Width / 55) - 1
         Dim size = New cv.Size(55, 31)
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(size, cv.InterpolationFlags.Nearest)
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(size, 0, 0, cv.InterpolationFlags.Nearest)
         Dim grayRatio = 12 / 255
         For y = 0 To dst1.Height - 1
             For x = 0 To dst1.Width - 1

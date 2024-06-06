@@ -242,7 +242,7 @@ Public Class Color8U_TopX_VB : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim input = src
-        input = input.Resize(task.lowRes, cv.InterpolationFlags.Nearest)
+        input = input.Resize(task.lowRes, 0, 0, cv.InterpolationFlags.Nearest)
 
         Static topXSlider = FindSlider("Top X pixels")
         topX.mapTopX = topXSlider.value

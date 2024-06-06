@@ -1027,7 +1027,7 @@ Public Class Depth_Colorizer_VB : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-        If src.Size <> task.lowRes Then src = src.Resize(task.lowRes, cv.InterpolationFlags.Nearest)
+        If src.Size <> task.lowRes Then src = src.Resize(task.lowRes, 0, 0, cv.InterpolationFlags.Nearest)
 
         dst2 = New cv.Mat(task.lowRes, cv.MatType.CV_8UC3, 0)
         For y = 0 To src.Rows - 1

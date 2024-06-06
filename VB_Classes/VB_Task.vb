@@ -651,10 +651,10 @@ Public Class VBtask : Implements IDisposable
 
 
             ' make sure that any outputs from the algorithm are the right size.nearest
-            If dst0.Size <> task.workingRes And dst0.Width > 0 Then dst0 = dst0.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
-            If dst1.Size <> task.workingRes And dst1.Width > 0 Then dst1 = dst1.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
-            If dst2.Size <> task.workingRes And dst2.Width > 0 Then dst2 = dst2.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
-            If dst3.Size <> task.workingRes And dst3.Width > 0 Then dst3 = dst3.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
+            If dst0.Size <> task.workingRes And dst0.Width > 0 Then dst0 = dst0.Resize(task.workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If dst1.Size <> task.workingRes And dst1.Width > 0 Then dst1 = dst1.Resize(task.workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If dst2.Size <> task.workingRes And dst2.Width > 0 Then dst2 = dst2.Resize(task.workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If dst3.Size <> task.workingRes And dst3.Width > 0 Then dst3 = dst3.Resize(task.workingRes, 0, 0, cv.InterpolationFlags.Nearest)
 
             If task.pixelViewerOn Then
                 If task.intermediateObject IsNot Nothing Then

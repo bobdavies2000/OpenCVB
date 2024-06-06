@@ -755,6 +755,38 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 
+    public class CSharp_AsciiArt_Basics : CS_Parent
+    {
+        string[] asciiChars = { "@", "%", "#", "*", "+", "=", "-", ":", ",", ".", " " };
+        Options_AsciiArt options = new Options_AsciiArt();
+
+        public CSharp_AsciiArt_Basics(VBtask task) : base(task)
+        {
+            //csAddAdvice(traceName + ": use the local options for height and width.");
+            labels = new string[] { "", "", "Ascii version", "Grayscale input to ascii art" };
+            desc = "Build an ascii art representation of the input stream.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            dst3 = src.CvtColor(ColorConversionCodes.BGR2GRAY).Resize(options.size, 0, 0, InterpolationFlags.Nearest); 
+            for (int y = 0; y < dst3.Height; y++)
+            {
+                for (int x = 0; x < dst3.Width; x++)
+                {
+                    byte grayValue = dst3.At<byte>(y, x);
+                    string asciiChar = asciiChars[grayValue * (asciiChars.Length - 1) / 255];
+                    setTrueText(asciiChar, new Point(x * options.wStep, y * options.hStep), 2);
+                }
+            }
+            labels[2] = "Ascii version using " + (dst3.Height * dst3.Width).ToString("N0") + " characters";
+        }
+    }
+
+
+
 }
 
 

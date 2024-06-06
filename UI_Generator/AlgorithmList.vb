@@ -1310,6 +1310,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(functionN
 	if algorithmName = "Options_AddWeightedAccum" Then return new Options_AddWeightedAccum
 	if algorithmName = "Options_Annealing" Then return new Options_Annealing
 	if algorithmName = "Options_ApproxPoly" Then return new Options_ApproxPoly
+	if algorithmName = "Options_AsciiArt" Then return new Options_AsciiArt
 	if algorithmName = "Options_Bernson" Then return new Options_Bernson
 	if algorithmName = "Options_BGSubtract" Then return new Options_BGSubtract
 	if algorithmName = "Options_BGSubtractSynthetic" Then return new Options_BGSubtractSynthetic

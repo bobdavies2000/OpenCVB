@@ -28,7 +28,7 @@ Public Class Gravity_Basics : Inherits VB_Parent
 
         Dim resolution = task.quarterRes
         If dst0.Size <> resolution Then
-            dst0 = dst0.Resize(resolution, cv.InterpolationFlags.Nearest)
+            dst0 = dst0.Resize(resolution, 0, 0, cv.InterpolationFlags.Nearest)
             resizeRatio = CInt(dst2.Height / resolution.Height)
         End If
 

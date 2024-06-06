@@ -151,7 +151,7 @@ Public Class Convex_RedCloudDefects : Inherits VB_Parent
         Dim rc = task.rc
         If rc.mask Is Nothing Then Exit Sub
 
-        dst2 = rc.mask.Resize(dst2.Size, cv.InterpolationFlags.Nearest)
+        dst2 = rc.mask.Resize(dst2.Size, 0, 0, cv.InterpolationFlags.Nearest)
         contours.Run(dst2)
         Dim c = contours.bestContour
 

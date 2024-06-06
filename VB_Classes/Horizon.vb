@@ -27,7 +27,7 @@ Public Class Horizon_Basics : Inherits VB_Parent
 
         Dim resolution = task.quarterRes
         If dst0.Size <> resolution Then
-            dst0 = dst0.Resize(resolution, cv.InterpolationFlags.Nearest)
+            dst0 = dst0.Resize(resolution, 0, 0, cv.InterpolationFlags.Nearest)
             resizeRatio = CInt(dst2.Height / resolution.Height)
         End If
 
@@ -285,9 +285,9 @@ Public Class Horizon_FindNonZeroOld : Inherits VB_Parent
         Dim splitY = task.pcSplit(1)
         Dim noDepth = task.noDepthMask
         If splitX.Size <> task.quarterRes Then
-            splitX = splitX.Resize(task.quarterRes, cv.InterpolationFlags.Nearest)
-            splitY = splitY.Resize(task.quarterRes, cv.InterpolationFlags.Nearest)
-            noDepth = task.noDepthMask.Resize(task.quarterRes, cv.InterpolationFlags.Nearest)
+            splitX = splitX.Resize(task.quarterRes, 0, 0, cv.InterpolationFlags.Nearest)
+            splitY = splitY.Resize(task.quarterRes, 0, 0, cv.InterpolationFlags.Nearest)
+            noDepth = task.noDepthMask.Resize(task.quarterRes, 0, 0, cv.InterpolationFlags.Nearest)
         End If
 
         dst1 = splitY.InRange(-0.05, 0.05)

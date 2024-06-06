@@ -4802,3 +4802,28 @@ Public Class Options_FeatureGather : Inherits VB_Parent
         Next
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_AsciiArt : Inherits VB_Parent
+    Public hStep As Single
+    Public wStep As Single
+    Public size As New cv.Size
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Character height in pixels", 20, 100, 31)
+            sliders.setupTrackBar("Character width in pixels", 20, 200, 55)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static hSlider = FindSlider("Character height in pixels")
+        Static wSlider = FindSlider("Character width in pixels")
+
+        hStep = CInt(task.workingRes.Height / hSlider.value)
+        wStep = CInt(task.workingRes.Width / wSlider.value)
+        Size = New cv.Size(CInt(wSlider.value), CInt(hSlider.value))
+    End Sub
+End Class

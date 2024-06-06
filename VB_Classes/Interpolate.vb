@@ -32,8 +32,8 @@ Public Class Interpolate_Basics : Inherits VB_Parent
         End If
 
         dst2 = src.Clone
-        dst2 = src.Resize(New cv.Size(CInt(dst2.Width * saveSliderValue / 100),
-                                      CInt(dst2.Height * saveSliderValue / 100)), 0, 0, options.warpFlag)
+        Dim newSize = New cv.Size(CInt(dst2.Width * saveSliderValue / 100), CInt(dst2.Height * saveSliderValue / 100))
+        dst2 = src.Resize(newSize, 0, 0, options.warpFlag)
         labels(2) = "Resize % = " + Format(saveSliderValue / 100, "0%")
     End Sub
 End Class
