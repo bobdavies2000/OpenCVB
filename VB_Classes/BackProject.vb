@@ -71,7 +71,7 @@ Public Class BackProject_Full : Inherits VB_Parent
         cv.Cv2.CalcBackProject({dst1}, {0}, histogram, dst2, ranges)
 
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst3 = vbPalette(dst2 * 255 / classCount)
+        dst3 = ShowPalette(dst2 * 255 / classCount)
     End Sub
 End Class
 
@@ -268,7 +268,7 @@ Public Class BackProject_Unstable : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         backP.Run(src)
-        dst2 = vbPalette(backP.dst2 * 255 / backP.classCount)
+        dst2 = ShowPalette(backP.dst2 * 255 / backP.classCount)
 
         diff.Run(dst2)
         dst3 = diff.dst2
@@ -295,13 +295,13 @@ Public Class BackProject_FullEqualized : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         backP.Run(src)
         backP.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst2 = vbPalette(dst2)
+        dst2 = ShowPalette(dst2)
 
         equalize.Run(src)
         backP.Run(equalize.dst2)
 
         backP.dst2.ConvertTo(dst3, cv.MatType.CV_8U)
-        dst3 = vbPalette(dst3)
+        dst3 = ShowPalette(dst3)
     End Sub
 End Class
 
@@ -428,7 +428,7 @@ Public Class BackProject_Top : Inherits VB_Parent
 
         Dim histogram = histTop.histogram.SetTo(0, Not dst2)
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogram, dst3, task.rangesTop)
-        dst3 = vbPalette(dst3.ConvertScaleAbs)
+        dst3 = ShowPalette(dst3.ConvertScaleAbs)
     End Sub
 End Class
 
@@ -714,7 +714,7 @@ Public Class BackProject_MeterByMeter : Inherits VB_Parent
 
         'dst1.SetTo(task.maxZmeters, task.maxDepthMask)
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst3 = vbPalette(dst1)
+        dst3 = ShowPalette(dst1)
     End Sub
 End Class
 
@@ -735,6 +735,6 @@ Public Class BackProject_Hue : Inherits VB_Parent
         hue.Run(src)
         classCount = hue.classCount
         dst2 = hue.dst2
-        dst3 = vbPalette(dst2 * 255 / classCount)
+        dst3 = ShowPalette(dst2 * 255 / classCount)
     End Sub
 End Class

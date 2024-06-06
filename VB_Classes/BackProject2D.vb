@@ -199,7 +199,7 @@ Public Class BackProject2D_FullImage : Inherits VB_Parent
             Next
         Next
 
-        dst3 = vbPalette(dst0 * 255 / classCount)
+        dst3 = ShowPalette(dst0 * 255 / classCount)
     End Sub
 End Class
 
@@ -223,7 +223,7 @@ Public Class BackProject2D_Top : Inherits VB_Parent
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, heat.histogramTop, dst3, task.rangesTop)
         dst3 = vbNormalize32f(dst3)
-        dst3 = vbPalette(dst3)
+        dst3 = ShowPalette(dst3)
     End Sub
 End Class
 
@@ -243,7 +243,7 @@ Public Class BackProject2D_Side : Inherits VB_Parent
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, heat.histogramSide, dst3, task.rangesSide)
         dst3 = vbNormalize32f(dst3)
-        dst3 = vbPalette(dst3)
+        dst3 = ShowPalette(dst3)
     End Sub
 End Class
 

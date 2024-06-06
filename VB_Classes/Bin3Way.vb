@@ -99,7 +99,7 @@ Public Class Bin3Way_Color : Inherits VB_Parent
         dst2.SetTo(1, bin3.bin3.mats.mat(0))
         dst2.SetTo(2, bin3.bin3.mats.mat(1))
         dst2.SetTo(3, bin3.bin3.mats.mat(2))
-        dst3 = vbPalette(dst2 * 255 / 3)
+        dst3 = ShowPalette(dst2 * 255 / 3)
     End Sub
 End Class
 

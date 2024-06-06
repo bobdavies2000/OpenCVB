@@ -521,6 +521,6 @@ Public Class Grid_ShowMap : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         task.gridMap.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst3 = vbPalette(dst2)
+        dst3 = ShowPalette(dst2)
     End Sub
 End Class

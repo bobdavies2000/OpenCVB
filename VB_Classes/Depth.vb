@@ -437,7 +437,7 @@ Public Class Depth_ColorMap : Inherits VB_Parent
         Static betaSlider = FindSlider("Depth ColorMap Beta")
         cv.Cv2.ConvertScaleAbs(task.pcSplit(2) * 1000, dst1, alphaSlider.Value / 100, betaSlider.Value)
         dst1 += 1
-        dst2 = vbPalette(dst1)
+        dst2 = ShowPalette(dst1)
         dst2.SetTo(0, task.noDepthMask)
         dst3 = task.palette.dst3
     End Sub
@@ -980,7 +980,7 @@ Public Class Depth_InRange : Inherits VB_Parent
         dst0.SetTo(cv.Scalar.White, dst3)
 
         If standaloneTest() Then
-            dst2 = vbPalette(dst2 * 255 / classCount)
+            dst2 = ShowPalette(dst2 * 255 / classCount)
         End If
         If task.heartBeat Then labels(2) = Format(classCount, "000") + " regions were found"
     End Sub
@@ -1008,7 +1008,7 @@ Public Class Depth_Regions : Inherits VB_Parent
         dst0.ConvertTo(dst2, cv.MatType.CV_8U)
         dst2.SetTo(0, task.noDepthMask)
 
-        If standaloneTest() Then dst3 = vbPalette(dst2)
+        If standaloneTest() Then dst3 = ShowPalette(dst2)
         labels(2) = CStr(classCount) + " regions defined in the depth data"
     End Sub
 End Class
@@ -1527,7 +1527,7 @@ Public Class Depth_TiersZ : Inherits VB_Parent
 
         classCount = task.maxZmeters * 100 / cmTier + 1
 
-        dst3 = vbPalette(dst2 * 255 / classCount)
+        dst3 = ShowPalette(dst2 * 255 / classCount)
         labels(2) = $"{classCount} regions found."
     End Sub
 End Class

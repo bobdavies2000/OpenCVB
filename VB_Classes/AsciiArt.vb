@@ -47,7 +47,7 @@ Public Class AsciiArt_Gray : Inherits VB_Parent
                 dst3(r).SetTo(asciiChar)
             Next
         Next
-        dst2 = vbPalette(dst3 / grayRatio)
+        dst2 = ShowPalette(dst3 / grayRatio)
     End Sub
 End Class
 

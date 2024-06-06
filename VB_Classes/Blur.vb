@@ -136,7 +136,7 @@ Public Class Blur_TopoMap : Inherits VB_Parent
         dst3 = (dst3 * 1 / reductionSlider.Value).tomat
         dst3 = (dst3 * reductionSlider.Value).toMat
 
-        addw.src2 = vbPalette(dst3)
+        addw.src2 = ShowPalette(dst3)
         addw.Run(task.color)
         dst3 = addw.dst2
 

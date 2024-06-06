@@ -880,7 +880,7 @@ Public Class Contour_DepthTiers : Inherits VB_Parent
         dst2.SetTo(1, dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
         classCount = task.maxZmeters * 100 / options.cmPerTier
 
-        If standaloneTest() Then dst3 = vbPalette(dst2 * 255 / classCount)
+        If standaloneTest() Then dst3 = ShowPalette(dst2 * 255 / classCount)
         labels(3) = $"All depth pixels are assigned a tier with {classCount} contours."
     End Sub
 End Class

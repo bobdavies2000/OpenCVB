@@ -787,6 +787,38 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 
+
+    public class CSharp_AsciiArt_Gray : CS_Parent
+    {
+        public CSharp_AsciiArt_Gray(VBtask task) : base(task)
+        {
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0));
+            desc = "A palette'd version of the ascii art data";
+        }
+
+        public void RunCS(Mat src)
+        {
+            int hStep = src.Height / 31 - 1;
+            int wStep = src.Width / 55 - 1;
+            Size size = new Size(55, 31);
+            dst1 = src.CvtColor(ColorConversionCodes.BGR2GRAY).Resize(size, 0, 0, InterpolationFlags.Nearest);
+            double grayRatio = 12.0 / 255;
+
+            for (int y = 0; y < dst1.Height; y++)
+            {
+                for (int x = 0; x < dst1.Width; x++)
+                {
+                    Rect r = new Rect(x * wStep, y * hStep, wStep - 1, hStep - 1);
+                    int asciiChar = (int)(dst1.At<byte>(y, x) * grayRatio);
+                    dst3[r].SetTo(asciiChar);
+                }
+            }
+
+            dst2 = ShowPalette(dst3 / grayRatio);
+        }
+    }
+
+
 }
 
 

@@ -113,7 +113,7 @@ Public Class Fractal_MandelbrotZoomColor : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         If zoom.mandel.options.resetCheck.Checked Then zoom.mandel.reset()
         zoom.Run(src)
-        dst2 = vbPalette(zoom.dst2)
+        dst2 = ShowPalette(zoom.dst2)
         labels(2) = zoom.labels(2)
     End Sub
 End Class
@@ -168,7 +168,7 @@ Public Class Fractal_Julia : Inherits VB_Parent
                         julia_point(x, y, r, depth, depth, c, z)
                     Next
                 End Sub)
-            dst2 = vbPalette(dst2)
+            dst2 = ShowPalette(dst2)
         End If
     End Sub
 End Class

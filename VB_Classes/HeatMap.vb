@@ -25,8 +25,8 @@ Public Class HeatMap_Basics : Inherits VB_Parent
         sideframes.Run(histogramSide)
         dst1 = sideframes.dst2
 
-        dst2 = vbPalette(dst0.ConvertScaleAbs())
-        dst3 = vbPalette(dst1.ConvertScaleAbs())
+        dst2 = ShowPalette(dst0.ConvertScaleAbs())
+        dst3 = ShowPalette(dst1.ConvertScaleAbs())
         labels(2) = "Top view of heat map with the last " + CStr(task.frameHistoryCount) + " frames"
         labels(3) = "Side view of heat map with the last " + CStr(task.frameHistoryCount) + " frames"
     End Sub

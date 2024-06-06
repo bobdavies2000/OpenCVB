@@ -988,7 +988,7 @@ Imports cv = OpenCvSharp
 '        desc = "Find the edges in regions without depth."
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
-'        src = vbPalette(src)
+'        src = ShowPalette(src)
 '        edges.Run(src)
 
 '        dst2.SetTo(0)

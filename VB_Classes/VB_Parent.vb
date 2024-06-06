@@ -146,6 +146,11 @@ Public Class VB_Parent : Implements IDisposable
             lastPt = pt
         Next
     End Sub
+    Public Function ShowPalette(input As cv.Mat) As cv.Mat
+        If input.Type = cv.MatType.CV_32SC1 Then input.ConvertTo(input, cv.MatType.CV_8U)
+        task.palette.Run(input)
+        Return task.palette.dst2.Clone
+    End Function
     Public Sub measureStartRun(name As String)
         If task.recordTimings = False Then Exit Sub
         Dim nextTime = Now

@@ -194,47 +194,17 @@ namespace CS_Classes
             Console.WriteLine("A slider was not found!\n\nReview the \n\n'" + opt + "' request ");
             return null;
         }
-    }
-
-    public class trueText
-    {
-        public string Text { get; set; }
-        public Point Pt { get; set; }
-        public int PicTag { get; set; }
-
-        public trueText(string text, Point pt, int picTag)
+        public cv.Mat ShowPalette(cv.Mat input)
         {
-            Text = text;
-            Pt = pt;
-            PicTag = picTag;
+            if (input.Type() == cv.MatType.CV_32SC1)
+            {
+                input.ConvertTo(input, cv.MatType.CV_8U);
+            }
+            task.palette.RunVB(input);
+            return task.palette.dst2.Clone();
         }
     }
 }
-
-
-    public class trueText
-    {
-        public string text;
-        public int picTag = 2;
-        public cv.Point pt;
-
-        private void setup(string _text, cv.Point _pt, int camPicIndex)
-        {
-            text = _text;
-            pt = _pt;
-            picTag = camPicIndex;
-        }
-
-        public trueText(string _text, cv.Point _pt, int camPicIndex)
-        {
-            setup(_text, _pt, camPicIndex);
-        }
-
-        public trueText(string _text, cv.Point _pt)
-        {
-            setup(_text, _pt, 2);
-        }
-    }
 
 
 

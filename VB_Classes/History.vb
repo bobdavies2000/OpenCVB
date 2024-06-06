@@ -136,7 +136,7 @@ Public Class History_BasicsDiff : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         frames.Run(src)
-        dst2 = vbPalette(frames.dst2)
+        dst2 = ShowPalette(frames.dst2)
 
         diff.Run(frames.dst2)
         dst3 = diff.dst2

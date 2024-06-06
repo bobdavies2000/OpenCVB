@@ -1071,7 +1071,7 @@ Public Class RedCloud_OutlineColor : Inherits VB_Parent
         colorClass.Run(src)
         dst1 = colorClass.dst2 + 1
         dst1.SetTo(0, outline.dst2)
-        dst3 = vbPalette(dst1 * 255 / colorClass.classCount)
+        dst3 = ShowPalette(dst1 * 255 / colorClass.classCount)
 
         redC.Run(dst1)
         dst2 = redC.dst2
@@ -1150,7 +1150,7 @@ Public Class RedCloud_FourColor : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binar4.Run(src)
-        dst3 = vbPalette(binar4.dst2 * 255 / 5)
+        dst3 = ShowPalette(binar4.dst2 * 255 / 5)
 
         redC.Run(binar4.dst2)
         dst2 = redC.dst2
@@ -1362,7 +1362,7 @@ Public Class RedCloud_OnlyColorAlt : Inherits VB_Parent
         labels(3) = CStr(task.redCells.Count) + " cells were identified.  The top " + CStr(redOptions.identifyCount) + " are numbered"
         labels(2) = redMasks.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
 
-        If task.redCells.Count > 0 Then dst2 = vbPalette(lastMap * 255 / task.redCells.Count)
+        If task.redCells.Count > 0 Then dst2 = ShowPalette(lastMap * 255 / task.redCells.Count)
     End Sub
 End Class
 
@@ -1572,7 +1572,7 @@ Public Class RedCloud_MotionBasics : Inherits VB_Parent
 
         lastColors = dst3.Clone
         lastMap = dst2.Clone
-        If redCells.Count > 0 Then dst1 = vbPalette(lastMap * 255 / redCells.Count)
+        If redCells.Count > 0 Then dst1 = ShowPalette(lastMap * 255 / redCells.Count)
     End Sub
 End Class
 
@@ -1753,7 +1753,7 @@ Public Class RedCloud_Tiers : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binar4.Run(src)
-        dst1 = vbPalette((binar4.dst2 * 255 / binar4.classCount).toMat)
+        dst1 = ShowPalette((binar4.dst2 * 255 / binar4.classCount).toMat)
 
         tiers.Run(src)
         dst3 = tiers.dst3
@@ -2624,7 +2624,7 @@ Public Class RedCloud_CPP : Inherits VB_Parent
             floodPoints.Add(New cv.Point(ptList(i), ptList(i + 1)))
         Next
 
-        If standalone Then dst3 = vbPalette(dst2 * 255 / classCount)
+        If standalone Then dst3 = ShowPalette(dst2 * 255 / classCount)
 
         If task.heartBeat Then labels(2) = "CV_8U result with " + CStr(classCount) + " regions."
         If task.heartBeat Then labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."
@@ -2664,7 +2664,7 @@ Public Class RedCloud_MaxDist_CPP : Inherits VB_Parent
         imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols)
         handleInput.Free()
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-        dst3 = vbPalette(dst2)
+        dst3 = ShowPalette(dst2)
 
         classCount = RedCloudMaxDist_Count(cPtr)
         labels(2) = "CV_8U version with " + CStr(classCount) + " cells."

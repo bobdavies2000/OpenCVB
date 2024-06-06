@@ -239,7 +239,7 @@ Public Class Binarize_FourPixelFlips : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         binar4.Run(src)
-        dst2 = vbPalette(binar4.dst2 * 255 / 5)
+        dst2 = ShowPalette(binar4.dst2 * 255 / 5)
 
         Static lastSubD As cv.Mat = binar4.dst2.Clone
         dst3 = lastSubD - binar4.dst2

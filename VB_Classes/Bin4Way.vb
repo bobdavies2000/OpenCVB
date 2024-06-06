@@ -468,7 +468,7 @@ Public Class Bin4Way_RegionsLeftRight : Inherits VB_Parent
         dst0.SetTo(3, binaryLeft.mats.mat(2))
         dst0.SetTo(4, binaryLeft.mats.mat(3))
 
-        dst2 = vbPalette((dst0 * 255 / classCount).ToMat)
+        dst2 = ShowPalette((dst0 * 255 / classCount).ToMat)
 
         binaryRight.Run(task.rightView)
 
@@ -477,7 +477,7 @@ Public Class Bin4Way_RegionsLeftRight : Inherits VB_Parent
         dst1.SetTo(3, binaryRight.mats.mat(2))
         dst1.SetTo(4, binaryRight.mats.mat(3))
 
-        dst3 = vbPalette((dst1 * 255 / classCount).ToMat)
+        dst3 = ShowPalette((dst1 * 255 / classCount).ToMat)
     End Sub
 End Class
 
@@ -786,7 +786,7 @@ Public Class Bin4Way_Regions : Inherits VB_Parent
         dst2.SetTo(3, binary.mats.mat(2))
         dst2.SetTo(4, binary.mats.mat(3))
 
-        dst3 = vbPalette((dst2 * 255 / classCount).ToMat)
+        dst3 = ShowPalette((dst2 * 255 / classCount).ToMat)
     End Sub
 End Class
 

@@ -33,7 +33,7 @@ Public Class HistPeak2D_Basics : Inherits VB_Parent
 
         Dim backProjection As New cv.Mat
         cv.Cv2.CalcBackProject({src}, redOptions.channels, histogram, backProjection, ranges)
-        dst2 = vbPalette(backProjection * 255 / delaunay.inputPoints.Count)
+        dst2 = ShowPalette(backProjection * 255 / delaunay.inputPoints.Count)
     End Sub
 End Class
 
@@ -66,7 +66,7 @@ Public Class HistPeak2D_TopAndSide : Inherits VB_Parent
         End If
         peak.Run(task.pointCloud)
         dst1 = peak.dst2
-        dst2 = vbPalette(dst1)
+        dst2 = ShowPalette(dst1)
     End Sub
 End Class
 

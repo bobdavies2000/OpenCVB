@@ -639,7 +639,7 @@ Public Class VBtask : Implements IDisposable
                 algorithmObjectCS.RunCS(src.Clone)
                 algorithmObjectCS.processFrame(src.Clone)
                 For Each ttxt In algorithmObjectCS.trueData
-                    task.trueData.Add(New trueText(ttxt.text, ttxt.pt, ttxt.picTag)) ' convert from CS_Classes trueText to VB_Classes trueText
+                    task.trueData.Add(ttxt)
                 Next
             Else
                 algorithmObjectVB.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...

@@ -142,11 +142,11 @@ Public Class GuidedBP_HotPoints : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         histTop.Run(src.Clone)
         topRects = hotPoints(histTop.dst3)
-        dst2 = vbPalette(histTop.dst3 * 255 / topRects.Count)
+        dst2 = ShowPalette(histTop.dst3 * 255 / topRects.Count)
 
         histSide.Run(src)
         sideRects = hotPoints(histSide.dst3)
-        dst3 = vbPalette(histSide.dst3 * 255 / sideRects.Count)
+        dst3 = ShowPalette(histSide.dst3 * 255 / sideRects.Count)
 
         If task.heartBeat Then labels(2) = "Top " + CStr(topRects.Count) + " objects identified in the top view."
         If task.heartBeat Then labels(3) = "Top " + CStr(sideRects.Count) + " objects identified in the side view."
@@ -228,12 +228,12 @@ Public Class GuidedBP_Points : Inherits VB_Parent
         topRects = New List(Of cv.Rect)(hotPoints.ptHot.topRects)
         sideRects = New List(Of cv.Rect)(hotPoints.ptHot.sideRects)
 
-        dst2 = vbPalette(backP * 255 / topRects.Count)
+        dst2 = ShowPalette(backP * 255 / topRects.Count)
 
         hotPoints.ptHot.histSide.dst3.ConvertTo(histogramSide, cv.MatType.CV_32F)
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogramSide, dst3, task.rangesSide)
 
-        dst3 = vbPalette(dst3 * 255 / sideRects.Count)
+        dst3 = ShowPalette(dst3 * 255 / sideRects.Count)
 
         classCount = topRects.Count + sideRects.Count
 

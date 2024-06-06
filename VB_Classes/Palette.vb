@@ -96,7 +96,7 @@ Public Class Palette_Reduction : Inherits VB_Parent
         reduction.Run(src)
         dst3 = reduction.dst2
 
-        dst2 = vbPalette(dst3 * 255 / reduction.classCount)
+        dst2 = ShowPalette(dst3 * 255 / reduction.classCount)
     End Sub
 End Class
 
@@ -110,7 +110,7 @@ Public Class Palette_DrawTest : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         draw.Run(src)
-        dst2 = vbPalette(draw.dst2)
+        dst2 = ShowPalette(draw.dst2)
     End Sub
 End Class
 
@@ -263,8 +263,8 @@ Public Class Palette_LeftRightImages : Inherits VB_Parent
         desc = "Use a palette with the left and right images."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst2 = vbPalette(task.leftView.ConvertScaleAbs)
-        dst3 = vbPalette(task.rightView.ConvertScaleAbs)
+        dst2 = ShowPalette(task.leftView.ConvertScaleAbs)
+        dst3 = ShowPalette(task.rightView.ConvertScaleAbs)
     End Sub
 End Class
 Public Class Palette_TaskColors : Inherits VB_Parent

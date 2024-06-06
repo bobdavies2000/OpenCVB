@@ -55,8 +55,8 @@ Public Class LeftRight_Palettized : Inherits VB_Parent
         labels(3) = "Right Image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst2 = vbPalette(task.leftview)
-        dst3 = vbPalette(task.rightview)
+        dst2 = ShowPalette(task.leftview)
+        dst3 = ShowPalette(task.rightview)
     End Sub
 End Class
 

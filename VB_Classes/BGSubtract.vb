@@ -352,7 +352,7 @@ Public Class BGSubtract_Reduction : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
 
-        dst2 = vbPalette(reduction.dst2.Clone)
+        dst2 = ShowPalette(reduction.dst2.Clone)
 
         bgSub.Run(dst2)
         dst3 = bgSub.dst2.Clone

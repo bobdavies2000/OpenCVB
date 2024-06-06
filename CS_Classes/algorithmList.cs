@@ -23,6 +23,7 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_Area_MinTriangle_CPP") return new CSharp_Area_MinTriangle_CPP(task);
 			if (algorithmName == "CSharp_Area_SoloPoints") return new CSharp_Area_SoloPoints(task);
 			if (algorithmName == "CSharp_AsciiArt_Basics") return new CSharp_AsciiArt_Basics(task);
+			if (algorithmName == "CSharp_AsciiArt_Gray") return new CSharp_AsciiArt_Gray(task);
 			if (algorithmName == "CSharp_Random_Basics") return new CSharp_Random_Basics(task);
 			return new CSharp_AddWeighted_Basics(task);
 		}

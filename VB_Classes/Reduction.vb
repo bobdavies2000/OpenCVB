@@ -26,7 +26,7 @@ Public Class Reduction_Basics : Inherits VB_Parent
             labels(2) = "No reduction requested"
         End If
 
-        dst3 = vbPalette(dst2 * 255 / classCount)
+        dst3 = ShowPalette(dst2 * 255 / classCount)
         labels(2) = CStr(classCount) + " colors after reduction"
     End Sub
 End Class
@@ -47,7 +47,7 @@ Public Class Reduction_Floodfill : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
-        dst2 = vbPalette(reduction.dst2 * 255 / reduction.classCount)
+        dst2 = ShowPalette(reduction.dst2 * 255 / reduction.classCount)
         redC.Run(reduction.dst2)
         dst3 = redC.dst2
         labels(3) = redC.labels(3)
@@ -111,7 +111,7 @@ Public Class Reduction_PointCloud : Inherits VB_Parent
         reduction.dst2.ConvertTo(dst2, cv.MatType.CV_32F)
 
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst3 = vbPalette(dst2 * 255 / reduction.classCount)
+        dst3 = ShowPalette(dst2 * 255 / reduction.classCount)
     End Sub
 End Class
 
@@ -226,7 +226,7 @@ Public Class Reduction_BGR : Inherits VB_Parent
 
         For i = 0 To 2
             reduction.Run(split(i))
-            If standaloneTest() Then mats.mat(i) = vbPalette(reduction.dst2 * 255 / reduction.classCount)
+            If standaloneTest() Then mats.mat(i) = ShowPalette(reduction.dst2 * 255 / reduction.classCount)
             split(0) = reduction.dst2.Clone
         Next
 

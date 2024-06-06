@@ -641,7 +641,7 @@ Public Class MSER_Binarize : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         bin4.Run(src)
-        dst2 = vbPalette(bin4.dst2 * 255 / 4)
+        dst2 = ShowPalette(bin4.dst2 * 255 / 4)
 
         mser.Run(dst2)
         dst3 = mser.dst2
@@ -822,7 +822,7 @@ Public Class MSER_CPP : Inherits VB_Parent
             maskCounts.Add(maskData.Get(Of Integer)(index, 0))
         Next
 
-        dst2 = vbPalette(dst0 * 255 / classcount)
+        dst2 = ShowPalette(dst0 * 255 / classcount)
         If standaloneTest() Then
             dst3 = src
             For i = 0 To boxes.Count - 1

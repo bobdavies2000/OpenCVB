@@ -63,7 +63,7 @@ Public Class Denoise_Pixels : Inherits VB_Parent
 
         If standaloneTest() Then
             dst2 *= 255 / classCount
-            dst3 = vbPalette(dst2)
+            dst3 = ShowPalette(dst2)
         End If
         If task.heartBeat Then
             strOut = CStr(classCount) + " pixel classes" + vbCrLf

@@ -61,7 +61,7 @@ Public Class EMax_Basics : Inherits VB_Parent
             dst2 = palette.dst2
         Else
             dst0 *= 255 / regionCount
-            dst2 = vbPalette(dst0)
+            dst2 = ShowPalette(dst0)
         End If
         centers = New List(Of cv.Point2f)(emaxInput.centers)
     End Sub

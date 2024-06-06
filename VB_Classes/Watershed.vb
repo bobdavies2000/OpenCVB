@@ -38,7 +38,7 @@ Public Class Watershed_Basics : Inherits VB_Parent
             markers *= Math.Truncate(255 / rects.Count)
             Dim tmp As New cv.Mat
             markers.ConvertTo(tmp, cv.MatType.CV_8U)
-            dst3 = vbPalette(tmp)
+            dst3 = ShowPalette(tmp)
 
             addW.src2 = task.palette.dst2
             addW.Run(src)

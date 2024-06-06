@@ -952,7 +952,7 @@ Public Class PointCloud_Histograms : Inherits VB_Parent
         End Select
 
         Dim mm as mmData = vbMinMax(dst2)
-        dst3 = vbPalette(dst2 * 255 / mm.maxVal)
+        dst3 = ShowPalette(dst2 * 255 / mm.maxVal)
     End Sub
 End Class
 

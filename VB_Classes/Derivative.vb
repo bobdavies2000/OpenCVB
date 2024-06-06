@@ -131,7 +131,7 @@ Public Class Derivative_Classes : Inherits VB_Parent
         For i = 0 To deriv.plot.histArray.Count - 1
             If deriv.plot.histArray(i) > 0 Then derivClassCount += 1
         Next
-        dst = vbPalette(deriv.dst0 * 255 / derivClassCount)
+        dst = ShowPalette(deriv.dst0 * 255 / derivClassCount)
         dst.SetTo(0, task.noDepthMask)
         Return derivClassCount
     End Function

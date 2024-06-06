@@ -29,7 +29,7 @@ Public Class BGRPattern_Basics : Inherits VB_Parent
 
         If standaloneTest() Then
             dst2 = dst2 * 255 / classCount
-            dst3 = vbPalette(dst2)
+            dst3 = ShowPalette(dst2)
         End If
     End Sub
     Public Sub Close()

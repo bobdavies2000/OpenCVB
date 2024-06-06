@@ -516,11 +516,6 @@ Module VB_Common
     Public Function vblowResize(input As cv.Mat) As cv.Mat
         Return input.Resize(task.lowRes, 0, 0, cv.InterpolationFlags.Nearest)
     End Function
-    Public Function vbPalette(input As cv.Mat) As cv.Mat
-        If input.Type = cv.MatType.CV_32SC1 Then input.ConvertTo(input, cv.MatType.CV_8U)
-        task.palette.Run(input)
-        Return task.palette.dst2.Clone
-    End Function
     Public Function vbIntersectTest(p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f, rect As cv.Rect) As cv.Point2f
         Dim x = p3 - p1
         Dim d1 = p2 - p1
