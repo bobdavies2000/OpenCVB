@@ -19,8 +19,8 @@ namespace CS_Classes
         public string desc = "";
         public Mat dst0, dst1, dst2, dst3, empty;
         public string traceName;
-        public string[] labels = new string[4]; 
-        private List<trueText> trueData = new List<trueText>();
+        public string[] labels = new string[4];
+        public List<trueText> trueData = new List<trueText>();
         public const string fmt0 = "0";
         public const string fmt1 = "0.0";
         public const string fmt2 = "0.00";

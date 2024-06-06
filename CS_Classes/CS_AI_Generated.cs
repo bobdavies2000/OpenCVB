@@ -631,6 +631,53 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 
+    public class CSharp_Area_FindNonZero : CS_Parent
+    {
+        public Mat nonZero;
+        public CSharp_Area_FindNonZero(VBtask task) : base(task)
+        {
+            labels[2] = "Coordinates of non-zero points";
+            labels[3] = "Non-zero original points";
+            desc = "Use FindNonZero API to get coordinates of non-zero points.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            if (standalone)
+            {
+                src = new Mat(src.Size(), MatType.CV_8U, Scalar.All(0));
+                Point[] srcPoints = new Point[100]; // doesn't really matter how many there are.
+                Random msRNG = new Random();
+                for (int i = 0; i < srcPoints.Length; i++)
+                {
+                    srcPoints[i].X = msRNG.Next(0, src.Width);
+                    srcPoints[i].Y = msRNG.Next(0, src.Height);
+                    src.Set<byte>(srcPoints[i].Y, srcPoints[i].X, 255);
+                }
+            }
+
+            nonZero = src.FindNonZero();
+
+            dst3 = new Mat(src.Size(), MatType.CV_8U, Scalar.All(0));
+            // mark the points so they are visible...
+            for (int i = 0; i < nonZero.Rows; i++)
+            {
+                Point pt = nonZero.At<Point>(i);
+                Cv2.Circle(dst3, pt, task.dotSize, Scalar.White);
+            }
+
+            string outstr = "Coordinates of the non-zero points (ordered by row - top to bottom): \n\n";
+            for (int i = 0; i < nonZero.Rows; i++)
+            {
+                Point pt = nonZero.At<Point>(i);
+                outstr += "X = \t" + pt.X + "\t y = \t" + pt.Y + "\n";
+                if (i > 100) break; // for when there are way too many points found...
+            }
+            setTrueText(outstr);
+        }
+    }
+
+
 
 
 

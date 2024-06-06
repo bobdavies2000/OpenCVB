@@ -635,8 +635,12 @@ Public Class VBtask : Implements IDisposable
 
             'cMotion.Run(src)
             If task.algName.StartsWith("CSharp_") Then
+                algorithmObjectCS.trueData.clear()
                 algorithmObjectCS.RunCS(src.Clone)
                 algorithmObjectCS.processFrame(src.Clone)
+                For Each ttxt In algorithmObjectCS.trueData
+                    task.trueData.Add(New trueText(ttxt.text, ttxt.pt, ttxt.picTag)) ' convert from CS_Classes trueText to VB_Classes trueText
+                Next
             Else
                 algorithmObjectVB.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
             End If
@@ -672,14 +676,14 @@ Public Class VBtask : Implements IDisposable
 
             Dim obj = checkIntermediateResults()
             task.intermediateObject = obj
-            task.trueData = New List(Of trueText)(trueData)
+            If task.algName.StartsWith("CSharp") = False Then task.trueData = New List(Of trueText)(trueData)
             If obj IsNot Nothing Then
                 If gOptions.displayDst0.Checked Then task.dst0 = MakeSureImage8uC3(obj.dst0) Else task.dst0 = task.color
                 If gOptions.displayDst1.Checked Then task.dst1 = MakeSureImage8uC3(obj.dst1) Else task.dst1 = task.depthRGB
                 task.dst2 = If(obj.dst2.Type = cv.MatType.CV_8UC3, obj.dst2, MakeSureImage8uC3(obj.dst2))
                 task.dst3 = If(obj.dst3.Type = cv.MatType.CV_8UC3, obj.dst3, MakeSureImage8uC3(obj.dst3))
                 task.labels = obj.labels
-                task.trueData = New List(Of trueText)(obj.trueData)
+                If task.algName.StartsWith("CSharp") = False Then task.trueData = New List(Of trueText)(obj.trueData)
             Else
                 If gOptions.displayDst0.Checked Then task.dst0 = MakeSureImage8uC3(dst0) Else task.dst0 = task.color
                 If gOptions.displayDst1.Checked Then task.dst1 = MakeSureImage8uC3(dst1) Else task.dst1 = task.depthRGB
