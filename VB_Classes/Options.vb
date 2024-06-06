@@ -6,14 +6,11 @@ Imports System.Drawing
 Imports System.Windows.Forms
 
 Public Class Options_Annealing : Inherits VB_Parent
-    Dim random As New Random_Basics
     Public cityCount As Integer = 25
     Public copyBestFlag As Boolean = False
     Public circularFlag As Boolean = True
     Public successCount As Integer = 8
     Public Sub New()
-        random.Run(empty) ' get the city positions (may or may not be used below.)
-
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Anneal Number of Cities", 5, 500, 25)
             sliders.setupTrackBar("Success = top X threads agree on energy level.", 2, Environment.ProcessorCount, 4)

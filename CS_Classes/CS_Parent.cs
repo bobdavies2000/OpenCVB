@@ -16,7 +16,7 @@ namespace CS_Classes
         public IntPtr cPtr;
         public bool standalone = true;
         public string desc = "";
-        public Mat dst0, dst1, dst2, dst3;
+        public Mat dst0, dst1, dst2, dst3, empty;
         public string traceName;
         public string[] labels = new string[4]; 
         private List<trueText> trueData = new List<trueText>();
@@ -25,6 +25,7 @@ namespace CS_Classes
         public const string fmt2 = "0.00";
         public const string fmt3 = "0.000";
         public System.Random msRNG = new System.Random();
+        public string strOut;
         public const string fmt4 = "0.0000"; public CS_Parent(VBtask _task)
         {
             this.task = _task;

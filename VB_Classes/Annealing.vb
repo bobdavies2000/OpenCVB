@@ -93,7 +93,6 @@ Public Class Annealing_MultiThreaded_CPP : Inherits VB_Parent
             anneal(i).cityPositions = random.pointList.ToArray
             anneal(i).circularPattern = options.circularFlag
             anneal(i).setup()
-            anneal(i).cityPositions = anneal(0).cityPositions.Clone() ' duplicate for all threads - working on the same set of points.
             anneal(i).Open() ' this will initialize the C++ copy of the city positions.
         Next
         Static startTime As DateTime
@@ -115,8 +114,6 @@ Public Class Annealing_MultiThreaded_CPP : Inherits VB_Parent
             End Sub)
 
         ' find the best result and start all the others with it.
-        Dim minEnergy As Single = Single.MaxValue
-        Dim minIndex As Integer = 0
         Dim bestList As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
         strOut = ""
         For i = 0 To anneal.Length - 1

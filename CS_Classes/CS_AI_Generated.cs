@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using static CS_Classes.CSharp_Externs;
 
 namespace CS_Classes
 { 
@@ -430,6 +431,157 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         public void Close()
         {
             if (cPtr != IntPtr.Zero) cPtr = Annealing_Basics_Close(cPtr);
+        }
+    }
+
+
+
+
+
+    public class CSharp_Random_Basics : CS_Parent
+    {
+        public List<Point2f> pointList = new List<Point2f>();
+        public Rect range;
+        public Options_Random options = new Options_Random();
+
+        public CSharp_Random_Basics(VBtask task) : base(task)
+        {
+            range = new Rect(0, 0, dst2.Cols, dst2.Rows);
+            desc = "Create a uniform random mask with a specified number of pixels.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            int sizeRequest = options.countSlider.Value;
+            if (!task.paused)
+            {
+                pointList.Clear();
+                Random msRNG = new Random();
+                while (pointList.Count < sizeRequest)
+                {
+                    pointList.Add(new Point2f(msRNG.Next(range.X, range.X + range.Width),
+                                              msRNG.Next(range.Y, range.Y + range.Height)));
+                }
+                if (standaloneTest())
+                {
+                    dst2.SetTo(0);
+                    foreach (var pt in pointList)
+                    {
+                        drawCircle(dst2, pt, task.dotSize, Scalar.Yellow);
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+
+    public class CSharp_Annealing_MultiThreaded_CPP : CS_Parent
+    {
+        private Options_Annealing options = new Options_Annealing();
+        private CSharp_Random_Basics random;
+        private CSharp_Annealing_Basics_CPP[] anneal;
+        private Mat_4to1 mats = new Mat_4to1();
+        private DateTime startTime;
+        private void setup()
+        {
+            random.options.countSlider.Value = options.cityCount;
+            random.RunCS(empty); // get the city positions (may or may not be used below.)
+
+            for (int i = 0; i < anneal.Length; i++)
+            {
+                anneal[i] = new CSharp_Annealing_Basics_CPP(task);
+                anneal[i].numberOfCities = options.cityCount;
+                anneal[i].cityPositions = random.pointList.ToArray();
+                anneal[i].circularPattern = options.circularFlag;
+                anneal[i].setup();
+                anneal[i].Open(); // this will initialize the C++ copy of the city positions.
+            }
+
+            TimeSpan timeSpent = DateTime.Now.Subtract(startTime);
+            if (timeSpent.TotalSeconds < 10000)
+            {
+                Console.WriteLine("time spent on last problem = " + timeSpent.TotalSeconds.ToString("0.00") + " seconds.");
+            }
+            startTime = DateTime.Now;
+        }
+
+        public CSharp_Annealing_MultiThreaded_CPP(VBtask task) : base(task)
+        {
+            random = new CSharp_Random_Basics(task);
+            anneal = new CSharp_Annealing_Basics_CPP[Environment.ProcessorCount / 2];
+            labels = new string[] { "", "", "Top 2 are best solutions, bottom 2 are worst.", "Log of Annealing progress" };
+            desc = "Setup and control finding the optimal route for a traveling salesman";
+        }
+
+        public void RunCS(cv.Mat src)
+        {
+            options.RunVB();
+
+            if (task.optionsChanged) setup();
+
+            Parallel.For(0, anneal.Length, i =>
+            {
+                anneal[i].RunCS(src);
+            });
+
+            // find the best result and start all the others with it.
+            SortedList<float, int> bestList = new SortedList<float, int>(new compareAllowIdenticalSingle());
+            strOut = "";
+            for (int i = 0; i < anneal.Length; i++)
+            {
+                bestList.Add(anneal[i].energy, i);
+                if (i % 2 == 0)
+                {
+                    strOut += "CPU=" + i.ToString("00") + " energy=" + anneal[i].energy.ToString("0") + "\t";
+                }
+                else
+                {
+                    strOut += "CPU=" + i.ToString("00") + " energy=" + anneal[i].energy.ToString("0") + "\n";
+                }
+            }
+            setTrueText(strOut, new cv.Point(10, 10), 3);
+
+            mats.mat[0] = anneal[bestList.ElementAt(0).Value].dst2;
+            if (bestList.Count >= 2)
+            {
+                mats.mat[1] = anneal[bestList.ElementAt(1).Value].dst2;
+                mats.mat[2] = anneal[bestList.ElementAt(bestList.Count - 2).Value].dst2;
+                mats.mat[3] = anneal[bestList.ElementAt(bestList.Count - 1).Value].dst2;
+            }
+            mats.Run(empty);
+            dst2 = mats.dst2;
+
+            // copy the top half of the solutions to the bottom half (worst solutions)
+            if (options.copyBestFlag)
+            {
+                for (int i = 0; i < anneal.Length / 2; i++)
+                {
+                    anneal[bestList.ElementAt(bestList.Count - 1 - i).Value].cityOrder = anneal[bestList.ElementAt(i).Value].cityOrder;
+                }
+            }
+
+            // if the top X are all the same energy, then we are done.
+            int workingCount = 0, successCounter = 0;
+            for (int i = 0; i < anneal.Length; i++)
+            {
+                int index = bestList.ElementAt(i).Value;
+                if (anneal[index].energy != anneal[index].energyLast)
+                {
+                    anneal[index].energyLast = anneal[index].energy;
+                    workingCount++;
+                }
+                else
+                {
+                    successCounter++;
+                }
+            }
+            labels[3] = $"There are {workingCount} threads working in parallel.";
+            if (successCounter >= options.successCount) setup();
         }
     }
 
