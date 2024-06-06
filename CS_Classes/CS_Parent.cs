@@ -108,6 +108,33 @@ namespace CS_Classes
             }
             dst.FillConvexPoly(vertices, color, LineTypes.Link8);
         }
+        public void DrawRotatedOutline(RotatedRect rotatedRect, Mat dst2, Scalar color)
+        {
+            Point2f[] pts = rotatedRect.Points();
+            Point lastPt = new Point((int)pts[0].X, (int)pts[0].Y);
+            for (int i = 1; i <= pts.Length; i++)
+            {
+                int index = i % pts.Length;
+                Point pt = new Point((int)pts[index].X, (int)pts[index].Y);
+                Cv2.Line(dst2, pt, lastPt, color);
+                lastPt = pt;
+            }
+        }
+        public List<Point2f> QuickRandomPoints(int howMany)
+        {
+            List<Point2f> srcPoints = new List<Point2f>();
+            int w = task.workingRes.Width;
+            int h = task.workingRes.Height;
+            Random msRNG = new Random();
+
+            for (int i = 0; i < howMany; i++)
+            {
+                Point2f pt = new Point2f(msRNG.Next(0, w), msRNG.Next(0, h));
+                srcPoints.Add(pt);
+            }
+
+            return srcPoints;
+        }
 
         public void processFrame(Mat src)
         {

@@ -681,6 +681,77 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 
+    public class CSharp_Area_SoloPoints : CS_Parent
+    {
+        private BackProject_SoloTop hotTop = new BackProject_SoloTop();
+        private BackProject_SoloSide hotSide = new BackProject_SoloSide();
+        private Area_FindNonZero nZero = new Area_FindNonZero();
+        public List<Point> soloPoints = new List<Point>();
+
+        public CSharp_Area_SoloPoints(VBtask task) : base(task)
+        {
+            desc = "Find the solo points in the pointcloud histograms for top and side views.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            hotTop.Run(src);
+            dst2 = hotTop.dst3;
+
+            hotSide.Run(src);
+            dst2 = dst2 | hotSide.dst3;
+
+            nZero.Run(dst2);
+            soloPoints.Clear();
+            for (int i = 0; i < nZero.nonZero.Rows; i++)
+            {
+                soloPoints.Add(nZero.nonZero.At<Point>(i, 0));
+            }
+
+            if (task.heartBeat)
+            {
+                labels[2] = $"There were {soloPoints.Count} points found";
+            }
+        }
+    }
+
+
+
+
+    public class CSharp_Area_MinRect : CS_Parent
+    {
+        public RotatedRect minRect;
+        Options_MinArea options = new Options_MinArea();
+        public List<Point2f> inputPoints = new List<Point2f>();
+
+        public CSharp_Area_MinRect(VBtask task) : base(task)
+        {
+            desc = "Find minimum containing rectangle for a set of points.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                if (!task.heartBeat) return;
+                options.RunVB();
+                inputPoints = QuickRandomPoints(options.numPoints);
+            }
+
+            minRect = Cv2.MinAreaRect(inputPoints.ToArray());
+
+            if (standaloneTest())
+            {
+                dst2.SetTo(Scalar.Black);
+                foreach (var pt in inputPoints)
+                {
+                    drawCircle(dst2, pt, task.dotSize + 2, Scalar.Red);
+                }
+                DrawRotatedOutline(minRect, dst2, Scalar.Yellow);
+            }
+        }
+    }
+
 
 
 
