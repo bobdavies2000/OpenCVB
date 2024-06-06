@@ -174,7 +174,7 @@ Public Class KNN_Core2DTest : Inherits VB_Parent
     Public knn As New KNN_Core
     Dim random As New Random_Basics
     Public Sub New()
-        findSlider("Random Pixel Count").Value = 10
+        FindSlider("Random Pixel Count").Value = 10
         desc = "Test knn with random 2D points in the image.  Find the nearest requested neighbors."
     End Sub
     Public Sub accumulateDisplay()
@@ -379,7 +379,7 @@ Public Class KNN_Core3DTest : Inherits VB_Parent
     Dim random As New Random_Basics3D
     Public Sub New()
         labels(2) = "Red=TrainingData, yellow = queries, text shows Euclidean distance to that point from query point"
-        findSlider("Random Pixel Count").Value = 100
+        FindSlider("Random Pixel Count").Value = 100
         desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -440,7 +440,7 @@ Public Class KNN_Core4DTest : Inherits VB_Parent
     Dim random As New Random_Basics4D
     Public Sub New()
         labels(2) = "Red=TrainingData, yellow = queries, text shows Euclidean distance to that point from query point"
-        findSlider("Random Pixel Count").Value = 5
+        FindSlider("Random Pixel Count").Value = 5
         desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -491,8 +491,8 @@ Public Class KNN_CoreNTest : Inherits VB_Parent
         desc = "Test the use of the general form KNN_CoreN algorithm"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static dimSlider = findSlider("KNN Dimension")
-        Static randomSlider = findSlider("Random input points")
+        Static dimSlider = FindSlider("KNN Dimension")
+        Static randomSlider = FindSlider("Random input points")
         knn.knnDimension = dimSlider.Value
         Dim points = randomSlider.Value
 
@@ -592,8 +592,8 @@ Public Class KNN_Input : Inherits VB_Parent
         desc = "Source of query/train points - generate points if standaloneTest().  Reuse points if requested."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static trainSlider = findSlider("KNN Train count")
-        Static querySlider = findSlider("KNN Query count")
+        Static trainSlider = FindSlider("KNN Train count")
+        Static querySlider = FindSlider("KNN Query count")
         randomTrain.options.countSlider.Value = trainSlider.Value
         randomTrain.Run(empty)
 
@@ -634,7 +634,7 @@ Public Class KNN_TrackMean : Inherits VB_Parent
     Public shiftY As Single
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Average distance multiplier", 1, 20, 10)
-        findSlider("Feature Sample Size").Value = 200
+        FindSlider("Feature Sample Size").Value = 200
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion"}
         desc = "Track points with KNN and match the goodFeatures from frame to frame"
@@ -667,7 +667,7 @@ Public Class KNN_TrackMean : Inherits VB_Parent
         Return histSum / histList.Count
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static dotSlider = findSlider("Average distance multiplier")
+        Static dotSlider = FindSlider("Average distance multiplier")
         Static lastImage As cv.Mat = src.Clone
         Dim multiplier = dotSlider.Value
 

@@ -8,8 +8,8 @@ Public Class FeaturePoly_Basics : Inherits VB_Parent
     Dim topFeatures As New FeaturePoly_TopFeatures
     Public sides As New FeaturePoly_Sides
     Public Sub New()
-        findSlider("Feature Sample Size").Value = 30
-        If dst2.Width >= 640 Then findSlider("Resync if feature moves > X pixels").Value = 15
+        FindSlider("Feature Sample Size").Value = 30
+        If dst2.Width >= 640 Then FindSlider("Resync if feature moves > X pixels").Value = 15
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
                   "Ordered Feature polygons of best features - white is original, yellow latest"}
@@ -130,7 +130,7 @@ Public Class FeaturePoly_Sides : Inherits VB_Parent
         desc = "Compute the lengths of each side in a polygon"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Resync if feature moves > X pixels")
+        Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
         Dim threshold = thresholdSlider.Value
 
         If firstPass Then prevImage = src.Clone
@@ -244,8 +244,8 @@ Public Class FeaturePoly_BasicsOriginal : Inherits VB_Parent
     Public center As Object
     Public Sub New()
         center = New FeaturePoly_Center ' FeaturePoly_PerpendicularsTest can be used to test the perpendicular method of finding the rotate center.
-        findSlider("Feature Sample Size").Value = 30
-        If dst2.Width >= 640 Then findSlider("Resync if feature moves > X pixels").Value = 15
+        FindSlider("Feature Sample Size").Value = 30
+        If dst2.Width >= 640 Then FindSlider("Resync if feature moves > X pixels").Value = 15
         If standaloneTest() Then gOptions.displayDst1.Checked = True
         labels = {"", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
                   "Ordered Feature polygons of best features - white is original, yellow latest"}
@@ -510,7 +510,7 @@ Public Class FeaturePoly_StartPoints : Inherits VB_Parent
         desc = "Track the feature grid points back to the last sync point"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Resync if feature moves > X pixels")
+        Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
         Dim threshold = thresholdSlider.Value
         Dim maxShift = fGrid.anchor.DistanceTo(fGrid.startAnchor) + threshold
 
@@ -1089,7 +1089,7 @@ Public Class FeaturePoly_Center : Inherits VB_Parent
             Exit Sub
         End If
 
-        Static thresholdSlider = findSlider("Resync if feature moves > X pixels")
+        Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
         Dim threshold = thresholdSlider.Value
 
         Dim sindex1 = fPD.polyPrevSideIndex
@@ -1310,14 +1310,14 @@ Public Class FeaturePoly_Core : Inherits VB_Parent
             sliders.setupTrackBar("Anchor point max movement", 1, 10, 5)
         End If
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F, 0)
-        findSlider("Feature Sample Size").Value = 20
+        FindSlider("Feature Sample Size").Value = 20
         labels = {"", "Distance change from previous frame", "", "Feature Grid with anchor"}
         desc = "Feature Grid: compute distances between good features from frame to frame"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Resync if feature moves > X pixels")
-        Static shiftSlider = findSlider("Maximum shift to trigger resync")
-        Static anchorSlider = findSlider("Anchor point max movement")
+        Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
+        Static shiftSlider = FindSlider("Maximum shift to trigger resync")
+        Static anchorSlider = FindSlider("Anchor point max movement")
         Dim maxShift = shiftSlider.Value
         threshold = thresholdSlider.Value
 

@@ -325,7 +325,7 @@ Public Class Kalman_Depth32f : Inherits VB_Parent
     Dim resize As Resize_Smaller
     Public Sub New()
         resize = New Resize_Smaller()
-        findSlider("Resize Percentage (%)").Value = 4
+        FindSlider("Resize Percentage (%)").Value = 4
 
         labels(2) = "Mask of non-zero depth after Kalman smoothing"
         labels(3) = "Difference from original depth"
@@ -534,9 +534,9 @@ Public Class Kalman_VB_Basics : Inherits VB_Parent
         desc = "Build a generic kalman filter based on Kalman_VB"
     End Sub
     Public Sub State_Update(ByVal q_m As Single)
-        Static deltaSlider = findSlider("Delta Time X100")
-        Static covarSlider = findSlider("Process Covariance X10000")
-        Static pDotSlider = findSlider("pDot entry X1000")
+        Static deltaSlider = FindSlider("Delta Time X100")
+        Static covarSlider = FindSlider("Process Covariance X10000")
+        Static pDotSlider = FindSlider("pDot entry X1000")
 
         Dim dt As Single = deltaSlider.Value / 100
         Dim unbias As Single = q_m - q_bias 'Unbias our gyro
@@ -576,7 +576,7 @@ Public Class Kalman_VB_Basics : Inherits VB_Parent
 
         If standaloneTest() Then kInput = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Mean()(0)
 
-        Static avgSlider = findSlider("Average input count")
+        Static avgSlider = FindSlider("Average input count")
         Static saveAvgCount As Integer
         If avgSlider.Value <> saveAvgCount Then
             saveAvgCount = avgSlider.Value

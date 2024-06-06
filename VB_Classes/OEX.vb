@@ -142,13 +142,13 @@ End Class
 Public Class OEX_BasicLinearTransforms : Inherits VB_Parent
     Dim options As New Options_BrightnessContrast
     Public Sub New()
-        findSlider("Alpha (contrast)").Value = 2
-        findSlider("Beta (brightness)").Value = 40
+        FindSlider("Alpha (contrast)").Value = 2
+        FindSlider("Beta (brightness)").Value = 40
         desc = "OpenCV Example BasicLinearTransforms - NOTE: much faster than BasicLinearTransformTrackBar"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static alphaSlider = findSlider("Alpha (contrast)")
-        Static betaSlider = findSlider("Beta (brightness)")
+        Static alphaSlider = FindSlider("Alpha (contrast)")
+        Static betaSlider = FindSlider("Beta (brightness)")
         src.ConvertTo(dst2, -1, alphaSlider.value, betaSlider.value)
     End Sub
 End Class
@@ -162,13 +162,13 @@ End Class
 Public Class OEX_BasicLinearTransformsTrackBar : Inherits VB_Parent
     Dim options As New Options_BrightnessContrast
     Public Sub New()
-        findSlider("Alpha (contrast)").Value = 2
-        findSlider("Beta (brightness)").Value = 40
+        FindSlider("Alpha (contrast)").Value = 2
+        FindSlider("Beta (brightness)").Value = 40
         desc = "OpenCV Example BasicLinearTransformTrackBar"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static alphaSlider = findSlider("Alpha (contrast)")
-        Static betaSlider = findSlider("Beta (brightness)")
+        Static alphaSlider = FindSlider("Alpha (contrast)")
+        Static betaSlider = FindSlider("Beta (brightness)")
         Dim alpha = alphaSlider.value
         Dim beta = betaSlider.value
         For y As Integer = 0 To src.Rows - 1
@@ -395,12 +395,12 @@ Public Class OEX_Threshold_Inrange : Inherits VB_Parent
         desc = "OpenCV Example Threshold_Inrange"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static hueLowSlider = findSlider("Hue low")
-        Static hueHighSlider = findSlider("Hue high")
-        Static satLowSlider = findSlider("Saturation low")
-        Static satHighSlider = findSlider("Saturation high")
-        Static valLowSlider = findSlider("Value low")
-        Static valHighSlider = findSlider("Value high")
+        Static hueLowSlider = FindSlider("Hue low")
+        Static hueHighSlider = FindSlider("Hue high")
+        Static satLowSlider = FindSlider("Saturation low")
+        Static satHighSlider = FindSlider("Saturation high")
+        Static valLowSlider = FindSlider("Value low")
+        Static valHighSlider = FindSlider("Value high")
         Dim lows As New cv.Scalar(hueLowSlider.value, satLowSlider.value, valLowSlider.value)
         Dim highs As New cv.Scalar(hueHighSlider.value, satHighSlider.value, valHighSlider.value)
 

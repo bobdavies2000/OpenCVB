@@ -117,7 +117,7 @@ Public Class Smoothing_Interior : Inherits VB_Parent
         Return nl
     End Function
     Public Sub New()
-        If standaloneTest() Then findSlider("Hull random points").Value = 16
+        If standaloneTest() Then FindSlider("Hull random points").Value = 16
 
         labels(2) = "Original Points (white) Smoothed (yellow)"
         labels(3) = ""

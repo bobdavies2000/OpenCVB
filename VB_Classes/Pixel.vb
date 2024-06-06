@@ -258,7 +258,7 @@ Public Class Pixel_Measure : Inherits VB_Parent
         Return halfLineInMeters * 2 / dst2.Width
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static distanceSlider = findSlider("Distance in mm")
+        Static distanceSlider = FindSlider("Distance in mm")
         Dim mmPP = Compute(distanceSlider.Value)
         setTrueText("At a distance of " + CStr(distanceSlider.Value) + " mm's the camera's FOV is " +
                     Format(mmPP * src.Width / 1000, fmt2) + " meters wide" + vbCrLf +
@@ -339,7 +339,7 @@ Public Class Pixel_Unstable : Inherits VB_Parent
         desc = "Detect where pixels are unstable"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static kSlider = findSlider("KMeans k")
+        Static kSlider = FindSlider("KMeans k")
         Static pixelCounts As New List(Of Integer)
         Static k As Integer = -1
         Static unstable As New List(Of cv.Mat)
@@ -390,7 +390,7 @@ Public Class Pixel_Zoom : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Zoom Factor", 2, 16, 4)
         labels(2) = "To zoom move the mouse over the image"
-        zoomSlider = findSlider("Zoom Factor")
+        zoomSlider = FindSlider("Zoom Factor")
         desc = "Zoom into the pixels under the mouse in dst2"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -603,7 +603,7 @@ End Class
 Public Class Pixel_NeighborsPatchNeighbors : Inherits VB_Parent
     Public options As New Options_Neighbors
     Public Sub New()
-        findSlider("Minimum offset to neighbor pixel").Value = 1
+        FindSlider("Minimum offset to neighbor pixel").Value = 1
         desc = "Update depth values for neighbors where they are within X mm's"
     End Sub
     Public Sub RunVB(src As cv.Mat)

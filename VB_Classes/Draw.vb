@@ -12,8 +12,8 @@ Public Class Draw_Noise : Inherits VB_Parent
         desc = "Add Noise to the color image"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static widthSlider = findSlider("Noise Width")
-        Static CountSlider = findSlider("Noise Count")
+        Static widthSlider = FindSlider("Noise Width")
+        Static CountSlider = FindSlider("Noise Count")
         maxNoiseWidth = widthSlider.Value
         src.CopyTo(dst2)
         noiseMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1).SetTo(0)

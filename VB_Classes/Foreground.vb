@@ -54,7 +54,7 @@ End Class
 Public Class Foreground_KMeans2 : Inherits VB_Parent
     Dim km As New KMeans_Image
     Public Sub New()
-        findSlider("KMeans k").Value = 2
+        FindSlider("KMeans k").Value = 2
         labels = {"", "", "Foreground Mask", "Background Mask"}
         dst2 = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)

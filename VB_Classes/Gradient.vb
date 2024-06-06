@@ -42,14 +42,14 @@ Public Class Gradient_CartToPolar : Inherits VB_Parent
     Public magnitude As New cv.Mat
     Public angle As New cv.Mat
     Public Sub New()
-        findSlider("Sobel kernel Size").Value = 1
+        FindSlider("Sobel kernel Size").Value = 1
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Contrast exponent to use X100", 0, 200, 30)
         labels(2) = "CartToPolar Magnitude Output Normalized"
         labels(3) = "CartToPolar Angle Output"
         desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static contrastSlider = findSlider("Contrast exponent to use X100")
+        Static contrastSlider = FindSlider("Contrast exponent to use X100")
         Dim tmp As New cv.Mat
         src.ConvertTo(tmp, cv.MatType.CV_32FC3, 1 / 255)
         basics.Run(tmp)

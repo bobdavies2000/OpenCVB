@@ -88,7 +88,7 @@ Public Class ROI_AccumulateOld : Inherits VB_Parent
         desc = "Accumulate pixels in a motion ROI - all pixels that are different by X"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Dim aoiSlider = findSlider("Max size area of interest %")
+        Dim aoiSlider = FindSlider("Max size area of interest %")
         Dim aoiPercent = aoiSlider.Value / 100
         If aoiRect.Width * aoiRect.Height > src.Total * aoiPercent Or task.optionsChanged Then
             dst0 = task.color
@@ -141,7 +141,7 @@ Public Class ROI_Accumulate : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         setTrueText(traceName + " is the same as ROI_AccumulateOld but simpler.", 3)
-        Dim roiSlider = findSlider("Max size area of interest %")
+        Dim roiSlider = FindSlider("Max size area of interest %")
         Dim roiPercent = roiSlider.Value / 100
         If roiRect.Width * roiRect.Height > src.Total * roiPercent Or task.optionsChanged Then
             dst2.SetTo(0)

@@ -120,8 +120,8 @@ Public Class Interpolate_Lines : Inherits VB_Parent
     Dim lines As New Line_Basics
     Dim inter As New Interpolate_Basics
     Public Sub New()
-        findSlider("Interpolation Resize %").Value = 80
-        findSlider("Interpolation threshold").Value = 100
+        FindSlider("Interpolation Resize %").Value = 80
+        FindSlider("Interpolation threshold").Value = 100
         desc = "Detect lines in interpolation results."
     End Sub
     Public Sub RunVB(src As cv.Mat)

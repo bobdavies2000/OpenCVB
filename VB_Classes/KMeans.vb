@@ -94,7 +94,7 @@ Public Class KMeans_k2_to_k8 : Inherits VB_Parent
         desc = "Show clustering with various settings for cluster count.  Draw to select region of interest."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static kSlider = findSlider("KMeans k")
+        Static kSlider = FindSlider("KMeans k")
 
         Static kmIndex As Integer
         If task.frameCount Mod 100 = 0 Then
@@ -171,7 +171,7 @@ Public Class KMeans_CustomData : Inherits VB_Parent
 
         If standaloneTest() Then
             Static random = New Random_Basics
-            Static randslider = findSlider("Random Pixel Count")
+            Static randslider = FindSlider("Random Pixel Count")
             If firstPass Then randslider.Value = 50
             If randslider.Value < k Then randslider.Value = k
             If task.heartBeat Then random.Run(empty)
@@ -295,7 +295,7 @@ Public Class KMeans_TierCount : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         kCount.Run(src)
-        Static kSlider = findSlider("KMeans k")
+        Static kSlider = FindSlider("KMeans k")
         If kSlider.value <> kCount.classCount Then kSlider.value = Math.Max(kCount.classCount, kSlider.minimum)
         classCount = kCount.classCount
 
@@ -393,7 +393,7 @@ Public Class KMeans_Dimensions : Inherits VB_Parent
         desc = "Demonstrate how to use KMeans for a variety of dimensions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static dimSlider = findSlider("Dimension")
+        Static dimSlider = FindSlider("Dimension")
 
         Dim merge As New cv.Mat
         Select Case dimSlider.value
@@ -450,7 +450,7 @@ Public Class KMeans_Valleys : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         tiers.Run(src)
 
-        Static kSlider = findSlider("KMeans k")
+        Static kSlider = FindSlider("KMeans k")
         kSlider.value = tiers.classCount
         Dim kMeansK = kSlider.Value
 
@@ -473,7 +473,7 @@ Public Class KMeans_Depth : Inherits VB_Parent
     Public km As New KMeans_Basics
     Public classCount As Integer
     Public Sub New()
-        findSlider("KMeans k").Value = 10
+        FindSlider("KMeans k").Value = 10
         labels(2) =
         desc = "Cluster depth using kMeans - useful to split foreground and background"
     End Sub

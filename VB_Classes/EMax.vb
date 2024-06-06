@@ -13,7 +13,7 @@ Public Class EMax_Basics : Inherits VB_Parent
     Dim options As New Options_Emax
     Public Sub New()
         cPtr = EMax_Open()
-        findSlider("EMax Number of Samples per region").Value = 1
+        FindSlider("EMax Number of Samples per region").Value = 1
         labels(3) = "Emax regions as integers"
         vbAddAdvice(traceName + ": use local options to control EMax.")
         desc = "Use EMax - Expectation Maximization - to classify the regions around a series of labeled points"
@@ -121,8 +121,8 @@ Public Class EMax_InputClusters : Inherits VB_Parent
         desc = "Options for EMax algorithms."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static sampleSlider = findSlider("EMax Number of Samples per region")
-        Static sigmaSlider = findSlider("EMax Sigma (spread)")
+        Static sampleSlider = FindSlider("EMax Number of Samples per region")
+        Static sigmaSlider = FindSlider("EMax Sigma (spread)")
         Dim samplesPerRegion As Integer
         Dim sigma As Integer
 
@@ -261,12 +261,12 @@ Public Class EMax_RandomClusters : Inherits VB_Parent
     Dim clusters As New Random_Clusters
     Dim emax As New EMax_Basics
     Public Sub New()
-        findSlider("Number of points per cluster").Value = 1
+        FindSlider("Number of points per cluster").Value = 1
         labels = {"", "", "Random_Clusters output", "EMax layout for the random clusters supplied"}
         desc = "Build an EMax layout for random set of clusters (not a grid)"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static regionSlider = findSlider("Number of Clusters")
+        Static regionSlider = FindSlider("Number of Clusters")
         emax.regionCount = regionSlider.Value
 
         clusters.Run(empty)

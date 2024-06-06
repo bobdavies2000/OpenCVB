@@ -189,8 +189,8 @@ Public Class Match_Motion : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         options.RunVB()
-        Static stdevSlider = findSlider("Stdev Threshold")
-        Static correlationSlider = findSlider("Feature Correlation Threshold")
+        Static stdevSlider = FindSlider("Stdev Threshold")
+        Static correlationSlider = FindSlider("Feature Correlation Threshold")
         Dim stdevThreshold = CSng(stdevSlider.Value)
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
 
@@ -479,7 +479,7 @@ Public Class Match_tCell : Inherits VB_Parent
     Public Sub New()
         Dim tc As tCell
         tCells.Add(tc)
-        cellSlider = findSlider("MatchTemplate Cell Size")
+        cellSlider = FindSlider("MatchTemplate Cell Size")
         desc = "Use MatchTemplate to find the new location of the template and update the tc that was provided."
     End Sub
     Public Function createCell(src As cv.Mat, correlation As Single, pt As cv.Point2f) As tCell
@@ -542,8 +542,8 @@ Public Class Match_LinePairTest : Inherits VB_Parent
         desc = "Use MatchTemplate to find the new location of the template and update the tc that was provided."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static cellSlider = findSlider("MatchTemplate Cell Size")
-        Static corrSlider = findSlider("Feature Correlation Threshold")
+        Static cellSlider = FindSlider("MatchTemplate Cell Size")
+        Static corrSlider = FindSlider("Feature Correlation Threshold")
         Dim minCorrelation = corrSlider.Value / 100
         Dim rSize = cellSlider.Value
         Dim radius = rSize / 2
@@ -613,7 +613,7 @@ Public Class Match_GoodFeatureKNN : Inherits VB_Parent
         desc = "Track the GoodFeatures with KNN"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static distSlider = findSlider("Maximum travel distance per frame")
+        Static distSlider = FindSlider("Maximum travel distance per frame")
         Dim maxDistance = distSlider.Value
 
         feat.Run(src)
@@ -669,7 +669,7 @@ Public Class Match_Point : Inherits VB_Parent
             Exit Sub
         End If
 
-        Static cellSlider = findSlider("MatchTemplate Cell Size")
+        Static cellSlider = FindSlider("MatchTemplate Cell Size")
         Dim rSize = cellSlider.Value
         Dim radius = rSize / 2
 

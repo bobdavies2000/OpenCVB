@@ -215,7 +215,7 @@ Public Class Fuzzy_TrackerDepth : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static displayCheck = findCheckBox("Display centroid and rectangle for each region")
-        Static minRectSizeSlider = findSlider("Threshold for rectangle size")
+        Static minRectSizeSlider = FindSlider("Threshold for rectangle size")
 
         fuzzy.Run(task.depthRGB)
         dst2 = fuzzy.dst1

@@ -18,7 +18,7 @@ Public Class Retina_Basics_CPP : Inherits VB_Parent
         desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static sampleSlider = findSlider("Retina Sample Factor")
+        Static sampleSlider = FindSlider("Retina Sample Factor")
         Static logCheck = findCheckBox("Use log sampling")
         Static xmlCheck = findCheckBox("Open resulting xml file")
         If xmlCheck.Checked Then

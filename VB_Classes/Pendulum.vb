@@ -14,7 +14,7 @@ Public Class Pendulum_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static initCheck = findCheckBox("Reset initial conditions")
-        Static timeSlider = findSlider("Pendulum FPS")
+        Static timeSlider = FindSlider("Pendulum FPS")
 
         Static l1 As Single = 150, l2 As Single = 150, m1 As Single = 10, m2 As Single = 10
         Static o1 = 2 * cv.Cv2.PI / 2, o2 = 2 * cv.Cv2.PI / 3

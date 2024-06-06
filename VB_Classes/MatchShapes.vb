@@ -194,7 +194,7 @@ Public Class MatchShapes_LeftRight : Inherits VB_Parent
         desc = "MatchShapes: Match shapes in the left and right images"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        'Static sizeSlider = findSlider("Min Size % of image size")
+        'Static sizeSlider = FindSlider("Min Size % of image size")
         'Dim minSize = sizeSlider.value * dst2.Total / 100
 
         'If standaloneTest() Then
@@ -257,7 +257,7 @@ Public Class MatchShapes_Hulls : Inherits VB_Parent
     Dim options As New Options_MatchShapes
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
-        findSlider("Match Threshold %").Value = 3
+        FindSlider("Match Threshold %").Value = 3
         labels = {"", "", "Output of RedCloud_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below."}
         desc = "Find all RedCloud hull shapes similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
@@ -292,7 +292,7 @@ Public Class MatchShapes_Contours : Inherits VB_Parent
     Dim options As New Options_MatchShapes
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        findSlider("Match Threshold %").Value = 3
+        FindSlider("Match Threshold %").Value = 3
         labels = {"", "", "Output of RedCloud_Basics", "All RedCloud cells that matched the selected cell with the current settings are below."}
         desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub

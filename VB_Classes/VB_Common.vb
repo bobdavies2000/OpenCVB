@@ -1,6 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
+Imports System.Windows.Forms
+Imports System.Drawing
+Imports System.IO.Pipes
 Module VB_Common
     Public Const fmt0 = "0"
     Public Const fmt1 = "0.0"
@@ -9,6 +12,28 @@ Module VB_Common
     Public Const fmt4 = "0.0000"
     Public Const depthListMaxCount As Integer = 10
     Public newPoint As New cv.Point
+    Public gOptions As New OptionsGlobal
+    Public redOptions As New OptionsRedCloud
+    Public task As VBtask
+
+    Public pipeCount As Integer
+    Public openGL_hwnd As IntPtr
+    Public openGLPipe As NamedPipeServerStream
+
+    Public allOptions As OptionsContainer
+    Public Const RESULT_DST0 = 0 ' 0=rgb 1=depth 2=dst1 3=dst2
+    Public Const RESULT_DST1 = 1 ' 0=rgb 1=depth 2=dst1 3=dst2
+    Public Const RESULT_DST2 = 2 ' 0=rgb 1=depth 2=dst1 3=dst2
+    Public Const RESULT_DST3 = 3 ' 0=rgb 1=depth 2=dst1 3=dst2
+    Public Const screenDWidth As Integer = 18
+    Public Const screenDHeight As Integer = 20
+    Public term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
+    Public recordedData As Replay_Play
+
+    Public algorithmTimes As New List(Of DateTime)
+    Public algorithmStack As New Stack()
+    Public pythonPipeIndex As Integer ' increment this for each algorithm to avoid any conflicts with other Python apps.
+
     Public Function findCenter(clist As List(Of cv.Point)) As cv.Point2f
         Dim xsum As Integer, ysum As Integer
         For Each pt In clist
@@ -562,16 +587,6 @@ Module VB_Common
     Public Sub drawLine(dst As Mat, p1 As Point2f, p2 As Point2f, color As Scalar)
         dst.Line(p1, p2, color, task.lineWidth, task.lineType)
     End Sub
-    Public Sub drawRotatedOutline(rotatedRect As cv.RotatedRect, dst2 As cv.Mat, color As cv.Scalar)
-        Dim pts = rotatedRect.Points()
-        Dim lastPt = pts(0)
-        For i = 1 To pts.Length
-            Dim index = i Mod pts.Length
-            Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
-            drawLine(dst2, pt, lastPt, task.highlightColor)
-            lastPt = pt
-        Next
-    End Sub
     Public Sub drawRotatedRectangle(rotatedRect As cv.RotatedRect, dst As cv.Mat, color As cv.Scalar)
         Dim vertices2f = rotatedRect.Points()
         Dim vertices(vertices2f.Length - 1) As cv.Point
@@ -583,6 +598,154 @@ Module VB_Common
     Public Function vecToScalar(v As cv.Vec3b) As cv.Scalar
         Return New cv.Scalar(v(0), v(1), v(2))
     End Function
+    Public Function FindSlider(opt As String) As TrackBar
+        Try
+            For Each frm In Application.OpenForms
+                If frm.text.endswith(" Sliders") Then
+                    For j = 0 To frm.trackbar.Count - 1
+                        If frm.sLabels(j).text.startswith(opt) Then Return frm.trackbar(j)
+                    Next
+                End If
+            Next
+        Catch ex As Exception
+            Console.WriteLine("FindSlider failed.  The application list of forms changed while iterating.  Not critical." + ex.Message)
+        End Try
+        Console.WriteLine("A slider was Not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+
+        Return Nothing
+    End Function
+    Public Function findfrm(title As String) As Windows.Forms.Form
+        For Each frm In Application.OpenForms
+            If frm.text = title Then Return frm
+        Next
+        Return Nothing
+    End Function
+    Public Function findCheckBox(opt As String) As CheckBox
+        While 1
+            Try
+                For Each frm In Application.OpenForms
+                    If frm.text.endswith(" CheckBoxes") Then
+                        For j = 0 To frm.Box.Count - 1
+                            If frm.Box(j).text = opt Then Return frm.Box(j)
+                        Next
+                    End If
+                Next
+            Catch ex As Exception
+                Console.WriteLine("findCheckBox failed.  The application list of forms changed while iterating.  Not critical.")
+            End Try
+            Application.DoEvents()
+            Static retryCount As Integer
+            retryCount += 1
+            If retryCount >= 5 Then
+                Console.WriteLine("A checkbox was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+                Exit While
+            End If
+        End While
+        Return Nothing
+    End Function
+    Private Function searchForms(opt As String, ByRef index As Integer)
+        While 1
+            Try
+                For Each frm In Application.OpenForms
+                    If frm.text.endswith(" Radio Buttons") Then
+                        For j = 0 To frm.check.count - 1
+                            If frm.check(j).text = opt Then
+                                index = j
+                                Return frm.check
+                            End If
+                        Next
+                    End If
+                Next
+            Catch ex As Exception
+                Console.WriteLine("findRadioForm failed.  The application list of forms changed while iterating.  Not critical.")
+            End Try
+            Application.DoEvents()
+            Static retryCount As Integer
+            retryCount += 1
+            If retryCount >= 5 Then
+                Console.WriteLine("A Radio button was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+                Exit While
+            End If
+        End While
+        Return Nothing
+    End Function
+    Public Function findRadio(opt As String) As RadioButton
+        Dim index As Integer
+        Dim radio = searchForms(opt, index)
+        If radio Is Nothing Then Return Nothing
+        Return radio(index)
+    End Function
+    Public Function findRadioText(ByRef radioList As List(Of RadioButton)) As String
+        For Each rad In radioList
+            If rad.Checked Then Return rad.Text
+        Next
+        Return radioList(0).Text
+    End Function
+    Public Function findRadioIndex(ByRef radioList As List(Of RadioButton)) As String
+        For i = 0 To radioList.Count - 1
+            If radioList(i).Checked Then Return i
+        Next
+        Return 0
+    End Function
+    Public Sub updateSettings()
+        Task.fpsRate = If(Task.frameCount < 30, 30, Task.fpsRate)
+        If Task.myStopWatch Is Nothing Then Task.myStopWatch = Stopwatch.StartNew()
+
+        ' update the time measures
+        Task.msWatch = Task.myStopWatch.ElapsedMilliseconds
+        quarterBeat()
+        If Task.frameCount = 0 Then Task.heartBeat = True
+        Dim frameDuration = 1000 / Task.fpsRate
+        Task.almostHeartBeat = If(Task.msWatch - Task.msLast + frameDuration * 1.5 > 1000, True, False)
+
+        If (Task.msWatch - Task.msLast) > 1000 Then
+            Task.msLast = Task.msWatch
+            Task.toggleOnOff = Not Task.toggleOnOff
+        End If
+
+        If Task.paused Then
+            Task.midHeartBeat = False
+            Task.almostHeartBeat = False
+        End If
+
+        Task.histogramBins = gOptions.HistBinSlider.Value
+        Task.lineWidth = gOptions.LineWidth.Value
+        Task.dotSize = gOptions.dotSizeSlider.Value
+
+        Task.maxZmeters = gOptions.MaxDepth.Value
+        Task.metersPerPixel = Task.maxZmeters / Task.workingRes.Height ' meters per pixel in projections - side and top.
+        Task.debugSyncUI = gOptions.debugSyncUI.Checked
+    End Sub
+    Public Function GetWindowImage(ByVal WindowHandle As IntPtr, ByVal rect As cv.Rect) As Bitmap
+        Dim b As New Bitmap(rect.Width, rect.Height, Imaging.PixelFormat.Format24bppRgb)
+
+        Using img As Graphics = Graphics.FromImage(b)
+            Dim ImageHDC As IntPtr = img.GetHdc
+            Try
+                Using window As Graphics = Graphics.FromHwnd(WindowHandle)
+                    Dim WindowHDC As IntPtr = window.GetHdc
+                    BitBlt(ImageHDC, 0, 0, rect.Width, rect.Height, WindowHDC, rect.X, rect.Y, CopyPixelOperation.SourceCopy)
+                    window.ReleaseHdc()
+                End Using
+                img.ReleaseHdc()
+            Catch ex As Exception
+                ' ignoring the error - they probably closed the OpenGL window.
+            End Try
+        End Using
+
+        Return b
+    End Function
+    <System.Runtime.CompilerServices.Extension()>
+    Public Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
+        Dim tempObj = thisObj
+        thisObj = withThisObj
+        withThisObj = tempObj
+    End Sub
+    Public Sub Swap(Of T)(ByRef a As T, ByRef b As T)
+        Dim temp = b
+        b = a
+        a = temp
+    End Sub
 End Module
 
 

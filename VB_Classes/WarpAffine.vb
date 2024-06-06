@@ -13,7 +13,7 @@ Public Class WarpAffine_Basics : Inherits VB_Parent
         options.RunVB()
 
         If standaloneTest() And task.heartBeat Then
-            Static angleSlider = findSlider("Angle")
+            Static angleSlider = FindSlider("Angle")
             rotateAngle = angleSlider.Value
             rotateCenter.X = msRNG.Next(0, dst2.Width)
             rotateCenter.Y = msRNG.Next(0, dst2.Height)

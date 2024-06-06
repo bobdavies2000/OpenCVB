@@ -62,7 +62,7 @@ Public Class Rectangle_Overlap : Inherits VB_Parent
     Public enclosingRect As cv.Rect
     Dim draw As New Rectangle_Basics
     Public Sub New()
-        findSlider("DrawCount").Value = 2
+        FindSlider("DrawCount").Value = 2
         desc = "Test if 2 rectangles overlap"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -134,12 +134,12 @@ Public Class Rectangle_Intersection : Inherits VB_Parent
         Return enclosing
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static mergeSlider = findSlider("Merge rectangles within X pixels")
+        Static mergeSlider = FindSlider("Merge rectangles within X pixels")
 
         If standaloneTest() Then
             If task.heartBeat Then
                 Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-                Static countSlider = findSlider("DrawCount")
+                Static countSlider = FindSlider("DrawCount")
 
                 rotatedCheck.Enabled = False
                 countSlider.Value = msRNG.Next(2, 10)
@@ -195,7 +195,7 @@ Public Class Rectangle_Union : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            Static countSlider = findSlider("DrawCount")
+            Static countSlider = FindSlider("DrawCount")
             Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             rotatedCheck.Enabled = False
             countSlider.Value = msRNG.Next(2, 10)
@@ -247,7 +247,7 @@ Public Class Rectangle_MultiOverlap : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
             Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-            Static countSlider = findSlider("DrawCount")
+            Static countSlider = FindSlider("DrawCount")
             rotatedCheck.Enabled = False
             countSlider.Value = msRNG.Next(2, 10)
 

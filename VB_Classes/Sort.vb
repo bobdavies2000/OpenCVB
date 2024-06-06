@@ -106,7 +106,7 @@ Public Class Sort_1Channel : Inherits VB_Parent
         desc = "Take some 1-channel input, sort it, and provide the list of unique elements"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Threshold for sort input")
+        Static thresholdSlider = FindSlider("Threshold for sort input")
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
@@ -163,7 +163,7 @@ Public Class Sort_3Channel : Inherits VB_Parent
         desc = "Take some 3-channel input, convert it to BGRA, sort it as integers, and provide the list of unique elements"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Threshold for sort input")
+        Static thresholdSlider = FindSlider("Threshold for sort input")
         Dim inputMask = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standaloneTest() Then inputMask = inputMask.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
 

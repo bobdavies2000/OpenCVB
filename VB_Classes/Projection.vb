@@ -155,7 +155,7 @@ Public Class Projection_Lines : Inherits VB_Parent
         desc = "Search for surfaces among the FeatureLess regions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Concentration threshold")
+        Static thresholdSlider = FindSlider("Concentration threshold")
         Static topCheck = findCheckBox("Top View (Unchecked Side View)")
         If task.heartBeat Then
             dst1.SetTo(0)
@@ -295,7 +295,7 @@ Public Class Projection_ObjectIsolate : Inherits VB_Parent
         desc = "Using the top down view, create a histogram for Y-values of the largest object."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static objSlider = findSlider("Index of object")
+        Static objSlider = FindSlider("Index of object")
         Dim index = objSlider.value
 
         top.Run(src)
@@ -369,7 +369,7 @@ Public Class Projection_Floor : Inherits VB_Parent
         desc = "Isolate just the floor."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static objSlider = findSlider("Index of object")
+        Static objSlider = FindSlider("Index of object")
         isolate.Run(src)
         dst2 = isolate.dst2
         dst3 = isolate.dst3

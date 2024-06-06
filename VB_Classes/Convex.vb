@@ -8,7 +8,7 @@ Public Class Convex_Basics : Inherits VB_Parent
         labels = {"", "", "Convex Hull - red dot is center and the black dots are the input points", ""}
     End Sub
     Public Function buildRandomHullPoints() As List(Of cv.Point)
-        Static hullSlider = findSlider("Hull random points")
+        Static hullSlider = FindSlider("Hull random points")
         Dim Count = hullSlider.Value
         Dim pad = 4
         Dim w = dst2.Width - dst2.Width / pad

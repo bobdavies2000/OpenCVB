@@ -9,7 +9,7 @@ Public Class RecursiveBilateralFilter_CPP : Inherits VB_Parent
         desc = "Apply the recursive bilateral filter"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static countSlider = findSlider("RBF Recursion count")
+        Static countSlider = FindSlider("RBF Recursion count")
         If dataSrc.Length <> src.Total * src.ElemSize Then ReDim dataSrc(src.Total * src.ElemSize - 1)
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)

@@ -76,7 +76,7 @@ End Module
 Public Class Hough_Circles : Inherits VB_Parent
     Dim circles As New Draw_Circles
     Public Sub New()
-        findSlider("DrawCount").Value = 3
+        FindSlider("DrawCount").Value = 3
         labels(2) = "Input circles to Hough"
         labels(3) = "Hough Circles found"
         desc = "Find circles using HoughCircles."
@@ -206,7 +206,7 @@ Public Class Hough_FeatureLessTopX : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Static segSlider = findSlider("Minimum feature pixels")
+        Static segSlider = FindSlider("Minimum feature pixels")
         Dim minSegments = segSlider.Value
         edges.Run(src)
 

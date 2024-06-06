@@ -16,7 +16,7 @@ Public Class Rotate_Basics : Inherits VB_Parent
         desc = "Rotate a rectangle by a specified angle"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static angleSlider = findSlider("Rotation Angle in degrees")
+        Static angleSlider = FindSlider("Rotation Angle in degrees")
         rotateAngle = angleSlider.Value
         options.RunVB()
 
@@ -213,7 +213,7 @@ Public Class Rotate_Horizon : Inherits VB_Parent
     Dim rotate As New Rotate_Basics
     Dim edges As New CameraMotion_WithRotation
     Public Sub New()
-        findSlider("Rotation Angle in degrees").Value = 3
+        FindSlider("Rotation Angle in degrees").Value = 3
         labels(2) = "White is the current horizon vector of the camera.  Highlighted color is the rotated horizon vector."
         desc = "Rotate the horizon independently from the rotation of the image to validate the Edge_CameraMotion algorithm."
     End Sub
@@ -235,7 +235,7 @@ Public Class Rotate_Horizon : Inherits VB_Parent
         Return New cv.Point2f(xNew, yNew)
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static angleSlider = findSlider("Rotation Angle in degrees")
+        Static angleSlider = FindSlider("Rotation Angle in degrees")
         rotate.rotateAngle = angleSlider.Value
 
         rotate.Run(src)

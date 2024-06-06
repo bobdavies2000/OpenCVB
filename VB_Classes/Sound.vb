@@ -148,11 +148,11 @@ Public Class Sound_SignalGenerator : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If task.testAllRunning Then Exit Sub ' there have been some failures in player.Init below when running during a test all.  Skip so testing can proceed.
         Static radioIndex As Integer
-        Static wgenSlider = findSlider("Sine Wave Frequency")
-        Static DecibelSlider = findSlider("Decibels")
-        Static endSweepSlider = findSlider("Sweep Only - End Frequency")
-        Static sweepDurationSlider = findSlider("Sweep Only - duration secs")
-        Static retainSlider = findSlider("Retain Data for x seconds")
+        Static wgenSlider = FindSlider("Sine Wave Frequency")
+        Static DecibelSlider = FindSlider("Decibels")
+        Static endSweepSlider = FindSlider("Sweep Only - End Frequency")
+        Static sweepDurationSlider = FindSlider("Sweep Only - duration secs")
+        Static retainSlider = FindSlider("Retain Data for x seconds")
         Static saveRadioIndex = -1
         Static reverse0Check = findCheckBox("PhaseReverse Left")
         Static reverse1Check = findCheckBox("PhaseReverse Right")

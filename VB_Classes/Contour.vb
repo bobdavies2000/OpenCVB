@@ -186,8 +186,8 @@ Public Class Contour_RemoveLines : Inherits VB_Parent
         desc = "Remove the lines from an invoice image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static morphSlider = findSlider("Morphology width/height")
-        Static morphExSlider = findSlider("MorphologyEx iterations")
+        Static morphSlider = FindSlider("Morphology width/height")
+        Static morphExSlider = FindSlider("MorphologyEx iterations")
         Dim tmp = cv.Cv2.ImRead(task.homeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
         Dim dstRect = New cv.Rect(0, 0, dstSize.Width, src.Height)
@@ -812,7 +812,7 @@ End Class
 Public Class Contour_WholeImage : Inherits VB_Parent
     Dim contour As New Contour_Basics
     Public Sub New()
-        findSlider("Max contours").Value = 20
+        FindSlider("Max contours").Value = 20
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find the top X contours by size and display them."
     End Sub

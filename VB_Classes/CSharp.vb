@@ -23,7 +23,7 @@ Imports cv = OpenCvSharp
 '        desc = "Smooth each pixel with a Gaussian kernel of different sizes."
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
-'        Static blurKernelSlider = findSlider("Blur Kernel Size")
+'        Static blurKernelSlider = FindSlider("Blur Kernel Size")
 '        CS_BlurGaussian.RunCS(src, dst2, blurKernelSlider.Value Or 1)
 '    End Sub
 'End Class
@@ -40,7 +40,7 @@ Imports cv = OpenCvSharp
 '        desc = "Replace each pixel with the median of neighborhood of varying sizes."
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
-'        Static blurKernelSlider = findSlider("Blur Kernel Size")
+'        Static blurKernelSlider = FindSlider("Blur Kernel Size")
 '        CS_BlurMedian.RunCS(src, dst2, blurKernelSlider.Value Or 1)
 '    End Sub
 'End Class
@@ -109,8 +109,8 @@ Imports cv = OpenCvSharp
 '        desc = "Match keypoints in the left and right images but display it as movement in the right image."
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
-'        Static maxSlider = findSlider("Max number of points to match")
-'        Static distSlider = findSlider("When matching, max possible distance")
+'        Static maxSlider = FindSlider("Max number of points to match")
+'        Static distSlider = FindSlider("When matching, max possible distance")
 
 '        CS_KazeLeft.GetKeypoints(task.leftView)
 '        CS_KazeRight.GetKeypoints(task.rightView)
@@ -241,9 +241,9 @@ Imports cv = OpenCvSharp
 '        End If
 '    End Sub
 '    Public Sub RunVB()
-'        Static minSlider = findSlider("min Threshold")
-'        Static maxSlider = findSlider("max Threshold")
-'        Static stepSlider = findSlider("Threshold Step")
+'        Static minSlider = FindSlider("min Threshold")
+'        Static maxSlider = FindSlider("max Threshold")
+'        Static stepSlider = FindSlider("Threshold Step")
 '        Static areaRadio = findRadio("FilterByArea")
 '        Static circRadio = findRadio("FilterByCircularity")
 '        Static convexRadio = findRadio("FilterByConvexity")
@@ -302,11 +302,11 @@ Imports cv = OpenCvSharp
 '    Dim numPointSlider As System.Windows.Forms.TrackBar
 '    Dim grid As New Grid_Rectangles
 '    Public Sub New()
-'        findSlider("Grid Cell Width").Maximum = dst2.Cols * 2
-'        findSlider("Grid Cell Width").Value = dst2.Cols * 2
-'        findSlider("Grid Cell Height").Value = 10
+'        FindSlider("Grid Cell Width").Maximum = dst2.Cols * 2
+'        FindSlider("Grid Cell Width").Value = dst2.Cols * 2
+'        FindSlider("Grid Cell Height").Value = 10
 
-'        numPointSlider = findSlider("Points to Match")
+'        numPointSlider = FindSlider("Points to Match")
 '        numPointSlider.Value = 1
 
 '        desc = "Compare 2 images to get a homography.  We will use left and right images - needs more work"
@@ -394,7 +394,7 @@ Imports cv = OpenCvSharp
 '    Dim siftCS As New CS_Classes.CS_SiftBasics
 '    Dim options As New Options_Sift
 '    Public Sub New()
-'        findSlider("Points to Match").Value = 1
+'        FindSlider("Points to Match").Value = 1
 '        desc = "Compare 2 images to get a homography but limit the search to a slice of the image."
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
@@ -731,7 +731,7 @@ Imports cv = OpenCvSharp
 '    desc = "Implement the Sieve of Eratothenes in C#"
 'End Sub
 'Public Sub RunVB(src As cv.Mat)
-'    Static countSlider = findSlider("Count of desired primes")
+'    Static countSlider = FindSlider("Count of desired primes")
 '    setTrueText(printer.shareResults(sieve.GetPrimeNumbers(countSlider.Value)))
 'End Sub
 'End Class
@@ -757,8 +757,8 @@ Imports cv = OpenCvSharp
 '        desc = "Segmented Linear Regression example"
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
-'        Static toleranceSlider = findSlider("Approximate accuracy (tolerance) X100")
-'        Static movingAvgSlider = findSlider("Simple moving average window size")
+'        Static toleranceSlider = FindSlider("Approximate accuracy (tolerance) X100")
+'        Static movingAvgSlider = FindSlider("Simple moving average window size")
 '        Dim tolerance = toleranceSlider.Value / 100
 '        Dim halfLength = movingAvgSlider.Value
 
@@ -878,7 +878,7 @@ Imports cv = OpenCvSharp
 '    Public random As New Random_Basics
 '    Public Sub New()
 '        labels(2) = "Ordered list output for Voronoi algorithm"
-'        findSlider("Random Pixel Count").Maximum = 100
+'        FindSlider("Random Pixel Count").Maximum = 100
 '        desc = "Use the ordered list method to find the Voronoi segments"
 '    End Sub
 '    Public Sub vDisplay(ByRef dst As cv.Mat, points As List(Of cv.Point2f), color As cv.Scalar)
@@ -906,8 +906,8 @@ Imports cv = OpenCvSharp
 '    Dim basics As New Voronoi_Basics
 '    Public random As New Random_Basics
 '    Public Sub New()
-'        findSlider("Random Pixel Count").Maximum = 150
-'        findSlider("Random Pixel Count").Value = 150
+'        FindSlider("Random Pixel Count").Maximum = 150
+'        FindSlider("Random Pixel Count").Value = 150
 '        labels = {"", "", "Brute Force method - check log timings", "Ordered List method - check log for timing"}
 '        desc = "C# implementations of the BruteForce and OrderedList Voronoi algorithms"
 '    End Sub
@@ -933,7 +933,7 @@ Imports cv = OpenCvSharp
 '        desc = "Use the C++ version of the Voronoi code"
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
-'        Static countSlider = findSlider("Random Pixel Count")
+'        Static countSlider = FindSlider("Random Pixel Count")
 '        If task.heartBeat Then vDemo.random.Run(empty)
 '        Dim ptList = vbFloat2Int(vDemo.random.pointList)
 '        Dim handleSrc = GCHandle.Alloc(ptList.ToArray, GCHandleType.Pinned)

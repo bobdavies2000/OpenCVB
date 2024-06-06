@@ -55,7 +55,7 @@ End Class
 Public Class FeatureROI_Color : Inherits VB_Parent
     Dim addw As New AddWeighted_Basics
     Public Sub New()
-        findSlider("Add Weighted %").Value = 70
+        FindSlider("Add Weighted %").Value = 70
         gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
@@ -240,7 +240,7 @@ Public Class FeatureROI_Correlation : Inherits VB_Parent
     Dim plot As New Plot_OverTimeSingle
     Dim options As New Options_Features
     Public Sub New()
-        findSlider("Feature Correlation Threshold").Value = 90
+        FindSlider("Feature Correlation Threshold").Value = 90
         desc = "Use the grid-based correlations with the previous image to determine if there was camera motion"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -312,7 +312,7 @@ Public Class FeatureROI_LowStdevCorrelation : Inherits VB_Parent
     Dim correlations As New List(Of Single)
     Dim options As New Options_Features
     Public Sub New()
-        findSlider("Feature Correlation Threshold").Value = 50
+        FindSlider("Feature Correlation Threshold").Value = 50
         desc = "Display the correlation coefficients for roi's with low standard deviation."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -388,7 +388,7 @@ Public Class FeatureROI_LRClick : Inherits VB_Parent
     Dim options As New Options_Features
     Public Sub New()
         gOptions.GridSize.Value = 16
-        findSlider("Feature Correlation Threshold").Value = 80
+        FindSlider("Feature Correlation Threshold").Value = 80
         If standalone Then gOptions.displayDst0.Checked = True
         If standalone Then gOptions.displayDst1.Checked = True
         labels(2) = "Click the above average stdev roi's (the darker regions) to find corresponding roi in the right image."
@@ -469,7 +469,7 @@ Public Class FeatureROI_LRAll : Inherits VB_Parent
     Public sortedRects As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
     Public Sub New()
         gOptions.GridSize.Value = 16
-        findSlider("Feature Correlation Threshold").Value = 95
+        FindSlider("Feature Correlation Threshold").Value = 95
         labels(3) = "The highlighted roi's are those high stdev roi's with the highest correlation between left and right images."
         desc = "Find all the roi's with high stdev and high correlation between left and right images."
     End Sub

@@ -8,7 +8,7 @@ Public Class Blob_Input : Inherits VB_Parent
     Public Mats As New Mat_4Click
     Public updateFrequency = 30
     Public Sub New()
-        findSlider("DrawCount").Value = 5
+        FindSlider("DrawCount").Value = 5
         findCheckBox("Draw filled (unchecked draw an outline)").Checked = True
 
         Mats.mats.lineSeparators = False

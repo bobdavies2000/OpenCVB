@@ -135,7 +135,7 @@ Public Class Plane_FloorStudy : Inherits VB_Parent
         desc = "Find the floor plane (if present)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Pixel Count threshold that indicates floor")
+        Static thresholdSlider = FindSlider("Pixel Count threshold that indicates floor")
         slice.Run(src)
         dst1 = slice.dst3
 

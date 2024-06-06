@@ -8,7 +8,7 @@ Public Class Cluster_Basics : Inherits VB_Parent
     Public clusters As New SortedList(Of Integer, List(Of cv.Point))
     Dim feat As New Feature_Basics
     Public Sub New()
-        findSlider("Min Distance to next").Value = 10
+        FindSlider("Min Distance to next").Value = 10
         desc = "Group the points based on their proximity to each other."
     End Sub
     Public Sub RunVB(src As cv.Mat)

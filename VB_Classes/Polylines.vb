@@ -10,7 +10,7 @@ Public Class Polylines_IEnumerableExample : Inherits VB_Parent
         desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static countSlider = findSlider("Polyline Count")
+        Static countSlider = FindSlider("Polyline Count")
         Static closeCheck = findCheckBox("Polyline closed if checked")
         Dim points = Enumerable.Range(0, countSlider.Value).Select(Of cv.Point)(
             Function(i)

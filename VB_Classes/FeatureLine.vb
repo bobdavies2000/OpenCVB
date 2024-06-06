@@ -203,7 +203,7 @@ Public Class FeatureLine_Tutorial2 : Inherits VB_Parent
         desc = "Find all the lines in the image and determine which are vertical and horizontal"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static kernelSlider = findSlider("Area kernel size for depth")
+        Static kernelSlider = FindSlider("Area kernel size for depth")
         Dim k = kernelSlider.Value - 1
         Dim kernel = kernelSlider.Value * 2 - 1
 
@@ -407,8 +407,8 @@ Public Class FeatureLine_Finder : Inherits VB_Parent
         desc = "Find all the lines in the image and determine which are vertical and horizontal"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static angleSlider = findSlider("Angle tolerance in degrees")
-        Static kernelSlider = findSlider("Area kernel size for depth")
+        Static angleSlider = FindSlider("Angle tolerance in degrees")
+        Static kernelSlider = FindSlider("Area kernel size for depth")
         Dim tolerance = angleSlider.Value
         Dim k = kernelSlider.Value - 1
         Dim kernel = kernelSlider.Value * 2 - 1

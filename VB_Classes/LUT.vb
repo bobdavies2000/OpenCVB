@@ -195,12 +195,12 @@ Public Class LUT_Custom : Inherits VB_Parent
     Dim gradMap As New Palette_RandomColorMap
     Public colorMap As cv.Mat
     Public Sub New()
-        findSlider("Color transitions").Value = 5
+        FindSlider("Color transitions").Value = 5
         labels(3) = "Custom Color Lookup Table"
         desc = "Use a palette to provide the lookup table for LUT"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static colorSlider = findSlider("Color transitions")
+        Static colorSlider = FindSlider("Color transitions")
         Static saveColorCount = -1
         If task.optionsChanged Or task.heartBeat Then
             If saveColorCount = 20 Then colorSlider.Value = 5 Else colorSlider.Value += 1
@@ -250,7 +250,7 @@ Public Class LUT_Create : Inherits VB_Parent
         desc = "Create a LUT table that can map similar pixels to the same exact pixel."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static diffSlider = findSlider("LUT entry diff threshold")
+        Static diffSlider = FindSlider("LUT entry diff threshold")
         Dim threshold = diffSlider.value
 
         Dim split = src.Split()

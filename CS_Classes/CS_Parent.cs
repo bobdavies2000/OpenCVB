@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using VB_Classes;
 using cv = OpenCvSharp;
 using OpenCvSharp;
+using System.Windows.Forms;
 
 namespace CS_Classes
 {
@@ -97,6 +98,17 @@ namespace CS_Classes
             dst.Circle(pt, radius, color, -1, task.lineType);
         }
 
+        public void DrawRotatedRectangle(RotatedRect rotatedRect, Mat dst, Scalar color)
+        {
+            Point2f[] vertices2f = rotatedRect.Points();
+            Point[] vertices = new Point[vertices2f.Length];
+            for (int j = 0; j < vertices2f.Length; j++)
+            {
+                vertices[j] = new Point((int)vertices2f[j].X, (int)vertices2f[j].Y);
+            }
+            dst.FillConvexPoly(vertices, color, LineTypes.Link8);
+        }
+
         public void processFrame(Mat src)
         {
             task.labels = labels;
@@ -126,6 +138,34 @@ namespace CS_Classes
             Point pt = new Point(0, 0);
             trueText str = new trueText(text, pt, picTag);
             trueData.Add(str);
+        }
+        public TrackBar FindSlider(string opt)
+        {
+            try
+            {
+                foreach (Form frm in Application.OpenForms)
+                {
+                    if (frm.Text.EndsWith(" Sliders"))
+                    {
+                        var trackbars = frm.Controls.OfType<TrackBar>().ToList();
+                        var sLabels = frm.Controls.OfType<Label>().ToList();
+
+                        for (int j = 0; j < trackbars.Count; j++)
+                        {
+                            if (sLabels[j].Text.StartsWith(opt))
+                            {
+                                return trackbars[j];
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("FindSlider failed. The application list of forms changed while iterating. Not critical." + ex.Message);
+            }
+            Console.WriteLine("A slider was not found!\n\nReview the \n\n'" + opt + "' request ");
+            return null;
         }
     }
 

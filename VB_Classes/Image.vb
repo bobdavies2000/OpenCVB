@@ -201,8 +201,8 @@ Public Class Image_MSER : Inherits VB_Parent
             check.addCheckBox("Load the next image")
         End If
 
-        findSlider("MSER Min Area").Value = 15
-        findSlider("MSER Max Area").Value = 200000
+        FindSlider("MSER Min Area").Value = 15
+        FindSlider("MSER Max Area").Value = 200000
         desc = "Find the MSER (Maximally Stable Extermal Regions) in the still image."
     End Sub
     Public Sub RunVB(src As cv.Mat)

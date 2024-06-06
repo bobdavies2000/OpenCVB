@@ -213,7 +213,6 @@
     <Compile Include="Thickness.vb" />
     <Compile Include="Threading.vb" />
     <Compile Include="Triangle.vb" />
-    <Compile Include="VB_Utilities.vb" />
     <Compile Include="Vignetting.vb" />
     <Compile Include="DLib.vb" />
     <Compile Include="Download.vb" />

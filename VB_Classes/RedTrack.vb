@@ -166,7 +166,7 @@ Public Class RedTrack_GoodCell : Inherits VB_Parent
     Dim good As New RedTrack_GoodCellInput
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
-        findSlider("Feature Sample Size").Value = 100
+        FindSlider("Feature Sample Size").Value = 100
         desc = "Track the cells that have good features"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -235,7 +235,7 @@ Public Class RedTrack_GoodCellInput : Inherits VB_Parent
         desc = "Use KNN to find good features to track"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static distSlider = findSlider("Max feature travel distance")
+        Static distSlider = FindSlider("Max feature travel distance")
         Dim maxDistance = distSlider.Value
 
         feat.Run(src)

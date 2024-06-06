@@ -114,11 +114,11 @@ Public Class CellularAutomata_Life : Inherits VB_Parent
         grid = New cv.Mat(dst2.Height / factor, dst2.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
         random.range = New cv.Rect(0, 0, grid.Width, grid.Height)
-        findSlider("Random Pixel Count").Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
+        FindSlider("Random Pixel Count").Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         desc = "Use OpenCV to implement the Game of Life"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static randomSlider = findSlider("Random Pixel Count")
+        Static randomSlider = FindSlider("Random Pixel Count")
         Static savePointCount As Integer
         If randomSlider.Value <> savePointCount Or generation = 0 Then
             random.Run(empty)
@@ -288,7 +288,7 @@ Public Class CellularAutomata_All256 : Inherits VB_Parent
         Return outstr
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static ruleSlider = findSlider("Current Rule")
+        Static ruleSlider = FindSlider("Current Rule")
         Static rotateRules = findCheckBox("Rotate through the different rules")
         Dim index = ruleSlider.Value
 

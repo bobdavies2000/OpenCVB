@@ -8,7 +8,7 @@ Public Class ORB_Basics : Inherits VB_Parent
         desc = "Find keypoints using ORB - Oriented Fast and Rotated BRIEF"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static countSlider = findSlider("ORB - desired point count")
+        Static countSlider = FindSlider("ORB - desired point count")
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         orb = cv.ORB.Create(countSlider.Value)
         keypoints = orb.Detect(src)

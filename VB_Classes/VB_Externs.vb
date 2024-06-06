@@ -1,6 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text
+Imports System.Drawing
 
 Module VB_Externs
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -1201,4 +1202,34 @@ Module VB_Externs
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function xPhoto_Inpaint_Run(xPhoto_Inpaint_Ptr As IntPtr, bgrPtr As IntPtr, maskPtr As IntPtr, rows As Integer, cols As Integer, iType As Integer) As IntPtr
     End Function
+
+
+    <DllImport("gdi32.dll")>
+    Public Function BitBlt(ByVal hdc As IntPtr, ByVal nXDest As Integer, ByVal nYDest As Integer, ByVal nWidth As Integer, ByVal nHeight As Integer,
+                        ByVal hdcSrc As IntPtr, ByVal nXSrc As Integer, ByVal nYSrc As Integer, ByVal dwRop As CopyPixelOperation) As Boolean
+    End Function
+
+    <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
+    Public Function FindWindow(ByVal lpClassName As String, ByVal lpWindowName As String) As IntPtr
+    End Function
+
+    <DllImport("user32.dll")>
+    Public Function SetForegroundWindow(ByVal hWnd As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
+    End Function
+
+    Public Declare Auto Function MoveWindow Lib "user32.dll" (ByVal hWnd As IntPtr, ByVal X As Int32, ByVal Y As Int32, ByVal nWidth As Int32,
+                                                              ByVal nHeight As Int32, ByVal bRepaint As Boolean) As Boolean
+
+    Public Declare Function GetWindowRect Lib "user32" (ByVal HWND As Integer, ByRef lpRect As RECT) As Integer
+    <StructLayout(LayoutKind.Sequential)> Public Structure RECT
+        Dim Left As Integer
+        Dim Top As Integer
+        Dim Right As Integer
+        Dim Bottom As Integer
+    End Structure
+    <DllImport("user32.dll", SetLastError:=True)>
+    Public Function SetWindowPos(ByVal hWnd As IntPtr, ByVal hWndInsertAfter As IntPtr, ByVal X As Integer, ByVal Y As Integer,
+                                  ByVal cx As Integer, ByVal cy As Integer, ByVal uFlags As UInteger) As Boolean
+    End Function
+
 End Module

@@ -159,7 +159,7 @@ Public Class OpenGL_BasicsSliders : Inherits VB_Parent
     Public pointCloudInput As cv.Mat
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Basics"
-        findSlider("OpenGL FOV").Value = 150
+        FindSlider("OpenGL FOV").Value = 150
         desc = "Show the OpenGL point cloud with sliders support."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -710,7 +710,7 @@ Public Class OpenGL_FlatStudy3 : Inherits VB_Parent
         desc = "Create an OpenGL display where the floor is built as a quad"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
+        Static cushionSlider = FindSlider("Structured Depth slice thickness in pixels")
 
         plane.Run(src)
         dst2 = plane.dst2
@@ -885,7 +885,7 @@ Public Class OpenGL_Sierpinski : Inherits VB_Parent
     Public Sub New()
         task.ogl.oglFunction = oCase.sierpinski
         task.OpenGLTitle = "OpenGL_Functions"
-        findSlider("OpenGL Point Size").Value = 3
+        FindSlider("OpenGL Point Size").Value = 3
         desc = "Draw the Sierpinski triangle pattern in OpenGL"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -966,7 +966,7 @@ Public Class OpenGL_Contours : Inherits VB_Parent
     Public Sub New()
         task.ogl.oglFunction = oCase.drawCells
         task.OpenGLTitle = "OpenGL_Functions"
-        findSlider("OpenGL shift fwd/back (Z-axis)").Value = -150
+        FindSlider("OpenGL shift fwd/back (Z-axis)").Value = -150
         labels = {"", "", "Output of RedCloud", "OpenGL snapshot"}
         desc = "Draw all the RedCloud contours in OpenGL with various settings."
     End Sub
@@ -1032,7 +1032,7 @@ Public Class OpenGL_PCLineCandidates : Inherits VB_Parent
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPointsAlone
         task.OpenGLTitle = "OpenGL_Functions"
-        findSlider("OpenGL Point Size").Value = 10
+        FindSlider("OpenGL Point Size").Value = 10
         desc = "Display the output of the PointCloud_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1057,7 +1057,7 @@ Public Class OpenGL_PClinesFirstLast : Inherits VB_Parent
     Public Sub New()
         task.ogl.oglFunction = oCase.pcLines
         task.OpenGLTitle = "OpenGL_Functions"
-        findSlider("OpenGL Point Size").Value = 10
+        FindSlider("OpenGL Point Size").Value = 10
         desc = "Draw the 3D lines found from the PCpoints"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1082,7 +1082,7 @@ Public Class OpenGL_PClinesAll : Inherits VB_Parent
     Public Sub New()
         task.ogl.oglFunction = oCase.pcLines
         task.OpenGLTitle = "OpenGL_Functions"
-        findSlider("OpenGL Point Size").Value = 10
+        FindSlider("OpenGL Point Size").Value = 10
         desc = "Draw the 3D lines found from the PCpoints"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1132,7 +1132,7 @@ Public Class OpenGL_PCpoints : Inherits VB_Parent
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
         task.OpenGLTitle = "OpenGL_Functions"
-        findSlider("OpenGL Point Size").Value = 10
+        FindSlider("OpenGL Point Size").Value = 10
         desc = "Display the output of the PointCloud_Points"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1159,7 +1159,7 @@ Public Class OpenGL_PCpointsPlane : Inherits VB_Parent
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
         task.OpenGLTitle = "OpenGL_Functions"
-        findSlider("OpenGL Point Size").Value = 10
+        FindSlider("OpenGL Point Size").Value = 10
         desc = "Display the points that are likely to be in a plane - found by both the vertical and horizontal searches"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1182,7 +1182,7 @@ Public Class OpenGL_PlaneClusters3D : Inherits VB_Parent
     Dim eq As New Plane_Equation
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
-        findSlider("OpenGL Point Size").Value = 10
+        FindSlider("OpenGL Point Size").Value = 10
         labels(3) = "Only the cells with a high probability plane are presented - blue on X-axis, green on Y-axis, red on Z-axis"
         desc = "Cluster the plane equations to find major planes in the image and display the clusters in OpenGL"
     End Sub
@@ -1289,9 +1289,9 @@ Public Class OpenGL_ProfileSweep : Inherits VB_Parent
         End If
 
         Dim bump = 1
-        Static xRotateSlider = findSlider("Rotate pointcloud around X-axis (degrees)")
-        Static yRotateSlider = findSlider("Rotate pointcloud around Y-axis (degrees)")
-        Static zRotateSlider = findSlider("Rotate pointcloud around Z-axis (degrees)")
+        Static xRotateSlider = FindSlider("Rotate pointcloud around X-axis (degrees)")
+        Static yRotateSlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
+        Static zRotateSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)")
         ' NOTE: the z and x sliders are switched on purpose.
         Select Case testCase
             Case 0
@@ -2087,7 +2087,7 @@ Public Class OpenGL_ColorReduced3D : Inherits VB_Parent
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
-        findSlider("OpenGL Point Size").Value = 20
+        FindSlider("OpenGL Point Size").Value = 20
         desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)"
     End Sub
     Public Sub RunVB(src As cv.Mat)

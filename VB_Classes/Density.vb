@@ -8,7 +8,7 @@ Public Class Density_Basics : Inherits VB_Parent
         desc = "Isolate points in 3D using the distance to the 8 neighboring points in the pointcloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static distSlider = findSlider("Distance in meters X10000")
+        Static distSlider = FindSlider("Distance in meters X10000")
         Dim distance As Single = distSlider.value / 10000
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
@@ -58,7 +58,7 @@ Public Class Density_Count_CPP : Inherits VB_Parent
         desc = "Isolate points in 3D by counting 8 neighboring Z points in the pointcloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static distSlider = findSlider("Neighboring Z count")
+        Static distSlider = FindSlider("Neighboring Z count")
         Dim zCount As Integer = distSlider.value
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)

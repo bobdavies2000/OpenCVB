@@ -11,7 +11,7 @@ Public Class CComp_Basics : Inherits VB_Parent
         desc = "Draw bounding boxes around BGR binarized connected Components"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("CComp threshold")
+        Static thresholdSlider = FindSlider("CComp threshold")
 
         Static lastImage As cv.Mat
         rects.Clear()

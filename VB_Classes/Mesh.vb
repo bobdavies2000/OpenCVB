@@ -7,7 +7,7 @@ Public Class Mesh_Basics : Inherits VB_Parent
         desc = "Build triangles from the ptList input of points."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static nabeSlider = findSlider("Number of nearest neighbors")
+        Static nabeSlider = FindSlider("Number of nearest neighbors")
         Dim nabeCount = nabeSlider.value
         dst2 = src
         If task.heartBeat And standaloneTest() Then
@@ -49,7 +49,7 @@ Public Class Mesh_Features : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Dim mesh As New Mesh_Basics
     Public Sub New()
-        findSlider("Min Distance to next").Value = 10
+        FindSlider("Min Distance to next").Value = 10
         labels(2) = "Triangles built with each feature point and the specified number of nearest neighbors."
         vbAddAdvice(traceName + ": Use 'Options_Features' to update results.")
         desc = "Build triangles from feature points"

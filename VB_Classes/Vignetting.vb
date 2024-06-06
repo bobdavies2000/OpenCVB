@@ -10,7 +10,7 @@ Public Class Vignetting_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static center As New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        Static radiusSlider = findSlider("Vignette radius X100")
+        Static radiusSlider = FindSlider("Vignette radius X100")
 
         If task.clickPoint <> New cv.Point Then center = task.clickPoint
 
@@ -47,7 +47,7 @@ Public Class Vignetting_VB : Inherits VB_Parent
     End Function
     Public Sub RunVB(src as cv.Mat)
         Static center As New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        Static factorSlider = findSlider("Vignette radius X100")
+        Static factorSlider = FindSlider("Vignette radius X100")
 
         If task.clickPoint <> New cv.Point Then center = task.clickPoint
         Dim maxDist = New cv.Point(0, 0).DistanceTo(center) * factorSlider.Value / 100

@@ -13,8 +13,8 @@ Public Class PhotoShop_Clahe : Inherits VB_Parent
         desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static clipSlider = findSlider("Clip Limit")
-        Static gridSlider = findSlider("Grid Size")
+        Static clipSlider = FindSlider("Clip Limit")
+        Static gridSlider = FindSlider("Grid Size")
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src
         Dim claheObj = cv.Cv2.CreateCLAHE()
@@ -57,8 +57,8 @@ Public Class PhotoShop_AlphaBeta : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static alphaSlider = findSlider("Alpha (contrast)")
-        Static betaSlider = findSlider("Brightness Beta")
+        Static alphaSlider = FindSlider("Alpha (contrast)")
+        Static betaSlider = FindSlider("Brightness Beta")
         dst2 = src.ConvertScaleAbs(alphaSlider.Value / 500, betaSlider.Value)
     End Sub
 End Class
@@ -77,7 +77,7 @@ Public Class PhotoShop_Gamma : Inherits VB_Parent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Brightness Gamma correction", 0, 200, 100)
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static gammaSlider = findSlider("Brightness Gamma correction")
+        Static gammaSlider = FindSlider("Brightness Gamma correction")
         Static lastGamma As Integer = -1
         If lastGamma <> gammaSlider.Value Then
             lastGamma = gammaSlider.Value
@@ -103,7 +103,7 @@ Public Class PhotoShop_WhiteBalance : Inherits VB_Parent
         desc = "Automate getting the right white balance"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static thresholdSlider = findSlider("White balance threshold X100")
+        Static thresholdSlider = FindSlider("White balance threshold X100")
         Dim thresholdVal As Single = thresholdSlider.Value / 100
 
         Dim rgbData(src.Total * src.ElemSize - 1) As Byte
@@ -140,7 +140,7 @@ Public Class PhotoShop_WhiteBalancePlot : Inherits VB_Parent
         desc = "Automate getting the right white balance"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static thresholdSlider = findSlider("White balance threshold X100")
+        Static thresholdSlider = FindSlider("White balance threshold X100")
         Dim thresholdVal = thresholdSlider.Value / 100
 
         Dim rgb32f As New cv.Mat
@@ -187,7 +187,7 @@ End Class
 Public Class PhotoShop_ChangeMask : Inherits VB_Parent
     Dim whiteBal As New PhotoShop_WhiteBalance
     Public Sub New()
-        findSlider("White balance threshold X100").Value = 3
+        FindSlider("White balance threshold X100").Value = 3
         desc = "Create a mask for the changed pixels after white balance"
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -288,7 +288,7 @@ Public Class PhotoShop_Emboss : Inherits VB_Parent
         Return kernel
     End Function
     Public Sub RunVB(src as cv.Mat)
-        Static sizeSlider = findSlider("Emboss Kernel Size")
+        Static sizeSlider = FindSlider("Emboss Kernel Size")
         Dim kernel = kernelGenerator(sizeSlider.Value)
 
         Dim direction As Integer
@@ -328,7 +328,7 @@ Public Class PhotoShop_EmbossAll : Inherits VB_Parent
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Emboss threshold", 0, 255, 200)
         End If
-        sizeSlider = findSlider("Emboss Kernel Size")
+        sizeSlider = FindSlider("Emboss Kernel Size")
         sizeSlider.Value = 5
 
         labels(2) = "The combination of all angles"
@@ -336,7 +336,7 @@ Public Class PhotoShop_EmbossAll : Inherits VB_Parent
         desc = "Emboss using all the directions provided"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static threshSlider = findSlider("Emboss threshold")
+        Static threshSlider = FindSlider("Emboss threshold")
         Dim kernel = emboss.kernelGenerator(sizeSlider.Value)
 
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -398,7 +398,7 @@ Public Class PhotoShop_DuoTone : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         Static duoCheck = findCheckBox("DuoTone Dark if checked, Light otherwise")
         options.RunVB()
-        Static expSlider = findSlider("DuoTone Exponent")
+        Static expSlider = FindSlider("DuoTone Exponent")
         Dim exp = 1 + expSlider.Value / 100
         Dim expMat As New cv.Mat(256, 1, cv.MatType.CV_8U)
         Dim expDark As New cv.Mat(256, 1, cv.MatType.CV_8U)
@@ -444,9 +444,9 @@ Public Class PhotoShop_UnsharpMask : Inherits VB_Parent
         labels(3) = "Unsharp mask (difference from Blur)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static sigmaSlider = findSlider("sigma")
-        Static thresholdSlider = findSlider("Photoshop Threshold")
-        Static shiftSlider = findSlider("Shift Amount")
+        Static sigmaSlider = FindSlider("sigma")
+        Static thresholdSlider = FindSlider("Photoshop Threshold")
+        Static shiftSlider = FindSlider("Shift Amount")
 
         Dim blurred As New cv.Mat
         Dim amount As Double = shiftSlider.Value / 1000
@@ -475,8 +475,8 @@ Public Class PhotoShop_SharpenDetail : Inherits VB_Parent
         desc = "Enhance detail on an image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static sSigmaSlider = findSlider("DetailEnhance Sigma_s")
-        Static rSigmaSlider = findSlider("DetailEnhance Sigma_r X100")
+        Static sSigmaSlider = FindSlider("DetailEnhance Sigma_s")
+        Static rSigmaSlider = FindSlider("DetailEnhance Sigma_r X100")
         cv.Cv2.DetailEnhance(src, dst2, sSigmaSlider.Value, rSigmaSlider.Value / rSigmaSlider.Maximum)
     End Sub
 End Class
@@ -497,8 +497,8 @@ Public Class PhotoShop_SharpenStylize : Inherits VB_Parent
         desc = "Stylize an image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static sSlider = findSlider("Stylize Sigma_s")
-        Static rSlider = findSlider("Stylize Sigma_r X100")
+        Static sSlider = FindSlider("Stylize Sigma_s")
+        Static rSlider = FindSlider("Stylize Sigma_r X100")
         cv.Cv2.Stylization(src, dst2, sSlider.Value, rSlider.Value / rSlider.maximum)
     End Sub
 End Class
@@ -521,9 +521,9 @@ Public Class PhotoShop_Pencil_Basics : Inherits VB_Parent
         desc = "Convert image to a pencil sketch"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static sSlider = findSlider("Pencil Sigma_s")
-        Static rSlider = findSlider("Pencil Sigma_r X100")
-        Static shadeSlider = findSlider("Pencil Shade Factor X100")
+        Static sSlider = FindSlider("Pencil Sigma_s")
+        Static rSlider = FindSlider("Pencil Sigma_r X100")
+        Static shadeSlider = FindSlider("Pencil Shade Factor X100")
         cv.Cv2.PencilSketch(src, dst3, dst2, sSlider.Value, rSlider.Value / rSlider.maximum, shadeSlider.Value / 1000)
     End Sub
 End Class
@@ -552,7 +552,7 @@ Public Class PhotoShop_Pencil_Manual : Inherits VB_Parent
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayinv As New cv.Mat
         grayinv = Not src
-        Static kernelSlider = findSlider("Blur kernel size")
+        Static kernelSlider = FindSlider("Blur kernel size")
         Dim ksize As Integer = kernelSlider.Value Or 1
         Dim blur = grayinv.Blur(New cv.Size(ksize, ksize), New cv.Point(ksize / 2, ksize / 2))
         cv.Cv2.Divide(src, 255 - blur, dst2, 256)

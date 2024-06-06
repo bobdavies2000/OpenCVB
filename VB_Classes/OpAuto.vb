@@ -265,7 +265,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits VB_Parent
         desc = "Find the peaks in a 2D histogram"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static boundarySlider = findSlider("Desired boundary count")
+        Static boundarySlider = FindSlider("Desired boundary count")
         Dim desiredBoundaries = boundarySlider.value
 
         ' input should be a 2D histogram.  If standaloneTest() or src is not a histogram, get one...
@@ -352,8 +352,8 @@ Public Class OpAuto_MSER : Inherits VB_Parent
         desc = "Option Automation: find the best MSER max and min area values"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static minSlider = findSlider("MSER Min Area")
-        Static maxSlider = findSlider("MSER Max Area")
+        Static minSlider = FindSlider("MSER Min Area")
+        Static maxSlider = FindSlider("MSER Max Area")
         If standaloneTest() Then
             mBase.Run(src)
             src = mBase.dst3

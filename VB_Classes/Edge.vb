@@ -28,8 +28,8 @@ Public Class Edge_DepthAndColor : Inherits VB_Parent
     Public Sub New()
         findRadio("Dilate shape: Rect").Checked = True
 
-        findSlider("Canny threshold1").Value = 100
-        findSlider("Canny threshold2").Value = 100
+        FindSlider("Canny threshold1").Value = 100
+        FindSlider("Canny threshold2").Value = 100
 
         desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow."
         labels(2) = "Edges in color and depth after dilate"
@@ -59,7 +59,7 @@ Public Class Edge_Scharr : Inherits VB_Parent
         desc = "Scharr is most accurate with 3x3 kernel."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static multSlider = findSlider("Scharr multiplier X100")
+        Static multSlider = FindSlider("Scharr multiplier X100")
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim xField = gray.Scharr(cv.MatType.CV_32FC1, 1, 0)
         Dim yField = gray.Scharr(cv.MatType.CV_32FC1, 0, 1)
@@ -90,8 +90,8 @@ Public Class Edge_Preserving : Inherits VB_Parent
         desc = "OpenCV's edge preserving filter."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static sigmaSSlider = findSlider("Edge Sigma_s")
-        Static sigmaRSlider = findSlider("Edge Sigma_r")
+        Static sigmaSSlider = FindSlider("Edge Sigma_s")
+        Static sigmaRSlider = FindSlider("Edge Sigma_r")
         Static recurseCheck = findRadio("Edge RecurseFilter")
         Dim sigma_s = sigmaSSlider.Value
         Dim sigma_r = sigmaRSlider.Value / sigmaRSlider.Maximum
@@ -124,7 +124,7 @@ Public Class Edge_RandomForest_CPP : Inherits VB_Parent
         labels(3) = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static rfSlider = findSlider("Edges RF Threshold")
+        Static rfSlider = FindSlider("Edges RF Threshold")
         If task.frameCount < 100 Then setTrueText("On the first call only, it takes a few seconds to load the randomForest model.", New cv.Point(10, 100))
 
         ' why not do this in the constructor?  Because the message is held up by the lengthy process of loading the model.
@@ -164,8 +164,8 @@ Public Class Edge_DCTfrequency : Inherits VB_Parent
         desc = "Find edges by removing all the highest frequencies."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static freqSlider = findSlider("Remove Frequencies < x")
-        Static thresholdSlider = findSlider("Threshold after Removal")
+        Static freqSlider = FindSlider("Remove Frequencies < x")
+        Static thresholdSlider = FindSlider("Threshold after Removal")
         Dim gray = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
@@ -200,8 +200,8 @@ Public Class Edge_Deriche_CPP : Inherits VB_Parent
         desc = "Edge detection using the Deriche X and Y gradients"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static alphaSlider = findSlider("Deriche Alpha X100")
-        Static omegaSlider = findSlider("Deriche Omega X1000")
+        Static alphaSlider = FindSlider("Deriche Alpha X100")
+        Static omegaSlider = FindSlider("Deriche Omega X1000")
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
@@ -255,7 +255,7 @@ End Class
 Public Class Edge_Consistent : Inherits VB_Parent
     Dim edges As New Bin4Way_Sobel
     Public Sub New()
-        findSlider("Sobel kernel Size").Value = 5
+        FindSlider("Sobel kernel Size").Value = 5
         desc = "Edges that are consistent for x number of frames"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -388,8 +388,8 @@ Public Class Edge_Matching : Inherits VB_Parent
         Static highlightCheck = findCheckBox("Highlight all grid entries above threshold")
         Static clearCheck = findCheckBox("Clear selected highlights (if Highlight all grid entries is unchecked)")
         Static redRects As New List(Of Integer)
-        Static thresholdSlider = findSlider("Edge Correlation threshold X100")
-        Static searchSlider = findSlider("Search depth in pixels")
+        Static thresholdSlider = FindSlider("Edge Correlation threshold X100")
+        Static searchSlider = FindSlider("Search depth in pixels")
         Dim threshold = thresholdSlider.Value / 100
         Dim searchDepth = searchSlider.Value
         dst2 = task.leftView
@@ -508,7 +508,7 @@ End Class
 Public Class Edge_SobelLR : Inherits VB_Parent
     Dim sobel As New Edge_Sobel_Old
     Public Sub New()
-        findSlider("Sobel kernel Size").Value = 3
+        FindSlider("Sobel kernel Size").Value = 3
         desc = "Find the edges in the LeftViewimages."
         labels = {"", "", "Edges in Left Image", "Edges in Right Image (except on Kinect 4 Azure)"}
     End Sub
@@ -534,8 +534,8 @@ Public Class Edge_ColorGap_CPP : Inherits VB_Parent
         desc = "Using grayscale image to identify color gaps which imply an edge - C++ version"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static distanceSlider = findSlider("Input pixel distance")
-        Static diffSlider = findSlider("Input pixel difference")
+        Static distanceSlider = FindSlider("Input pixel distance")
+        Static diffSlider = FindSlider("Input pixel difference")
         Dim diff = diffSlider.Value
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -578,8 +578,8 @@ Public Class Edge_ColorGap_VB : Inherits VB_Parent
         desc = "Using grayscale image to identify color gaps which imply an edge - VB edition"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static distanceSlider = findSlider("Input pixel distance")
-        Static diffSlider = findSlider("Input pixel difference")
+        Static distanceSlider = FindSlider("Input pixel distance")
+        Static diffSlider = FindSlider("Input pixel difference")
         Dim distance = distanceSlider.Value And 254
         Dim diff = diffSlider.Value
 
@@ -623,8 +623,8 @@ Public Class Edge_DepthEdgeTest : Inherits VB_Parent
         desc = "Find edges in depth data"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static diffSlider = findSlider("Threshold for depth difference")
-        Static rectSlider = findSlider("cv.rect offset")
+        Static diffSlider = FindSlider("Threshold for depth difference")
+        Static rectSlider = FindSlider("cv.rect offset")
         Dim offset = rectSlider.Value
 
         Dim r1 = New cv.Rect(0, 0, dst2.Width - offset, dst2.Height - offset)
@@ -662,8 +662,8 @@ Public Class Edge_DepthGap_VB : Inherits VB_Parent
         desc = "Using dpeth image to identify gaps which imply an edge"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static distanceSlider = findSlider("Input depth distance")
-        Static diffSlider = findSlider("Input depth difference in mm's")
+        Static distanceSlider = FindSlider("Input depth distance")
+        Static diffSlider = FindSlider("Input depth difference in mm's")
         Dim distance = distanceSlider.Value And 254
         Dim diff = diffSlider.Value / 1000
 
@@ -706,7 +706,7 @@ Public Class Edge_DepthGap_CPP : Inherits VB_Parent
         desc = "Create edges wherever depth differences are greater than x"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static diffSlider = findSlider("Input depth difference in mm's")
+        Static diffSlider = FindSlider("Input depth difference in mm's")
         Dim minDiff = diffSlider.Value / 1000
 
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
@@ -734,8 +734,8 @@ End Class
 Public Class Edge_CannyMin : Inherits VB_Parent
     Dim canny As New Edge_Canny
     Public Sub New()
-        findSlider("Canny threshold1").Value = 200
-        findSlider("Canny threshold2").Value = 200
+        FindSlider("Canny threshold1").Value = 200
+        FindSlider("Canny threshold2").Value = 200
         desc = "Set the max thresholds for Canny to get the minimum number of edge pixels"
         labels(2) = "Essential lines in the image - minimum number of pixels in Canny output"
     End Sub
@@ -758,8 +758,8 @@ End Class
 Public Class Edge_CannyLeftRight : Inherits VB_Parent
     Dim canny As New Edge_Canny
     Public Sub New()
-        findSlider("Canny threshold1").Value = 200
-        findSlider("Canny threshold2").Value = 200
+        FindSlider("Canny threshold1").Value = 200
+        FindSlider("Canny threshold2").Value = 200
         labels = {"", "", "Essential lines in the left image", "Essential lines in the right image"}
         desc = "Set the max thresholds for Canny to get the minimum number of edge pixels for the left and right images."
     End Sub
@@ -805,7 +805,7 @@ Public Class Edge_Regions : Inherits VB_Parent
     Dim tiers As New Depth_TiersZ
     Dim edge As New Edge_Canny
     Public Sub New()
-        findSlider("Canny threshold2").Value = 30
+        FindSlider("Canny threshold2").Value = 30
         labels = {"", "", "Edge_Canny output for the depth regions", "Identified regions "}
         desc = "Find the edges for the depth tiers."
     End Sub
@@ -889,8 +889,8 @@ Public Class Edge_ResizeAdd : Inherits VB_Parent
         labels(3) = "Found edges added to grayscale image source."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static vertSlider = findSlider("Border Vertical in Pixels")
-        Static horizSlider = findSlider("Border Horizontal in Pixels")
+        Static vertSlider = FindSlider("Border Vertical in Pixels")
+        Static horizSlider = FindSlider("Border Horizontal in Pixels")
         Dim gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim newFrame = gray(New cv.Range(vertSlider.Value, gray.Rows - vertSlider.Value),
@@ -1138,7 +1138,7 @@ Public Class Edge_SobelHorizontal : Inherits VB_Parent
         desc = "Find edges with Sobel only in the horizontal direction"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
+        Static thresholdSlider = FindSlider("Threshold to zero pixels below this value")
         edges.Run(src)
 
         dst2 = edges.dst2.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
@@ -1155,8 +1155,8 @@ Public Class Edge_MotionFrames : Inherits VB_Parent
     Dim frames As New History_Basics
     Public Sub New()
         labels = {"", "", "The multi-frame edges output", "The Edge_Canny output for the last frame only"}
-        findSlider("Canny threshold1").Value = 50
-        findSlider("Canny threshold2").Value = 50
+        FindSlider("Canny threshold1").Value = 50
+        FindSlider("Canny threshold2").Value = 50
         desc = "Collect edges over several frames controlled with global frame history"
     End Sub
     Public Sub RunVB(src As cv.Mat)

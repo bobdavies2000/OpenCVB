@@ -30,9 +30,9 @@ Public Class WarpPerspective_WidthHeight : Inherits VB_Parent
         desc = "Use WarpPerspective to transform input images."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static wSlider = findSlider("Warped Width")
-        Static hSlider = findSlider("Warped Height")
-        Static angleSlider = findSlider("Warped Angle")
+        Static wSlider = FindSlider("Warped Width")
+        Static hSlider = FindSlider("Warped Height")
+        Static angleSlider = FindSlider("Warped Angle")
 
         Dim srcPt() = {New cv.Point2f(0, 0), New cv.Point2f(0, src.Height), New cv.Point2f(src.Width, 0), New cv.Point2f(src.Width, src.Height)}
         Dim pts() = {New cv.Point2f(0, 0), New cv.Point2f(0, src.Height), New cv.Point2f(src.Width, 0),

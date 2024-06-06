@@ -29,7 +29,7 @@ Public Class LongLine_Basics : Inherits VB_Parent
         Return New pointPair(New cv.Point(lp.p1.X, 0), New cv.Point(lp.p1.X, dst2.Height))
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static countSlider = findSlider("Number of lines to display")
+        Static countSlider = FindSlider("Number of lines to display")
         Dim maxCount = countSlider.value
 
         dst2 = src.Clone
@@ -206,7 +206,7 @@ Public Class LongLine_Match : Inherits VB_Parent
         desc = "Find the longest line from last image and use matchTemplate to find the line in the latest image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static searchSlider = findSlider("Reduction for width/height in pixels")
+        Static searchSlider = FindSlider("Reduction for width/height in pixels")
         Dim pad = searchSlider.Value
 
         longest.Run(src)

@@ -180,7 +180,7 @@ Public Class Structured_MultiSlicePolygon : Inherits VB_Parent
         desc = "Detect polygons in the multiSlice output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static sidesSlider = findSlider("Max number of sides in the identified polygons")
+        Static sidesSlider = FindSlider("Max number of sides in the identified polygons")
         Dim maxSides = sidesSlider.Value
 
         multi.Run(src)
@@ -352,9 +352,9 @@ Public Class Structured_Cloud2 : Inherits VB_Parent
         desc = "Attempt to impose a structure on the point cloud data."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static xLineSlider = findSlider("Lines in X-Direction")
-        Static yLineSlider = findSlider("Lines in Y-Direction")
-        Static thresholdSlider = findSlider("Continuity threshold in mm")
+        Static xLineSlider = FindSlider("Lines in X-Direction")
+        Static yLineSlider = FindSlider("Lines in Y-Direction")
+        Static thresholdSlider = FindSlider("Continuity threshold in mm")
 
         Static xCheck = findCheckBox("Impose constraints on X")
         Static yCheck = findCheckBox("Impose constraints on Y")
@@ -418,9 +418,9 @@ Public Class Structured_Crosshairs : Inherits VB_Parent
         desc = "Connect vertical and horizontal dots that are in the same column and row."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static sliceSlider = findSlider("Number of slices")
-        Static xSlider = findSlider("Slice index X")
-        Static ySlider = findSlider("Slice index Y")
+        Static sliceSlider = FindSlider("Number of slices")
+        Static xSlider = FindSlider("Slice index X")
+        Static ySlider = FindSlider("Slice index Y")
         Dim xLines = sliceSlider.Value
         Dim yLines = CInt(xLines * dst2.Width / dst2.Height)
         Dim indexX = xSlider.Value
@@ -503,7 +503,7 @@ Public Class Structured_Cloud : Inherits VB_Parent
         desc = "Attempt to impose a linear structure on the pointcloud."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static sliceSlider = findSlider("Number of slices")
+        Static sliceSlider = FindSlider("Number of slices")
         Dim xLines = sliceSlider.Value
         Dim yLines = CInt(xLines * dst2.Height / dst2.Width)
 

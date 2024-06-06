@@ -92,7 +92,7 @@ Public Class Boundary_Rectangles : Inherits VB_Parent
         desc = "Build the boundaries for redCells and remove interior rectangles"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static percentSlider = findSlider("Desired percent of rectangles")
+        Static percentSlider = FindSlider("Desired percent of rectangles")
         Dim percentRect = percentSlider.value / 100
 
         bounds.Run(src)

@@ -31,7 +31,7 @@ Public Class FeatureLess_Canny : Inherits VB_Parent
         desc = "Use Canny edges to define featureless regions."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Threshold distance")
+        Static thresholdSlider = FindSlider("Threshold distance")
         edges.Run(src)
         dst2 = Not edges.dst2.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
     End Sub
@@ -51,7 +51,7 @@ Public Class FeatureLess_Sobel : Inherits VB_Parent
         desc = "Use Sobel edges to define featureless regions."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Threshold distance")
+        Static thresholdSlider = FindSlider("Threshold distance")
         edges.Run(src)
         dst2 = Not edges.dst2.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
     End Sub
@@ -67,7 +67,7 @@ Public Class FeatureLess_UniquePixels : Inherits VB_Parent
     Dim fless As New Hough_FeatureLessTopX
     Dim sort As New Sort_1Channel
     Public Sub New()
-        If standaloneTest() Then findSlider("Threshold for sort input").Value = 0
+        If standaloneTest() Then FindSlider("Threshold for sort input").Value = 0
         labels = {"", "Gray scale input to sort/remove dups", "Unique pixels", ""}
         desc = "Find the unique gray pixels for the featureless regions"
     End Sub

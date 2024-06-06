@@ -58,7 +58,7 @@ Public Class Depth_Flatland : Inherits VB_Parent
         desc = "Attempt to stabilize the depth image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static regionSlider = findSlider("Region Count")
+        Static regionSlider = FindSlider("Region Count")
         Dim reductionFactor As Single = regionSlider.Maximum - regionSlider.Value
         dst2 = task.depthRGB / reductionFactor
         dst2 *= reductionFactor
@@ -247,7 +247,7 @@ Public Class Depth_Uncertainty : Inherits VB_Parent
         desc = "Use the bio-inspired retina algorithm to determine depth uncertainty."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Uncertainty threshold")
+        Static thresholdSlider = FindSlider("Uncertainty threshold")
         retina.Run(task.depthRGB)
         dst2 = retina.dst2
         dst3 = retina.dst3.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
@@ -433,8 +433,8 @@ Public Class Depth_ColorMap : Inherits VB_Parent
         desc = "Display the depth as a color map"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static alphaSlider = findSlider("Depth ColorMap Alpha X100")
-        Static betaSlider = findSlider("Depth ColorMap Beta")
+        Static alphaSlider = FindSlider("Depth ColorMap Alpha X100")
+        Static betaSlider = FindSlider("Depth ColorMap Beta")
         cv.Cv2.ConvertScaleAbs(task.pcSplit(2) * 1000, dst1, alphaSlider.Value / 100, betaSlider.Value)
         dst1 += 1
         dst2 = vbPalette(dst1)
@@ -508,7 +508,7 @@ Public Class Depth_SmoothingMat : Inherits VB_Parent
         desc = "Use depth rate of change to smooth the depth values in close range"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Threshold in millimeters")
+        Static thresholdSlider = FindSlider("Threshold in millimeters")
         Static lastDepth = task.pcSplit(2)
 
         If standaloneTest() Then src = task.pcSplit(2)
@@ -574,7 +574,7 @@ Public Class Depth_HolesOverTime : Inherits VB_Parent
         desc = "Integrate memory holes over time to identify unstable depth"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static countSlider = findSlider("Number of images to retain")
+        Static countSlider = FindSlider("Number of images to retain")
         Static saveCount = countSlider.Value
         If saveCount <> countSlider.Value Then
             images.Clear()
@@ -616,8 +616,8 @@ Public Class Depth_Holes : Inherits VB_Parent
         desc = "Identify holes in the depth image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static borderSlider = findSlider("Amount of dilation of borderMask")
-        Static holeSlider = findSlider("Amount of dilation of holeMask")
+        Static borderSlider = FindSlider("Amount of dilation of borderMask")
+        Static holeSlider = FindSlider("Amount of dilation of holeMask")
         dst2 = task.pcSplit(2).Threshold(0.01, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
         dst2 = dst2.Dilate(element, Nothing, holeSlider.Value)
         dst3 = dst2.Dilate(element, Nothing, borderSlider.Value)
@@ -1084,7 +1084,7 @@ Public Class Depth_PunchDecreasing : Inherits VB_Parent
         task.pcSplit(2).CopyTo(dst1, fore.dst2)
 
         Static lastDepth = dst1
-        Static mmSlider = findSlider("Threshold in millimeters")
+        Static mmSlider = FindSlider("Threshold in millimeters")
         Dim mmThreshold = mmSlider.Value / 1000
         If Increasing Then
             cv.Cv2.Subtract(dst1, lastDepth, dst2)
@@ -1157,7 +1157,7 @@ Public Class Depth_PunchBlobNew : Inherits VB_Parent
         desc = "Identify a punch using both depth and color"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Threshold for punch")
+        Static thresholdSlider = FindSlider("Threshold for punch")
         Dim threshold = thresholdSlider.value
 
         Static lastColor As cv.Mat = task.color.Clone
@@ -1518,7 +1518,7 @@ Public Class Depth_TiersZ : Inherits VB_Parent
         desc = "Create a reduced image of the depth data to define tiers of similar values"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static cmSlider = findSlider("cm's per tier")
+        Static cmSlider = FindSlider("cm's per tier")
         Dim cmTier = cmSlider.value
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)

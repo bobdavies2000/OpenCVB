@@ -188,12 +188,12 @@ Public Class ML_DepthFromColor : Inherits VB_Parent
     Dim resizer As New Resize_Smaller
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Prediction Max Depth", 1000, 5000, 1500)
-        findSlider("Resize Percentage (%)").Value = 2 ' 2% of the image.
+        FindSlider("Resize Percentage (%)").Value = 2 ' 2% of the image.
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static depthSlider = findSlider("Prediction Max Depth")
+        Static depthSlider = FindSlider("Prediction Max Depth")
         mats.mat(1) = task.noDepthMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim color32f As New cv.Mat
@@ -251,12 +251,12 @@ Public Class ML_DepthFromXYColor : Inherits VB_Parent
     Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Prediction Max Depth", 1000, 5000, 1500)
-        findSlider("Resize Percentage (%)").Value = 2 ' 2% of the image.
+        FindSlider("Resize Percentage (%)").Value = 2 ' 2% of the image.
         labels(2) = "Predicted Depth"
         desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static depthSlider = findSlider("Prediction Max Depth")
+        Static depthSlider = FindSlider("Prediction Max Depth")
         shadow.Run(src)
         mats.mat(0) = shadow.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -473,7 +473,7 @@ Public Class ML_RemoveDups_CPP : Inherits VB_Parent
         desc = "The input is BGR, convert to BGRA, and sorted as an integer.  The output is a sorted BGR Mat file with duplicates removed."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Threshold for sort input")
+        Static thresholdSlider = FindSlider("Threshold for sort input")
         If src.Type = cv.MatType.CV_8UC3 Then
             dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32S, src.CvtColor(cv.ColorConversionCodes.BGR2BGRA).Data)
         Else

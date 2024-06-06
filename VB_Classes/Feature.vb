@@ -293,7 +293,7 @@ Public Class Feature_Delaunay : Inherits VB_Parent
     Dim facet As New Delaunay_Contours
     Dim feat As New Feature_Basics
     Public Sub New()
-        findSlider("Min Distance to next").Value = 10
+        FindSlider("Min Distance to next").Value = 10
         desc = "Divide the image into contours with Delaunay using features"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -482,7 +482,7 @@ Public Class Feature_ShiTomasi : Inherits VB_Parent
     Dim shiTomasi As New Corners_ShiTomasi_CPP
     Dim options As New Options_ShiTomasi
     Public Sub New()
-        findSlider("Corner normalize threshold").Value = 15
+        FindSlider("Corner normalize threshold").Value = 15
         labels = {"", "", "Features in the left camera image", "Features in the right camera image"}
         desc = "Identify feature points in the left And right views"
     End Sub
@@ -693,7 +693,7 @@ Public Class Feature_Gather : Inherits VB_Parent
 
         Select Case myOptions.featureSource
             Case FeatureSrc.goodFeaturesFull
-                Static sampleSlider = findSlider("Feature Sample Size")
+                Static sampleSlider = FindSlider("Feature Sample Size")
                 sampleSlider.value = 400
                 features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cv.Mat,
                                                       options.blockSize, True, options.k).ToList

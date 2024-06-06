@@ -28,9 +28,9 @@ Public Class HOG_Basics : Inherits VB_Parent
         Next rect
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("HOG Threshold")
-        Static strideSlider = findSlider("HOG Stride")
-        Static scaleSlider = findSlider("HOG Scale")
+        Static thresholdSlider = FindSlider("HOG Threshold")
+        Static strideSlider = FindSlider("HOG Stride")
+        Static scaleSlider = FindSlider("HOG Scale")
 
         Dim hog As New cv.HOGDescriptor()
         hog.SetSVMDetector(cv.HOGDescriptor.GetDefaultPeopleDetector())

@@ -2,7 +2,7 @@ Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Public Class LeftRight_Basics : Inherits VB_Parent
     Public Sub New()
-        If task.cameraName = "MYNT-EYE-D1000" Then findSlider("Alpha (contrast)").Value = 1100
+        If task.cameraName = "MYNT-EYE-D1000" Then FindSlider("Alpha (contrast)").Value = 1100
         labels = {"", "", "Left camera image", If(task.cameraName = "Azure Kinect 4K", "No right image", "Right camera image")}
         desc = "Display the left and right views as they came from the camera."
     End Sub
@@ -28,8 +28,8 @@ Public Class LeftRight_CompareRaw : Inherits VB_Parent
         desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static startYSlider = findSlider("Slice Starting Y")
-        Static hSlider = findSlider("Slice Height")
+        Static startYSlider = FindSlider("Slice Starting Y")
+        Static hSlider = FindSlider("Slice Height")
 
         Dim sliceY = startYSlider.Value
         Dim slideHeight = hSlider.Value
@@ -71,7 +71,7 @@ Public Class LeftRight_BRISK : Inherits VB_Parent
     Dim brisk As New BRISK_Basics
     Dim options As New Options_Features
     Public Sub New()
-        findSlider("Min Distance").Value = 20
+        FindSlider("Min Distance").Value = 20
         labels = {"", "", "Left Image", "Right Image"}
         desc = "Add color to the 8-bit infrared images."
     End Sub

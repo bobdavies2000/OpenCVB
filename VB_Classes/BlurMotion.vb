@@ -8,8 +8,8 @@ Public Class BlurMotion_Basics : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         If standaloneTest() Then
-            Static blurSlider = findSlider("Motion Blur Length")
-            Static blurAngleSlider = findSlider("Motion Blur Angle")
+            Static blurSlider = FindSlider("Motion Blur Length")
+            Static blurAngleSlider = FindSlider("Motion Blur Angle")
             blurAngleSlider.Value = If(blurAngleSlider.Value < blurAngleSlider.Maximum, blurAngleSlider.Value + 1, blurAngleSlider.Minimum)
         End If
         kernel = New cv.Mat(options.kernelSize, options.kernelSize, cv.MatType.CV_32F, 0)

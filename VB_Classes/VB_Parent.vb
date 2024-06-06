@@ -136,6 +136,16 @@ Public Class VB_Parent : Implements IDisposable
         dst.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
         drawCircle(dst, pt, task.dotSize, cv.Scalar.Black)
     End Sub
+    Public Sub drawRotatedOutline(rotatedRect As cv.RotatedRect, dst2 As cv.Mat, color As cv.Scalar)
+        Dim pts = rotatedRect.Points()
+        Dim lastPt = pts(0)
+        For i = 1 To pts.Length
+            Dim index = i Mod pts.Length
+            Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
+            drawLine(dst2, pt, lastPt, task.highlightColor)
+            lastPt = pt
+        Next
+    End Sub
     Public Sub measureStartRun(name As String)
         If task.recordTimings = False Then Exit Sub
         Dim nextTime = Now

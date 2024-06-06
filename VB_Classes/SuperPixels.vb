@@ -35,9 +35,9 @@ Public Class SuperPixel_Basics_CPP : Inherits VB_Parent
         desc = "Sub-divide the image into super pixels."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static countSlider = findSlider("Number of SuperPixels")
-        Static iterSlider = findSlider("SuperPixel Iterations")
-        Static priorSlider = findSlider("Prior")
+        Static countSlider = FindSlider("Number of SuperPixels")
+        Static iterSlider = FindSlider("SuperPixel Iterations")
+        Static priorSlider = FindSlider("Prior")
 
         Static numSuperPixels As Integer
         Static numIterations As Integer
@@ -84,7 +84,7 @@ Public Class SuperPixel_BinarizedImage : Inherits VB_Parent
     Public Sub New()
         binarize = New Binarize_Basics()
         pixels.gridColor = cv.Scalar.Red
-        findSlider("Number of SuperPixels").Value = 20 ' find the top 20 super pixels.
+        FindSlider("Number of SuperPixels").Value = 20 ' find the top 20 super pixels.
         desc = "Create SuperPixels from a binary image."
     End Sub
     Public Sub RunVB(src as cv.Mat)

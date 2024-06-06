@@ -23,7 +23,7 @@ Public Class Blur_Homogeneous : Inherits VB_Parent
         desc = "Smooth each pixel with a kernel of 1's of different sizes."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static blurKernelSlider = findSlider("Blur Kernel Size")
+        Static blurKernelSlider = FindSlider("Blur Kernel Size")
         Dim kernelSize = CInt(blurKernelSlider.Value) Or 1
         dst2 = src.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
     End Sub
@@ -41,7 +41,7 @@ Public Class Blur_Median : Inherits VB_Parent
         desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static blurKernelSlider = findSlider("Blur Kernel Size")
+        Static blurKernelSlider = FindSlider("Blur Kernel Size")
         Dim kernelSize = CInt(blurKernelSlider.Value) Or 1
         cv.Cv2.MedianBlur(src, dst2, kernelSize)
     End Sub
@@ -59,7 +59,7 @@ Public Class Blur_Bilateral : Inherits VB_Parent
         desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static blurKernelSlider = findSlider("Blur Kernel Size")
+        Static blurKernelSlider = FindSlider("Blur Kernel Size")
         Dim kernelSize = CInt(blurKernelSlider.Value) Or 1
         cv.Cv2.BilateralFilter(src, dst2, kernelSize, kernelSize * 2, kernelSize / 2)
     End Sub
@@ -113,9 +113,9 @@ Public Class Blur_TopoMap : Inherits VB_Parent
         desc = "Create a topo map from the blurred image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static reductionSlider = findSlider("Blur Color Reduction")
-        Static frameSlider = findSlider("Frame Count Cycle")
-        Static percentSlider = findSlider("Percent of Blurring")
+        Static reductionSlider = FindSlider("Blur Color Reduction")
+        Static frameSlider = FindSlider("Frame Count Cycle")
+        Static percentSlider = FindSlider("Percent of Blurring")
 
         Static savePercent As Single
         Static nextPercent As Single
@@ -157,8 +157,8 @@ Public Class Blur_Detection : Inherits VB_Parent
     Dim laplace As New Laplacian_Basics
     Dim blur As New Blur_Basics
     Public Sub New()
-        findSlider("Laplacian Threshold").Value = 50
-        findSlider("Blur Kernel Size").Value = 11
+        FindSlider("Laplacian Threshold").Value = 50
+        FindSlider("Blur Kernel Size").Value = 11
         labels = {"", "", "Draw a rectangle to blur a region in alternating frames and test further", "Detected blur in the highlight regions - non-blur is white."}
         desc = "Detect blur in an image"
     End Sub

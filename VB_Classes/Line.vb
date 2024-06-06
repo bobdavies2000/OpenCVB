@@ -522,7 +522,7 @@ Public Class Line_GCloud : Inherits VB_Parent
     End Function
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        Static angleSlider = findSlider("Angle tolerance in degrees")
+        Static angleSlider = FindSlider("Angle tolerance in degrees")
         Dim maxAngle = angleSlider.Value
 
         dst2 = src.Clone
@@ -819,7 +819,7 @@ Public Class Line_Canny : Inherits VB_Parent
     Dim canny As New Edge_Canny
     Dim lines As New Line_Basics
     Public Sub New()
-        findSlider("Canny Aperture").Value = 7
+        FindSlider("Canny Aperture").Value = 7
         labels = {"", "", "Straight lines in Canny output", "Input to Line_Basics"}
         desc = "Find lines in the Canny output"
     End Sub
@@ -1033,9 +1033,9 @@ Public Class Line_Verticals : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Static cellSlider = findSlider("MatchTemplate Cell Size")
-        Static angleXSlider = findSlider("X angle tolerance in degrees")
-        Static angleZSlider = findSlider("Z angle tolerance in degrees")
+        Static cellSlider = FindSlider("MatchTemplate Cell Size")
+        Static angleXSlider = FindSlider("X angle tolerance in degrees")
+        Static angleZSlider = FindSlider("Z angle tolerance in degrees")
         maxAngleX = angleXSlider.Value
         maxAngleZ = angleZSlider.Value
         Dim radius = CInt(cellSlider.Value / 2)
@@ -1272,7 +1272,7 @@ Public Class Line_Gravity : Inherits VB_Parent
         desc = "Find all the lines in the color image that are parallel to gravity or the horizon using distance to the line instead of slope."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static diffSlider = findSlider("Pixel difference threshold")
+        Static diffSlider = FindSlider("Pixel difference threshold")
         Dim pixelDiff = diffSlider.value
 
         dst2 = src.Clone
@@ -1337,7 +1337,7 @@ Public Class Line_GravityIntersect : Inherits VB_Parent
         desc = "Find all the lines in the color image that don't intersect the gravity and horizon vectors (indicating they are parallel."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        'Static distSlider = findSlider("Min distance to intersection (X1000)")
+        'Static distSlider = FindSlider("Min distance to intersection (X1000)")
         'Dim minDistance = distSlider.value
 
         'dst2 = src.Clone
@@ -1396,7 +1396,7 @@ Public Class Line_KNN : Inherits VB_Parent
     Dim lines As New Line_Basics
     Dim swarm As New Swarm_Basics
     Public Sub New()
-        findSlider("Connect X KNN points").Value = 1
+        FindSlider("Connect X KNN points").Value = 1
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Use KNN to find the other line end points nearest to each endpoint and connect them with a line."
     End Sub

@@ -181,7 +181,7 @@ Public Class Diff_Depth32S : Inherits VB_Parent
         desc = "Where is the depth difference between frames greater than X centimeters."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static mmSlider = findSlider("Depth varies more than X mm's")
+        Static mmSlider = FindSlider("Depth varies more than X mm's")
         Dim millimeters As Integer = mmSlider.value
 
         Dim depth32f As cv.Mat = 1000 * task.pcSplit(2)
@@ -219,7 +219,7 @@ Public Class Diff_Depth32f : Inherits VB_Parent
         desc = "Where is the depth difference between frames greater than X centimeters."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static mmSlider = findSlider("Depth varies more than X mm's")
+        Static mmSlider = FindSlider("Depth varies more than X mm's")
         Dim millimeters = mmSlider.value / 1000
 
         If task.optionsChanged Then lastDepth32f = task.pcSplit(2)

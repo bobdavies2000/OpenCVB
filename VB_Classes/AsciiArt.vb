@@ -13,8 +13,8 @@ Public Class AsciiArt_Basics : Inherits VB_Parent
         desc = "Build an ascii art representation of the input stream."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static hSlider = findSlider("Character height in pixels")
-        Static wSlider = findSlider("Character width in pixels")
+        Static hSlider = FindSlider("Character height in pixels")
+        Static wSlider = FindSlider("Character width in pixels")
 
         Dim hStep = CInt(src.Height / hSlider.value)
         Dim wStep = CInt(src.Width / wSlider.value)

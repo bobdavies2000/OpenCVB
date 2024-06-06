@@ -12,10 +12,10 @@ Public Class Coherence_Basics : Inherits VB_Parent
         desc = "Find lines that are artistically coherent in the image"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static sigmaSlider = findSlider("Coherence Sigma")
-        Static blendSlider = findSlider("Coherence Blend")
-        Static strSlider = findSlider("Coherence str_sigma")
-        Static eigenSlider = findSlider("Coherence eigen kernel")
+        Static sigmaSlider = FindSlider("Coherence Sigma")
+        Static blendSlider = FindSlider("Coherence Blend")
+        Static strSlider = FindSlider("Coherence str_sigma")
+        Static eigenSlider = FindSlider("Coherence eigen kernel")
 
         Dim sigma = sigmaSlider.Value * 2 + 1
         Dim blend As Single = blendSlider.Value / 10

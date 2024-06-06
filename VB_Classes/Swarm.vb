@@ -8,8 +8,8 @@ Public Class Swarm_Basics : Inherits VB_Parent
     Public distanceMax As Single
     Public options As New Options_Swarm
     Public Sub New()
-        findSlider("Feature Sample Size").Value = 1000
-        findSlider("Blocksize").Value = 1
+        FindSlider("Feature Sample Size").Value = 1000
+        FindSlider("Blocksize").Value = 1
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."
@@ -162,7 +162,7 @@ Public Class Swarm_Percentage : Inherits VB_Parent
         desc = "Use features to segment a percentage of the image then use RedCloud with a mask for the rest of the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static percentSlider = findSlider("Cells map X percent")
+        Static percentSlider = FindSlider("Cells map X percent")
         Dim percent = percentSlider.value / 100
 
         swarm.Run(src)

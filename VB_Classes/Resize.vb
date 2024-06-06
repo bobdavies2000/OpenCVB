@@ -51,9 +51,9 @@ Public Class Resize_Preserve : Inherits VB_Parent
     Public options As New Options_Resize
     Public newSize As cv.Size
     Public Sub New()
-        findSlider("Resize Percentage (%)").Maximum = 200
-        findSlider("Resize Percentage (%)").Value = 120
-        findSlider("Resize Percentage (%)").Minimum = 100
+        FindSlider("Resize Percentage (%)").Maximum = 200
+        FindSlider("Resize Percentage (%)").Value = 120
+        FindSlider("Resize Percentage (%)").Minimum = 100
         desc = "Decrease the size but preserve the full image size."
     End Sub
     Public Sub RunVB(src as cv.Mat)

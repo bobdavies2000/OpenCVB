@@ -82,7 +82,7 @@ Public Class Benford_Basics : Inherits VB_Parent
         addW.Run(dst3)
         dst2 = addW.dst2
 
-        Static weightSlider = findSlider("Add Weighted %")
+        Static weightSlider = FindSlider("Add Weighted %")
         Dim wt = weightSlider.value
         labels(2) = "AddWeighted: " + Format(wt, "%0.0") + " actual vs. " + Format(1 - wt, "%0.0") + " Benford distribution"
     End Sub
@@ -149,7 +149,7 @@ Public Class Benford_JPEG : Inherits VB_Parent
         desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static qualitySlider = findSlider("JPEG Quality")
+        Static qualitySlider = FindSlider("JPEG Quality")
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, qualitySlider.Value})
         Dim tmp = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
@@ -174,7 +174,7 @@ Public Class Benford_JPEG99 : Inherits VB_Parent
         desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static qualitySlider = findSlider("JPEG Quality")
+        Static qualitySlider = FindSlider("JPEG Quality")
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, qualitySlider.Value})
         Dim tmp = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
@@ -199,7 +199,7 @@ Public Class Benford_PNG : Inherits VB_Parent
         desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static compressionSlider = findSlider("PNG Compression")
+        Static compressionSlider = FindSlider("PNG Compression")
         Dim png = src.ImEncode(".png", New Integer() {cv.ImwriteFlags.PngCompression, compressionSlider.Value})
         Dim tmp = New cv.Mat(png.Count, 1, cv.MatType.CV_8U, png)
         dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
@@ -255,7 +255,7 @@ Public Class Benford_Primes : Inherits VB_Parent
     Dim sieve As New Sieve_BasicsVB
     Dim benford As New Benford_Basics
     Public Sub New()
-        Static countSlider = findSlider("Count of desired primes")
+        Static countSlider = FindSlider("Count of desired primes")
         countSlider.Value = countSlider.Maximum
         labels = {"", "", "Actual Distribution of input", ""}
         desc = "Apply Benford to a list of primes"

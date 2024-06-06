@@ -121,7 +121,7 @@ Public Class BGSubtract_MotionDetect : Inherits VB_Parent
         desc = "Detect Motion for use with background subtraction"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static correlationSlider = findSlider("Correlation Threshold")
+        Static correlationSlider = FindSlider("Correlation Threshold")
         Static frm = findfrm(traceName + " Radio Buttons")
         Dim threadData = radioChoices(findRadioIndex(frm.check))
 

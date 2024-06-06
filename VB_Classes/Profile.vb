@@ -106,7 +106,7 @@ Public Class Profile_Rotation : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            Static ySlider = findSlider("Rotate pointcloud around Y-axis")
+            Static ySlider = FindSlider("Rotate pointcloud around Y-axis")
             ySlider.value += 1
             If ySlider.value = ySlider.maximum Then ySlider.value = ySlider.minimum
             setTrueText("When running standaloneTest(), the Y-axis slider is rotating from -90 to 90.", 3)
@@ -239,7 +239,7 @@ Public Class Profile_ConcentrationTop : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         options.RunVB()
 
-        Static ySlider = findSlider("Rotate pointcloud around Y-axis (degrees)")
+        Static ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
         Static maxAverage As Single
         Static peakRotation As Integer
 

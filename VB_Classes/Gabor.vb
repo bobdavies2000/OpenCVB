@@ -22,12 +22,12 @@ Public Class Gabor_Basics : Inherits VB_Parent
         desc = "Explore Gabor kernel"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static ksizeSlider = findSlider("Gabor Kernel Size")
-        Static sigmaSlider = findSlider("Gabor Sigma")
-        Static lambdaSlider = findSlider("Gabor lambda")
-        Static gammaSlider = findSlider("Gabor gamma X10")
-        Static phaseSlider = findSlider("Gabor Phase offset X100")
-        Static thetaSlider = findSlider("Gabor Theta (degrees)")
+        Static ksizeSlider = FindSlider("Gabor Kernel Size")
+        Static sigmaSlider = FindSlider("Gabor Sigma")
+        Static lambdaSlider = FindSlider("Gabor lambda")
+        Static gammaSlider = FindSlider("Gabor gamma X10")
+        Static phaseSlider = FindSlider("Gabor Phase offset X100")
+        Static thetaSlider = FindSlider("Gabor Theta (degrees)")
         If standaloneTest() Then
             ksize = ksizeSlider.Value * 2 + 1
             Sigma = sigmaSlider.Value
@@ -52,10 +52,10 @@ Public Class Gabor_Basics_MT : Inherits VB_Parent
     Dim grid As New Grid_Rectangles
     Public Sub New()
         labels(3) = "The 32 kernels used"
-        findSlider("Grid Cell Width").Maximum = dst2.Width / 2
-        findSlider("Grid Cell Height").Maximum = dst2.Height / 2
-        findSlider("Grid Cell Width").Value = dst2.Width / 8
-        findSlider("Grid Cell Height").Value = dst2.Height / 4
+        FindSlider("Grid Cell Width").Maximum = dst2.Width / 2
+        FindSlider("Grid Cell Height").Maximum = dst2.Height / 2
+        FindSlider("Grid Cell Width").Value = dst2.Width / 8
+        FindSlider("Grid Cell Height").Value = dst2.Height / 4
 
         For i = 0 To gabor.Length - 1
             gabor(i) = New Gabor_Basics()
@@ -67,12 +67,12 @@ Public Class Gabor_Basics_MT : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         grid.Run(src)
 
-        Static ksizeSlider = findSlider("Gabor Kernel Size")
-        Static sigmaSlider = findSlider("Gabor Sigma")
-        Static lambdaSlider = findSlider("Gabor lambda")
-        Static gammaSlider = findSlider("Gabor gamma X10")
-        Static phaseSlider = findSlider("Gabor Phase offset X100")
-        Static thetaSlider = findSlider("Gabor Theta (degrees)")
+        Static ksizeSlider = FindSlider("Gabor Kernel Size")
+        Static sigmaSlider = FindSlider("Gabor Sigma")
+        Static lambdaSlider = FindSlider("Gabor lambda")
+        Static gammaSlider = FindSlider("Gabor gamma X10")
+        Static phaseSlider = FindSlider("Gabor Phase offset X100")
+        Static thetaSlider = FindSlider("Gabor Theta (degrees)")
         For i = 0 To gabor.Count - 1
             gabor(i).ksize = ksizeSlider.Value * 2 + 1
             gabor(i).Sigma = sigmaSlider.Value

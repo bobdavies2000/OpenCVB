@@ -21,11 +21,11 @@ Public Class Stabilizer_Basics : Inherits VB_Parent
         desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static widthSlider = findSlider("Width of input to matchtemplate")
-        Static heightSlider = findSlider("Height of input to matchtemplate")
-        Static netSlider = findSlider("Max % of lost pixels before reseting image")
-        Static stdevSlider = findSlider("Min stdev in correlation rect")
-        Static thresholdSlider = findSlider("Stabilizer Correlation Threshold X1000")
+        Static widthSlider = FindSlider("Width of input to matchtemplate")
+        Static heightSlider = FindSlider("Height of input to matchtemplate")
+        Static netSlider = FindSlider("Max % of lost pixels before reseting image")
+        Static stdevSlider = FindSlider("Min stdev in correlation rect")
+        Static thresholdSlider = FindSlider("Stabilizer Correlation Threshold X1000")
         Dim lostMax = netSlider.Value / 100
 
         Dim resetImage As Boolean
@@ -104,7 +104,7 @@ Public Class Stabilizer_BasicsRandomInput : Inherits VB_Parent
         desc = "Generate images that have been arbitrarily shifted"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static rangeSlider = findSlider("Range of random motion introduced (absolute value in pixels)")
+        Static rangeSlider = FindSlider("Range of random motion introduced (absolute value in pixels)")
         Dim range = rangeSlider.Value
 
         Dim input = src
@@ -339,7 +339,7 @@ Public Class Stabilizer_CornerPoints : Inherits VB_Parent
         desc = "Track the FAST feature points found in the corners of the BGR image."
     End Sub
     Private Sub getKeyPoints(src As cv.Mat, r As cv.Rect)
-        Static thresholdSlider = findSlider("FAST Threshold")
+        Static thresholdSlider = FindSlider("FAST Threshold")
         Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(src(r), thresholdSlider.value, True)
         For Each kp In kpoints
             features.Add(New cv.Point2f(kp.Pt.X + r.X, kp.Pt.Y + r.Y))

@@ -13,7 +13,7 @@ Public Class Corners_Basics : Inherits VB_Parent
         desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("FAST Threshold")
+        Static thresholdSlider = FindSlider("FAST Threshold")
         Static nonMaxCheck = findCheckBox("Use Non-Max = True")
 
         dst2 = src.Clone
@@ -53,9 +53,9 @@ Public Class Corners_Harris : Inherits VB_Parent
         labels(3) = "Corner Eigen values"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static blockSlider = findSlider("Corner block size")
-        Static apertureSlider = findSlider("Corner aperture size")
-        Static qualitySlider = findSlider("Corner quality level")
+        Static blockSlider = FindSlider("Corner block size")
+        Static apertureSlider = FindSlider("Corner aperture size")
+        Static qualitySlider = FindSlider("Corner quality level")
         Dim quality = qualitySlider.Value
 
         Static color As New cv.Mat
@@ -104,7 +104,7 @@ Public Class Corners_PreCornerDetect : Inherits VB_Parent
         desc = "Use PreCornerDetect to find features in the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static kernelSlider = findSlider("kernel Size")
+        Static kernelSlider = FindSlider("kernel Size")
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim prob As New cv.Mat
         cv.Cv2.PreCornerDetect(gray, prob, kernelSlider.Value Or 1)
@@ -133,9 +133,9 @@ Public Class Corners_ShiTomasi_CPP : Inherits VB_Parent
         labels(3) = "Corner Eigen values using ShiTomasi which is also what is used in GoodFeatures."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static blockSlider = findSlider("Corner block size")
-        Static apertureSlider = findSlider("Corner aperture size")
-        Static thresholdSlider = findSlider("Corner normalize threshold")
+        Static blockSlider = FindSlider("Corner block size")
+        Static apertureSlider = FindSlider("Corner aperture size")
+        Static thresholdSlider = FindSlider("Corner normalize threshold")
         Dim threshold = thresholdSlider.Value
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -308,7 +308,7 @@ Public Class Corners_HarrisDetector : Inherits VB_Parent
         cPtr = Harris_Detector_Open()
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static qualitySlider = findSlider("Quality Level")
+        Static qualitySlider = FindSlider("Quality Level")
         dst2 = src.Clone
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -373,7 +373,7 @@ Public Class Corners_SubPix : Inherits VB_Parent
         desc = "Use PreCornerDetect to refine the feature points to sub-pixel accuracy."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static kernelSlider = findSlider("SubPix kernel Size")
+        Static kernelSlider = FindSlider("SubPix kernel Size")
         Dim kernelSize As Integer = kernelSlider.value Or 1
 
         dst2 = src.Clone

@@ -4,13 +4,13 @@ Public Class TransformationMatrix_Basics : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("TMatrix Top View multiplier", 1, 1000, 500)
         If task.cameraName = "StereoLabs ZED 2/2i" Then
-            findSlider("TMatrix Top View multiplier").Value = 1 ' need a smaller multiplier for this camera...
+            FindSlider("TMatrix Top View multiplier").Value = 1 ' need a smaller multiplier for this camera...
         End If
         labels = {"", "", "View from above the camera", "View from side of the camera"}
         desc = "Show the contents of the transformation matrix"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static multSlider = findSlider("TMatrix Top View multiplier")
+        Static multSlider = FindSlider("TMatrix Top View multiplier")
         If task.transformationMatrix IsNot Nothing Then
             Dim t = task.transformationMatrix
             Dim mul = multSlider.Value

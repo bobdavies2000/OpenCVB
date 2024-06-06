@@ -135,7 +135,7 @@ Public Class PCA_Reconstruct : Inherits VB_Parent
         desc = "Reconstruct a video stream as a composite of X images."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static retainSlider = findSlider("Retained Variance")
+        Static retainSlider = FindSlider("Retained Variance")
         Static images(7) As cv.Mat
         Static images32f(images.Length) As cv.Mat
         Dim index = task.frameCount Mod images.Length

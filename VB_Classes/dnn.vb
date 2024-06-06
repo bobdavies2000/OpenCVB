@@ -91,9 +91,9 @@ Public Class DNN_Basics : Inherits VB_Parent
         labels(2) = "Cropped Input Image - must be square!"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static scaleSlider = findSlider("DNN Scale Factor")
-        Static meanSlider = findSlider("DNN MeanVal")
-        Static confidenceSlider = findSlider("DNN Confidence Threshold")
+        Static scaleSlider = FindSlider("DNN Scale Factor")
+        Static meanSlider = FindSlider("DNN MeanVal")
+        Static confidenceSlider = FindSlider("DNN Confidence Threshold")
         If dnnPrepared Then
             Dim inScaleFactor As Single = scaleSlider.Value / scaleSlider.Maximum ' should be 0.0078 by default...
             Dim inputBlob = CvDnn.BlobFromImage(src(crop), inScaleFactor, New cv.Size(300, 300), CSng(meanSlider.Value), False)

@@ -150,8 +150,8 @@ Public Class Hist_NormalizeGray : Inherits VB_Parent
         desc = "Create a histogram of a normalized image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static minSlider = findSlider("Min Gray")
-        Static maxSlider = findSlider("Max Gray")
+        Static minSlider = FindSlider("Min Gray")
+        Static maxSlider = FindSlider("Max Gray")
         If minSlider.Value >= maxSlider.Value Then minSlider.Value = maxSlider.Value - Math.Min(10, maxSlider.Value - 1)
         If minSlider.Value = maxSlider.Value Then maxSlider.Value += 1
         dst3 = src.Normalize(minSlider.Value, maxSlider.Value, cv.NormTypes.MinMax) ' only minMax is working...
@@ -1293,7 +1293,7 @@ Public Class Hist_PointCloud : Inherits VB_Parent
             sliders.setupTrackBar("Histogram threshold", 0, 1000, 500)
         End If
 
-        thresholdSlider = findSlider("Histogram threshold")
+        thresholdSlider = FindSlider("Histogram threshold")
         Select Case dst2.Width
             Case 640
                 thresholdSlider.Value = 200
@@ -1306,9 +1306,9 @@ Public Class Hist_PointCloud : Inherits VB_Parent
         desc = "Create a 2D histogram for the pointcloud in XZ and YZ."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static xSlider = findSlider("Histogram X bins")
-        Static ySlider = findSlider("Histogram Y bins")
-        Static zSlider = findSlider("Histogram Z bins")
+        Static xSlider = FindSlider("Histogram X bins")
+        Static ySlider = FindSlider("Histogram Y bins")
+        Static zSlider = FindSlider("Histogram Z bins")
         Dim xbins = xSlider.Value
         Dim ybins = ySlider.Value
         Dim zbins = zSlider.Value

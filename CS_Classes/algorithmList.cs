@@ -17,6 +17,7 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_ApproxPoly_Basics") return new CSharp_ApproxPoly_Basics(task);
 			if (algorithmName == "CSharp_ApproxPoly_FindandDraw") return new CSharp_ApproxPoly_FindandDraw(task);
 			if (algorithmName == "CSharp_ApproxPoly_Hull") return new CSharp_ApproxPoly_Hull(task);
+			if (algorithmName == "CSharp_Area_MinMotionRect") return new CSharp_Area_MinMotionRect(task);
 			if (algorithmName == "CSharp_Area_MinTriangle_CPP") return new CSharp_Area_MinTriangle_CPP(task);
 			if (algorithmName == "CSharp_Random_Basics") return new CSharp_Random_Basics(task);
 			return new CSharp_AddWeighted_Basics(task);

@@ -209,7 +209,7 @@ Public Class Delaunay_Generations : Inherits VB_Parent
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
         labels = {"", "Mask of unmatched regions - generation set to 0", "Facet Image with count for each region",
                   "Generation counts in CV_32SC1 format"}
-        findSlider("Random Pixel Count").Value = 10
+        FindSlider("Random Pixel Count").Value = 10
         desc = "Create a region in an image for each point provided"
     End Sub
     Public Sub RunVB(src As cv.Mat)

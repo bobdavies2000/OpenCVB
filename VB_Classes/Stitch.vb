@@ -10,9 +10,9 @@ Public Class Stitch_Basics : Inherits VB_Parent
         desc = "Stitch together random parts of a color image."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static countSlider = findSlider("Number of random images")
-        Static widthSlider = findSlider("Rectangle width")
-        Static heightSlider = findSlider("Rectangle height")
+        Static countSlider = FindSlider("Number of random images")
+        Static widthSlider = FindSlider("Rectangle width")
+        Static heightSlider = FindSlider("Rectangle height")
 
         Dim mats As New List(Of cv.Mat)
         Dim imageCount = countSlider.Value

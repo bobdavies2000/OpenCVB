@@ -49,9 +49,9 @@ Public Class Clone_ColorChange : Inherits VB_Parent
         desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static redChange = findSlider("Color Change - Red")
-        Static greenChange = findSlider("Color Change - Green")
-        Static blueChange = findSlider("Color Change - Blue")
+        Static redChange = FindSlider("Color Change - Red")
+        Static greenChange = FindSlider("Color Change - Green")
+        Static blueChange = FindSlider("Color Change - Blue")
         clone.cloneSpec = 0
         clone.colorChangeValues = New cv.Point3f(blueChange.Value / 10, greenChange.Value / 10, redChange.Value / 10)
         clone.Run(src)
@@ -75,8 +75,8 @@ Public Class Clone_IlluminationChange : Inherits VB_Parent
         desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static alphaSlider = findSlider("Alpha")
-        Static betaSlider = findSlider("Beta")
+        Static alphaSlider = FindSlider("Alpha")
+        Static betaSlider = FindSlider("Beta")
         clone.cloneSpec = 1
         clone.illuminationChangeValues = New cv.Vec2f(alphaSlider.Value / 10, betaSlider.Value / 10)
         clone.Run(src)
@@ -101,8 +101,8 @@ Public Class Clone_TextureFlattening : Inherits VB_Parent
         desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static lowSlider = findSlider("Low Threshold")
-        Static highSlider = findSlider("High Threshold")
+        Static lowSlider = FindSlider("Low Threshold")
+        Static highSlider = FindSlider("High Threshold")
         clone.cloneSpec = 2
         clone.textureFlatteningValues = New cv.Vec2f(lowSlider.Value, highSlider.Value)
         clone.Run(src)

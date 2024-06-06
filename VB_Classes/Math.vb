@@ -153,7 +153,7 @@ Public Class Math_Stdev : Inherits VB_Parent
         desc = "Compute the standard deviation in each segment"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static stdevSlider = findSlider("Stdev Threshold")
+        Static stdevSlider = FindSlider("Stdev Threshold")
         Static meanCheck = findCheckBox("Show mean")
         Static stdevCheck = findCheckBox("Show Stdev")
         Static gridCheck = findCheckBox("Show Grid Mask")
@@ -214,7 +214,7 @@ Public Class Math_StdevBoundary : Inherits VB_Parent
         dst2 = stdev.dst2
         stdev.saveFrame.CopyTo(dst3)
 
-        Static stdevSlider = findSlider("Stdev Threshold")
+        Static stdevSlider = FindSlider("Stdev Threshold")
         Dim stdevThreshold = CSng(stdevSlider.Value)
 
         For Each roi In task.gridList
@@ -334,8 +334,8 @@ Public Class Math_ImageMaskedAverage : Inherits VB_Parent
         desc = "Mask off pixels where the difference is great and create an image that is the mean of x number of previous images."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static avgSlider = findSlider("Average - number of input images")
-        Static diffSlider = findSlider("Pixel value difference threshold")
+        Static avgSlider = FindSlider("Average - number of input images")
+        Static diffSlider = FindSlider("Pixel value difference threshold")
 
         Static saveImageCount = avgSlider.Value
         If avgSlider.Value <> saveImageCount Then

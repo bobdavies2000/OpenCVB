@@ -65,7 +65,7 @@ Public Class Threshold_Definitions : Inherits VB_Parent
         desc = "Demonstrate BinaryInv, Trunc, ToZero, and ToZero_Inv threshold methods"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static truncateSlider = findSlider("Threshold")
+        Static truncateSlider = FindSlider("Threshold")
         Dim threshold = truncateSlider.value
         gradient.Run(empty)
         dst0 = gradient.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

@@ -52,7 +52,7 @@ Public Class FLANN_Basics : Inherits VB_Parent
     Dim qArray() As cv.Point2f
     Dim dist As New Distance_Point3D
     Public Sub New()
-        findSlider("Random Pixel Count").Value = 5
+        FindSlider("Random Pixel Count").Value = 5
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Query count", 1, 100, 1)
             sliders.setupTrackBar("Match count", 1, 100, 1)
@@ -71,10 +71,10 @@ Public Class FLANN_Basics : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         Static reuseCheck = findCheckBox("Reuse the same feature list (test different search parameters)")
         Static sortedCheck = findCheckBox("Search params sorted")
-        Static matchSlider = findSlider("Match count")
-        Static querySlider = findSlider("Query count")
-        Static searchSlider = findSlider("Search check count")
-        Static epsSlider = findSlider("EPS X100")
+        Static matchSlider = FindSlider("Match count")
+        Static querySlider = FindSlider("Query count")
+        Static searchSlider = FindSlider("Search check count")
+        Static epsSlider = FindSlider("EPS X100")
 
         Dim reuseData = reuseCheck.checked
         If reuseData = False Or task.frameCount < 2 Or task.mouseClickFlag Then random.Run(empty) ' fill result1 with random points in x and y range of the image.

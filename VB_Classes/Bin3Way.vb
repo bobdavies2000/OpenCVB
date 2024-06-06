@@ -61,7 +61,7 @@ Public Class Bin3Way_KMeans : Inherits VB_Parent
     Dim kmeans As New KMeans_Dimensions
     Dim mats As New Mat_4Click
     Public Sub New()
-        findSlider("KMeans k").Value = 2
+        FindSlider("KMeans k").Value = 2
         labels = {"", "", "Darkest (upper left), mixed (upper right), lightest (bottom left)", "Selected image from dst2"}
         desc = "Use kmeans with each of the 3-way split images"
     End Sub

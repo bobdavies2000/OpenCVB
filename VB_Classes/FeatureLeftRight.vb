@@ -9,8 +9,8 @@ Public Class FeatureLeftRight_Basics : Inherits VB_Parent
     Public Sub New()
         labels(1) = "NOTE: matching right point is always to the left of the left point"
         If standalone Then gOptions.displayDst1.Checked = True
-        findSlider("Feature Correlation Threshold").Value = 75
-        findSlider("Min Distance to next").Value = 1
+        FindSlider("Feature Correlation Threshold").Value = 75
+        FindSlider("Min Distance to next").Value = 1
         gOptions.MaxDepth.Value = 20
         labels(3) = "Click near any feature to get more details on the matched pair of points."
         desc = "Match the left and right features and allow the user to select a point to get more details."
@@ -194,8 +194,8 @@ Public Class FeatureLeftRight_Input : Inherits VB_Parent
     Public Sub New()
         labels(1) = "NOTE: matching right point is always to the left of the left point"
         If standalone Then gOptions.displayDst1.Checked = True
-        findSlider("Feature Correlation Threshold").Value = 75
-        findSlider("Min Distance to next").Value = 1
+        FindSlider("Feature Correlation Threshold").Value = 75
+        FindSlider("Min Distance to next").Value = 1
         gOptions.MaxDepth.Value = 20 ' up to 20 meters...
         labels(3) = "Click near any feature to get more details on the matched pair of points."
         desc = "Match the left and right features and allow the user to select a point to get more details."

@@ -25,7 +25,7 @@ Public Class Brightness_HSV : Inherits VB_Parent
         desc = "Implement the brightness effect for HSV images"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static brightnessSlider = findSlider("Brightness Value")
+        Static brightnessSlider = FindSlider("Brightness Value")
         Dim brightness As Single = brightnessSlider.Value / 100
 
         dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)

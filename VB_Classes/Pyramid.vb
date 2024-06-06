@@ -6,7 +6,7 @@ Public Class Pyramid_Basics : Inherits VB_Parent
         desc = "Use pyrup and pyrdown to zoom in and out of an image."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static zoomSlider = findSlider("Zoom in and out")
+        Static zoomSlider = FindSlider("Zoom in and out")
         Dim zoom = zoomSlider.Value
         If zoom <> 0 Then
             If zoom < 0 Then

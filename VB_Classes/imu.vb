@@ -385,7 +385,7 @@ Public Class IMU_PlotTotalDelay : Inherits VB_Parent
         desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static countSlider = findSlider("Number of Plot Values")
+        Static countSlider = FindSlider("Number of Plot Values")
         Dim plotLastX = countSlider.Value
         host.Run(src)
         imu.Run(src)
@@ -547,7 +547,7 @@ Public Class IMU_VerticalVerify : Inherits VB_Parent
             gCells = linesVH.gCells
         End If
 
-        Static arcYslider = findSlider("Minimum Arc-Y threshold angle (degrees)")
+        Static arcYslider = FindSlider("Minimum Arc-Y threshold angle (degrees)")
         Dim angleThreshold = arcYslider.Value
 
         strOut = "ID" + vbTab + "len3D" + vbTab + "Depth" + vbTab + "Arc Y" + vbTab + "Image" + vbTab + "IMU Y" + vbTab + vbCrLf
@@ -1039,9 +1039,9 @@ Public Class IMU_GMatrixWithOptions : Inherits VB_Parent
         desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
     Private Sub getSliderValues()
-        Static xSlider = findSlider("Rotate pointcloud around X-axis (degrees)")
-        Static ySlider = findSlider("Rotate pointcloud around Y-axis (degrees)")
-        Static zSlider = findSlider("Rotate pointcloud around Z-axis (degrees)")
+        Static xSlider = FindSlider("Rotate pointcloud around X-axis (degrees)")
+        Static ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
+        Static zSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)")
         cx = Math.Cos(xSlider.value * cv.Cv2.PI / 180)
         sx = Math.Sin(xSlider.value * cv.Cv2.PI / 180)
 
@@ -1073,9 +1073,9 @@ Public Class IMU_GMatrixWithOptions : Inherits VB_Parent
         Return tmpGMatrix
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static xSlider = findSlider("Rotate pointcloud around X-axis (degrees)")
-        Static ySlider = findSlider("Rotate pointcloud around Y-axis (degrees)")
-        Static zSlider = findSlider("Rotate pointcloud around Z-axis (degrees)")
+        Static xSlider = FindSlider("Rotate pointcloud around X-axis (degrees)")
+        Static ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
+        Static zSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)")
 
         If gOptions.gravityPointCloud.Checked Then
             '[cos(a) -sin(a)    0]

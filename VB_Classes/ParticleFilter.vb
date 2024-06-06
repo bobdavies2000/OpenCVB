@@ -9,7 +9,7 @@ Imports System.IO
 '        desc = "Use the good features of an image to create a histogram of particle motion. Peak histogram is net movement of the camera."
 '    End Sub
 '    Public Sub RunVB(src as cv.Mat)
-'        Static distanceSlider = findSlider("Distance threshold (pixels)")
+'        Static distanceSlider = FindSlider("Distance threshold (pixels)")
 '        Static histogram As New cv.Mat
 '        Dim matSize = 21 ' must be odd
 '        Dim halfsize = 10

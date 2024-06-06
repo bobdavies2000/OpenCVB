@@ -10,9 +10,9 @@ Public Class PyrFilter_Basics : Inherits VB_Parent
         desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static radiusSlider = findSlider("MeanShift Spatial Radius")
-        Static colorSlider = findSlider("MeanShift color Radius")
-        Static maxSlider = findSlider("MeanShift Max Pyramid level")
+        Static radiusSlider = FindSlider("MeanShift Spatial Radius")
+        Static colorSlider = FindSlider("MeanShift color Radius")
+        Static maxSlider = FindSlider("MeanShift Max Pyramid level")
         cv.Cv2.PyrMeanShiftFiltering(src, dst2, radiusSlider.Value, colorSlider.Value, maxSlider.Value)
     End Sub
 End Class

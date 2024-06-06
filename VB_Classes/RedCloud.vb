@@ -610,7 +610,7 @@ Public Class RedCloud_World : Inherits VB_Parent
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
-        If firstPass Then findSlider("RedCloud_Reduce Reduction").Value = 1000
+        If firstPass Then FindSlider("RedCloud_Reduce Reduction").Value = 1000
     End Sub
 End Class
 
@@ -1864,7 +1864,7 @@ Public Class RedCloud_FeatureLessReduce : Inherits VB_Parent
         desc = "Remove any cells which are in a featureless region - they are part of the neighboring (and often surrounding) region."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Percent featureLess threshold")
+        Static thresholdSlider = FindSlider("Percent featureLess threshold")
         Dim threshold = thresholdSlider.value / 100
         devGrid.Run(src)
 
@@ -2107,7 +2107,7 @@ Public Class RedCloud_Reduce : Inherits VB_Parent
         desc = "Reduction transform for the point cloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static reductionSlider = findSlider("RedCloud_Reduce Reduction")
+        Static reductionSlider = FindSlider("RedCloud_Reduce Reduction")
         Dim reduceAmt = reductionSlider.value
         task.pointCloud.ConvertTo(dst0, cv.MatType.CV_32S, 1000 / reduceAmt)
 
@@ -2387,7 +2387,7 @@ Public Class RedCloud_NaturalGray : Inherits VB_Parent
         desc = "Display the RedCloud results with the mean grayscale value of the cell +- delta"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static rangeSlider = findSlider("Grayscale range around mean")
+        Static rangeSlider = FindSlider("Grayscale range around mean")
         Dim range = rangeSlider.value
 
         redC.Run(src)

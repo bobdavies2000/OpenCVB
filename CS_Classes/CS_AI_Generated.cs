@@ -108,11 +108,12 @@ namespace CS_Classes
 
     public class CSharp_AddWeighted_InfraRed : CS_Parent
     {
-        private AddWeighted_Basics addw = new AddWeighted_Basics();
+        private CSharp_AddWeighted_Basics addw;
         private Mat src2 = new Mat();
 
         public CSharp_AddWeighted_InfraRed(VBtask task) : base(task)
         {
+            addw = new CSharp_AddWeighted_Basics(task);
             desc = "Align the depth data with the left or right view. Oak-D is aligned with the right image. Some cameras are not close to aligned.";
         }
 
@@ -130,7 +131,7 @@ namespace CS_Classes
             }
 
             addw.src2 = dst1;
-            addw.Run(task.depthRGB);
+            addw.RunCS(task.depthRGB);
             dst2 = addw.dst2.Clone();
         }
     }
@@ -584,6 +585,48 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             if (successCounter >= options.successCount) setup();
         }
     }
+
+
+
+
+    public class CSharp_Area_MinMotionRect : CS_Parent
+    {
+        private BGSubtract_Basics bgSub = new BGSubtract_Basics();
+
+        public CSharp_Area_MinMotionRect(VBtask task) : base(task)
+        {
+            desc = "Use minRectArea to encompass detected motion";
+            labels[2] = "MinRectArea of MOG motion";
+        }
+
+        private Mat motionRectangles(Mat gray, Vec3b[] colors)
+        {
+            Point[][] contours;
+            contours = Cv2.FindContoursAsArray(gray, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
+
+            for (int i = 0; i < contours.Length; i++)
+            {
+                RotatedRect minRect = Cv2.MinAreaRect(contours[i]);
+                Scalar nextColor = new Scalar(colors[i % 256].Item0, colors[i % 256].Item1, colors[i % 256].Item2);
+                DrawRotatedRectangle(minRect, gray, nextColor);
+            }
+            return gray;
+        }
+
+        public void RunCS(Mat src)
+        {
+            bgSub.Run(src);
+            Mat gray;
+            if (bgSub.dst2.Channels() == 1)
+                gray = bgSub.dst2;
+            else
+                gray = bgSub.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+
+            dst2 = motionRectangles(gray, task.vecColors);
+            dst2.SetTo(Scalar.All(255), gray);
+        }
+    }
+
 
 
 

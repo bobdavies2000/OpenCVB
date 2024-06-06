@@ -60,7 +60,7 @@ Public Class Palette_LinearPolar : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static radiusSlider = findSlider("LinearPolar radius")
+        Static radiusSlider = FindSlider("LinearPolar radius")
         Dim radius = radiusSlider.Value ' msRNG.next(0, dst2.Cols)
 
         dst2.SetTo(0)
@@ -160,7 +160,7 @@ Public Class Palette_DepthColorMap : Inherits VB_Parent
         desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static cvtScaleSlider = findSlider("Convert And Scale")
+        Static cvtScaleSlider = FindSlider("Convert And Scale")
         If task.optionsChanged Then
             gColor.color1 = cv.Scalar.Yellow
             gColor.color2 = cv.Scalar.Red
@@ -328,7 +328,7 @@ Public Class Palette_Create : Inherits VB_Parent
         Return result
     End Function
     Public Sub RunVB(src as cv.Mat)
-        Static transitionSlider = findSlider("Color Transitions")
+        Static transitionSlider = FindSlider("Color Transitions")
         Dim colorTransitionCount = transitionSlider.Value
 
         Static frm = findfrm(traceName + " Radio Buttons")
@@ -424,7 +424,7 @@ Public Class Palette_RandomColorMap : Inherits VB_Parent
         desc = "Build a random colormap that smoothly transitions colors"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static paletteSlider = findSlider("Color transitions")
+        Static paletteSlider = FindSlider("Color transitions")
         If transitionCount <> paletteSlider.Value Then
             transitionCount = paletteSlider.Value
 

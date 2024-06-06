@@ -85,7 +85,7 @@ Public Class PointCloud_Basics : Inherits VB_Parent
     End Function
 
     Public Sub RunVB(src As cv.Mat)
-        Static deltaSlider = findSlider("Delta Z threshold (cm)")
+        Static deltaSlider = FindSlider("Delta Z threshold (cm)")
         deltaThreshold = deltaSlider.value / 100
 
         dst2 = src
@@ -156,9 +156,9 @@ Public Class PointCloud_Spin : Inherits VB_Parent
         Static xCheck = findCheckBox("Spin pointcloud on X-axis")
         Static yCheck = findCheckBox("Spin pointcloud on Y-axis")
         Static zCheck = findCheckBox("Spin pointcloud on Z-axis")
-        Static xRotateSlider = findSlider("Rotate pointcloud around X-axis (degrees)")
-        Static yRotateSlider = findSlider("Rotate pointcloud around Y-axis (degrees)")
-        Static zRotateSlider = findSlider("Rotate pointcloud around Z-axis (degrees)")
+        Static xRotateSlider = FindSlider("Rotate pointcloud around X-axis (degrees)")
+        Static yRotateSlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
+        Static zRotateSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)")
 
         Static xBump = 1, yBump = 1, zBump = 1
 
@@ -229,7 +229,7 @@ Public Class PointCloud_Continuous_VB : Inherits VB_Parent
         desc = "Show where the pointcloud is continuous"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = findSlider("Threshold of continuity in mm")
+        Static thresholdSlider = FindSlider("Threshold of continuity in mm")
         Dim threshold = thresholdSlider.Value / 1000
 
         Dim input = src
@@ -367,7 +367,7 @@ Public Class PointCloud_SetupTop : Inherits VB_Parent
         Dim markerLeft = New cv.Point(cam.X - topLen, marker.Y)
         Dim markerRight = New cv.Point(cam.X + topLen, marker.Y)
 
-        Static zRotateSlider = findSlider("Rotate pointcloud around Z-axis (degrees)")
+        Static zRotateSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)")
         Dim offset = Math.Sin(task.accRadians.Z) * topLen
         If gOptions.gravityPointCloud.Checked Then
             If task.accRadians.Z > 0 Then

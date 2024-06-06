@@ -194,8 +194,8 @@ Public Class Grid_Rectangles : Inherits VB_Parent
         If standaloneTest() Then desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static widthSlider = findSlider("Grid Cell Width")
-        Static heightSlider = findSlider("Grid Cell Height")
+        Static widthSlider = FindSlider("Grid Cell Width")
+        Static heightSlider = FindSlider("Grid Cell Height")
         Dim width = widthSlider.Value
         Dim height = heightSlider.Value
 
@@ -249,7 +249,7 @@ Public Class Grid_FPS : Inherits VB_Parent
     Public fpsSlider As Windows.Forms.TrackBar
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired FPS rate", 1, 10, 2)
-        fpsSlider = findSlider("Desired FPS rate")
+        fpsSlider = FindSlider("Desired FPS rate")
         desc = "Provide a service that lets any algorithm control its frame rate"
     End Sub
     Public Sub RunVB(src As cv.Mat)

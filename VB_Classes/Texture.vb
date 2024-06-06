@@ -57,9 +57,9 @@ Public Class Texture_Flow : Inherits VB_Parent
         desc = "Find and mark the texture flow in an image - see texture_flow.py"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static deltaSlider = findSlider("Texture Flow Delta")
-        Static blockSlider = findSlider("Texture Eigen BlockSize")
-        Static ksizeSlider = findSlider("Texture Eigen Ksize")
+        Static deltaSlider = FindSlider("Texture Flow Delta")
+        Static blockSlider = FindSlider("Texture Eigen BlockSize")
+        Static ksizeSlider = FindSlider("Texture Eigen Ksize")
 
         Dim TFdelta = deltaSlider.Value
         Dim TFblockSize = blockSlider.Value * 2 + 1

@@ -93,9 +93,9 @@ Public Class Motion_ThruCorrelation : Inherits VB_Parent
         desc = "Detect motion through the correlation coefficient"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static ccSlider = findSlider("Correlation threshold X1000")
-        Static padSlider = findSlider("Pad size in pixels for the search area")
-        Static stdevSlider = findSlider("Stdev threshold for using correlation")
+        Static ccSlider = FindSlider("Correlation threshold X1000")
+        Static padSlider = FindSlider("Pad size in pixels for the search area")
+        Static stdevSlider = FindSlider("Stdev threshold for using correlation")
         Dim pad = padSlider.Value
         Dim ccThreshold = ccSlider.Value
         Dim stdevThreshold = stdevSlider.Value
@@ -277,7 +277,7 @@ Public Class Motion_Grid_MP : Inherits VB_Parent
         desc = "Detect Motion in the color image using multi-threading."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static correlationSlider = findSlider("Correlation Threshold")
+        Static correlationSlider = FindSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Then dst3 = src.Clone
@@ -312,7 +312,7 @@ Public Class Motion_Grid : Inherits VB_Parent
         desc = "Detect Motion in the color image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static correlationSlider = findSlider("Correlation Threshold")
+        Static correlationSlider = FindSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Then dst3 = src.Clone

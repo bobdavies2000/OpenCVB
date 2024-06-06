@@ -5,7 +5,7 @@ Public Class Transform_Resize : Inherits VB_Parent
         desc = "Resize an image based on the slider value."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static percentSlider = findSlider("Resize Percent")
+        Static percentSlider = FindSlider("Resize Percent")
         Dim resizeFactor = percentSlider.Value / 100
         Dim w = CInt(resizeFactor * src.Width)
         Dim h = CInt(resizeFactor * src.Height)
@@ -106,10 +106,10 @@ Public Class Transform_Rotate : Inherits VB_Parent
             sliders.setupTrackBar("Rotation center X", 1, dst2.Width, dst2.Width / 2)
             sliders.setupTrackBar("Rotation center Y", 1, dst2.Height, dst2.Height / 2)
         End If
-        angleSlider = findSlider("Angle")
-        scaleSlider = findSlider("Scale Factor% (100% means no scaling)")
-        centerXSlider = findSlider("Rotation center X")
-        centerYSlider = findSlider("Rotation center Y")
+        angleSlider = FindSlider("Angle")
+        scaleSlider = FindSlider("Scale Factor% (100% means no scaling)")
+        centerXSlider = FindSlider("Rotation center X")
+        centerYSlider = FindSlider("Rotation center Y")
         desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub RunVB(src as cv.Mat)

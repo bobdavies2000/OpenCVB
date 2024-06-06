@@ -96,7 +96,7 @@ End Class
 Public Class SVM_TestCase : Inherits VB_Parent
     ReadOnly options As New Options_SVM
     Public Sub New()
-        findSlider("Granularity").Value = 15
+        FindSlider("Granularity").Value = 15
         labels = {"", "", "Input points - color is the category label", "Predictions"}
         desc = "Text book example on SVM"
     End Sub
@@ -160,8 +160,8 @@ End Class
 Public Class SVM_ReuseBasics : Inherits VB_Parent
     ReadOnly svm As New SVM_Basics
     Public Sub New()
-        findSlider("Granularity").Value = 15
-        findSlider("SVM Sample Count").Value = 4
+        FindSlider("Granularity").Value = 15
+        FindSlider("SVM Sample Count").Value = 4
         labels = {"", "", "Input points", "Predictions"}
         desc = "Text book example on SVM"
     End Sub
@@ -209,7 +209,7 @@ End Class
 Public Class SVM_ReuseRandom : Inherits VB_Parent
     ReadOnly svm As New SVM_Basics
     Public Sub New()
-        findSlider("Granularity").Value = 15
+        FindSlider("Granularity").Value = 15
         task.drawRect = New cv.Rect(dst2.Cols / 4, dst2.Rows / 4, dst2.Cols / 2, dst2.Rows / 2)
         labels(2) = "SVM Training data - draw a rectangle anywhere to test further."
         desc = "Use SVM to classify random points - testing if height must equal width - needs more work"

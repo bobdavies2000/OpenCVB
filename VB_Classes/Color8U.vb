@@ -244,7 +244,7 @@ Public Class Color8U_TopX_VB : Inherits VB_Parent
         Dim input = src
         input = input.Resize(task.lowRes, cv.InterpolationFlags.Nearest)
 
-        Static topXSlider = findSlider("Top X pixels")
+        Static topXSlider = FindSlider("Top X pixels")
         topX.mapTopX = topXSlider.value
         topX.Run(input)
 

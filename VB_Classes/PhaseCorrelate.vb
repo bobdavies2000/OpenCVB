@@ -17,7 +17,7 @@ Public Class PhaseCorrelate_Basics : Inherits VB_Parent
         desc = "Look for a shift between the current frame and the previous"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static thresholdSlider = findSlider("Threshold shift to cause reset of lastFrame")
+        Static thresholdSlider = FindSlider("Threshold shift to cause reset of lastFrame")
 
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

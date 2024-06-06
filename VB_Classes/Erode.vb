@@ -30,14 +30,14 @@ Public Class Erode_CloudXY : Inherits VB_Parent
     Dim dilate As New Dilate_Basics
     Dim erodeMask As New Erode_Basics
     Public Sub New()
-        findSlider("Dilate Iterations").Value = 2
+        FindSlider("Dilate Iterations").Value = 2
         findRadio("Erode shape: Ellipse").Checked = True
         labels = {"", "", "Eroded point cloud X", "Erode point cloud Y"}
         desc = "Erode depth and then find edges"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static dilateSlider = findSlider("Dilate Iterations")
-        Static erodeSlider = findSlider("Erode Iterations")
+        Static dilateSlider = FindSlider("Dilate Iterations")
+        Static erodeSlider = FindSlider("Erode Iterations")
         erodeMask.Run(task.depthMask)
         dst1 = Not erodeMask.dst2
 
@@ -65,7 +65,7 @@ Public Class Erode_DepthSeed : Inherits VB_Parent
         desc = "Erode depth to build a depth mask for inrange data."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static depthSlider = findSlider("DepthSeed flat depth")
+        Static depthSlider = FindSlider("DepthSeed flat depth")
 
         cv.Cv2.Erode(task.pcSplit(2), dst0, erode.options.element)
         dst0 = task.pcSplit(2) - dst0
