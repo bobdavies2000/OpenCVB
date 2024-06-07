@@ -482,9 +482,7 @@ Public Class OpenCVB
         Dim workingRes = settings.workingRes
         Dim cres = settings.captureRes
         Dim dres = settings.displayRes
-        Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", WorkingRes " +
-            CStr(workingRes.Width) + "x" + CStr(workingRes.Height)
-        If AvailableAlgorithms.Text.StartsWith("Related_") Then resolutionDetails = "" ' The Related algorithms need the space...
+        Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", WorkingRes " + CStr(workingRes.Width) + "x" + CStr(workingRes.Height)
         camLabel(0).Text = "RGB"
         If picLabels(0) <> "" Then camLabel(0).Text = picLabels(0)
         If picLabels(1) <> "" Then camLabel(1).Text = picLabels(1)
@@ -689,6 +687,12 @@ Public Class OpenCVB
         lastNameSplit = nameSplit(0)
         AvailableAlgorithms.Items.Add(nextName)
     End Sub
+    Private Sub addNextCSplitAlgorithm(nextName As String, ByRef lastNameSplit As String)
+        Dim nameSplit = nextName.Split("_")
+        If nameSplit(0) + "_" + nameSplit(1) <> lastNameSplit And lastNameSplit <> "" Then AvailableAlgorithms.Items.Add("")
+        lastNameSplit = nameSplit(0) + "_" + nameSplit(1)
+        AvailableAlgorithms.Items.Add(nextName)
+    End Sub
     Private Sub groupName_SelectedIndexChanged(sender As Object, e As EventArgs) Handles GroupName.SelectedIndexChanged
         If GroupName.Text = "" Then
             Dim incr = 1
@@ -722,7 +726,14 @@ Public Class OpenCVB
             AvailableAlgorithms.Items.Clear()
 
             For i = 1 To split.Length - 1
-                If split(i).StartsWith("Options_") = False Then addNextAlgorithm(split(i), lastNameSplit)
+                If split(i).StartsWith("Options_") = False Then
+                    If split(i).StartsWith("CSharp_") Then
+                        addNextCSplitAlgorithm(split(i), lastNameSplit)
+                    Else
+                        addNextAlgorithm(split(i), lastNameSplit)
+                    End If
+
+                End If
             Next
             AvailableAlgorithms.Enabled = True
         End If
