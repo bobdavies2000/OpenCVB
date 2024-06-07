@@ -10,7 +10,7 @@ Public Class Reduction_Basics : Inherits VB_Parent
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If task.redOptions.reductionType = "Use Bitwise Reduction" Then
-            Dim bits = task.redOptions.BitwiseReductionSlider.Value
+            Dim bits = task.redOptions.BitwiseReductionBar.Value
             classCount = 255 / Math.Pow(2, bits)
             Dim zeroBits = Math.Pow(2, bits) - 1
             dst2 = src And New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))

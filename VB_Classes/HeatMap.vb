@@ -110,8 +110,8 @@ Public Class HeatMap_HotNot : Inherits VB_Parent
         heat.Run(src)
         dst0 = heat.dst2.ConvertScaleAbs
         dst1 = heat.dst3.ConvertScaleAbs
-        dst2 = dst0.Threshold(task.redOptions.ProjectionThreshold.Value, 255, cv.ThresholdTypes.Binary)
-        dst3 = dst1.Threshold(task.redOptions.ProjectionThreshold.Value, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst0.Threshold(task.redOptions.ProjectionThresholdBar.Value, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst1.Threshold(task.redOptions.ProjectionThresholdBar.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -183,7 +183,7 @@ End Class
 Public Class HeatMap_GuidedBP : Inherits VB_Parent
     Dim guided As New GuidedBP_Basics
     Public Sub New()
-        task.redOptions.ProjectionThreshold.Value = 1
+        task.redOptions.ProjectionThresholdBar.Value = 1
         desc = "This is just a placeholder to make it easy to find the GuidedBP_Basics which shows objects in top/side views."
     End Sub
     Public Sub RunVB(src As cv.Mat)

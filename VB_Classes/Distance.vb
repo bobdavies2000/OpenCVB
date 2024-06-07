@@ -185,7 +185,7 @@ Public Class Distance_RedCloud : Inherits VB_Parent
     Public Sub New()
         If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         task.redOptions.UseColorOnly.Checked = True
-        task.redOptions.HistBinSlider.Value = 5
+        task.redOptions.HistBinBar3D.Value = 5
         labels(1) = "3D Histogram distance for each of the cells at left"
         desc = "Identify RedCloud cells using the cell's 3D histogram distance from zero"
     End Sub

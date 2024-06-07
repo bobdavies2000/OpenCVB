@@ -517,7 +517,7 @@ Public Class KMeans_SimKColor : Inherits VB_Parent
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst1, task.redOptions.rangesBGR)
 
         dst2 = ShowPalette(dst1 * 255 / classCount)
-        labels(2) = simK.labels(2) + " with " + CStr(task.redOptions.bins3D) + " histogram bins"
+        labels(2) = simK.labels(2) + " with " + CStr(task.redOptions.histBins3D) + " histogram bins"
     End Sub
 End Class
 
@@ -548,6 +548,6 @@ Public Class KMeans_SimKDepth : Inherits VB_Parent
 
         dst2 = ShowPalette(dst1 * 255 / classCount)
 
-        labels(2) = simK.labels(2) + " with " + CStr(task.redOptions.bins3D) + " histogram bins"
+        labels(2) = simK.labels(2) + " with " + CStr(task.redOptions.histBins3D) + " histogram bins"
     End Sub
 End Class

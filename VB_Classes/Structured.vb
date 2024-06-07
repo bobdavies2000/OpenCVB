@@ -1197,7 +1197,7 @@ Public Class Structured_CountSideSum : Inherits VB_Parent
     Public maxCountIndex As Integer
     Public yValues As New List(Of Single)
     Public Sub New()
-        task.redOptions.ProjectionThreshold.Value += 50 ' to get the point cloud into the histogram.
+        task.redOptions.ProjectionThresholdBar.Value += 50 ' to get the point cloud into the histogram.
         labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
         desc = "Count the number of points found in each slice of the point cloud data."
     End Sub
@@ -1392,7 +1392,7 @@ End Class
 
 Public Class Structured_SurveyV : Inherits VB_Parent
     Public Sub New()
-        task.redOptions.XRangeSlider.Value = 250
+        task.redOptions.XRangeBar.Value = 250
         vbAddAdvice(traceName + ": use X-Range slider in RedCloud options.")
         labels(2) = "Each slice represents point cloud pixels with the same X-Range"
         labels(3) = "X-Range - compressed to increase the size of each slice.  Use X-range slider to adjust the size of each slice."

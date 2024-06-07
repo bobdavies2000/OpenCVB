@@ -4,8 +4,13 @@ Public Class OptionsRedCloud
     Public colorInputIndex As Integer
     Public reductionType As String = "Use Simple Reduction"
     Public depthInputIndex As Integer = 0 ' guidedBP is the default.
+
     Public SimpleReduction As Integer
     Public SimpleReductionChecked As Boolean
+
+    Public bitReduction As Integer
+    Public bitReductionChecked As Boolean
+
     Public PointCloudReduction As Integer
     Public channels() As Integer = {0, 1}
     Public channelIndex As Integer
@@ -16,7 +21,7 @@ Public Class OptionsRedCloud
     Public channelCount As Integer
     Public histBinList() As Integer
     Public identifyCount As Integer
-    Public bins3D As Integer
+    Public histBins3D As Integer
     Dim colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions", "Binarize_DepthTiers", "FeatureLess_Groups", "Hist3DColor_Basics",
                                     "KMeans_Basics", "LUT_Basics", "Reduction_Basics"}
     Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -61,9 +66,9 @@ Public Class OptionsRedCloud
                 task.yRange = 1.5
         End Select
 
-        XRangeSlider.Value = task.xRange * 100
+        XRangeBar.Value = task.xRange * 100
         YRangeSlider.Value = task.yRange * 100
-        IdentifyCountSlider.Value = 20
+        IdentifyCountBar.Value = 20
 
         task.xRangeDefault = task.xRange
         task.yRangeDefault = task.yRange
@@ -97,7 +102,7 @@ Public Class OptionsRedCloud
             Case "MYNT-EYE-D1000"
         End Select
 
-        task.redOptions.BitwiseReductionSlider.Value = 5
+        task.redOptions.BitwiseReductionBar.Value = 5
 
         Me.Left = 0
         Me.Top = 0
@@ -105,17 +110,17 @@ Public Class OptionsRedCloud
     Public Sub Sync()
         task.maxZmeters = task.gOptions.maxDepth + 0.01 ' why add a cm?  Because histograms are exclusive on ranges.
 
+        task.xRange = XRangeBar.Value / 100
+        task.yRange = YRangeSlider.Value / 100
+
         task.rangesTop = New cv.Rangef() {New cv.Rangef(0.1, task.maxZmeters), New cv.Rangef(-task.xRange, task.xRange)}
         task.rangesSide = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0.1, task.maxZmeters)}
 
         task.sideCameraPoint = New cv.Point(0, CInt(task.workingRes.Height / 2))
         task.topCameraPoint = New cv.Point(CInt(task.workingRes.Width / 2), 0)
 
-        task.xRange = XRangeSlider.Value / 100
-        task.yRange = YRangeSlider.Value / 100
-
-        task.projectionThreshold = ProjectionThreshold.Value
-        identifyCount = IdentifyCountSlider.Value
+        task.projectionThreshold = ProjectionThresholdBar.Value
+        identifyCount = IdentifyCountBar.Value
 
         Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
         Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
@@ -163,28 +168,29 @@ Public Class OptionsRedCloud
         End Select
 
         SimpleReductionBar.Enabled = Not BitwiseReduction.Checked
-        BitwiseReductionSlider.Enabled = BitwiseReduction.Checked
+        BitwiseReductionBar.Enabled = BitwiseReduction.Checked
         RedCloudOnly.Enabled = Not UseColorOnly.Checked
     End Sub
 
 
 
 
-    Private Sub XRangeSlider_ValueChanged(sender As Object, e As EventArgs) Handles XRangeSlider.ValueChanged
+    Private Sub XRangeSlider_ValueChanged(sender As Object, e As EventArgs) Handles XRangeBar.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        XLabel.Text = CStr(XRangeSlider.Value)
+        XLabel.Text = CStr(XRangeBar.Value)
     End Sub
     Private Sub YRangeSlider_ValueChanged(sender As Object, e As EventArgs) Handles YRangeSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
         YLabel.Text = CStr(YRangeSlider.Value)
     End Sub
-    Private Sub ProjectionThreshold_ValueChanged(sender As Object, e As EventArgs) Handles ProjectionThreshold.ValueChanged
+    Private Sub ProjectionThreshold_ValueChanged(sender As Object, e As EventArgs) Handles ProjectionThresholdBar.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        SideLabel.Text = CStr(ProjectionThreshold.Value)
+        SideLabel.Text = CStr(ProjectionThresholdBar.Value)
     End Sub
-    Private Sub IdentifyCountSlider_ValueChanged(sender As Object, e As EventArgs) Handles IdentifyCountSlider.ValueChanged
+    Private Sub IdentifyCountSlider_ValueChanged(sender As Object, e As EventArgs) Handles IdentifyCountBar.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        LabelIdentify.Text = CStr(IdentifyCountSlider.Value)
+        identifyCount = IdentifyCountBar.Value
+        LabelIdentify.Text = CStr(IdentifyCountBar.Value)
     End Sub
 
 
@@ -196,6 +202,7 @@ Public Class OptionsRedCloud
     End Sub
     Private Sub BitwiseReduction_CheckedChanged(sender As Object, e As EventArgs) Handles BitwiseReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
+        bitReductionChecked = BitwiseReduction.Checked
         reductionType = BitwiseReduction.Text
     End Sub
     Private Sub NoReduction_CheckedChanged(sender As Object, e As EventArgs) Handles NoReduction.CheckedChanged
@@ -211,9 +218,10 @@ Public Class OptionsRedCloud
         SimpleReduction = SimpleReductionBar.Value
         ColorLabel.Text = CStr(SimpleReductionBar.Value)
     End Sub
-    Private Sub BitwiseReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles BitwiseReductionSlider.ValueChanged
+    Private Sub BitwiseReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles BitwiseReductionBar.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        bitwiseLabel.Text = CStr(BitwiseReductionSlider.Value)
+        bitReduction = BitwiseReductionBar.Value
+        bitwiseLabel.Text = CStr(BitwiseReductionBar.Value)
     End Sub
 
 
@@ -264,10 +272,10 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         depthInputIndex = 1
     End Sub
-    Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinSlider.ValueChanged
+    Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinBar3D.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        LabelHistogramBins.Text = CStr(HistBinSlider.Value)
-        bins3D = HistBinSlider.Value * HistBinSlider.Value * HistBinSlider.Value
+        LabelHistogramBins.Text = CStr(HistBinBar3D.Value)
+        histBins3D = HistBinBar3D.Value * HistBinBar3D.Value * HistBinBar3D.Value
     End Sub
 
     Private Sub UseGuidedProjection_CheckedChanged(sender As Object, e As EventArgs) Handles UseGuidedProjection.CheckedChanged
@@ -290,7 +298,7 @@ Public Class OptionsRedCloud
         ReductionTypeGroup.Enabled = colorInputName = "Reduction_Basics"
         If colorInputName = "Reduction_Basics" Then
             SimpleReductionBar.Enabled = reductionType = "Use Simple Reduction"
-            BitwiseReductionSlider.Enabled = reductionType = "Use Bitwise Reduction"
+            BitwiseReductionBar.Enabled = reductionType = "Use Bitwise Reduction"
         End If
     End Sub
 

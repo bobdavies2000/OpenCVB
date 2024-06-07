@@ -190,7 +190,7 @@ Public Class Hist3D_Pixel : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 3 Then src = task.color
-        Dim bins = task.redOptions.HistBinSlider.Value
+        Dim bins = task.redOptions.HistBinBar3D.Value
         cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, task.redOptions.rangesBGR)
 
         ReDim histArray(histogram.Total - 1)
@@ -200,7 +200,7 @@ Public Class Hist3D_Pixel : Inherits VB_Parent
             histArray(i) = i + 1
         Next
 
-        classCount = task.redOptions.bins3D
+        classCount = task.redOptions.histBins3D
         Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
 
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
@@ -232,7 +232,7 @@ Public Class Hist3D_PixelCells : Inherits VB_Parent
             cv.Cv2.CalcBackProject({src(cell.rect)}, {0, 1, 2}, pixel.histogram, dst2(cell.rect), task.redOptions.rangesBGR)
         Next
 
-        dst3 = ShowPalette(dst2 * 255 / task.redOptions.bins3D)
+        dst3 = ShowPalette(dst2 * 255 / task.redOptions.histBins3D)
     End Sub
 End Class
 

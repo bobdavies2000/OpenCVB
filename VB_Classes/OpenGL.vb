@@ -1929,7 +1929,7 @@ Public Class OpenGL_HistDepth3D : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         hcloud.Run(src)
-        Dim histogram = New cv.Mat(task.redOptions.bins3D, 1, cv.MatType.CV_32F, hcloud.histogram.Data)
+        Dim histogram = New cv.Mat(task.redOptions.histBins3D, 1, cv.MatType.CV_32F, hcloud.histogram.Data)
         task.ogl.dataInput = histogram
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(New cv.Mat)

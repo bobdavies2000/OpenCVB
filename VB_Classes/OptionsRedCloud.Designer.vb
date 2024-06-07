@@ -24,16 +24,16 @@ Partial Class OptionsRedCloud
     Private Sub InitializeComponent()
         Me.RedCloudSliders = New System.Windows.Forms.GroupBox()
         Me.LabelHistogramBins = New System.Windows.Forms.Label()
-        Me.HistBinSlider = New System.Windows.Forms.TrackBar()
+        Me.HistBinBar3D = New System.Windows.Forms.TrackBar()
         Me.Label7 = New System.Windows.Forms.Label()
         Me.YLabel = New System.Windows.Forms.Label()
         Me.YRangeSlider = New System.Windows.Forms.TrackBar()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.XLabel = New System.Windows.Forms.Label()
-        Me.XRangeSlider = New System.Windows.Forms.TrackBar()
+        Me.XRangeBar = New System.Windows.Forms.TrackBar()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.SideLabel = New System.Windows.Forms.Label()
-        Me.ProjectionThreshold = New System.Windows.Forms.TrackBar()
+        Me.ProjectionThresholdBar = New System.Windows.Forms.TrackBar()
         Me.Label8 = New System.Windows.Forms.Label()
         Me.ReductionTypeGroup = New System.Windows.Forms.GroupBox()
         Me.NoReduction = New System.Windows.Forms.RadioButton()
@@ -41,7 +41,7 @@ Partial Class OptionsRedCloud
         Me.UseSimpleReduction = New System.Windows.Forms.RadioButton()
         Me.ReductionSliders = New System.Windows.Forms.GroupBox()
         Me.bitwiseLabel = New System.Windows.Forms.Label()
-        Me.BitwiseReductionSlider = New System.Windows.Forms.TrackBar()
+        Me.BitwiseReductionBar = New System.Windows.Forms.TrackBar()
         Me.reduceXbits = New System.Windows.Forms.Label()
         Me.ColorLabel = New System.Windows.Forms.Label()
         Me.SimpleReductionBar = New System.Windows.Forms.TrackBar()
@@ -60,7 +60,7 @@ Partial Class OptionsRedCloud
         Me.UseColorOnly = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.LabelIdentify = New System.Windows.Forms.Label()
-        Me.IdentifyCountSlider = New System.Windows.Forms.TrackBar()
+        Me.IdentifyCountBar = New System.Windows.Forms.TrackBar()
         Me.IdentifyCountLabel = New System.Windows.Forms.Label()
         Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.ColorSource = New System.Windows.Forms.ComboBox()
@@ -69,30 +69,30 @@ Partial Class OptionsRedCloud
         Me.naturalColor = New System.Windows.Forms.CheckBox()
         Me.CheckBox1 = New System.Windows.Forms.CheckBox()
         Me.RedCloudSliders.SuspendLayout()
-        CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.HistBinBar3D, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.XRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.ProjectionThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.XRangeBar, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.ProjectionThresholdBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ReductionTypeGroup.SuspendLayout()
         Me.ReductionSliders.SuspendLayout()
-        CType(Me.BitwiseReductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.BitwiseReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.RedCloudOnly.SuspendLayout()
         Me.RedCloudType.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
-        CType(Me.IdentifyCountSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.IdentifyCountBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'RedCloudSliders
         '
         Me.RedCloudSliders.Controls.Add(Me.LabelHistogramBins)
-        Me.RedCloudSliders.Controls.Add(Me.HistBinSlider)
+        Me.RedCloudSliders.Controls.Add(Me.HistBinBar3D)
         Me.RedCloudSliders.Controls.Add(Me.Label7)
         Me.RedCloudSliders.Controls.Add(Me.YLabel)
         Me.RedCloudSliders.Controls.Add(Me.YRangeSlider)
         Me.RedCloudSliders.Controls.Add(Me.Label4)
         Me.RedCloudSliders.Controls.Add(Me.XLabel)
-        Me.RedCloudSliders.Controls.Add(Me.XRangeSlider)
+        Me.RedCloudSliders.Controls.Add(Me.XRangeBar)
         Me.RedCloudSliders.Controls.Add(Me.Label2)
         Me.RedCloudSliders.Location = New System.Drawing.Point(12, 318)
         Me.RedCloudSliders.Name = "RedCloudSliders"
@@ -109,16 +109,16 @@ Partial Class OptionsRedCloud
         Me.LabelHistogramBins.TabIndex = 32
         Me.LabelHistogramBins.Text = "Label5"
         '
-        'HistBinSlider
+        'HistBinBar3D
         '
-        Me.HistBinSlider.Location = New System.Drawing.Point(156, 15)
-        Me.HistBinSlider.Maximum = 16
-        Me.HistBinSlider.Minimum = 2
-        Me.HistBinSlider.Name = "HistBinSlider"
-        Me.HistBinSlider.Size = New System.Drawing.Size(506, 69)
-        Me.HistBinSlider.TabIndex = 31
-        Me.HistBinSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.HistBinSlider.Value = 4
+        Me.HistBinBar3D.Location = New System.Drawing.Point(156, 15)
+        Me.HistBinBar3D.Maximum = 16
+        Me.HistBinBar3D.Minimum = 2
+        Me.HistBinBar3D.Name = "HistBinBar3D"
+        Me.HistBinBar3D.Size = New System.Drawing.Size(506, 69)
+        Me.HistBinBar3D.TabIndex = 31
+        Me.HistBinBar3D.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.HistBinBar3D.Value = 4
         '
         'Label7
         '
@@ -166,16 +166,16 @@ Partial Class OptionsRedCloud
         Me.XLabel.TabIndex = 11
         Me.XLabel.Text = "Label1"
         '
-        'XRangeSlider
+        'XRangeBar
         '
-        Me.XRangeSlider.Location = New System.Drawing.Point(156, 88)
-        Me.XRangeSlider.Maximum = 1000
-        Me.XRangeSlider.Minimum = 3
-        Me.XRangeSlider.Name = "XRangeSlider"
-        Me.XRangeSlider.Size = New System.Drawing.Size(506, 69)
-        Me.XRangeSlider.TabIndex = 10
-        Me.XRangeSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.XRangeSlider.Value = 5
+        Me.XRangeBar.Location = New System.Drawing.Point(156, 88)
+        Me.XRangeBar.Maximum = 1000
+        Me.XRangeBar.Minimum = 3
+        Me.XRangeBar.Name = "XRangeBar"
+        Me.XRangeBar.Size = New System.Drawing.Size(506, 69)
+        Me.XRangeBar.TabIndex = 10
+        Me.XRangeBar.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.XRangeBar.Value = 5
         '
         'Label2
         '
@@ -195,15 +195,15 @@ Partial Class OptionsRedCloud
         Me.SideLabel.TabIndex = 17
         Me.SideLabel.Text = "Label7"
         '
-        'ProjectionThreshold
+        'ProjectionThresholdBar
         '
-        Me.ProjectionThreshold.Location = New System.Drawing.Point(180, 96)
-        Me.ProjectionThreshold.Maximum = 200
-        Me.ProjectionThreshold.Name = "ProjectionThreshold"
-        Me.ProjectionThreshold.Size = New System.Drawing.Size(482, 69)
-        Me.ProjectionThreshold.TabIndex = 16
-        Me.ProjectionThreshold.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.ProjectionThreshold.Value = 10
+        Me.ProjectionThresholdBar.Location = New System.Drawing.Point(180, 96)
+        Me.ProjectionThresholdBar.Maximum = 200
+        Me.ProjectionThresholdBar.Name = "ProjectionThresholdBar"
+        Me.ProjectionThresholdBar.Size = New System.Drawing.Size(482, 69)
+        Me.ProjectionThresholdBar.TabIndex = 16
+        Me.ProjectionThresholdBar.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.ProjectionThresholdBar.Value = 10
         '
         'Label8
         '
@@ -262,7 +262,7 @@ Partial Class OptionsRedCloud
         'ReductionSliders
         '
         Me.ReductionSliders.Controls.Add(Me.bitwiseLabel)
-        Me.ReductionSliders.Controls.Add(Me.BitwiseReductionSlider)
+        Me.ReductionSliders.Controls.Add(Me.BitwiseReductionBar)
         Me.ReductionSliders.Controls.Add(Me.reduceXbits)
         Me.ReductionSliders.Controls.Add(Me.ColorLabel)
         Me.ReductionSliders.Controls.Add(Me.SimpleReductionBar)
@@ -283,15 +283,15 @@ Partial Class OptionsRedCloud
         Me.bitwiseLabel.TabIndex = 11
         Me.bitwiseLabel.Text = "BitwiseLabel"
         '
-        'BitwiseReductionSlider
+        'BitwiseReductionBar
         '
-        Me.BitwiseReductionSlider.Location = New System.Drawing.Point(156, 85)
-        Me.BitwiseReductionSlider.Maximum = 7
-        Me.BitwiseReductionSlider.Name = "BitwiseReductionSlider"
-        Me.BitwiseReductionSlider.Size = New System.Drawing.Size(506, 69)
-        Me.BitwiseReductionSlider.TabIndex = 10
-        Me.BitwiseReductionSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.BitwiseReductionSlider.Value = 5
+        Me.BitwiseReductionBar.Location = New System.Drawing.Point(156, 85)
+        Me.BitwiseReductionBar.Maximum = 7
+        Me.BitwiseReductionBar.Name = "BitwiseReductionBar"
+        Me.BitwiseReductionBar.Size = New System.Drawing.Size(506, 69)
+        Me.BitwiseReductionBar.TabIndex = 10
+        Me.BitwiseReductionBar.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.BitwiseReductionBar.Value = 5
         '
         'reduceXbits
         '
@@ -478,9 +478,9 @@ Partial Class OptionsRedCloud
         'GroupBox2
         '
         Me.GroupBox2.Controls.Add(Me.LabelIdentify)
-        Me.GroupBox2.Controls.Add(Me.IdentifyCountSlider)
+        Me.GroupBox2.Controls.Add(Me.IdentifyCountBar)
         Me.GroupBox2.Controls.Add(Me.IdentifyCountLabel)
-        Me.GroupBox2.Controls.Add(Me.ProjectionThreshold)
+        Me.GroupBox2.Controls.Add(Me.ProjectionThresholdBar)
         Me.GroupBox2.Controls.Add(Me.Label8)
         Me.GroupBox2.Controls.Add(Me.SideLabel)
         Me.GroupBox2.Location = New System.Drawing.Point(12, 4)
@@ -499,16 +499,16 @@ Partial Class OptionsRedCloud
         Me.LabelIdentify.TabIndex = 32
         Me.LabelIdentify.Text = "Label1"
         '
-        'IdentifyCountSlider
+        'IdentifyCountBar
         '
-        Me.IdentifyCountSlider.Location = New System.Drawing.Point(180, 30)
-        Me.IdentifyCountSlider.Maximum = 255
-        Me.IdentifyCountSlider.Minimum = 1
-        Me.IdentifyCountSlider.Name = "IdentifyCountSlider"
-        Me.IdentifyCountSlider.Size = New System.Drawing.Size(482, 69)
-        Me.IdentifyCountSlider.TabIndex = 31
-        Me.IdentifyCountSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.IdentifyCountSlider.Value = 10
+        Me.IdentifyCountBar.Location = New System.Drawing.Point(180, 30)
+        Me.IdentifyCountBar.Maximum = 255
+        Me.IdentifyCountBar.Minimum = 1
+        Me.IdentifyCountBar.Name = "IdentifyCountBar"
+        Me.IdentifyCountBar.Size = New System.Drawing.Size(482, 69)
+        Me.IdentifyCountBar.TabIndex = 31
+        Me.IdentifyCountBar.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.IdentifyCountBar.Value = 10
         '
         'IdentifyCountLabel
         '
@@ -601,15 +601,15 @@ Partial Class OptionsRedCloud
         Me.Text = "OptionsRedCloud"
         Me.RedCloudSliders.ResumeLayout(False)
         Me.RedCloudSliders.PerformLayout()
-        CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.HistBinBar3D, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.XRangeSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.ProjectionThreshold, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.XRangeBar, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.ProjectionThresholdBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ReductionTypeGroup.ResumeLayout(False)
         Me.ReductionTypeGroup.PerformLayout()
         Me.ReductionSliders.ResumeLayout(False)
         Me.ReductionSliders.PerformLayout()
-        CType(Me.BitwiseReductionSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.BitwiseReductionBar, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.RedCloudOnly.ResumeLayout(False)
         Me.RedCloudOnly.PerformLayout()
@@ -617,7 +617,7 @@ Partial Class OptionsRedCloud
         Me.RedCloudType.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
-        CType(Me.IdentifyCountSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.IdentifyCountBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -627,17 +627,17 @@ Partial Class OptionsRedCloud
     Friend WithEvents YRangeSlider As Windows.Forms.TrackBar
     Friend WithEvents Label4 As Windows.Forms.Label
     Friend WithEvents XLabel As Windows.Forms.Label
-    Friend WithEvents XRangeSlider As Windows.Forms.TrackBar
+    Friend WithEvents XRangeBar As Windows.Forms.TrackBar
     Friend WithEvents Label2 As Windows.Forms.Label
     Friend WithEvents SideLabel As Windows.Forms.Label
-    Friend WithEvents ProjectionThreshold As Windows.Forms.TrackBar
+    Friend WithEvents ProjectionThresholdBar As Windows.Forms.TrackBar
     Friend WithEvents Label8 As Windows.Forms.Label
     Friend WithEvents ReductionTypeGroup As Windows.Forms.GroupBox
     Friend WithEvents BitwiseReduction As Windows.Forms.RadioButton
     Friend WithEvents UseSimpleReduction As Windows.Forms.RadioButton
     Friend WithEvents ReductionSliders As Windows.Forms.GroupBox
     Friend WithEvents bitwiseLabel As Windows.Forms.Label
-    Friend WithEvents BitwiseReductionSlider As Windows.Forms.TrackBar
+    Friend WithEvents BitwiseReductionBar As Windows.Forms.TrackBar
     Friend WithEvents reduceXbits As Windows.Forms.Label
     Friend WithEvents ColorLabel As Windows.Forms.Label
     Friend WithEvents SimpleReductionBar As Windows.Forms.TrackBar
@@ -657,12 +657,12 @@ Partial Class OptionsRedCloud
     Friend WithEvents UseGuidedProjection As Windows.Forms.RadioButton
     Friend WithEvents GroupBox2 As Windows.Forms.GroupBox
     Friend WithEvents LabelHistogramBins As Windows.Forms.Label
-    Friend WithEvents HistBinSlider As Windows.Forms.TrackBar
+    Friend WithEvents HistBinBar3D As Windows.Forms.TrackBar
     Friend WithEvents Label7 As Windows.Forms.Label
     Friend WithEvents ColorSourceLabel As Windows.Forms.Label
     Friend WithEvents ColorSource As Windows.Forms.ComboBox
     Friend WithEvents LabelIdentify As Windows.Forms.Label
-    Friend WithEvents IdentifyCountSlider As Windows.Forms.TrackBar
+    Friend WithEvents IdentifyCountBar As Windows.Forms.TrackBar
     Friend WithEvents IdentifyCountLabel As Windows.Forms.Label
     Friend WithEvents IdentifyCells As Windows.Forms.CheckBox
     Friend WithEvents DisplayCellStats As Windows.Forms.CheckBox

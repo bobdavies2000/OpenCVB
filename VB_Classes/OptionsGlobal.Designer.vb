@@ -229,6 +229,7 @@ Partial Class OptionsGlobal
         Me.PixelDiffBar.Size = New System.Drawing.Size(506, 69)
         Me.PixelDiffBar.TabIndex = 49
         Me.PixelDiffBar.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.PixelDiffBar.Value = 25
         '
         'Label7
         '
