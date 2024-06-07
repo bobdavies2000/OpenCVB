@@ -4,8 +4,9 @@ Public Class OptionsRedCloud
     Public colorInputIndex As Integer
     Public reductionType As String = "Use Simple Reduction"
     Public depthInputIndex As Integer = 0 ' guidedBP is the default.
-
-    Public PCReduction As Integer
+    Public SimpleReduction As Integer
+    Public SimpleReductionChecked As Boolean
+    Public PointCloudReduction As Integer
     Public channels() As Integer = {0, 1}
     Public channelIndex As Integer
     Public rangesBGR() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 256), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
@@ -73,8 +74,8 @@ Public Class OptionsRedCloud
         task.channelsTop = {2, 0}
         task.channelsSide = {1, 2}
 
-        SimpleReduction.Checked = True
-        PCReduction = 3
+        UseSimpleReduction.Checked = True
+        PointCloudReduction = 3
         XYReduction.Checked = True
         histBinList = {task.histogramBins, task.histogramBins}
         UseColorOnly.Checked = True
@@ -85,13 +86,13 @@ Public Class OptionsRedCloud
         Next
         ColorSource.SelectedItem() = "Bin4Way_Regions"
 
-        task.redOptions.SimpleReductionSlider.Value = 40
+        task.redOptions.SimpleReductionBar.Value = 40
         Select Case task.cameraName
             Case "Azure Kinect 4K"
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
             Case "Intel(R) RealSense(TM) Depth Camera 455"
             Case "Oak-D camera"
-                task.redOptions.SimpleReductionSlider.Value = 80
+                task.redOptions.SimpleReductionBar.Value = 80
             Case "StereoLabs ZED 2/2i"
             Case "MYNT-EYE-D1000"
         End Select
@@ -123,7 +124,7 @@ Public Class OptionsRedCloud
 
         channelCount = 1
         channelIndex = 0
-        Select Case task.redOptions.PCReduction
+        Select Case task.redOptions.PointCloudReduction
             Case 0 ' "X Reduction"
                 ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
                 channels = {0}
@@ -161,7 +162,7 @@ Public Class OptionsRedCloud
                 histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
         End Select
 
-        SimpleReductionSlider.Enabled = Not BitwiseReduction.Checked
+        SimpleReductionBar.Enabled = Not BitwiseReduction.Checked
         BitwiseReductionSlider.Enabled = BitwiseReduction.Checked
         RedCloudOnly.Enabled = Not UseColorOnly.Checked
     End Sub
@@ -188,9 +189,10 @@ Public Class OptionsRedCloud
 
 
 
-    Private Sub SimpleReduction_CheckedChanged(sender As Object, e As EventArgs) Handles SimpleReduction.CheckedChanged
+    Private Sub SimpleReduction_CheckedChanged(sender As Object, e As EventArgs) Handles UseSimpleReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        reductionType = SimpleReduction.Text
+        SimpleReductionChecked = UseSimpleReduction.Checked
+        reductionType = UseSimpleReduction.Text
     End Sub
     Private Sub BitwiseReduction_CheckedChanged(sender As Object, e As EventArgs) Handles BitwiseReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
@@ -204,9 +206,10 @@ Public Class OptionsRedCloud
 
 
 
-    Private Sub ColorReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles SimpleReductionSlider.ValueChanged
+    Private Sub ColorReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles SimpleReductionBar.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        ColorLabel.Text = CStr(SimpleReductionSlider.Value)
+        SimpleReduction = SimpleReductionBar.Value
+        ColorLabel.Text = CStr(SimpleReductionBar.Value)
     End Sub
     Private Sub BitwiseReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles BitwiseReductionSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
@@ -217,37 +220,37 @@ Public Class OptionsRedCloud
 
     Private Sub XReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = XReduction.Tag
+        PointCloudReduction = XReduction.Tag
         task.gOptions.HistBinBar.Value = 16
     End Sub
     Private Sub YReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = YReduction.Tag
+        PointCloudReduction = YReduction.Tag
         task.gOptions.HistBinBar.Value = 16
     End Sub
     Private Sub ZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles ZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = ZReduction.Tag
+        PointCloudReduction = ZReduction.Tag
         task.gOptions.HistBinBar.Value = 16
     End Sub
     Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs) Handles XYReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = XYReduction.Tag
+        PointCloudReduction = XYReduction.Tag
         task.gOptions.HistBinBar.Value = 16
     End Sub
     Private Sub XZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = XZReduction.Tag
+        PointCloudReduction = XZReduction.Tag
         task.gOptions.HistBinBar.Value = 16
     End Sub
     Private Sub YZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = YZReduction.Tag
+        PointCloudReduction = YZReduction.Tag
         task.gOptions.HistBinBar.Value = 16
     End Sub
     Public Sub XYZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XYZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = XYZReduction.Tag
+        PointCloudReduction = XYZReduction.Tag
         task.gOptions.HistBinBar.Value = 6
     End Sub
 
@@ -286,7 +289,7 @@ Public Class OptionsRedCloud
         ReductionSliders.Enabled = colorInputName = "Reduction_Basics"
         ReductionTypeGroup.Enabled = colorInputName = "Reduction_Basics"
         If colorInputName = "Reduction_Basics" Then
-            SimpleReductionSlider.Enabled = reductionType = "Use Simple Reduction"
+            SimpleReductionBar.Enabled = reductionType = "Use Simple Reduction"
             BitwiseReductionSlider.Enabled = reductionType = "Use Bitwise Reduction"
         End If
     End Sub

@@ -908,7 +908,7 @@ Public Class PointCloud_Histograms : Inherits VB_Parent
         cv.Cv2.CalcHist({task.pointCloud}, task.redOptions.channels, New cv.Mat(), histogram, task.redOptions.channelCount,
                         task.redOptions.histBinList, task.redOptions.ranges)
 
-        Select Case task.redOptions.PCReduction
+        Select Case task.redOptions.PointCloudReduction
             Case 0, 1, 2 ' "X Reduction", "Y Reduction", "Z Reduction"
                 plot.Run(histogram)
                 dst2 = plot.histogram

@@ -16,11 +16,11 @@ Public Class Reduction_Basics : Inherits VB_Parent
             dst2 = src And New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))
             dst2 = dst2 / zeroBits
         ElseIf task.redOptions.reductionType = "Use Simple Reduction" Then
-            Dim reductionVal = task.redOptions.SimpleReductionSlider.Value
+            Dim reductionVal = task.redOptions.SimpleReductionBar.Value
             classCount = Math.Ceiling(255 / reductionVal)
 
             dst2 = src / reductionVal
-            labels(2) = "Reduced image - factor = " + CStr(task.redOptions.SimpleReductionSlider.Value)
+            labels(2) = "Reduced image - factor = " + CStr(task.redOptions.SimpleReductionBar.Value)
         Else
             dst2 = src
             labels(2) = "No reduction requested"
@@ -42,7 +42,7 @@ Public Class Reduction_Floodfill : Inherits VB_Parent
         task.redOptions.IdentifyCells.Checked = True
         task.redOptions.UseColorOnly.Checked = True
         labels(2) = "Reduced input to floodfill"
-        task.redOptions.SimpleReductionSlider.Value = 32
+        task.redOptions.SimpleReductionBar.Value = 32
         desc = "Use the reduction output as input to floodfill to get masks of cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -97,8 +97,8 @@ End Class
 Public Class Reduction_PointCloud : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        task.redOptions.SimpleReduction.Checked = True
-        task.redOptions.SimpleReductionSlider.Value = 20
+        task.redOptions.UseSimpleReduction.Checked = True
+        task.redOptions.SimpleReductionBar.Value = 20
         labels = {"", "", "8-bit reduced depth", "Palettized output of the different depth levels found"}
         desc = "Use reduction to smooth depth data"
     End Sub
@@ -131,8 +131,8 @@ Public Class Reduction_XYZ : Inherits VB_Parent
             check.Box(1).Checked = True
             check.Box(2).Checked = True
         End If
-        task.redOptions.SimpleReductionSlider.Maximum = 1000
-        task.redOptions.SimpleReductionSlider.Value = 400
+        task.redOptions.SimpleReductionBar.Maximum = 1000
+        task.redOptions.SimpleReductionBar.Value = 400
         desc = "Use reduction to slice the point cloud in 3 dimensions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -166,7 +166,7 @@ Public Class Reduction_Edges : Inherits VB_Parent
     Dim edges As New Edge_Laplacian
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        task.redOptions.SimpleReduction.Checked = True
+        task.redOptions.UseSimpleReduction.Checked = True
         desc = "Get the edges after reducing the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)

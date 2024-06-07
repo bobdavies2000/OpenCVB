@@ -49,7 +49,7 @@ Public Class CPP_Basics : Inherits VB_Parent
                                task.frameHistoryCount,
                                task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height,
                                task.lineWidth, task.lineType, task.dotSize, task.lowRes.Width, task.lowRes.Height,
-                               task.maxZmeters, task.redOptions.PCReduction, task.cvFontSize, task.cvFontThickness,
+                               task.maxZmeters, task.redOptions.PointCloudReduction, task.cvFontSize, task.cvFontThickness,
                                task.clickPoint.X, task.clickPoint.Y, task.mouseClickFlag,
                                task.mousePicTag, task.mouseMovePoint.X, task.mouseMovePoint.Y,
                                task.paletteIndex, 255, task.midHeartBeat,

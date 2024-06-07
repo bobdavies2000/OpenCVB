@@ -2113,7 +2113,7 @@ Public Class RedCloud_Reduce : Inherits VB_Parent
 
         Dim split = dst0.Split()
 
-        Select Case task.redOptions.PCReduction
+        Select Case task.redOptions.PointCloudReduction
             Case 0 ' "X Reduction"
                 dst0 = (split(0) * reduceAmt).toMat
             Case 1 ' "Y Reduction"

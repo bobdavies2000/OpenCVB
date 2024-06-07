@@ -978,6 +978,43 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             dst3 = ShowPalette(dst2 * 255 / classCount);
         }
     }
+
+
+
+
+    public class CSharp_BackProject_Reduction : CS_Parent
+    {
+        private Reduction_Basics reduction = new Reduction_Basics();
+        private BackProject_Basics backP = new BackProject_Basics();
+
+        public CSharp_BackProject_Reduction(VBtask task) : base(task)
+        {
+            task.redOptions.SimpleReductionChecked = true;
+            labels[3] = "Backprojection of highlighted histogram bin";
+            desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            reduction.Run(src);
+
+            backP.Run(reduction.dst2);
+            dst2 = backP.dst2;
+            dst3 = backP.dst3;
+            int reductionValue = task.redOptions.SimpleReduction;
+            labels[2] = "Reduction = " + reductionValue.ToString() + " and bins = " + task.histogramBins.ToString();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
 }
 
 

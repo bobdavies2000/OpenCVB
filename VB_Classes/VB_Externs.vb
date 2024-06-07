@@ -162,7 +162,7 @@ Module VB_Externs
                                       rectHeight As Integer, lineWidth As Integer,
                                       lineType As Integer, dotSize As Integer, lowResWidth As Integer,
                                       lowResHeight As Integer, maxZmeters As Single,
-                                      PCReduction As Integer, fontSize As Single,
+                                      PointCloudReduction As Integer, fontSize As Single,
                                       fontThickness As Integer, clickX As Integer,
                                       clickY As Integer, clickFlag As Boolean, picTag As Integer,
                                       moveX As Integer, moveY As Integer, paletteIndex As Integer,

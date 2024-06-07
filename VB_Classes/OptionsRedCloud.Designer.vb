@@ -38,14 +38,14 @@ Partial Class OptionsRedCloud
         Me.ReductionTypeGroup = New System.Windows.Forms.GroupBox()
         Me.NoReduction = New System.Windows.Forms.RadioButton()
         Me.BitwiseReduction = New System.Windows.Forms.RadioButton()
-        Me.SimpleReduction = New System.Windows.Forms.RadioButton()
+        Me.UseSimpleReduction = New System.Windows.Forms.RadioButton()
         Me.ReductionSliders = New System.Windows.Forms.GroupBox()
         Me.bitwiseLabel = New System.Windows.Forms.Label()
         Me.BitwiseReductionSlider = New System.Windows.Forms.TrackBar()
         Me.reduceXbits = New System.Windows.Forms.Label()
         Me.ColorLabel = New System.Windows.Forms.Label()
-        Me.SimpleReductionSlider = New System.Windows.Forms.TrackBar()
-        Me.ColorReduce = New System.Windows.Forms.Label()
+        Me.SimpleReductionBar = New System.Windows.Forms.TrackBar()
+        Me.SimpleReduceLabel = New System.Windows.Forms.Label()
         Me.RedCloudOnly = New System.Windows.Forms.GroupBox()
         Me.XYZReduction = New System.Windows.Forms.RadioButton()
         Me.YZReduction = New System.Windows.Forms.RadioButton()
@@ -76,7 +76,7 @@ Partial Class OptionsRedCloud
         Me.ReductionTypeGroup.SuspendLayout()
         Me.ReductionSliders.SuspendLayout()
         CType(Me.BitwiseReductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.SimpleReductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.RedCloudOnly.SuspendLayout()
         Me.RedCloudType.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -218,7 +218,7 @@ Partial Class OptionsRedCloud
         '
         Me.ReductionTypeGroup.Controls.Add(Me.NoReduction)
         Me.ReductionTypeGroup.Controls.Add(Me.BitwiseReduction)
-        Me.ReductionTypeGroup.Controls.Add(Me.SimpleReduction)
+        Me.ReductionTypeGroup.Controls.Add(Me.UseSimpleReduction)
         Me.ReductionTypeGroup.Location = New System.Drawing.Point(792, 318)
         Me.ReductionTypeGroup.Name = "ReductionTypeGroup"
         Me.ReductionTypeGroup.Size = New System.Drawing.Size(220, 129)
@@ -248,16 +248,16 @@ Partial Class OptionsRedCloud
         Me.BitwiseReduction.Text = "Use Bitwise Reduction"
         Me.BitwiseReduction.UseVisualStyleBackColor = True
         '
-        'SimpleReduction
+        'UseSimpleReduction
         '
-        Me.SimpleReduction.AutoSize = True
-        Me.SimpleReduction.Location = New System.Drawing.Point(15, 29)
-        Me.SimpleReduction.Name = "SimpleReduction"
-        Me.SimpleReduction.Size = New System.Drawing.Size(192, 24)
-        Me.SimpleReduction.TabIndex = 0
-        Me.SimpleReduction.TabStop = True
-        Me.SimpleReduction.Text = "Use Simple Reduction"
-        Me.SimpleReduction.UseVisualStyleBackColor = True
+        Me.UseSimpleReduction.AutoSize = True
+        Me.UseSimpleReduction.Location = New System.Drawing.Point(15, 29)
+        Me.UseSimpleReduction.Name = "UseSimpleReduction"
+        Me.UseSimpleReduction.Size = New System.Drawing.Size(192, 24)
+        Me.UseSimpleReduction.TabIndex = 0
+        Me.UseSimpleReduction.TabStop = True
+        Me.UseSimpleReduction.Text = "Use Simple Reduction"
+        Me.UseSimpleReduction.UseVisualStyleBackColor = True
         '
         'ReductionSliders
         '
@@ -265,8 +265,8 @@ Partial Class OptionsRedCloud
         Me.ReductionSliders.Controls.Add(Me.BitwiseReductionSlider)
         Me.ReductionSliders.Controls.Add(Me.reduceXbits)
         Me.ReductionSliders.Controls.Add(Me.ColorLabel)
-        Me.ReductionSliders.Controls.Add(Me.SimpleReductionSlider)
-        Me.ReductionSliders.Controls.Add(Me.ColorReduce)
+        Me.ReductionSliders.Controls.Add(Me.SimpleReductionBar)
+        Me.ReductionSliders.Controls.Add(Me.SimpleReduceLabel)
         Me.ReductionSliders.Location = New System.Drawing.Point(792, 453)
         Me.ReductionSliders.Name = "ReductionSliders"
         Me.ReductionSliders.Size = New System.Drawing.Size(779, 140)
@@ -311,24 +311,24 @@ Partial Class OptionsRedCloud
         Me.ColorLabel.TabIndex = 8
         Me.ColorLabel.Text = "ColorLabel"
         '
-        'SimpleReductionSlider
+        'SimpleReductionBar
         '
-        Me.SimpleReductionSlider.Location = New System.Drawing.Point(156, 18)
-        Me.SimpleReductionSlider.Maximum = 255
-        Me.SimpleReductionSlider.Minimum = 1
-        Me.SimpleReductionSlider.Name = "SimpleReductionSlider"
-        Me.SimpleReductionSlider.Size = New System.Drawing.Size(506, 69)
-        Me.SimpleReductionSlider.TabIndex = 7
-        Me.SimpleReductionSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.SimpleReductionSlider.Value = 80
+        Me.SimpleReductionBar.Location = New System.Drawing.Point(156, 18)
+        Me.SimpleReductionBar.Maximum = 255
+        Me.SimpleReductionBar.Minimum = 1
+        Me.SimpleReductionBar.Name = "SimpleReductionBar"
+        Me.SimpleReductionBar.Size = New System.Drawing.Size(506, 69)
+        Me.SimpleReductionBar.TabIndex = 7
+        Me.SimpleReductionBar.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.SimpleReductionBar.Value = 80
         '
-        'ColorReduce
+        'SimpleReduceLabel
         '
-        Me.ColorReduce.Location = New System.Drawing.Point(8, 25)
-        Me.ColorReduce.Name = "ColorReduce"
-        Me.ColorReduce.Size = New System.Drawing.Size(152, 45)
-        Me.ColorReduce.TabIndex = 6
-        Me.ColorReduce.Text = "Simple Reduction"
+        Me.SimpleReduceLabel.Location = New System.Drawing.Point(8, 25)
+        Me.SimpleReduceLabel.Name = "SimpleReduceLabel"
+        Me.SimpleReduceLabel.Size = New System.Drawing.Size(152, 45)
+        Me.SimpleReduceLabel.TabIndex = 6
+        Me.SimpleReduceLabel.Text = "Simple Reduction"
         '
         'RedCloudOnly
         '
@@ -610,7 +610,7 @@ Partial Class OptionsRedCloud
         Me.ReductionSliders.ResumeLayout(False)
         Me.ReductionSliders.PerformLayout()
         CType(Me.BitwiseReductionSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.SimpleReductionSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.RedCloudOnly.ResumeLayout(False)
         Me.RedCloudOnly.PerformLayout()
         Me.RedCloudType.ResumeLayout(False)
@@ -634,14 +634,14 @@ Partial Class OptionsRedCloud
     Friend WithEvents Label8 As Windows.Forms.Label
     Friend WithEvents ReductionTypeGroup As Windows.Forms.GroupBox
     Friend WithEvents BitwiseReduction As Windows.Forms.RadioButton
-    Friend WithEvents SimpleReduction As Windows.Forms.RadioButton
+    Friend WithEvents UseSimpleReduction As Windows.Forms.RadioButton
     Friend WithEvents ReductionSliders As Windows.Forms.GroupBox
     Friend WithEvents bitwiseLabel As Windows.Forms.Label
     Friend WithEvents BitwiseReductionSlider As Windows.Forms.TrackBar
     Friend WithEvents reduceXbits As Windows.Forms.Label
     Friend WithEvents ColorLabel As Windows.Forms.Label
-    Friend WithEvents SimpleReductionSlider As Windows.Forms.TrackBar
-    Friend WithEvents ColorReduce As Windows.Forms.Label
+    Friend WithEvents SimpleReductionBar As Windows.Forms.TrackBar
+    Friend WithEvents SimpleReduceLabel As Windows.Forms.Label
     Friend WithEvents RedCloudOnly As Windows.Forms.GroupBox
     Friend WithEvents XZReduction As Windows.Forms.RadioButton
     Friend WithEvents XYReduction As Windows.Forms.RadioButton
