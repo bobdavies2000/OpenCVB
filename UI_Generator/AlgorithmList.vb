@@ -95,8 +95,8 @@ Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	if algorithmName = "Area_MinTriangle_CPP" Then return new Area_MinTriangle_CPP
 	if algorithmName = "Area_SoloPoints" Then return new Area_SoloPoints
 	if algorithmName = "AsciiArt_Basics" Then return new AsciiArt_Basics
+	if algorithmName = "AsciiArt_Color" Then return new AsciiArt_Color
 	if algorithmName = "AsciiArt_Diff" Then return new AsciiArt_Diff
-	if algorithmName = "AsciiArt_Gray" Then return new AsciiArt_Gray
 	if algorithmName = "BackProject_Basics" Then return new BackProject_Basics
 	if algorithmName = "BackProject_BasicsKeyboard" Then return new BackProject_BasicsKeyboard
 	if algorithmName = "BackProject_Depth" Then return new BackProject_Depth

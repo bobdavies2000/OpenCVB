@@ -123,6 +123,9 @@ Public Class VBtask : Implements IDisposable
     Public gridROIclicked As Integer
     Public ogl As OpenGL_Basics
 
+    Public gOptions As New OptionsGlobal
+    Public redOptions As New OptionsRedCloud
+
     Public palette As Palette_LoadColorMap
     Public paletteGradient As cv.Mat
     Public paletteIndex As Integer
@@ -641,6 +644,7 @@ Public Class VBtask : Implements IDisposable
                 For Each ttxt In algorithmObjectCS.trueData
                     task.trueData.Add(ttxt)
                 Next
+                algorithmObjectCS.firstPass = False
             Else
                 algorithmObjectVB.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
             End If

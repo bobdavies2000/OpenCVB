@@ -29,7 +29,7 @@ End Class
 
 
 
-Public Class AsciiArt_Gray : Inherits VB_Parent
+Public Class AsciiArt_Color : Inherits VB_Parent
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "A palette'd version of the ascii art data"
@@ -58,7 +58,7 @@ End Class
 
 
 Public Class AsciiArt_Diff : Inherits VB_Parent
-    Dim grayAA As New AsciiArt_Gray
+    Dim grayAA As New AsciiArt_Color
     Dim diff As New Diff_Basics
     Public Sub New()
         desc = "Display the instability in image pixels."

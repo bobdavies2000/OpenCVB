@@ -12,8 +12,6 @@ Module VB_Common
     Public Const fmt4 = "0.0000"
     Public Const depthListMaxCount As Integer = 10
     Public newPoint As New cv.Point
-    Public gOptions As New OptionsGlobal
-    Public redOptions As New OptionsRedCloud
     Public task As VBtask
 
     Public pipeCount As Integer
