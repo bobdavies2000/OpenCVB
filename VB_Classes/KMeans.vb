@@ -172,7 +172,7 @@ Public Class KMeans_CustomData : Inherits VB_Parent
         If standaloneTest() Then
             Static random = New Random_Basics
             Static randslider = FindSlider("Random Pixel Count")
-            If firstPass Then randslider.Value = 50
+            If task.firstPass Then randslider.Value = 50
             If randslider.Value < k Then randslider.Value = k
             If task.heartBeat Then random.Run(empty)
 

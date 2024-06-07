@@ -79,7 +79,7 @@ Public Class BackProject2D_Compare : Inherits VB_Parent
         backP.Run(src)
         mats.mat(2) = backP.dst3
 
-        If firstPass Then mats.quadrant = RESULT_DST3
+        If task.firstPass Then mats.quadrant = RESULT_DST3
         mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3

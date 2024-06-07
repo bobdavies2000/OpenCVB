@@ -37,7 +37,7 @@ Public Class FeatureFlow_Basics : Inherits VB_Parent
         feat.Run(src)
         labels = feat.labels
 
-        dst3 = If(firstPass, src.Clone, dst2.Clone)
+        dst3 = If(task.firstPass, src.Clone, dst2.Clone)
         Static prevFeatures As New List(Of cv.Point)(task.featurePoints)
         buildCorrelations(prevFeatures, task.featurePoints)
 

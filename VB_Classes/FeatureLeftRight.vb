@@ -173,7 +173,7 @@ Public Class FeatureLeftRight_Grid : Inherits VB_Parent
         dst1 = match.dst1.Clone
         dst2 = match.dst2.Clone
         dst3 = match.dst3.Clone
-        If firstPass Then match.setClickPoint(match.mpList(0).p1, 2)
+        If task.firstPass Then match.setClickPoint(match.mpList(0).p1, 2)
         setTrueText(match.strOut, match.selectedPoint, 1)
         If task.heartBeat Then labels = match.labels
     End Sub

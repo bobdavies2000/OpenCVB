@@ -412,7 +412,7 @@ Public Class Mat_4Click : Inherits VB_Parent
         mats.Run(empty)
         dst2 = mats.dst2.Clone
         If standaloneTest() Then mats.defaultMats(src)
-        If firstPass Then
+        If task.firstPass Then
             task.clickPoint = New cv.Point(0, 0)
             task.mousePicTag = RESULT_DST2
         End If

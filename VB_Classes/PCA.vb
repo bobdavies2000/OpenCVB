@@ -59,7 +59,7 @@ Public Class PCA_Basics : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
             Static redC As New RedCloud_Basics
-            If firstPass Then task.redOptions.UseColorOnly.Checked = True
+            If task.firstPass Then task.redOptions.UseColorOnly.Checked = True
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)

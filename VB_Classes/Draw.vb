@@ -375,7 +375,7 @@ Public Class Draw_Line : Inherits VB_Parent
         desc = "Draw a line between the selected p1 and p2 - either by clicking twice in the image or externally providing p1 and p2."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If firstPass Then task.clickPoint = New cv.Point
+        If task.firstPass Then task.clickPoint = New cv.Point
 
         If p1 <> New cv.Point And p2 <> New cv.Point And task.clickPoint <> New cv.Point Then
             p1 = New cv.Point

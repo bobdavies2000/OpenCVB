@@ -16,7 +16,7 @@ Public Class FeaturePoly_Basics : Inherits VB_Parent
         desc = "Build a Feature polygon with the top generation counts of the good features"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If firstPass Then sides.prevImage = src.Clone
+        If task.firstPass Then sides.prevImage = src.Clone
         sides.options.RunVB()
 
         topFeatures.Run(src)
@@ -133,7 +133,7 @@ Public Class FeaturePoly_Sides : Inherits VB_Parent
         Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
         Dim threshold = thresholdSlider.Value
 
-        If firstPass Then prevImage = src.Clone
+        If task.firstPass Then prevImage = src.Clone
         options.RunVB()
 
         If standaloneTest() And task.heartBeat Then
@@ -149,7 +149,7 @@ Public Class FeaturePoly_Sides : Inherits VB_Parent
         Next
         currSideIndex = currLengths.IndexOf(currLengths.Max)
 
-        If firstPass Then
+        If task.firstPass Then
             prevPoly = New List(Of cv.Point2f)(currPoly)
             prevLengths = New List(Of Single)(currLengths)
             prevSideIndex = prevLengths.IndexOf(prevLengths.Max)
@@ -252,7 +252,7 @@ Public Class FeaturePoly_BasicsOriginal : Inherits VB_Parent
         desc = "Build a Feature polygon with the top generation counts of the good features"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If firstPass Then resyncImage = src.Clone
+        If task.firstPass Then resyncImage = src.Clone
         options.RunVB()
 
         topFeatures.Run(src)
@@ -267,7 +267,7 @@ Public Class FeaturePoly_BasicsOriginal : Inherits VB_Parent
         For i = 0 To fPD.currPoly.Count - 1
             setTrueText(CStr(i), fPD.currPoly(i), 1)
         Next
-        If firstPass Then fPD.lengthPrevious = New List(Of Single)(fPD.currLength)
+        If task.firstPass Then fPD.lengthPrevious = New List(Of Single)(fPD.currLength)
 
         center.fPD = fPD
         center.Run(src)
@@ -1019,7 +1019,7 @@ Public Class FeaturePoly_PointCloud : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         fMask.Run(src)
-        If fMask.fImage.fpoly.resync Or firstPass Then fPolyCloud = task.pointCloud.Clone
+        If fMask.fImage.fpoly.resync Or task.firstPass Then fPolyCloud = task.pointCloud.Clone
         dst1 = fMask.dst1
         dst2 = fMask.dst2
         dst3 = fMask.dst3

@@ -160,7 +160,7 @@ Public Class Delaunay_GenerationsNoKNN : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() And task.heartBeat Then
             Static random As New Random_Basics
-            If firstPass Then random.options.countSlider.Value = 10
+            If task.firstPass Then random.options.countSlider.Value = 10
             random.Run(empty)
             inputPoints = New List(Of cv.Point2f)(random.pointList)
         End If
@@ -177,7 +177,7 @@ Public Class Delaunay_GenerationsNoKNN : Inherits VB_Parent
             If index >= facet.facetList.Count Then Continue For
             Dim nextFacet = facet.facetList(index)
             ' insure that each facet has a unique generation number
-            If firstPass Then
+            If task.firstPass Then
                 g = usedG.Count
             Else
                 g = generationMap.Get(Of Integer)(pt.Y, pt.X) + 1
@@ -234,7 +234,7 @@ Public Class Delaunay_Generations : Inherits VB_Parent
             If index >= facet.facetList.Count Then Continue For
             Dim nextFacet = facet.facetList(index)
             ' insure that each facet has a unique generation number
-            If firstPass Then
+            If task.firstPass Then
                 g = usedG.Count
             Else
                 g = generationMap.Get(Of Integer)(mp.p2.Y, mp.p2.X) + 1

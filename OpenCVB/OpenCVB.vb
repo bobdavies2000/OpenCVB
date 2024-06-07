@@ -1450,6 +1450,7 @@ Public Class OpenCVB
             drawRect = New cv.Rect
             Dim task = New VB_Classes.VBtask(parms)
             textDesc = task.desc
+            task.firstPass = True
             intermediateReview = ""
 
             If ComplexityTimer.Enabled = False Then
@@ -1614,10 +1615,13 @@ Public Class OpenCVB
 
                 If parms.algName.StartsWith("CSharp_") Then
                     Static findCSharp = New CS_Classes.CSAlgorithmList()
-                    If task.algorithmObjectCS Is Nothing Then task.algorithmObjectCS = findCSharp.createCSAlgorithm(parms.algName, task)
+                    If task.algorithmObjectCS Is Nothing Then
+                        task.algorithmObjectCS = findCSharp.createCSAlgorithm(parms.algName, task)
+                    End If
                 End If
 
                 task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
+                task.firstPass = False
 
 
 

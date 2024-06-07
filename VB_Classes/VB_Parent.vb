@@ -22,7 +22,6 @@ Public Class VB_Parent : Implements IDisposable
     Public radio As New OptionsRadioButtons
     Public sliders As New OptionsSliders
     Public standalone As Boolean
-    Public firstPass As Boolean
     Public dst0 As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat, empty As cv.Mat
     Public labels(4 - 1) As String
     Public msRNG As New System.Random
@@ -83,7 +82,7 @@ Public Class VB_Parent : Implements IDisposable
                 algorithmStack.Push(3)
             End If
         End If
-        firstPass = True
+        task.firstPass = True
     End Sub
     Public Sub Run(src As cv.Mat)
         If task.testAllRunning = False Then measureStartRun(traceName)
@@ -92,7 +91,7 @@ Public Class VB_Parent : Implements IDisposable
         If task.paused = False Then
             If task.algName.StartsWith("Options_") = False Then algorithm.RunVB(src)
         End If
-        firstPass = False
+        task.firstPass = False
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
     Public Sub setTrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)

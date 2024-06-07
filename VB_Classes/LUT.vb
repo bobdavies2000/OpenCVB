@@ -256,7 +256,7 @@ Public Class LUT_Create : Inherits VB_Parent
         Dim split = src.Split()
         Static pixels(2)() As Byte
         For i = 0 To 2
-            If firstPass Then ReDim pixels(i)(src.Total - 1)
+            If task.firstPass Then ReDim pixels(i)(src.Total - 1)
             Marshal.Copy(split(i).Data, pixels(i), 0, pixels(i).Length)
         Next
 

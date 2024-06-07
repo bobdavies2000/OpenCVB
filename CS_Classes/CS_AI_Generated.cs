@@ -839,7 +839,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
-            if (firstPass)
+            if (task.firstPass)
                 lastFrame = src.Clone();
 
             if (task.optionsChanged || lastFrame.Size() != src.Size())

@@ -16,7 +16,6 @@ namespace CS_Classes
         public VBtask task;
         public IntPtr cPtr;
         public bool standalone = true;
-        public bool firstPass = true;
         public string desc = "";
         public Mat dst0, dst1, dst2, dst3, empty;
         public string traceName;

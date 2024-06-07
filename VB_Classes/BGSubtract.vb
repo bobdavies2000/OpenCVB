@@ -299,7 +299,7 @@ Public Class BGSubtract_Synthetic_CPP : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         If task.optionsChanged Then
-            If Not firstPass Then BGSubtract_Synthetic_Close(cPtr)
+            If Not task.firstPass Then BGSubtract_Synthetic_Close(cPtr)
 
             Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)

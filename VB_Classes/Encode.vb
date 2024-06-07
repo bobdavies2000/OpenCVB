@@ -19,7 +19,7 @@ Public Class Encode_Basics : Inherits VB_Parent
         Dim output As New cv.Mat
         cv.Cv2.Absdiff(src, dst3, output)
 
-        If firstPass Then options.scalingLevel = 10
+        If task.firstPass Then options.scalingLevel = 10
 
         output.ConvertTo(dst2, cv.MatType.CV_8UC3, options.scalingLevel)
         Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)

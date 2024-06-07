@@ -12,7 +12,7 @@ Public Class Depth_Basics : Inherits VB_Parent
         dst2 = task.pcSplit(2)
 
         task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
-        If firstPass Then
+        If task.firstPass Then
             task.maxDepthMask = task.pcSplit(2).ConvertScaleAbs().InRange(task.maxZmeters, task.maxZmeters)
             task.maxDepthMask.SetTo(0)
         End If
@@ -1483,7 +1483,7 @@ Public Class Depth_World : Inherits VB_Parent
         desc = "Build the (approximate) point cloud using camera intrinsics - see CameraOakD.vb for comparable calculations"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If firstPass Then template.Run(empty) ' intrinsics arrive with the first buffers.
+        If task.firstPass Then template.Run(empty) ' intrinsics arrive with the first buffers.
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 

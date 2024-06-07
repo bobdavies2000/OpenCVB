@@ -136,7 +136,7 @@ Public Class Feature_KNN : Inherits VB_Parent
         feat.Run(src)
 
         knn.queries = New List(Of cv.Point2f)(task.features)
-        If firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         knn.Run(empty)
 
         For i = 0 To knn.neighbors.Count - 1

@@ -376,7 +376,7 @@ Public Class Cell_Generate : Inherits VB_Parent
             bounds.Run(src)
             task.cellMap = bounds.bRects.bounds.dst2
             src = task.cellMap Or bounds.dst2
-            If firstPass Then task.cellMap.SetTo(0)
+            If task.firstPass Then task.cellMap.SetTo(0)
 
             Static redCPP As RedCloud_CPP
             redCPP = bounds.bRects.bounds.redCPP
@@ -420,7 +420,7 @@ Public Class Cell_Generate : Inherits VB_Parent
             If useLeftImage Then rc.motionPixels = diffLeft.dst2(rc.rect).CountNonZero Else rc.motionPixels = diffRight.dst2(rc.rect).CountNonZero
             If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
                 Dim lrc = task.redCells(rc.indexLast)
-                If (task.heartBeat = False Or firstPass) And Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 And rc.motionPixels = 0 Then
+                If (task.heartBeat = False Or task.firstPass) And Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 And rc.motionPixels = 0 Then
                     rc = lrc
                     rc.exactMatch = True
                     retained += 1

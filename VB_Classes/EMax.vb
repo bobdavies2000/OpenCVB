@@ -232,7 +232,7 @@ Public Class EMax_PointTracker : Inherits VB_Parent
 
         knn.queries = New List(Of cv.Point2f)(emax.centers)
         knn.Run(empty)
-        If firstPass Then
+        If task.firstPass Then
             knn.trainInput = New List(Of cv.Point2f)(knn.queries)
             Exit Sub
         End If

@@ -610,7 +610,7 @@ Public Class RedCloud_World : Inherits VB_Parent
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
-        If firstPass Then FindSlider("RedCloud_Reduce Reduction").Value = 1000
+        If task.firstPass Then FindSlider("RedCloud_Reduce Reduction").Value = 1000
     End Sub
 End Class
 

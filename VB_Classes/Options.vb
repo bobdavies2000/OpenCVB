@@ -3220,9 +3220,9 @@ Public Class Options_Gif : Inherits VB_Parent
     Public Sub RunVB()
         Static frmCheck = findfrm(traceName + " CheckBoxes")
         Static frmRadio = findfrm(traceName + " Radio Buttons")
-        If firstPass Then
+        If task.firstPass Then
             Static myFrameCount As Integer = 0
-            If myFrameCount > 5 Then firstPass = False
+            If myFrameCount > 5 Then task.firstPass = False
             myFrameCount += 1
             frmCheck.Left = task.gOptions.Width / 2
             frmCheck.top = task.gOptions.Height / 2
@@ -3732,8 +3732,8 @@ Public Class Options_Spectrum : Inherits VB_Parent
         gapGray = gapGSlider.value
         sampleThreshold = countSlider.value
 
-        If firstPass Then
-            firstPass = False
+        If task.firstPass Then
+            task.firstPass = False
             frmSliders.Left = task.gOptions.Width / 2
             frmSliders.top = task.gOptions.Height / 2
         End If
@@ -3812,8 +3812,8 @@ Public Class Options_Complexity : Inherits VB_Parent
                 Exit For
             End If
         Next
-        If firstPass Then
-            firstPass = False
+        If task.firstPass Then
+            task.firstPass = False
             frm.Left = task.gOptions.Width / 2
             frm.top = task.gOptions.Height / 2
         End If
@@ -3856,8 +3856,8 @@ Public Class Options_Edges_All : Inherits VB_Parent
     End Sub
     Public Sub RunVB()
         Static frm = findfrm(traceName + " Radio Buttons")
-        If firstPass Then
-            firstPass = False
+        If task.firstPass Then
+            task.firstPass = False
             frm.Left = task.gOptions.Width / 2
             frm.top = task.gOptions.Height / 2
         End If
@@ -4001,8 +4001,8 @@ Public Class Options_Classifier : Inherits VB_Parent
                 Exit For
             End If
         Next
-        If firstPass Then
-            firstPass = False
+        If task.firstPass Then
+            task.firstPass = False
             frm.Left = task.gOptions.Width / 2
             frm.top = task.gOptions.Height / 2
         End If

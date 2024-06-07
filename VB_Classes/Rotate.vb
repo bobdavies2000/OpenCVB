@@ -107,7 +107,7 @@ Public Class Rotate_Poly : Inherits VB_Parent
         optionsFPoly.RunVB()
 
         Static rPoly As New List(Of cv.Point2f)
-        If options.changeCheck.Checked Or firstPass Then
+        If options.changeCheck.Checked Or task.firstPass Then
             rPoly.Clear()
             For i = 0 To task.polyCount - 1
                 rPoly.Add(New cv.Point2f(msRNG.Next(dst2.Width / 4, dst2.Width * 3 / 4), msRNG.Next(dst2.Height / 4, dst2.Height * 3 / 4)))
