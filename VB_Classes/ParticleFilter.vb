@@ -4,7 +4,7 @@ Imports System.IO
 '    Dim trace As New Swarm_Basics
 '    Dim plot1D As New Plot_Histogram2D
 '    Public Sub New()
-'        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+'        If standaloneTest() Then task.gOptions.setDisplay1()
 '        labels = {"", "", "Particle traffic", "Largest count in 2D Histogram"}
 '        desc = "Use the good features of an image to create a histogram of particle motion. Peak histogram is net movement of the camera."
 '    End Sub

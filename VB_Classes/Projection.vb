@@ -185,7 +185,7 @@ Public Class Projection_Cell : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32FC3, 0)
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         task.gOptions.unFiltered.Checked = True
         labels = {"", "Top View projection of the selected cell", "RedCloud_Basics output - select a cell to project at right and above", "Side projection of the selected cell"}
         desc = "Create a top and side projection of the selected cell"

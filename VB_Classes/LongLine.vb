@@ -85,7 +85,7 @@ Public Class LongLine_Depth : Inherits VB_Parent
     Dim plot As New Plot_OverTimeScalar
     Dim kalman As New Kalman_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         plot.dst2 = dst3
         desc = "Find the longest line in BGR and use it to measure the average depth for the line"

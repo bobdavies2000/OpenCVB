@@ -50,7 +50,7 @@ Public Class OEX_CalcBackProject_Demo2 : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public classCount As Integer = 10 ' initial value is just a guess.  It is refined after the first pass.
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.setDisplay1()
         task.gOptions.HistBinBar.Value = 6
         labels = {"", "Mask for isolated region", "Backprojection of the hsv 2D histogram", "Mask in image context"}
         desc = "OpenCV Sample CalcBackProject_Demo2"
@@ -196,7 +196,7 @@ Public Class OEX_delaunay2 : Inherits VB_Parent
     Dim points As New List(Of cv.Point2f)
     Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, dst2.Width, dst2.Height))
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"", "", "Next triangle list being built.  Latest entry is in red.", "The completed voronoi facets"}
         desc = "OpenCV Example delaunay2"
     End Sub

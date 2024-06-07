@@ -98,7 +98,7 @@ Public Class Sort_1Channel : Inherits VB_Parent
     Public rangeStart As New List(Of Integer)
     Public rangeEnd As New List(Of Integer)
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         findRadio("Sort all pixels descending").Checked = True
         If standaloneTest() Then task.gOptions.GridSize.Value = 10
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -157,7 +157,7 @@ Public Class Sort_3Channel : Inherits VB_Parent
     Dim sort As New Sort_Basics
     Dim dups As New ML_RemoveDups_CPP
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         findRadio("Sort all pixels descending").Checked = True
         labels = {"", "The BGRA input to sort - shown here as 1-channel CV_32S format", "Output of sort - no duplicates", "Input before removing the dups - use slider to increase/decrease the amount of data"}
         desc = "Take some 3-channel input, convert it to BGRA, sort it as integers, and provide the list of unique elements"

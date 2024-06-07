@@ -291,7 +291,7 @@ Public Class Match_PointSlope : Inherits VB_Parent
     Dim templates As New List(Of cv.Mat)
     Dim mats As New Mat_4to1
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "Output of Lines_PointSlope", "Matched lines", "correlationMats"}
         desc = "Initialize with the best lines in the image and track them using matchTemplate.  Reinitialize when correlations drop."
     End Sub

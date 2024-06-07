@@ -299,4 +299,11 @@ Public Class OptionsGlobal
                 task.highlightColor = cv.Scalar.Red
         End Select
     End Sub
+
+    Public Sub setDisplay0()
+        displayDst0.Checked = True
+    End Sub
+    Public Sub setDisplay1()
+        displayDst1.Checked = True
+    End Sub
 End Class

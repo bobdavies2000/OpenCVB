@@ -137,7 +137,7 @@ End Class
 Public Class Profile_Derivative : Inherits VB_Parent
     Public sides As New Profile_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "", "Select a cell to analyze its contour", "Selected cell:  yellow = closer, blue = farther, white = no depth"}
         desc = "Visualize the derivative of X, Y, and Z in the contour of a RedCloud cell"
     End Sub
@@ -233,7 +233,7 @@ Public Class Profile_ConcentrationTop : Inherits VB_Parent
     Dim options As New Options_HeatMap
     Public Sub New()
         task.gOptions.gravityPointCloud.Checked = False
-        task.gOptions.displayDst1.Checked = True
+        task.gOptions.setDisplay1()
         desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -335,7 +335,7 @@ Public Class Profile_Kalman : Inherits VB_Parent
     Dim kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(12 - 1)
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "", "Profile_Basics output without Kalman", "Profile_Basics output with Kalman"}
         desc = "Use Kalman to smooth the results of the contour key points"
     End Sub

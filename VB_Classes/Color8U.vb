@@ -109,8 +109,8 @@ Public Class Color8U_KMeans : Inherits VB_Parent
     Public km2 As New KMeans_Basics
     Dim options As New Options_ColorFormat
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standaloneTest() Then task.gOptions.setDisplay1()
         labels(0) = "Recombined channels in other images."
         desc = "Run KMeans on each of the 3 color channels"
     End Sub

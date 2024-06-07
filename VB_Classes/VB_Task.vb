@@ -784,11 +784,10 @@ Public Class VBtask : Implements IDisposable
             For Each ttxt In algorithmObjectCS.trueData
                 task.trueData.Add(ttxt)
             Next
-
-            task.firstPass = False
         Else
             algorithmObjectVB.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
         End If
+        task.firstPass = False
 
         postProcess(src)
     End Sub

@@ -199,7 +199,7 @@ Public Class Spectrum_CellZoom : Inherits VB_Parent
     Dim breakdown As New Spectrum_Breakdown
     Public Sub New()
         labels = {"", "Cell trimming information", "", "White is after trimming, gray is before trim, black is outside the cell mask."}
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Zoom in on the selected RedCloud cell before and after Spectrum filtering."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -332,7 +332,7 @@ Public Class Spectrum_Mask : Inherits VB_Parent
     Dim gSpec As New Spectrum_Gray
     Public Sub New()
         If standaloneTest() Then strOut = "Select a cell to see its depth spectrum"
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Create a mask from the Spectrum ranges"
     End Sub
     Public Sub RunVB(src As cv.Mat)

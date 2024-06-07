@@ -183,7 +183,7 @@ Public Class Distance_RedCloud : Inherits VB_Parent
     Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         task.redOptions.UseColorOnly.Checked = True
         task.redOptions.HistBinBar3D.Value = 5
         labels(1) = "3D Histogram distance for each of the cells at left"
@@ -276,7 +276,7 @@ Public Class Distance_BinaryImage : Inherits VB_Parent
     Dim binary As New Binarize_Simple
     Dim distance As New Distance_Basics
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.setDisplay1()
         desc = "Measure the fragmentation of a binary image by using the distance transform"
     End Sub
     Public Sub RunVB(src As cv.Mat)

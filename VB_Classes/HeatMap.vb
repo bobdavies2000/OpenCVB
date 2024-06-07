@@ -153,7 +153,7 @@ Public Class HeatMap_Cell : Inherits VB_Parent
     Dim heat As New HeatMap_Hot
     Public Sub New()
         task.redOptions.IdentifyCells.Checked = True
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.setDisplay1()
         desc = "Display the heat map for the selected cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)

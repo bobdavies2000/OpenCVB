@@ -317,7 +317,7 @@ Public Class BackProject_MaskLines : Inherits VB_Parent
     Dim masks As New BackProject_Masks
     Dim lines As New Line_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels = {"", "lines detected in the backProjection mask", "Histogram of pixels in a grayscale image.  Move mouse to see lines detected in the backprojection mask",
                   "Yellow is backProjection, lines detected are highlighted"}

@@ -6,7 +6,7 @@ Public Class HistPeak2D_Basics : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public ranges() As cv.Rangef
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Find the top X peaks in a 2D histogram and use Delaunay to setup the backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)

@@ -195,7 +195,7 @@ Public Class Hough_FeatureLessTopX : Inherits VB_Parent
     Public maskFeat As cv.Mat
     Public maskPredict As cv.Mat
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         task.gOptions.GridSize.Value = 10
         maskFless = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         maskFeat = New cv.Mat(dst2.Size, cv.MatType.CV_8U)

@@ -199,7 +199,7 @@ Public Class DFT_Shapes : Inherits VB_Parent
     Dim optionsDFT As New Options_DFTShape
     Public Sub New()
         FindSlider("DrawCount").Value = 1
-        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"Inverse of the DFT - the same grayscale input.", "", "Input to the DFT", "Discrete Fourier Transform Output"}
         desc = "Show the spectrum magnitude for some standard shapes"
     End Sub

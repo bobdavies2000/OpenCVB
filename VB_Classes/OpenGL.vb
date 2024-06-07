@@ -855,7 +855,7 @@ Public Class OpenGL_FPolyCloud : Inherits VB_Parent
     Dim fpolyPC As New FeaturePoly_PointCloud
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         task.OpenGLTitle = "OpenGL_Functions"
         desc = "Display the pointcloud after FeaturePoly_PointCloud identifies the changes depth pixels"
     End Sub
@@ -1224,7 +1224,7 @@ Public Class OpenGL_Profile : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Dim ogl As New OpenGL_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.gravityPointCloud.Checked = False
         ogl.oglFunction = oCase.pcPointsAlone
         labels(3) = "Contour of selected cell is shown below.  Blue dot represents the minimum X (leftmost) point and red the maximum X (rightmost)"
@@ -1244,8 +1244,8 @@ Public Class OpenGL_Profile : Inherits VB_Parent
 
         dst3.SetTo(0)
         drawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
-        drawCircle(dst3,New cv.Point(p1.X + rc.rect.X, p1.Y + rc.rect.Y), task.dotSize + 2, cv.Scalar.Blue)
-        drawCircle(dst3,New cv.Point(p2.X + rc.rect.X, p2.Y + rc.rect.Y), task.dotSize + 2, cv.Scalar.Red)
+        drawCircle(dst3, New cv.Point(p1.X + rc.rect.X, p1.Y + rc.rect.Y), task.dotSize + 2, cv.Scalar.Blue)
+        drawCircle(dst3, New cv.Point(p2.X + rc.rect.X, p2.Y + rc.rect.Y), task.dotSize + 2, cv.Scalar.Red)
         If rc.contour3D.Count > 0 Then
             Dim vecMat As New cv.Mat(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
 
@@ -1273,7 +1273,7 @@ Public Class OpenGL_ProfileSweep : Inherits VB_Parent
     Dim visuals As New OpenGL_Profile
     Dim options As New Options_IMU
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         task.gOptions.gravityPointCloud.Checked = False
         desc = "Test the X-, Y-, and Z-axis rotation in sequence"
     End Sub

@@ -59,8 +59,8 @@ Public Class Threshold_Definitions : Inherits VB_Parent
     Dim mats As New Mat_4Click
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold", 0, 255, 127)
-        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"Gradient input (from Gradient_Basics)", "Binary threshold output of Gradient input at left", "Clockwise: binaryInv, Trunc, ToZero, ToZeroInv", "Current selection"}
         desc = "Demonstrate BinaryInv, Trunc, ToZero, and ToZero_Inv threshold methods"
     End Sub

@@ -209,7 +209,7 @@ End Class
 Public Class Structured_Depth : Inherits VB_Parent
     Dim sliceH As New Structured_SliceH
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "", "Use mouse to explore slices", "Top down view of the highlighted slice (at left)"}
         desc = "Use the structured depth to enhance the depth away from the centerline."
     End Sub
@@ -596,7 +596,7 @@ Public Class Structured_TilesQuad : Inherits VB_Parent
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
         task.gOptions.GridSize.Value = 10
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
         labels = {"", "RedCloud cells", "Simplified depth map - CV_32FC3", "Simplified depth map with RedCloud cell colors"}
         desc = "Simplify the OpenGL quads without using OpenGL's point size"
@@ -645,7 +645,7 @@ Public Class Structured_CountTop : Inherits VB_Parent
     Dim plot As New Plot_Histogram
     Dim counts As New List(Of Single)
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "Structured Slice heatmap input - red line is max", "Max Slice output - likely vertical surface", "Histogram of pixel counts in each slice"}
         desc = "Count the number of pixels found in each slice of the point cloud data."
     End Sub
@@ -1152,7 +1152,7 @@ Public Class Structured_CountSide : Inherits VB_Parent
     Public Sub New()
         rotate.rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Width / 2)
         rotate.rotateAngle = -90
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
         desc = "Count the number of pixels found in each slice of the point cloud data."
     End Sub

@@ -389,8 +389,8 @@ Public Class FeatureROI_LRClick : Inherits VB_Parent
     Public Sub New()
         task.gOptions.GridSize.Value = 16
         FindSlider("Feature Correlation Threshold").Value = 80
-        If standalone Then task.gOptions.displayDst0.Checked = True
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         labels(2) = "Click the above average stdev roi's (the darker regions) to find corresponding roi in the right image."
         desc = "Capture the above average standard deviation roi's for the left and right images."
     End Sub

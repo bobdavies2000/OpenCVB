@@ -143,7 +143,6 @@ Public Class VB_Parent : Implements IDisposable
         If task.paused = False Then
             If task.algName.StartsWith("Options_") = False Then algorithm.RunVB(src)
         End If
-        task.firstPass = False
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub
     Public Sub setTrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)

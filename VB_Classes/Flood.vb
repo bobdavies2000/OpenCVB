@@ -39,7 +39,7 @@ Public Class Flood_CellStatsPlot : Inherits VB_Parent
     Dim stats As New Cell_BasicsPlot
     Public Sub New()
         task.redOptions.IdentifyCells.Checked = True
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         task.gOptions.HistBinBar.Value = 1000
         labels(1) = "Histogram of the depth for the selected cell.  Click any cell in the lower left."
         desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"
@@ -200,7 +200,7 @@ Public Class Flood_Motion : Inherits VB_Parent
     Dim maxDists As New List(Of cv.Point2f)
     Dim maxIndex As New List(Of Integer)
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.setDisplay1()
         desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -294,7 +294,7 @@ Public Class Flood_LeftRight : Inherits VB_Parent
     Public cellsRight As New List(Of rcData)
     Public Sub New()
         task.redOptions.IdentifyCells.Checked = False
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.setDisplay1()
         desc = "Floodfill left and right images."
     End Sub
     Public Sub RunVB(src As cv.Mat)

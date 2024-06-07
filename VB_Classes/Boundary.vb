@@ -147,7 +147,7 @@ End Class
 Public Class Boundary_RemovedRects : Inherits VB_Parent
     Public bRects As New Boundary_Rectangles
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.setDisplay1()
         desc = "Build the boundaries for redCells and remove interior rectangles"
     End Sub
     Public Sub RunVB(src As cv.Mat)

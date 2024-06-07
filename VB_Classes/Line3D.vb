@@ -3,7 +3,7 @@ Public Class Line3D_Draw : Inherits VB_Parent
     Public p1 As cv.Point, p2 As cv.Point
     Dim plot As New Plot_OverTimeScalar
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         plot.plotCount = 2
 
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)

@@ -111,7 +111,7 @@ Public Class BackProject2D_RowCol : Inherits VB_Parent
         End If
 
         findRadio("HSV").Checked = True
-        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         task.gOptions.GridSize.Value = 10
         desc = "Backproject the whole row or column of the 2D histogram"
     End Sub

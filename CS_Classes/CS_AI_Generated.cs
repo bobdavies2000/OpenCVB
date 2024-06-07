@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using static CS_Classes.CSharp_Externs;
+using OpenCvSharp.XImgProc;
 
 namespace CS_Classes
 { 
@@ -1034,6 +1035,291 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             dst3 = backP.dst3;
             int reductionValue = task.redOptions.SimpleReduction;
             labels[2] = "Reduction = " + reductionValue.ToString() + " and bins = " + task.histogramBins.ToString();
+        }
+    }
+
+
+
+
+    public class CSharp_BackProject_BasicsKeyboard : CS_Parent
+    {
+        private Keyboard_Basics keys = new Keyboard_Basics();
+        private BackProject_Image backP = new BackProject_Image();
+        public CSharp_BackProject_BasicsKeyboard(VBtask task) : base(task)
+        {
+            labels[2] = "Move the mouse away from OpenCVB and use the left and right arrows to move between histogram bins.";
+            desc = "Move the mouse off of OpenCVB and then use the left and right arrow keys move around in the backprojection histogram";
+        }
+
+        public void RunCS(Mat src)
+        {
+            keys.Run(src);
+            List<string> keyIn = new List<string>(keys.keyInput);
+            int incrX = dst1.Width / task.histogramBins;
+
+            if (keyIn.Count > 0)
+            {
+                task.mouseMovePointUpdated = true;
+                for (int i = 0; i < keyIn.Count; i++)
+                {
+                    switch (keyIn[i])
+                    {
+                        case "Left":
+                            task.mouseMovePoint.X -= incrX;
+                            break;
+                        case "Right":
+                            task.mouseMovePoint.X += incrX;
+                            break;
+                    }
+                }
+            }
+
+            backP.Run(src);
+            dst2 = backP.dst2;
+            dst3 = backP.dst3;
+
+            // this is intended to provide a natural behavior for the left and right arrow keys.  The Keyboard_Basics Keyboard Options text box must be active.
+            if (task.heartBeat)
+            {
+                IntPtr hwnd = FindWindow(null, "OpenCVB Algorithm Options");
+                SetForegroundWindow(hwnd);
+            }
+        }
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+    }
+
+
+
+
+
+
+    public class CSharp_BackProject_FullLines : CS_Parent
+    {
+        private BackProject_Full backP = new BackProject_Full();
+        private Line_Basics lines = new Line_Basics();
+
+        public CSharp_BackProject_FullLines(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Lines found in the back projection", "Backprojection results" };
+            desc = "Find lines in the back projection";
+        }
+
+        public void RunCS(Mat src)
+        {
+            backP.Run(src);
+            dst3 = backP.dst3;
+
+            lines.Run(backP.dst2);
+            dst2 = lines.dst2;
+            labels[3] = lines.lpList.Count.ToString() + " lines were found";
+        }
+    }
+
+
+
+
+
+    public class CSharp_BackProject_PointCloud : CS_Parent
+    {
+        public Hist_PointCloud hist = new Hist_PointCloud();
+        public CSharp_BackProject_PointCloud(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_32FC3, Scalar.All(0));
+            labels = new string[] { "", "", "Backprojection after histogram binning X and Z values", "Backprojection after histogram binning Y and Z values" };
+            desc = "Explore Backprojection of the cloud histogram.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            int threshold = hist.thresholdSlider.Value;
+            hist.Run(src);
+
+            dst0 = hist.dst2.Threshold(threshold, 255, ThresholdTypes.Binary);
+            dst1 = hist.dst3.Threshold(threshold, 255, ThresholdTypes.Binary);
+
+            dst2 = new Mat(hist.dst2.Size(), MatType.CV_32F, Scalar.All(0));
+            dst3 = new Mat(hist.dst3.Size(), MatType.CV_32F, Scalar.All(0));
+
+            Mat mask = new Mat();
+            Cv2.CalcBackProject(new Mat[] { task.pointCloud }, new int[] { 0, 2 }, dst0, mask, hist.rangesX);
+            mask.ConvertTo(mask, MatType.CV_8U);
+            task.pointCloud.CopyTo(dst2, mask);
+
+            Cv2.CalcBackProject(new Mat[] { task.pointCloud }, new int[] { 1, 2 }, dst1, mask, hist.rangesY);
+            mask.ConvertTo(mask, MatType.CV_8U);
+            task.pointCloud.CopyTo(dst3, mask);
+        }
+    }
+
+
+
+
+
+    public class CSharp_BackProject_Display : CS_Parent
+    {
+        private BackProject_Full backP = new BackProject_Full();
+        public CSharp_BackProject_Display(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Back projection", "" };
+            desc = "Display the back projected color image";
+        }
+
+        public void RunCS(Mat src)
+        {
+            backP.Run(src);
+            dst2 = backP.dst2;
+            dst3 = backP.dst3;
+        }
+    }
+
+
+    public class CSharp_BackProject_Unstable : CS_Parent
+    {
+        private BackProject_Full backP = new BackProject_Full();
+        private Diff_Basics diff = new Diff_Basics();
+
+        public CSharp_BackProject_Unstable(VBtask task) : base(task)
+        {
+            task.gOptions.pixelDiffThreshold = 6;
+            labels = new string[] { "", "", "Backprojection output", "Unstable pixels in the backprojection. If flashing, set 'Pixel Difference Threshold' higher." };
+            desc = "Highlight the unstable pixels in the backprojection.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            backP.Run(src);
+            dst2 = ShowPalette(backP.dst2 * 255 / backP.classCount);
+
+            diff.Run(dst2);
+            dst3 = diff.dst2;
+        }
+    }
+
+
+
+
+
+
+    public class CSharp_BackProject_FullEqualized : CS_Parent
+    {
+        private BackProject_Full backP = new BackProject_Full();
+        private Hist_EqualizeColor equalize = new Hist_EqualizeColor();
+
+        public CSharp_BackProject_FullEqualized(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "BackProject_Full output without equalization", "BackProject_Full with equalization" };
+            desc = "Create a histogram from the equalized color and then backproject it.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            backP.Run(src);
+            backP.dst2.ConvertTo(dst2, MatType.CV_8U);
+            dst2 = ShowPalette(dst2);
+
+            equalize.Run(src);
+            backP.Run(equalize.dst2);
+
+            backP.dst2.ConvertTo(dst3, MatType.CV_8U);
+            dst3 = ShowPalette(dst3);
+        }
+    }
+
+
+
+
+    public class CSharp_Line_Basics : CS_Parent
+    {
+        private FastLineDetector ld;
+        public List<pointPair> lpList = new List<pointPair>();
+        public Scalar lineColor = Scalar.White;
+
+        public CSharp_Line_Basics(VBtask task) : base(task)
+        {
+            ld = CvXImgProc.CreateFastLineDetector();
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() == 3)
+                dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            else
+                dst2 = src.Clone();
+
+            if (dst2.Type() != MatType.CV_8U)
+                dst2.ConvertTo(dst2, MatType.CV_8U);
+
+            var lines = ld.Detect(dst2);
+
+            var sortByLen = new SortedList<float, pointPair>(new compareAllowIdenticalSingleInverted());
+            foreach (var v in lines)
+            {
+                if (v[0] >= 0 && v[0] <= dst2.Cols && v[1] >= 0 && v[1] <= dst2.Rows &&
+                    v[2] >= 0 && v[2] <= dst2.Cols && v[3] >= 0 && v[3] <= dst2.Rows)
+                {
+                    var p1 = new Point(v[0], v[1]);
+                    var p2 = new Point(v[2], v[3]);
+                    var lp = new pointPair(p1, p2);
+                    sortByLen.Add(lp.length, lp);
+                }
+            }
+
+            dst2 = src;
+            dst3.SetTo(0);
+            lpList.Clear();
+            foreach (var lp in sortByLen.Values)
+            {
+                lpList.Add(lp);
+                drawLine(dst2, lp.p1, lp.p2, lineColor);
+                drawLine(dst3, lp.p1, lp.p2, 255);
+            }
+            labels[2] = lpList.Count + " lines were detected in the current frame";
+        }
+    }
+
+
+
+
+
+    public class CSharp_BackProject_MaskLines : CS_Parent
+    {
+        BackProject_Masks masks = new BackProject_Masks();
+        CSharp_Line_Basics lines;
+        public CSharp_BackProject_MaskLines(VBtask task) : base(task)
+        {
+            lines = new CSharp_Line_Basics(task);
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0));
+            labels = new string[] { "", "lines detected in the backProjection mask", "Histogram of pixels in a grayscale image.  Move mouse to see lines detected in the backprojection mask",
+                                "Yellow is backProjection, lines detected are highlighted" };
+            desc = "Inspect the lines from individual backprojection masks from a histogram";
+        }
+
+        public void RunCS(Mat src)
+        {
+            masks.Run(src);
+            dst2 = masks.dst2;
+            dst3 = src.Clone();
+
+            if (task.heartBeat)
+                dst1.SetTo(Scalar.All(0));
+
+            lines.RunCS(masks.mask);
+            foreach (var lp in lines.lpList)
+            {
+                byte val = masks.dst3.At<byte>((int)lp.p1.Y, (int)lp.p1.X);
+                if (val == 255)
+                    drawLine(dst1, lp.p1, lp.p2, Scalar.White);
+            }
+            dst3.SetTo(Scalar.Yellow, masks.mask);
+            dst3.SetTo(task.highlightColor, dst1);
         }
     }
 

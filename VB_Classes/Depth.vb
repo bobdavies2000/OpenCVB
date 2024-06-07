@@ -32,8 +32,8 @@ End Class
 
 Public Class Depth_Display : Inherits VB_Parent
     Public Sub New()
-        task.gOptions.displayDst0.Checked = True
-        task.gOptions.displayDst1.Checked = True
+        task.gOptions.setDisplay1()
+        task.gOptions.setDisplay1()
         labels = {"task.pcSplit(2)", "task.pointcloud", "task.depthMask", "task.noDepthMask"}
         desc = "Display the task.pcSplit(2), task.pointcloud, task.depthMask, and task.noDepthMask"
     End Sub
@@ -946,7 +946,7 @@ Public Class Depth_InRange : Inherits VB_Parent
     Public classCount As Integer = 1
     Public Sub New()
         labels = {"", "", "Looks empty! But the values are there - 0 to classcount.  Run standaloneTest() to see the palette output for this", "Edges between the depth regions."}
-        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         dst3 = New cv.Mat(dst0.Size, cv.MatType.CV_8U)
         desc = "Create the selected number of depth ranges "
     End Sub

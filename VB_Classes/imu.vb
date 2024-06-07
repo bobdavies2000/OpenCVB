@@ -476,7 +476,7 @@ End Class
 Public Class IMU_PlotGravityAngles : Inherits VB_Parent
     ReadOnly plot As New Plot_OverTimeScalar
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Plot the motion of the camera based on the IMU data in degrees"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -503,7 +503,7 @@ End Class
 Public Class IMU_PlotAngularVelocity : Inherits VB_Parent
     ReadOnly plot As New Plot_OverTimeScalar
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Plot the IMU Velocity over time."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -644,7 +644,7 @@ End Class
 Public Class IMU_PlotAcceleration : Inherits VB_Parent
     ReadOnly plot As New Plot_OverTimeScalar
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Plot the IMU Acceleration in m/Sec^2 over time."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -693,8 +693,8 @@ Public Class IMU_PlotCompareIMU : Inherits VB_Parent
     ReadOnly plot(3 - 1) As Plot_OverTimeScalar
     ReadOnly imuAll As New IMU_AllMethods
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standaloneTest() Then task.gOptions.setDisplay1()
 
         For i = 0 To plot.Count - 1
             plot(i) = New Plot_OverTimeScalar
@@ -839,7 +839,7 @@ End Class
 Public Class IMU_VelocityPlot : Inherits VB_Parent
     Dim plot As New IMU_Plot
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Plot the angular velocity"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -984,7 +984,7 @@ Public Class IMU_PlotHostFrameScalar : Inherits VB_Parent
     Public HostInterruptDelayEstimate As Double
     Dim options As New Options_IMUFrameTime
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         plot.plotCount = 4
         labels(3) = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"

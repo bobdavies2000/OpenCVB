@@ -137,7 +137,7 @@ End Class
 Public Class Horizon_FindNonZero : Inherits VB_Parent
     Public Sub New()
         task.redOptions.YRangeSlider.Value = 3
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.setDisplay1()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         task.gravityVec = New pointPair(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
         task.horizonVec = New pointPair(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
@@ -269,7 +269,7 @@ End Class
 Public Class Horizon_FindNonZeroOld : Inherits VB_Parent
     Public Sub New()
         task.redOptions.YRangeSlider.Value = 3
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.setDisplay1()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         task.gravityVec = New pointPair(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
         task.horizonVec = New pointPair(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))

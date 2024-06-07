@@ -1620,6 +1620,7 @@ Public Class OpenCVB
                     End If
                 End If
 
+                task.firstPass = True
                 task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
                 task.firstPass = False
 

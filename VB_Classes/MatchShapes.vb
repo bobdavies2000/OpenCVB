@@ -187,8 +187,8 @@ Public Class MatchShapes_LeftRight : Inherits VB_Parent
     Public rightCells As New List(Of rcData)
     Dim doubleSize As cv.Mat
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standaloneTest() Then task.gOptions.setDisplay1()
         doubleSize = New cv.Mat(dst2.Rows, dst2.Cols * 2, cv.MatType.CV_8UC3)
         labels = {"", "", "Left image RedCloud output", "Right image RedCloud output"}
         desc = "MatchShapes: Match shapes in the left and right images"

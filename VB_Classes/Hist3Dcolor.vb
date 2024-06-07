@@ -113,7 +113,7 @@ Public Class Hist3Dcolor_Reduction : Inherits VB_Parent
     Dim reduction As New Reduction_BGR
     Public classCount As Integer
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         task.redOptions.SimpleReductionBar.Value = 45
         desc = "Backproject the 3D histogram for RGB after reduction"
     End Sub

@@ -26,10 +26,18 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_AsciiArt_Color") return new CSharp_AsciiArt_Color(task);
 			if (algorithmName == "CSharp_AsciiArt_Diff") return new CSharp_AsciiArt_Diff(task);
 			if (algorithmName == "CSharp_BackProject_Basics") return new CSharp_BackProject_Basics(task);
+			if (algorithmName == "CSharp_BackProject_BasicsKeyboard") return new CSharp_BackProject_BasicsKeyboard(task);
+			if (algorithmName == "CSharp_BackProject_Display") return new CSharp_BackProject_Display(task);
 			if (algorithmName == "CSharp_BackProject_FeatureLess") return new CSharp_BackProject_FeatureLess(task);
 			if (algorithmName == "CSharp_BackProject_Full") return new CSharp_BackProject_Full(task);
+			if (algorithmName == "CSharp_BackProject_FullEqualized") return new CSharp_BackProject_FullEqualized(task);
+			if (algorithmName == "CSharp_BackProject_FullLines") return new CSharp_BackProject_FullLines(task);
+			if (algorithmName == "CSharp_BackProject_MaskLines") return new CSharp_BackProject_MaskLines(task);
+			if (algorithmName == "CSharp_BackProject_PointCloud") return new CSharp_BackProject_PointCloud(task);
 			if (algorithmName == "CSharp_BackProject_Reduction") return new CSharp_BackProject_Reduction(task);
+			if (algorithmName == "CSharp_BackProject_Unstable") return new CSharp_BackProject_Unstable(task);
 			if (algorithmName == "CSharp_Diff_Basics") return new CSharp_Diff_Basics(task);
+			if (algorithmName == "CSharp_Line_Basics") return new CSharp_Line_Basics(task);
 			if (algorithmName == "CSharp_Random_Basics") return new CSharp_Random_Basics(task);
 			return new CSharp_AddWeighted_Basics(task);
 		}

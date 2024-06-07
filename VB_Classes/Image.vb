@@ -103,7 +103,7 @@ Public Class Image_RedCloudColor : Inherits VB_Parent
     Public images As New Image_Series
     Public redC As New RedCloud_Cells
     Public Sub New()
-        task.gOptions.displayDst0.Checked = True
+        task.gOptions.setDisplay1()
         desc = "Use RedCloud on a photo instead of the video stream."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -157,8 +157,8 @@ Public Class Image_CellStats : Inherits VB_Parent
     Dim images As New Image_RedCloudColor
     Dim stats As New Cell_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
+        If standaloneTest() Then task.gOptions.setDisplay1()
         task.redOptions.UseColorOnly.Checked = True
         desc = "Display the statistics for the selected cell"
     End Sub
@@ -195,7 +195,7 @@ Public Class Image_MSER : Inherits VB_Parent
     Public images As New Image_Series
     Dim core As New MSER_Detect
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         If findfrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Load the next image")

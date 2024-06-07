@@ -59,8 +59,8 @@ End Class
 Public Class Derivative_Sobel : Inherits VB_Parent
     Dim deriv As New Derivative_Basics
     Public Sub New()
-        If standalone Then task.gOptions.displayDst0.Checked = True
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
         desc = "Display the derivative of the selected depth dimension."
     End Sub
     Public Sub RunVB(src As cv.Mat)

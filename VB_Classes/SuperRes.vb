@@ -89,7 +89,7 @@ Public Class SuperRes_SubPixelZoom : Inherits VB_Parent
     Dim zoom As New Pixel_SubPixel
     Dim video As New SuperRes_Input
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Is SuperRes better than just zoom with sub-pixel accuracy?"
     End Sub
     Public Sub RunVB(src As cv.Mat)

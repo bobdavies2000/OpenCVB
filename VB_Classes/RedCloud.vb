@@ -387,8 +387,8 @@ Public Class RedCloud_FPS : Inherits VB_Parent
     Dim fps As New Grid_FPS
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        task.gOptions.displayDst0.Checked = True
-        task.gOptions.displayDst1.Checked = True
+        task.gOptions.setDisplay1()
+        task.gOptions.setDisplay1()
         desc = "Display RedCloud output at a fixed frame rate"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -678,7 +678,7 @@ Public Class RedCloud_ProjectCell : Inherits VB_Parent
     Dim mats As New Mat_4Click
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        task.gOptions.displayDst1.Checked = True
+        task.gOptions.setDisplay1()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Top: XZ values and mask, Bottom: ZY values and mask"
         desc = "Visualize the top and side projection of a RedCloud cell"
@@ -985,7 +985,7 @@ Public Class RedCloud_FloodPoint : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim stats As New Cell_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Verify that floodpoints correctly determine if depth is present."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1012,7 +1012,7 @@ Public Class RedCloud_CellStatsPlot : Inherits VB_Parent
     Dim cells As New Cell_BasicsPlot
     Public Sub New()
         task.redOptions.IdentifyCells.Checked = True
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         cells.runRedCloud = True
         desc = "Display the stats for the requested cell"
     End Sub
@@ -1441,8 +1441,8 @@ Public Class RedCloud_StructuredH : Inherits VB_Parent
     Public Sub New()
         If standalone Then
             task.redOptions.IdentifyCells.Checked = False
-            task.gOptions.displayDst0.Checked = True
-            task.gOptions.displayDst1.Checked = True
+            task.gOptions.setDisplay1()
+            task.gOptions.setDisplay1()
         End If
         desc = "Display the RedCloud cells found with a horizontal slice through the cellMap."
     End Sub
@@ -1483,8 +1483,8 @@ Public Class RedCloud_StructuredV : Inherits VB_Parent
     Public Sub New()
         If standalone Then
             task.redOptions.IdentifyCells.Checked = False
-            task.gOptions.displayDst0.Checked = True
-            task.gOptions.displayDst1.Checked = True
+            task.gOptions.setDisplay1()
+            task.gOptions.setDisplay1()
         End If
         desc = "Display the RedCloud cells found with a vertical slice through the cellMap."
     End Sub
@@ -1588,7 +1588,7 @@ Public Class RedCloud_ContourVsFeatureLess : Inherits VB_Parent
     Dim contour As New Contour_WholeImage
     Dim fLess As New FeatureLess_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "Contour_WholeImage Input", "RedCloud_Basics - toggling between Contour and Featureless inputs",
                   "FeatureLess_Basics Input"}
         desc = "Compare Contour_WholeImage and FeatureLess_Basics as input to RedCloud_Basics"
@@ -2417,7 +2417,7 @@ Public Class RedCloud_MotionBGsubtract : Inherits VB_Parent
     Public bgSub As New BGSubtract_Basics
     Public redCells As New List(Of rcData)
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         task.gOptions.pixelDiffThreshold = 25
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Use absDiff to build a mask of cells that changed."
@@ -2481,7 +2481,7 @@ End Class
 Public Class RedCloud_LeftRight : Inherits VB_Parent
     Dim redC As New Flood_LeftRight
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.setDisplay1()
         desc = "Placeholder to make it easier to find where left and right images are floodfilled."
     End Sub
     Public Sub RunVB(src As cv.Mat)

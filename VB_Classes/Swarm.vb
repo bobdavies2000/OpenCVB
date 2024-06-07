@@ -124,7 +124,7 @@ Public Class Swarm_LeftRight : Inherits VB_Parent
     Public rightMax As Single
     Dim swarm As New Swarm_Basics
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.setDisplay1()
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Get direction and distance from the left and right images."
     End Sub

@@ -222,7 +222,7 @@ Public Class LUT_RedCloud : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim sort3 As New Sort_3Channel
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.setDisplay1()
         desc = "Use LUT on the grayscale image after masking with rc.mask"
     End Sub
     Public Sub RunVB(src As cv.Mat)

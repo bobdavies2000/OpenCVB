@@ -211,7 +211,7 @@ End Class
 Public Class Motion_DepthReconstructed : Inherits VB_Parent
     Public motion As New Motion_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
         labels(2) = "The yellow rectangle indicates where the motion is and only that portion of the point cloud and depth mask is updated."
         desc = "Rebuild the point cloud based on the BGR motion history."
@@ -346,7 +346,7 @@ Public Class Motion_Intersect : Inherits VB_Parent
     Dim minCount = 4
     Dim reconstructedRGB As Integer
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         If dst2.Width = 1280 Or dst2.Width = 640 Then minCount = 16
         desc = "Track the max rectangle that covers all the motion until there is no motion in it."

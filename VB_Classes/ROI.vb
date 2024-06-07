@@ -80,7 +80,7 @@ Public Class ROI_AccumulateOld : Inherits VB_Parent
     Public aoiRect As cv.Rect
     Public minX = Integer.MaxValue, maxX = Integer.MinValue, minY = Integer.MaxValue, maxY = Integer.MinValue
     Public Sub New()
-        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "", "Area of Interest", ""}
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
         task.gOptions.pixelDiffThreshold = 30
