@@ -14,7 +14,7 @@ Public Class XPhoto_Bm3dDenoise : Inherits VB_Parent
         cv.Cv2.EqualizeHist(src, src)
         CvXPhoto.Bm3dDenoising(src, dst2)
         cv.Cv2.Subtract(dst2, src, dst3)
-        Dim mm as mmData = vbMinMax(dst3)
+        Dim mm as mmData = GetMinMax(dst3)
         labels(3) = "Diff from input - max change=" + CStr(mm.maxVal)
         dst3 = dst3.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
@@ -35,7 +35,7 @@ Public Class XPhoto_Bm3dDenoiseDepthImage : Inherits VB_Parent
         cv.Cv2.EqualizeHist(gray, gray)
         CvXPhoto.Bm3dDenoising(gray, dst2)
         cv.Cv2.Subtract(dst2, gray, dst3)
-        Dim mm as mmData = vbMinMax(dst3)
+        Dim mm as mmData = GetMinMax(dst3)
         labels(3) = "Diff from input - max change=" + CStr(mm.maxVal)
         dst3 = dst3.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub

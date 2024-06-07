@@ -74,9 +74,9 @@ Public Class Pixel_Viewer : Inherits VB_Parent
         If img.Type = cv.MatType.CV_32F Or img.Type = cv.MatType.CV_32FC3 Then
             If img.Channels = 3 Then
                 Dim tmp = img.Reshape(1)
-                mm = vbMinMax(tmp)
+                mm = GetMinMax(tmp)
             Else
-                mm = vbMinMax(img)
+                mm = GetMinMax(img)
             End If
             If mm.minVal >= 0 Then
                 If mm.maxVal < 1000 Then format32f = "000.00"
@@ -931,7 +931,7 @@ Public Class Pixel_Sampler : Inherits VB_Parent
                 End If
             Next
         Else
-            dominantGray = vbMinMax(src).maxVal
+            dominantGray = GetMinMax(src).maxVal
         End If
 
         If standaloneTest() Then

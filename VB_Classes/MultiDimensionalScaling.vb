@@ -18,7 +18,7 @@ Public Class MultiDimensionScaling_Cities : Inherits VB_Parent
     End Sub
     Private Function Torgerson(src As cv.Mat) As Double
         Dim rows = src.Rows
-        Dim mm as mmData = vbMinMax(src)
+        Dim mm as mmData = GetMinMax(src)
         Dim c1 = 0
         For i = 0 To rows - 1
             For j = 0 To rows - 1

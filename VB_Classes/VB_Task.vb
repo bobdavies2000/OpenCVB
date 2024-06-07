@@ -774,7 +774,7 @@ Public Class VBtask : Implements IDisposable
             algorithmObjectCS.trueData.clear()
             algorithmObjectCS.RunCS(src.Clone)
 
-            task.labels = labels
+            task.labels = algorithmObjectCS.labels
 
             dst0 = algorithmObjectCS.dst0
             dst1 = algorithmObjectCS.dst1
@@ -784,6 +784,7 @@ Public Class VBtask : Implements IDisposable
             For Each ttxt In algorithmObjectCS.trueData
                 task.trueData.Add(ttxt)
             Next
+
             task.firstPass = False
         Else
             algorithmObjectVB.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...

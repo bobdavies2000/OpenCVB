@@ -492,7 +492,7 @@ Public Class FeatureROI_LRAll : Inherits VB_Parent
             If roi.X = 0 Then Continue For
             Dim r = New cv.Rect(0, roi.Y, roi.X, roi.Height)
             cv.Cv2.MatchTemplate(src(roi), task.rightView(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-            Dim mm = vbMinMax(correlationMat)
+            Dim mm = GetMinMax(correlationMat)
             If mm.maxVal >= options.correlationMin Then sortedRects.Add(mm.maxVal, New cv.Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height))
         Next
         labels(2) = CStr(sortedRects.Count) + " roi's had left/right correlation higher than " + Format(options.correlationMin, fmt3)

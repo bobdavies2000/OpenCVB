@@ -100,7 +100,7 @@ Public Class LongLine_Depth : Inherits VB_Parent
         dst0.Line(longLine.ptLong.p1, longLine.ptLong.p2, 255, 3, task.lineType)
         dst0.SetTo(0, task.noDepthMask)
 
-        Dim mm As mmData = vbMinMax(task.pcSplit(2), dst0)
+        Dim mm As mmData = GetMinMax(task.pcSplit(2), dst0)
 
         kalman.kInput = {mm.minLoc.X, mm.minLoc.Y, mm.maxLoc.X, mm.maxLoc.Y}
         kalman.Run(empty)
@@ -221,7 +221,7 @@ Public Class LongLine_Match : Inherits VB_Parent
 
         Static template As cv.Mat = src(rect).Clone
         cv.Cv2.MatchTemplate(template, src, dst0, cv.TemplateMatchModes.CCoeffNormed)
-        Dim mm As mmData = vbMinMax(dst0)
+        Dim mm As mmData = GetMinMax(dst0)
 
         mm.maxLoc = New cv.Point(mm.maxLoc.X + rect.Width / 2, mm.maxLoc.Y + rect.Height / 2)
         drawCircle(dst2,mm.maxLoc, task.dotSize, cv.Scalar.Red)

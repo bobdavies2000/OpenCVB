@@ -12,7 +12,7 @@ Public Class Hist2D_Basics : Inherits VB_Parent
         desc = "Create a 2D histogram from the input."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        ranges = vbHist2Dminmax(src, channels(0), channels(1))
+        ranges = GetHist2Dminmax(src, channels(0), channels(1))
         cv.Cv2.CalcHist({src}, channels, New cv.Mat(), histogram, 2, histRowsCols, ranges)
         dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
@@ -42,7 +42,7 @@ Public Class Hist2D_Cloud : Inherits VB_Parent
         ranges = New cv.Rangef() {New cv.Rangef(r1.Item0, r1.Item1),
                                   New cv.Rangef(r2.Item0, r2.Item1)}
         cv.Cv2.CalcHist({task.pointCloud}, task.redOptions.channels, New cv.Mat(),
-                        histogram, 2, {task.gOptions.HistBinSlider.Value, task.gOptions.HistBinSlider.Value}, ranges)
+                        histogram, 2, {task.gOptions.HistBinBar.Value, task.gOptions.HistBinBar.Value}, ranges)
 
         plot1D.Run(histogram)
         dst2 = plot1D.dst2
@@ -141,7 +141,7 @@ Public Class Hist2D_BGR : Inherits VB_Parent
     Public histogram01 As New cv.Mat
     Public histogram02 As New cv.Mat
     Public Sub New()
-        task.gOptions.HistBinSlider.Value = 256
+        task.gOptions.HistBinBar.Value = 256
         desc = "Create a 2D histogram for blue to red and blue to green."
     End Sub
     Public Sub RunVB(src As cv.Mat)

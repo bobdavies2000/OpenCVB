@@ -328,8 +328,8 @@ Public Class Line_InDepthAndBGR : Inherits VB_Parent
             Dim mean = task.pointCloud(r).Mean(mask)
 
             If mean <> New cv.Scalar Then
-                Dim mmX = vbMinMax(task.pcSplit(0)(r), mask)
-                Dim mmY = vbMinMax(task.pcSplit(1)(r), mask)
+                Dim mmX = GetMinMax(task.pcSplit(0)(r), mask)
+                Dim mmY = GetMinMax(task.pcSplit(1)(r), mask)
                 Dim len1 = mmX.minLoc.DistanceTo(mmX.maxLoc)
                 Dim len2 = mmY.minLoc.DistanceTo(mmY.maxLoc)
                 If len1 > len2 Then

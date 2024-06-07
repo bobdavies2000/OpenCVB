@@ -278,7 +278,7 @@ Public Class Hist3Dcolor_Basics_CPP : Inherits VB_Parent
 
             cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
 
-            Dim mm as mmData = vbMinMax(dst2)
+            Dim mm as mmData = GetMinMax(dst2)
 
             dst3 = ShowPalette(dst2 * 255 / mm.maxVal)
             labels(2) = simK.labels(2)

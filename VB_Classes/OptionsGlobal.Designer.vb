@@ -37,7 +37,7 @@ Partial Class OptionsGlobal
         Me.Label7 = New System.Windows.Forms.Label()
         Me.DebugCheckBox = New System.Windows.Forms.CheckBox()
         Me.labelBinsCount = New System.Windows.Forms.Label()
-        Me.HistBinSlider = New System.Windows.Forms.TrackBar()
+        Me.HistBinBar = New System.Windows.Forms.TrackBar()
         Me.labelbins = New System.Windows.Forms.Label()
         Me.ThreadGridSize = New System.Windows.Forms.Label()
         Me.GridSize = New System.Windows.Forms.TrackBar()
@@ -86,7 +86,7 @@ Partial Class OptionsGlobal
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PixelDiffBar, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.HistBinBar, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.GridSize, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MaxDepthBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
@@ -112,7 +112,7 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.Controls.Add(Me.Label7)
         Me.MinMaxDepth.Controls.Add(Me.DebugCheckBox)
         Me.MinMaxDepth.Controls.Add(Me.labelBinsCount)
-        Me.MinMaxDepth.Controls.Add(Me.HistBinSlider)
+        Me.MinMaxDepth.Controls.Add(Me.HistBinBar)
         Me.MinMaxDepth.Controls.Add(Me.labelbins)
         Me.MinMaxDepth.Controls.Add(Me.ThreadGridSize)
         Me.MinMaxDepth.Controls.Add(Me.GridSize)
@@ -229,7 +229,6 @@ Partial Class OptionsGlobal
         Me.PixelDiffBar.Size = New System.Drawing.Size(506, 69)
         Me.PixelDiffBar.TabIndex = 49
         Me.PixelDiffBar.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.pixelDiffThreshold = 25
         '
         'Label7
         '
@@ -258,16 +257,16 @@ Partial Class OptionsGlobal
         Me.labelBinsCount.TabIndex = 44
         Me.labelBinsCount.Text = "HistBins"
         '
-        'HistBinSlider
+        'HistBinBar
         '
-        Me.HistBinSlider.Location = New System.Drawing.Point(212, 142)
-        Me.HistBinSlider.Maximum = 1000
-        Me.HistBinSlider.Minimum = 3
-        Me.HistBinSlider.Name = "HistBinSlider"
-        Me.HistBinSlider.Size = New System.Drawing.Size(506, 69)
-        Me.HistBinSlider.TabIndex = 43
-        Me.HistBinSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.HistBinSlider.Value = 40
+        Me.HistBinBar.Location = New System.Drawing.Point(212, 142)
+        Me.HistBinBar.Maximum = 1000
+        Me.HistBinBar.Minimum = 3
+        Me.HistBinBar.Name = "HistBinBar"
+        Me.HistBinBar.Size = New System.Drawing.Size(506, 69)
+        Me.HistBinBar.TabIndex = 43
+        Me.HistBinBar.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.HistBinBar.Value = 40
         '
         'labelbins
         '
@@ -741,7 +740,7 @@ Partial Class OptionsGlobal
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FrameHistory, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.PixelDiffBar, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.HistBinBar, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.GridSize, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.MaxDepthBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox2.ResumeLayout(False)
@@ -775,7 +774,7 @@ Partial Class OptionsGlobal
     Friend WithEvents Label5 As Windows.Forms.Label
     Friend WithEvents LineType As Windows.Forms.ComboBox
     Friend WithEvents labelBinsCount As Windows.Forms.Label
-    Friend WithEvents HistBinSlider As Windows.Forms.TrackBar
+    Friend WithEvents HistBinBar As Windows.Forms.TrackBar
     Friend WithEvents labelbins As Windows.Forms.Label
     Friend WithEvents ThreadGridSize As Windows.Forms.Label
     Friend WithEvents GridSize As Windows.Forms.TrackBar

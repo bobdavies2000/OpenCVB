@@ -22,13 +22,13 @@ Public Class BackProject_Basics : Inherits VB_Parent
         Dim totalPixels = dst2.Total ' assume we are including zeros.
         If histK.hist.plot.removeZeroEntry Then totalPixels = input.CountNonZero
 
-        Dim brickWidth = dst2.Width / task.gOptions.HistBinSlider.Value
-        Dim incr = (histK.hist.mm.maxVal - histK.hist.mm.minVal) / task.gOptions.HistBinSlider.Value
+        Dim brickWidth = dst2.Width / task.gOptions.HistBinBar.Value
+        Dim incr = (histK.hist.mm.maxVal - histK.hist.mm.minVal) / task.gOptions.HistBinBar.Value
         Dim histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
 
         minRange = New cv.Scalar(histIndex * incr)
         maxRange = New cv.Scalar((histIndex + 1) * incr)
-        If histIndex + 1 = task.gOptions.HistBinSlider.Value Then maxRange = New cv.Scalar(255)
+        If histIndex + 1 = task.gOptions.HistBinBar.Value Then maxRange = New cv.Scalar(255)
 
         '     Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
         '     cv.Cv2.CalcBackProject({input}, {0}, histK.hist.histogram, dst0, ranges)
@@ -39,7 +39,7 @@ Public Class BackProject_Basics : Inherits VB_Parent
         dst3 = task.color.Clone
         dst3.SetTo(cv.Scalar.Yellow, dst0)
         Dim count = histK.hist.histogram.Get(Of Single)(CInt(histIndex), 0)
-        Dim histMax As mmData = vbMinMax(histK.hist.histogram)
+        Dim histMax As mmData = GetMinMax(histK.hist.histogram)
         labels(3) = $"Backprojecting {CInt(minRange(0))} to {CInt(maxRange(0))} with {CInt(count)} of {totalPixels} compared to " +
                     $"mask pixels = {actualCount}.  Histogram max count = {CInt(histMax.maxVal)}"
         dst2.Rectangle(New cv.Rect(CInt(histIndex) * brickWidth, 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
@@ -57,6 +57,7 @@ End Class
 Public Class BackProject_Full : Inherits VB_Parent
     Public classCount As Integer
     Public Sub New()
+        labels = {"", "", "CV_8U format of the backprojection", "dst2 presented with a palette"}
         desc = "Create a color histogram, normalize it, and backproject it with a palette."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -647,7 +648,7 @@ Public Class BackProject_Image : Inherits VB_Parent
         dst3.SetTo(cv.Scalar.Yellow, mask)
         Dim actualCount = mask.CountNonZero
         Dim count = hist.histogram.Get(Of Single)(histIndex, 0)
-        Dim histMax As mmData = vbMinMax(hist.histogram)
+        Dim histMax As mmData = GetMinMax(hist.histogram)
         labels(3) = "Backprojecting " + CStr(CInt(minRange(0))) + " to " + CStr(CInt(maxRange(0))) + " with " +
                      CStr(count) + " histogram samples and " + CStr(actualCount) + " mask count.  Histogram max count = " +
                      CStr(CInt(histMax.maxVal))
@@ -699,7 +700,7 @@ Public Class BackProject_MeterByMeter : Inherits VB_Parent
         desc = "Backproject the depth data at 1 meter intervals WITHOUT A HISTOGRAM."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.gOptions.HistBinSlider.Value < task.maxZmeters Then task.gOptions.HistBinSlider.Value = task.maxZmeters + 1
+        If task.gOptions.HistBinBar.Value < task.maxZmeters Then task.gOptions.HistBinBar.Value = task.maxZmeters + 1
         If task.optionsChanged Then
             Dim incr = task.maxZmeters / task.histogramBins
             Dim histData As New List(Of Single)

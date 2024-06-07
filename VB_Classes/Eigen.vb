@@ -150,8 +150,8 @@ Public Class Eigen_Fitline : Inherits VB_Parent
         Dim pointMat = New cv.Mat(noisyLine.options.randomCount, 1, cv.MatType.CV_32FC2, noisyLine.points.ToArray)
         Dim mean = pointMat.Mean()
         Dim split() = pointMat.Split()
-        Dim mmX = vbMinMax(split(0))
-        Dim mmY = vbMinMax(split(1))
+        Dim mmX = GetMinMax(split(0))
+        Dim mmY = GetMinMax(split(1))
 
         Dim eigenInput As New cv.Vec4f
         For i = 0 To noisyLine.points.Count - 1

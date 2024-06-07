@@ -123,7 +123,7 @@ Public Class Entropy_Rectangle : Inherits VB_Parent
         Dim dimensions() = New Integer() {task.histogramBins}
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim mm = vbMinMax(src)
+        Dim mm = GetMinMax(src)
         Dim ranges() = New cv.Rangef() {New cv.Rangef(mm.minVal, mm.maxVal)}
         If mm.minVal = mm.maxVal Then ranges = New cv.Rangef() {New cv.Rangef(0, 255)}
 

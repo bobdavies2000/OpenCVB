@@ -113,7 +113,7 @@ Public Class Motion_ThruCorrelation : Inherits VB_Parent
             cv.Cv2.MeanStdDev(input(roi), mean, stdev)
             If stdev > stdevThreshold Then
                 cv.Cv2.MatchTemplate(lastFrame(roi), input(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
-                Dim mm As mmData = vbMinMax(correlation)
+                Dim mm As mmData = GetMinMax(correlation)
                 If mm.maxVal < ccThreshold / 1000 Then
                     If (i Mod task.gridRows) <> 0 Then dst3(task.gridList(i - 1)).SetTo(255)
                     If (i Mod task.gridRows) < task.gridRows And i < task.gridList.Count - 1 Then dst3(task.gridList(i + 1)).SetTo(255)

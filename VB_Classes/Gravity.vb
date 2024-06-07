@@ -38,10 +38,10 @@ Public Class Gravity_Basics : Inherits VB_Parent
 
         points.Clear()
         For i = dst0.Height / 3 To dst0.Height * 2 / 3 - 1
-            Dim mm1 = vbMinMax(dst0.Row(i))
+            Dim mm1 = GetMinMax(dst0.Row(i))
             If mm1.minVal > 0 And mm1.minVal < 0.005 Then
                 dst0.Row(i).Set(Of Single)(mm1.minLoc.Y, mm1.minLoc.X, 10)
-                Dim mm2 = vbMinMax(dst0.Row(i))
+                Dim mm2 = GetMinMax(dst0.Row(i))
                 If mm2.minVal > 0 And Math.Abs(mm1.minLoc.X - mm2.minLoc.X) <= 1 Then points.Add(New cv.Point(mm1.minLoc.X, i))
             End If
         Next

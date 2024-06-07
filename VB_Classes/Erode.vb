@@ -42,12 +42,12 @@ Public Class Erode_CloudXY : Inherits VB_Parent
         dst1 = Not erodeMask.dst2
 
         dilate.Run(task.pcSplit(0))
-        Dim mm as mmData = vbMinMax(dilate.dst2, erodeMask.dst2)
+        Dim mm as mmData = GetMinMax(dilate.dst2, erodeMask.dst2)
         dst2 = (dilate.dst2 - mm.minVal) / (mm.maxVal - mm.minVal)
         dst2.SetTo(0, dst1)
 
         erode.Run(task.pcSplit(1))
-        mm = vbMinMax(dilate.dst2, erodeMask.dst2)
+        mm = GetMinMax(dilate.dst2, erodeMask.dst2)
         dst3 = (erode.dst2 - mm.minVal) / (mm.maxVal - mm.minVal)
         dst3.SetTo(0, dst1)
     End Sub

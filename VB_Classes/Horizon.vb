@@ -37,10 +37,10 @@ Public Class Horizon_Basics : Inherits VB_Parent
 
         points.Clear()
         For i = dst0.Width / 3 To dst0.Width * 2 / 3 - 1
-            Dim mm1 = vbMinMax(dst0.Col(i))
+            Dim mm1 = GetMinMax(dst0.Col(i))
             If mm1.minVal > 0 And mm1.minVal < 0.005 Then
                 dst0.Col(i).Set(Of Single)(mm1.minLoc.Y, mm1.minLoc.X, 10)
-                Dim mm2 = vbMinMax(dst0.Col(i))
+                Dim mm2 = GetMinMax(dst0.Col(i))
                 If mm2.minVal > 0 And Math.Abs(mm1.minLoc.Y - mm2.minLoc.Y) <= 1 Then points.Add(New cv.Point(i, mm1.minLoc.Y))
             End If
         Next

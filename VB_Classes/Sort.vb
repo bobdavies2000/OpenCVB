@@ -195,7 +195,7 @@ Public Class Sort_FeatureLess : Inherits VB_Parent
     Dim plot As New Plot_Histogram
     Public Sub New()
         plot.createHistogram = True
-        task.gOptions.HistBinSlider.Value = 256
+        task.gOptions.HistBinBar.Value = 256
         task.gOptions.GridSize.Value = 8
         desc = "Sort all the featureless grayscale pixels."
     End Sub

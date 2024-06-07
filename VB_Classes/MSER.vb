@@ -37,7 +37,7 @@ Public Class MSER_Basics : Inherits VB_Parent
             drawContour(rc.mask, rc.contour, 255, -1)
 
             rc.floodPoint = floodPoints(index)
-            rc.maxDist = vbGetMaxDist(rc)
+            rc.maxDist = GetMaxDist(rc)
 
             rc.indexLast = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If rc.indexLast <> 0 And rc.indexLast < task.redCells.Count Then
@@ -743,7 +743,7 @@ Public Class MSER_Basics2 : Inherits VB_Parent
             dst1(rc.rect).SetTo(rc.index, rc.mask)
             rc.pixels = detect.maskCounts(i)
 
-            rc.maxDist = vbGetMaxDist(rc)
+            rc.maxDist = GetMaxDist(rc)
             rc.indexLast = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
 
             cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)

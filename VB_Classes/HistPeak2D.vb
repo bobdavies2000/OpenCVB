@@ -28,7 +28,7 @@ Public Class HistPeak2D_Basics : Inherits VB_Parent
         histogram.SetTo(0, Not mask)
 
         If ranges Is Nothing Or task.optionsChanged Then
-            ranges = vbHist2Dminmax(src, task.redOptions.channels(0), task.redOptions.channels(1))
+            ranges = GetHist2Dminmax(src, task.redOptions.channels(0), task.redOptions.channels(1))
         End If
 
         Dim backProjection As New cv.Mat
@@ -88,7 +88,7 @@ Public Class HistPeak2D_NotHotTop : Inherits VB_Parent
         histTop.Run(src)
         dst1 = histTop.histogram.InRange(0, 0).ConvertScaleAbs
 
-        Dim mm As mmData = vbMinMax(histTop.histogram)
+        Dim mm As mmData = GetMinMax(histTop.histogram)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, mm.maxVal)
         dst3 -= histTop.histogram
         dst3.SetTo(0, dst1)

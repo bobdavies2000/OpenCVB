@@ -258,7 +258,7 @@ Public Class BackProject2D_Filter : Inherits VB_Parent
     Public threshold As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        task.gOptions.HistBinSlider.Value = 100 ' extra bins to help isolate the stragglers.
+        task.gOptions.HistBinBar.Value = 100 ' extra bins to help isolate the stragglers.
         desc = "Filter a 2D histogram for the backprojection."
     End Sub
     Public Sub RunVB(src As cv.Mat)

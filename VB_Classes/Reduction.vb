@@ -143,7 +143,7 @@ Public Class Reduction_XYZ : Inherits VB_Parent
                 split(i) *= 1000
                 split(i).ConvertTo(dst0, cv.MatType.CV_32S)
                 reduction.Run(dst0)
-                Dim mm as mmData = vbMinMax(reduction.dst2)
+                Dim mm as mmData = GetMinMax(reduction.dst2)
                 reduction.dst2.ConvertTo(split(i), cv.MatType.CV_32F)
             End If
         Next

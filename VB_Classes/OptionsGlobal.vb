@@ -25,7 +25,7 @@ Public Class OptionsGlobal
         gravityPointCloud.Checked = True
 
         maxCount.Text = CStr(MaxDepthBar.Value)
-        labelBinsCount.Text = CStr(HistBinSlider.Value)
+        labelBinsCount.Text = CStr(HistBinBar.Value)
         PixelDiff.Text = CStr(PixelDiffBar.Value)
         fHist.Text = CStr(FrameHistory.Value)
         LineThicknessAmount.Text = CStr(LineWidth.Value)
@@ -217,9 +217,9 @@ Public Class OptionsGlobal
         If task IsNot Nothing Then task.optionsChanged = True
         ThreadGridSize.Text = CStr(GridSize.Value)
     End Sub
-    Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinSlider.ValueChanged
+    Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinBar.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        labelBinsCount.Text = CStr(HistBinSlider.Value)
+        labelBinsCount.Text = CStr(HistBinBar.Value)
     End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True

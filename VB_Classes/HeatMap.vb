@@ -134,8 +134,8 @@ Public Class HeatMap_Hot : Inherits VB_Parent
         histSide.Run(src)
         dst3 = histSide.histogram
 
-        Dim mmTop = vbMinMax(dst2)
-        Dim mmSide = vbMinMax(dst3)
+        Dim mmTop = GetMinMax(dst2)
+        Dim mmSide = GetMinMax(dst3)
         If task.heartBeat Then labels(2) = CStr(mmTop.maxVal) + " max count " + CStr(dst2.CountNonZero) + " pixels in the top down view"
         If task.heartBeat Then labels(3) = CStr(mmSide.maxVal) + " max count " + CStr(dst3.CountNonZero) + " pixels in the side view"
     End Sub

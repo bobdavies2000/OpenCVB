@@ -143,8 +143,8 @@ Public Class Model_CellZoom : Inherits VB_Parent
         Dim points = mask.FindNonZero()
         If points.Rows > 0 Then
             Dim split = points.Split()
-            Dim mmX = vbMinMax(split(0))
-            Dim mmY = vbMinMax(split(1))
+            Dim mmX = GetMinMax(split(0))
+            Dim mmY = GetMinMax(split(1))
 
             Dim r = New cv.Rect(mmX.minVal, mmY.minVal, mmX.maxVal - mmX.minVal, mmY.maxVal - mmY.minVal)
             dst1.Rectangle(r, cv.Scalar.White, 1, task.lineType)

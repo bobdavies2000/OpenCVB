@@ -893,8 +893,91 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 
+    public class CSharp_BackProject_Basics : CS_Parent
+    {
+        public Hist_Kalman histK = new Hist_Kalman();
+        public Scalar minRange, maxRange;
+
+        public CSharp_BackProject_Basics(VBtask task) : base(task)
+        {
+            labels[2] = "Move mouse to backproject a histogram column";
+            //vbAddAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.");
+            desc = "Mouse over any bin to see the histogram backprojected.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            Mat input = src.Clone();
+            if (input.Channels() != 1)
+                input = input.CvtColor(ColorConversionCodes.BGR2GRAY);
+
+            histK.Run(input);
+            if (histK.hist.mm.minVal == histK.hist.mm.maxVal)
+            {
+                setTrueText("The input image is empty - mm.minVal and mm.maxVal are both zero...");
+                return;
+            }
+
+            dst2 = histK.dst2;
+
+            long totalPixels = dst2.Total(); // assume we are including zeros.
+            if (histK.hist.plot.removeZeroEntry)
+                totalPixels = input.CountNonZero();
+
+            double brickWidth = dst2.Width / task.histogramBins;
+            double incr = (histK.hist.mm.maxVal - histK.hist.mm.minVal) / task.histogramBins;
+            int histIndex = (int)Math.Floor(task.mouseMovePoint.X / brickWidth);
+
+            minRange = new Scalar(histIndex * incr);
+            maxRange = new Scalar((histIndex + 1) * incr);
+            if (histIndex + 1 == task.histogramBins)
+                maxRange = new Scalar(255);
+
+            // For single dimension histograms, backprojection is the same as inRange (and this works for backproject_FeatureLess below)
+            dst0 = input.InRange(minRange, maxRange);
+
+            int actualCount = dst0.CountNonZero();
+            dst3 = task.color.Clone();
+            dst3.SetTo(Scalar.Yellow, dst0);
+            float count = histK.hist.histogram.Get<float>(histIndex, 0);
+            mmData histMax = GetMinMax(histK.hist.histogram);
+            labels[3] = $"Backprojecting {minRange.Val0} to {maxRange.Val0} with {count} of {totalPixels} compared to " +
+                        $"mask pixels = {actualCount}.  Histogram max count = {histMax.maxVal}";
+            dst2.Rectangle(new Rect((int)(histIndex * brickWidth), 0, (int)brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
+        }
+    }
 
 
+
+    public class CSharp_BackProject_Full : CS_Parent
+    {
+        public int classCount;
+
+        public CSharp_BackProject_Full(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "CV_8U format of the backprojection", "dst2 presented with a palette" };
+            desc = "Create a color histogram, normalize it, and backproject it with a palette.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            classCount = task.histogramBins;
+            if (src.Channels() == 3)
+            {
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            }
+            src.ConvertTo(dst1, MatType.CV_32F);
+            Mat histogram = new Mat();
+            Rangef[] ranges = new Rangef[] { new Rangef(0, 255) };
+            Cv2.CalcHist(new Mat[] { dst1 }, new int[] { 0 }, new Mat(), histogram, 1, new int[] { classCount }, ranges);
+            histogram = histogram.Normalize(0, classCount, NormTypes.MinMax);
+
+            Cv2.CalcBackProject(new Mat[] { dst1 }, new int[] { 0 }, histogram, dst2, ranges);
+
+            dst2.ConvertTo(dst2, MatType.CV_8U);
+            dst3 = ShowPalette(dst2 * 255 / classCount);
+        }
+    }
 }
 
 

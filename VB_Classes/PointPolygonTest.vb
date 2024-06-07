@@ -23,7 +23,7 @@ Public Class PointPolygonTest_Basics : Inherits VB_Parent
             Next
         Next
 
-        Dim mm = vbMinMax(dst1)
+        Dim mm = GetMinMax(dst1)
         mm.minVal = Math.Abs(mm.minVal)
         mm.maxVal = Math.Abs(mm.maxVal)
 

@@ -40,7 +40,7 @@ Public Class Flood_CellStatsPlot : Inherits VB_Parent
     Public Sub New()
         task.redOptions.IdentifyCells.Checked = True
         If standaloneTest() Then task.gOptions.displayDst1.Checked = True
-        task.gOptions.HistBinSlider.Value = 1000
+        task.gOptions.HistBinBar.Value = 1000
         labels(1) = "Histogram of the depth for the selected cell.  Click any cell in the lower left."
         desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"
     End Sub

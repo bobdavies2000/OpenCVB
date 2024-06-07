@@ -29,7 +29,7 @@ Public Class Match_Basics : Inherits VB_Parent
         Else
             cv.Cv2.MatchTemplate(template, src(searchRect), dst0, options.matchOption)
         End If
-        mmData = vbMinMax(dst0)
+        mmData = GetMinMax(dst0)
 
         correlation = mmData.maxVal
         labels(2) = "Correlation = " + Format(correlation, "#,##0.000")
@@ -116,7 +116,7 @@ Public Class Match_RandomTest : Inherits VB_Parent
         End If
 
         cv.Cv2.MatchTemplate(template, src, correlationMat, options.matchOption)
-        mm = vbMinMax(correlationMat)
+        mm = GetMinMax(correlationMat)
         mm.maxLoc = New cv.Point(mm.maxLoc.X + template.Width / 2, mm.maxLoc.Y + template.Height / 2)
         correlation = mm.maxVal
         If correlation < minCorrelation Then minCorrelation = correlation
@@ -329,7 +329,7 @@ Public Class Match_PointSlope : Inherits VB_Parent
                 Dim pt = Choose(j + 1, ptS.p1, ptS.p2)
                 cv.Cv2.MatchTemplate(templates(i * 2 + j), src, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
 
-                mm = vbMinMax(correlationMat)
+                mm = GetMinMax(correlationMat)
 
                 If i < 4 Then ' only 4 mats can be displayed in the Mat_4to1 algorithm...
                     mats.mat(i).SetTo(0)
@@ -507,7 +507,7 @@ Public Class Match_tCell : Inherits VB_Parent
             Dim tc = tCells(i)
             Dim input = src(tc.searchRect)
             cv.Cv2.MatchTemplate(tc.template, input, dst0, cv.TemplateMatchModes.CCoeffNormed)
-            Dim mm as mmData = vbMinMax(dst0)
+            Dim mm as mmData = GetMinMax(dst0)
             tc.center = New cv.Point2f(tc.searchRect.X + mm.maxLoc.X + rSize, tc.searchRect.Y + mm.maxLoc.Y + rSize)
             tc.searchRect = validateRect(New cv.Rect(tc.center.X - rSize * 3, tc.center.Y - rSize * 3, rSize * 6, rSize * 6))
             tc.rect = validateRect(New cv.Rect(tc.center.X - rSize, tc.center.Y - rSize, rSize * 2, rSize * 2))
@@ -577,7 +577,7 @@ Public Class Match_LinePairTest : Inherits VB_Parent
             rect = validateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, rSize, rSize))
             Dim searchRect = validateRect(New cv.Rect(rect.X - rSize, rect.Y - rSize, rSize * 3, rSize * 3))
             cv.Cv2.MatchTemplate(target(i), src(searchRect), dst0, cv.TemplateMatchModes.CCoeffNormed)
-            Dim mmData = vbMinMax(dst0)
+            Dim mmData = GetMinMax(dst0)
             correlation(i) = mmData.maxVal
             If i = 0 Then
                 dst0.CopyTo(dst2(New cv.Rect(0, 0, dst0.Width, dst0.Height)))
@@ -676,7 +676,7 @@ Public Class Match_Point : Inherits VB_Parent
         Dim rect = validateRect(New cv.Rect(pt.X - radius, pt.Y - radius, rSize, rSize))
         searchRect = validateRect(New cv.Rect(rect.X - rSize, rect.Y - rSize, rSize * 3, rSize * 3))
         cv.Cv2.MatchTemplate(target(rect), src(searchRect), dst0, cv.TemplateMatchModes.CCoeffNormed)
-        Dim mmData = vbMinMax(dst0)
+        Dim mmData = GetMinMax(dst0)
         correlation = mmData.maxVal
         pt = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
         drawCircle(src, pt, task.dotSize, cv.Scalar.White)

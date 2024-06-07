@@ -191,7 +191,7 @@ Public Class Diff_Depth32S : Inherits VB_Parent
 
         cv.Cv2.Absdiff(dst0, lastDepth32s, dst1)
         dst1 = dst1.ConvertScaleAbs
-        Dim mm As mmData = vbMinMax(dst1)
+        Dim mm As mmData = GetMinMax(dst1)
 
         dst2 = dst1.Threshold(millimeters - 1, 255, cv.ThresholdTypes.Binary)
 
@@ -225,7 +225,7 @@ Public Class Diff_Depth32f : Inherits VB_Parent
         If task.optionsChanged Then lastDepth32f = task.pcSplit(2)
 
         cv.Cv2.Absdiff(task.pcSplit(2), lastDepth32f, dst1)
-        Dim mm As mmData = vbMinMax(dst1)
+        Dim mm As mmData = GetMinMax(dst1)
 
         dst2 = dst1.Threshold(millimeters, 255, cv.ThresholdTypes.Binary)
 

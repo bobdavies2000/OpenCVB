@@ -70,6 +70,19 @@ namespace CS_Classes
 
             task.advice += advice + Environment.NewLine + Environment.NewLine;
         }
+        public mmData GetMinMax(Mat mat, Mat mask = null)
+        {
+            mmData mm = new mmData();
+            if (mask == null)
+            {
+                Cv2.MinMaxLoc(mat, out mm.minVal, out mm.maxVal, out mm.minLoc, out mm.maxLoc);
+            }
+            else
+            {
+                Cv2.MinMaxLoc(mat, out mm.minVal, out mm.maxVal, out mm.minLoc, out mm.maxLoc, mask);
+            }
+            return mm;
+        }
 
         public void drawContour(Mat dst, List<Point> contour, Scalar color, int lineWidth = -10)
         {

@@ -897,7 +897,7 @@ Public Class PointCloud_Histograms : Inherits VB_Parent
     Dim grid As New Grid_Basics
     Public histogram As New cv.Mat
     Public Sub New()
-        task.gOptions.HistBinSlider.Value = 9
+        task.gOptions.HistBinBar.Value = 9
         task.redOptions.XYReduction.Checked = True
         labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}
         desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options."
@@ -926,11 +926,11 @@ Public Class PointCloud_Histograms : Inherits VB_Parent
                 Dim histData(histogram.Total - 1) As Single
                 Marshal.Copy(histogram.Data, histData, 0, histData.Length)
 
-                If histData.Count > 255 And task.gOptions.HistBinSlider.Value > 3 Then
-                    task.gOptions.HistBinSlider.Value -= 1
+                If histData.Count > 255 And task.gOptions.HistBinBar.Value > 3 Then
+                    task.gOptions.HistBinBar.Value -= 1
                 End If
-                If histData.Count < 128 And task.gOptions.HistBinSlider.Value < task.gOptions.HistBinSlider.Maximum Then
-                    task.gOptions.HistBinSlider.Value += 1
+                If histData.Count < 128 And task.gOptions.HistBinBar.Value < task.gOptions.HistBinBar.Maximum Then
+                    task.gOptions.HistBinBar.Value += 1
                 End If
                 If task.gridList.Count < histData.Length And task.gOptions.GridSize.Value > 2 Then
                     task.gOptions.GridSize.Value -= 1
@@ -951,7 +951,7 @@ Public Class PointCloud_Histograms : Inherits VB_Parent
                 labels(2) = "2D plot of the resulting 3D histogram."
         End Select
 
-        Dim mm as mmData = vbMinMax(dst2)
+        Dim mm as mmData = GetMinMax(dst2)
         dst3 = ShowPalette(dst2 * 255 / mm.maxVal)
     End Sub
 End Class
@@ -977,7 +977,7 @@ Public Class PointCloud_ReduceSplit2 : Inherits VB_Parent
         If standaloneTest() Then
             dst3 = task.pointCloud
         Else
-            Dim mm = vbMinMax(dst1)
+            Dim mm = GetMinMax(dst1)
             dst1 *= task.maxZmeters / mm.maxVal
             cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), dst1}, dst3)
         End If

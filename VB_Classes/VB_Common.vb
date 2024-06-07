@@ -351,16 +351,6 @@ Module VB_Common
     Public Function convertVec3bToScalar(vec As cv.Vec3b) As cv.Scalar
         Return New cv.Scalar(vec(0), vec(1), vec(2))
     End Function
-    Public Function vbGetMaxDist(ByRef rc As rcData) As cv.Point
-        Dim mask = rc.mask.Clone
-        mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-        Dim mm As mmData = vbMinMax(distance32f)
-        mm.maxLoc.X += rc.rect.X
-        mm.maxLoc.Y += rc.rect.Y
-
-        Return mm.maxLoc
-    End Function
     Public Function vbContourToRect(contour As List(Of cv.Point)) As cv.Rect
         Dim minX As Integer = Integer.MaxValue, minY As Integer = Integer.MaxValue, maxX As Integer, maxY As Integer
         For Each pt In contour
@@ -502,15 +492,6 @@ Module VB_Common
         Dim split = pc.Split()
         Return split(index)
     End Function
-    Public Function vbMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
-        Dim mm As mmData
-        If mask Is Nothing Then
-            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
-        Else
-            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
-        End If
-        Return mm
-    End Function
     Public Function vblowResize(input As cv.Mat) As cv.Mat
         Return input.Resize(task.lowRes, 0, 0, cv.InterpolationFlags.Nearest)
     End Function
@@ -528,7 +509,7 @@ Module VB_Common
     Public Function checkIntermediateResults() As VB_Parent
         If task.algName.StartsWith("CPP_") Then Return Nothing ' we don't currently support intermediate results for CPP_ algorithms.
         For Each obj In task.activeObjects
-            If obj.traceName = task.intermediateName And obj.firstPass = False Then Return obj
+            If obj.traceName = task.intermediateName And task.firstPass = False Then Return obj
         Next
         Return Nothing
     End Function
@@ -701,7 +682,7 @@ Module VB_Common
             task.almostHeartBeat = False
         End If
 
-        task.histogramBins = task.gOptions.HistBinSlider.Value
+        task.histogramBins = task.gOptions.HistBinBar.Value
         task.lineWidth = task.gOptions.LineWidth.Value
         task.dotSize = task.gOptions.dotSizeSlider.Value
 

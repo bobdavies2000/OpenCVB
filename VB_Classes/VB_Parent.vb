@@ -84,6 +84,58 @@ Public Class VB_Parent : Implements IDisposable
         End If
         task.firstPass = True
     End Sub
+    Public Function Show_HSV_Hist(hist As cv.Mat) As cv.Mat
+        Dim img As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
+        Dim binCount = hist.Height
+        Dim binWidth = img.Width / hist.Height
+        Dim mm As mmData = GetMinMax(hist)
+        img.SetTo(0)
+        If mm.maxVal > 0 Then
+            For i = 0 To binCount - 2
+                Dim h = img.Height * (hist.Get(Of Single)(i, 0)) / mm.maxVal
+                If h = 0 Then h = 5 ' show the color range in the plot
+                cv.Cv2.Rectangle(img, New cv.Rect(i * binWidth, img.Height - h, binWidth, h),
+                                 New cv.Scalar(CInt(180.0 * i / binCount), 255, 255), -1)
+            Next
+        End If
+        Return img
+    End Function
+    Public Function GetHist2Dminmax(input As cv.Mat, chan1 As Integer, chan2 As Integer) As cv.Rangef()
+        If input.Type = cv.MatType.CV_8UC3 Then
+            ' ranges are exclusive in OpenCV 
+            Return {New cv.Rangef(-histDelta, 256),
+                    New cv.Rangef(-histDelta, 256)}
+        End If
+
+        Dim xInput = input.ExtractChannel(chan1)
+        Dim yInput = input.ExtractChannel(chan2)
+
+        Dim mmX = GetMinMax(xInput)
+        Dim mmY = GetMinMax(yInput)
+
+        ' ranges are exclusive in OpenCV 
+        Return {New cv.Rangef(mmX.minVal - histDelta, mmX.maxVal + histDelta),
+                New cv.Rangef(mmY.minVal - histDelta, mmY.maxVal + histDelta)}
+    End Function
+    Public Function GetMaxDist(ByRef rc As rcData) As cv.Point
+        Dim mask = rc.mask.Clone
+        mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+        Dim mm As mmData = GetMinMax(distance32f)
+        mm.maxLoc.X += rc.rect.X
+        mm.maxLoc.Y += rc.rect.Y
+
+        Return mm.maxLoc
+    End Function
+    Public Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
+        Dim mm As mmData
+        If mask Is Nothing Then
+            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
+        Else
+            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
+        End If
+        Return mm
+    End Function
     Public Sub Run(src As cv.Mat)
         If task.testAllRunning = False Then measureStartRun(traceName)
 

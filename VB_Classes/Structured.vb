@@ -28,7 +28,7 @@ Public Class Structured_LinearizeFloor : Inherits VB_Parent
         If sliceMask.CountNonZero > 0 Then
             Dim split = imuPC.Split()
             If xCheck.Checked Then
-                Dim mm As mmData = vbMinMax(split(0), sliceMask)
+                Dim mm As mmData = GetMinMax(split(0), sliceMask)
 
                 Dim firstCol As Integer, lastCol As Integer
                 For firstCol = 0 To sliceMask.Width - 1
@@ -46,7 +46,7 @@ Public Class Structured_LinearizeFloor : Inherits VB_Parent
             End If
 
             If yCheck.Checked Then
-                Dim mm As mmData = vbMinMax(split(1), sliceMask)
+                Dim mm As mmData = GetMinMax(split(1), sliceMask)
                 kalman.kInput = (mm.minVal + mm.maxVal) / 2
                 kalman.Run(src)
                 floorYPlane = kalman.kAverage
@@ -432,8 +432,8 @@ Public Class Structured_Crosshairs : Inherits VB_Parent
         Dim split = cv.Cv2.Split(sCloud.dst2)
 
         Static minX As Single, maxX As Single, minY As Single, maxY As Single
-        Dim mmX = vbMinMax(split(0))
-        Dim mmY = vbMinMax(split(1))
+        Dim mmX = GetMinMax(split(0))
+        Dim mmY = GetMinMax(split(1))
 
         minX = If(minX > mmX.minVal, mmX.minVal, minX)
         minY = If(minY > mmY.minVal, mmY.minVal, minY)
@@ -875,7 +875,7 @@ Public Class Structured_SliceXPlot : Inherits VB_Parent
 
         Dim rect = New cv.Rect(col, 0, If(col + options.sliceSize >= dst3.Width, dst3.Width - col,
                                options.sliceSize), dst3.Height - 1)
-        Dim mm as mmData = vbMinMax(multi.heat.topframes.dst2(rect))
+        Dim mm as mmData = GetMinMax(multi.heat.topframes.dst2(rect))
 
         drawCircle(dst3,New cv.Point(col, mm.maxLoc.Y), task.dotSize + 3, cv.Scalar.Yellow)
 
@@ -914,7 +914,7 @@ Public Class Structured_SliceYPlot : Inherits VB_Parent
 
         Dim rect = New cv.Rect(0, row, dst3.Width - 1, If(row + options.sliceSize >= dst3.Height,
                                dst3.Height - row, options.sliceSize))
-        Dim mm as mmData = vbMinMax(multi.heat.sideframes.dst2(rect))
+        Dim mm as mmData = GetMinMax(multi.heat.sideframes.dst2(rect))
 
         If mm.maxVal > 0 Then
             drawCircle(dst3,New cv.Point(mm.maxLoc.X, row), task.dotSize + 3, cv.Scalar.Yellow)

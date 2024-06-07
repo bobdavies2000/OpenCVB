@@ -5,7 +5,7 @@ Public Class Cell_Basics : Inherits VB_Parent
     Dim eq As New Plane_Equation
     Public runRedCloud As Boolean
     Public Sub New()
-        If standaloneTest() Then task.gOptions.HistBinSlider.Value = 20
+        If standaloneTest() Then task.gOptions.HistBinBar.Value = 20
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString()
@@ -283,7 +283,7 @@ Public Class Cell_BasicsPlot : Inherits VB_Parent
     Public Sub New()
         task.redOptions.IdentifyCells.Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
-        If standalone Then task.gOptions.HistBinSlider.Value = 20
+        If standalone Then task.gOptions.HistBinBar.Value = 20
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString(src As cv.Mat)
@@ -415,7 +415,7 @@ Public Class Cell_Generate : Inherits VB_Parent
             rc.naturalColor = New cv.Vec3b(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2))
             rc.naturalGray = CInt(rc.colorMean(2) * 0.299 + rc.colorMean(1) * 0.587 + rc.colorMean(0) * 0.114)
 
-            rc.maxDist = vbGetMaxDist(rc)
+            rc.maxDist = GetMaxDist(rc)
             rc.indexLast = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If useLeftImage Then rc.motionPixels = diffLeft.dst2(rc.rect).CountNonZero Else rc.motionPixels = diffRight.dst2(rc.rect).CountNonZero
             If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then

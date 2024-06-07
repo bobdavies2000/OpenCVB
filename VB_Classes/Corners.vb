@@ -76,7 +76,7 @@ Public Class Corners_Harris : Inherits VB_Parent
         Next
 
         Static mm As mmData
-        mm = vbMinMax(mc)
+        mm = GetMinMax(mc)
 
         src.CopyTo(dst2)
         For j = 0 To gray.Rows - 1

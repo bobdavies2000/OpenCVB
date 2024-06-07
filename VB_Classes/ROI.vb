@@ -14,8 +14,8 @@ Public Class ROI_Basics : Inherits VB_Parent
 
         Dim split = diff.dst2.FindNonZero().Split()
         If split.Length = 0 Then Exit Sub
-        Dim mm0 = vbMinMax(split(0))
-        Dim mm1 = vbMinMax(split(1))
+        Dim mm0 = GetMinMax(split(0))
+        Dim mm1 = GetMinMax(split(1))
 
         aoiRect = New cv.Rect(mm0.minVal, mm1.minVal, mm0.maxVal - mm0.minVal, mm1.maxVal - mm1.minVal)
 
@@ -152,8 +152,8 @@ Public Class ROI_Accumulate : Inherits VB_Parent
 
         Dim split = diff.dst2.FindNonZero().Split()
         If split.Length > 0 Then
-            Dim mm0 = vbMinMax(split(0))
-            Dim mm1 = vbMinMax(split(1))
+            Dim mm0 = GetMinMax(split(0))
+            Dim mm1 = GetMinMax(split(1))
 
             Dim motionRect = New cv.Rect(mm0.minVal, mm1.minVal, mm0.maxVal - mm0.minVal, mm1.maxVal - mm1.minVal)
             If motionRect.Width <> 0 And motionRect.Height <> 0 Then

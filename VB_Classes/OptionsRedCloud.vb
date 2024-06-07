@@ -218,37 +218,37 @@ Public Class OptionsRedCloud
     Private Sub XReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XReduction.Tag
-        task.gOptions.HistBinSlider.Value = 16
+        task.gOptions.HistBinBar.Value = 16
     End Sub
     Private Sub YReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = YReduction.Tag
-        task.gOptions.HistBinSlider.Value = 16
+        task.gOptions.HistBinBar.Value = 16
     End Sub
     Private Sub ZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles ZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = ZReduction.Tag
-        task.gOptions.HistBinSlider.Value = 16
+        task.gOptions.HistBinBar.Value = 16
     End Sub
     Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs) Handles XYReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XYReduction.Tag
-        task.gOptions.HistBinSlider.Value = 16
+        task.gOptions.HistBinBar.Value = 16
     End Sub
     Private Sub XZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XZReduction.Tag
-        task.gOptions.HistBinSlider.Value = 16
+        task.gOptions.HistBinBar.Value = 16
     End Sub
     Private Sub YZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = YZReduction.Tag
-        task.gOptions.HistBinSlider.Value = 16
+        task.gOptions.HistBinBar.Value = 16
     End Sub
     Public Sub XYZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XYZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XYZReduction.Tag
-        task.gOptions.HistBinSlider.Value = 6
+        task.gOptions.HistBinBar.Value = 6
     End Sub
 
 

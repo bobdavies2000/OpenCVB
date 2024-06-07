@@ -14,18 +14,18 @@ Public Class Hist_Basics : Inherits VB_Parent
     Public removeMax As Boolean
     Public autoDisplay As Boolean
     Public Sub New()
-        If standaloneTest() Then task.gOptions.HistBinSlider.Value = 255
+        If standaloneTest() Then task.gOptions.HistBinBar.Value = 255
         desc = "Create a histogram (no Kalman)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static splitIndex As Integer
         If standalone Then
             If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
-            mm = vbMinMax(src.ExtractChannel(splitIndex))
+            mm = GetMinMax(src.ExtractChannel(splitIndex))
             plot.backColor = Choose(splitIndex + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
         Else
             If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            mm = vbMinMax(src)
+            mm = GetMinMax(src)
         End If
         If fixedRanges Is Nothing Then
             ranges = {New cv.Rangef(mm.minVal - histDelta, mm.maxVal + histDelta)}
@@ -41,7 +41,7 @@ Public Class Hist_Basics : Inherits VB_Parent
         End If
 
         If removeMax Then
-            Dim mmMax = vbMinMax(histogram)
+            Dim mmMax = GetMinMax(histogram)
             histogram.Set(Of Single)(mmMax.maxLoc.Y, mmMax.maxLoc.X, 0)
         End If
 
@@ -70,7 +70,7 @@ End Class
 Public Class Hist_Grayscale : Inherits VB_Parent
     Public hist As New Hist_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.HistBinSlider.Value = 255
+        If standaloneTest() Then task.gOptions.HistBinBar.Value = 255
         desc = "Create a histogram of the grayscale image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -112,7 +112,7 @@ Public Class Hist_Graph : Inherits VB_Parent
             Dim hist As New cv.Mat
             cv.Cv2.CalcHist({src}, {i}, New cv.Mat(), hist, 1, dimensions, ranges)
             histRaw(i) = hist.Clone()
-            mm = vbMinMax(histRaw(i))
+            mm = GetMinMax(histRaw(i))
             histNormalized(i) = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
             If standaloneTest() Or plotRequested Then
                 Dim points = New List(Of cv.Point)
@@ -296,7 +296,7 @@ Public Class Hist_PeakMax : Inherits VB_Parent
         hist.Run(src)
         dst3 = hist.dst2
 
-        Dim mm As mmData = vbMinMax(hist.histogram)
+        Dim mm As mmData = GetMinMax(hist.histogram)
         Dim brickWidth = dst2.Width / task.histogramBins
         Dim brickRange = 255 / task.histogramBins
         Dim histindex = mm.maxLoc.Y
@@ -390,7 +390,7 @@ Public Class Hist_PeakFinder : Inherits VB_Parent
             sortedPeaks.Add(peakCounts(i), i)
         Next
 
-        Dim mm As mmData = vbMinMax(histogram)
+        Dim mm As mmData = GetMinMax(histogram)
         If mm.maxVal = 0 Then Exit Sub ' entries are all zero?  Likely camera trouble.
         Dim brickWidth = dst2.Width / histogram.Rows
         histogramPeaks.Clear()
@@ -497,7 +497,7 @@ Public Class Hist_Color : Inherits VB_Parent
         Dim mask As New cv.Mat
         cv.Cv2.CalcBackProject({input}, {1, 2}, histogram, mask, ranges)
 
-        Dim mm As mmData = vbMinMax(mask)
+        Dim mm As mmData = GetMinMax(mask)
 
         plot.Run(test)
         dst2 = plot.dst2
@@ -532,7 +532,7 @@ Public Class Hist_KalmanAuto : Inherits VB_Parent
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        mm = vbMinMax(src)
+        mm = GetMinMax(src)
         ranges = New cv.Rangef() {New cv.Rangef(mm.minVal, mm.maxVal)}
 
         If mm.minVal = mm.maxVal Then
@@ -686,7 +686,7 @@ Public Class Hist_ComparePlot : Inherits VB_Parent
             comp.histK.hist.plot.Run(histX)
             dst3 = comp.histK.hist.plot.dst2.Clone
 
-            Dim mm As mmData = vbMinMax(histX)
+            Dim mm As mmData = GetMinMax(histX)
             AddPlotScale(dst2, 0, mm.maxVal)
         End If
         trueData = New List(Of trueText)(ttLabels)
@@ -838,7 +838,7 @@ Public Class Hist_PointCloudXYZ : Inherits VB_Parent
         Static ttlists As New List(Of List(Of trueText))({New List(Of trueText), New List(Of trueText), New List(Of trueText)})
         For i = 0 To 2
             dst0 = task.pcSplit(i)
-            Dim mm As mmData = vbMinMax(dst0)
+            Dim mm As mmData = GetMinMax(dst0)
 
             Select Case i
                 Case 0
@@ -884,7 +884,7 @@ Public Class Hist_FlatSurfaces : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         Dim maxRange = 4
         Dim cloudY = task.pcSplit(1).Clone
-        Dim mm As mmData = vbMinMax(cloudY)
+        Dim mm As mmData = GetMinMax(cloudY)
         cloudY = cloudY.Threshold(maxRange, mm.maxVal, cv.ThresholdTypes.Trunc)
         Static saveMinVal = mm.minVal, saveMaxVal = mm.maxVal
         If task.heartBeat Then
@@ -899,7 +899,7 @@ Public Class Hist_FlatSurfaces : Inherits VB_Parent
         cloudY.Set(Of Single)(mm.maxLoc.Y, mm.maxLoc.X, saveMaxVal)
         cloudY = (cloudY - saveMinVal).tomat
         cloudY = cloudY.ConvertScaleAbs(255 / (-saveMinVal + saveMaxVal))
-        mm = vbMinMax(cloudY)
+        mm = GetMinMax(cloudY)
         cloudY.SetTo(0, task.noDepthMask)
         masks.Run(cloudY)
         dst2 = masks.dst2
@@ -918,7 +918,7 @@ End Class
 Public Class Hist_ShapeSide : Inherits VB_Parent
     Public rc As New rcData
     Public Sub New()
-        task.gOptions.HistBinSlider.Value = 60
+        task.gOptions.HistBinBar.Value = 60
         labels = {"", "", "ZY Side View", "ZY Side View Mask"}
         desc = "Create a 2D side view for ZY histogram of depth"
     End Sub
@@ -947,7 +947,7 @@ End Class
 Public Class Hist_ShapeTop : Inherits VB_Parent
     Public rc As New rcData
     Public Sub New()
-        task.gOptions.HistBinSlider.Value = 60
+        task.gOptions.HistBinBar.Value = 60
         labels = {"", "", "ZY Side View", "ZY Side View Mask"}
         desc = "Create a 2D top view for XZ histogram of depth"
     End Sub
@@ -1184,7 +1184,7 @@ Public Class Hist_Depth : Inherits VB_Parent
             src = task.pcSplit(2)(rc.rect).Clone
         Else
             If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-            mm = vbMinMax(src)
+            mm = GetMinMax(src)
             plot.minRange = mm.minVal ' because OpenCV's histogram makes the ranges exclusive.
             plot.maxRange = mm.maxVal
         End If
