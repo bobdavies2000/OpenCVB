@@ -1327,6 +1327,205 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 
+    public class CSharp_BackProject_Masks : CS_Parent
+    {
+        public Hist_Basics hist = new Hist_Basics();
+        public int histIndex;
+        public Mat mask = new Mat();
+
+        public CSharp_BackProject_Masks(VBtask task) : base(task)
+        {
+            labels[2] = "Histogram for the gray scale image.  Move mouse to see backprojection of each grayscale mask.";
+            desc = "Create all the backprojection masks from a grayscale histogram";
+        }
+
+        public Mat maskDetect(Mat gray, int histIndex)
+        {
+            int brickWidth = dst2.Width / hist.histogram.Rows;
+            float brickRange = 255f / hist.histogram.Rows;
+
+            float minRange = (histIndex == hist.histogram.Rows - 1) ? 255 - brickRange : histIndex * brickRange;
+            float maxRange = (histIndex == hist.histogram.Rows - 1) ? 255 : (histIndex + 1) * brickRange;
+
+            if (float.IsNaN(minRange) || float.IsInfinity(minRange) || float.IsNaN(maxRange) || float.IsInfinity(maxRange))
+            {
+                setTrueText("Input data has no values - exit " + traceName);
+                return new Mat();
+            }
+
+            Rangef[] ranges = { new Rangef(minRange, maxRange) };
+
+            Cv2.CalcBackProject(new[] { gray }, new[] { 0 }, hist.histogram, mask, ranges);
+            return mask;
+        }
+
+        public void RunCS(Mat src)
+        {
+            hist.Run(src);
+            dst2 = hist.dst2;
+
+            int brickWidth = dst2.Width / task.histogramBins;
+            histIndex = (int)Math.Floor((double)(task.mouseMovePoint.X / brickWidth));
+
+            Mat gray = (src.Channels() == 1) ? src : src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            dst3 = task.color.Clone();
+            dst1 = maskDetect(gray, histIndex);
+            if (dst1.Width == 0) return;
+            dst3.SetTo(Scalar.White, dst1);
+            dst2.Rectangle(new Rect(histIndex * brickWidth, 0, brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
+        }
+    }
+
+
+
+
+
+    public class CSharp_BackProject_Side : CS_Parent
+    {
+        private OpAuto_YRange autoY = new OpAuto_YRange();
+        private Projection_HistSide histSide = new Projection_HistSide();
+
+        public CSharp_BackProject_Side(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Hotspots in the Side View", "Back projection of the hotspots in the Side View" };
+            desc = "Display the back projection of the hotspots in the Side View";
+        }
+
+        public void RunCS(Mat src)
+        {
+            histSide.Run(src);
+            autoY.Run(histSide.histogram);
+
+            dst2 = autoY.histogram.Threshold(task.projectionThreshold, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+            Mat histogram = autoY.histogram.SetTo(0, ~dst2);
+            Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsSide, histogram, dst3, task.rangesSide);
+            dst3 = dst3.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+        }
+    }
+
+
+
+    public class CSharp_BackProject_Top : CS_Parent
+    {
+        private Projection_HistTop histTop = new Projection_HistTop();
+        public CSharp_BackProject_Top(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Hotspots in the Top View", "Back projection of the hotspots in the Top View" };
+            desc = "Display the back projection of the hotspots in the Top View";
+        }
+
+        public void RunCS(Mat src)
+        {
+            histTop.Run(src);
+            dst2 = histTop.dst2;
+
+            Mat histogram = histTop.histogram.SetTo(0, ~dst2);
+            Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsTop, histogram, dst3, task.rangesTop);
+            dst3 = ShowPalette(dst3.ConvertScaleAbs());
+        }
+    }
+
+
+
+
+
+    public class CSharp_BackProject_Horizontal : CS_Parent
+    {
+        private BackProject_Top bpTop = new BackProject_Top();
+        private BackProject_Side bpSide = new BackProject_Side();
+
+        public CSharp_BackProject_Horizontal(VBtask task) : base(task)
+        {
+            desc = "Use both the BackProject_Top to improve the results of the BackProject_Side for finding flat surfaces.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            bpTop.Run(src);
+            task.pointCloud.SetTo(0, bpTop.dst3);
+
+            bpSide.Run(src);
+            dst2 = bpSide.dst3;
+        }
+    }
+
+
+
+
+
+    public class CSharp_BackProject_Vertical : CS_Parent
+    {
+        private BackProject_Top bpTop = new BackProject_Top();
+        private BackProject_Side bpSide = new BackProject_Side();
+
+        public CSharp_BackProject_Vertical(VBtask task) : base(task)
+        {
+            desc = "Use both the BackProject_Top to improve the results of the BackProject_Side for finding flat surfaces.";
+        }
+
+        public void RunCS(cv.Mat src)
+        {
+            bpSide.Run(src);
+            task.pointCloud.SetTo(0, bpSide.dst3);
+
+            bpTop.Run(src);
+            dst2 = bpTop.dst3;
+        }
+    }
+
+
+
+
+    public class CSharp_BackProject_SoloSide : CS_Parent
+    {
+        Projection_HistSide histSide = new Projection_HistSide();
+
+        public CSharp_BackProject_SoloSide(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Solo samples in the Side View", "Back projection of the solo samples in the Side View" };
+            desc = "Display the back projection of the solo samples in the Side View";
+        }
+
+        public void RunCS(Mat src)
+        {
+            histSide.Run(src);
+
+            dst3 = histSide.histogram.Threshold(1, 255, ThresholdTypes.TozeroInv);
+            dst3.ConvertTo(dst2, MatType.CV_8U, 255);
+
+            histSide.histogram.SetTo(0, ~dst2);
+            Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsSide, histSide.histogram, dst3, task.rangesSide);
+            dst3 = dst3.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+        }
+    }
+
+    public class CSharp_BackProject_SoloTop : CS_Parent
+    {
+        Projection_HistTop histTop = new Projection_HistTop();
+
+        public CSharp_BackProject_SoloTop(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Solo samples in the Top View", "Back projection of the solo samples in the Top View" };
+            desc = "Display the back projection of the solo samples in the Top View";
+        }
+
+        public void RunCS(Mat src)
+        {
+            histTop.Run(src);
+
+            dst3 = histTop.histogram.Threshold(1, 255, ThresholdTypes.TozeroInv);
+            dst3.ConvertTo(dst2, MatType.CV_8U, 255);
+
+            histTop.histogram.SetTo(0, ~dst2);
+            Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsTop, histTop.histogram, dst3, task.rangesTop);
+            dst3 = dst3.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+        }
+    }
+
+
+
+
+
 
 
 

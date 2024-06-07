@@ -32,10 +32,17 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_BackProject_Full") return new CSharp_BackProject_Full(task);
 			if (algorithmName == "CSharp_BackProject_FullEqualized") return new CSharp_BackProject_FullEqualized(task);
 			if (algorithmName == "CSharp_BackProject_FullLines") return new CSharp_BackProject_FullLines(task);
+			if (algorithmName == "CSharp_BackProject_Horizontal") return new CSharp_BackProject_Horizontal(task);
 			if (algorithmName == "CSharp_BackProject_MaskLines") return new CSharp_BackProject_MaskLines(task);
+			if (algorithmName == "CSharp_BackProject_Masks") return new CSharp_BackProject_Masks(task);
 			if (algorithmName == "CSharp_BackProject_PointCloud") return new CSharp_BackProject_PointCloud(task);
 			if (algorithmName == "CSharp_BackProject_Reduction") return new CSharp_BackProject_Reduction(task);
+			if (algorithmName == "CSharp_BackProject_Side") return new CSharp_BackProject_Side(task);
+			if (algorithmName == "CSharp_BackProject_SoloSide") return new CSharp_BackProject_SoloSide(task);
+			if (algorithmName == "CSharp_BackProject_SoloTop") return new CSharp_BackProject_SoloTop(task);
+			if (algorithmName == "CSharp_BackProject_Top") return new CSharp_BackProject_Top(task);
 			if (algorithmName == "CSharp_BackProject_Unstable") return new CSharp_BackProject_Unstable(task);
+			if (algorithmName == "CSharp_BackProject_Vertical") return new CSharp_BackProject_Vertical(task);
 			if (algorithmName == "CSharp_Diff_Basics") return new CSharp_Diff_Basics(task);
 			if (algorithmName == "CSharp_Line_Basics") return new CSharp_Line_Basics(task);
 			if (algorithmName == "CSharp_Random_Basics") return new CSharp_Random_Basics(task);
