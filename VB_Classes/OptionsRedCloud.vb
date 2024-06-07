@@ -314,4 +314,18 @@ Public Class OptionsRedCloud
     Private Sub naturalColor_CheckedChanged(sender As Object, e As EventArgs) Handles naturalColor.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
+
+    Public Sub setSimpleReductionBar(newVal As Integer)
+        SimpleReductionBar.Value = newVal
+    End Sub
+    Public Sub checkSimpleReduction(newVal As Boolean)
+        UseSimpleReduction.Checked = newVal
+    End Sub
+
+    Public Sub setBitReductionBar(newVal As Integer)
+        BitwiseReductionBar.Value = newVal
+    End Sub
+    Public Sub checkBitReduction(newVal As Boolean)
+        BitwiseReduction.Checked = newVal
+    End Sub
 End Class

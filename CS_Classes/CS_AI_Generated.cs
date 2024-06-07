@@ -989,7 +989,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
         public CSharp_BackProject_Reduction(VBtask task) : base(task)
         {
-            task.redOptions.SimpleReductionChecked = true;
+            task.redOptions.checkSimpleReduction(true);
             labels[3] = "Backprojection of highlighted histogram bin";
             desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image.";
         }
@@ -1007,6 +1007,35 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
     }
 
 
+
+
+
+
+    public class CSharp_BackProject_FeatureLess : CS_Parent
+    {
+        private BackProject_Basics backP = new BackProject_Basics();
+        private Reduction_Basics reduction = new Reduction_Basics();
+        private Edge_ColorGap_CPP edges = new Edge_ColorGap_CPP();
+
+        public CSharp_BackProject_FeatureLess(VBtask task) : base(task)
+        {
+            task.redOptions.checkBitReduction(true);
+            labels = new string[] { "", "", "Histogram of the grayscale image at right",
+                                "Move mouse over the histogram to backproject a column" };
+            desc = "Create a histogram of the featureless regions";
+        }
+
+        public void RunCS(Mat src)
+        {
+            edges.Run(src);
+            reduction.Run(edges.dst3);
+            backP.Run(reduction.dst2);
+            dst2 = backP.dst2;
+            dst3 = backP.dst3;
+            int reductionValue = task.redOptions.SimpleReduction;
+            labels[2] = "Reduction = " + reductionValue.ToString() + " and bins = " + task.histogramBins.ToString();
+        }
+    }
 
 
 

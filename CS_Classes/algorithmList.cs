@@ -26,6 +26,7 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_AsciiArt_Color") return new CSharp_AsciiArt_Color(task);
 			if (algorithmName == "CSharp_AsciiArt_Diff") return new CSharp_AsciiArt_Diff(task);
 			if (algorithmName == "CSharp_BackProject_Basics") return new CSharp_BackProject_Basics(task);
+			if (algorithmName == "CSharp_BackProject_FeatureLess") return new CSharp_BackProject_FeatureLess(task);
 			if (algorithmName == "CSharp_BackProject_Full") return new CSharp_BackProject_Full(task);
 			if (algorithmName == "CSharp_BackProject_Reduction") return new CSharp_BackProject_Reduction(task);
 			if (algorithmName == "CSharp_Diff_Basics") return new CSharp_Diff_Basics(task);
