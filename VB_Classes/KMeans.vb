@@ -209,7 +209,7 @@ Public Class KMeans_Simple_CPP : Inherits VB_Parent
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = Kmeans_Simple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, CSng(mm.minVal), gOptions.MaxDepth.Value)
+        Dim imagePtr = Kmeans_Simple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, CSng(mm.minVal), task.gOptions.MaxDepthBar.Value)
         handleSrc.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
@@ -233,7 +233,7 @@ Public Class KMeans_Edges : Inherits VB_Parent
     Public classCount As Integer
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        redOptions.UseColorOnly.Checked = True
+        task.redOptions.UseColorOnly.Checked = True
         labels(3) = "KMeans with edges output"
         desc = "Use edges to isolate regions in the KMeans output - not much different from KMeans_Basics."
     End Sub
@@ -514,10 +514,10 @@ Public Class KMeans_SimKColor : Inherits VB_Parent
             classCount = simK.classCount
         End If
 
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst1, redOptions.rangesBGR)
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst1, task.redOptions.rangesBGR)
 
         dst2 = ShowPalette(dst1 * 255 / classCount)
-        labels(2) = simK.labels(2) + " with " + CStr(redOptions.bins3D) + " histogram bins"
+        labels(2) = simK.labels(2) + " with " + CStr(task.redOptions.bins3D) + " histogram bins"
     End Sub
 End Class
 
@@ -543,11 +543,11 @@ Public Class KMeans_SimKDepth : Inherits VB_Parent
             plot1D.histogram = simK.dst2
             classCount = simK.classCount
         End If
-        cv.Cv2.CalcBackProject({src}, {2}, plot1D.histogram, dst1, redOptions.rangesCloud)
+        cv.Cv2.CalcBackProject({src}, {2}, plot1D.histogram, dst1, task.redOptions.rangesCloud)
         dst1 = dst1.ConvertScaleAbs
 
         dst2 = ShowPalette(dst1 * 255 / classCount)
 
-        labels(2) = simK.labels(2) + " with " + CStr(redOptions.bins3D) + " histogram bins"
+        labels(2) = simK.labels(2) + " with " + CStr(task.redOptions.bins3D) + " histogram bins"
     End Sub
 End Class

@@ -275,7 +275,7 @@ Public Class GuidedBP_Depth : Inherits VB_Parent
     Dim myPalette As New Palette_Random
     Public classCount As Integer
     Public Sub New()
-        gOptions.HistBinSlider.Value = 16
+        task.gOptions.HistBinSlider.Value = 16
         desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -308,7 +308,7 @@ Public Class GuidedBP_Depth : Inherits VB_Parent
 
         Marshal.Copy(newSamples, 0, hist.histogram.Data, newSamples.Length)
 
-        cv.Cv2.CalcBackProject({src}, redOptions.channels, hist.histogram, dst2, redOptions.ranges)
+        cv.Cv2.CalcBackProject({src}, task.redOptions.channels, hist.histogram, dst2, task.redOptions.ranges)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
         If standaloneTest() Then

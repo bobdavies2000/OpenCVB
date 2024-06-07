@@ -130,7 +130,7 @@ Public Class Plane_FloorStudy : Inherits VB_Parent
     Public planeY As Single
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Pixel Count threshold that indicates floor", 1, 100, 10)
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "", ""}
         desc = "Find the floor plane (if present)"
     End Sub
@@ -467,7 +467,7 @@ End Class
 Public Class Plane_Verticals : Inherits VB_Parent
     Dim solo As New PointCloud_Solo
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels = {"RGB image with highlights for likely vertical surfaces over X frames.",
                   "Heatmap top view", "Single frame backprojection of red areas in the heatmap",
                   "Thresholded heatmap top view mask - flipped for backprojection"}
@@ -501,7 +501,7 @@ Public Class Plane_Horizontals : Inherits VB_Parent
     Dim solo As New PointCloud_Solo
     Dim frames As New History_Basics
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels = {"RGB image with highlights for likely floor or ceiling over X frames.",
                   "Heatmap side view", "Single frame backprojection areas in the heatmap",
                   "Thresholded heatmap top view mask - flipped for backprojection"}

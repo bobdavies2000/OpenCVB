@@ -5,8 +5,8 @@ Imports System.Runtime.InteropServices
 Public Class WarpModel_Basics : Inherits VB_Parent
     ReadOnly ecc As New WarpModel_ECC
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst0.Checked = True
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels = {"Original Blue plane", "Original Green plane", "Original Red plane", "ECC Aligned image"}
         desc = "Align the BGR inputs raw images from the Prokudin examples."
     End Sub
@@ -139,8 +139,8 @@ Public Class WarpModel_Input : Inherits VB_Parent
     ReadOnly sobel as new Edge_Sobel_Old
     ReadOnly options As New Options_WarpModel
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst0.Checked = True
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels = {"Original Blue plane", "Original Green plane", "Original Red plane", "Naively Aligned image"}
         desc = "Import the misaligned input."
     End Sub

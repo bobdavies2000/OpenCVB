@@ -10,10 +10,10 @@ Public Class Classifier_Basics : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If task.optionsChanged Then gOptions.DebugCheckBox.Checked = True
+        If task.optionsChanged Then task.gOptions.DebugCheckBox.Checked = True
         Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, options.sampleCount, options.methodIndex, dst2.Rows, dst2.Cols,
-                                                    If(gOptions.DebugCheckBox.Checked, 1, 0))
-        gOptions.DebugCheckBox.Checked = False
+                                                    If(task.gOptions.DebugCheckBox.Checked, 1, 0))
+        task.gOptions.DebugCheckBox.Checked = False
         dst1 = New cv.Mat(dst0.Rows, dst0.Cols, cv.MatType.CV_32S, imagePtr)
 
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
@@ -89,10 +89,10 @@ Public Class Classifier_Bayesian : Inherits VB_Parent
         Else
             sampleCount = src.Rows
         End If
-        If task.optionsChanged Then gOptions.DebugCheckBox.Checked = True
+        If task.optionsChanged Then task.gOptions.DebugCheckBox.Checked = True
         Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, sampleCount, methodIndex, dst2.Rows, dst2.Cols,
-                                                    If(gOptions.DebugCheckBox.Checked, 1, 0))
-        gOptions.DebugCheckBox.Checked = False
+                                                    If(task.gOptions.DebugCheckBox.Checked, 1, 0))
+        task.gOptions.DebugCheckBox.Checked = False
         dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, imagePtr)
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
         dst2 = ShowPalette(dst0 * 255 / 2)
@@ -113,10 +113,10 @@ Public Class Classifier_BayesianTest : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim nabs As New Neighbors_Precise
     Public Sub New()
-        redOptions.UseColorOnly.Checked = True
+        task.redOptions.UseColorOnly.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels = {"", "Mask of the neighbors to the selected cell", "RedCloud_Basics output", "Classifier_Bayesian output"}
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         cPtr = Classifier_Bayesian_Open()
         desc = "Classify the neighbor cells to be similar to the selected cell or not."
     End Sub

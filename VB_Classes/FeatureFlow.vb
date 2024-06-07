@@ -5,8 +5,8 @@ Public Class FeatureFlow_Basics : Inherits VB_Parent
     Public mpList As New List(Of pointPair)
     Public mpCorrelation As New List(Of Single)
     Public Sub New()
-        gOptions.MaxDepth.Value = 20
-        If standalone Then gOptions.displayDst1.Checked = True
+        task.gOptions.MaxDepthBar.Value = 20
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels(1) = "NOTE: matching right point is always to the left of the left point"
         desc = "Identify which feature in the left image corresponds to the feature in the right image."
     End Sub
@@ -139,7 +139,7 @@ Public Class FeatureFlow_LeftRight1 : Inherits VB_Parent
     Dim ptRight As New List(Of cv.Point)
     Public ptlist As New List(Of cv.Point)
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Find features using optical flow in both the left and right images."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -269,10 +269,10 @@ Public Class FeatureFlow_LeftRightHist : Inherits VB_Parent
 
         leftHist.Add(tmpLeft)
         rightHist.Add(tmpRight)
-        Dim threshold = Math.Min(gOptions.FrameHistory.Value, leftHist.Count)
+        Dim threshold = Math.Min(task.gOptions.FrameHistory.Value, leftHist.Count)
 
-        If leftHist.Count >= gOptions.FrameHistory.Value Then leftHist.RemoveAt(0)
-        If rightHist.Count >= gOptions.FrameHistory.Value Then rightHist.RemoveAt(0)
+        If leftHist.Count >= task.gOptions.FrameHistory.Value Then leftHist.RemoveAt(0)
+        If rightHist.Count >= task.gOptions.FrameHistory.Value Then rightHist.RemoveAt(0)
 
         If task.heartBeat Then
             labels(2) = CStr(leftFeatures.Count) + " detected in the left image that have matches in " + CStr(threshold) + " previous left images"

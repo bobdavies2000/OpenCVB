@@ -3,13 +3,13 @@ Public Class Bin3Way_Basics : Inherits VB_Parent
     Dim hist As New Hist_Basics
     Public mats As New Mat_4Click
     Public Sub New()
-        gOptions.HistBinSlider.Value = 256
+        task.gOptions.HistBinSlider.Value = 256
         labels = {"", "", "Image separated into three segments from darkest to lightest and 'Other' (between)", "Histogram Of grayscale image"}
         desc = "Split an image into 3 parts - darkest, lightest, and in-between the 2"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static firstThird As Integer, lastThird As Integer
-        Dim bins = gOptions.HistBinSlider.Value
+        Dim bins = task.gOptions.HistBinSlider.Value
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If task.heartBeat Then

@@ -14,11 +14,11 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
-        Dim bins = redOptions.HistBinSlider.Value
+        Dim bins = task.redOptions.HistBinSlider.Value
 
-        cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, {bins, bins, bins}, redOptions.rangesCloud)
+        cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, {bins, bins, bins}, task.redOptions.rangesCloud)
 
-        ReDim histArray(redOptions.bins3D - 1)
+        ReDim histArray(task.redOptions.bins3D - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
         Dim threshold = src.Total * 0.001
@@ -32,14 +32,14 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Parent
         histogram = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, simK.histArray)
         classCount = simK.classCount
 
-        cv.Cv2.CalcBackProject({src}, {2}, histogram, dst2, {redOptions.rangesCloud(redOptions.rangesCloud.Count - 1)})
+        cv.Cv2.CalcBackProject({src}, {2}, histogram, dst2, {task.redOptions.rangesCloud(task.redOptions.rangesCloud.Count - 1)})
         dst2 = dst2.ConvertScaleAbs
 
         dst2.SetTo(0, task.noDepthMask)
         'dst2.SetTo(classCount, task.maxDepthMask)
         dst3 = ShowPalette(dst2 * 255 / classCount)
 
-        labels(2) = simK.labels(2) + " with " + CStr(redOptions.bins3D) + " histogram bins"
+        labels(2) = simK.labels(2) + " with " + CStr(task.redOptions.bins3D) + " histogram bins"
         labels(3) = "LastClassCount/classCount = " + CStr(classCount) + "/" + CStr(classCount)
     End Sub
 End Class
@@ -57,7 +57,7 @@ Public Class Hist3Dcloud_DepthSplit : Inherits VB_Parent
     Dim mats1 As New Mat_4Click
     Dim mats2 As New Mat_4Click
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         hist = New List(Of Hist_Kalman)({New Hist_Kalman, New Hist_Kalman, New Hist_Kalman})
         hist2d = New List(Of Hist2D_Cloud)({New Hist2D_Cloud, New Hist2D_Cloud, New Hist2D_Cloud})
         labels(2) = "Histograms (Kalman) for X (upper left), Y (upper right) and Z.  UseZeroDepth removes 0 (no depth) entries."
@@ -69,9 +69,9 @@ Public Class Hist3Dcloud_DepthSplit : Inherits VB_Parent
             hist(i).Run(task.pcSplit(i))
             mats1.mat(i) = hist(i).dst2.Clone
 
-            If i = 0 Then redOptions.channels = {0, 1}
-            If i = 1 Then redOptions.channels = {0, 2}
-            If i = 2 Then redOptions.channels = {1, 2}
+            If i = 0 Then task.redOptions.channels = {0, 1}
+            If i = 1 Then task.redOptions.channels = {0, 2}
+            If i = 2 Then task.redOptions.channels = {1, 2}
             hist2d(i).Run(task.pointCloud)
             mats2.mat(i) = hist2d(i).histogram.ConvertScaleAbs
         Next
@@ -98,7 +98,7 @@ Public Class Hist3Dcloud_Highlights : Inherits VB_Parent
         desc = "Plot the 3D histogram of the depth data"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim bins = redOptions.HistBinSlider.Value
+        Dim bins = task.redOptions.HistBinSlider.Value
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim histInput(src.Total * src.ElemSize - 1) As Byte
@@ -114,7 +114,7 @@ Public Class Hist3Dcloud_Highlights : Inherits VB_Parent
                                      rx.Item(1), ry.Item(1), rz.Item(1))
         handleInput.Free()
 
-        histogram = New cv.Mat(redOptions.bins3D, 1, cv.MatType.CV_32F, dstPtr)
+        histogram = New cv.Mat(task.redOptions.bins3D, 1, cv.MatType.CV_32F, dstPtr)
 
         ranges = New cv.Rangef() {New cv.Rangef(rx(0), rx(1)), New cv.Rangef(ry(0), ry(1)), New cv.Rangef(rz(0), rz(1))}
 
@@ -155,7 +155,7 @@ Public Class Hist3Dcloud_BP_Filter : Inherits VB_Parent
     Public histogram As New cv.Mat
     Dim options As New Options_HistXD
     Public Sub New()
-        redOptions.HistBinSlider.Value = 16
+        task.redOptions.HistBinSlider.Value = 16
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
         labels(2) = "Mask of the pointcloud image after backprojection that removes 'blowback' pixels"
         desc = "Backproject a 3D pointcloud histogram after thresholding the bins with the small samples."
@@ -163,7 +163,7 @@ Public Class Hist3Dcloud_BP_Filter : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Dim bins = redOptions.HistBinSlider.Value
+        Dim bins = task.redOptions.HistBinSlider.Value
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim histInput(src.Total * 3 - 1) As Single

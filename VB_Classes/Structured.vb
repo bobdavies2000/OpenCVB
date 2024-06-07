@@ -209,7 +209,7 @@ End Class
 Public Class Structured_Depth : Inherits VB_Parent
     Dim sliceH As New Structured_SliceH
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
         labels = {"", "", "Use mouse to explore slices", "Top down view of the highlighted slice (at left)"}
         desc = "Use the structured depth to enhance the depth away from the centerline."
     End Sub
@@ -499,7 +499,7 @@ Public Class Structured_Cloud : Inherits VB_Parent
             sliders.setupTrackBar("Slice index Y", 1, 200, 50)
         End If
 
-        gOptions.GridSize.Value = 10
+        task.gOptions.GridSize.Value = 10
         desc = "Attempt to impose a linear structure on the pointcloud."
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -534,7 +534,7 @@ Public Class Structured_ROI : Inherits VB_Parent
     Public data As New cv.Mat
     Public oglData As New List(Of cv.Point3f)
     Public Sub New()
-        gOptions.GridSize.Value = 10
+        task.gOptions.GridSize.Value = 10
         desc = "Simplify the point cloud so it can be represented as quads in OpenGL"
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -561,7 +561,7 @@ Public Class Structured_Tiles : Inherits VB_Parent
     Public oglData As New List(Of cv.Vec3f)
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
-        gOptions.GridSize.Value = 10
+        task.gOptions.GridSize.Value = 10
         desc = "Use the OpenGL point size to represent the point cloud as data"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -595,8 +595,8 @@ Public Class Structured_TilesQuad : Inherits VB_Parent
     Dim options As New Options_OpenGLFunctions
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
-        gOptions.GridSize.Value = 10
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        task.gOptions.GridSize.Value = 10
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
         labels = {"", "RedCloud cells", "Simplified depth map - CV_32FC3", "Simplified depth map with RedCloud cell colors"}
         desc = "Simplify the OpenGL quads without using OpenGL's point size"
@@ -645,7 +645,7 @@ Public Class Structured_CountTop : Inherits VB_Parent
     Dim plot As New Plot_Histogram
     Dim counts As New List(Of Single)
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Structured Slice heatmap input - red line is max", "Max Slice output - likely vertical surface", "Histogram of pixel counts in each slice"}
         desc = "Count the number of pixels found in each slice of the point cloud data."
     End Sub
@@ -1152,7 +1152,7 @@ Public Class Structured_CountSide : Inherits VB_Parent
     Public Sub New()
         rotate.rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Width / 2)
         rotate.rotateAngle = -90
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
         desc = "Count the number of pixels found in each slice of the point cloud data."
     End Sub
@@ -1197,7 +1197,7 @@ Public Class Structured_CountSideSum : Inherits VB_Parent
     Public maxCountIndex As Integer
     Public yValues As New List(Of Single)
     Public Sub New()
-        redOptions.ProjectionThreshold.Value += 50 ' to get the point cloud into the histogram.
+        task.redOptions.ProjectionThreshold.Value += 50 ' to get the point cloud into the histogram.
         labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
         desc = "Count the number of points found in each slice of the point cloud data."
     End Sub
@@ -1345,7 +1345,7 @@ End Class
 
 Public Class Structured_SurveyH : Inherits VB_Parent
     Public Sub New()
-        redOptions.YRangeSlider.Value = 300
+        task.redOptions.YRangeSlider.Value = 300
         vbAddAdvice(traceName + ": use Y-Range slider in RedCloud options.")
         labels(2) = "Each slice represents point cloud pixels with the same Y-Range"
         labels(3) = "Y-Range - compressed to increase the size of each slice.  Use Y-range slider to adjust the size of each slice."
@@ -1392,7 +1392,7 @@ End Class
 
 Public Class Structured_SurveyV : Inherits VB_Parent
     Public Sub New()
-        redOptions.XRangeSlider.Value = 250
+        task.redOptions.XRangeSlider.Value = 250
         vbAddAdvice(traceName + ": use X-Range slider in RedCloud options.")
         labels(2) = "Each slice represents point cloud pixels with the same X-Range"
         labels(3) = "X-Range - compressed to increase the size of each slice.  Use X-range slider to adjust the size of each slice."

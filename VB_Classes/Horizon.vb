@@ -93,14 +93,14 @@ Public Class Horizon_Basics1 : Inherits VB_Parent
                     Dim pt = New cv.Point2f(x, y + Math.Abs(val) / Math.Abs(val - lastVal))
                     ptX.Add(pt.X)
                     ptY.Add(pt.Y)
-                    If ptX.Count >= gOptions.FrameHistory.Value Then Return New cv.Point2f(ptX.Average, ptY.Average)
+                    If ptX.Count >= task.gOptions.FrameHistory.Value Then Return New cv.Point2f(ptX.Average, ptY.Average)
                 End If
             Next
         Next
         Return New cv.Point
     End Function
     Public Sub RunVB(src As cv.Mat)
-        If gOptions.gravityPointCloud.Checked Then
+        If task.gOptions.gravityPointCloud.Checked Then
             cloudY = task.pcSplit(1) ' already oriented to gravity
         Else
             ' rebuild the pointcloud so it is oriented to gravity.
@@ -136,8 +136,8 @@ End Class
 
 Public Class Horizon_FindNonZero : Inherits VB_Parent
     Public Sub New()
-        redOptions.YRangeSlider.Value = 3
-        If standalone Then gOptions.displayDst1.Checked = True
+        task.redOptions.YRangeSlider.Value = 3
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         task.gravityVec = New pointPair(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
         task.horizonVec = New pointPair(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
@@ -268,8 +268,8 @@ End Class
 
 Public Class Horizon_FindNonZeroOld : Inherits VB_Parent
     Public Sub New()
-        redOptions.YRangeSlider.Value = 3
-        If standalone Then gOptions.displayDst1.Checked = True
+        task.redOptions.YRangeSlider.Value = 3
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         task.gravityVec = New pointPair(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
         task.horizonVec = New pointPair(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
@@ -277,7 +277,7 @@ Public Class Horizon_FindNonZeroOld : Inherits VB_Parent
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If gOptions.gravityPointCloud.Checked = False Then Exit Sub
+        If task.gOptions.gravityPointCloud.Checked = False Then Exit Sub
 
         Dim xRatio = dst0.Width / task.quarterRes.Width
         Dim yRatio = dst0.Height / task.quarterRes.Height
@@ -311,8 +311,8 @@ Public Class Horizon_FindNonZeroOld : Inherits VB_Parent
             drawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
         End If
 
-        'If task.horizonVec.originalLength < dst2.Width / 2 And redOptions.YRangeSlider.Value < redOptions.YRangeSlider.Maximum Or pointsMat.Rows = 0 Then
-        '    redOptions.YRangeSlider.Value += 1
+        'If task.horizonVec.originalLength < dst2.Width / 2 And task.redOptions.YRangeSlider.Value < task.redOptions.YRangeSlider.Maximum Or pointsMat.Rows = 0 Then
+        '    task.redOptions.YRangeSlider.Value += 1
         'End If
 
         dst3 = splitX.InRange(-0.01, 0.01)
@@ -338,8 +338,8 @@ Public Class Horizon_FindNonZeroOld : Inherits VB_Parent
             drawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
         End If
 
-        'If task.gravityVec.originalLength < dst2.Height / 2 And redOptions.XRangeSlider.Value < redOptions.XRangeSlider.Maximum Or pointsMat.Rows = 0 Then
-        '    redOptions.XRangeSlider.Value += 1
+        'If task.gravityVec.originalLength < dst2.Height / 2 And task.redOptions.XRangeSlider.Value < task.redOptions.XRangeSlider.Maximum Or pointsMat.Rows = 0 Then
+        '    task.redOptions.XRangeSlider.Value += 1
         'End If
     End Sub
 End Class

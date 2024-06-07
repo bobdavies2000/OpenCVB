@@ -32,8 +32,8 @@ End Class
 
 Public Class Depth_Display : Inherits VB_Parent
     Public Sub New()
-        gOptions.displayDst0.Checked = True
-        gOptions.displayDst1.Checked = True
+        task.gOptions.displayDst0.Checked = True
+        task.gOptions.displayDst1.Checked = True
         labels = {"task.pcSplit(2)", "task.pointcloud", "task.depthMask", "task.noDepthMask"}
         desc = "Display the task.pcSplit(2), task.pointcloud, task.depthMask, and task.noDepthMask"
     End Sub
@@ -536,7 +536,7 @@ Public Class Depth_Smoothing : Inherits VB_Parent
     Public mats As New Mat_4to1
     Public colorize As New Depth_ColorMap
     Public Sub New()
-        redOptions.BitwiseReduction.Checked = True
+        task.redOptions.BitwiseReduction.Checked = True
         labels(3) = "Mask of depth that is smooth"
         desc = "This attempt to get the depth data to 'calm' down is not working well enough to be useful - needs more work"
     End Sub
@@ -918,7 +918,7 @@ End Class
 
 Public Class Depth_Grid : Inherits VB_Parent
     Public Sub New()
-        gOptions.GridSize.Value = 4
+        task.gOptions.GridSize.Value = 4
         labels = {"", "", "White regions below are likely depth edges where depth changes rapidly", "Depth 32f display"}
         desc = "Find boundaries in depth to separate featureless regions."
     End Sub
@@ -946,7 +946,7 @@ Public Class Depth_InRange : Inherits VB_Parent
     Public classCount As Integer = 1
     Public Sub New()
         labels = {"", "", "Looks empty! But the values are there - 0 to classcount.  Run standaloneTest() to see the palette output for this", "Edges between the depth regions."}
-        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
         dst3 = New cv.Mat(dst0.Size, cv.MatType.CV_8U)
         desc = "Create the selected number of depth ranges "
     End Sub
@@ -1003,8 +1003,8 @@ Public Class Depth_Regions : Inherits VB_Parent
         desc = "Separate the scene into a specified number of regions by depth"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst1 = task.pcSplit(2).Threshold(gOptions.MaxDepth.Value, gOptions.MaxDepth.Value, cv.ThresholdTypes.Binary)
-        dst0 = (task.pcSplit(2) / gOptions.MaxDepth.Value) * 255 / classCount
+        dst1 = task.pcSplit(2).Threshold(task.gOptions.maxDepth, task.gOptions.maxDepth, cv.ThresholdTypes.Binary)
+        dst0 = (task.pcSplit(2) / task.gOptions.maxDepth) * 255 / classCount
         dst0.ConvertTo(dst2, cv.MatType.CV_8U)
         dst2.SetTo(0, task.noDepthMask)
 
@@ -1305,7 +1305,7 @@ Public Class Depth_StableMin : Inherits VB_Parent
     Public stableMin As cv.Mat
     Dim colorize As New Depth_Colorizer_CPP
     Public Sub New()
-        gOptions.unFiltered.Checked = True
+        task.gOptions.unFiltered.Checked = True
         labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
         desc = "To reduce z-Jitter, use the closest depth value at each pixel as long as the camera is stable"
     End Sub
@@ -1336,7 +1336,7 @@ Public Class Depth_StableMax : Inherits VB_Parent
     Public stableMax As cv.Mat
     Dim colorize As New Depth_Colorizer_CPP
     Public Sub New()
-        gOptions.unFiltered.Checked = True
+        task.gOptions.unFiltered.Checked = True
         labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
         desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
     End Sub
@@ -1370,7 +1370,7 @@ Public Class Depth_StableMinMax : Inherits VB_Parent
     Public dMax As New Depth_StableMax
     Dim options As New Options_MinMaxNone
     Public Sub New()
-        gOptions.unFiltered.Checked = True
+        task.gOptions.unFiltered.Checked = True
         labels(2) = "Depth map colorized"
         labels(3) = "32-bit StableDepth"
         desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"

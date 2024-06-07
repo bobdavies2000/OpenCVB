@@ -354,7 +354,7 @@ Public Class Pixel_Unstable : Inherits VB_Parent
         dst2.ConvertTo(dst2, cv.MatType.CV_32F)
         Static lastImage As cv.Mat = dst2
         cv.Cv2.Subtract(dst2, lastImage, dst3)
-        dst3 = dst3.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
 
         unstable.Add(dst3)
         If unstable.Count > task.frameHistoryCount Then unstable.RemoveAt(0)
@@ -657,9 +657,9 @@ Public Class Pixel_Vector3D : Inherits VB_Parent
     Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
-        redOptions.UseColorOnly.Checked = True
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
-        redOptions.HistBinSlider.Value = 3
+        task.redOptions.UseColorOnly.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        task.redOptions.HistBinSlider.Value = 3
         labels = {"", "RedCloud_Basics output", "3D Histogram counts for each of the cells at left", ""}
         desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."
     End Sub
@@ -702,7 +702,7 @@ End Class
 
 Public Class Pixel_Unique_CPP : Inherits VB_Parent
     Public Sub New()
-        redOptions.UseColorOnly.Checked = True
+        task.redOptions.UseColorOnly.Checked = True
         cPtr = Pixels_Vector_Open()
         desc = "Create the list of pixels in a RedCloud Cell"
     End Sub

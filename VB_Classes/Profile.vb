@@ -77,7 +77,7 @@ Public Class Profile_Basics : Inherits VB_Parent
 
         If task.heartBeat Then
             strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + "units=meters" + vbCrLf
-            Dim w = gOptions.GridSize.Value
+            Dim w = task.gOptions.GridSize.Value
             For i = 0 To corners.Count - 1
                 strOut += point3fToString(corners3D(i)) + vbTab + cornerNames(i) + vbCrLf
             Next
@@ -100,7 +100,7 @@ Public Class Profile_Rotation : Inherits VB_Parent
                               "It is a common mistake to the OpenGL sliders to try to move cell but they don't - use 'Options_IMU' sliders"
     Dim options As New Options_IMU
     Public Sub New()
-        If standaloneTest() Then gOptions.gravityPointCloud.Checked = False
+        If standaloneTest() Then task.gOptions.gravityPointCloud.Checked = False
         labels(2) = "Top matrix is the current gMatrix while the bottom one includes the Y-axis rotation."
         desc = "Build the rotation matrix around the Y-axis"
     End Sub
@@ -137,7 +137,7 @@ End Class
 Public Class Profile_Derivative : Inherits VB_Parent
     Public sides As New Profile_Basics
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Select a cell to analyze its contour", "Selected cell:  yellow = closer, blue = farther, white = no depth"}
         desc = "Visualize the derivative of X, Y, and Z in the contour of a RedCloud cell"
     End Sub
@@ -232,8 +232,8 @@ Public Class Profile_ConcentrationTop : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Dim options As New Options_HeatMap
     Public Sub New()
-        gOptions.gravityPointCloud.Checked = False
-        gOptions.displayDst1.Checked = True
+        task.gOptions.gravityPointCloud.Checked = False
+        task.gOptions.displayDst1.Checked = True
         desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -296,7 +296,7 @@ Public Class Profile_OpenGL : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32FC3, 0)
-        If standaloneTest() Then gOptions.gravityPointCloud.Checked = False
+        If standaloneTest() Then task.gOptions.gravityPointCloud.Checked = False
         task.ogl.options.PointSizeSlider.Value = 10
         task.ogl.oglFunction = oCase.pcPointsAlone
         desc = "Visualize just the RedCloud cell contour in OpenGL"
@@ -335,7 +335,7 @@ Public Class Profile_Kalman : Inherits VB_Parent
     Dim kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(12 - 1)
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Profile_Basics output without Kalman", "Profile_Basics output with Kalman"}
         desc = "Use Kalman to smooth the results of the contour key points"
     End Sub

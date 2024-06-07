@@ -17,7 +17,7 @@ Public Class Puzzle_Basics : Inherits VB_Parent
         Dim inputROI As New List(Of cv.Rect)
         For j = 0 To task.gridList.Count - 1
             Dim roi = task.gridList(j)
-            If roi.Width = gOptions.GridSize.Value And roi.Height = gOptions.GridSize.Value Then inputROI.Add(task.gridList(j))
+            If roi.Width = task.gOptions.GridSize.Value And roi.Height = task.gOptions.GridSize.Value Then inputROI.Add(task.gridList(j))
         Next
 
         scrambled = Shuffle(inputROI)
@@ -27,8 +27,8 @@ Public Class Puzzle_Basics : Inherits VB_Parent
         For i = 0 To scrambled.Count - 1
             Dim roi = task.gridList(i)
             Dim roi2 = scrambled(i)
-            If roi.Width = gOptions.GridSize.Value And roi.Height = gOptions.GridSize.Value And
-               roi2.Width = gOptions.GridSize.Value And roi2.Height = gOptions.GridSize.Value Then dst2(roi2) = src(roi)
+            If roi.Width = task.gOptions.GridSize.Value And roi.Height = task.gOptions.GridSize.Value And
+               roi2.Width = task.gOptions.GridSize.Value And roi2.Height = task.gOptions.GridSize.Value Then dst2(roi2) = src(roi)
         Next
     End Sub
 End Class
@@ -46,7 +46,7 @@ Public Class Puzzle_Solver : Inherits VB_Parent
     Dim match As New Match_Basics
     Public grayMat As cv.Mat
     Public Sub New()
-        If standaloneTest() Then gOptions.GridSize.Value = 8
+        If standaloneTest() Then task.gOptions.GridSize.Value = 8
         If findfrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Start another puzzle")
@@ -91,7 +91,7 @@ End Class
 Public Class Puzzle_SolverDynamic : Inherits VB_Parent
     Dim puzzle As New Puzzle_Solver
     Public Sub New()
-        If standaloneTest() Then gOptions.GridSize.Value = 8
+        If standaloneTest() Then task.gOptions.GridSize.Value = 8
         labels = {"", "", "Latest Puzzle input image", "Puzzle Solver Output - missing pieces can occur because of motion or when cells are identical."}
         desc = "Instead of matching the original image as Puzzle_Solver, match the latest image from the camera."
     End Sub

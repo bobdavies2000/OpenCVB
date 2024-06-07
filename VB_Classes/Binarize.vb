@@ -154,7 +154,7 @@ End Class
 Public Class Binarize_Bernson_MT : Inherits VB_Parent
     Dim options As New Options_Bernson
     Public Sub New()
-        gOptions.GridSize.Value = 32
+        task.gOptions.GridSize.Value = 32
         desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
         labels(2) = "Binarize Bernson"
     End Sub
@@ -258,7 +258,7 @@ Public Class Binarize_DepthTiers : Inherits VB_Parent
     Dim binar4 As New Bin4Way_Regions
     Public classCount = 200 ' 4-way split with 50 depth levels at 10 cm's each.
     Public Sub New()
-        redOptions.UseColorOnly.Checked = True
+        task.redOptions.UseColorOnly.Checked = True
         desc = "Add the Depth_TiersZ and Bin4Way_Regions output in preparation for RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)

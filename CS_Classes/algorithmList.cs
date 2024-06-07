@@ -25,6 +25,7 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_AsciiArt_Basics") return new CSharp_AsciiArt_Basics(task);
 			if (algorithmName == "CSharp_AsciiArt_Color") return new CSharp_AsciiArt_Color(task);
 			if (algorithmName == "CSharp_AsciiArt_Diff") return new CSharp_AsciiArt_Diff(task);
+			if (algorithmName == "CSharp_Diff_Basics") return new CSharp_Diff_Basics(task);
 			if (algorithmName == "CSharp_Random_Basics") return new CSharp_Random_Basics(task);
 			return new CSharp_AddWeighted_Basics(task);
 		}

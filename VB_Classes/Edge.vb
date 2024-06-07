@@ -566,7 +566,7 @@ End Class
 
 Public Class Edge_ColorGap_VB : Inherits VB_Parent
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Input pixel distance", 0, 20, 5)
             sliders.setupTrackBar("Input pixel difference", 0, 50, If(task.workingRes.Width = 640, 10, 20))
@@ -650,7 +650,7 @@ End Class
 
 Public Class Edge_DepthGap_VB : Inherits VB_Parent
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Input depth distance", 0, 20, 5)
             sliders.setupTrackBar("Input depth difference in mm's", 0, 2000, 1000)
@@ -897,7 +897,7 @@ Public Class Edge_ResizeAdd : Inherits VB_Parent
                             New cv.Range(horizSlider.Value, gray.Cols - horizSlider.Value))
         newFrame = newFrame.Resize(gray.Size(), 0, 0, cv.InterpolationFlags.Nearest)
         cv.Cv2.Absdiff(gray, newFrame, dst2)
-        dst2 = dst2.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst2.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.Add(gray, dst2, dst3)
     End Sub
 End Class
@@ -1017,8 +1017,8 @@ End Class
 Public Class Edge_SobelCustomLeftRight : Inherits VB_Parent
     Dim custom As New Edge_SobelCustom
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst0.Checked = True
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels = {"Left Image Custom 1", "Left Image Custom 2", "Right Image Custom 1", "Right Image Custom 2"}
         desc = "Show Sobel edge detection for both left and right images"
     End Sub
@@ -1191,7 +1191,7 @@ Public Class Edge_MotionOverlay : Inherits VB_Parent
         offsetImage(rect2) = src(rect1).Clone
 
         cv.Cv2.Absdiff(src, offsetImage, dst0)
-        dst2 = dst0.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst0.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         labels(2) = "Src offset (x,y) = (" + CStr(options.xDisp) + "," + CStr(options.yDisp) + ")"
     End Sub
 End Class

@@ -116,7 +116,14 @@ Module UI_GeneratorMain
 
         Dim csSortedNames As New SortedList(Of String, Integer)
         Dim csIndex As Integer
-        Dim csFileNames As New List(Of String)({homeDir.FullName + "/CS_Classes/CS_AI_Generated.cs"})
+        Dim csFileNames As New List(Of String)
+        Dim csAdds As New List(Of String)
+        ' we only want python files that are included in the Python_Classes Project.  Other Python files may be support modules or just experiments.
+        Dim csAppDir As New IO.DirectoryInfo(homeDir.FullName + "/CS_Classes/")
+        Dim csFiles() As String = Directory.GetFiles(csAppDir.FullName, "*.cs", SearchOption.AllDirectories)
+        For Each csFile As String In csFiles
+            csFileNames.Add(csFile)
+        Next
         For Each fileName In csFileNames
             If fileName.EndsWith("CS_Parent.cs") = False Then
                 Dim csName As String = ""
@@ -129,9 +136,15 @@ Module UI_GeneratorMain
                             CodeLineCount += 1
                             If LCase(line).StartsWith("public class ") Then
                                 Dim split As String() = Regex.Split(line, "\W+")
-                                If line.EndsWith(" : CS_Parent") Then csName = split(2)
+                                If line.EndsWith(" : CS_Parent") Then
+                                    csName = split(2)
+                                    If csAdds.Contains(fileName) = False Then
+                                        csAdds.Add(fileName)
+                                        fileNames.Add(fileName)
+                                    End If
+                                End If
                             End If
-                            If LCase(line).StartsWith("public ") And line.Contains(csName) And csSortedNames.ContainsKey(csName) = False Then
+                            If LCase(line).StartsWith("public ") And csSortedNames.ContainsKey(csName) = False And csName <> "" Then
                                 csSortedNames.Add(csName, csIndex)
                                 csIndex += 1
                             End If

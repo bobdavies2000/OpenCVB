@@ -8,10 +8,10 @@ Public Class FeatureLeftRight_Basics : Inherits VB_Parent
     Dim options As New Options_Features
     Public Sub New()
         labels(1) = "NOTE: matching right point is always to the left of the left point"
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         FindSlider("Feature Correlation Threshold").Value = 75
         FindSlider("Min Distance to next").Value = 1
-        gOptions.MaxDepth.Value = 20
+        task.gOptions.MaxDepthBar.Value = 20
         labels(3) = "Click near any feature to get more details on the matched pair of points."
         desc = "Match the left and right features and allow the user to select a point to get more details."
     End Sub
@@ -164,7 +164,7 @@ End Class
 Public Class FeatureLeftRight_Grid : Inherits VB_Parent
     Dim match As New FeatureLeftRight_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         findRadio("GoodFeatures (ShiTomasi) grid").Checked = True
         desc = "Run FeatureLeftRight_Basics but with 'GoodFeatures grid' instead of 'GoodFeatures full image'"
     End Sub
@@ -193,10 +193,10 @@ Public Class FeatureLeftRight_Input : Inherits VB_Parent
     Dim options As New Options_Features
     Public Sub New()
         labels(1) = "NOTE: matching right point is always to the left of the left point"
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         FindSlider("Feature Correlation Threshold").Value = 75
         FindSlider("Min Distance to next").Value = 1
-        gOptions.MaxDepth.Value = 20 ' up to 20 meters...
+        task.gOptions.MaxDepthBar.Value = 20 ' up to 20 meters...
         labels(3) = "Click near any feature to get more details on the matched pair of points."
         desc = "Match the left and right features and allow the user to select a point to get more details."
     End Sub

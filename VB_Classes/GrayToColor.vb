@@ -4,7 +4,7 @@ Public Class GrayToColor_Palette : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Public Sub New()
         labels = {"", "Right View", "", "Grayscale left view after palette applied."}
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Identify the main colors in an image using RedCloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)

@@ -2,25 +2,25 @@ Imports cv = OpenCvSharp
 Public Class Reduction_Basics : Inherits VB_Parent
     Public classCount As Integer
     Public Sub New()
-        redOptions.ReductionTypeGroup.Enabled = True
-        redOptions.ReductionSliders.Enabled = True
+        task.redOptions.ReductionTypeGroup.Enabled = True
+        task.redOptions.ReductionSliders.Enabled = True
         desc = "Reduction: a simpler way to KMeans by reducing color resolution"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        If redOptions.reductionType = "Use Bitwise Reduction" Then
-            Dim bits = redOptions.BitwiseReductionSlider.Value
+        If task.redOptions.reductionType = "Use Bitwise Reduction" Then
+            Dim bits = task.redOptions.BitwiseReductionSlider.Value
             classCount = 255 / Math.Pow(2, bits)
             Dim zeroBits = Math.Pow(2, bits) - 1
             dst2 = src And New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))
             dst2 = dst2 / zeroBits
-        ElseIf redOptions.reductionType = "Use Simple Reduction" Then
-            Dim reductionVal = redOptions.SimpleReductionSlider.Value
+        ElseIf task.redOptions.reductionType = "Use Simple Reduction" Then
+            Dim reductionVal = task.redOptions.SimpleReductionSlider.Value
             classCount = Math.Ceiling(255 / reductionVal)
 
             dst2 = src / reductionVal
-            labels(2) = "Reduced image - factor = " + CStr(redOptions.SimpleReductionSlider.Value)
+            labels(2) = "Reduced image - factor = " + CStr(task.redOptions.SimpleReductionSlider.Value)
         Else
             dst2 = src
             labels(2) = "No reduction requested"
@@ -39,10 +39,10 @@ Public Class Reduction_Floodfill : Inherits VB_Parent
     Public reduction As New Reduction_Basics
     Public redC As New RedCloud_Basics
     Public Sub New()
-        redOptions.IdentifyCells.Checked = True
-        redOptions.UseColorOnly.Checked = True
+        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.UseColorOnly.Checked = True
         labels(2) = "Reduced input to floodfill"
-        redOptions.SimpleReductionSlider.Value = 32
+        task.redOptions.SimpleReductionSlider.Value = 32
         desc = "Use the reduction output as input to floodfill to get masks of cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -97,8 +97,8 @@ End Class
 Public Class Reduction_PointCloud : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        redOptions.SimpleReduction.Checked = True
-        redOptions.SimpleReductionSlider.Value = 20
+        task.redOptions.SimpleReduction.Checked = True
+        task.redOptions.SimpleReductionSlider.Value = 20
         labels = {"", "", "8-bit reduced depth", "Palettized output of the different depth levels found"}
         desc = "Use reduction to smooth depth data"
     End Sub
@@ -131,8 +131,8 @@ Public Class Reduction_XYZ : Inherits VB_Parent
             check.Box(1).Checked = True
             check.Box(2).Checked = True
         End If
-        redOptions.SimpleReductionSlider.Maximum = 1000
-        redOptions.SimpleReductionSlider.Value = 400
+        task.redOptions.SimpleReductionSlider.Maximum = 1000
+        task.redOptions.SimpleReductionSlider.Value = 400
         desc = "Use reduction to slice the point cloud in 3 dimensions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -166,7 +166,7 @@ Public Class Reduction_Edges : Inherits VB_Parent
     Dim edges As New Edge_Laplacian
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        redOptions.SimpleReduction.Checked = True
+        task.redOptions.SimpleReduction.Checked = True
         desc = "Get the edges after reducing the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -174,7 +174,7 @@ Public Class Reduction_Edges : Inherits VB_Parent
         dst2 = reduction.dst2 * 255 / reduction.classCount
 
         Dim reductionRequested = True
-        If redOptions.reductionType = "No Reduction" Then reductionRequested = False
+        If task.redOptions.reductionType = "No Reduction" Then reductionRequested = False
         labels(2) = If(reductionRequested, "Reduced image", "Original image")
         labels(3) = If(reductionRequested, "Laplacian edges of reduced image", "Laplacian edges of original image")
         edges.Run(dst2)

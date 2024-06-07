@@ -14,7 +14,7 @@ Public Class Color8U_Basics : Inherits VB_Parent
             Static colorMethods() As Object = {New BackProject_Full, New Bin4Way_Regions, New Binarize_DepthTiers, New FeatureLess_Groups,
                                                New Hist3Dcolor_Basics, New KMeans_Basics, New LUT_Basics, New Reduction_Basics}
 
-            classifier = colorMethods(redOptions.colorInputIndex)
+            classifier = colorMethods(task.redOptions.colorInputIndex)
         End If
 
         dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
@@ -80,7 +80,7 @@ Public Class Color8U_Depth : Inherits VB_Parent
     Public depth As New Depth_InRange
     Public classCount As Integer
     Public Sub New()
-        gOptions.LineType.SelectedIndex = 1 ' linetype = link4
+        task.gOptions.LineType.SelectedIndex = 1 ' linetype = link4
         labels = {"", "", "Color Reduction Edges", "Depth Range Edges"}
         desc = "Add depth regions edges to the color Reduction image."
     End Sub
@@ -109,8 +109,8 @@ Public Class Color8U_KMeans : Inherits VB_Parent
     Public km2 As New KMeans_Basics
     Dim options As New Options_ColorFormat
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst0.Checked = True
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels(0) = "Recombined channels in other images."
         desc = "Run KMeans on each of the 3 color channels"
     End Sub

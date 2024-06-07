@@ -22,13 +22,13 @@ Public Class BackProject_Basics : Inherits VB_Parent
         Dim totalPixels = dst2.Total ' assume we are including zeros.
         If histK.hist.plot.removeZeroEntry Then totalPixels = input.CountNonZero
 
-        Dim brickWidth = dst2.Width / gOptions.HistBinSlider.Value
-        Dim incr = (histK.hist.mm.maxVal - histK.hist.mm.minVal) / gOptions.HistBinSlider.Value
+        Dim brickWidth = dst2.Width / task.gOptions.HistBinSlider.Value
+        Dim incr = (histK.hist.mm.maxVal - histK.hist.mm.minVal) / task.gOptions.HistBinSlider.Value
         Dim histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
 
         minRange = New cv.Scalar(histIndex * incr)
         maxRange = New cv.Scalar((histIndex + 1) * incr)
-        If histIndex + 1 = gOptions.HistBinSlider.Value Then maxRange = New cv.Scalar(255)
+        If histIndex + 1 = task.gOptions.HistBinSlider.Value Then maxRange = New cv.Scalar(255)
 
         '     Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
         '     cv.Cv2.CalcBackProject({input}, {0}, histK.hist.histogram, dst0, ranges)
@@ -87,7 +87,7 @@ Public Class BackProject_Reduction : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Dim backP As New BackProject_Basics
     Public Sub New()
-        redOptions.SimpleReduction.Checked = True
+        task.redOptions.SimpleReduction.Checked = True
         labels(3) = "Backprojection of highlighted histogram bin"
         desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image."
     End Sub
@@ -97,7 +97,7 @@ Public Class BackProject_Reduction : Inherits VB_Parent
         backP.Run(reduction.dst2)
         dst2 = backP.dst2
         dst3 = backP.dst3
-        labels(2) = "Reduction = " + CStr(redOptions.SimpleReductionSlider.Value) + " and bins = " + CStr(task.histogramBins)
+        labels(2) = "Reduction = " + CStr(task.redOptions.SimpleReductionSlider.Value) + " and bins = " + CStr(task.histogramBins)
     End Sub
 End Class
 
@@ -112,7 +112,7 @@ Public Class BackProject_FeatureLess : Inherits VB_Parent
     Dim reduction As New Reduction_Basics
     Dim edges As New Edge_ColorGap_CPP
     Public Sub New()
-        redOptions.BitwiseReduction.Checked = True
+        task.redOptions.BitwiseReduction.Checked = True
         labels = {"", "", "Histogram of the grayscale image at right",
                   "Move mouse over the histogram to backproject a column"}
         desc = "Create a histogram of the featureless regions"
@@ -123,7 +123,7 @@ Public Class BackProject_FeatureLess : Inherits VB_Parent
         backP.Run(reduction.dst2)
         dst2 = backP.dst2
         dst3 = backP.dst3
-        labels(2) = "Reduction = " + CStr(redOptions.SimpleReductionSlider.Value) + " and bins = " + CStr(task.histogramBins)
+        labels(2) = "Reduction = " + CStr(task.redOptions.SimpleReductionSlider.Value) + " and bins = " + CStr(task.histogramBins)
     End Sub
 End Class
 
@@ -181,7 +181,7 @@ Public Class BackProject_FullLines : Inherits VB_Parent
     Dim backP As New BackProject_Full
     Dim lines As New Line_Basics
     Public Sub New()
-        gOptions.RGBFilterActive.Checked = False
+        task.gOptions.RGBFilterActive.Checked = False
         labels = {"", "", "Lines found in the back projection", "Backprojection results"}
         desc = "Find lines in the back projection"
     End Sub
@@ -262,7 +262,7 @@ Public Class BackProject_Unstable : Inherits VB_Parent
     Dim backP As New BackProject_Full
     Dim diff As New Diff_Basics
     Public Sub New()
-        gOptions.PixelDiffThreshold.Value = 6
+        task.gOptions.pixelDiffThreshold = 6
         labels = {"", "", "Backprojection output", "Unstable pixels in the backprojection.  If flashing, set 'Pixel Difference Threshold' higher."}
         desc = "Highlight the unstable pixels in the backprojection."
     End Sub
@@ -316,7 +316,7 @@ Public Class BackProject_MaskLines : Inherits VB_Parent
     Dim masks As New BackProject_Masks
     Dim lines As New Line_Basics
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels = {"", "lines detected in the backProjection mask", "Histogram of pixels in a grayscale image.  Move mouse to see lines detected in the backprojection mask",
                   "Yellow is backProjection, lines detected are highlighted"}
@@ -699,7 +699,7 @@ Public Class BackProject_MeterByMeter : Inherits VB_Parent
         desc = "Backproject the depth data at 1 meter intervals WITHOUT A HISTOGRAM."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If gOptions.HistBinSlider.Value < task.maxZmeters Then gOptions.HistBinSlider.Value = task.maxZmeters + 1
+        If task.gOptions.HistBinSlider.Value < task.maxZmeters Then task.gOptions.HistBinSlider.Value = task.maxZmeters + 1
         If task.optionsChanged Then
             Dim incr = task.maxZmeters / task.histogramBins
             Dim histData As New List(Of Single)

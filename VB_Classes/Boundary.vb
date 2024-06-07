@@ -6,17 +6,17 @@ Public Class Boundary_Basics : Inherits VB_Parent
     Public contours As New List(Of List(Of cv.Point))
     Public runRedCPP As Boolean = True
     Public Sub New()
-        redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
+        task.redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Create a mask of the RedCloud cell boundaries"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            If redOptions.UseColorOnly.Checked Then
+            If task.redOptions.UseColorOnly.Checked Then
                 Static cvt As New Color8U_Basics
                 cvt.Run(src)
                 dst1 = cvt.dst2
-            ElseIf redOptions.UseDepth.Checked Then
+            ElseIf task.redOptions.UseDepth.Checked Then
                 Static prep As New RedCloud_Reduce
                 prep.Run(src)
                 dst1 = prep.dst2
@@ -147,7 +147,7 @@ End Class
 Public Class Boundary_RemovedRects : Inherits VB_Parent
     Public bRects As New Boundary_Rectangles
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build the boundaries for redCells and remove interior rectangles"
     End Sub
     Public Sub RunVB(src As cv.Mat)

@@ -65,7 +65,7 @@ Public Class OptionsContainer
                         indexHide += 1
                     Else
                         If title.Contains("OpenFile") Then
-                            frm.SetDesktopLocation(0, gOptions.Top + 350)
+                            frm.SetDesktopLocation(0, task.gOptions.Top + 350)
                         End If
                         If title.EndsWith(" Sliders") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                             If frm Is Nothing Then Continue For

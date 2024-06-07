@@ -11,13 +11,13 @@ Public Class BackProject2D_Basics : Inherits VB_Parent
     Public options As New Options_ColorFormat
     Public bpCol As Integer, bpRow As Integer, brickW As Integer, brickH As Integer
     Public Sub New()
-        If standaloneTest() Then gOptions.GridSize.Value = 5
-        If standaloneTest() Then hist2d.histRowsCols = {gOptions.GridSize.Value, gOptions.GridSize.Value}
+        If standaloneTest() Then task.gOptions.GridSize.Value = 5
+        If standaloneTest() Then hist2d.histRowsCols = {task.gOptions.GridSize.Value, task.gOptions.GridSize.Value}
         vbAddAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.")
         desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed and explored."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim dimension = gOptions.GridSize.Value
+        Dim dimension = task.gOptions.GridSize.Value
         brickW = task.gridCols
         brickH = task.gridRows
         bpCol = Math.Floor(task.mouseMovePoint.X / brickW)
@@ -36,7 +36,7 @@ Public Class BackProject2D_Basics : Inherits VB_Parent
         maxY = (bpCol + 1) * yRange / dimension
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(minX, maxX), New cv.Rangef(minY, maxY)}
-        cv.Cv2.CalcBackProject({src}, redOptions.channels, histogram, dst0, ranges)
+        cv.Cv2.CalcBackProject({src}, task.redOptions.channels, histogram, dst0, ranges)
         Dim bpCount = histogram.Get(Of Single)(bpRow, bpCol)
 
         dst3.SetTo(0)
@@ -68,7 +68,7 @@ Public Class BackProject2D_Compare : Inherits VB_Parent
     Dim mats As New Mat_4Click
     Public Sub New()
         labels(2) = "Hue (upper left), sat (upper right), highlighted backprojection (bottom left)"
-        If standaloneTest() Then gOptions.GridSize.Value = 10
+        If standaloneTest() Then task.gOptions.GridSize.Value = 10
         desc = "Compare the hue and brightness images and the results of the Hist_backprojection2d"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -111,8 +111,8 @@ Public Class BackProject2D_RowCol : Inherits VB_Parent
         End If
 
         findRadio("HSV").Checked = True
-        If standaloneTest() Then gOptions.displayDst0.Checked = True
-        gOptions.GridSize.Value = 10
+        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
+        task.gOptions.GridSize.Value = 10
         desc = "Backproject the whole row or column of the 2D histogram"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -129,7 +129,7 @@ Public Class BackProject2D_RowCol : Inherits VB_Parent
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255), New cv.Rangef(backp.minY, backp.maxY)}
         If rowRadio.checked Then ranges = New cv.Rangef() {New cv.Rangef(backp.minX, backp.maxX), New cv.Rangef(0, 255)}
 
-        cv.Cv2.CalcBackProject({src}, redOptions.channels, backp.histogram, dst1, ranges)
+        cv.Cv2.CalcBackProject({src}, task.redOptions.channels, backp.histogram, dst1, ranges)
 
         dst3.SetTo(0)
         dst3.SetTo(cv.Scalar.Yellow, dst1)
@@ -164,7 +164,7 @@ Public Class BackProject2D_FullImage : Inherits VB_Parent
     Public classCount As Integer
     Public Sub New()
         findRadio("BGR").Checked = True
-        gOptions.GridSize.Value = 3
+        task.gOptions.GridSize.Value = 3
         dst0 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Create masks for each of the non-zero histogram entries and build a full-size image with all the masks."
     End Sub
@@ -182,13 +182,13 @@ Public Class BackProject2D_FullImage : Inherits VB_Parent
         dst0.SetTo(1)
         masks.Clear()
         classCount = 1
-        For row = 0 To gOptions.GridSize.Value - 1
-            For col = 0 To gOptions.GridSize.Value - 1
+        For row = 0 To task.gOptions.GridSize.Value - 1
+            For col = 0 To task.gOptions.GridSize.Value - 1
                 Dim count = backp.histogram.Get(Of Single)(row, col)
                 If count > 100 Then
-                    Dim ranges() = New cv.Rangef() {New cv.Rangef(row * 255 / gOptions.GridSize.Value, (row + 1) * 255 / gOptions.GridSize.Value),
-                                                    New cv.Rangef(col * 255 / gOptions.GridSize.Value, (col + 1) * 255 / gOptions.GridSize.Value)}
-                    cv.Cv2.CalcBackProject({backp.options.dst2}, redOptions.channels,
+                    Dim ranges() = New cv.Rangef() {New cv.Rangef(row * 255 / task.gOptions.GridSize.Value, (row + 1) * 255 / task.gOptions.GridSize.Value),
+                                                    New cv.Rangef(col * 255 / task.gOptions.GridSize.Value, (col + 1) * 255 / task.gOptions.GridSize.Value)}
+                    cv.Cv2.CalcBackProject({backp.options.dst2}, task.redOptions.channels,
                                            backp.histogram, dst1, ranges)
                     If dst1.CountNonZero > 100 Then
                         classCount += 1
@@ -258,7 +258,7 @@ Public Class BackProject2D_Filter : Inherits VB_Parent
     Public threshold As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        gOptions.HistBinSlider.Value = 100 ' extra bins to help isolate the stragglers.
+        task.gOptions.HistBinSlider.Value = 100 ' extra bins to help isolate the stragglers.
         desc = "Filter a 2D histogram for the backprojection."
     End Sub
     Public Sub RunVB(src As cv.Mat)

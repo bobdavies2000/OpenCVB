@@ -635,7 +635,7 @@ Public Class KNN_TrackMean : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Average distance multiplier", 1, 20, 10)
         FindSlider("Feature Sample Size").Value = 200
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion"}
         desc = "Track points with KNN and match the goodFeatures from frame to frame"
     End Sub
@@ -680,7 +680,7 @@ Public Class KNN_TrackMean : Inherits VB_Parent
         Dim diffY As New List(Of Integer)
         Dim correlationMat As New cv.Mat
         dst2 = src.Clone
-        Dim sz = gOptions.GridSize.Value
+        Dim sz = task.gOptions.GridSize.Value
         For Each mps In knn.matches
             Dim currRect = validateRect(New cv.Rect(mps.p1.X - sz, mps.p1.Y - sz, sz * 2, sz * 2))
             Dim prevRect = validateRect(New cv.Rect(mps.p2.X - sz, mps.p2.Y - sz, currRect.Width, currRect.Height))

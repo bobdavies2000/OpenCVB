@@ -190,11 +190,11 @@ Module VB_Common
         Return outStr
     End Function
     Public Sub setPointCloudGrid()
-        gOptions.GridSize.Value = 8
+        task.gOptions.GridSize.Value = 8
         If task.workingRes.Width = 640 Then
-            gOptions.GridSize.Value = 16
+            task.gOptions.GridSize.Value = 16
         ElseIf task.workingRes.Width = 1280 Then
-            gOptions.GridSize.Value = 32
+            task.gOptions.GridSize.Value = 32
         End If
     End Sub
     Public Function separateMasks(rc As rcData, lrc As rcData) As cv.Mat
@@ -231,7 +231,7 @@ Module VB_Common
         Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
         task.cellMap.SetTo(0)
         For Each rc In task.redCells
-            dst(rc.rect).SetTo(If(redOptions.naturalColor.Checked, rc.naturalColor, rc.color), rc.mask)
+            dst(rc.rect).SetTo(If(task.redOptions.naturalColor.Checked, rc.naturalColor, rc.color), rc.mask)
             task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
         Next
         Return dst
@@ -495,7 +495,7 @@ Module VB_Common
         task.advice += advice + vbCrLf + vbCrLf
     End Sub
     Public Function vbPrepareDepthInput(index As Integer) As cv.Mat
-        If gOptions.gravityPointCloud.Checked Then Return task.pcSplit(index) ' already oriented to gravity
+        If task.gOptions.gravityPointCloud.Checked Then Return task.pcSplit(index) ' already oriented to gravity
 
         ' rebuild the pointcloud so it is oriented to gravity.
         Dim pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)
@@ -681,33 +681,33 @@ Module VB_Common
         Return 0
     End Function
     Public Sub updateSettings()
-        Task.fpsRate = If(Task.frameCount < 30, 30, Task.fpsRate)
-        If Task.myStopWatch Is Nothing Then Task.myStopWatch = Stopwatch.StartNew()
+        task.fpsRate = If(task.frameCount < 30, 30, task.fpsRate)
+        If task.myStopWatch Is Nothing Then task.myStopWatch = Stopwatch.StartNew()
 
         ' update the time measures
-        Task.msWatch = Task.myStopWatch.ElapsedMilliseconds
+        task.msWatch = task.myStopWatch.ElapsedMilliseconds
         quarterBeat()
-        If Task.frameCount = 0 Then Task.heartBeat = True
-        Dim frameDuration = 1000 / Task.fpsRate
-        Task.almostHeartBeat = If(Task.msWatch - Task.msLast + frameDuration * 1.5 > 1000, True, False)
+        If task.frameCount = 0 Then task.heartBeat = True
+        Dim frameDuration = 1000 / task.fpsRate
+        task.almostHeartBeat = If(task.msWatch - task.msLast + frameDuration * 1.5 > 1000, True, False)
 
-        If (Task.msWatch - Task.msLast) > 1000 Then
-            Task.msLast = Task.msWatch
-            Task.toggleOnOff = Not Task.toggleOnOff
+        If (task.msWatch - task.msLast) > 1000 Then
+            task.msLast = task.msWatch
+            task.toggleOnOff = Not task.toggleOnOff
         End If
 
-        If Task.paused Then
-            Task.midHeartBeat = False
-            Task.almostHeartBeat = False
+        If task.paused Then
+            task.midHeartBeat = False
+            task.almostHeartBeat = False
         End If
 
-        Task.histogramBins = gOptions.HistBinSlider.Value
-        Task.lineWidth = gOptions.LineWidth.Value
-        Task.dotSize = gOptions.dotSizeSlider.Value
+        task.histogramBins = task.gOptions.HistBinSlider.Value
+        task.lineWidth = task.gOptions.LineWidth.Value
+        task.dotSize = task.gOptions.dotSizeSlider.Value
 
-        Task.maxZmeters = gOptions.MaxDepth.Value
-        Task.metersPerPixel = Task.maxZmeters / Task.workingRes.Height ' meters per pixel in projections - side and top.
-        Task.debugSyncUI = gOptions.debugSyncUI.Checked
+        task.maxZmeters = task.gOptions.maxDepth
+        task.metersPerPixel = task.maxZmeters / task.workingRes.Height ' meters per pixel in projections - side and top.
+        task.debugSyncUI = task.gOptions.debugSyncUI.Checked
     End Sub
     Public Function GetWindowImage(ByVal WindowHandle As IntPtr, ByVal rect As cv.Rect) As Bitmap
         Dim b As New Bitmap(rect.Width, rect.Height, Imaging.PixelFormat.Format24bppRgb)

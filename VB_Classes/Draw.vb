@@ -307,7 +307,7 @@ Public Class Draw_ClipLine : Inherits VB_Parent
         pt1 = New cv.Point(r.X, r.Y)
         pt2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
         rect = initRandomRect(25)
-        If gOptions.UseKalman.Checked Then flow.msgs.Add("--------------------------- setup ---------------------------")
+        If task.gOptions.UseKalman.Checked Then flow.msgs.Add("--------------------------- setup ---------------------------")
     End Sub
     Public Sub New()
         setup()

@@ -91,7 +91,7 @@ Public Class Density_Mask : Inherits VB_Parent
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         src.SetTo(0, task.noDepthMask)
 
-        Dim threshold = gOptions.GridSize.Value * gOptions.GridSize.Value / 2
+        Dim threshold = task.gOptions.GridSize.Value * task.gOptions.GridSize.Value / 2
         Dim activeList(task.gridList.Count - 1) As Boolean
         dst3.SetTo(0)
         Parallel.For(0, task.gridList.Count,

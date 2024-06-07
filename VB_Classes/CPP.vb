@@ -16,10 +16,10 @@ Public Class CPP_Basics : Inherits VB_Parent
 
         cPtr = cppTask_Open(cppFunction, task.workingRes.Height, task.workingRes.Width,
                             task.heartBeat, 0.5, task.lineWidth, task.lineType, task.dotSize,
-                            gOptions.GridSize.Value, task.histogramBins,
-                            gOptions.gravityPointCloud.Checked, gOptions.PixelDiffThreshold.Value,
-                            gOptions.UseKalman.Checked, gOptions.Palettes.SelectedIndex, task.optionsChanged,
-                            task.frameHistoryCount, gOptions.displayDst0.Checked, gOptions.displayDst1.Checked)
+                            task.gOptions.GridSize.Value, task.histogramBins,
+                            task.gOptions.gravityPointCloud.Checked, task.gOptions.pixelDiffThreshold,
+                            task.gOptions.UseKalman.Checked, task.gOptions.Palettes.SelectedIndex, task.optionsChanged,
+                            task.frameHistoryCount, task.gOptions.displayDst0.Checked, task.gOptions.displayDst1.Checked)
 
         getOptions()
     End Sub
@@ -27,9 +27,9 @@ Public Class CPP_Basics : Inherits VB_Parent
         Dim labelBuffer As StringBuilder = New StringBuilder(512)
         Dim descBuffer As StringBuilder = New StringBuilder(512)
         Dim adviceBuffer As StringBuilder = New StringBuilder(512)
-        cppTask_OptionsCPPtoVB(cPtr, gOptions.GridSize.Value,
-                               gOptions.HistBinSlider.Value,
-                               gOptions.PixelDiffThreshold.Value, gOptions.UseKalman.Checked,
+        cppTask_OptionsCPPtoVB(cPtr, task.gOptions.GridSize.Value,
+                               task.gOptions.HistBinSlider.Value,
+                               task.gOptions.pixelDiffThreshold, task.gOptions.UseKalman.Checked,
                                task.frameHistoryCount, task.drawRect.X, task.drawRect.Y,
                                task.drawRect.Width, task.drawRect.Height, labelBuffer, descBuffer,
                                adviceBuffer)
@@ -43,17 +43,17 @@ Public Class CPP_Basics : Inherits VB_Parent
 
     Public Sub RunVB(src As cv.Mat)
 
-        cppTask_OptionsVBtoCPP(cPtr, gOptions.GridSize.Value,
-                               gOptions.HistBinSlider.Value,
-                               gOptions.PixelDiffThreshold.Value, gOptions.UseKalman.Checked,
+        cppTask_OptionsVBtoCPP(cPtr, task.gOptions.GridSize.Value,
+                               task.gOptions.HistBinSlider.Value,
+                               task.gOptions.pixelDiffThreshold, task.gOptions.UseKalman.Checked,
                                task.frameHistoryCount,
                                task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height,
                                task.lineWidth, task.lineType, task.dotSize, task.lowRes.Width, task.lowRes.Height,
-                               task.maxZmeters, redOptions.PCReduction, task.cvFontSize, task.cvFontThickness,
+                               task.maxZmeters, task.redOptions.PCReduction, task.cvFontSize, task.cvFontThickness,
                                task.clickPoint.X, task.clickPoint.Y, task.mouseClickFlag,
                                task.mousePicTag, task.mouseMovePoint.X, task.mouseMovePoint.Y,
                                task.paletteIndex, 255, task.midHeartBeat,
-                               task.quarterBeat, redOptions.colorInputIndex, redOptions.depthInputIndex,
+                               task.quarterBeat, task.redOptions.colorInputIndex, task.redOptions.depthInputIndex,
                                task.xRangeDefault, task.yRangeDefault)
 
         Dim pointCloudData(task.pointCloud.Total * task.pointCloud.ElemSize - 1) As Byte
@@ -89,7 +89,7 @@ Public Class CPP_Basics : Inherits VB_Parent
         Dim handleInput = GCHandle.Alloc(inputImage, GCHandleType.Pinned)
         cppTask_RunCPP(cPtr, handleInput.AddrOfPinnedObject(), src.Channels, task.frameCount, dst2.Rows, dst2.Cols,
                        task.accRadians.X, task.accRadians.Y, task.accRadians.Z, task.optionsChanged, task.heartBeat,
-                       gOptions.displayDst0.Checked, gOptions.displayDst1.Checked, gOptions.DebugCheckBox.Checked)
+                       task.gOptions.displayDst0.Checked, task.gOptions.displayDst1.Checked, task.gOptions.DebugCheckBox.Checked)
         handleInput.Free()
         getOptions()
 

@@ -79,7 +79,7 @@ Public Class Interpolate_Kalman : Inherits VB_Parent
         Next
         Marshal.Copy(results, 0, dst2.Data, kalman.kOutput.Length)
 
-        If gOptions.UseKalman.Checked Then
+        If task.gOptions.UseKalman.Checked Then
             labels(2) = "Kalman-smoothed output after resizing to " + CStr(dst2.Width) + "x" + CStr(dst2.Height)
         Else
             labels(2) = "Raw output after resizing to " + CStr(dst2.Width) + "x" + CStr(dst2.Height)

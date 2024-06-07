@@ -523,12 +523,8 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PreBuildEvent>$(ProjectDir)\..\bin\Release\UI_Generator.exe
-
-$(ProjectDir)\..\bin\Release\UIindexer.exe
-
-$(ProjectDir)\..\bin\Release\UIranking.exe
-</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

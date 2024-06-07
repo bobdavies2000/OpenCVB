@@ -9,7 +9,7 @@ Public Class Match_Basics : Inherits VB_Parent
     Public matchRect As New cv.Rect
     Public searchRect As New cv.Rect
     Public Sub New()
-        If standalone Then gOptions.DebugCheckBox.Checked = True
+        If standalone Then task.gOptions.DebugCheckBox.Checked = True
         labels(2) = If(standaloneTest(), "Draw anywhere to define a new target", "Both drawRect must be provided by the caller.")
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
         desc = "Find the requested template in an image.  Managing template is responsibility of caller (allows multiple targets per image.)"
@@ -17,8 +17,8 @@ Public Class Match_Basics : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         If standalone Then
-            If gOptions.DebugCheckBox.Checked Then
-                gOptions.DebugCheckBox.Checked = False
+            If task.gOptions.DebugCheckBox.Checked Then
+                task.gOptions.DebugCheckBox.Checked = False
                 Dim inputRect = If(firstPass, New cv.Rect(25, 25, 25, 25), validateRect(task.drawRect))
                 template = src(inputRect)
             End If
@@ -291,13 +291,13 @@ Public Class Match_PointSlope : Inherits VB_Parent
     Dim templates As New List(Of cv.Mat)
     Dim mats As New Mat_4to1
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Output of Lines_PointSlope", "Matched lines", "correlationMats"}
         desc = "Initialize with the best lines in the image and track them using matchTemplate.  Reinitialize when correlations drop."
     End Sub
     Public Sub RunVB(src as cv.Mat)
         dst2 = src.Clone
-        Dim w = gOptions.GridSize.Value
+        Dim w = task.gOptions.GridSize.Value
         Dim h = w
 
         If updateLines Then

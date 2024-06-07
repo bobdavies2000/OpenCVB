@@ -5,7 +5,7 @@ Public Class ROI_Basics : Inherits VB_Parent
     Public Sub New()
         labels = {"", "", "Enclosing rectangle of all pixels that have changed", ""}
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
-        gOptions.PixelDiffThreshold.Value = 30
+        task.gOptions.pixelDiffThreshold = 30
         desc = "Find the motion ROI in the latest image."
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -37,7 +37,7 @@ Public Class ROI_FindNonZeroNoSingle : Inherits VB_Parent
     Public Sub New()
         labels = {"", "", "Enclosing rectangle of all changed pixels (after removing single pixels)", ""}
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
-        gOptions.PixelDiffThreshold.Value = 30
+        task.gOptions.pixelDiffThreshold = 30
         desc = "Find the motion ROI in just the latest image - eliminate single pixels"
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -80,10 +80,10 @@ Public Class ROI_AccumulateOld : Inherits VB_Parent
     Public aoiRect As cv.Rect
     Public minX = Integer.MaxValue, maxX = Integer.MinValue, minY = Integer.MaxValue, maxY = Integer.MinValue
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
         labels = {"", "", "Area of Interest", ""}
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
-        gOptions.PixelDiffThreshold.Value = 30
+        task.gOptions.pixelDiffThreshold = 30
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max size area of interest %", 0, 100, 25)
         desc = "Accumulate pixels in a motion ROI - all pixels that are different by X"
     End Sub
@@ -135,7 +135,7 @@ Public Class ROI_Accumulate : Inherits VB_Parent
     Public Sub New()
         labels = {"", "", "Area of Interest", ""}
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
-        gOptions.PixelDiffThreshold.Value = 30
+        task.gOptions.pixelDiffThreshold = 30
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max size area of interest %", 0, 100, 25)
         desc = "Accumulate pixels in a motion ROI until the size is x% of the total image."
     End Sub

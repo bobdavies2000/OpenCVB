@@ -6,7 +6,7 @@ Public Class HistPeak2D_Basics : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public ranges() As cv.Rangef
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         desc = "Find the top X peaks in a 2D histogram and use Delaunay to setup the backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -28,11 +28,11 @@ Public Class HistPeak2D_Basics : Inherits VB_Parent
         histogram.SetTo(0, Not mask)
 
         If ranges Is Nothing Or task.optionsChanged Then
-            ranges = vbHist2Dminmax(src, redOptions.channels(0), redOptions.channels(1))
+            ranges = vbHist2Dminmax(src, task.redOptions.channels(0), task.redOptions.channels(1))
         End If
 
         Dim backProjection As New cv.Mat
-        cv.Cv2.CalcBackProject({src}, redOptions.channels, histogram, backProjection, ranges)
+        cv.Cv2.CalcBackProject({src}, task.redOptions.channels, histogram, backProjection, ranges)
         dst2 = ShowPalette(backProjection * 255 / delaunay.inputPoints.Count)
     End Sub
 End Class
@@ -56,11 +56,11 @@ Public Class HistPeak2D_TopAndSide : Inherits VB_Parent
         If task.toggleOnOff Then
             histSide.Run(src)
             peak.ranges = task.rangesSide
-            redOptions.channels = task.channelsSide
+            task.redOptions.channels = task.channelsSide
             peak.histogram = histSide.histogram
         Else
             histTop.Run(src)
-            redOptions.channels = task.channelsTop
+            task.redOptions.channels = task.channelsTop
             peak.ranges = task.rangesTop
             peak.histogram = histTop.histogram
         End If
@@ -216,7 +216,7 @@ Public Class HistPeak2D_HotSide : Inherits VB_Parent
 
         peak.histogram = histSide.histogram
         peak.ranges = task.rangesSide
-        redOptions.channels = task.channelsSide
+        task.redOptions.channels = task.channelsSide
         peak.Run(task.pointCloud)
         dst2 = peak.dst2
         dst2.SetTo(0, task.noDepthMask)
@@ -246,7 +246,7 @@ Public Class HistPeak2D_HotTop : Inherits VB_Parent
 
         peak.histogram = histTop.histogram
         peak.ranges = task.rangesTop
-        redOptions.channels = task.channelsTop
+        task.redOptions.channels = task.channelsTop
         peak.Run(task.pointCloud)
         dst2 = peak.dst2
         dst2.SetTo(0, task.noDepthMask)

@@ -124,7 +124,7 @@ Public Class Swarm_LeftRight : Inherits VB_Parent
     Public rightMax As Single
     Dim swarm As New Swarm_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Get direction and distance from the left and right images."
     End Sub
@@ -172,7 +172,7 @@ Public Class Swarm_Percentage : Inherits VB_Parent
         Dim pixels As Integer
         Dim count As Integer
         For Each rc In task.redCells
-            dst3(rc.rect).SetTo(If(redOptions.naturalColor.Checked, rc.naturalColor, rc.color), rc.mask)
+            dst3(rc.rect).SetTo(If(task.redOptions.naturalColor.Checked, rc.naturalColor, rc.color), rc.mask)
             pixels += rc.pixels
             count += 1
             If pixels / src.Total >= percent Then Exit For
@@ -192,7 +192,7 @@ Public Class Swarm_Flood : Inherits VB_Parent
     Public flood As New Flood_BasicsMask
     Dim cvt As New Color8U_Basics
     Public Sub New()
-        redOptions.IdentifyCells.Checked = True
+        task.redOptions.IdentifyCells.Checked = True
         desc = "Floodfill the color image using the swarm outline as a mask"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -221,7 +221,7 @@ Public Class Swarm_Flood2 : Inherits VB_Parent
     Public flood As New Flood_BasicsMask
     Public cvt As New Color8U_Basics
     Public Sub New()
-        redOptions.IdentifyCells.Checked = True
+        task.redOptions.IdentifyCells.Checked = True
         flood.genCells.removeContour = False
         desc = "Floodfill the color image using the swarm outline as a mask"
     End Sub

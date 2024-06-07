@@ -52,7 +52,7 @@ Public Class Projection_Basics : Inherits VB_Parent
         If task.heartBeat Then strOut = ""
         For Each rc In redCells
             If rc.index = 0 Then Continue For
-            If rc.index <= redOptions.identifyCount Then
+            If rc.index <= task.redOptions.identifyCount Then
                 If viewType = "Side" Then
                     xy1 = (ranges(0).End - ranges(0).Start) * rc.rect.Y / dst2.Height + ranges(0).Start
                     xy2 = (ranges(0).End - ranges(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height + ranges(0).Start
@@ -77,14 +77,14 @@ Public Class Projection_Basics : Inherits VB_Parent
         If task.heartBeat Then
             Dim check1 = src.Sum()(0)
             Dim depthCount = task.pcSplit(2).CountNonZero
-            strOut += CStr(redCells.Count - redOptions.identifyCount - 1) + " other objects " + vbTab + CStr(otherCount) + " pixels" + vbCrLf
+            strOut += CStr(redCells.Count - task.redOptions.identifyCount - 1) + " other objects " + vbTab + CStr(otherCount) + " pixels" + vbCrLf
             strOut += "Sum above   " + vbTab + CStr(check2) + " pixels" + " (losses from histogram ranges?)" + vbCrLf
             strOut += "Sum of src  " + vbTab + CStr(check1) + " pixels" + " (losses from RedCloud.)" + vbCrLf
             strOut += "Actual count" + vbTab + CStr(depthCount) + " pixels" + vbCrLf
         End If
         setTrueText(strOut, 3)
         If showRectangles Then
-            For i = 0 To Math.Min(redCells.Count, redOptions.identifyCount) - 1
+            For i = 0 To Math.Min(redCells.Count, task.redOptions.identifyCount) - 1
                 dst2.Rectangle(redCells(i).rect, task.highlightColor, task.lineWidth)
             Next
         End If
@@ -185,8 +185,8 @@ Public Class Projection_Cell : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32FC3, 0)
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
-        gOptions.unFiltered.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        task.gOptions.unFiltered.Checked = True
         labels = {"", "Top View projection of the selected cell", "RedCloud_Basics output - select a cell to project at right and above", "Side projection of the selected cell"}
         desc = "Create a top and side projection of the selected cell"
     End Sub
@@ -225,7 +225,7 @@ Public Class Projection_Top : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public objects As New Projection_Basics
     Public Sub New()
-        redOptions.IdentifyCells.Checked = True
+        task.redOptions.IdentifyCells.Checked = True
         desc = "Find all the masks, rects, and counts in the top down view."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -257,7 +257,7 @@ Public Class Projection_Side : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public objects As New Projection_Basics
     Public Sub New()
-        redOptions.IdentifyCells.Checked = True
+        task.redOptions.IdentifyCells.Checked = True
         objects.viewType = "Side"
         desc = "Find all the masks, rects, and counts in the side view."
     End Sub
@@ -327,7 +327,7 @@ Public Class Projection_Object : Inherits VB_Parent
     Dim top As New Projection_Top
     Dim side As New Projection_Side
     Public Sub New()
-        gOptions.DebugSlider.Value = 0 ' pick the biggest object...
+        task.gOptions.DebugSlider.Value = 0 ' pick the biggest object...
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
         top.objects.showRectangles = False
@@ -338,13 +338,13 @@ Public Class Projection_Object : Inherits VB_Parent
         dst3 = top.dst2
         labels(3) = top.labels(2)
 
-        Dim index = gOptions.DebugSlider.Value
+        Dim index = task.gOptions.DebugSlider.Value
         If index < top.objects.objectList.Count Then
             Dim lower = New cv.Scalar(top.objects.objectList(index)(0), -100, top.objects.objectList(index)(2))
             Dim upper = New cv.Scalar(top.objects.objectList(index)(1), +100, top.objects.objectList(index)(3))
             Dim mask = task.pointCloud.InRange(lower, upper)
 
-            Dim rc = top.objects.redCells(gOptions.DebugSlider.Value + 1) ' the biggest by default...
+            Dim rc = top.objects.redCells(task.gOptions.DebugSlider.Value + 1) ' the biggest by default...
             dst0.SetTo(0)
             dst0(rc.rect) = top.histTop.dst2(rc.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
             dst0.SetTo(0, dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))

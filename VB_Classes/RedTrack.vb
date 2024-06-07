@@ -3,7 +3,7 @@ Public Class RedTrack_Basics : Inherits VB_Parent
     Dim stats As New Cell_Basics
     Public redC As New RedCloud_Basics
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         If task.workingRes <> New cv.Size(168, 94) Then task.frameHistoryCount = 1
         desc = "Get stats on each RedCloud cell."
     End Sub

@@ -152,7 +152,7 @@ Public Class Hough_Featureless : Inherits VB_Parent
     Public options As New Options_Hough
     Public roiColor() As cv.Vec3b
     Public Sub New()
-        gOptions.GridSize.Value = 10
+        task.gOptions.GridSize.Value = 10
         labels(2) = "Featureless mask"
         desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
@@ -195,8 +195,8 @@ Public Class Hough_FeatureLessTopX : Inherits VB_Parent
     Public maskFeat As cv.Mat
     Public maskPredict As cv.Mat
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
-        gOptions.GridSize.Value = 10
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        task.gOptions.GridSize.Value = 10
         maskFless = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         maskFeat = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         maskPredict = New cv.Mat(dst2.Size, cv.MatType.CV_8U)

@@ -44,7 +44,7 @@ End Class
 Public Class Triangle_HullContour : Inherits VB_Parent
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
-        gOptions.displayDst1.Checked = True
+        task.gOptions.displayDst1.Checked = True
         labels = {"", "Selected cell", "RedCloud_Basics output", "Selected contour"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub

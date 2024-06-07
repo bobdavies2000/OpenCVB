@@ -3224,10 +3224,10 @@ Public Class Options_Gif : Inherits VB_Parent
             Static myFrameCount As Integer = 0
             If myFrameCount > 5 Then firstPass = False
             myFrameCount += 1
-            frmCheck.Left = gOptions.Width / 2
-            frmCheck.top = gOptions.Height / 2
-            frmRadio.left = gOptions.Width * 2 / 3
-            frmRadio.top = gOptions.Height * 2 / 3
+            frmCheck.Left = task.gOptions.Width / 2
+            frmCheck.top = task.gOptions.Height / 2
+            frmRadio.left = task.gOptions.Width * 2 / 3
+            frmRadio.top = task.gOptions.Height * 2 / 3
         End If
 
         If dst0Radio.Checked Then task.gifCaptureIndex = 0
@@ -3734,8 +3734,8 @@ Public Class Options_Spectrum : Inherits VB_Parent
 
         If firstPass Then
             firstPass = False
-            frmSliders.Left = gOptions.Width / 2
-            frmSliders.top = gOptions.Height / 2
+            frmSliders.Left = task.gOptions.Width / 2
+            frmSliders.top = task.gOptions.Height / 2
         End If
     End Sub
 End Class
@@ -3814,8 +3814,8 @@ Public Class Options_Complexity : Inherits VB_Parent
         Next
         If firstPass Then
             firstPass = False
-            frm.Left = gOptions.Width / 2
-            frm.top = gOptions.Height / 2
+            frm.Left = task.gOptions.Width / 2
+            frm.top = task.gOptions.Height / 2
         End If
     End Sub
 End Class
@@ -3858,8 +3858,8 @@ Public Class Options_Edges_All : Inherits VB_Parent
         Static frm = findfrm(traceName + " Radio Buttons")
         If firstPass Then
             firstPass = False
-            frm.Left = gOptions.Width / 2
-            frm.top = gOptions.Height / 2
+            frm.Left = task.gOptions.Width / 2
+            frm.top = task.gOptions.Height / 2
         End If
         Dim eSelection As String = ""
         For i = 0 To frm.check.Count - 1
@@ -4003,8 +4003,8 @@ Public Class Options_Classifier : Inherits VB_Parent
         Next
         If firstPass Then
             firstPass = False
-            frm.Left = gOptions.Width / 2
-            frm.top = gOptions.Height / 2
+            frm.Left = task.gOptions.Width / 2
+            frm.top = task.gOptions.Height / 2
         End If
 
         sampleCount = inputSlider.value

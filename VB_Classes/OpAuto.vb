@@ -33,10 +33,10 @@ Public Class OpAuto_XRange : Inherits VB_Parent
             Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
             Dim leftGap = histogram.Col(0).CountNonZero
             Dim rightGap = histogram.Col(histogram.Width - 1).CountNonZero
-            If leftGap = 0 And rightGap = 0 And redOptions.XRangeSlider.Value > 3 Then
-                redOptions.XRangeSlider.Value -= 1
+            If leftGap = 0 And rightGap = 0 And task.redOptions.XRangeSlider.Value > 3 Then
+                task.redOptions.XRangeSlider.Value -= 1
             Else
-                If adjustedCount < expectedCount Then redOptions.XRangeSlider.Value += 1 Else redOptions.XRangeSlider.Value -= 1
+                If adjustedCount < expectedCount Then task.redOptions.XRangeSlider.Value += 1 Else task.redOptions.XRangeSlider.Value -= 1
             End If
             task.optionsChanged = saveOptionState
         End If
@@ -82,10 +82,10 @@ Public Class OpAuto_YRange : Inherits VB_Parent
             Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
             Dim topGap = histogram.Row(0).CountNonZero
             Dim botGap = histogram.Row(histogram.Height - 1).CountNonZero
-            If topGap = 0 And botGap = 0 And redOptions.YRangeSlider.Value > 3 Then
-                redOptions.YRangeSlider.Value -= 1
+            If topGap = 0 And botGap = 0 And task.redOptions.YRangeSlider.Value > 3 Then
+                task.redOptions.YRangeSlider.Value -= 1
             Else
-                If adjustedCount < expectedCount Then redOptions.YRangeSlider.Value += 1 Else redOptions.YRangeSlider.Value -= 1
+                If adjustedCount < expectedCount Then task.redOptions.YRangeSlider.Value += 1 Else task.redOptions.YRangeSlider.Value -= 1
             End If
             task.optionsChanged = saveOptionState
         End If
@@ -156,7 +156,7 @@ Public Class OpAuto_Valley : Inherits VB_Parent
     Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public options As New Options_Boundary
     Public Sub New()
-        If standaloneTest() Then gOptions.HistBinSlider.Value = 256
+        If standaloneTest() Then task.gOptions.HistBinSlider.Value = 256
         desc = "Get the top X highest quality valley points in the histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -219,7 +219,7 @@ Public Class OpAuto_Peaks2D : Inherits VB_Parent
     Public options As New Options_Boundary
     Public clusterPoints As New List(Of cv.Point2f)
     Public Sub New()
-        If standaloneTest() Then gOptions.HistBinSlider.Value = 256
+        If standaloneTest() Then task.gOptions.HistBinSlider.Value = 256
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub
@@ -260,7 +260,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits VB_Parent
     Public clusterPoints As New List(Of cv.Point2f)
     Dim options As New Options_Boundary
     Public Sub New()
-        If standaloneTest() Then gOptions.HistBinSlider.Value = 256
+        If standaloneTest() Then task.gOptions.HistBinSlider.Value = 256
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub
@@ -313,7 +313,7 @@ End Class
 
 Public Class OpAuto_PixelDifference : Inherits VB_Parent
     Public Sub New()
-        gOptions.PixelDiffThreshold.Value = 2 ' set it low so it will move up to the right value.
+        task.gOptions.pixelDiffThreshold = 2 ' set it low so it will move up to the right value.
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub
@@ -330,11 +330,11 @@ Public Class OpAuto_PixelDifference : Inherits VB_Parent
             If src(roi).CountNonZero Then gridCount += 1
         Next
 
-        If gOptions.PixelDiffThreshold.Value < gOptions.PixelDiffThreshold.Maximum Then
-            If gridCount > task.gridList.Count / 10 Then gOptions.PixelDiffThreshold.Value += 1
+        If task.gOptions.pixelDiffThreshold < task.gOptions.PixelDiffBar.Maximum Then
+            If gridCount > task.gridList.Count / 10 Then task.gOptions.pixelDiffThreshold += 1
         End If
-        If gridCount = 0 And gOptions.PixelDiffThreshold.Value > 1 Then gOptions.PixelDiffThreshold.Value -= 1
-        setTrueText("Pixel difference threshold is at " + CStr(gOptions.PixelDiffThreshold.Value))
+        If gridCount = 0 And task.gOptions.pixelDiffThreshold > 1 Then task.gOptions.pixelDiffThreshold -= 1
+        setTrueText("Pixel difference threshold is at " + CStr(task.gOptions.pixelDiffThreshold))
         dst2 = src
     End Sub
 End Class

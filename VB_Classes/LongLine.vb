@@ -85,7 +85,7 @@ Public Class LongLine_Depth : Inherits VB_Parent
     Dim plot As New Plot_OverTimeScalar
     Dim kalman As New Kalman_Basics
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         plot.dst2 = dst3
         desc = "Find the longest line in BGR and use it to measure the average depth for the line"
@@ -466,7 +466,7 @@ Public Class LongLine_History : Inherits VB_Parent
         For Each lp In lpList
             drawLine(dst2, lp.p1, lp.p2, cv.Scalar.White)
         Next
-        If mpList.Count > gOptions.FrameHistory.Value Then mpList.RemoveAt(0)
+        If mpList.Count > task.gOptions.FrameHistory.Value Then mpList.RemoveAt(0)
 
         labels(2) = $"{lpList.Count} were found that were present for every one of the last {task.frameHistoryCount} frames."
     End Sub

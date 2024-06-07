@@ -94,9 +94,12 @@ Module IndexMain
             Dim nextFile As New System.IO.StreamReader(info.FullName)
             Dim classname As String = ""
             If info.Name.EndsWith(".py") Then classname = info.Name ' python file names are the class name - they don't have multiple classnames per file
-
             While nextFile.Peek() <> -1
                 line = Trim(nextFile.ReadLine())
+                If line.Contains("public class CSharp_") Then
+                    Dim split = line.Split(" \W+")
+                    CSnames.Add(split(2), split(2))
+                End If
                 Dim lcaseLine = " " + LCase(line)
                 If line.Contains("Parallel.For") Then
                     If multiThreaded.ContainsKey(classname) = False Then multiThreaded.Add(classname, classname)
@@ -133,6 +136,7 @@ Module IndexMain
                 End If
             End While
         Next
+
 
         ' add the VB Class names to each entry in tokens.
         For i = 0 To tokens.Count - 1

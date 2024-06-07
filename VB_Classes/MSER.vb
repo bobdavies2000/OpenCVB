@@ -519,7 +519,7 @@ Public Class MSER_TestExample : Inherits VB_Parent
     Public Sub New()
         labels(2) = "Contour regions from MSER"
         labels(3) = "Box regions from MSER"
-        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
         desc = "Maximally Stable Extremal Regions example - still image"
         image = cv.Cv2.ImRead(task.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         mser = cv.MSER.Create()
@@ -588,7 +588,7 @@ Public Class MSER_Mask_CPP : Inherits VB_Parent
     Dim redC As New RedCloud_Cells
     Public classCount As Integer
     Public Sub New()
-        redOptions.UseColorOnly.Checked = True
+        task.redOptions.UseColorOnly.Checked = True
         findCheckBox("Use grayscale input").Checked = False
         options.RunVB()
         cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
@@ -827,7 +827,7 @@ Public Class MSER_CPP : Inherits VB_Parent
             dst3 = src
             For i = 0 To boxes.Count - 1
                 dst3.Rectangle(boxes(i), task.highlightColor, task.lineWidth)
-                If i < redOptions.identifyCount Then setTrueText(CStr(i + 1), boxes(i).TopLeft, 3)
+                If i < task.redOptions.identifyCount Then setTrueText(CStr(i + 1), boxes(i).TopLeft, 3)
             Next
         End If
         labels(2) = CStr(classcount) + " regions identified"

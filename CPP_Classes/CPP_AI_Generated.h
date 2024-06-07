@@ -931,7 +931,7 @@ public:
     CPP_RedCloud_Reduce() : algorithmCPP() {
         traceName = "CPP_RedCloud_Reduce";
         //if (standalone) {
-        //    redOptions.RedCloud_Reduce.Checked = true;
+        //    task.redOptions.RedCloud_Reduce.Checked = true;
         //}
         desc = "Reduction transform for the point cloud";
     }
@@ -3433,7 +3433,7 @@ public:
 //    CPP_MotionRect_Basics() : algorithmCPP() {
 //        traceName = "CPP_MotionRect_Basics";
 //        bgSub = new CPP_BGSubtract_Basics();
-//        redOptions.UseColor.Checked = true;
+//        task.redOptions.UseColor.Checked = true;
 //        redCPP.imageThresholdPercent = 1.0;
 //        redCPP.cellMinPercent = 0;
 //        desc = "Use floodfill to find all the real motion in an image.";

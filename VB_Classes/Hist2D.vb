@@ -33,20 +33,20 @@ Public Class Hist2D_Cloud : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim r1 As cv.Vec2f, r2 As cv.Vec2f
-        If redOptions.channels(0) = 0 Or redOptions.channels(0) = 1 Then
+        If task.redOptions.channels(0) = 0 Or task.redOptions.channels(0) = 1 Then
             r1 = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
         End If
-        If redOptions.channels(1) = 1 Then r2 = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        If redOptions.channels(1) = 2 Then r2 = New cv.Vec2f(0, task.maxZmeters)
+        If task.redOptions.channels(1) = 1 Then r2 = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+        If task.redOptions.channels(1) = 2 Then r2 = New cv.Vec2f(0, task.maxZmeters)
 
         ranges = New cv.Rangef() {New cv.Rangef(r1.Item0, r1.Item1),
                                   New cv.Rangef(r2.Item0, r2.Item1)}
-        cv.Cv2.CalcHist({task.pointCloud}, redOptions.channels, New cv.Mat(),
-                        histogram, 2, {gOptions.HistBinSlider.Value, gOptions.HistBinSlider.Value}, ranges)
+        cv.Cv2.CalcHist({task.pointCloud}, task.redOptions.channels, New cv.Mat(),
+                        histogram, 2, {task.gOptions.HistBinSlider.Value, task.gOptions.HistBinSlider.Value}, ranges)
 
         plot1D.Run(histogram)
         dst2 = plot1D.dst2
-        channels = redOptions.channels
+        channels = task.redOptions.channels
     End Sub
 End Class
 
@@ -68,7 +68,7 @@ Public Class Hist2D_Depth : Inherits VB_Parent
 
         histogram = hist2d.histogram
         ranges = hist2d.ranges
-        channels = redOptions.channels
+        channels = task.redOptions.channels
 
         dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
@@ -121,10 +121,10 @@ Public Class Hist2D_HSV : Inherits VB_Parent
         Dim histRowsCols = {dst2.Height, dst2.Width}
 
         src = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-        cv.Cv2.CalcHist({src}, {0, 2}, task.depthMask, histogram02, 2, histRowsCols, redOptions.rangesHSV)
+        cv.Cv2.CalcHist({src}, {0, 2}, task.depthMask, histogram02, 2, histRowsCols, task.redOptions.rangesHSV)
         dst2 = histogram02.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        cv.Cv2.CalcHist({src}, {0, 1}, task.depthMask, histogram01, 2, histRowsCols, redOptions.rangesHSV)
+        cv.Cv2.CalcHist({src}, {0, 1}, task.depthMask, histogram01, 2, histRowsCols, task.redOptions.rangesHSV)
         dst3 = histogram01.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         labels(2) = "Hue is on the X-Axis and Value is on the Y-Axis"
@@ -141,15 +141,15 @@ Public Class Hist2D_BGR : Inherits VB_Parent
     Public histogram01 As New cv.Mat
     Public histogram02 As New cv.Mat
     Public Sub New()
-        gOptions.HistBinSlider.Value = 256
+        task.gOptions.HistBinSlider.Value = 256
         desc = "Create a 2D histogram for blue to red and blue to green."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim histRowsCols = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist({src}, {0, 2}, task.depthMask, histogram02, 2, histRowsCols, redOptions.rangesBGR)
+        cv.Cv2.CalcHist({src}, {0, 2}, task.depthMask, histogram02, 2, histRowsCols, task.redOptions.rangesBGR)
         dst2 = histogram02.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        cv.Cv2.CalcHist({src}, {0, 1}, task.depthMask, histogram01, 2, histRowsCols, redOptions.rangesBGR)
+        cv.Cv2.CalcHist({src}, {0, 1}, task.depthMask, histogram01, 2, histRowsCols, task.redOptions.rangesBGR)
         dst3 = histogram01.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         labels(2) = "Blue is on the X-Axis and Red is on the Y-Axis"
@@ -172,8 +172,8 @@ Public Class Hist2D_PlotHistogram1D : Inherits VB_Parent
         desc = "Create a 2D histogram for blue to red and blue to green."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        cv.Cv2.CalcHist({src}, redOptions.channels, task.depthMask, histogram, 2, {task.histogramBins, task.histogramBins},
-                        redOptions.rangesBGR)
+        cv.Cv2.CalcHist({src}, task.redOptions.channels, task.depthMask, histogram, 2, {task.histogramBins, task.histogramBins},
+                        task.redOptions.rangesBGR)
         dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         plot.Run(histogram)

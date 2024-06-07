@@ -49,7 +49,7 @@ Public Class Hist3D_BuildHistogram : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            gOptions.HistBinSlider.Value = 100
+            task.gOptions.HistBinSlider.Value = 100
             Static plot As New Hist_Depth
             plot.Run(src)
             src = plot.histogram
@@ -99,7 +99,7 @@ Public Class Hist3D_RedCloud : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim hist3D As New Hist3D_Basics
     Public Sub New()
-        redOptions.UseColorOnly.Checked = True
+        task.redOptions.UseColorOnly.Checked = True
         desc = "Run RedCloud_Basics on the combined Hist3D color/cloud output."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -124,8 +124,8 @@ Public Class Hist3D_RedColor : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
-        redOptions.IdentifyCells.Checked = True
-        redOptions.UseColorOnly.Checked = True
+        task.redOptions.IdentifyCells.Checked = True
+        task.redOptions.UseColorOnly.Checked = True
         desc = "Use the Hist3D color classes to segment the image with RedCloud_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -190,8 +190,8 @@ Public Class Hist3D_Pixel : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 3 Then src = task.color
-        Dim bins = redOptions.HistBinSlider.Value
-        cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, redOptions.rangesBGR)
+        Dim bins = task.redOptions.HistBinSlider.Value
+        cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, task.redOptions.rangesBGR)
 
         ReDim histArray(histogram.Total - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -200,10 +200,10 @@ Public Class Hist3D_Pixel : Inherits VB_Parent
             histArray(i) = i + 1
         Next
 
-        classCount = redOptions.bins3D
+        classCount = task.redOptions.bins3D
         Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
 
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, redOptions.rangesBGR)
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
         dst3 = If(classCount < 256, ShowPalette(dst2 * 255 / classCount), ShowPalette(dst2))
     End Sub
 End Class
@@ -229,10 +229,10 @@ Public Class Hist3D_PixelCells : Inherits VB_Parent
         pixel.Run(src)
 
         For Each cell In task.redCells
-            cv.Cv2.CalcBackProject({src(cell.rect)}, {0, 1, 2}, pixel.histogram, dst2(cell.rect), redOptions.rangesBGR)
+            cv.Cv2.CalcBackProject({src(cell.rect)}, {0, 1, 2}, pixel.histogram, dst2(cell.rect), task.redOptions.rangesBGR)
         Next
 
-        dst3 = ShowPalette(dst2 * 255 / redOptions.bins3D)
+        dst3 = ShowPalette(dst2 * 255 / task.redOptions.bins3D)
     End Sub
 End Class
 
@@ -271,7 +271,7 @@ Public Class Hist3D_PixelDiffMask : Inherits VB_Parent
     Dim pixel As New Hist3D_Pixel
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        redOptions.UseColorOnly.Checked = True
+        task.redOptions.UseColorOnly.Checked = True
         desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -298,7 +298,7 @@ Public Class Hist3D_RedCloudGrid : Inherits VB_Parent
     Dim pixels As New Pixel_Vectors
     Dim hVector As New Hist3Dcolor_Vector
     Public Sub New()
-        gOptions.GridSize.Value = 8
+        task.gOptions.GridSize.Value = 8
         desc = "Build RedCloud pixel vectors and then measure each grid element's distance to those vectors."
     End Sub
     Public Sub RunVB(src As cv.Mat)

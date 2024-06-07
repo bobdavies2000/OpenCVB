@@ -25,7 +25,7 @@ Public Class Kalman_Basics : Inherits VB_Parent
             ReDim kOutput(kInput.Count - 1)
         End If
 
-        If gOptions.UseKalman.Checked Then
+        If task.gOptions.UseKalman.Checked Then
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = kInput(i)
                 kalman(i).RunVB(Nothing)
@@ -229,7 +229,7 @@ Public Class Kalman_CVMat : Inherits VB_Parent
             output = New cv.Mat(input.Rows, 1, cv.MatType.CV_32F, 0)
         End If
 
-        If gOptions.UseKalman.Checked Then
+        If task.gOptions.UseKalman.Checked Then
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = input.Get(Of Single)(i, 0)
                 kalman(i).RunVB(src)
@@ -589,7 +589,7 @@ Public Class Kalman_VB_Basics : Inherits VB_Parent
         matrix(task.frameCount Mod saveAvgCount) = kInput
         kAverage = (New cv.Mat(saveAvgCount, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean()(0)
 
-        If gOptions.UseKalman.Checked Then
+        If task.gOptions.UseKalman.Checked Then
             'The Kalman Filter code comes from:
             'http://www.rotomotion.com/downloads/tilt.c
             State_Update(kInput)

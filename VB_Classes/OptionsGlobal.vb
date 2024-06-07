@@ -1,5 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Public Class OptionsGlobal
+    Public imu_Alpha As Single
+    Public maxDepth As Integer
+    Public pixelDiffThreshold As Integer
     Public mapNames As New List(Of String)({"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "TwilightShifted", "Viridis", "Winter"})
     Public heartBeatSeconds = 1
@@ -21,9 +24,9 @@ Public Class OptionsGlobal
         MotionFilteredColorAndCloud.Checked = True
         gravityPointCloud.Checked = True
 
-        maxCount.Text = CStr(MaxDepth.Value)
+        maxCount.Text = CStr(MaxDepthBar.Value)
         labelBinsCount.Text = CStr(HistBinSlider.Value)
-        PixelDiff.Text = CStr(PixelDiffThreshold.Value)
+        PixelDiff.Text = CStr(PixelDiffBar.Value)
         fHist.Text = CStr(FrameHistory.Value)
         LineThicknessAmount.Text = CStr(LineWidth.Value)
         DotSizeLabel.Text = CStr(dotSizeSlider.Value)
@@ -159,8 +162,8 @@ Public Class OptionsGlobal
         End Select
 
         task.depthThresholdPercent = 0.01
-        gOptions.dotSizeSlider.Value = task.dotSize
-        gOptions.LineWidth.Value = task.dotSize
+        task.gOptions.dotSizeSlider.Value = task.dotSize
+        task.gOptions.LineWidth.Value = task.dotSize
         DotSizeLabel.Text = CStr(dotSizeSlider.Value)
 
         Me.Left = 0
@@ -201,8 +204,9 @@ Public Class OptionsGlobal
     Private Sub displayDst1_CheckedChanged(sender As Object, e As EventArgs) Handles displayDst1.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
-    Private Sub MaxDepth_ValueChanged(sender As Object, e As EventArgs) Handles MaxDepth.ValueChanged
-        maxCount.Text = CStr(MaxDepth.Value)
+    Private Sub MaxDepth_ValueChanged(sender As Object, e As EventArgs) Handles MaxDepthBar.ValueChanged
+        maxCount.Text = CStr(MaxDepthBar.Value)
+        maxDepth = MaxDepthBar.Value
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
     Private Sub GridWidthSlider_Scroll(sender As Object, e As EventArgs) Handles GridSize.Scroll
@@ -220,16 +224,18 @@ Public Class OptionsGlobal
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
-    Private Sub PixelDiffThreshold_ValueChanged(sender As Object, e As EventArgs) Handles PixelDiffThreshold.ValueChanged
-        PixelDiff.Text = CStr(PixelDiffThreshold.Value)
+    Private Sub PixelDiffThreshold_ValueChanged(sender As Object, e As EventArgs) Handles PixelDiffBar.ValueChanged
+        PixelDiff.Text = CStr(PixelDiffBar.Value)
+        pixelDiffThreshold = PixelDiffBar.Value
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
     Private Sub FrameHistory_ValueChanged(sender As Object, e As EventArgs) Handles FrameHistory.ValueChanged
         fHist.Text = CStr(FrameHistory.Value)
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
-    Private Sub IMU_Alpha_ValueChanged(sender As Object, e As EventArgs) Handles IMU_Alpha.ValueChanged
-        IMU_Label.Text = CStr(IMU_Alpha.Value)
+    Private Sub IMU_Alpha_ValueChanged(sender As Object, e As EventArgs) Handles IMU_AlphaBar.ValueChanged
+        IMU_Label.Text = CStr(IMU_AlphaBar.Value)
+        imu_Alpha = IMU_AlphaBar.Value / 100
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
     Private Sub Palettes_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles Palettes.SelectedIndexChanged

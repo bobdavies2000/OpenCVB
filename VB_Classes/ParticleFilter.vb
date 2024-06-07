@@ -4,7 +4,7 @@ Imports System.IO
 '    Dim trace As New Swarm_Basics
 '    Dim plot1D As New Plot_Histogram2D
 '    Public Sub New()
-'        If standaloneTest() Then gOptions.displayDst1.Checked = True
+'        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
 '        labels = {"", "", "Particle traffic", "Largest count in 2D Histogram"}
 '        desc = "Use the good features of an image to create a histogram of particle motion. Peak histogram is net movement of the camera."
 '    End Sub
@@ -15,7 +15,7 @@ Imports System.IO
 '        Dim halfsize = 10
 '        If histogram.Rows <> matSize Then
 '            histogram = New cv.Mat(matSize, matSize, cv.MatType.CV_32F, 0)
-'            gOptions.HistBinSlider.Value = matSize
+'            task.gOptions.HistBinSlider.Value = matSize
 '        End If
 
 '        trace.Run(src)

@@ -196,8 +196,8 @@ Public Class Feature_MultiPass : Inherits VB_Parent
     Public featurePoints As New List(Of cv.Point2f)
     Dim sharpen As New PhotoShop_SharpenDetail
     Public Sub New()
-        gOptions.RGBFilterActive.Checked = True
-        gOptions.RGBFilterList.SelectedIndex = gOptions.RGBFilterList.Items.IndexOf("Filter_Laplacian")
+        task.gOptions.RGBFilterActive.Checked = True
+        task.gOptions.RGBFilterList.SelectedIndex = task.gOptions.RGBFilterList.Items.IndexOf("Filter_Laplacian")
         desc = "Run Feature_Basics twice and compare results."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -562,7 +562,7 @@ Public Class Feature_History : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         Static featureHistory As New List(Of List(Of cv.Point))
         Static gens As New List(Of Integer)
-        Dim histCount = gOptions.FrameHistory.Value
+        Dim histCount = task.gOptions.FrameHistory.Value
 
         feat.Run(src)
         dst2 = src.Clone

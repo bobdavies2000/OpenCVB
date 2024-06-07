@@ -19,9 +19,9 @@ Public Class Grid_Basics : Inherits VB_Parent
             task.gridRows = 0
             task.gridCols = 0
             Dim index As Integer
-            For y = 0 To src.Height - 1 Step gOptions.GridSize.Value
-                For x = 0 To src.Width - 1 Step gOptions.GridSize.Value
-                    Dim roi = validateRect(New cv.Rect(x, y, gOptions.GridSize.Value, gOptions.GridSize.Value))
+            For y = 0 To src.Height - 1 Step task.gOptions.GridSize.Value
+                For x = 0 To src.Width - 1 Step task.gOptions.GridSize.Value
+                    Dim roi = validateRect(New cv.Rect(x, y, task.gOptions.GridSize.Value, task.gOptions.GridSize.Value))
                     If roi.Width > 0 And roi.Height > 0 Then
                         If x = 0 Then task.gridRows += 1
                         If y = 0 Then task.gridCols += 1
@@ -37,11 +37,11 @@ Public Class Grid_Basics : Inherits VB_Parent
 
             If src.Size = task.color.Size Then
                 task.gridMask.SetTo(0)
-                For x = gOptions.GridSize.Value To src.Width - 1 Step gOptions.GridSize.Value
+                For x = task.gOptions.GridSize.Value To src.Width - 1 Step task.gOptions.GridSize.Value
                     Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, src.Height)
                     task.gridMask.Line(p1, p2, 255, task.lineWidth)
                 Next
-                For y = gOptions.GridSize.Value To src.Height - 1 Step gOptions.GridSize.Value
+                For y = task.gOptions.GridSize.Value To src.Height - 1 Step task.gOptions.GridSize.Value
                     Dim p1 = New cv.Point(0, y), p2 = New cv.Point(src.Width, y)
                     task.gridMask.Line(p1, p2, 255, task.lineWidth)
                 Next
@@ -93,7 +93,7 @@ Public Class Grid_Basics : Inherits VB_Parent
             task.color.CopyTo(dst2)
             dst2.SetTo(cv.Scalar.White, task.gridMask)
             labels(2) = "Grid_Basics " + CStr(gridList.Count) + " (" + CStr(task.gridRows) + "X" + CStr(task.gridCols) + ") " +
-                              CStr(gOptions.GridSize.Value) + "X" + CStr(gOptions.GridSize.Value) + " regions"
+                              CStr(task.gOptions.GridSize.Value) + "X" + CStr(task.gOptions.GridSize.Value) + " regions"
         End If
 
         If updateTaskGridList Then task.gridList = gridList
@@ -282,8 +282,8 @@ Public Class Grid_Neighbors : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.gridRows <> CInt(dst2.Height / 10) Then
-            gOptions.GridSize.Value = CInt(dst2.Height / 10)
-            task.gridRows = gOptions.GridSize.Value
+            task.gOptions.GridSize.Value = CInt(dst2.Height / 10)
+            task.gridRows = task.gOptions.GridSize.Value
             task.grid.Run(src)
         End If
 
@@ -334,7 +334,7 @@ Public Class Grid_Special : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.optionsChanged Then
-            gridWidth = gOptions.GridSize.Value
+            gridWidth = task.gOptions.GridSize.Value
             gridList.Clear()
             gridRows = 0
             gridCols = 0
@@ -441,7 +441,7 @@ Public Class Grid_MinMaxDepth : Inherits VB_Parent
     Public minMaxLocs(0) As pointPair
     Public minMaxVals(0) As cv.Vec2f
     Public Sub New()
-        gOptions.GridSize.Value = 8
+        task.gOptions.GridSize.Value = 8
         vbAddAdvice(traceName + ": goptions 'Grid Square Size' has direct impact.")
         desc = "Find the min and max depth within each grid roi."
     End Sub
@@ -478,13 +478,13 @@ Public Class Grid_TrackCenter : Inherits VB_Parent
     Public center As cv.Point
     Dim match As New Match_Basics
     Public Sub New()
-        If standalone Then gOptions.ShowGrid.Checked = True
+        If standalone Then task.gOptions.ShowGrid.Checked = True
 
         desc = "Track a cell near the center of the grid"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If match.correlation < match.options.correlationMin Or gOptions.DebugCheckBox.Checked Then
-            gOptions.DebugCheckBox.Checked = False
+        If match.correlation < match.options.correlationMin Or task.gOptions.DebugCheckBox.Checked Then
+            task.gOptions.DebugCheckBox.Checked = False
             Dim index = task.gridMap.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
             Dim roi = task.gridList(index)
             match.template = src(roi).Clone

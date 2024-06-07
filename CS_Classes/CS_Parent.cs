@@ -137,16 +137,6 @@ namespace CS_Classes
             return srcPoints;
         }
 
-        public void processFrame(Mat src)
-        {
-            task.labels = labels;
-
-            task.dst0 = task.color;
-            task.dst1 = task.depthRGB;
-            task.dst2 = dst2;
-            task.dst3 = dst3;
-        }
-
         public void setTrueText(string text, Point pt, int picTag = 2)
         {
             trueText str = new trueText(text, pt, picTag);

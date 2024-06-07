@@ -358,9 +358,9 @@ Public Class Contour_Sorted : Inherits VB_Parent
     Dim options As New Options_Contours
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Contours in the detected motion", "Diff output - detected motion"}
-        gOptions.PixelDiffThreshold.Value = 25
+        task.gOptions.pixelDiffThreshold = 25
         desc = "Display the contours from largest to smallest in the motion output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -620,7 +620,7 @@ Public Class Contour_RedCloudEdges : Inherits VB_Parent
     Dim redC As New RedCloud_Cells
     Dim edges As New EdgeDraw_Basics
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "EdgeDraw_Basics output", "", "Pixels below are both cell boundaries and edges."}
         desc = "Intersect the cell contours and the edges in the image."
@@ -783,7 +783,7 @@ Public Class Contour_Gray : Inherits VB_Parent
 
         If standalone Then
             Static reduction As New Reduction_Basics
-            redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
+            task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
             reduction.Run(src)
             src = reduction.dst2
         End If

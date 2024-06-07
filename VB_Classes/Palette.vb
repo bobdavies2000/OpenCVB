@@ -6,7 +6,7 @@ Public Class Palette_Basics : Inherits VB_Parent
         desc = "Apply the different color maps in OpenCV"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        labels(2) = "ColorMap = " + gOptions.Palettes.Text
+        labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
 
         If src.Type = cv.MatType.CV_32F Then
             src = vbNormalize32f(src)
@@ -275,10 +275,10 @@ Public Class Palette_TaskColors : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         Static direction = 1
 
-        If gOptions.GridSize.Value <= 10 Then direction *= -1
-        If gOptions.GridSize.Value >= 100 Then direction *= -1
+        If task.gOptions.GridSize.Value <= 10 Then direction *= -1
+        If task.gOptions.GridSize.Value >= 100 Then direction *= -1
 
-        gOptions.GridSize.Value -= direction * 1
+        task.gOptions.GridSize.Value -= direction * 1
         task.grid.Run(src)
 
         For i = 0 To task.gridList.Count - 1
@@ -463,8 +463,8 @@ Public Class Palette_LoadColorMap : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.optionsChanged Or colorMap.Rows <> 256 Then
-            labels(2) = "ColorMap = " + gOptions.Palettes.Text
-            Dim str = cMapDir.FullName + "/colorscale_" + gOptions.Palettes.Text + ".jpg"
+            labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
+            Dim str = cMapDir.FullName + "/colorscale_" + task.gOptions.Palettes.Text + ".jpg"
             Dim mapFile As New FileInfo(str)
             Dim tmp = cv.Cv2.ImRead(mapFile.FullName)
 
@@ -491,9 +491,9 @@ End Class
 Public Class Palette_CustomColorMap : Inherits VB_Parent
     Public colorMap As New cv.Mat
     Public Sub New()
-        labels(2) = "ColorMap = " + gOptions.Palettes.Text
+        labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
         Dim cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
-        Dim str = cMapDir.FullName + "/colorscale_" + gOptions.Palettes.Text + ".jpg"
+        Dim str = cMapDir.FullName + "/colorscale_" + task.gOptions.Palettes.Text + ".jpg"
         Dim mapFile As New FileInfo(str)
         Dim tmp = cv.Cv2.ImRead(mapFile.FullName)
 

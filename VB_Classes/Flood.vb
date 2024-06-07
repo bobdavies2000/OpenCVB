@@ -3,7 +3,7 @@ Public Class Flood_Basics : Inherits VB_Parent
     Dim redCPP As New RedCloud_CPP
     Public genCells As New Cell_Generate
     Public Sub New()
-        redOptions.IdentifyCells.Checked = True
+        task.redOptions.IdentifyCells.Checked = True
         desc = "Build the RedCloud cells with the grayscale input."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -38,9 +38,9 @@ Public Class Flood_CellStatsPlot : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Dim stats As New Cell_BasicsPlot
     Public Sub New()
-        redOptions.IdentifyCells.Checked = True
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
-        gOptions.HistBinSlider.Value = 1000
+        task.redOptions.IdentifyCells.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        task.gOptions.HistBinSlider.Value = 1000
         labels(1) = "Histogram of the depth for the selected cell.  Click any cell in the lower left."
         desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill"
     End Sub
@@ -71,7 +71,7 @@ End Class
 Public Class Flood_ContainedCells : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Public Sub New()
-        redOptions.IdentifyCells.Checked = True
+        task.redOptions.IdentifyCells.Checked = True
         desc = "Find cells that have only one neighbor.  They are likely to be completely contained in another cell."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -82,11 +82,11 @@ Public Class Flood_ContainedCells : Inherits VB_Parent
         End If
 
         Dim removeCells As New List(Of Integer)
-        For i = task.redCells.Count - 1 To redOptions.identifyCount Step -1
+        For i = task.redCells.Count - 1 To task.redOptions.identifyCount Step -1
             Dim rc = task.redCells(i)
             Dim nabs As New List(Of Integer)
             Dim contains As New List(Of Integer)
-            Dim count = Math.Min(redOptions.identifyCount, task.redCells.Count)
+            Dim count = Math.Min(task.redOptions.identifyCount, task.redCells.Count)
             For j = 0 To count - 1
                 Dim rcBig = task.redCells(j)
                 If rcBig.rect.IntersectsWith(rc.rect) Then nabs.Add(rcBig.index)
@@ -119,7 +119,7 @@ Public Class Flood_BasicsMask : Inherits VB_Parent
     Public buildInputMask As Boolean
     Public showSelected As Boolean = True
     Public Sub New()
-        redOptions.IdentifyCells.Checked = True
+        task.redOptions.IdentifyCells.Checked = True
         labels(3) = "The inputMask used to limit how much of the image is processed."
         desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
     End Sub
@@ -142,7 +142,7 @@ Public Class Flood_BasicsMask : Inherits VB_Parent
 
         dst2 = genCells.dst2
 
-        Dim cellCount = Math.Min(redOptions.identifyCount, task.redCells.Count)
+        Dim cellCount = Math.Min(task.redOptions.identifyCount, task.redCells.Count)
         If task.heartBeat Then labels(2) = $"{task.redCells.Count} cells identified and the largest {cellCount} are numbered below."
 
         If showSelected Then setSelectedContour()
@@ -158,11 +158,11 @@ Public Class Flood_Tiers : Inherits VB_Parent
     Dim tiers As New Depth_TiersZ
     Dim cvt As New Color8U_Basics
     Public Sub New()
-        redOptions.IdentifyCells.Checked = True
+        task.redOptions.IdentifyCells.Checked = True
         desc = "Subdivide the Flood_Basics cells using depth tiers."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim tier = gOptions.DebugSlider.Value
+        Dim tier = task.gOptions.DebugSlider.Value
 
         tiers.Run(src)
         If tier >= tiers.classCount Then tier = 0
@@ -200,7 +200,7 @@ Public Class Flood_Motion : Inherits VB_Parent
     Dim maxDists As New List(Of cv.Point2f)
     Dim maxIndex As New List(Of Integer)
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -293,8 +293,8 @@ Public Class Flood_LeftRight : Inherits VB_Parent
     Public cellsLeft As New List(Of rcData)
     Public cellsRight As New List(Of rcData)
     Public Sub New()
-        redOptions.IdentifyCells.Checked = False
-        If standalone Then gOptions.displayDst1.Checked = True
+        task.redOptions.IdentifyCells.Checked = False
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Floodfill left and right images."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -322,7 +322,7 @@ Public Class Flood_LeftRight : Inherits VB_Parent
         cellsRight = New List(Of rcData)(task.redCells)
         mapRight = task.cellMap.Clone
 
-        If redOptions.IdentifyCells.Checked Then
+        If task.redOptions.IdentifyCells.Checked Then
             If task.mousePicTag = 2 Then
                 setSelectedContour(cellsLeft, mapLeft)
                 task.color(task.rc.rect).SetTo(cv.Scalar.White, task.rc.mask)
@@ -346,7 +346,7 @@ Public Class Flood_MaxDistPoints : Inherits VB_Parent
     Dim redCPP As New RedCloud_MaxDist_CPP
     Public genCells As New Cell_Generate
     Public Sub New()
-        redOptions.IdentifyCells.Checked = True
+        task.redOptions.IdentifyCells.Checked = True
         labels(3) = "Contour boundaries - input to RedCloud_Basics"
         desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code."
     End Sub

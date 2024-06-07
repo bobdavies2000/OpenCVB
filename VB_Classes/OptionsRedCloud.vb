@@ -85,24 +85,24 @@ Public Class OptionsRedCloud
         Next
         ColorSource.SelectedItem() = "Bin4Way_Regions"
 
-        redOptions.SimpleReductionSlider.Value = 40
+        task.redOptions.SimpleReductionSlider.Value = 40
         Select Case task.cameraName
             Case "Azure Kinect 4K"
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
             Case "Intel(R) RealSense(TM) Depth Camera 455"
             Case "Oak-D camera"
-                redOptions.SimpleReductionSlider.Value = 80
+                task.redOptions.SimpleReductionSlider.Value = 80
             Case "StereoLabs ZED 2/2i"
             Case "MYNT-EYE-D1000"
         End Select
 
-        redOptions.BitwiseReductionSlider.Value = 5
+        task.redOptions.BitwiseReductionSlider.Value = 5
 
         Me.Left = 0
         Me.Top = 0
     End Sub
     Public Sub Sync()
-        task.maxZmeters = gOptions.MaxDepth.Value + 0.01 ' why add a cm?  Because histograms are exclusive on ranges.
+        task.maxZmeters = task.gOptions.maxDepth + 0.01 ' why add a cm?  Because histograms are exclusive on ranges.
 
         task.rangesTop = New cv.Rangef() {New cv.Rangef(0.1, task.maxZmeters), New cv.Rangef(-task.xRange, task.xRange)}
         task.rangesSide = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0.1, task.maxZmeters)}
@@ -123,7 +123,7 @@ Public Class OptionsRedCloud
 
         channelCount = 1
         channelIndex = 0
-        Select Case redOptions.PCReduction
+        Select Case task.redOptions.PCReduction
             Case 0 ' "X Reduction"
                 ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
                 channels = {0}
@@ -218,37 +218,37 @@ Public Class OptionsRedCloud
     Private Sub XReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XReduction.Tag
-        gOptions.HistBinSlider.Value = 16
+        task.gOptions.HistBinSlider.Value = 16
     End Sub
     Private Sub YReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = YReduction.Tag
-        gOptions.HistBinSlider.Value = 16
+        task.gOptions.HistBinSlider.Value = 16
     End Sub
     Private Sub ZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles ZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = ZReduction.Tag
-        gOptions.HistBinSlider.Value = 16
+        task.gOptions.HistBinSlider.Value = 16
     End Sub
     Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs) Handles XYReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XYReduction.Tag
-        gOptions.HistBinSlider.Value = 16
+        task.gOptions.HistBinSlider.Value = 16
     End Sub
     Private Sub XZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XZReduction.Tag
-        gOptions.HistBinSlider.Value = 16
+        task.gOptions.HistBinSlider.Value = 16
     End Sub
     Private Sub YZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = YZReduction.Tag
-        gOptions.HistBinSlider.Value = 16
+        task.gOptions.HistBinSlider.Value = 16
     End Sub
     Public Sub XYZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XYZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XYZReduction.Tag
-        gOptions.HistBinSlider.Value = 6
+        task.gOptions.HistBinSlider.Value = 6
     End Sub
 
 
@@ -293,8 +293,8 @@ Public Class OptionsRedCloud
 
 
     Private Sub DisplayCellStats_CheckedChanged(sender As Object, e As EventArgs) Handles DisplayCellStats.CheckedChanged
-        gOptions.displayDst1.Checked = DisplayCellStats.Checked
-        redOptions.IdentifyCells.Checked = True
+        task.gOptions.displayDst1.Checked = DisplayCellStats.Checked
+        task.redOptions.IdentifyCells.Checked = True
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
     Private Sub IdentifyCells_CheckedChanged(sender As Object, e As EventArgs) Handles IdentifyCells.CheckedChanged

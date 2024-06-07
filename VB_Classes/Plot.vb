@@ -143,7 +143,7 @@ Public Class Plot_Histogram2D : Inherits VB_Parent
             options.RunVB()
             src = options.dst2
             Dim bins = task.histogramBins
-            cv.Cv2.CalcHist({src}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, redOptions.rangesBGR)
+            cv.Cv2.CalcHist({src}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, task.redOptions.rangesBGR)
         End If
 
         dst2 = histogram.Resize(dst2.Size, 0, 0, cv.InterpolationFlags.Nearest)
@@ -259,17 +259,17 @@ Public Class Plot_OverTime : Inherits VB_Parent
         desc = "Plot an input variable over time"
         Select Case task.workingRes.Width
             Case 1920
-                gOptions.LineWidth.Value = 10
+                task.gOptions.LineWidth.Value = 10
             Case 1280
-                gOptions.LineWidth.Value = 7
+                task.gOptions.LineWidth.Value = 7
             Case 640
-                gOptions.LineWidth.Value = 4
+                task.gOptions.LineWidth.Value = 4
             Case 320
-                gOptions.LineWidth.Value = 2
+                task.gOptions.LineWidth.Value = 2
             Case Else
-                gOptions.LineWidth.Value = 1
+                task.gOptions.LineWidth.Value = 1
         End Select
-        gOptions.dotSizeSlider.Value = gOptions.LineWidth.Value
+        task.gOptions.dotSizeSlider.Value = task.gOptions.LineWidth.Value
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Const plotSeriesCount = 100
@@ -354,8 +354,8 @@ Public Class Plot_OverTimeFixedScale : Inherits VB_Parent
     Public Sub New()
         plotOutput = New cv.Mat(New cv.Size(320, 180), cv.MatType.CV_8UC3, 0)
         desc = "Plot an input variable over time"
-        gOptions.LineWidth.Value = 1
-        gOptions.dotSizeSlider.Value = 2
+        task.gOptions.LineWidth.Value = 1
+        task.gOptions.dotSizeSlider.Value = 2
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Const plotSeriesCount = 100

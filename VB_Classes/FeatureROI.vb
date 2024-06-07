@@ -7,7 +7,7 @@ Public Class FeatureROI_Basics : Inherits VB_Parent
     Public stdevList As New List(Of Single)
     Public stdevAverage As Single
     Public Sub New()
-        gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+        task.gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
     End Sub
@@ -56,7 +56,7 @@ Public Class FeatureROI_Color : Inherits VB_Parent
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         FindSlider("Add Weighted %").Value = 70
-        gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+        task.gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
     End Sub
@@ -100,7 +100,7 @@ Public Class FeatureROI_Canny : Inherits VB_Parent
     Dim canny As New Edge_Canny
     Dim devGrid As New FeatureROI_Basics
     Public Sub New()
-        gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+        task.gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         desc = "Create the stdev grid with the input image, then create the stdev grid for the canny output, then combine them."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -130,7 +130,7 @@ Public Class FeatureROI_Sorted : Inherits VB_Parent
     Public maskVal As Integer = 255
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+        task.gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         If standalone = False Then maskVal = 1
         labels(2) = "Use the AddWeighted slider to observe where stdev is above average."
         desc = "Sort the roi's by the sum of their bgr stdev's to find the least volatile regions"
@@ -207,7 +207,7 @@ Public Class FeatureROI_ColorSplit : Inherits VB_Parent
     Dim devGrid As New FeatureROI_Sorted
     Public Sub New()
         devGrid.maskVal = 255
-        gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+        task.gOptions.GridSize.Value = dst2.Width / 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         desc = "Split each roi into one of 9 categories - black, white, gray, yellow, purple, teal, blue, green, or red - based on the stdev for the roi"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -387,10 +387,10 @@ Public Class FeatureROI_LRClick : Inherits VB_Parent
     Dim clickPoint As cv.Point, picTag As Integer
     Dim options As New Options_Features
     Public Sub New()
-        gOptions.GridSize.Value = 16
+        task.gOptions.GridSize.Value = 16
         FindSlider("Feature Correlation Threshold").Value = 80
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst0.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels(2) = "Click the above average stdev roi's (the darker regions) to find corresponding roi in the right image."
         desc = "Capture the above average standard deviation roi's for the left and right images."
     End Sub
@@ -468,7 +468,7 @@ Public Class FeatureROI_LRAll : Inherits VB_Parent
     Dim options As New Options_Features
     Public sortedRects As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
     Public Sub New()
-        gOptions.GridSize.Value = 16
+        task.gOptions.GridSize.Value = 16
         FindSlider("Feature Correlation Threshold").Value = 95
         labels(3) = "The highlighted roi's are those high stdev roi's with the highest correlation between left and right images."
         desc = "Find all the roi's with high stdev and high correlation between left and right images."

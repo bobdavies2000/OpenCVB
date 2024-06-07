@@ -182,7 +182,7 @@ Public Class Motion_PixelDiff : Inherits VB_Parent
 
         Static lastFrame As cv.Mat = src
         cv.Cv2.Absdiff(src, lastFrame, dst2)
-        dst2 = dst2.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst2.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         changedPixels = dst2.CountNonZero
         task.motionFlag = changedPixels > 0
 
@@ -211,7 +211,7 @@ End Class
 Public Class Motion_DepthReconstructed : Inherits VB_Parent
     Public motion As New Motion_Basics
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
         labels(2) = "The yellow rectangle indicates where the motion is and only that portion of the point cloud and depth mask is updated."
         desc = "Rebuild the point cloud based on the BGR motion history."
@@ -346,7 +346,7 @@ Public Class Motion_Intersect : Inherits VB_Parent
     Dim minCount = 4
     Dim reconstructedRGB As Integer
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         If dst2.Width = 1280 Or dst2.Width = 640 Then minCount = 16
         desc = "Track the max rectangle that covers all the motion until there is no motion in it."
@@ -486,7 +486,7 @@ Public Class Motion_HistoryTest : Inherits VB_Parent
     Dim diff As New Diff_Basics
     Dim frames As New History_Basics
     Public Sub New()
-        gOptions.PixelDiffThreshold.Value = 10
+        task.gOptions.pixelDiffThreshold = 10
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Detect motion using the last X images"
     End Sub
@@ -513,7 +513,7 @@ Public Class Motion_History : Inherits VB_Parent
     Public motionCore As New Motion_Simple
     Dim frames As New History_Basics
     Public Sub New()
-        gOptions.FrameHistory.Value = 10
+        task.gOptions.FrameHistory.Value = 10
         desc = "Accumulate differences from the previous BGR images."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -639,7 +639,7 @@ Public Class Motion_Basics_QT : Inherits VB_Parent
     Public bgSub As New BGSubtract_MOG2
     Dim rectList As New List(Of cv.Rect)
     Public Sub New()
-        redOptions.IdentifyCells.Checked = False
+        task.redOptions.IdentifyCells.Checked = False
         desc = "The option-free version of Motion_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -841,7 +841,7 @@ Public Class Motion_Diff : Inherits VB_Parent
         End If
 
         cv.Cv2.Absdiff(src, dst1, dst3)
-        dst2 = dst3.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 

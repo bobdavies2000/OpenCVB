@@ -42,7 +42,7 @@ End Class
 Public Class HeatMap_Grid : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Public Sub New()
-        gOptions.GridSize.Value = 5
+        task.gOptions.GridSize.Value = 5
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "", "Histogram mask for top-down view - original histogram in dst0", "Histogram mask for side view - original histogram in dst1"}
@@ -57,7 +57,7 @@ Public Class HeatMap_Grid : Inherits VB_Parent
         dst3.SetTo(0)
         Dim maxCount1 As Integer, maxCount2 As Integer
         Dim sync1 As New Object, sync2 As New Object
-        If gOptions.UseMultiThreading.Checked Then
+        If task.gOptions.UseMultiThreading.Checked Then
             Parallel.ForEach(task.gridList,
             Sub(roi)
                 Dim count1 = heat.histogramTop(roi).CountNonZero
@@ -110,8 +110,8 @@ Public Class HeatMap_HotNot : Inherits VB_Parent
         heat.Run(src)
         dst0 = heat.dst2.ConvertScaleAbs
         dst1 = heat.dst3.ConvertScaleAbs
-        dst2 = dst0.Threshold(redOptions.ProjectionThreshold.Value, 255, cv.ThresholdTypes.Binary)
-        dst3 = dst1.Threshold(redOptions.ProjectionThreshold.Value, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst0.Threshold(task.redOptions.ProjectionThreshold.Value, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst1.Threshold(task.redOptions.ProjectionThreshold.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -152,8 +152,8 @@ Public Class HeatMap_Cell : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Dim heat As New HeatMap_Hot
     Public Sub New()
-        redOptions.IdentifyCells.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        task.redOptions.IdentifyCells.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Display the heat map for the selected cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -183,7 +183,7 @@ End Class
 Public Class HeatMap_GuidedBP : Inherits VB_Parent
     Dim guided As New GuidedBP_Basics
     Public Sub New()
-        redOptions.ProjectionThreshold.Value = 1
+        task.redOptions.ProjectionThreshold.Value = 1
         desc = "This is just a placeholder to make it easy to find the GuidedBP_Basics which shows objects in top/side views."
     End Sub
     Public Sub RunVB(src As cv.Mat)

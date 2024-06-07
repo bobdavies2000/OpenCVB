@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Imports System.Threading
 Public Class ML_Basics : Inherits VB_Parent
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels = {"", "depth32f - 32fc3 format with missing depth filled with predicted depth based on color (brighter is farther)", "", "Color used for roi prediction"}
         desc = "Predict depth from color to fill in the depth shadow areas"
     End Sub
@@ -158,8 +158,8 @@ Public Class ML_FillRGBDepth_MT : Inherits VB_Parent
     Dim shadow As New Depth_Holes
     Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
-        gOptions.GridSize.Maximum = dst2.Cols / 2
-        gOptions.GridSize.Value = dst2.Cols / 2
+        task.gOptions.GridSize.Maximum = dst2.Cols / 2
+        task.gOptions.GridSize.Value = dst2.Cols / 2
 
         labels = {"", "", "ML filled shadow", ""}
         desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
@@ -339,13 +339,13 @@ Public Class ML_Color2Depth : Inherits VB_Parent
     Dim minMax As New Grid_MinMaxDepth
     Dim colorClass As New Color8U_Basics
     Public Sub New()
-        redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
+        task.redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         desc = "Prepare a grid of color and depth data."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         colorClass.Run(src)
         dst2 = colorClass.dst3
-        labels(2) = "Output of Color8U_Basics running " + redOptions.colorInputName
+        labels(2) = "Output of Color8U_Basics running " + task.redOptions.colorInputName
 
         Dim rtree = cv.ML.RTrees.Create()
         Dim mlInput As New List(Of mlColor)
@@ -406,13 +406,13 @@ Public Class ML_ColorInTier2Depth : Inherits VB_Parent
     Dim colorClass As New Color8U_Basics
     Dim tiers As New Contour_DepthTiers
     Public Sub New()
-        redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
+        task.redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         desc = "Prepare a grid of color and depth data."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         colorClass.Run(src)
         dst2 = colorClass.dst3
-        labels(2) = "Output of Color8U_Basics running " + redOptions.colorInputName
+        labels(2) = "Output of Color8U_Basics running " + task.redOptions.colorInputName
 
         Dim rtree = cv.ML.RTrees.Create()
         Dim mlInput As New List(Of mlColorInTier)

@@ -5,7 +5,7 @@ Public Class Cell_Basics : Inherits VB_Parent
     Dim eq As New Plane_Equation
     Public runRedCloud As Boolean
     Public Sub New()
-        If standaloneTest() Then gOptions.HistBinSlider.Value = 20
+        If standaloneTest() Then task.gOptions.HistBinSlider.Value = 20
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString()
@@ -83,7 +83,7 @@ End Class
 Public Class Cell_PixelCountCompare : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        gOptions.DebugCheckBox.Checked = True
+        task.gOptions.DebugCheckBox.Checked = True
         desc = "The rc.mask is filled and may completely contain depth pixels.  This alg finds cells that contain depth islands."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -98,12 +98,12 @@ Public Class Cell_PixelCountCompare : Inherits VB_Parent
                 If rc.pixels <> rc.depthPixels Then
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
                     Dim pt = New cv.Point(rc.maxDist.X - 10, rc.maxDist.Y)
-                    If gOptions.DebugCheckBox.Checked Then
+                    If task.gOptions.DebugCheckBox.Checked Then
                         strOut = CStr(rc.pixels) + "/" + CStr(rc.depthPixels)
                     Else
                         strOut = Format(rc.depthPixels / rc.pixels, "0%")
                     End If
-                    If missCount < redOptions.identifyCount Then setTrueText(strOut, pt, 3)
+                    If missCount < task.redOptions.identifyCount Then setTrueText(strOut, pt, 3)
                     missCount += 1
                 End If
             End If
@@ -169,8 +169,8 @@ End Class
 Public Class Cell_Distance : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst0.Checked = True
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels = {"", "Depth distance to selected cell", "", "Color distance to selected cell"}
@@ -213,8 +213,8 @@ End Class
 Public Class Cell_Binarize : Inherits VB_Parent
     Public redC As New RedCloud_Basics
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst0.Checked = True
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels = {"", "Binarized image", "", "Relative gray image"}
@@ -281,9 +281,9 @@ Public Class Cell_BasicsPlot : Inherits VB_Parent
     Public runRedCloud As Boolean
     Dim stats As New Cell_Basics
     Public Sub New()
-        redOptions.IdentifyCells.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
-        If standalone Then gOptions.HistBinSlider.Value = 20
+        task.redOptions.IdentifyCells.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.HistBinSlider.Value = 20
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString(src As cv.Mat)

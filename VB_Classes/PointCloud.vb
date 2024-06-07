@@ -149,7 +149,7 @@ Public Class PointCloud_Spin : Inherits VB_Parent
             check.Box(2).Checked = True
         End If
 
-        gOptions.gravityPointCloud.Checked = False
+        task.gOptions.gravityPointCloud.Checked = False
         desc = "Spin the point cloud exercise"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -289,7 +289,7 @@ Public Class PointCloud_SetupSide : Inherits VB_Parent
         Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
 
         Dim offset = Math.Sin(task.accRadians.X) * marker.Y
-        If gOptions.gravityPointCloud.Checked Then
+        If task.gOptions.gravityPointCloud.Checked Then
             If task.accRadians.X > 0 Then
                 markerLeft.Y = markerLeft.Y - offset
                 markerRight.Y = markerRight.Y + offset
@@ -369,7 +369,7 @@ Public Class PointCloud_SetupTop : Inherits VB_Parent
 
         Static zRotateSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)")
         Dim offset = Math.Sin(task.accRadians.Z) * topLen
-        If gOptions.gravityPointCloud.Checked Then
+        If task.gOptions.gravityPointCloud.Checked Then
             If task.accRadians.Z > 0 Then
                 markerLeft.X = markerLeft.X - offset
                 markerRight.X = markerRight.X + offset
@@ -842,7 +842,7 @@ Public Class PointCloud_FrustrumTop : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Dim setupTop As New PointCloud_SetupTop
     Public Sub New()
-        gOptions.gravityPointCloud.Checked = False
+        task.gOptions.gravityPointCloud.Checked = False
         findCheckBox("Top View (Unchecked Side View)").Checked = True
         labels(3) = "Draw the frustrum from the top view"
         desc = "Draw the top view of the frustrum"
@@ -869,7 +869,7 @@ Public Class PointCloud_FrustrumSide : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Dim setupSide As New PointCloud_SetupSide
     Public Sub New()
-        gOptions.gravityPointCloud.Checked = False
+        task.gOptions.gravityPointCloud.Checked = False
         findCheckBox("Top View (Unchecked Side View)").Checked = False
         labels(2) = "Draw the frustrum from the side view"
         desc = "Draw the side view of the frustrum"
@@ -897,18 +897,18 @@ Public Class PointCloud_Histograms : Inherits VB_Parent
     Dim grid As New Grid_Basics
     Public histogram As New cv.Mat
     Public Sub New()
-        gOptions.HistBinSlider.Value = 9
-        redOptions.XYReduction.Checked = True
+        task.gOptions.HistBinSlider.Value = 9
+        task.redOptions.XYReduction.Checked = True
         labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}
         desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        redOptions.Sync() ' make sure settings are consistent
+        task.redOptions.Sync() ' make sure settings are consistent
 
-        cv.Cv2.CalcHist({task.pointCloud}, redOptions.channels, New cv.Mat(), histogram, redOptions.channelCount,
-                        redOptions.histBinList, redOptions.ranges)
+        cv.Cv2.CalcHist({task.pointCloud}, task.redOptions.channels, New cv.Mat(), histogram, task.redOptions.channelCount,
+                        task.redOptions.histBinList, task.redOptions.ranges)
 
-        Select Case redOptions.PCReduction
+        Select Case task.redOptions.PCReduction
             Case 0, 1, 2 ' "X Reduction", "Y Reduction", "Z Reduction"
                 plot.Run(histogram)
                 dst2 = plot.histogram
@@ -926,14 +926,14 @@ Public Class PointCloud_Histograms : Inherits VB_Parent
                 Dim histData(histogram.Total - 1) As Single
                 Marshal.Copy(histogram.Data, histData, 0, histData.Length)
 
-                If histData.Count > 255 And gOptions.HistBinSlider.Value > 3 Then
-                    gOptions.HistBinSlider.Value -= 1
+                If histData.Count > 255 And task.gOptions.HistBinSlider.Value > 3 Then
+                    task.gOptions.HistBinSlider.Value -= 1
                 End If
-                If histData.Count < 128 And gOptions.HistBinSlider.Value < gOptions.HistBinSlider.Maximum Then
-                    gOptions.HistBinSlider.Value += 1
+                If histData.Count < 128 And task.gOptions.HistBinSlider.Value < task.gOptions.HistBinSlider.Maximum Then
+                    task.gOptions.HistBinSlider.Value += 1
                 End If
-                If task.gridList.Count < histData.Length And gOptions.GridSize.Value > 2 Then
-                    gOptions.GridSize.Value -= 1
+                If task.gridList.Count < histData.Length And task.gOptions.GridSize.Value > 2 Then
+                    task.gOptions.GridSize.Value -= 1
                     grid.Run(src)
                     dst2.SetTo(0)
                 End If

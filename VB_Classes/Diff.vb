@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Diff_Basics : Inherits VB_Parent
     Public changedPixels As Integer
-    Public lastFrame As New cv.Mat
+    Public lastFrame As cv.Mat
     Public Sub New()
         labels = {"", "", "Unstable mask", ""}
         vbAddAdvice(traceName + ": use goption 'Pixel Difference Threshold' to control changed pixels.")
@@ -13,11 +13,11 @@ Public Class Diff_Basics : Inherits VB_Parent
         If task.optionsChanged Or lastFrame.Size <> src.Size Then lastFrame = src.Clone
 
         cv.Cv2.Absdiff(src, lastFrame, dst0)
-        dst2 = dst0.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst0.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         changedPixels = dst2.CountNonZero
         If changedPixels > 0 Then
             lastFrame = src.Clone
-            strOut = "Motion detected - " + CStr(changedPixels) + " pixels changed with threshold " + CStr(gOptions.PixelDiffThreshold.Value)
+            strOut = "Motion detected - " + CStr(changedPixels) + " pixels changed with threshold " + CStr(task.gOptions.pixelDiffThreshold)
             If task.heartBeat Then labels(3) = strOut
         Else
             strOut = "No motion detected"
@@ -144,7 +144,7 @@ Public Class Diff_Heartbeat : Inherits VB_Parent
 
         cv.Cv2.Absdiff(src, dst1, dst3)
         cumulativePixels = dst3.CountNonZero
-        dst2 = dst2 Or dst3.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst2 Or dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 

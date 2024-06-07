@@ -14,8 +14,8 @@ Public Class Hist3Dcolor_Basics : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_8UC3 Then src = task.color
         If task.heartBeat Or alwaysRun Then
-            Dim bins = redOptions.HistBinSlider.Value
-            cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, {bins, bins, bins}, redOptions.rangesBGR)
+            Dim bins = task.redOptions.HistBinSlider.Value
+            cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, {bins, bins, bins}, task.redOptions.rangesBGR)
 
             ReDim histArray(histogram.Total - 1)
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -26,7 +26,7 @@ Public Class Hist3Dcolor_Basics : Inherits VB_Parent
             classCount = simK.classCount
         End If
 
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, redOptions.rangesBGR)
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
         dst3 = ShowPalette(dst2 * 255 / classCount)
 
         labels(2) = simK.labels(2)
@@ -52,7 +52,7 @@ Public Class Hist3Dcolor_UniqueRGBPixels : Inherits VB_Parent
 
         pixels.Clear()
         counts.Clear()
-        Dim bins As Integer = redOptions.HistBinSlider.Value
+        Dim bins As Integer = task.redOptions.HistBinSlider.Value
         For z = 0 To bins - 1
             For y = 0 To bins - 1
                 For x = 0 To bins - 1
@@ -113,8 +113,8 @@ Public Class Hist3Dcolor_Reduction : Inherits VB_Parent
     Dim reduction As New Reduction_BGR
     Public classCount As Integer
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
-        redOptions.SimpleReductionSlider.Value = 45
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        task.redOptions.SimpleReductionSlider.Value = 45
         desc = "Backproject the 3D histogram for RGB after reduction"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -146,9 +146,9 @@ Public Class Hist3Dcolor_ZeroGroups : Inherits VB_Parent
         If src.Channels <> 3 Then src = task.color
 
         If task.optionsChanged Then
-            Dim bins = redOptions.HistBinSlider.Value
+            Dim bins = task.redOptions.HistBinSlider.Value
             Dim hBins() As Integer = {bins, bins, bins}
-            cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, hBins, redOptions.rangesBGR)
+            cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, hBins, task.redOptions.rangesBGR)
 
             Dim histArray(histogram.Total - 1) As Single
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -180,7 +180,7 @@ Public Class Hist3Dcolor_ZeroGroups : Inherits VB_Parent
 
             Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
         End If
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, redOptions.rangesBGR)
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
         dst3 = ShowPalette(dst2 * 255 / classCount)
         labels(2) = "Hist3Dcolor_ZeroGroups classCount = " + CStr(classCount)
     End Sub
@@ -228,7 +228,7 @@ Public Class Hist3Dcolor_Select : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         hColor.Run(src)
 
-        Dim selection = gOptions.DebugSlider.Value
+        Dim selection = task.gOptions.DebugSlider.Value
         dst2 = hColor.dst2.InRange(selection, selection)
         Dim saveCount = dst2.CountNonZero
 
@@ -262,11 +262,11 @@ Public Class Hist3Dcolor_Basics_CPP : Inherits VB_Parent
         Marshal.Copy(src.Data, histInput, 0, histInput.Length)
 
         Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
-        Dim bins = redOptions.HistBinSlider.Value
+        Dim bins = task.redOptions.HistBinSlider.Value
         Dim imagePtr = Hist3Dcolor_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins)
         handleInput.Free()
 
-        histogram = New cv.Mat(redOptions.bins3D, 1, cv.MatType.CV_32F, imagePtr)
+        histogram = New cv.Mat(task.redOptions.bins3D, 1, cv.MatType.CV_32F, imagePtr)
         If prepareImage Then
             Dim histArray(histogram.Total - 1) As Single
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -276,7 +276,7 @@ Public Class Hist3Dcolor_Basics_CPP : Inherits VB_Parent
             histogram = simK.dst2
             classCount = simK.classCount
 
-            cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, redOptions.rangesBGR)
+            cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
 
             Dim mm as mmData = vbMinMax(dst2)
 
@@ -297,7 +297,7 @@ Public Class Hist3Dcolor_Diff : Inherits VB_Parent
     Dim hColor As New Hist3Dcolor_Basics
     Dim diff As New Diff_Basics
     Public Sub New()
-        gOptions.PixelDiffThreshold.Value = 0
+        task.gOptions.pixelDiffThreshold = 0
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Create a mask for the color pixels that are changing with every frame of the Hist3Dcolor_basics."
     End Sub
@@ -326,7 +326,7 @@ Public Class Hist3Dcolor_Vector : Inherits VB_Parent
     Public simK As New Hist3D_BuildHistogram
     Dim binArray() As Integer
     Public Sub New()
-        Dim bins = redOptions.HistBinSlider.Value
+        Dim bins = task.redOptions.HistBinSlider.Value
         binArray = {bins, bins, bins}
         vbAddAdvice(traceName + ": redOptions '3D Histogram Bins'")
         desc = "Capture a 3D color histogram for input src - likely to be src(rect)."
@@ -334,11 +334,11 @@ Public Class Hist3Dcolor_Vector : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 3 Then src = task.color
         If task.optionsChanged Then
-            Dim bins = redOptions.HistBinSlider.Value
+            Dim bins = task.redOptions.HistBinSlider.Value
             binArray = {bins, bins, bins}
         End If
 
-        cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, binArray, redOptions.rangesBGR)
+        cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, binArray, task.redOptions.rangesBGR)
 
         ReDim histArray(histogram.Total - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)

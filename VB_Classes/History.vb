@@ -131,7 +131,7 @@ Public Class History_BasicsDiff : Inherits VB_Parent
     Dim frames As New History_BasicsNoSaturation
     Dim diff As New Diff_Basics
     Public Sub New()
-        gOptions.PixelDiffThreshold.Value = 0
+        task.gOptions.pixelDiffThreshold = 0
         desc = "Find the floodfill trouble spots."
     End Sub
     Public Sub RunVB(src As cv.Mat)

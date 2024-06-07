@@ -18,7 +18,7 @@ Public Class Moments_Basics : Inherits VB_Parent
         Dim m = cv.Cv2.Moments(foreground.dst2, True)
 
         Dim center As cv.Point2f
-        If gOptions.UseKalman.Checked Then
+        If task.gOptions.UseKalman.Checked Then
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
             kalman.Run(src)

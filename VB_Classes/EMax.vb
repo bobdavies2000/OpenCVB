@@ -107,9 +107,9 @@ Public Class EMax_InputClusters : Inherits VB_Parent
     Public eSamples As New List(Of cv.Point2f)
     Public centers As New List(Of cv.Point2f)
     Public Sub New()
-        gOptions.GridSize.Maximum = dst2.Width
-        gOptions.GridSize.Value = dst2.Width / 3
-        gOptions.GridSize.Minimum = 16
+        task.gOptions.GridSize.Maximum = dst2.Width
+        task.gOptions.GridSize.Value = dst2.Width / 3
+        task.gOptions.GridSize.Minimum = 16
         task.grid.Run(dst2)
 
         If sliders.Setup(traceName) Then
@@ -141,7 +141,7 @@ Public Class EMax_InputClusters : Inherits VB_Parent
             Dim roi = task.gridList(i)
             eLabelMat.RowRange(i * samplesPerRegion, (i + 1) * samplesPerRegion).SetTo(i)
             Dim tmp = samples.RowRange(i * samplesPerRegion, (i + 1) * samplesPerRegion)
-            cv.Cv2.Randn(tmp, New cv.Scalar(roi.X + gOptions.GridSize.Value / 2, roi.Y + gOptions.GridSize.Value / 2), cv.Scalar.All(sigma))
+            cv.Cv2.Randn(tmp, New cv.Scalar(roi.X + task.gOptions.GridSize.Value / 2, roi.Y + task.gOptions.GridSize.Value / 2), cv.Scalar.All(sigma))
         Next
 
         samples = samples.Reshape(1, 0)

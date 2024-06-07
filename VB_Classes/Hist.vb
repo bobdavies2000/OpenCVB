@@ -14,7 +14,7 @@ Public Class Hist_Basics : Inherits VB_Parent
     Public removeMax As Boolean
     Public autoDisplay As Boolean
     Public Sub New()
-        If standaloneTest() Then gOptions.HistBinSlider.Value = 255
+        If standaloneTest() Then task.gOptions.HistBinSlider.Value = 255
         desc = "Create a histogram (no Kalman)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -70,7 +70,7 @@ End Class
 Public Class Hist_Grayscale : Inherits VB_Parent
     Public hist As New Hist_Basics
     Public Sub New()
-        If standaloneTest() Then gOptions.HistBinSlider.Value = 255
+        If standaloneTest() Then task.gOptions.HistBinSlider.Value = 255
         desc = "Create a histogram of the grayscale image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -258,8 +258,8 @@ End Class
 Public Class Hist_Frustrum : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
-        gOptions.gravityPointCloud.Checked = False
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+        task.gOptions.gravityPointCloud.Checked = False
         desc = "Options for the side and top view.  See OptionCommon_Histogram to make settings permanent."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -291,7 +291,7 @@ Public Class Hist_PeakMax : Inherits VB_Parent
         labels(3) = "Grayscale Histogram"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        gOptions.UseKalman.Checked = False
+        task.gOptions.UseKalman.Checked = False
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.Run(src)
         dst3 = hist.dst2
@@ -703,7 +703,7 @@ Public Class Hist_CompareNumber : Inherits VB_Parent
     Dim comp As New Hist_CompareGray
     Dim plot As New Plot_OverTimeScalar
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         plot.plotCount = 2
 
         labels = {"", "", "Kalman-smoothed normalized histogram output", "Plot of the sum of the differences between recent normalized histograms"}
@@ -799,8 +799,8 @@ End Class
 Public Class Hist_Lab : Inherits VB_Parent
     Dim hist As New Hist_Basics
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst0.Checked = True
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst0.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels = {"Lab Colors ", "Lab Channel 0", "Lab Channel 1", "Lab Channel 2"}
         desc = "Create a histogram from a BGR image converted to LAB."
     End Sub
@@ -830,7 +830,7 @@ Public Class Hist_PointCloudXYZ : Inherits VB_Parent
     Public plot As New Plot_Histogram
     Public Sub New()
         plot.createHistogram = True
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Histogram of the X channel", "Histogram of the Y channel", "Histogram of the Z channel"}
         desc = "Show individual channel of the point cloud data as a histogram."
     End Sub
@@ -918,7 +918,7 @@ End Class
 Public Class Hist_ShapeSide : Inherits VB_Parent
     Public rc As New rcData
     Public Sub New()
-        gOptions.HistBinSlider.Value = 60
+        task.gOptions.HistBinSlider.Value = 60
         labels = {"", "", "ZY Side View", "ZY Side View Mask"}
         desc = "Create a 2D side view for ZY histogram of depth"
     End Sub
@@ -947,7 +947,7 @@ End Class
 Public Class Hist_ShapeTop : Inherits VB_Parent
     Public rc As New rcData
     Public Sub New()
-        gOptions.HistBinSlider.Value = 60
+        task.gOptions.HistBinSlider.Value = 60
         labels = {"", "", "ZY Side View", "ZY Side View Mask"}
         desc = "Create a 2D top view for XZ histogram of depth"
     End Sub

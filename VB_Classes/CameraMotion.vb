@@ -7,7 +7,7 @@ Public Class CameraMotion_Basics : Inherits VB_Parent
     Public Sub New()
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        gOptions.DebugSlider.Value = 3
+        task.gOptions.DebugSlider.Value = 3
         desc = "Merge with previous image using just translation of the gravity vector and horizon vector (if present)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -18,8 +18,8 @@ Public Class CameraMotion_Basics : Inherits VB_Parent
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        translationX = gOptions.DebugSlider.Value ' Math.Round(gravityVec.p1.X - task.gravityVec.p1.X)
-        translationY = gOptions.DebugSlider.Value ' Math.Round(horizonVec.p1.Y - task.horizonVec.p1.Y)
+        translationX = task.gOptions.DebugSlider.Value ' Math.Round(gravityVec.p1.X - task.gravityVec.p1.X)
+        translationY = task.gOptions.DebugSlider.Value ' Math.Round(horizonVec.p1.Y - task.horizonVec.p1.Y)
         If Math.Abs(translationX) >= dst2.Width / 2 Then translationX = 0
         If horizonVec.p1.Y >= dst2.Height Or horizonVec.p2.Y >= dst2.Height Or Math.Abs(translationY) >= dst2.Height / 2 Then
             horizonVec = New pointPair(New cv.Point2f, New cv.Point2f(336, 0))
@@ -64,7 +64,7 @@ Public Class CameraMotion_Basics : Inherits VB_Parent
                     task.camMotionPixels = 0
                     src.CopyTo(dst2)
                 End If
-                dst3 = (src - dst2).ToMat.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
+                dst3 = (src - dst2).ToMat.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
             End If
         End If
 
@@ -153,7 +153,7 @@ Public Class CameraMotion_WithRotation : Inherits VB_Parent
             rotate.rotateCenter = centerY
             rotate.Run(dst1)
             dst2 = rotate.dst2
-            dst3 = (src - dst2).ToMat.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
+            dst3 = (src - dst2).ToMat.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         Else
             dst2 = src
         End If

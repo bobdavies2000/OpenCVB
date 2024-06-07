@@ -348,7 +348,7 @@ Public Class Stabilizer_CornerPoints : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         Static ul As cv.Rect, ur As cv.Rect, ll As cv.Rect, lr As cv.Rect
         If task.optionsChanged Then
-            Dim size = gOptions.GridSize.Value
+            Dim size = task.gOptions.GridSize.Value
             ul = New cv.Rect(0, 0, size, size)
             ur = New cv.Rect(dst2.Width - size, 0, size, size)
             ll = New cv.Rect(0, dst2.Height - size, size, size)

@@ -386,8 +386,8 @@ Public Class VBtask : Implements IDisposable
         imuStabilityTest = New Stabilizer_VerticalIMU
 
         updateSettings()
-        redOptions.Show()
-        gOptions.Show()
+        task.redOptions.Show()
+        task.gOptions.Show()
         palette = New Palette_LoadColorMap
         If algName.StartsWith("OpenGL_") Or algName.EndsWith("_OpenGL") Or algName.StartsWith("Model_") Then
             ogl = New OpenGL_Basics
@@ -487,7 +487,7 @@ Public Class VBtask : Implements IDisposable
             End If
             If task.useRecordedData Then recordedData.Run(task.color.Clone)
 
-            redOptions.Sync()
+            task.redOptions.Sync()
 
             task.bins2D = {task.workingRes.Height, task.workingRes.Width}
             Dim src = task.color
@@ -505,7 +505,7 @@ Public Class VBtask : Implements IDisposable
             ' run any universal algorithms here
             task.IMU_RawAcceleration = task.IMU_Acceleration
             task.IMU_RawAngularVelocity = task.IMU_AngularVelocity
-            task.IMU_AlphaFilter = gOptions.IMU_Alpha.Value / 100
+            task.IMU_AlphaFilter = task.gOptions.imu_Alpha
             grid.RunVB(task.color)
 
             If task.algName.StartsWith("CPP_") = False Then task.motionFlag = True
@@ -516,7 +516,7 @@ Public Class VBtask : Implements IDisposable
             IMUBasics.RunVB(src)
             gMat.RunVB(src)
 
-            If gOptions.CreateGif.Checked Then
+            If task.gOptions.CreateGif.Checked Then
                 heartBeat = False
                 task.optionsChanged = False
             Else
@@ -524,9 +524,9 @@ Public Class VBtask : Implements IDisposable
             End If
 
             If task.paused = False Then
-                task.frameHistoryCount = gOptions.FrameHistory.Value
+                task.frameHistoryCount = task.gOptions.FrameHistory.Value
 
-                If gOptions.gravityPointCloud.Checked Then
+                If task.gOptions.gravityPointCloud.Checked Then
                     '******* this is the rotation *******
                     task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).ToMat.Reshape(3, src.Rows)
                 End If
@@ -536,31 +536,31 @@ Public Class VBtask : Implements IDisposable
 
 
 
-                gOptions.unFiltered.Checked = True ' until the motion rectangle problems are resolved.
+                task.gOptions.unFiltered.Checked = True ' until the motion rectangle problems are resolved.
 
 
 
 
                 ' on each heartbeat or when options changed, update the whole image.
-                If task.heartBeat Or gOptions.unFiltered.Checked Then
+                If task.heartBeat Or task.gOptions.unFiltered.Checked Then
                     task.motionDetected = True
                     task.motionRect = New cv.Rect(0, 0, src.Width, src.Height)
                     'motionColor.dst2 = src.Clone
                     'motionCloud.dst2 = task.pointCloud.Clone
                 Else
                     'motionBasics.RunVB(src) ' get the latest motionRect
-                    'If gOptions.UseHistoryCloud.Checked Then
+                    'If task.gOptions.UseHistoryCloud.Checked Then
                     '    hCloud.RunVB(task.pointCloud)
                     '    task.pointCloud = hCloud.dst2
-                    'ElseIf gOptions.MotionFilteredColorAndCloud.Checked Then
+                    'ElseIf task.gOptions.MotionFilteredColorAndCloud.Checked Then
                     '    motionColor.RunVB(src)
                     '    task.color = motionColor.dst2.Clone
                     '    motionCloud.RunVB(task.pointCloud)
                     '    task.pointCloud = motionCloud.dst2.Clone
-                    'ElseIf gOptions.MotionFilteredCloudOnly.Checked Then
+                    'ElseIf task.gOptions.MotionFilteredCloudOnly.Checked Then
                     '    motionCloud.RunVB(task.pointCloud)
                     '    task.pointCloud = motionCloud.dst2.Clone
-                    'ElseIf gOptions.MotionFilteredColorOnly.Checked Then
+                    'ElseIf task.gOptions.MotionFilteredColorOnly.Checked Then
                     '    motionColor.RunVB(src)
                     '    task.color = motionColor.dst2.Clone
                     'End If
@@ -594,7 +594,7 @@ Public Class VBtask : Implements IDisposable
 
             TaskTimer.Enabled = True
 
-            If gOptions.CreateGif.Checked Then
+            If task.gOptions.CreateGif.Checked Then
                 If task.gifCreator Is Nothing Then task.gifCreator = New Gif_OpenCVB
                 gifCreator.RunVB(src)
                 If task.gifBuild Then
@@ -623,8 +623,8 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            If gOptions.RGBFilterActive.Checked Then
-                Dim filterName = gOptions.RGBFilterList.Text
+            If task.gOptions.RGBFilterActive.Checked Then
+                Dim filterName = task.gOptions.RGBFilterList.Text
                 If rgbFilter Is Nothing Then rgbFilter = algoList.createVBAlgorithm(filterName)
                 If rgbFilter.traceName <> filterName Then rgbFilter = algoList.createVBAlgorithm(filterName)
                 rgbFilter.RunVB(src)
@@ -640,7 +640,14 @@ Public Class VBtask : Implements IDisposable
             If task.algName.StartsWith("CSharp_") Then
                 algorithmObjectCS.trueData.clear()
                 algorithmObjectCS.RunCS(src.Clone)
-                algorithmObjectCS.processFrame(src.Clone)
+
+                task.labels = labels
+
+                dst0 = algorithmObjectCS.dst0
+                dst1 = algorithmObjectCS.dst1
+                dst2 = algorithmObjectCS.dst2
+                dst3 = algorithmObjectCS.dst3
+
                 For Each ttxt In algorithmObjectCS.trueData
                     task.trueData.Add(ttxt)
                 Next
@@ -667,8 +674,8 @@ Public Class VBtask : Implements IDisposable
                     task.dst2 = task.intermediateObject.dst2
                     task.dst3 = task.intermediateObject.dst3
                 Else
-                    task.dst0 = If(gOptions.displayDst0.Checked, dst0, task.color)
-                    task.dst1 = If(gOptions.displayDst1.Checked, dst1, task.depthRGB)
+                    task.dst0 = If(task.gOptions.displayDst0.Checked, dst0, task.color)
+                    task.dst1 = If(task.gOptions.displayDst1.Checked, dst1, task.depthRGB)
                     task.dst2 = dst2
                     task.dst3 = dst3
                 End If
@@ -682,15 +689,15 @@ Public Class VBtask : Implements IDisposable
             task.intermediateObject = obj
             If task.algName.StartsWith("CSharp") = False Then task.trueData = New List(Of trueText)(trueData)
             If obj IsNot Nothing Then
-                If gOptions.displayDst0.Checked Then task.dst0 = MakeSureImage8uC3(obj.dst0) Else task.dst0 = task.color
-                If gOptions.displayDst1.Checked Then task.dst1 = MakeSureImage8uC3(obj.dst1) Else task.dst1 = task.depthRGB
+                If task.gOptions.displayDst0.Checked Then task.dst0 = MakeSureImage8uC3(obj.dst0) Else task.dst0 = task.color
+                If task.gOptions.displayDst1.Checked Then task.dst1 = MakeSureImage8uC3(obj.dst1) Else task.dst1 = task.depthRGB
                 task.dst2 = If(obj.dst2.Type = cv.MatType.CV_8UC3, obj.dst2, MakeSureImage8uC3(obj.dst2))
                 task.dst3 = If(obj.dst3.Type = cv.MatType.CV_8UC3, obj.dst3, MakeSureImage8uC3(obj.dst3))
                 task.labels = obj.labels
                 If task.algName.StartsWith("CSharp") = False Then task.trueData = New List(Of trueText)(obj.trueData)
             Else
-                If gOptions.displayDst0.Checked Then task.dst0 = MakeSureImage8uC3(dst0) Else task.dst0 = task.color
-                If gOptions.displayDst1.Checked Then task.dst1 = MakeSureImage8uC3(dst1) Else task.dst1 = task.depthRGB
+                If task.gOptions.displayDst0.Checked Then task.dst0 = MakeSureImage8uC3(dst0) Else task.dst0 = task.color
+                If task.gOptions.displayDst1.Checked Then task.dst1 = MakeSureImage8uC3(dst1) Else task.dst1 = task.depthRGB
                 task.dst2 = MakeSureImage8uC3(dst2)
                 task.dst3 = MakeSureImage8uC3(dst3)
             End If
@@ -698,7 +705,7 @@ Public Class VBtask : Implements IDisposable
             If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()
 
             If task.dst2.Width = task.workingRes.Width And task.dst2.Height = task.workingRes.Height Then
-                If gOptions.ShowGrid.Checked Then task.dst2.SetTo(cv.Scalar.White, task.gridMask)
+                If task.gOptions.ShowGrid.Checked Then task.dst2.SetTo(cv.Scalar.White, task.gridMask)
                 If task.dst2.Width <> task.workingRes.Width Or task.dst2.Height <> task.workingRes.Height Then
                     task.dst2 = task.dst2.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
                 End If
@@ -710,13 +717,13 @@ Public Class VBtask : Implements IDisposable
             Dim rc = task.rc
             If task.redCells.Count > 0 Then setSelectedContour()
 
-            If redOptions.IdentifyCells.Checked Then
+            If task.redOptions.IdentifyCells.Checked Then
                 Dim ptNew As New cv.Point
                 Dim ptCells As New List(Of cv.Point)
                 For i = 1 To redCells.Count - 1
                     Dim rcx = redCells(i)
                     If ptCells.Contains(rcx.maxDStable) = False Then
-                        If rcx.maxDStable <> ptNew And rcx.index <= redOptions.identifyCount Then
+                        If rcx.maxDStable <> ptNew And rcx.index <= task.redOptions.identifyCount Then
                             Dim str As New trueText(CStr(rcx.index), rcx.maxDStable, 2)
                             trueData.Add(str)
                         End If
@@ -729,7 +736,7 @@ Public Class VBtask : Implements IDisposable
                     task.color(rc.rect).SetTo(cv.Scalar.White, rc.mask)
 
                     task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-                    If redOptions.DisplayCellStats.Checked Then
+                    If task.redOptions.DisplayCellStats.Checked Then
                         dst3.SetTo(0)
                         If task.clickPoint = New cv.Point Then
                             If task.redCells.Count > 1 Then
@@ -746,18 +753,18 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            If redOptions.DisplayCellStats.Checked And task.clickPoint = New cv.Point Then
+            If task.redOptions.DisplayCellStats.Checked And task.clickPoint = New cv.Point Then
                 If task.redCells.Count > 1 Then
                     task.rc = task.redCells(1)
                     task.clickPoint = task.rc.maxDist
                 End If
             End If
 
-            If task.motionDetected And gOptions.ShowMotionRectangle.Checked Then
+            If task.motionDetected And task.gOptions.ShowMotionRectangle.Checked Then
                 task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
             End If
 
-            If gOptions.CrossHairs.Checked Then
+            If task.gOptions.CrossHairs.Checked Then
                 If task.paused = False Then
                     drawLine(task.color, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
                     drawLine(task.color, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White)

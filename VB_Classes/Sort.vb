@@ -98,9 +98,9 @@ Public Class Sort_1Channel : Inherits VB_Parent
     Public rangeStart As New List(Of Integer)
     Public rangeEnd As New List(Of Integer)
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         findRadio("Sort all pixels descending").Checked = True
-        If standaloneTest() Then gOptions.GridSize.Value = 10
+        If standaloneTest() Then task.gOptions.GridSize.Value = 10
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels = {"", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates"}
         desc = "Take some 1-channel input, sort it, and provide the list of unique elements"
@@ -117,7 +117,7 @@ Public Class Sort_1Channel : Inherits VB_Parent
 
         Dim pixelsPerBlock = CInt(dst3.Total / dst2.Rows)
         Dim sq = Math.Sqrt(pixelsPerBlock)
-        gOptions.GridSize.Value = CInt(Math.Min(sq, 10))
+        task.gOptions.GridSize.Value = CInt(Math.Min(sq, 10))
 
         dst0 = sort.dst2.Reshape(1, dst2.Rows)
 
@@ -157,7 +157,7 @@ Public Class Sort_3Channel : Inherits VB_Parent
     Dim sort As New Sort_Basics
     Dim dups As New ML_RemoveDups_CPP
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         findRadio("Sort all pixels descending").Checked = True
         labels = {"", "The BGRA input to sort - shown here as 1-channel CV_32S format", "Output of sort - no duplicates", "Input before removing the dups - use slider to increase/decrease the amount of data"}
         desc = "Take some 3-channel input, convert it to BGRA, sort it as integers, and provide the list of unique elements"
@@ -195,8 +195,8 @@ Public Class Sort_FeatureLess : Inherits VB_Parent
     Dim plot As New Plot_Histogram
     Public Sub New()
         plot.createHistogram = True
-        gOptions.HistBinSlider.Value = 256
-        gOptions.GridSize.Value = 8
+        task.gOptions.HistBinSlider.Value = 256
+        task.gOptions.GridSize.Value = 8
         desc = "Sort all the featureless grayscale pixels."
     End Sub
     Public Sub RunVB(src As cv.Mat)

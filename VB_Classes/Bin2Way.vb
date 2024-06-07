@@ -4,13 +4,13 @@ Public Class Bin2Way_Basics : Inherits VB_Parent
     Public mats As New Mat_4Click
     Public fraction As Single = dst2.Total / 2
     Public Sub New()
-        gOptions.HistBinSlider.Value = 256
+        task.gOptions.HistBinSlider.Value = 256
         labels = {"", "", "Image separated into 2 segments from darkest and lightest", "Histogram Of grayscale image"}
         desc = "Split an image into 2 parts - darkest and lightest,"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static halfSplit As Integer
-        Dim bins = gOptions.HistBinSlider.Value
+        Dim bins = task.gOptions.HistBinSlider.Value
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.Run(src)
         dst3 = hist.dst2

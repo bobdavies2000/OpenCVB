@@ -37,7 +37,7 @@ Public Class Photon_Test : Inherits VB_Parent
     Dim counts(4 - 1) As List(Of Integer)
     Dim mats As New Mat_4to1
     Public Sub New()
-        If standaloneTest() Then gOptions.displayDst1.Checked = True
+        If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         For i = 0 To counts.Count - 1
             counts(i) = New List(Of Integer)
         Next
@@ -45,7 +45,7 @@ Public Class Photon_Test : Inherits VB_Parent
         desc = ""
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        redOptions.SimpleReductionSlider.Value = 64 ' for now...
+        task.redOptions.SimpleReductionSlider.Value = 64 ' for now...
         Dim reduce = 64
 
         reduction.Run(src)

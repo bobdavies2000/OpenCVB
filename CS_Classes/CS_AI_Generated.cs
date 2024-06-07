@@ -822,58 +822,60 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 
-    //public class CSharp_Diff_Basics : CS_Parent
-    //{
-    //    public int changedPixels;
-    //    public Mat lastFrame = new Mat();
+    public class CSharp_Diff_Basics : CS_Parent
+    {
+        public int changedPixels;
+        public Mat lastFrame;
 
-    //    public CSharp_Diff_Basics(VBtask task) : base(task)
-    //    {
-    //        labels = new string[] { "", "", "Unstable mask", "" };
-    //        //vbAddAdvice(traceName + ": use goption 'Pixel Difference Threshold' to control changed pixels.");
-    //        desc = "Capture an image and compare it to previous frame using absDiff and threshold";
-    //    }
+        public CSharp_Diff_Basics(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Unstable mask", "" };
+            //vbAddAdvice(traceName + ": use goption 'Pixel Difference Threshold' to control changed pixels.");
+            desc = "Capture an image and compare it to previous frame using absDiff and threshold";
+        }
 
-    //    public void RunCS(Mat src)
-    //    {
-    //        if (src.Channels() != 1)
-    //            src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 1)
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
-    //        if (firstPass)
-    //            lastFrame = src.Clone();
+            if (firstPass)
+                lastFrame = src.Clone();
 
-    //        if (task.optionsChanged || lastFrame.Size() != src.Size())
-    //            lastFrame = src.Clone();
+            if (task.optionsChanged || lastFrame.Size() != src.Size())
+                lastFrame = src.Clone();
 
-    //        Cv2.Absdiff(src, lastFrame, dst0);
-    //        dst2 = dst0.Threshold(gOptions.PixelDiffThreshold.Value, 255, ThresholdTypes.Binary);
-    //        changedPixels = dst2.CountNonZero();
+            Cv2.Absdiff(src, lastFrame, dst0);
+            dst2 = dst0.Threshold(task.gOptions.pixelDiffThreshold, 255, ThresholdTypes.Binary);
+            changedPixels = dst2.CountNonZero();
 
-    //        if (changedPixels > 0)
-    //        {
-    //            lastFrame = src.Clone();
-    //            strOut = "Motion detected - " + changedPixels.ToString() + " pixels changed with threshold " + gOptions.PixelDiffThreshold.Value.ToString();
-    //            if (task.heartBeat)
-    //                labels[3] = strOut;
-    //        }
-    //        else
-    //        {
-    //            strOut = "No motion detected";
-    //        }
+            if (changedPixels > 0)
+            {
+                lastFrame = src.Clone();
+                int pixelD = task.gOptions.pixelDiffThreshold;
+                strOut = "Motion detected - " + changedPixels.ToString() + " pixels changed with threshold " + pixelD.ToString();
+                if (task.heartBeat)
+                    labels[3] = strOut;
+            }
+            else
+            {
+                strOut = "No motion detected";
+            }
 
-    //        setTrueText(strOut, 3);
-    //    }
-    //}
+            setTrueText(strOut, 3);
+        }
+    }
 
 
 
     public class CSharp_AsciiArt_Diff : CS_Parent
     {
         private CSharp_AsciiArt_Color colorAA;
-        private Diff_Basics diff = new Diff_Basics();
+        private CSharp_Diff_Basics diff;
 
         public CSharp_AsciiArt_Diff(VBtask task) : base(task)
         {
+            diff = new CSharp_Diff_Basics(task);
             colorAA = new CSharp_AsciiArt_Color(task);
             desc = "Display the instability in image pixels.";
         }
@@ -883,7 +885,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             colorAA.RunCS(src);
             dst2 = colorAA.dst2;
 
-            diff.Run(dst2.CvtColor(ColorConversionCodes.BGR2GRAY));
+            diff.RunCS(dst2.CvtColor(ColorConversionCodes.BGR2GRAY));
             dst3 = diff.dst2;
         }
     }

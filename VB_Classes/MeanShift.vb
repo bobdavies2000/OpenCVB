@@ -4,7 +4,7 @@ Public Class MeanShift_Basics : Inherits VB_Parent
     Public rectangleEdgeWidth As Integer = 2
     Public trackbox As New cv.Rect
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels(2) = "Draw anywhere to start mean shift tracking."
         desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track."
     End Sub
