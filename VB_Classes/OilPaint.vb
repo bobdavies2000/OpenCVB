@@ -59,7 +59,7 @@ Public Class OilPaint_Pointilism : Inherits VB_Parent
                 If options.useElliptical Then
                     dst2(saveDrawRect).Ellipse(rotatedRect, nextColor)
                 Else
-                    drawCircle(dst2(saveDrawRect), nPoint, slen / 4, nextColor)
+                    DrawCircle(dst2(saveDrawRect), nPoint, slen / 4, nextColor)
                 End If
             Next
         Next

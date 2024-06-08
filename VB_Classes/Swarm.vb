@@ -14,7 +14,7 @@ Public Class Swarm_Basics : Inherits VB_Parent
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."
     End Sub
-    Public Sub drawLines(dst As cv.Mat)
+    Public Sub DrawLines(dst As cv.Mat)
         Dim queries = knn.queries
         Dim trainInput = knn.trainInput
         Dim neighbors = knn.neighbors
@@ -58,7 +58,7 @@ Public Class Swarm_Basics : Inherits VB_Parent
             Dim pt = knn.queries(i)
             Dim ptNew = knn.trainInput(trainIndex)
             Dim nextDist = pt.DistanceTo(ptNew)
-            drawLine(dst2, pt, ptNew, cv.Scalar.White)
+            DrawLine(dst2, pt, ptNew, cv.Scalar.White)
             disList.Add(nextDist)
             mpList.Add(New pointPair(pt, ptNew))
             If nextDist > 0 Then
@@ -68,7 +68,7 @@ Public Class Swarm_Basics : Inherits VB_Parent
                 End If
             End If
         Next
-        drawLines(dst2)
+        DrawLines(dst2)
 
         labels(3) = CStr(mpList.Count) + " points were matched to the previous set of features."
         distanceAvg = 0
@@ -134,14 +134,14 @@ Public Class Swarm_LeftRight : Inherits VB_Parent
         leftDirection = swarm.directionAvg
         leftMax = swarm.distanceMax
         dst2 = task.leftView
-        swarm.drawLines(dst2)
+        swarm.DrawLines(dst2)
 
         swarm.Run(task.rightView)
         rightDistance = swarm.distanceAvg
         rightDirection = swarm.directionAvg
         rightMax = swarm.distanceMax
         dst3 = task.rightView
-        swarm.drawLines(dst3)
+        swarm.DrawLines(dst3)
 
         strOut = swarm.labels(2) + vbCrLf + swarm.labels(3)
         setTrueText(strOut, 1)

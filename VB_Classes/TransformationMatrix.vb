@@ -21,11 +21,11 @@ Public Class TransformationMatrix_Basics : Inherits VB_Parent
             For i = 0 To topLocations.Count - 1
                 Dim pt = topLocations.ElementAt(i)
                 If pt.X > 0 And pt.X < dst2.Width And pt.Z > 0 And pt.Z < src.Height Then
-                    drawCircle(dst2,New cv.Point(pt.X, pt.Z), task.dotSize + 2, cv.Scalar.Yellow)
+                    DrawCircle(dst2,New cv.Point(pt.X, pt.Z), task.dotSize + 2, cv.Scalar.Yellow)
                 End If
 
                 If pt.Z > 0 And pt.Z < dst2.Width And pt.Y > 0 And pt.Y < src.Height Then
-                    drawCircle(dst3,New cv.Point(pt.Z, pt.Y), task.dotSize + 2, cv.Scalar.Yellow)
+                    DrawCircle(dst3,New cv.Point(pt.Z, pt.Y), task.dotSize + 2, cv.Scalar.Yellow)
                 End If
             Next
 

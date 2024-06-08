@@ -63,12 +63,12 @@ Public Class Delaunay_SubDiv : Inherits VB_Parent
                 Dim e = edgeList(i)
                 Dim p0 = New cv.Point(Math.Round(e(0)), Math.Round(e(1)))
                 Dim p1 = New cv.Point(Math.Round(e(2)), Math.Round(e(3)))
-                drawLine(dst2, p0, p1, cv.Scalar.White)
+                DrawLine(dst2, p0, p1, cv.Scalar.White)
             Next
         Next
 
         For Each pt In random.pointList
-            drawCircle(dst2,pt, task.dotSize + 1, cv.Scalar.Red)
+            DrawCircle(dst2,pt, task.dotSize + 1, cv.Scalar.Red)
         Next
 
         Dim facets = New cv.Point2f()() {Nothing}
@@ -111,7 +111,7 @@ Public Class Delaunay_Subdiv2D : Inherits VB_Parent
             End Function).ToArray()
 
         For Each p In points
-            drawCircle(dst2,p, task.dotSize + 1, cv.Scalar.Red)
+            DrawCircle(dst2,p, task.dotSize + 1, cv.Scalar.Red)
         Next
         dst3 = dst2.Clone()
 
@@ -135,7 +135,7 @@ Public Class Delaunay_Subdiv2D : Inherits VB_Parent
         For Each edge In edgelist
             Dim p1 = New cv.Point2f(edge(0), edge(1))
             Dim p2 = New cv.Point2f(edge(2), edge(3))
-            drawLine(dst2, p1, p2, cv.Scalar.Green)
+            DrawLine(dst2, p1, p2, cv.Scalar.Green)
         Next
     End Sub
 End Class

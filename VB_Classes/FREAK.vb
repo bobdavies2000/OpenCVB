@@ -20,9 +20,9 @@ Public Class FREAK_Basics : Inherits VB_Parent
 
         For Each kpt In keypoints
             Dim r = kpt.Size / 2
-            drawCircle(dst2,kpt.Pt, r, cv.Scalar.Green)
-            drawLine(dst2,New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), cv.Scalar.Green)
-            drawLine(dst2,New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), cv.Scalar.Green)
+            DrawCircle(dst2,kpt.Pt, r, cv.Scalar.Green)
+            DrawLine(dst2,New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), cv.Scalar.Green)
+            DrawLine(dst2,New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), cv.Scalar.Green)
         Next
         labels(2) = CStr(orb.keypoints.Count) + " key points were identified"
         labels(3) = CStr(orb.keypoints.Count) + " FREAK Descriptors (resized) One row = keypoint"

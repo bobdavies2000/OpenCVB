@@ -56,7 +56,7 @@ Public Class SVD_Example2 : Inherits VB_Parent
         If task.heartBeat Then
             Dim m = cv.Cv2.Moments(rc.mask, True)
             Dim center = New cv.Point2f(m.M10 / rc.pixels, m.M01 / rc.pixels)
-            drawCircle(task.color(rc.rect), center, task.dotSize, task.highlightColor)
+            DrawCircle(task.color(rc.rect), center, task.dotSize, task.highlightColor)
 
             Dim mArea = New cv.Mat(4, 1, cv.MatType.CV_32F, {m.M20 / rc.pixels, m.Mu11 / rc.pixels, m.Mu11 / rc.pixels, m.Mu02 / rc.pixels})
             Dim U As New cv.Mat

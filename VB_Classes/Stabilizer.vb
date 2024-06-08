@@ -263,8 +263,8 @@ Public Class Stabilizer_OpticalFlow : Inherits VB_Parent
             dst3 = smoothedFrame.Resize(src.Size())
 
             For i = 0 To commonPoints.Count - 1
-                drawCircle(dst2,commonPoints.ElementAt(i), task.dotSize + 3, cv.Scalar.Red)
-                drawCircle(dst2,lastFeatures.ElementAt(i), task.dotSize + 1, cv.Scalar.Blue)
+                DrawCircle(dst2,commonPoints.ElementAt(i), task.dotSize + 3, cv.Scalar.Red)
+                DrawCircle(dst2,lastFeatures.ElementAt(i), task.dotSize + 1, cv.Scalar.Blue)
             Next
         End If
         inputFeat = Nothing ' show that we consumed the current set of features.
@@ -364,7 +364,7 @@ Public Class Stabilizer_CornerPoints : Inherits VB_Parent
 
         dst2.SetTo(0)
         For Each pt In features
-            drawCircle(dst2, pt, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst2, pt, task.dotSize, cv.Scalar.Yellow)
         Next
         labels(2) = "There were " + CStr(features.Count) + " key points detected"
     End Sub

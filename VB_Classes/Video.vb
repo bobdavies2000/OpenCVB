@@ -173,7 +173,7 @@ Public Class Video_MinCircle : Inherits VB_Parent
         If video.contours IsNot Nothing Then
             For i = 0 To video.contours.Length - 1
                 cv.Cv2.MinEnclosingCircle(video.contours(i), center, radius)
-                drawCircle(dst2, center, radius, cv.Scalar.White)
+                DrawCircle(dst2, center, radius, cv.Scalar.White)
             Next
         End If
     End Sub

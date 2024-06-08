@@ -14,7 +14,7 @@ Public Class ORB_Basics : Inherits VB_Parent
         keypoints = orb.Detect(src)
         dst2 = src.Clone().CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each kpt In keypoints
-            drawCircle(dst2,kpt.Pt, task.dotSize + 1, cv.Scalar.Yellow)
+            DrawCircle(dst2,kpt.Pt, task.dotSize + 1, cv.Scalar.Yellow)
         Next
         labels(2) = CStr(keypoints.Count) + " key points were identified"
     End Sub

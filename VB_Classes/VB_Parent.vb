@@ -175,22 +175,22 @@ Public Class VB_Parent : Implements IDisposable
         If task.advice.Contains(split(0) + ":") Then Return
         task.advice += advice + vbCrLf + vbCrLf
     End Sub
-    Public Sub drawContour(ByRef dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -10)
+    Public Sub DrawContour(ByRef dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -10)
         If lineWidth = -10 Then lineWidth = task.lineWidth ' VB.Net only allows constants for optional parameter.
         If contour.Count < 3 Then Exit Sub ' this is not enough to draw.
         Dim listOfPoints = New List(Of List(Of cv.Point))
         listOfPoints.Add(contour)
         cv.Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType)
     End Sub
-    Public Sub drawLine(dst As Mat, p1 As Point2f, p2 As Point2f, color As Scalar)
+    Public Sub DrawLine(dst As Mat, p1 As Point2f, p2 As Point2f, color As Scalar)
         dst.Line(p1, p2, color, task.lineWidth, task.lineType)
     End Sub
-    Public Sub drawCircle(dst As Mat, pt As Point2f, radius As Integer, color As Scalar)
-        dst.Circle(pt, radius, color, -1, task.linetype)
+    Public Sub DrawCircle(dst As Mat, pt As Point2f, radius As Integer, color As Scalar)
+        dst.Circle(pt, radius, color, -1, task.lineType)
     End Sub
     Public Sub drawPolkaDot(pt As cv.Point2f, dst As cv.Mat)
         dst.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
-        drawCircle(dst, pt, task.dotSize, cv.Scalar.Black)
+        DrawCircle(dst, pt, task.dotSize, cv.Scalar.Black)
     End Sub
     Public Sub drawRotatedOutline(rotatedRect As cv.RotatedRect, dst2 As cv.Mat, color As cv.Scalar)
         Dim pts = rotatedRect.Points()
@@ -198,7 +198,7 @@ Public Class VB_Parent : Implements IDisposable
         For i = 1 To pts.Length
             Dim index = i Mod pts.Length
             Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
-            drawLine(dst2, pt, lastPt, task.highlightColor)
+            DrawLine(dst2, pt, lastPt, task.highlightColor)
             lastPt = pt
         Next
     End Sub

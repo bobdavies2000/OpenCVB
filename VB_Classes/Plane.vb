@@ -603,7 +603,7 @@ Public Class Plane_Equation : Inherits VB_Parent
         If standaloneTest() Then
             setTrueText(strOut, 3)
             dst3.SetTo(0)
-            drawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+            DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
         End If
     End Sub
 End Class

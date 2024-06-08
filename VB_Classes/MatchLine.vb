@@ -81,7 +81,7 @@ Public Class MatchLine_Longest : Inherits VB_Parent
 
         matchLine.Run(src)
         dst2 = matchLine.dst2
-        drawLine(dst2, matchLine.lpOutput.p1, matchLine.lpOutput.p2, cv.Scalar.Red)
+        DrawLine(dst2, matchLine.lpOutput.p1, matchLine.lpOutput.p2, cv.Scalar.Red)
 
         labels(2) = "Longest line end points had correlation of " + Format(matchLine.match.correlation, fmt3) +
                     " with the original longest line."
@@ -102,7 +102,7 @@ Public Class MatchLine_Horizon : Inherits VB_Parent
         If task.quarterBeat Then matchLine.lpInput = task.horizonVec
         matchLine.Run(src)
         dst2 = matchLine.dst2
-        drawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
         labels(2) = "MatchLine correlation = " + Format(matchLine.match.correlation, fmt3) + " - Red = current horizon, yellow is matchLine output"
     End Sub
 End Class
@@ -119,7 +119,7 @@ Public Class MatchLine_Gravity : Inherits VB_Parent
         If task.quarterBeat Then matchLine.lpInput = task.gravityVec
         matchLine.Run(src)
         dst2 = matchLine.dst2
-        drawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.Red)
+        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.Red)
         labels(2) = "MatchLine correlation = " + Format(matchLine.match.correlation, fmt3) +
                     " - Red = current gravity vector, yellow is matchLine output"
     End Sub

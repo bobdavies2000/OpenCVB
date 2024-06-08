@@ -76,7 +76,7 @@ Public Class Feature_Basics : Inherits VB_Parent
 
         task.featurePoints.Clear()
         For Each pt In task.features
-            drawCircle(dst2,pt, task.dotSize, task.highlightColor)
+            DrawCircle(dst2,pt, task.dotSize, task.highlightColor)
             task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
         Next
         If task.heartBeat Then
@@ -111,7 +111,7 @@ Public Class Feature_BasicsNoFrills : Inherits VB_Parent
         For Each pt In gather.features
             task.features.Add(pt)
             task.featurePoints.Add(New cv.Point(pt.X, pt.X))
-            drawCircle(dst2,pt, task.dotSize, task.highlightColor)
+            DrawCircle(dst2,pt, task.dotSize, task.highlightColor)
         Next
 
         labels(2) = gather.labels(2)
@@ -150,8 +150,8 @@ Public Class Feature_KNN : Inherits VB_Parent
         src.CopyTo(dst2)
         dst3.SetTo(0)
         For Each pt In featurePoints
-            drawCircle(dst2,pt, task.dotSize + 2, cv.Scalar.White)
-            drawCircle(dst3,pt, task.dotSize + 2, cv.Scalar.White)
+            DrawCircle(dst2,pt, task.dotSize + 2, cv.Scalar.White)
+            DrawCircle(dst3,pt, task.dotSize + 2, cv.Scalar.White)
         Next
 
         labels(2) = feat.labels(2)
@@ -179,8 +179,8 @@ Public Class Feature_Reduction : Inherits VB_Parent
         feat.Run(reduction.dst2)
         If task.heartBeat Then dst3.SetTo(0)
         For Each pt In task.features
-            drawCircle(dst2,pt, task.dotSize, cv.Scalar.White)
-            drawCircle(dst3,pt, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst2,pt, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst3,pt, task.dotSize, cv.Scalar.White)
         Next
     End Sub
 End Class
@@ -220,7 +220,7 @@ Public Class Feature_MultiPass : Inherits VB_Parent
         passCounts += CStr(task.features.Count)
 
         For Each pt In featurePoints
-            drawCircle(dst2,pt, task.dotSize, task.highlightColor)
+            DrawCircle(dst2,pt, task.dotSize, task.highlightColor)
         Next
         If task.heartBeat Then
             labels(2) = "Total features = " + CStr(featurePoints.Count) + ", pass counts = " + passCounts
@@ -266,7 +266,7 @@ Public Class Feature_PointTracker : Inherits VB_Parent
         dst2 = src.Clone
         For i = mPoints.ptx.Count - 1 To 0 Step -1
             If mPoints.correlation(i) > correlationMin Then
-                drawCircle(dst2,mPoints.ptx(i), task.dotSize, task.highlightColor)
+                DrawCircle(dst2,mPoints.ptx(i), task.dotSize, task.highlightColor)
                 strOut += Format(mPoints.correlation(i), fmt3) + ", "
             Else
                 mPoints.ptx.RemoveAt(i)
@@ -309,7 +309,7 @@ Public Class Feature_Delaunay : Inherits VB_Parent
         facet.Run(src)
         dst3 = facet.dst2
         For Each pt In task.features
-            drawCircle(dst3,pt, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst3,pt, task.dotSize, cv.Scalar.White)
         Next
         labels(3) = "There were " + CStr(task.features.Count) + " Delaunay contours"
     End Sub
@@ -342,10 +342,10 @@ Public Class Feature_LucasKanade : Inherits VB_Parent
             Dim pt = New cv.Point(pyr.features(i).X, pyr.features(i).Y)
             ptList.Add(pt)
             If ptLast.Contains(pt) Then
-                drawCircle(dst3,pt, task.dotSize, task.highlightColor)
+                DrawCircle(dst3,pt, task.dotSize, task.highlightColor)
                 stationary += 1
             Else
-                drawLine(dst3, pyr.lastFeatures(i), pyr.features(i), cv.Scalar.White)
+                DrawLine(dst3, pyr.lastFeatures(i), pyr.features(i), cv.Scalar.White)
                 motion += 1
             End If
         Next
@@ -390,7 +390,7 @@ Public Class Feature_NearestCell : Inherits VB_Parent
         For i = 0 To task.redCells.Count - 1
             Dim rc = task.redCells(i)
             rc.nearestFeature = knn.trainInput(knn.result(i, 0))
-            drawLine(dst3, rc.nearestFeature, rc.maxDStable, task.highlightColor)
+            DrawLine(dst3, rc.nearestFeature, rc.maxDStable, task.highlightColor)
         Next
     End Sub
 End Class
@@ -414,8 +414,8 @@ Public Class Feature_Points : Inherits VB_Parent
         If task.heartBeat Then dst3.SetTo(0)
 
         For Each pt In task.features
-            drawCircle(dst2, pt, task.dotSize, task.highlightColor)
-            drawCircle(dst3, pt, task.dotSize, task.highlightColor)
+            DrawCircle(dst2, pt, task.dotSize, task.highlightColor)
+            DrawCircle(dst3, pt, task.dotSize, task.highlightColor)
         Next
         labels(2) = CStr(task.features.Count) + " targets were present with " + CStr(feat.options.featurePoints) + " requested."
     End Sub
@@ -463,9 +463,9 @@ Public Class Feature_TraceDelaunay : Inherits VB_Parent
         dst2.SetTo(0)
         For Each ptList In goodList
             For Each pt In ptList
-                drawCircle(task.color, pt, task.dotSize, task.highlightColor)
+                DrawCircle(task.color, pt, task.dotSize, task.highlightColor)
                 Dim c = dst3.Get(Of cv.Vec3b)(pt.Y, pt.X)
-                drawCircle(dst2,pt, task.dotSize + 1, c)
+                DrawCircle(dst2,pt, task.dotSize + 1, c)
             Next
         Next
         labels(2) = CStr(task.features.Count) + " features were identified in the image."
@@ -540,7 +540,7 @@ Public Class Feature_Generations : Inherits VB_Parent
         For i = 0 To features.Count - 1
             If gens(i) = 1 Then Exit For
             Dim pt = features(i)
-            drawCircle(dst2,pt, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst2,pt, task.dotSize, cv.Scalar.White)
         Next
 
         If task.heartBeat Then
@@ -591,10 +591,10 @@ Public Class Feature_History : Inherits VB_Parent
                 Dim pt = newFeatures(i)
                 features.Add(pt)
                 If gens(i) < histCount Then
-                    drawCircle(dst2,pt, task.dotSize + 2, cv.Scalar.Red)
+                    DrawCircle(dst2,pt, task.dotSize + 2, cv.Scalar.Red)
                 Else
                     whiteCount += 1
-                    drawCircle(dst2,pt, task.dotSize, task.highlightColor)
+                    DrawCircle(dst2,pt, task.dotSize, task.highlightColor)
                 End If
             End If
         Next
@@ -726,7 +726,7 @@ Public Class Feature_Gather : Inherits VB_Parent
                 For i = 0 To ptMat.Rows - 1
                     Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
                     features.Add(pt)
-                    If standaloneTest() Then drawCircle(dst2,pt, task.dotSize, cv.Scalar.White)
+                    If standaloneTest() Then DrawCircle(dst2,pt, task.dotSize, cv.Scalar.White)
                 Next
 
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"
@@ -751,7 +751,7 @@ Public Class Feature_Gather : Inherits VB_Parent
         If standaloneTest() Then
             dst2 = task.color.Clone
             For Each pt In features
-                drawCircle(dst2,pt, task.dotSize, task.highlightColor)
+                DrawCircle(dst2,pt, task.dotSize, task.highlightColor)
             Next
         End If
     End Sub

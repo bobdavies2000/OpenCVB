@@ -145,8 +145,8 @@ Public Class FeatureLine_VH : Inherits VB_Parent
             setTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gc.arcY, fmt1), gc.tc1.center, 2)
             setTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gc.arcY, fmt1), gc.tc1.center, 3)
 
-            drawLine(dst2, p1, p2, task.highlightColor)
-            drawLine(dst3, p1, p2, task.highlightColor)
+            DrawLine(dst2, p1, p2, task.highlightColor)
+            DrawLine(dst3, p1, p2, task.highlightColor)
         Next
     End Sub
 End Class
@@ -182,7 +182,7 @@ Public Class FeatureLine_Tutorial1 : Inherits VB_Parent
 
         dst3 = src
         For i = 0 To raw2D.Count - 2 Step 2
-            drawLine(dst3, raw2D(i).p1, raw2D(i).p2, task.highlightColor)
+            DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, task.highlightColor)
         Next
         If task.heartBeat Then labels(2) = "Starting with " + Format(lines.lpList.Count, "000") + " lines, there are " +
                                            Format(raw3D.Count / 2, "000") + " with depth data."
@@ -229,7 +229,7 @@ Public Class FeatureLine_Tutorial2 : Inherits VB_Parent
 
         dst3 = src
         For i = 0 To raw2D.Count - 2 Step 2
-            drawLine(dst3, raw2D(i).p1, raw2D(i).p2, task.highlightColor)
+            DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, task.highlightColor)
         Next
         If task.heartBeat Then labels(2) = "Starting with " + Format(lines.lpList.Count, "000") + " lines, there are " +
                                            Format(raw3D.Count, "000") + " with depth data."
@@ -285,7 +285,7 @@ Public Class FeatureLine_LongestVerticalKNN : Inherits VB_Parent
             setTrueText(CStr(index) + vbCrLf + Format(gc.arcY, fmt1), pt, 3)
             index += 1
 
-            drawLine(dst3, p1, p2, task.highlightColor)
+            DrawLine(dst3, p1, p2, task.highlightColor)
             longest.knn.trainInput.Add(p1)
             longest.knn.trainInput.Add(p2)
         Next
@@ -318,9 +318,9 @@ Public Class FeatureLine_LongestV_Tutorial1 : Inherits VB_Parent
         Dim index = lines.sortedVerticals.ElementAt(0).Value
         Dim p1 = lines.lines2D(index)
         Dim p2 = lines.lines2D(index + 1)
-        drawLine(dst2, p1, p2, task.highlightColor)
+        DrawLine(dst2, p1, p2, task.highlightColor)
         dst3.SetTo(0)
-        drawLine(dst3, p1, p2, task.highlightColor)
+        DrawLine(dst3, p1, p2, task.highlightColor)
     End Sub
 End Class
 
@@ -368,9 +368,9 @@ Public Class FeatureLine_LongestV_Tutorial2 : Inherits VB_Parent
         Dim p2 = New cv.Point2f(knn.trainInput(index)(2), knn.trainInput(index)(3))
         pt1 = match3D(index * 2)
         pt2 = match3D(index * 2 + 1)
-        drawLine(dst2, p1, p2, task.highlightColor)
+        DrawLine(dst2, p1, p2, task.highlightColor)
         dst3.SetTo(0)
-        drawLine(dst3, p1, p2, task.highlightColor)
+        DrawLine(dst3, p1, p2, task.highlightColor)
 
         Static lastLength = lines.sorted2DV.ElementAt(0).Key
         Dim bestLength = lines.sorted2DV.ElementAt(0).Key
@@ -452,7 +452,7 @@ Public Class FeatureLine_Finder : Inherits VB_Parent
                 Dim len3D = distance3D(pt1, pt2)
                 Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
                 If Math.Abs(arcY - 90) < tolerance Then
-                    drawLine(dst3, raw2D(i).p1, raw2D(i).p2, cv.Scalar.Blue)
+                    DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, cv.Scalar.Blue)
                     sortedVerticals.Add(len3D, lines3D.Count)
                     sorted2DV.Add(raw2D(i).p1.DistanceTo(raw2D(i).p2), lines2D.Count)
                     If pt1.Y > pt2.Y Then
@@ -468,7 +468,7 @@ Public Class FeatureLine_Finder : Inherits VB_Parent
                     End If
                 End If
                 If Math.Abs(arcY) < tolerance Then
-                    drawLine(dst3, raw2D(i).p1, raw2D(i).p2, cv.Scalar.Yellow)
+                    DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, cv.Scalar.Yellow)
                     sortedHorizontals.Add(len3D, lines3D.Count)
                     If pt1.X < pt2.X Then
                         lines3D.Add(pt1)
@@ -516,9 +516,9 @@ Public Class FeatureLine_VerticalLongLine : Inherits VB_Parent
         Dim index = lines.sortedVerticals.ElementAt(0).Value
         Dim p1 = lines.lines2D(index)
         Dim p2 = lines.lines2D(index + 1)
-        drawLine(dst2, p1, p2, task.highlightColor)
+        DrawLine(dst2, p1, p2, task.highlightColor)
         dst3.SetTo(0)
-        drawLine(dst3, p1, p2, task.highlightColor)
+        DrawLine(dst3, p1, p2, task.highlightColor)
         Dim pt1 = lines.lines3D(index)
         Dim pt2 = lines.lines3D(index + 1)
         Dim len3D = distance3D(pt1, pt2)
@@ -560,9 +560,9 @@ Public Class FeatureLine_DetailsAll : Inherits VB_Parent
                 Dim index = lines.sortedVerticals.ElementAt(i).Value
                 Dim p1 = lines.lines2D(index)
                 Dim p2 = lines.lines2D(index + 1)
-                drawLine(dst2, p1, p2, task.highlightColor)
+                DrawLine(dst2, p1, p2, task.highlightColor)
                 setTrueText(CStr(i), If(i Mod 2, p1, p2), 2)
-                drawLine(dst3, p1, p2, task.highlightColor)
+                DrawLine(dst3, p1, p2, task.highlightColor)
 
                 Dim pt1 = lines.lines3D(index)
                 Dim pt2 = lines.lines3D(index + 1)
@@ -628,9 +628,9 @@ Public Class FeatureLine_LongestKNN : Inherits VB_Parent
         match.Run(src)
         If match.correlation >= options.correlationMin Then
             dst3 = match.dst0.Resize(dst3.Size)
-            drawLine(dst2, p1, p2, task.highlightColor)
-            drawCircle(dst2,p1, task.dotSize, task.highlightColor)
-            drawCircle(dst2,p2, task.dotSize, task.highlightColor)
+            DrawLine(dst2, p1, p2, task.highlightColor)
+            DrawCircle(dst2,p1, task.dotSize, task.highlightColor)
+            DrawCircle(dst2,p2, task.dotSize, task.highlightColor)
             rect = validateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
             match.template = src(rect).Clone
         Else
@@ -684,9 +684,9 @@ Public Class FeatureLine_Longest : Inherits VB_Parent
         p2 = match2.matchCenter
 
         gline = glines.updateGLine(src, gline, p1, p2)
-        drawLine(dst2, p1, p2, task.highlightColor)
-        drawCircle(dst2,p1, task.dotSize, task.highlightColor)
-        drawCircle(dst2,p2, task.dotSize, task.highlightColor)
+        DrawLine(dst2, p1, p2, task.highlightColor)
+        DrawCircle(dst2,p1, task.dotSize, task.highlightColor)
+        DrawCircle(dst2,p2, task.dotSize, task.highlightColor)
         setTrueText(Format(match1.correlation, fmt3), p1)
         setTrueText(Format(match2.correlation, fmt3), p2)
     End Sub

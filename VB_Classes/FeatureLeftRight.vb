@@ -66,8 +66,8 @@ Public Class FeatureLeftRight_Basics : Inherits VB_Parent
         Next
 
         For Each mp In mpList
-            drawCircle(dst2,mp.p1, task.dotSize, task.highlightColor)
-            drawCircle(dst3,mp.p2, task.dotSize, task.highlightColor)
+            DrawCircle(dst2,mp.p1, task.dotSize, task.highlightColor)
+            DrawCircle(dst3,mp.p2, task.dotSize, task.highlightColor)
         Next
 
         If task.mouseClickFlag Then setClickPoint(task.clickPoint, task.mousePicTag)
@@ -93,8 +93,8 @@ Public Class FeatureLeftRight_Basics : Inherits VB_Parent
             Dim mpIndex = knn.result(0, 0)
             mp = mpList(mpIndex)
 
-            drawCircle(dst2,mp.p1, task.dotSize + 4, cv.Scalar.Red)
-            drawCircle(dst3,mp.p2, task.dotSize + 4, cv.Scalar.Red)
+            DrawCircle(dst2,mp.p1, task.dotSize + 4, cv.Scalar.Red)
+            DrawCircle(dst3,mp.p2, task.dotSize + 4, cv.Scalar.Red)
 
             Dim dspDistance = task.pcSplit(2).Get(Of Single)(mp.p1.Y, mp.p1.X)
 
@@ -108,8 +108,8 @@ Public Class FeatureLeftRight_Basics : Inherits VB_Parent
             Next
 
             If task.heartBeat Then dst1.SetTo(0)
-            drawCircle(dst1,mp.p1, task.dotSize, task.highlightColor)
-            drawCircle(dst1,mp.p2, task.dotSize, task.highlightColor)
+            DrawCircle(dst1,mp.p1, task.dotSize, task.highlightColor)
+            DrawCircle(dst1,mp.p2, task.dotSize, task.highlightColor)
 
             selectedPoint = New cv.Point(mp.p1.X, mpList(mpIndex).p1.Y + 10)
             setTrueText(strOut, selectedPoint, 1)
@@ -252,8 +252,8 @@ Public Class FeatureLeftRight_Input : Inherits VB_Parent
         Next
 
         For Each mp In mpList
-            drawCircle(dst2,mp.p1, task.dotSize, task.highlightColor)
-            drawCircle(dst3,mp.p2, task.dotSize, task.highlightColor)
+            DrawCircle(dst2,mp.p1, task.dotSize, task.highlightColor)
+            DrawCircle(dst3,mp.p2, task.dotSize, task.highlightColor)
         Next
 
         If task.mouseClickFlag Then setClickPoint(task.clickPoint, task.mousePicTag)
@@ -279,8 +279,8 @@ Public Class FeatureLeftRight_Input : Inherits VB_Parent
             Dim mpIndex = knn.result(0, 0)
             mp = mpList(mpIndex)
 
-            drawCircle(dst2,mp.p1, task.dotSize + 4, cv.Scalar.Red)
-            drawCircle(dst3,mp.p2, task.dotSize + 4, cv.Scalar.Red)
+            DrawCircle(dst2,mp.p1, task.dotSize + 4, cv.Scalar.Red)
+            DrawCircle(dst3,mp.p2, task.dotSize + 4, cv.Scalar.Red)
 
             Dim dspDistance = task.pcSplit(2).Get(Of Single)(mp.p1.Y, mp.p1.X)
 
@@ -294,8 +294,8 @@ Public Class FeatureLeftRight_Input : Inherits VB_Parent
             Next
 
             If task.heartBeat Then dst1.SetTo(0)
-            drawCircle(dst1,mp.p1, task.dotSize, task.highlightColor)
-            drawCircle(dst1,mp.p2, task.dotSize, task.highlightColor)
+            DrawCircle(dst1,mp.p1, task.dotSize, task.highlightColor)
+            DrawCircle(dst1,mp.p2, task.dotSize, task.highlightColor)
 
             selectedPoint = New cv.Point(mp.p1.X, mpList(mpIndex).p1.Y + 10)
             setTrueText(strOut, selectedPoint, 1)

@@ -27,7 +27,7 @@ Public Class MatchShapes_Basics : Inherits VB_Parent
         Next
 
         For Each p In hull(maxIndex)
-            drawCircle(dst, p, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst, p, task.dotSize, cv.Scalar.Yellow)
         Next
         Return maxIndex
     End Function
@@ -98,7 +98,7 @@ Public Class MatchShapes_NearbyHull : Inherits VB_Parent
                     minMatch = matchVal
                     bestCell = similarCells.Count
                 End If
-                drawContour(dst3(rc2.rect), rc2.hull, cv.Scalar.White, -1)
+                DrawContour(dst3(rc2.rect), rc2.hull, cv.Scalar.White, -1)
                 similarCells.Add(rc2)
             End If
         Next
@@ -148,7 +148,7 @@ Public Class MatchShapes_Nearby : Inherits VB_Parent
 
         If task.gOptions.displayDst0.Checked Then
             dst0 = task.color.Clone
-            drawContour(dst0(rc.rect), rc.contour, task.highlightColor)
+            DrawContour(dst0(rc.rect), rc.contour, task.highlightColor)
         End If
 
         Dim minMatch As Single = Single.MaxValue
@@ -162,14 +162,14 @@ Public Class MatchShapes_Nearby : Inherits VB_Parent
                     minMatch = matchVal
                     bestCell = similarCells.Count
                 End If
-                drawContour(dst3(rc2.rect), rc2.contour, rc2.color, -1)
+                DrawContour(dst3(rc2.rect), rc2.contour, rc2.color, -1)
                 similarCells.Add(rc2)
             End If
         Next
 
         If bestCell >= 0 Then
             Dim rc = similarCells(bestCell)
-            drawCircle(dst3,rc.maxDist, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst3,rc.maxDist, task.dotSize, cv.Scalar.White)
             setTrueText("Best match", rc.maxDist, 3)
         End If
         If similarCells.Count = 0 Then setTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
@@ -221,10 +221,10 @@ Public Class MatchShapes_LeftRight : Inherits VB_Parent
         '    match.Run()
         '    If match.bestCell >= 0 Then
         '        Dim best = match.similarCells(match.bestCell)
-        '        drawContour(dst1(rc.rect), rc.contour, best.color, -1)
-        '        drawContour(dst3(rc.rect), rc.contour, best.color, -1)
-        '        drawContour(dst0(best.rect), best.contour, best.color, -1)
-        '        drawContour(dst2(best.rect), best.contour, best.color, -1)
+        '        DrawContour(dst1(rc.rect), rc.contour, best.color, -1)
+        '        DrawContour(dst3(rc.rect), rc.contour, best.color, -1)
+        '        DrawContour(dst0(best.rect), best.contour, best.color, -1)
+        '        DrawContour(dst2(best.rect), best.contour, best.color, -1)
         '        Dim pt = New cv.Point(rc.maxDist.X + dst2.Width, rc.maxDist.Y)
         '        lines.Add(New pointPair(pt, best.maxDist))
         '    End If
@@ -235,7 +235,7 @@ Public Class MatchShapes_LeftRight : Inherits VB_Parent
         'dst3.CopyTo(doubleSize(New cv.Rect(dst2.Width, 0, dst2.Width, dst2.Height)))
 
         'For Each line In lines
-        '    drawLine(doubleSize, line.p1, line.p2, cv.Scalar.White)
+        '    DrawLine(doubleSize, line.p1, line.p2, cv.Scalar.White)
         'Next
 
         'doubleSize(New cv.Rect(0, 0, dst2.Width, dst2.Height)).CopyTo(dst2)
@@ -273,7 +273,7 @@ Public Class MatchShapes_Hulls : Inherits VB_Parent
         For Each rc In task.redCells
             If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rcX.hull, rc.hull, options.matchOption)
-            If matchVal < options.matchThreshold Then drawContour(dst3(rc.rect), rc.hull, cv.Scalar.White, -1)
+            If matchVal < options.matchThreshold Then DrawContour(dst3(rc.rect), rc.hull, cv.Scalar.White, -1)
         Next
     End Sub
 End Class
@@ -308,7 +308,7 @@ Public Class MatchShapes_Contours : Inherits VB_Parent
         For Each rc In task.redCells
             If rc.contour Is Nothing Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rcX.contour, rc.contour, options.matchOption)
-            If matchVal < options.matchThreshold Then drawContour(dst3(rc.rect), rc.contour, cv.Scalar.White, -1)
+            If matchVal < options.matchThreshold Then DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.White, -1)
         Next
     End Sub
 End Class

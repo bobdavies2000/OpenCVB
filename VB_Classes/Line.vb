@@ -30,8 +30,8 @@ Public Class Line_Basics : Inherits VB_Parent
         lpList.Clear()
         For Each lp In sortByLen.Values
             lpList.Add(lp)
-            drawLine(dst2, lp.p1, lp.p2, lineColor)
-            drawLine(dst3, lp.p1, lp.p2, 255)
+            DrawLine(dst2, lp.p1, lp.p2, lineColor)
+            DrawLine(dst3, lp.p1, lp.p2, 255)
         Next
         labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
     End Sub
@@ -80,8 +80,8 @@ Public Class Line_SubsetRect : Inherits VB_Parent
         dst2 = src
         dst3.SetTo(0)
         For Each lp In sortByLen.Values
-            drawLine(dst2, lp.p1, lp.p2, lineColor)
-            drawLine(dst3, lp.p1, lp.p2, 255)
+            DrawLine(dst2, lp.p1, lp.p2, lineColor)
+            DrawLine(dst3, lp.p1, lp.p2, 255)
         Next
         labels(2) = CStr(mpList.Count) + " lines were detected in the current frame"
     End Sub
@@ -145,9 +145,9 @@ Public Class Line_InterceptsUI : Inherits VB_Parent
             If color(0) = 1 Then p2 = New cv.Point((dst3.Height - b) / m, dst3.Height) ' green
             If color(0) = 2 Then p2 = New cv.Point(dst3.Width, dst3.Width * m + b) ' yellow
             If color(0) = 254 Then p2 = New cv.Point(0, b) ' blue
-            drawLine(dst3, center, p2, cv.Scalar.Black)
+            DrawLine(dst3, center, p2, cv.Scalar.Black)
         End If
-        drawCircle(dst3, center, task.dotSize, cv.Scalar.White)
+        DrawCircle(dst3, center, task.dotSize, cv.Scalar.White)
 
         If color(0) = 0 Then redRadio.checked = True
         If color(0) = 1 Then greenRadio.checked = True
@@ -185,8 +185,8 @@ Public Class Line_Intercepts : Inherits VB_Parent
     Public Sub hightLightIntercept(dst As cv.Mat)
         For Each inter In intercept
             If Math.Abs(options.mouseMovePoint - inter.Key) < options.interceptRange Then
-                drawLine(dst2, p1List(inter.Value), p2List(inter.Value), cv.Scalar.White)
-                drawLine(dst2, p1List(inter.Value), p2List(inter.Value), cv.Scalar.Blue)
+                DrawLine(dst2, p1List(inter.Value), p2List(inter.Value), cv.Scalar.White)
+                DrawLine(dst2, p1List(inter.Value), p2List(inter.Value), cv.Scalar.Blue)
             End If
         Next
         For Each inter In intercept
@@ -227,7 +227,7 @@ Public Class Line_Intercepts : Inherits VB_Parent
 
             p1List.Add(lp.p1)
             p2List.Add(lp.p2)
-            drawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
+            DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
 
             Dim saveP1 = lp.p1, saveP2 = lp.p2
 
@@ -340,7 +340,7 @@ Public Class Line_InDepthAndBGR : Inherits VB_Parent
                     lp.p2 = New cv.Point(mmY.maxLoc.X + r.X, mmY.maxLoc.Y + r.Y)
                 End If
                 If lp.p1.DistanceTo(lp.p2) > 1 Then
-                    drawLine(dst3, lp.p1, lp.p2, cv.Scalar.Yellow)
+                    DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Yellow)
                     p1List.Add(lp.p1)
                     p2List.Add(lp.p2)
                     z1List.Add(task.pointCloud.Get(Of cv.Point3f)(lp.p1.Y, lp.p1.X))
@@ -384,7 +384,7 @@ Public Class Line_PointSlope : Inherits VB_Parent
                 For j = 0 To knn.knnDimension - 1
                     knn.queries.Add(Choose(j + 1, lp.slope, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
                 Next
-                drawLine(dst3, lp.p1, lp.p2, task.highlightColor)
+                DrawLine(dst3, lp.p1, lp.p2, task.highlightColor)
                 If bestLines.Count >= lineCount Then Exit For
             Next
         End If
@@ -424,8 +424,8 @@ Public Class Line_PointSlope : Inherits VB_Parent
 
         bestLines = New List(Of pointPair)(nextLines)
         For Each ptS In bestLines
-            drawLine(dst2, ptS.p1, ptS.p2, task.highlightColor)
-            drawLine(dst1, ptS.p1, ptS.p2, cv.Scalar.Red)
+            DrawLine(dst2, ptS.p1, ptS.p2, task.highlightColor)
+            DrawLine(dst1, ptS.p1, ptS.p2, cv.Scalar.Red)
         Next
     End Sub
 End Class
@@ -471,7 +471,7 @@ Public Class Line_Movement : Inherits VB_Parent
             p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
         End If
         frameCount += 1
-        drawLine(dst2, p1, p2, gradientColors(frameCount Mod gradientColors.Count))
+        DrawLine(dst2, p1, p2, gradientColors(frameCount Mod gradientColors.Count))
     End Sub
 End Class
 
@@ -536,11 +536,11 @@ Public Class Line_GCloud : Inherits VB_Parent
             allLines.Add(lp.p1.DistanceTo(lp.p2), gc)
             If Math.Abs(90 - gc.arcY) < maxAngle And gc.tc1.depth > 0 And gc.tc2.depth > 0 Then
                 sortedVerticals.Add(lp.p1.DistanceTo(lp.p2), gc)
-                drawLine(dst2, lp.p1, lp.p2, cv.Scalar.Blue)
+                DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Blue)
             End If
             If Math.Abs(gc.arcY) <= maxAngle And gc.tc1.depth > 0 And gc.tc2.depth > 0 Then
                 sortedHorizontals.Add(lp.p1.DistanceTo(lp.p2), gc)
-                drawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
+                DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
             End If
         Next
 
@@ -587,7 +587,7 @@ Public Class Line_DisplayInfo : Inherits VB_Parent
         dst1.SetTo(0)
         Dim p1 = tcells(0).center
         Dim p2 = tcells(1).center
-        drawLine(dst1, p1, p2, 255)
+        DrawLine(dst1, p1, p2, 255)
 
         dst3.SetTo(0)
         blur.dst2.Threshold(1, 255, cv.ThresholdTypes.Binary).CopyTo(dst3, dst1)
@@ -601,7 +601,7 @@ Public Class Line_DisplayInfo : Inherits VB_Parent
         Next
 
         strOut = "Mask count = " + CStr(maskCount) + ", Expected count = " + CStr(distance) + " or " + Format(maskCount / distance, "0%") + vbCrLf
-        drawLine(dst2, p1, p2, task.highlightColor)
+        DrawLine(dst2, p1, p2, task.highlightColor)
 
         strOut += "Color changes when correlation falls below threshold and new line is detected." + vbCrLf +
                   "Correlation coefficient is shown with the depth in meters."
@@ -633,19 +633,19 @@ Public Class Line_Perpendicular : Inherits VB_Parent
                 p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             End If
             dst2.SetTo(0)
-            drawLine(dst2, p1, p2, cv.Scalar.White)
+            DrawLine(dst2, p1, p2, cv.Scalar.White)
 
             Dim slope As Single
             If p1.X = p2.X Then slope = 100000 Else slope = (p1.Y - p2.Y) / (p1.X - p2.X)
             Dim midPoint = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
 
-            drawCircle(dst2, midPoint, task.dotSize + 2, cv.Scalar.Red)
+            DrawCircle(dst2, midPoint, task.dotSize + 2, cv.Scalar.Red)
             Dim m = If(slope = 0, 100000, -1 / slope)
 
             Dim b = midPoint.Y - m * midPoint.X
             r1 = New cv.Point2f(-b / m, 0)
             r2 = New cv.Point2f((dst2.Height - b) / m, dst2.Height)
-            drawLine(dst2, r1, r2, cv.Scalar.Yellow)
+            DrawLine(dst2, r1, r2, cv.Scalar.Yellow)
         End If
     End Sub
 End Class
@@ -674,12 +674,12 @@ Public Class Line_CellsVertHoriz : Inherits VB_Parent
         For i = 0 To lines.sortedHorizontals.Count - 1
             Dim index = lines.sortedHorizontals.ElementAt(i).Value
             Dim p1 = lines.lines2D(index), p2 = lines.lines2D(index + 1)
-            drawLine(dst3, p1, p2, cv.Scalar.Yellow)
+            DrawLine(dst3, p1, p2, cv.Scalar.Yellow)
         Next
         For i = 0 To lines.sortedVerticals.Count - 1
             Dim index = lines.sortedVerticals.ElementAt(i).Value
             Dim p1 = lines.lines2D(index), p2 = lines.lines2D(index + 1)
-            drawLine(dst3, p1, p2, cv.Scalar.Blue)
+            DrawLine(dst3, p1, p2, cv.Scalar.Blue)
         Next
         labels(3) = CStr(lines.sortedVerticals.Count) + " vertical and " + CStr(lines.sortedHorizontals.Count) + " horizontal lines identified in the RedCloud output"
     End Sub
@@ -776,7 +776,7 @@ Public Class Line_FromContours : Inherits VB_Parent
 
         dst3.SetTo(0)
         For Each lp In lines.lpList
-            drawLine(dst3, lp.p1, lp.p2, cv.Scalar.White)
+            DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.White)
         Next
     End Sub
 End Class
@@ -861,7 +861,7 @@ Public Class Line_TimeViewLines : Inherits VB_Parent
         dst3.SetTo(cv.Scalar.White)
         Dim index = lines.frameList.Count - 1 ' the most recent.
         For Each lp In lines.lines.lpList
-            drawLine(dst3, lp.p1, lp.p2, cv.Scalar.Green)
+            DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Green)
             lpList.Add(lp)
             If lp.slope = 0 Then
                 dst3.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth * 2 + 1, task.lineType)
@@ -899,8 +899,8 @@ Public Class Line_TimeView : Inherits VB_Parent
         For i = 0 To frameList.Count - 1
             lineTotal += frameList(i).Count
             For Each lp In frameList(i)
-                drawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
-                drawLine(dst3, lp.p1, lp.p2, cv.Scalar.White)
+                DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
+                DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.White)
                 mpList.Add(lp)
             Next
         Next
@@ -1073,7 +1073,7 @@ Public Class Line_Verticals : Inherits VB_Parent
             If Math.Abs(arcX) <= maxAngleX And Math.Abs(arcZ) <= maxAngleZ Then
                 setTrueText(Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z", lines2(i), 2)
                 setTrueText(Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z", lines2(i), 3)
-                drawLine(dst2, lines2(i), lines2(i + 1), task.highlightColor)
+                DrawLine(dst2, lines2(i), lines2(i + 1), task.highlightColor)
                 verticals.Add(vert)
             End If
         Next
@@ -1149,7 +1149,7 @@ Public Class Line_Verts : Inherits VB_Parent
                     setTrueText(vert.tc1.strOut, New cv.Point(vert.tc1.rect.X, vert.tc1.rect.Y))
                     setTrueText(vert.tc1.strOut + vbCrLf + Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z",
                                 New cv.Point(vert.tc1.rect.X, vert.tc1.rect.Y), 3)
-                    drawLine(dst2, vert.tc1.center, vert.tc2.center, task.highlightColor)
+                    DrawLine(dst2, vert.tc1.center, vert.tc2.center, task.highlightColor)
                     verticals.Add(vert)
                 End If
             Next
@@ -1214,9 +1214,9 @@ Public Class Line_Nearest : Inherits VB_Parent
         If onTheLine = False Then nearPoint = If(distance1 < distance2, lp.p1, lp.p2)
         If standaloneTest() Then
             dst2.SetTo(0)
-            drawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
-            drawLine(dst2, pt, nearPoint, cv.Scalar.White)
-            drawCircle(dst2, pt, task.dotSize, cv.Scalar.White)
+            DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
+            DrawLine(dst2, pt, nearPoint, cv.Scalar.White)
+            DrawCircle(dst2, pt, task.dotSize, cv.Scalar.White)
         End If
         distance = Math.Sqrt(Math.Pow(pt.X - nearPoint.X, 2) + Math.Pow(pt.Y - nearPoint.Y, 2))
     End Sub
@@ -1247,7 +1247,7 @@ Public Class Line_Intersection : Inherits VB_Parent
         dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         dst2.Line(p3, p4, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         If intersectionPoint <> New cv.Point2f Then
-            drawCircle(dst2, intersectionPoint, task.dotSize + 4, cv.Scalar.White)
+            DrawCircle(dst2, intersectionPoint, task.dotSize + 4, cv.Scalar.White)
             labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
         Else
             labels(2) = "Parallel!!!"
@@ -1280,7 +1280,7 @@ Public Class Line_Gravity : Inherits VB_Parent
         If standaloneTest() Then dst3 = lines.dst2
 
         nearest.lp = task.gravityVec
-        drawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White)
+        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White)
         For Each lp In lines.lpList
             Dim ptInter = vbIntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
             If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
@@ -1288,19 +1288,19 @@ Public Class Line_Gravity : Inherits VB_Parent
             nearest.pt = lp.p1
             nearest.Run(Nothing)
             Dim d1 = nearest.distance
-            'drawLine(dst2,nearest.nearPoint, lp.p1, cv.Scalar.Red)
+            'DrawLine(dst2,nearest.nearPoint, lp.p1, cv.Scalar.Red)
 
             nearest.pt = lp.p2
             nearest.Run(Nothing)
             Dim d2 = nearest.distance
-            'drawLine(dst2,nearest.nearPoint, lp.p2, cv.Scalar.Red)
+            'DrawLine(dst2,nearest.nearPoint, lp.p2, cv.Scalar.Red)
 
             If Math.Abs(d1 - d2) <= pixelDiff Then
-                drawLine(dst2, lp.p1, lp.p2, task.highlightColor)
+                DrawLine(dst2, lp.p1, lp.p2, task.highlightColor)
             End If
         Next
 
-        drawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
         nearest.lp = task.horizonVec
         For Each lp In lines.lpList
             Dim ptInter = vbIntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
@@ -1315,7 +1315,7 @@ Public Class Line_Gravity : Inherits VB_Parent
             Dim d2 = nearest.distance
 
             If Math.Abs(d1 - d2) <= pixelDiff Then
-                drawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
+                DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
             End If
         Next
         labels(2) = "Slope for gravity is " + Format(task.gravityVec.slope, fmt1) + ".  Slope for horizon is " + Format(task.horizonVec.slope, fmt1)
@@ -1345,7 +1345,7 @@ Public Class Line_GravityIntersect : Inherits VB_Parent
         'If standaloneTest() Then dst3 = lines.dst2
 
         'nearest.lp = task.gravityVec
-        'drawLine(dst2,task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White)
+        'DrawLine(dst2,task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White)
         'For Each lp In lines.lpList
         '    Dim ptInter = vbIntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
         '    If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
@@ -1353,19 +1353,19 @@ Public Class Line_GravityIntersect : Inherits VB_Parent
         '    nearest.pt = lp.p1
         '    nearest.Run(Nothing)
         '    Dim d1 = nearest.distance
-        '    'drawLine(dst2,nearest.nearPoint, lp.p1, cv.Scalar.Red)
+        '    'DrawLine(dst2,nearest.nearPoint, lp.p1, cv.Scalar.Red)
 
         '    nearest.pt = lp.p2
         '    nearest.Run(Nothing)
         '    Dim d2 = nearest.distance
-        '    'drawLine(dst2,nearest.nearPoint, lp.p2, cv.Scalar.Red)
+        '    'DrawLine(dst2,nearest.nearPoint, lp.p2, cv.Scalar.Red)
 
         '    If Math.Abs(d1 - d2) <= pixelDiff Then
-        '        drawLine(dst2,lp.p1, lp.p2, task.highlightColor)
+        '        DrawLine(dst2,lp.p1, lp.p2, task.highlightColor)
         '    End If
         'Next
 
-        'drawLine(dst2,task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
+        'DrawLine(dst2,task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
         'nearest.lp = task.horizonVec
         'For Each lp In lines.lpList
         '    Dim ptInter = vbIntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
@@ -1380,7 +1380,7 @@ Public Class Line_GravityIntersect : Inherits VB_Parent
         '    Dim d2 = nearest.distance
 
         '    If Math.Abs(d1 - d2) <= pixelDiff Then
-        '        drawLine(dst2,lp.p1, lp.p2, cv.Scalar.Red)
+        '        DrawLine(dst2,lp.p1, lp.p2, cv.Scalar.Red)
         '    End If
         'Next
         'labels(2) = "Slope for gravity is " + Format(task.gravityVec.slope, fmt1) + ".  Slope for horizon is " + Format(task.horizonVec.slope, fmt1)
@@ -1410,12 +1410,12 @@ Public Class Line_KNN : Inherits VB_Parent
         For Each lp In lines.lpList
             swarm.knn.queries.Add(lp.p1)
             swarm.knn.queries.Add(lp.p2)
-            drawLine(dst3, lp.p1, lp.p2, 255)
+            DrawLine(dst3, lp.p1, lp.p2, 255)
         Next
         swarm.knn.trainInput = New List(Of cv.Point2f)(swarm.knn.queries)
         swarm.knn.Run(empty)
 
-        swarm.drawLines(dst3)
+        swarm.DrawLines(dst3)
         labels(2) = lines.labels(2)
     End Sub
 End Class

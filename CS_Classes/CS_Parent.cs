@@ -85,7 +85,7 @@ namespace CS_Classes
             return mm;
         }
 
-        public void drawContour(Mat dst, List<Point> contour, Scalar color, int lineWidth = -10)
+        public void DrawContour(Mat dst, List<Point> contour, Scalar color, int lineWidth = -10)
         {
             if (lineWidth == -10)
             {
@@ -99,14 +99,14 @@ namespace CS_Classes
             Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType); // Assuming 'task' has 'lineType' property
         }
 
-        public void drawLine(Mat dst, Point2f p1, Point2f p2, Scalar color)
+        public void DrawLine(Mat dst, Point2f p1, Point2f p2, Scalar color)
         {
             var pt1 = new cv.Point(p1.X, p1.Y);
             var pt2 = new cv.Point(p2.X, p2.Y);
             dst.Line(pt1, pt2, color, task.lineWidth, task.lineType);
         }
 
-        public void drawCircle(Mat dst, Point2f p1, int radius, Scalar color)
+        public void DrawCircle(Mat dst, Point2f p1, int radius, Scalar color)
         {
             var pt = new cv.Point(p1.X, p1.Y);
             dst.Circle(pt, radius, color, -1, task.lineType);

@@ -28,11 +28,11 @@ Public Class LinearRegression_Basics : Inherits VB_Parent
         p1 = New cv.Point(0, CInt(c))
         p2 = New cv.Point(dst2.Width, CInt(m * dst2.Width + c))
         dst2.SetTo(0)
-        drawLine(dst2, p1, p2, cv.Scalar.White)
+        DrawLine(dst2, p1, p2, cv.Scalar.White)
 
         For i = 0 To x.Count - 1
             Dim pt As New cv.Point(x(i), y(i))
-            drawCircle(dst2,pt, task.dotSize, cv.Scalar.Red)
+            DrawCircle(dst2,pt, task.dotSize, cv.Scalar.Red)
         Next
     End Sub
 End Class

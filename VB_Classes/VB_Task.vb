@@ -560,8 +560,8 @@ Public Class VBtask : Implements IDisposable
 
             If task.gOptions.CrossHairs.Checked Then
                 If task.paused = False Then
-                    drawLine(task.color, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
-                    drawLine(task.color, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White)
+                    DrawLine(task.color, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
+                    DrawLine(task.color, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White)
                 End If
             End If
 

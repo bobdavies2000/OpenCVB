@@ -130,7 +130,7 @@ Public Class Grid_BasicsTest : Inherits VB_Parent
          Sub(i)
              Dim roi = task.gridList(i)
              cv.Cv2.Subtract(mean, src(roi), dst3(roi))
-             drawLine(dst3(roi), New cv.Point(0, 0), New cv.Point(roi.Width, roi.Height), cv.Scalar.White)
+             DrawLine(dst3(roi), New cv.Point(0, 0), New cv.Point(roi.Width, roi.Height), cv.Scalar.White)
          End Sub)
     End Sub
 End Class
@@ -460,8 +460,8 @@ Public Class Grid_MinMaxDepth : Inherits VB_Parent
             dst2.SetTo(0)
             For i = 0 To minMaxLocs.Count - 1
                 Dim lp = minMaxLocs(i)
-                drawCircle(dst2(task.gridList(i)), lp.p2, task.dotSize, cv.Scalar.Red)
-                drawCircle(dst2(task.gridList(i)), lp.p1, task.dotSize, cv.Scalar.White)
+                DrawCircle(dst2(task.gridList(i)), lp.p2, task.dotSize, cv.Scalar.Red)
+                DrawCircle(dst2(task.gridList(i)), lp.p1, task.dotSize, cv.Scalar.White)
             Next
             dst2.SetTo(cv.Scalar.White, task.gridMask)
         End If
@@ -500,10 +500,10 @@ Public Class Grid_TrackCenter : Inherits VB_Parent
         If standaloneTest() Then
             dst2 = src
             dst2.Rectangle(match.matchRect, task.highlightColor, task.lineWidth + 1, task.lineType)
-            drawCircle(dst2, center, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst2, center, task.dotSize, cv.Scalar.White)
 
             If task.heartBeat Then dst3.SetTo(0)
-            drawCircle(dst3, center, task.dotSize, task.highlightColor)
+            DrawCircle(dst3, center, task.dotSize, task.highlightColor)
             setTrueText(Format(match.correlation, fmt3), center, 3)
 
             labels(3) = "Match correlation = " + Format(match.correlation, fmt3)

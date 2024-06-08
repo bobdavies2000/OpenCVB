@@ -25,8 +25,8 @@ Public Class Draw_Noise : Inherits VB_Parent
             Dim c = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             If addRandomColor = False Then c = cv.Scalar.Black
             Dim noiseWidth = msRNG.Next(1, maxNoiseWidth)
-            drawCircle(dst2, center, noiseWidth, c)
-            drawCircle(noiseMask, center, noiseWidth, cv.Scalar.White)
+            DrawCircle(dst2, center, noiseWidth, c)
+            DrawCircle(noiseMask, center, noiseWidth, cv.Scalar.White)
         Next
     End Sub
 End Class
@@ -177,7 +177,7 @@ Public Class Draw_Shapes : Inherits VB_Parent
                 Case 0 ' circle
                     Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
                     Dim radius = msRNG.Next(1, Math.Min(offsetX, offsetY))
-                    drawCircle(dst2, center, radius, color)
+                    DrawCircle(dst2, center, radius, color)
                 Case 1 ' Rectangle
                     Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
                     Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
@@ -386,9 +386,9 @@ Public Class Draw_Line : Inherits VB_Parent
             If p1 = New cv.Point Then p1 = task.clickPoint Else p2 = task.clickPoint
         End If
 
-        If p1 <> New cv.Point And p2 = New cv.Point Then drawCircle(dst2,p1, task.dotSize, task.highlightColor)
+        If p1 <> New cv.Point And p2 = New cv.Point Then DrawCircle(dst2,p1, task.dotSize, task.highlightColor)
         If p1 <> New cv.Point And p2 <> New cv.Point Then
-            drawLine(dst2, p1, p2, task.highlightColor)
+            DrawLine(dst2, p1, p2, task.highlightColor)
         End If
         setTrueText("Click twice in the image to provide the points below and they will be connected with a line" + vbCrLf +
                     "P1 = " + p1.ToString + vbCrLf + "P2 = " + p2.ToString, 3)

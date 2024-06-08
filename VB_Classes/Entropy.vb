@@ -198,16 +198,16 @@ Public Class Entropy_SubDivisions : Inherits VB_Parent
 
         Dim p1 = New cv.Point(0, dst2.Height / 3)
         Dim p2 = New cv.Point(dst2.Width, dst2.Height / 3)
-        drawLine(dst2, p1, p2, cv.Scalar.White)
+        DrawLine(dst2, p1, p2, cv.Scalar.White)
         p1 = New cv.Point(0, dst2.Height * 2 / 3)
         p2 = New cv.Point(dst2.Width, dst2.Height * 2 / 3)
-        drawLine(dst2, p1, p2, cv.Scalar.White)
+        DrawLine(dst2, p1, p2, cv.Scalar.White)
         p1 = New cv.Point(dst2.Width / 3, 0)
         p2 = New cv.Point(dst2.Width / 3, dst2.Height)
-        drawLine(dst2, p1, p2, cv.Scalar.White)
+        DrawLine(dst2, p1, p2, cv.Scalar.White)
         p1 = New cv.Point(dst2.Width * 2 / 3, 0)
         p2 = New cv.Point(dst2.Width * 2 / 3, dst2.Height)
-        drawLine(dst2, p1, p2, cv.Scalar.White)
+        DrawLine(dst2, p1, p2, cv.Scalar.White)
     End Sub
 End Class
 

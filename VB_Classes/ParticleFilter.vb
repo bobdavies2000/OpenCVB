@@ -100,7 +100,7 @@ End Class
 '        net.X = dst2.Width / 2 + net.X / trace.mpList.Count
 '        net.Y = dst2.Height / 2 + net.Y / trace.mpList.Count
 '        dst3.SetTo(0)
-'        drawLine(dst3, New cv.Point2f(dst2.Width / 2, dst2.Height / 2), net, cv.Scalar.White, task.lineWidth, task.lineType)
+'        DrawLine(dst3, New cv.Point2f(dst2.Width / 2, dst2.Height / 2), net, cv.Scalar.White, task.lineWidth, task.lineType)
 '        setTrueText(trace.strOut, 3)
 '    End Sub
 'End Class

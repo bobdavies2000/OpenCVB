@@ -692,7 +692,7 @@ Public Class Bin4Way_BasicsNew : Inherits VB_Parent
 
         For i = 0 To quartiles.Count - 1
             Dim offset = quartiles(i) / bins * dst3.Width
-            drawLine(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), cv.Scalar.White)
+            DrawLine(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), cv.Scalar.White)
         Next
 
         mats.mat(0) = src.InRange(0, quartiles(0) - 1)

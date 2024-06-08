@@ -121,7 +121,7 @@ Public Class Rotate_Poly : Inherits VB_Parent
         rotateQT.Run(src)
         dst2 = rotateQT.dst3
 
-        drawCircle(dst2,rotateQT.rotateCenter, task.dotSize + 2, cv.Scalar.Yellow)
+        DrawCircle(dst2,rotateQT.rotateCenter, task.dotSize + 2, cv.Scalar.Yellow)
         setTrueText("center of rotation", rotateQT.rotateCenter)
         labels(3) = rotateQT.labels(3)
     End Sub
@@ -247,8 +247,8 @@ Public Class Rotate_Horizon : Inherits VB_Parent
         horizonVec.p1 = RotatePoint(task.horizonVec.p1, rotate.rotateCenter, -rotate.rotateAngle)
         horizonVec.p2 = RotatePoint(task.horizonVec.p2, rotate.rotateCenter, -rotate.rotateAngle)
 
-        drawLine(dst2, horizonVec.p1, horizonVec.p2, task.highlightColor)
-        drawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
+        DrawLine(dst2, horizonVec.p1, horizonVec.p2, task.highlightColor)
+        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
 
         Dim y1 = horizonVec.p1.Y - task.horizonVec.p1.Y
         Dim y2 = horizonVec.p2.Y - task.horizonVec.p2.Y

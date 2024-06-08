@@ -118,7 +118,7 @@ Public Class Diff_Lines : Inherits VB_Parent
         lines.Run(dst2)
         dst3 = src
         For Each lp In lines.lpList
-            drawLine(dst3, lp.p1, lp.p2, cv.Scalar.Yellow)
+            DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Yellow)
         Next
     End Sub
 End Class

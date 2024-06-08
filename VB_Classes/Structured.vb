@@ -759,7 +759,7 @@ Public Class Structured_FloorCeiling : Inherits VB_Parent
         labels(2) = "Current slice is at row =" + CStr(task.mouseMovePoint.Y)
         labels(3) = "Ceiling is at row =" + CStr(CInt(kalman.kOutput(1))) + " floor at y=" + CStr(CInt(kalman.kOutput(0)))
 
-        drawLine(dst2, New cv.Point(0, floorY), New cv.Point(dst2.Width, floorY), cv.Scalar.Yellow)
+        DrawLine(dst2, New cv.Point(0, floorY), New cv.Point(dst2.Width, floorY), cv.Scalar.Yellow)
         setTrueText("floor", New cv.Point(10, floorY + task.dotSize), 3)
 
         Dim rect = New cv.Rect(0, Math.Max(ceilingY - 5, 0), dst2.Width, 10)
@@ -767,7 +767,7 @@ Public Class Structured_FloorCeiling : Inherits VB_Parent
         Dim mean As cv.Scalar, stdev As cv.Scalar
         cv.Cv2.MeanStdDev(mask, mean, stdev)
         If mean(0) < mean(2) Then
-            drawLine(dst2, New cv.Point(0, ceilingY), New cv.Point(dst2.Width, ceilingY), cv.Scalar.Yellow)
+            DrawLine(dst2, New cv.Point(0, ceilingY), New cv.Point(dst2.Width, ceilingY), cv.Scalar.Yellow)
             setTrueText("ceiling", New cv.Point(10, ceilingY + task.dotSize), 3)
         Else
             setTrueText("Ceiling does not appear to be present", 3)
@@ -877,7 +877,7 @@ Public Class Structured_SliceXPlot : Inherits VB_Parent
                                options.sliceSize), dst3.Height - 1)
         Dim mm as mmData = GetMinMax(multi.heat.topframes.dst2(rect))
 
-        drawCircle(dst3,New cv.Point(col, mm.maxLoc.Y), task.dotSize + 3, cv.Scalar.Yellow)
+        DrawCircle(dst3,New cv.Point(col, mm.maxLoc.Y), task.dotSize + 3, cv.Scalar.Yellow)
 
         dst2 = task.color.Clone
         Dim filterZ = (dst3.Height - mm.maxLoc.Y) / dst3.Height * task.maxZmeters
@@ -917,7 +917,7 @@ Public Class Structured_SliceYPlot : Inherits VB_Parent
         Dim mm as mmData = GetMinMax(multi.heat.sideframes.dst2(rect))
 
         If mm.maxVal > 0 Then
-            drawCircle(dst3,New cv.Point(mm.maxLoc.X, row), task.dotSize + 3, cv.Scalar.Yellow)
+            DrawCircle(dst3,New cv.Point(mm.maxLoc.X, row), task.dotSize + 3, cv.Scalar.Yellow)
             ' dst3.Line(New cv.Point(mm.maxLoc.X, 0), New cv.Point(mm.maxLoc.X, dst3.Height), task.highlightColor, task.lineWidth, task.lineType)
             Dim filterZ = mm.maxLoc.X / dst3.Width * task.maxZmeters
 
@@ -967,9 +967,9 @@ Public Class Structured_MouseSlice : Inherits VB_Parent
 
             'Dim topPt = topsList(tops.IndexOf(tops.Min))
             'Dim botPt = botsList(bots.IndexOf(bots.Max))
-            'drawCircle(dst3,New cv.Point2f((topPt.X + botPt.X) / 2, (topPt.Y + botPt.Y) / 2), task.dotSize + 5, cv.Scalar.Red)
+            'DrawCircle(dst3,New cv.Point2f((topPt.X + botPt.X) / 2, (topPt.Y + botPt.Y) / 2), task.dotSize + 5, cv.Scalar.Red)
             'dst3.Line(topPt, botPt, cv.Scalar.Red, task.lineWidth, task.lineType)
-            'drawLine(dst2,topPt, botPt, task.highlightColor, task.lineWidth + 2, task.lineType)
+            'DrawLine(dst2,topPt, botPt, task.highlightColor, task.lineWidth + 2, task.lineType)
         End If
         If standaloneTest() Then
             dst2 = src
@@ -1023,7 +1023,7 @@ Public Class Structured_SliceEither : Inherits VB_Parent
         labels(3) = heat.labels(3)
 
         dst3 = heat.dst3
-        drawCircle(dst3,New cv.Point(task.topCameraPoint.X, dst3.Height), task.dotSize,
+        DrawCircle(dst3,New cv.Point(task.topCameraPoint.X, dst3.Height), task.dotSize,
                     cv.Scalar.Yellow)
         If topView Then
             dst3.Line(New cv.Point(sliceVal, 0), New cv.Point(sliceVal, dst3.Height),
@@ -1222,7 +1222,7 @@ Public Class Structured_CountSideSum : Inherits VB_Parent
         Dim surfaces As New List(Of Single)
         For i = 0 To counts.Count - 1
             If counts(i) >= max / 2 Then
-                drawLine(dst2, New cv.Point(0, i), New cv.Point(dst2.Width, i), cv.Scalar.White)
+                DrawLine(dst2, New cv.Point(0, i), New cv.Point(dst2.Width, i), cv.Scalar.White)
                 surfaces.Add(yValues(i))
             End If
         Next
@@ -1283,7 +1283,7 @@ Public Class Structured_SliceV : Inherits VB_Parent
         labels(3) = heat.labels(3)
 
         dst3 = heat.dst2
-        drawCircle(dst3,New cv.Point(task.topCameraPoint.X, 0), task.dotSize, task.highlightColor)
+        DrawCircle(dst3,New cv.Point(task.topCameraPoint.X, 0), task.dotSize, task.highlightColor)
         dst3.Line(New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), task.highlightColor, options.sliceSize)
         If standaloneTest() Then
             dst2 = src
@@ -1328,7 +1328,7 @@ Public Class Structured_SliceH : Inherits VB_Parent
 
         dst3 = heat.dst3
         Dim yPlaneOffset = If(ycoordinate < dst3.Height - options.sliceSize, CInt(ycoordinate), dst3.Height - options.sliceSize - 1)
-        drawCircle(dst3,New cv.Point(0, task.sideCameraPoint.Y), task.dotSize, task.highlightColor)
+        DrawCircle(dst3,New cv.Point(0, task.sideCameraPoint.Y), task.dotSize, task.highlightColor)
         dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.highlightColor, options.sliceSize)
         If standaloneTest() Then
             dst2 = src

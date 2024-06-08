@@ -33,7 +33,7 @@ Public Class LineCoin_Basics : Inherits VB_Parent
         dst2.SetTo(0)
         For i = 0 To p1List.Count - 1
             If ptCounts(i) >= task.frameHistoryCount Then
-                drawLine(dst2, p1List(i), p2List(i), 255)
+                DrawLine(dst2, p1List(i), p2List(i), 255)
                 lpList.Add(New pointPair(p1List(i), p2List(i)))
             End If
         Next

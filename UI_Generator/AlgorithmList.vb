@@ -1386,6 +1386,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(functionN
 	if algorithmName = "Options_MinMaxNone" Then return new Options_MinMaxNone
 	if algorithmName = "Options_Motion" Then return new Options_Motion
 	if algorithmName = "Options_MotionBlur" Then return new Options_MotionBlur
+	if algorithmName = "Options_MotionDetect" Then return new Options_MotionDetect
 	if algorithmName = "Options_MSER" Then return new Options_MSER
 	if algorithmName = "Options_Neighbors" Then return new Options_Neighbors
 	if algorithmName = "Options_OilPaint" Then return new Options_OilPaint

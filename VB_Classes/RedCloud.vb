@@ -81,8 +81,8 @@ Public Class RedCloud_Hulls : Inherits VB_Parent
                 Catch ex As Exception
                     defectCount += 1
                 End Try
-                drawContour(dst3(rc.rect), rc.hull, rc.color, -1)
-                drawContour(task.cellMap(rc.rect), rc.hull, rc.index, -1)
+                DrawContour(dst3(rc.rect), rc.hull, rc.color, -1)
+                DrawContour(task.cellMap(rc.rect), rc.hull, rc.index, -1)
             End If
             redCells.Add(rc)
         Next
@@ -137,7 +137,7 @@ Public Class RedCloud_FindCells : Inherits VB_Parent
             For Each index In cellList
                 If task.redCells.Count <= index Then Continue For
                 Dim rc = task.redCells(index)
-                drawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+                DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
                 dst3(rc.rect).SetTo(If(task.redOptions.naturalColor.Checked, rc.naturalColor, cv.Scalar.White), rc.mask)
             Next
             dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
@@ -271,8 +271,8 @@ Public Class RedCloud_CellsAtDepth : Inherits VB_Parent
         dst3.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst3.Height), cv.Scalar.Yellow, task.lineWidth)
         For i = 0 To slotList(histIndex).Count - 1
             Dim rc = task.redCells(slotList(histIndex)(i))
-            drawContour(dst2(rc.rect), rc.contour, cv.Scalar.Yellow)
-            drawContour(task.color(rc.rect), rc.contour, cv.Scalar.Yellow)
+            DrawContour(dst2(rc.rect), rc.contour, cv.Scalar.Yellow)
+            DrawContour(task.color(rc.rect), rc.contour, cv.Scalar.Yellow)
         Next
     End Sub
 End Class
@@ -341,7 +341,7 @@ Public Class RedCloud_Features : Inherits VB_Parent
             dst3(rc.rect).SetTo(vbNearFar(If(selection = 2, correlationXtoZ, correlationYtoZ) + 1), rc.mask)
             setTrueText("(" + Format(correlationXtoZ, fmt3) + ", " + Format(correlationYtoZ, fmt3) + ")", New cv.Point(rc.rect.X, rc.rect.Y), 3)
         End If
-        drawContour(dst0(rc.rect), rc.contour, cv.Scalar.Yellow)
+        DrawContour(dst0(rc.rect), rc.contour, cv.Scalar.Yellow)
         setTrueText(labels(3), 3)
         labels(2) = "Highlighted feature = " + labelName
     End Sub
@@ -744,13 +744,13 @@ Public Class RedCloud_LikelyFlatSurfaces : Inherits VB_Parent
             If rc.depthMean(2) >= task.maxZmeters Then Continue For
             Dim tmp As cv.Mat = verts.dst2(rc.rect) And rc.mask
             If tmp.CountNonZero / rc.pixels > 0.5 Then
-                drawContour(dst2(rc.rect), rc.contour, rc.color, -1)
+                DrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
                 vCells.Add(rc)
             End If
             tmp = verts.dst3(rc.rect) And rc.mask
             Dim count = tmp.CountNonZero
             If count / rc.pixels > 0.5 Then
-                drawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+                DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
                 hCells.Add(rc)
             End If
         Next
@@ -787,7 +787,7 @@ Public Class RedCloud_PlaneEq3D : Inherits VB_Parent
         End If
 
         dst3.SetTo(0)
-        drawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+        DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
 
         setTrueText(eq.strOut, 3)
     End Sub
@@ -829,7 +829,7 @@ Public Class RedCloud_DelaunayGuidedFeatures : Inherits VB_Parent
         For Each ptList In goodList
             For Each pt In ptList
                 Dim c = dst2.Get(Of cv.Vec3b)(pt.Y, pt.X)
-                drawCircle(dst3,pt, task.dotSize, c)
+                DrawCircle(dst3,pt, task.dotSize, c)
             Next
         Next
     End Sub
@@ -887,9 +887,9 @@ Public Class RedCloud_UnstableCells : Inherits VB_Parent
 
         For Each rc In task.redCells
             If prevList.Contains(rc.maxDStable) = False Then
-                drawContour(dst1(rc.rect), rc.contour, cv.Scalar.White, -1)
-                drawContour(dst1(rc.rect), rc.contour, cv.Scalar.Black)
-                drawContour(dst3(rc.rect), rc.contour, cv.Scalar.White, -1)
+                DrawContour(dst1(rc.rect), rc.contour, cv.Scalar.White, -1)
+                DrawContour(dst1(rc.rect), rc.contour, cv.Scalar.Black)
+                DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.White, -1)
             End If
             currList.Add(rc.maxDStable)
         Next
@@ -927,9 +927,9 @@ Public Class RedCloud_UnstableHulls : Inherits VB_Parent
         For Each rc In task.redCells
             rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             If prevList.Contains(rc.maxDStable) = False Then
-                drawContour(dst1(rc.rect), rc.hull, cv.Scalar.White, -1)
-                drawContour(dst1(rc.rect), rc.hull, cv.Scalar.Black)
-                drawContour(dst3(rc.rect), rc.hull, cv.Scalar.White, -1)
+                DrawContour(dst1(rc.rect), rc.hull, cv.Scalar.White, -1)
+                DrawContour(dst1(rc.rect), rc.hull, cv.Scalar.Black)
+                DrawContour(dst3(rc.rect), rc.hull, cv.Scalar.White, -1)
             End If
             currList.Add(rc.maxDStable)
         Next
@@ -995,8 +995,8 @@ Public Class RedCloud_FloodPoint : Inherits VB_Parent
 
         dst1 = task.depthRGB
         For Each rc In task.redCells
-            drawCircle(dst1,rc.floodPoint, task.dotSize, cv.Scalar.White)
-            drawCircle(dst2,rc.floodPoint, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst1,rc.floodPoint, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst2,rc.floodPoint, task.dotSize, cv.Scalar.Yellow)
         Next
         stats.Run(src)
         setTrueText(stats.strOut, 3)
@@ -1458,7 +1458,7 @@ Public Class RedCloud_StructuredH : Inherits VB_Parent
 
         dst2.SetTo(0)
         For Each rc In motion.redCells
-            If rc.motionFlag Then drawContour(dst2(rc.rect), rc.contour, rc.color, -1)
+            If rc.motionFlag Then DrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
         Next
 
         Dim pc As New cv.Mat(task.pointCloud.Size, cv.MatType.CV_32FC3, 0)
@@ -1501,7 +1501,7 @@ Public Class RedCloud_StructuredV : Inherits VB_Parent
 
         dst2.SetTo(0)
         For Each rc In motion.redCells
-            If rc.motionFlag Then drawContour(dst2(rc.rect), rc.contour, rc.color, -1)
+            If rc.motionFlag Then DrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
         Next
 
         Dim pc As New cv.Mat(task.pointCloud.Size, cv.MatType.CV_32FC3, 0)
@@ -1696,9 +1696,9 @@ Public Class RedCloud_ContourUpdate : Inherits VB_Parent
         For i = 1 To redCells.Count - 1
             Dim rc = redCells(i)
             rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            drawContour(rc.mask, rc.contour, 255, -1)
+            DrawContour(rc.mask, rc.contour, 255, -1)
             redCells(i) = rc
-            drawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+            DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
         Next
     End Sub
 End Class
@@ -1722,7 +1722,7 @@ Public Class RedCloud_MaxDist : Inherits VB_Parent
         labels = redC.labels
 
         For Each rc In task.redCells
-            drawCircle(dst2,rc.maxDist, task.dotSize, task.highlightColor)
+            DrawCircle(dst2,rc.maxDist, task.dotSize, task.highlightColor)
         Next
 
         addTour.redCells = task.redCells
@@ -1732,7 +1732,7 @@ Public Class RedCloud_MaxDist : Inherits VB_Parent
         For i = 1 To addTour.redCells.Count - 1
             Dim rc = addTour.redCells(i)
             rc.maxDist = GetMaxDist(rc)
-            drawCircle(dst3,rc.maxDist, task.dotSize, task.highlightColor)
+            DrawCircle(dst3,rc.maxDist, task.dotSize, task.highlightColor)
         Next
     End Sub
 End Class
@@ -2000,8 +2000,8 @@ Public Class RedCloud_TopXHulls : Inherits VB_Parent
         For Each rc In task.redCells
             If rc.contour.Count >= 5 Then
                 rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
-                drawContour(dst2(rc.rect), rc.hull, rc.color, -1)
-                drawContour(rc.mask, rc.hull, 255, -1)
+                DrawContour(dst2(rc.rect), rc.hull, rc.color, -1)
+                DrawContour(rc.mask, rc.hull, 255, -1)
                 task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
             End If
             newCells.Add(rc)

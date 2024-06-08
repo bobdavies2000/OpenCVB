@@ -132,7 +132,7 @@ Public Class Interpolate_Lines : Inherits VB_Parent
         dst2 = lines.dst2
         dst3 = src
         For Each lp In lines.lpList
-            drawLine(dst3, lp.p1, lp.p2, cv.Scalar.Yellow)
+            DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Yellow)
         Next
         labels(3) = "There were " + CStr(lines.lpList.Count) + " lines found"
         labels(2) = inter.labels(2)

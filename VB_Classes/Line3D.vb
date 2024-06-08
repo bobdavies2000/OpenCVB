@@ -31,9 +31,9 @@ Public Class Line3D_Draw : Inherits VB_Parent
         If toggleFirstSecond Then Exit Sub ' wait until the second point is selected...
 
         dst1 = src
-        drawLine(dst1, p1, p2, task.highlightColor)
+        DrawLine(dst1, p1, p2, task.highlightColor)
         dst0.SetTo(0)
-        drawLine(dst0, p1, p2, 255)
+        DrawLine(dst0, p1, p2, 255)
         dst1.SetTo(0)
         task.pcSplit(0).CopyTo(dst1, dst0)
         Dim points = dst1.FindNonZero()
@@ -125,7 +125,7 @@ Public Class Line3D_CandidatesFirstLast : Inherits VB_Parent
         For Each ptlist In xyList
             Dim p1 = ptlist(0)
             Dim p2 = ptlist(ptlist.Count - 1)
-            drawLine(dst2, p1, p2, cv.Scalar.White)
+            DrawLine(dst2, p1, p2, cv.Scalar.White)
         Next
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -171,7 +171,7 @@ Public Class Line3D_CandidatesAll : Inherits VB_Parent
             For i = 0 To ptlist.Count - 2
                 Dim p1 = ptlist(i)
                 Dim p2 = ptlist(i + 1)
-                drawLine(dst2, p1, p2, cv.Scalar.White)
+                DrawLine(dst2, p1, p2, cv.Scalar.White)
             Next
         Next
     End Sub

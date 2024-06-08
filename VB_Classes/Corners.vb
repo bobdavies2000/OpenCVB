@@ -28,7 +28,7 @@ Public Class Corners_Basics : Inherits VB_Parent
         If standaloneTest() Then
             dst3.SetTo(0)
             For Each kp As cv.KeyPoint In kpoints
-                drawCircle(dst2, kp.Pt, task.dotSize, cv.Scalar.Yellow)
+                DrawCircle(dst2, kp.Pt, task.dotSize, cv.Scalar.Yellow)
                 dst3.Set(Of Byte)(kp.Pt.Y, kp.Pt.X, 255)
             Next
         End If
@@ -82,7 +82,7 @@ Public Class Corners_Harris : Inherits VB_Parent
         For j = 0 To gray.Rows - 1
             For i = 0 To gray.Cols - 1
                 If mc.Get(Of Single)(j, i) > mm.minVal + (mm.maxVal - mm.minVal) * quality / qualitySlider.Maximum Then
-                    drawCircle(dst2,New cv.Point(i, j), task.dotSize, task.highlightColor)
+                    DrawCircle(dst2,New cv.Point(i, j), task.dotSize, task.highlightColor)
                 End If
             Next
         Next
@@ -169,7 +169,7 @@ Public Class Corners_BasicsCentroid : Inherits VB_Parent
         dst2 = fast.dst2
         dst3.SetTo(0)
         For Each pt In fast.features
-            drawCircle(dst3, pt, task.dotSize + 2, cv.Scalar.White)
+            DrawCircle(dst3, pt, task.dotSize + 2, cv.Scalar.White)
         Next
         Dim gray = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim m = cv.Cv2.Moments(gray, True)
@@ -177,7 +177,7 @@ Public Class Corners_BasicsCentroid : Inherits VB_Parent
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
             kalman.Run(src)
-            drawCircle(dst3,New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red)
+            DrawCircle(dst3,New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red)
         End If
     End Sub
 End Class
@@ -209,7 +209,7 @@ Public Class Corners_BasicsStablePoints : Inherits VB_Parent
         For Each pt In fast.features
             Dim test = New cv.Point(pt.X, pt.Y)
             If features.Contains(test) Then
-                drawCircle(dst2, test, task.dotSize, cv.Scalar.Yellow)
+                DrawCircle(dst2, test, task.dotSize, cv.Scalar.Yellow)
                 newPts.Add(test)
                 dst3.Set(Of Byte)(test.Y, test.X, 255)
             End If
@@ -248,7 +248,7 @@ Public Class Corners_BasicsCentroids : Inherits VB_Parent
         Next
 
         For i = 0 To fastCenters.Count - 1
-            drawCircle(dst2,fastCenters(i), task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst2,fastCenters(i), task.dotSize, cv.Scalar.Yellow)
         Next
         dst2.SetTo(cv.Scalar.White, task.gridMask)
     End Sub
@@ -324,7 +324,7 @@ Public Class Corners_HarrisDetector : Inherits VB_Parent
             features.Clear()
             For i = 0 To ptCount - 1
                 features.Add(New cv.Point2f(ptMat.Get(Of Integer)(i, 0), ptMat.Get(Of Integer)(i, 1)))
-                drawCircle(dst2,features(i), task.dotSize, cv.Scalar.Yellow)
+                DrawCircle(dst2,features(i), task.dotSize, cv.Scalar.Yellow)
             Next
         End If
     End Sub
@@ -356,8 +356,8 @@ Public Class Corners_RedCloud : Inherits VB_Parent
 
         dst3 = task.color.Clone
         For Each pt In corners.nPoints
-            drawCircle(dst2,pt, task.dotSize, task.highlightColor)
-            drawCircle(dst3,pt, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst2,pt, task.dotSize, task.highlightColor)
+            DrawCircle(dst3,pt, task.dotSize, cv.Scalar.Yellow)
         Next
     End Sub
 End Class
@@ -386,7 +386,7 @@ Public Class Corners_SubPix : Inherits VB_Parent
         For i = 0 To task.features.Count - 1
             Dim pt = task.features(i)
             task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
-            drawCircle(dst2,pt, task.dotSize, task.highlightColor)
+            DrawCircle(dst2,pt, task.dotSize, task.highlightColor)
         Next
     End Sub
 End Class

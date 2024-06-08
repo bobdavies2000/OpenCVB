@@ -77,10 +77,10 @@ Public Class Depth_FirstLastDistance : Inherits VB_Parent
         desc = "Monitor the first and last depth distances"
     End Sub
     Private Sub identifyMinMax(pt As cv.Point, text As String)
-        drawCircle(dst2,pt, task.dotSize, task.highlightColor)
+        DrawCircle(dst2,pt, task.dotSize, task.highlightColor)
         setTrueText(text, pt, 2)
 
-        drawCircle(dst3,pt, task.dotSize, task.highlightColor)
+        DrawCircle(dst3,pt, task.dotSize, task.highlightColor)
         setTrueText(text, pt, 3)
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -125,7 +125,7 @@ Public Class Depth_HolesRect : Inherits VB_Parent
             Dim minRect = cv.Cv2.MinAreaRect(contour)
             Dim nextColor = New cv.Scalar(task.vecColors(i Mod 256)(0), task.vecColors(i Mod 256)(1), task.vecColors(i Mod 256)(2))
             drawRotatedRectangle(minRect, dst2, nextColor)
-            drawContour(dst3, contour.ToList, cv.Scalar.White, task.lineWidth)
+            DrawContour(dst3, contour.ToList, cv.Scalar.White, task.lineWidth)
         Next
         cv.Cv2.AddWeighted(dst2, 0.5, task.depthRGB, 0.5, 0, dst2)
     End Sub
@@ -339,13 +339,13 @@ Public Class Depth_LocalMinMax_MT : Inherits VB_Parent
             minPoint(i) = New cv.Point(mm.minLoc.X + roi.X, mm.minLoc.Y + roi.Y)
             maxPoint(i) = New cv.Point(mm.maxLoc.X + roi.X, mm.maxLoc.Y + roi.Y)
 
-            drawCircle(dst2(roi), mm.minLoc, task.dotSize, task.highlightColor)
-            drawCircle(dst2(roi), mm.maxLoc, task.dotSize, cv.Scalar.Red)
+            DrawCircle(dst2(roi), mm.minLoc, task.dotSize, task.highlightColor)
+            DrawCircle(dst2(roi), mm.maxLoc, task.dotSize, cv.Scalar.Red)
 
             Dim p1 = New cv.Point(mm.minLoc.X + roi.X, mm.minLoc.Y + roi.Y)
             Dim p2 = New cv.Point(mm.maxLoc.X + roi.X, mm.maxLoc.Y + roi.Y)
-            drawCircle(dst3,p1, task.dotSize, task.highlightColor)
-            drawCircle(dst3,p2, task.dotSize, cv.Scalar.Red)
+            DrawCircle(dst3,p1, task.dotSize, task.highlightColor)
+            DrawCircle(dst3,p2, task.dotSize, cv.Scalar.Red)
         End Sub)
     End Sub
 End Class
@@ -398,8 +398,8 @@ Public Class Depth_MinMaxToVoronoi : Inherits VB_Parent
             ptmin = validatePoint2f(ptmin)
             ptmax = validatePoint2f(ptmax)
             subdiv.Insert(ptmin)
-            drawCircle(dst2,ptmin, task.dotSize, cv.Scalar.Red)
-            drawCircle(dst2,ptmax, task.dotSize, cv.Scalar.Blue)
+            DrawCircle(dst2,ptmin, task.dotSize, cv.Scalar.Red)
+            DrawCircle(dst2,ptmax, task.dotSize, cv.Scalar.Blue)
         Next
         Dim facets = New cv.Point2f()() {Nothing}
         Dim centers() As cv.Point2f
@@ -774,7 +774,7 @@ Public Class Depth_MaxMask : Inherits VB_Parent
         dst3.SetTo(0)
         For Each c In contour.allContours
             Dim hull = cv.Cv2.ConvexHull(c, True).ToList
-            drawContour(dst3, hull, cv.Scalar.White, -1)
+            DrawContour(dst3, hull, cv.Scalar.White, -1)
         Next
     End Sub
 End Class
@@ -815,8 +815,8 @@ Public Class Depth_ForegroundOverTime : Inherits VB_Parent
         dst3.SetTo(0)
         For Each ctr In contours.allContours
             If ctr.Length >= options.minSizeContour Then
-                drawContour(dst2, ctr.ToList, cv.Scalar.White, -1)
-                drawContour(dst3, ctr.ToList, cv.Scalar.White)
+                DrawContour(dst2, ctr.ToList, cv.Scalar.White, -1)
+                DrawContour(dst3, ctr.ToList, cv.Scalar.White)
             End If
         Next
     End Sub
@@ -900,8 +900,8 @@ Public Class Depth_Foreground : Inherits VB_Parent
         dst3.SetTo(0)
         For Each ctr In contours.allContours
             If ctr.Length >= options.minSizeContour Then
-                drawContour(dst2, ctr.ToList, cv.Scalar.White, -1)
-                drawContour(dst3, ctr.ToList, cv.Scalar.White)
+                DrawContour(dst2, ctr.ToList, cv.Scalar.White, -1)
+                DrawContour(dst3, ctr.ToList, cv.Scalar.White)
             End If
         Next
     End Sub
@@ -969,9 +969,9 @@ Public Class Depth_InRange : Inherits VB_Parent
             contours.Run(regMats(i))
             For Each ctr In contours.allContours
                 If ctr.Length >= options.minSizeContour Then
-                    drawContour(dst2, ctr.ToList, classCount, -1)
+                    DrawContour(dst2, ctr.ToList, classCount, -1)
                     classCount += 1
-                    drawContour(dst3, ctr.ToList, cv.Scalar.White)
+                    DrawContour(dst3, ctr.ToList, cv.Scalar.White)
                 End If
             Next
         Next
@@ -1191,7 +1191,7 @@ Public Class Depth_Contour : Inherits VB_Parent
 
         dst2.SetTo(0)
         For Each tour In contour.contourlist
-            drawContour(dst2, tour.ToList, 255, -1)
+            DrawContour(dst2, tour.ToList, 255, -1)
         Next
     End Sub
 End Class
@@ -1218,7 +1218,7 @@ Public Class Depth_Outline : Inherits VB_Parent
 
         dst2.SetTo(0)
         For Each tour In contour.contourlist
-            drawContour(dst2, tour.ToList, 255, task.lineWidth)
+            DrawContour(dst2, tour.ToList, 255, task.lineWidth)
         Next
 
         If standaloneTest() Then

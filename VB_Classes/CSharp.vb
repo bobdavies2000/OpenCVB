@@ -57,7 +57,7 @@ Imports cv = OpenCvSharp
 '        CS_AKaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 '        src.CopyTo(dst2)
 '        For i = 0 To CS_AKaze.akazeKeyPoints.Count - 1
-'            drawCircle(dst2,CS_AKaze.akazeKeyPoints.ElementAt(i).Pt, task.dotSize, cv.Scalar.Red)
+'            DrawCircle(dst2,CS_AKaze.akazeKeyPoints.ElementAt(i).Pt, task.dotSize, cv.Scalar.Red)
 '        Next
 '    End Sub
 '    End ClassPublic Class KAZE_KeypointsKAZE_CS : Inherits VB_Parent
@@ -70,7 +70,7 @@ Imports cv = OpenCvSharp
 '        CS_Kaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 '        src.CopyTo(dst2)
 '        For i = 0 To CS_Kaze.kazeKeyPoints.Count - 1
-'            drawCircle(dst2,CS_Kaze.kazeKeyPoints.ElementAt(i).Pt, task.dotSize, cv.Scalar.Red)
+'            DrawCircle(dst2,CS_Kaze.kazeKeyPoints.ElementAt(i).Pt, task.dotSize, cv.Scalar.Red)
 '        Next
 '    End Sub
 'End Class
@@ -138,10 +138,10 @@ Imports cv = OpenCvSharp
 '                End If
 '            Next
 '            If minDistance < Single.MaxValue Then
-'                drawCircle(dst3,pt1.Pt, task.dotSize + 2, cv.Scalar.Blue)
-'                drawCircle(dst2,pt1.Pt, task.dotSize + 2, cv.Scalar.Blue)
-'                drawCircle(dst3,CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, task.dotSize + 2, cv.Scalar.Red)
-'                drawLine(dst3, pt1.Pt, CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, cv.Scalar.Yellow)
+'                DrawCircle(dst3,pt1.Pt, task.dotSize + 2, cv.Scalar.Blue)
+'                DrawCircle(dst2,pt1.Pt, task.dotSize + 2, cv.Scalar.Blue)
+'                DrawCircle(dst3,CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, task.dotSize + 2, cv.Scalar.Red)
+'                DrawLine(dst3, pt1.Pt, CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, cv.Scalar.Yellow)
 '            End If
 '        Next
 '        labels(2) = "Right image has " + CStr(CS_KazeRight.kazeKeyPoints.Count) + " key points"
@@ -356,7 +356,7 @@ Imports cv = OpenCvSharp
 '        Dim newPoints As New List(Of cv.Point)
 '        For i = 0 To sift.keypoints.Count - 1
 '            Dim pt = sift.keypoints(i).Pt
-'            drawCircle(dst2,pt, task.dotSize, cv.Scalar.Yellow)
+'            DrawCircle(dst2,pt, task.dotSize, cv.Scalar.Yellow)
 '            newPoints.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
 '        Next
 
@@ -374,7 +374,7 @@ Imports cv = OpenCvSharp
 '                End If
 '            Next
 '            If missing = False Then
-'                drawCircle(dst3,pt, task.dotSize, cv.Scalar.Yellow)
+'                DrawCircle(dst3,pt, task.dotSize, cv.Scalar.Yellow)
 '                stablePoints.Add(pt)
 '            End If
 '        Next
@@ -487,7 +487,7 @@ Imports cv = OpenCvSharp
 '        Dim keys2 = surf.CS_SurfBasics.keypoints2
 
 '        For i = 0 To keys1.Count - 1
-'            drawCircle(dst2,keys1(i).Pt, task.dotSize + 2, cv.Scalar.Red)
+'            DrawCircle(dst2,keys1(i).Pt, task.dotSize + 2, cv.Scalar.Red)
 '        Next
 
 '        Dim matchCount As Integer
@@ -497,7 +497,7 @@ Imports cv = OpenCvSharp
 
 '            For j = 0 To keys2.Count - 1
 '                If Math.Abs(keys2(j).Pt.Y - pt.Y) < range Then
-'                    drawCircle(dst3,keys2(j).Pt, task.dotSize + 2, task.highlightColor)
+'                    DrawCircle(dst3,keys2(j).Pt, task.dotSize + 2, task.highlightColor)
 '                    keys2(j).Pt.Y = -1 ' so we don't match it again.
 '                    matchCount += 1
 '                End If
@@ -507,7 +507,7 @@ Imports cv = OpenCvSharp
 '        ' mark those that were not
 '        For i = 0 To keys2.Count - 1
 '            Dim pt = keys2(i).Pt
-'            If pt.Y <> -1 Then drawCircle(dst3,keys2(i).Pt, task.dotSize + 2, cv.Scalar.Red)
+'            If pt.Y <> -1 Then DrawCircle(dst3,keys2(i).Pt, task.dotSize + 2, cv.Scalar.Red)
 '        Next
 '        labels(3) = "Yellow matched left to right = " + CStr(matchCount) + ". Red is unmatched."
 '    End Sub
@@ -611,7 +611,7 @@ Imports cv = OpenCvSharp
 '        Dim keys2 = surf.CS_SurfBasics.keypoints2
 
 '        For i = 0 To keys1.Count - 1
-'            drawCircle(dst2,keys1(i).Pt, task.dotSize + 3, cv.Scalar.Red)
+'            DrawCircle(dst2,keys1(i).Pt, task.dotSize + 3, cv.Scalar.Red)
 '        Next
 
 '        Dim matchCount As Integer
@@ -836,7 +836,7 @@ Imports cv = OpenCvSharp
 '    Private Sub connectLine(i As Integer)
 '        Dim p1 = New cv.Point2f(barMidPoint + dst2.Width * i / valList.Count, dst2.Height - dst2.Height * valList(i) / slr.hist.plot.maxValue)
 '        resultingPoints.Add(p1)
-'        drawLine(dst2,lastPoint, p1, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+'        DrawLine(dst2,lastPoint, p1, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
 '        lastPoint = p1
 '    End Sub
 '    Public Sub RunVB(src as cv.Mat)
@@ -886,7 +886,7 @@ Imports cv = OpenCvSharp
 '        dst = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
 '        For Each pt In points
-'            drawCircle(dst, pt, task.dotSize, color)
+'            DrawCircle(dst, pt, task.dotSize, color)
 '        Next
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)

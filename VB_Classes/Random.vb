@@ -19,7 +19,7 @@ Public Class Random_Basics : Inherits VB_Parent
             If standaloneTest() Then
                 dst2.SetTo(0)
                 For Each pt In pointList
-                    drawCircle(dst2, pt, task.dotSize, cv.Scalar.Yellow)
+                    DrawCircle(dst2, pt, task.dotSize, cv.Scalar.Yellow)
                 Next
             End If
         End If
@@ -73,7 +73,7 @@ Public Class Random_Enumerable : Inherits VB_Parent
             End Function).ToArray
         dst2.SetTo(0)
         For Each pt In points
-            drawCircle(dst2, pt, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst2, pt, task.dotSize, cv.Scalar.Yellow)
         Next
     End Sub
 End Class
@@ -101,7 +101,7 @@ Public Class Random_Basics3D : Inherits VB_Parent
             If standaloneTest() Then
                 dst2.SetTo(0)
                 For Each pt In PointList
-                    drawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.dotSize, cv.Scalar.Yellow)
+                    DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.dotSize, cv.Scalar.Yellow)
                 Next
             End If
             Points3f = PointList.ToArray
@@ -134,7 +134,7 @@ Public Class Random_Basics4D : Inherits VB_Parent
             If standaloneTest() Then
                 dst2.SetTo(0)
                 For Each v In PointList
-                    drawCircle(dst2, New cv.Point2f(v(0), v(1)), task.dotSize, cv.Scalar.Yellow)
+                    DrawCircle(dst2, New cv.Point2f(v(0), v(1)), task.dotSize, cv.Scalar.Yellow)
                 Next
             End If
             vec4f = PointList.ToArray
@@ -614,8 +614,8 @@ Public Class Random_KalmanPoints : Inherits VB_Parent
 
         dst2.SetTo(0)
         For i = 0 To currSet.Count - 1
-            drawCircle(dst2, currSet(i), task.dotSize + 2, cv.Scalar.Yellow)
-            drawCircle(dst2, targetSet(i), task.dotSize + 2, cv.Scalar.Red)
+            DrawCircle(dst2, currSet(i), task.dotSize + 2, cv.Scalar.Yellow)
+            DrawCircle(dst2, targetSet(i), task.dotSize + 2, cv.Scalar.Red)
         Next
 
         Dim noChanges As Boolean = True
@@ -679,7 +679,7 @@ Public Class Random_Clusters : Inherits VB_Parent
                 If pt.X >= dst2.Width Then pt.X = dst2.Width - 1
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y >= dst2.Height Then pt.Y = dst2.Height - 1
-                drawCircle(dst2,pt, task.dotSize, task.scalarColors(i Mod 256))
+                DrawCircle(dst2,pt, task.dotSize, task.scalarColors(i Mod 256))
 
                 cList.Add(pt)
                 labelList.Add(i)

@@ -59,7 +59,7 @@ def drawCross(img, center, r, g, b):
     cv.line(img, (ctrx + d, ctry - d), (ctrx - d, ctry + d), color, t, cv.LINE_AA)
 
 
-def drawLines(img, points, r, g, b):
+def DrawLines(img, points, r, g, b):
     cv.polylines(img, [np.int32(points)], isClosed=False, color=(r, g, b))
 
 
@@ -117,9 +117,9 @@ try:
             kalman_points.append(estimated)
 
             # Display the trajectories and current points
-            drawLines(img, kalman_points,   0,   255, 0)
+            DrawLines(img, kalman_points,   0,   255, 0)
             drawCross(img, estimated,       255, 255, 255)
-            drawLines(img, measured_points, 255, 255, 0)
+            DrawLines(img, measured_points, 255, 255, 0)
             drawCross(img, measured, 0,   0,   255)
 
             # Delay for specified interval, quitting on ESC

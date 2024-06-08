@@ -13,8 +13,8 @@ Public Class RedTrack_Basics : Inherits VB_Parent
         labels = stats.labels
         dst2.SetTo(0)
         For Each rc As rcData In task.redCells
-            drawContour(dst2(rc.rect), rc.contour, rc.color, -1)
-            If rc.index = task.rc.index Then drawContour(dst2(rc.rect), rc.contour, cv.Scalar.White, -1)
+            DrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
+            If rc.index = task.rc.index Then DrawContour(dst2(rc.rect), rc.contour, cv.Scalar.White, -1)
         Next
         strOut = stats.strOut
         setTrueText(strOut, 3)
@@ -40,7 +40,7 @@ Public Class RedTrack_Lines : Inherits VB_Parent
         If task.heartBeat Or task.motionFlag Then dst3.SetTo(0)
         Dim index As Integer
         For Each lp In lines.lpList
-            drawLine(dst3, lp.p1, lp.p2, 255)
+            DrawLine(dst3, lp.p1, lp.p2, 255)
             index += 1
             If index > 10 Then Exit For
         Next
@@ -117,7 +117,7 @@ Public Class RedTrack_LineSingle : Inherits VB_Parent
         rightmost = findNearest(rightCenter)
         rightCenter = task.redCells(rightmost).maxDist
 
-        drawLine(dst2, leftCenter, rightCenter, cv.Scalar.White)
+        DrawLine(dst2, leftCenter, rightCenter, cv.Scalar.White)
         labels(2) = track.redC.labels(2)
     End Sub
 End Class
@@ -147,9 +147,9 @@ Public Class RedTrack_FeaturesKNN : Inherits VB_Parent
             Dim p1 = knn.queries(i)
             Dim index = knn.neighbors(i)(knn.neighbors(i).Count - 1)
             Dim p2 = knn.trainInput(index)
-            drawCircle(dst3, p1, task.dotSize, cv.Scalar.Yellow)
-            drawCircle(dst3, p2, task.dotSize, cv.Scalar.Yellow)
-            drawLine(dst3, p1, p2, cv.Scalar.White)
+            DrawCircle(dst3, p1, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst3, p2, task.dotSize, cv.Scalar.Yellow)
+            DrawLine(dst3, p1, p2, cv.Scalar.White)
         Next
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
     End Sub
@@ -176,7 +176,7 @@ Public Class RedTrack_GoodCell : Inherits VB_Parent
         good.Run(src)
         dst3.SetTo(0)
         For Each pt In good.featureList
-            drawCircle(dst3,pt, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst3,pt, task.dotSize, cv.Scalar.White)
         Next
     End Sub
 End Class
@@ -208,11 +208,11 @@ Public Class RedTrack_GoodCells : Inherits VB_Parent
             If trackIndex.Contains(index) = False Then
                 Dim rc = task.redCells(index)
                 If rc.hull Is Nothing Then Continue For
-                drawContour(dst2(rc.rect), rc.hull, cv.Scalar.White, -1)
+                DrawContour(dst2(rc.rect), rc.hull, cv.Scalar.White, -1)
                 trackIndex.Add(index)
 
-                drawCircle(dst0, pt, task.dotSize, task.highlightColor)
-                drawCircle(dst3,pt, task.dotSize, cv.Scalar.White)
+                DrawCircle(dst0, pt, task.dotSize, task.highlightColor)
+                DrawCircle(dst3,pt, task.dotSize, cv.Scalar.White)
                 trackCells.Add(rc)
             End If
         Next
@@ -275,8 +275,8 @@ Public Class RedTrack_Points : Inherits VB_Parent
         dst3.SetTo(0)
         Dim index As Integer
         For Each lp In lines.lpList
-            drawCircle(dst3, lp.p1, task.dotSize, 255)
-            drawCircle(dst3, lp.p2, task.dotSize, 255)
+            DrawCircle(dst3, lp.p1, task.dotSize, 255)
+            DrawCircle(dst3, lp.p2, task.dotSize, 255)
             index += 1
             If index >= 10 Then Exit For
         Next
@@ -309,14 +309,14 @@ Public Class RedTrack_Features : Inherits VB_Parent
 
         If task.heartBeat Then dst2.SetTo(0)
         For Each pt In task.features
-            drawCircle(dst2, pt, task.dotSize, 255)
+            DrawCircle(dst2, pt, task.dotSize, 255)
         Next
 
         redC.Run(dst2)
         dst3.SetTo(0)
         For Each rc In task.redCells
             If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For
-            drawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+            DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
             If rc.contour.Count > 0 Then setTrueText(Format(shapeCorrelation(rc.contour), fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
         Next
         setTrueText("Move camera to see the value of this algorithm", 2)

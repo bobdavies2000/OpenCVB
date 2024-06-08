@@ -39,7 +39,7 @@ Public Class Contour_Basics : Inherits VB_Parent
             Dim tour = allContours(sortedList.ElementAt(i).Value)
             contourlist.Add(tour)
             Dim color As cv.Scalar = vecToScalar(dst2.Get(Of cv.Vec3b)(tour(0).Y, tour(0).X))
-            drawContour(dst3, tour.ToList, color, -1)
+            DrawContour(dst3, tour.ToList, color, -1)
         Next
         labels(3) = $"Top {sortedList.Count} contours found"
     End Sub
@@ -87,7 +87,7 @@ Public Class Contour_General : Inherits VB_Parent
 
         dst3.SetTo(0)
         For Each ctr In allContours.ToArray
-            drawContour(dst3, ctr.ToList, cv.Scalar.Yellow)
+            DrawContour(dst3, ctr.ToList, cv.Scalar.Yellow)
         Next
     End Sub
 End Class
@@ -132,7 +132,7 @@ Public Class Contour_GeneralWithOptions : Inherits VB_Parent
 
         dst3.SetTo(0)
         For Each ctr In allContours.ToArray
-            drawContour(dst3, ctr.ToList, cv.Scalar.Yellow)
+            DrawContour(dst3, ctr.ToList, cv.Scalar.Yellow)
         Next
     End Sub
 End Class
@@ -252,7 +252,7 @@ Public Class Contour_Edges : Inherits VB_Parent
                     color = New cv.Scalar(vec(0), vec(1), vec(2))
                 End If
                 colors.Add(vec)
-                drawContour(dst3, c.ToList, color, -1)
+                DrawContour(dst3, c.ToList, color, -1)
             End If
         Next
         lastImage = dst3.Clone
@@ -293,9 +293,9 @@ Public Class Contour_SidePoints : Inherits VB_Parent
 
             If rc.contour.Count > 0 Then
                 dst3.SetTo(0)
-                drawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
-                drawLine(dst3, ptLeft, ptRight, cv.Scalar.White)
-                drawLine(dst3, ptTop, ptBot, cv.Scalar.White)
+                DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
+                DrawLine(dst3, ptLeft, ptRight, cv.Scalar.White)
+                DrawLine(dst3, ptTop, ptBot, cv.Scalar.White)
             End If
             If task.heartBeat Then
                 strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + " 3D location (units=meters)" + vbCrLf
@@ -331,7 +331,7 @@ Public Class Contour_Foreground : Inherits VB_Parent
         contour.Run(dst2)
         dst3.SetTo(0)
         For Each ctr In contour.contourlist
-            drawContour(dst3, New List(Of cv.Point)(ctr), 255, -1)
+            DrawContour(dst3, New List(Of cv.Point)(ctr), 255, -1)
         Next
     End Sub
 End Class
@@ -380,7 +380,7 @@ Public Class Contour_Sorted : Inherits VB_Parent
                 sortedByArea.Add(area, i)
                 sortedContours.Add(area, cv.Cv2.ApproxPolyDP(contours.contourlist(i),
                                                              contours.options.epsilon, True))
-                drawContour(dst3, contours.contourlist(i).ToList, cv.Scalar.White, -1)
+                DrawContour(dst3, contours.contourlist(i).ToList, cv.Scalar.White, -1)
             End If
         Next
 
@@ -449,7 +449,7 @@ Public Class Contour_SelfIntersect : Inherits VB_Parent
             redC.Run(src)
             dst2 = redC.dst2
             rc = task.rc
-            drawContour(dst2(rc.rect), rc.contour, cv.Scalar.White, -1)
+            DrawContour(dst2(rc.rect), rc.contour, cv.Scalar.White, -1)
             labels(2) = redC.labels(2)
         End If
 
@@ -462,7 +462,7 @@ Public Class Contour_SelfIntersect : Inherits VB_Parent
                 Dim pct = ptList.Count / rc.contour.Count
                 If pct > 0.1 And pct < 0.9 Then
                     selfInt = True
-                    drawCircle(dst3,pt, task.dotSize, cv.Scalar.Red)
+                    DrawCircle(dst3,pt, task.dotSize, cv.Scalar.Red)
                 End If
             End If
             ptList.Add(ptStr)
@@ -583,7 +583,7 @@ Public Class Contour_RedCloudCorners : Inherits VB_Parent
         End If
 
         dst3.SetTo(0)
-        drawCircle(dst3, rc.maxDist, task.dotSize, cv.Scalar.White)
+        DrawCircle(dst3, rc.maxDist, task.dotSize, cv.Scalar.White)
         Dim center As New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
         Dim maxDistance(4 - 1) As Single
         For i = 0 To corners.Length - 1
@@ -603,9 +603,9 @@ Public Class Contour_RedCloudCorners : Inherits VB_Parent
             End If
         Next
 
-        drawContour(dst3(rc.rect), rc.contour, cv.Scalar.White)
+        DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.White)
         For i = 0 To corners.Count - 1
-            drawLine(dst3(rc.rect), center, corners(i), cv.Scalar.White)
+            DrawLine(dst3(rc.rect), center, corners(i), cv.Scalar.White)
         Next
     End Sub
 End Class
@@ -631,7 +631,7 @@ Public Class Contour_RedCloudEdges : Inherits VB_Parent
 
         dst2.SetTo(0)
         For Each rc In task.redCells
-            drawContour(dst2(rc.rect), rc.contour, 255, task.lineWidth)
+            DrawContour(dst2(rc.rect), rc.contour, 255, task.lineWidth)
         Next
 
         edges.Run(src)
@@ -658,7 +658,7 @@ Public Class Contour_RedCloud : Inherits VB_Parent
 
         dst3.SetTo(0)
         For Each rc In task.redCells
-            drawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
         Next
     End Sub
 End Class
@@ -708,10 +708,10 @@ Public Class Contour_Smoothing : Inherits VB_Parent
         dst3.SetTo(0)
 
         Dim bestContour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone)
-        drawContour(dst3(rc.rect), bestContour, cv.Scalar.White, task.lineWidth + 3)
+        DrawContour(dst3(rc.rect), bestContour, cv.Scalar.White, task.lineWidth + 3)
 
         Dim approxContour = contourBuild(rc.mask, options.ApproximationMode)
-        drawContour(dst3(rc.rect), approxContour, cv.Scalar.Red)
+        DrawContour(dst3(rc.rect), approxContour, cv.Scalar.Red)
 
         If task.heartBeat Then labels(2) = "Contour points count reduced from " + CStr(bestContour.Count) +
                                            " to " + CStr(approxContour.Count)
@@ -758,7 +758,7 @@ Public Class Contour_RC_AddContour : Inherits VB_Parent
         dst2 = src
         If allContours.Count = 0 Then Exit Sub
         Dim contour = New List(Of cv.Point)(allContours(maxIndex).ToList)
-        drawContour(dst2, contour, 255, task.lineWidth)
+        DrawContour(dst2, contour, 255, task.lineWidth)
     End Sub
 End Class
 
@@ -795,7 +795,7 @@ Public Class Contour_Gray : Inherits VB_Parent
 
         dst2 = src
         For Each tour In allContours
-            drawContour(dst2, tour.ToList, cv.Scalar.White, task.lineWidth)
+            DrawContour(dst2, tour.ToList, cv.Scalar.White, task.lineWidth)
         Next
         labels(2) = $"There were {allContours.Count} contours found."
     End Sub
@@ -826,7 +826,7 @@ Public Class Contour_WholeImage : Inherits VB_Parent
         dst2.SetTo(0)
         For i = 0 To sortedContours.Count - 1
             Dim tour = sortedContours.ElementAt(i).Value
-            drawContour(dst2, tour, 255, task.lineWidth)
+            DrawContour(dst2, tour, 255, task.lineWidth)
         Next
     End Sub
 End Class
@@ -873,7 +873,7 @@ Public Class Contour_DepthTiers : Inherits VB_Parent
             If val = 0 Then
                 Dim index = dst1.Get(Of Integer)(tour(0).Y, tour(0).X)
                 contourlist.Add(tour)
-                drawContour(dst2, tour.ToList, index, -1)
+                DrawContour(dst2, tour.ToList, index, -1)
             End If
         Next
 
@@ -903,7 +903,7 @@ Public Class Contour_FromPoints : Inherits VB_Parent
             dst2.SetTo(0)
             For Each p1 In random.pointList
                 For Each p2 In random.pointList
-                    drawLine(dst2, p1, p2, cv.Scalar.White)
+                    DrawLine(dst2, p1, p2, cv.Scalar.White)
                 Next
             Next
         End If
@@ -916,6 +916,6 @@ Public Class Contour_FromPoints : Inherits VB_Parent
         Next
 
         dst3.SetTo(0)
-        drawContour(dst3, hull, cv.Scalar.White, -1)
+        DrawContour(dst3, hull, cv.Scalar.White, -1)
     End Sub
 End Class

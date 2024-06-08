@@ -118,7 +118,7 @@ while (code!=27):
         for  i in range(0,ctrNoisy.shape[0]):
             k=(i+(p.origin*ctrNoisy.shape[0])//100)% ctrNoisyRotate.shape[0]
             ctrNoisyRotateShift[i] = ctrNoisyRotate[k]
-#       To draw contour using drawcontours
+#       To draw contour using drawContours
         cc= np.reshape(ctrNoisyRotateShift,[ctrNoisyRotateShift.shape[0],2])
         c = [ ctrRef,cc]
         p.update = False;

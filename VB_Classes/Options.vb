@@ -4827,3 +4827,20 @@ Public Class Options_AsciiArt : Inherits VB_Parent
         Size = New cv.Size(CInt(wSlider.value), CInt(hSlider.value))
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_MotionDetect : Inherits VB_Parent
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("firstSlider", 0, 100, 50)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static firstSlider = FindSlider("firstSlider")
+        Dim test = firstSlider.value
+    End Sub
+End Class

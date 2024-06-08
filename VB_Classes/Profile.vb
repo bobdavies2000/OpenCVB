@@ -24,7 +24,7 @@ Public Class Profile_Basics : Inherits VB_Parent
         If rc.contour.Count < 4 Then Exit Sub
 
         dst3.SetTo(0)
-        drawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
+        DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
 
         Dim sortLeft As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Dim sortTop As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
@@ -72,7 +72,7 @@ Public Class Profile_Basics : Inherits VB_Parent
         Next
 
         For i = 0 To corners.Count - 1
-            drawCircle(dst3,corners(i), task.dotSize + 2, cornerColors(i))
+            DrawCircle(dst3,corners(i), task.dotSize + 2, cornerColors(i))
         Next
 
         If task.heartBeat Then
@@ -169,12 +169,12 @@ Public Class Profile_Derivative : Inherits VB_Parent
                 Else
                     color = cv.Scalar.White
                 End If
-                drawCircle(dst3,pt, task.dotSize, color)
+                DrawCircle(dst3,pt, task.dotSize, color)
 
                 If sides.cornersRaw.Contains(rc.contour(i)) Then
                     Dim index = sides.cornersRaw.IndexOf(rc.contour(i))
-                    drawCircle(dst1,pt, task.dotSize + 5, cv.Scalar.White)
-                    drawCircle(dst1,pt, task.dotSize + 3, sides.cornerColors(index))
+                    DrawCircle(dst1,pt, task.dotSize + 5, cv.Scalar.White)
+                    DrawCircle(dst1,pt, task.dotSize + 3, sides.cornerColors(index))
                     setTrueText(sides.cornerNames(index), pt, 3)
                 End If
             Next
@@ -187,7 +187,7 @@ Public Class Profile_Derivative : Inherits VB_Parent
         For i = 0 To sides.corners.Count - 1
             color = sides.cornerColors(i)
             setTrueText(sides.cornerNames(i), sides.corners(i), 1)
-            drawCircle(dst1,sides.corners(i), task.dotSize, color)
+            DrawCircle(dst1,sides.corners(i), task.dotSize, color)
         Next
         setTrueText(strOut, 1)
         saveTrueText = New List(Of trueText)(trueData)
@@ -356,10 +356,10 @@ Public Class Profile_Kalman : Inherits VB_Parent
 
         If rc.index > 0 Then
             dst3.SetTo(0)
-            drawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
+            DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
             For i = 0 To sides.corners.Count - 1
                 Dim pt = New cv.Point(CInt(kalman.kOutput(i * 2)), CInt(kalman.kOutput(i * 2 + 1)))
-                drawCircle(dst3,pt, task.dotSize + 2, sides.cornerColors(i))
+                DrawCircle(dst3,pt, task.dotSize + 2, sides.cornerColors(i))
             Next
         End If
         setTrueText(sides.strOut, 3)

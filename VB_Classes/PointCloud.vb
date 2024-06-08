@@ -31,7 +31,7 @@ Public Class PointCloud_Basics : Inherits VB_Parent
                 If vec.Z > 0 Then
                     If (Math.Abs(lastVec.Z - vec.Z) < deltaThreshold And lastVec.X < vec.X) Or lastVec.Z = 0 Then
                         actualCount += 1
-                        drawCircle(dst2,New cv.Point(x, y), task.dotSize, cv.Scalar.White)
+                        DrawCircle(dst2,New cv.Point(x, y), task.dotSize, cv.Scalar.White)
                         vecList.Add(vec)
                         xyVec.Add(New cv.Point(x, y))
                     Else
@@ -63,7 +63,7 @@ Public Class PointCloud_Basics : Inherits VB_Parent
                 If vec.Z > 0 Then
                     If (Math.Abs(lastVec.Z - vec.Z) < deltaThreshold And lastVec.Y < vec.Y) Or lastVec.Z = 0 Then
                         actualCount += 1
-                        drawCircle(dst2,New cv.Point(x, y), task.dotSize, cv.Scalar.White)
+                        DrawCircle(dst2,New cv.Point(x, y), task.dotSize, cv.Scalar.White)
                         vecList.Add(vec)
                         xyVec.Add(New cv.Point(x, y))
                     Else
@@ -274,7 +274,7 @@ Public Class PointCloud_SetupSide : Inherits VB_Parent
         If src.Channels <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         If standaloneTest() Then dst2.SetTo(0) Else src.CopyTo(dst2)
-        drawCircle(dst2,task.sideCameraPoint, task.dotSize, cv.Scalar.BlueViolet)
+        DrawCircle(dst2,task.sideCameraPoint, task.dotSize, cv.Scalar.BlueViolet)
         For i = 1 To task.maxZmeters
             Dim xmeter = CInt(dst2.Width * i / task.maxZmeters * distanceRatio)
             dst2.Line(New cv.Point(xmeter, 0), New cv.Point(xmeter, dst2.Height), cv.Scalar.AliceBlue, 1)
@@ -308,8 +308,8 @@ Public Class PointCloud_SetupSide : Inherits VB_Parent
                                                (markerRight.Y - cam.Y) * Math.Cos(task.accRadians.Z) + (markerRight.X - cam.X) * Math.Sin(task.accRadians.Z) + cam.Y)
         End If
         If standaloneTest() = False Then
-            drawCircle(dst2,markerLeft, task.dotSize, cv.Scalar.Red)
-            drawCircle(dst2,markerRight, task.dotSize, cv.Scalar.Red)
+            DrawCircle(dst2,markerLeft, task.dotSize, cv.Scalar.Red)
+            DrawCircle(dst2,markerRight, task.dotSize, cv.Scalar.Red)
         End If
 
         ' draw the arc enclosing the camera FOV
@@ -322,8 +322,8 @@ Public Class PointCloud_SetupSide : Inherits VB_Parent
         dst2.Line(cam, fovTop, cv.Scalar.White, 1, task.lineType)
         dst2.Line(cam, fovBot, cv.Scalar.White, 1, task.lineType)
 
-        drawCircle(dst2,markerLeft, task.dotSize + 3, cv.Scalar.Red)
-        drawCircle(dst2,markerRight, task.dotSize + 3, cv.Scalar.Red)
+        DrawCircle(dst2,markerLeft, task.dotSize + 3, cv.Scalar.Red)
+        DrawCircle(dst2,markerRight, task.dotSize + 3, cv.Scalar.Red)
         dst2.Line(cam, markerLeft, cv.Scalar.Red, 1, task.lineType)
         dst2.Line(cam, markerRight, cv.Scalar.Red, 1, task.lineType)
 
@@ -353,7 +353,7 @@ Public Class PointCloud_SetupTop : Inherits VB_Parent
         If src.Channels <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         If standaloneTest() Then dst2.SetTo(0) Else src.CopyTo(dst2)
-        drawCircle(dst2,task.topCameraPoint, task.dotSize, cv.Scalar.BlueViolet)
+        DrawCircle(dst2,task.topCameraPoint, task.dotSize, cv.Scalar.BlueViolet)
         For i = 1 To task.maxZmeters
             Dim ymeter = CInt(dst2.Height - dst2.Height * i / (task.maxZmeters * distanceRatio))
             dst2.Line(New cv.Point(0, ymeter), New cv.Point(dst2.Width, ymeter), cv.Scalar.AliceBlue, 1)
@@ -388,15 +388,15 @@ Public Class PointCloud_SetupTop : Inherits VB_Parent
 
         dst2.Line(task.topCameraPoint, fovLeft, cv.Scalar.White, 1, task.lineType)
 
-        drawCircle(dst2,markerLeft, task.dotSize + 3, cv.Scalar.Red)
-        drawCircle(dst2,markerRight, task.dotSize + 3, cv.Scalar.Red)
+        DrawCircle(dst2,markerLeft, task.dotSize + 3, cv.Scalar.Red)
+        DrawCircle(dst2,markerRight, task.dotSize + 3, cv.Scalar.Red)
         dst2.Line(cam, markerLeft, cv.Scalar.Red, 1, task.lineType)
         dst2.Line(cam, markerRight, cv.Scalar.Red, 1, task.lineType)
 
         Dim shift = (src.Width - src.Height) / 2
         Dim labelLocation = New cv.Point(dst2.Width / 2 + shift, dst2.Height * 15 / 16)
         setTrueText("hFOV=" + Format(180 - startAngle * 2, "0.0") + " deg.", New cv.Point(4, dst2.Height * 7 / 8))
-        drawLine(dst2, task.topCameraPoint, fovRight, cv.Scalar.White)
+        DrawLine(dst2, task.topCameraPoint, fovRight, cv.Scalar.White)
     End Sub
 End Class
 
@@ -611,7 +611,7 @@ Public Class PointCloud_SurfaceH : Inherits VB_Parent
 
         Dim ratio = task.mouseMovePoint.Y / dst2.Height
         Dim offset = ratio * dst3.Height
-        drawLine(dst2, New cv.Point(0, task.mouseMovePoint.Y), New cv.Point(dst2.Width, task.mouseMovePoint.Y), cv.Scalar.Yellow)
+        DrawLine(dst2, New cv.Point(0, task.mouseMovePoint.Y), New cv.Point(dst2.Width, task.mouseMovePoint.Y), cv.Scalar.Yellow)
         dst3.Line(New cv.Point(0, offset), New cv.Point(dst3.Width, offset), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
@@ -691,7 +691,7 @@ Public Class PointCloud_PCpointsMask : Inherits VB_Parent
 
                     pcPoints.Set(Of cv.Point3f)(y, x, New cv.Point3f(mean(0), mean(1), mean(2)))
                     actualCount += 1
-                    drawCircle(dst2,New cv.Point(roi.X, roi.Y), task.dotSize * Math.Max(mean(2), 1), cv.Scalar.White)
+                    DrawCircle(dst2,New cv.Point(roi.X, roi.Y), task.dotSize * Math.Max(mean(2), 1), cv.Scalar.White)
                 End If
                 lastMeanZ = mean(2)
             Next
@@ -726,7 +726,7 @@ Public Class PointCloud_PCPoints : Inherits VB_Parent
             If mean(2) > 0 Then
                 pcPoints.Add(Choose(pt.Y Mod 3 + 1, red32, blue32, white32))
                 pcPoints.Add(New cv.Point3f(mean(0), mean(1), mean(2)))
-                drawCircle(dst2,pt, task.dotSize, Choose(pt.Y Mod 3 + 1, red, blue, white))
+                DrawCircle(dst2,pt, task.dotSize, Choose(pt.Y Mod 3 + 1, red, blue, white))
             End If
         Next
         labels(2) = "PointCloud Point Points found = " + CStr(pcPoints.Count / 2)
@@ -788,14 +788,14 @@ Public Class PointCloud_Inspector : Inherits VB_Parent
         Dim topPt = New cv.Point2f(cLine, 0)
         Dim botPt = New cv.Point2f(cLine, dst2.Height)
         dst2 = task.depthRGB
-        drawLine(dst2, topPt, botPt, 255)
+        DrawLine(dst2, topPt, botPt, 255)
 
         Dim stepY = dst2.Height / yLines
         setTrueText(vbTab + "   X" + vbTab + "  Y" + vbTab + "  Z", 3)
         For i = 1 To yLines - 1
             Dim pt1 = New cv.Point2f(dst2.Width, i * stepY)
             Dim pt2 = New cv.Point2f(0, i * stepY)
-            drawLine(dst2, pt1, pt2, cv.Scalar.White)
+            DrawLine(dst2, pt1, pt2, cv.Scalar.White)
 
             Dim pt = New cv.Point2f(cLine, i * stepY)
             Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)

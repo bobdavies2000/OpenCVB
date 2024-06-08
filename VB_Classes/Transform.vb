@@ -116,7 +116,7 @@ Public Class Transform_Rotate : Inherits VB_Parent
         imageCenter = New cv.Point2f(centerXSlider.Value, centerYSlider.Value)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, angleSlider.Value, scaleSlider.Value / 100)
         cv.Cv2.WarpAffine(src, dst2, rotationMat, New cv.Size())
-        drawCircle(dst2,imageCenter, task.dotSize * 2, cv.Scalar.Yellow)
-        drawCircle(dst2,imageCenter, task.dotSize, cv.Scalar.Blue)
+        DrawCircle(dst2,imageCenter, task.dotSize * 2, cv.Scalar.Yellow)
+        DrawCircle(dst2,imageCenter, task.dotSize, cv.Scalar.Blue)
     End Sub
 End Class

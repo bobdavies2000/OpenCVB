@@ -165,7 +165,7 @@ Module VB_Common
         Dim pad = 2
         If task.workingRes.Width >= 640 Then pad = 6
         dst.Line(p1, p2, fatColor, task.lineWidth + pad, task.lineType)
-        drawLine(dst, p1, p2, cv.Scalar.Black)
+        DrawLine(dst, p1, p2, cv.Scalar.Black)
     End Sub
     Public Sub sampleDrawRect(input As cv.Mat)
         If task.drawRect.Width > 0 Then
@@ -337,7 +337,7 @@ Module VB_Common
     Public Sub vbDrawFPoly(ByRef dst As cv.Mat, poly As List(Of cv.Point2f), color As cv.Scalar)
         Dim minMod = Math.Min(poly.Count, task.polyCount)
         For i = 0 To minMod - 1
-            drawLine(dst, poly(i), poly((i + 1) Mod minMod), color)
+            DrawLine(dst, poly(i), poly((i + 1) Mod minMod), color)
         Next
     End Sub
     Public Function vbFormatEquation(eq As cv.Vec4f) As String
@@ -552,7 +552,7 @@ Module VB_Common
         cv.Cv2.MatchTemplate(pts1, pts2, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
         Return correlationMat.Get(Of Single)(0, 0)
     End Function
-    Public Sub drawLine(dst As Mat, p1 As Point2f, p2 As Point2f, color As Scalar)
+    Public Sub DrawLine(dst As Mat, p1 As Point2f, p2 As Point2f, color As Scalar)
         dst.Line(p1, p2, color, task.lineWidth, task.lineType)
     End Sub
     Public Sub drawRotatedRectangle(rotatedRect As cv.RotatedRect, dst As cv.Mat, color As cv.Scalar)
@@ -935,7 +935,7 @@ Public Class fPolyData
     Public Sub jitterTest(dst As cv.Mat) ' return true if there is nothing to change
         If jitterCheck Is Nothing Then jitterCheck = New cv.Mat(dst.Size, cv.MatType.CV_8U, 0)
         Dim polymp = currmp()
-        drawLine(jitterCheck, polymp.p1, polymp.p2, 255)
+        DrawLine(jitterCheck, polymp.p1, polymp.p2, 255)
         Dim jitterPixels = jitterCheck.CountNonZero
         If jitterPixels = lastJitterPixels Then featureLineChanged = True Else featureLineChanged = False
         lastJitterPixels = jitterPixels

@@ -36,7 +36,7 @@ Public Class FitLine_Basics : Inherits VB_Parent
                 lines.Add(p1)
                 lines.Add(p2)
             End If
-            drawLine(dst2, p1, p2, cv.Scalar.Red)
+            DrawLine(dst2, p1, p2, cv.Scalar.Red)
         Next
     End Sub
 End Class
@@ -49,8 +49,8 @@ Public Class Fitline_3DBasics_MT : Inherits VB_Parent
         desc = "Use visual lines to find 3D lines.  This algorithm is NOT working."
         labels(3) = "White is featureless RGB, blue depth shadow"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        If not task.heartBeat Then Exit Sub
+    Public Sub RunVB(src As cv.Mat)
+        If Not task.heartBeat Then Exit Sub
         hlines.Run(src)
         dst3 = hlines.dst3
         Dim mask = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
@@ -92,6 +92,5 @@ Public Class Fitline_3DBasics_MT : Inherits VB_Parent
         For i = 0 To task.gridList.Count - 1
             houghShowLines3D(dst2(task.gridList(i)), lines.ElementAt(i))
         Next
-        dst2.SetTo(cv.scalar.white, task.gridMask)
     End Sub
 End Class

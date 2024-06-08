@@ -34,11 +34,11 @@ Public Class Area_MinTriangle_CPP : Inherits VB_Parent
             Dim p1 = New cv.Point(pt.X, pt.Y)
             pt = triangle.Get(Of cv.Point2f)((i + 1) Mod 3)
             Dim p2 = New cv.Point(pt.X, pt.Y)
-            drawLine(dst2, p1, p2, cv.Scalar.Black)
+            DrawLine(dst2, p1, p2, cv.Scalar.Black)
         Next
 
         For Each pt In srcPoints
-            drawCircle(dst2, pt, task.dotSize + 1, cv.Scalar.Red)
+            DrawCircle(dst2, pt, task.dotSize + 1, cv.Scalar.Red)
         Next
     End Sub
 End Class
@@ -105,7 +105,7 @@ Public Class Area_FindNonZero : Inherits VB_Parent
         dst3 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         ' mark the points so they are visible...
         For i = 0 To nonZero.Rows - 1
-            drawCircle(dst3, nonZero.Get(Of cv.Point)(0, i), task.dotSize, cv.Scalar.White)
+            DrawCircle(dst3, nonZero.Get(Of cv.Point)(0, i), task.dotSize, cv.Scalar.White)
         Next
 
         Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf
@@ -173,7 +173,7 @@ Public Class Area_MinRect : Inherits VB_Parent
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In inputPoints
-                drawCircle(dst2, pt, task.dotSize + 2, cv.Scalar.Red)
+                DrawCircle(dst2, pt, task.dotSize + 2, cv.Scalar.Red)
             Next
             drawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
         End If

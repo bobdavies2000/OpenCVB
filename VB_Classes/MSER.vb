@@ -34,7 +34,7 @@ Public Class MSER_Basics : Inherits VB_Parent
             rc.pixels = detect.maskCounts(index)
 
             rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            drawContour(rc.mask, rc.contour, 255, -1)
+            DrawContour(rc.mask, rc.contour, 255, -1)
 
             rc.floodPoint = floodPoints(index)
             rc.maxDist = GetMaxDist(rc)
@@ -188,7 +188,7 @@ Public Class MSER_SyntheticInput : Inherits VB_Parent
     End Sub
     Private Sub addNestedCircles(img As cv.Mat, p0 As cv.Point, width() As Integer, color() As Integer, n As Integer)
         For i = 0 To n - 1
-            drawCircle(img, p0, width(i) / 2, color(i))
+            DrawCircle(img, p0, width(i) / 2, color(i))
             img.FloodFill(p0, color(i))
         Next
     End Sub
@@ -304,7 +304,7 @@ Public Class MSER_Hulls : Inherits VB_Parent
         For Each rc In mBase.mserCells
             rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             pixels += rc.pixels
-            drawContour(dst3(rc.rect), rc.hull, rc.color, -1)
+            DrawContour(dst3(rc.rect), rc.hull, rc.color, -1)
         Next
 
         If task.heartBeat Then labels(2) = CStr(mBase.mserCells.Count) + " Regions with average size " + If(mBase.mserCells.Count > 0,

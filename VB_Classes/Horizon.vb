@@ -17,10 +17,10 @@ Public Class Horizon_Basics : Inherits VB_Parent
         dst2.SetTo(0)
         For Each pt In points
             pt = New cv.Point(pt.X * resizeRatio, pt.Y * resizeRatio)
-            drawCircle(dst2,pt, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst2,pt, task.dotSize, cv.Scalar.White)
         Next
 
-        drawLine(dst2, vec.p1, vec.p2, 255)
+        DrawLine(dst2, vec.p1, vec.p2, 255)
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then dst0 = vbPrepareDepthInput(1) Else dst0 = src
@@ -122,8 +122,8 @@ Public Class Horizon_Basics1 : Inherits VB_Parent
 
         If standaloneTest() Then
             dst2.SetTo(0)
-            drawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
-            drawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
+            DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
+            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
         End If
     End Sub
 End Class
@@ -174,7 +174,7 @@ Public Class Horizon_FindNonZero : Inherits VB_Parent
 
             Dim lp = New pointPair(p1, p2)
             task.horizonVec = lp.edgeToEdgeLine(dst2.Size)
-            drawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
+            DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
         End If
 
         dst3 = split(0).InRange(-0.01, 0.01)
@@ -197,7 +197,7 @@ Public Class Horizon_FindNonZero : Inherits VB_Parent
                 Dim lp = New pointPair(p1, p2)
                 task.gravityVec = lp.edgeToEdgeLine(dst2.Size)
             End If
-            drawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
+            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
         End If
     End Sub
 End Class
@@ -234,7 +234,7 @@ Public Class Horizon_UnstableResults : Inherits VB_Parent
             Dim p1 = New cv.Point2f(0, lpBest.yIntercept)
             Dim p2 = New cv.Point2f(dst2.Width, lpBest.slope * dst2.Width + lpBest.yIntercept)
             task.horizonVec = New pointPair(p1, p2)
-            drawLine(dst2, p1, p2, cv.Scalar.White)
+            DrawLine(dst2, p1, p2, cv.Scalar.White)
             labels(2) = "horizonVec slope/intercept = " + Format(lpBest.slope, fmt1) + "/" + Format(lpBest.yIntercept, fmt1)
         End If
 
@@ -254,7 +254,7 @@ Public Class Horizon_UnstableResults : Inherits VB_Parent
             Dim p1 = New cv.Point2f(0, lpBest.yIntercept)
             Dim p2 = New cv.Point2f(dst2.Width, lpBest.slope * dst2.Width + lpBest.yIntercept)
             task.gravityVec = New pointPair(p1, p2)
-            drawLine(dst2, p1, p2, cv.Scalar.White)
+            DrawLine(dst2, p1, p2, cv.Scalar.White)
             labels(3) = "gravityVec slope/intercept = " + Format(lpBest.slope, fmt1) + "/" + Format(lpBest.yIntercept, fmt1)
         End If
     End Sub
@@ -308,7 +308,7 @@ Public Class Horizon_FindNonZeroOld : Inherits VB_Parent
 
             Dim lp = New pointPair(p1, p2)
             task.horizonVec = lp.edgeToEdgeLine(dst2.Size)
-            drawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
+            DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
         End If
 
         'If task.horizonVec.originalLength < dst2.Width / 2 And task.redOptions.YRangeSlider.Value < task.redOptions.YRangeSlider.Maximum Or pointsMat.Rows = 0 Then
@@ -335,7 +335,7 @@ Public Class Horizon_FindNonZeroOld : Inherits VB_Parent
                 Dim lp = New pointPair(p1, p2)
                 task.gravityVec = lp.edgeToEdgeLine(dst2.Size)
             End If
-            drawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
+            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
         End If
 
         'If task.gravityVec.originalLength < dst2.Height / 2 And task.redOptions.XRangeSlider.Value < task.redOptions.XRangeSlider.Maximum Or pointsMat.Rows = 0 Then

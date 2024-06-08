@@ -2492,7 +2492,7 @@ public:
             cell.rect = task->validateRect(rectData.at<cv::Rect>(i, 0), dst2.cols, dst2.rows);
             inRange(dst2(cell.rect), cell.index, cell.index, cell.mask);
             //vector<Point> contour = contourBuild(cell.mask, cv::CHAIN_APPROX_NONE); 
-            //drawContours(cell.mask, vector<vector<Point>> {contour}, 255, -1);
+            //DrawContours(cell.mask, vector<vector<Point>> {contour}, 255, -1);
 
             cell.floodPoint = floodPointData.at<cv::Point>(i, 0);
             rectangle(cell.mask, cv::Rect(0, 0, cell.mask.cols, cell.mask.rows), 0, 1);

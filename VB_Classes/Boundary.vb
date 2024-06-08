@@ -38,7 +38,7 @@ Public Class Boundary_Basics : Inherits VB_Parent
                 Dim rect = redCPP.rectList(i - 1)
                 Dim mask = redCPP.dst2(rect).InRange(i, i)
                 Dim contour = contourBuild(mask, cv.ContourApproximationModes.ApproxNone)
-                drawContour(dst2(rect), contour, 255, task.lineWidth)
+                DrawContour(dst2(rect), contour, 255, task.lineWidth)
                 rects.Add(rect)
                 masks.Add(mask)
                 contours.Add(contour)
@@ -68,7 +68,7 @@ Public Class Boundary_Tiers : Inherits VB_Parent
         contours.Run(src)
         dst2.SetTo(0)
         For Each tour In contours.contourlist
-            drawContour(dst2, tour.ToList, 255, 2)
+            DrawContour(dst2, tour.ToList, 255, 2)
         Next
         labels(2) = $"{contours.contourlist.Count} depth tiers were found."
         labels(3) = cells.labels(2)
@@ -158,7 +158,7 @@ Public Class Boundary_RemovedRects : Inherits VB_Parent
         labels(3) = $"{bRects.bounds.rects.Count} cells before contain test"
 
         For i = 0 To bRects.smallRects.Count - 1
-            drawContour(dst2(bRects.smallRects(i)), bRects.smallContours(i), cv.Scalar.Black, task.lineWidth)
+            DrawContour(dst2(bRects.smallRects(i)), bRects.smallContours(i), cv.Scalar.Black, task.lineWidth)
         Next
         labels(1) = labels(2)
         labels(2) = $"{bRects.bounds.rects.Count - bRects.smallRects.Count} cells after contain test"
@@ -190,8 +190,8 @@ Public Class Boundary_Overlap : Inherits VB_Parent
                     dst2.SetTo(0)
                     Dim c1 = tour.Count
                     Dim c2 = bounds.contours(j).Count
-                    drawContour(dst2(rect), tour, 127, task.lineWidth)
-                    drawContour(dst2(r), bounds.contours(j), 255, task.lineWidth)
+                    DrawContour(dst2(rect), tour, 127, task.lineWidth)
+                    DrawContour(dst2(r), bounds.contours(j), 255, task.lineWidth)
                     Dim count = dst2.CountNonZero
                     If count <> c1 + c2 Then
                         overlapping = True

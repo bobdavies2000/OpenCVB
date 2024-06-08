@@ -22,7 +22,7 @@ namespace CS_Classes
 
         public CSharp_AddWeighted_Basics(VBtask task) : base(task) 
         {
-            //AddAdvice(traceName + ": use the local option slider 'Add Weighted %'");
+            UpdateAdvice(traceName + ": use the local option slider 'Add Weighted %'");
             desc = "Add 2 images with specified weights.";
         }
 
@@ -203,7 +203,7 @@ public class CSharp_ApproxPoly_Basics : CS_Parent
                 Point[] nextContour;
                 nextContour = Cv2.ApproxPolyDP(contour.bestContour, options.epsilon, options.closedPoly);
                 dst3.SetTo(Scalar.Black);
-                drawContour(dst3, new List<Point>(nextContour), Scalar.Yellow);
+                DrawContour(dst3, new List<Point>(nextContour), Scalar.Yellow);
             }
             else
             {
@@ -326,13 +326,13 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
                 Point p1 = new Point(pt.X, pt.Y);
                 pt = triangle.At<Point2f>((i + 1) % 3);
                 Point p2 = new Point(pt.X, pt.Y);
-                drawLine(dst2, p1, p2, Scalar.Black);
+                DrawLine(dst2, p1, p2, Scalar.Black);
             }
 
             foreach (var ptSrc in srcPoints)
             {
                 var pt = new cv.Point(ptSrc.X, ptSrc.Y);
-                drawCircle(dst2, pt, task.dotSize + 1, Scalar.Red);
+                DrawCircle(dst2, pt, task.dotSize + 1, Scalar.Red);
             }
         }
     }
@@ -363,8 +363,8 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             dst2.SetTo(Scalar.Black);
             for (int i = 0; i < cityOrder.Length; i++)
             {
-                drawCircle(dst2, cityPositions[i], task.dotSize, Scalar.White);
-                drawLine(dst2, cityPositions[i], cityPositions[cityOrder[i]], Scalar.White);
+                DrawCircle(dst2, cityPositions[i], task.dotSize, Scalar.White);
+                DrawLine(dst2, cityPositions[i], cityPositions[cityOrder[i]], Scalar.White);
             }
             setTrueText("Energy" + Environment.NewLine + energy.ToString(fmt0), new Point(10, 100), 2);
         }
@@ -471,7 +471,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
                     dst2.SetTo(0);
                     foreach (var pt in pointList)
                     {
-                        drawCircle(dst2, pt, task.dotSize, Scalar.Yellow);
+                        DrawCircle(dst2, pt, task.dotSize, Scalar.Yellow);
                     }
                 }
             }
@@ -748,7 +748,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
                 dst2.SetTo(Scalar.Black);
                 foreach (var pt in inputPoints)
                 {
-                    drawCircle(dst2, pt, task.dotSize + 2, Scalar.Red);
+                    DrawCircle(dst2, pt, task.dotSize + 2, Scalar.Red);
                 }
                 DrawRotatedOutline(minRect, dst2, Scalar.Yellow);
             }
@@ -765,7 +765,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
         public CSharp_AsciiArt_Basics(VBtask task) : base(task)
         {
-            //csAddAdvice(traceName + ": use the local options for height and width.");
+            UpdateAdvice(traceName + ": use the local options for height and width.");
             labels = new string[] { "", "", "Ascii version", "Grayscale input to ascii art" };
             desc = "Build an ascii art representation of the input stream.";
         }
@@ -833,7 +833,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         public CSharp_Diff_Basics(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Unstable mask", "" };
-            //UpdateAdvice(traceName + ": use goption 'Pixel Difference Threshold' to control changed pixels.");
+            UpdateAdvice(traceName + ": use goption 'Pixel Difference Threshold' to control changed pixels.");
             desc = "Capture an image and compare it to previous frame using absDiff and threshold";
         }
 
@@ -904,7 +904,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         public CSharp_BackProject_Basics(VBtask task) : base(task)
         {
             labels[2] = "Move mouse to backproject a histogram column";
-            //UpdateAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.");
+            UpdateAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.");
             desc = "Mouse over any bin to see the histogram backprojected.";
         }
 
@@ -1279,8 +1279,8 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             foreach (var lp in sortByLen.Values)
             {
                 lpList.Add(lp);
-                drawLine(dst2, lp.p1, lp.p2, lineColor);
-                drawLine(dst3, lp.p1, lp.p2, 255);
+                DrawLine(dst2, lp.p1, lp.p2, lineColor);
+                DrawLine(dst3, lp.p1, lp.p2, 255);
             }
             labels[2] = lpList.Count + " lines were detected in the current frame";
         }
@@ -1318,7 +1318,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             {
                 byte val = masks.dst3.At<byte>((int)lp.p1.Y, (int)lp.p1.X);
                 if (val == 255)
-                    drawLine(dst1, lp.p1, lp.p2, Scalar.White);
+                    DrawLine(dst1, lp.p1, lp.p2, Scalar.White);
             }
             dst3.SetTo(Scalar.Yellow, masks.mask);
             dst3.SetTo(task.highlightColor, dst1);
@@ -1963,7 +1963,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             new Point(350, 150),
             new Point(450, 50)
             };
-            // UpdateAdvice(traceName + ": Update the public points array variable. No exposed options.");
+            UpdateAdvice(traceName + ": Update the public points array variable. No exposed options.");
             desc = "Use n points to draw a Bezier curve.";
         }
 
@@ -1990,7 +1990,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
                 for (int j = 0; j <= 100; j++)
                 {
                     Point p2 = nextPoint(points, i, j / 100f);
-                    if (j > 0) drawLine(dst2, p1, p2, task.highlightColor);
+                    if (j > 0) DrawLine(dst2, p1, p2, task.highlightColor);
                     p1 = p2;
                 }
             }
@@ -2018,17 +2018,17 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             for (int i = 0; i < 100; i++)
             {
                 Point p2 = bezier.nextPoint(points, 0, i / 100f);
-                if (i > 0) drawLine(dst2, p1, p2, task.highlightColor);
+                if (i > 0) DrawLine(dst2, p1, p2, task.highlightColor);
                 p1 = p2;
             }
 
             for (int i = 0; i < points.Length; i++)
             {
-                drawCircle(dst2, points[i], task.dotSize + 2, Scalar.White);
+                DrawCircle(dst2, points[i], task.dotSize + 2, Scalar.White);
             }
 
-            drawLine(dst2, points[0], points[1], Scalar.White);
-            drawLine(dst2, points[2], points[3], Scalar.White);
+            DrawLine(dst2, points[0], points[1], Scalar.White);
+            DrawLine(dst2, points[2], points[3], Scalar.White);
         }
     }
 
@@ -2046,7 +2046,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         public CSharp_BGRPattern_Basics(VBtask task) : base(task)
         {
             cPtr = BGRPattern_Open();
-            //UpdateAdvice(traceName + ": local options 'Options_ColorFormat' selects color.");
+            UpdateAdvice(traceName + ": local options 'Options_ColorFormat' selects color.");
             desc = "Classify each 3-channel input pixel according to their relative values";
         }
 
@@ -2093,7 +2093,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         public CSharp_BGSubtract_Basics(VBtask task) : base(task)
         {
             cPtr = BGSubtract_BGFG_Open(options.currMethod);
-            //UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.");
+            UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.");
             desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++";
         }
 
@@ -2288,24 +2288,14 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
     //    Vec3i[] radioChoices;
     //    public CSharp_BGSubtract_MotionDetect(VBtask task) : base(task)
     //    {
-    //        if (sliders.Setup(traceName)) sliders.setupTrackBar("Correlation Threshold", 0, 1000, 980);
-    //        if (radio.Setup(traceName))
-    //        {
-    //            for (int i = 0; i < 7; i++)
-    //            {
-    //                radio.addRadio(Math.Pow(2, i) + " threads");
-    //            }
-    //            radio.check(5).Checked = true;
-    //        }
     //        int w = dst2.Width;
     //        int h = dst2.Height;
-    //        radioChoices = new Vec3i[]
-    //        {
-    //        new Vec3i(1, w, h), new Vec3i(2, w / 2, h), new Vec3i(4, w / 2, h / 2),
-    //        new Vec3i(8, w / 4, h / 2), new Vec3i(16, w / 4, h / 4), new Vec3i(32, w / 8, h / 4),
-    //        new Vec3i(32, w / 8, h / 8), new Vec3i(1, w, h), new Vec3i(2, w / 2, h), new Vec3i(4, w / 2, h / 2),
-    //        new Vec3i(8, w / 4, h / 2), new Vec3i(16, w / 4, h / 4), new Vec3i(32, w / 8, h / 4),
-    //        new Vec3i(32, w / 8, h / 8)
+    //        radioChoices = new Vec3i[] {
+    //            new Vec3i(1, w, h), new Vec3i(2, w / 2, h), new Vec3i(4, w / 2, h / 2),
+    //            new Vec3i(8, w / 4, h / 2), new Vec3i(16, w / 4, h / 4), new Vec3i(32, w / 8, h / 4),
+    //            new Vec3i(32, w / 8, h / 8), new Vec3i(1, w, h), new Vec3i(2, w / 2, h), new Vec3i(4, w / 2, h / 2),
+    //            new Vec3i(8, w / 4, h / 2), new Vec3i(16, w / 4, h / 4), new Vec3i(32, w / 8, h / 4),
+    //            new Vec3i(32, w / 8, h / 8)
     //        };
 
     //        labels[3] = "Only Motion Added";

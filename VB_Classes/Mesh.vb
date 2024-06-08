@@ -26,15 +26,15 @@ Public Class Mesh_Basics : Inherits VB_Parent
             Dim ptLast = knn.queries(i)
             For j = 1 To nabeCount - 1
                 Dim pt = knn.queries(knn.result(i, j))
-                drawLine(dst2, ptLast, pt, white)
+                DrawLine(dst2, ptLast, pt, white)
                 ptLast = pt
             Next
         Next
 
         dst3.SetTo(0)
         For i = 0 To knn.queries.Count - 1
-            drawCircle(dst2,knn.queries(i), task.dotSize, cv.Scalar.Red)
-            drawCircle(dst3,knn.queries(i), task.dotSize, task.highlightColor)
+            DrawCircle(dst2,knn.queries(i), task.dotSize, cv.Scalar.Red)
+            DrawCircle(dst3,knn.queries(i), task.dotSize, task.highlightColor)
         Next
         labels(2) = "Triangles built each input point and its " + CStr(nabeCount) + " nearest neighbors."
     End Sub

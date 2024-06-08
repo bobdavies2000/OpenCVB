@@ -432,8 +432,8 @@ Public Class Cell_Generate : Inherits VB_Parent
         For Each rc In initList
             If rc.exactMatch = False Then
                 rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-                drawContour(rc.mask, rc.contour, 255, -1)
-                If removeContour Then drawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
+                DrawContour(rc.mask, rc.contour, 255, -1)
+                If removeContour Then DrawContour(rc.mask, rc.contour, 0, 2) ' no overlap with neighbors.
 
                 rc.maxDStable = rc.maxDist ' assume it has to use the latest.
                 rc.indexLast = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
