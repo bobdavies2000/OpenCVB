@@ -232,22 +232,6 @@ End Class
 
 
 
-Public Class Benford_DepthRGB : Inherits VB_Parent
-    Public benford As New Benford_JPEG
-    Public Sub New()
-        desc = "Apply Benford to the depth BGR image that is compressed with JPEG"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        benford.Run(task.depthRGB)
-        dst2 = benford.dst3
-        labels(2) = benford.labels(3)
-    End Sub
-End Class
-
-
-
-
-
 
 
 

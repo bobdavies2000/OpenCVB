@@ -15,7 +15,7 @@ namespace CS_Classes
     {
         public VBtask task;
         public IntPtr cPtr;
-        public bool standalone = true;
+        public bool standalone;
         public string desc = "";
         public Mat dst0, dst1, dst2, dst3, empty;
         public string traceName;
@@ -27,12 +27,13 @@ namespace CS_Classes
         public const string fmt3 = "0.000";
         public System.Random msRNG = new System.Random();
         public string strOut;
-        public const string fmt4 = "0.0000"; public CS_Parent(VBtask _task)
+        public const string fmt4 = "0.0000"; 
+        public CS_Parent(VBtask _task)
         {
             this.task = _task;
             traceName = this.GetType().Name;
 
-            bool standalone = task.callTrace[0] == traceName + "\\"; // only the first is standaloneTest() (the primary algorithm.)
+            standalone = task.callTrace[0] == traceName + "\\"; // only the first is standaloneTest() (the primary algorithm.)
             //if (!standalone && !task.callTrace.Contains(callStack))
             //{
             //    task.callTrace.Add(callStack);

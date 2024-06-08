@@ -306,4 +306,7 @@ Public Class OptionsGlobal
     Public Sub setDisplay1()
         displayDst1.Checked = True
     End Sub
+    Public Sub setHistogramBins(val As Integer)
+        HistBinBar.Value = val
+    End Sub
 End Class

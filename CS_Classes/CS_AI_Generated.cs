@@ -16,6 +16,7 @@ namespace CS_Classes
 { 
     public class CSharp_AddWeighted_Basics : CS_Parent
     {
+        public Single weight;
         public Mat src2;
         public Options_AddWeighted options = new Options_AddWeighted();
 
@@ -28,6 +29,7 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             options.RunVB();
+            weight = options.addWeighted;
 
             Mat srcPlus = src2;
             // algorithm user normally provides src2! 
@@ -42,8 +44,8 @@ namespace CS_Classes
                     if (srcPlus.Type() != MatType.CV_8UC3) srcPlus = srcPlus.CvtColor(ColorConversionCodes.GRAY2BGR);
                 }
             }
-            Cv2.AddWeighted(src, options.addWeighted, srcPlus, 1.0 - options.addWeighted, 0, dst2);
-            labels[2] = $"Depth %: {100 - options.addWeighted * 100} BGR %: {(int)(options.addWeighted * 100)}";
+            Cv2.AddWeighted(src, weight, srcPlus, 1.0 - weight, 0, dst2);
+            labels[2] = $"Depth %: {100 - weight} BGR %: {(int)(weight )}";
         }
     }
 
@@ -89,7 +91,7 @@ namespace CS_Classes
         {
             desc = "Update a running average of the image";
         }
-        public void RunVB(cv.Mat src)
+        public void RunCS(cv.Mat src)
         {
             options.RunVB();
 
@@ -118,7 +120,7 @@ namespace CS_Classes
             desc = "Align the depth data with the left or right view. Oak-D is aligned with the right image. Some cameras are not close to aligned.";
         }
 
-        public void RunVB(Mat src)
+        public void RunCS(Mat src)
         {
             if (task.toggleOnOff)
             {
@@ -1521,6 +1523,1092 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             dst3 = dst3.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
         }
     }
+
+
+
+    public class CSharp_BackProject_LineTop : CS_Parent
+    {
+        Line_ViewTop line = new Line_ViewTop();
+        public CSharp_BackProject_LineTop(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Backproject the lines found in the top view.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            line.Run(src);
+
+            dst2.SetTo(0);
+            int w = task.lineWidth + 5;
+            foreach (var lp in line.lines.lpList)
+            {
+                var lpNew = lp.edgeToEdgeLine(dst2.Size());
+                cv.Point p1 = new cv.Point((int)lpNew.p1.X, (int)lpNew.p1.Y);
+                cv.Point p2 = new cv.Point((int)lpNew.p2.X, (int)lpNew.p2.Y);
+                dst2.Line(p1, p2, Scalar.White, w, task.lineType);
+            }
+
+            var histogram = line.autoX.histogram;
+            histogram.SetTo(0, ~dst2);
+            Cv2.CalcBackProject(new[] { task.pointCloud }, task.channelsTop, histogram, dst3, task.rangesTop);
+            dst3 = dst3.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+        }
+    }
+
+    public class CSharp_BackProject_LineSide : CS_Parent
+    {
+        Line_ViewSide line = new Line_ViewSide();
+        public List<pointPair> lpList = new List<pointPair>();
+
+        public CSharp_BackProject_LineSide(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Backproject the lines found in the side view.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            line.Run(src);
+
+            dst2.SetTo(0);
+            int w = task.lineWidth + 5;
+            lpList.Clear();
+            foreach (var lp in line.lines.lpList)
+            {
+                if (Math.Abs(lp.slope) < 0.1)
+                {
+                    var lpNew = lp.edgeToEdgeLine(dst2.Size());
+                    cv.Point p1 = new cv.Point((int)lpNew.p1.X, (int)lpNew.p1.Y);
+                    cv.Point p2 = new cv.Point((int)lpNew.p2.X, (int)lpNew.p2.Y);
+                    dst2.Line(p1, p2, Scalar.White, w, task.lineType);
+                    lpList.Add(lp);
+                }
+            }
+
+            var histogram = line.autoY.histogram;
+            histogram.SetTo(0, ~dst2);
+            Cv2.CalcBackProject(new[] { task.pointCloud }, task.channelsSide, histogram, dst1, task.rangesSide);
+            dst1 = dst1.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+            dst3 = src;
+            dst3.SetTo(Scalar.White, dst1);
+        }
+    }
+
+    public class CSharp_BackProject_Image : CS_Parent
+    {
+        public Hist_Basics hist = new Hist_Basics();
+        public Mat mask = new Mat();
+        Kalman_Basics kalman = new Kalman_Basics();
+        public bool useInrange;
+
+        public CSharp_BackProject_Image(VBtask task) : base(task)
+        {
+            labels[2] = "Move mouse to backproject each histogram column";
+            desc = "Explore Backprojection of each element of a grayscale histogram.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            Mat input = src;
+            if (input.Channels() != 1)
+                input = input.CvtColor(ColorConversionCodes.BGR2GRAY);
+            hist.Run(input);
+            if (hist.mm.minVal == hist.mm.maxVal)
+            {
+                setTrueText("The input image is empty - mm.minval and mm.maxVal are both zero...");
+                return; // the input image is empty...
+            }
+            dst2 = hist.dst2;
+
+            if (kalman.kInput.Length != 2)
+                Array.Resize(ref kalman.kInput, 2);
+            kalman.kInput[0] = (float) hist.mm.minVal;
+            kalman.kInput[1] = (float) hist.mm.maxVal;
+            kalman.Run(empty);
+            hist.mm.minVal = Math.Min(kalman.kOutput[0], kalman.kOutput[1]);
+            hist.mm.maxVal = Math.Max(kalman.kOutput[0], kalman.kOutput[1]);
+
+            double totalPixels = dst2.Total(); // assume we are including zeros.
+            if (hist.plot.removeZeroEntry)
+                totalPixels = input.CountNonZero();
+
+            double brickWidth = dst2.Width / task.histogramBins;
+            double incr = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins;
+            int histIndex = (int)Math.Round(task.mouseMovePoint.X / brickWidth);
+
+            Scalar minRange = new Scalar(histIndex * incr);
+            Scalar maxRange = new Scalar((histIndex + 1) * incr + 1);
+            if (histIndex + 1 == task.histogramBins)
+            {
+                minRange = new Scalar(254);
+                maxRange = new Scalar(255);
+            }
+            if (useInrange)
+            {
+                if (histIndex == 0 && hist.plot.removeZeroEntry)
+                    mask = new Mat(input.Size(), MatType.CV_8U, 0);
+                else
+                    mask = input.InRange(minRange, maxRange);
+            }
+            else
+            {
+                Rangef bRange = new Rangef((float)minRange.Val0, (float)maxRange.Val0);
+                Rangef[] ranges = { bRange };
+                Cv2.CalcBackProject(new[] { input }, new[] { 0 }, hist.histogram, mask, ranges);
+            }
+            dst3 = src;
+            if (mask.Type() != MatType.CV_8U)
+                mask.ConvertTo(mask, MatType.CV_8U);
+            dst3.SetTo(Scalar.Yellow, mask);
+            int actualCount = mask.CountNonZero();
+            float count = hist.histogram.Get<float>(histIndex, 0);
+            mmData histMax = GetMinMax(hist.histogram);
+            labels[3] = "Backprojecting " + ((int)minRange.Val0).ToString() + " to " + ((int)maxRange.Val0).ToString() + " with " +
+                         count.ToString() + " histogram samples and " + actualCount.ToString() + " mask count.  Histogram max count = " +
+                         ((int)histMax.maxVal).ToString();
+            dst2.Rectangle(new Rect((int)(histIndex * brickWidth), 0, (int)brickWidth, dst2.Height), Scalar.Yellow, task.lineWidth);
+        }
+    }
+
+    public class CSharp_BackProject_Mouse : CS_Parent
+    {
+        BackProject_Image backP = new BackProject_Image();
+        public CSharp_BackProject_Mouse(VBtask task) : base(task)
+        {
+            labels[2] = "Use the mouse to select what should be shown in the backprojection of the depth histogram";
+            desc = "Use the mouse to select what should be shown in the backprojection of the depth histogram";
+        }
+        public void RunCS(Mat src)
+        {
+            backP.Run(src);
+            dst2 = backP.dst2;
+            dst3 = backP.dst3;
+        }
+    }
+
+    public class CSharp_BackProject_Depth : CS_Parent
+    {
+        BackProject_Image backp = new BackProject_Image();
+        public CSharp_BackProject_Depth(VBtask task) : base(task)
+        {
+            desc = "Allow review of the depth backprojection";
+        }
+        public void RunCS(Mat src)
+        {
+            var depth = task.pcSplit[2].Threshold(task.maxZmeters, 255, ThresholdTypes.TozeroInv);
+            backp.Run(depth * 1000);
+            dst2 = backp.dst2;
+            dst3 = src;
+            dst3.SetTo(Scalar.White, backp.mask);
+        }
+    }
+
+    public class CSharp_BackProject_MeterByMeter : CS_Parent
+    {
+        Mat histogram = new Mat();
+        public CSharp_BackProject_MeterByMeter(VBtask task) : base(task)
+        {
+            desc = "Backproject the depth data at 1 meter intervals WITHOUT A HISTOGRAM.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.histogramBins < task.maxZmeters) task.gOptions.setHistogramBins( (int)task.maxZmeters + 1);
+            if (task.optionsChanged)
+            {
+                var incr = task.maxZmeters / task.histogramBins;
+                var histData = new List<float>();
+                for (int i = 0; i < task.histogramBins; i++)
+                {
+                    histData.Add((float)Math.Round(i * incr));
+                }
+
+                histogram = new Mat(task.histogramBins, 1, MatType.CV_32F, histData.ToArray());
+            }
+            var ranges = new[] { new Rangef(0, task.maxZmeters) };
+            Cv2.CalcBackProject(new[] { task.pcSplit[2] }, new[] { 0 }, histogram, dst1, ranges);
+
+            //dst1.SetTo(task.maxZmeters, task.maxDepthMask);
+            dst1.ConvertTo(dst2, MatType.CV_8U);
+            dst3 = ShowPalette(dst1);
+        }
+    }
+
+    public class CSharp_BackProject_Hue : CS_Parent
+    {
+        OEX_CalcBackProject_Demo1 hue = new OEX_CalcBackProject_Demo1();
+        public int classCount;
+        public CSharp_BackProject_Hue(VBtask task) : base(task)
+        {
+            desc = "Create an 8UC1 image with a backprojection of the hue.";
+        }
+        public void RunCS(Mat src)
+        {
+            hue.Run(src);
+            classCount = hue.classCount;
+            dst2 = hue.dst2;
+            dst3 = ShowPalette(dst2 * 255 / classCount);
+        }
+    }
+
+
+
+
+
+
+    public class CSharp_Benford_Basics : CS_Parent
+    {
+        public float[] expectedDistribution = new float[10];
+        public float[] counts;
+        Plot_Histogram plot = new Plot_Histogram();
+        CSharp_AddWeighted_Basics addW;
+        bool use99;
+
+        public CSharp_Benford_Basics(VBtask task) : base(task)
+        {
+            addW = new CSharp_AddWeighted_Basics(task);
+            for (int i = 1; i < expectedDistribution.Length; i++)
+            {
+                expectedDistribution[i] = (float)Math.Log10(1 + 1.0 / i); // get the precise expected values.
+            }
+
+            labels[3] = "Actual distribution of input";
+            desc = "Build the capability to perform a Benford analysis.";
+        }
+
+        public void setup99()
+        {
+            expectedDistribution = new float[100];
+            for (int i = 1; i < expectedDistribution.Length; i++)
+            {
+                expectedDistribution[i] = (float)Math.Log10(1 + 1.0 / i);
+            }
+            counts = new float[expectedDistribution.Length];
+            use99 = true;
+        }
+
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                dst2 = src.Channels() == 1 ? src : src.CvtColor(ColorConversionCodes.BGR2GRAY);
+                src = new Mat(dst2.Size(), MatType.CV_32F);
+                dst2.ConvertTo(src, MatType.CV_32F);
+            }
+
+            src = src.Reshape(1, src.Width * src.Height);
+            var indexer = src.GetGenericIndexer<float>();
+            counts = new float[expectedDistribution.Length];
+
+            if (!use99)
+            {
+                for (int i = 0; i < src.Rows; i++)
+                {
+                    string val = indexer[i].ToString();
+                    if (val != "0" && !float.IsNaN(float.Parse(val)))
+                    {
+                        var firstInt = Regex.Match(val, "[1-9]{1}");
+                        if (firstInt.Length > 0) counts[int.Parse(firstInt.Value)] += 1;
+                    }
+                }
+            }
+            else
+            {
+                // this is for the distribution 10-99
+                for (int i = 0; i < src.Rows; i++)
+                {
+                    string val = indexer[i].ToString();
+                    if (val != "0" && !float.IsNaN(float.Parse(val)))
+                    {
+                        var firstInt = Regex.Match(val, "[1-9]{1}").ToString();
+                        int index = val.IndexOf(firstInt);
+                        if (index < val.Length - 2 && index > 0)
+                        {
+                            string val99 = val.Substring(index + 1, 2);
+                            if (int.TryParse(val99, out int result)) counts[result] += 1;
+                        }
+                    }
+                }
+            }
+
+            Mat hist = new Mat(counts.Length, 1, MatType.CV_32F, counts);
+            plot.backColor = Scalar.Blue;
+            plot.Run(hist);
+            dst3 = plot.dst2.Clone();
+            for (int i = 0; i < counts.Length; i++)
+            {
+                counts[i] = src.Rows * expectedDistribution[i];
+            }
+
+            hist = new Mat(counts.Length, 1, MatType.CV_32F, counts);
+            plot.backColor = Scalar.Gray;
+            plot.Run(hist);
+
+            addW.src2 = ~plot.dst2;
+            addW.RunCS(dst3);
+            dst2 = addW.dst2;
+
+            float wt = addW.weight;
+            labels[2] = "AddWeighted: " + wt.ToString("0.0") + " actual vs. " + (1 - wt).ToString("0.0") + " Benford distribution";
+        }
+    }
+
+
+
+
+
+
+    public class CSharp_Benford_NormalizedImage : CS_Parent
+    {
+        public Benford_Basics benford = new Benford_Basics();
+        public CSharp_Benford_NormalizedImage(VBtask task) : base(task)
+        {
+            desc = "Perform a Benford analysis of an image normalized to between 0 and 1";
+        }
+        public void RunCS(Mat src)
+        {
+            dst3 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            Mat gray32f = new Mat();
+            dst3.ConvertTo(gray32f, MatType.CV_32F);
+
+            benford.Run(gray32f.Normalize(1));
+            dst2 = benford.dst2;
+            labels[2] = benford.labels[3];
+            labels[3] = "Input image";
+        }
+    }
+
+    // https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
+    public class CSharp_Benford_NormalizedImage99 : CS_Parent
+    {
+        public Benford_Basics benford = new Benford_Basics();
+        public CSharp_Benford_NormalizedImage99(VBtask task) : base(task)
+        {
+            benford.setup99();
+            desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1";
+        }
+        public void RunCS(Mat src)
+        {
+            dst3 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            Mat gray32f = new Mat();
+            dst3.ConvertTo(gray32f, MatType.CV_32F);
+
+            benford.Run(gray32f.Normalize(1));
+            dst2 = benford.dst2;
+            labels[2] = benford.labels[3];
+            labels[3] = "Input image";
+        }
+    }
+
+    //// https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
+    //public class CSharp_Benford_JPEG : CS_Parent
+    //{
+    //    public Benford_Basics benford = new Benford_Basics();
+    //    public CSharp_Benford_JPEG(VBtask task) : base(task)
+    //    {
+    //        if (sliders.Setup(traceName)) sliders.setupTrackBar("JPEG Quality", 1, 100, 90);
+    //        desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        var qualitySlider = FindSlider("JPEG Quality");
+    //        var jpeg = src.ImEncode(".jpg", new int[] { (int)ImwriteFlags.JpegQuality, qualitySlider.Value });
+    //        var tmp = new Mat(jpeg.Length, 1, MatType.CV_8U, jpeg);
+    //        dst3 = Cv2.ImDecode(tmp, ImreadModes.Color);
+    //        benford.Run(tmp);
+    //        dst2 = benford.dst2;
+    //        labels[2] = benford.labels[3];
+    //        labels[3] = "Input image";
+    //    }
+    //}
+
+    //// https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
+    //public class CSharp_Benford_JPEG99 : CS_Parent
+    //{
+    //    public Benford_Basics benford = new Benford_Basics();
+    //    public CSharp_Benford_JPEG99(VBtask task) : base(task)
+    //    {
+    //        benford.setup99();
+    //        if (sliders.Setup(traceName)) sliders.setupTrackBar("JPEG Quality", 1, 100, 90);
+    //        desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        var qualitySlider = FindSlider("JPEG Quality");
+    //        var jpeg = src.ImEncode(".jpg", new int[] { (int)ImwriteFlags.JpegQuality, qualitySlider.Value });
+    //        var tmp = new Mat(jpeg.Length, 1, MatType.CV_8U, jpeg);
+    //        dst3 = Cv2.ImDecode(tmp, ImreadModes.Color);
+    //        benford.Run(tmp);
+    //        dst2 = benford.dst2;
+    //        labels[2] = benford.labels[3];
+    //        labels[3] = "Input image";
+    //    }
+    //}
+
+
+
+
+
+    //public class CSharp_Benford_PNG : CS_Parent
+    //{
+    //    public Benford_Basics benford = new Benford_Basics();
+    //    public CSharp_Benford_PNG(VBtask task) : base(task)
+    //    {
+    //        if (sliders.Setup(traceName))
+    //            sliders.setupTrackBar("PNG Compression", 1, 100, 90);
+    //        desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        var compressionSlider = FindSlider("PNG Compression");
+    //        var png = src.ImEncode(".png", new int[] { (int)ImwriteFlags.PngCompression, compressionSlider.Value });
+    //        var tmp = new Mat(png.Length, 1, MatType.CV_8U, png);
+    //        dst3 = Cv2.ImDecode(tmp, ImreadModes.Color);
+    //        benford.Run(tmp);
+    //        dst2 = benford.dst2;
+    //        labels[2] = benford.labels[3];
+    //        labels[3] = "Input image";
+    //    }
+    //}
+
+    public class CSharp_Benford_Depth : CS_Parent
+    {
+        public Benford_Basics benford = new Benford_Basics();
+        public CSharp_Benford_Depth(VBtask task) : base(task)
+        {
+            desc = "Apply Benford to the depth data";
+        }
+        public void RunCS(Mat src)
+        {
+            benford.Run(task.pcSplit[2]);
+            dst2 = benford.dst2;
+            labels[2] = benford.labels[3];
+        }
+    }
+
+
+
+    public class CSharp_Benford_Primes : CS_Parent
+    {
+        Sieve_BasicsVB sieve = new Sieve_BasicsVB();
+        Benford_Basics benford = new Benford_Basics();
+        public CSharp_Benford_Primes(VBtask task) : base(task)
+        {
+            var countSlider = FindSlider("Count of desired primes");
+            countSlider.Value = countSlider.Maximum;
+            labels = new string[] { "", "", "Actual Distribution of input", "" };
+            desc = "Apply Benford to a list of primes";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.optionsChanged)
+                sieve.Run(src); // only need to compute this once...
+            setTrueText($"Primes found: {sieve.primes.Count}", 3);
+
+            var tmp = new Mat(sieve.primes.Count, 1, MatType.CV_32S, sieve.primes.ToArray());
+            tmp.ConvertTo(tmp, MatType.CV_32F);
+            benford.Run(tmp);
+            dst2 = benford.dst2;
+        }
+    }
+
+
+
+
+
+
+    public class CSharp_Bezier_Basics : CS_Parent
+    {
+        public Point[] points;
+
+        public CSharp_Bezier_Basics(VBtask task) : base(task)
+        {
+            points = new Point[]
+            {
+            new Point(100, 100),
+            new Point(150, 50),
+            new Point(250, 150),
+            new Point(300, 100),
+            new Point(350, 150),
+            new Point(450, 50)
+            };
+            // vbAddAdvice(traceName + ": Update the public points array variable. No exposed options.");
+            desc = "Use n points to draw a Bezier curve.";
+        }
+
+        public Point nextPoint(Point[] points, int i, float t)
+        {
+            double x = Math.Pow(1 - t, 3) * points[i].X +
+                       3 * t * Math.Pow(1 - t, 2) * points[i + 1].X +
+                       3 * Math.Pow(t, 2) * (1 - t) * points[i + 2].X +
+                       Math.Pow(t, 3) * points[i + 3].X;
+
+            double y = Math.Pow(1 - t, 3) * points[i].Y +
+                       3 * t * Math.Pow(1 - t, 2) * points[i + 1].Y +
+                       3 * Math.Pow(t, 2) * (1 - t) * points[i + 2].Y +
+                       Math.Pow(t, 3) * points[i + 3].Y;
+
+            return new Point((int)x, (int)y);
+        }
+
+        public void RunCS(Mat src)
+        {
+            Point p1 = new Point();
+            for (int i = 0; i <= points.Length - 4; i += 3)
+            {
+                for (int j = 0; j <= 100; j++)
+                {
+                    Point p2 = nextPoint(points, i, j / 100f);
+                    if (j > 0) drawLine(dst2, p1, p2, task.highlightColor);
+                    p1 = p2;
+                }
+            }
+            labels[2] = "Bezier output";
+        }
+    }
+
+    public class CSharp_Bezier_Example : CS_Parent
+    {
+        Bezier_Basics bezier = new Bezier_Basics();
+        public Point[] points;
+
+        public CSharp_Bezier_Example(VBtask task) : base(task)
+        {
+            points = new Point[] { new Point(task.dotSize, task.dotSize), new Point(dst2.Width / 6, dst2.Width / 6),
+                       new Point(dst2.Width * 3 / 4, dst2.Height / 2), new Point(dst2.Width - task.dotSize * 2,
+                       dst2.Height - task.dotSize * 2)};
+            desc = "Draw a Bezier curve based with the 4 input points.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            dst2.SetTo(Scalar.Black);
+            Point p1 = new Point();
+            for (int i = 0; i < 100; i++)
+            {
+                Point p2 = bezier.nextPoint(points, 0, i / 100f);
+                if (i > 0) drawLine(dst2, p1, p2, task.highlightColor);
+                p1 = p2;
+            }
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                drawCircle(dst2, points[i], task.dotSize + 2, Scalar.White);
+            }
+
+            drawLine(dst2, points[0], points[1], Scalar.White);
+            drawLine(dst2, points[2], points[3], Scalar.White);
+        }
+    }
+
+
+
+
+
+
+    public class CSharp_BGRPattern_Basics : CS_Parent
+    {
+        Denoise_Pixels denoise = new Denoise_Pixels();
+        Options_ColorFormat options = new Options_ColorFormat();
+        public int classCount;
+
+        public CSharp_BGRPattern_Basics(VBtask task) : base(task)
+        {
+            cPtr = BGRPattern_Open();
+            //vbAddAdvice(traceName + ": local options 'Options_ColorFormat' selects color.");
+            desc = "Classify each 3-channel input pixel according to their relative values";
+        }
+
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            src = options.dst2;
+
+            byte[] cppData = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, cppData, 0, cppData.Length);
+            GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
+            IntPtr imagePtr = BGRPattern_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
+            handleSrc.Free();
+
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr).Clone();
+
+            classCount = BGRPattern_ClassCount(cPtr);
+            denoise.classCount = classCount;
+            denoise.Run(dst2);
+            dst2 = denoise.dst2;
+
+            if (standaloneTest())
+            {
+                dst2 = dst2 * 255 / classCount;
+                dst3 = ShowPalette(dst2);
+            }
+        }
+
+        public void Close()
+        {
+            BGRPattern_Close(cPtr);
+        }
+    }
+
+
+
+
+
+
+    public class CSharp_BGSubtract_Basics : CS_Parent
+    {
+        public Options_BGSubtract options = new Options_BGSubtract();
+
+        public CSharp_BGSubtract_Basics(VBtask task) : base(task)
+        {
+            cPtr = BGSubtract_BGFG_Open(options.currMethod);
+            //vbAddAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.");
+            desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++";
+        }
+
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            if (task.optionsChanged)
+            {
+                BGSubtract_BGFG_Close(cPtr);
+                cPtr = BGSubtract_BGFG_Open(options.currMethod);
+            }
+
+            byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
+            GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+            IntPtr imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels(), options.learnRate);
+            handleSrc.Free();
+
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
+            labels[2] = options.methodDesc;
+        }
+
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero)
+            {
+                cPtr = BGSubtract_BGFG_Close(cPtr);
+            }
+        }
+    }
+
+    // https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
+    public class CSharp_BGSubtract_Basics_QT : CS_Parent
+    {
+        private double learnRate;
+
+        public CSharp_BGSubtract_Basics_QT(VBtask task) : base(task)
+        {
+            learnRate = (dst2.Width >= 1280) ? 0.5 : 0.1; // learn faster with large images (slower frame rate)
+            cPtr = BGSubtract_BGFG_Open(4); // MOG2 is the default method when running in QT mode.
+            desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++";
+        }
+
+        public void RunCS(Mat src)
+        {
+            byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
+            GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+            IntPtr imagePtr = BGSubtract_BGFG_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels(), learnRate);
+            handleSrc.Free();
+
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC1, imagePtr);
+        }
+
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero)
+            {
+                cPtr = BGSubtract_BGFG_Close(cPtr);
+            }
+        }
+    }
+
+    public class CSharp_BGSubtract_MOG2 : CS_Parent
+    {
+        private BackgroundSubtractorMOG2 MOG2;
+        private Options_BGSubtract options = new Options_BGSubtract();
+
+        public CSharp_BGSubtract_MOG2(VBtask task) : base(task)
+        {
+            MOG2 = BackgroundSubtractorMOG2.Create();
+            desc = "Subtract background using a mixture of Gaussians";
+        }
+
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (src.Channels() == 3)
+            {
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            }
+            MOG2.Apply(src, dst2, options.learnRate);
+        }
+    }
+
+    public class CSharp_BGSubtract_MOG2_QT : CS_Parent
+    {
+        private BackgroundSubtractorMOG2 MOG2;
+
+        public CSharp_BGSubtract_MOG2_QT(VBtask task) : base(task)
+        {
+            MOG2 = BackgroundSubtractorMOG2.Create();
+            desc = "Subtract background using a mixture of Gaussians - the QT version";
+        }
+
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() == 3)
+            {
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            }
+            double learnRate = (dst2.Width >= 1280) ? 0.5 : 0.1; // learn faster with large images (slower frame rate)
+            MOG2.Apply(src, dst2, learnRate);
+        }
+    }
+
+
+
+
+
+    //public class CSharp_BGSubtract_MotionDetect : CS_Parent
+    //{
+    //    Vec3i[] radioChoices;
+    //    public CSharp_BGSubtract_MotionDetect(VBtask task) : base(task)
+    //    {
+    //        if (sliders.Setup(traceName)) sliders.setupTrackBar("Correlation Threshold", 0, 1000, 980);
+    //        if (radio.Setup(traceName))
+    //        {
+    //            for (int i = 0; i < 7; i++)
+    //            {
+    //                radio.addRadio(Math.Pow(2, i) + " threads");
+    //            }
+    //            radio.check(5).Checked = true;
+    //        }
+    //        int w = dst2.Width;
+    //        int h = dst2.Height;
+    //        radioChoices = new Vec3i[]
+    //        {
+    //        new Vec3i(1, w, h), new Vec3i(2, w / 2, h), new Vec3i(4, w / 2, h / 2),
+    //        new Vec3i(8, w / 4, h / 2), new Vec3i(16, w / 4, h / 4), new Vec3i(32, w / 8, h / 4),
+    //        new Vec3i(32, w / 8, h / 8), new Vec3i(1, w, h), new Vec3i(2, w / 2, h), new Vec3i(4, w / 2, h / 2),
+    //        new Vec3i(8, w / 4, h / 2), new Vec3i(16, w / 4, h / 4), new Vec3i(32, w / 8, h / 4),
+    //        new Vec3i(32, w / 8, h / 8)
+    //        };
+
+    //        labels[3] = "Only Motion Added";
+    //        desc = "Detect Motion for use with background subtraction";
+    //    }
+
+    //    public void RunCS(Mat src)
+    //    {
+    //        var correlationSlider = FindSlider("Correlation Threshold");
+    //        var frm = findfrm(traceName + " Radio Buttons");
+    //        var threadData = radioChoices[findRadioIndex(frm.check)];
+
+    //        if (task.optionsChanged) src.CopyTo(dst3);
+    //        int threadCount = threadData.Item0;
+    //        int width = threadData.Item1, height = threadData.Item2;
+    //        Task[] taskArray = new Task[threadCount];
+    //        int xfactor = src.Width / width;
+    //        int yfactor = Math.Max(src.Height / height, src.Width / width);
+    //        float CCthreshold = (float)correlationSlider.Value / correlationSlider.Maximum;
+    //        dst2.SetTo(0);
+    //        bool motionFound = false;
+
+    //        for (int i = 0; i < threadCount; i++)
+    //        {
+    //            int section = i;
+    //            taskArray[i] = Task.Factory.StartNew(() =>
+    //            {
+    //                var roi = new Rect((section % xfactor) * width, height * (int)Math.Floor((double)section / yfactor), width, height);
+    //                var correlation = new Mat();
+    //                if (roi.X + roi.Width > dst3.Width) roi.Width = dst3.Width - roi.X - 1;
+    //                if (roi.Y + roi.Height > dst3.Height) roi.Height = dst3.Height - roi.Y - 1;
+    //                Cv2.MatchTemplate(src[roi], dst3[roi], correlation, TemplateMatchModes.CCoeffNormed);
+    //                if (CCthreshold > correlation.At<float>(0, 0))
+    //                {
+    //                    src[roi].CopyTo(dst2[roi]);
+    //                    src[roi].CopyTo(dst3[roi]);
+    //                    motionFound = true;
+    //                }
+    //            });
+    //        }
+    //        Task.WaitAll(taskArray);
+    //        if (!motionFound) setTrueText("No motion detected in any of the regions");
+    //    }
+    //}
+
+    public class CSharp_BGSubtract_MOG : CS_Parent
+    {
+        BackgroundSubtractorMOG MOG;
+        Options_BGSubtract options = new Options_BGSubtract();
+        public CSharp_BGSubtract_MOG(VBtask task) : base(task)
+        {
+            MOG = BackgroundSubtractorMOG.Create();
+            desc = "Subtract background using a mixture of Gaussians";
+        }
+
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            MOG.Apply(src, dst2, options.learnRate);
+        }
+    }
+
+    public class CSharp_BGSubtract_GMG_KNN : CS_Parent
+    {
+        BackgroundSubtractorGMG gmg;
+        BackgroundSubtractorKNN knn;
+        Options_BGSubtract options = new Options_BGSubtract();
+        public CSharp_BGSubtract_GMG_KNN(VBtask task) : base(task)
+        {
+            gmg = BackgroundSubtractorGMG.Create();
+            knn = BackgroundSubtractorKNN.Create();
+            desc = "GMG and KNN API's to subtract background";
+        }
+
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (task.frameCount < 120)
+            {
+                setTrueText("Waiting to get sufficient frames to learn background.  frameCount = " + task.frameCount);
+            }
+            else
+            {
+                setTrueText("");
+            }
+
+            dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            gmg.Apply(dst2, dst2, options.learnRate);
+            knn.Apply(dst2, dst2, options.learnRate);
+        }
+    }
+
+    public class CSharp_BGSubtract_MOG_RGBDepth : CS_Parent
+    {
+        public Mat grayMat = new Mat();
+        Options_BGSubtract options = new Options_BGSubtract();
+        BackgroundSubtractorMOG MOGDepth;
+        BackgroundSubtractorMOG MOGRGB;
+        public CSharp_BGSubtract_MOG_RGBDepth(VBtask task) : base(task)
+        {
+            MOGDepth = BackgroundSubtractorMOG.Create();
+            MOGRGB = BackgroundSubtractorMOG.Create();
+            labels = new string[] { "", "", "Unstable depth", "Unstable color (if there is motion)" };
+            desc = "Isolate motion in both depth and color data using a mixture of Gaussians";
+        }
+
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            grayMat = task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY);
+            MOGDepth.Apply(grayMat, grayMat, options.learnRate);
+            dst2 = grayMat.CvtColor(ColorConversionCodes.GRAY2BGR);
+
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            MOGRGB.Apply(src, dst3, options.learnRate);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

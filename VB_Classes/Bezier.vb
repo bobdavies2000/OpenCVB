@@ -60,10 +60,16 @@ Public Class Bezier_Example : Inherits VB_Parent
         Next
 
         For i = 0 To points.Count - 1
-            drawCircle(dst2,points(i), task.dotSize + 2, cv.Scalar.White)
+            drawCircle(dst2, points(i), task.dotSize + 2, cv.Scalar.White)
         Next
 
         drawLine(dst2, points(0), points(1), cv.Scalar.White)
         drawLine(dst2, points(2), points(3), cv.Scalar.White)
     End Sub
 End Class
+
+
+
+
+
+
