@@ -2421,7 +2421,120 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 
+    public class CSharp_BGSubtract_MOG_Retina : CS_Parent
+    {
+        BGSubtract_MOG bgSub = new BGSubtract_MOG();
+        Retina_Basics_CPP retina = new Retina_Basics_CPP();
 
+        public CSharp_BGSubtract_MOG_Retina(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "MOG results of depth motion", "Difference from retina depth motion." };
+            desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            retina.Run(task.depthRGB);
+            bgSub.Run(retina.dst3.Clone());
+            dst2 = bgSub.dst2;
+            Cv2.Subtract(bgSub.dst2, retina.dst3, dst3);
+        }
+    }
+
+    public class CSharp_BGSubtract_DepthOrColorMotion : CS_Parent
+    {
+        public Diff_UnstableDepthAndColor motion = new Diff_UnstableDepthAndColor();
+
+        public CSharp_BGSubtract_DepthOrColorMotion(VBtask task) : base(task)
+        {
+            desc = "Detect motion with both depth and color changes";
+        }
+
+        public void RunCS(Mat src)
+        {
+            motion.Run(src);
+            dst2 = motion.dst2;
+            dst3 = motion.dst3;
+            var mask = dst2.CvtColor(ColorConversionCodes.BGR2GRAY).ConvertScaleAbs();
+            src.CopyTo(dst3, ~mask);
+            labels[3] = "Image with instability filled with color data";
+        }
+    }
+
+    public class CSharp_BGSubtract_Video : CS_Parent
+    {
+        BGSubtract_Basics bgSub = new BGSubtract_Basics();
+        Video_Basics video = new Video_Basics();
+
+        public CSharp_BGSubtract_Video(VBtask task) : base(task)
+        {
+            video.srcVideo = task.homeDir + "opencv/Samples/Data/vtest.avi";
+            desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera.";
+        }
+
+        public void RunCS(Mat src)
+        {
+            video.Run(src);
+            dst3 = video.dst2;
+            bgSub.Run(dst3);
+            dst2 = bgSub.dst2;
+        }
+    }
+
+    public class CSharp_BGSubtract_Synthetic_CPP : CS_Parent
+    {
+        Options_BGSubtractSynthetic options = new Options_BGSubtractSynthetic();
+
+        public CSharp_BGSubtract_Synthetic_CPP(VBtask task) : base(task)
+        {
+            labels[2] = "Synthetic background/foreground image.";
+            desc = "Generate a synthetic input to background subtraction method";
+        }
+
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (task.optionsChanged)
+            {
+                if (!task.firstPass) BGSubtract_Synthetic_Close(cPtr);
+
+                byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
+                Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
+                GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+
+                cPtr = BGSubtract_Synthetic_Open(handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                                 task.homeDir + "opencv/Samples/Data/baboon.jpg",
+                                                 options.amplitude / 100, options.magnitude, options.waveSpeed / 100, options.objectSpeed);
+                handleSrc.Free();
+            }
+            IntPtr imagePtr = BGSubtract_Synthetic_Run(cPtr);
+            if (imagePtr != IntPtr.Zero) dst2 = new Mat(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr).Clone();
+        }
+
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero) cPtr = BGSubtract_Synthetic_Close(cPtr);
+        }
+    }
+
+    public class CSharp_BGSubtract_Synthetic : CS_Parent
+    {
+        BGSubtract_Basics bgSub = new BGSubtract_Basics();
+        BGSubtract_Synthetic_CPP synth = new BGSubtract_Synthetic_CPP();
+
+        public CSharp_BGSubtract_Synthetic(VBtask task) : base(task)
+        {
+            desc = "Demonstrate background subtraction algorithms with synthetic images";
+        }
+
+        public void RunCS(Mat src)
+        {
+            synth.Run(src);
+            dst3 = synth.dst2;
+            bgSub.Run(dst3);
+            dst2 = bgSub.dst2;
+        }
+    }
 
 
 
@@ -2622,5 +2735,6 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 }
+
 
 

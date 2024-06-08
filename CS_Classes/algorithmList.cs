@@ -63,12 +63,17 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_BGRPattern_Basics") return new CSharp_BGRPattern_Basics(task);
 			if (algorithmName == "CSharp_BGSubtract_Basics") return new CSharp_BGSubtract_Basics(task);
 			if (algorithmName == "CSharp_BGSubtract_Basics_QT") return new CSharp_BGSubtract_Basics_QT(task);
+			if (algorithmName == "CSharp_BGSubtract_DepthOrColorMotion") return new CSharp_BGSubtract_DepthOrColorMotion(task);
 			if (algorithmName == "CSharp_BGSubtract_GMG_KNN") return new CSharp_BGSubtract_GMG_KNN(task);
 			if (algorithmName == "CSharp_BGSubtract_MOG") return new CSharp_BGSubtract_MOG(task);
+			if (algorithmName == "CSharp_BGSubtract_MOG_Retina") return new CSharp_BGSubtract_MOG_Retina(task);
 			if (algorithmName == "CSharp_BGSubtract_MOG_RGBDepth") return new CSharp_BGSubtract_MOG_RGBDepth(task);
 			if (algorithmName == "CSharp_BGSubtract_MOG2") return new CSharp_BGSubtract_MOG2(task);
 			if (algorithmName == "CSharp_BGSubtract_MOG2_QT") return new CSharp_BGSubtract_MOG2_QT(task);
 			if (algorithmName == "CSharp_BGSubtract_MotionDetect") return new CSharp_BGSubtract_MotionDetect(task);
+			if (algorithmName == "CSharp_BGSubtract_Synthetic") return new CSharp_BGSubtract_Synthetic(task);
+			if (algorithmName == "CSharp_BGSubtract_Synthetic_CPP") return new CSharp_BGSubtract_Synthetic_CPP(task);
+			if (algorithmName == "CSharp_BGSubtract_Video") return new CSharp_BGSubtract_Video(task);
 			if (algorithmName == "CSharp_Diff_Basics") return new CSharp_Diff_Basics(task);
 			if (algorithmName == "CSharp_Line_Basics") return new CSharp_Line_Basics(task);
 			if (algorithmName == "CSharp_Random_Basics") return new CSharp_Random_Basics(task);
