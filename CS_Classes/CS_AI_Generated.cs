@@ -1205,7 +1205,6 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 
-
     public class CSharp_BackProject_FullEqualized : CS_Parent
     {
         private BackProject_Full backP = new BackProject_Full();
@@ -1221,13 +1220,15 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         {
             backP.Run(src);
             backP.dst2.ConvertTo(dst2, MatType.CV_8U);
-            dst2 = ShowPalette(dst2);
+            var mm = GetMinMax(dst2);
+            dst2 = ShowPalette(dst2 * 255 / mm.maxVal);
 
             equalize.Run(src);
             backP.Run(equalize.dst2);
 
             backP.dst2.ConvertTo(dst3, MatType.CV_8U);
-            dst3 = ShowPalette(dst3);
+            mm = GetMinMax(dst3);
+            dst3 = ShowPalette(dst3 * 255 / mm.maxVal);
         }
     }
 

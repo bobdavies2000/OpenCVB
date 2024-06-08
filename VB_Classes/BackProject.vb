@@ -296,13 +296,15 @@ Public Class BackProject_FullEqualized : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         backP.Run(src)
         backP.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst2 = ShowPalette(dst2)
+        Dim mm = GetMinMax(dst3)
+        dst2 = ShowPalette(dst2 * 255 / mm.maxVal)
 
         equalize.Run(src)
         backP.Run(equalize.dst2)
 
         backP.dst2.ConvertTo(dst3, cv.MatType.CV_8U)
-        dst3 = ShowPalette(dst3)
+        mm = GetMinMax(dst3)
+        dst3 = ShowPalette(dst3 * 255 / mm.maxVal)
     End Sub
 End Class
 
