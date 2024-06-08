@@ -7,7 +7,7 @@ Public Class Contour_Basics : Inherits VB_Parent
     Public sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         findRadio("FloodFill").Checked = True
-        vbAddAdvice(traceName + ": redOptions color class determines the input.  Use local options in 'Options_Contours' to further control output.")
+        UpdateAdvice(traceName + ": redOptions color class determines the input.  Use local options in 'Options_Contours' to further control output.")
         labels = {"", "", "FindContour input", "Draw contour output"}
         desc = "General purpose contour finder"
     End Sub
@@ -484,7 +484,7 @@ Public Class Contour_Largest : Inherits VB_Parent
     Public allContours As cv.Point()()
     Public options As New Options_Contours
     Public Sub New()
-        vbAddAdvice(traceName + ": use the local options in 'Options_Contours'")
+        UpdateAdvice(traceName + ": use the local options in 'Options_Contours'")
         labels = {"", "", "Input to FindContours", "Largest single contour in the input image."}
         desc = "Create a mask from the largest contour of the input."
     End Sub
@@ -844,7 +844,7 @@ Public Class Contour_DepthTiers : Inherits VB_Parent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         findRadio("FloodFill").Checked = True
-        vbAddAdvice(traceName + ": redOptions color class determines the input.  Use local options in 'Options_Contours' to further control output.")
+        UpdateAdvice(traceName + ": redOptions color class determines the input.  Use local options in 'Options_Contours' to further control output.")
         labels = {"", "", "FindContour input", "Draw contour output"}
         desc = "General purpose contour finder"
     End Sub

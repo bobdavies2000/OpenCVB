@@ -5,7 +5,7 @@ Imports System.Runtime.InteropServices
 Public Class Depth_Basics : Inherits VB_Parent
     Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
-        vbAddAdvice(traceName + ": use global option to control 'Max Depth'.")
+        UpdateAdvice(traceName + ": use global option to control 'Max Depth'.")
         desc = "Colorize the depth data into task.depthRGB"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1514,7 +1514,7 @@ Public Class Depth_TiersZ : Inherits VB_Parent
     Public classCount As Integer
     Dim options As New Options_Contours
     Public Sub New()
-        vbAddAdvice(traceName + ": gOptions 'Max Depth (meters)' and local options for cm's per tier.")
+        UpdateAdvice(traceName + ": gOptions 'Max Depth (meters)' and local options for cm's per tier.")
         desc = "Create a reduced image of the depth data to define tiers of similar values"
     End Sub
     Public Sub RunVB(src As cv.Mat)

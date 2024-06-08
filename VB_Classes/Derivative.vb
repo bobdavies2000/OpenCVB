@@ -5,7 +5,7 @@ Public Class Derivative_Basics : Inherits VB_Parent
     Public plot As New Plot_Histogram
     Public Sub New()
         backp.hist.plot.removeZeroEntry = False
-        vbAddAdvice(traceName + ": gOptions histogram Bins and several local options are important.")
+        UpdateAdvice(traceName + ": gOptions histogram Bins and several local options are important.")
         desc = "Display a first or second derivative of the selected depth dimension and direction."
     End Sub
     Public Sub RunVB(src As cv.Mat)

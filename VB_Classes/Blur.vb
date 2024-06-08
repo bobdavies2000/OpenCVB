@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Public Class Blur_Basics : Inherits VB_Parent
     Dim options As New Options_Blur
     Public Sub New()
-        vbAddAdvice(traceName + ": use local options to control the kernel size and sigma.")
+        UpdateAdvice(traceName + ": use local options to control the kernel size and sigma.")
         desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub RunVB(src As cv.Mat)

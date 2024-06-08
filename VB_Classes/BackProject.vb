@@ -5,7 +5,7 @@ Public Class BackProject_Basics : Inherits VB_Parent
     Public minRange As cv.Scalar, maxRange As cv.Scalar
     Public Sub New()
         labels(2) = "Move mouse to backproject a histogram column"
-        vbAddAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.")
+        UpdateAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.")
         desc = "Mouse over any bin to see the histogram backprojected."
     End Sub
     Public Sub RunVB(src as cv.Mat)

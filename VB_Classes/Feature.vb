@@ -97,7 +97,7 @@ Public Class Feature_BasicsNoFrills : Inherits VB_Parent
     Public options As New Options_Features
     Dim gather As New Feature_Gather
     Public Sub New()
-        vbAddAdvice(traceName + ": Use 'Options_Features' to control output.")
+        UpdateAdvice(traceName + ": Use 'Options_Features' to control output.")
         desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -516,7 +516,7 @@ Public Class Feature_Generations : Inherits VB_Parent
     Dim features As New List(Of cv.Point)
     Dim gens As New List(Of Integer)
     Public Sub New()
-        vbAddAdvice(traceName + ": Local options will determine how many features are present.")
+        UpdateAdvice(traceName + ": Local options will determine how many features are present.")
         desc = "Find feature age maximum and average."
     End Sub
     Public Sub RunVB(src As cv.Mat)

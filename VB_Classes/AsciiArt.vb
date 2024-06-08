@@ -4,7 +4,7 @@ Public Class AsciiArt_Basics : Inherits VB_Parent
     Dim asciiChars As String() = {"@", "%", "#", "*", "+", "=", "-", ":", ",", ".", " "}
     Dim options As New Options_AsciiArt
     Public Sub New()
-        vbAddAdvice(traceName + ": use the local options for height and width.")
+        UpdateAdvice(traceName + ": use the local options for height and width.")
         labels = {"", "", "Ascii version", "Grayscale input to ascii art"}
         desc = "Build an ascii art representation of the input stream."
     End Sub

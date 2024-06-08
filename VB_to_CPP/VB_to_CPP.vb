@@ -185,7 +185,7 @@ Public Class VB_to_CPP
             End If
 
             If line.Contains("options->Run()") Then Continue For
-            If line.Contains("vbAddAdvice(") Then Continue For
+            If line.Contains("UpdateAdvice(") Then Continue For
             line = line.Replace("cv::", "")
             line = line.Replace("std::", "")
             CPPrtb.Text += line + vbCrLf

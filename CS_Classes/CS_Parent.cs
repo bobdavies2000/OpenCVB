@@ -56,7 +56,7 @@ namespace CS_Classes
             return false;
         }
 
-        public void AddAdvice(string advice)
+        public void UpdateAdvice(string advice)
         {
             if (task.advice.StartsWith("No advice for "))
             {

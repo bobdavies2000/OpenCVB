@@ -7,7 +7,7 @@ Public Class OEX_CalcBackProject_Demo1 : Inherits VB_Parent
     Public classCount As Integer
     Public Sub New()
         labels = {"", "", "BackProjection of Hue channel", "Plot of Hue histogram"}
-        vbAddAdvice(traceName + ": <place advice here on any options that are useful>")
+        UpdateAdvice(traceName + ": <place advice here on any options that are useful>")
         desc = "OpenCV Sample CalcBackProject_Demo1"
     End Sub
     Public Sub RunVB(src As cv.Mat)

@@ -3,7 +3,7 @@ Public Class Convex_Basics : Inherits VB_Parent
     Public hull() As cv.Point
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Hull random points", 4, 20, 10)
-        vbAddAdvice(traceName + ": use the local options to control the number of points.")
+        UpdateAdvice(traceName + ": use the local options to control the number of points.")
         desc = "Surround a set of random points with a convex hull"
         labels = {"", "", "Convex Hull - red dot is center and the black dots are the input points", ""}
     End Sub

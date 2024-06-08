@@ -26,7 +26,7 @@ Public Class Contrast_Basics : Inherits VB_Parent
             sliders.setupTrackBar("Contrast", 1, 100, 100)
         End If
         labels(2) = "Brightness/Contrast"
-        vbAddAdvice(traceName + ": use the local options to control brightness and contrast.")
+        UpdateAdvice(traceName + ": use the local options to control brightness and contrast.")
         desc = "Show image with varying contrast and brightness."
     End Sub
     Public Sub RunVB(src as cv.Mat)

@@ -52,7 +52,6 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_BackProject_Vertical") return new CSharp_BackProject_Vertical(task);
 			if (algorithmName == "CSharp_Benford_Basics") return new CSharp_Benford_Basics(task);
 			if (algorithmName == "CSharp_Benford_Depth") return new CSharp_Benford_Depth(task);
-			if (algorithmName == "CSharp_Benford_DepthRGB") return new CSharp_Benford_DepthRGB(task);
 			if (algorithmName == "CSharp_Benford_NormalizedImage") return new CSharp_Benford_NormalizedImage(task);
 			if (algorithmName == "CSharp_Benford_NormalizedImage99") return new CSharp_Benford_NormalizedImage99(task);
 			if (algorithmName == "CSharp_Benford_Primes") return new CSharp_Benford_Primes(task);

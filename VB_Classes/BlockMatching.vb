@@ -7,7 +7,7 @@ Public Class BlockMatching_Basics : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels(2) = "Block matching disparity colorized like depth"
         labels(3) = "Right Image (used with left image)"
-        vbAddAdvice(traceName + ": click 'Show All' to see all the available options.")
+        UpdateAdvice(traceName + ": click 'Show All' to see all the available options.")
         desc = "Use OpenCV's block matching on left and right views"
     End Sub
     Public Sub RunVB(src as cv.Mat)

@@ -6,7 +6,7 @@ Public Class Color8U_Basics : Inherits VB_Parent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         labels(3) = "vbPalette output of dst2 at left"
-        vbAddAdvice(traceName + ": redOptions 'Color Source' control which color source is used.")
+        UpdateAdvice(traceName + ": redOptions 'Color Source' control which color source is used.")
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -146,7 +146,7 @@ End Class
 Public Class Color8U_RedHue : Inherits VB_Parent
     Dim options As New Options_CamShift
     Public Sub New()
-        vbAddAdvice(traceName + ": This mask of red hue areas is available for use.")
+        UpdateAdvice(traceName + ": This mask of red hue areas is available for use.")
         labels = {"", "", "Pixels with Red Hue", ""}
         desc = "Find all the reddish pixels in the image - indicate some life form."
     End Sub

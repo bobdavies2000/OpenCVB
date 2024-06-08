@@ -407,7 +407,7 @@ Public Class VBtask : Implements IDisposable
 
         If task.advice = "" Then
             task.advice = "No advice for " + algName + " yet." + vbCrLf +
-                           "Please use 'vbAddAdvice(<your advice>)' in the constructor)."
+                           "Please use 'UpdateAdvice(<your advice>)' in the constructor)."
         End If
 
         If parms.useRecordedData Then recordedData = New Replay_Play()

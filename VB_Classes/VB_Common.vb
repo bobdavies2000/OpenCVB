@@ -478,12 +478,6 @@ Module VB_Common
                             ((1 - factor) * farBlue(1) + factor * nearYellow(1)),
                             ((1 - factor) * farBlue(2) + factor * nearYellow(2)))
     End Function
-    Public Sub vbAddAdvice(advice As String)
-        If task.advice.StartsWith("No advice for ") Then task.advice = ""
-        Dim split = advice.Split(":")
-        If task.advice.Contains(split(0) + ":") Then Return
-        task.advice += advice + vbCrLf + vbCrLf
-    End Sub
     Public Function vbPrepareDepthInput(index As Integer) As cv.Mat
         If task.gOptions.gravityPointCloud.Checked Then Return task.pcSplit(index) ' already oriented to gravity
 

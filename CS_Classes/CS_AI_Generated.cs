@@ -833,7 +833,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         public CSharp_Diff_Basics(VBtask task) : base(task)
         {
             labels = new string[] { "", "", "Unstable mask", "" };
-            //vbAddAdvice(traceName + ": use goption 'Pixel Difference Threshold' to control changed pixels.");
+            //UpdateAdvice(traceName + ": use goption 'Pixel Difference Threshold' to control changed pixels.");
             desc = "Capture an image and compare it to previous frame using absDiff and threshold";
         }
 
@@ -904,7 +904,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         public CSharp_BackProject_Basics(VBtask task) : base(task)
         {
             labels[2] = "Move mouse to backproject a histogram column";
-            //vbAddAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.");
+            //UpdateAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.");
             desc = "Mouse over any bin to see the histogram backprojected.";
         }
 
@@ -1900,76 +1900,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         }
     }
 
-    //// https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-    //public class CSharp_Benford_JPEG : CS_Parent
-    //{
-    //    public Benford_Basics benford = new Benford_Basics();
-    //    public CSharp_Benford_JPEG(VBtask task) : base(task)
-    //    {
-    //        if (sliders.Setup(traceName)) sliders.setupTrackBar("JPEG Quality", 1, 100, 90);
-    //        desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image.";
-    //    }
-    //    public void RunCS(Mat src)
-    //    {
-    //        var qualitySlider = FindSlider("JPEG Quality");
-    //        var jpeg = src.ImEncode(".jpg", new int[] { (int)ImwriteFlags.JpegQuality, qualitySlider.Value });
-    //        var tmp = new Mat(jpeg.Length, 1, MatType.CV_8U, jpeg);
-    //        dst3 = Cv2.ImDecode(tmp, ImreadModes.Color);
-    //        benford.Run(tmp);
-    //        dst2 = benford.dst2;
-    //        labels[2] = benford.labels[3];
-    //        labels[3] = "Input image";
-    //    }
-    //}
 
-    //// https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-    //public class CSharp_Benford_JPEG99 : CS_Parent
-    //{
-    //    public Benford_Basics benford = new Benford_Basics();
-    //    public CSharp_Benford_JPEG99(VBtask task) : base(task)
-    //    {
-    //        benford.setup99();
-    //        if (sliders.Setup(traceName)) sliders.setupTrackBar("JPEG Quality", 1, 100, 90);
-    //        desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image.";
-    //    }
-    //    public void RunCS(Mat src)
-    //    {
-    //        var qualitySlider = FindSlider("JPEG Quality");
-    //        var jpeg = src.ImEncode(".jpg", new int[] { (int)ImwriteFlags.JpegQuality, qualitySlider.Value });
-    //        var tmp = new Mat(jpeg.Length, 1, MatType.CV_8U, jpeg);
-    //        dst3 = Cv2.ImDecode(tmp, ImreadModes.Color);
-    //        benford.Run(tmp);
-    //        dst2 = benford.dst2;
-    //        labels[2] = benford.labels[3];
-    //        labels[3] = "Input image";
-    //    }
-    //}
-
-
-
-
-
-    //public class CSharp_Benford_PNG : CS_Parent
-    //{
-    //    public Benford_Basics benford = new Benford_Basics();
-    //    public CSharp_Benford_PNG(VBtask task) : base(task)
-    //    {
-    //        if (sliders.Setup(traceName))
-    //            sliders.setupTrackBar("PNG Compression", 1, 100, 90);
-    //        desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image.";
-    //    }
-    //    public void RunCS(Mat src)
-    //    {
-    //        var compressionSlider = FindSlider("PNG Compression");
-    //        var png = src.ImEncode(".png", new int[] { (int)ImwriteFlags.PngCompression, compressionSlider.Value });
-    //        var tmp = new Mat(png.Length, 1, MatType.CV_8U, png);
-    //        dst3 = Cv2.ImDecode(tmp, ImreadModes.Color);
-    //        benford.Run(tmp);
-    //        dst2 = benford.dst2;
-    //        labels[2] = benford.labels[3];
-    //        labels[3] = "Input image";
-    //    }
-    //}
 
     public class CSharp_Benford_Depth : CS_Parent
     {
@@ -2032,7 +1963,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             new Point(350, 150),
             new Point(450, 50)
             };
-            // vbAddAdvice(traceName + ": Update the public points array variable. No exposed options.");
+            // UpdateAdvice(traceName + ": Update the public points array variable. No exposed options.");
             desc = "Use n points to draw a Bezier curve.";
         }
 
@@ -2115,7 +2046,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         public CSharp_BGRPattern_Basics(VBtask task) : base(task)
         {
             cPtr = BGRPattern_Open();
-            //vbAddAdvice(traceName + ": local options 'Options_ColorFormat' selects color.");
+            //UpdateAdvice(traceName + ": local options 'Options_ColorFormat' selects color.");
             desc = "Classify each 3-channel input pixel according to their relative values";
         }
 
@@ -2162,7 +2093,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         public CSharp_BGSubtract_Basics(VBtask task) : base(task)
         {
             cPtr = BGSubtract_BGFG_Open(options.currMethod);
-            //vbAddAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.");
+            //UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.");
             desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++";
         }
 
@@ -2271,77 +2202,6 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
     }
 
 
-
-
-
-    //public class CSharp_BGSubtract_MotionDetect : CS_Parent
-    //{
-    //    Vec3i[] radioChoices;
-    //    public CSharp_BGSubtract_MotionDetect(VBtask task) : base(task)
-    //    {
-    //        if (sliders.Setup(traceName)) sliders.setupTrackBar("Correlation Threshold", 0, 1000, 980);
-    //        if (radio.Setup(traceName))
-    //        {
-    //            for (int i = 0; i < 7; i++)
-    //            {
-    //                radio.addRadio(Math.Pow(2, i) + " threads");
-    //            }
-    //            radio.check(5).Checked = true;
-    //        }
-    //        int w = dst2.Width;
-    //        int h = dst2.Height;
-    //        radioChoices = new Vec3i[]
-    //        {
-    //        new Vec3i(1, w, h), new Vec3i(2, w / 2, h), new Vec3i(4, w / 2, h / 2),
-    //        new Vec3i(8, w / 4, h / 2), new Vec3i(16, w / 4, h / 4), new Vec3i(32, w / 8, h / 4),
-    //        new Vec3i(32, w / 8, h / 8), new Vec3i(1, w, h), new Vec3i(2, w / 2, h), new Vec3i(4, w / 2, h / 2),
-    //        new Vec3i(8, w / 4, h / 2), new Vec3i(16, w / 4, h / 4), new Vec3i(32, w / 8, h / 4),
-    //        new Vec3i(32, w / 8, h / 8)
-    //        };
-
-    //        labels[3] = "Only Motion Added";
-    //        desc = "Detect Motion for use with background subtraction";
-    //    }
-
-    //    public void RunCS(Mat src)
-    //    {
-    //        var correlationSlider = FindSlider("Correlation Threshold");
-    //        var frm = findfrm(traceName + " Radio Buttons");
-    //        var threadData = radioChoices[findRadioIndex(frm.check)];
-
-    //        if (task.optionsChanged) src.CopyTo(dst3);
-    //        int threadCount = threadData.Item0;
-    //        int width = threadData.Item1, height = threadData.Item2;
-    //        Task[] taskArray = new Task[threadCount];
-    //        int xfactor = src.Width / width;
-    //        int yfactor = Math.Max(src.Height / height, src.Width / width);
-    //        float CCthreshold = (float)correlationSlider.Value / correlationSlider.Maximum;
-    //        dst2.SetTo(0);
-    //        bool motionFound = false;
-
-    //        for (int i = 0; i < threadCount; i++)
-    //        {
-    //            int section = i;
-    //            taskArray[i] = Task.Factory.StartNew(() =>
-    //            {
-    //                var roi = new Rect((section % xfactor) * width, height * (int)Math.Floor((double)section / yfactor), width, height);
-    //                var correlation = new Mat();
-    //                if (roi.X + roi.Width > dst3.Width) roi.Width = dst3.Width - roi.X - 1;
-    //                if (roi.Y + roi.Height > dst3.Height) roi.Height = dst3.Height - roi.Y - 1;
-    //                Cv2.MatchTemplate(src[roi], dst3[roi], correlation, TemplateMatchModes.CCoeffNormed);
-    //                if (CCthreshold > correlation.At<float>(0, 0))
-    //                {
-    //                    src[roi].CopyTo(dst2[roi]);
-    //                    src[roi].CopyTo(dst3[roi]);
-    //                    motionFound = true;
-    //                }
-    //            });
-    //        }
-    //        Task.WaitAll(taskArray);
-    //        if (!motionFound) setTrueText("No motion detected in any of the regions");
-    //    }
-    //}
-
     public class CSharp_BGSubtract_MOG : CS_Parent
     {
         BackgroundSubtractorMOG MOG;
@@ -2418,6 +2278,154 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 
+
+
+
+
+
+    //public class CSharp_BGSubtract_MotionDetect : CS_Parent
+    //{
+    //    Vec3i[] radioChoices;
+    //    public CSharp_BGSubtract_MotionDetect(VBtask task) : base(task)
+    //    {
+    //        if (sliders.Setup(traceName)) sliders.setupTrackBar("Correlation Threshold", 0, 1000, 980);
+    //        if (radio.Setup(traceName))
+    //        {
+    //            for (int i = 0; i < 7; i++)
+    //            {
+    //                radio.addRadio(Math.Pow(2, i) + " threads");
+    //            }
+    //            radio.check(5).Checked = true;
+    //        }
+    //        int w = dst2.Width;
+    //        int h = dst2.Height;
+    //        radioChoices = new Vec3i[]
+    //        {
+    //        new Vec3i(1, w, h), new Vec3i(2, w / 2, h), new Vec3i(4, w / 2, h / 2),
+    //        new Vec3i(8, w / 4, h / 2), new Vec3i(16, w / 4, h / 4), new Vec3i(32, w / 8, h / 4),
+    //        new Vec3i(32, w / 8, h / 8), new Vec3i(1, w, h), new Vec3i(2, w / 2, h), new Vec3i(4, w / 2, h / 2),
+    //        new Vec3i(8, w / 4, h / 2), new Vec3i(16, w / 4, h / 4), new Vec3i(32, w / 8, h / 4),
+    //        new Vec3i(32, w / 8, h / 8)
+    //        };
+
+    //        labels[3] = "Only Motion Added";
+    //        desc = "Detect Motion for use with background subtraction";
+    //    }
+
+    //    public void RunCS(Mat src)
+    //    {
+    //        var correlationSlider = FindSlider("Correlation Threshold");
+    //        var frm = findfrm(traceName + " Radio Buttons");
+    //        var threadData = radioChoices[findRadioIndex(frm.check)];
+
+    //        if (task.optionsChanged) src.CopyTo(dst3);
+    //        int threadCount = threadData.Item0;
+    //        int width = threadData.Item1, height = threadData.Item2;
+    //        Task[] taskArray = new Task[threadCount];
+    //        int xfactor = src.Width / width;
+    //        int yfactor = Math.Max(src.Height / height, src.Width / width);
+    //        float CCthreshold = (float)correlationSlider.Value / correlationSlider.Maximum;
+    //        dst2.SetTo(0);
+    //        bool motionFound = false;
+
+    //        for (int i = 0; i < threadCount; i++)
+    //        {
+    //            int section = i;
+    //            taskArray[i] = Task.Factory.StartNew(() =>
+    //            {
+    //                var roi = new Rect((section % xfactor) * width, height * (int)Math.Floor((double)section / yfactor), width, height);
+    //                var correlation = new Mat();
+    //                if (roi.X + roi.Width > dst3.Width) roi.Width = dst3.Width - roi.X - 1;
+    //                if (roi.Y + roi.Height > dst3.Height) roi.Height = dst3.Height - roi.Y - 1;
+    //                Cv2.MatchTemplate(src[roi], dst3[roi], correlation, TemplateMatchModes.CCoeffNormed);
+    //                if (CCthreshold > correlation.At<float>(0, 0))
+    //                {
+    //                    src[roi].CopyTo(dst2[roi]);
+    //                    src[roi].CopyTo(dst3[roi]);
+    //                    motionFound = true;
+    //                }
+    //            });
+    //        }
+    //        Task.WaitAll(taskArray);
+    //        if (!motionFound) setTrueText("No motion detected in any of the regions");
+    //    }
+    //}
+
+
+
+
+
+
+    //// https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
+    //public class CSharp_Benford_JPEG : CS_Parent
+    //{
+    //    public Benford_Basics benford = new Benford_Basics();
+    //    public CSharp_Benford_JPEG(VBtask task) : base(task)
+    //    {
+    //        if (sliders.Setup(traceName)) sliders.setupTrackBar("JPEG Quality", 1, 100, 90);
+    //        desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        var qualitySlider = FindSlider("JPEG Quality");
+    //        var jpeg = src.ImEncode(".jpg", new int[] { (int)ImwriteFlags.JpegQuality, qualitySlider.Value });
+    //        var tmp = new Mat(jpeg.Length, 1, MatType.CV_8U, jpeg);
+    //        dst3 = Cv2.ImDecode(tmp, ImreadModes.Color);
+    //        benford.Run(tmp);
+    //        dst2 = benford.dst2;
+    //        labels[2] = benford.labels[3];
+    //        labels[3] = "Input image";
+    //    }
+    //}
+
+    //// https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
+    //public class CSharp_Benford_JPEG99 : CS_Parent
+    //{
+    //    public Benford_Basics benford = new Benford_Basics();
+    //    public CSharp_Benford_JPEG99(VBtask task) : base(task)
+    //    {
+    //        benford.setup99();
+    //        if (sliders.Setup(traceName)) sliders.setupTrackBar("JPEG Quality", 1, 100, 90);
+    //        desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        var qualitySlider = FindSlider("JPEG Quality");
+    //        var jpeg = src.ImEncode(".jpg", new int[] { (int)ImwriteFlags.JpegQuality, qualitySlider.Value });
+    //        var tmp = new Mat(jpeg.Length, 1, MatType.CV_8U, jpeg);
+    //        dst3 = Cv2.ImDecode(tmp, ImreadModes.Color);
+    //        benford.Run(tmp);
+    //        dst2 = benford.dst2;
+    //        labels[2] = benford.labels[3];
+    //        labels[3] = "Input image";
+    //    }
+    //}
+
+
+
+
+
+    //public class CSharp_Benford_PNG : CS_Parent
+    //{
+    //    public Benford_Basics benford = new Benford_Basics();
+    //    public CSharp_Benford_PNG(VBtask task) : base(task)
+    //    {
+    //        if (sliders.Setup(traceName))
+    //            sliders.setupTrackBar("PNG Compression", 1, 100, 90);
+    //        desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        var compressionSlider = FindSlider("PNG Compression");
+    //        var png = src.ImEncode(".png", new int[] { (int)ImwriteFlags.PngCompression, compressionSlider.Value });
+    //        var tmp = new Mat(png.Length, 1, MatType.CV_8U, png);
+    //        dst3 = Cv2.ImDecode(tmp, ImreadModes.Color);
+    //        benford.Run(tmp);
+    //        dst2 = benford.dst2;
+    //        labels[2] = benford.labels[3];
+    //        labels[3] = "Input image";
+    //    }
+    //}
 
 
 

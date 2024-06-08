@@ -35,7 +35,7 @@ Public Class CPP_Basics : Inherits VB_Parent
                                adviceBuffer)
 
         labels = labelBuffer.ToString.Split("|")
-        vbAddAdvice(traceName + ": " + adviceBuffer.ToString)
+        UpdateAdvice(traceName + ": " + adviceBuffer.ToString)
         desc = descBuffer.ToString
     End Sub
     Public Sub New()

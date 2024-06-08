@@ -5,7 +5,7 @@ Public Class BRISK_Basics : Inherits VB_Parent
     Dim options As New Options_Features
     Public Sub New()
         brisk = cv.BRISK.Create()
-        vbAddAdvice(traceName + ": use 'Options_Features Min Distance' to control the BRISK Radius threshold.")
+        UpdateAdvice(traceName + ": use 'Options_Features Min Distance' to control the BRISK Radius threshold.")
         desc = "Detect features with BRISK"
     End Sub
     Public Sub RunVB(src As cv.Mat)

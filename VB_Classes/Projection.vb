@@ -102,7 +102,7 @@ Public Class Projection_HistSide : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public Sub New()
         labels = {"", "", "Top view with histogram counts", "ZY (Side View) - mask"}
-        vbAddAdvice(traceName + ": redOptions 'Project threshold' affects how many regions are isolated.")
+        UpdateAdvice(traceName + ": redOptions 'Project threshold' affects how many regions are isolated.")
         desc = "Create a 2D side view for ZY histogram of depth"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -124,7 +124,7 @@ Public Class Projection_HistTop : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public Sub New()
         labels = {"", "", "Top view with histogram counts", "XZ (Top View) - mask"}
-        vbAddAdvice(traceName + ": redOptions 'Project threshold' affects how many regions are isolated.")
+        UpdateAdvice(traceName + ": redOptions 'Project threshold' affects how many regions are isolated.")
         desc = "Create a 2D top view for XZ histogram of depth"
     End Sub
     Public Sub RunVB(src As cv.Mat)

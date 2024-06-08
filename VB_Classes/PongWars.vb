@@ -25,7 +25,7 @@ Public Class PongWars_Basics : Inherits VB_Parent
         Next
         p1 = New cv.Point(msRNG.Next(0, dst2.Width / 4), msRNG.Next(0, dst2.Height / 2))
         p2 = New cv.Point(msRNG.Next(dst2.Width / 2, dst2.Width), msRNG.Next(dst2.Height / 4, dst2.Height))
-        vbAddAdvice(traceName + ": <place advice here on any options that are useful>")
+        UpdateAdvice(traceName + ": <place advice here on any options that are useful>")
         desc = "Pong as war between the forces of light and darkness."
     End Sub
     Private Function UpdateSquareAndBounce(pt As cv.Point, dxy As cv.Point2f, sqClass As Integer) As cv.Point2f

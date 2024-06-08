@@ -3,7 +3,7 @@ Public Class AddWeighted_Basics : Inherits VB_Parent
     Public src2 As cv.Mat
     Public options As New Options_AddWeighted
     Public Sub New()
-        vbAddAdvice(traceName + ": use the local option slider 'Add Weighted %'")
+        UpdateAdvice(traceName + ": use the local option slider 'Add Weighted %'")
         desc = "Add 2 images with specified weights."
     End Sub
     Public Sub RunVB(src As cv.Mat)

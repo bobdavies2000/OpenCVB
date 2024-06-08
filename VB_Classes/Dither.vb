@@ -5,7 +5,7 @@ Public Class Dither_Basics : Inherits VB_Parent
     Dim options As New Options_Dither
     Public Sub New()
         labels = {"", "", "Dither applied to the BGR image", "Dither applied to the Depth image"}
-        vbAddAdvice(traceName + ": use local options to control which method is used.")
+        UpdateAdvice(traceName + ": use local options to control which method is used.")
         desc = "Explore all the varieties of dithering"
     End Sub
     Public Sub RunVB(src as cv.Mat)

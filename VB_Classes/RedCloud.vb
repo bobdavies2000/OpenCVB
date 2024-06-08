@@ -7,7 +7,7 @@ Public Class RedCloud_Basics : Inherits VB_Parent
     Public Sub New()
         task.redOptions.IdentifyCells.Checked = True
         inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        vbAddAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
+        UpdateAdvice(traceName + ": there is dedicated panel for RedCloud algorithms." + vbCrLf +
                         "It is behind the global options (which affect most algorithms.)")
         desc = "Find cells and then match them to the previous generation with minimum boundary"
     End Sub
@@ -1410,7 +1410,7 @@ Public Class RedCloud_SizeOrder : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         task.redOptions.UseColorOnly.Checked = True
-        vbAddAdvice(traceName + ": Use the goptions 'DebugSlider' to select which cell is isolated.")
+        UpdateAdvice(traceName + ": Use the goptions 'DebugSlider' to select which cell is isolated.")
         task.gOptions.DebugSlider.Value = 0
         desc = "Select blobs by size using the DebugSlider in the global options"
     End Sub

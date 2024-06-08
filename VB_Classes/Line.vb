@@ -765,7 +765,7 @@ Public Class Line_FromContours : Inherits VB_Parent
     Public Sub New()
         task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
         lines.lineColor = cv.Scalar.Red
-        vbAddAdvice("Use the reduction sliders in the redoptions to control contours and subsequent lines found.")
+        UpdateAdvice("Use the reduction sliders in the redoptions to control contours and subsequent lines found.")
         desc = "Find the lines in the contours."
     End Sub
     Public Sub RunVB(src As cv.Mat)

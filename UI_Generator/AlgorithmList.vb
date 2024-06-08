@@ -134,7 +134,6 @@ Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	if algorithmName = "BackProject2D_Top" Then return new BackProject2D_Top
 	if algorithmName = "Benford_Basics" Then return new Benford_Basics
 	if algorithmName = "Benford_Depth" Then return new Benford_Depth
-	if algorithmName = "Benford_DepthRGB" Then return new Benford_DepthRGB
 	if algorithmName = "Benford_JPEG" Then return new Benford_JPEG
 	if algorithmName = "Benford_JPEG99" Then return new Benford_JPEG99
 	if algorithmName = "Benford_NormalizedImage" Then return new Benford_NormalizedImage

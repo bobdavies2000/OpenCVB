@@ -169,6 +169,12 @@ Public Class VB_Parent : Implements IDisposable
         If standalone Or showIntermediate() Then Return True
         Return False
     End Function
+    Public Sub UpdateAdvice(advice As String)
+        If task.advice.StartsWith("No advice for ") Then task.advice = ""
+        Dim split = advice.Split(":")
+        If task.advice.Contains(split(0) + ":") Then Return
+        task.advice += advice + vbCrLf + vbCrLf
+    End Sub
     Public Sub drawContour(ByRef dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -10)
         If lineWidth = -10 Then lineWidth = task.lineWidth ' VB.Net only allows constants for optional parameter.
         If contour.Count < 3 Then Exit Sub ' this is not enough to draw.

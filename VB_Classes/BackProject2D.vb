@@ -13,7 +13,7 @@ Public Class BackProject2D_Basics : Inherits VB_Parent
     Public Sub New()
         If standaloneTest() Then task.gOptions.GridSize.Value = 5
         If standaloneTest() Then hist2d.histRowsCols = {task.gOptions.GridSize.Value, task.gOptions.GridSize.Value}
-        vbAddAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.")
+        UpdateAdvice(traceName + ": the global option 'Histogram Bins' controls the histogram.")
         desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed and explored."
     End Sub
     Public Sub RunVB(src As cv.Mat)

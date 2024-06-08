@@ -6,7 +6,7 @@ Public Class BGRPattern_Basics : Inherits VB_Parent
     Public classCount As Integer
     Public Sub New()
         cPtr = BGRPattern_Open()
-        vbAddAdvice(traceName + ": local options 'Options_ColorFormat' selects color.")
+        UpdateAdvice(traceName + ": local options 'Options_ColorFormat' selects color.")
         desc = "Classify each 3-channel input pixel according to their relative values"
     End Sub
     Public Sub RunVB(ByVal src As cv.Mat)

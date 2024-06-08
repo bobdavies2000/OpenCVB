@@ -100,7 +100,7 @@ Public Class Threshold_ByChannels : Inherits VB_Parent
     Dim options As New Options_Threshold
     Public Sub New()
         labels(3) = "Threshold Inverse"
-        vbAddAdvice(traceName + ": see local options.")
+        UpdateAdvice(traceName + ": see local options.")
         desc = "Threshold by channel - use red threshold slider to impact grayscale results."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -135,7 +135,7 @@ Public Class Threshold_ColorSource : Inherits VB_Parent
     Dim colorClass As New Color8U_Basics
     Dim byChan As New Threshold_ByChannels
     Public Sub New()
-        vbAddAdvice(traceName + ": Use redOptions color source to change the input.  Also, see local options.")
+        UpdateAdvice(traceName + ": Use redOptions color source to change the input.  Also, see local options.")
         desc = "Use all the alternative color sources as input to Threshold_ByChannels."
     End Sub
     Public Sub RunVB(src As cv.Mat)

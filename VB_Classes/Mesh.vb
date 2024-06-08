@@ -51,7 +51,7 @@ Public Class Mesh_Features : Inherits VB_Parent
     Public Sub New()
         FindSlider("Min Distance to next").Value = 10
         labels(2) = "Triangles built with each feature point and the specified number of nearest neighbors."
-        vbAddAdvice(traceName + ": Use 'Options_Features' to update results.")
+        UpdateAdvice(traceName + ": Use 'Options_Features' to update results.")
         desc = "Build triangles from feature points"
     End Sub
     Public Sub RunVB(src As cv.Mat)

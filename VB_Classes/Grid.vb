@@ -442,7 +442,7 @@ Public Class Grid_MinMaxDepth : Inherits VB_Parent
     Public minMaxVals(0) As cv.Vec2f
     Public Sub New()
         task.gOptions.GridSize.Value = 8
-        vbAddAdvice(traceName + ": goptions 'Grid Square Size' has direct impact.")
+        UpdateAdvice(traceName + ": goptions 'Grid Square Size' has direct impact.")
         desc = "Find the min and max depth within each grid roi."
     End Sub
     Public Sub RunVB(src As cv.Mat)

@@ -5,7 +5,7 @@ Public Class BGSubtract_Basics : Inherits VB_Parent
     Public options As New Options_BGSubtract
     Public Sub New()
         cPtr = BGSubtract_BGFG_Open(options.currMethod)
-        vbAddAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
+        UpdateAdvice(traceName + ": local options 'Correlation Threshold' controls how well the image matches.")
         desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
     Public Sub RunVB(src As cv.Mat)

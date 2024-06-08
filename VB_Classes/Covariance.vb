@@ -4,7 +4,7 @@ Public Class Covariance_Basics : Inherits VB_Parent
     Public mean As New cv.Mat
     Public covariance As New cv.Mat
     Public Sub New()
-        vbAddAdvice(traceName + ": use the local options to control the number of points.")
+        UpdateAdvice(traceName + ": use the local options to control the number of points.")
         desc = "Calculate the covariance of random depth data points."
     End Sub
     Public Sub RunVB(src as cv.Mat)

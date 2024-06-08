@@ -4,7 +4,7 @@ Public Class Density_Basics : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Distance in meters X10000", 1, 2000, task.densityMetric)
         cPtr = Density_2D_Open()
-        vbAddAdvice(traceName + ": use local options to control separation of points in 3D.")
+        UpdateAdvice(traceName + ": use local options to control separation of points in 3D.")
         desc = "Isolate points in 3D using the distance to the 8 neighboring points in the pointcloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
