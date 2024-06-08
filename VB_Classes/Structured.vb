@@ -499,7 +499,7 @@ Public Class Structured_Cloud : Inherits VB_Parent
             sliders.setupTrackBar("Slice index Y", 1, 200, 50)
         End If
 
-        task.gOptions.GridSize.Value = 10
+        task.gOptions.setGridSize(10)
         desc = "Attempt to impose a linear structure on the pointcloud."
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -534,7 +534,7 @@ Public Class Structured_ROI : Inherits VB_Parent
     Public data As New cv.Mat
     Public oglData As New List(Of cv.Point3f)
     Public Sub New()
-        task.gOptions.GridSize.Value = 10
+        task.gOptions.setGridSize(10)
         desc = "Simplify the point cloud so it can be represented as quads in OpenGL"
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -561,7 +561,7 @@ Public Class Structured_Tiles : Inherits VB_Parent
     Public oglData As New List(Of cv.Vec3f)
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
-        task.gOptions.GridSize.Value = 10
+        task.gOptions.setGridSize(10)
         desc = "Use the OpenGL point size to represent the point cloud as data"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -595,7 +595,7 @@ Public Class Structured_TilesQuad : Inherits VB_Parent
     Dim options As New Options_OpenGLFunctions
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
-        task.gOptions.GridSize.Value = 10
+        task.gOptions.setGridSize(10)
         If standaloneTest() Then task.gOptions.setDisplay1()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
         labels = {"", "RedCloud cells", "Simplified depth map - CV_32FC3", "Simplified depth map with RedCloud cell colors"}

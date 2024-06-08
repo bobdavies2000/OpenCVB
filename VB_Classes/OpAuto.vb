@@ -156,7 +156,7 @@ Public Class OpAuto_Valley : Inherits VB_Parent
     Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public options As New Options_Boundary
     Public Sub New()
-        If standaloneTest() Then task.gOptions.HistBinBar.Value = 256
+        If standaloneTest() Then task.gOptions.setHistogramBins(256)
         desc = "Get the top X highest quality valley points in the histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -219,7 +219,7 @@ Public Class OpAuto_Peaks2D : Inherits VB_Parent
     Public options As New Options_Boundary
     Public clusterPoints As New List(Of cv.Point2f)
     Public Sub New()
-        If standaloneTest() Then task.gOptions.HistBinBar.Value = 256
+        If standaloneTest() Then task.gOptions.setHistogramBins(256)
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub
@@ -260,7 +260,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits VB_Parent
     Public clusterPoints As New List(Of cv.Point2f)
     Dim options As New Options_Boundary
     Public Sub New()
-        If standaloneTest() Then task.gOptions.HistBinBar.Value = 256
+        If standaloneTest() Then task.gOptions.setHistogramBins(256)
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub

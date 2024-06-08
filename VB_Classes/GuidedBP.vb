@@ -275,7 +275,7 @@ Public Class GuidedBP_Depth : Inherits VB_Parent
     Dim myPalette As New Palette_Random
     Public classCount As Integer
     Public Sub New()
-        task.gOptions.HistBinBar.Value = 16
+        task.gOptions.setHistogramBins(16)
         desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
     End Sub
     Public Sub RunVB(src As cv.Mat)

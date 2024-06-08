@@ -154,7 +154,7 @@ End Class
 Public Class Binarize_Bernson_MT : Inherits VB_Parent
     Dim options As New Options_Bernson
     Public Sub New()
-        task.gOptions.GridSize.Value = 32
+        task.gOptions.setGridSize(32)
         desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
         labels(2) = "Binarize Bernson"
     End Sub

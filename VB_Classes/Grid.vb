@@ -282,7 +282,7 @@ Public Class Grid_Neighbors : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.gridRows <> CInt(dst2.Height / 10) Then
-            task.gOptions.GridSize.Value = CInt(dst2.Height / 10)
+            task.gOptions.setGridSize(CInt(dst2.Height / 10))
             task.gridRows = task.gOptions.GridSize.Value
             task.grid.Run(src)
         End If
@@ -441,7 +441,7 @@ Public Class Grid_MinMaxDepth : Inherits VB_Parent
     Public minMaxLocs(0) As pointPair
     Public minMaxVals(0) As cv.Vec2f
     Public Sub New()
-        task.gOptions.GridSize.Value = 8
+        task.gOptions.setGridSize(8)
         UpdateAdvice(traceName + ": goptions 'Grid Square Size' has direct impact.")
         desc = "Find the min and max depth within each grid roi."
     End Sub

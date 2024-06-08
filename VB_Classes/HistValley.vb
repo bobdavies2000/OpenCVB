@@ -6,7 +6,7 @@ Public Class HistValley_Basics : Inherits VB_Parent
     Public valleys(3) As Integer ' grayscale values for low points in the histogram.
     Public Sub New()
         task.gOptions.FrameHistory.Value = 30
-        task.gOptions.HistBinBar.Value = 256
+        task.gOptions.setHistogramBins(256)
         labels(2) = "Histogram of the grayscale image.  White lines mark local minimum above threshold.  Yellow horizontal = histogram mean."
         desc = "Find the histogram valleys for a grayscale image."
     End Sub
@@ -120,7 +120,7 @@ Public Class HistValley_Peaks : Inherits VB_Parent
     Public peaks As New List(Of Integer)
     Public histArray() As Single
     Public Sub New()
-        task.gOptions.HistBinBar.Value = 100
+        task.gOptions.setHistogramBins(100)
         FindSlider("Desired boundary count").Value = 5
         labels(2) = "Histogram - white lines are peaks"
         desc = "Find the requested number of peaks in the histogram "
@@ -255,7 +255,7 @@ Public Class HistValley_Test : Inherits VB_Parent
     Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public options As New Options_Boundary
     Public Sub New()
-        If standaloneTest() Then task.gOptions.HistBinBar.Value = 256
+        If standaloneTest() Then task.gOptions.setHistogramBins(256)
         desc = "Get the top X highest quality valley points in the histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -321,7 +321,7 @@ Public Class HistValley_OptionsAuto : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public auto As New OpAuto_Valley
     Public Sub New()
-        task.gOptions.HistBinBar.Value = 256
+        task.gOptions.setHistogramBins(256)
         labels = {"", "", "Grayscale histogram - white lines are valleys", ""}
         desc = "Isolate the different levels of gray using the histogram valleys."
     End Sub
@@ -496,7 +496,7 @@ Public Class HistValley_Colors : Inherits VB_Parent
     Dim hist As New Hist_Kalman
     Dim auto As New OpAuto_Valley
     Public Sub New()
-        If standaloneTest() Then task.gOptions.HistBinBar.Value = 256
+        If standaloneTest() Then task.gOptions.setHistogramBins(256)
         If standaloneTest() Then FindSlider("Desired boundary count").Value = 10
         desc = "Find the histogram valleys for each of the colors."
     End Sub
@@ -534,7 +534,7 @@ Public Class HistValley_GrayKalman : Inherits VB_Parent
     Dim auto As New OpAuto_Valley
     Dim kalman As New Kalman_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.HistBinBar.Value = 256
+        If standaloneTest() Then task.gOptions.setHistogramBins(256)
         If standaloneTest() Then FindSlider("Desired boundary count").Value = 4
         desc = "Find the histogram valleys for a grayscale image."
     End Sub
@@ -573,7 +573,7 @@ End Class
 Public Class HistValley_GrayScale1 : Inherits VB_Parent
     Dim hist As New Hist_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.HistBinBar.Value = 256
+        If standaloneTest() Then task.gOptions.setHistogramBins(256)
         desc = "Find the histogram valleys for a grayscale image."
     End Sub
     Public Sub RunVB(src As cv.Mat)

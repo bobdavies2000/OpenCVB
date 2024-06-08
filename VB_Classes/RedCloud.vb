@@ -39,7 +39,7 @@ Public Class RedCloud_Reduction : Inherits VB_Parent
     Public Sub New()
         task.redOptions.UseColorOnly.Checked = True
         task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
-        task.gOptions.HistBinBar.Value = 20
+        task.gOptions.setHistogramBins(20)
         desc = "Segment the image based on both the reduced color"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -244,7 +244,7 @@ Public Class RedCloud_CellsAtDepth : Inherits VB_Parent
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Dim histBins = task.gOptions.HistBinBar.Value
+        Dim histBins = task.histogramBins
         Dim slotList(histBins) As List(Of Integer)
         For i = 0 To slotList.Count - 1
             slotList(i) = New List(Of Integer)
@@ -2454,7 +2454,7 @@ End Class
 Public Class RedCloud_JoinCells : Inherits VB_Parent
     Dim fLess As New FeatureLess_RedCloud
     Public Sub New()
-        task.gOptions.HistBinBar.Value = 20
+        task.gOptions.setHistogramBins(20)
         labels = {"", "FeatureLess_RedCloud output.", "RedCloud_Basics output", "RedCloud_Basics cells joined by using the color from the FeatureLess_RedCloud cellMap"}
         desc = "Run RedCloud_Basics and use FeatureLess_RedCloud to join cells that are in the same featureless regions."
     End Sub

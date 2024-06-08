@@ -229,37 +229,37 @@ Public Class OptionsRedCloud
     Private Sub XReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PointCloudReduction = XReduction.Tag
-        task.gOptions.HistBinBar.Value = 16
+        task.gOptions.setHistogramBins(16)
     End Sub
     Private Sub YReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PointCloudReduction = YReduction.Tag
-        task.gOptions.HistBinBar.Value = 16
+        task.gOptions.setHistogramBins(16)
     End Sub
     Private Sub ZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles ZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PointCloudReduction = ZReduction.Tag
-        task.gOptions.HistBinBar.Value = 16
+        task.gOptions.setHistogramBins(16)
     End Sub
     Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs) Handles XYReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PointCloudReduction = XYReduction.Tag
-        task.gOptions.HistBinBar.Value = 16
+        task.gOptions.setHistogramBins(16)
     End Sub
     Private Sub XZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PointCloudReduction = XZReduction.Tag
-        task.gOptions.HistBinBar.Value = 16
+        task.gOptions.setHistogramBins(16)
     End Sub
     Private Sub YZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PointCloudReduction = YZReduction.Tag
-        task.gOptions.HistBinBar.Value = 16
+        task.gOptions.setHistogramBins(16)
     End Sub
     Public Sub XYZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XYZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PointCloudReduction = XYZReduction.Tag
-        task.gOptions.HistBinBar.Value = 6
+        task.gOptions.setHistogramBins(6)
     End Sub
 
 

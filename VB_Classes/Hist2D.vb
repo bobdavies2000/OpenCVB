@@ -42,7 +42,7 @@ Public Class Hist2D_Cloud : Inherits VB_Parent
         ranges = New cv.Rangef() {New cv.Rangef(r1.Item0, r1.Item1),
                                   New cv.Rangef(r2.Item0, r2.Item1)}
         cv.Cv2.CalcHist({task.pointCloud}, task.redOptions.channels, New cv.Mat(),
-                        histogram, 2, {task.gOptions.HistBinBar.Value, task.gOptions.HistBinBar.Value}, ranges)
+                        histogram, 2, {task.histogramBins, task.histogramBins}, ranges)
 
         plot1D.Run(histogram)
         dst2 = plot1D.dst2
@@ -141,7 +141,7 @@ Public Class Hist2D_BGR : Inherits VB_Parent
     Public histogram01 As New cv.Mat
     Public histogram02 As New cv.Mat
     Public Sub New()
-        task.gOptions.HistBinBar.Value = 256
+        task.gOptions.setHistogramBins(256)
         desc = "Create a 2D histogram for blue to red and blue to green."
     End Sub
     Public Sub RunVB(src As cv.Mat)

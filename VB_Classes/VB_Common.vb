@@ -190,11 +190,11 @@ Module VB_Common
         Return outStr
     End Function
     Public Sub setPointCloudGrid()
-        task.gOptions.GridSize.Value = 8
+        task.gOptions.setGridSize(8)
         If task.workingRes.Width = 640 Then
-            task.gOptions.GridSize.Value = 16
+            task.gOptions.setGridSize(16)
         ElseIf task.workingRes.Width = 1280 Then
-            task.gOptions.GridSize.Value = 32
+            task.gOptions.setGridSize(32)
         End If
     End Sub
     Public Function separateMasks(rc As rcData, lrc As rcData) As cv.Mat

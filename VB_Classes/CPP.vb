@@ -28,7 +28,7 @@ Public Class CPP_Basics : Inherits VB_Parent
         Dim descBuffer As StringBuilder = New StringBuilder(512)
         Dim adviceBuffer As StringBuilder = New StringBuilder(512)
         cppTask_OptionsCPPtoVB(cPtr, task.gOptions.GridSize.Value,
-                               task.gOptions.HistBinBar.Value,
+                               task.histogramBins,
                                task.gOptions.pixelDiffThreshold, task.gOptions.UseKalman.Checked,
                                task.frameHistoryCount, task.drawRect.X, task.drawRect.Y,
                                task.drawRect.Width, task.drawRect.Height, labelBuffer, descBuffer,
@@ -44,7 +44,7 @@ Public Class CPP_Basics : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
 
         cppTask_OptionsVBtoCPP(cPtr, task.gOptions.GridSize.Value,
-                               task.gOptions.HistBinBar.Value,
+                               task.histogramBins,
                                task.gOptions.pixelDiffThreshold, task.gOptions.UseKalman.Checked,
                                task.frameHistoryCount,
                                task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height,

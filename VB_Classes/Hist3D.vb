@@ -49,7 +49,7 @@ Public Class Hist3D_BuildHistogram : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            task.gOptions.HistBinBar.Value = 100
+            task.gOptions.setHistogramBins(100)
             Static plot As New Hist_Depth
             plot.Run(src)
             src = plot.histogram
@@ -298,7 +298,7 @@ Public Class Hist3D_RedCloudGrid : Inherits VB_Parent
     Dim pixels As New Pixel_Vectors
     Dim hVector As New Hist3Dcolor_Vector
     Public Sub New()
-        task.gOptions.GridSize.Value = 8
+        task.gOptions.setGridSize(8)
         desc = "Build RedCloud pixel vectors and then measure each grid element's distance to those vectors."
     End Sub
     Public Sub RunVB(src As cv.Mat)

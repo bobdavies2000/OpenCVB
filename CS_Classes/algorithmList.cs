@@ -71,9 +71,14 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_BGSubtract_MOG2") return new CSharp_BGSubtract_MOG2(task);
 			if (algorithmName == "CSharp_BGSubtract_MOG2_QT") return new CSharp_BGSubtract_MOG2_QT(task);
 			if (algorithmName == "CSharp_BGSubtract_MotionDetect") return new CSharp_BGSubtract_MotionDetect(task);
+			if (algorithmName == "CSharp_BGSubtract_Reduction") return new CSharp_BGSubtract_Reduction(task);
 			if (algorithmName == "CSharp_BGSubtract_Synthetic") return new CSharp_BGSubtract_Synthetic(task);
 			if (algorithmName == "CSharp_BGSubtract_Synthetic_CPP") return new CSharp_BGSubtract_Synthetic_CPP(task);
 			if (algorithmName == "CSharp_BGSubtract_Video") return new CSharp_BGSubtract_Video(task);
+			if (algorithmName == "CSharp_Bin2Way_Basics") return new CSharp_Bin2Way_Basics(task);
+			if (algorithmName == "CSharp_Bin2Way_KMeans") return new CSharp_Bin2Way_KMeans(task);
+			if (algorithmName == "CSharp_Bin2Way_RedCloudDarkest") return new CSharp_Bin2Way_RedCloudDarkest(task);
+			if (algorithmName == "CSharp_Bin2Way_RedCloudLightest") return new CSharp_Bin2Way_RedCloudLightest(task);
 			if (algorithmName == "CSharp_Diff_Basics") return new CSharp_Diff_Basics(task);
 			if (algorithmName == "CSharp_Line_Basics") return new CSharp_Line_Basics(task);
 			if (algorithmName == "CSharp_Random_Basics") return new CSharp_Random_Basics(task);

@@ -22,13 +22,13 @@ Public Class BackProject_Basics : Inherits VB_Parent
         Dim totalPixels = dst2.Total ' assume we are including zeros.
         If histK.hist.plot.removeZeroEntry Then totalPixels = input.CountNonZero
 
-        Dim brickWidth = dst2.Width / task.gOptions.HistBinBar.Value
-        Dim incr = (histK.hist.mm.maxVal - histK.hist.mm.minVal) / task.gOptions.HistBinBar.Value
+        Dim brickWidth = dst2.Width / task.histogramBins
+        Dim incr = (histK.hist.mm.maxVal - histK.hist.mm.minVal) / task.histogramBins
         Dim histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
 
         minRange = New cv.Scalar(histIndex * incr)
         maxRange = New cv.Scalar((histIndex + 1) * incr)
-        If histIndex + 1 = task.gOptions.HistBinBar.Value Then maxRange = New cv.Scalar(255)
+        If histIndex + 1 = task.histogramBins Then maxRange = New cv.Scalar(255)
 
         '     Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
         '     cv.Cv2.CalcBackProject({input}, {0}, histK.hist.histogram, dst0, ranges)
@@ -700,7 +700,7 @@ Public Class BackProject_MeterByMeter : Inherits VB_Parent
         desc = "Backproject the depth data at 1 meter intervals WITHOUT A HISTOGRAM."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.gOptions.HistBinBar.Value < task.maxZmeters Then task.gOptions.HistBinBar.Value = task.maxZmeters + 1
+        If task.histogramBins < task.maxZmeters Then task.gOptions.setHistogramBins(task.maxZmeters + 1)
         If task.optionsChanged Then
             Dim incr = task.maxZmeters / task.histogramBins
             Dim histData As New List(Of Single)

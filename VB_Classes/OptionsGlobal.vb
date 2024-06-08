@@ -309,4 +309,7 @@ Public Class OptionsGlobal
     Public Sub setHistogramBins(val As Integer)
         HistBinBar.Value = val
     End Sub
+    Public Sub setGridSize(val As Integer)
+        GridSize.Value = val
+    End Sub
 End Class

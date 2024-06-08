@@ -46,7 +46,7 @@ Public Class Puzzle_Solver : Inherits VB_Parent
     Dim match As New Match_Basics
     Public grayMat As cv.Mat
     Public Sub New()
-        If standaloneTest() Then task.gOptions.GridSize.Value = 8
+        If standaloneTest() Then task.gOptions.setGridSize(8)
         If findfrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Start another puzzle")
@@ -91,7 +91,7 @@ End Class
 Public Class Puzzle_SolverDynamic : Inherits VB_Parent
     Dim puzzle As New Puzzle_Solver
     Public Sub New()
-        If standaloneTest() Then task.gOptions.GridSize.Value = 8
+        If standaloneTest() Then task.gOptions.setGridSize(8)
         labels = {"", "", "Latest Puzzle input image", "Puzzle Solver Output - missing pieces can occur because of motion or when cells are identical."}
         desc = "Instead of matching the original image as Puzzle_Solver, match the latest image from the camera."
     End Sub

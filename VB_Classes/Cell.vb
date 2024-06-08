@@ -5,7 +5,7 @@ Public Class Cell_Basics : Inherits VB_Parent
     Dim eq As New Plane_Equation
     Public runRedCloud As Boolean
     Public Sub New()
-        If standaloneTest() Then task.gOptions.HistBinBar.Value = 20
+        If standaloneTest() Then task.gOptions.setHistogramBins(20)
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString()
@@ -283,7 +283,7 @@ Public Class Cell_BasicsPlot : Inherits VB_Parent
     Public Sub New()
         task.redOptions.IdentifyCells.Checked = True
         If standalone Then task.gOptions.setDisplay1()
-        If standalone Then task.gOptions.HistBinBar.Value = 20
+        If standalone Then task.gOptions.setHistogramBins(20)
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString(src As cv.Mat)

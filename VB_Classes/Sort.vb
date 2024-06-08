@@ -100,7 +100,7 @@ Public Class Sort_1Channel : Inherits VB_Parent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         findRadio("Sort all pixels descending").Checked = True
-        If standaloneTest() Then task.gOptions.GridSize.Value = 10
+        If standaloneTest() Then task.gOptions.setGridSize(10)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels = {"", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates"}
         desc = "Take some 1-channel input, sort it, and provide the list of unique elements"
@@ -117,7 +117,7 @@ Public Class Sort_1Channel : Inherits VB_Parent
 
         Dim pixelsPerBlock = CInt(dst3.Total / dst2.Rows)
         Dim sq = Math.Sqrt(pixelsPerBlock)
-        task.gOptions.GridSize.Value = CInt(Math.Min(sq, 10))
+        task.gOptions.setGridSize(CInt(Math.Min(sq, 10)))
 
         dst0 = sort.dst2.Reshape(1, dst2.Rows)
 
@@ -195,8 +195,8 @@ Public Class Sort_FeatureLess : Inherits VB_Parent
     Dim plot As New Plot_Histogram
     Public Sub New()
         plot.createHistogram = True
-        task.gOptions.HistBinBar.Value = 256
-        task.gOptions.GridSize.Value = 8
+        task.gOptions.setHistogramBins(256)
+        task.gOptions.setGridSize(8)
         desc = "Sort all the featureless grayscale pixels."
     End Sub
     Public Sub RunVB(src As cv.Mat)

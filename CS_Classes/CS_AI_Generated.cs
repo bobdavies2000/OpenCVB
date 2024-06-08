@@ -2538,104 +2538,153 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public class CSharp_BGSubtract_Reduction : CS_Parent
+    {
+        private Reduction_Basics reduction = new Reduction_Basics();
+        private BGSubtract_Basics bgSub = new BGSubtract_Basics();
+
+        public CSharp_BGSubtract_Reduction(VBtask task) : base(task)
+        {
+            desc = "Use BGSubtract with the output of a reduction";
+        }
+
+        public void RunCS(Mat src)
+        {
+            reduction.Run(src);
+
+            dst2 = ShowPalette(reduction.dst2.Clone());
+
+            bgSub.Run(dst2);
+            dst3 = bgSub.dst2.Clone();
+
+            labels[3] = "Count nonzero = " + dst3.CountNonZero().ToString();
+        }
+    }
+
+
+
+
+
+    public class CSharp_Bin2Way_Basics : CS_Parent
+    {
+        public Hist_Basics hist = new Hist_Basics();
+        public Mat_4Click mats = new Mat_4Click();
+        public float fraction;
+
+        public CSharp_Bin2Way_Basics(VBtask task) : base(task)
+        {
+            fraction = dst2.Total() / 2;
+            task.gOptions.setHistogramBins(256);
+            labels = new string[] { "", "", "Image separated into 2 segments from darkest and lightest", "Histogram Of grayscale image" };
+            desc = "Split an image into 2 parts - darkest and lightest,";
+        }
+
+        public void RunCS(Mat src)
+        {
+            int halfSplit = 0;
+            int bins = task.histogramBins;
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            hist.Run(src);
+            dst3 = hist.dst2;
+
+            List<float> histArray = hist.histArray.ToList();
+            float accum = 0;
+            for (int i = 0; i < histArray.Count; i++)
+            {
+                accum += histArray[i];
+                if (accum > fraction)
+                {
+                    halfSplit = i;
+                    break;
+                }
+            }
+
+            float offset = halfSplit / (float)bins * dst3.Width;
+            Cv2.Line(dst3, new Point((int)offset, 0), new Point((int)offset, dst3.Height), Scalar.White);
+
+            mats.mat[0] = src.InRange(0, halfSplit - 1); // darkest
+            mats.mat[1] = src.InRange(halfSplit, 255);   // lightest
+
+            if (standaloneTest())
+            {
+                mats.Run(Mat.Zeros(src.Size(), MatType.CV_8UC1));
+                dst2 = mats.dst2;
+            }
+        }
+    }
+
+    public class CSharp_Bin2Way_KMeans : CS_Parent
+    {
+        public Bin2Way_Basics bin2 = new Bin2Way_Basics();
+        KMeans_Dimensions kmeans = new KMeans_Dimensions();
+        Mat_4Click mats = new Mat_4Click();
+
+        public CSharp_Bin2Way_KMeans(VBtask task) : base(task)
+        {
+            FindSlider("KMeans k").Value = 2;
+            labels = new string[] { "", "", "Darkest (upper left), lightest (upper right)", "Selected image from dst2" };
+            desc = "Use kmeans with each of the 2-way split images";
+        }
+
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            bin2.Run(src);
+
+            kmeans.Run(src);
+            for (int i = 0; i < 2; i++)
+            {
+                mats.mat[i].SetTo(0);
+                kmeans.dst3.CopyTo(mats.mat[i], bin2.mats.mat[i]);
+            }
+
+            mats.Run(Mat.Zeros(src.Size(), MatType.CV_8UC1));
+            dst2 = mats.dst2;
+            dst3 = mats.dst3;
+        }
+    }
+
+    public class CSharp_Bin2Way_RedCloudDarkest : CS_Parent
+    {
+        Bin2Way_RecurseOnce bin2 = new Bin2Way_RecurseOnce();
+        Flood_BasicsMask flood = new Flood_BasicsMask();
+
+        public CSharp_Bin2Way_RedCloudDarkest(VBtask task) : base(task)
+        {
+            desc = "Use RedCloud with the darkest regions";
+        }
+
+        public void RunCS(Mat src)
+        {
+            if (standalone) bin2.Run(src);
+
+            flood.inputMask = ~bin2.mats.mat[0];
+            flood.Run(bin2.mats.mat[0]);
+            dst2 = flood.dst2;
+            if (task.heartBeat) labels[2] = task.redCells.Count + " cells were identified";
+        }
+    }
+
+    public class CSharp_Bin2Way_RedCloudLightest : CS_Parent
+    {
+        Bin2Way_RecurseOnce bin2 = new Bin2Way_RecurseOnce();
+        Flood_BasicsMask flood = new Flood_BasicsMask();
+
+        public CSharp_Bin2Way_RedCloudLightest(VBtask task) : base(task)
+        {
+            desc = "Use RedCloud with the lightest regions";
+        }
+
+        public void RunCS(Mat src)
+        {
+            if (standalone) bin2.Run(src);
+
+            flood.inputMask = ~bin2.mats.mat[3];
+            flood.Run(bin2.mats.mat[3]);
+            dst2 = flood.dst2;
+            if (task.heartBeat) labels[2] = task.redCells.Count + " cells were identified";
+        }
+    }
 
 
 
@@ -2735,6 +2784,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 }
+
 
 
 

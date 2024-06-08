@@ -108,7 +108,7 @@ Public Class EMax_InputClusters : Inherits VB_Parent
     Public centers As New List(Of cv.Point2f)
     Public Sub New()
         task.gOptions.GridSize.Maximum = dst2.Width
-        task.gOptions.GridSize.Value = dst2.Width / 3
+        task.gOptions.setGridSize(CInt(dst2.Width / 3))
         task.gOptions.GridSize.Minimum = 16
         task.grid.Run(dst2)
 

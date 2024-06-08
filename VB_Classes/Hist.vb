@@ -14,7 +14,7 @@ Public Class Hist_Basics : Inherits VB_Parent
     Public removeMax As Boolean
     Public autoDisplay As Boolean
     Public Sub New()
-        If standaloneTest() Then task.gOptions.HistBinBar.Value = 255
+        If standaloneTest() Then task.gOptions.setHistogramBins(255)
         desc = "Create a histogram (no Kalman)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -70,7 +70,7 @@ End Class
 Public Class Hist_Grayscale : Inherits VB_Parent
     Public hist As New Hist_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.HistBinBar.Value = 255
+        If standaloneTest() Then task.gOptions.setHistogramBins(255)
         desc = "Create a histogram of the grayscale image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -918,7 +918,7 @@ End Class
 Public Class Hist_ShapeSide : Inherits VB_Parent
     Public rc As New rcData
     Public Sub New()
-        task.gOptions.HistBinBar.Value = 60
+        task.gOptions.setHistogramBins(60)
         labels = {"", "", "ZY Side View", "ZY Side View Mask"}
         desc = "Create a 2D side view for ZY histogram of depth"
     End Sub
@@ -947,7 +947,7 @@ End Class
 Public Class Hist_ShapeTop : Inherits VB_Parent
     Public rc As New rcData
     Public Sub New()
-        task.gOptions.HistBinBar.Value = 60
+        task.gOptions.setHistogramBins(60)
         labels = {"", "", "ZY Side View", "ZY Side View Mask"}
         desc = "Create a 2D top view for XZ histogram of depth"
     End Sub

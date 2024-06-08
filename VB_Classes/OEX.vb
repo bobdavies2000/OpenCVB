@@ -51,7 +51,7 @@ Public Class OEX_CalcBackProject_Demo2 : Inherits VB_Parent
     Public classCount As Integer = 10 ' initial value is just a guess.  It is refined after the first pass.
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
-        task.gOptions.HistBinBar.Value = 6
+        task.gOptions.setHistogramBins(6)
         labels = {"", "Mask for isolated region", "Backprojection of the hsv 2D histogram", "Mask in image context"}
         desc = "OpenCV Sample CalcBackProject_Demo2"
     End Sub

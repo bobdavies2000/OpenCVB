@@ -140,7 +140,7 @@ Public Class Math_Stdev : Inherits VB_Parent
     Public saveFrame As cv.Mat
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Stdev Threshold", 0, 100, 10)
-        task.gOptions.GridSize.Value = 16
+        task.gOptions.setGridSize(16)
 
         If check.Setup(traceName) Then
             check.addCheckBox("Show mean")
