@@ -1929,8 +1929,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         public CSharp_Benford_Primes(VBtask task) : base(task)
         {
             benford = new CSharp_Benford_Basics(task);
-            var countSlider = FindSlider("Count of desired primes");
-            countSlider.Value = countSlider.Maximum;
+            sieve.setMaxPrimes();
             labels = new string[] { "", "", "Actual Distribution of input", "" };
             desc = "Apply Benford to a list of primes";
         }
@@ -2560,8 +2559,8 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         public void Run(Mat src)
         {
             reduction.Run(src);
-
-            dst2 = ShowPalette(reduction.dst2.Clone());
+            var mm = GetMinMax(reduction.dst2);
+            dst2 = ShowPalette(reduction.dst2 * 255 / mm.maxVal);
 
             bgSub.Run(dst2);
             dst3 = bgSub.dst2.Clone();

@@ -19,8 +19,13 @@ Public Class Sieve_BasicsVB : Inherits VB_Parent
         Next
         Return completeList + Mid(nextList, 1, If(nextList.Length > 2, Len(nextList) - 2, ""))
     End Function
+    Public Sub setMaxPrimes()
+        Static countSlider = FindSlider("Count of desired primes")
+        countSlider.Value = countSlider.Maximum
+    End Sub
     Public Sub RunVB(src as cv.Mat)
         Static countSlider = FindSlider("Count of desired primes")
+
         Dim count = countSlider.Value
         Dim nextEntry As Integer = 2
         Dim output = New List(Of Integer)

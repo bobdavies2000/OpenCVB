@@ -242,8 +242,7 @@ Public Class Benford_Primes : Inherits VB_Parent
     Dim sieve As New Sieve_BasicsVB
     Dim benford As New Benford_Basics
     Public Sub New()
-        Static countSlider = FindSlider("Count of desired primes")
-        countSlider.Value = countSlider.Maximum
+        sieve.setMaxPrimes()
         labels = {"", "", "Actual Distribution of input", ""}
         desc = "Apply Benford to a list of primes"
     End Sub

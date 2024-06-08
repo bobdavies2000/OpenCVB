@@ -333,8 +333,8 @@ Public Class BGSubtract_Reduction : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
-
-        dst2 = ShowPalette(reduction.dst2.Clone)
+        Dim mm = GetMinMax(reduction.dst2)
+        dst2 = ShowPalette(reduction.dst2 * 255 / mm.maxval)
 
         bgSub.Run(dst2)
         dst3 = bgSub.dst2.Clone
