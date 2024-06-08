@@ -398,9 +398,7 @@ Public Class VBtask : Implements IDisposable
         callTrace.Add(algName + "\")
         activeObjects.Clear()
 
-        If task.algName.StartsWith("CSharp_") Then
-            ' desc = algorithmObjectCS.desc
-        Else
+        If task.algName.StartsWith("CSharp_") = False Then
             algorithmObjectVB = algoList.createVBAlgorithm(algName)
             desc = algorithmObjectVB.desc
         End If

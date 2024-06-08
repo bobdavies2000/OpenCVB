@@ -1455,7 +1455,7 @@ Public Class OpenCVB
 
             If ComplexityTimer.Enabled = False Then
                 Console.WriteLine(CStr(Now))
-                Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.algName + " - " + textDesc + vbCrLf + vbTab +
+                Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.algName + vbCrLf + vbTab +
                                   CStr(AlgorithmTestAllCount) + vbTab + "Algorithms tested")
                 Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " +
                                   parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
@@ -1617,12 +1617,15 @@ Public Class OpenCVB
                     Static findCSharp = New CS_Classes.CSAlgorithmList()
                     If task.algorithmObjectCS Is Nothing Then
                         task.algorithmObjectCS = findCSharp.createCSAlgorithm(parms.algName, task)
+                        task.desc = task.algorithmObjectCS.desc
                     End If
                 End If
 
                 task.firstPass = True
                 task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
                 task.firstPass = False
+                textDesc = task.desc
+
 
 
 

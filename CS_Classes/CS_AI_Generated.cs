@@ -2621,7 +2621,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
         public CSharp_Bin2Way_KMeans(VBtask task) : base(task)
         {
-            FindSlider("KMeans k").Value = 2;
+            //FindSlider("KMeans k").Value = 2;
             labels = new string[] { "", "", "Darkest (upper left), lightest (upper right)", "Selected image from dst2" };
             desc = "Use kmeans with each of the 2-way split images";
         }
