@@ -1618,13 +1618,14 @@ Public Class OpenCVB
                     If task.algorithmObjectCS Is Nothing Then
                         task.algorithmObjectCS = findCSharp.createCSAlgorithm(parms.algName, task)
                         task.desc = task.algorithmObjectCS.desc
+                        task.firstPass = True
                     End If
                 End If
 
-                task.firstPass = True
                 task.RunAlgorithm() ' <<<<<<<<<<<<<<<<<<<<<<<<< this is where the real work gets done.
                 task.firstPass = False
                 textDesc = task.desc
+                picLabels = task.labels
 
 
 

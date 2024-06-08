@@ -401,6 +401,7 @@ Public Class VBtask : Implements IDisposable
         If task.algName.StartsWith("CSharp_") = False Then
             algorithmObjectVB = algoList.createVBAlgorithm(algName)
             desc = algorithmObjectVB.desc
+            firstPass = True
         End If
 
         If task.advice = "" Then
@@ -770,7 +771,7 @@ Public Class VBtask : Implements IDisposable
         'cMotion.Run(src)
         If task.algName.StartsWith("CSharp_") Then
             algorithmObjectCS.trueData.clear()
-            algorithmObjectCS.RunCS(src.Clone)
+            algorithmObjectCS.Run(src.Clone)
 
             task.labels = algorithmObjectCS.labels
 
@@ -785,7 +786,6 @@ Public Class VBtask : Implements IDisposable
         Else
             algorithmObjectVB.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
         End If
-        task.firstPass = False
 
         postProcess(src)
     End Sub

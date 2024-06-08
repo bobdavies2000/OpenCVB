@@ -24,7 +24,7 @@ Imports cv = OpenCvSharp
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
 '        Static blurKernelSlider = FindSlider("Blur Kernel Size")
-'        CS_BlurGaussian.RunCS(src, dst2, blurKernelSlider.Value Or 1)
+'        CS_BlurGaussian.Run(src, dst2, blurKernelSlider.Value Or 1)
 '    End Sub
 'End Class
 
@@ -41,7 +41,7 @@ Imports cv = OpenCvSharp
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
 '        Static blurKernelSlider = FindSlider("Blur Kernel Size")
-'        CS_BlurMedian.RunCS(src, dst2, blurKernelSlider.Value Or 1)
+'        CS_BlurMedian.Run(src, dst2, blurKernelSlider.Value Or 1)
 '    End Sub
 'End Class
 
@@ -88,7 +88,7 @@ Imports cv = OpenCvSharp
 '        desc = "Match keypoints in 2 photos."
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
-'        Dim result = CS_Kaze.RunCS(box, box_in_scene)
+'        Dim result = CS_Kaze.Run(box, box_in_scene)
 '        dst2 = result.Resize(src.Size())
 '    End Sub
 'End Class
@@ -206,7 +206,7 @@ Imports cv = OpenCvSharp
 '        Else
 '            dst2 = src
 '        End If
-'        blobDetector.RunCS(dst2, dst3, options.blobParams)
+'        blobDetector.Run(dst2, dst3, options.blobParams)
 '    End Sub
 'End Class
 
@@ -279,7 +279,7 @@ Imports cv = OpenCvSharp
 '        options.RunVB()
 
 '        Dim doubleSize As New cv.Mat(dst2.Rows, dst2.Cols * 2, cv.MatType.CV_8UC3)
-'        siftCS.RunCS(task.leftView, task.rightView, doubleSize, options.useBFMatcher, options.pointCount)
+'        siftCS.Run(task.leftView, task.rightView, doubleSize, options.useBFMatcher, options.pointCount)
 
 '        doubleSize(New cv.Rect(0, 0, dst2.Width, dst2.Height)).CopyTo(dst2)
 '        doubleSize(New cv.Rect(dst2.Width, 0, dst2.Width, dst2.Height)).CopyTo(dst3)
@@ -323,7 +323,7 @@ Imports cv = OpenCvSharp
 '            Dim right = task.rightView(roi).Clone()
 '            Dim dstROI = New cv.Rect(roi.X, roi.Y, roi.Width * 2, roi.Height)
 '            Dim dstTmp = output(dstROI).Clone()
-'            siftCS.RunCS(left, right, dstTmp, bfRadio.Checked, numFeatures)
+'            siftCS.Run(left, right, dstTmp, bfRadio.Checked, numFeatures)
 '            dstTmp.CopyTo(output(dstROI))
 '        End Sub)
 
@@ -351,7 +351,7 @@ Imports cv = OpenCvSharp
 '    Public Sub RunVB(src As cv.Mat)
 '        options.RunVB()
 '        dst2 = src.Clone
-'        sift.RunCS(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), options.pointCount)
+'        sift.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), options.pointCount)
 
 '        Dim newPoints As New List(Of cv.Point)
 '        For i = 0 To sift.keypoints.Count - 1
@@ -406,7 +406,7 @@ Imports cv = OpenCvSharp
 '            If i + stepsize >= dst2.Height Then stepsize = dst2.Height - i - 1
 '            Dim r1 = New cv.Rect(0, i, dst2.Width, stepsize)
 '            Dim r2 = New cv.Rect(0, i, dst2.Width * 2, stepsize)
-'            siftCS.RunCS(task.leftView(r1), task.rightView(r1), doubleSize(r2), options.useBFMatcher, options.pointCount)
+'            siftCS.Run(task.leftView(r1), task.rightView(r1), doubleSize(r2), options.useBFMatcher, options.pointCount)
 '        Next
 
 '        doubleSize(New cv.Rect(0, 0, dst2.Width, dst2.Height)).CopyTo(dst2)
@@ -437,7 +437,7 @@ Imports cv = OpenCvSharp
 
 '        If standaloneTest() Then matrix.bVector = defaultBVector
 
-'        Dim result = matrix.RunCS(input) ' C# class Run - see MatrixInverse.cs file...
+'        Dim result = matrix.Run(input) ' C# class Run - see MatrixInverse.cs file...
 
 '        Dim outstr = printMatrixResults(input, result)
 '        setTrueText(outstr + vbCrLf + "Intermediate results are optionally available in the console log.")
@@ -457,7 +457,7 @@ Imports cv = OpenCvSharp
 '        options.RunVB()
 
 '        Dim doubleSize As New cv.Mat
-'        CS_SurfBasics.RunCS(task.leftView, task.rightView, doubleSize, options.surfThreshold, options.useBFMatch)
+'        CS_SurfBasics.Run(task.leftView, task.rightView, doubleSize, options.surfThreshold, options.useBFMatch)
 
 '        doubleSize(New cv.Rect(0, 0, src.Width, src.Height)).CopyTo(dst2)
 '        doubleSize(New cv.Rect(src.Width, 0, src.Width, src.Height)).CopyTo(dst3)
@@ -560,7 +560,7 @@ Imports cv = OpenCvSharp
 '    Public Sub RunVB(src As cv.Mat)
 '        options.RunVB()
 
-'        CS_SurfBasics.RunCS(task.leftView, task.rightView, New cv.Mat, options.surfThreshold, options.useBFMatch)
+'        CS_SurfBasics.Run(task.leftView, task.rightView, New cv.Mat, options.surfThreshold, options.useBFMatch)
 '        If CS_SurfBasics.keypoints1 Is Nothing Then Exit Sub
 
 '        Dim doublesize As New cv.Mat
@@ -656,7 +656,7 @@ Imports cv = OpenCvSharp
 '    End Sub
 '    Public Sub RunVB(src as cv.Mat)
 '        Dim image = cv.Cv2.ImRead(task.homeDir + "Data/space_shuttle.jpg")
-'        Dim str = caffeCS.RunCS(image)
+'        Dim str = caffeCS.Run(image)
 '        dst3 = image.Resize(dst3.Size())
 '        setTrueText(str)
 '    End Sub
@@ -891,7 +891,7 @@ Imports cv = OpenCvSharp
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
 '        If task.heartBeat Then random.Run(empty)
-'        vDemo.RunCS(dst2, random.pointList)
+'        vDemo.Run(dst2, random.pointList)
 '        vDisplay(dst2, random.pointList, cv.Scalar.Yellow)
 '    End Sub
 'End Class
@@ -913,10 +913,10 @@ Imports cv = OpenCvSharp
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
 '        random.Run(empty)
-'        basics.vDemo.RunCS(dst2, random.pointList, True)
+'        basics.vDemo.Run(dst2, random.pointList, True)
 '        basics.vDisplay(dst2, random.pointList, cv.Scalar.Yellow)
 
-'        basics.vDemo.RunCS(dst3, random.pointList, False)
+'        basics.vDemo.Run(dst3, random.pointList, False)
 '        basics.vDisplay(dst3, random.pointList, cv.Scalar.Yellow)
 '    End Sub
 'End Class

@@ -12,7 +12,7 @@ Imports System.Threading
 '        Dim input = src
 '        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-'        sobel.RunCS(input)
+'        sobel.Run(input)
 
 '        d2Mat.dGray = sobel.edgeImage
 '        d2Mat.Run(src)
@@ -39,13 +39,13 @@ Imports System.Threading
 '        Dim input = src
 '        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-'        blur.RunCS(input)
+'        blur.Run(input)
 
 '        d2Mat.dGray = blur.blurredGray
 '        d2Mat.Run(src)
 '        dst2 = d2Mat.dst2
 
-'        blur.RunCS(src) ' now blur the 8uc3 image
+'        blur.Run(src) ' now blur the 8uc3 image
 '        d2Mat.dRGB = blur.blurredRGB
 '        dst3 = d2Mat.dst3
 '    End Sub
@@ -69,7 +69,7 @@ Imports System.Threading
 '        Dim input = src
 '        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-'        faces.RunCS(input)
+'        faces.Run(input)
 
 '        dst2 = src
 '        For Each r In faces.rects
