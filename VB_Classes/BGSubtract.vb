@@ -100,38 +100,20 @@ End Class
 
 
 Public Class BGSubtract_MotionDetect : Inherits VB_Parent
-    Dim radioChoices As cv.Vec3i()
+    Dim options As New Options_MotionDetect
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 0, 1000, 980)
-        If radio.Setup(traceName) Then
-            For i = 0 To 7 - 1
-                radio.addRadio(CStr(2 ^ i) + " threads")
-            Next
-            radio.check(5).Checked = True
-        End If
-        Dim w = dst2.Width
-        Dim h = dst2.Height
-        radioChoices = {New cv.Vec3i(1, w, h), New cv.Vec3i(2, w / 2, h), New cv.Vec3i(4, w / 2, h / 2),
-                        New cv.Vec3i(8, w / 4, h / 2), New cv.Vec3i(16, w / 4, h / 4), New cv.Vec3i(32, w / 8, h / 4),
-                        New cv.Vec3i(32, w / 8, h / 8), New cv.Vec3i(1, w, h), New cv.Vec3i(2, w / 2, h), New cv.Vec3i(4, w / 2, h / 2),
-                        New cv.Vec3i(8, w / 4, h / 2), New cv.Vec3i(16, w / 4, h / 4), New cv.Vec3i(32, w / 8, h / 4),
-                        New cv.Vec3i(32, w / 8, h / 8)}
-
         labels(3) = "Only Motion Added"
         desc = "Detect Motion for use with background subtraction"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static correlationSlider = FindSlider("Correlation Threshold")
-        Static frm = findfrm(traceName + " Radio Buttons")
-        Dim threadData = radioChoices(findRadioIndex(frm.check))
+        options.RunVB()
 
-        If task.optionsChanged Then src.CopyTo(dst3)
-        Dim threadCount = threadData(0)
-        Dim width = threadData(1), height = threadData(2)
+        If task.optionsChanged Or task.frameCount < 10 Then src.CopyTo(dst3)
+        Dim threadCount = options.threadData(0)
+        Dim width = options.threadData(1), height = options.threadData(2)
         Dim taskArray(threadCount - 1) As System.Threading.Tasks.Task
         Dim xfactor = CInt(src.Width / width)
         Dim yfactor = Math.Max(CInt(src.Height / height), CInt(src.Width / width))
-        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         dst2.SetTo(0)
         Dim motionFound As Boolean
         For i = 0 To threadCount - 1
@@ -143,7 +125,7 @@ Public Class BGSubtract_MotionDetect : Inherits VB_Parent
                     If roi.X + roi.Width > dst3.Width Then roi.Width = dst3.Width - roi.X - 1
                     If roi.Y + roi.Height > dst3.Height Then roi.Height = dst3.Height - roi.Y - 1
                     cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
-                    If CCthreshold > correlation.Get(Of Single)(0, 0) Then
+                    If options.CCthreshold > correlation.Get(Of Single)(0, 0) Then
                         src(roi).CopyTo(dst2(roi))
                         src(roi).CopyTo(dst3(roi))
                         motionFound = True

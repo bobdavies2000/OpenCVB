@@ -52,8 +52,11 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_BackProject_Vertical") return new CSharp_BackProject_Vertical(task);
 			if (algorithmName == "CSharp_Benford_Basics") return new CSharp_Benford_Basics(task);
 			if (algorithmName == "CSharp_Benford_Depth") return new CSharp_Benford_Depth(task);
+			if (algorithmName == "CSharp_Benford_JPEG") return new CSharp_Benford_JPEG(task);
+			if (algorithmName == "CSharp_Benford_JPEG99") return new CSharp_Benford_JPEG99(task);
 			if (algorithmName == "CSharp_Benford_NormalizedImage") return new CSharp_Benford_NormalizedImage(task);
 			if (algorithmName == "CSharp_Benford_NormalizedImage99") return new CSharp_Benford_NormalizedImage99(task);
+			if (algorithmName == "CSharp_Benford_PNG") return new CSharp_Benford_PNG(task);
 			if (algorithmName == "CSharp_Benford_Primes") return new CSharp_Benford_Primes(task);
 			if (algorithmName == "CSharp_Bezier_Basics") return new CSharp_Bezier_Basics(task);
 			if (algorithmName == "CSharp_Bezier_Example") return new CSharp_Bezier_Example(task);
@@ -65,6 +68,7 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_BGSubtract_MOG_RGBDepth") return new CSharp_BGSubtract_MOG_RGBDepth(task);
 			if (algorithmName == "CSharp_BGSubtract_MOG2") return new CSharp_BGSubtract_MOG2(task);
 			if (algorithmName == "CSharp_BGSubtract_MOG2_QT") return new CSharp_BGSubtract_MOG2_QT(task);
+			if (algorithmName == "CSharp_BGSubtract_MotionDetect") return new CSharp_BGSubtract_MotionDetect(task);
 			if (algorithmName == "CSharp_Diff_Basics") return new CSharp_Diff_Basics(task);
 			if (algorithmName == "CSharp_Line_Basics") return new CSharp_Line_Basics(task);
 			if (algorithmName == "CSharp_Random_Basics") return new CSharp_Random_Basics(task);

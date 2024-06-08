@@ -144,13 +144,14 @@ End Class
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
 Public Class Benford_JPEG : Inherits VB_Parent
     Public benford As New Benford_Basics
+    Dim options As New Options_JpegQuality
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("JPEG Quality", 1, 100, 90)
         desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static qualitySlider = FindSlider("JPEG Quality")
-        Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, qualitySlider.Value})
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, options.quality})
         Dim tmp = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
@@ -168,14 +169,15 @@ End Class
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
 Public Class Benford_JPEG99 : Inherits VB_Parent
     Public benford As New Benford_Basics
+    Public options As New Options_JpegQuality
     Public Sub New()
         benford.setup99()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("JPEG Quality", 1, 100, 90)
         desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static qualitySlider = FindSlider("JPEG Quality")
-        Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, qualitySlider.Value})
+        options.RunVB()
+
+        Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, options.quality})
         Dim tmp = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
@@ -193,14 +195,15 @@ End Class
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
 Public Class Benford_PNG : Inherits VB_Parent
+    Dim options As New Options_PNGCompression
     Public benford As New Benford_Basics
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("PNG Compression", 1, 100, 90)
         desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static compressionSlider = FindSlider("PNG Compression")
-        Dim png = src.ImEncode(".png", New Integer() {cv.ImwriteFlags.PngCompression, compressionSlider.Value})
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        Dim png = src.ImEncode(".png", New Integer() {cv.ImwriteFlags.PngCompression, options.compression})
         Dim tmp = New cv.Mat(png.Count, 1, cv.MatType.CV_8U, png)
         dst3 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)

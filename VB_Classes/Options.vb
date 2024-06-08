@@ -4834,13 +4834,59 @@ End Class
 
 
 Public Class Options_MotionDetect : Inherits VB_Parent
+    Public radioChoices As cv.Vec3i()
+    Public threadData As cv.Vec3i
+    Public CCthreshold As Single
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("firstSlider", 0, 100, 50)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 0, 1000, 980)
+        If radio.Setup(traceName) Then
+            For i = 0 To 7 - 1
+                radio.addRadio(CStr(2 ^ i) + " threads")
+            Next
+            radio.check(5).Checked = True
         End If
+        Dim w = dst2.Width
+        Dim h = dst2.Height
+        radioChoices = {New cv.Vec3i(1, w, h), New cv.Vec3i(2, w / 2, h), New cv.Vec3i(4, w / 2, h / 2),
+                        New cv.Vec3i(8, w / 4, h / 2), New cv.Vec3i(16, w / 4, h / 4), New cv.Vec3i(32, w / 8, h / 4),
+                        New cv.Vec3i(32, w / 8, h / 8), New cv.Vec3i(1, w, h), New cv.Vec3i(2, w / 2, h), New cv.Vec3i(4, w / 2, h / 2),
+                        New cv.Vec3i(8, w / 4, h / 2), New cv.Vec3i(16, w / 4, h / 4), New cv.Vec3i(32, w / 8, h / 4),
+                        New cv.Vec3i(32, w / 8, h / 8)}
     End Sub
     Public Sub RunVB()
-        Static firstSlider = FindSlider("firstSlider")
-        Dim test = firstSlider.value
+        Static correlationSlider = FindSlider("Correlation Threshold")
+        Static frm = findfrm(traceName + " Radio Buttons")
+        CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
+        threadData = radioChoices(findRadioIndex(frm.check))
+
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_JpegQuality : Inherits VB_Parent
+    Public quality As Integer
+    Public Sub New()
+        If (sliders.Setup(traceName)) Then sliders.setupTrackBar("JPEG Quality", 1, 100, 90)
+    End Sub
+    Public Sub RunVB()
+        Static qualitySlider = FindSlider("JPEG Quality")
+        quality = qualitySlider.value
+    End Sub
+End Class
+
+
+
+
+Public Class Options_PNGCompression : Inherits VB_Parent
+    Public compression As Integer
+    Public Sub New()
+        If (sliders.Setup(traceName)) Then sliders.setupTrackBar("PNG Compression", 1, 100, 90)
+    End Sub
+    Public Sub RunVB()
+        Static compressionSlider = FindSlider("PNG Compression")
+        compression = compressionSlider.value
     End Sub
 End Class
