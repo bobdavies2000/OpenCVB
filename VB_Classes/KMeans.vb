@@ -387,7 +387,7 @@ End Class
 
 
 Public Class KMeans_Dimensions : Inherits VB_Parent
-    Dim km As New KMeans_Basics
+    Public km As New KMeans_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Dimension", 1, 6, 1)
         desc = "Demonstrate how to use KMeans for a variety of dimensions"

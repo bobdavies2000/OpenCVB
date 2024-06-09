@@ -2941,6 +2941,9 @@ Public Class Options_KMeans : Inherits VB_Parent
             radio.check(2).Checked = True
         End If
     End Sub
+    Public Sub setK(k As Integer)
+        FindSlider("KMeans k").Value = k
+    End Sub
     Public Sub RunVB()
         Static frm = findfrm(traceName + " Radio Buttons")
         Static kSlider = FindSlider("KMeans k")

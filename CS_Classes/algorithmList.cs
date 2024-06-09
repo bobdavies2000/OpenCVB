@@ -81,6 +81,14 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_Bin2Way_RedCloud") return new CSharp_Bin2Way_RedCloud(task);
 			if (algorithmName == "CSharp_Bin2Way_RedCloudDarkest") return new CSharp_Bin2Way_RedCloudDarkest(task);
 			if (algorithmName == "CSharp_Bin2Way_RedCloudLightest") return new CSharp_Bin2Way_RedCloudLightest(task);
+			if (algorithmName == "CSharp_Bin3Way_Basics") return new CSharp_Bin3Way_Basics(task);
+			if (algorithmName == "CSharp_Bin3Way_Color") return new CSharp_Bin3Way_Color(task);
+			if (algorithmName == "CSharp_Bin3Way_KMeans") return new CSharp_Bin3Way_KMeans(task);
+			if (algorithmName == "CSharp_Bin3Way_RedCloud") return new CSharp_Bin3Way_RedCloud(task);
+			if (algorithmName == "CSharp_Bin3Way_RedCloud1") return new CSharp_Bin3Way_RedCloud1(task);
+			if (algorithmName == "CSharp_Bin3Way_RedCloudDarkest") return new CSharp_Bin3Way_RedCloudDarkest(task);
+			if (algorithmName == "CSharp_Bin3Way_RedCloudLightest") return new CSharp_Bin3Way_RedCloudLightest(task);
+			if (algorithmName == "CSharp_Bin3Way_RedCloudOther") return new CSharp_Bin3Way_RedCloudOther(task);
 			if (algorithmName == "CSharp_Diff_Basics") return new CSharp_Diff_Basics(task);
 			if (algorithmName == "CSharp_Line_Basics") return new CSharp_Line_Basics(task);
 			if (algorithmName == "CSharp_Random_Basics") return new CSharp_Random_Basics(task);

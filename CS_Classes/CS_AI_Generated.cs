@@ -2795,11 +2795,303 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 
+    public class CSharp_Bin3Way_Basics : CS_Parent
+    {
+        private Hist_Basics hist = new Hist_Basics();
+        public Mat_4Click mats = new Mat_4Click();
+        private int firstThird = 0, lastThird = 0;
+
+        public CSharp_Bin3Way_Basics(VBtask task) : base(task)
+        {
+            task.gOptions.setHistogramBins(256);
+            labels = new string[] { "", "", "Image separated into three segments from darkest to lightest and 'Other' (between)", "Histogram Of grayscale image" };
+            desc = "Split an image into 3 parts - darkest, lightest, and in-between the 2";
+        }
+
+        public void Run(Mat src)
+        {
+            int bins = task.histogramBins;
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+
+            if (task.heartBeat)
+            {
+                firstThird = 0;
+                lastThird = 0;
+                hist.Run(src);
+                dst3 = hist.dst2;
+
+                var histogram = hist.histArray.ToList();
+                double third = src.Total() / 3;
+                float accum = 0;
+                for (int i = 0; i < histogram.Count; i++)
+                {
+                    accum += histogram[i];
+                    if (accum > third)
+                    {
+                        if (firstThird == 0)
+                        {
+                            firstThird = i;
+                            accum = 0;
+                        }
+                        else
+                        {
+                            lastThird = i;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            double offset = firstThird / (double)bins * dst3.Width;
+            Cv2.Line(dst3, new Point(offset, 0), new Point(offset, dst3.Height), Scalar.White);
+            offset = lastThird / (double)bins * dst3.Width;
+            Cv2.Line(dst3, new Point(offset, 0), new Point(offset, dst3.Height), Scalar.White);
+
+            mats.mat[0] = src.InRange(0, firstThird - 1);         // darkest
+            mats.mat[1] = src.InRange(lastThird, 255);            // lightest
+            mats.mat[2] = src.InRange(firstThird, lastThird - 1); // other
+
+            if (standaloneTest())
+            {
+                mats.Run(Mat.Zeros(src.Size(), MatType.CV_8U));
+                dst2 = mats.dst2;
+            }
+        }
+    }
+
+    public class CSharp_Bin3Way_KMeans : CS_Parent
+    {
+        public Bin3Way_Basics bin3 = new Bin3Way_Basics();
+        private KMeans_Dimensions kmeans = new KMeans_Dimensions();
+        private Mat_4Click mats = new Mat_4Click();
+
+        public CSharp_Bin3Way_KMeans(VBtask task) : base(task)
+        {
+            kmeans.km.options.setK(2);
+            labels = new string[] { "", "", "Darkest (upper left), mixed (upper right), lightest (bottom left)", "Selected image from dst2" };
+            desc = "Use kmeans with each of the 3-way split images";
+        }
+
+        public void Run(Mat src)
+        {
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            bin3.Run(src);
+
+            kmeans.Run(src);
+            for (int i = 0; i < 2; i++)
+            {
+                mats.mat[i].SetTo(0);
+                kmeans.dst3.CopyTo(mats.mat[i], bin3.mats.mat[i]);
+            }
+
+            mats.Run(Mat.Zeros(src.Size(), MatType.CV_8U));
+            dst2 = mats.dst2;
+            dst3 = mats.dst3;
+        }
+    }
+
+    public class CSharp_Bin3Way_Color : CS_Parent
+    {
+        private Bin3Way_KMeans bin3 = new Bin3Way_KMeans();
+
+        public CSharp_Bin3Way_Color(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "CV_8U format of the image", "showPalette output of dst2" };
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Build the palette input that best separates the light and dark regions of an image";
+        }
+
+        public void Run(Mat src)
+        {
+            bin3.Run(src);
+            dst2.SetTo(4);
+            dst2.SetTo(1, bin3.bin3.mats.mat[0]);
+            dst2.SetTo(2, bin3.bin3.mats.mat[1]);
+            dst2.SetTo(3, bin3.bin3.mats.mat[2]);
+            dst3 = ShowPalette(dst2 * 255 / 3);
+        }
+    }
 
 
 
+    public class CSharp_Bin3Way_RedCloudDarkest : CS_Parent
+    {
+        Bin3Way_KMeans bin3 = new Bin3Way_KMeans();
+        Flood_BasicsMask flood = new Flood_BasicsMask();
 
+        public CSharp_Bin3Way_RedCloudDarkest(VBtask task) : base(task)
+        {
+            desc = "Use RedCloud with the darkest regions";
+        }
 
+        public void Run(Mat src)
+        {
+            if (standalone) bin3.Run(src);
+
+            flood.inputMask = ~bin3.bin3.mats.mat[0];
+            flood.Run(bin3.bin3.mats.mat[0]);
+            dst2 = flood.dst2;
+        }
+    }
+
+    public class CSharp_Bin3Way_RedCloudLightest : CS_Parent
+    {
+        Bin3Way_KMeans bin3 = new Bin3Way_KMeans();
+        Flood_BasicsMask flood = new Flood_BasicsMask();
+
+        public CSharp_Bin3Way_RedCloudLightest(VBtask task) : base(task)
+        {
+            desc = "Use RedCloud with the lightest regions";
+        }
+
+        public void Run(Mat src)
+        {
+            if (standalone) bin3.Run(src);
+
+            flood.inputMask = ~bin3.bin3.mats.mat[2];
+            flood.Run(bin3.bin3.mats.mat[2]);
+            dst2 = flood.dst2;
+        }
+    }
+
+    public class CSharp_Bin3Way_RedCloudOther : CS_Parent
+    {
+        Bin3Way_KMeans bin3 = new Bin3Way_KMeans();
+        Flood_BasicsMask flood = new Flood_BasicsMask();
+        Color8U_Basics color = new Color8U_Basics();
+
+        public CSharp_Bin3Way_RedCloudOther(VBtask task) : base(task)
+        {
+            flood.inputMask = new Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0));
+            desc = "Use RedCloud with the regions that are neither lightest or darkest";
+        }
+
+        public void Run(Mat src)
+        {
+            if (standalone) bin3.Run(src);
+
+            flood.inputMask = bin3.bin3.mats.mat[0] | bin3.bin3.mats.mat[1];
+
+            color.Run(src);
+            flood.Run(color.dst2);
+            dst2 = flood.dst2;
+        }
+    }
+
+    public class CSharp_Bin3Way_RedCloud1 : CS_Parent
+    {
+        Bin3Way_KMeans bin3 = new Bin3Way_KMeans();
+        Flood_BasicsMask flood = new Flood_BasicsMask();
+        Color8U_Basics color = new Color8U_Basics();
+        Mat[] cellMaps = new Mat[3];
+        List<rcData>[] redCells = new List<rcData>[3];
+        Options_Bin3WayRedCloud options = new Options_Bin3WayRedCloud();
+
+        public CSharp_Bin3Way_RedCloud1(VBtask task) : base(task)
+        {
+            desc = "Identify the lightest, darkest, and 'Other' regions separately and then combine the rcData.";
+        }
+
+        public void Run(Mat src)
+        {
+            options.RunVB();
+
+            if (task.optionsChanged)
+            {
+                for (int i = 0; i < redCells.Length; i++)
+                {
+                    redCells[i] = new List<rcData>();
+                    cellMaps[i] = new Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0));
+                }
+            }
+
+            bin3.Run(src);
+
+            for (int i = options.startRegion; i <= options.endRegion; i++)
+            {
+                task.cellMap = cellMaps[i];
+                task.redCells = redCells[i];
+                if (i == 2)
+                {
+                    flood.inputMask = bin3.bin3.mats.mat[0] | bin3.bin3.mats.mat[1];
+                    color.Run(src);
+                    flood.Run(color.dst2);
+                }
+                else
+                {
+                    flood.inputMask = ~bin3.bin3.mats.mat[i];
+                    flood.Run(bin3.bin3.mats.mat[i]);
+                }
+                cellMaps[i] = task.cellMap.Clone();
+                redCells[i] = new List<rcData>(task.redCells);
+            }
+
+            SortedList<int, rcData> sortedCells = new SortedList<int, rcData>(new compareAllowIdenticalIntegerInverted());
+            for (int i = 0; i < 3; i++)
+            {
+                foreach (var rc in redCells[i])
+                {
+                    sortedCells.Add(rc.pixels, rc);
+                }
+            }
+
+            dst2 = RebuildCells(sortedCells);
+
+            if (task.heartBeat) labels[2] = task.redCells.Count + " cells were identified and matched to the previous image";
+        }
+    }
+
+    public class CSharp_Bin3Way_RedCloud : CS_Parent
+    {
+        Bin3Way_KMeans bin3 = new Bin3Way_KMeans();
+        Flood_BasicsMask flood = new Flood_BasicsMask();
+        Color8U_Basics color = new Color8U_Basics();
+        Mat[] cellMaps = new Mat[3];
+        List<rcData>[] redCells = new List<rcData>[3];
+        Options_Bin3WayRedCloud options = new Options_Bin3WayRedCloud();
+
+        public CSharp_Bin3Way_RedCloud(VBtask task) : base(task)
+        {
+            flood.showSelected = false;
+            desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData.";
+        }
+
+        public void Run(Mat src)
+        {
+            options.RunVB();
+
+            if (task.optionsChanged)
+            {
+                for (int i = 0; i < redCells.Length; i++)
+                {
+                    redCells[i] = new List<rcData>();
+                    cellMaps[i] = new Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0));
+                }
+            }
+
+            bin3.Run(src);
+
+            SortedList<int, rcData> sortedCells = new SortedList<int, rcData>(new compareAllowIdenticalIntegerInverted());
+            for (int i = options.startRegion; i <= options.endRegion; i++)
+            {
+                task.cellMap = cellMaps[i];
+                task.redCells = redCells[i];
+                flood.inputMask = ~bin3.bin3.mats.mat[i];
+                flood.Run(bin3.bin3.mats.mat[i]);
+                cellMaps[i] = task.cellMap.Clone();
+                redCells[i] = new List<rcData>(task.redCells);
+                foreach (var rc in redCells[i])
+                {
+                    if (rc.index == 0) continue;
+                    sortedCells.Add(rc.pixels, rc);
+                }
+            }
+
+            dst2 = RebuildCells(sortedCells);
+
+            if (task.heartBeat) labels[2] = task.redCells.Count + " cells were identified and matched to the previous image";
+        }
+    }
 
 
 
