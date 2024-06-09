@@ -494,7 +494,7 @@ Public Class Mat_ToList : Inherits VB_Parent
         dst2 = histTop.histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
 
         Dim ptList As New List(Of cv.Point)
-        If task.gOptions.DebugCheckBox.Checked Then
+        If task.gOptions.DebugChecked Then
             For y = 0 To dst2.Height - 1
                 For x = 0 To dst2.Width - 1
                     If dst2.Get(Of Byte)(y, x) <> 0 Then ptList.Add(New cv.Point(x, y))

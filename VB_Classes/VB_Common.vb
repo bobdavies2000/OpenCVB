@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
-Imports System.Windows.Forms
 Imports System.Drawing
 Imports System.IO.Pipes
+Imports System.Windows.Forms
 Module VB_Common
     Public Const fmt0 = "0"
     Public Const fmt1 = "0.0"
@@ -39,6 +39,12 @@ Module VB_Common
             ysum += pt.Y
         Next
         Return New cv.Point2f(xsum / clist.Count, ysum / clist.Count)
+    End Function
+    Public Function findfrm(title As String) As Windows.Forms.Form
+        For Each frm In Application.OpenForms
+            If frm.text = title Then Return frm
+        Next
+        Return Nothing
     End Function
     Public Function validContourPoint(rc As rcData, pt As cv.Point, offset As Integer) As cv.Point
         If pt.X < rc.rect.Width And pt.Y < rc.rect.Height Then Return pt
@@ -534,95 +540,6 @@ Module VB_Common
     End Sub
     Public Function vecToScalar(v As cv.Vec3b) As cv.Scalar
         Return New cv.Scalar(v(0), v(1), v(2))
-    End Function
-    Public Function FindSlider(opt As String) As TrackBar
-        Try
-            For Each frm In Application.OpenForms
-                If frm.text.endswith(" Sliders") Then
-                    For j = 0 To frm.trackbar.Count - 1
-                        If frm.sLabels(j).text.startswith(opt) Then Return frm.trackbar(j)
-                    Next
-                End If
-            Next
-        Catch ex As Exception
-            Console.WriteLine("FindSlider failed.  The application list of forms changed while iterating.  Not critical." + ex.Message)
-        End Try
-        Console.WriteLine("A slider was Not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
-
-        Return Nothing
-    End Function
-    Public Function findfrm(title As String) As Windows.Forms.Form
-        For Each frm In Application.OpenForms
-            If frm.text = title Then Return frm
-        Next
-        Return Nothing
-    End Function
-    Public Function findCheckBox(opt As String) As CheckBox
-        While 1
-            Try
-                For Each frm In Application.OpenForms
-                    If frm.text.endswith(" CheckBoxes") Then
-                        For j = 0 To frm.Box.Count - 1
-                            If frm.Box(j).text = opt Then Return frm.Box(j)
-                        Next
-                    End If
-                Next
-            Catch ex As Exception
-                Console.WriteLine("findCheckBox failed.  The application list of forms changed while iterating.  Not critical.")
-            End Try
-            Application.DoEvents()
-            Static retryCount As Integer
-            retryCount += 1
-            If retryCount >= 5 Then
-                Console.WriteLine("A checkbox was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
-                Exit While
-            End If
-        End While
-        Return Nothing
-    End Function
-    Private Function searchForms(opt As String, ByRef index As Integer)
-        While 1
-            Try
-                For Each frm In Application.OpenForms
-                    If frm.text.endswith(" Radio Buttons") Then
-                        For j = 0 To frm.check.count - 1
-                            If frm.check(j).text = opt Then
-                                index = j
-                                Return frm.check
-                            End If
-                        Next
-                    End If
-                Next
-            Catch ex As Exception
-                Console.WriteLine("findRadioForm failed.  The application list of forms changed while iterating.  Not critical.")
-            End Try
-            Application.DoEvents()
-            Static retryCount As Integer
-            retryCount += 1
-            If retryCount >= 5 Then
-                Console.WriteLine("A Radio button was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
-                Exit While
-            End If
-        End While
-        Return Nothing
-    End Function
-    Public Function findRadio(opt As String) As RadioButton
-        Dim index As Integer
-        Dim radio = searchForms(opt, index)
-        If radio Is Nothing Then Return Nothing
-        Return radio(index)
-    End Function
-    Public Function findRadioText(ByRef radioList As List(Of RadioButton)) As String
-        For Each rad In radioList
-            If rad.Checked Then Return rad.Text
-        Next
-        Return radioList(0).Text
-    End Function
-    Public Function findRadioIndex(ByRef radioList As List(Of RadioButton)) As String
-        For i = 0 To radioList.Count - 1
-            If radioList(i).Checked Then Return i
-        Next
-        Return 0
     End Function
     Public Sub updateSettings()
         task.fpsRate = If(task.frameCount < 30, 30, task.fpsRate)

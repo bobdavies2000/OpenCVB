@@ -1612,12 +1612,12 @@ Public Class OpenCVB
 
 
 
-
+                ' task.gridMap = New cv.Mat(task.workingRes, cv.MatType.CV_32S, 0)
                 If parms.algName.StartsWith("CSharp_") Then
                     Static findCSharp = New CS_Classes.CSAlgorithmList()
-                    If task.algorithmObjectCS Is Nothing Then
-                        task.algorithmObjectCS = findCSharp.createCSAlgorithm(parms.algName, task)
-                        task.desc = task.algorithmObjectCS.desc
+                    If task.csAlgorithmObject Is Nothing Then
+                        task.csAlgorithmObject = findCSharp.createCSAlgorithm(parms.algName, task)
+                        task.desc = task.csAlgorithmObject.desc
                         task.firstPass = True
                     End If
                 End If

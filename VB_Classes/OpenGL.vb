@@ -1497,7 +1497,7 @@ Public Class OpenGL_DiffDepth : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         diff.Run(src)
         dst2 = diff.dst2
-        If task.gOptions.DebugCheckBox.Checked = False Then task.pointCloud.SetTo(0, dst2)
+        If task.gOptions.DebugChecked = False Then task.pointCloud.SetTo(0, dst2)
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
         labels = diff.labels
@@ -1720,7 +1720,7 @@ Public Class OpenGL_NoSolo : Inherits VB_Parent
         hotSide.Run(src)
         dst2 = dst2 Or hotSide.dst3
 
-        If task.gOptions.DebugCheckBox.Checked = False Then task.pointCloud.SetTo(0, dst2)
+        If task.gOptions.DebugChecked = False Then task.pointCloud.SetTo(0, dst2)
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
         setTrueText("Toggle the solo points on and off using the 'DebugCheckBox' global option.", 3)

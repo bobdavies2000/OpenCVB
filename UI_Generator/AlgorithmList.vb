@@ -173,7 +173,7 @@ Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	if algorithmName = "Bin3Way_RedCloudOther" Then return new Bin3Way_RedCloudOther
 	if algorithmName = "Bin4Way_Basics" Then return new Bin4Way_Basics
 	if algorithmName = "Bin4Way_BasicsColors" Then return new Bin4Way_BasicsColors
-	if algorithmName = "Bin4Way_BasicsNew" Then return new Bin4Way_BasicsNew
+	if algorithmName = "Bin4Way_BasicsRed" Then return new Bin4Way_BasicsRed
 	if algorithmName = "Bin4Way_Canny" Then return new Bin4Way_Canny
 	if algorithmName = "Bin4Way_RedCloud" Then return new Bin4Way_RedCloud
 	if algorithmName = "Bin4Way_Regions" Then return new Bin4Way_Regions

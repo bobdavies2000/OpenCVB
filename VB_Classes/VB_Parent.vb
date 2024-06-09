@@ -1,5 +1,6 @@
 Imports OpenCvSharp
 Imports cv = OpenCvSharp
+Imports System.Windows.Forms
 Public Class trueText
     Public text As String
     Public picTag = 2
@@ -83,6 +84,94 @@ Public Class VB_Parent : Implements IDisposable
             End If
         End If
     End Sub
+    Public Function FindSlider(opt As String) As TrackBar
+        Try
+            For Each frm In Application.OpenForms
+                If frm.text.endswith(" Sliders") Then
+                    'Dim controls = frm.Controls
+                    'For Each ctl In controls
+                    '    Dim j = controls.indexof(ctl)
+                    '    If ctl.text.startswith(opt) Then Return frm.trackbar(j)
+                    'Next
+                    For j = 0 To frm.trackbar.Count - 1
+                        If frm.sLabels(j).text.startswith(opt) Then Return frm.trackbar(j)
+                    Next
+                End If
+            Next
+        Catch ex As Exception
+            Console.WriteLine("FindSlider failed.  The application list of forms changed while iterating.  Not critical." + ex.Message)
+        End Try
+        Console.WriteLine("A slider was Not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+
+        Return Nothing
+    End Function
+    Public Function findCheckBox(opt As String) As CheckBox
+        While 1
+            Try
+                For Each frm In Application.OpenForms
+                    If frm.text.endswith(" CheckBoxes") Then
+                        For j = 0 To frm.Box.Count - 1
+                            If frm.Box(j).text = opt Then Return frm.Box(j)
+                        Next
+                    End If
+                Next
+            Catch ex As Exception
+                Console.WriteLine("findCheckBox failed.  The application list of forms changed while iterating.  Not critical.")
+            End Try
+            Application.DoEvents()
+            Static retryCount As Integer
+            retryCount += 1
+            If retryCount >= 5 Then
+                Console.WriteLine("A checkbox was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+                Exit While
+            End If
+        End While
+        Return Nothing
+    End Function
+    Private Function searchForms(opt As String, ByRef index As Integer)
+        While 1
+            Try
+                For Each frm In Application.OpenForms
+                    If frm.text.endswith(" Radio Buttons") Then
+                        For j = 0 To frm.check.count - 1
+                            If frm.check(j).text = opt Then
+                                index = j
+                                Return frm.check
+                            End If
+                        Next
+                    End If
+                Next
+            Catch ex As Exception
+                Console.WriteLine("findRadioForm failed.  The application list of forms changed while iterating.  Not critical.")
+            End Try
+            Application.DoEvents()
+            Static retryCount As Integer
+            retryCount += 1
+            If retryCount >= 5 Then
+                Console.WriteLine("A Radio button was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+                Exit While
+            End If
+        End While
+        Return Nothing
+    End Function
+    Public Function findRadio(opt As String) As RadioButton
+        Dim index As Integer
+        Dim radio = searchForms(opt, index)
+        If radio Is Nothing Then Return Nothing
+        Return radio(index)
+    End Function
+    Public Function findRadioText(ByRef radioList As List(Of RadioButton)) As String
+        For Each rad In radioList
+            If rad.Checked Then Return rad.Text
+        Next
+        Return radioList(0).Text
+    End Function
+    Public Function findRadioIndex(ByRef radioList As List(Of RadioButton)) As String
+        For i = 0 To radioList.Count - 1
+            If radioList(i).Checked Then Return i
+        Next
+        Return 0
+    End Function
     Public Function RebuildCells(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
         task.redCells.Clear()
         task.redCells.Add(New rcData)

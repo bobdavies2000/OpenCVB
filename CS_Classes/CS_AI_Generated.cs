@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using static CS_Classes.CSharp_Externs;
 using OpenCvSharp.XImgProc;
+using System.Security.Cryptography;
 
 namespace CS_Classes
 { 
@@ -2629,7 +2630,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
         public CSharp_Bin2Way_KMeans(VBtask task) : base(task)
         {
-            //FindSlider("KMeans k").Value = 2;
+            kmeans.km.options.setK(2);
             labels = new string[] { "", "", "Darkest (upper left), lightest (upper right)", "Selected image from dst2" };
             desc = "Use kmeans with each of the 2-way split images";
         }
@@ -3095,23 +3096,692 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 
+    public class CSharp_Bin4Way_Basics : CS_Parent
+    {
+        Mat_4to1 mats = new Mat_4to1();
+        Bin4Way_SplitMean binary = new Bin4Way_SplitMean();
+        Diff_Basics[] diff = new Diff_Basics[4];
+        private string[] labelStr = new string[4];
+        private Point[] points = new Point[4];
+        private int index = 0;
+        public CSharp_Bin4Way_Basics(VBtask task) : base(task)
+        {
+            if (standalone) task.gOptions.setDisplay1();
+            dst0 = new Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0));
+            for (int i = 0; i < diff.Length; i++)
+            {
+                diff[i] = new Diff_Basics();
+            }
+            labels = new string[] { "", "Quartiles for selected roi.  Click in dst1 to see different roi.", "4 brightness levels - darkest to lightest",
+                      "Quartiles for the selected grid element, darkest to lightest" };
+            desc = "Highlight the contours for each grid element with stats for each.";
+        }
+
+        public void Run(Mat src)
+        {
+            if (task.mousePicTag == 1) index = task.gridMap.At<int>(task.clickPoint.Y, task.clickPoint.X);
+            Rect roiSave = index < task.gridList.Count ? task.gridList[index] : new Rect();
+
+            if (task.optionsChanged) index = 0;
+
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            Mat[] matList = new Mat[4];
+            for (int i = 0; i < matList.Length; i++)
+            {
+                mats.mat[i] = new Mat(mats.mat[i].Size(), MatType.CV_8U, Scalar.All(0));
+                binary.mats.mat[i] = new Mat(binary.mats.mat[i].Size(), MatType.CV_8U, Scalar.All(0));
+            }
+
+            int quadrant;
+            binary.Run(src);
+            binary.mats.Run(new Mat());
+            dst2 = binary.mats.dst2;
+            dst1 = binary.mats.dst3 * 0.5;
+            matList = binary.mats.mat;
+            quadrant = binary.mats.quadrant;
+
+            dst0.SetTo(Scalar.All(0));
+            for (int i = 0; i < diff.Length; i++)
+            {
+                diff[i].Run(binary.mats.mat[i]);
+                dst0 = dst0 | diff[i].dst2;
+            }
+
+            int[,] counts = new int[4, task.gridList.Count];
+            List<List<int>> contourCounts = new List<List<int>>();
+            List<List<float>> means = new List<List<float>>();
+
+            Point[][] allContours;
+            for (int i = 0; i < counts.GetLength(0); i++)
+            {
+                for (int j = 0; j < task.gridList.Count; j++)
+                {
+                    Rect roi = task.gridList[j];
+                    Mat tmp = new Mat(matList[i], roi);
+                    Cv2.FindContours(tmp, out allContours, out _, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
+                    if (i == 0)
+                    {
+                        contourCounts.Add(new List<int>());
+                        means.Add(new List<float>());
+                    }
+                    contourCounts[j].Add(allContours.Length);
+                    means[j].Add((float)(src[roi].Mean(tmp)[0]));
+                    if (i == quadrant) setTrueText(allContours.Length.ToString(), roi.TopLeft, 1);
+                    counts[i, j] = allContours.Length;
+                }
+            }
+
+            int bump = 3;
+            double ratio = (double)dst2.Height / task.gridList[0].Height;
+            for (int i = 0; i < matList.Length; i++)
+            {
+                Mat tmp = new Mat(matList[i], roiSave) * 0.5;
+                int nextCount = Cv2.CountNonZero(tmp);
+                Mat tmpVolatile = new Mat(dst0, roiSave) & tmp;
+                tmp.SetTo(Scalar.All(255), tmpVolatile);
+                new Mat(dst0, roiSave).CopyTo(tmp, tmpVolatile);
+                Rect r = new Rect(0, 0, (int)(tmp.Width * ratio), (int)(tmp.Height * ratio));
+                mats.mat[i][r] = tmp.Resize(new Size(r.Width, r.Height));
+
+                if (task.heartBeat)
+                {
+                    int plus = mats.mat[i][r].Width / 2;
+
+                    if (i == 0) points[i] = new Point(bump + plus, bump);
+                    if (i == 1) points[i] = new Point(bump + dst2.Width / 2 + plus, bump);
+                    if (i == 2) points[i] = new Point(bump + plus, bump + dst2.Height / 2);
+                    if (i == 3) points[i] = new Point(bump + dst2.Width / 2 + plus, bump + dst2.Height / 2);
+                }
+            }
+
+            for (int i = 0; i < labelStr.Length; i++)
+            {
+                setTrueText(labelStr[i], points[i], 3);
+            }
+
+            mats.Run(src);
+            dst3 = mats.dst2;
+
+            dst1.Rectangle(roiSave, Scalar.White, task.lineWidth);
+            task.color.Rectangle(roiSave, Scalar.White, task.lineWidth);
+        }
+    }
 
 
 
+    public class CSharp_Bin4Way_Canny : CS_Parent
+    {
+        Edge_Canny edges = new Edge_Canny();
+        Bin4Way_SplitMean binary = new Bin4Way_SplitMean();
+        Mat_4Click mats = new Mat_4Click();
+
+        public CSharp_Bin4Way_Canny(VBtask task) : base(task)
+        {
+            labels[2] = "Edges between halves, lightest, darkest, and the combo";
+            desc = "Find edges from each of the binarized images";
+        }
+
+        public void Run(Mat src)
+        {
+            binary.Run(src);
+
+            edges.Run(binary.mats.mat[0]);  // the light and dark halves
+            mats.mat[0] = edges.dst2.Threshold(0, 255, ThresholdTypes.Binary);
+            mats.mat[3] = edges.dst2.Threshold(0, 255, ThresholdTypes.Binary);
+
+            edges.Run(binary.mats.mat[1]);  // the lightest of the light half
+            mats.mat[1] = edges.dst2.Threshold(0, 255, ThresholdTypes.Binary);
+            mats.mat[3] = mats.mat[1] | mats.mat[3];
+
+            edges.Run(binary.mats.mat[3]);  // the darkest of the dark half
+            mats.mat[2] = edges.dst2.Threshold(0, 255, ThresholdTypes.Binary);
+            mats.mat[3] = mats.mat[2] | mats.mat[3];
+
+            mats.Run(Mat.Zeros(src.Size(), MatType.CV_8UC1));
+            dst2 = mats.dst2;
+
+            if (mats.dst3.Channels() == 3)
+            {
+                labels[3] = "Combo of first 3 below.  Click quadrants in dst2.";
+                dst3 = mats.mat[3];
+            }
+            else
+            {
+                dst3 = mats.dst3;
+            }
+        }
+    }
+
+    public class CSharp_Bin4Way_Sobel : CS_Parent
+    {
+        Edge_Sobel_Old edges = new Edge_Sobel_Old();
+        Bin4Way_SplitMean binary = new Bin4Way_SplitMean();
+        public Mat_4Click mats = new Mat_4Click();
+
+        public CSharp_Bin4Way_Sobel(VBtask task) : base(task)
+        {
+            FindSlider("Sobel kernel Size").Value = 5;
+            labels[2] = "Edges between halves, lightest, darkest, and the combo";
+            labels[3] = "Click any quadrant in dst2 to view it in dst3";
+            desc = "Collect Sobel edges from binarized images";
+        }
+
+        public void Run(Mat src)
+        {
+            binary.Run(src);
+
+            edges.Run(binary.mats.mat[0]); // the light and dark halves
+            mats.mat[0] = edges.dst2.Threshold(0, 255, ThresholdTypes.Binary);
+            mats.mat[3] = edges.dst2.Threshold(0, 255, ThresholdTypes.Binary);
+
+            edges.Run(binary.mats.mat[1]); // the lightest of the light half
+            mats.mat[1] = edges.dst2.Threshold(0, 255, ThresholdTypes.Binary);
+            mats.mat[3] = mats.mat[1] | mats.mat[3];
+
+            edges.Run(binary.mats.mat[3]);  // the darkest of the dark half
+            mats.mat[2] = edges.dst2.Threshold(0, 255, ThresholdTypes.Binary);
+            mats.mat[3] = mats.mat[2] | mats.mat[3];
+
+            mats.Run(Mat.Zeros(src.Size(), MatType.CV_8UC1));
+            dst2 = mats.dst2;
+            dst3 = mats.dst3;
+        }
+    }
+
+    public class CSharp_Bin4Way_Unstable1 : CS_Parent
+    {
+        Bin4Way_SplitMean binary = new Bin4Way_SplitMean();
+        Diff_Basics diff = new Diff_Basics();
+
+        public CSharp_Bin4Way_Unstable1(VBtask task) : base(task)
+        {
+            desc = "Find the unstable pixels in the binary image";
+        }
+
+        public void Run(Mat src)
+        {
+            binary.Run(src);
+            dst2 = binary.dst2;
+            diff.Run(binary.dst3);
+            dst3 = diff.dst2;
+
+            if (task.heartBeat)
+            {
+                labels[3] = "There are " + dst3.CountNonZero().ToString() + " unstable pixels";
+            }
+        }
+    }
+
+    public class CSharp_Bin4Way_UnstableEdges : CS_Parent
+    {
+        Edge_Canny canny = new Edge_Canny();
+        Blur_Basics blur = new Blur_Basics();
+        Bin4Way_Unstable unstable = new Bin4Way_Unstable();
+
+        public CSharp_Bin4Way_UnstableEdges(VBtask task) : base(task)
+        {
+            if (standalone)
+            {
+                task.gOptions.setDisplay1();
+            }
+            desc = "Find unstable pixels but remove those that are also edges.";
+        }
+
+        public void Run(Mat src)
+        {
+            canny.Run(src);
+            blur.Run(canny.dst2);
+            dst1 = blur.dst2.Threshold(0, 255, ThresholdTypes.Binary);
+
+            unstable.Run(src);
+            dst2 = unstable.dst2;
+            dst3 = unstable.dst3;
+
+            if (!task.gOptions.debugChecked)
+            {
+                dst3.SetTo(0, dst1);
+            }
+        }
+    }
+
+
+    public class CSharp_Bin4Way_UnstablePixels : CS_Parent
+    {
+        Bin4Way_UnstableEdges unstable = new Bin4Way_UnstableEdges();
+        public List<byte> gapValues = new List<byte>();
+
+        public CSharp_Bin4Way_UnstablePixels(VBtask task) : base(task)
+        {
+            desc = "Identify the unstable grayscale pixel values ";
+        }
+
+        public void Run(Mat src)
+        {
+            if (src.Channels() != 1)
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+
+            unstable.Run(src);
+            dst2 = unstable.dst3;
+
+            var points = dst2.FindNonZero();
+            if (points.Rows == 0) return;
+
+            int[] pts = new int[points.Rows * 2];
+            Marshal.Copy(points.Data, pts, 0, pts.Length);
+
+            List<byte> pixels = new List<byte>();
+            SortedList<byte, int> pixelSort = new SortedList<byte, int>(new compareByte());
+            for (int i = 0; i < pts.Length; i += 2)
+            {
+                byte val = src.At<byte>(pts[i + 1], pts[i]);
+                if (!pixels.Contains(val))
+                {
+                    pixelSort.Add(val, 1);
+                    pixels.Add(val);
+                }
+            }
+
+            int gapThreshold = 2;
+            gapValues.Clear();
+            strOut = "These are the ranges of grayscale bytes where there is fuzziness.\n";
+            int lastIndex = 0, lastGap = 0;
+            foreach (var index in pixelSort.Keys)
+            {
+                if (Math.Abs(lastIndex - index) > gapThreshold)
+                {
+                    strOut += "\n";
+                    gapValues.Add((byte)((index + lastGap) / 2));
+                    lastGap = index;
+                    for (int i = index + 1; i < pixelSort.Keys.Count; i++)
+                    {
+                        if (pixelSort.Keys.ElementAt(i) - lastGap > gapThreshold) break;
+                        lastGap = i;
+                    }
+                }
+                strOut += index.ToString() + "\t";
+                lastIndex = index;
+            }
+            if (gapValues.Count < 4)
+            {
+                gapValues.Add((byte)((255 + lastGap) / 2));
+            }
+
+            strOut += "\n\nThe best thresholds for this image to avoid fuzziness are: \n";
+            foreach (var index in gapValues)
+            {
+                strOut += index.ToString() + "\t";
+            }
+            setTrueText(strOut, 3);
+            if (task.heartBeat) labels[3] = "There are " + dst2.CountNonZero().ToString() + " unstable pixels";
+        }
+    }
+
+    public class CSharp_Bin4Way_SplitValley : CS_Parent
+    {
+        Binarize_Simple binary = new Binarize_Simple();
+        HistValley_Basics valley = new HistValley_Basics();
+        public Mat_4Click mats = new Mat_4Click();
+
+        public CSharp_Bin4Way_SplitValley(VBtask task) : base(task)
+        {
+            labels[2] = "A 4-way split - darkest (upper left) to lightest (lower right)";
+            desc = "Binarize an image using the valleys provided by HistValley_Basics";
+        }
+
+        public void Run(Mat src)
+        {
+            Mat gray = src.Channels() == 1 ? src.Clone() : src.CvtColor(ColorConversionCodes.BGR2GRAY);
+
+            binary.Run(gray);
+            Mat mask = binary.dst2.Clone();
+
+            if (task.heartBeat) valley.Run(gray);
+
+            mats.mat[0] = gray.InRange(0, valley.valleys[1] - 1);
+            mats.mat[1] = gray.InRange(valley.valleys[1], valley.valleys[2] - 1);
+            mats.mat[2] = gray.InRange(valley.valleys[2], valley.valleys[3] - 1);
+            mats.mat[3] = gray.InRange(valley.valleys[3], 255);
+
+            mats.Run(Mat.Zeros(src.Size(), MatType.CV_8UC1));
+            dst2 = mats.dst2;
+            dst3 = mats.dst3;
+            labels[3] = mats.labels[3];
+        }
+    }
+
+    public class CSharp_Bin4Way_UnstablePixels1 : CS_Parent
+    {
+        Hist_Basics hist = new Hist_Basics();
+        Bin4Way_UnstableEdges unstable = new Bin4Way_UnstableEdges();
+        public List<byte> gapValues = new List<byte>();
+
+        public CSharp_Bin4Way_UnstablePixels1(VBtask task) : base(task)
+        {
+            task.gOptions.setHistogramBins(256);
+            desc = "Identify the unstable grayscale pixel values ";
+        }
+
+        public void Run(Mat src)
+        {
+            if (src.Channels() != 1)
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+
+            hist.Run(src);
+
+            unstable.Run(src);
+            dst2 = unstable.dst3;
+
+            var points = dst2.FindNonZero();
+            if (points.Rows == 0) return;
+
+            int[] pts = new int[points.Rows * 2];
+            Marshal.Copy(points.Data, pts, 0, pts.Length);
+
+            List<byte> pixels = new List<byte>();
+            SortedList<byte, int> pixelSort = new SortedList<byte, int>(new compareByte());
+            for (int i = 0; i < pts.Length; i += 2)
+            {
+                byte val = src.At<byte>(pts[i + 1], pts[i]);
+                if (!pixels.Contains(val))
+                {
+                    pixelSort.Add(val, 1);
+                    pixels.Add(val);
+                }
+            }
+
+            byte[] boundaries = new byte[5];
+            boundaries[0] = (byte)(0 * 255 / 4);
+            boundaries[1] = (byte)(1 * 255 / 4);
+            boundaries[2] = (byte)(2 * 255 / 4);
+            boundaries[3] = (byte)(3 * 255 / 4);
+            boundaries[4] = 255;
+
+            int gapThreshold = 2, lastIndex = 0, bIndex = 1;
+            strOut = "These are the ranges of grayscale bytes where there is fuzziness.\n";
+            for (int i = 0; i < pixelSort.Keys.Count; i++)
+            {
+                byte index = pixelSort.ElementAt(i).Key;
+                if (Math.Abs(lastIndex - index) > gapThreshold)
+                {
+                    strOut += "\n";
+                    if (bIndex < boundaries.Length)
+                    {
+                        boundaries[bIndex] = index;
+                        bIndex++;
+                    }
+                }
+                strOut += index.ToString() + "\t";
+                lastIndex = index;
+            }
+
+            gapValues.Clear();
+            for (int i = 1; i < boundaries.Length; i++)
+            {
+                byte minVal = byte.MaxValue;
+                int minIndex = 0;
+                for (int j = boundaries[i - 1]; j < boundaries[i]; j++)
+                {
+                    if (hist.histArray[j] < minVal)
+                    {
+                        minVal = (byte) hist.histArray[j];
+                        minIndex = j;
+                    }
+                }
+                gapValues.Add((byte)minIndex);
+            }
+            strOut += "\n\nThe best thresholds for this image to avoid fuzziness are: \n";
+            foreach (var index in gapValues)
+            {
+                strOut += index.ToString() + "\t";
+            }
+            setTrueText(strOut, 3);
+            if (task.heartBeat) labels[3] = "There are " + dst2.CountNonZero().ToString() + " unstable pixels";
+        }
+    }
 
 
 
+    public class CSharp_Bin4Way_Regions1 : CS_Parent
+    {
+        Binarize_Simple binary = new Binarize_Simple();
+        public Mat_4Click mats = new Mat_4Click();
+        public int classCount = 4; // 4-way split
+
+        public CSharp_Bin4Way_Regions1(VBtask task) : base(task)
+        {
+            labels[2] = "A 4-way split - darkest (upper left) to lightest (lower right)";
+            desc = "Binarize an image and split it into quartiles using peaks.";
+        }
+
+        public void Run(Mat src)
+        {
+            Mat gray = (src.Channels() == 1) ? src.Clone() : src.CvtColor(ColorConversionCodes.BGR2GRAY);
+
+            binary.Run(gray);
+            Mat mask = binary.dst2.Clone();
+
+            double midColor = binary.meanScalar[0];
+            double topColor = Cv2.Mean(gray, mask)[0];
+            double botColor = Cv2.Mean(gray, ~mask)[0];
+            mats.mat[0] = gray.InRange(0, botColor);
+            mats.mat[1] = gray.InRange(botColor, midColor);
+            mats.mat[2] = gray.InRange(midColor, topColor);
+            mats.mat[3] = gray.InRange(topColor, 255);
+
+            mats.Run(Mat.Zeros(dst1.Size(), MatType.CV_8U));
+            dst2 = mats.dst2;
+            dst3 = mats.dst3;
+            labels[3] = mats.labels[3];
+        }
+    }
 
 
+    public class CSharp_Bin4Way_SplitGaps : CS_Parent
+    {
+        Bin4Way_UnstablePixels unstable = new Bin4Way_UnstablePixels();
+        public Mat_4Click mats = new Mat_4Click();
+        Diff_Basics[] diff = new Diff_Basics[4];
+
+        public CSharp_Bin4Way_SplitGaps(VBtask task) : base(task)
+        {
+            for (int i = 0; i < diff.Length; i++)
+            {
+                diff[i] = new Diff_Basics();
+                mats.mat[i] = new Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0));
+            }
+            if (standalone) task.gOptions.setDisplay1();
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0));
+            labels[2] = "A 4-way split - darkest (upper left) to lightest (lower right)";
+            desc = "Separate the quartiles of the image using the fuzzy grayscale pixel values";
+        }
+
+        public void Run(Mat src)
+        {
+            Mat gray = (src.Channels() == 1) ? src.Clone() : src.CvtColor(ColorConversionCodes.BGR2GRAY);
+
+            unstable.Run(gray);
+
+            int lastVal = 255;
+            for (int i = Math.Min(mats.mat.Length, unstable.gapValues.Count) - 1; i >= 0; i--)
+            {
+                mats.mat[i] = gray.InRange(unstable.gapValues[i], lastVal);
+                lastVal = unstable.gapValues[i];
+            }
+
+            dst1.SetTo(Scalar.All(0));
+            for (int i = 0; i < diff.Length; i++)
+            {
+                diff[i].Run(mats.mat[i]);
+                dst1 = dst1 | diff[i].dst2;
+            }
+            mats.Run(Mat.Zeros(dst1.Size(), MatType.CV_8U));
+            dst2 = mats.dst2;
+            dst3 = mats.dst3;
+            if (task.heartBeat) labels[1] = "There are " + dst1.CountNonZero().ToString() + " unstable pixels";
+        }
+    }
+
+    public class CSharp_Bin4Way_RegionsLeftRight : CS_Parent
+    {
+        Bin4Way_SplitGaps binaryLeft = new Bin4Way_SplitGaps();
+        Bin4Way_SplitGaps binaryRight = new Bin4Way_SplitGaps();
+        public int classCount = 4; // 4-way split
+
+        public CSharp_Bin4Way_RegionsLeftRight(VBtask task) : base(task)
+        {
+            dst0 = new Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0));
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0));
+            labels = new string[] { "", "", "Left in 4 colors", "Right image in 4 colors" };
+            desc = "Add the 4-way split of left and right views.";
+        }
+
+        public void Run(Mat src)
+        {
+            binaryLeft.Run(src);
+
+            dst0.SetTo(Scalar.All(1), binaryLeft.mats.mat[0]);
+            dst0.SetTo(Scalar.All(2), binaryLeft.mats.mat[1]);
+            dst0.SetTo(Scalar.All(3), binaryLeft.mats.mat[2]);
+            dst0.SetTo(Scalar.All(4), binaryLeft.mats.mat[3]);
+
+            dst2 = ShowPalette((dst0 * 255 / classCount).ToMat());
+
+            binaryRight.Run(task.rightView);
+
+            dst1.SetTo(Scalar.All(1), binaryRight.mats.mat[0]);
+            dst1.SetTo(Scalar.All(2), binaryRight.mats.mat[1]);
+            dst1.SetTo(Scalar.All(3), binaryRight.mats.mat[2]);
+            dst1.SetTo(Scalar.All(4), binaryRight.mats.mat[3]);
+
+            dst3 = ShowPalette((dst1 * 255 / classCount).ToMat());
+        }
+    }
 
 
+    public class CSharp_Bin4Way_RedCloud : CS_Parent
+    {
+        Bin4Way_BasicsRed bin2 = new Bin4Way_BasicsRed();
+        Flood_BasicsMask flood = new Flood_BasicsMask();
+        Mat[] cellMaps = new Mat[4];
+        List<rcData>[] redCells = new List<rcData>[4];
+        Options_Bin2WayRedCloud options = new Options_Bin2WayRedCloud();
 
+        public CSharp_Bin4Way_RedCloud(VBtask task) : base(task)
+        {
+            flood.showSelected = false;
+            desc = "Identify the lightest and darkest regions separately and then combine the rcData.";
+        }
 
+        public void Run(Mat src)
+        {
+            options.RunVB();
 
+            if (task.optionsChanged)
+            {
+                for (int i = 0; i < redCells.Length; i++)
+                {
+                    redCells[i] = new List<rcData>();
+                    cellMaps[i] = new Mat(dst2.Size(), MatType.CV_8U, 0);
+                }
+            }
 
+            bin2.Run(src);
 
+            var sortedCells = new SortedList<int, rcData>(new compareAllowIdenticalIntegerInverted());
+            for (int i = options.startRegion; i <= options.endRegion; i++)
+            {
+                task.cellMap = cellMaps[i];
+                task.redCells = redCells[i];
+                flood.inputMask = ~bin2.mats.mat[i];
+                flood.Run(bin2.mats.mat[i]);
+                cellMaps[i] = task.cellMap.Clone();
+                redCells[i] = new List<rcData>(task.redCells);
+                foreach (var rc in task.redCells)
+                {
+                    if (rc.index == 0) continue;
+                    sortedCells.Add(rc.pixels, rc);
+                }
+            }
 
+            dst2 = RebuildCells(sortedCells);
 
+            if (task.heartBeat) labels[2] = $"{task.redCells.Count} cells were identified and matched to the previous image";
+        }
+    }
+
+    public class CSharp_Bin4Way_Regions : CS_Parent
+    {
+        Bin4Way_SplitMean binary = new Bin4Way_SplitMean();
+        public int classCount = 4; // 4-way split 
+
+        public CSharp_Bin4Way_Regions(VBtask task) : base(task)
+        {
+            rebuildMats();
+            labels = new string[] { "", "", "CV_8U version of dst3 with values ranging from 1 to 4", "Palettized version of dst2" };
+            desc = "Add the 4-way split of images to define the different regions.";
+        }
+
+        private void rebuildMats()
+        {
+            dst2 = new Mat(task.workingRes, MatType.CV_8U, 0);
+            for (int i = 0; i < binary.mats.mat.Count(); i++)
+            {
+                binary.mats.mat[i] = new Mat(task.workingRes, MatType.CV_8UC1, 0);
+            }
+        }
+
+        public void Run(Mat src)
+        {
+            binary.Run(src);
+            if (dst2.Width != binary.mats.mat[0].Width) rebuildMats();
+
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            dst2.SetTo(1, binary.mats.mat[0]);
+            dst2.SetTo(2, binary.mats.mat[1]);
+            dst2.SetTo(3, binary.mats.mat[2]);
+            dst2.SetTo(4, binary.mats.mat[3]);
+
+            dst3 = ShowPalette((dst2 * 255 / classCount).ToMat());
+        }
+    }
+
+    public class CSharp_Bin4Way_SplitMean : CS_Parent
+    {
+        public Binarize_Simple binary = new Binarize_Simple();
+        public Mat_4Click mats = new Mat_4Click();
+
+        public CSharp_Bin4Way_SplitMean(VBtask task) : base(task)
+        {
+            labels[2] = "A 4-way split - darkest (upper left) to lightest (lower right)";
+            desc = "Binarize an image and split it into quartiles using peaks.";
+        }
+
+        public void Run(Mat src)
+        {
+            Mat gray = src.Channels() == 1 ? src.Clone() : src.CvtColor(ColorConversionCodes.BGR2GRAY);
+
+            binary.Run(gray);
+            Mat mask = binary.dst2.Clone();
+
+            Scalar botColor = new Scalar(), midColor = new Scalar(), topColor = new Scalar();
+            if (task.heartBeat)
+            {
+                midColor = binary.meanScalar[0];
+                topColor = Cv2.Mean(gray, mask)[0];
+                botColor = Cv2.Mean(gray, ~mask)[0];
+            }
+
+            mats.mat[0] = gray.InRange(0, botColor);
+            mats.mat[1] = gray.InRange(botColor, midColor);
+            mats.mat[2] = gray.InRange(midColor, topColor);
+            mats.mat[3] = gray.InRange(topColor, 255);
+
+            mats.Run(Mat.Zeros(src.Size(), MatType.CV_8U));
+            dst2 = mats.dst2;
+            dst3 = mats.dst3;
+            labels[3] = mats.labels[3];
+        }
+    }
 
 
 

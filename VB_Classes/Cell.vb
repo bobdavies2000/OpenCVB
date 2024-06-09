@@ -83,7 +83,7 @@ End Class
 Public Class Cell_PixelCountCompare : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        task.gOptions.DebugCheckBox.Checked = True
+        task.gOptions.DebugChecked = True
         desc = "The rc.mask is filled and may completely contain depth pixels.  This alg finds cells that contain depth islands."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -98,7 +98,7 @@ Public Class Cell_PixelCountCompare : Inherits VB_Parent
                 If rc.pixels <> rc.depthPixels Then
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
                     Dim pt = New cv.Point(rc.maxDist.X - 10, rc.maxDist.Y)
-                    If task.gOptions.DebugCheckBox.Checked Then
+                    If task.gOptions.DebugChecked Then
                         strOut = CStr(rc.pixels) + "/" + CStr(rc.depthPixels)
                     Else
                         strOut = Format(rc.depthPixels / rc.pixels, "0%")

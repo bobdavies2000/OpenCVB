@@ -4524,6 +4524,9 @@ Public Class Options_Sobel : Inherits VB_Parent
             check.Box(1).Checked = True
         End If
     End Sub
+    Public Sub setKernelSize(size As Integer)
+        FindSlider("Sobel kernel Size").Value = size
+    End Sub
     Public Sub RunVB()
         Static thresholdSlider = FindSlider("Threshold to zero pixels below this value")
         Static ksizeSlider = FindSlider("Sobel kernel Size")

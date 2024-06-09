@@ -9,8 +9,8 @@ Public Class VBtask : Implements IDisposable
     Public TaskTimer As New System.Timers.Timer(1000)
     Public algoList As New AlgorithmList
 
-    Public algorithmObjectVB As Object
-    Public algorithmObjectCS As Object
+    Public vbAlgorithmObject As Object
+    Public csAlgorithmObject As Object
     Public frameCount As Integer = 0
     Public heartBeat As Boolean
     Public quarterBeat As Boolean
@@ -399,8 +399,8 @@ Public Class VBtask : Implements IDisposable
         activeObjects.Clear()
 
         If task.algName.StartsWith("CSharp_") = False Then
-            algorithmObjectVB = algoList.createVBAlgorithm(algName)
-            desc = algorithmObjectVB.desc
+            vbAlgorithmObject = algoList.createVBAlgorithm(algName)
+            desc = vbAlgorithmObject.desc
             firstPass = True
         End If
 
@@ -446,7 +446,7 @@ Public Class VBtask : Implements IDisposable
         End If
         TaskTimer.Enabled = False
         allOptions.Close()
-        If algorithmObjectVB IsNot Nothing Then algorithmObjectVB.Dispose()
+        If vbAlgorithmObject IsNot Nothing Then vbAlgorithmObject.Dispose()
     End Sub
     Public Sub trueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
         Dim str As New trueText(text, pt, picTag)
@@ -770,21 +770,21 @@ Public Class VBtask : Implements IDisposable
 
         'cMotion.Run(src)
         If task.algName.StartsWith("CSharp_") Then
-            algorithmObjectCS.trueData.clear()
-            algorithmObjectCS.Run(src.Clone)
+            csAlgorithmObject.trueData.clear()
+            csAlgorithmObject.Run(src.Clone)
 
-            task.labels = algorithmObjectCS.labels
+            task.labels = csAlgorithmObject.labels
 
-            dst0 = algorithmObjectCS.dst0
-            dst1 = algorithmObjectCS.dst1
-            dst2 = algorithmObjectCS.dst2
-            dst3 = algorithmObjectCS.dst3
+            dst0 = csAlgorithmObject.dst0
+            dst1 = csAlgorithmObject.dst1
+            dst2 = csAlgorithmObject.dst2
+            dst3 = csAlgorithmObject.dst3
 
-            For Each ttxt In algorithmObjectCS.trueData
+            For Each ttxt In csAlgorithmObject.trueData
                 task.trueData.Add(ttxt)
             Next
         Else
-            algorithmObjectVB.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
+            vbAlgorithmObject.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
         End If
 
         postProcess(src)

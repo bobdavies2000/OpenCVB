@@ -246,7 +246,7 @@ Partial Class OptionsGlobal
         Me.DebugCheckBox.Name = "DebugCheckBox"
         Me.DebugCheckBox.Size = New System.Drawing.Size(658, 35)
         Me.DebugCheckBox.TabIndex = 56
-        Me.DebugCheckBox.Text = "DebugCheckbox - task.gOptions.DebugCheckBox.checked - use anywhere as a toggle"
+        Me.DebugCheckBox.Text = "DebugCheckbox - task.gOptions.DebugChecked - use anywhere as a toggle"
         Me.DebugCheckBox.UseVisualStyleBackColor = True
         '
         'labelBinsCount

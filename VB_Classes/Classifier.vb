@@ -10,10 +10,10 @@ Public Class Classifier_Basics : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If task.optionsChanged Then task.gOptions.DebugCheckBox.Checked = True
+        If task.optionsChanged Then task.gOptions.DebugChecked = True
         Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, options.sampleCount, options.methodIndex, dst2.Rows, dst2.Cols,
-                                                    If(task.gOptions.DebugCheckBox.Checked, 1, 0))
-        task.gOptions.DebugCheckBox.Checked = False
+                                                    If(task.gOptions.DebugChecked, 1, 0))
+        task.gOptions.DebugChecked = False
         dst1 = New cv.Mat(dst0.Rows, dst0.Cols, cv.MatType.CV_32S, imagePtr)
 
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
@@ -89,10 +89,10 @@ Public Class Classifier_Bayesian : Inherits VB_Parent
         Else
             sampleCount = src.Rows
         End If
-        If task.optionsChanged Then task.gOptions.DebugCheckBox.Checked = True
+        If task.optionsChanged Then task.gOptions.DebugChecked = True
         Dim imagePtr = OEX_Points_Classifier_RunCPP(cPtr, sampleCount, methodIndex, dst2.Rows, dst2.Cols,
-                                                    If(task.gOptions.DebugCheckBox.Checked, 1, 0))
-        task.gOptions.DebugCheckBox.Checked = False
+                                                    If(task.gOptions.DebugChecked, 1, 0))
+        task.gOptions.DebugChecked = False
         dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, imagePtr)
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
         dst2 = ShowPalette(dst0 * 255 / 2)

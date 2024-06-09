@@ -483,8 +483,8 @@ Public Class Grid_TrackCenter : Inherits VB_Parent
         desc = "Track a cell near the center of the grid"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If match.correlation < match.options.correlationMin Or task.gOptions.DebugCheckBox.Checked Then
-            task.gOptions.DebugCheckBox.Checked = False
+        If match.correlation < match.options.correlationMin Or task.gOptions.DebugChecked Then
+            task.gOptions.DebugChecked = False
             Dim index = task.gridMap.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
             Dim roi = task.gridList(index)
             match.template = src(roi).Clone

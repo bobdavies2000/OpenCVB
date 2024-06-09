@@ -59,7 +59,7 @@ Public Class Bin4Way_Basics : Inherits VB_Parent
                     means.Add(New List(Of Single))
                 End If
                 contourCounts(j).Add(allContours.Count)
-                means(j).Add(src(roi).Mean(tmp).Item(0))
+                means(j).Add(src(roi).Mean(tmp)(0))
                 If i = quadrant Then setTrueText(CStr(allContours.Count), roi.TopLeft, 1)
                 counts(i, j) = allContours.Count
             Next
@@ -221,7 +221,7 @@ Public Class Bin4Way_UnstableEdges : Inherits VB_Parent
         dst2 = unstable.dst2
         dst3 = unstable.dst3
 
-        If task.gOptions.DebugCheckBox.Checked = False Then dst3.SetTo(0, dst1)
+        If task.gOptions.debugChecked = False Then dst3.SetTo(0, dst1)
     End Sub
 End Class
 
@@ -662,7 +662,7 @@ End Class
 
 
 
-Public Class Bin4Way_BasicsNew : Inherits VB_Parent
+Public Class Bin4Way_BasicsRed : Inherits VB_Parent
     Public mats As New Mat_4to1
     Dim bin4 As New Bin4Way_Basics
     Dim hist As New Hist_Basics
@@ -716,7 +716,7 @@ End Class
 
 
 Public Class Bin4Way_RedCloud : Inherits VB_Parent
-    Dim bin2 As New Bin4Way_BasicsNew
+    Dim bin2 As New Bin4Way_BasicsRed
     Dim flood As New Flood_BasicsMask
     Dim cellMaps(3) As cv.Mat, redCells(3) As List(Of rcData)
     Dim options As New Options_Bin2WayRedCloud

@@ -89,7 +89,7 @@ Public Class CPP_Basics : Inherits VB_Parent
         Dim handleInput = GCHandle.Alloc(inputImage, GCHandleType.Pinned)
         cppTask_RunCPP(cPtr, handleInput.AddrOfPinnedObject(), src.Channels, task.frameCount, dst2.Rows, dst2.Cols,
                        task.accRadians.X, task.accRadians.Y, task.accRadians.Z, task.optionsChanged, task.heartBeat,
-                       task.gOptions.displayDst0.Checked, task.gOptions.displayDst1.Checked, task.gOptions.DebugCheckBox.Checked)
+                       task.gOptions.displayDst0.Checked, task.gOptions.displayDst1.Checked, task.gOptions.DebugChecked)
         handleInput.Free()
         getOptions()
 
