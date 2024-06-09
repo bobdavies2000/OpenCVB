@@ -4379,6 +4379,184 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
     }
 
 
+    public class CSharp_BlurMotion_Basics : CS_Parent
+    {
+        public Mat kernel;
+        public Options_MotionBlur options = new Options_MotionBlur();
+
+        public CSharp_BlurMotion_Basics(VBtask task) : base(task)
+        {
+            desc = "Use Filter2D to create a motion blur";
+        }
+
+        public void Run(Mat src)
+        {
+            options.RunVB();
+
+            if (standaloneTest())
+            {
+                var blurSlider = FindSlider("Motion Blur Length");
+                var blurAngleSlider = FindSlider("Motion Blur Angle");
+                blurAngleSlider.Value = blurAngleSlider.Value < blurAngleSlider.Maximum ? blurAngleSlider.Value + 1 : blurAngleSlider.Minimum;
+            }
+
+            kernel = new Mat(options.kernelSize, options.kernelSize, MatType.CV_32F, Scalar.All(0));
+            var pt1 = new Point(0, (options.kernelSize - 1) / 2);
+            var pt2 = new Point(options.kernelSize * Math.Cos(options.theta) + pt1.X, options.kernelSize * Math.Sin(options.theta) + pt1.Y);
+            kernel.Line(pt1, pt2, new Scalar(1.0 / options.kernelSize));
+            dst2 = src.Filter2D(-1, kernel);
+
+            pt1 += new Point(src.Width / 2, src.Height / 2);
+            pt2 += new Point(src.Width / 2, src.Height / 2);
+
+            if (options.showDirection)
+            {
+                dst2.Line(pt1, pt2, Scalar.Yellow, task.lineWidth + 3, task.lineType);
+            }
+        }
+    }
+
+    // https://docs.opencv.org/trunk/d1/dfd/tutorial_motion_deblur_filter.html
+    public class CSharp_BlurMotion_Deblur : CS_Parent
+    {
+        private CSharp_BlurMotion_Basics mblur;
+
+        private Mat calcPSF(Size filterSize, int len, double theta)
+        {
+            var h = new Mat(filterSize, MatType.CV_32F, Scalar.All(0));
+            var pt = new Point(filterSize.Width / 2, filterSize.Height / 2);
+            h.Ellipse(pt, new Size(0, len / 2), 90 - theta, 0, 360, new Scalar(255), -1);
+            var summa = Cv2.Sum(h);
+            return h / summa[0];
+        }
+
+        private Mat calcWeinerFilter(Mat input_h_PSF, double nsr)
+        {
+            var h_PSF_shifted = fftShift(input_h_PSF);
+            var planes = new Mat[] { h_PSF_shifted.Clone(), new Mat(h_PSF_shifted.Size(), MatType.CV_32F, Scalar.All(0)) };
+            var complexI = new Mat();
+            Cv2.Merge(planes, complexI);
+            Cv2.Dft(complexI, complexI);
+            planes = Cv2.Split(complexI);
+            var denom = new Mat();
+            Cv2.Pow(Cv2.Abs(planes[0]), 2, denom);
+            denom += nsr;
+            var output_G = new Mat();
+            Cv2.Divide(planes[0], denom, output_G);
+            return output_G;
+        }
+
+        private Mat fftShift(Mat inputImg)
+        {
+            var outputImg = inputImg.Clone();
+            int cx = outputImg.Width / 2;
+            int cy = outputImg.Height / 2;
+            var q0 = new Mat(outputImg, new Rect(0, 0, cx, cy));
+            var q1 = new Mat(outputImg, new Rect(cx, 0, cx, cy));
+            var q2 = new Mat(outputImg, new Rect(0, cy, cx, cy));
+            var q3 = new Mat(outputImg, new Rect(cx, cy, cx, cy));
+            var tmp = q0.Clone();
+            q3.CopyTo(q0);
+            tmp.CopyTo(q3);
+            q1.CopyTo(tmp);
+            q2.CopyTo(q1);
+            tmp.CopyTo(q2);
+            return outputImg;
+        }
+
+        private Mat edgeTaper(Mat inputImg, double gamma, double beta)
+        {
+            int nx = inputImg.Width;
+            int ny = inputImg.Height;
+            var w1 = new Mat(1, nx, MatType.CV_32F, Scalar.All(0));
+            var w2 = new Mat(ny, 1, MatType.CV_32F, Scalar.All(0));
+
+            float dx = (float)(2.0 * Math.PI / nx);
+            float x = (float)-Math.PI;
+            for (int i = 0; i < nx; i++)
+            {
+                w1.Set<float>(0, i, 0.5f * (float)(Math.Tanh((x + gamma / 2) / beta) - Math.Tanh((x - gamma / 2) / beta)));
+                x += dx;
+            }
+
+            float dy = (float)(2.0 * Math.PI / ny);
+            float y = (float)-Math.PI;
+            for (int i = 0; i < ny; i++)
+            {
+                w2.Set<float>(i, 0, 0.5f * (float)(Math.Tanh((y + gamma / 2) / beta) - Math.Tanh((y - gamma / 2) / beta)));
+                y += dy;
+            }
+
+            var w = w2 * w1;
+            var outputImg = new Mat();
+            Cv2.Multiply(inputImg, w, outputImg);
+            return outputImg;
+        }
+
+        private Mat filter2DFreq(Mat inputImg, Mat H)
+        {
+            var planes = new Mat[] { inputImg.Clone(), new Mat(inputImg.Size(), MatType.CV_32F, Scalar.All(0)) };
+            var complexI = new Mat();
+            Cv2.Merge(planes, complexI);
+            Cv2.Dft(complexI, complexI, DftFlags.Scale);
+            var planesH = new Mat[] { H.Clone(), new Mat(H.Size(), MatType.CV_32F, Scalar.All(0)) };
+            var complexH = new Mat();
+            Cv2.Merge(planesH, complexH);
+            var complexIH = new Mat();
+            Cv2.MulSpectrums(complexI, complexH, complexIH, 0);
+            Cv2.Idft(complexIH, complexIH);
+            planes = Cv2.Split(complexIH);
+            return planes[0];
+        }
+
+        public CSharp_BlurMotion_Deblur(VBtask task) : base(task)
+        {
+            mblur = new CSharp_BlurMotion_Basics(task);
+            desc = "Deblur a motion blurred image";
+            labels[2] = "Blurred Image Input";
+            labels[3] = "Deblurred Image Output";
+        }
+
+        public void Run(Mat src)
+        {
+            mblur.options.RunVB();
+
+            if (task.heartBeat)
+            {
+                mblur.options.redoCheckBox.Checked = true;
+            }
+
+            if (mblur.options.redoCheckBox.Checked)
+            {
+                mblur.Run(src);
+                mblur.options.showDirection = false;
+                mblur.options.redoCheckBox.Checked = false;
+            }
+            else
+            {
+                mblur.Run(src);
+            }
+
+            dst2 = mblur.dst2;
+            double beta = 0.2;
+
+            int width = src.Width;
+            int height = src.Height;
+            var roi = new Rect(0, 0, width % 2 == 0 ? width : width - 1, height % 2 == 0 ? height : height - 1);
+
+            var h = calcPSF(roi.Size, mblur.options.restoreLen, mblur.options.theta);
+            var hW = calcWeinerFilter(h, 1.0 / mblur.options.SNR);
+
+            var gray8u = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+            var imgIn = new Mat();
+            gray8u.ConvertTo(imgIn, MatType.CV_32F);
+            imgIn = edgeTaper(imgIn, mblur.options.gamma, beta);
+
+            var imgOut = filter2DFreq(imgIn[roi], hW);
+            imgOut.ConvertTo(dst3, MatType.CV_8U);
+            dst3.Normalize(0, 255, NormTypes.MinMax);
+        }
+    }
 
 
 

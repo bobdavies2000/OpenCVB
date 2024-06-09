@@ -124,6 +124,8 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_Blur_Median") return new CSharp_Blur_Median(task);
 			if (algorithmName == "CSharp_Blur_PlusHistogram") return new CSharp_Blur_PlusHistogram(task);
 			if (algorithmName == "CSharp_Blur_TopoMap") return new CSharp_Blur_TopoMap(task);
+			if (algorithmName == "CSharp_BlurMotion_Basics") return new CSharp_BlurMotion_Basics(task);
+			if (algorithmName == "CSharp_BlurMotion_Deblur") return new CSharp_BlurMotion_Deblur(task);
 			if (algorithmName == "CSharp_Diff_Basics") return new CSharp_Diff_Basics(task);
 			if (algorithmName == "CSharp_Line_Basics") return new CSharp_Line_Basics(task);
 			if (algorithmName == "CSharp_Random_Basics") return new CSharp_Random_Basics(task);
