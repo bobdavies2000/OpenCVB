@@ -126,6 +126,11 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_Blur_TopoMap") return new CSharp_Blur_TopoMap(task);
 			if (algorithmName == "CSharp_BlurMotion_Basics") return new CSharp_BlurMotion_Basics(task);
 			if (algorithmName == "CSharp_BlurMotion_Deblur") return new CSharp_BlurMotion_Deblur(task);
+			if (algorithmName == "CSharp_Boundary_Basics") return new CSharp_Boundary_Basics(task);
+			if (algorithmName == "CSharp_Boundary_Overlap") return new CSharp_Boundary_Overlap(task);
+			if (algorithmName == "CSharp_Boundary_Rectangles") return new CSharp_Boundary_Rectangles(task);
+			if (algorithmName == "CSharp_Boundary_RemovedRects") return new CSharp_Boundary_RemovedRects(task);
+			if (algorithmName == "CSharp_Boundary_Tiers") return new CSharp_Boundary_Tiers(task);
 			if (algorithmName == "CSharp_Diff_Basics") return new CSharp_Diff_Basics(task);
 			if (algorithmName == "CSharp_Line_Basics") return new CSharp_Line_Basics(task);
 			if (algorithmName == "CSharp_Random_Basics") return new CSharp_Random_Basics(task);

@@ -4953,3 +4953,20 @@ Public Class Options_BlurTopo : Inherits VB_Parent
         kernelSize = CInt(nextPercent / 100 * dst2.Width) Or 1
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_BoundaryRect : Inherits VB_Parent
+    Public percentRect As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired percent of rectangles", 0, 100, 25)
+    End Sub
+    Public Sub RunVB()
+        Static percentSlider = FindSlider("Desired percent of rectangles")
+        percentRect = percentSlider.value / 100
+    End Sub
+End Class
+

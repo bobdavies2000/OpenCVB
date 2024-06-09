@@ -47,6 +47,25 @@ namespace CS_Classes
 
             controls = new Controls_Basics();
         }
+        public List<Point> ContourBuild(Mat mask, ContourApproximationModes approxMode)
+        {
+            Point[][] allContours;
+            Cv2.FindContours(mask, out allContours, out _, RetrievalModes.External, approxMode);
+
+            int maxCount = 0, maxIndex = 0;
+            for (int i = 0; i < allContours.Length; i++)
+            {
+                int len = allContours[i].Length;
+                if (len > maxCount)
+                {
+                    maxCount = len;
+                    maxIndex = i;
+                }
+            }
+            if (allContours.Length > 0)
+                return new List<Point>(allContours[maxIndex].ToList());
+            return new List<Point>();
+        }
         public Mat GetNormalize32f(Mat input)
         {
             Mat outMat = new Mat();

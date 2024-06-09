@@ -6,7 +6,7 @@ Public Class Boundary_Basics : Inherits VB_Parent
     Public contours As New List(Of List(Of cv.Point))
     Public runRedCPP As Boolean = True
     Public Sub New()
-        task.redOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
+        task.redOptions.setColorSource("Bin4Way_Regions")
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Create a mask of the RedCloud cell boundaries"
     End Sub
@@ -87,13 +87,12 @@ Public Class Boundary_Rectangles : Inherits VB_Parent
     Public rects As New List(Of cv.Rect)
     Public smallRects As New List(Of cv.Rect)
     Public smallContours As New List(Of List(Of cv.Point))
+    Dim options As New Options_BoundaryRect
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired percent of rectangles", 0, 100, 25)
         desc = "Build the boundaries for redCells and remove interior rectangles"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static percentSlider = FindSlider("Desired percent of rectangles")
-        Dim percentRect = percentSlider.value / 100
+        options.RunVB()
 
         bounds.Run(src)
 
@@ -106,10 +105,10 @@ Public Class Boundary_Rectangles : Inherits VB_Parent
         rects.Clear()
         smallRects.Clear()
         smallContours.Clear()
-        For i = 0 To bounds.rects.Count * percentRect - 1
+        For i = 0 To bounds.rects.Count * options.percentRect - 1
             rects.Add(bounds.rects(i))
         Next
-        For i = bounds.rects.Count - 1 To CInt(bounds.rects.Count * percentRect) Step -1
+        For i = bounds.rects.Count - 1 To CInt(bounds.rects.Count * options.percentRect) Step -1
             Dim r = bounds.rects(i)
             Dim contained As Boolean = False
             For Each rect In bounds.rects

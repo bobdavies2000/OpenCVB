@@ -4560,7 +4560,233 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 
+    public class CSharp_Boundary_Basics : CS_Parent
+    {
+        public RedCloud_CPP redCPP = new RedCloud_CPP();
+        public List<Rect> rects = new List<Rect>();
+        public List<Mat> masks = new List<Mat>();
+        public List<List<Point>> contours = new List<List<Point>>();
+        public bool runRedCPP = true;
+        private Color8U_Basics cvt;
+        private RedCloud_Reduce prep;
+        private GuidedBP_Depth guided;
 
+        public CSharp_Boundary_Basics(VBtask task) : base(task)
+        {
+            cvt = new Color8U_Basics();
+            prep = new RedCloud_Reduce();
+            guided = new GuidedBP_Depth();
+            task.redOptions.setColorSource("Bin4Way_Regions");
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Create a mask of the RedCloud cell boundaries";
+        }
+
+        public void Run(Mat src)
+        {
+            if (src.Channels() != 1)
+            {
+                if (task.redOptions.useColorOnlyChecked)
+                {
+                    cvt.Run(src);
+                    dst1 = cvt.dst2;
+                }
+                else if (task.redOptions.useDepthChecked)
+                {
+                    prep.Run(src);
+                    dst1 = prep.dst2;
+                }
+                else
+                {
+                    guided.Run(src);
+                    dst1 = guided.dst2;
+                }
+            }
+
+            if (runRedCPP)
+            {
+                redCPP.Run(dst1);
+
+                dst2.SetTo(0);
+                rects.Clear();
+                masks.Clear();
+                contours.Clear();
+                for (int i = 1; i < redCPP.classCount; i++)
+                {
+                    var rect = redCPP.rectList[i - 1];
+                    var mask = redCPP.dst2[rect].InRange(i, i);
+                    var contour = ContourBuild(mask, ContourApproximationModes.ApproxNone);
+                    DrawContour(dst2[rect], contour, 255, task.lineWidth);
+                    rects.Add(rect);
+                    masks.Add(mask);
+                    contours.Add(contour);
+                }
+
+                labels[2] = $"{redCPP.classCount} cells were found.";
+            }
+        }
+    }
+
+    public class CSharp_Boundary_Tiers : CS_Parent
+    {
+        Boundary_Basics cells = new Boundary_Basics();
+        Contour_DepthTiers contours = new Contour_DepthTiers();
+
+        public CSharp_Boundary_Tiers(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Add the depth tiers to the cell boundaries";
+        }
+
+        public void Run(Mat src)
+        {
+            cells.Run(src);
+            dst3 = cells.dst2;
+
+            contours.Run(src);
+            dst2.SetTo(0);
+            foreach (var tour in contours.contourlist)
+            {
+                DrawContour(dst2, tour.ToList(), 255, 2);
+            }
+            labels[2] = $"{contours.contourlist.Count} depth tiers were found.";
+            labels[3] = cells.labels[2];
+        }
+    }
+
+    public class CSharp_Boundary_Rectangles : CS_Parent
+    {
+        public Boundary_Basics bounds = new Boundary_Basics();
+        public List<Rect> rects = new List<Rect>();
+        public List<Rect> smallRects = new List<Rect>();
+        public List<List<Point>> smallContours = new List<List<Point>>();
+        public Options_BoundaryRect options = new Options_BoundaryRect();
+        public CSharp_Boundary_Rectangles(VBtask task) : base(task)
+        {
+            desc = "Build the boundaries for redCells and remove interior rectangles";
+        }
+
+        public void Run(Mat src)
+        {
+            options.RunVB();
+
+            bounds.Run(src);
+
+            dst2.SetTo(0);
+            foreach (var r in bounds.rects)
+            {
+                dst2.Rectangle(r, task.highlightColor, task.lineWidth);
+            }
+            labels[2] = $"{bounds.rects.Count} rectangles before contain test";
+
+            rects.Clear();
+            smallRects.Clear();
+            smallContours.Clear();
+            for (int i = 0; i < bounds.rects.Count * options.percentRect; i++)
+            {
+                rects.Add(bounds.rects[i]);
+            }
+            for (int i = bounds.rects.Count - 1; i >= (int)(bounds.rects.Count * options.percentRect); i--)
+            {
+                var r = bounds.rects[i];
+                bool contained = false;
+                foreach (var rect in bounds.rects)
+                {
+                    if (r == rect) continue;
+                    if (rect.Contains(r))
+                    {
+                        contained = true;
+                        break;
+                    }
+                }
+
+                if (contained)
+                {
+                    smallContours.Add(bounds.contours[i]);
+                    smallRects.Add(r);
+                }
+                else
+                {
+                    rects.Add(r);
+                }
+            }
+
+            dst3.SetTo(0);
+            foreach (var r in rects)
+            {
+                dst3.Rectangle(r, task.highlightColor, task.lineWidth);
+            }
+            labels[3] = $"{rects.Count} rectangles after contain test";
+        }
+    }
+
+    public class CSharp_Boundary_RemovedRects : CS_Parent
+    {
+        public Boundary_Rectangles bRects = new Boundary_Rectangles();
+
+        public CSharp_Boundary_RemovedRects(VBtask task) : base(task)
+        {
+            if (standalone) task.gOptions.setDisplay1();
+            desc = "Build the boundaries for redCells and remove interior rectangles";
+        }
+
+        public void Run(Mat src)
+        {
+            bRects.Run(src);
+            dst2 = bRects.bounds.dst2.Clone();
+            dst3 = bRects.dst2;
+            dst1 = bRects.dst3;
+            labels[3] = $"{bRects.bounds.rects.Count} cells before contain test";
+
+            for (int i = 0; i < bRects.smallRects.Count; i++)
+            {
+                DrawContour(dst2[bRects.smallRects[i]], bRects.smallContours[i], Scalar.Black, task.lineWidth);
+            }
+            labels[1] = labels[2];
+            labels[2] = $"{bRects.bounds.rects.Count - bRects.smallRects.Count} cells after contain test";
+        }
+    }
+
+    public class CSharp_Boundary_Overlap : CS_Parent
+    {
+        Boundary_Basics bounds = new Boundary_Basics();
+
+        public CSharp_Boundary_Overlap(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst1.Size(), MatType.CV_8U, 0);
+            desc = "Determine if 2 contours overlap";
+        }
+
+        public void Run(Mat src)
+        {
+            bounds.Run(src);
+            dst3 = bounds.dst2;
+            bool overlapping = false;
+            for (int i = 0; i < bounds.contours.Count; i++)
+            {
+                var tour = bounds.contours[i];
+                var rect = bounds.rects[i];
+                for (int j = i + 1; j < bounds.contours.Count; j++)
+                {
+                    var r = bounds.rects[j];
+                    if (r.IntersectsWith(rect))
+                    {
+                        dst2.SetTo(0);
+                        int c1 = tour.Count;
+                        int c2 = bounds.contours[j].Count;
+                        DrawContour(dst2[rect], tour, 127, task.lineWidth);
+                        DrawContour(dst2[r], bounds.contours[j], 255, task.lineWidth);
+                        int count = dst2.CountNonZero();
+                        if (count != c1 + c2)
+                        {
+                            overlapping = true;
+                            break;
+                        }
+                    }
+                }
+                if (overlapping) break;
+            }
+        }
+    }
 
 
 

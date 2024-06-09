@@ -22,6 +22,7 @@ Public Class OptionsRedCloud
     Public histBinList() As Integer
     Public useNaturalColor As Boolean
     Public useColorOnlyChecked As Boolean
+    Public useDepthChecked As Boolean
     Public identifyCount As Integer
     Public histBins3D As Integer
     Dim colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions", "Binarize_DepthTiers", "FeatureLess_Groups", "Hist3DColor_Basics",
@@ -285,6 +286,7 @@ Public Class OptionsRedCloud
     End Sub
     Private Sub UseDepth_CheckedChanged(sender As Object, e As EventArgs) Handles UseDepth.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
+        useDepthChecked = UseDepth.Checked
     End Sub
     Private Sub UseColor_CheckedChanged(sender As Object, e As EventArgs) Handles UseColorOnly.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
@@ -332,4 +334,8 @@ Public Class OptionsRedCloud
     Public Sub checkBitReduction(newVal As Boolean)
         BitwiseReduction.Checked = newVal
     End Sub
+    Public Sub setColorSource(source As String)
+        task.redOptions.ColorSource.SelectedItem() = source
+    End Sub
+
 End Class
