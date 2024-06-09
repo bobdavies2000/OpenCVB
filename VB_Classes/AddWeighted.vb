@@ -14,8 +14,8 @@ Public Class AddWeighted_Basics : Inherits VB_Parent
         If standaloneTest() Or src2 Is Nothing Then srcPlus = task.depthRGB
         If srcPlus.Type <> src.Type Then
             If src.Type <> cv.MatType.CV_8UC3 Or srcPlus.Type <> cv.MatType.CV_8UC3 Then
-                If src.Type = cv.MatType.CV_32FC1 Then src = vbNormalize32f(src)
-                If srcPlus.Type = cv.MatType.CV_32FC1 Then srcPlus = vbNormalize32f(srcPlus)
+                If src.Type = cv.MatType.CV_32FC1 Then src = GetNormalize32f(src)
+                If srcPlus.Type = cv.MatType.CV_32FC1 Then srcPlus = GetNormalize32f(srcPlus)
                 If src.Type <> cv.MatType.CV_8UC3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 If srcPlus.Type <> cv.MatType.CV_8UC3 Then srcPlus = srcPlus.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             End If

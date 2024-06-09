@@ -4896,3 +4896,26 @@ Public Class Options_PNGCompression : Inherits VB_Parent
         compression = compressionSlider.value
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_Binarize : Inherits VB_Parent
+    Public binarizeLabel As String
+    Public Sub New()
+        If radio.Setup(traceName) Then
+            radio.addRadio("Binary")
+            radio.addRadio("Binary + OTSU")
+            radio.addRadio("OTSU")
+            radio.addRadio("OTSU + Blur")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static frm = findfrm(traceName + " Radio Buttons")
+        For i = 0 To frm.check.Count - 1
+            If frm.check(i).Checked Then binarizeLabel = radio.check(i).Text
+        Next
+    End Sub
+End Class

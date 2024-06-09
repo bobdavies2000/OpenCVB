@@ -103,6 +103,14 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_Bin4Way_UnstableEdges") return new CSharp_Bin4Way_UnstableEdges(task);
 			if (algorithmName == "CSharp_Bin4Way_UnstablePixels") return new CSharp_Bin4Way_UnstablePixels(task);
 			if (algorithmName == "CSharp_Bin4Way_UnstablePixels1") return new CSharp_Bin4Way_UnstablePixels1(task);
+			if (algorithmName == "CSharp_Binarize_Basics") return new CSharp_Binarize_Basics(task);
+			if (algorithmName == "CSharp_Binarize_Bernson_MT") return new CSharp_Binarize_Bernson_MT(task);
+			if (algorithmName == "CSharp_Binarize_DepthTiers") return new CSharp_Binarize_DepthTiers(task);
+			if (algorithmName == "CSharp_Binarize_FourPixelFlips") return new CSharp_Binarize_FourPixelFlips(task);
+			if (algorithmName == "CSharp_Binarize_KMeansMasks") return new CSharp_Binarize_KMeansMasks(task);
+			if (algorithmName == "CSharp_Binarize_KMeansRGB") return new CSharp_Binarize_KMeansRGB(task);
+			if (algorithmName == "CSharp_Binarize_OTSU") return new CSharp_Binarize_OTSU(task);
+			if (algorithmName == "CSharp_Binarize_Simple") return new CSharp_Binarize_Simple(task);
 			if (algorithmName == "CSharp_Diff_Basics") return new CSharp_Diff_Basics(task);
 			if (algorithmName == "CSharp_Line_Basics") return new CSharp_Line_Basics(task);
 			if (algorithmName == "CSharp_Random_Basics") return new CSharp_Random_Basics(task);

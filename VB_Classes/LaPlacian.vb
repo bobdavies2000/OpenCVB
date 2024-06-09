@@ -71,19 +71,19 @@ Public Class Laplacian_PyramidFilter : Inherits VB_Parent
         desc = "VB.Net version of the Laplacian Pyramid Filter - see reference."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        ' this usage of sliders.trackbar(x) is OK as long as this algorithm is not reused in multiple places (which it isn't)
-        Dim levelMat(sliders.trackbar.Count - 1) As cv.Mat
+        ' this usage of sliders.mytrackbars(x) is OK as long as this algorithm is not reused in multiple places (which it isn't)
+        Dim levelMat(sliders.mytrackbars.Count - 1) As cv.Mat
         Dim img As New cv.Mat
         src.ConvertTo(img, cv.MatType.CV_32F)
-        For i = 0 To sliders.trackbar.Count - 2
+        For i = 0 To sliders.mytrackbars.Count - 2
             Dim nextImg = img.PyrDown()
-            levelMat(i) = (img - nextImg.PyrUp(img.Size)) * sliders.trackbar(i).Value
+            levelMat(i) = (img - nextImg.PyrUp(img.Size)) * sliders.mytrackbars(i).Value
             img = nextImg
         Next
-        levelMat(sliders.trackbar.Count - 1) = img * sliders.trackbar(sliders.trackbar.Count - 1).Value
+        levelMat(sliders.mytrackbars.Count - 1) = img * sliders.mytrackbars(sliders.mytrackbars.Count - 1).Value
 
-        img = levelMat(sliders.trackbar.Count - 1)
-        For i = sliders.trackbar.Count - 1 To 1 Step -1
+        img = levelMat(sliders.mytrackbars.Count - 1)
+        For i = sliders.mytrackbars.Count - 1 To 1 Step -1
             img = img.PyrUp(levelMat(i - 1).Size)
             img += levelMat(i - 1)
         Next

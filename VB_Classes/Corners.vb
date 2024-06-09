@@ -148,7 +148,7 @@ Public Class Corners_ShiTomasi_CPP : Inherits VB_Parent
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr).Clone
 
-        dst3 = vbNormalize32f(dst2)
+        dst3 = GetNormalize32f(dst2)
         dst3 = dst3.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
@@ -177,7 +177,7 @@ Public Class Corners_BasicsCentroid : Inherits VB_Parent
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
             kalman.Run(src)
-            DrawCircle(dst3,New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red)
+            DrawCircle(dst3, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red)
         End If
     End Sub
 End Class
@@ -248,7 +248,7 @@ Public Class Corners_BasicsCentroids : Inherits VB_Parent
         Next
 
         For i = 0 To fastCenters.Count - 1
-            DrawCircle(dst2,fastCenters(i), task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst2, fastCenters(i), task.dotSize, cv.Scalar.Yellow)
         Next
         dst2.SetTo(cv.Scalar.White, task.gridMask)
     End Sub
@@ -282,7 +282,7 @@ Public Class Corners_Harris_CPP : Inherits VB_Parent
         handleSrc.Free()
 
         Dim gray32f = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr)
-        '  gray32f = vbNormalize32f(gray32f)
+        '  gray32f = GetNormalize32f(gray32f)
         gray32f.ConvertTo(dst2, cv.MatType.CV_8U)
         addw.src2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         addw.Run(task.color)

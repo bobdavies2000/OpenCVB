@@ -40,30 +40,21 @@ End Class
 'https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
 Public Class Binarize_OTSU : Inherits VB_Parent
     Dim binarize As Binarize_Basics
+    Dim options As New Options_Binarize
     Public Sub New()
         binarize = New Binarize_Basics()
-
-        If radio.Setup(traceName) Then
-            radio.addRadio("Binary")
-            radio.addRadio("Binary + OTSU")
-            radio.addRadio("OTSU")
-            radio.addRadio("OTSU + Blur")
-            radio.check(0).Checked = True
-        End If
 
         labels(2) = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"
         labels(3) = "Histograms correspond to images on the left"
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         binarize.meanScalar = cv.Cv2.Mean(input)
-        Static frm = findfrm(traceName + " Radio Buttons")
-        For i = 0 To frm.check.Count - 1
-            If frm.check(i).Checked Then labels(2) = radio.check(i).Text
-        Next
 
         binarize.useBlur = False
         Select Case labels(2)

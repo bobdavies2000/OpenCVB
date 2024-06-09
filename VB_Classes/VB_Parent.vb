@@ -88,13 +88,8 @@ Public Class VB_Parent : Implements IDisposable
         Try
             For Each frm In Application.OpenForms
                 If frm.text.endswith(" Sliders") Then
-                    'Dim controls = frm.Controls
-                    'For Each ctl In controls
-                    '    Dim j = controls.indexof(ctl)
-                    '    If ctl.text.startswith(opt) Then Return frm.trackbar(j)
-                    'Next
-                    For j = 0 To frm.trackbar.Count - 1
-                        If frm.sLabels(j).text.startswith(opt) Then Return frm.trackbar(j)
+                    For j = 0 To frm.myTrackbars.Count - 1
+                        If frm.myLabels(j).text.startswith(opt) Then Return frm.myTrackbars(j)
                     Next
                 End If
             Next

@@ -308,6 +308,7 @@ Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	if algorithmName = "Contour_WholeImage" Then return new Contour_WholeImage
 	if algorithmName = "Contrast_Basics" Then return new Contrast_Basics
 	if algorithmName = "Contrast_POW" Then return new Contrast_POW
+	if algorithmName = "Controls_Basics" Then return new Controls_Basics
 	if algorithmName = "Convex_Basics" Then return new Convex_Basics
 	if algorithmName = "Convex_Defects" Then return new Convex_Defects
 	if algorithmName = "Convex_RedCloud" Then return new Convex_RedCloud
@@ -1315,6 +1316,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(functionN
 	if algorithmName = "Options_BGSubtractSynthetic" Then return new Options_BGSubtractSynthetic
 	if algorithmName = "Options_Bin2WayRedCloud" Then return new Options_Bin2WayRedCloud
 	if algorithmName = "Options_Bin3WayRedCloud" Then return new Options_Bin3WayRedCloud
+	if algorithmName = "Options_Binarize" Then return new Options_Binarize
 	if algorithmName = "Options_BinarizeNiBlack" Then return new Options_BinarizeNiBlack
 	if algorithmName = "Options_BlockMatching" Then return new Options_BlockMatching
 	if algorithmName = "Options_Blur" Then return new Options_Blur

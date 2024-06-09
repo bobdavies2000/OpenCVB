@@ -1,8 +1,8 @@
 ﻿Imports System.Windows.Forms
 Imports System.Drawing
 Public Class OptionsSliders
-    Public trackbar As New List(Of TrackBar)
-    Public sLabels As New List(Of Label)
+    Public mytrackbars As New List(Of TrackBar)
+    Public myLabels As New List(Of Label)
     Dim defaultHeight = 400
     Dim groups As New List(Of FlowLayoutPanel)
     Dim defaultWidth = 600
@@ -26,33 +26,33 @@ Public Class OptionsSliders
         grp.Width = Me.Width + 10
         grp.Height = 50
 
-        Dim index = sLabels.Count
-        sLabels.Add(New Label)
-        sLabels(index).AutoSize = False
-        sLabels(index).Width = 100
-        sLabels(index).Height = 50
-        grp.Controls.Add(sLabels(index))
+        Dim index = myLabels.Count
+        myLabels.Add(New Label)
+        myLabels(index).AutoSize = False
+        myLabels(index).Width = 100
+        myLabels(index).Height = 50
+        grp.Controls.Add(myLabels(index))
 
-        trackbar.Add(New TrackBar)
-        trackbar(index).Width = 350
-        trackbar(index).Tag = index
-        trackbar(index).Visible = False
-        trackbar(index).Minimum = min
-        trackbar(index).Maximum = max
-        trackbar(index).Value = If(value >= min And value <= max, value, (max - min) / 2)
-        trackbar(index).Visible = True
-        AddHandler trackbar(index).ValueChanged, AddressOf TrackBar_ValueChanged
-        grp.Controls.Add(trackbar(index))
+        mytrackbars.Add(New TrackBar)
+        mytrackbars(index).Width = 350
+        mytrackbars(index).Tag = index
+        mytrackbars(index).Visible = False
+        mytrackbars(index).Minimum = min
+        mytrackbars(index).Maximum = max
+        mytrackbars(index).Value = If(value >= min And value <= max, value, (max - min) / 2)
+        mytrackbars(index).Visible = True
+        AddHandler mytrackbars(index).ValueChanged, AddressOf TrackBar_ValueChanged
+        grp.Controls.Add(mytrackbars(index))
 
-        sLabels(index).Text = labelStr + " = " + CStr(trackbar(index).Value)
-        sLabels(index).Visible = True
+        myLabels(index).Text = labelStr + " = " + CStr(mytrackbars(index).Value)
+        myLabels(index).Visible = True
         FlowLayoutPanel1.AutoScroll = If(index > 3, True, False)
         FlowLayoutPanel1.Controls.Add(grp)
     End Sub
     Private Sub TrackBar_ValueChanged(sender As Object, e As EventArgs)
-        Dim outStr = sLabels(sender.tag).Text
+        Dim outStr = myLabels(sender.tag).Text
         Dim split = outStr.Split("=")
-        sLabels(sender.tag).Text = split(0) + "= " + CStr(trackbar(sender.tag).Value)
+        myLabels(sender.tag).Text = split(0) + "= " + CStr(mytrackbars(sender.tag).Value)
         task.optionsChanged = True
     End Sub
     Private Sub OptionsSliders_Load(sender As Object, e As EventArgs) Handles MyBase.Load

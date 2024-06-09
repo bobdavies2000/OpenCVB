@@ -764,7 +764,7 @@ End Class
 
 Public Class Bin4Way_Regions : Inherits VB_Parent
     Dim binary As New Bin4Way_SplitMean
-    Public classCount = 4 ' 4-way split 
+    Public classCount As Integer = 4 ' 4-way split 
     Public Sub New()
         rebuildMats()
         labels = {"", "", "CV_8U version of dst3 with values ranging from 1 to 4", "Palettized version of dst2"}

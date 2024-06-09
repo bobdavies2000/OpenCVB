@@ -9,7 +9,7 @@ Public Class Palette_Basics : Inherits VB_Parent
         labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
 
         If src.Type = cv.MatType.CV_32F Then
-            src = vbNormalize32f(src)
+            src = GetNormalize32f(src)
             src.ConvertTo(src, cv.MatType.CV_8U)
         End If
 
@@ -474,7 +474,7 @@ Public Class Palette_LoadColorMap : Inherits VB_Parent
         End If
 
         If src.Type = cv.MatType.CV_32F Then
-            src = vbNormalize32f(src)
+            src = GetNormalize32f(src)
             src.ConvertTo(src, cv.MatType.CV_8U)
         End If
         cv.Cv2.ApplyColorMap(src, dst2, colorMap)
@@ -502,7 +502,7 @@ Public Class Palette_CustomColorMap : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Type = cv.MatType.CV_32F Then
-            src = vbNormalize32f(src)
+            src = GetNormalize32f(src)
             src.ConvertTo(src, cv.MatType.CV_8U)
         End If
         cv.Cv2.ApplyColorMap(src, dst2, colorMap)

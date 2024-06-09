@@ -336,7 +336,7 @@ int* cppTask_GetDst(cppTask * task, int index, int& channels)
 }
 
 
-cv::Mat vbNormalize32f(const cv::Mat& input) {
+cv::Mat GetNormalize32f(const cv::Mat& input) {
     cv::Mat outMat;
     cv::normalize(input, outMat, 0, 255, cv::NORM_MINMAX, CV_8U);  // Normalize to 8-bit unsigned
 
@@ -358,16 +358,16 @@ Mat MakeSureImage8uC3(const Mat& input) {
     }
 
     if (input.type() == CV_32F) {
-        outMat = vbNormalize32f(input);  // Assuming this function is defined
+        outMat = GetNormalize32f(input);  // Assuming this function is defined
     }
     else if (input.type() == CV_32SC1) {
         input.convertTo(outMat, CV_32F);
-        outMat = vbNormalize32f(outMat);
+        outMat = GetNormalize32f(outMat);
     }
     else if (input.type() == CV_32SC3) {
         input.convertTo(outMat, CV_32F);
         cvtColor(outMat, outMat, COLOR_BGR2GRAY);
-        outMat = vbNormalize32f(outMat);
+        outMat = GetNormalize32f(outMat);
     }
     else if (input.type() == CV_32FC3) {
         std::vector<Mat> split;

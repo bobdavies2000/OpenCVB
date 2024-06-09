@@ -27,7 +27,8 @@ namespace CS_Classes
         public const string fmt3 = "0.000";
         public System.Random msRNG = new System.Random();
         public string strOut;
-        public const string fmt4 = "0.0000"; 
+        public const string fmt4 = "0.0000";
+        public Controls_Basics controls;
         public CS_Parent(VBtask _task)
         {
             this.task = _task;
@@ -43,6 +44,20 @@ namespace CS_Classes
             dst1 = new Mat(task.workingRes, MatType.CV_8UC3, Scalar.All(0));
             dst2 = new Mat(task.workingRes, MatType.CV_8UC3, Scalar.All(0));
             dst3 = new Mat(task.workingRes, MatType.CV_8UC3, Scalar.All(0));
+
+            controls = new Controls_Basics();
+        }
+        public Mat GetNormalize32f(Mat input)
+        {
+            Mat outMat = new Mat();
+            Cv2.Normalize(input, outMat, 0, 255, NormTypes.MinMax);
+            if (input.Channels() == 1)
+            {
+                outMat.ConvertTo(outMat, MatType.CV_8U);
+                return outMat.CvtColor(ColorConversionCodes.GRAY2BGR);
+            }
+            outMat.ConvertTo(outMat, MatType.CV_8UC3);
+            return outMat;
         }
         public Mat RebuildCells(SortedList<int, rcData> sortedCells)
         {
@@ -196,33 +211,9 @@ namespace CS_Classes
             trueText str = new trueText(text, pt, picTag);
             trueData.Add(str);
         }
-        public TrackBar FindSlider(string opt)
+        public void FindSlider(string opt, int val)
         {
-            try
-            {
-                foreach (Form frm in Application.OpenForms)
-                {
-                    if (frm.Text.EndsWith(" Sliders"))
-                    {
-                        var trackbars = frm.Controls.OfType<TrackBar>().ToList();
-                        var sLabels = frm.Controls.OfType<Label>().ToList();
-
-                        for (int j = 0; j < trackbars.Count; j++)
-                        {
-                            if (sLabels[j].Text.StartsWith(opt))
-                            {
-                                return trackbars[j];
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("FindSlider failed. The application list of forms changed while iterating. Not critical." + ex.Message);
-            }
-            Console.WriteLine("A slider was not found!\n\nReview the \n\n'" + opt + "' request ");
-            return null;
+            controls.CS_FindSlider(opt, val);  
         }
         public cv.Mat ShowPalette(cv.Mat input)
         {

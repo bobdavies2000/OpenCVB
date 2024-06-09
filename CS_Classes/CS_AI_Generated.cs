@@ -39,8 +39,8 @@ namespace CS_Classes
             {
                 if (src.Type() != MatType.CV_8UC3 || srcPlus.Type() != MatType.CV_8UC3)
                 {
-                    //if (src.Type() == MatType.CV_32FC1) src = vbNormalize32f(src);
-                    //if (srcPlus.Type() == MatType.CV_32FC1) srcPlus = vbNormalize32f(srcPlus);
+                    if (src.Type() == MatType.CV_32FC1) src = GetNormalize32f(src);
+                    if (srcPlus.Type() == MatType.CV_32FC1) srcPlus = GetNormalize32f(srcPlus);
                     if (src.Type() != MatType.CV_8UC3) src = src.CvtColor(ColorConversionCodes.GRAY2BGR);
                     if (srcPlus.Type() != MatType.CV_8UC3) srcPlus = srcPlus.CvtColor(ColorConversionCodes.GRAY2BGR);
                 }
@@ -3260,7 +3260,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
         public CSharp_Bin4Way_Sobel(VBtask task) : base(task)
         {
-            FindSlider("Sobel kernel Size").Value = 5;
+            FindSlider("Sobel kernel Size", 5);
             labels[2] = "Edges between halves, lightest, darkest, and the combo";
             labels[3] = "Click any quadrant in dst2 to view it in dst3";
             desc = "Collect Sobel edges from binarized images";
@@ -3784,11 +3784,296 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
     }
 
 
+    public class CSharp_Binarize_Basics : CS_Parent
+    {
+        public ThresholdTypes thresholdType = ThresholdTypes.Otsu;
+        public Mat histogram = new Mat();
+        public Scalar meanScalar;
+        public Mat mask = new Mat();
+        Blur_Basics blur = new Blur_Basics();
+        public bool useBlur;
+
+        public CSharp_Binarize_Basics(VBtask task) : base(task)
+        {
+            mask = new Mat(dst2.Size(), MatType.CV_8U, 255);
+            UpdateAdvice(traceName + ": use local options to control the kernel size and sigma.");
+            desc = "Binarize an image using Threshold with OTSU.";
+        }
+
+        public void Run(Mat src)
+        {
+            meanScalar = Cv2.Mean(src, mask);
+
+            Mat input = src;
+            if (input.Channels() == 3)
+                input = input.CvtColor(ColorConversionCodes.BGR2GRAY);
+
+            if (useBlur)
+            {
+                blur.Run(input);
+                dst2 = blur.dst2.Threshold(meanScalar.Val0, 255, thresholdType);
+            }
+            else
+            {
+                dst2 = input.Threshold(meanScalar.Val0, 255, thresholdType);
+            }
+        }
+    }
+
+    // https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
+    public class CSharp_Binarize_OTSU : CS_Parent
+    {
+        Binarize_Basics binarize;
+        Options_Binarize options = new Options_Binarize();
+        public CSharp_Binarize_OTSU(VBtask task) : base(task)
+        {
+            binarize = new Binarize_Basics();
+            labels[2] = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur";
+            labels[3] = "Histograms correspond to images on the left";
+            desc = "Binarize an image using Threshold with OTSU.";
+        }
+
+        public void Run(Mat src)
+        {
+            options.RunVB();
+
+            Mat input = src;
+            if (input.Channels() == 3)
+                input = input.CvtColor(ColorConversionCodes.BGR2GRAY);
+
+            binarize.meanScalar = Cv2.Mean(input);
+
+            binarize.useBlur = false;
+            switch (labels[2])
+            {
+                case "Binary":
+                    binarize.thresholdType = ThresholdTypes.Binary;
+                    break;
+                case "Binary + OTSU":
+                    binarize.thresholdType = ThresholdTypes.Binary | ThresholdTypes.Otsu;
+                    break;
+                case "OTSU":
+                    binarize.thresholdType = ThresholdTypes.Otsu;
+                    break;
+                case "OTSU + Blur":
+                    binarize.useBlur = true;
+                    binarize.thresholdType = ThresholdTypes.Binary | ThresholdTypes.Otsu;
+                    break;
+            }
+            binarize.Run(input);
+            dst2 = binarize.dst2;
+        }
+    }
+
+    // Disable Warning BC40000
+    //public class CSharp_Binarize_Niblack_Sauvola : CS_Parent
+    //{
+    //    Options_BinarizeNiBlack options = new Options_BinarizeNiBlack();
+
+    //    public CSharp_Binarize_Niblack_Sauvola(VBtask task) : base(task)
+    //    {
+    //        desc = "Binarize an image using Niblack and Sauvola";
+    //        labels[2] = "Binarize Niblack";
+    //        labels[3] = "Binarize Sauvola";
+    //    }
+
+    //    public void Run(Mat src)
+    //    {
+    //        options.RunVB();
+    //        if (src.Channels() == 3)
+    //            src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+    //        CvExtensions.Binarizer.Niblack(src, out Mat dst0, options.kernelSize, options.niBlackK);
+    //        dst2 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR);
+    //        CvExtensions.Binarizer.Sauvola(src, out dst0, options.kernelSize, options.sauvolaK, options.sauvolaR);
+    //        dst3 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR);
+    //    }
+    //}
 
 
 
+    //public class CSharp_Binarize_Niblack_Nick : CS_Parent
+    //{
+    //    Options_BinarizeNiBlack options = new Options_BinarizeNiBlack();
+    //    public CSharp_Binarize_Niblack_Nick(VBtask task) : base(task)
+    //    {
+    //        desc = "Binarize an image using Niblack and Nick";
+    //        labels[2] = "Binarize Niblack";
+    //        labels[3] = "Binarize Nick";
+    //    }
+    //    public void RunVB(Mat src)
+    //    {
+    //        options.Run();
+
+    //        if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+
+    //        Cv2.Extensions.Binarizer.Niblack(src, out Mat dst2, options.kernelSize, options.niBlackK);
+    //        Cv2.Extensions.Binarizer.Nick(src, out Mat dst3, options.kernelSize, options.nickK);
+    //    }
+    //}
+
+    //public class CSharp_Binarize_Bernson : CS_Parent
+    //{
+    //    Options_Bernson options = new Options_Bernson();
+    //    public CSharp_Binarize_Bernson(VBtask task) : base(task)
+    //    {
+    //        labels[2] = "Binarize Bernson (Draw Enabled)";
+
+    //        int w = 40, h = 40;
+    //        task.drawRect = new Rect(dst2.Width / 2 - w, dst2.Height / 2 - h, w, h);
+    //        desc = "Binarize an image using Bernson. Draw on image (because Bernson is so slow).";
+    //    }
+    //    public void RunCSharp_(Mat src)
+    //    {
+    //        options.RunVB();
+    //        Mat dst0 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+    //        Cv2.Extensions.Binarizer.Bernsen(dst0[task.drawRect], dst0[task.drawRect], options.kernelSize, options.contrastMin, options.bgThreshold);
+    //        dst2 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR);
+    //    }
+    //}
+
+    public class CSharp_Binarize_Bernson_MT : CS_Parent
+    {
+        Binarize_Bernson_MT bernson;
+        public CSharp_Binarize_Bernson_MT(VBtask task) : base(task)
+        {
+            bernson = new Binarize_Bernson_MT();
+            task.gOptions.setGridSize(32);
+            desc = "Binarize an image using Bernson. Draw on image (because Bernson is so slow).";
+            labels[2] = "Binarize Bernson";
+        }
+        public void Run(Mat src)
+        {
+            bernson.RunVB(src);
+            dst2 = bernson.dst2;
+            dst3 = bernson.dst3;
+        }
+    }
+
+    public class CSharp_Binarize_KMeansMasks : CS_Parent
+    {
+        KMeans_Image km = new KMeans_Image();
+        Mat_4Click mats = new Mat_4Click();
+        public CSharp_Binarize_KMeansMasks(VBtask task) : base(task)
+        {
+            labels[2] = "Ordered from dark to light, top left darkest, bottom right lightest ";
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, 0);
+            desc = "Display the top 4 masks from the BGR kmeans output";
+        }
+        public void Run(Mat src)
+        {
+            km.Run(src);
+            for (int i = 0; i < km.masks.Count; i++)
+            {
+                mats.mat[i] = km.masks[i];
+                dst1.SetTo(i + 1, km.masks[i]);
+                if (i >= 3) break;
+            }
+
+            mats.Run(Mat.Zeros(src.Size(), MatType.CV_8U));
+            dst2 = mats.dst2;
+            dst3 = mats.dst3;
+        }
+    }
 
 
+
+    public class CSharp_Binarize_KMeansRGB : CS_Parent
+    {
+        KMeans_Image km = new KMeans_Image();
+        Mat_4Click mats = new Mat_4Click();
+
+        public CSharp_Binarize_KMeansRGB(VBtask task) : base(task)
+        {
+            labels[2] = "Ordered from dark to light, top left darkest, bottom right lightest ";
+            desc = "Display the top 4 masks from the BGR kmeans output";
+        }
+
+        public void Run(Mat src)
+        {
+            km.Run(src);
+            dst1.SetTo(0);
+            for (int i = 0; i < km.masks.Count; i++)
+            {
+                mats.mat[i] = new Mat(dst2.Size(), MatType.CV_8UC3, Scalar.All(0));
+                src.CopyTo(mats.mat[i], km.masks[i]);
+                if (i >= 3) break;
+            }
+            mats.Run(Mat.Zeros(src.Size(), MatType.CV_8UC3));
+            dst2 = mats.dst2;
+            dst3 = mats.dst3;
+        }
+    }
+
+    public class CSharp_Binarize_FourPixelFlips : CS_Parent
+    {
+        Bin4Way_Regions binar4 = new Bin4Way_Regions();
+        private Mat lastSubD;
+        public CSharp_Binarize_FourPixelFlips(VBtask task) : base(task)
+        {
+            desc = "Identify the marginal regions that flip between subdivisions based on brightness.";
+        }
+
+        public void Run(Mat src)
+        {
+            binar4.Run(src);
+            dst2 = ShowPalette(binar4.dst2 * 255 / 5);
+
+            if (task.firstPass) lastSubD = binar4.dst2.Clone();
+            dst3 = lastSubD - binar4.dst2;
+            dst3 = dst3.Threshold(0, 255, ThresholdTypes.Binary);
+            lastSubD = binar4.dst2.Clone();
+        }
+    }
+
+    public class CSharp_Binarize_DepthTiers : CS_Parent
+    {
+        Depth_TiersZ tiers = new Depth_TiersZ();
+        Bin4Way_Regions binar4 = new Bin4Way_Regions();
+        public int classCount = 200; // 4-way split with 50 depth levels at 10 cm's each.
+
+        public CSharp_Binarize_DepthTiers(VBtask task) : base(task)
+        {
+            task.redOptions.useColorOnlyChecked = true;
+            desc = "Add the Depth_TiersZ and Bin4Way_Regions output in preparation for RedCloud";
+        }
+
+        public void Run(Mat src)
+        {
+            binar4.Run(src);
+            tiers.Run(src);
+            dst3 = tiers.dst3;
+
+            dst0 = tiers.dst2 + binar4.dst2;
+
+            if (task.heartBeat)
+            {
+                dst2 = dst0.Clone();
+            }
+            else if (task.motionDetected)
+            {
+                dst0[task.motionRect].CopyTo(dst2[task.motionRect]);
+            }
+            classCount = binar4.classCount + tiers.classCount;
+        }
+    }
+
+    public class CSharp_Binarize_Simple : CS_Parent
+    {
+        public Scalar meanScalar;
+        public int injectVal = 255;
+
+        public CSharp_Binarize_Simple(VBtask task) : base(task)
+        {
+            desc = "Binarize an image using Threshold with OTSU.";
+        }
+
+        public void Run(Mat src)
+        {
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            meanScalar = Cv2.Mean(src);
+            dst2 = src.Threshold(meanScalar[0], injectVal, ThresholdTypes.Binary);
+        }
+    }
 
 
 
