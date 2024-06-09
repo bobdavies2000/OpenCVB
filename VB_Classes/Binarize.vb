@@ -1,4 +1,6 @@
 Imports System.Windows.Automation
+Imports OpenCvSharp
+Imports OpenCvSharp.XImgProc
 Imports cv = OpenCvSharp
 
 ' https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
@@ -77,8 +79,7 @@ End Class
 
 
 
-#Disable Warning BC40000
-Public Class Binarize_Niblack_Sauvola : Inherits VB_Parent
+Public Class Binarize_Niblack_Sauvola1 : Inherits VB_Parent
     Dim options As New Options_BinarizeNiBlack
     Public Sub New()
         desc = "Binarize an image using Niblack and Sauvola"
@@ -88,10 +89,10 @@ Public Class Binarize_Niblack_Sauvola : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        cv.Extensions.Binarizer.Niblack(src, dst0, options.kernelSize, options.niBlackK)
-        dst2 = dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Extensions.Binarizer.Sauvola(src, dst0, options.kernelSize, options.sauvolaK, options.sauvolaR)
-        dst3 = dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        CvXImgProc.NiblackThreshold(src, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack)
+        dst2 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR)
+        CvXImgProc.NiblackThreshold(src, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Sauvola)
+        dst3 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -100,7 +101,7 @@ End Class
 
 
 
-Public Class Binarize_Niblack_Nick : Inherits VB_Parent
+Public Class Binarize_Wolf_Nick : Inherits VB_Parent
     Dim options As New Options_BinarizeNiBlack
     Public Sub New()
         desc = "Binarize an image using Niblack and Nick"
@@ -112,52 +113,8 @@ Public Class Binarize_Niblack_Nick : Inherits VB_Parent
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        cv.Extensions.Binarizer.Niblack(src, dst2, options.kernelSize, options.niBlackK)
-        cv.Extensions.Binarizer.Nick(src, dst3, options.kernelSize, options.nickK)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Binarize_Bernson : Inherits VB_Parent
-    Dim options As New Options_Bernson
-    Public Sub New()
-        labels(2) = "Binarize Bernson (Draw Enabled)"
-
-        Dim w = 40, h = 40
-        task.drawRect = New cv.Rect(dst2.Width / 2 - w, dst2.Height / 2 - h, w, h)
-        desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        dst0 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        cv.Extensions.Binarizer.Bernsen(dst0(task.drawRect), dst0(task.drawRect), options.kernelSize, options.contrastMin, options.bgThreshold)
-        dst2 = dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-    End Sub
-End Class
-
-
-
-
-Public Class Binarize_Bernson_MT : Inherits VB_Parent
-    Dim options As New Options_Bernson
-    Public Sub New()
-        task.gOptions.setGridSize(32)
-        desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
-        labels(2) = "Binarize Bernson"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Parallel.ForEach(task.gridList,
-            Sub(roi)
-                Dim grayBin = src(roi).Clone()
-                cv.Extensions.Binarizer.Bernsen(src(roi), grayBin, options.kernelSize, options.contrastMin, options.bgThreshold)
-                dst2(roi) = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            End Sub)
+        CvXImgProc.NiblackThreshold(src, dst2, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Wolf)
+        CvXImgProc.NiblackThreshold(src, dst3, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Nick)
     End Sub
 End Class
 

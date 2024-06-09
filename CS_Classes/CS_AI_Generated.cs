@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using static CS_Classes.CSharp_Externs;
 using OpenCvSharp.XImgProc;
-using System.Security.Cryptography;
 
 namespace CS_Classes
 { 
@@ -3865,89 +3864,6 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         }
     }
 
-    // Disable Warning BC40000
-    //public class CSharp_Binarize_Niblack_Sauvola : CS_Parent
-    //{
-    //    Options_BinarizeNiBlack options = new Options_BinarizeNiBlack();
-
-    //    public CSharp_Binarize_Niblack_Sauvola(VBtask task) : base(task)
-    //    {
-    //        desc = "Binarize an image using Niblack and Sauvola";
-    //        labels[2] = "Binarize Niblack";
-    //        labels[3] = "Binarize Sauvola";
-    //    }
-
-    //    public void Run(Mat src)
-    //    {
-    //        options.RunVB();
-    //        if (src.Channels() == 3)
-    //            src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-    //        CvExtensions.Binarizer.Niblack(src, out Mat dst0, options.kernelSize, options.niBlackK);
-    //        dst2 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR);
-    //        CvExtensions.Binarizer.Sauvola(src, out dst0, options.kernelSize, options.sauvolaK, options.sauvolaR);
-    //        dst3 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR);
-    //    }
-    //}
-
-
-
-    //public class CSharp_Binarize_Niblack_Nick : CS_Parent
-    //{
-    //    Options_BinarizeNiBlack options = new Options_BinarizeNiBlack();
-    //    public CSharp_Binarize_Niblack_Nick(VBtask task) : base(task)
-    //    {
-    //        desc = "Binarize an image using Niblack and Nick";
-    //        labels[2] = "Binarize Niblack";
-    //        labels[3] = "Binarize Nick";
-    //    }
-    //    public void RunVB(Mat src)
-    //    {
-    //        options.Run();
-
-    //        if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-
-    //        Cv2.Extensions.Binarizer.Niblack(src, out Mat dst2, options.kernelSize, options.niBlackK);
-    //        Cv2.Extensions.Binarizer.Nick(src, out Mat dst3, options.kernelSize, options.nickK);
-    //    }
-    //}
-
-    //public class CSharp_Binarize_Bernson : CS_Parent
-    //{
-    //    Options_Bernson options = new Options_Bernson();
-    //    public CSharp_Binarize_Bernson(VBtask task) : base(task)
-    //    {
-    //        labels[2] = "Binarize Bernson (Draw Enabled)";
-
-    //        int w = 40, h = 40;
-    //        task.drawRect = new Rect(dst2.Width / 2 - w, dst2.Height / 2 - h, w, h);
-    //        desc = "Binarize an image using Bernson. Draw on image (because Bernson is so slow).";
-    //    }
-    //    public void RunCSharp_(Mat src)
-    //    {
-    //        options.RunVB();
-    //        Mat dst0 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-    //        Cv2.Extensions.Binarizer.Bernsen(dst0[task.drawRect], dst0[task.drawRect], options.kernelSize, options.contrastMin, options.bgThreshold);
-    //        dst2 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR);
-    //    }
-    //}
-
-    public class CSharp_Binarize_Bernson_MT : CS_Parent
-    {
-        Binarize_Bernson_MT bernson;
-        public CSharp_Binarize_Bernson_MT(VBtask task) : base(task)
-        {
-            bernson = new Binarize_Bernson_MT();
-            task.gOptions.setGridSize(32);
-            desc = "Binarize an image using Bernson. Draw on image (because Bernson is so slow).";
-            labels[2] = "Binarize Bernson";
-        }
-        public void Run(Mat src)
-        {
-            bernson.RunVB(src);
-            dst2 = bernson.dst2;
-            dst3 = bernson.dst3;
-        }
-    }
 
     public class CSharp_Binarize_KMeansMasks : CS_Parent
     {
@@ -4076,11 +3992,55 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
     }
 
 
+    public class CSharp_Binarize_Niblack_Sauvola : CS_Parent
+    {
+        Options_BinarizeNiBlack options = new Options_BinarizeNiBlack();
+        //[InlineData(LocalBinarizationMethods.Niblack)]
+        //[InlineData(LocalBinarizationMethods.Sauvola)]
+        //[InlineData(LocalBinarizationMethods.Wolf)]
+        //[InlineData(LocalBinarizationMethods.Nick)]
+        public CSharp_Binarize_Niblack_Sauvola(VBtask task) : base(task)
+        {
+            desc = "Binarize an image using Niblack and Sauvola";
+            labels[2] = "Binarize Niblack";
+            labels[3] = "Binarize Sauvola";
+        }
+
+        public void Run(Mat src)
+        {
+            options.RunVB();
+            if (src.Channels() == 3)
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            CvXImgProc.NiblackThreshold(src, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack);
+            dst2 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR);
+            CvXImgProc.NiblackThreshold(src, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Sauvola);
+            dst3 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR);
+        }
+    }
 
 
 
+    public class CSharp_Binarize_Wolf_Nick : CS_Parent
+    {
+        Options_BinarizeNiBlack options = new Options_BinarizeNiBlack();
+        public CSharp_Binarize_Wolf_Nick(VBtask task) : base(task)
+        {
+            desc = "Binarize an image using Wolf and Nick";
+            labels[2] = "Binarize Wolf";
+            labels[3] = "Binarize Nick";
+        }
+        public void Run(Mat src)
+        {
+            options.RunVB();
 
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
+            CvXImgProc.NiblackThreshold(src, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Wolf);
+            dst2 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR);
+            CvXImgProc.NiblackThreshold(src, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Nick);
+            dst3 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR);
+        }
+    }
 
 
 
