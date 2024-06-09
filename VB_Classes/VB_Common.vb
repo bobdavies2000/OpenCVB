@@ -205,37 +205,6 @@ Module VB_Common
         Dim rect = New cv.Rect(x, y, w, h)
         Return rc.mask
     End Function
-    Public Function vbRebuildCells(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
-        task.redCells.Clear()
-        task.redCells.Add(New rcData)
-        For Each rc In sortedCells.Values
-            rc.index = task.redCells.Count
-            task.redCells.Add(rc)
-            If rc.index >= 255 Then Exit For
-        Next
-
-        Return vbDisplayCells()
-    End Function
-    Public Function vbRebuildCells(cells As List(Of rcData)) As cv.Mat
-        task.redCells.Clear()
-        task.redCells.Add(New rcData)
-        For Each rc In cells
-            rc.index = task.redCells.Count
-            task.redCells.Add(rc)
-            If rc.index >= 255 Then Exit For
-        Next
-
-        Return vbDisplayCells()
-    End Function
-    Public Function vbDisplayCells() As cv.Mat
-        Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
-        task.cellMap.SetTo(0)
-        For Each rc In task.redCells
-            dst(rc.rect).SetTo(If(task.redOptions.naturalColor.Checked, rc.naturalColor, rc.color), rc.mask)
-            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
-        Next
-        Return dst
-    End Function
     Public Sub setSelectedContour()
         If task.redCells.Count = 0 Then Exit Sub
         If task.clickPoint = newPoint And task.redCells.Count > 1 Then task.clickPoint = task.redCells(1).maxDist

@@ -82,8 +82,27 @@ Public Class VB_Parent : Implements IDisposable
                 algorithmStack.Push(3)
             End If
         End If
-        task.firstPass = True
     End Sub
+    Public Function RebuildCells(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
+        task.redCells.Clear()
+        task.redCells.Add(New rcData)
+        For Each rc In sortedCells.Values
+            rc.index = task.redCells.Count
+            task.redCells.Add(rc)
+            If rc.index >= 255 Then Exit For
+        Next
+
+        Return DisplayCells()
+    End Function
+    Public Function DisplayCells() As cv.Mat
+        Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
+        task.cellMap.SetTo(0)
+        For Each rc In task.redCells
+            dst(rc.rect).SetTo(If(task.redOptions.NaturalColor.Checked, rc.naturalColor, rc.color), rc.mask)
+            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+        Next
+        Return dst
+    End Function
     Public Function Show_HSV_Hist(hist As cv.Mat) As cv.Mat
         Dim img As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
         Dim binCount = hist.Height

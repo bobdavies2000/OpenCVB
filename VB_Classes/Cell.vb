@@ -480,7 +480,7 @@ Public Class Cell_Generate : Inherits VB_Parent
         Next
 
         task.redCells = New List(Of rcData)(sortedCells.Values)
-        dst2 = vbRebuildCells(sortedCells)
+        dst2 = RebuildCells(sortedCells)
 
         Static saveRetained As Integer = retained
         If retained > 0 Then saveRetained = retained

@@ -54,7 +54,7 @@ Public Class MSER_Basics : Inherits VB_Parent
             If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
         Next
 
-        dst2 = vbRebuildCells(sortedCells)
+        dst2 = RebuildCells(sortedCells)
 
         labels(2) = CStr(task.redCells.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
     End Sub

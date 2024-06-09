@@ -138,7 +138,7 @@ Public Class RedCloud_FindCells : Inherits VB_Parent
                 If task.redCells.Count <= index Then Continue For
                 Dim rc = task.redCells(index)
                 DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
-                dst3(rc.rect).SetTo(If(task.redOptions.naturalColor.Checked, rc.naturalColor, cv.Scalar.White), rc.mask)
+                dst3(rc.rect).SetTo(If(task.redOptions.NaturalColor.Checked, rc.naturalColor, cv.Scalar.White), rc.mask)
             Next
             dst2.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
         End If
@@ -2345,7 +2345,7 @@ Public Class RedCloud_Consistent : Inherits VB_Parent
         Next
 
         task.redCells = New List(Of rcData)(newCells)
-        dst2 = vbDisplayCells()
+        dst2 = DisplayCells()
         lastImage = dst2.Clone
 
         If cellmaps.Count > task.gOptions.FrameHistory.Value Then
@@ -2369,7 +2369,7 @@ Public Class RedCloud_NaturalColor : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
         labels(2) = redC.labels(2)
-        dst2 = vbDisplayCells()
+        dst2 = DisplayCells()
     End Sub
 End Class
 

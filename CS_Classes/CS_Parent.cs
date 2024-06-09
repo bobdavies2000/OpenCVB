@@ -44,6 +44,32 @@ namespace CS_Classes
             dst2 = new Mat(task.workingRes, MatType.CV_8UC3, Scalar.All(0));
             dst3 = new Mat(task.workingRes, MatType.CV_8UC3, Scalar.All(0));
         }
+        public Mat RebuildCells(SortedList<int, rcData> sortedCells)
+        {
+            task.redCells.Clear();
+            task.redCells.Add(new rcData());
+            foreach (var rc in sortedCells.Values)
+            {
+                rc.index = task.redCells.Count;
+                task.redCells.Add(rc);
+                if (rc.index >= 255) break;
+            }
+
+            return DisplayCells();
+        }
+        public Mat DisplayCells()
+        {
+            Mat dst = new Mat(task.workingRes, MatType.CV_8UC3, Scalar.All(0));
+            task.cellMap.SetTo(Scalar.All(0));
+            foreach (var rc in task.redCells)
+            {
+                bool natural = task.redOptions.useNaturalColor;
+                dst[rc.rect].SetTo(natural ? rc.naturalColor : rc.color, rc.mask);
+                task.cellMap[rc.rect].SetTo(rc.index, rc.mask);
+            }
+            return dst;
+        }
+
         public bool standaloneTest()
         {
             if (standalone || ShowIntermediate()) return true;

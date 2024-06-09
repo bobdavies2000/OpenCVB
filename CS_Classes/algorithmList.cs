@@ -77,6 +77,8 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_BGSubtract_Video") return new CSharp_BGSubtract_Video(task);
 			if (algorithmName == "CSharp_Bin2Way_Basics") return new CSharp_Bin2Way_Basics(task);
 			if (algorithmName == "CSharp_Bin2Way_KMeans") return new CSharp_Bin2Way_KMeans(task);
+			if (algorithmName == "CSharp_Bin2Way_RecurseOnce") return new CSharp_Bin2Way_RecurseOnce(task);
+			if (algorithmName == "CSharp_Bin2Way_RedCloud") return new CSharp_Bin2Way_RedCloud(task);
 			if (algorithmName == "CSharp_Bin2Way_RedCloudDarkest") return new CSharp_Bin2Way_RedCloudDarkest(task);
 			if (algorithmName == "CSharp_Bin2Way_RedCloudLightest") return new CSharp_Bin2Way_RedCloudLightest(task);
 			if (algorithmName == "CSharp_Diff_Basics") return new CSharp_Diff_Basics(task);

@@ -20,6 +20,7 @@ Public Class OptionsRedCloud
     Public ranges() As cv.Rangef
     Public channelCount As Integer
     Public histBinList() As Integer
+    Public useNaturalColor As Boolean
     Public identifyCount As Integer
     Public histBins3D As Integer
     Dim colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions", "Binarize_DepthTiers", "FeatureLess_Groups", "Hist3DColor_Basics",
@@ -311,8 +312,9 @@ Public Class OptionsRedCloud
     Private Sub IdentifyCells_CheckedChanged(sender As Object, e As EventArgs) Handles IdentifyCells.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
-    Private Sub naturalColor_CheckedChanged(sender As Object, e As EventArgs) Handles naturalColor.CheckedChanged
+    Private Sub naturalColor_CheckedChanged(sender As Object, e As EventArgs) Handles NaturalColor.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
+        useNaturalColor = NaturalColor.Checked
     End Sub
 
     Public Sub setSimpleReductionBar(newVal As Integer)

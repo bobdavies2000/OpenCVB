@@ -750,7 +750,7 @@ Public Class Bin4Way_RedCloud : Inherits VB_Parent
             Next
         Next
 
-        dst2 = vbRebuildCells(sortedCells)
+        dst2 = RebuildCells(sortedCells)
 
         If task.heartBeat Then labels(2) = CStr(task.redCells.Count) + " cells were identified and matched to the previous image"
     End Sub

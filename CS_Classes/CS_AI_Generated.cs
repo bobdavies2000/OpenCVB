@@ -2696,7 +2696,102 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
 
 
+    public class CSharp_Bin2Way_RecurseOnce : CS_Parent
+    {
+        private Bin2Way_Basics bin2 = new Bin2Way_Basics();
+        public Mat_4Click mats = new Mat_4Click();
 
+        public CSharp_Bin2Way_RecurseOnce(VBtask task) : base(task)
+        {
+            desc = "Keep splitting an image between light and dark";
+        }
+
+        public void Run(Mat src)
+        {
+            if (src.Channels() != 1)
+            {
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            }
+
+            bin2.fraction = src.Total() / 2;
+            bin2.hist.inputMask = new Mat();
+            bin2.Run(src);
+            Mat darkestMask = bin2.mats.mat[0].Clone();
+            Mat lightestMask = bin2.mats.mat[1].Clone();
+
+            bin2.fraction = src.Total() / 4;
+            bin2.hist.inputMask = darkestMask;
+            bin2.Run(src);
+
+            mats.mat[0] = bin2.mats.mat[0];
+            mats.mat[1] = bin2.mats.mat[1] & ~lightestMask;
+
+            bin2.fraction = src.Total() / 4;
+            bin2.hist.inputMask = lightestMask;
+            bin2.Run(src);
+            mats.mat[2] = bin2.mats.mat[0] & ~darkestMask;
+            mats.mat[3] = bin2.mats.mat[1];
+
+            mats.Run(empty);
+            dst2 = mats.dst2;
+            dst3 = mats.dst3;
+        }
+    }
+
+    public class CSharp_Bin2Way_RedCloud : CS_Parent
+    {
+        private Bin2Way_RecurseOnce bin2 = new Bin2Way_RecurseOnce();
+        private Flood_BasicsMask flood = new Flood_BasicsMask();
+        private Color8U_Basics color = new Color8U_Basics();
+        private Mat[] cellMaps = new Mat[4];
+        private List<rcData>[] redCells = new List<rcData>[4];
+        private Options_Bin2WayRedCloud options = new Options_Bin2WayRedCloud();
+
+        public CSharp_Bin2Way_RedCloud(VBtask task) : base(task)
+        {
+            flood.showSelected = false;
+            desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData.";
+        }
+
+        public void Run(Mat src)
+        {
+            options.RunVB();
+
+            if (task.optionsChanged)
+            {
+                for (int i = 0; i < redCells.Length; i++)
+                {
+                    redCells[i] = new List<rcData>();
+                    cellMaps[i] = new Mat(dst2.Size(), MatType.CV_8U, 0);
+                }
+            }
+
+            bin2.Run(src);
+
+            SortedList<int, rcData> sortedCells = new SortedList<int, rcData>(new compareAllowIdenticalIntegerInverted());
+            for (int i = options.startRegion; i <= options.endRegion; i++)
+            {
+                task.cellMap = cellMaps[i];
+                task.redCells = redCells[i];
+                flood.inputMask = ~bin2.mats.mat[i];
+                flood.Run(bin2.mats.mat[i]);
+                cellMaps[i] = task.cellMap.Clone();
+                redCells[i] = new List<rcData>(task.redCells);
+                foreach (var rc in task.redCells)
+                {
+                    if (rc.index == 0) continue;
+                    sortedCells.Add(rc.pixels, rc);
+                }
+            }
+
+            dst2 = RebuildCells(sortedCells);
+
+            if (task.heartBeat)
+            {
+                labels[2] = $"{task.redCells.Count} cells were identified and matched to the previous image";
+            }
+        }
+    }
 
 
 
