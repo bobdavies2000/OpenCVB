@@ -213,7 +213,15 @@ namespace CS_Classes
         }
         public void FindSlider(string opt, int val)
         {
-            controls.CS_FindSlider(opt, val);  
+            controls.CS_FindSlider(opt, val);
+        }
+        public TrackBar FindSlider(string opt)
+        {
+            return controls.CS_GetSlider(opt);
+        }
+        public void FindCheckBox(string opt, bool val)
+        {
+            controls.CS_FindCheckBox(opt, val); 
         }
         public cv.Mat ShowPalette(cv.Mat input)
         {

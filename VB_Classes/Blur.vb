@@ -82,16 +82,16 @@ Public Class Blur_PlusHistogram : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         myhist.Run(src)
 
-        mat2to1.mat(0) = myhist.dst2.Clone()
+        mat2to1.mat(0) = myhist.dst2.Clone
 
         blur.Run(src)
+        dst2 = blur.dst2.Clone
 
-        myhist.Run(blur.dst2.Clone)
+        myhist.Run(blur.dst2)
 
-        mat2to1.mat(1) = myhist.dst3.Clone()
+        mat2to1.mat(1) = myhist.dst2.Clone
         mat2to1.Run(src)
         dst3 = mat2to1.dst2
-        dst2 = blur.dst2
     End Sub
 End Class
 
@@ -103,46 +103,31 @@ End Class
 Public Class Blur_TopoMap : Inherits VB_Parent
     Dim gradient As New Gradient_CartToPolar
     Dim addw As New AddWeighted_Basics
+    Dim options As New Options_BlurTopo
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Percent of Blurring", 0, 100, 20)
-            sliders.setupTrackBar("Blur Color Reduction", 2, 64, 20)
-            sliders.setupTrackBar("Frame Count Cycle", 1, 200, 50)
-        End If
         labels(2) = "Image Gradient"
         desc = "Create a topo map from the blurred image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static reductionSlider = FindSlider("Blur Color Reduction")
-        Static frameSlider = FindSlider("Frame Count Cycle")
-        Static percentSlider = FindSlider("Percent of Blurring")
-
-        Static savePercent As Single
-        Static nextPercent As Single
-        If savePercent <> percentSlider.Value Then
-            savePercent = percentSlider.Value
-            nextPercent = savePercent
-        End If
-
-        Dim kernelSize = CInt(nextPercent / 100 * src.Width) Or 1
+        options.RunVB()
 
         gradient.Run(src)
         dst2 = gradient.magnitude
 
-        If kernelSize > 1 Then cv.Cv2.GaussianBlur(dst2, dst3, New cv.Size(kernelSize, kernelSize), 0, 0)
+        If options.kernelSize > 1 Then cv.Cv2.GaussianBlur(dst2, dst3, New cv.Size(options.kernelSize, options.kernelSize), 0, 0)
         dst3 = dst3.Normalize(255)
         dst3 = dst3.ConvertScaleAbs(255)
 
-        dst3 = (dst3 * 1 / reductionSlider.Value).tomat
-        dst3 = (dst3 * reductionSlider.Value).toMat
+        dst3 = (dst3 * 1 / options.reduction).ToMat
+        dst3 = (dst3 * options.reduction).ToMat
 
         addw.src2 = ShowPalette(dst3)
         addw.Run(task.color)
         dst3 = addw.dst2
 
-        labels(3) = "Blur = " + CStr(nextPercent) + "% Reduction Factor = " + CStr(reductionSlider.Value)
-        If task.frameCount Mod frameSlider.Value = 0 Then nextPercent -= 1
-        If nextPercent <= 0 Then nextPercent = savePercent
+        labels(3) = "Blur = " + CStr(options.nextPercent) + "% Reduction Factor = " + CStr(options.reduction)
+        If task.frameCount Mod options.frameCycle = 0 Then options.nextPercent -= 1
+        If options.nextPercent <= 0 Then options.nextPercent = options.savePercent
     End Sub
 End Class
 

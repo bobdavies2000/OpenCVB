@@ -113,6 +113,17 @@ namespace CS_Classes
 			if (algorithmName == "CSharp_Binarize_Simple") return new CSharp_Binarize_Simple(task);
 			if (algorithmName == "CSharp_Binarize_Wolf_Nick") return new CSharp_Binarize_Wolf_Nick(task);
 			if (algorithmName == "CSharp_BitmapToMat") return new CSharp_BitmapToMat(task);
+			if (algorithmName == "CSharp_Blob_Input") return new CSharp_Blob_Input(task);
+			if (algorithmName == "CSharp_Blob_RenderBlobs") return new CSharp_Blob_RenderBlobs(task);
+			if (algorithmName == "CSharp_BlockMatching_Basics") return new CSharp_BlockMatching_Basics(task);
+			if (algorithmName == "CSharp_Blur_Basics") return new CSharp_Blur_Basics(task);
+			if (algorithmName == "CSharp_Blur_Bilateral") return new CSharp_Blur_Bilateral(task);
+			if (algorithmName == "CSharp_Blur_Depth") return new CSharp_Blur_Depth(task);
+			if (algorithmName == "CSharp_Blur_Detection") return new CSharp_Blur_Detection(task);
+			if (algorithmName == "CSharp_Blur_Homogeneous") return new CSharp_Blur_Homogeneous(task);
+			if (algorithmName == "CSharp_Blur_Median") return new CSharp_Blur_Median(task);
+			if (algorithmName == "CSharp_Blur_PlusHistogram") return new CSharp_Blur_PlusHistogram(task);
+			if (algorithmName == "CSharp_Blur_TopoMap") return new CSharp_Blur_TopoMap(task);
 			if (algorithmName == "CSharp_Diff_Basics") return new CSharp_Diff_Basics(task);
 			if (algorithmName == "CSharp_Line_Basics") return new CSharp_Line_Basics(task);
 			if (algorithmName == "CSharp_Random_Basics") return new CSharp_Random_Basics(task);

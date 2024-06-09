@@ -4919,3 +4919,37 @@ Public Class Options_Binarize : Inherits VB_Parent
         Next
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_BlurTopo : Inherits VB_Parent
+    Public savePercent As Single
+    Public nextPercent As Single
+    Public reduction As Integer
+    Public frameCycle As Integer
+    Public kernelSize As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Percent of Blurring", 0, 100, 20)
+            sliders.setupTrackBar("Blur Color Reduction", 2, 64, 20)
+            sliders.setupTrackBar("Frame Count Cycle", 1, 200, 50)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static reductionSlider = FindSlider("Blur Color Reduction")
+        Static frameSlider = FindSlider("Frame Count Cycle")
+        Static percentSlider = FindSlider("Percent of Blurring")
+
+        If savePercent <> percentSlider.Value Then
+            savePercent = percentSlider.Value
+            nextPercent = savePercent
+        End If
+
+        frameCycle = frameSlider.value
+        reduction = reductionSlider.value / 100
+        kernelSize = CInt(nextPercent / 100 * dst2.Width) Or 1
+    End Sub
+End Class

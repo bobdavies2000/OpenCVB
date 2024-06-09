@@ -4043,14 +4043,340 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
     }
 
 
+    public class CSharp_Blob_Input : CS_Parent
+    {
+        private Rectangle_Rotated rotatedRect = new Rectangle_Rotated();
+        private Draw_Circles circles = new Draw_Circles();
+        private Draw_Ellipses ellipses = new Draw_Ellipses();
+        private Draw_Polygon poly = new Draw_Polygon();
+        public Mat_4Click Mats = new Mat_4Click();
+        public int updateFrequency = 30;
+
+        public CSharp_Blob_Input(VBtask task) : base(task)
+        {
+            FindSlider("DrawCount", 5);
+            FindCheckBox("Draw filled (unchecked draw an outline)", true);
+
+            Mats.mats.lineSeparators = false;
+
+            labels[2] = "Click any quadrant below to view it on the right";
+            labels[3] = "Click any quadrant at left to view it below";
+            desc = "Generate data to test Blob Detector.";
+        }
+
+        public void Run(Mat src)
+        {
+            rotatedRect.Run(src);
+            Mats.mat[0] = rotatedRect.dst2;
+
+            circles.Run(src);
+            Mats.mat[1] = circles.dst2;
+
+            ellipses.Run(src);
+            Mats.mat[2] = ellipses.dst2;
+
+            poly.Run(src);
+            Mats.mat[3] = poly.dst3;
+            Mats.Run(empty);
+            dst2 = Mats.dst2;
+            dst3 = Mats.dst3;
+        }
+    }
+
+    public class CSharp_Blob_RenderBlobs : CS_Parent
+    {
+        private Blob_Input input = new Blob_Input();
+
+        public CSharp_Blob_RenderBlobs(VBtask task) : base(task)
+        {
+            labels[2] = "Input blobs";
+            labels[3] = "Largest blob, centroid in yellow";
+            desc = "Use connected components to find blobs.";
+        }
+
+        public void Run(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                input.Run(src);
+                dst2 = input.dst2;
+                var gray = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+                var binary = gray.Threshold(0, 255, ThresholdTypes.Otsu | ThresholdTypes.Binary);
+                var labelView = dst2.EmptyClone();
+                var stats = new Mat();
+                var centroids = new Mat();
+                var cc = Cv2.ConnectedComponentsEx(binary);
+                var labelCount = Cv2.ConnectedComponentsWithStats(binary, labelView, stats, centroids);
+                cc.RenderBlobs(labelView);
+
+                foreach (var b in cc.Blobs.Skip(1))
+                {
+                    dst2.Rectangle(b.Rect, Scalar.Red, task.lineWidth + 1, task.lineType);
+                }
+
+                var maxBlob = cc.GetLargestBlob();
+                dst3.SetTo(0);
+                cc.FilterByBlob(dst2, dst3, maxBlob);
+
+                dst3.Circle(new Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.dotSize + 3, Scalar.Blue, -1, task.lineType);
+                DrawCircle(dst3, new Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.dotSize, Scalar.Yellow);
+            }
+        }
+    }
+
+
+    public class CSharp_BlockMatching_Basics : CS_Parent
+    {
+        private Depth_Colorizer_CPP colorizer = new Depth_Colorizer_CPP();
+        private Options_BlockMatching options = new Options_BlockMatching();
+
+        public CSharp_BlockMatching_Basics(VBtask task) : base(task)
+        {
+            if (standaloneTest())
+            {
+                task.gOptions.setDisplay1();
+            }
+            labels[2] = "Block matching disparity colorized like depth";
+            labels[3] = "Right Image (used with left image)";
+            UpdateAdvice(traceName + ": click 'Show All' to see all the available options.");
+            desc = "Use OpenCV's block matching on left and right views";
+        }
+
+        public void Run(Mat src)
+        {
+            options.RunVB();
+
+            if (task.cameraName == "Azure Kinect 4K")
+            {
+                setTrueText("For the K4A 4 Azure camera, the left and right views are the same.");
+            }
+
+            var blockMatch = StereoBM.Create();
+            blockMatch.BlockSize = options.blockSize;
+            blockMatch.MinDisparity = 0;
+            blockMatch.ROI1 = new Rect(0, 0, task.leftView.Width, task.leftView.Height);
+            blockMatch.ROI2 = new Rect(0, 0, task.leftView.Width, task.leftView.Height);
+            blockMatch.PreFilterCap = 31;
+            blockMatch.NumDisparities = options.numDisparity;
+            blockMatch.TextureThreshold = 10;
+            blockMatch.UniquenessRatio = 15;
+            blockMatch.SpeckleWindowSize = 100;
+            blockMatch.SpeckleRange = 32;
+            blockMatch.Disp12MaxDiff = 1;
+
+            Mat tmpLeft = task.leftView.Channels() == 3 ? task.leftView.CvtColor(ColorConversionCodes.BGR2GRAY) : task.leftView;
+            Mat tmpRight = task.rightView.Channels() == 3 ? task.rightView.CvtColor(ColorConversionCodes.BGR2GRAY) : task.rightView;
+
+            Mat disparity = new Mat();
+            blockMatch.Compute(tmpLeft, tmpRight, disparity);
+            disparity.ConvertTo(dst1, MatType.CV_32F, 1.0 / 16);
+            dst1 = dst1.Threshold(0, 0, ThresholdTypes.Tozero);
+
+            int topMargin = 10, sideMargin = 8;
+            Rect rect = new Rect(options.numDisparity + sideMargin, topMargin, src.Width - options.numDisparity - sideMargin * 2, src.Height - topMargin * 2);
+            Cv2.Divide(options.distance, dst1[rect], dst1[rect]); // this needs much more refinement. The trackbar value is just an approximation.
+            dst1[rect] = dst1[rect].Threshold(10, 10, ThresholdTypes.Trunc);
+
+            colorizer.Run(dst1);
+            dst2[rect] = colorizer.dst2[rect];
+            dst3 = task.rightView.Resize(src.Size());
+        }
+    }
+
+
+    public class CSharp_Blur_Basics : CS_Parent
+    {
+        Options_Blur options = new Options_Blur();
+        public CSharp_Blur_Basics(VBtask task) : base(task)
+        {
+            UpdateAdvice(traceName + ": use local options to control the kernel size and sigma.");
+            desc = "Smooth each pixel with a Gaussian kernel of different sizes.";
+        }
+        public void Run(Mat src)
+        {
+            options.RunVB();
+            Cv2.GaussianBlur(src, dst2, new Size(options.kernelSize, options.kernelSize), options.sigma, options.sigma);
+        }
+    }
+
+    public class CSharp_Blur_Homogeneous : CS_Parent
+    {
+        Blur_Basics blur = new Blur_Basics();
+        public CSharp_Blur_Homogeneous(VBtask task) : base(task)
+        {
+            desc = "Smooth each pixel with a kernel of 1's of different sizes.";
+        }
+        public void Run(Mat src)
+        {
+            var blurKernelSlider = FindSlider("Blur Kernel Size");
+            int kernelSize = (int)blurKernelSlider.Value | 1;
+            Cv2.Blur(src, dst2, new Size(kernelSize, kernelSize), new Point(-1, -1));
+        }
+    }
+
+    public class CSharp_Blur_Median : CS_Parent
+    {
+        Blur_Basics blur = new Blur_Basics();
+        public CSharp_Blur_Median(VBtask task) : base(task)
+        {
+            desc = "Replace each pixel with the median of neighborhood of varying sizes.";
+        }
+        public void Run(Mat src)
+        {
+            var blurKernelSlider = FindSlider("Blur Kernel Size");
+            int kernelSize = (int)blurKernelSlider.Value | 1;
+            Cv2.MedianBlur(src, dst2, kernelSize);
+        }
+    }
+
+    // https://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html?highlight=bilateralfilter
+    // https://www.tutorialspoint.com/opencv/opencv_bilateral_filter.htm
+    public class CSharp_Blur_Bilateral : CS_Parent
+    {
+        Blur_Basics blur = new Blur_Basics();
+        public CSharp_Blur_Bilateral(VBtask task) : base(task)
+        {
+            desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges";
+        }
+        public void Run(Mat src)
+        {
+            var blurKernelSlider = FindSlider("Blur Kernel Size");
+            int kernelSize = (int)blurKernelSlider.Value | 1;
+            Cv2.BilateralFilter(src, dst2, kernelSize, kernelSize * 2, kernelSize / 2);
+        }
+    }
 
 
 
+    public class CSharp_Blur_PlusHistogram : CS_Parent
+    {
+        Mat_2to1 mat2to1 = new Mat_2to1();
+        Blur_Bilateral blur = new Blur_Bilateral();
+        Hist_EqualizeGray myhist = new Hist_EqualizeGray();
+
+        public CSharp_Blur_PlusHistogram(VBtask task) : base(task)
+        {
+            labels[2] = "Use Blur slider to see impact on histogram peak values";
+            labels[3] = "Top is before equalize, Bottom is after Equalize";
+            desc = "Compound algorithms Blur and Histogram";
+        }
+
+        public void Run(Mat src)
+        {
+            myhist.Run(src);
+            mat2to1.mat[0] = myhist.dst2.Clone();
+
+            blur.Run(src);
+            dst2 = blur.dst2.Clone();
+
+            myhist.Run(blur.dst2);
+            mat2to1.mat[1] = myhist.dst2.Clone();
+            mat2to1.Run(src);
+            dst3 = mat2to1.dst2;
+        }
+    }
 
 
+    public class CSharp_Blur_Detection : CS_Parent
+    {
+        Laplacian_Basics laplace = new Laplacian_Basics();
+        Blur_Basics blur = new Blur_Basics();
 
+        public CSharp_Blur_Detection(VBtask task) : base(task)
+        {
+            FindSlider("Laplacian Threshold").Value = 50;
+            FindSlider("Blur Kernel Size").Value = 11;
+            labels = new string[] { "", "", "Draw a rectangle to blur a region in alternating frames and test further", "Detected blur in the highlight regions - non-blur is white." };
+            desc = "Detect blur in an image";
+        }
 
+        public void Run(Mat src)
+        {
+            Rect r = new Rect(dst2.Width / 2 - 25, dst2.Height / 2 - 25, 50, 50);
+            if (standaloneTest())
+            {
+                if (task.drawRect != new Rect()) r = task.drawRect;
+                if (task.frameCount % 2 == 1)
+                {
+                    blur.Run(src[r]);
+                    src[r] = blur.dst2;
+                }
+            }
 
+            dst2 = src;
+            laplace.Run(src);
+            dst3 = laplace.dst2;
+
+            Scalar mean, stdev;
+            Cv2.MeanStdDev(dst2, out mean, out stdev);
+            setTrueText("Blur variance is " + (stdev.Val0 * stdev.Val0).ToString("F3"), 3);
+
+            if (standaloneTest()) dst2.Rectangle(r, Scalar.White, task.lineWidth);
+        }
+    }
+
+    public class CSharp_Blur_Depth : CS_Parent
+    {
+        Blur_Basics blur = new Blur_Basics();
+
+        public CSharp_Blur_Depth(VBtask task) : base(task)
+        {
+            desc = "Blur the depth results to help find the boundaries to large depth regions";
+        }
+
+        public void Run(Mat src)
+        {
+            dst3 = task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY).Threshold(0, 255, ThresholdTypes.Binary);
+
+            blur.Run(dst3);
+            dst2 = blur.dst2;
+        }
+    }
+
+    public class CSharp_Blur_TopoMap : CS_Parent
+    {
+        Gradient_CartToPolar gradient = new Gradient_CartToPolar();
+        AddWeighted_Basics addw = new AddWeighted_Basics();
+        Options_BlurTopo options = new Options_BlurTopo();
+
+        public CSharp_Blur_TopoMap(VBtask task) : base(task)
+        {
+            labels[2] = "Image Gradient";
+            desc = "Create a topo map from the blurred image";
+        }
+
+        public void Run(Mat src)
+        {
+            options.RunVB();
+
+            gradient.Run(src);
+            dst2 = gradient.magnitude;
+
+            if (options.kernelSize > 1)
+            {
+                Cv2.GaussianBlur(dst2, dst3, new Size(options.kernelSize, options.kernelSize), 0, 0);
+            }
+            dst3 = dst3.Normalize(255);
+            dst3 = dst3.ConvertScaleAbs(255);
+
+            dst3 = (dst3 * 1 / options.reduction).ToMat();
+            dst3 = (dst3 * options.reduction).ToMat();
+
+            addw.src2 = ShowPalette(dst3);
+            addw.Run(task.color);
+            dst3 = addw.dst2;
+
+            labels[3] = "Blur = " + options.nextPercent.ToString() + "% Reduction Factor = " + options.reduction.ToString();
+            if (task.frameCount % options.frameCycle == 0)
+            {
+                options.nextPercent -= 1;
+            }
+            if (options.nextPercent <= 0)
+            {
+                options.nextPercent = options.savePercent;
+            }
+        }
+    }
 
 
 

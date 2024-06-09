@@ -1318,6 +1318,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(functionN
 	if algorithmName = "Options_BinarizeNiBlack" Then return new Options_BinarizeNiBlack
 	if algorithmName = "Options_BlockMatching" Then return new Options_BlockMatching
 	if algorithmName = "Options_Blur" Then return new Options_Blur
+	if algorithmName = "Options_BlurTopo" Then return new Options_BlurTopo
 	if algorithmName = "Options_Boundary" Then return new Options_Boundary
 	if algorithmName = "Options_BrightnessContrast" Then return new Options_BrightnessContrast
 	if algorithmName = "Options_CamShift" Then return new Options_CamShift
