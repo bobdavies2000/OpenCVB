@@ -26,7 +26,7 @@ namespace CS_Classes
             desc = "Add 2 images with specified weights.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
             weight = options.addWeighted;
@@ -67,14 +67,14 @@ namespace CS_Classes
             desc = "Add in the edges separating light and dark to the color image";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             edges.Run(src);
             dst2 = edges.dst2;
             labels[2] = edges.labels[2];
 
             addw.src2 = edges.dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
-            addw.Run(src);
+            addw.RunCS(src);
             dst3 = addw.dst2;
         }
     }
@@ -120,7 +120,7 @@ namespace CS_Classes
             desc = "Align the depth data with the left or right view. Oak-D is aligned with the right image. Some cameras are not close to aligned.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (task.toggleOnOff)
             {
@@ -134,7 +134,7 @@ namespace CS_Classes
             }
 
             addw.src2 = dst1;
-            addw.Run(task.depthRGB);
+            addw.RunCS(task.depthRGB);
             dst2 = addw.dst2.Clone();
         }
     }
@@ -155,7 +155,7 @@ namespace CS_Classes
             desc = "Use the Windows alpha channel to separate foreground and background";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             src = src.CvtColor(ColorConversionCodes.BGR2BGRA);
             Mat[] split = Cv2.Split(src);
@@ -184,7 +184,7 @@ public class CSharp_ApproxPoly_Basics : CS_Parent
             desc = "Using the input contours, create ApproxPoly output";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
 
@@ -229,7 +229,7 @@ public class CSharp_ApproxPoly_Basics : CS_Parent
             desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             rotatedRect.Run(src);
             dst2 = rotatedRect.dst2;
@@ -267,7 +267,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             labels = new string[] { "", "", "Original Hull", "Hull after ApproxPoly" };
             desc = "Use ApproxPolyDP on a hull to show impact of options (which appears to be minimal - what is wrong?)";
         }
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             hull.Run(src);
             dst2 = hull.dst2;
@@ -294,7 +294,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Find minimum containing triangle for a set of points.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
             if (task.heartBeat)
@@ -408,7 +408,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             var saveCityOrder = (int[])cityOrder.Clone();
             GCHandle hCityOrder = GCHandle.Alloc(cityOrder, GCHandleType.Pinned);
@@ -454,7 +454,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Create a uniform random mask with a specified number of pixels.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             int sizeRequest = options.countSlider.Value;
             if (!task.paused)
@@ -494,7 +494,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         private void setup()
         {
             random.options.countSlider.Value = options.cityCount;
-            random.Run(empty); // get the city positions (may or may not be used below.)
+            random.RunCS(empty); // get the city positions (may or may not be used below.)
 
             for (int i = 0; i < anneal.Length; i++)
             {
@@ -530,7 +530,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
             Parallel.For(0, anneal.Length, i =>
             {
-                anneal[i].Run(src);
+                anneal[i].RunCS(src);
             });
 
             // find the best result and start all the others with it.
@@ -616,7 +616,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             return gray;
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             bgSub.Run(src);
             Mat gray;
@@ -644,7 +644,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Use FindNonZero API to get coordinates of non-zero points.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (standalone)
             {
@@ -696,7 +696,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Find the solo points in the pointcloud histograms for top and side views.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             hotTop.Run(src);
             dst2 = hotTop.dst3;
@@ -732,7 +732,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Find minimum containing rectangle for a set of points.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (standaloneTest())
             {
@@ -770,7 +770,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Build an ascii art representation of the input stream.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
 
@@ -799,7 +799,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "A palette'd version of the ascii art data";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             int hStep = src.Height / 31 - 1;
             int wStep = src.Width / 55 - 1;
@@ -837,7 +837,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Capture an image and compare it to previous frame using absDiff and threshold";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -882,12 +882,12 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Display the instability in image pixels.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
-            colorAA.Run(src);
+            colorAA.RunCS(src);
             dst2 = colorAA.dst2;
 
-            diff.Run(dst2.CvtColor(ColorConversionCodes.BGR2GRAY));
+            diff.RunCS(dst2.CvtColor(ColorConversionCodes.BGR2GRAY));
             dst3 = diff.dst2;
         }
     }
@@ -907,7 +907,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Mouse over any bin to see the histogram backprojected.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             Mat input = src.Clone();
             if (input.Channels() != 1)
@@ -961,7 +961,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Create a color histogram, normalize it, and backproject it with a palette.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             classCount = task.histogramBins;
             if (src.Channels() == 3)
@@ -996,7 +996,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             reduction.Run(src);
 
@@ -1027,7 +1027,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Create a histogram of the featureless regions";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             edges.Run(src);
             reduction.Run(edges.dst3);
@@ -1052,7 +1052,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Move the mouse off of OpenCVB and then use the left and right arrow keys move around in the backprojection histogram";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             keys.Run(src);
             List<string> keyIn = new List<string>(keys.keyInput);
@@ -1110,7 +1110,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Find lines in the back projection";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             backP.Run(src);
             dst3 = backP.dst3;
@@ -1135,7 +1135,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Explore Backprojection of the cloud histogram.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             int threshold = hist.thresholdSlider.Value;
             hist.Run(src);
@@ -1170,7 +1170,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Display the back projected color image";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             backP.Run(src);
             dst2 = backP.dst2;
@@ -1191,7 +1191,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Highlight the unstable pixels in the backprojection.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             backP.Run(src);
             dst2 = ShowPalette(backP.dst2 * 255 / backP.classCount);
@@ -1216,7 +1216,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Create a histogram from the equalized color and then backproject it.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             backP.Run(src);
             backP.dst2.ConvertTo(dst2, MatType.CV_8U);
@@ -1248,7 +1248,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (src.Channels() == 3)
                 dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -1305,16 +1305,16 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Inspect the lines from individual backprojection masks from a histogram";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
-            masks.Run(src);
+            masks.RunCS(src);
             dst2 = masks.dst2;
             dst3 = src.Clone();
 
             if (task.heartBeat)
                 dst1.SetTo(Scalar.All(0));
 
-            lines.Run(masks.mask);
+            lines.RunCS(masks.mask);
             foreach (var lp in lines.lpList)
             {
                 byte val = masks.dst3.At<byte>((int)lp.p1.Y, (int)lp.p1.X);
@@ -1362,7 +1362,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             return mask;
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             hist.Run(src);
             dst2 = hist.dst2;
@@ -1394,7 +1394,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Display the back projection of the hotspots in the Side View";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             histSide.Run(src);
             autoY.Run(histSide.histogram);
@@ -1417,7 +1417,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Display the back projection of the hotspots in the Top View";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             histTop.Run(src);
             dst2 = histTop.dst2;
@@ -1442,7 +1442,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Use both the BackProject_Top to improve the results of the BackProject_Side for finding flat surfaces.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             bpTop.Run(src);
             task.pointCloud.SetTo(0, bpTop.dst3);
@@ -1489,7 +1489,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Display the back projection of the solo samples in the Side View";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             histSide.Run(src);
 
@@ -1512,7 +1512,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Display the back projection of the solo samples in the Top View";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             histTop.Run(src);
 
@@ -1536,7 +1536,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Backproject the lines found in the top view.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             line.Run(src);
 
@@ -1568,7 +1568,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Backproject the lines found in the side view.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             line.Run(src);
 
@@ -1609,7 +1609,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Explore Backprojection of each element of a grayscale histogram.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             Mat input = src;
             if (input.Channels() != 1)
@@ -1681,9 +1681,9 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             labels[2] = "Use the mouse to select what should be shown in the backprojection of the depth histogram";
             desc = "Use the mouse to select what should be shown in the backprojection of the depth histogram";
         }
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
-            backP.Run(src);
+            backP.RunCS(src);
             dst2 = backP.dst2;
             dst3 = backP.dst3;
         }
@@ -1697,10 +1697,10 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             backp = new CSharp_BackProject_Image(task);
             desc = "Allow review of the depth backprojection";
         }
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             var depth = task.pcSplit[2].Threshold(task.maxZmeters, 255, ThresholdTypes.TozeroInv);
-            backp.Run(depth * 1000);
+            backp.RunCS(depth * 1000);
             dst2 = backp.dst2;
             dst3 = src;
             dst3.SetTo(Scalar.White, backp.mask);
@@ -1714,7 +1714,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         {
             desc = "Backproject the depth data at 1 meter intervals WITHOUT A HISTOGRAM.";
         }
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (task.histogramBins < task.maxZmeters) task.gOptions.setHistogramBins( (int)task.maxZmeters + 1);
             if (task.optionsChanged)
@@ -1745,7 +1745,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         {
             desc = "Create an 8UC1 image with a backprojection of the hue.";
         }
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             hue.Run(src);
             classCount = hue.classCount;
@@ -1790,7 +1790,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             use99 = true;
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (standaloneTest())
             {
@@ -1848,7 +1848,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             plot.Run(hist);
 
             addW.src2 = ~plot.dst2;
-            addW.Run(dst3);
+            addW.RunCS(dst3);
             dst2 = addW.dst2;
 
             float wt = addW.weight;
@@ -1868,7 +1868,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         {
             desc = "Perform a Benford analysis of an image normalized to between 0 and 1";
         }
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             dst3 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             Mat gray32f = new Mat();
@@ -1890,7 +1890,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             benford.setup99();
             desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1";
         }
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             dst3 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             Mat gray32f = new Mat();
@@ -1912,7 +1912,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         {
             desc = "Apply Benford to the depth data";
         }
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             benford.Run(task.pcSplit[2]);
             dst2 = benford.dst2;
@@ -1933,7 +1933,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             labels = new string[] { "", "", "Actual Distribution of input", "" };
             desc = "Apply Benford to a list of primes";
         }
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (task.optionsChanged)
                 sieve.Run(src); // only need to compute this once...
@@ -1941,7 +1941,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
             var tmp = new Mat(sieve.primes.Count, 1, MatType.CV_32S, sieve.primes.ToArray());
             tmp.ConvertTo(tmp, MatType.CV_32F);
-            benford.Run(tmp);
+            benford.RunCS(tmp);
             dst2 = benford.dst2;
         }
     }
@@ -1985,7 +1985,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             return new Point((int)x, (int)y);
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             Point p1 = new Point();
             for (int i = 0; i <= points.Length - 4; i += 3)
@@ -2015,7 +2015,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Draw a Bezier curve based with the 4 input points.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             dst2.SetTo(Scalar.Black);
             Point p1 = new Point();
@@ -2054,7 +2054,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Classify each 3-channel input pixel according to their relative values";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
             src = options.dst2;
@@ -2101,7 +2101,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
 
@@ -2142,7 +2142,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Detect motion using background subtraction algorithms in OpenCV - some only available in C++";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
@@ -2173,7 +2173,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Subtract background using a mixture of Gaussians";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
             if (src.Channels() == 3)
@@ -2194,7 +2194,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Subtract background using a mixture of Gaussians - the QT version";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (src.Channels() == 3)
             {
@@ -2216,7 +2216,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Subtract background using a mixture of Gaussians";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -2236,7 +2236,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "GMG and KNN API's to subtract background";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
             if (task.frameCount < 120)
@@ -2268,7 +2268,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Isolate motion in both depth and color data using a mixture of Gaussians";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
             grayMat = task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -2297,7 +2297,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Detect Motion for use with background subtraction";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
 
@@ -2437,10 +2437,10 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             retina.Run(task.depthRGB);
-            bgSub.Run(retina.dst3.Clone());
+            bgSub.RunCS(retina.dst3.Clone());
             dst2 = bgSub.dst2;
             Cv2.Subtract(bgSub.dst2, retina.dst3, dst3);
         }
@@ -2455,7 +2455,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Detect motion with both depth and color changes";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             motion.Run(src);
             dst2 = motion.dst2;
@@ -2478,11 +2478,11 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             video.Run(src);
             dst3 = video.dst2;
-            bgSub.Run(dst3);
+            bgSub.RunCS(dst3);
             dst2 = bgSub.dst2;
         }
     }
@@ -2497,7 +2497,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Generate a synthetic input to background subtraction method";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
             if (task.optionsChanged)
@@ -2535,11 +2535,11 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Demonstrate background subtraction algorithms with synthetic images";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
-            synth.Run(src);
+            synth.RunCS(src);
             dst3 = synth.dst2;
-            bgSub.Run(dst3);
+            bgSub.RunCS(dst3);
             dst2 = bgSub.dst2;
         }
     }
@@ -2556,7 +2556,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Use BGSubtract with the output of a reduction";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             reduction.Run(src);
             var mm = GetMinMax(reduction.dst2);
@@ -2587,7 +2587,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Split an image into 2 parts - darkest and lightest,";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             int halfSplit = 0;
             int bins = task.histogramBins;
@@ -2634,7 +2634,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Use kmeans with each of the 2-way split images";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             bin2.Run(src);
@@ -2662,7 +2662,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Use RedCloud with the darkest regions";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (standalone) bin2.Run(src);
 
@@ -2683,7 +2683,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Use RedCloud with the lightest regions";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (standalone) bin2.Run(src);
 
@@ -2706,7 +2706,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Keep splitting an image between light and dark";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (src.Channels() != 1)
             {
@@ -2753,7 +2753,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
 
@@ -2808,7 +2808,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Split an image into 3 parts - darkest, lightest, and in-between the 2";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             int bins = task.histogramBins;
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -2872,7 +2872,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Use kmeans with each of the 3-way split images";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             bin3.Run(src);
@@ -2901,7 +2901,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Build the palette input that best separates the light and dark regions of an image";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             bin3.Run(src);
             dst2.SetTo(4);
@@ -2924,7 +2924,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Use RedCloud with the darkest regions";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (standalone) bin3.Run(src);
 
@@ -2944,7 +2944,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Use RedCloud with the lightest regions";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (standalone) bin3.Run(src);
 
@@ -2966,7 +2966,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Use RedCloud with the regions that are neither lightest or darkest";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (standalone) bin3.Run(src);
 
@@ -2992,7 +2992,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Identify the lightest, darkest, and 'Other' regions separately and then combine the rcData.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
 
@@ -3056,7 +3056,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
 
@@ -3116,7 +3116,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Highlight the contours for each grid element with stats for each.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (task.mousePicTag == 1) index = task.gridMap.At<int>(task.clickPoint.Y, task.clickPoint.X);
             Rect roiSave = index < task.gridList.Count ? task.gridList[index] : new Rect();
@@ -3220,7 +3220,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Find edges from each of the binarized images";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             binary.Run(src);
 
@@ -3265,7 +3265,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Collect Sobel edges from binarized images";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             binary.Run(src);
 
@@ -3297,7 +3297,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Find the unstable pixels in the binary image";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             binary.Run(src);
             dst2 = binary.dst2;
@@ -3326,7 +3326,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Find unstable pixels but remove those that are also edges.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             canny.Run(src);
             blur.Run(canny.dst2);
@@ -3354,7 +3354,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Identify the unstable grayscale pixel values ";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -3427,7 +3427,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Binarize an image using the valleys provided by HistValley_Basics";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             Mat gray = src.Channels() == 1 ? src.Clone() : src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
@@ -3460,7 +3460,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Identify the unstable grayscale pixel values ";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (src.Channels() != 1)
                 src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -3552,7 +3552,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Binarize an image and split it into quartiles using peaks.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             Mat gray = (src.Channels() == 1) ? src.Clone() : src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
@@ -3594,7 +3594,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Separate the quartiles of the image using the fuzzy grayscale pixel values";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             Mat gray = (src.Channels() == 1) ? src.Clone() : src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
@@ -3634,7 +3634,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Add the 4-way split of left and right views.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             binaryLeft.Run(src);
 
@@ -3671,7 +3671,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Identify the lightest and darkest regions separately and then combine the rcData.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
 
@@ -3729,7 +3729,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             }
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             binary.Run(src);
             if (dst2.Width != binary.mats.mat[0].Width) rebuildMats();
@@ -3755,7 +3755,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Binarize an image and split it into quartiles using peaks.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             Mat gray = src.Channels() == 1 ? src.Clone() : src.CvtColor(ColorConversionCodes.BGR2GRAY);
 
@@ -3799,7 +3799,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Binarize an image using Threshold with OTSU.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             meanScalar = Cv2.Mean(src, mask);
 
@@ -3832,7 +3832,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Binarize an image using Threshold with OTSU.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
 
@@ -3875,7 +3875,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             dst1 = new Mat(dst1.Size(), MatType.CV_8U, 0);
             desc = "Display the top 4 masks from the BGR kmeans output";
         }
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             km.Run(src);
             for (int i = 0; i < km.masks.Count; i++)
@@ -3904,7 +3904,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Display the top 4 masks from the BGR kmeans output";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             km.Run(src);
             dst1.SetTo(0);
@@ -3929,7 +3929,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Identify the marginal regions that flip between subdivisions based on brightness.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             binar4.Run(src);
             dst2 = ShowPalette(binar4.dst2 * 255 / 5);
@@ -3953,7 +3953,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Add the Depth_TiersZ and Bin4Way_Regions output in preparation for RedCloud";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             binar4.Run(src);
             tiers.Run(src);
@@ -3983,7 +3983,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Binarize an image using Threshold with OTSU.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
             meanScalar = Cv2.Mean(src);
@@ -4006,7 +4006,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             labels[3] = "Binarize Sauvola";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
             if (src.Channels() == 3)
@@ -4029,7 +4029,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             labels[2] = "Binarize Wolf";
             labels[3] = "Binarize Nick";
         }
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
 
@@ -4064,7 +4064,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Generate data to test Blob Detector.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             rotatedRect.Run(src);
             Mats.mat[0] = rotatedRect.dst2;
@@ -4094,7 +4094,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Use connected components to find blobs.";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (task.heartBeat)
             {
@@ -4142,7 +4142,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Use OpenCV's block matching on left and right views";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
 
@@ -4192,7 +4192,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             UpdateAdvice(traceName + ": use local options to control the kernel size and sigma.");
             desc = "Smooth each pixel with a Gaussian kernel of different sizes.";
         }
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
             Cv2.GaussianBlur(src, dst2, new Size(options.kernelSize, options.kernelSize), options.sigma, options.sigma);
@@ -4206,7 +4206,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         {
             desc = "Smooth each pixel with a kernel of 1's of different sizes.";
         }
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             var blurKernelSlider = FindSlider("Blur Kernel Size");
             int kernelSize = (int)blurKernelSlider.Value | 1;
@@ -4221,7 +4221,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         {
             desc = "Replace each pixel with the median of neighborhood of varying sizes.";
         }
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             var blurKernelSlider = FindSlider("Blur Kernel Size");
             int kernelSize = (int)blurKernelSlider.Value | 1;
@@ -4238,7 +4238,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
         {
             desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges";
         }
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             var blurKernelSlider = FindSlider("Blur Kernel Size");
             int kernelSize = (int)blurKernelSlider.Value | 1;
@@ -4261,7 +4261,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Compound algorithms Blur and Histogram";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             myhist.Run(src);
             mat2to1.mat[0] = myhist.dst2.Clone();
@@ -4290,7 +4290,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Detect blur in an image";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             Rect r = new Rect(dst2.Width / 2 - 25, dst2.Height / 2 - 25, 50, 50);
             if (standaloneTest())
@@ -4324,7 +4324,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Blur the depth results to help find the boundaries to large depth regions";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             dst3 = task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY).Threshold(0, 255, ThresholdTypes.Binary);
 
@@ -4345,7 +4345,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Create a topo map from the blurred image";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
 
@@ -4389,7 +4389,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Use Filter2D to create a motion blur";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
 
@@ -4517,7 +4517,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             labels[3] = "Deblurred Image Output";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             mblur.options.RunVB();
 
@@ -4528,13 +4528,13 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
 
             if (mblur.options.redoCheckBox.Checked)
             {
-                mblur.Run(src);
+                mblur.RunCS(src);
                 mblur.options.showDirection = false;
                 mblur.options.redoCheckBox.Checked = false;
             }
             else
             {
-                mblur.Run(src);
+                mblur.RunCS(src);
             }
 
             dst2 = mblur.dst2;
@@ -4581,7 +4581,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Create a mask of the RedCloud cell boundaries";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             if (src.Channels() != 1)
             {
@@ -4637,7 +4637,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Add the depth tiers to the cell boundaries";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             cells.Run(src);
             dst3 = cells.dst2;
@@ -4665,7 +4665,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Build the boundaries for redCells and remove interior rectangles";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             options.RunVB();
 
@@ -4729,7 +4729,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Build the boundaries for redCells and remove interior rectangles";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             bRects.Run(src);
             dst2 = bRects.bounds.dst2.Clone();
@@ -4756,7 +4756,7 @@ public class CSharp_ApproxPoly_Hull : CS_Parent
             desc = "Determine if 2 contours overlap";
         }
 
-        public void Run(Mat src)
+        public void RunCS(Mat src)
         {
             bounds.Run(src);
             dst3 = bounds.dst2;

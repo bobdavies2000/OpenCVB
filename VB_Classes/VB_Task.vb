@@ -771,7 +771,7 @@ Public Class VBtask : Implements IDisposable
         'cMotion.Run(src)
         If task.algName.StartsWith("CSharp_") Then
             csAlgorithmObject.trueData.clear()
-            csAlgorithmObject.Run(src.Clone)
+            csAlgorithmObject.RunCS(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested CS algorithm runs...
 
             task.labels = csAlgorithmObject.labels
 
@@ -786,6 +786,7 @@ Public Class VBtask : Implements IDisposable
         Else
             vbAlgorithmObject.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
         End If
+        task.firstPass = False
 
         postProcess(src)
     End Sub

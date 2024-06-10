@@ -3225,7 +3225,6 @@ Public Class Options_Gif : Inherits VB_Parent
         Static frmRadio = findfrm(traceName + " Radio Buttons")
         If task.firstPass Then
             Static myFrameCount As Integer = 0
-            If myFrameCount > 5 Then task.firstPass = False
             myFrameCount += 1
             frmCheck.Left = task.gOptions.Width / 2
             frmCheck.top = task.gOptions.Height / 2
@@ -3736,7 +3735,6 @@ Public Class Options_Spectrum : Inherits VB_Parent
         sampleThreshold = countSlider.value
 
         If task.firstPass Then
-            task.firstPass = False
             frmSliders.Left = task.gOptions.Width / 2
             frmSliders.top = task.gOptions.Height / 2
         End If
@@ -3816,7 +3814,6 @@ Public Class Options_Complexity : Inherits VB_Parent
             End If
         Next
         If task.firstPass Then
-            task.firstPass = False
             frm.Left = task.gOptions.Width / 2
             frm.top = task.gOptions.Height / 2
         End If
@@ -3860,7 +3857,6 @@ Public Class Options_Edges_All : Inherits VB_Parent
     Public Sub RunVB()
         Static frm = findfrm(traceName + " Radio Buttons")
         If task.firstPass Then
-            task.firstPass = False
             frm.Left = task.gOptions.Width / 2
             frm.top = task.gOptions.Height / 2
         End If
@@ -4005,7 +4001,6 @@ Public Class Options_Classifier : Inherits VB_Parent
             End If
         Next
         If task.firstPass Then
-            task.firstPass = False
             frm.Left = task.gOptions.Width / 2
             frm.top = task.gOptions.Height / 2
         End If

@@ -189,7 +189,7 @@ Public Class Kalman_MousePredict : Inherits VB_Parent
         kalman.kInput = {task.mouseMovePoint.X, task.mouseMovePoint.Y}
         kalman.Run(src)
         DrawLine(dst2, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), lastStateResult, white)
-        DrawLine(dst2, task.mouseMovePoint, lastRealMouse, cv.Scalar.Red)
+        dst2.Line(task.mouseMovePoint, lastRealMouse, cv.Scalar.Red)
         lastRealMouse = task.mouseMovePoint
     End Sub
 End Class

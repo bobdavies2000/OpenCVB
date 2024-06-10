@@ -9,7 +9,7 @@ Public Class Diff_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.firstPass Then lastFrame = src.Clone
+        If task.firstPass Or lastFrame Is Nothing Then lastFrame = src.Clone
         If task.optionsChanged Or lastFrame.Size <> src.Size Then lastFrame = src.Clone
 
         cv.Cv2.Absdiff(src, lastFrame, dst0)

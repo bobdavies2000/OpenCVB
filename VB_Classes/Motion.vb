@@ -620,6 +620,7 @@ Public Class Motion_Grayscale : Inherits VB_Parent
         End If
 
         If standaloneTest() Then
+            If diff.lastFrame Is Nothing Then diff.lastFrame = dst2.Clone
             If diff.lastFrame.Width = 0 Then diff.lastFrame = dst2.Clone
             diff.Run(src)
             dst3 = diff.dst2

@@ -21,7 +21,7 @@ Public Class Pendulum_Basics : Inherits VB_Parent
         Static w1 As Single, w2 As Single
         Static g = 9.81
         Static dw As Single = 2, dh As Single = 4
-        Static center = New cv.Point(dst2.Width / 2, 0)
+        Static center = New cv.Point2f(dst2.Width / 2, 0)
         Static fps As Single = 300
         Dim accumulator As Single
 

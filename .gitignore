@@ -346,12 +346,11 @@ Azure-Kinect-Sensor-SDK
 opencv
 librealsense
 Data/FileNames.txt
-RankList.txt
+RankList1.txt
 README.docx
 Data/nextScheme.jpg
 Data/AlgorithmGroupNames.txt
 Data/AlgorithmList.txt
-UI_Generator/AlgorithmList.vb
 VB_Classes/Python/model_compiler/downloads/*s
 VB_Classes/Python/resources/nn/
 svm_data.dat
@@ -389,3 +388,4 @@ Mynt
 OrbbecSDK
 zed-sdk/
 *.json
+CS_Classes\createAlgorithms.cs

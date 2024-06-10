@@ -1,0 +1,2 @@
+<Reuse Rank 2 times>,Edge_Canny
+<Reuse Rank 5 times>,Depth_ColorMap
