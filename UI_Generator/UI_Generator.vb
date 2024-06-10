@@ -5,12 +5,12 @@ Module UI_GeneratorMain
         Console.WriteLine("Starting work to generate the user interface.")
         Dim cppAlgorithmInput = New FileInfo("../CPP_Classes/CPP_Algorithms.h")
         Dim CPPInput = New FileInfo("../CPP_Classes/CPP_AI_Generated.h")
-        Dim CSInput = New FileInfo("../CS_Classes/AI_Gen1.cs")
+        Dim CSInput = New FileInfo("../CS_Classes/CS_AI_Gen1.cs")
         Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../VB_classes/")
         If cppAlgorithmInput.Exists = False Then
             cppAlgorithmInput = New FileInfo("../../CPP_Classes/CPP_Algorithms.h")
             CPPInput = New FileInfo("../../CPP_Classes/CPP_AI_Generated.h")
-            CSInput = New FileInfo("../../CS_Classes/AI_Gen1.cs")
+            CSInput = New FileInfo("../../CS_Classes/CS_AI_Gen1.cs")
             VBcodeDir = New DirectoryInfo(CurDir() + "/../../VB_classes/")
         End If
         Dim homeDir As New DirectoryInfo(VBcodeDir.FullName + "/../")
