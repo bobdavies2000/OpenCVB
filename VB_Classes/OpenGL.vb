@@ -4,8 +4,6 @@ Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 Imports System.Drawing
 Imports cvext = OpenCvSharp.Extensions
-Imports System.Windows.Documents
-Imports Microsoft.VisualBasic.ApplicationServices
 
 Public Class OpenGL_Basics : Inherits VB_Parent
     Dim memMapWriter As MemoryMappedViewAccessor
