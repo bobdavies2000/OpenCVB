@@ -106,7 +106,7 @@ Public Class OpenGL_Basics : Inherits VB_Parent
             If pointCloudBuffer.Length <> pointCloudInput.Total * pointCloudInput.ElemSize Then ReDim pointCloudBuffer(pointCloudInput.Total * pointCloudInput.ElemSize - 1)
         End If
 
-        If task.firstPass Then
+        If memMapPtr = 0 Then
             StartOpenGLWindow()
         Else
             Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
