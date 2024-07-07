@@ -2,14 +2,14 @@ Imports cv = OpenCvSharp
 Public Class Extrinsics_Basics : Inherits VB_Parent
     Dim addw As New AddWeighted_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.dotSizeSlider.Value = 5
+        If standaloneTest() Then task.gOptions.DotSizeSlider.Value = 5
         desc = "MatchShapes: Show the alignment of the BGR image to the left and right camera images."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        dst2 = task.leftview
-        dst3 = task.rightview
+        dst2 = task.leftView
+        dst3 = task.rightView
 
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         If task.drawRect.Width > 0 Then
             dst2.Rectangle(task.drawRect, cv.Scalar.White, task.lineWidth, task.lineType)
@@ -20,11 +20,11 @@ Public Class Extrinsics_Basics : Inherits VB_Parent
 
         Dim pt = New cv.Point(dst2.Width / 2, dst2.Height / 2)
         If standaloneTest() Then
-            DrawCircle(dst2, pt, task.dotSize, cv.Scalar.White)
-            DrawCircle(dst3, pt, task.dotSize, cv.Scalar.White)
-            DrawCircle(dst2, pt, task.dotSize - 2, cv.Scalar.Black)
-            DrawCircle(dst3, pt, task.dotSize - 2, cv.Scalar.Black)
-            DrawCircle(task.color, pt, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
+            DrawCircle(dst3, pt, task.DotSize, cv.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize - 2, cv.Scalar.Black)
+            DrawCircle(dst3, pt, task.DotSize - 2, cv.Scalar.Black)
+            DrawCircle(task.color, pt, task.DotSize, cv.Scalar.White)
         End If
     End Sub
 End Class
@@ -49,11 +49,11 @@ Public Class Extrinsics_Display : Inherits VB_Parent
 
         Dim rectLeft = New cv.Rect(options.leftCorner - optTrans.leftTrans, options.topCorner, dst2.Width - 2 * options.leftCorner, dst2.Height - 2 * options.topCorner)
         Dim rectRight = New cv.Rect(options.rightCorner - optTrans.rightTrans, options.topCorner, dst2.Width - 2 * options.rightCorner, dst2.Height - 2 * options.topCorner)
-        addw.src2 = task.leftview(rectLeft).Resize(dst2.Size)
+        addw.src2 = task.leftView(rectLeft).Resize(dst2.Size)
         addw.Run(src)
         dst2 = addw.dst2.Clone
 
-        addw.src2 = task.rightview(rectRight).Resize(dst2.Size)
+        addw.src2 = task.rightView(rectRight).Resize(dst2.Size)
         addw.Run(src)
         dst3 = addw.dst2.Clone
     End Sub

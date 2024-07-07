@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Imports System.Security.Cryptography
 Imports cv = OpenCvSharp
-'Public Class CSharp_Basics : Inherits VB_Parent
+'Public Class CS_Basics : Inherits VB_Parent
 '    Public Sub New()
 '        desc = "Invoke the selected C# algorithm"
 '    End Sub
@@ -54,7 +54,7 @@ Imports cv = OpenCvSharp
 '        labels(2) = "AKAZE key points"
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
-'        CS_AKaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+'        CS_AKaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2Gray))
 '        src.CopyTo(dst2)
 '        For i = 0 To CS_AKaze.akazeKeyPoints.Count - 1
 '            DrawCircle(dst2,CS_AKaze.akazeKeyPoints.ElementAt(i).Pt, task.dotSize, cv.Scalar.Red)
@@ -67,7 +67,7 @@ Imports cv = OpenCvSharp
 '        labels(2) = "KAZE key points"
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
-'        CS_Kaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+'        CS_Kaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2Gray))
 '        src.CopyTo(dst2)
 '        For i = 0 To CS_Kaze.kazeKeyPoints.Count - 1
 '            DrawCircle(dst2,CS_Kaze.kazeKeyPoints.ElementAt(i).Pt, task.dotSize, cv.Scalar.Red)
@@ -115,8 +115,8 @@ Imports cv = OpenCvSharp
 '        CS_KazeLeft.GetKeypoints(task.leftView)
 '        CS_KazeRight.GetKeypoints(task.rightView)
 
-'        dst3 = If(task.leftView.Channels = 1, task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.leftView)
-'        dst2 = If(task.rightView.Channels = 1, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView)
+'        dst3 = If(task.leftView.Channels() = 1, task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.leftView)
+'        dst2 = If(task.rightView.Channels() = 1, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView)
 
 '        Dim maxPoints = maxSlider.Value
 '        Dim topDistance = distSlider.Value
@@ -173,7 +173,7 @@ Imports cv = OpenCvSharp
 '            dst3 = src
 '        End If
 
-'        dst1 = If(dst3.Channels = 3, dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst3)
+'        dst1 = If(dst3.Channels() = 3, dst3.CvtColor(cv.ColorConversionCodes.BGR2Gray), dst3)
 '        If options.horizontalDerivative Then dst2 = dst1.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
 '        If options.verticalDerivative Then dst0 = dst1.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
 '        dst2 = dst2.ConvertScaleAbs()
@@ -244,11 +244,11 @@ Imports cv = OpenCvSharp
 '        Static minSlider = FindSlider("min Threshold")
 '        Static maxSlider = FindSlider("max Threshold")
 '        Static stepSlider = FindSlider("Threshold Step")
-'        Static areaRadio = findRadio("FilterByArea")
-'        Static circRadio = findRadio("FilterByCircularity")
-'        Static convexRadio = findRadio("FilterByConvexity")
-'        Static inertiaRadio = findRadio("FilterByInertia")
-'        Static colorRadio = findRadio("FilterByColor")
+'        Static areaRadio = FindRadio("FilterByArea")
+'        Static circRadio = FindRadio("FilterByCircularity")
+'        Static convexRadio = FindRadio("FilterByConvexity")
+'        Static inertiaRadio = FindRadio("FilterByInertia")
+'        Static colorRadio = FindRadio("FilterByColor")
 
 '        blobParams = New cv.SimpleBlobDetector.Params
 '        If areaRadio.Checked Then blobParams.FilterByArea = areaRadio.Checked
@@ -312,7 +312,7 @@ Imports cv = OpenCvSharp
 '        desc = "Compare 2 images to get a homography.  We will use left and right images - needs more work"
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
-'        Static bfRadio = findRadio("Use BF Matcher")
+'        Static bfRadio = FindRadio("Use BF Matcher")
 '        grid.Run(src)
 
 '        Dim output As New cv.Mat(src.Rows, src.Cols * 2, cv.MatType.CV_8UC3)
@@ -351,7 +351,7 @@ Imports cv = OpenCvSharp
 '    Public Sub RunVB(src As cv.Mat)
 '        options.RunVB()
 '        dst2 = src.Clone
-'        sift.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), options.pointCount)
+'        sift.Run(src.CvtColor(cv.ColorConversionCodes.BGR2Gray), options.pointCount)
 
 '        Dim newPoints As New List(Of cv.Point)
 '        For i = 0 To sift.keypoints.Count - 1
@@ -480,8 +480,8 @@ Imports cv = OpenCvSharp
 '    Public Sub RunVB(src As cv.Mat)
 '        surf.Run(src)
 
-'        dst2 = If(task.leftView.Channels = 1, task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.leftView)
-'        dst3 = If(task.rightView.Channels = 1, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView)
+'        dst2 = If(task.leftView.Channels() = 1, task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.leftView)
+'        dst3 = If(task.rightView.Channels() = 1, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView)
 
 '        Dim keys1 = surf.CS_SurfBasics.keypoints1
 '        Dim keys2 = surf.CS_SurfBasics.keypoints2
@@ -804,7 +804,7 @@ Imports cv = OpenCvSharp
 '        desc = "Run Segmented Linear Regression on grayscale image data - just an experiment"
 '    End Sub
 '    Public Sub RunVB(src as cv.Mat)
-'        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+'        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 '        hist.Run(src)
 '        dst2 = hist.dst2
 '        For i = 0 To hist.histogram.Rows - 1

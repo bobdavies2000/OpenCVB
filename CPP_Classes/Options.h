@@ -34,9 +34,9 @@ public:
 	int topCorner;
 	CPP_Options_Extrinsics() {
 		int leftVal = 15, rightVal = 15, topBotVal = 15;
-		leftCorner = task->workingRes.width * leftVal;
-		rightCorner = task->workingRes.width * rightVal;
-		topCorner = task->workingRes.width * topBotVal;
+		leftCorner = task->WorkingRes.width * leftVal;
+		rightCorner = task->WorkingRes.width * rightVal;
+		topCorner = task->WorkingRes.width * topBotVal;
 	}
 	void RunVB() {
 	}
@@ -164,7 +164,7 @@ public:
 class CPP_Options_Boundary {
 public:
 	int desiredBoundaries = 15;
-	int peakDistance = task->workingRes.width / 20;
+	int peakDistance = task->WorkingRes.width / 20;
 	CPP_Options_Boundary() {
 	}
 	void RunVB() {}
@@ -331,7 +331,7 @@ public:
 
 class CPP_Options_DFT {
 public:
-	int radius = task->workingRes.width;
+	int radius = task->WorkingRes.width;
 	int order = 2;
 	CPP_Options_DFT() {
 	}
@@ -411,7 +411,7 @@ public:
 
 class CPP_Options_DrawArc {
 public:
-	int saveMargin = task->workingRes.width / 16;
+	int saveMargin = task->WorkingRes.width / 16;
 	bool drawFull;
 	bool drawFill;
 	CPP_Options_DrawArc() {
@@ -803,7 +803,7 @@ public:
 	cv::ShapeMatchModes matchOption;
 	float matchThreshold = 0.8f;
 	float maxYdelta = 0.05f;
-	float minSize = (task->workingRes.width * task->workingRes.height) / 100;
+	float minSize = (task->WorkingRes.width * task->WorkingRes.height) / 100;
 	CPP_Options_MatchShapes() {
 		matchOption = cv::ShapeMatchModes::CONTOURS_MATCH_I1;
 	}
@@ -1209,8 +1209,8 @@ public:
 	cv::Scalar fillColor = cv::Scalar(0, 0, 255);
 	int numPoints = 500;
 	int nGenPer = 100;
-	int radius1 = task->workingRes.height / 4;
-	int radius2 = task->workingRes.height / 8;
+	int radius1 = task->WorkingRes.height / 4;
+	int radius2 = task->WorkingRes.height / 8;
 	float dTheta = 2 * CV_PI / numPoints;
 	bool symmetricRipple = true;
 	bool reverseInOut = false;

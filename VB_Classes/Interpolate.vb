@@ -5,6 +5,7 @@ Imports OpenCvSharp.Flann
 Public Class Interpolate_Basics : Inherits VB_Parent
     Public options As New Options_Resize
     Public iOptions As New Options_Interpolate
+    Dim direction = 1
     Public Sub New()
         UpdateAdvice(traceName + ": 'Interpolation threshold' is the primary control" + vbCrLf +
                     "Local option 'Resize %' has a secondary effect." + vbCrLf +
@@ -19,7 +20,6 @@ Public Class Interpolate_Basics : Inherits VB_Parent
         If standaloneTest() Then
             Dim userGrab As Boolean = iOptions.interpolationThreshold <> iOptions.saveDefaultThreshold
             If userGrab = False Then
-                Static direction = 1
                 saveSliderValue += direction
                 If saveSliderValue > 50 Then direction = -1
                 If saveSliderValue = 1 Then direction = 1
@@ -48,13 +48,13 @@ End Class
 Public Class Interpolate_Kalman : Inherits VB_Parent
     Dim inter As New Interpolate_Basics
     Dim kalman As New Kalman_Basics
+    Dim updatedFrames As Integer
+    Dim myFrameCount As Integer
+    Dim heartCount As Integer
     Public Sub New()
         desc = "Use Kalman to smooth the grayscale results of interpolation"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static updatedFrames As Integer
-        Static myFrameCount As Integer
-
         inter.Run(src)
 
         dst2 = inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -100,7 +100,6 @@ Public Class Interpolate_Kalman : Inherits VB_Parent
                     Format((myFrameCount - updatedFrames) / myFrameCount, "0%") + " diffCount = " + CStr(diffCount)
 
         If task.heartBeat Then
-            Static heartCount As Integer
             heartCount += 1
             If heartCount Mod 10 = 0 Then
                 myFrameCount = 0
@@ -170,16 +169,15 @@ End Class
 
 Public Class Interpolate_QuarterBeat : Inherits VB_Parent
     Dim diff As New Diff_Basics
+    Dim updatedFrames As Integer
+    Dim myFrameCount As Integer
+    Dim cameraFPS As Single
+    Dim processedFPS As Single
+    Dim nextTime = Now
     Public Sub New()
         desc = "Highlight the image differences after every quarter second."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static updatedFrames As Integer
-        Static myFrameCount As Integer
-        Static cameraFPS As Single
-        Static processedFPS As Single
-        Static nextTime = Now
-
         If task.quarterBeat Then
             diff.Run(src)
             dst3 = diff.dst2

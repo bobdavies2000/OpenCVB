@@ -11,7 +11,7 @@ Public Class KMeans_Basics : Inherits VB_Parent
         desc = "Cluster the input using kMeans."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standaloneTest() And src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standaloneTest() And src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         options.RunVB()
         classCount = options.kMeansK
         Static lastK = classCount
@@ -89,6 +89,7 @@ End Class
 Public Class KMeans_k2_to_k8 : Inherits VB_Parent
     Dim Mats As New Mat_4Click
     Dim km As New KMeans_Basics
+    Dim kmIndex As Integer
     Public Sub New()
         labels(2) = "kmeans - k=2,4,6,8"
         desc = "Show clustering with various settings for cluster count.  Draw to select region of interest."
@@ -96,7 +97,6 @@ Public Class KMeans_k2_to_k8 : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         Static kSlider = FindSlider("KMeans k")
 
-        Static kmIndex As Integer
         If task.frameCount Mod 100 = 0 Then
             kmIndex += 1
             If kmIndex >= 4 Then kmIndex = 0
@@ -161,6 +161,7 @@ End Class
 Public Class KMeans_CustomData : Inherits VB_Parent
     Dim km As New KMeans_Basics
     Public centers = New cv.Mat()
+    Dim random = New Random_Basics
     Public Sub New()
         desc = "Cluster the selected input using kMeans"
     End Sub
@@ -170,9 +171,8 @@ Public Class KMeans_CustomData : Inherits VB_Parent
         If src.Rows < k Then k = src.Rows
 
         If standaloneTest() Then
-            Static random = New Random_Basics
             Static randslider = FindSlider("Random Pixel Count")
-            If task.firstPass Then randslider.Value = 50
+            If task.FirstPass Then randslider.Value = 50
             If randslider.Value < k Then randslider.Value = k
             If task.heartBeat Then random.Run(empty)
 
@@ -202,9 +202,9 @@ Public Class KMeans_Simple_CPP : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then src = task.pcSplit(2)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim mm as mmData = GetMinMax(src, task.depthMask)
+        Dim mm As mmData = GetMinMax(src, task.depthMask)
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
@@ -213,7 +213,7 @@ Public Class KMeans_Simple_CPP : Inherits VB_Parent
         handleSrc.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
-        setTrueText("Use 'Max Depth' in the global options to set the boundary between blue and yellow.", 3)
+        SetTrueText("Use 'Max Depth' in the global options to set the boundary between blue and yellow.", 3)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Kmeans_Simple_Close(cPtr)
@@ -319,6 +319,7 @@ Public Class KMeans_Image : Inherits VB_Parent
     Public masks As New List(Of cv.Mat)
     Public counts As New List(Of Integer)
     Public classCount As Integer
+    Dim maskIndex As Integer
     Public Sub New()
         labels = {"", "", "KMeans output after Palette run", "Each of the KMeans masks is displayed below in rotation."}
         desc = "Cluster the input image pixels using kMeans and allow any region to be selected for highlight in dst3."
@@ -336,7 +337,6 @@ Public Class KMeans_Image : Inherits VB_Parent
             masks.Add(mask)
             counts.Add(mask.CountNonZero)
         Next
-        Static maskIndex As Integer
         If task.heartBeat Then maskIndex += 1
         If maskIndex >= masks.Count Then maskIndex = 0
         dst3 = masks(maskIndex)
@@ -357,7 +357,7 @@ Public Class KMeans_DepthPlusGray : Inherits VB_Parent
     Public Sub New()
         km.buildPaletteOutput = False
         labels(3) = "KMeans 8-bit results"
-        grayPlus(0) = New cv.Mat(task.workingRes, cv.MatType.CV_32F, 0)
+        grayPlus(0) = New cv.Mat(task.WorkingRes, cv.MatType.CV_32F, 0)
         desc = "Cluster the rgb+depth image pixels using kMeans"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -398,7 +398,7 @@ Public Class KMeans_Dimensions : Inherits VB_Parent
         Dim merge As New cv.Mat
         Select Case dimSlider.value
             Case 1 ' grayscale
-                If src.Channels = 1 Then
+                If src.Channels() = 1 Then
                     src.ConvertTo(merge, cv.MatType.CV_32F)
                 Else
                     src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertTo(merge, cv.MatType.CV_32F)

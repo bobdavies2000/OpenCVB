@@ -2,27 +2,31 @@
 Public Class Line3D_Draw : Inherits VB_Parent
     Public p1 As cv.Point, p2 As cv.Point
     Dim plot As New Plot_OverTimeScalar
+    Dim toggleFirstSecond As Boolean
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         plot.plotCount = 2
 
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, 0)
 
         p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
         p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
         labels(2) = "Click twice in the image below to draw a line and that line's depth is correlated in X to Z and Y to Z in the plot at right"
         desc = "Determine where a 3D line is close to the real depth data"
     End Sub
+    Private Function findCorrelation(pts1 As cv.Mat, pts2 As cv.Mat) As Single
+        Dim correlationMat As New cv.Mat
+        cv.Cv2.MatchTemplate(pts1, pts2, correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+        Return correlationMat.Get(Of Single)(0, 0)
+    End Function
     Public Sub RunVB(src as cv.Mat)
-        Static toggleFirstSecond As Boolean
-
         If standaloneTest() Then
             If task.mouseClickFlag Then
                 If toggleFirstSecond = False Then
-                    p1 = task.clickPoint
+                    p1 = task.ClickPoint
                 Else
-                    p2 = task.clickPoint
+                    p2 = task.ClickPoint
                     toggleFirstSecond = False
                 End If
             End If
@@ -31,7 +35,7 @@ Public Class Line3D_Draw : Inherits VB_Parent
         If toggleFirstSecond Then Exit Sub ' wait until the second point is selected...
 
         dst1 = src
-        DrawLine(dst1, p1, p2, task.highlightColor)
+        DrawLine(dst1, p1, p2, task.HighlightColor)
         dst0.SetTo(0)
         DrawLine(dst0, p1, p2, 255)
         dst1.SetTo(0)
@@ -111,7 +115,7 @@ Public Class Line3D_CandidatesFirstLast : Inherits VB_Parent
     Public pcLinesMat As cv.Mat
     Public actualCount As Integer
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Get a list of points from PointCloud_Basics.  Identify first and last as the line in the sequence"
     End Sub
     Private Sub addLines(nextList As List(Of List(Of cv.Point3f)), xyList As List(Of List(Of cv.Point)))
@@ -155,7 +159,7 @@ Public Class Line3D_CandidatesAll : Inherits VB_Parent
     Public actualCount As Integer
     Dim white32 As New cv.Point3f(1, 1, 1)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Get a list of points from PointCloud_Basics.  Identify all the lines in the sequence"
     End Sub
     Private Sub addLines(nextList As List(Of List(Of cv.Point3f)), xyList As List(Of List(Of cv.Point)))

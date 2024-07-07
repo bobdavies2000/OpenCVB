@@ -6,12 +6,12 @@ Public Class Fuzzy_Basics : Inherits VB_Parent
     Public contours As cv.Point()()
     Public sortContours As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
-        Dim floodRadio = findRadio("FloodFill")
+        Dim floodRadio = FindRadio("FloodFill")
         If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.redOptions.SimpleReductionBar.Value = 32
         cPtr = Fuzzy_Open()
-        findRadio("CComp").Checked = True
+        FindRadio("CComp").Checked = True
         labels = {"", "Solid regions", "8-Bit output of Fuzzy_Basics", "Fuzzy edges"}
         desc = "That which is not solid is fuzzy"
     End Sub
@@ -20,7 +20,7 @@ Public Class Fuzzy_Basics : Inherits VB_Parent
 
         reduction.Run(src)
         dst0 = reduction.dst2
-        If dst0.Channels <> 1 Then dst0 = dst0.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If dst0.Channels() <> 1 Then dst0 = dst0.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim dataSrc(dst0.Total) As Byte
         Marshal.Copy(dst0.Data, dataSrc, 0, dataSrc.Length)
@@ -86,9 +86,9 @@ Public Class Fuzzy_Filter : Inherits VB_Parent
         desc = "Use a 2D filter to find smooth areas"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Options.RunVB()
+        options.RunVB()
 
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         reduction.Run(src)
 
         Dim src32f As New cv.Mat
@@ -158,11 +158,11 @@ End Class
 
 Public Class Fuzzy_NeighborProof : Inherits VB_Parent
     Dim fuzzy as New Fuzzy_Basics
+    Dim proofFailed As Boolean = False
     Public Sub New()
         desc = "Prove that every contour point has at one and only one neighbor with the mask ID and that the rest are zero"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static proofFailed As Boolean = False
         If proofFailed Then Exit Sub
         fuzzy.Run(src)
         dst2 = fuzzy.dst1
@@ -186,7 +186,7 @@ Public Class Fuzzy_NeighborProof : Inherits VB_Parent
                 Next
             Next
         Next
-        setTrueText("Results are valid." + vbCrLf + "Mask ID's for all contour points in each region identified only one region.", New cv.Point(10, 50), 3)
+        SetTrueText("Results are valid." + vbCrLf + "Mask ID's for all contour points in each region identified only one region.", New cv.Point(10, 50), 3)
     End Sub
 End Class
 
@@ -214,7 +214,7 @@ Public Class Fuzzy_TrackerDepth : Inherits VB_Parent
         desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static displayCheck = findCheckBox("Display centroid and rectangle for each region")
+        Static displayCheck = FindCheckBox("Display centroid and rectangle for each region")
         Static minRectSizeSlider = FindSlider("Threshold for rectangle size")
 
         fuzzy.Run(task.depthRGB)
@@ -242,8 +242,8 @@ Public Class Fuzzy_TrackerDepth : Inherits VB_Parent
                 rects.Add(rect)
                 layoutColor.Add(vec(1))
                 If displayRect Then
-                    DrawCircle(dst2,centroid, task.dotSize + 3, cv.Scalar.Yellow)
-                    DrawCircle(dst2,centroid, task.dotSize, cv.Scalar.Red)
+                    DrawCircle(dst2,centroid, task.DotSize + 3, cv.Scalar.Yellow)
+                    DrawCircle(dst2,centroid, task.DotSize, cv.Scalar.Red)
                     dst2.Rectangle(rect, cv.Scalar.Yellow, 2)
                 End If
             End If
@@ -272,11 +272,11 @@ Public Class Fuzzy_TrackerDepthClick : Inherits VB_Parent
         tracker.Run(src)
         dst2 = tracker.dst2
 
-        If highlightRegion < 0 Then setTrueText("Click any color region to get more details and track it", New cv.Point(10, 50), 3)
+        If highlightRegion < 0 Then SetTrueText("Click any color region to get more details and track it", New cv.Point(10, 50), 3)
 
         dst3 = tracker.fuzzy.dst1
         If task.mouseClickFlag Then
-            highlightPoint = task.clickPoint
+            highlightPoint = task.ClickPoint
             highlightRegion = tracker.fuzzy.dst2.Get(Of Byte)(highlightPoint.Y, highlightPoint.X)
         End If
         If highlightRegion >= 0 Then

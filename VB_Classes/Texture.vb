@@ -12,9 +12,9 @@ Public Class Texture_Basics : Inherits VB_Parent
         desc = "find the best sample 256x256 texture of a mask"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If standaloneTest() Or src.Channels <> 1 Then
+        If standaloneTest() Or src.Channels() <> 1 Then
             ellipse.Run(src)
-            dst2 = ellipse.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst2 = ellipse.dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
             dst2 = dst2.ConvertScaleAbs(255)
             dst3 = ellipse.dst2.Clone
             dst3.SetTo(cv.Scalar.Yellow, task.gridMask)
@@ -65,7 +65,7 @@ Public Class Texture_Flow : Inherits VB_Parent
         Dim TFblockSize = blockSlider.Value * 2 + 1
         Dim TFksize = ksizeSlider.Value * 2 + 1
         dst2 = src.Clone
-        If src.Channels <> 1 Then src = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2Gray)
         Dim eigen = src.CornerEigenValsAndVecs(TFblockSize, TFksize)
         Dim split = eigen.Split()
         Dim d2 = TFdelta / 2
@@ -74,7 +74,7 @@ Public Class Texture_Flow : Inherits VB_Parent
                 Dim delta = New cv.Point2f(split(4).Get(Of Single)(y, x), split(5).Get(Of Single)(y, x)) * TFdelta
                 Dim p1 = New cv.Point(CInt(x - delta.X), CInt(y - delta.Y))
                 Dim p2 = New cv.Point(CInt(x + delta.X), CInt(y + delta.Y))
-                DrawLine(dst2, p1, p2, task.highlightColor)
+                DrawLine(dst2, p1, p2, task.HighlightColor)
             Next
         Next
     End Sub
@@ -136,7 +136,7 @@ Public Class OpenGL_TextureShuffle : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
             If dst2.Width = 320 Then
-                setTrueText("Texture_Shuffle is not supported at the 320x240 resolution.  It needs at least 256 rows in the output.")
+                SetTrueText("Texture_Shuffle is not supported at the 320x240 resolution.  It needs at least 256 rows in the output.")
                 Exit Sub
             End If
             floor.plane.Run(src)
@@ -153,9 +153,9 @@ Public Class OpenGL_TextureShuffle : Inherits VB_Parent
         tRect = New cv.Rect(0, 0, texture.tRect.Width * 4, texture.tRect.Height * 4)
         dst2(tRect) = shuffle.dst2.Repeat(4, 4)
         Dim split = dst2(tRect).Split()
-        Dim alpha As New cv.Mat(split(0).Size, cv.MatType.CV_8U, 1)
+        Dim alpha As New cv.Mat(split(0).Size(), cv.MatType.CV_8U, 1)
         Dim merged() As cv.Mat = {split(2), split(1), split(0), alpha}
         cv.Cv2.Merge(merged, rgbaTexture)
-        setTrueText("Use mouse movement over the image to display results.", 3)
+        SetTrueText("Use mouse movement over the image to display results.", 3)
     End Sub
 End Class

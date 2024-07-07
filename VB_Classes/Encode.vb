@@ -9,17 +9,15 @@ Public Class Encode_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         options.RunVB()
+        If task.FirstPass Then FindSlider("Encode Output Scaling").Value = 10
 
         Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}
-
         Dim buf() = src.ImEncode(".jpg", encodeParams)
         Dim image = New cv.Mat(buf.Count, 1, cv.MatType.CV_8U, buf)
         dst3 = cv.Cv2.ImDecode(image, cv.ImreadModes.AnyColor)
 
         Dim output As New cv.Mat
         cv.Cv2.Absdiff(src, dst3, output)
-
-        If task.firstPass Then options.scalingLevel = 10
 
         output.ConvertTo(dst2, cv.MatType.CV_8UC3, options.scalingLevel)
         Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
@@ -40,7 +38,6 @@ Public Class Encode_Scaling : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Dim fileExtension = ".jpg"
         Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}
 
         Dim buf() = src.ImEncode(".jpg", encodeParams)

@@ -20,7 +20,7 @@ Public Class PlyFormat_Basics : Inherits VB_Parent
         desc = "Create a .ply format file with the pointcloud."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.firstPass Then fileNameForm.Left = allOptions.Width / 3
+        If task.FirstPass Then fileNameForm.Left = allOptions.Width / 3
         If fileNameForm.PlayButton.Text = "Save" Then Exit Sub
         fileNameForm.PlayButton.Text = "Save"
 
@@ -55,7 +55,7 @@ Public Class PlyFormat_PlusRGB : Inherits VB_Parent
         desc = "Save the pointcloud in .ply format and include the RGB data."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.firstPass Then ply.fileNameForm.Left = allOptions.Width / 3
+        If task.FirstPass Then ply.fileNameForm.Left = allOptions.Width / 3
         If ply.fileNameForm.PlayButton.Text = "Save" Then Exit Sub
         ply.fileNameForm.PlayButton.Text = "Save"
 

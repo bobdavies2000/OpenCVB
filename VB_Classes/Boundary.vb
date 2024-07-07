@@ -5,23 +5,23 @@ Public Class Boundary_Basics : Inherits VB_Parent
     Public masks As New List(Of cv.Mat)
     Public contours As New List(Of List(Of cv.Point))
     Public runRedCPP As Boolean = True
+    Dim cvt As New Color8U_Basics
+    Dim prep As New RedCloud_Reduce
+    Dim guided As New GuidedBP_Depth
     Public Sub New()
         task.redOptions.setColorSource("Bin4Way_Regions")
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Create a mask of the RedCloud cell boundaries"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
+        If src.Channels() <> 1 Then
             If task.redOptions.UseColorOnly.Checked Then
-                Static cvt As New Color8U_Basics
                 cvt.Run(src)
                 dst1 = cvt.dst2
             ElseIf task.redOptions.UseDepth.Checked Then
-                Static prep As New RedCloud_Reduce
                 prep.Run(src)
                 dst1 = prep.dst2
             Else
-                Static guided As New GuidedBP_Depth
                 guided.Run(src)
                 dst1 = guided.dst2
             End If
@@ -58,7 +58,7 @@ Public Class Boundary_Tiers : Inherits VB_Parent
     Dim cells As New Boundary_Basics
     Dim contours As New Contour_DepthTiers
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Add the depth tiers to the cell boundaries"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -98,7 +98,7 @@ Public Class Boundary_Rectangles : Inherits VB_Parent
 
         dst2.SetTo(0)
         For Each r In bounds.rects
-            dst2.Rectangle(r, task.highlightColor, task.lineWidth)
+            dst2.Rectangle(r, task.HighlightColor, task.lineWidth)
         Next
         labels(2) = $"{bounds.rects.Count} rectangles before contain test"
 
@@ -129,7 +129,7 @@ Public Class Boundary_Rectangles : Inherits VB_Parent
 
         dst3.SetTo(0)
         For Each r In rects
-            dst3.Rectangle(r, task.highlightColor, task.lineWidth)
+            dst3.Rectangle(r, task.HighlightColor, task.lineWidth)
         Next
         labels(3) = $"{rects.Count} rectangles after contain test"
     End Sub
@@ -173,7 +173,7 @@ End Class
 Public Class Boundary_Overlap : Inherits VB_Parent
     Dim bounds As New Boundary_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
         desc = "Determine if 2 contours overlap"
     End Sub
     Public Sub RunVB(src As cv.Mat)

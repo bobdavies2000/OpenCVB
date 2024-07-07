@@ -57,7 +57,7 @@ Public Class OEX_CalcBackProject_Demo2 : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim count As Integer
-        If task.clickPoint <> New cv.Point Then
+        If task.ClickPoint <> New cv.Point Then
             Dim connectivity As Integer = 8
             Dim flags = connectivity Or (255 << 8) Or cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.MaskOnly
             Dim mask2 As New cv.Mat(src.Rows + 2, src.Cols + 2, cv.MatType.CV_8U, 0)
@@ -65,7 +65,7 @@ Public Class OEX_CalcBackProject_Demo2 : Inherits VB_Parent
             ' the delta between each regions value is 255 / classcount. no low or high bound needed.
             Dim delta = CInt(255 / classCount) - 1
             Dim bounds = New cv.Scalar(delta, delta, delta)
-            count = cv.Cv2.FloodFill(dst2, mask2, task.clickPoint, 255, Nothing, bounds, bounds, flags)
+            count = cv.Cv2.FloodFill(dst2, mask2, task.ClickPoint, 255, Nothing, bounds, bounds, flags)
 
             If count <> src.Total Then dst1 = mask2(New cv.Range(1, mask2.Rows - 1), New cv.Range(1, mask2.Cols - 1))
         End If
@@ -80,7 +80,7 @@ Public Class OEX_CalcBackProject_Demo2 : Inherits VB_Parent
         dst3 = src
         dst3.SetTo(cv.Scalar.White, dst1)
 
-        setTrueText("Click anywhere to isolate that region.", 1)
+        SetTrueText("Click anywhere to isolate that region.", 1)
     End Sub
 End Class
 
@@ -142,17 +142,13 @@ End Class
 Public Class OEX_BasicLinearTransforms : Inherits VB_Parent
     Dim options As New Options_BrightnessContrast
     Public Sub New()
-        FindSlider("Alpha (contrast)").Value = 2
-        FindSlider("Beta (brightness)").Value = 40
         desc = "OpenCV Example BasicLinearTransforms - NOTE: much faster than BasicLinearTransformTrackBar"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static alphaSlider = FindSlider("Alpha (contrast)")
-        Static betaSlider = FindSlider("Beta (brightness)")
-        src.ConvertTo(dst2, -1, alphaSlider.value, betaSlider.value)
+        options.RunVB()
+        src.ConvertTo(dst2, -1, options.brightness, options.contrast)
     End Sub
 End Class
-
 
 
 
@@ -162,21 +158,21 @@ End Class
 Public Class OEX_BasicLinearTransformsTrackBar : Inherits VB_Parent
     Dim options As New Options_BrightnessContrast
     Public Sub New()
-        FindSlider("Alpha (contrast)").Value = 2
-        FindSlider("Beta (brightness)").Value = 40
-        desc = "OpenCV Example BasicLinearTransformTrackBar"
+        desc = "OpenCV Example BasicLinearTransformTrackBar - much slower than OEX_BasicLinearTransforms"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static alphaSlider = FindSlider("Alpha (contrast)")
-        Static betaSlider = FindSlider("Beta (brightness)")
-        Dim alpha = alphaSlider.value
-        Dim beta = betaSlider.value
+        options.RunVB()
+
+        If src.Cols >= 640 Then
+            src = src.Resize(task.lowRes)
+            dst2 = dst2.Resize(task.lowRes)
+        End If
         For y As Integer = 0 To src.Rows - 1
             For x As Integer = 0 To src.Cols - 1
                 Dim vec = src.Get(Of cv.Vec3b)(y, x)
-                vec(0) = Math.Min(vec(0) * alpha + beta, 255)
-                vec(1) = Math.Min(vec(1) * alpha + beta, 255)
-                vec(2) = Math.Min(vec(2) * alpha + beta, 255)
+                vec(0) = Math.Max(Math.Min(vec(0) * options.brightness + options.contrast, 255), 0)
+                vec(1) = Math.Max(Math.Min(vec(1) * options.brightness + options.contrast, 255), 0)
+                vec(2) = Math.Max(Math.Min(vec(2) * options.brightness + options.contrast, 255), 0)
                 dst2.Set(Of cv.Vec3b)(y, x, vec)
             Next
         Next
@@ -218,7 +214,7 @@ Public Class OEX_delaunay2 : Inherits VB_Parent
             Loop While e <> e0
         End If
 
-        DrawCircle(img, pt, task.dotSize, activeColor)
+        DrawCircle(img, pt, task.DotSize, activeColor)
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.quarterBeat Then
@@ -279,12 +275,12 @@ Public Class OEX_MeanShift : Inherits VB_Parent
     Dim term_crit As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
     Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180)}
     Public histogram As New cv.Mat
+    Dim trackWindow As cv.Rect
     Public Sub New()
         labels(3) = "Draw a rectangle around the region of interest"
         desc = "OpenCV Example MeanShift"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static trackWindow As cv.Rect
         Dim roi = If(task.drawRect.Width > 0, task.drawRect, New cv.Rect(0, 0, dst2.Width, dst2.Height))
         Dim hsv As cv.Mat = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         dst2 = src
@@ -312,7 +308,7 @@ End Class
 Public Class OEX_PointPolygonTest_demo : Inherits VB_Parent
     Dim pointPoly As New PointPolygonTest_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "OpenCV Example PointPolygonTest_demo - it became PointPolygonTest_Basics."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -425,7 +421,7 @@ Public Class OEX_Points_Classifier : Inherits VB_Parent
         dst2 = basics.dst2
         dst3 = basics.dst3
         labels = basics.labels
-        setTrueText("Click the global DebugCheckBox to get another set of points.", 2)
+        SetTrueText("Click the global DebugCheckBox to get another set of points.", 2)
     End Sub
 End Class
 
@@ -512,7 +508,7 @@ Public Class OEX_Core_Reduce : Inherits VB_Parent
             'col_max = [  5,   6]
             'row_max = [  2,   4,   6]
         End If
-        setTrueText(strOut, 2)
+        SetTrueText(strOut, 2)
     End Sub
 End Class
 
@@ -549,7 +545,7 @@ Public Class OEX_Core_Split : Inherits VB_Parent
             Next
         Next
 
-        setTrueText(strOut, 2)
+        SetTrueText(strOut, 2)
     End Sub
 End Class
 
@@ -558,18 +554,18 @@ End Class
 
 
 Public Class OEX_Filter2D : Inherits VB_Parent
+    Dim ddepth As cv.MatType = -1, anchor = New cv.Point(-1, -1), kernelSize As Integer = 3, ind = 0
     Public Sub New()
         desc = "OpenCV Example Filter2D demo - Use a varying kernel to show the impact."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static ddepth As cv.MatType = -1, anchor = New cv.Point(-1, -1), kernelSize As Integer = 3, ind = 0
 
         If task.heartBeat Then ind += 1
         kernelSize = 3 + 2 * (ind Mod 5)
         Dim kernel As cv.Mat = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F, 1 / (kernelSize * kernelSize))
 
         dst2 = src.Filter2D(ddepth, kernel, anchor, 0, cv.BorderTypes.Default)
-        setTrueText("Kernel size = " + CStr(kernelSize), 3)
+        SetTrueText("Kernel size = " + CStr(kernelSize), 3)
     End Sub
 End Class
 
@@ -581,7 +577,7 @@ Public Class OEX_FitEllipse : Inherits VB_Parent
     Dim img As cv.Mat
     Dim options As New Options_FitEllipse
     Public Sub New()
-        Dim fileInputName As New FileInfo(task.homeDir + "opencv/samples/data/ellipses.jpg")
+        Dim fileInputName As New FileInfo(task.HomeDir + "opencv/samples/data/ellipses.jpg")
         img = cv.Cv2.ImRead(fileInputName.FullName).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         cPtr = OEX_FitEllipse_Open()

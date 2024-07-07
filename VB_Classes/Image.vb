@@ -4,14 +4,15 @@ Imports cv = OpenCvSharp
 Public Class Image_Basics : Inherits VB_Parent
     Public fileNameForm As OptionsFileName
     Public inputFileName As String
+    Dim fileInputName As FileInfo
     Public Sub New()
         fileNameForm = New OptionsFileName
-        fileNameForm.OpenFileDialog1.InitialDirectory = task.homeDir + "Images/train"
+        fileNameForm.OpenFileDialog1.InitialDirectory = task.HomeDir + "Images/train"
         fileNameForm.OpenFileDialog1.FileName = "*.*"
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("OpenCVB", "Image_Basics_Name", "Image_Basics_Name", task.homeDir + "Images/train/2092.jpg")
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "Image_Basics_Name", "Image_Basics_Name", task.HomeDir + "Images/train/2092.jpg")
         fileNameForm.Text = "Select an image file for use in OpenCVB"
         fileNameForm.FileNameLabel.Text = "Select a file."
         fileNameForm.PlayButton.Hide()
@@ -22,7 +23,6 @@ Public Class Image_Basics : Inherits VB_Parent
         desc = "Load an image into OpenCVB"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static fileInputName As FileInfo
         fileInputName = New FileInfo(fileNameForm.filename.Text)
         If inputFileName <> fileInputName.FullName Or task.optionsChanged Then
             inputFileName = fileInputName.FullName
@@ -82,7 +82,7 @@ Public Class Image_Series : Inherits VB_Parent
             images.fileNameForm.filename.Text = fileNameList(fileIndex)
 
             ' to work on a specific file, specify it here.
-            ' images.fileNameForm.filename.Text = task.homeDir + "Images/train/103041.jpg"
+            ' images.fileNameForm.filename.Text = task.HomeDir + "Images/train/103041.jpg"
 
             images.Run(empty)
             dst2 = images.dst2
@@ -173,7 +173,7 @@ Public Class Image_CellStats : Inherits VB_Parent
 
         stats.statsString()
 
-        setTrueText(stats.strOut, 3)
+        SetTrueText(stats.strOut, 3)
     End Sub
 End Class
 
@@ -196,7 +196,7 @@ Public Class Image_MSER : Inherits VB_Parent
     Dim core As New MSER_Detect
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        If findfrm(traceName + " CheckBox Options") Is Nothing Then
+        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Load the next image")
         End If
@@ -206,7 +206,7 @@ Public Class Image_MSER : Inherits VB_Parent
         desc = "Find the MSER (Maximally Stable Extermal Regions) in the still image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static nextCheck = findCheckBox("Load the next image")
+        Static nextCheck = FindCheckBox("Load the next image")
         loadNextImage = nextCheck.checked
         nextCheck.checked = False
 

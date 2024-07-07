@@ -22,6 +22,7 @@ Public Class PCA_Basics : Inherits VB_Parent
     Dim prep As New PCA_Prep_CPP
     Public pca_analysis As New cv.PCA
     Public runRedCloud As Boolean
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Find the Principal Component Analysis vector for the 3D points in a RedCloud cell contour."
     End Sub
@@ -58,8 +59,7 @@ Public Class PCA_Basics : Inherits VB_Parent
     End Function
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
-            Static redC As New RedCloud_Basics
-            If task.firstPass Then task.redOptions.UseColorOnly.Checked = True
+            If task.FirstPass Then task.redOptions.UseColorOnly.Checked = True
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
@@ -77,9 +77,9 @@ Public Class PCA_Basics : Inherits VB_Parent
             pca_analysis = New cv.PCA(inputMat, New cv.Mat, cv.PCA.Flags.DataAsRow)
 
             strOut = displayResults()
-            setTrueText(strOut, 3)
+            SetTrueText(strOut, 3)
         Else
-            setTrueText("Select a cell to compute the eigenvector")
+            SetTrueText("Select a cell to compute the eigenvector")
         End If
     End Sub
 End Class
@@ -117,7 +117,7 @@ Public Class PCA_CellMask : Inherits VB_Parent
             pca.pca_analysis = Nothing
         End If
 
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -130,14 +130,14 @@ End Class
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/pca.cpp
 Public Class PCA_Reconstruct : Inherits VB_Parent
+    Dim images(7) As cv.Mat
+    Dim images32f(images.Length) As cv.Mat
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Retained Variance", 1, 100, 95)
         desc = "Reconstruct a video stream as a composite of X images."
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static retainSlider = FindSlider("Retained Variance")
-        Static images(7) As cv.Mat
-        Static images32f(images.Length) As cv.Mat
         Dim index = task.frameCount Mod images.Length
         images(index) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
@@ -151,7 +151,7 @@ Public Class PCA_Reconstruct : Inherits VB_Parent
             Next
 
             Dim retainedVariance As Single = retainSlider.Value / 100
-            Dim pca = New cv.PCA(data, New cv.Mat, cv.PCA.Flags.DataAsRow, retainedVariance)  ' the pca inputarray cannot be static so we reallocate each time.
+            Dim pca = New cv.PCA(data, New cv.Mat, cv.PCA.Flags.DataAsRow, retainedVariance)  ' the pca inputarray cannot be Static so we reallocate each time.
 
             Dim point = pca.Project(data.Row(0))
             Dim reconstruction = pca.BackProject(point)
@@ -168,7 +168,7 @@ Public Class PCA_Depth : Inherits VB_Parent
     Public Sub New()
         desc = "Reconstruct a depth stream as a composite of X images."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         pca.Run(task.depthRGB)
         dst2 = pca.dst2
     End Sub
@@ -182,7 +182,7 @@ Public Class PCA_DrawImage : Inherits VB_Parent
     Dim pca As New PCA_Reconstruct
     Dim image As New cv.Mat
     Public Sub New()
-        image = cv.Cv2.ImRead(task.homeDir + "opencv/Samples/Data/pca_test1.jpg")
+        image = cv.Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/pca_test1.jpg")
         desc = "Use PCA to find the principal direction of an object."
         labels(2) = "Original image"
         labels(3) = "PCA Output"
@@ -200,7 +200,7 @@ Public Class PCA_DrawImage : Inherits VB_Parent
         p.Y = q.Y + 9 * Math.Sin(angle - Math.PI / 4)
         img.Line(p, q, color, task.lineWidth, task.lineType)
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         dst2 = image.Resize(dst2.Size())
         Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)
         Dim hierarchy() As cv.HierarchyIndex
@@ -228,7 +228,7 @@ Public Class PCA_DrawImage : Inherits VB_Parent
                 eigen_val(j) = pca_analysis.Eigenvalues.Get(Of Double)(0, j)
             Next
 
-            DrawCircle(dst3,cntr, task.dotSize + 1, cv.Scalar.BlueViolet)
+            DrawCircle(dst3,cntr, task.DotSize + 1, cv.Scalar.BlueViolet)
             Dim factor As Single = 0.02 ' scaling factor for the lines depicting the principal components.
             Dim ept1 = New cv.Point(cntr.X + factor * eigen_vecs(0).X * eigen_val(0), cntr.Y + factor * eigen_vecs(0).Y * eigen_val(0))
             Dim ept2 = New cv.Point(cntr.X - factor * eigen_vecs(1).X * eigen_val(1), cntr.Y - factor * eigen_vecs(1).Y * eigen_val(1))
@@ -261,7 +261,7 @@ Public Class PCA_Prep_CPP : Inherits VB_Parent
         handleSrc.Free()
         Dim count = pca_prep_getcount(cPtr)
         inputData = New cv.Mat(count, 3, cv.MatType.CV_32F, imagePtr).Clone
-        setTrueText("Data has been prepared and resides in inputData public")
+        SetTrueText("Data has been prepared and resides in inputData public")
     End Sub
     Public Sub Close()
         PCA_Prep_Close(cPtr)

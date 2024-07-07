@@ -99,6 +99,7 @@ Public Class Rotate_Poly : Inherits VB_Parent
     Dim optionsFPoly As New Options_FPoly
     Public options As New Options_RotatePoly
     Public rotateQT As New Rotate_PolyQT
+    Dim rPoly As New List(Of cv.Point2f)
     Public Sub New()
         labels = {"", "", "Triangle before rotation", "Triangle after rotation"}
         desc = "Rotate a triangle around a center of rotation"
@@ -106,8 +107,7 @@ Public Class Rotate_Poly : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         optionsFPoly.RunVB()
 
-        Static rPoly As New List(Of cv.Point2f)
-        If options.changeCheck.Checked Or task.firstPass Then
+        If options.changeCheck.Checked Or task.FirstPass Then
             rPoly.Clear()
             For i = 0 To task.polyCount - 1
                 rPoly.Add(New cv.Point2f(msRNG.Next(dst2.Width / 4, dst2.Width * 3 / 4), msRNG.Next(dst2.Height / 4, dst2.Height * 3 / 4)))
@@ -121,8 +121,8 @@ Public Class Rotate_Poly : Inherits VB_Parent
         rotateQT.Run(src)
         dst2 = rotateQT.dst3
 
-        DrawCircle(dst2,rotateQT.rotateCenter, task.dotSize + 2, cv.Scalar.Yellow)
-        setTrueText("center of rotation", rotateQT.rotateCenter)
+        DrawCircle(dst2,rotateQT.rotateCenter, task.DotSize + 2, cv.Scalar.Yellow)
+        SetTrueText("center of rotation", rotateQT.rotateCenter)
         labels(3) = rotateQT.labels(3)
     End Sub
 End Class
@@ -150,7 +150,7 @@ Public Class Rotate_PolyQT : Inherits VB_Parent
         End If
 
         If standaloneTest() Then
-            setTrueText(traceName + " has no output when run standaloneTest().")
+            SetTrueText(traceName + " has no output when run standaloneTest().")
             Exit Sub
         End If
 
@@ -242,12 +242,12 @@ Public Class Rotate_Horizon : Inherits VB_Parent
         dst2 = rotate.dst2.Clone
         dst1 = dst2.Clone
 
-        Dim horizonVec = New pointPair(task.horizonVec.p1, task.horizonVec.p2)
+        Dim horizonVec = New PointPair(task.horizonVec.p1, task.horizonVec.p2)
 
         horizonVec.p1 = RotatePoint(task.horizonVec.p1, rotate.rotateCenter, -rotate.rotateAngle)
         horizonVec.p2 = RotatePoint(task.horizonVec.p2, rotate.rotateCenter, -rotate.rotateAngle)
 
-        DrawLine(dst2, horizonVec.p1, horizonVec.p2, task.highlightColor)
+        DrawLine(dst2, horizonVec.p1, horizonVec.p2, task.HighlightColor)
         DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
 
         Dim y1 = horizonVec.p1.Y - task.horizonVec.p1.Y

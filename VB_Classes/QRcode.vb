@@ -5,9 +5,9 @@ Public Class QRcode_Basics : Inherits VB_Parent
     Dim qrInput1 As New cv.Mat
     Dim qrInput2 As New cv.Mat
     Public Sub New()
-        Dim fileInfo = New FileInfo(task.homeDir + "data/QRcode1.png")
+        Dim fileInfo = New FileInfo(task.HomeDir + "data/QRcode1.png")
         If fileInfo.Exists Then qrInput1 = cv.Cv2.ImRead(fileInfo.FullName)
-        fileInfo = New FileInfo(task.homeDir + "Data/QRCode2.png")
+        fileInfo = New FileInfo(task.HomeDir + "Data/QRCode2.png")
         If fileInfo.Exists Then qrInput2 = cv.Cv2.ImRead(fileInfo.FullName)
         If dst2.Width < 480 Then ' for the smallest configurations the default size can be too big!
             qrInput1 = qrInput1.Resize(New cv.Size(120, 160))
@@ -17,7 +17,7 @@ Public Class QRcode_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If src.Height < 240 Then
-            setTrueText("This QR Code test does not run at low resolutions")
+            SetTrueText("This QR Code test does not run at low resolutions")
             Exit Sub
         End If
         Dim x = msRNG.Next(0, src.Width - Math.Max(qrInput1.Width, qrInput2.Width))

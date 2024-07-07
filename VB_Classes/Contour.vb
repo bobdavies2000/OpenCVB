@@ -6,7 +6,7 @@ Public Class Contour_Basics : Inherits VB_Parent
     Public options As New Options_Contours
     Public sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
-        findRadio("FloodFill").Checked = True
+        FindRadio("FloodFill").Checked = True
         UpdateAdvice(traceName + ": redOptions color class determines the input.  Use local options in 'Options_Contours' to further control output.")
         labels = {"", "", "FindContour input", "Draw contour output"}
         desc = "General purpose contour finder"
@@ -55,19 +55,19 @@ Public Class Contour_General : Inherits VB_Parent
     Public contourlist As New List(Of cv.Point())
     Public allContours As cv.Point()()
     Public options As New Options_Contours
+    Dim rotatedRect As New Rectangle_Rotated
     Public Sub New()
         labels = {"", "", "FindContour input", "Draw contour output"}
         desc = "General purpose contour finder"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
-            Static rotatedRect As New Rectangle_Rotated
             If Not task.heartBeat Then Exit Sub
             rotatedRect.Run(src)
             dst2 = rotatedRect.dst2
             dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
-            If src.Channels = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src
+            If src.Channels() = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src
         End If
 
         If dst2.Type = cv.MatType.CV_8U Then
@@ -100,6 +100,7 @@ Public Class Contour_GeneralWithOptions : Inherits VB_Parent
     Public contourlist As New List(Of cv.Point())
     Public allContours As cv.Point()()
     Public options As New Options_Contours
+    Dim rotatedRect As New Rectangle_Rotated
     Public Sub New()
         labels = {"", "", "FindContour input", "Draw contour output"}
         desc = "General purpose contour finder"
@@ -108,17 +109,16 @@ Public Class Contour_GeneralWithOptions : Inherits VB_Parent
         options.RunVB()
 
         If standaloneTest() Then
-            Static rotatedRect As New Rectangle_Rotated
             If Not task.heartBeat Then Exit Sub
             rotatedRect.Run(src)
             dst2 = rotatedRect.dst2
-            If dst2.Channels = 3 Then
+            If dst2.Channels() = 3 Then
                 dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
             Else
                 dst2 = dst2.ConvertScaleAbs(255)
             End If
         Else
-            If src.Channels = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src
+            If src.Channels() = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src
         End If
 
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then dst2.ConvertTo(dst2, cv.MatType.CV_32SC1)
@@ -153,7 +153,7 @@ Public Class Contour_RotatedRects : Inherits VB_Parent
         Dim imageInput As New cv.Mat
         rotatedRect.Run(src)
         imageInput = rotatedRect.dst2
-        If imageInput.Channels = 3 Then
+        If imageInput.Channels() = 3 Then
             dst2 = imageInput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
         Else
             dst2 = imageInput.ConvertScaleAbs(255)
@@ -176,19 +176,16 @@ End Class
 
 ' https://github.com/SciSharp/SharpCV/blob/master/src/SharpCV.Examples/Program.cs
 Public Class Contour_RemoveLines : Inherits VB_Parent
+    Dim options As New Options_Morphology
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Morphology width/height", 1, 100, 20)
-            sliders.setupTrackBar("MorphologyEx iterations", 1, 5, 1)
-        End If
         labels(2) = "Original image"
         labels(3) = "Original with horizontal/vertical lines removed"
         desc = "Remove the lines from an invoice image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static morphSlider = FindSlider("Morphology width/height")
-        Static morphExSlider = FindSlider("MorphologyEx iterations")
-        Dim tmp = cv.Cv2.ImRead(task.homeDir + "Data/invoice.jpg")
+        options.RunVB()
+
+        Dim tmp = cv.Cv2.ImRead(task.HomeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
         Dim dstRect = New cv.Rect(0, 0, dstSize.Width, src.Height)
         tmp = tmp.Resize(dstSize)
@@ -197,17 +194,17 @@ Public Class Contour_RemoveLines : Inherits VB_Parent
         Dim thresh = gray.Threshold(0, 255, cv.ThresholdTypes.BinaryInv Or cv.ThresholdTypes.Otsu)
 
         ' remove horizontal lines
-        Dim hkernel = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(CInt(morphSlider.Value), 1))
+        Dim hkernel = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(options.widthHeight, 1))
         Dim removedH As New cv.Mat
-        cv.Cv2.MorphologyEx(thresh, removedH, cv.MorphTypes.Open, hkernel,, morphExSlider.Value)
+        cv.Cv2.MorphologyEx(thresh, removedH, cv.MorphTypes.Open, hkernel,, options.iterations)
         Dim cnts = cv.Cv2.FindContoursAsArray(removedH, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
         For i = 0 To cnts.Count - 1
             cv.Cv2.DrawContours(tmp, cnts, i, cv.Scalar.White, task.lineWidth)
         Next
 
-        Dim vkernel = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(1, CInt(morphSlider.Value)))
+        Dim vkernel = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(1, options.widthHeight))
         Dim removedV As New cv.Mat
-        cv.Cv2.MorphologyEx(thresh, removedV, cv.MorphTypes.Open, vkernel,, morphExSlider.Value)
+        cv.Cv2.MorphologyEx(thresh, removedV, cv.MorphTypes.Open, vkernel,, options.iterations)
         cnts = cv.Cv2.FindContoursAsArray(removedV, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
         For i = 0 To cnts.Count - 1
             cv.Cv2.DrawContours(tmp, cnts, i, cv.Scalar.White, task.lineWidth)
@@ -230,6 +227,7 @@ End Class
 Public Class Contour_Edges : Inherits VB_Parent
     Dim edges As New Edge_ResizeAdd
     Dim contour As New Contour_General
+    Dim lastImage = New cv.Mat(task.WorkingRes, cv.MatType.CV_8UC3, 0)
     Public Sub New()
         desc = "Create contours for Edge_MotionAccum"
     End Sub
@@ -240,7 +238,6 @@ Public Class Contour_Edges : Inherits VB_Parent
         contour.Run(dst2)
 
         dst3.SetTo(0)
-        Static lastImage = New cv.Mat(dst3.Size, cv.MatType.CV_8UC3, 0)
         Dim colors As New List(Of cv.Vec3b)
         Dim color As cv.Scalar
         For Each c In contour.allContours
@@ -274,6 +271,9 @@ Public Class Contour_SidePoints : Inherits VB_Parent
     Public Sub New()
         desc = "Find the left/right and top/bottom sides of a contour"
     End Sub
+    Private Function vec3fToString(v As cv.Vec3f) As String
+        Return Format(v(0), fmt3) + vbTab + Format(v(1), fmt3) + vbTab + Format(v(2), fmt3)
+    End Function
     Public Sub RunVB(src As cv.Mat)
         sides.Run(src)
         dst2 = sides.dst2
@@ -306,7 +306,7 @@ Public Class Contour_SidePoints : Inherits VB_Parent
                 strOut += "The contour may show points further away but they don't have depth."
             End If
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -320,7 +320,7 @@ Public Class Contour_Foreground : Inherits VB_Parent
     Dim km As New Foreground_KMeans2
     Dim contour As New Contour_General
     Public Sub New()
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "", "Kmeans foreground output", "Contour of foreground"}
         desc = "Build a contour for the foreground"
     End Sub
@@ -357,7 +357,7 @@ Public Class Contour_Sorted : Inherits VB_Parent
     Dim dilate As New Dilate_Basics
     Dim options As New Options_Contours
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "", "Contours in the detected motion", "Diff output - detected motion"}
         task.gOptions.pixelDiffThreshold = 25
@@ -390,9 +390,9 @@ Public Class Contour_Sorted : Inherits VB_Parent
         Dim beforeCount = dst1.CountNonZero
         dst1.SetTo(0, dst3)
         Dim afterCount = dst1.CountNonZero
-        setTrueText("Before dilate: " + CStr(beforeCount) + vbCrLf + "After dilate " + CStr(afterCount) + vbCrLf + "Removed = " + CStr(beforeCount - afterCount), 1)
+        SetTrueText("Before dilate: " + CStr(beforeCount) + vbCrLf + "After dilate " + CStr(afterCount) + vbCrLf + "Removed = " + CStr(beforeCount - afterCount), 1)
 
-        setTrueText("The motion detected produced " + CStr(sortedContours.Count) + " contours after filtering for length and area.", 3)
+        SetTrueText("The motion detected produced " + CStr(sortedContours.Count) + " contours after filtering for length and area.", 3)
     End Sub
 End Class
 
@@ -440,12 +440,12 @@ End Class
 
 Public Class Contour_SelfIntersect : Inherits VB_Parent
     Public rc As New rcData
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Search the contour points for duplicates indicating the contour is self-intersecting."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             rc = task.rc
@@ -462,7 +462,7 @@ Public Class Contour_SelfIntersect : Inherits VB_Parent
                 Dim pct = ptList.Count / rc.contour.Count
                 If pct > 0.1 And pct < 0.9 Then
                     selfInt = True
-                    DrawCircle(dst3,pt, task.dotSize, cv.Scalar.Red)
+                    DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Red)
                 End If
             End If
             ptList.Add(ptStr)
@@ -483,6 +483,7 @@ Public Class Contour_Largest : Inherits VB_Parent
     Public bestContour As New List(Of cv.Point)
     Public allContours As cv.Point()()
     Public options As New Options_Contours
+    Dim rotatedRect As New Rectangle_Rotated
     Public Sub New()
         UpdateAdvice(traceName + ": use the local options in 'Options_Contours'")
         labels = {"", "", "Input to FindContours", "Largest single contour in the input image."}
@@ -491,7 +492,6 @@ Public Class Contour_Largest : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         If standaloneTest() Then
-            Static rotatedRect As New Rectangle_Rotated
             If task.heartBeat Then
                 rotatedRect.Run(src)
                 dst2 = rotatedRect.dst2
@@ -500,7 +500,7 @@ Public Class Contour_Largest : Inherits VB_Parent
             dst2 = src
         End If
 
-        If dst2.Channels <> 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If dst2.Channels() <> 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then
             dst2.ConvertTo(dst1, cv.MatType.CV_32SC1)
             cv.Cv2.FindContours(dst1, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
@@ -522,7 +522,7 @@ Public Class Contour_Largest : Inherits VB_Parent
         If standaloneTest() Then
             dst3.SetTo(0)
             If maxIndex >= 0 And maxCount >= 2 Then
-                cv.Cv2.DrawContours(dst3, allContours, maxIndex, cv.Scalar.White)
+                DrawContour(dst3, allContours(maxIndex).ToList, cv.Scalar.White)
             End If
         End If
     End Sub
@@ -569,13 +569,13 @@ End Class
 Public Class Contour_RedCloudCorners : Inherits VB_Parent
     Public corners(4 - 1) As cv.Point
     Public rc As New rcData
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(2) = "The RedCloud Output with the highlighted contour to smooth"
         desc = "Find the point farthest from the center in each cell."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
@@ -583,7 +583,7 @@ Public Class Contour_RedCloudCorners : Inherits VB_Parent
         End If
 
         dst3.SetTo(0)
-        DrawCircle(dst3, rc.maxDist, task.dotSize, cv.Scalar.White)
+        DrawCircle(dst3, rc.maxDist, task.DotSize, cv.Scalar.White)
         Dim center As New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
         Dim maxDistance(4 - 1) As Single
         For i = 0 To corners.Length - 1
@@ -621,7 +621,7 @@ Public Class Contour_RedCloudEdges : Inherits VB_Parent
     Dim edges As New EdgeDraw_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "EdgeDraw_Basics output", "", "Pixels below are both cell boundaries and edges."}
         desc = "Intersect the cell contours and the edges in the image."
     End Sub
@@ -649,7 +649,7 @@ End Class
 Public Class Contour_RedCloud : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "Show all the contours found in the RedCloud output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -727,24 +727,24 @@ End Class
 Public Class Contour_RC_AddContour : Inherits VB_Parent
     Public contour As New List(Of cv.Point)
     Public options As New Options_Contours
+    Dim myFrameCount As Integer = task.frameCount
+    Dim reduction As New Reduction_Basics
     Public Sub New()
         desc = "Find the contour for the src."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static myFrameCount As Integer = task.frameCount
         If myFrameCount <> task.frameCount Then
             options.RunVB() ' avoid running options more than once per frame.
             myFrameCount = task.frameCount
         End If
 
         If standalone Then
-            Static reduction As New Reduction_Basics
             reduction.Run(src)
             src = reduction.dst2
         End If
 
         Dim allContours As cv.Point()()
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.FindContours(src, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
 
         Dim maxCount As Integer, maxIndex As Integer
@@ -771,25 +771,25 @@ End Class
 Public Class Contour_Gray : Inherits VB_Parent
     Public contour As New List(Of cv.Point)
     Public options As New Options_Contours
+    Dim myFrameCount As Integer = task.frameCount
+    Dim reduction As New Reduction_Basics
     Public Sub New()
         desc = "Find the contour for the src."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static myFrameCount As Integer = task.frameCount
         If myFrameCount <> task.frameCount Then
             options.RunVB() ' avoid running options more than once per frame.
             myFrameCount = task.frameCount
         End If
 
         If standalone Then
-            Static reduction As New Reduction_Basics
             task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
             reduction.Run(src)
             src = reduction.dst2
         End If
 
         Dim allContours As cv.Point()()
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.FindContours(src, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
         If allContours.Count = 0 Then Exit Sub
 
@@ -813,7 +813,7 @@ Public Class Contour_WholeImage : Inherits VB_Parent
     Dim contour As New Contour_Basics
     Public Sub New()
         FindSlider("Max contours").Value = 20
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Find the top X contours by size and display them."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -842,8 +842,8 @@ Public Class Contour_DepthTiers : Inherits VB_Parent
     Public classCount As Integer
     Public contourlist As New List(Of cv.Point())
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        findRadio("FloodFill").Checked = True
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        FindRadio("FloodFill").Checked = True
         UpdateAdvice(traceName + ": redOptions color class determines the input.  Use local options in 'Options_Contours' to further control output.")
         labels = {"", "", "FindContour input", "Draw contour output"}
         desc = "General purpose contour finder"
@@ -878,7 +878,7 @@ Public Class Contour_DepthTiers : Inherits VB_Parent
         Next
 
         dst2.SetTo(1, dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
-        classCount = task.maxZmeters * 100 / options.cmPerTier
+        classCount = task.MaxZmeters * 100 / options.cmPerTier
 
         If standaloneTest() Then dst3 = ShowPalette(dst2 * 255 / classCount)
         labels(3) = $"All depth pixels are assigned a tier with {classCount} contours."
@@ -893,8 +893,8 @@ Public Class Contour_FromPoints : Inherits VB_Parent
     Dim contour As New Contour_Basics
     Dim random As New Random_Basics
     Public Sub New()
-        random.options.countSlider.Value = 3
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        FindSlider("Random Pixel Count").Value = 3
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Create a contour from some random points"
     End Sub
     Public Sub RunVB(src As cv.Mat)

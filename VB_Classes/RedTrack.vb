@@ -4,7 +4,7 @@ Public Class RedTrack_Basics : Inherits VB_Parent
     Public redC As New RedCloud_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        If task.workingRes <> New cv.Size(168, 94) Then task.frameHistoryCount = 1
+        If task.WorkingRes <> New cv.Size(168, 94) Then task.frameHistoryCount = 1
         desc = "Get stats on each RedCloud cell."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -17,7 +17,7 @@ Public Class RedTrack_Basics : Inherits VB_Parent
             If rc.index = task.rc.index Then DrawContour(dst2(rc.rect), rc.contour, cv.Scalar.White, -1)
         Next
         strOut = stats.strOut
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -31,7 +31,7 @@ Public Class RedTrack_Lines : Inherits VB_Parent
     Dim lines As New Line_Basics
     Dim track As New RedTrack_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "Identify and track the lines in an image as RedCloud Cells"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -63,6 +63,8 @@ End Class
 
 Public Class RedTrack_LineSingle : Inherits VB_Parent
     Dim track As New RedTrack_Basics
+    Dim leftMost As Integer, rightmost As Integer
+    Dim leftCenter As cv.Point, rightCenter As cv.Point
     Public Sub New()
         desc = "Create a line between the rightmost and leftmost good feature to show camera motion"
     End Sub
@@ -84,7 +86,7 @@ Public Class RedTrack_LineSingle : Inherits VB_Parent
         dst1 = track.redC.dst1
         dst2 = track.dst2
         If task.redCells.Count = 0 Then
-            setTrueText("No lines found to track.", 3)
+            SetTrueText("No lines found to track.", 3)
             Exit Sub
         End If
         Dim xList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
@@ -96,8 +98,6 @@ Public Class RedTrack_LineSingle : Inherits VB_Parent
         Dim minLeft As Integer = xList.Count / 4
         Dim minRight As Integer = (xList.Count - minLeft)
 
-        Static leftMost As Integer, rightmost As Integer
-        Static leftCenter As cv.Point, rightCenter As cv.Point
         If leftMost = 0 Or rightmost = 0 Or leftMost = rightmost Then
             leftCenter = rightCenter ' force iteration...
             Dim iterations As Integer
@@ -147,8 +147,8 @@ Public Class RedTrack_FeaturesKNN : Inherits VB_Parent
             Dim p1 = knn.queries(i)
             Dim index = knn.neighbors(i)(knn.neighbors(i).Count - 1)
             Dim p2 = knn.trainInput(index)
-            DrawCircle(dst3, p1, task.dotSize, cv.Scalar.Yellow)
-            DrawCircle(dst3, p2, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst3, p1, task.DotSize, cv.Scalar.Yellow)
+            DrawCircle(dst3, p2, task.DotSize, cv.Scalar.Yellow)
             DrawLine(dst3, p1, p2, cv.Scalar.White)
         Next
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
@@ -176,7 +176,7 @@ Public Class RedTrack_GoodCell : Inherits VB_Parent
         good.Run(src)
         dst3.SetTo(0)
         For Each pt In good.featureList
-            DrawCircle(dst3,pt, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst3,pt, task.DotSize, cv.Scalar.White)
         Next
     End Sub
 End Class
@@ -211,8 +211,8 @@ Public Class RedTrack_GoodCells : Inherits VB_Parent
                 DrawContour(dst2(rc.rect), rc.hull, cv.Scalar.White, -1)
                 trackIndex.Add(index)
 
-                DrawCircle(dst0, pt, task.dotSize, task.highlightColor)
-                DrawCircle(dst3,pt, task.dotSize, cv.Scalar.White)
+                DrawCircle(dst0, pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst3,pt, task.DotSize, cv.Scalar.White)
                 trackCells.Add(rc)
             End If
         Next
@@ -265,7 +265,7 @@ Public Class RedTrack_Points : Inherits VB_Parent
     Dim lines As New Line_Basics
     Dim track As New RedTrack_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "", "RedCloudX_Track output", "Input to RedCloudX_Track"}
         desc = "Identify and track the end points of lines in an image of RedCloud Cells"
     End Sub
@@ -275,8 +275,8 @@ Public Class RedTrack_Points : Inherits VB_Parent
         dst3.SetTo(0)
         Dim index As Integer
         For Each lp In lines.lpList
-            DrawCircle(dst3, lp.p1, task.dotSize, 255)
-            DrawCircle(dst3, lp.p2, task.dotSize, 255)
+            DrawCircle(dst3, lp.p1, task.DotSize, 255)
+            DrawCircle(dst3, lp.p2, task.DotSize, 255)
             index += 1
             If index >= 10 Then Exit For
         Next
@@ -299,7 +299,7 @@ Public Class RedTrack_Features : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "", "Output of Feature_Basics - input to RedCloud",
                   "Value Is correlation of x to y in contour points (0 indicates circular.)"}
         desc = "Similar to RedTrack_KNNPoints"
@@ -309,7 +309,7 @@ Public Class RedTrack_Features : Inherits VB_Parent
 
         If task.heartBeat Then dst2.SetTo(0)
         For Each pt In task.features
-            DrawCircle(dst2, pt, task.dotSize, 255)
+            DrawCircle(dst2, pt, task.DotSize, 255)
         Next
 
         redC.Run(dst2)
@@ -317,9 +317,9 @@ Public Class RedTrack_Features : Inherits VB_Parent
         For Each rc In task.redCells
             If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For
             DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
-            If rc.contour.Count > 0 Then setTrueText(Format(shapeCorrelation(rc.contour), fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
+            If rc.contour.Count > 0 Then SetTrueText(Format(shapeCorrelation(rc.contour), fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
         Next
-        setTrueText("Move camera to see the value of this algorithm", 2)
-        setTrueText("Values are correlation of x to y.  Leans left (negative) or right (positive) or circular (neutral correlation.)", 3)
+        SetTrueText("Move camera to see the value of this algorithm", 2)
+        SetTrueText("Values are correlation of x to y.  Leans left (negative) or right (positive) or circular (neutral correlation.)", 3)
     End Sub
 End Class

@@ -25,7 +25,7 @@ Public Class OptionsRedCloud
     Public useDepthChecked As Boolean
     Public identifyCount As Integer
     Public histBins3D As Integer
-    Dim colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions", "Binarize_DepthTiers", "FeatureLess_Groups", "Hist3DColor_Basics",
+    Dim colorMethods() As String = {"BackProject_Full", "BackProject2D_Full", "Bin4Way_Regions", "Binarize_DepthTiers", "FeatureLess_Groups", "Hist3DColor_Basics",
                                     "KMeans_Basics", "LUT_Basics", "Reduction_Basics"}
     Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
@@ -47,7 +47,7 @@ Public Class OptionsRedCloud
                     task.xRange = 2.5
                     task.yRange = 0.8
                 End If
-            Case "Intel(R) RealSense(TM) Depth Camera 455"
+            Case "Intel(R) RealSense(TM) Depth Camera 455", ""
                 If task.workingRes.Height = 480 Or task.workingRes.Height = 240 Or task.workingRes.Height = 120 Then
                     task.xRange = 2.04
                     task.yRange = 2.14
@@ -119,8 +119,8 @@ Public Class OptionsRedCloud
         task.rangesTop = New cv.Rangef() {New cv.Rangef(0.1, task.maxZmeters), New cv.Rangef(-task.xRange, task.xRange)}
         task.rangesSide = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0.1, task.maxZmeters)}
 
-        task.sideCameraPoint = New cv.Point(0, CInt(task.workingRes.Height / 2))
-        task.topCameraPoint = New cv.Point(CInt(task.workingRes.Width / 2), 0)
+        task.sideCameraPoint = New cv.Point(0, CInt(task.WorkingRes.Height / 2))
+        task.topCameraPoint = New cv.Point(CInt(task.WorkingRes.Width / 2), 0)
 
         task.projectionThreshold = ProjectionThresholdBar.Value
         identifyCount = IdentifyCountBar.Value
@@ -321,8 +321,14 @@ Public Class OptionsRedCloud
         useNaturalColor = NaturalColor.Checked
     End Sub
 
+    Public Sub setUseColorOnly(newVal As Boolean)
+        UseColorOnly.Checked = newVal
+    End Sub
     Public Sub setSimpleReductionBar(newVal As Integer)
         SimpleReductionBar.Value = newVal
+    End Sub
+    Public Sub setHistBinBar3D(newVal As Integer)
+        HistBinBar3D.Value = newVal
     End Sub
     Public Sub checkSimpleReduction(newVal As Boolean)
         UseSimpleReduction.Checked = newVal
@@ -337,5 +343,10 @@ Public Class OptionsRedCloud
     Public Sub setColorSource(source As String)
         task.redOptions.ColorSource.SelectedItem() = source
     End Sub
-
+    Public Sub setIdentifyCells(val As Boolean)
+        IdentifyCells.Checked = val
+    End Sub
+    Public Function getIdentifyCells() As Boolean
+        Return IdentifyCells.Checked
+    End Function
 End Class

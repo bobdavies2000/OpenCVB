@@ -11,7 +11,7 @@ Public Class Polylines_IEnumerableExample : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static countSlider = FindSlider("Polyline Count")
-        Static closeCheck = findCheckBox("Polyline closed if checked")
+        Static closeCheck = FindCheckBox("Polyline closed if checked")
         Dim points = Enumerable.Range(0, countSlider.Value).Select(Of cv.Point)(
             Function(i)
                 Return New cv.Point(CInt(msRNG.Next(0, src.Width)), CInt(msRNG.Next(0, src.Height)))

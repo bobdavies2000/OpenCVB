@@ -9,12 +9,12 @@ Public Class ORB_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static countSlider = FindSlider("ORB - desired point count")
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         orb = cv.ORB.Create(countSlider.Value)
         keypoints = orb.Detect(src)
         dst2 = src.Clone().CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each kpt In keypoints
-            DrawCircle(dst2,kpt.Pt, task.dotSize + 1, cv.Scalar.Yellow)
+            DrawCircle(dst2,kpt.Pt, task.DotSize + 1, cv.Scalar.Yellow)
         Next
         labels(2) = CStr(keypoints.Count) + " key points were identified"
     End Sub
@@ -32,6 +32,6 @@ Public Class ORB_Match : Inherits VB_Parent
         desc = "Find ORB keypoints and match with a previous frame"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
     End Sub
 End Class

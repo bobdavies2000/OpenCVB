@@ -2,12 +2,12 @@
 Imports cv = OpenCvSharp
 Public Class OpAuto_XRange : Inherits VB_Parent
     Public histogram As New cv.Mat
+    Dim adjustedCount As Integer = 0
     Public Sub New()
         labels(2) = "Optimized top view to show as many samples as possible."
         desc = "Automatically adjust the X-Range option of the pointcloud to maximize visible pixels"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static adjustedCount As Integer = 0
         Dim expectedCount = task.depthMask.CountNonZero
 
         Dim diff = Math.Abs(expectedCount - adjustedCount)
@@ -41,7 +41,7 @@ Public Class OpAuto_XRange : Inherits VB_Parent
             task.optionsChanged = saveOptionState
         End If
 
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -51,12 +51,12 @@ End Class
 
 Public Class OpAuto_YRange : Inherits VB_Parent
     Public histogram As New cv.Mat
+    Dim adjustedCount As Integer = 0
     Public Sub New()
         labels(2) = "Optimized side view to show as much as possible."
         desc = "Automatically adjust the Y-Range option of the pointcloud to maximize visible pixels"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static adjustedCount As Integer = 0
         Dim expectedCount = task.depthMask.CountNonZero
 
         Dim diff = Math.Abs(expectedCount - adjustedCount)
@@ -89,7 +89,7 @@ Public Class OpAuto_YRange : Inherits VB_Parent
             End If
             task.optionsChanged = saveOptionState
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -104,7 +104,7 @@ Public Class OpAuto_FloorCeiling : Inherits VB_Parent
     Public floorY As Single
     Public ceilingY As Single
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
         desc = "Automatically find the Y values that best describes the floor and ceiling (if present)"
     End Sub
     Private Sub rebuildMask(maskLabel As String, min As Single, max As Single)
@@ -142,7 +142,7 @@ Public Class OpAuto_FloorCeiling : Inherits VB_Parent
 
             dst2.SetTo(cv.Scalar.White, dst1)
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -155,6 +155,7 @@ End Class
 Public Class OpAuto_Valley : Inherits VB_Parent
     Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public options As New Options_Boundary
+    Dim kalmanHist As New Hist_Kalman
     Public Sub New()
         If standaloneTest() Then task.gOptions.setHistogramBins(256)
         desc = "Get the top X highest quality valley points in the histogram."
@@ -165,7 +166,6 @@ Public Class OpAuto_Valley : Inherits VB_Parent
 
         ' input should be a histogram.  If not, get one...
         If standaloneTest() Then
-            Static kalmanHist As New Hist_Kalman
             kalmanHist.Run(src)
             dst2 = kalmanHist.dst2
             src = kalmanHist.hist.histogram.Clone
@@ -206,7 +206,7 @@ Public Class OpAuto_Valley : Inherits VB_Parent
                 Dim col = entry.Value * dst2.Width / task.histogramBins
                 DrawLine(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White)
             Next
-            setTrueText(CStr(valleys.Count) + " valleys in histogram", 3)
+            SetTrueText(CStr(valleys.Count) + " valleys in histogram", 3)
         End If
     End Sub
 End Class
@@ -218,6 +218,7 @@ End Class
 Public Class OpAuto_Peaks2D : Inherits VB_Parent
     Public options As New Options_Boundary
     Public clusterPoints As New List(Of cv.Point2f)
+    Dim heatmap As New HeatMap_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setHistogramBins(256)
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
@@ -230,7 +231,6 @@ Public Class OpAuto_Peaks2D : Inherits VB_Parent
 
         ' input should be a 2D histogram.  If standaloneTest(), get one...
         If standaloneTest() Then
-            Static heatmap As New HeatMap_Basics
             heatmap.Run(src)
             dst2 = If(task.toggleOnOff, heatmap.dst2, heatmap.dst3)
             src = If(task.toggleOnOff, heatmap.dst0.Clone, heatmap.dst1.Clone)
@@ -247,7 +247,7 @@ Public Class OpAuto_Peaks2D : Inherits VB_Parent
         If Not standaloneTest() Then dst2.SetTo(0)
         For i = 0 To clusterPoints.Count - 1
             Dim pt = clusterPoints(i)
-            DrawCircle(dst2,pt, task.dotSize * 3, cv.Scalar.White)
+            DrawCircle(dst2,pt, task.DotSize * 3, cv.Scalar.White)
         Next
     End Sub
 End Class
@@ -259,6 +259,7 @@ End Class
 Public Class OpAuto_Peaks2DGrid : Inherits VB_Parent
     Public clusterPoints As New List(Of cv.Point2f)
     Dim options As New Options_Boundary
+    Dim hist2d As New Hist2D_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setHistogramBins(256)
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
@@ -270,7 +271,6 @@ Public Class OpAuto_Peaks2DGrid : Inherits VB_Parent
 
         ' input should be a 2D histogram.  If standaloneTest() or src is not a histogram, get one...
         If standaloneTest() Or src.Type = cv.MatType.CV_8UC3 Then
-            Static hist2d As New Hist2D_Basics
             hist2d.Run(src)
             src = hist2d.histogram
             dst2.SetTo(0)
@@ -293,7 +293,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits VB_Parent
         If Not standaloneTest() Then dst2.SetTo(0)
         For i = 0 To clusterPoints.Count - 1
             Dim pt = clusterPoints(i)
-            DrawCircle(dst2,pt, task.dotSize * 3, cv.Scalar.White)
+            DrawCircle(dst2,pt, task.DotSize * 3, cv.Scalar.White)
         Next
 
         dst2.SetTo(cv.Scalar.White, task.gridMask)
@@ -312,6 +312,7 @@ End Class
 
 
 Public Class OpAuto_PixelDifference : Inherits VB_Parent
+    Dim diff As New Diff_Basics
     Public Sub New()
         task.gOptions.pixelDiffThreshold = 2 ' set it low so it will move up to the right value.
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
@@ -320,7 +321,6 @@ Public Class OpAuto_PixelDifference : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If not task.heartBeat And task.frameCount > 10 Then Exit Sub
         If standaloneTest() Then
-            Static diff As New Diff_Basics
             diff.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             src = diff.dst2
         End If
@@ -334,7 +334,7 @@ Public Class OpAuto_PixelDifference : Inherits VB_Parent
             If gridCount > task.gridList.Count / 10 Then task.gOptions.pixelDiffThreshold += 1
         End If
         If gridCount = 0 And task.gOptions.pixelDiffThreshold > 1 Then task.gOptions.pixelDiffThreshold -= 1
-        setTrueText("Pixel difference threshold is at " + CStr(task.gOptions.pixelDiffThreshold))
+        SetTrueText("Pixel difference threshold is at " + CStr(task.gOptions.pixelDiffThreshold))
         dst2 = src
     End Sub
 End Class
@@ -348,6 +348,7 @@ End Class
 Public Class OpAuto_MSER : Inherits VB_Parent
     Dim mBase As New MSER_Basics
     Public classCount As Integer
+    Dim checkOften As Boolean = True
     Public Sub New()
         desc = "Option Automation: find the best MSER max and min area values"
     End Sub
@@ -361,9 +362,8 @@ Public Class OpAuto_MSER : Inherits VB_Parent
         End If
         dst2 = src.Clone
 
-        Static checkOften As Boolean = True
         If task.heartBeat Or checkOften Then
-            If src.Channels <> 1 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src
+            If src.Channels() <> 1 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src
             Dim count = dst1.CountNonZero
             Dim desired = CInt(dst2.Total * 0.6)
             If count < desired Then
@@ -385,6 +385,6 @@ Public Class OpAuto_MSER : Inherits VB_Parent
             strOut += "minSlider value = " + CStr(minSlider.value) + vbCrLf
             strOut += "checkOften variable is " + CStr(checkOften)
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class

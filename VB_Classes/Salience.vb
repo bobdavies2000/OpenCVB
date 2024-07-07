@@ -10,7 +10,7 @@ Public Class Salience_Basics_CPP : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static numSlider = FindSlider("Salience numScales")
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         If src.Total <> grayData.Length Then ReDim grayData(src.Total - 1)
         Dim grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, grayData, 0, grayData.Length)
@@ -35,7 +35,7 @@ Public Class Salience_Basics_MT : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         Static scaleSlider = FindSlider("Salience numScales")
         Dim numScales = scaleSlider.Value
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         Dim threads = 32
         Dim h = CInt(src.Height / threads)
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)

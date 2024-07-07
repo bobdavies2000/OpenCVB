@@ -26,7 +26,7 @@ Public Class LaneFinder_Videos : Inherits VB_Parent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("challenge.mp4")
             radio.addRadio("solidWhiteRight.mp4")
@@ -35,10 +35,10 @@ Public Class LaneFinder_Videos : Inherits VB_Parent
         End If
         desc = "Read in the videos showing road conditions."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If task.optionsChanged Then
-            Static frm = findfrm(traceName + " Radio Buttons")
-            Dim inputfile As New FileInfo(task.homeDir + "/Data/" + findRadioText(frm.check))
+            Static frm = FindFrm(traceName + " Radio Buttons")
+            Dim inputfile As New FileInfo(task.HomeDir + "/Data/" + findRadioText(frm.check))
             If inputfile.Exists Then video.fileNameForm.filename.Text = inputfile.FullName
         End If
         video.Run(empty)
@@ -99,12 +99,12 @@ End Class
 ' https://github.com/mohamedameen93/Lane-lines-detection-using-Python-and-OpenCV
 Public Class LaneFinder_ROI : Inherits VB_Parent
     Dim hls As New LaneFinder_HLSColor
+    Dim pListList = New cv.Point()() {Nothing}
     Public Sub New()
         labels = {"Original input", "Mask showing ROI", "HLS version with ROI outline", "HLS Mask with ROI outline"}
         desc = "Define the ROI for the location of the lanes"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static pListList = New cv.Point()() {Nothing}
         hls.Run(empty)
 
         If task.optionsChanged Then
@@ -184,7 +184,7 @@ Public Class LaneFinder_SlopeIntercept : Inherits VB_Parent
         rightLaneIntercept = mat1.Dot(mat3) / weight
         rightAvgSlope = mat1.Dot(mat2) / weight
 
-        setTrueText("Left lane intercept = " + Format(leftLaneIntercept, fmt1) +
+        SetTrueText("Left lane intercept = " + Format(leftLaneIntercept, fmt1) +
                     " Right lane intercept = " + Format(rightLaneIntercept, fmt1) + vbCrLf +
                     "Left slope = " + Format(leftAvgSlope, fmt3) +
                     " Right slope = " + Format(rightAvgSlope, fmt3), 3)

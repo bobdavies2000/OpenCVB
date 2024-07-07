@@ -20,7 +20,7 @@ Public Class Quaterion_Basics : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
         Dim quatmul = Quaternion.Multiply(options.q1, options.q2)
-        setTrueText("q1 = " + options.q1.ToString() + vbCrLf + "q2 = " + options.q2.ToString() + vbCrLf +
+        SetTrueText("q1 = " + options.q1.ToString() + vbCrLf + "q2 = " + options.q2.ToString() + vbCrLf +
                     "Multiply q1 * q2" + quatmul.ToString())
     End Sub
 End Class
@@ -55,7 +55,7 @@ Public Class Quaterion_IMUPrediction : Inherits VB_Parent
 
         Dim diffq = Quaternion.Subtract(task.IMU_Rotation, predictedRotation)
 
-        setTrueText("IMU_Acceleration = " + vbTab +
+        SetTrueText("IMU_Acceleration = " + vbTab +
                                  Format(task.IMU_Acceleration.X, fmt3) + vbTab +
                                  Format(task.IMU_Acceleration.Y, fmt3) + vbTab +
                                  Format(task.IMU_Acceleration.Z, fmt3) + vbTab + vbCrLf +

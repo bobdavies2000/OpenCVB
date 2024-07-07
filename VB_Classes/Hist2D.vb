@@ -8,13 +8,14 @@ Public Class Hist2D_Basics : Inherits VB_Parent
     Public channels() As Integer = {0, 2}
     Public Sub New()
         histRowsCols = {dst2.Height, dst2.Width}
-        labels = {"", "", "Plot of 2D histogram (32F format)", "All non-zero entries in the 2D histogram"}
+        labels = {"", "", "All non-zero entries in the 2D histogram", ""}
         desc = "Create a 2D histogram from the input."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         ranges = GetHist2Dminmax(src, channels(0), channels(1))
         cv.Cv2.CalcHist({src}, channels, New cv.Mat(), histogram, 2, histRowsCols, ranges)
         dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
     End Sub
 End Class
 
@@ -37,7 +38,7 @@ Public Class Hist2D_Cloud : Inherits VB_Parent
             r1 = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
         End If
         If task.redOptions.channels(1) = 1 Then r2 = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        If task.redOptions.channels(1) = 2 Then r2 = New cv.Vec2f(0, task.maxZmeters)
+        If task.redOptions.channels(1) = 2 Then r2 = New cv.Vec2f(0, task.MaxZmeters)
 
         ranges = New cv.Rangef() {New cv.Rangef(r1.Item0, r1.Item1),
                                   New cv.Rangef(r2.Item0, r2.Item1)}

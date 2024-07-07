@@ -42,7 +42,7 @@ Public Class Eigen_Basics : Inherits VB_Parent
             Next
             nextLine += " = " + vbTab + "0.0" + vbCrLf
         Next
-        setTrueText(nextLine)
+        SetTrueText(nextLine)
     End Sub
 End Class
 
@@ -77,7 +77,7 @@ Public Class Eigen_FitLineInput : Inherits VB_Parent
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > height Then pt.Y = height
                 points.Add(pt)
-                DrawCircle(dst2,points(i), task.dotSize, cv.Scalar.White)
+                DrawCircle(dst2,points(i), task.DotSize, cv.Scalar.White)
             Next
 
             Dim p1 As cv.Point2f, p2 As cv.Point2f
@@ -108,7 +108,7 @@ Public Class Eigen_FitLineInput : Inherits VB_Parent
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > height Then pt.Y = height
                 points.Add(pt)
-                DrawCircle(dst2,pt, task.dotSize + 1, highLight)
+                DrawCircle(dst2,pt, task.DotSize + 1, highLight)
             Next
         End If
     End Sub
@@ -120,17 +120,16 @@ End Class
 ' http://www.cs.cmu.edu/~youngwoo/doc/lineFittingTest.cpp
 Public Class Eigen_Fitline : Inherits VB_Parent
     Dim noisyLine As New Eigen_FitLineInput
+    Dim eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, 0), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, 0)
+    Dim theta As Single
+    Dim len As Single
+    Dim m2 As Single
     Public Sub New()
         labels(2) = "blue is Ground Truth, red is fitline, yellow is EigenFit"
         labels(3) = "Raw input (use sliders below to explore)"
         desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, 0), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, 0)
-        Static theta As Single
-        Static len As Single
-        Static m2 As Single
-
         noisyLine.options.recompute = True
         noisyLine.Run(src)
 
@@ -179,7 +178,7 @@ Public Class Eigen_Fitline : Inherits VB_Parent
         m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
 
         If Math.Abs(m2) > 1.0 Then
-            dst2.Line(p1, p2, task.highlightColor, 10, task.lineType)
+            dst2.Line(p1, p2, task.HighlightColor, 10, task.lineType)
         Else
             p1 = New cv.Point2f(mean.Val0 - Math.Cos(-theta) * len / 2, mean.Val1 - Math.Sin(-theta) * len / 2)
             p2 = New cv.Point2f(mean.Val0 + Math.Cos(-theta) * len / 2, mean.Val1 + Math.Sin(-theta) * len / 2)
@@ -189,7 +188,7 @@ Public Class Eigen_Fitline : Inherits VB_Parent
         p1 = New cv.Point(0, noisyLine.bb)
         p2 = New cv.Point(width, noisyLine.m * width + noisyLine.bb)
         dst2.Line(p1, p2, cv.Scalar.Blue, task.lineWidth + 2, task.lineType)
-        setTrueText("Ground Truth m = " + Format(noisyLine.m, fmt2) + " eigen m = " + Format(m2, fmt2) + "    len = " + CStr(CInt(len)) + vbCrLf +
+        SetTrueText("Ground Truth m = " + Format(noisyLine.m, fmt2) + " eigen m = " + Format(m2, fmt2) + "    len = " + CStr(CInt(len)) + vbCrLf +
                     "Confidence = " + Format(eigenVal.Get(Of Single)(0, 0) / eigenVal.Get(Of Single)(1, 0), fmt1) + vbCrLf +
                     "theta: atan2(" + Format(eigenVec.Get(Of Single)(1, 0), fmt1) + ", " + Format(eigenVec.Get(Of Single)(0, 0), fmt1) + ") = " +
                     Format(theta, fmt4))

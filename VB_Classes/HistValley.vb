@@ -4,6 +4,7 @@ Public Class HistValley_Basics : Inherits VB_Parent
     Dim hist As New Hist_Basics
     Dim options As New Options_Boundary
     Public valleys(3) As Integer ' grayscale values for low points in the histogram.
+    Dim scaleList As New List(Of Single)
     Public Sub New()
         task.gOptions.FrameHistory.Value = 30
         task.gOptions.setHistogramBins(256)
@@ -15,16 +16,15 @@ Public Class HistValley_Basics : Inherits VB_Parent
         Dim vCount = options.desiredBoundaries
         Dim minDistance = options.peakDistance
 
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         hist.Run(src)
         dst2 = hist.dst2
 
-        Static scaleList As New List(Of Single)
         Dim avg = hist.histogram.Mean()
         scaleList.Add(dst2.Height - dst2.Height * avg(0) / hist.plot.mm.maxVal)
         Dim scale = scaleList.Average()
-        setTrueText("Mean", New cv.Point(5, scale), 3)
+        SetTrueText("Mean", New cv.Point(5, scale), 3)
         dst2.Line(New cv.Point(0, scale), New cv.Point(dst2.Width, scale), cv.Scalar.Yellow, task.lineWidth + 1)
 
         If scaleList.Count > task.gOptions.FrameHistory.Value Then scaleList.RemoveAt(0)
@@ -96,14 +96,14 @@ Public Class HistValley_FromPeaks : Inherits VB_Parent
 
         If task.optionsChanged Then ReDim avgValley(valleyIndex.Count - 1)
 
-        Dim depthPerBin = task.maxZmeters / histList.Count
+        Dim depthPerBin = task.MaxZmeters / histList.Count
         For i = 0 To avgValley.Count - 1
             avgValley(i) = (avgValley(i) + valleyIndex(i) * depthPerBin) / 2
         Next
 
         If standaloneTest() Then
             updatePlot(dst2, task.histogramBins)
-            setTrueText("Input data used by default is the depth data", 3)
+            SetTrueText("Input data used by default is the depth data", 3)
         End If
         labels(2) = peak.labels(2) + " and " + CStr(valleyIndex.Count) + " valleys (marked at bottom)"
     End Sub
@@ -193,12 +193,12 @@ End Class
 
 Public Class HistValley_Depth : Inherits VB_Parent
     Public valley As New HistValley_FromPeaks
+    Dim histogram As cv.Mat
     Public Sub New()
         labels(2) = "Top markerstop = peaks, bottom markers = valleys"
         desc = "Find the valleys in the depth histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static histogram As cv.Mat
         If task.heartBeat Then
             valley.Run(src)
             dst2 = valley.dst2
@@ -254,6 +254,7 @@ End Class
 Public Class HistValley_Test : Inherits VB_Parent
     Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public options As New Options_Boundary
+    Dim kalmanHist As New Hist_Kalman
     Public Sub New()
         If standaloneTest() Then task.gOptions.setHistogramBins(256)
         desc = "Get the top X highest quality valley points in the histogram."
@@ -264,7 +265,6 @@ Public Class HistValley_Test : Inherits VB_Parent
 
         ' input should be a histogram.  If not, get one...
         If standaloneTest() Then
-            Static kalmanHist As New Hist_Kalman
             kalmanHist.Run(src)
             dst2 = kalmanHist.dst2
             src = kalmanHist.hist.histogram.Clone
@@ -305,7 +305,7 @@ Public Class HistValley_Test : Inherits VB_Parent
                 Dim col = entry.Value * dst2.Width / task.histogramBins
                 DrawLine(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White)
             Next
-            setTrueText(CStr(valleys.Count) + " valleys in histogram", 3)
+            SetTrueText(CStr(valleys.Count) + " valleys in histogram", 3)
         End If
     End Sub
 End Class
@@ -452,7 +452,7 @@ Public Class HistValley_Simple : Inherits VB_Parent
             DrawLine(dst2, lastPoint, p1, cv.Scalar.Yellow)
             lastPoint = p1
         Next
-        labels(2) = "Depth regions between 0 and " + CStr(CInt(task.maxZmeters + 1)) + " meters"
+        labels(2) = "Depth regions between 0 and " + CStr(CInt(task.MaxZmeters + 1)) + " meters"
     End Sub
 End Class
 
@@ -467,7 +467,7 @@ Public Class HistValley_Tiers : Inherits VB_Parent
     Dim valleys As New HistValley_FromPeaks
     Public Sub New()
         labels = {"", "", "CV_8U tier map with values ranging from 0 to the desired valley count", "vbPalette output of dst2."}
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Display the depth as tiers defined by the depth valleys in the histogram of depth."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -495,13 +495,13 @@ End Class
 Public Class HistValley_Colors : Inherits VB_Parent
     Dim hist As New Hist_Kalman
     Dim auto As New OpAuto_Valley
+    Dim splitIndex As Integer
     Public Sub New()
         If standaloneTest() Then task.gOptions.setHistogramBins(256)
         If standaloneTest() Then FindSlider("Desired boundary count").Value = 10
         desc = "Find the histogram valleys for each of the colors."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static splitIndex As Integer
         If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
         src = src.ExtractChannel(splitIndex)
         hist.hist.plot.backColor = Choose(splitIndex + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)

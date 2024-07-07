@@ -3,6 +3,7 @@ Imports cv = OpenCvSharp
 Public Class MeanShift_Basics : Inherits VB_Parent
     Public rectangleEdgeWidth As Integer = 2
     Public trackbox As New cv.Rect
+    Dim histogram As New cv.Mat
     Public Sub New()
         If standalone Then task.gOptions.setDisplay1()
         labels(2) = "Draw anywhere to start mean shift tracking."
@@ -14,7 +15,6 @@ Public Class MeanShift_Basics : Inherits VB_Parent
         Dim ch() As Integer = {0, 1, 2}
         Dim hsize() As Integer = {16, 16, 16}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 180)}
-        Static histogram As New cv.Mat
         If task.optionsChanged Then
             trackbox = task.drawRect
             Dim maskROI = hsv(roi).InRange(New cv.Scalar(0, 60, 32), New cv.Scalar(180, 255, 255))

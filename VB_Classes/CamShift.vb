@@ -4,6 +4,8 @@ Imports cv = OpenCvSharp
 Public Class CamShift_Basics : Inherits VB_Parent
     Public trackBox As New cv.RotatedRect
     Dim redHue As New CamShift_RedHue
+    Dim roi As New cv.Rect
+    Dim histogram As New cv.Mat
     Public Sub New()
         UpdateAdvice(traceName + ": Draw on any available red hue area.")
         labels(2) = "Draw anywhere to create histogram and start camshift"
@@ -12,9 +14,6 @@ Public Class CamShift_Basics : Inherits VB_Parent
         desc = "CamShift Demo - draw on the images to define the object to track. "
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static roi As New cv.Rect
-        Static histogram As New cv.Mat
-
         redHue.Run(src)
         dst2 = redHue.dst2
         Dim hue = redHue.dst1
@@ -22,7 +21,7 @@ Public Class CamShift_Basics : Inherits VB_Parent
 
         Dim ranges() = {New cv.Rangef(0, 180)}
         Dim hsize() As Integer = {task.histogramBins}
-        task.drawRect = validateRect(task.drawRect)
+        task.drawRect = ValidateRect(task.drawRect)
         cv.Cv2.CalcHist({hue(task.drawRect)}, {0}, mask(task.drawRect), histogram, 1, hsize, ranges)
         histogram = histogram.Normalize(0, 255, cv.NormTypes.MinMax)
         roi = task.drawRect
@@ -31,7 +30,7 @@ Public Class CamShift_Basics : Inherits VB_Parent
             cv.Cv2.CalcBackProject({hue}, {0}, histogram, dst1, ranges)
             trackBox = cv.Cv2.CamShift(dst1 And mask, roi, cv.TermCriteria.Both(10, 1))
             dst3 = Show_HSV_Hist(histogram)
-            If dst3.Channels = 1 Then dst3 = src
+            If dst3.Channels() = 1 Then dst3 = src
             dst3 = dst3.CvtColor(cv.ColorConversionCodes.HSV2BGR)
         End If
         If trackBox.Size.Width > 0 Then

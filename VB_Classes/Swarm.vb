@@ -2,16 +2,17 @@
 Public Class Swarm_Basics : Inherits VB_Parent
     Public knn As New KNN_Core
     Dim feat As New Feature_Basics
-    Public mpList As New List(Of pointPair)
+    Public mpList As New List(Of PointPair)
     Public distanceAvg As Single
     Public directionAvg As Single
     Public distanceMax As Single
     Public options As New Options_Swarm
+    Dim cornerHistory As New List(Of List(Of cv.Point2f))
     Public Sub New()
         FindSlider("Feature Sample Size").Value = 1000
         FindSlider("Blocksize").Value = 1
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."
     End Sub
     Public Sub DrawLines(dst As cv.Mat)
@@ -37,7 +38,6 @@ Public Class Swarm_Basics : Inherits VB_Parent
         feat.Run(src)
         dst3 = feat.dst2
 
-        Static cornerHistory As New List(Of List(Of cv.Point2f))
         If task.optionsChanged Then cornerHistory.Clear()
 
         Dim histCount = task.frameHistoryCount
@@ -60,7 +60,7 @@ Public Class Swarm_Basics : Inherits VB_Parent
             Dim nextDist = pt.DistanceTo(ptNew)
             DrawLine(dst2, pt, ptNew, cv.Scalar.White)
             disList.Add(nextDist)
-            mpList.Add(New pointPair(pt, ptNew))
+            mpList.Add(New PointPair(pt, ptNew))
             If nextDist > 0 Then
                 If pt.Y <> ptNew.Y Then
                     Dim nextDirection = Math.Atan((pt.X - ptNew.X) / (pt.Y - ptNew.Y))
@@ -144,7 +144,7 @@ Public Class Swarm_LeftRight : Inherits VB_Parent
         swarm.DrawLines(dst3)
 
         strOut = swarm.labels(2) + vbCrLf + swarm.labels(3)
-        setTrueText(strOut, 1)
+        SetTrueText(strOut, 1)
     End Sub
 End Class
 
@@ -205,7 +205,7 @@ Public Class Swarm_Flood : Inherits VB_Parent
         flood.Run(cvt.dst2)
         dst2 = flood.dst2
 
-        setSelectedContour()
+        task.setSelectedContour()
         labels(2) = flood.genCells.labels(2)
     End Sub
 End Class
@@ -239,7 +239,7 @@ Public Class Swarm_Flood2 : Inherits VB_Parent
         dst2 = runRedCloud(src).Clone()
         dst3 = lines.dst3.Clone
 
-        setSelectedContour()
+        task.setSelectedContour()
         labels(2) = flood.genCells.labels(2)
         labels(3) = lines.labels(2)
     End Sub

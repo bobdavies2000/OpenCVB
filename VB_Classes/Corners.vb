@@ -4,21 +4,18 @@ Imports System.Runtime.InteropServices
 Public Class Corners_Basics : Inherits VB_Parent
     Public features As New List(Of cv.Point2f)
     Dim options As New Options_Features
+    Dim optionCorner As New Options_Corners
     Public Sub New()
-        If check.Setup(traceName) Then
-            check.addCheckBox("Use Non-Max = True")
-            check.Box(0).Checked = True
-        End If
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U)
         desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = FindSlider("FAST Threshold")
-        Static nonMaxCheck = findCheckBox("Use Non-Max = True")
+        optionCorner.RunVB()
+        options.RunVB()
 
         dst2 = src.Clone
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(src, thresholdSlider.Value, nonMaxCheck.checked)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(src, task.FASTthreshold, optionCorner.useNonMax)
 
         features.Clear()
         For Each kp As cv.KeyPoint In kpoints
@@ -28,7 +25,7 @@ Public Class Corners_Basics : Inherits VB_Parent
         If standaloneTest() Then
             dst3.SetTo(0)
             For Each kp As cv.KeyPoint In kpoints
-                DrawCircle(dst2, kp.Pt, task.dotSize, cv.Scalar.Yellow)
+                DrawCircle(dst2, kp.Pt, task.DotSize, cv.Scalar.Yellow)
                 dst3.Set(Of Byte)(kp.Pt.Y, kp.Pt.X, 255)
             Next
         End If
@@ -43,49 +40,44 @@ End Class
 
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
 Public Class Corners_Harris : Inherits VB_Parent
+    Dim options As New Options_HarrisCorners
+    Dim gray As New cv.Mat
+    Dim mc As New cv.Mat, mm As mmData
+
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Corner block size", 1, 21, 3)
-            sliders.setupTrackBar("Corner aperture size", 1, 21, 3)
-            sliders.setupTrackBar("Corner quality level", 1, 100, 50)
-        End If
         desc = "Find corners using Eigen values and vectors"
         labels(3) = "Corner Eigen values"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static blockSlider = FindSlider("Corner block size")
-        Static apertureSlider = FindSlider("Corner aperture size")
-        Static qualitySlider = FindSlider("Corner quality level")
-        Dim quality = qualitySlider.Value
-
-        Static color As New cv.Mat
-        Static gray As New cv.Mat
-        Static mc As New cv.Mat
+        options.RunVB()
 
         gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         mc = New cv.Mat(gray.Size(), cv.MatType.CV_32FC1, 0)
         dst2 = New cv.Mat(gray.Size(), cv.MatType.CV_8U, 0)
-        cv.Cv2.CornerEigenValsAndVecs(gray, dst2, blockSlider.Value Or 1, apertureSlider.Value Or 1, cv.BorderTypes.Default)
+        cv.Cv2.CornerEigenValsAndVecs(gray, dst2, options.blockSize, options.aperture, cv.BorderTypes.Default)
 
-        For j = 0 To gray.Rows - 1
-            For i = 0 To gray.Cols - 1
-                Dim lambda_1 = dst2.Get(Of cv.Vec6f)(j, i)(0)
-                Dim lambda_2 = dst2.Get(Of cv.Vec6f)(j, i)(1)
-                mc.Set(Of Single)(j, i, lambda_1 * lambda_2 - 0.04 * Math.Pow(lambda_1 + lambda_2, 2))
+        For y = 0 To gray.Rows - 1
+            For x = 0 To gray.Cols - 1
+                Dim lambda_1 = dst2.Get(Of cv.Vec6f)(y, x)(0)
+                Dim lambda_2 = dst2.Get(Of cv.Vec6f)(y, x)(1)
+                mc.Set(Of Single)(y, x, lambda_1 * lambda_2 - 0.04 * Math.Pow(lambda_1 + lambda_2, 2))
             Next
         Next
 
-        Static mm As mmData
         mm = GetMinMax(mc)
 
         src.CopyTo(dst2)
-        For j = 0 To gray.Rows - 1
-            For i = 0 To gray.Cols - 1
-                If mc.Get(Of Single)(j, i) > mm.minVal + (mm.maxVal - mm.minVal) * quality / qualitySlider.Maximum Then
-                    DrawCircle(dst2,New cv.Point(i, j), task.dotSize, task.highlightColor)
+        Dim count As Integer
+        For y = 0 To gray.Rows - 1
+            For x = 0 To gray.Cols - 1
+                If mc.Get(Of Single)(y, x) > mm.minVal + (mm.maxVal - mm.minVal) * options.quality / options.qualityMax Then
+                    DrawCircle(dst2, New cv.Point(x, y), task.DotSize, task.HighlightColor)
+                    count += 1
                 End If
             Next
         Next
+
+        labels(2) = "Corners_Harris found " + CStr(count) + " corners in the image."
 
         Dim McNormal As New cv.Mat
         cv.Cv2.Normalize(mc, McNormal, 127, 255, cv.NormTypes.MinMax)
@@ -97,17 +89,19 @@ End Class
 
 
 
+
 Public Class Corners_PreCornerDetect : Inherits VB_Parent
     Dim median As New Math_Median_CDF
+    Dim options As New Options_PreCorners
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("kernel Size", 1, 20, 19)
         desc = "Use PreCornerDetect to find features in the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static kernelSlider = FindSlider("kernel Size")
+        options.RunVB()
+
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim prob As New cv.Mat
-        cv.Cv2.PreCornerDetect(gray, prob, kernelSlider.Value Or 1)
+        cv.Cv2.PreCornerDetect(gray, prob, options.kernelSize)
 
         cv.Cv2.Normalize(prob, prob, 0, 255, cv.NormTypes.MinMax)
         prob.ConvertTo(gray, cv.MatType.CV_8U)
@@ -123,33 +117,26 @@ End Class
 
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
 Public Class Corners_ShiTomasi_CPP : Inherits VB_Parent
+    Dim options As New Options_ShiTomasi
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Corner block size", 1, 21, 3)
-            sliders.setupTrackBar("Corner aperture size", 1, 21, 3)
-            sliders.setupTrackBar("Corner normalize threshold", 0, 32, 0)
-        End If
         desc = "Find corners using Eigen values and vectors"
         labels(3) = "Corner Eigen values using ShiTomasi which is also what is used in GoodFeatures."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static blockSlider = FindSlider("Corner block size")
-        Static apertureSlider = FindSlider("Corner aperture size")
-        Static thresholdSlider = FindSlider("Corner normalize threshold")
-        Dim threshold = thresholdSlider.Value
+        options.RunVB()
 
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim data(src.Total - 1) As Byte
         Dim handle = GCHandle.Alloc(data, GCHandleType.Pinned)
         Marshal.Copy(src.Data, data, 0, data.Length)
-        Dim imagePtr = Corners_ShiTomasi(handle.AddrOfPinnedObject, src.Rows, src.Cols, blockSlider.Value Or 1, apertureSlider.Value Or 1)
+        Dim imagePtr = Corners_ShiTomasi(handle.AddrOfPinnedObject, src.Rows, src.Cols, options.blocksize, options.aperture)
         handle.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr).Clone
 
         dst3 = GetNormalize32f(dst2)
-        dst3 = dst3.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst3.Threshold(options.threshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -169,7 +156,7 @@ Public Class Corners_BasicsCentroid : Inherits VB_Parent
         dst2 = fast.dst2
         dst3.SetTo(0)
         For Each pt In fast.features
-            DrawCircle(dst3, pt, task.dotSize + 2, cv.Scalar.White)
+            DrawCircle(dst3, pt, task.DotSize + 2, cv.Scalar.White)
         Next
         Dim gray = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim m = cv.Cv2.Moments(gray, True)
@@ -192,7 +179,7 @@ Public Class Corners_BasicsStablePoints : Inherits VB_Parent
     Dim fast As New Corners_Basics
     Public Sub New()
         labels = {"", "", "", "FAST stable points without context"}
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "Find and save only the stable points in the FAST output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -209,7 +196,7 @@ Public Class Corners_BasicsStablePoints : Inherits VB_Parent
         For Each pt In fast.features
             Dim test = New cv.Point(pt.X, pt.Y)
             If features.Contains(test) Then
-                DrawCircle(dst2, test, task.dotSize, cv.Scalar.Yellow)
+                DrawCircle(dst2, test, task.DotSize, cv.Scalar.Yellow)
                 newPts.Add(test)
                 dst3.Set(Of Byte)(test.Y, test.X, 255)
             End If
@@ -248,7 +235,7 @@ Public Class Corners_BasicsCentroids : Inherits VB_Parent
         Next
 
         For i = 0 To fastCenters.Count - 1
-            DrawCircle(dst2, fastCenters(i), task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst2, fastCenters(i), task.DotSize, cv.Scalar.Yellow)
         Next
         dst2.SetTo(cv.Scalar.White, task.gridMask)
     End Sub
@@ -273,7 +260,7 @@ Public Class Corners_Harris_CPP : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim dataSrc(src.Total - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
@@ -308,15 +295,16 @@ Public Class Corners_HarrisDetector : Inherits VB_Parent
         cPtr = Harris_Detector_Open()
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static qualitySlider = FindSlider("Quality Level")
+        options.RunVB()
+
         dst2 = src.Clone
 
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim dataSrc(src.Total) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
 
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
-        Dim imagePtr = Harris_Detector_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, qualitySlider.Value / 100)
+        Dim imagePtr = Harris_Detector_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.quality)
         handleSrc.Free()
         Dim ptCount = Harris_Detector_Count(cPtr)
         If ptCount > 1 Then
@@ -324,7 +312,7 @@ Public Class Corners_HarrisDetector : Inherits VB_Parent
             features.Clear()
             For i = 0 To ptCount - 1
                 features.Add(New cv.Point2f(ptMat.Get(Of Integer)(i, 0), ptMat.Get(Of Integer)(i, 1)))
-                DrawCircle(dst2,features(i), task.dotSize, cv.Scalar.Yellow)
+                DrawCircle(dst2, features(i), task.DotSize, cv.Scalar.Yellow)
             Next
         End If
     End Sub
@@ -356,8 +344,8 @@ Public Class Corners_RedCloud : Inherits VB_Parent
 
         dst3 = task.color.Clone
         For Each pt In corners.nPoints
-            DrawCircle(dst2,pt, task.dotSize, task.highlightColor)
-            DrawCircle(dst3,pt, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+            DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
         Next
     End Sub
 End Class
@@ -367,26 +355,25 @@ End Class
 
 Public Class Corners_SubPix : Inherits VB_Parent
     Public feat As New Feature_Basics
+    Dim options As New Options_PreCorners
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("SubPix kernel Size", 1, 20, 3)
         labels(2) = "Output of PreCornerDetect"
         desc = "Use PreCornerDetect to refine the feature points to sub-pixel accuracy."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static kernelSlider = FindSlider("SubPix kernel Size")
-        Dim kernelSize As Integer = kernelSlider.value Or 1
+        options.RunVB()
 
         dst2 = src.Clone
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         feat.Run(src)
-        cv.Cv2.CornerSubPix(src, task.features, New cv.Size(kernelSize, kernelSize), New cv.Size(-1, -1), term)
+        cv.Cv2.CornerSubPix(src, task.features, New cv.Size(options.subpixSize, options.subpixSize), New cv.Size(-1, -1), term)
 
         task.featurePoints.Clear()
         For i = 0 To task.features.Count - 1
             Dim pt = task.features(i)
             task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst2,pt, task.dotSize, task.highlightColor)
+            DrawCircle(dst2,pt, task.DotSize, task.HighlightColor)
         Next
     End Sub
 End Class

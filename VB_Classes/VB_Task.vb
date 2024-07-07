@@ -3,9 +3,9 @@ Imports System.Windows.Forms
 Imports System.IO.Pipes
 Imports System.Drawing
 Imports System.IO
+Imports OpenCvSharp
 
 Public Class VBtask : Implements IDisposable
-#Region "VBTask variables"
     Public TaskTimer As New System.Timers.Timer(1000)
     Public algoList As New AlgorithmList
 
@@ -14,12 +14,13 @@ Public Class VBtask : Implements IDisposable
     Public frameCount As Integer = 0
     Public heartBeat As Boolean
     Public quarterBeat As Boolean
+    Public quarter(4) As Boolean
     Public midHeartBeat As Boolean
     Public almostHeartBeat As Boolean
     Public myStopWatch As Stopwatch
     Public msWatch As Integer
     Public msLast As Integer
-    Public firstPass As Boolean
+    Public FirstPass As Boolean
 
     Public toggleOnOff As Boolean ' toggles on the heartbeat.
     Public optionsChanged As Boolean ' global or local options changed.
@@ -45,7 +46,7 @@ Public Class VBtask : Implements IDisposable
 
     Public debugSyncUI As Boolean
 
-    Public workingRes As cv.Size
+    Public WorkingRes As cv.Size
     Public resolutionRatio As Single ' mousepoints/drawrects need the ratio of the display to the working resolution.
     Public disparityAdjustment As Single ' adjusts for resolution and some hidden elements.
 
@@ -53,8 +54,8 @@ Public Class VBtask : Implements IDisposable
     Public motionFlag As Boolean
     Public motionDetected As Boolean
 
-    Public gravityVec As New pointPair
-    Public horizonVec As New pointPair
+    Public gravityVec As New PointPair
+    Public horizonVec As New PointPair
 
     Public camMotionPixels As Single ' distance in pixels that the camera has moved.
     Public camDirection As Single ' camera direction in radians.
@@ -92,7 +93,9 @@ Public Class VBtask : Implements IDisposable
     Public roll As Single
 
     Public gMatrix As cv.Mat ' transformation matrix to convert point cloud to be vertical according to gravity.
+    Public useGravityPointcloud As Boolean
 
+    Public cellStats As Cell_Basics
     Public imuStabilityTest As Stabilizer_VerticalIMU
     Public cameraStable As Boolean
     Public cameraStableString As String
@@ -106,12 +109,13 @@ Public Class VBtask : Implements IDisposable
     Public srcThread As cv.Mat
     Public recordTimings As Boolean = True
 
-    Public highlightColor As cv.Scalar ' color to use to highlight objects in an image.
+    Public HighlightColor As cv.Scalar ' color to use to highlight objects in an image.
     Public activateTaskRequest As Boolean
 
     Public histogramBins As Integer
 
     Public grid As Grid_Basics
+    Public gridSize As Integer
     Public gridRows As Integer
     Public gridCols As Integer
     Public gridIndex As New List(Of Integer)
@@ -132,12 +136,12 @@ Public Class VBtask : Implements IDisposable
     Public paletteIndex As Integer
 
     Public mouseClickFlag As Boolean
-    Public clickPoint As cv.Point
+    Public ClickPoint As cv.Point
     Public mousePicTag As Integer ' which image was the mouse in?
     Public mouseMovePoint As cv.Point ' trace any mouse movements using this.
     Public mouseMovePointUpdated As Boolean
 
-    Public dotSize As Integer
+    Public DotSize As Integer
     Public lineWidth As Integer
     Public lineType As cv.LineTypes
     Public resolutionIndex As Integer
@@ -187,7 +191,7 @@ Public Class VBtask : Implements IDisposable
     Public algName As String
     Public cameraName As String
     Public calibData As cameraInfo
-    Public homeDir As String
+    Public HomeDir As String
     Public fpsRate As Integer
     Public densityMetric As Integer ' how dense is the pointcloud in z - heuristic.
     Public FASTthreshold As Integer
@@ -202,14 +206,14 @@ Public Class VBtask : Implements IDisposable
 
     Public trueData As New List(Of trueText)
     Public flowData As New List(Of trueText)
-    Public callTrace As New List(Of String)
 
-    Public algorithm_ms As New List(Of Single)
-    Public algorithmNames As New List(Of String)
+    Public callTraceMain As New List(Of String)
+    Public algorithm_msMain As New List(Of Single)
+    Public algorithmNamesMain As New List(Of String)
+
     Public waitingForInput As Single ' the amount of time waiting for buffers.
     Public inputBufferCopy As Single ' the amount of time copying the buffers.
     Public returnCopyTime As Single ' the amount of time returning buffers to the host.
-    Public algorithmAccumulate As Boolean ' accumulate times or use latest interval times.
 
     Public OpenGLTitle As String
     Public oglRect As cv.Rect
@@ -253,9 +257,8 @@ Public Class VBtask : Implements IDisposable
     Public yRange As Single
     Public xRangeDefault As Single
     Public yRangeDefault As Single
-    Public maxZmeters As Single
+    Public MaxZmeters As Single
     Public metersPerPixel As Single
-#End Region
     Public Structure inBuffer
         Dim color As cv.Mat
         Dim leftView As cv.Mat
@@ -284,7 +287,7 @@ Public Class VBtask : Implements IDisposable
         Public cameraName As String
         Public cameraIndex As Integer
 
-        Public homeDir As String
+        Public HomeDir As String
         Public useRecordedData As Boolean
         Public externalPythonInvocation As Boolean ' OpenCVB was initialized remotely...
         Public showConsoleLog As Boolean
@@ -297,7 +300,7 @@ Public Class VBtask : Implements IDisposable
         Public main_hwnd As IntPtr
 
         Public fpsRate As Integer
-        Public workingRes As cv.Size
+        Public WorkingRes As cv.Size
         Public captureRes As cv.Size ' DisparityIn-verted_Basics needs the full resolution to compute disparity.
         Public displayRes As cv.Size
 
@@ -347,24 +350,25 @@ Public Class VBtask : Implements IDisposable
         task = Me
         useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve results.
         gridList = New List(Of cv.Rect)
+        FirstPass = True
         algName = parms.algName
         cameraName = parms.cameraName
         testAllRunning = parms.testAllRunning
         showConsoleLog = parms.showConsoleLog
         fpsRate = parms.fpsRate
         calibData = parms.cameraInfo
-        homeDir = parms.homeDir
+        HomeDir = parms.HomeDir
         main_hwnd = parms.main_hwnd
         useRecordedData = parms.useRecordedData
         externalPythonInvocation = parms.externalPythonInvocation
 
         mainFormLocation = parms.mainFormLocation
-        workingRes = parms.workingRes ' gets referenced a lot
-        resolutionIndex = If(workingRes.Width = 640, 2, 3)
+        WorkingRes = parms.WorkingRes ' gets referenced a lot
+        resolutionIndex = If(WorkingRes.Width = 640, 2, 3)
         displayRes = parms.displayRes
 
         buildColors()
-        pythonTaskName = homeDir + "Python_Classes\" + algName
+        pythonTaskName = HomeDir + "Python_Classes\" + algName
 
         allOptions = New OptionsContainer
         allOptions.Show()
@@ -372,7 +376,7 @@ Public Class VBtask : Implements IDisposable
         callTrace.Add("Options_XYRanges") ' so calltrace is not nothing on initial call...
         gOptions = New OptionsGlobal
         redOptions = New OptionsRedCloud
-        task.cellMap = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
+        task.cellMap = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, 0)
 
         grid = New Grid_Basics
         PixelViewer = New Pixel_Viewer
@@ -395,13 +399,16 @@ Public Class VBtask : Implements IDisposable
         End If
 
         callTrace.Clear()
+        task.callTraceMain.Clear()
+        task.algorithm_msMain.Clear()
+        task.algorithmNamesMain.Clear()
         callTrace.Add(algName + "\")
         activeObjects.Clear()
 
-        If task.algName.StartsWith("CSharp_") = False Then
+        If task.algName.StartsWith("CS_") = False Then
             vbAlgorithmObject = algoList.createVBAlgorithm(algName)
             desc = vbAlgorithmObject.desc
-            firstPass = True
+            FirstPass = True
         End If
 
         If task.advice = "" Then
@@ -452,13 +459,42 @@ Public Class VBtask : Implements IDisposable
         Dim str As New trueText(text, pt, picTag)
         task.trueData.Add(str)
     End Sub
+    Public Sub setSelectedContour(ByRef redCells As List(Of rcData), ByRef cellMap As cv.Mat)
+        Static ptNew As New cv.Point
+        If redCells.Count = 0 Then Exit Sub
+        If task.ClickPoint = ptNew And redCells.Count > 1 Then task.ClickPoint = redCells(1).maxDist
+        Dim index = cellMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+        task.rc = redCells(index)
+        If index > 0 And index < task.redCells.Count Then
+            ' task.ClickPoint = redCells(index).maxDist
+            task.rc = redCells(index)
+        End If
+    End Sub
+    Public Sub setSelectedContour()
+        If task.redCells.Count = 0 Then Exit Sub
+        If task.ClickPoint = newPoint And task.redCells.Count > 1 Then task.ClickPoint = task.redCells(1).maxDist
+        Dim index = task.cellMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+        If index > 0 And index < task.redCells.Count Then
+            ' task.ClickPoint = task.redCells(index).maxDist
+            task.rc = task.redCells(index)
+        Else
+            task.rc = task.redCells(0)
+        End If
+    End Sub
+    Private Function checkIntermediateResults() As VB_Parent
+        If task.algName.StartsWith("CPP_") Then Return Nothing ' we don't currently support intermediate results for CPP_ algorithms.
+        For Each obj In task.activeObjects
+            If obj.traceName = task.intermediateName And task.FirstPass = False Then Return obj
+        Next
+        Return Nothing
+    End Function
     Private Sub postProcess(src As cv.Mat)
         Try
             ' make sure that any outputs from the algorithm are the right size.nearest
-            If dst0.Size <> task.workingRes And dst0.Width > 0 Then dst0 = dst0.Resize(task.workingRes, 0, 0, cv.InterpolationFlags.Nearest)
-            If dst1.Size <> task.workingRes And dst1.Width > 0 Then dst1 = dst1.Resize(task.workingRes, 0, 0, cv.InterpolationFlags.Nearest)
-            If dst2.Size <> task.workingRes And dst2.Width > 0 Then dst2 = dst2.Resize(task.workingRes, 0, 0, cv.InterpolationFlags.Nearest)
-            If dst3.Size <> task.workingRes And dst3.Width > 0 Then dst3 = dst3.Resize(task.workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If dst0.Size <> task.WorkingRes And dst0.Width > 0 Then dst0 = dst0.Resize(task.WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If dst1.Size <> task.WorkingRes And dst1.Width > 0 Then dst1 = dst1.Resize(task.WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If dst2.Size <> task.WorkingRes And dst2.Width > 0 Then dst2 = dst2.Resize(task.WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If dst3.Size <> task.WorkingRes And dst3.Width > 0 Then dst3 = dst3.Resize(task.WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
 
             If task.pixelViewerOn Then
                 If task.intermediateObject IsNot Nothing Then
@@ -497,13 +533,13 @@ Public Class VBtask : Implements IDisposable
 
             If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()
 
-            If task.dst2.Width = task.workingRes.Width And task.dst2.Height = task.workingRes.Height Then
+            If task.dst2.Width = task.WorkingRes.Width And task.dst2.Height = task.WorkingRes.Height Then
                 If task.gOptions.ShowGrid.Checked Then task.dst2.SetTo(cv.Scalar.White, task.gridMask)
-                If task.dst2.Width <> task.workingRes.Width Or task.dst2.Height <> task.workingRes.Height Then
-                    task.dst2 = task.dst2.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
+                If task.dst2.Width <> task.WorkingRes.Width Or task.dst2.Height <> task.WorkingRes.Height Then
+                    task.dst2 = task.dst2.Resize(task.WorkingRes, cv.InterpolationFlags.Nearest)
                 End If
-                If task.dst3.Width <> task.workingRes.Width Or task.dst3.Height <> task.workingRes.Height Then
-                    task.dst3 = task.dst3.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
+                If task.dst3.Width <> task.WorkingRes.Width Or task.dst3.Height <> task.WorkingRes.Height Then
+                    task.dst3 = task.dst3.Resize(task.WorkingRes, cv.InterpolationFlags.Nearest)
                 End If
             End If
 
@@ -531,13 +567,13 @@ Public Class VBtask : Implements IDisposable
                     task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
                     If task.redOptions.DisplayCellStats.Checked Then
                         dst3.SetTo(0)
-                        If task.clickPoint = New cv.Point Then
+                        If task.ClickPoint = New cv.Point Then
                             If task.redCells.Count > 1 Then
                                 task.rc = task.redCells(1)
-                                task.clickPoint = task.rc.maxDist
+                                task.ClickPoint = task.rc.maxDist
                             End If
                         End If
-                        Static cellStats As New Cell_Basics
+                        If cellStats Is Nothing Then cellStats = New Cell_Basics
                         cellStats.statsString()
                         dst1 = cellStats.dst1
                         Dim str As New trueText(cellStats.strOut, New cv.Point, 3)
@@ -546,10 +582,10 @@ Public Class VBtask : Implements IDisposable
                 End If
             End If
 
-            If task.redOptions.DisplayCellStats.Checked And task.clickPoint = New cv.Point Then
+            If task.redOptions.DisplayCellStats.Checked And task.ClickPoint = New cv.Point Then
                 If task.redCells.Count > 1 Then
                     task.rc = task.redCells(1)
-                    task.clickPoint = task.rc.maxDist
+                    task.ClickPoint = task.rc.maxDist
                 End If
             End If
 
@@ -568,6 +604,10 @@ Public Class VBtask : Implements IDisposable
             task.optionsChanged = False
             TaskTimer.Enabled = False
             task.frameCount += 1
+
+            task.callTraceMain = New List(Of String)(callTrace)
+            task.algorithm_msMain = New List(Of Single)(algorithm_ms)
+            task.algorithmNamesMain = New List(Of String)(algorithmNames)
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try
@@ -582,34 +622,27 @@ Public Class VBtask : Implements IDisposable
 
         If task.testAllRunning = False Then
             If algorithm_ms.Count = 0 Then
-                task.algorithmNames.Add("waitingForInput")
+                algorithmNames.Add("waitingForInput")
                 algorithmTimes.Add(Now)
-                task.algorithm_ms.Add(0)
+                algorithm_ms.Add(0)
 
-                task.algorithmNames.Add("inputBufferCopy")
+                algorithmNames.Add("inputBufferCopy")
                 algorithmTimes.Add(Now)
-                task.algorithm_ms.Add(0)
+                algorithm_ms.Add(0)
 
-                task.algorithmNames.Add("ReturnCopyTime")
+                algorithmNames.Add("ReturnCopyTime")
                 algorithmTimes.Add(Now)
-                task.algorithm_ms.Add(0)
+                algorithm_ms.Add(0)
 
-                task.algorithmNames.Add(task.algName)
+                algorithmNames.Add(task.algName)
                 algorithmTimes.Add(Now)
-                task.algorithm_ms.Add(0)
+                algorithm_ms.Add(0)
 
                 algorithmStack = New Stack()
                 algorithmStack.Push(0)
                 algorithmStack.Push(1)
                 algorithmStack.Push(2)
                 algorithmStack.Push(3)
-            End If
-            If algorithmAccumulate = False Then
-                If task.heartBeat Then
-                    For i = 0 To algorithm_ms.Count - 1
-                        algorithm_ms(i) = 0
-                    Next
-                End If
             End If
 
             algorithm_ms(0) += waitingForInput
@@ -621,14 +654,14 @@ Public Class VBtask : Implements IDisposable
 
         task.redOptions.Sync()
 
-        task.bins2D = {task.workingRes.Height, task.workingRes.Width}
+        task.bins2D = {task.WorkingRes.Height, task.WorkingRes.Width}
         Dim src = task.color
 
-        ' If the workingRes changes, the previous generation of images needs to be reset.
-        If task.pointCloud.Size <> task.workingRes Or task.color.Size <> task.workingRes Then
-            task.pointCloud = New cv.Mat(task.workingRes, cv.MatType.CV_32FC3, 0)
-            task.noDepthMask = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
-            task.depthMask = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
+        ' If the WorkingRes changes, the previous generation of images needs to be reset.
+        If task.pointCloud.Size <> task.WorkingRes Or task.color.Size <> task.WorkingRes Then
+            task.pointCloud = New cv.Mat(task.WorkingRes, cv.MatType.CV_32FC3, 0)
+            task.noDepthMask = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, 0)
+            task.depthMask = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, 0)
         End If
 
         allOptions.TopMost = task.activateTaskRequest
@@ -658,7 +691,8 @@ Public Class VBtask : Implements IDisposable
         If task.paused = False Then
             task.frameHistoryCount = task.gOptions.FrameHistory.Value
 
-            If task.gOptions.gravityPointCloud.Checked Then
+            If task.useGravityPointcloud Then
+                If task.pointCloud.Size <> src.Size Then task.pointCloud = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)
                 '******* this is the rotation *******
                 task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).ToMat.Reshape(3, src.Rows)
             End If
@@ -703,8 +737,8 @@ Public Class VBtask : Implements IDisposable
             task.pcSplit = task.pointCloud.Split
 
             If task.optionsChanged Then task.maxDepthMask.SetTo(0)
-            task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
-            'task.maxDepthMask = task.pcSplit(2).InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
+            task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc)
+            'task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
 
             task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
             task.noDepthMask = Not task.depthMask
@@ -721,7 +755,7 @@ Public Class VBtask : Implements IDisposable
 
         ' small improvement to speed up colorized depth - make it smaller before colorizing.
         Dim depthRGBInput = task.pcSplit(2).Resize(task.quarterRes)
-        colorizer.RunVB(depthRGBInput.Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc))
+        colorizer.RunVB(depthRGBInput.Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc))
         task.depthRGB = colorizer.dst2.Resize(task.color.Size)
 
         TaskTimer.Enabled = True
@@ -735,20 +769,20 @@ Public Class VBtask : Implements IDisposable
                     MsgBox("Collect images first and then click 'Build GIF...'")
                 Else
                     For i = 0 To task.gifImages.Count - 1
-                        Dim fileName As New FileInfo(task.homeDir + "Temp/image" + Format(i, "000") + ".bmp")
+                        Dim fileName As New FileInfo(task.HomeDir + "Temp/image" + Format(i, "000") + ".bmp")
                         task.gifImages(i).Save(fileName.FullName)
                     Next
 
                     task.gifImages.Clear()
-                    Dim dirInfo As New DirectoryInfo(task.homeDir + "\GifBuilder\bin\Release\")
+                    Dim dirInfo As New DirectoryInfo(task.HomeDir + "\GifBuilder\bin\x64\Release\net7.0-windows\")
                     Dim dirData = dirInfo.GetDirectories()
-                    Dim gifExe As New FileInfo(dirInfo.FullName + "\" + dirData(0).ToString + "\GifBuilder.exe")
+                    Dim gifExe As New FileInfo(dirInfo.FullName + "GifBuilder.exe")
                     If gifExe.Exists = False Then
                         MsgBox("GifBuilder.exe was not found!")
                     Else
                         Dim gifProcess As New Process
                         gifProcess.StartInfo.FileName = gifExe.FullName
-                        gifProcess.StartInfo.WorkingDirectory = task.homeDir + "Temp/"
+                        gifProcess.StartInfo.WorkingDirectory = task.HomeDir + "Temp/"
                         gifProcess.Start()
                     End If
                 End If
@@ -769,24 +803,26 @@ Public Class VBtask : Implements IDisposable
 
 
         'cMotion.Run(src)
-        If task.algName.StartsWith("CSharp_") Then
-            csAlgorithmObject.trueData.clear()
-            csAlgorithmObject.RunCS(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested CS algorithm runs...
+        If task.paused = False Then
+            If task.algName.StartsWith("CS_") Then
+                csAlgorithmObject.trueData.clear()
+                csAlgorithmObject.RunCS(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested CS algorithm runs...
 
-            task.labels = csAlgorithmObject.labels
+                task.labels = csAlgorithmObject.labels
 
-            dst0 = csAlgorithmObject.dst0
-            dst1 = csAlgorithmObject.dst1
-            dst2 = csAlgorithmObject.dst2
-            dst3 = csAlgorithmObject.dst3
+                dst0 = csAlgorithmObject.dst0
+                dst1 = csAlgorithmObject.dst1
+                dst2 = csAlgorithmObject.dst2
+                dst3 = csAlgorithmObject.dst3
 
-            For Each ttxt In csAlgorithmObject.trueData
-                task.trueData.Add(ttxt)
-            Next
-        Else
-            vbAlgorithmObject.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
+                For Each ttxt In csAlgorithmObject.trueData
+                    task.trueData.Add(ttxt)
+                Next
+            Else
+                vbAlgorithmObject.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
+            End If
+            task.FirstPass = False
         End If
-        task.firstPass = False
 
         postProcess(src)
     End Sub

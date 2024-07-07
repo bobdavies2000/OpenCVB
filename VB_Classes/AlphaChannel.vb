@@ -3,7 +3,7 @@ Imports OpenCvSharp.Extensions
 ' https://www.learnopencv.com/alpha-blending-using-opencv-cpp-python/
 ' https://docs.microsoft.com/en-us/dotnet/api/system.drawing.bitmap.maketransparent?view=dotnet-plat-ext-3.1
 Public Class AlphaChannel_Basics : Inherits VB_Parent
-    Dim alpha As New imageForm
+    Dim alpha As New ImageForm
     Public Sub New()
         alpha.Show()
         alpha.Size = New System.Drawing.Size(dst2.Width + 10, dst2.Height + 10)

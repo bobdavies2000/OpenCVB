@@ -11,10 +11,10 @@ Public Class Annealing_Basics_CPP : Inherits VB_Parent
     Public Sub drawMap()
         dst2.SetTo(0)
         For i = 0 To cityOrder.Length - 1
-            DrawCircle(dst2, cityPositions(i), task.dotSize, cv.Scalar.White)
+            DrawCircle(dst2, cityPositions(i), task.DotSize, cv.Scalar.White)
             DrawLine(dst2, cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White)
         Next
-        setTrueText("Energy" + vbCrLf + Format(energy, fmt0), New cv.Point(10, 100), 2)
+        SetTrueText("Energy" + vbCrLf + Format(energy, fmt0), New cv.Point(10, 100), 2)
     End Sub
     Public Sub setup()
         ReDim cityOrder(numberOfCities - 1)
@@ -33,7 +33,7 @@ Public Class Annealing_Basics_CPP : Inherits VB_Parent
         For i = 0 To cityOrder.Length - 1
             cityOrder(i) = (i + 1) Mod numberOfCities
         Next
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3, 0)
     End Sub
     Public Sub Open()
         Dim hCityPosition = GCHandle.Alloc(cityPositions, GCHandleType.Pinned)
@@ -83,8 +83,9 @@ Public Class Annealing_MultiThreaded_CPP : Inherits VB_Parent
     Dim anneal() As Annealing_Basics_CPP
     Dim mats As New Mat_4to1
     Dim options As New Options_Annealing
+    Dim startTime As DateTime
     Private Sub setup()
-        random.options.countSlider.Value = options.cityCount
+        random.options.count = options.cityCount
         random.Run(empty) ' get the city positions (may or may not be used below.)
 
         For i = 0 To anneal.Length - 1
@@ -95,7 +96,6 @@ Public Class Annealing_MultiThreaded_CPP : Inherits VB_Parent
             anneal(i).setup()
             anneal(i).Open() ' this will initialize the C++ copy of the city positions.
         Next
-        Static startTime As DateTime
         Dim timeSpent = Now.Subtract(startTime)
         If timeSpent.TotalSeconds < 10000 Then Console.WriteLine("time spent on last problem = " + Format(timeSpent.TotalSeconds, fmt1) + " seconds.")
         startTime = Now
@@ -124,7 +124,7 @@ Public Class Annealing_MultiThreaded_CPP : Inherits VB_Parent
                 strOut += "CPU=" + Format(i, "00") + " energy=" + Format(anneal(i).energy, "0") + vbCrLf
             End If
         Next
-        setTrueText(strOut, New cv.Point(10, 10), 3)
+        SetTrueText(strOut, New cv.Point(10, 10), 3)
 
         mats.mat(0) = anneal(CInt(bestList.ElementAt(0).Value)).dst2
         If bestList.Count >= 2 Then

@@ -8,8 +8,10 @@ Public Class Random_Basics : Inherits VB_Parent
         range = New cv.Rect(0, 0, dst2.Cols, dst2.Rows)
         desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Dim sizeRequest = options.countSlider.Value
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        Dim sizeRequest = options.count
         If task.paused = False Then
             pointList.Clear()
             While pointList.Count < sizeRequest
@@ -19,7 +21,7 @@ Public Class Random_Basics : Inherits VB_Parent
             If standaloneTest() Then
                 dst2.SetTo(0)
                 For Each pt In pointList
-                    DrawCircle(dst2, pt, task.dotSize, cv.Scalar.Yellow)
+                    DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
                 Next
             End If
         End If
@@ -38,16 +40,18 @@ Public Class Random_Point2d : Inherits VB_Parent
         range = New cv.Rect(0, 0, dst2.Cols, dst2.Rows)
         desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         PointList.Clear()
         If task.paused = False Then
-            For i = 0 To options.countSlider.Value - 1
+            For i = 0 To options.count - 1
                 PointList.Add(New cv.Point2d(msRNG.Next(range.X, range.X + range.Width), msRNG.Next(range.Y, range.Y + range.Height)))
             Next
             If standaloneTest() Then
                 dst2.SetTo(0)
                 For Each pt In PointList
-                    dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+                    dst2.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
                 Next
             End If
         End If
@@ -63,17 +67,19 @@ Public Class Random_Enumerable : Inherits VB_Parent
     Public options As New Options_Random
     Public points() As cv.Point2f
     Public Sub New()
-        options.countSlider.Value = 100
+        FindSlider("Random Pixel Count").Value = 100
         desc = "Create an enumerable list of points using a lambda function"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        points = Enumerable.Range(0, options.countSlider.Value).Select(Of cv.Point2f)(
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        points = Enumerable.Range(0, options.count).Select(Of cv.Point2f)(
             Function(i)
                 Return New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             End Function).ToArray
         dst2.SetTo(0)
         For Each pt In points
-            DrawCircle(dst2, pt, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
         Next
     End Sub
 End Class
@@ -84,24 +90,26 @@ End Class
 
 Public Class Random_Basics3D : Inherits VB_Parent
     Public Points3f() As cv.Point3f
+    Dim options As New Options_Random
     Public PointList As New List(Of cv.Point3f)
-    Public ranges() As Single = {0, dst2.Width, 0, dst2.Height, 0, task.maxZmeters}
+    Public ranges() As Single = {0, dst2.Width, 0, dst2.Height, 0, task.MaxZmeters}
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Random Pixel Count", 1, dst2.Cols * dst2.Rows, 20)
+        FindSlider("Random Pixel Count").Value = 20
+        FindSlider("Random Pixel Count").Maximum = dst2.Cols * dst2.Rows
         desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static countSlider = FindSlider("Random Pixel Count")
-        Dim count = countSlider.Value
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         PointList.Clear()
         If task.paused = False Then
-            For i = 0 To count - 1
+            For i = 0 To options.count - 1
                 PointList.Add(New cv.Point3f(msRNG.Next(ranges(0), ranges(1)), msRNG.Next(ranges(2), ranges(3)), msRNG.Next(ranges(4), ranges(5))))
             Next
             If standaloneTest() Then
                 dst2.SetTo(0)
                 For Each pt In PointList
-                    DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.dotSize, cv.Scalar.Yellow)
+                    DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, cv.Scalar.Yellow)
                 Next
             End If
             Points3f = PointList.ToArray
@@ -117,13 +125,14 @@ End Class
 Public Class Random_Basics4D : Inherits VB_Parent
     Public vec4f() As cv.Vec4f
     Public PointList As New List(Of cv.Vec4f)
-    Public ranges() As Single = {0, dst2.Width, 0, dst2.Height, 0, task.maxZmeters, 0, task.maxZmeters}
+    Public ranges() As Single = {0, dst2.Width, 0, dst2.Height, 0, task.MaxZmeters, 0, task.MaxZmeters}
+    Dim options As New Options_Random
+    Dim countSlider As Windows.Forms.TrackBar
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Random Pixel Count", 1, dst2.Cols * dst2.Rows, 20)
         desc = "Create a uniform random mask with a specificied number of pixels."
+        countSlider = FindSlider("Random Pixel Count")
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static countSlider = FindSlider("Random Pixel Count")
         PointList.Clear()
         Dim count = countSlider.Value
         If task.paused = False Then
@@ -134,7 +143,7 @@ Public Class Random_Basics4D : Inherits VB_Parent
             If standaloneTest() Then
                 dst2.SetTo(0)
                 For Each v In PointList
-                    DrawCircle(dst2, New cv.Point2f(v(0), v(1)), task.dotSize, cv.Scalar.Yellow)
+                    DrawCircle(dst2, New cv.Point2f(v(0), v(1)), task.DotSize, cv.Scalar.Yellow)
                 Next
             End If
             vec4f = PointList.ToArray
@@ -166,12 +175,12 @@ End Class
 Public Class Random_LUTMask : Inherits VB_Parent
     Dim random As New Random_Basics
     Dim km As New KMeans_Image
+    Dim lutMat As cv.Mat
     Public Sub New()
         desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
         labels(3) = "kmeans run to get colors"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static lutMat As cv.Mat
         If task.heartBeat Or task.frameCount < 10 Then
             random.Run(empty)
             lutMat = New cv.Mat(New cv.Size(1, 256), cv.MatType.CV_8UC3, 0)
@@ -230,8 +239,8 @@ Public Class Random_NormalDist : Inherits VB_Parent
         Static redSlider = FindSlider("Random_NormalDist Red Mean")
         Static stdevSlider = FindSlider("Random_NormalDist Stdev")
 
-        Static grayCheck = findCheckBox("Use Grayscale image")
-        If grayCheck.checked And dst2.Channels <> 1 Then dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        Static grayCheck = FindCheckBox("Use Grayscale image")
+        If grayCheck.checked And dst2.Channels() <> 1 Then dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         cv.Cv2.Randn(dst2, New cv.Scalar(blueSlider.Value, greenSlider.Value, redSlider.Value), cv.Scalar.All(stdevSlider.Value))
     End Sub
 End Class
@@ -436,7 +445,7 @@ Public Class Random_CustomHistogram : Inherits VB_Parent
         desc = "Create a random number distribution that reflects histogram of a grayscale image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         hist.plot.maxValue = 0 ' we are sharing the plot with the code below...
         hist.Run(src)
@@ -517,7 +526,7 @@ Public Class Random_StaticTVFaster : Inherits VB_Parent
         mats.mat(0) = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.Binary)
         Dim nochangeMask = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
 
-        Dim valMat As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim valMat As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         cv.Cv2.Randu(valMat, 0, valSlider.Value)
         valMat.SetTo(0, nochangeMask)
 
@@ -558,11 +567,11 @@ Public Class Random_StaticTVFastSimple : Inherits VB_Parent
         random.Run(src)
         Dim nochangeMask = random.dst2.Threshold(255 - percentSlider.Value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
 
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         cv.Cv2.Randu(dst3, 0, valSlider.Value)
         dst3.SetTo(0, nochangeMask)
 
-        Dim tmp As New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        Dim tmp As New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         cv.Cv2.Randu(tmp, 0, 255)
         Dim plusMask = tmp.Threshold(128, 255, cv.ThresholdTypes.Binary)
         Dim minusMask = tmp.Threshold(128, 255, cv.ThresholdTypes.BinaryInv)
@@ -581,6 +590,9 @@ End Class
 Public Class Random_KalmanPoints : Inherits VB_Parent
     Dim random As New Random_Basics
     Dim kalman As New Kalman_Basics
+    Dim targetSet As New List(Of cv.Point2f)
+    Dim currSet As New List(Of cv.Point2f)
+    Dim refreshPoints As Boolean = True
     Public Sub New()
         Dim offset = dst2.Width / 5
         random.range = New cv.Rect(offset, offset, Math.Abs(dst2.Width - offset * 2), Math.Abs(dst2.Height - offset * 2))
@@ -588,9 +600,6 @@ Public Class Random_KalmanPoints : Inherits VB_Parent
         desc = "Smoothly transition a random point from location to location."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static targetSet As New List(Of cv.Point2f)
-        Static currSet As New List(Of cv.Point2f)
-        Static refreshPoints As Boolean = True
         If refreshPoints Then
             random.Run(empty)
             targetSet = New List(Of cv.Point2f)(random.pointList)
@@ -614,8 +623,8 @@ Public Class Random_KalmanPoints : Inherits VB_Parent
 
         dst2.SetTo(0)
         For i = 0 To currSet.Count - 1
-            DrawCircle(dst2, currSet(i), task.dotSize + 2, cv.Scalar.Yellow)
-            DrawCircle(dst2, targetSet(i), task.dotSize + 2, cv.Scalar.Red)
+            DrawCircle(dst2, currSet(i), task.DotSize + 2, cv.Scalar.Yellow)
+            DrawCircle(dst2, targetSet(i), task.DotSize + 2, cv.Scalar.Red)
         Next
 
         Dim noChanges As Boolean = True
@@ -679,7 +688,7 @@ Public Class Random_Clusters : Inherits VB_Parent
                 If pt.X >= dst2.Width Then pt.X = dst2.Width - 1
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y >= dst2.Height Then pt.Y = dst2.Height - 1
-                DrawCircle(dst2,pt, task.dotSize, task.scalarColors(i Mod 256))
+                DrawCircle(dst2,pt, task.DotSize, task.scalarColors(i Mod 256))
 
                 cList.Add(pt)
                 labelList.Add(i)

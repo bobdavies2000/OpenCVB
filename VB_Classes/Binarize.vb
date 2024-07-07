@@ -16,7 +16,7 @@ Public Class Binarize_Basics : Inherits VB_Parent
     Dim blur As New Blur_Basics
     Public useBlur As Boolean
     Public Sub New()
-        mask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+        mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 255)
         UpdateAdvice(traceName + ": use local options to control the kernel size and sigma.")
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
@@ -24,7 +24,7 @@ Public Class Binarize_Basics : Inherits VB_Parent
         meanScalar = cv.Cv2.Mean(src, mask)
 
         Dim input = src
-        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If input.Channels() = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         If useBlur Then
             blur.Run(input)
@@ -54,7 +54,7 @@ Public Class Binarize_OTSU : Inherits VB_Parent
         options.RunVB()
 
         Dim input = src
-        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If input.Channels() = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         binarize.meanScalar = cv.Cv2.Mean(input)
 
@@ -88,7 +88,7 @@ Public Class Binarize_Niblack_Sauvola1 : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         CvXImgProc.NiblackThreshold(src, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack)
         dst2 = dst0.CvtColor(ColorConversionCodes.GRAY2BGR)
         CvXImgProc.NiblackThreshold(src, dst0, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Sauvola)
@@ -111,7 +111,7 @@ Public Class Binarize_Wolf_Nick : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         CvXImgProc.NiblackThreshold(src, dst2, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Wolf)
         CvXImgProc.NiblackThreshold(src, dst3, 255, ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Nick)
@@ -128,7 +128,7 @@ Public Class Binarize_KMeansMasks : Inherits VB_Parent
     Dim mats As New Mat_4Click
     Public Sub New()
         labels(2) = "Ordered from dark to light, top left darkest, bottom right lightest "
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
         desc = "Display the top 4 masks from the BGR kmeans output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -163,7 +163,7 @@ Public Class Binarize_KMeansRGB : Inherits VB_Parent
         km.Run(src)
         dst1.SetTo(0)
         For i = 0 To km.masks.Count - 1
-            mats.mat(i) = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
+            mats.mat(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3, 0)
             src.CopyTo(mats.mat(i), km.masks(i))
             If i >= 3 Then Exit For
         Next
@@ -239,7 +239,7 @@ Public Class Binarize_Simple : Inherits VB_Parent
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         meanScalar = cv.Cv2.Mean(src)
         dst2 = src.Threshold(meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
     End Sub

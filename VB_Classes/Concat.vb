@@ -30,8 +30,8 @@ Public Class Concat_4way : Inherits VB_Parent
         If standaloneTest() Then
             img(0) = src
             img(1) = task.depthRGB
-            img(2) = If(task.leftView.Channels = 1, task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.leftView)
-            img(3) = If(task.rightView.Channels = 1, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView)
+            img(2) = If(task.leftView.Channels() = 1, task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.leftView)
+            img(3) = If(task.rightView.Channels() = 1, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView)
         End If
         Dim tmp1 As New cv.Mat, tmp2 As New cv.Mat, tmp3 As New cv.Mat
         cv.Cv2.HConcat(img(0), img(1), tmp1)

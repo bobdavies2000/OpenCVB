@@ -2,7 +2,7 @@ Imports NAudio
 Imports cv = OpenCvSharp
 Public Class FeatureFlow_Basics : Inherits VB_Parent
     Dim feat As New Feature_Basics
-    Public mpList As New List(Of pointPair)
+    Public mpList As New List(Of PointPair)
     Public mpCorrelation As New List(Of Single)
     Public Sub New()
         task.gOptions.MaxDepthBar.Value = 20
@@ -18,17 +18,17 @@ Public Class FeatureFlow_Basics : Inherits VB_Parent
         mpCorrelation.Clear()
         Dim pad = feat.options.templatePad, size = feat.options.templateSize
         For Each p1 In prevFeatures
-            Dim rect = validateRect(New cv.Rect(p1.X - pad, p1.Y - pad, size, size))
+            Dim rect = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, size, size))
             Dim correlations As New List(Of Single)
             For Each p2 In currFeatures
-                Dim r = validateRect(New cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, size), Math.Min(size, rect.Height)))
+                Dim r = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, size), Math.Min(size, rect.Height)))
                 cv.Cv2.MatchTemplate(dst2(rect), dst3(r), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
                 correlations.Add(correlationmat.Get(Of Single)(0, 0))
             Next
             Dim maxCorrelation = correlations.Max
             If maxCorrelation >= correlationMin Then
                 Dim index = correlations.IndexOf(maxCorrelation)
-                mpList.Add(New pointPair(p1, currFeatures(index)))
+                mpList.Add(New PointPair(p1, currFeatures(index)))
                 mpCorrelation.Add(maxCorrelation)
             End If
         Next
@@ -37,14 +37,14 @@ Public Class FeatureFlow_Basics : Inherits VB_Parent
         feat.Run(src)
         labels = feat.labels
 
-        dst3 = If(task.firstPass, src.Clone, dst2.Clone)
+        dst3 = If(task.FirstPass, src.Clone, dst2.Clone)
         Static prevFeatures As New List(Of cv.Point)(task.featurePoints)
         buildCorrelations(prevFeatures, task.featurePoints)
 
-        setTrueText("Click near any feature to find the corresponding pair of features.", 1)
+        SetTrueText("Click near any feature to find the corresponding pair of features.", 1)
         dst2 = src.Clone
         For Each pt In task.featurePoints
-            DrawCircle(dst2, pt, task.dotSize, task.highlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
         Next
         prevFeatures = New List(Of cv.Point)(task.featurePoints)
     End Sub
@@ -62,7 +62,7 @@ Public Class FeatureFlow_Dense : Inherits VB_Parent
         desc = "Use dense optical flow algorithm  "
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         options.RunVB()
         Static lastGray As cv.Mat = src.Clone
         Dim hsv = opticalFlow_Dense(lastGray, src, options.pyrScale, options.levels, options.winSize, options.iterations, options.polyN,
@@ -96,7 +96,7 @@ Public Class FeatureFlow_LucasKanade : Inherits VB_Parent
         dst2 = src.Clone()
         dst3 = src.Clone()
 
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static lastGray As cv.Mat = src.Clone
         feat.Run(src)
         features = task.features
@@ -114,9 +114,9 @@ Public Class FeatureFlow_LucasKanade : Inherits VB_Parent
                 If length < 30 Then
                     features.Add(pt1)
                     lastFeatures.Add(pt2)
-                    dst2.Line(pt1, pt2, task.highlightColor, task.lineWidth + task.lineWidth, task.lineType)
-                    DrawCircle(dst3, pt1, task.dotSize + 3, cv.Scalar.White)
-                    DrawCircle(dst3, pt2, task.dotSize + 1, cv.Scalar.Red)
+                    dst2.Line(pt1, pt2, task.HighlightColor, task.lineWidth + task.lineWidth, task.lineType)
+                    DrawCircle(dst3, pt1, task.DotSize + 3, cv.Scalar.White)
+                    DrawCircle(dst3, pt2, task.DotSize + 1, cv.Scalar.Red)
                 End If
             End If
         Next
@@ -152,12 +152,12 @@ Public Class FeatureFlow_LeftRight1 : Inherits VB_Parent
         For i = 0 To pyrLeft.features.Count - 1
             Dim pt = pyrLeft.features(i)
             ptLeft.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst2, pt, task.dotSize, task.highlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
             leftY.Add(pt.Y)
 
             pt = pyrLeft.lastFeatures(i)
             ptLeft.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst2, pt, task.dotSize, task.highlightColor)
+            DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
             leftY.Add(pt.Y)
         Next
 
@@ -167,20 +167,20 @@ Public Class FeatureFlow_LeftRight1 : Inherits VB_Parent
         For i = 0 To pyrRight.features.Count - 1
             Dim pt = pyrRight.features(i)
             ptRight.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst3, pt, task.dotSize, task.highlightColor)
+            DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
             rightY.Add(pt.Y)
 
             pt = pyrRight.lastFeatures(i)
             ptRight.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst3, pt, task.dotSize, task.highlightColor)
+            DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
             rightY.Add(pt.Y)
         Next
 
-        Dim mpList As New List(Of pointPair)
+        Dim mpList As New List(Of PointPair)
         ptlist.Clear()
         For i = 0 To leftY.Count - 1
             Dim index = rightY.IndexOf(leftY(i))
-            If index >= 0 Then mpList.Add(New pointPair(ptLeft(i), ptRight(index)))
+            If index >= 0 Then mpList.Add(New PointPair(ptLeft(i), ptRight(index)))
         Next
 
         If task.heartBeat Then
@@ -205,7 +205,7 @@ Public Class FeatureFlow_LeftRightHist : Inherits VB_Parent
     End Sub
     Public Function displayFeatures(dst As cv.Mat, features As List(Of cv.Point)) As cv.Mat
         For Each pt In features
-            DrawCircle(dst, pt, task.dotSize, task.highlightColor)
+            DrawCircle(dst, pt, task.DotSize, task.HighlightColor)
         Next
         Return dst
     End Function
@@ -296,7 +296,7 @@ Public Class FeatureFlow_LeftRight : Inherits VB_Parent
     Public Function displayFeatures(dst As cv.Mat, features As List(Of List(Of cv.Point))) As cv.Mat
         For Each ptlist In features
             For Each pt In ptlist
-                DrawCircle(dst, pt, task.dotSize, task.highlightColor)
+                DrawCircle(dst, pt, task.DotSize, task.HighlightColor)
             Next
         Next
         Return dst

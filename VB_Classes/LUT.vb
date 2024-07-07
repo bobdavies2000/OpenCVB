@@ -5,6 +5,8 @@ Imports cv = OpenCvSharp
 Public Class LUT_Basics : Inherits VB_Parent
     Public classCount As Integer
     Dim options As New Options_LUT
+    Dim segment(255) As Byte
+    Dim myLut As cv.Mat
     Public Sub New()
         labels(3) = "Palettized version of dst2"
         desc = "Divide the image into n-segments controlled with a slider."
@@ -12,8 +14,6 @@ Public Class LUT_Basics : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Static segment(255) As Byte
-        Static myLut As cv.Mat
         If classCount <> options.lutSegments Then
             classCount = options.lutSegments
             Dim incr = Math.Truncate(255 / classCount)
@@ -28,7 +28,7 @@ Public Class LUT_Basics : Inherits VB_Parent
             Next
             myLut = New cv.Mat(1, 256, cv.MatType.CV_8U, segment)
         End If
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src.LUT(myLut) * classCount / 255
 
         dst3 = ShowPalette(dst2 * 255 / classCount)
@@ -50,7 +50,7 @@ Public Class LUT_Sliders : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Dim gray = If(src.Channels = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        Dim gray = If(src.Channels() = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         Dim myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
         Dim splitIndex As Integer
         For i = 0 To 255
@@ -194,6 +194,7 @@ End Class
 Public Class LUT_Custom : Inherits VB_Parent
     Dim gradMap As New Palette_RandomColorMap
     Public colorMap As cv.Mat
+    Dim saveColorCount = -1
     Public Sub New()
         FindSlider("Color transitions").Value = 5
         labels(3) = "Custom Color Lookup Table"
@@ -201,7 +202,6 @@ Public Class LUT_Custom : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static colorSlider = FindSlider("Color transitions")
-        Static saveColorCount = -1
         If task.optionsChanged Or task.heartBeat Then
             If saveColorCount = 20 Then colorSlider.Value = 5 Else colorSlider.Value += 1
             saveColorCount = colorSlider.Value
@@ -245,6 +245,7 @@ End Class
 
 
 Public Class LUT_Create : Inherits VB_Parent
+    Dim pixels(2)() As Byte
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("LUT entry diff threshold", 1, 100, 10)
         desc = "Create a LUT table that can map similar pixels to the same exact pixel."
@@ -254,9 +255,8 @@ Public Class LUT_Create : Inherits VB_Parent
         Dim threshold = diffSlider.value
 
         Dim split = src.Split()
-        Static pixels(2)() As Byte
         For i = 0 To 2
-            If task.firstPass Then ReDim pixels(i)(src.Total - 1)
+            If task.FirstPass Then ReDim pixels(i)(src.Total - 1)
             Marshal.Copy(split(i).Data, pixels(i), 0, pixels(i).Length)
         Next
 

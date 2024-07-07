@@ -6,7 +6,7 @@ Imports System.ComponentModel
 Public Class GifBuilder
     Private Sub GifBuilder_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim strFileSize As String = ""
-        Dim imgDir As New DirectoryInfo(System.AppDomain.CurrentDomain.BaseDirectory + "/../../../../Temp/")
+        Dim imgDir As New DirectoryInfo(System.AppDomain.CurrentDomain.BaseDirectory + "/../../../../../Temp/")
         Dim imgList As FileInfo() = imgDir.GetFiles("*.bmp")
 
         If imgList.Count = 0 Then

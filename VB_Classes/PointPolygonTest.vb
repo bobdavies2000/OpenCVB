@@ -8,14 +8,14 @@ Public Class PointPolygonTest_Basics : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
             rotatedRect.Run(src)
-            src = rotatedRect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            src = rotatedRect.dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         End If
 
         dst2 = src.Clone
         Dim contours As cv.Point()()
         cv.Cv2.FindContours(src, contours, Nothing, RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
 
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, 0)
         For i = 0 To dst1.Rows - 1
             For j = 0 To dst1.Cols - 1
                 Dim distance = cv.Cv2.PointPolygonTest(contours(0), New cv.Point(j, i), True)

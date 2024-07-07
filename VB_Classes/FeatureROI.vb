@@ -8,11 +8,11 @@ Public Class FeatureROI_Basics : Inherits VB_Parent
     Public stdevAverage As Single
     Public Sub New()
         task.gOptions.setGridSize(CInt(dst2.Width / 40)) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst1 = If(src.Channels <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
+        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2Gray), src.Clone)
         stdevList.Clear()
         meanList.Clear()
         Dim mean As cv.Scalar, stdev As cv.Scalar
@@ -57,7 +57,7 @@ Public Class FeatureROI_Color : Inherits VB_Parent
     Public Sub New()
         FindSlider("Add Weighted %").Value = 70
         task.gOptions.setGridSize(CInt(dst2.Width / 40)) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -129,7 +129,7 @@ Public Class FeatureROI_Sorted : Inherits VB_Parent
     Public options As New Options_StdevGrid
     Public maskVal As Integer = 255
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         task.gOptions.setGridSize(CInt(dst2.Width / 40)) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         If standalone = False Then maskVal = 1
         labels(2) = "Use the AddWeighted slider to observe where stdev is above average."
@@ -168,7 +168,7 @@ Public Class FeatureROI_Sorted : Inherits VB_Parent
                 colorIndex = 9
             End If
 
-            Dim color = Choose(colorIndex, black, white, gray, yellow, purple, teal, blue, green, red)
+            Dim color = Choose(colorIndex, black, white, grayColor, yellow, purple, teal, blue, green, red)
             categories(colorIndex) += 1
             bgrList.Add(color)
             roiList.Add(roi)
@@ -225,7 +225,7 @@ Public Class FeatureROI_ColorSplit : Inherits VB_Parent
             Dim colorName = Choose(i, "black", "white", "gray", "yellow", "purple", "teal", "blue", "green", "red")
             strOut += colorName + vbTab + CStr(devGrid.categories(i)) + vbCrLf
         Next
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -246,7 +246,7 @@ Public Class FeatureROI_Correlation : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        dst1 = If(src.Channels <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
+        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2Gray), src.Clone)
         gather.Run(dst1)
         dst2 = gather.dst2
 
@@ -259,7 +259,7 @@ Public Class FeatureROI_Correlation : Inherits VB_Parent
             If gather.stdevList(i) >= gather.stdevAverage Then
                 cv.Cv2.MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                 Dim corr = correlationMat.Get(Of Single)(0, 0)
-                If corr < options.correlationMin Then setTrueText(Format(corr, fmt1), roi.TopLeft)
+                If corr < options.correlationMin Then SetTrueText(Format(corr, fmt1), roi.TopLeft)
                 If corr < options.correlationMin Then motionCount += 1
             End If
         Next
@@ -286,7 +286,7 @@ Public Class FeatureROI_LowStdev : Inherits VB_Parent
         desc = "Isolate the roi's with low stdev"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst1 = If(src.Channels <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
+        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2Gray), src.Clone)
         gather.Run(dst1)
         dst2 = gather.dst2
 
@@ -295,7 +295,7 @@ Public Class FeatureROI_LowStdev : Inherits VB_Parent
             Dim roi = task.gridList(i)
             If gather.stdevList(i) < gather.stdevAverage Then
                 rects.Add(roi)
-                setTrueText(Format(gather.stdevList(i), fmt1), roi.TopLeft, 3)
+                SetTrueText(Format(gather.stdevList(i), fmt1), roi.TopLeft, 3)
             End If
         Next
         If task.heartBeat Then labels = {"", "", CStr(task.gridList.Count - gather.rects.Count) + " roi's had low standard deviation",
@@ -311,6 +311,7 @@ Public Class FeatureROI_LowStdevCorrelation : Inherits VB_Parent
     Dim gather As New FeatureROI_LowStdev
     Dim correlations As New List(Of Single)
     Dim options As New Options_Features
+    Dim saveStdev As New List(Of Single)
     Public Sub New()
         FindSlider("Feature Correlation Threshold").Value = 50
         desc = "Display the correlation coefficients for roi's with low standard deviation."
@@ -318,7 +319,7 @@ Public Class FeatureROI_LowStdevCorrelation : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        dst1 = If(src.Channels <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
+        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2Gray), src.Clone)
         gather.Run(dst1)
         dst2 = gather.dst2
 
@@ -334,7 +335,6 @@ Public Class FeatureROI_LowStdevCorrelation : Inherits VB_Parent
 
         Static saveCorrs As New List(Of Single)(correlations)
         Static saveRects As New List(Of cv.Rect)(gather.rects)
-        Static saveStdev As New List(Of Single)
         If task.heartBeat Then
             saveCorrs = New List(Of Single)(correlations)
             saveRects = New List(Of cv.Rect)(gather.rects)
@@ -347,8 +347,8 @@ Public Class FeatureROI_LowStdevCorrelation : Inherits VB_Parent
             Next
         End If
         For i = 0 To saveRects.Count - 1
-            If saveCorrs(i) < options.correlationMin Then setTrueText(Format(saveCorrs(i), fmt2), saveRects(i).TopLeft)
-            If saveCorrs(i) < options.correlationMin Then setTrueText(Format(saveStdev(i), fmt2), saveRects(i).TopLeft, 3)
+            If saveCorrs(i) < options.correlationMin Then SetTrueText(Format(saveCorrs(i), fmt2), saveRects(i).TopLeft)
+            If saveCorrs(i) < options.correlationMin Then SetTrueText(Format(saveStdev(i), fmt2), saveRects(i).TopLeft, 3)
         Next
 
         lastImage = dst1.Clone
@@ -384,7 +384,7 @@ End Class
 
 Public Class FeatureROI_LRClick : Inherits VB_Parent
     Dim gather As New FeatureROI_Basics
-    Dim clickPoint As cv.Point, picTag As Integer
+    Dim ClickPoint As cv.Point, picTag As Integer
     Dim options As New Options_Features
     Public Sub New()
         task.gOptions.setGridSize(16)
@@ -395,26 +395,26 @@ Public Class FeatureROI_LRClick : Inherits VB_Parent
         desc = "Capture the above average standard deviation roi's for the left and right images."
     End Sub
     Public Sub setClickPoint(pt As cv.Point, _pictag As Integer)
-        clickPoint = pt
+        ClickPoint = pt
         picTag = _pictag
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
         dst0 = src.Clone
-        dst3 = If(task.rightView.Channels <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
+        dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
 
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.rightView.Channels <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        If task.rightView.Channels() <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         gather.Run(src)
         dst2 = gather.dst2
         labels = gather.labels
 
         If gather.rects.Count = 0 Then Exit Sub
-        If task.mouseClickFlag Then setClickPoint(task.clickPoint, task.mousePicTag)
-        If clickPoint = newPoint Then setClickPoint(gather.rects(gather.rects.Count / 2).TopLeft, 2)
-        Dim gridIndex = task.gridMap.Get(Of Integer)(clickPoint.Y, clickPoint.X)
+        If task.mouseClickFlag Then setClickPoint(task.ClickPoint, task.mousePicTag)
+        If ClickPoint = newPoint Then setClickPoint(gather.rects(gather.rects.Count / 2).TopLeft, 2)
+        Dim gridIndex = task.gridMap.Get(Of Integer)(ClickPoint.Y, ClickPoint.X)
         Dim roi = task.gridList(gridIndex)
         dst2.Rectangle(roi, cv.Scalar.White, task.lineWidth)
 
@@ -427,11 +427,11 @@ Public Class FeatureROI_LRClick : Inherits VB_Parent
         Next
 
         If corr.Count = 0 Then
-            setTrueText("No corresponding roi found", 2)
+            SetTrueText("No corresponding roi found", 2)
         Else
             Dim maxCorr = corr.Max
             If maxCorr < options.correlationMin Then
-                setTrueText("Correlation " + Format(maxCorr, fmt3) + " is less than " + Format(options.correlationMin, fmt1), 1)
+                SetTrueText("Correlation " + Format(maxCorr, fmt3) + " is less than " + Format(options.correlationMin, fmt1), 1)
             Else
                 Dim index = corr.IndexOf(maxCorr)
                 Dim rectRight = New cv.Rect(index, roi.Y, roi.Width, roi.Height)
@@ -444,14 +444,14 @@ Public Class FeatureROI_LRClick : Inherits VB_Parent
                     strOut += "Right Mean = " + Format(mean(0), fmt3) + " Right stdev = " + Format(stdev(0), fmt3) + vbCrLf
                     strOut += "Right rectangle is offset " + CStr(offset) + " pixels from the left image rectangle"
                 End If
-                dst3.Rectangle(rectRight, task.highlightColor, task.lineWidth)
-                dst0.Rectangle(roi, task.highlightColor, task.lineWidth)
+                dst3.Rectangle(rectRight, task.HighlightColor, task.lineWidth)
+                dst0.Rectangle(roi, task.HighlightColor, task.lineWidth)
                 dst1.SetTo(0)
-                DrawCircle(dst1,roi.TopLeft, task.dotSize, task.highlightColor)
-                DrawCircle(dst1,rectRight.TopLeft, task.dotSize + 2, task.highlightColor)
+                DrawCircle(dst1, roi.TopLeft, task.DotSize, task.HighlightColor)
+                DrawCircle(dst1, rectRight.TopLeft, task.DotSize + 2, task.HighlightColor)
                 Dim pt = New cv.Point(rectRight.X, roi.Y + 5)
-                setTrueText(CStr(offset) + " pixel offset" + vbCrLf + "Larger = Right", pt, 1)
-                setTrueText(strOut, 1)
+                SetTrueText(CStr(offset) + " pixel offset" + vbCrLf + "Larger = Right", pt, 1)
+                SetTrueText(strOut, 1)
                 labels(3) = "Corresponding roi highlighted in yellow.  Average stdev = " + Format(gather.stdevAverage, fmt3)
             End If
         End If
@@ -476,10 +476,10 @@ Public Class FeatureROI_LRAll : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        dst3 = If(task.rightView.Channels <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
+        dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
 
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.rightView.Channels <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        If task.rightView.Channels() <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         gather.Run(src)
         dst2 = gather.dst2
@@ -498,7 +498,7 @@ Public Class FeatureROI_LRAll : Inherits VB_Parent
         labels(2) = CStr(sortedRects.Count) + " roi's had left/right correlation higher than " + Format(options.correlationMin, fmt3)
 
         For Each roi In sortedRects.Values
-            dst3.Rectangle(roi, task.highlightColor, task.lineWidth)
+            dst3.Rectangle(roi, task.HighlightColor, task.lineWidth)
         Next
     End Sub
 End Class

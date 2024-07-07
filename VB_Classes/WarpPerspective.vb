@@ -8,8 +8,8 @@ Public Class WarpPerspective_Basics : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
         dst2 = src.EmptyClone
-        cv.Cv2.WarpPerspective(src, dst2, options.transformMatrix, dst2.Size, cv.InterpolationFlags.Cubic Or cv.InterpolationFlags.WarpInverseMap)
-        setTrueText("Use sliders to understand impact of WarpPerspective", 3)
+        cv.Cv2.WarpPerspective(src, dst2, options.transformMatrix, dst2.Size(), cv.InterpolationFlags.Cubic Or cv.InterpolationFlags.WarpInverseMap)
+        SetTrueText("Use sliders to understand impact of WarpPerspective", 3)
     End Sub
 End Class
 

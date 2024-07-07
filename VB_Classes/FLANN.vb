@@ -32,7 +32,7 @@ Public Class FLANN_Test : Inherits VB_Parent
                     output += String.Format("distance:{0}", dist) + vbCrLf
                     output += String.Format("data:({0}, {1})", pt.X, pt.Y) + vbCrLf
                 Next i
-                setTrueText(output)
+                SetTrueText(output)
             End Using
         End Using
     End Sub
@@ -69,8 +69,8 @@ Public Class FLANN_Basics : Inherits VB_Parent
         labels(2) = "Red is query, Nearest points blue"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static reuseCheck = findCheckBox("Reuse the same feature list (test different search parameters)")
-        Static sortedCheck = findCheckBox("Search params sorted")
+        Static reuseCheck = FindCheckBox("Reuse the same feature list (test different search parameters)")
+        Static sortedCheck = FindCheckBox("Search params sorted")
         Static matchSlider = FindSlider("Match count")
         Static querySlider = FindSlider("Query count")
         Static searchSlider = FindSlider("Search check count")
@@ -85,7 +85,7 @@ Public Class FLANN_Basics : Inherits VB_Parent
         dst2.SetTo(cv.Scalar.White)
         For i = 0 To features.Rows - 1
             Dim pt = random.PointList(i)
-            DrawCircle(dst2, pt, task.dotSize, cv.Scalar.Blue)
+            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Blue)
         Next
 
         If reuseData = False Or task.optionsChanged Or task.mouseClickFlag Then
@@ -114,7 +114,7 @@ Public Class FLANN_Basics : Inherits VB_Parent
                         DrawLine(dst2, pt1, pt2, cv.Scalar.Red)
                     End If
                 Next
-                DrawCircle(dst2, pt1, task.dotSize, cv.Scalar.Red)
+                DrawCircle(dst2, pt1, task.DotSize, cv.Scalar.Red)
             Next
         End Using
 
@@ -126,6 +126,6 @@ Public Class FLANN_Basics : Inherits VB_Parent
         output += "Play with the EPS and searchparams check count to see if that helps." + vbCrLf + vbCrLf
         output += "If the 'Search check' is set to 25 and the 'Match count' is set to 4, it does appear to return to the top 4." + vbCrLf
         output += "Perhaps FLANN is only good enough to find a group of neighbors.  Use with caution."
-        setTrueText(output, New cv.Point(10, 50), 3)
+        SetTrueText(output, New cv.Point(10, 50), 3)
     End Sub
 End Class

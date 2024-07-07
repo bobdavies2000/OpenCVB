@@ -11,7 +11,7 @@ Public Class Cartoonify_Basics : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
 
-        Dim gray8u = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray8u = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         gray8u = gray8u.MedianBlur(options.medianBlur)
         Dim edges = gray8u.Laplacian(cv.MatType.CV_8U, options.kernelSize)
         Dim mask = edges.Threshold(options.threshold, 255, cv.ThresholdTypes.Binary)
@@ -20,6 +20,3 @@ Public Class Cartoonify_Basics : Inherits VB_Parent
         src.CopyTo(dst3, mask)
     End Sub
 End Class
-
-
-

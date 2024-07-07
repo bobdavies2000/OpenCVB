@@ -5,6 +5,7 @@ Imports System.Windows.Media.Media3D
 Public Class Pixel_Viewer : Inherits VB_Parent
     Dim firstUpdate = True
     Public viewerForm As New PixelViewerForm
+    Dim mouseLoc = New cv.Point(10, 10) ' assume 
     Enum displayTypes
         noType = -1
         type8uC3 = 0
@@ -21,8 +22,8 @@ Public Class Pixel_Viewer : Inherits VB_Parent
         If standaloneTest() Then
             task.dst0 = task.color.Clone
             task.dst1 = task.depthRGB.Clone
-            task.dst2 = New cv.Mat(task.dst1.Size, cv.MatType.CV_8UC3, 0)
-            task.dst3 = New cv.Mat(task.dst1.Size, cv.MatType.CV_8UC3, 0)
+            task.dst2 = New cv.Mat(task.dst1.Size(), cv.MatType.CV_8UC3, 0)
+            task.dst3 = New cv.Mat(task.dst1.Size(), cv.MatType.CV_8UC3, 0)
         End If
 
         Dim dst = Choose(task.mousePicTag + 1, task.dst0, task.dst1, task.dst2, task.dst3)
@@ -34,8 +35,8 @@ Public Class Pixel_Viewer : Inherits VB_Parent
         If dst.Type = cv.MatType.CV_32FC3 Then displayType = displayTypes.type32FC3
         If dst.Type = cv.MatType.CV_32SC1 Then displayType = displayTypes.type32SC1
         If dst.Type = cv.MatType.CV_32SC3 Then displayType = displayTypes.type32SC3
-        If displayType < 0 Or dst.Channels > 3 Then
-            setTrueText("The pixel Viewer does not support this cv.Mat!  Please add support.")
+        If displayType < 0 Or dst.Channels() > 3 Then
+            SetTrueText("The pixel Viewer does not support this cv.Mat!  Please add support.")
             Exit Sub
         End If
 
@@ -52,7 +53,6 @@ Public Class Pixel_Viewer : Inherits VB_Parent
             task.mouseMovePointUpdated = True
             viewerForm.mousePoint = New cv.Point
         End If
-        Static mouseLoc = New cv.Point(10, 10) ' assume 
         If task.mouseMovePoint.X Or task.mouseMovePoint.Y Then
             Dim x As Integer = If(task.mouseMovePoint.X >= drWidth, task.mouseMovePoint.X - drWidth - 1, 0)
             Dim y As Integer = If(task.mouseMovePoint.Y >= drHeight, task.mouseMovePoint.Y - drHeight - 1, 0)
@@ -64,7 +64,7 @@ Public Class Pixel_Viewer : Inherits VB_Parent
         task.pixelViewerRect = New cv.Rect(0, 0, -1, -1)
         task.pixelViewTag = task.mousePicTag
         Dim dw = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
-        dw = validateRect(dw)
+        dw = ValidateRect(dw)
 
         Dim img = dst(dw).Clone
 
@@ -72,7 +72,7 @@ Public Class Pixel_Viewer : Inherits VB_Parent
         Dim format32f = "0000.0"
         Dim format32S = "0000"
         If img.Type = cv.MatType.CV_32F Or img.Type = cv.MatType.CV_32FC3 Then
-            If img.Channels = 3 Then
+            If img.Channels() = 3 Then
                 Dim tmp = img.Reshape(1)
                 mm = GetMinMax(tmp)
             Else
@@ -92,7 +92,7 @@ Public Class Pixel_Viewer : Inherits VB_Parent
         End If
 
         Dim imgText = ""
-        Dim clickPoint = New cv.Point(task.clickPoint.X - dw.X, task.clickPoint.Y - dw.Y)
+        Dim ClickPoint = New cv.Point(task.ClickPoint.X - dw.X, task.ClickPoint.Y - dw.Y)
         Select Case displayType
 
             Case displayTypes.type8uC3
@@ -111,7 +111,7 @@ Public Class Pixel_Viewer : Inherits VB_Parent
                 For y = 0 To img.Height - 1
                     imgText += "r" + Format(dw.Y + y, "000") + "   "
                     For x = 0 To img.Width - 1
-                        If (task.toggleOnOff And y = clickPoint.Y) And (x = clickPoint.X - 1 Or x = clickPoint.X) Then
+                        If (task.toggleOnOff And y = ClickPoint.Y) And (x = ClickPoint.X - 1 Or x = ClickPoint.X) Then
                             imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "***", "*")
                         Else
                             imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "   ", " ")
@@ -169,7 +169,7 @@ Public Class Pixel_Viewer : Inherits VB_Parent
         End If
 
         desc = "Display pixels under the cursor"
-        setTrueText("Move the mouse to location that you want to inspect." + vbCrLf +
+        SetTrueText("Move the mouse to location that you want to inspect." + vbCrLf +
                     "Click and hold the right-mouse button to move away from that location")
     End Sub
     Public Sub closeViewer()
@@ -232,7 +232,7 @@ Public Class Pixel_GetSet : Inherits VB_Parent
         watch.Stop()
         output += "Marshal Copy took " + CStr(watch.ElapsedMilliseconds) + "ms" + vbCrLf
 
-        setTrueText(output, New cv.Point(src.Width / 2 + 10, src.Height / 2 + 20))
+        SetTrueText(output, New cv.Point(src.Width / 2 + 10, src.Height / 2 + 20))
 
         mats.Run(Empty)
         dst2 = mats.dst2
@@ -249,7 +249,7 @@ End Class
 
 Public Class Pixel_Measure : Inherits VB_Parent
     Public Sub New()
-        Dim maxZ = task.maxZmeters * 1000
+        Dim maxZ = task.MaxZmeters * 1000
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Distance in mm", 50, If(maxZ < 1500, 1500, maxZ), maxZ)
         desc = "Compute how many pixels per meter at a requested distance"
     End Sub
@@ -260,7 +260,7 @@ Public Class Pixel_Measure : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         Static distanceSlider = FindSlider("Distance in mm")
         Dim mmPP = Compute(distanceSlider.Value)
-        setTrueText("At a distance of " + CStr(distanceSlider.Value) + " mm's the camera's FOV is " +
+        SetTrueText("At a distance of " + CStr(distanceSlider.Value) + " mm's the camera's FOV is " +
                     Format(mmPP * src.Width / 1000, fmt2) + " meters wide" + vbCrLf +
                     "Pixels are " + Format(mmPP, fmt2) + " mm per pixel at " +
                     CStr(distanceSlider.Value) + " mm's in the image view")
@@ -318,10 +318,10 @@ Public Class Pixel_SampleColor : Inherits VB_Parent
             dst2 = src
             dst2.Rectangle(random.range, cv.Scalar.White, 1)
             For Each pt In random.pointList
-                DrawCircle(dst2,pt, task.dotSize, cv.Scalar.White)
+                DrawCircle(dst2,pt, task.DotSize, cv.Scalar.White)
             Next
             labels(2) = "Dominant color value = " + CStr(maskColor(0)) + ", " + CStr(maskColor(1)) + ", " + CStr(maskColor(2))
-            setTrueText("Draw in the image to select a region for testing.", New cv.Point(10, 200), 3)
+            SetTrueText("Draw in the image to select a region for testing.", New cv.Point(10, 200), 3)
         End If
     End Sub
 End Class
@@ -333,26 +333,24 @@ End Class
 
 Public Class Pixel_Unstable : Inherits VB_Parent
     Dim km As New KMeans_Basics
+    Dim pixelCounts As New List(Of Integer)
+    Dim k As Integer = -1
+    Dim unstable As New List(Of cv.Mat)
+    Dim lastImage As cv.Mat
     Public unstablePixels As New cv.Mat
+    Dim kSlider = FindSlider("KMeans k")
     Public Sub New()
+        task.gOptions.setPixelDifference(2)
         labels(2) = "KMeans_Basics output"
         desc = "Detect where pixels are unstable"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static kSlider = FindSlider("KMeans k")
-        Static pixelCounts As New List(Of Integer)
-        Static k As Integer = -1
-        Static unstable As New List(Of cv.Mat)
-        If task.heartBeat Then
-            pixelCounts.Clear()
-            unstable.Clear()
-            k = kSlider.Value
-        End If
+        k = kSlider.Value
 
         km.Run(src)
         dst2 = km.dst2
         dst2.ConvertTo(dst2, cv.MatType.CV_32F)
-        Static lastImage As cv.Mat = dst2
+        If lastImage Is Nothing Then lastImage = dst2.Clone
         cv.Cv2.Subtract(dst2, lastImage, dst3)
         dst3 = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
 
@@ -367,7 +365,7 @@ Public Class Pixel_Unstable : Inherits VB_Parent
         Dim unstableCount = dst3.CountNonZero
 
         pixelCounts.Add(unstableCount)
-        If pixelCounts.Count > 100 Then pixelCounts.RemoveAt(0)
+        If pixelCounts.Count > 10 Then pixelCounts.RemoveAt(0)
 
         ' compute stdev from the list
         Dim avg = pixelCounts.Average()
@@ -403,7 +401,7 @@ Public Class Pixel_Zoom : Inherits VB_Parent
         Dim x = Math.Min(mousePoint.X, src.Width - width)
         Dim y = Math.Min(mousePoint.Y, src.Height - height)
         dst1 = src(New cv.Rect(CInt(x), CInt(y), width, height))
-        dst2 = dst1.Resize(dst2.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        dst2 = dst1.Resize(dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
     End Sub
 End Class
 
@@ -430,7 +428,7 @@ Public Class Pixel_SubPixel : Inherits VB_Parent
         Dim y = Math.Min(zoom.mousePoint.Y, src.Height - height)
         dst3 = src.GetRectSubPix(New cv.Size(width, height), New cv.Point2f(x, y)).Resize(dst2.Size)
         Dim r = New cv.Rect(x - width \ 2, y - height \ 2, width, height)
-        r = validateRect(r)
+        r = ValidateRect(r)
         dst2 = src(r).Resize(dst2.Size)
         labels(2) = "Pixel_SubPixel: No SubPixel zoom with factor " + CStr(zoomFactor)
         labels(3) = "Pixel_SubPixel: SubPixel zoom with factor " + CStr(zoomFactor)
@@ -533,7 +531,7 @@ Public Class Pixel_NeighborsMaskH : Inherits VB_Parent
         options.RunVB()
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
-        Dim tmp32f = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
         Dim r1 = New cv.Rect(0, 0, dst2.Width, dst2.Height - options.pixels)
         Dim r2 = New cv.Rect(0, options.pixels, dst2.Width, dst2.Height - options.pixels)
         cv.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
@@ -560,7 +558,7 @@ Public Class Pixel_NeighborsMaskV : Inherits VB_Parent
         options.RunVB()
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
-        Dim tmp32f = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
         Dim r1 = New cv.Rect(0, 0, dst2.Width, dst2.Height - options.pixels)
         Dim r2 = New cv.Rect(0, options.pixels, dst2.Width, dst2.Height - options.pixels)
         cv.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
@@ -655,6 +653,7 @@ End Class
 Public Class Pixel_Vector3D : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
+    Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
         task.redOptions.UseColorOnly.Checked = True
@@ -667,7 +666,6 @@ Public Class Pixel_Vector3D : Inherits VB_Parent
         redC.Run(src)
         Dim maxRegion = 20
 
-        Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
         If task.heartBeat Then
             pixelVector.Clear()
             strOut = "3D histogram counts for each cell - " + CStr(maxRegion) + " largest only for readability..." + vbCrLf
@@ -683,14 +681,14 @@ Public Class Pixel_Vector3D : Inherits VB_Parent
                 If cell.index >= maxRegion Then Exit For
             Next
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
 
         dst1.SetTo(0)
         dst2.SetTo(0)
         For Each cell In task.redCells
             task.color(cell.rect).CopyTo(dst2(cell.rect), cell.mask)
             dst1(cell.rect).SetTo(cell.color, cell.mask)
-            If cell.index <= maxRegion Then setTrueText(CStr(cell.index), cell.maxDist, 2)
+            If cell.index <= maxRegion Then SetTrueText(CStr(cell.index), cell.maxDist, 2)
         Next
         labels(2) = redC.labels(3)
     End Sub
@@ -716,7 +714,7 @@ Public Class Pixel_Unique_CPP : Inherits VB_Parent
 
         If classCount = 0 Then Exit Sub
         Dim pixelData = New cv.Mat(classCount, 1, cv.MatType.CV_8UC3, Pixels_Vector_Pixels(cPtr))
-        setTrueText(CStr(classCount) + " unique BGR pixels were found in the src." + vbCrLf +
+        SetTrueText(CStr(classCount) + " unique BGR pixels were found in the src." + vbCrLf +
                     "Or " + Format(classCount / src.Total, "0%") + " of the input.")
     End Sub
     Public Sub Close()
@@ -733,6 +731,7 @@ Public Class Pixel_Vectors : Inherits VB_Parent
     Dim hVector As New Hist3Dcolor_Vector
     Public pixelVector As New List(Of Single())
     Public redCells As New List(Of rcData)
+    Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
     Public Sub New()
         labels = {"", "", "RedCloud_Basics output", ""}
         desc = "Create a vector for each cell's 3D histogram."
@@ -742,7 +741,6 @@ Public Class Pixel_Vectors : Inherits VB_Parent
         dst2 = redC.dst2
         labels(2) = redC.labels(3)
 
-        Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
         pixelVector.Clear()
         For Each cell In task.redCells
             hVector.inputMask = cell.mask
@@ -751,7 +749,7 @@ Public Class Pixel_Vectors : Inherits VB_Parent
         Next
         redCells = task.redCells
 
-        setTrueText("3D color histograms were created for " + CStr(pixelVector.Count) + " cells", 3)
+        SetTrueText("3D color histograms were created for " + CStr(pixelVector.Count) + " cells", 3)
     End Sub
 End Class
 
@@ -904,9 +902,9 @@ Public Class Pixel_Sampler : Inherits VB_Parent
         Else
             random.range = New cv.Rect(0, 0, src.Width, src.Height)
         End If
-        random.Run(Empty)
+        random.Run(empty)
 
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim index As New List(Of cv.Point)
         Dim pixels As New List(Of Byte)
         Dim counts(random.pointList.Count - 1) As Integer
@@ -938,10 +936,10 @@ Public Class Pixel_Sampler : Inherits VB_Parent
             dst2 = src
             dst2.Rectangle(random.range, cv.Scalar.White, 1)
             For Each pt In random.pointList
-                DrawCircle(dst2,pt, task.dotSize, cv.Scalar.White)
+                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
             Next
             labels(2) = "Dominant gray value = " + CStr(dominantGray)
-            setTrueText("Draw in the image to select a region for testing.", New cv.Point(10, 200), 3)
+            SetTrueText("Draw in the image to select a region for testing.", New cv.Point(10, 200), 3)
         End If
     End Sub
 End Class
@@ -961,7 +959,7 @@ Public Class Pixel_Display : Inherits VB_Parent
         Else
             random.range = New cv.Rect(msRNG.Next(0, dst2.Width - width), msRNG.Next(0, dst2.Height - height), width, height)
         End If
-        random.Run(Empty)
+        random.Run(empty)
         task.drawRect = random.range
 
         labels(2) = "Draw a rectangle anywhere in the image to see the stats for that region."
@@ -975,7 +973,7 @@ Public Class Pixel_Display : Inherits VB_Parent
             Dim pt = New cv.Vec3i(mean(0), mean(1), mean(2))
             strOut = "Mean BGR " + pt.ToString() + vbCrLf + "Stdev BGR " + stdev.ToString
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 

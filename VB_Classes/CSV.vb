@@ -6,7 +6,7 @@ Public Class CSV_Basics : Inherits VB_Parent
     Public array(,) As String
     Public arrayList As New List(Of List(Of String))
     Public Sub New()
-        Dim fileInput As New FileInfo(task.homeDir + "Data/agaricus-lepiota.data")
+        Dim fileInput As New FileInfo(task.HomeDir + "Data/agaricus-lepiota.data")
         inputFile = fileInput.FullName
         desc = "Read and prepare a .csv file"
     End Sub
@@ -27,7 +27,7 @@ Public Class CSV_Basics : Inherits VB_Parent
                 arrayList(i).Add(array(j, i))
             Next
         Next
-        If standaloneTest() Then setTrueText(inputFile + " is now loaded into the csv.array")
+        If standaloneTest() Then SetTrueText(inputFile + " is now loaded into the csv.array")
     End Sub
 End Class
 
@@ -43,7 +43,7 @@ End Class
 '    Public inputFile As String
 '    Public dataTable As DataTable
 '    Public Sub New()
-'        inputFile = task.homeDir + "Data\examples.xls" ' default input file when run standaloneTest()
+'        inputFile = task.HomeDir + "Data\examples.xls" ' default input file when run standaloneTest()
 '        desc = "Read an Excel file"
 '    End Sub
 '    Public Sub RunVB(src as cv.Mat)
@@ -56,7 +56,7 @@ End Class
 '        Dim dataSet = reader.AsDataSet(conf)
 '        dataTable = dataSet.Tables(0)
 '        If standaloneTest() Then Dim array = dataTable.ToJagged(Of Double)("Column0", "Column1")
-'        setTrueText("Input file: " + inputFile + vbCrLf + "Can now be read with the following:" + vbCrLf + vbCrLf +
+'        SetTrueText("Input file: " + inputFile + vbCrLf + "Can now be read with the following:" + vbCrLf + vbCrLf +
 '                    "dim array = excel.dataTable.ToJagged(of Double)(column1 label, column2 label)")
 '        reader.Close()
 '    End Sub

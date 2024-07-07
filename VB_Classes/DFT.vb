@@ -32,7 +32,7 @@ Public Class DFT_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         grayMat = src
-        If src.Channels = 3 Then grayMat = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then grayMat = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         rows = cv.Cv2.GetOptimalDFTSize(grayMat.Rows)
         cols = cv.Cv2.GetOptimalDFTSize(grayMat.Cols)
@@ -84,7 +84,7 @@ Public Class DFT_Inverse : Inherits VB_Parent
         desc = "Take the inverse of the Discrete Fourier Transform."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         Dim gray32f As New cv.Mat
         src.ConvertTo(gray32f, cv.MatType.CV_32F)
         Dim planes() = {gray32f, New cv.Mat(gray32f.Size(), cv.MatType.CV_32F, 0)}
@@ -131,7 +131,7 @@ Public Class DFT_ButterworthFilter_MT : Inherits VB_Parent
             Parallel.For(0, 2,
             Sub(k)
                 Dim r = options.radius / (k + 1), rNext As Double
-                options.butterworthFilter(k) = New cv.Mat(dft.complexImage.Size, cv.MatType.CV_32FC2)
+                options.butterworthFilter(k) = New cv.Mat(dft.complexImage.Size(), cv.MatType.CV_32FC2)
                 Dim tmp As New cv.Mat(options.butterworthFilter(k).Size(), cv.MatType.CV_32F, 0)
                 Dim center As New cv.Point(options.butterworthFilter(k).Rows / 2, options.butterworthFilter(k).Cols / 2)
                 For i = 0 To options.butterworthFilter(k).Rows - 1
@@ -170,7 +170,7 @@ Public Class DFT_ButterworthDepth : Inherits VB_Parent
         labels(3) = "Same filter with radius / 2"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        bfilter.Run(task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        bfilter.Run(task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2Gray))
         dst2 = bfilter.dst2
         dst3 = bfilter.dst3
     End Sub
@@ -199,14 +199,13 @@ Public Class DFT_Shapes : Inherits VB_Parent
     Dim optionsDFT As New Options_DFTShape
     Public Sub New()
         FindSlider("DrawCount").Value = 1
-        If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"Inverse of the DFT - the same grayscale input.", "", "Input to the DFT", "Discrete Fourier Transform Output"}
         desc = "Show the spectrum magnitude for some standard shapes"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         options.RunVB()
 
-        Static frm = findfrm("Options_DFTShape Radio Buttons")
+        Static frm = FindFrm("Options_DFTShape Radio Buttons")
         Select Case findRadioText(frm.check)
             Case "Draw Circle"
                 circle.Run(src)
@@ -228,7 +227,7 @@ Public Class DFT_Shapes : Inherits VB_Parent
                 dst2 = symShapes.dst2
             Case "Draw Point"
                 If task.heartBeat Then
-                    dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+                    dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
                     Dim pt1 = New cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10))
                     Dim pt2 = New cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10))
                     dst2.Set(Of Byte)(pt1.Y, pt1.X, 255)

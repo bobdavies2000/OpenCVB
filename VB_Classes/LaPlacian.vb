@@ -10,7 +10,7 @@ Public Class Laplacian_Basics : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
         If standaloneTest() Then src = src.GaussianBlur(options.kernel, 0, 0)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         dst3 = src.Laplacian(cv.MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs()
 
         erode.Run(dst3.Threshold(options.threshold, 255, cv.ThresholdTypes.Binary))
@@ -46,7 +46,7 @@ Public Class Laplacian_Blur : Inherits VB_Parent
             src = src.MedianBlur(options.kernel.Width)
             blurText = "MedianBlur"
         End If
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         dst2 = src.Laplacian(cv.MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs()
         labels(2) = "Laplacian+" + blurText + " k = " + CStr(options.kernel.Width)
     End Sub

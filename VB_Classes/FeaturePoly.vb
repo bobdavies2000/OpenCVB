@@ -16,7 +16,7 @@ Public Class FeaturePoly_Basics : Inherits VB_Parent
         desc = "Build a Feature polygon with the top generation counts of the good features"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.firstPass Then sides.prevImage = src.Clone
+        If task.FirstPass Then sides.prevImage = src.Clone
         sides.options.RunVB()
 
         topFeatures.Run(src)
@@ -27,9 +27,9 @@ Public Class FeaturePoly_Basics : Inherits VB_Parent
         dst3 = sides.dst2
 
         For i = 0 To sides.currPoly.Count - 1
-            setTrueText(CStr(i), sides.currPoly(i), 3)
+            SetTrueText(CStr(i), sides.currPoly(i), 3)
         Next
-        setTrueText("Rotate center", New cv.Point2f(sides.rotateCenter.X + 10, sides.rotateCenter.Y), 3)
+        SetTrueText("Rotate center", New cv.Point2f(sides.rotateCenter.X + 10, sides.rotateCenter.Y), 3)
 
         Dim causes As String = ""
         If Math.Abs(sides.rotateAngle * 57.2958) > 10 Then
@@ -88,10 +88,10 @@ Public Class FeaturePoly_Basics : Inherits VB_Parent
         For Each keyval In topFeatures.stable.goodCounts
             Dim pt = topFeatures.stable.basics.ptList(keyval.Value)
             Dim g = topFeatures.stable.basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
-            setTrueText(CStr(g), pt)
+            SetTrueText(CStr(g), pt)
         Next
 
-        setTrueText(strOut, 1)
+        SetTrueText(strOut, 1)
         resync = False
     End Sub
 End Class
@@ -107,13 +107,13 @@ Public Class FeaturePoly_Sides : Inherits VB_Parent
     Public currSideIndex As Integer
     Public currLengths As New List(Of Single)
     Public currFLineLen As Single
-    Public mpCurr As pointPair
+    Public mpCurr As PointPair
 
     Public prevPoly As New List(Of cv.Point2f)
     Public prevSideIndex As Integer
     Public prevLengths As New List(Of Single)
     Public prevFLineLen As Single
-    Public mpPrev As pointPair
+    Public mpPrev As PointPair
 
     Public prevImage As cv.Mat
 
@@ -125,20 +125,19 @@ Public Class FeaturePoly_Sides : Inherits VB_Parent
     Dim near As New Line_Nearest
     Public rotatePoly As New Rotate_PolyQT
     Dim newPoly As List(Of cv.Point2f)
+    Dim random As New Random_Basics
     Public Sub New()
         labels(2) = "White is the original FPoly and yellow is the current FPoly."
         desc = "Compute the lengths of each side in a polygon"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
-        Dim threshold = thresholdSlider.Value
+        options.RunVB()
 
-        If task.firstPass Then prevImage = src.Clone
+        If task.FirstPass Then prevImage = src.Clone
         options.RunVB()
 
         If standaloneTest() And task.heartBeat Then
-            Static random As New Random_Basics
-            random.Run(empty)
+            Random.Run(empty)
             currPoly = New List(Of cv.Point2f)(random.pointList)
         End If
 
@@ -149,14 +148,16 @@ Public Class FeaturePoly_Sides : Inherits VB_Parent
         Next
         currSideIndex = currLengths.IndexOf(currLengths.Max)
 
-        If task.firstPass Then
+        If task.FirstPass Then
             prevPoly = New List(Of cv.Point2f)(currPoly)
             prevLengths = New List(Of Single)(currLengths)
             prevSideIndex = prevLengths.IndexOf(prevLengths.Max)
         End If
 
-        mpPrev = New pointPair(prevPoly(prevSideIndex), prevPoly((prevSideIndex + 1) Mod task.polyCount))
-        mpCurr = New pointPair(currPoly(currSideIndex), currPoly((currSideIndex + 1) Mod task.polyCount))
+        If prevPoly.Count = 0 Then Exit Sub
+
+        mpPrev = New PointPair(prevPoly(prevSideIndex), prevPoly((prevSideIndex + 1) Mod task.polyCount))
+        mpCurr = New PointPair(currPoly(currSideIndex), currPoly((currSideIndex + 1) Mod task.polyCount))
 
         prevFLineLen = mpPrev.p1.DistanceTo(mpPrev.p2)
         currFLineLen = mpCurr.p1.DistanceTo(mpCurr.p2)
@@ -164,15 +165,15 @@ Public Class FeaturePoly_Sides : Inherits VB_Parent
         Dim d1 = mpPrev.p1.DistanceTo(mpCurr.p1)
         Dim d2 = mpPrev.p2.DistanceTo(mpCurr.p2)
 
-        Dim newNear As pointPair
+        Dim newNear As PointPair
         If d1 < d2 Then
             centerShift = New cv.Point2f(mpPrev.p1.X - mpCurr.p1.X, mpPrev.p1.Y - mpCurr.p1.Y)
             rotateCenter = mpPrev.p1
-            newNear = New pointPair(mpPrev.p2, mpCurr.p2)
+            newNear = New PointPair(mpPrev.p2, mpCurr.p2)
         Else
             centerShift = New cv.Point2f(mpPrev.p2.X - mpCurr.p2.X, mpPrev.p2.Y - mpCurr.p2.Y)
             rotateCenter = mpPrev.p2
-            newNear = New pointPair(mpPrev.p1, mpCurr.p1)
+            newNear = New PointPair(mpPrev.p1, mpCurr.p1)
         End If
 
         Dim transPoly As New List(Of cv.Point2f)
@@ -186,7 +187,7 @@ Public Class FeaturePoly_Sides : Inherits VB_Parent
         strOut = "No rotation" + vbCrLf
         rotateAngle = 0
         If d1 <> d2 Then
-            If newNear.p1.DistanceTo(newNear.p2) > threshold Then
+            If newNear.p1.DistanceTo(newNear.p2) > options.removeThreshold Then
                 near.lp = mpPrev
                 near.pt = newNear.p1
                 near.Run(empty)
@@ -252,7 +253,7 @@ Public Class FeaturePoly_BasicsOriginal : Inherits VB_Parent
         desc = "Build a Feature polygon with the top generation counts of the good features"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.firstPass Then resyncImage = src.Clone
+        If task.FirstPass Then resyncImage = src.Clone
         options.RunVB()
 
         topFeatures.Run(src)
@@ -265,9 +266,9 @@ Public Class FeaturePoly_BasicsOriginal : Inherits VB_Parent
 
         fPD.computeCurrLengths()
         For i = 0 To fPD.currPoly.Count - 1
-            setTrueText(CStr(i), fPD.currPoly(i), 1)
+            SetTrueText(CStr(i), fPD.currPoly(i), 1)
         Next
-        If task.firstPass Then fPD.lengthPrevious = New List(Of Single)(fPD.currLength)
+        If task.FirstPass Then fPD.lengthPrevious = New List(Of Single)(fPD.currLength)
 
         center.fPD = fPD
         center.Run(src)
@@ -326,8 +327,8 @@ Public Class FeaturePoly_BasicsOriginal : Inherits VB_Parent
         vbDrawFPoly(dst2, fPD.currPoly, white)
         fPD.drawPolys(dst1, fPD.currPoly)
         For i = 0 To fPD.prevPoly.Count - 1
-            setTrueText(CStr(i), fPD.currPoly(i), 1)
-            setTrueText(CStr(i), fPD.currPoly(i), 1)
+            SetTrueText(CStr(i), fPD.currPoly(i), 1)
+            SetTrueText(CStr(i), fPD.currPoly(i), 1)
         Next
 
         strOut = "Rotation: " + Format(fPD.rotateAngle * 57.2958, fmt1) + " degrees" + vbCrLf
@@ -339,10 +340,10 @@ Public Class FeaturePoly_BasicsOriginal : Inherits VB_Parent
         For Each keyval In topFeatures.stable.goodCounts
             Dim pt = topFeatures.stable.basics.ptList(keyval.Value)
             Dim g = topFeatures.stable.basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
-            setTrueText(CStr(g), pt)
+            SetTrueText(CStr(g), pt)
         Next
 
-        setTrueText(strOut, 1)
+        SetTrueText(strOut, 1)
         dst3 = center.dst3
         labels(3) = center.labels(3)
         resync = False
@@ -384,7 +385,7 @@ Public Class FeaturePoly_Plot : Inherits VB_Parent
             If absDiff >= hist.Length Then absDiff = hist.Length - 1
             If absDiff < fGrid.threshold Then
                 hist(CInt(absDiff)) += 1
-                DrawLine(dst3, fGrid.anchor, pt, task.highlightColor)
+                DrawLine(dst3, fGrid.anchor, pt, task.HighlightColor)
                 distDiff.Add(absDiff)
             Else
                 hist(fGrid.threshold) += 1
@@ -469,7 +470,7 @@ Public Class FeaturePoly_Stablizer : Inherits VB_Parent
         dst3 = fGrid.dst3
         labels(3) = fGrid.labels(2)
 
-        Static syncImage = src.Clone
+        Static  syncImage = src.Clone
         If fGrid.startAnchor = fGrid.anchor Then syncImage = src.Clone
 
         Dim shift As cv.Point2f = New cv.Point2f(fGrid.startAnchor.X - fGrid.anchor.X, fGrid.startAnchor.Y - fGrid.anchor.Y)
@@ -505,18 +506,18 @@ Public Class FeaturePoly_StartPoints : Inherits VB_Parent
     Public goodPoints As New List(Of cv.Point2f)
     Dim fGrid As New FeaturePoly_Core
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 255)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 255)
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Track the feature grid points back to the last sync point"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
+        Static  thresholdSlider = FindSlider("Resync if feature moves > X pixels")
         Dim threshold = thresholdSlider.Value
         Dim maxShift = fGrid.anchor.DistanceTo(fGrid.startAnchor) + threshold
 
         fGrid.Run(src)
         dst2 = fGrid.dst3
-        Static facets As New List(Of List(Of cv.Point))
+        Static  facets As New List(Of List(Of cv.Point))
         Dim lastPoints = dst0.Clone
         If fGrid.startAnchor = fGrid.anchor Or goodPoints.Count < 5 Then
             startPoints = New List(Of cv.Point2f)(fGrid.goodPoints)
@@ -525,7 +526,7 @@ Public Class FeaturePoly_StartPoints : Inherits VB_Parent
 
         dst0.SetTo(255)
         If standaloneTest() Then dst1.SetTo(0)
-        Dim mpList As New List(Of pointPair)
+        Dim mpList As New List(Of PointPair)
         goodPoints = New List(Of cv.Point2f)(fGrid.goodPoints)
         Dim facet As New List(Of cv.Point)
         Dim usedGood As New List(Of Integer)
@@ -538,14 +539,14 @@ Public Class FeaturePoly_StartPoints : Inherits VB_Parent
                 facet = facets(startPoint)
                 dst0.FillConvexPoly(facet, startPoint, cv.LineTypes.Link4)
                 If standaloneTest() Then dst1.FillConvexPoly(facet, task.scalarColors(startPoint), task.lineType)
-                mpList.Add(New pointPair(startPoints(startPoint), pt))
+                mpList.Add(New PointPair(startPoints(startPoint), pt))
             End If
         Next
 
         ' dst3.SetTo(0)
         For Each mp In mpList
             If mp.p1.DistanceTo(mp.p2) <= maxShift Then DrawLine(dst1, mp.p1, mp.p2, cv.Scalar.Yellow)
-            DrawCircle(dst1, mp.p1, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst1, mp.p1, task.DotSize, cv.Scalar.Yellow)
         Next
         dst1.Line(fGrid.anchor, fGrid.startAnchor, cv.Scalar.White, task.lineWidth + 1, task.lineType)
     End Sub
@@ -596,7 +597,7 @@ Public Class FeaturePoly_TopFeatures : Inherits VB_Parent
         For Each keyVal In stable.goodCounts
             Dim pt = stable.basics.ptList(keyVal.Value)
             Dim g = stable.basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
-            setTrueText(CStr(g), pt)
+            SetTrueText(CStr(g), pt)
             If poly.Count < task.polyCount Then poly.Add(pt)
         Next
 
@@ -663,7 +664,7 @@ Public Class FeaturePoly_WarpAffinePoly : Inherits VB_Parent
         vbDrawFPoly(dst3, rotatePoly.poly, cv.Scalar.Yellow)
         vbDrawFPoly(dst2, rotatePoly.poly, cv.Scalar.Yellow)
 
-        setTrueText(fPoly.strOut, 3)
+        SetTrueText(fPoly.strOut, 3)
     End Sub
 End Class
 
@@ -702,7 +703,7 @@ Public Class FeaturePoly_RotatePoints : Inherits VB_Parent
     End Function
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            setTrueText(traceName + " is meant only to run with FeaturePoly_Basics to validate the translation")
+            SetTrueText(traceName + " is meant only to run with FeaturePoly_Basics to validate the translation")
             Exit Sub
         End If
 
@@ -718,8 +719,8 @@ Public Class FeaturePoly_RotatePoints : Inherits VB_Parent
             Dim p2 = New cv.Point2f(rotatePoly.poly((i + 1) Mod task.polyCount).X - centerShift.X,
                                     rotatePoly.poly((i + 1) Mod task.polyCount).Y - centerShift.Y)
             rotateAndShift.Add(p1)
-            setTrueText(CStr(i), rotatePoly.poly(i), 2)
-            setTrueText(CStr(i), polyPrev(i), 2)
+            SetTrueText(CStr(i), rotatePoly.poly(i), 2)
+            SetTrueText(CStr(i), polyPrev(i), 2)
         Next
         vbDrawFPoly(dst3, polyPrev, white)
         vbDrawFPoly(dst3, rotateAndShift, cv.Scalar.Yellow)
@@ -729,7 +730,7 @@ Public Class FeaturePoly_RotatePoints : Inherits VB_Parent
                  "Center of Rotation: " + Format(rotateCenter.X, fmt0) + ", " + Format(rotateCenter.Y, fmt0) + vbCrLf +
                  "If the algorithm is working properly, the white and yellow Feature polygons below " + vbCrLf +
                  "should match in size and location."
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -775,7 +776,7 @@ Public Class FeaturePoly_WarpAffineImage : Inherits VB_Parent
         strOut += vbCrLf + Format(diffCount / 1000, fmt0) + "k pixels differ or " +
                            Format(diffCount / dst3.Total, "0%")
 
-        setTrueText(strOut, 1)
+        SetTrueText(strOut, 1)
     End Sub
 End Class
 
@@ -797,7 +798,7 @@ Public Class FeaturePoly_Perpendiculars : Inherits VB_Parent
         desc = "Find the center of rotation using the perpendicular lines from polymp and FLine (feature line) in FeaturePoly_Basics"
     End Sub
     Private Function findrotateAngle(p1 As cv.Point2f, p2 As cv.Point2f, pt As cv.Point2f) As Single
-        near.lp = New pointPair(p1, p2)
+        near.lp = New PointPair(p1, p2)
         near.pt = pt
         near.Run(empty)
         DrawLine(dst2, pt, near.nearPoint, cv.Scalar.Red)
@@ -809,13 +810,13 @@ Public Class FeaturePoly_Perpendiculars : Inherits VB_Parent
     End Function
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            setTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().")
+            SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().")
             Exit Sub
         End If
 
-        Static kalman As New Kalman_Basics
-        Static perp1 As New Line_Perpendicular
-        Static perp2 As New Line_Perpendicular
+        Static  kalman As New Kalman_Basics
+        Static  perp1 As New Line_Perpendicular
+        Static  perp2 As New Line_Perpendicular
 
         dst2.SetTo(0)
         perp1.p1 = fPD.currPoly(fPD.polyPrevSideIndex)
@@ -829,11 +830,11 @@ Public Class FeaturePoly_Perpendiculars : Inherits VB_Parent
         perp2.Run(empty)
         DrawLine(dst2, perp2.r1, perp2.r2, white)
 
-        fPD.rotateCenter = vbIntersectTest(perp2.r1, perp2.r2, perp1.r1, perp1.r2, New cv.Rect(0, 0, src.Width, src.Height))
+        fPD.rotateCenter = IntersectTest(perp2.r1, perp2.r2, perp1.r1, perp1.r2, New cv.Rect(0, 0, src.Width, src.Height))
         If fPD.rotateCenter = New cv.Point2f Then
             fPD.rotateAngle = 0
         Else
-            DrawCircle(dst2, fPD.rotateCenter, task.dotSize + 2, cv.Scalar.Red)
+            DrawCircle(dst2, fPD.rotateCenter, task.DotSize + 2, cv.Scalar.Red)
             fPD.rotateAngle = findrotateAngle(perp2.r1, perp2.r2, perp1.r1)
         End If
         If fPD.rotateAngle = 0 Then fPD.rotateCenter = New cv.Point2f
@@ -936,7 +937,7 @@ Public Class FeaturePoly_Image : Inherits VB_Parent
                 Dim offset As cv.Point2f = fpoly.fPD.centerShift
 
                 Dim r1 = New cv.Rect(offset.X, offset.Y, dst2.Width - Math.Abs(offset.X), dst2.Height - Math.Abs(offset.Y))
-                r1 = validateRect(r1)
+                r1 = ValidateRect(r1)
                 If offset.X < 0 Then r1.X = 0
                 If offset.Y < 0 Then r1.Y = 0
 
@@ -948,11 +949,11 @@ Public Class FeaturePoly_Image : Inherits VB_Parent
                 If offset.X > 0 Then r2.X = 0
                 If offset.Y > 0 Then r2.Y = 0
 
-                Dim mask2 As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+                Dim mask2 As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 255)
                 rotate.Run(mask2)
                 mask2 = rotate.dst2
 
-                Dim mask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+                Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
                 mask(r1).SetTo(255)
                 mask(r1) = mask2(r2)
                 mask = Not mask
@@ -975,7 +976,7 @@ Public Class FeaturePoly_Image : Inherits VB_Parent
             dst3.SetTo(0)
         End If
 
-        setTrueText(strOut, 1)
+        SetTrueText(strOut, 1)
     End Sub
 End Class
 
@@ -1000,7 +1001,7 @@ Public Class FeaturePoly_ImageMask : Inherits VB_Parent
         dst3 = dst0.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         labels = fImage.labels
         dst1 = fImage.fpoly.dst1
-        setTrueText(fImage.strOut, 1)
+        SetTrueText(fImage.strOut, 1)
     End Sub
 End Class
 
@@ -1019,13 +1020,13 @@ Public Class FeaturePoly_PointCloud : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         fMask.Run(src)
-        If fMask.fImage.fpoly.resync Or task.firstPass Then fPolyCloud = task.pointCloud.Clone
+        If fMask.fImage.fpoly.resync Or task.FirstPass Then fPolyCloud = task.pointCloud.Clone
         dst1 = fMask.dst1
         dst2 = fMask.dst2
         dst3 = fMask.dst3
         task.pointCloud.CopyTo(fPolyCloud, dst3)
 
-        setTrueText(fMask.fImage.strOut, 1)
+        SetTrueText(fMask.fImage.strOut, 1)
     End Sub
 End Class
 
@@ -1038,15 +1039,15 @@ End Class
 Public Class FeaturePoly_ResyncCheck : Inherits VB_Parent
     Dim fPoly As New FeaturePoly_BasicsOriginal
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "If there was no resync, check the longest side of the feature polygon (Feature Line) for unnecessary jitter."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         fPoly.Run(src)
         dst2 = fPoly.dst1
-        setTrueText(fPoly.strOut, 2)
+        SetTrueText(fPoly.strOut, 2)
 
-        Static lastPixelCount As Integer
+        Static  lastPixelCount As Integer
         If fPoly.resync Then
             dst3.SetTo(0)
             lastPixelCount = 0
@@ -1058,7 +1059,7 @@ Public Class FeaturePoly_ResyncCheck : Inherits VB_Parent
         DrawLine(dst3, polymp.p1, polymp.p2, 255)
 
         Dim pixelCount = dst3.CountNonZero
-        setTrueText(Format(Math.Abs(lastPixelCount - pixelCount)) + " pixels ", 3)
+        SetTrueText(Format(Math.Abs(lastPixelCount - pixelCount)) + " pixels ", 3)
         lastPixelCount = pixelCount
     End Sub
 End Class
@@ -1084,12 +1085,12 @@ Public Class FeaturePoly_Center : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            setTrueText(traceName + " is called by FeaturePoly_Basics to get the rotate center and angle." + vbCrLf +
+            SetTrueText(traceName + " is called by FeaturePoly_Basics to get the rotate center and angle." + vbCrLf +
                         "It does not produce any output when run standaloneTest().")
             Exit Sub
         End If
 
-        Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
+        Static  thresholdSlider = FindSlider("Resync if feature moves > X pixels")
         Dim threshold = thresholdSlider.Value
 
         Dim sindex1 = fPD.polyPrevSideIndex
@@ -1099,15 +1100,15 @@ Public Class FeaturePoly_Center : Inherits VB_Parent
         Dim mp2 = fPD.prevmp()
         Dim d1 = mp1.p1.DistanceTo(mp2.p1)
         Dim d2 = mp1.p2.DistanceTo(mp2.p2)
-        Dim newNear As pointPair
+        Dim newNear As PointPair
         If d1 < d2 Then
             fPD.centerShift = New cv.Point2f(mp1.p1.X - mp2.p1.X, mp1.p1.Y - mp2.p1.Y)
             fPD.rotateCenter = mp1.p1
-            newNear = New pointPair(mp1.p2, mp2.p2)
+            newNear = New PointPair(mp1.p2, mp2.p2)
         Else
             fPD.centerShift = New cv.Point2f(mp1.p2.X - mp2.p2.X, mp1.p2.Y - mp2.p2.Y)
             fPD.rotateCenter = mp1.p2
-            newNear = New pointPair(mp1.p1, mp2.p1)
+            newNear = New PointPair(mp1.p1, mp2.p1)
         End If
 
         Dim transPoly As New List(Of cv.Point2f)
@@ -1120,13 +1121,13 @@ Public Class FeaturePoly_Center : Inherits VB_Parent
 
         dst1.SetTo(0)
         fPD.drawPolys(dst1, transPoly)
-        setTrueText("Rotate center", fPD.rotateCenter, 1)
+        SetTrueText("Rotate center", fPD.rotateCenter, 1)
 
         strOut = "No rotation" + vbCrLf
         fPD.rotateAngle = 0
         If d1 <> d2 Then
             If newNear.p1.DistanceTo(newNear.p2) > threshold Then
-                near.lp = New pointPair(fPD.prevPoly(sindex1), fPD.prevPoly(sIndex2))
+                near.lp = New PointPair(fPD.prevPoly(sindex1), fPD.prevPoly(sIndex2))
                 near.pt = newNear.p1
                 near.Run(empty)
                 dst1.Line(near.pt, near.nearPoint, cv.Scalar.Red, task.lineWidth + 5, task.lineType)
@@ -1156,7 +1157,7 @@ Public Class FeaturePoly_Center : Inherits VB_Parent
         End If
         dst3.SetTo(0)
         fPD.drawPolys(dst3, fPD.currPoly)
-        setTrueText(strOut, 2)
+        SetTrueText(strOut, 2)
     End Sub
 End Class
 
@@ -1232,11 +1233,11 @@ Public Class FeaturePoly_ImageNew : Inherits VB_Parent
             If offset.X > 0 Then r2.X = 0
             If offset.Y > 0 Then r2.Y = 0
 
-            Dim mask2 As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+            Dim mask2 As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 255)
             rotate.Run(mask2)
             mask2 = rotate.dst2
 
-            Dim mask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
             mask(r1).SetTo(255)
             mask(r1) = mask2(r2)
             mask = Not mask
@@ -1258,7 +1259,7 @@ Public Class FeaturePoly_ImageNew : Inherits VB_Parent
             dst3.SetTo(0)
         End If
 
-        setTrueText(strOut, 1)
+        SetTrueText(strOut, 1)
     End Sub
 End Class
 
@@ -1281,11 +1282,11 @@ Public Class FeaturePoly_LeftRight : Inherits VB_Parent
         dst1 = task.rightView
         leftPoly.Run(task.leftView)
         dst2 = leftPoly.dst3
-        setTrueText(leftPoly.strOut, 2)
+        SetTrueText(leftPoly.strOut, 2)
 
         rightPoly.Run(task.rightView)
         dst3 = rightPoly.dst3
-        setTrueText(rightPoly.strOut, 3)
+        SetTrueText(rightPoly.strOut, 3)
     End Sub
 End Class
 
@@ -1309,15 +1310,15 @@ Public Class FeaturePoly_Core : Inherits VB_Parent
             sliders.setupTrackBar("Maximum shift to trigger resync", 1, 100, 50)
             sliders.setupTrackBar("Anchor point max movement", 1, 10, 5)
         End If
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, 0)
         FindSlider("Feature Sample Size").Value = 20
         labels = {"", "Distance change from previous frame", "", "Feature Grid with anchor"}
         desc = "Feature Grid: compute distances between good features from frame to frame"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
-        Static shiftSlider = FindSlider("Maximum shift to trigger resync")
-        Static anchorSlider = FindSlider("Anchor point max movement")
+        Static  thresholdSlider = FindSlider("Resync if feature moves > X pixels")
+        Static  shiftSlider = FindSlider("Maximum shift to trigger resync")
+        Static  anchorSlider = FindSlider("Anchor point max movement")
         Dim maxShift = shiftSlider.Value
         threshold = thresholdSlider.Value
 
@@ -1326,7 +1327,7 @@ Public Class FeaturePoly_Core : Inherits VB_Parent
 
         Dim lastDistance = dst0.Clone
         anchor = stable.basics.anchorPoint
-        Static lastAnchor = anchor
+        Static  lastAnchor = anchor
         If lastAnchor.distanceto(anchor) > anchorSlider.Value Then lastDistance.SetTo(0)
 
         dst0.SetTo(0)
@@ -1343,8 +1344,8 @@ Public Class FeaturePoly_Core : Inherits VB_Parent
             If absDiff < threshold Then
                 goodPoints.Add(pt)
                 goodFacets.Add(facet)
-                setTrueText(Format(absDiff, fmt1), pt, 2)
-                DrawLine(dst3, anchor, pt, task.highlightColor)
+                SetTrueText(Format(absDiff, fmt1), pt, 2)
+                DrawLine(dst3, anchor, pt, task.HighlightColor)
                 dst2.Set(Of cv.Vec3b)(pt.Y, pt.X, white)
             End If
         Next

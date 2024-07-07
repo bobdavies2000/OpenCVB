@@ -26,8 +26,8 @@ Module recordPlaybackCommon
         Public cloudElemsize As integer
     End Structure
     Public Sub writeHeader(binWrite As BinaryWriter)
-        binWrite.Write(task.workingRes.Width)
-        binWrite.Write(task.workingRes.Height)
+        binWrite.Write(task.WorkingRes.Width)
+        binWrite.Write(task.WorkingRes.Height)
         binWrite.Write(task.color.ElemSize)
 
         binWrite.Write(task.pcSplit(2).Width)
@@ -74,14 +74,15 @@ Public Class Replay_Record : Inherits VB_Parent
     Dim maxBytes As Single = 20000000000
     Dim recordingFilename As FileInfo
     Dim fileNameForm As OptionsFileName
+    Dim bytesTotal As Int64
     Public Sub New()
         fileNameForm = New OptionsFileName
-        fileNameForm.OpenFileDialog1.InitialDirectory = task.homeDir + "Data/"
+        fileNameForm.OpenFileDialog1.InitialDirectory = task.HomeDir + "Data/"
         fileNameForm.OpenFileDialog1.FileName = "*.*"
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "ocvb (*.ocvb)|*.ocvb"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", task.homeDir + "Recording.ocvb")
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", task.HomeDir + "Recording.ocvb")
         fileNameForm.Text = "Select an OpenCVB bag file to create"
         fileNameForm.FileNameLabel.Text = "Select a file to record all the image data."
         fileNameForm.Setup(traceName)
@@ -90,10 +91,9 @@ Public Class Replay_Record : Inherits VB_Parent
         desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static bytesTotal As Int64
         recordingFilename = New FileInfo(fileNameForm.filename.Text)
         If task.useRecordedData And recordingFilename.Exists = False Then
-            setTrueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", New cv.Point(10, 125))
+            SetTrueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", New cv.Point(10, 125))
             Exit Sub
         End If
 
@@ -163,15 +163,15 @@ Public Class Replay_Play : Inherits VB_Parent
     Dim fs As FileStream
     Dim recordingFilename As FileInfo
     Dim fileNameForm As OptionsFileName
+    Dim bytesTotal As Int64
     Public Sub New()
-
         fileNameForm = New OptionsFileName
-        fileNameForm.OpenFileDialog1.InitialDirectory = task.homeDir + "Data/"
+        fileNameForm.OpenFileDialog1.InitialDirectory = task.HomeDir + "Data/"
         fileNameForm.OpenFileDialog1.FileName = "*.*"
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "ocvb (*.ocvb)|*.ocvb"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", task.homeDir + "Recording.ocvb")
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", task.HomeDir + "Recording.ocvb")
         fileNameForm.Text = "Select an OpenCVB bag file to create"
         fileNameForm.FileNameLabel.Text = "Select an OpenCVB bag file to read"
         fileNameForm.Setup(traceName)
@@ -180,15 +180,14 @@ Public Class Replay_Play : Inherits VB_Parent
         desc = "Playback a file recorded by OpenCVB"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static bytesTotal As Int64
         recordingFilename = New FileInfo(fileNameForm.filename.Text)
-        If recordingFilename.Exists = False Then setTrueText("File not found: " + recordingFilename.FullName, New cv.Point(10, 125))
+        If recordingFilename.Exists = False Then SetTrueText("File not found: " + recordingFilename.FullName, New cv.Point(10, 125))
         If fileNameForm.fileStarted And recordingFilename.Exists Then
             Dim maxBytes = recordingFilename.Length
             If playbackActive Then
                 colorBytes = binRead.ReadBytes(bytesPerColor)
                 Dim tmpMat = New cv.Mat(fh.colorHeight, fh.colorWidth, cv.MatType.CV_8UC3, colorBytes)
-                task.color = tmpMat.Resize(task.workingRes)
+                task.color = tmpMat.Resize(task.WorkingRes)
                 bytesTotal += colorBytes.Length
 
                 depth32fBytes = binRead.ReadBytes(bytesPerdepth32f)
@@ -224,7 +223,7 @@ Public Class Replay_Play : Inherits VB_Parent
                     ReDim cloudBytes(bytesPerCloud - 1)
                     playbackActive = True
                 Else
-                    setTrueText("Recorded data was saved at " + CStr(fh.cloudWidth) + "x" + CStr(fh.cloudHeight) + vbCrLf +
+                    SetTrueText("Recorded data was saved at " + CStr(fh.cloudWidth) + "x" + CStr(fh.cloudHeight) + vbCrLf +
                                       "and the current format is " + CStr(src.Width) + "x" + CStr(src.Height))
                 End If
             End If

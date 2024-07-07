@@ -30,7 +30,7 @@ Public Class SVD_Example : Inherits VB_Parent
             strOut += vbCrLf
         Next
 
-        setTrueText(strOut)
+        SetTrueText(strOut)
     End Sub
 End Class
 
@@ -56,7 +56,7 @@ Public Class SVD_Example2 : Inherits VB_Parent
         If task.heartBeat Then
             Dim m = cv.Cv2.Moments(rc.mask, True)
             Dim center = New cv.Point2f(m.M10 / rc.pixels, m.M01 / rc.pixels)
-            DrawCircle(task.color(rc.rect), center, task.dotSize, task.highlightColor)
+            DrawCircle(task.color(rc.rect), center, task.DotSize, task.HighlightColor)
 
             Dim mArea = New cv.Mat(4, 1, cv.MatType.CV_32F, {m.M20 / rc.pixels, m.Mu11 / rc.pixels, m.Mu11 / rc.pixels, m.Mu02 / rc.pixels})
             Dim U As New cv.Mat
@@ -85,7 +85,7 @@ Public Class SVD_Example2 : Inherits VB_Parent
 
             strOut += "Rect is at (" + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ") with width/height = " + CStr(rc.rect.Width) + "/" + CStr(rc.rect.Height) + vbCrLf
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -142,8 +142,8 @@ Public Class SVD_Gaussian : Inherits VB_Parent
         Dim size = New cv.Size2f(10, 100) ' New cv.Size2f(W.Get(Of Double)(0, 0), W.Get(Of Double)(1, 0))
         Dim pt = New cv.Point2f(covar.mean.Get(Of Double)(0, 0), covar.mean.Get(Of Double)(0, 1))
         Dim rrect = New cv.RotatedRect(pt, size, angle)
-        dst2.Ellipse(rrect, task.highlightColor, task.lineWidth, task.lineType)
+        dst2.Ellipse(rrect, task.HighlightColor, task.lineWidth, task.lineType)
 
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class

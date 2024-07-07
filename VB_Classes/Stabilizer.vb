@@ -16,7 +16,7 @@ Public Class Stabilizer_Basics : Inherits VB_Parent
             sliders.setupTrackBar("Min stdev in correlation rect", 1, 50, 10)
         End If
 
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         labels(2) = "Current frame - rectangle input to matchTemplate"
         desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames"
     End Sub
@@ -32,7 +32,7 @@ Public Class Stabilizer_Basics : Inherits VB_Parent
         templateRect = New cv.Rect(src.Width / 2 - widthSlider.Value / 2, src.Height / 2 - heightSlider.Value / 2, widthSlider.Value, heightSlider.Value)
 
         Dim input = src
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Static lastFrame = input
         dst2 = input
@@ -103,12 +103,12 @@ Public Class Stabilizer_BasicsRandomInput : Inherits VB_Parent
         labels(3) = "Image after shift"
         desc = "Generate images that have been arbitrarily shifted"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static rangeSlider = FindSlider("Range of random motion introduced (absolute value in pixels)")
         Dim range = rangeSlider.Value
 
         Dim input = src
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim shiftX = msRNG.Next(-range, range)
         Dim shiftY = msRNG.Next(-range, range)
@@ -153,7 +153,7 @@ Public Class Stabilizer_BasicsTest : Inherits VB_Parent
         labels(2) = "Unstable input to Stabilizer_Basics"
         desc = "Test the Stabilizer_Basics with random movement"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
 
         random.Run(src)
         stable.Run(random.dst3.Clone)
@@ -181,7 +181,7 @@ Public Class Stabilizer_OpticalFlow : Inherits VB_Parent
         desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
         labels(2) = "Stabilized Image"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         If task.optionsChanged Then
             errScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 1)
@@ -193,7 +193,7 @@ Public Class Stabilizer_OpticalFlow : Inherits VB_Parent
 
         dst2 = src
 
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         feat.Run(src)
         inputFeat = New List(Of cv.Point2f)(task.features)
         features1 = New cv.Mat(inputFeat.Count, 1, cv.MatType.CV_32FC2, inputFeat.ToArray)
@@ -230,7 +230,7 @@ Public Class Stabilizer_OpticalFlow : Inherits VB_Parent
             Dim saveDX = dx, saveDY = dy, saveDA = da
 
             Dim text = "Original dx = " + Format(dx, fmt2) + vbNewLine + " dy = " + Format(dy, fmt2) + vbNewLine + " da = " + Format(da, fmt2)
-            setTrueText(text)
+            SetTrueText(text)
 
             Dim sx = ds_x, sy = ds_y
 
@@ -248,7 +248,7 @@ Public Class Stabilizer_OpticalFlow : Inherits VB_Parent
             If Math.Abs(da) > 50 Then da = saveDA
 
             text = "dx = " + Format(dx, fmt2) + vbNewLine + " dy = " + Format(dy, fmt2) + vbNewLine + " da = " + Format(da, fmt2)
-            setTrueText(text, New cv.Point(10, 100))
+            SetTrueText(text, New cv.Point(10, 100))
 
             Dim smoothedMat = New cv.Mat(2, 3, cv.MatType.CV_64F)
             smoothedMat.Set(Of Double)(0, 0, sx * Math.Cos(da))
@@ -263,8 +263,8 @@ Public Class Stabilizer_OpticalFlow : Inherits VB_Parent
             dst3 = smoothedFrame.Resize(src.Size())
 
             For i = 0 To commonPoints.Count - 1
-                DrawCircle(dst2,commonPoints.ElementAt(i), task.dotSize + 3, cv.Scalar.Red)
-                DrawCircle(dst2,lastFeatures.ElementAt(i), task.dotSize + 1, cv.Scalar.Blue)
+                DrawCircle(dst2, commonPoints.ElementAt(i), task.DotSize + 3, cv.Scalar.Red)
+                DrawCircle(dst2, lastFeatures.ElementAt(i), task.DotSize + 1, cv.Scalar.Blue)
             Next
         End If
         inputFeat = Nothing ' show that we consumed the current set of features.
@@ -282,14 +282,14 @@ End Class
 Public Class Stabilizer_VerticalIMU : Inherits VB_Parent
     Public stableTest As Boolean
     Public stableStr As String
+    Dim angleXValue As New List(Of Single)
+    Dim angleYValue As New List(Of Single)
+    Dim stableCount As New List(Of Integer)
+    Dim lastAngleX As Single, lastAngleY As Single
     Public Sub New()
         desc = "Use the IMU angular velocity to determine if the camera is moving or stable."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static angleXValue As New List(Of Single)
-        Static angleYValue As New List(Of Single)
-        Static stableCount As New List(Of Integer)
-
+    Public Sub RunVB(src As cv.Mat)
         angleXValue.Add(task.accRadians.X)
         angleYValue.Add(task.accRadians.Y)
 
@@ -298,6 +298,10 @@ Public Class Stabilizer_VerticalIMU : Inherits VB_Parent
                   Format(task.accRadians.Z * 57.2958, fmt3) + vbCrLf
         Dim avgX = angleXValue.Average
         Dim avgY = angleYValue.Average
+        If task.FirstPass Then
+            lastAngleX = avgX
+            lastAngleY = avgY
+        End If
         strOut += "Angle X" + vbTab + "Angle Y" + vbCrLf
         strOut += Format(avgX, fmt3) + vbTab + Format(avgY, fmt3) + vbCrLf
 
@@ -305,7 +309,6 @@ Public Class Stabilizer_VerticalIMU : Inherits VB_Parent
         If avgX < 0 Then angle *= -1
         labels(2) = "stabilizer_Vertical Angle = " + Format(angle, fmt1)
 
-        Static lastAngleX = avgX, lastAngleY = avgY
         stableTest = Math.Abs(lastAngleX - avgX) < 0.001 And Math.Abs(lastAngleY - avgY) < 0.01
         stableCount.Add(If(stableTest, 1, 0))
         If task.heartBeat Then
@@ -313,7 +316,7 @@ Public Class Stabilizer_VerticalIMU : Inherits VB_Parent
             stableStr = "IMU stable = " + Format(avgStable, "0.0%") + " of the time"
             stableCount.Clear()
         End If
-        setTrueText(strOut + vbCrLf + stableStr, 2)
+        SetTrueText(strOut + vbCrLf + stableStr, 2)
 
         lastAngleX = avgX
         lastAngleY = avgY
@@ -334,6 +337,7 @@ End Class
 Public Class Stabilizer_CornerPoints : Inherits VB_Parent
     Public basics As New Stable_Basics
     Public features As New List(Of cv.Point2f)
+    Dim ul As cv.Rect, ur As cv.Rect, ll As cv.Rect, lr As cv.Rect
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
         desc = "Track the FAST feature points found in the corners of the BGR image."
@@ -346,9 +350,8 @@ Public Class Stabilizer_CornerPoints : Inherits VB_Parent
         Next
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static ul As cv.Rect, ur As cv.Rect, ll As cv.Rect, lr As cv.Rect
         If task.optionsChanged Then
-            Dim size = task.gOptions.GridSize.Value
+            Dim size = task.gridSize
             ul = New cv.Rect(0, 0, size, size)
             ur = New cv.Rect(dst2.Width - size, 0, size, size)
             ll = New cv.Rect(0, dst2.Height - size, size, size)
@@ -364,7 +367,7 @@ Public Class Stabilizer_CornerPoints : Inherits VB_Parent
 
         dst2.SetTo(0)
         For Each pt In features
-            DrawCircle(dst2, pt, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
         Next
         labels(2) = "There were " + CStr(features.Count) + " key points detected"
     End Sub

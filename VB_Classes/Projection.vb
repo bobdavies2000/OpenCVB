@@ -5,16 +5,16 @@ Public Class Projection_Basics : Inherits VB_Parent
     Public viewType As String = "Top"
     Public objectList As New List(Of cv.Vec4f)
     Public showRectangles As Boolean = True
+    Dim histTop As New Projection_HistTop
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Find all the masks, rects, and counts in the input"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
-            Static histTop As New Projection_HistTop
             histTop.Run(src)
             src = histTop.dst2
 
-            Static redC As New RedCloud_Basics
             redC.inputMask = Not histTop.dst3
             redC.Run(histTop.dst3)
             redCellInput = task.redCells
@@ -26,7 +26,7 @@ Public Class Projection_Basics : Inherits VB_Parent
         Dim check2 As Integer
         For i = 0 To redCellInput.Count - 1
             Dim rc = redCellInput(i)
-            Dim tmp = New cv.Mat(rc.rect.Size, cv.MatType.CV_32F, 0)
+            Dim tmp = New cv.Mat(rc.rect.Size(), cv.MatType.CV_32F, 0)
             src(rc.rect).CopyTo(tmp, rc.mask)
             rc.pixels = tmp.Sum()
             sortedCells.Add(rc.pixels, rc)
@@ -82,10 +82,10 @@ Public Class Projection_Basics : Inherits VB_Parent
             strOut += "Sum of src  " + vbTab + CStr(check1) + " pixels" + " (losses from RedCloud.)" + vbCrLf
             strOut += "Actual count" + vbTab + CStr(depthCount) + " pixels" + vbCrLf
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
         If showRectangles Then
             For i = 0 To Math.Min(redCells.Count, task.redOptions.identifyCount) - 1
-                dst2.Rectangle(redCells(i).rect, task.highlightColor, task.lineWidth)
+                dst2.Rectangle(redCells(i).rect, task.HighlightColor, task.lineWidth)
             Next
         End If
         labels(2) = CStr(redCells.Count) + " objects were found in the " + viewType + " view."
@@ -149,14 +149,14 @@ Public Class Projection_Lines : Inherits VB_Parent
     Dim lines As New Line_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Concentration threshold", 0, 100, 2)
-        findCheckBox("Top View (Unchecked Side View)").Checked = False
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        FindCheckBox("Top View (Unchecked Side View)").Checked = False
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "Lines found in the threshold output", "FeatureLess cells found", "Projections of each of the FeatureLess cells"}
         desc = "Search for surfaces among the FeatureLess regions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static thresholdSlider = FindSlider("Concentration threshold")
-        Static topCheck = findCheckBox("Top View (Unchecked Side View)")
+        Static topCheck = FindCheckBox("Top View (Unchecked Side View)")
         If task.heartBeat Then
             dst1.SetTo(0)
             dst3.SetTo(0)
@@ -184,7 +184,7 @@ Public Class Projection_Cell : Inherits VB_Parent
     Dim heatCell As New HeatMap_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32FC3, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32FC3, 0)
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.gOptions.unFiltered.Checked = True
         labels = {"", "Top View projection of the selected cell", "RedCloud_Basics output - select a cell to project at right and above", "Side projection of the selected cell"}
@@ -207,7 +207,7 @@ Public Class Projection_Cell : Inherits VB_Parent
         heatCell.Run(dst0)
         Dim maskTop = heatCell.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
         Dim maskSide = heatCell.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
-        If maskTop.CountNonZero = 0 And maskSide.CountNonZero = 0 Then setTrueText("The selected cell has no depth data.", 3)
+        If maskTop.CountNonZero = 0 And maskSide.CountNonZero = 0 Then SetTrueText("The selected cell has no depth data.", 3)
         dst1.SetTo(cv.Scalar.White, maskTop)
         dst3.SetTo(cv.Scalar.White, maskSide)
     End Sub
@@ -241,7 +241,7 @@ Public Class Projection_Top : Inherits VB_Parent
 
         dst2 = objects.dst2
         labels(2) = redC.labels(2)
-        setTrueText(objects.strOut, 3)
+        SetTrueText(objects.strOut, 3)
     End Sub
 End Class
 
@@ -274,7 +274,7 @@ Public Class Projection_Side : Inherits VB_Parent
 
         dst2 = objects.dst2
         labels(2) = redC.labels(2)
-        setTrueText(objects.strOut, 3)
+        SetTrueText(objects.strOut, 3)
     End Sub
 End Class
 
@@ -290,7 +290,7 @@ Public Class Projection_ObjectIsolate : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Index of object", 0, 100, 0) ' zero is the largest object present.
 
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
         side.objects.showRectangles = False
         desc = "Using the top down view, create a histogram for Y-values of the largest object."
     End Sub
@@ -327,9 +327,9 @@ Public Class Projection_Object : Inherits VB_Parent
     Dim top As New Projection_Top
     Dim side As New Projection_Side
     Public Sub New()
-        task.gOptions.DebugSlider.Value = 0 ' pick the biggest object...
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
+        task.gOptions.setDebugSlider(0) ' pick the biggest object...
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
         top.objects.showRectangles = False
         desc = "Using the top down view, create a histogram for Y-values of the largest object."
     End Sub
@@ -338,13 +338,13 @@ Public Class Projection_Object : Inherits VB_Parent
         dst3 = top.dst2
         labels(3) = top.labels(2)
 
-        Dim index = task.gOptions.DebugSlider.Value
+        Dim index = task.gOptions.debugSliderValue
         If index < top.objects.objectList.Count Then
             Dim lower = New cv.Scalar(top.objects.objectList(index)(0), -100, top.objects.objectList(index)(2))
             Dim upper = New cv.Scalar(top.objects.objectList(index)(1), +100, top.objects.objectList(index)(3))
             Dim mask = task.pointCloud.InRange(lower, upper)
 
-            Dim rc = top.objects.redCells(task.gOptions.DebugSlider.Value + 1) ' the biggest by default...
+            Dim rc = top.objects.redCells(task.gOptions.debugSliderValue + 1) ' the biggest by default...
             dst0.SetTo(0)
             dst0(rc.rect) = top.histTop.dst2(rc.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
             dst0.SetTo(0, dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))

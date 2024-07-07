@@ -3,16 +3,16 @@ Imports  System.IO
 Imports System.Runtime.InteropServices
 Public Class Vignetting_Basics : Inherits VB_Parent
     Public removeVig As Boolean
+    Dim center As New cv.Point(dst2.Width / 2, dst2.Height / 2)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Vignette radius X100", 1, 300, 80)
         cPtr = Vignetting_Open()
         desc = "C++ version of vignetting for comparison with the VB version."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static center As New cv.Point(dst2.Width / 2, dst2.Height / 2)
         Static radiusSlider = FindSlider("Vignette radius X100")
 
-        If task.clickPoint <> New cv.Point Then center = task.clickPoint
+        If task.ClickPoint <> New cv.Point Then center = task.ClickPoint
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
@@ -34,6 +34,7 @@ End Class
 
 Public Class Vignetting_VB : Inherits VB_Parent
     Public removeVig As Boolean
+    Dim center As New cv.Point(dst2.Width / 2, dst2.Height / 2)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Vignette radius X100", 1, 300, 80)
         labels = {"", "", "Resulting vignetting.  Click where the center should be located for vignetting", ""}
@@ -46,10 +47,9 @@ Public Class Vignetting_VB : Inherits VB_Parent
         Return 1.27323954 * x - 0.405284735 * x * x
     End Function
     Public Sub RunVB(src as cv.Mat)
-        Static center As New cv.Point(dst2.Width / 2, dst2.Height / 2)
         Static factorSlider = FindSlider("Vignette radius X100")
 
-        If task.clickPoint <> New cv.Point Then center = task.clickPoint
+        If task.ClickPoint <> New cv.Point Then center = task.ClickPoint
         Dim maxDist = New cv.Point(0, 0).DistanceTo(center) * factorSlider.Value / 100
         Dim tmp As Double
         For y = 0 To src.Height - 1
@@ -83,7 +83,7 @@ Public Class Vignetting_Removal : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If standaloneTest() And defaultImage Is Nothing Then
-            Dim fileInfo = New FileInfo(task.homeDir + "data/nature.jpg")
+            Dim fileInfo = New FileInfo(task.HomeDir + "data/nature.jpg")
             If fileInfo.Exists Then defaultImage = cv.Cv2.ImRead(fileInfo.FullName)
             defaultImage = defaultImage.Resize(dst3.Size)
             dst2 = defaultImage.Clone

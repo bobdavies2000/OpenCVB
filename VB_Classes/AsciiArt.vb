@@ -11,12 +11,12 @@ Public Class AsciiArt_Basics : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(options.size, 0, 0, cv.InterpolationFlags.Nearest)
+        dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2Gray).Resize(options.size, 0, 0, cv.InterpolationFlags.Nearest)
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
                 Dim grayValue = dst3.Get(Of Byte)(y, x)
                 Dim asciiChar = asciiChars(grayValue * (asciiChars.Length - 1) / 255)
-                setTrueText(asciiChar, New cv.Point(x * options.wStep, y * options.hStep), 2)
+                SetTrueText(asciiChar, New cv.Point(x * options.wStep, y * options.hStep), 2)
             Next
         Next
         labels(2) = "Ascii version using " + Format(dst3.Height * dst3.Width, fmt0) + " characters"
@@ -31,14 +31,14 @@ End Class
 
 Public Class AsciiArt_Color : Inherits VB_Parent
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "A palette'd version of the ascii art data"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim hStep = CInt(src.Height / 31) - 1
         Dim wStep = CInt(src.Width / 55) - 1
         Dim size = New cv.Size(55, 31)
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(size, 0, 0, cv.InterpolationFlags.Nearest)
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2Gray).Resize(size, 0, 0, cv.InterpolationFlags.Nearest)
         Dim grayRatio = 12 / 255
         For y = 0 To dst1.Height - 1
             For x = 0 To dst1.Width - 1
@@ -67,7 +67,7 @@ Public Class AsciiArt_Diff : Inherits VB_Parent
         grayAA.Run(src)
         dst2 = grayAA.dst2
 
-        diff.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        diff.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray))
         dst3 = diff.dst2
     End Sub
 End Class

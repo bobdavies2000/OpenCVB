@@ -4,6 +4,7 @@ Public Class Cell_Basics : Inherits VB_Parent
     Dim pca As New PCA_Basics
     Dim eq As New Plane_Equation
     Public runRedCloud As Boolean
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setHistogramBins(20)
         desc = "Display the statistics for the selected cell."
@@ -62,14 +63,14 @@ Public Class Cell_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
-            Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
         End If
 
-        setTrueText(strOut, 3)
-        labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.maxZmeters)) + " meters"
+        statsString()
+        SetTrueText(strOut, 3)
+        labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.MaxZmeters)) + " meters"
     End Sub
 End Class
 
@@ -103,7 +104,7 @@ Public Class Cell_PixelCountCompare : Inherits VB_Parent
                     Else
                         strOut = Format(rc.depthPixels / rc.pixels, "0%")
                     End If
-                    If missCount < task.redOptions.identifyCount Then setTrueText(strOut, pt, 3)
+                    If missCount < task.redOptions.identifyCount Then SetTrueText(strOut, pt, 3)
                     missCount += 1
                 End If
             End If
@@ -122,7 +123,7 @@ Public Class Cell_ValidateColorCells : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
         labels(3) = "Cells shown below have rc.depthPixels / rc.pixels < 50%"
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
         desc = "Validate that all the depthCells are correctly identified."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -156,7 +157,7 @@ Public Class Cell_ValidateColorCells : Inherits VB_Parent
             strOut += "Depth cell percentage average " + Format(percentDepth.Average, "0%") + vbCrLf
             strOut += "Depth cell percentage range " + Format(percentDepth.Min, "0%") + " to " + Format(percentDepth.Max, "0%")
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -169,10 +170,10 @@ End Class
 Public Class Cell_Distance : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        If standalone Then task.gOptions.setDisplay1()
+        If standalone Then task.gOptions.setDisplay1()
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "Depth distance to selected cell", "", "Color distance to selected cell"}
         desc = "Measure the color distance of each cell to the selected cell."
     End Sub
@@ -196,7 +197,7 @@ Public Class Cell_Distance : Inherits VB_Parent
             Dim maxColorDistance = colorDistance.Max()
             For i = 0 To task.redCells.Count - 1
                 Dim rc = task.redCells(i)
-                dst1(rc.rect).SetTo(255 - depthDistance(i) * 255 / task.maxZmeters, rc.mask)
+                dst1(rc.rect).SetTo(255 - depthDistance(i) * 255 / task.MaxZmeters, rc.mask)
                 dst3(rc.rect).SetTo(255 - colorDistance(i) * 255 / maxColorDistance, rc.mask)
             Next
         End If
@@ -215,8 +216,8 @@ Public Class Cell_Binarize : Inherits VB_Parent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "Binarized image", "", "Relative gray image"}
         desc = "Separate the image into light and dark using RedCloud cells"
     End Sub
@@ -266,7 +267,8 @@ Public Class Cell_Floodfill : Inherits VB_Parent
         dst0 = stats.dst0
         dst1 = stats.dst1
         dst2 = flood.dst2
-        setTrueText(stats.strOut, 3)
+        labels = flood.labels
+        SetTrueText(stats.strOut, 3)
     End Sub
 End Class
 
@@ -280,6 +282,7 @@ Public Class Cell_BasicsPlot : Inherits VB_Parent
     Dim plot As New Hist_Depth
     Public runRedCloud As Boolean
     Dim stats As New Cell_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.redOptions.IdentifyCells.Checked = True
         If standalone Then task.gOptions.setDisplay1()
@@ -298,21 +301,20 @@ Public Class Cell_BasicsPlot : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
-            Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            If task.clickPoint = New cv.Point Then
+            If task.ClickPoint = New cv.Point Then
                 If task.redCells.Count > 1 Then
                     task.rc = task.redCells(1)
-                    task.clickPoint = task.rc.maxDist
+                    task.ClickPoint = task.rc.maxDist
                 End If
             End If
         End If
         If task.heartBeat Then statsString(src)
 
-        setTrueText(strOut, 3)
-        labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.maxZmeters)) + " meters"
+        SetTrueText(strOut, 3)
+        labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.MaxZmeters)) + " meters"
     End Sub
 End Class
 
@@ -365,20 +367,20 @@ Public Class Cell_Generate : Inherits VB_Parent
     Dim diffLeft As New Diff_Basics
     Dim diffRight As New Diff_Basics
     Public useLeftImage As Boolean = True
+    Dim bounds As New Boundary_RemovedRects
+    Dim redCPP As RedCloud_CPP
     Public Sub New()
-        task.cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        task.cellMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         task.redCells = New List(Of rcData)
         desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
-            Static bounds As New Boundary_RemovedRects
             bounds.Run(src)
             task.cellMap = bounds.bRects.bounds.dst2
             src = task.cellMap Or bounds.dst2
-            If task.firstPass Then task.cellMap.SetTo(0)
+            If task.FirstPass Then task.cellMap.SetTo(0)
 
-            Static redCPP As RedCloud_CPP
             redCPP = bounds.bRects.bounds.redCPP
 
             If redCPP.classCount = 0 Then Exit Sub ' no data to process.
@@ -420,7 +422,7 @@ Public Class Cell_Generate : Inherits VB_Parent
             If useLeftImage Then rc.motionPixels = diffLeft.dst2(rc.rect).CountNonZero Else rc.motionPixels = diffRight.dst2(rc.rect).CountNonZero
             If rc.indexLast > 0 And rc.indexLast < task.redCells.Count Then
                 Dim lrc = task.redCells(rc.indexLast)
-                If (task.heartBeat = False Or task.firstPass) And Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 And rc.motionPixels = 0 Then
+                If (task.heartBeat = False Or task.FirstPass) And Math.Abs(lrc.naturalGray - rc.naturalGray) <= 1 And rc.motionPixels = 0 Then
                     rc = lrc
                     rc.exactMatch = True
                     retained += 1

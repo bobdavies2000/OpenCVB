@@ -28,7 +28,7 @@ Public Class Bezier_Basics : Inherits VB_Parent
         For i = 0 To points.Count - 4 Step 3
             For j = 0 To 100
                 Dim p2 = nextPoint(points, i, j / 100)
-                If j > 0 Then DrawLine(dst2, p1, p2, task.highlightColor)
+                If j > 0 Then DrawLine(dst2, p1, p2, task.HighlightColor)
                 p1 = p2
             Next
         Next
@@ -44,9 +44,9 @@ End Class
 
 Public Class Bezier_Example : Inherits VB_Parent
     Dim bezier As New Bezier_Basics
-    Public points() As cv.Point = {New cv.Point(task.dotSize, task.dotSize), New cv.Point(dst2.Width / 6, dst2.Width / 6),
+    Public points() As cv.Point = {New cv.Point(task.DotSize, task.DotSize), New cv.Point(dst2.Width / 6, dst2.Width / 6),
                                    New cv.Point(dst2.Width * 3 / 4, dst2.Height / 2),
-                                   New cv.Point(dst2.Width - task.dotSize * 2, dst2.Height - task.dotSize * 2)}
+                                   New cv.Point(dst2.Width - task.DotSize * 2, dst2.Height - task.DotSize * 2)}
     Public Sub New()
         desc = "Draw a Bezier curve based with the 4 input points."
     End Sub
@@ -55,12 +55,12 @@ Public Class Bezier_Example : Inherits VB_Parent
         Dim p1 As cv.Point
         For i = 0 To 100 - 1
             Dim p2 = bezier.nextPoint(points, 0, i / 100)
-            If i > 0 Then DrawLine(dst2, p1, p2, task.highlightColor)
+            If i > 0 Then DrawLine(dst2, p1, p2, task.HighlightColor)
             p1 = p2
         Next
 
         For i = 0 To points.Count - 1
-            DrawCircle(dst2, points(i), task.dotSize + 2, cv.Scalar.White)
+            DrawCircle(dst2, points(i), task.DotSize + 2, cv.Scalar.White)
         Next
 
         DrawLine(dst2, points(0), points(1), cv.Scalar.White)

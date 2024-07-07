@@ -14,7 +14,7 @@ Public Class FREAK_Basics : Inherits VB_Parent
         Dim freak = cv.XFeatures2D.FREAK.Create()
         Dim fdesc = New cv.Mat
         Dim keypoints = orb.keypoints.ToList
-        freak.Compute(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), orb.keypoints, fDesc)
+        freak.Compute(src.CvtColor(cv.ColorConversionCodes.BGR2Gray), orb.keypoints, fDesc)
 
         dst2 = src.Clone()
 

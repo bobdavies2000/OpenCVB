@@ -11,12 +11,19 @@ Public Class Hull_Basics : Inherits VB_Parent
         If standaloneTest() Then random.range = New cv.Rect(100, 100, 50, 50)
         desc = "Given a list of points, create a hull that encloses them."
     End Sub
+    Private Function vbFloat2Int(ptList2f As List(Of cv.Point2f)) As List(Of cv.Point)
+        Dim ptList As New List(Of cv.Point)
+        For Each pt In ptList2f
+            ptList.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
+        Next
+        Return ptList
+    End Function
     Public Sub RunVB(src As cv.Mat)
         If (standaloneTest() And task.heartBeat) Or (useRandomPoints And task.heartBeat) Then
             random.Run(empty)
             dst2.SetTo(0)
             For Each pt In random.pointList
-                DrawCircle(dst2, pt, task.dotSize, cv.Scalar.White)
+                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
             Next
             inputPoints = New List(Of cv.Point2f)(random.pointList)
         End If

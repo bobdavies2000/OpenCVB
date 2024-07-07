@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
 Public Class Distance_Basics : Inherits VB_Parent
     Dim options As New Options_Distance
     Public Sub New()
@@ -11,7 +10,7 @@ Public Class Distance_Basics : Inherits VB_Parent
         options.RunVB()
 
         If standaloneTest() Then src = task.depthRGB
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         dst0 = src.DistanceTransform(options.distanceType, 0)
         dst1 = GetNormalize32f(dst0)
@@ -35,7 +34,7 @@ Public Class Distance_Labels : Inherits VB_Parent
         options.RunVB()
 
         If standaloneTest() Then src = task.depthRGB
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         'Dim labels As cv.Mat
         'cv.Cv2.DistanceTransformWithLabels(src, dst0, labels, cv.DistanceTypes.L2, cv.DistanceTransformMasks.Precise)
@@ -59,22 +58,20 @@ Public Class Distance_Foreground : Inherits VB_Parent
         labels(3) = "Input mask to distance transformm"
         desc = "Distance algorithm basics."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static cRadio = findRadio("C")
-        Static l1Radio = findRadio("L1")
+    Public Sub RunVB(src As cv.Mat)
+        Static cRadio = FindRadio("C")
+        Static l1Radio = FindRadio("L1")
 
         foreground.Run(src)
         dst3 = If(useBackgroundAsInput, foreground.dst2, foreground.dst3)
 
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim DistanceType = cv.DistanceTypes.L2
         If cRadio.Checked Then DistanceType = cv.DistanceTypes.C
         If l1Radio.Checked Then DistanceType = cv.DistanceTypes.L1
 
         src = dst3 And src
-        Dim kernelSize = 0 ' this is precise distance (there is no distance of 1)
-
-        Dim dist = src.DistanceTransform(DistanceType, kernelSize)
+        Dim dist = src.DistanceTransform(DistanceType, cv.DistanceTransformMasks.Precise)
         Dim dist32f = dist.Normalize(0, 255, cv.NormTypes.MinMax)
         dist32f.ConvertTo(src, cv.MatType.CV_8UC1)
         dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -122,7 +119,7 @@ Public Class Distance_Point3D : Inherits VB_Parent
             dst2.SetTo(0)
             Dim p1 = New cv.Point(inPoint1.X, inPoint1.Y)
             Dim p2 = New cv.Point(inPoint2.X, inPoint2.Y)
-            DrawLine(dst2, p1, p2, task.highlightColor)
+            DrawLine(dst2, p1, p2, task.HighlightColor)
 
             Dim vec1 = task.pointCloud.Get(Of cv.Point3f)(p1.Y, p1.X)
             Dim vec2 = task.pointCloud.Get(Of cv.Point3f)(p2.Y, p2.X)
@@ -136,7 +133,7 @@ Public Class Distance_Point3D : Inherits VB_Parent
         strOut = Format(inPoint1.X, fmt3) + ", " + Format(inPoint1.Y, fmt3) + ", " + Format(inPoint1.Z, fmt3) + vbCrLf
         strOut += Format(inPoint2.X, fmt3) + ", " + Format(inPoint2.Y, fmt3) + ", " + Format(inPoint2.Z, fmt3) + vbCrLf
         strOut += "Distance = " + Format(distance, fmt3)
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -155,9 +152,9 @@ Public Class Distance_Point4D : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
             inPoint1 = New cv.Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height),
-                                    msRNG.Next(0, task.maxZmeters), msRNG.Next(0, task.maxZmeters))
+                                    msRNG.Next(0, task.MaxZmeters), msRNG.Next(0, task.MaxZmeters))
             inPoint2 = New cv.Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height),
-                                    msRNG.Next(0, task.maxZmeters), msRNG.Next(0, task.maxZmeters))
+                                    msRNG.Next(0, task.MaxZmeters), msRNG.Next(0, task.MaxZmeters))
         End If
 
         Dim x = inPoint1(0) - inPoint2(0)
@@ -167,7 +164,7 @@ Public Class Distance_Point4D : Inherits VB_Parent
         distance = Math.Sqrt(x * x + y * y + z * z + d * d)
 
         strOut = inPoint1.ToString + vbCrLf + inPoint2.ToString + vbCrLf + "Distance = " + Format(distance, fmt1)
-        setTrueText(strOut, New cv.Point(10, 10), 2)
+        SetTrueText(strOut, New cv.Point(10, 10), 2)
     End Sub
 End Class
 
@@ -182,6 +179,9 @@ Public Class Distance_RedCloud : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
+    Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
+    Dim lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
+    Dim lastredCells As New List(Of rcData)
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.redOptions.UseColorOnly.Checked = True
@@ -199,9 +199,6 @@ Public Class Distance_RedCloud : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
 
-        Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
-        Static lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
-        Static lastredCells As New List(Of rcData)
         pixelVector.Clear()
         distances.Clear()
         For i = 0 To task.redCells.Count - 1
@@ -223,7 +220,7 @@ Public Class Distance_RedCloud : Inherits VB_Parent
                 index += 1
 
                 Dim rc = task.redCells(el.Value)
-                setTrueText(CStr(el.Value), rc.maxDist)
+                SetTrueText(CStr(el.Value), rc.maxDist)
             Next
 
             strOut += "----------------------" + vbCrLf
@@ -234,21 +231,21 @@ Public Class Distance_RedCloud : Inherits VB_Parent
                 If index Mod 6 = 5 Then strOut += vbCrLf
                 index += 1
                 Dim rc = lastredCells(el.Value)
-                setTrueText(el.Value, New cv.Point(rc.maxDist.X, rc.maxDist.Y + 10))
+                SetTrueText(el.Value, New cv.Point(rc.maxDist.X, rc.maxDist.Y + 10))
             Next
 
             For Each el In distances
                 Dim rc = task.redCells(el.Value)
-                setTrueText(CStr(el.Value), rc.maxDist)
+                SetTrueText(CStr(el.Value), rc.maxDist)
             Next
         End If
 
         For Each el In lastDistances
             Dim rp = lastredCells(el.Value)
-            setTrueText(el.Value, New cv.Point(rp.maxDist.X, rp.maxDist.Y + 10))
+            SetTrueText(el.Value, New cv.Point(rp.maxDist.X, rp.maxDist.Y + 10))
         Next
 
-        setTrueText(strOut, 1)
+        SetTrueText(strOut, 1)
 
         dst2.SetTo(0)
         dst3.SetTo(0)
@@ -290,6 +287,6 @@ Public Class Distance_BinaryImage : Inherits VB_Parent
             distance.Run(dst2)
         End If
         dst3 = distance.dst2
-        dst1 = dst3.Threshold(task.gOptions.DebugSlider.Value, 255, cv.ThresholdTypes.Binary)
+        dst1 = dst3.Threshold(task.gOptions.DebugSliderValue, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class

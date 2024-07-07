@@ -4,9 +4,9 @@ Public Class KLT_Basics : Inherits VB_Parent
     Public status As New cv.Mat
     Public outputMat As New cv.Mat
     Public circleColor = cv.Scalar.Red
-    Dim term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
     Public options As New Options_KLT
     Public Sub New()
+        term = New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
         desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -15,7 +15,7 @@ Public Class KLT_Basics : Inherits VB_Parent
         If options.nightMode Then dst2.SetTo(0) Else src.CopyTo(dst2)
         Static lastGray As cv.Mat = src.Clone
 
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         If options.inputPoints Is Nothing Then
             options.inputPoints = cv.Cv2.GoodFeaturesToTrack(src, options.maxCorners, options.qualityLevel,
                                                              options.minDistance, New cv.Mat, options.blockSize, False, 0)
@@ -45,7 +45,7 @@ Public Class KLT_Basics : Inherits VB_Parent
             Dim pt = outputMat.Get(Of cv.Point2f)(i)
             If pt.X >= 0 And pt.X <= src.Cols And pt.Y >= 0 And pt.Y <= src.Rows Then
                 If status.Get(Of Byte)(i) Then
-                    DrawCircle(dst2,pt, task.dotSize + 1, circleColor)
+                    DrawCircle(dst2,pt, task.DotSize + 1, circleColor)
                 End If
             Else
                 status.Set(Of Byte)(i, 0) ' this point is not visible!

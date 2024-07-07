@@ -11,10 +11,10 @@ Public Class Threshold_Basics : Inherits VB_Parent
 
         labels(3) = "Image after thresholding with threshold = " + CStr(options.threshold)
         dst2 = src
-        If options.inputGray Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If options.inputGray Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         If options.otsuOption Then options.thresholdMethod += cv.ThresholdTypes.Otsu
-        If (options.otsuOption Or options.thresholdMethod = cv.ThresholdTypes.Triangle) And dst2.Channels <> 1 Then
-            dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If (options.otsuOption Or options.thresholdMethod = cv.ThresholdTypes.Triangle) And dst2.Channels() <> 1 Then
+            dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         End If
         dst3 = dst2.Threshold(options.threshold, 255, options.thresholdMethod)
     End Sub
@@ -41,7 +41,7 @@ Public Class Threshold_Adaptive : Inherits VB_Parent
         Options.RunVB()
         optionsAdaptive.RunVB()
 
-        If src.Channels <> 1 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src
+        If src.Channels() <> 1 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2Gray) Else dst2 = src
         dst3 = dst2.AdaptiveThreshold(255, optionsAdaptive.method, options.thresholdMethod,
                                       optionsAdaptive.blockSize, optionsAdaptive.constantVal)
     End Sub
@@ -68,7 +68,7 @@ Public Class Threshold_Definitions : Inherits VB_Parent
         Static truncateSlider = FindSlider("Threshold")
         Dim threshold = truncateSlider.value
         gradient.Run(empty)
-        dst0 = gradient.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst0 = gradient.dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         dst1 = dst0.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
         mats.mat(0) = dst0.Threshold(threshold, 255, cv.ThresholdTypes.BinaryInv)
         mats.mat(1) = dst0.Threshold(threshold, 255, cv.ThresholdTypes.Trunc)
@@ -77,13 +77,13 @@ Public Class Threshold_Definitions : Inherits VB_Parent
         mats.Run(empty)
         dst2 = mats.dst2
         dst3 = mats.dst3
-        setTrueText("Input Gradient Image", 0)
-        setTrueText("Binary", New cv.Point(dst2.Width / 2 + 5, 10), 1)
-        setTrueText("BinaryInv", 2)
-        setTrueText("Trunc", New cv.Point(dst2.Width / 2 + 5, 10), 2)
-        setTrueText("ToZero", New cv.Point(10, dst2.Height / 2 + 10), 2)
-        setTrueText("ToZeroInv", New cv.Point(dst2.Width / 2 + 5, dst2.Height / 2 + 10), 2)
-        setTrueText("Current selection from grid at left", 3)
+        SetTrueText("Input Gradient Image", 0)
+        SetTrueText("Binary", New cv.Point(dst2.Width / 2 + 5, 10), 1)
+        SetTrueText("BinaryInv", 2)
+        SetTrueText("Trunc", New cv.Point(dst2.Width / 2 + 5, 10), 2)
+        SetTrueText("ToZero", New cv.Point(10, dst2.Height / 2 + 10), 2)
+        SetTrueText("ToZeroInv", New cv.Point(dst2.Width / 2 + 5, dst2.Height / 2 + 10), 2)
+        SetTrueText("Current selection from grid at left", 3)
     End Sub
 End Class
 
@@ -108,7 +108,7 @@ Public Class Threshold_ByChannels : Inherits VB_Parent
         optionsColor.RunVB()
 
         If options.inputGray Then
-            src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
             dst2 = src.Threshold(optionsColor.redS, 255, options.thresholdMethod)
         Else
             Dim split = src.Split()

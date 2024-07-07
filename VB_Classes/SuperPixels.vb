@@ -24,6 +24,9 @@ End Class
 Public Class SuperPixel_Basics_CPP : Inherits VB_Parent
     Public wireGrid As cv.Mat
     Public gridColor = cv.Scalar.White
+    Dim numSuperPixels As Integer
+    Dim numIterations As Integer
+    Dim prior As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Number of SuperPixels", 1, 1000, 400)
@@ -39,9 +42,6 @@ Public Class SuperPixel_Basics_CPP : Inherits VB_Parent
         Static iterSlider = FindSlider("SuperPixel Iterations")
         Static priorSlider = FindSlider("Prior")
 
-        Static numSuperPixels As Integer
-        Static numIterations As Integer
-        Static prior As Integer
         If numSuperPixels <> countSlider.Value Or numIterations <> iterSlider.Value Or prior <> priorSlider.Value Then
             numSuperPixels = countSlider.Value
             numIterations = iterSlider.Value
@@ -51,7 +51,7 @@ Public Class SuperPixel_Basics_CPP : Inherits VB_Parent
         End If
 
         Dim input = src
-        If input.Channels = 1 Then input = input.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If input.Channels() = 1 Then input = input.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim dataSrc(input.Total * input.ElemSize - 1) As Byte
         Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)

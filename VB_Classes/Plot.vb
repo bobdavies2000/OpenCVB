@@ -51,7 +51,7 @@ Public Class Plot_Histogram : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Or createHistogram Then
-            If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             cv.Cv2.CalcHist({src}, {0}, New cv.Mat(), histogram, 1, {task.histogramBins}, {New cv.Rangef(minRange, maxRange)})
         Else
             histogram = src
@@ -100,13 +100,13 @@ Public Class Plot_Depth : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-        'src.SetTo(task.maxZmeters, task.maxDepthMask)
+        'src.SetTo(task.MaxZmeters, task.maxDepthMask)
 
         hist.Run(src)
         plotDepth.srcX.Clear()
         plotDepth.srcY.Clear()
         For i = 0 To task.histogramBins - 1
-            plotDepth.srcX.Add(i * task.maxZmeters / task.histogramBins)
+            plotDepth.srcX.Add(i * task.MaxZmeters / task.histogramBins)
             plotDepth.srcY.Add(hist.histogram.Get(Of Single)(i, 0))
         Next
         plotDepth.Run(empty)
@@ -120,7 +120,7 @@ Public Class Plot_Depth : Inherits VB_Parent
             For i = 1 To lineCount
                 Dim x = i * meterDepth
                 DrawLine(dst2, New cv.Point(x, 0), New cv.Point(x, src.Height), cv.Scalar.White)
-                setTrueText(Format(i, "0") + "m", New cv.Point(x + 4, src.Height - 10))
+                SetTrueText(Format(i, "0") + "m", New cv.Point(x + 4, src.Height - 10))
             Next
         End If
     End Sub
@@ -132,6 +132,7 @@ End Class
 
 
 Public Class Plot_Histogram2D : Inherits VB_Parent
+    Public colorFmt As New Color_Basics
     Public Sub New()
         labels = {"", "", "2D Histogram", ""}
         desc = "Plot a 2D histgram from the input Mat"
@@ -139,14 +140,13 @@ Public Class Plot_Histogram2D : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         Dim histogram = src.Clone
         If standaloneTest() Then
-            Static options As New Options_ColorFormat
-            options.RunVB()
-            src = options.dst2
+            colorFmt.Run(src)
+            src = colorFmt.dst2
             Dim bins = task.histogramBins
             cv.Cv2.CalcHist({src}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, task.redOptions.rangesBGR)
         End If
 
-        dst2 = histogram.Resize(dst2.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        dst2 = histogram.Resize(dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
 
         If standaloneTest() Then dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
@@ -164,12 +164,12 @@ Public Class Plot_OverTimeSingle : Inherits VB_Parent
     Public backColor = cv.Scalar.DarkGray
     Public max As Single, min As Single, avg, fmt As String
     Public plotColor = cv.Scalar.Blue
+    Dim inputList As New List(Of Single)
     Public Sub New()
         labels(2) = "Plot_OverTime "
         desc = "Plot an input variable over time"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static inputList As New List(Of Single)
         dst2 = dst2.Resize(task.quarterRes)
         If standaloneTest() Then plotData = task.color.Mean(task.depthMask)(0)
 
@@ -200,7 +200,7 @@ Public Class Plot_OverTimeSingle : Inherits VB_Parent
         Dim p1 = New cv.Point(0, dst2.Height / 2)
         Dim p2 = New cv.Point(dst2.Width, dst2.Height / 2)
         dst2.Line(p1, p2, cv.Scalar.White, task.cvFontThickness)
-        If standaloneTest() Then setTrueText("standaloneTest() test is with the blue channel mean of the color image.", 3)
+        If standaloneTest() Then SetTrueText("standaloneTest() test is with the blue channel mean of the color image.", 3)
     End Sub
 End Class
 
@@ -257,7 +257,7 @@ Public Class Plot_OverTime : Inherits VB_Parent
     Public controlScale As Boolean ' Use this to programmatically control the scale (rather than let the automated way below keep the scale.)
     Public Sub New()
         desc = "Plot an input variable over time"
-        Select Case task.workingRes.Width
+        Select Case task.WorkingRes.Width
             Case 1920
                 task.gOptions.LineWidth.Value = 10
             Case 1280
@@ -269,17 +269,17 @@ Public Class Plot_OverTime : Inherits VB_Parent
             Case Else
                 task.gOptions.LineWidth.Value = 1
         End Select
-        task.gOptions.dotSizeSlider.Value = task.gOptions.LineWidth.Value
+        task.gOptions.DotSizeSlider.Value = task.gOptions.LineWidth.Value
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
 
-        If columnIndex + task.dotSize >= dst2.Width Then
+        If columnIndex + task.DotSize >= dst2.Width Then
             dst2.ColRange(columnIndex, dst2.Width).SetTo(backColor)
             columnIndex = 1
         End If
-        dst2.ColRange(columnIndex, columnIndex + task.dotSize).SetTo(backColor)
+        dst2.ColRange(columnIndex, columnIndex + task.DotSize).SetTo(backColor)
         If standaloneTest() Then plotData = task.color.Mean()
 
         For i = 0 To plotCount - 1
@@ -291,7 +291,7 @@ Public Class Plot_OverTime : Inherits VB_Parent
 
         ' if enough points are off the charted area or if manually requested, then redo the scale.
         If (offChartCount > plotTriggerRescale And lastXdelta.Count >= plotSeriesCount And controlScale = False) Then
-            If Not task.firstPass Then
+            If Not task.FirstPass Then
                 maxScale = Integer.MinValue
                 minScale = Integer.MaxValue
                 For i = 0 To lastXdelta.Count - 1
@@ -312,9 +312,9 @@ Public Class Plot_OverTime : Inherits VB_Parent
         For i = 0 To plotCount - 1
             Dim y = 1 - (plotData(i) - minScale) / (maxScale - minScale)
             y *= dst2.Height - 1
-            Dim c As New cv.Point(columnIndex - task.dotSize, y - task.dotSize)
+            Dim c As New cv.Point(columnIndex - task.DotSize, y - task.DotSize)
             If c.X < 1 Then c.X = 1
-            DrawCircle(dst2,c, task.dotSize, plotColors(i))
+            DrawCircle(dst2,c, task.DotSize, plotColors(i))
         Next
 
 
@@ -322,7 +322,7 @@ Public Class Plot_OverTime : Inherits VB_Parent
             dst2.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst2.Height), cv.Scalar.White, 1)
         End If
 
-        columnIndex += task.dotSize
+        columnIndex += task.DotSize
         dst2.Col(columnIndex).SetTo(0)
         If standaloneTest() Then labels(2) = "RGB Means: blue = " + Format(plotData(0), fmt1) + " green = " + Format(plotData(1), fmt1) + " red = " + Format(plotData(2), fmt1)
         Dim lineCount = CInt(maxScale - minScale - 1)
@@ -355,17 +355,17 @@ Public Class Plot_OverTimeFixedScale : Inherits VB_Parent
         plotOutput = New cv.Mat(New cv.Size(320, 180), cv.MatType.CV_8UC3, 0)
         desc = "Plot an input variable over time"
         task.gOptions.LineWidth.Value = 1
-        task.gOptions.dotSizeSlider.Value = 2
+        task.gOptions.DotSizeSlider.Value = 2
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
 
-        If columnIndex + task.dotSize >= plotOutput.Width Then
+        If columnIndex + task.DotSize >= plotOutput.Width Then
             plotOutput.ColRange(columnIndex, plotOutput.Width).SetTo(backColor)
             columnIndex = 1
         End If
-        plotOutput.ColRange(columnIndex, columnIndex + task.dotSize).SetTo(backColor)
+        plotOutput.ColRange(columnIndex, columnIndex + task.DotSize).SetTo(backColor)
         If standaloneTest() Then plotData = task.color.Mean()
 
         For i = 0 To plotCount - 1
@@ -378,7 +378,7 @@ Public Class Plot_OverTimeFixedScale : Inherits VB_Parent
         If fixedScale = False Then
             ' if enough points are off the charted area or if manually requested, then redo the scale.
             If (offChartCount > plotTriggerRescale And lastXdelta.Count >= plotSeriesCount And controlScale = False) Then
-                If Not task.firstPass Then
+                If Not task.FirstPass Then
                     maxScale = Integer.MinValue
                     minScale = Integer.MaxValue
                     For i = 0 To lastXdelta.Count - 1
@@ -405,9 +405,9 @@ Public Class Plot_OverTimeFixedScale : Inherits VB_Parent
             If plotData(i) <> 0 Then
                 Dim y = 1 - (plotData(i) - minScale) / (maxScale - minScale)
                 y *= plotOutput.Height - 1
-                Dim c As New cv.Point(columnIndex - task.dotSize, y - task.dotSize)
+                Dim c As New cv.Point(columnIndex - task.DotSize, y - task.DotSize)
                 If c.X < 1 Then c.X = 1
-                DrawCircle(plotOutput, c, task.dotSize, plotColors(i))
+                DrawCircle(plotOutput, c, task.DotSize, plotColors(i))
             End If
         Next
 
@@ -419,11 +419,11 @@ Public Class Plot_OverTimeFixedScale : Inherits VB_Parent
         strOut += "Green = " + Format(plotData(1), fmt1) + vbCrLf
         strOut += "Red = " + Format(plotData(2), fmt1) + vbCrLf
         strOut += "White = " + Format(plotData(3), fmt1) + vbCrLf
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
         Dim lineCount = CInt(maxScale - minScale - 1)
         If lineCount > 3 Or lineCount < 0 Then lineCount = 3
         If showScale Then AddPlotScale(plotOutput, minScale, maxScale, lineCount)
-        dst2 = plotOutput.Resize(task.workingRes)
+        dst2 = plotOutput.Resize(task.WorkingRes)
     End Sub
 End Class
 
@@ -452,7 +452,7 @@ Public Class Plot_Beats : Inherits VB_Parent
         strOut += "task.midHeartBeat (green) = " + CStr(plot.plotData(1)) + vbCrLf
         strOut += "task.quarterBeat (red) = " + CStr(plot.plotData(2)) + vbCrLf
         strOut += "task.almostHeartBeat (white) = " + CStr(plot.plotData(3)) + vbCrLf
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -465,7 +465,7 @@ Public Class Plot_Basics_CPP : Inherits VB_Parent
     Public srcX As New List(Of Double)
     Public srcY As New List(Of Double)
     Public Sub New()
-        For i = 0 To CInt(task.maxZmeters) ' something to plot if standaloneTest().
+        For i = 0 To CInt(task.MaxZmeters) ' something to plot if standaloneTest().
             srcX.Add(i)
             srcY.Add(i * i * i)
         Next
@@ -514,7 +514,7 @@ Public Class Plot_Dots : Inherits VB_Parent
         If wipeSlate Then dst2.SetTo(0)
         For i = 0 To srcX.Count - 1
             Dim pt = New cv.Point(dst2.Width * srcX(i) / maxX, dst2.Height - dst2.Height * srcY(i) / maxY)
-            DrawCircle(dst2,pt, task.dotSize, plotColor)
+            DrawCircle(dst2,pt, task.DotSize, plotColor)
         Next
         labels(2) = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + ", y-axis: " + CStr(minY) + " to " + CStr(maxY)
     End Sub

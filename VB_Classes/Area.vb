@@ -15,8 +15,8 @@ Public Class Area_MinTriangle_CPP : Inherits VB_Parent
             If srcPoints.Count < 3 Then Exit Sub ' not enough points
         End If
 
-        Dim dataSrc(srcPoints.Count * Marshal.SizeOf(Of Integer) * 2 - 1) As Single ' input is a list of points.
-        Dim dstData(3 * Marshal.SizeOf(Of Integer) * 2 - 1) As Single ' minTriangle returns 3 points
+        Dim dataSrc(srcPoints.Count * 2 - 1) As Single ' input is a list of points.
+        Dim dstData(3 * 2 - 1) As Single ' minTriangle returns 3 points
 
         dst2.SetTo(cv.Scalar.White)
 
@@ -38,7 +38,7 @@ Public Class Area_MinTriangle_CPP : Inherits VB_Parent
         Next
 
         For Each pt In srcPoints
-            DrawCircle(dst2, pt, task.dotSize + 1, cv.Scalar.Red)
+            DrawCircle(dst2, pt, task.DotSize + 1, cv.Scalar.Red)
         Next
     End Sub
 End Class
@@ -63,14 +63,14 @@ Public Class Area_MinMotionRect : Inherits VB_Parent
         For i = 0 To contours.Length - 1
             Dim minRect = cv.Cv2.MinAreaRect(contours(i))
             Dim nextColor = New cv.Scalar(colors(i Mod 256)(0), colors(i Mod 256)(1), colors(i Mod 256)(2))
-            drawRotatedRectangle(minRect, gray, nextColor)
+            DrawRotatedRectangle(minRect, gray, nextColor)
         Next
         Return gray
     End Function
     Public Sub RunVB(src As cv.Mat)
         bgSub.Run(src)
         Dim gray As cv.Mat
-        If bgSub.dst2.Channels = 1 Then gray = bgSub.dst2 Else gray = bgSub.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If bgSub.dst2.Channels() = 1 Then gray = bgSub.dst2 Else gray = bgSub.dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         dst2 = motionRectangles(gray, task.vecColors)
         dst2.SetTo(cv.Scalar.All(255), gray)
     End Sub
@@ -105,7 +105,7 @@ Public Class Area_FindNonZero : Inherits VB_Parent
         dst3 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         ' mark the points so they are visible...
         For i = 0 To nonZero.Rows - 1
-            DrawCircle(dst3, nonZero.Get(Of cv.Point)(0, i), task.dotSize, cv.Scalar.White)
+            DrawCircle(dst3, nonZero.Get(Of cv.Point)(0, i), task.DotSize, cv.Scalar.White)
         Next
 
         Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf
@@ -114,7 +114,7 @@ Public Class Area_FindNonZero : Inherits VB_Parent
             outstr += "X = " + vbTab + CStr(pt.X) + vbTab + " y = " + vbTab + CStr(pt.Y) + vbCrLf
             If i > 100 Then Exit For ' for when there are way too many points found...
         Next
-        setTrueText(outstr)
+        SetTrueText(outstr)
     End Sub
 End Class
 
@@ -173,7 +173,7 @@ Public Class Area_MinRect : Inherits VB_Parent
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In inputPoints
-                DrawCircle(dst2, pt, task.dotSize + 2, cv.Scalar.Red)
+                DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.Red)
             Next
             drawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
         End If

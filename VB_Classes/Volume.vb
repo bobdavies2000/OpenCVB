@@ -42,6 +42,6 @@ Public Class Volume_Basics : Inherits VB_Parent
             strOut += Format(minY * meterFactor, fmt0) + vbTab + Format(maxY * meterFactor, fmt0) + vbTab + Format((maxY - minY) * meterFactor, fmt0) + vbTab + " Y dimension" + vbCrLf
             strOut += Format(minZ * meterFactor, fmt0) + vbTab + Format(maxZ * meterFactor, fmt0) + vbTab + Format((maxZ - minZ) * meterFactor, fmt0) + vbTab + " Z dimension" + vbCrLf
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class

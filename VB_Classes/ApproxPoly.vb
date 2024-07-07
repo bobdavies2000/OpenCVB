@@ -48,7 +48,7 @@ Public Class ApproxPoly_FindandDraw : Inherits VB_Parent
         labels(3) = "FindandDraw output - note the change in line width where ApproxPoly differs from DrawContours"
         desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         rotatedRect.Run(src)
         dst2 = rotatedRect.dst2
         dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

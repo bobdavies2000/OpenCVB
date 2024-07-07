@@ -36,7 +36,7 @@ public:
     float gyro[3] = { 0, 0, 0 };
     ob::Context ctx;
     double imuTimeStamp;
-    bool firstPass = true;
+    bool FirstPass = true;
     std::mutex frameMutex;
     std::map<OBFrameType, std::shared_ptr<ob::Frame>> imuFrameMap;
 
@@ -91,9 +91,9 @@ public:
         static std::vector<int64_t> imuTimeStamps;
         static std::vector<std::shared_ptr<ob::Frame>> imuFrames;
         static std::mutex imuMutex;
-        if (firstPass)
+        if (FirstPass)
         {
-            firstPass = false;
+            FirstPass = false;
             auto profiles = gyroSensor->getStreamProfileList();
             auto profile = profiles->getProfile(OB_PROFILE_DEFAULT);
             gyroSensor->start(profile, [&](std::shared_ptr<ob::Frame> frame) {

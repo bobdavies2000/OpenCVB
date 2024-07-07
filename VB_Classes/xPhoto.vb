@@ -10,7 +10,7 @@ Public Class XPhoto_Bm3dDenoise : Inherits VB_Parent
         labels(3) = "Difference from Input"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         cv.Cv2.EqualizeHist(src, src)
         CvXPhoto.Bm3dDenoising(src, dst2)
         cv.Cv2.Subtract(dst2, src, dst3)
@@ -30,8 +30,8 @@ Public Class XPhoto_Bm3dDenoiseDepthImage : Inherits VB_Parent
         labels(3) = "Difference from Input"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Dim test = New cv.Mat(src.Size, cv.MatType.CV_8U)
-        Dim gray = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim test = New cv.Mat(src.Size(), cv.MatType.CV_8U)
+        Dim gray = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         cv.Cv2.EqualizeHist(gray, gray)
         CvXPhoto.Bm3dDenoising(gray, dst2)
         cv.Cv2.Subtract(dst2, gray, dst3)
@@ -92,15 +92,15 @@ Public Class XPhoto_Inpaint : Inherits VB_Parent
         desc = "Use the xPhoto inpaint to fill in the depth holes"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static radioFast = findRadio("FSR_Fast")
-        Static radioSMap = findRadio("ShiftMap")
+        Static radioFast = FindRadio("FSR_Fast")
+        Static radioSMap = FindRadio("ShiftMap")
         dst2 = src
         Dim mask = basics.drawRandomLine(dst2)
         'Dim iType = InpaintTypes.FSR_BEST
         'If radioFast.checked Then iType = InpaintTypes.FSR_FAST
         'If radioSMap.checked Then iType = InpaintTypes.SHIFTMAP
         'CvXPhoto.Inpaint(dst2, mask, dst3, InpaintTypes.FSR_BEST)
-        setTrueText("This VB interface for xPhoto Inpaint does not work...  Uncomment the lines above this msg to test.", 3)
+        SetTrueText("This VB interface for xPhoto Inpaint does not work...  Uncomment the lines above this msg to test.", 3)
     End Sub
 End Class
 
@@ -117,8 +117,8 @@ Public Class XPhoto_Inpaint_CPP : Inherits VB_Parent
         desc = "Use the xPhoto Oil Painting transform"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static radioFast = findRadio("FSR_Fast")
-        Static radioSMap = findRadio("ShiftMap")
+        Static radioFast = FindRadio("FSR_Fast")
+        Static radioSMap = FindRadio("ShiftMap")
         Dim iType = InpaintTypes.FSR_BEST
         If radioFast.checked Then iType = InpaintTypes.FSR_FAST
         If radioSMap.checked Then iType = InpaintTypes.SHIFTMAP
@@ -138,7 +138,7 @@ Public Class XPhoto_Inpaint_CPP : Inherits VB_Parent
         handleMask.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
-        setTrueText("The xPhoto Inpaint call hangs." + vbCrLf + "Uncomment the C++ line - see XPhoto.cpp - to test", 1)
+        SetTrueText("The xPhoto Inpaint call hangs." + vbCrLf + "Uncomment the C++ line - see XPhoto.cpp - to test", 1)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = xPhoto_Inpaint_Close(cPtr)

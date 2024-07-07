@@ -61,8 +61,8 @@ Public Class Cluster_Basics : Inherits VB_Parent
         Next
         dst3.SetTo(0)
         For i = 0 To knn.queries.Count - 1
-            DrawCircle(dst2,knn.queries(i), task.dotSize, cv.Scalar.Red)
-            DrawCircle(dst3,knn.queries(i), task.dotSize, task.highlightColor)
+            DrawCircle(dst2,knn.queries(i), task.DotSize, cv.Scalar.Red)
+            DrawCircle(dst3,knn.queries(i), task.DotSize, task.HighlightColor)
         Next
         labels(2) = CStr(clusters.Count) + " groups built from " + CStr(ptInput.Count) + " by combining each input point and its nearest neighbor."
     End Sub
@@ -102,7 +102,7 @@ Public Class Cluster_Hulls : Inherits VB_Parent
             End If
 
             hulls.Add(hull)
-            DrawContour(dst3, hull, cv.Scalar.White, task.lineWidth)
+            If (hull.Count > 0) Then DrawContour(dst3, hull, cv.Scalar.White, task.lineWidth)
         Next
     End Sub
 End Class

@@ -5,8 +5,8 @@ Public Class GuidedBP_Basics : Inherits VB_Parent
     Dim topMap As New cv.Mat
     Dim sideMap As New cv.Mat
     Public Sub New()
-        topMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        sideMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        topMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        sideMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Correlate the hot points with the previous generation using a Map"
     End Sub
     Private Sub runMap(rectList As List(Of cv.Rect), dstindex As Integer, map As cv.Mat)
@@ -32,7 +32,7 @@ Public Class GuidedBP_Basics : Inherits VB_Parent
             Dim pt = New cv.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
             Dim index = indices(ptList.IndexOf(pt))
             map.Rectangle(r, index, -1)
-            setTrueText(CStr(index), pt, dstindex)
+            SetTrueText(CStr(index), pt, dstindex)
         Next
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -66,7 +66,7 @@ Public Class GuidedBP_HotPointsKNN : Inherits VB_Parent
             knn.queries.Add(New cv.Point2f(CSng(r.X + r.Width / 2), CSng(r.Y + r.Height / 2)))
         Next
 
-        If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        If task.FirstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
 
         knn.Run(empty)
 
@@ -79,7 +79,7 @@ Public Class GuidedBP_HotPointsKNN : Inherits VB_Parent
             If dist < r.Width / 2 And dist < r.Height / 2 Then
                 dst.Rectangle(r, cv.Scalar.White, task.lineWidth)
                 Dim pt = New cv.Point(r.X + r.Width, r.Y + r.Height)
-                setTrueText(CStr(index), pt, dstindex)
+                SetTrueText(CStr(index), pt, dstindex)
             End If
         Next
 
@@ -109,13 +109,13 @@ Public Class GuidedBP_HotPoints : Inherits VB_Parent
     Public histSide As New Projection_HistSide
     Public topRects As New List(Of cv.Rect)
     Public sideRects As New List(Of cv.Rect)
+    Dim floodRect As New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2)
+    Dim mask As New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U)
     Public Sub New()
         task.useXYRange = False
         desc = "Use floodfill to identify all the objects in both the top and side views."
     End Sub
     Private Function hotPoints(ByRef view As cv.Mat) As List(Of cv.Rect)
-        Static floodRect As New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2)
-        Static mask As New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U)
         Dim rect As cv.Rect
         Dim points = view.FindNonZero()
 
@@ -237,7 +237,7 @@ Public Class GuidedBP_Points : Inherits VB_Parent
 
         classCount = topRects.Count + sideRects.Count
 
-        If task.mouseClickFlag Then selectedPoint = task.clickPoint
+        If task.mouseClickFlag Then selectedPoint = task.ClickPoint
         If task.heartBeat Then labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
         If task.heartBeat Then labels(3) = CStr(sideRects.Count) + " objects were identified in the side view."
     End Sub
@@ -252,7 +252,7 @@ End Class
 Public Class GuidedBP_Lookup : Inherits VB_Parent
     Dim guided As New GuidedBP_Basics
     Public Sub New()
-        task.clickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
+        task.ClickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
         desc = "Given a point cloud pixel, look up which object it is in.  Click in the Depth RGB image to test."
     End Sub
     Public Sub RunVB(src As cv.Mat)

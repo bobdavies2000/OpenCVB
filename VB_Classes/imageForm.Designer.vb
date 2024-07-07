@@ -1,5 +1,5 @@
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class imageForm
+Partial Class ImageForm
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -35,13 +35,13 @@ Partial Class imageForm
         Me.imagePic.TabIndex = 0
         Me.imagePic.TabStop = False
         '
-        'imageForm
+        'ImageForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1440, 997)
         Me.Controls.Add(Me.imagePic)
-        Me.Name = "imageForm"
+        Me.Name = "ImageForm"
         Me.Text = "OptionsAlphaBlend"
         CType(Me.imagePic, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)

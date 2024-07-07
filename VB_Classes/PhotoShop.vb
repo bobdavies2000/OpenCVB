@@ -15,7 +15,7 @@ Public Class PhotoShop_Clahe : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         Static clipSlider = FindSlider("Clip Limit")
         Static gridSlider = FindSlider("Grid Size")
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src
         Dim claheObj = cv.Cv2.CreateCLAHE()
         claheObj.TilesGridSize() = New cv.Size(CInt(gridSlider.Value), CInt(gridSlider.Value))
@@ -33,7 +33,7 @@ Public Class PhotoShop_Hue : Inherits VB_Parent
         labels(3) = "Saturation"
         desc = "Show hue (Result1) and Saturation (Result2)."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim imghsv = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         cv.Cv2.CvtColor(src, imghsv, cv.ColorConversionCodes.RGB2HSV)
         Dim hsv_planes = imghsv.Split()
@@ -56,7 +56,7 @@ Public Class PhotoShop_AlphaBeta : Inherits VB_Parent
             sliders.setupTrackBar("Brightness Beta", -100, 100, 0)
         End If
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static alphaSlider = FindSlider("Alpha (contrast)")
         Static betaSlider = FindSlider("Brightness Beta")
         dst2 = src.ConvertScaleAbs(alphaSlider.Value / 500, betaSlider.Value)
@@ -72,13 +72,13 @@ End Class
 
 Public Class PhotoShop_Gamma : Inherits VB_Parent
     Dim lookupTable(255) As Byte
+    Dim lastGamma As Integer = -1
     Public Sub New()
         desc = "Use gamma with ConvertScaleAbs."
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Brightness Gamma correction", 0, 200, 100)
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static gammaSlider = FindSlider("Brightness Gamma correction")
-        Static lastGamma As Integer = -1
         If lastGamma <> gammaSlider.Value Then
             lastGamma = gammaSlider.Value
             For i = 0 To lookupTable.Length - 1
@@ -102,7 +102,7 @@ Public Class PhotoShop_WhiteBalance : Inherits VB_Parent
         labels = {"", "", "Image with white balance applied", "White pixels were altered from the original"}
         desc = "Automate getting the right white balance"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static thresholdSlider = FindSlider("White balance threshold X100")
         Dim thresholdVal As Single = thresholdSlider.Value / 100
 
@@ -139,7 +139,7 @@ Public Class PhotoShop_WhiteBalancePlot : Inherits VB_Parent
         labels = {"", "", "Image with auto white balance", "Histogram of pixel values"}
         desc = "Automate getting the right white balance"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static thresholdSlider = FindSlider("White balance threshold X100")
         Dim thresholdVal = thresholdSlider.Value / 100
 
@@ -168,7 +168,7 @@ Public Class PhotoShop_WhiteBalancePlot : Inherits VB_Parent
         Dim mask = sum32f.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(1)
 
         Dim mean = rgb32f.Mean(mask)
-        For i = 0 To rgb32f.Channels - 1
+        For i = 0 To rgb32f.Channels() - 1
             planes(i) *= maxVal / mean(i)
             planes(i) = planes(i).Threshold(255, 255, cv.ThresholdTypes.Trunc)
         Next
@@ -190,7 +190,7 @@ Public Class PhotoShop_ChangeMask : Inherits VB_Parent
         FindSlider("White balance threshold X100").Value = 3
         desc = "Create a mask for the changed pixels after white balance"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         whiteBal.Run(src)
         dst2 = whiteBal.dst2
         labels(2) = "White balanced image"
@@ -215,7 +215,7 @@ Public Class PhotoShop_PlotHist : Inherits VB_Parent
         hist2.plot.addLabels = False
         desc = "Plot the histogram of the before and after white balancing"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         hist1.Run(src)
         mat2to1.mat(0) = hist1.dst2
 
@@ -244,7 +244,7 @@ Public Class PhotoShop_Sepia : Inherits VB_Parent
     Public Sub New()
         desc = "Create a sepia image"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2RGB)
         Dim tMatrix = New cv.Mat(3, 3, cv.MatType.CV_64F, {{0.393, 0.769, 0.189}, {0.349, 0.686, 0.168}, {0.272, 0.534, 0.131}})
         dst2 = dst2.Transform(tMatrix).Threshold(255, 255, cv.ThresholdTypes.Trunc)
@@ -274,7 +274,7 @@ Public Class PhotoShop_Emboss : Inherits VB_Parent
             radio.check(0).Checked = True
         End If
 
-        gray128 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 128)
+        gray128 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 128)
         labels(3) = "Embossed output"
         desc = "Use the video stream to make it appear like an embossed paper image."
     End Sub
@@ -287,12 +287,12 @@ Public Class PhotoShop_Emboss : Inherits VB_Parent
         Next
         Return kernel
     End Function
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static sizeSlider = FindSlider("Emboss Kernel Size")
         Dim kernel = kernelGenerator(sizeSlider.Value)
 
         Dim direction As Integer
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For direction = 0 To frm.check.Count - 1
             If frm.check(direction).Checked Then Exit For
         Next
@@ -335,7 +335,7 @@ Public Class PhotoShop_EmbossAll : Inherits VB_Parent
         labels(3) = "bottom left, bottom right, top left, top right"
         desc = "Emboss using all the directions provided"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static threshSlider = FindSlider("Emboss threshold")
         Dim kernel = emboss.kernelGenerator(sizeSlider.Value)
 
@@ -396,7 +396,7 @@ Public Class PhotoShop_DuoTone : Inherits VB_Parent
         desc = "Create a DuoTone image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static duoCheck = findCheckBox("DuoTone Dark if checked, Light otherwise")
+        Static duoCheck = FindCheckBox("DuoTone Dark if checked, Light otherwise")
         options.RunVB()
         Static expSlider = FindSlider("DuoTone Exponent")
         Dim exp = 1 + expSlider.Value / 100
@@ -410,7 +410,7 @@ Public Class PhotoShop_DuoTone : Inherits VB_Parent
         Dim split = src.Split()
 
         Dim switch1 As Integer
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For switch1 = 0 To frm.check.Count - 1
             If frm.check(switch1).Checked Then Exit For
         Next
@@ -548,8 +548,8 @@ Public Class PhotoShop_Pencil_Manual : Inherits VB_Parent
         End If
         desc = "Break down the process of converting an image to a sketch"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayinv As New cv.Mat
         grayinv = Not src
         Static kernelSlider = FindSlider("Blur kernel size")
@@ -558,7 +558,7 @@ Public Class PhotoShop_Pencil_Manual : Inherits VB_Parent
         cv.Cv2.Divide(src, 255 - blur, dst2, 256)
 
         Dim index As Integer = -1
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For index = 0 To frm.check.Count - 1
             If radio.check(index).Checked Then Exit For
         Next

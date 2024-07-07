@@ -15,7 +15,7 @@ Public Class Sort_Basics : Inherits VB_Parent
             src = src.Reshape(1, src.Rows * src.Cols)
             options.sortOption = cv.SortFlags.EveryColumn + cv.SortFlags.Ascending
         End If
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src.Sort(options.sortOption)
         If options.radio4.Checked Or options.radio5.Checked Then dst2 = dst2.Reshape(1, dst0.Rows)
     End Sub
@@ -36,8 +36,8 @@ Public Class Sort_RectAndMask : Inherits VB_Parent
         If standaloneTest() Then task.drawRect = New cv.Rect(10, 10, 50, 5)
         desc = "Sort the grayscale image portion in a rect while allowing for a mask."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim tmpRect = If(rect = New cv.Rect, task.drawRect, rect)
         dst1 = src(tmpRect).Clone
         If mask IsNot Nothing Then
@@ -62,8 +62,8 @@ Public Class Sort_MLPrepTest_CPP : Inherits VB_Parent
         cPtr = Sort_MLPrepTest_Open()
         desc = "Prepare the grayscale image and row to predict depth"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         reduction.Run(src)
 
@@ -99,16 +99,16 @@ Public Class Sort_1Channel : Inherits VB_Parent
     Public rangeEnd As New List(Of Integer)
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        findRadio("Sort all pixels descending").Checked = True
+        FindRadio("Sort all pixels descending").Checked = True
         If standaloneTest() Then task.gOptions.setGridSize(10)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates"}
         desc = "Take some 1-channel input, sort it, and provide the list of unique elements"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static thresholdSlider = FindSlider("Threshold for sort input")
 
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
 
         dst2.SetTo(0)
@@ -156,9 +156,10 @@ End Class
 Public Class Sort_3Channel : Inherits VB_Parent
     Dim sort As New Sort_Basics
     Dim dups As New ML_RemoveDups_CPP
+    Dim bgra As cv.Mat
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        findRadio("Sort all pixels descending").Checked = True
+        FindRadio("Sort all pixels descending").Checked = True
         labels = {"", "The BGRA input to sort - shown here as 1-channel CV_32S format", "Output of sort - no duplicates", "Input before removing the dups - use slider to increase/decrease the amount of data"}
         desc = "Take some 3-channel input, convert it to BGRA, sort it as integers, and provide the list of unique elements"
     End Sub
@@ -167,11 +168,10 @@ Public Class Sort_3Channel : Inherits VB_Parent
         Dim inputMask = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standaloneTest() Then inputMask = inputMask.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
 
-        Static bgra As cv.Mat
         bgra = src.CvtColor(cv.ColorConversionCodes.BGR2BGRA)
         dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, bgra.Data)
 
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32S, 0)
         dst1.CopyTo(dst0, inputMask)
         sort.Run(dst0)
         dst2 = sort.dst2.Reshape(1, dst2.Rows)
@@ -230,17 +230,17 @@ Public Class Sort_Integer : Inherits VB_Parent
     Public data(dst2.Total - 1) As Integer
     Public vecList As New List(Of Integer)
     Public Sub New()
-        findRadio("Sort all pixels ascending").Checked = True
+        FindRadio("Sort all pixels ascending").Checked = True
         labels = {"", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates"}
         desc = "Take some 1-channel input, sort it, and provide the list of unique elements"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
             Dim split = src.Split()
-            Dim zero As New cv.Mat(split(0).Size, cv.MatType.CV_8U, 0)
+            Dim zero As New cv.Mat(split(0).Size(), cv.MatType.CV_8U, 0)
             cv.Cv2.Merge({split(0), split(1), split(2), zero}, src)
             Marshal.Copy(src.Data, data, 0, data.Length)
-            src = New cv.Mat(src.Size, cv.MatType.CV_32S, 0)
+            src = New cv.Mat(src.Size(), cv.MatType.CV_32S, 0)
             Marshal.Copy(data, 0, src.Data, data.Length)
         End If
 
@@ -263,6 +263,7 @@ End Class
 
 Public Class Sort_GrayScale1 : Inherits VB_Parent
     Dim sort As New Sort_Integer
+    Dim pixels(2)() As Byte
     Public Sub New()
         desc = "Sort the grayscale image but keep the 8uc3 pixels with each gray entry."
     End Sub
@@ -272,9 +273,8 @@ Public Class Sort_GrayScale1 : Inherits VB_Parent
         Marshal.Copy(dst1.Data, gray, 0, gray.Length)
 
         Dim split = src.Split()
-        Static pixels(2)() As Byte
         For i = 0 To 2
-            If task.firstPass Then ReDim pixels(i)(src.Total - 1)
+            If task.FirstPass Then ReDim pixels(i)(src.Total - 1)
             Marshal.Copy(split(i).Data, pixels(i), 0, pixels(i).Length)
         Next
 
@@ -303,14 +303,14 @@ End Class
 
 Public Class Sort_GrayScale : Inherits VB_Parent
     Dim plot As New Plot_Histogram
+    Dim pixels(2)() As Byte
     Public Sub New()
         desc = "Sort the grayscale image but keep the 8uc3 pixels with each gray entry."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim split = src.Split()
-        Static pixels(2)() As Byte
         For i = 0 To 2
-            If task.firstPass Then ReDim pixels(i)(src.Total - 1)
+            If task.FirstPass Then ReDim pixels(i)(src.Total - 1)
             Marshal.Copy(split(i).Data, pixels(i), 0, pixels(i).Length)
         Next
 

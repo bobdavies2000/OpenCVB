@@ -10,7 +10,7 @@ Public Class SemiGlobalMatching_CPP : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         If task.frameCount < 10 Then Exit Sub
         If task.cameraName = "Azure Kinect 4K" Then
-            setTrueText("The left and right views are identical with the Microsoft K4A 4 Azure camera.")
+            SetTrueText("The left and right views are identical with the Microsoft K4A 4 Azure camera.")
             Exit Sub
         End If
 
@@ -31,7 +31,7 @@ Public Class SemiGlobalMatching_CPP : Inherits VB_Parent
         'handleRight.Free()
 
         'Dim dst2 = New cv.Mat(task.leftView.Rows, task.leftView.Cols, cv.MatType.CV_8U, imagePtr)
-        setTrueText("This algorithm runs but always returns zero - a bug in the C++ algorithm as ported?" + vbCrLf +
+        SetTrueText("This algorithm runs but always returns zero - a bug in the C++ algorithm as ported?" + vbCrLf +
                     "Needs work but investing further is not needed - we have disparity from the device.", 3)
     End Sub
     Public Sub Close()

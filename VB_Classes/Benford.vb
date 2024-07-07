@@ -17,11 +17,13 @@ Public Class Benford_Basics : Inherits VB_Parent
     Dim plot As New Plot_Histogram
     Dim addW As New AddWeighted_Basics
     Dim use99 As Boolean
+    Dim weightSlider As Windows.Forms.TrackBar
     Public Sub New()
         For i = 1 To expectedDistribution.Count - 1
             expectedDistribution(i) = Math.Log10(1 + 1 / i) ' get the precise expected values.
         Next
 
+        weightSlider = FindSlider("Add Weighted %")
         labels(3) = "Actual distribution of input"
         desc = "Build the capability to perform a Benford analysis."
     End Sub
@@ -35,8 +37,8 @@ Public Class Benford_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If standaloneTest() Then
-            dst2 = If(src.Channels = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            src = New cv.Mat(dst2.Size, cv.MatType.CV_32F)
+            dst2 = If(src.Channels() = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2Gray))
+            src = New cv.Mat(dst2.Size(), cv.MatType.CV_32F)
             dst2.ConvertTo(src, cv.MatType.CV_32F)
         End If
 
@@ -82,7 +84,6 @@ Public Class Benford_Basics : Inherits VB_Parent
         addW.Run(dst3)
         dst2 = addW.dst2
 
-        Static weightSlider = FindSlider("Add Weighted %")
         Dim wt = weightSlider.value
         labels(2) = "AddWeighted: " + Format(wt, "%0.0") + " actual vs. " + Format(1 - wt, "%0.0") + " Benford distribution"
     End Sub
@@ -100,7 +101,7 @@ Public Class Benford_NormalizedImage : Inherits VB_Parent
         desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         Dim gray32f As New cv.Mat
         dst3.ConvertTo(gray32f, cv.MatType.CV_32F)
 
@@ -125,7 +126,7 @@ Public Class Benford_NormalizedImage99 : Inherits VB_Parent
         desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst3 = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         Dim gray32f As New cv.Mat
         dst3.ConvertTo(gray32f, cv.MatType.CV_32F)
 
@@ -248,7 +249,7 @@ Public Class Benford_Primes : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If task.optionsChanged Then sieve.Run(src) ' only need to compute this once...
-        setTrueText($"Primes found: {sieve.primes.Count}", 3)
+        SetTrueText($"Primes found: {sieve.primes.Count}", 3)
 
         Dim tmp = New cv.Mat(sieve.primes.Count, 1, cv.MatType.CV_32S, sieve.primes.ToArray())
         tmp.ConvertTo(tmp, cv.MatType.CV_32F)

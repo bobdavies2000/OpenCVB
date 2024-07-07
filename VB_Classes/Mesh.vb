@@ -33,8 +33,8 @@ Public Class Mesh_Basics : Inherits VB_Parent
 
         dst3.SetTo(0)
         For i = 0 To knn.queries.Count - 1
-            DrawCircle(dst2,knn.queries(i), task.dotSize, cv.Scalar.Red)
-            DrawCircle(dst3,knn.queries(i), task.dotSize, task.highlightColor)
+            DrawCircle(dst2,knn.queries(i), task.DotSize, cv.Scalar.Red)
+            DrawCircle(dst3,knn.queries(i), task.DotSize, task.HighlightColor)
         Next
         labels(2) = "Triangles built each input point and its " + CStr(nabeCount) + " nearest neighbors."
     End Sub
@@ -68,11 +68,11 @@ Public Class Mesh_Features : Inherits VB_Parent
         For Each pt In task.features
             Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
             If depth = 0 Then
-                Dim r = validateRect(New cv.Rect(pt.X - pad, pt.Y - pad, size, size))
+                Dim r = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, size, size))
                 depth = task.pcSplit(2)(r).Mean(task.depthMask(r))(0)
                 depthMiss += 1
             End If
-            ' setTrueText(Format(depth, fmt1) + "m ", pt)
+            ' SetTrueText(Format(depth, fmt1) + "m ", pt)
         Next
 
         labels(2) = mesh.labels(2)

@@ -8,10 +8,8 @@ Public Class ML_Basics : Inherits VB_Parent
         desc = "Predict depth from color to fill in the depth shadow areas"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static noDepthCount() As Integer
-        Static roiColor() As cv.Vec3b
-        ReDim noDepthCount(task.gridList.Count - 1)
-        ReDim roiColor(task.gridList.Count - 1)
+        Dim noDepthCount(task.gridList.Count - 1) As Integer
+        Dim roiColor(task.gridList.Count - 1) As cv.Vec3b
 
         dst2.SetTo(0)
         Parallel.For(0, task.gridList.Count,
@@ -42,7 +40,7 @@ Public Class ML_Basics : Inherits VB_Parent
         If mlInput.Count = 0 Then
             strOut = "No learning data was found or provided.  Exit..."
             dst3.SetTo(0)
-            setTrueText(strOut, 3)
+            SetTrueText(strOut, 3)
             Exit Sub
         End If
 
@@ -103,7 +101,7 @@ Module ML__Exports
         Dim learnData As New SortedList(Of cv.Vec3f, Single)(New CompareVec3f)
         Dim rng As New System.Random
         Dim holeCount = cv.Cv2.CountNonZero(holeMask)
-        If borderMask.Channels <> 1 Then borderMask = borderMask.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If borderMask.Channels() <> 1 Then borderMask = borderMask.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim borderCount = cv.Cv2.CountNonZero(borderMask)
         If holeCount > 0 And borderCount > minLearnCount Then
             Dim color32f As New cv.Mat
@@ -158,7 +156,7 @@ Public Class ML_FillRGBDepth_MT : Inherits VB_Parent
     Dim shadow As New Depth_Holes
     Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
-        task.gOptions.GridSize.Maximum = dst2.Cols / 2
+        task.gOptions.GridSlider.Maximum = dst2.Cols / 2
         task.gOptions.setGridSize(CInt(dst2.Cols / 2))
 
         labels = {"", "", "ML filled shadow", ""}
@@ -369,7 +367,7 @@ Public Class ML_Color2Depth : Inherits VB_Parent
         Next
 
         If mlInput.Count = 0 Then
-            setTrueText("No learning data was found or provided.  Exit...", 3)
+            SetTrueText("No learning data was found or provided.  Exit...", 3)
             Exit Sub
         End If
 
@@ -436,7 +434,7 @@ Public Class ML_ColorInTier2Depth : Inherits VB_Parent
         Next
 
         If mlInput.Count = 0 Then
-            setTrueText("No learning data was found or provided.  Exit...", 3)
+            SetTrueText("No learning data was found or provided.  Exit...", 3)
             Exit Sub
         End If
 

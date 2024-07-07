@@ -28,7 +28,7 @@ Public Class Vector_Magnitude : Inherits VB_Parent
         cv.Cv2.Absdiff(points1, points2, other_manhattan_distance)
         other_manhattan_distance = other_manhattan_distance.Col(0) + other_manhattan_distance.Col(1)
         strOut += "other_manhattan_distance = " + CStr(other_manhattan_distance.Get(Of Single)(0, 0))
-        setTrueText(strOut)
+        SetTrueText(strOut)
     End Sub
 End Class
 

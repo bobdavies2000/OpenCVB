@@ -17,7 +17,7 @@ Public Class Spectrum_Basics : Inherits VB_Parent
             strOut += gSpec.strOut
         End If
 
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -41,7 +41,7 @@ Public Class Spectrum_X : Inherits VB_Parent
             Dim ranges = options.buildDepthRanges(task.pcSplit(0)(task.rc.rect).Clone, " pointcloud X ")
             strOut = options.strOut
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -65,7 +65,7 @@ Public Class Spectrum_Y : Inherits VB_Parent
             Dim ranges = options.buildDepthRanges(task.pcSplit(1)(task.rc.rect).Clone, " pointcloud Y ")
             strOut = options.strOut
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -88,7 +88,7 @@ Public Class Spectrum_Z : Inherits VB_Parent
             Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rc.rect).Clone, " pointcloud Z ")
             strOut = options.strOut
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -121,7 +121,7 @@ Public Class Spectrum_Cloud : Inherits VB_Parent
             specZ.Run(src)
             strOut += specZ.strOut
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -150,7 +150,7 @@ Public Class Spectrum_GrayAndCloud : Inherits VB_Parent
             gSpec.Run(src)
             strOut += gSpec.strOut
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -184,7 +184,7 @@ Public Class Spectrum_RGB : Inherits VB_Parent
         gSpec.Run(split(2))
         If task.heartBeat Then strOut += gSpec.strOut
 
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -209,14 +209,14 @@ Public Class Spectrum_CellZoom : Inherits VB_Parent
 
         If task.heartBeat Then
             breakdown.Run(src)
-            setTrueText(breakdown.strOut, 1)
+            SetTrueText(breakdown.strOut, 1)
 
             proportion.Run(breakdown.dst3)
             dst3 = proportion.dst2
             strOut = breakdown.options.strOut
         End If
 
-        setTrueText(strOut, 1)
+        SetTrueText(strOut, 1)
     End Sub
 End Class
 
@@ -230,6 +230,7 @@ End Class
 Public Class Spectrum_Breakdown : Inherits VB_Parent
     Public options As New Options_Spectrum
     Public buildMaskOnly As Boolean
+    Dim proportion As New Resize_Proportional
     Public Sub New()
         desc = "Breakdown a cell if possible."
     End Sub
@@ -242,12 +243,12 @@ Public Class Spectrum_Breakdown : Inherits VB_Parent
         Dim rc = task.rc
         Dim ranges As List(Of rangeData), input As cv.Mat, typeSpec As String
         If rc.depthPixels / rc.pixels < 0.5 Then
-            input = New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
+            input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_8U, 0)
             src(rc.rect).CopyTo(input, rc.mask)
             input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             typeSpec = " grayscale "
         Else
-            input = New cv.Mat(rc.mask.Size, cv.MatType.CV_32F, 0)
+            input = New cv.Mat(rc.mask.Size(), cv.MatType.CV_32F, 0)
             task.pcSplit(2)(rc.rect).CopyTo(input, rc.mask)
             typeSpec = " pointcloud Z "
         End If
@@ -263,12 +264,12 @@ Public Class Spectrum_Breakdown : Inherits VB_Parent
             End If
         Next
 
-        Dim rangeClip As New cv.Mat(input.Size, cv.MatType.CV_8U, 0)
+        Dim rangeClip As New cv.Mat(input.Size(), cv.MatType.CV_8U, 0)
         If input.Type = cv.MatType.CV_8U Then
             rangeClip = input.InRange(maxRange.start, maxRange.ending)
             rangeClip = rangeClip.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         Else
-            rangeClip = New cv.Mat(rc.mask.Size, cv.MatType.CV_32F, 0)
+            rangeClip = New cv.Mat(rc.mask.Size(), cv.MatType.CV_32F, 0)
             input.CopyTo(rangeClip, rc.mask)
 
             rangeClip = rangeClip.InRange(maxRange.start / 100, maxRange.ending / 100)
@@ -281,7 +282,6 @@ Public Class Spectrum_Breakdown : Inherits VB_Parent
         End If
 
         If standaloneTest() Then
-            Static proportion As New Resize_Proportional
             proportion.Run(dst3)
             dst3 = proportion.dst2
         End If
@@ -364,6 +364,6 @@ Public Class Spectrum_Gray : Inherits VB_Parent
         If input.Type <> cv.MatType.CV_8U Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim ranges = options.buildColorRanges(input, typeSpec)
         strOut = options.strOut
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class

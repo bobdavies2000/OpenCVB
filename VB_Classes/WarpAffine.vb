@@ -42,7 +42,7 @@ Public Class WarpAffine_BasicsQT : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() And task.heartBeat Then
-            setTrueText("There is no output for the " + traceName + " algorithm.  Use WarpAffine_Basics to test.")
+            SetTrueText("There is no output for the " + traceName + " algorithm.  Use WarpAffine_Basics to test.")
             Exit Sub
         End If
         Dim rotationMatrix = cv.Cv2.GetRotationMatrix2D(rotateCenter, rotateAngle, 1.0)
@@ -152,13 +152,13 @@ End Class
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
 Public Class WarpAffine_3Points : Inherits VB_Parent
     Dim triangle As New Area_MinTriangle_CPP
+    Dim M As New cv.Mat
     Public Sub New()
         desc = "Use 3 non-colinear points to build an affine transform and apply it to the color image."
         labels(2) = "Triangles define the affine transform"
         labels(3) = "Image with affine transform applied"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static M As New cv.Mat
         If task.heartBeat Then
             Dim triangles(1) As cv.Mat
             triangle.Run(src)
@@ -188,9 +188,9 @@ Public Class WarpAffine_3Points : Inherits VB_Parent
             Next
 
             Dim corner = triangles(0).Get(Of cv.Point2f)(0)
-            DrawCircle(wideMat, corner, task.dotSize + 5, cv.Scalar.Yellow)
+            DrawCircle(wideMat, corner, task.DotSize + 5, cv.Scalar.Yellow)
             corner = New cv.Point2f(M.Get(Of Double)(0, 2) + src.Width, M.Get(Of Double)(1, 2))
-            DrawCircle(wideMat, corner, task.dotSize + 5, cv.Scalar.Yellow)
+            DrawCircle(wideMat, corner, task.DotSize + 5, cv.Scalar.Yellow)
 
             dst2 = wideMat(New cv.Rect(0, 0, src.Width, src.Height))
             dst3 = wideMat(New cv.Rect(src.Width, 0, src.Width, src.Height))
@@ -198,12 +198,12 @@ Public Class WarpAffine_3Points : Inherits VB_Parent
             Dim pt As cv.Point
             For i = 0 To srcPoints1.Count - 1
                 pt = New cv.Point(CInt(srcPoints1(i).X), CInt(srcPoints1(i).Y))
-                DrawCircle(dst2,pt, task.dotSize + 2, cv.Scalar.White)
+                DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.White)
                 pt = New cv.Point(CInt(srcPoints2(i).X), CInt(srcPoints2(i).Y))
-                DrawCircle(dst3,pt, task.dotSize + 2, cv.Scalar.White)
+                DrawCircle(dst3, pt, task.DotSize + 2, cv.Scalar.White)
             Next
         End If
-        setTrueText("M defined as: " + vbCrLf +
+        SetTrueText("M defined as: " + vbCrLf +
                       Format(M.Get(Of Double)(0, 0), fmt2) + vbTab +
                       Format(M.Get(Of Double)(0, 1), fmt2) + vbTab +
                       Format(M.Get(Of Double)(0, 2), fmt2) + vbCrLf +
@@ -221,12 +221,12 @@ End Class
 Public Class WarpAffine_4Points : Inherits VB_Parent
     Dim mRect As New Area_MinRect
     Dim options As New Options_MinArea
+    Dim M As New cv.Mat
     Public Sub New()
         desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
         labels(2) = "Color image with perspective transform applied"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static M As New cv.Mat
         If task.heartBeat Then
             options.RunVB()
             mRect.inputPoints = options.srcPoints
@@ -259,7 +259,7 @@ Public Class WarpAffine_4Points : Inherits VB_Parent
             Next
         End If
 
-        setTrueText("M defined as: " + vbCrLf +
+        SetTrueText("M defined as: " + vbCrLf +
                       Format(M.Get(Of Double)(0, 0), fmt2) + vbTab +
                       Format(M.Get(Of Double)(0, 1), fmt2) + vbTab +
                       Format(M.Get(Of Double)(0, 2), fmt2) + vbCrLf +
@@ -270,9 +270,9 @@ Public Class WarpAffine_4Points : Inherits VB_Parent
                       Format(M.Get(Of Double)(2, 1), fmt2) + vbTab +
                       Format(M.Get(Of Double)(2, 2), fmt2) + vbCrLf)
         Dim center As New cv.Point2f(M.Get(Of Double)(0, 2), M.Get(Of Double)(1, 2))
-        DrawCircle(dst2,center, task.dotSize + 5, cv.Scalar.Yellow)
+        DrawCircle(dst2,center, task.DotSize + 5, cv.Scalar.Yellow)
         center = New cv.Point2f(50, src.Height / 2)
-        DrawCircle(dst2,center, task.dotSize + 5, cv.Scalar.Yellow)
+        DrawCircle(dst2,center, task.DotSize + 5, cv.Scalar.Yellow)
     End Sub
 End Class
 
@@ -344,7 +344,7 @@ Public Class WarpAffine_RepeatedExample8 : Inherits VB_Parent
         desc = "Compare an image before and after repeated rotations."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Dim input = cv.Cv2.ImRead(task.homeDir + "Data/8.jpg", cv.ImreadModes.Color)
+        Dim input = cv.Cv2.ImRead(task.HomeDir + "Data/8.jpg", cv.ImreadModes.Color)
 
         Dim center = New cv.Point(input.Width / 2, input.Height / 2)
         Dim angle45 = 45, angle90 = 90, scale = 1.0, h = input.Height, w = input.Width

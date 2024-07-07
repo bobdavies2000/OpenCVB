@@ -2,8 +2,9 @@
 Imports System.IO
 Imports System.Numerics
 Imports OpenCvSharp.ML
-Imports System.Drawing
+Imports OpenCvSharp
 Imports System.Windows.Forms
+Imports System.Windows.Forms.VisualStyles
 
 Public Class Options_Annealing : Inherits VB_Parent
     Public cityCount As Integer = 25
@@ -25,10 +26,10 @@ Public Class Options_Annealing : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static travelCheck = findCheckBox("Restart Traveling Salesman")
-        Static circleCheck = findCheckBox("Circular pattern of cities (allows you to visually check if successful.)")
-        Static copyBestCheck = findCheckBox("Copy Best Intermediate solutions (top half) to Bottom Half")
-        Static circularCheck = findCheckBox("Circular pattern of cities (allows you to visually check if successful.)")
+        Static travelCheck = FindCheckBox("Restart Traveling Salesman")
+        Static circleCheck = FindCheckBox("Circular pattern of cities (allows you to visually check if successful.)")
+        Static copyBestCheck = FindCheckBox("Copy Best Intermediate solutions (top half) to Bottom Half")
+        Static circularCheck = FindCheckBox("Circular pattern of cities (allows you to visually check if successful.)")
         Static citySlider = FindSlider("Anneal Number of Cities")
         Static successSlider = FindSlider("Success = top X threads agree on energy level.")
 
@@ -90,7 +91,7 @@ Public Class Options_Contours2 : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         ApproximationMode = radioChoices(findRadioIndex(frm.check))
     End Sub
 End Class
@@ -100,8 +101,8 @@ End Class
 
 
 Public Class Options_Contours : Inherits VB_Parent
-    Public retrievalMode = cv.RetrievalModes.External
-    Public ApproximationMode = cv.ContourApproximationModes.ApproxTC89KCOS
+    Public retrievalMode As cv.RetrievalModes = cv.RetrievalModes.External
+    Public ApproximationMode As cv.ContourApproximationModes = cv.ContourApproximationModes.ApproxTC89KCOS
     Public epsilon As Single = 3 / 100
     Public minPixels As Integer = 30
     Public cmPerTier As Integer = 50
@@ -137,7 +138,7 @@ Public Class Options_Contours : Inherits VB_Parent
 
         ' epsilon = epsilonSlider.Value / 100
 
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 retrievalMode = Choose(i + 1, cv.RetrievalModes.CComp, cv.RetrievalModes.External,
@@ -172,8 +173,8 @@ Public Class Options_Draw : Inherits VB_Parent
     End Sub
     Public Sub RunVB()
         Static countSlider = FindSlider("DrawCount")
-        Static fillCheck = findCheckBox("Draw filled (unchecked draw an outline)")
-        Static rotateCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+        Static fillCheck = FindCheckBox("Draw filled (unchecked draw an outline)")
+        Static rotateCheck = FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
         drawCount = countSlider.Value
         drawFilled = If(fillCheck.checked, -1, 2)
         drawRotated = rotateCheck.checked
@@ -206,7 +207,7 @@ Public Class Options_Encode : Inherits VB_Parent
     Public Sub RunVB()
         Static qualitySlider = FindSlider("Encode Quality Level")
         Static scalingSlider = FindSlider("Encode Output Scaling")
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 encodeOption = Choose(i + 1, cv.ImwriteFlags.JpegChromaQuality, cv.ImwriteFlags.JpegLumaQuality, cv.ImwriteFlags.JpegOptimize, cv.ImwriteFlags.JpegProgressive,
@@ -266,7 +267,7 @@ Public Class Options_GeneticDrawing : Inherits VB_Parent
         Static genSlider = FindSlider("Number of Generations")
         Static stageSlider = FindSlider("Number of Stages")
         Static brushSlider = FindSlider("Brush size Percentage")
-        Static snapCheckbox = findCheckBox("Snapshot Video input to initialize genetic drawing")
+        Static snapCheckbox = FindCheckBox("Snapshot Video input to initialize genetic drawing")
         Static strokeSlider = FindSlider("Brushstroke count per generation")
 
         If snapCheckbox.checked Then snapCheckbox.checked = False
@@ -290,7 +291,7 @@ Public Class Options_MatchShapes : Inherits VB_Parent
     Public maxYdelta As Single = 0.05
     Public minSize As Single = dst2.Total / 100
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("I1 - Hu moments absolute sum of inverse differences")
             radio.addRadio("I2 - Hu moments absolute difference")
@@ -312,7 +313,7 @@ Public Class Options_MatchShapes : Inherits VB_Parent
         maxYdelta = ySlider.Value * dst2.Height / 100
         minSize = minSlider.value * dst2.Total / 100
 
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 matchOption = Choose(i + 1, cv.ShapeMatchModes.I1, cv.ShapeMatchModes.I2, cv.ShapeMatchModes.I3)
@@ -337,7 +338,7 @@ Public Class Options_Plane : Inherits VB_Parent
     Public use3Points As Boolean
     Public reuseRawDepthData As Boolean
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Use all points in the rc mask")
             radio.addRadio("Use only points in the contour of the rc mask")
@@ -354,14 +355,14 @@ Public Class Options_Plane : Inherits VB_Parent
         Static rmsSlider = FindSlider("RMS error threshold for flat X100")
         rmsThreshold = rmsSlider.Value / 100
 
-        Static maskRadio = findRadio("Use all points in the rc mask")
-        Static contourRadio = findRadio("Use only points in the contour of the rc mask")
-        Static simpleRadio = findRadio("Use 3 points in the contour of the rc mask")
+        Static maskRadio = FindRadio("Use all points in the rc mask")
+        Static contourRadio = FindRadio("Use only points in the contour of the rc mask")
+        Static simpleRadio = FindRadio("Use 3 points in the contour of the rc mask")
         useMaskPoints = maskRadio.checked
         useContourPoints = contourRadio.checked
         use3Points = simpleRadio.checked
 
-        Static depthRadio = findRadio("Don't replace the depth data with computed plane data")
+        Static depthRadio = FindRadio("Don't replace the depth data with computed plane data")
         reuseRawDepthData = depthRadio.checked
     End Sub
 
@@ -410,8 +411,8 @@ Public Class Options_Interpolate : Inherits VB_Parent
             sliders.setupTrackBar("Interpolation threshold", 1, 255, interpolationThreshold)
             sliders.setupTrackBar("Number of interplation pixels that changed", 0, 100, pixelCountThreshold)
         End If
-        findRadio("WarpFillOutliers").Enabled = False
-        findRadio("WarpInverseMap").Enabled = False
+        FindRadio("WarpFillOutliers").Enabled = False
+        FindRadio("WarpInverseMap").Enabled = False
     End Sub
     Public Sub RunVB()
         Static resizeSlider = FindSlider("Interpolation Resize %")
@@ -455,7 +456,7 @@ Public Class Options_Resize : Inherits VB_Parent
         Static offsetSlider = FindSlider("Offset from top left corner")
         resizePercent = percentSlider.Value / 100
         topLeftOffset = offsetSlider.Value
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 warpFlag = Choose(i + 1, cv.InterpolationFlags.Area, cv.InterpolationFlags.Cubic, cv.InterpolationFlags.Lanczos4,
@@ -532,7 +533,7 @@ Public Class Options_SuperRes : Inherits VB_Parent
     Public restartWithNewOptions As Boolean
     Dim radioChoices = {"farneback", "tvl1", "brox", "pyrlk"}
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("farneback")
             radio.addRadio("tvl1")
@@ -545,7 +546,7 @@ Public Class Options_SuperRes : Inherits VB_Parent
     End Sub
     Public Sub RunVB()
         Static iterSlider = FindSlider("SuperRes Iterations")
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         method = radioChoices(findRadioIndex(frm.check))
         Static lastMethod = method
         restartWithNewOptions = False
@@ -577,14 +578,14 @@ Public Class Options_SVM2 : Inherits VB_Parent
         desc = "SVM has many options - enough for 2 options classes."
     End Sub
     Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 SVMType = Choose(i + 1, cv.ML.SVM.Types.CSvc, cv.ML.SVM.Types.EpsSvr, cv.ML.SVM.Types.NuSvc, cv.ML.SVM.Types.NuSvr, cv.ML.SVM.Types.OneClass)
                 Exit For
             End If
         Next
-        If standaloneTest() Then setTrueText(traceName + " has no output when run standaloneTest()." + vbCrLf + "It is used to setup more SVM options.")
+        If standaloneTest() Then SetTrueText(traceName + " has no output when run standaloneTest()." + vbCrLf + "It is used to setup more SVM options.")
     End Sub
 End Class
 
@@ -648,7 +649,7 @@ Public Class Options_SVM : Inherits VB_Parent
 
     Public Sub RunVB()
         options2.RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         kernelType = radioChoices(findRadioIndex(frm.check))
 
         Static granSlider = FindSlider("Granularity")
@@ -703,8 +704,8 @@ Public Class Options_WarpModel : Inherits VB_Parent
         If check.Setup(traceName) Then check.addCheckBox("Use Gradient in WarpInput")
     End Sub
     Public Sub RunVB()
-        Static gradientCheck = findCheckBox("Use Gradient in WarpInput")
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static gradientCheck = FindCheckBox("Use Gradient in WarpInput")
+        Static frm = FindFrm(traceName + " Radio Buttons")
 
         If task.optionsChanged Then
             options2.RunVB()
@@ -717,7 +718,7 @@ Public Class Options_WarpModel : Inherits VB_Parent
             For i = 0 To frm.check.Count - 1
                 Dim nextRadio = frm.check(i)
                 If nextRadio.Checked Then
-                    Dim photo As New FileInfo(task.homeDir + "Data\Prokudin\" + nextRadio.Text)
+                    Dim photo As New FileInfo(task.HomeDir + "Data\Prokudin\" + nextRadio.Text)
                     pkImage = cv.Cv2.ImRead(photo.FullName, cv.ImreadModes.Grayscale)
                     Exit For
                 End If
@@ -748,7 +749,7 @@ Public Class Options_MinMaxNone : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static frm As OptionsRadioButtons = findfrm(traceName + " Radio Buttons")
+        Static frm As OptionsRadioButtons = FindFrm(traceName + " Radio Buttons")
         useMax = frm.check(0).Checked
         useMin = frm.check(1).Checked
         useNone = frm.check(2).Checked
@@ -962,8 +963,8 @@ Public Class Options_Eigen : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static recomputeBox = findCheckBox("Recompute with new random data")
-        Static highlightBox = findCheckBox("Highlight Line Data")
+        Static recomputeBox = FindCheckBox("Recompute with new random data")
+        Static highlightBox = FindCheckBox("Highlight Line Data")
         Static randomSlider = FindSlider("Random point count")
         Static linePairSlider = FindSlider("Random point count")
         Static noiseSlider = FindSlider("Line Noise")
@@ -1010,7 +1011,7 @@ Public Class Options_Fractal : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Mandelbrot iterations", 1, 50, iterations)
         If check.Setup(traceName) Then check.addCheckBox("Reset to original Mandelbrot")
-        resetCheck = findCheckBox("Reset to original Mandelbrot")
+        resetCheck = FindCheckBox("Reset to original Mandelbrot")
     End Sub
     Public Sub RunVB()
         Static iterSlider = FindSlider("Mandelbrot iterations")
@@ -1108,7 +1109,7 @@ Public Class Options_Pointilism : Inherits VB_Parent
     Public Sub RunVB()
         Static radiusSlider = FindSlider("Smoothing Radius")
         Static strokeSlider = FindSlider("Stroke Scale")
-        Static ellipStroke = findRadio("Use Elliptical stroke")
+        Static ellipStroke = FindRadio("Use Elliptical stroke")
         smoothingRadius = radiusSlider.Value * 2 + 1
         strokeSize = strokeSlider.Value
         useElliptical = ellipStroke.checked
@@ -1134,7 +1135,7 @@ Public Class Options_MotionBlur : Inherits VB_Parent
             check.addCheckBox("Redo motion blurred image")
             check.Box(0).Checked = True
         End If
-        redoCheckBox = findCheckBox("Redo motion blurred image")
+        redoCheckBox = FindCheckBox("Redo motion blurred image")
 
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Deblur Restore Vector", 1, 10, restoreLen)
@@ -1310,7 +1311,7 @@ Public Class Options_Dither : Inherits VB_Parent
         Static bppSlider = FindSlider("Bits per color plane (Nbpp only)")
         bppIndex = bppSlider.Value
 
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 radioIndex = i
@@ -1334,7 +1335,7 @@ End Class
 
 Public Class Options_SymmetricalShapes : Inherits VB_Parent
     Public rotateAngle As Single = 0
-    Public fillColor = cv.Scalar.Red
+    Public fillColor As cv.Scalar = cv.Scalar.Red
     Public numPoints As Integer
     Public nGenPer As Integer
     Public radius1 As Integer
@@ -1364,11 +1365,11 @@ Public Class Options_SymmetricalShapes : Inherits VB_Parent
         Static r1Slider = FindSlider("Radius 1")
         Static r2Slider = FindSlider("Radius 2")
         Static nGenPerSlider = FindSlider("nGenPer")
-        Static symCheck = findCheckBox("Symmetric Ripple")
-        Static fillCheck = findCheckBox("Filled Shapes")
-        Static regularCheck = findCheckBox("Only Regular Shapes")
-        Static reverseCheck = findCheckBox("Reverse In/Out")
-        Static demoCheck = findCheckBox("Use demo mode")
+        Static symCheck = FindCheckBox("Symmetric Ripple")
+        Static fillCheck = FindCheckBox("Filled Shapes")
+        Static regularCheck = FindCheckBox("Only Regular Shapes")
+        Static reverseCheck = FindCheckBox("Reverse In/Out")
+        Static demoCheck = FindCheckBox("Use demo mode")
 
         If demoCheck.Checked Then
             If task.frameCount Mod 30 = 0 Then
@@ -1403,7 +1404,7 @@ End Class
 
 
 Public Class Options_DrawArc : Inherits VB_Parent
-    Public saveMargin As Integer = task.workingRes.Width / 16
+    Public saveMargin As Integer = task.WorkingRes.Width / 16
     Public drawFull As Boolean
     Public drawFill As Boolean
     Public Sub New()
@@ -1420,8 +1421,8 @@ Public Class Options_DrawArc : Inherits VB_Parent
     End Sub
     Public Sub RunVB()
         Static marginSlider = FindSlider("Clearance from image edge (margin size)")
-        Static fillCheck = findRadio("Draw Filled Arc")
-        Static fullCheck = findRadio("Draw Full Ellipse")
+        Static fillCheck = FindRadio("Draw Filled Arc")
+        Static fullCheck = FindRadio("Draw Full Ellipse")
         saveMargin = marginSlider.Value / 16
         drawFull = fullCheck.checked
         drawFill = fillCheck.checked
@@ -1453,7 +1454,7 @@ Public Class Options_FilterNorm : Inherits VB_Parent
 
         Dim normType = cv.NormTypes.L1
         kernel = New cv.Mat(1, 21, cv.MatType.CV_32FC1, New Single() {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 normType = Choose(i + 1, cv.NormTypes.INF, cv.NormTypes.L1, cv.NormTypes.L2, cv.NormTypes.MinMax)
@@ -1490,7 +1491,7 @@ Public Class Options_SepFilter2D : Inherits VB_Parent
         Static xSlider = FindSlider("Kernel X size")
         Static ySlider = FindSlider("Kernel Y size")
         Static sigmaSlider = FindSlider("SepFilter2D Sigma X10")
-        Static diffCheckBox = findCheckBox("Show Difference SepFilter2D and Gaussian")
+        Static diffCheckBox = FindCheckBox("Show Difference SepFilter2D and Gaussian")
         xDim = xSlider.Value Or 1
         yDim = ySlider.Value Or 1
         sigma = sigmaSlider.Value / 10
@@ -1627,8 +1628,8 @@ Public Class Options_KLT : Inherits VB_Parent
         Static qualitySlider = FindSlider("KLT - qualityLevel")
         Static minSlider = FindSlider("KLT - minDistance")
         Static blockSlider = FindSlider("KLT - BlockSize")
-        Static nightCheck = findCheckBox("KLT - Night Mode")
-        Static deleteCheck = findCheckBox("KLT - delete all Points")
+        Static nightCheck = FindCheckBox("KLT - Night Mode")
+        Static deleteCheck = FindCheckBox("KLT - delete all Points")
 
         If deleteCheck.Checked Or task.heartBeat Then
             inputPoints = Nothing ' just delete all points and start again.
@@ -1676,8 +1677,8 @@ Public Class Options_Laplacian : Inherits VB_Parent
         Static scaleSlider = FindSlider("Laplacian Scale")
         Static deltaSlider = FindSlider("Laplacian Delta")
         Static thresholdSlider = FindSlider("Laplacian Threshold")
-        Static blurCheck = findRadio("Add Gaussian Blur")
-        Static boxCheck = findRadio("Add boxfilter Blur")
+        Static blurCheck = FindRadio("Add Gaussian Blur")
+        Static boxCheck = FindRadio("Add boxfilter Blur")
         Dim kernelSize As Integer = kernelSlider.Value Or 1
         scale = scaleSlider.Value / 100
         delta = deltaSlider.Value / 100
@@ -1739,7 +1740,7 @@ Public Class Options_OpticalFlow : Inherits VB_Parent
         polySigma = 1.5
         If polyN <= 5 Then polySigma = 1.1
 
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 OpticalFlowFlags = Choose(i + 1, cv.OpticalFlowFlags.FarnebackGaussian, cv.OpticalFlowFlags.LkGetMinEigenvals, cv.OpticalFlowFlags.None,
@@ -1771,7 +1772,7 @@ Public Class Options_OpticalFlowSparse : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 OpticalFlowFlag = Choose(i + 1, cv.OpticalFlowFlags.FarnebackGaussian, cv.OpticalFlowFlags.LkGetMinEigenvals, cv.OpticalFlowFlags.None,
@@ -1836,7 +1837,7 @@ Public Class Options_XPhoto : Inherits VB_Parent
             sliders.setupTrackBar("XPhoto Block Size", 1, 100, 3)
         End If
         If radio.Setup(traceName) Then
-            radio.addRadio("BGR2GRAY")
+            radio.addRadio("getGrayInput")
             radio.addRadio("BGR2HSV")
             radio.addRadio("BGR2YUV")
             radio.addRadio("BGR2XYZ")
@@ -1849,7 +1850,7 @@ Public Class Options_XPhoto : Inherits VB_Parent
         Static sizeSlider = FindSlider("XPhoto Block Size")
         dynamicRatio = ratioSlider.Value
         blockSize = sizeSlider.Value
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 colorCode = Choose(i + 1, cv.ColorConversionCodes.BGR2GRAY, cv.ColorConversionCodes.BGR2HSV, cv.ColorConversionCodes.BGR2YUV,
@@ -1876,7 +1877,7 @@ Public Class Options_InPaint : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static teleaRadio = findRadio("TELEA")
+        Static teleaRadio = FindRadio("TELEA")
         telea = teleaRadio.checked
     End Sub
 End Class
@@ -1896,13 +1897,13 @@ Public Class Options_RotatePoly : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Amount to rotate triangle", -180, 180, 10)
 
-        If findfrm(traceName + " CheckBoxes") Is Nothing Then
+        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Change center of rotation and triangle")
         End If
 
         angleSlider = FindSlider("Amount to rotate triangle")
-        changeCheck = findCheckBox("Change center of rotation and triangle")
+        changeCheck = FindCheckBox("Change center of rotation and triangle")
     End Sub
     Public Sub RunVB()
     End Sub
@@ -1954,7 +1955,7 @@ End Class
 Public Class Options_Homography : Inherits VB_Parent
     Public hMethod = cv.HomographyMethods.None
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("None")
             radio.addRadio("LMedS")
@@ -1971,7 +1972,7 @@ Public Class Options_Homography : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 hMethod = Choose(i + 1, cv.HomographyMethods.None, cv.HomographyMethods.LMedS, cv.HomographyMethods.Ransac,
@@ -1997,12 +1998,13 @@ End Class
 
 
 Public Class Options_Random : Inherits VB_Parent
-    Public countSlider As Windows.Forms.TrackBar
+    Public count As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Random Pixel Count", 1, dst2.Cols * dst2.Rows, 20)
-        countSlider = FindSlider("Random Pixel Count")
     End Sub
     Public Sub RunVB()
+        Static countSlider = FindSlider("Random Pixel Count")
+        count = countSlider.value
     End Sub
 End Class
 
@@ -2081,13 +2083,13 @@ End Class
 Public Class Options_ColorMatch : Inherits VB_Parent
     Public maxDistanceCheck As Boolean
     Public Sub New()
-        If findfrm(traceName + " CheckBoxes") Is Nothing Then
+        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Show Max Distance point")
         End If
     End Sub
     Public Sub RunVB()
-        Static maxCheck = findCheckBox("Show Max Distance point")
+        Static maxCheck = FindCheckBox("Show Max Distance point")
         maxDistanceCheck = maxCheck.checked
     End Sub
 End Class
@@ -2119,12 +2121,12 @@ Public Class Options_Sort : Inherits VB_Parent
             radio.check(0).Checked = True
         End If
 
-        radio0 = findRadio("EveryColumn, Ascending")
-        radio1 = findRadio("EveryColumn, Descending")
-        radio2 = findRadio("EveryRow, Ascending")
-        radio3 = findRadio("EveryRow, Descending")
-        radio4 = findRadio("Sort all pixels ascending")
-        radio5 = findRadio("Sort all pixels descending")
+        radio0 = FindRadio("EveryColumn, Ascending")
+        radio1 = FindRadio("EveryColumn, Descending")
+        radio2 = FindRadio("EveryRow, Ascending")
+        radio3 = FindRadio("EveryRow, Descending")
+        radio4 = FindRadio("Sort all pixels ascending")
+        radio5 = FindRadio("Sort all pixels descending")
     End Sub
     Public Sub RunVB()
         If radio1.Checked Then sortOption = cv.SortFlags.EveryColumn + cv.SortFlags.Descending
@@ -2141,7 +2143,7 @@ End Class
 Public Class Options_Distance : Inherits VB_Parent
     Public distanceType As cv.DistanceTypes
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("C")
             radio.addRadio("L1")
@@ -2150,9 +2152,9 @@ Public Class Options_Distance : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static cRadio = findRadio("C")
-        Static l1Radio = findRadio("L1")
-        Static l2Radio = findRadio("L2")
+        Static cRadio = FindRadio("C")
+        Static l1Radio = FindRadio("L1")
+        Static l2Radio = FindRadio("L2")
         If cRadio.Checked Then distanceType = cv.DistanceTypes.C
         If l1Radio.Checked Then distanceType = cv.DistanceTypes.L1
         If l2Radio.Checked Then distanceType = cv.DistanceTypes.L2
@@ -2249,7 +2251,7 @@ Public Class Options_HistCompare : Inherits VB_Parent
     Public compareMethod As cv.HistCompMethods = cv.HistCompMethods.Correl
     Public compareName As String
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Compare using Correlation")
             radio.addRadio("Compare using Chi-squared")
@@ -2262,13 +2264,13 @@ Public Class Options_HistCompare : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static correlationRadio = findRadio("Compare using Correlation")
-        Static chiRadio = findRadio("Compare using Chi-squared")
-        Static intersectionRadio = findRadio("Compare using intersection")
-        Static bhattRadio = findRadio("Compare using Bhattacharyya")
-        Static chiAltRadio = findRadio("Compare using Chi-squared Alt")
-        Static hellingerRadio = findRadio("Compare using Hellinger")
-        Static kldivRadio = findRadio("Compare using KLDiv")
+        Static correlationRadio = FindRadio("Compare using Correlation")
+        Static chiRadio = FindRadio("Compare using Chi-squared")
+        Static intersectionRadio = FindRadio("Compare using intersection")
+        Static bhattRadio = FindRadio("Compare using Bhattacharyya")
+        Static chiAltRadio = FindRadio("Compare using Chi-squared Alt")
+        Static hellingerRadio = FindRadio("Compare using Hellinger")
+        Static kldivRadio = FindRadio("Compare using KLDiv")
 
         If correlationRadio.checked Then compareMethod = cv.HistCompMethods.Correl
         If chiRadio.checked Then compareMethod = cv.HistCompMethods.Chisqr
@@ -2288,40 +2290,6 @@ Public Class Options_HistCompare : Inherits VB_Parent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class Options_BrightnessContrast : Inherits VB_Parent
-    Public alpha As Single
-    Public beta As Integer
-    Public Sub New()
-        Dim alphaDefault = 2000
-        Dim betaDefault = -100
-        If task.cameraName = "Oak-D camera" Then
-            alphaDefault = 500
-            betaDefault = 0
-        End If
-        If task.cameraName = "Azure Kinect 4K" Then
-            alphaDefault = 600
-            betaDefault = 0
-        End If
-        If task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then alphaDefault = 1500
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Alpha (contrast)", 0, 10000, alphaDefault)
-            sliders.setupTrackBar("Beta (brightness)", -127, 127, betaDefault)
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static betaSlider = FindSlider("Beta (brightness)")
-        Static alphaSlider = FindSlider("Alpha (contrast)")
-        alpha = alphaSlider.value / 500
-        beta = betaSlider.value
-    End Sub
-End Class
 
 
 
@@ -2429,7 +2397,7 @@ Public Class Options_OpenGL_Contours : Inherits VB_Parent
     Public depthPointStyle As Integer
     Public filterThreshold As Single = 0.3
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Unfiltered depth points")
             radio.addRadio("Filtered depth points")
@@ -2441,9 +2409,9 @@ Public Class Options_OpenGL_Contours : Inherits VB_Parent
     End Sub
     Public Sub RunVB()
         Static thresholdSlider = FindSlider("Filter threshold in meters X100")
-        Static unFilteredRadio = findRadio("Unfiltered depth points")
-        Static filteredRadio = findRadio("Filtered depth points")
-        Static flattenRadio = findRadio("Flatten depth points")
+        Static unFilteredRadio = FindRadio("Unfiltered depth points")
+        Static filteredRadio = FindRadio("Filtered depth points")
+        Static flattenRadio = FindRadio("Flatten depth points")
         filterThreshold = thresholdSlider.value / 100
 
         If unFilteredRadio.checked Then
@@ -2494,7 +2462,7 @@ End Class
 
 Public Class Options_Emax : Inherits VB_Parent
     Public predictionStepSize As Integer = 5
-    Public consistentcolors As Integer
+    Public consistentcolors As Boolean
     Public covarianceType = cv.EMTypes.CovMatDefault
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("EMax Prediction Step Size", 1, 20, predictionStepSize)
@@ -2506,19 +2474,19 @@ Public Class Options_Emax : Inherits VB_Parent
             radio.check(0).Checked = True
         End If
 
-        If findfrm(traceName + " CheckBoxes") Is Nothing Then
+        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Use palette to keep colors consistent")
             check.Box(0).Checked = True
         End If
     End Sub
     Public Sub RunVB()
-        Static colorCheck = findCheckBox("Use palette to keep colors consistent")
+        Static colorCheck = FindCheckBox("Use palette to keep colors consistent")
         Static stepSlider = FindSlider("EMax Prediction Step Size")
         predictionStepSize = stepSlider.value
         covarianceType = cv.EMTypes.CovMatDefault
         consistentcolors = colorCheck.checked
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked = True Then
                 covarianceType = Choose(i + 1, cv.EMTypes.CovMatSpherical, cv.EMTypes.CovMatDiagonal, cv.EMTypes.CovMatGeneric)
@@ -2555,10 +2523,10 @@ Public Class Options_Intercepts : Inherits VB_Parent
         Static interceptSlider = FindSlider("Intercept width range in pixels")
         interceptRange = interceptSlider.Value
 
-        Static topRadio = findRadio("Show Top intercepts")
-        Static botRadio = findRadio("Show Bottom intercepts")
-        Static leftRadio = findRadio("Show Left intercepts")
-        Static rightRadio = findRadio("Show Right intercepts")
+        Static topRadio = FindRadio("Show Top intercepts")
+        Static botRadio = FindRadio("Show Bottom intercepts")
+        Static leftRadio = FindRadio("Show Left intercepts")
+        Static rightRadio = FindRadio("Show Right intercepts")
 
         For selectedIntercept = 0 To 3
             mouseMovePoint = Choose(selectedIntercept + 1, task.mouseMovePoint.X, task.mouseMovePoint.X, task.mouseMovePoint.Y, task.mouseMovePoint.Y)
@@ -2576,7 +2544,7 @@ Public Class Options_PlaneEstimation : Inherits VB_Parent
     Public useDiagonalLines As Boolean
     Public useContour_SidePoints As Boolean
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Use diagonal lines")
             radio.addRadio("Use horizontal And vertical lines")
@@ -2585,8 +2553,8 @@ Public Class Options_PlaneEstimation : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static diagonalRadio = findRadio("Use diagonal lines")
-        Static sidePointsRadio = findRadio("Use Contour_SidePoints to find the line pair")
+        Static diagonalRadio = FindRadio("Use diagonal lines")
+        Static sidePointsRadio = FindRadio("Use Contour_SidePoints to find the line pair")
         useDiagonalLines = diagonalRadio.checked
         useContour_SidePoints = sidePointsRadio.checked
     End Sub
@@ -2617,7 +2585,7 @@ Public Class Options_ForeGround : Inherits VB_Parent
         maxForegroundDepthInMeters = depthSlider.value / 1000
         minSizeContour = minSizeSlider.value
         numberOfRegions = regionSlider.value
-        depthPerRegion = task.maxZmeters / numberOfRegions
+        depthPerRegion = task.MaxZmeters / numberOfRegions
     End Sub
 End Class
 
@@ -2635,15 +2603,15 @@ Public Class Options_Flood : Inherits VB_Parent
             sliders.setupTrackBar("Min Pixels", 1, 2000, 30)
             sliders.setupTrackBar("Step Size", 1, dst2.Cols / 2, stepSize)
         End If
-        If findfrm(traceName + " CheckBoxes") Is Nothing Then
+        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Use floating range")
             check.addCheckBox("Use connectivity 8 (unchecked in connectivity 4)")
         End If
     End Sub
     Public Sub RunVB()
-        Static floatingCheck = findCheckBox("Use floating range")
-        Static connectCheck = findCheckBox("Use connectivity 8 (unchecked in connectivity 4)")
+        Static floatingCheck = FindCheckBox("Use floating range")
+        Static connectCheck = FindCheckBox("Use connectivity 8 (unchecked in connectivity 4)")
         Static stepSlider = FindSlider("Step Size")
         Static minSlider = FindSlider("Min Pixels")
 
@@ -2661,7 +2629,7 @@ End Class
 Public Class Options_ShapeDetect : Inherits VB_Parent
     Public fileName As String
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("coins.jpg")
             radio.addRadio("demo.jpg")
@@ -2671,7 +2639,7 @@ Public Class Options_ShapeDetect : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         fileName = findRadioText(frm.check)
     End Sub
 End Class
@@ -2708,49 +2676,13 @@ End Class
 
 
 
-
-
-
-Public Class Options_Harris : Inherits VB_Parent
-    Public threshold As Single = 1 / 10000
-    Public neighborhood As Integer = 3
-    Public aperture As Integer = 21
-    Public harrisParm As Single = 1
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Harris Threshold", 1, 100, threshold * 10000)
-            sliders.setupTrackBar("Harris Neighborhood", 1, 41, neighborhood)
-            sliders.setupTrackBar("Harris aperture", 1, 31, aperture)
-            sliders.setupTrackBar("Harris Parameter", 1, 100, harrisParm)
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static thresholdslider = FindSlider("Harris Threshold")
-        Static neighborSlider = FindSlider("Harris Neighborhood")
-        Static apertureSlider = FindSlider("Harris aperture")
-        Static parmSlider = FindSlider("Harris Parameter")
-
-        threshold = thresholdslider.Value / 10000
-        neighborhood = neighborSlider.Value Or 1
-        aperture = apertureSlider.Value Or 1
-        harrisParm = parmSlider.Value / 100
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Options_Wavelet : Inherits VB_Parent
     Public useHaar As Boolean
     Public iterations As Integer = 3
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Wavelet Iterations", 1, 5, iterations)
 
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Haar")
             radio.addRadio("CDF")
@@ -2759,7 +2691,7 @@ Public Class Options_Wavelet : Inherits VB_Parent
     End Sub
     Public Sub RunVB()
         Static iterSlider = FindSlider("Wavelet Iterations")
-        Static haarRadio = findRadio("Haar")
+        Static haarRadio = FindRadio("Haar")
         useHaar = haarRadio.checked
         iterations = iterSlider.value
     End Sub
@@ -2802,6 +2734,41 @@ End Class
 
 
 
+Public Class Options_SURF : Inherits VB_Parent
+    Public hessianThreshold As Integer
+    Public useBFMatcher As Boolean
+    Public verticalRange As Integer
+    Public pointCount As Integer = 200
+    Public Sub New()
+        If radio.Setup(traceName) Then
+            radio.addRadio("Use BF Matcher")
+            radio.addRadio("Use Flann Matcher")
+            radio.check(0).Checked = True
+        End If
+
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Hessian threshold", 1, 5000, 2000)
+            sliders.setupTrackBar("Surf Vertical Range to Search", 0, 50, 1)
+            sliders.setupTrackBar("Points to Match", 1, 1000, pointCount)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static thresholdSlider = FindSlider("Hessian threshold")
+        Static BFRadio = FindRadio("Use BF Matcher")
+        Static rangeSlider = FindSlider("Surf Vertical Range to Search")
+        Static countSlider = FindSlider("Points to Match")
+
+        useBFMatcher = BFRadio.checked
+        hessianThreshold = thresholdSlider.value
+        verticalRange = rangeSlider.value
+        pointCount = countSlider.value
+    End Sub
+End Class
+
+
+
+
+
 
 
 
@@ -2822,57 +2789,13 @@ Public Class Options_Sift : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static bfRadio = findRadio("Use BF Matcher")
+        Static bfRadio = FindRadio("Use BF Matcher")
         Static countSlider = FindSlider("Points to Match")
         Static stepSlider = FindSlider("Sift StepSize")
 
         useBFMatcher = bfRadio.checked
         pointCount = countSlider.value
         stepSize = stepSlider.value
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Options_Erode : Inherits VB_Parent
-    Public kernelSize As Integer = 3
-    Public iterations As Integer = 1
-    Public morphShape As cv.MorphShapes
-    Public element As cv.Mat
-    Public noshape As Boolean
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Erode Kernel Size", 1, 32, kernelSize)
-            sliders.setupTrackBar("Erode Iterations", 0, 32, iterations)
-        End If
-
-        If radio.Setup(traceName) Then
-            radio.addRadio("Erode shape: Cross")
-            radio.addRadio("Erode shape: Ellipse")
-            radio.addRadio("Erode shape: Rect")
-            radio.addRadio("Erode shape: None")
-            radio.check(0).Checked = True
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static ellipseRadio = findRadio("Erode shape: Ellipse")
-        Static rectRadio = findRadio("Erode shape: Rect")
-        Static iterSlider = FindSlider("Erode Iterations")
-        Static kernelSlider = FindSlider("Erode Kernel Size")
-        Static noShapeRadio = findRadio("Erode shape: None")
-        iterations = iterSlider.Value
-        kernelSize = kernelSlider.Value Or 1
-
-        morphShape = cv.MorphShapes.Cross
-        If ellipseRadio.Checked Then morphShape = cv.MorphShapes.Ellipse
-        If rectRadio.Checked Then morphShape = cv.MorphShapes.Rect
-        element = cv.Cv2.GetStructuringElement(morphShape, New cv.Size(kernelSize, kernelSize))
-        noshape = noShapeRadio.checked
     End Sub
 End Class
 
@@ -2903,11 +2826,11 @@ Public Class Options_Dilate : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static ellipseRadio = findRadio("Dilate shape: Ellipse")
-        Static rectRadio = findRadio("Dilate shape: Rect")
+        Static ellipseRadio = FindRadio("Dilate shape: Ellipse")
+        Static rectRadio = FindRadio("Dilate shape: Rect")
         Static iterSlider = FindSlider("Dilate Iterations")
         Static kernelSlider = FindSlider("Dilate Kernel Size")
-        Static noShapeRadio = findRadio("Dilate shape: None")
+        Static noShapeRadio = FindRadio("Dilate shape: None")
         iterations = iterSlider.Value
         kernelSize = kernelSlider.Value Or 1
 
@@ -2933,7 +2856,7 @@ Public Class Options_KMeans : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("KMeans k", 2, 32, kMeansK)
 
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Use PpCenters")
             radio.addRadio("Use RandomCenters")
@@ -2945,7 +2868,7 @@ Public Class Options_KMeans : Inherits VB_Parent
         FindSlider("KMeans k").Value = k
     End Sub
     Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         Static kSlider = FindSlider("KMeans k")
         Select Case findRadioText(frm.check)
             Case "Use PpCenters"
@@ -3001,77 +2924,6 @@ End Class
 
 
 
-Public Class Options_ColorFormat : Inherits VB_Parent
-    Public colorFormat As String
-    Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("BGR")
-            radio.addRadio("LAB")
-            radio.addRadio("HSV")
-            radio.addRadio("XYZ")
-            radio.addRadio("HLS")
-            radio.addRadio("YUV")
-            radio.addRadio("YCrCb")
-            radio.check(0).Checked = True
-        End If
-    End Sub
-    Public Sub RunVB()
-        Dim src = task.color
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then colorFormat = radio.check(i).Text
-        Next
-
-        If colorFormat Is Nothing Then colorFormat = "BGR" ' multiple invocations cause this to be necessary but how to fix?
-        Select Case colorFormat
-            Case "BGR"
-                dst2 = src
-            Case "LAB"
-                dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2Lab)
-            Case "HSV"
-                dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-            Case "XYZ"
-                dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2XYZ)
-            Case "HLS"
-                dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2HLS)
-            Case "YUV"
-                dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2YUV)
-            Case "YCrCb"
-                dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2YCrCb)
-        End Select
-    End Sub
-End Class
-
-
-
-
-
-Public Class Options_CComp : Inherits VB_Parent
-    Public light As Integer = 127
-    Public dark As Integer = 50
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Threshold for lighter input", 1, 255, light)
-            sliders.setupTrackBar("Threshold for darker input", 1, 255, dark)
-        End If
-
-        desc = "Options for CComp_Both"
-    End Sub
-    Public Sub RunVB()
-        Static lightSlider = FindSlider("Threshold for lighter input")
-        Static darkSlider = FindSlider("Threshold for darker input")
-        light = lightSlider.value
-        dark = darkSlider.value
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Options_WarpModel2 : Inherits VB_Parent
     Public warpMode As Integer
     Public useWarpAffine As Boolean
@@ -3089,11 +2941,11 @@ Public Class Options_WarpModel2 : Inherits VB_Parent
     End Sub
     Public Sub RunVB()
         If standaloneTest() Then
-            setTrueText("Options for the WarpModel algorithms.  No output when run standaloneTest().")
+            SetTrueText("Options for the WarpModel algorithms.  No output when run standaloneTest().")
             Exit Sub
         End If
 
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then warpMode = i
         Next
@@ -3103,53 +2955,6 @@ Public Class Options_WarpModel2 : Inherits VB_Parent
 End Class
 
 
-
-
-
-
-
-Public Class Options_DNN : Inherits VB_Parent
-    Public superResModelFileName As String
-    Public shortModelName As String
-    Public superResMultiplier As Integer
-    Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("EDSR_x2.pb")
-            radio.addRadio("EDSR_x3.pb")
-            radio.addRadio("EDSR_x4.pb")
-            radio.addRadio("ESPCN_x2.pb")
-            radio.addRadio("ESPCN_x3.pb")
-            radio.addRadio("ESPCN_x4.pb")
-            radio.addRadio("FSRCNN_X2.pb")
-            radio.addRadio("FSRCNN_X3.pb")
-            radio.addRadio("FSRCNN_X4.pb")
-            radio.addRadio("LapSRN_x2.pb")
-            radio.addRadio("LapSRN_x4.pb")
-            radio.addRadio("LapSRN_x8.pb")
-            radio.check(8).Checked = True
-        End If
-        desc = "Options for the different SuperRes models and multipliers."
-    End Sub
-    Public Sub RunVB()
-        superResModelFileName = task.homeDir + "Data/DNN_SuperResModels/"
-        Static frm = findfrm(traceName + " Radio Buttons")
-        Dim index = findRadioIndex(frm.check)
-        If radio.check(index).Checked Then
-            superResModelFileName += radio.check(index).Text
-            Dim split = radio.check(index).Text.Split("_")
-            shortModelName = LCase(split(0))
-            superResMultiplier = CInt(split(1).Substring(1, 1))
-            Dim testFile As New FileInfo(superResModelFileName)
-            If testFile.Exists = False Then
-                MsgBox("The " + radio.check(index).Text + " super res model file is missing!")
-                superResModelFileName = ""
-            End If
-        End If
-        setTrueText("Current Options: " + shortModelName + " at resolution " + CStr(superResMultiplier) + vbCrLf +
-                    superResModelFileName + " is present and will be used.")
-    End Sub
-End Class
 
 
 
@@ -3172,7 +2977,7 @@ Public Class Options_Photoshop : Inherits VB_Parent
         desc = "More options for the DuoTone image"
     End Sub
     Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For switch = 0 To frm.check.Count - 1
             If frm.check(switch).Checked Then Exit For
         Next
@@ -3193,14 +2998,14 @@ Public Class Options_Gif : Inherits VB_Parent
     Public OpenCVBwindow As Windows.Forms.RadioButton
     Public OpenGLwindow As Windows.Forms.RadioButton
     Public Sub New()
-        If findfrm(traceName + " CheckBoxes") Is Nothing Then
+        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Check this box when Gif_Basics dst2 contains the desired snapshot.")
             check.addCheckBox("Build GIF file in <OpenCVB Home Directory>\Temp\myGIF.gif")
             check.addCheckBox("Restart - clear all previous images.")
         End If
 
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Capture dst0")
             radio.addRadio("Capture dst1")
@@ -3210,20 +3015,20 @@ Public Class Options_Gif : Inherits VB_Parent
             radio.addRadio("Capture OpenGL window")
             radio.check(4).Checked = True
         End If
-        buildCheck = findCheckBox("Build GIF file in <OpenCVB Home Directory>\Temp\myGIF.gif")
-        restartCheck = findCheckBox("Restart - clear all previous images.")
+        buildCheck = FindCheckBox("Build GIF file in <OpenCVB Home Directory>\Temp\myGIF.gif")
+        restartCheck = FindCheckBox("Restart - clear all previous images.")
 
-        dst0Radio = findRadio("Capture dst0")
-        dst1Radio = findRadio("Capture dst1")
-        dst2Radio = findRadio("Capture dst2")
-        dst3Radio = findRadio("Capture dst3")
-        OpenCVBwindow = findRadio("Capture entire OpenCVB window")
-        OpenGLwindow = findRadio("Capture OpenGL window")
+        dst0Radio = FindRadio("Capture dst0")
+        dst1Radio = FindRadio("Capture dst1")
+        dst2Radio = FindRadio("Capture dst2")
+        dst3Radio = FindRadio("Capture dst3")
+        OpenCVBwindow = FindRadio("Capture entire OpenCVB window")
+        OpenGLwindow = FindRadio("Capture OpenGL window")
     End Sub
     Public Sub RunVB()
-        Static frmCheck = findfrm(traceName + " CheckBoxes")
-        Static frmRadio = findfrm(traceName + " Radio Buttons")
-        If task.firstPass Then
+        Static frmCheck = FindFrm(traceName + " CheckBoxes")
+        Static frmRadio = FindFrm(traceName + " Radio Buttons")
+        If task.FirstPass Then
             Static myFrameCount As Integer = 0
             myFrameCount += 1
             frmCheck.Left = task.gOptions.Width / 2
@@ -3301,7 +3106,7 @@ Public Class Options_FeatureMatch : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 matchOption = Choose(i + 1, cv.TemplateMatchModes.CCoeff, cv.TemplateMatchModes.CCoeffNormed, cv.TemplateMatchModes.CCorr,
@@ -3363,6 +3168,8 @@ Public Class Options_Features : Inherits VB_Parent
         Static cellSlider = FindSlider("MatchTemplate Cell Size")
         Static resyncSlider = FindSlider("Threshold Percent for Resync")
         Static agastslider = FindSlider("Agast Threshold")
+        Static FASTslider = FindSlider("FAST Threshold")
+        task.FASTthreshold = FASTslider.value
 
         blockSize = blocksizeSlider.value Or 1
         k = kSlider.value / 1000
@@ -3392,7 +3199,7 @@ Public Class Options_HeatMap : Inherits VB_Parent
     Public topView As Boolean = True
     Public sideView As Boolean
     Public Sub New()
-        If findfrm(traceName + " CheckBox Options") Is Nothing Then
+        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Top View (Unchecked Side View)")
             check.addCheckBox("Slice Vertically (Unchecked Slice Horizontally)")
@@ -3404,7 +3211,7 @@ Public Class Options_HeatMap : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static topCheck = findCheckBox("Top View (Unchecked Side View)")
+        Static topCheck = FindCheckBox("Top View (Unchecked Side View)")
         Static redSlider = FindSlider("Threshold for Red channel")
 
         redThreshold = redSlider.value
@@ -3422,7 +3229,7 @@ End Class
 
 Public Class Options_Boundary : Inherits VB_Parent
     Public desiredBoundaries As Integer = 15
-    Public peakDistance As Integer = task.workingRes.Width / 20
+    Public peakDistance As Integer = task.WorkingRes.Width / 20
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Desired boundary count", 2, 100, desiredBoundaries)
@@ -3448,14 +3255,14 @@ End Class
 Public Class Options_Denoise : Inherits VB_Parent
     Public removeSinglePixels As Boolean
     Public Sub New()
-        If findfrm(traceName + " CheckBox Options") Is Nothing Then
+        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Remove single pixels")
             check.Box(0).Checked = True
         End If
     End Sub
     Public Sub RunVB()
-        Static singleCheck = findCheckBox("Remove single pixels")
+        Static singleCheck = FindCheckBox("Remove single pixels")
         removeSinglePixels = singleCheck.checked
     End Sub
 End Class
@@ -3482,7 +3289,7 @@ Public Class Options_MSER : Inherits VB_Parent
     Public pass2Setting As Boolean
     Public graySetting As Boolean
     Public Sub New()
-        Select Case task.workingRes.Width
+        Select Case task.WorkingRes.Width
             Case 1920
                 maxArea = 350000
                 minArea = 6000
@@ -3549,8 +3356,8 @@ Public Class Options_MSER : Inherits VB_Parent
         minMargin = marginSlider.Value / 1000
         edgeBlurSize = blurSlider.Value Or 1
 
-        Static pass2Check = findCheckBox("Pass2Only")
-        Static grayCheck = findCheckBox("Use grayscale input")
+        Static pass2Check = FindCheckBox("Pass2Only")
+        Static grayCheck = FindCheckBox("Use grayscale input")
         pass2Setting = pass2Check.checked
         graySetting = grayCheck.checked
     End Sub
@@ -3726,7 +3533,7 @@ Public Class Options_Spectrum : Inherits VB_Parent
         Return ranges
     End Function
     Public Sub RunVB()
-        Static frmSliders = findfrm("Options_Spectrum Sliders")
+        Static frmSliders = FindFrm("Options_Spectrum Sliders")
         Static gapDSlider = FindSlider("Gap in depth spectrum (cm's)")
         Static gapGSlider = FindSlider("Gap in gray spectrum")
         Static countSlider = FindSlider("Sample count threshold")
@@ -3734,7 +3541,7 @@ Public Class Options_Spectrum : Inherits VB_Parent
         gapGray = gapGSlider.value
         sampleThreshold = countSlider.value
 
-        If task.firstPass Then
+        If task.FirstPass Then
             frmSliders.Left = task.gOptions.Width / 2
             frmSliders.top = task.gOptions.Height / 2
         End If
@@ -3762,7 +3569,6 @@ Public Class Options_HistXD : Inherits VB_Parent
         Static topSlider = FindSlider("Min top bin samples")
         Static sideSlider = FindSlider("Min side bin samples")
         Static bothSlider = FindSlider("Min samples per bin")
-        Static bins3DSlider = FindSlider("3D Histogram Bins")
         topThreshold = topSlider.value
         sideThreshold = sideSlider.value
         threshold3D = bothSlider.value
@@ -3779,11 +3585,11 @@ Public Class Options_Complexity : Inherits VB_Parent
     Public filenames As List(Of String)
     Public plotColor As cv.Scalar = cv.Scalar.Yellow
     Public Sub New()
-        Dim fnames = Directory.GetFiles(task.homeDir + "Complexity")
+        Dim fnames = Directory.GetFiles(task.HomeDir + "Complexity")
         filenames = fnames.ToList
-        Dim latestFile = Directory.GetFiles(task.homeDir + "Complexity").OrderByDescending(
+        Dim latestFile = Directory.GetFiles(task.HomeDir + "Complexity").OrderByDescending(
                      Function(f) New FileInfo(f).LastWriteTime).First()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
 
             Dim saveIndex As Integer
@@ -3796,7 +3602,7 @@ Public Class Options_Complexity : Inherits VB_Parent
         End If
     End Sub
     Public Function setPlotColor() As cv.Scalar
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         Dim index As Integer
         For index = 0 To filenames.Count - 1
             If filename.FullName = filenames(index) Then Exit For
@@ -3805,15 +3611,15 @@ Public Class Options_Complexity : Inherits VB_Parent
         Return plotColor
     End Function
     Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.count - 1
             If frm.check(i).checked Then
-                filename = New FileInfo(task.homeDir + "Complexity/" + frm.check(i).text)
+                filename = New FileInfo(task.HomeDir + "Complexity/" + frm.check(i).text)
                 plotColor = Choose((i + 1) Mod 4, cv.Scalar.White, cv.Scalar.Red, cv.Scalar.Green, cv.Scalar.Yellow)
                 Exit For
             End If
         Next
-        If task.firstPass Then
+        If task.FirstPass Then
             frm.Left = task.gOptions.Width / 2
             frm.top = task.gOptions.Height / 2
         End If
@@ -3828,8 +3634,6 @@ End Class
 
 
 Public Class Options_Edges_All : Inherits VB_Parent
-    Public edges As Object
-    Public saveSelection As String
     Dim canny As New Edge_Canny
     Dim scharr As New Edge_Scharr
     Dim binRed As New Edge_BinarizedReduction
@@ -3839,8 +3643,9 @@ Public Class Options_Edges_All : Inherits VB_Parent
     Dim Laplacian As New Edge_Laplacian
     Dim resizeAdd As New Edge_ResizeAdd
     Dim regions As New Edge_Regions
+    Public edgeSelection As String = ""
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Canny")
             radio.addRadio("Scharr")
@@ -3854,43 +3659,50 @@ Public Class Options_Edges_All : Inherits VB_Parent
             radio.check(0).Checked = True
         End If
     End Sub
+    Public Sub RunEdges(src As cv.Mat)
+        Select Case edgeSelection
+            Case "Canny"
+                canny.Run(src)
+                dst2 = canny.dst2
+            Case "Scharr"
+                scharr.Run(src)
+                dst2 = scharr.dst3
+            Case "Binarized Reduction"
+                binRed.Run(src)
+                dst2 = binRed.dst2
+            Case "Binarized Sobel"
+                binSobel.Run(src)
+                dst2 = binSobel.dst2
+            Case "Color Gap"
+                colorGap.Run(src)
+                dst2 = colorGap.dst2
+            Case "Deriche"
+                deriche.Run(src)
+                dst2 = deriche.dst2
+            Case "Laplacian"
+                Laplacian.Run(src)
+                dst2 = Laplacian.dst2
+            Case "Resize And Add"
+                resizeAdd.Run(src)
+                dst2 = resizeAdd.dst2
+            Case "Depth Region Boundaries"
+                regions.Run(src)
+                dst2 = regions.dst2
+        End Select
+    End Sub
+
     Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
-        If task.firstPass Then
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        If task.FirstPass Then
             frm.Left = task.gOptions.Width / 2
             frm.top = task.gOptions.Height / 2
         End If
-        Dim eSelection As String = ""
         For i = 0 To frm.check.Count - 1
             If frm.check(i).checked Then
-                eSelection = frm.check(i).text
+                edgeSelection = frm.check(i).text
                 Exit For
             End If
         Next
-
-        If saveSelection <> eSelection Then
-            Select Case eSelection
-                Case "Canny"
-                    edges = canny
-                Case "Scharr"
-                    edges = scharr
-                Case "Binarized Reduction"
-                    edges = binRed
-                Case "Binarized Sobel"
-                    edges = binSobel
-                Case "Color Gap"
-                    edges = colorGap
-                Case "Deriche"
-                    edges = deriche
-                Case "Laplacian"
-                    edges = Laplacian
-                Case "Resize And Add"
-                    edges = resizeAdd
-                Case "Depth Region Boundaries"
-                    edges = regions
-            End Select
-            saveSelection = eSelection
-        End If
     End Sub
 End Class
 
@@ -3949,7 +3761,7 @@ Public Class Options_BGSubtract : Inherits VB_Parent
     End Sub
     Public Sub RunVB()
         Static learnRateSlider = FindSlider("MOG Learn Rate X1000")
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 If currMethod = i Then
@@ -3977,7 +3789,7 @@ Public Class Options_Classifier : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Random Samples", 10, dst2.Total, 200)
 
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Normal Bayes (NBC)")
             radio.addRadio("K Nearest Neighbor (KNN)")
@@ -3992,7 +3804,7 @@ Public Class Options_Classifier : Inherits VB_Parent
     End Sub
     Public Sub RunVB()
         Static inputSlider = FindSlider("Random Samples")
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 methodIndex = i
@@ -4000,7 +3812,7 @@ Public Class Options_Classifier : Inherits VB_Parent
                 Exit For
             End If
         Next
-        If task.firstPass Then
+        If task.FirstPass Then
             frm.Left = task.gOptions.Width / 2
             frm.top = task.gOptions.Height / 2
         End If
@@ -4017,12 +3829,12 @@ End Class
 
 
 Public Class Options_Derivative : Inherits VB_Parent
-    Public channel = 0 ' assume X Dimension
+    Public channel As Integer = 0 ' assume X Dimension
     Public kernelSize As Integer
     Dim options As New Options_Sobel
     Public derivativeRange As Single = 0.1
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("X Dimension")
             radio.addRadio("Y Dimension")
@@ -4033,7 +3845,7 @@ Public Class Options_Derivative : Inherits VB_Parent
     Public Sub RunVB()
         options.RunVB()
 
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         channel = 2
         If frm.check(2).checked = False Then
             If frm.check(0).checked Then channel = 0 Else channel = 1
@@ -4085,13 +3897,13 @@ Public Class Options_Threshold : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold value", 0, 255, threshold)
 
-        If findfrm(traceName + " CheckBoxes") Is Nothing Then
+        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("GrayScale Input")
             check.addCheckBox("Add OTSU Option - a 50/50 split")
         End If
 
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Binary")
             radio.addRadio("Binary Inverse")
@@ -4105,13 +3917,13 @@ Public Class Options_Threshold : Inherits VB_Parent
         dst2 = gradient.dst2
     End Sub
     Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         Dim index = findRadioIndex(frm.check)
         thresholdMethod = radioChoices(index)
         thresholdName = Choose(index + 1, "Binary", "BinaryInv", "Tozero", "TozeroInv", "Triangle", "Trunc")
 
-        Static inputGrayCheck = findCheckBox("GrayScale Input")
-        Static otsuCheck = findCheckBox("Add OTSU Option - a 50/50 split")
+        Static inputGrayCheck = FindCheckBox("GrayScale Input")
+        Static otsuCheck = FindCheckBox("Add OTSU Option - a 50/50 split")
         Static threshSlider = FindSlider("Threshold value")
         Static maxSlider = FindSlider("MaxVal setting")
 
@@ -4131,7 +3943,7 @@ Public Class Options_Threshold_Adaptive : Inherits VB_Parent
     Public blockSize As Integer = 5
     Public constantVal As Integer
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("GaussianC")
             radio.addRadio("MeanC")
@@ -4144,13 +3956,13 @@ Public Class Options_Threshold_Adaptive : Inherits VB_Parent
         End If
 
         If standaloneTest() = False Then
-            findRadio("ToZero").Enabled = False
-            findRadio("ToZero Inverse").Enabled = False
-            findRadio("Trunc").Enabled = False
+            FindRadio("ToZero").Enabled = False
+            FindRadio("ToZero Inverse").Enabled = False
+            FindRadio("Trunc").Enabled = False
         End If
     End Sub
     Public Sub RunVB()
-        Static gaussRadio = findRadio("GaussianC")
+        Static gaussRadio = FindRadio("GaussianC")
         Static constantSlider = FindSlider("Constant subtracted from mean Or weighted mean")
         Static blockSlider = FindSlider("AdaptiveThreshold block size")
 
@@ -4195,7 +4007,7 @@ End Class
 Public Class Options_Threshold_AdaptiveMin : Inherits VB_Parent
     Public adaptiveMethod As cv.AdaptiveThresholdTypes
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("GaussianC")
             radio.addRadio("MeanC")
@@ -4203,7 +4015,7 @@ Public Class Options_Threshold_AdaptiveMin : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static gaussRadio = findRadio("GaussianC")
+        Static gaussRadio = FindRadio("GaussianC")
         adaptiveMethod = If(gaussRadio.checked, cv.AdaptiveThresholdTypes.GaussianC, cv.AdaptiveThresholdTypes.MeanC)
     End Sub
 End Class
@@ -4236,13 +4048,13 @@ Public Class Options_ThresholdAll : Inherits VB_Parent
             sliders.setupTrackBar("Constant subtracted from mean Or weighted mean", -20, 20, 0)
         End If
 
-        If findfrm(traceName + " CheckBoxes") Is Nothing Then
+        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("GrayScale Input")
             check.addCheckBox("Add OTSU Option - a 50/50 split")
         End If
 
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Binary")
             radio.addRadio("Binary Inverse")
@@ -4259,11 +4071,11 @@ Public Class Options_ThresholdAll : Inherits VB_Parent
         options.RunVB()
         adaptiveMethod = options.adaptiveMethod
 
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         thresholdMethod = radioChoices(findRadioIndex(frm.check))
 
-        Static inputGrayCheck = findCheckBox("GrayScale Input")
-        Static otsuCheck = findCheckBox("Add OTSU Option - a 50/50 split")
+        Static inputGrayCheck = FindCheckBox("GrayScale Input")
+        Static otsuCheck = FindCheckBox("Add OTSU Option - a 50/50 split")
 
         Static threshSlider = FindSlider("Threshold value")
         Static maxSlider = FindSlider("MaxVal setting")
@@ -4311,37 +4123,6 @@ End Class
 
 
 
-Public Class Options_SURF : Inherits VB_Parent
-    Public surfThreshold As Integer
-    Public useBFMatch As Boolean
-    Public verticalRange As Integer
-    Public Sub New()
-        If radio.Setup(traceName) Then
-            radio.addRadio("Use BF Matcher")
-            radio.addRadio("Use Flann Matcher")
-            radio.check(0).Checked = True
-        End If
-
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Hessian threshold", 1, 5000, 2000)
-            sliders.setupTrackBar("Surf Vertical Range to Search", 0, 50, 1)
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static thresholdSlider = FindSlider("Hessian threshold")
-        Static BFRadio = findRadio("Use BF Matcher")
-        Static rangeSlider = FindSlider("Surf Vertical Range to Search")
-
-        useBFMatch = BFRadio.checked
-        surfThreshold = thresholdSlider.value
-        verticalRange = rangeSlider.value
-    End Sub
-End Class
-
-
-
-
-
 Public Class Options_DFT : Inherits VB_Parent
     Public radius As Integer = dst2.Rows
     Public order As Integer = 2
@@ -4368,7 +4149,7 @@ Public Class Options_DFT : Inherits VB_Parent
         radius = radiusSlider.Value
         order = orderSlider.Value
 
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 dftFlag = Choose(i + 1, cv.DftFlags.ComplexOutput, cv.DftFlags.Inverse, cv.DftFlags.None,
@@ -4398,6 +4179,8 @@ Public Class Options_DFTShape : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
+        Static frm = FindFrm("Options_DFTShape Radio Buttons")
+        dftShape = findRadioText(frm.check)
     End Sub
 End Class
 
@@ -4412,7 +4195,7 @@ Public Class Options_FitEllipse : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("FitEllipse threshold", 0, 255, 70)
 
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("fitEllipseQ")
             radio.addRadio("fitEllipseAMS")
@@ -4422,9 +4205,9 @@ Public Class Options_FitEllipse : Inherits VB_Parent
     End Sub
     Public Sub RunVB()
         Static thresholdSlider = FindSlider("FitEllipse threshold")
-        Static qRadio = findRadio("fitEllipseQ")
-        Static amsRadio = findRadio("fitEllipseAMS")
-        Static directRadio = findRadio("fitEllipseDirect")
+        Static qRadio = FindRadio("fitEllipseQ")
+        Static amsRadio = FindRadio("fitEllipseAMS")
+        Static directRadio = FindRadio("fitEllipseDirect")
         fitType = 0
         If amsRadio.checked Then fitType = 1
         If directRadio.checked Then fitType = 2
@@ -4474,27 +4257,6 @@ End Class
 
 
 
-Public Class Options_ShiTomasi : Inherits VB_Parent
-    Public useShiTomasi As Boolean = True
-    Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Harris features")
-            radio.addRadio("Shi-Tomasi features")
-            radio.check(1).Checked = True
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static typeRadio = findRadio("Shi-Tomasi features")
-        useShiTomasi = typeRadio.checked
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Options_Sobel : Inherits VB_Parent
     Public kernelSize As Integer = 3
@@ -4510,7 +4272,7 @@ Public Class Options_Sobel : Inherits VB_Parent
             sliders.setupTrackBar("Range around zero X100", 1, 500, derivativeRange * 100)
         End If
 
-        If findfrm(traceName + " CheckBox Options") Is Nothing Then
+        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Vertical Derivative")
             check.addCheckBox("Horizontal Derivative")
@@ -4528,9 +4290,9 @@ Public Class Options_Sobel : Inherits VB_Parent
         Static rangeSlider = FindSlider("Range around zero X100")
         kernelSize = ksizeSlider.Value Or 1
         threshold = thresholdSlider.value
-        Static vDeriv = findCheckBox("Vertical Derivative")
-        Static hDeriv = findCheckBox("Horizontal Derivative")
-        Static checkBlur = findCheckBox("Blur input before Sobel")
+        Static vDeriv = FindCheckBox("Vertical Derivative")
+        Static hDeriv = FindCheckBox("Horizontal Derivative")
+        Static checkBlur = FindCheckBox("Blur input before Sobel")
         horizontalDerivative = hDeriv.checked
         verticalDerivative = vDeriv.checked
         useBlur = checkBlur.checked
@@ -4624,7 +4386,7 @@ Public Class Options_ApproxPoly : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("epsilon - max distance from original curve", 0, 100, 3)
 
-        If findfrm(traceName + " CheckBoxes") Is Nothing Then
+        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Closed polygon - connect first and last vertices.")
             check.Box(0).Checked = True
@@ -4632,7 +4394,7 @@ Public Class Options_ApproxPoly : Inherits VB_Parent
     End Sub
     Public Sub RunVB()
         Static epsilonSlider = FindSlider("epsilon - max distance from original curve")
-        Static closedPolyCheck = findCheckBox("Closed polygon - connect first and last vertices.")
+        Static closedPolyCheck = FindCheckBox("Closed polygon - connect first and last vertices.")
         epsilon = epsilonSlider.value
         closedPoly = closedPolyCheck.checked
     End Sub
@@ -4646,7 +4408,7 @@ Public Class Options_Bin3WayRedCloud : Inherits VB_Parent
     Public startRegion As Integer
     Public endRegion As Integer
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Review All Regions")
             radio.addRadio("Review Darkest and Lightest")
@@ -4657,7 +4419,7 @@ Public Class Options_Bin3WayRedCloud : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         Select Case findRadioIndex(frm.check)
             Case 0
                 startRegion = 0
@@ -4687,7 +4449,7 @@ Public Class Options_Bin2WayRedCloud : Inherits VB_Parent
     Public startRegion As Integer
     Public endRegion As Integer
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Review All Regions")
             radio.addRadio("Review Darkest Regions")
@@ -4698,7 +4460,7 @@ Public Class Options_Bin2WayRedCloud : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         Select Case findRadioIndex(frm.check)
             Case 0
                 startRegion = 0
@@ -4751,15 +4513,15 @@ Public Class Options_OpenGL_Duster : Inherits VB_Parent
     Public useClusterColors As Boolean
     Public useTaskPointCloud As Boolean
     Public Sub New()
-        If findfrm(traceName + " CheckBox Options") Is Nothing Then
+        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Display cluster colors")
             check.addCheckBox("Use task.pointCloud")
         End If
     End Sub
     Public Sub RunVB()
-        Static colorCheck = findCheckBox("Display cluster colors")
-        Static cloudCheck = findCheckBox("Use task.pointCloud")
+        Static colorCheck = FindCheckBox("Display cluster colors")
+        Static cloudCheck = FindCheckBox("Use task.pointCloud")
         useClusterColors = colorCheck.checked
         useTaskPointCloud = cloudCheck.checked
     End Sub
@@ -4779,9 +4541,9 @@ End Enum
 
 
 Public Class Options_FeatureGather : Inherits VB_Parent
-    Public featureSource As featureSrc
+    Public featureSource As FeatureSrc
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("GoodFeatures (ShiTomasi) full image")
             radio.addRadio("GoodFeatures (ShiTomasi) grid")
@@ -4793,7 +4555,7 @@ Public Class Options_FeatureGather : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 featureSource = Choose(i + 1, FeatureSrc.goodFeaturesFull, FeatureSrc.goodFeaturesGrid, FeatureSrc.Agast,
@@ -4823,9 +4585,9 @@ Public Class Options_AsciiArt : Inherits VB_Parent
         Static hSlider = FindSlider("Character height in pixels")
         Static wSlider = FindSlider("Character width in pixels")
 
-        hStep = CInt(task.workingRes.Height / hSlider.value)
-        wStep = CInt(task.workingRes.Width / wSlider.value)
-        Size = New cv.Size(CInt(wSlider.value), CInt(hSlider.value))
+        hStep = CInt(task.WorkingRes.Height / hSlider.value)
+        wStep = CInt(task.WorkingRes.Width / wSlider.value)
+        size = New cv.Size(CInt(wSlider.value), CInt(hSlider.value))
     End Sub
 End Class
 
@@ -4856,7 +4618,7 @@ Public Class Options_MotionDetect : Inherits VB_Parent
     End Sub
     Public Sub RunVB()
         Static correlationSlider = FindSlider("Correlation Threshold")
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         threadData = radioChoices(findRadioIndex(frm.check))
 
@@ -4908,7 +4670,7 @@ Public Class Options_Binarize : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then binarizeLabel = radio.check(i).Text
         Next
@@ -4965,3 +4727,1122 @@ Public Class Options_BoundaryRect : Inherits VB_Parent
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class Options_BrightnessContrast : Inherits VB_Parent
+    Public brightness As Single
+    Public contrast As Integer
+    Public hsvBrightness As Single
+    Public exponent As Single
+    Public Sub New()
+        Dim alphaDefault = 2000
+        Dim betaDefault = -100
+        If task.cameraName = "Oak-D camera" Then
+            alphaDefault = 500
+            betaDefault = 0
+        End If
+        If task.cameraName = "Azure Kinect 4K" Then
+            alphaDefault = 600
+            betaDefault = 0
+        End If
+        If task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then alphaDefault = 1500
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Alpha (contrast)", 0, 10000, alphaDefault)
+            sliders.setupTrackBar("Beta (brightness)", -127, 127, betaDefault)
+            sliders.setupTrackBar("HSV Brightness Value", 0, 150, 100)
+            sliders.setupTrackBar("Contrast exponent to use X100", 0, 200, 30)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static betaSlider = FindSlider("Beta (brightness)")
+        Static alphaSlider = FindSlider("Alpha (contrast)")
+        brightness = alphaSlider.value / 500
+        contrast = betaSlider.value
+        Static brightnessSlider = FindSlider("HSV Brightness Value")
+        hsvBrightness = brightnessSlider.Value / 100
+        Static exponentSlider = FindSlider("Contrast exponent to use X100")
+        exponent = exponentSlider.value / 100
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_HistPointCloud : Inherits VB_Parent
+    Public threshold As Integer
+    Public xBins As Integer, yBins As Integer, zBins As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Histogram X bins", 1, dst2.Cols, 30)
+            sliders.setupTrackBar("Histogram Y bins", 1, dst2.Rows, 30)
+            sliders.setupTrackBar("Histogram Z bins", 1, 200, 100)
+            sliders.setupTrackBar("Histogram threshold", 0, 1000, 500)
+        End If
+
+        Select Case dst2.Width
+            Case 640
+                FindSlider("Histogram threshold").Value = 200
+            Case 320
+                FindSlider("Histogram threshold").Value = 60
+            Case 160
+                FindSlider("Histogram threshold").Value = 25
+        End Select
+    End Sub
+    Public Sub RunVB()
+        Static xSlider = FindSlider("Histogram X bins")
+        Static ySlider = FindSlider("Histogram Y bins")
+        Static zSlider = FindSlider("Histogram Z bins")
+        Static tSlider = FindSlider("Histogram threshold")
+        xBins = xSlider.Value
+        yBins = ySlider.Value
+        zBins = zSlider.Value
+        threshold = tSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_Harris : Inherits VB_Parent
+    Public threshold As Single = 1 / 10000
+    Public neighborhood As Integer = 3
+    Public aperture As Integer = 21
+    Public harrisParm As Single = 1
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Harris Threshold", 1, 100, threshold * 10000)
+            sliders.setupTrackBar("Harris Neighborhood", 1, 41, neighborhood)
+            sliders.setupTrackBar("Harris aperture", 1, 31, aperture)
+            sliders.setupTrackBar("Harris Parameter", 1, 100, harrisParm)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static thresholdslider = FindSlider("Harris Threshold")
+        Static neighborSlider = FindSlider("Harris Neighborhood")
+        Static apertureSlider = FindSlider("Harris aperture")
+        Static parmSlider = FindSlider("Harris Parameter")
+
+        threshold = thresholdslider.Value / 10000
+        neighborhood = neighborSlider.Value Or 1
+        aperture = apertureSlider.Value Or 1
+        harrisParm = parmSlider.Value / 100
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_HarrisCorners : Inherits VB_Parent
+    Public quality As Integer
+    Public qualityMax As Integer = 100
+    Public blockSize As Integer
+    Public aperture As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Corner block size", 1, 21, 3)
+            sliders.setupTrackBar("Corner aperture size", 1, 21, 3)
+            sliders.setupTrackBar("Corner quality level", 1, 100, 50)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static blockSlider = FindSlider("Corner block size")
+        Static apertureSlider = FindSlider("Corner aperture size")
+        Static qualitySlider = FindSlider("Corner quality level")
+        quality = qualitySlider.Value
+        aperture = apertureSlider.value Or 1
+        blockSize = blockSlider.value Or 1
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Databases : Inherits VB_Parent
+    Public linkAddress As String
+    Dim downloadActive As Boolean
+    Dim downloadIndex As Integer
+    Public Sub New()
+        If radio.Setup(traceName) Then
+            radio.addRadio("Download the 1.7 Gb 300 Faces In-The-Wild database")
+            radio.addRadio("Download TensorFlow MobileNet-SSD v1")
+            radio.addRadio("Download TensorFlow MobileNet-SSD v1 PPN")
+            radio.addRadio("Download TensorFlow MobileNet-SSD v2")
+            radio.addRadio("Download TensorFlow Inception-SSD v2")
+            radio.addRadio("Download TensorFlow MobileNet-SSD v3")
+            radio.addRadio("Download TensorFlow Faster-RCNN Inception v2")
+            radio.addRadio("Download TensorFlow Faster-RCNN ResNet-50")
+            radio.addRadio("Download TensorFlow Mask-RCNN Inception v2")
+            radio.addRadio("Download All")
+            radio.check(6).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static downloadAllCheck = FindRadio("Download All")
+        If downloadAllCheck.checked Then
+            If downloadActive = False Then
+                downloadIndex += 1
+                If downloadIndex >= radio.check.Count - 1 Then
+                    downloadIndex = 0
+                    radio.check(6).Checked = True
+                End If
+            End If
+        End If
+
+        If radio.check(0).Checked Then linkAddress = "http://dlib.net/files/data/ibug_300W_large_face_landmark_dataset.tar.gz"
+        If radio.check(1).Checked Then linkAddress = "http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_coco_2017_11_17.tar.gz"
+        If radio.check(2).Checked Then linkAddress = "http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_ppn_shared_box_predictor_300x300_coco14_sync_2018_07_03.tar.gz"
+        If radio.check(3).Checked Then linkAddress = "http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v2_coco_2018_03_29.tar.gz"
+        If radio.check(4).Checked Then linkAddress = "http://download.tensorflow.org/models/object_detection/ssd_inception_v2_coco_2017_11_17.tar.gz"
+        If radio.check(5).Checked Then linkAddress = "http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v3_large_coco_2020_01_14.tar.gz"
+        If radio.check(6).Checked Then linkAddress = "http://download.tensorflow.org/models/object_detection/faster_rcnn_inception_v2_coco_2018_01_28.tar.gz"
+        If radio.check(7).Checked Then linkAddress = "http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet50_coco_2018_01_28.tar.gz"
+        If radio.check(8).Checked Then linkAddress = "http://download.tensorflow.org/models/object_detection/mask_rcnn_inception_v2_coco_2018_01_28.tar.gz"
+
+        Dim filename As String = ""
+        If radio.check(0).Checked Or downloadIndex = 0 Then filename = "ibug_300W_large_face_landmark_dataset.tar.gz"
+        If radio.check(1).Checked Or downloadIndex = 1 Then filename = "ssd_mobilenet_v1_coco_2017_11_17.tar.gz"
+        If radio.check(2).Checked Or downloadIndex = 2 Then filename = "ssd_mobilenet_v1_ppn_shared_box_predictor_300x300_coco14_sync_2018_07_03.tar.gz"
+        If radio.check(3).Checked Or downloadIndex = 3 Then filename = "ssd_mobilenet_v2_coco_2018_03_29.tar.gz"
+        If radio.check(4).Checked Or downloadIndex = 4 Then filename = "ssd_inception_v2_coco_2017_11_17.tar.gz"
+        If radio.check(5).Checked Or downloadIndex = 5 Then filename = "ssd_mobilenet_v3_large_coco_2020_01_14.tar.gz"
+        If radio.check(6).Checked Or downloadIndex = 6 Then filename = "faster_rcnn_inception_v2_coco_2018_01_28.tar.gz"
+        If radio.check(7).Checked Or downloadIndex = 7 Then filename = "faster_rcnn_resnet50_coco_2018_01_28.tar.gz"
+        If radio.check(8).Checked Or downloadIndex = 8 Then filename = "mask_rcnn_inception_v2_coco_2018_01_28.tar.gz"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_EdgeMatching : Inherits VB_Parent '
+    Public threshold As Single
+    Public searchDepth As Integer
+    Public overlayChecked As Boolean
+    Public highlightChecked As Boolean
+    Public clearChecked As Boolean
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Search depth in pixels", 1, 256, 256)
+            sliders.setupTrackBar("Edge Correlation threshold X100", 1, 100, 80)
+        End If
+
+        If check.Setup(traceName) Then
+            check.addCheckBox("Overlay thread grid")
+            check.addCheckBox("Highlight all grid entries above threshold")
+            check.addCheckBox("Clear selected highlights (if Highlight all grid entries is unchecked)")
+            check.Box(1).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static overlayCheck = FindCheckBox("Overlay thread grid")
+        Static highlightCheck = FindCheckBox("Highlight all grid entries above threshold")
+        Static clearCheck = FindCheckBox("Clear selected highlights (if Highlight all grid entries is unchecked)")
+        Static thresholdSlider = FindSlider("Edge Correlation threshold X100")
+        Static searchSlider = FindSlider("Search depth in pixels")
+        threshold = thresholdSlider.Value / 100
+        searchDepth = searchSlider.Value
+        overlayChecked = overlayCheck.checked
+        highlightChecked = highlightCheck.checked
+        clearChecked = clearCheck.checked
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_EmaxInputClusters : Inherits VB_Parent
+    Public samplesPerRegion As Integer
+    Public sigma As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("EMax Number of Samples per region", 1, 20, 10)
+            sliders.setupTrackBar("EMax Sigma (spread)", 1, 100, 10)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static sampleSlider = FindSlider("EMax Number of Samples per region")
+        Static sigmaSlider = FindSlider("EMax Sigma (spread)")
+        samplesPerRegion = sampleSlider.value
+        sigma = sigmaSlider.value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_CComp : Inherits VB_Parent
+    Public light As Integer = 127
+    Public dark As Integer = 50
+    Public threshold As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Threshold for lighter input", 1, 255, light)
+            sliders.setupTrackBar("Threshold for darker input", 1, 255, dark)
+            sliders.setupTrackBar("CComp threshold", 0, 255, 50)
+        End If
+
+        desc = "Options for CComp_Both"
+    End Sub
+    Public Sub RunVB()
+        Static lightSlider = FindSlider("Threshold for lighter input")
+        Static darkSlider = FindSlider("Threshold for darker input")
+        Static thresholdSlider = FindSlider("CComp threshold")
+        threshold = thresholdSlider.value
+        light = lightSlider.value
+        dark = darkSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_CellAutomata : Inherits VB_Parent
+    Public currentRule As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Current Rule", 0, 255, 0)
+    End Sub
+    Public Sub RunVB()
+        Static ruleSlider = FindSlider("Current Rule")
+        currentRule = ruleSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_BackProject2D : Inherits VB_Parent
+    Public backProjectRow As Boolean
+    Public Sub New()
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("BackProject Row")
+            radio.addRadio("BackProject Col")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static rowRadio = FindRadio("BackProject Row")
+        If task.mouseClickFlag Then rowRadio.checked = Not rowRadio.checked
+        backProjectRow = rowRadio.checked
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Kaze : Inherits VB_Parent
+    Public pointsToMatch As Integer
+    Public maxDistance As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Max number of points to match", 1, 300, 100)
+            sliders.setupTrackBar("When matching, max possible distance", 1, 200, 100)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static maxSlider = FindSlider("Max number of points to match")
+        Static distSlider = FindSlider("When matching, max possible distance")
+        pointsToMatch = maxSlider.value
+        maxDistance = distSlider.value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Blob : Inherits VB_Parent
+    Dim blob As New Blob_Input
+    Public blobParams = New cv.SimpleBlobDetector.Params
+    Public Sub New()
+        If standaloneTest() Then blob.updateFrequency = 30
+
+        If radio.Setup(traceName) Then
+            radio.addRadio("FilterByArea")
+            radio.addRadio("FilterByCircularity")
+            radio.addRadio("FilterByConvexity")
+            radio.addRadio("FilterByInertia")
+            radio.addRadio("FilterByColor")
+            radio.check(1).Checked = True
+        End If
+
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("min Threshold", 0, 255, 100)
+            sliders.setupTrackBar("max Threshold", 0, 255, 255)
+            sliders.setupTrackBar("Threshold Step", 1, 50, 5)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static minSlider = FindSlider("min Threshold")
+        Static maxSlider = FindSlider("max Threshold")
+        Static stepSlider = FindSlider("Threshold Step")
+        Static areaRadio = FindRadio("FilterByArea")
+        Static circRadio = FindRadio("FilterByCircularity")
+        Static convexRadio = FindRadio("FilterByConvexity")
+        Static inertiaRadio = FindRadio("FilterByInertia")
+        Static colorRadio = FindRadio("FilterByColor")
+
+        blobParams = New cv.SimpleBlobDetector.Params
+        If areaRadio.Checked Then blobParams.FilterByArea = areaRadio.Checked
+        If circRadio.Checked Then blobParams.FilterByCircularity = circRadio.Checked
+        If convexRadio.Checked Then blobParams.FilterByConvexity = convexRadio.Checked
+        If inertiaRadio.Checked Then blobParams.FilterByInertia = inertiaRadio.Checked
+        If colorRadio.Checked Then blobParams.FilterByColor = colorRadio.Checked
+
+        blobParams.MaxArea = 100
+        blobParams.MinArea = 0.001
+
+        blobParams.MinThreshold = minSlider.Value
+        blobParams.MaxThreshold = maxSlider.Value
+        blobParams.ThresholdStep = stepSlider.Value
+
+        blobParams.MinDistBetweenBlobs = 10
+        blobParams.MinRepeatability = 1
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_SLR : Inherits VB_Parent
+    Public tolerance As Single
+    Public halfLength As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Approximate accuracy (tolerance) X100", 1, 1000, 30)
+            sliders.setupTrackBar("Simple moving average window size", 1, 100, 10)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static toleranceSlider = FindSlider("Approximate accuracy (tolerance) X100")
+        Static movingAvgSlider = FindSlider("Simple moving average window size")
+        tolerance = toleranceSlider.Value / 100
+        halfLength = movingAvgSlider.Value
+    End Sub
+End Class
+
+
+
+
+Public Class Options_KNN : Inherits VB_Parent
+    Public knnDimension As Integer
+    Public numPoints As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("KNN Dimension", 2, 10, 2)
+            sliders.setupTrackBar("Random input points", 5, 100, 10)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static dimSlider = FindSlider("KNN Dimension")
+        Static randomSlider = FindSlider("Random input points")
+        knnDimension = dimSlider.Value
+        numPoints = randomSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Clone : Inherits VB_Parent
+    Public alpha As Single
+    Public beta As Single
+    Public lowThreshold As Integer
+    Public highThreshold As Integer
+    Public blueChange As Single
+    Public greenChange As Single
+    Public redChange As Single
+    Public cloneFlag As New cv.SeamlessCloneMethods
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Alpha", 0, 20, 2)
+            sliders.setupTrackBar("Beta", 0, 20, 2)
+            sliders.setupTrackBar("Low Threshold", 0, 100, 10)
+            sliders.setupTrackBar("High Threshold", 0, 100, 50)
+            sliders.setupTrackBar("Color Change - Red", 5, 25, 15)
+            sliders.setupTrackBar("Color Change - Green", 5, 25, 5)
+            sliders.setupTrackBar("Color Change - Blue", 5, 25, 5)
+        End If
+
+        If (radio.Setup(traceName)) Then
+            radio.addRadio("Seamless Normal Clone")
+            radio.addRadio("Seamless Mono Clone")
+            radio.addRadio("Seamless Mixed Clone")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static alphaSlider = FindSlider("Alpha")
+        Static betaSlider = FindSlider("Beta")
+        Static lowSlider = FindSlider("Low Threshold")
+        Static highSlider = FindSlider("High Threshold")
+        Static redSlider = FindSlider("Color Change - Red")
+        Static greenSlider = FindSlider("Color Change - Green")
+        Static blueSlider = FindSlider("Color Change - Blue")
+        alpha = alphaSlider.value / 10
+        beta = betaSlider.value / 10
+        lowThreshold = lowSlider.value
+        highThreshold = highSlider.value
+        blueChange = blueSlider.value / 10
+        greenChange = greenSlider.value / 10
+        redChange = redSlider.value / 10
+
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        For i = 0 To frm.check.Count - 1
+            If frm.check(i).Checked Then
+                cloneFlag = Choose(i + 1, cv.SeamlessCloneMethods.MixedClone, cv.SeamlessCloneMethods.MonochromeTransfer, cv.SeamlessCloneMethods.NormalClone)
+                Exit For
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Coherence : Inherits VB_Parent
+    Public sigma As Integer
+    Public blend As Single
+    Public str_sigma As Integer
+    Public eigenkernelsize As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Coherence Sigma", 1, 15, 9)
+            sliders.setupTrackBar("Coherence Blend", 1, 10, 10)
+            sliders.setupTrackBar("Coherence str_sigma", 1, 15, 15)
+            sliders.setupTrackBar("Coherence eigen kernel", 1, 31, 1)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static sigmaSlider = FindSlider("Coherence Sigma")
+        Static blendSlider = FindSlider("Coherence Blend")
+        Static strSlider = FindSlider("Coherence str_sigma")
+        Static eigenSlider = FindSlider("Coherence eigen kernel")
+
+        sigma = sigmaSlider.Value * 2 + 1
+        blend = blendSlider.Value / 10
+        str_sigma = strSlider.Value * 2 + 1
+        eigenkernelsize = eigenSlider.Value * 2 + 1
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Color : Inherits VB_Parent
+    Public colorFormat As String
+    Public Sub New()
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("BGR")
+            radio.addRadio("LAB")
+            radio.addRadio("HSV")
+            radio.addRadio("XYZ")
+            radio.addRadio("HLS")
+            radio.addRadio("YUV")
+            radio.addRadio("YCrCb")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        For i = 0 To radio.check.Count - 1
+            If radio.check(i).Checked Then
+                colorFormat = radio.check(i).Text
+                Exit For
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Grayscale8U : Inherits VB_Parent
+    Public useOpenCV As Boolean = True
+    Public Sub New()
+        If check.Setup(traceName) Then
+            check.addCheckBox("Use OpenCV to create grayscale image")
+            check.Box(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static grayCheck = FindCheckBox("Use OpenCV to create grayscale image")
+        useOpenCV = grayCheck.checked
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Color8UTopX : Inherits VB_Parent
+    Public topXcount As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Top X pixels", 2, 32, 16)
+    End Sub
+    Public Sub RunVB()
+        Static topXSlider = FindSlider("Top X pixels")
+        topXcount = topXSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_Morphology : Inherits VB_Parent
+    Public widthHeight As Integer
+    Public iterations As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Morphology width/height", 1, 100, 20)
+            sliders.setupTrackBar("MorphologyEx iterations", 1, 5, 1)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static morphSlider = FindSlider("Morphology width/height")
+        Static morphExSlider = FindSlider("MorphologyEx iterations")
+        widthHeight = morphSlider.value
+        iterations = morphExSlider.value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Convex : Inherits VB_Parent
+    Public hullCount As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Hull random points", 4, 20, 10)
+    End Sub
+    Public Sub RunVB()
+        Static hullSlider = FindSlider("Hull random points")
+        hullCount = hullSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Corners : Inherits VB_Parent
+    Public useNonMax As Boolean
+    Public Sub New()
+        If check.Setup(traceName) Then
+            check.addCheckBox("Use Non-Max = True")
+            check.Box(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static nonMaxCheck = FindCheckBox("Use Non-Max = True")
+        useNonMax = nonMaxCheck.checked
+    End Sub
+End Class
+
+
+Public Class Options_PreCorners : Inherits VB_Parent
+    Public kernelSize As Integer
+    Public subpixSize As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("kernel Size", 1, 20, 19)
+            sliders.setupTrackBar("SubPix kernel Size", 1, 20, 3)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static kernelSlider = FindSlider("kernel Size")
+        Static subpixSlider = FindSlider("SubPix kernel Size")
+        kernelSize = kernelSlider.value Or 1
+        subpixSize = subpixSlider.value Or 1
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_ShiTomasi : Inherits VB_Parent
+    Public useShiTomasi As Boolean = True
+    Public threshold As Integer
+    Public aperture As Integer
+    Public blocksize As Integer
+
+    Public Sub New()
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Harris features")
+            radio.addRadio("Shi-Tomasi features")
+            radio.check(1).Checked = True
+        End If
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Corner block size", 1, 21, 3)
+            sliders.setupTrackBar("Corner aperture size", 1, 21, 3)
+            sliders.setupTrackBar("Corner normalize threshold", 0, 32, 0)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static typeRadio = FindRadio("Shi-Tomasi features")
+        Static blockSlider = FindSlider("Corner block size")
+        Static apertureSlider = FindSlider("Corner aperture size")
+        Static thresholdSlider = FindSlider("Corner normalize threshold")
+        threshold = thresholdSlider.Value
+        useShiTomasi = typeRadio.checked
+        aperture = apertureSlider.value Or 1
+        blocksize = blockSlider.value Or 1
+    End Sub
+End Class
+
+
+
+
+Public Class Options_FlatLand : Inherits VB_Parent
+    Public reductionFactor As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Region Count", 1, 250, 10)
+    End Sub
+    Public Sub RunVB()
+        Static regionSlider = FindSlider("Region Count")
+        reductionFactor = regionSlider.Maximum - regionSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Depth : Inherits VB_Parent
+    Public mmThreshold As Double
+    Public millimeters As Integer
+    Public threshold As Double
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Threshold in millimeters", 0, 1000, 8)
+            sliders.setupTrackBar("Threshold for punch", 0, 255, 250)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static mmSlider = FindSlider("Threshold in millimeters")
+        Static thresholdSlider = FindSlider("Threshold for punch")
+        millimeters = mmSlider.value
+        mmThreshold = mmSlider.Value / 1000.0
+        threshold = thresholdSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_DepthHoles : Inherits VB_Parent
+    Public borderDilation As Integer
+    Public holeDilation As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Amount of dilation of borderMask", 1, 10, 1)
+            sliders.setupTrackBar("Amount of dilation of holeMask", 0, 10, 0)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static borderSlider = FindSlider("Amount of dilation of borderMask")
+        Static holeSlider = FindSlider("Amount of dilation of holeMask")
+        borderDilation = borderSlider.value
+        holeDilation = holeSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Uncertainty : Inherits VB_Parent
+    Public uncertaintyThreshold As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Uncertainty threshold", 1, 255, 100)
+    End Sub
+    Public Sub RunVB()
+        Static thresholdSlider = FindSlider("Uncertainty threshold")
+        uncertaintyThreshold = thresholdSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_DepthColor : Inherits VB_Parent
+    Public alpha As Single
+    Public beta As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Depth ColorMap Alpha X100", 1, 100, 5)
+            sliders.setupTrackBar("Depth ColorMap Beta", 1, 100, 3)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static alphaSlider = FindSlider("Depth ColorMap Alpha X100")
+        Static betaSlider = FindSlider("Depth ColorMap Beta")
+        alpha = alphaSlider.value / 100
+        beta = betaSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_DNN : Inherits VB_Parent
+    Public superResModelFileName As String
+    Public shortModelName As String
+    Public superResMultiplier As Integer
+    Public ScaleFactor As Single
+    Public scaleMax As Single
+    Public meanValue As Single
+    Public confidenceThreshold As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("DNN Scale Factor", 1, 10000, 78)
+            sliders.setupTrackBar("DNN MeanVal", 1, 255, 127)
+            sliders.setupTrackBar("DNN Confidence Threshold", 1, 100, 80)
+        End If
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("EDSR_x2.pb")
+            radio.addRadio("EDSR_x3.pb")
+            radio.addRadio("EDSR_x4.pb")
+            radio.addRadio("ESPCN_x2.pb")
+            radio.addRadio("ESPCN_x3.pb")
+            radio.addRadio("ESPCN_x4.pb")
+            radio.addRadio("FSRCNN_X2.pb")
+            radio.addRadio("FSRCNN_X3.pb")
+            radio.addRadio("FSRCNN_X4.pb")
+            radio.addRadio("LapSRN_x2.pb")
+            radio.addRadio("LapSRN_x4.pb")
+            radio.addRadio("LapSRN_x8.pb")
+            radio.check(8).Checked = True
+        End If
+        desc = "Options for the different SuperRes models and multipliers."
+    End Sub
+    Public Sub RunVB()
+        Static scaleSlider = FindSlider("DNN Scale Factor")
+        Static meanSlider = FindSlider("DNN MeanVal")
+        Static confidenceSlider = FindSlider("DNN Confidence Threshold")
+        confidenceThreshold = confidenceSlider.Value / 100
+        ScaleFactor = scaleSlider.value
+        scaleMax = scaleSlider.maximum
+        meanValue = meanSlider.value
+
+        superResModelFileName = task.HomeDir + "Data/DNN_SuperResModels/"
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        Dim index = findRadioIndex(frm.check)
+        If radio.check(index).Checked Then
+            superResModelFileName += radio.check(index).Text
+            Dim split = radio.check(index).Text.Split("_")
+            shortModelName = LCase(split(0))
+            superResMultiplier = CInt(split(1).Substring(1, 1))
+            Dim testFile As New FileInfo(superResModelFileName)
+            If testFile.Exists = False Then
+                MsgBox("The " + radio.check(index).Text + " super res model file is missing!")
+                superResModelFileName = ""
+            End If
+        End If
+        SetTrueText("Current Options: " + shortModelName + " at resolution " + CStr(superResMultiplier) + vbCrLf +
+                    superResModelFileName + " is present and will be used.")
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_DrawNoise : Inherits VB_Parent
+    Public noiseCount As Integer
+    Public noiseWidth As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Noise Count", 1, 1000, 100)
+            sliders.setupTrackBar("Noise Width", 1, 10, 3)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static widthSlider = FindSlider("Noise Width")
+        Static CountSlider = FindSlider("Noise Count")
+        noiseCount = CountSlider.Value
+        noiseWidth = widthSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Edges : Inherits VB_Parent
+    Public scharrMultiplier As Single
+    Public recurseCheck As Boolean
+    Public EP_Sigma_s As Single
+    Public EP_Sigma_r As Single
+    Public Sub New()
+        If radio.Setup(traceName) Then
+            radio.addRadio("Edge-preserving RecurseFilter")
+            radio.addRadio("Edge-preserving NormconvFilter")
+            radio.check(0).Checked = True
+        End If
+
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Scharr multiplier X100", 1, 500, 50)
+            sliders.setupTrackBar("Edge-preserving Sigma_s", 0, 200, 10)
+            sliders.setupTrackBar("Edge-preserving Sigma_r", 1, 100, 40)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static sigmaSSlider = FindSlider("Edge-preserving Sigma_s")
+        Static sigmaRSlider = FindSlider("Edge-preserving Sigma_r")
+        Static recurseRadio = FindRadio("Edge-preserving RecurseFilter")
+        EP_Sigma_s = sigmaSSlider.Value
+        EP_Sigma_r = sigmaRSlider.Value / sigmaRSlider.Maximum
+        recurseCheck = recurseRadio.checked
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Edges2 : Inherits VB_Parent
+    Public edgeRFthreshold As Integer
+    Public removeFrequencies As Integer
+    Public dctThreshold As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Remove Frequencies < x", 0, 100, 32)
+            sliders.setupTrackBar("Threshold after Removal", 1, 255, 20)
+            sliders.setupTrackBar("Edges RF Threshold", 1, 255, 35)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static freqSlider = FindSlider("Remove Frequencies < x")
+        Static thresholdSlider = FindSlider("Threshold after Removal")
+
+        Static rfSlider = FindSlider("Edges RF Threshold")
+        edgeRFthreshold = rfSlider.value
+        removeFrequencies = freqSlider.value
+        dctThreshold = thresholdSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Edges3 : Inherits VB_Parent
+    Public alpha As Single
+    Public omega As Single
+    Public gapDistance As Integer
+    Public gapdiff As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Deriche Alpha X100", 1, 400, 100)
+            sliders.setupTrackBar("Deriche Omega X1000", 1, 1000, 100)
+            sliders.setupTrackBar("Input pixel distance", 0, 20, 5)
+            sliders.setupTrackBar("Input pixel difference", 0, 50, If(task.WorkingRes.Width = 640, 10, 20))
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static alphaSlider = FindSlider("Deriche Alpha X100")
+        Static omegaSlider = FindSlider("Deriche Omega X1000")
+        alpha = alphaSlider.value / 100
+        omega = omegaSlider.value / 100
+
+        Static distanceSlider = FindSlider("Input pixel distance")
+        Static diffSlider = FindSlider("Input pixel difference")
+        gapDistance = distanceSlider.Value And 254
+        gapdiff = diffSlider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_DepthEdges : Inherits VB_Parent
+    Public depthDiff As Integer
+    Public depthOffset As Single
+    Public depthDist As Integer
+    Public mmDepthDiff As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Threshold for depth difference", 0, 255, 200)
+            sliders.setupTrackBar("cv.rect offset X1000", 0, 20, 1)
+            sliders.setupTrackBar("Input depth distance", 0, 20, 5)
+            sliders.setupTrackBar("Input depth difference in mm's", 0, 2000, 1000)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static diffSlider = FindSlider("Threshold for depth difference")
+        Static rectSlider = FindSlider("cv.rect offset X1000")
+        Static distanceSlider = FindSlider("Input depth distance")
+        Static mmDiffSlider = FindSlider("Input depth difference in mm's")
+
+        depthDiff = diffSlider.value
+        depthOffset = rectSlider.value / 1000
+
+        depthDist = distanceSlider.value And 254
+        mmDepthDiff = mmDiffSlider.value / 1000
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Edges4 : Inherits VB_Parent
+    Public vertPixels As Integer
+    Public horizPixels As Integer
+    Public horizonCheck As Boolean
+    Public verticalCheck As Boolean
+    Public Sub New()
+        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Horizontal Edges")
+            check.addCheckBox("Vertical Edges")
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+        End If
+
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Border Vertical in Pixels", 1, 20, 5)
+            sliders.setupTrackBar("Border Horizontal in Pixels", 1, 20, 5)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static hCheck = FindCheckBox("Horizontal Edges")
+        Static vCheck = FindCheckBox("Vertical Edges")
+        Static vertSlider = FindSlider("Border Vertical in Pixels")
+        Static horizSlider = FindSlider("Border Horizontal in Pixels")
+        vertPixels = vertSlider.value
+        horizPixels = horizSlider.value
+        horizonCheck = hCheck.checked
+        verticalCheck = vCheck.checked
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Options_Erode : Inherits VB_Parent
+    Public kernelSize As Integer = 3
+    Public iterations As Integer = 1
+    Public morphShape As cv.MorphShapes
+    Public element As cv.Mat
+    Public noshape As Boolean
+    Public flatDepth As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Erode Kernel Size", 1, 32, kernelSize)
+            sliders.setupTrackBar("Erode Iterations", 0, 32, iterations)
+            sliders.setupTrackBar("DepthSeed flat depth X1000", 1, 200, 100)
+        End If
+
+        If radio.Setup(traceName) Then
+            radio.addRadio("Erode shape: Cross")
+            radio.addRadio("Erode shape: Ellipse")
+            radio.addRadio("Erode shape: Rect")
+            radio.addRadio("Erode shape: None")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static ellipseRadio = FindRadio("Erode shape: Ellipse")
+        Static rectRadio = FindRadio("Erode shape: Rect")
+        Static iterSlider = FindSlider("Erode Iterations")
+        Static kernelSlider = FindSlider("Erode Kernel Size")
+        Static noShapeRadio = FindRadio("Erode shape: None")
+        Static depthSlider = FindSlider("DepthSeed flat depth X1000")
+        iterations = iterSlider.Value
+        kernelSize = kernelSlider.Value Or 1
+
+        morphShape = cv.MorphShapes.Cross
+        If ellipseRadio.Checked Then morphShape = cv.MorphShapes.Ellipse
+        If rectRadio.Checked Then morphShape = cv.MorphShapes.Rect
+        element = cv.Cv2.GetStructuringElement(morphShape, New cv.Size(kernelSize, kernelSize))
+        noshape = noShapeRadio.checked
+        flatDepth = depthSlider.value / 1000
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Etch_ASketch : Inherits VB_Parent
+    Public demoMode As Boolean
+    Public cleanMode As Boolean
+    Public Sub New()
+        If check.Setup(traceName) Then
+            check.addCheckBox("Etch_ASketch clean slate")
+            check.addCheckBox("Demo mode")
+            check.Box(1).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static cleanCheck = FindCheckBox("Etch_ASketch clean slate")
+        Static demoCheck = FindCheckBox("Demo mode")
+        demoMode = demoCheck.checked
+
+        If cleanMode Then cleanCheck.checked = False ' only on for one frame.
+        cleanMode = cleanCheck.checked
+    End Sub
+End Class

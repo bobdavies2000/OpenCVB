@@ -15,14 +15,14 @@ Public Class Correlation_Basics : Inherits VB_Parent
         dst2 = kFlood.dst3
 
         Dim row = task.mouseMovePoint.Y
-        If row = 0 Then setTrueText("Move mouse across image to see the relationship between X and Z" + vbCrLf +
+        If row = 0 Then SetTrueText("Move mouse across image to see the relationship between X and Z" + vbCrLf +
                                     "A linear relationship is a useful correlation", New cv.Point(0, 10), 3)
 
         Dim dataX As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, 0)
         Dim dataY As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, 0)
         Dim dataZ As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, 0)
 
-        Dim mask = kFlood.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim mask = kFlood.dst3.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         task.pcSplit(0).CopyTo(dataX, mask)
         task.pcSplit(1).CopyTo(dataY, mask)
         task.pcSplit(2).CopyTo(dataZ, mask)
@@ -54,11 +54,11 @@ Public Class Correlation_Basics : Inherits VB_Parent
             For i = 0 To plotX.Count - 1
                 Dim x = dst3.Width * (plotX(i) - minx) / (maxx - minx)
                 Dim y = dst3.Height * (plotZ(i) - minZ) / (maxZ - minZ)
-                DrawCircle(dst3,New cv.Point(x, y), task.dotSize, cv.Scalar.Yellow)
+                DrawCircle(dst3,New cv.Point(x, y), task.DotSize, cv.Scalar.Yellow)
             Next
-            setTrueText("Z-min " + Format(minZ, fmt2), New cv.Point(10, 5), 3)
-            setTrueText("Z-max " + Format(maxZ, fmt2) + vbCrLf + vbTab + "X-min " + Format(minx, fmt2), New cv.Point(0, dst3.Height - 20), 3)
-            setTrueText("X-max " + Format(maxx, fmt2), New cv.Point(dst3.Width - 40, dst3.Height - 10), 3)
+            SetTrueText("Z-min " + Format(minZ, fmt2), New cv.Point(10, 5), 3)
+            SetTrueText("Z-max " + Format(maxZ, fmt2) + vbCrLf + vbTab + "X-min " + Format(minx, fmt2), New cv.Point(0, dst3.Height - 20), 3)
+            SetTrueText("X-max " + Format(maxx, fmt2), New cv.Point(dst3.Width - 40, dst3.Height - 10), 3)
         End If
     End Sub
 End Class

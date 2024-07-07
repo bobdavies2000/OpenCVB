@@ -11,13 +11,13 @@ Public Class Depth_Basics : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         dst2 = task.pcSplit(2)
 
-        task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
-        If task.firstPass Then
-            task.maxDepthMask = task.pcSplit(2).ConvertScaleAbs().InRange(task.maxZmeters, task.maxZmeters)
+        task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc)
+        If task.FirstPass Then
+            task.maxDepthMask = task.pcSplit(2).ConvertScaleAbs().InRange(task.MaxZmeters, task.MaxZmeters)
             task.maxDepthMask.SetTo(0)
         End If
         If standalone Then dst3 = task.maxDepthMask
-        setTrueText(task.gMat.strOut, 3)
+        SetTrueText(task.gMat.strOut, 3)
 
         colorizer.Run(task.pcSplit(2))
         task.depthRGB = colorizer.dst2
@@ -51,37 +51,16 @@ End Class
 
 
 
-Public Class Depth_Flatland : Inherits VB_Parent
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Region Count", 1, 250, 10)
-        labels(3) = "Grayscale version"
-        desc = "Attempt to stabilize the depth image."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static regionSlider = FindSlider("Region Count")
-        Dim reductionFactor As Single = regionSlider.Maximum - regionSlider.Value
-        dst2 = task.depthRGB / reductionFactor
-        dst2 *= reductionFactor
-        dst3 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Depth_FirstLastDistance : Inherits VB_Parent
     Public Sub New()
         desc = "Monitor the first and last depth distances"
     End Sub
     Private Sub identifyMinMax(pt As cv.Point, text As String)
-        DrawCircle(dst2,pt, task.dotSize, task.highlightColor)
-        setTrueText(text, pt, 2)
+        DrawCircle(dst2, pt, task.DotSize, task.HighlightColor)
+        SetTrueText(text, pt, 2)
 
-        DrawCircle(dst3,pt, task.dotSize, task.highlightColor)
-        setTrueText(text, pt, 3)
+        DrawCircle(dst3, pt, task.DotSize, task.HighlightColor)
+        SetTrueText(text, pt, 3)
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim mm As mmData = GetMinMax(task.pcSplit(2), task.depthMask)
@@ -112,7 +91,7 @@ Public Class Depth_HolesRect : Inherits VB_Parent
         shadow.Run(src)
 
         Dim contours As cv.Point()()
-        If shadow.dst3.Channels = 3 Then shadow.dst3 = shadow.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If shadow.dst3.Channels() = 3 Then shadow.dst3 = shadow.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         contours = cv.Cv2.FindContoursAsArray(shadow.dst3, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
 
         Dim sortContours As New SortedList(Of Integer, List(Of cv.Point))(New compareAllowIdenticalIntegerInverted)
@@ -124,7 +103,7 @@ Public Class Depth_HolesRect : Inherits VB_Parent
             Dim contour = sortContours.ElementAt(i).Value
             Dim minRect = cv.Cv2.MinAreaRect(contour)
             Dim nextColor = New cv.Scalar(task.vecColors(i Mod 256)(0), task.vecColors(i Mod 256)(1), task.vecColors(i Mod 256)(2))
-            drawRotatedRectangle(minRect, dst2, nextColor)
+            DrawRotatedRectangle(minRect, dst2, nextColor)
             DrawContour(dst3, contour.ToList, cv.Scalar.White, task.lineWidth)
         Next
         cv.Cv2.AddWeighted(dst2, 0.5, task.depthRGB, 0.5, 0, dst2)
@@ -140,6 +119,7 @@ End Class
 
 Public Class Depth_MeanStdev_MT : Inherits VB_Parent
     Dim meanSeries As New cv.Mat
+    Dim maxMeanVal As Single, maxStdevVal As Single
     Public Sub New()
         dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Rows, dst3.Cols, cv.MatType.CV_8U, 0)
@@ -167,12 +147,11 @@ Public Class Depth_MeanStdev_MT : Inherits VB_Parent
         If task.frameCount >= task.frameHistoryCount Then
             Dim means As New cv.Mat(task.gridList.Count, 1, cv.MatType.CV_32F, meanValues.ToArray)
             Dim stdevs As New cv.Mat(task.gridList.Count, 1, cv.MatType.CV_32F, stdValues.ToArray)
-            Dim meanmask = means.Threshold(1, task.maxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+            Dim meanmask = means.Threshold(1, task.MaxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs()
             Dim mm As mmData = GetMinMax(means, meanmask)
-            Dim stdMask = stdevs.Threshold(0.001, task.maxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs() ' volatile region is x cm stdev.
+            Dim stdMask = stdevs.Threshold(0.001, task.MaxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs() ' volatile region is x cm stdev.
             Dim mmStd = GetMinMax(stdevs, stdMask)
 
-            Static maxMeanVal As Single, maxStdevVal As Single
             maxMeanVal = Math.Max(maxMeanVal, mm.maxVal)
             maxStdevVal = Math.Max(maxStdevVal, mmStd.maxVal)
 
@@ -194,7 +173,7 @@ Public Class Depth_MeanStdev_MT : Inherits VB_Parent
             If standaloneTest() Then
                 For i = 0 To task.gridList.Count - 1
                     Dim roi = task.gridList(i)
-                    setTrueText(Format(meanValues(i), fmt3) + vbCrLf + Format(stdValues(i), fmt3), New cv.Point(roi.X, roi.Y), 3)
+                    SetTrueText(Format(meanValues(i), fmt3) + vbCrLf + Format(stdValues(i), fmt3), New cv.Point(roi.X, roi.Y), 3)
                 Next
             End If
 
@@ -241,16 +220,17 @@ End Class
 
 Public Class Depth_Uncertainty : Inherits VB_Parent
     Dim retina As New Retina_Basics_CPP
+    Dim options As New Options_Uncertainty
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Uncertainty threshold", 1, 255, 100)
         labels(3) = "Mask of areas with stable depth"
         desc = "Use the bio-inspired retina algorithm to determine depth uncertainty."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = FindSlider("Uncertainty threshold")
+        options.RunVB()
+
         retina.Run(task.depthRGB)
         dst2 = retina.dst2
-        dst3 = retina.dst3.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+        dst3 = retina.dst3.Threshold(options.uncertaintyThreshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -270,7 +250,7 @@ Public Class Depth_Palette : Inherits VB_Parent
         gColor.Run(empty)
         customColorMap = gColor.gradient
 
-        Dim mult = 255 / task.maxZmeters
+        Dim mult = 255 / task.MaxZmeters
         Dim depthNorm = (task.pcSplit(2) * mult).ToMat
         depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
         Dim ColorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, customColorMap.Data())
@@ -296,7 +276,7 @@ Public Class Depth_Colorizer_CPP : Inherits VB_Parent
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, depthData, 0, depthData.Length)
-        Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.maxZmeters)
+        Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
         handleSrc.Free()
 
         If imagePtr <> 0 Then dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
@@ -339,13 +319,13 @@ Public Class Depth_LocalMinMax_MT : Inherits VB_Parent
             minPoint(i) = New cv.Point(mm.minLoc.X + roi.X, mm.minLoc.Y + roi.Y)
             maxPoint(i) = New cv.Point(mm.maxLoc.X + roi.X, mm.maxLoc.Y + roi.Y)
 
-            DrawCircle(dst2(roi), mm.minLoc, task.dotSize, task.highlightColor)
-            DrawCircle(dst2(roi), mm.maxLoc, task.dotSize, cv.Scalar.Red)
+            DrawCircle(dst2(roi), mm.minLoc, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2(roi), mm.maxLoc, task.DotSize, cv.Scalar.Red)
 
             Dim p1 = New cv.Point(mm.minLoc.X + roi.X, mm.minLoc.Y + roi.Y)
             Dim p2 = New cv.Point(mm.maxLoc.X + roi.X, mm.maxLoc.Y + roi.Y)
-            DrawCircle(dst3,p1, task.dotSize, task.highlightColor)
-            DrawCircle(dst3,p2, task.dotSize, cv.Scalar.Red)
+            DrawCircle(dst3, p1, task.DotSize, task.HighlightColor)
+            DrawCircle(dst3, p2, task.DotSize, cv.Scalar.Red)
         End Sub)
     End Sub
 End Class
@@ -398,8 +378,8 @@ Public Class Depth_MinMaxToVoronoi : Inherits VB_Parent
             ptmin = validatePoint2f(ptmin)
             ptmax = validatePoint2f(ptmax)
             subdiv.Insert(ptmin)
-            DrawCircle(dst2,ptmin, task.dotSize, cv.Scalar.Red)
-            DrawCircle(dst2,ptmax, task.dotSize, cv.Scalar.Blue)
+            DrawCircle(dst2, ptmin, task.DotSize, cv.Scalar.Red)
+            DrawCircle(dst2,ptmax, task.DotSize, cv.Scalar.Blue)
         Next
         Dim facets = New cv.Point2f()() {Nothing}
         Dim centers() As cv.Point2f
@@ -425,17 +405,14 @@ End Class
 
 
 Public Class Depth_ColorMap : Inherits VB_Parent
+    Dim options As New Options_DepthColor
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Depth ColorMap Alpha X100", 1, 100, 5)
-            sliders.setupTrackBar("Depth ColorMap Beta", 1, 100, 3)
-        End If
         desc = "Display the depth as a color map"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static alphaSlider = FindSlider("Depth ColorMap Alpha X100")
-        Static betaSlider = FindSlider("Depth ColorMap Beta")
-        cv.Cv2.ConvertScaleAbs(task.pcSplit(2) * 1000, dst1, alphaSlider.Value / 100, betaSlider.Value)
+        options.RunVB()
+
+        cv.Cv2.ConvertScaleAbs(task.pcSplit(2) * 1000, dst1, options.alpha, options.beta)
         dst1 += 1
         dst2 = ShowPalette(dst1)
         dst2.SetTo(0, task.noDepthMask)
@@ -474,7 +451,7 @@ End Class
 Public Class Depth_Median : Inherits VB_Parent
     Dim median As New Math_Median_CDF
     Public Sub New()
-        median.rangeMax = task.maxZmeters
+        median.rangeMax = task.MaxZmeters
         median.rangeMin = 0
         desc = "Divide the depth image ahead and behind the median."
     End Sub
@@ -502,13 +479,14 @@ End Class
 
 
 Public Class Depth_SmoothingMat : Inherits VB_Parent
+    Dim options As New Options_Depth
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold in millimeters", 1, 1000, 10)
         labels(3) = "Depth pixels after smoothing"
         desc = "Use depth rate of change to smooth the depth values in close range"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = FindSlider("Threshold in millimeters")
+        options.RunVB()
+
         Static lastDepth = task.pcSplit(2)
 
         If standaloneTest() Then src = task.pcSplit(2)
@@ -516,12 +494,11 @@ Public Class Depth_SmoothingMat : Inherits VB_Parent
 
         cv.Cv2.Subtract(lastDepth, task.pcSplit(2), dst2)
 
-        Dim mmThreshold = CSng(thresholdSlider.Value / 1000)
-        dst2 = dst2.Threshold(mmThreshold, 0, cv.ThresholdTypes.TozeroInv).Threshold(-mmThreshold, 0, cv.ThresholdTypes.Tozero)
+        dst2 = dst2.Threshold(options.mmThreshold, 0, cv.ThresholdTypes.TozeroInv).Threshold(-options.mmThreshold, 0, cv.ThresholdTypes.Tozero)
         cv.Cv2.Add(task.pcSplit(2), dst2, dst3)
         lastDepth = task.pcSplit(2)
 
-        labels(2) = "Smoothing Mat: range to " + CStr(task.maxZmeters) + " meters"
+        labels(2) = "Smoothing Mat: range to " + CStr(task.MaxZmeters) + " meters"
     End Sub
 End Class
 
@@ -567,20 +544,16 @@ End Class
 Public Class Depth_HolesOverTime : Inherits VB_Parent
     Dim images As New List(Of cv.Mat)
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of images to retain", 0, 30, 10)
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         labels(3) = "Latest hole mask"
         desc = "Integrate memory holes over time to identify unstable depth"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static countSlider = FindSlider("Number of images to retain")
-        Static saveCount = countSlider.Value
-        If saveCount <> countSlider.Value Then
+        If task.optionsChanged Then
             images.Clear()
             dst0.SetTo(0)
         End If
-        saveCount = countSlider.Value
 
         dst3 = task.noDepthMask
         dst1 = dst3.Threshold(0, 1, cv.ThresholdTypes.Binary)
@@ -590,7 +563,7 @@ Public Class Depth_HolesOverTime : Inherits VB_Parent
         dst2 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         labels(2) = "Depth holes integrated over the past " + CStr(images.Count) + " images"
-        If images.Count >= saveCount Then
+        If images.Count >= task.frameHistoryCount Then
             dst0 -= images(0)
             images.RemoveAt(0)
         End If
@@ -682,7 +655,7 @@ Public Class Depth_ForegroundHead : Inherits VB_Parent
             dst2.Rectangle(kRect, cv.Scalar.Red, 2)
             dst2.Rectangle(nextRect, cv.Scalar.Blue, 2)
             If Math.Abs(kRect.X - nextRect.X) < rectSize / 4 And Math.Abs(kRect.Y - nextRect.Y) < rectSize / 4 Then
-                trustedRect = validateRect(kRect)
+                trustedRect = ValidateRect(kRect)
                 trustworthy = True
                 dst2.Rectangle(trustedRect, cv.Scalar.Green, 5)
             End If
@@ -769,6 +742,9 @@ Public Class Depth_MaxMask : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         dst2 = src
 
+        If task.maxDepthMask.Width = 0 Then
+            task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
+        End If
         dst2.SetTo(cv.Scalar.White, task.maxDepthMask)
         contour.Run(task.maxDepthMask)
         dst3.SetTo(0)
@@ -789,15 +765,15 @@ Public Class Depth_ForegroundOverTime : Inherits VB_Parent
     Dim options As New Options_ForeGround
     Dim fore As New Depth_Foreground
     Dim contours As New Contour_Largest
+    Dim lastFrames As New List(Of cv.Mat)
     Public Sub New()
         labels = {"", "", "Foreground objects", "Edges for the Foreground Objects"}
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         task.frameHistoryCount = 5
         desc = "Create a fused foreground mask over x number of frames (task.frameHistoryCount)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static lastFrames As New List(Of cv.Mat)
         options.RunVB()
 
         If task.optionsChanged Then lastFrames.Clear()
@@ -885,8 +861,8 @@ Public Class Depth_Foreground : Inherits VB_Parent
     Dim contours As New Contour_Largest
     Public Sub New()
         labels(2) = "Foreground objects"
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "Create a mask for the objects in the foreground"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -947,14 +923,13 @@ Public Class Depth_InRange : Inherits VB_Parent
     Public Sub New()
         labels = {"", "", "Looks empty! But the values are there - 0 to classcount.  Run standaloneTest() to see the palette output for this", "Edges between the depth regions."}
         If standaloneTest() Then task.gOptions.setDisplay1()
-        dst3 = New cv.Mat(dst0.Size, cv.MatType.CV_8U)
+        dst3 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U)
         desc = "Create the selected number of depth ranges "
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
         Dim regMats As New List(Of cv.Mat)
-        ' regMats.Add(task.noDepthMask)
         For i = 0 To options.numberOfRegions - 1
             Dim upperBound = (i + 1) * options.depthPerRegion
             If i = options.numberOfRegions - 1 Then upperBound = 1000
@@ -962,7 +937,7 @@ Public Class Depth_InRange : Inherits VB_Parent
             If i = 0 Then regMats(0).SetTo(0, task.noDepthMask)
         Next
 
-        dst2 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 0)
         dst3.SetTo(0)
         classCount = 1
         For i = 0 To regMats.Count - 1
@@ -979,12 +954,16 @@ Public Class Depth_InRange : Inherits VB_Parent
         dst0 = src.Clone
         dst0.SetTo(cv.Scalar.White, dst3)
 
-        If standaloneTest() Then
-            dst2 = ShowPalette(dst2 * 255 / classCount)
-        End If
+        If standaloneTest() Then dst2 = ShowPalette(dst2 * 255 / classCount)
         If task.heartBeat Then labels(2) = Format(classCount, "000") + " regions were found"
     End Sub
 End Class
+
+
+
+
+
+
 
 
 
@@ -1022,6 +1001,8 @@ End Class
 
 
 Public Class Depth_Colorizer_VB : Inherits VB_Parent
+    Dim nearColor = cv.Scalar.Yellow
+    Dim farColor = cv.Scalar.Blue
     Public Sub New()
         desc = "Colorize the depth based on the near and far colors."
     End Sub
@@ -1033,8 +1014,8 @@ Public Class Depth_Colorizer_VB : Inherits VB_Parent
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
                 Dim pixel = src.Get(Of Single)(y, x)
-                If pixel > 0 And pixel <= task.maxZmeters Then
-                    Dim t = pixel / task.maxZmeters
+                If pixel > 0 And pixel <= task.MaxZmeters Then
+                    Dim t = pixel / task.MaxZmeters
                     Dim color = New cv.Vec3b(((1 - t) * nearColor(0) + t * farColor(0)),
                                              ((1 - t) * nearColor(1) + t * farColor(1)),
                                              ((1 - t) * nearColor(2) + t * farColor(2)))
@@ -1075,7 +1056,7 @@ Public Class Depth_PunchDecreasing : Inherits VB_Parent
     Dim fore As New Depth_Foreground
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold in millimeters", 0, 1000, 8)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, 0)
         desc = "Identify where depth is decreasing - coming toward the camera."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1105,6 +1086,10 @@ Public Class Depth_PunchBlob : Inherits VB_Parent
     Dim depthDec As New Depth_PunchDecreasing
     Dim depthInc As New Depth_PunchDecreasing
     Dim contours As New Contour_General
+    Dim lastContoursCount As Integer
+    Dim punchCount As Integer
+    Dim showMessage As Integer
+    Dim showWarningInfo As Integer
     Public Sub New()
         desc = "Identify the punch with a rectangle around the largest blob"
     End Sub
@@ -1117,9 +1102,6 @@ Public Class Depth_PunchBlob : Inherits VB_Parent
         contours.Run(dst1)
         dst3 = contours.dst3
 
-        Static lastContoursCount As Integer
-        Static punchCount As Integer
-        Static showMessage As Integer
         If contours.contourlist.Count > 0 Then showMessage = 30
 
         If showMessage = 30 And lastContoursCount = 0 Then punchCount += 1
@@ -1127,16 +1109,15 @@ Public Class Depth_PunchBlob : Inherits VB_Parent
         labels(3) = CStr(punchCount) + " Punches Thrown"
 
         If showMessage > 0 Then
-            setTrueText("Punched!!!", New cv.Point(10, 100), 3)
+            SetTrueText("Punched!!!", New cv.Point(10, 100), 3)
             showMessage -= 1
         End If
 
-        Static showWarningInfo As Integer
         If contours.contourlist.Count > 3 Then showWarningInfo = 100
 
         If showWarningInfo Then
             showWarningInfo -= 1
-            setTrueText("Too many contours!  Reduce the Max Depth.", New cv.Point(10, 130), 3)
+            SetTrueText("Too many contours!  Reduce the Max Depth.", New cv.Point(10, 130), 3)
         End If
     End Sub
 End Class
@@ -1182,7 +1163,7 @@ End Class
 Public Class Depth_Contour : Inherits VB_Parent
     Dim contour As New Contour_General
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         labels(2) = "task.depthMask contour"
         desc = "Create and display the task.depthMask output as a contour."
     End Sub
@@ -1207,8 +1188,8 @@ End Class
 Public Class Depth_Outline : Inherits VB_Parent
     Dim contour As New Contour_General
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         labels(2) = "Contour separating depth from no depth"
         desc = "Provide a line that separates depth from no depth throughout the image."
     End Sub
@@ -1237,11 +1218,11 @@ Public Class Depth_StableAverage : Inherits VB_Parent
     Dim dAvg As New Depth_Averaging
     Dim extrema As New Depth_StableMinMax
     Public Sub New()
-        findRadio("Use farthest distance").Checked = True
+        FindRadio("Use farthest distance").Checked = True
         desc = "Use Depth_StableMax to remove the artifacts from the Depth_Averaging"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static unchangedRadio = findRadio("Use unchanged depth input")
+        Static unchangedRadio = FindRadio("Use unchanged depth input")
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
         extrema.Run(src)
 
@@ -1263,6 +1244,7 @@ End Class
 
 Public Class Depth_MinMaxNone : Inherits VB_Parent
     Public options As New Options_MinMaxNone
+    Dim filtered As Integer
     Public Sub New()
         desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
     End Sub
@@ -1271,7 +1253,6 @@ Public Class Depth_MinMaxNone : Inherits VB_Parent
         Dim split() As cv.Mat
         If src.Type = cv.MatType.CV_32FC3 Then split = src.Split() Else split = task.pcSplit
 
-        Static filtered As Integer
         If task.heartBeat Then
             dst3 = split(2)
             filtered = 0
@@ -1368,7 +1349,7 @@ Public Class Depth_StableMinMax : Inherits VB_Parent
     Dim colorize As New Depth_Colorizer_CPP
     Public dMin As New Depth_StableMin
     Public dMax As New Depth_StableMax
-    Dim options As New Options_MinMaxNone
+    Public options As New Options_MinMaxNone
     Public Sub New()
         task.gOptions.unFiltered.Checked = True
         labels(2) = "Depth map colorized"
@@ -1432,7 +1413,7 @@ Public Class Depth_WorldXYMT : Inherits VB_Parent
                       Next
                   Next
               End Sub)
-        setTrueText("OpenGL data prepared.")
+        SetTrueText("OpenGL data prepared.")
     End Sub
 End Class
 
@@ -1465,7 +1446,7 @@ Public Class Depth_WorldXYZ : Inherits VB_Parent
                 End If
             Next
         Next
-        setTrueText("OpenGL data prepared and in dst2.", 3)
+        SetTrueText("OpenGL data prepared and in dst2.", 3)
     End Sub
 End Class
 
@@ -1483,7 +1464,7 @@ Public Class Depth_World : Inherits VB_Parent
         desc = "Build the (approximate) point cloud using camera intrinsics - see CameraOakD.vb for comparable calculations"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.firstPass Then template.Run(empty) ' intrinsics arrive with the first buffers.
+        If task.FirstPass Then template.Run(empty) ' intrinsics arrive with the first buffers.
 
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
@@ -1525,7 +1506,7 @@ Public Class Depth_TiersZ : Inherits VB_Parent
         dst1 = (src * 100 / cmTier).toMat
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        classCount = task.maxZmeters * 100 / cmTier + 1
+        classCount = task.MaxZmeters * 100 / cmTier + 1
 
         dst3 = ShowPalette(dst2 * 255 / classCount)
         labels(2) = $"{classCount} regions found."
@@ -1541,6 +1522,7 @@ End Class
 Public Class Depth_TierCount : Inherits VB_Parent
     Public valley As New HistValley_Depth1
     Public classCount As Integer
+    Dim kValues As New List(Of Integer)
     Public Sub New()
         labels = {"", "Histogram of the depth data with instantaneous valley lines", "", ""}
         desc = "Determine the 'K' value for the best number of clusters for the depth"
@@ -1549,14 +1531,39 @@ Public Class Depth_TierCount : Inherits VB_Parent
         valley.Run(src)
         dst2 = valley.dst2
 
-        Static kValues As New List(Of Integer)
         kValues.Add(valley.valleyOrder.Count)
 
         classCount = CInt(kValues.Average)
         If kValues.Count > task.frameHistoryCount * 10 Then kValues.RemoveAt(0)
 
-        setTrueText("'K' value = " + CStr(classCount) + " after averaging.  Instanteous value = " +
+        SetTrueText("'K' value = " + CStr(classCount) + " after averaging.  Instanteous value = " +
                     CStr(valley.valleyOrder.Count), 3)
         labels(2) = "There are " + CStr(classCount)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Depth_Flatland : Inherits VB_Parent
+    Dim options As New Options_FlatLand
+    Public Sub New()
+        labels(3) = "Grayscale version"
+        desc = "Attempt to stabilize the depth image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        dst2 = task.depthRGB / options.reductionFactor
+        dst2 *= options.reductionFactor
+        dst3 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+    End Sub
+End Class
+
+
+
+

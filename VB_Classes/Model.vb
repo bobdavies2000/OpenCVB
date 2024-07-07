@@ -41,11 +41,13 @@ End Class
 
 Public Class Model_FlatSurfaces : Inherits VB_Parent
     Public totalPixels As Integer
+    Dim floorList As New List(Of Single)
+    Dim ceilingList As New List(Of Single)
     Public Sub New()
         desc = "Minimalist approach to find a flat surface that is oriented to gravity (floor or ceiling)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.maxZmeters)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.MaxZmeters)}
         cv.Cv2.CalcHist({task.pointCloud}, {1, 2}, New cv.Mat, dst0, 2,
                         {dst2.Height, dst2.Width}, ranges)
 
@@ -62,7 +64,6 @@ Public Class Model_FlatSurfaces : Inherits VB_Parent
             End If
         Next
 
-        Static floorList As New List(Of Single)
         Dim floorY = rect.Y
         floorList.Add(nextY)
         task.pcFloor = floorList.Average()
@@ -80,7 +81,6 @@ Public Class Model_FlatSurfaces : Inherits VB_Parent
             End If
         Next
 
-        Static ceilingList As New List(Of Single)
         Dim ceilingY = rect.Y
         ceilingList.Add(nextY)
         task.pcCeiling = ceilingList.Average()

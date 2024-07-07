@@ -88,10 +88,10 @@ Public Class Density_Mask : Inherits VB_Parent
         desc = "Measure a mask's size in any image and track the biggest regions."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         src.SetTo(0, task.noDepthMask)
 
-        Dim threshold = task.gOptions.GridSize.Value * task.gOptions.GridSize.Value / 2
+        Dim threshold = task.gridSize * task.gridSize / 2
         Dim activeList(task.gridList.Count - 1) As Boolean
         dst3.SetTo(0)
         Parallel.For(0, task.gridList.Count,

@@ -16,7 +16,7 @@ Public Class FitLine_Basics : Inherits VB_Parent
 
         If standaloneTest() Then
             draw.Run(src)
-            dst3 = draw.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+            dst3 = draw.dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray).Threshold(1, 255, cv.ThresholdTypes.Binary)
             dst2 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Else
             lines.Clear()
@@ -53,7 +53,7 @@ Public Class Fitline_3DBasics_MT : Inherits VB_Parent
         If Not task.heartBeat Then Exit Sub
         hlines.Run(src)
         dst3 = hlines.dst3
-        Dim mask = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim mask = dst3.CvtColor(cv.ColorConversionCodes.BGR2Gray).Threshold(1, 255, cv.ThresholdTypes.Binary)
         dst3 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         src.CopyTo(dst2)
 

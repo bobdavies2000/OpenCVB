@@ -64,7 +64,7 @@ Public Class Resize_Preserve : Inherits VB_Parent
 
         Dim rect = New cv.Rect(options.topLeftOffset, options.topLeftOffset, dst2.Width, dst2.Height)
         src.CopyTo(dst0(rect))
-        dst2 = dst0.Resize(dst2.Size, 0, 0, options.warpFlag)
+        dst2 = dst0.Resize(dst2.Size(), 0, 0, options.warpFlag)
 
         labels(2) = "Image after resizing to: " + CStr(newSize.Width) + "X" + CStr(newSize.Height)
     End Sub
@@ -79,12 +79,12 @@ End Class
 
 
 Public Class Resize_Proportional : Inherits VB_Parent
+    Dim options As New Options_Spectrum
     Public Sub New()
         desc = "Resize the input but keep the results proportional to the original."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            Static options As New Options_Spectrum
             options.RunVB()
             dst2 = options.runRedCloud(labels(2))
             src = src(task.rc.rect)

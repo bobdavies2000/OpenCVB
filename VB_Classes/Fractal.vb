@@ -70,6 +70,7 @@ End Class
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
 Public Class Fractal_MandelbrotZoom : Inherits VB_Parent
     Public mandel As New Fractal_Mandelbrot
+    Dim saveDrawRect As New cv.Rect(1, 1, 1, 1)
     Public Sub New()
         desc = "Run the classic Mandalbrot algorithm and allow zooming in"
     End Sub
@@ -88,7 +89,6 @@ Public Class Fractal_MandelbrotZoom : Inherits VB_Parent
         End If
         If mandel.options.resetCheck.Checked Then mandel.reset()
 
-        Static saveDrawRect As New cv.Rect(1, 1, 1, 1)
         If task.optionsChanged Or saveDrawRect <> task.drawRect Then
             saveDrawRect = task.drawRect
             mandel.Run(src)
@@ -131,6 +131,7 @@ Public Class Fractal_Julia : Inherits VB_Parent
     Dim mandel As New Fractal_MandelbrotZoomColor
     Dim rt As Double = 0.282
     Dim mt As Double = -0.58
+    Dim savedMouse = New cv.Point(-1, -1)
     Public Sub New()
         labels(3) = "Mouse selects different Julia Sets - zoom for detail"
         desc = "Build Julia set from any point in the Mandelbrot fractal"
@@ -146,8 +147,7 @@ Public Class Fractal_Julia : Inherits VB_Parent
         Return julia_point(x, y, r, depth - 1, max, c, Complex.Pow(z, 2) + c)
     End Function
     Public Sub RunVB(src as cv.Mat)
-        Static resetCheck = findCheckBox("Reset to original Mandelbrot")
-        Static savedMouse = New cv.Point(-1, -1)
+        Static resetCheck = FindCheckBox("Reset to original Mandelbrot")
         If savedMouse <> task.mouseMovePoint Or resetCheck.Checked Then
             savedMouse = task.mouseMovePoint
             mandel.Run(src)
@@ -183,7 +183,7 @@ End Class
 Public Class Fractal_Dimension : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "", "RedCloud_Basics output - select any region.", "The selected region (as a square)"}
         desc = "Compute the fractal dimension of the provided (square) image.  Algorithm is incomplete."
     End Sub

@@ -97,7 +97,7 @@ public:
 
             dst2.setTo(0);
             for (Point2f pt : pointList) {
-                circle(dst2, pt, task->dotSize, Scalar(0, 255, 255), -1, task->lineType, 0);
+                circle(dst2, pt, task->DotSize, Scalar(0, 255, 255), -1, task->lineType, 0);
             }
         }
     }
@@ -225,7 +225,7 @@ public:
 
         dst2 = Mat::zeros(dst2.size(), dst2.type());  // Set dst2 to black
         for (const Point2f& pt : points) {
-            circle(dst2, pt, task->dotSize, Scalar(0, 255, 255), -1, task->lineType, 0);
+            circle(dst2, pt, task->DotSize, Scalar(0, 255, 255), -1, task->lineType, 0);
         }
     }
 };
@@ -331,7 +331,7 @@ public:
             vector<Point> nextFacet = facet->facetlist[index];
 
             // Ensure unique generation numbers
-            if (task->firstPass) {
+            if (task->FirstPass) {
                 g = (int) usedG.size();
             }
             else {
@@ -342,7 +342,7 @@ public:
             }
             fillConvexPoly(generationMap, nextFacet, g, task->lineType);
             usedG.push_back(g);
-            task->setTrueText(to_string(g), dst2, pt);   
+            task->SetTrueText(to_string(g), dst2, pt);   
         }
         dst3 = generationMap.clone();
     }
@@ -362,8 +362,8 @@ public:
     }
 
     void Run(Mat src) {
-        if (task->mouseClickFlag && !task->firstPass) {
-            task->gridROIclicked = task->gridToRoiIndex.at<int>(task->clickPoint.y, task->clickPoint.x);
+        if (task->mouseClickFlag && !task->FirstPass) {
+            task->gridROIclicked = task->gridToRoiIndex.at<int>(task->ClickPoint.y, task->ClickPoint.x);
         }
         if (task->optionsChanged) {
             task->gridMask = Mat::zeros(src.size(), CV_8U);
@@ -458,12 +458,12 @@ public:
             int test = result.at<int>(i, 0);
             if (test >= trainInput.size() || test < 0) continue;
             Point2f nn = trainInput[result.at<int>(i, 0)];
-            circle(dst2, pt, task->dotSize + 4, Scalar(0, 255, 255), -1, task->lineType);  // Yellow
+            circle(dst2, pt, task->DotSize + 4, Scalar(0, 255, 255), -1, task->lineType);  // Yellow
             line(dst2, pt, nn, Scalar(0, 255, 255), task->lineWidth, task->lineType);
         }
 
         for (Point2f pt : trainInput) {
-            circle(dst2, pt, task->dotSize + 4, Scalar(0, 0, 255), -1, task->lineType);  // Red
+            circle(dst2, pt, task->DotSize + 4, Scalar(0, 0, 255), -1, task->lineType);  // Red
         }
     }
     void generateRandom(Mat src)
@@ -488,7 +488,7 @@ public:
 
         Mat queryMat((int)queries.size(), KNNdimension, CV_32F, queries.data());
         if (queryMat.rows == 0) {
-            task->setTrueText("There were no queries provided. There is nothing to do...", dst2);
+            task->SetTrueText("There were no queries provided. There is nothing to do...", dst2);
             return;
         }
 
@@ -544,7 +544,7 @@ class CPP_KNN_Basics : public algorithmCPP
 {
 private:
 public:
-    vector<pointPair> matches;
+    vector<PointPair> matches;
     vector<Point> noMatch;
     CPP_KNN_Core* basics;
     vector<Point2f> queries;
@@ -569,7 +569,7 @@ public:
         }
 
         if (queries.empty()) {
-            task->setTrueText("Place some input points in queries before starting the knn run.", dst2);
+            task->SetTrueText("Place some input points in queries before starting the knn run.", dst2);
             return;
         }
 
@@ -603,14 +603,14 @@ public:
         // Display results
         dst3.setTo(0);
         for (const Point2f& pt : basics->trainInput) {
-            circle(dst3, pt, task->dotSize + 4, Scalar(0, 0, 255), -1, task->lineType);
+            circle(dst3, pt, task->DotSize + 4, Scalar(0, 0, 255), -1, task->lineType);
         }
 
         noMatch.clear();
         matches.clear();
         for (int i = 0; i < neighbors.size(); i++) {
             Point2f pt = queries[i];
-            circle(dst3, pt, task->dotSize + 4, Scalar(0, 255, 255), -1, task->lineType);
+            circle(dst3, pt, task->DotSize + 4, Scalar(0, 255, 255), -1, task->lineType);
             if (neighbors[i] == -1) {
                 noMatch.push_back(pt);
             }
@@ -670,13 +670,13 @@ public:
 
         vector<int> usedG;
         int g;
-        for (const pointPair& mp : knn->matches) {
+        for (const PointPair& mp : knn->matches) {
             int index = facet->facet32s.at<int>(mp.p2.y, mp.p2.x);
             if (index >= facet->facetlist.size()) continue;
             const vector<Point>& nextFacet = facet->facetlist[index];
 
             // Ensure unique generation numbers
-            if (task->firstPass) {
+            if (task->FirstPass) {
                 g = (int)usedG.size();
             }
             else {
@@ -688,7 +688,7 @@ public:
 
             fillConvexPoly(generationMap, nextFacet, g, task->lineType);
             usedG.push_back(g);
-            task->setTrueText(to_string(g), dst2, mp.p2);
+            task->SetTrueText(to_string(g), dst2, mp.p2);
         }
         dst3 = generationMap.clone();
     }
@@ -727,7 +727,7 @@ public:
         }
         cv::Scalar color = (dst2.channels() == 3) ? cv::Scalar(0, 255, 255) : cv::Scalar(255, 255, 255);
         for (const auto& pt : featurePoints) {
-            cv::circle(dst2, pt, task->dotSize, color, -1, task->lineType);
+            cv::circle(dst2, pt, task->DotSize, color, -1, task->lineType);
         }
         labels[2] = "Found " + to_string(featurePoints.size()) + " points with quality = " + to_string(options->quality) +
             " and minimum distance = " + to_string(options->minDistance);
@@ -769,7 +769,7 @@ public:
             int g = facetGen->dst3.at<int>(pt.y, pt.x);
             generations.push_back(g);
             ptList.push_back(pt);
-            task->setTrueText(to_string(g), dst2, pt);
+            task->SetTrueText(to_string(g), dst2, pt);
         }
 
         int maxGens = *max_element(generations.begin(), generations.end());
@@ -784,8 +784,8 @@ public:
         dst2 = facetGen->dst2;
         dst3 = src.clone();
         for (const Point2f& pt : ptList) {
-            circle(dst2, pt, task->dotSize, Scalar(0, 255, 255), task->lineWidth, task->lineType);
-            circle(dst3, pt, task->dotSize, Scalar(255, 255, 255), task->lineWidth, task->lineType);
+            circle(dst2, pt, task->DotSize, Scalar(0, 255, 255), task->lineWidth, task->lineType);
+            circle(dst3, pt, task->DotSize, Scalar(255, 255, 255), task->lineWidth, task->lineType);
         }
 
         string text = to_string(ptList.size()) + " stable points were identified with " + to_string(maxGens) + " generations at the anchor point";
@@ -824,10 +824,10 @@ public:
         for (auto i = 0; i < basics->ptList.size(); i++)
         {
             Point2f pt = basics->ptList[i];
-            circle(dst2, pt, task->dotSize, YELLOW, task->lineWidth, task->lineType);
+            circle(dst2, pt, task->DotSize, YELLOW, task->lineWidth, task->lineType);
             g = basics->facetGen->dst3.at<int>(pt.y, pt.x);
             goodCounts[g] = i;
-            task->setTrueText(to_string(g), dst2, pt);
+            task->SetTrueText(to_string(g), dst2, pt);
         }
     }
 };
@@ -910,8 +910,8 @@ public:
                 float pixel = src.at<float>(y, x);
                 if (pixel != 0)
                     int k = 0;
-                if (pixel > 0 && pixel <= task->maxZmeters) {
-                    float t = pixel / task->maxZmeters;
+                if (pixel > 0 && pixel <= task->MaxZmeters) {
+                    float t = pixel / task->MaxZmeters;
                     Scalar colorS = 255 * ((1 - t) * nearColor + t * farColor);
                     Vec3b color = Vec3b(colorS[0], colorS[1], colorS[2]);
                     dst2.at<Vec3b>(y, x) = color;
@@ -1042,7 +1042,7 @@ public:
                                 gMt[2][0] * 0   + gMt[2][1] * 1 + gMt[2][2] * 0,
                                 gMt[2][0] * -sy + gMt[2][1] * 0 + gMt[2][2] * cy}};
         task->gMatrix = Mat(3, 3, CV_32F, gMatrix).clone();
-        task->setTrueText("task->gMatrix is set...", dst2);
+        task->SetTrueText("task->gMatrix is set...", dst2);
     }
 };
 
@@ -1072,7 +1072,7 @@ public:
         //qt->cy = cos(rotateY * PI / 180);
         //qt->sy = sin(rotateY * PI / 180);
         qt->Run(src);
-        task->setTrueText("task->gMatrix is set...", dst2);
+        task->SetTrueText("task->gMatrix is set...", dst2);
     }
 };
 
@@ -1105,7 +1105,7 @@ public:
         if (option_resizeFactor != 1) {
             resize(dst0, dst1, Size(int((dst2.cols * option_resizeFactor)), int((dst2.rows * option_resizeFactor))));
         }
-        task->setTrueText("gCloud is ready for use", dst3);
+        task->SetTrueText("gCloud is ready for use", dst3);
 
         cloud->Run(task->gCloud);
         dst2 = cloud->dst2;
@@ -1361,7 +1361,7 @@ public:
             kOutput.resize(kInput.size());
         }
 
-        if (task->useKalman) {
+        if (task->UseKalman) {
             for (int i = 0; i < kalman.size(); i++) {
                 kalman[i].inputReal = kInput[i];
                 kalman[i].Run();
@@ -1381,7 +1381,7 @@ public:
             rect = task->validateRect(rect, dst2.cols, dst2.rows);
             static Rect lastRect = rect;
             if (rect == lastRect) {
-                Rect r = task->initRandomRect(src.rows <= 240 ? 20 : 50, dst2.cols);
+                Rect r = task->InitRandomRect(src.rows <= 240 ? 20 : 50, dst2.cols);
                 kInput = { float(r.x), float(r.y), float(r.width), float(r.height) };
             }
             lastRect = rect;
@@ -1456,7 +1456,7 @@ public:
         histK->Run(input);
         if (histK->hist->mm.minVal == histK->hist->mm.maxVal) {
 
-            task->setTrueText("The input image is empty - mm.minVal and mm.maxVal are both zero...", dst2);
+            task->SetTrueText("The input image is empty - mm.minVal and mm.maxVal are both zero...", dst2);
             return;
         }
 
@@ -1529,7 +1529,7 @@ public:
                 Rect r = Rect(nPoint.x, nPoint.y, width, height);
 
                 if (options_drawRotated) {
-                    task->drawRotatedRectangle(rr, dst2, nextColor);
+                    task->DrawRotatedRectangle(rr, dst2, nextColor);
                 }
                 else {
                     rectangle(dst2, r, nextColor, options_drawFilled ? -1 : 1);
@@ -1638,7 +1638,7 @@ public:
 
     void Run(Mat src) override {
         if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
-        if (task->firstPass) lastGray = src.clone();
+        if (task->FirstPass) lastGray = src.clone();
         if (task->optionsChanged || lastGray.size() != src.size()) {
             lastGray = src.clone();
             dst3 = src.clone();
@@ -1718,7 +1718,7 @@ public:
             task->drawContour(dst3, nextContour, Scalar(0, 255, 255));
         }
         else {
-            task->setTrueText("No contours found", dst2);
+            task->SetTrueText("No contours found", dst2);
         }
     }
 };
@@ -2074,7 +2074,7 @@ public:
         } 
 
         if (hullList.empty()) {
-            task->setTrueText("No points were provided. Update hullList before running.", dst2);
+            task->SetTrueText("No points were provided. Update hullList before running.", dst2);
             return;
         }
         hull.clear();
@@ -2120,7 +2120,7 @@ class CPP_Line_BasicsOld : public algorithmCPP {
 public: 
     Ptr<ximgproc::FastLineDetector> ld;
     map<float, int> sortLength;
-    vector<pointPair> mpList;
+    vector<PointPair> mpList;
     vector<Point2f> ptList;
     Rect subsetRect;
     int options_lineLengthThreshold = 20;
@@ -2155,7 +2155,7 @@ public:
                 0 <= x2 && x2 < dst2.cols && 0 <= y2 && y2 < dst2.rows) {
                 Point p1(x1, y1), p2(x2, y2);
                 if (norm(p1 - p2) >= options_lineLengthThreshold) {
-                    pointPair mps(p1, p2);
+                    PointPair mps(p1, p2);
                     mpList.push_back(mps);
                     ptList.push_back(p1);
                     ptList.push_back(p2);
@@ -2168,7 +2168,7 @@ public:
         dst2 = src.clone();
         dst3.setTo(0);
         for (const auto& nextLine : sortLength) {
-            const pointPair& mps = mpList[nextLine.second];
+            const PointPair& mps = mpList[nextLine.second];
             line(dst2, mps.p1, mps.p2, Scalar(255, 255, 255), task->lineWidth, task->lineType);
             line(dst3, mps.p1, mps.p2, 255, task->lineWidth, task->lineType);
         }
@@ -2342,7 +2342,7 @@ public:
             for (int j = 0; j <= 100; j++) {
                 Point p2 = nextPoint(points, i, j / 100.0f);
                 if (j > 0) {
-                    line(dst2, p1, p2, task->highlightColor, task->lineWidth);
+                    line(dst2, p1, p2, task->HighlightColor, task->lineWidth);
                 }
                 p1 = p2;
             }
@@ -2532,7 +2532,7 @@ public:
     void Run(Mat src) {
         minCore->Run(src);
         vector<rcData> lastCells = redCells;
-        if (task->firstPass) lastColors = dst3.clone();
+        if (task->FirstPass) lastColors = dst3.clone();
         redCells.clear();
         dst2.setTo(0);
         dst3.setTo(0);
@@ -2552,20 +2552,20 @@ public:
                 redCells.push_back(cell);
                 dst2(cell.rect).setTo(cell.index, cell.mask);
                 dst3(cell.rect).setTo(cell.color, cell.mask);
-                //task->setTrueText(to_string(cell.index), cell.maxDist, 2);
-                //task->setTrueText(to_string(cell.index), cell.maxDist, 3);
+                //task->SetTrueText(to_string(cell.index), cell.maxDist, 2);
+                //task->SetTrueText(to_string(cell.index), cell.maxDist, 3);
             }
         }
         labels[3] = to_string(redCells.size()) + " cells were identified.";
         task->rcSelect = rcData();
-        if (task->clickPoint == Point(0, 0)) {
+        if (task->ClickPoint == Point(0, 0)) {
             if (redCells.size() > 2) {
-                task->clickPoint = redCells[0].maxDist;
+                task->ClickPoint = redCells[0].maxDist;
                 task->rcSelect = redCells[0];
             }
         }
         else {
-            uchar index = dst2.at<uchar>(task->clickPoint.y, task->clickPoint.x);
+            uchar index = dst2.at<uchar>(task->ClickPoint.y, task->ClickPoint.x);
             if (index != 0) task->rcSelect = redCells[index - 1];
         }
         lastColors = dst3.clone();
@@ -2605,7 +2605,7 @@ public:
             line(dst2, p1, p2, Scalar(255, 255, 255), task->lineWidth, task->lineType);
         }
         for (int i = 0; i < knn->queries.size(); i++) {
-            circle(dst2, knn->queries[i], task->dotSize + 2, Scalar(0, 0, 255), -1, task->lineType);
+            circle(dst2, knn->queries[i], task->DotSize + 2, Scalar(0, 0, 255), -1, task->lineType);
         }
         return dst2;
     }
@@ -2665,7 +2665,7 @@ public:
             auto p1 = Point2f(round(pt.pt.x), round(pt.pt.y));
             if (find(lastPoints.begin(), lastPoints.end(), p1) != lastPoints.end()) {
                 stablePoints.push_back(p1);
-                circle(dst2, p1, task->dotSize, Scalar(0, 0, 255), -1, task->lineType);
+                circle(dst2, p1, task->DotSize, Scalar(0, 0, 255), -1, task->lineType);
             }
         }
 
@@ -2759,7 +2759,7 @@ public:
         if (standalone) {
             dst2.setTo(0);
             for (const Point2f& pt : inputPoints) {
-                circle(dst2, pt, task->dotSize + 2, Scalar(0, 0, 255), -1, task->lineType);
+                circle(dst2, pt, task->DotSize + 2, Scalar(0, 0, 255), -1, task->lineType);
             }
             task->drawRotatedOutline(minRect, dst2, Scalar(0, 255, 255));
         }
@@ -2839,17 +2839,17 @@ public:
     }
     void Run(Mat src) {
         if (standalone) mats->defaultMats(src);
-        if (task->firstPass) {
+        if (task->FirstPass) {
             task->mouseClickFlag = true;
-            task->clickPoint = Point(0, 0);
+            task->ClickPoint = Point(0, 0);
             task->mousePicTag = RESULT_DST2;
         }
         if (task->mouseClickFlag && task->mousePicTag == RESULT_DST2) {
-            if (task->clickPoint.y < task->workingRes.height / 2) {
-                quadrant = (task->clickPoint.x < task->workingRes.width / 2) ? RESULT_DST0 : RESULT_DST1;
+            if (task->ClickPoint.y < task->WorkingRes.height / 2) {
+                quadrant = (task->ClickPoint.x < task->WorkingRes.width / 2) ? RESULT_DST0 : RESULT_DST1;
             }
             else {
-                quadrant = (task->clickPoint.x < task->workingRes.width / 2) ? RESULT_DST2 : RESULT_DST3;
+                quadrant = (task->ClickPoint.x < task->WorkingRes.width / 2) ? RESULT_DST2 : RESULT_DST3;
             }
         }
         mats->Run(empty);
@@ -3052,7 +3052,7 @@ public:
     void Run(Mat src) {
         cv::Vec2f rx(-task->xRangeDefault, task->xRangeDefault);
         cv::Vec2f ry(-task->yRangeDefault, task->yRangeDefault);
-        cv::Vec2f rz(0, task->maxZmeters);
+        cv::Vec2f rz(0, task->MaxZmeters);
         rangesCloud = { cv::Range(rx[0], rx[1]), cv::Range(ry[0], ry[1]), cv::Range(rz[0], rz[1]) };
 
         task->channelCount = 1;
@@ -3179,7 +3179,7 @@ public:
             if (displayCount >= desiredCount * 2) break;
             Point2f pt = it->second;
             if (displayCount < desiredCount) {
-                circle(dst2, pt, task->dotSize, Scalar(255, 255, 255), -1, task->lineType);
+                circle(dst2, pt, task->DotSize, Scalar(255, 255, 255), -1, task->lineType);
                 displayCount++;
             }
             stablePoints.push_back(pt);

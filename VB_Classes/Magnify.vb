@@ -6,7 +6,7 @@ Public Class Magnify_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst2 = src
-        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then dst3 = dst2(task.drawRect).Resize(dst3.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then dst3 = dst2(task.drawRect).Resize(dst3.Size(), 0, 0, cv.InterpolationFlags.Nearest)
     End Sub
 End Class
 

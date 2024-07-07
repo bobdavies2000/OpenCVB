@@ -54,7 +54,8 @@ Public Class Smoothing_Exterior : Inherits VB_Parent
                 dst2.SetTo(0)
                 hull.Run(src)
                 Dim nextHull = cv.Cv2.ConvexHull(hullList.ToArray, True)
-                inputPoints = drawPoly(dst2, nextHull.ToList, cv.Scalar.White)
+                inputPoints = nextHull.ToList
+                drawPoly(dst2, inputPoints, cv.Scalar.White)
             Else
                 Exit Sub
             End If
@@ -92,7 +93,7 @@ Public Class Smoothing_Interior : Inherits VB_Parent
         Next
 
         For i = 1 To nrOfIterations
-            nl = getSmootherChaikin(nl, cutdist)
+            If nl.Count > 0 Then nl = getSmootherChaikin(nl, cutdist)
         Next
 
         Return nl
@@ -131,7 +132,8 @@ Public Class Smoothing_Interior : Inherits VB_Parent
                 dst2.SetTo(0)
                 hull.Run(src)
                 Dim nextHull = cv.Cv2.ConvexHull(hullList.ToArray, True)
-                inputPoints = drawPoly(dst2, nextHull.ToList, cv.Scalar.White)
+                inputPoints = nextHull.ToList
+                drawPoly(dst2, nextHull.ToList, cv.Scalar.White)
             Else
                 Exit Sub
             End If
@@ -146,27 +148,3 @@ Public Class Smoothing_Interior : Inherits VB_Parent
         If smoothPoints.Count > 0 Then drawPoly(dst2, smoothPoints, plotColor)
     End Sub
 End Class
-
-
-
-
-
-
-
-Module Hull_module
-    Public Function drawPoly(result As cv.Mat, polyPoints As List(Of cv.Point), color As cv.Scalar) As List(Of cv.Point)
-        Dim listOfPoints = New List(Of List(Of cv.Point))
-        Dim points = New List(Of cv.Point)
-        For Each pt In polyPoints
-            points.Add(pt)
-        Next
-        listOfPoints.Add(points)
-        cv.Cv2.DrawContours(result, listOfPoints, 0, color, 2)
-
-        For i = 0 To polyPoints.Count - 1
-            result.Circle(polyPoints(i), task.dotSize + 2, color, -1, task.lineType)
-        Next
-
-        Return points
-    End Function
-End Module

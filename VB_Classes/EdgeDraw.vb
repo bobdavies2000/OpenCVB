@@ -7,7 +7,7 @@ Public Class EdgeDraw_Basics : Inherits VB_Parent
         desc = "Access the EdgeDraw algorithm directly rather than through to CPP_Basics interface - more efficient"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         Dim cppData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
@@ -33,12 +33,12 @@ Public Class EdgeDraw_Segments : Inherits VB_Parent
     Public Sub New()
         cPtr = EdgeDraw_Lines_Open()
         labels = {"", "", "EdgeDraw_Segments output", ""}
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Access the EdgeDraw algorithm directly rather than through to CPP_Basics interface - more efficient"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         Dim cppData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)

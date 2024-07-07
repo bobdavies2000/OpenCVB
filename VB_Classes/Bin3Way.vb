@@ -2,15 +2,15 @@
 Public Class Bin3Way_Basics : Inherits VB_Parent
     Dim hist As New Hist_Basics
     Public mats As New Mat_4Click
+    Dim firstThird As Integer, lastThird As Integer
     Public Sub New()
         task.gOptions.setHistogramBins(256)
         labels = {"", "", "Image separated into three segments from darkest to lightest and 'Other' (between)", "Histogram Of grayscale image"}
         desc = "Split an image into 3 parts - darkest, lightest, and in-between the 2"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static firstThird As Integer, lastThird As Integer
         Dim bins = task.histogramBins
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If task.heartBeat Then
             firstThird = 0
@@ -66,7 +66,7 @@ Public Class Bin3Way_KMeans : Inherits VB_Parent
         desc = "Use kmeans with each of the 3-way split images"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         bin3.Run(src)
 
         kmeans.Run(src)
@@ -90,7 +90,7 @@ End Class
 Public Class Bin3Way_Color : Inherits VB_Parent
     Dim bin3 As New Bin3Way_KMeans
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Build the palette input that best separates the light and dark regions of an image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -154,7 +154,7 @@ Public Class Bin3Way_RedCloudOther : Inherits VB_Parent
     Dim flood As New Flood_BasicsMask
     Dim color As New Color8U_Basics
     Public Sub New()
-        flood.inputMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        flood.inputMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Use RedCloud with the regions that are neither lightest or darkest"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -189,7 +189,7 @@ Public Class Bin3Way_RedCloud1 : Inherits VB_Parent
         If task.optionsChanged Then
             For i = 0 To redCells.Count - 1
                 redCells(i) = New List(Of rcData)
-                cellMaps(i) = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
             Next
         End If
 
@@ -246,7 +246,7 @@ Public Class Bin3Way_RedCloud : Inherits VB_Parent
         If task.optionsChanged Then
             For i = 0 To redCells.Count - 1
                 redCells(i) = New List(Of rcData)
-                cellMaps(i) = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
             Next
         End If
 

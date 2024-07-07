@@ -6,30 +6,30 @@ CPP_Hist_RedOptions* redOptions;
 
 extern "C" __declspec(dllexport)
 int * cppTask_Open(int function, int rows, int cols, bool heartBeat, float addWeighted, 
-                   int lineWidth, int lineType, int dotSize,
+                   int lineWidth, int lineType, int DotSize,
                    int gridSize, int histogramBins, bool gravityPointCloud, int pixelDiffThreshold,
-                   bool useKalman, int paletteIndex, bool optionsChanged, int frameHistory,
+                   bool UseKalman, int paletteIndex, bool optionsChanged, int frameHistory,
                    bool displayDst0, bool displayDst1)
 {
     task = new cppTask(rows, cols);
-    workingRes = Size(cols, rows);
+    WorkingRes = Size(cols, rows);
     task->heartBeat = heartBeat;
     task->lineType = lineType;
     task->lineWidth = lineWidth;
-    task->dotSize = dotSize;
+    task->DotSize = DotSize;
     task->pixelDiffThreshold = pixelDiffThreshold;
     task->gravityPointCloud = gravityPointCloud;
     task->AddWeighted = double(addWeighted);
     task->gridSize = gridSize;
     task->histogramBins = histogramBins;    
-    task->useKalman = useKalman;
+    task->UseKalman = UseKalman;
     task->paletteIndex = paletteIndex;
     task->optionsChanged = optionsChanged;
     task->frameHistoryCount = frameHistory;
     task->displayDst0 = displayDst0;
     task->displayDst1 = displayDst1;
 
-    task->highlightColor = highlightColors[task->frameCount % highlightColors.size()];
+    task->HighlightColor = HighlightColors[task->frameCount % HighlightColors.size()];
 
     switch (function)
     {
@@ -209,14 +209,14 @@ void cppTask_Labels(cppTask * task)
 // https://www.codeproject.com/Articles/197493/Marshal-variable-length-array-of-structs-from-C-to
 extern "C" __declspec(dllexport)
 void cppTask_OptionsCPPtoVB(cppTask * task, int& gridSize,
-    int& histogramBins, int& pixelDiffThreshold, bool& useKalman,
+    int& histogramBins, int& pixelDiffThreshold, bool& UseKalman,
     int& frameHistory, int& rectX, int& rectY, int& rectWidth, int& rectHeight,
     LPSTR labelBuffer, LPSTR desc, LPSTR advice)
 {
     pixelDiffThreshold = task->pixelDiffThreshold;
     gridSize = task->gridSize;
     histogramBins = task->histogramBins;
-    useKalman = task->useKalman;
+    UseKalman = task->UseKalman;
     frameHistory = task->frameHistoryCount;
     rectX = task->drawRect.x;
     rectY = task->drawRect.y;
@@ -235,10 +235,10 @@ void cppTask_OptionsCPPtoVB(cppTask * task, int& gridSize,
 // https://www.codeproject.com/Articles/197493/Marshal-variable-length-array-of-structs-from-C-to
 extern "C" __declspec(dllexport)
 void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
-                            int histogramBins, int pixelDiffThreshold, bool useKalman,
+                            int histogramBins, int pixelDiffThreshold, bool UseKalman,
                             int frameHistory, int rectX, int rectY, int rectWidth, int rectHeight,
-                            int lineWidth, int lineType, int dotSize, int lowResWidth, int lowResHeight,
-                            float maxZmeters, int PCReduction, float fontSize, int fontThickness,
+                            int lineWidth, int lineType, int DotSize, int lowResWidth, int lowResHeight,
+                            float MaxZmeters, int PCReduction, float fontSize, int fontThickness,
                             int clickX, int clickY, bool clickFlag, int picTag, int moveX, int moveY,
                             int paletteIndex, int desiredCells, bool midHeartBeat, bool quarterBeat,
                             int colorIndex, int depthInputIndex, float xRangeDefault, float yRangeDefault)
@@ -246,7 +246,7 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
     task->pixelDiffThreshold = pixelDiffThreshold;
     task->gridSize = gridSize;
     task->histogramBins = histogramBins;
-    task->useKalman = useKalman;
+    task->UseKalman = UseKalman;
     task->frameHistoryCount = frameHistory;
     task->drawRect.x = rectX;
     task->drawRect.y = rectY;
@@ -254,13 +254,13 @@ void cppTask_OptionsVBtoCPP(cppTask * task, int gridSize,
     task->drawRect.height = rectHeight;
     task->lineWidth = lineWidth;
     task->lineType = lineType;
-    task->dotSize = dotSize;
+    task->DotSize = DotSize;
     task->lowRes = Size(lowResWidth, lowResHeight);
-    task->maxZmeters = maxZmeters;
+    task->MaxZmeters = MaxZmeters;
     task->PCReduction = PCReduction;
     task->cvFontSize = fontSize * 0.6;
     task->cvFontThickness = fontThickness;
-    task->clickPoint = Point(clickX, clickY);
+    task->ClickPoint = Point(clickX, clickY);
     task->mouseMovePoint = Point(moveX, moveY);
     task->mouseClickFlag = clickFlag;
     task->mousePicTag = picTag;
@@ -297,7 +297,7 @@ int* cppTask_PointCloud(cppTask * task, int* dataPtr, int rows, int cols)
     task->depthMask = task->depth32f > 0;
     bitwise_not(task->depthMask, task->noDepthMask);
 
-    threshold(task->pcSplit[2], task->maxDepthMask, task->maxZmeters, 255, THRESH_BINARY);  
+    threshold(task->pcSplit[2], task->maxDepthMask, task->MaxZmeters, 255, THRESH_BINARY);  
     task->maxDepthMask.convertTo(task->maxDepthMask, CV_8U);
 
     static CPP_Depth_PointCloud_IMU* pCloud = new CPP_Depth_PointCloud_IMU();
@@ -432,7 +432,7 @@ int* cppTask_RunCPP(cppTask * task, int* dataPtr, int channels, int frameCount, 
 
     task->alg->Run(src);   //<<<<<< the real work is done here...
 
-    task->firstPass = false;
+    task->FirstPass = false;
 
     if (src.size() != task->alg->dst0.size()) resize(task->alg->dst0, task->alg->dst0, src.size());
     if (src.size() != task->alg->dst1.size()) resize(task->alg->dst1, task->alg->dst1, src.size());

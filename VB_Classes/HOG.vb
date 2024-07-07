@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HOGSample.vb
 Public Class HOG_Basics : Inherits VB_Parent
-    Dim staticImage As cv.Mat
-    Dim staticImageProcessed As Boolean
+    Dim Image As cv.Mat
+    Dim ImageProcessed As Boolean
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("HOG Threshold", 0, 100, 0)
@@ -10,8 +10,8 @@ Public Class HOG_Basics : Inherits VB_Parent
             sliders.setupTrackBar("HOG Scale", 0, 2000, 300)
         End If
         desc = "Find people with Histogram of Gradients (HOG) 2D feature"
-        staticImage = cv.Cv2.ImRead(task.homeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
-        dst3 = staticImage.Resize(dst3.Size)
+        If Image Is Nothing Then Image = cv.Cv2.ImRead(task.HomeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
+        dst3 = Image.Resize(dst3.Size)
     End Sub
     Private Sub drawFoundRectangles(dst2 As cv.Mat, found() As cv.Rect)
         For Each rect As cv.Rect In found
@@ -50,12 +50,12 @@ Public Class HOG_Basics : Inherits VB_Parent
         If dst2.Height = 94 Then dst2 = src.Resize(dst2.Size) Else src.CopyTo(dst2)
         drawFoundRectangles(dst2, found)
 
-        If staticImageProcessed = False Then
+        If ImageProcessed = False Then
             If dst3.Height = 94 Then dst3 = dst3.Resize(New cv.Size(dst3.Width * 2, dst3.Height * 2))
             found = hog.DetectMultiScale(dst3, threshold, New cv.Size(stride, stride), New cv.Size(24, 16), scale, 2)
             drawFoundRectangles(dst3, found)
             If found.Length > 0 Then
-                staticImageProcessed = True
+                ImageProcessed = True
                 labels(3) = String.Format("{0} region(s) found", found.Length)
             Else
                 labels(3) = "Try adjusting slider bars."

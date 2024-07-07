@@ -5,7 +5,7 @@ Public Class Hist3D_Basics : Inherits VB_Parent
     Dim hCloud As New Hist3Dcloud_Basics
     Public classCount As Integer
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Add color and cloud 8UC1")
             radio.addRadio("Copy cloud into color 8UC1")
@@ -16,7 +16,7 @@ Public Class Hist3D_Basics : Inherits VB_Parent
         desc = "Build an 8UC1 image by adding Hist3Dcolor_Basics and Hist3Dcloud_Basics output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static addRadio = findRadio("Add color and cloud 8UC1")
+        Static addRadio = FindRadio("Add color and cloud 8UC1")
         Dim addCloud = addRadio.checked
 
         hColor.Run(src)
@@ -44,13 +44,13 @@ Public Class Hist3D_BuildHistogram : Inherits VB_Parent
     Public threshold As Integer
     Public classCount As Integer
     Public histArray() As Single
+    Dim plot As New Hist_Depth
     Public Sub New()
         desc = "Build a guided 3D histogram from the 3D histogram supplied in src."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
             task.gOptions.setHistogramBins(100)
-            Static plot As New Hist_Depth
             plot.Run(src)
             src = plot.histogram
         End If
@@ -152,12 +152,12 @@ End Class
 Public Class Hist3D_DepthWithMask : Inherits VB_Parent
     Dim hColor As New Hist3Dcolor_Basics
     Public depthMask As New cv.Mat
+    Dim fore As New Foreground_KMeans2
     Public Sub New()
         desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            Static fore As New Foreground_KMeans2
             fore.Run(src)
             depthMask = fore.dst2 Or task.noDepthMask
         End If
@@ -189,7 +189,7 @@ Public Class Hist3D_Pixel : Inherits VB_Parent
         desc = "Classify each pixel using a 3D histogram backprojection."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 3 Then src = task.color
+        If src.Channels() <> 3 Then src = task.color
         Dim bins = task.redOptions.HistBinBar3D.Value
         cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, task.redOptions.rangesBGR)
 
@@ -219,7 +219,7 @@ Public Class Hist3D_PixelCells : Inherits VB_Parent
     Dim pixel As New Hist3D_Pixel
     Dim redC As New Flood_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "", "Cell-by-cell backprojection of the Hist3D_Pixel algorithm", "Palette version of dst2"}
         desc = "After classifying each pixel, backproject each redCell using the same 3D histogram."
     End Sub
@@ -301,6 +301,20 @@ Public Class Hist3D_RedCloudGrid : Inherits VB_Parent
         task.gOptions.setGridSize(8)
         desc = "Build RedCloud pixel vectors and then measure each grid element's distance to those vectors."
     End Sub
+    Private Function distanceN(vec1 As List(Of Single), vec2 As List(Of Single)) As Double
+        Dim accum As Double
+        For i = 0 To vec1.Count - 1
+            accum += (vec1(i) - vec2(i)) * (vec1(i) - vec2(i))
+        Next
+        Return Math.Sqrt(accum)
+    End Function
+    Private Function distanceN(vec1() As Single, vec2() As Single) As Double
+        Dim accum As Double
+        For i = 0 To vec1.Count - 1
+            accum += (vec1(i) - vec2(i)) * (vec1(i) - vec2(i))
+        Next
+        Return Math.Sqrt(accum)
+    End Function
     Public Sub RunVB(src As cv.Mat)
         pixels.Run(src)
         dst2 = task.cellMap

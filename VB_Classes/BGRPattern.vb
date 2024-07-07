@@ -2,7 +2,7 @@
 Imports cv = OpenCvSharp
 Public Class BGRPattern_Basics : Inherits VB_Parent
     Dim denoise As New Denoise_Pixels
-    Dim options As New Options_ColorFormat
+    Public colorFmt As New Color_Basics
     Public classCount As Integer
     Public Sub New()
         cPtr = BGRPattern_Open()
@@ -10,8 +10,8 @@ Public Class BGRPattern_Basics : Inherits VB_Parent
         desc = "Classify each 3-channel input pixel according to their relative values"
     End Sub
     Public Sub RunVB(ByVal src As cv.Mat)
-        options.RunVB()
-        src = options.dst2
+        colorFmt.Run(src)
+        src = colorFmt.dst2
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)

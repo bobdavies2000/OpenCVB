@@ -11,7 +11,7 @@ Public Class Photon_Basics : Inherits VB_Parent
         cv.Cv2.Absdiff(src, lastImage, dst1)
 
         dst0 = dst1.Reshape(1, dst1.Rows * 3)
-        dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         If dst0.CountNonZero > 0 Then
@@ -44,7 +44,7 @@ Public Class Photon_Test : Inherits VB_Parent
         labels = {"", "", "5 color levels from reduction (black not shown)", "Selected distribution"}
         desc = ""
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         task.redOptions.SimpleReductionBar.Value = 64 ' for now...
         Dim reduce = 64
 
@@ -57,10 +57,10 @@ Public Class Photon_Test : Inherits VB_Parent
             mats.mat(i) = dst1.InRange(reduce * i, reduce * i)
             counts(i).Add(mats.mat(i).CountNonZero)
             If counts(i).Count > testCount Then counts(i).RemoveAt(0)
-            strout += "for " + CStr(i * reduce) + " average = " + Format(counts(i).Average, "###,##0") + " min = " + Format(counts(i).Min, "###,##0.0") + " max = " +
+            strOut += "for " + CStr(i * reduce) + " average = " + Format(counts(i).Average, "###,##0") + " min = " + Format(counts(i).Min, "###,##0.0") + " max = " +
                       Format(counts(i).Max, "###,##0.0") + vbCrLf
         Next
-        setTrueText(strout, 3)
+        SetTrueText(strOut, 3)
         mats.Run(empty)
         dst2 = mats.dst2
 
@@ -94,7 +94,7 @@ Public Class Photon_Subtraction : Inherits VB_Parent
         labels = {"", "", "Points where B, G, or R differ", "Histogram showing distribution of differences"}
         desc = "Same as Photon_Basics but without ignoring sign."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         src = src.Reshape(1, src.Rows * 3)
         src.ConvertTo(src, cv.MatType.CV_32F)
 
@@ -107,7 +107,7 @@ Public Class Photon_Subtraction : Inherits VB_Parent
         dst2 = hist.dst2
 
         subOutput = subOutput.Reshape(3, dst2.Height)
-        dst1 = subOutput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1 = subOutput.CvtColor(cv.ColorConversionCodes.BGR2Gray).Threshold(0, 255, cv.ThresholdTypes.Binary)
         If dst1.CountNonZero Then dst3 = dst1.Clone ' occasionally the image returned is identical to the last.  hmmm...
         lastImage = src
     End Sub

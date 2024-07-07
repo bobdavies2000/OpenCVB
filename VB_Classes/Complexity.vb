@@ -27,9 +27,9 @@ Public Class Complexity_Basics : Inherits VB_Parent
 
         dst3 = complex.dst2.Clone
 
-        setTrueText(">>>>>> Increasing input data >>>>>>" + vbCrLf + "All available complexity runs",
+        SetTrueText(">>>>>> Increasing input data >>>>>>" + vbCrLf + "All available complexity runs",
                     New cv.Point(dst2.Width / 4, 10), 3)
-        setTrueText(" TIME " + "(Max = " + Format(complex.maxTime, fmt0) + ")", New cv.Point(0, dst2.Height / 2), 3)
+        SetTrueText(" TIME " + "(Max = " + Format(complex.maxTime, fmt0) + ")", New cv.Point(0, dst2.Height / 2), 3)
 
         complex.initialize = True
         complex.fileName = saveLatestFile
@@ -37,9 +37,9 @@ Public Class Complexity_Basics : Inherits VB_Parent
         complex.Run(src)
         dst2 = complex.dst2
 
-        setTrueText(" >>>>>> Increasing input data >>>>>>" + vbCrLf + complex.options.filename.Name,
+        SetTrueText(" >>>>>> Increasing input data >>>>>>" + vbCrLf + complex.options.filename.Name,
                     New cv.Point(dst2.Width / 4, 10))
-        setTrueText(" TIME " + "(Max = " + Format(complex.maxTime, fmt0) + ")", New cv.Point(0, dst2.Height / 2))
+        SetTrueText(" TIME " + "(Max = " + Format(complex.maxTime, fmt0) + ")", New cv.Point(0, dst2.Height / 2))
         labels(2) = complex.labels(2)
         labels(3) = "Plots For all available complexity runs"
     End Sub
@@ -106,9 +106,9 @@ Public Class Complexity_PlotOpenCV : Inherits VB_Parent
 
         Dim maxTime = plotData(0)
 
-        setTrueText(">>>>>> Increasing input data >>>>>>", New cv.Point(dst2.Width / 4, 10))
-        setTrueText(" TIME", New cv.Point(0, dst2.Height / 2))
-        setTrueText("Max Time = " + Format(maxTime, fmt0), New cv.Point(10, 10))
+        SetTrueText(">>>>>> Increasing input data >>>>>>", New cv.Point(dst2.Width / 4, 10))
+        SetTrueText(" TIME", New cv.Point(0, dst2.Height / 2))
+        SetTrueText("Max Time = " + Format(maxTime, fmt0), New cv.Point(10, 10))
         labels(2) = "Complexity plot for " + options.filename.Name.Substring(0, Len(options.filename.Name) - 4)
     End Sub
 End Class
@@ -123,6 +123,7 @@ Public Class Complexity_Dots : Inherits VB_Parent
     Public options As New Options_Complexity
     Public initialize As Boolean = True, maxTime As Single, fileName As String
     Public plotColor As cv.Scalar
+    Dim dst As New cv.Mat(New cv.Size(task.lowRes.Width * 2, task.lowRes.Height * 2), cv.MatType.CV_8UC3, 0)
     Public Sub New()
         desc = "Plot the results of multiple runs at various resolutions."
     End Sub
@@ -170,12 +171,11 @@ Public Class Complexity_Dots : Inherits VB_Parent
 
         Dim maxX = srcX.Max
         Dim pointSet As New List(Of cv.Point)
-        Static dst As New cv.Mat(New cv.Size(task.lowRes.Width * 2, task.lowRes.Height * 2), cv.MatType.CV_8UC3, 0)
         If initialize Then dst.SetTo(0)
         For i = 0 To sortData.Count - 1
             Dim pt = New cv.Point(dst.Width * sortData.ElementAt(i).Key / maxX,
                                   dst.Height - dst.Height * sortData.ElementAt(i).Value / maxTime)
-            DrawCircle(dst, pt, task.dotSize, plotColor)
+            DrawCircle(dst, pt, task.DotSize, plotColor)
             pointSet.Add(pt)
         Next
 
@@ -183,9 +183,9 @@ Public Class Complexity_Dots : Inherits VB_Parent
             DrawLine(dst, pointSet(i - 1), pointSet(i), plotColor)
         Next
 
-        setTrueText(">>>>>> Increasing input data >>>>>>" + vbCrLf + options.filename.Name,
+        SetTrueText(">>>>>> Increasing input data >>>>>>" + vbCrLf + options.filename.Name,
                     New cv.Point(dst2.Width / 4, 10))
-        setTrueText(" TIME " + "(Max = " + Format(maxTime, fmt0) + ")", New cv.Point(0, dst2.Height / 2))
+        SetTrueText(" TIME " + "(Max = " + Format(maxTime, fmt0) + ")", New cv.Point(0, dst2.Height / 2))
         labels(2) = "Complexity plot for " + options.filename.Name.Substring(0, Len(options.filename.Name) - 4)
         dst2 = dst.Resize(dst2.Size)
     End Sub

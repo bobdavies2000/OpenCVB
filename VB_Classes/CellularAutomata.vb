@@ -1,43 +1,22 @@
 Imports cv = OpenCvSharp
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
 Public Class CellularAutomata_Basics : Inherits VB_Parent
-    Public i18 As New List(Of String)
+    Public i18 As New List(Of String)({"00011110 Rule 30 (chaotic)", "00110110 Rule 54", "00111100 Rule 60", "00111110 Rule 62",
+                                       "01011010 Rule 90", "01011110 Rule 94", "01100110 Rule 102", "01101110 Rule 110",
+                                       "01111010 Rule 122", "01111110 Rule 126", "10010110 Rule 150", "10011110 Rule 158",
+                                       "10110110 Rule 182", "10111100 Rule 188", "10111110 Rule 190", "11011100 Rule 220",
+                                       "11011110 Rule 222", "11111010 Rule 250"})
     Dim inputCombo = "111,110,101,100,011,010,001,000"
     Dim cellInput(,) = {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}, {1, 0, 0}, {0, 1, 1}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}}
+    Public options As New Options_CellAutomata
     Public input As New cv.Mat
+    Public index As Integer
     Public Sub New()
-        i18.Add("00011110 Rule 30 (chaotic)")
-        i18.Add("00110110 Rule 54")
-        i18.Add("00111100 Rule 60")
-        i18.Add("00111110 Rule 62")
-        i18.Add("01011010 Rule 90")
-        i18.Add("01011110 Rule 94")
-        i18.Add("01100110 Rule 102")
-        i18.Add("01101110 Rule 110")
-        i18.Add("01111010 Rule 122")
-
-        i18.Add("01111110 Rule 126")
-        i18.Add("10010110 Rule 150")
-        i18.Add("10011110 Rule 158")
-        i18.Add("10110110 Rule 182")
-        i18.Add("10111100 Rule 188")
-        i18.Add("10111110 Rule 190")
-        i18.Add("11011100 Rule 220")
-        i18.Add("11011110 Rule 222")
-        i18.Add("11111010 Rule 250")
-
         Dim label = "The 18 most interesting automata from the first 256 in 'New Kind of Science'" + vbCrLf + "The input combinations are: " + inputCombo
-        combo.Setup(traceName, label + vbCrLf + "output below:", i18)
-
-        If check.Setup(traceName) Then
-            check.addCheckBox("Rotate through the different rules")
-            check.Box(0).Checked = True
-        End If
-
         desc = "Visualize the 30 interesting examples from the first 256 in 'New Kind of Science'"
     End Sub
     Public Function createCells(outStr As String) As cv.Mat
-        Dim outcomes(8 - 1) As Byte
+        Dim outcomes(7) As Byte
         For i = 0 To outcomes.Length - 1
             outcomes(i) = Integer.Parse(outStr.Substring(i, 1))
         Next
@@ -59,20 +38,22 @@ Public Class CellularAutomata_Basics : Inherits VB_Parent
         Return dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static rotateCheckBox = findCheckBox("Rotate through the different rules")
-        If standaloneTest() Then
+        options.RunVB()
+
+        If task.heartBeat Then
+            labels(2) = i18(index)
+            index += 1
+            If index >= i18.Count Then index = 0
+        End If
+
+        If standalone Then
             input = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
             input.Set(Of Byte)(0, src.Width / 2, 1)
-            If task.frameCount Mod 2 Then dst3 = createCells(combo.Box.Text) Else dst2 = createCells(combo.Box.Text)
+            dst2 = createCells(labels(2))
         Else
             input = src.Clone
-            dst2 = createCells(combo.Box.Text)
+            dst2 = createCells(labels(2))
         End If
-        If rotateCheckBox.Checked Then
-            Dim index = combo.Box.SelectedIndex
-            If index + 1 < i18.Count - 1 Then combo.Box.SelectedIndex += 1 Else combo.Box.SelectedIndex = 0
-        End If
-        labels(2) = combo.Box.Text
     End Sub
 End Class
 
@@ -91,6 +72,8 @@ Public Class CellularAutomata_Life : Inherits VB_Parent
     Public population As Integer
     Public nodeColor = cv.Scalar.White
     Public backColor = cv.Scalar.Black
+    Dim savePointCount As Integer
+    Dim lastPopulation As Integer
     Private Function CountNeighbors(cellX As Integer, cellY As Integer) As Integer
         If cellX > 0 And cellY > 0 Then
             If grid.Get(Of Byte)(cellY - 1, cellX - 1) Then CountNeighbors += 1
@@ -118,12 +101,10 @@ Public Class CellularAutomata_Life : Inherits VB_Parent
         desc = "Use OpenCV to implement the Game of Life"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static randomSlider = FindSlider("Random Pixel Count")
-        Static savePointCount As Integer
-        If randomSlider.Value <> savePointCount Or generation = 0 Then
+        If random.options.count <> savePointCount Or generation = 0 Then
             random.Run(empty)
             generation = 0
-            savePointCount = randomSlider.Value
+            savePointCount = random.options.count
             For i = 0 To random.pointList.Count - 1
                 grid.Set(Of Byte)(random.pointList(i).Y, random.pointList(i).X, 1)
             Next
@@ -146,13 +127,12 @@ Public Class CellularAutomata_Life : Inherits VB_Parent
                 End If
                 If nextgrid.Get(Of Byte)(y, x) Then
                     Dim pt = New cv.Point(x, y) * factor
-                    DrawCircle(dst2,pt, factor / 2, nodeColor)
+                    DrawCircle(dst2, pt, factor / 2, nodeColor)
                     population += 1
                 End If
             Next
         Next
 
-        Static lastPopulation As Integer
         Const countInit = 200
         Static countdown As Integer = countInit
         Dim countdownText = ""
@@ -188,17 +168,16 @@ Public Class CellularAutomata_LifeColor : Inherits VB_Parent
         desc = "Game of Life but with color added"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        Dim lastBoard = game.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         game.Run(src)
-        dst2 = game.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Static lastBoard = dst2.Clone
+        dst1 = game.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim deaths As New cv.Mat, births As New cv.Mat
 
-        cv.Cv2.Subtract(dst2, lastBoard, births)
-        cv.Cv2.Subtract(lastBoard, dst2, deaths)
+        cv.Cv2.Subtract(dst1, lastBoard, births)
+        cv.Cv2.Subtract(lastBoard, dst1, deaths)
         births = births.Threshold(0, 255, cv.ThresholdTypes.Binary)
         deaths = deaths.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        lastBoard = dst2.Clone
         dst2 = game.dst2.Clone()
         dst2.SetTo(cv.Scalar.Blue, births)
         dst2.SetTo(cv.Scalar.Red, deaths)
@@ -231,40 +210,26 @@ End Class
 
 
 
-' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
-Public Class CellularAutomata_Basics_MT : Inherits VB_Parent
+Public Class CellularAutomata_MultiPoint : Inherits VB_Parent
     Dim cell As New CellularAutomata_Basics
-    Dim i18 As New List(Of String)
-    Dim i18Index As Integer
+    Dim val1 As Integer = 0
+    Dim val2 As Integer = dst2.Width / 2
     Public Sub New()
-        i18 = cell.i18
-        desc = "Multi-threaded version of CellularAutomata_Basics"
+        cell.index = 4 ' this one is nice...
+        desc = "All256 above starts with just one point.  Here we start with multiple points."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static rotateRules = findCheckBox("Rotate through the different rules")
-        If standaloneTest() Then
-            cell.input = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
-            cell.input.Set(Of Byte)(0, cell.input.Width / 2, 1)
-        End If
-        Parallel.For(0, 2,
-          Sub(i)
-              Select Case i
-                  Case 0
-                      labels(2) = i18.ElementAt(i18Index)
-                      dst2 = cell.createCells(labels(2))
-                  Case 1
-                      If rotateRules.Checked Then
-                          If i18Index + 1 < i18.Count - 1 Then i18Index += 1 Else i18Index = 0
-                          labels(3) = i18.ElementAt(i18Index)
-                      Else
-                          If i18Index < i18.Count - 1 Then labels(3) = i18.ElementAt(i18Index + 1) Else labels(3) = i18.ElementAt(0)
-                      End If
-                      dst3 = cell.createCells(labels(3))
-              End Select
-          End Sub)
+        Dim tmp = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
+        tmp.Set(0, val1, 1)
+        tmp.Set(0, val2, 1)
+        cell.Run(tmp)
+
+        dst2 = cell.dst2
+        val1 += 1
+        If val1 > tmp.Width Then val1 = 0
+        If val2 >= src.Width Then val2 = 0
     End Sub
 End Class
-
 
 
 
@@ -274,9 +239,10 @@ End Class
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
 Public Class CellularAutomata_All256 : Inherits VB_Parent
     Dim cell As New CellularAutomata_Basics
+    Dim options As New Options_CellAutomata
+    Dim ruleSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        cell.combo.Visible = False ' won't need this...
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Current Rule", 0, 255, 0)
+        ruleSlider = FindSlider("Current Rule")
         desc = "Run through all 256 combinations of outcomes"
     End Sub
     Private Function createOutcome(val As Integer) As String
@@ -288,50 +254,20 @@ Public Class CellularAutomata_All256 : Inherits VB_Parent
         Return outstr
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static ruleSlider = FindSlider("Current Rule")
-        Static rotateRules = findCheckBox("Rotate through the different rules")
-        Dim index = ruleSlider.Value
+        If task.heartBeat Then
+            cell.input = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
+            cell.input.Set(Of Byte)(0, cell.input.Width / 2, 1)
 
-        If not task.heartBeat Then Exit Sub
+            labels(2) = createOutcome(options.currentRule) + " options.currentRule = " + CStr(options.currentRule)
+            dst2 = cell.createCells(labels(2))
 
-        cell.input = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
-        cell.input.Set(Of Byte)(0, cell.input.Width / 2, 1)
+            options.RunVB()
 
-        labels(2) = createOutcome(index) + " index = " + CStr(index)
-        dst2 = cell.createCells(labels(2))
-
-        If rotateRules.checked Then
-            If index < 255 Then index += 1 Else index = 0
-            labels(3) = createOutcome(index) + " index = " + CStr(index)
+            labels(3) = createOutcome(options.currentRule) + " current rule = " + CStr(options.currentRule)
             dst3 = cell.createCells(labels(3))
+
+            If ruleSlider.Value < ruleSlider.Maximum - 1 Then ruleSlider.Value += 1 Else ruleSlider.Value = 0
         End If
-        ruleSlider.Value = index
-    End Sub
-End Class
-
-
-
-
-
-Public Class CellularAutomata_MultiPoint : Inherits VB_Parent
-    Dim cell As New CellularAutomata_Basics
-    Public Sub New()
-        cell.combo.Box.SelectedIndex = 4 ' this one is nice...
-        findCheckBox("Rotate through the different rules").Checked = False ' just the one pattern.
-        desc = "All256 above starts with just one point.  Here we start with multiple points."
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Dim tmp = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
-        Static pt1 = 0
-        Static pt2 = tmp.Width / 2
-        tmp.Set(0, pt1, 1)
-        tmp.Set(0, pt2, 1)
-        cell.Run(tmp)
-
-        dst2 = cell.dst2
-        pt1 += 1
-        If pt1 > tmp.Width Then pt1 = 0
-        If pt1 >= src.Width Then pt1 = 0
     End Sub
 End Class
 

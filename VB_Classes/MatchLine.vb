@@ -1,9 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 Public Class MatchLine_Basics : Inherits VB_Parent
     Public match As New Match_Basics
-    Public lpInput As New pointPair
-    Public lpOutput As pointPair
+    Public lpInput As New PointPair
+    Public lpOutput As PointPair
     Public corner1 As Integer, corner2 As Integer
+    Dim lpSave As New PointPair
+    Dim knn As New KNN_ClosestTracker
     Public Sub New()
         desc = "Find and track a line in the BGR image."
     End Sub
@@ -21,17 +23,15 @@ Public Class MatchLine_Basics : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         dst2 = src.Clone
 
-        Static lpSave As New pointPair
         Dim correlationMin = match.options.correlationMin
         If task.quarterBeat Or match.correlation < correlationMin Or lpSave.p1 <> lpInput.p1 Or lpSave.p2 <> lpInput.p2 Then
             lpSave = lpInput
             If standalone Then
-                Static knn As New KNN_ClosestTracker
                 knn.Run(src.Clone)
-                lpInput = New pointPair(knn.lastPair.p1, knn.lastPair.p2)
+                lpInput = New PointPair(knn.lastPair.p1, knn.lastPair.p2)
             End If
 
-            Dim r = validateRect(New cv.Rect(Math.Min(lpInput.p1.X, lpInput.p2.X), Math.Min(lpInput.p1.Y, lpInput.p2.Y),
+            Dim r = ValidateRect(New cv.Rect(Math.Min(lpInput.p1.X, lpInput.p2.X), Math.Min(lpInput.p1.Y, lpInput.p2.Y),
                                              Math.Abs(lpInput.p1.X - lpInput.p2.X), Math.Abs(lpInput.p1.Y - lpInput.p2.Y)))
             match.template = src(r).Clone
 
@@ -58,8 +58,8 @@ Public Class MatchLine_Basics : Inherits VB_Parent
             If standaloneTest() Then dst3 = match.dst0.Resize(dst3.Size)
             Dim p1 = cornerToPoint(corner1, match.matchRect)
             Dim p2 = cornerToPoint(corner2, match.matchRect)
-            dst2.Line(p1, p2, task.highlightColor, task.lineWidth + 2, task.lineType)
-            lpOutput = New pointPair(p1, p2)
+            dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 2, task.lineType)
+            lpOutput = New PointPair(p1, p2)
         End If
         labels(2) = "Longest line end points had correlation of " + Format(match.correlation, fmt3) + " with the original longest line."
     End Sub
@@ -77,7 +77,7 @@ Public Class MatchLine_Longest : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         knn.Run(src.Clone)
-        matchLine.lpInput = New pointPair(knn.lastPair.p1, knn.lastPair.p2)
+        matchLine.lpInput = New PointPair(knn.lastPair.p1, knn.lastPair.p2)
 
         matchLine.Run(src)
         dst2 = matchLine.dst2

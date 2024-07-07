@@ -6,6 +6,7 @@ Public Class Retina_Basics_CPP : Inherits VB_Parent
     Dim startInfo As New ProcessStartInfo
     Dim magnoData(0) As Byte
     Dim dataSrc(0) As Byte
+    Dim samplingFactor As Single = -1 ' force open
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Retina Sample Factor", 1, 10, 2)
         If check.Setup(traceName) Then
@@ -19,22 +20,21 @@ Public Class Retina_Basics_CPP : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static sampleSlider = FindSlider("Retina Sample Factor")
-        Static logCheck = findCheckBox("Use log sampling")
-        Static xmlCheck = findCheckBox("Open resulting xml file")
+        Static logCheck = FindCheckBox("Use log sampling")
+        Static xmlCheck = FindCheckBox("Open resulting xml file")
         If xmlCheck.Checked Then
             xmlCheck.Checked = False
             Dim fileinfo = New FileInfo(CurDir() + "/RetinaDefaultParameters.xml")
             If fileinfo.Exists Then
-                FileCopy(CurDir() + "/RetinaDefaultParameters.xml", task.homeDir + "data/RetinaDefaultParameters.xml")
+                FileCopy(CurDir() + "/RetinaDefaultParameters.xml", task.HomeDir + "data/RetinaDefaultParameters.xml")
                 startInfo.FileName = "wordpad.exe"
-                startInfo.Arguments = task.homeDir + "Data/RetinaDefaultParameters.xml"
+                startInfo.Arguments = task.HomeDir + "Data/RetinaDefaultParameters.xml"
                 Process.Start(startInfo)
             Else
                 MsgBox("RetinaDefaultParameters.xml should have been created but was not found.  OpenCV error?")
             End If
         End If
         Static useLogSampling As Integer = logCheck.Checked
-        Static samplingFactor As Single = -1 ' force open
         If useLogSampling <> logCheck.Checked Or samplingFactor <> sampleSlider.Value Then
             If cPtr <> 0 Then Retina_Basics_Close(cPtr)
             ReDim magnoData(src.Total - 1)
@@ -50,7 +50,7 @@ Public Class Retina_Basics_CPP : Inherits VB_Parent
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
             imagePtr = Retina_Basics_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, handleMagno.AddrOfPinnedObject(), useLogSampling)
         Else
-            setTrueText("Retina_Basics_CPP runs fine but during 'Test All' it is not run because it can oversubscribe OpenCL memory.")
+            SetTrueText("Retina_Basics_CPP runs fine but during 'Test All' it is not run because it can oversubscribe OpenCL memory.")
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
         End If
         handleSrc.Free()
@@ -75,6 +75,7 @@ End Class
 
 Public Class Retina_Depth : Inherits VB_Parent
     Dim retina As New Retina_Basics_CPP
+    Dim lastMotion As New cv.Mat
     Public Sub New()
         desc = "Use the bio-inspired retina algorithm with the depth data."
         labels(2) = "Last result || current result"
@@ -83,7 +84,6 @@ Public Class Retina_Depth : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         retina.Run(task.depthRGB)
         dst3 = retina.dst3
-        Static lastMotion As New cv.Mat
         If lastMotion.Width = 0 Then lastMotion = retina.dst3
         dst2 = lastMotion Or retina.dst3
         lastMotion = retina.dst3

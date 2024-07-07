@@ -75,6 +75,7 @@ End Module
 ' https://docs.opencv.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 Public Class Hough_Circles : Inherits VB_Parent
     Dim circles As New Draw_Circles
+    Dim method As Integer = 3
     Public Sub New()
         FindSlider("DrawCount").Value = 3
         labels(2) = "Input circles to Hough"
@@ -84,7 +85,6 @@ Public Class Hough_Circles : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         circles.Run(src)
         dst2 = circles.dst2
-        Static Dim method As Integer = 3
         cv.Cv2.CvtColor(dst2, dst3, cv.ColorConversionCodes.BGR2GRAY)
         Dim cFound = cv.Cv2.HoughCircles(dst3, method, 1, dst2.Rows / 4, 100, 10, 1, 200)
         Dim foundColor = New cv.Scalar(0, 0, 255)
@@ -197,9 +197,9 @@ Public Class Hough_FeatureLessTopX : Inherits VB_Parent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.gOptions.setGridSize(10)
-        maskFless = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        maskFeat = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        maskPredict = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        maskFless = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        maskFeat = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        maskPredict = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         labels = {"", "", "Areas without features", "Areas with features"}
         desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
@@ -270,7 +270,7 @@ Public Class Hough_LaneFinder : Inherits VB_Parent
         dst1 = mask.Clone
 
         dst0 = hls.dst0
-        dst2 = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(mask.Size(), cv.MatType.CV_8U, 0)
         hls.dst3.CopyTo(dst2, mask)
 
         Dim rho = 1
@@ -279,12 +279,12 @@ Public Class Hough_LaneFinder : Inherits VB_Parent
         Dim minLineLength = 20
         Dim maxLineGap = 300
         segments = cv.Cv2.HoughLinesP(dst2.Clone, rho, theta, threshold, minLineLength, maxLineGap)
-        dst3 = New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
+        dst3 = New cv.Mat(mask.Size(), cv.MatType.CV_8UC3, 0)
         laneLineMinY = dst2.Height
         For i = 0 To segments.Length - 1
             If laneLineMinY > segments(i).P1.Y Then laneLineMinY = segments(i).P1.Y
             If laneLineMinY > segments(i).P2.Y Then laneLineMinY = segments(i).P2.Y
-            DrawLine(dst3, segments(i).P1, segments(i).P2, task.highlightColor)
+            DrawLine(dst3, segments(i).P1, segments(i).P2, task.HighlightColor)
         Next
     End Sub
 End Class
@@ -300,7 +300,7 @@ Public Class Hough_Sudoku : Inherits VB_Parent
         desc = "Successful use of Hough to find lines in Sudoku grid."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        dst2 = cv.Cv2.ImRead(task.homeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
+        dst2 = cv.Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
         dst3 = dst2.Clone
         hough.Run(dst2)
         houghShowLines(dst3, hough.segments, hough.options.lineCount)

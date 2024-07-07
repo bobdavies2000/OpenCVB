@@ -10,7 +10,7 @@ Imports System.Threading
 '    End Sub
 '    Public Sub RunVB(src as cv.Mat)
 '        Dim input = src
-'        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+'        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
 '        sobel.Run(input)
 
@@ -37,7 +37,7 @@ Imports System.Threading
 '    Public Sub RunVB(src as cv.Mat)
 
 '        Dim input = src
-'        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+'        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
 '        blur.Run(input)
 
@@ -67,7 +67,7 @@ Imports System.Threading
 '    Public Sub RunVB(src as cv.Mat)
 
 '        Dim input = src
-'        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+'        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
 '        faces.Run(input)
 
@@ -98,7 +98,7 @@ Public Class Dlib_iBug300WDownload : Inherits VB_Parent
         desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static checkDownload = findCheckBox("Download the 1.7 Gb 300 Faces In-The-Wild database")
+        Static checkDownload = FindCheckBox("Download the 1.7 Gb 300 Faces In-The-Wild database")
         Dim ibugDir = New DirectoryInfo(task.homeDir + "Data/ibug_300W_large_face_landmark_dataset")
         If ibugDir.Exists And downloadActive = False And pythonActive = False Then
             setTrueText("The iBug 300W face database was downloaded and is ready for use.", New cv.Point(40, 200))

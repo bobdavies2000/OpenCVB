@@ -1,3 +1,4 @@
 #define STEREOLAB_INSTALLED // support for Zed 2 camera 
 //#define MYNTD_1000 // support for MyntD cameras
 #define ORB335L // support for 335L cameras
+#define OAKD // support for Oak-D

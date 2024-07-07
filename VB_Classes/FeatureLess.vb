@@ -73,7 +73,7 @@ Public Class FeatureLess_UniquePixels : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         fless.Run(src)
-        dst2 = fless.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = fless.dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         sort.Run(dst2)
         dst3 = sort.dst2
     End Sub
@@ -93,7 +93,7 @@ Public Class FeatureLess_Unique3Pixels : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         fless.Run(src)
-        dst2 = fless.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = fless.dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         sort3.Run(fless.dst2)
         dst3 = sort3.dst2
@@ -199,14 +199,14 @@ End Class
 Public Class FeatureLess_Edge_CPP : Inherits VB_Parent
     Dim cpp As New CPP_Basics
     Public Sub New()
-        cpp.updateFunction(AlgorithmList.functionNames._CPP_EdgeDraw_Basics)
+        cpp.updateFunction(AlgorithmList.cppFunctionNames._CPP_EdgeDraw_Basics)
         desc = "Floodfill the output of the Edge Drawing filter (C++)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         cpp.Run(src)
         dst2 = cpp.dst2
         dst3 = cpp.dst3
-        setTrueText("The objective here is to show how to get the output of a C++ IncludeOnly algorithm.", 3)
+        SetTrueText("The objective here is to show how to get the output of a C++ IncludeOnly algorithm.", 3)
     End Sub
 End Class
 

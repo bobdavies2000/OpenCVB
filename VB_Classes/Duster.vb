@@ -40,10 +40,10 @@ Public Class Duster_MaskZ : Inherits VB_Parent
         hist.bins = options.bins
 
         Dim src32f = task.pcSplit(2)
-        task.maxDepthMask = src32f.InRange(task.maxZmeters, task.maxZmeters).ConvertScaleAbs()
-        src32f.SetTo(task.maxZmeters, task.maxDepthMask)
+        task.maxDepthMask = src32f.InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
+        src32f.SetTo(task.MaxZmeters, task.maxDepthMask)
 
-        hist.fixedRanges = {New cv.Rangef(0.001, task.maxZmeters)}
+        hist.fixedRanges = {New cv.Rangef(0.001, task.MaxZmeters)}
         hist.Run(src32f)
 
         Dim histArray = hist.histArray
@@ -66,9 +66,8 @@ Public Class Duster_MaskZ : Inherits VB_Parent
             sampleCount += histArray(i)
         Next
 
-        Dim incr = task.maxZmeters / options.bins
+        Dim incr = task.MaxZmeters / options.bins
         classCount = 0
-        ReDim histArray(hist.histogram.Rows - 1)
         For i = 0 To Math.Min(clusters.Count, options.maxClusters) - 1
             Dim vec = clusters.ElementAt(i).Value
             classCount += 1

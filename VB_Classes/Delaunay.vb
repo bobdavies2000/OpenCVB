@@ -6,7 +6,7 @@ Public Class Delaunay_Basics : Inherits VB_Parent
     Dim randEnum As New Random_Enumerable
     Dim subdiv As New cv.Subdiv2D
     Public Sub New()
-        facet32s = New cv.Mat(dst2.Size, cv.MatType.CV_32SC1, 0)
+        facet32s = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
         labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub
@@ -48,7 +48,7 @@ End Class
 Public Class Delaunay_SubDiv : Inherits VB_Parent
     Dim random As New Random_Basics
     Public Sub New()
-        random.options.countSlider.Value = 100
+        FindSlider("Random Pixel Count").Value = 100
         desc = "Use Delaunay to subdivide an image into triangles."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -68,7 +68,7 @@ Public Class Delaunay_SubDiv : Inherits VB_Parent
         Next
 
         For Each pt In random.pointList
-            DrawCircle(dst2,pt, task.dotSize + 1, cv.Scalar.Red)
+            DrawCircle(dst2,pt, task.DotSize + 1, cv.Scalar.Red)
         Next
 
         Dim facets = New cv.Point2f()() {Nothing}
@@ -111,7 +111,7 @@ Public Class Delaunay_Subdiv2D : Inherits VB_Parent
             End Function).ToArray()
 
         For Each p In points
-            DrawCircle(dst2,p, task.dotSize + 1, cv.Scalar.Red)
+            DrawCircle(dst2,p, task.DotSize + 1, cv.Scalar.Red)
         Next
         dst3 = dst2.Clone()
 
@@ -152,15 +152,15 @@ End Class
 Public Class Delaunay_GenerationsNoKNN : Inherits VB_Parent
     Public inputPoints As New List(Of cv.Point2f)
     Public facet As New Delaunay_Basics
+    Dim random As New Random_Basics
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32S, 0)
+        FindSlider("Random Pixel Count").Value = 10
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32S, 0)
         labels = {"", "Mask of unmatched regions - generation set to 0", "Facet Image with index of each region", "Generation counts for each region."}
         desc = "Create a region in an image for each point provided without using KNN."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() And task.heartBeat Then
-            Static random As New Random_Basics
-            If task.firstPass Then random.options.countSlider.Value = 10
             random.Run(empty)
             inputPoints = New List(Of cv.Point2f)(random.pointList)
         End If
@@ -177,7 +177,7 @@ Public Class Delaunay_GenerationsNoKNN : Inherits VB_Parent
             If index >= facet.facetList.Count Then Continue For
             Dim nextFacet = facet.facetList(index)
             ' insure that each facet has a unique generation number
-            If task.firstPass Then
+            If task.FirstPass Then
                 g = usedG.Count
             Else
                 g = generationMap.Get(Of Integer)(pt.Y, pt.X) + 1
@@ -187,7 +187,7 @@ Public Class Delaunay_GenerationsNoKNN : Inherits VB_Parent
             End If
             dst3.FillConvexPoly(nextFacet, g, task.lineType)
             usedG.Add(g)
-            setTrueText(CStr(g), pt, 2)
+            SetTrueText(CStr(g), pt, 2)
         Next
         generationMap = dst3.Clone
     End Sub
@@ -205,8 +205,9 @@ Public Class Delaunay_Generations : Inherits VB_Parent
     Public inputPoints As New List(Of cv.Point2f)
     Public facet As New Delaunay_Basics
     Dim knn As New KNN_Basics
+    Dim random As New Random_Basics
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32S, 0)
         labels = {"", "Mask of unmatched regions - generation set to 0", "Facet Image with count for each region",
                   "Generation counts in CV_32SC1 format"}
         FindSlider("Random Pixel Count").Value = 10
@@ -214,8 +215,7 @@ Public Class Delaunay_Generations : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            Static random As New Random_Basics
-            If task.heartBeat Then random.Run(empty)
+            If task.heartBeat Then Random.Run(empty)
             inputPoints = New List(Of cv.Point2f)(random.pointList)
         End If
 
@@ -234,7 +234,7 @@ Public Class Delaunay_Generations : Inherits VB_Parent
             If index >= facet.facetList.Count Then Continue For
             Dim nextFacet = facet.facetList(index)
             ' insure that each facet has a unique generation number
-            If task.firstPass Then
+            If task.FirstPass Then
                 g = usedG.Count
             Else
                 g = generationMap.Get(Of Integer)(mp.p2.Y, mp.p2.X) + 1
@@ -244,7 +244,7 @@ Public Class Delaunay_Generations : Inherits VB_Parent
             End If
             dst0.FillConvexPoly(nextFacet, g, task.lineType)
             usedG.Add(g)
-            setTrueText(CStr(g), mp.p2, 2)
+            SetTrueText(CStr(g), mp.p2, 2)
         Next
     End Sub
 End Class
@@ -260,8 +260,11 @@ Public Class Delaunay_ConsistentColor : Inherits VB_Parent
     Dim randEnum As New Random_Enumerable
     Dim subdiv As New cv.Subdiv2D
     Public Sub New()
-        facet32s = New cv.Mat(dst2.Size, cv.MatType.CV_32SC1, 0)
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        facet32s = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
         UpdateAdvice(traceName + ": use local options to control the number of points")
+        labels(1) = "Input points to subdiv"
+        labels(3) = "Inconsistent colors in dst2 are duplicate randomCellColor output."
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -278,7 +281,7 @@ Public Class Delaunay_ConsistentColor : Inherits VB_Parent
 
         Dim usedColors As New List(Of cv.Vec3b)
         facetList.Clear()
-        Static lastColor = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
+        Static lastColor = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3, 0)
         For i = 0 To facets.Length - 1
             Dim nextFacet As New List(Of cv.Point)
             For j = 0 To facets(i).Length - 1
@@ -294,8 +297,11 @@ Public Class Delaunay_ConsistentColor : Inherits VB_Parent
             facet32s.FillConvexPoly(nextFacet, i, task.lineType)
             facetList.Add(nextFacet)
         Next
-        facet32s.ConvertTo(dst1, cv.MatType.CV_8U)
 
+        dst1.SetTo(0)
+        For Each pt In inputPoints
+            dst1.Circle(New cv.Point(pt.X, pt.Y), task.DotSize, task.HighlightColor, -1, task.lineType)
+        Next
         lastColor = dst2.Clone
         labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
     End Sub
@@ -309,7 +315,7 @@ Public Class Delaunay_Contours : Inherits VB_Parent
     Dim randEnum As New Random_Enumerable
     Dim subdiv As New cv.Subdiv2D
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub
@@ -332,9 +338,7 @@ Public Class Delaunay_Contours : Inherits VB_Parent
                 ptList.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
             Next
 
-            Dim listOfPoints = New List(Of List(Of cv.Point))
-            listOfPoints.Add(ptList)
-            cv.Cv2.DrawContours(dst2, listOfPoints, -1, 255, 1, cv.LineTypes.Link8)
+            DrawContour(dst2, ptList, 255, 1)
         Next
         labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
     End Sub

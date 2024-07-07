@@ -4,11 +4,11 @@ Public Class Kalman_Basics : Inherits VB_Parent
     Dim kalman() As Kalman_Simple
     Public kInput(4 - 1) As Single
     Public kOutput(4 - 1) As Single
+    Dim saveDimension = -1
     Public Sub New()
         desc = "Use Kalman to stabilize values (such as a cv.rect.)"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static saveDimension = -1
         If saveDimension <> kInput.Length Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
@@ -39,10 +39,10 @@ Public Class Kalman_Basics : Inherits VB_Parent
         If standaloneTest() Then
             dst2 = src
             Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
-            rect = validateRect(rect)
+            rect = ValidateRect(rect)
             Static lastRect = rect
             If rect = lastRect Then
-                Dim r = initRandomRect(If(src.Height <= 240, 20, 50))
+                Dim r = InitRandomRect(If(src.Height <= 240, 20, 50))
                 kInput = New Single() {r.X, r.Y, r.Width, r.Height}
             End If
             lastRect = rect
@@ -205,6 +205,7 @@ Public Class Kalman_CVMat : Inherits VB_Parent
     Public output As cv.Mat
     Dim basics As New Kalman_Basics
     Public input As cv.Mat
+    Dim saveDimension = -1
     Public Sub New()
         ReDim basics.kInput(4 - 1)
         input = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
@@ -212,7 +213,6 @@ Public Class Kalman_CVMat : Inherits VB_Parent
         desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static saveDimension = -1
         If saveDimension <> input.Rows Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
@@ -247,11 +247,11 @@ Public Class Kalman_CVMat : Inherits VB_Parent
             Next
             dst2 = src
             Dim rect = New cv.Rect(CInt(rx(0)), CInt(rx(1)), CInt(rx(2)), CInt(rx(3)))
-            rect = validateRect(rect)
+            rect = ValidateRect(rect)
 
             Static lastRect As cv.Rect = rect
             If lastRect = rect Then
-                Dim r = initRandomRect(25)
+                Dim r = InitRandomRect(25)
                 Dim array() As Single = {r.X, r.Y, r.Width, r.Height}
                 input = New cv.Mat(4, 1, cv.MatType.CV_32F, array)
             End If
@@ -278,7 +278,7 @@ Public Class Kalman_ImageSmall : Inherits VB_Parent
         desc = "Resize the image to allow the Kalman filter to process the whole image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         resize.Run(src)
 
         Dim saveOriginal = resize.dst2.Clone()
@@ -502,7 +502,7 @@ Public Class Kalman_VB : Inherits VB_Parent
         strOut = "Use first slider in the options to test the algorithm.  The other sliders in the options visualize the impact." + vbCrLf +
                  "In the options form nearby, resize the sliders to show more of them. " + vbCrLf +
                  "This shows more details of the impact of moving the first slider."
-        setTrueText(strOut + vbCrLf + "The results are all in the output of the sliders in the options for " + traceName)
+        SetTrueText(strOut + vbCrLf + "The results are all in the output of the sliders in the options for " + traceName)
     End Sub
 End Class
 
@@ -523,6 +523,7 @@ Public Class Kalman_VB_Basics : Inherits VB_Parent
     Dim processCovar As Single = 0.001 'This is the process covarience matrix. It's how much we trust the accelerometer
     Dim matrix As New List(Of Single)
     Dim plot As New Plot_OverTimeScalar
+    Dim saveAvgCount As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Average input count", 1, 500, 20)
@@ -577,7 +578,6 @@ Public Class Kalman_VB_Basics : Inherits VB_Parent
         If standaloneTest() Then kInput = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Mean()(0)
 
         Static avgSlider = FindSlider("Average input count")
-        Static saveAvgCount As Integer
         If avgSlider.Value <> saveAvgCount Then
             saveAvgCount = avgSlider.Value
             matrix.Clear()

@@ -12,10 +12,6 @@ Public Class OptionsContainer
         Me.Top = GetSetting("OpenCVB", "gOptionsTop", "gOptionsTop", task.mainFormLocation.Y - offset)
         Me.Width = GetSetting("OpenCVB", "gOptionsWidth", "gOptionsWidth", task.mainFormLocation.Width)
         Me.Height = GetSetting("OpenCVB", "gOptionsHeight", "gOptionsHeight", task.mainFormLocation.Height)
-
-        Dim goodPoint = Screen.GetWorkingArea(New Point(Me.Left, Me.Top)) ' when they change the main screen, old coordinates can go way off the screen.
-        If goodPoint.X > Me.Left Then Me.Left = goodPoint.X
-        If goodPoint.Y > Me.Top Then Me.Top = goodPoint.Y
     End Sub
     Private Sub Options_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         SaveSetting("OpenCVB", "gOptionsLeft", "gOptionsLeft", Me.Left)
@@ -53,7 +49,7 @@ Public Class OptionsContainer
             Dim indexO = 1
             Dim indexHide As Integer
             For Each title In optionsTitle
-                Dim frm = findfrm(title)
+                Dim frm = FindFrm(title)
                 If frm IsNot Nothing Then
                     frm.BringToFront()
                     Dim sidelineOptions As Boolean = True

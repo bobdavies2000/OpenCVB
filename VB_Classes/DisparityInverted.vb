@@ -18,6 +18,8 @@
 ' If the stereo setup Is Not calibrated, then the function will not be accurate.
 Public Class DisparityFunction_Basics : Inherits VB_Parent
     Dim match As New FeatureLeftRight_Basics
+    Dim depthStr As String
+    Dim dispStr As String
     Public Sub New()
         labels = {"", "", "AddWeighted output: lines show disparity between left and right images",
                   "Disparity as a function of depth"}
@@ -29,7 +31,7 @@ Public Class DisparityFunction_Basics : Inherits VB_Parent
     End Function
     Public Sub RunVB(src As cv.Mat)
         If task.cameraName = "Azure Kinect 4K" Then
-            setTrueText("Kinect for Azure does not have a left and right view to compute disparities", 2)
+            SetTrueText("Kinect for Azure does not have a left and right view to compute disparities", 2)
             Exit Sub
         End If
         match.Run(src)
@@ -42,8 +44,6 @@ Public Class DisparityFunction_Basics : Inherits VB_Parent
             disparity.Add(mp.p1.X - mp.p2.X, match.mpCorrelation(i))
         Next
 
-        Static depthStr As String
-        Static dispStr As String
         If task.heartBeat Then
             dispStr = "Disparity: " + vbCrLf
             depthStr = "Depth: " + vbCrLf
@@ -64,7 +64,7 @@ Public Class DisparityFunction_Basics : Inherits VB_Parent
             strOut += "baseline * focal length / actual depth" + vbCrLf
             strOut += "A disparity adjustment that is dependent on working resolution is used here " + vbCrLf
             strOut += "to adjust the observed disparity to match the formula." + vbCrLf
-            strOut += "At working resolution = " + CStr(task.workingRes.Width) + "x" + CStr(task.workingRes.Height)
+            strOut += "At working resolution = " + CStr(task.WorkingRes.Width) + "x" + CStr(task.WorkingRes.Height)
             strOut += " the adjustment factor is " + Format(task.disparityAdjustment, fmt1) + vbCrLf + vbCrLf
 
             Dim disparityformulaoutput = disparityFormula(actualDepth)
@@ -80,7 +80,7 @@ Public Class DisparityFunction_Basics : Inherits VB_Parent
             strOut += "Predicted disparity at " + Format(actualDepth, fmt3) + "m = " +
                        CStr(CInt(disparityformulaoutput / task.disparityAdjustment)) + " pixels"
         End If
-        setTrueText(depthStr + vbCrLf + vbCrLf + dispStr, 3)
-        setTrueText(strOut, New cv.Point(0, dst2.Height / 3), 3)
+        SetTrueText(depthStr + vbCrLf + vbCrLf + dispStr, 3)
+        SetTrueText(strOut, New cv.Point(0, dst2.Height / 3), 3)
     End Sub
 End Class

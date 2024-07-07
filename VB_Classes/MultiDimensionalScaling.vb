@@ -76,11 +76,11 @@ Public Class MultiDimensionScaling_Cities : Inherits VB_Parent
             Dim y = at(1, c)
             x = w * 0.1 + 0.7 * w * (x - minX) / (maxX - minX)
             y = h * 0.1 + 0.7 * h * (y - minY) / (maxY - minY)
-            DrawCircle(dst2, New cv.Point(x, y), task.dotSize + 3, cv.Scalar.Red)
+            DrawCircle(dst2, New cv.Point(x, y), task.DotSize + 3, cv.Scalar.Red)
             Dim textPos = New cv.Point(x + 5, y + 10)
             Dim cityName = Choose(c + 1, "Atlanta", "Chicago", "Denver", "Houston", "Los Angeles", "Miami", "New York", "San Francisco",
                                          "Seattle", "Washington D.C.")
-            setTrueText(cityName, textPos, 2)
+            SetTrueText(cityName, textPos, 2)
         Next
     End Sub
 End Class

@@ -89,7 +89,7 @@ Public Class HistPeak2D_NotHotTop : Inherits VB_Parent
         dst1 = histTop.histogram.InRange(0, 0).ConvertScaleAbs
 
         Dim mm As mmData = GetMinMax(histTop.histogram)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, mm.maxVal)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, mm.maxVal)
         dst3 -= histTop.histogram
         dst3.SetTo(0, dst1)
 
@@ -211,7 +211,7 @@ Public Class HistPeak2D_HotSide : Inherits VB_Parent
 
         For i = 0 To peak.auto.clusterPoints.Count - 1
             Dim pt = peak.auto.clusterPoints(i)
-            DrawCircle(dst3,pt, task.dotSize * 3, cv.Scalar.White)
+            DrawCircle(dst3,pt, task.DotSize * 3, cv.Scalar.White)
         Next
 
         peak.histogram = histSide.histogram
@@ -241,7 +241,7 @@ Public Class HistPeak2D_HotTop : Inherits VB_Parent
 
         For i = 0 To peak.auto.clusterPoints.Count - 1
             Dim pt = peak.auto.clusterPoints(i)
-            DrawCircle(dst3,pt, task.dotSize * 3, cv.Scalar.White)
+            DrawCircle(dst3,pt, task.DotSize * 3, cv.Scalar.White)
         Next
 
         peak.histogram = histTop.histogram

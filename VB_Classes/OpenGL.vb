@@ -19,7 +19,7 @@ Public Class OpenGL_Basics : Inherits VB_Parent
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         UpdateAdvice(traceName + ": 'Show All' to see all the OpenGL options.")
-        pointCloudInput = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        pointCloudInput = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
         desc = "Create an OpenGL window and update it with images"
     End Sub
     Private Function memMapFill() As Double()
@@ -112,7 +112,7 @@ Public Class OpenGL_Basics : Inherits VB_Parent
             Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
             If openGLPipe IsNot Nothing Then
                 Dim bytesRead = openGLPipe.Read(readPipe, 0, 4)
-                If bytesRead = 0 Then setTrueText("The OpenGL process appears to have stopped.", New cv.Point(20, 100))
+                If bytesRead = 0 Then SetTrueText("The OpenGL process appears to have stopped.", New cv.Point(20, 100))
             End If
         End If
 
@@ -140,8 +140,8 @@ Public Class OpenGL_Basics : Inherits VB_Parent
         Catch ex As Exception
             ' OpenGL window was likely closed.  
         End Try
-        ' If standaloneTest() Then setTrueText(task.gMat.strout, 3)
-        If standaloneTest() Then setTrueText(task.gMat.strOut, 3)
+        ' If standaloneTest() Then SetTrueText(task.gMat.strout, 3)
+        If standaloneTest() Then SetTrueText(task.gMat.strOut, 3)
     End Sub
 End Class
 
@@ -362,7 +362,7 @@ End Class
 Public Class OpenGL_VerticalOrHorizontal : Inherits VB_Parent
     ReadOnly vLine As New FeatureLine_Finder
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Show Vertical Lines")
             radio.addRadio("Show Horizontal Lines")
@@ -373,7 +373,7 @@ Public Class OpenGL_VerticalOrHorizontal : Inherits VB_Parent
         desc = "Visualize all the vertical lines found in FeatureLine_Finder"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static verticalRadio = findRadio("Show Vertical Lines")
+        Static verticalRadio = FindRadio("Show Vertical Lines")
         Dim showVerticals = verticalRadio.checked
 
         vLine.Run(src)
@@ -528,7 +528,7 @@ Public Class OpenGL_Bricks : Inherits VB_Parent
         Dim index As Integer
         For Each roi In task.gridList
             If index < tess.depths.Count Then
-                setTrueText(Format(tess.depths(index), fmt1) + vbCrLf + Format(tess.depths(index + 1), fmt1), New cv.Point(roi.X, roi.Y), 2)
+                SetTrueText(Format(tess.depths(index), fmt1) + vbCrLf + Format(tess.depths(index + 1), fmt1), New cv.Point(roi.X, roi.Y), 2)
             End If
             index += 2
         Next
@@ -562,7 +562,7 @@ Public Class OpenGL_StructuredCloud : Inherits VB_Parent
         labels = redC.labels
         task.ogl.pointCloudInput = sCloud.dst2
         task.ogl.Run(dst2)
-        task.ogl.options.PointSizeSlider.Value = task.gOptions.GridSize.Value
+        task.ogl.options.PointSizeSlider.Value = task.gridSize
         If task.gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
@@ -587,7 +587,7 @@ Public Class OpenGL_Tiles : Inherits VB_Parent
         task.ogl.dataInput = New cv.Mat(sCloud.oglData.Count, 1, cv.MatType.CV_32FC3, sCloud.oglData.ToArray)
         task.ogl.Run(src)
         If task.gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
-        task.ogl.options.PointSizeSlider.Value = task.gOptions.GridSize.Value
+        task.ogl.options.PointSizeSlider.Value = task.gridSize
     End Sub
 End Class
 
@@ -735,7 +735,7 @@ Public Class OpenGL_FlatFloor : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         flatness.Run(src)
-        setTrueText(flatness.labels(2), 3)
+        SetTrueText(flatness.labels(2), 3)
 
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.dataInput = New cv.Mat(1, 1, cv.MatType.CV_32F, {task.pcFloor})
@@ -760,7 +760,7 @@ Public Class OpenGL_FlatCeiling : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         flatness.Run(src)
-        setTrueText(flatness.labels(2), 3)
+        SetTrueText(flatness.labels(2), 3)
 
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.dataInput = New cv.Mat(1, 1, cv.MatType.CV_32F, {task.pcCeiling})
@@ -862,7 +862,7 @@ Public Class OpenGL_FPolyCloud : Inherits VB_Parent
         dst1 = fpolyPC.dst1
         dst2 = fpolyPC.dst2
         dst3 = fpolyPC.dst3
-        setTrueText(fpolyPC.fMask.fImage.strOut, 1)
+        SetTrueText(fpolyPC.fMask.fImage.strOut, 1)
         labels = fpolyPC.labels
 
         task.ogl.pointCloudInput = fpolyPC.fPolyCloud
@@ -947,7 +947,7 @@ Public Class OpenGL_DrawHulls : Inherits VB_Parent
         ogl.dataInput = New cv.Mat(oglData.Count, 1, cv.MatType.CV_32FC3, oglData.ToArray)
         ogl.Run(dst2)
         If task.gOptions.OpenGLCapture.Checked Then dst3 = ogl.dst2
-        setTrueText(CStr(polygonCount) + " polygons were sent to OpenGL", 2)
+        SetTrueText(CStr(polygonCount) + " polygons were sent to OpenGL", 2)
     End Sub
 End Class
 
@@ -1223,7 +1223,7 @@ Public Class OpenGL_Profile : Inherits VB_Parent
     Dim ogl As New OpenGL_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        If standaloneTest() Then task.gOptions.gravityPointCloud.Checked = False
+        If standaloneTest() Then task.gOptions.setGravityUsage(False)
         ogl.oglFunction = oCase.pcPointsAlone
         labels(3) = "Contour of selected cell is shown below.  Blue dot represents the minimum X (leftmost) point and red the maximum X (rightmost)"
         desc = "Visualize a RedCloud Cell and rotate it using the Options_IMU Sliders"
@@ -1242,8 +1242,8 @@ Public Class OpenGL_Profile : Inherits VB_Parent
 
         dst3.SetTo(0)
         DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
-        DrawCircle(dst3, New cv.Point(p1.X + rc.rect.X, p1.Y + rc.rect.Y), task.dotSize + 2, cv.Scalar.Blue)
-        DrawCircle(dst3, New cv.Point(p2.X + rc.rect.X, p2.Y + rc.rect.Y), task.dotSize + 2, cv.Scalar.Red)
+        DrawCircle(dst3, New cv.Point(p1.X + rc.rect.X, p1.Y + rc.rect.Y), task.DotSize + 2, cv.Scalar.Blue)
+        DrawCircle(dst3, New cv.Point(p2.X + rc.rect.X, p2.Y + rc.rect.Y), task.DotSize + 2, cv.Scalar.Red)
         If rc.contour3D.Count > 0 Then
             Dim vecMat As New cv.Mat(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
 
@@ -1270,13 +1270,13 @@ End Class
 Public Class OpenGL_ProfileSweep : Inherits VB_Parent
     Dim visuals As New OpenGL_Profile
     Dim options As New Options_IMU
+    Dim testCase As Integer = 0
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        task.gOptions.gravityPointCloud.Checked = False
         desc = "Test the X-, Y-, and Z-axis rotation in sequence"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static testCase As Integer = 0
+        task.gOptions.setGravityUsage(False)
         If task.frameCount Mod 100 = 0 Then
             testCase += 1
             If testCase >= 3 Then testCase = 0
@@ -1305,7 +1305,7 @@ Public Class OpenGL_ProfileSweep : Inherits VB_Parent
                 If xRotateSlider.value >= 45 Then xRotateSlider.value = -45
                 labels(3) = "Rotating around Z-axis with " + CStr(xRotateSlider.value) + " degrees"
         End Select
-        setTrueText("Top down view: " + labels(3), 1)
+        SetTrueText("Top down view: " + labels(3), 1)
 
         visuals.Run(src)
         dst1 = visuals.dst1
@@ -1409,7 +1409,7 @@ Public Class OpenGL_GravityAverage : Inherits VB_Parent
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
         If task.gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -1446,7 +1446,7 @@ Public Class OpenGL_GravityKalman : Inherits VB_Parent
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
         If task.gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -1495,7 +1495,7 @@ Public Class OpenGL_DiffDepth : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         diff.Run(src)
         dst2 = diff.dst2
-        If task.gOptions.DebugChecked = False Then task.pointCloud.SetTo(0, dst2)
+        If task.gOptions.debugChecked = False Then task.pointCloud.SetTo(0, dst2)
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
         labels = diff.labels
@@ -1641,7 +1641,7 @@ Public Class OpenGL_RedTrack : Inherits VB_Parent
 
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(dst2)
-        setTrueText(redCC.strOut, 3)
+        SetTrueText(redCC.strOut, 3)
     End Sub
 End Class
 
@@ -1656,7 +1656,7 @@ Public Class OpenGL_Density2D : Inherits VB_Parent
     Dim dense As New Density_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
         desc = "Create a mask showing which pixels are close to each other and display the results."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1665,7 +1665,7 @@ Public Class OpenGL_Density2D : Inherits VB_Parent
         task.pointCloud.CopyTo(dst2, dense.dst2)
 
         task.ogl.pointCloudInput = dst2
-        task.ogl.Run(New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, cv.Scalar.White))
+        task.ogl.Run(New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3, cv.Scalar.White))
     End Sub
 End Class
 
@@ -1718,10 +1718,10 @@ Public Class OpenGL_NoSolo : Inherits VB_Parent
         hotSide.Run(src)
         dst2 = dst2 Or hotSide.dst3
 
-        If task.gOptions.DebugChecked = False Then task.pointCloud.SetTo(0, dst2)
+        If task.gOptions.debugChecked = False Then task.pointCloud.SetTo(0, dst2)
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
-        setTrueText("Toggle the solo points on and off using the 'DebugCheckBox' global option.", 3)
+        SetTrueText("Toggle the solo points on and off using the 'DebugCheckBox' global option.", 3)
     End Sub
 End Class
 
@@ -1787,11 +1787,11 @@ Public Class OpenGL_RedCloudCell : Inherits VB_Parent
         dst2 = specZ.options.runRedCloud(labels(2))
 
         specZ.Run(src)
-        setTrueText(specZ.strOut, 3)
+        SetTrueText(specZ.strOut, 3)
 
-        If task.clickPoint = New cv.Point And task.redCells.Count > 1 Then
+        If task.ClickPoint = New cv.Point And task.redCells.Count > 1 Then
             task.rc = task.redCells(1) ' pick the largest cell
-            task.clickPoint = task.rc.maxDist
+            task.ClickPoint = task.rc.maxDist
         End If
 
         breakdown.Run(src)
@@ -1932,7 +1932,7 @@ Public Class OpenGL_HistDepth3D : Inherits VB_Parent
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(New cv.Mat)
         If task.gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
-        setTrueText("Use the sliders for X/Y/Z histogram bins to add more points")
+        SetTrueText("Use the sliders for X/Y/Z histogram bins to add more points")
     End Sub
 End Class
 
@@ -1960,7 +1960,7 @@ Public Class OpenGL_SoloPointsRemoved : Inherits VB_Parent
 
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
-        setTrueText("You should see the difference in the OpenGL window as the solo points are toggled on an off.", 3)
+        SetTrueText("You should see the difference in the OpenGL window as the solo points are toggled on an off.", 3)
     End Sub
 End Class
 
@@ -1975,7 +1975,7 @@ Public Class OpenGL_World : Inherits VB_Parent
     ReadOnly world As New Depth_World
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Use Generated Pointcloud")
             radio.addRadio("Use Pointcloud from camera")
@@ -1986,7 +1986,7 @@ Public Class OpenGL_World : Inherits VB_Parent
         desc = "Display the generated point cloud in OpenGL"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static generatedRadio = findRadio("Use Generated Pointcloud")
+        Static generatedRadio = FindRadio("Use Generated Pointcloud")
 
         If generatedRadio.checked Then
             world.Run(src)
@@ -2143,7 +2143,7 @@ Public Class OpenGL_ColorBin4Way : Inherits VB_Parent
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         task.ogl.options.PointSizeSlider.Value = 10
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8UC3, cv.Scalar.White)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8UC3, cv.Scalar.White)
         desc = "Plot the results of a 3D histogram of the lightest and darkest BGR data"
     End Sub
     Public Sub RunVB(src As cv.Mat)

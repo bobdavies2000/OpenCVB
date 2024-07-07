@@ -27,6 +27,9 @@ End Class
 
 
 Public Class Transform_Affine3D : Inherits VB_Parent
+    Dim pc1 As cv.Mat
+    Dim pc2 As cv.Mat
+    Dim affineTransform As cv.Mat
     Public Sub New()
         If check.Setup(traceName) Then
             check.addCheckBox("Check to snap the first point cloud")
@@ -35,12 +38,9 @@ Public Class Transform_Affine3D : Inherits VB_Parent
         desc = "Using 2 point clouds compute the 3D affine transform between them"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static firstCheck = findCheckBox("Check to snap the first point cloud")
-        Static secondCheck = findCheckBox("Check to snap the second point cloud")
+        Static firstCheck = FindCheckBox("Check to snap the first point cloud")
+        Static secondCheck = FindCheckBox("Check to snap the second point cloud")
         Dim output = "Use the check boxes to snapshot the different point clouds" + vbCrLf
-        Static pc1 As cv.Mat
-        Static pc2 As cv.Mat
-        Static affineTransform As cv.Mat
 
         If task.testAllRunning Then
             If task.frameCount = 30 Then firstCheck.Checked = True
@@ -81,7 +81,7 @@ Public Class Transform_Affine3D : Inherits VB_Parent
             Next
             output += "0" + vbTab + "0" + vbTab + "0" + vbTab + "1" + vbCrLf
         End If
-        setTrueText(output)
+        SetTrueText(output)
     End Sub
 End Class
 
@@ -116,7 +116,7 @@ Public Class Transform_Rotate : Inherits VB_Parent
         imageCenter = New cv.Point2f(centerXSlider.Value, centerYSlider.Value)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, angleSlider.Value, scaleSlider.Value / 100)
         cv.Cv2.WarpAffine(src, dst2, rotationMat, New cv.Size())
-        DrawCircle(dst2,imageCenter, task.dotSize * 2, cv.Scalar.Yellow)
-        DrawCircle(dst2,imageCenter, task.dotSize, cv.Scalar.Blue)
+        DrawCircle(dst2,imageCenter, task.DotSize * 2, cv.Scalar.Yellow)
+        DrawCircle(dst2,imageCenter, task.DotSize, cv.Scalar.Blue)
     End Sub
 End Class

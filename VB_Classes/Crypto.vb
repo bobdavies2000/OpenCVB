@@ -1,16 +1,15 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Security.Cryptography
-Imports  System.IO
 ' https://www.codeproject.com/Tips/5308853/Prefer-using-Stream-to-byte
 Public Class Crypto_Hash : Inherits VB_Parent
     Dim flow As New Font_FlowText
+    Dim images As New List(Of cv.Mat)
+    Dim guids As New List(Of String)
     Public Sub New()
         desc = "Experiment with hashing algorithm and guid"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static images As New List(Of cv.Mat)
-        Static guids As New List(Of String)
         Dim iSize = src.Total * src.ElemSize
         Dim maxImages = 10
         images.Add(src)

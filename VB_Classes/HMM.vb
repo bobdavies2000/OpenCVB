@@ -9,7 +9,7 @@ Public Class HMM_Example_CPP : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If task.testAllRunning Then
-            setTrueText("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")
+            SetTrueText("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")
             Exit Sub
         End If
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
@@ -18,7 +18,7 @@ Public Class HMM_Example_CPP : Inherits VB_Parent
         Dim imagePtr = HMM_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then dst2 = New cv.Mat(src.Rows, src.Cols, IIf(src.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr).Clone
+        If imagePtr <> 0 Then dst2 = New cv.Mat(src.Rows, src.Cols, IIf(src.Channels() = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr).Clone
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = HMM_Close(cPtr)

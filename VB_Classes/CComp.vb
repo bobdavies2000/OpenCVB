@@ -1,33 +1,35 @@
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
 Public Class CComp_Basics : Inherits VB_Parent
-    Public connectedComponents As Object
+    Public connectedComponents As ConnectedComponents
     Public rects As New List(Of cv.Rect)
     Public centroids As New List(Of cv.Point2f)
+    Dim lastImage As cv.Mat
+    Dim options As New Options_CComp
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("CComp threshold", 0, 255, 50)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        UpdateAdvice(traceName + ": only the local options for threshold is used in CComp_Basics.")
         labels(2) = "Input to ConnectedComponenetsEx"
         desc = "Draw bounding boxes around BGR binarized connected Components"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = FindSlider("CComp threshold")
+        options.RunVB()
 
-        Static lastImage As cv.Mat
         rects.Clear()
         centroids.Clear()
 
         Dim input = src
-        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If input.Channels() = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        dst2 = input.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.BinaryInv) '  + cv.ThresholdTypes.Otsu
+        dst2 = input.Threshold(options.threshold, 255, cv.ThresholdTypes.BinaryInv) '  + cv.ThresholdTypes.Otsu
 
         connectedComponents = cv.Cv2.ConnectedComponentsEx(dst2)
         connectedComponents.renderblobs(dst3)
 
         Dim count As Integer = 0
         For Each blob In connectedComponents.Blobs
-            Dim rect = validateRect(blob.Rect)
+            Dim rect = ValidateRect(blob.Rect)
             Dim m = cv.Cv2.Moments(dst2(rect), True)
             If m.M00 = 0 Then Continue For ' avoid divide by zero...
             rects.Add(rect)
@@ -53,7 +55,7 @@ Public Class CComp_Shapes : Inherits VB_Parent
     Dim shapes As cv.Mat
     Dim mats As New Mat_4Click
     Public Sub New()
-        shapes = New cv.Mat(task.homeDir + "Data/Shapes.png", cv.ImreadModes.Color)
+        shapes = New cv.Mat(task.HomeDir + "Data/Shapes.png", cv.ImreadModes.Color)
         labels(2) = "Largest connected component"
         labels(3) = "RectView, LabelView, Binary, grayscale"
         desc = "Use connected components to isolate objects in image."
@@ -154,14 +156,14 @@ Public Class CComp_Stats : Inherits VB_Parent
     Public numberOfLabels As Integer
     Public options As New Options_CComp
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "Use a threshold slider on the CComp input"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst2 = src
         options.RunVB()
 
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standaloneTest() Then src = src.Threshold(options.light, 255, cv.ThresholdTypes.BinaryInv)
 
         Dim stats As New cv.Mat
@@ -182,12 +184,12 @@ Public Class CComp_Stats : Inherits VB_Parent
         For i = 0 To Math.Min(256, stats.Rows) - 1
             Dim area = stats.Get(Of Integer)(i, 4)
             If area < 10 Then Continue For
-            Dim r1 = validateRect(stats.Get(Of cv.Rect)(i, 0))
-            Dim r = validateRect(New cv.Rect(r1.X, r1.Y, r1.Width, r1.Height))
+            Dim r1 = ValidateRect(stats.Get(Of cv.Rect)(i, 0))
+            Dim r = ValidateRect(New cv.Rect(r1.X, r1.Y, r1.Width, r1.Height))
             If (r.Width = dst2.Width And r.Height = dst2.Height) Or (r.Width = 1 And r.Height = 1) Then Continue For
             areas.Add(area)
             unsortedRects.Add(r)
-            dst2.Rectangle(r, task.highlightColor, task.lineWidth)
+            dst2.Rectangle(r, task.HighlightColor, task.lineWidth)
             index.Add(i)
             colors.Add(task.vecColors(colors.Count))
             maskOrder.Add(area, unsortedMasks.Count)

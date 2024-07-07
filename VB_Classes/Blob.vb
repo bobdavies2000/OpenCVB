@@ -9,7 +9,7 @@ Public Class Blob_Input : Inherits VB_Parent
     Public updateFrequency = 30
     Public Sub New()
         FindSlider("DrawCount").Value = 5
-        findCheckBox("Draw filled (unchecked draw an outline)").Checked = True
+        FindCheckBox("Draw filled (unchecked draw an outline)").Checked = True
 
         Mats.mats.lineSeparators = False
 
@@ -49,7 +49,7 @@ Public Class Blob_RenderBlobs : Inherits VB_Parent
         If task.frameCount Mod input.updateFrequency = 0 Then
             input.Run(src)
             dst2 = input.dst2
-            Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
             Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
             Dim labelView = dst2.EmptyClone
             Dim stats As New cv.Mat
@@ -66,8 +66,8 @@ Public Class Blob_RenderBlobs : Inherits VB_Parent
             dst3.SetTo(0)
             cc.FilterByBlob(dst2, dst3, maxBlob)
 
-            dst3.Circle(New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.dotSize + 3, cv.Scalar.Blue, -1, task.lineType)
-            DrawCircle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.dotSize, cv.Scalar.Yellow)
+            dst3.Circle(New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize + 3, cv.Scalar.Blue, -1, task.lineType)
+            DrawCircle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize, cv.Scalar.Yellow)
         End If
     End Sub
 End Class

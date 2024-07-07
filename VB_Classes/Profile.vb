@@ -12,6 +12,9 @@ Public Class Profile_Basics : Inherits VB_Parent
     Public Sub New()
         desc = "Find the left/right, top/bottom, and near/far sides of a cell"
     End Sub
+    Private Function point3fToString(v As cv.Point3f) As String
+        Return Format(v.X, fmt3) + vbTab + Format(v.Y, fmt3) + vbTab + Format(v.Z, fmt3)
+    End Function
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
         dst2 = redC.dst2
@@ -72,19 +75,19 @@ Public Class Profile_Basics : Inherits VB_Parent
         Next
 
         For i = 0 To corners.Count - 1
-            DrawCircle(dst3,corners(i), task.dotSize + 2, cornerColors(i))
+            DrawCircle(dst3,corners(i), task.DotSize + 2, cornerColors(i))
         Next
 
         If task.heartBeat Then
             strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + "units=meters" + vbCrLf
-            Dim w = task.gOptions.GridSize.Value
+            Dim w = task.gridSize
             For i = 0 To corners.Count - 1
                 strOut += point3fToString(corners3D(i)) + vbTab + cornerNames(i) + vbCrLf
             Next
             strOut += vbCrLf + "The contour may show points further away but they don't have depth."
             If sortFront.Count = 0 Then strOut += vbCrLf + "None of the contour points had depth."
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -100,7 +103,7 @@ Public Class Profile_Rotation : Inherits VB_Parent
                               "It is a common mistake to the OpenGL sliders to try to move cell but they don't - use 'Options_IMU' sliders"
     Dim options As New Options_IMU
     Public Sub New()
-        If standaloneTest() Then task.gOptions.gravityPointCloud.Checked = False
+        If standaloneTest() Then task.gOptions.setGravityUsage(False)
         labels(2) = "Top matrix is the current gMatrix while the bottom one includes the Y-axis rotation."
         desc = "Build the rotation matrix around the Y-axis"
     End Sub
@@ -109,7 +112,7 @@ Public Class Profile_Rotation : Inherits VB_Parent
             Static ySlider = FindSlider("Rotate pointcloud around Y-axis")
             ySlider.value += 1
             If ySlider.value = ySlider.maximum Then ySlider.value = ySlider.minimum
-            setTrueText("When running standaloneTest(), the Y-axis slider is rotating from -90 to 90.", 3)
+            SetTrueText("When running standaloneTest(), the Y-axis slider is rotating from -90 to 90.", 3)
         End If
 
         gMat.Run(src)
@@ -123,7 +126,7 @@ Public Class Profile_Rotation : Inherits VB_Parent
             strOut += "Angle X = " + Format(options.rotateX, fmt1) + vbCrLf
             strOut += "Angle Y = " + Format(options.rotateY, fmt1) + vbCrLf
             strOut += "Angle Z = " + Format(options.rotateZ, fmt1) + vbCrLf
-            setTrueText(strOut + vbCrLf + vbCrLf + strMsg)
+            SetTrueText(strOut + vbCrLf + vbCrLf + strMsg)
         End If
     End Sub
 End Class
@@ -136,13 +139,13 @@ End Class
 
 Public Class Profile_Derivative : Inherits VB_Parent
     Public sides As New Profile_Basics
+    Dim saveTrueText As New List(Of trueText)
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "", "Select a cell to analyze its contour", "Selected cell:  yellow = closer, blue = farther, white = no depth"}
         desc = "Visualize the derivative of X, Y, and Z in the contour of a RedCloud cell"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static saveTrueText As New List(Of trueText)
         sides.Run(src)
         dst2 = sides.dst2
         Dim rc = task.rc
@@ -169,13 +172,13 @@ Public Class Profile_Derivative : Inherits VB_Parent
                 Else
                     color = cv.Scalar.White
                 End If
-                DrawCircle(dst3,pt, task.dotSize, color)
+                DrawCircle(dst3,pt, task.DotSize, color)
 
                 If sides.cornersRaw.Contains(rc.contour(i)) Then
                     Dim index = sides.cornersRaw.IndexOf(rc.contour(i))
-                    DrawCircle(dst1,pt, task.dotSize + 5, cv.Scalar.White)
-                    DrawCircle(dst1,pt, task.dotSize + 3, sides.cornerColors(index))
-                    setTrueText(sides.cornerNames(index), pt, 3)
+                    DrawCircle(dst1,pt, task.DotSize + 5, cv.Scalar.White)
+                    DrawCircle(dst1,pt, task.DotSize + 3, sides.cornerColors(index))
+                    SetTrueText(sides.cornerNames(index), pt, 3)
                 End If
             Next
         End If
@@ -186,10 +189,10 @@ Public Class Profile_Derivative : Inherits VB_Parent
         dst1 = sides.dst3.Clone
         For i = 0 To sides.corners.Count - 1
             color = sides.cornerColors(i)
-            setTrueText(sides.cornerNames(i), sides.corners(i), 1)
-            DrawCircle(dst1,sides.corners(i), task.dotSize, color)
+            SetTrueText(sides.cornerNames(i), sides.corners(i), 1)
+            DrawCircle(dst1,sides.corners(i), task.DotSize, color)
         Next
-        setTrueText(strOut, 1)
+        SetTrueText(strOut, 1)
         saveTrueText = New List(Of trueText)(trueData)
         If saveTrueText IsNot Nothing Then trueData = New List(Of trueText)(saveTrueText)
     End Sub
@@ -205,7 +208,7 @@ End Class
 Public Class Profile_ConcentrationSide : Inherits VB_Parent
     Dim profile As New Profile_ConcentrationTop
     Public Sub New()
-        findCheckBox("Top View (Unchecked Side View)").Checked = False
+        FindCheckBox("Top View (Unchecked Side View)").Checked = False
         labels = {"", "The outline of the selected RedCloud cell", traceName + " - click any RedCloud cell to visualize it's side view in the upper right image.", ""}
         desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
     End Sub
@@ -231,8 +234,10 @@ Public Class Profile_ConcentrationTop : Inherits VB_Parent
     Public sides As New Profile_Basics
     Dim heat As New HeatMap_Basics
     Dim options As New Options_HeatMap
+    Dim maxAverage As Single
+    Dim peakRotation As Integer
     Public Sub New()
-        task.gOptions.gravityPointCloud.Checked = False
+        task.gOptions.setGravityUsage(False)
         task.gOptions.setDisplay1()
         desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
     End Sub
@@ -240,14 +245,12 @@ Public Class Profile_ConcentrationTop : Inherits VB_Parent
         options.RunVB()
 
         Static ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
-        Static maxAverage As Single
-        Static peakRotation As Integer
 
         sides.Run(src)
         dst2 = sides.dst2
         Dim rc = task.rc
         If rc.contour3D.Count = 0 Then
-            setTrueText("The selected cell has no 3D data.  The 3D data can only be computed from cells with depth data.", 1)
+            SetTrueText("The selected cell has no 3D data.  The 3D data can only be computed from cells with depth data.", 1)
             Exit Sub
         End If
         Dim vecMat As New cv.Mat(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
@@ -295,8 +298,8 @@ Public Class Profile_OpenGL : Inherits VB_Parent
     Public rotate As New Profile_Rotation
     Dim heat As New HeatMap_Basics
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32FC3, 0)
-        If standaloneTest() Then task.gOptions.gravityPointCloud.Checked = False
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32FC3, 0)
+        If standaloneTest() Then task.gOptions.setGravityUsage(False)
         task.ogl.options.PointSizeSlider.Value = 10
         task.ogl.oglFunction = oCase.pcPointsAlone
         desc = "Visualize just the RedCloud cell contour in OpenGL"
@@ -318,7 +321,7 @@ Public Class Profile_OpenGL : Inherits VB_Parent
             heat.Run(vecMat)
             dst1 = heat.dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
         End If
-        setTrueText("Select a RedCloud Cell to display the contour in OpenGL." + vbCrLf + rotate.strMsg, 3)
+        SetTrueText("Select a RedCloud Cell to display the contour in OpenGL." + vbCrLf + rotate.strMsg, 3)
     End Sub
 End Class
 
@@ -359,10 +362,10 @@ Public Class Profile_Kalman : Inherits VB_Parent
             DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
             For i = 0 To sides.corners.Count - 1
                 Dim pt = New cv.Point(CInt(kalman.kOutput(i * 2)), CInt(kalman.kOutput(i * 2 + 1)))
-                DrawCircle(dst3,pt, task.dotSize + 2, sides.cornerColors(i))
+                DrawCircle(dst3,pt, task.DotSize + 2, sides.cornerColors(i))
             Next
         End If
-        setTrueText(sides.strOut, 3)
-        setTrueText("Select a cell in the upper right image", 2)
+        SetTrueText(sides.strOut, 3)
+        SetTrueText("Select a cell in the upper right image", 2)
     End Sub
 End Class

@@ -53,6 +53,7 @@ End Class
 
 Public Class Palette_LinearPolar : Inherits VB_Parent
     Public rotateOptions As New Options_Resize
+    Dim pt = New cv.Point2f(msRNG.Next(0, dst2.Cols - 1), msRNG.Next(0, dst2.Rows - 1))
     Public Sub New()
         desc = "Use LinearPolar To create gradient image"
         If sliders.Setup(traceName) Then
@@ -71,7 +72,6 @@ Public Class Palette_LinearPolar : Inherits VB_Parent
 
         rotateOptions.RunVB()
 
-        Static pt = New cv.Point2f(msRNG.Next(0, dst2.Cols - 1), msRNG.Next(0, dst2.Rows - 1))
         dst3.SetTo(0)
         If rotateOptions.warpFlag = cv.InterpolationFlags.WarpInverseMap Then radiusSlider.Value = radiusSlider.Maximum
         cv.Cv2.LinearPolar(dst2, dst2, pt, radius, rotateOptions.warpFlag)
@@ -268,17 +268,16 @@ Public Class Palette_LeftRightImages : Inherits VB_Parent
     End Sub
 End Class
 Public Class Palette_TaskColors : Inherits VB_Parent
+    Dim direction = 1
     Public Sub New()
         labels = {"", "", "ScalarColors", "VecColors"}
         desc = "Display that task.scalarColors and task.vecColors"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static direction = 1
+        If task.gridSize <= 10 Then direction *= -1
+        If task.gridSize >= 100 Then direction *= -1
 
-        If task.gOptions.GridSize.Value <= 10 Then direction *= -1
-        If task.gOptions.GridSize.Value >= 100 Then direction *= -1
-
-        task.gOptions.GridSize.Value -= direction * 1
+        task.gridSize -= direction * 1
         task.grid.Run(src)
 
         For i = 0 To task.gridList.Count - 1
@@ -298,11 +297,13 @@ Public Class Palette_Create : Inherits VB_Parent
     Dim schemes() As FileInfo
     Dim schemeName As String
     Dim colorGrad As New cv.Mat
+    Dim activeSchemeName As String = ""
+    Dim saveColorTransitionCount As Integer = -1
     Public Sub New()
-        Dim dirInfo = New DirectoryInfo(task.homeDir + "Data")
+        Dim dirInfo = New DirectoryInfo(task.HomeDir + "Data")
         schemes = dirInfo.GetFiles("scheme*.jpg")
 
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             For i = 0 To schemes.Count - 1
                 radio.addRadio(Mid(schemes(i).Name, 1, Len(schemes(i).Name) - 4))
@@ -327,15 +328,13 @@ Public Class Palette_Create : Inherits VB_Parent
         Next
         Return result
     End Function
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static transitionSlider = FindSlider("Color Transitions")
         Dim colorTransitionCount = transitionSlider.Value
 
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         schemeName = schemes(findRadioIndex(frm.check)).FullName
 
-        Static activeSchemeName As String = ""
-        Static saveColorTransitionCount As Integer = -1
         If activeSchemeName <> schemeName Or colorTransitionCount <> saveColorTransitionCount Then
             activeSchemeName = schemeName
             saveColorTransitionCount = colorTransitionCount
@@ -351,13 +350,13 @@ Public Class Palette_Create : Inherits VB_Parent
                     If i = 0 Then colorGrad = gradMat Else cv.Cv2.HConcat(colorGrad, gradMat, colorGrad)
                 Next
                 colorGrad = colorGrad.Resize(New cv.Size(256, 1))
-                cv.Cv2.ImWrite(task.homeDir + "data\nextScheme.jpg", colorGrad) ' use this to create new color schemes.
+                cv.Cv2.ImWrite(task.HomeDir + "data\nextScheme.jpg", colorGrad) ' use this to create new color schemes.
             Else
                 colorGrad = cv.Cv2.ImRead(schemeName).Row(0).Clone
             End If
         End If
 
-        setTrueText("Use the 'Color Transitions' slider and radio buttons to change the color ranges.", 3)
+        SetTrueText("Use the 'Color Transitions' slider and radio buttons to change the color ranges.", 3)
         Dim depth8u = task.pcSplit(2).ConvertScaleAbs(colorTransitionCount)
         Dim colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, colorGrad.Data())
         cv.Cv2.ApplyColorMap(depth8u, dst2, colorMap)
@@ -457,7 +456,7 @@ End Class
 Public Class Palette_LoadColorMap : Inherits VB_Parent
     Public whitebackground As Boolean
     Public colorMap As New cv.Mat
-    Dim cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
+    Dim cMapDir As New DirectoryInfo(task.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
     Public Sub New()
         desc = "Apply the different color maps in OpenCV"
     End Sub
@@ -492,7 +491,7 @@ Public Class Palette_CustomColorMap : Inherits VB_Parent
     Public colorMap As New cv.Mat
     Public Sub New()
         labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
-        Dim cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
+        Dim cMapDir As New DirectoryInfo(task.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
         Dim str = cMapDir.FullName + "/colorscale_" + task.gOptions.Palettes.Text + ".jpg"
         Dim mapFile As New FileInfo(str)
         Dim tmp = cv.Cv2.ImRead(mapFile.FullName)

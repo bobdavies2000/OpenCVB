@@ -27,4 +27,7 @@ Public Class OptionsFileName
         Me.Text = traceName + " OpenFile Options"
         allOptions.addTitle(Me)
     End Sub
+    Public Sub setFileName(filespec As String)
+        filename.Text = filespec
+    End Sub
 End Class

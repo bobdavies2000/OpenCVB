@@ -41,6 +41,14 @@ Public Class Plane_From3Points : Inherits VB_Parent
         input = {New cv.Point3f(2, 1, -1), New cv.Point3f(0, -2, 0), New cv.Point3f(1, -1, 2)}
         desc = "Build a plane equation from 3 points in 3-dimensional space"
     End Sub
+    Public Function vbFormatEquation(eq As cv.Vec4f) As String
+        Dim s1 = If(eq(1) < 0, " - ", " +")
+        Dim s2 = If(eq(2) < 0, " - ", " +")
+        Return If(eq(0) < 0, "-", " ") + Format(Math.Abs(eq(0)), fmt3) + "*x " + s1 +
+                                         Format(Math.Abs(eq(1)), fmt3) + "*y " + s2 +
+                                         Format(Math.Abs(eq(2)), fmt3) + "*z = " +
+                                         Format(eq(3), fmt3) + vbCrLf
+    End Function
     Public Sub RunVB(src As cv.Mat)
         Dim v1 = input(1) - input(0)
         Dim v2 = input(1) - input(2)
@@ -62,7 +70,7 @@ Public Class Plane_From3Points : Inherits VB_Parent
         Dim s2 = If(cross.Z < 0, " - ", " + ")
         strOut += "Plane equation: " + Format(cross.X, fmt3) + "x" + s1 + Format(Math.Abs(cross.Y), fmt3) + "y" + s2 +
                    Format(Math.Abs(cross.Z), fmt3) + "z + " + Format(-k, fmt3) + vbCrLf
-        If showWork Then setTrueText(strOut, 2)
+        If showWork Then SetTrueText(strOut, 2)
     End Sub
 End Class
 
@@ -127,6 +135,7 @@ End Class
 
 Public Class Plane_FloorStudy : Inherits VB_Parent
     Public slice As New Structured_SliceH
+    Dim yList As New List(Of Single)
     Public planeY As Single
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Pixel Count threshold that indicates floor", 1, 100, 10)
@@ -147,7 +156,7 @@ Public Class Plane_FloorStudy : Inherits VB_Parent
             If count > thresholdSlider.Value Then
                 nextY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y - thicknessCMs / 2.5 ' narrow it down to about 1 cm
                 labels(2) = "Y = " + Format(planeY, fmt3) + " separates the floor."
-                setTrueText(labels(2), 3)
+                SetTrueText(labels(2), 3)
                 Dim sliceMask = task.pcSplit(1).InRange(cv.Scalar.All(planeY), cv.Scalar.All(3.0))
                 dst2 = src
                 dst2.SetTo(cv.Scalar.White, sliceMask)
@@ -155,7 +164,6 @@ Public Class Plane_FloorStudy : Inherits VB_Parent
             End If
         Next
 
-        Static yList As New List(Of Single)
         yList.Add(nextY)
         planeY = yList.Average()
         If yList.Count > 20 Then yList.RemoveAt(0)
@@ -177,7 +185,7 @@ Public Class Plane_OnlyPlanes : Inherits VB_Parent
     Public plane As New Plane_CellColor
     Public contours As List(Of cv.Point)
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
         labels = {"", "", "RedCloud Cells", "gCloud reworked with planes instead of depth data"}
         desc = "Replace the gCloud with planes in every RedCloud cell"
     End Sub
@@ -219,6 +227,7 @@ Public Class Plane_EqCorrelation : Inherits VB_Parent
     Public correlations As New List(Of Single)
     Public equations As New List(Of cv.Vec4f)
     Public ptList2D As New List(Of List(Of cv.Point))
+    Dim kalman As New Kalman_Basics
     Public Sub New()
         desc = "Classify equations based on the correlation of their coefficients"
     End Sub
@@ -228,7 +237,7 @@ Public Class Plane_EqCorrelation : Inherits VB_Parent
 
         If plane.equations.Count = 0 Then
             dst0 = src
-            setTrueText("Select a RedCloud cell to analyze.", 3)
+            SetTrueText("Select a RedCloud cell to analyze.", 3)
             Exit Sub
         End If
 
@@ -260,7 +269,6 @@ Public Class Plane_EqCorrelation : Inherits VB_Parent
         Dim s2 = If(pt(2) < 0, " - ", " + ")
 
         If count(index) > plane.equations.Count / 4 Then
-            Static kalman As New Kalman_Basics
             kalman.kInput = {pt(0), pt(1), pt(2), pt(3)}
             kalman.Run(empty)
 
@@ -268,7 +276,7 @@ Public Class Plane_EqCorrelation : Inherits VB_Parent
                      Format(Math.Abs(kalman.kOutput(2)), fmt3) + "z = " + Format(-kalman.kOutput(3), fmt3) + " with " + CStr(count(index)) +
                      " closely matching plane equations." + vbCrLf
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -345,6 +353,7 @@ Public Class Plane_Points : Inherits VB_Parent
     Public ptList As New List(Of cv.Point3f)
     Public ptList2D As New List(Of List(Of cv.Point))
     Dim redC As New RedCloud_Basics
+    Dim needOutput As Boolean
     Public Sub New()
         labels = {"", "", "RedCloud Basics output - click to highlight a cell", ""}
         desc = "Detect if a some or all points in a RedCloud cell are in a plane."
@@ -370,7 +379,6 @@ Public Class Plane_Points : Inherits VB_Parent
             End If
         Next
 
-        Static needOutput As Boolean
         If task.heartBeat Or needOutput Then
             ptList2D.Clear()
             equations.Clear()
@@ -390,14 +398,14 @@ Public Class Plane_Points : Inherits VB_Parent
                     Next
 
                     plane.Run(empty)
-                    strOut += vbFormatEquation(New cv.Vec4f(plane.cross.X, plane.cross.Y, plane.cross.Z, plane.k))
+                    strOut += plane.vbFormatEquation(New cv.Vec4f(plane.cross.X, plane.cross.Y, plane.cross.Z, plane.k))
                     equations.Add(New cv.Vec4f(plane.cross.X, plane.cross.Y, plane.cross.Z, plane.k))
                     ptList2D.Add(list2Dinput)
                 Next
             End If
         End If
 
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -455,79 +463,9 @@ Public Class Plane_Histogram : Inherits VB_Parent
         If Math.Abs(peak - peakFloor) > rangePerBin * 2 Then peakFloor = peak
 
         labels(3) = "Peak Ceiling = " + Format(peakCeiling, fmt3) + " and Peak Floor = " + Format(peakFloor, fmt3)
-        setTrueText("Yellow rectangle is likely floor and black is likely ceiling.")
+        SetTrueText("Yellow rectangle is likely floor and black is likely ceiling.")
     End Sub
 End Class
-
-
-
-
-
-
-Public Class Plane_Verticals : Inherits VB_Parent
-    Dim solo As New PointCloud_Solo
-    Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        labels = {"RGB image with highlights for likely vertical surfaces over X frames.",
-                  "Heatmap top view", "Single frame backprojection of red areas in the heatmap",
-                  "Thresholded heatmap top view mask - flipped for backprojection"}
-        desc = "Use a heatmap to isolate vertical walls - incomplete!"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        solo.Run(src)
-        dst3 = solo.heat.topframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total)
-
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, 0)
-        solo.heat.dst0.CopyTo(dst1, dst3)
-
-        'cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, dst2, task.rangesTop)
-
-        'frames.Run(dst2)
-        'frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        'dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        'dst2.ConvertTo(dst0, cv.MatType.CV_8U)
-        'task.color.SetTo(cv.Scalar.White, dst0)
-
-        'dst1 = solo.heat.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Plane_Horizontals : Inherits VB_Parent
-    Dim solo As New PointCloud_Solo
-    Dim frames As New History_Basics
-    Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
-        labels = {"RGB image with highlights for likely floor or ceiling over X frames.",
-                  "Heatmap side view", "Single frame backprojection areas in the heatmap",
-                  "Thresholded heatmap top view mask - flipped for backprojection"}
-        desc = "Use the solo points to isolate horizontal surfaces - floor or ceiling or table tops."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        solo.Run(src)
-        dst3 = solo.heat.sideframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total)
-
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, 0)
-        Dim tmp32f As New cv.Mat
-        solo.heat.dst1.ConvertTo(tmp32f, cv.MatType.CV_32FC1)
-        solo.heat.dst1.CopyTo(dst1, dst3)
-
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, dst1, dst2, task.rangesSide)
-
-        frames.Run(dst2)
-        frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        dst2.ConvertTo(dst0, cv.MatType.CV_8U)
-        task.color.SetTo(cv.Scalar.White, dst0)
-
-        dst1 = solo.heat.dst3
-    End Sub
-End Class
-
 
 
 
@@ -539,16 +477,16 @@ End Class
 Public Class Plane_Equation : Inherits VB_Parent
     Public rc As New rcData
     Public justEquation As String
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Compute the coefficients for an estimated plane equation given the rc contour"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             rc = task.rc
-            If rc.index = 0 Then setTrueText("Select a cell in the image at left.")
+            If rc.index = 0 Then SetTrueText("Select a cell in the image at left.")
         End If
 
         Dim offset = CInt(rc.contour.Count / 4) - 1
@@ -601,9 +539,76 @@ Public Class Plane_Equation : Inherits VB_Parent
             End If
         End If
         If standaloneTest() Then
-            setTrueText(strOut, 3)
+            SetTrueText(strOut, 3)
             dst3.SetTo(0)
             DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Plane_Verticals : Inherits VB_Parent
+    Dim solo As New PointCloud_Solo
+    Dim frames As New History_Basics
+    Public Sub New()
+        If standaloneTest() Then task.gOptions.setDisplay1()
+        labels = {"RGB image with highlights for likely vertical surfaces over X frames.",
+                  "Heatmap top view", "Single frame backprojection of red areas in the heatmap",
+                  "Thresholded heatmap top view mask"}
+        desc = "Use a heatmap to isolate vertical walls - incomplete!"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        solo.Run(src)
+        dst3 = solo.heat.topframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total)
+
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC1, 0)
+        solo.heat.dst0.CopyTo(dst1, dst3)
+        dst1.ConvertTo(dst1, cv.MatType.CV_32FC1)
+
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, dst2, task.rangesTop)
+
+        frames.Run(dst2)
+        frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2.ConvertTo(dst0, cv.MatType.CV_8U)
+        task.color.SetTo(cv.Scalar.White, dst0)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Plane_Horizontals : Inherits VB_Parent
+    Dim solo As New PointCloud_Solo
+    Dim frames As New History_Basics
+    Public Sub New()
+        If standaloneTest() Then task.gOptions.setDisplay1()
+        labels = {"RGB image with highlights for likely floor or ceiling over X frames.",
+                  "Heatmap side view", "Single frame backprojection areas in the heatmap",
+                  "Thresholded heatmap side view mask"}
+        desc = "Use the solo points to isolate horizontal surfaces - floor or ceiling or table tops."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        solo.Run(src)
+        dst3 = solo.heat.sideframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total)
+
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        solo.heat.dst1.CopyTo(dst1, dst3)
+        dst1.ConvertTo(dst1, cv.MatType.CV_32FC1)
+
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, dst1, dst2, task.rangesSide)
+
+        frames.Run(dst2)
+        frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2.ConvertTo(dst0, cv.MatType.CV_8U)
+        task.color.SetTo(cv.Scalar.White, dst0)
     End Sub
 End Class

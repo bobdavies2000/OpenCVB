@@ -2,11 +2,11 @@ Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
 Public Class Fibonacci_Basics : Inherits VB_Parent
     Dim flow As New Font_FlowText
+    Dim a As Double = 0, b As Double = 1
     Public Sub New()
         desc = "Generate the fibonacci sequence using conventional code"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static a As Double = 0, b As Double = 1
         If a = 1134903170 Then
             a = 0
             b = 1

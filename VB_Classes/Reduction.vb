@@ -7,13 +7,13 @@ Public Class Reduction_Basics : Inherits VB_Parent
         desc = "Reduction: a simpler way to KMeans by reducing color resolution"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         If task.redOptions.reductionType = "Use Bitwise Reduction" Then
             Dim bits = task.redOptions.BitwiseReductionBar.Value
             classCount = 255 / Math.Pow(2, bits)
             Dim zeroBits = Math.Pow(2, bits) - 1
-            dst2 = src And New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))
+            dst2 = src And New cv.Mat(src.Size(), src.Type, cv.Scalar.All(255 - zeroBits))
             dst2 = dst2 / zeroBits
         ElseIf task.redOptions.reductionType = "Use Simple Reduction" Then
             Dim reductionVal = task.redOptions.SimpleReductionBar.Value
@@ -105,7 +105,7 @@ Public Class Reduction_PointCloud : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pcSplit(2)
 
-        src *= 255 / task.maxZmeters
+        src *= 255 / task.MaxZmeters
         src.ConvertTo(dst0, cv.MatType.CV_32S)
         reduction.Run(dst0)
         reduction.dst2.ConvertTo(dst2, cv.MatType.CV_32F)
@@ -150,7 +150,7 @@ Public Class Reduction_XYZ : Inherits VB_Parent
 
         cv.Cv2.Merge(split, dst3)
         dst3.SetTo(0, task.noDepthMask)
-        setTrueText("Task.PointCloud (or 32fc3 input) has been reduced and is in dst3")
+        SetTrueText("Task.PointCloud (or 32fc3 input) has been reduced and is in dst3")
     End Sub
 End Class
 

@@ -7,10 +7,11 @@ Public Class Grid_Basics : Inherits VB_Parent
         desc = "Create a grid of squares covering the entire image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.mouseClickFlag And Not task.firstPass Then
-            task.gridROIclicked = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+        If task.mouseClickFlag And Not task.FirstPass Then
+            task.gridROIclicked = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         End If
         If task.optionsChanged Then
+            task.gridSize = task.gOptions.GridSlider.Value
             task.gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8U)
             task.gridMap = New cv.Mat(src.Size(), cv.MatType.CV_32S, 255)
 
@@ -19,9 +20,9 @@ Public Class Grid_Basics : Inherits VB_Parent
             task.gridRows = 0
             task.gridCols = 0
             Dim index As Integer
-            For y = 0 To src.Height - 1 Step task.gOptions.GridSize.Value
-                For x = 0 To src.Width - 1 Step task.gOptions.GridSize.Value
-                    Dim roi = validateRect(New cv.Rect(x, y, task.gOptions.GridSize.Value, task.gOptions.GridSize.Value))
+            For y = 0 To src.Height - 1 Step task.gridSize
+                For x = 0 To src.Width - 1 Step task.gridSize
+                    Dim roi = ValidateRect(New cv.Rect(x, y, task.gridSize, task.gridSize))
                     If roi.Width > 0 And roi.Height > 0 Then
                         If x = 0 Then task.gridRows += 1
                         If y = 0 Then task.gridCols += 1
@@ -37,11 +38,11 @@ Public Class Grid_Basics : Inherits VB_Parent
 
             If src.Size = task.color.Size Then
                 task.gridMask.SetTo(0)
-                For x = task.gOptions.GridSize.Value To src.Width - 1 Step task.gOptions.GridSize.Value
+                For x = task.gridSize To src.Width - 1 Step task.gridSize
                     Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, src.Height)
                     task.gridMask.Line(p1, p2, 255, task.lineWidth)
                 Next
-                For y = task.gOptions.GridSize.Value To src.Height - 1 Step task.gOptions.GridSize.Value
+                For y = task.gridSize To src.Height - 1 Step task.gridSize
                     Dim p1 = New cv.Point(0, y), p2 = New cv.Point(src.Width, y)
                     task.gridMask.Line(p1, p2, 255, task.lineWidth)
                 Next
@@ -93,7 +94,7 @@ Public Class Grid_Basics : Inherits VB_Parent
             task.color.CopyTo(dst2)
             dst2.SetTo(cv.Scalar.White, task.gridMask)
             labels(2) = "Grid_Basics " + CStr(gridList.Count) + " (" + CStr(task.gridRows) + "X" + CStr(task.gridCols) + ") " +
-                              CStr(task.gOptions.GridSize.Value) + "X" + CStr(task.gOptions.GridSize.Value) + " regions"
+                              CStr(task.gridSize) + "X" + CStr(task.gridSize) + " regions"
         End If
 
         If updateTaskGridList Then task.gridList = gridList
@@ -120,7 +121,7 @@ Public Class Grid_BasicsTest : Inherits VB_Parent
         For i = 0 To task.gridList.Count - 1
             Dim roi = task.gridList(i)
             cv.Cv2.Subtract(mean, src(roi), dst2(roi))
-            setTrueText(CStr(i), New cv.Point(roi.X, roi.Y))
+            SetTrueText(CStr(i), New cv.Point(roi.X, roi.Y))
         Next
         'End Sub)
         dst2.SetTo(cv.Scalar.White, task.gridMask)
@@ -166,7 +167,7 @@ Public Class Grid_List : Inherits VB_Parent
                 If threadCount Mod 5 = 0 Then str += vbCrLf
                 If thread.threadstate <> 5 Then notIdle += 1
             Next thread
-            setTrueText("There were " + CStr(threadCount) + " threads in OpenCVB with " + CStr(notIdle) + " of them not idle when traversing the gridList" + vbCrLf + str)
+            SetTrueText("There were " + CStr(threadCount) + " threads in OpenCVB with " + CStr(notIdle) + " of them not idle when traversing the gridList" + vbCrLf + str)
         Catch e As Exception
             MsgBox(e.Message)
         End Try
@@ -199,7 +200,7 @@ Public Class Grid_Rectangles : Inherits VB_Parent
         Dim width = widthSlider.Value
         Dim height = heightSlider.Value
 
-        If task.mouseClickFlag Then task.gridROIclicked = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+        If task.mouseClickFlag Then task.gridROIclicked = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         If task.optionsChanged Then
             task.gridList.Clear()
             For y = 0 To dst2.Height - 1 Step height
@@ -247,6 +248,8 @@ End Class
 Public Class Grid_FPS : Inherits VB_Parent
     Public heartBeat As Boolean
     Public fpsSlider As Windows.Forms.TrackBar
+    Dim skipCount As Integer
+    Dim saveSkip As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired FPS rate", 1, 10, 2)
         fpsSlider = FindSlider("Desired FPS rate")
@@ -256,8 +259,6 @@ Public Class Grid_FPS : Inherits VB_Parent
         Dim fps = CInt(task.fpsRate / fpsSlider.Value)
         If fps = 0 Then fps = 1
         heartBeat = (task.frameCount Mod fps) = 0
-        Static skipCount As Integer
-        Static saveSkip As Integer
         If heartBeat Then
             saveSkip = skipCount
             skipCount = 0
@@ -276,6 +277,7 @@ End Class
 
 
 Public Class Grid_Neighbors : Inherits VB_Parent
+    Dim mask As New cv.Mat
     Public Sub New()
         labels = {"", "", "Grid_Basics output", ""}
         desc = "Click any grid element to see its neighbors"
@@ -283,7 +285,7 @@ Public Class Grid_Neighbors : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If task.gridRows <> CInt(dst2.Height / 10) Then
             task.gOptions.setGridSize(CInt(dst2.Height / 10))
-            task.gridRows = task.gOptions.GridSize.Value
+            task.gridRows = task.gridSize
             task.grid.Run(src)
         End If
 
@@ -291,17 +293,16 @@ Public Class Grid_Neighbors : Inherits VB_Parent
         If standaloneTest() Then
             If task.heartBeat Then
                 task.mouseClickFlag = True
-                task.clickPoint = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+                task.ClickPoint = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             End If
         End If
 
-        setTrueText("Click any grid entry to see its neighbors", 3)
-        Static mask As New cv.Mat
+        SetTrueText("Click any grid entry to see its neighbors", 3)
         If task.optionsChanged Then mask = task.gridMask.Clone
 
         If task.mouseClickFlag Then
             mask = task.gridMask.Clone
-            Dim roiIndex = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            Dim roiIndex = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
 
             For Each index In task.gridNeighbors(roiIndex)
                 Dim roi = task.gridList(index)
@@ -334,7 +335,7 @@ Public Class Grid_Special : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.optionsChanged Then
-            gridWidth = task.gOptions.GridSize.Value
+            gridWidth = task.gridSize
             gridList.Clear()
             gridRows = 0
             gridCols = 0
@@ -438,7 +439,7 @@ End Class
 
 
 Public Class Grid_MinMaxDepth : Inherits VB_Parent
-    Public minMaxLocs(0) As pointPair
+    Public minMaxLocs(0) As PointPair
     Public minMaxVals(0) As cv.Vec2f
     Public Sub New()
         task.gOptions.setGridSize(8)
@@ -452,7 +453,7 @@ Public Class Grid_MinMaxDepth : Inherits VB_Parent
         For i = 0 To minMaxLocs.Count - 1
             Dim roi = task.gridList(i)
             task.pcSplit(2)(roi).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthMask(roi))
-            minMaxLocs(i) = New pointPair(mm.minLoc, mm.maxLoc)
+            minMaxLocs(i) = New PointPair(mm.minLoc, mm.maxLoc)
             minMaxVals(i) = New cv.Vec2f(mm.minVal, mm.maxVal)
         Next
 
@@ -460,8 +461,8 @@ Public Class Grid_MinMaxDepth : Inherits VB_Parent
             dst2.SetTo(0)
             For i = 0 To minMaxLocs.Count - 1
                 Dim lp = minMaxLocs(i)
-                DrawCircle(dst2(task.gridList(i)), lp.p2, task.dotSize, cv.Scalar.Red)
-                DrawCircle(dst2(task.gridList(i)), lp.p1, task.dotSize, cv.Scalar.White)
+                DrawCircle(dst2(task.gridList(i)), lp.p2, task.DotSize, cv.Scalar.Red)
+                DrawCircle(dst2(task.gridList(i)), lp.p1, task.DotSize, cv.Scalar.White)
             Next
             dst2.SetTo(cv.Scalar.White, task.gridMask)
         End If
@@ -493,18 +494,18 @@ Public Class Grid_TrackCenter : Inherits VB_Parent
 
         Dim templatePad = match.options.templatePad
         Dim templateSize = match.options.templateSize
-        match.searchRect = validateRect(New cv.Rect(center.X - templatePad, center.Y - templatePad, templateSize, templateSize))
+        match.searchRect = ValidateRect(New cv.Rect(center.X - templatePad, center.Y - templatePad, templateSize, templateSize))
         match.Run(src)
         center = match.matchCenter
 
         If standaloneTest() Then
             dst2 = src
-            dst2.Rectangle(match.matchRect, task.highlightColor, task.lineWidth + 1, task.lineType)
-            DrawCircle(dst2, center, task.dotSize, cv.Scalar.White)
+            dst2.Rectangle(match.matchRect, task.HighlightColor, task.lineWidth + 1, task.lineType)
+            DrawCircle(dst2, center, task.DotSize, cv.Scalar.White)
 
             If task.heartBeat Then dst3.SetTo(0)
-            DrawCircle(dst3, center, task.dotSize, task.highlightColor)
-            setTrueText(Format(match.correlation, fmt3), center, 3)
+            DrawCircle(dst3, center, task.DotSize, task.HighlightColor)
+            SetTrueText(Format(match.correlation, fmt3), center, 3)
 
             labels(3) = "Match correlation = " + Format(match.correlation, fmt3)
         End If

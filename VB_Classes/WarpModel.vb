@@ -11,7 +11,7 @@ Public Class WarpModel_Basics : Inherits VB_Parent
         desc = "Align the BGR inputs raw images from the Prokudin examples."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static gradientCheck = findCheckBox("Use Gradient in WarpInput")
+        Static gradientCheck = FindCheckBox("Use Gradient in WarpInput")
         If standaloneTest() Then ecc.warpInput.Run(src)
         dst0 = ecc.warpInput.rgb(0).Clone
         dst1 = ecc.warpInput.rgb(1).Clone
@@ -34,7 +34,7 @@ Public Class WarpModel_Basics : Inherits VB_Parent
         cv.Cv2.Merge(mergeInput, merged)
         dst3.SetTo(0)
         dst3(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged
-        setTrueText("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
+        SetTrueText("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
                       "Other than that, images look the same." + vbCrLf +
                       "Displacement increases with Sobel" + vbCrLf + "kernel size", New cv.Point(merged.Width + 10, 40), 3)
     End Sub
@@ -102,8 +102,8 @@ Public Class WarpModel_ECC : Inherits VB_Parent
             cv.Cv2.WarpPerspective(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
         End If
 
-        dst2 = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, 0)
 
         outputRect = New cv.Rect(0, 0, src.Width, src.Height)
         dst2(outputRect) = src
@@ -118,7 +118,7 @@ Public Class WarpModel_ECC : Inherits VB_Parent
         If options.useWarpAffine Or options.useWarpHomography Then
             outStr += vbCrLf + "NOTE: Gradients may give better results."
         End If
-        setTrueText(outStr, New cv.Point(aligned.Width + 10, 220))
+        SetTrueText(outStr, New cv.Point(aligned.Width + 10, 220))
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = WarpModel_Close(cPtr)

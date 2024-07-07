@@ -145,7 +145,7 @@
 '	}
 '	For (int i= 0;i<classNum;i++)
 '	{
-'		classmean[i].convertTo(classmean[i],CV_64FC1,1.0/static_cast<Double>(setNum[i]));
+'		classmean[i].convertTo(classmean[i],CV_64FC1,1.0/Static _cast<Double>(setNum[i]));
 '	}
 
 '	vector<Mat> cluster(classNum);

@@ -4,7 +4,7 @@ Public Class ROI_Basics : Inherits VB_Parent
     Public aoiRect As cv.Rect
     Public Sub New()
         labels = {"", "", "Enclosing rectangle of all pixels that have changed", ""}
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
+        dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
         task.gOptions.pixelDiffThreshold = 30
         desc = "Find the motion ROI in the latest image."
     End Sub
@@ -36,7 +36,7 @@ Public Class ROI_FindNonZeroNoSingle : Inherits VB_Parent
     Public aoiRect As cv.Rect
     Public Sub New()
         labels = {"", "", "Enclosing rectangle of all changed pixels (after removing single pixels)", ""}
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
+        dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
         task.gOptions.pixelDiffThreshold = 30
         desc = "Find the motion ROI in just the latest image - eliminate single pixels"
     End Sub
@@ -82,7 +82,7 @@ Public Class ROI_AccumulateOld : Inherits VB_Parent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "", "Area of Interest", ""}
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
+        dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
         task.gOptions.pixelDiffThreshold = 30
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max size area of interest %", 0, 100, 25)
         desc = "Accumulate pixels in a motion ROI - all pixels that are different by X"
@@ -134,13 +134,13 @@ Public Class ROI_Accumulate : Inherits VB_Parent
     Dim roiRect As cv.Rect
     Public Sub New()
         labels = {"", "", "Area of Interest", ""}
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
         task.gOptions.pixelDiffThreshold = 30
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Max size area of interest %", 0, 100, 25)
         desc = "Accumulate pixels in a motion ROI until the size is x% of the total image."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        setTrueText(traceName + " is the same as ROI_AccumulateOld but simpler.", 3)
+        SetTrueText(traceName + " is the same as ROI_AccumulateOld but simpler.", 3)
         Dim roiSlider = FindSlider("Max size area of interest %")
         Dim roiPercent = roiSlider.Value / 100
         If roiRect.Width * roiRect.Height > src.Total * roiPercent Or task.optionsChanged Then
@@ -162,6 +162,6 @@ Public Class ROI_Accumulate : Inherits VB_Parent
             End If
         End If
         dst2.Rectangle(roiRect, cv.Scalar.White, task.lineWidth)
-        task.color.Rectangle(roiRect, task.highlightColor, task.lineWidth)
+        task.color.Rectangle(roiRect, task.HighlightColor, task.lineWidth)
     End Sub
 End Class

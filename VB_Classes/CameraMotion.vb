@@ -4,25 +4,26 @@ Public Class CameraMotion_Basics : Inherits VB_Parent
     Public translationY As Integer
     Dim gravity As New Gravity_Horizon
     Public secondOpinion As Boolean
+    Dim feat As New Swarm_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        task.gOptions.DebugSlider.Value = 3
+        dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        task.gOptions.setDebugSlider(3)
         desc = "Merge with previous image using just translation of the gravity vector and horizon vector (if present)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         gravity.Run(src)
 
-        Static gravityVec As pointPair = New pointPair(task.gravityVec.p1, task.gravityVec.p2)
-        Static horizonVec As pointPair = New pointPair(task.horizonVec.p1, task.horizonVec.p2)
+        Dim gravityVec = New PointPair(task.gravityVec.p1, task.gravityVec.p2)
+        Dim horizonVec = New PointPair(task.horizonVec.p1, task.horizonVec.p2)
 
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        translationX = task.gOptions.DebugSlider.Value ' Math.Round(gravityVec.p1.X - task.gravityVec.p1.X)
-        translationY = task.gOptions.DebugSlider.Value ' Math.Round(horizonVec.p1.Y - task.horizonVec.p1.Y)
+        translationX = task.gOptions.DebugSliderValue ' Math.Round(gravityVec.p1.X - task.gravityVec.p1.X)
+        translationY = task.gOptions.DebugSliderValue ' Math.Round(horizonVec.p1.Y - task.horizonVec.p1.Y)
         If Math.Abs(translationX) >= dst2.Width / 2 Then translationX = 0
         If horizonVec.p1.Y >= dst2.Height Or horizonVec.p2.Y >= dst2.Height Or Math.Abs(translationY) >= dst2.Height / 2 Then
-            horizonVec = New pointPair(New cv.Point2f, New cv.Point2f(336, 0))
+            horizonVec = New PointPair(New cv.Point2f, New cv.Point2f(336, 0))
             translationY = 0
         End If
 
@@ -54,8 +55,6 @@ Public Class CameraMotion_Basics : Inherits VB_Parent
             End If
 
             If secondOpinion Then
-                Static feat As New Swarm_Basics
-
                 dst3.SetTo(0)
                 ' the point cloud contributes one set of camera motion distance and direction.  Now confirm it with feature points
                 feat.Run(src)
@@ -68,9 +67,9 @@ Public Class CameraMotion_Basics : Inherits VB_Parent
             End If
         End If
 
-        gravityVec = New pointPair(task.gravityVec.p1, task.gravityVec.p2)
-        horizonVec = New pointPair(task.horizonVec.p1, task.horizonVec.p2)
-        setTrueText(strOut, 3)
+        gravityVec = New PointPair(task.gravityVec.p1, task.gravityVec.p2)
+        horizonVec = New PointPair(task.horizonVec.p1, task.horizonVec.p2)
+        SetTrueText(strOut, 3)
 
         labels(2) = "Translation (X, Y) = (" + CStr(translationX) + ", " + CStr(translationY) + ")" +
                     If(horizonVec.p1.Y = 0 And horizonVec.p2.Y = 0, " there is no horizon present", "")
@@ -92,9 +91,11 @@ Public Class CameraMotion_WithRotation : Inherits VB_Parent
     Public rotationY As Single
     Public centerY As cv.Point2f
     Public rotate As New Rotate_BasicsQT
+    Dim gravityVec As PointPair
+    Dim horizonVec As PointPair
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
         desc = "Merge with previous image using rotation AND translation of the camera motion - not as good as translation alone."
     End Sub
     Public Sub translateRotateX(x1 As Integer, x2 As Integer)
@@ -130,9 +131,12 @@ Public Class CameraMotion_WithRotation : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static gravityVec As pointPair = task.gravityVec
-        Static horizonVec As pointPair = task.horizonVec
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.FirstPass Then
+            gravityVec = task.gravityVec
+            horizonVec = task.horizonVec
+        End If
+
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim x1 = gravityVec.p1.X - task.gravityVec.p1.X
         Dim x2 = gravityVec.p2.X - task.gravityVec.p2.X

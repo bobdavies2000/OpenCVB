@@ -1,30 +1,24 @@
 Imports cv = OpenCvSharp
 Imports System.Drawing
 Public Class Draw_Noise : Inherits VB_Parent
-    Public maxNoiseWidth As Integer = 3
     Public addRandomColor As Boolean
     Public noiseMask As cv.Mat
+    Public options As New Options_DrawNoise
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Noise Count", 1, 1000, 100)
-            sliders.setupTrackBar("Noise Width", 1, 10, 3)
-        End If
         desc = "Add Noise to the color image"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static widthSlider = FindSlider("Noise Width")
-        Static CountSlider = FindSlider("Noise Count")
-        maxNoiseWidth = widthSlider.Value
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         src.CopyTo(dst2)
         noiseMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1).SetTo(0)
-        Dim count = CountSlider.Value
-        For n = 0 To count - 1
+        For n = 0 To options.noiseCount - 1
             Dim i = msRNG.Next(0, src.Cols - 1)
             Dim j = msRNG.Next(0, src.Rows - 1)
             Dim center = New cv.Point2f(i, j)
             Dim c = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             If addRandomColor = False Then c = cv.Scalar.Black
-            Dim noiseWidth = msRNG.Next(1, maxNoiseWidth)
+            Dim noiseWidth = msRNG.Next(1, options.noiseWidth)
             DrawCircle(dst2, center, noiseWidth, c)
             DrawCircle(noiseMask, center, noiseWidth, cv.Scalar.White)
         Next
@@ -239,8 +233,7 @@ End Class
 
 
 Public Class Draw_Arc : Inherits VB_Parent
-    ReadOnly kalman As New Kalman_Basics
-    ReadOnly saveArcAngle As Integer
+    Dim kalman As New Kalman_Basics
     Dim rect As cv.Rect
 
     Dim angle As Single
@@ -283,7 +276,8 @@ Public Class Draw_Arc : Inherits VB_Parent
             Dim startAngle = kalman.kOutput(5)
             Dim endAngle = kalman.kOutput(6)
             If options.drawFill Then thickness = -1
-            dst2.Ellipse(New cv.Point(rr.Center.X, rr.Center.Y), New cv.Size(rr.BoundingRect.Size.Width, rr.BoundingRect.Size.Height),
+            Dim r1 = rr.BoundingRect
+            dst2.Ellipse(New cv.Point(rr.Center.X, rr.Center.Y), New cv.Size(r1.Width, r1.Height),
                          angle, startAngle, endAngle, color, thickness, task.lineType)
         End If
     End Sub
@@ -297,10 +291,11 @@ End Class
 Public Class Draw_ClipLine : Inherits VB_Parent
     Dim flow As New Font_FlowText
     Dim kalman As New Kalman_Basics
-    Dim lastRect As cv.Rect
     Dim pt1 As cv.Point
     Dim pt2 As cv.Point
     Dim rect As cv.Rect
+    Dim linenum = 0
+    Dim hitCount = 0
     Private Sub setup()
         ReDim kalman.kInput(8)
         Dim r = initRandomRect(25)
@@ -328,11 +323,9 @@ Public Class Draw_ClipLine : Inherits VB_Parent
         dst3.Line(p1, p2, If(clipped, cv.Scalar.White, cv.Scalar.Black), task.lineWidth + 1, task.lineType)
         dst3.Rectangle(r, If(clipped, cv.Scalar.Yellow, cv.Scalar.Red), task.lineWidth + 1, task.lineType)
 
-        Static linenum = 0
         flow.msgs.Add("(" + CStr(linenum) + ") line " + If(clipped, "interects rectangle", "does not intersect rectangle"))
         linenum += 1
 
-        Static hitCount = 0
         hitCount += If(clipped, 1, 0)
         setTrueText("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
                      New cv.Point(src.Width / 2, 200))
@@ -349,7 +342,7 @@ End Class
 
 ' http://www3.psych.purdue.edu/~zpizlo/GestaltCube
 Public Class Draw_Hexagon : Inherits VB_Parent
-    Dim alpha As New imageForm
+    Dim alpha As New ImageForm
     Public Sub New()
         alpha.imagePic.Image = Image.FromFile(task.homeDir + "Data/GestaltCube.gif")
         alpha.Show()
@@ -357,7 +350,7 @@ Public Class Draw_Hexagon : Inherits VB_Parent
         alpha.Text = "Perception is the key"
         desc = "What it means to recognize a cube.  Zygmunt Pizlo - UC Irvine"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
     End Sub
 End Class
 
@@ -374,8 +367,8 @@ Public Class Draw_Line : Inherits VB_Parent
     Public Sub New()
         desc = "Draw a line between the selected p1 and p2 - either by clicking twice in the image or externally providing p1 and p2."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        If task.firstPass Then task.clickPoint = New cv.Point
+    Public Sub RunVB(src As cv.Mat)
+        If task.firstPass Then task.ClickPoint = New cv.Point
 
         If p1 <> New cv.Point And p2 <> New cv.Point And task.clickPoint <> New cv.Point Then
             p1 = New cv.Point
@@ -386,11 +379,11 @@ Public Class Draw_Line : Inherits VB_Parent
             If p1 = New cv.Point Then p1 = task.clickPoint Else p2 = task.clickPoint
         End If
 
-        If p1 <> New cv.Point And p2 = New cv.Point Then DrawCircle(dst2,p1, task.dotSize, task.highlightColor)
+        If p1 <> New cv.Point And p2 = New cv.Point Then DrawCircle(dst2, p1, task.DotSize, task.highlightColor)
         If p1 <> New cv.Point And p2 <> New cv.Point Then
             DrawLine(dst2, p1, p2, task.highlightColor)
         End If
-        setTrueText("Click twice in the image to provide the points below and they will be connected with a line" + vbCrLf +
+        SetTrueText("Click twice in the image to provide the points below and they will be connected with a line" + vbCrLf +
                     "P1 = " + p1.ToString + vbCrLf + "P2 = " + p2.ToString, 3)
         task.clickPoint = New cv.Point
     End Sub

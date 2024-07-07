@@ -94,6 +94,7 @@ End Class
 Public Class Hist3Dcloud_Highlights : Inherits VB_Parent
     Public histogram As New cv.Mat
     Public ranges() As cv.Rangef
+    Dim maskval As Integer
     Public Sub New()
         desc = "Plot the 3D histogram of the depth data"
     End Sub
@@ -106,7 +107,7 @@ Public Class Hist3Dcloud_Highlights : Inherits VB_Parent
 
         Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
         Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        Dim rz = New cv.Vec2f(0, task.maxZmeters)
+        Dim rz = New cv.Vec2f(0, task.MaxZmeters)
 
         Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
         Dim dstPtr = Hist3Dcloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins,
@@ -136,7 +137,6 @@ Public Class Hist3Dcloud_Highlights : Inherits VB_Parent
         Marshal.Copy(samples, 0, histogram.Data, samples.Length)
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, ranges)
 
-        Static maskval As Integer
         If task.heartBeat Then maskval += 1
 
         If sortedHist.ElementAt(maskval).Key = 0 Then maskval = 0
@@ -156,7 +156,7 @@ Public Class Hist3Dcloud_BP_Filter : Inherits VB_Parent
     Dim options As New Options_HistXD
     Public Sub New()
         task.redOptions.HistBinBar3D.Value = 16
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
         labels(2) = "Mask of the pointcloud image after backprojection that removes 'blowback' pixels"
         desc = "Backproject a 3D pointcloud histogram after thresholding the bins with the small samples."
     End Sub
@@ -171,7 +171,7 @@ Public Class Hist3Dcloud_BP_Filter : Inherits VB_Parent
 
         Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
         Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        Dim rz = New cv.Vec2f(0, task.maxZmeters)
+        Dim rz = New cv.Vec2f(0, task.MaxZmeters)
 
         Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
         Dim imagePtr = BackProjectCloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins, options.threshold3D,

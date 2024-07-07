@@ -2,7 +2,7 @@
 Public Class OptionsCheckbox
     Public Box As New List(Of CheckBox)
     Public Function Setup(traceName As String) As Boolean
-        If findfrm(traceName + " CheckBoxes") IsNot Nothing Then Return False
+        If FindFrm(traceName + " CheckBoxes") IsNot Nothing Then Return False
         Me.MdiParent = allOptions
         Me.Text = traceName + " CheckBoxes"
         allOptions.addTitle(Me)

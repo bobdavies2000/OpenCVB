@@ -6,17 +6,26 @@ Public Class Entropy_Basics : Inherits VB_Parent
         labels(2) = "Control entropy values with histogram bins slider"
         desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
+    Private Function validatePreserve(ByVal r As cv.Rect) As cv.Rect
+        If r.Width <= 0 Then r.Width = 1
+        If r.Height <= 0 Then r.Height = 1
+        If r.X < 0 Then r.X = 0
+        If r.Y < 0 Then r.Y = 0
+        If r.X + r.Width >= task.WorkingRes.Width Then r.X = task.WorkingRes.Width - r.Width - 1
+        If r.Y + r.Height >= task.WorkingRes.Height Then r.Y = task.WorkingRes.Height - r.Height - 1
+        Return r
+    End Function
     Public Sub RunVB(src As cv.Mat)
         Dim stdSize = 30
         If task.drawRect = New cv.Rect Then
             task.drawRect = New cv.Rect(30, 30, stdSize, stdSize) ' arbitrary rectangle
         End If
         If task.mouseClickFlag Then
-            task.drawRect = validatePreserve(New cv.Rect(task.clickPoint.X, task.clickPoint.Y, stdSize, stdSize))
+            task.drawRect = validatePreserve(New cv.Rect(task.ClickPoint.X, task.ClickPoint.Y, stdSize, stdSize))
         End If
-        task.drawRect = validateRect(task.drawRect)
-        If src.Channels = 3 Then
-            entropy.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)(task.drawRect))
+        task.drawRect = ValidateRect(task.drawRect)
+        If src.Channels() = 3 Then
+            entropy.Run(src.CvtColor(cv.ColorConversionCodes.BGR2Gray)(task.drawRect))
         Else
             entropy.Run(src(task.drawRect))
         End If
@@ -25,7 +34,7 @@ Public Class Entropy_Basics : Inherits VB_Parent
         If task.heartBeat Then strOut = "Click anywhere to measure the entropy with rect(pt.x, pt.y, " +
                                          CStr(stdSize) + ", " + CStr(stdSize) + ")" + vbCrLf + vbCrLf + "Total entropy = " +
                                          Format(entropy.entropyVal, fmt1) + vbCrLf + entropy.strOut
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -49,7 +58,7 @@ Public Class Entropy_Highest : Inherits VB_Parent
         Dim maxEntropy As Single = Single.MinValue
         Dim minEntropy As Single = Single.MaxValue
 
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         For Each roi In task.gridList
             entropy.Run(src(roi))
             entropyMap(roi).SetTo(entropy.entropyVal)
@@ -61,8 +70,8 @@ Public Class Entropy_Highest : Inherits VB_Parent
             If entropy.entropyVal < minEntropy Then minEntropy = entropy.entropyVal
             If standaloneTest() Then
                 Dim pt = New cv.Point(roi.X, roi.Y)
-                setTrueText(Format(entropy.entropyVal, fmt2), pt, 2)
-                setTrueText(Format(entropy.entropyVal, fmt2), pt, 3)
+                SetTrueText(Format(entropy.entropyVal, fmt2), pt, 2)
+                SetTrueText(Format(entropy.entropyVal, fmt2), pt, 3)
             End If
         Next
 
@@ -98,7 +107,7 @@ Public Class Entropy_FAST : Inherits VB_Parent
         entropy.Run(fast.dst2)
         dst2 = entropy.dst2
         dst3 = entropy.dst2
-        dst3.Rectangle(entropy.eMaxRect, task.highlightColor, task.lineWidth)
+        dst3.Rectangle(entropy.eMaxRect, task.HighlightColor, task.lineWidth)
     End Sub
 End Class
 
@@ -121,7 +130,7 @@ Public Class Entropy_Rectangle : Inherits VB_Parent
     End Function
     Public Sub RunVB(src As cv.Mat)
         Dim dimensions() = New Integer() {task.histogramBins}
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         Dim mm = GetMinMax(src)
         Dim ranges() = New cv.Rangef() {New cv.Rangef(mm.minVal, mm.maxVal)}
@@ -142,7 +151,7 @@ Public Class Entropy_Rectangle : Inherits VB_Parent
         dst2 = src
         dst2.Rectangle(task.drawRect, cv.Scalar.White, task.lineWidth)
         dst3 = src
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -171,7 +180,7 @@ Public Class Entropy_SubDivisions : Inherits VB_Parent
             eROI(i).Clear()
         Next
 
-        dst1 = If(src.Channels = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst1 = If(src.Channels() = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2Gray))
         Dim dimensions() = New Integer() {task.histogramBins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255)}
         Dim hist As New cv.Mat
@@ -184,7 +193,7 @@ Public Class Entropy_SubDivisions : Inherits VB_Parent
 
             entropies(task.subDivisions(i)).Add(nextEntropy)
             eROI(task.subDivisions(i)).Add(roi)
-            If standaloneTest() Then setTrueText(Format(nextEntropy, fmt2), New cv.Point(roi.X, roi.Y), 3)
+            If standaloneTest() Then SetTrueText(Format(nextEntropy, fmt2), New cv.Point(roi.X, roi.Y), 3)
         Next
 
         roiList.Clear()
@@ -228,6 +237,6 @@ Public Class Entropy_BinaryImage : Inherits VB_Parent
         labels(2) = binary.labels(2)
 
         entropy.Run(dst2)
-        setTrueText(entropy.strOut, 3)
+        SetTrueText(entropy.strOut, 3)
     End Sub
 End Class

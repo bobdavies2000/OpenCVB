@@ -1,17 +1,17 @@
 ﻿Imports cv = OpenCvSharp
 Public Class LongLine_Basics : Inherits VB_Parent
     Public lines As New LongLine_Core
-    Public lpList As New List(Of pointPair)
+    Public lpList As New List(Of PointPair)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of lines to display", 0, 100, 25)
         lines.lineCount = 1000
         desc = "Identify the longest lines"
     End Sub
-    Public Function buildLongLine(lp As pointPair) As pointPair
+    Public Function buildLongLine(lp As PointPair) As PointPair
         If lp.p1.X <> lp.p2.X Then
             Dim b = lp.p1.Y - lp.p1.X * lp.slope
             If lp.p1.Y = lp.p2.Y Then
-                Return New pointPair(New cv.Point(0, lp.p1.Y), New cv.Point(dst2.Width, lp.p1.Y))
+                Return New PointPair(New cv.Point(0, lp.p1.Y), New cv.Point(dst2.Width, lp.p1.Y))
             Else
                 Dim xint1 = CInt(-b / lp.slope)
                 Dim xint2 = CInt((dst2.Height - b) / lp.slope)
@@ -23,10 +23,10 @@ Public Class LongLine_Basics : Inherits VB_Parent
                 If xint2 >= 0 And xint2 <= dst2.Width Then points.Add(New cv.Point(xint2, dst2.Height))
                 If yint1 >= 0 And yint1 <= dst2.Height Then points.Add(New cv.Point(0, yint1))
                 If yint2 >= 0 And yint2 <= dst2.Height Then points.Add(New cv.Point(dst2.Width, yint2))
-                Return New pointPair(points(0), points(1))
+                Return New PointPair(points(0), points(1))
             End If
         End If
-        Return New pointPair(New cv.Point(lp.p1.X, 0), New cv.Point(lp.p1.X, dst2.Height))
+        Return New PointPair(New cv.Point(lp.p1.X, 0), New cv.Point(lp.p1.X, dst2.Height))
     End Function
     Public Sub RunVB(src As cv.Mat)
         Static countSlider = FindSlider("Number of lines to display")
@@ -39,7 +39,7 @@ Public Class LongLine_Basics : Inherits VB_Parent
         For Each lp In lines.lpList
             lp = buildLongLine(lp)
             DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.White)
-            If lp.p1.X > lp.p2.X Then lp = New pointPair(lp.p2, lp.p1)
+            If lp.p1.X > lp.p2.X Then lp = New PointPair(lp.p2, lp.p1)
             lpList.Add(lp)
             If lpList.Count >= maxCount Then Exit For
         Next
@@ -57,7 +57,7 @@ End Class
 Public Class LongLine_Core : Inherits VB_Parent
     Public lines As New Line_Basics
     Public lineCount As Integer = 1 ' How many of the longest lines...
-    Public lpList As New List(Of pointPair) ' this will be sorted by length - longest first
+    Public lpList As New List(Of PointPair) ' this will be sorted by length - longest first
     Public Sub New()
         desc = "Isolate the longest X lines."
     End Sub
@@ -70,7 +70,7 @@ Public Class LongLine_Core : Inherits VB_Parent
         lpList.Clear()
         For Each lp In lines.lpList
             lpList.Add(lp)
-            DrawLine(dst2, lp.p1, lp.p2, task.highlightColor)
+            DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
             If lpList.Count >= lineCount Then Exit For
         Next
     End Sub
@@ -86,7 +86,7 @@ Public Class LongLine_Depth : Inherits VB_Parent
     Dim kalman As New Kalman_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 0)
         plot.dst2 = dst3
         desc = "Find the longest line in BGR and use it to measure the average depth for the line"
     End Sub
@@ -107,14 +107,14 @@ Public Class LongLine_Depth : Inherits VB_Parent
         mm.minLoc = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
         mm.maxLoc = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
 
-        DrawCircle(dst1, mm.minLoc, task.dotSize, cv.Scalar.Red)
-        DrawCircle(dst1, mm.maxLoc, task.dotSize, cv.Scalar.Blue)
-        setTrueText(Format(mm.minVal, fmt1) + "m", New cv.Point(mm.minLoc.X + 5, mm.minLoc.Y), 1)
-        setTrueText(Format(mm.maxVal, fmt1) + "m", New cv.Point(mm.maxLoc.X + 5, mm.maxLoc.Y), 1)
+        DrawCircle(dst1, mm.minLoc, task.DotSize, cv.Scalar.Red)
+        DrawCircle(dst1, mm.maxLoc, task.DotSize, cv.Scalar.Blue)
+        SetTrueText(Format(mm.minVal, fmt1) + "m", New cv.Point(mm.minLoc.X + 5, mm.minLoc.Y), 1)
+        SetTrueText(Format(mm.maxVal, fmt1) + "m", New cv.Point(mm.maxLoc.X + 5, mm.maxLoc.Y), 1)
 
         Dim depth = task.pcSplit(2).Mean(dst0)(0)
 
-        setTrueText("Average Depth = " + Format(depth, fmt1) + "m", New cv.Point((longLine.ptLong.p1.X + longLine.ptLong.p2.X) / 2 + 30,
+        SetTrueText("Average Depth = " + Format(depth, fmt1) + "m", New cv.Point((longLine.ptLong.p1.X + longLine.ptLong.p2.X) / 2 + 30,
                                                                                  (longLine.ptLong.p1.Y + longLine.ptLong.p2.Y) / 2), 1)
 
         labels(3) = "Mean (blue)/Min (green)/Max (red) = " + Format(depth, fmt1) + "/" + Format(mm.minVal, fmt1) + "/" +
@@ -137,7 +137,7 @@ End Class
 
 Public Class LongLine_Consistent : Inherits VB_Parent
     Dim longest As New LongLine_Core
-    Public ptLong As pointPair
+    Public ptLong As PointPair
     Public Sub New()
         longest.lineCount = 4
         desc = "Isolate the line that is consistently among the longest lines present in the image."
@@ -149,7 +149,7 @@ Public Class LongLine_Consistent : Inherits VB_Parent
         If ptLong Is Nothing Then ptLong = longest.lpList(0)
 
         Dim minDistance = Single.MaxValue
-        Dim lpMin As pointPair
+        Dim lpMin As PointPair
         For Each lp In longest.lpList
             Dim distance = lp.p1.DistanceTo(ptLong.p1) + lp.p2.DistanceTo(ptLong.p2)
             If distance < minDistance Then
@@ -159,7 +159,7 @@ Public Class LongLine_Consistent : Inherits VB_Parent
         Next
 
         labels(2) = "minDistance = " + Format(minDistance, fmt1)
-        DrawLine(dst2, ptLong.p1, ptLong.p2, task.highlightColor)
+        DrawLine(dst2, ptLong.p1, ptLong.p2, task.HighlightColor)
         ptLong = lpMin
     End Sub
 End Class
@@ -190,7 +190,7 @@ Public Class LongLine_Point : Inherits VB_Parent
         lp.p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
         longPt = New cv.Point((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
 
-        DrawCircle(dst2,longPt, task.dotSize, cv.Scalar.Red)
+        DrawCircle(dst2,longPt, task.DotSize, cv.Scalar.Red)
     End Sub
 End Class
 
@@ -202,7 +202,7 @@ Public Class LongLine_Match : Inherits VB_Parent
     Dim longest As New LongLine_Consistent
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Reduction for width/height in pixels", 1, 20, 3)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, 0)
         desc = "Find the longest line from last image and use matchTemplate to find the line in the latest image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -216,20 +216,20 @@ Public Class LongLine_Match : Inherits VB_Parent
 
         Dim x1 = Math.Min(lp.p1.X - pad, lp.p2.X - pad), x2 = Math.Max(lp.p1.X + pad, lp.p2.X + pad)
         Dim y1 = Math.Min(lp.p1.Y - pad, lp.p2.Y - pad), y2 = Math.Max(lp.p1.Y + pad, lp.p2.Y + pad)
-        Dim rect = validateRect(New cv.Rect(Math.Min(x1, x2), Math.Min(y1, y2), Math.Abs(x1 - x2), Math.Abs(y1 - y2)))
-        dst2.Rectangle(rect, task.highlightColor, task.lineWidth)
+        Dim rect = ValidateRect(New cv.Rect(Math.Min(x1, x2), Math.Min(y1, y2), Math.Abs(x1 - x2), Math.Abs(y1 - y2)))
+        dst2.Rectangle(rect, task.HighlightColor, task.lineWidth)
 
         Static template As cv.Mat = src(rect).Clone
         cv.Cv2.MatchTemplate(template, src, dst0, cv.TemplateMatchModes.CCoeffNormed)
         Dim mm As mmData = GetMinMax(dst0)
 
         mm.maxLoc = New cv.Point(mm.maxLoc.X + rect.Width / 2, mm.maxLoc.Y + rect.Height / 2)
-        DrawCircle(dst2,mm.maxLoc, task.dotSize, cv.Scalar.Red)
+        DrawCircle(dst2,mm.maxLoc, task.DotSize, cv.Scalar.Red)
 
         dst3.SetTo(0)
         dst0 = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
         dst0.CopyTo(dst3(New cv.Rect((dst3.Width - dst0.Width) / 2, (dst3.Height - dst0.Height) / 2, dst0.Width, dst0.Height)))
-        DrawCircle(dst3,mm.maxLoc, task.dotSize, 255)
+        DrawCircle(dst3,mm.maxLoc, task.DotSize, 255)
 
         template = src(rect).Clone
     End Sub
@@ -245,7 +245,7 @@ Public Class LongLine_ExtendTest : Inherits VB_Parent
     Dim longLine As New LongLine_Basics
     Public Sub New()
         labels = {"", "", "Random Line drawn", ""}
-        desc = "Test pointPair constructor with random values to make sure lines are extended properly"
+        desc = "Test PointPair constructor with random values to make sure lines are extended properly"
     End Sub
 
     Public Sub RunVB(src As cv.Mat)
@@ -253,12 +253,12 @@ Public Class LongLine_ExtendTest : Inherits VB_Parent
             Dim p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             Dim p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
 
-            Dim mps = New pointPair(p1, p2)
+            Dim mps = New PointPair(p1, p2)
             Dim emps = longLine.buildLongLine(mps)
             dst2 = src
-            DrawLine(dst2, emps.p1, emps.p2, task.highlightColor)
-            DrawCircle(dst2,p1, task.dotSize + 2, cv.Scalar.Red)
-            DrawCircle(dst2,p2, task.dotSize + 2, cv.Scalar.Red)
+            DrawLine(dst2, emps.p1, emps.p2, task.HighlightColor)
+            DrawCircle(dst2,p1, task.DotSize + 2, cv.Scalar.Red)
+            DrawCircle(dst2,p2, task.DotSize + 2, cv.Scalar.Red)
         End If
     End Sub
 End Class
@@ -272,7 +272,7 @@ End Class
 
 Public Class LongLine_ExtendAll : Inherits VB_Parent
     Public lines As New Line_Basics
-    Public lpList As New List(Of pointPair)
+    Public lpList As New List(Of PointPair)
     Public Sub New()
         labels = {"", "", "Image output from Line_Basics", "The extended line for each line found in Line_Basics"}
         desc = "Create a list of all the extended lines in an image"
@@ -285,7 +285,7 @@ Public Class LongLine_ExtendAll : Inherits VB_Parent
         lpList.Clear()
         For Each lp In lines.lpList
             lpList.Add(lp)
-            DrawLine(dst3, lp.p1, lp.p2, task.highlightColor)
+            DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
         Next
     End Sub
 End Class
@@ -350,7 +350,7 @@ Public Class LongLine_ExtendParallel : Inherits VB_Parent
                         If (cp.p1 = cp.p3 Or cp.p1 = cp.p4) And (cp.p2 = cp.p3 Or cp.p2 = cp.p4) Then
                             ' duplicate points...
                         Else
-                            DrawLine(dst2, cp.p1, cp.p2, task.highlightColor)
+                            DrawLine(dst2, cp.p1, cp.p2, task.HighlightColor)
                             DrawLine(dst2, cp.p3, cp.p4, cv.Scalar.Red)
                             parList.Add(cp)
                             checkList.Add(cp.p1)
@@ -376,12 +376,12 @@ End Class
 
 Public Class LongLine_Extend : Inherits VB_Parent
     Dim lines As New LongLine_Basics
+    Dim saveP1 As cv.Point, saveP2 As cv.Point, p1 As cv.Point, p2 As cv.Point
     Public Sub New()
         labels = {"", "", "Original Line", "Original line Extended"}
         desc = "Given 2 points, extend the line to the edges of the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static saveP1 As cv.Point, saveP2 As cv.Point, p1 As cv.Point, p2 As cv.Point
         If standaloneTest() And task.heartBeat Then
             p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -389,15 +389,15 @@ Public Class LongLine_Extend : Inherits VB_Parent
             saveP2 = p2
         End If
 
-        Dim mps = New pointPair(p1, p2)
+        Dim mps = New PointPair(p1, p2)
         Dim emps = lines.buildLongLine(mps)
 
         If standaloneTest() Then
             labels(2) = emps.p1.ToString + " and " + emps.p2.ToString + " started with " + saveP1.ToString + " and " + saveP2.ToString
             dst2 = src
-            DrawLine(dst2, emps.p1, emps.p2, task.highlightColor)
-            DrawCircle(dst2,saveP1, task.dotSize, cv.Scalar.Red)
-            DrawCircle(dst2,saveP2, task.dotSize, cv.Scalar.Red)
+            DrawLine(dst2, emps.p1, emps.p2, task.HighlightColor)
+            DrawCircle(dst2,saveP1, task.DotSize, cv.Scalar.Red)
+            DrawCircle(dst2,saveP2, task.DotSize, cv.Scalar.Red)
         End If
     End Sub
 End Class
@@ -411,7 +411,7 @@ End Class
 Public Class LongLine_NoDepth : Inherits VB_Parent
     Dim lineHist As New LineCoin_Basics
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Find any lines in regions without depth."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -432,7 +432,8 @@ End Class
 
 Public Class LongLine_History : Inherits VB_Parent
     Dim lines As New LongLine_Basics
-    Public lpList As New List(Of pointPair)
+    Public lpList As New List(Of PointPair)
+    Dim mpList As New List(Of List(Of PointPair))
     Public Sub New()
         desc = "Find the longest lines and toss any that are intermittant."
     End Sub
@@ -440,10 +441,9 @@ Public Class LongLine_History : Inherits VB_Parent
         lines.Run(src)
         dst2 = lines.dst2
 
-        Static mpList As New List(Of List(Of pointPair))
         mpList.Add(lines.lpList)
 
-        Dim tmplist As New List(Of pointPair)
+        Dim tmplist As New List(Of PointPair)
         Dim lpCount As New List(Of Integer)
         For Each list In mpList
             For Each lp In list

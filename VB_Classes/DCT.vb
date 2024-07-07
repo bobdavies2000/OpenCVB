@@ -9,7 +9,7 @@ Public Class DCT_Basics : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
 
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         Dim src32f As New cv.Mat
         src.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
@@ -74,7 +74,7 @@ Public Class DCT_Depth : Inherits VB_Parent
         desc = "Find featureless surfaces in the depth data - expected to be useful only on the K4A for Azure camera."
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Dim gray = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
         gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
@@ -123,8 +123,8 @@ Public Class DCT_FeatureLess : Inherits VB_Parent
         Next
 
         dst3.SetTo(0)
-        If dst2.Channels = 3 Then
-            dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        If dst2.Channels() = 3 Then
+            dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray).Threshold(1, 255, cv.ThresholdTypes.Binary)
         Else
             dst2 = dst2.Threshold(1, 255, cv.ThresholdTypes.Binary)
         End If

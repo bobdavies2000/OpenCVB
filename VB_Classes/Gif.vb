@@ -16,7 +16,7 @@ Public Class Gif_Basics : Inherits VB_Parent
         desc = "Create a GIF file by clicking on the checkbox when dst2 is to be used."
     End Sub
     Private Sub clearTempDir()
-        Dim imgDir As New DirectoryInfo(task.homeDir + "Temp")
+        Dim imgDir As New DirectoryInfo(task.HomeDir + "Temp")
         If imgDir.Exists = False Then imgDir.Create()
         Dim imgList As FileInfo() = imgDir.GetFiles("*.bmp")
 
@@ -24,7 +24,7 @@ Public Class Gif_Basics : Inherits VB_Parent
             For Each imgFile In imgList
                 My.Computer.FileSystem.DeleteFile(imgFile.FullName)
             Next
-            Dim gifFile As New FileInfo(task.homeDir + "Temp\myGif.gif")
+            Dim gifFile As New FileInfo(task.HomeDir + "Temp\myGif.gif")
             If gifFile.Exists Then My.Computer.FileSystem.DeleteFile(gifFile.FullName)
         End If
     End Sub
@@ -41,7 +41,7 @@ Public Class Gif_Basics : Inherits VB_Parent
         task.optionsChanged = False ' trying to reduce the impact of options changing on the active algorithm
 
         labels(2) = "Images captured: " + CStr(task.gifImages.Count)
-        setTrueText("Gif_Basics is typically called from VB_Task to create the .gif file." + vbCrLf +
+        SetTrueText("Gif_Basics is typically called from VB_Task to create the .gif file." + vbCrLf +
                     "The snapshots that are input to GifBuilder are created in VB_Parent.vb (see GifCreator)", 3)
     End Sub
 End Class
@@ -68,7 +68,7 @@ Public Class Gif_OpenGL : Inherits VB_Parent
         Dim r = New cv.Rect(0, 0, dst2.Height, dst2.Height)
         gifC.Run(dst2(r))
 
-        setTrueText("Select 'Gif_Basics CheckBox Options' form (see 'OpenCVB Algorithm Options'" + vbCrLf +
+        SetTrueText("Select 'Gif_Basics CheckBox Options' form (see 'OpenCVB Algorithm Options'" + vbCrLf +
                     "Click the check box for each frame to be included" + vbCrLf + "Then click 'Build GIF file...' when done." +
                     vbCrLf + vbCrLf + "To adjust the GIF size, change the working size in the OpenCVB options.", 3)
         labels(2) = gifC.labels(2)
@@ -99,7 +99,7 @@ Public Class Gif_OpenGLwithColor : Inherits VB_Parent
 
         gifC.Run(tmp)
 
-        setTrueText("Select 'Gif_Basics CheckBox Options' form (see 'OpenCVB Algorithm Options'" + vbCrLf +
+        SetTrueText("Select 'Gif_Basics CheckBox Options' form (see 'OpenCVB Algorithm Options'" + vbCrLf +
                     "Click the check box for each frame to be included" + vbCrLf + "Then click 'Build GIF file...' when done.", 3)
         labels(2) = gifC.labels(2)
     End Sub
@@ -119,24 +119,24 @@ Public Class Gif_OpenCVB : Inherits VB_Parent
         desc = "Create a GIF of the OpenCVB main screen for any algorithm."
     End Sub
     Public Sub createNextGifImage()
-        Static snapCheck = findCheckBox("Check this box when Gif_Basics dst2 contains the desired snapshot.")
+        Static snapCheck = FindCheckBox("Check this box when Gif_Basics dst2 contains the desired snapshot.")
         If snapCheck.checked Then
             Dim nextBMP As Bitmap
             Select Case task.gifCaptureIndex
                 Case gifTypes.gifdst0
-                    If task.dst0.Channels = 1 Then task.dst0 = task.dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                    If task.dst0.Channels() = 1 Then task.dst0 = task.dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     nextBMP = New Bitmap(task.dst0.Width, task.dst0.Height, Imaging.PixelFormat.Format24bppRgb)
                     cvext.BitmapConverter.ToBitmap(task.dst0, nextBMP)
                 Case gifTypes.gifdst1
-                    If task.dst1.Channels = 1 Then task.dst1 = task.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                    If task.dst1.Channels() = 1 Then task.dst1 = task.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     nextBMP = New Bitmap(task.dst1.Width, task.dst1.Height, Imaging.PixelFormat.Format24bppRgb)
                     cvext.BitmapConverter.ToBitmap(task.dst1, nextBMP)
                 Case gifTypes.gifdst2
-                    If task.dst2.Channels = 1 Then task.dst2 = task.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                    If task.dst2.Channels() = 1 Then task.dst2 = task.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     nextBMP = New Bitmap(task.dst2.Width, task.dst2.Height, Imaging.PixelFormat.Format24bppRgb)
                     cvext.BitmapConverter.ToBitmap(task.dst2, nextBMP)
                 Case gifTypes.gifdst3
-                    If task.dst3.Channels = 1 Then task.dst3 = task.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                    If task.dst3.Channels() = 1 Then task.dst3 = task.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     nextBMP = New Bitmap(task.dst3.Width, task.dst3.Height, Imaging.PixelFormat.Format24bppRgb)
                     cvext.BitmapConverter.ToBitmap(task.dst3, nextBMP)
                 Case gifTypes.openCVBwindow
@@ -161,8 +161,8 @@ Public Class Gif_OpenCVB : Inherits VB_Parent
         End If
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        setTrueText("Results are best when the main form is set to an 'auto-sized' setting.", 3)
-        Static snapCheck = findCheckBox("Check this box when Gif_Basics dst2 contains the desired snapshot.")
+        SetTrueText("Results are best when the main form is set to an 'auto-sized' setting.", 3)
+        Static snapCheck = FindCheckBox("Check this box when Gif_Basics dst2 contains the desired snapshot.")
 
         If snapCheck.checked Or (standaloneTest() And task.heartBeat) And task.mainFormLocation.Width > 0 Then
             Dim snapshot As Bitmap = GetWindowImage(task.main_hwnd,

@@ -1,26 +1,13 @@
 Imports cv = OpenCvSharp
 ' http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
 Public Class Coherence_Basics : Inherits VB_Parent
+    Dim options As New Options_Coherence
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Coherence Sigma", 1, 15, 9)
-            sliders.setupTrackBar("Coherence Blend", 1, 10, 10)
-            sliders.setupTrackBar("Coherence str_sigma", 1, 15, 15)
-            sliders.setupTrackBar("Coherence eigen kernel", 1, 31, 1)
-        End If
         labels(2) = "Coherence - draw rectangle to apply"
         desc = "Find lines that are artistically coherent in the image"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static sigmaSlider = FindSlider("Coherence Sigma")
-        Static blendSlider = FindSlider("Coherence Blend")
-        Static strSlider = FindSlider("Coherence str_sigma")
-        Static eigenSlider = FindSlider("Coherence eigen kernel")
-
-        Dim sigma = sigmaSlider.Value * 2 + 1
-        Dim blend As Single = blendSlider.Value / 10
-        Dim str_sigma = strSlider.Value * 2 + 1
-        Dim eigenKernelSize = eigenslider.Value * 2 + 1
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
         Dim side As Integer
         Select Case src.Height
@@ -46,13 +33,13 @@ Public Class Coherence_Basics : Inherits VB_Parent
         Dim split() As cv.Mat
         For i = 0 To 3
             gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            eigen = gray.CornerEigenValsAndVecs(str_sigma, eigenKernelSize)
+            eigen = gray.CornerEigenValsAndVecs(options.str_sigma, options.eigenkernelsize)
             split = eigen.Split()
             Dim x = split(2), y = split(3)
 
-            Dim gxx = gray.Sobel(cv.MatType.CV_32F, 2, 0, sigma)
-            Dim gxy = gray.Sobel(cv.MatType.CV_32F, 1, 1, sigma)
-            Dim gyy = gray.Sobel(cv.MatType.CV_32F, 0, 2, sigma)
+            Dim gxx = gray.Sobel(cv.MatType.CV_32F, 2, 0, options.sigma)
+            Dim gxy = gray.Sobel(cv.MatType.CV_32F, 1, 1, options.sigma)
+            Dim gyy = gray.Sobel(cv.MatType.CV_32F, 0, 2, options.sigma)
 
             Dim tmpX As New cv.Mat, tmpXY As New cv.Mat, tmpY As New cv.Mat
             cv.Cv2.Multiply(x, x, tmpX)
@@ -74,7 +61,7 @@ Public Class Coherence_Basics : Inherits VB_Parent
 
             Dim imgl = erode
             dilate.CopyTo(imgl, mask)
-            src = src * (1 - blend) + imgl * blend
+            src = src * (1 - options.blend) + imgl * options.blend
         Next
         dst2(srcRect) = src
         dst2.Rectangle(srcRect, cv.Scalar.Yellow, 2)

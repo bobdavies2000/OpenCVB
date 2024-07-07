@@ -8,8 +8,8 @@ Public Class Diff_Basics : Inherits VB_Parent
         desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.firstPass Or lastFrame Is Nothing Then lastFrame = src.Clone
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        If task.FirstPass Or lastFrame Is Nothing Then lastFrame = src.Clone
         If task.optionsChanged Or lastFrame.Size <> src.Size Then lastFrame = src.Clone
 
         cv.Cv2.Absdiff(src, lastFrame, dst0)
@@ -22,7 +22,7 @@ Public Class Diff_Basics : Inherits VB_Parent
         Else
             strOut = "No motion detected"
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -38,10 +38,10 @@ Public Class Diff_Color : Inherits VB_Parent
         desc = "Use Diff_Basics with a color image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.firstPass Then diff.lastFrame = src.Reshape(1, src.Rows * 3)
+        If task.FirstPass Then diff.lastFrame = src.Reshape(1, src.Rows * 3)
         diff.Run(src.Reshape(1, src.Rows * 3))
         dst2 = diff.dst2.Reshape(3, src.Rows)
-        dst3 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst3 = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
     End Sub
 End Class
 
@@ -63,7 +63,7 @@ Public Class Diff_UnstableDepthAndColor : Inherits VB_Parent
         Dim unstableDepth As New cv.Mat
         Dim mask As New cv.Mat
         unstableDepth = Not depth.dst3
-        If unstableGray.Channels = 3 Then unstableGray = unstableGray.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If unstableGray.Channels() = 3 Then unstableGray = unstableGray.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         mask = unstableGray Or unstableDepth
         dst2 = src.Clone()
         dst2.SetTo(0, mask)
@@ -81,7 +81,7 @@ Public Class Diff_RGBAccum : Inherits VB_Parent
     Dim history As New List(Of cv.Mat)
     Public Sub New()
         labels = {"", "", "Accumulated BGR image", "Mask of changed pixels"}
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Run Diff_Basics and accumulate BGR diff data."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -131,12 +131,12 @@ End Class
 Public Class Diff_Heartbeat : Inherits VB_Parent
     Public cumulativePixels As Integer
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "", "Unstable mask", "Pixel difference"}
         desc = "Diff an image with one from the last heartbeat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         If task.heartBeat Then
             dst1 = src.Clone
             dst2.SetTo(0)

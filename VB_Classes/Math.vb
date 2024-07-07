@@ -49,7 +49,7 @@ Public Class Math_Median_CDF : Inherits VB_Parent
         desc = "Compute the src image median"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         medianVal = computeMedian(src, New cv.Mat, src.Total, task.histogramBins, rangeMin, rangeMax)
 
         If standaloneTest() Then
@@ -82,7 +82,7 @@ Public Class Math_DepthMeanStdev : Inherits VB_Parent
         Dim mask = minMax.dst3 ' the mask for stable depth.
         dst3.SetTo(0)
         task.depthRGB.CopyTo(dst3, mask)
-        If mask.Type <> cv.MatType.CV_8U Then mask = mask.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If mask.Type <> cv.MatType.CV_8U Then mask = mask.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         cv.Cv2.MeanStdDev(task.pcSplit(2), mean, stdev, mask)
         labels(3) = "stablized depth mean=" + Format(mean, fmt1) + " stdev=" + Format(stdev, fmt1)
 
@@ -148,15 +148,15 @@ Public Class Math_Stdev : Inherits VB_Parent
             check.addCheckBox("Show Grid Mask")
         End If
 
-        highStdevMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        lowStdevMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        highStdevMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        lowStdevMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         desc = "Compute the standard deviation in each segment"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Static stdevSlider = FindSlider("Stdev Threshold")
-        Static meanCheck = findCheckBox("Show mean")
-        Static stdevCheck = findCheckBox("Show Stdev")
-        Static gridCheck = findCheckBox("Show Grid Mask")
+        Static meanCheck = FindCheckBox("Show mean")
+        Static stdevCheck = FindCheckBox("Show Stdev")
+        Static gridCheck = FindCheckBox("Show Grid Mask")
         Dim stdevThreshold = CSng(stdevSlider.Value)
 
         Dim updateCount As Integer
@@ -164,7 +164,7 @@ Public Class Math_Stdev : Inherits VB_Parent
         highStdevMask.SetTo(0)
 
         dst2 = src.Clone
-        If dst2.Channels = 3 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If dst2.Channels() = 3 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         Dim showMean = meanCheck.checked
         Dim showStdev = stdevCheck.checked
@@ -177,8 +177,8 @@ Public Class Math_Stdev : Inherits VB_Parent
             If stdev < stdevThreshold Then
                 Interlocked.Increment(updateCount)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                If showMean Then setTrueText(Format(mean, fmt0), pt, 2)
-                If showStdev Then setTrueText(Format(stdev, fmt2), pt, 2)
+                If showMean Then SetTrueText(Format(mean, fmt0), pt, 2)
+                If showStdev Then SetTrueText(Format(stdev, fmt2), pt, 2)
                 lowStdevMask(roi).SetTo(255)
             Else
                 highStdevMask(roi).SetTo(255)
@@ -260,8 +260,8 @@ End Class
 
 Public Class Math_Template : Inherits VB_Parent
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, 0)
         labels = {"", "", "Input Template showing columns", "Input Template showing rows"}
         desc = "Build a template for use with computing the point cloud"
     End Sub
@@ -302,7 +302,7 @@ Public Class Math_ImageAverage : Inherits VB_Parent
         If task.optionsChanged Then images.Clear()
         dst3 = src.Clone
         If dst3.Type <> cv.MatType.CV_32F Then
-            If dst3.Channels <> 1 Then dst3.ConvertTo(dst3, cv.MatType.CV_32FC3) Else dst3.ConvertTo(dst3, cv.MatType.CV_32F)
+            If dst3.Channels() <> 1 Then dst3.ConvertTo(dst3, cv.MatType.CV_32FC3) Else dst3.ConvertTo(dst3, cv.MatType.CV_32F)
         End If
         cv.Cv2.Multiply(dst3, cv.Scalar.All(1 / (images.Count + 1)), dst3)
         images.Add(dst3.Clone)
@@ -389,7 +389,7 @@ Public Class Math_ParallelTest : Inherits VB_Parent
             strOut += "normalized v2" + " = " + Format(v2.X, fmt3) + ", " + Format(v2.Y, fmt3) + ", " + Format(v2.Z, fmt3) + vbCrLf
 
             strOut += "Dot Product = " + Format(n1, fmt3) + " - if close to 1, the vectors are parallel" + vbCrLf
-            setTrueText(strOut, 2)
+            SetTrueText(strOut, 2)
         End If
     End Sub
 End Class

@@ -11,7 +11,7 @@ Public Class History_Basics : Inherits VB_Parent
         End If
         If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(src, cv.MatType.CV_32F)
 
-        If dst1.Type <> src.Type Or dst1.Channels <> src.Channels Or task.optionsChanged Then
+        If dst1.Type <> src.Type Or dst1.Channels() <> src.Channels() Or task.optionsChanged Then
             dst1 = src
             saveFrames.Clear()
         End If
@@ -23,7 +23,7 @@ Public Class History_Basics : Inherits VB_Parent
             dst1 += m
         Next
         dst1 *= 1 / (saveFrames.Count + 1)
-        If src.Channels = 1 Then
+        If src.Channels() = 1 Then
             dst1.ConvertTo(dst2, cv.MatType.CV_8U)
         Else
             dst1.ConvertTo(dst2, cv.MatType.CV_8UC3)
@@ -61,17 +61,16 @@ End Class
 
 Public Class History_Cloud : Inherits VB_Parent
     Public frames As New History_BasicsNoSaturation
+    Dim saveFrames As New List(Of cv.Mat)
     Public Sub New()
         desc = "Create a frame history and sum the last X task.pointcloud's"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static saveFrames As New List(Of cv.Mat)
-
-        If src.Type <> cv.MatType.CV_32FC3 Or src.Channels <> 3 Then src = task.pointCloud
+        If src.Type <> cv.MatType.CV_32FC3 Or src.Channels() <> 3 Then src = task.pointCloud
 
         If task.optionsChanged Or dst3.Type <> cv.MatType.CV_32FC3 Then
             saveFrames.Clear()
-            dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
         End If
 
         If saveFrames.Count >= task.frameHistoryCount Then
@@ -99,9 +98,9 @@ Public Class History_BasicsNoSaturation : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim input = src.Clone
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If input.Type <> cv.MatType.CV_32F Then input.ConvertTo(input, cv.MatType.CV_32F)
-        If dst3.Type <> input.Type Or dst3.Channels <> input.Channels Then dst3 = New cv.Mat(input.Size, input.Type, 0)
+        If dst3.Type <> input.Type Or dst3.Channels() <> input.Channels() Then dst3 = New cv.Mat(input.Size(), input.Type, 0)
         input /= 255 ' input is all zeros or ones.
 
         If task.optionsChanged Then

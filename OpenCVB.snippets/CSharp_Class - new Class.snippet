@@ -7,17 +7,20 @@
         <Snippet>
             <Code Language="C#">
                 <![CDATA[
-using OpenCvSharp;
-namespace CS_Classes
-{
-    public class AnyName
+	public class CS_AnyName_Basics : CS_Parent
     {
-        public Mat RunCS(Mat img1)
+        public Options_Blur options;
+        public CS_AnyName_Basics(VBtask task) : base(task)
         {
-            return img1.CvtColor(ColorConversionCodes.BGR2GRAY);
+		    options = new Options_Blur();
+            desc = "description";
         }
-    }
-}
+
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+        }
+    }  // End Class
 ]]>
             </Code>
         </Snippet>

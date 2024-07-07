@@ -6,7 +6,7 @@ Public Class SLR_Data : Inherits VB_Parent
     Public dataX As New List(Of Double)
     Public dataY As New List(Of Double)
     Public Sub New()
-        Dim sr = New StreamReader(task.homeDir + "/Data/real_data.txt")
+        Dim sr = New StreamReader(task.HomeDir + "/Data/real_data.txt")
         Dim code As String = sr.ReadToEnd
         sr.Close()
 
@@ -36,7 +36,7 @@ End Class
 Public Class SLR_TrendImages : Inherits VB_Parent
     Dim trends As New SLR_Trends
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("pcSplit(2) input")
             radio.addRadio("Grayscale input")
@@ -48,16 +48,16 @@ Public Class SLR_TrendImages : Inherits VB_Parent
 
         desc = "Find trends by filling in short histogram gaps for depth or 1-channel images"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim split = src.Split()
         trends.hist.plot.maxRange = 255
         trends.hist.plot.removeZeroEntry = False ' default is to look at element 0....
 
         Dim splitIndex = 0
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         Select Case findRadioText(frm.check)
             Case "pcSplit(2) input"
-                trends.hist.plot.maxRange = task.maxZmeters
+                trends.hist.plot.maxRange = task.MaxZmeters
                 trends.hist.plot.removeZeroEntry = True ' not interested in the undefined depth areas...
                 trends.Run(task.pcSplit(2))
                 labels(2) = "SLR_TrendImages - pcSplit(2)"

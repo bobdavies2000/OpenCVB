@@ -10,10 +10,10 @@ Public Class BackProject_Basics : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Dim input = src.Clone
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         histK.Run(input)
         If histK.hist.mm.minVal = histK.hist.mm.maxVal Then
-            setTrueText("The input image is empty - mm.minVal and mm.maxVal are both zero...")
+            SetTrueText("The input image is empty - mm.minVal and mm.maxVal are both zero...")
             Exit Sub
         End If
 
@@ -62,7 +62,7 @@ Public Class BackProject_Full : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         classCount = task.histogramBins
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         src.ConvertTo(dst1, cv.MatType.CV_32F)
         Dim histogram As New cv.Mat
         Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 255)}
@@ -207,19 +207,19 @@ End Class
 Public Class BackProject_PointCloud : Inherits VB_Parent
     Public hist As New Hist_PointCloud
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
         labels = {"", "", "Backprojection after histogram binning X and Z values", "Backprojection after histogram binning Y and Z values"}
         desc = "Explore Backprojection of the cloud histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim threshold = hist.thresholdSlider.Value
+        Dim threshold = hist.options.threshold
         hist.Run(src)
 
         dst0 = hist.dst2.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
         dst1 = hist.dst3.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
 
-        dst2 = New cv.Mat(hist.dst2.Size, cv.MatType.CV_32F, 0)
-        dst3 = New cv.Mat(hist.dst3.Size, cv.MatType.CV_32F, 0)
+        dst2 = New cv.Mat(hist.dst2.Size(), cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(hist.dst3.Size(), cv.MatType.CV_32F, 0)
 
         Dim mask As New cv.Mat
         cv.Cv2.CalcBackProject({task.pointCloud}, {0, 2}, dst0, mask, hist.rangesX)
@@ -296,7 +296,7 @@ Public Class BackProject_FullEqualized : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         backP.Run(src)
         backP.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        Dim mm = GetMinMax(dst3)
+        Dim mm = GetMinMax(dst2)
         dst2 = ShowPalette(dst2 * 255 / mm.maxVal)
 
         equalize.Run(src)
@@ -320,7 +320,7 @@ Public Class BackProject_MaskLines : Inherits VB_Parent
     Dim lines As New Line_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "lines detected in the backProjection mask", "Histogram of pixels in a grayscale image.  Move mouse to see lines detected in the backprojection mask",
                   "Yellow is backProjection, lines detected are highlighted"}
         desc = "Inspect the lines from individual backprojection masks from a histogram"
@@ -338,7 +338,7 @@ Public Class BackProject_MaskLines : Inherits VB_Parent
             If val = 255 Then DrawLine(dst1, lp.p1, lp.p2, cv.Scalar.White)
         Next
         dst3.SetTo(cv.Scalar.Yellow, masks.mask)
-        dst3.SetTo(task.highlightColor, dst1)
+        dst3.SetTo(task.HighlightColor, dst1)
     End Sub
 End Class
 
@@ -364,7 +364,7 @@ Public Class BackProject_Masks : Inherits VB_Parent
         Dim maxRange = If(histIndex = hist.histogram.Rows - 1, 255, (histIndex + 1) * brickRange)
         If Single.IsNaN(minRange) Or Single.IsInfinity(minRange) Or
            Single.IsNaN(maxRange) Or Single.IsInfinity(maxRange) Then
-            setTrueText("Input data has no values - exit " + traceName)
+            SetTrueText("Input data has no values - exit " + traceName)
             Return New cv.Mat
         End If
 
@@ -380,7 +380,7 @@ Public Class BackProject_Masks : Inherits VB_Parent
         Dim brickWidth = dst2.Width / task.histogramBins
         histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
 
-        Dim gray = If(src.Channels = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        Dim gray = If(src.Channels() = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst3 = task.color.Clone
         dst1 = maskDetect(gray, histIndex)
         If dst1.Width = 0 Then Exit Sub
@@ -537,7 +537,7 @@ End Class
 Public Class BackProject_LineTop : Inherits VB_Parent
     Dim line As New Line_ViewTop
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Backproject the lines found in the top view."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -566,9 +566,9 @@ End Class
 
 Public Class BackProject_LineSide : Inherits VB_Parent
     Dim line As New Line_ViewSide
-    Public lpList As New List(Of pointPair)
+    Public lpList As New List(Of PointPair)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Backproject the lines found in the side view."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -610,10 +610,10 @@ Public Class BackProject_Image : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim input = src
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.Run(input)
         If hist.mm.minVal = hist.mm.maxVal Then
-            setTrueText("The input image is empty - mm.minval and mm.maxVal are both zero...")
+            SetTrueText("The input image is empty - mm.minval and mm.maxVal are both zero...")
             Exit Sub ' the input image is empty...
         End If
         dst2 = hist.dst2
@@ -639,7 +639,7 @@ Public Class BackProject_Image : Inherits VB_Parent
             maxRange = New cv.Scalar(255)
         End If
         If useInrange Then
-            If histIndex = 0 And hist.plot.removeZeroEntry Then mask = New cv.Mat(input.Size, cv.MatType.CV_8U, 0) Else mask = input.InRange(minRange, maxRange)
+            If histIndex = 0 And hist.plot.removeZeroEntry Then mask = New cv.Mat(input.Size(), cv.MatType.CV_8U, 0) Else mask = input.InRange(minRange, maxRange)
         Else
             Dim bRange = New cv.Rangef(minRange(0), maxRange(0))
             Dim ranges() = New cv.Rangef() {bRange}
@@ -685,7 +685,7 @@ Public Class BackProject_Depth : Inherits VB_Parent
         desc = "Allow review of the depth backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim depth = task.pcSplit(2).Threshold(task.maxZmeters, 255, cv.ThresholdTypes.TozeroInv)
+        Dim depth = task.pcSplit(2).Threshold(task.MaxZmeters, 255, cv.ThresholdTypes.TozeroInv)
         backp.Run(depth * 1000)
         dst2 = backp.dst2
         dst3 = src
@@ -702,9 +702,9 @@ Public Class BackProject_MeterByMeter : Inherits VB_Parent
         desc = "Backproject the depth data at 1 meter intervals WITHOUT A HISTOGRAM."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.histogramBins < task.maxZmeters Then task.gOptions.setHistogramBins(task.maxZmeters + 1)
+        If task.histogramBins < task.MaxZmeters Then task.gOptions.setHistogramBins(task.MaxZmeters + 1)
         If task.optionsChanged Then
-            Dim incr = task.maxZmeters / task.histogramBins
+            Dim incr = task.MaxZmeters / task.histogramBins
             Dim histData As New List(Of Single)
             For i = 0 To task.histogramBins - 1
                 histData.Add(Math.Round(i * incr))
@@ -712,10 +712,10 @@ Public Class BackProject_MeterByMeter : Inherits VB_Parent
 
             histogram = New cv.Mat(task.histogramBins, 1, cv.MatType.CV_32F, histData.ToArray)
         End If
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZmeters)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.MaxZmeters)}
         cv.Cv2.CalcBackProject({task.pcSplit(2)}, {0}, histogram, dst1, ranges)
 
-        'dst1.SetTo(task.maxZmeters, task.maxDepthMask)
+        'dst1.SetTo(task.MaxZmeters, task.maxDepthMask)
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
         dst3 = ShowPalette(dst1)
     End Sub

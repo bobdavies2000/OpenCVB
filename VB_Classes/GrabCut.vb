@@ -5,17 +5,16 @@ Public Class GrabCut_Basics : Inherits VB_Parent
     Public fgFineTune As cv.Mat
     Public bgFineTune As cv.Mat
     Public fore As New Foreground_Basics
+    Dim bgModel As New cv.Mat(1, 65, cv.MatType.CV_64F, 0), fgModel As New cv.Mat(1, 65, cv.MatType.CV_64F, 0)
     Public Sub New()
         desc = "Use Foreground_Basics to define the foreground for use in GrabCut."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static bgModel As New cv.Mat(1, 65, cv.MatType.CV_64F, 0), fgModel As New cv.Mat(1, 65, cv.MatType.CV_64F, 0)
-        Static fgFineTune As cv.Mat, bgFineTune As cv.Mat
         fore.Run(src)
         dst2 = fore.dst2
         dst3 = fore.dst3
 
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
         dst0.SetTo(cv.GrabCutClasses.FGD, fore.fg)
         dst0.SetTo(cv.GrabCutClasses.BGD, fore.bg)
 
@@ -59,13 +58,13 @@ Public Class GrabCut_FineTune : Inherits VB_Parent
         desc = "There are probably mistakes in the initial Grabcut_Basics.  Use the checkbox to fine tune what is background and foreground"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static fgFineTuning = findRadio("Selected rectangle is added to the foreground")
-        Static clearCheck = findRadio("Clear all foreground and background fine tuning")
+        Static fgFineTuning = FindRadio("Selected rectangle is added to the foreground")
+        Static clearCheck = FindRadio("Clear all foreground and background fine tuning")
         Static saveRadio = fgFineTuning.checked
 
         If clearCheck.checked Or basics.fgFineTune Is Nothing Then
-            basics.fgFineTune = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
-            basics.bgFineTune = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
+            basics.fgFineTune = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+            basics.bgFineTune = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         End If
 
         If saveRadio <> fgFineTuning.checked Then
@@ -103,27 +102,26 @@ End Class
 
 Public Class GrabCut_ImageRect : Inherits VB_Parent
     Dim image As cv.Mat
+    Dim bgModel As New cv.Mat, fgModel As New cv.Mat
+    Dim bgRect1 = New cv.Rect(482, 0, 128, 640)
+    Dim bgRect2 = New cv.Rect(0, 0, 162, 320)
+    Dim fgRect1 = New cv.Rect(196, 134, 212, 344)
+    Dim fgRect2 = New cv.Rect(133, 420, 284, 60)
     Public Sub New()
-        Dim fileInputName = New FileInfo(task.homeDir + "data/cat.jpg")
+        Dim fileInputName = New FileInfo(task.HomeDir + "data/cat.jpg")
         image = cv.Cv2.ImRead(fileInputName.FullName)
         desc = "Grabcut example using a single image.  Fix this."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static bgModel As New cv.Mat, fgModel As New cv.Mat
-        Static bgRect1 = New cv.Rect(482, 0, 128, 640)
-        Static bgRect2 = New cv.Rect(0, 0, 162, 320)
-        Static fgRect1 = New cv.Rect(196, 134, 212, 344)
-        Static fgRect2 = New cv.Rect(133, 420, 284, 60)
-
         dst2 = image
 
-        dst0 = New cv.Mat(image.Size, cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
+        dst0 = New cv.Mat(image.Size(), cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
         dst0(bgRect1).SetTo(cv.GrabCutClasses.BGD)
         dst0(bgRect2).SetTo(cv.GrabCutClasses.BGD)
         dst0(fgRect1).SetTo(cv.GrabCutClasses.FGD)
         dst0(fgRect2).SetTo(cv.GrabCutClasses.FGD)
 
-        If task.firstPass Then
+        If task.FirstPass Then
             cv.Cv2.GrabCut(dst2, dst0, bgRect1, bgModel, fgModel, 1, cv.GrabCutModes.InitWithRect)
             cv.Cv2.GrabCut(dst2, dst0, bgRect2, bgModel, fgModel, 1, cv.GrabCutModes.InitWithRect)
             cv.Cv2.GrabCut(dst2, dst0, fgRect1, bgModel, fgModel, 1, cv.GrabCutModes.InitWithRect)
@@ -147,7 +145,7 @@ End Class
 Public Class GrabCut_ImageMask : Inherits VB_Parent
     Dim image As cv.Mat
     Public Sub New()
-        Dim fileInputName = New FileInfo(task.homeDir + "data/cat.jpg")
+        Dim fileInputName = New FileInfo(task.HomeDir + "data/cat.jpg")
         image = cv.Cv2.ImRead(fileInputName.FullName)
         desc = "Grabcut example using a single image. "
     End Sub
@@ -156,8 +154,8 @@ Public Class GrabCut_ImageMask : Inherits VB_Parent
 
         If task.heartBeat Then
             dst2 = image
-            dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cv.ThresholdTypes.Binary)
-            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
+            dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray).Threshold(50, 255, cv.ThresholdTypes.Binary)
+            dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
             dst1.SetTo(cv.GrabCutClasses.FGD, dst0)
 
             cv.Cv2.GrabCut(dst2, dst1, New cv.Rect, bgModel, fgModel, 1, cv.GrabCutModes.InitWithMask)

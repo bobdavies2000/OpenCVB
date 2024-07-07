@@ -11,7 +11,7 @@ Public Class Match_Basics : Inherits VB_Parent
     Public Sub New()
         If standalone Then task.gOptions.DebugChecked = True
         labels(2) = If(standaloneTest(), "Draw anywhere to define a new target", "Both drawRect must be provided by the caller.")
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, 0)
         desc = "Find the requested template in an image.  Managing template is responsibility of caller (allows multiple targets per image.)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -19,7 +19,7 @@ Public Class Match_Basics : Inherits VB_Parent
         If standalone Then
             If task.gOptions.DebugChecked Then
                 task.gOptions.DebugChecked = False
-                Dim inputRect = If(task.firstPass, New cv.Rect(25, 25, 25, 25), validateRect(task.drawRect))
+                Dim inputRect = If(task.FirstPass, New cv.Rect(25, 25, 25, 25), ValidateRect(task.drawRect))
                 template = src(inputRect)
             End If
         End If
@@ -43,7 +43,7 @@ Public Class Match_Basics : Inherits VB_Parent
         End If
         If standalone Then
             dst2 = src
-            DrawCircle(dst2,matchCenter, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst2,matchCenter, task.DotSize, cv.Scalar.White)
             dst3 = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
         End If
     End Sub
@@ -64,8 +64,8 @@ Public Class Match_BasicsTest : Inherits VB_Parent
         desc = "Test the Match_Basics algorithm"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If (task.firstPass Or (task.mouseClickFlag And task.drawRect.Width <> 0)) And standaloneTest() Then
-            Dim r = If(task.firstPass, New cv.Rect(25, 25, 25, 25), validateRect(task.drawRect))
+        If (task.FirstPass Or (task.mouseClickFlag And task.drawRect.Width <> 0)) And standaloneTest() Then
+            Dim r = If(task.FirstPass, New cv.Rect(25, 25, 25, 25), ValidateRect(task.drawRect))
             match.template = src(r)
             task.drawRectClear = True
         End If
@@ -74,9 +74,9 @@ Public Class Match_BasicsTest : Inherits VB_Parent
 
         If standaloneTest() Then
             dst2 = src
-            DrawCircle(dst2,match.matchCenter, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst2,match.matchCenter, task.DotSize, cv.Scalar.White)
             dst3 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
-            setTrueText(Format(match.correlation, fmt3), match.matchCenter)
+            SetTrueText(Format(match.correlation, fmt3), match.matchCenter)
         End If
     End Sub
 End Class
@@ -127,7 +127,7 @@ Public Class Match_RandomTest : Inherits VB_Parent
             labels(2) = options.matchText + " for " + CStr(template.Cols) + " random test samples = " + Format(correlation, "#,##0.00")
             flow.msgs.Add(options.matchText + " = " + Format(correlation, "#,##0.00"))
             flow.Run(empty)
-            setTrueText("The expectation is that the " + CStr(template.Cols) + " random test samples should produce" + vbCrLf +
+            SetTrueText("The expectation is that the " + CStr(template.Cols) + " random test samples should produce" + vbCrLf +
                         " a correlation coefficient near zero" + vbCrLf +
                         "The larger the sample size, the closer to zero the correlation will be - See 'Sample Size' slider nearby." + vbCrLf +
                         "There should also be symmetry in the min and max around zero." + vbCrLf + vbCrLf +
@@ -183,7 +183,7 @@ Public Class Match_Motion : Inherits VB_Parent
     Public mask As cv.Mat
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Stdev Threshold", 0, 100, 10)
-        mask = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         dst3 = mask.Clone
         desc = "Assign each segment a correlation coefficient and stdev to the previous frame"
     End Sub
@@ -195,7 +195,7 @@ Public Class Match_Motion : Inherits VB_Parent
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
 
         dst2 = src.Clone
-        If dst2.Channels = 3 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If dst2.Channels() = 3 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Static lastFrame As cv.Mat = dst2.Clone()
         Dim saveFrame As cv.Mat = dst2.Clone
@@ -216,7 +216,7 @@ Public Class Match_Motion : Inherits VB_Parent
                     mask(roi).SetTo(255)
                     dst2(roi).SetTo(0)
                 End If
-                setTrueText(Format(correlation.Get(Of Single)(0, 0), fmt2), pt, 2)
+                SetTrueText(Format(correlation.Get(Of Single)(0, 0), fmt2), pt, 2)
             Else
                 Interlocked.Increment(updateCount)
             End If
@@ -252,7 +252,7 @@ Public Class Match_Lines : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         lines.Run(src)
         dst2 = lines.dst2
-        Static lastPt As New List(Of pointPair)(lines.lpList)
+        Static lastPt As New List(Of PointPair)(lines.lpList)
 
         knn.queries.Clear()
         For Each lp In lines.lpList
@@ -275,7 +275,7 @@ Public Class Match_Lines : Inherits VB_Parent
         Next
 
         knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
-        lastPt = New List(Of pointPair)(lines.lpList)
+        lastPt = New List(Of PointPair)(lines.lpList)
     End Sub
 End Class
 
@@ -290,6 +290,8 @@ Public Class Match_PointSlope : Inherits VB_Parent
     Public matches As New List(Of matchRect)
     Dim templates As New List(Of cv.Mat)
     Dim mats As New Mat_4to1
+    Dim strOut1 As String
+    Dim strOut2 As String
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "Output of Lines_PointSlope", "Matched lines", "correlationMats"}
@@ -297,7 +299,7 @@ Public Class Match_PointSlope : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         dst2 = src.Clone
-        Dim w = task.gOptions.GridSize.Value
+        Dim w = task.gridSize
         Dim h = w
 
         If updateLines Then
@@ -306,15 +308,15 @@ Public Class Match_PointSlope : Inherits VB_Parent
             lines.Run(src)
             dst1 = src.Clone
             For Each pts In lines.bestLines
-                Dim rect = validateRect(New cv.Rect(pts.p1.X - w, pts.p1.Y - h, w * 2, h * 2))
+                Dim rect = ValidateRect(New cv.Rect(pts.p1.X - w, pts.p1.Y - h, w * 2, h * 2))
                 templates.Add(src(rect))
                 dst1.Rectangle(rect, cv.Scalar.White, task.lineWidth)
 
-                rect = validateRect(New cv.Rect(pts.p2.X - w, pts.p2.Y - h, w * 2, h * 2))
+                rect = ValidateRect(New cv.Rect(pts.p2.X - w, pts.p2.Y - h, w * 2, h * 2))
                 templates.Add(src(rect))
                 dst1.Rectangle(rect, cv.Scalar.White, task.lineWidth)
 
-                DrawLine(dst1, pts.p1, pts.p2, task.highlightColor)
+                DrawLine(dst1, pts.p1, pts.p2, task.HighlightColor)
             Next
         End If
 
@@ -341,12 +343,12 @@ Public Class Match_PointSlope : Inherits VB_Parent
                 If j = 0 Then
                     mr.p1 = New cv.Point(mm.maxLoc.X + w, mm.maxLoc.Y + h)
                     mr.correlation1 = mm.maxVal
-                    Dim rect = validateRect(New cv.Rect(mr.p1.X - w, mr.p1.Y - h, w * 2, h * 2))
+                    Dim rect = ValidateRect(New cv.Rect(mr.p1.X - w, mr.p1.Y - h, w * 2, h * 2))
                     newTemplates.Add(src(rect))
                 Else
                     mr.p2 = New cv.Point(mm.maxLoc.X + w, mm.maxLoc.Y + h)
                     mr.correlation2 = mm.maxVal
-                    Dim rect = validateRect(New cv.Rect(mr.p2.X - w, mr.p2.Y - h, w * 2, h * 2))
+                    Dim rect = ValidateRect(New cv.Rect(mr.p2.X - w, mr.p2.Y - h, w * 2, h * 2))
                     newTemplates.Add(src(rect))
                 End If
             Next
@@ -357,20 +359,18 @@ Public Class Match_PointSlope : Inherits VB_Parent
         mats.Run(empty)
         dst3 = mats.dst2
 
-        Static strOut1 As String
-        Static strOut2 As String
         Dim incorrectCount As Integer
         For Each mr In matches
             If mr.correlation1 < 0.5 Or mr.correlation2 < 0.5 Then incorrectCount += 1
-            DrawLine(dst2, mr.p1, mr.p2, task.highlightColor)
-            DrawCircle(dst2,mr.p1, task.dotSize, task.highlightColor)
-            DrawCircle(dst2,mr.p2, task.dotSize, task.highlightColor)
+            DrawLine(dst2, mr.p1, mr.p2, task.HighlightColor)
+            DrawCircle(dst2,mr.p1, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2,mr.p2, task.DotSize, task.HighlightColor)
             If task.heartBeat Then
                 strOut1 = Format(mr.correlation1, fmt3)
                 strOut2 = Format(mr.correlation2, fmt3)
             End If
-            setTrueText(strOut1, mr.p1, 2)
-            setTrueText(strOut2, mr.p2, 2)
+            SetTrueText(strOut1, mr.p1, 2)
+            SetTrueText(strOut2, mr.p2, 2)
         Next
 
         labels(2) = CStr(matches.Count - incorrectCount) + " lines were confirmed with correlations"
@@ -386,17 +386,17 @@ End Class
 
 Public Class Match_TraceRedC : Inherits VB_Parent
     Dim redC As New RedCloud_Basics
+    Dim frameList As New List(Of cv.Mat)
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32S, 0)
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32S, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32S, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Track each RedCloud cell center to highlight zones of RedCloud cell instability.  Look for clusters of points in dst2."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.heartBeat Or task.cameraStable = False Then dst2.SetTo(0)
         redC.Run(src)
 
-        Static frameList As New List(Of cv.Mat)
         If task.optionsChanged Then frameList.Clear()
 
         dst0.SetTo(0)
@@ -432,7 +432,7 @@ Public Class Match_DrawRect : Inherits VB_Parent
     Public showOutput As Boolean
     Public Sub New()
         inputRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40) ' arbitrary template to match
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, 0)
         If standaloneTest() Then labels(3) = "Probabilities (draw rectangle to test again)"
         labels(2) = "Red dot marks best match for the selected region.  Draw a rectangle anywhere to test again. "
         desc = "Find the requested template in task.drawrect in an image"
@@ -440,10 +440,10 @@ Public Class Match_DrawRect : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         Static lastImage As cv.Mat = src.Clone
         If task.mouseClickFlag And task.drawRect.Width <> 0 Then
-            inputRect = validateRect(task.drawRect)
+            inputRect = ValidateRect(task.drawRect)
             match.template = src(inputRect).Clone()
         Else
-            If task.firstPass Then match.template = lastImage(inputRect).Clone()
+            If task.FirstPass Then match.template = lastImage(inputRect).Clone()
         End If
 
         match.Run(src)
@@ -456,11 +456,11 @@ Public Class Match_DrawRect : Inherits VB_Parent
             dst2 = src
         End If
 
-        setTrueText("maxLoc = " + CStr(match.matchCenter.X) + ", " + CStr(match.matchCenter.Y), New cv.Point(1, 1), 3)
+        SetTrueText("maxLoc = " + CStr(match.matchCenter.X) + ", " + CStr(match.matchCenter.Y), New cv.Point(1, 1), 3)
 
         If standaloneTest() Then
-            DrawCircle(dst2,match.matchCenter, task.dotSize, cv.Scalar.Red)
-            setTrueText(Format(match.correlation, fmt3), match.matchCenter, 2)
+            DrawCircle(dst2,match.matchCenter, task.DotSize, cv.Scalar.Red)
+            SetTrueText(Format(match.correlation, fmt3), match.matchCenter, 2)
         End If
         lastImage = src
     End Sub
@@ -476,6 +476,7 @@ Public Class Match_tCell : Inherits VB_Parent
     Public tCells As New List(Of tCell)
     Dim cellSlider As Windows.Forms.TrackBar
     Dim options As New Options_Features
+    Dim lineDisp As New Line_DisplayInfo
     Public Sub New()
         Dim tc As tCell
         tCells.Add(tc)
@@ -486,11 +487,11 @@ Public Class Match_tCell : Inherits VB_Parent
         Dim rSize = cellSlider.Value
         Dim tc As tCell
 
-        tc.rect = validateRect(New cv.Rect(pt.X - rSize, pt.Y - rSize, rSize * 2, rSize * 2))
+        tc.rect = ValidateRect(New cv.Rect(pt.X - rSize, pt.Y - rSize, rSize * 2, rSize * 2))
         tc.correlation = correlation
         tc.depth = task.pcSplit(2)(tc.rect).Mean(task.depthMask(tc.rect))(0) / 1000
         tc.center = pt
-        tc.searchRect = validateRect(New cv.Rect(tc.center.X - rSize * 3, tc.center.Y - rSize * 3, rSize * 6, rSize * 6))
+        tc.searchRect = ValidateRect(New cv.Rect(tc.center.X - rSize * 3, tc.center.Y - rSize * 3, rSize * 6, rSize * 6))
         If tc.template Is Nothing Then tc.template = src(tc.rect).Clone
         Return tc
     End Function
@@ -509,8 +510,8 @@ Public Class Match_tCell : Inherits VB_Parent
             cv.Cv2.MatchTemplate(tc.template, input, dst0, cv.TemplateMatchModes.CCoeffNormed)
             Dim mm as mmData = GetMinMax(dst0)
             tc.center = New cv.Point2f(tc.searchRect.X + mm.maxLoc.X + rSize, tc.searchRect.Y + mm.maxLoc.Y + rSize)
-            tc.searchRect = validateRect(New cv.Rect(tc.center.X - rSize * 3, tc.center.Y - rSize * 3, rSize * 6, rSize * 6))
-            tc.rect = validateRect(New cv.Rect(tc.center.X - rSize, tc.center.Y - rSize, rSize * 2, rSize * 2))
+            tc.searchRect = ValidateRect(New cv.Rect(tc.center.X - rSize * 3, tc.center.Y - rSize * 3, rSize * 6, rSize * 6))
+            tc.rect = ValidateRect(New cv.Rect(tc.center.X - rSize, tc.center.Y - rSize, rSize * 2, rSize * 2))
             tc.correlation = mm.maxVal
             tc.depth = task.pcSplit(2)(tc.rect).Mean(task.depthMask(tc.rect))(0) / 1000
             tc.strOut = Format(tc.correlation, fmt2) + vbCrLf + Format(tc.depth, fmt2) + "m"
@@ -518,7 +519,6 @@ Public Class Match_tCell : Inherits VB_Parent
         Next
 
         If standaloneTest() Then
-            Static lineDisp As New Line_DisplayInfo
             lineDisp.tcells = tCells
             lineDisp.Run(src)
             dst2 = lineDisp.dst2
@@ -554,28 +554,28 @@ Public Class Match_LinePairTest : Inherits VB_Parent
 
         If (target(0) IsNot Nothing And correlation(0) < minCorrelation) Then target(0) = Nothing
         If task.mouseClickFlag Then
-            ptx(0) = task.clickPoint
+            ptx(0) = task.ClickPoint
             ptx(1) = New cv.Point2f(msRNG.Next(rSize, dst2.Width - 2 * rSize), msRNG.Next(rSize, dst2.Height - 2 * rSize))
 
-            rect = validateRect(New cv.Rect(ptx(0).X - radius, ptx(0).Y - radius, rSize, rSize))
+            rect = ValidateRect(New cv.Rect(ptx(0).X - radius, ptx(0).Y - radius, rSize, rSize))
             target(0) = src(rect)
 
-            rect = validateRect(New cv.Rect(ptx(1).X - radius, ptx(1).Y - radius, rSize, rSize))
+            rect = ValidateRect(New cv.Rect(ptx(1).X - radius, ptx(1).Y - radius, rSize, rSize))
             target(1) = src(rect)
         End If
 
         If target(0) Is Nothing Or target(1) Is Nothing Then
             dst3 = src
-            setTrueText("Click anywhere in the image to start the algorithm.")
+            SetTrueText("Click anywhere in the image to start the algorithm.")
             Exit Sub
         End If
 
         dst3 = src.Clone
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC1, 0)
 
         For i = 0 To ptx.Count - 1
-            rect = validateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, rSize, rSize))
-            Dim searchRect = validateRect(New cv.Rect(rect.X - rSize, rect.Y - rSize, rSize * 3, rSize * 3))
+            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, rSize, rSize))
+            Dim searchRect = ValidateRect(New cv.Rect(rect.X - rSize, rect.Y - rSize, rSize * 3, rSize * 3))
             cv.Cv2.MatchTemplate(target(i), src(searchRect), dst0, cv.TemplateMatchModes.CCoeffNormed)
             Dim mmData = GetMinMax(dst0)
             correlation(i) = mmData.maxVal
@@ -584,9 +584,9 @@ Public Class Match_LinePairTest : Inherits VB_Parent
                 dst2 = dst2.Threshold(minCorrelation, 255, cv.ThresholdTypes.Binary)
             End If
             ptx(i) = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
-            DrawCircle(dst3,ptx(i), task.dotSize, task.highlightColor)
+            DrawCircle(dst3,ptx(i), task.DotSize, task.HighlightColor)
             dst3.Rectangle(searchRect, cv.Scalar.Yellow, 1)
-            rect = validateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, rSize, rSize))
+            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, rSize, rSize))
             target(i) = task.color(rect)
         Next
 
@@ -605,10 +605,11 @@ End Class
 Public Class Match_GoodFeatureKNN : Inherits VB_Parent
     Public knn As New KNN_Basics
     Public feat As New Feature_Basics
+    Dim frameList As New List(Of cv.Mat)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Maximum travel distance per frame", 1, 20, 5)
-        dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
+        dst0 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
+        dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
         labels(3) = "Shake camera to see tracking of the highlighted features"
         desc = "Track the GoodFeatures with KNN"
     End Sub
@@ -621,7 +622,6 @@ Public Class Match_GoodFeatureKNN : Inherits VB_Parent
         knn.queries = New List(Of cv.Point2f)(task.features)
         knn.Run(empty)
 
-        Static frameList As New List(Of cv.Mat)
         If task.optionsChanged Then
             frameList.Clear()
             dst1.SetTo(0)
@@ -640,7 +640,7 @@ Public Class Match_GoodFeatureKNN : Inherits VB_Parent
         dst2 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         dst3 = src
-        dst3.SetTo(task.highlightColor, dst2)
+        dst3.SetTo(task.HighlightColor, dst2)
     End Sub
 End Class
 
@@ -663,7 +663,7 @@ Public Class Match_Point : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If standaloneTest() Then
-            setTrueText("Set the target mat and the pt then run to track an individual point." + vbCrLf +
+            SetTrueText("Set the target mat and the pt then run to track an individual point." + vbCrLf +
                         "After running, the pt is updated with the new location and correlation with the updated correlation." + vbCrLf +
                         "There is no output when run standaloneTest()")
             Exit Sub
@@ -673,13 +673,13 @@ Public Class Match_Point : Inherits VB_Parent
         Dim rSize = cellSlider.Value
         Dim radius = rSize / 2
 
-        Dim rect = validateRect(New cv.Rect(pt.X - radius, pt.Y - radius, rSize, rSize))
-        searchRect = validateRect(New cv.Rect(rect.X - rSize, rect.Y - rSize, rSize * 3, rSize * 3))
+        Dim rect = ValidateRect(New cv.Rect(pt.X - radius, pt.Y - radius, rSize, rSize))
+        searchRect = ValidateRect(New cv.Rect(rect.X - rSize, rect.Y - rSize, rSize * 3, rSize * 3))
         cv.Cv2.MatchTemplate(target(rect), src(searchRect), dst0, cv.TemplateMatchModes.CCoeffNormed)
         Dim mmData = GetMinMax(dst0)
         correlation = mmData.maxVal
         pt = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
-        DrawCircle(src, pt, task.dotSize, cv.Scalar.White)
+        DrawCircle(src, pt, task.DotSize, cv.Scalar.White)
         src.Rectangle(searchRect, cv.Scalar.Yellow, 1)
     End Sub
 End Class
@@ -701,12 +701,12 @@ Public Class Match_Points : Inherits VB_Parent
         desc = "Track the selected points"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.firstPass Then mPoint.target = src.Clone
+        If task.FirstPass Then mPoint.target = src.Clone
 
         If standaloneTest() Then
             feat.Run(src)
             ptx = New List(Of cv.Point2f)(task.features)
-            setTrueText("Move camera around to watch the point being tracked", 3)
+            SetTrueText("Move camera around to watch the point being tracked", 3)
         End If
 
         dst2 = src.Clone

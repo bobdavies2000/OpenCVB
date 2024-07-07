@@ -32,7 +32,7 @@ Public Class LinearRegression_Basics : Inherits VB_Parent
 
         For i = 0 To x.Count - 1
             Dim pt As New cv.Point(x(i), y(i))
-            DrawCircle(dst2,pt, task.dotSize, cv.Scalar.Red)
+            DrawCircle(dst2,pt, task.DotSize, cv.Scalar.Red)
         Next
     End Sub
 End Class

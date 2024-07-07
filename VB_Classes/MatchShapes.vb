@@ -10,12 +10,12 @@ Public Class MatchShapes_Basics : Inherits VB_Parent
     Dim match As New Options_MatchShapes
     Dim options As New Options_Contours
     Public Sub New()
-        findRadio("CComp").Checked = True
-        findRadio("FloodFill").Enabled = False
-        findRadio("ApproxNone").Checked = True
+        FindRadio("CComp").Checked = True
+        FindRadio("FloodFill").Enabled = False
+        FindRadio("ApproxNone").Checked = True
 
-        dst0 = cv.Cv2.ImRead(task.homeDir + "Data/star1.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = cv.Cv2.ImRead(task.homeDir + "Data/star2.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst0 = cv.Cv2.ImRead(task.HomeDir + "Data/star1.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        dst1 = cv.Cv2.ImRead(task.HomeDir + "Data/star2.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2Gray)
         desc = "MatchShapes compares single hull to single hull - pretty tricky"
     End Sub
     Public Function findBiggestHull(hull As cv.Point()(), maxLen As Integer, maxIndex As Integer, dst As cv.Mat) As Integer
@@ -27,7 +27,7 @@ Public Class MatchShapes_Basics : Inherits VB_Parent
         Next
 
         For Each p In hull(maxIndex)
-            DrawCircle(dst, p, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst, p, task.DotSize, cv.Scalar.Yellow)
         Next
         Return maxIndex
     End Function
@@ -103,7 +103,7 @@ Public Class MatchShapes_NearbyHull : Inherits VB_Parent
             End If
         Next
 
-        If similarCells.Count = 0 Then setTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
+        If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
     End Sub
 End Class
 
@@ -148,7 +148,7 @@ Public Class MatchShapes_Nearby : Inherits VB_Parent
 
         If task.gOptions.displayDst0.Checked Then
             dst0 = task.color.Clone
-            DrawContour(dst0(rc.rect), rc.contour, task.highlightColor)
+            DrawContour(dst0(rc.rect), rc.contour, task.HighlightColor)
         End If
 
         Dim minMatch As Single = Single.MaxValue
@@ -169,10 +169,10 @@ Public Class MatchShapes_Nearby : Inherits VB_Parent
 
         If bestCell >= 0 Then
             Dim rc = similarCells(bestCell)
-            DrawCircle(dst3,rc.maxDist, task.dotSize, cv.Scalar.White)
-            setTrueText("Best match", rc.maxDist, 3)
+            DrawCircle(dst3,rc.maxDist, task.DotSize, cv.Scalar.White)
+            SetTrueText("Best match", rc.maxDist, 3)
         End If
-        If similarCells.Count = 0 Then setTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
+        If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
     End Sub
 End Class
 
@@ -214,7 +214,7 @@ Public Class MatchShapes_LeftRight : Inherits VB_Parent
         '    dst3.SetTo(0)
         'End If
 
-        'Dim lines As New List(Of pointPair)
+        'Dim lines As New List(Of PointPair)
         'For Each rc In rightCells
         '    If rc.pixels < minSize Then Continue For
         '    match.rcX = rc
@@ -226,7 +226,7 @@ Public Class MatchShapes_LeftRight : Inherits VB_Parent
         '        DrawContour(dst0(best.rect), best.contour, best.color, -1)
         '        DrawContour(dst2(best.rect), best.contour, best.color, -1)
         '        Dim pt = New cv.Point(rc.maxDist.X + dst2.Width, rc.maxDist.Y)
-        '        lines.Add(New pointPair(pt, best.maxDist))
+        '        lines.Add(New PointPair(pt, best.maxDist))
         '    End If
         '    If lines.Count > 3 Then Exit For
         'Next

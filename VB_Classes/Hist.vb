@@ -13,18 +13,18 @@ Public Class Hist_Basics : Inherits VB_Parent
     Public bins As Integer
     Public removeMax As Boolean
     Public autoDisplay As Boolean
+    Dim splitIndex As Integer
     Public Sub New()
         If standaloneTest() Then task.gOptions.setHistogramBins(255)
         desc = "Create a histogram (no Kalman)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static splitIndex As Integer
         If standalone Then
             If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
             mm = GetMinMax(src.ExtractChannel(splitIndex))
             plot.backColor = Choose(splitIndex + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
         Else
-            If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             mm = GetMinMax(src)
         End If
         If fixedRanges Is Nothing Then
@@ -108,7 +108,7 @@ Public Class Hist_Graph : Inherits VB_Parent
 
         Dim mm As mmData
         dst2.SetTo(backColor)
-        For i = 0 To src.Channels - 1
+        For i = 0 To src.Channels() - 1
             Dim hist As New cv.Mat
             cv.Cv2.CalcHist({src}, {i}, New cv.Mat(), hist, 1, dimensions, ranges)
             histRaw(i) = hist.Clone()
@@ -180,7 +180,7 @@ Public Class Hist_EqualizeGray : Inherits VB_Parent
         desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         histogram.Run(src)
         cv.Cv2.EqualizeHist(src, dst2)
         histogramEQ.Run(dst2)
@@ -205,7 +205,7 @@ Public Class Hist_Simple : Inherits VB_Parent
         desc = "Build a simple and reusable histogram for grayscale images."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plot.minRange, plot.maxRange)}
         Dim hist As New cv.Mat
@@ -259,7 +259,7 @@ Public Class Hist_Frustrum : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        task.gOptions.gravityPointCloud.Checked = False
+        task.gOptions.setGravityUsage(False)
         desc = "Options for the side and top view.  See OptionCommon_Histogram to make settings permanent."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -267,7 +267,7 @@ Public Class Hist_Frustrum : Inherits VB_Parent
         dst2 = heat.dst2
         dst3 = heat.dst3
 
-        setTrueText("This algorithm was created to tune the frustrum and camera locations." + vbCrLf +
+        SetTrueText("This algorithm was created to tune the frustrum and camera locations." + vbCrLf +
                     "Without these tuning parameters the side and top views will look correct." + vbCrLf +
                     "To see how these adjustments work or to add a new camera, " + vbCrLf +
                     "use the HeatMap_Basics algorithm." + vbCrLf +
@@ -292,7 +292,7 @@ Public Class Hist_PeakMax : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         task.gOptions.UseKalman.Checked = False
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.Run(src)
         dst3 = hist.dst2
 
@@ -304,7 +304,7 @@ Public Class Hist_PeakMax : Inherits VB_Parent
         Dim pixelMax = CInt((histindex + 1) * brickRange)
 
         Dim mask = src.InRange(pixelMin, pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        Dim tmp = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim tmp = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         src.CopyTo(tmp, mask)
         dst2 = tmp.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
@@ -328,19 +328,18 @@ Public Class Hist_PeakFinder : Inherits VB_Parent
     Public resetPeaks As Boolean
     Public histogramPeaks As New List(Of Integer)
     Public hCount() As Single
+    Dim saveHistBins = task.histogramBins
+    Dim peakCounts(task.histogramBins) As Single
+    Dim allPCounts As New List(Of Integer)
+    Dim maxList As New List(Of Integer)
     Public Sub New()
         desc = "Find the peaks - columns taller that both neighbors - in the histogram"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.pcSplit(2)
+        If src.Channels() <> 1 Then src = task.pcSplit(2)
 
         hist.Run(src)
         dst2 = hist.dst2
-
-        Static saveHistBins = task.histogramBins
-        Static peakCounts(task.histogramBins) As Single
-        Static allPCounts As New List(Of Integer)
-        Static maxList As New List(Of Integer)
 
         resetPeaks = False
         If saveHistBins <> task.histogramBins Then
@@ -383,7 +382,7 @@ Public Class Hist_PeakFinder : Inherits VB_Parent
         maxList.Add(maxIndex)
 
         peakCount = CInt(allPCounts.Average)
-        setTrueText(vbTab + "Avg peaks: " + CStr(peakCount) + ".  Current: " + CStr(peaks.Count) + " peaks.", New cv.Point(0, 10), 3)
+        SetTrueText(vbTab + "Avg peaks: " + CStr(peakCount) + ".  Current: " + CStr(peaks.Count) + " peaks.", New cv.Point(0, 10), 3)
 
         Dim sortedPeaks = New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To peakCounts.Count - 1
@@ -406,7 +405,7 @@ Public Class Hist_PeakFinder : Inherits VB_Parent
             maxList.RemoveAt(0)
         End If
         If Math.Abs(maxList.Average - maxIndex) > saveHistBins / 10 Then saveHistBins = 0
-        labels(2) = "There were " + CStr(peakCount) + " depth peaks (highlighted) up to " + CStr(CInt(task.maxZmeters)) + " meters.  " +
+        labels(2) = "There were " + CStr(peakCount) + " depth peaks (highlighted) up to " + CStr(CInt(task.MaxZmeters)) + " meters.  " +
                     "Use global option Histogram Bins to set the number of bins."
     End Sub
 End Class
@@ -517,12 +516,12 @@ Public Class Hist_KalmanAuto : Inherits VB_Parent
     Public plot As New Plot_Histogram
     Dim mm As mmData
     Public ranges() As cv.Rangef
+    Dim splitIndex = 0
+    Dim colorName = "Gray"
     Public Sub New()
         desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static splitIndex = 0
-        Static colorName = "Gray"
         If standaloneTest() Then
             If task.heartBeat Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
             colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
@@ -530,13 +529,13 @@ Public Class Hist_KalmanAuto : Inherits VB_Parent
             src = split(splitIndex)
         End If
 
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         mm = GetMinMax(src)
         ranges = New cv.Rangef() {New cv.Rangef(mm.minVal, mm.maxVal)}
 
         If mm.minVal = mm.maxVal Then
-            setTrueText("The input image is empty - minVal and maxVal are both zero...")
+            SetTrueText("The input image is empty - minVal and maxVal are both zero...")
             Exit Sub
         End If
         Dim dimensions() = {task.histogramBins}
@@ -642,7 +641,7 @@ Public Class Hist_CompareGray : Inherits VB_Parent
             If Double.IsNaN(Comparison) Then Comparison = 0
             labels(3) = "CompareHist output = " + Format(Comparison, fmt3) + " using " + options.compareName + " method"
             trueData = New List(Of trueText)(histK.hist.plot.trueData)
-            setTrueText(labels(3), 2)
+            SetTrueText(labels(3), 2)
         Else
             lastHistNorm = histNorm.Clone
         End If
@@ -671,6 +670,7 @@ End Class
 
 Public Class Hist_ComparePlot : Inherits VB_Parent
     Dim comp As New Hist_CompareGray
+    Dim ttLabels As New List(Of trueText)
     Public Sub New()
         labels(3) = "Differences have been multiplied by 1000 to build scale at the left"
         desc = "Compare grayscale histograms for successive frames and plot the difference as a histogram."
@@ -679,7 +679,6 @@ Public Class Hist_ComparePlot : Inherits VB_Parent
         comp.Run(src)
         dst2 = comp.dst2.Clone
 
-        Static ttLabels As New List(Of trueText)
         If task.heartBeat Then
             ttLabels = New List(Of trueText)(comp.trueData)
             Dim histX = comp.histDiffAbs
@@ -720,7 +719,7 @@ Public Class Hist_CompareNumber : Inherits VB_Parent
         dst2 = plot.dst2
         dst3 = plot.dst3
 
-        setTrueText("Upper left is the sum * 100 of the difference" + vbCrLf + "Upper right is the sum of the absolute values * 100", New cv.Point(0, dst2.Height / 2), 2)
+        SetTrueText("Upper left is the sum * 100 of the difference" + vbCrLf + "Upper right is the sum of the absolute values * 100", New cv.Point(0, dst2.Height / 2), 2)
     End Sub
 End Class
 
@@ -765,7 +764,7 @@ Public Class Hist_CompareEMD_hsv : Inherits VB_Parent
         Next
 
         Dim emd = cv.Cv2.EMD(sig1, sig2, cv.DistanceTypes.L2)
-        setTrueText("EMD similarity from the current image to the last is " + Format(1 - emd, "0.0%"), 2)
+        SetTrueText("EMD similarity from the current image to the last is " + Format(1 - emd, "0.0%"), 2)
 
         lastHSV = hsv.Clone
     End Sub
@@ -852,7 +851,7 @@ Public Class Hist_PointCloudXYZ : Inherits VB_Parent
                 Case 2
                     plot.removeZeroEntry = True
                     plot.minRange = 0
-                    plot.maxRange = task.maxZmeters
+                    plot.maxRange = task.MaxZmeters
             End Select
 
             plot.Run(dst0)
@@ -1000,7 +999,7 @@ Public Class Hist_Gotcha2D : Inherits VB_Parent
                      "Another way that samples may be lost: X or Y range.  Use Y-Range slider to show impact." +
                      "A third way samples may not match: max depth can toss samples as well."
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
         dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
     End Sub
 End Class
@@ -1018,7 +1017,7 @@ Public Class Hist_Gotcha : Inherits VB_Parent
         desc = "Simple test: input samples should equal histogram samples.  What is wrong?  Exclusive ranges!"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim expected = src.Total
 
@@ -1034,7 +1033,7 @@ Public Class Hist_Gotcha : Inherits VB_Parent
                      "The number of entries in the histogram is the 'actual' number of samples." + vbCrLf +
                      "How can the values not be equal?  The ranges in the histogram are exclusive!"
         End If
-        setTrueText(strOut, 2)
+        SetTrueText(strOut, 2)
     End Sub
 End Class
 
@@ -1048,7 +1047,7 @@ Public Class Hist_GotchaFixed_CPP : Inherits VB_Parent
         desc = "Testing the C++ CalcHist to investigate gotcha with sample counts"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
@@ -1065,7 +1064,7 @@ Public Class Hist_GotchaFixed_CPP : Inherits VB_Parent
                      "The number of entries in the histogram is the 'actual' number of samples." + vbCrLf +
                      "How can the values not be equal?  The ranges in the histogram are exclusive!"
         End If
-        setTrueText(strOut, 2)
+        SetTrueText(strOut, 2)
     End Sub
     Public Sub Close()
         Hist_1D_Close(cPtr)
@@ -1082,7 +1081,7 @@ Public Class Hist_Byte_CPP : Inherits VB_Parent
         desc = "For Byte histograms, the C++ code works but the .Net interface doesn't honor exclusive ranges."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
@@ -1094,7 +1093,7 @@ Public Class Hist_Byte_CPP : Inherits VB_Parent
         plot.Run(histogram)
         dst2 = plot.dst2
 
-        setTrueText(strOut, 2)
+        SetTrueText(strOut, 2)
     End Sub
     Public Sub Close()
         Hist_1D_Close(cPtr)
@@ -1115,7 +1114,7 @@ Public Class Hist_Xdimension : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         plot.Run(task.pcSplit(0))
         dst2 = plot.dst2
-        setTrueText("Chart left = " + Format(plot.mm.minVal, fmt0) + vbCrLf +
+        SetTrueText("Chart left = " + Format(plot.mm.minVal, fmt0) + vbCrLf +
                     "Chart right = " + Format(plot.mm.maxVal, fmt0), 2)
     End Sub
 End Class
@@ -1135,7 +1134,7 @@ Public Class Hist_Ydimension : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         plot.Run(task.pcSplit(1))
         dst2 = plot.dst2
-        setTrueText("Chart left = " + Format(plot.mm.minVal, fmt0) + vbCrLf +
+        SetTrueText("Chart left = " + Format(plot.mm.minVal, fmt0) + vbCrLf +
                     "Chart right = " + Format(plot.mm.maxVal, fmt0), 2)
     End Sub
 End Class
@@ -1155,7 +1154,7 @@ Public Class Hist_Zdimension : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         plot.Run(task.pcSplit(2))
         dst2 = plot.dst2
-        setTrueText("Chart left = " + Format(plot.mm.minVal, fmt0) + vbCrLf +
+        SetTrueText("Chart left = " + Format(plot.mm.minVal, fmt0) + vbCrLf +
                     "Chart right = " + Format(plot.mm.maxVal, fmt0), 2)
     End Sub
 End Class
@@ -1178,7 +1177,7 @@ Public Class Hist_Depth : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If src.Rows <= 0 Then Exit Sub
         plot.minRange = 0
-        plot.maxRange = task.maxZmeters
+        plot.maxRange = task.MaxZmeters
         If rc IsNot Nothing Then
             If rc.index = 0 Then Exit Sub
             src = task.pcSplit(2)(rc.rect).Clone
@@ -1195,8 +1194,8 @@ Public Class Hist_Depth : Inherits VB_Parent
         plot.Run(plot.histogram)
         dst2 = plot.dst2
 
-        Dim stepsize = dst2.Width / task.maxZmeters
-        For i = 1 To CInt(task.maxZmeters) - 1
+        Dim stepsize = dst2.Width / task.MaxZmeters
+        For i = 1 To CInt(task.MaxZmeters) - 1
             dst2.Line(New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), cv.Scalar.White, task.cvFontThickness)
         Next
 
@@ -1208,8 +1207,8 @@ Public Class Hist_Depth : Inherits VB_Parent
             strOut += "Difference:" + vbTab + vbTab + vbTab + vbTab + vbTab + vbTab + CStr(Math.Abs(actual - expected)) + vbCrLf
             'strOut += "Count nonzero entries in task.maxDepthMask: " + vbTab + vbTab + CStr(task.maxDepthMask.CountNonZero)
         End If
-        setTrueText(strOut, 3)
-        labels(2) = "Histogram Depth to " + Format(task.maxZmeters, "0.0") + " m"
+        SetTrueText(strOut, 3)
+        labels(2) = "Histogram Depth to " + Format(task.MaxZmeters, "0.0") + " m"
     End Sub
 End Class
 
@@ -1226,7 +1225,7 @@ Public Class Hist_Cell : Inherits VB_Parent
     Dim hist As New Hist_Depth
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, 0)
         labels = {"", "", "RedCloud cells", "Histogram of the depth for the selected cell."}
         desc = "Review depth data for a RedCloud Cell"
     End Sub
@@ -1244,6 +1243,36 @@ Public Class Hist_Cell : Inherits VB_Parent
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class Hist_PointCloud : Inherits VB_Parent
+    Public rangesX() As cv.Rangef
+    Public rangesY() As cv.Rangef
+    Public options As New Options_HistPointCloud
+    Public Sub New()
+        labels = {"", "", "Histogram of XZ - X on the Y-Axis and Z on the X-Axis", "Histogram of YZ with Y on the Y-Axis and Z on the X-Axis"}
+        desc = "Create a 2D histogram for the pointcloud in XZ and YZ."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        rangesX = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange), New cv.Rangef(0, task.MaxZmeters)}
+        rangesY = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.MaxZmeters)}
+
+        Dim sizesX() As Integer = {options.xBins, options.zBins}
+        cv.Cv2.CalcHist({src}, {0, 2}, New cv.Mat(), dst2, 2, sizesX, rangesX)
+        dst2.Set(Of cv.Point3f)(dst2.Height / 2, 0, New cv.Point3f)
+
+        Dim sizesY() As Integer = {options.yBins, options.zBins}
+        cv.Cv2.CalcHist({src}, {1, 2}, New cv.Mat(), dst3, 2, sizesY, rangesY)
+        dst3.Set(Of cv.Point3f)(dst3.Height / 2, 0, New cv.Point3f)
+    End Sub
+End Class
 
 
 
@@ -1271,58 +1300,5 @@ Public Class Hist_Kalman : Inherits VB_Parent
         hist.histogram = New cv.Mat(kalman.kOutput.Length, 1, cv.MatType.CV_32FC1, kalman.kOutput)
         hist.plot.Run(hist.histogram)
         dst2 = hist.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Hist_PointCloud : Inherits VB_Parent
-    Public rangesX() As cv.Rangef
-    Public rangesY() As cv.Rangef
-    Public thresholdSlider As Windows.Forms.TrackBar
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Histogram X bins", 1, dst2.Cols, 30)
-            sliders.setupTrackBar("Histogram Y bins", 1, dst2.Rows, 30)
-            sliders.setupTrackBar("Histogram Z bins", 1, 200, 100)
-            sliders.setupTrackBar("Histogram threshold", 0, 1000, 500)
-        End If
-
-        thresholdSlider = FindSlider("Histogram threshold")
-        Select Case dst2.Width
-            Case 640
-                thresholdSlider.Value = 200
-            Case 320
-                thresholdSlider.Value = 60
-            Case 160
-                thresholdSlider.Value = 25
-        End Select
-        labels = {"", "", "Histogram of XZ - X on the Y-Axis and Z on the X-Axis", "Histogram of YZ with Y on the Y-Axis and Z on the X-Axis"}
-        desc = "Create a 2D histogram for the pointcloud in XZ and YZ."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static xSlider = FindSlider("Histogram X bins")
-        Static ySlider = FindSlider("Histogram Y bins")
-        Static zSlider = FindSlider("Histogram Z bins")
-        Dim xbins = xSlider.Value
-        Dim ybins = ySlider.Value
-        Dim zbins = zSlider.Value
-
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        rangesX = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange), New cv.Rangef(0, task.maxZmeters)}
-        rangesY = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.maxZmeters)}
-
-        Dim sizesX() As Integer = {xbins, zbins}
-        cv.Cv2.CalcHist({src}, {0, 2}, New cv.Mat(), dst2, 2, sizesX, rangesX)
-        dst2.Set(Of cv.Point3f)(dst2.Height / 2, 0, New cv.Point3f)
-
-        Dim sizesY() As Integer = {ybins, zbins}
-        cv.Cv2.CalcHist({src}, {1, 2}, New cv.Mat(), dst3, 2, sizesY, rangesY)
-        dst3.Set(Of cv.Point3f)(dst3.Height / 2, 0, New cv.Point3f)
     End Sub
 End Class

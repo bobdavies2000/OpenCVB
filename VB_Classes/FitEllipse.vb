@@ -18,7 +18,7 @@ Public Class FitEllipse_Basics : Inherits VB_Parent
 
         dst2.SetTo(0)
         For Each pt In inputPoints
-            DrawCircle(dst2,pt, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst2,pt, task.DotSize, cv.Scalar.White)
         Next
 
         If inputPoints.Count > 4 Then
@@ -54,7 +54,7 @@ Public Class FitEllipse_AMS_CPP : Inherits VB_Parent
         End If
         dst2.SetTo(0)
         For Each pt In inputPoints
-            DrawCircle(dst2, pt, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
         Next
 
         Dim input As New cv.Mat(inputPoints.Count, 1, cv.MatType.CV_32FC2, inputPoints.ToArray)
@@ -97,7 +97,7 @@ Public Class FitEllipse_Direct_CPP : Inherits VB_Parent
 
         dst2.SetTo(0)
         For Each pt In options.srcPoints
-            DrawCircle(dst2,pt, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst2,pt, task.DotSize, cv.Scalar.White)
         Next
 
         Dim input As New cv.Mat(options.srcPoints.Count, 1, cv.MatType.CV_32FC2, options.srcPoints.ToArray)

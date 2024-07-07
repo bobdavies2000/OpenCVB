@@ -14,9 +14,9 @@ Public Class Structured_LinearizeFloor : Inherits VB_Parent
         desc = "Using the mask for the floor create a better representation of the floor plane"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static xCheck = findCheckBox("Smooth in X-direction")
-        Static yCheck = findCheckBox("Smooth in Y-direction")
-        Static zCheck = findCheckBox("Smooth in Z-direction")
+        Static xCheck = FindCheckBox("Smooth in X-direction")
+        Static yCheck = FindCheckBox("Smooth in Y-direction")
+        Static zCheck = FindCheckBox("Smooth in Z-direction")
         floor.Run(src)
         dst2 = floor.dst2
         dst3 = floor.dst3
@@ -107,7 +107,7 @@ Public Class Structured_MultiSlice : Inherits VB_Parent
 
         split = task.pointCloud.Split()
 
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         For xCoordinate = 0 To src.Width - 1 Step stepSize
             Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
             If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
@@ -219,7 +219,7 @@ Public Class Structured_Depth : Inherits VB_Parent
         dst2 = sliceH.dst2
 
         Dim mask = sliceH.sliceMask
-        Dim perMeter = dst3.Height / task.maxZmeters
+        Dim perMeter = dst3.Height / task.MaxZmeters
         dst3.SetTo(0)
         Dim white As New cv.Vec3b(255, 255, 255)
         For y = 0 To mask.Height - 1
@@ -247,7 +247,7 @@ Public Class Structured_Rebuild : Inherits VB_Parent
     Dim thickness As Single
     Public pointcloud As New cv.Mat
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Show original data")
             radio.addRadio("Show rebuilt data")
@@ -258,7 +258,7 @@ Public Class Structured_Rebuild : Inherits VB_Parent
         desc = "Rebuild the point cloud using inrange - not useful yet"
     End Sub
     Private Function rebuildX(viewX As cv.Mat) As cv.Mat
-        Dim output As New cv.Mat(task.pcSplit(1).Size, cv.MatType.CV_32F, 0)
+        Dim output As New cv.Mat(task.pcSplit(1).Size(), cv.MatType.CV_32F, 0)
         Dim firstCol As Integer
         For firstCol = 0 To viewX.Width - 1
             If viewX.Col(firstCol).CountNonZero > 0 Then Exit For
@@ -280,7 +280,7 @@ Public Class Structured_Rebuild : Inherits VB_Parent
         Return output
     End Function
     Private Function rebuildY(viewY As cv.Mat) As cv.Mat
-        Dim output As New cv.Mat(task.pcSplit(1).Size, cv.MatType.CV_32F, 0)
+        Dim output As New cv.Mat(task.pcSplit(1).Size(), cv.MatType.CV_32F, 0)
         Dim firstLine As Integer
         For firstLine = 0 To viewY.Height - 1
             If viewY.Row(firstLine).CountNonZero > 0 Then Exit For
@@ -302,11 +302,11 @@ Public Class Structured_Rebuild : Inherits VB_Parent
         Return output
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static rebuiltRadio = findRadio("Show rebuilt data")
-        Static originalRadio = findRadio("Show original data")
+        Static rebuiltRadio = FindRadio("Show rebuilt data")
+        Static originalRadio = FindRadio("Show original data")
 
         options.RunVB()
-        Dim metersPerPixel = task.maxZmeters / dst3.Height
+        Dim metersPerPixel = task.MaxZmeters / dst3.Height
         thickness = options.sliceSize * metersPerPixel
         heat.Run(src)
 
@@ -356,8 +356,8 @@ Public Class Structured_Cloud2 : Inherits VB_Parent
         Static yLineSlider = FindSlider("Lines in Y-Direction")
         Static thresholdSlider = FindSlider("Continuity threshold in mm")
 
-        Static xCheck = findCheckBox("Impose constraints on X")
-        Static yCheck = findCheckBox("Impose constraints on Y")
+        Static xCheck = FindCheckBox("Impose constraints on X")
+        Static yCheck = FindCheckBox("Impose constraints on Y")
 
         Dim xLines = xLineSlider.Value
         Dim yLines = yLineSlider.Value
@@ -371,7 +371,7 @@ Public Class Structured_Cloud2 : Inherits VB_Parent
 
         Dim stepX = dst2.Width / xLines
         Dim stepY = dst2.Height / yLines
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
         Dim midX = dst2.Width / 2
         Dim midY = dst2.Height / 2
         Dim halfStepX = stepX / 2
@@ -400,7 +400,7 @@ Public Class Structured_Cloud2 : Inherits VB_Parent
                 End If
             Next
         Next
-        dst2 = dst3(New cv.Rect(0, 0, xLines, yLines)).Resize(dst2.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        dst2 = dst3(New cv.Rect(0, 0, xLines, yLines)).Resize(dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
     End Sub
 End Class
 
@@ -414,6 +414,7 @@ End Class
 
 Public Class Structured_Crosshairs : Inherits VB_Parent
     Dim sCloud As New Structured_Cloud
+    Dim minX As Single, maxX As Single, minY As Single, maxY As Single
     Public Sub New()
         desc = "Connect vertical and horizontal dots that are in the same column and row."
     End Sub
@@ -431,7 +432,6 @@ Public Class Structured_Crosshairs : Inherits VB_Parent
         sCloud.Run(src)
         Dim split = cv.Cv2.Split(sCloud.dst2)
 
-        Static minX As Single, maxX As Single, minY As Single, maxY As Single
         Dim mmX = GetMinMax(split(0))
         Dim mmY = GetMinMax(split(1))
 
@@ -440,13 +440,13 @@ Public Class Structured_Crosshairs : Inherits VB_Parent
         maxX = If(maxX < mmX.maxVal, mmX.maxVal, maxX)
         maxY = If(maxY < mmY.maxVal, mmY.maxVal, maxY)
 
-        setTrueText("mmx min/max = " + Format(minX, "0.00") + "/" + Format(maxX, "0.00") + " mmy min/max " + Format(minY, "0.00") +
+        SetTrueText("mmx min/max = " + Format(minX, "0.00") + "/" + Format(maxX, "0.00") + " mmy min/max " + Format(minY, "0.00") +
                     "/" + Format(maxY, "0.00"), 3)
 
         dst2.SetTo(0)
         Dim white = New cv.Vec3b(255, 255, 255)
-        Dim pointX As New cv.Mat(sCloud.dst2.Size, cv.MatType.CV_32S, 0)
-        Dim pointY As New cv.Mat(sCloud.dst2.Size, cv.MatType.CV_32S, 0)
+        Dim pointX As New cv.Mat(sCloud.dst2.Size(), cv.MatType.CV_32S, 0)
+        Dim pointY As New cv.Mat(sCloud.dst2.Size(), cv.MatType.CV_32S, 0)
         Dim yy As Integer, xx As Integer
         For y = 1 To sCloud.dst2.Height - 1
             For x = 1 To sCloud.dst2.Width - 1
@@ -469,14 +469,14 @@ Public Class Structured_Crosshairs : Inherits VB_Parent
                         Dim p1 = New cv.Point(pointX.Get(Of Integer)(y - 1, x), pointY.Get(Of Integer)(y - 1, x))
                         If p1.X > 0 Then
                             Dim p2 = New cv.Point(xx, yy)
-                            dst2.Line(p1, p2, task.highlightColor, task.lineWidth + 1, task.lineType)
+                            dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
                         End If
                     End If
                     If y = indexY Then
                         Dim p1 = New cv.Point(pointX.Get(Of Integer)(y, x - 1), pointY.Get(Of Integer)(y, x - 1))
                         If p1.X > 0 Then
                             Dim p2 = New cv.Point(xx, yy)
-                            dst2.Line(p1, p2, task.highlightColor, task.lineWidth + 1, task.lineType)
+                            dst2.Line(p1, p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
                         End If
                     End If
                 End If
@@ -509,7 +509,7 @@ Public Class Structured_Cloud : Inherits VB_Parent
 
         Dim stepX = dst3.Width / xLines
         Dim stepY = dst3.Height / yLines
-        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
+        dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
         For y = 0 To yLines - 1
             For x = 0 To xLines - 1
                 Dim r = New cv.Rect(x * stepX, y * stepY, stepX - 1, stepY - 1)
@@ -538,7 +538,7 @@ Public Class Structured_ROI : Inherits VB_Parent
         desc = "Simplify the point cloud so it can be represented as quads in OpenGL"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
+        dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
         For Each roi In task.gridList
             Dim d = task.pointCloud(roi).Mean(task.depthMask(roi))
             Dim depth = New cv.Vec3f(d.Val0, d.Val1, d.Val2)
@@ -597,7 +597,7 @@ Public Class Structured_TilesQuad : Inherits VB_Parent
     Public Sub New()
         task.gOptions.setGridSize(10)
         If standaloneTest() Then task.gOptions.setDisplay1()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
         labels = {"", "RedCloud cells", "Simplified depth map - CV_32FC3", "Simplified depth map with RedCloud cell colors"}
         desc = "Simplify the OpenGL quads without using OpenGL's point size"
     End Sub
@@ -719,7 +719,7 @@ Public Class Structured_FloorCeiling : Inherits VB_Parent
     Dim kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(2 - 1)
-        findCheckBox("Top View (Unchecked Side View)").Checked = False
+        FindCheckBox("Top View (Unchecked Side View)").Checked = False
         desc = "Find the floor or ceiling plane"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -760,7 +760,7 @@ Public Class Structured_FloorCeiling : Inherits VB_Parent
         labels(3) = "Ceiling is at row =" + CStr(CInt(kalman.kOutput(1))) + " floor at y=" + CStr(CInt(kalman.kOutput(0)))
 
         DrawLine(dst2, New cv.Point(0, floorY), New cv.Point(dst2.Width, floorY), cv.Scalar.Yellow)
-        setTrueText("floor", New cv.Point(10, floorY + task.dotSize), 3)
+        SetTrueText("floor", New cv.Point(10, floorY + task.DotSize), 3)
 
         Dim rect = New cv.Rect(0, Math.Max(ceilingY - 5, 0), dst2.Width, 10)
         Dim mask = slice.heat.dst3(rect)
@@ -768,9 +768,9 @@ Public Class Structured_FloorCeiling : Inherits VB_Parent
         cv.Cv2.MeanStdDev(mask, mean, stdev)
         If mean(0) < mean(2) Then
             DrawLine(dst2, New cv.Point(0, ceilingY), New cv.Point(dst2.Width, ceilingY), cv.Scalar.Yellow)
-            setTrueText("ceiling", New cv.Point(10, ceilingY + task.dotSize), 3)
+            SetTrueText("ceiling", New cv.Point(10, ceilingY + task.DotSize), 3)
         Else
-            setTrueText("Ceiling does not appear to be present", 3)
+            SetTrueText("Ceiling does not appear to be present", 3)
         End If
     End Sub
 End Class
@@ -786,7 +786,7 @@ Public Class Structured_MultiSliceH : Inherits VB_Parent
     Public sliceMask As cv.Mat
     Dim options As New Options_Structured
     Public Sub New()
-        findCheckBox("Top View (Unchecked Side View)").Checked = False
+        FindCheckBox("Top View (Unchecked Side View)").Checked = False
         desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -796,7 +796,7 @@ Public Class Structured_MultiSliceH : Inherits VB_Parent
         heat.Run(src)
         dst3 = heat.dst3
 
-        sliceMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        sliceMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         For yCoordinate = 0 To src.Height - 1 Step stepsize
             Dim planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
             If yCoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
@@ -824,7 +824,7 @@ Public Class Structured_MultiSliceV : Inherits VB_Parent
     Public heat As New HeatMap_Basics
     Dim options As New Options_Structured
     Public Sub New()
-        findCheckBox("Top View (Unchecked Side View)").Checked = True
+        FindCheckBox("Top View (Unchecked Side View)").Checked = True
         desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -834,7 +834,7 @@ Public Class Structured_MultiSliceV : Inherits VB_Parent
         heat.Run(src)
         dst3 = heat.dst2
 
-        Dim sliceMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim sliceMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         For xCoordinate = 0 To src.Width - 1 Step stepsize
             Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
             If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
@@ -877,18 +877,18 @@ Public Class Structured_SliceXPlot : Inherits VB_Parent
                                options.sliceSize), dst3.Height - 1)
         Dim mm as mmData = GetMinMax(multi.heat.topframes.dst2(rect))
 
-        DrawCircle(dst3,New cv.Point(col, mm.maxLoc.Y), task.dotSize + 3, cv.Scalar.Yellow)
+        DrawCircle(dst3,New cv.Point(col, mm.maxLoc.Y), task.DotSize + 3, cv.Scalar.Yellow)
 
         dst2 = task.color.Clone
-        Dim filterZ = (dst3.Height - mm.maxLoc.Y) / dst3.Height * task.maxZmeters
+        Dim filterZ = (dst3.Height - mm.maxLoc.Y) / dst3.Height * task.MaxZmeters
         If filterZ > 0 Then
             Dim depthMask = multi.split(2).InRange(filterZ - 0.05, filterZ + 0.05) ' a 10 cm buffer surrounding the z value
             depthMask = multi.sliceMask And depthMask
             dst2.SetTo(cv.Scalar.White, depthMask)
         End If
 
-        labels(3) = "Peak histogram count (" + Format(mm.maxVal, fmt0) + ") at " + Format(filterZ, fmt2) + " meters +-" + Format(5 / dst2.Height / task.maxZmeters, fmt2) + " m"
-        setTrueText("Use the mouse to move the yellow dot above.", New cv.Point(10, dst2.Height * 7 / 8), 3)
+        labels(3) = "Peak histogram count (" + Format(mm.maxVal, fmt0) + ") at " + Format(filterZ, fmt2) + " meters +-" + Format(5 / dst2.Height / task.MaxZmeters, fmt2) + " m"
+        SetTrueText("Use the mouse to move the yellow dot above.", New cv.Point(10, dst2.Height * 7 / 8), 3)
     End Sub
 End Class
 
@@ -917,17 +917,17 @@ Public Class Structured_SliceYPlot : Inherits VB_Parent
         Dim mm as mmData = GetMinMax(multi.heat.sideframes.dst2(rect))
 
         If mm.maxVal > 0 Then
-            DrawCircle(dst3,New cv.Point(mm.maxLoc.X, row), task.dotSize + 3, cv.Scalar.Yellow)
-            ' dst3.Line(New cv.Point(mm.maxLoc.X, 0), New cv.Point(mm.maxLoc.X, dst3.Height), task.highlightColor, task.lineWidth, task.lineType)
-            Dim filterZ = mm.maxLoc.X / dst3.Width * task.maxZmeters
+            DrawCircle(dst3,New cv.Point(mm.maxLoc.X, row), task.DotSize + 3, cv.Scalar.Yellow)
+            ' dst3.Line(New cv.Point(mm.maxLoc.X, 0), New cv.Point(mm.maxLoc.X, dst3.Height), task.HighlightColor, task.lineWidth, task.lineType)
+            Dim filterZ = mm.maxLoc.X / dst3.Width * task.MaxZmeters
 
             Dim depthMask = multi.split(2).InRange(filterZ - 0.05, filterZ + 0.05) ' a 10 cm buffer surrounding the z value
             dst2 = task.color.Clone
             dst2.SetTo(cv.Scalar.White, depthMask)
-            Dim pixelsPerMeter = dst2.Width / task.maxZmeters
+            Dim pixelsPerMeter = dst2.Width / task.MaxZmeters
             labels(3) = "Peak histogram count (" + Format(mm.maxVal, fmt0) + ") at " + Format(filterZ, fmt2) + " meters +-" + Format(5 / pixelsPerMeter, fmt2) + " m"
         End If
-        setTrueText("Use the mouse to move the yellow dot above.", New cv.Point(10, dst2.Height * 7 / 8), 3)
+        SetTrueText("Use the mouse to move the yellow dot above.", New cv.Point(10, dst2.Height * 7 / 8), 3)
     End Sub
 End Class
 
@@ -958,7 +958,7 @@ Public Class Structured_MouseSlice : Inherits VB_Parent
         If lines.lpList.Count > 0 Then
             dst3 = lines.dst2
             For Each lp In lines.lpList
-                dst3.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth + 3, task.lineType)
+                dst3.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth + 3, task.lineType)
                 tops.Add(If(lp.p1.Y < lp.p2.Y, lp.p1.Y, lp.p2.Y))
                 bots.Add(If(lp.p1.Y > lp.p2.Y, lp.p1.Y, lp.p2.Y))
                 topsList.Add(lp.p1)
@@ -967,9 +967,9 @@ Public Class Structured_MouseSlice : Inherits VB_Parent
 
             'Dim topPt = topsList(tops.IndexOf(tops.Min))
             'Dim botPt = botsList(bots.IndexOf(bots.Max))
-            'DrawCircle(dst3,New cv.Point2f((topPt.X + botPt.X) / 2, (topPt.Y + botPt.Y) / 2), task.dotSize + 5, cv.Scalar.Red)
+            'DrawCircle(dst3,New cv.Point2f((topPt.X + botPt.X) / 2, (topPt.Y + botPt.Y) / 2), task.DotSize + 5, cv.Scalar.Red)
             'dst3.Line(topPt, botPt, cv.Scalar.Red, task.lineWidth, task.lineType)
-            'DrawLine(dst2,topPt, botPt, task.highlightColor, task.lineWidth + 2, task.lineType)
+            'DrawLine(dst2,topPt, botPt, task.HighlightColor, task.lineWidth + 2, task.lineType)
         End If
         If standaloneTest() Then
             dst2 = src
@@ -989,12 +989,12 @@ Public Class Structured_SliceEither : Inherits VB_Parent
     Public sliceMask As New cv.Mat
     Dim options As New Options_Structured
     Public Sub New()
-        findCheckBox("Top View (Unchecked Side View)").Checked = False
+        FindCheckBox("Top View (Unchecked Side View)").Checked = False
         desc = "Create slices in top and side views"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        Static topRadio = findCheckBox("Top View (Unchecked Side View)")
+        Static topRadio = FindCheckBox("Top View (Unchecked Side View)")
         Dim topView = topRadio.checked
 
         Dim sliceVal = If(topView, task.mouseMovePoint.X, task.mouseMovePoint.Y)
@@ -1023,7 +1023,7 @@ Public Class Structured_SliceEither : Inherits VB_Parent
         labels(3) = heat.labels(3)
 
         dst3 = heat.dst3
-        DrawCircle(dst3,New cv.Point(task.topCameraPoint.X, dst3.Height), task.dotSize,
+        DrawCircle(dst3,New cv.Point(task.topCameraPoint.X, dst3.Height), task.DotSize,
                     cv.Scalar.Yellow)
         If topView Then
             dst3.Line(New cv.Point(sliceVal, 0), New cv.Point(sliceVal, dst3.Height),
@@ -1184,7 +1184,7 @@ Public Class Structured_CountSide : Inherits VB_Parent
         dst3 = dst3.Resize(New cv.Size(dst2.Width, dst2.Width))
         rotate.Run(dst3)
         dst3 = rotate.dst2
-        setTrueText("Max flat surface at: " + vbCrLf + Format(yValues(maxCountIndex), fmt3), 2)
+        SetTrueText("Max flat surface at: " + vbCrLf + Format(yValues(maxCountIndex), fmt3), 2)
     End Sub
 End Class
 
@@ -1234,7 +1234,7 @@ Public Class Structured_CountSideSum : Inherits VB_Parent
                 If i Mod 10 = 0 And i > 0 Then strOut += vbCrLf
             Next
         End If
-        setTrueText(strOut, 2)
+        SetTrueText(strOut, 2)
 
         dst3.SetTo(cv.Scalar.Red)
         Dim barHeight = dst2.Height / counts.Count
@@ -1257,7 +1257,7 @@ Public Class Structured_SliceV : Inherits VB_Parent
     Public sliceMask As New cv.Mat
     Public options As New Options_Structured
     Public Sub New()
-        findCheckBox("Top View (Unchecked Side View)").Checked = True
+        FindCheckBox("Top View (Unchecked Side View)").Checked = True
         desc = "Find and isolate planes using the top view histogram data"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1283,8 +1283,8 @@ Public Class Structured_SliceV : Inherits VB_Parent
         labels(3) = heat.labels(3)
 
         dst3 = heat.dst2
-        DrawCircle(dst3,New cv.Point(task.topCameraPoint.X, 0), task.dotSize, task.highlightColor)
-        dst3.Line(New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), task.highlightColor, options.sliceSize)
+        DrawCircle(dst3,New cv.Point(task.topCameraPoint.X, 0), task.DotSize, task.HighlightColor)
+        dst3.Line(New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), task.HighlightColor, options.sliceSize)
         If standaloneTest() Then
             dst2 = src
             dst2.SetTo(cv.Scalar.White, sliceMask)
@@ -1328,8 +1328,8 @@ Public Class Structured_SliceH : Inherits VB_Parent
 
         dst3 = heat.dst3
         Dim yPlaneOffset = If(ycoordinate < dst3.Height - options.sliceSize, CInt(ycoordinate), dst3.Height - options.sliceSize - 1)
-        DrawCircle(dst3,New cv.Point(0, task.sideCameraPoint.Y), task.dotSize, task.highlightColor)
-        dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.highlightColor, options.sliceSize)
+        DrawCircle(dst3,New cv.Point(0, task.sideCameraPoint.Y), task.DotSize, task.HighlightColor)
+        dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.HighlightColor, options.sliceSize)
         If standaloneTest() Then
             dst2 = src
             dst2.SetTo(cv.Scalar.White, sliceMask)

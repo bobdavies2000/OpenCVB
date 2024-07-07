@@ -2,14 +2,16 @@ Imports cv = OpenCvSharp
 Public Class BlurMotion_Basics : Inherits VB_Parent
     Public kernel As cv.Mat
     Public options As New Options_MotionBlur
+    Dim blurSlider As Windows.Forms.TrackBar
+    Dim blurAngleSlider As Windows.Forms.TrackBar
     Public Sub New()
+        blurSlider = FindSlider("Motion Blur Length")
+        blurAngleSlider = FindSlider("Motion Blur Angle")
         desc = "Use Filter2D to create a motion blur"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         If standaloneTest() Then
-            Static blurSlider = FindSlider("Motion Blur Length")
-            Static blurAngleSlider = FindSlider("Motion Blur Angle")
             blurAngleSlider.Value = If(blurAngleSlider.Value < blurAngleSlider.Maximum, blurAngleSlider.Value + 1, blurAngleSlider.Minimum)
         End If
         kernel = New cv.Mat(options.kernelSize, options.kernelSize, cv.MatType.CV_32F, 0)
@@ -132,7 +134,7 @@ Public Class BlurMotion_Deblur : Inherits VB_Parent
         Dim h = calcPSF(roi.Size(), mblur.options.restoreLen, mblur.options.theta)
         Dim hW = calcWeinerFilter(h, 1.0 / mblur.options.SNR)
 
-        Dim gray8u = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray8u = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         Dim imgIn As New cv.Mat
         gray8u.ConvertTo(imgIn, cv.MatType.CV_32F)
         imgIn = edgeTaper(imgIn, mblur.options.gamma, beta)

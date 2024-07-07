@@ -72,7 +72,7 @@ Public Class MSER_Regions : Inherits VB_Parent
     Public cellMap As cv.Mat
     Public useOpAuto As Boolean = True
     Public Sub New()
-        cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        cellMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         labels(3) = "Latest frame only - no accumulation"
         desc = "Tag and track the MSER (Maximally Stable Extremal Region) regions"
     End Sub
@@ -160,7 +160,7 @@ Public Class MSER_Detect : Inherits VB_Parent
             mser.Pass2Only = options.pass2Setting
         End If
 
-        If options.graySetting And src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If options.graySetting And src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         mser.DetectRegions(src, regions, boxes)
 
         classCount = boxes.Count
@@ -324,7 +324,7 @@ Public Class MSER_TestSynthetic : Inherits VB_Parent
     Dim synth As New MSER_SyntheticInput
     Dim mBase As New MSER_Basics
     Public Sub New()
-        findCheckBox("Use grayscale input").Checked = True
+        FindCheckBox("Use grayscale input").Checked = True
         labels = {"", "", "Synthetic input", "Output from MSER (Maximally Stable Extremal Region)"}
         desc = "Test MSER (Maximally Stable Extremal Region) with the synthetic image."
     End Sub
@@ -350,7 +350,7 @@ Public Class MSER_Grayscale : Inherits VB_Parent
     Dim mBase As New MSER_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        findCheckBox("Use grayscale input").Checked = True
+        FindCheckBox("Use grayscale input").Checked = True
         desc = "Run MSER (Maximally Stable Extremal Region) with grayscale input"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -372,7 +372,7 @@ Public Class MSER_ReducedRGB : Inherits VB_Parent
     Dim mBase As New MSER_Basics
     Dim reduction As New Reduction_BGR
     Public Sub New()
-        findCheckBox("Use grayscale input").Checked = False
+        FindCheckBox("Use grayscale input").Checked = False
         desc = "Run MSER (Maximally Stable Extremal Region) with a reduced RGB input"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -486,7 +486,7 @@ Public Class MSER_ROI : Inherits VB_Parent
                 If center.X >= box.X And center.X <= (box.X + box.Width) Then
                     If center.Y >= box.Y And center.Y <= (box.Y + box.Height) Then
                         removeBoxes.Add(i)
-                        dst3.Rectangle(b, task.highlightColor, task.lineWidth)
+                        dst3.Rectangle(b, task.HighlightColor, task.lineWidth)
                     End If
                 End If
             Next
@@ -497,7 +497,7 @@ Public Class MSER_ROI : Inherits VB_Parent
         End While
 
         For Each rect In containers
-            dst2.Rectangle(rect, task.highlightColor, task.lineWidth)
+            dst2.Rectangle(rect, task.HighlightColor, task.lineWidth)
         Next
 
         labels(2) = CStr(containers.Count) + " consolidated regions of interest located"
@@ -521,7 +521,7 @@ Public Class MSER_TestExample : Inherits VB_Parent
         labels(3) = "Box regions from MSER"
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "Maximally Stable Extremal Regions example - still image"
-        image = cv.Cv2.ImRead(task.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
+        image = cv.Cv2.ImRead(task.HomeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         mser = cv.MSER.Create()
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -551,7 +551,7 @@ Public Class MSER_TestExample : Inherits VB_Parent
         Next
 
         For Each box In boxes
-            dst3.Rectangle(box, task.highlightColor, task.lineWidth + 1, task.lineType)
+            dst3.Rectangle(box, task.HighlightColor, task.lineWidth + 1, task.lineType)
         Next
         labels(2) = CStr(boxes.Count) + " regions were found using MSER"
     End Sub
@@ -589,7 +589,7 @@ Public Class MSER_Mask_CPP : Inherits VB_Parent
     Public classCount As Integer
     Public Sub New()
         task.redOptions.UseColorOnly.Checked = True
-        findCheckBox("Use grayscale input").Checked = False
+        FindCheckBox("Use grayscale input").Checked = False
         options.RunVB()
         cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                          options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
@@ -603,7 +603,7 @@ Public Class MSER_Mask_CPP : Inherits VB_Parent
                              options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
         End If
 
-        If options.graySetting And src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If options.graySetting And src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If task.heartBeat Then
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -674,6 +674,7 @@ End Class
 
 Public Class MSER_BasicsNew : Inherits VB_Parent
     Dim detect As New MSER_CPP
+    Dim displaycount As Integer
     Public Sub New()
         desc = "Create cells for each region in MSER output"
     End Sub
@@ -687,12 +688,11 @@ Public Class MSER_BasicsNew : Inherits VB_Parent
             boxes.Add(r.Width * r.Height, r)
         Next
 
-        Static displaycount As Integer
         dst3 = src
         For i = 0 To boxes.Count - 1
             Dim r = boxes.ElementAt(i).Value
-            dst3.Rectangle(r, task.highlightColor, task.lineWidth)
-            If i >= displayCount Then Exit For
+            dst3.Rectangle(r, task.HighlightColor, task.lineWidth)
+            If i >= displaycount Then Exit For
         Next
 
         If task.heartBeat Then
@@ -709,13 +709,12 @@ End Class
 
 Public Class MSER_Basics2 : Inherits VB_Parent
     Dim detect As New MSER_CPP
+    Dim cellMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
         desc = "Create cells for each region in MSER output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-
         detect.Run(src)
         dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -773,7 +772,7 @@ Public Class MSER_CPP : Inherits VB_Parent
     Public maskCounts As New List(Of Integer)
     Public classcount As Integer
     Public Sub New()
-        findCheckBox("Use grayscale input").Checked = False
+        FindCheckBox("Use grayscale input").Checked = False
         options.RunVB()
         cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                          options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
@@ -787,7 +786,7 @@ Public Class MSER_CPP : Inherits VB_Parent
                              options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
         End If
 
-        If options.graySetting And src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If options.graySetting And src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
@@ -826,8 +825,8 @@ Public Class MSER_CPP : Inherits VB_Parent
         If standaloneTest() Then
             dst3 = src
             For i = 0 To boxes.Count - 1
-                dst3.Rectangle(boxes(i), task.highlightColor, task.lineWidth)
-                If i < task.redOptions.identifyCount Then setTrueText(CStr(i + 1), boxes(i).TopLeft, 3)
+                dst3.Rectangle(boxes(i), task.HighlightColor, task.lineWidth)
+                If i < task.redOptions.identifyCount Then SetTrueText(CStr(i + 1), boxes(i).TopLeft, 3)
             Next
         End If
         labels(2) = CStr(classcount) + " regions identified"

@@ -6,7 +6,7 @@ Public Class XFeatures2D_StarDetector : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         dst2 = src.Clone()
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         Dim detector = OpenCvSharp.XFeatures2D.StarDetector.Create()
         Dim keypoints() = detector.Detect(src)
 

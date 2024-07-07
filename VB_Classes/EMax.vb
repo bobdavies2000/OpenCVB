@@ -11,6 +11,8 @@ Public Class EMax_Basics : Inherits VB_Parent
     Public regionCount As Integer
     Public centers As New List(Of cv.Point2f)
     Dim options As New Options_Emax
+    Dim useInputClusters As Boolean
+    Dim palette As New Palette_Variable
     Public Sub New()
         cPtr = EMax_Open()
         FindSlider("EMax Number of Samples per region").Value = 1
@@ -21,7 +23,6 @@ Public Class EMax_Basics : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         Options.RunVB()
 
-        Static useInputClusters As Boolean
         If eLabels.Count = 0 Or useInputClusters Then
             useInputClusters = True
             emaxInput.Run(empty)
@@ -44,7 +45,6 @@ Public Class EMax_Basics : Inherits VB_Parent
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
 
         If options.consistentcolors Then
-            Static palette As New Palette_Variable
             palette.colors.Clear()
             Dim newLabels(regionCount) As cv.Vec3b
             For i = 0 To eLabels.Count - 1
@@ -88,9 +88,9 @@ Public Class EMax_Centers : Inherits VB_Parent
         dst2 = emax.dst2
         Static lastCenters As New List(Of cv.Point2f)(emax.centers)
         For i = 0 To emax.centers.Count - 1
-            DrawCircle(dst2,emax.centers(i), task.dotSize + 1, task.highlightColor)
+            DrawCircle(dst2,emax.centers(i), task.DotSize + 1, task.HighlightColor)
             If i < lastCenters.Count Then
-                DrawCircle(dst2,lastCenters(i), task.dotSize + 2, cv.Scalar.Black)
+                DrawCircle(dst2,lastCenters(i), task.DotSize + 2, cv.Scalar.Black)
             End If
         Next
         lastCenters = New List(Of cv.Point2f)(emax.centers)
@@ -106,42 +106,33 @@ Public Class EMax_InputClusters : Inherits VB_Parent
     Public eLabels() As Integer
     Public eSamples As New List(Of cv.Point2f)
     Public centers As New List(Of cv.Point2f)
+    Dim options As New Options_EmaxInputClusters
     Public Sub New()
-        task.gOptions.GridSize.Maximum = dst2.Width
-        task.gOptions.setGridSize(CInt(dst2.Width / 3))
-        task.gOptions.GridSize.Minimum = 16
-        task.grid.Run(dst2)
-
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("EMax Number of Samples per region", 1, 20, 10)
-            sliders.setupTrackBar("EMax Sigma (spread)", 1, 100, 10)
-        End If
-
         labels(2) = "EMax algorithms input samples"
         desc = "Options for EMax algorithms."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static sampleSlider = FindSlider("EMax Number of Samples per region")
-        Static sigmaSlider = FindSlider("EMax Sigma (spread)")
-        Dim samplesPerRegion As Integer
-        Dim sigma As Integer
+        options.RunVB()
+
+        If task.FirstPass Then
+            task.gOptions.GridSlider.Maximum = dst2.Width
+            task.gOptions.setGridSize(CInt(dst2.Width / 3))
+            task.grid.Run(dst2)
+        End If
 
         If regionCount <> task.gridList.Count Then task.optionsChanged = True
-        If samplesPerRegion <> sampleSlider.Value Then task.optionsChanged = True
-        If sigma <> sigmaSlider.Value Then task.optionsChanged = True
 
         regionCount = task.gridList.Count
-        samplesPerRegion = sampleSlider.Value
-        sigma = sigmaSlider.Value
 
-        Dim samples = New cv.Mat(regionCount * samplesPerRegion, 2, cv.MatType.CV_32F).Reshape(2, 0)
-        Dim eLabelMat = New cv.Mat(regionCount * samplesPerRegion, 1, cv.MatType.CV_32S)
+        Dim samples = New cv.Mat(regionCount * options.samplesPerRegion, 2, cv.MatType.CV_32F).Reshape(2, 0)
+        Dim eLabelMat = New cv.Mat(regionCount * options.samplesPerRegion, 1, cv.MatType.CV_32S)
 
         For i = 0 To regionCount - 1
             Dim roi = task.gridList(i)
-            eLabelMat.RowRange(i * samplesPerRegion, (i + 1) * samplesPerRegion).SetTo(i)
-            Dim tmp = samples.RowRange(i * samplesPerRegion, (i + 1) * samplesPerRegion)
-            cv.Cv2.Randn(tmp, New cv.Scalar(roi.X + task.gOptions.GridSize.Value / 2, roi.Y + task.gOptions.GridSize.Value / 2), cv.Scalar.All(sigma))
+            eLabelMat.RowRange(i * options.samplesPerRegion, (i + 1) * options.samplesPerRegion).SetTo(i)
+            Dim tmp = samples.RowRange(i * options.samplesPerRegion, (i + 1) * options.samplesPerRegion)
+            cv.Cv2.Randn(tmp, New cv.Scalar(roi.X + task.gridSize / 2, roi.Y + task.gridSize / 2),
+                         cv.Scalar.All(options.sigma))
         Next
 
         samples = samples.Reshape(1, 0)
@@ -149,12 +140,12 @@ Public Class EMax_InputClusters : Inherits VB_Parent
         dst2.SetTo(0)
         eSamples.Clear()
         centers.Clear()
-        For i = 0 To regionCount * samplesPerRegion - 1
+        For i = 0 To regionCount * options.samplesPerRegion - 1
             Dim pt = samples.Get(Of cv.Point2f)(i, 0)
             centers.Add(pt)
             eSamples.Add(New cv.Point2f(CInt(pt.X), CInt(pt.Y))) ' easier to debug with just integers...
             Dim label = eLabelMat.Get(Of Integer)(i)
-            DrawCircle(dst2,pt, task.dotSize + 2, task.highlightColor)
+            DrawCircle(dst2, pt, task.DotSize + 2, task.HighlightColor)
         Next
 
         ReDim eLabels(eLabelMat.Rows - 1)
@@ -183,7 +174,7 @@ Public Class EMax_VB_Failing : Inherits VB_Parent
         eLabels = New List(Of Integer)(emaxInput.eLabels.ToList)
         eSamples = New List(Of cv.Point2f)(emaxInput.eSamples)
         regionCount = emaxInput.regionCount
-        setTrueText("The EMax algorithm fails as a result of a bug in em_model.Predict2.  See code for details." + vbCrLf +
+        SetTrueText("The EMax algorithm fails as a result of a bug in em_model.Predict2.  See code for details." + vbCrLf +
                       "The C++ version works fine (EMax_RedCloud) and the 2 are functionally identical.", New cv.Point(20, 100))
 
         Exit Sub ' comment this line to see the bug in the VB.Net version of this Predict2 below.  Any answers would be gratefully received.
@@ -206,7 +197,7 @@ Public Class EMax_VB_Failing : Inherits VB_Parent
                 Dim response = Math.Round(em_model.Predict2(sample)(1))
 
                 Dim c = task.vecColors(response)
-                DrawCircle(dst2, New cv.Point(j, i), task.dotSize, c)
+                DrawCircle(dst2, New cv.Point(j, i), task.DotSize, c)
             Next
         Next
     End Sub
@@ -232,7 +223,7 @@ Public Class EMax_PointTracker : Inherits VB_Parent
 
         knn.queries = New List(Of cv.Point2f)(emax.centers)
         knn.Run(empty)
-        If task.firstPass Then
+        If task.FirstPass Then
             knn.trainInput = New List(Of cv.Point2f)(knn.queries)
             Exit Sub
         End If
@@ -241,8 +232,8 @@ Public Class EMax_PointTracker : Inherits VB_Parent
         For i = 0 To knn.queries.Count - 1
             Dim p1 = knn.queries(i)
             Dim p2 = knn.trainInput(knn.result(i, 0))
-            DrawCircle(dst3,p1, task.dotSize, task.highlightColor)
-            DrawCircle(dst3,p2, task.dotSize, cv.Scalar.Red)
+            DrawCircle(dst3,p1, task.DotSize, task.HighlightColor)
+            DrawCircle(dst3,p2, task.DotSize, cv.Scalar.Red)
             DrawLine(dst3, p1, p2, cv.Scalar.White)
         Next
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)

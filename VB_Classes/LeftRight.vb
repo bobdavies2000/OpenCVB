@@ -136,8 +136,8 @@ Public Class LeftRight_Markers : Inherits VB_Parent
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
         desc = "Use the left/right reductions to find hard markers - neighboring pixels of identical values"
     End Sub
@@ -151,7 +151,7 @@ Public Class LeftRight_Markers : Inherits VB_Parent
 
         ' find combinations in the left image - they are markers.
         Dim impList As New List(Of List(Of Integer))
-        Dim lineLen = task.gOptions.DebugSlider.Value
+        Dim lineLen = task.gOptions.DebugSliderValue
         For y = 0 To left.Height - 1
             Dim important As New List(Of Integer)
             Dim impCounts As New List(Of Integer)
@@ -195,8 +195,8 @@ End Class
 Public Class LeftRight_Markers1 : Inherits VB_Parent
     Dim redView As New LeftRight_Reduction
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
         desc = "Use the left/right reductions to find markers - neighboring pixels of identical values"
     End Sub
@@ -207,7 +207,7 @@ Public Class LeftRight_Markers1 : Inherits VB_Parent
 
         ' find combinations in the left image - they are markers.
         Dim impList As New List(Of List(Of Integer))
-        Dim lineLen = task.gOptions.DebugSlider.Value
+        Dim lineLen = task.gOptions.DebugSliderValue
         For y = 0 To dst2.Height - 1
             Dim important As New List(Of Integer)
             Dim impCounts As New List(Of Integer)

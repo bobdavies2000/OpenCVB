@@ -14,7 +14,7 @@ Public Class BlockMatching_Basics : Inherits VB_Parent
         Options.RunVB()
 
         If task.cameraName = "Azure Kinect 4K" Then
-            setTrueText("For the K4A 4 Azure camera, the left and right views are the same.")
+            SetTrueText("For the K4A 4 Azure camera, the left and right views are the same.")
         End If
 
         Static blockMatch = cv.StereoBM.Create()
@@ -30,8 +30,8 @@ Public Class BlockMatching_Basics : Inherits VB_Parent
         blockMatch.SpeckleRange = 32
         blockMatch.Disp12MaxDiff = 1
 
-        Dim tmpLeft = If(task.leftview.Channels = 3, task.leftview.CvtColor(cv.ColorConversionCodes.BGR2GRAY), task.leftview)
-        Dim tmpRight = If(task.rightview.Channels = 3, task.rightview.CvtColor(cv.ColorConversionCodes.BGR2GRAY), task.rightview)
+        Dim tmpLeft = If(task.leftview.Channels() = 3, task.leftview.CvtColor(cv.ColorConversionCodes.BGR2Gray), task.leftview)
+        Dim tmpRight = If(task.rightview.Channels() = 3, task.rightview.CvtColor(cv.ColorConversionCodes.BGR2Gray), task.rightview)
 
         Dim disparity As New cv.Mat
         blockMatch.compute(tmpLeft, tmpRight, disparity)

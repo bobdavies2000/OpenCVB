@@ -3,22 +3,22 @@
 Public Class SuperRes_Basics : Inherits VB_Parent
     Dim video As New SuperRes_Input
     Dim options As New Options_SuperRes
+    Dim optFlow As cv.DenseOpticalFlowExt
+    Dim superres As cv.SuperResolution
+    Dim warningMessage As Integer = 10
     Public Sub New()
         labels(2) = "Original Input video"
         labels(3) = "SuperRes output"
         desc = "Create superres version of the video input"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static optFlow As cv.DenseOpticalFlowExt
-        Static superres As cv.SuperResolution
-        Static warningMessage As Integer = 10
         If warningMessage > 0 Then
-            setTrueText("The first frame takes a while when iterations are over 50 or so")
+            SetTrueText("The first frame takes a while when iterations are over 50 or so")
             warningMessage -= 1
             Exit Sub
         End If
 
-        Options.RunVB()
+        options.RunVB()
         If options.restartWithNewOptions Then
             warningMessage = 10
             optFlow = Nothing ' start over...
@@ -66,7 +66,7 @@ Public Class SuperRes_Input : Inherits VB_Parent
     Public video As New Video_Basics
     Public inputFileName As String
     Public Sub New()
-        video.fileNameForm.filename.Text = task.homeDir + "Data/testdata_superres_car.avi"
+        video.fileNameForm.filename.Text = task.HomeDir + "Data/testdata_superres_car.avi"
         inputFileName = video.fileNameForm.filename.Text
         desc = "Input data for the superres testing"
     End Sub

@@ -14,10 +14,10 @@ Public Class CPP_Basics : Inherits VB_Parent
         cppFunction = _cppFunction
         labels(2) = "Running CPP_Basics, Output from " + task.algName
 
-        cPtr = cppTask_Open(cppFunction, task.workingRes.Height, task.workingRes.Width,
-                            task.heartBeat, 0.5, task.lineWidth, task.lineType, task.dotSize,
-                            task.gOptions.GridSize.Value, task.histogramBins,
-                            task.gOptions.gravityPointCloud.Checked, task.gOptions.pixelDiffThreshold,
+        cPtr = cppTask_Open(cppFunction, task.WorkingRes.Height, task.WorkingRes.Width,
+                            task.heartBeat, 0.5, task.lineWidth, task.lineType, task.DotSize,
+                            task.gridSize, task.histogramBins,
+                            task.useGravityPointcloud, task.gOptions.pixelDiffThreshold,
                             task.gOptions.UseKalman.Checked, task.gOptions.Palettes.SelectedIndex, task.optionsChanged,
                             task.frameHistoryCount, task.gOptions.displayDst0.Checked, task.gOptions.displayDst1.Checked)
 
@@ -27,7 +27,7 @@ Public Class CPP_Basics : Inherits VB_Parent
         Dim labelBuffer As StringBuilder = New StringBuilder(512)
         Dim descBuffer As StringBuilder = New StringBuilder(512)
         Dim adviceBuffer As StringBuilder = New StringBuilder(512)
-        cppTask_OptionsCPPtoVB(cPtr, task.gOptions.GridSize.Value,
+        cppTask_OptionsCPPtoVB(cPtr, task.gridSize,
                                task.histogramBins,
                                task.gOptions.pixelDiffThreshold, task.gOptions.UseKalman.Checked,
                                task.frameHistoryCount, task.drawRect.X, task.drawRect.Y,
@@ -43,14 +43,14 @@ Public Class CPP_Basics : Inherits VB_Parent
 
     Public Sub RunVB(src As cv.Mat)
 
-        cppTask_OptionsVBtoCPP(cPtr, task.gOptions.GridSize.Value,
+        cppTask_OptionsVBtoCPP(cPtr, task.gridSize,
                                task.histogramBins,
                                task.gOptions.pixelDiffThreshold, task.gOptions.UseKalman.Checked,
                                task.frameHistoryCount,
                                task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height,
-                               task.lineWidth, task.lineType, task.dotSize, task.lowRes.Width, task.lowRes.Height,
-                               task.maxZmeters, task.redOptions.PointCloudReduction, task.cvFontSize, task.cvFontThickness,
-                               task.clickPoint.X, task.clickPoint.Y, task.mouseClickFlag,
+                               task.lineWidth, task.lineType, task.DotSize, task.lowRes.Width, task.lowRes.Height,
+                               task.MaxZmeters, task.redOptions.PointCloudReduction, task.cvFontSize, task.cvFontThickness,
+                               task.ClickPoint.X, task.ClickPoint.Y, task.mouseClickFlag,
                                task.mousePicTag, task.mouseMovePoint.X, task.mouseMovePoint.Y,
                                task.paletteIndex, 255, task.midHeartBeat,
                                task.quarterBeat, task.redOptions.colorInputIndex, task.redOptions.depthInputIndex,

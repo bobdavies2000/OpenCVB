@@ -1,18 +1,18 @@
 Imports cv = OpenCvSharp
 Public Class Mouse_Basics : Inherits VB_Parent
+    Dim lastPoint = New cv.Point
+    Dim colorIndex As Integer
     Public Sub New()
         labels(2) = "Move the mouse below to show mouse tracking."
         desc = "Test the mousePoint interface"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static lastPoint = New cv.Point
         ' only display mouse movement in the lower left image (pic.tag = 2)
         If lastPoint = task.mouseMovePoint Or task.mousePicTag <> 2 Then Exit Sub
         lastPoint = task.mouseMovePoint
-        Static colorIndex As Integer
         Dim nextColor = task.scalarColors(colorIndex)
         Dim nextPt = task.mouseMovePoint
-        DrawCircle(dst2,nextPt, task.dotSize + 3, nextColor)
+        DrawCircle(dst2,nextPt, task.DotSize + 3, nextColor)
         colorIndex += 1
         If colorIndex >= task.scalarColors.Count Then colorIndex = 0
     End Sub
@@ -26,7 +26,7 @@ Public Class Mouse_LeftClickZoom : Inherits VB_Parent
         desc = "Demonstrate what the left-click enables"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        setTrueText("Left-click and drag to select a region in any of the images." + vbCrLf +
+        SetTrueText("Left-click and drag to select a region in any of the images." + vbCrLf +
                     "The selected area is a rectangle that is saved in task.drawRect." + vbCrLf +
                     "In this example, the selected region from the BGR image will be resized to fit in the Result2 image to the right." + vbCrLf +
                     "Double-click an image to remove the selected region.")
@@ -45,15 +45,15 @@ End Class
 Public Class Mouse_ClickPointUsage : Inherits VB_Parent
     Dim feat As New Feature_Basics
     Public Sub New()
-        desc = "This algorithm shows how to use task.clickPoint to dynamically identify what to break on."
+        desc = "This algorithm shows how to use task.ClickPoint to dynamically identify what to break on."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        setTrueText("Click on one of the feature points (carefully) to hit the breakpoint below.")
+        SetTrueText("Click on one of the feature points (carefully) to hit the breakpoint below.")
         feat.Run(src)
         dst2 = feat.dst2
 
         For Each pt In task.features
-            If pt = task.clickPoint Then
+            If pt = task.ClickPoint Then
                 Console.WriteLine("Hit the point you selected.")
             End If
         Next

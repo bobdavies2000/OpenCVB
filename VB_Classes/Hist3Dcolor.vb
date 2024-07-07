@@ -64,7 +64,7 @@ Public Class Hist3Dcolor_UniqueRGBPixels : Inherits VB_Parent
                 Next
             Next
         Next
-        setTrueText("There are " + CStr(pixels.Count) + " non-zero entries in the 3D histogram " + vbCrLf + "See uniquePixels list in Hist3Dcolor_UniquePixels", 2)
+        SetTrueText("There are " + CStr(pixels.Count) + " non-zero entries in the 3D histogram " + vbCrLf + "See uniquePixels list in Hist3Dcolor_UniquePixels", 2)
     End Sub
 End Class
 
@@ -96,7 +96,7 @@ Public Class Hist3Dcolor_TopXColors : Inherits VB_Parent
             topXPixels.Add(sortedPixels.ElementAt(i).Value.ToPoint3i)
             If topXPixels.Count >= mapTopX Then Exit For
         Next
-        setTrueText("There are " + CStr(sortedPixels.Count) + " non-zero entries in the 3D histogram " + vbCrLf + "The top " + CStr(mapTopX) + " pixels are in topXPixels", 2)
+        SetTrueText("There are " + CStr(sortedPixels.Count) + " non-zero entries in the 3D histogram " + vbCrLf + "The top " + CStr(mapTopX) + " pixels are in topXPixels", 2)
     End Sub
 End Class
 
@@ -118,7 +118,7 @@ Public Class Hist3Dcolor_Reduction : Inherits VB_Parent
         desc = "Backproject the 3D histogram for RGB after reduction"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 3 Then src = task.color
+        If src.Channels() <> 3 Then src = task.color
         reduction.Run(src)
 
         hColor.Run(reduction.dst2)
@@ -143,7 +143,7 @@ Public Class Hist3Dcolor_ZeroGroups : Inherits VB_Parent
         desc = "Breakdown the 3D histogram using the '0' entries as boundaries between clusters."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 3 Then src = task.color
+        If src.Channels() <> 3 Then src = task.color
 
         If task.optionsChanged Then
             Dim bins = task.redOptions.HistBinBar3D.Value
@@ -228,7 +228,7 @@ Public Class Hist3Dcolor_Select : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         hColor.Run(src)
 
-        Dim selection = task.gOptions.DebugSlider.Value
+        Dim selection = task.gOptions.DebugSliderValue
         dst2 = hColor.dst2.InRange(selection, selection)
         Dim saveCount = dst2.CountNonZero
 
@@ -298,7 +298,7 @@ Public Class Hist3Dcolor_Diff : Inherits VB_Parent
     Dim diff As New Diff_Basics
     Public Sub New()
         task.gOptions.pixelDiffThreshold = 0
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "Create a mask for the color pixels that are changing with every frame of the Hist3Dcolor_basics."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -332,7 +332,7 @@ Public Class Hist3Dcolor_Vector : Inherits VB_Parent
         desc = "Capture a 3D color histogram for input src - likely to be src(rect)."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 3 Then src = task.color
+        If src.Channels() <> 3 Then src = task.color
         If task.optionsChanged Then
             Dim bins = task.redOptions.HistBinBar3D.Value
             binArray = {bins, bins, bins}
@@ -342,6 +342,6 @@ Public Class Hist3Dcolor_Vector : Inherits VB_Parent
 
         ReDim histArray(histogram.Total - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
-        If standaloneTest() Then setTrueText("Vector prepared in histArray")
+        If standaloneTest() Then SetTrueText("Vector prepared in histArray")
     End Sub
 End Class

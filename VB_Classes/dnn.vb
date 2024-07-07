@@ -9,7 +9,7 @@ Public Class DNN_Test : Inherits VB_Parent
     Dim classnames() As String
     Public Sub New()
 
-        Dim modelFile As New FileInfo(task.homeDir + "Data/bvlc_googlenet.caffemodel")
+        Dim modelFile As New FileInfo(task.HomeDir + "Data/bvlc_googlenet.caffemodel")
         If File.Exists(modelFile.FullName) = False Then
             ' this site is apparently gone.  caffemodel is in the Data directory in OpenCVB_HomeDir
             Dim client = HttpWebRequest.CreateHttp("http://dl.caffe.berkeleyvision.org/bvlc_googlenet.caffemodel")
@@ -19,9 +19,9 @@ Public Class DNN_Test : Inherits VB_Parent
             responseStream.CopyTo(memory)
             File.WriteAllBytes(modelFile.FullName, memory.ToArray)
         End If
-        Dim protoTxt = task.homeDir + "Data/bvlc_googlenet.prototxt"
+        Dim protoTxt = task.HomeDir + "Data/bvlc_googlenet.prototxt"
         net = CvDnn.ReadNetFromCaffe(protoTxt, modelFile.FullName)
-        Dim synsetWords = task.homeDir + "Data/synset_words.txt"
+        Dim synsetWords = task.HomeDir + "Data/synset_words.txt"
         classnames = File.ReadAllLines(synsetWords) ' .Select(line >= line.Split(' ').Last()).ToArray()
         For i = 0 To classNames.Count - 1
             classNames(i) = classNames(i).Split(" ").Last
@@ -32,14 +32,14 @@ Public Class DNN_Test : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
 
-        Dim image = cv.Cv2.ImRead(task.homeDir + "Data/space_shuttle.jpg")
+        Dim image = cv.Cv2.ImRead(task.HomeDir + "Data/space_shuttle.jpg")
         dst3 = image.Resize(dst3.Size())
         Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
         net.SetInput(inputBlob, "data")
         Dim prob = net.Forward("prob")
 
         Dim mm as mmData = GetMinMax(prob.Reshape(1, 1))
-        setTrueText("Best classification: index = " + CStr(mm.maxLoc.X) + " which is for '" + classnames(mm.maxLoc.X) + "' with Probability " +
+        SetTrueText("Best classification: index = " + CStr(mm.maxLoc.X) + " which is for '" + classnames(mm.maxLoc.X) + "' with Probability " +
                     Format(mm.maxVal, "#0.00%"), New cv.Point(40, 200))
     End Sub
 End Class
@@ -58,14 +58,11 @@ Public Class DNN_Basics : Inherits VB_Parent
     Dim testImage As cv.Mat
     Dim kalman(10) As Kalman_Basics
     Public rect As cv.Rect
+    Dim options As New Options_DNN
     Dim classNames() = {"background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse",
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
+    Dim activeKalman As Integer
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("DNN Scale Factor", 1, 10000, 78)
-            sliders.setupTrackBar("DNN MeanVal", 1, 255, 127)
-            sliders.setupTrackBar("DNN Confidence Threshold", 1, 100, 80)
-        End If
         For i = 0 To kalman.Count - 1
             kalman(i) = New Kalman_Basics()
             ReDim kalman(i).kInput(4 - 1)
@@ -76,27 +73,26 @@ Public Class DNN_Basics : Inherits VB_Parent
         dnnHeight = dst2.Height
         crop = New cv.Rect(dst2.Width / 2 - dnnWidth / 2, dst2.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
 
-        Dim infoText As New FileInfo(task.homeDir + "Data/MobileNetSSD_deploy.prototxt")
+        Dim infoText As New FileInfo(task.HomeDir + "Data/MobileNetSSD_deploy.prototxt")
         If infoText.Exists Then
-            Dim infoModel As New FileInfo(task.homeDir + "Data/MobileNetSSD_deploy.caffemodel")
+            Dim infoModel As New FileInfo(task.HomeDir + "Data/MobileNetSSD_deploy.caffemodel")
             If infoModel.Exists Then
                 net = CvDnn.ReadNetFromCaffe(infoText.FullName, infoModel.FullName)
                 dnnPrepared = True
             End If
         End If
         If dnnPrepared = False Then
-            setTrueText("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.")
+            SetTrueText("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.")
         End If
         desc = "Use OpenCV's dnn from Caffe file."
         labels(2) = "Cropped Input Image - must be square!"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static scaleSlider = FindSlider("DNN Scale Factor")
-        Static meanSlider = FindSlider("DNN MeanVal")
-        Static confidenceSlider = FindSlider("DNN Confidence Threshold")
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         If dnnPrepared Then
-            Dim inScaleFactor As Single = scaleSlider.Value / scaleSlider.Maximum ' should be 0.0078 by default...
-            Dim inputBlob = CvDnn.BlobFromImage(src(crop), inScaleFactor, New cv.Size(300, 300), CSng(meanSlider.Value), False)
+            Dim inScaleFactor As Single = options.ScaleFactor / options.scaleMax ' should be 0.0078 by default...
+            Dim inputBlob = CvDnn.BlobFromImage(src(crop), inScaleFactor, New cv.Size(300, 300), CSng(options.meanValue), False)
             src.CopyTo(dst3)
             src(crop).CopyTo(dst2(crop))
             net.SetInput(inputBlob, "data")
@@ -104,7 +100,6 @@ Public Class DNN_Basics : Inherits VB_Parent
             Dim detection = net.Forward("detection_out")
             Dim detectionMat = New cv.Mat(detection.Size(2), detection.Size(3), cv.MatType.CV_32F, detection.Data)
 
-            Dim confidenceThreshold As Single = confidenceSlider.Value / 100
             Dim rows = src(crop).Rows
             Dim cols = src(crop).Cols
             labels(3) = ""
@@ -112,7 +107,7 @@ Public Class DNN_Basics : Inherits VB_Parent
             Dim kPoints As New List(Of cv.Point)
             For i = 0 To detectionMat.Rows - 1
                 Dim confidence = detectionMat.Get(Of Single)(i, 2)
-                If confidence > confidenceThreshold Then
+                If confidence > options.confidenceThreshold Then
                     Dim vec = detectionMat.Get(Of cv.Vec4f)(i, 3)
                     If kalman(i).kInput(0) = 0 And kalman(i).kInput(1) = 0 Then
                         kPoints.Add(New cv.Point2f(vec(0) * cols + crop.Left, vec(1) * rows + crop.Top))
@@ -122,11 +117,10 @@ Public Class DNN_Basics : Inherits VB_Parent
                 End If
             Next
 
-            Static activeKalman As Integer
             If kPoints.Count > activeKalman Then activeKalman = kPoints.Count
             For i = 0 To detectionMat.Rows - 1
                 Dim confidence = detectionMat.Get(Of Single)(i, 2)
-                If confidence > confidenceThreshold Then
+                If confidence > options.confidenceThreshold Then
                     Dim nextName = classNames(CInt(detectionMat.Get(Of Single)(i, 1)))
                     labels(3) += nextName + " "  ' display the name of what we found.
                     Dim vec = detectionMat.Get(Of cv.Vec4f)(i, 3)
@@ -153,7 +147,7 @@ Public Class DNN_Basics : Inherits VB_Parent
                     rect.Width = src.Width / 12
                     rect.Height = src.Height / 16
                     dst3.Rectangle(rect, cv.Scalar.Black, -1)
-                    setTrueText(nextName, New cv.Point(rect.X, rect.Y), 3)
+                    SetTrueText(nextName, New cv.Point(rect.X, rect.Y), 3)
                 End If
             Next
 
@@ -179,6 +173,8 @@ End Class
 Public Class DNN_SuperRes : Inherits VB_Parent
     Public options As New Options_DNN
     Public dnn = New DnnSuperResImpl("fsrcnn", 4)
+    Dim saveModelFile = ""
+    Dim multiplier As Integer
     Public Sub New()
         task.drawRect = New cv.Rect(10, 10, 20, 20)
         labels(2) = "Output of a resize using OpenCV"
@@ -186,8 +182,6 @@ Public Class DNN_SuperRes : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         options.RunVB()
-        Static saveModelFile = ""
-        Static multiplier As Integer
         If saveModelFile <> options.superResModelFileName Then
             saveModelFile = options.superResModelFileName
             multiplier = options.superResMultiplier

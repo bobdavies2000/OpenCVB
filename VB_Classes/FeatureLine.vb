@@ -25,7 +25,7 @@ Public Class FeatureLine_Basics : Inherits VB_Parent
             lines.Run(src.Clone)
 
             If lines.mpList.Count = 0 Then
-                setTrueText("No lines found.", 3)
+                SetTrueText("No lines found.", 3)
                 Exit Sub
             End If
             Dim lp = lines.sortByLen.ElementAt(0).Value
@@ -39,14 +39,14 @@ Public Class FeatureLine_Basics : Inherits VB_Parent
             match.tCells(0) = tcells(i)
             match.Run(src)
             tcells(i) = match.tCells(0)
-            setTrueText(tcells(i).strOut, New cv.Point(tcells(i).rect.X, tcells(i).rect.Y))
-            setTrueText(tcells(i).strOut, New cv.Point(tcells(i).rect.X, tcells(i).rect.Y), 3)
+            SetTrueText(tcells(i).strOut, New cv.Point(tcells(i).rect.X, tcells(i).rect.Y))
+            SetTrueText(tcells(i).strOut, New cv.Point(tcells(i).rect.X, tcells(i).rect.Y), 3)
         Next
 
         lineDisp.tcells = New List(Of tCell)(tcells)
         lineDisp.Run(src)
         dst2 = lineDisp.dst2
-        setTrueText(lineDisp.strOut, New cv.Point(10, 40), 3)
+        SetTrueText(lineDisp.strOut, New cv.Point(10, 40), 3)
     End Sub
 End Class
 
@@ -84,7 +84,7 @@ Public Class FeatureLine_VH : Inherits VB_Parent
     Dim gLines As New Line_GCloud
     Dim options As New Options_Features
     Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Vertical lines")
             radio.addRadio("Horizontal lines")
@@ -99,10 +99,10 @@ Public Class FeatureLine_VH : Inherits VB_Parent
         ' gLines.lines.subsetRect = New cv.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6)
         gLines.Run(src)
 
-        Static vertRadio = findRadio("Vertical lines")
+        Static vertRadio = FindRadio("Vertical lines")
         Dim sortedLines = If(vertRadio.checked, gLines.sortedVerticals, gLines.sortedHorizontals)
         If sortedLines.Count = 0 Then
-            setTrueText("There were no vertical lines found.", 3)
+            SetTrueText("There were no vertical lines found.", 3)
             Exit Sub
         End If
 
@@ -142,11 +142,11 @@ Public Class FeatureLine_VH : Inherits VB_Parent
                 tc = Choose(j + 1, gc.tc1, gc.tc2)
                 If j = 0 Then p1 = tc.center Else p2 = tc.center
             Next
-            setTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gc.arcY, fmt1), gc.tc1.center, 2)
-            setTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gc.arcY, fmt1), gc.tc1.center, 3)
+            SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gc.arcY, fmt1), gc.tc1.center, 2)
+            SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gc.arcY, fmt1), gc.tc1.center, 3)
 
-            DrawLine(dst2, p1, p2, task.highlightColor)
-            DrawLine(dst3, p1, p2, task.highlightColor)
+            DrawLine(dst2, p1, p2, task.HighlightColor)
+            DrawLine(dst3, p1, p2, task.HighlightColor)
         Next
     End Sub
 End Class
@@ -170,7 +170,7 @@ Public Class FeatureLine_Tutorial1 : Inherits VB_Parent
         lines.Run(src)
         dst2 = lines.dst2
 
-        Dim raw2D As New List(Of pointPair)
+        Dim raw2D As New List(Of PointPair)
         Dim raw3D As New List(Of cv.Point3f)
         For Each lp In lines.lpList
             If task.pcSplit(2).Get(Of Single)(lp.p1.Y, lp.p1.X) > 0 And task.pcSplit(2).Get(Of Single)(lp.p2.Y, lp.p2.X) > 0 Then
@@ -182,7 +182,7 @@ Public Class FeatureLine_Tutorial1 : Inherits VB_Parent
 
         dst3 = src
         For i = 0 To raw2D.Count - 2 Step 2
-            DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, task.highlightColor)
+            DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, task.HighlightColor)
         Next
         If task.heartBeat Then labels(2) = "Starting with " + Format(lines.lpList.Count, "000") + " lines, there are " +
                                            Format(raw3D.Count / 2, "000") + " with depth data."
@@ -210,13 +210,13 @@ Public Class FeatureLine_Tutorial2 : Inherits VB_Parent
         lines.Run(src)
         dst2 = lines.dst2
 
-        Dim raw2D As New List(Of pointPair)
+        Dim raw2D As New List(Of PointPair)
         Dim raw3D As New List(Of cv.Point3f)
         For Each lp In lines.lpList
             Dim pt1 As cv.Point3f, pt2 As cv.Point3f
             For j = 0 To 1
                 Dim pt = Choose(j + 1, lp.p1, lp.p2)
-                Dim rect = validateRect(New cv.Rect(pt.x - k, pt.y - k, kernel, kernel))
+                Dim rect = ValidateRect(New cv.Rect(pt.x - k, pt.y - k, kernel, kernel))
                 Dim val = task.pointCloud(rect).Mean(task.depthMask(rect))
                 If j = 0 Then pt1 = New cv.Point3f(val(0), val(1), val(2)) Else pt2 = New cv.Point3f(val(0), val(1), val(2))
             Next
@@ -229,12 +229,12 @@ Public Class FeatureLine_Tutorial2 : Inherits VB_Parent
 
         dst3 = src
         For i = 0 To raw2D.Count - 2 Step 2
-            DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, task.highlightColor)
+            DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, task.HighlightColor)
         Next
         If task.heartBeat Then labels(2) = "Starting with " + Format(lines.lpList.Count, "000") + " lines, there are " +
                                            Format(raw3D.Count, "000") + " with depth data."
         If raw3D.Count = 0 Then
-            setTrueText("No vertical or horizontal lines were found")
+            SetTrueText("No vertical or horizontal lines were found")
         Else
             gMat.Run(empty)
             task.gMatrix = gMat.gMatrix
@@ -257,7 +257,7 @@ Public Class FeatureLine_LongestVerticalKNN : Inherits VB_Parent
         labels(3) = "All vertical lines.  The numbers: index and Arc-Y for the longest X vertical lines."
         desc = "Find all the vertical lines and then track the longest one with a lightweight KNN."
     End Sub
-    Private Function testLastPair(lastPair As pointPair, gc As gravityLine) As Boolean
+    Private Function testLastPair(lastPair As PointPair, gc As gravityLine) As Boolean
         Dim distance1 = lastPair.p1.DistanceTo(lastPair.p2)
         Dim p1 = gc.tc1.center
         Dim p2 = gc.tc2.center
@@ -267,25 +267,25 @@ Public Class FeatureLine_LongestVerticalKNN : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         gLines.Run(src)
         If gLines.sortedVerticals.Count = 0 Then
-            setTrueText("No vertical lines were present", 3)
+            SetTrueText("No vertical lines were present", 3)
             Exit Sub
         End If
 
         dst3 = src.Clone
         Dim index As Integer
 
-        If testLastPair(longest.knn.lastPair, gLines.sortedVerticals.ElementAt(0).Value) Then longest.knn.lastPair = New pointPair
+        If testLastPair(longest.knn.lastPair, gLines.sortedVerticals.ElementAt(0).Value) Then longest.knn.lastPair = New PointPair
         For Each gc In gLines.sortedVerticals.Values
             If index >= 10 Then Exit For
 
             Dim p1 = gc.tc1.center
             Dim p2 = gc.tc2.center
-            If longest.knn.lastPair.compare(New pointPair) Then longest.knn.lastPair = New pointPair(p1, p2)
+            If longest.knn.lastPair.compare(New PointPair) Then longest.knn.lastPair = New PointPair(p1, p2)
             Dim pt = New cv.Point((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
-            setTrueText(CStr(index) + vbCrLf + Format(gc.arcY, fmt1), pt, 3)
+            SetTrueText(CStr(index) + vbCrLf + Format(gc.arcY, fmt1), pt, 3)
             index += 1
 
-            DrawLine(dst3, p1, p2, task.highlightColor)
+            DrawLine(dst3, p1, p2, task.HighlightColor)
             longest.knn.trainInput.Add(p1)
             longest.knn.trainInput.Add(p2)
         Next
@@ -311,16 +311,16 @@ Public Class FeatureLine_LongestV_Tutorial1 : Inherits VB_Parent
         lines.Run(src)
 
         If lines.sortedVerticals.Count = 0 Then
-            setTrueText("No vertical lines were found", 3)
+            SetTrueText("No vertical lines were found", 3)
             Exit Sub
         End If
 
         Dim index = lines.sortedVerticals.ElementAt(0).Value
         Dim p1 = lines.lines2D(index)
         Dim p2 = lines.lines2D(index + 1)
-        DrawLine(dst2, p1, p2, task.highlightColor)
+        DrawLine(dst2, p1, p2, task.HighlightColor)
         dst3.SetTo(0)
-        DrawLine(dst3, p1, p2, task.highlightColor)
+        DrawLine(dst3, p1, p2, task.HighlightColor)
     End Sub
 End Class
 
@@ -334,6 +334,7 @@ Public Class FeatureLine_LongestV_Tutorial2 : Inherits VB_Parent
     Dim knn As New KNN_Core4D
     Public pt1 As New cv.Point3f
     Public pt2 As New cv.Point3f
+    Dim lengthReject As Integer
     Public Sub New()
         desc = "Use FeatureLine_Finder to find all the vertical lines.  Use KNN_Core4D to track each line."
     End Sub
@@ -343,7 +344,7 @@ Public Class FeatureLine_LongestV_Tutorial2 : Inherits VB_Parent
         dst1 = lines.dst3
 
         If lines.sortedVerticals.Count = 0 Then
-            setTrueText("No vertical lines were found", 3)
+            SetTrueText("No vertical lines were found", 3)
             Exit Sub
         End If
 
@@ -368,13 +369,12 @@ Public Class FeatureLine_LongestV_Tutorial2 : Inherits VB_Parent
         Dim p2 = New cv.Point2f(knn.trainInput(index)(2), knn.trainInput(index)(3))
         pt1 = match3D(index * 2)
         pt2 = match3D(index * 2 + 1)
-        DrawLine(dst2, p1, p2, task.highlightColor)
+        DrawLine(dst2, p1, p2, task.HighlightColor)
         dst3.SetTo(0)
-        DrawLine(dst3, p1, p2, task.highlightColor)
+        DrawLine(dst3, p1, p2, task.HighlightColor)
 
         Static lastLength = lines.sorted2DV.ElementAt(0).Key
         Dim bestLength = lines.sorted2DV.ElementAt(0).Key
-        Static lengthReject As Integer
         knn.queries.Clear()
         If lastLength > 0.5 * bestLength Then
             knn.queries.Add(New cv.Vec4f(p1.X, p1.Y, p2.X, p2.Y))
@@ -423,13 +423,13 @@ Public Class FeatureLine_Finder : Inherits VB_Parent
         lines.Run(src)
         dst2 = lines.dst2
 
-        Dim raw2D As New List(Of pointPair)
+        Dim raw2D As New List(Of PointPair)
         Dim raw3D As New List(Of cv.Point3f)
         For Each lp In lines.lpList
             Dim pt1 As cv.Point3f, pt2 As cv.Point3f
             For j = 0 To 1
                 Dim pt = Choose(j + 1, lp.p1, lp.p2)
-                Dim rect = validateRect(New cv.Rect(pt.x - k, pt.y - k, kernel, kernel))
+                Dim rect = ValidateRect(New cv.Rect(pt.x - k, pt.y - k, kernel, kernel))
                 Dim val = task.pointCloud(rect).Mean(task.depthMask(rect))
                 If j = 0 Then pt1 = New cv.Point3f(val(0), val(1), val(2)) Else pt2 = New cv.Point3f(val(0), val(1), val(2))
             Next
@@ -442,7 +442,7 @@ Public Class FeatureLine_Finder : Inherits VB_Parent
         Next
 
         If raw3D.Count = 0 Then
-            setTrueText("No vertical or horizontal lines were found")
+            SetTrueText("No vertical or horizontal lines were found")
         Else
             Dim matLines3D As cv.Mat = (New cv.Mat(raw3D.Count, 3, cv.MatType.CV_32F, raw3D.ToArray)) * task.gMatrix
 
@@ -507,7 +507,7 @@ Public Class FeatureLine_VerticalLongLine : Inherits VB_Parent
             lines.Run(src)
 
             If lines.sortedVerticals.Count = 0 Then
-                setTrueText("No vertical lines were found", 3)
+                SetTrueText("No vertical lines were found", 3)
                 Exit Sub
             End If
         End If
@@ -516,15 +516,15 @@ Public Class FeatureLine_VerticalLongLine : Inherits VB_Parent
         Dim index = lines.sortedVerticals.ElementAt(0).Value
         Dim p1 = lines.lines2D(index)
         Dim p2 = lines.lines2D(index + 1)
-        DrawLine(dst2, p1, p2, task.highlightColor)
+        DrawLine(dst2, p1, p2, task.HighlightColor)
         dst3.SetTo(0)
-        DrawLine(dst3, p1, p2, task.highlightColor)
+        DrawLine(dst3, p1, p2, task.HighlightColor)
         Dim pt1 = lines.lines3D(index)
         Dim pt2 = lines.lines3D(index + 1)
         Dim len3D = distance3D(pt1, pt2)
         Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
-        setTrueText(Format(arcY, fmt3) + vbCrLf + Format(len3D, fmt3) + "m len" + vbCrLf + Format(pt1.Z, fmt1) + "m dist", p1)
-        setTrueText(Format(arcY, fmt3) + vbCrLf + Format(len3D, fmt3) + "m len" + vbCrLf + Format(pt1.Z, fmt1) + "m distant", p1, 3)
+        SetTrueText(Format(arcY, fmt3) + vbCrLf + Format(len3D, fmt3) + "m len" + vbCrLf + Format(pt1.Z, fmt1) + "m dist", p1)
+        SetTrueText(Format(arcY, fmt3) + vbCrLf + Format(len3D, fmt3) + "m len" + vbCrLf + Format(pt1.Z, fmt1) + "m distant", p1, 3)
     End Sub
 End Class
 
@@ -538,6 +538,8 @@ Public Class FeatureLine_DetailsAll : Inherits VB_Parent
     Dim flow As New Font_FlowText
     Dim arcList As New List(Of Single)
     Dim arcLongAverage As New List(Of Single)
+    Dim firstAverage As New List(Of Single)
+    Dim firstBest As Integer
     Public Sub New()
         flow.dst = 3
         desc = "Use FeatureLine_Finder data to collect vertical lines and measure accuracy of each."
@@ -548,7 +550,7 @@ Public Class FeatureLine_DetailsAll : Inherits VB_Parent
             lines.Run(src)
 
             If lines.sortedVerticals.Count = 0 Then
-                setTrueText("No vertical lines were found", 3)
+                SetTrueText("No vertical lines were found", 3)
                 Exit Sub
             End If
 
@@ -560,9 +562,9 @@ Public Class FeatureLine_DetailsAll : Inherits VB_Parent
                 Dim index = lines.sortedVerticals.ElementAt(i).Value
                 Dim p1 = lines.lines2D(index)
                 Dim p2 = lines.lines2D(index + 1)
-                DrawLine(dst2, p1, p2, task.highlightColor)
-                setTrueText(CStr(i), If(i Mod 2, p1, p2), 2)
-                DrawLine(dst3, p1, p2, task.highlightColor)
+                DrawLine(dst2, p1, p2, task.HighlightColor)
+                SetTrueText(CStr(i), If(i Mod 2, p1, p2), 2)
+                DrawLine(dst3, p1, p2, task.HighlightColor)
 
                 Dim pt1 = lines.lines3D(index)
                 Dim pt2 = lines.lines3D(index + 1)
@@ -575,9 +577,8 @@ Public Class FeatureLine_DetailsAll : Inherits VB_Parent
             Next
         End If
         flow.Run(Nothing)
+        If arcList.Count = 0 Then Exit Sub
 
-        Static firstAverage As New List(Of Single)
-        Static firstBest As Integer
         Dim mostAccurate = arcList(0)
         firstAverage.Add(mostAccurate)
         For Each arc In arcList
@@ -610,6 +611,7 @@ Public Class FeatureLine_LongestKNN : Inherits VB_Parent
     Public options As New Options_Features
     Public gline As gravityLine
     Public match As New Match_Basics
+    Dim p1 As cv.Point, p2 As cv.Point
     Public Sub New()
         desc = "Find and track the longest line in the BGR image with a lightweight KNN."
     End Sub
@@ -617,25 +619,24 @@ Public Class FeatureLine_LongestKNN : Inherits VB_Parent
         options.RunVB()
         dst2 = src
 
-        Static p1 As cv.Point, p2 As cv.Point
         knn.Run(src.Clone)
         p1 = knn.lastPair.p1
         p2 = knn.lastPair.p2
         gline = glines.updateGLine(src, gline, p1, p2)
 
-        Dim rect = validateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
+        Dim rect = ValidateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
         match.template = src(rect)
         match.Run(src)
         If match.correlation >= options.correlationMin Then
             dst3 = match.dst0.Resize(dst3.Size)
-            DrawLine(dst2, p1, p2, task.highlightColor)
-            DrawCircle(dst2,p1, task.dotSize, task.highlightColor)
-            DrawCircle(dst2,p2, task.dotSize, task.highlightColor)
-            rect = validateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
+            DrawLine(dst2, p1, p2, task.HighlightColor)
+            DrawCircle(dst2,p1, task.DotSize, task.HighlightColor)
+            DrawCircle(dst2,p2, task.DotSize, task.HighlightColor)
+            rect = ValidateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
             match.template = src(rect).Clone
         Else
-            task.highlightColor = If(task.highlightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
-            knn.lastPair = New pointPair(New cv.Point2f, New cv.Point2f)
+            task.HighlightColor = If(task.HighlightColor = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
+            knn.lastPair = New PointPair(New cv.Point2f, New cv.Point2f)
         End If
         labels(2) = "Longest line end points had correlation of " + Format(match.correlation, fmt3) + " with the original longest line."
     End Sub
@@ -669,11 +670,11 @@ Public Class FeatureLine_Longest : Inherits VB_Parent
             knn.Run(src.Clone)
 
             p1 = knn.lastPair.p1
-            Dim r1 = validateRect(New cv.Rect(p1.X - templatePad, p1.Y - templatePad, templateSize, templateSize))
+            Dim r1 = ValidateRect(New cv.Rect(p1.X - templatePad, p1.Y - templatePad, templateSize, templateSize))
             match1.template = src(r1).Clone
 
             p2 = knn.lastPair.p2
-            Dim r2 = validateRect(New cv.Rect(p2.X - templatePad, p2.Y - templatePad, templateSize, templateSize))
+            Dim r2 = ValidateRect(New cv.Rect(p2.X - templatePad, p2.Y - templatePad, templateSize, templateSize))
             match2.template = src(r2).Clone
         End If
 
@@ -684,10 +685,10 @@ Public Class FeatureLine_Longest : Inherits VB_Parent
         p2 = match2.matchCenter
 
         gline = glines.updateGLine(src, gline, p1, p2)
-        DrawLine(dst2, p1, p2, task.highlightColor)
-        DrawCircle(dst2,p1, task.dotSize, task.highlightColor)
-        DrawCircle(dst2,p2, task.dotSize, task.highlightColor)
-        setTrueText(Format(match1.correlation, fmt3), p1)
-        setTrueText(Format(match2.correlation, fmt3), p2)
+        DrawLine(dst2, p1, p2, task.HighlightColor)
+        DrawCircle(dst2,p1, task.DotSize, task.HighlightColor)
+        DrawCircle(dst2,p2, task.DotSize, task.HighlightColor)
+        SetTrueText(Format(match1.correlation, fmt3), p1)
+        SetTrueText(Format(match2.correlation, fmt3), p2)
     End Sub
 End Class

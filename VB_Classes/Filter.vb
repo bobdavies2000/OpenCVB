@@ -82,8 +82,8 @@ Public Class Filter_SepFilter2D : Inherits VB_Parent
         dst2 = src.GaussianBlur(New cv.Size(options.xDim, options.yDim), options.sigma)
         dst3 = src.SepFilter2D(cv.MatType.CV_8UC3, kernel, kernel)
         If options.diffCheck Then
-            Dim graySep = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            Dim grayGauss = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim graySep = dst3.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+            Dim grayGauss = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
             dst3 = (graySep - grayGauss).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
             labels(3) = "Gaussian - SepFilter2D " + CStr(dst3.CountNonZero) + " pixels different."
         Else

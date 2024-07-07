@@ -2,10 +2,10 @@
 Public Class Gravity_Basics : Inherits VB_Parent
     Public points As New List(Of cv.Point)
     Dim resizeRatio As Integer = 1
-    Public vec As New pointPair
+    Public vec As New PointPair
     Public autoDisplay As Boolean
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Find all the points where depth X-component transitions from positive to negative"
     End Sub
     Public Sub displayResults(p1 As cv.Point, p2 As cv.Point)
@@ -17,14 +17,14 @@ Public Class Gravity_Basics : Inherits VB_Parent
         dst3.SetTo(0)
         For Each pt In points
             pt = New cv.Point(pt.X * resizeRatio, pt.Y * resizeRatio)
-            DrawCircle(dst2,pt, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst2,pt, task.DotSize, cv.Scalar.White)
         Next
 
         DrawLine(dst2, vec.p1, vec.p2, cv.Scalar.White)
         DrawLine(dst3, vec.p1, vec.p2, cv.Scalar.White)
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then dst0 = vbPrepareDepthInput(0) Else dst0 = src
+        If src.Type <> cv.MatType.CV_32F Then dst0 = PrepareDepthInput(0) Else dst0 = src
 
         Dim resolution = task.quarterRes
         If dst0.Size <> resolution Then
@@ -34,7 +34,7 @@ Public Class Gravity_Basics : Inherits VB_Parent
 
         dst0 = dst0.Abs()
         dst1 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-        dst0.SetTo(task.maxZmeters, Not dst1)
+        dst0.SetTo(task.MaxZmeters, Not dst1)
 
         points.Clear()
         For i = dst0.Height / 3 To dst0.Height * 2 / 3 - 1
@@ -57,15 +57,15 @@ Public Class Gravity_Basics : Inherits VB_Parent
         Dim distance = p1.DistanceTo(p2)
         If distance < 10 Then ' enough to get a line with some credibility
             points.Clear()
-            vec = New pointPair
+            vec = New PointPair
             strOut = "Gravity vector not found " + vbCrLf + "The distance of p1 to p2 is " + CStr(CInt(distance)) + " pixels."
         Else
-            Dim lp = New pointPair(p1, p2)
+            Dim lp = New PointPair(p1, p2)
             vec = lp.edgeToEdgeLine(dst2.Size)
             If standaloneTest() Or autoDisplay Then displayResults(p1, p2)
         End If
 
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -74,9 +74,9 @@ End Class
 
 
 Public Class Gravity_BasicsOriginal : Inherits VB_Parent
-    Public vec As New pointPair
+    Public vec As New PointPair
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Search for the transition from positive to negative to find the gravity vector."
     End Sub
     Private Function findTransition(startRow As Integer, stopRow As Integer, stepRow As Integer) As cv.Point2f
@@ -99,18 +99,18 @@ Public Class Gravity_BasicsOriginal : Inherits VB_Parent
         Return New cv.Point
     End Function
     Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then dst0 = vbPrepareDepthInput(0) Else dst0 = src
+        If src.Type <> cv.MatType.CV_32F Then dst0 = PrepareDepthInput(0) Else dst0 = src
 
         Dim p1 = findTransition(0, dst0.Height - 1, 1)
         Dim p2 = findTransition(dst0.Height - 1, 0, -1)
-        Dim lp = New pointPair(p1, p2)
+        Dim lp = New PointPair(p1, p2)
         vec = lp.edgeToEdgeLine(dst2.Size)
 
         If p1.X >= 1 Then
             strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +
                       Format(dst0.Get(Of Single)(p1.Y, p1.X)) + vbCrLf + "lastVal = " + Format(dst0.Get(Of Single)(p1.Y, p1.X - 1))
         End If
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
 
         If standaloneTest() Then
             dst2.SetTo(0)
@@ -142,11 +142,11 @@ Public Class Gravity_HorizonCompare : Inherits VB_Parent
         Dim h2 = task.horizonVec
 
         If standaloneTest() Then
-            setTrueText(strOut, 3)
+            SetTrueText(strOut, 3)
 
             dst2.SetTo(0)
-            DrawLine(dst2, g1.p1, g1.p2, task.highlightColor)
-            DrawLine(dst2, g2.p1, g2.p2, task.highlightColor)
+            DrawLine(dst2, g1.p1, g1.p2, task.HighlightColor)
+            DrawLine(dst2, g2.p1, g2.p2, task.HighlightColor)
 
             DrawLine(dst2, h1.p1, h1.p2, cv.Scalar.Red)
             DrawLine(dst2, h2.p1, h2.p2, cv.Scalar.Red)
@@ -179,9 +179,9 @@ Public Class Gravity_Horizon : Inherits VB_Parent
 
         task.horizonVec = horizon.vec
         If standaloneTest() Then
-            setTrueText("Gravity vector (yellow):" + vbCrLf + gravity.strOut + vbCrLf + vbCrLf + "Horizon Vector (red): " + vbCrLf + horizon.strOut, 3)
+            SetTrueText("Gravity vector (yellow):" + vbCrLf + gravity.strOut + vbCrLf + vbCrLf + "Horizon Vector (red): " + vbCrLf + horizon.strOut, 3)
             dst2.SetTo(0)
-            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.highlightColor)
+            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.HighlightColor)
             DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
         End If
     End Sub
@@ -193,12 +193,12 @@ End Class
 
 Public Class Gravity_BasicsFail : Inherits VB_Parent
     Dim horizon As New Horizon_Basics
-    Public vec As New pointPair
+    Public vec As New PointPair
     Dim center As cv.Point
     Dim angle As Single = cv.Cv2.PI / 2
     Public Sub New()
         Dim center = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         If standalone Then labels = {"", "", "Gravity vector before rotating it back to vertical", "Gravity vector"}
         desc = "Reuse the Horizon_Basics to compute the Gravity vector - parallel but not precisely the gravity vector."
     End Sub
@@ -208,7 +208,7 @@ Public Class Gravity_BasicsFail : Inherits VB_Parent
         Return New cv.Point(x1, y1)
     End Function
     Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then dst0 = vbPrepareDepthInput(0) Else dst0 = src
+        If src.Type <> cv.MatType.CV_32F Then dst0 = PrepareDepthInput(0) Else dst0 = src
         Dim M = cv.Cv2.GetRotationMatrix2D(center, angle * 57.2958, 1)
         Dim offset = (dst2.Width - dst2.Height) / 2
         Dim r = New cv.Rect(offset, 0, dst2.Height, dst2.Height)
@@ -217,7 +217,7 @@ Public Class Gravity_BasicsFail : Inherits VB_Parent
         horizon.Run(dst2)
         Dim p1 = ptRotate(horizon.vec.p1)
         Dim p2 = ptRotate(horizon.vec.p2)
-        Dim lp = New pointPair(New cv.Point(p1.X + r.X, p1.Y), New cv.Point(p2.X + r.X, p2.Y))
+        Dim lp = New PointPair(New cv.Point(p1.X + r.X, p1.Y), New cv.Point(p2.X + r.X, p2.Y))
         vec = lp.edgeToEdgeLine(dst2.Size)
 
         If standalone Then
@@ -229,6 +229,6 @@ Public Class Gravity_BasicsFail : Inherits VB_Parent
         End If
 
         strOut = "p1 = " + vec.p1.ToString + vbCrLf + "p2 = " + vec.p2.ToString
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class

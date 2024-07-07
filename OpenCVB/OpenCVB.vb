@@ -727,7 +727,7 @@ Public Class OpenCVB
 
             For i = 1 To split.Length - 1
                 If split(i).StartsWith("Options_") = False Then
-                    If split(i).StartsWith("CSharp_") Then
+                    If split(i).StartsWith("CS_") Then
                         addNextCSplitAlgorithm(split(i), lastNameSplit)
                     Else
                         addNextAlgorithm(split(i), lastNameSplit)
@@ -1613,7 +1613,7 @@ Public Class OpenCVB
 
 
                 ' task.gridMap = New cv.Mat(task.workingRes, cv.MatType.CV_32S, 0)
-                If parms.algName.StartsWith("CSharp_") Then
+                If parms.algName.StartsWith("CS_") Then
                     Static findCSharp = New CS_Classes.CSAlgorithmList()
                     If task.csAlgorithmObject Is Nothing Then
                         task.csAlgorithmObject = findCSharp.createCSAlgorithm(parms.algName, task)
@@ -1685,9 +1685,9 @@ Public Class OpenCVB
 
                 If frameCount Mod task.fpsRate = 0 Then
                     SyncLock callTraceLock
-                        callTrace = New List(Of String)(task.callTrace)
-                        algorithm_ms = New List(Of Single)(task.algorithm_ms)
-                        algorithmNames = New List(Of String)(task.algorithmNames)
+                        callTrace = New List(Of String)(task.callTraceMain)
+                        algorithm_ms = New List(Of Single)(task.algorithm_msMain)
+                        algorithmNames = New List(Of String)(task.algorithmNamesMain)
                     End SyncLock
                 End If
 

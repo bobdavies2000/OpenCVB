@@ -30,7 +30,7 @@ Public Class Mat_PointToMat : Inherits VB_Parent
         random.Run(empty)
         dst2.SetTo(0)
         For Each pt In random.pointList
-            DrawCircle(dst2, pt, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
         Next
 
         Dim rows = random.pointList.Count
@@ -136,15 +136,15 @@ End Class
 
 
 Public Class Mat_Managed : Inherits VB_Parent
+    Dim autoRand As New Random()
+    Dim img(dst2.Total) As cv.Vec3b
+    Dim nextColor As cv.Vec3b
     Public Sub New()
         labels(2) = "Color change is in the managed cv.vec3b array"
         desc = "There is a limited ability to use Mat data in Managed code directly."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static autoRand As New Random()
-        Static img(src.Total) As cv.Vec3b
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, img)
-        Static nextColor As cv.Vec3b
         If task.heartBeat Then
             If nextColor = New cv.Vec3b(0, 0, 255) Then nextColor = New cv.Vec3b(0, 255, 0) Else nextColor = New cv.Vec3b(0, 0, 255)
         End If
@@ -243,7 +243,7 @@ Public Class Mat_Inverse : Inherits VB_Parent
         Dim nextline = ""
 
         Dim decompType = cv.DecompTypes.Cholesky
-        Static frm = findfrm("Mat_Inverse Radio Buttons")
+        Static frm = FindFrm("Mat_Inverse Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 decompType = Choose(i + 1, cv.DecompTypes.Cholesky, cv.DecompTypes.Eig, cv.DecompTypes.LU, cv.DecompTypes.Normal,
@@ -313,7 +313,7 @@ End Class
 '        Else
 '            dRGB = Dlib.LoadImageData(Of BgrPixel)(array, src.Rows, src.Cols, src.Cols * src.ElemSize)
 '        End If
-'        setTrueText("OpenCVB Mat converted to an Array2D for use with DlibDotNet")
+'        SetTrueText("OpenCVB Mat converted to an Array2D for use with DlibDotNet")
 '    End Sub
 'End Class
 
@@ -367,7 +367,7 @@ Public Class Mat_2to1 : Inherits VB_Parent
         desc = "Fill a Mat with 2 images"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim nSize = New cv.Size(task.workingRes.Width, task.workingRes.Height / 2)
+        Dim nSize = New cv.Size(task.WorkingRes.Width, task.WorkingRes.Height / 2)
         Dim roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Dim roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         If standaloneTest() Then
@@ -411,17 +411,17 @@ Public Class Mat_4Click : Inherits VB_Parent
         mat = mats.mat
         mats.Run(empty)
         dst2 = mats.dst2.Clone
-        If standaloneTest() Then mats.defaultMats(src)
-        If task.firstPass Then
-            task.clickPoint = New cv.Point(0, 0)
+        If standalone Then mats.defaultMats(src)
+        If task.FirstPass Then
+            task.ClickPoint = New cv.Point(0, 0)
             task.mousePicTag = RESULT_DST2
         End If
 
         If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then
-            If task.clickPoint.Y < dst2.Rows / 2 Then
-                quadrant = If(task.clickPoint.X < task.workingRes.Width / 2, RESULT_DST0, RESULT_DST1)
+            If task.ClickPoint.Y < dst2.Rows / 2 Then
+                quadrant = If(task.ClickPoint.X < task.WorkingRes.Width / 2, RESULT_DST0, RESULT_DST1)
             Else
-                quadrant = If(task.clickPoint.X < task.workingRes.Width / 2, RESULT_DST2, RESULT_DST3)
+                quadrant = If(task.ClickPoint.X < task.WorkingRes.Width / 2, RESULT_DST2, RESULT_DST3)
             End If
         End If
         mats.Run(empty)
@@ -449,10 +449,10 @@ Public Class Mat_4to1 : Inherits VB_Parent
         desc = "Use one Mat for up to 4 images"
     End Sub
     Public Sub defaultMats(src As cv.Mat)
-        Dim tmpLeft = If(task.leftView.Channels = 1, task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR),
-task.leftView)
-        Dim tmpRight = If(task.rightView.Channels = 1, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR),
-task.rightView)
+        Dim tmpLeft = If(task.leftView.Channels() = 1, task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR),
+                         task.leftView)
+        Dim tmpRight = If(task.rightView.Channels() = 1, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR),
+                          task.rightView)
         mat = {task.color.Clone, task.depthRGB.Clone, tmpLeft, tmpRight}
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -461,12 +461,12 @@ task.rightView)
         Dim roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
         Dim roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         Dim roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
-        If standaloneTest() Then defaultMats(src)
+        If standalone Then defaultMats(src)
 
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC3)
         For i = 0 To 4 - 1
             Dim tmp = mat(i).Clone
-            If tmp.Channels = 1 Then tmp = mat(i).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            If tmp.Channels() = 1 Then tmp = mat(i).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
             dst2(roi) = tmp.Resize(nSize)
         Next

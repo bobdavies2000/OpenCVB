@@ -1,13 +1,13 @@
 Imports cv = OpenCvSharp
 Public Class Blur_Basics : Inherits VB_Parent
-    Dim options As New Options_Blur
+    Public Options As New Options_Blur
     Public Sub New()
         UpdateAdvice(traceName + ": use local options to control the kernel size and sigma.")
         desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        cv.Cv2.GaussianBlur(src, dst2, New cv.Size(options.kernelSize, options.kernelSize), options.sigma, options.sigma)
+        Options.RunVB()
+        cv.Cv2.GaussianBlur(src, dst2, New cv.Size(Options.kernelSize, Options.kernelSize), Options.sigma, Options.sigma)
     End Sub
 End Class
 
@@ -19,11 +19,12 @@ End Class
 
 Public Class Blur_Homogeneous : Inherits VB_Parent
     Dim blur As New Blur_Basics
+    Dim blurKernelSlider As Windows.Forms.TrackBar
     Public Sub New()
         desc = "Smooth each pixel with a kernel of 1's of different sizes."
+        blurKernelSlider = FindSlider("Blur Kernel Size")
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static blurKernelSlider = FindSlider("Blur Kernel Size")
         Dim kernelSize = CInt(blurKernelSlider.Value) Or 1
         dst2 = src.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
     End Sub
@@ -37,11 +38,12 @@ End Class
 
 Public Class Blur_Median : Inherits VB_Parent
     Dim blur As New Blur_Basics
+    Dim blurKernelSlider As Windows.Forms.TrackBar
     Public Sub New()
         desc = "Replace each pixel with the median of neighborhood of varying sizes."
+        blurKernelSlider = FindSlider("Blur Kernel Size")
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static blurKernelSlider = FindSlider("Blur Kernel Size")
         Dim kernelSize = CInt(blurKernelSlider.Value) Or 1
         cv.Cv2.MedianBlur(src, dst2, kernelSize)
     End Sub
@@ -55,11 +57,12 @@ End Class
 ' https://www.tutorialspoint.com/opencv/opencv_bilateral_filter.htm
 Public Class Blur_Bilateral : Inherits VB_Parent
     Dim blur As New Blur_Basics
+    Dim blurKernelSlider As Windows.Forms.TrackBar
     Public Sub New()
         desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
+        blurKernelSlider = FindSlider("Blur Kernel Size")
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static blurKernelSlider = FindSlider("Blur Kernel Size")
         Dim kernelSize = CInt(blurKernelSlider.Value) Or 1
         cv.Cv2.BilateralFilter(src, dst2, kernelSize, kernelSize * 2, kernelSize / 2)
     End Sub
@@ -164,7 +167,7 @@ Public Class Blur_Detection : Inherits VB_Parent
 
         Dim mean As Single, stdev As Single
         cv.Cv2.MeanStdDev(dst2, mean, stdev)
-        setTrueText("Blur variance is " + Format(stdev * stdev, fmt3), 3)
+        SetTrueText("Blur variance is " + Format(stdev * stdev, fmt3), 3)
 
         If standaloneTest() Then dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
     End Sub
@@ -188,3 +191,37 @@ Public Class Blur_Depth : Inherits VB_Parent
         dst2 = blur.dst2
     End Sub
 End Class
+
+
+
+
+
+'Public Class KAZE_KeypointsAKAZE_CS : Inherits VB_Parent
+'    Dim CS_AKaze As New CS_Classes.AKaze_Basics
+'    Public Sub New()
+'        desc = "Find keypoints using AKAZE algorithm."
+'        labels(2) = "AKAZE key points"
+'    End Sub
+'    Public Sub RunVB(src As cv.Mat)
+'        CS_AKaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+'        src.CopyTo(dst2)
+'        For i = 0 To CS_AKaze.akazeKeyPoints.Count - 1
+'            DrawCircle(dst2, CS_AKaze.akazeKeyPoints.ElementAt(i).Pt, task.DotSize, cv.Scalar.Red)
+'        Next
+'    End Sub
+'    End 
+
+'    ClassPublic Class KAZE_KeypointsKAZE_CS : Inherits VB_Parent
+'        Dim CS_Kaze As New CS_Classes.Kaze_Basics
+'        Public Sub New()
+'            desc = "Find keypoints using KAZE algorithm."
+'            labels(2) = "KAZE key points"
+'        End Sub
+'        Public Sub RunVB(src As cv.Mat)
+'            CS_Kaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+'            src.CopyTo(dst2)
+'            For i = 0 To CS_Kaze.kazeKeyPoints.Count - 1
+'                DrawCircle(dst2, CS_Kaze.kazeKeyPoints.ElementAt(i).Pt, task.DotSize, cv.Scalar.Red)
+'            Next
+'        End Sub
+'    End Class

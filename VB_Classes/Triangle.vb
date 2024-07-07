@@ -19,7 +19,7 @@ Public Class Triangle_Basics : Inherits VB_Parent
         For Each pt In rc.contour
             pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
             Dim vec = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
-            DrawCircle(dst3, pt, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
             pt3D.Add(vec)
         Next
 
@@ -59,13 +59,13 @@ Public Class Triangle_HullContour : Inherits VB_Parent
         dst3.SetTo(0)
         For Each pt In rc.contour
             pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
-            DrawCircle(dst3, pt, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
         Next
 
         dst1.SetTo(0)
         For Each pt In rc.hull
             pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
-            DrawCircle(dst1, pt, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst1, pt, task.DotSize, cv.Scalar.Yellow)
         Next
     End Sub
 End Class
@@ -152,7 +152,7 @@ Public Class Triangle_Cell : Inherits VB_Parent
         For Each pt In rc.contour
             Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
             pt = New cv.Point(xFactor * pt.X / rc.rect.Width, yFactor * pt.Y / rc.rect.Height)
-            DrawCircle(dst3, pt, task.dotSize, cv.Scalar.Yellow)
+            DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
             pt3D.Add(vec)
         Next
 
@@ -211,14 +211,14 @@ Public Class Triangle_Mask : Inherits VB_Parent
                 If rc.mask.Get(Of Byte)(y, x) = 0 Then Continue For
                 Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
                 Dim pt = New cv.Point2f(xFactor * x / rc.rect.Width, yFactor * y / rc.rect.Height)
-                DrawCircle(dst3, pt, task.dotSize, cv.Scalar.Yellow)
+                DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
                 pt3D.Add(vec)
             Next
         Next
 
         Dim newMaxDist = New cv.Point2f(xFactor * (rc.maxDist.X - rc.rect.X) / rc.rect.Width,
                                       yFactor * (rc.maxDist.Y - rc.rect.Y) / rc.rect.Height)
-        DrawCircle(dst3, newMaxDist, task.dotSize + 2, cv.Scalar.Red)
+        DrawCircle(dst3, newMaxDist, task.DotSize + 2, cv.Scalar.Red)
         labels(2) = redC.labels(2)
     End Sub
 End Class

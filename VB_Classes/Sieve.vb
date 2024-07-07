@@ -37,7 +37,7 @@ Public Class Sieve_BasicsVB : Inherits VB_Parent
             nextEntry += 1
         End While
         If standaloneTest() Then
-            If output.Count > 0 Then setTrueText(shareResults(output))
+            If output.Count > 0 Then SetTrueText(shareResults(output))
         Else
             primes = New List(Of Integer)(output)
         End If
@@ -79,7 +79,7 @@ Public Class Sieve_Image : Inherits VB_Parent
         Next
 
         If referenceResults.containskey(numCeiling) Then
-            If referenceResults(numCeiling) <> countPrimes Then setTrueText("Invalid prime count - check this...")
+            If referenceResults(numCeiling) <> countPrimes Then SetTrueText("Invalid prime count - check this...")
         End If
         dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8U, numArray.ToArray)
         dst2 = Not dst2

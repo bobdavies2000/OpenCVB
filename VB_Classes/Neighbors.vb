@@ -30,15 +30,15 @@ Public Class Neighbors_Basics : Inherits VB_Parent
         Next
 
         If standalone Then
-            setSelectedContour()
+            task.setSelectedContour()
             dst3.SetTo(0)
             Dim ptCount As Integer
             For Each index In task.rc.nabs
                 Dim pt = task.redCells(index).maxDStable
                 If pt = task.rc.maxDStable Then
-                    DrawCircle(dst2,pt, task.dotSize, black)
+                    DrawCircle(dst2,pt, task.DotSize, black)
                 Else
-                    DrawCircle(dst2,pt, task.dotSize, task.highlightColor)
+                    DrawCircle(dst2,pt, task.DotSize, task.HighlightColor)
                     ptCount += 1
                     If ptCount > options.xNeighbors Then Exit For
                 End If
@@ -55,12 +55,12 @@ End Class
 
 Public Class Neighbors_Intersects : Inherits VB_Parent
     Public nPoints As New List(Of cv.Point)
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Find the corner points where multiple cells intersect."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Or src.Type <> cv.MatType.CV_8U Then
-            Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             src = task.cellMap
@@ -92,8 +92,8 @@ Public Class Neighbors_Intersects : Inherits VB_Parent
         If standaloneTest() Then
             dst3 = task.color.Clone
             For Each pt In nPoints
-                DrawCircle(dst2,pt, task.dotSize, task.highlightColor)
-                DrawCircle(dst3,pt, task.dotSize, cv.Scalar.Yellow)
+                DrawCircle(dst2,pt, task.DotSize, task.HighlightColor)
+                DrawCircle(dst3,pt, task.DotSize, cv.Scalar.Yellow)
             Next
         End If
 
@@ -121,7 +121,7 @@ Public Class Neighbors_ColorOnly : Inherits VB_Parent
 
         corners.Run(task.cellMap.Clone())
         For Each pt In corners.nPoints
-            DrawCircle(dst2,pt, task.dotSize, task.highlightColor)
+            DrawCircle(dst2,pt, task.DotSize, task.HighlightColor)
         Next
 
         labels(2) = redC.labels(2) + " and " + CStr(corners.nPoints.Count) + " cell intersections"
@@ -143,7 +143,7 @@ Public Class Neighbors_PreciseTest : Inherits VB_Parent
         desc = "Test Neighbors_Precise to show how to use it."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        setTrueText("Review the neighbors_Precise algorithm")
+        SetTrueText("Review the neighbors_Precise algorithm")
         'nabs.Run(src)
         'dst2 = nabs.dst2
         'labels(2) = nabs.labels(2)
@@ -169,6 +169,7 @@ Public Class Neighbors_Precise : Inherits VB_Parent
     Dim stats As New Cell_Basics
     Public redCells As List(Of rcData)
     Public runRedCloud As Boolean = False
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         cPtr = Neighbors_Open()
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -176,7 +177,6 @@ Public Class Neighbors_Precise : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
-            Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             labels = redC.labels
@@ -190,7 +190,7 @@ Public Class Neighbors_Precise : Inherits VB_Parent
         Dim handleSrc = GCHandle.Alloc(mapData, GCHandleType.Pinned)
         Dim nabCount = Neighbors_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()
-        setTrueText("Review the neighbors_Precise algorithm")
+        SetTrueText("Review the neighbors_Precise algorithm")
 
         'If nabCount > 0 Then
         '    Dim nabData = New cv.Mat(nabCount, 1, cv.MatType.CV_32SC2, Neighbors_NabList(cPtr))
@@ -229,7 +229,7 @@ Public Class Neighbors_Precise : Inherits VB_Parent
         '            strOut += vbCrLf
         '        End If
         '    End If
-        '    setTrueText(strOut, 3)
+        '    SetTrueText(strOut, 3)
         'End If
 
         labels(3) = CStr(nabCount) + " neighbor pairs were found."

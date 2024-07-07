@@ -1,25 +1,24 @@
-﻿Imports NAudio.Wave
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Color8U_Basics : Inherits VB_Parent
     Public classCount As Integer
     Public classifier As Object
+    Dim colorMethods() As Object = {New BackProject_Full, New BackProject2D_Full, New Bin4Way_Regions, New Binarize_DepthTiers, New FeatureLess_Groups,
+                                    New Hist3Dcolor_Basics, New KMeans_Basics, New LUT_Basics, New Reduction_Basics}
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         labels(3) = "vbPalette output of dst2 at left"
         UpdateAdvice(traceName + ": redOptions 'Color Source' control which color source is used.")
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.optionsChanged Or classifier Is Nothing Then
-            Static colorMethods() As Object = {New BackProject_Full, New Bin4Way_Regions, New Binarize_DepthTiers, New FeatureLess_Groups,
-                                               New Hist3Dcolor_Basics, New KMeans_Basics, New LUT_Basics, New Reduction_Basics}
+        If task.optionsChanged Or classifier Is Nothing Then classifier = colorMethods(task.redOptions.colorInputIndex)
 
-            classifier = colorMethods(task.redOptions.colorInputIndex)
+        If task.redOptions.colorInputName = "BackProject2D_Full" Then
+            classifier.Run(src)
+        Else
+            dst1 = If(src.Channels() = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
+            classifier.Run(dst1)
         End If
-
-        dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
-
-        classifier.run(dst1)
 
         If task.heartBeat Then
             dst2 = classifier.dst2.clone
@@ -45,17 +44,15 @@ End Class
 
 
 Public Class Color8U_Grayscale : Inherits VB_Parent
+    Dim options As New Options_Grayscale8U
     Public Sub New()
-        If check.Setup(traceName) Then
-            check.addCheckBox("Use OpenCV to create grayscale image")
-            check.Box(0).Checked = True
-        End If
         labels = {"", "", "Color_Grayscale", ""}
         desc = "Manually create a grayscale image.  The only reason for this example is to show how slow it can be to do the work manually in VB.Net"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static grayCheck = findCheckBox("Use OpenCV to create grayscale image")
-        If grayCheck.Checked Then
+        options.RunVB()
+
+        If options.useOpenCV Then
             dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
             dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
@@ -107,7 +104,7 @@ Public Class Color8U_KMeans : Inherits VB_Parent
     Public km0 As New KMeans_Basics
     Public km1 As New KMeans_Basics
     Public km2 As New KMeans_Basics
-    Dim options As New Options_ColorFormat
+    Public colorFmt As New Color_Basics
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.setDisplay1()
@@ -115,8 +112,8 @@ Public Class Color8U_KMeans : Inherits VB_Parent
         desc = "Run KMeans on each of the 3 color channels"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        dst0 = options.dst2
+        colorFmt.Run(src)
+        dst0 = colorFmt.dst2
 
         Dim split = dst0.Split()
 
@@ -130,7 +127,7 @@ Public Class Color8U_KMeans : Inherits VB_Parent
         dst3 = km2.dst2 * 255 / km0.classCount
 
         For i = 1 To 3
-            labels(i) = options.colorFormat + " channel " + CStr(i - 1)
+            labels(i) = colorFmt.options.colorFormat + " channel " + CStr(i - 1)
         Next
     End Sub
 End Class
@@ -198,7 +195,7 @@ Public Class Color8U_ComplementaryTest : Inherits VB_Parent
         desc = "Create the complementary images for Gilles Tran's 'Glasses' image for comparison"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        images.fileNameForm.filename.Text = task.homeDir + "Data/Glasses by Gilles Tran.png"
+        images.fileNameForm.filename.Text = task.HomeDir + "Data/Glasses by Gilles Tran.png"
         images.Run(empty)
         dst2 = images.dst2
 
@@ -220,7 +217,7 @@ Public Class Color8U_InRange : Inherits VB_Parent
         desc = "Use inRange to isolate colors from the background"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst2 = cv.Cv2.ImRead(task.homeDir + "Data/1.jpg", cv.ImreadModes.Grayscale)
+        dst2 = cv.Cv2.ImRead(task.HomeDir + "Data/1.jpg", cv.ImreadModes.Grayscale)
         dst1 = dst2.InRange(105, 165) ' should make this a slider and experiment further...
         dst3 = dst2.Clone
         dst3.SetTo(0, dst1)
@@ -236,16 +233,17 @@ End Class
 
 Public Class Color8U_TopX_VB : Inherits VB_Parent
     Dim topX As New Hist3Dcolor_TopXColors
+    Dim options As New Options_Color8UTopX
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Top X pixels", 2, 32, 16)
         desc = "Classify every BGR pixel into some common colors"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         Dim input = src
         input = input.Resize(task.lowRes, 0, 0, cv.InterpolationFlags.Nearest)
 
-        Static topXSlider = FindSlider("Top X pixels")
-        topX.mapTopX = topXSlider.value
+        topX.mapTopX = options.topXcount
         topX.Run(input)
 
         Dim top As New List(Of cv.Vec3b)
@@ -312,7 +310,7 @@ Public Class Color8U_Smoothing : Inherits VB_Parent
     Dim frames As New History_Basics
     Public Sub New()
         labels = {"", "", "Averaged BGR image over the last X frames", ""}
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32FC3, 0)
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32FC3, 0)
         desc = "Merge that last X BGR frames to smooth out differences."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -338,7 +336,7 @@ Public Class Color8U_Denoise : Inherits VB_Parent
         denoise.Run(src)
         dst2 = denoise.dst2
         dst3 = denoise.dst3
-        setTrueText(denoise.strOut, 2)
+        SetTrueText(denoise.strOut, 2)
     End Sub
 End Class
 
@@ -397,7 +395,7 @@ Public Class Color8U_BlackAndWhite : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
         dst2 = dst1.Threshold(options.minThreshold, 255, cv.ThresholdTypes.BinaryInv)
         dst3 = dst1.Threshold(options.maxThreshold, 255, cv.ThresholdTypes.Binary)
     End Sub

@@ -1,8 +1,10 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.ComponentModel
+Imports cv = OpenCvSharp
 Public Class OptionsGlobal
     Public imu_Alpha As Single
     Public maxDepth As Integer
     Public debugChecked As Boolean
+    Public DebugSliderValue As Integer
     Public pixelDiffThreshold As Integer
     Public mapNames As New List(Of String)({"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "TwilightShifted", "Viridis", "Winter"})
@@ -10,15 +12,15 @@ Public Class OptionsGlobal
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
 
-        ThreadGridSize.Text = CStr(GridSize.Value)
+        ThreadGridSize.Text = CStr(GridSlider.Value)
 
-        dotSizeSlider.Value = 1
+        DotSizeSlider.Value = 1
         LineWidth.Value = 1
-        If task.workingRes.Width <= 320 Then
-            dotSizeSlider.Value = 1
+        If task.WorkingRes.Width <= 320 Then
+            DotSizeSlider.Value = 1
             LineWidth.Value = 1
-        ElseIf task.workingRes.Width = 640 Then
-            dotSizeSlider.Value = 2
+        ElseIf task.WorkingRes.Width = 640 Then
+            DotSizeSlider.Value = 2
             LineWidth.Value = 2
         End If
         FrameHistory.Value = 3
@@ -30,7 +32,7 @@ Public Class OptionsGlobal
         PixelDiff.Text = CStr(PixelDiffBar.Value)
         fHist.Text = CStr(FrameHistory.Value)
         LineThicknessAmount.Text = CStr(LineWidth.Value)
-        DotSizeLabel.Text = CStr(dotSizeSlider.Value)
+        DotSizeLabel.Text = CStr(DotSizeSlider.Value)
         TempSliderLabel.Text = CStr(DebugSlider.Value)
 
         UseKalman.Checked = True
@@ -65,14 +67,14 @@ Public Class OptionsGlobal
 
         ShowAllOptions.Checked = GetSetting("OpenCVB", "ShowAllOptions", "ShowAllOptions", False)
 
-        task.dotSize = 1
+        task.DotSize = 1
         task.cvFontThickness = 1
-        Select Case task.workingRes.Width
+        Select Case task.WorkingRes.Width
             Case 1920
-                GridSize.Value = 192
+                GridSlider.Value = 192
                 task.cvFontSize = 3.5
                 task.cvFontThickness = 4
-                task.dotSize = 4
+                task.DotSize = 4
                 task.disparityAdjustment = 1.1
                 task.lowRes = New cv.Size(240, 135)
                 task.quarterRes = New cv.Size(480, 270)
@@ -80,17 +82,17 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 25
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
             Case 960
-                GridSize.Value = 96
+                GridSlider.Value = 96
                 task.cvFontSize = 2.0
                 task.cvFontThickness = 2
-                task.dotSize = 2
+                task.DotSize = 2
                 task.disparityAdjustment = 2.2
                 task.lowRes = New cv.Size(240, 135)
                 task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 200
                 task.FASTthreshold = 40
             Case 480
-                GridSize.Value = 48
+                GridSlider.Value = 48
                 task.cvFontSize = 1.2
                 task.disparityAdjustment = 4.4
                 task.lowRes = New cv.Size(240, 135)
@@ -98,10 +100,10 @@ Public Class OptionsGlobal
                 task.densityMetric = 650
                 task.FASTthreshold = 10
             Case 1280
-                GridSize.Value = 128
+                GridSlider.Value = 128
                 task.cvFontSize = 2.5
                 task.cvFontThickness = 2
-                task.dotSize = 5
+                task.DotSize = 5
                 task.disparityAdjustment = 2.2
                 task.lowRes = New cv.Size(320, 180)
                 task.quarterRes = New cv.Size(320, 180)
@@ -109,25 +111,25 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 40
                 'gravityPointCloud.Checked = False ' too expensive at this resolution
             Case 640
-                GridSize.Value = 64
+                GridSlider.Value = 64
                 task.cvFontSize = 1.5
-                task.dotSize = 2
+                task.DotSize = 2
                 task.disparityAdjustment = 4.2
-                task.lowRes = New cv.Size(320, task.workingRes.Height / 2)
+                task.lowRes = New cv.Size(320, task.WorkingRes.Height / 2)
                 task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 200
                 task.FASTthreshold = 30
             Case 320
-                GridSize.Value = 32
+                GridSlider.Value = 32
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 8.4
                 task.lowRes = New cv.Size(320, 180)
                 task.quarterRes = New cv.Size(320, 180)
-                If task.workingRes.Height = 240 Then task.lowRes = New cv.Size(160, 120)
+                If task.WorkingRes.Height = 240 Then task.lowRes = New cv.Size(160, 120)
                 task.densityMetric = 500
                 task.FASTthreshold = 10
             Case 160
-                GridSize.Value = 16
+                GridSlider.Value = 16
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 4.4
                 task.lowRes = New cv.Size(160, 120)
@@ -135,25 +137,25 @@ Public Class OptionsGlobal
                 task.densityMetric = 100
                 task.FASTthreshold = 10
             Case 672
-                GridSize.Value = 64
+                GridSlider.Value = 64
                 task.cvFontSize = 1.5
-                task.dotSize = 1
+                task.DotSize = 1
                 task.disparityAdjustment = 4.4
                 task.lowRes = New cv.Size(168, 94)
                 task.quarterRes = New cv.Size(336, 188)
                 task.densityMetric = 300
                 task.FASTthreshold = 10
             Case 336
-                GridSize.Value = 32
+                GridSlider.Value = 32
                 task.cvFontSize = 1.0
-                task.dotSize = 1
+                task.DotSize = 1
                 task.disparityAdjustment = 8.8
                 task.lowRes = New cv.Size(168, 94)
                 task.quarterRes = New cv.Size(336, 188)
                 task.densityMetric = 700
                 task.FASTthreshold = 10
             Case 168
-                GridSize.Value = 16
+                GridSlider.Value = 16
                 task.cvFontSize = 0.5
                 task.disparityAdjustment = 20.0
                 task.lowRes = New cv.Size(168, 94)
@@ -163,9 +165,9 @@ Public Class OptionsGlobal
         End Select
 
         task.depthThresholdPercent = 0.01
-        task.gOptions.dotSizeSlider.Value = task.dotSize
-        task.gOptions.LineWidth.Value = task.dotSize
-        DotSizeLabel.Text = CStr(dotSizeSlider.Value)
+        task.gOptions.DotSizeSlider.Value = task.DotSize
+        task.gOptions.LineWidth.Value = task.DotSize
+        DotSizeLabel.Text = CStr(DotSizeSlider.Value)
 
         Me.Left = 0
         Me.Top = 30
@@ -189,8 +191,8 @@ Public Class OptionsGlobal
         If task IsNot Nothing Then task.optionsChanged = True
         LineThicknessAmount.Text = CStr(LineWidth.Value)
     End Sub
-    Private Sub dotSizeSlider_Scroll(sender As Object, e As EventArgs) Handles dotSizeSlider.Scroll
-        DotSizeLabel.Text = CStr(dotSizeSlider.Value)
+    Private Sub DotSizeSlider_Scroll(sender As Object, e As EventArgs) Handles DotSizeSlider.Scroll
+        DotSizeLabel.Text = CStr(DotSizeSlider.Value)
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
     Private Sub UseKalman_CheckedChanged(sender As Object, e As EventArgs) Handles UseKalman.CheckedChanged
@@ -210,20 +212,26 @@ Public Class OptionsGlobal
         maxDepth = MaxDepthBar.Value
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
-    Private Sub GridWidthSlider_Scroll(sender As Object, e As EventArgs) Handles GridSize.Scroll
-        If task IsNot Nothing Then task.optionsChanged = True
-        ThreadGridSize.Text = CStr(GridSize.Value)
+    Private Sub GridSlider_Scroll(sender As Object, e As EventArgs) Handles GridSlider.Scroll
+        If task IsNot Nothing Then
+            task.optionsChanged = True
+            task.gridSize = GridSlider.Value
+        End If
+        ThreadGridSize.Text = CStr(GridSlider.Value)
     End Sub
-    Private Sub GridWidthSlider_ValueChanged(sender As Object, e As EventArgs) Handles GridSize.ValueChanged
+    Private Sub GridSlider_ValueChanged(sender As Object, e As EventArgs) Handles GridSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        ThreadGridSize.Text = CStr(GridSize.Value)
+        ThreadGridSize.Text = CStr(GridSlider.Value)
     End Sub
     Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinBar.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
         labelBinsCount.Text = CStr(HistBinBar.Value)
     End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
+        If task IsNot Nothing Then
+            task.optionsChanged = True
+            task.useGravityPointcloud = gravityPointCloud.Checked
+        End If
     End Sub
     Private Sub PixelDiffThreshold_ValueChanged(sender As Object, e As EventArgs) Handles PixelDiffBar.ValueChanged
         PixelDiff.Text = CStr(PixelDiffBar.Value)
@@ -258,6 +266,7 @@ Public Class OptionsGlobal
     End Sub
     Private Sub tempSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
         TempSliderLabel.Text = CStr(DebugSlider.Value)
+        DebugSliderValue = DebugSlider.Value
     End Sub
     Private Sub debugSyncUI_CheckedChanged(sender As Object, e As EventArgs) Handles debugSyncUI.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
@@ -292,13 +301,13 @@ Public Class OptionsGlobal
     Private Sub HighlightColor_SelectedIndexChanged(sender As Object, e As EventArgs) Handles HighlightColor.SelectedIndexChanged
         Select Case HighlightColor.Text
             Case "Yellow"
-                task.highlightColor = cv.Scalar.Yellow
+                task.HighlightColor = cv.Scalar.Yellow
             Case "Black"
-                task.highlightColor = cv.Scalar.Black
+                task.HighlightColor = cv.Scalar.Black
             Case "White"
-                task.highlightColor = cv.Scalar.White
+                task.HighlightColor = cv.Scalar.White
             Case "Red"
-                task.highlightColor = cv.Scalar.Red
+                task.HighlightColor = cv.Scalar.Red
         End Select
     End Sub
 
@@ -311,7 +320,41 @@ Public Class OptionsGlobal
     Public Sub setHistogramBins(val As Integer)
         HistBinBar.Value = val
     End Sub
+    Public Sub setPixelDifference(val As Integer)
+        PixelDiffBar.Value = val
+    End Sub
     Public Sub setGridSize(val As Integer)
-        GridSize.Value = val
+        GridSlider.Value = val
+    End Sub
+    Public Sub setGridMaximum(val As Integer)
+        GridSlider.Maximum = val
+    End Sub
+    Public Sub setGridMinimum(val As Integer)
+        GridSlider.Minimum = val
+    End Sub
+    Public Sub setDebugSlider(val As Integer)
+        DebugSlider.Value = val
+    End Sub
+    Public Sub setDebugCheckBox(val As Boolean)
+        DebugCheckBox.Checked = val
+    End Sub
+    Public Function getDebugCheckBox() As Boolean
+        Return DebugCheckBox.Checked
+    End Function
+    Public Sub setGravityUsage(val As Boolean)
+        gravityPointCloud.Checked = val
+    End Sub
+    Public Sub setLineType(val As Integer)
+        LineType.SelectedIndex = val
+    End Sub
+    Public Sub setUnfiltered(val As Boolean)
+        unFiltered.Checked = val
+    End Sub
+    Public Function GetUseKalman() As Boolean
+        Return UseKalman.Checked
+    End Function
+
+    Public Sub SetDotSize(val As Integer)
+        DotSizeSlider.Value = val
     End Sub
 End Class

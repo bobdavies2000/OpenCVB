@@ -8,7 +8,7 @@ Public Class Denoise_Basics_CPP : Inherits VB_Parent
         desc = "Denoise example."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) - 1
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) - 1
         Dim dataSrc(src.Total - 1) As Byte
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
@@ -34,6 +34,7 @@ End Class
 Public Class Denoise_Pixels : Inherits VB_Parent
     Public classCount As Integer
     Dim options As New Options_Denoise
+    Dim reduction As New Reduction_Basics
     Public Sub New()
         cPtr = Denoise_Pixels_Open()
         labels = {"", "", "Before removing single pixels", "After removing single pixels"}
@@ -43,12 +44,11 @@ Public Class Denoise_Pixels : Inherits VB_Parent
         options.RunVB()
 
         If standaloneTest() Then
-            Static reduction As New Reduction_Basics
             reduction.Run(src)
             src = reduction.dst2
             classCount = reduction.classCount
         End If
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If options.removeSinglePixels Then
             Dim cppData(src.Total - 1) As Byte
@@ -70,7 +70,7 @@ Public Class Denoise_Pixels : Inherits VB_Parent
             strOut += CStr(Denoise_Pixels_EdgeCountBefore(cPtr)) + " edges before" + vbCrLf
             strOut += CStr(Denoise_Pixels_EdgeCountAfter(cPtr)) + " edges after"
         End If
-        setTrueText(strOut, 2)
+        SetTrueText(strOut, 2)
     End Sub
     Public Sub Close()
         Denoise_Pixels_Close(cPtr)

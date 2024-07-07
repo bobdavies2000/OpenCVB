@@ -123,7 +123,7 @@ struct sortInt
     }
 };
 
-class pointPair {
+class PointPair {
 public:
     Point2f p1;
     Point2f p2;
@@ -131,14 +131,14 @@ public:
     float yIntercept;
     static constexpr float verticalSlope = 1000000.0f;  // Using constexpr for constant
 
-    pointPair(const Point2f& _p1, const Point2f& _p2) : p1(_p1), p2(_p2) {
+    PointPair(const Point2f& _p1, const Point2f& _p2) : p1(_p1), p2(_p2) {
         slope = (p1.x != p2.x) ? (p1.y - p2.y) / (p1.x - p2.x) : verticalSlope;
         yIntercept = p1.y - slope * p1.x;
     }
 
-    pointPair() : p1(), p2() {}  // Default constructor
+    PointPair() : p1(), p2() {}  // Default constructor
 
-    bool compare(const pointPair& mp) const {  // Using const for non-modifying methods
+    bool compare(const PointPair& mp) const {  // Using const for non-modifying methods
         return mp.p1 == p1 && mp.p2 == p2;
     }
 };
@@ -151,11 +151,11 @@ public:
 #define YELLOW Scalar(0, 255, 255)
 #define BLACK Scalar(0, 0, 0)
 #define GRAY Scalar(127, 127, 127)
-vector<Scalar> highlightColors = { YELLOW, WHITE, BLUE, GRAY, RED, GREEN };
+vector<Scalar> HighlightColors = { YELLOW, WHITE, BLUE, GRAY, RED, GREEN };
 
 #include "CPP_Functions.h"
 
-Size workingRes;
+Size WorkingRes;
 
 class algorithmCPP
 {
@@ -169,7 +169,7 @@ public:
     vector<string> labels{ "", "", "", "" };
     algorithmCPP()
     {
-        dst0 = Mat(workingRes.height, workingRes.width, CV_8UC3);
+        dst0 = Mat(WorkingRes.height, WorkingRes.width, CV_8UC3);
         dst0.setTo(0);
         dst1 = Mat(dst0.size(), CV_8UC3);
         dst1.setTo(0);
@@ -213,10 +213,10 @@ public:
     int channelCount;
     int histBins[3];
 
-    bool optionsChanged; double AddWeighted; int dotSize; int gridSize; float maxZmeters;
-    int histogramBins; int pixelDiffThreshold; bool gravityPointCloud; bool useKalman;
-    int paletteIndex; int polyCount; bool firstPass; Scalar highlightColor; int frameHistoryCount;
-    Point clickPoint; bool mouseClickFlag; int mousePicTag; Point mouseMovePoint; bool mouseMovePointUpdated;
+    bool optionsChanged; double AddWeighted; int DotSize; int gridSize; float MaxZmeters;
+    int histogramBins; int pixelDiffThreshold; bool gravityPointCloud; bool UseKalman;
+    int paletteIndex; int polyCount; bool FirstPass; Scalar HighlightColor; int frameHistoryCount;
+    Point ClickPoint; bool mouseClickFlag; int mousePicTag; Point mouseMovePoint; bool mouseMovePointUpdated;
     Scalar scalarColors[256]; Vec3b vecColors[256]; Rect drawRect; bool displayDst0; bool displayDst1;
     bool gridROIclicked;
     Mat gridToRoiIndex;
@@ -228,12 +228,12 @@ public:
 
     Mat gMatrix; vector<Mat> pcSplit;
     bool paused = false;
-    Size workingRes;
+    Size WorkingRes;
     cppTask(int rows, int cols)
     {
-        workingRes = Size(cols, rows);
+        WorkingRes = Size(cols, rows);
         cppFunction = -1;
-        firstPass = true;
+        FirstPass = true;
 
         polyCount = 10; // use FPoly_TopFeatures and the slider to double-check this value.  It seems pretty good.
         buildColors();
@@ -263,7 +263,7 @@ public:
         vec.assign((Point*)hull2i.data, (Point*)hull2i.data + hull2i.total());
         return vec;
     }
-    void setTrueText(String text, Mat dst, Point2f pt = Point2f(10, 50))
+    void SetTrueText(String text, Mat dst, Point2f pt = Point2f(10, 50))
     {
         if (cppFunction < 0) return;
         putText(dst, text, pt, this->font, this->cvFontSize, this->fontColor);
@@ -296,7 +296,7 @@ public:
         for (int i = 1; i <= pts.size(); i++) {
             int index = i % pts.size();
             Point pt = pts[index];
-            line(dst2, pt, lastPt, highlightColor, lineWidth, lineType);
+            line(dst2, pt, lastPt, HighlightColor, lineWidth, lineType);
             lastPt = pt;
         }
     }
@@ -304,8 +304,8 @@ public:
         std::vector<Point2f> srcPoints;
         random_device rd;
         mt19937 gen(rd());  // Mersenne Twister engine for randomness
-        uniform_int_distribution<> dist_width(0, workingRes.width - 1);  
-        uniform_int_distribution<> dist_height(0, workingRes.height - 1);
+        uniform_int_distribution<> dist_width(0, WorkingRes.width - 1);  
+        uniform_int_distribution<> dist_height(0, WorkingRes.height - 1);
 
         srcPoints.clear();
         for (int i = 0; i < howMany; i++) {
@@ -397,7 +397,7 @@ public:
         return result;
     }
 
-    Rect initRandomRect(int margin, int width) {
+    Rect InitRandomRect(int margin, int width) {
         // Use C++11's random number generator for better randomness
         static random_device rd;
         static mt19937 gen(rd());  // Mersenne Twister engine
@@ -405,7 +405,7 @@ public:
         return Rect(dist(gen), dist(gen), dist(gen), dist(gen));
     }
 
-    void drawRotatedRectangle(RotatedRect rr, Mat dst2, const Scalar color) {
+    void DrawRotatedRectangle(RotatedRect rr, Mat dst2, const Scalar color) {
         vector<Point2f> vertices2f;
         rr.points(vertices2f);
         vector<Point> vertices(vertices2f.size());

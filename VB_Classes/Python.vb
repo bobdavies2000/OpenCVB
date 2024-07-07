@@ -37,7 +37,7 @@ Public Class Python_Basics : Inherits VB_Parent
         desc = "Access Python from OpenCVB - contains the startPython interface"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        setTrueText("There is no output from " + traceName + ".  It contains the interface to python.")
+        SetTrueText("There is no output from " + traceName + ".  It contains the interface to python.")
     End Sub
 End Class
 
@@ -52,7 +52,7 @@ Public Class Python_Run : Inherits VB_Parent
     Dim pythonApp As FileInfo
     Dim testPyStreamOakD As Boolean = False ' set this to true to test the PyStream problem with the OakD Python camera
     Public Sub OakDPipeIssue()
-        setTrueText("Python Stream ('_PS.py') algorithms don't work reliably when using the Oak-D Python camera interface." + vbCrLf +
+        SetTrueText("Python Stream ('_PS.py') algorithms don't work reliably when using the Oak-D Python camera interface." + vbCrLf +
                     "They both use named pipes to communicate between OpenCVB and the external processes (a camera and a Python algorithm.)" + vbCrLf +
                     "To experiment with Python Stream algorithms, any of the other supported cameras work fine." + vbCrLf +
                     "To see the problem: comment out the camera test in RunVB below to test any '_PS.py' algorithm.  It may work but" + vbCrLf +
@@ -70,7 +70,7 @@ Public Class Python_Run : Inherits VB_Parent
             End If
         Else
             python.StartPython("")
-            If python.strOut <> "" Then setTrueText(python.strOut)
+            If python.strOut <> "" Then SetTrueText(python.strOut)
         End If
         desc = "Run Python app: " + pythonApp.Name
     End Sub
@@ -86,7 +86,7 @@ Public Class Python_Run : Inherits VB_Parent
                 labels(3) = "Second Output of Python Backend"
             Else
                 If pythonApp.Name = "PyStream.py" Then
-                    setTrueText("The PyStream.py algorithm is used by a wide variety of apps but has no output when run by itself.")
+                    SetTrueText("The PyStream.py algorithm is used by a wide variety of apps but has no output when run by itself.")
                 End If
             End If
         End If
@@ -116,16 +116,16 @@ Public Class Python_MemMap : Inherits VB_Parent
         If standaloneTest() Then
             If task.externalPythonInvocation = False Then
                 python.StartPython("--MemMapLength=" + CStr(memMapbufferSize))
-                If python.strOut <> "" Then setTrueText(python.strOut)
+                If python.strOut <> "" Then SetTrueText(python.strOut)
             End If
             Dim pythonApp = New FileInfo(task.pythonTaskName)
-            setTrueText("No output for Python_MemMap - see Python console log (see Options/'Show Console Log for external processes' in the main form)")
+            SetTrueText("No output for Python_MemMap - see Python console log (see Options/'Show Console Log for external processes' in the main form)")
             desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
         End If
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If standaloneTest() Then
-            setTrueText(traceName + " has no output when run standaloneTest().")
+            SetTrueText(traceName + " has no output when run standaloneTest().")
             Exit Sub
         End If
 
@@ -156,14 +156,14 @@ Public Class Python_Stream : Inherits VB_Parent
         Try
             task.pythonPipeOut = New NamedPipeServerStream(task.pipeName, PipeDirection.Out)
         Catch ex As Exception
-            setTrueText("Python_Stream: pipeOut NamedPipeServerStream failed to open.")
+            SetTrueText("Python_Stream: pipeOut NamedPipeServerStream failed to open.")
             Exit Sub
         End Try
         task.pythonPipeIn = New NamedPipeServerStream(task.pipeName + "Results", PipeDirection.In)
 
         ' Was this class invoked standaloneTest()?  Then just run something that works with BGR and depth...
         If task.pythonTaskName.EndsWith("Python_Stream") Then
-            task.pythonTaskName = task.homeDir + "Python_Classes/Python_Stream_PS.py"
+            task.pythonTaskName = task.HomeDir + "Python_Classes/Python_Stream_PS.py"
         End If
 
         memMap = New Python_MemMap()
@@ -172,7 +172,7 @@ Public Class Python_Stream : Inherits VB_Parent
             task.pythonReady = True ' python was already running and invoked OpenCVB.
         Else
             task.pythonReady = python.StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + task.pipeName)
-            If python.strOut <> "" Then setTrueText(python.strOut)
+            If python.strOut <> "" Then SetTrueText(python.strOut)
         End If
         If task.pythonReady Then
             task.pythonPipeOut.WaitForConnection()
@@ -183,7 +183,7 @@ Public Class Python_Stream : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If standaloneTest() Then
-            setTrueText(traceName + " has no output when run standaloneTest().")
+            SetTrueText(traceName + " has no output when run standaloneTest().")
             Exit Sub
         End If
 

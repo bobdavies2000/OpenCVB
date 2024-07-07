@@ -124,7 +124,7 @@ Public Class Tessallate_QuadSimple : Inherits VB_Parent
             Dim rc = task.redCells(index)
 
             dst3(roi).SetTo(rc.color)
-            setTrueText(Format(rc.depthMean(2), fmt1), New cv.Point(roi.X, roi.Y))
+            SetTrueText(Format(rc.depthMean(2), fmt1), New cv.Point(roi.X, roi.Y))
 
             Dim topLeft = getWorldCoordinates(New cv.Point3f(roi.X, roi.Y, rc.depthMean(2)))
             Dim botRight = getWorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, rc.depthMean(2)))
@@ -298,7 +298,7 @@ Public Class Tessallate_QuadMinMax : Inherits VB_Parent
                 oglData.Add(New cv.Point3f(botRight.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
                 oglData.Add(New cv.Point3f(topLeft.X + shift.X, botRight.Y + shift.Y, depth + shift.Z))
             Next
-            setTrueText(Format(d1, fmt1) + vbCrLf + Format(d2, fmt1), New cv.Point(roi.X, roi.Y), 3)
+            SetTrueText(Format(d1, fmt1) + vbCrLf + Format(d2, fmt1), New cv.Point(roi.X, roi.Y), 3)
 
             If depthList1(i).Count >= depthListMaxCount Then depthList1(i).RemoveAt(0)
             If depthList2(i).Count >= depthListMaxCount Then depthList2(i).RemoveAt(0)
@@ -317,15 +317,14 @@ Public Class Tessallate_Bricks : Inherits VB_Parent
     Public depths As New List(Of Single)
     Public options As New Options_OpenGLFunctions
     Public hulls As New RedCloud_Hulls
+    Dim depthMinList As New List(Of List(Of Single))
+    Dim depthMaxList As New List(Of List(Of Single))
+    Dim myListMax = 10
     Public Sub New()
         task.gOptions.setGridSize(20)
         desc = "Tessellate each quad in point cloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static depthMinList As New List(Of List(Of Single))
-        Static depthMaxList As New List(Of List(Of Single))
-        Static myListMax = 10
-
         If task.optionsChanged Then
             depthMinList.Clear()
             depthMaxList.Clear()
@@ -356,7 +355,7 @@ Public Class Tessallate_Bricks : Inherits VB_Parent
                 Dim test = depthMin + rc.depthStdev(2) * 3
                 If test < depthMax Then depthMax = test
 
-                If depthMin > 0 And depthMax > 0 And depthMax < task.maxZmeters Then
+                If depthMin > 0 And depthMax > 0 And depthMax < task.MaxZmeters Then
                     depthMinList(i).Add(depthMin)
                     depthMaxList(i).Add(depthMax)
 
@@ -399,7 +398,7 @@ Public Class Tessallate_Bricks : Inherits VB_Parent
                     oglData.Add(min(3))
                     oglData.Add(max(3))
 
-                    setTrueText(Format(depthMin, fmt1) + vbCrLf + Format(depthMax, fmt1), New cv.Point(roi.X, roi.Y))
+                    SetTrueText(Format(depthMin, fmt1) + vbCrLf + Format(depthMax, fmt1), New cv.Point(roi.X, roi.Y))
                     If depthMinList(i).Count >= myListMax Then depthMinList(i).RemoveAt(0)
                     If depthMaxList(i).Count >= myListMax Then depthMaxList(i).RemoveAt(0)
                 End If
@@ -408,6 +407,6 @@ Public Class Tessallate_Bricks : Inherits VB_Parent
             depths.Add(depthMax)
         Next
         labels(2) = traceName + " completed: " + Format(task.gridList.Count, fmt0) + " ROI's produced " + Format(oglData.Count / 25, fmt0) + " six sided bricks with color"
-        setTrueText("There should be no 0.0 values in the list of min and max depths in the dst2 image.", 3)
+        SetTrueText("There should be no 0.0 values in the list of min and max depths in the dst2 image.", 3)
     End Sub
 End Class

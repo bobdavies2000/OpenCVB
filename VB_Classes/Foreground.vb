@@ -6,7 +6,7 @@ Public Class Foreground_Basics : Inherits VB_Parent
     Public fg As New cv.Mat, bg As New cv.Mat, classCount As Integer
     Public Sub New()
         labels(3) = "Foreground - all the KMeans classes up to and including the first class over 1 meter."
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
         desc = "Find the first KMeans class with depth over 1 meter and use it to define foreground"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -41,7 +41,7 @@ Public Class Foreground_Basics : Inherits VB_Parent
 
         dst3.SetTo(0)
         src.CopyTo(dst3, fg)
-        setTrueText("KMeans classes are in dst1 - ordered by depth" + vbCrLf + "fg = foreground mask", 3)
+        SetTrueText("KMeans classes are in dst1 - ordered by depth" + vbCrLf + "fg = foreground mask", 3)
         labels(2) = "KMeans output defining the " + CStr(classCount) + " classes"
     End Sub
 End Class
@@ -56,8 +56,8 @@ Public Class Foreground_KMeans2 : Inherits VB_Parent
     Public Sub New()
         FindSlider("KMeans k").Value = 2
         labels = {"", "", "Foreground Mask", "Background Mask"}
-        dst2 = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(task.WorkingRes, cv.MatType.CV_8U, 0)
         desc = "Separate foreground and background using Kmeans with k=2."
     End Sub
     Public Sub RunVB(src As cv.Mat)

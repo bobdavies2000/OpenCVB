@@ -41,7 +41,7 @@ Public Class InPaint_Noise : Inherits VB_Parent
         Options.RunVB()
         noise.Run(src) ' create some noise in the result1 image.
         dst2 = noise.dst2
-        cv.Cv2.Inpaint(dst2, noise.noiseMask, dst3, noise.maxNoiseWidth, If(options.telea, cv.InpaintMethod.Telea, cv.InpaintMethod.NS))
+        cv.Cv2.Inpaint(dst2, noise.noiseMask, dst3, noise.options.noiseWidth, If(options.telea, cv.InpaintMethod.Telea, cv.InpaintMethod.NS))
     End Sub
 End Class
 

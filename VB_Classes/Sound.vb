@@ -20,12 +20,12 @@ Public Class Sound_Basics : Inherits VB_Parent
     Private Sub LoadSoundData()
         Dim tmp(reader.Length - 1) As Byte
         Dim count = reader.Read(tmp, 0, tmp.Length)
-        stereo = reader.WaveFormat.Channels = 2
+        stereo = reader.WaveFormat.Channels() = 2
         bpp16 = reader.WaveFormat.BitsPerSample = 16
         memData = New WaveBuffer(tmp)
         If stereo Then
-            ReDim pcmData16(count / reader.WaveFormat.Channels - 1)
-            For i = 0 To count / reader.WaveFormat.Channels - 1
+            ReDim pcmData16(count / reader.WaveFormat.Channels() - 1)
+            For i = 0 To count / reader.WaveFormat.Channels() - 1
                 pcmData16(i) = memData.ShortBuffer(i)
             Next
         Else
@@ -39,12 +39,12 @@ Public Class Sound_Basics : Inherits VB_Parent
     Public Sub New()
 
         fileNameForm = New OptionsFileName
-        fileNameForm.OpenFileDialog1.InitialDirectory = task.homeDir + "Data\"
+        fileNameForm.OpenFileDialog1.InitialDirectory = task.HomeDir + "Data\"
         fileNameForm.OpenFileDialog1.FileName = "*.*"
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "m4a (*.m4a)|*.m4a|mp3 (*.mp3)|*.mp3|mp4 (*.mp4)|*.mp4|wav (*.wav)|*.wav|aac (*.aac)|*.aac|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("OpenCVB", "AudioFileName", "AudioFileName", task.homeDir + "Data/01 I Let the Music Speak.m4a")
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "AudioFileName", "AudioFileName", task.HomeDir + "Data/01 I Let the Music Speak.m4a")
         fileNameForm.Text = "Select an audio file to analyze"
         fileNameForm.FileNameLabel.Text = "Select a file for use with the Sound_Basics algorithm."
         fileNameForm.PlayButton.Hide()
@@ -90,7 +90,7 @@ Public Class Sound_Basics : Inherits VB_Parent
             fileNameForm.PlayButton_Click(sender, e)
             player?.Stop()
         End If
-        setTrueText("Requested sound data is in the pcm32f cv.Mat")
+        SetTrueText("Requested sound data is in the pcm32f cv.Mat")
     End Sub
     Public Sub Close()
         player?.Stop()
@@ -114,8 +114,9 @@ Public Class Sound_SignalGenerator : Inherits VB_Parent
     Dim pcmData() As Single
     Dim generatedSamplesPerSecond As Integer = 44100
     Dim startTime As Date
+    Dim radioIndex As Integer
+    Dim saveRadioIndex = -1
     Public Sub New()
-
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Sine Wave Frequency", 10, 4000, 1000)
             sliders.setupTrackBar("Decibels", -100, 0, -20)
@@ -147,17 +148,15 @@ Public Class Sound_SignalGenerator : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.testAllRunning Then Exit Sub ' there have been some failures in player.Init below when running during a test all.  Skip so testing can proceed.
-        Static radioIndex As Integer
         Static wgenSlider = FindSlider("Sine Wave Frequency")
         Static DecibelSlider = FindSlider("Decibels")
         Static endSweepSlider = FindSlider("Sweep Only - End Frequency")
         Static sweepDurationSlider = FindSlider("Sweep Only - duration secs")
         Static retainSlider = FindSlider("Retain Data for x seconds")
-        Static saveRadioIndex = -1
-        Static reverse0Check = findCheckBox("PhaseReverse Left")
-        Static reverse1Check = findCheckBox("PhaseReverse Right")
+        Static reverse0Check = FindCheckBox("PhaseReverse Left")
+        Static reverse1Check = FindCheckBox("PhaseReverse Right")
 
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then
                 wGen.Type = Choose(i + 1, Pink, white, Sweep, Sin, Square, Triangle, SawTooth)
@@ -188,7 +187,7 @@ Public Class Sound_SignalGenerator : Inherits VB_Parent
             pcm32f = New cv.Mat(pcmData.Length, 1, cv.MatType.CV_32F, pcmData)
             player.Play()
         End If
-        setTrueText("Requested sound data is in the pcm32f cv.Mat")
+        SetTrueText("Requested sound data is in the pcm32f cv.Mat")
     End Sub
     Public Sub Close()
         player?.Stop()
@@ -203,6 +202,11 @@ End Class
 
 Public Class Sound_Display : Inherits VB_Parent
     Public soundSource As Object = New Sound_SignalGenerator
+    Dim sliderPercent As Single
+    Dim fileStarted As Boolean
+    Dim formatIndex As Integer
+    Dim samplesperLine As Single
+    Dim starttime As Date
     Public Sub New()
         If radio.Setup(traceName) Then
             radio.addRadio("Max Absolute Value")
@@ -216,11 +220,6 @@ Public Class Sound_Display : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.testAllRunning Then Exit Sub ' there have been some failures in player.Init below when running during a test all.  Skip so testing can proceed.
-        Static sliderPercent As Single
-        Static fileStarted As Boolean
-        Static formatIndex As Integer
-        Static samplesperLine As Single
-        Static starttime As Date
         If standaloneTest() Then soundSource.Run(src)
         If fileStarted = False Then
             fileStarted = True
@@ -233,12 +232,12 @@ Public Class Sound_Display : Inherits VB_Parent
 
         Dim totalSamples = soundSource.pcm32f.Rows
         If totalSamples = 0 Then
-            setTrueText("No sound data was loaded.")
+            SetTrueText("No sound data was loaded.")
             Exit Sub
         End If
         dst2 = New cv.Mat(New cv.Size(src.Width * 2, src.Height), cv.MatType.CV_8UC3, cv.Scalar.Beige)
         samplesperLine = If(soundSource.stereo, totalSamples / 2 / dst2.Width, totalSamples / dst2.Width)
-        Static frm = findfrm(traceName + " Radio Buttons")
+        Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.Count - 1
             If frm.check(i).Checked Then formatIndex = i
         Next

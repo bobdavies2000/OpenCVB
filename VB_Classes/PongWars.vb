@@ -3,20 +3,21 @@
 ' https://twitter.com/nicolasdnl/status/1749715070928433161
 Public Class PongWars_Basics : Inherits VB_Parent
     Dim sqWidth As Integer = 25
-    Dim sqHeight As Integer = 25 * task.workingRes.Height / task.workingRes.Width
-    Dim numSquaresX As Integer = task.workingRes.Width / sqWidth
-    Dim numSquaresY As Integer = task.workingRes.Height / sqHeight
+    Dim sqHeight As Integer = 25 * task.WorkingRes.Height / task.WorkingRes.Width
+    Dim numSquaresX As Integer = task.WorkingRes.Width / sqWidth
+    Dim numSquaresY As Integer = task.WorkingRes.Height / sqHeight
 
     Dim DAY_COLOR = 1, DAY_BALL_COLOR = 2, NIGHT_COLOR = 3, NIGHT_BALL_COLOR = 4
     Dim squares(numSquaresX - 1, numSquaresY - 1) As Integer
 
-    Dim p1 = New cv.Point(task.workingRes.Width / 4, task.workingRes.Height / 2)
+    Dim p1 = New cv.Point(task.WorkingRes.Width / 4, task.WorkingRes.Height / 2)
     Dim d1 As cv.Point2f = New cv.Point(12.5, -12.5)
 
-    Dim p2 = New cv.Point((task.workingRes.Width / 4) * 3, task.workingRes.Height / 2)
+    Dim p2 = New cv.Point((task.WorkingRes.Width / 4) * 3, task.WorkingRes.Height / 2)
     Dim d2 As cv.Point2f = New cv.Point(-12.5, 12.5)
 
     Dim iteration As Integer = 0
+    Dim p1Last As New cv.Point, p2Last As New cv.Point
     Public Sub New()
         For i As Integer = 0 To numSquaresX - 1
             For j As Integer = 0 To numSquaresY - 1
@@ -88,7 +89,6 @@ Public Class PongWars_Basics : Inherits VB_Parent
         p2.x += d2.X
         p2.y += d2.Y
 
-        Static p1Last As New cv.Point, p2Last As New cv.Point
         If p1Last = p1 Then p1 = New cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2))
         p1Last = p1
         If p2Last = p2 Then p2 = New cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2))
@@ -105,10 +105,10 @@ Public Class PongWars_Basics : Inherits VB_Parent
         Next
 
         Dim pt = New cv.Point(CInt(p1.x - sqWidth / 2), CInt(p1.y - sqHeight / 2))
-        DrawCircle(dst2,pt, task.dotSize + 5, task.scalarColors(DAY_BALL_COLOR))
+        DrawCircle(dst2,pt, task.DotSize + 5, task.scalarColors(DAY_BALL_COLOR))
 
         pt = New cv.Point(CInt(p2.x - sqWidth / 2), CInt(p2.y - sqHeight / 2))
-        DrawCircle(dst2,pt, task.dotSize + 5, task.scalarColors(NIGHT_BALL_COLOR))
+        DrawCircle(dst2,pt, task.DotSize + 5, task.scalarColors(NIGHT_BALL_COLOR))
     End Sub
 End Class
 

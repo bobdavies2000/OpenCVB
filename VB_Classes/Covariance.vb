@@ -40,7 +40,7 @@ Public Class Covariance_Basics : Inherits VB_Parent
             lastCenter = center
             strOut += "Yellow is last center, red is the current center"
         End If
-        setTrueText(strOut)
+        SetTrueText(strOut)
     End Sub
 End Class
 
@@ -56,8 +56,8 @@ Public Class Covariance_Test : Inherits VB_Parent
         Dim testInput() As Double = {1.5, 2.3, 3.0, 1.7, 1.2, 2.9, 2.1, 2.2, 3.1, 3.1, 1.3, 2.7, 2.0, 1.7, 1.0, 2.0, 0.5, 0.6, 1.0, 0.9}
         Dim samples = New cv.Mat(10, 2, cv.MatType.CV_64F, testInput)
         covar.Run(samples)
-        setTrueText(covar.strOut, New cv.Point(20, 60))
-        setTrueText("Results should be a symmetric array with 2.1 and -2.1", New cv.Point(20, 150))
+        SetTrueText(covar.strOut, New cv.Point(20, 60))
+        SetTrueText("Results should be a symmetric array with 2.1 and -2.1", New cv.Point(20, 150))
     End Sub
 End Class
 
@@ -71,12 +71,12 @@ Public Class Covariance_Images : Inherits VB_Parent
     Dim covar As New Covariance_Basics
     Public mean As cv.Mat
     Public covariance As cv.Mat
+    Dim last32f As New cv.Mat
     Public Sub New()
         desc = "Calculate the covariance of 2 images"
     End Sub
     Public Sub RunVB(src as cv.Mat)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Static last32f As New cv.Mat
         If task.optionsChanged Then gray.ConvertTo(last32f, cv.MatType.CV_32F)
         dst2 = gray
 
@@ -88,7 +88,7 @@ Public Class Covariance_Images : Inherits VB_Parent
 
         last32f = gray32f
 
-        setTrueText(covar.strOut, New cv.Point(10, 10), 3)
+        SetTrueText(covar.strOut, New cv.Point(10, 10), 3)
 
         mean = covar.mean
         covariance = covar.covariance

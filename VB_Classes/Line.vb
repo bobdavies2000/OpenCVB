@@ -1,26 +1,26 @@
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits VB_Parent
     Dim ld As cv.XImgProc.FastLineDetector
-    Public lpList As New List(Of pointPair)
+    Public lpList As New List(Of PointPair)
     Public lineColor = cv.Scalar.White
     Public Sub New()
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src.Clone
+        If src.Channels() = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src.Clone
         If dst2.Type <> cv.MatType.CV_8U Then dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
         Dim lines = ld.Detect(dst2)
 
-        Dim sortByLen As New SortedList(Of Single, pointPair)(New compareAllowIdenticalSingleInverted)
+        Dim sortByLen As New SortedList(Of Single, PointPair)(New compareAllowIdenticalSingleInverted)
         For Each v In lines
             If v(0) >= 0 And v(0) <= dst2.Cols And v(1) >= 0 And v(1) <= dst2.Rows And
                v(2) >= 0 And v(2) <= dst2.Cols And v(3) >= 0 And v(3) <= dst2.Rows Then
                 Dim p1 = New cv.Point(v(0), v(1))
                 Dim p2 = New cv.Point(v(2), v(3))
-                Dim lp = New pointPair(p1, p2)
+                Dim lp = New PointPair(p1, p2)
                 sortByLen.Add(lp.length, lp)
             End If
         Next
@@ -44,19 +44,19 @@ End Class
 
 Public Class Line_SubsetRect : Inherits VB_Parent
     Dim ld As cv.XImgProc.FastLineDetector
-    Public sortByLen As New SortedList(Of Single, pointPair)(New compareAllowIdenticalSingleInverted)
-    Public mpList As New List(Of pointPair)
+    Public sortByLen As New SortedList(Of Single, PointPair)(New compareAllowIdenticalSingleInverted)
+    Public mpList As New List(Of PointPair)
     Public ptList As New List(Of cv.Point2f)
     Public subsetRect As cv.Rect
     Public lineColor = cv.Scalar.White
     Public Sub New()
         subsetRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src.Clone
+        If src.Channels() = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src.Clone
         If dst2.Type <> cv.MatType.CV_8U Then dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
         Dim lines = ld.Detect(dst2(subsetRect))
@@ -69,7 +69,7 @@ Public Class Line_SubsetRect : Inherits VB_Parent
                v(2) >= 0 And v(2) <= dst2.Cols And v(3) >= 0 And v(3) <= dst2.Rows Then
                 Dim p1 = New cv.Point(v(0) + subsetRect.X, v(1) + subsetRect.Y)
                 Dim p2 = New cv.Point(v(2) + subsetRect.X, v(3) + subsetRect.Y)
-                Dim lp = New pointPair(p1, p2)
+                Dim lp = New PointPair(p1, p2)
                 mpList.Add(lp)
                 ptList.Add(p1)
                 ptList.Add(p2)
@@ -95,15 +95,16 @@ End Class
 Public Class Line_InterceptsUI : Inherits VB_Parent
     Dim lines As New Line_Intercepts
     Dim interceptColor As Integer
+    Dim p2 As cv.Point
     Public Sub New()
         labels(2) = "Use mouse in right image to highlight lines"
         desc = "An alternative way to highlight line segments with common slope"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static redRadio = findRadio("Show Top intercepts")
-        Static greenRadio = findRadio("Show Bottom intercepts")
-        Static yellowRadio = findRadio("Show Right intercepts")
-        Static blueRadio = findRadio("Show Left intercepts")
+        Static redRadio = FindRadio("Show Top intercepts")
+        Static greenRadio = FindRadio("Show Bottom intercepts")
+        Static yellowRadio = FindRadio("Show Right intercepts")
+        Static blueRadio = FindRadio("Show Left intercepts")
 
         lines.Run(src)
         dst3.SetTo(0)
@@ -134,7 +135,6 @@ Public Class Line_InterceptsUI : Inherits VB_Parent
         Dim color = dst3.Get(Of cv.Vec3b)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
 
         Dim p1 = task.mouseMovePoint
-        Static p2 As cv.Point
         If p1.X = center.X Then
             If p1.Y <= center.Y Then p2 = New cv.Point(dst3.Width / 2, 0) Else p2 = New cv.Point(dst3.Width, dst3.Height)
         Else
@@ -147,7 +147,7 @@ Public Class Line_InterceptsUI : Inherits VB_Parent
             If color(0) = 254 Then p2 = New cv.Point(0, b) ' blue
             DrawLine(dst3, center, p2, cv.Scalar.Black)
         End If
-        DrawCircle(dst3, center, task.dotSize, cv.Scalar.White)
+        DrawCircle(dst3, center, task.DotSize, cv.Scalar.White)
 
         If color(0) = 0 Then redRadio.checked = True
         If color(0) = 1 Then greenRadio.checked = True
@@ -266,7 +266,7 @@ Public Class Line_LeftRightImages : Inherits VB_Parent
         desc = "Find lines in the infrared images and overlay them in a single image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static rgbCheck = findCheckBox("Show lines from BGR in green")
+        Static rgbCheck = FindCheckBox("Show lines from BGR in green")
 
         If task.cameraStable = False Then dst2.SetTo(cv.Scalar.White)
 
@@ -362,11 +362,11 @@ Public Class Line_PointSlope : Inherits VB_Parent
     Dim extend As New LongLine_Extend
     Dim lines As New Line_Basics
     Dim knn As New KNN_CoreN
-    Public bestLines As New List(Of pointPair)
+    Public bestLines As New List(Of PointPair)
     Const lineCount As Integer = 3
     Const searchCount As Integer = 100
     Public Sub New()
-        knn.knnDimension = 5 ' slope, p1.x, p1.y, p2.x, p2.y
+        knn.options.knnDimension = 5 ' slope, p1.x, p1.y, p2.x, p2.y
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "TrainInput to KNN", "Tracking these lines", "Query inputs to KNN"}
         desc = "Find the 3 longest lines in the image and identify them from frame to frame using the point and slope."
@@ -381,10 +381,10 @@ Public Class Line_PointSlope : Inherits VB_Parent
             knn.queries.Clear()
             For Each lp In lines.lpList
                 bestLines.Add(lp)
-                For j = 0 To knn.knnDimension - 1
+                For j = 0 To knn.options.knnDimension - 1
                     knn.queries.Add(Choose(j + 1, lp.slope, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
                 Next
-                DrawLine(dst3, lp.p1, lp.p2, task.highlightColor)
+                DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor)
                 If bestLines.Count >= lineCount Then Exit For
             Next
         End If
@@ -392,19 +392,19 @@ Public Class Line_PointSlope : Inherits VB_Parent
         dst1.SetTo(0)
         knn.trainInput.Clear()
         For Each lp In lines.lpList
-            For j = 0 To knn.knnDimension - 1
+            For j = 0 To knn.options.knnDimension - 1
                 knn.trainInput.Add(Choose(j + 1, lp.slope, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
             Next
-            dst1.Line(lp.p1, lp.p2, task.highlightColor, task.lineWidth + 1, task.lineType)
+            dst1.Line(lp.p1, lp.p2, task.HighlightColor, task.lineWidth + 1, task.lineType)
         Next
         If knn.trainInput.Count = 0 Then
-            setTrueText("There were no lines detected!  Were there any unusual settings for this run?", 3)
+            SetTrueText("There were no lines detected!  Were there any unusual settings for this run?", 3)
             Exit Sub
         End If
 
         knn.Run(empty)
 
-        Dim nextLines As New List(Of pointPair)
+        Dim nextLines As New List(Of PointPair)
         Dim usedBest As New List(Of Integer)
         Dim index As Integer
         For i = 0 To knn.result.GetUpperBound(0)
@@ -414,17 +414,17 @@ Public Class Line_PointSlope : Inherits VB_Parent
             Next
             usedBest.Add(index)
 
-            If index * knn.knnDimension < knn.trainInput.Count Then
-                Dim mps = New pointPair(New cv.Point2f(knn.trainInput(index * knn.knnDimension + 1), knn.trainInput(index * knn.knnDimension + 2)),
-                          New cv.Point2f(knn.trainInput(index * knn.knnDimension + 3), knn.trainInput(index * knn.knnDimension + 4)))
-                mps.slope = knn.trainInput(index * knn.knnDimension)
+            If index * knn.options.knnDimension + 4 < knn.trainInput.Count Then
+                Dim mps = New PointPair(New cv.Point2f(knn.trainInput(index * knn.options.knnDimension + 0), knn.trainInput(index * knn.options.knnDimension + 1)),
+                          New cv.Point2f(knn.trainInput(index * knn.options.knnDimension + 2), knn.trainInput(index * knn.options.knnDimension + 3)))
+                mps.slope = knn.trainInput(index * knn.options.knnDimension)
                 nextLines.Add(mps)
             End If
         Next
 
-        bestLines = New List(Of pointPair)(nextLines)
+        bestLines = New List(Of PointPair)(nextLines)
         For Each ptS In bestLines
-            DrawLine(dst2, ptS.p1, ptS.p2, task.highlightColor)
+            DrawLine(dst2, ptS.p1, ptS.p2, task.HighlightColor)
             DrawLine(dst1, ptS.p1, ptS.p2, cv.Scalar.Red)
         Next
     End Sub
@@ -560,9 +560,10 @@ Public Class Line_DisplayInfo : Inherits VB_Parent
     Dim blur As New Blur_Basics
     Public distance As Integer
     Public maskCount As Integer
+    Dim myCurrentFrame As Integer = -1
     Public Sub New()
-        dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         labels(2) = "When running standaloneTest(), a pair of random points is used to test the algorithm."
         desc = "Display the line provided in mp"
     End Sub
@@ -578,7 +579,6 @@ Public Class Line_DisplayInfo : Inherits VB_Parent
         End If
         If tcells.Count < 2 Then Exit Sub
 
-        Static myCurrentFrame As Integer = -1
         If myCurrentFrame < task.frameCount Then
             canny.Run(src)
             blur.Run(canny.dst2)
@@ -595,17 +595,17 @@ Public Class Line_DisplayInfo : Inherits VB_Parent
         maskCount = dst3.CountNonZero
 
         For Each tc In tcells
-            'dst2.Rectangle(tc.rect, myHighLightColor)
+            'dst2.Rectangle(tc.rect, myHighlightColor)
             'dst2.Rectangle(tc.searchRect, cv.Scalar.White, task.lineWidth)
-            setTrueText(tc.strOut, New cv.Point(tc.rect.X, tc.rect.Y))
+            SetTrueText(tc.strOut, New cv.Point(tc.rect.X, tc.rect.Y))
         Next
 
         strOut = "Mask count = " + CStr(maskCount) + ", Expected count = " + CStr(distance) + " or " + Format(maskCount / distance, "0%") + vbCrLf
-        DrawLine(dst2, p1, p2, task.highlightColor)
+        DrawLine(dst2, p1, p2, task.HighlightColor)
 
         strOut += "Color changes when correlation falls below threshold and new line is detected." + vbCrLf +
                   "Correlation coefficient is shown with the depth in meters."
-        setTrueText(strOut, 3)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -639,7 +639,7 @@ Public Class Line_Perpendicular : Inherits VB_Parent
             If p1.X = p2.X Then slope = 100000 Else slope = (p1.Y - p2.Y) / (p1.X - p2.X)
             Dim midPoint = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
 
-            DrawCircle(dst2, midPoint, task.dotSize + 2, cv.Scalar.Red)
+            DrawCircle(dst2, midPoint, task.DotSize + 2, cv.Scalar.Red)
             Dim m = If(slope = 0, 100000, -1 / slope)
 
             Dim b = midPoint.Y - m * midPoint.X
@@ -845,7 +845,7 @@ End Class
 
 Public Class Line_TimeViewLines : Inherits VB_Parent
     Dim lines As New Line_TimeView
-    Public lpList As New List(Of pointPair)
+    Public lpList As New List(Of PointPair)
     Public Sub New()
         labels(2) = "Lines from the latest Line_TimeLine"
         labels(3) = "Vertical (blue) Horizontal (Red) Other (Green)"
@@ -877,19 +877,19 @@ End Class
 
 
 Public Class Line_TimeView : Inherits VB_Parent
-    Public frameList As New List(Of List(Of pointPair))
+    Public frameList As New List(Of List(Of PointPair))
     Public lines As New Line_Basics
     Public pixelcount As Integer
-    Public mpList As New List(Of pointPair)
+    Public mpList As New List(Of PointPair)
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "Collect lines over time"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         lines.Run(src)
 
         If task.optionsChanged Or task.motionFlag Then frameList.Clear()
-        Dim nextMpList = New List(Of pointPair)(lines.lpList)
+        Dim nextMpList = New List(Of PointPair)(lines.lpList)
         frameList.Add(nextMpList)
 
         dst2 = src
@@ -926,7 +926,7 @@ Public Class Line_RegionsVB : Inherits VB_Parent
         task.redOptions.BitwiseReduction.Checked = True
         task.redOptions.BitwiseReductionBar.Value = 6
 
-        If findfrm(traceName + " CheckBoxes") Is Nothing Then
+        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Show intermediate vertical step results.")
             check.addCheckBox("Run horizontal without vertical step")
@@ -935,8 +935,8 @@ Public Class Line_RegionsVB : Inherits VB_Parent
         desc = "Use the reduction values between lines to identify regions."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static noVertCheck = findCheckBox("Run horizontal without vertical step")
-        Static verticalCheck = findCheckBox("Show intermediate vertical step results.")
+        Static noVertCheck = FindCheckBox("Run horizontal without vertical step")
+        Static verticalCheck = FindCheckBox("Show intermediate vertical step results.")
         reduction.Run(src)
         dst2 = reduction.dst2
         dst3 = dst2.Clone
@@ -1071,9 +1071,9 @@ Public Class Line_Verticals : Inherits VB_Parent
             Dim arcX = Math.Asin((vert.pt1.X - vert.pt2.X) / vert.len3D) * 57.2958
             Dim arcZ = Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958
             If Math.Abs(arcX) <= maxAngleX And Math.Abs(arcZ) <= maxAngleZ Then
-                setTrueText(Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z", lines2(i), 2)
-                setTrueText(Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z", lines2(i), 3)
-                DrawLine(dst2, lines2(i), lines2(i + 1), task.highlightColor)
+                SetTrueText(Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z", lines2(i), 2)
+                SetTrueText(Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z", lines2(i), 3)
+                DrawLine(dst2, lines2(i), lines2(i + 1), task.HighlightColor)
                 verticals.Add(vert)
             End If
         Next
@@ -1146,10 +1146,10 @@ Public Class Line_Verts : Inherits VB_Parent
                 Dim arcX = Math.Asin((vert.pt1.X - vert.pt2.X) / vert.len3D) * 57.2958
                 Dim arcZ = Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958
                 If Math.Abs(arcX) <= verts.maxAngleX And Math.Abs(arcZ) <= verts.maxAngleZ Then
-                    setTrueText(vert.tc1.strOut, New cv.Point(vert.tc1.rect.X, vert.tc1.rect.Y))
-                    setTrueText(vert.tc1.strOut + vbCrLf + Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z",
+                    SetTrueText(vert.tc1.strOut, New cv.Point(vert.tc1.rect.X, vert.tc1.rect.Y))
+                    SetTrueText(vert.tc1.strOut + vbCrLf + Format(arcX, fmt1) + " X" + vbCrLf + Format(arcZ, fmt1) + " Z",
                                 New cv.Point(vert.tc1.rect.X, vert.tc1.rect.Y), 3)
-                    DrawLine(dst2, vert.tc1.center, vert.tc2.center, task.highlightColor)
+                    DrawLine(dst2, vert.tc1.center, vert.tc2.center, task.HighlightColor)
                     verticals.Add(vert)
                 End If
             Next
@@ -1167,7 +1167,7 @@ End Class
 
 Public Class Line_Nearest : Inherits VB_Parent
     Public pt As cv.Point2f ' How close is this point to the input line?
-    Public lp As New pointPair ' the input line.
+    Public lp As New PointPair ' the input line.
     Public nearPoint As cv.Point2f
     Public onTheLine As Boolean
     Public distance As Single
@@ -1216,7 +1216,7 @@ Public Class Line_Nearest : Inherits VB_Parent
             dst2.SetTo(0)
             DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
             DrawLine(dst2, pt, nearPoint, cv.Scalar.White)
-            DrawCircle(dst2, pt, task.dotSize, cv.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
         End If
         distance = Math.Sqrt(Math.Pow(pt.X - nearPoint.X, 2) + Math.Pow(pt.Y - nearPoint.Y, 2))
     End Sub
@@ -1241,13 +1241,13 @@ Public Class Line_Intersection : Inherits VB_Parent
             p4 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
         End If
 
-        intersectionPoint = vbIntersectTest(p1, p2, p3, p4, New cv.Rect(0, 0, src.Width, src.Height))
+        intersectionPoint = IntersectTest(p1, p2, p3, p4, New cv.Rect(0, 0, src.Width, src.Height))
 
         dst2.SetTo(0)
         dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         dst2.Line(p3, p4, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         If intersectionPoint <> New cv.Point2f Then
-            DrawCircle(dst2, intersectionPoint, task.dotSize + 4, cv.Scalar.White)
+            DrawCircle(dst2, intersectionPoint, task.DotSize + 4, cv.Scalar.White)
             labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
         Else
             labels(2) = "Parallel!!!"
@@ -1282,7 +1282,7 @@ Public Class Line_Gravity : Inherits VB_Parent
         nearest.lp = task.gravityVec
         DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White)
         For Each lp In lines.lpList
-            Dim ptInter = vbIntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
+            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
             If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
 
             nearest.pt = lp.p1
@@ -1296,14 +1296,14 @@ Public Class Line_Gravity : Inherits VB_Parent
             'DrawLine(dst2,nearest.nearPoint, lp.p2, cv.Scalar.Red)
 
             If Math.Abs(d1 - d2) <= pixelDiff Then
-                DrawLine(dst2, lp.p1, lp.p2, task.highlightColor)
+                DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor)
             End If
         Next
 
         DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
         nearest.lp = task.horizonVec
         For Each lp In lines.lpList
-            Dim ptInter = vbIntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
+            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
             If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
 
             nearest.pt = lp.p1
@@ -1347,7 +1347,7 @@ Public Class Line_GravityIntersect : Inherits VB_Parent
         'nearest.lp = task.gravityVec
         'DrawLine(dst2,task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White)
         'For Each lp In lines.lpList
-        '    Dim ptInter = vbIntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
+        '    Dim ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
         '    If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
 
         '    nearest.pt = lp.p1
@@ -1361,14 +1361,14 @@ Public Class Line_GravityIntersect : Inherits VB_Parent
         '    'DrawLine(dst2,nearest.nearPoint, lp.p2, cv.Scalar.Red)
 
         '    If Math.Abs(d1 - d2) <= pixelDiff Then
-        '        DrawLine(dst2,lp.p1, lp.p2, task.highlightColor)
+        '        DrawLine(dst2,lp.p1, lp.p2, task.HighlightColor)
         '    End If
         'Next
 
         'DrawLine(dst2,task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
         'nearest.lp = task.horizonVec
         'For Each lp In lines.lpList
-        '    Dim ptInter = vbIntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
+        '    Dim ptInter = IntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
         '    If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
 
         '    nearest.pt = lp.p1
@@ -1397,7 +1397,7 @@ Public Class Line_KNN : Inherits VB_Parent
     Dim swarm As New Swarm_Basics
     Public Sub New()
         FindSlider("Connect X KNN points").Value = 1
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
         desc = "Use KNN to find the other line end points nearest to each endpoint and connect them with a line."
     End Sub
     Public Sub RunVB(src As cv.Mat)

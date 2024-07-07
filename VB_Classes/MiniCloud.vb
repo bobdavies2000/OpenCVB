@@ -15,7 +15,7 @@ Public Class MiniCloud_Basics : Inherits VB_Parent
         split(2).SetTo(0, task.noDepthMask.Resize(split(2).Size))
         rect = New cv.Rect(0, 0, resize.dst2.Width, resize.dst2.Height)
         If rect.Height < dst2.Height / 2 Then rect.Y = dst2.Height / 4 ' move it below the dst2 caption
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         dst2(rect) = split(2).ConvertScaleAbs(255)
         dst2.Rectangle(rect, cv.Scalar.White, 1)
         cv.Cv2.Merge(split, dst3)
@@ -34,7 +34,7 @@ Public Class MiniCloud_Rotate : Inherits VB_Parent
     Public mini As New MiniCloud_Basics
     Public histogram As New cv.Mat
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         labels(3) = "Side view after resize percentage - use Y-Axis slider to rotate image."
         desc = "Create a histogram for the mini point cloud"
     End Sub
@@ -68,7 +68,7 @@ Public Class MiniCloud_Rotate : Inherits VB_Parent
         Dim mask = split(2).Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
         input.SetTo(0, mask.ConvertScaleAbs(255)) ' remove zero depth pixels with non-zero x and y.
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.maxZmeters)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.MaxZmeters)}
         cv.Cv2.CalcHist({input}, {1, 2}, New cv.Mat, histogram, 2, {input.Height, input.Width}, ranges)
 
         dst2(mini.rect) = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
@@ -161,6 +161,6 @@ Public Class MiniCloud_RotateSinglePass : Inherits VB_Parent
         dst2 = peak.dst2
         dst3 = peak.dst3
 
-        setTrueText("Peak concentration in the histogram is at angle " + CStr(bestAngle) + " degrees", 3)
+        SetTrueText("Peak concentration in the histogram is at angle " + CStr(bestAngle) + " degrees", 3)
     End Sub
 End Class

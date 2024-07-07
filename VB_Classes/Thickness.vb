@@ -16,6 +16,6 @@ Public Class Thickness_Basics : Inherits VB_Parent
         volZ.rc = rc
         volZ.Run(src)
         dst3 = volZ.dst3
-        setTrueText(volZ.strOut, 3)
+        SetTrueText(volZ.strOut, 3)
     End Sub
 End Class

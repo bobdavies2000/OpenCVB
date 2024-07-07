@@ -23,7 +23,7 @@ Public Class Rectangle_Basics : Inherits VB_Parent
                 Dim rr = New cv.RotatedRect(nPoint, eSize, angle)
                 Dim r = New cv.Rect(nPoint.X, nPoint.Y, width, height)
                 If options.drawRotated Then
-                    drawRotatedRectangle(rr, dst2, nextColor)
+                    DrawRotatedRectangle(rr, dst2, nextColor)
                 Else
                     cv.Cv2.Rectangle(dst2, r, nextColor, options.drawFilled)
                 End If
@@ -40,7 +40,7 @@ End Class
 Public Class Rectangle_Rotated : Inherits VB_Parent
     Public rectangle As New Rectangle_Basics
     Public Sub New()
-        findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)").Checked = True
+        FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)").Checked = True
         desc = "Draw the requested number of rectangles."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -66,7 +66,7 @@ Public Class Rectangle_Overlap : Inherits VB_Parent
         desc = "Test if 2 rectangles overlap"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static typeCheckBox = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+        Static typeCheckBox = FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
         If not task.heartBeat Then Exit Sub
         If standaloneTest() Then
             draw.Run(src)
@@ -138,7 +138,7 @@ Public Class Rectangle_Intersection : Inherits VB_Parent
 
         If standaloneTest() Then
             If task.heartBeat Then
-                Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+                Static rotatedCheck = FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
                 Static countSlider = FindSlider("DrawCount")
 
                 rotatedCheck.Enabled = False
@@ -196,7 +196,7 @@ Public Class Rectangle_Union : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
             Static countSlider = FindSlider("DrawCount")
-            Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+            Static rotatedCheck = FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             rotatedCheck.Enabled = False
             countSlider.Value = msRNG.Next(2, 10)
             labels(2) = "Input rectangles = " + CStr(draw.rectangles.Count)
@@ -246,7 +246,7 @@ Public Class Rectangle_MultiOverlap : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+            Static rotatedCheck = FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             Static countSlider = FindSlider("DrawCount")
             rotatedCheck.Enabled = False
             countSlider.Value = msRNG.Next(2, 10)
@@ -307,7 +307,7 @@ Public Class Rectangle_EnclosingPoints : Inherits VB_Parent
             pointList = quickRandomPoints(20)
             dst2.SetTo(0)
             For Each pt In pointList
-                DrawCircle(dst2,pt, task.dotSize, task.highlightColor)
+                DrawCircle(dst2,pt, task.DotSize, task.HighlightColor)
             Next
         End If
 

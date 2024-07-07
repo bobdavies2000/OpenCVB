@@ -31,7 +31,7 @@ Public Class PointCloud_Basics : Inherits VB_Parent
                 If vec.Z > 0 Then
                     If (Math.Abs(lastVec.Z - vec.Z) < deltaThreshold And lastVec.X < vec.X) Or lastVec.Z = 0 Then
                         actualCount += 1
-                        DrawCircle(dst2,New cv.Point(x, y), task.dotSize, cv.Scalar.White)
+                        DrawCircle(dst2,New cv.Point(x, y), task.DotSize, cv.Scalar.White)
                         vecList.Add(vec)
                         xyVec.Add(New cv.Point(x, y))
                     Else
@@ -63,7 +63,7 @@ Public Class PointCloud_Basics : Inherits VB_Parent
                 If vec.Z > 0 Then
                     If (Math.Abs(lastVec.Z - vec.Z) < deltaThreshold And lastVec.Y < vec.Y) Or lastVec.Z = 0 Then
                         actualCount += 1
-                        DrawCircle(dst2,New cv.Point(x, y), task.dotSize, cv.Scalar.White)
+                        DrawCircle(dst2,New cv.Point(x, y), task.DotSize, cv.Scalar.White)
                         vecList.Add(vec)
                         xyVec.Add(New cv.Point(x, y))
                     Else
@@ -140,8 +140,9 @@ End Class
 Public Class PointCloud_Spin : Inherits VB_Parent
     Dim options As New Options_IMU
     Dim gMat As New IMU_GMatrixWithOptions
+    Dim xBump = 1, yBump = 1, zBump = 1
     Public Sub New()
-        If findfrm(traceName + " CheckBoxes") Is Nothing Then
+        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Spin pointcloud on X-axis")
             check.addCheckBox("Spin pointcloud on Y-axis")
@@ -149,18 +150,16 @@ Public Class PointCloud_Spin : Inherits VB_Parent
             check.Box(2).Checked = True
         End If
 
-        task.gOptions.gravityPointCloud.Checked = False
+        task.gOptions.setGravityUsage(False)
         desc = "Spin the point cloud exercise"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static xCheck = findCheckBox("Spin pointcloud on X-axis")
-        Static yCheck = findCheckBox("Spin pointcloud on Y-axis")
-        Static zCheck = findCheckBox("Spin pointcloud on Z-axis")
+        Static xCheck = FindCheckBox("Spin pointcloud on X-axis")
+        Static yCheck = FindCheckBox("Spin pointcloud on Y-axis")
+        Static zCheck = FindCheckBox("Spin pointcloud on Z-axis")
         Static xRotateSlider = FindSlider("Rotate pointcloud around X-axis (degrees)")
         Static yRotateSlider = FindSlider("Rotate pointcloud around Y-axis (degrees)")
         Static zRotateSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)")
-
-        Static xBump = 1, yBump = 1, zBump = 1
 
         If xCheck.checked Then
             If xRotateSlider.value = -90 Then xBump = 1
@@ -224,8 +223,8 @@ Public Class PointCloud_Continuous_VB : Inherits VB_Parent
             sliders.setupTrackBar("Threshold of continuity in mm", 0, 1000, 10)
         End If
 
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Show where the pointcloud is continuous"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -271,25 +270,25 @@ Public Class PointCloud_SetupSide : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim distanceRatio As Single = 1
-        If src.Channels <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If src.Channels() <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         If standaloneTest() Then dst2.SetTo(0) Else src.CopyTo(dst2)
-        DrawCircle(dst2,task.sideCameraPoint, task.dotSize, cv.Scalar.BlueViolet)
-        For i = 1 To task.maxZmeters
-            Dim xmeter = CInt(dst2.Width * i / task.maxZmeters * distanceRatio)
+        DrawCircle(dst2, task.sideCameraPoint, task.DotSize, cv.Scalar.BlueViolet)
+        For i = 1 To task.MaxZmeters
+            Dim xmeter = CInt(dst2.Width * i / task.MaxZmeters * distanceRatio)
             dst2.Line(New cv.Point(xmeter, 0), New cv.Point(xmeter, dst2.Height), cv.Scalar.AliceBlue, 1)
-            setTrueText(CStr(i) + "m", New cv.Point(xmeter - src.Width / 24, dst2.Height - 10))
+            SetTrueText(CStr(i) + "m", New cv.Point(xmeter - src.Width / 24, dst2.Height - 10))
         Next
 
         Dim cam = task.sideCameraPoint
-        Dim marker As New cv.Point2f(dst2.Width / (task.maxZmeters * distanceRatio), 0)
+        Dim marker As New cv.Point2f(dst2.Width / (task.MaxZmeters * distanceRatio), 0)
         marker.Y = marker.X * Math.Tan((task.vFov / 2) * cv.Cv2.PI / 180)
         Dim topLen = marker.X * Math.Tan((task.hFov / 2) * cv.Cv2.PI / 180)
         Dim markerLeft = New cv.Point(marker.X, cam.Y - marker.Y)
         Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
 
         Dim offset = Math.Sin(task.accRadians.X) * marker.Y
-        If task.gOptions.gravityPointCloud.Checked Then
+        If task.useGravityPointcloud Then
             If task.accRadians.X > 0 Then
                 markerLeft.Y = markerLeft.Y - offset
                 markerRight.Y = markerRight.Y + offset
@@ -308,8 +307,8 @@ Public Class PointCloud_SetupSide : Inherits VB_Parent
                                                (markerRight.Y - cam.Y) * Math.Cos(task.accRadians.Z) + (markerRight.X - cam.X) * Math.Sin(task.accRadians.Z) + cam.Y)
         End If
         If standaloneTest() = False Then
-            DrawCircle(dst2,markerLeft, task.dotSize, cv.Scalar.Red)
-            DrawCircle(dst2,markerRight, task.dotSize, cv.Scalar.Red)
+            DrawCircle(dst2, markerLeft, task.DotSize, cv.Scalar.Red)
+            DrawCircle(dst2, markerRight, task.DotSize, cv.Scalar.Red)
         End If
 
         ' draw the arc enclosing the camera FOV
@@ -322,13 +321,13 @@ Public Class PointCloud_SetupSide : Inherits VB_Parent
         dst2.Line(cam, fovTop, cv.Scalar.White, 1, task.lineType)
         dst2.Line(cam, fovBot, cv.Scalar.White, 1, task.lineType)
 
-        DrawCircle(dst2,markerLeft, task.dotSize + 3, cv.Scalar.Red)
-        DrawCircle(dst2,markerRight, task.dotSize + 3, cv.Scalar.Red)
+        DrawCircle(dst2, markerLeft, task.DotSize + 3, cv.Scalar.Red)
+        DrawCircle(dst2, markerRight, task.DotSize + 3, cv.Scalar.Red)
         dst2.Line(cam, markerLeft, cv.Scalar.Red, 1, task.lineType)
         dst2.Line(cam, markerRight, cv.Scalar.Red, 1, task.lineType)
 
         Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
-        setTrueText("vFOV=" + Format(180 - startAngle * 2, "0.0") + " deg.", New cv.Point(4, dst2.Height * 3 / 4))
+        SetTrueText("vFOV=" + Format(180 - startAngle * 2, "0.0") + " deg.", New cv.Point(4, dst2.Height * 3 / 4))
     End Sub
 End Class
 
@@ -350,18 +349,18 @@ Public Class PointCloud_SetupTop : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim distanceRatio As Single = 1
-        If src.Channels <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If src.Channels() <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         If standaloneTest() Then dst2.SetTo(0) Else src.CopyTo(dst2)
-        DrawCircle(dst2,task.topCameraPoint, task.dotSize, cv.Scalar.BlueViolet)
-        For i = 1 To task.maxZmeters
-            Dim ymeter = CInt(dst2.Height - dst2.Height * i / (task.maxZmeters * distanceRatio))
+        DrawCircle(dst2, task.topCameraPoint, task.DotSize, cv.Scalar.BlueViolet)
+        For i = 1 To task.MaxZmeters
+            Dim ymeter = CInt(dst2.Height - dst2.Height * i / (task.MaxZmeters * distanceRatio))
             dst2.Line(New cv.Point(0, ymeter), New cv.Point(dst2.Width, ymeter), cv.Scalar.AliceBlue, 1)
-            setTrueText(CStr(i) + "m", New cv.Point(10, ymeter))
+            SetTrueText(CStr(i) + "m", New cv.Point(10, ymeter))
         Next
 
         Dim cam = task.topCameraPoint
-        Dim marker As New cv.Point2f(cam.X, dst2.Height / task.maxZmeters)
+        Dim marker As New cv.Point2f(cam.X, dst2.Height / task.MaxZmeters)
         Dim topLen = marker.Y * Math.Tan((task.hFov / 2) * cv.Cv2.PI / 180)
         Dim sideLen = marker.Y * Math.Tan((task.vFov / 2) * cv.Cv2.PI / 180)
         Dim markerLeft = New cv.Point(cam.X - topLen, marker.Y)
@@ -369,7 +368,7 @@ Public Class PointCloud_SetupTop : Inherits VB_Parent
 
         Static zRotateSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)")
         Dim offset = Math.Sin(task.accRadians.Z) * topLen
-        If task.gOptions.gravityPointCloud.Checked Then
+        If task.useGravityPointcloud Then
             If task.accRadians.Z > 0 Then
                 markerLeft.X = markerLeft.X - offset
                 markerRight.X = markerRight.X + offset
@@ -388,14 +387,14 @@ Public Class PointCloud_SetupTop : Inherits VB_Parent
 
         dst2.Line(task.topCameraPoint, fovLeft, cv.Scalar.White, 1, task.lineType)
 
-        DrawCircle(dst2,markerLeft, task.dotSize + 3, cv.Scalar.Red)
-        DrawCircle(dst2,markerRight, task.dotSize + 3, cv.Scalar.Red)
+        DrawCircle(dst2, markerLeft, task.DotSize + 3, cv.Scalar.Red)
+        DrawCircle(dst2, markerRight, task.DotSize + 3, cv.Scalar.Red)
         dst2.Line(cam, markerLeft, cv.Scalar.Red, 1, task.lineType)
         dst2.Line(cam, markerRight, cv.Scalar.Red, 1, task.lineType)
 
         Dim shift = (src.Width - src.Height) / 2
         Dim labelLocation = New cv.Point(dst2.Width / 2 + shift, dst2.Height * 15 / 16)
-        setTrueText("hFOV=" + Format(180 - startAngle * 2, "0.0") + " deg.", New cv.Point(4, dst2.Height * 7 / 8))
+        SetTrueText("hFOV=" + Format(180 - startAngle * 2, "0.0") + " deg.", New cv.Point(4, dst2.Height * 7 / 8))
         DrawLine(dst2, task.topCameraPoint, fovRight, cv.Scalar.White)
     End Sub
 End Class
@@ -415,12 +414,12 @@ Public Class PointCloud_Raw_CPP : Inherits VB_Parent
         cPtr = SimpleProjectionOpen()
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.firstPass Then ReDim depthBytes(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1)
+        If task.FirstPass Then ReDim depthBytes(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1)
 
         Marshal.Copy(task.pcSplit(2).Data, depthBytes, 0, depthBytes.Length)
         Dim handleDepth = GCHandle.Alloc(depthBytes, GCHandleType.Pinned)
 
-        Dim imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject, 0, task.maxZmeters, task.pcSplit(2).Height, task.pcSplit(2).Width)
+        Dim imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject, 0, task.MaxZmeters, task.pcSplit(2).Height, task.pcSplit(2).Width)
 
         dst2 = New cv.Mat(task.pcSplit(2).Rows, task.pcSplit(2).Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst3 = New cv.Mat(task.pcSplit(2).Rows, task.pcSplit(2).Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -447,7 +446,7 @@ Public Class PointCloud_Raw : Inherits VB_Parent
         cPtr = SimpleProjectionOpen()
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim range As Single = task.maxZmeters
+        Dim range As Single = task.MaxZmeters
 
         ' this VB.Net version is much slower than the optimized C++ version below.
         dst2 = src.EmptyClone.SetTo(cv.Scalar.White)
@@ -485,7 +484,7 @@ End Class
 Public Class PointCloud_Solo : Inherits VB_Parent
     Public heat As New HeatMap_Basics
     Public Sub New()
-        findCheckBox("Top View (Unchecked Side View)").Checked = True
+        FindCheckBox("Top View (Unchecked Side View)").Checked = True
         labels(2) = "Top down view after inrange sampling"
         labels(3) = "Histogram after filtering For Single-only histogram bins"
         desc = "Find floor And ceiling Using gravity aligned top-down view And selecting bins With exactly 1 sample"
@@ -545,7 +544,7 @@ Public Class PointCloud_SurfaceH_CPP : Inherits VB_Parent
         Dim peakVal As Integer
         For i = 0 To dst2.Height - 1
             plot.srcX.Add(i)
-            If dst2.Channels = 1 Then plot.srcY.Add(dst2.Row(i).CountNonZero) Else plot.srcY.Add(dst2.Row(i).CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero)
+            If dst2.Channels() = 1 Then plot.srcY.Add(dst2.Row(i).CountNonZero) Else plot.srcY.Add(dst2.Row(i).CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero)
             If peakVal < plot.srcY(i) Then
                 peakVal = plot.srcY(i)
                 peakRow = i
@@ -576,7 +575,7 @@ Public Class PointCloud_SurfaceH : Inherits VB_Parent
     Public botRow As Integer
     Public peakRow As Integer
     Public Sub New()
-        findCheckBox("Top View (Unchecked Side View)").Checked = True
+        FindCheckBox("Top View (Unchecked Side View)").Checked = True
         labels(3) = "Histogram Of Each Of " + CStr(task.histogramBins) + " bins aligned With the sideview"
         desc = "Find the horizontal surfaces With a projects Of the SideView histogram."
     End Sub
@@ -590,7 +589,7 @@ Public Class PointCloud_SurfaceH : Inherits VB_Parent
         botRow = 0
         peakRow = 0
         Dim peakVal As Integer
-        If dst2.Channels <> 1 Then dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If dst2.Channels() <> 1 Then dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         For i = 0 To dst1.Height - 1
             indexer(i) = dst1.Row(i).CountNonZero
             If peakVal < indexer(i) Then
@@ -633,7 +632,7 @@ Public Class PointCloud_NeighborV : Inherits VB_Parent
         options.RunVB()
         If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
-        Dim tmp32f = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
         Dim r1 = New cv.Rect(options.pixels, 0, dst2.Width - options.pixels, dst2.Height)
         Dim r2 = New cv.Rect(0, 0, dst2.Width - options.pixels, dst2.Height)
         cv.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
@@ -672,10 +671,10 @@ Public Class PointCloud_PCpointsMask : Inherits VB_Parent
     Public actualCount As Integer
     Public Sub New()
         setPointCloudGrid()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Reduce the point cloud to a manageable number points in 3D representing the averages of X, Y, and Z in that roi."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If task.optionsChanged Then pcPoints = New cv.Mat(task.gridRows, task.gridCols, cv.MatType.CV_32FC3, 0)
 
         dst2.SetTo(0)
@@ -687,11 +686,11 @@ Public Class PointCloud_PCpointsMask : Inherits VB_Parent
                 Dim mean = task.pointCloud(roi).Mean(task.depthMask(roi))
                 Dim depthPresent = task.depthMask(roi).CountNonZero > roi.Width * roi.Height / 2
                 If (depthPresent And mean(2) > 0 And Math.Abs(lastMeanZ - mean(2)) < 0.2 And
-                    mean(2) < task.maxZmeters) Or (lastMeanZ = 0 And mean(2) > 0) Then
+                    mean(2) < task.MaxZmeters) Or (lastMeanZ = 0 And mean(2) > 0) Then
 
                     pcPoints.Set(Of cv.Point3f)(y, x, New cv.Point3f(mean(0), mean(1), mean(2)))
                     actualCount += 1
-                    DrawCircle(dst2,New cv.Point(roi.X, roi.Y), task.dotSize * Math.Max(mean(2), 1), cv.Scalar.White)
+                    DrawCircle(dst2, New cv.Point(roi.X, roi.Y), task.DotSize * Math.Max(mean(2), 1), cv.Scalar.White)
                 End If
                 lastMeanZ = mean(2)
             Next
@@ -712,7 +711,7 @@ Public Class PointCloud_PCPoints : Inherits VB_Parent
         setPointCloudGrid()
         desc = "Reduce the point cloud to a manageable number points in 3D using the mean value"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim rw = task.gridList(0).Width / 2, rh = task.gridList(0).Height / 2
         Dim red32 = New cv.Point3f(0, 0, 1), blue32 = New cv.Point3f(1, 0, 0), white32 = New cv.Point3f(1, 1, 1)
         Dim red = cv.Scalar.Red, blue = cv.Scalar.Blue, white = cv.Scalar.White
@@ -726,7 +725,7 @@ Public Class PointCloud_PCPoints : Inherits VB_Parent
             If mean(2) > 0 Then
                 pcPoints.Add(Choose(pt.Y Mod 3 + 1, red32, blue32, white32))
                 pcPoints.Add(New cv.Point3f(mean(0), mean(1), mean(2)))
-                DrawCircle(dst2,pt, task.dotSize, Choose(pt.Y Mod 3 + 1, red, blue, white))
+                DrawCircle(dst2, pt, task.DotSize, Choose(pt.Y Mod 3 + 1, red, blue, white))
             End If
         Next
         labels(2) = "PointCloud Point Points found = " + CStr(pcPoints.Count / 2)
@@ -749,7 +748,7 @@ Public Class PointCloud_PCPointsPlane : Inherits VB_Parent
         setPointCloudGrid()
         desc = "Find planes using a reduced set of 3D points and the intersection of vertical and horizontal lines through those points."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         pcBasics.Run(src)
 
         pcPoints.Clear()
@@ -774,11 +773,11 @@ End Class
 
 Public Class PointCloud_Inspector : Inherits VB_Parent
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         task.mouseMovePoint.X = dst2.Width / 2
         desc = "Inspect x, y, and z values in a row or column"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim yLines = 20
         Dim cLine = task.mouseMovePoint.X
 
@@ -791,7 +790,7 @@ Public Class PointCloud_Inspector : Inherits VB_Parent
         DrawLine(dst2, topPt, botPt, 255)
 
         Dim stepY = dst2.Height / yLines
-        setTrueText(vbTab + "   X" + vbTab + "  Y" + vbTab + "  Z", 3)
+        SetTrueText(vbTab + "   X" + vbTab + "  Y" + vbTab + "  Z", 3)
         For i = 1 To yLines - 1
             Dim pt1 = New cv.Point2f(dst2.Width, i * stepY)
             Dim pt2 = New cv.Point2f(0, i * stepY)
@@ -799,7 +798,7 @@ Public Class PointCloud_Inspector : Inherits VB_Parent
 
             Dim pt = New cv.Point2f(cLine, i * stepY)
             Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
-            setTrueText("Row " + CStr(i) + vbTab + Format(xyz(0), fmt2) + vbTab + Format(xyz(1), fmt2) + vbTab + Format(xyz(2), fmt2), New cv.Point(5, pt.Y), 3)
+            SetTrueText("Row " + CStr(i) + vbTab + Format(xyz(0), fmt2) + vbTab + Format(xyz(1), fmt2) + vbTab + Format(xyz(2), fmt2), New cv.Point(5, pt.Y), 3)
         Next
         labels(2) = "Values displayed are the point cloud X, Y, and Z values for column " + CStr(cLine)
         labels(3) = "Move mouse in the image at left to see the point cloud X, Y, and Z values."
@@ -817,10 +816,10 @@ End Class
 Public Class PointCloud_Average : Inherits VB_Parent
     Dim pcHistory As New List(Of cv.Mat)
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
         desc = "Average all 3 elements of the point cloud - not just depth."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         pcHistory.Add(task.pointCloud)
         If pcHistory.Count >= task.frameHistoryCount Then pcHistory.RemoveAt(0)
 
@@ -842,8 +841,8 @@ Public Class PointCloud_FrustrumTop : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Dim setupTop As New PointCloud_SetupTop
     Public Sub New()
-        task.gOptions.gravityPointCloud.Checked = False
-        findCheckBox("Top View (Unchecked Side View)").Checked = True
+        task.gOptions.setGravityUsage(False)
+        FindCheckBox("Top View (Unchecked Side View)").Checked = True
         labels(3) = "Draw the frustrum from the top view"
         desc = "Draw the top view of the frustrum"
     End Sub
@@ -869,8 +868,8 @@ Public Class PointCloud_FrustrumSide : Inherits VB_Parent
     Dim heat As New HeatMap_Basics
     Dim setupSide As New PointCloud_SetupSide
     Public Sub New()
-        task.gOptions.gravityPointCloud.Checked = False
-        findCheckBox("Top View (Unchecked Side View)").Checked = False
+        task.gOptions.setGravityUsage(False)
+        FindCheckBox("Top View (Unchecked Side View)").Checked = False
         labels(2) = "Draw the frustrum from the side view"
         desc = "Draw the side view of the frustrum"
     End Sub
@@ -918,7 +917,7 @@ Public Class PointCloud_Histograms : Inherits VB_Parent
                 dst2 = plot2D.dst2
                 labels(2) = "2D plot of 2D histogram."
             Case 6 ' "XYZ Reduction"
-                If dst2.Type <> cv.MatType.CV_8U Then dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+                If dst2.Type <> cv.MatType.CV_8U Then dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
 
                 hcloud.Run(task.pointCloud)
 
@@ -932,8 +931,8 @@ Public Class PointCloud_Histograms : Inherits VB_Parent
                 If histData.Count < 128 And task.histogramBins < task.gOptions.HistBinBar.Maximum Then
                     task.histogramBins += 1
                 End If
-                If task.gridList.Count < histData.Length And task.gOptions.GridSize.Value > 2 Then
-                    task.gOptions.GridSize.Value -= 1
+                If task.gridList.Count < histData.Length And task.gridSize > 2 Then
+                    task.gridSize -= 1
                     grid.Run(src)
                     dst2.SetTo(0)
                 End If
@@ -978,7 +977,7 @@ Public Class PointCloud_ReduceSplit2 : Inherits VB_Parent
             dst3 = task.pointCloud
         Else
             Dim mm = GetMinMax(dst1)
-            dst1 *= task.maxZmeters / mm.maxVal
+            dst1 *= task.MaxZmeters / mm.maxVal
             cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), dst1}, dst3)
         End If
     End Sub

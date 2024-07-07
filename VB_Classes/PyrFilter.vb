@@ -33,7 +33,7 @@ Public Class PyrFilter_RedCloud : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         pyr.Run(src)
-        dst3 = pyr.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst3 = pyr.dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         reduction.Run(dst3)
 

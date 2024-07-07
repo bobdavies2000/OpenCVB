@@ -6,6 +6,7 @@ Public Class OilPaint_Pointilism : Inherits VB_Parent
     Dim randomMask As cv.Mat
     Dim myRNG As New cv.RNG
     Dim options As New Options_Pointilism
+    Dim saveDrawRect As New cv.Rect
     Public Sub New()
         task.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)
         desc = "Alter the image to effect the pointilism style"
@@ -15,7 +16,6 @@ Public Class OilPaint_Pointilism : Inherits VB_Parent
 
         dst2 = src
         Dim img = src(task.drawRect)
-        Static saveDrawRect As New cv.Rect
         If saveDrawRect <> task.drawRect Then
             saveDrawRect = task.drawRect
             ' only need to create the mask to order the brush strokes once.

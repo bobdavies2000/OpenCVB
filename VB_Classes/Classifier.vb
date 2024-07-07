@@ -18,10 +18,10 @@ Public Class Classifier_Basics : Inherits VB_Parent
 
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
         dst2 = ShowPalette(dst0 * 255 / 2)
-        imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.dotSize)
+        imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize)
         dst3 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
 
-        setTrueText("Click the global DebugCheckBox to get another set of points.", 3)
+        SetTrueText("Click the global DebugCheckBox to get another set of points.", 3)
     End Sub
     Public Sub Close()
         OEX_Points_Classifier_Close(cPtr)
@@ -43,7 +43,7 @@ Module OEX_Points_Classifier_CPP_Module
     Public Sub OEX_Points_Classifier_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OEX_ShowPoints(cPtr As IntPtr, imgRows As Integer, imgCols As Integer, dotSize As Integer) As IntPtr
+    Public Function OEX_ShowPoints(cPtr As IntPtr, imgRows As Integer, imgCols As Integer, DotSize As Integer) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function OEX_Points_Classifier_RunCPP(cPtr As IntPtr, count As Integer, methodIndex As Integer,
@@ -75,6 +75,7 @@ End Module
 
 
 Public Class Classifier_Bayesian : Inherits VB_Parent
+    Dim options As New Options_Classifier
     Public Sub New()
         cPtr = OEX_Points_Classifier_Open()
         desc = "Run the Bayesian classifier with the input."
@@ -82,7 +83,6 @@ Public Class Classifier_Bayesian : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         Dim sampleCount As Integer, methodIndex = 0
         If src.Type <> cv.MatType.CV_32FC2 Then
-            Static options As New Options_Classifier
             options.RunVB()
             sampleCount = options.sampleCount
             methodIndex = options.methodIndex
@@ -96,7 +96,7 @@ Public Class Classifier_Bayesian : Inherits VB_Parent
         dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_32S, imagePtr)
         dst1.ConvertTo(dst0, cv.MatType.CV_8U)
         dst2 = ShowPalette(dst0 * 255 / 2)
-        imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.dotSize)
+        imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize)
     End Sub
 End Class
 
@@ -114,7 +114,7 @@ Public Class Classifier_BayesianTest : Inherits VB_Parent
     Dim nabs As New Neighbors_Precise
     Public Sub New()
         task.redOptions.UseColorOnly.Checked = True
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
         labels = {"", "Mask of the neighbors to the selected cell", "RedCloud_Basics output", "Classifier_Bayesian output"}
         If standalone Then task.gOptions.setDisplay1()
         cPtr = Classifier_Bayesian_Open()
@@ -124,7 +124,7 @@ Public Class Classifier_BayesianTest : Inherits VB_Parent
         redC.Run(src)
         dst2 = redC.dst2
 
-        setTrueText("Review the neighbors_Precise algorithm")
+        SetTrueText("Review the neighbors_Precise algorithm")
         'nabs.redCells = task.redCells
         'nabs.Run(task.cellMap)
 
@@ -182,7 +182,7 @@ Public Class Classifier_BayesianTest : Inherits VB_Parent
         '        zeroOutput = False
         '    End If
         'Next
-        'If zeroOutput Then setTrueText("None of the neighbors were as similar to the selected cell.", 3)
+        'If zeroOutput Then SetTrueText("None of the neighbors were as similar to the selected cell.", 3)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then Classifier_Bayesian_Close(cPtr)

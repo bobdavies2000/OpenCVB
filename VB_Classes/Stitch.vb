@@ -4,8 +4,8 @@ Public Class Stitch_Basics : Inherits VB_Parent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Number of random images", 10, 50, 10)
-            sliders.setupTrackBar("Rectangle width", task.workingRes.Width / 4, task.workingRes.Width - 1, task.workingRes.Width / 2)
-            sliders.setupTrackBar("Rectangle height", task.workingRes.Height / 4, task.workingRes.Height - 1, task.workingRes.Height / 2)
+            sliders.setupTrackBar("Rectangle width", task.WorkingRes.Width / 4, task.WorkingRes.Width - 1, task.WorkingRes.Width / 2)
+            sliders.setupTrackBar("Rectangle height", task.WorkingRes.Height / 4, task.WorkingRes.Height - 1, task.WorkingRes.Height / 2)
         End If
         desc = "Stitch together random parts of a color image."
     End Sub
@@ -29,7 +29,7 @@ Public Class Stitch_Basics : Inherits VB_Parent
 
         If task.testAllRunning Then
             ' It runs fine but after several runs during 'Test All', it will fail with an external exception.  Only happens on 'Test All' runs.
-            setTrueText("Stitch_Basics only fails when running 'Test All'." + vbCrLf +
+            SetTrueText("Stitch_Basics only fails when running 'Test All'." + vbCrLf +
                                      "Skipping it during a 'Test All' just so all the other tests can be exercised.", New cv.Point(10, 100), 3)
             Exit Sub
         End If
@@ -47,7 +47,7 @@ Public Class Stitch_Basics : Inherits VB_Parent
             If h > dst2.Height Then h = dst2.Height
             pano.CopyTo(dst3(New cv.Rect(0, 0, w, h)))
         Else
-            If status = cv.Stitcher.Status.ErrorNeedMoreImgs Then setTrueText("Need more images", 3)
+            If status = cv.Stitcher.Status.ErrorNeedMoreImgs Then SetTrueText("Need more images", 3)
         End If
     End Sub
 End Class

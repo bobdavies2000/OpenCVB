@@ -17,10 +17,10 @@ Public Class Sides_Basics : Inherits VB_Parent
             Dim nextColor = sides.cornerColors(i)
             Dim nextLabel = sides.cornerNames(i)
             DrawLine(dst3, task.rc.maxDist, corners(i), cv.Scalar.White)
-            setTrueText(nextLabel, New cv.Point(corners(i).X, corners(i).Y), 3)
+            SetTrueText(nextLabel, New cv.Point(corners(i).X, corners(i).Y), 3)
         Next
 
-        If corners.Count Then setTrueText(sides.strOut, 3) Else setTrueText(strOut, 3)
+        If corners.Count Then SetTrueText(sides.strOut, 3) Else SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -43,7 +43,7 @@ Public Class Sides_Profile : Inherits VB_Parent
 
         sides.Run(src)
         dst3 = sides.dst3
-        setTrueText(sides.strOut, 3)
+        SetTrueText(sides.strOut, 3)
     End Sub
 End Class
 
@@ -67,7 +67,7 @@ Public Class Sides_Corner : Inherits VB_Parent
 
         sides.Run(src)
         dst3 = sides.dst3
-        setTrueText("Center point is rcSelect.maxDist", 3)
+        SetTrueText("Center point is rcSelect.maxDist", 3)
     End Sub
 End Class
 

@@ -1,8 +1,15 @@
 ﻿Imports cv = OpenCvSharp
 'https://github.com/DinoZ1729/Double-Pendulum/blob/main/pendulum_with_trace.cpp
 Public Class Pendulum_Basics : Inherits VB_Parent
+    Dim l1 As Single = 150, l2 As Single = 150, m1 As Single = 10, m2 As Single = 10
+    Dim o1 = 2 * cv.Cv2.PI / 2, o2 = 2 * cv.Cv2.PI / 3
+    Dim w1 As Single, w2 As Single
+    Dim g = 9.81
+    Dim dw As Single = 2, dh As Single = 4
+    Dim center = New cv.Point2f(dst2.Width / 2, 0)
+    Dim fps As Single = 300
     Public Sub New()
-        If findfrm(traceName + " CheckBoxes") Is Nothing Then
+        If FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Reset initial conditions")
             check.Box(0).Checked = True
@@ -13,16 +20,9 @@ Public Class Pendulum_Basics : Inherits VB_Parent
         desc = "Build a double pendulum"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static initCheck = findCheckBox("Reset initial conditions")
+        Static initCheck = FindCheckBox("Reset initial conditions")
         Static timeSlider = FindSlider("Pendulum FPS")
 
-        Static l1 As Single = 150, l2 As Single = 150, m1 As Single = 10, m2 As Single = 10
-        Static o1 = 2 * cv.Cv2.PI / 2, o2 = 2 * cv.Cv2.PI / 3
-        Static w1 As Single, w2 As Single
-        Static g = 9.81
-        Static dw As Single = 2, dh As Single = 4
-        Static center = New cv.Point2f(dst2.Width / 2, 0)
-        Static fps As Single = 300
         Dim accumulator As Single
 
         If task.frameCount Mod 1000 = 0 Or task.optionsChanged Then
@@ -56,10 +56,10 @@ Public Class Pendulum_Basics : Inherits VB_Parent
         p1 = New cv.Point2f(p1.X * 2, p1.Y * 0.5)
         Dim p2 = New cv.Point2f(p1.X + (Math.Sin(o2) * l2 + dw * 0.5) / dw, p1.Y - (Math.Cos(o2) * l2 + dh * 0.5) / dh)
 
-        DrawLine(dst2, center, p1, task.highlightColor)
-        DrawLine(dst2, p1, p2, task.highlightColor)
+        DrawLine(dst2, center, p1, task.HighlightColor)
+        DrawLine(dst2, p1, p2, task.HighlightColor)
 
-        DrawCircle(dst3,p1, task.dotSize, task.highlightColor)
-        DrawCircle(dst3,p2, task.dotSize, task.highlightColor)
+        DrawCircle(dst3,p1, task.DotSize, task.HighlightColor)
+        DrawCircle(dst3,p2, task.DotSize, task.HighlightColor)
     End Sub
 End Class

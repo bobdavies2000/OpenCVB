@@ -39,7 +39,7 @@ Public Class Guess_ImageEdges_CPP : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src as cv.Mat)
         If task.cameraName = "Oak-D camera" Or task.cameraName = "Azure Kinect 4K" Then
-            setTrueText("Only RealSense cameras are likely to benefit from enhanced depth at the image edges.")
+            SetTrueText("Only RealSense cameras are likely to benefit from enhanced depth at the image edges.")
             Exit Sub
         End If
         Static distSlider = FindSlider("Max Distance from edge")

@@ -8,12 +8,12 @@ Public Class Video_Basics : Inherits VB_Parent
     Dim fileInfo As FileInfo
     Public Sub New()
         fileNameForm = New OptionsFileName
-        fileNameForm.OpenFileDialog1.InitialDirectory = task.homeDir + "Data\"
+        fileNameForm.OpenFileDialog1.InitialDirectory = task.HomeDir + "Data\"
         fileNameForm.OpenFileDialog1.FileName = "*.*"
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", task.homeDir + "Data\CarsDrivingUnderBridge.mp4")
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", task.HomeDir + "Data\CarsDrivingUnderBridge.mp4")
         fileNameForm.Text = "Select a video file for input"
         fileNameForm.FileNameLabel.Text = "Select a video file for input"
         fileNameForm.PlayButton.Hide()
@@ -30,7 +30,7 @@ Public Class Video_Basics : Inherits VB_Parent
     Public Sub RunVB(src as cv.Mat)
         If srcVideo <> fileNameForm.filename.Text Then
             If fileInfo.Exists = False Then
-                setTrueText("File not found: " + fileInfo.FullName, New cv.Point(10, 125))
+                SetTrueText("File not found: " + fileInfo.FullName, New cv.Point(10, 125))
                 Exit Sub
             End If
             srcVideo = fileNameForm.filename.Text
@@ -59,6 +59,8 @@ Public Class Video_CarCounting : Inherits VB_Parent
     Dim flow As New Font_FlowText
     Dim video As New Video_Basics
     Dim bgSub As New BGSubtract_MOG
+    Dim activeState(5) As Boolean
+    Dim carCount As Integer
     Public Sub New()
         desc = "Count cars in a video file"
     End Sub
@@ -73,8 +75,6 @@ Public Class Video_CarCounting : Inherits VB_Parent
         ' NOTE: if long shadows are present this approach will not work without provision for the width of a car.  Needs more sample data.
         Dim activeHeight = 30
         Dim finishLine = bgSub.dst2.Height - activeHeight * 8
-        Static activeState(5) As Boolean
-        Static carCount As Integer
         For i = 1 To activeState.Length - 1
             Dim lane = New cv.Rect(Choose(i, 230, 460, 680, 900, 1110), finishLine, 40, activeHeight)
             Dim cellCount = videoImage(lane).CountNonZero
@@ -91,7 +91,7 @@ Public Class Video_CarCounting : Inherits VB_Parent
         Next
 
         Dim tmp = videoImage.Resize(src.Size())
-        If tmp.Channels <> dst2.Channels Then tmp = tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If tmp.Channels() <> dst2.Channels() Then tmp = tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         flow.msgs.Add("  Cars " + CStr(carCount))
         flow.Run(empty)
         dst2 = dst2 Or tmp
@@ -132,7 +132,7 @@ Public Class Video_MinRect : Inherits VB_Parent
     Public bgSub As New BGSubtract_MOG
     Public contours As cv.Point()()
     Public Sub New()
-        video.srcVideo = task.homeDir + "Data/CarsDrivingUnderBridge.mp4"
+        video.srcVideo = task.HomeDir + "Data/CarsDrivingUnderBridge.mp4"
         video.Run(dst2)
         desc = "Find area of car outline - example of using minAreaRect"
     End Sub
@@ -146,7 +146,7 @@ Public Class Video_MinRect : Inherits VB_Parent
             If standaloneTest() Then
                 For i = 0 To contours.Length - 1
                     Dim minRect = cv.Cv2.MinAreaRect(contours(i))
-                    drawRotatedRectangle(minRect, dst2, cv.Scalar.Red)
+                    DrawRotatedRectangle(minRect, dst2, cv.Scalar.Red)
                 Next
             End If
             dst3 = video.dst2

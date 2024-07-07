@@ -4,6 +4,7 @@ Public Class SVM_Basics : Inherits VB_Parent
     Dim sampleData As New SVM_SampleData
     Public points As New List(Of cv.Point2f)
     Public response As New List(Of Integer)
+    Dim svm As cv.ML.SVM
     Public Sub New()
         desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
         If standaloneTest() Then task.gOptions.setGridSize(8)
@@ -23,7 +24,6 @@ Public Class SVM_Basics : Inherits VB_Parent
         Dim resMat = New cv.Mat(options.sampleCount, 1, cv.MatType.CV_32SC1, response.ToArray)
         dataMat *= 1 / src.Height
 
-        Static svm As cv.ML.SVM
         If task.optionsChanged Then svm = options.createSVM()
         svm.Train(dataMat, cv.ML.SampleTypes.RowSample, resMat)
 
@@ -94,7 +94,10 @@ End Class
 
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
 Public Class SVM_TestCase : Inherits VB_Parent
-    ReadOnly options As New Options_SVM
+    Dim options As New Options_SVM
+    Dim points As New List(Of cv.Point2f)
+    Dim responses As New List(Of Integer)
+    Dim svm As cv.ML.SVM
     Public Sub New()
         FindSlider("Granularity").Value = 15
         labels = {"", "", "Input points - color is the category label", "Predictions"}
@@ -107,9 +110,6 @@ Public Class SVM_TestCase : Inherits VB_Parent
         dst3.SetTo(0)
         Dim labeled = 1
         Dim nonlabel = -1
-
-        Static points As New List(Of cv.Point2f)
-        Static responses As New List(Of Integer)
 
         If task.heartBeat Then
             points.Clear()
@@ -124,7 +124,6 @@ Public Class SVM_TestCase : Inherits VB_Parent
         Dim labelsMat = New cv.Mat(4, 1, cv.MatType.CV_32SC1, responses.ToArray)
         Dim dataMat = trainMat * 1 / src.Height
 
-        Static svm As cv.ML.SVM
         If task.optionsChanged Then svm = options.createSVM()
         svm.Train(dataMat, cv.ML.SampleTypes.RowSample, labelsMat)
 
@@ -135,15 +134,15 @@ Public Class SVM_TestCase : Inherits VB_Parent
                 sampleMat.Set(Of Single)(0, 1, y / src.Height)
                 Dim response = svm.Predict(sampleMat)
                 Dim color = If(response >= 0, cv.Scalar.Blue, cv.Scalar.Red)
-                DrawCircle(dst3,New cv.Point(CInt(x), CInt(y)), task.dotSize + 1, color)
+                DrawCircle(dst3,New cv.Point(CInt(x), CInt(y)), task.DotSize + 1, color)
             Next
         Next
 
         For i = 0 To trainMat.Rows - 1
             Dim color = If(labelsMat.Get(Of Integer)(i) = 1, cv.Scalar.Blue, cv.Scalar.Red)
             Dim pt = New cv.Point(trainMat.Get(Of Single)(i, 0), trainMat.Get(Of Single)(i, 1))
-            DrawCircle(dst2,pt, task.dotSize + 2, color)
-            DrawCircle(dst3,pt, task.dotSize + 2, color)
+            DrawCircle(dst2,pt, task.DotSize + 2, color)
+            DrawCircle(dst3,pt, task.DotSize + 2, color)
         Next
     End Sub
 End Class
@@ -158,7 +157,10 @@ End Class
 
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
 Public Class SVM_ReuseBasics : Inherits VB_Parent
-    ReadOnly svm As New SVM_Basics
+    Dim svm As New SVM_Basics
+    Dim points As New List(Of cv.Point2f)
+    Dim responses As New List(Of Integer)
+
     Public Sub New()
         FindSlider("Granularity").Value = 15
         FindSlider("SVM Sample Count").Value = 4
@@ -168,9 +170,6 @@ Public Class SVM_ReuseBasics : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         Dim labeled = 1
         Dim nonlabel = -1
-
-        Static points As New List(Of cv.Point2f)
-        Static responses As New List(Of Integer)
 
         If task.heartBeat Then
             points.Clear()
@@ -194,8 +193,8 @@ Public Class SVM_ReuseBasics : Inherits VB_Parent
         dst2.SetTo(cv.Scalar.White)
         For i = 0 To svm.points.Count - 1
             Dim color = If(svm.response(i) = 1, cv.Scalar.Blue, cv.Scalar.Red)
-            DrawCircle(dst2,svm.points(i), task.dotSize, color)
-            DrawCircle(dst3,svm.points(i), task.dotSize, color)
+            DrawCircle(dst2,svm.points(i), task.DotSize, color)
+            DrawCircle(dst3,svm.points(i), task.DotSize, color)
         Next
     End Sub
 End Class
@@ -208,6 +207,7 @@ End Class
 
 Public Class SVM_ReuseRandom : Inherits VB_Parent
     ReadOnly svm As New SVM_Basics
+    Dim blueCount As Integer
     Public Sub New()
         FindSlider("Granularity").Value = 15
         task.drawRect = New cv.Rect(dst2.Cols / 4, dst2.Rows / 4, dst2.Cols / 2, dst2.Rows / 2)
@@ -233,7 +233,6 @@ Public Class SVM_ReuseRandom : Inherits VB_Parent
             rect.Width = width
         End If
 
-        Static blueCount As Integer
         If task.heartBeat Then
             dst2.SetTo(0)
             blueCount = 0
@@ -251,7 +250,7 @@ Public Class SVM_ReuseRandom : Inherits VB_Parent
 
                 svm.response.Add(res)
                 If res > 0 Then blueCount += 1
-                DrawCircle(dst2,pt, task.dotSize, If(res = 1, cv.Scalar.Blue, cv.Scalar.Green))
+                DrawCircle(dst2, pt, task.DotSize, If(res = 1, cv.Scalar.Blue, cv.Scalar.Green))
             Next
 
             svm.Run(src)

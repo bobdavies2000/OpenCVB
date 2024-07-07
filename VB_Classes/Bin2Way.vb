@@ -3,6 +3,7 @@ Public Class Bin2Way_Basics : Inherits VB_Parent
     Public hist As New Hist_Basics
     Public mats As New Mat_4Click
     Public fraction As Single
+    Dim halfSplit As Integer
     Public Sub New()
         fraction = dst2.Total / 2
         task.gOptions.setHistogramBins(256)
@@ -10,9 +11,8 @@ Public Class Bin2Way_Basics : Inherits VB_Parent
         desc = "Split an image into 2 parts - darkest and lightest,"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static halfSplit As Integer
         Dim bins = task.histogramBins
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.Run(src)
         dst3 = hist.dst2
 
@@ -54,7 +54,7 @@ Public Class Bin2Way_KMeans : Inherits VB_Parent
         desc = "Use kmeans with each of the 2-way split images"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         bin2.Run(src)
 
         kmeans.Run(src)
@@ -123,7 +123,7 @@ Public Class Bin2Way_RecurseOnce : Inherits VB_Parent
         desc = "Keep splitting an image between light and dark"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         bin2.fraction = src.Total / 2
         bin2.hist.inputMask = New cv.Mat
@@ -158,7 +158,6 @@ End Class
 Public Class Bin2Way_RedCloud : Inherits VB_Parent
     Dim bin2 As New Bin2Way_RecurseOnce
     Dim flood As New Flood_BasicsMask
-    Dim color As New Color8U_Basics
     Dim cellMaps(3) As cv.Mat, redCells(3) As List(Of rcData)
     Dim options As New Options_Bin2WayRedCloud
     Public Sub New()
@@ -171,7 +170,7 @@ Public Class Bin2Way_RedCloud : Inherits VB_Parent
         If task.optionsChanged Then
             For i = 0 To redCells.Count - 1
                 redCells(i) = New List(Of rcData)
-                cellMaps(i) = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
             Next
         End If
 
