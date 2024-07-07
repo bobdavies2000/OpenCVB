@@ -184,11 +184,11 @@ Public Class Stabilizer_OpticalFlow : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         If task.optionsChanged Then
-            errScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 1)
-            qScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 0.004)
-            rScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 0.5)
-            sumScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 0)
-            sScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 0)
+            errScale = New cv.Mat(New cv.Size(1, 5), cv.MatType.CV_64F, 1)
+            qScale = New cv.Mat(New cv.Size(1, 5), cv.MatType.CV_64F, 0.004)
+            rScale = New cv.Mat(New cv.Size(1, 5), cv.MatType.CV_64F, 0.5)
+            sumScale = New cv.Mat(New cv.Size(1, 5), cv.MatType.CV_64F, 0)
+            sScale = New cv.Mat(New cv.Size(1, 5), cv.MatType.CV_64F, 0)
         End If
 
         dst2 = src

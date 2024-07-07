@@ -1,7 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports System.Windows.Media.Media3D
-
 Public Class Pixel_Viewer : Inherits VB_Parent
     Dim firstUpdate = True
     Public viewerForm As New PixelViewerForm

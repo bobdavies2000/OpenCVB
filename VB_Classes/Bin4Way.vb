@@ -1,6 +1,4 @@
 ﻿Imports System.Runtime.InteropServices
-Imports System.Windows.Documents
-Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Bin4Way_Basics : Inherits VB_Parent
     Dim mats As New Mat_4to1

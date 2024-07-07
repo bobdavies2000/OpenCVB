@@ -1,5 +1,4 @@
 Imports System.Runtime.InteropServices
-Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Public Class Hist_Basics : Inherits VB_Parent
     Public histogram As New cv.Mat

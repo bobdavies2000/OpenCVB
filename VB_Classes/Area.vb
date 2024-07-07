@@ -20,7 +20,7 @@ Public Class Area_MinTriangle_CPP : Inherits VB_Parent
 
         dst2.SetTo(cv.Scalar.White)
 
-        Dim input As New cv.Mat(srcPoints.Count, 1, cv.MatType.CV_32FC2, srcPoints.ToArray)
+        Dim input As New cv.Mat(1, srcPoints.Count, cv.MatType.CV_32FC2, srcPoints.ToArray)
         Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length)
         Dim srcHandle = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
         Dim dstHandle = GCHandle.Alloc(dstData, GCHandleType.Pinned)

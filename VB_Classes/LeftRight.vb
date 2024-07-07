@@ -1,4 +1,3 @@
-Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Public Class LeftRight_Basics : Inherits VB_Parent
     Public Sub New()

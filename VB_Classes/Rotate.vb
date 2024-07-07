@@ -1,8 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Math
-Imports System.Transactions
-Imports System.Windows
-Imports System.Windows.Media.Imaging
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
 Public Class Rotate_Basics : Inherits VB_Parent
     Public M As cv.Mat

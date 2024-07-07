@@ -1,6 +1,4 @@
-﻿Imports System.Windows.Media.Media3D
-Imports cv = OpenCvSharp
-
+﻿Imports cv = OpenCvSharp
 Public Class Hull_Basics : Inherits VB_Parent
     Dim random As New Random_Basics
     Public inputPoints As New List(Of cv.Point2f)

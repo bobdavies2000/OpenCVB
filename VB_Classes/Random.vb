@@ -397,10 +397,9 @@ End Class
 ' https://www.khanacademy.org/computing/computer-programming/programming-natural-simulations/programming-randomness/a/custom-distribution-of-random-numbers
 Public Class Random_MonteCarlo : Inherits VB_Parent
     Public plot As New Plot_Histogram
-    Public outputRandom = New cv.Mat(4000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
+    Public outputRandom = New cv.Mat(New cv.Size(1, 4000), cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public Sub New()
         plot.maxValue = 100
-
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of bins", 1, 255, 91)
         desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
     End Sub

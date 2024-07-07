@@ -1,5 +1,4 @@
-﻿Imports System.Windows.Media
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class GrayToColor_Palette : Inherits VB_Parent
     Dim flood As New Flood_Basics
     Public Sub New()

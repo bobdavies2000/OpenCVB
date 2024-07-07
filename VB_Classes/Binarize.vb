@@ -1,4 +1,3 @@
-Imports System.Windows.Automation
 Imports OpenCvSharp
 Imports OpenCvSharp.XImgProc
 Imports cv = OpenCvSharp
