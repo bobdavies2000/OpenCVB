@@ -13,6 +13,7 @@ using static CS_Classes.CS_Externs;
 using OpenCvSharp.XImgProc;
 using System.IO;
 using System.Security.Cryptography;
+using System.Net;
 
 namespace CS_Classes
 {
@@ -15987,6 +15988,300 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     tmp.Add(pt.Y, new List<Point> { pt });
                 }
             }
+        }
+    }
+
+    public class CS_FeatureLeftRight_Basics : CS_Parent
+    {
+        public FeatureLeftRight_LeftRightPrep prep = new FeatureLeftRight_LeftRightPrep();
+        public List<PointPair> mpList = new List<PointPair>();
+        public List<float> mpCorrelation = new List<float>();
+        public Point selectedPoint;
+        public int mpIndex;
+        public Point ClickPoint;
+        public int picTag;
+        public Options_Features options = new Options_Features();
+        public KNN_Core knn = new KNN_Core();
+        public CS_FeatureLeftRight_Basics(VBtask task) : base(task)
+        {
+            labels[1] = "NOTE: matching right point is always to the left of the left point";
+            if (standalone) task.gOptions.setDisplay1();
+            FindSlider("Feature Correlation Threshold").Value = 75;
+            FindSlider("Min Distance to next").Value = 1;
+            task.gOptions.setMaxDepth(20); // up to 20 meters...
+            labels[3] = "Click near any feature to get more details on the matched pair of points.";
+            desc = "Match the left and right features and allow the user to select a point to get more details.";
+        }
+        public void setClickPoint(Point2f pt, int _pictag)
+        {
+            ClickPoint = new cv.Point((int)pt.X, (int)pt.Y);
+            picTag = _pictag;
+            task.drawRect = new Rect(ClickPoint.X - options.templatePad, ClickPoint.Y - options.templatePad, options.templateSize, options.templateSize);
+            task.drawRectUpdated = true;
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            dst2 = task.leftView.Clone();
+            dst3 = task.rightView.Clone();
+            prep.Run(src);
+            List<PointPair> prepList = new List<PointPair>();
+            foreach (Point p1 in prep.leftFeatures)
+            {
+                foreach (Point p2 in prep.rightFeatures)
+                {
+                    if (p1.Y == p2.Y) prepList.Add(new PointPair(p1, p2));
+                }
+            }
+            Mat correlationmat = new Mat();
+            mpList.Clear();
+            mpCorrelation.Clear();
+            for (int i = 0; i < prepList.Count; i++)
+            {
+                PointPair mpBase = prepList[i];
+                List<float> correlations = new List<float>();
+                List<PointPair> tmpList = new List<PointPair>();
+                for (int j = i; j < prepList.Count; j++)
+                {
+                    PointPair mp = prepList[j];
+                    if (mp.p1.Y != mpBase.p1.Y)
+                    {
+                        i = j;
+                        break;
+                    }
+                    Rect r1 = ValidateRect(new Rect((int)(mp.p1.X - options.templatePad), (int)(mp.p1.Y - options.templatePad), options.templateSize, options.templateSize));
+                    Rect r2 = ValidateRect(new Rect((int)(mp.p2.X - options.templatePad), (int)(mp.p2.Y - options.templatePad), options.templateSize, options.templateSize));
+                    Cv2.MatchTemplate(task.leftView[r1], task.rightView[r2], correlationmat, TemplateMatchModes.CCoeffNormed);
+                    correlations.Add(correlationmat.Get<float>(0, 0));
+                    tmpList.Add(mp);
+                }
+                float maxCorrelation = correlations.Max();
+                if (maxCorrelation >= options.correlationMin)
+                {
+                    mpList.Add(tmpList[correlations.IndexOf(maxCorrelation)]);
+                    mpCorrelation.Add(maxCorrelation);
+                }
+            }
+            foreach (PointPair mp in mpList)
+            {
+                DrawCircle(dst2, mp.p1, task.DotSize, task.HighlightColor, -1);
+                DrawCircle(dst3, mp.p2, task.DotSize, task.HighlightColor, -1);
+            }
+            if (task.mouseClickFlag) setClickPoint(task.ClickPoint, task.mousePicTag);
+            SetTrueText("Click near any feature to find the corresponding pair of features." + Environment.NewLine +
+                        "The correlation values in the lower left for the correlation of the left to the right views." + Environment.NewLine +
+                        "The dst2 shows features for the left view, dst3 shows features for the right view.", 1);
+            if (ClickPoint == new cv.Point() && mpList.Count > 0) setClickPoint(mpList[0].p1, 2);
+            if (mpList.Count > 0)
+            {
+                knn.queries.Clear();
+                knn.queries.Add(task.ClickPoint);
+                PointPair mp;
+                knn.trainInput.Clear();
+                foreach (PointPair mpX in mpList)
+                {
+                    Point2f pt = (picTag == 2) ? mpX.p1 : mpX.p2;
+                    knn.trainInput.Add(pt);
+                }
+                knn.Run(null);
+                dst1.SetTo(Scalar.All(0));
+                int mpIndex = knn.result[0, 0];
+                mp = mpList[mpIndex];
+                DrawCircle(dst2, mp.p1, task.DotSize + 4, Scalar.Red, -1);
+                DrawCircle(dst3, mp.p2, task.DotSize + 4, Scalar.Red, -1);
+                float dspDistance = task.pcSplit[2].Get<float>((int)mp.p1.Y, (int)mp.p1.X);
+                int offset = (int)(mp.p1.X - mp.p2.X);
+                string strOut = string.Format(fmt3, mpCorrelation[mpIndex]) + Environment.NewLine +
+                                string.Format(fmt3, dspDistance) + "m (from camera)" + Environment.NewLine +
+                                offset.ToString() + " Pixel difference";
+                for (int i = 0; i < mpList.Count; i++)
+                {
+                    Point2f pt = mpList[i].p1;
+                    SetTrueText(string.Format("{0:0%}", mpCorrelation[i]), new cv.Point((int)pt.X, (int)pt.Y));
+                }
+                if (task.heartBeat) dst1.SetTo(Scalar.All(0));
+                DrawCircle(dst1, mp.p1, task.DotSize, task.HighlightColor, -1);
+                DrawCircle(dst1, mp.p2, task.DotSize, task.HighlightColor, -1);
+                selectedPoint = new Point(mp.p1.X, mpList[mpIndex].p1.Y + 10);
+                SetTrueText(strOut, selectedPoint, 1);
+                if (task.heartBeat)
+                {
+                    labels[2] = mpList.Count + " features matched and confirmed with left/right image correlation coefficients";
+                }
+            }
+            labels[2] = mpList.Count + " features were matched using correlation coefficients in the left and right images. White box is cell around click point.";
+        }
+    }
+    public class CS_FeatureLeftRight_LeftRightPrep : CS_Parent
+    {
+        public Feature_Basics lFeat = new Feature_Basics();
+        public Feature_Basics rFeat = new Feature_Basics();
+        public List<Point> leftFeatures = new List<Point>();
+        public List<Point> rightFeatures = new List<Point>();
+        public List<Point2f> saveLFeatures = new List<Point2f>();
+        public List<Point2f> saveRFeatures = new List<Point2f>();
+        public CS_FeatureLeftRight_LeftRightPrep(VBtask task) : base(task)
+        {
+            desc = "Prepare features for the left and right views";
+        }
+        public void RunCS(Mat src)
+        {
+            task.features = new List<cv.Point2f> (saveLFeatures);
+            lFeat.Run(task.leftView);
+            dst2 = lFeat.dst2;
+            labels[2] = lFeat.labels[2];
+            leftFeatures = task.featurePoints.ToList();
+            saveLFeatures = task.features.ToList();
+            task.features = new List<cv.Point2f>(saveRFeatures);
+            rFeat.Run(task.rightView);
+            dst3 = rFeat.dst2;
+            labels[3] = rFeat.labels[2];
+            rightFeatures = task.featurePoints.ToList();
+            saveRFeatures = task.features.ToList();
+        }
+    }
+    public class CS_FeatureLeftRight_Grid : CS_Parent
+    {
+        public FeatureLeftRight_Basics match = new FeatureLeftRight_Basics();
+        public CS_FeatureLeftRight_Grid(VBtask task) : base(task)
+        {
+            if (standalone) task.gOptions.setDisplay1();
+            FindRadio("GoodFeatures (ShiTomasi) grid").Checked = true;
+            desc = "Run FeatureLeftRight_Basics but with 'GoodFeatures grid' instead of 'GoodFeatures full image'";
+        }
+        public void RunCS(Mat src)
+        {
+            match.Run(src);
+            dst1 = match.dst1.Clone();
+            dst2 = match.dst2.Clone();
+            dst3 = match.dst3.Clone();
+            if (task.FirstPass) match.setClickPoint(match.mpList[0].p1, 2);
+            SetTrueText(match.strOut, match.selectedPoint, 1);
+            if (task.heartBeat) labels = match.labels;
+        }
+    }
+    public class CS_FeatureLeftRight_Input : CS_Parent
+    {
+        public List<Point> ptLeft = new List<Point>();
+        public List<Point> ptRight = new List<Point>();
+        public List<PointPair> mpList = new List<PointPair>();
+        public List<float> mpCorrelation = new List<float>();
+        public Point selectedPoint;
+        public Point ClickPoint;
+        public int picTag;
+        public Options_Features options = new Options_Features();
+        public KNN_Core knn = new KNN_Core();
+        public CS_FeatureLeftRight_Input(VBtask task) : base(task)
+        {
+            labels[1] = "NOTE: matching right point is always to the left of the left point";
+            if (standalone) task.gOptions.setDisplay1();
+            FindSlider("Feature Correlation Threshold").Value = 75;
+            FindSlider("Min Distance to next").Value = 1;
+            task.gOptions.setMaxDepth(20); // up to 20 meters...
+            labels[3] = "Click near any feature to get more details on the matched pair of points.";
+            desc = "Match the left and right features and allow the user to select a point to get more details.";
+        }
+        public void setClickPoint(Point2f pt, int _pictag)
+        {
+            ClickPoint = new cv.Point(pt.X, pt.Y);
+            picTag = _pictag;
+            task.drawRect = new Rect(ClickPoint.X - options.templatePad, ClickPoint.Y - options.templatePad, options.templateSize, options.templateSize);
+            task.drawRectUpdated = true;
+        }
+        public void RunCS(Mat src)
+        {
+            if (ptLeft.Count == 0 || ptRight.Count == 0)
+            {
+                SetTrueText("Caller provides the ptLeft/ptRight points to use.", 1);
+                return;
+            }
+            options.RunVB();
+            List<PointPair> prepList = new List<PointPair>();
+            foreach (Point p1 in ptLeft)
+            {
+                foreach (Point p2 in ptRight)
+                {
+                    if (p1.Y == p2.Y) prepList.Add(new PointPair(p1, p2));
+                }
+            }
+            Mat correlationmat = new Mat();
+            mpList.Clear();
+            mpCorrelation.Clear();
+            for (int i = 0; i < prepList.Count; i++)
+            {
+                PointPair mpBase = prepList[i];
+                List<float> correlations = new List<float>();
+                List<PointPair> tmpList = new List<PointPair>();
+                for (int j = i; j < prepList.Count; j++)
+                {
+                    PointPair mp = prepList[j];
+                    if (mp.p1.Y != mpBase.p1.Y)
+                    {
+                        i = j;
+                        break;
+                    }
+                    Rect r1 = ValidateRect(new Rect((int)(mp.p1.X - options.templatePad), (int)(mp.p1.Y - options.templatePad), options.templateSize, options.templateSize));
+                    Rect r2 = ValidateRect(new Rect((int)(mp.p2.X - options.templatePad), (int)(mp.p2.Y - options.templatePad), options.templateSize, options.templateSize));
+                    Cv2.MatchTemplate(task.leftView[r1], task.rightView[r2], correlationmat, TemplateMatchModes.CCoeffNormed);
+                    correlations.Add(correlationmat.Get<float>(0, 0));
+                    tmpList.Add(mp);
+                }
+                float maxCorrelation = correlations.Max();
+                if (maxCorrelation >= options.correlationMin)
+                {
+                    mpList.Add(tmpList[correlations.IndexOf(maxCorrelation)]);
+                    mpCorrelation.Add(maxCorrelation);
+                }
+            }
+            foreach (PointPair mp in mpList)
+            {
+                DrawCircle(dst2, mp.p1, task.DotSize, task.HighlightColor, -1);
+                DrawCircle(dst3, mp.p2, task.DotSize, task.HighlightColor, -1);
+            }
+            if (task.mouseClickFlag) setClickPoint(task.ClickPoint, task.mousePicTag);
+            SetTrueText("Click near any feature to find the corresponding pair of features." + Environment.NewLine +
+                        "The correlation values in the lower left for the correlation of the left to the right views." + Environment.NewLine +
+                        "The dst2 shows features for the left view, dst3 shows features for the right view.", 1);
+            if (ClickPoint == new cv.Point() && mpList.Count > 0) setClickPoint(mpList[0].p1, 2);
+            if (mpList.Count > 0)
+            {
+                knn.queries.Clear();
+                knn.queries.Add(task.ClickPoint);
+                PointPair mp;
+                knn.trainInput.Clear();
+                foreach (PointPair  mpX in mpList)
+                {
+                    cv.Point2f pt = (picTag == 2) ? mpX.p1 : mpX.p2;
+                    knn.trainInput.Add(new Point2f(pt.X, pt.Y));
+                }
+                knn.Run(null);
+                dst1.SetTo(Scalar.All(0));
+                int mpIndex = knn.result[0, 0];
+                mp = mpList[mpIndex];
+                DrawCircle(dst2, mp.p1, task.DotSize + 4, Scalar.Red, -1);
+                DrawCircle(dst3, mp.p2, task.DotSize + 4, Scalar.Red, -1);
+                float dspDistance = task.pcSplit[2].Get<float>((int)mp.p1.Y, (int)mp.p1.X);
+                int offset = (int)(mp.p1.X - mp.p2.X);
+                string strOut = string.Format(fmt3, mpCorrelation[mpIndex]) + Environment.NewLine +
+                                string.Format(fmt3, dspDistance) + "m (from camera)" + Environment.NewLine +
+                                offset.ToString() + " Pixel difference";
+                for (int i = 0; i < mpList.Count; i++)
+                {
+                    Point2f pt = mpList[i].p1;
+                    SetTrueText(string.Format("{0:0%}", mpCorrelation[i]), new cv.Point((int)pt.X, (int)pt.Y));
+                }
+                if (task.heartBeat) dst1.SetTo(Scalar.All(0));
+                DrawCircle(dst1, mp.p1, task.DotSize, task.HighlightColor, -1);
+                DrawCircle(dst1, mp.p2, task.DotSize, task.HighlightColor, -1);
+                selectedPoint = new Point(mp.p1.X, mpList[mpIndex].p1.Y + 10);
+                SetTrueText(strOut, selectedPoint, 1);
+                if (task.heartBeat)
+                {
+                    labels[2] = mpList.Count + " features matched and confirmed with left/right image correlation coefficients";
+                }
+            }
+            labels[2] = mpList.Count + " features were matched using correlation coefficients in the left and right images. White box is cell around click point.";
         }
     }
 

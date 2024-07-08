@@ -16,8 +16,8 @@ Public Class FeatureLeftRight_Basics : Inherits VB_Parent
         labels(3) = "Click near any feature to get more details on the matched pair of points."
         desc = "Match the left and right features and allow the user to select a point to get more details."
     End Sub
-    Public Sub setClickPoint(pt As cv.Point, _pictag As Integer)
-        ClickPoint = pt
+    Public Sub setClickPoint(pt As cv.Point2f, _pictag As Integer)
+        ClickPoint = New cv.Point(pt.X, pt.Y)
         picTag = _pictag
         task.drawRect = New cv.Rect(ClickPoint.X - options.templatePad, ClickPoint.Y - options.templatePad, options.templateSize, options.templateSize)
         task.drawRectUpdated = True

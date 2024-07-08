@@ -90,7 +90,7 @@ Partial Class Touchup
         Me.Controls.Add(Me.Label1)
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "Touchup"
-        Me.Text = "Form1"
+        Me.Text = "Touchup AI-Generated C# code"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

@@ -425,6 +425,10 @@ namespace CS_Classes
 			if (algorithmName == "CS_FeatureFlow_LeftRight1") return new CS_FeatureFlow_LeftRight1(task);
 			if (algorithmName == "CS_FeatureFlow_LeftRightHist") return new CS_FeatureFlow_LeftRightHist(task);
 			if (algorithmName == "CS_FeatureFlow_LucasKanade") return new CS_FeatureFlow_LucasKanade(task);
+			if (algorithmName == "CS_FeatureLeftRight_Basics") return new CS_FeatureLeftRight_Basics(task);
+			if (algorithmName == "CS_FeatureLeftRight_Grid") return new CS_FeatureLeftRight_Grid(task);
+			if (algorithmName == "CS_FeatureLeftRight_Input") return new CS_FeatureLeftRight_Input(task);
+			if (algorithmName == "CS_FeatureLeftRight_LeftRightPrep") return new CS_FeatureLeftRight_LeftRightPrep(task);
 			if (algorithmName == "CS_Line_Basics") return new CS_Line_Basics(task);
 			if (algorithmName == "CS_Mat_4Click") return new CS_Mat_4Click(task);
 			if (algorithmName == "CS_Mat_4to1") return new CS_Mat_4to1(task);

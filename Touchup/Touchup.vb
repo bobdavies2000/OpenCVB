@@ -28,6 +28,9 @@ Public Class Touchup
             inline = inline.Replace("Options_CS_", "Options_")
             inline = inline.Replace("task.gOptions.FrameHistory.Value", "task.frameHistoryCount")
             inline = inline.Replace("options.RunCSharp", "options.RunVB")
+            inline = inline.Replace("options.Run(", "options.RunVB(")
+            inline = inline.Replace("options;", "options")
+            inline = inline.Replace("Mat dst", "dst") ' Mat dst2 problem - should never need to be declared.
             outputLines += inline + vbCrLf
         Next
 
