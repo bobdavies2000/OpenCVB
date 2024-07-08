@@ -61,6 +61,7 @@ Public Class FeatureFlow_Dense : Inherits VB_Parent
     Public Sub New()
         desc = "Use dense optical flow algorithm  "
     End Sub
+
     Public Sub RunVB(src As cv.Mat)
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         options.RunVB()

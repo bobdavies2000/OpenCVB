@@ -310,7 +310,9 @@ Public Class OptionsGlobal
                 task.HighlightColor = cv.Scalar.Red
         End Select
     End Sub
-
+    Public Sub setMaxDepth(val As Integer)
+        MaxDepthBar.Value = val
+    End Sub
     Public Sub setDisplay0()
         displayDst0.Checked = True
     End Sub

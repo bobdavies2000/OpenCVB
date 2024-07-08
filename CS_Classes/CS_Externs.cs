@@ -573,33 +573,6 @@ namespace CS_Classes
         public static extern int Neighbor2_RunCPP(IntPtr cPtr, IntPtr dataPtr, int rows, int cols);
 
 
-        public Mat opticalFlow_Dense(Mat oldGray, Mat gray, float pyrScale, int levels, int winSize, int iterations,
-                        float polyN, float polySigma, OpticalFlowFlags OpticalFlowFlags)
-        {
-            Mat flow = new Mat();
-            if (pyrScale >= 1) pyrScale = 0.99f;
-
-            if (oldGray.Size() != gray.Size()) oldGray = gray.Clone();
-
-            Cv2.CalcOpticalFlowFarneback(oldGray, gray, flow, pyrScale, levels, winSize, iterations, (int)polyN, polySigma, OpticalFlowFlags);
-            Mat[] flowVec = flow.Split();
-
-            Mat hsv = new Mat();
-            Mat hsv0 = new Mat();
-            Mat hsv1 = new Mat(gray.Rows, gray.Cols, MatType.CV_8UC1, new Scalar(255));
-            Mat hsv2 = new Mat();
-
-            Mat magnitude = new Mat();
-            Mat angle = new Mat();
-            Cv2.CartToPolar(flowVec[0], flowVec[1], magnitude, angle);
-            angle.ConvertTo(hsv0, MatType.CV_8UC1, 180 / Math.PI / 2);
-            Cv2.Normalize(magnitude, hsv2, 0, 255, NormTypes.MinMax, MatType.CV_8UC1);
-
-            Mat[] hsvVec = { hsv0, hsv1, hsv2 };
-            Cv2.Merge(hsvVec, hsv);
-            return hsv;
-        }
-
         [DllImport(("CPP_Classes.dll"), CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr OpticalFlow_CPP_Open();
 

@@ -419,6 +419,12 @@ namespace CS_Classes
 			if (algorithmName == "CS_Feature_SURFMatch") return new CS_Feature_SURFMatch(task);
 			if (algorithmName == "CS_Feature_Trace") return new CS_Feature_Trace(task);
 			if (algorithmName == "CS_Feature_TraceDelaunay") return new CS_Feature_TraceDelaunay(task);
+			if (algorithmName == "CS_FeatureFlow_Basics") return new CS_FeatureFlow_Basics(task);
+			if (algorithmName == "CS_FeatureFlow_Dense") return new CS_FeatureFlow_Dense(task);
+			if (algorithmName == "CS_FeatureFlow_LeftRight") return new CS_FeatureFlow_LeftRight(task);
+			if (algorithmName == "CS_FeatureFlow_LeftRight1") return new CS_FeatureFlow_LeftRight1(task);
+			if (algorithmName == "CS_FeatureFlow_LeftRightHist") return new CS_FeatureFlow_LeftRightHist(task);
+			if (algorithmName == "CS_FeatureFlow_LucasKanade") return new CS_FeatureFlow_LucasKanade(task);
 			if (algorithmName == "CS_Line_Basics") return new CS_Line_Basics(task);
 			if (algorithmName == "CS_Mat_4Click") return new CS_Mat_4Click(task);
 			if (algorithmName == "CS_Mat_4to1") return new CS_Mat_4to1(task);

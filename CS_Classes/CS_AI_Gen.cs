@@ -10235,7 +10235,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Delaunay_GenerationsNoKNN : CS_Parent
     {
         public List<Point2f> inputPoints;
-        public Delaunay_Basics facet;
+        public Delaunay_Basics facet = new Delaunay_Basics();
         Random_Basics random = new Random_Basics();
 
         public CS_Delaunay_GenerationsNoKNN(VBtask task) : base(task)
@@ -10291,7 +10291,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Delaunay_Generations : CS_Parent
     {
         public List<Point2f> inputPoints;
-        public Delaunay_Basics facet;
+        public Delaunay_Basics facet = new Delaunay_Basics();
         KNN_Basics knn = new KNN_Basics();
         Random_Basics random = new Random_Basics();
 
@@ -15623,6 +15623,372 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
 
 
+    public class CS_FeatureFlow_Basics : CS_Parent
+    {
+        public Feature_Basics feat = new Feature_Basics();
+        public List<PointPair> mpList = new List<PointPair>();
+        public List<float> mpCorrelation = new List<float>();
+        public CS_FeatureFlow_Basics(VBtask task) : base(task)
+        {
+            task.gOptions.setMaxDepth(20);
+            if (standalone) task.gOptions.setDisplay1();
+            labels[1] = "NOTE: matching right point is always to the left of the left point";
+            desc = "Identify which feature in the left image corresponds to the feature in the right image.";
+        }
+        public void buildCorrelations(List<Point> prevFeatures, List<Point> currFeatures)
+        {
+            float correlationMin = feat.options.correlationMin;
+            Mat correlationmat = new Mat();
+            mpList.Clear();
+            mpCorrelation.Clear();
+            int pad = feat.options.templatePad, size = feat.options.templateSize;
+            foreach (Point p1 in prevFeatures)
+            {
+                Rect rect = ValidateRect(new Rect(p1.X - pad, p1.Y - pad, size, size));
+                List<float> correlations = new List<float>();
+                foreach (Point p2 in currFeatures)
+                {
+                    Rect r = ValidateRect(new Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, size), Math.Min(size, rect.Height)));
+                    Cv2.MatchTemplate(dst2[rect], dst3[r], correlationmat, TemplateMatchModes.CCoeffNormed);
+                    correlations.Add(correlationmat.Get<float>(0, 0));
+                }
+                float maxCorrelation = correlations.Max();
+                if (maxCorrelation >= correlationMin)
+                {
+                    int index = correlations.IndexOf(maxCorrelation);
+                    mpList.Add(new PointPair(p1, currFeatures[index]));
+                    mpCorrelation.Add(maxCorrelation);
+                }
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(src);
+            labels = feat.labels;
+            dst3 = task.FirstPass ? src.Clone() : dst2.Clone();
+            List<Point> prevFeatures = new List<Point>(task.featurePoints);
+            buildCorrelations(prevFeatures, task.featurePoints);
+            SetTrueText("Click near any feature to find the corresponding pair of features.", 1);
+            dst2 = src.Clone();
+            foreach (Point pt in task.featurePoints)
+            {
+                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
+            }
+            prevFeatures = new List<Point>(task.featurePoints);
+        }
+    }
+    public class CS_FeatureFlow_Dense : CS_Parent
+    {
+        public Options_OpticalFlow options = new Options_OpticalFlow();
+        public CS_FeatureFlow_Dense(VBtask task) : base(task)
+        {
+            desc = "Use dense optical flow algorithm";
+        }
+        public Mat opticalFlow_Dense(Mat oldGray, Mat gray, float pyrScale, int levels, int winSize, int iterations,
+                   float polyN, float polySigma, OpticalFlowFlags OpticalFlowFlags)
+        {
+            Mat flow = new Mat();
+            if (pyrScale >= 1) pyrScale = 0.99f;
+
+            if (oldGray.Size() != gray.Size()) oldGray = gray.Clone();
+
+            Cv2.CalcOpticalFlowFarneback(oldGray, gray, flow, pyrScale, levels, winSize, iterations, (int)polyN, polySigma, OpticalFlowFlags);
+            Mat[] flowVec = flow.Split();
+
+            Mat hsv = new Mat();
+            Mat hsv0 = new Mat();
+            Mat hsv1 = new Mat(gray.Rows, gray.Cols, MatType.CV_8UC1, new Scalar(255));
+            Mat hsv2 = new Mat();
+
+            Mat magnitude = new Mat();
+            Mat angle = new Mat();
+            Cv2.CartToPolar(flowVec[0], flowVec[1], magnitude, angle);
+            angle.ConvertTo(hsv0, MatType.CV_8UC1, 180 / Math.PI / 2);
+            Cv2.Normalize(magnitude, hsv2, 0, 255, NormTypes.MinMax, MatType.CV_8UC1);
+
+            Mat[] hsvVec = { hsv0, hsv1, hsv2 };
+            Cv2.Merge(hsvVec, hsv);
+            return hsv;
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            options.RunVB();
+            Mat lastGray = src.Clone();
+            Mat hsv = opticalFlow_Dense(lastGray, src, options.pyrScale, options.levels, options.winSize, options.iterations, options.polyN,
+                                        options.polySigma, options.OpticalFlowFlags);
+            dst2 = hsv.CvtColor(ColorConversionCodes.HSV2RGB);
+            dst2 = dst2.ConvertScaleAbs(options.outputScaling);
+            dst3 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+            lastGray = src.Clone();
+        }
+    }
+    public class CS_FeatureFlow_LucasKanade : CS_Parent
+    {
+        public List<Point2f> features = new List<Point2f>();
+        public List<Point2f> lastFeatures = new List<Point2f>();
+        public Feature_Basics feat = new Feature_Basics();
+        public Options_OpticalFlowSparse options = new Options_OpticalFlowSparse();
+        public CS_FeatureFlow_LucasKanade(VBtask task) : base(task)
+        {
+            desc = "Show the optical flow of a sparse matrix.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2 = src.Clone();
+            dst3 = src.Clone();
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            Mat lastGray = src.Clone();
+            feat.Run(src);
+            features = task.features.ToList();
+            Mat features1 = new Mat(features.Count, 1, MatType.CV_32FC2, features.ToArray());
+            Mat features2 = new Mat();
+            Mat status = new Mat();
+            Mat err = new Mat();
+            Size winSize = new Size(3, 3);
+            cv.TermCriteria term = new cv.TermCriteria((cv.CriteriaTypes)((int)cv.CriteriaTypes.Eps + (int)cv.CriteriaTypes.Count), 10, 1.0);
+            Cv2.CalcOpticalFlowPyrLK(src, lastGray, features1, features2, status, err, winSize, 3, term, options.OpticalFlowFlag);
+            features = new List<Point2f>();
+            lastFeatures.Clear();
+            for (int i = 0; i < status.Rows; i++)
+            {
+                if (status.Get<byte>(i, 0) != 0)
+                {
+                    Point2f pt1 = features1.Get<Point2f>(i, 0);
+                    Point2f pt2 = features2.Get<Point2f>(i, 0);
+                    float length = (float)Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y));
+                    if (length < 30)
+                    {
+                        features.Add(pt1);
+                        lastFeatures.Add(pt2);
+                        DrawLine(dst2, pt1, pt2, task.HighlightColor, task.lineWidth + task.lineWidth);
+                        DrawCircle(dst3, pt1, task.DotSize + 3, Scalar.White, -1);
+                        DrawCircle(dst3, pt2, task.DotSize + 1, Scalar.Red, -1);
+                    }
+                }
+            }
+            labels[2] = "Matched " + features.Count + " points";
+            if (task.heartBeat) lastGray = src.Clone();
+            lastGray = src.Clone();
+        }
+    }
+    public class CS_FeatureFlow_LeftRight1 : CS_Parent
+    {
+        public FeatureFlow_LucasKanade pyrLeft = new FeatureFlow_LucasKanade();
+        public FeatureFlow_LucasKanade pyrRight = new FeatureFlow_LucasKanade();
+        public List<Point> ptLeft = new List<Point>();
+        public List<Point> ptRight = new List<Point>();
+        public List<Point> ptlist = new List<Point>();
+        public CS_FeatureFlow_LeftRight1(VBtask task) : base(task)
+        {
+            if (standalone) task.gOptions.setDisplay1();
+            desc = "Find features using optical flow in both the left and right images.";
+        }
+        public void RunCS(Mat src)
+        {
+            pyrLeft.Run(task.leftView);
+            pyrRight.Run(task.rightView);
+            List<int> leftY = new List<int>();
+            ptLeft.Clear();
+            dst2 = task.leftView.Clone();
+            for (int i = 0; i < pyrLeft.features.Count; i++)
+            {
+                Point pt = new cv.Point((int)pyrLeft.features[i].X, (int)pyrLeft.features[i].Y);
+                ptLeft.Add(new Point(pt.X, pt.Y));
+                Cv2.Circle(dst2, pt, task.DotSize, task.HighlightColor, -1, task.lineType, 0);
+                leftY.Add(pt.Y);
+                pt = new cv.Point((int)pyrLeft.lastFeatures[i].X, (int)pyrLeft.lastFeatures[i].Y);
+                ptLeft.Add(new Point(pt.X, pt.Y));
+                Cv2.Circle(dst2, pt, task.DotSize, task.HighlightColor, -1, task.lineType, 0);
+                leftY.Add(pt.Y);
+            }
+            List<int> rightY = new List<int>();
+            ptRight.Clear();
+            dst3 = task.rightView.Clone();
+            for (int i = 0; i < pyrRight.features.Count; i++)
+            {
+                Point pt = new cv.Point((int)pyrRight.features[i].X, (int)pyrRight.features[i].Y); 
+                ptRight.Add(new Point(pt.X, pt.Y));
+                Cv2.Circle(dst3, pt, task.DotSize, task.HighlightColor, -1, task.lineType, 0);
+                rightY.Add(pt.Y);
+                pt = new cv.Point((int)pyrRight.lastFeatures[i].X, (int)pyrRight.lastFeatures[i].Y); 
+                ptRight.Add(new Point(pt.X, pt.Y));
+                Cv2.Circle(dst3, pt, task.DotSize, task.HighlightColor, -1, task.lineType, 0);
+                rightY.Add(pt.Y);
+            }
+            List<PointPair> mpList = new List<PointPair>();
+            ptlist.Clear();
+            for (int i = 0; i < leftY.Count; i++)
+            {
+                int index = rightY.IndexOf(leftY[i]);
+                if (index != -1) mpList.Add(new PointPair(ptLeft[i], ptRight[index]));
+            }
+            if (task.heartBeat)
+            {
+                labels[2] = ptLeft.Count + " features found in the left image, " + ptRight.Count + " features in the right and " +
+                            ptlist.Count + " features are matched.";
+            }
+        }
+    }
+    public class CS_FeatureFlow_LeftRightHist : CS_Parent
+    {
+        public FeatureFlow_LucasKanade pyrLeft = new FeatureFlow_LucasKanade();
+        public FeatureFlow_LucasKanade pyrRight = new FeatureFlow_LucasKanade();
+        public List<Point> leftFeatures = new List<Point>();
+        public List<Point> rightFeatures = new List<Point>();
+        public CS_FeatureFlow_LeftRightHist(VBtask task) : base(task)
+        {
+            desc = "Keep only the features that have been around for the specified number of frames.";
+        }
+        public Mat displayFeatures(Mat dst, List<Point> features)
+        {
+            foreach (Point pt in features)
+            {
+                Cv2.Circle(dst, pt, task.DotSize, task.HighlightColor, -1, task.lineType, 0);
+            }
+            return dst;
+        }
+        public void RunCS(Mat src)
+        {
+            pyrLeft.Run(task.leftView);
+            List<Point> tmpLeft = new List<Point>();
+            for (int i = 0; i < pyrLeft.features.Count; i++)
+            {
+                Point pt = new Point(pyrLeft.features[i].X, pyrLeft.features[i].Y);
+                tmpLeft.Add(new Point(pt.X, pt.Y));
+                pt = new Point(pyrLeft.lastFeatures[i].X, pyrLeft.lastFeatures[i].Y);
+                tmpLeft.Add(new Point(pt.X, pt.Y));
+            }
+            pyrRight.Run(task.rightView);
+            List<Point> tmpRight = new List<Point>();
+            for (int i = 0; i < pyrRight.features.Count; i++)
+            {
+                Point pt = new Point(pyrRight.features[i].X, pyrRight.features[i].Y);
+                tmpRight.Add(new Point(pt.X, pt.Y));
+                pt = new Point(pyrRight.lastFeatures[i].X, pyrRight.lastFeatures[i].Y);
+                tmpRight.Add(new Point(pt.X, pt.Y));
+            }
+            List<List<Point>> leftHist = new List<List<Point>> { tmpLeft };
+            List<List<Point>> rightHist = new List<List<Point>> { tmpRight };
+            if (task.optionsChanged)
+            {
+                leftHist = new List<List<Point>> { tmpLeft };
+                rightHist = new List<List<Point>> { tmpRight };
+            }
+            leftFeatures.Clear();
+            foreach (Point pt in tmpLeft)
+            {
+                int count = 0;
+                foreach (List<Point> hist in leftHist)
+                {
+                    if (hist.Contains(pt)) count++;
+                    else break;
+                }
+                if (count == leftHist.Count) leftFeatures.Add(pt);
+            }
+            rightFeatures.Clear();
+            foreach (Point pt in tmpRight)
+            {
+                int count = 0;
+                foreach (List<Point> hist in rightHist)
+                {
+                    if (hist.Contains(pt)) count++;
+                    else break;
+                }
+                if (count == rightHist.Count) rightFeatures.Add(pt);
+            }
+            int minPoints = 10; // just a guess - trying to keep things current.
+            if (leftFeatures.Count < minPoints)
+            {
+                leftFeatures = tmpLeft;
+                leftHist = new List<List<Point>> { tmpLeft };
+            }
+            if (rightFeatures.Count < minPoints)
+            {
+                rightFeatures = tmpRight;
+                rightHist = new List<List<Point>> { tmpRight };
+            }
+            dst2 = displayFeatures(task.leftView.Clone(), leftFeatures);
+            dst3 = displayFeatures(task.rightView.Clone(), rightFeatures);
+            leftHist.Add(tmpLeft);
+            rightHist.Add(tmpRight);
+            int threshold = Math.Min(task.frameHistoryCount, leftHist.Count);
+            if (leftHist.Count >= task.frameHistoryCount) leftHist.RemoveAt(0);
+            if (rightHist.Count >= task.frameHistoryCount) rightHist.RemoveAt(0);
+            if (task.heartBeat)
+            {
+                labels[2] = leftFeatures.Count + " detected in the left image that have matches in " + threshold + " previous left images";
+                labels[3] = rightFeatures.Count + " detected in the right image that have matches in " + threshold + " previous right images";
+            }
+        }
+    }
+    public class CS_FeatureFlow_LeftRight : CS_Parent
+    {
+        CS_FeatureFlow_LeftRightHist flowHist;
+        public List<List<Point>> leftFeatures = new List<List<Point>>();
+        public List<List<Point>> rightFeatures = new List<List<Point>>();
+        public CS_FeatureFlow_LeftRight(VBtask task) : base(task)
+        {
+            flowHist = new CS_FeatureFlow_LeftRightHist(task);
+            desc = "Match features in the left and right images";
+        }
+        public Mat DisplayFeatures(Mat dst, List<List<Point>> features)
+        {
+            foreach (var ptlist in features)
+            {
+                foreach (var pt in ptlist)
+                {
+                    Cv2.Circle(dst, pt, task.DotSize, task.HighlightColor);
+                }
+            }
+            return dst;
+        }
+        public void RunCS(Mat src)
+        {
+            flowHist.RunAndMeasure(src, flowHist);
+            var tmpLeft = new SortedList<int, List<Point>>();
+            var tmpRight = new SortedList<int, List<Point>>();
+            ProcessFeatures(flowHist.leftFeatures, tmpLeft);
+            ProcessFeatures(flowHist.rightFeatures, tmpRight);
+            leftFeatures.Clear();
+            rightFeatures.Clear();
+            foreach (var ele in tmpLeft)
+            {
+                int index = tmpRight.Keys.ToList().IndexOf(ele.Key);
+                if (index >= 0)
+                {
+                    leftFeatures.Add(ele.Value);
+                    rightFeatures.Add(tmpRight.ElementAt(index).Value);
+                }
+            }
+            dst2 = DisplayFeatures(task.leftView.Clone(), leftFeatures);
+            dst3 = DisplayFeatures(task.rightView.Clone(), rightFeatures);
+            if (task.heartBeat)
+            {
+                labels[2] = $"{leftFeatures.Count} detected in the left image that match one or more Y-coordinates found in the right image";
+                labels[3] = $"{rightFeatures.Count} detected in the right image that match one or more Y-coordinates found in the left image";
+            }
+        }
+        void ProcessFeatures(List<Point> features, SortedList<int, List<Point>> tmp)
+        {
+            foreach (var pt in features)
+            {
+                if (tmp.ContainsKey(pt.Y))
+                {
+                    var index = tmp.Keys.ToList().IndexOf(pt.Y);
+                    var ptlist = tmp.ElementAt(index).Value;
+                    ptlist.Add(pt);
+                    tmp.RemoveAt(index);
+                    tmp.Add(pt.Y, ptlist);
+                }
+                else
+                {
+                    tmp.Add(pt.Y, new List<Point> { pt });
+                }
+            }
+        }
+    }
 
 
 
