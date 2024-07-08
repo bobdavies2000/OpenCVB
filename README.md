@@ -20,6 +20,7 @@
     -   The Touchup application is invoked from OpenCVB’s main toolbar.
     -   Most algorithms were converted to C\# in a few minutes.
     -   Longer conversions required the improved VB.Net infrastructure.
+-   Previous Releases had a discontinued C++ AI translation process. It will return.
 -   A log of previous changes is included at the bottom of this document.
 
 ![A screenshot of a computer Description automatically generated](media/5dd47a048cd220e4dd856894c3d6bac7.png)
@@ -43,6 +44,8 @@ A full installation can take about 30-50 minutes using the 1-step “Update_All.
 However, a full installation is recommended. An algorithm may fit in one page of code and reading is one way to review the code but understanding the algorithms is a lot faster and easier when the output is visualized by running it. The output is often self-documenting or a natural representation of the algorithm’s intent.
 
 The basic layout of OpenCVB is shown below. Any of the algorithms can be selected from the first combo box at the top of the form. The second combo box is used to select an algorithm group. The default grouping is “\<All\>”. There are a variety of other special groupings that select, for example, all Python or all C++ algorithms.
+
+# OpenCVB Layout
 
 ![A screenshot of a computer Description automatically generated](media/5bfa7d36d0713e88db4510ae57d5bac9.png)
 
@@ -70,11 +73,11 @@ The basic layout of OpenCVB is shown below. Any of the algorithms can be selecte
 
 **Complexity Evaluation:** *The ![](media/a5052fbe863b1a080812ce60d9b4644f.png) button will run the current algorithm across a variety of resolutions to evaluate the complexity of the algorithm. Complexity if often designated as O(n), hence the O.*
 
-**Algorithm Translation:** *The ![](media/8b48ec3d1b9bd1ac4814aa20cb031b96.png) button will guide the user through the translation of the VB.Net algorithm to C++ using Google’s Bard or Microsoft’s ChatGPT AI interfaces. Once translated to C++, the algorithm may be moved to any environment or operating system.*
+**Algorithm Translation:** *The ![](media/8b48ec3d1b9bd1ac4814aa20cb031b96.png) button invokes the Touchup.exe application that guides the translation of VB.Net algorithms to C\#.*
 
 **Advice/Info Button:** *The ![](media/e895e394551ce117375db85115ea6cd5.png) button will display any advice about how to use the algorithm. With so many global and local options, this advice will highlight which sliders or check boxes are most relevant to impacting the current algorithm.*
 
-**OpenCVB Caption:** *The caption at the top requires some further explanation. The number of lines of code in OpenCVB and the number of algorithms are shown. Using these, the average number of lines per algorithm is computed. Also, the name of the current camera is shown next to the frame rate for the camera and the frame rate for the algorithm. The camera is in its own thread so its frame rate may be higher than the rate at which the frames are processed in the algorithm thread.*
+**OpenCVB Main Form Caption:** *The caption at the top requires some further explanation. The number of lines of code in OpenCVB and algorithms are shown. Using these, the average number of lines per algorithm is computed. Also, the name of the current camera is shown next to the frame rate for the camera and the frame rate for the algorithm. The camera is in its own thread so its frame rate may be higher than the rate at which the frames are processed in the algorithm thread.*
 
 # The Objective
 
@@ -92,9 +95,11 @@ Making these languages and libraries available while using the same infrastructu
 
 There are other objectives. Convolutions combined with neural nets (CNN’s) are a successful approach to computer vision. CNN’s detect differences within a set of images and identify content surprisingly well. OpenCVB is a pathway to search for more and better features than convolutions, features that are measured, objective, and essential. Depth, infrared, gravity, and camera motion are the kind of objective features that can enhance almost any imaging algorithm.
 
+# What If?
+
 And what if all cameras had depth and an IMU? Making this assumption explains why only a few cameras from StereoLabs, Intel, Microsoft, and others are currently supported. The data from each camera – color, depth, point cloud, and IMU data - is presented to all the algorithms in the same standardized format. More cameras with depth are expected to arrive and integration with OpenCVB is likely to follow. OpenCVB is an opportunity to experiment with the features of these cameras and apply the same algorithm to all of them.
 
-The algorithms are notably short, almost always less than a page of code, labelled reasonably well, easily searched, and easily combined, while often providing links in the code to online documentation and versions for other platforms. Many downloadable algorithms are encumbered by environmental considerations that can obscure the meaning or context of an algorithm. All the algorithms here contain just the algorithm separate from any camera dependencies and will work with each of the supported cameras. Isolating just the algorithm functionality enables easy adaptation to other environments or platforms.
+The algorithms are notably short, almost always less than a page of code, labelled reasonably well, easily searched, and easily combined, while often providing links in the code to online documentation and versions for other platforms. Many existing algorithms on the web have environmental considerations that can obscure the meaning or context of an algorithm and complicate downloading. All the algorithms here contain just the algorithm separate from any camera dependencies and will work with each of the supported cameras. Isolating just the algorithm functionality enables easy adaptation to other environments or platforms.
 
 # Before You Start
 
@@ -142,6 +147,7 @@ Installation is not as simple as opening the OpenCVB.sln file but it is not much
     -   Remove **“\<OpenCVB Dir\>/Azure-Kinect-Sensor-SDK”** to update Microsoft Kinect for Azure support
     -   Remove **“\<OpenCVB Dir\>/opencv”** to update both OpenCV and OpenCV contributions.
     -   Remove **“\<OpenCVB Dir\>/OrbbecSDK”** to update the latest Orbbec code.
+    -   Use Visual Studio’s NuGet Package Manager for any other updates.
 
 Why are there no official releases of OpenCVB? The repository is the release. The infrastructure is solid at this point (the exceptions are rare and transitory.) Any problems that arise are easily avoided because they will be confined to an algorithm. OpenCVB regression tests are continuously running so even individual algorithm problems will be apparent shortly. If any problem is encountered, download the latest and if it is still there, submit a pull request.
 
@@ -154,7 +160,7 @@ Support for some optional cameras can be added.
     -   NOTE: StereoLabs requires an NVIDIA card with CUDA.
 -   For the Mynt Eye D 1000 camera, download the SDK from:
     -   <https://mynt-eye-d-sdk.readthedocs.io/en/latest/sdk/install_win_exe.html>
--   For the Orbbec 335L camera, the Update_All.bat file has downloaded and prepared the SDK but it also necessary to download the proprietary binaries from here:
+-   For the Orbbec 335L camera, the Update_All.bat file has downloaded and prepared the SDK but it is also necessary to download the proprietary binaries from here:
     -   https://github.com/orbbec/OrbbecSDK/releases
 
 Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for StereoLabs Zed 2 or Mynt Eye D 1000 or Orbbec 335L support.
@@ -169,17 +175,17 @@ Some typical problems with new installations:
         -   \<OpenCVB Dir\>/librealsense/Build/librealsense2.sln
         -   \<OpenCVB Dir\>/opencv/Build/opencv.sln
         -   \<OpenCVB Dir\>/OrbbecSDK/Build/ OrbbecSDK.sln
-    -   Review the “Path” – both global and user values – and remove older Visual Studio installations.
+    -   Review the “Path” – both global and user values – and remove older or possibly unused Visual Studio installations.
     -   Figure out which component is failing:
         -   Review the output of the “Update_All.bat” run. Which component didn’t complete?
     -   Post any problems encountered. Install problems have the highest priority.
 -   Camera Failure: check the camera installation by testing the examples provided by the camera vendor. Did the Kinect4Azure support get upgraded recently? Post if some configuration problems prevent the camera from working in OpenCVB.
 -   Python Scripts Fail: if any Python scripts fail, open a command line window and run the script. The error messages will indicate which package is missing from your Python installation. Any Python script problem is likely to be a missing package. But the challenge is identifying which package.
--   Link problems: the C++ code in OpenCVB relies on PragmaLibs.h which is automatically created as part of the build process. “PragmaLibs.h” defines the names of the OpenCV libraries. It should be updated automatically with the current OpenCV version that is in use. If not, run the “VersionUpdates” application included in the OpenCVB.sln file. “VersionUpdates” will update the names of the files from OpenCV to be linked into the OpenCVB interfaces. Open the “PragmaLibs.h” file to see the current version of OpenCV that is expected to be present.
+-   Link problems: the C++ code in OpenCVB relies on PragmaLibs.h which is automatically created as part of the build process. “PragmaLibs.h” defines the names of the OpenCV libraries. It should be updated automatically with the current OpenCV version that is in use. If not, run the “VersionUpdates” application included in the OpenCVB tree. “VersionUpdates” will update the names of the files from OpenCV to be linked into the OpenCVB interfaces. Open the “PragmaLibs.h” file to see the current version of OpenCV that is expected to be present.
 
 # Building New Experiments with Snippets
 
-OpenCVB is a WinForms application and most of the algorithms were written using Microsoft's managed code, but C++ and Python examples are provided as well. New algorithms can be added using code snippets or the “Blue Plus” button in the user interface.
+OpenCVB is a WinForms application and most of the algorithms were written using Microsoft's managed code, but C++ and Python examples are provided as well. New algorithms can be added using code snippets or the “Blue Plus” button *![](media/0dede74f225b8e19e8f4fd5a50ba9f28.png)* in the user interface.
 
 Code snippets are installed using the Tools/Code Snippets Manager menu entry. For both “Basic” and “CSharp” use the “Add” button to point to:
 
@@ -197,9 +203,9 @@ To install OpenCVB’s snippets in Visual Studio:
 -   Select “Basic” or “CSharp” as the Language.
 -   Add the “\<OpenCVB Dir\>/OpenCVB.snippets” directory.
 -   Access the code snippets with a right-click in the VB.Net or C\# code, select “Snippet/Insert Snippet” and select “OpenCVB.snippets”.
--   Even C++ algorithms can use snippets, but each C++ algorithm has a VB.Net entry that includes both the C++ and the VB.Net code in the snippet. The C++ portion is to be cut and pasted anywhere in OpenCVB’s “CPP_Classes” Visual Studio project.
+-   Even C++ algorithms can use snippets, but each C++ algorithm has a VB.Net entry that includes both the C++ and the VB.Net code in the snippet. The C++ portion can be cut and pasted anywhere in OpenCVB’s “CPP_Classes” Visual Studio project.
 
-An alternate way to add projects is also available in OpenCVB. To see the complete list of algorithm types that can be added to OpenCVB, click on the “Blue Plus” button in OpenCVB’s main toolbar. A dialog box will guide the selection of the type of algorithm to be added.
+An alternate way to add projects is also available in OpenCVB. To see the complete list of algorithm types that can be added to OpenCVB, click on the “Blue Plus” button*![](media/0dede74f225b8e19e8f4fd5a50ba9f28.png)* in OpenCVB’s main toolbar. A dialog box will guide the selection of the type of algorithm to be added.
 
 # Algorithm Groups
 
@@ -231,9 +237,9 @@ VB.Net provides a full-featured language just like C\# with lambda functions and
 
 The main caution in using VB.Net is to treat it as a scripting language like Python. Most of the algorithms avoid pixel-by-pixel details – VB.Net can be detailed but it will be slower than optimized C++. Usually, OpenCVB is doing most of the real work in optimized C++ through the OpenCVSharp interface. Most algorithms run reasonably fast even in Debug mode because the release version of OpenCVSharp is active when OpenCVB is in Debug mode.
 
-Critics will point out that a Windows 10 app using VB.Net is not easily portable to other platforms. The entire OpenCVB application does not need to be ported to other platforms. Only individual algorithms are likely to be ported after they are debugged and polished. Most OpenCVB algorithms consist almost entirely of OpenCV APIs which are available everywhere. OpenCVB’s value lies in the ability to experiment and test an OpenCV algorithm. After the prototype is complete the algorithm can be transferred to a different platform.
+Critics will point out that a Windows 10/11 app using VB.Net is not easily portable to other platforms. The entire OpenCVB application does not need to be ported to other platforms. Only individual algorithms are likely to be ported after they are debugged and polished. Most OpenCVB algorithms consist almost entirely of OpenCV APIs which are available everywhere. OpenCVB’s value lies in the ability to experiment and test an OpenCV algorithm. After the prototype is complete the algorithm can be transferred to a different platform.
 
-OpenCVB also includes the ability to translate VB.Net algorithms to C++. A new icon is present in the OpenCVB user interface but invoking the “VB_to_CPP” project in the “OpenCVB.sln” file is more convenient. The translation is a 90% translation where the user must manually replace some VB.Net lines. All of the algorithms that are translated into a C++ include file called “CPP_IncludeOnly.h”. Using an “include-only” approach makes it simpler to include the translated algorithms into a C++ application.
+OpenCVB also includes the ability to translate VB.Net algorithms to C\#. A new icon is present in the OpenCVB user interface. The translation is a 98% translation where the user must manually replace some VB.Net names. The small app “Touchup.exe” provides almost all that is needed after translation with AI.
 
 # Camera Interface
 
@@ -249,9 +255,9 @@ To accommodate building new OpenGL experiments, OpenCVB includes an interface sh
 
 # Python Interface
 
-OpenCV has numerous examples of Python scripts and Python is often used for computer vision experiments. To add a new Python script for use with OpenCVB, add the Python script to the VB_Classes project so any changes to a Python script will automatically show the new or renamed Python files in the user interface. Python scripts don’t require a VB.Net wrapper – just add a new script to the VB_Classes Project – and it will appear in the user interface.
+OpenCV has numerous examples of Python scripts and Python is often used for computer vision experiments. To add a new Python script for use with OpenCVB, add the Python script to the Python_Classes project so any changes to a Python script will automatically show the new or renamed Python files in the user interface. Python scripts don’t require a VB.Net wrapper – just add a new script to the VB_Classes Project – and it will appear in the user interface.
 
-Python scripts can get a stream of images from the camera and return resulting images. There are numerous examples of how to do this: see z_AddWeighted_PS.py or z_Camshift_PS.py for the simplest examples. The “_PS” suffix is an OpenCVB convention that indicates it is a Python Streaming script that expects a stream of RGB and Depth images and will return images. NOTE: The Python script name MUST end with “_PS.py” to stream images to and from Python code. To see the list of all the Python Streaming scripts, select the pre-defined subset group called “\<PyStream\>”.
+Python scripts can get a stream of images from the camera and return resulting images. There are numerous examples of how to do this: see AddWeighted_PS.py or Camshift_PS.py for the simplest examples. The “_PS” suffix is an OpenCVB convention that indicates it is a Python Streaming script that expects a stream of RGB and Depth images and will return images. NOTE: The Python Streaming scripts MUST end with “_PS.py” to stream images to and from Python code. Other Python scripts don’t require anything from OpenCVB and can use any name. To see the list of all the Python Streaming scripts, select the pre-defined subset group called “\<PyStream\>”.
 
 Some care is required when first using an OpenCVB “PyStream” script. The algorithm thread is writing to a pipe received by the Python script. However, if the right version of Python is not set in OpenCVB or some of the packages are missing, it will appear to hang the algorithm thread in OpenCVB. The problem is almost always a missing Python package.
 
@@ -770,7 +776,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 # Recent Changes – February 2023
 
 -   Over 1400 algorithms are included with an average of 31 lines of code per algorithm
--   Adding a new OpenCVB algorithm using the ‘Blue Plus’ button is now expanded and easier.
+-   Adding a new OpenCVB algorithm using the ‘Blue Plus’ button *![](media/0dede74f225b8e19e8f4fd5a50ba9f28.png)* is now expanded and easier.
 -   Depth at the image edges for RealSense cameras have gaps that can be approximated.
     -   See the Guess_ImageEdge algorithm (RealSense only)
 -   OpenCVB has been tested on Windows 11 without incident.
@@ -928,7 +934,7 @@ The heat map is a well-known method to display populations – blue is cool or l
         -   Snippets are available to add algorithms, options, sliders, radio buttons, checkboxes.
         -   3 option groups: general OpenCVB, all algorithms, and algorithm specific.
     -   Make it simple to add more algorithms.
-        -   Snippets and “Blue Plus” button generate new algorithms easily.
+        -   Snippets and “Blue Plus” button *![](media/0dede74f225b8e19e8f4fd5a50ba9f28.png)* generate new algorithms easily.
 -   A list of RedCloud neighbor cells was added for each cell.
 -   A Principal Component Analysis (PCA) eigenvector is available for RedCloud cells
 -   A plane equation has been added for each RedCloud cell found.
