@@ -29,9 +29,9 @@ Public Class CameraORB : Inherits Camera
     Public deviceNum As Integer
     Public deviceName As String
     Public cPtrOpen As IntPtr
-    Public Sub New(workingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
-        MyBase.setupMats(workingRes)
+        MyBase.setupMats(WorkingRes)
 
         cPtr = ORBOpen(captureRes.Width, captureRes.Height)
 
@@ -43,7 +43,7 @@ Public Class CameraORB : Inherits Camera
         cameraInfo.fx = intrinInfo(2)
         cameraInfo.fy = intrinInfo(3)
     End Sub
-    Public Sub GetNextFrame(workingRes As cv.Size)
+    Public Sub GetNextFrame(WorkingRes As cv.Size)
 
         If cPtr = 0 Then Exit Sub
 
@@ -60,8 +60,8 @@ Public Class CameraORB : Inherits Camera
         IMU_TimeStamp = ORBIMUTimeStamp(cPtr) - imuStartTime
 
         SyncLock cameraLock
-            Dim cols = workingRes.Width, rows = workingRes.Height
-            If captureRes = workingRes Then
+            Dim cols = WorkingRes.Width, rows = WorkingRes.Height
+            If captureRes = WorkingRes Then
                 If colorData <> 0 Then mbuf(mbIndex).color = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, colorData).Clone
 
                 Dim pcData = ORBPointCloud(cPtr)
@@ -77,26 +77,26 @@ Public Class CameraORB : Inherits Camera
             Else
                 If colorData <> 0 Then
                     mbuf(mbIndex).color = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, colorData).
-                                                     Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                                                     Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
                 Dim pcData = ORBPointCloud(cPtr)
                 If pcData <> 0 Then
                     mbuf(mbIndex).pointCloud = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, pcData).
-                                                          Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest) * 0.001
+                                                          Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest) * 0.001
                 End If
 
                 Dim leftData = ORBLeftImage(cPtr)
                 If leftData <> 0 Then
                     mbuf(mbIndex).leftView = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, leftData).
-                                                          Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest).
+                                                          Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest).
                                                           CvtColor(cv.ColorConversionCodes.GRAY2BGR) * 3
                 End If
 
                 Dim rightData = ORBRightImage(cPtr)
                 If rightData <> 0 Then
                     mbuf(mbIndex).rightView = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, rightData).
-                                                         Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest).
+                                                         Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest).
                                                          CvtColor(cv.ColorConversionCodes.GRAY2BGR) * 3
                 End If
             End If

@@ -14899,6 +14899,728 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
 
 
+    public class CS_Feature_Basics : CS_Parent
+    {
+        List<Mat> matList = new List<Mat>();
+        List<Point2f> ptList = new List<Point2f>();
+        KNN_Core knn = new KNN_Core();
+        List<Point2f> ptLost = new List<Point2f>();
+        Feature_Gather gather = new Feature_Gather();
+        List<Mat> featureMat = new List<Mat>();
+        public Options_Features options = new Options_Features();
+        public CS_Feature_Basics(VBtask task) : base(task)
+        {
+            task.features.Clear(); // in case it was previously in use...
+            desc = "Identify features with GoodFeaturesToTrack but manage them with MatchTemplate";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2 = src.Clone();
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            gather.Run(src);
+            if (task.optionsChanged)
+            {
+                task.features.Clear();
+                featureMat.Clear();
+            }
+            matList.Clear();
+            ptList.Clear();
+            Mat correlationMat = new Mat();
+            for (int i = 0; i < Math.Min(featureMat.Count, task.features.Count); i++)
+            {
+                Point2f pt = task.features[i];
+                Rect rect = ValidateRect(new Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), featureMat[i].Width, featureMat[i].Height));
+                if (!gather.ptList.Contains(new cv.Point((int)pt.X, (int)pt.Y)))
+                {
+                    Cv2.MatchTemplate(src.SubMat(rect), featureMat[i], correlationMat, TemplateMatchModes.CCoeffNormed);
+                    if (correlationMat.Get<float>(0, 0) < options.correlationMin)
+                    {
+                        Point2f ptNew = new Point2f((int)pt.X, (int)pt.Y);
+                        if (!ptLost.Contains(ptNew)) ptLost.Add(ptNew);
+                        continue;
+                    }
+                }
+                matList.Add(featureMat[i]);
+                ptList.Add(pt);
+            }
+            featureMat = new List<Mat>(matList);
+            task.features = new List<Point2f>(ptList);
+            float extra = 1 + (1 - options.resyncThreshold);
+            task.featureMotion = true;
+            if (task.features.Count < gather.features.Count * options.resyncThreshold || task.features.Count > extra * gather.features.Count)
+            {
+                ptLost.Clear();
+                featureMat.Clear();
+                task.features.Clear();
+                foreach (Point2f pt in gather.features)
+                {
+                    Rect rect = ValidateRect(new Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), options.templateSize, options.templateSize));
+                    featureMat.Add(src.SubMat(rect));
+                    task.features.Add(pt);
+                }
+            }
+            else
+            {
+                if (ptLost.Count > 0)
+                {
+                    knn.queries = ptLost;
+                    knn.trainInput = gather.features;
+                    knn.Run(null);
+                    for (int i = 0; i < knn.queries.Count; i++)
+                    {
+                        Point2f pt = knn.queries[i];
+                        Rect rect = ValidateRect(new Rect((int)(pt.X - options.templatePad), (int)(pt.Y - options.templatePad), options.templateSize, options.templateSize));
+                        featureMat.Add(src.SubMat(rect));
+                        task.features.Add(knn.trainInput[knn.result[i, 0]]);
+                    }
+                }
+                else
+                {
+                    task.featureMotion = false;
+                }
+            }
+            task.featurePoints.Clear();
+            foreach (Point2f pt in task.features)
+            {
+                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
+                task.featurePoints.Add(new Point((int)pt.X, (int)pt.Y));
+            }
+            if (task.heartBeat)
+            {
+                labels[2] = $"{task.features.Count}/{matList.Count} features were matched to the previous frame using correlation and {ptLost.Count} features had to be relocated.";
+            }
+        }
+    }
+    public class CS_Feature_BasicsNoFrills : CS_Parent
+    {
+        public Options_Features options = new Options_Features();
+        Feature_Gather gather = new Feature_Gather();
+        public CS_Feature_BasicsNoFrills(VBtask task) : base(task)
+        {
+            UpdateAdvice(traceName + ": Use 'Options_Features' to control output.");
+            desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2 = src.Clone();
+            gather.Run(src);
+            task.features.Clear();
+            task.featurePoints.Clear();
+            foreach (Point2f pt in gather.features)
+            {
+                task.features.Add(pt);
+                task.featurePoints.Add(new Point((int)pt.X, (int)pt.X));
+                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
+            }
+            labels[2] = gather.labels[2];
+        }
+    }
+    public class CS_Feature_KNN : CS_Parent
+    {
+        KNN_Core knn = new KNN_Core();
+        public List<Point2f> featurePoints = new List<Point2f>();
+        public Feature_Basics feat = new Feature_Basics();
+        public CS_Feature_KNN(VBtask task) : base(task)
+        {
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "Find good features to track in a BGR image but use the same point if closer than a threshold";
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(src);
+            knn.queries = new List<Point2f>(task.features);
+            if (task.FirstPass) knn.trainInput = new List<Point2f>(knn.queries);
+            knn.Run(null);
+            for (int i = 0; i < knn.neighbors.Count; i++)
+            {
+                int trainIndex = knn.neighbors[i][0]; // index of the matched train input
+                Point2f pt = knn.trainInput[trainIndex];
+                Point2f qPt = task.features[i];
+                if (pt.DistanceTo(qPt) > feat.options.minDistance) knn.trainInput[trainIndex] = task.features[i];
+            }
+            featurePoints = new List<Point2f>(knn.trainInput);
+            src.CopyTo(dst2);
+            dst3.SetTo(0);
+            foreach (Point2f pt in featurePoints)
+            {
+                DrawCircle(dst2, pt, task.DotSize + 2, Scalar.White);
+                DrawCircle(dst3, pt, task.DotSize + 2, Scalar.White);
+            }
+            labels[2] = feat.labels[2];
+            labels[3] = feat.labels[2];
+        }
+    }
+    public class CS_Feature_Reduction : CS_Parent
+    {
+        Reduction_Basics reduction = new Reduction_Basics();
+        Feature_Basics feat = new Feature_Basics();
+        public CS_Feature_Reduction(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Good features", "History of good features" };
+            desc = "Get the features in a reduction grayscale image.";
+        }
+        public void RunCS(Mat src)
+        {
+            reduction.Run(src);
+            dst2 = src;
+            feat.Run(reduction.dst2);
+            if (task.heartBeat) dst3.SetTo(0);
+            foreach (Point2f pt in task.features)
+            {
+                DrawCircle(dst2, pt, task.DotSize, Scalar.White);
+                DrawCircle(dst3, pt, task.DotSize, Scalar.White);
+            }
+        }
+    }
+    public class CS_Feature_MultiPass : CS_Parent
+    {
+        Feature_Basics feat = new Feature_Basics();
+        public List<Point2f> featurePoints = new List<Point2f>();
+        PhotoShop_SharpenDetail sharpen = new PhotoShop_SharpenDetail();
+        public CS_Feature_MultiPass(VBtask task) : base(task)
+        {
+            task.gOptions.setRGBFilterActive(true);
+            task.gOptions.setRGBFilterSelection("Filter_Laplacian");
+            desc = "Run Feature_Basics twice and compare results.";
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(task.color);
+            dst2 = src.Clone();
+            featurePoints = new List<Point2f>(task.features);
+            string passCounts = $"{featurePoints.Count}/";
+            feat.Run(src);
+            foreach (var pt in task.features)
+            {
+                featurePoints.Add(pt);
+            }
+            passCounts += $"{task.features.Count}/";
+            sharpen.Run(task.color);
+            feat.Run(sharpen.dst2);
+            foreach (var pt in task.features)
+            {
+                featurePoints.Add(pt);
+            }
+            passCounts += $"{task.features.Count}";
+            foreach (var pt in featurePoints)
+            {
+                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
+            }
+            if (task.heartBeat)
+            {
+                labels[2] = $"Total features = {featurePoints.Count}, pass counts = {passCounts}";
+            }
+        }
+    }
+    public class CS_Feature_PointTracker : CS_Parent
+    {
+        Font_FlowText flow = new Font_FlowText();
+        public Feature_Basics feat = new Feature_Basics();
+        Match_Points mPoints = new Match_Points();
+        Options_Features options = new Options_Features();
+        public CS_Feature_PointTracker(VBtask task) : base(task)
+        {
+            flow.dst = RESULT_DST3;
+            labels[3] = "Correlation coefficients for each remaining cell";
+            desc = "Use the top X goodFeatures and then use matchTemplate to find track them.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            double correlationMin = options.correlationMin;
+            int templatePad = options.templatePad;
+            int templateSize = options.templateSize;
+            strOut = "";
+            if (mPoints.ptx.Count <= 3)
+            {
+                mPoints.ptx.Clear();
+                feat.Run(src);
+                foreach (var pt in task.features)
+                {
+                    mPoints.ptx.Add(pt);
+                    Rect rect = ValidateRect(new Rect((int)(pt.X - templatePad), (int)(pt.Y - templatePad), templateSize, templateSize));
+                }
+                strOut = "Restart tracking -----------------------------------------------------------------------------\n";
+            }
+            mPoints.Run(src);
+            dst2 = src.Clone();
+            for (int i = mPoints.ptx.Count - 1; i >= 0; i--)
+            {
+                if (mPoints.correlation[i] > correlationMin)
+                {
+                    DrawCircle(dst2, mPoints.ptx[i], task.DotSize, task.HighlightColor);
+                    strOut += $"{mPoints.correlation[i]:F3}, ";
+                }
+                else
+                {
+                    mPoints.ptx.RemoveAt(i);
+                }
+            }
+            if (standaloneTest())
+            {
+                flow.msgs.Add(strOut);
+                flow.Run(empty);
+            }
+            labels[2] = $"Of the {task.features.Count} input points, {mPoints.ptx.Count} points were tracked with correlation above {correlationMin:F2}";
+        }
+    }
+    public class CS_Feature_Delaunay : CS_Parent
+    {
+        Delaunay_Contours facet = new Delaunay_Contours();
+        Feature_Basics feat = new Feature_Basics();
+        public CS_Feature_Delaunay(VBtask task) : base(task)
+        {
+            FindSlider("Min Distance to next").Value = 10;
+            desc = "Divide the image into contours with Delaunay using features";
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(src);
+            dst2 = feat.dst2;
+            labels[2] = feat.labels[2];
+            facet.inputPoints.Clear();
+            foreach (var pt in task.features)
+            {
+                facet.inputPoints.Add(pt);
+            }
+            facet.Run(src);
+            dst3 = facet.dst2;
+            foreach (var pt in task.features)
+            {
+                DrawCircle(dst3, pt, task.DotSize, Scalar.White);
+            }
+            labels[3] = $"There were {task.features.Count} Delaunay contours";
+        }
+    }
+    public class CS_Feature_LucasKanade : CS_Parent
+    {
+        FeatureFlow_LucasKanade pyr = new FeatureFlow_LucasKanade();
+        public List<Point> ptList = new List<Point>();
+        public List<Point> ptLast = new List<Point>();
+        List<List<Point>> ptHist = new List<List<Point>>();
+        public CS_Feature_LucasKanade(VBtask task) : base(task)
+        {
+            desc = "Provide a trace of the tracked features";
+        }
+        public void RunCS(Mat src)
+        {
+            pyr.Run(src);
+            dst2 = src;
+            labels[2] = pyr.labels[2];
+            if (task.heartBeat) dst3.SetTo(0);
+            ptList.Clear();
+            int stationary = 0, motion = 0;
+            for (int i = 0; i < pyr.features.Count; i++)
+            {
+                Point pt = new Point((int)pyr.features[i].X, (int)pyr.features[i].Y);
+                ptList.Add(pt);
+                if (ptLast.Contains(pt))
+                {
+                    Cv2.Circle(dst3, pt, task.DotSize, task.HighlightColor);
+                    stationary++;
+                }
+                else
+                {
+                    DrawLine(dst3, pyr.lastFeatures[i], pyr.features[i], Scalar.White, task.lineWidth);
+                    motion++;
+                }
+            }
+            if (task.heartBeat) labels[3] = $"{stationary} features were stationary and {motion} features had some motion.";
+            ptLast = new List<Point>(ptList);
+        }
+    }
+    public class CS_Feature_NearestCell : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        FeatureLeftRight_Basics feat = new FeatureLeftRight_Basics();
+        KNN_Core knn = new KNN_Core();
+        public CS_Feature_NearestCell(VBtask task) : base(task)
+        {
+            desc = "Find the nearest feature to every cell in task.redCells";
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(src);
+            redC.Run(src);
+            dst2 = redC.dst2;
+            dst3 = redC.dst2.Clone();
+            labels[2] = redC.labels[2];
+            knn.queries.Clear();
+            foreach (var rc in task.redCells)
+            {
+                knn.queries.Add(rc.maxDStable);
+            }
+            knn.trainInput.Clear();
+            foreach (var mp in feat.mpList)
+            {
+                knn.trainInput.Add(new Point2f(mp.p1.X, mp.p1.Y));
+            }
+            knn.Run(null);
+            for (int i = 0; i < task.redCells.Count; i++)
+            {
+                var rc = task.redCells[i];
+                rc.nearestFeature = knn.trainInput[knn.result[i, 0]];
+                DrawLine(dst3, rc.nearestFeature, rc.maxDStable, task.HighlightColor, task.lineWidth);
+            }
+        }
+    }
+    public class CS_Feature_Points : CS_Parent
+    {
+        public Feature_Basics feat = new Feature_Basics();
+        public CS_Feature_Points(VBtask task) : base(task)
+        {
+            labels[3] = "Features found in the image";
+            desc = "Use the sorted list of Delaunay regions to find the top X points to track.";
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(src);
+            dst2 = feat.dst2;
+            if (task.heartBeat) dst3.SetTo(0);
+            foreach (var pt in task.features)
+            {
+                DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
+                DrawCircle(dst3, pt, task.DotSize, task.HighlightColor);
+            }
+            labels[2] = $"{task.features.Count} targets were present with {feat.options.featurePoints} requested.";
+        }
+    }
+    public class CS_Feature_Trace : CS_Parent
+    {
+        RedTrack_Features track = new RedTrack_Features();
+        public CS_Feature_Trace(VBtask task) : base(task)
+        {
+            desc = "Placeholder to help find RedTrack_Features";
+        }
+        public void RunCS(Mat src)
+        {
+            track.Run(src);
+            dst2 = track.dst2;
+            labels = track.labels;
+        }
+    }
+    public class CS_Feature_TraceDelaunay : CS_Parent
+    {
+        Feature_Delaunay features = new Feature_Delaunay();
+        public List<List<Point2f>> goodList = new List<List<Point2f>>(); // stable points only
+        public CS_Feature_TraceDelaunay(VBtask task) : base(task)
+        {
+            labels = new string[] { "Stable points highlighted", "", "", "Delaunay map of regions defined by the feature points" };
+            desc = "Trace the GoodFeatures points using only Delaunay - no KNN or RedCloud or Matching.";
+        }
+        public void RunCS(Mat src)
+        {
+            features.Run(src);
+            dst3 = features.dst2;
+            if (task.optionsChanged)
+                goodList.Clear();
+            List<Point2f> ptList = new List<Point2f>(task.features);
+            goodList.Add(ptList);
+            if (goodList.Count >= task.frameHistoryCount)
+                goodList.RemoveAt(0);
+            dst2.SetTo(0);
+            foreach (var pt_List in goodList)
+            {
+                foreach (var pt in pt_List)
+                {
+                    DrawCircle(task.color, pt, task.DotSize, task.HighlightColor);
+                    Vec3b c = dst3.Get<Vec3b>((int)pt.Y, (int)pt.X);
+                    DrawCircle(dst2, pt, task.DotSize + 1, vecToScalar(c));
+                }
+            }
+            labels[2] = $"{task.features.Count} features were identified in the image.";
+        }
+    }
+    public class CS_Feature_ShiTomasi : CS_Parent
+    {
+        Corners_HarrisDetector harris = new Corners_HarrisDetector();
+        Corners_ShiTomasi_CPP shiTomasi = new Corners_ShiTomasi_CPP();
+        Options_ShiTomasi options = new Options_ShiTomasi();
+        public CS_Feature_ShiTomasi(VBtask task) : base(task)
+        {
+            FindSlider("Corner normalize threshold").Value = 15;
+            labels = new string[] { "", "", "Features in the left camera image", "Features in the right camera image" };
+            desc = "Identify feature points in the left and right views";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (options.useShiTomasi)
+            {
+                dst2 = task.leftView;
+                dst3 = task.rightView;
+                shiTomasi.Run(task.leftView);
+                dst2.SetTo(Scalar.White, shiTomasi.dst3.CvtColor(ColorConversionCodes.BGR2GRAY));
+                shiTomasi.Run(task.rightView);
+                dst3.SetTo(task.HighlightColor, shiTomasi.dst3.CvtColor(ColorConversionCodes.BGR2GRAY));
+            }
+            else
+            {
+                harris.Run(task.leftView);
+                dst2 = harris.dst2.Clone();
+                harris.Run(task.rightView);
+                dst3 = harris.dst2;
+            }
+        }
+    }
+    public class CS_Feature_Generations : CS_Parent
+    {
+        Feature_Basics feat = new Feature_Basics();
+        List<Point> features = new List<Point>();
+        List<int> gens = new List<int>();
+        public CS_Feature_Generations(VBtask task) : base(task)
+        {
+            UpdateAdvice(traceName + ": Local options will determine how many features are present.");
+            desc = "Find feature age maximum and average.";
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(src);
+            SortedList<int, Point> newfeatures = new SortedList<int, Point>(new compareAllowIdenticalIntegerInverted());
+            foreach (var pt in task.featurePoints)
+            {
+                int index = features.IndexOf(pt);
+                if (index >= 0)
+                    newfeatures.Add(gens[index] + 1, pt);
+                else
+                    newfeatures.Add(1, pt);
+            }
+            if (task.heartBeat)
+            {
+                features.Clear();
+                gens.Clear();
+            }
+            features = new List<Point>(newfeatures.Values);
+            gens = new List<int>(newfeatures.Keys);
+            dst2 = src;
+            for (int i = 0; i < features.Count; i++)
+            {
+                if (gens[i] == 1)
+                    break;
+                Point pt = features[i];
+                DrawCircle(dst2, pt, task.DotSize, Scalar.White);
+            }
+            if (task.heartBeat)
+            {
+                labels[2] = $"{features.Count} features found with max/average {gens[0]}/{gens.Average():F2} generations";
+            }
+        }
+    }
+    public class CS_Feature_History : CS_Parent
+    {
+        public List<Point> features = new List<Point>();
+        public Feature_Basics feat = new Feature_Basics();
+        List<List<Point>> featureHistory = new List<List<Point>>();
+        List<int> gens = new List<int>();
+        public CS_Feature_History(VBtask task) : base(task)
+        {
+            desc = "Find good features across multiple frames.";
+        }
+        public void RunCS(Mat src)
+        {
+            int histCount = task.frameHistoryCount;
+            feat.Run(src);
+            dst2 = src.Clone();
+            featureHistory.Add(new List<Point>(task.featurePoints));
+            List<Point> newFeatures = new List<Point>();
+            gens.Clear();
+            foreach (var cList in featureHistory)
+            {
+                foreach (var pt in cList)
+                {
+                    int index = newFeatures.IndexOf(pt);
+                    if (index >= 0)
+                    {
+                        gens[index]++;
+                    }
+                    else
+                    {
+                        newFeatures.Add(pt);
+                        gens.Add(1);
+                    }
+                }
+            }
+            int threshold = histCount == 1 ? 0 : 1;
+            features.Clear();
+            int whiteCount = 0;
+            for (int i = 0; i < newFeatures.Count; i++)
+            {
+                if (gens[i] > threshold)
+                {
+                    Point pt = newFeatures[i];
+                    features.Add(pt);
+                    if (gens[i] < histCount)
+                    {
+                        DrawCircle(dst2, pt, task.DotSize + 2, Scalar.Red);
+                    }
+                    else
+                    {
+                        whiteCount++;
+                        DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
+                    }
+                }
+            }
+            if (featureHistory.Count > histCount)
+                featureHistory.RemoveAt(0);
+            if (task.heartBeat)
+            {
+                labels[2] = $"{features.Count}/{whiteCount} present/present on every frame" +
+                            $" Red is a recent addition, yellow is present on previous {histCount} frames";
+            }
+        }
+    }
+    public class CS_Feature_GridPopulation : CS_Parent
+    {
+        Feature_Basics feat = new Feature_Basics();
+        public CS_Feature_GridPopulation(VBtask task) : base(task)
+        {
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            labels[3] = "Click 'Show grid mask overlay' to see grid boundaries.";
+            desc = "Find the feature population for each cell.";
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(src);
+            dst2 = feat.dst2;
+            labels[2] = feat.labels[2];
+            dst3.SetTo(0);
+            foreach (var pt in task.featurePoints)
+            {
+                dst3.Set<byte>((int)pt.Y, (int)pt.X, 255);
+            }
+            foreach (var roi in task.gridList)
+            {
+                Mat test = dst3.SubMat(roi).FindNonZero();
+                SetTrueText(test.Rows.ToString(), roi.TopLeft, 3);
+            }
+        }
+    }
+    public class CS_Feature_Compare : CS_Parent
+    {
+        Feature_Basics feat = new Feature_Basics();
+        Feature_BasicsNoFrills noFrill = new Feature_BasicsNoFrills();
+        List<Point2f> saveLFeatures = new List<Point2f>();
+        List<Point2f> saveRFeatures = new List<Point2f>();
+        public CS_Feature_Compare(VBtask task) : base(task)
+        {
+            desc = "Prepare features for the left and right views";
+        }
+        public void RunCS(Mat src)
+        {
+            task.features = new List<Point2f>(saveLFeatures);
+            feat.Run(src.Clone());
+            dst2 = feat.dst2;
+            labels[2] = feat.labels[2];
+            saveLFeatures = new List<Point2f>(task.features);
+            task.features = new List<Point2f>(saveRFeatures);
+            noFrill.Run(src.Clone());
+            dst3 = noFrill.dst2;
+            labels[3] = "With no correlation coefficients " + noFrill.labels[2];
+            saveRFeatures = new List<Point2f>(task.features);
+        }
+    }
+    public class CS_Feature_Gather : CS_Parent
+    {
+        Corners_HarrisDetector harris = new Corners_HarrisDetector();
+        Corners_Basics FAST = new Corners_Basics();
+        Options_FeatureGather myOptions = new Options_FeatureGather();
+        public List<Point2f> features = new List<Point2f>();
+        public List<Point> ptList = new List<Point>();
+        BRISK_Basics brisk = new BRISK_Basics();
+        public Options_Features options = new Options_Features();
+        public CS_Feature_Gather(VBtask task) : base(task)
+        {
+            FindSlider("Feature Sample Size").Value = 400;
+            cPtr = Agast_Open();
+            desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            myOptions.RunVB();
+
+            if (src.Channels() != 1)
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            switch (myOptions.featureSource)
+            {
+                case FeatureSrc.goodFeaturesFull:
+                    features = new List<Point2f>(Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, null,
+                                                          options.blockSize, true, options.k));
+                    labels[2] = $"GoodFeatures produced {features.Count} features";
+                    break;
+                case FeatureSrc.goodFeaturesGrid:
+                    options.featurePoints = 4;
+                    features.Clear();
+                    for (int i = 0; i < task.gridList.Count; i++)
+                    {
+                        var roi = task.gridList[i];
+                        var tmpFeatures = new List<Point2f>(Cv2.GoodFeaturesToTrack(src.SubMat(roi), options.featurePoints, options.quality, options.minDistance, null,
+                                                                     options.blockSize, true, options.k));
+                        for (int j = 0; j < tmpFeatures.Count; j++)
+                        {
+                            features.Add(new Point2f(tmpFeatures[j].X + roi.X, tmpFeatures[j].Y + roi.Y));
+                        }
+                    }
+                    labels[2] = $"GoodFeatures produced {features.Count} features";
+                    break;
+                case FeatureSrc.Agast:
+                    src = task.color.Clone();
+                    byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
+                    Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
+                    GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+                    IntPtr imagePtr = Agast_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.agastThreshold);
+                    handleSrc.Free();
+                    Mat ptMat = new Mat(Agast_Count(cPtr), 1, MatType.CV_32FC2, imagePtr).Clone();
+                    features.Clear();
+                    if (standaloneTest())
+                        dst2 = src;
+                    for (int i = 0; i < ptMat.Rows; i++)
+                    {
+                        Point2f pt = ptMat.Get<Point2f>(i, 0);
+                        features.Add(pt);
+                        if (standaloneTest())
+                            DrawCircle(dst2, pt, task.DotSize, Scalar.White);
+                    }
+                    labels[2] = $"GoodFeatures produced {features.Count} features";
+                    break;
+                case FeatureSrc.BRISK:
+                    brisk.Run(src);
+                    features = brisk.features;
+                    labels[2] = $"GoodFeatures produced {features.Count} features";
+                    break;
+                case FeatureSrc.Harris:
+                    harris.Run(src);
+                    features = harris.features;
+                    labels[2] = $"Harris Detector produced {features.Count} features";
+                    break;
+                case FeatureSrc.FAST:
+                    FAST.Run(src);
+                    features = FAST.features;
+                    labels[2] = $"FAST produced {features.Count} features";
+                    break;
+            }
+            ptList.Clear();
+            foreach (var pt in features)
+            {
+                ptList.Add(new Point((int)pt.X, (int)pt.Y));
+            }
+            if (standaloneTest())
+            {
+                dst2 = task.color.Clone();
+                foreach (var pt in features)
+                {
+                    DrawCircle(dst2, pt, task.DotSize, task.HighlightColor);
+                }
+            }
+        }
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero)
+                cPtr = Agast_Close(cPtr);
+        }
+    }
 
 
 

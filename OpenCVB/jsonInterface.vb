@@ -11,6 +11,7 @@ Namespace jsonClass
         Public cameraIndex As Integer
         Public cameraName As String
         Public cameraPresent As List(Of Boolean)
+        Public cameraFound As Boolean
         Public resolutionsSupported As List(Of Boolean)
         Public cameraSupported As List(Of Boolean)
         Public camera640x480Support As List(Of Boolean)
@@ -29,8 +30,8 @@ Namespace jsonClass
         Public snap320 As Boolean
         Public snapCustom As Boolean
 
-        Public workingRes As cv.Size
-        Public workingResIndex As Integer
+        Public WorkingRes As cv.Size
+        Public WorkingResIndex As Integer
         Public captureRes As cv.Size
         Public displayRes As cv.Size
 
@@ -70,15 +71,21 @@ Namespace jsonClass
             Dim emptyApp As New ApplicationStorage
             emptyApp.cameraName = ""
             emptyApp.cameraIndex = 0
-            emptyApp.workingRes = New cv.Size(320, 240)
+            emptyApp.WorkingRes = New cv.Size(320, 240)
             emptyApp.snap640 = True
             emptyApp.testAllDuration = 5
             emptyApp.showConsoleLog = False
             emptyApp.treeButton = True
-            emptyApp.algorithmGroup = "<All VB.Net>"
-            SaveSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", 0)
-            SaveSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", 0)
+            emptyApp.algorithmGroup = "<All but Python ("
+            SaveSetting("OpenCVB", "OpenGLtaskX", "OpenGLtaskX", 30)
+            SaveSetting("OpenCVB", "OpenGLtaskY", "OpenGLtaskY", 30)
             SaveSetting("OpenCVB", "OpenGLtaskWidth", "OpenGLtaskWidth", 512)
+
+            SaveSetting("OpenCVB", "gOptionsLeft", "gOptionsLeft", 10)
+            SaveSetting("OpenCVB", "gOptionsTop", "gOptionsTop", 10)
+
+            SaveSetting("OpenCVB", "treeViewLeft", "treeViewLeft", 20)
+            SaveSetting("OpenCVB", "treeViewTop", "treeViewTop", 20)
 
             empty.Add(emptyApp)
             Return empty

@@ -353,7 +353,12 @@ Public Class OptionsGlobal
     Public Function GetUseKalman() As Boolean
         Return UseKalman.Checked
     End Function
-
+    Public Sub setRGBFilterActive(val As Boolean)
+        RGBFilterActive.Checked = val
+    End Sub
+    Public Sub setRGBFilterSelection(val As String)
+        RGBFilterList.SelectedIndex = task.gOptions.RGBFilterList.Items.IndexOf(val)
+    End Sub
     Public Sub SetDotSize(val As Integer)
         DotSizeSlider.Value = val
     End Sub

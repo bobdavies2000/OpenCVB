@@ -33,9 +33,9 @@ Module Zed2_Interface
     End Function
 End Module
 Public Class CameraZED2 : Inherits Camera
-    Public Sub New(workingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
-        MyBase.setupMats(workingRes)
+        MyBase.setupMats(WorkingRes)
         ' if OpenCVB fails here, it is likely because you have turned off the StereoLabs support.
         ' Open the CameraDefines.hpp file and uncomment the StereoLab
         cPtr = Zed2Open(captureRes.Width, captureRes.Height)
@@ -62,20 +62,20 @@ Public Class CameraZED2 : Inherits Camera
         Dim h_fov As Single ' horizontal field of view in degrees.
         Dim d_fov As Single ' diagonal field of view in degrees.
     End Structure
-    Public Sub GetNextFrame(workingRes As cv.Size)
+    Public Sub GetNextFrame(WorkingRes As cv.Size)
         Zed2WaitForFrame(cPtr)
 
         If cPtr = 0 Then Exit Sub
-        Zed2GetData(cPtr, workingRes.Width, workingRes.Height)
+        Zed2GetData(cPtr, WorkingRes.Width, WorkingRes.Height)
 
         SyncLock cameraLock
-            mbuf(mbIndex).color = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_8UC3,
+            mbuf(mbIndex).color = New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3,
                                              Zed2Color(cPtr)).Clone
-            mbuf(mbIndex).rightView = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_8UC3,
+            mbuf(mbIndex).rightView = New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3,
                                                  Zed2RightView(cPtr)).Clone
             mbuf(mbIndex).leftView = mbuf(mbIndex).color.Clone
 
-            mbuf(mbIndex).pointCloud = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_32FC3,
+            mbuf(mbIndex).pointCloud = New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_32FC3,
                                                       Zed2PointCloud(cPtr)).Clone
             Dim acc = Zed2Acceleration(cPtr)
             IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)

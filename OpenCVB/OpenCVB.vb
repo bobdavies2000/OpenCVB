@@ -64,7 +64,7 @@ Public Class OpenCVB
     Dim LastX As Integer
     Dim LastY As Integer
     Dim mouseClickFlag As Boolean
-    Dim clickPoint As New cv.Point
+    Dim ClickPoint As New cv.Point
     Dim mousePicTag As Integer
     Dim mouseDownPoint As New cv.Point
     Dim mouseMovePoint As New cv.Point
@@ -80,7 +80,7 @@ Public Class OpenCVB
     Dim textDesc As String = ""
     Dim textAdvice As String = ""
     Dim totalBytesOfMemoryUsed As Integer
-    Dim trueData As List(Of VB_Classes.trueText)
+    Dim trueData As New List(Of VB_Classes.trueText)
 
     Dim pauseAlgorithmThread As Boolean
     Dim logAlgorithms As StreamWriter
@@ -187,24 +187,28 @@ Public Class OpenCVB
                        "and rebuild OpenCVB with the StereoLabs SDK.")
             End If
 
-            If .cameraName = "" Then
-                Dim cameraList As String = ""
-                For Each cam In cameraNames
-                    cameraList += cam + vbCrLf
-                Next
-                MsgBox("There are no supported cameras present!" + vbCrLf + vbCrLf +
-                       "Connect any of these cameras: " + vbCrLf + vbCrLf + cameraList)
+
+            settings.cameraFound = False
+            For i = 0 To settings.cameraPresent.Count - 1
+                If settings.cameraPresent(i) Then
+                    settings.cameraFound = True
+                    Exit For
+                End If
+            Next
+            If settings.cameraFound = False Then
+                settings.cameraName = ""
+                MsgBox("There are no supported cameras present!" + vbCrLf + vbCrLf)
             End If
 
             If settings.testAllDuration < 5 Then settings.testAllDuration = 5
             If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
 
-            Select Case .workingRes.Height
+            Select Case .WorkingRes.Height
                 Case 270, 540, 1080
                     .captureRes = New cv.Size(1920, 1080)
                     If .camera1920x1080Support(.cameraIndex) = False Then
                         .captureRes = New cv.Size(1280, 720)
-                        .workingRes = New cv.Size(320, 180)
+                        .WorkingRes = New cv.Size(320, 180)
                     End If
                 Case 180, 360, 720
                     .captureRes = New cv.Size(1280, 720)
@@ -214,11 +218,11 @@ Public Class OpenCVB
                     .captureRes = New cv.Size(640, 480)
                     If .camera640x480Support(.cameraIndex) = False Then
                         .captureRes = New cv.Size(1280, 720)
-                        .workingRes = New cv.Size(320, 180)
+                        .WorkingRes = New cv.Size(320, 180)
                     End If
             End Select
 
-            Dim wh = .workingRes.Height
+            Dim wh = .WorkingRes.Height
             ' desktop style is the default
             If .snap320 = False And .snap640 = False And .snapCustom = False Then .snap640 = True
             If .snap640 Then
@@ -234,21 +238,21 @@ Public Class OpenCVB
             End If
 
             Dim border As Integer = 6
-            Dim defaultWidth = .workingRes.Width * 2 + border * 7
-            Dim defaultHeight = .workingRes.Height * 2 + ToolStrip1.Height + border * 12
+            Dim defaultWidth = .WorkingRes.Width * 2 + border * 7
+            Dim defaultHeight = .WorkingRes.Height * 2 + ToolStrip1.Height + border * 12
             If Me.Height < 50 Then
                 Me.Width = defaultWidth
                 Me.Height = defaultHeight
             End If
 
             If .fontInfo Is Nothing Then .fontInfo = New Font("Tahoma", 9)
-            If settings.algorithmGroup = "" Then settings.algorithmGroup = "<All VB.Net"
+            If settings.algorithmGroup = "" Then settings.algorithmGroup = "<All but Python"
 
             If testAllRunning = False Then
-                Dim resStr = CStr(.workingRes.Width) + "x" + CStr(.workingRes.Height)
+                Dim resStr = CStr(.WorkingRes.Width) + "x" + CStr(.WorkingRes.Height)
                 For i = 0 To OptionsDialog.resolutionList.Count - 1
                     If OptionsDialog.resolutionList(i).StartsWith(resStr) Then
-                        .workingResIndex = i
+                        .WorkingResIndex = i
                         Exit For
                     End If
                 Next
@@ -288,7 +292,7 @@ Public Class OpenCVB
         ' currently the only commandline arg is the name of the algorithm to run.  Save it and continue...
         If args.Length > 1 Then
             Dim algorithm As String = "AddWeighted_PS.py"
-            settings.algorithmGroup = "<All>"
+            settings.algorithmGroup = "<All >"
             If args.Length > 2 Then ' arguments from python os.spawnv are passed as wide characters.  
                 For i = 0 To args.Length - 1
                     algorithm += args(i)
@@ -373,9 +377,11 @@ Public Class OpenCVB
             updatePath(K4ADLL.Directory.FullName, "Kinect depth engine dll.")
         End If
 
-        startCamera()
-        While camera Is Nothing ' wait for camera to start...
-        End While
+        If settings.cameraFound Then
+            startCamera()
+            While camera Is Nothing ' wait for camera to start...
+            End While
+        End If
 
         setupCamPics()
 
@@ -395,11 +401,11 @@ Public Class OpenCVB
             GroupName.Text = settings.algorithmGroup
         End If
 
-        If GroupName.SelectedItem() Is Nothing Then GroupName.SelectedItem() = groupNames(0)
+        If GroupName.SelectedItem() Is Nothing Then GroupName.SelectedItem() = groupNames(1)
 
         If AvailableAlgorithms.Items.Count = 0 Then
             MsgBox("There were no algorithms listed for the " + GroupName.Text + vbCrLf +
-                   "This usually indicates something has changed with " + vbCrLf + "UIindexer or UIGenerator")
+                   "This usually indicates something has changed with " + vbCrLf + "UIGenerator")
         Else
             If settings.algorithm Is Nothing Then
                 AvailableAlgorithms.SelectedIndex = 0
@@ -420,7 +426,7 @@ Public Class OpenCVB
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
         Dim g As Graphics = e.Graphics
         Dim pic = DirectCast(sender, PictureBox)
-        Dim ratio = camPic(2).Width / settings.workingRes.Width
+        Dim ratio = camPic(2).Width / settings.WorkingRes.Width
         g.ScaleTransform(1, 1)
         g.DrawImage(pic.Image, 0, 0)
 
@@ -479,10 +485,10 @@ Public Class OpenCVB
             End Try
         End SyncLock
 
-        Dim workingRes = settings.workingRes
+        Dim WorkingRes = settings.WorkingRes
         Dim cres = settings.captureRes
         Dim dres = settings.displayRes
-        Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", WorkingRes " + CStr(workingRes.Width) + "x" + CStr(workingRes.Height)
+        Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", WorkingRes " + CStr(WorkingRes.Width) + "x" + CStr(WorkingRes.Height)
         camLabel(0).Text = "RGB"
         If picLabels(0) <> "" Then camLabel(0).Text = picLabels(0)
         If picLabels(1) <> "" Then camLabel(1).Text = picLabels(1)
@@ -595,7 +601,7 @@ Public Class OpenCVB
     Private Sub killTranslator()
         Dim proc = Process.GetProcesses()
         For i = 0 To proc.Count - 1
-            If proc(i).ProcessName.ToLower.Contains("vb_to_cpp") Then
+            If proc(i).ProcessName.ToLower.Contains("touchup") Then
                 If proc(i).HasExited = False Then proc(i).Kill()
             End If
         Next
@@ -631,7 +637,7 @@ Public Class OpenCVB
         ' we always need the number of lines from the AlgorithmList.txt file (and it is not always read when working with a subset of algorithms.)
         Dim AlgorithmListFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmList.txt")
         If AlgorithmListFileInfo.Exists = False Then
-            MsgBox("The AlgorithmList.txt file is missing.  It should be in " + AlgorithmListFileInfo.FullName + "  Look at UI_Generator project.")
+            MsgBox("The AlgorithmList.txt file is missing.  Run 'UI_Generator' or rebuild all to rebuild the user interface.")
             End
         End If
         Dim sr = New StreamReader(AlgorithmListFileInfo.FullName)
@@ -646,7 +652,7 @@ Public Class OpenCVB
 
         Dim AlgorithmMapFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmGroupNames.txt")
         If AlgorithmMapFileInfo.Exists = False Then
-            MsgBox("The AlgorithmGroupNames.txt file is missing.  Look at the 'UIindexer' Project that creates the mapping of algorithms to OpenCV keywords.")
+            MsgBox("The AlgorithmGroupNames.txt file is missing.  Run 'UI_Generator' or rebuild all to rebuild the user interface.")
             End
         End If
         sr = New StreamReader(AlgorithmMapFileInfo.FullName)
@@ -654,7 +660,6 @@ Public Class OpenCVB
         Dim lastNameSplit As String = "", lastSplit0 As String = ""
         While sr.EndOfStream = False
             infoLine = sr.ReadLine
-
             Split = Regex.Split(infoLine, ",")
 
             If Split(0).StartsWith("<") = False Then
@@ -839,8 +844,8 @@ Public Class OpenCVB
             mousePicTag = pic.Tag
             mousePoint.X = e.X
             mousePoint.Y = e.Y
-            mousePoint *= settings.workingRes.Width / camPic(0).Width
-            XYloc.Text = mousePoint.ToString + " - last click point at: " + clickPoint.ToString
+            mousePoint *= settings.WorkingRes.Width / camPic(0).Width
+            XYloc.Text = mousePoint.ToString + " - last click point at: " + ClickPoint.ToString
         Catch ex As Exception
             Console.WriteLine("Error in camPic_MouseMove: " + ex.Message)
         End Try
@@ -889,7 +894,7 @@ Public Class OpenCVB
                 AddHandler camPic(i).MouseUp, AddressOf camPic_MouseUp
                 AddHandler camPic(i).MouseMove, AddressOf camPic_MouseMove
                 camPic(i).Tag = i
-                camPic(i).Size = New Size(settings.workingRes.Width, settings.workingRes.Height)
+                camPic(i).Size = New Size(settings.WorkingRes.Width, settings.WorkingRes.Height)
                 Me.Controls.Add(camPic(i))
             Next
         End If
@@ -911,7 +916,7 @@ Public Class OpenCVB
         If settings.snap640 Then width = 640
         If settings.snap320 Then width = 320
         If settings.snapCustom Then ' custom size - neither snap320 or snap640
-            Dim ratio = settings.workingRes.Height / settings.workingRes.Width
+            Dim ratio = settings.WorkingRes.Height / settings.WorkingRes.Width
             height = CInt(width * ratio)
         End If
         Dim padX = 12
@@ -986,7 +991,7 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
-        If activateTreeView = False And activateblocked = False Then
+        If activateTreeView = False And activateBlocked = False Then
             activateTaskRequest = True
             activateTreeView = True
         End If
@@ -1005,7 +1010,7 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub TranslateButton_Click(sender As Object, e As EventArgs) Handles TranslateButton.Click
-        Shell(HomeDir.FullName + "bin/Debug/VB_to_CPP.exe", AppWinStyle.NormalFocus)
+        Shell(HomeDir.FullName + "Touchup\bin\x64\Debug\Touchup.exe", AppWinStyle.NormalFocus)
     End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If AvailableAlgorithms.Text = "" Then
@@ -1029,10 +1034,10 @@ Public Class OpenCVB
 
         optionsForm.OptionsDialog_Load(sender, e)
         optionsForm.cameraRadioButton(settings.cameraIndex).Checked = True
-        Dim resStr = CStr(settings.workingRes.Width) + "x" + CStr(settings.workingRes.Height)
+        Dim resStr = CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height)
         For i = 0 To OptionsDialog.resolutionList.Count - 1
             If OptionsDialog.resolutionList(i).StartsWith(resStr) Then
-                optionsForm.workingResRadio(i).Checked = True
+                optionsForm.WorkingResRadio(i).Checked = True
             End If
         Next
 
@@ -1042,7 +1047,7 @@ Public Class OpenCVB
             If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e)
             restartCameraRequest = True
             saveAlgorithmName = ""
-            settings.workingRes = optionsForm.cameraWorkingRes
+            settings.WorkingRes = optionsForm.cameraWorkingRes
             settings.displayRes = optionsForm.cameraDisplayRes
             settings.cameraName = optionsForm.cameraName
             settings.cameraIndex = optionsForm.cameraIndex
@@ -1111,35 +1116,35 @@ Public Class OpenCVB
     Private Function getCamera() As Object
         Select Case settings.cameraIndex
             Case 0
-                Return New CameraKinect(settings.workingRes, settings.captureRes, settings.cameraName)
+                Return New CameraKinect(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case 1
-                Return New CameraRS2(settings.workingRes, settings.captureRes, "Intel RealSense D435I")
+                Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D435I")
             Case 2
-                Return New CameraRS2(settings.workingRes, settings.captureRes, "Intel RealSense D455")
+                Return New CameraRS2(settings.WorkingRes, settings.captureRes, "Intel RealSense D455")
             Case 3
                 Return Nothing ' special handling required.  See CameraTask...
             Case 4
-                Return New CameraZED2(settings.workingRes, settings.captureRes, settings.cameraName)
+                Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case 5
-                Return New CameraMyntD(settings.workingRes, settings.captureRes, settings.cameraName)
+                Return New CameraMyntD(settings.WorkingRes, settings.captureRes, settings.cameraName)
             Case 6
-                Return New CameraORB(settings.workingRes, settings.captureRes, settings.cameraName)
+                Return New CameraORB(settings.WorkingRes, settings.captureRes, settings.cameraName)
         End Select
-        Return New CameraKinect(settings.workingRes, settings.captureRes, settings.cameraName)
+        Return New CameraKinect(settings.WorkingRes, settings.captureRes, settings.cameraName)
     End Function
     Private Sub CameraTask()
         restartCameraRequest = True
         Static saveWorkingRes As cv.Size
         For i = 0 To mbuf.Count - 1
-            mbuf(i).color = New cv.Mat(settings.workingRes, cv.MatType.CV_8UC3)
-            mbuf(i).leftView = New cv.Mat(settings.workingRes, cv.MatType.CV_8UC3)
-            mbuf(i).rightView = New cv.Mat(settings.workingRes, cv.MatType.CV_8UC3)
-            mbuf(i).pointCloud = New cv.Mat(settings.workingRes, cv.MatType.CV_32FC3)
+            mbuf(i).color = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
+            mbuf(i).leftView = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
+            mbuf(i).rightView = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
+            mbuf(i).pointCloud = New cv.Mat(settings.WorkingRes, cv.MatType.CV_32FC3)
         Next
 
         While 1
-            If restartCameraRequest Or settings.workingRes <> saveWorkingRes Then
-                saveWorkingRes = settings.workingRes
+            If restartCameraRequest Or settings.WorkingRes <> saveWorkingRes Then
+                saveWorkingRes = settings.WorkingRes
                 If settings.cameraIndex = 3 Then
                     ' special handling for the Oak-D camera as it cannot be restarted.
                     ' It is my problem but I don't see how to fix it.
@@ -1148,7 +1153,7 @@ Public Class OpenCVB
                     ' Oak-D camera cannot be restarted without restarting OpenCVB.
                     ' Leave it alone once it is started...
                     settings.captureRes = New cv.Size(1280, 720)
-                    If camera Is Nothing Then camera = New CameraOakD(settings.workingRes, settings.captureRes, settings.cameraName)
+                    If camera Is Nothing Then camera = New CameraOakD(settings.WorkingRes, settings.captureRes, settings.cameraName)
                 Else
                     If camera IsNot Nothing Then camera.stopCamera()
                     camera = getCamera()
@@ -1156,7 +1161,7 @@ Public Class OpenCVB
                 End If
             End If
             If camera Is Nothing Then Continue While ' transition from one camera to another.  Problem showed up once.
-            If restartCameraRequest = False Then camera.GetNextFrame(settings.workingRes)
+            If restartCameraRequest = False Then camera.GetNextFrame(settings.WorkingRes)
 
             ' The first few frames from the camera are junk.  Skip them.
             SyncLock cameraLock
@@ -1225,42 +1230,42 @@ Public Class OpenCVB
         activateBlocked = False
     End Sub
     Private Sub setWorkingRes()
-        Select Case settings.workingResIndex
+        Select Case settings.WorkingResIndex
             Case 0
-                settings.workingRes = New cv.Size(1920, 1080)
+                settings.WorkingRes = New cv.Size(1920, 1080)
                 settings.captureRes = New cv.Size(1920, 1080)
             Case 1
-                settings.workingRes = New cv.Size(960, 540)
+                settings.WorkingRes = New cv.Size(960, 540)
                 settings.captureRes = New cv.Size(1920, 1080)
             Case 2
-                settings.workingRes = New cv.Size(480, 270)
+                settings.WorkingRes = New cv.Size(480, 270)
                 settings.captureRes = New cv.Size(1920, 1080)
             Case 3
-                settings.workingRes = New cv.Size(1280, 720)
+                settings.WorkingRes = New cv.Size(1280, 720)
                 settings.captureRes = New cv.Size(1280, 720)
             Case 4
-                settings.workingRes = New cv.Size(640, 360)
+                settings.WorkingRes = New cv.Size(640, 360)
                 settings.captureRes = New cv.Size(1280, 720)
             Case 5
-                settings.workingRes = New cv.Size(320, 180)
+                settings.WorkingRes = New cv.Size(320, 180)
                 settings.captureRes = New cv.Size(1280, 720)
             Case 6
-                settings.workingRes = New cv.Size(640, 480)
+                settings.WorkingRes = New cv.Size(640, 480)
                 settings.captureRes = New cv.Size(640, 480)
             Case 7
-                settings.workingRes = New cv.Size(320, 240)
+                settings.WorkingRes = New cv.Size(320, 240)
                 settings.captureRes = New cv.Size(640, 480)
             Case 8
-                settings.workingRes = New cv.Size(160, 120)
+                settings.WorkingRes = New cv.Size(160, 120)
                 settings.captureRes = New cv.Size(640, 480)
             Case 9
-                settings.workingRes = New cv.Size(672, 376)
+                settings.WorkingRes = New cv.Size(672, 376)
                 settings.captureRes = New cv.Size(672, 376)
             Case 10
-                settings.workingRes = New cv.Size(336, 188)
+                settings.WorkingRes = New cv.Size(336, 188)
                 settings.captureRes = New cv.Size(672, 376)
             Case 11
-                settings.workingRes = New cv.Size(168, 94)
+                settings.WorkingRes = New cv.Size(168, 94)
                 settings.captureRes = New cv.Size(672, 376)
         End Select
     End Sub
@@ -1278,7 +1283,7 @@ Public Class OpenCVB
                 ComplexityTimer.Interval = 30000
                 complexityStartTime = Now
                 ComplexityTimer.Enabled = True
-                settings.workingResIndex = OpenCVB.settings.resolutionsSupported.Count - 1 ' start smallest resolution
+                settings.WorkingResIndex = OpenCVB.settings.resolutionsSupported.Count - 1 ' start smallest resolution
                 ComplexityButton.Image = stopTest
                 ComplexityTimer_Tick(sender, e)
             End If
@@ -1297,13 +1302,13 @@ Public Class OpenCVB
 
     Private Sub ComplexityTimer_Tick(sender As Object, e As EventArgs) Handles ComplexityTimer.Tick
         While 1
-            If OpenCVB.settings.resolutionsSupported(settings.workingResIndex) Then
+            If OpenCVB.settings.resolutionsSupported(settings.WorkingResIndex) Then
                 setWorkingRes()
                 Exit While
             Else
-                settings.workingResIndex -= 1
-                If settings.workingResIndex < 0 Then
-                    settings.workingResIndex = OpenCVB.settings.resolutionsSupported.Count - 1
+                settings.WorkingResIndex -= 1
+                If settings.WorkingResIndex < 0 Then
+                    settings.WorkingResIndex = OpenCVB.settings.resolutionsSupported.Count - 1
                 End If
             End If
         End While
@@ -1316,22 +1321,22 @@ Public Class OpenCVB
             complexityStartTime = Now
         End If
         complexityResults.Add("-------------------")
-        complexityResults.Add("Image" + vbTab + CStr(settings.workingRes.Width) + vbTab +
-                                      CStr(settings.workingRes.Height))
+        complexityResults.Add("Image" + vbTab + CStr(settings.WorkingRes.Width) + vbTab +
+                                      CStr(settings.WorkingRes.Height))
         jsonWrite()
         jsonRead()
         LineUpCamPics()
 
         ' when switching resolution, best to reset these as the move from higher to lower res
         ' could mean the point is no longer valid.
-        clickPoint = New cv.Point
+        ClickPoint = New cv.Point
         mousePoint = New cv.Point
 
         StartTask()
 
-        settings.workingResIndex -= 1
-        If settings.workingResIndex < 0 Then
-            settings.workingResIndex = OpenCVB.settings.resolutionsSupported.Count - 1
+        settings.WorkingResIndex -= 1
+        If settings.WorkingResIndex < 0 Then
+            settings.WorkingResIndex = OpenCVB.settings.resolutionsSupported.Count - 1
         End If
     End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
@@ -1358,7 +1363,7 @@ Public Class OpenCVB
         TestAllTimer.Interval = settings.testAllDuration * 1000
         Static startingAlgorithm = AvailableAlgorithms.Text
         If AvailableAlgorithms.Text = startingAlgorithm And AlgorithmTestAllCount > 1 Then
-            If settings.workingResIndex > testAllEndingRes Then
+            If settings.WorkingResIndex > testAllEndingRes Then
                 While 1
                     settings.cameraIndex += 1
                     If settings.cameraIndex >= cameraNames.Count - 1 Then settings.cameraIndex = 0
@@ -1366,7 +1371,7 @@ Public Class OpenCVB
                     If settings.cameraPresent(settings.cameraIndex) Then
                         OptionsDialog.defineCameraResolutions(settings.cameraIndex)
                         setupTestAll()
-                        settings.workingResIndex = testAllStartingRes
+                        settings.WorkingResIndex = testAllStartingRes
                         Exit While
                     End If
                 End While
@@ -1382,13 +1387,13 @@ Public Class OpenCVB
 
             ' when switching resolution, best to reset these as the move from higher to lower res
             ' could mean the point is no longer valid.
-            clickPoint = New cv.Point
+            ClickPoint = New cv.Point
             mousePoint = New cv.Point
         End If
 
         Static saveLastAlgorithm = AvailableAlgorithms.Text
         If saveLastAlgorithm <> AvailableAlgorithms.Text Then
-            settings.workingResIndex += 1
+            settings.WorkingResIndex += 1
             saveLastAlgorithm = AvailableAlgorithms.Text
         End If
         StartTask()
@@ -1397,7 +1402,9 @@ Public Class OpenCVB
         Console.WriteLine("Starting algorithm " + AvailableAlgorithms.Text)
         SyncLock callTraceLock
             If TreeViewDialog IsNot Nothing Then
+                callTrace.Clear()
                 algorithm_ms.Clear()
+                algorithmNames.Clear()
                 TreeViewDialog.PercentTime.Text = ""
             End If
         End SyncLock
@@ -1413,15 +1420,15 @@ Public Class OpenCVB
         parms.externalPythonInvocation = externalPythonInvocation
         parms.showConsoleLog = settings.showConsoleLog
 
-        parms.homeDir = HomeDir.FullName
+        parms.HomeDir = HomeDir.FullName
         parms.cameraName = settings.cameraName
         parms.cameraIndex = settings.cameraIndex
-        parms.cameraInfo = camera.cameraInfo
+        If settings.cameraName <> "" Then parms.cameraInfo = camera.cameraInfo
 
         parms.main_hwnd = Me.Handle
         parms.mainFormLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
 
-        parms.workingRes = settings.workingRes
+        parms.WorkingRes = settings.WorkingRes
         parms.captureRes = settings.captureRes
         parms.displayRes = settings.displayRes
         parms.algName = AvailableAlgorithms.Text
@@ -1448,9 +1455,8 @@ Public Class OpenCVB
             algorithmQueueCount -= 1
             AlgorithmTestAllCount += 1
             drawRect = New cv.Rect
-            Dim task = New VB_Classes.VBtask(parms)
+            Dim task = New VBtask(parms)
             textDesc = task.desc
-            task.firstPass = True
             intermediateReview = ""
 
             If ComplexityTimer.Enabled = False Then
@@ -1462,36 +1468,32 @@ Public Class OpenCVB
 
                 Console.WriteLine(vbTab + "Active camera = " + settings.cameraName + ", Input resolution " +
                                   CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) + " and working resolution of " +
-                                  CStr(settings.workingRes.Width) + "x" + CStr(settings.workingRes.Height) + vbCrLf)
+                                  CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height) + vbCrLf)
             End If
-            ' Adjust drawrect for the ratio of the actual size and workingRes.
+            ' Adjust drawrect for the ratio of the actual size and WorkingRes.
             If task.drawRect <> New cv.Rect Then
                 ' relative size of algorithm size image to displayed image
-                Dim ratio = camPic(0).Width / task.workingRes.Width
+                Dim ratio = camPic(0).Width / task.WorkingRes.Width
                 drawRect = New cv.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
                                        task.drawRect.Width * ratio, task.drawRect.Height * ratio)
             End If
 
-            trueData.Clear()
-            BothFirstAndLastReady = False
-            frameCount = 0 ' restart the count...
-
-            Dim saveWorkingRes = settings.workingRes
-            picLabels = {"", "", "", ""}
+            Dim saveWorkingRes = settings.WorkingRes
             task.labels = {"", "", "", ""}
-            mousePoint = New cv.Point(task.workingRes.Width / 2, task.workingRes.Height / 2) ' mouse click point default = center of the image
+            mousePoint = New cv.Point(task.WorkingRes.Width / 2, task.WorkingRes.Height / 2) ' mouse click point default = center of the image
 
+            Dim saveDrawRect As cv.Rect
             While 1
                 Dim waitTime = Now
                 ' relative size of displayed image and algorithm size image.
-                task.resolutionRatio = task.workingRes.Width / camPic(0).Width
+                task.resolutionRatio = task.WorkingRes.Width / camPic(0).Width
                 While 1
                     ' camera has exited or resolution is changed.
                     If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or
-                    saveWorkingRes <> settings.workingRes Then Exit While
+                    saveWorkingRes <> settings.WorkingRes Then Exit While
                     If saveAlgorithmName <> task.algName Then Exit While
                     ' switching camera resolution means stopping the current algorithm
-                    If saveWorkingRes <> settings.workingRes Then Exit While
+                    If saveWorkingRes <> settings.WorkingRes Then Exit While
 
                     If pauseAlgorithmThread Then
                         task.paused = True
@@ -1510,8 +1512,8 @@ Public Class OpenCVB
 
                         If frameCount < 10 Then
                             Dim sizeRatio = settings.captureRes.Width / saveWorkingRes.Width
-                            task.calibData.ppx = task.workingRes.Width / 2 ' camera.cameraInfo.ppx / sizeRatio
-                            task.calibData.ppy = task.workingRes.Height / 2 ' camera.cameraInfo.ppy / sizeRatio
+                            task.calibData.ppx = task.WorkingRes.Width / 2 ' camera.cameraInfo.ppx / sizeRatio
+                            task.calibData.ppy = task.WorkingRes.Height / 2 ' camera.cameraInfo.ppy / sizeRatio
                             task.calibData.fx = camera.cameraInfo.fx
                             task.calibData.fy = camera.cameraInfo.fy
                             task.calibData.v_fov = camera.cameraInfo.v_fov
@@ -1555,12 +1557,10 @@ Public Class OpenCVB
                         If GrabRectangleData Then
                             GrabRectangleData = False
                             ' relative size of algorithm size image to displayed image
-                            Dim ratio = task.workingRes.Width / camPic(0).Width
-                            Dim tmpDrawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio,
-                                                          drawRect.Width * ratio, drawRect.Height * ratio)
+                            Dim ratio = task.WorkingRes.Width / camPic(0).Width
+                            Dim tmpDrawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
                             task.drawRect = New cv.Rect
                             If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
-                                Static saveDrawRect As cv.Rect
                                 If saveDrawRect <> tmpDrawRect Then
                                     task.optionsChanged = True
                                     saveDrawRect = tmpDrawRect
@@ -1577,7 +1577,7 @@ Public Class OpenCVB
                 End While
 
                 ' camera has exited or resolution is changed.
-                If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or saveWorkingRes <> settings.workingRes Or
+                If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or saveWorkingRes <> settings.WorkingRes Or
                 saveAlgorithmName <> task.algName Then
                     Exit While
                 End If
@@ -1586,18 +1586,18 @@ Public Class OpenCVB
                     SyncLock mouseLock
                         If mousePoint.X < 0 Then mousePoint.X = 0
                         If mousePoint.Y < 0 Then mousePoint.Y = 0
-                        If mousePoint.X >= task.workingRes.Width Then mousePoint.X = task.workingRes.Width - 1
-                        If mousePoint.Y >= task.workingRes.Height Then mousePoint.Y = task.workingRes.Height - 1
+                        If mousePoint.X >= task.WorkingRes.Width Then mousePoint.X = task.WorkingRes.Width - 1
+                        If mousePoint.Y >= task.WorkingRes.Height Then mousePoint.Y = task.WorkingRes.Height - 1
 
                         task.mouseMovePoint = mousePoint
                         If task.mouseMovePoint = New cv.Point(0, 0) Then
-                            task.mouseMovePoint = New cv.Point(task.workingRes.Width / 2, task.workingRes.Height / 2)
+                            task.mouseMovePoint = New cv.Point(task.WorkingRes.Width / 2, task.WorkingRes.Height / 2)
                         End If
                         task.mousePicTag = mousePicTag
                         If mouseClickFlag Then
                             task.mouseClickFlag = mouseClickFlag
-                            task.clickPoint = mousePoint
-                            clickPoint = task.clickPoint
+                            task.ClickPoint = mousePoint
+                            ClickPoint = task.ClickPoint
                             mouseClickFlag = False
                         End If
                     End SyncLock
@@ -1608,11 +1608,6 @@ Public Class OpenCVB
                 Dim spanWait = New TimeSpan(elapsedWaitTicks)
                 task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
                 Dim updatedDrawRect = task.drawRect
-
-
-
-
-                ' task.gridMap = New cv.Mat(task.workingRes, cv.MatType.CV_32S, 0)
                 If parms.algName.StartsWith("CS_") Then
                     Static findCSharp = New CS_Classes.CSAlgorithmList()
                     If task.csAlgorithmObject Is Nothing Then
@@ -1625,11 +1620,6 @@ Public Class OpenCVB
                 textDesc = task.desc
                 picLabels = task.labels
 
-
-
-
-
-
                 Dim returnTime = Now
 
                 ' in case the algorithm has changed the mouse location...
@@ -1637,9 +1627,8 @@ Public Class OpenCVB
                 If updatedDrawRect <> task.drawRect Then
                     drawRect = task.drawRect
                     ' relative size of algorithm size image to displayed image
-                    Dim ratio = camPic(0).Width / task.workingRes.Width
-                    drawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio,
-                                       drawRect.Width * ratio, drawRect.Height * ratio)
+                    Dim ratio = camPic(0).Width / task.WorkingRes.Width
+                    drawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
                 End If
                 If task.drawRectClear Then
                     drawRect = New cv.Rect

@@ -682,18 +682,18 @@ Public Class Feature_Gather : Inherits VB_Parent
     Dim brisk As New BRISK_Basics
     Public options As New Options_Features
     Public Sub New()
+        FindSlider("Feature Sample Size").Value = 400
         cPtr = Agast_Open()
         desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         myOptions.RunVB()
+
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Select Case myOptions.featureSource
             Case FeatureSrc.goodFeaturesFull
-                Static sampleSlider = FindSlider("Feature Sample Size")
-                sampleSlider.value = 400
                 features = cv.Cv2.GoodFeaturesToTrack(src, options.featurePoints, options.quality, options.minDistance, New cv.Mat,
                                                       options.blockSize, True, options.k).ToList
                 labels(2) = "GoodFeatures produced " + CStr(features.Count) + " features"

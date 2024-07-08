@@ -26,6 +26,8 @@ Public Class Touchup
             inline = inline.Replace(" Run(Mat ", " RunCS(Mat ")
             inline = inline.Replace("RunCSharp(Mat ", "RunCS(Mat ")
             inline = inline.Replace("Options_CS_", "Options_")
+            inline = inline.Replace("task.gOptions.FrameHistory.Value", "task.frameHistoryCount")
+            inline = inline.Replace("options.RunCSharp", "options.RunVB")
             outputLines += inline + vbCrLf
         Next
 

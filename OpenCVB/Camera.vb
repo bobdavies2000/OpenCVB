@@ -61,12 +61,12 @@ Public Class Camera
         Public trackerConfidence As Integer
         Public mapperConfidence As Integer
     End Structure
-    Public Sub setupMats(workingRes As cv.Size)
+    Public Sub setupMats(WorkingRes As cv.Size)
         For i = 0 To mbuf.Count - 1
-            mbuf(i).color = New cv.Mat(workingRes, cv.MatType.CV_8UC3)
-            mbuf(i).leftView = New cv.Mat(workingRes, cv.MatType.CV_8UC3)
-            mbuf(i).rightView = New cv.Mat(workingRes, cv.MatType.CV_8UC3)
-            mbuf(i).pointCloud = New cv.Mat(workingRes, cv.MatType.CV_32FC3)
+            mbuf(i).color = New cv.Mat(WorkingRes, cv.MatType.CV_8UC3)
+            mbuf(i).leftView = New cv.Mat(WorkingRes, cv.MatType.CV_8UC3)
+            mbuf(i).rightView = New cv.Mat(WorkingRes, cv.MatType.CV_8UC3)
+            mbuf(i).pointCloud = New cv.Mat(WorkingRes, cv.MatType.CV_32FC3)
         Next
     End Sub
     Public Sub New()

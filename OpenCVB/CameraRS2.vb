@@ -39,9 +39,9 @@ Public Class CameraRS2 : Inherits Camera
     Public deviceNum As Integer
     Public deviceName As String
     Public cPtrOpen As IntPtr
-    Public Sub New(workingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
-        MyBase.setupMats(workingRes)
+        MyBase.setupMats(WorkingRes)
 
         Dim devName As StringBuilder = New StringBuilder(deviceName)
         cPtr = RS2Open(devName, captureRes.Width, captureRes.Height)
@@ -54,11 +54,11 @@ Public Class CameraRS2 : Inherits Camera
         cameraInfo.fx = intrinInfo(2)
         cameraInfo.fy = intrinInfo(3)
     End Sub
-    Public Sub GetNextFrame(workingRes As cv.Size)
+    Public Sub GetNextFrame(WorkingRes As cv.Size)
         If cPtr = 0 Then Exit Sub
 
         ' if OpenCVB fails here, just unplug and plug in the RealSense camera.
-        RS2WaitForFrame(cPtr, workingRes.Width, workingRes.Height)
+        RS2WaitForFrame(cPtr, WorkingRes.Width, WorkingRes.Height)
 
         Dim accelFrame = RS2Accel(cPtr)
         If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
@@ -71,15 +71,15 @@ Public Class CameraRS2 : Inherits Camera
         IMU_TimeStamp = RS2IMUTimeStamp(cPtr) - imuStartTime
 
         SyncLock cameraLock
-            Dim cols = workingRes.Width, rows = workingRes.Height
+            Dim cols = WorkingRes.Width, rows = WorkingRes.Height
             mbuf(mbIndex).color = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, RS2Color(cPtr)).Clone
             Dim tmp As cv.Mat = New cv.Mat(rows, cols, cv.MatType.CV_8U, RS2LeftRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             mbuf(mbIndex).leftView = tmp * 4 - 35 ' improved brightness specific to RealSense
             tmp = New cv.Mat(rows, cols, cv.MatType.CV_8U, RS2RightRaw(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             mbuf(mbIndex).rightView = tmp * 4 - 35 ' improved brightness specific to RealSense
-            If captureRes <> workingRes Then
+            If captureRes <> WorkingRes Then
                 Dim pc = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, RS2PointCloud(cPtr))
-                mbuf(mbIndex).pointCloud = pc.Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                mbuf(mbIndex).pointCloud = pc.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
             Else
                 mbuf(mbIndex).pointCloud = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, RS2PointCloud(cPtr)).Clone
             End If

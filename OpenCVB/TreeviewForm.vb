@@ -54,8 +54,7 @@ Public Class TreeviewForm
 
         Dim tv = TreeView1
         tv.Nodes.Clear()
-        Dim callTrace = OpenCVB.callTrace
-        Dim rootcall = Trim(callTrace(0))
+        Dim rootcall = Trim(OpenCVB.callTrace(0))
         Dim title = Mid(rootcall, 1, Len(rootcall) - 1)
         Me.Text = title + titleStr
         Dim n = tv.Nodes.Add(title)
@@ -65,8 +64,8 @@ Public Class TreeviewForm
         For nodeLevel = 0 To 100 ' this loop will terminate after the depth of the nesting.  100 is excessive insurance deep nesting may occur.
             Dim alldone = True
 
-            For i = 1 To callTrace.Count - 1
-                Dim fullname = callTrace(i)
+            For i = 1 To OpenCVB.callTrace.Count - 1
+                Dim fullname = OpenCVB.callTrace(i)
                 Dim split() = fullname.Split("\")
                 If split.Count = nodeLevel + 3 Then
                     alldone = False
@@ -92,7 +91,7 @@ Public Class TreeviewForm
             If alldone Then Exit For ' we didn't find any more nodes to add.
         Next
 
-        For Each sn In callTrace
+        For Each sn In OpenCVB.callTrace
             Dim split() = sn.Split("\")
             treeData.Add(split(split.Length - 2))
         Next
@@ -167,7 +166,6 @@ Public Class TreeviewForm
                 For Each sn In timeDataTree
                     If sn.Contains("%") Then PercentTime.Text += sn + vbCrLf
                 Next
-
             End If
         End SyncLock
     End Sub

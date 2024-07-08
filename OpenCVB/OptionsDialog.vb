@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class OptionsDialog
     Public cameraRadioButton(OpenCVB.cameraNames.Count - 1) As RadioButton
-    Public workingResRadio(resolutionList.Count - 1) As RadioButton
+    Public WorkingResRadio(resolutionList.Count - 1) As RadioButton
     Public cameraWorkingRes As cv.Size
     Public cameraDisplayRes As cv.Size
     Public cameraName As String
@@ -21,7 +21,7 @@ Public Class OptionsDialog
 
         For Each radio In Resolutions.Controls
             If radio.Checked Then
-                OpenCVB.settings.workingResIndex = radio.Tag
+                OpenCVB.settings.WorkingResIndex = radio.Tag
                 Dim strRes = radio.text.split(" ")
                 Dim resText = strRes(0)
                 Dim strVals = resText.split("x")
@@ -30,7 +30,7 @@ Public Class OptionsDialog
             End If
         Next
 
-        OpenCVB.settings.workingRes = cameraWorkingRes
+        OpenCVB.settings.WorkingRes = cameraWorkingRes
         OpenCVB.settings.displayRes = cameraDisplayRes
 
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
@@ -69,23 +69,23 @@ Public Class OptionsDialog
 
         defineCameraResolutions(cameraIndex)
 
-        For i = 0 To workingResRadio.Count - 1
-            workingResRadio(i).Enabled = OpenCVB.settings.resolutionsSupported(i)
+        For i = 0 To WorkingResRadio.Count - 1
+            WorkingResRadio(i).Enabled = OpenCVB.settings.resolutionsSupported(i)
         Next
 
         If cameraName.StartsWith("Intel") Then
-            workingResRadio(resolutionList.IndexOf("320x240 - Quarter resolution")).Checked = True
+            WorkingResRadio(resolutionList.IndexOf("320x240 - Quarter resolution")).Checked = True
         Else
-            workingResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
+            WorkingResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
         End If
         If cameraName.StartsWith("StereoLabs") Then
-            workingResRadio(resolutionList.IndexOf("336x188 - Quarter resolution")).Checked = True
+            WorkingResRadio(resolutionList.IndexOf("336x188 - Quarter resolution")).Checked = True
         End If
         If cameraName.StartsWith("Azure Kinect 4K") Then
-            workingResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
+            WorkingResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
         End If
         If cameraName.StartsWith("Orbbec Gemini 335L") Then
-            workingResRadio(resolutionList.IndexOf("1280x720 - Full resolution")).Checked = True
+            WorkingResRadio(resolutionList.IndexOf("1280x720 - Full resolution")).Checked = True
         End If
     End Sub
     Public Sub OptionsDialog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -101,11 +101,11 @@ Public Class OptionsDialog
                 AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
             Next
 
-            For i = 0 To workingResRadio.Count - 1
-                workingResRadio(i) = New RadioButton With {.Text = resolutionList(i), .Tag = i,
+            For i = 0 To WorkingResRadio.Count - 1
+                WorkingResRadio(i) = New RadioButton With {.Text = resolutionList(i), .Tag = i,
                                      .AutoSize = True, .Visible = True}
-                workingResRadio(i).Enabled = OpenCVB.settings.resolutionsSupported(i)
-                Resolutions.Controls.Add(workingResRadio(i))
+                WorkingResRadio(i).Enabled = OpenCVB.settings.resolutionsSupported(i)
+                Resolutions.Controls.Add(WorkingResRadio(i))
             Next
         End If
 
