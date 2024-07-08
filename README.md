@@ -1,43 +1,44 @@
-# Recent Changes – June 2024
+# Recent Changes – July 2024
 
--   Over 2000 algorithms are included, averaging 31 lines of code per algorithm.
--   Support for the Orbbec Gemini 335L camera was added but there are limitations.
-    -   Only 5 frames per second to keep depth in sync with RGB image.
-    -   Supported image sizes are 1280x720 and 640x480.
-        -   Other image sizes are present but not commonly used.
-    -   The Orbbec Gemini 335L arrived May 2024. Firmware will likely improve.
-    -   OpenCVB will work with any camera that has RGB, cloud, left, and right images.
-        -   IMU is needed as well to find gravity and orient the image in 3D.
-    -   There are now 7 cameras supported in OpenCVB.
-
-        ![A screenshot of a computer Description automatically generated](media/87473380f7ef7669aac59b0e2568b664.png)
-
-        **OpenCVB Global Settings:** *There are 7 cameras supported in OpenCVB. Cameras that were not found in initialization are disabled. Switching to another camera will change the resolutions that are available.*
-
-    -   The Orbbec SDK is automatically installed with the Update_All.bat install run.
-    -   It is a small thrill to see all 2000 algorithms suddenly working with the 335L.
--   Python_Classes added to separate Python algorithms from the VB_Classes
-    -   Default group name is \<All VB.Net\> to get only VB.Net classes
-    -   Other group names added were: “\<All Python\>” and “\<All C\#\>” classes.
--   The code to find and track features was reorganized. New features added for ROI’s.
-    -   Feature_Basics now uses correlation coefficients to track RGB features.
--   Color8U is the new name for algorithms converting RGB to CV_8U format.
--   New modules for C\# interface were added but are not yet in use.
+-   Over 2400 algorithms are included, averaging 31 lines of code per algorithm.
+-   Please Note: the June version of OpenCVSharp has compile-time issues in VB.Net.
+    -   It will be addressed soon and it is only a problem to VB.Net.
+    -   In the meantime, please use the January version: 4.9.0.20240103
+    -   The January version is present by default but if you upgrade to June…
+-   The jump in algorithm count is due to the addition of AI-generated C\# algorithms.
+    -   Only about 400 of the 1800 VB.Net algorithms have been converted to C\#.
+    -   The remaining algorithms will continue to be translated in future releases.
+-   Microsoft’s CodeConverter.ai translated the VB.Net algorithms to C\#.
+    -   With such small algorithms, AI translation is much more feasible.
+    -   The VB.Net code was improved because of translation to C\#.
+-   C\# is now a peer to VB.Net when developing algorithms in OpenCVB.
+    -   A new snippet version for C\# is equivalent to the VB.Net snippet.
+    -   Performance measurement for C\# works the same as that for VB.Net
+    -   All existing manually created C\# algorithms are in CS_Non_AI.cs.
+-   Existing VB.Net infrastructure is reused for C\# algorithms.
+-   OpenCVB’s Touchup.exe simplifies necessary small changes after AI translation.
+    -   The Touchup application is invoked from OpenCVB’s main toolbar.
+    -   Most algorithms were converted to C\# in a few minutes.
+    -   Longer conversions required the improved VB.Net infrastructure.
 -   A log of previous changes is included at the bottom of this document.
 
-![A screenshot of a computer Description automatically generated](media/c8c7bce7087510e62ffc160f82e12e07.png)
+![A screenshot of a computer Description automatically generated](media/5dd47a048cd220e4dd856894c3d6bac7.png)
 
-**LeftRight_Basics:** *This output shows all 4 images provided by the Orbbec Gemini 335L camera – RGB, depth, left, and right images. The depth image is the 3rd channel of the point cloud data colorized by OpenCVB’s* Depth_Colorizer_CPP *algorithm. The point cloud is shown below.*
+**CS_AddWeighted_Basics:** *The C\# version of the AddWeighted_Basics algorithm is shown above. All the C\# algorithms start with “CS_” to distinguish them from the VB.Net version.*
 
-![](media/0f3868fe21a923bc219e81fb71aaabec.gif)
+![A screenshot of a computer program Description automatically generated](media/498a747eed8b64cf8e4aab79d498d0c7.png)
 
-**OpenGL_Basics:** *This output shows the Orbbec Gemini 335L camera while toggling the checkbox to adjust the 3D point cloud with and without correcting for gravity. The same algorithm to adjust for gravity works with all the cameras supported by OpenCVB. Similarly, all 2000+ algorithms in OpenCVB work for the 335L camera after adding an interface to the Orbbec SDK.*
+![A screenshot of a computer Description automatically generated](media/62511f56cfdd66446f8e3e6adcfbe50f.png)
+
+**Performance Comparison:** *The top image was captured when running the VB.Net version of Annealing_MultiThreaded_CPP. The bottom image was taken from the C\# version. There are some differences in layout but the critical numbers are present and look correct. More testing is needed. The performance metrics are provided in the VB.Net infrastructure code.*
+
+# 
 
 # Introduction
 
 There is no better documentation of an algorithm than a working example, especially in computer vision where the output is often self-explanatory. Imagine having access to over 2000 OpenCV examples in a single app, where each algorithm is less than a page of code and written in a familiar language. Each algorithm is designed to be reused in other algorithms, so variations can be easily built. [Moreover, each algorithm is free from any baggage from a user interface or environment.](https://microsoft.github.io/computervision-recipes/)
 
-A full installation can take about 30-50 minutes using the 1-step “Update_All.bat” file discussed in the “Installation” section below. But there is no obligation to install needed libraries just to read the code for an algorithm. Open the OpenCVB.sln file after downloading and inspect the code in the C++, C\#, VB.Net or Python. Each algorithm gets a standardized presentation of all the data from any of the RGBZ cameras listed below.
+A full installation can take about 30-50 minutes using the 1-step “Update_All.bat” file discussed in the “Installation” section below. But there is no obligation to install needed libraries just to read the code for an algorithm. Open the OpenCVB.sln file after downloading and inspect the code in the C++, C\#, VB.Net or Python. Each algorithm gets a standardized presentation of all the data from any of the seven RGBZ cameras listed below.
 
 However, a full installation is recommended. An algorithm may fit in one page of code and reading is one way to review the code but understanding the algorithms is a lot faster and easier when the output is visualized by running it. The output is often self-documenting or a natural representation of the algorithm’s intent.
 
@@ -180,21 +181,25 @@ Some typical problems with new installations:
 
 OpenCVB is a WinForms application and most of the algorithms were written using Microsoft's managed code, but C++ and Python examples are provided as well. New algorithms can be added using code snippets or the “Blue Plus” button in the user interface.
 
-For C++, C\#, and VB.Net writing a new experiment requires a new class to be added in the “VB_Classes” project. OpenCVB will automatically detect the new class and present it in the user interface. The code is self-aware in this regard – the UI_Generator project is invoked in a pre-compile step for the VB_Classes project. Just add code for a new algorithm and it will automatically appear in the user interface.
+Code snippets are installed using the Tools/Code Snippets Manager menu entry. For both “Basic” and “CSharp” use the “Add” button to point to:
 
-Python examples don’t even require a VB.Net wrapper. But they do need to be added to the VB_Classes Project. Python algorithms, once added to the VB_Classes project, will appear in the user interface. Adding Python scripts to VB_Classes also makes it easy to edit the script. (Note that Python examples start with “z_” to isolate them in the VB_Classes project.)
+\<OpenCVB HomeDir\>/OpenCVB.snippets \>
+
+For C++ and VB.Net writing a new experiment requires a new class to be added in the “VB_Classes” project. OpenCVB will automatically detect the new class and present it in the user interface. The UI_Generator project is invoked in a pre-compile step for the VB_Classes project and the CS_Classes project. Just add code for a new algorithm and it will automatically appear in the user interface. Similarly, for C\# algorithms, add a code snippet to the “CS_Non_AI.cs” file and the recompile will add the algorithm to the user interface.
+
+Python examples don’t even require a VB.Net wrapper. But they do need to be added to the VB_Classes Project. Python algorithms, once added to the Python_Classes project, will appear in the user interface.
 
 There are several VB.Net examples that demonstrate how to move images to Python and get results back into the OpenCVB user interface (see “z_AddWeighted_PS.py” as an example that is only a few lines of code.)
 
-Code “snippets” are provided to accelerate development of new VB.Net, OpenGL, and C++ algorithms. To use any snippets, first install them in Visual Studio:
+To install OpenCVB’s snippets in Visual Studio:
 
 -   Click the menu “Tools/Code Snippets Manager”.
--   Select “Basic” as the Language.
+-   Select “Basic” or “CSharp” as the Language.
 -   Add the “\<OpenCVB Dir\>/OpenCVB.snippets” directory.
--   Access the code snippets with a right-click in the VB.Net code, select “Snippet/Insert Snippet” and select “OpenCVB.snippets”.
+-   Access the code snippets with a right-click in the VB.Net or C\# code, select “Snippet/Insert Snippet” and select “OpenCVB.snippets”.
 -   Even C++ algorithms can use snippets, but each C++ algorithm has a VB.Net entry that includes both the C++ and the VB.Net code in the snippet. The C++ portion is to be cut and pasted anywhere in OpenCVB’s “CPP_Classes” Visual Studio project.
 
-To see the complete list of algorithm types that can be added to OpenCVB, click on the “Blue Plus” button in the user interface. A dialog box will guide the selection of the type of algorithm to be added.
+An alternate way to add projects is also available in OpenCVB. To see the complete list of algorithm types that can be added to OpenCVB, click on the “Blue Plus” button in OpenCVB’s main toolbar. A dialog box will guide the selection of the type of algorithm to be added.
 
 # Algorithm Groups
 
@@ -936,7 +941,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 -   Json has been introduced and parameters are being converted from registry to json.
     -   All parameters are vetted in jsonRead() and jsonWrite.
     -   No more registry entries for OpenCVB.
-    -   If anything goes wrong, just delete the \<OpenCVB HomeDir\>/settings.json.
+    -   If anything goes wrong, just delete the \<OpenCVB HomeDir\>/settings.json\>.
     -   Improved testing for a wider range of settings.
 
 ![A picture containing text, screenshot, multimedia software, art Description automatically generated](media/195f7fde1649a871e7cb3cab7ca8f4fe.png)**RedCloud_Planes** *– The data for each cell now contains the plane equation for the cell and a list of neighboring cells. The lower left shows the numbered cells with the selected cell shown in white. The selected cell and its neighbors are shown in the upper right image. The upper left image highlights the selected cell in the RGB image. In the lower right are the same cells colored with the direction of the principal axis of the plane equation – red cells are oriented along the Z-axis, blue for X-axis, and green along the Y-axis (floor and ceiling).*
@@ -1368,3 +1373,38 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A collage of images of a room Description automatically generated](media/41d5af9a9a6b649c81cbb837cb95dab4.png)
 
 **Bin3Way_RedCloud:** *RedCloud is run against the darkest and the lightest frames in the Bin3Way_Basics algorithm. While there is more unclassified space in the lower right image, the cells identified are more consistently present than in other RedCloud algorithms that attempt to classify each pixel in the image. This algorithm produces fewer cells but they are more robust and stable. This sample output also shows the output for the global options to “Display Cell Stats”. The upper right frame shows the histogram of the depth for the selected cell while the lower right frame shows the statistics for the selected cell.*
+
+# Recent Changes – June 2024
+
+-   Over 2000 algorithms are included, averaging 31 lines of code per algorithm.
+-   Support for the Orbbec Gemini 335L camera was added but there are limitations.
+    -   Only 5 frames per second to keep depth in sync with RGB image.
+    -   Supported image sizes are 1280x720 and 640x480.
+        -   Other image sizes are present but not commonly used.
+    -   The Orbbec Gemini 335L arrived May 2024. Firmware will likely improve.
+    -   OpenCVB will work with any camera that has RGB, cloud, left, and right images.
+        -   IMU is needed as well to find gravity and orient the image in 3D.
+    -   There are now 7 cameras supported in OpenCVB.
+
+        ![A screenshot of a computer Description automatically generated](media/87473380f7ef7669aac59b0e2568b664.png)
+
+        **OpenCVB Global Settings:** *There are 7 cameras supported in OpenCVB. Cameras that were not found in initialization are disabled. Switching to another camera will change the resolutions that are available.*
+
+    -   The Orbbec SDK is automatically installed with the Update_All.bat install run.
+    -   It is a small thrill to see all 2000 algorithms suddenly working with the 335L.
+-   Python_Classes added to separate Python algorithms from the VB_Classes
+    -   Default group name is \<All VB.Net\> to get only VB.Net classes
+    -   Other group names added were: “\<All Python\>” and “\<All C\#\>” classes.
+-   The code to find and track features was reorganized. New features added for ROI’s.
+    -   Feature_Basics now uses correlation coefficients to track RGB features.
+-   Color8U is the new name for algorithms converting RGB to CV_8U format.
+-   New modules for C\# interface were added but are not yet in use.
+-   A log of previous changes is included at the bottom of this document.
+
+![A screenshot of a computer Description automatically generated](media/c8c7bce7087510e62ffc160f82e12e07.png)
+
+**LeftRight_Basics:** *This output shows all 4 images provided by the Orbbec Gemini 335L camera – RGB, depth, left, and right images. The depth image is the 3rd channel of the point cloud data colorized by OpenCVB’s* Depth_Colorizer_CPP *algorithm. The point cloud is shown below.*
+
+![A room with a white door and a blue line Description automatically generated](media/0f3868fe21a923bc219e81fb71aaabec.gif)
+
+**OpenGL_Basics:** *This output shows the Orbbec Gemini 335L camera while toggling the checkbox to adjust the 3D point cloud with and without correcting for gravity. The same algorithm to adjust for gravity works with all the cameras supported by OpenCVB. Similarly, all 2000+ algorithms in OpenCVB work for the 335L camera after adding an interface to the Orbbec SDK.*
