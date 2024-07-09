@@ -355,6 +355,7 @@ Module UI_GeneratorMain
             If info.Name.EndsWith(".py") Then className = info.Name ' python file names are the class name - they don't have multiple classnames per file
             While nextFile.Peek() <> -1
                 Dim codeline = Trim(nextFile.ReadLine())
+                If codeline.Trim.StartsWith("//") Then Continue For
                 If codeline.Contains("public class CS_") Then
                     Dim split = codeline.Split(" \W+")
                     CSnames.Add(split(2), split(2))

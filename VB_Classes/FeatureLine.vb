@@ -84,23 +84,17 @@ Public Class FeatureLine_VH : Inherits VB_Parent
     Dim gLines As New Line_GCloud
     Dim options As New Options_Features
     Public Sub New()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Vertical lines")
-            radio.addRadio("Horizontal lines")
-            radio.check(0).Checked = True
-        End If
         labels(3) = "More readable than dst1 - index, correlation, length (meters), and ArcY"
         desc = "Find and track all the horizontal or vertical lines"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
+
         Dim templatePad = options.templatePad
         ' gLines.lines.subsetRect = New cv.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6)
         gLines.Run(src)
 
-        Static vertRadio = FindRadio("Vertical lines")
-        Dim sortedLines = If(vertRadio.checked, gLines.sortedVerticals, gLines.sortedHorizontals)
+        Dim sortedLines = If(options.usevertical, gLines.sortedVerticals, gLines.sortedHorizontals)
         If sortedLines.Count = 0 Then
             SetTrueText("There were no vertical lines found.", 3)
             Exit Sub
@@ -198,14 +192,12 @@ End Class
 Public Class FeatureLine_Tutorial2 : Inherits VB_Parent
     Dim lines As New Line_Basics
     Dim gMat As New IMU_GMatrix
+    Dim options As New Options_LineFinder()
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Area kernel size for depth", 1, 10, 5)
         desc = "Find all the lines in the image and determine which are vertical and horizontal"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static kernelSlider = FindSlider("Area kernel size for depth")
-        Dim k = kernelSlider.Value - 1
-        Dim kernel = kernelSlider.Value * 2 - 1
+        options.RunVB()
 
         lines.Run(src)
         dst2 = lines.dst2
@@ -216,7 +208,7 @@ Public Class FeatureLine_Tutorial2 : Inherits VB_Parent
             Dim pt1 As cv.Point3f, pt2 As cv.Point3f
             For j = 0 To 1
                 Dim pt = Choose(j + 1, lp.p1, lp.p2)
-                Dim rect = ValidateRect(New cv.Rect(pt.x - k, pt.y - k, kernel, kernel))
+                Dim rect = ValidateRect(New cv.Rect(pt.x - options.kSize, pt.y - options.kSize, options.kernelSize, options.kernelSize))
                 Dim val = task.pointCloud(rect).Mean(task.depthMask(rect))
                 If j = 0 Then pt1 = New cv.Point3f(val(0), val(1), val(2)) Else pt2 = New cv.Point3f(val(0), val(1), val(2))
             Next
@@ -399,19 +391,13 @@ Public Class FeatureLine_Finder : Inherits VB_Parent
     Public sorted2DV As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
     Public sortedVerticals As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
     Public sortedHorizontals As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
+    Dim options As New Options_LineFinder()
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Area kernel size for depth", 1, 10, 5)
-            sliders.setupTrackBar("Angle tolerance in degrees", 0, 20, 5)
-        End If
         desc = "Find all the lines in the image and determine which are vertical and horizontal"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static angleSlider = FindSlider("Angle tolerance in degrees")
-        Static kernelSlider = FindSlider("Area kernel size for depth")
-        Dim tolerance = angleSlider.Value
-        Dim k = kernelSlider.Value - 1
-        Dim kernel = kernelSlider.Value * 2 - 1
+        options.RunVB()
+
         dst3 = src.Clone
 
         lines2D.Clear()
@@ -429,7 +415,7 @@ Public Class FeatureLine_Finder : Inherits VB_Parent
             Dim pt1 As cv.Point3f, pt2 As cv.Point3f
             For j = 0 To 1
                 Dim pt = Choose(j + 1, lp.p1, lp.p2)
-                Dim rect = ValidateRect(New cv.Rect(pt.x - k, pt.y - k, kernel, kernel))
+                Dim rect = ValidateRect(New cv.Rect(pt.x - options.kSize, pt.y - options.kSize, options.kernelSize, options.kernelSize))
                 Dim val = task.pointCloud(rect).Mean(task.depthMask(rect))
                 If j = 0 Then pt1 = New cv.Point3f(val(0), val(1), val(2)) Else pt2 = New cv.Point3f(val(0), val(1), val(2))
             Next
@@ -451,7 +437,7 @@ Public Class FeatureLine_Finder : Inherits VB_Parent
                 Dim pt2 = matLines3D.Get(Of cv.Point3f)(i + 1, 0)
                 Dim len3D = distance3D(pt1, pt2)
                 Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
-                If Math.Abs(arcY - 90) < tolerance Then
+                If Math.Abs(arcY - 90) < options.tolerance Then
                     DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, cv.Scalar.Blue)
                     sortedVerticals.Add(len3D, lines3D.Count)
                     sorted2DV.Add(raw2D(i).p1.DistanceTo(raw2D(i).p2), lines2D.Count)
@@ -467,7 +453,7 @@ Public Class FeatureLine_Finder : Inherits VB_Parent
                         lines2D.Add(raw2D(i).p1)
                     End If
                 End If
-                If Math.Abs(arcY) < tolerance Then
+                If Math.Abs(arcY) < options.tolerance Then
                     DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, cv.Scalar.Yellow)
                     sortedHorizontals.Add(len3D, lines3D.Count)
                     If pt1.X < pt2.X Then

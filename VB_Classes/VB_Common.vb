@@ -2,6 +2,7 @@
 Imports System.Drawing
 Imports System.IO.Pipes
 Imports System.Windows.Forms
+Imports System.Runtime.InteropServices
 Module VB_Common
     Public task As VBtask
     Public allOptions As OptionsContainer

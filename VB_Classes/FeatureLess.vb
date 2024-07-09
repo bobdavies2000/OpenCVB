@@ -26,14 +26,15 @@ End Class
 
 Public Class FeatureLess_Canny : Inherits VB_Parent
     Dim edges As New Edge_Canny
+    Dim options As New Options_Sobel()
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold distance", 0, 100, 10)
         desc = "Use Canny edges to define featureless regions."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = FindSlider("Threshold distance")
+        options.RunVB()
+
         edges.Run(src)
-        dst2 = Not edges.dst2.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
+        dst2 = Not edges.dst2.Threshold(options.distanceThreshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -46,14 +47,15 @@ End Class
 
 Public Class FeatureLess_Sobel : Inherits VB_Parent
     Dim edges As New Edge_Sobel_Old
+    Dim options As New Options_Sobel()
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold distance", 0, 100, 10)
         desc = "Use Sobel edges to define featureless regions."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = FindSlider("Threshold distance")
+        options.RunVB()
+
         edges.Run(src)
-        dst2 = Not edges.dst2.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
+        dst2 = Not edges.dst2.Threshold(options.distanceThreshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -276,3 +278,6 @@ Public Class FeatureLess_Groups : Inherits VB_Parent
         labels(3) = CStr(classCount) + " featureless regions were found."
     End Sub
 End Class
+
+
+

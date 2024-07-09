@@ -31,6 +31,13 @@ Public Class Touchup
             inline = inline.Replace("options.Run(", "options.RunVB(")
             inline = inline.Replace("options;", "options")
             inline = inline.Replace("Mat dst", "dst") ' Mat dst2 problem - should never need to be declared.
+            inline = inline.Replace("MCvScalar", "cv.Scalar")
+            inline = inline.Replace("Rectangle r", "Rect r")
+            inline = inline.Replace("Rectangle(", "Rect(")
+            inline = inline.Replace("CvInvoke.", "cv.")
+            inline = inline.Replace(" Point ", " cv.Point ")
+            inline = inline.Replace(" Point(", " cv.Point(")
+            inline = inline.Replace(" Size(", " cv.Size(")
             outputLines += inline + vbCrLf
         Next
 

@@ -3122,76 +3122,6 @@ End Class
 
 
 
-
-
-
-
-Public Class Options_Features : Inherits VB_Parent
-    Public quality As Double = 0.01
-    Public minDistance As Double = 1
-    Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
-    Public matchText As String = ""
-    Public k As Double = 0.04
-    Public blockSize As Integer = 3
-
-    Public featurePoints As Integer = 400
-    Public templatePad As Integer = 10
-    Public templateSize As Integer
-    Public correlationMin As Single = 0.75
-    Public resyncThreshold As Single = 0.75
-    Public agastThreshold As Integer = 20
-    Public Sub New()
-        correlationMin = If(dst2.Width > 336, 0.8, 0.9)
-        templatePad = If(dst2.Width > 336, 20, 10)
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Min Distance to next", 1, 100, minDistance)
-
-            sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
-            sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, correlationMin * 100)
-            sliders.setupTrackBar("MatchTemplate Cell Size", 2, 100, templatePad)
-            sliders.setupTrackBar("Threshold Percent for Resync", 1, 99, resyncThreshold * 100)
-
-            sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
-            sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
-            sliders.setupTrackBar("Blocksize", 1, 21, blockSize)
-            sliders.setupTrackBar("Agast Threshold", 1, 100, agastThreshold)
-            sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static qualitySlider = FindSlider("Quality Level")
-        Static distSlider = FindSlider("Min Distance to next")
-        Static kSlider = FindSlider("k X1000")
-        Static blocksizeSlider = FindSlider("Blocksize")
-        Static featureSlider = FindSlider("Feature Sample Size")
-        Static corrSlider = FindSlider("Feature Correlation Threshold")
-        Static cellSlider = FindSlider("MatchTemplate Cell Size")
-        Static resyncSlider = FindSlider("Threshold Percent for Resync")
-        Static agastslider = FindSlider("Agast Threshold")
-        Static FASTslider = FindSlider("FAST Threshold")
-        task.FASTthreshold = FASTslider.value
-
-        blockSize = blocksizeSlider.value Or 1
-        k = kSlider.value / 1000
-
-        featurePoints = featureSlider.value
-        correlationMin = corrSlider.value / 100
-        templatePad = CInt(cellSlider.value / 2)
-        templateSize = cellSlider.value Or 1
-        resyncThreshold = resyncSlider.value / 100
-        agastThreshold = agastslider.value
-
-        If task.optionsChanged Then
-            quality = qualitySlider.Value / 100
-            minDistance = distSlider.Value
-        End If
-    End Sub
-End Class
-
-
-
-
-
 Public Class Options_HeatMap : Inherits VB_Parent
     Public redThreshold As Integer = 20
     Public viewName As String = "vertical"
@@ -4261,6 +4191,7 @@ End Class
 Public Class Options_Sobel : Inherits VB_Parent
     Public kernelSize As Integer = 3
     Public threshold As Integer = 50
+    Public distanceThreshold As Integer
     Public derivativeRange As Single = 0.1
     Public horizontalDerivative As Boolean
     Public verticalDerivative As Boolean
@@ -4270,6 +4201,7 @@ Public Class Options_Sobel : Inherits VB_Parent
             sliders.setupTrackBar("Sobel kernel Size", 1, 31, kernelSize)
             sliders.setupTrackBar("Threshold to zero pixels below this value", 0, 255, threshold)
             sliders.setupTrackBar("Range around zero X100", 1, 500, derivativeRange * 100)
+            sliders.setupTrackBar("Threshold distance", 0, 100, 10)
         End If
 
         If FindFrm(traceName + " CheckBox Options") Is Nothing Then
@@ -4288,6 +4220,7 @@ Public Class Options_Sobel : Inherits VB_Parent
         Static thresholdSlider = FindSlider("Threshold to zero pixels below this value")
         Static ksizeSlider = FindSlider("Sobel kernel Size")
         Static rangeSlider = FindSlider("Range around zero X100")
+        Static distanceSlider = FindSlider("Threshold distance")
         kernelSize = ksizeSlider.Value Or 1
         threshold = thresholdSlider.value
         Static vDeriv = FindCheckBox("Vertical Derivative")
@@ -4297,6 +4230,7 @@ Public Class Options_Sobel : Inherits VB_Parent
         verticalDerivative = vDeriv.checked
         useBlur = checkBlur.checked
         derivativeRange = rangeSlider.value / 100
+        distanceThreshold = distanceSlider.value
     End Sub
 End Class
 
@@ -5844,5 +5778,107 @@ Public Class Options_Etch_ASketch : Inherits VB_Parent
 
         If cleanMode Then cleanCheck.checked = False ' only on for one frame.
         cleanMode = cleanCheck.checked
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Options_Features : Inherits VB_Parent
+    Public quality As Double = 0.01
+    Public minDistance As Double = 1
+    Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed
+    Public matchText As String = ""
+    Public k As Double = 0.04
+    Public blockSize As Integer = 3
+
+    Public featurePoints As Integer = 400
+    Public templatePad As Integer = 10
+    Public templateSize As Integer
+    Public correlationMin As Single = 0.75
+    Public resyncThreshold As Single = 0.75
+    Public agastThreshold As Integer = 20
+    Public useVertical As Boolean
+    Public Sub New()
+        correlationMin = If(dst2.Width > 336, 0.8, 0.9)
+        templatePad = If(dst2.Width > 336, 20, 10)
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Vertical lines")
+            radio.addRadio("Horizontal lines")
+            radio.check(0).Checked = True
+        End If
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Min Distance to next", 1, 100, minDistance)
+
+            sliders.setupTrackBar("Feature Sample Size", 1, 1000, featurePoints)
+            sliders.setupTrackBar("Feature Correlation Threshold", 1, 100, correlationMin * 100)
+            sliders.setupTrackBar("MatchTemplate Cell Size", 2, 100, templatePad)
+            sliders.setupTrackBar("Threshold Percent for Resync", 1, 99, resyncThreshold * 100)
+
+            sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
+            sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
+            sliders.setupTrackBar("Blocksize", 1, 21, blockSize)
+            sliders.setupTrackBar("Agast Threshold", 1, 100, agastThreshold)
+            sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static qualitySlider = FindSlider("Quality Level")
+        Static distSlider = FindSlider("Min Distance to next")
+        Static kSlider = FindSlider("k X1000")
+        Static blocksizeSlider = FindSlider("Blocksize")
+        Static featureSlider = FindSlider("Feature Sample Size")
+        Static corrSlider = FindSlider("Feature Correlation Threshold")
+        Static cellSlider = FindSlider("MatchTemplate Cell Size")
+        Static resyncSlider = FindSlider("Threshold Percent for Resync")
+        Static agastslider = FindSlider("Agast Threshold")
+        Static FASTslider = FindSlider("FAST Threshold")
+        Static vertRadio = FindRadio("Vertical lines")
+        useVertical = vertRadio.checked
+        task.FASTthreshold = FASTslider.value
+
+        blockSize = blocksizeSlider.value Or 1
+        k = kSlider.value / 1000
+
+        featurePoints = featureSlider.value
+        correlationMin = corrSlider.value / 100
+        templatePad = CInt(cellSlider.value / 2)
+        templateSize = cellSlider.value Or 1
+        resyncThreshold = resyncSlider.value / 100
+        agastThreshold = agastslider.value
+
+        If task.optionsChanged Then
+            quality = qualitySlider.Value / 100
+            minDistance = distSlider.Value
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_LineFinder : Inherits VB_Parent
+    Public tolerance As Integer
+    Public kernelSize As Integer
+    Public kSize As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Area kernel size for depth", 1, 10, 5)
+            sliders.setupTrackBar("Angle tolerance in degrees", 0, 20, 5)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static angleSlider = FindSlider("Angle tolerance in degrees")
+        Static kernelSlider = FindSlider("Area kernel size for depth")
+        kernelSize = kernelSlider.value * 2 - 1
+        tolerance = angleSlider.value
+        kSize = kernelSlider.Value - 1
     End Sub
 End Class

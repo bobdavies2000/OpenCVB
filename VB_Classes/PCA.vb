@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Windows.Forms.AxHost
 
 ' You can find the main direction of a series of points using principal component analysis ‘(PCA).
 ' PCA is a statistical technique that can be used to find the directions of greatest variance in a dataset.
@@ -136,7 +137,7 @@ Public Class PCA_Reconstruct : Inherits VB_Parent
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Retained Variance", 1, 100, 95)
         desc = "Reconstruct a video stream as a composite of X images."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static retainSlider = FindSlider("Retained Variance")
         Dim index = task.frameCount Mod images.Length
         images(index) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -228,7 +229,7 @@ Public Class PCA_DrawImage : Inherits VB_Parent
                 eigen_val(j) = pca_analysis.Eigenvalues.Get(Of Double)(0, j)
             Next
 
-            DrawCircle(dst3,cntr, task.DotSize + 1, cv.Scalar.BlueViolet)
+            DrawCircle(dst3, cntr, task.DotSize + 1, cv.Scalar.BlueViolet)
             Dim factor As Single = 0.02 ' scaling factor for the lines depicting the principal components.
             Dim ept1 = New cv.Point(cntr.X + factor * eigen_vecs(0).X * eigen_val(0), cntr.Y + factor * eigen_vecs(0).Y * eigen_val(0))
             Dim ept2 = New cv.Point(cntr.X - factor * eigen_vecs(1).X * eigen_val(1), cntr.Y - factor * eigen_vecs(1).Y * eigen_val(1))
@@ -251,7 +252,7 @@ Public Class PCA_Prep_CPP : Inherits VB_Parent
         cPtr = PCA_Prep_Open()
         desc = "Take some pointcloud data and return the non-zero points in a point3f vector"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -259,7 +260,7 @@ Public Class PCA_Prep_CPP : Inherits VB_Parent
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim imagePtr = PCA_Prep_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()
-        Dim count = pca_prep_getcount(cPtr)
+        Dim count = PCA_Prep_GetCount(cPtr)
         inputData = New cv.Mat(count, 3, cv.MatType.CV_32F, imagePtr).Clone
         SetTrueText("Data has been prepared and resides in inputData public")
     End Sub
@@ -267,3 +268,494 @@ Public Class PCA_Prep_CPP : Inherits VB_Parent
         PCA_Prep_Close(cPtr)
     End Sub
 End Class
+
+
+
+
+' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
+Module PCAModule
+    <StructLayout(LayoutKind.Sequential)>
+    Public Structure PALENTRY
+        Public start As Integer
+        Public N As Integer
+        Public red As Byte
+        Public green As Byte
+        Public blue As Byte
+        Public ErrorVal As Double
+    End Structure
+
+    Public Function MakePalette(ByVal rgb As Byte(), ByVal width As Integer, ByVal height As Integer, ByVal pal As Byte(), Optional ByVal N As Integer = 256) As Integer
+        Dim buff As Byte() = Nothing
+        Dim entry As PALENTRY() = Nothing
+        Dim best As Double
+        Dim bestii As Integer
+        Dim i, ii As Integer
+
+        Try
+            buff = New Byte(width * height * 3 - 1) {}
+            Array.Copy(rgb, buff, width * height * 3)
+
+            entry = New PALENTRY(N - 1) {}
+            entry(0).start = 0
+            entry(0).N = width * height
+            CalcError(entry(0), buff)
+
+            For i = 1 To N - 1
+                best = entry(0).ErrorVal
+                bestii = 0
+                For ii = 0 To i - 1
+                    If entry(ii).ErrorVal > best Then
+                        best = entry(ii).ErrorVal
+                        bestii = ii
+                    End If
+                Next
+                SplitPCA(entry(bestii), entry(i), buff)
+            Next
+
+            For i = 0 To N - 1
+                pal(i * 3) = entry(i).red
+                pal(i * 3 + 1) = entry(i).green
+                pal(i * 3 + 2) = entry(i).blue
+            Next
+
+            Return 0
+        Catch ex As Exception
+            Return -1
+        Finally
+            buff = Nothing
+            entry = Nothing
+        End Try
+    End Function
+
+    Public Sub CalcError(ByRef entry As PALENTRY, ByRef buff() As Byte)
+        entry.red = CByte(MeanColour(buff, entry.start * 3, entry.N, 0))
+        entry.green = CByte(MeanColour(buff, entry.start * 3, entry.N, 1))
+        entry.blue = CByte(MeanColour(buff, entry.start * 3, entry.N, 2))
+        entry.ErrorVal = 0
+
+        For i As Integer = 0 To entry.N - 1
+            entry.ErrorVal += Math.Abs(CInt(buff((entry.start + i) * 3)) - entry.red)
+            entry.ErrorVal += Math.Abs(CInt(buff((entry.start + i) * 3 + 1)) - entry.green)
+            entry.ErrorVal += Math.Abs(CInt(buff((entry.start + i) * 3 + 2)) - entry.blue)
+        Next
+    End Sub
+
+    Public Function MeanColour(rgb As Byte(), start As Integer, N As Integer, index As Integer) As Double
+        If N = 0 Then
+            Return 0
+        End If
+
+        Dim answer As Double = 0
+
+        For i = 0 To N - 1
+            answer += rgb(start + i * 3 + index)
+        Next
+
+        Return answer / N
+    End Function
+
+    ' Get principal components of variance
+    ' Params: ret - return for components of major axis of variance
+    '         pixels - the pixels
+    '         N - count of pixels
+    Function PCA(ByRef ret As Double(), pixels As Byte(), start As Integer, N As Integer) As Integer
+        Dim cov(2, 2) As Double
+        Dim mu(2) As Double
+        Dim i, j, k As Integer
+        Dim var As Double
+        Dim d(2) As Double
+        Dim v(2, 2) As Double
+
+        For i = 0 To 2
+            mu(i) = MeanColour(pixels, start, N, i)
+        Next
+
+        ' Calculate 3x3 channel covariance matrix
+        For i = 0 To 2
+            For j = 0 To i
+                var = 0
+                For k = 0 To N - 1
+                    var += (pixels(start + k * 3 + i) - mu(i)) * (pixels(start + k * 3 + j) - mu(j))
+                Next
+                cov(i, j) = var / N
+                cov(j, i) = var / N
+            Next
+        Next
+
+        EigenDecomposition(cov, v, d)
+        ' Main component in col 3 of eigenvector matrix
+        ret(0) = v(0, 2)
+        ret(1) = v(1, 2)
+        ret(2) = v(2, 2)
+
+        Return 0
+    End Function
+    Private Function Project(ByVal rgb As Byte(), start As Integer, ByVal comp As Double()) As Integer
+        Return CInt(rgb(start) * comp(0) + rgb(start + 1) * comp(1) + rgb(start + 2) * comp(2))
+    End Function
+    ''' <summary>
+    ''' Split an entry using PCA and Otsu thresholding.
+    ''' We find the principal component of variance in RGB space.
+    ''' Then we apply Otsu thresholding along that axis, and cut.
+    ''' We partition using one pass of quick sort.
+    ''' </summary>
+    Public Sub SplitPCA(ByRef entry As PALENTRY, ByRef split As PALENTRY, ByRef buff As Byte())
+        Dim low As Integer = 0
+        Dim high As Integer = entry.N - 1
+        Dim cut As Integer
+        Dim comp(2) As Double
+        Dim temp As Byte
+        Dim i As Integer
+
+        PCA(comp, buff, (entry.start * 3), entry.N)
+        cut = GetOtsuThreshold2(buff, (entry.start * 3), entry.N, comp)
+
+        While low < high
+            While low < high AndAlso Project(buff, ((entry.start + low) * 3), comp) < cut
+                low += 1
+            End While
+            While low < high AndAlso Project(buff, ((entry.start + high) * 3), comp) >= cut
+                high -= 1
+            End While
+            If low < high Then
+                For i = 0 To 2
+                    temp = buff((entry.start + low) * 3 + i)
+                    buff((entry.start + low) * 3 + i) = buff((entry.start + high) * 3 + i)
+                    buff((entry.start + high) * 3 + i) = temp
+                Next
+            End If
+            low += 1
+            high -= 1
+        End While
+
+        split.start = entry.start + low
+        split.N = entry.N - low
+        entry.N = low
+
+        CalcError(entry, buff)
+        CalcError(split, buff)
+    End Sub
+    ''' <summary>
+    ''' Get the Otsu threshold for image segmentation
+    ''' </summary>
+    ''' <param name="rgb">The RGB image data</param>
+    ''' <param name="N">Total number of pixels</param>
+    ''' <param name="remap">Remapping values for RGB channels</param>
+    ''' <returns>Threshold at which to split pixels into foreground and background</returns>
+    Public Function GetOtsuThreshold2(ByVal rgb As Byte(), ByVal start As Integer, ByVal N As Integer, ByVal remap As Double()) As Integer
+        Dim hist(1023) As Integer
+        Dim wB As Integer = 0
+        Dim wF As Integer
+        Dim mB, mF As Single
+        Dim sum As Single = 0
+        Dim sumB As Single = 0
+        Dim varBetween As Single
+        Dim varMax As Single = 0.0F
+        Dim answer As Integer = 0
+
+        For i As Integer = 0 To N - 1
+            Dim nc As Integer = CInt(rgb(start + i * 3) * remap(0) + rgb(start + i * 3 + 1) * remap(1) + rgb(start + i * 3 + 2) * remap(2))
+            hist(512 + nc) += 1
+        Next
+
+        ' Sum of all (for means)
+        For k As Integer = 0 To 1023
+            sum += k * hist(k)
+        Next
+
+        For k As Integer = 0 To 1023
+            wB += hist(k)
+            If wB = 0 Then
+                Continue For
+            End If
+
+            wF = N - wB
+            If wF = 0 Then
+                Exit For
+            End If
+
+            sumB += CSng(k * hist(k))
+
+            mB = sumB / wB            ' Mean Background
+            mF = (sum - sumB) / wF    ' Mean Foreground
+
+            ' Calculate Between Class Variance
+            varBetween = CSng(wB) * CSng(wF) * (mB - mF) * (mB - mF)
+
+            ' Check if new maximum found
+            If varBetween > varMax Then
+                varMax = varBetween
+                answer = k
+            End If
+        Next
+
+        Return answer - 512
+    End Function
+    Sub EigenDecomposition(ByVal A(,) As Double, ByRef V(,) As Double, ByRef d() As Double)
+        Dim n As Integer = A.GetLength(0)
+        Dim e(n - 1) As Double
+
+        For i As Integer = 0 To n - 1
+            For j As Integer = 0 To n - 1
+                V(i, j) = A(i, j)
+            Next
+        Next
+
+        Tred2(V, d, e)
+        Tql2(V, d, e)
+    End Sub
+    Sub Tred2(ByRef V(,) As Double, ByRef d() As Double, ByRef e() As Double)
+        Dim n As Integer = d.Length
+        Dim i, j, k As Integer
+
+        ' This is derived from the Algol procedures tred2 by
+        ' Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
+        ' Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
+        ' Fortran subroutine in EISPACK.
+
+        For j = 0 To n - 1
+            d(j) = V(n - 1, j)
+        Next
+
+        ' Householder reduction to tridiagonal form.
+
+        For i = n - 1 To 1 Step -1
+            ' Scale to avoid under/overflow.
+
+            Dim scale As Double = 0.0
+            Dim h As Double = 0.0
+            For k = 0 To i - 1
+                scale += Math.Abs(d(k))
+            Next
+
+            If scale = 0.0 Then
+                e(i) = d(i - 1)
+                For j = 0 To i - 1
+                    d(j) = V(i - 1, j)
+                    V(i, j) = 0.0
+                    V(j, i) = 0.0
+                Next
+            Else
+                ' Generate Householder vector.
+                Dim f, g As Double
+                Dim hh As Double
+
+                For k = 0 To i - 1
+                    d(k) /= scale
+                    h += d(k) * d(k)
+                Next
+                f = d(i - 1)
+                g = Math.Sqrt(h)
+                If f > 0 Then
+                    g = -g
+                End If
+                e(i) = scale * g
+                h = h - f * g
+                d(i - 1) = f - g
+                For j = 0 To i - 1
+                    e(j) = 0.0
+                Next
+
+                ' Apply similarity transformation to remaining columns.
+
+                For j = 0 To i - 1
+                    f = d(j)
+                    V(j, i) = f
+                    g = e(j) + V(j, j) * f
+                    For k = j + 1 To i - 1
+                        g += V(k, j) * d(k)
+                        e(k) += V(k, j) * f
+                    Next
+                    e(j) = g
+                Next
+                f = 0.0
+                For j = 0 To i - 1
+                    e(j) /= h
+                    f += e(j) * d(j)
+                Next
+                hh = f / (h + h)
+                For j = 0 To i - 1
+                    e(j) -= hh * d(j)
+                Next
+                For j = 0 To i - 1
+                    f = d(j)
+                    g = e(j)
+                    For k = j To i - 1
+                        V(k, j) -= (f * e(k) + g * d(k))
+                    Next
+                    d(j) = V(i - 1, j)
+                    V(i, j) = 0.0
+                Next
+            End If
+            d(i) = h
+        Next
+
+        ' Accumulate transformations.
+
+        For i = 0 To n - 2
+            Dim h As Double
+            V(n - 1, i) = V(i, i)
+            V(i, i) = 1.0
+            h = d(i + 1)
+            If h <> 0.0 Then
+                For k = 0 To i
+                    d(k) = V(k, i + 1) / h
+                Next
+                For j = 0 To i
+                    Dim g As Double = 0.0
+                    For k = 0 To i
+                        g += V(k, i + 1) * V(k, j)
+                    Next
+                    For k = 0 To i
+                        V(k, j) -= g * d(k)
+                    Next
+                Next
+            End If
+            For k = 0 To i
+                V(k, i + 1) = 0.0
+            Next
+        Next
+        For j = 0 To n - 1
+            d(j) = V(n - 1, j)
+            V(n - 1, j) = 0.0
+        Next
+        V(n - 1, n - 1) = 1.0
+        e(0) = 0.0
+    End Sub
+
+    ' Symmetric tridiagonal QL algorithm.
+
+    Sub Tql2(ByRef V(,) As Double, ByRef d() As Double, ByRef e() As Double)
+        ' This is derived from the Algol procedures tql2, by
+        ' Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
+        ' Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
+        ' Fortran subroutine in EISPACK.
+
+        Dim n As Integer = d.Length
+        Dim i, j, k, l As Integer
+        Dim f, tst1, eps As Double
+
+        For i = 1 To n - 1
+            e(i - 1) = e(i)
+        Next
+        e(n - 1) = 0.0
+
+        f = 0.0
+        tst1 = 0.0
+        eps = Math.Pow(2.0, -52.0)
+        For l = 0 To n - 1
+            ' Find small subdiagonal element
+
+            tst1 = Math.Max(tst1, Math.Abs(d(l)) + Math.Abs(e(l)))
+            Dim m As Integer = l
+            While m < n
+                If Math.Abs(e(m)) <= eps * tst1 Then
+                    Exit While
+                End If
+                m += 1
+            End While
+
+            ' If m == l, d(l) is an eigenvalue,
+            ' otherwise, iterate.
+
+            If m > l Then
+                Dim iter As Integer = 0
+                Do
+                    Dim g, p, r As Double
+                    Dim dl1 As Double
+                    Dim h As Double
+                    Dim c As Double
+                    Dim c2 As Double
+                    Dim c3 As Double
+                    Dim el1 As Double
+                    Dim s As Double
+                    Dim s2 As Double
+
+                    iter += 1  ' (Could check iteration count here.)
+
+                    ' Compute implicit shift
+
+                    g = d(l)
+                    p = (d(l + 1) - g) / (2.0 * e(l))
+                    r = Hypot(p, 1.0)
+                    If p < 0 Then
+                        r = -r
+                    End If
+                    d(l) = e(l) / (p + r)
+                    d(l + 1) = e(l) * (p + r)
+                    dl1 = d(l + 1)
+                    h = g - d(l)
+                    For i = l + 2 To n - 1
+                        d(i) -= h
+                    Next
+                    f += h
+
+                    ' Implicit QL transformation.
+
+                    p = d(m)
+                    c = 1.0
+                    c2 = c
+                    c3 = c
+                    el1 = e(l + 1)
+                    s = 0.0
+                    s2 = 0.0
+                    For i = m - 1 To l Step -1
+                        c3 = c2
+                        c2 = c
+                        s2 = s
+                        g = c * e(i)
+                        h = c * p
+                        r = Hypot(p, e(i))
+                        e(i + 1) = s * r
+                        s = e(i) / r
+                        c = p / r
+                        p = c * d(i) - s * g
+                        d(i + 1) = h + s * (c * g + s * d(i))
+
+                        ' Accumulate transformation.
+
+                        For k = 0 To n - 1
+                            h = V(k, i + 1)
+                            V(k, i + 1) = s * V(k, i) + c * h
+                            V(k, i) = c * V(k, i) - s * h
+                        Next
+                    Next
+                    p = -s * s2 * c3 * el1 * e(l) / dl1
+                    e(l) = s * p
+                    d(l) = c * p
+
+                    ' Check for convergence.
+
+                Loop While Math.Abs(e(l)) > eps * tst1
+            End If
+            d(l) += f
+            e(l) = 0.0
+        Next
+
+        ' Sort eigenvalues and corresponding vectors.
+
+        For i = 0 To n - 2
+            Dim k1 As Integer = i
+            Dim p As Double = d(i)
+            For j = i + 1 To n - 1
+                If d(j) < p Then
+                    k1 = j
+                    p = d(j)
+                End If
+            Next
+            If k1 <> i Then
+                d(k1) = d(i)
+                d(i) = p
+                For j = 0 To n - 1
+                    p = V(j, i)
+                    V(j, i) = V(j, k1)
+                    V(j, k1) = p
+                Next
+            End If
+        Next
+    End Sub
+
+    Private Function Hypot(ByVal a As Double, ByVal b As Double) As Double
+        Return Math.Sqrt(a * a + b * b)
+    End Function
+End Module

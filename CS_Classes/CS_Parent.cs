@@ -601,6 +601,11 @@ namespace CS_Classes
             trueText str = new trueText(text, pt, picTag);
             trueData.Add(str);
         }
+        public void SetTrueText(string text, cv.Point2f pt, int picTag = 2)
+        {
+            trueText str = new trueText(text, new cv.Point(pt.X, pt.Y), picTag);
+            trueData.Add(str);
+        }
 
         public void SetTrueText(string text)
         {
