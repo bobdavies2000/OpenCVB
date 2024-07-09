@@ -1489,6 +1489,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "ParticleFilter_Example" Then return new ParticleFilter_Example
 	if algorithmName = "PCA_Basics" Then return new PCA_Basics
 	if algorithmName = "PCA_CellMask" Then return new PCA_CellMask
+	if algorithmName = "PCA_Color256" Then return new PCA_Color256
 	if algorithmName = "PCA_Depth" Then return new PCA_Depth
 	if algorithmName = "PCA_DrawImage" Then return new PCA_DrawImage
 	if algorithmName = "PCA_Prep_CPP" Then return new PCA_Prep_CPP

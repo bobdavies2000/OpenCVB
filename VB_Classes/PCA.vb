@@ -2,13 +2,25 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
 Public Class PCA_Color256 : Inherits VB_Parent
+    Dim custom As New Palette_CustomColorMap
     Public Sub New()
-        labels = {"", "", "Grayscale", "dst3Label"}
-        UpdateAdvice(traceName + ": <place advice here on any options that are useful>")
-        desc = "description"
+        labels = {"", "", "Original BGR image is above and the 256 color image is below", ""}
+        desc = "Use PCA to build a 256 color image from the input using a palette."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Static palette(256 * 3) As Byte
+
+        Dim rgb(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, rgb, 0, rgb.Length)
+
+        MakePalette(rgb, dst2.Width, dst2.Height, palette, 256)
+        Dim paletteInput As Byte() = RgbToIndex(rgb, dst1.Width, dst1.Height, palette, 256)
+        Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Marshal.Copy(paletteInput, 0, img8u.Data, paletteInput.Length)
+
+        Marshal.Copy(palette, 0, custom.colorMap.Data, palette.Length)
+        custom.Run(img8u)
+        dst2 = custom.dst2
     End Sub
 End Class
 
@@ -322,48 +334,39 @@ Module PCAModule
         Return answer
     End Function
 
-    Public Function MakePalette(rgb As Byte(), width As Integer, height As Integer, pal As Byte(), Optional N As Integer = 256) As Integer
+    Public Sub MakePalette(rgb As Byte(), width As Integer, height As Integer, pal As Byte(), Optional N As Integer = 256)
         Dim buff As Byte() = Nothing
         Dim entry As PALENTRY() = Nothing
         Dim best As Double
         Dim bestii As Integer
         Dim i, ii As Integer
 
-        Try
-            buff = New Byte(width * height * 3 - 1) {}
-            Array.Copy(rgb, buff, width * height * 3)
+        buff = New Byte(width * height * 3 - 1) {}
+        Array.Copy(rgb, buff, width * height * 3)
 
-            entry = New PALENTRY(N - 1) {}
-            entry(0).start = 0
-            entry(0).N = width * height
-            CalcError(entry(0), buff)
+        entry = New PALENTRY(N - 1) {}
+        entry(0).start = 0
+        entry(0).N = width * height
+        CalcError(entry(0), buff)
 
-            For i = 1 To N - 1
-                best = entry(0).ErrorVal
-                bestii = 0
-                For ii = 0 To i - 1
-                    If entry(ii).ErrorVal > best Then
-                        best = entry(ii).ErrorVal
-                        bestii = ii
-                    End If
-                Next
-                SplitPCA(entry(bestii), entry(i), buff)
+        For i = 1 To N - 1
+            best = entry(0).ErrorVal
+            bestii = 0
+            For ii = 0 To i - 1
+                If entry(ii).ErrorVal > best Then
+                    best = entry(ii).ErrorVal
+                    bestii = ii
+                End If
             Next
+            SplitPCA(entry(bestii), entry(i), buff)
+        Next
 
-            For i = 0 To N - 1
-                pal(i * 3) = entry(i).red
-                pal(i * 3 + 1) = entry(i).green
-                pal(i * 3 + 2) = entry(i).blue
-            Next
-
-            Return 0
-        Catch ex As Exception
-            Return -1
-        Finally
-            buff = Nothing
-            entry = Nothing
-        End Try
-    End Function
+        For i = 0 To N - 1
+            pal(i * 3) = entry(i).red
+            pal(i * 3 + 1) = entry(i).green
+            pal(i * 3 + 2) = entry(i).blue
+        Next
+    End Sub
 
     Public Sub CalcError(ByRef entry As PALENTRY, ByRef buff() As Byte)
         entry.red = CByte(MeanColour(buff, entry.start * 3, entry.N, 0))
