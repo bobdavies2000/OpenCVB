@@ -1,6 +1,17 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports System.Windows.Forms.AxHost
+
+Public Class PCA_Color256 : Inherits VB_Parent
+    Public Sub New()
+        labels = {"", "", "Grayscale", "dst3Label"}
+        UpdateAdvice(traceName + ": <place advice here on any options that are useful>")
+        desc = "description"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    End Sub
+End Class
+
 
 ' You can find the main direction of a series of points using principal component analysis ‘(PCA).
 ' PCA is a statistical technique that can be used to find the directions of greatest variance in a dataset.
@@ -283,8 +294,35 @@ Module PCAModule
         Public blue As Byte
         Public ErrorVal As Double
     End Structure
+    ' Colour difference function
+    Private Function CDiff(ByVal a As Byte(), start As Integer, ByVal b As Byte(), startB As Integer) As Double
+        Return (CInt(a(start + 0)) - CInt(b(startB + 0))) * (CInt(a(start + 0)) - CInt(startB + b(0))) * 5 +
+               (CInt(a(start + 1)) - CInt(b(startB + 1))) * (CInt(a(start + 1)) - CInt(startB + b(1))) * 8 +
+               (CInt(a(start + 2)) - CInt(b(startB + 2))) * (CInt(a(start + 2)) - CInt(startB + b(2))) * 2
+    End Function
+    ' Convert an image to indexed form, using passed-in palette
+    Function RgbToIndex(rgb As Byte(), width As Integer, height As Integer, pal As Byte(), N As Integer) As Byte()
+        Dim answer As Byte() = New Byte(width * height - 1) {}
 
-    Public Function MakePalette(ByVal rgb As Byte(), ByVal width As Integer, ByVal height As Integer, ByVal pal As Byte(), Optional ByVal N As Integer = 256) As Integer
+        For i As Integer = 0 To width * height - 1
+            Dim best As Double = CDiff(rgb, i * 3, pal, 0)
+            Dim bestii As Integer = 0
+
+            For ii As Integer = 1 To N - 1
+                Dim [error] As Double = CDiff(rgb, i * 3, pal, ii * 3)
+                If [error] < best Then
+                    best = [error]
+                    bestii = ii
+                End If
+            Next
+
+            answer(i) = CByte(bestii)
+        Next
+
+        Return answer
+    End Function
+
+    Public Function MakePalette(rgb As Byte(), width As Integer, height As Integer, pal As Byte(), Optional N As Integer = 256) As Integer
         Dim buff As Byte() = Nothing
         Dim entry As PALENTRY() = Nothing
         Dim best As Double
@@ -390,7 +428,7 @@ Module PCAModule
 
         Return 0
     End Function
-    Private Function Project(ByVal rgb As Byte(), start As Integer, ByVal comp As Double()) As Integer
+    Private Function Project(rgb As Byte(), start As Integer, comp As Double()) As Integer
         Return CInt(rgb(start) * comp(0) + rgb(start + 1) * comp(1) + rgb(start + 2) * comp(2))
     End Function
     ''' <summary>
@@ -442,7 +480,7 @@ Module PCAModule
     ''' <param name="N">Total number of pixels</param>
     ''' <param name="remap">Remapping values for RGB channels</param>
     ''' <returns>Threshold at which to split pixels into foreground and background</returns>
-    Public Function GetOtsuThreshold2(ByVal rgb As Byte(), ByVal start As Integer, ByVal N As Integer, ByVal remap As Double()) As Integer
+    Public Function GetOtsuThreshold2(rgb As Byte(), start As Integer, N As Integer, remap As Double()) As Integer
         Dim hist(1023) As Integer
         Dim wB As Integer = 0
         Dim wF As Integer
@@ -491,7 +529,7 @@ Module PCAModule
 
         Return answer - 512
     End Function
-    Sub EigenDecomposition(ByVal A(,) As Double, ByRef V(,) As Double, ByRef d() As Double)
+    Sub EigenDecomposition(A(,) As Double, ByRef V(,) As Double, ByRef d() As Double)
         Dim n As Integer = A.GetLength(0)
         Dim e(n - 1) As Double
 
@@ -755,7 +793,8 @@ Module PCAModule
         Next
     End Sub
 
-    Private Function Hypot(ByVal a As Double, ByVal b As Double) As Double
+    Private Function Hypot(a As Double, b As Double) As Double
         Return Math.Sqrt(a * a + b * b)
     End Function
 End Module
+

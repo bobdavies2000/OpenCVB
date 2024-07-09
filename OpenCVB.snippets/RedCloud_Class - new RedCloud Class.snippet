@@ -11,7 +11,7 @@ Public Class RedCloud_AnyName : Inherits VB_Parent
     dim redC as new RedCloud_Basics
     Public Sub New()
 	    labels = {"", "", "Grayscale", "dst3Label"}
-        vbAddAdvice(tracename + ": <place advice here on any options that are useful>")
+        UpdateAdvice(tracename + ": <place advice here on any options that are useful>")
         desc = "description"
     End Sub
     Public Sub RunVB(src as cv.Mat)
