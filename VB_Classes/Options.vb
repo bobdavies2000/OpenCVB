@@ -5882,3 +5882,19 @@ Public Class Options_LineFinder : Inherits VB_Parent
         kSize = kernelSlider.Value - 1
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_PCA_NColor : Inherits VB_Parent
+    Public desiredNcolors As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired number of colors", 1, 256, 256)
+    End Sub
+    Public Sub RunVB()
+        Static nSlider = FindSlider("Desired number of colors")
+        desiredNcolors = nSlider.value
+    End Sub
+End Class

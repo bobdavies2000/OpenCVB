@@ -1,26 +1,33 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
-Public Class PCA_Color256 : Inherits VB_Parent
+Public Class PCA_NColor : Inherits VB_Parent
     Dim custom As New Palette_CustomColorMap
+    Dim options As New Options_PCA_NColor
     Public Sub New()
         labels = {"", "", "Original BGR image is above and the 256 color image is below", ""}
         desc = "Use PCA to build a 256 color image from the input using a palette."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         Static palette(256 * 3) As Byte
 
         Dim rgb(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)
 
-        MakePalette(rgb, dst2.Width, dst2.Height, palette, 256)
-        Dim paletteInput As Byte() = RgbToIndex(rgb, dst1.Width, dst1.Height, palette, 256)
+        MakePalette(rgb, dst2.Width, dst2.Height, palette, options.desiredNcolors)
+        Dim paletteInput As Byte() = RgbToIndex(rgb, dst1.Width, dst1.Height, palette, options.desiredNcolors)
         Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Marshal.Copy(paletteInput, 0, img8u.Data, paletteInput.Length)
 
         Marshal.Copy(palette, 0, custom.colorMap.Data, palette.Length)
         custom.Run(img8u)
         dst2 = custom.dst2
+
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        task.palette.Run(gray)
+        dst3 = task.palette.dst2
     End Sub
 End Class
 
@@ -300,7 +307,7 @@ Module PCAModule
     <StructLayout(LayoutKind.Sequential)>
     Public Structure PALENTRY
         Public start As Integer
-        Public N As Integer
+        Public nColors As Integer
         Public red As Byte
         Public green As Byte
         Public blue As Byte
@@ -334,7 +341,7 @@ Module PCAModule
         Return answer
     End Function
 
-    Public Sub MakePalette(rgb As Byte(), width As Integer, height As Integer, pal As Byte(), Optional N As Integer = 256)
+    Public Sub MakePalette(rgb As Byte(), width As Integer, height As Integer, pal As Byte(), nColors As Integer)
         Dim buff As Byte() = Nothing
         Dim entry As PALENTRY() = Nothing
         Dim best As Double
@@ -344,12 +351,12 @@ Module PCAModule
         buff = New Byte(width * height * 3 - 1) {}
         Array.Copy(rgb, buff, width * height * 3)
 
-        entry = New PALENTRY(N - 1) {}
+        entry = New PALENTRY(nColors - 1) {}
         entry(0).start = 0
-        entry(0).N = width * height
+        entry(0).nColors = width * height
         CalcError(entry(0), buff)
 
-        For i = 1 To N - 1
+        For i = 1 To nColors - 1
             best = entry(0).ErrorVal
             bestii = 0
             For ii = 0 To i - 1
@@ -361,7 +368,7 @@ Module PCAModule
             SplitPCA(entry(bestii), entry(i), buff)
         Next
 
-        For i = 0 To N - 1
+        For i = 0 To nColors - 1
             pal(i * 3) = entry(i).red
             pal(i * 3 + 1) = entry(i).green
             pal(i * 3 + 2) = entry(i).blue
@@ -369,12 +376,12 @@ Module PCAModule
     End Sub
 
     Public Sub CalcError(ByRef entry As PALENTRY, ByRef buff() As Byte)
-        entry.red = CByte(MeanColour(buff, entry.start * 3, entry.N, 0))
-        entry.green = CByte(MeanColour(buff, entry.start * 3, entry.N, 1))
-        entry.blue = CByte(MeanColour(buff, entry.start * 3, entry.N, 2))
+        entry.red = CByte(MeanColour(buff, entry.start * 3, entry.nColors, 0))
+        entry.green = CByte(MeanColour(buff, entry.start * 3, entry.nColors, 1))
+        entry.blue = CByte(MeanColour(buff, entry.start * 3, entry.nColors, 2))
         entry.ErrorVal = 0
 
-        For i As Integer = 0 To entry.N - 1
+        For i As Integer = 0 To entry.nColors - 1
             entry.ErrorVal += Math.Abs(CInt(buff((entry.start + i) * 3)) - entry.red)
             entry.ErrorVal += Math.Abs(CInt(buff((entry.start + i) * 3 + 1)) - entry.green)
             entry.ErrorVal += Math.Abs(CInt(buff((entry.start + i) * 3 + 2)) - entry.blue)
@@ -442,14 +449,14 @@ Module PCAModule
     ''' </summary>
     Public Sub SplitPCA(ByRef entry As PALENTRY, ByRef split As PALENTRY, ByRef buff As Byte())
         Dim low As Integer = 0
-        Dim high As Integer = entry.N - 1
+        Dim high As Integer = entry.nColors - 1
         Dim cut As Integer
         Dim comp(2) As Double
         Dim temp As Byte
         Dim i As Integer
 
-        PCA(comp, buff, (entry.start * 3), entry.N)
-        cut = GetOtsuThreshold2(buff, (entry.start * 3), entry.N, comp)
+        PCA(comp, buff, (entry.start * 3), entry.nColors)
+        cut = GetOtsuThreshold2(buff, (entry.start * 3), entry.nColors, comp)
 
         While low < high
             While low < high AndAlso Project(buff, ((entry.start + low) * 3), comp) < cut
@@ -470,8 +477,8 @@ Module PCAModule
         End While
 
         split.start = entry.start + low
-        split.N = entry.N - low
-        entry.N = low
+        split.nColors = entry.nColors - low
+        entry.nColors = low
 
         CalcError(entry, buff)
         CalcError(split, buff)
