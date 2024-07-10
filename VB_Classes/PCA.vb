@@ -1,37 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
-Public Class PCA_NColor : Inherits VB_Parent
-    Dim custom As New Palette_CustomColorMap
-    Dim options As New Options_PCA_NColor
-    Public Sub New()
-        labels = {"", "", "Original BGR image is above and the 256 color image is below", ""}
-        desc = "Use PCA to build a 256 color image from the input using a palette."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        Static palette(256 * 3) As Byte
-
-        Dim rgb(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, rgb, 0, rgb.Length)
-
-        MakePalette(rgb, dst2.Width, dst2.Height, palette, options.desiredNcolors)
-        Dim paletteInput As Byte() = RgbToIndex(rgb, dst1.Width, dst1.Height, palette, options.desiredNcolors)
-        Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Marshal.Copy(paletteInput, 0, img8u.Data, paletteInput.Length)
-
-        Marshal.Copy(palette, 0, custom.colorMap.Data, palette.Length)
-        custom.Run(img8u)
-        dst2 = custom.dst2
-
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        task.palette.Run(gray)
-        dst3 = task.palette.dst2
-    End Sub
-End Class
-
-
 ' You can find the main direction of a series of points using principal component analysis ‘(PCA).
 ' PCA is a statistical technique that can be used to find the directions of greatest variance in a dataset.
 ' The main direction of a series of points is the direction of greatest variance in the dataset.
@@ -218,7 +187,7 @@ Public Class PCA_DrawImage : Inherits VB_Parent
         labels(2) = "Original image"
         labels(3) = "PCA Output"
     End Sub
-    Private Sub drawAxis(img As cv.Mat, p As cv.Point, q As cv.Point, color As cv.Scalar, scale As Single)
+    Sub drawAxis(img As cv.Mat, p As cv.Point, q As cv.Point, color As cv.Scalar, scale As Single)
         Dim angle = Math.Atan2(p.Y - q.Y, p.X - q.X) ' angle in radians
         Dim hypotenuse = Math.Sqrt((p.Y - q.Y) * (p.Y - q.Y) + (p.X - q.X) * (p.X - q.X))
         q.X = p.X - scale * hypotenuse * Math.Cos(angle)
@@ -305,32 +274,32 @@ End Class
 ' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
 Module PCAModule
     <StructLayout(LayoutKind.Sequential)>
-    Public Structure PALENTRY
+    Public Structure paletteEntry
         Public start As Integer
-        Public nColors As Integer
+        Public nCount As Integer
         Public red As Byte
         Public green As Byte
         Public blue As Byte
         Public ErrorVal As Double
     End Structure
     ' Colour difference function
-    Private Function CDiff(ByVal a As Byte(), start As Integer, ByVal b As Byte(), startB As Integer) As Double
-        Return (CInt(a(start + 0)) - CInt(b(startB + 0))) * (CInt(a(start + 0)) - CInt(startB + b(0))) * 5 +
-               (CInt(a(start + 1)) - CInt(b(startB + 1))) * (CInt(a(start + 1)) - CInt(startB + b(1))) * 8 +
-               (CInt(a(start + 2)) - CInt(b(startB + 2))) * (CInt(a(start + 2)) - CInt(startB + b(2))) * 2
+    Function CDiff(ByVal a As Byte(), start As Integer, ByVal b As Byte(), startPal As Integer) As Double
+        Return (CInt(a(start + 0)) - CInt(b(startPal + 0))) * (CInt(a(start + 0)) - CInt(b(startPal + 0))) * 5 +
+               (CInt(a(start + 1)) - CInt(b(startPal + 1))) * (CInt(a(start + 1)) - CInt(b(startPal + 1))) * 8 +
+               (CInt(a(start + 2)) - CInt(b(startPal + 2))) * (CInt(a(start + 2)) - CInt(b(startPal + 2))) * 2
     End Function
     ' Convert an image to indexed form, using passed-in palette
-    Function RgbToIndex(rgb As Byte(), width As Integer, height As Integer, pal As Byte(), N As Integer) As Byte()
-        Dim answer As Byte() = New Byte(width * height - 1) {}
+    Function RgbToIndex(rgb As Byte(), width As Integer, height As Integer, pal As Byte(), nColor As Integer) As Byte()
+        Dim answer(width * height - 1) As Byte
 
-        For i As Integer = 0 To width * height - 1
-            Dim best As Double = CDiff(rgb, i * 3, pal, 0)
-            Dim bestii As Integer = 0
+        For i = 0 To width * height - 1
+            Dim best = CDiff(rgb, i * 3, pal, 0)
+            Dim bestii = 0
 
-            For ii As Integer = 1 To N - 1
-                Dim [error] As Double = CDiff(rgb, i * 3, pal, ii * 3)
-                If [error] < best Then
-                    best = [error]
+            For ii = 1 To nColor - 1
+                Dim nextError = CDiff(rgb, i * 3, pal, ii * 3)
+                If nextError < best Then
+                    best = nextError
                     bestii = ii
                 End If
             Next
@@ -341,19 +310,18 @@ Module PCAModule
         Return answer
     End Function
 
-    Public Sub MakePalette(rgb As Byte(), width As Integer, height As Integer, pal As Byte(), nColors As Integer)
-        Dim buff As Byte() = Nothing
-        Dim entry As PALENTRY() = Nothing
+    Public Function MakePalette(rgb As Byte(), width As Integer, height As Integer, nColors As Integer) As Byte()
+        Dim buff(width * height * 3 - 1) As Byte
+        Dim entry(nColors - 1) As paletteEntry
         Dim best As Double
         Dim bestii As Integer
         Dim i, ii As Integer
+        Dim pal(256 * 3 - 1) As Byte
 
-        buff = New Byte(width * height * 3 - 1) {}
         Array.Copy(rgb, buff, width * height * 3)
 
-        entry = New PALENTRY(nColors - 1) {}
         entry(0).start = 0
-        entry(0).nColors = width * height
+        entry(0).nCount = width * height
         CalcError(entry(0), buff)
 
         For i = 1 To nColors - 1
@@ -373,40 +341,36 @@ Module PCAModule
             pal(i * 3 + 1) = entry(i).green
             pal(i * 3 + 2) = entry(i).blue
         Next
-    End Sub
+        Return pal
+    End Function
 
-    Public Sub CalcError(ByRef entry As PALENTRY, ByRef buff() As Byte)
-        entry.red = CByte(MeanColour(buff, entry.start * 3, entry.nColors, 0))
-        entry.green = CByte(MeanColour(buff, entry.start * 3, entry.nColors, 1))
-        entry.blue = CByte(MeanColour(buff, entry.start * 3, entry.nColors, 2))
+    Public Sub CalcError(ByRef entry As paletteEntry, ByRef buff() As Byte)
+        entry.red = CByte(MeanColour(buff, entry.start * 3, entry.nCount, 0))
+        entry.green = CByte(MeanColour(buff, entry.start * 3, entry.nCount, 1))
+        entry.blue = CByte(MeanColour(buff, entry.start * 3, entry.nCount, 2))
         entry.ErrorVal = 0
 
-        For i As Integer = 0 To entry.nColors - 1
+        For i = 0 To entry.nCount - 1
             entry.ErrorVal += Math.Abs(CInt(buff((entry.start + i) * 3)) - entry.red)
             entry.ErrorVal += Math.Abs(CInt(buff((entry.start + i) * 3 + 1)) - entry.green)
             entry.ErrorVal += Math.Abs(CInt(buff((entry.start + i) * 3 + 2)) - entry.blue)
         Next
     End Sub
 
-    Public Function MeanColour(rgb As Byte(), start As Integer, N As Integer, index As Integer) As Double
-        If N = 0 Then
-            Return 0
-        End If
-
+    Public Function MeanColour(rgb As Byte(), start As Integer, nnCount As Integer, index As Integer) As Double
+        If nnCount = 0 Then Return 0
         Dim answer As Double = 0
-
-        For i = 0 To N - 1
+        For i = 0 To nnCount - 1
             answer += rgb(start + i * 3 + index)
         Next
-
-        Return answer / N
+        Return answer / nnCount
     End Function
 
     ' Get principal components of variance
     ' Params: ret - return for components of major axis of variance
     '         pixels - the pixels
-    '         N - count of pixels
-    Function PCA(ByRef ret As Double(), pixels As Byte(), start As Integer, N As Integer) As Integer
+    '         nnCount - count of pixels
+    Sub PCA(ByRef ret As Double(), pixels As Byte(), start As Integer, nnCount As Integer)
         Dim cov(2, 2) As Double
         Dim mu(2) As Double
         Dim i, j, k As Integer
@@ -415,18 +379,18 @@ Module PCAModule
         Dim v(2, 2) As Double
 
         For i = 0 To 2
-            mu(i) = MeanColour(pixels, start, N, i)
+            mu(i) = MeanColour(pixels, start, nnCount, i)
         Next
 
         ' Calculate 3x3 channel covariance matrix
         For i = 0 To 2
             For j = 0 To i
                 var = 0
-                For k = 0 To N - 1
+                For k = 0 To nnCount - 1
                     var += (pixels(start + k * 3 + i) - mu(i)) * (pixels(start + k * 3 + j) - mu(j))
                 Next
-                cov(i, j) = var / N
-                cov(j, i) = var / N
+                cov(i, j) = var / nnCount
+                cov(j, i) = var / nnCount
             Next
         Next
 
@@ -435,10 +399,8 @@ Module PCAModule
         ret(0) = v(0, 2)
         ret(1) = v(1, 2)
         ret(2) = v(2, 2)
-
-        Return 0
-    End Function
-    Private Function Project(rgb As Byte(), start As Integer, comp As Double()) As Integer
+    End Sub
+    Function Project(rgb As Byte(), start As Integer, comp As Double()) As Integer
         Return CInt(rgb(start) * comp(0) + rgb(start + 1) * comp(1) + rgb(start + 2) * comp(2))
     End Function
     ''' <summary>
@@ -447,16 +409,16 @@ Module PCAModule
     ''' Then we apply Otsu thresholding along that axis, and cut.
     ''' We partition using one pass of quick sort.
     ''' </summary>
-    Public Sub SplitPCA(ByRef entry As PALENTRY, ByRef split As PALENTRY, ByRef buff As Byte())
+    Public Sub SplitPCA(ByRef entry As paletteEntry, ByRef split As paletteEntry, ByRef buff As Byte())
         Dim low As Integer = 0
-        Dim high As Integer = entry.nColors - 1
+        Dim high As Integer = entry.nCount - 1
         Dim cut As Integer
         Dim comp(2) As Double
         Dim temp As Byte
         Dim i As Integer
 
-        PCA(comp, buff, (entry.start * 3), entry.nColors)
-        cut = GetOtsuThreshold2(buff, (entry.start * 3), entry.nColors, comp)
+        PCA(comp, buff, (entry.start * 3), entry.nCount)
+        cut = GetOtsuThreshold2(buff, (entry.start * 3), entry.nCount, comp)
 
         While low < high
             While low < high AndAlso Project(buff, ((entry.start + low) * 3), comp) < cut
@@ -477,8 +439,8 @@ Module PCAModule
         End While
 
         split.start = entry.start + low
-        split.nColors = entry.nColors - low
-        entry.nColors = low
+        split.nCount = entry.nCount - low
+        entry.nCount = low
 
         CalcError(entry, buff)
         CalcError(split, buff)
@@ -540,11 +502,11 @@ Module PCAModule
         Return answer - 512
     End Function
     Sub EigenDecomposition(A(,) As Double, ByRef V(,) As Double, ByRef d() As Double)
-        Dim n As Integer = A.GetLength(0)
-        Dim e(n - 1) As Double
+        Dim bufLen As Integer = A.GetLength(0)
+        Dim e(bufLen - 1) As Double
 
-        For i As Integer = 0 To n - 1
-            For j As Integer = 0 To n - 1
+        For i = 0 To bufLen - 1
+            For j = 0 To bufLen - 1
                 V(i, j) = A(i, j)
             Next
         Next
@@ -553,7 +515,7 @@ Module PCAModule
         Tql2(V, d, e)
     End Sub
     Sub Tred2(ByRef V(,) As Double, ByRef d() As Double, ByRef e() As Double)
-        Dim n As Integer = d.Length
+        Dim dLen As Integer = d.Length
         Dim i, j, k As Integer
 
         ' This is derived from the Algol procedures tred2 by
@@ -561,13 +523,13 @@ Module PCAModule
         ' Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
         ' Fortran subroutine in EISPACK.
 
-        For j = 0 To n - 1
-            d(j) = V(n - 1, j)
+        For j = 0 To dLen - 1
+            d(j) = V(dLen - 1, j)
         Next
 
         ' Householder reduction to tridiagonal form.
 
-        For i = n - 1 To 1 Step -1
+        For i = dLen - 1 To 1 Step -1
             ' Scale to avoid under/overflow.
 
             Dim scale As Double = 0.0
@@ -640,9 +602,9 @@ Module PCAModule
 
         ' Accumulate transformations.
 
-        For i = 0 To n - 2
+        For i = 0 To dLen - 2
             Dim h As Double
-            V(n - 1, i) = V(i, i)
+            V(dLen - 1, i) = V(i, i)
             V(i, i) = 1.0
             h = d(i + 1)
             If h <> 0.0 Then
@@ -663,11 +625,11 @@ Module PCAModule
                 V(k, i + 1) = 0.0
             Next
         Next
-        For j = 0 To n - 1
-            d(j) = V(n - 1, j)
-            V(n - 1, j) = 0.0
+        For j = 0 To dLen - 1
+            d(j) = V(dLen - 1, j)
+            V(dLen - 1, j) = 0.0
         Next
-        V(n - 1, n - 1) = 1.0
+        V(dLen - 1, dLen - 1) = 1.0
         e(0) = 0.0
     End Sub
 
@@ -679,24 +641,24 @@ Module PCAModule
         ' Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
         ' Fortran subroutine in EISPACK.
 
-        Dim n As Integer = d.Length
+        Dim dLen = d.Length
         Dim i, j, k, l As Integer
         Dim f, tst1, eps As Double
 
-        For i = 1 To n - 1
+        For i = 1 To dLen - 1
             e(i - 1) = e(i)
         Next
-        e(n - 1) = 0.0
+        e(dLen - 1) = 0.0
 
         f = 0.0
         tst1 = 0.0
         eps = Math.Pow(2.0, -52.0)
-        For l = 0 To n - 1
+        For l = 0 To dLen - 1
             ' Find small subdiagonal element
 
             tst1 = Math.Max(tst1, Math.Abs(d(l)) + Math.Abs(e(l)))
             Dim m As Integer = l
-            While m < n
+            While m < dLen
                 If Math.Abs(e(m)) <= eps * tst1 Then
                     Exit While
                 End If
@@ -733,7 +695,7 @@ Module PCAModule
                     d(l + 1) = e(l) * (p + r)
                     dl1 = d(l + 1)
                     h = g - d(l)
-                    For i = l + 2 To n - 1
+                    For i = l + 2 To dLen - 1
                         d(i) -= h
                     Next
                     f += h
@@ -762,7 +724,7 @@ Module PCAModule
 
                         ' Accumulate transformation.
 
-                        For k = 0 To n - 1
+                        For k = 0 To dLen - 1
                             h = V(k, i + 1)
                             V(k, i + 1) = s * V(k, i) + c * h
                             V(k, i) = c * V(k, i) - s * h
@@ -782,10 +744,10 @@ Module PCAModule
 
         ' Sort eigenvalues and corresponding vectors.
 
-        For i = 0 To n - 2
+        For i = 0 To dLen - 2
             Dim k1 As Integer = i
             Dim p As Double = d(i)
-            For j = i + 1 To n - 1
+            For j = i + 1 To dLen - 1
                 If d(j) < p Then
                     k1 = j
                     p = d(j)
@@ -794,7 +756,7 @@ Module PCAModule
             If k1 <> i Then
                 d(k1) = d(i)
                 d(i) = p
-                For j = 0 To n - 1
+                For j = 0 To dLen - 1
                     p = V(j, i)
                     V(j, i) = V(j, k1)
                     V(j, k1) = p
@@ -803,8 +765,43 @@ Module PCAModule
         Next
     End Sub
 
-    Private Function Hypot(a As Double, b As Double) As Double
+    Function Hypot(a As Double, b As Double) As Double
         Return Math.Sqrt(a * a + b * b)
     End Function
 End Module
 
+
+
+
+
+
+Public Class PCA_NColorOriginal : Inherits VB_Parent
+    Dim custom As New Palette_CustomColorMap
+    Dim options As New Options_PCA_NColor
+    Public Sub New()
+        labels = {"", "", "Original BGR image is above and the 256 color image is below", ""}
+        desc = "Use PCA to build a 256 color image from the input using a palette."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        Static palette(256 * 3) As Byte
+
+        Dim rgb(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, rgb, 0, rgb.Length)
+
+        palette = MakePalette(rgb, dst2.Width, dst2.Height, options.desiredNcolors)
+        Dim paletteImage = RgbToIndex(rgb, dst1.Width, dst1.Height, palette, options.desiredNcolors)
+        Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length)
+
+        custom.colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3)
+        Marshal.Copy(palette, 0, custom.colorMap.Data, palette.Length)
+        custom.Run(img8u)
+        dst2 = custom.dst2.Clone
+
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        custom.Run(gray)
+        dst3 = custom.dst2.Clone
+    End Sub
+End Class

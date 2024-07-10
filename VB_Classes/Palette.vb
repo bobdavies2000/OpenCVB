@@ -488,18 +488,25 @@ End Class
 
 
 Public Class Palette_CustomColorMap : Inherits VB_Parent
-    Public colorMap As New cv.Mat
+    Public colorMap As cv.Mat
     Public Sub New()
         labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
-        Dim cMapDir As New DirectoryInfo(task.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
-        Dim str = cMapDir.FullName + "/colorscale_" + task.gOptions.Palettes.Text + ".jpg"
-        Dim mapFile As New FileInfo(str)
-        Dim tmp = cv.Cv2.ImRead(mapFile.FullName)
+        If standalone Then
+            Dim cMapDir As New DirectoryInfo(task.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
+            Dim str = cMapDir.FullName + "/colorscale_" + task.gOptions.Palettes.Text + ".jpg"
+            Dim mapFile As New FileInfo(str)
+            Dim tmp = cv.Cv2.ImRead(mapFile.FullName)
 
-        colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, tmp.Data).Clone
-        desc = "Apply only the requested color map - which should be provided."
+            colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, tmp.Data).Clone
+        End If
+        desc = "Apply the provided color map to the input image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        If colorMap Is Nothing Then
+            SetTrueText("With " + traceName + " the colorMap must be provided.  Update the ColorMap Mat and then call Run(src)...")
+            Exit Sub
+        End If
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If src.Type = cv.MatType.CV_32F Then
             src = GetNormalize32f(src)
             src.ConvertTo(src, cv.MatType.CV_8U)
