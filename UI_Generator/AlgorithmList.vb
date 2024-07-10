@@ -86,6 +86,7 @@ Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	if algorithmName = "AlphaChannel_Basics" Then return new AlphaChannel_Basics
 	if algorithmName = "Annealing_Basics_CPP" Then return new Annealing_Basics_CPP
 	if algorithmName = "Annealing_MultiThreaded_CPP" Then return new Annealing_MultiThreaded_CPP
+	if algorithmName = "Anyname_CPP" Then return new Anyname_CPP
 	if algorithmName = "ApproxPoly_Basics" Then return new ApproxPoly_Basics
 	if algorithmName = "ApproxPoly_FindandDraw" Then return new ApproxPoly_FindandDraw
 	if algorithmName = "ApproxPoly_Hull" Then return new ApproxPoly_Hull

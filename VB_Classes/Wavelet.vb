@@ -7,8 +7,8 @@ Imports CS_Classes
 '        labels = {"", "", "Input image after wavelet transform", "Input image restored from the wavelet transform"}
 '        desc = "Accord: perform the wavelet transform on the input image."
 '    End Sub
-'    Public Sub RunVB(src as cv.Mat)
-'        Options.RunVB()
+'    Public Sub RunVB(src As cv.Mat)
+'        options.RunVB()
 
 '        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(New cv.Size(512, 512))
 '        Dim Bitmap = cv.Extensions.BitmapConverter.ToBitmap(src)

@@ -135,7 +135,7 @@ Module UI_GeneratorMain
         For Each fileName In fileNames
             If fileName.EndsWith(".py") And fileName.Contains("__init") = False Then
                 Dim fileinfo As New FileInfo(fileName)
-                sortedNames.Add(fileinfo.Name, sIndex)
+                If sortedNames.Keys.Contains(fileinfo.Name) = False Then sortedNames.Add(fileinfo.Name, sIndex)
                 sIndex += 1
                 fileName = fileinfo.FullName
             Else
@@ -152,7 +152,7 @@ Module UI_GeneratorMain
                                     If fileline.EndsWith(" : Inherits VB_Parent") Then className = split(2)
                                 End If
                                 If LCase(fileline).StartsWith("public sub new(") And sortedNames.ContainsKey(className) = False Then
-                                    sortedNames.Add(className, sIndex)
+                                    If sortedNames.Keys.Contains(className) = False Then sortedNames.Add(className, sIndex)
                                     sIndex += 1
                                 End If
                             End If
