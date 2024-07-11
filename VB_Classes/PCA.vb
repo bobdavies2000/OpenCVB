@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Drawing
 
 ' You can find the main direction of a series of points using principal component analysis ‘(PCA).
 ' PCA is a statistical technique that can be used to find the directions of greatest variance in a dataset.
@@ -272,7 +273,18 @@ End Class
 
 
 ' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
-Module PCAModule
+Public Class PCA_NColorOriginal : Inherits VB_Parent
+    Dim custom As New Palette_CustomColorMap
+    Dim options As New Options_PCA_NColor
+    Dim palette(256 * 3) As Byte
+    Dim rgb(dst2.Total * dst2.ElemSize - 1) As Byte
+    Dim answer(dst2.Width * dst2.Height - 1) As Byte
+    Dim buff(dst2.Width * dst2.Height * 3 - 1) As Byte
+    Public Sub New()
+        custom.colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3)
+        labels = {"", "", "Original BGR image is above and the palettized CV_8U image is below", ""}
+        desc = "Use PCA to build a palettized CV_8U image from the input using a palette."
+    End Sub
     <StructLayout(LayoutKind.Sequential)>
     Public Structure paletteEntry
         Public start As Integer
@@ -282,22 +294,22 @@ Module PCAModule
         Public blue As Byte
         Public ErrorVal As Double
     End Structure
-    ' Colour difference function
-    Function CDiff(ByVal a As Byte(), start As Integer, ByVal b As Byte(), startPal As Integer) As Double
-        Return (CInt(a(start + 0)) - CInt(b(startPal + 0))) * (CInt(a(start + 0)) - CInt(b(startPal + 0))) * 5 +
-               (CInt(a(start + 1)) - CInt(b(startPal + 1))) * (CInt(a(start + 1)) - CInt(b(startPal + 1))) * 8 +
-               (CInt(a(start + 2)) - CInt(b(startPal + 2))) * (CInt(a(start + 2)) - CInt(b(startPal + 2))) * 2
+    ' color difference function
+    Function CDiff(start As Integer, startPal As Integer) As Double
+        Return (CInt(rgb(start + 0)) - CInt(palette(startPal + 0))) * (CInt(rgb(start + 0)) - CInt(palette(startPal + 0))) * 5 +
+               (CInt(rgb(start + 1)) - CInt(palette(startPal + 1))) * (CInt(rgb(start + 1)) - CInt(palette(startPal + 1))) * 8 +
+               (CInt(rgb(start + 2)) - CInt(palette(startPal + 2))) * (CInt(rgb(start + 2)) - CInt(palette(startPal + 2))) * 2
     End Function
     ' Convert an image to indexed form, using passed-in palette
-    Function RgbToIndex(rgb As Byte(), width As Integer, height As Integer, pal As Byte(), nColor As Integer) As Byte()
-        Dim answer(width * height - 1) As Byte
+    Function RgbToIndex(nColor As Integer) As Byte()
 
-        For i = 0 To width * height - 1
-            Dim best = CDiff(rgb, i * 3, pal, 0)
+        For i = 0 To dst2.Total - 1
+            Dim best = CDiff(i * 3, 0)
             Dim bestii = 0
 
             For ii = 1 To nColor - 1
-                Dim nextError = CDiff(rgb, i * 3, pal, ii * 3)
+                Dim nextError = CDiff(i * 3, ii * 3)
+
                 If nextError < best Then
                     best = nextError
                     bestii = ii
@@ -310,18 +322,15 @@ Module PCAModule
         Return answer
     End Function
 
-    Public Function MakePalette(rgb As Byte(), width As Integer, height As Integer, nColors As Integer) As Byte()
-        Dim buff(width * height * 3 - 1) As Byte
+    Public Function MakePalette(nColors As Integer) As Byte()
         Dim entry(nColors - 1) As paletteEntry
         Dim best As Double
         Dim bestii As Integer
         Dim i, ii As Integer
         Dim pal(256 * 3 - 1) As Byte
 
-        Array.Copy(rgb, buff, width * height * 3)
-
         entry(0).start = 0
-        entry(0).nCount = width * height
+        entry(0).nCount = dst2.Total
         CalcError(entry(0), buff)
 
         For i = 1 To nColors - 1
@@ -345,9 +354,9 @@ Module PCAModule
     End Function
 
     Public Sub CalcError(ByRef entry As paletteEntry, ByRef buff() As Byte)
-        entry.red = CByte(MeanColour(buff, entry.start * 3, entry.nCount, 0))
-        entry.green = CByte(MeanColour(buff, entry.start * 3, entry.nCount, 1))
-        entry.blue = CByte(MeanColour(buff, entry.start * 3, entry.nCount, 2))
+        entry.red = CByte(Meancolor(entry.start * 3, entry.nCount, 0))
+        entry.green = CByte(Meancolor(entry.start * 3, entry.nCount, 1))
+        entry.blue = CByte(Meancolor(entry.start * 3, entry.nCount, 2))
         entry.ErrorVal = 0
 
         For i = 0 To entry.nCount - 1
@@ -357,7 +366,7 @@ Module PCAModule
         Next
     End Sub
 
-    Public Function MeanColour(rgb As Byte(), start As Integer, nnCount As Integer, index As Integer) As Double
+    Public Function Meancolor(start As Integer, nnCount As Integer, index As Integer) As Double
         If nnCount = 0 Then Return 0
         Dim answer As Double = 0
         For i = 0 To nnCount - 1
@@ -370,7 +379,7 @@ Module PCAModule
     ' Params: ret - return for components of major axis of variance
     '         pixels - the pixels
     '         nnCount - count of pixels
-    Sub PCA(ByRef ret As Double(), pixels As Byte(), start As Integer, nnCount As Integer)
+    Sub PCA(ByRef ret As Double(), start As Integer, nnCount As Integer)
         Dim cov(2, 2) As Double
         Dim mu(2) As Double
         Dim i, j, k As Integer
@@ -379,7 +388,7 @@ Module PCAModule
         Dim v(2, 2) As Double
 
         For i = 0 To 2
-            mu(i) = MeanColour(pixels, start, nnCount, i)
+            mu(i) = Meancolor(start, nnCount, i)
         Next
 
         ' Calculate 3x3 channel covariance matrix
@@ -387,7 +396,7 @@ Module PCAModule
             For j = 0 To i
                 var = 0
                 For k = 0 To nnCount - 1
-                    var += (pixels(start + k * 3 + i) - mu(i)) * (pixels(start + k * 3 + j) - mu(j))
+                    var += (rgb(start + k * 3 + i) - mu(i)) * (rgb(start + k * 3 + j) - mu(j))
                 Next
                 cov(i, j) = var / nnCount
                 cov(j, i) = var / nnCount
@@ -400,7 +409,7 @@ Module PCAModule
         ret(1) = v(1, 2)
         ret(2) = v(2, 2)
     End Sub
-    Function Project(rgb As Byte(), start As Integer, comp As Double()) As Integer
+    Function Project(start As Integer, comp As Double()) As Integer
         Return CInt(rgb(start) * comp(0) + rgb(start + 1) * comp(1) + rgb(start + 2) * comp(2))
     End Function
     ''' <summary>
@@ -417,14 +426,14 @@ Module PCAModule
         Dim temp As Byte
         Dim i As Integer
 
-        PCA(comp, buff, (entry.start * 3), entry.nCount)
+        PCA(comp, (entry.start * 3), entry.nCount)
         cut = GetOtsuThreshold2(buff, (entry.start * 3), entry.nCount, comp)
 
         While low < high
-            While low < high AndAlso Project(buff, ((entry.start + low) * 3), comp) < cut
+            While low < high AndAlso Project(((entry.start + low) * 3), comp) < cut
                 low += 1
             End While
-            While low < high AndAlso Project(buff, ((entry.start + high) * 3), comp) >= cut
+            While low < high AndAlso Project(((entry.start + high) * 3), comp) >= cut
                 high -= 1
             End While
             If low < high Then
@@ -768,31 +777,14 @@ Module PCAModule
     Function Hypot(a As Double, b As Double) As Double
         Return Math.Sqrt(a * a + b * b)
     End Function
-End Module
-
-
-
-
-
-
-Public Class PCA_NColorOriginal : Inherits VB_Parent
-    Dim custom As New Palette_CustomColorMap
-    Dim options As New Options_PCA_NColor
-    Public Sub New()
-        custom.colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3)
-        labels = {"", "", "Original BGR image is above and the palettized CV_8U image is below", ""}
-        desc = "Use PCA to build a palettized CV_8U image from the input using a palette."
-    End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Static palette(256 * 3) As Byte
-
-        Dim rgb(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)
+        Marshal.Copy(src.Data, buff, 0, buff.Length)
 
-        If task.heartBeat Then palette = MakePalette(rgb, dst2.Width, dst2.Height, options.desiredNcolors)
-        Dim paletteImage = RgbToIndex(rgb, dst1.Width, dst1.Height, palette, options.desiredNcolors)
+        If task.heartBeat Then palette = MakePalette(options.desiredNcolors)
+        Dim paletteImage = RgbToIndex(options.desiredNcolors)
         Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length)
 
