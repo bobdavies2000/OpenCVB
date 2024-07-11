@@ -1495,6 +1495,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "PCA_NColor" Then return new PCA_NColor
 	if algorithmName = "PCA_NColor_CPP" Then return new PCA_NColor_CPP
 	if algorithmName = "PCA_NColor1" Then return new PCA_NColor1
+	if algorithmName = "PCA_NColorOriginal" Then return new PCA_NColorOriginal
 	if algorithmName = "PCA_Palettize" Then return new PCA_Palettize
 	if algorithmName = "PCA_Prep_CPP" Then return new PCA_Prep_CPP
 	if algorithmName = "PCA_Reconstruct" Then return new PCA_Reconstruct
