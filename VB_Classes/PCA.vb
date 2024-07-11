@@ -791,7 +791,7 @@ Public Class PCA_NColorOriginal : Inherits VB_Parent
         Dim rgb(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)
 
-        palette = MakePalette(rgb, dst2.Width, dst2.Height, options.desiredNcolors)
+        If task.heartBeat Then palette = MakePalette(rgb, dst2.Width, dst2.Height, options.desiredNcolors)
         Dim paletteImage = RgbToIndex(rgb, dst1.Width, dst1.Height, palette, options.desiredNcolors)
         Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length)
@@ -810,78 +810,47 @@ End Class
 
 
 
-'//#include <cstdlib>
-'//#include <cstdio>
-'//#include <iostream>
-'//#include <algorithm>
-'//#include <opencv2/core.hpp>
-'//#include <opencv2/imgproc.hpp>
-'//#include <opencv2/highgui.hpp>
 
-'//using namespace std;
-'//using namespace cv;
-'//class Anyname
-'//{
-'//private:
-'//public:
-'//    Mat src, dst;
-'//    Anyname(){}
-'//    void RunCPP() {
-'//        dst = src.clone();
-'//    }
-'//};
-
-'//extern "C" __declspec(dllexport)
-'//Anyname *Anyname_Open() {
-'//    Anyname *cPtr = new Anyname();
-'//    return cPtr;
-'//}
-
-'//extern "C" __declspec(dllexport)
-'//void Anyname_Close(Anyname *cPtr)
-'//{
-'//    delete cPtr;
-'//}
-
-'//extern "C" __declspec(dllexport)
-'//int *Anyname_RunCPP(Anyname *cPtr, int *dataPtr, int rows, int cols, int channels)
-'//{
-'//		cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, dataPtr);
-'//		cPtr->RunCPP();
-'//		return (int *) cPtr->dst.data; 
-'//}
-
-Public Class Anyname_CPP : Inherits VB_Parent
+' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
+Public Class PCA_NColorOriginal_CPP : Inherits VB_Parent
+    Dim custom As New Palette_CustomColorMap
+    Dim options As New Options_PCA_NColor
     Public Sub New()
-        cPtr = Anyname_Open()
-        labels = {"", "", "Grayscale image of src", "dst3Label"}
-        UpdateAdvice(traceName + ": <place advice here on any options that are useful>")
-        desc = "description"
+        cPtr = PCA_NColorOriginal_Open()
+        labels = {"", "", "Palettized (CV_8U) version of color image.", ""}
+        desc = "Create a faster version of the PCA_NColor algorithm."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        options.RunVB()
 
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = Anyname_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        Dim imagePtr = PCA_NColorOriginal_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.desiredNcolors)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, If(src.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr).Clone
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+        custom.colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, PCA_NColorOriginal_Palette(cPtr))
+
+        custom.Run(dst2)
+        dst3 = custom.dst2
     End Sub
     Public Sub Close()
-        Anyname_Close(cPtr)
+        PCA_NColorOriginal_Close(cPtr)
     End Sub
 End Class
 
-Module Anyname_CPP_Module
+Module PCA_NColorOriginal_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Anyname_Open() As IntPtr
+    Public Function PCA_NColorOriginal_Open() As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Anyname_Close(cPtr As IntPtr)
+    Public Sub PCA_NColorOriginal_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Anyname_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
+    Public Function PCA_NColorOriginal_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, desiredNcolors As Integer) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function PCA_NColorOriginal_Palette(cPtr As IntPtr) As IntPtr
     End Function
 End Module

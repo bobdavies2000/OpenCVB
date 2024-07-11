@@ -5891,7 +5891,7 @@ End Class
 Public Class Options_PCA_NColor : Inherits VB_Parent
     Public desiredNcolors As Integer
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired number of colors", 1, 256, 256)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired number of colors", 1, 256, 8)
     End Sub
     Public Sub RunVB()
         Static nSlider = FindSlider("Desired number of colors")

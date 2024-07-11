@@ -86,7 +86,6 @@ Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	if algorithmName = "AlphaChannel_Basics" Then return new AlphaChannel_Basics
 	if algorithmName = "Annealing_Basics_CPP" Then return new Annealing_Basics_CPP
 	if algorithmName = "Annealing_MultiThreaded_CPP" Then return new Annealing_MultiThreaded_CPP
-	if algorithmName = "Anyname_CPP" Then return new Anyname_CPP
 	if algorithmName = "ApproxPoly_Basics" Then return new ApproxPoly_Basics
 	if algorithmName = "ApproxPoly_FindandDraw" Then return new ApproxPoly_FindandDraw
 	if algorithmName = "ApproxPoly_Hull" Then return new ApproxPoly_Hull
@@ -1494,6 +1493,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "PCA_Depth" Then return new PCA_Depth
 	if algorithmName = "PCA_DrawImage" Then return new PCA_DrawImage
 	if algorithmName = "PCA_NColorOriginal" Then return new PCA_NColorOriginal
+	if algorithmName = "PCA_NColorOriginal_CPP" Then return new PCA_NColorOriginal_CPP
 	if algorithmName = "PCA_Prep_CPP" Then return new PCA_Prep_CPP
 	if algorithmName = "PCA_Reconstruct" Then return new PCA_Reconstruct
 	if algorithmName = "Pendulum_Basics" Then return new Pendulum_Basics

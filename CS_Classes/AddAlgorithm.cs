@@ -2,7 +2,7 @@
   
 namespace CS_Classes
 {
-    public class AnyName
+    public class PCA_NColor
     {
         public Mat RunCS(Mat img1)
         {

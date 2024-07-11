@@ -32,6 +32,7 @@
     <ClCompile Include="CPP_IncludeOnly.cpp" />
     <ClCompile Include="Dither.cpp" />
     <ClCompile Include="ParticleFilter.cpp" />
+    <ClCompile Include="PCA.cpp" />
     <ClCompile Include="recursiveBilateralFilter.cpp" />
     <ClCompile Include="Retina.cpp" />
     <ClCompile Include="Salience.cpp" />

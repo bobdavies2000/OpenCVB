@@ -10,6 +10,7 @@
     <ClCompile Include="Voronoi.cpp" />
     <ClCompile Include="CPP_IncludeOnly.cpp" />
     <ClCompile Include="Tracker.cpp" />
+    <ClCompile Include="PCA.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPP_Externs.h" />
