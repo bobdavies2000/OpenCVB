@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Drawing
+Imports System.Drawing.Imaging
 
 ' You can find the main direction of a series of points using principal component analysis ‘(PCA).
 ' PCA is a statistical technique that can be used to find the directions of greatest variance in a dataset.
@@ -273,16 +274,15 @@ End Class
 
 
 ' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
-Public Class PCA_NColorOriginal : Inherits VB_Parent
+Public Class PCA_NColor : Inherits VB_Parent
     Dim custom As New Palette_CustomColorMap
-    Dim options As New Options_PCA_NColor
-    Dim palette(256 * 3) As Byte
-    Dim rgb(dst2.Total * dst2.ElemSize - 1) As Byte
+    Public options As New Options_PCA_NColor
+    Public palette(256 * 3) As Byte
+    Public rgb(dst2.Total * dst2.ElemSize - 1) As Byte
     Dim answer(dst2.Width * dst2.Height - 1) As Byte
-    Dim buff(dst2.Width * dst2.Height * 3 - 1) As Byte
+    Public buff(dst2.Width * dst2.Height * 3 - 1) As Byte
     Public Sub New()
         custom.colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3)
-        labels = {"", "", "Original BGR image is above and the palettized CV_8U image is below", ""}
         desc = "Use PCA to build a palettized CV_8U image from the input using a palette."
     End Sub
     <StructLayout(LayoutKind.Sequential)>
@@ -294,7 +294,6 @@ Public Class PCA_NColorOriginal : Inherits VB_Parent
         Public blue As Byte
         Public ErrorVal As Double
     End Structure
-    ' color difference function
     Function CDiff(start As Integer, startPal As Integer) As Double
         Return (CInt(rgb(start + 0)) - CInt(palette(startPal + 0))) * (CInt(rgb(start + 0)) - CInt(palette(startPal + 0))) * 5 +
                (CInt(rgb(start + 1)) - CInt(palette(startPal + 1))) * (CInt(rgb(start + 1)) - CInt(palette(startPal + 1))) * 8 +
@@ -303,26 +302,29 @@ Public Class PCA_NColorOriginal : Inherits VB_Parent
     ' Convert an image to indexed form, using passed-in palette
     Function RgbToIndex(nColor As Integer) As Byte()
 
-        For i = 0 To dst2.Total - 1
-            Dim best = CDiff(i * 3, 0)
+        For i = 0 To dst2.Total * dst2.ElemSize - 3 Step 3
+            Dim best = CDiff(i, 0)
             Dim bestii = 0
 
-            For ii = 1 To nColor - 1
-                Dim nextError = CDiff(i * 3, ii * 3)
+            For ii = 1 To nColor * 3 - 3 Step 3
+                Dim nextError = CDiff(i, ii)
 
                 If nextError < best Then
                     best = nextError
-                    bestii = ii
+                    bestii = ii / 3
                 End If
             Next
 
-            answer(i) = CByte(bestii)
+            answer(i / 3) = CByte(bestii)
         Next
 
         Return answer
     End Function
 
-    Public Function MakePalette(nColors As Integer) As Byte()
+    Public Function MakePalette(src As cv.Mat, nColors As Integer) As Byte()
+        Marshal.Copy(src.Data, rgb, 0, rgb.Length)
+        Marshal.Copy(src.Data, buff, 0, buff.Length)
+
         Dim entry(nColors - 1) As paletteEntry
         Dim best As Double
         Dim bestii As Integer
@@ -346,7 +348,7 @@ Public Class PCA_NColorOriginal : Inherits VB_Parent
         Next
 
         For i = 0 To nColors - 1
-            pal(i * 3) = entry(i).red
+            pal(i * 3 + 0) = entry(i).red
             pal(i * 3 + 1) = entry(i).green
             pal(i * 3 + 2) = entry(i).blue
         Next
@@ -773,30 +775,71 @@ Public Class PCA_NColorOriginal : Inherits VB_Parent
             End If
         Next
     End Sub
-
     Function Hypot(a As Double, b As Double) As Double
         Return Math.Sqrt(a * a + b * b)
     End Function
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Marshal.Copy(src.Data, rgb, 0, rgb.Length)
-        Marshal.Copy(src.Data, buff, 0, buff.Length)
-
-        If task.heartBeat Then palette = MakePalette(options.desiredNcolors)
+        palette = MakePalette(src, options.desiredNcolors)
         Dim paletteImage = RgbToIndex(options.desiredNcolors)
+
         Dim img8u = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length)
 
         Marshal.Copy(palette, 0, custom.colorMap.Data, palette.Length)
         custom.Run(img8u)
-        dst2 = custom.dst2.Clone
+        dst2 = custom.dst2
 
-        task.palette.Run(img8u * 256 / options.desiredNcolors)
-        dst3 = task.palette.dst2
+        Dim tmp = New cv.Mat(256, 1, cv.MatType.CV_8UC3, palette)
+        Dim paletteCount = tmp.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
+
+        If standaloneTest() Then
+            task.palette.Run(img8u * 256 / options.desiredNcolors)
+            dst3 = task.palette.dst2
+            labels(3) = "dst2 is palettized using global palette option: " + task.gOptions.Palettes.Text
+        End If
+
+        labels(2) = "The image above is mapped to " + CStr(paletteCount) + " colors below."
     End Sub
 End Class
 
+
+Module PCA_NColor_CPP_Module
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function PCA_NColor_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub PCA_NColor_Close(cPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function PCA_NColor_RunCPP(cPtr As IntPtr, imagePtr As IntPtr, palettePtr As IntPtr, rows As Integer, cols As Integer, desiredNcolors As Integer) As IntPtr
+    End Function
+End Module
+
+
+
+
+
+' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
+Public Class PCA_Palettize : Inherits VB_Parent
+    Public nColor As New PCA_NColor
+    Public palette As Byte()
+    Public Sub New()
+        FindSlider("Desired number of colors").Value = 256
+        desc = "Create a palette for the input image but don't use it."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        nColor.options.RunVB()
+
+        palette = nColor.MakePalette(src, nColor.options.desiredNcolors)
+        Dim tmp = New cv.Mat(256, 1, cv.MatType.CV_8UC3, palette)
+        Dim paletteCount = tmp.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
+        dst2 = tmp.Resize(dst2.Size)
+        labels(2) = "The palette found from the current image (repeated across the image) with " + CStr(paletteCount) + " entries"
+        SetTrueText("Palettes with less then 256 entries are produced when the image has fewer than 256 colors.")
+    End Sub
+End Class
 
 
 
@@ -804,45 +847,85 @@ End Class
 
 
 ' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
-Public Class PCA_NColorOriginal_CPP : Inherits VB_Parent
+Public Class PCA_NColor_CPP : Inherits VB_Parent
     Dim custom As New Palette_CustomColorMap
-    Dim options As New Options_PCA_NColor
+    Dim palettize As New PCA_Palettize
     Public Sub New()
-        cPtr = PCA_NColorOriginal_Open()
+        cPtr = PCA_NColor_Open()
         labels = {"", "", "Palettized (CV_8U) version of color image.", ""}
         desc = "Create a faster version of the PCA_NColor algorithm."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
+        palettize.Run(src) ' get the palette in VB.Net
 
-        Dim cppData(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
-        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = PCA_NColorOriginal_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.desiredNcolors)
+        Dim handleSrc = GCHandle.Alloc(palettize.nColor.rgb, GCHandleType.Pinned)
+        Dim handlePalette = GCHandle.Alloc(palettize.palette, GCHandleType.Pinned)
+        Dim imagePtr = PCA_NColor_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), handlePalette.AddrOfPinnedObject(), src.Rows, src.Cols, palettize.nColor.options.desiredNcolors)
+        handlePalette.Free()
         handleSrc.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
-        custom.colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, PCA_NColorOriginal_Palette(cPtr))
+        custom.colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, palettize.palette)
 
         custom.Run(dst2)
         dst3 = custom.dst2
     End Sub
     Public Sub Close()
-        PCA_NColorOriginal_Close(cPtr)
+        PCA_NColor_Close(cPtr)
     End Sub
 End Class
 
-Module PCA_NColorOriginal_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function PCA_NColorOriginal_Open() As IntPtr
+
+
+
+
+
+' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
+Public Class PCA_NColor1 : Inherits VB_Parent
+    Dim custom As New Palette_CustomColorMap
+    Dim palettize As New PCA_Palettize
+    Public palette() As Byte
+    Public rgb() As Byte
+    Dim answer(dst2.Width * dst2.Height - 1) As Byte
+    Function CDiff(start As Integer, startPal As Integer) As Double
+        Return (CInt(rgb(start + 0)) - CInt(palette(startPal + 0))) * (CInt(rgb(start + 0)) - CInt(palette(startPal + 0))) * 5 +
+               (CInt(rgb(start + 1)) - CInt(palette(startPal + 1))) * (CInt(rgb(start + 1)) - CInt(palette(startPal + 1))) * 8 +
+               (CInt(rgb(start + 2)) - CInt(palette(startPal + 2))) * (CInt(rgb(start + 2)) - CInt(palette(startPal + 2))) * 2
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub PCA_NColorOriginal_Close(cPtr As IntPtr)
+    Function RgbToIndex(nColor As Integer) As Byte()
+        For i = 0 To dst1.Total * dst1.ElemSize - 3 Step 3
+            Dim best = CDiff(i, 0)
+            Dim bestii = 0
+
+            For ii = 1 To nColor * 3 - 3 Step 3
+                Dim nextError = CDiff(i, ii)
+
+                If nextError < best Then
+                    best = nextError
+                    bestii = ii / 3
+                End If
+            Next
+
+            answer(i / 3) = CByte(bestii)
+        Next
+
+        Return answer
+    End Function
+    Public Sub New()
+        FindSlider("Desired number of colors").Value = 256
+        desc = "Create a faster version of the PCA_NColor algorithm."
     End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function PCA_NColorOriginal_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, desiredNcolors As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function PCA_NColorOriginal_Palette(cPtr As IntPtr) As IntPtr
-    End Function
-End Module
+    Public Sub RunVB(src As cv.Mat)
+        Static nColorSlider = FindSlider("Desired number of colors")
+        If task.heartBeat Then palettize.Run(src) ' get the palette in VB.Net which is very fast.
+        rgb = palettize.nColor.rgb
+        palette = palettize.palette
+        Dim paletteImage = RgbToIndex(nColorSlider.value)
+
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, paletteImage).Clone
+        custom.colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, palette)
+
+        custom.Run((dst2 * 255 / nColorSlider.value).toMat)
+        dst3 = custom.dst2
+    End Sub
+End Class
