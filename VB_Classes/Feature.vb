@@ -6,7 +6,7 @@ Public Class Feature_Basics : Inherits VB_Parent
     Dim knn As New KNN_Core
     Dim ptLost As New List(Of cv.Point2f)
     Dim gather As New Feature_Gather
-    Dim featureMat As New List(Of cv.Mat)
+    Dim featureMatList As New List(Of cv.Mat)
     Public options As New Options_Features
     Public Sub New()
         task.features.Clear() ' in case it was previously in use...
@@ -21,28 +21,28 @@ Public Class Feature_Basics : Inherits VB_Parent
 
         If task.optionsChanged Then
             task.features.Clear()
-            featureMat.Clear()
+            featureMatList.Clear()
         End If
 
         matList.Clear()
         ptList.Clear()
         Dim correlationMat As New cv.Mat
-        For i = 0 To Math.Min(featureMat.Count, task.features.Count) - 1
+        For i = 0 To Math.Min(featureMatList.Count, task.features.Count) - 1
             Dim pt = task.features(i)
-            Dim rect = ValidateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMat(i).Width, featureMat(i).Height))
+            Dim rect = ValidateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMatList(i).Width, featureMatList(i).Height))
             If gather.ptList.Contains(pt) = False Then
-                cv.Cv2.MatchTemplate(src(rect), featureMat(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                cv.Cv2.MatchTemplate(src(rect), featureMatList(i), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                 If correlationMat.Get(Of Single)(0, 0) < options.correlationMin Then
                     Dim ptNew = New cv.Point2f(CInt(pt.X), CInt(pt.Y))
                     If ptLost.Contains(ptNew) = False Then ptLost.Add(ptNew)
                     Continue For
                 End If
             End If
-            matList.Add(featureMat(i))
+            matList.Add(featureMatList(i))
             ptList.Add(pt)
         Next
 
-        featureMat = New List(Of cv.Mat)(matList)
+        featureMatList = New List(Of cv.Mat)(matList)
         task.features = New List(Of cv.Point2f)(ptList)
 
         Dim extra = 1 + (1 - options.resyncThreshold)
@@ -50,11 +50,11 @@ Public Class Feature_Basics : Inherits VB_Parent
 
         If task.features.Count < gather.features.Count * options.resyncThreshold Or task.features.Count > extra * gather.features.Count Then
             ptLost.Clear()
-            featureMat.Clear()
+            featureMatList.Clear()
             task.features.Clear()
             For Each pt In gather.features
                 Dim rect = ValidateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
-                featureMat.Add(src(rect))
+                featureMatList.Add(src(rect))
                 task.features.Add(pt)
             Next
         Else
@@ -66,7 +66,7 @@ Public Class Feature_Basics : Inherits VB_Parent
                 For i = 0 To knn.queries.Count - 1
                     Dim pt = knn.queries(i)
                     Dim rect = ValidateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, options.templateSize, options.templateSize))
-                    featureMat.Add(src(rect))
+                    featureMatList.Add(src(rect))
                     task.features.Add(knn.trainInput(knn.result(i, 0)))
                 Next
             Else

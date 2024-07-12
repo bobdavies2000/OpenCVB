@@ -88,7 +88,7 @@ Public Class OpenCVB
     Public algorithm_ms As New List(Of Single)
     Public algorithmNames As New List(Of String)
 
-    Const MAX_RECENT = 25
+    Const MAX_RECENT = 50
     Dim algHistory As New List(Of String)
     Dim arrowList As New List(Of String)
     Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem

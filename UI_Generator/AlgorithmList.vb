@@ -259,6 +259,7 @@ Public Function createVBAlgorithm( algorithmName as string) As VB_Parent
 	if algorithmName = "Clone_TextureFlattening" Then return new Clone_TextureFlattening
 	if algorithmName = "Cluster_Basics" Then return new Cluster_Basics
 	if algorithmName = "Cluster_Hulls" Then return new Cluster_Hulls
+	if algorithmName = "Cluster_RedCloud" Then return new Cluster_RedCloud
 	if algorithmName = "Coherence_Basics" Then return new Coherence_Basics
 	if algorithmName = "Coherence_Depth" Then return new Coherence_Depth
 	if algorithmName = "Color_Basics" Then return new Color_Basics

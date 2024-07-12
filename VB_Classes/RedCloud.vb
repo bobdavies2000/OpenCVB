@@ -30,6 +30,17 @@ Public Class RedCloud_Basics : Inherits VB_Parent
         dst2 = genCells.dst2
 
         labels(2) = genCells.labels(2)
+
+        dst3.SetTo(0)
+        Dim smallCellThreshold = src.Total / 1000
+        Dim cellCount As Integer
+        For Each rc In task.redCells
+            If rc.pixels > smallCellThreshold Then
+                DrawCircle(dst3, rc.maxDist, task.DotSize, task.HighlightColor)
+                cellCount += 1
+            End If
+        Next
+        labels(3) = CStr(cellCount) + " RedCloud cells with more than " + CStr(smallCellThreshold) + " pixels.  " + CStr(task.redCells.Count) + " cells present."
     End Sub
 End Class
 
