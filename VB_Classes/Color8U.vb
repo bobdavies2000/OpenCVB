@@ -3,7 +3,7 @@ Public Class Color8U_Basics : Inherits VB_Parent
     Public classCount As Integer
     Public classifier As Object
     Dim colorMethods() As Object = {New BackProject_Full, New BackProject2D_Full, New Bin4Way_Regions, New Binarize_DepthTiers, New FeatureLess_Groups,
-                                    New Hist3Dcolor_Basics, New KMeans_Basics, New LUT_Basics, New Reduction_Basics}
+                                    New Hist3Dcolor_Basics, New KMeans_Basics, New LUT_Basics, New Reduction_Basics, New PCA_NColor_CPP}
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         labels(3) = "vbPalette output of dst2 at left"
@@ -16,8 +16,12 @@ Public Class Color8U_Basics : Inherits VB_Parent
         If task.redOptions.colorInputName = "BackProject2D_Full" Then
             classifier.Run(src)
         Else
-            dst1 = If(src.Channels() = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
-            classifier.Run(dst1)
+            If task.redOptions.colorInputName <> "PCA_NColor_CPP" Then
+                dst1 = If(src.Channels() = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
+                classifier.Run(dst1)
+            Else
+                classifier.run(src)
+            End If
         End If
 
         If task.heartBeat Then

@@ -860,7 +860,7 @@ Public Class PCA_NColor : Inherits VB_Parent
             labels(3) = "dst2 is palettized using global palette option: " + task.gOptions.Palettes.Text
         End If
 
-        labels(2) = "The image above is mapped to " + CStr(paletteCount) + " colors below.  " + CStr(paletteCount) + " non-zero palette entries."
+        labels(2) = "The image above is mapped to " + CStr(paletteCount) + " colors below.  "
     End Sub
 End Class
 
@@ -874,27 +874,32 @@ Public Class PCA_NColor_CPP : Inherits VB_Parent
     Dim custom As New Palette_CustomColorMap
     Dim palettize As New PCA_Palettize
     Public rgb(dst1.Total * dst1.ElemSize - 1) As Byte
+    Public classCount As Integer
     Public Sub New()
         cPtr = PCA_NColor_Open()
         FindSlider("Desired number of colors").Value = 8
+        UpdateAdvice(traceName + ": Adjust the 'Desired number of colors' between 1 and 256")
         labels = {"", "", "Palettized (CV_8U) version of color image.", ""}
         desc = "Create a faster version of the PCA_NColor algorithm."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If task.heartBeat Then palettize.Run(src) ' get the palette in VB.Net
         Marshal.Copy(src.Data, rgb, 0, rgb.Length)
+        classCount = palettize.options.desiredNcolors
 
         Dim handleSrc = GCHandle.Alloc(rgb, GCHandleType.Pinned)
         Dim handlePalette = GCHandle.Alloc(palettize.palette, GCHandleType.Pinned)
-        Dim imagePtr = PCA_NColor_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), handlePalette.AddrOfPinnedObject(), src.Rows, src.Cols, palettize.options.desiredNcolors)
+        Dim imagePtr = PCA_NColor_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), handlePalette.AddrOfPinnedObject(), src.Rows, src.Cols, classCount)
         handlePalette.Free()
         handleSrc.Free()
 
-        Dim img8u = New cv.Mat(dst2.Height, dst2.Width, cv.MatType.CV_8U, imagePtr)
+        dst2 = New cv.Mat(dst2.Height, dst2.Width, cv.MatType.CV_8U, imagePtr)
         custom.colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, palettize.palette)
 
-        custom.Run(img8u)
-        dst2 = custom.dst2
+        custom.Run(dst2)
+        dst3 = custom.dst2
+        labels(2) = "The CV_8U image is below.  Values range from 0 to " + CStr(classCount)
+        labels(3) = "The upper left image is mapped to " + CStr(classCount) + " colors below.  "
     End Sub
     Public Sub Close()
         PCA_NColor_Close(cPtr)

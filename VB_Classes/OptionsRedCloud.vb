@@ -26,7 +26,7 @@ Public Class OptionsRedCloud
     Public identifyCount As Integer
     Public histBins3D As Integer
     Dim colorMethods() As String = {"BackProject_Full", "BackProject2D_Full", "Bin4Way_Regions", "Binarize_DepthTiers", "FeatureLess_Groups", "Hist3DColor_Basics",
-                                    "KMeans_Basics", "LUT_Basics", "Reduction_Basics"}
+                                    "KMeans_Basics", "LUT_Basics", "Reduction_Basics", "PCA_NColor_CPP"}
     Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
         Me.Text = "Options mostly for RedCloud_Basics but other related algorithms too."
