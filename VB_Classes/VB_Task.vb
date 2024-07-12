@@ -801,9 +801,8 @@ Public Class VBtask : Implements IDisposable
 
 
 
-
         'cMotion.Run(src)
-        If task.paused = False Then
+        If task.paused = False And src.Size = task.WorkingRes Then
             If task.algName.StartsWith("CS_") Then
                 csAlgorithmObject.trueData.clear()
                 csAlgorithmObject.RunCS(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested CS algorithm runs...
@@ -822,8 +821,7 @@ Public Class VBtask : Implements IDisposable
                 vbAlgorithmObject.processFrame(src.Clone)  ' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This is where the requested VB algorithm runs...
             End If
             task.FirstPass = False
+            postProcess(src)
         End If
-
-        postProcess(src)
     End Sub
 End Class
