@@ -109,6 +109,7 @@ Public Class Cluster_Hulls : Inherits VB_Parent
             hulls.Add(hull)
             If (hull.Count > 0) Then DrawContour(dst3, hull, cv.Scalar.White, task.lineWidth)
         Next
+        labels(3) = feat.labels(3)
     End Sub
 End Class
 

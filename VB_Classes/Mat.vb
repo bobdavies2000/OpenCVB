@@ -169,23 +169,18 @@ Public Class Mat_MultiplyReview : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         Dim a(,) = {{1, 4, 2}, {2, 5, 1}}
         Dim b(,) = {{3, 4, 2}, {3, 5, 7}, {1, 2, 1}}
-        Dim nextLine = ""
-        flow.msgs.Add("Matrix a")
+        flow.nextMsg = "Matrix a"
         For i = 0 To a.GetLength(0) - 1
-            nextLine = ""
             For j = 0 To a.GetLength(1) - 1
-                nextLine += CStr(a(i, j)) + vbTab
+                flow.nextMsg += CStr(a(i, j)) + vbTab
             Next
-            flow.msgs.Add(nextLine)
         Next
 
-        flow.msgs.Add("Matrix b")
+        flow.nextMsg += "Matrix b"
         For i = 0 To b.GetLength(0) - 1
-            nextLine = ""
             For j = 0 To b.GetLength(1) - 1
-                nextLine += CStr(b(i, j)) + vbTab
+                flow.nextMsg += CStr(b(i, j)) + vbTab
             Next
-            flow.msgs.Add(nextLine)
         Next
 
         Dim c(a.GetLength(0) - 1, a.GetLength(1) - 1) As Integer
@@ -201,13 +196,11 @@ Public Class Mat_MultiplyReview : Inherits VB_Parent
         Next
 
 
-        flow.msgs.Add("Matrix c = a X b")
+        flow.nextMsg += "Matrix c = a X b"
         For i = 0 To a.GetLength(0) - 1
-            nextLine = ""
             For j = 0 To a.GetLength(1) - 1
-                nextLine += CStr(c(i, j)) + " = " + input(i, j)
+                flow.nextMsg += CStr(c(i, j)) + " = " + input(i, j)
             Next
-            flow.msgs.Add(nextLine)
         Next
 
         flow.Run(empty)
@@ -252,13 +245,11 @@ Public Class Mat_Inverse : Inherits VB_Parent
         Next
 
         If standaloneTest() Or validateInverse Then
-            flow.msgs.Add("Matrix Input")
+            flow.nextMsg = "Matrix Input"
             For i = 0 To matrix.GetLength(0) - 1
-                nextline = ""
                 For j = 0 To matrix.GetLength(1) - 1
-                    nextline += CStr(matrix(i, j)) + vbTab
+                    flow.nextMsg += CStr(matrix(i, j)) + vbTab
                 Next
-                flow.msgs.Add(nextline)
             Next
         End If
 
@@ -266,24 +257,20 @@ Public Class Mat_Inverse : Inherits VB_Parent
         cv.Cv2.Invert(input, inverse, decompType)
 
         If standaloneTest() Or validateInverse Then
-            flow.msgs.Add("Matrix Inverse")
+            flow.nextMsg += "Matrix Inverse"
             For i = 0 To matrix.GetLength(0) - 1
-                nextline = ""
                 For j = 0 To matrix.GetLength(1) - 1
-                    nextline += CStr(inverse.Get(Of Single)(j, i)) + vbTab
+                    flow.nextMsg += CStr(inverse.Get(Of Single)(j, i)) + vbTab
                 Next
-                flow.msgs.Add(nextline)
             Next
 
             Dim identity = (input * inverse).ToMat
 
-            flow.msgs.Add("Verify Inverse is correct")
+            flow.nextMsg += "Verify Inverse is correct"
             For i = 0 To matrix.GetLength(0) - 1
-                nextline = ""
                 For j = 0 To matrix.GetLength(1) - 1
-                    nextline += CStr(identity.Get(Of Single)(j, i)) + vbTab
+                    flow.nextMsg += CStr(identity.Get(Of Single)(j, i)) + vbTab
                 Next
-                flow.msgs.Add(nextline)
             Next
         End If
 

@@ -238,3 +238,36 @@ Public Class Diff_Depth32f : Inherits VB_Parent
         End If
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Diff_Identical : Inherits VB_Parent
+    Dim diffColor As New Diff_Color
+    Dim noMotionFrames As Integer
+    Dim flowText As New List(Of String)
+    Public Sub New()
+        desc = "Count frames that are identical to the previous - a driver issue.  The interrupt is triggered by something other than an RGB image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        diffColor.Run(src)
+        dst2 = diffColor.dst2
+        If diffColor.diff.changedPixels = 0 Then noMotionFrames += 1
+
+        If task.heartBeat Then
+            labels(2) = CStr(noMotionFrames) + " frames since the last heartbeat with no motion " +
+                        " or " + Format(noMotionFrames / task.fpsRate, "0%")
+            flowText.Add(labels(2))
+            noMotionFrames = 0
+            If flowText.Count > 20 Then flowText.RemoveAt(0)
+            strOut = ""
+            For Each txt In flowText
+                strOut += txt + vbCrLf
+            Next
+        End If
+        SetTrueText(strOut, 3)
+    End Sub
+End Class

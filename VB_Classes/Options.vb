@@ -5801,7 +5801,7 @@ Public Class Options_Features : Inherits VB_Parent
     Public templatePad As Integer = 10
     Public templateSize As Integer
     Public correlationMin As Single = 0.75
-    Public resyncThreshold As Single = 0.75
+    Public resyncThreshold As Single = 0.95
     Public agastThreshold As Integer = 20
     Public useVertical As Boolean
     Public Sub New()

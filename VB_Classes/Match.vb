@@ -125,7 +125,7 @@ Public Class Match_RandomTest : Inherits VB_Parent
         If standaloneTest() Then
             dst2.SetTo(0)
             labels(2) = options.matchText + " for " + CStr(template.Cols) + " random test samples = " + Format(correlation, "#,##0.00")
-            flow.msgs.Add(options.matchText + " = " + Format(correlation, "#,##0.00"))
+            flow.nextMsg = options.matchText + " = " + Format(correlation, "#,##0.00")
             flow.Run(empty)
             SetTrueText("The expectation is that the " + CStr(template.Cols) + " random test samples should produce" + vbCrLf +
                         " a correlation coefficient near zero" + vbCrLf +

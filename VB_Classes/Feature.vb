@@ -8,8 +8,10 @@ Public Class Feature_Basics : Inherits VB_Parent
     Dim gather As New Feature_Gather
     Dim featureMatList As New List(Of cv.Mat)
     Public options As New Options_Features
+    Dim noMotionFrames As Single
     Public Sub New()
         task.features.Clear() ' in case it was previously in use...
+        FindSlider("Min Distance to next").Value = options.templatePad ' so we don't overlap adding work without benefit.
         desc = "Identify features with GoodFeaturesToTrack but manage them with MatchTemplate"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -46,9 +48,9 @@ Public Class Feature_Basics : Inherits VB_Parent
         task.features = New List(Of cv.Point2f)(ptList)
 
         Dim extra = 1 + (1 - options.resyncThreshold)
-        task.featureMotion = True
 
         If task.features.Count < gather.features.Count * options.resyncThreshold Or task.features.Count > extra * gather.features.Count Then
+            task.featureMotion = True
             ptLost.Clear()
             featureMatList.Clear()
             task.features.Clear()
@@ -69,9 +71,9 @@ Public Class Feature_Basics : Inherits VB_Parent
                     featureMatList.Add(src(rect))
                     task.features.Add(knn.trainInput(knn.result(i, 0)))
                 Next
-            Else
-                task.featureMotion = False
             End If
+            task.featureMotion = False
+            noMotionFrames += 1
         End If
 
         task.featurePoints.Clear()
@@ -82,6 +84,13 @@ Public Class Feature_Basics : Inherits VB_Parent
         If task.heartBeat Then
             labels(2) = CStr(task.features.Count) + "/" + CStr(matList.Count) + " features were matched to the previous frame using correlation and " +
                         CStr(ptLost.Count) + " features had to be relocated."
+        End If
+        If task.heartBeat Then
+            Dim percent = noMotionFrames / task.fpsRate
+            If percent > 1 Then percent = 1
+            labels(3) = CStr(noMotionFrames) + " frames since the last heartbeat with no motion " +
+                        " or " + Format(percent, "0%")
+            noMotionFrames = 0
         End If
     End Sub
 End Class
@@ -273,7 +282,7 @@ Public Class Feature_PointTracker : Inherits VB_Parent
             End If
         Next
         If standaloneTest() Then
-            flow.msgs.Add(strOut)
+            flow.nextMsg = strOut
             flow.Run(empty)
         End If
 

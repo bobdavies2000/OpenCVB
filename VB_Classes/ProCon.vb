@@ -32,7 +32,7 @@ Public Class ProCon_Basics : Inherits VB_Parent
                 head = success(head)
                 Dim item = options.buffer(head)
                 If item <> -1 Then
-                    flow.msgs.Add("Consumer: = " + CStr(item))
+                    flow.nextMsg = "Consumer: = " + CStr(item)
                     options.buffer(head) = -1
                 End If
             End SyncLock
@@ -45,7 +45,7 @@ Public Class ProCon_Basics : Inherits VB_Parent
             SyncLock mutex
                 tail = success(tail)
                 If options.buffer(tail) = -1 Then
-                    flow.msgs.Add("producer: = " + CStr(frameCount))
+                    flow.nextMsg = "producer: = " + CStr(frameCount)
                     options.buffer(tail) = frameCount
                     frameCount += 1
                 End If
@@ -93,7 +93,7 @@ Public Class ProCon_Variation : Inherits VB_Parent
         SyncLock procon.mutex
             procon.tail = procon.success(procon.tail)
             If procon.options.buffer(procon.tail) = -1 Then
-                procon.flow.msgs.Add("producer: = " + CStr(frameCount))
+                procon.flow.nextMsg = "producer: = " + CStr(frameCount)
                 procon.options.buffer(procon.tail) = frameCount
                 frameCount += 1
             End If

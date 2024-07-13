@@ -25,12 +25,9 @@ Public Class Crypto_Hash : Inherits VB_Parent
             Dim algorithm = MD5.Create()
             bytes = algorithm.ComputeHash(bytes)
 
-            guids.Add((New Guid(bytes)).ToString)
-            flow.msgs.Clear()
-            For i = 0 To guids.Count - 1
-                flow.msgs.Add(guids(i))
-            Next
-            If guids.Count >= 25 Then guids.RemoveAt(0)
+            flow.nextmsg = New Guid(bytes).ToString
+            If guids.Count >= flow.flowText.Count Then guids.RemoveAt(0)
+            guids.Add(flow.nextmsg)
             flow.Run(empty)
         End If
     End Sub

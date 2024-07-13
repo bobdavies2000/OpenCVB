@@ -192,9 +192,9 @@ Public Class DCT_Surfaces_debug : Inherits VB_Parent
                 If fitPoints.Count > 0 Then
                     Dim eq = fitDepthPlane(fitPoints)
                     If Single.IsNaN(eq(0)) = False Then
-                        flow.msgs.Add("a=" + Format(eq(0), fmt2) + " b=" + Format(eq(1), fmt2) + " c=" + Format(Math.Abs(eq(2)), fmt2) +
+                        flow.nextMsg = "a=" + Format(eq(0), fmt2) + " b=" + Format(eq(1), fmt2) + " c=" + Format(Math.Abs(eq(2)), fmt2) +
                               vbTab + "depth=" + Format(-eq(3), fmt2) + "m " + "roi(x,y) = " + Format(roi.X, "000") + "," +
-                              Format(roi.Y, "000") + vbTab + "Min=" + Format(minDepth, fmt1) + "m " + " Max=" + Format(maxDepth, fmt1) + "m")
+                              Format(roi.Y, "000") + vbTab + "Min=" + Format(minDepth, fmt1) + "m " + " Max=" + Format(maxDepth, fmt1) + "m"
                     End If
                 End If
             End If

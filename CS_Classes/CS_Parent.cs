@@ -4,11 +4,8 @@ using System.Linq;
 using VB_Classes;
 using cv = OpenCvSharp;
 using OpenCvSharp;
-using System.Windows.Forms;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Windows.Controls;
-using System.Threading.Tasks;
 
 namespace CS_Classes
 {

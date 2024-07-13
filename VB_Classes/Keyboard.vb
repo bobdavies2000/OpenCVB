@@ -13,12 +13,11 @@ Public Class Keyboard_Basics : Inherits VB_Parent
         keyInput = New List(Of String)(checkKeys.inputText)
         checkKeys.inputText.Clear()
         If standaloneTest() Then
-            Dim inputText As String = ""
+            flow.nextMsg = ""
             For i = 0 To keyInput.Count - 1
-                inputText += keyInput(i).ToString()
+                flow.nextMsg += keyInput(i).ToString()
             Next
-            If inputText <> "" Then flow.msgs.Add(inputText)
-            flow.Run(empty)
+            If flow.nextMsg <> "" Then flow.Run(empty)
         End If
     End Sub
 End Class

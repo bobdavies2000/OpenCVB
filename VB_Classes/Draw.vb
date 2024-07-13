@@ -302,7 +302,7 @@ Public Class Draw_ClipLine : Inherits VB_Parent
         pt1 = New cv.Point(r.X, r.Y)
         pt2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
         rect = initRandomRect(25)
-        If task.gOptions.UseKalman.Checked Then flow.msgs.Add("--------------------------- setup ---------------------------")
+        If task.gOptions.UseKalman.Checked Then flow.flowText.Add("--------------------------- setup ---------------------------")
     End Sub
     Public Sub New()
         setup()
@@ -323,7 +323,7 @@ Public Class Draw_ClipLine : Inherits VB_Parent
         dst3.Line(p1, p2, If(clipped, cv.Scalar.White, cv.Scalar.Black), task.lineWidth + 1, task.lineType)
         dst3.Rectangle(r, If(clipped, cv.Scalar.Yellow, cv.Scalar.Red), task.lineWidth + 1, task.lineType)
 
-        flow.msgs.Add("(" + CStr(linenum) + ") line " + If(clipped, "interects rectangle", "does not intersect rectangle"))
+        flow.nextMsg = "(" + CStr(linenum) + ") line " + If(clipped, "interects rectangle", "does not intersect rectangle")
         linenum += 1
 
         hitCount += If(clipped, 1, 0)

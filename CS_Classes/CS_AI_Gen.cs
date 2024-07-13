@@ -13,8 +13,6 @@ using static CS_Classes.CS_Externs;
 using OpenCvSharp.XImgProc;
 using System.IO;
 using System.Security.Cryptography;
-using System.Drawing;
-using System.Windows.Controls;
 
 namespace CS_Classes
 {
@@ -9775,14 +9773,14 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 }
 
                 guids.Add(new Guid(bytes).ToString());
-                flow.msgs.Clear();
+                flow.flowText.Clear();
 
                 for (int i = 0; i < guids.Count; i++)
                 {
-                    flow.msgs.Add(guids[i]);
+                    flow.flowText.Add(guids[i]);
                 }
 
-                if (guids.Count >= 25)
+                if (guids.Count >= flow.maxLines)
                 {
                     guids.RemoveAt(0);
                 }
@@ -10065,9 +10063,9 @@ public class CS_ApproxPoly_Basics : CS_Parent
                         var eq = fitDepthPlane(fitPoints);
                         if (!float.IsNaN(eq[0]))
                         {
-                            flow.msgs.Add($"a={eq[0]:F2} b={eq[1]:F2} c={Math.Abs(eq[2]):F2}\t" +
+                            flow.nextMsg = $"a={eq[0]:F2} b={eq[1]:F2} c={Math.Abs(eq[2]):F2}\t" +
                                           $"depth={-eq[3]:F2}m roi(x,y) = {roi.X:000},{roi.Y:000}\t" +
-                                          $"Min={minDepth:F1}m Max={maxDepth:F1}m");
+                                          $"Min={minDepth:F1}m Max={maxDepth:F1}m";
                         }
                     }
                 }
@@ -13401,7 +13399,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             pt1 = new cv.Point(r.X, r.Y);
             pt2 = new cv.Point(r.X + r.Width, r.Y + r.Height);
             rect = InitRandomRect(25);
-            if (task.gOptions.GetUseKalman()) flow.msgs.Add("--------------------------- setup ---------------------------");
+            if (task.gOptions.GetUseKalman()) flow.flowText.Add("--------------------------- setup ---------------------------");
         }
         public CS_Draw_ClipLine(VBtask task) : base(task)
         {
@@ -13421,7 +13419,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             bool clipped = Cv2.ClipLine(r, ref p1, ref p2); // Returns false when the line and the rectangle don't intersect.
             Cv2.Line(dst3, p1, p2, clipped ? Scalar.White : Scalar.Black, task.lineWidth + 1, task.lineType);
             Cv2.Rectangle(dst3, r, clipped ? Scalar.Yellow : Scalar.Red, task.lineWidth + 1, task.lineType);
-            flow.msgs.Add($"({linenum}) line {(clipped ? "intersects rectangle" : "does not intersect rectangle")}");
+            flow.nextMsg = $"({linenum}) line {(clipped ? "intersects rectangle" : "does not intersect rectangle")}";
             linenum++;
             hitCount += clipped ? 1 : 0;
             SetTrueText($"There were {hitCount:###,##0} intersects and {linenum - hitCount} misses",
@@ -15162,7 +15160,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             }
             if (standaloneTest())
             {
-                flow.msgs.Add(strOut);
+                flow.nextMsg = strOut;
                 flow.Run(empty);
             }
             labels[2] = $"Of the {task.features.Count} input points, {mPoints.ptx.Count} points were tracked with correlation above {correlationMin:F2}";
@@ -17727,8 +17725,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 }
                 dst3.SetTo(0);
                 arcList.Clear();
-                flow.msgs.Clear();
-                flow.msgs.Add("ID\tlength\tdistance");
+                flow.flowText.Clear();
+                flow.flowText.Add("ID\tlength\tdistance");
                 for (int i = 0; i < Math.Min(10, lines.sortedVerticals.Count); i++)
                 {
                     int index = lines.sortedVerticals.ElementAt(i).Value;
@@ -17744,7 +17742,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     {
                         float arcY = Math.Abs((float)(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958));
                         arcList.Add(arcY);
-                        flow.msgs.Add($"{arcY:F3}\t{len3D:F3}m\t{pt1.Z:F1}m");
+                        flow.flowText.Add($"{arcY:F3}\t{len3D:F3}m\t{pt1.Z:F1}m");
                     }
                 }
             }

@@ -42,13 +42,13 @@ End Class
 
 
 
-Public Class Font_FlowText : Inherits VB_Parent
+Public Class Font_FlowTextOld : Inherits VB_Parent
     Public msgs As New List(Of String)
     Public dst As Integer = RESULT_DST2
     Public Sub New()
         desc = "Show TrueType text flowing through an image."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
             msgs.Add("-------------------------------------------------------------------------------------------------------------------")
             msgs.Add("To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText()' to the class constructor.")
@@ -80,3 +80,40 @@ Public Class Font_FlowText : Inherits VB_Parent
 End Class
 
 
+
+
+
+
+
+
+
+Public Class Font_FlowText : Inherits VB_Parent
+    Public flowText As New List(Of String)
+    Public nextMsg As String
+    Public maxLines As Integer = 23
+    Public dst As Integer = RESULT_DST2
+    Public Sub New()
+        desc = "Show TrueType text flowing through an image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standaloneTest() Then
+            strOut = "-------------------------------------------------------------------------------------------------------------------"
+            strOut += "To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText()' to the class constructor."
+            strOut += "Also optionally indicate if you want result1 or result2 for text (the default is result1.)"
+            strOut += "Then in your Run method, add a line 'flow.msgs.add('your next line of text')' - for as many msgs as you need on each pass."
+            strOut += "Then at the end of your Run method, invoke flow.Run(empty)"
+            Exit Sub
+        End If
+
+        flowText.Add(nextMsg)
+        If flowText.Count > maxLines Then flowText.RemoveAt(0)
+
+        If task.heartBeat Then
+            strOut = ""
+            For i = 0 To Math.Min(maxLines, flowText.Count) - 1
+                strOut += flowText(i) + vbCrLf
+            Next
+        End If
+        setFlowText(strOut, dst)
+    End Sub
+End Class

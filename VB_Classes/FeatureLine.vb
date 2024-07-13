@@ -521,7 +521,7 @@ End Class
 
 Public Class FeatureLine_DetailsAll : Inherits VB_Parent
     Dim lines As New FeatureLine_Finder
-    Dim flow As New Font_FlowText
+    Dim flow As New Font_FlowTextOld
     Dim arcList As New List(Of Single)
     Dim arcLongAverage As New List(Of Single)
     Dim firstAverage As New List(Of Single)
@@ -542,7 +542,6 @@ Public Class FeatureLine_DetailsAll : Inherits VB_Parent
 
             dst3.SetTo(0)
             arcList.Clear()
-            flow.msgs.Clear()
             flow.msgs.Add("ID" + vbTab + "length" + vbTab + "distance")
             For i = 0 To Math.Min(10, lines.sortedVerticals.Count) - 1
                 Dim index = lines.sortedVerticals.ElementAt(i).Value

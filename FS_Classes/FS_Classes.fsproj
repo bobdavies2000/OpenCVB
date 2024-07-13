@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework> 
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WarnOn>3390;$(WarnOn)</WarnOn>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="FS_Parent.fs" />
+    <Compile Include="FS_AI_Gen.fs" />
+    <None Include="Script.fsx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VB_Classes\VB_Classes.vbproj" />
+  </ItemGroup>
+</Project>
