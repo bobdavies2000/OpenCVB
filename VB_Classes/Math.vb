@@ -103,6 +103,7 @@ Public Class Math_RGBCorrelation : Inherits VB_Parent
     Dim flow As New Font_FlowText
     Dim match As New Match_Basics
     Public Sub New()
+        flow.parentData = Me
         desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
     End Sub
     Public Sub RunVB(src as cv.Mat)

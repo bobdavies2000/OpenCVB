@@ -74,7 +74,7 @@ Public Class Font_FlowTextOld : Inherits VB_Parent
         For i = 0 To Math.Min(maxLines, msgs.Count) - 1
             strOut += msgs(i) + vbCrLf
         Next
-        setFlowText(strOut, dst)
+        SetTrueText(strOut, dst)
         If clearRequested Then msgs.Clear()
     End Sub
 End Class
@@ -92,28 +92,28 @@ Public Class Font_FlowText : Inherits VB_Parent
     Public nextMsg As String
     Public maxLines As Integer = 23
     Public dst As Integer = RESULT_DST2
+    Public parentData As VB_Parent
     Public Sub New()
         desc = "Show TrueType text flowing through an image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
-            strOut = "-------------------------------------------------------------------------------------------------------------------"
-            strOut += "To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText()' to the class constructor."
-            strOut += "Also optionally indicate if you want result1 or result2 for text (the default is result1.)"
-            strOut += "Then in your Run method, add a line 'flow.msgs.add('your next line of text')' - for as many msgs as you need on each pass."
-            strOut += "Then at the end of your Run method, invoke flow.Run(empty)"
-            Exit Sub
-        End If
+            strOut = "-------------------------------------------------------------------------------------------------------------------" + vbCrLf
+            strOut += "To get text to flow across an image in any algorithm, add Font_FlowText to your algorithm." + vbCrLf
+            strOut += "Also optionally indicate if you want result1 or result2 for text (the default is result1.)" + vbCrLf
+            strOut += "NOTE: add 'flow.parentData = me to your constructor for the algorithm." + vbCrLf
+            strOut += "Then in your Run method, add a line 'flow.nextMsg = 'your next line of text'" + vbCrLf
+            strOut += "Then at the end of your Run method, invoke flow.Run(empty)" + vbCrLf
+        Else
+            flowText.Add(nextMsg)
+            If flowText.Count > maxLines Then flowText.RemoveAt(0)
 
-        flowText.Add(nextMsg)
-        If flowText.Count > maxLines Then flowText.RemoveAt(0)
-
-        If task.heartBeat Then
             strOut = ""
-            For i = 0 To Math.Min(maxLines, flowText.Count) - 1
-                strOut += flowText(i) + vbCrLf
+            For Each txt In flowText
+                strOut += txt + vbCrLf
             Next
         End If
-        setFlowText(strOut, dst)
+        SetTrueText(strOut, dst)
+        If standalone = False Then parentData.trueData = trueData
     End Sub
 End Class

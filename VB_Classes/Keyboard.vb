@@ -5,20 +5,19 @@ Public Class Keyboard_Basics : Inherits VB_Parent
     Dim flow As New Font_FlowText
     Public checkKeys As New OptionsKeyboardInput
     Public Sub New()
+        flow.parentData = Me
         checkKeys.Setup(traceName)
         labels(2) = "Use the Options form to send in keystrokes"
         desc = "Test the keyboard interface available to all algorithms"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        keyInput = New List(Of String)(checkKeys.inputText)
-        checkKeys.inputText.Clear()
-        If standaloneTest() Then
-            flow.nextMsg = ""
-            For i = 0 To keyInput.Count - 1
-                flow.nextMsg += keyInput(i).ToString()
+    Public Sub RunVB(src As cv.Mat)
+        If standaloneTest() And checkKeys.inputText.Count > 0 Then
+            For Each txt In checkKeys.inputText
+                flow.nextMsg += txt.ToString()
             Next
-            If flow.nextMsg <> "" Then flow.Run(empty)
+            flow.Run(empty)
         End If
+        checkKeys.inputText.Clear()
     End Sub
 End Class
 

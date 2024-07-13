@@ -305,6 +305,7 @@ Public Class Draw_ClipLine : Inherits VB_Parent
         If task.gOptions.UseKalman.Checked Then flow.flowText.Add("--------------------------- setup ---------------------------")
     End Sub
     Public Sub New()
+        flow.parentData = Me
         setup()
         desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
     End Sub

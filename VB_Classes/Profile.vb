@@ -154,7 +154,7 @@ Public Class Profile_Derivative : Inherits VB_Parent
         Dim rsizeX = (dst2.Width - offset * 2) / rc.rect.Width
         Dim rsizeY = (dst2.Height - offset * 2) / rc.rect.Height
         saveTrueText.Clear()
-        trueData.Clear()
+        task.trueData.Clear()
         dst3.SetTo(0)
 
         Dim color As cv.Scalar, near = cv.Scalar.Yellow, far = cv.Scalar.Blue

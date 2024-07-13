@@ -62,6 +62,7 @@ Public Class Video_CarCounting : Inherits VB_Parent
     Dim activeState(5) As Boolean
     Dim carCount As Integer
     Public Sub New()
+        flow.parentData = Me
         desc = "Count cars in a video file"
     End Sub
     Public Sub RunVB(src as cv.Mat)

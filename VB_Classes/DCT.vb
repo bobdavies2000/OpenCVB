@@ -143,6 +143,7 @@ Public Class DCT_Surfaces_debug : Inherits VB_Parent
     Dim flow As New Font_FlowText
     Dim plane As New Plane_CellColor
     Public Sub New()
+        flow.parentData = Me
         labels = {"", "", "Stats on the largest region below DCT threshold", "Various views of regions with DCT below threshold"}
         task.gOptions.displayDst0.Checked = False
         desc = "Find plane equation for a featureless surface - debugging one region for now."

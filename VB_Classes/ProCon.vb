@@ -13,6 +13,7 @@ Public Class ProCon_Basics : Inherits VB_Parent
     Public terminateProducer As Boolean
     Public options As New Options_ProCon
     Public Sub New()
+        flow.parentData = Me
         p = New Thread(AddressOf Producer)
         p.Name = "Producer"
         p.Start()

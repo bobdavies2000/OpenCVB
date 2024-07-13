@@ -205,7 +205,6 @@ Public Class VBtask : Implements IDisposable
     Public main_hwnd As IntPtr
 
     Public trueData As New List(Of trueText)
-    Public flowData As New List(Of trueText)
 
     Public callTraceMain As New List(Of String)
     Public algorithm_msMain As New List(Of Single)

@@ -521,12 +521,14 @@ End Class
 
 Public Class FeatureLine_DetailsAll : Inherits VB_Parent
     Dim lines As New FeatureLine_Finder
-    Dim flow As New Font_FlowTextOld
+    Dim flow As New Font_FlowText
     Dim arcList As New List(Of Single)
     Dim arcLongAverage As New List(Of Single)
     Dim firstAverage As New List(Of Single)
     Dim firstBest As Integer
+    Dim title = "ID" + vbTab + "length" + vbTab + "distance "
     Public Sub New()
+        flow.parentData = Me
         flow.dst = 3
         desc = "Use FeatureLine_Finder data to collect vertical lines and measure accuracy of each."
     End Sub
@@ -542,7 +544,7 @@ Public Class FeatureLine_DetailsAll : Inherits VB_Parent
 
             dst3.SetTo(0)
             arcList.Clear()
-            flow.msgs.Add("ID" + vbTab + "length" + vbTab + "distance")
+            flow.nextMsg = title
             For i = 0 To Math.Min(10, lines.sortedVerticals.Count) - 1
                 Dim index = lines.sortedVerticals.ElementAt(i).Value
                 Dim p1 = lines.lines2D(index)
@@ -557,9 +559,10 @@ Public Class FeatureLine_DetailsAll : Inherits VB_Parent
                 If len3D > 0 Then
                     Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
                     arcList.Add(arcY)
-                    flow.msgs.Add(Format(arcY, fmt3) + vbTab + Format(len3D, fmt3) + "m " + vbTab + Format(pt1.Z, fmt1) + "m")
+                    flow.nextMsg += Format(arcY, fmt3) + " degrees" + vbTab + Format(len3D, fmt3) + "m " + vbTab + Format(pt1.Z, fmt1) + "m"
                 End If
             Next
+            If flow.nextMsg = title Then flow.nextMsg = "No feature line found..."
         End If
         flow.Run(Nothing)
         If arcList.Count = 0 Then Exit Sub

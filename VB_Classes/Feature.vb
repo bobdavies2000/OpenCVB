@@ -250,6 +250,7 @@ Public Class Feature_PointTracker : Inherits VB_Parent
     Dim mPoints As New Match_Points
     Dim options As New Options_Features
     Public Sub New()
+        flow.parentData = Me
         flow.dst = RESULT_DST3
         labels(3) = "Correlation coefficients for each remaining cell"
         desc = "Use the top X goodFeatures and then use matchTemplate to find track them."

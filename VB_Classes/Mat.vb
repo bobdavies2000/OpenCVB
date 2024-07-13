@@ -164,6 +164,7 @@ End Class
 Public Class Mat_MultiplyReview : Inherits VB_Parent
     Dim flow As New Font_FlowText
     Public Sub New()
+        flow.parentData = Me
         desc = "Review matrix multiplication"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -219,6 +220,7 @@ Public Class Mat_Inverse : Inherits VB_Parent
     Public validateInverse As Boolean
     Public inverse As New cv.Mat
     Public Sub New()
+        flow.parentData = Me
         If radio.Setup(traceName) Then
             radio.addRadio("Cholesky")
             radio.addRadio("Eig (works but results are incorrect)")

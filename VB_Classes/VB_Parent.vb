@@ -531,14 +531,10 @@ Public Class VB_Parent : Implements IDisposable
         trueData.Add(str)
     End Sub
     Public Sub SetTrueText(text As String, picTag As Integer)
+        If text Is Nothing Then Return
         Dim pt = New cv.Point(0, 0)
         Dim str As New trueText(text, pt, picTag)
         trueData.Add(str)
-    End Sub
-    Public Sub setFlowText(text As String, picTag As Integer)
-        Dim pt = New cv.Point(0, 0)
-        Dim str As New trueText(text, pt, picTag)
-        task.flowData.Add(str)
     End Sub
     Public Function standaloneTest() As Boolean
         If standalone Or showIntermediate() Then Return True
@@ -620,7 +616,8 @@ Public Class VB_Parent : Implements IDisposable
         task.dst1 = dst1
         task.dst2 = dst2
         task.dst3 = dst3
-        task.trueData = trueData
+        task.trueData = New List(Of trueText)(trueData)
+        trueData.Clear()
     End Sub
     Public Sub measureStartRun(name As String)
         If task.recordTimings = False Then Exit Sub
@@ -653,7 +650,7 @@ Public Class VB_Parent : Implements IDisposable
     Public Sub Run(src As cv.Mat)
         If task.testAllRunning = False Then measureStartRun(traceName)
 
-        trueData.Clear()
+        task.trueData.Clear()
         If task.paused = False Then algorithm.RunVB(src)
         If task.testAllRunning = False Then measureEndRun(traceName)
     End Sub

@@ -1652,11 +1652,7 @@ Public Class OpenCVB
                         Else
                             trueData = New List(Of VB_Classes.trueText)
                         End If
-                        For Each txt In task.flowData
-                            trueData.Add(txt)
-                        Next
                         task.trueData.Clear()
-                        task.flowData.Clear()
                     End SyncLock
                 End If
 

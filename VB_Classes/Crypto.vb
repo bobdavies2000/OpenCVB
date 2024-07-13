@@ -7,6 +7,7 @@ Public Class Crypto_Hash : Inherits VB_Parent
     Dim images As New List(Of cv.Mat)
     Dim guids As New List(Of String)
     Public Sub New()
+        flow.parentData = Me
         desc = "Experiment with hashing algorithm and guid"
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -26,8 +27,8 @@ Public Class Crypto_Hash : Inherits VB_Parent
             bytes = algorithm.ComputeHash(bytes)
 
             flow.nextmsg = New Guid(bytes).ToString
-            If guids.Count >= flow.flowText.Count Then guids.RemoveAt(0)
-            guids.Add(flow.nextmsg)
+            guids.Add(flow.nextMsg)
+            If guids.Count >= flow.maxLines Then guids.RemoveAt(0)
             flow.Run(empty)
         End If
     End Sub

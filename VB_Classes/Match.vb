@@ -98,6 +98,7 @@ Public Class Match_RandomTest : Inherits VB_Parent
     Public maxCorrelation = Single.MinValue
     Public options As New Options_Features
     Public Sub New()
+        flow.parentData = Me
         desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
     Public Sub RunVB(src As cv.Mat)
