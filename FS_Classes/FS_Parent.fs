@@ -166,7 +166,7 @@ module FS_Classes =
 //    let distance3DScalar (p1: Scalar) (p2: Scalar) =
 //        Math.Sqrt((p1.[0] - p2.[0]) ** 2.0 + (p1.[1] - p2.[1]) ** 2.0 + (p1.[2] - p2.[2]) ** 2.0) |> float32
 
-//    let vbDrawFPoly (dst: Mat) (poly: Point2f list) (color: Scalar) =
+//    let DrawFPoly (dst: Mat) (poly: Point2f list) (color: Scalar) =
 //        let minMod = min poly.Length task.polyCount
 //        for i in 0 .. minMod - 1 do
 //            DrawLine(dst, poly.[i], poly.[(i + 1) % minMod], color, task.lineWidth)

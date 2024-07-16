@@ -13,6 +13,7 @@ using static CS_Classes.CS_Externs;
 using OpenCvSharp.XImgProc;
 using System.IO;
 using System.Security.Cryptography;
+using System.Windows.Controls;
 
 namespace CS_Classes
 {
@@ -17854,6 +17855,1219 @@ public class CS_ApproxPoly_Basics : CS_Parent
             SetTrueText($"{match2.correlation:F3}", new cv.Point(p2.X, p2.Y));
         }
     }
+
+
+
+    public class CS_FeaturePoly_Basics : CS_Parent
+    {
+        public bool resync;
+        public string resyncCause;
+        public int resyncFrames;
+        public float maskChangePercent;
+        FeaturePoly_TopFeatures topFeatures = new FeaturePoly_TopFeatures();
+        public FeaturePoly_Sides sides = new FeaturePoly_Sides();
+        public CS_FeaturePoly_Basics(VBtask task) : base(task)
+        {
+            FindSlider("Feature Sample Size").Value = 30;
+            if (dst2.Width >= 640) FindSlider("Resync if feature moves > X pixels").Value = 15;
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
+                  "Ordered Feature polygons of best features - white is original, yellow latest" };
+            desc = "Build a Feature polygon with the top generation counts of the good features";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.FirstPass) sides.prevImage = src.Clone();
+            sides.options.RunVB();
+
+            topFeatures.Run(src);
+            dst2 = topFeatures.dst2;
+            sides.currPoly = new List<Point2f>(topFeatures.poly);
+            if (sides.currPoly.Count < task.polyCount) return;
+            sides.Run(src);
+            dst3 = sides.dst2;
+            for (int i = 0; i < sides.currPoly.Count; i++)
+            {
+                SetTrueText(i.ToString(), sides.currPoly[i], 3);
+            }
+            SetTrueText("Rotate center", new Point2f(sides.rotateCenter.X + 10, sides.rotateCenter.Y), 3);
+            string causes = "";
+            if (Math.Abs(sides.rotateAngle * 57.2958) > 10)
+            {
+                resync = true;
+                causes += " - Rotation angle exceeded threshold.";
+                sides.rotateAngle = 0;
+            }
+            causes += Environment.NewLine;
+            if (task.optionsChanged)
+            {
+                resync = true;
+                causes += " - Options changed";
+            }
+            causes += Environment.NewLine;
+            if (resyncFrames > sides.options.autoResyncAfterX)
+            {
+                resync = true;
+                causes += $" - More than {sides.options.autoResyncAfterX} frames without resync";
+            }
+            causes += Environment.NewLine;
+            if (Math.Abs(sides.currLengths.Sum() - sides.prevLengths.Sum()) > sides.options.removeThreshold * task.polyCount)
+            {
+                resync = true;
+                causes += $" - The top {task.polyCount} vertices have moved because of the generation counts";
+            }
+            else
+            {
+                if (Math.Abs(sides.prevFLineLen - sides.currFLineLen) > sides.options.removeThreshold)
+                {
+                    resync = true;
+                    causes += $" - The Feature polygon's longest side (FLine) changed more than the threshold of {sides.options.removeThreshold} pixels";
+                }
+            }
+            causes += Environment.NewLine;
+            if (resync || sides.prevPoly.Count != task.polyCount || task.optionsChanged)
+            {
+                sides.prevPoly = new List<Point2f>(sides.currPoly);
+                sides.prevLengths = new List<float>(sides.currLengths);
+                sides.prevSideIndex = sides.prevLengths.IndexOf(sides.prevLengths.Max());
+                sides.prevImage = src.Clone();
+                resyncFrames = 0;
+                resyncCause = causes;
+            }
+            resyncFrames++;
+            strOut = $"Rotation: {sides.rotateAngle * 57.2958:F1} degrees{Environment.NewLine}";
+            strOut += $"Translation: {(int)sides.centerShift.X}, {(int)sides.centerShift.Y}{Environment.NewLine}";
+            strOut += $"Rotate center: {sides.rotateCenter.X:F0}, {sides.rotateCenter.Y:F0}{Environment.NewLine}";
+            strOut += $"Frames since last resync: {resyncFrames:000}{Environment.NewLine}{Environment.NewLine}";
+            strOut += $"Resync last caused by: {Environment.NewLine}{resyncCause}";
+            foreach (var keyval in topFeatures.stable.goodCounts)
+            {
+                var ptmp = topFeatures.stable.basics.ptList[keyval.Value];
+                var pt = new cv.Point((int)ptmp.X, (int)ptmp.Y);
+                int g = topFeatures.stable.basics.facetGen.dst0.Get<int>(pt.Y, pt.X);
+                SetTrueText(g.ToString(), pt);
+            }
+            SetTrueText(strOut, 1);
+            resync = false;
+        }
+    }
+    public class CS_FeaturePoly_Sides : CS_Parent
+    {
+        public List<Point2f> currPoly = new List<Point2f>();
+        public int currSideIndex;
+        public List<float> currLengths = new List<float>();
+        public float currFLineLen;
+        public PointPair mpCurr;
+        public List<Point2f> prevPoly = new List<Point2f>();
+        public int prevSideIndex;
+        public List<float> prevLengths = new List<float>();
+        public float prevFLineLen;
+        public PointPair mpPrev;
+        public Mat prevImage;
+        public Point2f rotateCenter;
+        public float rotateAngle;
+        public Point2f centerShift;
+        public Options_FPoly options = new Options_FPoly();
+        Line_Nearest near = new Line_Nearest();
+        public Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
+        List<Point2f> newPoly;
+        Random_Basics random = new Random_Basics();
+        public CS_FeaturePoly_Sides(VBtask task) : base(task)
+        {
+            labels[2] = "White is the original FPoly and yellow is the current FPoly.";
+            desc = "Compute the lengths of each side in a polygon";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (task.FirstPass) prevImage = src.Clone();
+            options.RunVB();
+            if (standaloneTest() && task.heartBeat)
+            {
+                random.Run(empty);
+                currPoly = new List<Point2f>(random.pointList);
+            }
+            dst2.SetTo(0);
+            currLengths.Clear();
+            for (int i = 0; i < currPoly.Count - 1; i++)
+            {
+                currLengths.Add(Distance(currPoly[i], currPoly[i + 1]));
+            }
+            currSideIndex = currLengths.IndexOf(currLengths.Max());
+            if (task.FirstPass)
+            {
+                prevPoly = new List<Point2f>(currPoly);
+                prevLengths = new List<float>(currLengths);
+                prevSideIndex = prevLengths.IndexOf(prevLengths.Max());
+            }
+            if (prevPoly.Count == 0) return;
+            mpPrev = new PointPair(prevPoly[prevSideIndex], prevPoly[(prevSideIndex + 1) % task.polyCount]);
+            mpCurr = new PointPair(currPoly[currSideIndex], currPoly[(currSideIndex + 1) % task.polyCount]);
+            prevFLineLen = Distance(mpPrev.p1, mpPrev.p2);
+            currFLineLen = Distance(mpCurr.p1, mpCurr.p2);
+            float d1 = Distance(mpPrev.p1, mpCurr.p1);
+            float d2 = Distance(mpPrev.p2, mpCurr.p2);
+            PointPair newNear;
+            if (d1 < d2)
+            {
+                centerShift = new Point2f(mpPrev.p1.X - mpCurr.p1.X, mpPrev.p1.Y - mpCurr.p1.Y);
+                rotateCenter = mpPrev.p1;
+                newNear = new PointPair(mpPrev.p2, mpCurr.p2);
+            }
+            else
+            {
+                centerShift = new Point2f(mpPrev.p2.X - mpCurr.p2.X, mpPrev.p2.Y - mpCurr.p2.Y);
+                rotateCenter = mpPrev.p2;
+                newNear = new PointPair(mpPrev.p1, mpCurr.p1);
+            }
+            List<Point2f> transPoly = new List<Point2f>();
+            for (int i = 0; i < currPoly.Count; i++)
+            {
+                transPoly.Add(new Point2f(currPoly[i].X - centerShift.X, currPoly[i].Y - centerShift.Y));
+            }
+            newNear.p1 = new Point2f(newNear.p1.X - centerShift.X, newNear.p1.Y - centerShift.Y);
+            newNear.p2 = new Point2f(newNear.p2.X - centerShift.X, newNear.p2.Y - centerShift.Y);
+            rotateCenter = new Point2f(rotateCenter.X - centerShift.X, rotateCenter.Y - centerShift.Y);
+            strOut = "No rotation" + Environment.NewLine;
+            rotateAngle = 0;
+            if (d1 != d2)
+            {
+                if (Distance(newNear.p1, newNear.p2) > options.removeThreshold)
+                {
+                    near.lp = mpPrev;
+                    near.pt = newNear.p1;
+                    near.Run(empty);
+                    DrawLine(dst1, near.pt, near.nearPoint, Scalar.Red, task.lineWidth + 5);
+                    float hypotenuse = Distance(rotateCenter, near.pt);
+                    rotateAngle = -(float)Math.Asin(Distance(near.nearPoint, near.pt) / hypotenuse);
+                    if (float.IsNaN(rotateAngle)) rotateAngle = 0;
+                    strOut = $"Angle is {rotateAngle * 57.2958:F1} degrees{Environment.NewLine}";
+                }
+            }
+            strOut += $"Translation (shift) is {-centerShift.X:F0}, {-centerShift.Y:F0}";
+            if (Math.Abs(rotateAngle) > 0)
+            {
+                rotatePoly.rotateCenter = rotateCenter;
+                rotatePoly.rotateAngle = rotateAngle;
+                rotatePoly.poly.Clear();
+                rotatePoly.poly.Add(newNear.p1);
+                rotatePoly.Run(empty);
+                if (Distance(near.nearPoint, rotatePoly.poly[0]) > Distance(newNear.p1, rotatePoly.poly[0])) rotateAngle *= -1;
+                rotatePoly.rotateAngle = rotateAngle;
+                rotatePoly.poly = new List<Point2f>(transPoly);
+                rotatePoly.Run(empty);
+                newPoly = new List<Point2f>(rotatePoly.poly);
+            }
+            DrawFPoly(ref dst2, prevPoly, Scalar.White);
+            DrawFPoly(ref dst2, currPoly, Scalar.Yellow);
+            DrawFatLine(mpPrev.p1, mpPrev.p2, dst2, Scalar.White);
+            DrawFatLine(mpCurr.p1, mpCurr.p2, dst2, Scalar.Yellow);
+        }
+        float Distance(Point2f p1, Point2f p2)
+        {
+            return (float)Math.Sqrt(Math.Pow(p2.X - p1.X, 2) + Math.Pow(p2.Y - p1.Y, 2));
+        }
+    }
+    public class CS_FeaturePoly_BasicsOriginal : CS_Parent
+    {
+        public fPolyData fPD = new fPolyData();
+        public Mat resyncImage;
+        public bool resync;
+        public string resyncCause;
+        public int resyncFrames;
+        public float maskChangePercent;
+        FeaturePoly_TopFeatures topFeatures = new FeaturePoly_TopFeatures();
+        public Options_FPoly options = new Options_FPoly();
+        public object center;
+        public CS_FeaturePoly_BasicsOriginal(VBtask task) : base(task)
+        {
+            center = new FeaturePoly_Center(); // FeaturePoly_PerpendicularsTest can be used to test the perpendicular method of finding the rotate center.
+            FindSlider("Feature Sample Size").Value = 30;
+            if (dst2.Width >= 640) FindSlider("Resync if feature moves > X pixels").Value = 15;
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
+                  "Ordered Feature polygons of best features - white is original, yellow latest" };
+            desc = "Build a Feature polygon with the top generation counts of the good features";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.FirstPass) resyncImage = src.Clone();
+            options.RunVB();
+            topFeatures.Run(src);
+            dst2 = topFeatures.dst2;
+            dst1 = topFeatures.dst3;
+            fPD.currPoly = new List<Point2f>(topFeatures.poly);
+            if (task.optionsChanged) fPD = new fPolyData(fPD.currPoly);
+            if (fPD.currPoly.Count < task.polyCount) return;
+            fPD.computeCurrLengths();
+            for (int i = 0; i < fPD.currPoly.Count; i++)
+            {
+                SetTrueText(i.ToString(), fPD.currPoly[i], 1);
+            }
+            if (task.FirstPass) fPD.lengthPrevious = new List<float>(fPD.currLength);
+            ((dynamic)center).fPD = fPD;
+            ((dynamic)center).Run(src);
+            fPD = ((dynamic)center).fPD;
+            dst1 = (dst1 | ((dynamic)center).dst2).ToMat();
+            dst0 = ((dynamic)center).dst3;
+            fPD.jitterTest(dst2, this); // the feature line has not really moved.
+            string causes = "";
+            if (Math.Abs(fPD.rotateAngle * 57.2958) > 10)
+            {
+                resync = true;
+                causes += " - Rotation angle exceeded threshold.";
+                fPD.rotateAngle = 0;
+            }
+            causes += Environment.NewLine;
+            if (maskChangePercent > 0.2)
+            {
+                resync = true;
+                causes += " - Difference of startFrame and current frame exceeded 20% of image size";
+            }
+            causes += Environment.NewLine;
+            if (task.optionsChanged)
+            {
+                resync = true;
+                causes += " - Options changed";
+            }
+            causes += Environment.NewLine;
+            if (resyncFrames > options.autoResyncAfterX)
+            {
+                resync = true;
+                causes += $" - More than {options.autoResyncAfterX} frames without resync";
+            }
+            causes += Environment.NewLine;
+            if (Math.Abs(fPD.currLength.Sum() - fPD.lengthPrevious.Sum()) > options.removeThreshold * task.polyCount)
+            {
+                resync = true;
+                causes += $" - The top {task.polyCount} vertices have moved because of the generation counts";
+            }
+            else
+            {
+                if (fPD.computeFLineLength() > options.removeThreshold)
+                {
+                    resync = true;
+                    causes += $" - The Feature polygon's longest side (FLine) changed more than the threshold of {options.removeThreshold} pixels";
+                }
+            }
+            causes += Environment.NewLine;
+            if (resync || fPD.prevPoly.Count != task.polyCount || task.optionsChanged)
+            {
+                fPD.resync();
+                resyncImage = src.Clone();
+                resyncFrames = 0;
+                resyncCause = causes;
+            }
+            resyncFrames++;
+            DrawFPoly(ref dst2, fPD.currPoly, Scalar.White);
+            fPD.DrawPolys(dst1, fPD.currPoly, this);
+            for (int i = 0; i < fPD.prevPoly.Count; i++)
+            {
+                SetTrueText(i.ToString(), fPD.currPoly[i], 1);
+                SetTrueText(i.ToString(), fPD.currPoly[i], 1);
+            }
+            strOut = $"Rotation: {fPD.rotateAngle * 57.2958:F1} degrees{Environment.NewLine}";
+            strOut += $"Translation: {(int)fPD.centerShift.X}, {(int)fPD.centerShift.Y}{Environment.NewLine}";
+            strOut += $"Rotate center: {fPD.rotateCenter.X:F0}, {fPD.rotateCenter.Y:F0}{Environment.NewLine}";
+            strOut += $"Frames since last resync: {resyncFrames:000}{Environment.NewLine}";
+            strOut += $"Last resync cause(s): {Environment.NewLine}{resyncCause}";
+            foreach (var keyval in topFeatures.stable.goodCounts)
+            {
+                var pt = topFeatures.stable.basics.ptList[keyval.Value];
+                int g = topFeatures.stable.basics.facetGen.dst0.At<int>((int)pt.Y, (int)pt.X);
+                SetTrueText(g.ToString(), pt);
+            }
+            SetTrueText(strOut, 1);
+            dst3 = ((dynamic)center).dst3;
+            labels[3] = ((dynamic)center).labels[3];
+            resync = false;
+        }
+    }
+    public class CS_FeaturePoly_Plot : CS_Parent
+    {
+        public FeaturePoly_Core fGrid = new FeaturePoly_Core();
+        Plot_Histogram plot = new Plot_Histogram();
+        public float[] hist;
+        public List<float> distDiff = new List<float>();
+        public CS_FeaturePoly_Plot(VBtask task) : base(task)
+        {
+            plot.minRange = 0;
+            plot.removeZeroEntry = false;
+            labels = new string[] { "", "", "", "anchor and companions - input to distance difference" };
+            desc = "Feature Grid: compute distances between good features from frame to frame and plot the distribution";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat lastDistance = fGrid.dst0.Clone();
+            fGrid.Run(src);
+            dst3 = fGrid.dst3;
+            dst3 = src.Clone();
+            hist = new float[fGrid.threshold + 2];
+            distDiff.Clear();
+            for (int i = 0; i < fGrid.stable.basics.facetGen.facet.facetList.Count; i++)
+            {
+                var pt = fGrid.stable.basics.ptList[i];
+                float d = (float)fGrid.anchor.DistanceTo(pt);
+                float lastd = lastDistance.At<float>((int)pt.Y, (int)pt.X);
+                float absDiff = Math.Abs(lastd - d);
+                if (absDiff >= hist.Length) absDiff = hist.Length - 1;
+                if (absDiff < fGrid.threshold)
+                {
+                    hist[(int)absDiff]++;
+                    DrawLine(dst3, fGrid.anchor, pt, task.HighlightColor, task.lineWidth);
+                    distDiff.Add(absDiff);
+                }
+                else
+                {
+                    hist[fGrid.threshold]++;
+                }
+            }
+            var hlist = hist.ToList();
+            float peak = hlist.Max();
+            int peakIndex = hlist.IndexOf(peak);
+            Mat histMat = new Mat(hist.Length, 1, MatType.CV_32F, hist);
+            plot.maxValue = fGrid.stable.basics.ptList.Count;
+            plot.Run(histMat);
+            dst2 = plot.dst2;
+            float avg = distDiff.Count > 0 ? distDiff.Average() : 0;
+            labels[2] = $"Average distance change (after threshholding) = {avg:F3}, peak at {peakIndex} with {peak:F1} occurances";
+        }
+    }
+    public class CS_FeaturePoly_PlotWeighted : CS_Parent
+    {
+        public FeaturePoly_Plot fPlot = new FeaturePoly_Plot();
+        Plot_Histogram plot = new Plot_Histogram();
+        AddWeighted_Basics addw = new AddWeighted_Basics();
+        Kalman_Basics kalman = new Kalman_Basics();
+        public CS_FeaturePoly_PlotWeighted(VBtask task) : base(task)
+        {
+            plot.minRange = 0;
+            plot.removeZeroEntry = false;
+            labels = new string[] { "", "Distance change from previous frame", "", "anchor and companions - input to distance difference" };
+            desc = "Feature Grid: compute distances between good features from frame to frame and plot with weighting and Kalman to smooth results";
+        }
+        public void RunCS(Mat src)
+        {
+            fPlot.Run(src);
+            dst3 = fPlot.dst3;
+            Mat lastPlot = plot.dst2.Clone();
+            if (task.optionsChanged) kalman.kInput = new float[fPlot.hist.Length];
+            kalman.kInput = fPlot.hist;
+            kalman.Run(new Mat());
+            fPlot.hist = kalman.kOutput;
+            var hlist = fPlot.hist.ToList();
+            float peak = hlist.Max();
+            int peakIndex = hlist.IndexOf(peak);
+            Mat histMat = new Mat(fPlot.hist.Length, 1, MatType.CV_32F, fPlot.hist);
+            plot.maxValue = fPlot.fGrid.stable.basics.ptList.Count;
+            plot.Run(histMat);
+            addw.src2 = plot.dst2;
+            addw.Run(lastPlot);
+            dst2 = addw.dst2;
+            if (task.heartBeat)
+            {
+                float avg = fPlot.distDiff.Count > 0 ? fPlot.distDiff.Average() : 0;
+                labels[2] = $"Average distance change (after threshholding) = {avg:F3}, peak at {peakIndex} with {peak:F1} occurances";
+            }
+        }
+    }
+    public class CS_FeaturePoly_Stablizer : CS_Parent
+    {
+        public FeaturePoly_Core fGrid;
+        public CS_FeaturePoly_Stablizer(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "Movement amount - dot is current anchor point", "SyncImage aligned to current image - slide camera left or right",
+                  "current image with distance map" };
+            desc = "Feature Grid: show the accumulated camera movement in X and Y (no rotation)";
+            fGrid = new FeaturePoly_Core();
+        }
+        public void RunCS(Mat src)
+        {
+            fGrid.Run(src.Clone());
+            dst3 = fGrid.dst3;
+            labels[3] = fGrid.labels[2];
+            Mat syncImage = src.Clone();
+            if (fGrid.startAnchor == fGrid.anchor) syncImage = src.Clone();
+            cv.Point shift = new cv.Point(fGrid.startAnchor.X - fGrid.anchor.X, fGrid.startAnchor.Y - fGrid.anchor.Y);
+            Rect rect = new Rect();
+            if (shift.X < 0) rect.X = 0; else rect.X = shift.X;
+            if (shift.Y < 0) rect.Y = 0; else rect.Y = shift.Y;
+            rect.Width = dst1.Width - Math.Abs(shift.X);
+            rect.Height = dst1.Height - Math.Abs(shift.Y);
+
+            dst1.SetTo(0);
+            dst1[rect] = syncImage[rect];
+            DrawLine(dst1, fGrid.startAnchor, fGrid.anchor, new cv.Scalar(255), 2);
+            DrawCircle(dst1, fGrid.anchor, 5, new cv.Scalar(255), -1);
+            Rect r = new Rect(0, 0, rect.Width, rect.Height);
+            if (fGrid.anchor.X > fGrid.startAnchor.X) r.X = (int)(fGrid.anchor.X - fGrid.startAnchor.X);
+            if (fGrid.anchor.Y > fGrid.startAnchor.Y) r.Y = (int)(fGrid.anchor.Y - fGrid.startAnchor.Y);
+
+            dst2.SetTo(0);
+            dst2[r] = syncImage[rect];
+        }
+    }
+    public class CS_FeaturePoly_StartPoints : CS_Parent
+    {
+        public List<Point> startPoints;
+        public List<Point> goodPoints;
+        public FeaturePoly_Core fGrid;
+        public CS_FeaturePoly_StartPoints(VBtask task) : base(task)
+        {
+            dst0 = new Mat(dst0.Rows, dst0.Cols, MatType.CV_8U, 1);
+            dst0.SetTo(new cv.Scalar(255));
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Track the feature grid points back to the last sync point";
+        }
+        public void RunCS(Mat src)
+        {
+            int threshold = FindSlider("Resync if feature moves > X pixels").Value;
+            double maxShift = fGrid.anchor.DistanceTo(fGrid.startAnchor) + threshold;
+            fGrid.Run(src);
+            dst2 = fGrid.dst3;
+            List<List<Point>> facets = new List<List<Point>>();
+            Mat lastPoints = dst0.Clone();
+            if (fGrid.startAnchor == fGrid.anchor || goodPoints.Count < 5)
+            {
+                startPoints = new List<cv.Point>();
+                foreach (var pt in fGrid.goodPoints)
+                {
+                    startPoints.Add(new cv.Point((int)pt.X, (int)pt.Y));
+                }
+                facets = new List<List<Point>>(fGrid.goodFacets);
+            }
+            dst0.SetTo(new cv.Scalar(255));
+            if (standaloneTest()) dst1.SetTo(new cv.Scalar(0));
+            List<PointPair> mpList = new List<PointPair>();
+            goodPoints = new List<Point>();
+            foreach (var pt in fGrid.goodPoints)
+            {
+                goodPoints.Add(new cv.Point((int)pt.X, (int)pt.Y));
+            }
+            List<Point> facet = new List<Point>();
+            List<int> usedGood = new List<int>();
+            for (int i = 0; i < goodPoints.Count; i++)
+            {
+                cv.Point pt = goodPoints[i];
+                byte startPoint = lastPoints.Get<byte>(pt.Y, pt.X);
+                if (startPoint == 255 && i < 256) startPoint = (byte)i;
+                if (startPoint < startPoints.Count && !usedGood.Contains(startPoint))
+                {
+                    usedGood.Add(startPoint);
+                    facet = facets[startPoint];
+                    dst0.FillConvexPoly(facet.ToArray(), startPoint, cv.LineTypes.Link4);
+                    if (standaloneTest()) dst1.FillConvexPoly(facet.ToArray(), task.scalarColors[startPoint], task.lineType);
+                    mpList.Add(new PointPair(startPoints[startPoint], pt));
+                }
+            }
+            // dst3.SetTo(new cv.Scalar(0));
+            foreach (PointPair mp in mpList)
+            {
+                if (mp.p1.DistanceTo(mp.p2) <= maxShift) DrawLine(dst1, mp.p1, mp.p2, new cv.Scalar(255, 255, 0), 2);
+                DrawCircle(dst1, mp.p1, task.DotSize, new cv.Scalar(255, 255, 0), -1);
+            }
+            DrawLine(dst1, fGrid.anchor, fGrid.startAnchor, new cv.Scalar(255), task.lineWidth + 1);
+        }
+    }
+    public class CS_FeaturePoly_Triangle : CS_Parent
+    {
+        Area_MinTriangle_CPP triangle = new Area_MinTriangle_CPP();
+        FeaturePoly_Core fGrid = new FeaturePoly_Core();
+        public CS_FeaturePoly_Triangle(VBtask task) : base(task)
+        {
+            desc = "Find the minimum triangle that contains the feature grid";
+        }
+        public void RunCS(Mat src)
+        {
+            fGrid.Run(src);
+            dst2 = fGrid.dst2;
+            triangle.srcPoints = new List<Point2f>();
+            foreach (var pt in fGrid.goodPoints)
+            {
+                triangle.srcPoints.Add(new cv.Point((int)pt.X, (int)pt.Y));
+            }
+            triangle.Run(null);
+            dst3 = triangle.dst2;
+        }
+    }
+    public class CS_FeaturePoly_TopFeatures : CS_Parent
+    {
+        Stable_BasicsCount stable = new Stable_BasicsCount();
+        List<Point2f> poly = new List<Point2f>();
+        Options_FPoly options = new Options_FPoly();
+        public CS_FeaturePoly_TopFeatures(VBtask task) : base(task)
+        {
+            desc = "Get the top features and validate them";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            stable.Run(src);
+            dst2 = stable.dst2;
+            poly.Clear();
+            foreach (KeyValuePair<int, int> keyVal in stable.goodCounts)
+            {
+                var ptmp = stable.basics.ptList[keyVal.Value];
+                var pt = new cv.Point((int)ptmp.X, (int)ptmp.Y);
+                int g = stable.basics.facetGen.dst0.Get<int>(pt.Y, pt.X);
+                SetTrueText(g.ToString(), pt);
+                if (poly.Count < task.polyCount) poly.Add(pt);
+            }
+            for (int i = 0; i < poly.Count - 1; i++)
+            {
+                DrawLine(dst2, poly[i], poly[i + 1], new cv.Scalar(255), 2);
+            }
+        }
+    }
+    public class CS_FeaturePoly_WarpAffinePoly : CS_Parent
+    {
+        Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
+        WarpAffine_BasicsQT warp = new WarpAffine_BasicsQT();
+        FeaturePoly_BasicsOriginal fPoly = new FeaturePoly_BasicsOriginal();
+        public CS_FeaturePoly_WarpAffinePoly(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Feature polygon after just rotation - white (original), yellow (current)",
+                  "Feature polygon with rotation and shift - should be aligned" };
+            desc = "Rotate and shift just the Feature polygon as indicated by FeaturePoly_Basics";
+        }
+        public void RunCS(Mat src)
+        {
+            fPoly.Run(src);
+            List<Point2f> polyPrev = fPoly.fPD.prevPoly;
+            List<Point2f> poly = new List<Point2f>(fPoly.fPD.currPoly);
+            dst2.SetTo(new cv.Scalar(0));
+            dst3.SetTo(new cv.Scalar(0));
+            DrawFPoly(ref dst2, polyPrev, new cv.Scalar(255));
+            warp.rotateCenter = fPoly.fPD.rotateCenter;
+            warp.rotateAngle = fPoly.fPD.rotateAngle;
+            warp.Run(dst2);
+            dst3 = warp.dst2;
+            rotatePoly.rotateAngle = fPoly.fPD.rotateAngle;
+            rotatePoly.rotateCenter = fPoly.fPD.rotateCenter;
+            rotatePoly.poly = new List<Point2f>(poly);
+            rotatePoly.Run(null);
+            if (fPoly.fPD.polyPrevSideIndex >= rotatePoly.poly.Count) fPoly.fPD.polyPrevSideIndex = 0;
+            cv.Point offset = new cv.Point(rotatePoly.poly[fPoly.fPD.polyPrevSideIndex].X - polyPrev[fPoly.fPD.polyPrevSideIndex].X,
+                                     rotatePoly.poly[fPoly.fPD.polyPrevSideIndex].Y - polyPrev[fPoly.fPD.polyPrevSideIndex].Y);
+            Rect r1 = new Rect(offset.X, offset.Y, dst2.Width - Math.Abs(offset.X), dst2.Height - Math.Abs(offset.Y));
+            if (offset.X < 0) r1.X = 0;
+            if (offset.Y < 0) r1.Y = 0;
+            Rect r2 = new Rect(Math.Abs(offset.X), Math.Abs(offset.Y), r1.Width, r1.Height);
+            if (offset.X > 0) r2.X = 0;
+            if (offset.Y > 0) r2.Y = 0;
+
+            dst3[r1] = dst2[r1];
+            dst3 -= dst2;
+
+            DrawFPoly(ref dst3, rotatePoly.poly, new cv.Scalar(255, 255, 0));
+            DrawFPoly(ref dst2, rotatePoly.poly, new cv.Scalar(255, 255, 0));
+            SetTrueText(fPoly.strOut, 3);
+        }
+    }
+    public class CS_FeaturePoly_RotatePoints : CS_Parent
+    {
+        Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
+        public List<Point> poly;
+        public List<Point2f> polyPrev;
+        public float rotateAngle;
+        public cv.Point rotateCenter;
+        public int polyPrevSideIndex;
+        public cv.Point centerShift;
+        public CS_FeaturePoly_RotatePoints(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Feature polygon after just rotation - white (original), yellow (current)",
+                  "Feature polygons with rotation and shift - should be aligned" };
+            desc = "Rotate and shift just the Feature polygon as indicated by FeaturePoly_Basics";
+        }
+        public cv.Point shiftPoly(List<Point2f> polyPrev, List<Point> poly)
+        {
+            rotatePoly.rotateAngle = rotateAngle;
+            rotatePoly.rotateCenter = rotateCenter;
+            rotatePoly.poly = new List<Point2f>();
+            foreach (var pt in poly)
+            {
+                rotatePoly.poly.Add(new cv.Point2f(pt.X, pt.Y));
+            }
+            rotatePoly.Run(null);
+            int totalX = (int)(rotatePoly.poly[polyPrevSideIndex].X - polyPrev[polyPrevSideIndex].X);
+            int totalY = (int)(rotatePoly.poly[polyPrevSideIndex].Y - polyPrev[polyPrevSideIndex].Y);
+            return new cv.Point(totalX, totalY);
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                SetTrueText(traceName + " is meant only to run with FeaturePoly_Basics to validate the translation", 3);
+                return;
+            }
+            dst2.SetTo(new cv.Scalar(0));
+            dst3.SetTo(new cv.Scalar(0));
+            List<Point2f> rotateAndShift = new List<Point2f>();
+            centerShift = shiftPoly(polyPrev, poly);
+            DrawFPoly(ref dst2, polyPrev, new cv.Scalar(255));
+            DrawFPoly(ref dst2, rotatePoly.poly, new cv.Scalar(255, 255, 0));
+            for (int i = 0; i < polyPrev.Count; i++)
+            {
+                cv.Point2f p1 = new cv.Point(rotatePoly.poly[i].X - centerShift.X, rotatePoly.poly[i].Y - centerShift.Y);
+                cv.Point p2 = new cv.Point(rotatePoly.poly[(i + 1) % task.polyCount].X - centerShift.X, rotatePoly.poly[(i + 1) % task.polyCount].Y - centerShift.Y);
+                rotateAndShift.Add(p1);
+                SetTrueText(i.ToString(), rotatePoly.poly[i], 2);
+                SetTrueText(i.ToString(), polyPrev[i], 2);
+            }
+            DrawFPoly(ref dst3, polyPrev, new cv.Scalar(255));
+            DrawFPoly(ref dst3, rotateAndShift, new cv.Scalar(255, 255, 0));
+            strOut = "After Rotation: " + rotatePoly.rotateAngle.ToString("F2") + " degrees " +
+                     "After Translation (shift) of: " + centerShift.X.ToString("F2") + ", " + centerShift.Y.ToString("F2") + "\r\n" +
+                     "Center of Rotation: " + rotateCenter.X.ToString("F2") + ", " + rotateCenter.Y.ToString("F2") + "\r\n" +
+                     "If the algorithm is working properly, the white and yellow Feature polygons below " + "\r\n" +
+                     "should match in size and location.";
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_FeaturePoly_WarpAffineImage : CS_Parent
+    {
+        WarpAffine_BasicsQT warp = new WarpAffine_BasicsQT();
+        FeaturePoly_BasicsOriginal fPoly = new FeaturePoly_BasicsOriginal();
+        public CS_FeaturePoly_WarpAffineImage(VBtask task) : base(task)
+        {
+            if (standaloneTest())
+                task.gOptions.setDisplay1();
+            desc = "Use OpenCV's WarpAffine to rotate and translate the starting image.";
+        }
+        public void RunCS(Mat src)
+        {
+            fPoly.Run(src);
+            warp.rotateCenter = fPoly.fPD.rotateCenter;
+            warp.rotateAngle = fPoly.fPD.rotateAngle;
+            warp.Run(fPoly.resyncImage.Clone());
+            dst2 = warp.dst2;
+            dst1 = fPoly.dst1;
+            cv.Point2f offset = fPoly.fPD.centerShift;
+            Rect r1 = new Rect((int)offset.X, (int)offset.Y, (int)(dst2.Width - Math.Abs(offset.X)), (int)(dst2.Height - Math.Abs(offset.Y)));
+            if (offset.X < 0) r1.X = 0;
+            if (offset.Y < 0) r1.Y = 0;
+            Rect r2 = new Rect((int)Math.Abs(offset.X), (int)Math.Abs(offset.Y), r1.Width, r1.Height);
+            if (offset.X > 0) r2.X = 0;
+            if (offset.Y > 0) r2.Y = 0;
+            dst3[r1] = dst2[r2];
+            dst3 = src - dst2;
+            Mat tmp = dst3.CvtColor(ColorConversionCodes.BGR2GRAY);
+            Mat changed = tmp.Threshold(task.gOptions.pixelDiffThreshold, 255, ThresholdTypes.Binary);
+            int diffCount = changed.CountNonZero();
+            strOut = fPoly.strOut;
+            strOut += Environment.NewLine + string.Format("{0:N0}k pixels differ or {1:P0}", diffCount / 1000.0, (double)diffCount / dst3.Total());
+            SetTrueText(strOut, 1);
+        }
+    }
+    public class CS_FeaturePoly_Perpendiculars : CS_Parent
+    {
+        public Point2f altCenterShift;
+        public fPolyData fPD;
+        public FeaturePoly_RotatePoints rotatePoints = new FeaturePoly_RotatePoints();
+        Line_Nearest near = new Line_Nearest();
+        public CS_FeaturePoly_Perpendiculars(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Output of FeaturePoly_Basics", "Center of rotation is where the extended lines intersect" };
+            desc = "Find the center of rotation using the perpendicular lines from polymp and FLine (feature line) in FeaturePoly_Basics";
+        }
+        float findrotateAngle(Point2f p1, Point2f p2, Point2f pt)
+        {
+            near.lp = new PointPair(p1, p2);
+            near.pt = pt;
+            near.Run(empty);
+            DrawLine(dst2, pt, near.nearPoint, Scalar.Red, task.lineWidth);
+            double d1 = fPD.rotateCenter.DistanceTo(pt);
+            double d2 = fPD.rotateCenter.DistanceTo(near.nearPoint);
+            double angle = Math.Asin(near.nearPoint.DistanceTo(pt) / (d1 > d2 ? d1 : d2));
+            if (double.IsNaN(angle)) return 0;
+            return (float)angle;
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().");
+                return;
+            }
+            Kalman_Basics kalman = new Kalman_Basics();
+            Line_Perpendicular perp1 = new Line_Perpendicular();
+            Line_Perpendicular perp2 = new Line_Perpendicular();
+            dst2.SetTo(0);
+            perp1.p1 = fPD.currPoly[fPD.polyPrevSideIndex];
+            perp1.p2 = fPD.currPoly[(fPD.polyPrevSideIndex + 1) % task.polyCount];
+            perp1.Run(empty);
+            DrawLine(dst2, perp1.r1, perp1.r2, Scalar.Yellow, task.lineWidth);
+            perp2.p1 = fPD.prevPoly[fPD.polyPrevSideIndex];
+            perp2.p2 = fPD.prevPoly[(fPD.polyPrevSideIndex + 1) % task.polyCount];
+            perp2.Run(empty);
+            DrawLine(dst2, perp2.r1, perp2.r2, Scalar.White, task.lineWidth);
+            fPD.rotateCenter = IntersectTest(perp2.r1, perp2.r2, perp1.r1, perp1.r2, new Rect(0, 0, src.Width, src.Height));
+            if (fPD.rotateCenter == new Point2f())
+            {
+                fPD.rotateAngle = 0;
+            }
+            else
+            {
+                DrawCircle(dst2, fPD.rotateCenter, task.DotSize + 2, Scalar.Red);
+                fPD.rotateAngle = findrotateAngle(perp2.r1, perp2.r2, perp1.r1);
+            }
+            if (fPD.rotateAngle == 0) fPD.rotateCenter = new Point2f();
+            altCenterShift = new Point2f(fPD.currPoly[fPD.polyPrevSideIndex].X - fPD.prevPoly[fPD.polyPrevSideIndex].X,
+                                         fPD.currPoly[fPD.polyPrevSideIndex].Y - fPD.prevPoly[fPD.polyPrevSideIndex].Y);
+            kalman.kInput = new float[] { fPD.rotateAngle };
+            kalman.Run(empty);
+            fPD.rotateAngle = kalman.kOutput[0];
+            rotatePoints.poly = fPD.currPoly;
+            rotatePoints.polyPrev = fPD.prevPoly;
+            rotatePoints.polyPrevSideIndex = fPD.polyPrevSideIndex;
+            rotatePoints.rotateAngle = fPD.rotateAngle;
+            rotatePoints.Run(src);
+            fPD.centerShift = rotatePoints.centerShift;
+            dst3 = rotatePoints.dst3;
+        }
+    }
+    public class CS_FeaturePoly_PerpendicularsTest : CS_Parent
+    {
+        FeaturePoly_Perpendiculars center = new FeaturePoly_Perpendiculars();
+        FeaturePoly_BasicsOriginal fPoly = new FeaturePoly_BasicsOriginal();
+        public CS_FeaturePoly_PerpendicularsTest(VBtask task) : base(task)
+        {
+            fPoly.center = center;
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Test the perpendicular method of finding the rotate center of the Feature Polygon";
+        }
+        public void RunCS(Mat src)
+        {
+            fPoly.Run(src);
+            dst1 = fPoly.dst1;
+            dst2 = fPoly.dst2;
+            dst3 = fPoly.dst3;
+        }
+    }
+    public class CS_FeaturePoly_PerpendicularsImage : CS_Parent
+    {
+        FeaturePoly_Perpendiculars center = new FeaturePoly_Perpendiculars();
+        FeaturePoly_Image fImage = new FeaturePoly_Image();
+        public CS_FeaturePoly_PerpendicularsImage(VBtask task) : base(task)
+        {
+            fImage.fpoly.center = center;
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Rotate the image using the perpendicular method of finding the rotate center";
+        }
+        public void RunCS(Mat src)
+        {
+            fImage.Run(src);
+            dst1 = fImage.dst1;
+            dst2 = fImage.dst2;
+            dst3 = fImage.dst3;
+        }
+    }
+    public class CS_FeaturePoly_Image : CS_Parent
+    {
+        public FeaturePoly_BasicsOriginal fpoly = new FeaturePoly_BasicsOriginal();
+        Rotate_BasicsQT rotate = new Rotate_BasicsQT();
+        public bool resync;
+        public CS_FeaturePoly_Image(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
+                                "Resync Image after rotation and translation", "Difference between current image and dst2" };
+            desc = "Rotate and shift the image as indicated by FeaturePoly_Basics";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat input = src.Clone();
+            fpoly.Run(src);
+            dst1 = fpoly.dst1;
+            if (!fpoly.resync)
+            {
+                if (!fpoly.fPD.featureLineChanged)
+                {
+                    dst2.SetTo(0);
+                    dst3.SetTo(0);
+                    rotate.rotateAngle = fpoly.fPD.rotateAngle;
+                    rotate.rotateCenter = fpoly.fPD.rotateCenter;
+                    rotate.Run(fpoly.resyncImage);
+                    dst0 = rotate.dst2;
+                    Point2f offset = fpoly.fPD.centerShift;
+                    Rect r1 = new Rect((int)offset.X, (int)offset.Y, dst2.Width - Math.Abs((int)offset.X), dst2.Height - Math.Abs((int)offset.Y));
+                    r1 = ValidateRect(r1);
+                    if (offset.X < 0) r1.X = 0;
+                    if (offset.Y < 0) r1.Y = 0;
+                    Rect r2 = new Rect(Math.Abs((int)offset.X), Math.Abs((int)offset.Y), r1.Width, r1.Height);
+                    r2.Width = r1.Width;
+                    r2.Height = r1.Height;
+                    if (r2.X < 0 || r2.X >= dst2.Width) return; // wedged...
+                    if (r2.Y < 0 || r2.Y >= dst2.Height) return; // wedged...
+                    if (offset.X > 0) r2.X = 0;
+                    if (offset.Y > 0) r2.Y = 0;
+                    Mat mask2 = new Mat(dst2.Size(), MatType.CV_8U, 255);
+                    rotate.Run(mask2);
+                    mask2 = rotate.dst2;
+                    Mat mask = new Mat(dst2.Size(), MatType.CV_8U, 0);
+                    mask[r1].SetTo(255);
+                    mask[r1] = mask2[r2];
+                    mask = ~mask;
+                    dst2[r1] = dst0[r2];
+                    dst3 = input - dst2;
+                    dst3.SetTo(0, mask);
+                }
+                Mat tmp = dst3.CvtColor(ColorConversionCodes.BGR2GRAY);
+                Mat changed = tmp.Threshold(task.gOptions.pixelDiffThreshold, 255, ThresholdTypes.Binary);
+                int diffCount = changed.CountNonZero();
+                resync = fpoly.resync;
+                fpoly.maskChangePercent = (float)diffCount / dst3.Total();
+                strOut = fpoly.strOut;
+                strOut += Environment.NewLine + string.Format("{0:N0}k pixels differ or {1:P0}", diffCount / 1000.0, fpoly.maskChangePercent);
+            }
+            else
+            {
+                dst2 = fpoly.resyncImage.Clone();
+                dst3.SetTo(0);
+            }
+            SetTrueText(strOut, 1);
+        }
+    }
+    public class CS_FeaturePoly_ImageMask : CS_Parent
+    {
+        public FeaturePoly_Image fImage = new FeaturePoly_Image();
+        public CS_FeaturePoly_ImageMask(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            task.gOptions.pixelDiffThreshold = 10;
+            desc = "Build the image mask of the differences between the current frame and resync image";
+        }
+        public void RunCS(Mat src)
+        {
+            fImage.Run(src);
+            dst2 = fImage.dst3;
+            dst0 = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+            dst3 = dst0.Threshold(task.gOptions.pixelDiffThreshold, 255, ThresholdTypes.Binary);
+            labels = fImage.labels;
+            dst1 = fImage.fpoly.dst1;
+            SetTrueText(fImage.strOut, 1);
+        }
+    }
+    public class CS_FeaturePoly_PointCloud : CS_Parent
+    {
+        public FeaturePoly_ImageMask fMask = new FeaturePoly_ImageMask();
+        public Mat fPolyCloud;
+        public CS_FeaturePoly_PointCloud(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Update changed point cloud pixels as indicated by the FeaturePoly_ImageMask";
+        }
+        public void RunCS(Mat src)
+        {
+            fMask.Run(src);
+            if (fMask.fImage.fpoly.resync || task.FirstPass) fPolyCloud = task.pointCloud.Clone();
+            dst1 = fMask.dst1;
+            dst2 = fMask.dst2;
+            dst3 = fMask.dst3;
+            task.pointCloud.CopyTo(fPolyCloud, dst3);
+            SetTrueText(fMask.fImage.strOut, 1);
+        }
+    }
+    public class CS_FeaturePoly_ResyncCheck : CS_Parent
+    {
+        FeaturePoly_BasicsOriginal fPoly = new FeaturePoly_BasicsOriginal();
+        int lastPixelCount = 0;
+        public CS_FeaturePoly_ResyncCheck(VBtask task) : base(task)
+        {
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "If there was no resync, check the longest side of the feature polygon (Feature Line) for unnecessary jitter.";
+        }
+        public void RunCS(Mat src)
+        {
+            fPoly.Run(src);
+            dst2 = fPoly.dst1;
+            SetTrueText(fPoly.strOut, 2);
+            if (fPoly.resync)
+            {
+                dst3.SetTo(0);
+                lastPixelCount = 0;
+            }
+            if (fPoly.fPD.currPoly.Count < 2) return; // polygon not found...
+            var polymp = fPoly.fPD.currmp();
+            DrawLine(dst3, polymp.p1, polymp.p2, new Scalar(255), 1);
+            int pixelCount = Cv2.CountNonZero(dst3);
+            SetTrueText($"{Math.Abs(lastPixelCount - pixelCount)} pixels ", 3);
+            lastPixelCount = pixelCount;
+        }
+    }
+    public class CS_FeaturePoly_Center : CS_Parent
+    {
+        public Rotate_PolyQT rotatePoly = new Rotate_PolyQT();
+        Line_Nearest near = new Line_Nearest();
+        public fPolyData fPD;
+        List<Point2f> newPoly;
+        public CS_FeaturePoly_Center(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "Layout of feature polygons after just translation - red line is used in sine computation",
+                      "Layout of the starting (white) and current (yellow) feature polygons",
+                      "Layout of feature polygons after rotation and translation" };
+            desc = "Manually rotate and translate the current feature polygon to a previous feature polygon.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                SetTrueText(traceName + " is called by FeaturePoly_Basics to get the rotate center and angle." + Environment.NewLine +
+                            "It does not produce any output when run standaloneTest().");
+                return;
+            }
+            var thresholdSlider = FindSlider("Resync if feature moves > X pixels");
+            float threshold = thresholdSlider.Value;
+            int sindex1 = fPD.polyPrevSideIndex;
+            int sIndex2 = (sindex1 + 1) % task.polyCount;
+            var mp1 = fPD.currmp();
+            var mp2 = fPD.prevmp();
+            float d1 = (float) mp1.p1.DistanceTo(mp2.p1);
+            float d2 = (float) mp1.p2.DistanceTo(mp2.p2);
+            PointPair newNear;
+            if (d1 < d2)
+            {
+                fPD.centerShift = new Point2f(mp1.p1.X - mp2.p1.X, mp1.p1.Y - mp2.p1.Y);
+                fPD.rotateCenter = mp1.p1;
+                newNear = new PointPair(mp1.p2, mp2.p2);
+            }
+            else
+            {
+                fPD.centerShift = new Point2f(mp1.p2.X - mp2.p2.X, mp1.p2.Y - mp2.p2.Y);
+                fPD.rotateCenter = mp1.p2;
+                newNear = new PointPair(mp1.p1, mp2.p1);
+            }
+            var transPoly = new List<Point2f>();
+            foreach (var point in fPD.currPoly)
+            {
+                transPoly.Add(new Point2f(point.X - fPD.centerShift.X, point.Y - fPD.centerShift.Y));
+            }
+            newNear.p1 = new Point2f(newNear.p1.X - fPD.centerShift.X, newNear.p1.Y - fPD.centerShift.Y);
+            newNear.p2 = new Point2f(newNear.p2.X - fPD.centerShift.X, newNear.p2.Y - fPD.centerShift.Y);
+            fPD.rotateCenter = new Point2f(fPD.rotateCenter.X - fPD.centerShift.X, fPD.rotateCenter.Y - fPD.centerShift.Y);
+            dst1.SetTo(0);
+            fPD.DrawPolys(dst1, transPoly, this);
+            SetTrueText("Rotate center", fPD.rotateCenter, 1);
+            strOut = "No rotation" + Environment.NewLine;
+            fPD.rotateAngle = 0;
+            if (d1 != d2)
+            {
+                if (newNear.p1.DistanceTo(newNear.p2) > threshold)
+                {
+                    near.lp = new PointPair(fPD.prevPoly[sindex1], fPD.prevPoly[sIndex2]);
+                    near.pt = newNear.p1;
+                    near.Run(new Mat());
+                    DrawLine(dst1, near.pt, near.nearPoint, new Scalar(0, 0, 255), task.lineWidth + 5);
+                    float hypotenuse = (float) fPD.rotateCenter.DistanceTo(near.pt);
+                    fPD.rotateAngle = -(float)Math.Asin(near.nearPoint.DistanceTo(near.pt) / hypotenuse);
+                    if (float.IsNaN(fPD.rotateAngle)) fPD.rotateAngle = 0;
+                    strOut = $"Angle is {fPD.rotateAngle * 57.2958:F1} degrees" + Environment.NewLine;
+                }
+            }
+            strOut += $"Translation (shift) is {-fPD.centerShift.X:F0}, {-fPD.centerShift.Y:F0}";
+            if (Math.Abs(fPD.rotateAngle) > 0)
+            {
+                rotatePoly.rotateCenter = fPD.rotateCenter;
+                rotatePoly.rotateAngle = fPD.rotateAngle;
+                rotatePoly.poly.Clear();
+                rotatePoly.poly.Add(newNear.p1);
+                rotatePoly.Run(new Mat());
+                if (near.nearPoint.DistanceTo(rotatePoly.poly[0]) > newNear.p1.DistanceTo(rotatePoly.poly[0])) fPD.rotateAngle *= -1;
+                rotatePoly.rotateAngle = fPD.rotateAngle;
+                rotatePoly.poly = new List<Point2f>(transPoly);
+                rotatePoly.Run(new Mat());
+                newPoly = new List<Point2f>(rotatePoly.poly);
+            }
+            dst3.SetTo(0);
+            fPD.DrawPolys(dst3, fPD.currPoly, this);
+            SetTrueText(strOut, 2);
+        }
+    }
+    public class CS_FeaturePoly_EdgeRemoval : CS_Parent
+    {
+        FeaturePoly_ImageMask fMask = new FeaturePoly_ImageMask();
+        Edge_All edges = new Edge_All();
+        public CS_FeaturePoly_EdgeRemoval(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Remove edges from the FeaturePoly_ImageMask";
+        }
+        public void RunCS(Mat src)
+        {
+            fMask.Run(src);
+            dst2 = fMask.dst3;
+            edges.Run(src);
+            dst1 = edges.dst2;
+            dst3 = dst2 & ~dst1;
+        }
+    }
+    public class CS_FeaturePoly_ImageNew : CS_Parent
+    {
+        public FeaturePoly_Basics fpoly = new FeaturePoly_Basics();
+        Rotate_BasicsQT rotate = new Rotate_BasicsQT();
+        public bool resync;
+        public CS_FeaturePoly_ImageNew(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
+                  "Resync Image after rotation and translation", "Difference between current image and dst2" };
+            desc = "Rotate and shift the image as indicated by FeaturePoly_Basics";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat input = src.Clone();
+            fpoly.Run(src);
+            dst1 = fpoly.dst3;
+            if (!fpoly.resync)
+            {
+                dst2.SetTo(0);
+                dst3.SetTo(0);
+                rotate.rotateAngle = fpoly.sides.rotateAngle;
+                rotate.rotateCenter = fpoly.sides.rotateCenter;
+                rotate.Run(fpoly.sides.prevImage);
+                dst0 = rotate.dst2;
+                Point2f offset = fpoly.sides.centerShift;
+                Rect r1 = new Rect((int)offset.X, (int)offset.Y, dst2.Width - Math.Abs((int)offset.X), dst2.Height - Math.Abs((int)offset.Y));
+                if (offset.X < 0) r1.X = 0;
+                if (offset.Y < 0) r1.Y = 0;
+                Rect r2 = new Rect(Math.Abs((int)offset.X), Math.Abs((int)offset.Y), r1.Width, r1.Height);
+                if (offset.X > 0) r2.X = 0;
+                if (offset.Y > 0) r2.Y = 0;
+                Mat mask2 = new Mat(dst2.Size(), MatType.CV_8U, 255);
+                rotate.Run(mask2);
+                mask2 = rotate.dst2;
+                Mat mask = new Mat(dst2.Size(), MatType.CV_8U, 0);
+                mask[r1].SetTo(255);
+                mask[r1] = mask2[r2];
+                Cv2.BitwiseNot(mask, mask);
+                dst0[r2].CopyTo(dst2[r1]);
+                Cv2.Subtract(input, dst2, dst3);
+                dst3.SetTo(0, mask);
+                Mat tmp = dst3.CvtColor(ColorConversionCodes.BGR2GRAY);
+                Mat changed = tmp.Threshold(task.gOptions.pixelDiffThreshold, 255, ThresholdTypes.Binary);
+                int diffCount = Cv2.CountNonZero(changed);
+                resync = fpoly.resync;
+                fpoly.maskChangePercent = (float)diffCount / dst3.Total();
+                strOut = fpoly.strOut;
+                strOut += Environment.NewLine + string.Format("{0:N0}k pixels differ or {1:P0}", diffCount / 1000.0, fpoly.maskChangePercent);
+            }
+            else
+            {
+                dst2 = fpoly.sides.prevImage.Clone();
+                dst3.SetTo(0);
+            }
+            SetTrueText(strOut, 1);
+        }
+    }
+    public class CS_FeaturePoly_LeftRight : CS_Parent
+    {
+        FeaturePoly_Basics leftPoly = new FeaturePoly_Basics();
+        FeaturePoly_Basics rightPoly = new FeaturePoly_Basics();
+        public CS_FeaturePoly_LeftRight(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "Left image", "Right image", "FPoly output for left image", "FPoly output for right image" };
+            desc = "Measure camera motion through the left and right images using FPoly";
+        }
+        public void RunCS(Mat src)
+        {
+            dst0 = task.leftView;
+            dst1 = task.rightView;
+            leftPoly.Run(task.leftView);
+            dst2 = leftPoly.dst3;
+            SetTrueText(leftPoly.strOut, 2);
+            rightPoly.Run(task.rightView);
+            dst3 = rightPoly.dst3;
+            SetTrueText(rightPoly.strOut, 3);
+        }
+    }
+
+
+    public class CS_FeaturePoly_Core : CS_Parent
+    {
+        public Stable_GoodFeatures stable = new Stable_GoodFeatures();
+        public Point2f anchor;
+        public Point2f startAnchor;
+        public List<Point2f> goodPoints = new List<Point2f>();
+        public List<List<Point>> goodFacets = new List<List<Point>>();
+        Options_FPoly options = new Options_FPoly();
+        Options_FPolyCore optionsCore = new Options_FPolyCore();
+        public CS_FeaturePoly_Core(VBtask task) : base(task)
+        {
+            dst0 = new Mat(dst0.Size(), MatType.CV_32F, 0);
+            FindSlider("Feature Sample Size").Value = 20;
+            labels = new string[] { "", "Distance change from previous frame", "", "Feature Grid with anchor" };
+            desc = "Feature Grid: compute distances between good features from frame to frame";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            optionsCore.RunVB();
+
+            stable.Run(src);
+            dst3 = stable.basics.dst3;
+            Mat lastDistance = dst0.Clone();
+            anchor = stable.basics.anchorPoint;
+            Point2f lastAnchor = anchor;
+            if (lastAnchor.DistanceTo(anchor) > optionsCore.anchorMovement)
+                lastDistance.SetTo(0);
+            dst0.SetTo(0);
+            goodPoints.Clear();
+            goodFacets.Clear();
+            dst2.SetTo(0);
+            cv.Vec3b white = new cv.Vec3b(255, 255, 255);
+            for (int i = 0; i < stable.basics.facetGen.facet.facetList.Count; i++)
+            {
+                List<Point> facet = stable.basics.facetGen.facet.facetList[i];
+                Point2f pt = stable.basics.ptList[i];
+                double d = anchor.DistanceTo(pt);
+                dst0.FillConvexPoly(facet, d, task.lineType);
+                float lastd = lastDistance.Get<float>((int)pt.Y, (int)pt.X);
+                double absDiff = Math.Abs(lastd - d);
+                if (absDiff < optionsCore.resyncThreshold)
+                {
+                    goodPoints.Add(pt);
+                    goodFacets.Add(facet);
+                    SetTrueText(pt.ToString(), pt, 2);
+                    Cv2.Line(dst3, anchor.ToPoint(), pt.ToPoint(), task.HighlightColor);
+                    dst2.Set<Vec3b>((int)pt.Y, (int)pt.X, white);
+                }
+            }
+            Point2f shift = new Point2f(startAnchor.X - anchor.X, startAnchor.Y - anchor.Y);
+            if (goodPoints.Count == 0 || Math.Abs(shift.X) > optionsCore.maxShift || Math.Abs(shift.Y) > optionsCore.maxShift)
+                startAnchor = anchor;
+            labels[2] = "Distance change (after threshholding) since last reset = " + shift.ToString();
+            lastAnchor = anchor;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

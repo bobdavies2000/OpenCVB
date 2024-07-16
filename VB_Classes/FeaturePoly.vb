@@ -216,10 +216,10 @@ Public Class FeaturePoly_Sides : Inherits VB_Parent
             newPoly = New List(Of cv.Point2f)(rotatePoly.poly)
         End If
 
-        vbDrawFPoly(dst2, prevPoly, cv.Scalar.White)
-        vbDrawFPoly(dst2, currPoly, cv.Scalar.Yellow)
-        drawFatLine(mpPrev.p1, mpPrev.p2, dst2, cv.Scalar.White)
-        drawFatLine(mpCurr.p1, mpCurr.p2, dst2, cv.Scalar.Yellow)
+        DrawFPoly(dst2, prevPoly, cv.Scalar.White)
+        DrawFPoly(dst2, currPoly, cv.Scalar.Yellow)
+        DrawFatLine(mpPrev.p1, mpPrev.p2, dst2, cv.Scalar.White)
+        DrawFatLine(mpCurr.p1, mpCurr.p2, dst2, cv.Scalar.Yellow)
     End Sub
 End Class
 
@@ -276,7 +276,7 @@ Public Class FeaturePoly_BasicsOriginal : Inherits VB_Parent
         dst1 = (dst1 Or center.dst2).tomat
         dst0 = center.dst3
 
-        fPD.jitterTest(dst2) ' the feature line has not really moved.
+        fPD.jitterTest(dst2, Me) ' the feature line has not really moved.
 
         Dim causes As String = ""
         If Math.Abs(fPD.rotateAngle * 57.2958) > 10 Then
@@ -324,8 +324,8 @@ Public Class FeaturePoly_BasicsOriginal : Inherits VB_Parent
         End If
         resyncFrames += 1
 
-        vbDrawFPoly(dst2, fPD.currPoly, white)
-        fPD.drawPolys(dst1, fPD.currPoly)
+        DrawFPoly(dst2, fPD.currPoly, white)
+        fPD.DrawPolys(dst1, fPD.currPoly, Me)
         For i = 0 To fPD.prevPoly.Count - 1
             SetTrueText(CStr(i), fPD.currPoly(i), 1)
             SetTrueText(CStr(i), fPD.currPoly(i), 1)
@@ -470,7 +470,7 @@ Public Class FeaturePoly_Stablizer : Inherits VB_Parent
         dst3 = fGrid.dst3
         labels(3) = fGrid.labels(2)
 
-        Static  syncImage = src.Clone
+        Static syncImage = src.Clone
         If fGrid.startAnchor = fGrid.anchor Then syncImage = src.Clone
 
         Dim shift As cv.Point2f = New cv.Point2f(fGrid.startAnchor.X - fGrid.anchor.X, fGrid.startAnchor.Y - fGrid.anchor.Y)
@@ -482,7 +482,7 @@ Public Class FeaturePoly_Stablizer : Inherits VB_Parent
 
         dst1.SetTo(0)
         dst1(rect) = syncImage(rect)
-        drawFatLine(fGrid.startAnchor, fGrid.anchor, dst1, cv.Scalar.White)
+        DrawFatLine(fGrid.startAnchor, fGrid.anchor, dst1, cv.Scalar.White)
         drawPolkaDot(fGrid.anchor, dst1)
 
         Dim r = New cv.Rect(0, 0, rect.Width, rect.Height)
@@ -511,13 +511,13 @@ Public Class FeaturePoly_StartPoints : Inherits VB_Parent
         desc = "Track the feature grid points back to the last sync point"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static  thresholdSlider = FindSlider("Resync if feature moves > X pixels")
+        Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
         Dim threshold = thresholdSlider.Value
         Dim maxShift = fGrid.anchor.DistanceTo(fGrid.startAnchor) + threshold
 
         fGrid.Run(src)
         dst2 = fGrid.dst3
-        Static  facets As New List(Of List(Of cv.Point))
+        Static facets As New List(Of List(Of cv.Point))
         Dim lastPoints = dst0.Clone
         If fGrid.startAnchor = fGrid.anchor Or goodPoints.Count < 5 Then
             startPoints = New List(Of cv.Point2f)(fGrid.goodPoints)
@@ -633,7 +633,7 @@ Public Class FeaturePoly_WarpAffinePoly : Inherits VB_Parent
         dst2.SetTo(0)
         dst3.SetTo(0)
 
-        vbDrawFPoly(dst2, polyPrev, white)
+        DrawFPoly(dst2, polyPrev, white)
 
         warp.rotateCenter = fPoly.fPD.rotateCenter
         warp.rotateAngle = fPoly.fPD.rotateAngle
@@ -661,8 +661,8 @@ Public Class FeaturePoly_WarpAffinePoly : Inherits VB_Parent
         dst3(r1) = dst2(r2)
         dst3 = dst3 - dst2
 
-        vbDrawFPoly(dst3, rotatePoly.poly, cv.Scalar.Yellow)
-        vbDrawFPoly(dst2, rotatePoly.poly, cv.Scalar.Yellow)
+        DrawFPoly(dst3, rotatePoly.poly, cv.Scalar.Yellow)
+        DrawFPoly(dst2, rotatePoly.poly, cv.Scalar.Yellow)
 
         SetTrueText(fPoly.strOut, 3)
     End Sub
@@ -712,8 +712,8 @@ Public Class FeaturePoly_RotatePoints : Inherits VB_Parent
 
         Dim rotateAndShift As New List(Of cv.Point2f)
         centerShift = shiftPoly(polyPrev, poly)
-        vbDrawFPoly(dst2, polyPrev, white)
-        vbDrawFPoly(dst2, rotatePoly.poly, cv.Scalar.Yellow)
+        DrawFPoly(dst2, polyPrev, white)
+        DrawFPoly(dst2, rotatePoly.poly, cv.Scalar.Yellow)
         For i = 0 To polyPrev.Count - 1
             Dim p1 = New cv.Point2f(rotatePoly.poly(i).X - centerShift.X, rotatePoly.poly(i).Y - centerShift.Y)
             Dim p2 = New cv.Point2f(rotatePoly.poly((i + 1) Mod task.polyCount).X - centerShift.X,
@@ -722,8 +722,8 @@ Public Class FeaturePoly_RotatePoints : Inherits VB_Parent
             SetTrueText(CStr(i), rotatePoly.poly(i), 2)
             SetTrueText(CStr(i), polyPrev(i), 2)
         Next
-        vbDrawFPoly(dst3, polyPrev, white)
-        vbDrawFPoly(dst3, rotateAndShift, cv.Scalar.Yellow)
+        DrawFPoly(dst3, polyPrev, white)
+        DrawFPoly(dst3, rotateAndShift, cv.Scalar.Yellow)
 
         strOut = "After Rotation: " + Format(rotatePoly.rotateAngle, fmt0) + " degrees " +
                  "After Translation (shift) of: " + Format(centerShift.X, fmt0) + ", " + Format(centerShift.Y, fmt0) + vbCrLf +
@@ -814,9 +814,9 @@ Public Class FeaturePoly_Perpendiculars : Inherits VB_Parent
             Exit Sub
         End If
 
-        Static  kalman As New Kalman_Basics
-        Static  perp1 As New Line_Perpendicular
-        Static  perp2 As New Line_Perpendicular
+        Static kalman As New Kalman_Basics
+        Static perp1 As New Line_Perpendicular
+        Static perp2 As New Line_Perpendicular
 
         dst2.SetTo(0)
         perp1.p1 = fPD.currPoly(fPD.polyPrevSideIndex)
@@ -1047,7 +1047,7 @@ Public Class FeaturePoly_ResyncCheck : Inherits VB_Parent
         dst2 = fPoly.dst1
         SetTrueText(fPoly.strOut, 2)
 
-        Static  lastPixelCount As Integer
+        Static lastPixelCount As Integer
         If fPoly.resync Then
             dst3.SetTo(0)
             lastPixelCount = 0
@@ -1090,7 +1090,7 @@ Public Class FeaturePoly_Center : Inherits VB_Parent
             Exit Sub
         End If
 
-        Static  thresholdSlider = FindSlider("Resync if feature moves > X pixels")
+        Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
         Dim threshold = thresholdSlider.Value
 
         Dim sindex1 = fPD.polyPrevSideIndex
@@ -1120,7 +1120,7 @@ Public Class FeaturePoly_Center : Inherits VB_Parent
         fPD.rotateCenter = New cv.Point2f(fPD.rotateCenter.X - fPD.centerShift.X, fPD.rotateCenter.Y - fPD.centerShift.Y)
 
         dst1.SetTo(0)
-        fPD.drawPolys(dst1, transPoly)
+        fPD.DrawPolys(dst1, transPoly, Me)
         SetTrueText("Rotate center", fPD.rotateCenter, 1)
 
         strOut = "No rotation" + vbCrLf
@@ -1156,7 +1156,7 @@ Public Class FeaturePoly_Center : Inherits VB_Parent
             newPoly = New List(Of cv.Point2f)(rotatePoly.poly)
         End If
         dst3.SetTo(0)
-        fPD.drawPolys(dst3, fPD.currPoly)
+        fPD.DrawPolys(dst3, fPD.currPoly, Me)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -1305,30 +1305,24 @@ Public Class FeaturePoly_Core : Inherits VB_Parent
     Public goodFacets As New List(Of List(Of cv.Point))
     Public threshold As Integer
     Dim options As New Options_FPoly
+    Dim optionsCore As New Options_FPolyCore
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Maximum shift to trigger resync", 1, 100, 50)
-            sliders.setupTrackBar("Anchor point max movement", 1, 10, 5)
-        End If
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, 0)
         FindSlider("Feature Sample Size").Value = 20
         labels = {"", "Distance change from previous frame", "", "Feature Grid with anchor"}
         desc = "Feature Grid: compute distances between good features from frame to frame"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static  thresholdSlider = FindSlider("Resync if feature moves > X pixels")
-        Static  shiftSlider = FindSlider("Maximum shift to trigger resync")
-        Static  anchorSlider = FindSlider("Anchor point max movement")
-        Dim maxShift = shiftSlider.Value
-        threshold = thresholdSlider.Value
+        options.RunVB()
+        optionsCore.RunVB()
 
         stable.Run(src)
         dst3 = stable.basics.dst3
 
         Dim lastDistance = dst0.Clone
         anchor = stable.basics.anchorPoint
-        Static  lastAnchor = anchor
-        If lastAnchor.distanceto(anchor) > anchorSlider.Value Then lastDistance.SetTo(0)
+        Static lastAnchor = anchor
+        If lastAnchor.distanceto(anchor) > optionsCore.anchorMovement Then lastDistance.SetTo(0)
 
         dst0.SetTo(0)
         goodPoints.Clear()
@@ -1351,7 +1345,7 @@ Public Class FeaturePoly_Core : Inherits VB_Parent
         Next
 
         Dim shift As cv.Point2f = New cv.Point2f(startAnchor.X - anchor.X, startAnchor.Y - anchor.Y)
-        If goodPoints.Count = 0 Or Math.Abs(shift.X) > maxShift Or Math.Abs(shift.Y) > maxShift Then startAnchor = anchor
+        If goodPoints.Count = 0 Or Math.Abs(shift.X) > optionsCore.maxShift Or Math.Abs(shift.Y) > optionsCore.maxShift Then startAnchor = anchor
         labels(2) = "Distance change (after threshholding) since last reset = " + shift.ToString
         lastAnchor = anchor
     End Sub

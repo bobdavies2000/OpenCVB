@@ -5898,3 +5898,27 @@ Public Class Options_PCA_NColor : Inherits VB_Parent
         desiredNcolors = nSlider.value
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_FPolyCore : Inherits VB_Parent
+    Public maxShift As Integer
+    Public resyncThreshold As Integer
+    Public anchorMovement As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Maximum shift to trigger resync", 1, 100, 50)
+            sliders.setupTrackBar("Anchor point max movement", 1, 10, 5)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static thresholdSlider = FindSlider("Resync if feature moves > X pixels")
+        Static shiftSlider = FindSlider("Maximum shift to trigger resync")
+        Static anchorSlider = FindSlider("Anchor point max movement")
+        maxShift = shiftSlider.Value
+        resyncThreshold = thresholdSlider.Value
+        anchorMovement = anchorSlider.value
+    End Sub
+End Class

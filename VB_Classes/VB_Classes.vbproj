@@ -141,7 +141,6 @@
     <Compile Include="MatchRect.vb" />
     <Compile Include="OEX.vb" />
     <Compile Include="PlyFormat.vb" />
-    <Compile Include="PointPolygonTest.vb" />
     <Compile Include="PongWars.vb" />
     <Compile Include="Bin4Way.vb" />
     <Compile Include="Quadrant.vb" />

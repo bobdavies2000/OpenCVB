@@ -151,7 +151,7 @@ Public Class Rotate_PolyQT : Inherits VB_Parent
             Exit Sub
         End If
 
-        vbDrawFPoly(dst2, poly, cv.Scalar.Red)
+        DrawFPoly(dst2, poly, cv.Scalar.Red)
 
         labels(3) = "White is the original polygon, yellow has been rotated " + Format(rotateAngle * 57.2958) + " degrees"
 
@@ -170,13 +170,13 @@ Public Class Rotate_PolyQT : Inherits VB_Parent
             rotated.Add(New cv.Point2f(x, y))
         Next
 
-        vbDrawFPoly(dst3, poly, white)
+        DrawFPoly(dst3, poly, white)
         poly.Clear()
         For Each pt In rotated
             poly.Add(New cv.Point2f(pt.X + rotateCenter.X, pt.Y + rotateCenter.Y))
         Next
 
-        vbDrawFPoly(dst3, poly, cv.Scalar.Yellow)
+        DrawFPoly(dst3, poly, cv.Scalar.Yellow)
     End Sub
 End Class
 

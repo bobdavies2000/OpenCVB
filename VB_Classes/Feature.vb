@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Feature_Basics : Inherits VB_Parent
-    Dim matList As New List(Of cv.Mat)
+    Dim nextMatList As New List(Of cv.Mat)
     Dim ptList As New List(Of cv.Point2f)
     Dim knn As New KNN_Core
     Dim ptLost As New List(Of cv.Point2f)
@@ -26,10 +26,11 @@ Public Class Feature_Basics : Inherits VB_Parent
             featureMatList.Clear()
         End If
 
-        matList.Clear()
+        nextMatList.Clear()
         ptList.Clear()
         Dim correlationMat As New cv.Mat
-        For i = 0 To Math.Min(featureMatList.Count, task.features.Count) - 1
+        Dim saveFeatureCount = Math.Min(featureMatList.Count, task.features.Count)
+        For i = 0 To saveFeatureCount - 1
             Dim pt = task.features(i)
             Dim rect = ValidateRect(New cv.Rect(pt.X - options.templatePad, pt.Y - options.templatePad, featureMatList(i).Width, featureMatList(i).Height))
             If gather.ptList.Contains(pt) = False Then
@@ -40,14 +41,13 @@ Public Class Feature_Basics : Inherits VB_Parent
                     Continue For
                 End If
             End If
-            matList.Add(featureMatList(i))
+            nextMatList.Add(featureMatList(i))
             ptList.Add(pt)
         Next
 
-        featureMatList = New List(Of cv.Mat)(matList)
-        task.features = New List(Of cv.Point2f)(ptList)
-
+        Dim survivorPercent As Single = (ptList.Count - ptLost.Count) / saveFeatureCount
         Dim extra = 1 + (1 - options.resyncThreshold)
+        task.features = New List(Of cv.Point2f)(ptList)
 
         If task.features.Count < gather.features.Count * options.resyncThreshold Or task.features.Count > extra * gather.features.Count Then
             task.featureMotion = True
@@ -74,6 +74,7 @@ Public Class Feature_Basics : Inherits VB_Parent
             End If
             task.featureMotion = False
             noMotionFrames += 1
+            featureMatList = New List(Of cv.Mat)(nextMatList)
         End If
 
         task.featurePoints.Clear()
@@ -82,8 +83,9 @@ Public Class Feature_Basics : Inherits VB_Parent
             task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
         Next
         If task.heartBeat Then
-            labels(2) = CStr(task.features.Count) + "/" + CStr(matList.Count) + " features were matched to the previous frame using correlation and " +
-                        CStr(ptLost.Count) + " features had to be relocated."
+            If task.featureMotion = True Then survivorPercent = 0
+            labels(2) = Format(survivorPercent, "0%") + " of " + CStr(task.features.Count) + " features were matched to the previous frame using correlation and " +
+                        CStr(ptLost.Count) + " features had to be relocated"
         End If
         If task.heartBeat Then
             Dim percent = noMotionFrames / task.fpsRate

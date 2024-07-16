@@ -9,7 +9,6 @@ Imports System.Management
 Imports System.Runtime.InteropServices
 Imports VB_Classes
 Imports FS_Classes
-
 Module opencv_module
     ' Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
     Public callTraceLock As New Mutex(True, "callTraceLock")
@@ -722,7 +721,14 @@ Public Class OpenCVB
             While sr.EndOfStream = False
                 infoLine = sr.ReadLine
                 infoLine = UCase(Mid(infoLine, 1, 1)) + Mid(infoLine, 2)
-                If infoLine.StartsWith("Options_") = False Then addNextAlgorithm(infoLine, lastNameSplit)
+                If infoLine.StartsWith("Options_") = False Then
+                    If infoLine.StartsWith("CS_") Then
+                        addNextCSplitAlgorithm(infoLine, lastNameSplit)
+                    Else
+                        addNextAlgorithm(infoLine, lastNameSplit)
+                    End If
+
+                End If
             End While
             sr.Close()
         Else
@@ -739,7 +745,6 @@ Public Class OpenCVB
                     Else
                         addNextAlgorithm(split(i), lastNameSplit)
                     End If
-
                 End If
             Next
             AvailableAlgorithms.Enabled = True

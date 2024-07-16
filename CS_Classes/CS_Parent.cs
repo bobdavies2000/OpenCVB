@@ -229,12 +229,23 @@ namespace CS_Classes
         return (float)Math.Sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]) + (p1[2] - p2[2]) * (p1[2] - p2[2]));
     }
 
-    public void vbDrawFPoly(ref cv.Mat dst, List<cv.Point2f> poly, cv.Scalar color)
+        public void DrawFatLine(Point2f p1, Point2f p2, Mat dst, Scalar fatColor)
+        {
+            int pad = 2;
+            if (task.WorkingRes.Width >= 640) pad = 6;
+
+            DrawLine(dst, p1, p2, fatColor, task.lineWidth + pad);
+            DrawLine(dst, p1, p2, Scalar.Black, task.lineWidth);
+        }
+
+        public void DrawFPoly(ref cv.Mat dst, List<cv.Point2f> poly, cv.Scalar color)
     {
         int minMod = Math.Min(poly.Count, task.polyCount);
         for (int i = 0; i < minMod; i++)
         {
-            DrawLine(dst, poly[i], poly[(i + 1) % minMod], color, task.lineWidth);
+                var p1 = new cv.Point((int)poly[i].X, (int)poly[i].Y);
+                var p2 = new cv.Point((int)poly[(i+1) % minMod].X, (int)poly[(i+1) % minMod].Y);
+                DrawLine(dst, p1, poly[(i + 1) % minMod], color, task.lineWidth);
         }
     }
 

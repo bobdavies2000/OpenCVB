@@ -165,8 +165,11 @@ Public Class VB_Parent : Implements IDisposable
                            task.cvFontThickness, task.lineType)
         Next
     End Sub
-    Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
-        dst.Line(p1, p2, color, task.lineWidth, task.lineType)
+    Public Sub DrawFatLine(p1 As cv.Point2f, p2 As cv.Point2f, dst As cv.Mat, fatColor As cv.Scalar)
+        Dim pad = 2
+        If task.WorkingRes.Width >= 640 Then pad = 6
+        dst.Line(p1, p2, fatColor, task.lineWidth + pad, task.lineType)
+        DrawLine(dst, p1, p2, cv.Scalar.Black)
     End Sub
     Public Function IntersectTest(p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f, rect As cv.Rect) As cv.Point2f
         Dim x = p3 - p1
@@ -211,12 +214,6 @@ Public Class VB_Parent : Implements IDisposable
                          (p1(1) - p2(1)) * (p1(1) - p2(1)) +
                          (p1(2) - p2(2)) * (p1(2) - p2(2)))
     End Function
-    Public Sub vbDrawFPoly(ByRef dst As cv.Mat, poly As List(Of cv.Point2f), color As cv.Scalar)
-        Dim minMod = Math.Min(poly.Count, task.polyCount)
-        For i = 0 To minMod - 1
-            DrawLine(dst, poly(i), poly((i + 1) Mod minMod), color)
-        Next
-    End Sub
     Public Function contourBuild(mask As cv.Mat, approxMode As cv.ContourApproximationModes) As List(Of cv.Point)
         Dim allContours As cv.Point()()
         cv.Cv2.FindContours(mask, allContours, Nothing, cv.RetrievalModes.External, approxMode)
@@ -545,6 +542,15 @@ Public Class VB_Parent : Implements IDisposable
         Dim split = advice.Split(":")
         If task.advice.Contains(split(0) + ":") Then Return
         task.advice += advice + vbCrLf + vbCrLf
+    End Sub
+    Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
+        dst.Line(p1, p2, color, task.lineWidth, task.lineType)
+    End Sub
+    Public Sub DrawFPoly(ByRef dst As cv.Mat, poly As List(Of cv.Point2f), color As cv.Scalar)
+        Dim minMod = Math.Min(poly.Count, task.polyCount)
+        For i = 0 To minMod - 1
+            DrawLine(dst, poly(i), poly((i + 1) Mod minMod), color)
+        Next
     End Sub
     Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f, radius As Integer, color As cv.Scalar)
         dst.Circle(pt, radius, color, -1, task.lineType)

@@ -32,15 +32,6 @@ Module VB_Common
         thisObj = withThisObj
         withThisObj = tempObj
     End Sub
-    Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
-        dst.Line(p1, p2, color, task.lineWidth, task.lineType)
-    End Sub
-    Public Sub vbDrawFPoly(ByRef dst As cv.Mat, poly As List(Of cv.Point2f), color As cv.Scalar)
-        Dim minMod = Math.Min(poly.Count, task.polyCount)
-        For i = 0 To minMod - 1
-            DrawLine(dst, poly(i), poly((i + 1) Mod minMod), color)
-        Next
-    End Sub
     Public Function GetNormalize32f(Input As cv.Mat) As cv.Mat
         Dim outMat = Input.Normalize(0, 255, cv.NormTypes.MinMax)
         If Input.Channels() = 1 Then
@@ -116,13 +107,6 @@ Module VB_Common
         task.MaxZmeters = task.gOptions.maxDepth
         task.metersPerPixel = task.MaxZmeters / task.WorkingRes.Height ' meters per pixel in projections - side and top.
         task.debugSyncUI = task.gOptions.debugSyncUI.Checked
-    End Sub
-
-    Public Sub drawFatLine(p1 As cv.Point2f, p2 As cv.Point2f, dst As cv.Mat, fatColor As cv.Scalar)
-        Dim pad = 2
-        If task.WorkingRes.Width >= 640 Then pad = 6
-        dst.Line(p1, p2, fatColor, task.lineWidth + pad, task.lineType)
-        DrawLine(dst, p1, p2, cv.Scalar.Black)
     End Sub
 End Module
 
@@ -334,16 +318,16 @@ Public Class fPolyData
         If polyPrevSideIndex >= currPoly.Count - 1 Then polyPrevSideIndex = 0
         Return New PointPair(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount))
     End Function
-    Public Sub drawPolys(dst As cv.Mat, currPoly As List(Of cv.Point2f))
-        vbDrawFPoly(dst, prevPoly, cv.Scalar.White)
-        vbDrawFPoly(dst, currPoly, cv.Scalar.Yellow)
-        drawFatLine(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount), dst, cv.Scalar.Yellow)
-        drawFatLine(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod task.polyCount), dst, cv.Scalar.White)
+    Public Sub DrawPolys(dst As cv.Mat, currPoly As List(Of cv.Point2f), parent As Object)
+        parent.DrawFPoly(dst, prevPoly, cv.Scalar.White)
+        parent.DrawFPoly(dst, currPoly, cv.Scalar.Yellow)
+        parent.DrawFatLine(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount), dst, cv.Scalar.Yellow)
+        parent.DrawFatLine(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod task.polyCount), dst, cv.Scalar.White)
     End Sub
-    Public Sub jitterTest(dst As cv.Mat) ' return true if there is nothing to change
+    Public Sub jitterTest(dst As cv.Mat, parent As Object) ' return true if there is nothing to change
         If jitterCheck Is Nothing Then jitterCheck = New cv.Mat(dst.Size(), cv.MatType.CV_8U, 0)
         Dim polymp = currmp()
-        DrawLine(jitterCheck, polymp.p1, polymp.p2, 255)
+        parent.DrawLine(jitterCheck, polymp.p1, polymp.p2, 255)
         Dim jitterPixels = jitterCheck.CountNonZero
         If jitterPixels = lastJitterPixels Then featureLineChanged = True Else featureLineChanged = False
         lastJitterPixels = jitterPixels
