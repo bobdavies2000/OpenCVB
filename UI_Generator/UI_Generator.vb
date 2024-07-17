@@ -39,20 +39,22 @@ Module UI_GeneratorMain
         Dim PYStreamNames As New SortedList(Of String, String)
         Dim LastEdits As New SortedList(Of String, String)
 
-
         Dim cppAlgorithmInput = New FileInfo("../CPP_Classes/CPP_Algorithms.h")
-        Dim CPPInput = New FileInfo("../CPP_Classes/CPP_AI_Generated.h")
-        Dim CSInput = New FileInfo("../CS_Classes/CS_AI_Gen1.cs")
+        Dim CPPIncludeOnly = New FileInfo("../CPP_Classes/CPP_AI_Generated.h")
+        Dim CSInput = New FileInfo("../CS_Classes/CS_AI_Gen.cs")
         Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../VB_classes/")
         If cppAlgorithmInput.Exists = False Then
             cppAlgorithmInput = New FileInfo("../../CPP_Classes/CPP_Algorithms.h")
-            CPPInput = New FileInfo("../../CPP_Classes/CPP_AI_Generated.h")
-            CSInput = New FileInfo("../../CS_Classes/CS_AI_Gen1.cs")
+            CPPIncludeOnly = New FileInfo("../../CPP_Classes/CPP_AI_Generated.h")
+            CSInput = New FileInfo("../../CS_Classes/CS_AI_Gen.cs")
             VBcodeDir = New DirectoryInfo(CurDir() + "/../../VB_classes/")
         End If
         Dim HomeDir As New DirectoryInfo(VBcodeDir.FullName + "/../")
 
         Dim indexTestFile = New FileInfo(HomeDir.FullName + "/Data/AlgorithmGroupNames.txt")
+#If DEBUG Then
+        If indexTestFile.Exists Then My.Computer.FileSystem.DeleteFile(indexTestFile.FullName)
+#End If
         If indexTestFile.Exists And Not Debugger.IsAttached Then
             If checkDates(New DirectoryInfo(HomeDir.FullName + "/CS_Classes/"), indexTestFile) = False Then
                 If checkDates(New DirectoryInfo(HomeDir.FullName + "/VB_Classes/"), indexTestFile) = False Then
@@ -63,8 +65,8 @@ Module UI_GeneratorMain
         End If
         Console.WriteLine("Starting work to generate the user interface.")
 
-        Dim includeOnly = File.ReadAllLines(CPPInput.FullName)
-        Dim cppLines As Integer
+        Dim includeOnly = File.ReadAllLines(CPPIncludeOnly.FullName)
+        Dim cppLines As Integer, csLines As Integer
         For Each incline In includeOnly
             incline = Trim(incline)
             If incline.StartsWith("//") Then Continue For
@@ -72,12 +74,12 @@ Module UI_GeneratorMain
             cppLines += 1
         Next
 
-        Dim AlgorithmList = File.ReadAllLines(CPPInput.FullName)
-        For Each algline In AlgorithmList
+        Dim CSAlgorithms = File.ReadAllLines(CSInput.FullName)
+        For Each algline In CSAlgorithms
             algline = Trim(algline)
             If algline.StartsWith("//") Then Continue For
             If algline.Length = 0 Then Continue For
-            cppLines += 1
+            csLines += 1
         Next
 
         ' first read all the cpp functions that are present in the project
@@ -129,7 +131,7 @@ Module UI_GeneratorMain
         Next
 
         Dim className As String = ""
-        Dim CodeLineCount As Integer = cppLines  ' now adding in the C++ and C# lines...
+        Dim CodeLineCount As Integer = cppLines + csLines ' now adding in the C++ and C# lines...
         Dim sortedNames As New SortedList(Of String, Integer)
         Dim sIndex As Integer
         For Each fileName In fileNames
@@ -355,7 +357,7 @@ Module UI_GeneratorMain
             If info.Name.EndsWith(".py") Then className = info.Name ' python file names are the class name - they don't have multiple classnames per file
             While nextFile.Peek() <> -1
                 Dim codeline = Trim(nextFile.ReadLine())
-                If codeline.Trim.StartsWith("//") Then Continue For
+                If codeline.Trim.StartsWith("//") Then Continue While
                 If codeline.Contains("public class CS_") Then
                     Dim split = codeline.Split(" \W+")
                     CSnames.Add(split(2), split(2))
