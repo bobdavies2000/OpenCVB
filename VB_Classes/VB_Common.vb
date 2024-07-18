@@ -327,7 +327,7 @@ Public Class fPolyData
     Public Sub jitterTest(dst As cv.Mat, parent As Object) ' return true if there is nothing to change
         If jitterCheck Is Nothing Then jitterCheck = New cv.Mat(dst.Size(), cv.MatType.CV_8U, 0)
         Dim polymp = currmp()
-        parent.DrawLine(jitterCheck, polymp.p1, polymp.p2, 255)
+        parent.DrawLine(jitterCheck, polymp.p1, polymp.p2, 255, task.lineWidth)
         Dim jitterPixels = jitterCheck.CountNonZero
         If jitterPixels = lastJitterPixels Then featureLineChanged = True Else featureLineChanged = False
         lastJitterPixels = jitterPixels

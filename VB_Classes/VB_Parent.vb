@@ -543,6 +543,9 @@ Public Class VB_Parent : Implements IDisposable
         If task.advice.Contains(split(0) + ":") Then Return
         task.advice += advice + vbCrLf + vbCrLf
     End Sub
+    Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar, lineWidth As Integer)
+        dst.Line(p1, p2, color, lineWidth, task.lineType)
+    End Sub
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
         dst.Line(p1, p2, color, task.lineWidth, task.lineType)
     End Sub

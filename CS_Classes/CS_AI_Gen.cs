@@ -17612,9 +17612,12 @@ public class CS_ApproxPoly_Basics : CS_Parent
     {
         public List<Point> startPoints;
         public List<Point> goodPoints;
-        public FeaturePoly_Core fGrid;
+        public FeaturePoly_Core fGrid = new FeaturePoly_Core();
+        TrackBar resyncSlider;
         public CS_FeaturePoly_StartPoints(VBtask task) : base(task)
         {
+            resyncSlider = FindSlider("Resync if feature moves > X pixels");
+
             dst0 = new Mat(dst0.Rows, dst0.Cols, MatType.CV_8U, 1);
             dst0.SetTo(new cv.Scalar(255));
             if (standaloneTest()) task.gOptions.setDisplay1();
@@ -17622,7 +17625,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         }
         public void RunCS(Mat src)
         {
-            int threshold = FindSlider("Resync if feature moves > X pixels").Value;
+            int threshold = resyncSlider.Value;
             double maxShift = fGrid.anchor.DistanceTo(fGrid.startAnchor) + threshold;
             fGrid.Run(src);
             dst2 = fGrid.dst3;
