@@ -564,7 +564,7 @@ Public Class FeatureLine_DetailsAll : Inherits VB_Parent
             Next
             If flow.nextMsg = title Then flow.nextMsg = "No feature line found..."
         End If
-        flow.Run(Nothing)
+        flow.Run(empty)
         If arcList.Count = 0 Then Exit Sub
 
         Dim mostAccurate = arcList(0)

@@ -9747,6 +9747,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
         public CS_Crypto_Hash(VBtask task) : base(task)
         {
+            flow.parentData = this;
             desc = "Experiment with hashing algorithm and guid";
         }
 
@@ -9785,6 +9786,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 {
                     guids.RemoveAt(0);
                 }
+
 
                 flow.Run(empty);
             }
@@ -10007,6 +10009,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
         public CS_DCT_Surfaces_debug(VBtask task) : base(task)
         {
+            flow.parentData = this;
             labels = new string[] { "", "", "Stats on the largest region below DCT threshold", "Various views of regions with DCT below threshold" };
             task.gOptions.setDisplay0();
             desc = "Find plane equation for a featureless surface - debugging one region for now.";
@@ -10071,7 +10074,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     }
                 }
             }
-            flow.Run(new Mat());
+            flow.Run(empty);
         }
     }
 
@@ -13404,6 +13407,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         }
         public CS_Draw_ClipLine(VBtask task) : base(task)
         {
+            flow.parentData = this;
             setup();
             desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle";
         }
@@ -15123,6 +15127,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         Options_Features options = new Options_Features();
         public CS_Feature_PointTracker(VBtask task) : base(task)
         {
+            flow.parentData = this;
             flow.dst = RESULT_DST3;
             labels[3] = "Correlation coefficients for each remaining cell";
             desc = "Use the top X goodFeatures and then use matchTemplate to find track them.";
@@ -17010,6 +17015,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         int firstBest;
         public CS_FeatureLine_DetailsAll(VBtask task) : base(task)
         {
+            flow.parentData = this;
             flow.dst = 3;
             desc = "Use FeatureLine_Finder data to collect vertical lines and measure accuracy of each.";
         }
@@ -17047,7 +17053,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     }
                 }
             }
-            flow.Run(null);
+            flow.Run(empty);
             if (arcList.Count == 0) return;
             float mostAccurate = arcList[0];
             firstAverage.Add(mostAccurate);
