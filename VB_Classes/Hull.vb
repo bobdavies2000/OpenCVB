@@ -20,10 +20,10 @@ Public Class Hull_Basics : Inherits VB_Parent
         If (standaloneTest() And task.heartBeat) Or (useRandomPoints And task.heartBeat) Then
             random.Run(empty)
             dst2.SetTo(0)
-            For Each pt In random.pointList
+            For Each pt In random.PointList
                 DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
             Next
-            inputPoints = New List(Of cv.Point2f)(random.pointList)
+            inputPoints = New List(Of cv.Point2f)(random.PointList)
         End If
         Dim hull2f = cv.Cv2.ConvexHull(inputPoints, True)
         hull = vbFloat2Int(hull2f.ToList)

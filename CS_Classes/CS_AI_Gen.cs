@@ -524,7 +524,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
     public class CS_Random_Basics : CS_Parent
     {
-        public List<cv.Point2f> pointList = new List<cv.Point2f>();
+        public List<cv.Point2f> PointList = new List<cv.Point2f>();
         public Rect range;
         public Options_Random options = new Options_Random();
 
@@ -541,17 +541,17 @@ public class CS_ApproxPoly_Basics : CS_Parent
             int sizeRequest = options.count;
             if (!task.paused)
             {
-                pointList.Clear();
+                PointList.Clear();
                 Random msRNG = new Random();
-                while (pointList.Count < sizeRequest)
+                while (PointList.Count < sizeRequest)
                 {
-                    pointList.Add(new cv.Point2f(msRNG.Next(range.X, range.X + range.Width),
+                    PointList.Add(new cv.Point2f(msRNG.Next(range.X, range.X + range.Width),
                                               msRNG.Next(range.Y, range.Y + range.Height)));
                 }
                 if (standaloneTest())
                 {
                     dst2.SetTo(0);
-                    foreach (var pt in pointList)
+                    foreach (var pt in PointList)
                     {
                         DrawCircle(dst2, pt, task.DotSize, Scalar.Yellow);
                     }
@@ -582,7 +582,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 anneal[i] = new CS_Annealing_Basics_CPP(task);
                 anneal[i].numberOfCities = options.cityCount;
-                anneal[i].cityPositions = random.pointList.ToArray();
+                anneal[i].cityPositions = random.PointList.ToArray();
                 anneal[i].circularPattern = options.circularFlag;
                 anneal[i].setup();
                 anneal[i].Open(); // this will initialize the C++ copy of the city positions.
@@ -6355,7 +6355,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 random.RunAndMeasure(empty, random);
                 generation = 0;
                 savePointCount = random.options.count;
-                foreach (var point in random.pointList)
+                foreach (var point in random.PointList)
                 {
                     grid.Set((int)point.Y, (int)point.X, 1);
                 }
@@ -8861,16 +8861,16 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 random.Run(src);
                 dst2.SetTo(0);
-                foreach (var p1 in random.pointList)
+                foreach (var p1 in random.PointList)
                 {
-                    foreach (var p2 in random.pointList)
+                    foreach (var p2 in random.PointList)
                     {
                         DrawLine(dst2, p1, p2, Scalar.White, task.lineWidth);
                     }
                 }
             }
 
-            var hullPoints = Cv2.ConvexHull(random.pointList.ToArray(), true).ToList();
+            var hullPoints = Cv2.ConvexHull(random.PointList.ToArray(), true).ToList();
 
             var hull = new List<cv.Point>();
             foreach (var pt in hullPoints)
@@ -9648,10 +9648,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (standaloneTest())
             {
                 random.RunAndMeasure(empty, random);
-                src = new Mat(random.pointList.Count, 2, MatType.CV_32F, random.pointList.ToArray());
-                for (int i = 0; i < random.pointList.Count; i++)
+                src = new Mat(random.PointList.Count, 2, MatType.CV_32F, random.PointList.ToArray());
+                for (int i = 0; i < random.PointList.Count; i++)
                 {
-                    DrawCircle(dst3, random.pointList[i], 3, Scalar.White);
+                    DrawCircle(dst3, random.PointList[i], 3, Scalar.White);
                 }
             }
 
@@ -10149,7 +10149,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             random.Run(null);
             dst2.SetTo(new Scalar(0));
 
-            foreach (var pt in random.pointList)
+            foreach (var pt in random.PointList)
             {
                 subdiv.Insert(pt);
                 var edgeList = subdiv.GetEdgeList();
@@ -10161,7 +10161,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 }
             }
 
-            foreach (var pt in random.pointList)
+            foreach (var pt in random.PointList)
             {
                 DrawCircle(dst2, pt, task.DotSize + 1, new Scalar(255, 0, 0), -1);
             }
@@ -10255,7 +10255,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (standaloneTest() && task.heartBeat)
             {
                 random.Run(null);
-                inputPoints = random.pointList.ToList();
+                inputPoints = random.PointList.ToList();
             }
 
             facet.inputPoints = inputPoints;
@@ -10315,7 +10315,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 {
                     random.Run(null);
                 }
-                inputPoints = random.pointList.ToList();
+                inputPoints = random.PointList.ToList();
             }
 
             knn.queries = inputPoints;
@@ -17291,7 +17291,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (standaloneTest() && task.heartBeat)
             {
                 random.Run(empty);
-                currPoly = new List<Point2f>(random.pointList);
+                currPoly = new List<Point2f>(random.PointList);
             }
             dst2.SetTo(0);
             currLengths.Clear();
@@ -19186,9 +19186,583 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
 
 
+    public class CS_FitLine_Basics : CS_Parent
+    {
+        Options_FitLine options = new Options_FitLine();
+        public Draw_Lines draw = new Draw_Lines();
+        public List<Point> lines = new List<Point>(); // there are always an even number - 2 points define the line.
+        public CS_FitLine_Basics(VBtask task) : base(task)
+        {
+            FindSlider("DrawCount").Value = 2;
+            labels[3] = "CS_FitLine_Basics input";
+            desc = "Show how Fitline API works. When the lines overlap the image has a single contour and the lines are occasionally not found.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (!task.heartBeat) return;
+            options.RunVB();
+            if (standaloneTest())
+            {
+                draw.Run(src);
+                dst3 = draw.dst2.CvtColor(ColorConversionCodes.BGR2GRAY).Threshold(1, 255, ThresholdTypes.Binary);
+                dst2 = dst3.CvtColor(ColorConversionCodes.GRAY2BGR);
+            }
+            else
+            {
+                lines.Clear();
+            }
+            Point[][] contours = Cv2.FindContoursAsArray(dst3, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
+            for (int i = 0; i < contours.Length; i++)
+            {
+                Point[] tour = contours[i];
+                Line2D line2d = Cv2.FitLine(tour, DistanceTypes.L2, 0, options.radiusAccuracy, options.angleAccuracy);
+                double slope = line2d.Vy / line2d.Vx;
+                int leftY = (int)Math.Round(-line2d.X1 * slope + line2d.Y1);
+                int rightY = (int)Math.Round((src.Cols - line2d.X1) * slope + line2d.Y1);
+                cv.Point p1 = new cv.Point(0, leftY);
+                cv.Point p2 = new cv.Point(src.Cols - 1, rightY);
+                if (standaloneTest())
+                {
+                    lines.Add(p1);
+                    lines.Add(p2);
+                }
+                DrawLine(dst2, p1, p2, Scalar.Red, task.lineWidth);
+            }
+        }
+    }
+    public class CS_FitLine_Basics3D : CS_Parent
+    {
+        Hough_Lines_MT hlines = new Hough_Lines_MT();
+        public CS_FitLine_Basics3D(VBtask task) : base(task)
+        {
+            desc = "Use visual lines to find 3D lines.  This algorithm is NOT working.";
+            labels[3] = "White is featureless RGB, blue depth shadow";
+        }
+        public void houghShowLines3D(Mat dst, Line3D segment)
+        {
+            double x = segment.X1 * dst.Cols;
+            double y = segment.Y1 * dst.Rows;
+            double m = segment.Vx < 0.001 ? 0 : segment.Vy / segment.Vx; // vertical slope a no-no.
+            double b = y - m * x;
+            cv.Point pt1 = new cv.Point(x, y);
+            cv.Point pt2 = m == 0 ? new cv.Point(x, dst.Rows) : new cv.Point((dst.Rows - b) / m, dst.Rows);
+            DrawLine(dst, pt1, pt2, Scalar.Red, task.lineWidth + 2);
+        }
+        public void RunCS(Mat src)
+        {
+            if (!task.heartBeat) return;
+            hlines.Run(src);
+            dst3 = hlines.dst3;
+            Mat mask = dst3.CvtColor(ColorConversionCodes.BGR2GRAY).Threshold(1, 255, ThresholdTypes.Binary);
+            dst3 = mask.CvtColor(ColorConversionCodes.GRAY2BGR);
+            src.CopyTo(dst2);
+            List<Line3D> lines = new List<Line3D>();
+            Line3D nullLine = new Line3D(0, 0, 0, 0, 0, 0);
+            Parallel.ForEach(task.gridList, roi =>
+            {
+                Mat depth = task.pcSplit[2][roi];
+                Mat fMask = mask[roi];
+                List<Point3f> points = new List<Point3f>();
+                int rows = src.Rows, cols = src.Cols;
+                for (int y = 0; y < roi.Height; y++)
+                {
+                    for (int x = 0; x < roi.Width; x++)
+                    {
+                        if (fMask.Get<byte>(y, x) > 0)
+                        {
+                            float d = depth.Get<float>(y, x);
+                            if (d > 0 && d < 10000)
+                            {
+                                points.Add(new Point3f(x / (float)rows, y / (float)cols, d / 10000f));
+                            }
+                        }
+                    }
+                }
+                Line3D line = nullLine;
+                if (points.Count == 0)
+                {
+                    // save the average color for this roi
+                    Scalar mean = task.depthRGB[roi].Mean();
+                    mean[0] = 255 - mean[0];
+                    Cv2.Rectangle(dst3, roi, mean);
+                }
+                else
+                {
+                    line = Cv2.FitLine(points.ToArray(), DistanceTypes.L2, 0, 0, 0.01);
+                }
+                lock (lines)
+                {
+                    lines.Add(line);
+                }
+            });
+            // putting this in the parallel for above causes a memory leak - could not find it...
+            for (int i = 0; i < task.gridList.Count; i++)
+            {
+                cv.Rect roi = task.gridList[i];
+                houghShowLines3D(dst2[roi], lines[i]);
+            }
+        }
+    }
 
 
+    public class CS_FLANN_Test : CS_Parent
+    {
+        public CS_FLANN_Test(VBtask task) : base(task)
+        {
+            desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. ";
+            labels[2] = "FLANN Basics";
+        }
+        public void RunCS(Mat src)
+        {
+            // creates data set
+            using (var features = new Mat(10000, 2, MatType.CV_32FC1))
+            {
+                Cv2.Randu(features, 0, new Random().Next(9900, 10000));
+                var queryPoint = new Point2f(new Random().Next(0, 10000), new Random().Next(0, 10000));
+                var queries = new Mat(1, 2, MatType.CV_32FC1);
+                queries.Set<float>(0, 0, queryPoint.X);
+                queries.Set<float>(0, 1, queryPoint.Y);
+                // knnSearch
+                using (var nnIndex = new cv.Flann.Index(features, new cv.Flann.KDTreeIndexParams(4)))
+                {
+                    int knn = 1;
+                    int[] indices;
+                    float[] dists;
+                    nnIndex.KnnSearch(queries, out indices, out dists, knn, new cv.Flann.SearchParams(32));
+                    var output = "";
+                    for (int i = 0; i < knn; i++)
+                    {
+                        int index = indices[i];
+                        float dist = dists[i];
+                        var pt = new Point2f(features.Get<float>(index, 0), features.Get<float>(index, 1));
+                        output += $"No.{i}\t\n";
+                        output += $"index:{index}\n";
+                        output += $"distance:{dist}\n";
+                        output += $"data:({pt.X}, {pt.Y})\n";
+                    }
+                    SetTrueText(output);
+                }
+            }
+        }
+    }
+    public class CS_FLANN_Basics : CS_Parent
+    {
+        Random_Basics random = new Random_Basics();
+        Point2f[] qArray;
+        Distance_Point3D dist = new Distance_Point3D();
+        Options_FLANN options = new Options_FLANN();
+        public CS_FLANN_Basics(VBtask task) : base(task)
+        {
+            FindSlider("Random Pixel Count").Value = 5;
+            desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor";
+            labels[2] = "Red is query, Nearest points blue";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (options.reuseData == false || task.frameCount < 2 || task.mouseClickFlag)
+                random.Run(empty); // fill result1 with random points in x and y range of the image.
+            var features = new Mat(random.PointList.Count, 2, MatType.CV_32F, random.PointList.ToArray());
+            int matchCount = Math.Min(options.matchCount, random.PointList.Count - 1);
+            dst2.SetTo(Scalar.White);
+            for (int i = 0; i < features.Rows; i++)
+            {
+                var pt = random.PointList[i];
+                DrawCircle(dst2, pt, task.DotSize, Scalar.Blue);
+            }
+            if (options.reuseData == false || task.optionsChanged || task.mouseClickFlag)
+            {
+                qArray = new Point2f[options.queryCount];
+                for (int i = 0; i < options.queryCount; i++)
+                {
+                    qArray[i] = new Point2f(new Random().Next(0, src.Width), new Random().Next(0, src.Height));
+                }
+            }
+            var queries = new Mat(options.queryCount, 2, MatType.CV_32F, qArray);
+            using (var nnIndex = new cv.Flann.Index(features, new cv.Flann.KDTreeIndexParams(matchCount)))
+            {
+                int[] indices;
+                float[] distances;
+                for (int i = 0; i < options.queryCount; i++)
+                {
+                    var pt1 = queries.Get<Point2f>(i);
+                    var query = new Mat(1, 2, MatType.CV_32F);
+                    query.Set<float>(0, 0, pt1.X);
+                    query.Set<float>(0, 1, pt1.Y);
+                    nnIndex.KnnSearch(query, out indices, out distances, matchCount, new cv.Flann.SearchParams(options.searchCheck, options.eps, options.sorted));
+                    for (int j = 0; j < matchCount; j++)
+                    {
+                        int index = indices[j];
+                        if (index >= 0 && index < random.PointList.Count)
+                        {
+                            var pt2 = random.PointList[index];
+                            DrawLine(dst2, pt1, pt2, Scalar.Red, task.lineWidth);
+                        }
+                    }
+                    DrawCircle(dst2, pt1, task.DotSize, Scalar.Red);
+                }
+            }
+            string output = "FLANN does not appear to be working (most likely, it is my problem) but to show this:\n";
+            output += "Set query count to 1 and set to reuse the same data (defaults.)\n";
+            output += "The query (in red) is often not picking the nearest blue point.\n";
+            output += "To try different inputs, click anywhere in the image.";
+            output += "To test further, set the match count to a higher value and observe it will often switch blue dots.\n";
+            output += "Play with the EPS and searchparams check count to see if that helps.\n\n";
+            output += "If the 'Search check' is set to 25 and the 'Match count' is set to 4, it does appear to return to the top 4.\n";
+            output += "Perhaps FLANN is only good enough to find a group of neighbors.  Use with caution.";
+            SetTrueText(output, new cv.Point(10, 50), 3);
+        }
+    }
 
+
+    public class CS_Flood_Basics : CS_Parent
+    {
+        RedCloud_CPP redCPP = new RedCloud_CPP();
+        public Cell_Generate genCells = new Cell_Generate();
+        Color8U_Basics color;
+        public CS_Flood_Basics(VBtask task) : base(task)
+        {
+            task.redOptions.setIdentifyCells(true);
+            desc = "Build the RedCloud cells with the grayscale input.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 1)
+            {
+                if (color == null) color = new Color8U_Basics();
+                color.Run(src);
+                src = color.dst2;
+            }
+            else
+            {
+                redCPP.inputMask = src;
+            }
+            redCPP.Run(src);
+            if (redCPP.classCount == 0) return; // no data to process.
+            genCells.classCount = redCPP.classCount;
+            genCells.rectList = redCPP.rectList;
+            genCells.floodPoints = redCPP.floodPoints;
+            genCells.removeContour = false;
+            genCells.Run(redCPP.dst2);
+            dst2 = genCells.dst2;
+            task.setSelectedContour();
+            labels[2] = genCells.labels[2];
+        }
+    }
+    public class CS_Flood_CellStatsPlot : CS_Parent
+    {
+        Flood_Basics flood = new Flood_Basics();
+        Cell_BasicsPlot stats = new Cell_BasicsPlot();
+        public CS_Flood_CellStatsPlot(VBtask task) : base(task)
+        {
+            task.redOptions.setIdentifyCells(true);
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            task.gOptions.setHistogramBins(1000);
+            labels[1] = "Histogram of the depth for the selected cell.  Click any cell in the lower left.";
+            desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill";
+        }
+        public void RunCS(Mat src)
+        {
+            flood.Run(src);
+            stats.Run(src);
+            dst1 = stats.dst1;
+            dst2 = flood.dst2;
+            SetTrueText(stats.strOut, 3);
+            if (task.ClickPoint == new cv.Point())
+            {
+                if (task.redCells.Count > 1)
+                {
+                    task.rc = task.redCells[1];
+                    task.ClickPoint = task.rc.maxDist;
+                }
+            }
+        }
+    }
+    public class CS_Flood_ContainedCells : CS_Parent
+    {
+        Flood_Basics flood = new Flood_Basics();
+        public CS_Flood_ContainedCells(VBtask task) : base(task)
+        {
+            task.redOptions.setIdentifyCells(true);
+            desc = "Find cells that have only one neighbor.  They are likely to be completely contained in another cell.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standalone)
+            {
+                flood.Run(src);
+                dst2 = flood.dst2;
+                labels = flood.labels;
+            }
+            List<int> removeCells = new List<int>();
+            for (int i = task.redCells.Count - 1; i >= task.redOptions.identifyCount; i--)
+            {
+                var rc = task.redCells[i];
+                List<int> nabs = new List<int>();
+                List<int> contains = new List<int>();
+                int count = Math.Min(task.redOptions.identifyCount, task.redCells.Count);
+                for (int j = 0; j < count; j++)
+                {
+                    var rcBig = task.redCells[j];
+                    if (rcBig.rect.IntersectsWith(rc.rect)) nabs.Add(rcBig.index);
+                    if (rcBig.rect.Contains(rc.rect)) contains.Add(rcBig.index);
+                }
+                if (contains.Count == 1) removeCells.Add(rc.index);
+            }
+            dst3.SetTo(0);
+            foreach (int index in removeCells)
+            {
+                var rc = task.redCells[index];
+                dst3[rc.rect].SetTo(rc.color, rc.mask);
+            }
+            if (task.heartBeat) labels[3] = $"{removeCells.Count} cells were completely contained in exactly one other cell's rect";
+        }
+    }
+    public class CS_Flood_BasicsMask : CS_Parent
+    {
+        public Mat binarizedImage;
+        public Mat inputMask;
+        public Cell_Generate genCells = new Cell_Generate();
+        RedCloud_CPP redCPP = new RedCloud_CPP();
+        public bool buildInputMask;
+        public bool showSelected = true;
+        Color8U_Basics cvt = new Color8U_Basics();
+        public CS_Flood_BasicsMask(VBtask task) : base(task)
+        {
+            task.redOptions.setIdentifyCells(true);
+            labels[3] = "The inputMask used to limit how much of the image is processed.";
+            desc = "Floodfill by color as usual but this is run repeatedly with the different tiers.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standalone || buildInputMask)
+            {
+                cvt.Run(src);
+                inputMask = task.pcSplit[2].InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs();
+                src = cvt.dst2;
+            }
+            dst3 = inputMask;
+            redCPP.inputMask = inputMask;
+            redCPP.Run(src);
+            genCells.classCount = redCPP.classCount;
+            genCells.rectList = redCPP.rectList;
+            genCells.floodPoints = redCPP.floodPoints;
+            genCells.Run(redCPP.dst2);
+            dst2 = genCells.dst2;
+            int cellCount = Math.Min(task.redOptions.identifyCount, task.redCells.Count);
+            if (task.heartBeat) labels[2] = $"{task.redCells.Count} cells identified and the largest {cellCount} are numbered below.";
+            if (showSelected) task.setSelectedContour();
+        }
+    }
+    public class CS_Flood_Tiers : CS_Parent
+    {
+        Flood_BasicsMask flood = new Flood_BasicsMask();
+        Depth_TiersZ tiers = new Depth_TiersZ();
+        Color8U_Basics cvt = new Color8U_Basics();
+        public CS_Flood_Tiers(VBtask task) : base(task)
+        {
+            task.redOptions.setIdentifyCells(true);
+            desc = "Subdivide the Flood_Basics cells using depth tiers.";
+        }
+        public void RunCS(Mat src)
+        {
+            int tier = task.gOptions.DebugSliderValue;
+            tiers.Run(src);
+            if (tier >= tiers.classCount) tier = 0;
+            if (tier == 0)
+            {
+                dst1 = ~tiers.dst2.InRange(0, 1);
+            }
+            else
+            {
+                dst1 = ~tiers.dst2.InRange(tier, tier);
+            }
+            labels[2] = tiers.labels[2] + " in tier " + tier.ToString() + ".  Use the global options 'DebugSlider' to select different tiers.";
+            cvt.Run(src);
+            flood.inputMask = dst1;
+            flood.Run(cvt.dst2);
+            dst2 = flood.dst2;
+            dst3 = flood.dst3;
+            task.setSelectedContour();
+        }
+    }
+    public class CS_Flood_Motion : CS_Parent
+    {
+        Flood_Basics flood = new Flood_Basics();
+        List<rcData> redCells = new List<rcData>();
+        Mat cellMap = new Mat();
+        List<Point2f> maxDists = new List<Point2f>();
+        List<int> maxIndex = new List<int>();
+        public CS_Flood_Motion(VBtask task) : base(task)
+        {
+            if (standalone) task.gOptions.setDisplay1();
+            desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                flood.Run(src);
+                redCells = new List<rcData>(task.redCells);
+                cellMap = task.cellMap.Clone();
+                dst2 = flood.dst2.Clone();
+                dst3 = flood.dst2.Clone();
+                labels[2] = flood.labels[2];
+                labels[3] = flood.labels[2];
+                maxDists.Clear();
+                foreach (var rc in redCells)
+                {
+                    maxDists.Add(rc.maxDist);
+                    maxIndex.Add(rc.index);
+                }
+            }
+            else
+            {
+                flood.Run(src);
+                dst1.SetTo(0);
+                for (int i = 0; i < task.redCells.Count; i++)
+                {
+                    var rc = task.redCells[i];
+                    if (maxDists.Contains(rc.maxDist))
+                    {
+                        var lrc = redCells[maxIndex[maxDists.IndexOf(rc.maxDist)]];
+                        dst1[lrc.rect].SetTo(lrc.color, lrc.mask);
+                    }
+                }
+                dst3 = flood.dst2;
+                labels[3] = flood.labels[2];
+            }
+        }
+    }
+    public class CS_Flood_Motion1 : CS_Parent
+    {
+        Flood_Basics flood = new Flood_Basics();
+        Motion_Basics motion = new Motion_Basics();
+        List<rcData> redCells = new List<rcData>();
+        List<Point2f> maxDists = new List<Point2f>();
+        List<int> maxIndex = new List<int>();
+        public CS_Flood_Motion1(VBtask task) : base(task)
+        {
+            desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                flood.Run(src);
+                redCells = new List<rcData>(task.redCells);
+                dst2 = flood.dst2.Clone();
+                dst3 = flood.dst2.Clone();
+                labels[2] = flood.labels[2];
+                labels[3] = flood.labels[2];
+                maxDists.Clear();
+                foreach (var rc in redCells)
+                {
+                    maxDists.Add(rc.maxDist);
+                    maxIndex.Add(rc.index);
+                }
+            }
+            else
+            {
+                flood.Run(src);
+                motion.Run(flood.dst2);
+                for (int i = 0; i < task.redCells.Count; i++)
+                {
+                    var rc = task.redCells[i];
+                    if (maxDists.Contains(rc.maxDist))
+                    {
+                        var lrc = redCells[maxIndex[maxDists.IndexOf(rc.maxDist)]];
+                        dst1[lrc.rect].SetTo(lrc.color, lrc.mask);
+                    }
+                }
+                dst3 = flood.dst2;
+                labels[3] = flood.labels[2];
+            }
+        }
+    }
+    public class CS_Flood_LeftRight : CS_Parent
+    {
+        RedCloud_Basics redLeft = new RedCloud_Basics();
+        RedCloud_Basics redRight = new RedCloud_Basics();
+        public Mat mapLeft;
+        public Mat mapRight;
+        public List<rcData> cellsLeft = new List<rcData>();
+        public List<rcData> cellsRight = new List<rcData>();
+        public CS_Flood_LeftRight(VBtask task) : base(task)
+        {
+            mapLeft = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            mapRight = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            task.redOptions.setIdentifyCells(false);
+            if (standalone) task.gOptions.setDisplay1();
+            desc = "Floodfill left and right images.";
+        }
+        public void RunCS(Mat src)
+        {
+            task.redCells = new List<rcData>(cellsLeft);
+            task.cellMap = mapLeft.Clone();
+            redLeft.genCells.useLeftImage = true;
+            redLeft.Run(task.leftView);
+            labels[2] = redLeft.labels[2];
+            dst2 = redLeft.dst2;
+            cellsLeft = new List<rcData>(task.redCells);
+            mapLeft = task.cellMap.Clone();
+            task.redCells = new List<rcData>(cellsRight);
+            task.cellMap = mapRight.Clone();
+            redRight.genCells.useLeftImage = false;
+            redRight.Run(task.rightView);
+            labels[3] = redRight.labels[2];
+            dst3 = redRight.dst2;
+            cellsRight = new List<rcData>(task.redCells);
+            mapRight = task.cellMap.Clone();
+            if (task.redOptions.getIdentifyCells())
+            {
+                if (task.mousePicTag == 2)
+                {
+                    task.setSelectedContour(ref cellsLeft, ref mapLeft);
+                    task.color[task.rc.rect].SetTo(Scalar.White, task.rc.mask);
+                }
+                else
+                {
+                    task.setSelectedContour(ref cellsRight, ref mapRight);
+                    dst1 = task.rightView;
+                    dst1[task.rc.rect].SetTo(Scalar.White, task.rc.mask);
+                }
+            }
+        }
+    }
+    public class CS_Flood_MaxDistPoints : CS_Parent
+    {
+        Boundary_RemovedRects bounds = new Boundary_RemovedRects();
+        RedCloud_MaxDist_CPP redCPP = new RedCloud_MaxDist_CPP();
+        public Cell_Generate genCells = new Cell_Generate();
+        Color8U_Basics cvt = new Color8U_Basics();
+        public CS_Flood_MaxDistPoints(VBtask task) : base(task)
+        {
+            task.redOptions.setIdentifyCells(true);
+            labels[3] = "Contour boundaries - input to RedCloud_Basics";
+            desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code.";
+        }
+        public void RunCS(Mat src)
+        {
+            cvt.Run(src);
+            redCPP.Run(cvt.dst2);
+            if (redCPP.classCount == 0) return; // no data to process.
+            genCells.classCount = redCPP.classCount;
+            genCells.rectList = redCPP.RectList;
+            genCells.floodPoints = redCPP.floodPoints;
+            genCells.removeContour = false;
+            genCells.Run(redCPP.dst2);
+            dst2 = genCells.dst2;
+            redCPP.maxList.Clear();
+            for (int i = 1; i < task.redCells.Count; i++)
+            {
+                redCPP.maxList.Add(task.redCells[i].maxDist.X);
+                redCPP.maxList.Add(task.redCells[i].maxDist.Y);
+            }
+            task.setSelectedContour();
+            labels[2] = genCells.labels[2];
+        }
+    }
 
 
 

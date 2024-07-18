@@ -29,12 +29,12 @@ Public Class Mat_PointToMat : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         random.Run(empty)
         dst2.SetTo(0)
-        For Each pt In random.pointList
+        For Each pt In random.PointList
             DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
         Next
 
-        Dim rows = random.pointList.Count
-        Dim pMat = New cv.Mat(rows, 1, cv.MatType.CV_32FC2, random.pointList.ToArray)
+        Dim rows = random.PointList.Count
+        Dim pMat = New cv.Mat(rows, 1, cv.MatType.CV_32FC2, random.PointList.ToArray)
         Dim indexer = pMat.GetGenericIndexer(Of cv.Vec2f)()
         dst3.SetTo(0)
         Dim white = New cv.Vec3b(255, 255, 255)

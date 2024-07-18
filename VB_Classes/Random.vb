@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Random_Basics : Inherits VB_Parent
-    Public pointList As New List(Of cv.Point2f)
+    Public PointList As New List(Of cv.Point2f)
     Public range As cv.Rect
     Public options As New Options_Random
     Public Sub New()
@@ -187,7 +187,7 @@ Public Class Random_LUTMask : Inherits VB_Parent
             Dim lutIndex = 0
             km.Run(src)
             dst2 = km.dst2
-            For Each pt In random.pointList
+            For Each pt In random.PointList
                 lutMat.Set(lutIndex, 0, dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
                 lutIndex += 1
                 If lutIndex >= lutMat.Rows Then Exit For
@@ -601,8 +601,8 @@ Public Class Random_KalmanPoints : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If refreshPoints Then
             random.Run(empty)
-            targetSet = New List(Of cv.Point2f)(random.pointList)
-            currSet = New List(Of cv.Point2f)(random.pointList) ' just to get the updated size
+            targetSet = New List(Of cv.Point2f)(random.PointList)
+            currSet = New List(Of cv.Point2f)(random.PointList) ' just to get the updated size
             refreshPoints = False
 
             If targetSet.Count * 2 <> kalman.kInput.Length Then ReDim kalman.kInput(targetSet.Count * 2 - 1)

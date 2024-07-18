@@ -91,7 +91,7 @@ Public Class Annealing_MultiThreaded_CPP : Inherits VB_Parent
         For i = 0 To anneal.Length - 1
             anneal(i) = New Annealing_Basics_CPP()
             anneal(i).numberOfCities = options.cityCount
-            anneal(i).cityPositions = random.pointList.ToArray
+            anneal(i).cityPositions = random.PointList.ToArray
             anneal(i).circularPattern = options.circularFlag
             anneal(i).setup()
             anneal(i).Open() ' this will initialize the C++ copy of the city positions.

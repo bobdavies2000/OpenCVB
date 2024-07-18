@@ -177,7 +177,7 @@ Public Class KMeans_CustomData : Inherits VB_Parent
             If task.heartBeat Then random.Run(empty)
 
             Dim input As New List(Of Single)
-            For Each pt In random.pointlist
+            For Each pt In random.PointList
                 input.Add(pt.x)
                 input.Add(pt.y)
             Next

@@ -47,6 +47,7 @@ Public Class Touchup
                 inline = inline.Replace(".Rect(", ".Rectangle(")
                 inline = inline.Replace("Cv2.Line(", "DrawLine(")
                 inline = inline.Replace("Cv2.Circle(", "DrawCircle(")
+                inline = inline.Replace(" override ", "")
             Else
                 If line.StartsWith("Public Class CS_") Then
                     inline = inline.Replace("Public Class CS_", "Public Class VB_")

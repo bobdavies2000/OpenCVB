@@ -51,61 +51,40 @@ Public Class FLANN_Basics : Inherits VB_Parent
     Dim random As New Random_Basics
     Dim qArray() As cv.Point2f
     Dim dist As New Distance_Point3D
+    Dim options As New Options_FLANN
     Public Sub New()
         FindSlider("Random Pixel Count").Value = 5
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Query count", 1, 100, 1)
-            sliders.setupTrackBar("Match count", 1, 100, 1)
-            sliders.setupTrackBar("Search check count", 1, 1000, 5)
-            sliders.setupTrackBar("EPS X100", 0, 100, 0)
-        End If
-        If check.Setup(traceName) Then
-            check.addCheckBox("Search params sorted")
-            check.addCheckBox("Reuse the same feature list (test different search parameters)")
-            check.Box(1).Checked = True
-        End If
-
         desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
         labels(2) = "Red is query, Nearest points blue"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static reuseCheck = FindCheckBox("Reuse the same feature list (test different search parameters)")
-        Static sortedCheck = FindCheckBox("Search params sorted")
-        Static matchSlider = FindSlider("Match count")
-        Static querySlider = FindSlider("Query count")
-        Static searchSlider = FindSlider("Search check count")
-        Static epsSlider = FindSlider("EPS X100")
+        options.RunVB()
 
-        Dim reuseData = reuseCheck.checked
-        If reuseData = False Or task.frameCount < 2 Or task.mouseClickFlag Then random.Run(empty) ' fill result1 with random points in x and y range of the image.
+        If options.reuseData = False Or task.frameCount < 2 Or task.mouseClickFlag Then random.Run(empty) ' fill result1 with random points in x and y range of the image.
         Dim features As New cv.Mat(random.PointList.Count, 2, cv.MatType.CV_32F, random.PointList.ToArray)
 
-        Dim matchCount = Math.Min(matchSlider.Value, random.PointList.Count - 1)
-        Dim queryCount = querySlider.Value
+        Dim matchCount = Math.Min(options.matchCount, random.PointList.Count - 1)
         dst2.SetTo(cv.Scalar.White)
         For i = 0 To features.Rows - 1
             Dim pt = random.PointList(i)
             DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Blue)
         Next
 
-        If reuseData = False Or task.optionsChanged Or task.mouseClickFlag Then
-            ReDim qArray(queryCount - 1)
-            For i = 0 To queryCount - 1
+        If options.reuseData = False Or task.optionsChanged Or task.mouseClickFlag Then
+            ReDim qArray(options.queryCount - 1)
+            For i = 0 To options.queryCount - 1
                 qArray(i) = New cv.Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
             Next
         End If
-        Dim queries As New cv.Mat(queryCount, 2, cv.MatType.CV_32F, qArray)
-
-        Dim searchCheck = searchSlider.Value
-        Dim eps = epsSlider.Value / 100
+        Dim queries As New cv.Mat(options.queryCount, 2, cv.MatType.CV_32F, qArray)
 
         Using nnIndex As New cv.Flann.Index(features, New cv.Flann.KDTreeIndexParams(matchCount))
             Dim indices() As Integer
             Dim distances() As Single
-            For i = 0 To queryCount - 1
+            For i = 0 To options.queryCount - 1
                 Dim pt1 = queries.Get(Of cv.Point2f)(i)
                 Dim query As New cv.Mat(1, 2, cv.MatType.CV_32F, pt1)
-                nnIndex.KnnSearch(query, indices, distances, matchCount, New cv.Flann.SearchParams(searchCheck, eps, sortedCheck.Checked))
+                nnIndex.KnnSearch(query, indices, distances, matchCount, New cv.Flann.SearchParams(options.searchCheck, options.eps, options.sorted))
 
                 For j = 0 To matchCount - 1
                     Dim index = indices(j)

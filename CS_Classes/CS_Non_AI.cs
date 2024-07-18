@@ -802,8 +802,8 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             if (task.heartBeat) random.RunAndMeasure(empty, random);
-            vDemo.RunCS(ref dst2, random.pointList);
-            vDisplay(ref dst2, random.pointList, Scalar.Yellow);
+            vDemo.RunCS(ref dst2, random.PointList);
+            vDisplay(ref dst2, random.PointList, Scalar.Yellow);
         }
     }
 
@@ -825,11 +825,11 @@ namespace CS_Classes
         public void RunCS(Mat src)
         {
             random.Run(empty);
-            basics.vDemo.RunCS(ref dst2, random.pointList, true);
-            basics.vDisplay(ref dst2, random.pointList, Scalar.Yellow);
+            basics.vDemo.RunCS(ref dst2, random.PointList, true);
+            basics.vDisplay(ref dst2, random.PointList, Scalar.Yellow);
 
-            basics.vDemo.RunCS(ref dst3, random.pointList, false);
-            basics.vDisplay(ref dst3, random.pointList, Scalar.Yellow);
+            basics.vDemo.RunCS(ref dst3, random.PointList, false);
+            basics.vDisplay(ref dst3, random.PointList, Scalar.Yellow);
         }
     }
 
@@ -858,9 +858,9 @@ namespace CS_Classes
             var countSlider = FindSlider("Random Pixel Count");
             if (task.heartBeat) vDemo.random.RunAndMeasure(empty, vDemo.random);
             List<cv.Point> ptList = new List<cv.Point>();
-            for (int i = 0; i < vDemo.random.pointList.Count; i++)
+            for (int i = 0; i < vDemo.random.PointList.Count; i++)
             {
-                var pt = vDemo.random.pointList[i];
+                var pt = vDemo.random.PointList[i];
                 ptList.Add(new cv.Point(pt.X, pt.Y));
             }
             var handleSrc = GCHandle.Alloc(ptList.ToArray(), GCHandleType.Pinned);
@@ -868,7 +868,7 @@ namespace CS_Classes
             handleSrc.Free();
 
             dst2 = new Mat(dst2.Rows, dst2.Cols, MatType.CV_32F, imagePtr).Clone();
-            vDemo.vDisplay(ref dst2, vDemo.random.pointList, Scalar.Yellow);
+            vDemo.vDisplay(ref dst2, vDemo.random.PointList, Scalar.Yellow);
         }
 
         public void Close()

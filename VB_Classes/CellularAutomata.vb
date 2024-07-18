@@ -105,8 +105,8 @@ Public Class CellularAutomata_Life : Inherits VB_Parent
             random.Run(empty)
             generation = 0
             savePointCount = random.options.count
-            For i = 0 To random.pointList.Count - 1
-                grid.Set(Of Byte)(random.pointList(i).Y, random.pointList(i).X, 1)
+            For i = 0 To random.PointList.Count - 1
+                grid.Set(Of Byte)(random.PointList(i).Y, random.PointList(i).X, 1)
             Next
         End If
         generation += 1

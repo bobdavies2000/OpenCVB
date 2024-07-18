@@ -5922,3 +5922,43 @@ Public Class Options_FPolyCore : Inherits VB_Parent
         anchorMovement = anchorSlider.value
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_FLANN : Inherits VB_Parent
+    Public reuseData As Boolean
+    Public matchCount As Integer
+    Public queryCount As Integer
+    Public searchCheck As Integer
+    Public eps As Single
+    Public sorted As Boolean
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Query count", 1, 100, 1)
+            sliders.setupTrackBar("Match count", 1, 100, 1)
+            sliders.setupTrackBar("Search check count", 1, 1000, 5)
+            sliders.setupTrackBar("EPS X100", 0, 100, 0)
+        End If
+        If check.Setup(traceName) Then
+            check.addCheckBox("Search params sorted")
+            check.addCheckBox("Reuse the same feature list (test different search parameters)")
+            check.Box(1).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static reuseCheck = FindCheckBox("Reuse the same feature list (test different search parameters)")
+        Static sortedCheck = FindCheckBox("Search params sorted")
+        Static matchSlider = FindSlider("Match count")
+        Static querySlider = FindSlider("Query count")
+        Static searchSlider = FindSlider("Search check count")
+        Static epsSlider = FindSlider("EPS X100")
+        reuseData = reuseCheck.checked
+        matchCount = matchSlider.value
+        queryCount = querySlider.Value
+        searchCheck = searchSlider.Value
+        eps = epsSlider.Value / 100
+        sorted = sortedCheck.checked
+    End Sub
+End Class

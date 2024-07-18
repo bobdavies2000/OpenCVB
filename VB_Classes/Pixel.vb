@@ -298,7 +298,7 @@ Public Class Pixel_SampleColor : Inherits VB_Parent
         Dim counts As New List(Of Integer)
         Dim pixel0 = New cv.Vec3b
         random.Run(Empty)
-        For Each pt In random.pointList
+        For Each pt In random.PointList
             Dim pixel = src.Get(Of cv.Vec3b)(pt.Y, pt.X)
             If pixel <> pixel0 Then
                 If pixels.Contains(pixel) Then
@@ -315,7 +315,7 @@ Public Class Pixel_SampleColor : Inherits VB_Parent
         If standaloneTest() Then
             dst2 = src
             dst2.Rectangle(random.range, cv.Scalar.White, 1)
-            For Each pt In random.pointList
+            For Each pt In random.PointList
                 DrawCircle(dst2,pt, task.DotSize, cv.Scalar.White)
             Next
             labels(2) = "Dominant color value = " + CStr(maskColor(0)) + ", " + CStr(maskColor(1)) + ", " + CStr(maskColor(2))
@@ -905,8 +905,8 @@ Public Class Pixel_Sampler : Inherits VB_Parent
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim index As New List(Of cv.Point)
         Dim pixels As New List(Of Byte)
-        Dim counts(random.pointList.Count - 1) As Integer
-        For Each pt In random.pointList
+        Dim counts(random.PointList.Count - 1) As Integer
+        For Each pt In random.PointList
             Dim pixel = src.Get(Of Byte)(pt.Y, pt.X)
             If pixel <> 0 Then
                 If pixels.Contains(pixel) Then
@@ -933,7 +933,7 @@ Public Class Pixel_Sampler : Inherits VB_Parent
         If standaloneTest() Then
             dst2 = src
             dst2.Rectangle(random.range, cv.Scalar.White, 1)
-            For Each pt In random.pointList
+            For Each pt In random.PointList
                 DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
             Next
             labels(2) = "Dominant gray value = " + CStr(dominantGray)

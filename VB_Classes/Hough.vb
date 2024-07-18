@@ -52,18 +52,6 @@ Module Hough_Exports
             dst.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 1, task.lineType, 0)
         Next
     End Sub
-
-    Public Sub houghShowLines3D(ByRef dst As cv.Mat, segment As cv.Line3D)
-        Dim x As Double = segment.X1 * dst.Cols
-        Dim y As Double = segment.Y1 * dst.Rows
-        Dim m As Double
-        If segment.Vx < 0.001 Then m = 0 Else m = segment.Vy / segment.Vx ' vertical slope a no-no.
-        Dim b As Double = y - m * x
-        Dim pt1 As cv.Point = New cv.Point(x, y)
-        Dim pt2 As cv.Point
-        If m = 0 Then pt2 = New cv.Point(x, dst.Rows) Else pt2 = New cv.Point((dst.Rows - b) / m, dst.Rows)
-        dst.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 2, task.lineType, 0)
-    End Sub
 End Module
 
 

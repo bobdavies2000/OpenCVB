@@ -138,7 +138,7 @@ Public Class FeaturePoly_Sides : Inherits VB_Parent
 
         If standaloneTest() And task.heartBeat Then
             Random.Run(empty)
-            currPoly = New List(Of cv.Point2f)(random.pointList)
+            currPoly = New List(Of cv.Point2f)(random.PointList)
         End If
 
         dst2.SetTo(0)

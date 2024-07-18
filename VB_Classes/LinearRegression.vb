@@ -80,9 +80,9 @@ Public Class LinearRegression_Random : Inherits VB_Parent
 
         regress.x.Clear()
         regress.y.Clear()
-        For i = 0 To random.pointList.Count - 1
-            regress.x.Add(random.pointList(i).X)
-            regress.y.Add(random.pointList(i).Y)
+        For i = 0 To random.PointList.Count - 1
+            regress.x.Add(random.PointList(i).X)
+            regress.y.Add(random.PointList(i).Y)
         Next
 
         regress.Run(Nothing)

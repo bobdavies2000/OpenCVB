@@ -16,10 +16,10 @@ Public Class KNN_Basics : Inherits VB_Parent
         If standaloneTest() Then
             If task.heartBeat Then
                 Random.Run(empty)
-                knn.trainInput = New List(Of cv.Point2f)(Random.pointList)
+                knn.trainInput = New List(Of cv.Point2f)(random.PointList)
             End If
             Random.Run(empty)
-            queries = New List(Of cv.Point2f)(random.pointList)
+            queries = New List(Of cv.Point2f)(random.PointList)
         End If
 
         If queries.Count = 0 Then
@@ -113,10 +113,10 @@ Public Class KNN_Core : Inherits VB_Parent
         If standalone Then
             If task.heartBeat Then
                 Random.Run(empty)
-                trainInput = New List(Of cv.Point2f)(Random.pointList)
+                trainInput = New List(Of cv.Point2f)(random.PointList)
             End If
             Random.Run(empty)
-            queries = New List(Of cv.Point2f)(random.pointList)
+            queries = New List(Of cv.Point2f)(random.PointList)
         End If
 
         Dim queryMat = New cv.Mat(queries.Count, KNNdimension, cv.MatType.CV_32F, queries.ToArray)
@@ -197,10 +197,10 @@ Public Class KNN_Core2DTest : Inherits VB_Parent
         If task.heartBeat Then
             dst3.SetTo(0)
             random.Run(empty)
-            knn.trainInput = New List(Of cv.Point2f)(random.pointList)
+            knn.trainInput = New List(Of cv.Point2f)(random.PointList)
         End If
         random.Run(empty)
-        knn.queries = New List(Of cv.Point2f)(random.pointList)
+        knn.queries = New List(Of cv.Point2f)(random.PointList)
 
         knn.Run(empty)
         knn.displayResults()
@@ -858,10 +858,10 @@ Public Class KNN_BasicsOld : Inherits VB_Parent
         If standaloneTest() Then
             If task.heartBeat Then
                 Random.Run(empty)
-                knn.trainInput = New List(Of cv.Point2f)(Random.pointList)
+                knn.trainInput = New List(Of cv.Point2f)(random.PointList)
             End If
             Random.Run(empty)
-            queries = New List(Of cv.Point2f)(random.pointList)
+            queries = New List(Of cv.Point2f)(random.PointList)
         End If
 
         If queries.Count = 0 Then
@@ -950,7 +950,7 @@ Public Class KNN_Farthest : Inherits VB_Parent
         If standaloneTest() Then
             If task.heartBeat Then
                 Random.Run(empty)
-                knn.trainInput = New List(Of cv.Point2f)(Random.pointList)
+                knn.trainInput = New List(Of cv.Point2f)(random.PointList)
                 knn.queries = New List(Of cv.Point2f)(knn.trainInput)
             End If
         End If

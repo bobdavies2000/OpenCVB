@@ -56,7 +56,7 @@ Public Class Delaunay_SubDiv : Inherits VB_Parent
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         random.Run(empty)
         dst2.SetTo(0)
-        For Each pt In random.pointList
+        For Each pt In random.PointList
             subdiv.Insert(pt)
             Dim edgeList = subdiv.GetEdgeList()
             For i = 0 To edgeList.Length - 1
@@ -67,7 +67,7 @@ Public Class Delaunay_SubDiv : Inherits VB_Parent
             Next
         Next
 
-        For Each pt In random.pointList
+        For Each pt In random.PointList
             DrawCircle(dst2,pt, task.DotSize + 1, cv.Scalar.Red)
         Next
 
@@ -162,7 +162,7 @@ Public Class Delaunay_GenerationsNoKNN : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() And task.heartBeat Then
             random.Run(empty)
-            inputPoints = New List(Of cv.Point2f)(random.pointList)
+            inputPoints = New List(Of cv.Point2f)(random.PointList)
         End If
 
         facet.inputPoints = New List(Of cv.Point2f)(inputPoints)
@@ -216,7 +216,7 @@ Public Class Delaunay_Generations : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         If standaloneTest() Then
             If task.heartBeat Then Random.Run(empty)
-            inputPoints = New List(Of cv.Point2f)(random.pointList)
+            inputPoints = New List(Of cv.Point2f)(random.PointList)
         End If
 
         knn.queries = New List(Of cv.Point2f)(inputPoints)

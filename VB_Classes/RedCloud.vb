@@ -2669,7 +2669,7 @@ End Class
 
 Public Class RedCloud_MaxDist_CPP : Inherits VB_Parent
     Public classCount As Integer
-    Public rectList As New List(Of cv.Rect)
+    Public RectList As New List(Of cv.Rect)
     Public floodPoints As New List(Of cv.Point)
     Public maxList As New List(Of Integer)
     Dim color As New Color8U_Basics

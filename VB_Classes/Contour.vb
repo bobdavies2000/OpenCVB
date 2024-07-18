@@ -901,14 +901,14 @@ Public Class Contour_FromPoints : Inherits VB_Parent
         If task.heartBeat Then
             random.Run(src)
             dst2.SetTo(0)
-            For Each p1 In random.pointList
-                For Each p2 In random.pointList
+            For Each p1 In random.PointList
+                For Each p2 In random.PointList
                     DrawLine(dst2, p1, p2, cv.Scalar.White)
                 Next
             Next
         End If
 
-        Dim hullPoints = cv.Cv2.ConvexHull(random.pointList.ToArray, True).ToList
+        Dim hullPoints = cv.Cv2.ConvexHull(random.PointList.ToArray, True).ToList
 
         Dim hull As New List(Of cv.Point)
         For Each pt In hullPoints
