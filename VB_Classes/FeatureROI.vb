@@ -1,4 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
+Imports OpenCvSharp
+Imports System.Security.Cryptography
 Imports cv = OpenCvSharp
 Public Class FeatureROI_Basics : Inherits VB_Parent
     Dim addw As New AddWeighted_Basics
@@ -12,7 +14,7 @@ Public Class FeatureROI_Basics : Inherits VB_Parent
         desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white)."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2Gray), src.Clone)
+        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
         stdevList.Clear()
         meanList.Clear()
         Dim mean As cv.Scalar, stdev As cv.Scalar
@@ -246,7 +248,7 @@ Public Class FeatureROI_Correlation : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2Gray), src.Clone)
+        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
         gather.Run(dst1)
         dst2 = gather.dst2
 
@@ -286,7 +288,7 @@ Public Class FeatureROI_LowStdev : Inherits VB_Parent
         desc = "Isolate the roi's with low stdev"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2Gray), src.Clone)
+        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
         gather.Run(dst1)
         dst2 = gather.dst2
 
@@ -319,7 +321,7 @@ Public Class FeatureROI_LowStdevCorrelation : Inherits VB_Parent
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2Gray), src.Clone)
+        dst1 = If(src.Channels() <> 1, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src.Clone)
         gather.Run(dst1)
         dst2 = gather.dst2
 
@@ -403,9 +405,8 @@ Public Class FeatureROI_LRClick : Inherits VB_Parent
 
         dst0 = src.Clone
         dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
-
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
-        If task.rightView.Channels() <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.rightView.Channels() <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         gather.Run(src)
         dst2 = gather.dst2
@@ -477,8 +478,7 @@ Public Class FeatureROI_LRAll : Inherits VB_Parent
         options.RunVB()
 
         dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
-
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.rightView.Channels() <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         gather.Run(src)
@@ -502,3 +502,5 @@ Public Class FeatureROI_LRAll : Inherits VB_Parent
         Next
     End Sub
 End Class
+
+

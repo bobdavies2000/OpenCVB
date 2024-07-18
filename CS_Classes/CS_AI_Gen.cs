@@ -18847,10 +18847,343 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
 
 
+    public class CS_Fibonacci_Basics : CS_Parent
+    {
+        Font_FlowText flow = new Font_FlowText();
+        double a = 0, b = 1;
+        public CS_Fibonacci_Basics(VBtask task) : base(task)
+        {
+            flow.parentData = this;
+            desc = "Generate the fibonacci sequence using conventional code";
+        }
+        public void RunCS(Mat src)
+        {
+            if (a == 1134903170)
+            {
+                a = 0;
+                b = 1;
+            }
+            double t = a + b;
+            a = b;
+            b = t;
+            flow.nextMsg = t.ToString();
+            flow.Run(empty);
+        }
+    }
+    public class CS_Fibonacci_Yield : CS_Parent
+    {
+        Font_FlowText flow = new Font_FlowText();
+        public CS_Fibonacci_Yield(VBtask task) : base(task)
+        {
+            flow.parentData = this;
+            desc = "Generate the fibonacci sequence using ienumerable's";
+        }
+        IEnumerable<double> NextFib()
+        {
+            double a = 0;
+            double b = 1;
+            double t;
+            while (true)
+            {
+                yield return a;
+                t = a + b;
+                if (a == 806515533049393) // start to lose precision after this...
+                {
+                    a = 0;
+                    b = 1;
+                    t = a + b;
+                }
+                a = b;
+                b = t;
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            IEnumerable<double> fibs = NextFib();
+            flow.nextMsg = $"{task.frameCount % 74:00} fibonacci number {fibs.ElementAt(task.frameCount):###,##0}";
+            flow.Run(empty);
+        }
+    }
 
 
+    public class CS_Filter_Laplacian : CS_Parent
+    {
+        public CS_Filter_Laplacian(VBtask task) : base(task)
+        {
+            labels[2] = "Sharpened image using Filter2D output";
+            labels[3] = "Output of Filter2D (approximated Laplacian)";
+            desc = "Use a filter to approximate the Laplacian derivative.";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat imgLaplacian = src.Filter2D(MatType.CV_32F,
+                new Mat(3, 3, MatType.CV_32FC1, new float[] { 1, 1, 1, 1, -8, 1, 1, 1, 1 }));
+            src.ConvertTo(dst1, MatType.CV_32F);
+            dst0 = (dst1 - imgLaplacian).ToMat();
+            dst0.ConvertTo(dst2, src.Type());
+            imgLaplacian.ConvertTo(dst3, src.Type());
+        }
+    }
+    public class CS_Filter_NormalizedKernel : CS_Parent
+    {
+        Options_FilterNorm options = new Options_FilterNorm();
+        public CS_Filter_NormalizedKernel(VBtask task) : base(task)
+        {
+            desc = "Create a normalized kernel and use it.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            double sum = 0;
+            for (int i = 0; i < options.kernel.Width; i++)
+            {
+                sum += Math.Abs(options.kernel.Get<float>(0, i));
+            }
+            labels[2] = $"kernel sum = {sum:F3}";
+            Mat dst32f = src.Filter2D(MatType.CV_32FC1, options.kernel, anchor: new cv.Point(0, 0));
+            dst32f.ConvertTo(dst2, MatType.CV_8UC3);
+        }
+    }
+    public class CS_Filter_Normalized2D : CS_Parent
+    {
+        Options_Filter options = new Options_Filter();
+        public CS_Filter_Normalized2D(VBtask task) : base(task)
+        {
+            desc = "Create and apply a normalized kernel.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            int kernelSize = standaloneTest() ? (task.frameCount % 20) + 1 : options.kernelSize;
+            Mat kernel = new Mat(kernelSize, kernelSize, MatType.CV_32F).SetTo(1.0 / (kernelSize * kernelSize));
+            dst2 = src.Filter2D(-1, kernel);
+            labels[2] = $"Normalized KernelSize = {kernelSize}";
+        }
+    }
+    public class CS_Filter_SepFilter2D : CS_Parent
+    {
+        Options_SepFilter2D options = new Options_SepFilter2D();
+        public CS_Filter_SepFilter2D(VBtask task) : base(task)
+        {
+            labels[2] = "Gaussian Blur result";
+            desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            Mat kernel = Cv2.GetGaussianKernel(options.xDim, options.sigma);
+            dst2 = src.GaussianBlur(new cv.Size(options.xDim, options.yDim), options.sigma);
+            dst3 = src.SepFilter2D(MatType.CV_8UC3, kernel, kernel);
+            if (options.diffCheck)
+            {
+                Mat graySep = dst3.CvtColor(ColorConversionCodes.BGR2GRAY);
+                Mat grayGauss = dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+                dst3 = (graySep - grayGauss).ToMat().Threshold(0, 255, ThresholdTypes.Binary);
+                labels[3] = $"Gaussian - SepFilter2D {dst3.CountNonZero()} pixels different.";
+            }
+            else
+            {
+                labels[3] = "SepFilter2D Result";
+            }
+        }
+    }
+    public class CS_Filter_Minimum : CS_Parent
+    {
+        Options_Filter options = new Options_Filter();
+        public CS_Filter_Minimum(VBtask task) : base(task)
+        {
+            desc = "Implement the Minimum Filter - use minimum value in kernel";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            int kernelSize = standaloneTest() ? (task.frameCount % 20) + 1 : options.kernelSize;
+            Mat element = Cv2.GetStructuringElement(MorphShapes.Rect, new cv.Size(kernelSize, kernelSize));
+            dst2 = src.Erode(element);
+        }
+    }
+    public class CS_Filter_Maximum : CS_Parent
+    {
+        Options_Filter options = new Options_Filter();
+        public CS_Filter_Maximum(VBtask task) : base(task)
+        {
+            desc = "Implement the Maximum Filter - use maximum value in kernel";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            int kernelSize = standaloneTest() ? (task.frameCount % 20) + 1 : options.kernelSize;
+            Mat element = Cv2.GetStructuringElement(MorphShapes.Rect, new cv.Size(kernelSize, kernelSize));
+            dst2 = src.Dilate(element);
+        }
+    }
+    public class CS_Filter_Mean : CS_Parent
+    {
+        Options_Filter options = new Options_Filter();
+        public CS_Filter_Mean(VBtask task) : base(task)
+        {
+            desc = "Implement the Mean Filter - use mean value in kernel";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            int kernelSize = standaloneTest() ? (task.frameCount % 20) + 1 : options.kernelSize;
+            Mat kernel = (Mat.Ones(MatType.CV_32FC1, kernelSize, kernelSize) / (kernelSize * kernelSize)).ToMat();
+            dst2 = src.Filter2D(-1, kernel);
+        }
+    }
+    public class CS_Filter_Median : CS_Parent
+    {
+        Options_Filter options = new Options_Filter();
+        public CS_Filter_Median(VBtask task) : base(task)
+        {
+            desc = "Implement the Median Filter - use median value in kernel";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            int kernelSize = standaloneTest() ? (task.frameCount % 20) + 1 : options.kernelSize;
+            if (kernelSize % 2 == 0) kernelSize += 1;
+            dst2 = src.MedianBlur(kernelSize);
+        }
+    }
 
 
+    public class CS_FitEllipse_Basics : CS_Parent
+    {
+        Options_MinArea options = new Options_MinArea();
+        public List<Point2f> inputPoints = new List<Point2f>();
+        public RotatedRect box;
+        public Point2f[] vertices;
+        public CS_FitEllipse_Basics(VBtask task) : base(task)
+        {
+            desc = "Use FitEllipse OpenCV API to draw around a set of points";
+        }
+        public void RunCS(Mat src)
+        {
+            if (!task.heartBeat) return;
+            if (standaloneTest())
+            {
+                options.RunVB();
+                inputPoints = options.srcPoints;
+            }
+            dst2.SetTo(0);
+            foreach (var pt in inputPoints)
+            {
+                DrawCircle(dst2, pt, task.DotSize, Scalar.White, -1);
+            }
+            if (inputPoints.Count > 4)
+            {
+                box = Cv2.FitEllipse(inputPoints);
+                vertices = box.Points();
+                if (standaloneTest())
+                {
+                    for (int j = 0; j < vertices.Length; j++)
+                    {
+                        DrawLine(dst2, vertices[j], vertices[(j + 1) % 4], Scalar.Green, task.lineWidth);
+                    }
+                    Cv2.Ellipse(dst2, box, Scalar.Green, task.lineWidth, task.lineType);
+                }
+            }
+        }
+    }
+    public class CS_FitEllipse_AMS_CPP : CS_Parent
+    {
+        Options_MinArea options = new Options_MinArea();
+        public List<Point2f> inputPoints = new List<Point2f>();
+        public CS_FitEllipse_AMS_CPP(VBtask task) : base(task)
+        {
+            labels[2] = "CS_FitEllipse_AMS_CPP C++ ";
+            desc = "Use FitEllipse_AMS to draw around a set of points";
+        }
+        public void RunCS(Mat src)
+        {
+            if (!task.heartBeat) return;
+            if (standaloneTest())
+            {
+                options.RunVB();
+                inputPoints = options.srcPoints;
+            }
+            dst2.SetTo(0);
+            foreach (var pt in inputPoints)
+            {
+                DrawCircle(dst2, pt, task.DotSize, Scalar.White, -1);
+            }
+            Mat input = new Mat(inputPoints.Count, 1, MatType.CV_32FC2, inputPoints.ToArray());
+            float[] dataSrc = new float[inputPoints.Count * 2];
+            Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length);
+            GCHandle srcHandle = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+            IntPtr boxPtr = FitEllipse_AMS(srcHandle.AddrOfPinnedObject(), inputPoints.Count);
+            srcHandle.Free();
+            float[] ellipse = new float[5];
+            Marshal.Copy(boxPtr, ellipse, 0, ellipse.Length);
+            float angle = ellipse[0];
+            Point2f center = new Point2f(ellipse[1], ellipse[2]);
+            Size2f size = new Size2f(ellipse[3], ellipse[4]);
+            if (size.Width < task.lineWidth + 1 || size.Height < task.lineWidth + 1) return;
+            RotatedRect box = new RotatedRect(center, size, angle);
+            Cv2.Ellipse(dst2, box, Scalar.Yellow, task.lineWidth, task.lineType);
+        }
+    }
+    public class CS_FitEllipse_Direct_CPP : CS_Parent
+    {
+        Options_MinArea options = new Options_MinArea();
+        public CS_FitEllipse_Direct_CPP(VBtask task) : base(task)
+        {
+            labels[2] = "The FitEllipse_Direct C++ ";
+            desc = "Use FitEllipse to draw around a set of points";
+        }
+        public void RunCS(Mat src)
+        {
+            if (!task.heartBeat) return;
+            options.RunVB();
+            float[] dataSrc = new float[options.srcPoints.Count * 2];
+            dst2.SetTo(0);
+            foreach (var pt in options.srcPoints)
+            {
+                DrawCircle(dst2, pt, task.DotSize, Scalar.White, -1);
+            }
+            Mat input = new Mat(options.srcPoints.Count, 1, MatType.CV_32FC2, options.srcPoints.ToArray());
+            Marshal.Copy(input.Data, dataSrc, 0, dataSrc.Length);
+            GCHandle srcHandle = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+            IntPtr boxPtr = FitEllipse_Direct(srcHandle.AddrOfPinnedObject(), options.srcPoints.Count);
+            srcHandle.Free();
+            float[] ellipse = new float[5];
+            Marshal.Copy(boxPtr, ellipse, 0, ellipse.Length);
+            float angle = ellipse[0];
+            Point2f center = new Point2f(ellipse[1], ellipse[2]);
+            Size2f size = new Size2f(ellipse[3], ellipse[4]);
+            if (size.Width < task.lineWidth + 1 || size.Height < task.lineWidth + 1) return;
+            RotatedRect box = new RotatedRect(center, size, angle);
+            Cv2.Ellipse(dst2, box, Scalar.Yellow, task.lineWidth, task.lineType);
+        }
+    }
+    public class CS_FitEllipse_RedCloud : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        FitEllipse_Basics fitE = new FitEllipse_Basics();
+        public CS_FitEllipse_RedCloud(VBtask task) : base(task)
+        {
+            desc = "Create an ellipse from a contour";
+        }
+        public void RunCS(Mat src)
+        {
+            if (!task.heartBeat) return;
+            redC.Run(src);
+            dst2 = redC.dst2;
+            if (task.rc.contour == null) return;
+            fitE.inputPoints.Clear();
+            foreach (var pt in task.rc.contour)
+            {
+                fitE.inputPoints.Add(new Point2f(pt.X, pt.Y));
+            }
+            fitE.Run(new Mat());
+            dst3.SetTo(0);
+            dst3[task.rc.rect].SetTo(Scalar.White, task.rc.mask);
+            Cv2.Rectangle(dst3, task.rc.rect, Scalar.White, task.lineWidth, task.lineType);
+            Cv2.Ellipse(dst3[task.rc.rect], fitE.box, Scalar.Yellow, task.lineWidth, task.lineType);
+        }
+    }
 
 
 
@@ -18870,4 +19203,5 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
 
 }
+
 
