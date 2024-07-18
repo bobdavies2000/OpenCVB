@@ -264,7 +264,7 @@ Public Class FeatureROI_Correlation : Inherits VB_Parent
             End If
         Next
 
-        plot.plotData = New cv.Scalar(motionCount, 0, 0)
+        plot.plotData = motionCount
         plot.min = -1
         plot.Run(empty)
         dst3 = plot.dst2

@@ -32,6 +32,14 @@ namespace CS_Classes
         public const int RESULT_DST2 = 2;
         public const int RESULT_DST3 = 3;
         public Vec3b black = new Vec3b(0, 0, 0);
+        public Vec3b white = new Vec3b(255, 255, 255);
+        public Vec3b grayColor = new Vec3b(127, 127, 127);
+        public Vec3b yellow = new Vec3b(0, 255, 255);
+        public Vec3b purple = new Vec3b(255, 0, 255);
+        public Vec3b teal = new Vec3b(255, 255, 0);
+        public Vec3b red = new Vec3b(0, 0, 255);
+        public Vec3b green = new Vec3b(0, 255, 0);
+        public Vec3b blue = new Vec3b(255, 0, 0);
         string callStack = "";
         public CS_Parent(VBtask _task)
         {

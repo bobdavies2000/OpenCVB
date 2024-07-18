@@ -18355,6 +18355,495 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
 
 
+    public class CS_FeatureROI_Basics : CS_Parent
+    {
+        AddWeighted_Basics addw = new AddWeighted_Basics();
+        public List<Rect> rects = new List<Rect>();
+        public List<float> meanList = new List<float>();
+        public List<float> stdevList = new List<float>();
+        public float stdevAverage;
+        public CS_FeatureROI_Basics(VBtask task) : base(task)
+        {
+            task.gOptions.setGridSize((int)(dst2.Width / 40)); // arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white).";
+        }
+        public void RunCS(Mat src)
+        {
+            dst1 = src.Channels() != 1 ? src.CvtColor(ColorConversionCodes.BGR2GRAY) : src.Clone();
+            stdevList.Clear();
+            meanList.Clear();
+            Scalar mean, stdev;
+            foreach (var roi in task.gridList)
+            {
+                Cv2.MeanStdDev(dst1[roi], out mean, out stdev);
+                stdevList.Add((float)stdev.Val0);
+                meanList.Add((float)mean.Val0);
+            }
+            stdevAverage = stdevList.Average();
+            dst3.SetTo(0);
+            rects.Clear();
+            for (int i = 0; i < stdevList.Count; i++)
+            {
+                var roi = task.gridList[i];
+                var depthCheck = task.noDepthMask[roi];
+                if (stdevList[i] < stdevAverage || depthCheck.CountNonZero() / depthCheck.Total() > 0.5)
+                {
+                    dst3.Rectangle(roi, Scalar.White, -1);
+                }
+                else
+                {
+                    rects.Add(roi);
+                }
+            }
+            if (task.heartBeat)
+            {
+                labels[2] = $"{rects.Count} of {task.gridList.Count} roi's had above average standard deviation (average = {stdevList.Average().ToString(fmt1)})";
+            }
+            addw.src2 = dst3;
+            addw.Run(dst1);
+            dst2 = addw.dst2;
+        }
+    }
+    public class CS_FeatureROI_Color : CS_Parent
+    {
+        AddWeighted_Basics addw = new AddWeighted_Basics();
+        public CS_FeatureROI_Color(VBtask task) : base(task)
+        {
+            FindSlider("Add Weighted %").Value = 70;
+            task.gOptions.setGridSize((int)(dst2.Width / 40)); // arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "Use roi's to compute the stdev for each roi.  If small (<10), mark as featureLess (white).";
+        }
+        public void RunCS(Mat src)
+        {
+            var stdevList0 = new List<float>();
+            var stdevList1 = new List<float>();
+            var stdevList2 = new List<float>();
+            Scalar mean, stdev;
+            foreach (var roi in task.gridList)
+            {
+                Cv2.MeanStdDev(src[roi], out mean, out stdev);
+                stdevList0.Add((float)stdev.Val0);
+                stdevList1.Add((float)stdev.Val1);
+                stdevList2.Add((float)stdev.Val2);
+            }
+            float avg0 = stdevList0.Average();
+            float avg1 = stdevList1.Average();
+            float avg2 = stdevList2.Average();
+            dst3.SetTo(0);
+            for (int i = 0; i < stdevList0.Count; i++)
+            {
+                var roi = task.gridList[i];
+                if (stdevList0[i] < avg0 && stdevList1[i] < avg1 && stdevList2[i] < avg2)
+                {
+                    dst3.Rectangle(roi, Scalar.White, -1);
+                }
+            }
+            labels[3] = $"Stdev average X/Y/Z = {(int)stdevList0.Average()}, {(int)stdevList1.Average()}, {(int)stdevList2.Average()}";
+            addw.src2 = dst3.CvtColor(ColorConversionCodes.GRAY2BGR);
+            addw.Run(src);
+            dst2 = addw.dst2;
+        }
+    }
+    public class CS_FeatureROI_Canny : CS_Parent
+    {
+        Edge_Canny canny = new Edge_Canny();
+        FeatureROI_Basics devGrid = new FeatureROI_Basics();
+        public CS_FeatureROI_Canny(VBtask task) : base(task)
+        {
+            task.gOptions.setGridSize((int)(dst2.Width / 40)); // arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+            desc = "Create the stdev grid with the input image, then create the stdev grid for the canny output, then combine them.";
+        }
+        public void RunCS(Mat src)
+        {
+            canny.Run(src);
+            dst3 = canny.dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
+            devGrid.Run(src | dst3);
+            dst2 = devGrid.dst2;
+        }
+    }
+    public class CS_FeatureROI_Sorted : CS_Parent
+    {
+        AddWeighted_Basics addw = new AddWeighted_Basics();
+        Grid_LowRes gridLow = new Grid_LowRes();
+        public SortedList<float, Rect> sortedStd = new SortedList<float, Rect>(new compareAllowIdenticalSingle());
+        public List<Vec3b> bgrList = new List<Vec3b>();
+        public List<Rect> roiList = new List<Rect>();
+        public int[] categories;
+        public Options_StdevGrid options = new Options_StdevGrid();
+        public int maskVal = 255;
+        public CS_FeatureROI_Sorted(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            task.gOptions.setGridSize((int)(dst2.Width / 40)); // arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+            if (!standalone) maskVal = 1;
+            labels[2] = "Use the AddWeighted slider to observe where stdev is above average.";
+            desc = "Sort the roi's by the sum of their bgr stdev's to find the least volatile regions";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            Scalar meanS, stdev;
+            sortedStd.Clear();
+            bgrList.Clear();
+            roiList.Clear();
+            categories = new int[10];
+            foreach (var roi in task.gridList)
+            {
+                Cv2.MeanStdDev(src[roi], out meanS, out stdev);
+                sortedStd.Add((float)(stdev.Val0 + stdev.Val1 + stdev.Val2), roi);
+                int colorIndex = 1;
+                Vec3i mean = new Vec3i((int)meanS.Val0, (int)meanS.Val1, (int)meanS.Val2);
+                if (mean.Item0 < options.minThreshold && mean.Item1 < options.minThreshold && mean.Item2 < options.minThreshold)
+                    colorIndex = 1;
+                else if (mean.Item0 > options.maxThreshold && mean.Item1 > options.maxThreshold && mean.Item2 > options.maxThreshold)
+                    colorIndex = 2;
+                else if (Math.Abs(mean.Item0 - mean.Item1) < options.diffThreshold && Math.Abs(mean.Item1 - mean.Item2) < options.diffThreshold)
+                    colorIndex = 3;
+                else if (Math.Abs(mean.Item1 - mean.Item2) < options.diffThreshold)
+                    colorIndex = 4;
+                else if (Math.Abs(mean.Item0 - mean.Item2) < options.diffThreshold)
+                    colorIndex = 5;
+                else if (Math.Abs(mean.Item0 - mean.Item1) < options.diffThreshold)
+                    colorIndex = 6;
+                else if (Math.Abs(mean.Item0 - mean.Item1) > options.diffThreshold && Math.Abs(mean.Item0 - mean.Item2) > options.diffThreshold)
+                    colorIndex = 7;
+                else if (Math.Abs(mean.Item1 - mean.Item0) > options.diffThreshold && Math.Abs(mean.Item1 - mean.Item2) > options.diffThreshold)
+                    colorIndex = 8;
+                else if (Math.Abs(mean.Item2 - mean.Item0) > options.diffThreshold && Math.Abs(mean.Item2 - mean.Item1) > options.diffThreshold)
+                    colorIndex = 9;
+
+                Vec3b color = black;
+                if (colorIndex == 1) color = black;
+                if (colorIndex == 2) color = white;
+                if (colorIndex == 3) color = grayColor;
+                if (colorIndex == 4) color = yellow;
+                if (colorIndex == 5) color = purple;
+                if (colorIndex == 6) color = teal;
+                if (colorIndex == 7) color = blue;
+                if (colorIndex == 8) color = green;
+                if (colorIndex == 9) color = red;
+
+                categories[colorIndex]++;
+                bgrList.Add(color);
+                roiList.Add(roi);
+            }
+            float avg = sortedStd.Keys.Average();
+            int count = 0;
+            dst2.SetTo(0);
+            for (int i = 0; i < sortedStd.Count; i++)
+            {
+                float nextStdev = sortedStd.ElementAt(i).Key;
+                if (nextStdev < avg)
+                {
+                    Rect roi = sortedStd.ElementAt(i).Value;
+                    dst2[roi].SetTo(maskVal);
+                    count++;
+                }
+            }
+            if (standaloneTest())
+            {
+                addw.src2 = dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
+                addw.Run(src);
+                dst3 = addw.dst2;
+            }
+            labels[3] = $"{count} roi's or {(float)count / sortedStd.Count:P0} have an average stdev sum of {avg.ToString(fmt1)} or less";
+        }
+    }
+    public class CS_FeatureROI_ColorSplit : CS_Parent
+    {
+        FeatureROI_Sorted devGrid = new FeatureROI_Sorted();
+        public CS_FeatureROI_ColorSplit(VBtask task) : base(task)
+        {
+            devGrid.maskVal = 255;
+            task.gOptions.setGridSize((int)(dst2.Width / 40)); // arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+            desc = "Split each roi into one of 9 categories - black, white, gray, yellow, purple, teal, blue, green, or red - based on the stdev for the roi";
+        }
+        public void RunCS(Mat src)
+        {
+            devGrid.Run(src);
+            for (int i = 0; i < devGrid.bgrList.Count; i++)
+            {
+                Rect roi = devGrid.roiList[i];
+                Vec3b color = devGrid.bgrList[i];
+                dst2[roi].SetTo(color);
+            }
+            dst2.SetTo(0, ~devGrid.dst2);
+            string strOut = "Categories:\n";
+            for (int i = 1; i < devGrid.categories.Length; i++)
+            {
+                string colorName ="black";
+                if (i == 1) colorName = "black";
+                if (i == 2) colorName = "white";
+                if (i == 3) colorName = "gray";
+                if (i == 4) colorName = "yellow";
+                if (i == 5) colorName = "purple";
+                if (i == 6) colorName = "blue";
+                if (i == 7) colorName = "red";
+
+                strOut += $"{colorName}\t{devGrid.categories[i]}\n";
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_FeatureROI_Correlation : CS_Parent
+    {
+        public FeatureROI_Basics gather = new FeatureROI_Basics();
+        public Plot_OverTimeSingle plot = new Plot_OverTimeSingle();
+        public Options_Features options = new Options_Features();
+        Mat lastImage;
+        public CS_FeatureROI_Correlation(VBtask task) : base(task)
+        {
+            FindSlider("Feature Correlation Threshold").Value = 90;
+            desc = "Use the grid-based correlations with the previous image to determine if there was camera motion";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst1 = (src.Channels() != 1) ? src.CvtColor(ColorConversionCodes.BGR2GRAY) : src.Clone();
+            gather.Run(dst1);
+            dst2 = gather.dst2;
+            if (task.FirstPass) lastImage = dst1.Clone();
+            Mat correlationMat = new Mat();
+            int motionCount = 0;
+            for (int i = 0; i < gather.stdevList.Count; i++)
+            {
+                Rect roi = task.gridList[i];
+                if (gather.stdevList[i] >= gather.stdevAverage)
+                {
+                    Cv2.MatchTemplate(dst1[roi], lastImage[roi], correlationMat, TemplateMatchModes.CCoeffNormed);
+                    float corr = correlationMat.Get<float>(0, 0);
+                    if (corr < options.correlationMin) SetTrueText(corr.ToString("F3"), roi.TopLeft);
+                    if (corr < options.correlationMin) motionCount++;
+                }
+            }
+            plot.plotData = motionCount;
+            plot.min = -1;
+            plot.Run(empty);
+            dst3 = plot.dst2;
+            labels[2] = gather.rects.Count + " of " + task.gridList.Count + " roi's had above average standard deviation.";
+            lastImage = dst1.Clone();
+        }
+    }
+    public class CS_FeatureROI_LowStdev : CS_Parent
+    {
+        public List<Rect> rects = new List<Rect>();
+        public FeatureROI_Basics gather = new FeatureROI_Basics();
+        public CS_FeatureROI_LowStdev(VBtask task) : base(task)
+        {
+            desc = "Isolate the roi's with low stdev";
+        }
+        public void RunCS(Mat src)
+        {
+            dst1 = (src.Channels() != 1) ? src.CvtColor(ColorConversionCodes.BGR2GRAY) : src.Clone();
+            gather.Run(dst1);
+            dst2 = gather.dst2;
+            rects.Clear();
+            for (int i = 0; i < gather.stdevList.Count; i++)
+            {
+                Rect roi = task.gridList[i];
+                if (gather.stdevList[i] < gather.stdevAverage)
+                {
+                    rects.Add(roi);
+                    SetTrueText(gather.stdevList[i].ToString("F3"), roi.TopLeft, 3);
+                }
+            }
+            if (task.heartBeat) labels = new string[] { "", "", (task.gridList.Count - gather.rects.Count).ToString() + " roi's had low standard deviation ", "Stdev average = " + gather.stdevList.Average().ToString("F3") };
+        }
+    }
+    public class CS_FeatureROI_LowStdevCorrelation : CS_Parent
+    {
+        public FeatureROI_LowStdev gather = new FeatureROI_LowStdev();
+        public List<float> correlations = new List<float>();
+        public Options_Features options = new Options_Features();
+        public List<float> saveStdev = new List<float>();
+        Mat lastImage;
+        List<float> saveCorrs;
+        List<Rect> saveRects;
+        public CS_FeatureROI_LowStdevCorrelation(VBtask task) : base(task)
+        {
+            FindSlider("Feature Correlation Threshold").Value = 50;
+            desc = "Display the correlation coefficients for roi's with low standard deviation.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst1 = (src.Channels() != 1) ? src.CvtColor(ColorConversionCodes.BGR2GRAY) : src.Clone();
+            gather.Run(dst1);
+            dst2 = gather.dst2;
+            if (task.FirstPass) lastImage = dst1.Clone();
+            Mat correlationMat = new Mat();
+            correlations.Clear();
+            foreach (Rect roi in gather.rects)
+            {
+                Cv2.MatchTemplate(dst1[roi], lastImage[roi], correlationMat, TemplateMatchModes.CCoeffNormed);
+                float corr = correlationMat.Get<float>(0, 0);
+                correlations.Add(corr);
+            }
+            if (task.heartBeat)
+            {
+                saveCorrs = new List<float>(correlations);
+                saveRects = new List<Rect>(gather.rects);
+                saveStdev.Clear();
+                Scalar mean, stdev;
+                for (int i = 0; i < saveRects.Count; i++)
+                {
+                    Cv2.MeanStdDev(dst1[saveRects[i]], out mean, out stdev);
+                    saveStdev.Add((float)stdev[0]);
+                }
+            }
+            for (int i = 0; i < saveRects.Count; i++)
+            {
+                if (saveCorrs[i] < options.correlationMin) SetTrueText(saveCorrs[i].ToString("F3"), saveRects[i].TopLeft);
+                if (saveCorrs[i] < options.correlationMin) SetTrueText(saveStdev[i].ToString("F3"), saveRects[i].TopLeft, 3);
+            }
+            lastImage = dst1.Clone();
+        }
+    }
+    public class CS_FeatureROI_LR : CS_Parent
+    {
+        public FeatureROI_Basics gLeft = new FeatureROI_Basics();
+        public FeatureROI_Basics gRight = new FeatureROI_Basics();
+        public CS_FeatureROI_LR(VBtask task) : base(task)
+        {
+            desc = "Capture the above average standard deviation roi's for the left and right images.";
+        }
+        public void RunCS(Mat src)
+        {
+            gLeft.Run(task.leftView);
+            dst2 = gLeft.dst2;
+            labels[2] = gLeft.rects.Count + " roi's had above average standard deviation in the left image";
+            gRight.Run(task.rightView);
+            dst3 = gRight.dst2;
+            labels[3] = gRight.rects.Count + " roi's had above average standard deviation in the right image";
+        }
+    }
+    public class CS_FeatureROI_LRClick : CS_Parent
+    {
+        public FeatureROI_Basics gather = new FeatureROI_Basics();
+        public cv.Point ClickPoint = new cv.Point();
+        public int picTag = 0;
+        public Options_Features options = new Options_Features();
+        public CS_FeatureROI_LRClick(VBtask task) : base(task)
+        {
+            task.gOptions.setGridSize(16);
+            FindSlider("Feature Correlation Threshold").Value = 80;
+            if (standalone) task.gOptions.setDisplay1();
+            if (standalone) task.gOptions.setDisplay1();
+            labels[2] = "Click the above average stdev roi's (the darker regions) to find corresponding roi in the right image.";
+            desc = "Capture the above average standard deviation roi's for the left and right images.";
+        }
+        public void setClickPoint(Point pt, int _pictag)
+        {
+            ClickPoint = pt;
+            picTag = _pictag;
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            dst0 = src.Clone();
+            dst3 = (task.rightView.Channels() != 3) ? task.rightView.CvtColor(ColorConversionCodes.GRAY2BGR) : task.rightView.Clone();
+
+            src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            if (task.rightView.Channels() != 1) task.rightView = task.rightView.CvtColor(ColorConversionCodes.BGR2GRAY);
+
+            gather.Run(src);
+            dst2 = gather.dst2;
+            labels = gather.labels;
+            if (gather.rects.Count == 0) return;
+            if (task.mouseClickFlag) setClickPoint(task.ClickPoint, task.mousePicTag);
+            if (ClickPoint == new cv.Point()) setClickPoint(gather.rects[gather.rects.Count / 2].TopLeft, 2);
+
+            int gridIndex = task.gridMap.Get<int>(ClickPoint.Y, ClickPoint.X);
+            Rect roi = task.gridList[gridIndex];
+            dst2.Rectangle(roi, Scalar.White, task.lineWidth);
+
+            Mat correlationMat = new Mat();
+            List<float> corr = new List<float>();
+            for (int j = 0; j < roi.X; j++)
+            {
+                Rect r = new Rect(j, roi.Y, roi.Width, roi.Height);
+                Cv2.MatchTemplate(src[roi], task.rightView[r], correlationMat, TemplateMatchModes.CCoeffNormed);
+                corr.Add(correlationMat.Get<float>(0, 0));
+            }
+            if (corr.Count == 0)
+            {
+                SetTrueText("No corresponding roi found", 2);
+            }
+            else
+            {
+                float maxCorr = corr.Max();
+                if (maxCorr < options.correlationMin)
+                {
+                    SetTrueText("Correlation " + maxCorr.ToString("F3") + " is less than " + options.correlationMin.ToString("F3"), 1);
+                }
+                else
+                {
+                    int index = corr.IndexOf(maxCorr);
+                    Rect rectRight = new Rect(index, roi.Y, roi.Width, roi.Height);
+                    int offset = roi.TopLeft.X - rectRight.TopLeft.X;
+                    if (task.heartBeat)
+                    {
+                        strOut = "CoeffNormed max correlation = " + maxCorr.ToString("F3") + Environment.NewLine;
+                        strOut += "Left Mean = " + gather.meanList[gridIndex].ToString("F3") + " Left stdev = " + gather.stdevList[gridIndex].ToString("F3") + Environment.NewLine;
+                        Scalar mean, stdev;
+                        Cv2.MeanStdDev(dst3[rectRight], out mean, out stdev);
+                        strOut += "Right Mean = " + mean[0].ToString("F3") + " Right stdev = " + stdev[0].ToString("F3") + Environment.NewLine;
+                        strOut += "Right rectangle is offset " + offset.ToString() + " pixels from the left image rectangle";
+                    }
+                    dst3.Rectangle(rectRight, task.HighlightColor, task.lineWidth);
+                    dst0.Rectangle(roi, task.HighlightColor, task.lineWidth);
+                    dst1 = Mat.Zeros(src.Size(), src.Type());
+                    Cv2.Circle(dst1, roi.TopLeft, task.DotSize, task.HighlightColor, -1);
+                    Cv2.Circle(dst1, new cv.Point(rectRight.X, roi.Y + 5), task.DotSize + 2, task.HighlightColor, -1);
+                    cv.Point pt = new cv.Point(rectRight.X, roi.Y + 5);
+                    SetTrueText((offset + " pixel offset" + Environment.NewLine + "Larger = Right").ToString(), pt, 1);
+                    SetTrueText(strOut, 1);
+                    labels[3] = "Corresponding roi highlighted in yellow.  Average stdev = " + gather.stdevAverage.ToString("F3");
+                }
+            }
+        }
+    }
+    public class CS_FeatureROI_LRAll : CS_Parent
+    {
+        public FeatureROI_Basics gather = new FeatureROI_Basics();
+        public Options_Features options = new Options_Features();
+        public SortedList<float, Rect> sortedRects = new SortedList<float, Rect>(new compareAllowIdenticalSingleInverted());
+        public CS_FeatureROI_LRAll(VBtask task) : base(task)
+        {
+            task.gOptions.setGridSize(16);
+            FindSlider("Feature Correlation Threshold").Value = 95;
+            labels[3] = "The highlighted roi's are those high stdev roi's with the highest correlation between left and right images.";
+            desc = "Find all the roi's with high stdev and high correlation between left and right images.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst3 = (task.rightView.Channels() != 3) ? task.rightView.CvtColor(ColorConversionCodes.GRAY2BGR) : task.rightView.Clone();
+            src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            if (task.rightView.Channels() != 1) task.rightView = task.rightView.CvtColor(ColorConversionCodes.BGR2GRAY);
+            gather.Run(src);
+            dst2 = gather.dst2;
+            if (gather.rects.Count == 0) return;
+            Mat correlationMat = new Mat();
+            sortedRects.Clear();
+            foreach (Rect roi in gather.rects)
+            {
+                if (roi.X == 0) continue;
+                Rect r = new Rect(0, roi.Y, roi.X, roi.Height);
+                Cv2.MatchTemplate(src[roi], task.rightView[r], correlationMat, TemplateMatchModes.CCoeffNormed);
+                mmData mm = GetMinMax(correlationMat);
+                if (mm.maxVal >= options.correlationMin) sortedRects.Add((float)mm.maxVal, new Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height));
+            }
+            labels[2] = sortedRects.Count + " roi's had left/right correlation higher than " + options.correlationMin.ToString("F3");
+            foreach (Rect roi in sortedRects.Values)
+            {
+                dst3.Rectangle(roi, task.HighlightColor, task.lineWidth);
+            }
+        }
+    }
 
 
 

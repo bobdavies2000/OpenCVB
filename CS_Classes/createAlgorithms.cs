@@ -477,6 +477,17 @@ namespace CS_Classes
 			if (algorithmName == "CS_FeaturePoly_Triangle") return new CS_FeaturePoly_Triangle(task);
 			if (algorithmName == "CS_FeaturePoly_WarpAffineImage") return new CS_FeaturePoly_WarpAffineImage(task);
 			if (algorithmName == "CS_FeaturePoly_WarpAffinePoly") return new CS_FeaturePoly_WarpAffinePoly(task);
+			if (algorithmName == "CS_FeatureROI_Basics") return new CS_FeatureROI_Basics(task);
+			if (algorithmName == "CS_FeatureROI_Canny") return new CS_FeatureROI_Canny(task);
+			if (algorithmName == "CS_FeatureROI_Color") return new CS_FeatureROI_Color(task);
+			if (algorithmName == "CS_FeatureROI_ColorSplit") return new CS_FeatureROI_ColorSplit(task);
+			if (algorithmName == "CS_FeatureROI_Correlation") return new CS_FeatureROI_Correlation(task);
+			if (algorithmName == "CS_FeatureROI_LowStdev") return new CS_FeatureROI_LowStdev(task);
+			if (algorithmName == "CS_FeatureROI_LowStdevCorrelation") return new CS_FeatureROI_LowStdevCorrelation(task);
+			if (algorithmName == "CS_FeatureROI_LR") return new CS_FeatureROI_LR(task);
+			if (algorithmName == "CS_FeatureROI_LRAll") return new CS_FeatureROI_LRAll(task);
+			if (algorithmName == "CS_FeatureROI_LRClick") return new CS_FeatureROI_LRClick(task);
+			if (algorithmName == "CS_FeatureROI_Sorted") return new CS_FeatureROI_Sorted(task);
 			if (algorithmName == "CS_Line_Basics") return new CS_Line_Basics(task);
 			if (algorithmName == "CS_Mat_4Click") return new CS_Mat_4Click(task);
 			if (algorithmName == "CS_Mat_4to1") return new CS_Mat_4to1(task);
