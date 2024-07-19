@@ -5962,3 +5962,29 @@ Public Class Options_FLANN : Inherits VB_Parent
         sorted = sortedCheck.checked
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class Options_TrackerDepth : Inherits VB_Parent
+    Public displayRect As Boolean
+    Public minRectSize As Integer
+    Public Sub New()
+        If check.Setup(traceName) Then
+            check.addCheckBox("Display centroid and rectangle for each region")
+            check.Box(0).Checked = True
+        End If
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold for rectangle size", 50, 50000, 10000)
+    End Sub
+    Public Sub RunVB()
+        Static displayCheck = FindCheckBox("Display centroid and rectangle for each region")
+        Static minRectSizeSlider = FindSlider("Threshold for rectangle size")
+
+        displayRect = displayCheck.checked
+        minRectSize = minRectSizeSlider.value
+    End Sub
+End Class

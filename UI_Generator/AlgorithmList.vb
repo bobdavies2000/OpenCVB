@@ -1464,6 +1464,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Options_Threshold_AdaptiveMin" Then return new Options_Threshold_AdaptiveMin
 	if algorithmName = "Options_ThresholdAll" Then return new Options_ThresholdAll
 	if algorithmName = "Options_TopX" Then return new Options_TopX
+	if algorithmName = "Options_TrackerDepth" Then return new Options_TrackerDepth
 	if algorithmName = "Options_Translation" Then return new Options_Translation
 	if algorithmName = "Options_Uncertainty" Then return new Options_Uncertainty
 	if algorithmName = "Options_Warp" Then return new Options_Warp

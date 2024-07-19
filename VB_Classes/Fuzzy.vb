@@ -205,17 +205,12 @@ Public Class Fuzzy_TrackerDepth : Inherits VB_Parent
     Public highlightPoint As cv.Point
     Public highlightRect As cv.Rect
     Public highlightRegion = -1
+    Dim options As New Options_TrackerDepth
     Public Sub New()
-        If check.Setup(traceName) Then
-            check.addCheckBox("Display centroid and rectangle for each region")
-            check.Box(0).Checked = True
-        End If
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold for rectangle size", 50, 50000, 10000)
         desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static displayCheck = FindCheckBox("Display centroid and rectangle for each region")
-        Static minRectSizeSlider = FindSlider("Threshold for rectangle size")
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
         fuzzy.Run(task.depthRGB)
         dst2 = fuzzy.dst1
@@ -225,8 +220,6 @@ Public Class Fuzzy_TrackerDepth : Inherits VB_Parent
         layoutColor.Clear()
         Dim minX As Double, maxX As Double
         Dim minY As Double, maxY As Double
-        Dim minRectSize = minRectSizeSlider.Value
-        Dim displayRect = displayCheck.checked
         For Each vec In fuzzy.sortContours.Values
             Dim contours = fuzzy.contours(vec(0))
             Dim points = New cv.Mat(contours.Length, 1, cv.MatType.CV_32SC2, contours.ToArray)
@@ -236,14 +229,14 @@ Public Class Fuzzy_TrackerDepth : Inherits VB_Parent
             points.Col(1).MinMaxIdx(minY, maxY)
 
             Dim rect = New cv.Rect(minX, minY, maxX - minX, maxY - minY)
-            If rect.Width * rect.Height > minRectSize Then
+            If rect.Width * rect.Height > options.minRectSize Then
                 Dim centroid = New cv.Point2f(center(0) / contours.Length, center(1) / contours.Length)
                 centroids.Add(centroid)
                 rects.Add(rect)
                 layoutColor.Add(vec(1))
-                If displayRect Then
-                    DrawCircle(dst2,centroid, task.DotSize + 3, cv.Scalar.Yellow)
-                    DrawCircle(dst2,centroid, task.DotSize, cv.Scalar.Red)
+                If options.displayRect Then
+                    DrawCircle(dst2, centroid, task.DotSize + 3, cv.Scalar.Yellow)
+                    DrawCircle(dst2, centroid, task.DotSize, cv.Scalar.Red)
                     dst2.Rectangle(rect, cv.Scalar.Yellow, 2)
                 End If
             End If
@@ -286,6 +279,3 @@ Public Class Fuzzy_TrackerDepthClick : Inherits VB_Parent
         labels(2) = CStr(tracker.fuzzy.sortContours.Count) + " regions were found in the image."
     End Sub
 End Class
-
-
-

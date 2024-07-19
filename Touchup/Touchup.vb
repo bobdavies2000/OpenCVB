@@ -28,7 +28,6 @@ Public Class Touchup
                 If inline.Contains(".Get(") Then inline = inline.Replace(".Get(", "[") ' force a compile error to indicate you have to manually put the corresponding close bracket ']' 
                 If inline.Contains("public CS_") And inline.EndsWith("()") Then inline = inline.Replace("()", "(VBtask task) : base(task)")
                 inline = inline.Replace("private ", "")
-                inline = inline.Replace("BGR2Gray ", "BGR2GRAY")
                 inline = inline.Replace(" Run(Mat ", " RunCS(Mat ")
                 inline = inline.Replace("RunCSharp(Mat ", "RunCS(Mat ")
                 inline = inline.Replace("Options_CS_", "Options_")
@@ -48,6 +47,9 @@ Public Class Touchup
                 inline = inline.Replace("Cv2.Line(", "DrawLine(")
                 inline = inline.Replace("Cv2.Circle(", "DrawCircle(")
                 inline = inline.Replace("override ", "")
+                inline = Replace(inline, "bgr2gray", "BGR2GRAY", 1, -1, vbTextCompare)
+                inline = Replace(inline, "task.rightview", "task.rightView", 1, -1, vbTextCompare)
+                inline = Replace(inline, "task.leftview", "task.leftView", 1, -1, vbTextCompare)
             Else
                 If line.StartsWith("Public Class CS_") Then
                     inline = inline.Replace("Public Class CS_", "Public Class VB_")

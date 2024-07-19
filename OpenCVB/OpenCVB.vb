@@ -603,10 +603,10 @@ Public Class OpenCVB
                         Thread.Sleep(100) ' let the camera task free resources.
                         foundCamera = True
                     End If
-                    If proc(i).ProcessName.ToLower.Contains("touchup") Then
-                        If proc(i).HasExited = False Then proc(i).Kill()
-                    End If
                 End If
+            End If
+            If proc(i).ProcessName.ToLower.Contains("touchup") Then
+                If proc(i).HasExited = False Then proc(i).Kill()
             End If
         Next
         'For Each procStr In procList.Keys

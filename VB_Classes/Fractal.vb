@@ -48,26 +48,6 @@ End Class
 
 
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
-'Public Class Fractal_Mandelbrot_MT : Inherits VB_Parent
-'    Dim mandel As New Fractal_Mandelbrot
-'    Public Sub New()
-'        desc = "Run a multi-threaded version of the Mandalbrot algorithm"
-'    End Sub
-'    Public Sub RunVB(src as cv.Mat)
-'        Parallel.For(0, src.Height,
-'        Sub(y)
-'            mandel.mandelbrotLoop(y)
-'        End Sub)
-'        dst2 = mandel.dst2
-'    End Sub
-'End Class
-
-
-
-
-
-
-' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
 Public Class Fractal_MandelbrotZoom : Inherits VB_Parent
     Public mandel As New Fractal_Mandelbrot
     Dim saveDrawRect As New cv.Rect(1, 1, 1, 1)
@@ -190,8 +170,8 @@ Public Class Fractal_Dimension : Inherits VB_Parent
     Public Function dimension(Input As cv.Mat) As Double
         Dim tmp64f As New cv.Mat
         Input.ConvertTo(tmp64f, cv.MatType.CV_64F, 0, 0)
-        Dim gMin = 0, gMax = 255, G = 256
-        Dim prev = -1, d As Double
+        Dim G = 256
+        Dim d As Double
 
         For j = 2 To Input.Width / 2 - 1
             Dim h = Math.Max(1, Math.Floor(g / (Math.Floor(Input.Width / j))))
