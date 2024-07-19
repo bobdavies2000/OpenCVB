@@ -583,10 +583,19 @@ Public Class OpenCVB
                "is not computationally intensive but is built on many almost trivial" + vbCrLf +
                "algorithms working together." + vbCrLf)
     End Sub
+    Public Class compareAllowIdenticalString : Implements IComparer(Of String)
+        Public Function Compare(ByVal a As String, ByVal b As String) As Integer Implements IComparer(Of String).Compare
+            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+            If a >= b Then Return 1
+            Return -1
+        End Function
+    End Class
     Private Function killPythonCameraOrTask() As Boolean
         Dim proc = Process.GetProcesses()
         Dim foundCamera As Boolean
+        'Dim procList As New SortedList(Of String, String)(New compareAllowIdenticalString)
         For i = 0 To proc.Count - 1
+            'procList.Add(proc(i).ProcessName, proc(i).ProcessName)
             If proc(i).ProcessName.ToLower.Contains("python") Then
                 If proc(i).HasExited = False Then
                     proc(i).Kill()
@@ -594,26 +603,24 @@ Public Class OpenCVB
                         Thread.Sleep(100) ' let the camera task free resources.
                         foundCamera = True
                     End If
+                    If proc(i).ProcessName.ToLower.Contains("touchup") Then
+                        If proc(i).HasExited = False Then proc(i).Kill()
+                    End If
                 End If
             End If
         Next
+        'For Each procStr In procList.Keys
+        '    Console.WriteLine(procStr)
+        'Next
         Return foundCamera
     End Function
-    Private Sub killTranslator()
-        Dim proc = Process.GetProcesses()
-        For i = 0 To proc.Count - 1
-            If proc(i).ProcessName.ToLower.Contains("touchup") Then
-                If proc(i).HasExited = False Then proc(i).Kill()
-            End If
-        Next
-    End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         jsonWrite()
 
         cameraTaskHandle = Nothing
         If TreeButton.Checked Then TreeViewDialog.Close()
 
-        killTranslator()
+        killPythonCameraOrTask()
 
         saveAlgorithmName = "" ' this will close the current algorithm.
     End Sub

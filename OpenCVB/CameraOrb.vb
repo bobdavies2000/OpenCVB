@@ -44,71 +44,76 @@ Public Class CameraORB : Inherits Camera
         cameraInfo.fy = intrinInfo(3)
     End Sub
     Public Sub GetNextFrame(WorkingRes As cv.Size)
-
         If cPtr = 0 Then Exit Sub
 
-        Dim colorData = ORBWaitForFrame(cPtr)
+        Try
 
-        Dim accelFrame = ORBAccel(cPtr)
-        If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
-        ' IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
+            Dim colorData = ORBWaitForFrame(cPtr)
 
-        Dim gyroFrame = ORBGyro(cPtr)
-        If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
+            Dim accelFrame = ORBAccel(cPtr)
+            If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
+            ' IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
 
-        Static imuStartTime = ORBIMUTimeStamp(cPtr)
-        IMU_TimeStamp = ORBIMUTimeStamp(cPtr) - imuStartTime
+            Dim gyroFrame = ORBGyro(cPtr)
+            If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
 
-        SyncLock cameraLock
-            Dim cols = WorkingRes.Width, rows = WorkingRes.Height
-            If captureRes = WorkingRes Then
-                If colorData <> 0 Then mbuf(mbIndex).color = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, colorData).Clone
+            Static imuStartTime = ORBIMUTimeStamp(cPtr)
+            IMU_TimeStamp = ORBIMUTimeStamp(cPtr) - imuStartTime
 
-                Dim pcData = ORBPointCloud(cPtr)
-                If pcData <> 0 Then mbuf(mbIndex).pointCloud = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, pcData) * 0.001
+            SyncLock cameraLock
+                Dim cols = WorkingRes.Width, rows = WorkingRes.Height
+                If captureRes = WorkingRes Then
+                    If colorData <> 0 Then mbuf(mbIndex).color = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, colorData).Clone
 
-                Dim leftData = ORBLeftImage(cPtr)
-                If leftData <> 0 Then mbuf(mbIndex).leftView = New cv.Mat(rows, cols, cv.MatType.CV_8U, leftData).
+                    Dim pcData = ORBPointCloud(cPtr)
+                    If pcData <> 0 Then mbuf(mbIndex).pointCloud = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, pcData) * 0.001
+
+                    Dim leftData = ORBLeftImage(cPtr)
+                    If leftData <> 0 Then mbuf(mbIndex).leftView = New cv.Mat(rows, cols, cv.MatType.CV_8U, leftData).
                     CvtColor(cv.ColorConversionCodes.GRAY2BGR) * 3
 
-                Dim rightData = ORBRightImage(cPtr)
-                If rightData <> 0 Then mbuf(mbIndex).rightView = New cv.Mat(rows, cols, cv.MatType.CV_8U, rightData).
+                    Dim rightData = ORBRightImage(cPtr)
+                    If rightData <> 0 Then mbuf(mbIndex).rightView = New cv.Mat(rows, cols, cv.MatType.CV_8U, rightData).
                     CvtColor(cv.ColorConversionCodes.GRAY2BGR) * 3
-            Else
-                If colorData <> 0 Then
-                    mbuf(mbIndex).color = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, colorData).
+                Else
+                    If colorData <> 0 Then
+                        mbuf(mbIndex).color = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, colorData).
                                                      Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-                End If
+                    End If
 
-                Dim pcData = ORBPointCloud(cPtr)
-                If pcData <> 0 Then
-                    mbuf(mbIndex).pointCloud = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, pcData).
+                    Dim pcData = ORBPointCloud(cPtr)
+                    If pcData <> 0 Then
+                        mbuf(mbIndex).pointCloud = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, pcData).
                                                           Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest) * 0.001
-                End If
+                    End If
 
-                Dim leftData = ORBLeftImage(cPtr)
-                If leftData <> 0 Then
-                    mbuf(mbIndex).leftView = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, leftData).
+                    Dim leftData = ORBLeftImage(cPtr)
+                    If leftData <> 0 Then
+                        mbuf(mbIndex).leftView = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, leftData).
                                                           Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest).
                                                           CvtColor(cv.ColorConversionCodes.GRAY2BGR) * 3
-                End If
+                    End If
 
-                Dim rightData = ORBRightImage(cPtr)
-                If rightData <> 0 Then
-                    mbuf(mbIndex).rightView = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, rightData).
+                    Dim rightData = ORBRightImage(cPtr)
+                    If rightData <> 0 Then
+                        mbuf(mbIndex).rightView = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, rightData).
                                                          Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest).
                                                          CvtColor(cv.ColorConversionCodes.GRAY2BGR) * 3
+                    End If
                 End If
-            End If
-        End SyncLock
+            End SyncLock
 
-        MyBase.GetNextFrameCounts(IMU_FrameTime)
+            MyBase.GetNextFrameCounts(IMU_FrameTime)
+        Catch ex As Exception
+            Console.WriteLine("Orbec camera failure..." + ex.Message)
+        End Try
     End Sub
     Public Sub stopCamera()
         Application.DoEvents()
         Try
             ORBClose(cPtr)
         Catch ex As Exception
+            Console.WriteLine("Orbec camera shutdown failure..." + ex.Message)
         End Try
         cPtr = 0
     End Sub
