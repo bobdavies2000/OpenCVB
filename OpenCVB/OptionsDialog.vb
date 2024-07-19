@@ -131,7 +131,7 @@ Public Class OptionsDialog
         If TestAllDuration.Value < 5 Then TestAllDuration.Value = 5
         testDuration = TestAllDuration.Value
     End Sub
-    Private Sub Button1_Click(sender As Object, e As EventArgs)
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         FontDialog1.Font = OpenCVB.settings.fontInfo
         If FontDialog1.ShowDialog() = Windows.Forms.DialogResult.OK Then OpenCVB.settings.fontInfo = FontDialog1.Font
     End Sub

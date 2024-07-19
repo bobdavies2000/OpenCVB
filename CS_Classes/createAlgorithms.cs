@@ -506,15 +506,6 @@ namespace CS_Classes
 			if (algorithmName == "CS_FitLine_Basics3D") return new CS_FitLine_Basics3D(task);
 			if (algorithmName == "CS_FLANN_Basics") return new CS_FLANN_Basics(task);
 			if (algorithmName == "CS_FLANN_Test") return new CS_FLANN_Test(task);
-			if (algorithmName == "CS_Flood_Basics") return new CS_Flood_Basics(task);
-			if (algorithmName == "CS_Flood_BasicsMask") return new CS_Flood_BasicsMask(task);
-			if (algorithmName == "CS_Flood_CellStatsPlot") return new CS_Flood_CellStatsPlot(task);
-			if (algorithmName == "CS_Flood_ContainedCells") return new CS_Flood_ContainedCells(task);
-			if (algorithmName == "CS_Flood_LeftRight") return new CS_Flood_LeftRight(task);
-			if (algorithmName == "CS_Flood_MaxDistPoints") return new CS_Flood_MaxDistPoints(task);
-			if (algorithmName == "CS_Flood_Motion") return new CS_Flood_Motion(task);
-			if (algorithmName == "CS_Flood_Motion1") return new CS_Flood_Motion1(task);
-			if (algorithmName == "CS_Flood_Tiers") return new CS_Flood_Tiers(task);
 			if (algorithmName == "CS_Line_Basics") return new CS_Line_Basics(task);
 			if (algorithmName == "CS_Mat_4Click") return new CS_Mat_4Click(task);
 			if (algorithmName == "CS_Mat_4to1") return new CS_Mat_4to1(task);

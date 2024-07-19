@@ -38,9 +38,6 @@ Namespace jsonClass
         Public testAllDuration As Integer
         Public showConsoleLog As Boolean
 
-        Public defaultFontSize As Integer
-        Public defaultFontName As String
-
         Public treeButton As Boolean
 
         Public PixelViewerButton As Boolean

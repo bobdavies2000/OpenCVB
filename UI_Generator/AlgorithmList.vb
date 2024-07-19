@@ -712,7 +712,6 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Font_FlowText" Then return new Font_FlowText
 	if algorithmName = "Font_FlowTextOld" Then return new Font_FlowTextOld
 	if algorithmName = "Font_OpenCV" Then return new Font_OpenCV
-	if algorithmName = "Font_TrueType" Then return new Font_TrueType
 	if algorithmName = "Foreground_Basics" Then return new Foreground_Basics
 	if algorithmName = "Foreground_CellsBack" Then return new Foreground_CellsBack
 	if algorithmName = "Foreground_CellsFore" Then return new Foreground_CellsFore

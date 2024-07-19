@@ -320,7 +320,6 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         useNaturalColor = NaturalColor.Checked
     End Sub
-
     Public Sub setUseColorOnly(newVal As Boolean)
         UseColorOnly.Checked = newVal
     End Sub
@@ -333,7 +332,6 @@ Public Class OptionsRedCloud
     Public Sub checkSimpleReduction(newVal As Boolean)
         UseSimpleReduction.Checked = newVal
     End Sub
-
     Public Sub setBitReductionBar(newVal As Integer)
         BitwiseReductionBar.Value = newVal
     End Sub

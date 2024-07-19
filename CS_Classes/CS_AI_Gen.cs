@@ -13,7 +13,6 @@ using static CS_Classes.CS_Externs;
 using OpenCvSharp.XImgProc;
 using System.IO;
 using System.Security.Cryptography;
-using System.Windows.Controls;
 
 namespace CS_Classes
 {
@@ -19415,359 +19414,643 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
 
 
-    public class CS_Flood_Basics : CS_Parent
-    {
-        RedCloud_CPP redCPP = new RedCloud_CPP();
-        public Cell_Generate genCells = new Cell_Generate();
-        Color8U_Basics color;
-        public CS_Flood_Basics(VBtask task) : base(task)
-        {
-            task.redOptions.setIdentifyCells(true);
-            desc = "Build the RedCloud cells with the grayscale input.";
-        }
-        public void RunCS(Mat src)
-        {
-            if (src.Channels() != 1)
-            {
-                if (color == null) color = new Color8U_Basics();
-                color.Run(src);
-                src = color.dst2;
-            }
-            else
-            {
-                redCPP.inputMask = src;
-            }
-            redCPP.Run(src);
-            if (redCPP.classCount == 0) return; // no data to process.
-            genCells.classCount = redCPP.classCount;
-            genCells.rectList = redCPP.rectList;
-            genCells.floodPoints = redCPP.floodPoints;
-            genCells.removeContour = false;
-            genCells.Run(redCPP.dst2);
-            dst2 = genCells.dst2;
-            task.setSelectedContour();
-            labels[2] = genCells.labels[2];
-        }
-    }
-    public class CS_Flood_CellStatsPlot : CS_Parent
-    {
-        Flood_Basics flood = new Flood_Basics();
-        Cell_BasicsPlot stats = new Cell_BasicsPlot();
-        public CS_Flood_CellStatsPlot(VBtask task) : base(task)
-        {
-            task.redOptions.setIdentifyCells(true);
-            if (standaloneTest()) task.gOptions.setDisplay1();
-            task.gOptions.setHistogramBins(1000);
-            labels[1] = "Histogram of the depth for the selected cell.  Click any cell in the lower left.";
-            desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill";
-        }
-        public void RunCS(Mat src)
-        {
-            flood.Run(src);
-            stats.Run(src);
-            dst1 = stats.dst1;
-            dst2 = flood.dst2;
-            SetTrueText(stats.strOut, 3);
-            if (task.ClickPoint == new cv.Point())
-            {
-                if (task.redCells.Count > 1)
-                {
-                    task.rc = task.redCells[1];
-                    task.ClickPoint = task.rc.maxDist;
-                }
-            }
-        }
-    }
-    public class CS_Flood_ContainedCells : CS_Parent
-    {
-        Flood_Basics flood = new Flood_Basics();
-        public CS_Flood_ContainedCells(VBtask task) : base(task)
-        {
-            task.redOptions.setIdentifyCells(true);
-            desc = "Find cells that have only one neighbor.  They are likely to be completely contained in another cell.";
-        }
-        public void RunCS(Mat src)
-        {
-            if (standalone)
-            {
-                flood.Run(src);
-                dst2 = flood.dst2;
-                labels = flood.labels;
-            }
-            List<int> removeCells = new List<int>();
-            for (int i = task.redCells.Count - 1; i >= task.redOptions.identifyCount; i--)
-            {
-                var rc = task.redCells[i];
-                List<int> nabs = new List<int>();
-                List<int> contains = new List<int>();
-                int count = Math.Min(task.redOptions.identifyCount, task.redCells.Count);
-                for (int j = 0; j < count; j++)
-                {
-                    var rcBig = task.redCells[j];
-                    if (rcBig.rect.IntersectsWith(rc.rect)) nabs.Add(rcBig.index);
-                    if (rcBig.rect.Contains(rc.rect)) contains.Add(rcBig.index);
-                }
-                if (contains.Count == 1) removeCells.Add(rc.index);
-            }
-            dst3.SetTo(0);
-            foreach (int index in removeCells)
-            {
-                var rc = task.redCells[index];
-                dst3[rc.rect].SetTo(rc.color, rc.mask);
-            }
-            if (task.heartBeat) labels[3] = $"{removeCells.Count} cells were completely contained in exactly one other cell's rect";
-        }
-    }
-    public class CS_Flood_BasicsMask : CS_Parent
-    {
-        public Mat binarizedImage;
-        public Mat inputMask;
-        public Cell_Generate genCells = new Cell_Generate();
-        RedCloud_CPP redCPP = new RedCloud_CPP();
-        public bool buildInputMask;
-        public bool showSelected = true;
-        Color8U_Basics cvt = new Color8U_Basics();
-        public CS_Flood_BasicsMask(VBtask task) : base(task)
-        {
-            task.redOptions.setIdentifyCells(true);
-            labels[3] = "The inputMask used to limit how much of the image is processed.";
-            desc = "Floodfill by color as usual but this is run repeatedly with the different tiers.";
-        }
-        public void RunCS(Mat src)
-        {
-            if (standalone || buildInputMask)
-            {
-                cvt.Run(src);
-                inputMask = task.pcSplit[2].InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs();
-                src = cvt.dst2;
-            }
-            dst3 = inputMask;
-            redCPP.inputMask = inputMask;
-            redCPP.Run(src);
-            genCells.classCount = redCPP.classCount;
-            genCells.rectList = redCPP.rectList;
-            genCells.floodPoints = redCPP.floodPoints;
-            genCells.Run(redCPP.dst2);
-            dst2 = genCells.dst2;
-            int cellCount = Math.Min(task.redOptions.identifyCount, task.redCells.Count);
-            if (task.heartBeat) labels[2] = $"{task.redCells.Count} cells identified and the largest {cellCount} are numbered below.";
-            if (showSelected) task.setSelectedContour();
-        }
-    }
-    public class CS_Flood_Tiers : CS_Parent
-    {
-        Flood_BasicsMask flood = new Flood_BasicsMask();
-        Depth_TiersZ tiers = new Depth_TiersZ();
-        Color8U_Basics cvt = new Color8U_Basics();
-        public CS_Flood_Tiers(VBtask task) : base(task)
-        {
-            task.redOptions.setIdentifyCells(true);
-            desc = "Subdivide the Flood_Basics cells using depth tiers.";
-        }
-        public void RunCS(Mat src)
-        {
-            int tier = task.gOptions.DebugSliderValue;
-            tiers.Run(src);
-            if (tier >= tiers.classCount) tier = 0;
-            if (tier == 0)
-            {
-                dst1 = ~tiers.dst2.InRange(0, 1);
-            }
-            else
-            {
-                dst1 = ~tiers.dst2.InRange(tier, tier);
-            }
-            labels[2] = tiers.labels[2] + " in tier " + tier.ToString() + ".  Use the global options 'DebugSlider' to select different tiers.";
-            cvt.Run(src);
-            flood.inputMask = dst1;
-            flood.Run(cvt.dst2);
-            dst2 = flood.dst2;
-            dst3 = flood.dst3;
-            task.setSelectedContour();
-        }
-    }
-    public class CS_Flood_Motion : CS_Parent
-    {
-        Flood_Basics flood = new Flood_Basics();
-        List<rcData> redCells = new List<rcData>();
-        Mat cellMap = new Mat();
-        List<Point2f> maxDists = new List<Point2f>();
-        List<int> maxIndex = new List<int>();
-        public CS_Flood_Motion(VBtask task) : base(task)
-        {
-            if (standalone) task.gOptions.setDisplay1();
-            desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame.";
-        }
-        public void RunCS(Mat src)
-        {
-            if (task.heartBeat)
-            {
-                flood.Run(src);
-                redCells = new List<rcData>(task.redCells);
-                cellMap = task.cellMap.Clone();
-                dst2 = flood.dst2.Clone();
-                dst3 = flood.dst2.Clone();
-                labels[2] = flood.labels[2];
-                labels[3] = flood.labels[2];
-                maxDists.Clear();
-                foreach (var rc in redCells)
-                {
-                    maxDists.Add(rc.maxDist);
-                    maxIndex.Add(rc.index);
-                }
-            }
-            else
-            {
-                flood.Run(src);
-                dst1.SetTo(0);
-                for (int i = 0; i < task.redCells.Count; i++)
-                {
-                    var rc = task.redCells[i];
-                    if (maxDists.Contains(rc.maxDist))
-                    {
-                        var lrc = redCells[maxIndex[maxDists.IndexOf(rc.maxDist)]];
-                        dst1[lrc.rect].SetTo(lrc.color, lrc.mask);
-                    }
-                }
-                dst3 = flood.dst2;
-                labels[3] = flood.labels[2];
-            }
-        }
-    }
-    public class CS_Flood_Motion1 : CS_Parent
-    {
-        Flood_Basics flood = new Flood_Basics();
-        Motion_Basics motion = new Motion_Basics();
-        List<rcData> redCells = new List<rcData>();
-        List<Point2f> maxDists = new List<Point2f>();
-        List<int> maxIndex = new List<int>();
-        public CS_Flood_Motion1(VBtask task) : base(task)
-        {
-            desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame.";
-        }
-        public void RunCS(Mat src)
-        {
-            if (task.heartBeat)
-            {
-                flood.Run(src);
-                redCells = new List<rcData>(task.redCells);
-                dst2 = flood.dst2.Clone();
-                dst3 = flood.dst2.Clone();
-                labels[2] = flood.labels[2];
-                labels[3] = flood.labels[2];
-                maxDists.Clear();
-                foreach (var rc in redCells)
-                {
-                    maxDists.Add(rc.maxDist);
-                    maxIndex.Add(rc.index);
-                }
-            }
-            else
-            {
-                flood.Run(src);
-                motion.Run(flood.dst2);
-                for (int i = 0; i < task.redCells.Count; i++)
-                {
-                    var rc = task.redCells[i];
-                    if (maxDists.Contains(rc.maxDist))
-                    {
-                        var lrc = redCells[maxIndex[maxDists.IndexOf(rc.maxDist)]];
-                        dst1[lrc.rect].SetTo(lrc.color, lrc.mask);
-                    }
-                }
-                dst3 = flood.dst2;
-                labels[3] = flood.labels[2];
-            }
-        }
-    }
-    public class CS_Flood_LeftRight : CS_Parent
-    {
-        RedCloud_Basics redLeft = new RedCloud_Basics();
-        RedCloud_Basics redRight = new RedCloud_Basics();
-        public Mat mapLeft;
-        public Mat mapRight;
-        public List<rcData> cellsLeft = new List<rcData>();
-        public List<rcData> cellsRight = new List<rcData>();
-        public CS_Flood_LeftRight(VBtask task) : base(task)
-        {
-            mapLeft = new Mat(dst2.Size(), MatType.CV_8U, 0);
-            mapRight = new Mat(dst2.Size(), MatType.CV_8U, 0);
-            task.redOptions.setIdentifyCells(false);
-            if (standalone) task.gOptions.setDisplay1();
-            desc = "Floodfill left and right images.";
-        }
-        public void RunCS(Mat src)
-        {
-            task.redCells = new List<rcData>(cellsLeft);
-            task.cellMap = mapLeft.Clone();
-            redLeft.genCells.useLeftImage = true;
-            redLeft.Run(task.leftView);
-            labels[2] = redLeft.labels[2];
-            dst2 = redLeft.dst2;
-            cellsLeft = new List<rcData>(task.redCells);
-            mapLeft = task.cellMap.Clone();
-            task.redCells = new List<rcData>(cellsRight);
-            task.cellMap = mapRight.Clone();
-            redRight.genCells.useLeftImage = false;
-            redRight.Run(task.rightView);
-            labels[3] = redRight.labels[2];
-            dst3 = redRight.dst2;
-            cellsRight = new List<rcData>(task.redCells);
-            mapRight = task.cellMap.Clone();
-            if (task.redOptions.getIdentifyCells())
-            {
-                if (task.mousePicTag == 2)
-                {
-                    task.setSelectedContour(ref cellsLeft, ref mapLeft);
-                    task.color[task.rc.rect].SetTo(Scalar.White, task.rc.mask);
-                }
-                else
-                {
-                    task.setSelectedContour(ref cellsRight, ref mapRight);
-                    dst1 = task.rightView;
-                    dst1[task.rc.rect].SetTo(Scalar.White, task.rc.mask);
-                }
-            }
-        }
-    }
-    public class CS_Flood_MaxDistPoints : CS_Parent
-    {
-        Boundary_RemovedRects bounds = new Boundary_RemovedRects();
-        RedCloud_MaxDist_CPP redCPP = new RedCloud_MaxDist_CPP();
-        public Cell_Generate genCells = new Cell_Generate();
-        Color8U_Basics cvt = new Color8U_Basics();
-        public CS_Flood_MaxDistPoints(VBtask task) : base(task)
-        {
-            task.redOptions.setIdentifyCells(true);
-            labels[3] = "Contour boundaries - input to RedCloud_Basics";
-            desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code.";
-        }
-        public void RunCS(Mat src)
-        {
-            cvt.Run(src);
-            redCPP.Run(cvt.dst2);
-            if (redCPP.classCount == 0) return; // no data to process.
-            genCells.classCount = redCPP.classCount;
-            genCells.rectList = redCPP.RectList;
-            genCells.floodPoints = redCPP.floodPoints;
-            genCells.removeContour = false;
-            genCells.Run(redCPP.dst2);
-            dst2 = genCells.dst2;
-            redCPP.maxList.Clear();
-            for (int i = 1; i < task.redCells.Count; i++)
-            {
-                redCPP.maxList.Add(task.redCells[i].maxDist.X);
-                redCPP.maxList.Add(task.redCells[i].maxDist.Y);
-            }
-            task.setSelectedContour();
-            labels[2] = genCells.labels[2];
-        }
-    }
+    //public class CS_Flood_Basics : CS_Parent
+    //{
+    //    RedCloud_CPP redCPP = new RedCloud_CPP();
+    //    public Cell_Generate genCells = new Cell_Generate();
+    //    Color8U_Basics color;
+    //    public CS_Flood_Basics(VBtask task) : base(task)
+    //    {
+    //        task.redOptions.setIdentifyCells(true);
+    //        desc = "Build the RedCloud cells with the grayscale input.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        if (src.Channels() != 1)
+    //        {
+    //            if (color == null) color = new Color8U_Basics();
+    //            color.Run(src);
+    //            src = color.dst2;
+    //        }
+    //        else
+    //        {
+    //            redCPP.inputMask = src;
+    //        }
+    //        redCPP.Run(src);
+    //        if (redCPP.classCount == 0) return; // no data to process.
+    //        genCells.classCount = redCPP.classCount;
+    //        genCells.rectList = redCPP.rectList;
+    //        genCells.floodPoints = redCPP.floodPoints;
+    //        genCells.removeContour = false;
+    //        genCells.Run(redCPP.dst2);
+    //        dst2 = genCells.dst2;
+    //        task.setSelectedContour();
+    //        labels[2] = genCells.labels[2];
+    //    }
+    //}
+    //public class CS_Flood_CellStatsPlot : CS_Parent
+    //{
+    //    Flood_Basics flood = new Flood_Basics();
+    //    Cell_BasicsPlot stats = new Cell_BasicsPlot();
+    //    public CS_Flood_CellStatsPlot(VBtask task) : base(task)
+    //    {
+    //        task.redOptions.setIdentifyCells(true);
+    //        if (standaloneTest()) task.gOptions.setDisplay1();
+    //        task.gOptions.setHistogramBins(1000);
+    //        labels[1] = "Histogram of the depth for the selected cell.  Click any cell in the lower left.";
+    //        desc = "Provide cell stats on the flood_basics cells.  Identical to Cell_Floodfill";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        flood.Run(src);
+    //        stats.Run(src);
+    //        dst1 = stats.dst1;
+    //        dst2 = flood.dst2;
+    //        SetTrueText(stats.strOut, 3);
+    //        if (task.ClickPoint == new cv.Point())
+    //        {
+    //            if (task.redCells.Count > 1)
+    //            {
+    //                task.rc = task.redCells[1];
+    //                task.ClickPoint = task.rc.maxDist;
+    //            }
+    //        }
+    //    }
+    //}
+    //public class CS_Flood_ContainedCells : CS_Parent
+    //{
+    //    Flood_Basics flood = new Flood_Basics();
+    //    public CS_Flood_ContainedCells(VBtask task) : base(task)
+    //    {
+    //        task.redOptions.setIdentifyCells(true);
+    //        desc = "Find cells that have only one neighbor.  They are likely to be completely contained in another cell.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        if (standalone)
+    //        {
+    //            flood.Run(src);
+    //            dst2 = flood.dst2;
+    //            labels = flood.labels;
+    //        }
+    //        List<int> removeCells = new List<int>();
+    //        for (int i = task.redCells.Count - 1; i >= task.redOptions.identifyCount; i--)
+    //        {
+    //            var rc = task.redCells[i];
+    //            List<int> nabs = new List<int>();
+    //            List<int> contains = new List<int>();
+    //            int count = Math.Min(task.redOptions.identifyCount, task.redCells.Count);
+    //            for (int j = 0; j < count; j++)
+    //            {
+    //                var rcBig = task.redCells[j];
+    //                if (rcBig.rect.IntersectsWith(rc.rect)) nabs.Add(rcBig.index);
+    //                if (rcBig.rect.Contains(rc.rect)) contains.Add(rcBig.index);
+    //            }
+    //            if (contains.Count == 1) removeCells.Add(rc.index);
+    //        }
+    //        dst3.SetTo(0);
+    //        foreach (int index in removeCells)
+    //        {
+    //            var rc = task.redCells[index];
+    //            dst3[rc.rect].SetTo(rc.color, rc.mask);
+    //        }
+    //        if (task.heartBeat) labels[3] = $"{removeCells.Count} cells were completely contained in exactly one other cell's rect";
+    //    }
+    //}
+    //public class CS_Flood_BasicsMask : CS_Parent
+    //{
+    //    public Mat binarizedImage;
+    //    public Mat inputMask;
+    //    public Cell_Generate genCells = new Cell_Generate();
+    //    RedCloud_CPP redCPP = new RedCloud_CPP();
+    //    public bool buildInputMask;
+    //    public bool showSelected = true;
+    //    Color8U_Basics cvt = new Color8U_Basics();
+    //    public CS_Flood_BasicsMask(VBtask task) : base(task)
+    //    {
+    //        task.redOptions.setIdentifyCells(true);
+    //        labels[3] = "The inputMask used to limit how much of the image is processed.";
+    //        desc = "Floodfill by color as usual but this is run repeatedly with the different tiers.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        if (standalone || buildInputMask)
+    //        {
+    //            cvt.Run(src);
+    //            inputMask = task.pcSplit[2].InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs();
+    //            src = cvt.dst2;
+    //        }
+    //        dst3 = inputMask;
+    //        redCPP.inputMask = inputMask;
+    //        redCPP.Run(src);
+    //        genCells.classCount = redCPP.classCount;
+    //        genCells.rectList = redCPP.rectList;
+    //        genCells.floodPoints = redCPP.floodPoints;
+    //        genCells.Run(redCPP.dst2);
+    //        dst2 = genCells.dst2;
+    //        int cellCount = Math.Min(task.redOptions.identifyCount, task.redCells.Count);
+    //        if (task.heartBeat) labels[2] = $"{task.redCells.Count} cells identified and the largest {cellCount} are numbered below.";
+    //        if (showSelected) task.setSelectedContour();
+    //    }
+    //}
+    //public class CS_Flood_Tiers : CS_Parent
+    //{
+    //    Flood_BasicsMask flood = new Flood_BasicsMask();
+    //    Depth_TiersZ tiers = new Depth_TiersZ();
+    //    Color8U_Basics cvt = new Color8U_Basics();
+    //    public CS_Flood_Tiers(VBtask task) : base(task)
+    //    {
+    //        task.redOptions.setIdentifyCells(true);
+    //        desc = "Subdivide the Flood_Basics cells using depth tiers.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        int tier = task.gOptions.DebugSliderValue;
+    //        tiers.Run(src);
+    //        if (tier >= tiers.classCount) tier = 0;
+    //        if (tier == 0)
+    //        {
+    //            dst1 = ~tiers.dst2.InRange(0, 1);
+    //        }
+    //        else
+    //        {
+    //            dst1 = ~tiers.dst2.InRange(tier, tier);
+    //        }
+    //        labels[2] = tiers.labels[2] + " in tier " + tier.ToString() + ".  Use the global options 'DebugSlider' to select different tiers.";
+    //        cvt.Run(src);
+    //        flood.inputMask = dst1;
+    //        flood.Run(cvt.dst2);
+    //        dst2 = flood.dst2;
+    //        dst3 = flood.dst3;
+    //        task.setSelectedContour();
+    //    }
+    //}
+    //public class CS_Flood_Motion : CS_Parent
+    //{
+    //    Flood_Basics flood = new Flood_Basics();
+    //    List<rcData> redCells = new List<rcData>();
+    //    Mat cellMap = new Mat();
+    //    List<Point2f> maxDists = new List<Point2f>();
+    //    List<int> maxIndex = new List<int>();
+    //    public CS_Flood_Motion(VBtask task) : base(task)
+    //    {
+    //        if (standalone) task.gOptions.setDisplay1();
+    //        desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        if (task.heartBeat)
+    //        {
+    //            flood.Run(src);
+    //            redCells = new List<rcData>(task.redCells);
+    //            cellMap = task.cellMap.Clone();
+    //            dst2 = flood.dst2.Clone();
+    //            dst3 = flood.dst2.Clone();
+    //            labels[2] = flood.labels[2];
+    //            labels[3] = flood.labels[2];
+    //            maxDists.Clear();
+    //            foreach (var rc in redCells)
+    //            {
+    //                maxDists.Add(rc.maxDist);
+    //                maxIndex.Add(rc.index);
+    //            }
+    //        }
+    //        else
+    //        {
+    //            flood.Run(src);
+    //            dst1.SetTo(0);
+    //            for (int i = 0; i < task.redCells.Count; i++)
+    //            {
+    //                var rc = task.redCells[i];
+    //                if (maxDists.Contains(rc.maxDist))
+    //                {
+    //                    var lrc = redCells[maxIndex[maxDists.IndexOf(rc.maxDist)]];
+    //                    dst1[lrc.rect].SetTo(lrc.color, lrc.mask);
+    //                }
+    //            }
+    //            dst3 = flood.dst2;
+    //            labels[3] = flood.labels[2];
+    //        }
+    //    }
+    //}
+    //public class CS_Flood_Motion1 : CS_Parent
+    //{
+    //    Flood_Basics flood = new Flood_Basics();
+    //    Motion_Basics motion = new Motion_Basics();
+    //    List<rcData> redCells = new List<rcData>();
+    //    List<Point2f> maxDists = new List<Point2f>();
+    //    List<int> maxIndex = new List<int>();
+    //    public CS_Flood_Motion1(VBtask task) : base(task)
+    //    {
+    //        desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        if (task.heartBeat)
+    //        {
+    //            flood.Run(src);
+    //            redCells = new List<rcData>(task.redCells);
+    //            dst2 = flood.dst2.Clone();
+    //            dst3 = flood.dst2.Clone();
+    //            labels[2] = flood.labels[2];
+    //            labels[3] = flood.labels[2];
+    //            maxDists.Clear();
+    //            foreach (var rc in redCells)
+    //            {
+    //                maxDists.Add(rc.maxDist);
+    //                maxIndex.Add(rc.index);
+    //            }
+    //        }
+    //        else
+    //        {
+    //            flood.Run(src);
+    //            motion.Run(flood.dst2);
+    //            for (int i = 0; i < task.redCells.Count; i++)
+    //            {
+    //                var rc = task.redCells[i];
+    //                if (maxDists.Contains(rc.maxDist))
+    //                {
+    //                    var lrc = redCells[maxIndex[maxDists.IndexOf(rc.maxDist)]];
+    //                    dst1[lrc.rect].SetTo(lrc.color, lrc.mask);
+    //                }
+    //            }
+    //            dst3 = flood.dst2;
+    //            labels[3] = flood.labels[2];
+    //        }
+    //    }
+    //}
+    //public class CS_Flood_LeftRight : CS_Parent
+    //{
+    //    RedCloud_Basics redLeft = new RedCloud_Basics();
+    //    RedCloud_Basics redRight = new RedCloud_Basics();
+    //    public Mat mapLeft;
+    //    public Mat mapRight;
+    //    public List<rcData> cellsLeft = new List<rcData>();
+    //    public List<rcData> cellsRight = new List<rcData>();
+    //    public CS_Flood_LeftRight(VBtask task) : base(task)
+    //    {
+    //        mapLeft = new Mat(dst2.Size(), MatType.CV_8U, 0);
+    //        mapRight = new Mat(dst2.Size(), MatType.CV_8U, 0);
+    //        task.redOptions.setIdentifyCells(false);
+    //        if (standalone) task.gOptions.setDisplay1();
+    //        desc = "Floodfill left and right images.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        task.redCells = new List<rcData>(cellsLeft);
+    //        task.cellMap = mapLeft.Clone();
+    //        redLeft.genCells.useLeftImage = true;
+    //        redLeft.Run(task.leftView);
+    //        labels[2] = redLeft.labels[2];
+    //        dst2 = redLeft.dst2;
+    //        cellsLeft = new List<rcData>(task.redCells);
+    //        mapLeft = task.cellMap.Clone();
+    //        task.redCells = new List<rcData>(cellsRight);
+    //        task.cellMap = mapRight.Clone();
+    //        redRight.genCells.useLeftImage = false;
+    //        redRight.Run(task.rightView);
+    //        labels[3] = redRight.labels[2];
+    //        dst3 = redRight.dst2;
+    //        cellsRight = new List<rcData>(task.redCells);
+    //        mapRight = task.cellMap.Clone();
+    //        if (task.redOptions.getIdentifyCells())
+    //        {
+    //            if (task.mousePicTag == 2)
+    //            {
+    //                task.setSelectedContour(ref cellsLeft, ref mapLeft);
+    //                task.color[task.rc.rect].SetTo(Scalar.White, task.rc.mask);
+    //            }
+    //            else
+    //            {
+    //                task.setSelectedContour(ref cellsRight, ref mapRight);
+    //                dst1 = task.rightView;
+    //                dst1[task.rc.rect].SetTo(Scalar.White, task.rc.mask);
+    //            }
+    //        }
+    //    }
+    //}
+    //public class CS_Flood_MaxDistPoints : CS_Parent
+    //{
+    //    Boundary_RemovedRects bounds = new Boundary_RemovedRects();
+    //    RedCloud_MaxDist_CPP redCPP = new RedCloud_MaxDist_CPP();
+    //    public Cell_Generate genCells = new Cell_Generate();
+    //    Color8U_Basics cvt = new Color8U_Basics();
+    //    public CS_Flood_MaxDistPoints(VBtask task) : base(task)
+    //    {
+    //        task.redOptions.setIdentifyCells(true);
+    //        labels[3] = "Contour boundaries - input to RedCloud_Basics";
+    //        desc = "Build the RedCloud cells by providing the maxDist floodpoints to the RedCell C++ code.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        cvt.Run(src);
+    //        redCPP.Run(cvt.dst2);
+    //        if (redCPP.classCount == 0) return; // no data to process.
+    //        genCells.classCount = redCPP.classCount;
+    //        genCells.rectList = redCPP.RectList;
+    //        genCells.floodPoints = redCPP.floodPoints;
+    //        genCells.removeContour = false;
+    //        genCells.Run(redCPP.dst2);
+    //        dst2 = genCells.dst2;
+    //        redCPP.maxList.Clear();
+    //        for (int i = 1; i < task.redCells.Count; i++)
+    //        {
+    //            redCPP.maxList.Add(task.redCells[i].maxDist.X);
+    //            redCPP.maxList.Add(task.redCells[i].maxDist.Y);
+    //        }
+    //        task.setSelectedContour();
+    //        labels[2] = genCells.labels[2];
+    //    }
+    //}
 
 
 
+    //public class CS_Font_OpenCV : CS_Parent
+    //{
+    //    public CS_Font_OpenCV(VBtask task) : base(task)
+    //    {
+    //        desc = "Display different font options available in OpenCV";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        if (!task.heartBeat) return;
+    //        HersheyFonts hersheyFont = (HersheyFonts)((task.frameCount % 7) + 1);
+    //        string hersheyName = new string[] { "HersheyComplex", "HersheyComplexSmall", "HersheyDuplex", "HersheyPlain", "HersheyScriptComplex",
+    //                                        "HersheyScriptSimplex", "HersheySimplex", "HersheyTriplex", "Italic" }[task.frameCount % 7];
+    //        labels[2] = hersheyName;
+    //        labels[3] = "Italicized " + hersheyName;
+    //        dst2.SetTo(0);
+    //        dst3.SetTo(0);
+    //        for (int i = 1; i <= 10; i++)
+    //        {
+    //            double size = 1.5 - i * 0.1;
+    //            Cv2.PutText(dst2, $"{hersheyName} {size:F1}", new cv.Point(10, 30 + i * 30), hersheyFont, size, Scalar.White, task.lineWidth, task.lineType);
+    //            HersheyFonts hersheyFontItalics = hersheyFont | HersheyFonts.Italic;
+    //            Cv2.PutText(dst3, $"{hersheyName} {size:F1}", new cv.Point(10, 30 + i * 30), hersheyFontItalics, size, Scalar.White, task.lineWidth, task.lineType);
+    //        }
+    //    }
+    //}
+
+    //public class CS_Font_FlowTextOld : CS_Parent
+    //{
+    //    public List<string> msgs = new List<string>();
+    //    public int dst = RESULT_DST2;
+    //    public CS_Font_FlowTextOld(VBtask task) : base(task)
+    //    {
+    //        desc = "Show TrueType text flowing through an image.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        if (standaloneTest())
+    //        {
+    //            msgs.Add("-------------------------------------------------------------------------------------------------------------------");
+    //            msgs.Add("To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText()' to the class constructor.");
+    //            msgs.Add("Also optionally indicate if you want result1 or result2 for text (the default is result1.)");
+    //            msgs.Add("Then in your Run method, add a line 'flow.msgs.add('your next line of text')' - for as many msgs as you need on each pass.");
+    //            msgs.Add("Then at the end of your Run method, invoke flow.Run(empty)");
+    //        }
+    //        int maxLines = 31;
+    //        if (task.WorkingRes.Height == 720 || task.WorkingRes.Height == 360 || task.WorkingRes.Height == 180) maxLines = 23;
+    //        bool clearRequested = false;
+    //        if (msgs.Count > maxLines)
+    //        {
+    //            if (msgs.Count < maxLines * 2)
+    //            {
+    //                msgs.RemoveRange(0, msgs.Count - maxLines);
+    //            }
+    //            else
+    //            {
+    //                clearRequested = true;
+    //            }
+    //        }
+    //        string strOut = string.Join(Environment.NewLine, msgs.GetRange(0, Math.Min(maxLines, msgs.Count)));
+    //        SetTrueText(strOut, dst);
+    //        if (clearRequested) msgs.Clear();
+    //    }
+    //}
+    //public class CS_Font_FlowText : CS_Parent
+    //{
+    //    public List<string> flowText = new List<string>();
+    //    public string nextMsg;
+    //    public int maxLines = 23;
+    //    public int dst = RESULT_DST2;
+    //    public List<trueText> textResult = new List<trueText>();
+    //    public object parentData;
+    //    public CS_Font_FlowText(VBtask task) : base(task)
+    //    {
+    //        desc = "Show TrueType text flowing through an image.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        string strOut;
+    //        if (standaloneTest())
+    //        {
+    //            strOut = "-------------------------------------------------------------------------------------------------------------------\n" +
+    //                     "To get text to flow across an image in any algorithm, add CS_Font_FlowText to your algorithm.\n" +
+    //                     "Also optionally indicate if you want RESULT_DST2 or RESULT_DST3 for text (the default is RESULT_DST2.)\n" +
+    //                     "NOTE: add 'flow.parentData = me to your constructor for the algorithm.\n" +
+    //                     "Then in your Run method, add a line 'flow.nextMsg = 'your next line of text'\n" +
+    //                     "Then at the end of your Run method, invoke flow.Run(empty)";
+    //        }
+    //        else
+    //        {
+    //            flowText.Add(nextMsg);
+    //            if (flowText.Count > maxLines) flowText.RemoveAt(0);
+    //            strOut = string.Join(Environment.NewLine, flowText);
+    //        }
+    //        SetTrueText(strOut, dst);
+    //        if (!standalone) ((dynamic)parentData).trueData = trueData;
+    //    }
+    //}
 
 
+    //public class CS_Foreground_Basics : CS_Parent
+    //{
+    //    KMeans_Depth simK = new KMeans_Depth();
+    //    public float fgDepth;
+    //    public Mat fg = new Mat(), bg = new Mat();
+    //    public int classCount;
+    //    public CS_Foreground_Basics(VBtask task) : base(task)
+    //    {
+    //        labels[3] = "Foreground - all the KMeans classes up to and including the first class over 1 meter.";
+    //        dst1 = new Mat(dst1.Size(), MatType.CV_8U, 0);
+    //        desc = "Find the first KMeans class with depth over 1 meter and use it to define foreground";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        simK.Run(src);
+    //        classCount = simK.classCount;
+    //        // Order the KMeans classes from foreground to background using depth data.
+    //        List<Mat> depthMats = new List<Mat>();
+    //        SortedList<float, int> sortedMats = new SortedList<float, int>(new CompareAllowIdenticalSingle());
+    //        for (int i = 0; i < classCount; i++)
+    //        {
+    //            Mat tmp = simK.dst2.InRange(i, i);
+    //            depthMats.Add(tmp.Clone());
+    //            float depth = (float)task.pcSplit[2].Mean(tmp)[0];
+    //            sortedMats.Add(depth, i);
+    //        }
+    //        fgDepth = 0;
+    //        foreach (float depth in sortedMats.Keys)
+    //        {
+    //            if (depth >= 1)
+    //            {
+    //                fgDepth = depth;
+    //                break; // find all the regions closer than a meter (inclusive)
+    //            }
+    //        }
+    //        foreach (int index in sortedMats.Values)
+    //        {
+    //            Mat tmp = depthMats[index];
+    //            dst1.SetTo(index + 1, tmp);
+    //        }
+    //        dst2 = ShowPalette(dst1 * 255 / depthMats.Count);
+    //        fg = task.pcSplit[2].Threshold(fgDepth, 255, ThresholdTypes.BinaryInv).ConvertScaleAbs();
+    //        dst0 = fg;
+    //        fg.SetTo(0, task.noDepthMask);
+    //        bg = ~fg;
+    //        dst3.SetTo(0);
+    //        src.CopyTo(dst3, fg);
+    //        SetTrueText("KMeans classes are in dst1 - ordered by depth\nfg = foreground mask", 3);
+    //        labels[2] = $"KMeans output defining the {classCount} classes";
+    //    }
+    //}
+    //public class CS_Foreground_KMeans2 : CS_Parent
+    //{
+    //    KMeans_Image km = new KMeans_Image();
+    //    public CS_Foreground_KMeans2(VBtask task) : base(task)
+    //    {
+    //        FindSlider("KMeans k").Value = 2;
+    //        labels = new string[] { "", "", "Foreground Mask", "Background Mask" };
+    //        dst2 = new Mat(task.WorkingRes, MatType.CV_8U, 0);
+    //        dst3 = new Mat(task.WorkingRes, MatType.CV_8U, 0);
+    //        desc = "Separate foreground and background using Kmeans with k=2.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        km.Run(task.pcSplit[2]);
+    //        float minDistance = float.MaxValue;
+    //        int minIndex = 0;
+    //        for (int i = 0; i < km.km.colors.Rows; i++)
+    //        {
+    //            float distance = km.km.colors.Get<float>(i, 0);
+    //            if (minDistance > distance && distance > 0)
+    //            {
+    //                minDistance = distance;
+    //                minIndex = i;
+    //            }
+    //        }
+    //        dst2.SetTo(0);
+    //        dst2.SetTo(255, km.masks[minIndex]);
+    //        dst2.SetTo(0, task.noDepthMask);
+    //        dst3 = ~dst2;
+    //        dst3.SetTo(0, task.noDepthMask);
+    //    }
+    //}
+    //public class CS_Foreground_Contours : CS_Parent
+    //{
+    //    public Foreground_Hist3D fore = new Foreground_Hist3D();
+    //    Contour_General contours = new Contour_General();
+    //    public CS_Foreground_Contours(VBtask task) : base(task)
+    //    {
+    //        desc = "Create contours for the foreground mask";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        fore.Run(src);
+    //        contours.Run(fore.dst2);
+    //        dst2 = contours.dst2;
+    //    }
+    //}
+    //public class CS_Foreground_Hist3D : CS_Parent
+    //{
+    //    Hist3Dcloud_Basics hcloud = new Hist3Dcloud_Basics();
+    //    public CS_Foreground_Hist3D(VBtask task) : base(task)
+    //    {
+    //        hcloud.maskInput = task.noDepthMask;
+    //        labels = new string[] { "", "", "Foreground", "Background" };
+    //        desc = "Use the first class of hist3Dcloud_Basics as the definition of foreground";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        hcloud.Run(src);
+    //        dst2.SetTo(0);
+    //        dst2 = hcloud.dst2.InRange(1, 1) | task.noDepthMask;
+    //        dst3 = ~dst2;
+    //    }
+    //}
+    //public class CS_Foreground_RedCloud : CS_Parent
+    //{
+    //    Foreground_CellsFore fore = new Foreground_CellsFore();
+    //    Foreground_CellsBack back = new Foreground_CellsBack();
+    //    public CS_Foreground_RedCloud(VBtask task) : base(task)
+    //    {
+    //        desc = "Isolate foreground from background, then segment each with RedCloud";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        fore.Run(src);
+    //        dst2 = fore.dst2;
+    //        labels[2] = fore.labels[2];
+    //        back.Run(src);
+    //        dst3 = back.dst2;
+    //        labels[3] = back.labels[2];
+    //        if (task.redCells.Count > 0)
+    //        {
+    //            dst2[task.rc.rect].SetTo(Scalar.White, task.rc.mask);
+    //        }
+    //    }
+    //}
+    //public class CS_Foreground_CellsFore : CS_Parent
+    //{
+    //    Foreground_Hist3D fore = new Foreground_Hist3D();
+    //    public RedCloud_Basics redC = new RedCloud_Basics();
+    //    public List<rcData> redCells = new List<rcData>();
+    //    public CS_Foreground_CellsFore(VBtask task) : base(task)
+    //    {
+    //        task.redOptions.setIdentifyCells(false);
+    //        task.redOptions.setUseColorOnly(true);
+    //        desc = "Get the foreground cells";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        redC.Run(src);
+    //        fore.Run(src);
+    //        dst3 = fore.dst2 & task.depthMask;
+    //        dst2.SetTo(0);
+    //        foreach (rcData rc in task.redCells)
+    //        {
+    //            Mat tmp = dst3[rc.rect] & rc.mask;
+    //            if (Cv2.CountNonZero(tmp) > 0)
+    //                dst2[rc.rect].SetTo(rc.color, rc.mask);
+    //        }
+    //    }
+    //}
+    //public class CS_Foreground_CellsBack : CS_Parent
+    //{
+    //    Foreground_Hist3D fore = new Foreground_Hist3D();
+    //    public RedCloud_Basics redC = new RedCloud_Basics();
+    //    public List<rcData> redCells = new List<rcData>();
+    //    public CS_Foreground_CellsBack(VBtask task) : base(task)
+    //    {
+    //        task.redOptions.setIdentifyCells(false);
+    //        task.redOptions.setUseColorOnly(true);
+    //        desc = "Get the background cells";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        redC.Run(src);
+    //        fore.Run(src);
+    //        dst3 = ~fore.dst2 & task.depthMask;
+    //        dst2.SetTo(0);
+    //        foreach (rcData rc in task.redCells)
+    //        {
+    //            Mat tmp = dst3[rc.rect] & rc.mask;
+    //            if (Cv2.CountNonZero(tmp) > 0)
+    //                dst2[rc.rect].SetTo(rc.color, rc.mask);
+    //        }
+    //    }
+    //}
 
 
 
