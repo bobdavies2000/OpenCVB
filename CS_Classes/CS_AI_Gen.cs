@@ -14,6 +14,7 @@ using OpenCvSharp.XImgProc;
 using System.IO;
 using System.Security.Cryptography;
 using System.Numerics;
+using System.Windows.Controls;
 
 namespace CS_Classes
 {
@@ -20159,7 +20160,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         double rt = 0.282;
         double mt = -0.58;
         cv.Point savedMouse = new cv.Point(-1, -1);
-        CheckBox resetCheck;
+        System.Windows.Forms.CheckBox resetCheck;
         public CS_Fractal_Julia(VBtask task) : base(task)
         {
             resetCheck = FindCheckBox("Reset to original Mandelbrot");
@@ -20671,7 +20672,438 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst2 = src.Filter2D(MatType.CV_8UC3, options.gKernel);
         }
     }
-    
+    public class CS_GrabCut_Basics : CS_Parent
+    {
+        public Mat fgFineTune;
+        public Mat bgFineTune;
+        public Foreground_Basics fore = new Foreground_Basics();
+        Mat bgModel = new Mat(1, 65, MatType.CV_64F, 0);
+        Mat fgModel = new Mat(1, 65, MatType.CV_64F, 0);
+        public CS_GrabCut_Basics(VBtask task) : base(task)
+        {
+            desc = "Use Foreground_Basics to define the foreground for use in GrabCut.";
+        }
+        public void RunCS(Mat src)
+        {
+            fore.Run(src);
+            dst2 = fore.dst2;
+            dst3 = fore.dst3;
+            dst0 = new Mat(dst0.Size(), MatType.CV_8U, (double)GrabCutClasses.PR_BGD);
+            dst0.SetTo((double)GrabCutClasses.FGD, fore.fg);
+            dst0.SetTo((double)GrabCutClasses.BGD, fore.bg);
+            // Cv2.GrabCut(src, dst0, new Rect(), bgModel, fgModel, 1, GrabCutModes.InitWithMask);
+            fore.bg = ~fore.fg;
+            if (Cv2.CountNonZero(fore.fg) > 0)
+            {
+                if (fgFineTune != null) dst0.SetTo((double)GrabCutClasses.FGD, fgFineTune);
+                if (bgFineTune != null) dst0.SetTo((double)GrabCutClasses.BGD, bgFineTune);
+                Cv2.GrabCut(src, dst0, new Rect(), bgModel, fgModel, 1, GrabCutModes.Eval);
+            }
+            dst3.SetTo(0);
+            src.CopyTo(dst3, dst0);
+            labels[2] = "KMeans output defining the " + fore.classCount.ToString() + " classes.";
+        }
+    }
+
+    public class CS_GrabCut_ImageRect : CS_Parent
+    {
+        Mat image;
+        Mat bgModel = new Mat();
+        Mat fgModel = new Mat();
+        Rect bgRect1 = new Rect(482, 0, 128, 640);
+        Rect bgRect2 = new Rect(0, 0, 162, 320);
+        Rect fgRect1 = new Rect(196, 134, 212, 344);
+        Rect fgRect2 = new Rect(133, 420, 284, 60);
+        public CS_GrabCut_ImageRect(VBtask task) : base(task)
+        {
+            var fileInputName = new FileInfo(task.HomeDir + "data/cat.jpg");
+            image = Cv2.ImRead(fileInputName.FullName);
+            desc = "Grabcut example using a single image.  Fix this.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = image;
+            dst0 = new Mat(image.Size(), MatType.CV_8U, (double)GrabCutClasses.PR_BGD);
+            dst0[bgRect1].SetTo((double)GrabCutClasses.BGD);
+            dst0[bgRect2].SetTo((double)GrabCutClasses.BGD);
+            dst0[fgRect1].SetTo((double)GrabCutClasses.FGD);
+            dst0[fgRect2].SetTo((double)GrabCutClasses.FGD);
+            if (task.FirstPass)
+            {
+                Cv2.GrabCut(dst2, dst0, bgRect1, bgModel, fgModel, 1, GrabCutModes.InitWithRect);
+                Cv2.GrabCut(dst2, dst0, bgRect2, bgModel, fgModel, 1, GrabCutModes.InitWithRect);
+                Cv2.GrabCut(dst2, dst0, fgRect1, bgModel, fgModel, 1, GrabCutModes.InitWithRect);
+                Cv2.GrabCut(dst2, dst0, fgRect2, bgModel, fgModel, 1, GrabCutModes.InitWithRect);
+            }
+            var rect = new Rect();
+            Cv2.GrabCut(dst2, dst0, rect, bgModel, fgModel, 1, GrabCutModes.Eval);
+            dst3.SetTo(0);
+            dst2.CopyTo(dst3, dst0 + 1);
+        }
+    }
+    public class CS_GrabCut_ImageMask : CS_Parent
+    {
+        Mat image;
+        Mat bgModel = new Mat(), fgModel = new Mat();
+        public CS_GrabCut_ImageMask(VBtask task) : base(task)
+        {
+            var fileInputName = new FileInfo(task.HomeDir + "data/cat.jpg");
+            image = Cv2.ImRead(fileInputName.FullName);
+            desc = "Grabcut example using a single image. ";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                dst2 = image;
+                dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, ThresholdTypes.Binary);
+                dst1 = new Mat(dst2.Size(), MatType.CV_8U, (double)GrabCutClasses.PR_BGD);
+                dst1.SetTo((double)GrabCutClasses.FGD, dst0);
+                Cv2.GrabCut(dst2, dst1, new Rect(), bgModel, fgModel, 1, GrabCutModes.InitWithMask);
+            }
+            else
+            {
+                Cv2.GrabCut(dst2, dst1, new Rect(), bgModel, fgModel, 5, GrabCutModes.Eval);
+            }
+            dst3.SetTo(0);
+            dst2.CopyTo(dst3, dst1 + 1);
+        }
+    }
+
+    public class CS_GrabCut_FineTune : CS_Parent
+    {
+        GrabCut_Basics basics = new GrabCut_Basics();
+        Mat_4to1 mats = new Mat_4to1();
+        Options_GrabCut options = new Options_GrabCut();
+        bool saveRadio = true;
+        public CS_GrabCut_FineTune(VBtask task) : base(task)
+        {
+            labels[2] = "Foreground Mask, fg fine tuning, bg fine tuning, blank";
+            labels[3] = "Grabcut results after adding fine tuning selections";
+            desc = "There are probably mistakes in the initial Grabcut_Basics.  Use the checkbox to fine tune what is background and foreground";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (options.clearAll || basics.fgFineTune == null)
+            {
+                basics.fgFineTune = new Mat(src.Size(), MatType.CV_8U, 0);
+                basics.bgFineTune = new Mat(src.Size(), MatType.CV_8U, 0);
+            }
+            if (saveRadio != options.fineTuning)
+            {
+                saveRadio = options.fineTuning;
+                task.drawRectClear = true;
+                return;
+            }
+            if (task.drawRect.Width != 0)
+            {
+                if (options.fineTuning)
+                {
+                    basics.fgFineTune[task.drawRect].SetTo(255);
+                }
+                else
+                {
+                    basics.bgFineTune[task.drawRect].SetTo(255);
+                }
+            }
+            basics.Run(src);
+            mats.mat[0] = basics.dst2;
+            mats.mat[1] = basics.fgFineTune;
+            mats.mat[2] = basics.bgFineTune;
+            mats.Run(empty);
+            dst2 = mats.dst2;
+            dst3 = basics.dst3;
+        }
+    }
+
+    public class CS_Gradient_Basics : CS_Parent
+    {
+        public Edge_Sobel_Old sobel = new Edge_Sobel_Old();
+        public CS_Gradient_Basics(VBtask task) : base(task)
+        {
+            dst3 = new Mat(dst2.Size(), MatType.CV_32F, 0);
+            labels = new string[] { "", "", "CS_Gradient_Basics - Sobel output", "Phase Output" };
+            desc = "Use phase to compute gradient";
+        }
+        public void RunCS(Mat src)
+        {
+            sobel.Run(src);
+            Cv2.Phase(sobel.dst0, sobel.dst1, dst3);
+            dst2 = sobel.dst0;
+        }
+    }
+    public class CS_Gradient_Depth : CS_Parent
+    {
+        Edge_Sobel_Old sobel = new Edge_Sobel_Old();
+        public CS_Gradient_Depth(VBtask task) : base(task)
+        {
+            labels[3] = "Phase Output";
+            desc = "Use phase to compute gradient on depth image";
+        }
+        public void RunCS(Mat src)
+        {
+            sobel.Run(task.pcSplit[2]);
+            Cv2.Phase(sobel.dst0, sobel.dst1, dst3);
+            dst2 = sobel.dst0;
+        }
+    }
+
+    public class CS_Gradient_Color : CS_Parent
+    {
+        public Scalar color1 = Scalar.Blue;
+        public Scalar color2 = Scalar.Yellow;
+        public int gradientWidth;
+        public Mat gradient;
+        public CS_Gradient_Color(VBtask task) : base(task)
+        {
+            desc = "Provide a spectrum that is a gradient from one color to another.";
+        }
+        public void RunCS(Mat src)
+        {
+            gradientWidth = dst2.Width;
+            double f = 1.0;
+            Mat gradientColors = new Mat(1, gradientWidth, MatType.CV_64FC3);
+            for (int i = 0; i < gradientWidth; i++)
+            {
+                gradientColors.Set(0, i, new Scalar(f * color2[0] + (1 - f) * color1[0], f * color2[1] + (1 - f) * color1[1],
+                    f * color2[2] + (1 - f) * color1[2]));
+                f -= 1.0 / gradientWidth;
+            }
+            gradient = new Mat(1, gradientWidth, MatType.CV_8UC3);
+            for (int i = 0; i < gradientWidth; i++)
+            {
+                gradient.Col(i).SetTo(gradientColors.Get<Scalar>(0, i));
+            }
+            dst2 = gradient.Resize(dst2.Size());
+        }
+    }
+    public class CS_Gradient_CartToPolar : CS_Parent
+    {
+        public Gradient_Basics basics = new Gradient_Basics();
+        public Mat magnitude = new Mat();
+        public Mat angle = new Mat();
+        Options_Gradient options = new Options_Gradient();
+        public CS_Gradient_CartToPolar(VBtask task) : base(task)
+        {
+            FindSlider("Sobel kernel Size").Value = 1;
+            labels[2] = "CartToPolar Magnitude Output Normalized";
+            labels[3] = "CartToPolar Angle Output";
+            desc = "Compute the gradient and use CartToPolar to image the magnitude and angle";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            Mat tmp = new Mat();
+            src.ConvertTo(tmp, MatType.CV_32FC3, 1.0 / 255);
+            basics.Run(tmp);
+            basics.sobel.dst2.ConvertTo(dst2, MatType.CV_32F);
+            basics.sobel.dst2.ConvertTo(dst3, MatType.CV_32F);
+            magnitude = new Mat();
+            angle = new Mat();
+            Cv2.CartToPolar(dst2, dst3, magnitude, angle, true);
+            magnitude = magnitude.Normalize();
+            magnitude = magnitude.Pow(options.exponent);
+            dst2 = magnitude;
+        }
+    }
+    public class CS_Gravity_Basics : CS_Parent
+    {
+        public List<Point> points = new List<Point>();
+        int resizeRatio = 1;
+        public PointPair vec = new PointPair();
+        public bool autoDisplay;
+        public CS_Gravity_Basics(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Find all the points where depth X-component transitions from positive to negative";
+        }
+        public void displayResults(Point2f p1, cv.Point2f p2)
+        {
+            if (task.heartBeat)
+            {
+                if (p1.Y >= 1 && p1.Y <= dst2.Height - 1)
+                    strOut = "p1 = " + p1.ToString() + Environment.NewLine + "p2 = " + p2.ToString() + Environment.NewLine;
+            }
+            dst2.SetTo(0);
+            dst3.SetTo(0);
+            foreach (var pt in points)
+            {
+                var newPt = new cv.Point(pt.X * resizeRatio, pt.Y * resizeRatio);
+                DrawCircle(dst2, newPt, task.DotSize, Scalar.White);
+            }
+            DrawLine(dst2, vec.p1, vec.p2, Scalar.White, task.lineWidth);
+            DrawLine(dst3, vec.p1, vec.p2, Scalar.White, task.lineWidth);
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_32F)
+                dst0 = PrepareDepthInput(0);
+            else
+                dst0 = src;
+            var resolution = task.quarterRes;
+            if (dst0.Size() != resolution)
+            {
+                dst0 = dst0.Resize(resolution, 0, 0, InterpolationFlags.Nearest);
+                resizeRatio = (int)(dst2.Height / resolution.Height);
+            }
+            dst0 = dst0.Abs();
+            dst1 = dst0.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+            dst0.SetTo(task.MaxZmeters, ~dst1);
+            points.Clear();
+            for (int i = dst0.Height / 3; i < dst0.Height * 2 / 3 - 1; i++)
+            {
+                var mm1 = GetMinMax(dst0.Row(i));
+                if (mm1.minVal > 0 && mm1.minVal < 0.005)
+                {
+                    dst0.Row(i).Set<float>(mm1.minLoc.Y, mm1.minLoc.X, 10);
+                    var mm2 = GetMinMax(dst0.Row(i));
+                    if (mm2.minVal > 0 && Math.Abs(mm1.minLoc.X - mm2.minLoc.X) <= 1)
+                        points.Add(new cv.Point(mm1.minLoc.X, i));
+                }
+            }
+            labels[2] = points.Count.ToString() + " points found. ";
+            cv.Point p1 = new cv.Point();
+            cv.Point p2 = new cv.Point();
+            if (points.Count >= 2)
+            {
+                p1 = new cv.Point(resizeRatio * points[points.Count - 1].X, resizeRatio * points[points.Count - 1].Y);
+                p2 = new cv.Point(resizeRatio * points[0].X, resizeRatio * points[0].Y);
+            }
+            var distance = p1.DistanceTo(p2);
+            if (distance < 10) // enough to get a line with some credibility
+            {
+                points.Clear();
+                vec = new PointPair();
+                strOut = "Gravity vector not found " + Environment.NewLine + "The distance of p1 to p2 is " + (int)distance + " pixels.";
+            }
+            else
+            {
+                var lp = new PointPair(p1, p2);
+                vec = lp.edgeToEdgeLine(dst2.Size());
+                if (standaloneTest() || autoDisplay)
+                    displayResults(p1, p2);
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_Gravity_BasicsOriginal : CS_Parent
+    {
+        public PointPair vec = new PointPair();
+        public CS_Gravity_BasicsOriginal(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Search for the transition from positive to negative to find the gravity vector.";
+        }
+        Point2f findTransition(int startRow, int stopRow, int stepRow)
+        {
+            float val = 0, lastVal = 0;
+            var ptX = new List<float>();
+            var ptY = new List<float>();
+            for (int y = startRow; y <= stopRow; y += stepRow)
+            {
+                for (int x = 0; x < dst0.Cols; x++)
+                {
+                    lastVal = val;
+                    val = dst0.Get<float>(y, x);
+                    if (val > 0 && lastVal < 0)
+                    {
+                        // change to sub-pixel accuracy here 
+                        var pt = new Point2f(x + Math.Abs(val) / Math.Abs(val - lastVal), y);
+                        ptX.Add(pt.X);
+                        ptY.Add(pt.Y);
+                        if (ptX.Count >= task.frameHistoryCount)
+                            return new Point2f(ptX.Average(), ptY.Average());
+                    }
+                }
+            }
+            return new cv.Point();
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_32F)
+                dst0 = PrepareDepthInput(0);
+            else
+                dst0 = src;
+            var p1 = findTransition(0, dst0.Height - 1, 1);
+            var p2 = findTransition(dst0.Height - 1, 0, -1);
+            var lp = new PointPair(p1, p2);
+            vec = lp.edgeToEdgeLine(dst2.Size());
+            if (p1.X >= 1)
+            {
+                strOut = "p1 = " + p1.ToString() + Environment.NewLine + "p2 = " + p2.ToString() + Environment.NewLine + "      val =  " +
+                          dst0.Get<float>((int)p1.Y, (int)p1.X).ToString() + Environment.NewLine + "lastVal = " + dst0.Get<float>((int)p1.Y, (int)p1.X - 1).ToString();
+            }
+            SetTrueText(strOut, 3);
+            if (standaloneTest())
+            {
+                dst2.SetTo(0);
+                DrawLine(dst2, vec.p1, vec.p2, 255, task.lineWidth);
+            }
+        }
+    }
+    public class CS_Gravity_HorizonCompare : CS_Parent
+    {
+        Gravity_Basics gravity = new Gravity_Basics();
+        Horizon_Basics horizon = new Horizon_Basics();
+        public CS_Gravity_HorizonCompare(VBtask task) : base(task)
+        {
+            gravity.autoDisplay = true;
+            horizon.autoDisplay = true;
+            desc = "Collect results from Horizon_Basics with Gravity_Basics";
+        }
+        public void RunCS(Mat src)
+        {
+            gravity.Run(src);
+            var g1 = gravity.vec;
+            var h1 = gravity.vec;
+            horizon.Run(src);
+            var g2 = horizon.vec;
+            var h2 = horizon.vec;
+            if (standaloneTest())
+            {
+                SetTrueText("Gravity vector (yellow):" + Environment.NewLine + gravity.strOut + Environment.NewLine + Environment.NewLine + "Horizon Vector (red): " + Environment.NewLine + horizon.strOut, 3);
+                dst2.SetTo(0);
+                DrawLine(dst2, g1.p1, g1.p2, task.HighlightColor, task.lineWidth);
+                DrawLine(dst2, g2.p1, g2.p2, task.HighlightColor, task.lineWidth);
+                DrawLine(dst2, h1.p1, h1.p2, Scalar.Red, task.lineWidth);
+                DrawLine(dst2, h2.p1, h2.p2, Scalar.Red, task.lineWidth);
+            }
+        }
+    }
+    public class CS_Gravity_Horizon : CS_Parent
+    {
+        Gravity_Basics gravity = new Gravity_Basics();
+        Horizon_Basics horizon = new Horizon_Basics();
+        PointPair lastVec;
+        public CS_Gravity_Horizon(VBtask task) : base(task)
+        {
+            gravity.autoDisplay = true;
+            horizon.autoDisplay = true;
+            labels[2] = "Gravity vector in yellow and Horizon vector in red.";
+            desc = "Compute the gravity vector and the horizon vector separately";
+        }
+        public void RunCS(Mat src)
+        {
+            gravity.Run(src);
+            if (gravity.vec.p2.Y > 0 || gravity.vec.p1.Y > 0)
+                task.gravityVec = gravity.vec; // don't update if not found
+            horizon.Run(src);
+            if (task.FirstPass) lastVec = horizon.vec;
+            if (horizon.vec.p1.Y > 0)
+                lastVec = horizon.vec;
+            if (horizon.vec.p1.Y == 0)
+                horizon.vec = lastVec;
+            task.horizonVec = horizon.vec;
+            if (standaloneTest())
+            {
+                SetTrueText("Gravity vector (yellow):" + Environment.NewLine + gravity.strOut + Environment.NewLine + Environment.NewLine + "Horizon Vector (red): " + Environment.NewLine + horizon.strOut, 3);
+                dst2.SetTo(0);
+                DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.HighlightColor, task.lineWidth);
+                DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, Scalar.Red, task.lineWidth);
+            }
+        }
+    }
 
 
 

@@ -547,7 +547,9 @@ Public Class VB_Parent : Implements IDisposable
         dst.Line(p1, p2, color, lineWidth, task.lineType)
     End Sub
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
-        dst.Line(p1, p2, color, task.lineWidth, task.lineType)
+        Dim pt1 = New cv.Point(p1.X, p1.Y)
+        Dim pt2 = New cv.Point(p2.X, p2.Y)
+        dst.Line(pt1, pt2, color, task.lineWidth, task.lineType)
     End Sub
     Public Sub DrawFPoly(ByRef dst As cv.Mat, poly As List(Of cv.Point2f), color As cv.Scalar)
         Dim minMod = Math.Min(poly.Count, task.polyCount)

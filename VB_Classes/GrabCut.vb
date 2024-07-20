@@ -45,36 +45,29 @@ End Class
 Public Class GrabCut_FineTune : Inherits VB_Parent
     Dim basics As New GrabCut_Basics
     Dim mats As New Mat_4to1
+    Dim options As New Options_GrabCut
+    Dim saveRadio As Boolean = True
     Public Sub New()
-        If radio.Setup(traceName) Then
-            radio.addRadio("Selected rectangle is added to the foreground")
-            radio.addRadio("Selected rectangle is added to the background")
-            radio.addRadio("Clear all foreground and background fine tuning")
-            radio.check(0).Checked = True
-        End If
-
         labels(2) = "Foreground Mask, fg fine tuning, bg fine tuning, blank"
         labels(3) = "Grabcut results after adding fine tuning selections"
         desc = "There are probably mistakes in the initial Grabcut_Basics.  Use the checkbox to fine tune what is background and foreground"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static fgFineTuning = FindRadio("Selected rectangle is added to the foreground")
-        Static clearCheck = FindRadio("Clear all foreground and background fine tuning")
-        Static saveRadio = fgFineTuning.checked
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
-        If clearCheck.checked Or basics.fgFineTune Is Nothing Then
+        If options.clearAll Or basics.fgFineTune Is Nothing Then
             basics.fgFineTune = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
             basics.bgFineTune = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         End If
 
-        If saveRadio <> fgFineTuning.checked Then
-            saveRadio = fgFineTuning.checked
+        If saveRadio <> options.fineTuning Then
+            saveRadio = options.fineTuning
             task.drawRectClear = True
             Exit Sub
         End If
 
         If task.drawRect.Width <> 0 Then
-            If fgFineTuning.checked Then
+            If options.fineTuning Then
                 basics.fgFineTune(task.drawRect).SetTo(255)
             Else
                 basics.bgFineTune(task.drawRect).SetTo(255)

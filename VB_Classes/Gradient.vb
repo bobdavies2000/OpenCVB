@@ -1,13 +1,12 @@
 Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
 Public Class Gradient_Basics : Inherits VB_Parent
-    Public sobel as new Edge_Sobel_Old
+    Public sobel As New Edge_Sobel_Old
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
         labels = {"", "", "Gradient_Basics - Sobel output", "Phase Output"}
         desc = "Use phase to compute gradient"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         sobel.Run(src)
         cv.Cv2.Phase(sobel.dst0, sobel.dst1, dst3)
         dst2 = sobel.dst0
@@ -41,15 +40,16 @@ Public Class Gradient_CartToPolar : Inherits VB_Parent
     Public basics As New Gradient_Basics
     Public magnitude As New cv.Mat
     Public angle As New cv.Mat
+    Dim options As New Options_Gradient
     Public Sub New()
         FindSlider("Sobel kernel Size").Value = 1
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Contrast exponent to use X100", 0, 200, 30)
         labels(2) = "CartToPolar Magnitude Output Normalized"
         labels(3) = "CartToPolar Angle Output"
         desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static contrastSlider = FindSlider("Contrast exponent to use X100")
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         Dim tmp As New cv.Mat
         src.ConvertTo(tmp, cv.MatType.CV_32FC3, 1 / 255)
         basics.Run(tmp)
@@ -61,8 +61,7 @@ Public Class Gradient_CartToPolar : Inherits VB_Parent
         angle = New cv.Mat
         cv.Cv2.CartToPolar(dst2, dst3, magnitude, angle, True)
         magnitude = magnitude.Normalize()
-        Dim exponent = contrastSlider.Value / 100
-        magnitude = magnitude.Pow(exponent)
+        magnitude = magnitude.Pow(options.exponent)
 
         dst2 = magnitude
     End Sub

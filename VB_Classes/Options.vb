@@ -6028,3 +6028,43 @@ Public Class Options_Gabor : Inherits VB_Parent
         gKernel /= 1.5 * multiplier(0)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_GrabCut : Inherits VB_Parent
+    Public clearAll As Boolean
+    Public fineTuning As Boolean
+
+    Public Sub New()
+        If radio.Setup(traceName) Then
+            radio.addRadio("Selected rectangle is added to the foreground")
+            radio.addRadio("Selected rectangle is added to the background")
+            radio.addRadio("Clear all foreground and background fine tuning")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static fgFineTuning = FindRadio("Selected rectangle is added to the foreground")
+        Static clearCheck = FindRadio("Clear all foreground and background fine tuning")
+        Static saveRadio = fgFineTuning.checked
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Gradient : Inherits VB_Parent
+    Public exponent As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Contrast exponent to use X100", 0, 200, 30)
+    End Sub
+    Public Sub RunVB()
+        Static contrastSlider = FindSlider("Contrast exponent to use X100")
+        exponent = contrastSlider.Value / 100
+    End Sub
+End Class

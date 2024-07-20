@@ -130,16 +130,18 @@ Public Class Gravity_HorizonCompare : Inherits VB_Parent
     Dim gravity As New Gravity_Basics
     Dim horizon As New Horizon_Basics
     Public Sub New()
+        gravity.autoDisplay = True
+        horizon.autoDisplay = True
         desc = "Collect results from Horizon_Basics with Gravity_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         gravity.Run(src)
-        Dim g1 = task.gravityVec
-        Dim h1 = task.horizonVec
+        Dim g1 = gravity.vec
+        Dim h1 = gravity.vec
 
         horizon.Run(src)
-        Dim g2 = task.gravityVec
-        Dim h2 = task.horizonVec
+        Dim g2 = horizon.vec
+        Dim h2 = horizon.vec
 
         If standaloneTest() Then
             SetTrueText(strOut, 3)
@@ -164,8 +166,11 @@ End Class
 Public Class Gravity_Horizon : Inherits VB_Parent
     Dim gravity As New Gravity_Basics
     Dim horizon As New Horizon_Basics
+    Dim lastVec As PointPair
     Public Sub New()
-        labels(2) = "Gravity vector Integer yellow and Horizon vector in red."
+        gravity.autoDisplay = True
+        horizon.autoDisplay = True
+        labels(2) = "Gravity vector in yellow and Horizon vector in red."
         desc = "Compute the gravity vector and the horizon vector separately"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -173,7 +178,7 @@ Public Class Gravity_Horizon : Inherits VB_Parent
         If gravity.vec.p2.Y > 0 Or gravity.vec.p1.Y > 0 Then task.gravityVec = gravity.vec ' don't update if not found
 
         horizon.Run(src)
-        Static lastVec = horizon.vec
+        If task.FirstPass Then lastVec = horizon.vec
         If horizon.vec.p1.Y > 0 Then lastVec = horizon.vec
         If horizon.vec.p1.Y = 0 Then horizon.vec = lastVec
 
@@ -184,51 +189,5 @@ Public Class Gravity_Horizon : Inherits VB_Parent
             DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.HighlightColor)
             DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
         End If
-    End Sub
-End Class
-
-
-
-
-
-Public Class Gravity_BasicsFail : Inherits VB_Parent
-    Dim horizon As New Horizon_Basics
-    Public vec As New PointPair
-    Dim center As cv.Point
-    Dim angle As Single = cv.Cv2.PI / 2
-    Public Sub New()
-        Dim center = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        If standalone Then labels = {"", "", "Gravity vector before rotating it back to vertical", "Gravity vector"}
-        desc = "Reuse the Horizon_Basics to compute the Gravity vector - parallel but not precisely the gravity vector."
-    End Sub
-    Private Function ptRotate(pt As cv.Point) As cv.Point
-        Dim x1 As Single = CSng((pt.X - center.X) * Math.Cos(-angle) - (pt.Y - center.Y) * Math.Sin(-angle) + center.X)
-        Dim y1 As Single = CSng((pt.X - center.X) * Math.Sin(-angle) + (pt.Y - center.Y) * Math.Cos(-angle) + center.Y)
-        Return New cv.Point(x1, y1)
-    End Function
-    Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then dst0 = PrepareDepthInput(0) Else dst0 = src
-        Dim M = cv.Cv2.GetRotationMatrix2D(center, angle * 57.2958, 1)
-        Dim offset = (dst2.Width - dst2.Height) / 2
-        Dim r = New cv.Rect(offset, 0, dst2.Height, dst2.Height)
-        horizon.Run(dst0(r).WarpAffine(M, src.Size(), cv.InterpolationFlags.Nearest))
-
-        horizon.Run(dst2)
-        Dim p1 = ptRotate(horizon.vec.p1)
-        Dim p2 = ptRotate(horizon.vec.p2)
-        Dim lp = New PointPair(New cv.Point(p1.X + r.X, p1.Y), New cv.Point(p2.X + r.X, p2.Y))
-        vec = lp.edgeToEdgeLine(dst2.Size)
-
-        If standalone Then
-            horizon.displayResults(horizon.vec.p1, horizon.vec.p2)
-            dst3 = horizon.dst2
-
-            dst2.SetTo(0)
-            DrawLine(dst2, vec.p1, vec.p2, 255)
-        End If
-
-        strOut = "p1 = " + vec.p1.ToString + vbCrLf + "p2 = " + vec.p2.ToString
-        SetTrueText(strOut, 3)
     End Sub
 End Class

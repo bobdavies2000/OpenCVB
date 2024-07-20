@@ -9,7 +9,7 @@ Public Class Horizon_Basics : Inherits VB_Parent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         desc = "Find all the points where depth Y-component transitions from positive to negative"
     End Sub
-    Public Sub displayResults(p1 As cv.Point, p2 As cv.Point)
+    Public Sub displayResults(p1 As cv.Point2f, p2 As cv.Point2f)
         If task.heartBeat Then
             If p1.Y >= 1 And p1.Y <= dst2.Height - 1 Then strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf
         End If
@@ -17,7 +17,7 @@ Public Class Horizon_Basics : Inherits VB_Parent
         dst2.SetTo(0)
         For Each pt In points
             pt = New cv.Point(pt.X * resizeRatio, pt.Y * resizeRatio)
-            DrawCircle(dst2,pt, task.DotSize, cv.Scalar.White)
+            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.White)
         Next
 
         DrawLine(dst2, vec.p1, vec.p2, 255)

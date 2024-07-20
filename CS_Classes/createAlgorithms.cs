@@ -540,6 +540,18 @@ namespace CS_Classes
 			if (algorithmName == "CS_Fuzzy_TrackerDepth") return new CS_Fuzzy_TrackerDepth(task);
 			if (algorithmName == "CS_Fuzzy_TrackerDepthClick") return new CS_Fuzzy_TrackerDepthClick(task);
 			if (algorithmName == "CS_Gabor_Basics") return new CS_Gabor_Basics(task);
+			if (algorithmName == "CS_GrabCut_Basics") return new CS_GrabCut_Basics(task);
+			if (algorithmName == "CS_GrabCut_FineTune") return new CS_GrabCut_FineTune(task);
+			if (algorithmName == "CS_GrabCut_ImageMask") return new CS_GrabCut_ImageMask(task);
+			if (algorithmName == "CS_GrabCut_ImageRect") return new CS_GrabCut_ImageRect(task);
+			if (algorithmName == "CS_Gradient_Basics") return new CS_Gradient_Basics(task);
+			if (algorithmName == "CS_Gradient_CartToPolar") return new CS_Gradient_CartToPolar(task);
+			if (algorithmName == "CS_Gradient_Color") return new CS_Gradient_Color(task);
+			if (algorithmName == "CS_Gradient_Depth") return new CS_Gradient_Depth(task);
+			if (algorithmName == "CS_Gravity_Basics") return new CS_Gravity_Basics(task);
+			if (algorithmName == "CS_Gravity_BasicsOriginal") return new CS_Gravity_BasicsOriginal(task);
+			if (algorithmName == "CS_Gravity_Horizon") return new CS_Gravity_Horizon(task);
+			if (algorithmName == "CS_Gravity_HorizonCompare") return new CS_Gravity_HorizonCompare(task);
 			if (algorithmName == "CS_Line_Basics") return new CS_Line_Basics(task);
 			if (algorithmName == "CS_Mat_4Click") return new CS_Mat_4Click(task);
 			if (algorithmName == "CS_Mat_4to1") return new CS_Mat_4to1(task);
