@@ -16,6 +16,8 @@ using System.Security.Cryptography;
 using System.Numerics;
 using System.Windows.Controls;
 using System.Diagnostics;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using NAudio.Gui;
 
 namespace CS_Classes
 {
@@ -5548,7 +5550,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         List<Mat> unstable = new List<Mat>();
         Mat lastImage;
         public Mat unstablePixels = new Mat();
-        TrackBar kSlider;
+        System.Windows.Forms.TrackBar kSlider;
         public CS_Pixel_Unstable(VBtask task) : base(task)
         {
             task.gOptions.setPixelDifference(2);
@@ -17622,7 +17624,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public List<Point> startPoints;
         public List<Point> goodPoints;
         public FeaturePoly_Core fGrid = new FeaturePoly_Core();
-        TrackBar resyncSlider;
+        System.Windows.Forms.TrackBar resyncSlider;
         public CS_FeaturePoly_StartPoints(VBtask task) : base(task)
         {
             resyncSlider = FindSlider("Resync if feature moves > X pixels");
@@ -21398,7 +21400,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_Grid_FPS : CS_Parent
     {
         public bool heartBeat;
-        public TrackBar fpsSlider;
+        public System.Windows.Forms.TrackBar fpsSlider;
         int skipCount;
         int saveSkip;
         Options_Grid options = new Options_Grid();
@@ -22122,6 +22124,1170 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst2 = guided.dst2;
             dst3 = guided.dst3;
             labels = guided.labels;
+        }
+    }
+    public class CS_Hist_Basics : CS_Parent
+    {
+        public Mat histogram = new Mat();
+        public mmData mm;
+        public Plot_Histogram plot = new Plot_Histogram();
+        public Rangef[] ranges;
+        public float[] histArray;
+        public Mat inputMask = new Mat();
+        public Rangef[] fixedRanges;
+        public int bins;
+        public bool removeMax;
+        public bool autoDisplay;
+        int splitIndex;
+        public CS_Hist_Basics(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setHistogramBins(255);
+            desc = "Create a histogram (no Kalman)";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standalone)
+            {
+                if (task.heartBeat) splitIndex = (splitIndex + 1) % 3;
+                mm = GetMinMax(src.ExtractChannel(splitIndex));
+                if (splitIndex == 0)
+                    plot.backColor = Scalar.Blue;
+                else if (splitIndex == 1)
+                    plot.backColor = Scalar.Green;
+                else
+                    plot.backColor = Scalar.Red;
+
+            }
+            else
+            {
+                if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+                mm = GetMinMax(src);
+            }
+            if (fixedRanges == null)
+            {
+                ranges = new Rangef[] { new Rangef((float)(mm.minVal - histDelta), (float)(mm.maxVal + histDelta)) };
+            }
+            else
+            {
+                ranges = fixedRanges;
+            }
+            // ranges are exclusive in OpenCV!!!
+            if (bins == 0)
+            {
+                Cv2.CalcHist(new Mat[] { src }, new int[] { splitIndex }, inputMask, histogram, 1, new int[] { task.histogramBins }, ranges);
+            }
+            else
+            {
+                Cv2.CalcHist(new Mat[] { src }, new int[] { splitIndex }, inputMask, histogram, 1, new int[] { bins }, ranges);
+            }
+            if (removeMax)
+            {
+                var mmMax = GetMinMax(histogram);
+                histogram.Set<float>(mmMax.maxLoc.Y, mmMax.maxLoc.X, 0);
+            }
+            histArray = new float[histogram.Total()];
+            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
+            plot.Run(histogram);
+            histogram = plot.histogram; // reflect any updates to the 0 entry...  
+            dst2 = plot.dst2;
+            if (standalone)
+            {
+                string colorName;
+                if (splitIndex == 0)
+                    colorName = "Blue";
+                else if (splitIndex == 1)
+                    colorName = "Green";
+                else
+                    colorName = "Red";
+
+                labels[2] = colorName + " histogram, bins = " +
+                               task.histogramBins.ToString() + ", X ranges from " +
+                               mm.minVal.ToString("0.0") + " to " +
+                               mm.maxVal.ToString("0.0") + ", y is sample count";
+            }
+            else
+            {
+                labels[2] = "Range = " + ranges[0].Start.ToString(fmt3) + " To " + ranges[0].End.ToString(fmt3);
+            }
+        }
+    }
+    public class CS_Hist_Grayscale : CS_Parent
+    {
+        public Hist_Basics hist = new Hist_Basics();
+        public CS_Hist_Grayscale(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setHistogramBins(255);
+            desc = "Create a histogram of the grayscale image";
+        }
+        public void RunCS(Mat src)
+        {
+            hist.Run(src.CvtColor(ColorConversionCodes.BGR2GRAY));
+            dst2 = hist.dst2;
+            dst3 = hist.dst3;
+            labels = hist.labels;
+        }
+    }
+    public class CS_Hist_Graph : CS_Parent
+    {
+        public Mat[] histRaw = new Mat[3];
+        public Mat[] histNormalized = new Mat[3];
+        public float minRange = 0;
+        public float maxRange = 255;
+        public Scalar backColor = Scalar.Gray;
+        public bool plotRequested;
+        public Scalar[] plotColors = { Scalar.Blue, Scalar.Green, Scalar.Red };
+        public float plotMaxValue;
+        public CS_Hist_Graph(VBtask task) : base(task)
+        {
+            desc = "Plot histograms for up to 3 channels.";
+        }
+        public void RunCS(Mat src)
+        {
+            int[] dimensions = { task.histogramBins };
+            Rangef[] ranges = new Rangef[] { new Rangef(minRange, maxRange) };
+            float plotWidth = dst2.Width / task.histogramBins;
+            mmData mm = new mmData();
+            dst2.SetTo(backColor);
+            for (int i = 0; i < src.Channels(); i++)
+            {
+                Mat hist = new Mat();
+                Cv2.CalcHist(new Mat[] { src }, new int[] { i }, new Mat(), hist, 1, dimensions, ranges);
+                histRaw[i] = hist.Clone();
+                mm = GetMinMax(histRaw[i]);
+                histNormalized[i] = hist.Normalize(0, hist.Rows, NormTypes.MinMax);
+                if (standaloneTest() || plotRequested)
+                {
+                    List<Point> points = new List<Point>();
+                    List<List<Point>> listOfPoints = new List<List<Point>>();
+                    for (int j = 0; j < task.histogramBins; j++)
+                    {
+                        points.Add(new cv.Point((int)(j * plotWidth), dst2.Rows - dst2.Rows * histRaw[i].Get<float>(j, 0) / mm.maxVal));
+                    }
+                    listOfPoints.Add(points);
+                    dst2.Polylines(listOfPoints, false, plotColors[i], task.lineWidth, task.lineType);
+                }
+            }
+            if (standaloneTest() || plotRequested)
+            {
+                plotMaxValue = (float)Math.Round((float)(mm.maxVal / 1000), 0) * 1000 + 1000; // smooth things out a little for the scale below
+                AddPlotScale(dst2, 0, plotMaxValue);
+                labels[2] = "Histogram for src image (default color) - " + task.histogramBins.ToString() + " bins";
+            }
+        }
+    }
+    public class CS_Hist_NormalizeGray : CS_Parent
+    {
+        public Hist_Basics histogram = new Hist_Basics();
+        private Options_Histogram options = new Options_Histogram();
+
+        public CS_Hist_NormalizeGray(VBtask task) : base(task)
+        {
+            labels[2] = "Use sliders to adjust the image and create a histogram of the results";
+            desc = "Create a histogram of a normalized image";
+        }
+
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            dst3 = src.Normalize(options.minGray, options.maxGray, NormTypes.MinMax); // only minMax is working...
+            histogram.Run(dst3);
+            dst2 = histogram.dst2;
+        }
+    }
+    public class CS_Hist_EqualizeGray : CS_Parent
+    {
+        public Hist_Basics histogramEQ = new Hist_Basics();
+        public Hist_Basics histogram = new Hist_Basics();
+        Mat_4to1 mats = new Mat_4to1();
+        public CS_Hist_EqualizeGray(VBtask task) : base(task)
+        {
+            histogramEQ.plot.addLabels = false;
+            histogram.plot.addLabels = false;
+            labels[2] = "Equalized image";
+            labels[3] = "Orig. Hist, Eq. Hist, Orig. Image, Eq. Image";
+            desc = "Create an equalized histogram of the grayscale image.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            histogram.Run(src);
+            Cv2.EqualizeHist(src, dst2);
+            histogramEQ.Run(dst2);
+            mats.mat[0] = histogram.dst2.Clone();
+            mats.mat[1] = histogramEQ.dst2;
+            mats.mat[2] = src;
+            mats.mat[3] = dst2;
+            mats.Run(empty);
+            dst3 = mats.dst2;
+        }
+    }
+    public class CS_Hist_Simple : CS_Parent
+    {
+        public Plot_Histogram plot = new Plot_Histogram();
+        public CS_Hist_Simple(VBtask task) : base(task)
+        {
+            labels[2] = "Histogram of the grayscale video stream";
+            desc = "Build a simple and reusable histogram for grayscale images.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            Rangef[] ranges = new Rangef[] { new Rangef(plot.minRange, plot.maxRange) };
+            Mat hist = new Mat();
+            Cv2.CalcHist(new Mat[] { src }, new int[] { 0 }, new Mat(), hist, 1, new int[] { task.histogramBins }, ranges);
+            plot.Run(hist);
+            dst2 = plot.dst2;
+        }
+    }
+    public class CS_Hist_ColorsAndGray : CS_Parent
+    {
+        Hist_Basics histogram = new Hist_Basics();
+        Mat_4Click mats = new Mat_4Click();
+        public CS_Hist_ColorsAndGray(VBtask task) : base(task)
+        {
+            labels[2] = "Click any quadrant at right to view it below";
+            desc = "Create a histogram of a normalized image";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat[] split = src.Split();
+            Array.Resize(ref split, 4);
+            split[3] = src.CvtColor(ColorConversionCodes.BGR2GRAY); // add a 4th image - the grayscale image to the R G and B images.
+            for (int i = 0; i < split.Length; i++)
+            {
+                Mat histSrc = split[i];
+                if (i == 0)
+                    histogram.plot.backColor = Scalar.Blue;
+                else if (i == 1)
+                    histogram.plot.backColor = Scalar.Green;
+                else
+                    histogram.plot.backColor = Scalar.Red;
+                histogram.Run(histSrc);
+                mats.mat[i] = histogram.plot.dst2.Clone();
+            }
+            mats.Run(empty);
+            dst2 = mats.dst2;
+            dst3 = mats.dst3;
+        }
+    }
+    public class CS_Hist_Frustrum : CS_Parent
+    {
+        HeatMap_Basics heat = new HeatMap_Basics();
+        public CS_Hist_Frustrum(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            task.gOptions.setGravityUsage(false);
+            desc = "Options for the side and top view.  See OptionCommon_Histogram to make settings permanent.";
+        }
+        public void RunCS(Mat src)
+        {
+            heat.Run(src);
+            dst2 = heat.dst2;
+            dst3 = heat.dst3;
+            SetTrueText("This algorithm was created to tune the frustrum and camera locations." + Environment.NewLine +
+                        "Without these tuning parameters the side and top views will look correct." + Environment.NewLine +
+                        "To see how these adjustments work or to add a new camera, " + Environment.NewLine +
+                        "use the HeatMap_Basics algorithm." + Environment.NewLine +
+                        "For new cameras, make the adjustments needed, note the value, and update " + Environment.NewLine +
+                        "the Select statement in the constructor for Options_CameraDetails.", new cv.Point(10, 80), 1);
+        }
+    }
+    public class CS_Hist_PeakMax : CS_Parent
+    {
+        Hist_Basics hist;
+        public CS_Hist_PeakMax(VBtask task) : base(task)
+        {
+            desc = "Create a histogram and back project into the image the grayscale color with the highest occurance.";
+            labels[3] = "Grayscale Histogram";
+            hist = new Hist_Basics();
+        }
+        public void RunCS(Mat src)
+        {
+            task.gOptions.SetUseKalman(false);
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            hist.Run(src);
+            dst3 = hist.dst2;
+            mmData mm = GetMinMax(hist.histogram);
+            int brickWidth = dst2.Width / task.histogramBins;
+            int brickRange = 255 / task.histogramBins;
+            int histindex = mm.maxLoc.Y;
+            int pixelMin = (int)(histindex * brickRange);
+            int pixelMax = (int)((histindex + 1) * brickRange);
+            Mat mask = src.InRange(pixelMin, pixelMax).Threshold(1, 255, ThresholdTypes.Binary);
+            Mat tmp = new Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0));
+            src.CopyTo(tmp, mask);
+            dst2 = tmp.Threshold(0, 255, ThresholdTypes.Binary);
+            labels[2] = "BackProjection of most frequent gray pixel";
+            Cv2.Rectangle(dst3, new Rect(brickWidth * histindex, 0, brickWidth, dst2.Height), Scalar.Yellow, 1);
+        }
+    }
+    public class CS_Hist_PeakFinder : CS_Parent
+    {
+        public Hist_Basics hist;
+        public int peakCount;
+        public bool resetPeaks;
+        public List<int> histogramPeaks = new List<int>();
+        public float[] hCount;
+        int saveHistBins;
+        float[] peakCounts;
+        List<int> allPCounts;
+        List<int> maxList;
+        public CS_Hist_PeakFinder(VBtask task) : base(task)
+        {
+            desc = "Find the peaks - columns taller that both neighbors - in the histogram";
+            hist = new Hist_Basics();
+            allPCounts = new List<int>();
+            maxList = new List<int>();
+            peakCounts = new float[task.histogramBins];
+            saveHistBins = task.histogramBins;
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 1) src = task.pcSplit[2];
+            hist.Run(src);
+            dst2 = hist.dst2;
+            resetPeaks = false;
+            if (saveHistBins != task.histogramBins)
+            {
+                resetPeaks = true;
+                allPCounts.Clear();
+                maxList.Clear();
+                saveHistBins = task.histogramBins;
+                Array.Resize(ref peakCounts, task.histogramBins);
+            }
+            hCount = new float[task.histogramBins];
+            Mat histogram = hist.histogram;
+            List<int> peaks = new List<int>();
+            float maxPeak = float.MinValue;
+            int maxIndex = 0;
+            for (int i = 0; i < histogram.Rows; i++)
+            {
+                float prev = histogram.Get<float>(Math.Max(i - 1, 0), 0);
+                float curr = histogram.Get<float>(i, 0);
+                float nextVal = histogram.Get<float>(Math.Min(i + 1, histogram.Rows - 1), 0);
+                hCount[i] = curr;
+                if (i == 0)
+                {
+                    if (prev >= nextVal)
+                    {
+                        peaks.Add(i);
+                        peakCounts[i] += 1;
+                    }
+                }
+                else
+                {
+                    if (prev <= curr && curr > nextVal)
+                    {
+                        peaks.Add(i);
+                        peakCounts[i] += 1;
+                    }
+                }
+                if (curr > maxPeak)
+                {
+                    maxPeak = curr;
+                    maxIndex = i;
+                }
+            }
+            allPCounts.Add(peaks.Count);
+            maxList.Add(maxIndex);
+
+            peakCount = (int)allPCounts.Average();
+            SetTrueText("/t" + "Avg peaks: " + peakCount + ".  Current: " + peaks.Count + " peaks.", new cv.Point(0, 10), 3);
+            var sortedPeaks = new SortedDictionary<int, int>(new compareAllowIdenticalIntegerInverted());
+            for (int i = 0; i < peakCounts.Length; i++)
+            {
+                sortedPeaks.Add((int)peakCounts[i], i);
+            }
+            mmData mm = GetMinMax(histogram);
+            if (mm.maxVal == 0) return; // entries are all zero?  Likely camera trouble.
+            int brickWidth = dst2.Width / histogram.Rows;
+            histogramPeaks.Clear();
+            for (int i = 0; i < Math.Min(sortedPeaks.Count, peakCount); i++)
+            {
+                int index = sortedPeaks.ElementAt(i).Value;
+                histogramPeaks.Add(index);
+                int h = (int)(hCount[index] * dst2.Height / mm.maxVal);
+                Cv2.Rectangle(dst2, new Rect(index * brickWidth, dst2.Height - h, brickWidth, h), Scalar.Yellow, task.lineWidth);
+            }
+            if (allPCounts.Count > 100)
+            {
+                allPCounts.RemoveAt(0);
+                maxList.RemoveAt(0);
+            }
+            if (Math.Abs(maxList.Average() - maxIndex) > saveHistBins / 10) saveHistBins = 0;
+            labels[2] = "There were " + peakCount + " depth peaks (highlighted) up to " + task.MaxZmeters + " meters.  " +
+                        "Use global option Histogram Bins to set the number of bins.";
+        }
+    }
+    public class CS_Hist_PeaksDepth : CS_Parent
+    {
+        Hist_PeakFinder peaks;
+        public CS_Hist_PeaksDepth(VBtask task) : base(task)
+        {
+            desc = "Find the peaks - columns taller that both neighbors - in the histogram";
+            peaks = new Hist_PeakFinder();
+        }
+        public void RunCS(Mat src)
+        {
+            peaks.Run(task.pcSplit[2]);
+            dst2 = peaks.dst2;
+            labels[2] = peaks.labels[2];
+        }
+    }
+    public class CS_Hist_PeaksRGB : CS_Parent
+    {
+        Mat_4Click mats;
+        Hist_PeakFinder[] peaks;
+        public CS_Hist_PeaksRGB(VBtask task) : base(task)
+        {
+            peaks = new Hist_PeakFinder[3];
+            for (int i = 0; i < 3; i++)
+            {
+                peaks[i] = new Hist_PeakFinder();
+            }
+            labels[2] = "Upper left is Blue, upper right is Green, bottom left is Red";
+            desc = "Find the peaks and valleys for each of the BGR channels.";
+            mats = new Mat_4Click();
+        }
+        public void RunCS(Mat src)
+        {
+            Mat[] split = src.Split();
+            for (int i = 0; i < 3; i++)
+            {
+                peaks[i].hist.plot.backColor = new Scalar(i == 0 ? 255 : 0, i == 1 ? 255 : 0, i == 2 ? 255 : 0);
+                peaks[i].hist.plot.addLabels = false;
+                peaks[i].Run(split[i]);
+                mats.mat[i] = peaks[i].dst2.Clone();
+            }
+            if (task.optionsChanged)
+            {
+                task.mouseClickFlag = true;
+                task.mousePicTag = RESULT_DST2;
+            }
+            mats.Run(new Mat());
+            dst2 = mats.dst2;
+            dst3 = mats.dst3;
+        }
+    }
+    public class CS_Hist_Color : CS_Parent
+    {
+        Mat histogram = new cv.Mat();
+        Plot_Histogram plot = new Plot_Histogram();
+        Rangef[] ranges;
+        public CS_Hist_Color(VBtask task) : base(task)
+        {
+            desc = "Create a histogram of green and red.";
+        }
+        public void RunCS(Mat src)
+        {
+            ranges = new Rangef[2] { new Rangef(0, 255), new Rangef(0, 255) };
+            Cv2.CalcHist(new Mat[] { src }, new int[] { 1, 2 }, new Mat(), histogram, 1, new int[] { task.histogramBins, task.histogramBins }, ranges);
+            Mat test = histogram.Clone();
+            test.Normalize(0, 255, NormTypes.MinMax);
+            Mat input = new cv.Mat();
+            src.ConvertTo(input, MatType.CV_32FC3);
+            Mat mask = new Mat();
+            Cv2.CalcBackProject(new Mat[] { input }, new int[] { 1, 2 }, histogram, mask, ranges);
+            mmData mm = GetMinMax(mask);
+            plot.Run(test);
+            dst2 = plot.dst2;
+        }
+    }
+    public class CS_Hist_KalmanAuto : CS_Parent
+    {
+        Mat histogram = new Mat();
+        Kalman_Basics kalman = new Kalman_Basics();
+        Plot_Histogram plot = new Plot_Histogram();
+        mmData mm;
+        Rangef[] ranges;
+        int splitIndex = 0;
+        string colorName = "Gray";
+        public CS_Hist_KalmanAuto(VBtask task) : base(task)
+        {
+            desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                if (task.heartBeat) splitIndex = (splitIndex + 1) % 3;
+                if (splitIndex == 0)
+                    colorName = "Blue";
+                else if (splitIndex == 1)
+                    colorName = "Green";
+                else
+                    colorName = "Red";
+                Mat[] split = src.Split();
+                src = split[splitIndex];
+            }
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            mm = GetMinMax(src);
+            ranges = new Rangef[1] { new Rangef((float)mm.minVal, (float)mm.maxVal) };
+            if (mm.minVal == mm.maxVal)
+            {
+                SetTrueText("The input image is empty - minVal and maxVal are both zero...");
+                return;
+            }
+            int[] dimensions = { task.histogramBins };
+            Cv2.CalcHist(new Mat[] { src }, new int[] { 0 }, new Mat(), histogram, 1, dimensions, ranges);
+            if (kalman.kInput.Length != task.histogramBins) Array.Resize(ref kalman.kInput, task.histogramBins);
+            for (int i = 0; i < task.histogramBins; i++)
+            {
+                kalman.kInput[i] = histogram.Get<float>(i, 0);
+            }
+            kalman.Run(src);
+            histogram = new Mat(kalman.kOutput.Length, 1, MatType.CV_32FC1, kalman.kOutput);
+            if (standaloneTest())
+            {
+                if (splitIndex == 0) 
+                    plot.backColor = Scalar.Blue;
+                else if(splitIndex == 1) 
+                    plot.backColor = Scalar.Green;
+                else 
+                    plot.backColor = Scalar.Red;
+            }
+            plot.Run(histogram);
+            dst2 = plot.dst2;
+            labels[2] = colorName + " histogram, bins = " + task.histogramBins + ", X ranges from " + mm.minVal + " to " + mm.maxVal + ", y is occurances";
+        }
+    }
+    public class CS_Hist_EqualizeColor : CS_Parent
+    {
+        Hist_Basics kalmanEq = new Hist_Basics();
+        Hist_Basics kalman = new Hist_Basics();
+        Mat_2to1 mats = new Mat_2to1();
+        public bool displayHist;
+        public int channel;
+        public CS_Hist_EqualizeColor(VBtask task) : base(task)
+        {
+            kalmanEq.plot.addLabels = false;
+            kalman.plot.addLabels = false;
+            desc = "Create an equalized histogram of the color image.";
+            labels[2] = "Image Enhanced with Equalized Histogram";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat[] rgb = src.Split();
+            Mat[] rgbEq = src.Split();
+            for (int i = 0; i < rgb.Length; i++)
+            {
+                Cv2.EqualizeHist(rgbEq[i], rgbEq[i]);
+            }
+            if (standaloneTest() || displayHist)
+            {
+                Cv2.Split(src, out rgb); // equalizehist alters the input...
+                kalman.plot.backColor = Scalar.Red;
+                kalman.Run(rgb[channel].Clone());
+                mats.mat[0] = kalman.dst2.Clone();
+                kalmanEq.Run(rgbEq[channel].Clone());
+                mats.mat[1] = kalmanEq.dst2.Clone();
+                mats.Run(new Mat());
+                dst3 = mats.dst2;
+                labels[3] = "Before (top) and After Red Histogram";
+            }
+            Cv2.Merge(rgbEq, dst2);
+        }
+    }
+    public class CS_Hist_CompareGray : CS_Parent
+    {
+        Hist_Kalman histK = new Hist_Kalman();
+        Options_HistCompare options = new Options_HistCompare();
+        Mat histDiff;
+        Mat histDiffAbs = new cv.Mat();
+        Mat normHistDiff;
+        Mat normHistDiffAbs = new cv.Mat();
+        Mat lastHist;
+        Mat lastHistNorm;
+        public CS_Hist_CompareGray(VBtask task) : base(task)
+        {
+            labels[2] = "Kalman-smoothed current histogram";
+            desc = "Compare grayscale histograms for successive frames";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            histK.Run(src);
+            dst2 = histK.dst2.Clone();
+            if (task.FirstPass) lastHist = histK.hist.histogram.Clone();
+            Mat histNorm = histK.hist.histogram.Clone();
+            histNorm.Normalize(0, 1, NormTypes.MinMax);
+            if (task.FirstPass) lastHistNorm = histNorm.Clone();
+            if (lastHistNorm.Size() == histK.hist.histogram.Size())
+            {
+                double Comparison = Cv2.CompareHist(histNorm, lastHistNorm, options.compareMethod);
+                if (double.IsNaN(Comparison)) Comparison = 0;
+                labels[3] = "CompareHist output = " + Comparison.ToString("F3") + " using " + options.compareName + " method";
+                trueData = histK.hist.plot.trueData.ToList();
+                SetTrueText(labels[3], 2);
+            }
+            else
+            {
+                lastHistNorm = histNorm.Clone();
+            }
+            if (histNorm.Size() == lastHistNorm.Size())
+            {
+                normHistDiff = histNorm - lastHistNorm;
+                Cv2.Absdiff(histNorm, lastHistNorm, normHistDiffAbs);
+            }
+            lastHistNorm = histNorm.Clone();
+            if (histK.hist.histogram.Size() == lastHist.Size())
+            {
+                histDiff = histK.hist.histogram - lastHist;
+                Cv2.Absdiff(histK.hist.histogram, lastHist, histDiffAbs);
+            }
+            lastHist = histK.hist.histogram.Clone();
+        }
+    }
+    public class CS_Hist_ComparePlot : CS_Parent
+    {
+        Hist_CompareGray comp = new Hist_CompareGray();
+        List<trueText> ttLabels;
+        public CS_Hist_ComparePlot(VBtask task) : base(task)
+        {
+            labels[3] = "Differences have been multiplied by 1000 to build scale at the left";
+            desc = "Compare grayscale histograms for successive frames and plot the difference as a histogram.";
+        }
+        public void RunCS(Mat src)
+        {
+            comp.Run(src);
+            dst2 = comp.dst2.Clone();
+            if (task.heartBeat)
+            {
+                ttLabels = comp.trueData.ToList();
+                Mat histX = comp.histDiffAbs;
+                comp.histK.hist.plot.Run(histX);
+                dst3 = comp.histK.hist.plot.dst2.Clone();
+                mmData mm = GetMinMax(histX);
+                AddPlotScale(dst2, 0, mm.maxVal);
+            }
+            trueData = ttLabels;
+        }
+    }
+    public class CS_Hist_CompareNumber : CS_Parent
+    {
+        Hist_CompareGray comp = new Hist_CompareGray();
+        Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
+        public CS_Hist_CompareNumber(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            plot.plotCount = 2;
+            labels = new string[] { "", "", "Kalman-smoothed normalized histogram output", "Plot of the sum of the differences between recent normalized histograms" };
+            desc = "The idea is to reduce a comparison of 2 histograms to a single number";
+        }
+        public void RunCS(Mat src)
+        {
+            comp.Run(src);
+            dst1 = comp.dst2.Clone();
+            double sum = Cv2.Sum(comp.normHistDiff)[0] * 100;
+            double sumAbs = Cv2.Sum(comp.normHistDiffAbs)[0] * 100;
+            plot.plotData = new Scalar(sum, sumAbs, 0);
+            plot.Run(new Mat());
+            dst2 = plot.dst2;
+            dst3 = plot.dst3;
+            SetTrueText("Upper left is the sum * 100 of the difference\nUpper right is the sum of the absolute values * 100", new cv.Point(0, dst2.Height / 2), 2);
+        }
+    }
+    public class CS_Hist_CompareEMD_hsv : CS_Parent
+    {
+        Hist_Basics hist = new Hist_Basics();
+        Mat lastHSV;
+        public CS_Hist_CompareEMD_hsv(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Kalman-smoothed normalized histogram output", "Plot of the sum of the differences between recent normalized histograms" };
+            desc = "Use OpenCV's Earth Mover Distance to compare 2 images.";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat hsv = src.CvtColor(ColorConversionCodes.BGR2HSV);
+            if (task.FirstPass) lastHSV = hsv.Clone();
+            int hBins = 30, sBins = 32;
+            Mat histA = new Mat(), histB = new Mat();
+            Rangef[] ranges = new Rangef[2] { new Rangef(0, 180), new Rangef(0, 256) };
+            Cv2.CalcHist(new Mat[] { hsv }, new int[] { 0, 1 }, new Mat(), histA, 2, new int[] { hBins, sBins }, ranges);
+            Mat histNormA = histA.Clone();
+            histNormA.Normalize(0, 1, NormTypes.MinMax);
+            Cv2.CalcHist(new Mat[] { lastHSV }, new int[] { 0, 1 }, new Mat(), histB, 2, new int[] { hBins, sBins }, ranges);
+            Mat histNormB = histB.Clone();
+            histNormB.Normalize(0, 1, NormTypes.MinMax);
+            Mat sig1 = new Mat(sBins * hBins, 3, MatType.CV_32F, Scalar.All(0));
+            Mat sig2 = new Mat(sBins * hBins, 3, MatType.CV_32F, Scalar.All(0));
+            for (int h = 0; h < hBins; h++)
+            {
+                for (int s = 0; s < sBins; s++)
+                {
+                    sig1.Set<float>(h * sBins + s, 0, histNormA.Get<float>(h, s));
+                    sig1.Set<float>(h * sBins + s, 1, h);
+                    sig1.Set<float>(h * sBins + s, 2, s);
+                    sig2.Set<float>(h * sBins + s, 0, histNormB.Get<float>(h, s));
+                    sig2.Set<float>(h * sBins + s, 1, h);
+                    sig2.Set<float>(h * sBins + s, 2, s);
+                }
+            }
+            double emd = Cv2.EMD(sig1, sig2, DistanceTypes.L2);
+            SetTrueText("EMD similarity from the current image to the last is " + (1 - emd).ToString("F0%"), 2);
+            lastHSV = hsv.Clone();
+        }
+    }
+    public class CS_Hist_Peaks : CS_Parent
+    {
+        BackProject_Masks masks;
+        public CS_Hist_Peaks(VBtask task) : base(task)
+        {
+            desc = "Interactive Histogram";
+            masks = new BackProject_Masks();
+        }
+        public void RunCS(Mat src)
+        {
+            masks.Run(src);
+            dst2 = masks.dst2;
+            dst3 = masks.dst3;
+        }
+    }
+    public class CS_Hist_Lab : CS_Parent
+    {
+        Hist_Basics hist;
+        public CS_Hist_Lab(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "Lab Colors ", "Lab Channel 0", "Lab Channel 1", "Lab Channel 2" };
+            desc = "Create a histogram from a BGR image converted to LAB.";
+            hist = new Hist_Basics();
+        }
+        public void RunCS(Mat src)
+        {
+            dst0 = src.CvtColor(ColorConversionCodes.BGR2Lab);
+            Mat[] split = dst0.Split();
+            hist.Run(split[0]);
+            dst1 = hist.dst2.Clone();
+            hist.Run(split[1]);
+            dst2 = hist.dst2.Clone();
+            hist.Run(split[2]);
+            dst3 = hist.dst2.Clone();
+        }
+    }
+    public class CS_Hist_PointCloudXYZ : CS_Parent
+    {
+        public Plot_Histogram plot = new Plot_Histogram();
+        List<List<trueText>> ttlists;
+        public CS_Hist_PointCloudXYZ(VBtask task) : base(task)
+        {
+            plot.createHistogram = true;
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "Histogram of the X channel", "Histogram of the Y channel", "Histogram of the Z channel" };
+            desc = "Show individual channel of the point cloud data as a histogram.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.FirstPass) ttlists = new List<List<trueText>> { new List<trueText>(), new List<trueText>(), new List<trueText>() };
+            for (int i = 0; i <= 2; i++)
+            {
+                dst0 = task.pcSplit[i];
+                mmData mm = GetMinMax(dst0);
+                switch (i)
+                {
+                    case 0:
+                        plot.removeZeroEntry = false;
+                        plot.minRange = -task.xRange;
+                        plot.maxRange = task.xRange;
+                        break;
+                    case 1:
+                        plot.removeZeroEntry = false;
+                        plot.minRange = -task.yRange;
+                        plot.maxRange = task.yRange;
+                        break;
+                    case 2:
+                        plot.removeZeroEntry = true;
+                        plot.minRange = 0;
+                        plot.maxRange = task.MaxZmeters;
+                        break;
+                }
+                plot.Run(dst0);
+                switch (i)
+                {
+                    case 0:
+                        dst1 = plot.dst2.Clone();
+                        break;
+                    case 1:
+                        dst2 = plot.dst2.Clone();
+                        break;
+                    case 2:
+                        dst3 = plot.dst2.Clone();
+                        break;
+                }
+                string xyzStr = "X";
+                if (i == 1) xyzStr = "Y";   
+                if (i == 2) xyzStr = "Z";   
+                if (task.heartBeat)
+                {
+                    labels[i + 1] = "Histogram " + xyzStr + " ranges from " + plot.minRange.ToString("0.0") + "m to " + plot.maxRange.ToString("0.0") + "m";
+                }
+            }
+        }
+    }
+    public class CS_Hist_FlatSurfaces : CS_Parent
+    {
+        BackProject_Masks masks = new BackProject_Masks();
+        float saveMinVal, saveMaxVal;
+        public CS_Hist_FlatSurfaces(VBtask task) : base(task)
+        {
+            desc = "Find flat surfaces with the histogram";
+        }
+        public void RunCS(Mat src)
+        {
+            int maxRange = 4;
+            Mat cloudY = task.pcSplit[1].Clone();
+            mmData mm = GetMinMax(cloudY);
+            cloudY = cloudY.Threshold(maxRange, mm.maxVal, ThresholdTypes.Trunc);
+            if (task.FirstPass)
+            {
+                saveMinVal = (float)mm.minVal;
+                saveMaxVal = (float)mm.maxVal;
+            }
+            if (task.heartBeat)
+            {
+                saveMinVal = (float)mm.minVal;
+                saveMaxVal = (float)mm.maxVal;
+            }
+            if (saveMinVal > mm.minVal) saveMinVal = (float)mm.minVal;
+            if (saveMaxVal < mm.maxVal) saveMaxVal = (float)mm.maxVal;
+            cloudY.Set<float>(mm.minLoc.Y, mm.minLoc.X, -saveMinVal);
+            cloudY.Set<float>(mm.maxLoc.Y, mm.maxLoc.X, saveMaxVal);
+            cloudY -= saveMinVal;
+            cloudY = cloudY.ConvertScaleAbs(255 / (-saveMinVal + saveMaxVal));
+            mm = GetMinMax(cloudY);
+            cloudY.SetTo(0, task.noDepthMask);
+            masks.Run(cloudY);
+            dst2 = masks.dst2;
+            dst3 = src;
+            dst3 = dst3.SetTo(new Scalar(255, 255, 255), masks.dst1);
+            labels[2] = "Range for the histogram is from " + saveMinVal.ToString(fmt1) + " to " + saveMaxVal.ToString(fmt1);
+        }
+    }
+    public class CS_Hist_ShapeSide : CS_Parent
+    {
+        public rcData rc = new rcData();
+        public CS_Hist_ShapeSide(VBtask task) : base(task)
+        {
+            task.gOptions.setHistogramBins(60);
+            labels = new string[] { "", "", "ZY Side View", "ZY Side View Mask" };
+            desc = "Create a 2D side view for ZY histogram of depth";
+        }
+        public void RunCS(Mat src)
+        {
+            if (rc.pixels == 0) src = task.pointCloud;
+            Cv2.CalcHist(new Mat[] { src }, task.channelsSide, new Mat(), dst0, 2,
+                          new int[] { task.histogramBins, task.histogramBins }, task.rangesSide);
+            dst0.Col(0).SetTo(0); // too many zero depth points...
+            dst0 = GetNormalize32f(dst0);
+            dst0.ConvertTo(dst0, MatType.CV_8UC1);
+            Rect r = new Rect(0, 0, dst2.Height, dst2.Height);
+            dst2[r] = dst0.Resize(new cv.Size(dst2.Height, dst2.Height), 0, 0, InterpolationFlags.Nearest);
+            dst3 = dst2.Threshold(0, 255, ThresholdTypes.Binary);
+        }
+    }
+    public class CS_Hist_ShapeTop : CS_Parent
+    {
+        public rcData rc = new rcData();
+        public CS_Hist_ShapeTop(VBtask task) : base(task)
+        {
+            task.gOptions.setHistogramBins(60);
+            labels = new string[] { "", "", "ZY Side View", "ZY Side View Mask" };
+            desc = "Create a 2D top view for XZ histogram of depth";
+        }
+        public void RunCS(Mat src)
+        {
+            if (rc.pixels == 0) src = task.pointCloud;
+            Cv2.CalcHist(new Mat[] { src }, task.channelsTop, new Mat(), dst0, 2,
+                          new int[] { task.histogramBins, task.histogramBins }, task.rangesTop);
+            dst0.Row(0).SetTo(0); // too many zero depth points...
+            dst0 = GetNormalize32f(dst0);
+            dst0.ConvertTo(dst0, MatType.CV_8UC1);
+            Rect r = new Rect(0, 0, dst2.Height, dst2.Height);
+            dst2[r] = dst0.Resize(new cv.Size(dst2.Height, dst2.Height), 0, 0, InterpolationFlags.Nearest);
+            dst3 = dst2.Threshold(0, 255, ThresholdTypes.Binary);
+        }
+    }
+    public class CS_Hist_Gotcha2D : CS_Parent
+    {
+        public Mat histogram = new Mat();
+        public CS_Hist_Gotcha2D(VBtask task) : base(task)
+        {
+            labels[2] = "ZY (Side View)";
+            desc = "Create a 2D side view for ZY histogram of depth using integer values.  Testing calcHist gotcha.";
+        }
+        public void RunCS(Mat src)
+        {
+            int expected = task.pcSplit[2].CountNonZero();
+            Rangef[] ranges = task.rangesSide;
+            if (task.toggleOnOff)
+            {
+                ranges = new Rangef[] { new Rangef(-10, +10), new Rangef(-1, 20) };
+            }
+            Cv2.CalcHist(new Mat[] { task.pointCloud }, task.channelsSide, new Mat(), histogram, 2, task.bins2D, task.rangesSide);
+            var actual = histogram.Sum().Val0;
+            if (task.heartBeat)
+            {
+                strOut = "Expected sample count:" + "\t" + expected + "\n" +
+                         "Actual sample count:" + "\t" + actual + "\n" +
+                         "The number of samples input is the expected value." + "\n" +
+                         "The number of entries in the histogram is the 'actual' number of samples." + "\n" +
+                         "How can the values not be equal?  The ranges of the histogram are exclusive." + "\n" +
+                         "Another way that samples may be lost: X or Y range.  Use Y-Range slider to show impact." +
+                         "A third way samples may not match: max depth can toss samples as well.";
+            }
+            SetTrueText(strOut, 3);
+            dst2 = histogram.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+        }
+    }
+    public class CS_Hist_Gotcha : CS_Parent
+    {
+        public Mat histogram = new Mat();
+        Hist_Basics hist = new Hist_Basics();
+        public CS_Hist_Gotcha(VBtask task) : base(task)
+        {
+            labels[2] = "Grayscale histogram";
+            desc = "Simple test: input samples should equal histogram samples.  What is wrong?  Exclusive ranges!";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            long expected = src.Total();
+            hist.Run(src);
+            double actual = hist.histogram.Sum().Val0;
+            if (task.heartBeat)
+            {
+                strOut = "Expected sample count:" + "\t" + expected + "\n" +
+                         "Actual sample count:" + "\t" + actual + "\n" +
+                         "Difference:" + "\t" + Math.Abs(actual - expected) + "\n" +
+                         "The number of samples input is the expected value." + "\n" +
+                         "The number of entries in the histogram is the 'actual' number of samples." + "\n" +
+                         "How can the values not be equal?  The ranges in the histogram are exclusive!";
+            }
+            SetTrueText(strOut, 2);
+        }
+    }
+    public class CS_Hist_GotchaFixed_CPP : CS_Parent
+    {
+        public CS_Hist_GotchaFixed_CPP(VBtask task) : base(task)
+        {
+            cPtr = Hist_1D_Open();
+            desc = "Testing the C++ CalcHist to investigate gotcha with sample counts";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            byte[] cppData = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, cppData, 0, cppData.Length);
+            GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
+            IntPtr imagePtr = Hist_1D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.histogramBins);
+            handleSrc.Free();
+            if (task.heartBeat)
+            {
+                int actual = (int)Hist_1D_Sum(cPtr);
+                strOut = "Expected sample count:" + "\t" + dst2.Total() + "\n" +
+                         "Actual sample count:" + "\t" + actual + "\n" +
+                         "Difference:" + "\t" + Math.Abs(actual - dst2.Total()) + "\n" +
+                         "The number of samples input is the expected value." + "\n" +
+                         "The number of entries in the histogram is the 'actual' number of samples." + "\n" +
+                         "How can the values not be equal?  The ranges in the histogram are exclusive!";
+            }
+            SetTrueText(strOut, 2);
+        }
+        public void Close()
+        {
+            Hist_1D_Close(cPtr);
+        }
+    }
+    public class CS_Hist_Byte_CPP : CS_Parent
+    {
+        public Plot_Histogram plot = new Plot_Histogram();
+        public CS_Hist_Byte_CPP(VBtask task) : base(task)
+        {
+            cPtr = Hist_1D_Open();
+            desc = "For Byte histograms, the C++ code works but the .Net interface doesn't honor exclusive ranges.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            byte[] cppData = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, cppData, 0, cppData.Length);
+            GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
+            IntPtr imagePtr = Hist_1D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.histogramBins);
+            handleSrc.Free();
+            Mat histogram = new Mat(task.histogramBins, 1, MatType.CV_32F, imagePtr);
+            plot.Run(histogram);
+            dst2 = plot.dst2;
+            SetTrueText(strOut, 2);
+        }
+        public void Close()
+        {
+            Hist_1D_Close(cPtr);
+        }
+    }
+    public class CS_Hist_Xdimension : CS_Parent
+    {
+        Hist_Depth plot = new Hist_Depth();
+        public CS_Hist_Xdimension(VBtask task) : base(task)
+        {
+            desc = "Plot the histogram of the X layer of the point cloud";
+        }
+        public void RunCS(Mat src)
+        {
+            plot.Run(task.pcSplit[0]);
+            dst2 = plot.dst2;
+            SetTrueText("Chart left = " + string.Format(fmt0, plot.mm.minVal) + Environment.NewLine +
+                        "Chart right = " + string.Format(fmt0, plot.mm.maxVal), 2);
+        }
+    }
+    public class CS_Hist_Ydimension : CS_Parent
+    {
+        Hist_Depth plot = new Hist_Depth();
+        public CS_Hist_Ydimension(VBtask task) : base(task)
+        {
+            desc = "Plot the histogram of the Y layer of the point cloud";
+        }
+        public void RunCS(Mat src)
+        {
+            plot.Run(task.pcSplit[1]);
+            dst2 = plot.dst2;
+            SetTrueText("Chart left = " + string.Format(fmt0, plot.mm.minVal) + Environment.NewLine +
+                        "Chart right = " + string.Format(fmt0, plot.mm.maxVal), 2);
+        }
+    }
+    public class CS_Hist_Zdimension : CS_Parent
+    {
+        Hist_Depth plot = new Hist_Depth();
+        public CS_Hist_Zdimension(VBtask task) : base(task)
+        {
+            desc = "Plot the histogram of the Z layer of the point cloud";
+        }
+        public void RunCS(Mat src)
+        {
+            plot.Run(task.pcSplit[2]);
+            dst2 = plot.dst2;
+            SetTrueText("Chart left = " + string.Format(fmt0, plot.mm.minVal) + Environment.NewLine +
+                        "Chart right = " + string.Format(fmt0, plot.mm.maxVal), 2);
+        }
+    }
+    public class CS_Hist_Depth : CS_Parent
+    {
+        public Plot_Histogram plot = new Plot_Histogram();
+        public rcData rc;
+        public mmData mm;
+        public Mat histogram = new Mat();
+        public CS_Hist_Depth(VBtask task) : base(task)
+        {
+            desc = "Show depth data as a histogram.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Rows <= 0) return;
+            plot.minRange = 0;
+            plot.maxRange = task.MaxZmeters;
+            if (rc != null)
+            {
+                if (rc.index == 0) return;
+                src = task.pcSplit[2][rc.rect].Clone();
+            }
+            else
+            {
+                if (src.Type() != MatType.CV_32F) src = task.pcSplit[2];
+                mm = GetMinMax(src);
+                plot.minRange = (float)mm.minVal; // because OpenCV's histogram makes the ranges exclusive.
+                plot.maxRange = (float)mm.maxVal;
+            }
+            Cv2.CalcHist(new Mat[] { src }, new int[] { 0 }, new Mat(), histogram, 1, new int[] { task.histogramBins }, new Rangef[] { new Rangef(plot.minRange, plot.maxRange) });
+            plot.histogram = histogram;
+            plot.Run(plot.histogram);
+            dst2 = plot.dst2;
+            float stepsize = dst2.Width / task.MaxZmeters;
+            for (int i = 1; i < (int)task.MaxZmeters; i++)
+            {
+                dst2.Line(new cv.Point(stepsize * i, 0), new cv.Point(stepsize * i, dst2.Height), Scalar.White, task.cvFontThickness);
+            }
+            if (standaloneTest())
+            {
+                int expected = src.CountNonZero();
+                int actual = (int)plot.histogram.Sum().Val0;
+                strOut = "Expected sample count (non-zero task.pcSplit[2]] entries):" + "\t" + expected + Environment.NewLine;
+                strOut += "Histogram sum (ranges can reduce):" + "\t\t\t" + actual + Environment.NewLine;
+                strOut += "Difference:" + "\t\t\t\t\t\t" + Math.Abs(actual - expected) + Environment.NewLine;
+            }
+            SetTrueText(strOut, 3);
+            labels[2] = "Histogram Depth to " + string.Format("0.0", task.MaxZmeters) + " m";
+        }
+    }
+    public class CS_Hist_Cell : CS_Parent
+    {
+        Hist_Depth hist = new Hist_Depth();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_Hist_Cell(VBtask task) : base(task)
+        {
+            dst1 = new Mat(dst1.Size(), MatType.CV_32F, 0);
+            labels = new string[] { "", "", "RedCloud cells", "Histogram of the depth for the selected cell." };
+            desc = "Review depth data for a RedCloud Cell";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            hist.rc = task.rc;
+            if (hist.rc.index == 0 || hist.rc.maxVec.Z == 0) return;
+            dst1.SetTo(0);
+            task.pcSplit[2][hist.rc.rect].CopyTo(dst1);
+            hist.Run(dst1);
+            dst3 = hist.dst2;
+        }
+    }
+    public class CS_Hist_PointCloud : CS_Parent
+    {
+        public Rangef[] rangesX;
+        public Rangef[] rangesY;
+        public Options_HistPointCloud options = new Options_HistPointCloud();
+        public CS_Hist_PointCloud(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Histogram of XZ - X on the Y-Axis and Z on the X-Axis", "Histogram of YZ with Y on the Y-Axis and Z on the X-Axis" };
+            desc = "Create a 2D histogram for the pointcloud in XZ and YZ.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (src.Type() != MatType.CV_32FC3) src = task.pointCloud;
+            rangesX = new Rangef[] { new Rangef(-task.xRange, task.xRange), new Rangef(0, task.MaxZmeters) };
+            rangesY = new Rangef[] { new Rangef(-task.yRange, task.yRange), new Rangef(0, task.MaxZmeters) };
+            int[] sizesX = new int[] { options.xBins, options.zBins };
+            Cv2.CalcHist(new Mat[] { src }, new int[] { 0, 2 }, new Mat(), dst2, 2, sizesX, rangesX);
+            dst2.Set<Point3f>(dst2.Height / 2, 0, new Point3f());
+            int[] sizesY = new int[] { options.yBins, options.zBins };
+            Cv2.CalcHist(new Mat[] { src }, new int[] { 1, 2 }, new Mat(), dst3, 2, sizesY, rangesY);
+            dst3.Set<Point3f>(dst3.Height / 2, 0, new Point3f());
+        }
+    }
+    public class CS_Hist_Kalman : CS_Parent
+    {
+        public Hist_Basics hist = new Hist_Basics();
+        Kalman_Basics kalman = new Kalman_Basics();
+        public CS_Hist_Kalman(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "With Kalman", "Without Kalman" };
+            desc = "Use Kalman to smooth the histogram results.";
+        }
+        public void RunCS(Mat src)
+        {
+            hist.Run(src);
+            dst3 = hist.dst2.Clone();
+            if (hist.histogram.Rows == 0) hist.histogram = new Mat(task.histogramBins, 1, MatType.CV_32F, 0);
+            if (kalman.kInput.Length != task.histogramBins) Array.Resize(ref kalman.kInput, task.histogramBins);
+            for (int i = 0; i < task.histogramBins; i++)
+            {
+                kalman.kInput[i] = hist.histogram.Get<float>(i, 0);
+            }
+            kalman.Run(src);
+            hist.histogram = new Mat(kalman.kOutput.Length, 1, MatType.CV_32FC1, kalman.kOutput);
+            hist.plot.Run(hist.histogram);
+            dst2 = hist.dst2;
         }
     }
 

@@ -6094,3 +6094,27 @@ Public Class Options_Grid : Inherits VB_Parent
         height = heightSlider.value
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_Histogram : Inherits VB_Parent
+    Public minGray As Integer
+    Public maxGray As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Min Gray", 0, 255, 50)
+            sliders.setupTrackBar("Max Gray", 0, 255, 200)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static minSlider = FindSlider("Min Gray")
+        Static maxSlider = FindSlider("Max Gray")
+        If minSlider.Value >= maxSlider.Value Then minSlider.Value = maxSlider.Value - Math.Min(10, maxSlider.Value - 1)
+        If minSlider.Value = maxSlider.Value Then maxSlider.Value += 1
+        minGray = minSlider.value
+        maxGray = maxSlider.value
+    End Sub
+End Class

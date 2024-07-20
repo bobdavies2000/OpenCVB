@@ -1394,6 +1394,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Options_HarrisCorners" Then return new Options_HarrisCorners
 	if algorithmName = "Options_HeatMap" Then return new Options_HeatMap
 	if algorithmName = "Options_HistCompare" Then return new Options_HistCompare
+	if algorithmName = "Options_Histogram" Then return new Options_Histogram
 	if algorithmName = "Options_HistPointCloud" Then return new Options_HistPointCloud
 	if algorithmName = "Options_HistXD" Then return new Options_HistXD
 	if algorithmName = "Options_Homography" Then return new Options_Homography

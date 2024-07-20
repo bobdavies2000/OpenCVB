@@ -358,6 +358,9 @@ Public Class OptionsGlobal
     Public Sub setUnfiltered(val As Boolean)
         unFiltered.Checked = val
     End Sub
+    Public Sub SetUseKalman(val As Boolean)
+        UseKalman.Checked = val
+    End Sub
     Public Function GetUseKalman() As Boolean
         Return UseKalman.Checked
     End Function

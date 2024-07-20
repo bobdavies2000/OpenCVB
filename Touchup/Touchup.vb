@@ -20,6 +20,8 @@ Public Class Touchup
                     Dim split = line.Split(" ")
                     className = split(2)
                 End If
+                If inline.Contains("string desc;") Then Continue For
+                If inline.Contains("IntPtr cPtr;") Then Continue For
                 If inline.Contains(className) Then inline = inline.Replace(className, "CS_" + className)
                 If inline.Contains("VB_Parent") Then inline = inline.Replace("VB_Parent", "CS_Parent")
                 If inline.Contains("RunVB(Mat") Then inline = inline.Replace("RunVB(Mat", "RunCS(Mat")
@@ -51,7 +53,16 @@ Public Class Touchup
                 inline = Replace(inline, "task.rightview", "task.rightView", 1, -1, vbTextCompare)
                 inline = Replace(inline, "task.leftview", "task.leftView", 1, -1, vbTextCompare)
                 inline = Replace(inline, "ColorConversion.BgrToGray", "cv.ColorConversionCodes.BGR2GRAY", 1, -1, vbTextCompare)
-                inline = Replace(inline, "task.pcSplit(2)", "task.pcSplit[2]]")
+                inline = Replace(inline, "task.pcSplit(2)", "task.pcSplit[2]")
+                inline = Replace(inline, "task.pcSplit(1)", "task.pcSplit[1]")
+                inline = Replace(inline, "task.pcSplit(i)", "task.pcSplit[i]")
+                inline = Replace(inline, ".Type", ".Type()")
+                inline = Replace(inline, ".Total", ".Total()")
+                inline = Replace(inline, ".Size", ".Size()")
+                inline = Replace(inline, ".ElemSize", ".ElemSize()")
+                inline = Replace(inline, "CountNonZero", "CountNonZero()")
+                inline = Replace(inline, "absdiff", "Absdiff")
+                inline = Replace(inline, "vbtab", """/t""")
             Else
                 If line.StartsWith("Public Class CS_") Then
                     inline = inline.Replace("Public Class CS_", "Public Class VB_")

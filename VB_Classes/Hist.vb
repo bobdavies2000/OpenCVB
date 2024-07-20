@@ -139,21 +139,15 @@ End Class
 
 Public Class Hist_NormalizeGray : Inherits VB_Parent
     Public histogram As New Hist_Basics
+    Dim options As New Options_Histogram
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Min Gray", 0, 255, 50)
-            sliders.setupTrackBar("Max Gray", 0, 255, 200)
-        End If
-
         labels(2) = "Use sliders to adjust the image and create a histogram of the results"
         desc = "Create a histogram of a normalized image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static minSlider = FindSlider("Min Gray")
-        Static maxSlider = FindSlider("Max Gray")
-        If minSlider.Value >= maxSlider.Value Then minSlider.Value = maxSlider.Value - Math.Min(10, maxSlider.Value - 1)
-        If minSlider.Value = maxSlider.Value Then maxSlider.Value += 1
-        dst3 = src.Normalize(minSlider.Value, maxSlider.Value, cv.NormTypes.MinMax) ' only minMax is working...
+        options.RunVB()
+
+        dst3 = src.Normalize(options.minGray, options.maxGray, cv.NormTypes.MinMax) ' only minMax is working...
         histogram.Run(dst3)
         dst2 = histogram.dst2
     End Sub
