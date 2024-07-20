@@ -6068,3 +6068,29 @@ Public Class Options_Gradient : Inherits VB_Parent
         exponent = contrastSlider.Value / 100
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_Grid : Inherits VB_Parent
+    Public desiredFPS As Integer
+    Public width As Integer
+    Public height As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Grid Cell Width", 1, dst2.Width, 32)
+            sliders.setupTrackBar("Grid Cell Height", 1, dst2.Height, 32)
+            sliders.setupTrackBar("Desired FPS rate", 1, 10, 2)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static widthSlider = FindSlider("Grid Cell Width")
+        Static heightSlider = FindSlider("Grid Cell Height")
+        Static fpsSlider = FindSlider("Desired FPS rate")
+        desiredFPS = fpsSlider.value
+        width = widthSlider.value
+        height = heightSlider.value
+    End Sub
+End Class

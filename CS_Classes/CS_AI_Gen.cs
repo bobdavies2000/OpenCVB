@@ -15,6 +15,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Numerics;
 using System.Windows.Controls;
+using System.Diagnostics;
 
 namespace CS_Classes
 {
@@ -18468,7 +18469,6 @@ public class CS_ApproxPoly_Basics : CS_Parent
     public class CS_FeatureROI_Sorted : CS_Parent
     {
         AddWeighted_Basics addw = new AddWeighted_Basics();
-        Grid_LowRes gridLow = new Grid_LowRes();
         public SortedList<float, Rect> sortedStd = new SortedList<float, Rect>(new compareAllowIdenticalSingle());
         public List<Vec3b> bgrList = new List<Vec3b>();
         public List<Rect> roiList = new List<Rect>();
@@ -21102,6 +21102,571 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.HighlightColor, task.lineWidth);
                 DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, Scalar.Red, task.lineWidth);
             }
+        }
+    }
+    public class CS_GrayToColor_Palette : CS_Parent
+    {
+        Flood_Basics flood = new Flood_Basics();
+        public CS_GrayToColor_Palette(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "Right View", "", "Grayscale left view after palette applied." };
+            if (standalone) task.gOptions.setDisplay1();
+            desc = "Identify the main colors in an image using RedCloud";
+        }
+        public void RunCS(Mat src)
+        {
+            flood.Run(src);
+            dst2 = flood.dst2;
+            labels[2] = flood.labels[2];
+            byte[] indices = new byte[256];
+            Vec3b[] colors = new Vec3b[256];
+            SortedList<int, Vec3b> sorted = new SortedList<int, Vec3b>(new CompareAllowIdenticalInteger());
+            foreach (var rc in task.redCells)
+            {
+                int index = rc.naturalGray;
+                if (index == 0) continue;
+                colors[index] = rc.naturalColor;
+                indices[index] = (byte)index;
+                sorted.Add(index, rc.naturalColor);
+            }
+            int firstIndex = sorted.Keys[0];
+            Vec3b lastColor = colors[firstIndex];
+            for (int i = 0; i < colors.Length; i++)
+            {
+                if (indices[i] == 0) colors[i] = lastColor;
+                else lastColor = colors[i];
+            }
+            dst1 = task.rightView;
+            Mat colorMap = new Mat(256, 1, MatType.CV_8UC3, colors);
+            Cv2.ApplyColorMap(task.leftView, dst3, colorMap);
+        }
+    }
+    public class CS_Grid_Basics : CS_Parent
+    {
+        public List<Rect> gridList = new List<Rect>();
+        public bool updateTaskGridList = true;
+        public CS_Grid_Basics(VBtask task) : base(task)
+        {
+            desc = "Create a grid of squares covering the entire image.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.mouseClickFlag && !task.FirstPass)
+            {
+                task.gridROIclicked = task.gridMap.At<int>(task.ClickPoint.Y, task.ClickPoint.X);
+            }
+            if (task.optionsChanged)
+            {
+                task.gridSize = task.gOptions.getGridSize();
+                task.gridMask = new Mat(src.Size(), MatType.CV_8U);
+                task.gridMap = new Mat(src.Size(), MatType.CV_32S, 255);
+                gridList.Clear();
+                task.gridIndex.Clear();
+                task.gridRows = 0;
+                task.gridCols = 0;
+                int index = 0;
+                for (int y = 0; y < src.Height; y += task.gridSize)
+                {
+                    for (int x = 0; x < src.Width; x += task.gridSize)
+                    {
+                        var roi = ValidateRect(new Rect(x, y, task.gridSize, task.gridSize));
+                        if (roi.Width > 0 && roi.Height > 0)
+                        {
+                            if (x == 0) task.gridRows += 1;
+                            if (y == 0) task.gridCols += 1;
+                            gridList.Add(roi);
+                            task.gridIndex.Add(index);
+                            index++;
+                        }
+                    }
+                }
+                task.subDivisionCount = 9;
+                if (task.color == null) return; // startup condition.
+                if (src.Size() == task.color.Size())
+                {
+                    task.gridMask.SetTo(0);
+                    for (int x = task.gridSize; x < src.Width; x += task.gridSize)
+                    {
+                        var p1 = new cv.Point(x, 0);
+                        var p2 = new cv.Point(x, src.Height);
+                        task.gridMask.Line(p1, p2, 255, task.lineWidth);
+                    }
+                    for (int y = task.gridSize; y < src.Height; y += task.gridSize)
+                    {
+                        var p1 = new cv.Point(0, y);
+                        var p2 = new cv.Point(src.Width, y);
+                        task.gridMask.Line(p1, p2, 255, task.lineWidth);
+                    }
+                    for (int i = 0; i < gridList.Count; i++)
+                    {
+                        var roi = gridList[i];
+                        task.gridMap.Rectangle(roi, i, -1);
+                    }
+                    task.gridNeighbors.Clear();
+                    int xx = 0, yy = 0;
+                    foreach (var roi in gridList)
+                    {
+                        task.gridNeighbors.Add(new List<int>());
+                        for (int i = 0; i < 9; i++)
+                        {
+                            if (i == 0) xx = roi.X - 1;
+                            if (i == 1) xx = roi.X;
+                            if (i == 2) xx = roi.X + roi.Width + 1;
+                            if (i == 3) xx = roi.X - 1;
+                            if (i == 4) xx = roi.X;
+                            if (i == 5) xx = roi.X + roi.Width + 1;
+                            if (i == 6) xx = roi.X - 1;
+                            if (i == 7) xx = roi.X;
+                            if (i == 8) xx = roi.X + roi.Width + 1;
+                                          
+                            if (i == 0) yy = roi.Y - 1;
+                            if (i == 1) yy = roi.Y - 1;
+                            if (i == 2) yy = roi.Y - 1;
+                            if (i == 3) yy = roi.Y;
+                            if (i == 4) yy = roi.Y;
+                            if (i == 5) yy = roi.Y;
+                            if (i == 6) yy = roi.Y + roi.Height + 1;
+                            if (i == 7) yy = roi.Y + roi.Height + 1;
+                            if (i == 8) yy = roi.Y + roi.Height + 1;
+
+                            if (xx >= 0 && xx < src.Width && yy >= 0 && yy < src.Height)
+                            {
+                                task.gridNeighbors.Last().Add(task.gridMap.At<int>(yy, xx));
+                            }
+                        }
+                    }
+                }
+                foreach (var roi in gridList)
+                {
+                    int xSub = roi.X + roi.Width;
+                    int ySub = roi.Y + roi.Height;
+                    if (ySub <= dst2.Height / 3)
+                    {
+                        if (xSub <= dst2.Width / 3) task.subDivisions.Add(0);
+                        if (xSub >= dst2.Width / 3 && xSub <= dst2.Width * 2 / 3) task.subDivisions.Add(1);
+                        if (xSub > dst2.Width * 2 / 3) task.subDivisions.Add(2);
+                    }
+                    if (ySub > dst2.Height / 3 && ySub <= dst2.Height * 2 / 3)
+                    {
+                        if (xSub <= dst2.Width / 3) task.subDivisions.Add(3);
+                        if (xSub >= dst2.Width / 3 && xSub <= dst2.Width * 2 / 3) task.subDivisions.Add(4);
+                        if (xSub > dst2.Width * 2 / 3) task.subDivisions.Add(5);
+                    }
+                    if (ySub > dst2.Height * 2 / 3)
+                    {
+                        if (xSub <= dst2.Width / 3) task.subDivisions.Add(6);
+                        if (xSub >= dst2.Width / 3 && xSub <= dst2.Width * 2 / 3) task.subDivisions.Add(7);
+                        if (xSub > dst2.Width * 2 / 3) task.subDivisions.Add(8);
+                    }
+                }
+            }
+            if (standaloneTest())
+            {
+                dst2 = new Mat(src.Size(), MatType.CV_8U);
+                task.color.CopyTo(dst2);
+                dst2.SetTo(Scalar.White, task.gridMask);
+                labels[2] = "CS_Grid_Basics " + gridList.Count + " (" + task.gridRows + "X" + task.gridCols + ") " +
+                            task.gridSize + "X" + task.gridSize + " regions";
+            }
+            if (updateTaskGridList) task.gridList = gridList;
+        }
+    }
+    public class CS_Grid_BasicsTest : CS_Parent
+    {
+        public CS_Grid_BasicsTest(VBtask task) : base(task)
+        {
+            labels = new[] { "", "", "Each grid element is assigned a value below", "The line is the diagonal for each roi.  Bottom might be a shortened roi." };
+            if (standaloneTest()) desc = "Validation test for Grid_Basics algorithm";
+        }
+        public void RunCS(Mat src)
+        {
+            var mean = Cv2.Mean(src);
+            dst2.SetTo(0);
+            for (int i = 0; i < task.gridList.Count; i++)
+            {
+                var roi = task.gridList[i];
+                Cv2.Subtract(mean, src[roi], dst2[roi]);
+                SetTrueText(i.ToString(), new cv.Point(roi.X, roi.Y));
+            }
+            dst2.SetTo(Scalar.White, task.gridMask);
+            dst3.SetTo(0);
+            Parallel.For(0, task.gridList.Count, i =>
+            {
+                var roi = task.gridList[i];
+                Cv2.Subtract(mean, src[roi], dst3[roi]);
+                DrawLine(dst3[roi], new cv.Point(0, 0), new cv.Point(roi.Width, roi.Height), Scalar.White, task.lineWidth);
+            });
+        }
+    }
+    public class CS_Grid_List : CS_Parent
+    {
+        public CS_Grid_List(VBtask task) : base(task)
+        {
+            labels[2] = "Adjust grid width/height to increase thread count.";
+            if (standaloneTest()) desc = "List the active threads";
+        }
+        public void RunCS(Mat src)
+        {
+            Parallel.ForEach(task.gridList, roi =>
+            {
+                dst3[roi].SetTo(0);
+            });
+            try
+            {
+                var currentProcess = Process.GetCurrentProcess();
+                var myThreads = currentProcess.Threads;
+                string str = "";
+                int threadCount = 0;
+                int notIdle = 0;
+                foreach (ProcessThread thread in myThreads)
+                {
+                    str += thread.Id + " state = " + thread.ThreadState + ", ";
+                    threadCount++;
+                    if (threadCount % 5 == 0) str += Environment.NewLine;
+                    if (thread.ThreadState != ThreadState.Wait) notIdle++;
+                }
+                SetTrueText("There were " + threadCount + " threads in OpenCVB with " + notIdle + " of them not idle when traversing the gridList" + Environment.NewLine + str);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+        }
+    }
+    public class CS_Grid_Rectangles : CS_Parent
+    {
+        public int tilesPerRow;
+        public int tilesPerCol;
+        Options_Grid options = new Options_Grid();
+        public CS_Grid_Rectangles(VBtask task) : base(task)
+        {
+            task.gridMask = new Mat(dst2.Size(), MatType.CV_8U);
+            task.gridMap = new Mat(dst2.Size(), MatType.CV_32S);
+            if (standaloneTest()) desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            if (task.mouseClickFlag) task.gridROIclicked = task.gridMap.At<int>(task.ClickPoint.Y, task.ClickPoint.X);
+            if (task.optionsChanged)
+            {
+                task.gridList.Clear();
+                for (int y = 0; y < dst2.Height; y += options.height)
+                {
+                    for (int x = 0; x < dst2.Width; x += options.width)
+                    {
+                        var roi = new Rect(x, y, options.width, options.height);
+                        if (x + roi.Width >= dst2.Width) roi.Width = dst2.Width - x;
+                        if (y + roi.Height >= dst2.Height) roi.Height = dst2.Height - y;
+                        if (roi.Width > 0 && roi.Height > 0)
+                        {
+                            if (y == 0) tilesPerRow += 1;
+                            if (x == 0) tilesPerCol += 1;
+                            task.gridList.Add(roi);
+                        }
+                    }
+                }
+                task.gridMask.SetTo(0);
+                for (int x = options.width; x < dst2.Width; x += options.width)
+                {
+                    var p1 = new cv.Point(x, 0);
+                    var p2 = new cv.Point(x, dst2.Height);
+                    task.gridMask.Line(p1, p2, 255, task.lineWidth);
+                }
+                for (int y = options.height; y < dst2.Height; y += options.height)
+                {
+                    var p1 = new cv.Point(0, y);
+                    var p2 = new cv.Point(dst2.Width, y);
+                    task.gridMask.Line(p1, p2, 255, task.lineWidth);
+                }
+                for (int i = 0; i < task.gridList.Count; i++)
+                {
+                    var roi = task.gridList[i];
+                    task.gridMap.Rectangle(roi, i, -1);
+                }
+            }
+            if (standaloneTest())
+            {
+                task.color.CopyTo(dst2);
+                dst2.SetTo(Scalar.White, task.gridMask);
+                labels[2] = "Grid_Basics " + task.gridList.Count + " (" + tilesPerRow + "X" + tilesPerCol + ") " +
+                            options.width + "X" + options.height + " regions";
+            }
+        }
+    }
+    public class CS_Grid_FPS : CS_Parent
+    {
+        public bool heartBeat;
+        public TrackBar fpsSlider;
+        int skipCount;
+        int saveSkip;
+        Options_Grid options = new Options_Grid();
+        public CS_Grid_FPS(VBtask task) : base(task)
+        {
+            fpsSlider = FindSlider("Desired FPS rate");
+            desc = "Provide a service that lets any algorithm control its frame rate";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            int fps = (int)(task.fpsRate / options.desiredFPS);
+            if (fps == 0) fps = 1;
+            heartBeat = (task.frameCount % fps) == 0;
+            if (heartBeat)
+            {
+                saveSkip = skipCount;
+                skipCount = 0;
+                if (standaloneTest()) dst2 = src;
+            }
+            else
+            {
+                skipCount++;
+            }
+            strOut = "Grid heartbeat set to " + fpsSlider.Value + " times per second.  " + saveSkip + " frames skipped";
+        }
+    }
+    public class CS_Grid_Neighbors : CS_Parent
+    {
+        Mat mask = new Mat();
+        public CS_Grid_Neighbors(VBtask task) : base(task)
+        {
+            labels = new[] { "", "", "Grid_Basics output", "" };
+            desc = "Click any grid element to see its neighbors";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.gridRows != (int)(dst2.Height / 10))
+            {
+                task.gOptions.setGridSize((int)(dst2.Height / 10));
+                task.gridRows = task.gridSize;
+                task.grid.Run(src);
+            }
+            dst2 = src;
+            if (standaloneTest())
+            {
+                if (task.heartBeat)
+                {
+                    task.mouseClickFlag = true;
+                    task.ClickPoint = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                }
+            }
+            SetTrueText("Click any grid entry to see its neighbors", 3);
+            if (task.optionsChanged) mask = task.gridMask.Clone();
+            if (task.mouseClickFlag)
+            {
+                mask = task.gridMask.Clone();
+                int roiIndex = task.gridMap.At<int>(task.ClickPoint.Y, task.ClickPoint.X);
+                foreach (int index in task.gridNeighbors[roiIndex])
+                {
+                    var roi = task.gridList[index];
+                    mask.Rectangle(roi, Scalar.White);
+                }
+            }
+            dst2.SetTo(Scalar.White, mask);
+        }
+    }
+    public class CS_Grid_Special : CS_Parent
+    {
+        public int gridWidth = 10;
+        public int gridHeight = 10;
+        public List<Rect> gridList = new List<Rect>();
+        public int gridRows;
+        public int gridCols;
+        public Mat gridMask;
+        public List<List<int>> gridNeighbors = new List<List<int>>();
+        public Mat gridMap;
+        public CS_Grid_Special(VBtask task) : base(task)
+        {
+            gridMask = new Mat(dst2.Size(), MatType.CV_8U);
+            gridMap = new Mat(dst2.Size(), MatType.CV_32S);
+            desc = "Grids are normally square.  CS_Grid_Special allows grid elements to be rectangles.  Specify the Y size.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.optionsChanged)
+            {
+                gridWidth = task.gridSize;
+                gridList.Clear();
+                gridRows = 0;
+                gridCols = 0;
+                for (int y = 0; y < dst2.Height; y += gridHeight)
+                {
+                    for (int x = 0; x < dst2.Width; x += gridWidth)
+                    {
+                        var roi = new Rect(x, y, gridWidth, gridHeight);
+                        if (x + roi.Width >= dst2.Width) roi.Width = dst2.Width - x;
+                        if (y + roi.Height >= dst2.Height) roi.Height = dst2.Height - y;
+                        if (roi.Width > 0 && roi.Height > 0)
+                        {
+                            if (x == 0) gridRows += 1;
+                            if (y == 0) gridCols += 1;
+                            gridList.Add(roi);
+                        }
+                    }
+                }
+                gridMask.SetTo(0);
+                for (int x = gridWidth; x < dst2.Width; x += gridWidth)
+                {
+                    var p1 = new cv.Point(x, 0);
+                    var p2 = new cv.Point(x, dst2.Height);
+                    gridMask.Line(p1, p2, 255, task.lineWidth);
+                }
+                for (int y = gridHeight; y < dst2.Height; y += gridHeight)
+                {
+                    var p1 = new cv.Point(0, y);
+                    var p2 = new cv.Point(dst2.Width, y);
+                    gridMask.Line(p1, p2, 255, task.lineWidth);
+                }
+                for (int i = 0; i < task.gridList.Count; i++)
+                {
+                    var roi = gridList[i];
+                    gridMap.Rectangle(roi, i, -1);
+                }
+                gridNeighbors.Clear();
+                foreach (var roi in gridList)
+                {
+                    gridNeighbors.Add(new List<int>());
+                    int x = 0, y = 0;
+                    for (int i = 0; i < 9; i++)
+                    {
+                        if (i == 0) x = roi.X - 1;
+                        if (i == 1) x = roi.X;
+                        if (i == 2) x = roi.X + roi.Width + 1;
+                        if (i == 3) x = roi.X - 1;
+                        if (i == 4) x = roi.X;
+                        if (i == 5) x = roi.X + roi.Width + 1;
+                        if (i == 6) x = roi.X - 1;
+                        if (i == 7) x = roi.X;
+                        if (i == 8) x = roi.X + roi.Width + 1;
+
+                        if (i == 0) x = roi.Y - 1;
+                        if (i == 1) x = roi.Y - 1;
+                        if (i == 2) x = roi.Y - 1;
+                        if (i == 3) x = roi.Y;
+                        if (i == 4) x = roi.Y;
+                        if (i == 5) x = roi.Y;
+                        if (i == 6) x = roi.Y + roi.Height + 1;
+                        if (i == 7) x = roi.Y + roi.Height + 1;
+                        if (i == 8) x = roi.Y + roi.Height + 1;
+
+                        if (x >= 0 && x < dst2.Width && y >= 0 && y < dst2.Height)
+                        {
+                            gridNeighbors.Last().Add(gridMap.At<int>(y, x));
+                        }
+                    }
+                }
+            }
+            if (standaloneTest())
+            {
+                task.color.CopyTo(dst2);
+                dst2.SetTo(Scalar.White, gridMask);
+                labels[2] = "Grid_Basics " + gridList.Count + " (" + gridRows + "X" + gridCols + ") " +
+                            gridWidth + "X" + gridHeight + " regions";
+            }
+        }
+    }
+    public class CS_Grid_QuarterRes : CS_Parent
+    {
+        public List<Rect> gridList = new List<Rect>();
+        Grid_Basics grid = new Grid_Basics();
+        Mat inputSrc;
+        public CS_Grid_QuarterRes(VBtask task) : base(task)
+        {
+            inputSrc = new Mat(task.quarterRes, MatType.CV_8U, 0);
+            grid.updateTaskGridList = false;
+            desc = "Provide the grid list for the lowest resolution of the current stream.";
+        }
+        public void RunCS(Mat src)
+        {
+            grid.Run(inputSrc);
+            gridList = grid.gridList;
+            if (standaloneTest()) dst2 = task.gridMask;
+        }
+    }
+
+    public class CS_Grid_MinMaxDepth : CS_Parent
+    {
+        public PointPair[] minMaxLocs = new PointPair[1];
+        public Vec2f[] minMaxVals = new Vec2f[1];
+        public CS_Grid_MinMaxDepth(VBtask task) : base(task)
+        {
+            task.gOptions.setGridSize(8);
+            UpdateAdvice(traceName + ": goptions 'Grid Square Size' has direct impact.");
+            desc = "Find the min and max depth within each grid roi.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (minMaxLocs.Length != task.gridList.Count) Array.Resize(ref minMaxLocs, task.gridList.Count);
+            if (minMaxVals.Length != task.gridList.Count) Array.Resize(ref minMaxVals, task.gridList.Count);
+            mmData mm = new mmData();
+            for (int i = 0; i < minMaxLocs.Length; i++)
+            {
+                var roi = task.gridList[i];
+                task.pcSplit[2][roi].MinMaxLoc(out mm.minVal, out mm.maxVal, out mm.minLoc, out mm.maxLoc, task.depthMask[roi]);
+                minMaxLocs[i] = new PointPair(mm.minLoc, mm.maxLoc);
+                minMaxVals[i] = new Vec2f((float) mm.minVal, (float) mm.maxVal);
+            }
+            if (standaloneTest())
+            {
+                dst2.SetTo(0);
+                for (int i = 0; i < minMaxLocs.Length; i++)
+                {
+                    var lp = minMaxLocs[i];
+                    DrawCircle(dst2[task.gridList[i]], lp.p2, task.DotSize, Scalar.Red);
+                    DrawCircle(dst2[task.gridList[i]], lp.p1, task.DotSize, Scalar.White);
+                }
+                dst2.SetTo(Scalar.White, task.gridMask);
+            }
+        }
+    }
+    public class CS_Grid_TrackCenter : CS_Parent
+    {
+        public cv.Point center;
+        Match_Basics match = new Match_Basics();
+        public CS_Grid_TrackCenter(VBtask task) : base(task)
+        {
+            if (standalone) task.gOptions.setShowGrid(true);
+            desc = "Track a cell near the center of the grid";
+        }
+        public void RunCS(Mat src)
+        {
+            if (match.correlation < match.options.correlationMin || task.gOptions.getDebugCheckBox())
+            {
+                task.gOptions.setDebugCheckBox(false);
+                int index = task.gridMap.Get<int>(dst2.Height / 2, dst2.Width / 2);
+                var roi = task.gridList[index];
+                match.template = src[roi].Clone();
+                center = new cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2);
+            }
+            int templatePad = match.options.templatePad;
+            int templateSize = match.options.templateSize;
+            match.searchRect = ValidateRect(new Rect(center.X - templatePad, center.Y - templatePad, templateSize, templateSize));
+            match.Run(src);
+            center = match.matchCenter;
+            if (standaloneTest())
+            {
+                dst2 = src;
+                dst2.Rectangle(match.matchRect, task.HighlightColor, task.lineWidth + 1, task.lineType);
+                DrawCircle(dst2, center, task.DotSize, Scalar.White);
+                if (task.heartBeat) dst3.SetTo(0);
+                DrawCircle(dst3, center, task.DotSize, task.HighlightColor);
+                SetTrueText(match.correlation.ToString(fmt3), center, 3);
+                labels[3] = "Match correlation = " + match.correlation.ToString(fmt3);
+            }
+        }
+    }
+    public class CS_Grid_ShowMap : CS_Parent
+    {
+        public CS_Grid_ShowMap(VBtask task) : base(task)
+        {
+            desc = "Verify that task.gridMap is laid out correctly";
+        }
+        public void RunCS(Mat src)
+        {
+            task.gridMap.ConvertTo(dst2, MatType.CV_8U);
+            dst3 = ShowPalette(dst2);
         }
     }
 

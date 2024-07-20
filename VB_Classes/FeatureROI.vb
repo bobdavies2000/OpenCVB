@@ -123,7 +123,6 @@ End Class
 
 Public Class FeatureROI_Sorted : Inherits VB_Parent
     Dim addw As New AddWeighted_Basics
-    Dim gridLow As New Grid_LowRes
     Public sortedStd As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingle)
     Public bgrList As New List(Of cv.Vec3b)
     Public roiList As New List(Of cv.Rect)

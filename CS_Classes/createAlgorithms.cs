@@ -552,6 +552,18 @@ namespace CS_Classes
 			if (algorithmName == "CS_Gravity_BasicsOriginal") return new CS_Gravity_BasicsOriginal(task);
 			if (algorithmName == "CS_Gravity_Horizon") return new CS_Gravity_Horizon(task);
 			if (algorithmName == "CS_Gravity_HorizonCompare") return new CS_Gravity_HorizonCompare(task);
+			if (algorithmName == "CS_GrayToColor_Palette") return new CS_GrayToColor_Palette(task);
+			if (algorithmName == "CS_Grid_Basics") return new CS_Grid_Basics(task);
+			if (algorithmName == "CS_Grid_BasicsTest") return new CS_Grid_BasicsTest(task);
+			if (algorithmName == "CS_Grid_FPS") return new CS_Grid_FPS(task);
+			if (algorithmName == "CS_Grid_List") return new CS_Grid_List(task);
+			if (algorithmName == "CS_Grid_MinMaxDepth") return new CS_Grid_MinMaxDepth(task);
+			if (algorithmName == "CS_Grid_Neighbors") return new CS_Grid_Neighbors(task);
+			if (algorithmName == "CS_Grid_QuarterRes") return new CS_Grid_QuarterRes(task);
+			if (algorithmName == "CS_Grid_Rectangles") return new CS_Grid_Rectangles(task);
+			if (algorithmName == "CS_Grid_ShowMap") return new CS_Grid_ShowMap(task);
+			if (algorithmName == "CS_Grid_Special") return new CS_Grid_Special(task);
+			if (algorithmName == "CS_Grid_TrackCenter") return new CS_Grid_TrackCenter(task);
 			if (algorithmName == "CS_Line_Basics") return new CS_Line_Basics(task);
 			if (algorithmName == "CS_Mat_4Click") return new CS_Mat_4Click(task);
 			if (algorithmName == "CS_Mat_4to1") return new CS_Mat_4to1(task);

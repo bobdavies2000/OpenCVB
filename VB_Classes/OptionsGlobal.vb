@@ -325,9 +325,15 @@ Public Class OptionsGlobal
     Public Sub setPixelDifference(val As Integer)
         PixelDiffBar.Value = val
     End Sub
+    Public Sub setShowGrid(val As Boolean)
+        ShowGrid.Checked = val
+    End Sub
     Public Sub setGridSize(val As Integer)
         GridSlider.Value = val
     End Sub
+    Public Function getGridSize() As Integer
+        Return GridSlider.Value
+    End Function
     Public Sub setGridMaximum(val As Integer)
         GridSlider.Maximum = val
     End Sub

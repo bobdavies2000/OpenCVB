@@ -184,28 +184,21 @@ End Class
 Public Class Grid_Rectangles : Inherits VB_Parent
     Public tilesPerRow As Integer
     Public tilesPerCol As Integer
+    Dim options As New Options_Grid
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Grid Cell Width", 1, dst2.Width, 32)
-            sliders.setupTrackBar("Grid Cell Height", 1, dst2.Height, 32)
-        End If
-
         task.gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         task.gridMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S)
         If standaloneTest() Then desc = "Create a grid of rectangles (not necessarily squares) for use with parallel.For"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static widthSlider = FindSlider("Grid Cell Width")
-        Static heightSlider = FindSlider("Grid Cell Height")
-        Dim width = widthSlider.Value
-        Dim height = heightSlider.Value
+        options.RunVB()
 
         If task.mouseClickFlag Then task.gridROIclicked = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         If task.optionsChanged Then
             task.gridList.Clear()
-            For y = 0 To dst2.Height - 1 Step height
-                For x = 0 To dst2.Width - 1 Step width
-                    Dim roi = New cv.Rect(x, y, width, height)
+            For y = 0 To dst2.Height - 1 Step options.height
+                For x = 0 To dst2.Width - 1 Step options.width
+                    Dim roi = New cv.Rect(x, y, options.width, options.height)
                     If x + roi.Width >= dst2.Width Then roi.Width = dst2.Width - x
                     If y + roi.Height >= dst2.Height Then roi.Height = dst2.Height - y
                     If roi.Width > 0 And roi.Height > 0 Then
@@ -217,11 +210,11 @@ Public Class Grid_Rectangles : Inherits VB_Parent
             Next
 
             task.gridMask.SetTo(0)
-            For x = width To dst2.Width - 1 Step width
+            For x = options.width To dst2.Width - 1 Step options.width
                 Dim p1 = New cv.Point(CInt(x), 0), p2 = New cv.Point(CInt(x), dst2.Height)
                 task.gridMask.Line(p1, p2, 255, task.lineWidth)
             Next
-            For y = height To dst2.Height - 1 Step height
+            For y = options.height To dst2.Height - 1 Step options.height
                 Dim p1 = New cv.Point(0, CInt(y)), p2 = New cv.Point(dst2.Width, CInt(y))
                 task.gridMask.Line(p1, p2, 255, task.lineWidth)
             Next
@@ -235,7 +228,7 @@ Public Class Grid_Rectangles : Inherits VB_Parent
             task.color.CopyTo(dst2)
             dst2.SetTo(cv.Scalar.White, task.gridMask)
             labels(2) = "Grid_Basics " + CStr(task.gridList.Count) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
-                          CStr(width) + "X" + CStr(height) + " regions"
+                          CStr(options.width) + "X" + CStr(options.height) + " regions"
         End If
     End Sub
 End Class
@@ -247,16 +240,16 @@ End Class
 
 Public Class Grid_FPS : Inherits VB_Parent
     Public heartBeat As Boolean
-    Public fpsSlider As Windows.Forms.TrackBar
     Dim skipCount As Integer
     Dim saveSkip As Integer
+    Dim options As New Options_Grid
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired FPS rate", 1, 10, 2)
-        fpsSlider = FindSlider("Desired FPS rate")
         desc = "Provide a service that lets any algorithm control its frame rate"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim fps = CInt(task.fpsRate / fpsSlider.Value)
+        options.RunVB()
+
+        Dim fps = CInt(task.fpsRate / options.desiredFPS)
         If fps = 0 Then fps = 1
         heartBeat = (task.frameCount Mod fps) = 0
         If heartBeat Then
@@ -266,7 +259,7 @@ Public Class Grid_FPS : Inherits VB_Parent
         Else
             skipCount += 1
         End If
-        strOut = "Grid heartbeat set to " + CStr(fpsSlider.Value) + " times per second.  " + CStr(saveSkip) + " frames skipped"
+        strOut = "Grid heartbeat set to " + CStr(options.desiredFPS) + " times per second.  " + CStr(saveSkip) + " frames skipped"
     End Sub
 End Class
 
@@ -409,26 +402,7 @@ Public Class Grid_QuarterRes : Inherits VB_Parent
         Static inputSrc As New cv.Mat(task.quarterRes, cv.MatType.CV_8U, 0)
         grid.Run(inputSrc)
         gridList = grid.gridList
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Grid_LowRes : Inherits VB_Parent
-    Public gridList As New List(Of cv.Rect)
-    Dim grid As New Grid_Basics
-    Public Sub New()
-        grid.updateTaskGridList = False
-        desc = "Provide the grid list for the lowest resolution of the current stream."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static inputSrc As New cv.Mat(task.lowRes, cv.MatType.CV_8U, 0)
-        grid.Run(inputSrc)
-        gridList = grid.gridList
+        If standaloneTest() Then dst2 = task.gridMask
     End Sub
 End Class
 
