@@ -183,7 +183,7 @@ End Class
 Public Class HeatMap_GuidedBP : Inherits VB_Parent
     Dim guided As New GuidedBP_Basics
     Public Sub New()
-        task.redOptions.ProjectionThresholdBar.Value = 1
+        task.redOptions.setProjection(1)
         desc = "This is just a placeholder to make it easy to find the GuidedBP_Basics which shows objects in top/side views."
     End Sub
     Public Sub RunVB(src As cv.Mat)

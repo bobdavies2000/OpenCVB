@@ -344,6 +344,12 @@ Public Class OptionsRedCloud
     Public Sub setIdentifyCells(val As Boolean)
         IdentifyCells.Checked = val
     End Sub
+    Public Sub setProjection(val As Integer)
+        ProjectionThresholdBar.Value = val
+    End Sub
+    Public Function getProjection() As Integer
+        Return ProjectionThresholdBar.Value
+    End Function
     Public Function getIdentifyCells() As Boolean
         Return IdentifyCells.Checked
     End Function

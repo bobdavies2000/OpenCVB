@@ -21669,6 +21669,461 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst3 = ShowPalette(dst2);
         }
     }
+    public class CS_GuidedBP_Basics : CS_Parent
+    {
+        public GuidedBP_HotPoints ptHot = new GuidedBP_HotPoints();
+        Mat topMap = new Mat();
+        Mat sideMap = new Mat();
+        public CS_GuidedBP_Basics(VBtask task) : base(task)
+        {
+            topMap = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            sideMap = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Correlate the hot points with the previous generation using a Map";
+        }
+        void runMap(List<Rect> rectList, int dstindex, Mat map)
+        {
+            var sortRects = new SortedList<int, Rect>(new compareAllowIdenticalIntegerInverted());
+            foreach (var r in rectList)
+            {
+                sortRects.Add(r.Width * r.Height, r);
+            }
+            var ptList = new List<Point>();
+            var indices = new List<int>();
+            foreach (var r in sortRects.Values)
+            {
+                var pt = new cv.Point((int)(r.X + r.Width / 2), (int)(r.Y + r.Height / 2));
+                int index = (int)map.At<byte>(pt.Y, pt.X);
+                if (index == 0 || indices.Contains(index))
+                {
+                    index = (index == ptList.Count) ? ptList.Count + 1 : ptList.Count;
+                }
+                ptList.Add(pt);
+                indices.Add(index);
+            }
+            map.SetTo(0);
+            foreach (var r in sortRects.Values)
+            {
+                var pt = new cv.Point((int)(r.X + r.Width / 2), (int)(r.Y + r.Height / 2));
+                var index = indices[ptList.IndexOf(pt)];
+                map.Rectangle(r, index, -1);
+                SetTrueText(index.ToString(), pt, dstindex);
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            ptHot.Run(src);
+            dst2 = ptHot.dst2;
+            dst3 = ptHot.dst3;
+            runMap(ptHot.topRects, 2, topMap);
+            runMap(ptHot.sideRects, 3, sideMap);
+            labels[2] = ptHot.topRects.Count.ToString() + " objects found in the top view";
+            labels[3] = ptHot.sideRects.Count.ToString() + " objects found in the Side view";
+        }
+    }
+    public class CS_GuidedBP_HotPointsKNN : CS_Parent
+    {
+        GuidedBP_HotPoints ptHot = new GuidedBP_HotPoints();
+        KNN_Core knnSide = new KNN_Core();
+        KNN_Core knnTop = new KNN_Core();
+        public CS_GuidedBP_HotPointsKNN(VBtask task) : base(task)
+        {
+            desc = "Correlate the hot points with the previous generation to ID each object";
+        }
+        void runKNN(KNN_Core knn, List<Rect> rectList, Mat dst, int dstindex)
+        {
+            knn.queries.Clear();
+            foreach (var r in rectList)
+            {
+                knn.queries.Add(new Point2f((float)(r.X + r.Width / 2), (float)(r.Y + r.Height / 2)));
+            }
+            if (task.FirstPass) knn.trainInput = new List<Point2f>(knn.queries);
+            knn.Run(empty);
+            for (int i = 0; i < knn.queries.Count; i++)
+            {
+                var p1 = knn.queries[i];
+                var index = knn.result[i, 0];
+                var p2 = knn.trainInput[index];
+                var dist = p1.DistanceTo(p2);
+                var r = rectList[i];
+                if (dist < r.Width / 2 && dist < r.Height / 2)
+                {
+                    dst.Rectangle(r, Scalar.White, task.lineWidth);
+                    var pt = new cv.Point(r.X + r.Width, r.Y + r.Height);
+                    SetTrueText(index.ToString(), pt, dstindex);
+                }
+            }
+            knn.trainInput = new List<Point2f>(knn.queries);
+        }
+        public void RunCS(Mat src)
+        {
+            ptHot.Run(src);
+            dst2 = ptHot.dst2;
+            dst3 = ptHot.dst3;
+            runKNN(knnTop, ptHot.topRects, dst2, 2);
+            runKNN(knnSide, ptHot.sideRects, dst3, 3);
+            labels[2] = ptHot.topRects.Count.ToString() + " objects found in the top view";
+            labels[3] = ptHot.sideRects.Count.ToString() + " objects found in the Side view";
+        }
+    }
+    public class CS_GuidedBP_HotPoints : CS_Parent
+    {
+        public Projection_HistTop histTop = new Projection_HistTop();
+        public Projection_HistSide histSide = new Projection_HistSide();
+        public List<Rect> topRects = new List<Rect>();
+        public List<Rect> sideRects = new List<Rect>();
+        Rect floodRect;
+        Mat mask;
+        public CS_GuidedBP_HotPoints(VBtask task) : base(task)
+        {
+            floodRect = new Rect(1, 1, dst2.Width - 2, dst2.Height - 2);
+            mask = new Mat(new cv.Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U);
+            task.useXYRange = false;
+            desc = "Use floodfill to identify all the objects in both the top and side views.";
+        }
+        List<Rect> hotPoints(ref Mat view)
+        {
+            Rect rect = new Rect();
+            var points = view.FindNonZero();
+            var viewList = new SortedList<int, Point>(new compareAllowIdenticalIntegerInverted());
+            mask.SetTo(0);
+            for (int i = 0; i < points.Rows; i++)
+            {
+                var pt = points.At<Point>(i, 0);
+                int maskOnly = (int)FloodFillFlags.MaskOnly;
+                int count = view.FloodFill(mask, pt, 0, out rect, 0, 0, (cv.FloodFillFlags)(4 | maskOnly | (255 << 8)));
+                if (count > 0) viewList.Add(count, pt);
+            }
+            mask.SetTo(0);
+            var rectList = new List<Rect>();
+            for (int i = 0; i < Math.Min(viewList.Count, 10); i++)
+            {
+                var pt = viewList.ElementAt(i).Value;
+                int fixedRange = (int)FloodFillFlags.FixedRange;
+                view.FloodFill(mask, pt, 0, out rect, 0, 0, (cv.FloodFillFlags)(4 | fixedRange | ((i + 1) << 8)));
+                rectList.Add(new Rect(rect.X - 1, rect.Y - 1, rect.Width, rect.Height));
+            }
+            mask[floodRect].CopyTo(view);
+            return rectList;
+        }
+        public void RunCS(Mat src)
+        {
+            histTop.Run(src.Clone());
+            topRects = hotPoints(ref histTop.dst3);
+            dst2 = ShowPalette(histTop.dst3 * 255 / topRects.Count);
+            histSide.Run(src);
+            sideRects = hotPoints(ref histSide.dst3);
+            dst3 = ShowPalette(histSide.dst3 * 255 / sideRects.Count);
+            if (task.heartBeat) labels[2] = "Top " + topRects.Count.ToString() + " objects identified in the top view.";
+            if (task.heartBeat) labels[3] = "Top " + sideRects.Count.ToString() + " objects identified in the side view.";
+        }
+    }
+    public class CS_GuidedBP_PlanesPlot : CS_Parent
+    {
+        Projection_HistSide histSide = new Projection_HistSide();
+        public CS_GuidedBP_PlanesPlot(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Side view", "Plot of nonzero rows in the side view" };
+            desc = "Plot the likely floor or ceiling areas.";
+        }
+        public void RunCS(Mat src)
+        {
+            histSide.Run(src);
+            dst2 = histSide.dst3;
+            var sumList = new List<int>();
+            dst3.SetTo(0);
+            for (int i = 0; i < dst2.Rows; i++)
+            {
+                int x = dst2.Row(i).CountNonZero();
+                sumList.Add(x);
+                DrawLine(dst3, new cv.Point(0, i), new cv.Point(x, i), Scalar.White, task.lineWidth);
+            }
+            var flatSurfacesInRow = new List<int>();
+            for (int i = 0; i < sumList.Count; i++)
+            {
+                if (sumList[i] > 5)
+                {
+                    int maxSpike = sumList[i];
+                    int maxRow = i;
+                    for (int j = i + 1; j < sumList.Count; j++)
+                    {
+                        if (maxSpike < sumList[j])
+                        {
+                            maxSpike = sumList[j];
+                            maxRow = j;
+                        }
+                        if (sumList[j] == 0)
+                        {
+                            i = j;
+                            flatSurfacesInRow.Add(maxRow);
+                            break;
+                        }
+                    }
+                }
+            }
+            labels[2] = "There were " + flatSurfacesInRow.Count.ToString() + " flat surface candidates found.";
+        }
+    }
+    public class CS_GuidedBP_Points : CS_Parent
+    {
+        public GuidedBP_Basics hotPoints = new GuidedBP_Basics();
+        public int classCount;
+        public cv.Point selectedPoint;
+        public List<Rect> topRects = new List<Rect>();
+        public List<Rect> sideRects = new List<Rect>();
+        public Mat histogramTop = new Mat();
+        public Mat histogramSide = new Mat();
+        public Mat backP = new Mat();
+        public CS_GuidedBP_Points(VBtask task) : base(task)
+        {
+            desc = "Use floodfill to identify all the objects in the selected view then build a backprojection that identifies k objects in the image view.";
+        }
+        public void RunCS(Mat src)
+        {
+            hotPoints.Run(src);
+            hotPoints.ptHot.histTop.dst3.ConvertTo(histogramTop, MatType.CV_32F);
+            Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsTop, histogramTop, backP, task.rangesTop);
+            topRects = new List<Rect>(hotPoints.ptHot.topRects);
+            sideRects = new List<Rect>(hotPoints.ptHot.sideRects);
+            dst2 = ShowPalette(backP * 255 / topRects.Count);
+            hotPoints.ptHot.histSide.dst3.ConvertTo(histogramSide, MatType.CV_32F);
+            Cv2.CalcBackProject(new Mat[] { task.pointCloud }, task.channelsSide, histogramSide, dst3, task.rangesSide);
+            dst3 = ShowPalette(dst3 * 255 / sideRects.Count);
+            classCount = topRects.Count + sideRects.Count;
+            if (task.mouseClickFlag) selectedPoint = task.ClickPoint;
+            if (task.heartBeat) labels[2] = topRects.Count.ToString() + " objects were identified in the top view.";
+            if (task.heartBeat) labels[3] = sideRects.Count.ToString() + " objects were identified in the side view.";
+        }
+    }
+    public class CS_GuidedBP_Lookup : CS_Parent
+    {
+        GuidedBP_Basics guided = new GuidedBP_Basics();
+        public CS_GuidedBP_Lookup(VBtask task) : base(task)
+        {
+            task.ClickPoint = new cv.Point(dst2.Width / 2, dst2.Height / 2);
+            desc = "Given a point cloud pixel, look up which object it is in.  Click in the Depth RGB image to test.";
+        }
+        public void RunCS(Mat src)
+        {
+            guided.Run(src);
+            dst2 = guided.dst2;
+            labels[2] = guided.labels[2];
+        }
+    }
+    public class CS_GuidedBP_Depth : CS_Parent
+    {
+        public PointCloud_Histograms hist = new PointCloud_Histograms();
+        Palette_Random myPalette = new Palette_Random();
+        public int classCount;
+        public CS_GuidedBP_Depth(VBtask task) : base(task)
+        {
+            task.gOptions.setHistogramBins(16);
+            desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_32FC3) src = task.pointCloud;
+            hist.Run(src);
+            float[] histArray = new float[hist.histogram.Total()];
+            Marshal.Copy(hist.histogram.Data, histArray, 0, histArray.Length);
+            var histList = histArray.ToList();
+            histArray[histList.IndexOf(histList.Max())] = 0;
+            var sortedHist = new SortedList<float, int>(new compareAllowIdenticalSingleInverted());
+            for (int i = 0; i < histArray.Length; i++)
+            {
+                sortedHist.Add(histArray[i], i);
+            }
+            classCount = 0;
+            int count = 0;
+            float[] newSamples = new float[histArray.Length];
+            for (int i = 0; i < sortedHist.Count; i++)
+            {
+                int index = sortedHist.ElementAt(i).Value;
+                count += (int)sortedHist.ElementAt(i).Key;
+                newSamples[index] = classCount;
+                classCount++;
+                if (classCount >= 255) break;
+            }
+            Marshal.Copy(newSamples, 0, hist.histogram.Data, newSamples.Length);
+            Cv2.CalcBackProject(new Mat[] { src }, task.redOptions.channels, hist.histogram, dst2, task.redOptions.ranges);
+            dst2.ConvertTo(dst2, MatType.CV_8U);
+            if (standaloneTest())
+            {
+                labels[3] = "Note that colors are shifting because this is before any matching.";
+                dst2 += 1;
+                dst2.SetTo(0, task.noDepthMask);
+                myPalette.Run(dst2);
+                dst3 = myPalette.dst2;
+            }
+            int depthCount = task.depthMask.CountNonZero();
+            labels[2] = classCount.ToString() + " regions detected in the backprojection - " + string.Format("{0:0%}", (float)count / depthCount);
+        }
+    }
+    public class CS_HeatMap_Basics : CS_Parent
+    {
+        public History_Basics topframes = new History_Basics();
+        public History_Basics sideframes = new History_Basics();
+        public Mat histogramTop = new Mat();
+        public Mat histogramSide = new Mat();
+        Options_HeatMap options = new Options_HeatMap();
+        public CS_HeatMap_Basics(VBtask task) : base(task)
+        {
+            desc = "Highlight concentrations of depth pixels in the side view";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (src.Type() != MatType.CV_32FC3) src = task.pointCloud;
+            Cv2.CalcHist(new Mat[] { src }, task.channelsTop, new Mat(), histogramTop, 2, task.bins2D, task.rangesTop);
+            histogramTop.Row(0).SetTo(0);
+            Cv2.CalcHist(new Mat[] { src }, task.channelsSide, new Mat(), histogramSide, 2, task.bins2D, task.rangesSide);
+            histogramSide.Col(0).SetTo(0);
+            topframes.Run(histogramTop);
+            dst0 = topframes.dst2;
+            sideframes.Run(histogramSide);
+            dst1 = sideframes.dst2;
+            dst2 = ShowPalette(dst0.ConvertScaleAbs());
+            dst3 = ShowPalette(dst1.ConvertScaleAbs());
+            labels[2] = "Top view of heat map with the last " + task.frameHistoryCount.ToString() + " frames";
+            labels[3] = "Side view of heat map with the last " + task.frameHistoryCount.ToString() + " frames";
+        }
+    }
+    public class CS_HeatMap_Grid : CS_Parent
+    {
+        HeatMap_Basics heat = new HeatMap_Basics();
+        public CS_HeatMap_Grid(VBtask task) : base(task)
+        {
+            task.gOptions.setGridSize(5);
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            dst3 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            labels = new string[] { "", "", "Histogram mask for top-down view - original histogram in dst0", "Histogram mask for side view - original histogram in dst1" };
+            desc = "Apply a grid to the HeatMap_OverTime to isolate objects.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_32FC3) src = task.pointCloud;
+            heat.Run(src);
+            dst2.SetTo(0);
+            dst3.SetTo(0);
+            int maxCount1 = 0, maxCount2 = 0;
+            object sync1 = new object(), sync2 = new object();
+            if (task.gOptions.getMultiThreading())
+            {
+                Parallel.ForEach(task.gridList, roi =>
+                {
+                    int count1 = heat.histogramTop[roi].CountNonZero();
+                    dst2[roi].SetTo(count1);
+                    if (count1 > maxCount1)
+                    {
+                        lock (sync1)
+                        {
+                            maxCount1 = count1;
+                        }
+                    }
+                    int count2 = heat.histogramSide[roi].CountNonZero();
+                    dst3[roi].SetTo(count2);
+                    if (count2 > maxCount2)
+                    {
+                        lock (sync2)
+                        {
+                            maxCount2 = count2;
+                        }
+                    }
+                });
+            }
+            else
+            {
+                foreach (var roi in task.gridList)
+                {
+                    int count1 = heat.histogramTop[roi].CountNonZero();
+                    dst2[roi].SetTo(count1);
+                    if (count1 > maxCount1) maxCount1 = count1;
+                    int count2 = heat.histogramSide[roi].CountNonZero();
+                    dst3[roi].SetTo(count2);
+                    if (count2 > maxCount2) maxCount2 = count2;
+                }
+            }
+            dst2 *= 255.0 / maxCount1;
+            dst3 *= 255.0 / maxCount2;
+        }
+    }
+    public class CS_HeatMap_HotNot : CS_Parent
+    {
+        HeatMap_Hot heat = new HeatMap_Hot();
+        public CS_HeatMap_HotNot(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Mask of cool areas in the heat map - top view", "Mask of cool areas in the heat map - side view" };
+            desc = "Isolate points with low histogram values in side and top views";
+        }
+        public void RunCS(Mat src)
+        {
+            heat.Run(src);
+            dst0 = heat.dst2.ConvertScaleAbs();
+            dst1 = heat.dst3.ConvertScaleAbs();
+            dst2 = dst0.Threshold(task.redOptions.getProjection(), 255, ThresholdTypes.Binary);
+            dst3 = dst1.Threshold(task.redOptions.getProjection(), 255, ThresholdTypes.Binary);
+        }
+    }
+    public class CS_HeatMap_Hot : CS_Parent
+    {
+        Projection_HistTop histTop = new Projection_HistTop();
+        Projection_HistSide histSide = new Projection_HistSide();
+        public CS_HeatMap_Hot(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Mask of hotter areas for the Top View", "Mask of hotter areas for the Side View" };
+            desc = "Isolate masks for just the hotspots in the heat map";
+        }
+        public void RunCS(Mat src)
+        {
+            histTop.Run(src);
+            dst2 = histTop.histogram;
+            histSide.Run(src);
+            dst3 = histSide.histogram;
+            var mmTop = GetMinMax(dst2);
+            var mmSide = GetMinMax(dst3);
+            if (task.heartBeat) labels[2] = mmTop.maxVal.ToString() + " max count " + dst2.CountNonZero() + " pixels in the top down view";
+            if (task.heartBeat) labels[3] = mmSide.maxVal.ToString() + " max count " + dst3.CountNonZero() + " pixels in the side view";
+        }
+    }
+    public class CS_HeatMap_Cell : CS_Parent
+    {
+        Flood_Basics flood = new Flood_Basics();
+        HeatMap_Hot heat = new HeatMap_Hot();
+        public CS_HeatMap_Cell(VBtask task) : base(task)
+        {
+            task.redOptions.setIdentifyCells(true);
+            if (standalone) task.gOptions.setDisplay1();
+            desc = "Display the heat map for the selected cell";
+        }
+        public void RunCS(Mat src)
+        {
+            flood.Run(src);
+            dst2 = flood.dst2;
+            labels[2] = flood.labels[2];
+            dst0 = new Mat(dst2.Size(), MatType.CV_32FC3, 0);
+            task.pointCloud[task.rc.rect].CopyTo(dst0[task.rc.rect], task.rc.mask);
+            heat.Run(dst0);
+            dst1 = heat.dst2;
+            dst3 = heat.dst3;
+            labels[1] = heat.labels[2];
+            labels[3] = heat.labels[3];
+        }
+    }
+    public class CS_HeatMap_GuidedBP : CS_Parent
+    {
+        GuidedBP_Basics guided = new GuidedBP_Basics();
+        public CS_HeatMap_GuidedBP(VBtask task) : base(task)
+        {
+            task.redOptions.setProjection(1);
+            desc = "This is just a placeholder to make it easy to find the GuidedBP_Basics which shows objects in top/side views.";
+        }
+        public void RunCS(Mat src)
+        {
+            guided.Run(src);
+            dst2 = guided.dst2;
+            dst3 = guided.dst3;
+            labels = guided.labels;
+        }
+    }
 
 
 

@@ -361,6 +361,9 @@ Public Class OptionsGlobal
     Public Function GetUseKalman() As Boolean
         Return UseKalman.Checked
     End Function
+    Public Function getMultiThreading() As Boolean
+        Return UseMultiThreading.Checked
+    End Function
     Public Sub setRGBFilterActive(val As Boolean)
         RGBFilterActive.Checked = val
     End Sub
