@@ -16158,6 +16158,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public void RunCS(Mat src)
         {
             match.Run(src);
+            if (match.mpList.Count() == 0) return;
             dst1 = match.dst1.Clone();
             dst2 = match.dst2.Clone();
             dst3 = match.dst3.Clone();
@@ -16858,7 +16859,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 lengthReject++;
                 lastLength = bestLength;
             }
-            labels[3] = "Length rejects = " + (lengthReject / task.frameCount).ToString("P0");
+            labels[3] = "Length rejects = " + (lengthReject / (task.frameCount + 1)).ToString("P0");
         }
     }
 
@@ -20657,6 +20658,20 @@ public class CS_ApproxPoly_Basics : CS_Parent
             labels[2] = tracker.fuzzy.sortContours.Count + " regions were found in the image.";
         }
     }
+    public class CS_Gabor_Basics : CS_Parent
+    {
+        public Options_Gabor options = new Options_Gabor();
+        public CS_Gabor_Basics(VBtask task) : base(task)
+        {
+            desc = "Explore Gabor kernel";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2 = src.Filter2D(MatType.CV_8UC3, options.gKernel);
+        }
+    }
+    
 
 
 

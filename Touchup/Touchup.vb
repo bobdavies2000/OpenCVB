@@ -50,6 +50,7 @@ Public Class Touchup
                 inline = Replace(inline, "bgr2gray", "BGR2GRAY", 1, -1, vbTextCompare)
                 inline = Replace(inline, "task.rightview", "task.rightView", 1, -1, vbTextCompare)
                 inline = Replace(inline, "task.leftview", "task.leftView", 1, -1, vbTextCompare)
+                inline = Replace(inline, "ColorConversion.BgrToGray", "cv.ColorConversionCodes.BGR2GRAY", 1, -1, vbTextCompare)
             Else
                 If line.StartsWith("Public Class CS_") Then
                     inline = inline.Replace("Public Class CS_", "Public Class VB_")

@@ -169,6 +169,7 @@ Public Class FeatureLeftRight_Grid : Inherits VB_Parent
     End Sub
     Public Sub RunVB(src As cv.Mat)
         match.Run(src)
+        If match.mpList.Count = 0 Then Exit Sub
         dst1 = match.dst1.Clone
         dst2 = match.dst2.Clone
         dst3 = match.dst3.Clone

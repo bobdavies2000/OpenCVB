@@ -539,6 +539,7 @@ namespace CS_Classes
 			if (algorithmName == "CS_Fuzzy_NeighborProof") return new CS_Fuzzy_NeighborProof(task);
 			if (algorithmName == "CS_Fuzzy_TrackerDepth") return new CS_Fuzzy_TrackerDepth(task);
 			if (algorithmName == "CS_Fuzzy_TrackerDepthClick") return new CS_Fuzzy_TrackerDepthClick(task);
+			if (algorithmName == "CS_Gabor_Basics") return new CS_Gabor_Basics(task);
 			if (algorithmName == "CS_Line_Basics") return new CS_Line_Basics(task);
 			if (algorithmName == "CS_Mat_4Click") return new CS_Mat_4Click(task);
 			if (algorithmName == "CS_Mat_4to1") return new CS_Mat_4to1(task);

@@ -375,7 +375,7 @@ Public Class FeatureLine_LongestV_Tutorial2 : Inherits VB_Parent
             lengthReject += 1
             lastLength = bestLength
         End If
-        labels(3) = "Length rejects = " + Format(lengthReject / task.frameCount, "0%")
+        labels(3) = "Length rejects = " + Format(lengthReject / (task.frameCount + 1), "0%")
     End Sub
 End Class
 

@@ -5988,3 +5988,43 @@ Public Class Options_TrackerDepth : Inherits VB_Parent
         minRectSize = minRectSizeSlider.value
     End Sub
 End Class
+
+
+
+
+Public Class Options_Gabor : Inherits VB_Parent
+    Public gKernel As cv.Mat
+    Public ksize As Double
+    Public Sigma As Double
+    Public theta As Double
+    Public lambda As Double
+    Public gamma As Double
+    Public phaseOffset As Double
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Gabor Kernel Size", 0, 50, 15)
+            sliders.setupTrackBar("Gabor Sigma", 0, 100, 4)
+            sliders.setupTrackBar("Gabor Theta (degrees)", 0, 180, 90)
+            sliders.setupTrackBar("Gabor lambda", 0, 100, 10)
+            sliders.setupTrackBar("Gabor gamma X10", 0, 10, 5)
+            sliders.setupTrackBar("Gabor Phase offset X100", 0, 100, 0)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static ksizeSlider = FindSlider("Gabor Kernel Size")
+        Static sigmaSlider = FindSlider("Gabor Sigma")
+        Static lambdaSlider = FindSlider("Gabor lambda")
+        Static gammaSlider = FindSlider("Gabor gamma X10")
+        Static phaseSlider = FindSlider("Gabor Phase offset X100")
+        Static thetaSlider = FindSlider("Gabor Theta (degrees)")
+        ksize = ksizeSlider.Value * 2 + 1
+        Sigma = sigmaSlider.Value
+        lambda = lambdaSlider.Value
+        gamma = gammaSlider.Value / 10
+        phaseOffset = phaseSlider.Value / 1000
+        theta = Math.PI * thetaSlider.Value / 180
+        gKernel = cv.Cv2.GetGaborKernel(New cv.Size(ksize, ksize), Sigma, theta, lambda, gamma, phaseOffset, cv.MatType.CV_32F)
+        Dim multiplier = gKernel.Sum()
+        gKernel /= 1.5 * multiplier(0)
+    End Sub
+End Class
