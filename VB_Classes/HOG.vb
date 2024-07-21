@@ -3,12 +3,8 @@ Imports cv = OpenCvSharp
 Public Class HOG_Basics : Inherits VB_Parent
     Dim Image As cv.Mat
     Dim ImageProcessed As Boolean
+    Dim options As New Options_HOG
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("HOG Threshold", 0, 100, 0)
-            sliders.setupTrackBar("HOG Stride", 1, 100, 1)
-            sliders.setupTrackBar("HOG Scale", 0, 2000, 300)
-        End If
         desc = "Find people with Histogram of Gradients (HOG) 2D feature"
         If Image Is Nothing Then Image = cv.Cv2.ImRead(task.HomeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
         dst3 = Image.Resize(dst3.Size)
@@ -28,9 +24,7 @@ Public Class HOG_Basics : Inherits VB_Parent
         Next rect
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static thresholdSlider = FindSlider("HOG Threshold")
-        Static strideSlider = FindSlider("HOG Stride")
-        Static scaleSlider = FindSlider("HOG Scale")
+        options.RunVB()
 
         Dim hog As New cv.HOGDescriptor()
         hog.SetSVMDetector(cv.HOGDescriptor.GetDefaultPeopleDetector())
@@ -41,18 +35,15 @@ Public Class HOG_Basics : Inherits VB_Parent
         ' run the detector with default parameters. to get a higher hit-rate
         ' (and more false alarms, respectively), decrease the hitThreshold and
         ' groupThreshold (set groupThreshold to 0 to turn off the grouping completely).
-        Dim threshold = thresholdSlider.Value
-        Dim stride = CInt(strideSlider.Value)
-        Dim scale = scaleSlider.Value / 1000
         If src.Height = 94 Then src = src.Resize(New cv.Size(src.Width * 2, src.Height * 2))
-        Dim found() As cv.Rect = hog.DetectMultiScale(src, threshold, New cv.Size(stride, stride), New cv.Size(24, 16), scale, 2)
+        Dim found() As cv.Rect = hog.DetectMultiScale(src, options.thresholdHOG, New cv.Size(options.strideHOG, options.strideHOG), New cv.Size(24, 16), options.scaleHOG, 2)
         labels(2) = String.Format("{0} region(s) found", found.Length)
         If dst2.Height = 94 Then dst2 = src.Resize(dst2.Size) Else src.CopyTo(dst2)
         drawFoundRectangles(dst2, found)
 
         If ImageProcessed = False Then
             If dst3.Height = 94 Then dst3 = dst3.Resize(New cv.Size(dst3.Width * 2, dst3.Height * 2))
-            found = hog.DetectMultiScale(dst3, threshold, New cv.Size(stride, stride), New cv.Size(24, 16), scale, 2)
+            found = hog.DetectMultiScale(dst3, options.thresholdHOG, New cv.Size(options.strideHOG, options.strideHOG), New cv.Size(24, 16), options.scaleHOG, 2)
             drawFoundRectangles(dst3, found)
             If found.Length > 0 Then
                 ImageProcessed = True

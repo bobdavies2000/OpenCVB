@@ -74,7 +74,7 @@ End Class
 
 
 
-Public Class Horizon_Basics1 : Inherits VB_Parent
+Public Class Horizon_BasicsAlt : Inherits VB_Parent
     Public cloudY As cv.Mat
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
@@ -88,7 +88,7 @@ Public Class Horizon_Basics1 : Inherits VB_Parent
             For y = 0 To cloudY.Rows - 1
                 lastVal = val
                 val = cloudY.Get(Of Single)(y, x)
-                If val > 0 And lastVal < 0 Then
+                If val >= 0 And lastVal <= 0 Then
                     ' change sub-pixel accuracy here 
                     Dim pt = New cv.Point2f(x, y + Math.Abs(val) / Math.Abs(val - lastVal))
                     ptX.Add(pt.X)

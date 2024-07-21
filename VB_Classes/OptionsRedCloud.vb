@@ -350,6 +350,10 @@ Public Class OptionsRedCloud
     Public Sub setProjection(val As Integer)
         ProjectionThresholdBar.Value = val
     End Sub
+
+    Public Sub setYRangeSlider(val As Integer)
+        YRangeSlider.Value = val
+    End Sub
     Public Function getProjection() As Integer
         Return ProjectionThresholdBar.Value
     End Function

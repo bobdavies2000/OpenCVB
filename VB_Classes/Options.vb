@@ -6154,3 +6154,29 @@ Public Class Options_Hist3D : Inherits VB_Parent
         addCloud = addRadio.checked
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_HOG : Inherits VB_Parent
+    Public thresholdHOG As Integer
+    Public strideHOG As Integer
+    Public scaleHOG As Single
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("HOG Threshold", 0, 100, 0)
+            sliders.setupTrackBar("HOG Stride", 1, 100, 1)
+            sliders.setupTrackBar("HOG Scale", 0, 2000, 300)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static thresholdSlider = FindSlider("HOG Threshold")
+        Static strideSlider = FindSlider("HOG Stride")
+        Static scaleSlider = FindSlider("HOG Scale")
+
+        thresholdHOG = thresholdSlider.Value
+        strideHOG = CInt(strideSlider.Value)
+        scaleHOG = scaleSlider.Value / 1000
+    End Sub
+End Class

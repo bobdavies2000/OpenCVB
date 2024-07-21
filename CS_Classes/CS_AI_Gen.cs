@@ -18,6 +18,8 @@ using System.Windows.Controls;
 using System.Diagnostics;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using NAudio.Gui;
+using OpenCvSharp.Internal.Vectors;
+using CS_Classes;
 
 namespace CS_Classes
 {
@@ -25238,6 +25240,769 @@ public class CS_ApproxPoly_Basics : CS_Parent
         [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr HMM_Run(IntPtr HMMPtr, IntPtr bgrPtr, int rows, int cols, int channels);
     }
+    public class CS_HOG_Basics : CS_Parent
+    {
+        Mat Image;
+        bool ImageProcessed;
+        Options_HOG options = new Options_HOG();
+        public CS_HOG_Basics(VBtask task) : base(task)
+        {
+            desc = "Find people with Histogram of Gradients (HOG) 2D feature";
+            if (Image == null) Image = Cv2.ImRead(task.HomeDir + "Data/Asahiyama.jpg", ImreadModes.Color);
+            dst3 = Image.Resize(dst3.Size());
+        }
+        void drawFoundRectangles(cv.Mat dst2, Rect[] found)
+        {
+            foreach (Rect rect in found)
+            {
+                // the HOG detector returns slightly larger rectangles than the real objects.
+                // so we slightly shrink the rectangles to get a nicer output.
+                Rect r = new Rect
+                {
+                    X = rect.X + (int)Math.Truncate(Math.Round(rect.Width * 0.1)),
+                    Y = rect.Y + (int)Math.Truncate(Math.Round(rect.Height * 0.1)),
+                    Width = (int)Math.Truncate(Math.Round(rect.Width * 0.8)),
+                    Height = (int)Math.Truncate(Math.Round(rect.Height * 0.8))
+                };
+                dst2.Rectangle(r.TopLeft, r.BottomRight, Scalar.Red, 3, LineTypes.Link8, 0);
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            HOGDescriptor hog = new HOGDescriptor();
+            hog.SetSVMDetector(HOGDescriptor.GetDefaultPeopleDetector());
+            bool b = hog.CheckDetectorSize();
+            b.ToString();
+            // run the detector with default parameters. to get a higher hit-rate
+            // (and more false alarms, respectively), decrease the hitThreshold and
+            // groupThreshold (set groupThreshold to 0 to turn off the grouping completely).
+            if (src.Height == 94) src = src.Resize(new cv.Size(src.Width * 2, src.Height * 2));
+            Rect[] found = hog.DetectMultiScale(src, options.thresholdHOG, new cv.Size(options.strideHOG, options.strideHOG), new cv.Size(24, 16), options.scaleHOG, 2);
+            labels[2] = string.Format("{0} region(s) found", found.Length);
+            if (dst2.Height == 94) dst2 = src.Resize(dst2.Size()); else src.CopyTo(dst2);
+            drawFoundRectangles(dst2, found);
+            if (!ImageProcessed)
+            {
+                if (dst3.Height == 94) dst3 = dst3.Resize(new cv.Size(dst3.Width * 2, dst3.Height * 2));
+                found = hog.DetectMultiScale(dst3, options.thresholdHOG, new cv.Size(options.strideHOG, options.strideHOG), new cv.Size(24, 16), options.scaleHOG, 2);
+                drawFoundRectangles(dst3, found);
+                if (found.Length > 0)
+                {
+                    ImageProcessed = true;
+                    labels[3] = string.Format("{0} region(s) found", found.Length);
+                }
+                else
+                {
+                    labels[3] = "Try adjusting slider bars.";
+                }
+            }
+        }
+    }
+    public class CS_Homography_Basics : CS_Parent
+    {
+        public List<Point2d> corners1 = new List<Point2d>();
+        public List<Point2d> corners2 = new List<Point2d>();
+        Random_Point2d random = new Random_Point2d();
+        Options_Homography options = new Options_Homography();
+        public CS_Homography_Basics(VBtask task) : base(task)
+        {
+            desc = "Build the homography matrix from 2 lists of corners and use it in a WarpPerspective call.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standaloneTest() && task.heartBeat && (cv.HomographyMethods) options.hMethod == HomographyMethods.None)
+            {
+                random.Run(empty);
+                corners1 = new List<Point2d>(random.PointList);
+                random.Run(empty);
+                corners2 = new List<Point2d>(random.PointList);
+            }
+            // cannot find a homography when less than 4...
+            if (corners1.Count() >= 4 || corners2.Count() >= 4)
+            {
+                Mat H = Cv2.FindHomography(corners1, corners2, (cv.HomographyMethods)options.hMethod);
+                if (H.Width > 0)
+                    dst2 = src.WarpPerspective(H, src.Size());
+            }
+        }
+    }
+    public class CS_Homography_FPoly : CS_Parent
+    {
+        FeaturePoly_BasicsOriginal fPoly = new FeaturePoly_BasicsOriginal();
+        Homography_Basics hGraph = new Homography_Basics();
+        public CS_Homography_FPoly(VBtask task) : base(task)
+        {
+            desc = "Use the feature polygon to warp the current image to a previous image.  This is not useful but demonstrates how to use homography.";
+        }
+        public void RunCS(Mat src)
+        {
+            fPoly.Run(src);
+            dst2 = fPoly.dst1;
+            if (fPoly.fPD.currPoly == null || fPoly.fPD.prevPoly == null) return;
+            if (fPoly.fPD.currPoly.Count() == 0 || fPoly.fPD.prevPoly.Count() == 0) return;
+            if (fPoly.fPD.currPoly.Count() != fPoly.fPD.prevPoly.Count()) return;
+            hGraph.corners1.Clear();
+            hGraph.corners2.Clear();
+            for (int i = 0; i < fPoly.fPD.currPoly.Count(); i++)
+            {
+                Point2f p1 = fPoly.fPD.currPoly[i];
+                Point2f p2 = fPoly.fPD.prevPoly[i];
+                hGraph.corners1.Add(new Point2d(p1.X, p1.Y));
+                hGraph.corners2.Add(new Point2d(p2.X, p2.Y));
+            }
+            hGraph.Run(src);
+            dst3 = hGraph.dst2;
+        }
+    }
+    public class CS_Horizon_Basics : CS_Parent
+    {
+        public List<Point> points = new List<Point>();
+        int resizeRatio = 1;
+        public PointPair vec;
+        public bool vecPresent;
+        public bool autoDisplay;
+        public CS_Horizon_Basics(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Find all the points where depth Y-component transitions from positive to negative";
+        }
+        public void displayResults(Point2f p1, Point2f p2)
+        {
+            if (task.heartBeat)
+            {
+                if (p1.Y >= 1 && p1.Y <= dst2.Height - 1) strOut = "p1 = " + p1.ToString() + "\n" + "p2 = " + p2.ToString() + "\n";
+            }
+            dst2.SetTo(new cv.Scalar(0));
+            foreach (Point pt in points)
+            {
+                cv.Point pX = new cv.Point(pt.X * resizeRatio, pt.Y * resizeRatio);
+                DrawCircle(dst2, pX, task.DotSize, new cv.Scalar(255), -1);
+            }
+            DrawLine(dst2, vec.p1, vec.p2, new cv.Scalar(255), 255);
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_32F) dst0 = PrepareDepthInput(1); else dst0 = src;
+            Size resolution = task.quarterRes;
+            if (dst0.Size() != resolution)
+            {
+                dst0 = dst0.Resize(resolution, 0, 0, cv.InterpolationFlags.Linear);
+                resizeRatio = dst2.Height / (int)resolution.Height;
+            }
+            dst0 = dst0.Abs();
+            dst1 = dst0.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+            dst0.SetTo(task.MaxZmeters, ~dst1);
+            points.Clear();
+            for (int i = dst0.Width / 3; i < dst0.Width * 2 / 3; i++)
+            {
+                mmData mm1 = GetMinMax(dst0.Col(i));
+                if (mm1.minVal > 0 && mm1.minVal < 0.005)
+                {
+                    dst0.Col(i).Set(mm1.minLoc.Y, mm1.minLoc.X, 10);
+                    mmData mm2 = GetMinMax(dst0.Col(i));
+                    if (mm2.minVal > 0 && Math.Abs(mm1.minLoc.Y - mm2.minLoc.Y) <= 1) points.Add(new cv.Point(i, mm1.minLoc.Y));
+                }
+            }
+            labels[2] = points.Count() + " points found. ";
+            cv.Point p1 = new cv.Point(), p2 = new cv.Point();
+            if (points.Count() >= 2)
+            {
+                p1 = new cv.Point(resizeRatio * points[points.Count() - 1].X, resizeRatio * points[points.Count() - 1].Y);
+                p2 = new cv.Point(resizeRatio * points[0].X, resizeRatio * points[0].Y);
+            }
+            double distance = p1.DistanceTo(p2);
+            if (distance < 10) // enough to get a line with some credibility
+            {
+                points.Clear();
+                vecPresent = false;
+                vec = new PointPair();
+                strOut = "Horizon not found \n" + "The distance of p1 to p2 is " + (int)distance + " pixels.";
+            }
+            else
+            {
+                PointPair lp = new PointPair(p1, p2);
+                vec = lp.edgeToEdgeLine(dst2.Size());
+                vecPresent = true;
+                if (standaloneTest() || autoDisplay) displayResults(p1, p2);
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_Horizon_BasicsAlt : CS_Parent
+    {
+        public Mat cloudY;
+        public CS_Horizon_BasicsAlt(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Search for the transition from positive to negative to find the horizon.";
+        }
+        Point2f findTransition(int startCol, int stopCol, int stepCol)
+        {
+            float val = 0, lastVal = 0;
+            List<float> ptX = new List<float>();
+            List<float> ptY = new List<float>();
+            for (int x = startCol; x <= stopCol; x += stepCol)
+            {
+                for (int y = 0; y < cloudY.Rows; y++)
+                {
+                    lastVal = val;
+                    val = cloudY.At<float>(y, x);
+                    if (val > 0 && lastVal < 0)
+                    {
+                        // change sub-pixel accuracy here 
+                        Point2f pt = new Point2f(x, y + Math.Abs(val) / Math.Abs(val - lastVal));
+                        ptX.Add(pt.X);
+                        ptY.Add(pt.Y);
+                        if (ptX.Count() >= task.frameHistoryCount)
+                            return new Point2f(ptX.Average(), ptY.Average());
+                    }
+                }
+            }
+            return new Point2f();
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.useGravityPointcloud)
+            {
+                cloudY = task.pcSplit[1]; // already oriented to gravity
+            }
+            else
+            {
+                // rebuild the pointcloud so it is oriented to gravity.
+                Mat pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat().Reshape(3, task.pointCloud.Rows);
+                Mat[] split = pc.Split();
+                cloudY = split[1];
+            }
+            Point2f p1 = findTransition(0, cloudY.Width - 1, 1);
+            Point2f p2 = findTransition(cloudY.Width - 1, cloudY.Width - 1, -1);
+            PointPair lp = new PointPair(p1, p2);
+            task.horizonVec = lp.edgeToEdgeLine(dst2.Size());
+            if (p1.Y >= 1 && p1.Y <= dst2.Height - 1)
+            {
+                strOut = "p1 = " + p1.ToString() + Environment.NewLine + "p2 = " + p2.ToString() + Environment.NewLine + "      val =  " +
+                          cloudY.At<float>((int)p1.Y, (int)p1.X).ToString() + Environment.NewLine + "lastVal = " + cloudY.At<float>((int)(p1.Y - 1), (int)p1.X).ToString();
+            }
+            SetTrueText(strOut, 3);
+            if (standaloneTest())
+            {
+                dst2.SetTo(0);
+                DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255, task.lineWidth);
+                DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255, task.lineWidth);
+            }
+        }
+    }
+
+    public class CS_Horizon_FindNonZero : CS_Parent
+    {
+        public CS_Horizon_FindNonZero(VBtask task) : base(task)
+        {
+            task.redOptions.setYRangeSlider(3);
+            if (standalone) task.gOptions.setDisplay1();
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            task.gravityVec = new PointPair(new Point2f(dst2.Width / 2, 0), new Point2f(dst2.Width / 2, dst2.Height));
+            task.horizonVec = new PointPair(new Point2f(0, dst2.Height / 2), new Point2f(dst2.Width, dst2.Height / 2));
+            labels = new string[] { "", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask" };
+            desc = "Create lines for the gravity vector and horizon vector in the camera image";
+        }
+        public void RunCS(Mat src)
+        {
+            double xRatio = dst0.Width / task.quarterRes.Width;
+            double yRatio = dst0.Height / task.quarterRes.Height;
+
+            var pc = task.pointCloud.Resize(task.quarterRes);
+            var split = pc.Split();
+            split[2].SetTo(task.MaxZmeters);
+            Cv2.Merge(split, pc);
+
+            pc = (pc.Reshape(1, pc.Rows * pc.Cols) * task.gMatrix).ToMat().Reshape(3, pc.Rows);
+
+            dst1 = split[1].InRange(-0.05, 0.05);
+            var noDepth = task.noDepthMask.Resize(task.quarterRes);
+            dst1.SetTo(0, noDepth);
+            cv.Mat pointsMat = dst1.FindNonZero();
+            if (pointsMat.Rows > 0)
+            {
+                dst2.SetTo(new cv.Scalar(0));
+                List<int> xVals = new List<int>();
+                List<Point2f> points = new List<Point2f>();
+                for (int i = 0; i < pointsMat.Rows; i++)
+                {
+                    cv.Point pt = pointsMat.Get<Point>(i, 0);
+                    xVals.Add(pt.X);
+                    points.Add(new Point2f((float)(pt.X * xRatio), (float)(pt.Y * yRatio)));
+                }
+                Point2f p1 = points[xVals.IndexOf(xVals.Min())];
+                Point2f p2 = points[xVals.IndexOf(xVals.Max())];
+                PointPair lp = new PointPair(p1, p2);
+                task.horizonVec = lp.edgeToEdgeLine(dst2.Size());
+                DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, new cv.Scalar(255), task.lineWidth);
+            }
+            dst3 = split[0].InRange(-0.01, 0.01);
+            dst3.SetTo(new cv.Scalar(0), noDepth);
+            pointsMat = new Mat();
+            pointsMat = dst3.FindNonZero();
+            if (pointsMat.Rows > 0)
+            {
+                List<int> yVals = new List<int>();
+                List<Point2f> points = new List<Point2f>();
+                for (int i = 0; i < pointsMat.Rows; i++)
+                {
+                    cv.Point pt = pointsMat.Get<Point>(i, 0);
+                    yVals.Add(pt.Y);
+                    points.Add(new Point2f((float)(pt.X * xRatio), (float)(pt.Y * yRatio)));
+                }
+                Point2f p1 = points[yVals.IndexOf(yVals.Min())];
+                Point2f p2 = points[yVals.IndexOf(yVals.Max())];
+                if (Math.Abs(p1.X - p2.X) < 2)
+                {
+                    task.gravityVec = new PointPair(new Point2f(dst2.Width / 2, 0), new Point2f(dst2.Width / 2, dst2.Height));
+                }
+                else
+                {
+                    PointPair lp = new PointPair(p1, p2);
+                    task.gravityVec = lp.edgeToEdgeLine(dst2.Size());
+                }
+                DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, new cv.Scalar(255), task.lineWidth);
+            }
+        }
+    }
+    public class CS_Horizon_UnstableResults : CS_Parent
+    {
+        Line_Basics lines = new Line_Basics();
+        public CS_Horizon_UnstableResults(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Create lines for the gravity vector and horizon vector in the camera image";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != cv.MatType.CV_32FC3) src = task.pointCloud;
+            dst1 = task.pcSplit[1].InRange(-0.05, 0.05);
+            dst0.SetTo(new cv.Scalar(0));
+            dst0.SetTo(new cv.Scalar(255), dst1);
+            dst0.SetTo(new cv.Scalar(0), task.noDepthMask);
+            lines.Run(dst0);
+            dst2.SetTo(new cv.Scalar(0));
+            if (lines.lpList.Count() > 0)
+            {
+                SortedList<float, PointPair> distances = new SortedList<float, PointPair>(new compareAllowIdenticalSingleInverted());
+                foreach (PointPair lp in lines.lpList)
+                {
+                    distances.Add((float)lp.p1.DistanceTo(lp.p2), lp);
+                }
+                PointPair lpBest = distances.Values[0];
+                Point2f p1 = new Point2f(0, lpBest.yIntercept);
+                Point2f p2 = new Point2f(dst2.Width, lpBest.slope * dst2.Width + lpBest.yIntercept);
+                task.horizonVec = new PointPair(p1, p2);
+                DrawLine(dst2, p1, p2, new cv.Scalar(255), 255);
+                labels[2] = "horizonVec slope/intercept = " + lpBest.slope.ToString("F4") + "/" + lpBest.yIntercept.ToString("F4");
+            }
+            dst1 = task.pcSplit[0].InRange(-0.01, 0.01);
+            dst0.SetTo(new cv.Scalar(0));
+            dst0.SetTo(new cv.Scalar(255), dst1);
+            dst0.SetTo(new cv.Scalar(0), task.noDepthMask);
+            lines.Run(dst0);
+            if (lines.lpList.Count() > 0)
+            {
+                SortedList<float, PointPair> distances = new SortedList<float, PointPair>(new compareAllowIdenticalSingleInverted());
+                foreach (PointPair lp in lines.lpList)
+                {
+                    distances.Add((float)lp.p1.DistanceTo(lp.p2), lp);
+                }
+                PointPair lpBest = distances.Values[0];
+                Point2f p1 = new Point2f(0, lpBest.yIntercept);
+                Point2f p2 = new Point2f(dst2.Width, lpBest.slope * dst2.Width + lpBest.yIntercept);
+                task.gravityVec = new PointPair(p1, p2);
+                DrawLine(dst2, p1, p2, new cv.Scalar(255), 255);
+                labels[3] = "gravityVec slope/intercept = " + lpBest.slope.ToString("F4") + "/" + lpBest.yIntercept.ToString("F4");
+            }
+        }
+    }
+    public class CS_Horizon_FindNonZeroOld : CS_Parent
+    {
+        public CS_Horizon_FindNonZeroOld(VBtask task) : base(task)
+        {
+            task.gOptions.setGravityUsage(false);
+            task.redOptions.setYRangeSlider(3);
+            if (standalone) task.gOptions.setDisplay1();
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            task.gravityVec = new PointPair(new Point2f(dst2.Width / 2, 0), new Point2f(dst2.Width / 2, dst2.Height));
+            task.horizonVec = new PointPair(new Point2f(0, dst2.Height / 2), new Point2f(dst2.Width, dst2.Height / 2));
+            labels = new string[] { "", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask" };
+            desc = "Create lines for the gravity vector and horizon vector in the camera image";
+        }
+        public void RunCS(Mat src)
+        {
+            double xRatio = dst0.Width / (double)task.quarterRes.Width;
+            double yRatio = dst0.Height / (double)task.quarterRes.Height;
+            Mat splitX = task.pcSplit[0];
+            Mat splitY = task.pcSplit[1];
+            Mat noDepth = task.noDepthMask;
+            if (splitX.Size() != task.quarterRes)
+            {
+                splitX = splitX.Resize(task.quarterRes, 0, 0, cv.InterpolationFlags.Linear);
+                splitY = splitY.Resize(task.quarterRes, 0, 0, cv.InterpolationFlags.Linear);
+                noDepth = noDepth.Resize(task.quarterRes, 0, 0, cv.InterpolationFlags.Linear);
+            }
+            dst1 = splitY.InRange(-0.05, 0.05);
+            dst1.SetTo(new cv.Scalar(0), noDepth);
+            Mat pointsMat = new Mat();
+            pointsMat = dst1.FindNonZero();
+            if (pointsMat.Rows > 0)
+            {
+                dst2.SetTo(new cv.Scalar(0));
+                List<int> xVals = new List<int>();
+                List<Point2f> points = new List<Point2f>();
+                for (int i = 0; i < pointsMat.Rows; i++)
+                {
+                    cv.Point pt = pointsMat.Get<Point>(i, 0);
+                    xVals.Add(pt.X);
+                    points.Add(new Point2f((float)(pt.X * xRatio), (float)(pt.Y * yRatio)));
+                }
+                Point2f p1 = points[xVals.IndexOf(xVals.Min())];
+                Point2f p2 = points[xVals.IndexOf(xVals.Max())];
+                PointPair lp = new PointPair(p1, p2);
+                task.horizonVec = lp.edgeToEdgeLine(dst2.Size());
+                DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, new cv.Scalar(255), 255);
+            }
+            //If task.horizonVec.originalLength < dst2.Width / 2 And task.redOptions.YRangeSlider.Value < task.redOptions.YRangeSlider.Maximum Or pointsMat.Rows = 0 Then
+            //    task.redOptions.YRangeSlider.Value += 1
+            //End If
+            dst3 = splitX.InRange(-0.01, 0.01);
+            dst3.SetTo(new cv.Scalar(0), noDepth);
+            pointsMat = new Mat();
+            pointsMat = dst3.FindNonZero();
+            if (pointsMat.Rows > 0)
+            {
+                List<int> yVals = new List<int>();
+                List<Point2f> points = new List<Point2f>();
+                for (int i = 0; i < pointsMat.Rows; i++)
+                {
+                    cv.Point pt = pointsMat.Get<Point>(i, 0);
+                    yVals.Add(pt.Y);
+                    points.Add(new Point2f((float)(pt.X * xRatio), (float)(pt.Y * yRatio)));
+                }
+                Point2f p1 = points[yVals.IndexOf(yVals.Min())];
+                Point2f p2 = points[yVals.IndexOf(yVals.Max())];
+                if (Math.Abs(p1.X - p2.X) < 2)
+                {
+                    task.gravityVec = new PointPair(new Point2f(dst2.Width / 2, 0), new Point2f(dst2.Width / 2, dst2.Height));
+                }
+                else
+                {
+                    PointPair lp = new PointPair(p1, p2);
+                    task.gravityVec = lp.edgeToEdgeLine(dst2.Size());
+                }
+                DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, new cv.Scalar(255), 255);
+            }
+            //If task.gravityVec.originalLength < dst2.Height / 2 And task.redOptions.XRangeSlider.Value < task.redOptions.XRangeSlider.Maximum Or pointsMat.Rows = 0 Then
+            //    task.redOptions.XRangeSlider.Value += 1
+            //End If
+        }
+    }
+    public class CS_Horizon_Validate : CS_Parent
+    {
+        Match_Basics match = new Match_Basics();
+        Point2f ptLeft, ptRight;
+        Mat leftTemplate, rightTemplate;
+        public CS_Horizon_Validate(VBtask task) : base(task)
+        {
+            desc = "Validate the horizon points using Match_Basics";
+        }
+        public void RunCS(Mat src)
+        {
+            int templatePad = match.options.templatePad;
+            int templateSize = match.options.templateSize;
+            src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            if (task.heartBeat)
+            {
+                ptLeft = task.gravityVec.p1;
+                ptRight = task.gravityVec.p2;
+                Rect r = ValidateRect(new Rect((int)(ptLeft.X - templatePad), (int)(ptLeft.Y - templatePad), templateSize, templateSize));
+                leftTemplate = new Mat(src, r);
+                r = ValidateRect(new Rect((int)(ptRight.X - templatePad), (int)(ptRight.Y - templatePad), templateSize, templateSize));
+                rightTemplate = new Mat(src, r);
+            }
+            else
+            {
+                Rect r = ValidateRect(new Rect((int)(ptLeft.X - templatePad), (int)(ptLeft.Y - templatePad), templateSize, templateSize));
+                match.template = leftTemplate;
+                match.Run(src);
+                ptLeft = match.matchCenter;
+                r = ValidateRect(new Rect((int)(ptRight.X - templatePad), (int)(ptRight.Y - templatePad), templateSize, templateSize));
+                match.template = leftTemplate;
+                match.Run(src);
+                ptLeft = match.matchCenter;
+            }
+        }
+    }
+    public class CS_Horizon_Regress : CS_Parent
+    {
+        Horizon_Basics horizon = new Horizon_Basics();
+        LinearRegression_Basics regress = new LinearRegression_Basics();
+        public CS_Horizon_Regress(VBtask task) : base(task)
+        {
+            desc = "Collect the horizon points and run a linear regression on all the points.";
+        }
+        public void RunCS(Mat src)
+        {
+            horizon.Run(src);
+            foreach (Point point in horizon.points)
+            {
+                regress.x.Add(point.X);
+                regress.y.Add(point.Y);
+            }
+            regress.Run(null);
+            horizon.displayResults(regress.p1, regress.p2);
+            dst2 = horizon.dst2;
+        }
+    }
+    public class CS_Horizon_ExternalTest : CS_Parent
+    {
+        Horizon_Basics horizon = new Horizon_Basics();
+        public CS_Horizon_ExternalTest(VBtask task) : base(task)
+        {
+            desc = "Supply the point cloud input to Horizon_Basics";
+        }
+        public void RunCS(Mat src)
+        {
+            dst0 = PrepareDepthInput(1);
+            horizon.Run(dst0);
+            dst2 = horizon.dst2;
+        }
+    }
+    public class CS_Hough_Basics : CS_Parent
+    {
+        Edge_Canny edges = new Edge_Canny();
+        public LineSegmentPolar[] segments;
+        public Options_Hough options = new Options_Hough();
+        public CS_Hough_Basics(VBtask task) : base(task)
+        {
+            desc = "Use Houghlines to find lines in the image.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            edges.Run(src);
+            segments = Cv2.HoughLines(edges.dst2, options.rho, options.theta, options.threshold);
+            labels[2] = "Found " + segments.Length + " Lines";
+            if (standaloneTest())
+            {
+                src.CopyTo(dst2);
+                dst2.SetTo(Scalar.White, edges.dst2);
+                src.CopyTo(dst3);
+                base.HoughShowLines(ref dst2, segments, options.lineCount);
+                var probSegments = Cv2.HoughLinesP(edges.dst2, options.rho, options.theta, options.threshold);
+                for (int i = 0; i < Math.Min(probSegments.Length, options.lineCount); i++)
+                {
+                    var line = probSegments[i];
+                    dst3.Line(line.P1, line.P2, Scalar.Red, task.lineWidth + 2, task.lineType);
+                }
+                labels[3] = "Probablistic lines = " + probSegments.Length;
+            }
+        }
+    }
+    public class CS_Hough_Circles : CS_Parent
+    {
+        Draw_Circles circles = new Draw_Circles();
+        int method = 3;
+        public CS_Hough_Circles(VBtask task) : base(task)
+        {
+            FindSlider("DrawCount").Value = 3;
+            labels[2] = "Input circles to Hough";
+            labels[3] = "Hough Circles found";
+            desc = "Find circles using HoughCircles.";
+        }
+        public void RunCS(Mat src)
+        {
+            circles.Run(src);
+            dst2 = circles.dst2;
+            Cv2.CvtColor(dst2, dst3, ColorConversionCodes.BGR2GRAY);
+            var cFound = Cv2.HoughCircles(dst3, (cv.HoughModes) method, 1, dst2.Rows / 4, 100, 10, 1, 200);
+            var foundColor = new Scalar(0, 0, 255);
+            dst2.CopyTo(dst3);
+            for (int i = 0; i < cFound.Length; i++)
+            {
+                cv.Point pt = new cv.Point((int)cFound[i].Center.X, (int)cFound[i].Center.Y);
+                DrawCircle(dst3, pt, (int)cFound[i].Radius, foundColor, (int)task.lineType);
+            }
+            labels[3] = cFound.Length + " circles were identified";
+        }
+    }
+    public class CS_Hough_Lines_MT : CS_Parent
+    {
+        Edge_Canny edges = new Edge_Canny();
+        Options_Hough options = new Options_Hough();
+        public CS_Hough_Lines_MT(VBtask task) : base(task)
+        {
+            labels[2] = "Output of the Canny Edge algorithm (no Hough lines)";
+            labels[3] = "Hough Lines for each threaded cell or if no lines, the featureless cell depth data.";
+            desc = "Multithread Houghlines to find lines in image fragments.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            edges.Run(src);
+            dst2 = edges.dst2;
+            var depth8uC3 = task.depthRGB;
+            Parallel.ForEach(task.gridList, roi =>
+            {
+                var segments = Cv2.HoughLines(dst2[roi], options.rho, options.theta, options.threshold);
+                if (segments.Length == 0)
+                {
+                    dst3[roi] = depth8uC3[roi];
+                    return;
+                }
+                dst3[roi].SetTo(0);
+                Mat tmp = dst3[roi];
+                HoughShowLines(ref tmp, segments, 1);
+            });
+            dst2.SetTo(Scalar.White, task.gridMask);
+        }
+    }
+    public class CS_Hough_Featureless : CS_Parent
+    {
+        public Edge_Canny edges = new Edge_Canny();
+        public int[] noDepthCount;
+        public Options_Hough options = new Options_Hough();
+        public Vec3b[] roiColor;
+        public CS_Hough_Featureless(VBtask task) : base(task)
+        {
+            task.gOptions.setGridSize(10);
+            labels[2] = "Featureless mask";
+            desc = "Multithread Houghlines to find featureless regions in an image.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            edges.Run(src);
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            int regionCount = 0;
+            noDepthCount = new int[task.gridList.Count()];
+            roiColor = new Vec3b[task.gridList.Count()];
+            foreach (var roi in task.gridList)
+            {
+                var segments = Cv2.HoughLines(edges.dst2[roi], options.rho, options.theta, options.threshold);
+                if (edges.dst2[roi].CountNonZero() == 0)
+            {
+                    regionCount++;
+                    dst2[roi].SetTo(255);
+                }
+            }
+            dst3.SetTo(0);
+            src.CopyTo(dst3, dst2);
+            labels[2] = "FeatureLess Regions = " + regionCount;
+            labels[3] = "Of the " + task.gridList.Count() + " grid elements, " + regionCount + " had no edge or hough features present";
+        }
+    }
+    public class CS_Hough_FeatureLessTopX : CS_Parent
+    {
+        public Edge_Canny edges = new Edge_Canny();
+        public Options_Hough options = new Options_Hough();
+        public Mat maskFless;
+        public Mat maskFeat;
+        public Mat maskPredict;
+        public CS_Hough_FeatureLessTopX(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            task.gOptions.setGridSize(10);
+            maskFless = new Mat(dst2.Size(), MatType.CV_8U);
+            maskFeat = new Mat(dst2.Size(), MatType.CV_8U);
+            maskPredict = new Mat(dst2.Size(), MatType.CV_8U);
+            labels = new string[] { "", "", "Areas without features", "Areas with features" };
+            desc = "Multithread Houghlines to find featureless regions in an image.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            var segSlider = FindSlider("Minimum feature pixels");
+            int minSegments = segSlider.Value;
+            edges.Run(src);
+            src.CopyTo(dst2);
+            maskFless.SetTo(0);
+            maskFeat.SetTo(0);
+            Parallel.ForEach(task.gridList, roi =>
+            {
+            var segments = Cv2.HoughLines(edges.dst2[roi], options.rho, options.theta, options.threshold);
+            if (segments.Length == 0) maskFless[roi].SetTo(255);
+            if (edges.dst2[roi].CountNonZero() >= minSegments) maskFeat[roi].SetTo(255);
+        });
+        maskPredict.SetTo(255);
+        maskPredict.SetTo(0, maskFless);
+        maskPredict.SetTo(0, maskFeat);
+        dst1.SetTo(0);
+        src.CopyTo(dst1, maskPredict);
+        int pCount = maskPredict.CountNonZero();
+        labels[1] = string.Format("{0:0%} are inbetween feature and featureless", (double) pCount / dst1.Total());
+        dst2.SetTo(0);
+        src.CopyTo(dst2, maskFless);
+        dst3.SetTo(0);
+        src.CopyTo(dst3, maskFeat);
+    }
+}
+public class CS_Hough_LaneFinder : CS_Parent
+{
+    LaneFinder_HLSColor hls = new LaneFinder_HLSColor();
+    public LineSegmentPoint[] segments;
+    public Mat mask;
+    public int laneLineMinY;
+    public CS_Hough_LaneFinder(VBtask task) : base(task)
+    {
+        labels = new string[] { "Original video image", "Mask to isolate lane regions", "Combined yellow and white masks", "HoughLines output" };
+        desc = "Use Hough to isolate features in the mask of the road.";
+    }
+    public void RunCS(Mat src)
+    {
+        hls.Run(empty);
+        if (task.optionsChanged)
+        {
+            int w = hls.input.video.dst2.Width;
+            int h = hls.input.video.dst2.Height;
+            var bl = new cv.Point(w * 0.1, h * 0.95);
+            var tl = new cv.Point(w * 0.4, h * 0.6);
+            var br = new cv.Point(w * 0.95, h * 0.95);
+            var tr = new cv.Point(w * 0.6, h * 0.6);
+            var pList = new Point[] { bl, tl, tr, br };
+            mask = new Mat(new cv.Size(w, h), MatType.CV_8U, 0);
+            mask.FillConvexPoly(pList, Scalar.White, task.lineType);
+        }
+        dst1 = mask.Clone();
+        dst0 = hls.dst0;
+        dst2 = new Mat(mask.Size(), MatType.CV_8U, 0);
+        hls.dst3.CopyTo(dst2, mask);
+        int rho = 1;
+        double theta = Cv2.PI / 180;
+        int threshold = 20;
+        int minLineLength = 20;
+        int maxLineGap = 300;
+        segments = Cv2.HoughLinesP(dst2.Clone(), rho, theta, threshold, minLineLength, maxLineGap);
+        dst3 = new Mat(mask.Size(), MatType.CV_8UC3, 0);
+        laneLineMinY = dst2.Height;
+        for (int i = 0; i < segments.Length; i++)
+        {
+            if (laneLineMinY > segments[i].P1.Y) laneLineMinY = segments[i].P1.Y;
+            if (laneLineMinY > segments[i].P2.Y) laneLineMinY = segments[i].P2.Y;
+            DrawLine(dst3, segments[i].P1, segments[i].P2, task.HighlightColor, task.lineWidth);
+        }
+    }
+}
+public class CS_Hough_Sudoku : CS_Parent
+{
+    Hough_Basics hough = new Hough_Basics();
+    public CS_Hough_Sudoku(VBtask task) : base(task)
+    {
+        desc = "Successful use of Hough to find lines in Sudoku grid.";
+    }
+    public void RunCS(Mat src)
+    {
+        dst2 = Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size());
+        dst3 = dst2.Clone();
+        hough.Run(dst2);
+        HoughShowLines(ref dst3, hough.segments, hough.options.lineCount);
+    }
+}
 
 
 

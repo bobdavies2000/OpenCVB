@@ -58,13 +58,17 @@ Public Class Touchup
                 inline = Replace(inline, "task.pcSplit(i)", "task.pcSplit[i]")
                 inline = Replace(inline, ".Type", ".Type()")
                 inline = Replace(inline, ".Total", ".Total()")
+                inline = Replace(inline, "CountNonZero", "CountNonZero()")
                 inline = Replace(inline, ".Count", ".Count()")
                 inline = Replace(inline, ".Size", ".Size()")
                 inline = Replace(inline, ".Channels", ".Channels()")
                 inline = Replace(inline, ".ElemSize", ".ElemSize()")
-                inline = Replace(inline, "CountNonZero", "CountNonZero()")
                 inline = Replace(inline, "absdiff", "Absdiff")
                 inline = Replace(inline, "vbtab", """/t""")
+                inline = Replace(inline, "DepthType.", "MatType.")
+                inline = Replace(inline, "Cv8u", "CV_8U")
+
+                inline = Replace(inline, "()(", "(")
                 inline = Replace(inline, "()()", "()")
             Else
                 If line.StartsWith("Public Class CS_") Then

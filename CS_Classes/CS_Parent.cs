@@ -710,6 +710,23 @@ namespace CS_Classes
                 Cv2.Rectangle(src, fface, Scalar.Red, task.lineWidth, task.lineType);
             }
         }
+        public void HoughShowLines(ref Mat dst, LineSegmentPolar[] segments, int desiredCount)
+        {
+            for (int i = 0; i < Math.Min(segments.Length, desiredCount); i++)
+            {
+                float rho = segments[i].Rho;
+                float theta = segments[i].Theta;
+
+                double a = Math.Cos(theta);
+                double b = Math.Sin(theta);
+                double x = a * rho;
+                double y = b * rho;
+
+                cv.Point pt1 = new cv.Point(x + 1000 * -b, y + 1000 * a);
+                cv.Point pt2 = new cv.Point(x - 1000 * -b, y - 1000 * a);
+                dst.Line(pt1, pt2, Scalar.Red, task.lineWidth + 1, task.lineType, 0);
+            }
+        }
 
     }
 }

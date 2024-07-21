@@ -36,29 +36,6 @@ End Class
 
 
 
-Module Hough_Exports
-    Public Sub houghShowLines(ByRef dst As cv.Mat, segments() As cv.LineSegmentPolar, desiredCount As Integer)
-        For i = 0 To Math.Min(segments.Length, desiredCount) - 1
-            Dim rho As Single = segments(i).Rho
-            Dim theta As Single = segments(i).Theta
-
-            Dim a As Double = Math.Cos(theta)
-            Dim b As Double = Math.Sin(theta)
-            Dim x As Double = a * rho
-            Dim y As Double = b * rho
-
-            Dim pt1 As cv.Point = New cv.Point(x + 1000 * -b, y + 1000 * a)
-            Dim pt2 As cv.Point = New cv.Point(x - 1000 * -b, y - 1000 * a)
-            dst.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 1, task.lineType, 0)
-        Next
-    End Sub
-End Module
-
-
-
-
-
-
 
 ' https://docs.opencv.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 Public Class Hough_Circles : Inherits VB_Parent
