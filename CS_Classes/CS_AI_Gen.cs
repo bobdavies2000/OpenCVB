@@ -23495,6 +23495,491 @@ public class CS_ApproxPoly_Basics : CS_Parent
             // Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
         }
     }
+    public class CS_Hist3D_Basics : CS_Parent
+    {
+        Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
+        Hist3Dcloud_Basics hCloud = new Hist3Dcloud_Basics();
+        public int classCount;
+        Options_Hist3D options = new Options_Hist3D();
+        public CS_Hist3D_Basics(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Sum of 8UC1 outputs of Hist3Dcolor_Basics and Hist3Dcloud_basics", "" };
+            desc = "Build an 8UC1 image by adding Hist3Dcolor_Basics and Hist3Dcloud_Basics output";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            hColor.Run(src);
+            dst2 = hColor.dst2;
+            hCloud.Run(src);
+            hCloud.dst2 += hColor.classCount + 1;
+            hCloud.dst2.SetTo(0, task.noDepthMask);
+            if (options.addCloud)
+                dst2 += hCloud.dst2;
+            else
+                hCloud.dst2.CopyTo(dst2, task.depthMask);
+            classCount = hColor.classCount + hCloud.classCount;
+            dst3 = ShowPalette(dst2 * 255 / classCount);
+            labels[3] = classCount.ToString() + " classes ";
+        }
+    }
+
+
+    public class CS_Hist3D_BuildHistogram : CS_Parent
+        {
+            public int threshold;
+            public int classCount;
+            public float[] histArray;
+            Hist_Depth plot = new Hist_Depth();
+            public CS_Hist3D_BuildHistogram(VBtask task) : base(task)
+            {
+                desc = "Build a guided 3D histogram from the 3D histogram supplied in src.";
+            }
+            public void RunCS(Mat src)
+            {
+                if (standaloneTest())
+                {
+                    task.gOptions.setHistogramBins(100);
+                    plot.Run(src);
+                    src = plot.histogram;
+                }
+                histArray = new float[src.Total() - 1];
+                Marshal.Copy(src.Data, histArray, 0, histArray.Length);
+                classCount = 1;
+                int index = 0;
+                for (int i = index; i < histArray.Length; i++)
+                {
+                    for (; index < histArray.Length; index++)
+                    {
+                        if (histArray[index] > threshold) break;
+                        histArray[index] = classCount;
+                    }
+                    classCount++;
+                    for (; index < histArray.Length; index++)
+                    {
+                        if (histArray[index] <= threshold) break;
+                        histArray[index] = classCount;
+                    }
+                    if (index >= histArray.Length) break;
+                }
+                int minClass = (int)(histArray.Min() - 1);
+                if (minClass != 0)
+                {
+                    src -= minClass;
+                    for (int i = 0; i < histArray.Length; i++)
+                    {
+                        histArray[i] -= minClass;
+                    }
+                    classCount -= minClass;
+                }
+                dst2 = src.Clone();
+                Marshal.Copy(histArray, 0, dst2.Data, histArray.Length);
+                labels[2] = "Histogram entries vary from " + histArray.Min() + " to " + classCount + " inclusive";
+            }
+        }
+        public class CS_Hist3D_RedCloud : CS_Parent
+        {
+            RedCloud_Basics redC = new RedCloud_Basics();
+            Hist3D_Basics hist3D = new Hist3D_Basics();
+            public CS_Hist3D_RedCloud(VBtask task) : base(task)
+            {
+                task.redOptions.setUseColorOnly(true);
+                desc = "Run RedCloud_Basics on the combined Hist3D color/cloud output.";
+            }
+            public void RunCS(Mat src)
+            {
+                hist3D.Run(src);
+                dst2 = hist3D.dst3;
+                labels[2] = hist3D.labels[3];
+                redC.Run(hist3D.dst2);
+                dst3 = redC.dst2;
+                labels[3] = redC.labels[2];
+            }
+        }
+        public class CS_Hist3D_RedColor : CS_Parent
+        {
+            RedCloud_Basics redC = new RedCloud_Basics();
+            Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
+            public CS_Hist3D_RedColor(VBtask task) : base(task)
+            {
+                task.redOptions.setIdentifyCells(true);
+                task.redOptions.setUseColorOnly(true);
+                desc = "Use the Hist3D color classes to segment the image with RedCloud_Basics";
+            }
+            public void RunCS(Mat src)
+            {
+                hColor.Run(src);
+                dst3 = hColor.dst3;
+                labels[3] = hColor.labels[3];
+                redC.Run(hColor.dst2);
+                dst2 = redC.dst2;
+                labels[2] = redC.labels[3];
+                if (task.redCells.Count > 0)
+                {
+                    dst2[task.rc.rect].SetTo(Scalar.White, task.rc.mask);
+                }
+            }
+        }
+        public class CS_Hist3D_DepthWithMask : CS_Parent
+        {
+            Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
+            public Mat depthMask = new Mat();
+            Foreground_KMeans2 fore = new Foreground_KMeans2();
+            public CS_Hist3D_DepthWithMask(VBtask task) : base(task)
+            {
+                desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics";
+            }
+            public void RunCS(Mat src)
+            {
+                if (standaloneTest())
+                {
+                    fore.Run(src);
+                    depthMask = fore.dst2 | task.noDepthMask;
+                }
+                hColor.inputMask = depthMask;
+                dst0 = ~depthMask;
+                src.SetTo(0, dst0);
+                hColor.Run(src);
+                dst2 = hColor.dst2;
+                dst2.SetTo(0, dst0);
+                dst3 = hColor.dst3;
+                dst3.SetTo(0, dst0);
+                labels = hColor.labels;
+            }
+        }
+        public class CS_Hist3D_Pixel : CS_Parent
+        {
+            public Mat histogram = new Mat();
+            public float[] histArray;
+            public int classCount;
+            public CS_Hist3D_Pixel(VBtask task) : base(task)
+            {
+                desc = "Classify each pixel using a 3D histogram backprojection.";
+            }
+            public void RunCS(Mat src)
+            {
+                if (src.Channels() != 3) src = task.color;
+                var bins = task.redOptions.getHistBinBar3D();
+                Cv2.CalcHist(new Mat[] { src }, new int[] { 0, 1, 2 }, new Mat(), histogram, 3, new int[] { bins, bins, bins }, task.redOptions.rangesBGR);
+                histArray = new float[histogram.Total() - 1];
+                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
+                for (int i = 0; i < histArray.Length; i++)
+                {
+                    histArray[i] = i + 1;
+                }
+                classCount = task.redOptions.histBins3D;
+                Marshal.Copy(histArray, 0, histogram.Data, histArray.Length);
+                Cv2.CalcBackProject(new Mat[] { src }, new int[] { 0, 1, 2 }, histogram, dst2, task.redOptions.rangesBGR);
+                dst3 = classCount < 256 ? ShowPalette(dst2 * 255 / classCount) : ShowPalette(dst2);
+            }
+        }
+        public class CS_Hist3D_PixelCells : CS_Parent
+        {
+            Hist3D_Pixel pixel = new Hist3D_Pixel();
+            Flood_Basics redC = new Flood_Basics();
+            public CS_Hist3D_PixelCells(VBtask task) : base(task)
+            {
+                dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+                labels = new string[] { "", "", "Cell-by-cell backprojection of the Hist3D_Pixel algorithm", "Palette version of dst2" };
+                desc = "After classifying each pixel, backproject each redCell using the same 3D histogram.";
+            }
+            public void RunCS(Mat src)
+            {
+                redC.Run(src);
+                pixel.Run(src);
+                foreach (var cell in task.redCells)
+                {
+                    Cv2.CalcBackProject(new Mat[] { src[cell.rect] }, new int[] { 0, 1, 2 }, pixel.histogram, dst2[cell.rect], task.redOptions.rangesBGR);
+                }
+                dst3 = ShowPalette(dst2 * 255 / task.redOptions.histBins3D);
+            }
+        }
+        public class CS_Hist3D_PixelClassify : CS_Parent
+        {
+            Hist3D_Pixel pixel = new Hist3D_Pixel();
+            RedCloud_Basics redC = new RedCloud_Basics();
+            public CS_Hist3D_PixelClassify(VBtask task) : base(task)
+            {
+                desc = "Classify each pixel with a 3D histogram backprojection and run RedCloud_Basics on the output.";
+            }
+            public void RunCS(Mat src)
+            {
+                pixel.Run(src);
+                redC.Run(pixel.dst2);
+                dst2 = redC.dst2;
+                labels[2] = redC.labels[2];
+                if (task.redCells.Count > 0)
+                {
+                    dst2[task.rc.rect].SetTo(Scalar.White, task.rc.mask);
+                }
+            }
+        }
+        public class CS_Hist3D_PixelDiffMask : CS_Parent
+        {
+            Hist3D_Pixel pixel = new Hist3D_Pixel();
+            RedCloud_Basics redC = new RedCloud_Basics();
+            Mat lastImage = new cv.Mat();
+            public CS_Hist3D_PixelDiffMask(VBtask task) : base(task)
+            {
+                task.redOptions.setUseColorOnly(true);
+                desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection";
+            }
+            public void RunCS(Mat src)
+            {
+                pixel.Run(src);
+                if (task.FirstPass) lastImage = pixel.dst2.Clone();
+                Cv2.Absdiff(lastImage, pixel.dst2, dst3);
+                dst2 = dst3.Threshold(0, 255, ThresholdTypes.Binary);
+                lastImage = pixel.dst2.Clone();
+            }
+        }
+        public class CS_Hist3D_RedCloudGrid : CS_Parent
+        {
+            Pixel_Vectors pixels = new Pixel_Vectors();
+            Hist3Dcolor_Vector hVector = new Hist3Dcolor_Vector();
+            public CS_Hist3D_RedCloudGrid(VBtask task) : base(task)
+            {
+                task.gOptions.setGridSize(8);
+                desc = "Build RedCloud pixel vectors and then measure each grid element's distance to those vectors.";
+            }
+            double distanceN(List<float> vec1, List<float> vec2)
+            {
+                double accum = 0;
+                for (int i = 0; i < vec1.Count; i++)
+                {
+                    accum += (vec1[i] - vec2[i]) * (vec1[i] - vec2[i]);
+                }
+                return Math.Sqrt(accum);
+            }
+            double distanceN(float[] vec1, float[] vec2)
+            {
+                double accum = 0;
+                for (int i = 0; i < vec1.Length; i++)
+                {
+                    accum += (vec1[i] - vec2[i]) * (vec1[i] - vec2[i]);
+                }
+                return Math.Sqrt(accum);
+            }
+            public void RunCS(Mat src)
+            {
+                pixels.Run(src);
+                dst2 = task.cellMap;
+                dst3 = dst2.InRange(0, 0);
+                if (pixels.pixelVector.Count == 0) return;
+                dst1.SetTo(0);
+                dst0 = task.cellMap;
+                foreach (var roi in task.gridList)
+                {
+                    if (dst3[roi].CountNonZero() > 0)
+                    {
+                        var candidates = new List<int>();
+                        for (int y = 0; y < roi.Height; y++)
+                        {
+                            for (int x = 0; x < roi.Width; x++)
+                            {
+                                var val = dst0[roi].Get<byte>(y, x);
+                                if (val == 0) continue;
+                                if (!candidates.Contains(val)) candidates.Add(val);
+                            }
+                        }
+                        if (candidates.Count > 1)
+                        {
+                            hVector.inputMask = dst3[roi];
+                            hVector.Run(src[roi]);
+                            var distances = new List<double>();
+                            foreach (var index in candidates)
+                            {
+                                var vec = pixels.pixelVector[index - 1];
+                                distances.Add(distanceN(vec, hVector.histArray));
+                            }
+                            var cell = pixels.redCells[candidates[distances.IndexOf(distances.Min())] - 1];
+                            dst1[roi].SetTo(cell.color, dst3[roi]);
+                        }
+                        else if (candidates.Count == 1)
+                        {
+                            var cell = pixels.redCells[candidates[0] - 1];
+                            dst1[roi].SetTo(cell.color, dst3[roi]);
+                        }
+                    }
+                }
+            }
+        }
+    public class CS_Hist3Dcloud_Basics : CS_Parent
+    {
+        public Mat histogram = new Mat();
+        public Mat histogram1D = new Mat();
+        public float[] histArray;
+        public int classCount;
+        public Mat maskInput = new Mat();
+        public Hist3D_BuildHistogram simK = new Hist3D_BuildHistogram();
+        public CS_Hist3Dcloud_Basics(VBtask task) : base(task)
+        {
+            labels[2] = "dst2 = backprojection of pointcloud (8UC1 format).";
+            desc = "Build a 3D histogram from the pointcloud and backproject it to segment the image.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_32FC3) src = task.pointCloud;
+            int bins = task.redOptions.getHistBinBar3D();
+            Cv2.CalcHist(new Mat[] { src }, new int[] { 0, 1, 2 }, maskInput, histogram, 3, new int[] { bins, bins, bins }, task.redOptions.rangesCloud);
+            histArray = new float[task.redOptions.histBins3D];
+            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
+            double threshold = src.Total() * 0.001;
+            for (int i = 0; i < histArray.Length; i++)
+            {
+                if (histArray[i] > threshold) break;
+                histArray[i] = 0;
+            }
+            histogram = new Mat(histArray.Length, 1, MatType.CV_32F, histArray);
+            simK.Run(histogram);
+            histogram = new Mat(histArray.Length, 1, MatType.CV_32F, simK.histArray);
+            classCount = simK.classCount;
+            Cv2.CalcBackProject(new Mat[] { src }, new int[] { 2 }, histogram, dst2, new Rangef[] { task.redOptions.rangesCloud[task.redOptions.rangesCloud.Count() - 1] });
+            dst2 = dst2.ConvertScaleAbs();
+            dst2.SetTo(0, task.noDepthMask);
+            //dst2.SetTo(classCount, task.maxDepthMask);
+            dst3 = ShowPalette(dst2 * 255 / classCount);
+            labels[2] = simK.labels[2] + " with " + task.redOptions.getHistBins3D().ToString() + " histogram bins";
+            labels[3] = "LastClassCount/classCount = " + classCount.ToString() + "/" + classCount.ToString();
+        }
+    }
+    public class CS_Hist3Dcloud_DepthSplit : CS_Parent
+    {
+        List<Hist_Kalman> hist;
+        List<Hist2D_Cloud> hist2d;
+        Mat_4Click mats1 = new Mat_4Click();
+        Mat_4Click mats2 = new Mat_4Click();
+        public CS_Hist3Dcloud_DepthSplit(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            hist = new List<Hist_Kalman> { new Hist_Kalman(), new Hist_Kalman(), new Hist_Kalman() };
+            hist2d = new List<Hist2D_Cloud> { new Hist2D_Cloud(), new Hist2D_Cloud(), new Hist2D_Cloud() };
+            labels[2] = "Histograms (Kalman) for X (upper left), Y (upper right) and Z.  UseZeroDepth removes 0 (no depth) entries.";
+            labels[3] = "X to Y histogram (upper left), X to Z (upper right), and Y to Z (bottom).";
+            desc = "Plot the 3 histograms of the depth data dimensions";
+        }
+        public void RunCS(Mat src)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                hist[i].Run(task.pcSplit[i]);
+                mats1.mat[i] = hist[i].dst2.Clone();
+                if (i == 0) task.redOptions.channels = new int[] { 0, 1 };
+                if (i == 1) task.redOptions.channels = new int[] { 0, 2 };
+                if (i == 2) task.redOptions.channels = new int[] { 1, 2 };
+                hist2d[i].Run(task.pointCloud);
+                mats2.mat[i] = hist2d[i].histogram.ConvertScaleAbs();
+            }
+            mats1.Run(empty);
+            dst2 = mats1.dst2;
+            dst3 = mats1.mat[mats1.quadrant];
+            mats2.Run(empty);
+            dst1 = mats2.dst2;
+        }
+    }
+    public class CS_Hist3Dcloud_Highlights : CS_Parent
+    {
+        public Mat histogram = new Mat();
+        public Rangef[] ranges;
+        int maskval;
+        public CS_Hist3Dcloud_Highlights(VBtask task) : base(task)
+        {
+            desc = "Plot the 3D histogram of the depth data";
+        }
+        public void RunCS(Mat src)
+        {
+            int bins = task.redOptions.getHistBinBar3D();
+            if (src.Type() != MatType.CV_32FC3) src = task.pointCloud;
+            byte[] histInput = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, histInput, 0, histInput.Length);
+            Vec2f rx = new Vec2f(-task.xRangeDefault, task.xRangeDefault);
+            Vec2f ry = new Vec2f(-task.yRangeDefault, task.yRangeDefault);
+            Vec2f rz = new Vec2f(0, task.MaxZmeters);
+            GCHandle handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned);
+            IntPtr dstPtr = Hist3Dcloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins,
+                                             rx[0], ry[0], rz[0], rx[1], ry[1], rz[1]);
+            handleInput.Free();
+            histogram = new Mat(task.redOptions.histBins3D, 1, MatType.CV_32F, dstPtr);
+            ranges = new Rangef[] { new Rangef(rx[0], rx[1]), new Rangef(ry[0], ry[1]), new Rangef(rz[0], rz[1]) };
+            float[] samples = new float[histogram.Total()];
+            Marshal.Copy(histogram.Data, samples, 0, samples.Length);
+            SortedList<float, int> sortedHist = new SortedList<float, int>(new compareAllowIdenticalSingleInverted());
+            for (int i = 0; i < samples.Length; i++)
+            {
+                sortedHist.Add(samples[i], i);
+            }
+            for (int i = 0; i < sortedHist.Count; i++)
+            {
+                var key = sortedHist.ElementAt(i);
+                int val = key.Value;
+                samples[val] = i + 1;
+            }
+            Marshal.Copy(samples, 0, histogram.Data, samples.Length);
+            Cv2.CalcBackProject(new Mat[] { src }, new int[] { 0, 1, 2 }, histogram, dst2, ranges);
+            if (task.heartBeat) maskval += 1;
+            if (sortedHist.ElementAt(maskval).Key == 0) maskval = 0;
+            int index = sortedHist.ElementAt(maskval).Value;
+            dst3 = dst2.InRange(index, index);
+            labels[3] = "There were " + sortedHist.ElementAt(maskval).Key + " samples in bin " + index;
+        }
+    }
+    public class CS_Hist3Dcloud_BP_Filter : CS_Parent
+    {
+        public Mat histogram = new Mat();
+        Options_HistXD options = new Options_HistXD();
+        public CS_Hist3Dcloud_BP_Filter(VBtask task) : base(task)
+        {
+            task.redOptions.setHistBinBar3D(16);
+            dst3 = new Mat(dst3.Size(), MatType.CV_32FC3, 0);
+            labels[2] = "Mask of the pointcloud image after backprojection that removes 'blowback' pixels";
+            desc = "Backproject a 3D pointcloud histogram after thresholding the bins with the small samples.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            int bins = task.redOptions.getHistBinBar3D();
+            if (src.Type() != MatType.CV_32FC3) src = task.pointCloud;
+            float[] histInput = new float[src.Total() * 3];
+            Marshal.Copy(src.Data, histInput, 0, histInput.Length);
+            Vec2f rx = new Vec2f(-task.xRangeDefault, task.xRangeDefault);
+            Vec2f ry = new Vec2f(-task.yRangeDefault, task.yRangeDefault);
+            Vec2f rz = new Vec2f(0, task.MaxZmeters);
+            GCHandle handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned);
+            IntPtr imagePtr = BackProjectCloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins, options.threshold3D,
+                                             rx[0], ry[0], rz[0], rx[1], ry[1], rz[1]);
+            handleInput.Free();
+            dst2 = new Mat(dst2.Height, dst2.Width, MatType.CV_8U, imagePtr);
+            dst2.SetTo(0, task.noDepthMask);
+            dst3.SetTo(0);
+            task.pointCloud.CopyTo(dst3, dst2);
+        }
+    }
+    public class CS_Hist3Dcloud_PlotHist1D : CS_Parent
+    {
+        Hist3Dcloud_Basics hcloud = new Hist3Dcloud_Basics();
+        Plot_Histogram plot = new Plot_Histogram();
+        public Mat histogram;
+        public float[] histArray;
+        Hist3D_BuildHistogram simK = new Hist3D_BuildHistogram();
+        public CS_Hist3Dcloud_PlotHist1D(VBtask task) : base(task)
+        {
+            plot.removeZeroEntry = false;
+            labels[2] = "The 3D histogram of the pointcloud data stream - note the number of gaps";
+            desc = "Present the 3D histogram as a typical histogram bar chart.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_32FC3) src = task.pointCloud;
+            hcloud.Run(src);
+            histArray = new float[hcloud.histogram.Total()];
+            Marshal.Copy(hcloud.histogram.Data, histArray, 0, histArray.Length);
+            histogram = new Mat(histArray.Length, 1, MatType.CV_32F, histArray);
+            plot.Run(histogram);
+            dst2 = plot.dst2;
+            simK.Run(histogram);
+            labels[3] = simK.labels[2];
+        }
+    }
 
 
 

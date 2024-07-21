@@ -6134,3 +6134,23 @@ Public Class Options_Guess : Inherits VB_Parent
         MaxDistance = distSlider.value
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_Hist3D : Inherits VB_Parent
+    Public addCloud As Boolean
+    Public Sub New()
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Add color and cloud 8UC1")
+            radio.addRadio("Copy cloud into color 8UC1")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static addRadio = FindRadio("Add color and cloud 8UC1")
+        addCloud = addRadio.checked
+    End Sub
+End Class

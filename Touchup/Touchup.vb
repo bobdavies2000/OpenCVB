@@ -63,6 +63,7 @@ Public Class Touchup
                 inline = Replace(inline, "CountNonZero", "CountNonZero()")
                 inline = Replace(inline, "absdiff", "Absdiff")
                 inline = Replace(inline, "vbtab", """/t""")
+                inline = Replace(inline, "()()", "()")
             Else
                 If line.StartsWith("Public Class CS_") Then
                     inline = inline.Replace("Public Class CS_", "Public Class VB_")

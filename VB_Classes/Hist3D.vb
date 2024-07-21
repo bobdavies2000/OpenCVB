@@ -4,20 +4,13 @@ Public Class Hist3D_Basics : Inherits VB_Parent
     Dim hColor As New Hist3Dcolor_Basics
     Dim hCloud As New Hist3Dcloud_Basics
     Public classCount As Integer
+    Dim options As New Options_Hist3D
     Public Sub New()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Add color and cloud 8UC1")
-            radio.addRadio("Copy cloud into color 8UC1")
-            radio.check(0).Checked = True
-        End If
-
         labels = {"", "", "Sum of 8UC1 outputs of Hist3Dcolor_Basics and Hist3Dcloud_basics", ""}
         desc = "Build an 8UC1 image by adding Hist3Dcolor_Basics and Hist3Dcloud_Basics output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static addRadio = FindRadio("Add color and cloud 8UC1")
-        Dim addCloud = addRadio.checked
+        options.RunVB()
 
         hColor.Run(src)
         dst2 = hColor.dst2
@@ -26,7 +19,7 @@ Public Class Hist3D_Basics : Inherits VB_Parent
         hCloud.dst2 += hColor.classCount + 1
         hCloud.dst2.SetTo(0, task.noDepthMask)
 
-        If addCloud Then dst2 += hCloud.dst2 Else hCloud.dst2.CopyTo(dst2, task.depthMask)
+        If options.addCloud Then dst2 += hCloud.dst2 Else hCloud.dst2.CopyTo(dst2, task.depthMask)
         classCount = hColor.classCount + hCloud.classCount
 
         dst3 = ShowPalette(dst2 * 255 / classCount)

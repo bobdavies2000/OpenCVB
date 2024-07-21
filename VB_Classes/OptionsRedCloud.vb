@@ -329,6 +329,9 @@ Public Class OptionsRedCloud
     Public Sub setHistBinBar3D(newVal As Integer)
         HistBinBar3D.Value = newVal
     End Sub
+    Public Function getHistBinBar3D() As Integer
+        Return HistBinBar3D.Value
+    End Function
     Public Sub checkSimpleReduction(newVal As Boolean)
         UseSimpleReduction.Checked = newVal
     End Sub
@@ -352,5 +355,8 @@ Public Class OptionsRedCloud
     End Function
     Public Function getIdentifyCells() As Boolean
         Return IdentifyCells.Checked
+    End Function
+    Public Function getHistBins3D() As Integer
+        Return histBins3D
     End Function
 End Class
