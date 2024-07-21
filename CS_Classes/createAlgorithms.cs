@@ -637,6 +637,16 @@ namespace CS_Classes
 			if (algorithmName == "CS_Hist3Dcloud_DepthSplit") return new CS_Hist3Dcloud_DepthSplit(task);
 			if (algorithmName == "CS_Hist3Dcloud_Highlights") return new CS_Hist3Dcloud_Highlights(task);
 			if (algorithmName == "CS_Hist3Dcloud_PlotHist1D") return new CS_Hist3Dcloud_PlotHist1D(task);
+			if (algorithmName == "CS_Hist3Dcolor_Basics") return new CS_Hist3Dcolor_Basics(task);
+			if (algorithmName == "CS_Hist3Dcolor_Basics_CPP") return new CS_Hist3Dcolor_Basics_CPP(task);
+			if (algorithmName == "CS_Hist3Dcolor_Diff") return new CS_Hist3Dcolor_Diff(task);
+			if (algorithmName == "CS_Hist3Dcolor_PlotHist1D") return new CS_Hist3Dcolor_PlotHist1D(task);
+			if (algorithmName == "CS_Hist3Dcolor_Reduction") return new CS_Hist3Dcolor_Reduction(task);
+			if (algorithmName == "CS_Hist3Dcolor_Select") return new CS_Hist3Dcolor_Select(task);
+			if (algorithmName == "CS_Hist3Dcolor_TopXColors") return new CS_Hist3Dcolor_TopXColors(task);
+			if (algorithmName == "CS_Hist3Dcolor_UniqueRGBPixels") return new CS_Hist3Dcolor_UniqueRGBPixels(task);
+			if (algorithmName == "CS_Hist3Dcolor_Vector") return new CS_Hist3Dcolor_Vector(task);
+			if (algorithmName == "CS_Hist3Dcolor_ZeroGroups") return new CS_Hist3Dcolor_ZeroGroups(task);
 			if (algorithmName == "CS_Line_Basics") return new CS_Line_Basics(task);
 			if (algorithmName == "CS_Mat_4Click") return new CS_Mat_4Click(task);
 			if (algorithmName == "CS_Mat_4to1") return new CS_Mat_4to1(task);

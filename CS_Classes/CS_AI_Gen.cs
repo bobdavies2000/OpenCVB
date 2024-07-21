@@ -23980,6 +23980,299 @@ public class CS_ApproxPoly_Basics : CS_Parent
             labels[3] = simK.labels[2];
         }
     }
+    public class CS_Hist3Dcolor_Basics : CS_Parent
+    {
+        public Mat histogram = new Mat();
+        public Mat histogram1D = new Mat();
+        public int classCount;
+        public Mat inputMask = new Mat();
+        public float[] histArray;
+        public Hist3D_BuildHistogram simK = new Hist3D_BuildHistogram();
+        public bool alwaysRun;
+        public CS_Hist3Dcolor_Basics(VBtask task) : base(task)
+        {
+            desc = "Capture a 3D color histogram, find the gaps, and backproject the clusters found.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_8UC3) src = task.color;
+            if (task.heartBeat || alwaysRun)
+            {
+                int bins = task.redOptions.getHistBinBar3D();
+                Cv2.CalcHist(new Mat[] { src }, new int[] { 0, 1, 2 }, inputMask, histogram, 3, new int[] { bins, bins, bins }, task.redOptions.rangesBGR);
+                histArray = new float[histogram.Total()];
+                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
+                histogram1D = new Mat((int)histogram.Total(), 1, MatType.CV_32F, histogram.Data);
+                simK.Run(histogram1D);
+                histogram = simK.dst2;
+                classCount = simK.classCount;
+            }
+            Cv2.CalcBackProject(new Mat[] { src }, new int[] { 0, 1, 2 }, histogram, dst2, task.redOptions.rangesBGR);
+            dst3 = ShowPalette(dst2 * 255 / classCount);
+            labels[2] = simK.labels[2];
+            labels[3] = "Backprojection of " + classCount.ToString() + " histogram entries.";
+        }
+    }
+    public class CS_Hist3Dcolor_UniqueRGBPixels : CS_Parent
+    {
+        Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
+        public List<Point3f> pixels = new List<Point3f>();
+        public List<int> counts = new List<int>();
+        public CS_Hist3Dcolor_UniqueRGBPixels(VBtask task) : base(task)
+        {
+            desc = "Get the number of non-zero BGR elements in the 3D color histogram of the current image and their BGR values";
+        }
+        public void RunCS(Mat src)
+        {
+            hColor.Run(src);
+            pixels.Clear();
+            counts.Clear();
+            int bins = task.redOptions.getHistBinBar3D();
+            for (int z = 0; z < bins; z++)
+            {
+                for (int y = 0; y < bins; y++)
+                {
+                    for (int x = 0; x < bins; x++)
+                    {
+                        float val = hColor.histArray[x * bins * bins + y * bins + z];
+                        if (val > 0)
+                        {
+                            pixels.Add(new Point3f((float)(255 * x / bins), (float)(255 * y / bins), (float)(255 * z / bins)));
+                            counts.Add((int)val);
+                        }
+                    }
+                }
+            }
+            SetTrueText("There are " + pixels.Count.ToString() + " non-zero entries in the 3D histogram " + Environment.NewLine + "See uniquePixels list in Hist3Dcolor_UniquePixels", 2);
+        }
+    }
+    public class CS_Hist3Dcolor_TopXColors : CS_Parent
+    {
+        Hist3Dcolor_UniqueRGBPixels unique = new Hist3Dcolor_UniqueRGBPixels();
+        public List<Point3i> topXPixels = new List<Point3i>();
+        public int mapTopX = 16;
+        public CS_Hist3Dcolor_TopXColors(VBtask task) : base(task)
+        {
+            desc = "Get the top 256 of non-zero BGR elements in the 3D color histogram of the current image and their BGR values";
+        }
+        public void RunCS(Mat src)
+        {
+            unique.Run(src);
+            var sortedPixels = new SortedList<int, Point3f>(new CompareAllowIdenticalIntegerInverted());
+            for (int i = 0; i < unique.pixels.Count; i++)
+            {
+                sortedPixels.Add(unique.counts[i], unique.pixels[i]);
+            }
+            topXPixels.Clear();
+            for (int i = 0; i < sortedPixels.Count; i++)
+            {
+                topXPixels.Add(sortedPixels.ElementAt(i).Value.ToPoint3i());
+                if (topXPixels.Count >= mapTopX) break;
+            }
+            SetTrueText("There are " + sortedPixels.Count.ToString() + " non-zero entries in the 3D histogram " + Environment.NewLine + "The top " + mapTopX.ToString() + " pixels are in topXPixels", 2);
+        }
+    }
+    public class CS_Hist3Dcolor_Reduction : CS_Parent
+    {
+        Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
+        Reduction_BGR reduction = new Reduction_BGR();
+        public int classCount;
+        public CS_Hist3Dcolor_Reduction(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            task.redOptions.setSimpleReductionBar(45);
+            desc = "Backproject the 3D histogram for RGB after reduction";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 3) src = task.color;
+            reduction.Run(src);
+            hColor.Run(reduction.dst2);
+            dst1 = reduction.dst2;
+            dst2 = hColor.dst2;
+            dst3 = hColor.dst3;
+            labels[2] = hColor.labels[2];
+        }
+    }
+    public class CS_Hist3Dcolor_ZeroGroups : CS_Parent
+    {
+        public Mat maskInput = new Mat();
+        public int classCount;
+        public Mat histogram = new Mat();
+        public CS_Hist3Dcolor_ZeroGroups(VBtask task) : base(task)
+        {
+            desc = "Breakdown the 3D histogram using the '0' entries as boundaries between clusters.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 3) src = task.color;
+            if (task.optionsChanged)
+            {
+                int bins = task.redOptions.getHistBinBar3D();
+                int[] hBins = { bins, bins, bins };
+                Cv2.CalcHist(new Mat[] { src }, new int[] { 0, 1, 2 }, maskInput, histogram, 3, hBins, task.redOptions.rangesBGR);
+                float[] histArray = new float[histogram.Total()];
+                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
+                List<int> boundaries = new List<int>();
+                bool zeroMode = false;
+                for (int i = 0; i < histArray.Length; i++)
+                {
+                    if (histArray[i] == 0 && !zeroMode)
+                    {
+                        boundaries.Add(i);
+                        zeroMode = true;
+                    }
+                    if (histArray[i] != 0) zeroMode = false;
+                }
+                int lastIndex = 0;
+                classCount = 1;
+                foreach (int index in boundaries)
+                {
+                    for (int i = lastIndex; i <= index; i++)
+                    {
+                        histArray[i] = classCount;
+                    }
+                    lastIndex = index + 1;
+                    classCount++;
+                }
+                for (int i = lastIndex; i < histArray.Length; i++)
+                {
+                    histArray[i] = classCount;
+                }
+                classCount++;
+                Marshal.Copy(histArray, 0, histogram.Data, histArray.Length);
+            }
+            Cv2.CalcBackProject(new Mat[] { src }, new int[] { 0, 1, 2 }, histogram, dst2, task.redOptions.rangesBGR);
+            dst3 = ShowPalette(dst2 * 255 / classCount);
+            labels[2] = "CS_Hist3Dcolor_ZeroGroups classCount = " + classCount.ToString();
+        }
+    }
+    public class CS_Hist3Dcolor_PlotHist1D : CS_Parent
+    {
+        Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
+        Plot_Histogram plot = new Plot_Histogram();
+        public Mat histogram1D;
+        public Mat histogram;
+        public float[] histArray;
+        public CS_Hist3Dcolor_PlotHist1D(VBtask task) : base(task)
+        {
+            hColor.alwaysRun = true;
+            plot.removeZeroEntry = false;
+            labels[2] = "The 3D histogram of the RGB image stream - note the number of gaps";
+            desc = "Present the 3D histogram as a typical histogram bar chart.";
+        }
+        public void RunCS(Mat src)
+        {
+            hColor.Run(src);
+            histogram1D = hColor.histogram1D;
+            histArray = hColor.histArray;
+            plot.Run(hColor.histogram1D);
+            dst2 = plot.dst2;
+        }
+    }
+    public class CS_Hist3Dcolor_Select : CS_Parent
+    {
+        Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
+        public CS_Hist3Dcolor_Select(VBtask task) : base(task)
+        {
+            labels[3] = "The highlighted pixels are in the selected bin";
+            desc = "Build a 3D histogram from the BGR image and backproject the 'Selected bin' (in options_HistXD sliders).";
+        }
+        public void RunCS(Mat src)
+        {
+            hColor.Run(src);
+            int selection = task.gOptions.DebugSliderValue;
+            dst2 = hColor.dst2.InRange(selection, selection);
+            int saveCount = dst2.CountNonZero();
+            dst3 = src.Clone();
+            dst3.SetTo(Scalar.White, dst2);
+            labels[2] = saveCount.ToString() + " pixels were found in bin " + selection.ToString();
+        }
+    }
+    public class CS_Hist3Dcolor_Basics_CPP : CS_Parent
+    {
+        public Mat histogram = new Mat();
+        public bool prepareImage = true;
+        public Mat histogram1D = new Mat();
+        public Hist3D_BuildHistogram simK = new Hist3D_BuildHistogram();
+        public int classCount;
+        public CS_Hist3Dcolor_Basics_CPP(VBtask task) : base(task)
+        {
+            desc = "Build a 3D histogram from the BGR image and sort it by histogram entry size.";
+        }
+        public void RunCS(Mat src)
+        {
+            byte[] histInput = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, histInput, 0, histInput.Length);
+            GCHandle handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned);
+            int bins = task.redOptions.getHistBinBar3D();
+            IntPtr imagePtr = Hist3Dcolor_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins);
+            handleInput.Free();
+            histogram = new Mat(task.redOptions.histBins3D, 1, MatType.CV_32F, imagePtr);
+            if (prepareImage)
+            {
+                float[] histArray = new float[histogram.Total()];
+                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
+                histogram1D = new Mat(histArray.Length, 1, MatType.CV_32F, histArray);
+                simK.Run(histogram);
+                histogram = simK.dst2;
+                classCount = simK.classCount;
+                Cv2.CalcBackProject(new Mat[] { src }, new int[] { 0, 1, 2 }, histogram, dst2, task.redOptions.rangesBGR);
+                mmData mm = GetMinMax(dst2);
+                dst3 = ShowPalette(dst2 * 255 / mm.maxVal);
+                labels[2] = simK.labels[2];
+                labels[3] = mm.maxVal.ToString() + " different levels in the backprojection.";
+            }
+        }
+    }
+    public class CS_Hist3Dcolor_Diff : CS_Parent
+    {
+        Hist3Dcolor_Basics hColor = new Hist3Dcolor_Basics();
+        Diff_Basics diff = new Diff_Basics();
+        public CS_Hist3Dcolor_Diff(VBtask task) : base(task)
+        {
+            task.gOptions.pixelDiffThreshold = 0;
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "Create a mask for the color pixels that are changing with every frame of the Hist3Dcolor_basics.";
+        }
+        public void RunCS(Mat src)
+        {
+            hColor.Run(src);
+            dst2 = hColor.dst3;
+            labels[2] = hColor.labels[3];
+            diff.Run(hColor.dst2);
+            if (task.heartBeat) dst3.SetTo(0);
+            dst3 = dst3 | diff.dst2;
+        }
+    }
+    public class CS_Hist3Dcolor_Vector : CS_Parent
+    {
+        public Mat histogram = new Mat();
+        public Mat inputMask = new Mat();
+        public float[] histArray;
+        public Hist3D_BuildHistogram simK = new Hist3D_BuildHistogram();
+        int[] binArray;
+        public CS_Hist3Dcolor_Vector(VBtask task) : base(task)
+        {
+            int bins = task.redOptions.getHistBinBar3D();
+            binArray = new int[] { bins, bins, bins };
+            UpdateAdvice(traceName + ": redOptions '3D Histogram Bins'");
+            desc = "Capture a 3D color histogram for input src - likely to be src(rect).";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() != 3) src = task.color;
+            if (task.optionsChanged)
+            {
+                int bins = task.redOptions.getHistBinBar3D();
+                binArray = new int[] { bins, bins, bins };
+            }
+            Cv2.CalcHist(new Mat[] { src }, new int[] { 0, 1, 2 }, inputMask, histogram, 3, binArray, task.redOptions.rangesBGR);
+            histArray = new float[histogram.Total()];
+            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
+            if (standaloneTest()) SetTrueText("Vector prepared in histArray");
+        }
+    }
 
 
 
