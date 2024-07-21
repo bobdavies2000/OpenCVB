@@ -1389,6 +1389,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Options_Gradient" Then return new Options_Gradient
 	if algorithmName = "Options_Grayscale8U" Then return new Options_Grayscale8U
 	if algorithmName = "Options_Grid" Then return new Options_Grid
+	if algorithmName = "Options_Guess" Then return new Options_Guess
 	if algorithmName = "Options_GuidedBPDepth" Then return new Options_GuidedBPDepth
 	if algorithmName = "Options_Harris" Then return new Options_Harris
 	if algorithmName = "Options_HarrisCorners" Then return new Options_HarrisCorners

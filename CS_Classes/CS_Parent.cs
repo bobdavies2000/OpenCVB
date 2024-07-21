@@ -146,8 +146,34 @@ namespace CS_Classes
         cv.Point pt2 = new cv.Point((int)p2.X, (int)p2.Y);
         dst.Line(pt1, pt2, color, task.lineWidth);
     }
+    public Rangef[] GetHist2Dminmax(Mat input, int chan1, int chan2)
+    {
+        float histDelta = 0.00001f;
+        if (input.Type() == MatType.CV_8UC3)
+        {
+            // ranges are exclusive in OpenCV 
+            return new Rangef[]
+            {
+                new Rangef(-histDelta, 256),
+                new Rangef(-histDelta, 256)
+            };
+        }
 
-    public static OpenCvSharp.Point GetMaxDist(ref rcData rc)
+        var xInput = input.ExtractChannel(chan1);
+        var yInput = input.ExtractChannel(chan2);
+
+        var mmX = GetMinMax(xInput);
+        var mmY = GetMinMax(yInput);
+
+        // ranges are exclusive in OpenCV 
+        return new Rangef[]
+        {
+            new Rangef((float)(mmX.minVal - histDelta), (float)(mmX.maxVal + histDelta)),
+            new Rangef((float)(mmY.minVal - histDelta), (float)(mmY.maxVal + histDelta))
+        };
+    }
+
+        public static OpenCvSharp.Point GetMaxDist(ref rcData rc)
     {
         using (var mask = rc.mask.Clone())
         {

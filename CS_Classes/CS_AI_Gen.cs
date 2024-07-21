@@ -23290,6 +23290,211 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst2 = hist.dst2;
         }
     }
+    public class CS_Guess_Depth_CPP : CS_Parent
+    {
+        public CS_Guess_Depth_CPP(VBtask task) : base(task)
+        {
+            cPtr = Guess_Depth_Open();
+            labels = new string[] { "", "", "Updated point cloud (holes filled)", "Original point cloud" };
+            desc = "Fill single pixel holes in the point cloud.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_32FC3) src = task.pointCloud;
+            byte[] cppData = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, cppData, 0, cppData.Length);
+            GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
+            IntPtr imagePtr = Guess_Depth_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols);
+            handleSrc.Free();
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_32FC3, imagePtr).Clone();
+            if (standaloneTest()) dst3 = task.pointCloud;
+        }
+        public void Close()
+        {
+            Guess_Depth_Close(cPtr);
+        }
+    }
+    public class CS_Guess_ImageEdges_CPP : CS_Parent
+    {
+        Options_Guess options = new Options_Guess();
+        public CS_Guess_ImageEdges_CPP(VBtask task) : base(task)
+        {
+            cPtr = Guess_ImageEdges_Open();
+            labels = new string[] { "", "", "Updated point cloud - nearest depth to each edge is replicated to the image boundary", "Original point cloud" };
+            desc = "Replicate the nearest depth measurement at all the image edges";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            if (task.cameraName == "Oak-D camera" || task.cameraName == "Azure Kinect 4K")
+            {
+                SetTrueText("Only RealSense cameras are likely to benefit from enhanced depth at the image edges.");
+                return;
+            }
+            if (src.Type() != MatType.CV_32FC3) src = task.pointCloud;
+            byte[] cppData = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, cppData, 0, cppData.Length);
+            GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
+            IntPtr imagePtr = Guess_ImageEdges_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, options.MaxDistance);
+            handleSrc.Free();
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_32FC3, cppData).Clone();
+            if (standaloneTest()) dst3 = task.pointCloud;
+        }
+        public void Close()
+        {
+            Guess_ImageEdges_Close(cPtr);
+        }
+    }
+    public class CS_Hist2D_Basics : CS_Parent
+    {
+        public int[] histRowsCols;
+        public Rangef[] ranges;
+        public Mat histogram = new Mat();
+        public int[] channels = { 0, 2 };
+        public CS_Hist2D_Basics(VBtask task) : base(task)
+        {
+            histRowsCols = new int[] { dst2.Height, dst2.Width };
+            labels = new string[] { "", "", "All non-zero entries in the 2D histogram", "" };
+            desc = "Create a 2D histogram from the input.";
+        }
+        public void RunCS(Mat src)
+        {
+            ranges = GetHist2Dminmax(src, channels[0], channels[1]);
+            Cv2.CalcHist(new Mat[] { src }, channels, new Mat(), histogram, 2, histRowsCols, ranges);
+            dst2 = histogram.Threshold(0, 255, ThresholdTypes.Binary);
+            dst2.ConvertTo(dst2, MatType.CV_8U);
+        }
+    }
+    public class CS_Hist2D_Cloud : CS_Parent
+    {
+        Plot_Histogram2D plot1D = new Plot_Histogram2D();
+        int[] channels;
+        public Rangef[] ranges;
+        public Mat histogram = new Mat();
+        public CS_Hist2D_Cloud(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram" };
+            desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options.";
+        }
+        public void RunCS(Mat src)
+        {
+            Vec2f r1 = new Vec2f(), r2 = new Vec2f();
+            if (task.redOptions.channels[0] == 0 || task.redOptions.channels[0] == 1)
+            {
+                r1 = new Vec2f(-task.xRangeDefault, task.xRangeDefault);
+            }
+            if (task.redOptions.channels[1] == 1) r2 = new Vec2f(-task.yRangeDefault, task.yRangeDefault);
+            if (task.redOptions.channels[1] == 2) r2 = new Vec2f(0, task.MaxZmeters);
+            ranges = new Rangef[] { new Rangef(r1.Item0, r1.Item1), new Rangef(r2.Item0, r2.Item1) };
+            Cv2.CalcHist(new Mat[] { task.pointCloud }, task.redOptions.channels, new Mat(),
+                          histogram, 2, new int[] { task.histogramBins, task.histogramBins }, ranges);
+            plot1D.Run(histogram);
+            dst2 = plot1D.dst2;
+            channels = task.redOptions.channels;
+        }
+    }
+    public class CS_Hist2D_Depth : CS_Parent
+    {
+        Hist2D_Cloud hist2d = new Hist2D_Cloud();
+        public int[] channels;
+        public Rangef[] ranges;
+        public Mat histogram = new Mat();
+        public CS_Hist2D_Depth(VBtask task) : base(task)
+        {
+            desc = "Create 2D histogram from the 3D pointcloud - use options to select dimensions.";
+        }
+        public void RunCS(Mat src)
+        {
+            hist2d.Run(task.pointCloud);
+            histogram = hist2d.histogram;
+            ranges = hist2d.ranges;
+            channels = task.redOptions.channels;
+            dst2 = histogram.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+            dst3 = histogram.Threshold(task.projectionThreshold, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+            labels = new string[] { "", "", "Mask of the 2D histogram for selected channels", "Mask of 2D histogram after thresholding" };
+        }
+    }
+    public class CS_Hist2D_Zoom : CS_Parent
+    {
+        Hist2D_Basics hist2d = new Hist2D_Basics();
+        Magnify_Basics zoom = new Magnify_Basics();
+        public CS_Hist2D_Zoom(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Mask of histogram", "DrawRect area from the histogram" };
+            desc = "Draw a rectangle on an area to zoom in on...";
+        }
+        public void RunCS(Mat src)
+        {
+            hist2d.Run(src);
+            dst2 = hist2d.dst2;
+            zoom.Run(hist2d.histogram);
+            dst3 = zoom.dst3;
+        }
+    }
+    public class CS_Hist2D_HSV : CS_Parent
+    {
+        public Mat histogram01 = new Mat();
+        public Mat histogram02 = new Mat();
+        public CS_Hist2D_HSV(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "HSV image", "", "" };
+            desc = "Create a 2D histogram for Hue to Saturation and Hue to Value.";
+        }
+        public void RunCS(Mat src)
+        {
+            int[] histRowsCols = new int[] { dst2.Height, dst2.Width };
+            src = src.CvtColor(ColorConversionCodes.BGR2HSV);
+            Cv2.CalcHist(new Mat[] { src }, new int[] { 0, 2 }, task.depthMask, histogram02, 2, histRowsCols, task.redOptions.rangesHSV);
+            dst2 = histogram02.Threshold(0, 255, ThresholdTypes.Binary);
+            Cv2.CalcHist(new Mat[] { src }, new int[] { 0, 1 }, task.depthMask, histogram01, 2, histRowsCols, task.redOptions.rangesHSV);
+            dst3 = histogram01.Threshold(0, 255, ThresholdTypes.Binary);
+            labels[2] = "Hue is on the X-Axis and Value is on the Y-Axis";
+            labels[3] = "Hue is on the X-Axis and Saturation is on the Y-Axis";
+        }
+    }
+    public class CS_Hist2D_BGR : CS_Parent
+    {
+        public Mat histogram01 = new Mat();
+        public Mat histogram02 = new Mat();
+        public CS_Hist2D_BGR(VBtask task) : base(task)
+        {
+            task.gOptions.setHistogramBins(256);
+            desc = "Create a 2D histogram for blue to red and blue to green.";
+        }
+        public void RunCS(Mat src)
+        {
+            int[] histRowsCols = new int[] { dst2.Height, dst2.Width };
+            Cv2.CalcHist(new Mat[] { src }, new int[] { 0, 2 }, task.depthMask, histogram02, 2, histRowsCols, task.redOptions.rangesBGR);
+            dst2 = histogram02.Threshold(0, 255, ThresholdTypes.Binary);
+            Cv2.CalcHist(new Mat[] { src }, new int[] { 0, 1 }, task.depthMask, histogram01, 2, histRowsCols, task.redOptions.rangesBGR);
+            dst3 = histogram01.Threshold(0, 255, ThresholdTypes.Binary);
+            labels[2] = "Blue is on the X-Axis and Red is on the Y-Axis";
+            labels[3] = "Blue is on the X-Axis and Green is on the Y-Axis";
+        }
+    }
+    public class CS_Hist2D_PlotHistogram1D : CS_Parent
+    {
+        Mat histogram = new Mat();
+        Plot_Histogram plot = new Plot_Histogram();
+        public float[] histArray;
+        public CS_Hist2D_PlotHistogram1D(VBtask task) : base(task)
+        {
+            plot.removeZeroEntry = false;
+            labels[2] = "CS_Hist2D_PlotHistogram1D output shown with plot_histogram";
+            desc = "Create a 2D histogram for blue to red and blue to green.";
+        }
+        public void RunCS(Mat src)
+        {
+            Cv2.CalcHist(new Mat[] { src }, task.redOptions.channels, task.depthMask, histogram, 2, new int[] { task.histogramBins, task.histogramBins },
+                          task.redOptions.rangesBGR);
+            dst2 = histogram.Threshold(0, 255, ThresholdTypes.Binary);
+            plot.Run(histogram);
+            dst3 = plot.dst2;
+            // histArray = new float[histogram.Total()];
+            // Marshal.Copy(histogram.Data, histArray, 0, histArray.Length);
+        }
+    }
 
 
 

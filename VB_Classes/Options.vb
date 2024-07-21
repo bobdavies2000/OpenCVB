@@ -6118,3 +6118,19 @@ Public Class Options_Histogram : Inherits VB_Parent
         maxGray = maxSlider.value
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_Guess : Inherits VB_Parent
+    Public MaxDistance As Integer
+    Public Sub New()
+        If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Max Distance from edge (pixels)", 0, 100, 50)
+    End Sub
+    Public Sub RunVB()
+        Static distSlider = FindSlider("Max Distance from edge (pixels)")
+        MaxDistance = distSlider.value
+    End Sub
+End Class

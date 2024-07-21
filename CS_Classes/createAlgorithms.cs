@@ -564,6 +564,8 @@ namespace CS_Classes
 			if (algorithmName == "CS_Grid_ShowMap") return new CS_Grid_ShowMap(task);
 			if (algorithmName == "CS_Grid_Special") return new CS_Grid_Special(task);
 			if (algorithmName == "CS_Grid_TrackCenter") return new CS_Grid_TrackCenter(task);
+			if (algorithmName == "CS_Guess_Depth_CPP") return new CS_Guess_Depth_CPP(task);
+			if (algorithmName == "CS_Guess_ImageEdges_CPP") return new CS_Guess_ImageEdges_CPP(task);
 			if (algorithmName == "CS_GuidedBP_Basics") return new CS_GuidedBP_Basics(task);
 			if (algorithmName == "CS_GuidedBP_Depth") return new CS_GuidedBP_Depth(task);
 			if (algorithmName == "CS_GuidedBP_HotPoints") return new CS_GuidedBP_HotPoints(task);
@@ -613,6 +615,13 @@ namespace CS_Classes
 			if (algorithmName == "CS_Hist_Xdimension") return new CS_Hist_Xdimension(task);
 			if (algorithmName == "CS_Hist_Ydimension") return new CS_Hist_Ydimension(task);
 			if (algorithmName == "CS_Hist_Zdimension") return new CS_Hist_Zdimension(task);
+			if (algorithmName == "CS_Hist2D_Basics") return new CS_Hist2D_Basics(task);
+			if (algorithmName == "CS_Hist2D_BGR") return new CS_Hist2D_BGR(task);
+			if (algorithmName == "CS_Hist2D_Cloud") return new CS_Hist2D_Cloud(task);
+			if (algorithmName == "CS_Hist2D_Depth") return new CS_Hist2D_Depth(task);
+			if (algorithmName == "CS_Hist2D_HSV") return new CS_Hist2D_HSV(task);
+			if (algorithmName == "CS_Hist2D_PlotHistogram1D") return new CS_Hist2D_PlotHistogram1D(task);
+			if (algorithmName == "CS_Hist2D_Zoom") return new CS_Hist2D_Zoom(task);
 			if (algorithmName == "CS_Line_Basics") return new CS_Line_Basics(task);
 			if (algorithmName == "CS_Mat_4Click") return new CS_Mat_4Click(task);
 			if (algorithmName == "CS_Mat_4to1") return new CS_Mat_4to1(task);
