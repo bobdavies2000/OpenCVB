@@ -24273,6 +24273,971 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (standaloneTest()) SetTrueText("Vector prepared in histArray");
         }
     }
+    public class CS_History_Basics : CS_Parent
+    {
+        public List<Mat> saveFrames = new List<Mat>();
+        public CS_History_Basics(VBtask task) : base(task)
+        {
+            desc = "Create a frame history to sum the last X frames";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.frameHistoryCount == 1)
+            {
+                dst2 = src;
+                return;
+            }
+            if (src.Type() != MatType.CV_32F)
+                src.ConvertTo(src, MatType.CV_32F);
+            if (dst1.Type() != src.Type() || dst1.Channels() != src.Channels() || task.optionsChanged)
+            {
+                dst1 = src;
+                saveFrames.Clear();
+            }
+            if (saveFrames.Count >= task.frameHistoryCount)
+                saveFrames.RemoveAt(0);
+            saveFrames.Add(src.Clone());
+            foreach (var m in saveFrames)
+            {
+                dst1 += m;
+            }
+            dst1 *= 1.0 / (saveFrames.Count + 1);
+            if (src.Channels() == 1)
+            {
+                dst1.ConvertTo(dst2, MatType.CV_8U);
+            }
+            else
+            {
+                dst1.ConvertTo(dst2, MatType.CV_8UC3);
+            }
+        }
+    }
+    public class CS_History_MotionRect : CS_Parent
+    {
+        public CS_History_MotionRect(VBtask task) : base(task)
+        {
+            desc = "Create an image that is the motionRect applied to the previous image.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+                dst2 = src.Clone();
+            if (task.motionDetected)
+            {
+                src[task.motionRect].CopyTo(dst2[task.motionRect]);
+            }
+        }
+    }
+    public class CS_History_Cloud : CS_Parent
+    {
+        public History_BasicsNoSaturation frames = new History_BasicsNoSaturation();
+        List<Mat> saveFrames = new List<Mat>();
+        public CS_History_Cloud(VBtask task) : base(task)
+        {
+            desc = "Create a frame history and sum the last X task.pointcloud's";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_32FC3 || src.Channels() != 3)
+                src = task.pointCloud;
+            if (task.optionsChanged || dst3.Type() != MatType.CV_32FC3)
+            {
+                saveFrames.Clear();
+                dst3 = new Mat(dst2.Size(), MatType.CV_32FC3, 0);
+            }
+            if (saveFrames.Count >= task.frameHistoryCount)
+            {
+                dst3 = dst3.Subtract(saveFrames[0]);
+                saveFrames.RemoveAt(0);
+            }
+            saveFrames.Add(src.Clone());
+            dst3 = src + dst3;
+            dst2 = dst3 / saveFrames.Count;
+            frames.Run(task.depthMask);
+            dst2.SetTo(0, ~frames.dst2);
+        }
+    }
+    public class CS_History_BasicsNoSaturation : CS_Parent
+    {
+        public List<Mat> saveFrames = new List<Mat>();
+        public CS_History_BasicsNoSaturation(VBtask task) : base(task)
+        {
+            desc = "Create a frame history and sum the last X frames (without saturation!)";
+        }
+        public void RunCS(Mat src)
+        {
+            var input = src.Clone();
+            if (input.Channels() != 1)
+                input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            if (input.Type() != MatType.CV_32F)
+                input.ConvertTo(input, MatType.CV_32F);
+            if (dst3.Type() != input.Type() || dst3.Channels() != input.Channels())
+                dst3 = new Mat(input.Size(), input.Type(), 0);
+            input /= 255; // input is all zeros or ones.
+            if (task.optionsChanged)
+            {
+                saveFrames.Clear();
+                dst3.SetTo(0);
+            }
+            if (saveFrames.Count >= task.frameHistoryCount)
+            {
+                dst3 = dst3.Subtract(saveFrames[0]);
+                saveFrames.RemoveAt(0);
+            }
+            saveFrames.Add(input);
+            dst3 += input;
+            dst1 = 255 * dst3 / saveFrames.Count;
+            dst1.ConvertTo(dst2, MatType.CV_8U);
+        }
+    }
+    public class CS_History_BasicsDiff : CS_Parent
+    {
+        History_BasicsNoSaturation frames = new History_BasicsNoSaturation();
+        Diff_Basics diff = new Diff_Basics();
+        public CS_History_BasicsDiff(VBtask task) : base(task)
+        {
+            task.gOptions.pixelDiffThreshold = 0;
+            desc = "Find the floodfill trouble spots.";
+        }
+        public void RunCS(Mat src)
+        {
+            frames.Run(src);
+            dst2 = ShowPalette(frames.dst2);
+            diff.Run(frames.dst2);
+            dst3 = diff.dst2;
+        }
+    }
+    public class CS_HistPeak2D_Basics : CS_Parent
+    {
+        public OpAuto_Peaks2DGrid auto = new OpAuto_Peaks2DGrid();
+        Hist2D_BGR bgr = new Hist2D_BGR();
+        Delaunay_ConsistentColor delaunay = new Delaunay_ConsistentColor();
+        public Mat histogram = new Mat();
+        public Rangef[] ranges;
+        public CS_HistPeak2D_Basics(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Find the top X peaks in a 2D histogram and use Delaunay to setup the backprojection";
+        }
+        public void RunCS(Mat src)
+        {
+            // if standaloneTest(), go get a histogram for input.  Src is the 3-channel input to the histogram.
+            if (standaloneTest())
+            {
+                bgr.Run(src);
+                histogram = bgr.histogram02;
+            }
+            if (task.heartBeat)
+            {
+                auto.Run(histogram);
+                delaunay.inputPoints = new List<Point2f>(auto.clusterPoints);
+                delaunay.Run(src);
+                dst1 = auto.dst2;
+                dst3 = delaunay.dst2;
+            }
+            var mask = histogram.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+            delaunay.dst1.ConvertTo(histogram, MatType.CV_32F);
+            histogram.SetTo(0, ~mask);
+            if (ranges == null || task.optionsChanged)
+            {
+                ranges = GetHist2Dminmax(src, task.redOptions.channels[0], task.redOptions.channels[1]);
+            }
+            var backProjection = new Mat();
+            Cv2.CalcBackProject(new Mat[] { src }, task.redOptions.channels, histogram, backProjection, ranges);
+            dst2 = ShowPalette(backProjection * 255 / delaunay.inputPoints.Count);
+        }
+    }
+    public class CS_HistPeak2D_TopAndSide : CS_Parent
+    {
+        HistPeak2D_Basics peak = new HistPeak2D_Basics();
+        Projection_HistSide histSide = new Projection_HistSide();
+        Projection_HistTop histTop = new Projection_HistTop();
+        public CS_HistPeak2D_TopAndSide(VBtask task) : base(task)
+        {
+            desc = "Find the top X peaks in the 2D histogram of the top and side views and backproject them.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.toggleOnOff)
+            {
+                histSide.Run(src);
+                peak.ranges = task.rangesSide;
+                task.redOptions.channels = task.channelsSide;
+                peak.histogram = histSide.histogram;
+            }
+            else
+            {
+                histTop.Run(src);
+                task.redOptions.channels = task.channelsTop;
+                peak.ranges = task.rangesTop;
+                peak.histogram = histTop.histogram;
+            }
+            peak.Run(task.pointCloud);
+            dst1 = peak.dst2;
+            dst2 = ShowPalette(dst1);
+        }
+    }
+    public class CS_HistPeak2D_NotHotTop : CS_Parent
+    {
+        public Projection_HistTop histTop = new Projection_HistTop();
+        HistPeak2D_Basics peak = new HistPeak2D_Basics();
+        public CS_HistPeak2D_NotHotTop(VBtask task) : base(task)
+        {
+            desc = "Find the regions with the non-zero (low) samples in the top view";
+        }
+        public void RunCS(Mat src)
+        {
+            histTop.Run(src);
+            dst1 = histTop.histogram.InRange(0, 0).ConvertScaleAbs();
+            var mm = GetMinMax(histTop.histogram);
+            dst3 = new Mat(dst3.Size(), MatType.CV_32F, mm.maxVal);
+            dst3 -= histTop.histogram;
+            dst3.SetTo(0, dst1);
+            peak.histogram = histTop.histogram;
+            peak.Run(task.pointCloud);
+            dst2 = peak.dst2;
+        }
+    }
+    public class CS_HistPeak2D_Edges : CS_Parent
+    {
+        HistPeak2D_Basics peak = new HistPeak2D_Basics();
+        Projection_HistTop histTop = new Projection_HistTop();
+        Edge_Canny edges = new Edge_Canny();
+        public CS_HistPeak2D_Edges(VBtask task) : base(task)
+        {
+            desc = "Display the HistPeak2D_Basics edges in the RGB image";
+        }
+        public void RunCS(Mat src)
+        {
+            histTop.Run(src);
+            dst3 = histTop.histogram.Threshold(task.projectionThreshold, 255, ThresholdTypes.Binary);
+            peak.histogram = histTop.histogram;
+            peak.Run(task.pointCloud);
+            dst2 = peak.dst2;
+            edges.Run(dst2);
+            dst3 = src;
+            dst3.SetTo(Scalar.White, edges.dst2);
+        }
+    }
+    public class CS_HistPeak2D_HSV : CS_Parent
+    {
+        Hist2D_HSV hsv = new Hist2D_HSV();
+        HistPeak2D_Basics peak = new HistPeak2D_Basics();
+        public CS_HistPeak2D_HSV(VBtask task) : base(task)
+        {
+            desc = "Find the peaks in the 2D plot of the HSV image";
+        }
+        public void RunCS(Mat src)
+        {
+            hsv.Run(src);
+            peak.histogram = hsv.histogram01;
+            peak.Run(hsv.dst1);
+            dst2 = peak.dst2;
+            dst3 = peak.auto.dst2;
+            labels[3] = hsv.labels[2];
+        }
+    }
+    public class CS_HistPeak2D_BGR : CS_Parent
+    {
+        Hist2D_BGR bgr = new Hist2D_BGR();
+        HistPeak2D_Basics peak = new HistPeak2D_Basics();
+        public CS_HistPeak2D_BGR(VBtask task) : base(task)
+        {
+            desc = "Find the peaks in the 2D plot of the BGR image";
+        }
+        public void RunCS(Mat src)
+        {
+            bgr.Run(src);
+            peak.histogram = bgr.histogram02;
+            peak.Run(src);
+            dst2 = peak.dst2;
+            dst3 = peak.auto.dst2;
+            labels[3] = bgr.labels[2];
+        }
+    }
+    public class CS_HistPeak2D_RGB : CS_Parent
+    {
+        HistPeak2D_BGR peak = new HistPeak2D_BGR();
+        public CS_HistPeak2D_RGB(VBtask task) : base(task)
+        {
+            desc = "Find the peaks in the 2D plot of the BGR image";
+        }
+        public void RunCS(Mat src)
+        {
+            peak.Run(src);
+            dst2 = peak.dst2;
+            dst3 = peak.dst3;
+            labels[3] = peak.labels[2];
+        }
+    }
+    public class CS_HistPeak2D_HotSide : CS_Parent
+    {
+        HistPeak2D_Basics peak = new HistPeak2D_Basics();
+        Projection_HistSide histSide = new Projection_HistSide();
+        public CS_HistPeak2D_HotSide(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Backprojection of Side View hotspots", "Side view with highlighted hot spots" };
+            desc = "Find the top X peaks in the 2D histogram of the side view and backproject it.";
+        }
+        public void RunCS(Mat src)
+        {
+            histSide.Run(src);
+            dst3 = histSide.histogram;
+            for (int i = 0; i < peak.auto.clusterPoints.Count; i++)
+            {
+                var pt = peak.auto.clusterPoints[i];
+                DrawCircle(dst3, pt, task.DotSize * 3, Scalar.White);
+            }
+            peak.histogram = histSide.histogram;
+            peak.ranges = task.rangesSide;
+            task.redOptions.channels = task.channelsSide;
+            peak.Run(task.pointCloud);
+            dst2 = peak.dst2;
+            dst2.SetTo(0, task.noDepthMask);
+        }
+    }
+    public class CS_HistPeak2D_HotTop : CS_Parent
+    {
+        HistPeak2D_Basics peak = new HistPeak2D_Basics();
+        Projection_HistTop histTop = new Projection_HistTop();
+        public CS_HistPeak2D_HotTop(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Backprojection of Top View hotspots", "Top view with highlighted hot spots" };
+            desc = "Find the top X peaks in the 2D histogram of the top view and backproject it.";
+        }
+        public void RunCS(Mat src)
+        {
+            histTop.Run(src);
+            dst3 = histTop.histogram;
+            for (int i = 0; i < peak.auto.clusterPoints.Count; i++)
+            {
+                var pt = peak.auto.clusterPoints[i];
+                DrawCircle(dst3, pt, task.DotSize * 3, Scalar.White);
+            }
+            peak.histogram = histTop.histogram;
+            peak.ranges = task.rangesTop;
+            task.redOptions.channels = task.channelsTop;
+            peak.Run(task.pointCloud);
+            dst2 = peak.dst2;
+            dst2.SetTo(0, task.noDepthMask);
+        }
+    }
+    public class CS_HistValley_Basics : CS_Parent
+    {
+        Hist_Basics hist = new Hist_Basics();
+        Options_Boundary options = new Options_Boundary();
+        public int[] valleys = new int[4]; // grayscale values for low points in the histogram.
+        List<float> scaleList = new List<float>();
+        public CS_HistValley_Basics(VBtask task) : base(task)
+        {
+            task.frameHistoryCount = 30;
+            task.gOptions.setHistogramBins(256);
+            labels[2] = "Histogram of the grayscale image.  White lines mark local minimum above threshold.  Yellow horizontal = histogram mean.";
+            desc = "Find the histogram valleys for a grayscale image.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            int vCount = options.desiredBoundaries;
+            int minDistance = options.peakDistance;
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            hist.Run(src);
+            dst2 = hist.dst2;
+            var avg = hist.histogram.Mean();
+            scaleList.Add((float)(dst2.Height - dst2.Height * avg[0] / hist.plot.mm.maxVal));
+            float scale = scaleList.Average();
+            SetTrueText("Mean", new cv.Point(5, scale), 3);
+            dst2.Line(new cv.Point(0, scale), new cv.Point(dst2.Width, scale), Scalar.Yellow, task.lineWidth + 1);
+            if (scaleList.Count > task.frameHistoryCount) scaleList.RemoveAt(0);
+            var hArray = hist.histArray;
+            int quartile = (int)Math.Floor(hArray.Count() / 4.0); // note we really just want quartiles 
+            float threshold = (float)avg[0] / 2;
+            Array.Clear(valleys, 0, valleys.Length);
+            for (int i = 0; i < valleys.Length; i++)
+            {
+                valleys[i] = quartile * i;
+                float minVal = (float) avg[0];
+                for (int j = quartile * i; j < quartile * (i + 1); j++)
+                {
+                    float nextVal = hArray[j];
+                    if (nextVal < minVal && nextVal > threshold && (j - valleys[i]) >= minDistance)
+                    {
+                        valleys[i] = j;
+                        minVal = nextVal;
+                    }
+                }
+            }
+            float wPlot = (float)dst2.Width / task.histogramBins;
+            for (int i = 0; i < valleys.Length; i++)
+            {
+                float col = valleys[i] * wPlot;
+                dst2.Line(new cv.Point(col, 0), new cv.Point(col, dst2.Height), Scalar.White, task.lineWidth + 1);
+            }
+        }
+    }
+    public class CS_HistValley_FromPeaks : CS_Parent
+    {
+        public HistValley_Peaks peak = new HistValley_Peaks();
+        public List<int> peaks = new List<int>();
+        public List<int> valleyIndex = new List<int>();
+        public float[] avgValley;
+        public List<float> histList = new List<float>();
+        public CS_HistValley_FromPeaks(VBtask task) : base(task)
+        {
+            FindSlider("Desired boundary count").Value = 10;
+            desc = "Use the peaks identified in HistValley_Peaks to find the valleys between the peaks.";
+        }
+        public void updatePlot(cv.Mat dst, int bins)
+        {
+            foreach (var valley in valleyIndex)
+            {
+                float col = dst.Width * valley / bins;
+                dst.Line(new cv.Point(col, dst.Height), new cv.Point(col, dst.Height * 9 / 10), Scalar.White, task.lineWidth);
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            peak.Run(src);
+            dst2 = peak.hist.dst2;
+            histList = peak.histArray.ToList();
+            peaks = new List<int>(peak.peaks);
+            valleyIndex.Clear();
+            for (int i = 0; i < peaks.Count - 1; i++)
+            {
+                int start = peaks[i];
+                int finish = peaks[i + 1];
+                List<float> testList = new List<float>();
+                for (int j = start; j <= finish; j++)
+                {
+                    testList.Add(histList[j]);
+                }
+                valleyIndex.Add(start + testList.IndexOf(testList.Min()));
+            }
+            if (task.optionsChanged) avgValley = new float[valleyIndex.Count];
+            float depthPerBin = task.MaxZmeters / histList.Count;
+            for (int i = 0; i < avgValley.Length; i++)
+            {
+                avgValley[i] = (avgValley[i] + valleyIndex[i] * depthPerBin) / 2;
+            }
+            if (standaloneTest())
+            {
+                updatePlot(dst2, task.histogramBins);
+                SetTrueText("Input data used by default is the depth data", 3);
+            }
+            labels[2] = peak.labels[2] + " and " + valleyIndex.Count.ToString() + " valleys (marked at bottom)";
+        }
+    }
+    public class CS_HistValley_Peaks : CS_Parent
+    {
+        public Hist_Basics hist = new Hist_Basics();
+        public Options_Boundary options = new Options_Boundary();
+        public List<int> peaks = new List<int>();
+        public float[] histArray;
+        public CS_HistValley_Peaks(VBtask task) : base(task)
+        {
+            task.gOptions.setHistogramBins(100);
+            FindSlider("Desired boundary count").Value = 5;
+            labels[2] = "Histogram - white lines are peaks";
+            desc = "Find the requested number of peaks in the histogram ";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            int desiredBoundaries = options.desiredBoundaries;
+            if (src.Type() != MatType.CV_32FC1 || standaloneTest())
+            {
+                src = task.pcSplit[2];
+                hist.Run(src);
+                dst2 = hist.dst2;
+                histArray = new float[hist.histogram.Rows];
+                Marshal.Copy(hist.histogram.Data, histArray, 0, histArray.Length);
+            }
+            else
+            {
+                histArray = new float[src.Rows];
+                Marshal.Copy(src.Data, histArray, 0, histArray.Length);
+            }
+            var histList = histArray.ToList();
+            var sortPeaks = new SortedList<int, int>(new compareAllowIdenticalInteger());
+            for (int i = 0; i < histList.Count; i++)
+            {
+                if (histList[i] != 0)
+                {
+                    sortPeaks.Add(i, i);
+                    break;
+                }
+            }
+            for (int i = histList.Count - 1; i >= 0; i--)
+            {
+                if (histList[i] != 0)
+                {
+                    sortPeaks.Add(i, i);
+                    break;
+                }
+            }
+            for (int i = 0; i < desiredBoundaries; i++)
+            {
+                int index = histList.IndexOf(histList.Max());
+                float lastCount = histList[index];
+                sortPeaks.Add(index, index);
+                for (int j = index - 1; j >= 0; j--)
+                {
+                    float count = histList[j];
+                    if (lastCount > count) histList[j] = 0; else break;
+                    lastCount = count;
+                }
+                lastCount = histList[index];
+                histList[index] = 0;
+                for (int j = index + 1; j < histList.Count; j++)
+                {
+                    float count = histList[j];
+                    if (lastCount > count) histList[j] = 0; else break;
+                    lastCount = count;
+                }
+            }
+            mmData mm = GetMinMax(src);
+            float incr = (float)(mm.maxVal - mm.minVal) / task.histogramBins;
+            peaks.Clear();
+            foreach (var index in sortPeaks.Keys)
+            {
+                float col = (float)dst2.Width * index / task.histogramBins;
+                peaks.Add(index);
+                DrawLine(dst2, new cv.Point(col, 0), new cv.Point(col, dst2.Height / 10), Scalar.White, task.lineWidth);
+            }
+            labels[2] = (peaks.Count - 2).ToString() + " peaks (marked at top) were found in the histogram";
+        }
+    }
+    public class CS_HistValley_Depth : CS_Parent
+    {
+        public HistValley_FromPeaks valley = new HistValley_FromPeaks();
+        Mat histogram;
+        public CS_HistValley_Depth(VBtask task) : base(task)
+        {
+            labels[2] = "Top markers = peaks, bottom markers = valleys";
+            desc = "Find the valleys in the depth histogram.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                valley.Run(src);
+                dst2 = valley.dst2;
+                List<int> vList = new List<int>(valley.valleyIndex);
+                float[] histArray = new float[valley.histList.Count];
+                for (int i = 0; i < vList.Count - 1; i++)
+                {
+                    int start = vList[i];
+                    int finish = vList[i + 1];
+                    for (int j = start; j <= finish; j++)
+                    {
+                        histArray[j] = i + 1;
+                    }
+                }
+                histogram = valley.peak.hist.histogram;
+                Marshal.Copy(histArray, 0, histogram.Data, histArray.Length);
+                histogram += 1; // shift away from 0
+            }
+            if (standaloneTest()) valley.updatePlot(dst2, task.histogramBins);
+        }
+    }
+    public class CS_HistValley_Depth1 : CS_Parent
+    {
+        public HistValley_OptionsAuto valley = new HistValley_OptionsAuto();
+        public SortedList<int, int> valleyOrder = new SortedList<int, int>(new compareAllowIdenticalInteger());
+        public CS_HistValley_Depth1(VBtask task) : base(task)
+        {
+            desc = "Find the valleys in the depth histogram.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_32F) src = task.pcSplit[2];
+            valley.Run(src);
+            dst1 = valley.dst1;
+            dst2 = valley.dst2;
+            dst3 = valley.dst3;
+            valleyOrder = valley.auto.valleyOrder;
+        }
+    }
+    public class CS_HistValley_Test : CS_Parent
+    {
+        public SortedList<int, int> valleyOrder = new SortedList<int, int>(new compareAllowIdenticalInteger());
+        public Options_Boundary options = new Options_Boundary();
+        Hist_Kalman kalmanHist = new Hist_Kalman();
+        public CS_HistValley_Test(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setHistogramBins(256);
+            desc = "Get the top X highest quality valley points in the histogram.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            int desiredBoundaries = options.desiredBoundaries;
+            // input should be a histogram.  If not, get one...
+            if (standaloneTest())
+            {
+                kalmanHist.Run(src);
+                dst2 = kalmanHist.dst2;
+                src = kalmanHist.hist.histogram.Clone();
+            }
+            float[] histArray = new float[src.Total() - 1];
+            Marshal.Copy(src.Data, histArray, 0, histArray.Length);
+            var histList = histArray.ToList();
+            List<float> valleys = new List<float>();
+            float incr = histList.Count / desiredBoundaries;
+            for (int i = 0; i < desiredBoundaries; i++)
+            {
+                List<float> nextList = new List<float>();
+                for (int j = (int)(i * incr); j < (int)((i + 1) * incr); j++)
+                {
+                    if (i == 0 && j < 5)
+                    {
+                        nextList.Add(dst2.Total()); // there are typically some gaps near zero.
+                    }
+                    else
+                    {
+                        if (histList[j] == 0) nextList.Add(dst2.Total()); else nextList.Add(histList[j]);
+                    }
+                }
+                int index = nextList.IndexOf(nextList.Min());
+                valleys.Add(index + i * incr);
+            }
+            valleyOrder.Clear();
+            int lastEntry = 0;
+            for (int i = 0; i < desiredBoundaries; i++)
+            {
+                valleyOrder.Add(lastEntry, (int)(valleys[i] - 1));
+                lastEntry = (int)valleys[i];
+            }
+            if (valleys[desiredBoundaries - 1] != histList.Count - 1)
+            {
+                valleyOrder.Add((int)valleys[desiredBoundaries - 1], 256);
+            }
+            if (standaloneTest())
+            {
+                foreach (var entry in valleyOrder)
+                {
+                    float col = (float)entry.Value * dst2.Width / task.histogramBins;
+                    DrawLine(dst2, new cv.Point(col, 0), new cv.Point(col, dst2.Height), Scalar.White, task.lineWidth);
+                }
+                SetTrueText(valleys.Count.ToString() + " valleys in histogram", 3);
+            }
+        }
+    }
+    public class CS_HistValley_OptionsAuto : CS_Parent
+    {
+        Hist_Kalman kalman = new Hist_Kalman();
+        public Mat histogram = new Mat();
+        public OpAuto_Valley auto = new OpAuto_Valley();
+        public CS_HistValley_OptionsAuto(VBtask task) : base(task)
+        {
+            task.gOptions.setHistogramBins(256);
+            labels = new string[] { "", "", "Grayscale histogram - white lines are valleys", "" };
+            desc = "Isolate the different levels of gray using the histogram valleys.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                kalman.Run(src);
+                dst2 = kalman.dst2;
+                histogram = kalman.hist.histogram.Clone();
+                auto.Run(histogram);
+                if (auto.valleyOrder.Count == 0) return;
+                for (int i = 0; i < auto.valleyOrder.Count; i++)
+                {
+                    var entry = auto.valleyOrder.ElementAt(i);
+                    float cClass = (float)(255 / (i + 1));
+                    int index = (i % 2 == 0) ? (int)(255 - cClass) : (int)cClass;
+                    for (int j = entry.Key; j <= entry.Value; j++)
+                    {
+                        histogram.Set<float>(j, 0, index);
+                    }
+                    int col = dst2.Width * entry.Value / task.histogramBins;
+                    DrawLine(dst2, new cv.Point(col, 0), new cv.Point(col, dst2.Height), Scalar.White, task.lineWidth);
+                }
+            }
+            if (src.Type() == MatType.CV_32F) histogram += 1;
+            Cv2.CalcBackProject(new Mat[] { src }, new int[] { 0 }, histogram, dst1, kalman.hist.ranges);
+            if (dst1.Type() != MatType.CV_8U)
+            {
+                dst1.SetTo(0, task.noDepthMask);
+                dst1.ConvertTo(dst1, MatType.CV_8U);
+            }
+            dst3 = ShowPalette(dst1);
+            labels[3] = (auto.valleyOrder.Count + 1).ToString() + " colors in the back projection";
+        }
+    }
+    public class CS_HistValley_Diff : CS_Parent
+    {
+        Diff_Basics diff = new Diff_Basics();
+        HistValley_FromPeaks valley = new HistValley_FromPeaks();
+        public CS_HistValley_Diff(VBtask task) : base(task)
+        {
+            desc = "Compare frame to frame what has changed";
+        }
+        public void RunCS(Mat src)
+        {
+            valley.Run(src);
+            dst2 = valley.dst2;
+            diff.Run(valley.dst2);
+            dst3 = diff.dst2;
+        }
+    }
+    public class CS_HistValley_EdgeDraw : CS_Parent
+    {
+        HistValley_FromPeaks valley = new HistValley_FromPeaks();
+        EdgeDraw_Basics edges = new EdgeDraw_Basics();
+        public CS_HistValley_EdgeDraw(VBtask task) : base(task)
+        {
+            desc = "Remove edge color in RGB before HistValley_FromPeaks";
+        }
+        public void RunCS(Mat src)
+        {
+            edges.Run(src);
+            dst3 = src;
+            dst3.SetTo(Scalar.Black, edges.dst2);
+            valley.Run(dst3);
+            dst2 = valley.dst2;
+        }
+    }
+    public class CS_HistValley_Simple : CS_Parent
+    {
+        SLR_Trends trends = new SLR_Trends();
+        public Kalman_Basics kalman = new Kalman_Basics();
+        public List<int> depthRegions = new List<int>();
+        public CS_HistValley_Simple(VBtask task) : base(task)
+        {
+            desc = "Identify ranges by marking the depth histogram entries from valley to valley";
+        }
+        public void RunCS(Mat src)
+        {
+            trends.Run(src);
+            if (kalman.kInput.Length != task.histogramBins) Array.Resize(ref kalman.kInput, task.histogramBins);
+            kalman.kInput = trends.resultingValues.ToArray();
+            kalman.Run(src);
+            dst2.SetTo(Scalar.Black);
+            float barWidth = (float)dst2.Width / trends.resultingValues.Count;
+            int colorIndex = 0;
+            Scalar color = task.scalarColors[colorIndex % 256];
+            int[] vals = { -1, -1, -1 };
+            for (int i = 0; i < kalman.kOutput.Count(); i++)
+            {
+                int h = dst2.Height - (int)kalman.kOutput[i];
+                vals[0] = vals[1];
+                vals[1] = vals[2];
+                vals[2] = h;
+                if (vals[0] >= 0)
+                {
+                    if (vals[0] > vals[1] && vals[2] > vals[1])
+                    {
+                        colorIndex++;
+                        color = task.scalarColors[colorIndex % 256];
+                    }
+                }
+                Cv2.Rectangle(dst2, new Rect(i * (int)barWidth, dst2.Height - h, (int)barWidth, h), color, -1);
+                depthRegions.Add(colorIndex);
+            }
+            cv.Point2f lastPoint = trends.resultingPoints[0];
+            for (int i = 1; i < trends.resultingPoints.Count; i++)
+            {
+                cv.Point2f p1 = trends.resultingPoints[i];
+                DrawLine(dst2, lastPoint, p1, Scalar.Yellow, task.lineWidth);
+                lastPoint = p1;
+            }
+            labels[2] = "Depth regions between 0 and " + ((int)(task.MaxZmeters + 1)).ToString() + " meters";
+        }
+    }
+    public class CS_HistValley_Tiers : CS_Parent
+    {
+        HistValley_FromPeaks valleys = new HistValley_FromPeaks();
+        public CS_HistValley_Tiers(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "CV_8U tier map with values ranging from 0 to the desired valley count", "vbPalette output of dst2." };
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Display the depth as tiers defined by the depth valleys in the histogram of depth.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (!task.heartBeat) return;
+            valleys.Run(src);
+            dst2.SetTo(0);
+            var marks = valleys.avgValley;
+            marks[0] = 0;
+            for (int i = 1; i < marks.Count(); i++)
+            {
+                dst2.SetTo(i + 1, task.pcSplit[2].InRange(marks[i - 1], marks[i]));
+            }
+            dst2.SetTo(marks.Count(), task.pcSplit[2].InRange(marks[marks.Count() - 1], 100));
+            dst3 = ShowPalette(dst2 * 255 / (marks.Count() + 1));
+        }
+    }
+    public class CS_HistValley_Colors : CS_Parent
+    {
+        Hist_Kalman hist = new Hist_Kalman();
+        OpAuto_Valley auto = new OpAuto_Valley();
+        int splitIndex;
+        public CS_HistValley_Colors(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setHistogramBins(256);
+            if (standaloneTest()) FindSlider("Desired boundary count").Value = 10;
+            desc = "Find the histogram valleys for each of the colors.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat) splitIndex = (splitIndex + 1) % 3;
+            src = src.ExtractChannel(splitIndex);
+            if (splitIndex == 0)
+                hist.hist.plot.backColor = Scalar.Blue;
+            else if (splitIndex == 1)
+                hist.hist.plot.backColor = Scalar.Green;
+            else
+                hist.hist.plot.backColor = Scalar.Red;
+            hist.Run(src);
+            dst2 = hist.dst2;
+            auto.Run(hist.hist.histogram);
+            for (int i = 0; i < auto.valleyOrder.Count; i++)
+            {
+                var entry = auto.valleyOrder.ElementAt(i);
+                float cClass = (float)(255 / (i + 1));
+                int index = (i % 2 == 0) ? (int)(255 - cClass) : (int)cClass;
+                for (int j = entry.Key; j <= entry.Value; j++)
+                {
+                    hist.hist.histogram.Set<float>(j, 0, index);
+                }
+                int col = dst2.Width * entry.Value / task.histogramBins;
+                DrawLine(dst2, new cv.Point(col, 0), new cv.Point(col, dst2.Height), Scalar.White, task.lineWidth);
+            }
+        }
+    }
+    public class CS_HistValley_GrayKalman : CS_Parent
+    {
+        Hist_Kalman hist = new Hist_Kalman();
+        OpAuto_Valley auto = new OpAuto_Valley();
+        Kalman_Basics kalman = new Kalman_Basics();
+        public CS_HistValley_GrayKalman(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setHistogramBins(256);
+            if (standaloneTest()) FindSlider("Desired boundary count").Value = 4;
+            desc = "Find the histogram valleys for a grayscale image.";
+        }
+        public void RunCS(Mat src)
+        {
+            src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            hist.Run(src);
+            dst2 = hist.dst2;
+            auto.Run(hist.hist.histogram);
+            Array.Resize(ref kalman.kInput, auto.valleyOrder.Count);
+            for (int i = 0; i < auto.valleyOrder.Count; i++)
+            {
+                kalman.kInput[i] = auto.valleyOrder.ElementAt(i).Value;
+            }
+            kalman.Run(src);
+            int lastEntry = 0;
+            for (int i = 0; i < kalman.kOutput.Count(); i++)
+            {
+                int entry = auto.valleyOrder.ElementAt(i).Value;
+                for (int j = lastEntry; j <= entry; j++)
+                {
+                    hist.hist.histogram.Set<float>(j, 0, i);
+                }
+                int col = dst2.Width * entry / task.histogramBins;
+                DrawLine(dst2, new cv.Point(col, 0), new cv.Point(col, dst2.Height), Scalar.White, task.lineWidth);
+                lastEntry = entry;
+            }
+        }
+    }
+    public class CS_HistValley_GrayScale1 : CS_Parent
+    {
+        Hist_Basics hist = new Hist_Basics();
+        public CS_HistValley_GrayScale1(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setHistogramBins(256);
+            desc = "Find the histogram valleys for a grayscale image.";
+        }
+        public void RunCS(Mat src)
+        {
+            src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            hist.Run(src);
+            dst2 = hist.dst2;
+            int wquartile = dst2.Width / 4;
+            for (int i = 0; i < 3; i++)
+            {
+                int col = wquartile * (i + 1);
+                dst2.Line(new cv.Point(col, 0), new cv.Point(col, dst2.Height), Scalar.Yellow, task.lineWidth + 2);
+            }
+            int start = 0;
+            int lastentry = 0;
+            int[] minEntries = new int[4];
+            int quartile = (int)Math.Floor(hist.histogram.Rows / 4.0);
+            for (int i = 0; i < hist.histArray.Count(); i++)
+            {
+                if (hist.histArray[i] != 0 && i > quartile / 4)
+                {
+                    lastentry = (int)hist.histArray[i];
+                    minEntries[0] = i;
+                    start = i;
+                    break;
+                }
+            }
+            for (int i = start; i < hist.histArray.Count(); i++)
+            {
+                if (hist.histArray[i] == 0) hist.histArray[i] = lastentry;
+                lastentry = (int)hist.histArray[i];
+            }
+            for (int i = 0; i < minEntries.Length; i++)
+            {
+                minEntries[i] = quartile * i;
+                for (int j = quartile * i; j < quartile * (i + 1); j++)
+                {
+                    if (hist.histArray[minEntries[i]] >= hist.histArray[j]) minEntries[i] = j;
+                }
+            }
+            float wPlot = (float)dst2.Width / task.histogramBins;
+            for (int i = 0; i < minEntries.Length; i++)
+            {
+                int col = minEntries[i] * (int)wPlot;
+                dst2.Line(new cv.Point(col, 0), new cv.Point(col, dst2.Height), Scalar.White, task.lineWidth + 1);
+            }
+        }
+    }
+    public class CS_HMM_Example_CPP : CS_Parent
+    {
+        public CS_HMM_Example_CPP(VBtask task) : base(task)
+        {
+            if (!task.testAllRunning) cPtr = HMM_Open();
+            labels[2] = "Text output with explanation will appear in the Visual Studio output.";
+            desc = "Simple test of Hidden Markov Model - text output";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.testAllRunning)
+            {
+                SetTrueText("When CS_HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.");
+                return;
+            }
+            byte[] dataSrc = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length);
+            GCHandle handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned);
+            IntPtr imagePtr = HMM_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels());
+            handleSrc.Free();
+            if (imagePtr != IntPtr.Zero)
+            {
+                dst2 = new Mat(src.Rows, src.Cols, src.Channels() == 3 ? MatType.CV_8UC3 : MatType.CV_8UC1, imagePtr).Clone();
+            }
+        }
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero) cPtr = HMM_Close(cPtr);
+        }
+        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr HMM_Open();
+
+        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr HMM_Close(IntPtr cPtr);
+
+        [DllImport("CPP_Classes.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr HMM_Run(IntPtr HMMPtr, IntPtr bgrPtr, int rows, int cols, int channels);
+    }
 
 
 

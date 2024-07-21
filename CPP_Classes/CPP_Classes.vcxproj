@@ -24,6 +24,7 @@
     <ClInclude Include="CPP_Functions.h" />
     <ClInclude Include="CPP_Task.h" />
     <ClInclude Include="CPP_AI_Generated.h" />
+    <ClInclude Include="CvHMM.h" />
     <ClInclude Include="Options.h" />
     <ClInclude Include="ParticleFilter.h" />
     <ClInclude Include="PragmaLibs.h" />
@@ -31,6 +32,7 @@
   <ItemGroup>
     <ClCompile Include="CPP_IncludeOnly.cpp" />
     <ClCompile Include="Dither.cpp" />
+    <ClCompile Include="HMM.cpp" />
     <ClCompile Include="ParticleFilter.cpp" />
     <ClCompile Include="PCA.cpp" />
     <ClCompile Include="recursiveBilateralFilter.cpp" />

@@ -11,6 +11,7 @@
     <ClCompile Include="CPP_IncludeOnly.cpp" />
     <ClCompile Include="Tracker.cpp" />
     <ClCompile Include="PCA.cpp" />
+    <ClCompile Include="HMM.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPP_Externs.h" />
@@ -21,5 +22,6 @@
     <ClInclude Include="PragmaLibs.h" />
     <ClInclude Include="CPP_Algorithms.h" />
     <ClInclude Include="Options.h" />
+    <ClInclude Include="CvHMM.h" />
   </ItemGroup>
 </Project>
