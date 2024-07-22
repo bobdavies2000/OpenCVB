@@ -694,6 +694,13 @@ namespace CS_Classes
 			if (algorithmName == "CS_Hough_LaneFinder") return new CS_Hough_LaneFinder(task);
 			if (algorithmName == "CS_Hough_Lines_MT") return new CS_Hough_Lines_MT(task);
 			if (algorithmName == "CS_Hough_Sudoku") return new CS_Hough_Sudoku(task);
+			if (algorithmName == "CS_Hull_Basics") return new CS_Hull_Basics(task);
+			if (algorithmName == "CS_Hull_Contour") return new CS_Hull_Contour(task);
+			if (algorithmName == "CS_Image_Basics") return new CS_Image_Basics(task);
+			if (algorithmName == "CS_Image_CellStats") return new CS_Image_CellStats(task);
+			if (algorithmName == "CS_Image_MSER") return new CS_Image_MSER(task);
+			if (algorithmName == "CS_Image_RedCloudColor") return new CS_Image_RedCloudColor(task);
+			if (algorithmName == "CS_Image_Series") return new CS_Image_Series(task);
 			if (algorithmName == "CS_Line_Basics") return new CS_Line_Basics(task);
 			if (algorithmName == "CS_Mat_4Click") return new CS_Mat_4Click(task);
 			if (algorithmName == "CS_Mat_4to1") return new CS_Mat_4to1(task);

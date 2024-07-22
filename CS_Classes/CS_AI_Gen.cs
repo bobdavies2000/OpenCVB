@@ -7570,7 +7570,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
         public void RunCS(Mat src)
         {
-            images.fileNameForm.setFileName(task.HomeDir + "Data/Glasses by Gilles Tran.png");
+            images.options.fileNameForm.setFileName(task.HomeDir + "Data/Glasses by Gilles Tran.png");
             images.Run(new Mat());
             dst2 = images.dst2;
 
@@ -25940,69 +25940,252 @@ public class CS_ApproxPoly_Basics : CS_Parent
         src.CopyTo(dst2, maskFless);
         dst3.SetTo(0);
         src.CopyTo(dst3, maskFeat);
-    }
-}
-public class CS_Hough_LaneFinder : CS_Parent
-{
-    LaneFinder_HLSColor hls = new LaneFinder_HLSColor();
-    public LineSegmentPoint[] segments;
-    public Mat mask;
-    public int laneLineMinY;
-    public CS_Hough_LaneFinder(VBtask task) : base(task)
-    {
-        labels = new string[] { "Original video image", "Mask to isolate lane regions", "Combined yellow and white masks", "HoughLines output" };
-        desc = "Use Hough to isolate features in the mask of the road.";
-    }
-    public void RunCS(Mat src)
-    {
-        hls.Run(empty);
-        if (task.optionsChanged)
-        {
-            int w = hls.input.video.dst2.Width;
-            int h = hls.input.video.dst2.Height;
-            var bl = new cv.Point(w * 0.1, h * 0.95);
-            var tl = new cv.Point(w * 0.4, h * 0.6);
-            var br = new cv.Point(w * 0.95, h * 0.95);
-            var tr = new cv.Point(w * 0.6, h * 0.6);
-            var pList = new Point[] { bl, tl, tr, br };
-            mask = new Mat(new cv.Size(w, h), MatType.CV_8U, 0);
-            mask.FillConvexPoly(pList, Scalar.White, task.lineType);
-        }
-        dst1 = mask.Clone();
-        dst0 = hls.dst0;
-        dst2 = new Mat(mask.Size(), MatType.CV_8U, 0);
-        hls.dst3.CopyTo(dst2, mask);
-        int rho = 1;
-        double theta = Cv2.PI / 180;
-        int threshold = 20;
-        int minLineLength = 20;
-        int maxLineGap = 300;
-        segments = Cv2.HoughLinesP(dst2.Clone(), rho, theta, threshold, minLineLength, maxLineGap);
-        dst3 = new Mat(mask.Size(), MatType.CV_8UC3, 0);
-        laneLineMinY = dst2.Height;
-        for (int i = 0; i < segments.Length; i++)
-        {
-            if (laneLineMinY > segments[i].P1.Y) laneLineMinY = segments[i].P1.Y;
-            if (laneLineMinY > segments[i].P2.Y) laneLineMinY = segments[i].P2.Y;
-            DrawLine(dst3, segments[i].P1, segments[i].P2, task.HighlightColor, task.lineWidth);
         }
     }
-}
-public class CS_Hough_Sudoku : CS_Parent
-{
-    Hough_Basics hough = new Hough_Basics();
-    public CS_Hough_Sudoku(VBtask task) : base(task)
+    public class CS_Hough_LaneFinder : CS_Parent
     {
-        desc = "Successful use of Hough to find lines in Sudoku grid.";
+        LaneFinder_HLSColor hls = new LaneFinder_HLSColor();
+        public LineSegmentPoint[] segments;
+        public Mat mask;
+        public int laneLineMinY;
+        public CS_Hough_LaneFinder(VBtask task) : base(task)
+        {
+            labels = new string[] { "Original video image", "Mask to isolate lane regions", "Combined yellow and white masks", "HoughLines output" };
+            desc = "Use Hough to isolate features in the mask of the road.";
+        }
+        public void RunCS(Mat src)
+        {
+            hls.Run(empty);
+            if (task.optionsChanged)
+            {
+                int w = hls.input.video.dst2.Width;
+                int h = hls.input.video.dst2.Height;
+                var bl = new cv.Point(w * 0.1, h * 0.95);
+                var tl = new cv.Point(w * 0.4, h * 0.6);
+                var br = new cv.Point(w * 0.95, h * 0.95);
+                var tr = new cv.Point(w * 0.6, h * 0.6);
+                var pList = new Point[] { bl, tl, tr, br };
+                mask = new Mat(new cv.Size(w, h), MatType.CV_8U, 0);
+                mask.FillConvexPoly(pList, Scalar.White, task.lineType);
+            }
+            dst1 = mask.Clone();
+            dst0 = hls.dst0;
+            dst2 = new Mat(mask.Size(), MatType.CV_8U, 0);
+            hls.dst3.CopyTo(dst2, mask);
+            int rho = 1;
+            double theta = Cv2.PI / 180;
+            int threshold = 20;
+            int minLineLength = 20;
+            int maxLineGap = 300;
+            segments = Cv2.HoughLinesP(dst2.Clone(), rho, theta, threshold, minLineLength, maxLineGap);
+            dst3 = new Mat(mask.Size(), MatType.CV_8UC3, 0);
+            laneLineMinY = dst2.Height;
+            for (int i = 0; i < segments.Length; i++)
+            {
+                if (laneLineMinY > segments[i].P1.Y) laneLineMinY = segments[i].P1.Y;
+                if (laneLineMinY > segments[i].P2.Y) laneLineMinY = segments[i].P2.Y;
+                DrawLine(dst3, segments[i].P1, segments[i].P2, task.HighlightColor, task.lineWidth);
+            }
+        }
     }
-    public void RunCS(Mat src)
+    public class CS_Hough_Sudoku : CS_Parent
     {
-        dst2 = Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size());
-        dst3 = dst2.Clone();
-        hough.Run(dst2);
-        HoughShowLines(ref dst3, hough.segments, hough.options.lineCount);
+        Hough_Basics hough = new Hough_Basics();
+        public CS_Hough_Sudoku(VBtask task) : base(task)
+        {
+            desc = "Successful use of Hough to find lines in Sudoku grid.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = Cv2.ImRead(task.HomeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size());
+            dst3 = dst2.Clone();
+            hough.Run(dst2);
+            HoughShowLines(ref dst3, hough.segments, hough.options.lineCount);
+        }
     }
-}
+    public class CS_Hull_Basics : CS_Parent
+    {
+        Random_Basics random = new Random_Basics();
+        public List<Point2f> inputPoints = new List<Point2f>();
+        public List<Point> hull = new List<Point>();
+        public bool useRandomPoints;
+        public CS_Hull_Basics(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Input Points - draw a rectangle anywhere.  Enclosing rectangle in yellow.", "" };
+            if (standaloneTest()) random.range = new Rect(100, 100, 50, 50);
+            desc = "Given a list of points, create a hull that encloses them.";
+        }
+        List<Point> vbFloat2Int(List<Point2f> ptList2f)
+        {
+            List<Point> ptList = new List<Point>();
+            foreach (var pt in ptList2f)
+            {
+                ptList.Add(new cv.Point((int)pt.X, (int)pt.Y));
+            }
+            return ptList;
+        }
+        public void RunCS(Mat src)
+        {
+            if ((standaloneTest() && task.heartBeat) || (useRandomPoints && task.heartBeat))
+            {
+                random.Run(empty);
+                dst2.SetTo(0);
+                foreach (var pt in random.PointList)
+                {
+                    DrawCircle(dst2, pt, task.DotSize, Scalar.White);
+                }
+                inputPoints = new List<Point2f>(random.PointList);
+            }
+            var hull2f = Cv2.ConvexHull(inputPoints, true);
+            hull = vbFloat2Int(hull2f.ToList());
+            DrawContour(dst2, hull, Scalar.Yellow);
+        }
+    }
+    public class CS_Hull_Contour : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_Hull_Contour(VBtask task) : base(task)
+        {
+            desc = "Compare the hull to the contour of a RedCloud cell";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            dst3.SetTo(0);
+            var rc = task.rc;
+            List<Point> jumpList = new List<Point>();
+            for (int i = 1; i < rc.contour.Count(); i++)
+            {
+                var p1 = rc.contour[i - 1];
+                var p2 = rc.contour[i];
+                if (p1.DistanceTo(p2) > 1)
+                {
+                    if (!jumpList.Contains(p2)) jumpList.Add(p2);
+                }
+            }
+            rc.hull = Cv2.ConvexHull(rc.contour.ToArray(), true).ToList();
+            DrawContour(dst3, rc.contour, Scalar.LightBlue, task.lineWidth);
+            if (rc.hull.Count() > 0) rc.hull.RemoveAt(rc.hull.Count() - 1);
+            DrawContour(dst3, rc.hull, Scalar.White, task.lineWidth);
+        }
+    }
+    public class CS_Image_Basics : CS_Parent
+    {
+        public string inputFileName;
+        public Options_Images options = new Options_Images();
+        public CS_Image_Basics(VBtask task) : base(task)
+        {
+            desc = "Load an image into OpenCVB";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            src = options.fullsizeImage;
+            if (src.Width != dst2.Width || src.Height != dst2.Height)
+            {
+                var newSize = new cv.Size(dst2.Height * src.Width / src.Height, dst2.Height);
+                if (newSize.Width > dst2.Width)
+                {
+                    newSize = new cv.Size(dst2.Width, dst2.Width * src.Height / src.Width);
+                }
+                dst2.SetTo(0);
+                dst2[new Rect(0, 0, newSize.Width, newSize.Height)] = src.Resize(newSize);
+            }
+            else
+            {
+                dst2 = src;
+            }
+        }
+    }
+    public class CS_Image_Series : CS_Parent
+    {
+        public Image_Basics images = new Image_Basics();
+        public CS_Image_Series(VBtask task) : base(task)
+        {
+            images.options.imageSeries = true;
+            desc = "Display a new image from the directory every heartbeat";
+        }
+        public void RunCS(Mat src)
+        {
+            // to work on a specific file, specify it here.
+            // options.fileInputName = new FileInfo(task.HomeDir + "Images/train/103041.jpg");
+            images.Run(images.options.fullsizeImage);
+            dst2 = images.dst2;
+        }
+    }
+    public class CS_Image_RedCloudColor : CS_Parent
+    {
+        public Image_Series images = new Image_Series();
+        public RedCloud_Cells redC = new RedCloud_Cells();
+        public CS_Image_RedCloudColor(VBtask task) : base(task)
+        {
+            task.gOptions.setDisplay1();
+            desc = "Use RedCloud on a photo instead of the video stream.";
+        }
+        public void RunCS(Mat src)
+        {
+            images.Run(empty);
+            dst0 = images.dst2.Clone();
+            dst1 = images.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+            redC.Run(dst0);
+            dst2 = redC.dst2;
+            var mask = task.cellMap.InRange(0, 0);
+            dst2.SetTo(Scalar.Black, mask);
+            labels[2] = redC.labels[2];
+        }
+    }
+    public class CS_Image_CellStats : CS_Parent
+    {
+        Image_RedCloudColor images = new Image_RedCloudColor();
+        Cell_Basics stats = new Cell_Basics();
+        public CS_Image_CellStats(VBtask task) : base(task)
+        {
+            images.images.images.options.imageSeries = false;
+            if (standaloneTest()) task.gOptions.setDisplay0();
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            task.redOptions.setUseColorOnly(true);
+            desc = "Display the statistics for the selected cell";
+        }
+        public void RunCS(Mat src)
+        {
+            task.pointCloud.SetTo(0);
+            task.pcSplit = task.pointCloud.Split();
+            images.Run(empty);
+            dst0 = images.dst0;
+            dst1 = images.dst1;
+            dst2 = images.dst2;
+            stats.statsString();
+            SetTrueText(stats.strOut, 3);
+        }
+    }
+    public class CS_Image_MSER : CS_Parent
+    {
+        public Image_Series images = new Image_Series();
+        MSER_Detect core = new MSER_Detect();
+        Options_Images options = new Options_Images();
+        public CS_Image_MSER(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            FindSlider("MSER Min Area").Value = 15;
+            FindSlider("MSER Max Area").Value = 200000;
+            desc = "Find the MSER (Maximally Stable Extermal Regions) in the still image.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            images.Run(options.fullsizeImage);
+            dst1 = images.dst2;
+            core.Run(dst1);
+            dst2 = core.dst2;
+        }
+    }
+
+
+
+
+
 
 
 

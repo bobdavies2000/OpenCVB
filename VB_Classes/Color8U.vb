@@ -199,7 +199,7 @@ Public Class Color8U_ComplementaryTest : Inherits VB_Parent
         desc = "Create the complementary images for Gilles Tran's 'Glasses' image for comparison"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        images.fileNameForm.filename.Text = task.HomeDir + "Data/Glasses by Gilles Tran.png"
+        images.options.fileNameForm.filename.Text = task.HomeDir + "Data/Glasses by Gilles Tran.png"
         images.Run(empty)
         dst2 = images.dst2
 

@@ -2,48 +2,25 @@
 Imports cv = OpenCvSharp
 ' https://www.kaggle.com/datasets/balraj98/berkeley-segmentation-dataset-500-bsds500
 Public Class Image_Basics : Inherits VB_Parent
-    Public fileNameForm As OptionsFileName
     Public inputFileName As String
-    Dim fileInputName As FileInfo
+    Public options As New Options_Images
     Public Sub New()
-        fileNameForm = New OptionsFileName
-        fileNameForm.OpenFileDialog1.InitialDirectory = task.HomeDir + "Images/train"
-        fileNameForm.OpenFileDialog1.FileName = "*.*"
-        fileNameForm.OpenFileDialog1.CheckFileExists = False
-        fileNameForm.OpenFileDialog1.Filter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
-        fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("OpenCVB", "Image_Basics_Name", "Image_Basics_Name", task.HomeDir + "Images/train/2092.jpg")
-        fileNameForm.Text = "Select an image file for use in OpenCVB"
-        fileNameForm.FileNameLabel.Text = "Select a file."
-        fileNameForm.PlayButton.Hide()
-        fileNameForm.TrackBar1.Hide()
-        fileNameForm.Setup(traceName)
-        fileNameForm.Show()
-
         desc = "Load an image into OpenCVB"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        fileInputName = New FileInfo(fileNameForm.filename.Text)
-        If inputFileName <> fileInputName.FullName Or task.optionsChanged Then
-            inputFileName = fileInputName.FullName
-            If fileInputName.Exists = False Then
-                labels(2) = "No input file specified or file not found."
-                Exit Sub
-            End If
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
-            Dim fullsizeImage = cv.Cv2.ImRead(fileInputName.FullName)
-            If fullsizeImage.Width <> dst2.Width Or fullsizeImage.Height <> dst2.Height Then
-                Dim newSize = New cv.Size(dst2.Height * fullsizeImage.Width / fullsizeImage.Height, dst2.Height)
-                If newSize.Width > dst2.Width Then
-                    newSize = New cv.Size(dst2.Width, dst2.Width * fullsizeImage.Height / fullsizeImage.Width)
-                End If
-                dst2.SetTo(0)
-                dst2(New cv.Rect(0, 0, newSize.Width, newSize.Height)) = fullsizeImage.Resize(newSize)
-            Else
-                dst2 = fullsizeImage
-            End If
+        src = options.fullsizeImage
 
-            ' SaveSetting("OpenCVB", "Image_Basics_Name", "Image_Basics_Name", fileInputName.FullName)
+        If src.Width <> dst2.Width Or src.Height <> dst2.Height Then
+            Dim newSize = New cv.Size(dst2.Height * src.Width / src.Height, dst2.Height)
+            If newSize.Width > dst2.Width Then
+                newSize = New cv.Size(dst2.Width, dst2.Width * src.Height / src.Width)
+            End If
+            dst2.SetTo(0)
+            dst2(New cv.Rect(0, 0, newSize.Width, newSize.Height)) = src.Resize(newSize)
+        Else
+            dst2 = src
         End If
     End Sub
 End Class
@@ -58,35 +35,16 @@ End Class
 
 
 Public Class Image_Series : Inherits VB_Parent
-    Dim images As New Image_Basics
-    Dim fileIndex As Integer
-    Public fileInputName As FileInfo
-    Dim fileNameList As New List(Of String)
+    Public images As New Image_Basics
     Public Sub New()
-        fileInputName = New FileInfo(images.fileNameForm.filename.Text)
-
-        Dim dirName = fileInputName.Directory
-        Dim fileList As IO.FileInfo() = dirName.GetFiles("*.jpg")
-        For Each file In fileList
-            fileNameList.Add(file.FullName)
-        Next
-
+        images.options.imageSeries = True
         desc = "Display a new image from the directory every heartbeat"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        If task.optionsChanged Or loadNextImage Then
-            If loadNextImage Then fileIndex += 1
-            loadNextImage = False
-            If fileIndex >= fileNameList.Count Then fileIndex = 0
-
-            images.fileNameForm.filename.Text = fileNameList(fileIndex)
-
-            ' to work on a specific file, specify it here.
-            ' images.fileNameForm.filename.Text = task.HomeDir + "Images/train/103041.jpg"
-
-            images.Run(empty)
-            dst2 = images.dst2
-        End If
+    Public Sub RunVB(src As cv.Mat)
+        ' to work on a specific file, specify it here.
+        ' options.fileInputName = new fileinfo(task.HomeDir + "Images/train/103041.jpg")
+        images.Run(images.options.fullsizeImage)
+        dst2 = images.dst2
     End Sub
 End Class
 
@@ -126,38 +84,12 @@ End Class
 
 
 
-
-
-
-
-
-Public Class Image_RedCloudColorSeries : Inherits VB_Parent
-    Dim images As New Image_RedCloudColor
-    Public Sub New()
-        desc = "Use RedCloud on a series of photos instead of the video stream."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If task.heartBeat Then loadNextImage = True
-        images.Run(empty)
-        dst0 = images.dst0
-        dst1 = images.dst1
-        dst2 = images.dst2
-        dst3 = images.dst3
-        labels(2) = images.images.fileInputName.Name
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Image_CellStats : Inherits VB_Parent
     Dim images As New Image_RedCloudColor
     Dim stats As New Cell_Basics
     Public Sub New()
-        If standaloneTest() Then task.gOptions.setDisplay1()
+        images.images.images.options.imageSeries = False
+        If standaloneTest() Then task.gOptions.setDisplay0()
         If standaloneTest() Then task.gOptions.setDisplay1()
         task.redOptions.UseColorOnly.Checked = True
         desc = "Display the statistics for the selected cell"
@@ -182,38 +114,24 @@ End Class
 
 
 
-Module Image_Variables
-    Public loadNextImage As Boolean
-End Module
-
-
-
-
 
 
 Public Class Image_MSER : Inherits VB_Parent
     Public images As New Image_Series
     Dim core As New MSER_Detect
+    Dim options As New Options_Images
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
-            check.Setup(traceName)
-            check.addCheckBox("Load the next image")
-        End If
-
         FindSlider("MSER Min Area").Value = 15
         FindSlider("MSER Max Area").Value = 200000
         desc = "Find the MSER (Maximally Stable Extermal Regions) in the still image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static nextCheck = FindCheckBox("Load the next image")
-        loadNextImage = nextCheck.checked
-        nextCheck.checked = False
+        options.RunVB()
 
-        images.Run(empty)
-        dst0 = images.dst2
-
-        core.Run(dst0)
+        images.Run(options.fullsizeImage)
+        dst1 = images.dst2
+        core.Run(dst1)
         dst2 = core.dst2
     End Sub
 End Class

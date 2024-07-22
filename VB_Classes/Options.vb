@@ -6180,3 +6180,56 @@ Public Class Options_HOG : Inherits VB_Parent
         scaleHOG = scaleSlider.Value / 1000
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_Images : Inherits VB_Parent
+    Public fileNameForm As OptionsFileName
+    Public fileIndex As Integer
+    Public fileNameList As New List(Of String)
+    Public fileInputName As FileInfo
+    Public dirName As String
+    Public imageSeries As Boolean
+    Public fullsizeImage As cv.Mat
+    Public Sub New()
+        fileNameForm = New OptionsFileName
+        dirName = task.HomeDir + "Images/train"
+        fileNameForm.OpenFileDialog1.InitialDirectory = dirName
+        fileNameForm.OpenFileDialog1.FileName = "*.*"
+        fileNameForm.OpenFileDialog1.CheckFileExists = False
+        fileNameForm.OpenFileDialog1.Filter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
+        fileNameForm.OpenFileDialog1.FilterIndex = 1
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "Image_Basics_Name", "Image_Basics_Name", task.HomeDir + "Images/train/2092.jpg")
+        fileNameForm.Text = "Select an image file for use in OpenCVB"
+        fileNameForm.FileNameLabel.Text = "Select a file."
+        fileNameForm.PlayButton.Hide()
+        fileNameForm.TrackBar1.Hide()
+        fileNameForm.Setup(traceName)
+        fileNameForm.Show()
+
+        Dim inputDir = New DirectoryInfo(dirName)
+        Dim fileList As IO.FileInfo() = inputDir.GetFiles("*.jpg")
+        For Each file In fileList
+            fileNameList.Add(file.FullName)
+        Next
+
+        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Load the next image")
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static nextCheck = FindCheckBox("Load the next image")
+        If (task.heartBeat And imageSeries) Or fullsizeImage Is Nothing Then nextCheck.checked = True
+        If nextCheck.checked = True Then
+            If nextCheck.checked Then fileIndex += 1
+            If fileIndex >= fileNameList.Count Then fileIndex = 0
+            fileInputName = New FileInfo(fileNameList(fileIndex))
+            fullsizeImage = cv.Cv2.ImRead(fileInputName.FullName)
+        End If
+        nextCheck.checked = False
+    End Sub
+End Class
