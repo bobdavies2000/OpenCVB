@@ -527,68 +527,6 @@ End Class
 
 
 
-Public Class IMU_VerticalVerify : Inherits VB_Parent
-    Public gCells As New List(Of gravityLine)
-    Dim linesVH As New FeatureLine_VH
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Minimum Arc-Y threshold angle (degrees)", 70, 90, 80)
-        End If
-
-        labels = {"", "", "Highlighted vertical lines", "Line details"}
-        desc = "Use the Y-Arc to confirm which vertical lines are valid"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-
-        dst2 = src.Clone
-
-        If standaloneTest() Then
-            linesVH.Run(src)
-            gCells = linesVH.gCells
-        End If
-
-        Static arcYslider = FindSlider("Minimum Arc-Y threshold angle (degrees)")
-        Dim angleThreshold = arcYslider.Value
-
-        strOut = "ID" + vbTab + "len3D" + vbTab + "Depth" + vbTab + "Arc Y" + vbTab + "Image" + vbTab + "IMU Y" + vbTab + vbCrLf
-        dst3.SetTo(0)
-        Dim index As Integer
-        For i = gCells.Count - 1 To 0 Step -1
-            Dim gc = gCells(i)
-            If gc.arcY > angleThreshold Then
-                index = gCells.Count - i
-                Dim p1 = gc.tc1.center
-                Dim p2 = gc.tc2.center
-                Dim xOffset = p1.X - p2.X
-                If p1.Y < p2.Y Then xOffset = p2.X - p1.X
-                Dim hypot = p1.DistanceTo(p2)
-                gc.imageAngle = -Math.Asin(xOffset / hypot) * 57.2958
-
-                strOut += CStr(index) + vbTab + Format(gc.len3D, fmt1) + "m" + vbTab +
-                                                Format(gc.tc1.depth, fmt1) + "m" + vbTab +
-                                                Format(gc.arcY, fmt1) + vbTab +
-                                                Format(gc.imageAngle, fmt1) + vbTab
-                strOut += Format(task.accRadians.Y * 57.2958, fmt1) + vbCrLf
-
-                SetTrueText(CStr(index), gc.tc1.center, 2)
-                SetTrueText(CStr(index), gc.tc1.center, 3)
-                DrawLine(dst2, gc.tc1.center, gc.tc2.center, task.HighlightColor)
-                DrawLine(dst3, gc.tc1.center, gc.tc2.center, cv.Scalar.White)
-                gCells(i) = gc
-            Else
-                gCells.RemoveAt(i)
-            End If
-        Next
-        SetTrueText(strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class IMU_Lines : Inherits VB_Parent
     Dim vert As New Line_GCloud
     Dim kalman As New Kalman_Basics
@@ -781,55 +719,6 @@ Public Class IMU_AllMethods : Inherits VB_Parent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-Public Class IMU_Plot : Inherits VB_Parent
-    Dim plot As New Plot_OverTimeScalar
-    Public blueA As Single, greenA As Single, redA As Single
-    Public Sub New()
-        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
-            check.Setup(traceName)
-            check.addCheckBox("Blue Variable")
-            check.addCheckBox("Green Variable")
-            check.addCheckBox("Red Variable")
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
-            check.Box(2).Checked = True
-        End If
-
-        plot.plotCount = 3
-        desc = "Plot the angular velocity of the camera based on the IMU data"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standaloneTest() Then
-            blueA = task.IMU_AngularVelocity.X * 1000
-            greenA = task.IMU_AngularVelocity.Y * 1000
-            redA = task.IMU_AngularVelocity.Z * 1000
-        End If
-
-        Static blueCheck = FindCheckBox("Blue Variable")
-        Static greenCheck = FindCheckBox("Green Variable")
-        Static redCheck = FindCheckBox("Red Variable")
-
-        Dim blueX As Single, greenX As Single, redX As Single
-
-        If blueCheck.checked Then blueX = blueA
-        If greenCheck.checked Then greenX = greenA
-        If redCheck.checked Then redX = redA
-
-        plot.plotData = New cv.Scalar(blueX, greenX, redX)
-        plot.Run(empty)
-        dst2 = plot.dst2
-        dst3 = plot.dst3
-        labels(2) = "When run standaloneTest(), the default is to plot the angular velocity for X, Y, and Z"
-    End Sub
-End Class
 
 
 
@@ -1121,5 +1010,102 @@ Public Class IMU_GMatrixWithOptions : Inherits VB_Parent
         End If
         SetTrueText(strOut)
         task.gMatrix = gMatrix
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class IMU_VerticalVerify : Inherits VB_Parent
+    Public gCells As New List(Of gravityLine)
+    Dim linesVH As New FeatureLine_VH
+    Dim options As New Options_VerticalVerify
+    Public Sub New()
+        labels = {"", "", "Highlighted vertical lines", "Line details"}
+        desc = "Use the Y-Arc to confirm which vertical lines are valid"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        dst2 = src.Clone
+
+        If standaloneTest() Then
+            linesVH.Run(src)
+            gCells = linesVH.gCells
+        End If
+
+        strOut = "ID" + vbTab + "len3D" + vbTab + "Depth" + vbTab + "Arc Y" + vbTab + "Image" + vbTab + "IMU Y" + vbTab + vbCrLf
+        dst3.SetTo(0)
+        Dim index As Integer
+        For i = gCells.Count - 1 To 0 Step -1
+            Dim gc = gCells(i)
+            If gc.arcY > options.angleThreshold Then
+                index = gCells.Count - i
+                Dim p1 = gc.tc1.center
+                Dim p2 = gc.tc2.center
+                Dim xOffset = p1.X - p2.X
+                If p1.Y < p2.Y Then xOffset = p2.X - p1.X
+                Dim hypot = p1.DistanceTo(p2)
+                gc.imageAngle = -Math.Asin(xOffset / hypot) * 57.2958
+
+                strOut += CStr(index) + vbTab + Format(gc.len3D, fmt1) + "m" + vbTab +
+                                                Format(gc.tc1.depth, fmt1) + "m" + vbTab +
+                                                Format(gc.arcY, fmt1) + vbTab +
+                                                Format(gc.imageAngle, fmt1) + vbTab
+                strOut += Format(task.accRadians.Y * 57.2958, fmt1) + vbCrLf
+
+                SetTrueText(CStr(index), gc.tc1.center, 2)
+                SetTrueText(CStr(index), gc.tc1.center, 3)
+                DrawLine(dst2, gc.tc1.center, gc.tc2.center, task.HighlightColor)
+                DrawLine(dst3, gc.tc1.center, gc.tc2.center, cv.Scalar.White)
+                gCells(i) = gc
+            Else
+                gCells.RemoveAt(i)
+            End If
+        Next
+        SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class IMU_Plot : Inherits VB_Parent
+    Dim plot As New Plot_OverTimeScalar
+    Public blueA As Single, greenA As Single, redA As Single
+    Dim options As New Options_IMUPlot
+    Public Sub New()
+        plot.plotCount = 3
+        desc = "Plot the angular velocity of the camera based on the IMU data"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If standaloneTest() Then
+            blueA = task.IMU_AngularVelocity.X * 1000
+            greenA = task.IMU_AngularVelocity.Y * 1000
+            redA = task.IMU_AngularVelocity.Z * 1000
+        End If
+
+        Dim blueX As Single, greenX As Single, redX As Single
+
+        If options.setBlue Then blueX = blueA
+        If options.setGreen Then greenX = greenA
+        If options.setRed Then redX = redA
+
+        plot.plotData = New cv.Scalar(blueX, greenX, redX)
+        plot.Run(empty)
+        dst2 = plot.dst2
+        dst3 = plot.dst3
+        labels(2) = "When run standaloneTest(), the default is to plot the angular velocity for X, Y, and Z"
     End Sub
 End Class

@@ -6233,3 +6233,52 @@ Public Class Options_Images : Inherits VB_Parent
         nextCheck.checked = False
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_VerticalVerify : Inherits VB_Parent
+    Public angleThreshold As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Minimum Arc-Y threshold angle (degrees)", 70, 90, 80)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static arcYslider = FindSlider("Minimum Arc-Y threshold angle (degrees)")
+        angleThreshold = arcYslider.Value
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Options_IMUPlot : Inherits VB_Parent
+    Public setBlue As Boolean
+    Public setGreen As Boolean
+    Public setRed As Boolean
+    Public Sub New()
+        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Blue Variable")
+            check.addCheckBox("Green Variable")
+            check.addCheckBox("Red Variable")
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+            check.Box(2).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static blueCheck = FindCheckBox("Blue Variable")
+        Static greenCheck = FindCheckBox("Green Variable")
+        Static redCheck = FindCheckBox("Red Variable")
+        setBlue = blueCheck.checked
+        setGreen = greenCheck.checked
+        setRed = redCheck.checked
+    End Sub
+End Class

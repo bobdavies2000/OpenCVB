@@ -452,7 +452,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 DrawCircle(dst2, cityPositions[i], task.DotSize, Scalar.White);
                 DrawLine(dst2, cityPositions[i], cityPositions[cityOrder[i]], Scalar.White, task.lineWidth);
             }
-            SetTrueText("Energy" + Environment.NewLine + energy.ToString(fmt0), new cv.Point(10, 100), 2);
+            SetTrueText("Energy" + "\n" + energy.ToString(fmt0), new cv.Point(10, 100), 2);
         }
 
         public void setup()
@@ -7805,7 +7805,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
             dst3 = complex.dst2.Clone();
 
-            SetTrueText(">>>>>> Increasing input data >>>>>>" + Environment.NewLine + "All available complexity runs",
+            SetTrueText(">>>>>> Increasing input data >>>>>>" + "\n" + "All available complexity runs",
                         new cv.Point(dst2.Width / 4, 10), 3);
             SetTrueText(" TIME " + "(Max = " + complex.maxTime.ToString(fmt0) + ")", new cv.Point(0, dst2.Height / 2), 3);
 
@@ -7815,7 +7815,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             complex.Run(src);
             dst2 = complex.dst2;
 
-            SetTrueText(" >>>>>> Increasing input data >>>>>>" + Environment.NewLine + complex.options.filename.Name,
+            SetTrueText(" >>>>>> Increasing input data >>>>>>" + "\n" + complex.options.filename.Name,
                         new cv.Point(dst2.Width / 4, 10));
             SetTrueText(" TIME " + "(Max = " + complex.maxTime.ToString(fmt0) + ")", new cv.Point(0, dst2.Height / 2));
             labels[2] = complex.labels[2];
@@ -7837,7 +7837,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         public void prepareSortedData(string filename)
         {
             string contents = File.ReadAllText(filename);
-            string[] lines = contents.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            string[] lines = contents.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
             int nextSize = 0, myFrameCount = 0;
             List<float> times = new List<float>();
             sortData.Clear();
@@ -7916,7 +7916,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
             if (!string.IsNullOrEmpty(fileName)) options.filename = new FileInfo(fileName);
             string contents = File.ReadAllText(options.filename.FullName);
-            string[] lines = contents.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            string[] lines = contents.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
             SortedList<int, int> sortData = new SortedList<int, int>(new compareAllowIdenticalInteger());
             int nextSize = 0, myFrameCount = 0;
@@ -7981,7 +7981,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 Cv2.Line(dst, pointSet[i - 1], pointSet[i], plotColor);
             }
 
-            SetTrueText(">>>>>> Increasing input data >>>>>>" + Environment.NewLine + options.filename.Name,
+            SetTrueText(">>>>>> Increasing input data >>>>>>" + "\n" + options.filename.Name,
                         new cv.Point(dst2.Width / 4, 10));
             SetTrueText(" TIME " + "(Max = " + maxTime.ToString(fmt0) + ")", new cv.Point(0, dst2.Height / 2));
             labels[2] = "Complexity plot for " + Path.GetFileNameWithoutExtension(options.filename.Name);
@@ -13194,7 +13194,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
     public class CS_Draw_Lines : CS_Parent
     {
-        readonly Options_Draw options = new Options_Draw();
+        Options_Draw options = new Options_Draw();
         public CS_Draw_Lines(VBtask task) : base(task)
         {
             desc = "Draw the requested number of Lines.";
@@ -13217,7 +13217,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
     public class CS_Draw_Polygon : CS_Parent
     {
-        readonly Options_Draw options = new Options_Draw();
+        Options_Draw options = new Options_Draw();
         public CS_Draw_Polygon(VBtask task) : base(task)
         {
             desc = "Draw Polygon figures";
@@ -13343,7 +13343,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
     public class CS_Draw_Arc : CS_Parent
     {
-        readonly Kalman_Basics kalman = new Kalman_Basics();
+        Kalman_Basics kalman = new Kalman_Basics();
         Rect rect;
         float angle;
         float startAngle;
@@ -13487,7 +13487,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
     }
     public class CS_Draw_LineTest : CS_Parent
     {
-        readonly Draw_Line line = new Draw_Line();
+        Draw_Line line = new Draw_Line();
         public CS_Draw_LineTest(VBtask task) : base(task)
         {
             desc = "Test the external use of the Draw_Line algorithm - provide 2 points and draw the line...";
@@ -14271,7 +14271,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             eLabels = new List<int>(emaxInput.eLabels);
             eSamples = new List<Point2f>(emaxInput.eSamples);
             regionCount = emaxInput.regionCount;
-            SetTrueText("The EMax algorithm fails as a result of a bug in em_model.Predict2.  See code for details." + Environment.NewLine +
+            SetTrueText("The EMax algorithm fails as a result of a bug in em_model.Predict2.  See code for details." + "\n" +
                         "The C++ version works fine (EMax_RedCloud) and the 2 are functionally identical.", new cv.Point(20, 100));
             return; // Comment this line to see the bug in the C# version of this Predict2 below. Any answers would be gratefully received.
             //EM em_model = EM.Create();
@@ -16080,8 +16080,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 DrawCircle(dst3, mp.p2, task.DotSize, task.HighlightColor, -1);
             }
             if (task.mouseClickFlag) setClickPoint(task.ClickPoint, task.mousePicTag);
-            SetTrueText("Click near any feature to find the corresponding pair of features." + Environment.NewLine +
-                        "The correlation values in the lower left for the correlation of the left to the right views." + Environment.NewLine +
+            SetTrueText("Click near any feature to find the corresponding pair of features." + "\n" +
+                        "The correlation values in the lower left for the correlation of the left to the right views." + "\n" +
                         "The dst2 shows features for the left view, dst3 shows features for the right view.", 1);
             if (ClickPoint == new cv.Point() && mpList.Count > 0) setClickPoint(mpList[0].p1, 2);
             if (mpList.Count > 0)
@@ -16103,8 +16103,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 DrawCircle(dst3, mp.p2, task.DotSize + 4, Scalar.Red, -1);
                 float dspDistance = task.pcSplit[2].Get<float>((int)mp.p1.Y, (int)mp.p1.X);
                 int offset = (int)(mp.p1.X - mp.p2.X);
-                string strOut = string.Format(fmt3, mpCorrelation[mpIndex]) + Environment.NewLine +
-                                string.Format(fmt3, dspDistance) + "m (from camera)" + Environment.NewLine +
+                string strOut = string.Format(fmt3, mpCorrelation[mpIndex]) + "\n" +
+                                string.Format(fmt3, dspDistance) + "m (from camera)" + "\n" +
                                 offset.ToString() + " Pixel difference";
                 for (int i = 0; i < mpList.Count; i++)
                 {
@@ -16252,8 +16252,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 DrawCircle(dst3, mp.p2, task.DotSize, task.HighlightColor, -1);
             }
             if (task.mouseClickFlag) setClickPoint(task.ClickPoint, task.mousePicTag);
-            SetTrueText("Click near any feature to find the corresponding pair of features." + Environment.NewLine +
-                        "The correlation values in the lower left for the correlation of the left to the right views." + Environment.NewLine +
+            SetTrueText("Click near any feature to find the corresponding pair of features." + "\n" +
+                        "The correlation values in the lower left for the correlation of the left to the right views." + "\n" +
                         "The dst2 shows features for the left view, dst3 shows features for the right view.", 1);
             if (ClickPoint == new cv.Point() && mpList.Count > 0) setClickPoint(mpList[0].p1, 2);
             if (mpList.Count > 0)
@@ -16275,8 +16275,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 DrawCircle(dst3, mp.p2, task.DotSize + 4, Scalar.Red, -1);
                 float dspDistance = task.pcSplit[2].Get<float>((int)mp.p1.Y, (int)mp.p1.X);
                 int offset = (int)(mp.p1.X - mp.p2.X);
-                string strOut = string.Format(fmt3, mpCorrelation[mpIndex]) + Environment.NewLine +
-                                string.Format(fmt3, dspDistance) + "m (from camera)" + Environment.NewLine +
+                string strOut = string.Format(fmt3, mpCorrelation[mpIndex]) + "\n" +
+                                string.Format(fmt3, dspDistance) + "m (from camera)" + "\n" +
                                 offset.ToString() + " Pixel difference";
                 for (int i = 0; i < mpList.Count; i++)
                 {
@@ -17211,19 +17211,19 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 causes += " - Rotation angle exceeded threshold.";
                 sides.rotateAngle = 0;
             }
-            causes += Environment.NewLine;
+            causes += "\n";
             if (task.optionsChanged)
             {
                 resync = true;
                 causes += " - Options changed";
             }
-            causes += Environment.NewLine;
+            causes += "\n";
             if (resyncFrames > sides.options.autoResyncAfterX)
             {
                 resync = true;
                 causes += $" - More than {sides.options.autoResyncAfterX} frames without resync";
             }
-            causes += Environment.NewLine;
+            causes += "\n";
             if (Math.Abs(sides.currLengths.Sum() - sides.prevLengths.Sum()) > sides.options.removeThreshold * task.polyCount)
             {
                 resync = true;
@@ -17237,7 +17237,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     causes += $" - The Feature polygon's longest side (FLine) changed more than the threshold of {sides.options.removeThreshold} pixels";
                 }
             }
-            causes += Environment.NewLine;
+            causes += "\n";
             if (resync || sides.prevPoly.Count != task.polyCount || task.optionsChanged)
             {
                 sides.prevPoly = new List<Point2f>(sides.currPoly);
@@ -17248,11 +17248,11 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 resyncCause = causes;
             }
             resyncFrames++;
-            strOut = $"Rotation: {sides.rotateAngle * 57.2958:F1} degrees{Environment.NewLine}";
-            strOut += $"Translation: {(int)sides.centerShift.X}, {(int)sides.centerShift.Y}{Environment.NewLine}";
-            strOut += $"Rotate center: {sides.rotateCenter.X:F0}, {sides.rotateCenter.Y:F0}{Environment.NewLine}";
-            strOut += $"Frames since last resync: {resyncFrames:000}{Environment.NewLine}{Environment.NewLine}";
-            strOut += $"Resync last caused by: {Environment.NewLine}{resyncCause}";
+            strOut = $"Rotation: {sides.rotateAngle * 57.2958:F1} degrees{"\n"}";
+            strOut += $"Translation: {(int)sides.centerShift.X}, {(int)sides.centerShift.Y}{"\n"}";
+            strOut += $"Rotate center: {sides.rotateCenter.X:F0}, {sides.rotateCenter.Y:F0}{"\n"}";
+            strOut += $"Frames since last resync: {resyncFrames:000}{"\n"}{"\n"}";
+            strOut += $"Resync last caused by: {"\n"}{resyncCause}";
             foreach (var keyval in topFeatures.stable.goodCounts)
             {
                 var ptmp = topFeatures.stable.basics.ptList[keyval.Value];
@@ -17341,7 +17341,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             newNear.p1 = new Point2f(newNear.p1.X - centerShift.X, newNear.p1.Y - centerShift.Y);
             newNear.p2 = new Point2f(newNear.p2.X - centerShift.X, newNear.p2.Y - centerShift.Y);
             rotateCenter = new Point2f(rotateCenter.X - centerShift.X, rotateCenter.Y - centerShift.Y);
-            strOut = "No rotation" + Environment.NewLine;
+            strOut = "No rotation" + "\n";
             rotateAngle = 0;
             if (d1 != d2)
             {
@@ -17354,7 +17354,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     float hypotenuse = Distance(rotateCenter, near.pt);
                     rotateAngle = -(float)Math.Asin(Distance(near.nearPoint, near.pt) / hypotenuse);
                     if (float.IsNaN(rotateAngle)) rotateAngle = 0;
-                    strOut = $"Angle is {rotateAngle * 57.2958:F1} degrees{Environment.NewLine}";
+                    strOut = $"Angle is {rotateAngle * 57.2958:F1} degrees{"\n"}";
                 }
             }
             strOut += $"Translation (shift) is {-centerShift.X:F0}, {-centerShift.Y:F0}";
@@ -17431,25 +17431,25 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 causes += " - Rotation angle exceeded threshold.";
                 fPD.rotateAngle = 0;
             }
-            causes += Environment.NewLine;
+            causes += "\n";
             if (maskChangePercent > 0.2)
             {
                 resync = true;
                 causes += " - Difference of startFrame and current frame exceeded 20% of image size";
             }
-            causes += Environment.NewLine;
+            causes += "\n";
             if (task.optionsChanged)
             {
                 resync = true;
                 causes += " - Options changed";
             }
-            causes += Environment.NewLine;
+            causes += "\n";
             if (resyncFrames > options.autoResyncAfterX)
             {
                 resync = true;
                 causes += $" - More than {options.autoResyncAfterX} frames without resync";
             }
-            causes += Environment.NewLine;
+            causes += "\n";
             if (Math.Abs(fPD.currLength.Sum() - fPD.lengthPrevious.Sum()) > options.removeThreshold * task.polyCount)
             {
                 resync = true;
@@ -17463,7 +17463,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     causes += $" - The Feature polygon's longest side (FLine) changed more than the threshold of {options.removeThreshold} pixels";
                 }
             }
-            causes += Environment.NewLine;
+            causes += "\n";
             if (resync || fPD.prevPoly.Count != task.polyCount || task.optionsChanged)
             {
                 fPD.resync();
@@ -17479,11 +17479,11 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 SetTrueText(i.ToString(), fPD.currPoly[i], 1);
                 SetTrueText(i.ToString(), fPD.currPoly[i], 1);
             }
-            strOut = $"Rotation: {fPD.rotateAngle * 57.2958:F1} degrees{Environment.NewLine}";
-            strOut += $"Translation: {(int)fPD.centerShift.X}, {(int)fPD.centerShift.Y}{Environment.NewLine}";
-            strOut += $"Rotate center: {fPD.rotateCenter.X:F0}, {fPD.rotateCenter.Y:F0}{Environment.NewLine}";
-            strOut += $"Frames since last resync: {resyncFrames:000}{Environment.NewLine}";
-            strOut += $"Last resync cause(s): {Environment.NewLine}{resyncCause}";
+            strOut = $"Rotation: {fPD.rotateAngle * 57.2958:F1} degrees{"\n"}";
+            strOut += $"Translation: {(int)fPD.centerShift.X}, {(int)fPD.centerShift.Y}{"\n"}";
+            strOut += $"Rotate center: {fPD.rotateCenter.X:F0}, {fPD.rotateCenter.Y:F0}{"\n"}";
+            strOut += $"Frames since last resync: {resyncFrames:000}{"\n"}";
+            strOut += $"Last resync cause(s): {"\n"}{resyncCause}";
             foreach (var keyval in topFeatures.stable.goodCounts)
             {
                 var pt = topFeatures.stable.basics.ptList[keyval.Value];
@@ -17872,7 +17872,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             Mat changed = tmp.Threshold(task.gOptions.pixelDiffThreshold, 255, ThresholdTypes.Binary);
             int diffCount = changed.CountNonZero();
             strOut = fPoly.strOut;
-            strOut += Environment.NewLine + string.Format("{0:N0}k pixels differ or {1:P0}", diffCount / 1000.0, (double)diffCount / dst3.Total());
+            strOut += "\n" + string.Format("{0:N0}k pixels differ or {1:P0}", diffCount / 1000.0, (double)diffCount / dst3.Total());
             SetTrueText(strOut, 1);
         }
     }
@@ -18035,7 +18035,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 resync = fpoly.resync;
                 fpoly.maskChangePercent = (float)diffCount / dst3.Total();
                 strOut = fpoly.strOut;
-                strOut += Environment.NewLine + string.Format("{0:N0}k pixels differ or {1:P0}", diffCount / 1000.0, fpoly.maskChangePercent);
+                strOut += "\n" + string.Format("{0:N0}k pixels differ or {1:P0}", diffCount / 1000.0, fpoly.maskChangePercent);
             }
             else
             {
@@ -18130,7 +18130,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         {
             if (standaloneTest())
             {
-                SetTrueText(traceName + " is called by FeaturePoly_Basics to get the rotate center and angle." + Environment.NewLine +
+                SetTrueText(traceName + " is called by FeaturePoly_Basics to get the rotate center and angle." + "\n" +
                             "It does not produce any output when run standaloneTest().");
                 return;
             }
@@ -18166,7 +18166,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst1.SetTo(0);
             fPD.DrawPolys(dst1, transPoly, this);
             SetTrueText("Rotate center", fPD.rotateCenter, 1);
-            strOut = "No rotation" + Environment.NewLine;
+            strOut = "No rotation" + "\n";
             fPD.rotateAngle = 0;
             if (d1 != d2)
             {
@@ -18179,7 +18179,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     float hypotenuse = (float) fPD.rotateCenter.DistanceTo(near.pt);
                     fPD.rotateAngle = -(float)Math.Asin(near.nearPoint.DistanceTo(near.pt) / hypotenuse);
                     if (float.IsNaN(fPD.rotateAngle)) fPD.rotateAngle = 0;
-                    strOut = $"Angle is {fPD.rotateAngle * 57.2958:F1} degrees" + Environment.NewLine;
+                    strOut = $"Angle is {fPD.rotateAngle * 57.2958:F1} degrees" + "\n";
                 }
             }
             strOut += $"Translation (shift) is {-fPD.centerShift.X:F0}, {-fPD.centerShift.Y:F0}";
@@ -18267,7 +18267,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 resync = fpoly.resync;
                 fpoly.maskChangePercent = (float)diffCount / dst3.Total();
                 strOut = fpoly.strOut;
-                strOut += Environment.NewLine + string.Format("{0:N0}k pixels differ or {1:P0}", diffCount / 1000.0, fpoly.maskChangePercent);
+                strOut += "\n" + string.Format("{0:N0}k pixels differ or {1:P0}", diffCount / 1000.0, fpoly.maskChangePercent);
             }
             else
             {
@@ -18792,11 +18792,11 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     int offset = roi.TopLeft.X - rectRight.TopLeft.X;
                     if (task.heartBeat)
                     {
-                        strOut = "CoeffNormed max correlation = " + maxCorr.ToString("F3") + Environment.NewLine;
-                        strOut += "Left Mean = " + gather.meanList[gridIndex].ToString("F3") + " Left stdev = " + gather.stdevList[gridIndex].ToString("F3") + Environment.NewLine;
+                        strOut = "CoeffNormed max correlation = " + maxCorr.ToString("F3") + "\n";
+                        strOut += "Left Mean = " + gather.meanList[gridIndex].ToString("F3") + " Left stdev = " + gather.stdevList[gridIndex].ToString("F3") + "\n";
                         Scalar mean, stdev;
                         Cv2.MeanStdDev(dst3[rectRight], out mean, out stdev);
-                        strOut += "Right Mean = " + mean[0].ToString("F3") + " Right stdev = " + stdev[0].ToString("F3") + Environment.NewLine;
+                        strOut += "Right Mean = " + mean[0].ToString("F3") + " Right stdev = " + stdev[0].ToString("F3") + "\n";
                         strOut += "Right rectangle is offset " + offset.ToString() + " pixels from the left image rectangle";
                     }
                     dst3.Rectangle(rectRight, task.HighlightColor, task.lineWidth);
@@ -18805,7 +18805,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     Cv2.Circle(dst1, roi.TopLeft, task.DotSize, task.HighlightColor, -1);
                     Cv2.Circle(dst1, new cv.Point(rectRight.X, roi.Y + 5), task.DotSize + 2, task.HighlightColor, -1);
                     cv.Point pt = new cv.Point(rectRight.X, roi.Y + 5);
-                    SetTrueText((offset + " pixel offset" + Environment.NewLine + "Larger = Right").ToString(), pt, 1);
+                    SetTrueText((offset + " pixel offset" + "\n" + "Larger = Right").ToString(), pt, 1);
                     SetTrueText(strOut, 1);
                     labels[3] = "Corresponding roi highlighted in yellow.  Average stdev = " + gather.stdevAverage.ToString("F3");
                 }
@@ -19830,7 +19830,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     clearRequested = true;
                 }
             }
-            string strOut = string.Join(Environment.NewLine, msgs.GetRange(0, Math.Min(maxLines, msgs.Count)));
+            string strOut = string.Join("\n", msgs.GetRange(0, Math.Min(maxLines, msgs.Count)));
             SetTrueText(strOut, dst);
             if (clearRequested) msgs.Clear();
         }
@@ -19863,7 +19863,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 flowText.Add(nextMsg);
                 if (flowText.Count > maxLines) flowText.RemoveAt(0);
-                strOut = string.Join(Environment.NewLine, flowText);
+                strOut = string.Join("\n", flowText);
             }
             SetTrueText(strOut, dst);
             if (!standalone) ((dynamic)parentData).trueData = trueData;
@@ -20927,7 +20927,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             if (task.heartBeat)
             {
                 if (p1.Y >= 1 && p1.Y <= dst2.Height - 1)
-                    strOut = "p1 = " + p1.ToString() + Environment.NewLine + "p2 = " + p2.ToString() + Environment.NewLine;
+                    strOut = "p1 = " + p1.ToString() + "\n" + "p2 = " + p2.ToString() + "\n";
             }
             dst2.SetTo(0);
             dst3.SetTo(0);
@@ -20979,7 +20979,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 points.Clear();
                 vec = new PointPair();
-                strOut = "Gravity vector not found " + Environment.NewLine + "The distance of p1 to p2 is " + (int)distance + " pixels.";
+                strOut = "Gravity vector not found " + "\n" + "The distance of p1 to p2 is " + (int)distance + " pixels.";
             }
             else
             {
@@ -21035,8 +21035,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
             vec = lp.edgeToEdgeLine(dst2.Size());
             if (p1.X >= 1)
             {
-                strOut = "p1 = " + p1.ToString() + Environment.NewLine + "p2 = " + p2.ToString() + Environment.NewLine + "      val =  " +
-                          dst0.Get<float>((int)p1.Y, (int)p1.X).ToString() + Environment.NewLine + "lastVal = " + dst0.Get<float>((int)p1.Y, (int)p1.X - 1).ToString();
+                strOut = "p1 = " + p1.ToString() + "\n" + "p2 = " + p2.ToString() + "\n" + "      val =  " +
+                          dst0.Get<float>((int)p1.Y, (int)p1.X).ToString() + "\n" + "lastVal = " + dst0.Get<float>((int)p1.Y, (int)p1.X - 1).ToString();
             }
             SetTrueText(strOut, 3);
             if (standaloneTest())
@@ -21066,7 +21066,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             var h2 = horizon.vec;
             if (standaloneTest())
             {
-                SetTrueText("Gravity vector (yellow):" + Environment.NewLine + gravity.strOut + Environment.NewLine + Environment.NewLine + "Horizon Vector (red): " + Environment.NewLine + horizon.strOut, 3);
+                SetTrueText("Gravity vector (yellow):" + "\n" + gravity.strOut + "\n" + "\n" + "Horizon Vector (red): " + "\n" + horizon.strOut, 3);
                 dst2.SetTo(0);
                 DrawLine(dst2, g1.p1, g1.p2, task.HighlightColor, task.lineWidth);
                 DrawLine(dst2, g2.p1, g2.p2, task.HighlightColor, task.lineWidth);
@@ -21101,7 +21101,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
             task.horizonVec = horizon.vec;
             if (standaloneTest())
             {
-                SetTrueText("Gravity vector (yellow):" + Environment.NewLine + gravity.strOut + Environment.NewLine + Environment.NewLine + "Horizon Vector (red): " + Environment.NewLine + horizon.strOut, 3);
+                SetTrueText("Gravity vector (yellow):" + "\n" + gravity.strOut + "\n" + "\n" + "Horizon Vector (red): " + "\n" + horizon.strOut, 3);
                 dst2.SetTo(0);
                 DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.HighlightColor, task.lineWidth);
                 DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, Scalar.Red, task.lineWidth);
@@ -21326,10 +21326,10 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 {
                     str += thread.Id + " state = " + thread.ThreadState + ", ";
                     threadCount++;
-                    if (threadCount % 5 == 0) str += Environment.NewLine;
+                    if (threadCount % 5 == 0) str += "\n";
                     if (thread.ThreadState != ThreadState.Wait) notIdle++;
                 }
-                SetTrueText("There were " + threadCount + " threads in OpenCVB with " + notIdle + " of them not idle when traversing the gridList" + Environment.NewLine + str);
+                SetTrueText("There were " + threadCount + " threads in OpenCVB with " + notIdle + " of them not idle when traversing the gridList" + "\n" + str);
             }
             catch (Exception e)
             {
@@ -22387,11 +22387,11 @@ public class CS_ApproxPoly_Basics : CS_Parent
             heat.Run(src);
             dst2 = heat.dst2;
             dst3 = heat.dst3;
-            SetTrueText("This algorithm was created to tune the frustrum and camera locations." + Environment.NewLine +
-                        "Without these tuning parameters the side and top views will look correct." + Environment.NewLine +
-                        "To see how these adjustments work or to add a new camera, " + Environment.NewLine +
-                        "use the HeatMap_Basics algorithm." + Environment.NewLine +
-                        "For new cameras, make the adjustments needed, note the value, and update " + Environment.NewLine +
+            SetTrueText("This algorithm was created to tune the frustrum and camera locations." + "\n" +
+                        "Without these tuning parameters the side and top views will look correct." + "\n" +
+                        "To see how these adjustments work or to add a new camera, " + "\n" +
+                        "use the HeatMap_Basics algorithm." + "\n" +
+                        "For new cameras, make the adjustments needed, note the value, and update " + "\n" +
                         "the Select statement in the constructor for Options_CameraDetails.", new cv.Point(10, 80), 1);
         }
     }
@@ -23139,7 +23139,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         {
             plot.Run(task.pcSplit[0]);
             dst2 = plot.dst2;
-            SetTrueText("Chart left = " + string.Format(fmt0, plot.mm.minVal) + Environment.NewLine +
+            SetTrueText("Chart left = " + string.Format(fmt0, plot.mm.minVal) + "\n" +
                         "Chart right = " + string.Format(fmt0, plot.mm.maxVal), 2);
         }
     }
@@ -23154,7 +23154,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         {
             plot.Run(task.pcSplit[1]);
             dst2 = plot.dst2;
-            SetTrueText("Chart left = " + string.Format(fmt0, plot.mm.minVal) + Environment.NewLine +
+            SetTrueText("Chart left = " + string.Format(fmt0, plot.mm.minVal) + "\n" +
                         "Chart right = " + string.Format(fmt0, plot.mm.maxVal), 2);
         }
     }
@@ -23169,7 +23169,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
         {
             plot.Run(task.pcSplit[2]);
             dst2 = plot.dst2;
-            SetTrueText("Chart left = " + string.Format(fmt0, plot.mm.minVal) + Environment.NewLine +
+            SetTrueText("Chart left = " + string.Format(fmt0, plot.mm.minVal) + "\n" +
                         "Chart right = " + string.Format(fmt0, plot.mm.maxVal), 2);
         }
     }
@@ -23213,9 +23213,9 @@ public class CS_ApproxPoly_Basics : CS_Parent
             {
                 int expected = src.CountNonZero();
                 int actual = (int)plot.histogram.Sum().Val0;
-                strOut = "Expected sample count (non-zero task.pcSplit[2]] entries):" + "\t" + expected + Environment.NewLine;
-                strOut += "Histogram sum (ranges can reduce):" + "\t\t\t" + actual + Environment.NewLine;
-                strOut += "Difference:" + "\t\t\t\t\t\t" + Math.Abs(actual - expected) + Environment.NewLine;
+                strOut = "Expected sample count (non-zero task.pcSplit[2]] entries):" + "\t" + expected + "\n";
+                strOut += "Histogram sum (ranges can reduce):" + "\t\t\t" + actual + "\n";
+                strOut += "Difference:" + "\t\t\t\t\t\t" + Math.Abs(actual - expected) + "\n";
             }
             SetTrueText(strOut, 3);
             labels[2] = "Histogram Depth to " + string.Format("0.0", task.MaxZmeters) + " m";
@@ -24045,7 +24045,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                     }
                 }
             }
-            SetTrueText("There are " + pixels.Count.ToString() + " non-zero entries in the 3D histogram " + Environment.NewLine + "See uniquePixels list in Hist3Dcolor_UniquePixels", 2);
+            SetTrueText("There are " + pixels.Count.ToString() + " non-zero entries in the 3D histogram " + "\n" + "See uniquePixels list in Hist3Dcolor_UniquePixels", 2);
         }
     }
     public class CS_Hist3Dcolor_TopXColors : CS_Parent
@@ -24071,7 +24071,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 topXPixels.Add(sortedPixels.ElementAt(i).Value.ToPoint3i());
                 if (topXPixels.Count >= mapTopX) break;
             }
-            SetTrueText("There are " + sortedPixels.Count.ToString() + " non-zero entries in the 3D histogram " + Environment.NewLine + "The top " + mapTopX.ToString() + " pixels are in topXPixels", 2);
+            SetTrueText("There are " + sortedPixels.Count.ToString() + " non-zero entries in the 3D histogram " + "\n" + "The top " + mapTopX.ToString() + " pixels are in topXPixels", 2);
         }
     }
     public class CS_Hist3Dcolor_Reduction : CS_Parent
@@ -25481,8 +25481,8 @@ public class CS_ApproxPoly_Basics : CS_Parent
             task.horizonVec = lp.edgeToEdgeLine(dst2.Size());
             if (p1.Y >= 1 && p1.Y <= dst2.Height - 1)
             {
-                strOut = "p1 = " + p1.ToString() + Environment.NewLine + "p2 = " + p2.ToString() + Environment.NewLine + "      val =  " +
-                          cloudY.At<float>((int)p1.Y, (int)p1.X).ToString() + Environment.NewLine + "lastVal = " + cloudY.At<float>((int)(p1.Y - 1), (int)p1.X).ToString();
+                strOut = "p1 = " + p1.ToString() + "\n" + "p2 = " + p2.ToString() + "\n" + "      val =  " +
+                          cloudY.At<float>((int)p1.Y, (int)p1.X).ToString() + "\n" + "lastVal = " + cloudY.At<float>((int)(p1.Y - 1), (int)p1.X).ToString();
             }
             SetTrueText(strOut, 3);
             if (standaloneTest())
@@ -26181,6 +26181,1029 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst2 = core.dst2;
         }
     }
+    public class CS_ImShow_Basics : CS_Parent
+    {
+        public CS_ImShow_Basics(VBtask task) : base(task)
+        {
+            desc = "This is just a reminder that all HighGUI methods are available in OpenCVB";
+        }
+        public void RunCS(Mat src)
+        {
+            Cv2.ImShow("color", src);
+        }
+    }
+    public class CS_ImShow_WaitKey : CS_Parent
+    {
+        Feature_Basics feat = new Feature_Basics();
+        public CS_ImShow_WaitKey(VBtask task) : base(task)
+        {
+            desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time.";
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(src);
+            Cv2.ImShow("Hit space bar to advance to the next frame", feat.dst2);
+            Cv2.WaitKey(1000); // No need for waitkey with imshow in OpenCVB - finishing a buffer is the same thing so waitkey just delays by 1 second here.
+            dst2 = feat.dst2;
+        }
+    }
+    public class CS_ImShow_CV32FC3 : CS_Parent
+    {
+        public CS_ImShow_CV32FC3(VBtask task) : base(task)
+        {
+            desc = "Experimenting with how to show an 32fc3 Mat file.";
+        }
+        public void RunCS(Mat src)
+        {
+            Cv2.ImShow("Point cloud", task.pointCloud);
+            dst2 = task.pointCloud.Clone();
+        }
+    }
+    public class CS_IMU_Basics : CS_Parent
+    {
+        double lastTimeStamp;
+        public CS_IMU_Basics(VBtask task) : base(task)
+        {
+            desc = "Read and display the IMU coordinates";
+        }
+        public void RunCS(Mat src)
+        {
+            Point3f gyroAngle;
+            if (task.optionsChanged)
+            {
+                lastTimeStamp = task.IMU_TimeStamp;
+            }
+            else
+            {
+                gyroAngle = task.IMU_AngularVelocity;
+                double dt_gyro = (task.IMU_TimeStamp - lastTimeStamp) / 1000;
+                if (task.cameraName != "Intel(R) RealSense(TM) Depth Camera 435i") dt_gyro /= 1000; // different units in the timestamp?
+                gyroAngle = gyroAngle * dt_gyro;
+                task.theta += new Point3f(-gyroAngle.Z, -gyroAngle.Y, gyroAngle.X);
+                lastTimeStamp = task.IMU_TimeStamp;
+            }
+            // NOTE: Initialize the angle around the y-axis to zero.
+            cv.Point3f g = task.IMU_RawAcceleration;
+            task.accRadians = new Point3f((float)Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
+                                         (float)Math.Abs(Math.Atan2(g.X, g.Y)), (float)Math.Atan2(g.Y, g.Z));
+            if (task.optionsChanged)
+            {
+                task.theta = task.accRadians;
+            }
+            else
+            {
+                // Apply the Complementary Filter:
+                //  - high-pass filter = theta * alpha: allows short-duration signals to pass while filtering steady signals (trying to cancel drift)
+                //  - low-pass filter = accel * (1 - alpha): lets the long-term changes through, filtering out short term fluctuations
+                task.theta.X = task.theta.X * task.IMU_AlphaFilter + task.accRadians.X * (1 - task.IMU_AlphaFilter);
+                task.theta.Y = task.accRadians.Y;
+                task.theta.Z = task.theta.Z * task.IMU_AlphaFilter + task.accRadians.Z * (1 - task.IMU_AlphaFilter);
+            }
+            double x1 = -(90 + task.accRadians.X * 57.2958);
+            double x2 = -(90 + task.theta.X * 57.2958);
+            double y1 = task.accRadians.Y - Math.PI;
+            if (task.accRadians.X < 0) y1 *= -1;
+            strOut = "Angles in degree to gravity (before velocity filter)" + "\n" +
+                     x1.ToString(fmt1) + "\t" + (y1 * 57.2958).ToString(fmt1) + "\t" + (task.accRadians.Z * 57.2958).ToString(fmt1) + 
+                     x1.ToString(fmt1) + "\t" + (y1 * 57.2958).ToString(fmt1) + "\t" + (task.accRadians.Z * 57.2958).ToString(fmt1) + "\n" +
+                     "Velocity-Filtered Angles to gravity in degrees" + "\n" +
+                     x2.ToString(fmt1) + "\t" + (y1 * 57.2958).ToString(fmt1) + "\t" + (task.theta.Z * 57.2958).ToString(fmt1) + "\n";
+            strOut += "cx = " + task.gMat.cx.ToString(fmt3) + " sx = " + task.gMat.sx.ToString(fmt3) + "\n" +
+                      "cy = " + task.gMat.cy.ToString(fmt3) + " sy = " + task.gMat.sy.ToString(fmt3) + "\n" +
+                      "cz = " + task.gMat.cz.ToString(fmt3) + " sz = " + task.gMat.sz.ToString(fmt3);
+            task.accRadians = task.theta;
+            if (task.accRadians.Y > Math.PI / 2) task.accRadians.Y -= (float)Math.PI / 2;
+            task.accRadians.Z += (float)Math.PI / 2;
+            SetTrueText(strOut);
+        }
+    }
+    public class CS_IMU_BasicsKalman : CS_Parent
+    {
+        double lastTimeStamp;
+        Kalman_Basics kalman = new Kalman_Basics();
+        public CS_IMU_BasicsKalman(VBtask task) : base(task)
+        {
+            desc = "Read and display the IMU coordinates";
+        }
+        public void RunCS(Mat src)
+        {
+            Point3f gyroAngle;
+            if (task.optionsChanged)
+            {
+                lastTimeStamp = task.IMU_TimeStamp;
+            }
+            else
+            {
+                gyroAngle = task.IMU_AngularVelocity;
+                double dt_gyro = (task.IMU_TimeStamp - lastTimeStamp) / 1000;
+                if (task.cameraName != "Intel(R) RealSense(TM) Depth Camera 435i") dt_gyro /= 1000; // different units in the timestamp?
+                gyroAngle = gyroAngle * dt_gyro;
+                lastTimeStamp = task.IMU_TimeStamp;
+            }
+            // NOTE: Initialize the angle around the y-axis to zero.
+            cv.Point3f g = task.IMU_RawAcceleration;
+            task.accRadians = new Point3f((float)Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
+                                         (float)Math.Abs(Math.Atan2(g.X, g.Y)), (float)Math.Atan2(g.Y, g.Z));
+            kalman.kInput = new float[] { task.accRadians.X, task.accRadians.Y, task.accRadians.Z };
+            kalman.Run(null);
+            task.accRadians = new Point3f(kalman.kOutput[0], kalman.kOutput[1], kalman.kOutput[2]);
+            double x1 = -(90 + task.accRadians.X * 57.2958);
+            double y1 = task.accRadians.Y - Math.PI;
+            if (task.accRadians.X < 0) y1 *= -1;
+            strOut = "Angles in degree to gravity (before velocity filter)" + "\n" +
+                     x1.ToString(fmt1) + "\t" + (y1 * 57.2958).ToString(fmt1) + "\t" + (task.accRadians.Z * 57.2958).ToString(fmt1) + "\n";
+            strOut += "cx = " + task.gMat.cx.ToString(fmt3) + " sx = " + task.gMat.sx.ToString(fmt3) + "\n" +
+                      "cy = " + task.gMat.cy.ToString(fmt3) + " sy = " + task.gMat.sy.ToString(fmt3) + "\n" +
+                      "cz = " + task.gMat.cz.ToString(fmt3) + " sz = " + task.gMat.sz.ToString(fmt3);
+            if (task.accRadians.Y > Math.PI / 2) task.accRadians.Y -= (float)Math.PI / 2;
+            task.accRadians.Z += (float)Math.PI / 2;
+            SetTrueText(strOut);
+        }
+    }
+    public class CS_IMU_BasicsWithOptions : CS_Parent
+    {
+        double lastTimeStamp;
+        Options_IMU options = new Options_IMU();
+        public CS_IMU_BasicsWithOptions(VBtask task) : base(task)
+        {
+            desc = "Read and display the IMU coordinates";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            Point3f gyroAngle;
+            if (task.optionsChanged)
+            {
+                lastTimeStamp = task.IMU_TimeStamp;
+            }
+            else
+            {
+                gyroAngle = task.IMU_AngularVelocity;
+                double dt_gyro = (task.IMU_TimeStamp - lastTimeStamp) / 1000;
+                if (task.cameraName != "Intel(R) RealSense(TM) Depth Camera 435i") dt_gyro /= 1000; // different units in the timestamp?
+                gyroAngle = gyroAngle * dt_gyro;
+                task.theta += new Point3f(-gyroAngle.Z, -gyroAngle.Y, gyroAngle.X);
+                lastTimeStamp = task.IMU_TimeStamp;
+            }
+            // NOTE: Initialize the angle around the y-axis to zero.
+            cv.Point3f g = task.IMU_RawAcceleration;
+            task.accRadians = new Point3f((float)Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
+                                          (float)Math.Abs(Math.Atan2(g.X, g.Y)), (float)Math.Atan2(g.Y, g.Z));
+            if (task.optionsChanged)
+            {
+                task.theta = task.accRadians;
+            }
+            else
+            {
+                // Apply the Complementary Filter:
+                //  - high-pass filter = theta * alpha: allows short-duration signals to pass while filtering steady signals (trying to cancel drift)
+                //  - low-pass filter = accel * (1 - alpha): lets the long-term changes through, filtering out short term fluctuations
+                task.theta.X = task.theta.X * task.IMU_AlphaFilter + task.accRadians.X * (1 - task.IMU_AlphaFilter);
+                task.theta.Y = task.accRadians.Y;
+                task.theta.Z = task.theta.Z * task.IMU_AlphaFilter + task.accRadians.Z * (1 - task.IMU_AlphaFilter);
+            }
+            double x1 = -(90 + task.accRadians.X * 57.2958);
+            double x2 = -(90 + task.theta.X * 57.2958);
+            double y1 = task.accRadians.Y - Math.PI;
+            if (task.accRadians.X < 0) y1 *= -1;
+            strOut = "Angles in degree to gravity (before velocity filter)" + "\n" +
+                     x1.ToString(fmt1) + "\t" + (y1 * 57.2958).ToString(fmt1) + "\t" + (task.accRadians.Z * 57.2958).ToString(fmt1) + "\n" +
+                     "Velocity-Filtered Angles to gravity in degrees" + "\n" +
+                     x2.ToString(fmt1) + "\t" + (y1 * 57.2958).ToString(fmt1) + "\t" + (task.theta.Z * 57.2958).ToString(fmt1) + "\n";
+            SetTrueText(strOut);
+            task.accRadians = task.theta;
+            if (task.accRadians.Y > Math.PI / 2) task.accRadians.Y -= (float)Math.PI / 2;
+            task.accRadians.Z += (float)Math.PI / 2;
+            SetTrueText(strOut);
+        }
+    }
+    public class CS_IMU_GMatrix : CS_Parent
+    {
+        public float cx = 1, sx = 0, cy = 1, sy = 0, cz = 1, sz = 0;
+        public Mat gMatrix;
+        public CS_IMU_GMatrix(VBtask task) : base(task)
+        {
+            desc = "Find the angle of tilt for the camera with respect to gravity.";
+        }
+        void buildGmatrix()
+        {
+            //[cx -sx    0]  [1  0   0 ] 
+            //[sx  cx    0]  [0  cz -sz]
+            //[0   0     1]  [0  sz  cz]
+            float[,] gArray = {{cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
+                           {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
+                           {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}};
+            float g1 = gArray[0, 0] * cy + gArray[0, 1] * 0 + gArray[0, 2] * sy;
+            float g2 = gArray[0, 0] * 0 + gArray[0, 1] * 1 + gArray[0, 2] * 0;
+            float g3 = gArray[0, 0] * -sy + gArray[0, 1] * 0 + gArray[0, 2] * cy;
+            float g4 = gArray[1, 0] * cy + gArray[1, 1] * 0 + gArray[1, 2] * sy;
+            float g5 = gArray[1, 0] * 0 + gArray[1, 1] * 1 + gArray[1, 2] * 0;
+            float g6 = gArray[1, 0] * -sy + gArray[1, 1] * 0 + gArray[1, 2] * cy;
+            float g7 = gArray[2, 0] * cy + gArray[2, 1] * 0 + gArray[2, 2] * sy;
+            float g8 = gArray[2, 0] * 0 + gArray[2, 1] * 1 + gArray[2, 2] * 0;
+            float g9 = gArray[2, 0] * -sy + gArray[2, 1] * 0 + gArray[2, 2] * cy;
+            float[] tmp = new float[] { g1, g2, g3, g4, g5, g6, g7, g8, g9 };
+            gMatrix = new Mat(3, 3, MatType.CV_32F, tmp);
+        }
+        public void RunCS(Mat src)
+        {
+            //[cos(a) -sin(a)    0]
+            //[sin(a)  cos(a)    0]
+            //[0       0         1] rotate the point cloud around the x-axis.
+            cz = (float)Math.Cos(task.accRadians.Z);
+            sz = (float)Math.Sin(task.accRadians.Z);
+            //[1       0         0      ] rotate the point cloud around the z-axis.
+            //[0       cos(a)    -sin(a)]
+            //[0       sin(a)    cos(a) ]
+            cx = (float)Math.Cos(task.accRadians.X);
+            sx = (float)Math.Sin(task.accRadians.X);
+            buildGmatrix();
+            cv.Point3f g = task.IMU_Acceleration;
+            string fmt = fmt3;
+            strOut = "IMU Acceleration in X-direction = " + "\t" + g.X.ToString(fmt) + "\n"
+                     + "IMU Acceleration in Y-direction = " + "\t" + g.Y.ToString(fmt) + "\n"
+                     + "IMU Acceleration in Z-direction = " + "\t" + g.Z.ToString(fmt) + "\n" + "\n"
+                     + "\n" + "sqrt (" + "\t" + g.X.ToString(fmt) + "*" + g.X.ToString(fmt) + "\t" +
+                     g.Y.ToString(fmt) + "*" + g.Y.ToString(fmt) + "\t" +
+                     g.Z.ToString( fmt) + "*" + g.Z.ToString( fmt) + " ) = " + "\t" +
+                     (Math.Sqrt(g.X * g.X + g.Y * g.Y + g.Z * g.Z)).ToString(fmt) + "\n" +
+                     "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)";
+            strOut += "\n" + "Gravity-oriented gMatrix - move camera to test this:" + "\n" + gMatrixToStr(gMatrix);
+            SetTrueText(strOut);
+            task.gMatrix = gMatrix;
+        }
+    }
+    public class CS_IMU_Stabilize : CS_Parent
+    {
+        Kalman_Basics kalman = new Kalman_Basics();
+        public CS_IMU_Stabilize(VBtask task) : base(task)
+        {
+            kalman.kInput = new float[3];
+            desc = "Stabilize IMU acceleration data.";
+            labels = new string[] { "", "", "IMU Stabilize (move camera around)", "Difference from Color Image" };
+        }
+        public void RunCS(Mat src)
+        {
+            int borderCrop = 5;
+            int vert_Border = borderCrop * src.Rows / src.Cols;
+            double dx = task.IMU_AngularVelocity.X;
+            double dy = task.IMU_AngularVelocity.Y;
+            double dz = task.IMU_AngularVelocity.Z;
+            double sx = 1; // assume no scaling is taking place.
+            double sy = 1; // assume no scaling is taking place.
+            kalman.kInput = new float[] { (float)dx, (float)dy, (float)dz };
+            kalman.Run(src);
+            dx = kalman.kOutput[0];
+            dy = kalman.kOutput[1];
+            dz = kalman.kOutput[2];
+            Mat smoothedMat = new Mat(2, 3, MatType.CV_64F, new double[] {
+            sx * Math.Cos(dz), sx * -Math.Sin(dz), dx,
+            sy * Math.Sin(dz), sy * Math.Cos(dz), dy });
+            Mat smoothedFrame = src.WarpAffine(smoothedMat, src.Size());
+            smoothedFrame = smoothedFrame.RowRange(borderCrop, smoothedFrame.Rows - borderCrop).ColRange(borderCrop, smoothedFrame.Cols - borderCrop);
+            dst2 = smoothedFrame.Resize(src.Size());
+            Cv2.Subtract(src, dst2, dst3);
+            string Text = "dx = " + dx.ToString(fmt2) + "\n" + "dy = " + dy.ToString(fmt2) + "\n" + "dz = " + dz.ToString(fmt2);
+            SetTrueText(Text, new cv.Point(10, 10), 3);
+        }
+    }
+    public class CS_IMU_PlotIMUFrameTime : CS_Parent
+    {
+        Plot_OverTime plot = new Plot_OverTime();
+        public double CPUInterval;
+        public double IMUtoCaptureEstimate;
+        Options_IMUFrameTime options = new Options_IMUFrameTime();
+        double imuTotalTime;
+        int allZeroCount;
+        public CS_IMU_PlotIMUFrameTime(VBtask task) : base(task)
+        {
+            plot.dst2 = dst3;
+            plot.maxScale = 40;
+            plot.minScale = -10;
+            plot.plotCount = 4;
+            labels[3] = "IMU (blue) Host (green) Latency est. (red) - all in ms";
+            desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            int IMUanchor = (int)task.IMU_FrameTime;
+            int[] histogramIMU = new int[plot.maxScale];
+            // there can be some errant times at startup.
+            if (task.IMU_FrameTime >= histogramIMU.Length) task.IMU_FrameTime = plot.maxScale;
+            if (task.IMU_FrameTime < 0) task.IMU_FrameTime = 0;
+            imuTotalTime += task.IMU_FrameTime;
+            if (imuTotalTime == 0)
+            {
+                allZeroCount++;
+                if (allZeroCount > 20)
+                {
+                    SetTrueText("Is IMU present?  No IMU FrameTimes");
+                    allZeroCount = int.MinValue; // don't show message again.
+                }
+                return; // if the IMU frametime was 0, then no new IMU data was generated (or it is unsupported!)
+            }
+            int maxval = int.MinValue;
+            for (int i = 0; i < histogramIMU.Length; i++)
+            {
+                if (maxval < histogramIMU[i])
+                {
+                    maxval = histogramIMU[i];
+                    IMUanchor = i;
+                }
+            }
+            int imuFrameTime = (int)task.IMU_FrameTime;
+            if (IMUanchor != 0) imuFrameTime = imuFrameTime % IMUanchor;
+            IMUtoCaptureEstimate = IMUanchor - imuFrameTime + options.minDelayIMU;
+            if (IMUtoCaptureEstimate > IMUanchor) IMUtoCaptureEstimate -= IMUanchor;
+            if (IMUtoCaptureEstimate < options.minDelayIMU) IMUtoCaptureEstimate = options.minDelayIMU;
+            double sampledIMUFrameTime = task.IMU_FrameTime;
+            if (task.heartBeat) sampledIMUFrameTime = task.IMU_FrameTime;
+            histogramIMU[Math.Min((int)task.IMU_FrameTime, histogramIMU.Length - 1)]++;
+            if (standaloneTest())
+            {
+                string output = "IMU_TimeStamp (ms) " + task.IMU_TimeStamp.ToString("00") + "\n" +
+                                "CPU TimeStamp (ms) " + task.CPU_TimeStamp.ToString("00") + "\n" +
+                                "IMU Frametime (ms, sampled) " + sampledIMUFrameTime.ToString("000.00") +
+                                " IMUanchor = " + IMUanchor.ToString("00") +
+                                " latest = " + task.IMU_FrameTime.ToString("00.00") + "\n" +
+                                "IMUtoCapture (ms, sampled, in red) " + IMUtoCaptureEstimate.ToString("00") + "\n" + "\n" +
+                                "IMU Frame Time = Blue" + "\n" +
+                                "Host Frame Time = Green" + "\n" +
+                                "IMU Total Delay = Red" + "\n" +
+                                "IMU Anchor Frame Time = White (IMU Frame Time that occurs most often" + "\n" + "\n" + "\n";
+                plot.plotData = new Scalar(task.IMU_FrameTime, task.CPU_FrameTime, IMUtoCaptureEstimate, IMUanchor);
+                plot.Run(null);
+                if (plot.maxScale - plot.minScale > histogramIMU.Length) Array.Resize(ref histogramIMU, plot.maxScale - plot.minScale);
+                if (plot.lastXdelta.Count() > options.plotLastX)
+                {
+                    for (int i = 0; i < plot.plotCount; i++)
+                    {
+                        string timeLabel = " IMU FrameTime ";
+                        if (i == 1) timeLabel = " Host Frame Time ";
+                        if (i == 2) timeLabel = " IMUtoCapture ms ";
+                        if (i == 3) timeLabel = " IMU Center time ";
+
+                        output += "Last " + options.plotLastX + timeLabel + "\t";
+                        for (int j = plot.lastXdelta.Count() - options.plotLastX - 1; j < plot.lastXdelta.Count() - 1; j++)
+                        {
+                            output += plot.lastXdelta[j][i].ToString("00") + ", ";
+                        }
+                        output += "\n";
+                    }
+                }
+                SetTrueText(output);
+            }
+        }
+    }
+    public class CS_IMU_PlotTotalDelay : CS_Parent
+    {
+        IMU_PlotHostFrameTimes host = new IMU_PlotHostFrameTimes();
+        IMU_PlotIMUFrameTime imu = new IMU_PlotIMUFrameTime();
+        Plot_OverTime plot = new Plot_OverTime();
+        Kalman_Single kalman = new Kalman_Single();
+        System.Windows.Forms.TrackBar countSlider;
+        double sampledCPUDelay = 0;
+        double sampledIMUDelay = 0;
+        double sampledTotalDelay = 0;
+        double sampledSmooth = 0;
+        public CS_IMU_PlotTotalDelay(VBtask task) : base(task)
+        {
+            countSlider = FindSlider("Number of Plot Values");
+            plot.dst2 = dst3;
+            plot.maxScale = 50;
+            plot.minScale = 0;
+            plot.plotCount = 4;
+            labels[2] = "Timing data - total (white) right image";
+            labels[3] = "IMU (blue) Host (green) Latency est. (red) - all in ms";
+            desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion.";
+        }
+        public void RunCS(Mat src)
+        {
+            int plotLastX = countSlider.Value;
+            host.Run(src);
+            imu.Run(src);
+            double totaldelay = host.HostInterruptDelayEstimate + imu.IMUtoCaptureEstimate;
+            kalman.inputReal = (float)totaldelay;
+            kalman.Run(src);
+            if (task.FirstPass)
+            {
+                sampledCPUDelay = host.HostInterruptDelayEstimate;
+                sampledIMUDelay = imu.IMUtoCaptureEstimate;
+                sampledTotalDelay = totaldelay;
+                sampledSmooth = kalman.stateResult;
+            }
+            if (task.heartBeat)
+            {
+                sampledCPUDelay = host.HostInterruptDelayEstimate;
+                sampledIMUDelay = imu.IMUtoCaptureEstimate;
+                sampledTotalDelay = totaldelay;
+                sampledSmooth = kalman.stateResult;
+            }
+            string output = "Estimated host delay (ms, sampled) " + string.Format("{0:00}", sampledCPUDelay) + "\n" +
+                            "Estimated IMU delay (ms, sampled) " + string.Format("{0:00}", sampledIMUDelay) + "\n" +
+                            "Estimated Total delay (ms, sampled) " + string.Format("{0:00}", sampledTotalDelay) + "\n" +
+                            "Estimated Total delay Smoothed (ms, sampled, in White) " + string.Format("{0:00}", sampledSmooth) + "\n" + "\n" +
+                            "Blue" + "\t" + "IMU Frame Time" + "\n" +
+                            "Green" + "\t" + "Host Frame Time" + "\n" +
+                            "Red" + "\t" + "Host+IMU Total Delay (latency)" + "\n" +
+                            "White" + "\t" + "Host+IMU Anchor Frame Time (Host Frame Time that occurs most often)" + "\n" + "\n" + "\n";
+            plot.plotData = new Scalar(imu.IMUtoCaptureEstimate, host.HostInterruptDelayEstimate, totaldelay, kalman.stateResult);
+            plot.Run(empty);
+            if (plot.lastXdelta.Count() > plotLastX)
+            {
+                for (int i = 0; i < plot.plotCount; i++)
+                {
+                    string timeLabel = " IMU Delay ";
+                    if (i == 1) timeLabel = " Host Delay ";
+                    if (i == 2) timeLabel = " Total Delay ms ";
+                    if (i == 3) timeLabel = " Smoothed Total ";
+                    output += "Last " + plotLastX + timeLabel + "\t";
+                    for (int j = plot.lastXdelta.Count() - plotLastX - 1; j < plot.lastXdelta.Count(); j++)
+                    {
+                        output += string.Format("{0:00}", plot.lastXdelta[j][i]) + ", ";
+                    }
+                    output += "\n";
+                }
+            }
+            SetTrueText(output);
+        }
+    }
+    public class CS_IMU_VerticalAngles : CS_Parent
+    {
+        Line_GCloud vert = new Line_GCloud();
+        public CS_IMU_VerticalAngles(VBtask task) : base(task)
+        {
+            labels = new[] { "", "", "Highlighted vertical lines", "Line details" };
+            desc = "Compare the IMU changes to the angle changes in the vertical lines.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = src.Clone();
+            vert.Run(src);
+            string strOut = "ID" + "\t" + "len3D" + "\t" + "Depth" + "\t" + "Arc X" + "\t" + "Arc Y" + "\t" + "Arc Z" + "\t" + "IMU X" + "\t" + "IMU Y" + "\t" + "IMU Z" + "\n";
+            dst3.SetTo(0);
+            for (int i = 0; i < vert.sortedVerticals.Count(); i++)
+            {
+                var gc = vert.sortedVerticals.ElementAt(i).Value;
+                strOut += i + "\t" + string.Format("{0}", gc.len3D) + "m" + "\t" + string.Format("{0}", gc.tc1.depth) + "m" + "\t" +
+                          string.Format("{0}", gc.arcX) + "\t" + string.Format("{0}", gc.arcY) + "\t" + string.Format("{0}", gc.arcZ) + "\t";
+                strOut += string.Format("{0}", task.accRadians.X * 57.2958) + "\t" + string.Format("{0}", task.accRadians.Y * 57.2958) + "\t" + string.Format("{0}", task.accRadians.Z * 57.2958) + "\t" + "\n";
+                SetTrueText(i.ToString(), gc.tc1.center, 2);
+                SetTrueText(i.ToString(), gc.tc1.center, 3);
+                DrawLine(dst2, gc.tc1.center, gc.tc2.center, task.HighlightColor, task.lineWidth);
+                DrawLine(dst3, gc.tc1.center, gc.tc2.center, Scalar.White, task.lineWidth);
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_IMU_PlotGravityAngles : CS_Parent
+    {
+        Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
+        public CS_IMU_PlotGravityAngles(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Plot the motion of the camera based on the IMU data in degrees";
+        }
+        public void RunCS(Mat src)
+        {
+            SetTrueText("ts = " + string.Format("{0}", task.IMU_TimeStamp) + "\n" + "X degrees = " + string.Format("{0}", task.accRadians.X * 57.2958) + "\n" +
+                        "Y degrees = " + string.Format("{0}", Math.Abs(task.accRadians.Y * 57.2958)) + "\n" + "Z degrees = " + string.Format("{0}", task.accRadians.Z * 57.2958) + "\n" + "\n" +
+                        "Motion (radians/sec) " + "\n" + "pitch = " + string.Format("{0}", task.IMU_AngularVelocity.X) + "\n" +
+                        "Yaw = " + string.Format("{0}", task.IMU_AngularVelocity.Y) + "\n" + " Roll = " + string.Format("{0}", task.IMU_AngularVelocity.Z), 1);
+            plot.plotData = new Scalar(task.accRadians.X * 57.2958, task.accRadians.Y * 57.2958, task.accRadians.Z * 57.2958);
+            plot.Run(empty);
+            dst2 = plot.dst2;
+            dst3 = plot.dst3;
+        }
+    }
+    public class CS_IMU_PlotAngularVelocity : CS_Parent
+    {
+        Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
+        public CS_IMU_PlotAngularVelocity(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Plot the IMU Velocity over time.";
+        }
+        public void RunCS(Mat src)
+        {
+            SetTrueText("ts = " + string.Format("{0}", task.IMU_TimeStamp) + "\n" + "X m/sec^2 = " + string.Format("{0}", task.IMU_Acceleration.X) + "\n" +
+                        "Y m/sec^2 = " + string.Format("{0}", task.IMU_Acceleration.Y) + "\n" + "Z m/sec^2 = " + string.Format("{0}", task.IMU_Acceleration.Z) + "\n" + "\n" +
+                        "Motion (radians/sec) " + "\n" + "X - Pitch = " + string.Format("{0}", task.IMU_AngularVelocity.X) + "\n" +
+                        "Y - Yaw = " + string.Format("{0}", task.IMU_AngularVelocity.Y) + "\n" + "Z - Roll = " + string.Format("{0}", task.IMU_AngularVelocity.Z) + "\n" + "\n" +
+                        "Move the camera to move values off of zero...", 1);
+            plot.plotData = new Scalar(task.IMU_AngularVelocity.X, task.IMU_AngularVelocity.Y, task.IMU_AngularVelocity.Z);
+            plot.Run(empty);
+            dst2 = plot.dst2;
+            dst3 = plot.dst3;
+        }
+    }
+    
+    public class CS_IMU_Lines : CS_Parent
+    {
+        Line_GCloud vert = new Line_GCloud();
+        Kalman_Basics kalman = new Kalman_Basics();
+        gravityLine lastGcell;
+        public CS_IMU_Lines(VBtask task) : base(task)
+        {
+            labels[2] = "Vertical lines in Blue and horizontal lines in Yellow";
+            desc = "Find the vertical and horizontal lines";
+        }
+        public void RunCS(Mat src)
+        {
+            vert.Run(src);
+            dst2 = vert.dst2;
+            gravityLine gcell;
+            var cells = vert.sortedVerticals;
+            if (cells.Count() > 0) gcell = cells.ElementAt(0).Value; else gcell = lastGcell;
+            if (gcell.len3D > 0)
+            {
+                string strOut = "ID" + "\t" + "len3D" + "\t" + "Depth" + "\t" + "Arc Y" + "\t" + "Image" + "\t" + "IMU Y" + "\t" + "\n";
+                if (task.heartBeat) dst3.SetTo(0);
+                var p1 = gcell.tc1.center;
+                var p2 = gcell.tc2.center;
+                var lastP1 = new cv.Point(kalman.kOutput[0], kalman.kOutput[1]);
+                var lastp2 = new cv.Point(kalman.kOutput[2], kalman.kOutput[3]);
+                kalman.kInput = new float[] { p1.X, p1.Y, p2.X, p2.Y };
+                kalman.Run(empty);
+                p1 = new cv.Point(kalman.kOutput[0], kalman.kOutput[1]);
+                p2 = new cv.Point(kalman.kOutput[2], kalman.kOutput[3]);
+                DrawCircle(dst2, p1, task.DotSize, task.HighlightColor);
+                DrawCircle(dst2, p2, task.DotSize, task.HighlightColor);
+                DrawCircle(dst3, p1, task.DotSize, Scalar.White);
+                DrawCircle(dst3, p2, task.DotSize, Scalar.White);
+                lastGcell = gcell;
+                strOut += "0" + "\t" + string.Format("{0}", gcell.len3D) + "m" + "\t" +
+                                                    string.Format("{0}", gcell.tc1.depth) + "m" + "\t" +
+                                                    string.Format("{0}", gcell.arcY) + "\t" +
+                                                    string.Format("{0}", gcell.imageAngle) + "\t";
+                strOut += string.Format("{0}", task.accRadians.Y * 57.2958) + "\n";
+                SetTrueText(strOut, 3);
+                labels[2] = vert.labels[3];
+            }
+        }
+    }
+    public class CS_IMU_PlotAcceleration : CS_Parent
+    {
+        Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
+        public CS_IMU_PlotAcceleration(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Plot the IMU Acceleration in m/Sec^2 over time.";
+        }
+        public void RunCS(Mat src)
+        {
+            SetTrueText("ts = " + string.Format("{0}", task.IMU_TimeStamp) + "\n" + "X m/sec^2 = " + string.Format("{0}", task.IMU_Acceleration.X) + "\n" +
+                        "Y m/sec^2 = " + string.Format("{0}", task.IMU_Acceleration.Y) + "\n" + "Z m/sec^2 = " + string.Format("{0}", task.IMU_Acceleration.Z) + "\n" + "\n" +
+                        "Motion (radians/sec) " + "\n" + "pitch = " + string.Format("{0}", task.IMU_AngularVelocity.X) + "\n" +
+                        "Yaw = " + string.Format("{0}", task.IMU_AngularVelocity.Y) + "\n" + " Roll = " + string.Format("{0}", task.IMU_AngularVelocity.Z), 1);
+            plot.plotData = new Scalar(task.IMU_Acceleration.X, task.IMU_Acceleration.Y, task.IMU_Acceleration.Z);
+            plot.Run(empty);
+            dst2 = plot.dst2;
+            dst3 = plot.dst3;
+        }
+    }
+    public class CS_IMU_Average : CS_Parent
+    {
+        List<Scalar> accList = new List<Scalar>();
+        public CS_IMU_Average(VBtask task) : base(task)
+        {
+            desc = "Average the IMU Acceleration values over the previous X images.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.optionsChanged) accList.Clear();
+            accList.Add(new cv.Scalar(task.IMU_RawAcceleration.X, task.IMU_RawAcceleration.Y, task.IMU_RawAcceleration.Z));
+            var accMat = new Mat(accList.Count(), 1, MatType.CV_64FC4, accList.ToArray());
+            var imuMean = accMat.Mean();
+            task.IMU_AverageAcceleration = new Point3f((float)imuMean[0], (float)imuMean[1], (float)imuMean[2]);
+            if (accList.Count() >= task.frameHistoryCount) accList.RemoveAt(0);
+            string strOut = "Average IMU acceleration: " + "\n" + string.Format("{0}", task.IMU_AverageAcceleration.X) + "\t" + string.Format("{0}", task.IMU_AverageAcceleration.Y) + "\t" +
+                            string.Format("{0}", task.IMU_AverageAcceleration.Z) + "\n";
+            SetTrueText(strOut);
+        }
+    }
+    public class CS_IMU_PlotCompareIMU : CS_Parent
+    {
+        Plot_OverTimeScalar[] plot = new Plot_OverTimeScalar[3];
+        IMU_AllMethods imuAll = new IMU_AllMethods();
+        public CS_IMU_PlotCompareIMU(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay0();
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            for (int i = 0; i < plot.Length; i++)
+            {
+                plot[i] = new Plot_OverTimeScalar();
+                plot[i].plotCount = 4;
+            }
+            labels = new string [] { "IMU Acceleration in X", "IMU Acceleration in Y", "IMU Acceleration in Z", "" };
+            desc = "imre the results of the raw IMU data with the same values after Kalman";
+        }
+        public void RunCS(Mat src)
+        {
+            imuAll.Run(empty);
+            plot[0].plotData = new Scalar(task.IMU_RawAcceleration.X, task.IMU_Acceleration.X, task.kalmanIMUacc.X, task.IMU_AverageAcceleration.X);
+            plot[0].Run(empty);
+            dst0 = plot[0].dst2;
+            plot[1].plotData = new Scalar(task.IMU_RawAcceleration.Y, task.IMU_Acceleration.Y, task.kalmanIMUacc.Y, task.IMU_AverageAcceleration.Y);
+            plot[1].Run(empty);
+            dst1 = plot[1].dst2;
+            plot[2].plotData = new Scalar(task.IMU_RawAcceleration.Z, task.IMU_Acceleration.Z, task.kalmanIMUacc.Z, task.IMU_AverageAcceleration.Z);
+            plot[2].Run(empty);
+            dst2 = plot[2].dst2;
+            SetTrueText("Blue (usually hidden) is the raw signal" + "\n" + "Green (usually hidden) is the Velocity-filtered results" + "\n" +
+                        "Red is the Kalman IMU data" + "\n" + "White is the IMU Averaging output (note delay from Kalman output)" + "\n" + "\n" +
+                        "Move the camera around to see the impact on the IMU data." + "\n" +
+                        "Adjust the global option 'Frame History' to see the impact." + "\n" + "\n" +
+                        "Remember that IMU Data filtering only impacts the X and Z values." + "\n" +
+                        "Averaging seems to track closer but is not as timely.", 3);
+        }
+    }
+    public class CS_IMU_Kalman : CS_Parent
+    {
+        Kalman_Basics kalman = new Kalman_Basics();
+        public CS_IMU_Kalman(VBtask task) : base(task)
+        {
+            desc = "Use Kalman Filter to stabilize the IMU acceleration and velocity";
+        }
+        public void RunCS(Mat src)
+        {
+            kalman.kInput = new float[] { task.IMU_RawAcceleration.X, task.IMU_RawAcceleration.Y, task.IMU_RawAcceleration.Z,
+                                       task.IMU_RawAngularVelocity.X, task.IMU_RawAngularVelocity.Y, task.IMU_RawAngularVelocity.Z };
+            kalman.Run(empty);
+            task.kalmanIMUacc = new Point3f(kalman.kOutput[0], kalman.kOutput[1], kalman.kOutput[2]);
+            task.kalmanIMUvelocity = new Point3f(kalman.kOutput[3], kalman.kOutput[4], kalman.kOutput[5]);
+            string strOut = "IMU Acceleration Raw" + "\t" + "IMU Velocity Raw" + "\n" +
+                            string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t", task.IMU_RawAcceleration.X, task.IMU_RawAcceleration.Y, task.IMU_RawAcceleration.Z, task.IMU_RawAngularVelocity.X, task.IMU_RawAngularVelocity.Y, task.IMU_RawAngularVelocity.Z) + "\n" + "\n" +
+                            "kalmanIMUacc" + "\t" + "\t" + "kalmanIMUvelocity" + "\n" +
+                            string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t", task.kalmanIMUacc.X, task.kalmanIMUacc.Y, task.kalmanIMUacc.Z, task.kalmanIMUvelocity.X, task.kalmanIMUvelocity.Y, task.kalmanIMUvelocity.Z);
+            SetTrueText(strOut);
+        }
+    }
+    public class CS_IMU_AllMethods : CS_Parent
+    {
+        IMU_Basics basics = new IMU_Basics();
+        IMU_Average imuAvg = new IMU_Average();
+        IMU_Kalman kalman = new IMU_Kalman();
+        public CS_IMU_AllMethods(VBtask task) : base(task)
+        {
+            desc = "Compute the IMU acceleration using all available methods - raw, Kalman, averaging, and velocity-filtered.";
+        }
+        public void RunCS(Mat src)
+        {
+            basics.Run(empty);
+            kalman.Run(empty);
+            imuAvg.Run(empty);
+            SetTrueText(basics.strOut + "\n" + kalman.strOut + "\n" + "\n" + imuAvg.strOut, 2);
+        }
+    }
+    public class CS_IMU_VelocityPlot : CS_Parent
+    {
+        IMU_Plot plot = new IMU_Plot();
+        public CS_IMU_VelocityPlot(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "Plot the angular velocity";
+        }
+        public void RunCS(Mat src)
+        {
+            task.pitch = task.IMU_AngularVelocity.X;
+            task.yaw = task.IMU_AngularVelocity.Y;
+            task.roll = task.IMU_AngularVelocity.Z;
+            plot.blue = task.pitch * 1000;
+            plot.green = task.yaw * 1000;
+            plot.red = task.roll * 1000;
+            plot.labels[2] = "pitch X 1000 (blue), Yaw X 1000 (green), and roll X 1000 (red)";
+            plot.Run(empty);
+            dst2 = plot.dst2;
+            dst3 = plot.dst3;
+            if (task.heartBeat)
+            {
+                strOut = "Pitch X1000 (blue): " + "\t" + (task.pitch * 1000).ToString(fmt1) + "\n" +
+                         "Yaw X1000 (green): " + "\t" + (task.yaw * 1000).ToString(fmt1) + "\n" +
+                         "Roll X1000 (red): " + "\t" + (task.roll * 1000).ToString(fmt1);
+            }
+            SetTrueText(strOut, 1);
+        }
+    }
+    public class CS_IMU_IscameraStable : CS_Parent
+    {
+        IMU_Plot plot = new IMU_Plot();
+        Options_IMU options = new Options_IMU();
+        public CS_IMU_IscameraStable(VBtask task) : base(task)
+        {
+            desc = "Track the standard deviation of the angular velocities.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            task.pitch = task.IMU_AngularVelocity.X;
+            task.yaw = task.IMU_AngularVelocity.Y;
+            task.roll = task.IMU_AngularVelocity.Z;
+            if (task.heartBeat)
+            {
+                strOut = "Pitch X1000 (blue): " + "\t" + (task.pitch * 1000).ToString(fmt1) + "\n" +
+                         "Yaw X1000 (green): " + "\t" + (task.yaw * 1000).ToString(fmt1) + "\n" +
+                         "Roll X1000 (red): " + "\t" + (task.roll * 1000).ToString(fmt1);
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_IMU_PlotHostFrameTimes : CS_Parent
+    {
+        public Plot_OverTime plot = new Plot_OverTime();
+        public double CPUInterval;
+        public double HostInterruptDelayEstimate;
+        Options_IMUFrameTime options = new Options_IMUFrameTime();
+        int CPUanchor = 0;
+        int[] hist;
+        double sampledCPUFrameTime = 0;
+        public CS_IMU_PlotHostFrameTimes(VBtask task) : base(task)
+        {
+            plot.dst2 = dst3;
+            plot.maxScale = 50;
+            plot.minScale = -10;
+            plot.plotCount = 4;
+            labels[3] = "IMU (blue) Host (green) Latency est. (red) - all in ms";
+            desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (task.FirstPass) CPUanchor = (int)task.CPU_FrameTime;
+            if (task.FirstPass) hist = new int[plot.maxScale + 1];
+            // there can be some errant times at startup.
+            if (task.CPU_FrameTime > plot.maxScale) task.CPU_FrameTime = plot.maxScale;
+            if (task.CPU_FrameTime < 0) task.CPU_FrameTime = 0;
+            int maxval = int.MinValue;
+            for (int i = 0; i < hist.Length; i++)
+            {
+                if (maxval < hist[i])
+                {
+                    maxval = hist[i];
+                    CPUanchor = i;
+                }
+            }
+            int cpuFrameTime = (int)task.CPU_FrameTime;
+            if (CPUanchor != 0) cpuFrameTime = cpuFrameTime % CPUanchor;
+            HostInterruptDelayEstimate = CPUanchor - cpuFrameTime + options.minDelayHost;
+            if (HostInterruptDelayEstimate > CPUanchor) HostInterruptDelayEstimate -= CPUanchor;
+            if (HostInterruptDelayEstimate < 0) HostInterruptDelayEstimate = options.minDelayHost;
+            if (task.FirstPass) sampledCPUFrameTime = task.CPU_FrameTime;
+            if (task.heartBeat) sampledCPUFrameTime = task.CPU_FrameTime;
+            hist[Math.Min((int)task.CPU_FrameTime, hist.Length - 1)] += 1;
+            if (standaloneTest())
+            {
+                string output = "IMU_TimeStamp (ms) " + task.IMU_TimeStamp.ToString("00") + "\n" +
+                                "CPU TimeStamp (ms) " + task.CPU_TimeStamp.ToString("00") + "\n" +
+                                "Host Frametime (ms, sampled) " + sampledCPUFrameTime.ToString("000.00") +
+                                " CPUanchor = " + CPUanchor.ToString("00") +
+                                " latest = " + task.CPU_FrameTime.ToString("00.00") + "\n" +
+                                "Host Interrupt Delay (ms, sampled, in red) " + HostInterruptDelayEstimate.ToString("00") + "\n" + "\n" +
+                                "Blue" + "\t" + "IMU Frame Time" + "\n" +
+                                "Green" + "\t" + "Host Frame Time" + "\n" +
+                                "Red" + "\t" + "Host Total Delay (latency)" + "\n" +
+                                "White" + "\t" + "Host Anchor Frame Time (Host Frame Time that occurs most often" + "\n" + "\n" + "\n";
+                plot.plotData = new Scalar(task.IMU_FrameTime, task.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor);
+                plot.Run(empty);
+                if (plot.maxScale - plot.minScale > hist.Length) Array.Resize(ref hist, plot.maxScale - plot.minScale + 1);
+                if (plot.lastXdelta.Count() > options.plotLastX)
+                {
+                    for (int i = 0; i < plot.plotCount; i++)
+                    {
+                        string timeLabel = " IMU FrameTime ";
+                        if (i == 1) timeLabel = " IMU Delay ";
+                        if (i == 2) timeLabel = " Host FrameTime ";
+                        if (i == 3) timeLabel = " CPUanchor FT";
+                        output += "Last " + options.plotLastX.ToString() + timeLabel + "\t";
+                        for (int j = plot.lastXdelta.Count() - options.plotLastX - 1; j < plot.lastXdelta.Count(); j++)
+                        {
+                            output += plot.lastXdelta[j][i].ToString("00") + ", ";
+                        }
+                        output += "\n";
+                    }
+                }
+                SetTrueText(output);
+            }
+        }
+    }
+    public class CS_IMU_PlotHostFrameScalar : CS_Parent
+    {
+        public Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
+        public double CPUInterval;
+        public double HostInterruptDelayEstimate;
+        Options_IMUFrameTime options = new Options_IMUFrameTime();
+        double CPUanchor = 0;
+        double sampledCPUFrameTime = 0;
+        public CS_IMU_PlotHostFrameScalar(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            plot.plotCount = 4;
+            labels[3] = "IMU (blue) Host (green) Latency est. (red) - all in ms";
+            desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (task.FirstPass) CPUanchor = task.CPU_FrameTime;
+            int cpuFrameTime = (int)task.CPU_FrameTime;
+            if (CPUanchor != 0) cpuFrameTime = (int)(cpuFrameTime % CPUanchor);
+            HostInterruptDelayEstimate = CPUanchor - cpuFrameTime + options.minDelayHost;
+            if (HostInterruptDelayEstimate > CPUanchor) HostInterruptDelayEstimate -= CPUanchor;
+            if (HostInterruptDelayEstimate < 0) HostInterruptDelayEstimate = options.minDelayHost;
+            if (task.FirstPass) sampledCPUFrameTime = task.CPU_FrameTime;
+            if (task.heartBeat) sampledCPUFrameTime = task.CPU_FrameTime;
+            if (standaloneTest())
+            {
+                string strOut = "IMU_TimeStamp (ms) " + task.IMU_TimeStamp.ToString("00") + "\n" +
+                                "CPU TimeStamp (ms) " + task.CPU_TimeStamp.ToString("00") + "\n" +
+                                "Host Frametime (ms, sampled) " + sampledCPUFrameTime.ToString("000.00") +
+                                " CPUanchor = " + CPUanchor.ToString("00") +
+                                " latest = " + task.CPU_FrameTime.ToString("00.00") + "\n" +
+                                "Host Interrupt Delay (ms, sampled, in red) " + HostInterruptDelayEstimate.ToString("00") + "\n" + "\n" +
+                                "Blue" + "\t" + "IMU Frame Time" + "\n" +
+                                "Green" + "\t" + "Host Frame Time" + "\n" +
+                                "Red" + "\t" + "Host Total Delay (latency)" + "\n" +
+                                "White" + "\t" + "Host Anchor Frame Time (Host Frame Time that occurs most often" + "\n" + "\n" + "\n";
+                plot.plotData = new Scalar(task.IMU_FrameTime, task.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor);
+                plot.Run(empty);
+                dst2 = plot.dst2;
+                dst3 = plot.dst3;
+                SetTrueText(strOut, 1);
+            }
+        }
+    }
+    public class CS_IMU_GMatrixWithOptions : CS_Parent
+    {
+        public float cx = 1, sx = 0, cy = 1, sy = 0, cz = 1, sz = 0;
+        public Mat gMatrix;
+        System.Windows.Forms.TrackBar xSlider;
+        System.Windows.Forms.TrackBar ySlider;
+        System.Windows.Forms.TrackBar zSlider;
+        Options_IMU options = new Options_IMU();
+        public CS_IMU_GMatrixWithOptions(VBtask task) : base(task)
+        {
+            desc = "Find the angle of tilt for the camera with respect to gravity.";
+        }
+        void getSliderValues()
+        {
+            if (xSlider == null) xSlider = FindSlider("Rotate pointcloud around X-axis (degrees)");
+            if (ySlider == null) ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)");
+            if (zSlider == null) zSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)");
+            cx = (float)Math.Cos(xSlider.Value * Cv2.PI / 180);
+            sx = (float)Math.Sin(xSlider.Value * Cv2.PI / 180);
+            cy = (float)Math.Cos(ySlider.Value * Cv2.PI / 180);
+            sy = (float)Math.Sin(ySlider.Value * Cv2.PI / 180);
+            cz = (float)Math.Cos(zSlider.Value * Cv2.PI / 180);
+            sz = (float)Math.Sin(zSlider.Value * Cv2.PI / 180);
+        }
+        Mat buildGmatrix()
+        {
+            float[,] gArray = new float[3, 3]
+            {
+            { cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz },
+            { sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz },
+            { 0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz }
+            };
+            Mat tmpGMatrix = new Mat(3, 3, MatType.CV_32F, new float[]
+            {
+            gArray[0, 0] * cy + gArray[0, 1] * 0 + gArray[0, 2] * sy,
+            gArray[0, 0] * 0 + gArray[0, 1] * 1 + gArray[0, 2] * 0,
+            gArray[0, 0] * -sy + gArray[0, 1] * 0 + gArray[0, 2] * cy,
+            gArray[1, 0] * cy + gArray[1, 1] * 0 + gArray[1, 2] * sy,
+            gArray[1, 0] * 0 + gArray[1, 1] * 1 + gArray[1, 2] * 0,
+            gArray[1, 0] * -sy + gArray[1, 1] * 0 + gArray[1, 2] * cy,
+            gArray[2, 0] * cy + gArray[2, 1] * 0 + gArray[2, 2] * sy,
+            gArray[2, 0] * 0 + gArray[2, 1] * 1 + gArray[2, 2] * 0,
+            gArray[2, 0] * -sy + gArray[2, 1] * 0 + gArray[2, 2] * cy
+            });
+            return tmpGMatrix;
+        }
+        public void RunCS(Mat src)
+        {
+            if (xSlider == null) xSlider = FindSlider("Rotate pointcloud around X-axis (degrees)");
+            if (ySlider == null) ySlider = FindSlider("Rotate pointcloud around Y-axis (degrees)");
+            if (zSlider == null) zSlider = FindSlider("Rotate pointcloud around Z-axis (degrees)");
+            if (task.useGravityPointcloud)
+            {
+                cz = (float)Math.Cos(task.accRadians.Z);
+                sz = (float)Math.Sin(task.accRadians.Z);
+                cx = (float)Math.Cos(task.accRadians.X);
+                sx = (float)Math.Sin(task.accRadians.X);
+            }
+            else
+            {
+                getSliderValues();
+            }
+            gMatrix = buildGmatrix();
+            if (standaloneTest())
+            {
+                var g = task.IMU_Acceleration;
+                strOut = "IMU Acceleration in X-direction = " + "\t\t" + string.Format("{0:F4}", g.X) + "\n";
+                strOut += "IMU Acceleration in Y-direction = " + "\t\t" + string.Format("{0:F4}", g.Y) + "\n";
+                strOut += "IMU Acceleration in Z-direction = " + "\t\t" + string.Format("{0:F4}", g.Z) + "\n\n";
+                strOut += "Rotate around X-axis (in degrees) = " + "\t" + string.Format("{0:F4}", xSlider.Value) + "\n";
+                strOut += "Rotate around Y-axis (in degrees) = " + "\t" + string.Format("{0:F4}", ySlider.Value) + "\n";
+                strOut += "Rotate around Z-axis (in degrees) = " + "\t" + string.Format("{0:F4}", zSlider.Value) + "\n";
+                strOut += "\n" + "sqrt (" + "\t" + string.Format("{0:F4}", g.X) + "*" + string.Format("{0:F4}", g.X) + "\t\t" +
+                          string.Format("{0:F4}", g.Y) + "*" + string.Format("{0:F4}", g.Y) + "\t\t" +
+                          string.Format("{0:F4}", g.Z) + "*" + string.Format("{0:F4}", g.Z) + " ) = " + "\t\t" +
+                          string.Format("{0:F4}", Math.Sqrt(g.X * g.X + g.Y * g.Y + g.Z * g.Z)) + "\n" +
+                          "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)";
+                var tmpGMat1 = buildGmatrix();
+                strOut += "\nGravity-oriented gMatrix - move camera to test this:\n" + gMatrixToStr(tmpGMat1);
+                getSliderValues();
+                var tmpGMat2 = buildGmatrix();
+                strOut += "\ngMatrix with slider input - use Options_IMU Sliders to change this:\n" + gMatrixToStr(tmpGMat2);
+            }
+            SetTrueText(strOut);
+            task.gMatrix = gMatrix;
+        }
+    }
+    public class CS_IMU_VerticalVerify : CS_Parent
+    {
+        public List<gravityLine> gCells = new List<gravityLine>();
+        FeatureLine_VH linesVH = new FeatureLine_VH();
+        Options_VerticalVerify options = new Options_VerticalVerify();
+        public CS_IMU_VerticalVerify(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Highlighted vertical lines", "Line details" };
+            desc = "Use the Y-Arc to confirm which vertical lines are valid";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2 = src.Clone();
+            if (standaloneTest())
+            {
+                linesVH.Run(src);
+                gCells = linesVH.gCells;
+            }
+            strOut = "ID" + "\t" + "len3D" + "\t" + "Depth" + "\t" + "Arc Y" + "\t" + "Image" + "\t" + "IMU Y" + "\n";
+            dst3.SetTo(0);
+            int index;
+            for (int i = gCells.Count() - 1; i >= 0; i--)
+            {
+                var gc = gCells[i];
+                if (gc.arcY > options.angleThreshold)
+                {
+                    index = gCells.Count() - i;
+                    var p1 = gc.tc1.center;
+                    var p2 = gc.tc2.center;
+                    float xOffset = p1.X - p2.X;
+                    if (p1.Y < p2.Y) xOffset = p2.X - p1.X;
+                    float hypot = (float)p1.DistanceTo(p2);
+                    gc.imageAngle = -(float)Math.Asin(xOffset / hypot) * 57.2958f;
+                    strOut += index.ToString() + "\t" + string.Format("{0:F1}", gc.len3D) + "m" + "\t" +
+                              string.Format("{0:F1}", gc.tc1.depth) + "m" + "\t" +
+                              string.Format("{0:F1}", gc.arcY) + "\t" +
+                              string.Format("{0:F1}", gc.imageAngle) + "\t";
+                    strOut += string.Format("{0:F1}", task.accRadians.Y * 57.2958) + "\n";
+                    SetTrueText(index.ToString(), gc.tc1.center, 2);
+                    SetTrueText(index.ToString(), gc.tc1.center, 3);
+                    DrawLine(dst2, gc.tc1.center, gc.tc2.center, task.HighlightColor, task.lineWidth);
+                    DrawLine(dst3, gc.tc1.center, gc.tc2.center, Scalar.White, task.lineWidth);
+                    gCells[i] = gc;
+                }
+                else
+                {
+                    gCells.RemoveAt(i);
+                }
+            }
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_IMU_Plot : CS_Parent
+    {
+        Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
+        public float blueA, greenA, redA;
+        Options_IMUPlot options = new Options_IMUPlot();
+        public CS_IMU_Plot(VBtask task) : base(task)
+        {
+            plot.plotCount = 3;
+            desc = "Plot the angular velocity of the camera based on the IMU data";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standaloneTest())
+            {
+                blueA = task.IMU_AngularVelocity.X * 1000;
+                greenA = task.IMU_AngularVelocity.Y * 1000;
+                redA = task.IMU_AngularVelocity.Z * 1000;
+            }
+            float blueX = 0, greenX = 0, redX = 0;
+            if (options.setBlue) blueX = blueA;
+            if (options.setGreen) greenX = greenA;
+            if (options.setRed) redX = redA;
+            plot.plotData = new Scalar(blueX, greenX, redX);
+            plot.Run(empty);
+            dst2 = plot.dst2;
+            dst3 = plot.dst3;
+            labels[2] = "When run standaloneTest(), the default is to plot the angular velocity for X, Y, and Z";
+        }
+    }
+
 
 
 

@@ -67,6 +67,7 @@ Public Class Touchup
                 inline = Replace(inline, "vbtab", """/t""")
                 inline = Replace(inline, "DepthType.", "MatType.")
                 inline = Replace(inline, "Cv8u", "CV_8U")
+                inline = Replace(inline, "Environment.NewLine", """\n""")
 
                 inline = Replace(inline, "()(", "(")
                 inline = Replace(inline, "()()", "()")
