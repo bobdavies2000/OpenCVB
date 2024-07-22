@@ -1409,6 +1409,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Options_Intercepts" Then return new Options_Intercepts
 	if algorithmName = "Options_Interpolate" Then return new Options_Interpolate
 	if algorithmName = "Options_JpegQuality" Then return new Options_JpegQuality
+	if algorithmName = "Options_Kalman" Then return new Options_Kalman
 	if algorithmName = "Options_Kalman_VB" Then return new Options_Kalman_VB
 	if algorithmName = "Options_Kaze" Then return new Options_Kaze
 	if algorithmName = "Options_KLT" Then return new Options_KLT

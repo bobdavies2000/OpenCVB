@@ -27203,6 +27203,763 @@ public class CS_ApproxPoly_Basics : CS_Parent
             labels[2] = "When run standaloneTest(), the default is to plot the angular velocity for X, Y, and Z";
         }
     }
+    public class CS_InPaint_Basics : CS_Parent
+    {
+        Options_InPaint options = new Options_InPaint();
+        public CS_InPaint_Basics(VBtask task) : base(task)
+        {
+            desc = "Create a flaw in an image and then use inPaint to mask it.";
+            labels[3] = "Repaired Image";
+        }
+        public Mat drawRandomLine(Mat dst)
+        {
+            var p1 = new Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4));
+            var p2 = new Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4));
+            DrawLine(dst2, p1, p2, new Scalar(0, 0, 0), task.lineWidth);
+            var mask = new Mat(dst2.Size(), MatType.CV_8UC1);
+            mask.SetTo(0);
+            DrawLine(mask, p1, p2, Scalar.All(255), task.lineWidth);
+            return mask;
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            src.CopyTo(dst2);
+            Mat mask = drawRandomLine(dst2);
+            Cv2.Inpaint(dst2, mask, dst3, task.lineWidth, options.telea ? InpaintMethod.Telea : InpaintMethod.NS);
+        }
+    }
+    public class CS_InPaint_Noise : CS_Parent
+    {
+        Draw_Noise noise = new Draw_Noise();
+        Options_InPaint options = new Options_InPaint();
+        public CS_InPaint_Noise(VBtask task) : base(task)
+        {
+            desc = "Create noise in an image and then use inPaint to remove it.";
+            labels[3] = "Repaired Image";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            noise.Run(src); // create some noise in the result1 image.
+            dst2 = noise.dst2;
+            Cv2.Inpaint(dst2, noise.noiseMask, dst3, noise.options.noiseWidth, options.telea ? InpaintMethod.Telea : InpaintMethod.NS);
+        }
+    }
+    public class CS_InPaint_Depth : CS_Parent
+    {
+        Options_InPaint options = new Options_InPaint();
+        public CS_InPaint_Depth(VBtask task) : base(task)
+        {
+            labels[2] = "32-bit representation of original depth";
+            labels[3] = "32-bit depth repaired with inpainting";
+            desc = "Use Navier-Stokes to fill in the holes in the depth";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (src.Type() != MatType.CV_32F) src = task.pcSplit[2];
+            dst2 = src.Clone();
+            Cv2.Inpaint(src, task.noDepthMask, dst3, 20, options.telea ? InpaintMethod.Telea : InpaintMethod.NS);
+        }
+    }
+    public class CS_Interpolate_Basics : CS_Parent
+    {
+        public Options_Resize options = new Options_Resize();
+        public Options_Interpolate iOptions = new Options_Interpolate();
+        int direction = 1;
+        int saveSliderValue = 0;
+        public CS_Interpolate_Basics(VBtask task) : base(task)
+        {
+            UpdateAdvice(traceName + ": 'Interpolation threshold' is the primary control" + "\n" +
+                         "Local option 'Resize %' has a secondary effect." + "\n" +
+                         "Local option 'Line length' affects the lines found.");
+            desc = "Resize image using all available interpolation methods in OpenCV";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            iOptions.RunVB();
+            if (task.FirstPass) saveSliderValue = iOptions.interpolationThreshold;
+            if (standaloneTest())
+            {
+                bool userGrab = iOptions.interpolationThreshold != iOptions.saveDefaultThreshold;
+                if (!userGrab)
+                {
+                    saveSliderValue += direction;
+                    if (saveSliderValue > 50) direction = -1;
+                    if (saveSliderValue == 1) direction = 1;
+                }
+                else
+                {
+                    userGrab = true;
+                    saveSliderValue = iOptions.interpolationThreshold;
+                }
+            }
+            else
+            {
+                saveSliderValue = iOptions.interpolationThreshold;
+            }
+            dst2 = src.Clone();
+            var newSize = new cv.Size((int)(dst2.Width * saveSliderValue / 100), (int)(dst2.Height * saveSliderValue / 100));
+            dst2 = src.Resize(newSize, 0, 0, options.warpFlag);
+            labels[2] = "Resize % = " + string.Format("{0:0%}", saveSliderValue / 100.0);
+        }
+    }
+    public class CS_Interpolate_Kalman : CS_Parent
+    {
+        Interpolate_Basics inter = new Interpolate_Basics();
+        Kalman_Basics kalman = new Kalman_Basics();
+        int updatedFrames;
+        int myFrameCount;
+        int heartCount;
+        Mat lastFrame = new cv.Mat();
+        public CS_Interpolate_Kalman(VBtask task) : base(task)
+        {
+            desc = "Use Kalman to smooth the grayscale results of interpolation";
+        }
+        public void RunCS(Mat src)
+        {
+            inter.Run(src);
+            dst2 = inter.dst2.CvtColor(ColorConversionCodes.BGR2GRAY);
+            if (task.optionsChanged)
+            {
+                kalman.kInput = new float[dst2.Width * dst2.Height];
+                myFrameCount = 1;
+                updatedFrames = 0;
+            }
+            Mat tmp32f = new Mat();
+            dst2.ConvertTo(tmp32f, MatType.CV_32F);
+            Marshal.Copy(tmp32f.Data, kalman.kInput, 0, kalman.kInput.Length);
+            kalman.Run(empty);
+            byte[] results = new byte[kalman.kInput.Length];
+            for (int i = 0; i < kalman.kOutput.Length; i++)
+            {
+                float val = kalman.kOutput[i];
+                if (float.IsNaN(val)) val = 255;
+                if (val < 0) val = 0;
+                if (val > 255) val = 255;
+                results[i] = (byte)val;
+            }
+            Marshal.Copy(results, 0, dst2.Data, kalman.kOutput.Length);
+            if (task.gOptions.GetUseKalman())
+            {
+                labels[2] = "Kalman-smoothed output after resizing to " + dst2.Width + "x" + dst2.Height;
+            }
+            else
+            {
+                labels[2] = "Raw output after resizing to " + dst2.Width + "x" + dst2.Height;
+            }
+            if (task.FirstPass) lastFrame = dst2.Clone();
+            if (lastFrame.Size() != dst2.Size()) lastFrame = dst2.Clone();
+            Mat tmp = dst2 - lastFrame;
+            int diffCount = tmp.CountNonZero();
+            if (diffCount > inter.iOptions.pixelCountThreshold)
+            {
+                lastFrame = dst2.Clone();
+                dst3 = src.Clone();
+                updatedFrames++;
+            }
+            labels[3] = "Total frames = " + myFrameCount + " updates=" + updatedFrames +
+                         " savings = " + (myFrameCount - updatedFrames) + " or " +
+                         string.Format("{0:0%}", (myFrameCount - updatedFrames) / (float)myFrameCount) + " diffCount = " + diffCount;
+            if (task.heartBeat)
+            {
+                heartCount++;
+                if (heartCount % 10 == 0)
+                {
+                    myFrameCount = 0;
+                    updatedFrames = 0;
+                }
+            }
+            myFrameCount++;
+        }
+    }
+    public class CS_Interpolate_Lines : CS_Parent
+    {
+        Line_Basics lines = new Line_Basics();
+        Interpolate_Basics inter = new Interpolate_Basics();
+        public CS_Interpolate_Lines(VBtask task) : base(task)
+        {
+            FindSlider("Interpolation Resize %").Value = 80;
+            FindSlider("Interpolation threshold").Value = 100;
+            desc = "Detect lines in interpolation results.";
+        }
+        public void RunCS(Mat src)
+        {
+            inter.Run(src);
+            dst1 = inter.dst2.CvtColor(ColorConversionCodes.BGR2GRAY).Resize(dst3.Size());
+            dst1 = dst1.Threshold(inter.iOptions.interpolationThreshold, 255, ThresholdTypes.Binary);
+            lines.Run(dst1);
+            dst2 = lines.dst2;
+            dst3 = src;
+            foreach (var lp in lines.lpList)
+            {
+                DrawLine(dst3, lp.p1, lp.p2, Scalar.Yellow, task.lineWidth);
+            }
+            labels[3] = "There were " + lines.lpList.Count() + " lines found";
+            labels[2] = inter.labels[2];
+        }
+    }
+    public class CS_Interpolate_Difference : CS_Parent
+    {
+        Interpolate_Kalman inter = new Interpolate_Kalman();
+        Diff_Basics diff = new Diff_Basics();
+        public CS_Interpolate_Difference(VBtask task) : base(task)
+        {
+            desc = "Highlight the difference between the interpolation results and the current image.";
+        }
+        public void RunCS(Mat src)
+        {
+            inter.Run(src);
+            dst2 = inter.dst3.CvtColor(ColorConversionCodes.BGR2GRAY);
+            labels[2] = inter.labels[3];
+            diff.lastFrame = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            diff.Run(dst2);
+            dst3 = diff.dst2;
+        }
+    }
+    public class CS_Interpolate_QuarterBeat : CS_Parent
+    {
+        Diff_Basics diff = new Diff_Basics();
+        int updatedFrames;
+        int myFrameCount;
+        float cameraFPS;
+        float processedFPS;
+        int heartCount = 0;
+        DateTime nextTime = DateTime.Now;
+        public CS_Interpolate_QuarterBeat(VBtask task) : base(task)
+        {
+            desc = "Highlight the image differences after every quarter second.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.quarterBeat)
+            {
+                diff.Run(src);
+                dst3 = diff.dst2;
+                if (diff.dst2.CountNonZero() > 0)
+            {
+                    diff.lastFrame = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+                    dst2 = src;
+                    updatedFrames++;
+                }
+            }
+            if (task.heartBeat)
+            {
+                heartCount++;
+                if (heartCount % 3 == 0)
+                {
+                    DateTime newTime = DateTime.Now;
+                    long elapsedTicks = newTime.Ticks - nextTime.Ticks;
+                    TimeSpan span = new TimeSpan(elapsedTicks);
+                    cameraFPS = myFrameCount / (span.Ticks / TimeSpan.TicksPerSecond);
+                    processedFPS = updatedFrames / (span.Ticks / TimeSpan.TicksPerSecond);
+                    nextTime = newTime;
+                    myFrameCount = 0;
+                    updatedFrames = 0;
+                }
+            }
+            myFrameCount++;
+            labels[2] = "Total frames = " + myFrameCount + " updates=" + updatedFrames +
+                         " savings = " + (myFrameCount - updatedFrames) + " or " +
+                         string.Format("{0:0%}", (myFrameCount - updatedFrames) / (float)myFrameCount) + " cameraFPS = " + string.Format("{0:00.0}", cameraFPS) +
+                         " processedFPS = " + string.Format("{0:00.0}", processedFPS);
+        }
+    }
+    public class CS_Kalman_Basics : CS_Parent
+    {
+        Kalman_Simple[] kalman;
+        public float[] kInput = new float[4];
+        public float[] kOutput = new float[4];
+        int saveDimension = -1;
+        cv.Rect lastRect = new cv.Rect(0, 0, 0, 0);
+        public CS_Kalman_Basics(VBtask task) : base(task)
+        {
+            desc = "Use Kalman to stabilize values (such as a cv.rect.)";
+        }
+        public void RunCS(Mat src)
+        {
+            if (saveDimension != kInput.Length)
+            {
+                if (kalman != null && kalman.Length > 0)
+                {
+                    foreach (var k in kalman)
+                    {
+                        k.Dispose();
+                    }
+                }
+                saveDimension = kInput.Length;
+                kalman = new Kalman_Simple[kInput.Length];
+                for (int i = 0; i < kInput.Length; i++)
+                {
+                    kalman[i] = new Kalman_Simple();
+                }
+                kOutput = new float[kInput.Length];
+            }
+            if (task.gOptions.GetUseKalman())
+            {
+                for (int i = 0; i < kalman.Length; i++)
+                {
+                    kalman[i].inputReal = kInput[i];
+                    kalman[i].RunVB(null);
+                    if (double.IsNaN(kalman[i].stateResult)) kalman[i].stateResult = kalman[i].inputReal; // kalman failure...
+                    kOutput[i] = kalman[i].stateResult;
+                }
+            }
+            else
+            {
+                kOutput = kInput; // do nothing to the input.
+            }
+            if (standaloneTest())
+            {
+                dst2 = src;
+                cv.Rect rect = new cv.Rect((int)kOutput[0], (int)kOutput[1], (int)kOutput[2], (int)kOutput[3]);
+                rect = ValidateRect(rect);
+                if (task.FirstPass) lastRect = rect;
+                if (rect == lastRect)
+                {
+                    var r = InitRandomRect(src.Height <= 240 ? 20 : 50);
+                    kInput = new float[] { r.X, r.Y, r.Width, r.Height };
+                }
+                lastRect = rect;
+                dst2.Rectangle(rect, Scalar.White, task.lineWidth + 1);
+                dst2.Rectangle(rect, Scalar.Red, task.lineWidth);
+            }
+        }
+    }
+    public class CS_Kalman_Compare : CS_Parent
+    {
+        Kalman_Single[] kalman;
+        public Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
+        public Plot_OverTimeScalar kPlot = new Plot_OverTimeScalar();
+        public CS_Kalman_Compare(VBtask task) : base(task)
+        {
+            plot.plotCount = 3;
+            kPlot.plotCount = 3;
+            labels[2] = "Kalman input: mean values for RGB";
+            labels[3] = "Kalman output: smoothed mean values for RGB";
+            desc = "Use this kalman filter to predict the next value.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.optionsChanged)
+            {
+                if (kalman != null && kalman.Length > 0)
+                {
+                    foreach (var k in kalman)
+                    {
+                        k.Dispose();
+                    }
+                }
+                kalman = new Kalman_Single[3];
+                for (int i = 0; i < kalman.Length; i++)
+                {
+                    kalman[i] = new Kalman_Single();
+                }
+            }
+            plot.plotData = src.Mean();
+            plot.Run(empty);
+            dst2 = plot.dst2;
+            for (int i = 0; i < kalman.Length; i++)
+            {
+                kalman[i].inputReal = (float)plot.plotData[i];
+                kalman[i].Run(src);
+            }
+            kPlot.plotData = new Scalar(kalman[0].stateResult, kalman[1].stateResult, kalman[2].stateResult);
+            kPlot.Run(empty);
+            dst3 = kPlot.dst2;
+        }
+    }
+    public class CS_Kalman_RotatingPoint : CS_Parent
+    {
+        KalmanFilter kf = new KalmanFilter(2, 1, 0);
+        Mat kState = new Mat(2, 1, MatType.CV_32F);
+        Mat processNoise = new Mat(2, 1, MatType.CV_32F);
+        Mat measurement = new Mat(1, 1, MatType.CV_32F, 0);
+        Point2f center, statePt;
+        float radius;
+        cv.Point calcPoint(Point2f center, double R, double angle)
+        {
+            return new Point((int)(center.X + Math.Cos(angle)), (int)(center.Y - Math.Sin(angle)) * R);
+        }
+        void drawCross(Mat dst2, cv.Point center, Scalar color)
+        {
+            int d = 3;
+            DrawLine(dst2, new cv.Point(center.X - d, center.Y - d), new cv.Point(center.X + d, center.Y + d), color, task.lineWidth);
+            DrawLine(dst2, new cv.Point(center.X + d, center.Y - d), new cv.Point(center.X - d, center.Y + d), color, task.lineWidth);
+        }
+        public CS_Kalman_RotatingPoint(VBtask task) : base(task)
+        {
+            labels[2] = "Estimate Yellow < Real Red (if working)";
+            Cv2.Randn(kState, new Scalar(0), Scalar.All(0.1));
+            kf.TransitionMatrix = new Mat(2, 2, MatType.CV_32F, new float[] { 1, 1, 0, 1 });
+            Cv2.SetIdentity(kf.MeasurementMatrix);
+            Cv2.SetIdentity(kf.ProcessNoiseCov, Scalar.All(0.00001));
+            Cv2.SetIdentity(kf.MeasurementNoiseCov, Scalar.All(0.1));
+            Cv2.SetIdentity(kf.ErrorCovPost, Scalar.All(1));
+            Cv2.Randn(kf.StatePost, new Scalar(0), Scalar.All(1));
+            radius = dst2.Rows / 2.4f; // so we see the entire circle...
+            center = new Point2f(dst2.Cols / 2, dst2.Rows / 2);
+            desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real).";
+        }
+        public void RunCS(Mat src)
+        {
+            float stateAngle = kState.Get<float>(0);
+            Mat prediction = kf.Predict();
+            float predictAngle = prediction.Get<float>(0);
+            cv.Point predictPt = calcPoint(center, radius, predictAngle);
+            statePt = calcPoint(center, radius, stateAngle);
+            Cv2.Randn(measurement, new Scalar(0), Scalar.All(kf.MeasurementNoiseCov.Get<float>(0)));
+            measurement += kf.MeasurementMatrix * kState;
+            float measAngle = measurement.Get<float>(0);
+            cv.Point measPt = calcPoint(center, radius, measAngle);
+            dst2.SetTo(0);
+            drawCross(dst2, new cv.Point((int)statePt.X, (int)statePt.Y), Scalar.White);
+            drawCross(dst2, measPt, Scalar.White);
+            drawCross(dst2, predictPt, Scalar.White);
+            DrawLine(dst2, statePt, measPt, new Scalar(0, 0, 255), task.lineWidth + 2);
+            DrawLine(dst2, statePt, predictPt, new Scalar(0, 255, 255), task.lineWidth + 2);
+            if (msRNG.Next(0, 4) != 0) kf.Correct(measurement);
+            Cv2.Randn(processNoise, Scalar.Black, Scalar.All(Math.Sqrt(kf.ProcessNoiseCov.Get<float>(0, 0))));
+            kState = kf.TransitionMatrix * kState + processNoise;
+        }
+    }
+    public class CS_Kalman_MousePredict : CS_Parent
+    {
+        Kalman_Basics kalman = new Kalman_Basics();
+        cv.Point lastRealMouse = new cv.Point(0, 0);
+        public CS_Kalman_MousePredict(VBtask task) : base(task)
+        {
+            kalman.kInput = new float[2];
+            kalman.kOutput = new float[2];
+            labels[2] = "Red is real mouse, white is prediction";
+            desc = "Use kalman filter to predict the next mouse location.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.frameCount % 300 == 0) dst2.SetTo(0);
+            cv.Point lastStateResult = new cv.Point(kalman.kOutput[0], kalman.kOutput[1]);
+            if (task.FirstPass) lastRealMouse = task.mouseMovePoint;
+            kalman.kInput = new float[] { task.mouseMovePoint.X, task.mouseMovePoint.Y };
+            kalman.Run(src);
+            DrawLine(dst2, new cv.Point(kalman.kOutput[0], kalman.kOutput[1]), lastStateResult, cv.Scalar.White, task.lineWidth);
+            dst2.Line(task.mouseMovePoint, lastRealMouse, Scalar.Red);
+            lastRealMouse = task.mouseMovePoint;
+        }
+    }
+    public class CS_Kalman_CVMat : CS_Parent
+    {
+        Kalman_Simple[] kalman;
+        public Mat output;
+        Kalman_Basics basics = new Kalman_Basics();
+        public Mat input;
+        int saveDimension = -1;
+        cv.Rect lastRect;
+        public CS_Kalman_CVMat(VBtask task) : base(task)
+        {
+            basics.kInput = new float[4];
+            input = new Mat(4, 1, MatType.CV_32F, 0);
+            if (standaloneTest()) labels[2] = "Rectangle moves smoothly to random locations";
+            desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat";
+        }
+        public void RunCS(Mat src)
+        {
+            if (saveDimension != input.Rows)
+            {
+                if (kalman != null && kalman.Length > 0)
+                {
+                    foreach (var k in kalman)
+                    {
+                        k.Dispose();
+                    }
+                }
+                saveDimension = input.Rows;
+                kalman = new Kalman_Simple[input.Rows];
+                for (int i = 0; i < input.Rows; i++)
+                {
+                    kalman[i] = new Kalman_Simple();
+                }
+                output = new Mat(input.Rows, 1, MatType.CV_32F, 0);
+            }
+            if (task.gOptions.GetUseKalman())
+            {
+                for (int i = 0; i < kalman.Length; i++)
+                {
+                    kalman[i].inputReal = input.Get<float>(i, 0);
+                    kalman[i].RunVB(src);
+                    output.Set<float>(i, 0, kalman[i].stateResult);
+                }
+            }
+            else
+            {
+                output = input; // do nothing to the input.
+            }
+            if (standaloneTest())
+            {
+                float[] rx = new float[input.Rows];
+                for (int i = 0; i < input.Rows; i++)
+                {
+                    rx[i] = output.Get<float>(i, 0);
+                }
+                dst2 = src;
+                Rect rect = new Rect((int)rx[0], (int)rx[1], (int)rx[2], (int)rx[3]);
+                rect = ValidateRect(rect);
+                if (task.FirstPass) lastRect = rect;
+                if (lastRect == rect)
+                {
+                    var r = InitRandomRect(25);
+                    float[] array = { r.X, r.Y, r.Width, r.Height };
+                    input = new Mat(4, 1, MatType.CV_32F, array);
+                }
+                dst2.Rectangle(rect, Scalar.Red, 2);
+                lastRect = rect;
+            }
+        }
+    }
+    public class CS_Kalman_ImageSmall : CS_Parent
+    {
+        Kalman_CVMat kalman = new Kalman_CVMat();
+        Resize_Smaller resize;
+        public CS_Kalman_ImageSmall(VBtask task) : base(task)
+        {
+            resize = new Resize_Smaller();
+            labels[2] = "The small image is processed by the Kalman filter";
+            labels[3] = "Mask of the smoothed image minus original";
+            desc = "Resize the image to allow the Kalman filter to process the whole image.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            resize.Run(src);
+            var saveOriginal = resize.dst2.Clone();
+            Mat gray32f = new Mat();
+            resize.dst2.ConvertTo(gray32f, MatType.CV_32F);
+            kalman.input = gray32f.Reshape(1, gray32f.Width * gray32f.Height);
+            kalman.Run(src);
+            Mat tmp = new Mat();
+            kalman.output.ConvertTo(tmp, MatType.CV_8U);
+            tmp = tmp.Reshape(1, gray32f.Height);
+            dst2 = tmp.Resize(dst2.Size());
+            Cv2.Subtract(tmp, saveOriginal, dst3);
+            dst3 = dst3.Threshold(1, 255, ThresholdTypes.Binary);
+            dst3 = dst3.Resize(dst2.Size());
+        }
+    }
+    public class CS_Kalman_DepthSmall : CS_Parent
+    {
+        Kalman_ImageSmall kalman = new Kalman_ImageSmall();
+        public CS_Kalman_DepthSmall(VBtask task) : base(task)
+        {
+            labels[2] = "Mask of non-zero depth after Kalman smoothing";
+            labels[3] = "Mask of the smoothed image minus original";
+            desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)";
+        }
+        public void RunCS(Mat src)
+        {
+            kalman.Run(task.depthRGB);
+            dst2 = kalman.dst2;
+            dst3 = kalman.dst3;
+        }
+    }
+    public class CS_Kalman_Depth32f : CS_Parent
+    {
+        Kalman_CVMat kalman = new Kalman_CVMat();
+        Resize_Smaller resize;
+        public CS_Kalman_Depth32f(VBtask task) : base(task)
+        {
+            resize = new Resize_Smaller();
+            FindSlider("Resize Percentage (%)").Value = 4;
+            labels[2] = "Mask of non-zero depth after Kalman smoothing";
+            labels[3] = "Difference from original depth";
+            desc = "Use a resized depth Mat to find where depth is decreasing (getting closer.)";
+        }
+        public void RunCS(Mat src)
+        {
+            resize.Run(task.pcSplit[2]);
+            kalman.input = resize.dst2.Reshape(1, resize.dst2.Width * resize.dst2.Height);
+            kalman.Run(src);
+            dst2 = kalman.output.Reshape(1, resize.dst2.Height);
+            dst2 = dst2.Resize(src.Size());
+            Cv2.Subtract(dst2, task.pcSplit[2], dst3);
+            dst3 = dst3.Normalize(255);
+        }
+    }
+    public class CS_Kalman_Single : CS_Parent
+    {
+        Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
+        KalmanFilter kf = new KalmanFilter(2, 1, 0);
+        Mat processNoise = new Mat(2, 1, MatType.CV_32F);
+        public Mat measurement = new Mat(1, 1, MatType.CV_32F, 0);
+        public float inputReal;
+        public float stateResult;
+        public float ProcessNoiseCov = 0.00001f;
+        public float MeasurementNoiseCov = 0.1f;
+        public float ErrorCovPost = 1f;
+        public float[] transitionMatrix = { 1, 1, 0, 1 }; // Change the transition matrix externally and set newTransmissionMat_vbbacrix.
+        public bool newTransmissionMatrix = true;
+        public CS_Kalman_Single(VBtask task) : base(task)
+        {
+            float[] tMatrix = { 1, 1, 0, 1 };
+            kf.TransitionMatrix = new Mat(2, 2, MatType.CV_32F, tMatrix);
+            kf.MeasurementMatrix.SetIdentity(1);
+            kf.ProcessNoiseCov.SetIdentity(0.00001);
+            kf.MeasurementNoiseCov.SetIdentity(0.1);
+            kf.ErrorCovPost.SetIdentity(1);
+            plot.plotCount = 2;
+            desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                dst1 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+                inputReal = (float)dst1.Mean()[0];
+            }
+            var prediction = kf.Predict();
+            measurement.Set<float>(0, 0, inputReal);
+            stateResult = kf.Correct(measurement).Get<float>(0, 0);
+            if (standaloneTest())
+            {
+                plot.plotData = new Scalar(inputReal, stateResult, 0, 0);
+                plot.Run(empty);
+                dst2 = plot.dst2;
+                dst3 = plot.dst3;
+                labels[2] = "Mean of the grayscale image is predicted";
+                labels[3] = "Mean (blue) = " + string.Format("{0:0.0}", inputReal) + " predicted (green) = " + string.Format("{0:0.0}", stateResult);
+            }
+        }
+    }
+    public class CS_Kalman_Simple : IDisposable
+    {
+        KalmanFilter kf = new KalmanFilter(2, 1, 0);
+        Mat processNoise = new Mat(2, 1, MatType.CV_32F);
+        public Mat measurement = new Mat(1, 1, MatType.CV_32F, 0);
+        public float inputReal;
+        public float stateResult;
+        public float ProcessNoiseCov = 0.00001f;
+        public float MeasurementNoiseCov = 0.1f;
+        public float ErrorCovPost = 1f;
+        public float[] transitionMatrix = { 1, 1, 0, 1 }; // Change the transition matrix externally and set newTransmissionMatrix.
+        public bool newTMatrix = true;
+        public void updateTMatrix()
+        {
+            kf.TransitionMatrix = new Mat(2, 2, MatType.CV_32F, transitionMatrix);
+            kf.MeasurementMatrix.SetIdentity(1);
+            kf.ProcessNoiseCov.SetIdentity(0.00001);
+            kf.MeasurementNoiseCov.SetIdentity(0.1);
+            kf.ErrorCovPost.SetIdentity(1);
+        }
+        public CS_Kalman_Simple()
+        {
+            float[] tMatrix = { 1, 1, 0, 1 };
+        }
+        public void RunCS(Mat src)
+        {
+            if (newTMatrix)
+            {
+                newTMatrix = false;
+                updateTMatrix();
+            }
+            var prediction = kf.Predict();
+            measurement.Set<float>(0, 0, inputReal);
+            stateResult = kf.Correct(measurement).Get<float>(0, 0);
+        }
+        public void Dispose()
+        {
+            // required dispose function. It is tempting to remove this but it is needed...It does not inherit from CS_Parent...
+        }
+    }
+    
+    // https://towardsdatascience.com/kalman-filter-interview-bdc39f3e6cf3
+    // https://towardsdatascience.com/extended-kalman-filter-43e52b16757d
+    // https://towardsdatascience.com/the-unscented-kalman-filter-anything-ekf-can-do-i-can-do-it-better-ce7c773cf88d
+    public class CS_Kalman_CSharp_Basics : CS_Parent
+    {
+        public float kInput;
+        public float kOutput;
+        public float kAverage;
+        float[,] P = new float[,] { { 1, 0 }, { 0, 1 } }; // 2x2 This is the covariance matrix
+        float q_bias;
+        float outputError = 0.002f;
+        float processCovar = 0.001f; // This is the process covariance matrix. It's how much we trust the accelerometer
+        List<float> matrix = new List<float>();
+        Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
+        int saveAvgCount = 0;
+        Options_Kalman options = new Options_Kalman();
+        public CS_Kalman_CSharp_Basics(VBtask task) : base(task)
+        {
+            labels[2] = "Blue = grayscale mean after Kalman, green is grayscale mean value without Kalman, red is the grayscale average without Kalman";
+            desc = "Build a generic kalman filter based on Kalman_CSharp";
+        }
+        public void State_Update(float q_m)
+        {
+            float unbias = q_m - q_bias; // Unbias our gyro
+            float[] Pdot = new float[] { processCovar - P[0, 1] - P[1, 0], -P[1, 1], -P[1, 1], options.pdotEntry };
+            kOutput += unbias * options.delta;
+            plot.plotCount = 3;
+            // Update the covariance matrix
+            P[0, 0] += Pdot[0] * options.delta;
+            P[0, 1] += Pdot[1] * options.delta;
+            P[1, 0] += Pdot[2] * options.delta;
+            P[1, 1] += Pdot[3] * options.delta;
+        }
+        public void Kalman_Update()
+        {
+            float kError = kInput - kOutput;
+            float C_0 = 1;
+            float PCt_0 = C_0 * P[0, 0]; // + C_1 * P[0, 1] 'This second part is always 0, so we don't bother
+            float PCt_1 = C_0 * P[1, 0]; // + C_1 * P[1, 1]
+            float err = outputError + C_0 * PCt_0; // Compute the error estimate.
+            float K_0 = PCt_0 / err; // Compute the Kalman filter gains
+            float K_1 = PCt_1 / err;
+            float t_0 = PCt_0;
+            float t_1 = C_0 * P[0, 1];
+            P[0, 0] -= K_0 * t_0; // Update covariance matrix
+            P[0, 1] -= K_0 * t_1;
+            P[1, 0] -= K_1 * t_0;
+            P[1, 1] -= K_1 * t_1;
+            kOutput += K_0 * kError; // Update our state estimate
+            q_bias += K_1 * kError;
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            if (standaloneTest()) kInput = (float)src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Mean()[0];
+            if (options.averageInputCount != saveAvgCount)
+            {
+                saveAvgCount = options.averageInputCount;
+                matrix.Clear();
+                for (int i = 0; i < saveAvgCount; i++)
+                {
+                    matrix.Add(kInput);
+                }
+            }
+            matrix[task.frameCount % saveAvgCount] = kInput;
+            kAverage = (float)(new Mat(saveAvgCount, 1, MatType.CV_32F, matrix.ToArray())).Mean()[0];
+            if (task.gOptions.GetUseKalman())
+            {
+                // The Kalman Filter code comes from:
+                // http://www.rotomotion.com/downloads/tilt.c
+                State_Update(kInput);
+                Kalman_Update();
+            }
+            else
+            {
+                kOutput = kInput;
+            }
+            if (standaloneTest())
+            {
+                plot.plotData = new Scalar(kOutput, kInput, kAverage);
+                plot.Run(empty);
+                dst2 = plot.dst2;
+                dst3 = plot.dst3;
+            }
+            labels[3] = "Move the camera around to see the impact of the Kalman filter.";
+        }
+    }
+
 
 
 

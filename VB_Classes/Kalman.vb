@@ -241,7 +241,6 @@ Public Class Kalman_CVMat : Inherits VB_Parent
 
         If standaloneTest() Then
             Dim rx(input.Rows - 1) As Single
-            Dim testrect As New cv.Rect
             For i = 0 To input.Rows - 1
                 rx(i) = output.Get(Of Single)(i, 0)
             Next
@@ -524,35 +523,24 @@ Public Class Kalman_VB_Basics : Inherits VB_Parent
     Dim matrix As New List(Of Single)
     Dim plot As New Plot_OverTimeScalar
     Dim saveAvgCount As Integer
+    Dim options As New Options_Kalman
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Average input count", 1, 500, 20)
-            sliders.setupTrackBar("Delta Time X100", 1, 30, 5)
-            sliders.setupTrackBar("Process Covariance X10000", 0, 10000, 10)
-            sliders.setupTrackBar("pDot entry X1000", 0, 1000, 300)
-        End If
         labels(2) = "Blue = grayscale mean after Kalman, green is grayscale mean value without Kalman, red is the grayscale average without Kalman"
         desc = "Build a generic kalman filter based on Kalman_VB"
     End Sub
     Public Sub State_Update(ByVal q_m As Single)
-        Static deltaSlider = FindSlider("Delta Time X100")
-        Static covarSlider = FindSlider("Process Covariance X10000")
-        Static pDotSlider = FindSlider("pDot entry X1000")
 
-        Dim dt As Single = deltaSlider.Value / 100
         Dim unbias As Single = q_m - q_bias 'Unbias our gyro
-        Dim pdotEntry = pDotSlider.Value / 1000
-        processCovar = covarSlider.Value / 10000
-        Dim Pdot() As Single = {processCovar - P(0, 1) - P(1, 0), -P(1, 1), -P(1, 1), pdotEntry}
-        kOutput += unbias * dt
+        Dim Pdot() As Single = {processCovar - P(0, 1) - P(1, 0), -P(1, 1), -P(1, 1), options.pdotEntry}
+        kOutput += unbias * options.delta
 
         plot.plotCount = 3
 
         'Update the covariance matrix
-        P(0, 0) += Pdot(0) * dt
-        P(0, 1) += Pdot(1) * dt
-        P(1, 0) += Pdot(2) * dt
-        P(1, 1) += Pdot(3) * dt
+        P(0, 0) += Pdot(0) * options.delta
+        P(0, 1) += Pdot(1) * options.delta
+        P(1, 0) += Pdot(2) * options.delta
+        P(1, 1) += Pdot(3) * options.delta
     End Sub
     Public Sub Kalman_Update()
         Dim kError As Single = kInput - kOutput
@@ -574,6 +562,7 @@ Public Class Kalman_VB_Basics : Inherits VB_Parent
         q_bias += K_1 * kError
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
         If standaloneTest() Then kInput = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Mean()(0)
 

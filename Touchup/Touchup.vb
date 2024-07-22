@@ -60,6 +60,7 @@ Public Class Touchup
                 inline = Replace(inline, ".Total", ".Total()")
                 inline = Replace(inline, "CountNonZero", "CountNonZero()")
                 inline = Replace(inline, ".Count", ".Count()")
+                inline = Replace(inline, "Count()NonZero", "CountNonZero")
                 inline = Replace(inline, ".Size", ".Size()")
                 inline = Replace(inline, ".Channels", ".Channels()")
                 inline = Replace(inline, ".ElemSize", ".ElemSize()")

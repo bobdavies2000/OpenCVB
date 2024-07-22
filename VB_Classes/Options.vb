@@ -402,8 +402,8 @@ End Class
 
 Public Class Options_Interpolate : Inherits VB_Parent
     Public resizePercent As Integer = 2
-    Public interpolationThreshold = 4
-    Public pixelCountThreshold = 0
+    Public interpolationThreshold As Integer = 4
+    Public pixelCountThreshold As Integer = 0
     Public saveDefaultThreshold As Integer = resizePercent
     Public Sub New()
         If sliders.Setup(traceName) Then
@@ -431,7 +431,7 @@ End Class
 
 
 Public Class Options_Resize : Inherits VB_Parent
-    Public warpFlag = cv.InterpolationFlags.Nearest
+    Public warpFlag As cv.InterpolationFlags = cv.InterpolationFlags.Nearest
     Public radioIndex As Integer
     Public resizePercent As Single = 0.03
     Public topLeftOffset As Integer = 10
@@ -1522,77 +1522,6 @@ Public Class Options_IMUFrameTime : Inherits VB_Parent
         minDelayIMU = minSliderIMU.Value
         minDelayHost = minSliderHost.Value
         plotLastX = plotSlider.Value
-    End Sub
-End Class
-
-
-
-
-
-Public Class Options_Kalman_VB : Inherits VB_Parent
-    Public kalmanInput As Single
-    Public matrix As New List(Of Single)
-    Public noisyInput As Integer
-    Dim oRand As System.Random
-    Public angle As Single
-    Public Sub New()
-        oRand = New System.Random(DateTime.Now.Millisecond)
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Move this to see results", 0, 1000, 500)
-            sliders.setupTrackBar("Input with Noise", 0, 1000, 500)
-            sliders.setupTrackBar("20 point average of output", 0, 1000, 500)
-            sliders.setupTrackBar("Kalman Output", 0, 1000, 500)
-            sliders.setupTrackBar("20 Point average difference", 0, 1000, 500)
-            sliders.setupTrackBar("Kalman difference", 0, 1000, 500)
-            sliders.setupTrackBar("Simulated Noise", 0, 100, 25)
-            sliders.setupTrackBar("Simulated Bias", -100, 100, 0)
-            sliders.setupTrackBar("Simulated Scale", 0, 100, 0)
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static inputSlider = FindSlider("Move this to see results")
-        Static noisyInputSlider = FindSlider("Input with Noise")
-        Static pointSlider = FindSlider("20 point average of output")
-        Static avgSlider = FindSlider("20 Point average difference")
-        Static noiseSlider = FindSlider("Simulated Noise")
-        Static biasSlider = FindSlider("Simulated Bias")
-        Static scaleSlider = FindSlider("Simulated Scale")
-        Static outputSlider = FindSlider("Kalman Output")
-        Static kDiffSlider = FindSlider("Kalman difference")
-
-        kalmanInput = inputSlider.Value
-
-        Dim scalefactor As Single = (scaleSlider.Value / 100) + 1 'This should be between 1 and 2
-        Dim iRand = oRand.Next(0, noiseSlider.Value)
-        noisyInput = CInt((kalmanInput * scalefactor) + biasSlider.Value + iRand - (noiseSlider.Value / 2))
-
-        If noisyInput < 0 Then noisyInput = 0
-        If noisyInput > noisyInputSlider.Maximum Then noisyInput = noisyInputSlider.Maximum
-        noisyInputSlider.Value = noisyInput
-
-        If matrix.Count > 0 Then
-            Const MAX_INPUT = 20
-            matrix(task.frameCount Mod MAX_INPUT) = kalmanInput
-            Dim AverageOutput = (New cv.Mat(MAX_INPUT, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean()(0)
-
-            If AverageOutput < 0 Then AverageOutput = 0
-            If AverageOutput > pointSlider.Maximum Then AverageOutput = pointSlider.Maximum
-            pointSlider.Value = CInt(AverageOutput)
-
-            Dim AverageDiff = CInt(Math.Abs(AverageOutput - kalmanInput) * 10)
-            If AverageDiff > avgSlider.Maximum Then AverageDiff = avgSlider.Maximum
-            avgSlider.Value = AverageDiff
-
-            Dim KalmanOutput As Single = angle
-
-            If KalmanOutput < 0 Then KalmanOutput = 0
-            If KalmanOutput > outputSlider.Maximum Then KalmanOutput = outputSlider.Maximum
-            outputSlider.Value = CInt(KalmanOutput)
-
-            Dim KalmanDiff = CInt(Math.Abs(KalmanOutput - kalmanInput) * 10)
-            If KalmanDiff > kDiffSlider.Maximum Then KalmanDiff = kDiffSlider.Maximum
-            kDiffSlider.Value = KalmanDiff
-        End If
     End Sub
 End Class
 
@@ -6280,5 +6209,106 @@ Public Class Options_IMUPlot : Inherits VB_Parent
         setBlue = blueCheck.checked
         setGreen = greenCheck.checked
         setRed = redCheck.checked
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Kalman_VB : Inherits VB_Parent
+    Public kalmanInput As Single
+    Public matrix As New List(Of Single)
+    Public noisyInput As Integer
+    Dim oRand As System.Random
+    Public angle As Single
+    Public Sub New()
+        oRand = New System.Random(DateTime.Now.Millisecond)
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Move this to see results", 0, 1000, 500)
+            sliders.setupTrackBar("Input with Noise", 0, 1000, 500)
+            sliders.setupTrackBar("20 point average of output", 0, 1000, 500)
+            sliders.setupTrackBar("Kalman Output", 0, 1000, 500)
+            sliders.setupTrackBar("20 Point average difference", 0, 1000, 500)
+            sliders.setupTrackBar("Kalman difference", 0, 1000, 500)
+            sliders.setupTrackBar("Simulated Noise", 0, 100, 25)
+            sliders.setupTrackBar("Simulated Bias", -100, 100, 0)
+            sliders.setupTrackBar("Simulated Scale", 0, 100, 0)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static inputSlider = FindSlider("Move this to see results")
+        Static noisyInputSlider = FindSlider("Input with Noise")
+        Static pointSlider = FindSlider("20 point average of output")
+        Static avgSlider = FindSlider("20 Point average difference")
+        Static noiseSlider = FindSlider("Simulated Noise")
+        Static biasSlider = FindSlider("Simulated Bias")
+        Static scaleSlider = FindSlider("Simulated Scale")
+        Static outputSlider = FindSlider("Kalman Output")
+        Static kDiffSlider = FindSlider("Kalman difference")
+
+        kalmanInput = inputSlider.Value
+
+        Dim scalefactor As Single = (scaleSlider.Value / 100) + 1 'This should be between 1 and 2
+        Dim iRand = oRand.Next(0, noiseSlider.Value)
+        noisyInput = CInt((kalmanInput * scalefactor) + biasSlider.Value + iRand - (noiseSlider.Value / 2))
+
+        If noisyInput < 0 Then noisyInput = 0
+        If noisyInput > noisyInputSlider.Maximum Then noisyInput = noisyInputSlider.Maximum
+        noisyInputSlider.Value = noisyInput
+
+        If matrix.Count > 0 Then
+            Const MAX_INPUT = 20
+            matrix(task.frameCount Mod MAX_INPUT) = kalmanInput
+            Dim AverageOutput = (New cv.Mat(MAX_INPUT, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean()(0)
+
+            If AverageOutput < 0 Then AverageOutput = 0
+            If AverageOutput > pointSlider.Maximum Then AverageOutput = pointSlider.Maximum
+            pointSlider.Value = CInt(AverageOutput)
+
+            Dim AverageDiff = CInt(Math.Abs(AverageOutput - kalmanInput) * 10)
+            If AverageDiff > avgSlider.Maximum Then AverageDiff = avgSlider.Maximum
+            avgSlider.Value = AverageDiff
+
+            Dim KalmanOutput As Single = angle
+
+            If KalmanOutput < 0 Then KalmanOutput = 0
+            If KalmanOutput > outputSlider.Maximum Then KalmanOutput = outputSlider.Maximum
+            outputSlider.Value = CInt(KalmanOutput)
+
+            Dim KalmanDiff = CInt(Math.Abs(KalmanOutput - kalmanInput) * 10)
+            If KalmanDiff > kDiffSlider.Maximum Then KalmanDiff = kDiffSlider.Maximum
+            kDiffSlider.Value = KalmanDiff
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Kalman : Inherits VB_Parent
+    Public delta As Single
+    Public pdotEntry As Single
+    Public processCovar As Single
+    Public averageInputCount As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Average input count", 1, 500, 20)
+            sliders.setupTrackBar("Delta Time X100", 1, 30, 5)
+            sliders.setupTrackBar("Process Covariance X10000", 0, 10000, 10)
+            sliders.setupTrackBar("pDot entry X1000", 0, 1000, 300)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static deltaSlider = FindSlider("Delta Time X100")
+        Static covarSlider = FindSlider("Process Covariance X10000")
+        Static pDotSlider = FindSlider("pDot entry X1000")
+        Static avgSlider = FindSlider("Average input count")
+        delta = deltaSlider.Value / 100
+        pdotEntry = pDotSlider.Value / 1000
+        processCovar = covarSlider.Value / 10000
+        averageInputCount = avgSlider.value
     End Sub
 End Class
