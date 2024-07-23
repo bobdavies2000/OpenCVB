@@ -1415,6 +1415,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Options_KLT" Then return new Options_KLT
 	if algorithmName = "Options_KMeans" Then return new Options_KMeans
 	if algorithmName = "Options_KNN" Then return new Options_KNN
+	if algorithmName = "Options_LaneFinder" Then return new Options_LaneFinder
 	if algorithmName = "Options_Laplacian" Then return new Options_Laplacian
 	if algorithmName = "Options_LaplacianKernels" Then return new Options_LaplacianKernels
 	if algorithmName = "Options_LineFinder" Then return new Options_LineFinder

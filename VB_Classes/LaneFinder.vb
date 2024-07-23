@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Imports  System.IO
+Imports System.IO
 Public Class LaneFinder_Basics : Inherits VB_Parent
     Dim lane As New LaneFinder_SlopeIntercept
     Public Sub New()
@@ -7,7 +7,7 @@ Public Class LaneFinder_Basics : Inherits VB_Parent
         If standaloneTest() Then task.gOptions.setDisplay1()
         desc = "The basics of lane-finding.  A better name than LaneFinder_SlopeIntercept"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         lane.Run(src)
         dst0 = lane.dst0
         dst1 = lane.dst1
@@ -23,24 +23,20 @@ End Class
 ' https://github.com/mohamedameen93/Lane-lines-detection-using-Python-and-OpenCV
 Public Class LaneFinder_Videos : Inherits VB_Parent
     Public video As New Video_Basics
+    Dim options As New Options_LaneFinder
     Public Sub New()
         If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.setDisplay1()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("challenge.mp4")
-            radio.addRadio("solidWhiteRight.mp4")
-            radio.addRadio("solidYellowLeft.mp4")
-            radio.check(0).Checked = True
-        End If
+
         desc = "Read in the videos showing road conditions."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         If task.optionsChanged Then
-            Static frm = FindFrm(traceName + " Radio Buttons")
-            Dim inputfile As New FileInfo(task.HomeDir + "/Data/" + findRadioText(frm.check))
-            If inputfile.Exists Then video.fileNameForm.filename.Text = inputfile.FullName
+            If options.inputfile.Exists Then video.fileNameForm.filename.Text = options.inputfile.FullName
         End If
+
         video.Run(empty)
         dst2 = video.dst2
     End Sub

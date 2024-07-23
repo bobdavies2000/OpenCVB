@@ -2,9 +2,6 @@
 Imports System.IO
 Imports System.Numerics
 Imports OpenCvSharp.ML
-Imports OpenCvSharp
-Imports System.Windows.Forms
-Imports System.Windows.Forms.VisualStyles
 
 Public Class Options_Annealing : Inherits VB_Parent
     Public cityCount As Integer = 25
@@ -5020,17 +5017,27 @@ End Class
 Public Class Options_KNN : Inherits VB_Parent
     Public knnDimension As Integer
     Public numPoints As Integer
+    Public multiplier As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("KNN Dimension", 2, 10, 2)
             sliders.setupTrackBar("Random input points", 5, 100, 10)
+            sliders.setupTrackBar("Average distance multiplier", 1, 20, 10)
+        End If
+        If check.Setup(traceName) Then
+            check.addCheckBox("Display queries")
+            check.addCheckBox("Display training input and connecting line")
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
         End If
     End Sub
     Public Sub RunVB()
         Static dimSlider = FindSlider("KNN Dimension")
         Static randomSlider = FindSlider("Random input points")
+        Static distSlider = FindSlider("Random input points")
         knnDimension = dimSlider.Value
         numPoints = randomSlider.Value
+        multiplier = distSlider.value
     End Sub
 End Class
 
@@ -6313,5 +6320,27 @@ Public Class Options_Kalman : Inherits VB_Parent
         pdotEntry = pDotSlider.Value / 1000
         processCovar = covarSlider.Value / 10000
         averageInputCount = avgSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_LaneFinder : Inherits VB_Parent
+    Public inputfile As FileInfo
+    Public Sub New()
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("challenge.mp4")
+            radio.addRadio("solidWhiteRight.mp4")
+            radio.addRadio("solidYellowLeft.mp4")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        inputfile = New FileInfo(task.HomeDir + "/Data/" + findRadioText(frm.check))
     End Sub
 End Class

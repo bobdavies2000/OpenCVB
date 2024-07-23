@@ -140,13 +140,19 @@ namespace CS_Classes
         }
     }
 
-    public void DrawLine(cv.Mat dst, cv.Point2f p1, cv.Point2f p2, cv.Scalar color, int lineWidth)
-    {
-        cv.Point pt1 = new cv.Point((int)p1.X, (int)p1.Y);
-        cv.Point pt2 = new cv.Point((int)p2.X, (int)p2.Y);
-        dst.Line(pt1, pt2, color, task.lineWidth);
-    }
-    public Rangef[] GetHist2Dminmax(Mat input, int chan1, int chan2)
+        public void DrawLine(cv.Mat dst, cv.Point2f p1, cv.Point2f p2, cv.Scalar color, int lineWidth)
+        {
+            cv.Point pt1 = new cv.Point((int)p1.X, (int)p1.Y);
+            cv.Point pt2 = new cv.Point((int)p2.X, (int)p2.Y);
+            dst.Line(pt1, pt2, color, lineWidth);
+        }
+        public void DrawLine(cv.Mat dst, cv.Point2f p1, cv.Point2f p2, cv.Scalar color)
+        {
+            cv.Point pt1 = new cv.Point((int)p1.X, (int)p1.Y);
+            cv.Point pt2 = new cv.Point((int)p2.X, (int)p2.Y);
+            dst.Line(pt1, pt2, color, task.lineWidth);
+        }
+        public Rangef[] GetHist2Dminmax(Mat input, int chan1, int chan2)
     {
         float histDelta = 0.00001f;
         if (input.Type() == MatType.CV_8UC3)

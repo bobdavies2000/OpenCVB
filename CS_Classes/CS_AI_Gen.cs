@@ -20,6 +20,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using NAudio.Gui;
 using OpenCvSharp.Internal.Vectors;
 using CS_Classes;
+using OpenCvSharp.ML;
 
 namespace CS_Classes
 {
@@ -28525,6 +28526,1163 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst1 = dst1.ConvertScaleAbs();
             dst2 = ShowPalette(dst1 * 255 / classCount);
             labels[2] = simK.labels[2] + " with " + task.redOptions.getHistBins3D().ToString() + " histogram bins";
+        }
+    }
+    public class CS_KNN_Basics : CS_Parent
+    {
+        public List<PointPair> matches = new List<PointPair>();
+        public List<Point2f> noMatch = new List<Point2f>();
+        public KNN_Core knn = new KNN_Core();
+        public List<Point2f> queries = new List<Point2f>();
+        public List<int> neighbors = new List<int>();
+        Random_Basics random = new Random_Basics();
+        public CS_KNN_Basics(VBtask task) : base(task)
+        {
+            labels[2] = "KNN_Core output with many-to-one results";
+            labels[3] = "CS_CS_KNN_Basics output with just the closest match.  Red = training data, yellow = queries.";
+            desc = "Map points 1:1 with losses. Toss any farther duplicates. Easier to follow than previous version.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                if (task.heartBeat)
+                {
+                    random.Run(empty);
+                    knn.trainInput = new List<Point2f>(random.PointList);
+                }
+                random.Run(empty);
+                queries = new List<Point2f>(random.PointList);
+            }
+            if (queries.Count() == 0)
+            {
+                SetTrueText("Place some input points in queries before starting the knn run.");
+                return;
+            }
+            knn.queries = queries;
+            knn.Run(empty);
+            knn.displayResults();
+            dst2 = knn.dst2;
+            neighbors.Clear();
+            for (int i = 0; i < knn.neighbors.Count(); i++)
+            {
+                neighbors.Add(knn.neighbors[i][0]);
+            }
+            for (int i = 0; i < neighbors.Count(); i++)
+            {
+                var p1 = knn.queries[i];
+                if (neighbors[i] == -1) continue;
+                var ptn = knn.trainInput[neighbors[i]];
+                for (int j = i + 1; j < neighbors.Count(); j++)
+                {
+                    if (neighbors[j] == neighbors[i])
+                    {
+                        var p2 = knn.queries[j];
+                        var d1 = p1.DistanceTo(ptn);
+                        var d2 = p2.DistanceTo(ptn);
+                        neighbors[d1 > d2 ? i : j] = -1;
+                    }
+                }
+            }
+            dst3.SetTo(0);
+            foreach (var pt in knn.trainInput)
+            {
+                DrawCircle(dst3, pt, task.DotSize + 4, Scalar.Red);
+            }
+            noMatch.Clear();
+            matches.Clear();
+            for (int i = 0; i < neighbors.Count(); i++)
+            {
+                var pt = queries[i];
+                DrawCircle(dst3, pt, task.DotSize + 4, Scalar.Yellow);
+                if (neighbors[i] == -1)
+                {
+                    noMatch.Add(pt);
+                }
+                else
+                {
+                    var nn = knn.trainInput[neighbors[i]];
+                    matches.Add(new PointPair(pt, nn));
+                    DrawLine(dst3, nn, pt, Scalar.White);
+                }
+            }
+            if (!standaloneTest()) knn.trainInput = new List<Point2f>(queries);
+        }
+    }
+    public class CS_CS_KNN_Core : CS_Parent
+    {
+        public KNearest knn;
+        public List<Point2f> trainInput = new List<Point2f>(); // put training data here
+        public List<Point2f> queries = new List<Point2f>(); // put Query data here
+        public List<List<int>> neighbors = new List<List<int>>();
+        public int[,] result; // Get results here...
+        public int desiredMatches = -1; // -1 indicates it is to use the number of queries.
+        Random_Basics random = new Random_Basics();
+        public CS_CS_KNN_Core(VBtask task) : base(task)
+        {
+            knn = KNearest.Create();
+            labels[2] = "Red=TrainingData, yellow = queries";
+            desc = "Train a KNN model and map each query to the nearest training neighbor.";
+        }
+        public void displayResults()
+        {
+            dst2.SetTo(0);
+            int dm = Math.Min(trainInput.Count(), queries.Count());
+            for (int i = 0; i < queries.Count(); i++)
+            {
+                var pt = queries[i];
+                var test = result[i, 0];
+                if (test >= trainInput.Count() || test < 0) continue;
+                var nn = trainInput[result[i, 0]];
+                DrawCircle(dst2, pt, task.DotSize + 4, Scalar.Yellow);
+                DrawLine(dst2, pt, nn, Scalar.Yellow);
+            }
+            foreach (var pt in trainInput)
+            {
+                DrawCircle(dst2, pt, task.DotSize + 4, Scalar.Red);
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            int KNNdimension = 2;
+            if (standalone)
+            {
+                if (task.heartBeat)
+                {
+                    random.Run(empty);
+                    trainInput = new List<Point2f>(random.PointList);
+                }
+                random.Run(empty);
+                queries = new List<Point2f>(random.PointList);
+            }
+            var queryMat = new Mat(queries.Count(), KNNdimension, MatType.CV_32F, queries.ToArray());
+            if (queryMat.Rows == 0)
+            {
+                SetTrueText("There were no queries provided.  There is nothing to do...");
+                return;
+            }
+            if (trainInput.Count() == 0) trainInput = new List<Point2f>(queries); // first pass, just match the queries.
+            var trainData = new Mat(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
+            var response = new Mat(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
+            knn.Train(trainData, SampleTypes.RowSample, response);
+            var neighborMat = new Mat();
+            int dm = desiredMatches < 0 ? trainInput.Count() : desiredMatches;
+            knn.FindNearest(queryMat, dm, new Mat(), neighborMat);
+            if (neighborMat.Rows != queryMat.Rows || neighborMat.Cols != dm)
+            {
+                Console.WriteLine("KNN's FindNearest did not return the correct number of neighbors.  Marshal.copy will fail so exit.");
+                return;
+            }
+            float[] nData = new float[queryMat.Rows * dm];
+            if (nData.Length == 0) return;
+            Marshal.Copy(neighborMat.Data, nData, 0, nData.Length);
+            for (int i = 0; i < nData.Length; i++)
+            {
+                if (Math.Abs(nData[i]) > trainInput.Count()) nData[i] = 0; // value must be within the range of traininput
+            }
+            result = new int[queryMat.Rows, dm];
+            neighbors = new List<List<int>>();
+            for (int i = 0; i < queryMat.Rows; i++)
+            {
+                var pt = queries[i];
+                var res = new List<int>();
+                for (int j = 0; j < dm; j++)
+                {
+                    var test = nData[i * dm + j];
+                    if (test < nData.Length && test >= 0)
+                    {
+                        result[i, j] = (int)nData[i * dm + j];
+                        int index = (int)nData[i * dm + j];
+                        res.Add(index);
+                    }
+                }
+                neighbors.Add(res);
+            }
+            if (standaloneTest()) displayResults();
+        }
+    }
+    public class CS_CS_KNN_Core2DTest : CS_Parent
+    {
+        public KNN_Core knn = new KNN_Core();
+        Random_Basics random = new Random_Basics();
+        public CS_CS_KNN_Core2DTest(VBtask task) : base(task)
+        {
+            FindSlider("Random Pixel Count").Value = 10;
+            desc = "Test knn with random 2D points in the image.  Find the nearest requested neighbors.";
+        }
+        public void accumulateDisplay()
+        {
+            int dm = Math.Min(knn.trainInput.Count(), knn.queries.Count());
+            for (int i = 0; i < knn.queries.Count(); i++)
+            {
+                var pt = knn.queries[i];
+                var test = knn.result[i, 0];
+                if (test >= knn.trainInput.Count() || test < 0) continue;
+                var nn = knn.trainInput[knn.result[i, 0]];
+                DrawCircle(dst3, pt, task.DotSize + 4, Scalar.Yellow);
+                DrawLine(dst3, pt, nn, Scalar.Yellow);
+            }
+            foreach (var pt in knn.trainInput)
+            {
+                DrawCircle(dst3, pt, task.DotSize + 4, Scalar.Red);
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                dst3.SetTo(0);
+                random.Run(empty);
+                knn.trainInput = new List<Point2f>(random.PointList);
+            }
+            random.Run(empty);
+            knn.queries = new List<Point2f>(random.PointList);
+            knn.Run(empty);
+            knn.displayResults();
+            dst2 = knn.dst2;
+            accumulateDisplay();
+            labels[2] = "The top " + knn.trainInput.Count() + " best matches are shown. Red=TrainingData, yellow = queries";
+        }
+    }
+    public class CS_CS_KNN_Core3D : CS_Parent
+    {
+        public KNearest knn;
+        public List<Point3f> trainInput = new List<Point3f>(); // put training data here
+        public List<Point3f> queries = new List<Point3f>(); // put Query data here
+        public int[,] result; // Get results here...
+        public CS_CS_KNN_Core3D(VBtask task) : base(task)
+        {
+            knn = KNearest.Create();
+            desc = "Use knn with the input 3D points in the image.  Find the nearest neighbors.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "Test algorithm");
+                return;
+            }
+            int KNNdimension = 3;
+            var queryMat = new Mat(queries.Count(), KNNdimension, MatType.CV_32F, queries.ToArray());
+            if (queryMat.Rows == 0)
+            {
+                SetTrueText("There were no queries provided.  There is nothing to do...");
+                return;
+            }
+            if (trainInput.Count() == 0) trainInput = new List<Point3f>(queries); // first pass, just match the queries.
+            var trainData = new Mat(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
+            var response = new Mat(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
+            knn.Train(trainData, SampleTypes.RowSample, response);
+            var neighbors = new Mat();
+            int dm = trainInput.Count();
+            knn.FindNearest(queryMat, dm, new Mat(), neighbors);
+            float[] nData = new float[queryMat.Rows * dm];
+            Marshal.Copy(neighbors.Data, nData, 0, nData.Length);
+            result = new int[queryMat.Rows, dm];
+            for (int i = 0; i < queryMat.Rows; i++)
+            {
+                for (int j = 0; j < dm; j++)
+                {
+                    var test = nData[i * dm + j];
+                    if (test < nData.Length && test >= 0) result[i, j] = (int)nData[i * dm + j];
+                }
+            }
+        }
+    }
+    public class CS_KNN_Core4D : CS_Parent
+    {
+        public KNearest knn;
+        public List<Vec4f> trainInput = new List<Vec4f>(); // put training data here
+        public List<Vec4f> queries = new List<Vec4f>(); // put Query data here
+        public int[,] result; // Get results here...
+        public CS_KNN_Core4D(VBtask task) : base(task)
+        {
+            knn = KNearest.Create();
+            labels[2] = "Red=TrainingData, yellow = queries, text shows Z distance to that point from query point";
+            desc = "Use knn with the input 4D points in the image.  Find the nearest neighbors.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "Test algorithm");
+                return;
+            }
+            int KNNdimension = 4;
+            Mat queryMat = new Mat(queries.Count(), KNNdimension, MatType.CV_32F, queries.ToArray());
+            if (queryMat.Rows == 0)
+            {
+                SetTrueText("There were no queries provided.  There is nothing to do...");
+                return;
+            }
+            if (trainInput.Count() == 0) trainInput = new List<Vec4f>(queries); // first pass, just match the queries.
+            Mat trainData = new Mat(trainInput.Count(), KNNdimension, MatType.CV_32F, trainInput.ToArray());
+            Mat response = new Mat(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
+            knn.Train(trainData, SampleTypes.RowSample, response);
+            Mat neighbors = new Mat();
+            int dm = trainInput.Count();
+            knn.FindNearest(queryMat, dm, new Mat(), neighbors);
+            float[] nData = new float[queryMat.Rows * dm];
+            Marshal.Copy(neighbors.Data, nData, 0, nData.Length);
+            result = new int[queryMat.Rows, dm];
+            for (int i = 0; i < queryMat.Rows; i++)
+            {
+                for (int j = 0; j < dm; j++)
+                {
+                    float test = nData[i * dm + j];
+                    if (test < nData.Length && test >= 0) result[i, j] = (int)nData[i * dm + j];
+                }
+            }
+        }
+    }
+    public class CS_KNN_CoreN : CS_Parent
+    {
+        public KNearest knn;
+        public List<float> trainInput = new List<float>(); // put training data here
+        public List<float> queries = new List<float>(); // put Query data here
+        public int[,] result; // Get results here...
+        bool messageSent;
+        public Options_KNN options = new Options_KNN();
+        public CS_KNN_CoreN(VBtask task) : base(task)
+        {
+            knn = KNearest.Create();
+            desc = "Generalize the use knn with X input points.  Find the nearest requested neighbors.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            IEnumerable<int> responseList = Enumerable.Range(0, 10);
+            if (standaloneTest())
+            {
+                SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "_Test algorithm");
+                return;
+            }
+            if (options.knnDimension == 0)
+            {
+                if (!messageSent)
+                {
+                    MessageBox.Show("The KNN dimension needs to be set for the general purpose KNN_Core to start");
+                    messageSent = true;
+                }
+                return;
+            }
+            int qRows = (int)(queries.Count() / options.knnDimension);
+            if (qRows == 0)
+            {
+                SetTrueText("There were no queries provided.  There is nothing to do...");
+                return;
+            }
+            Mat queryMat = new Mat(qRows, options.knnDimension, MatType.CV_32F, queries.ToArray());
+            Mat trainData = new Mat((int)(trainInput.Count() / options.knnDimension), options.knnDimension, MatType.CV_32F, trainInput.ToArray());
+            Mat response = new Mat(trainData.Rows, 1, MatType.CV_32S, Enumerable.Range(0, trainData.Rows).ToArray());
+            knn.Train(trainData, SampleTypes.RowSample, response);
+            Mat neighbors = new Mat();
+            int dm = trainInput.Count();
+            knn.FindNearest(queryMat, dm, new Mat(), neighbors);
+            result = new int[neighbors.Rows, neighbors.Cols];
+            for (int i = 0; i < neighbors.Rows; i++)
+            {
+                for (int j = 0; j < neighbors.Cols; j++)
+                {
+                    float test = neighbors.Get<float>(i, j);
+                    if (test < trainInput.Count() && test >= 0) result[i, j] = neighbors.Get<int>(i, j);
+                }
+            }
+        }
+    }
+    public class CS_KNN_Core3DTest : CS_Parent
+    {
+        KNN_Core3D knn = new KNN_Core3D();
+        Distance_Point3D dist = new Distance_Point3D();
+        Random_Basics3D random = new Random_Basics3D();
+        public CS_KNN_Core3DTest(VBtask task) : base(task)
+        {
+            labels[2] = "Red=TrainingData, yellow = queries, text shows Euclidean distance to that point from query point";
+            FindSlider("Random Pixel Count").Value = 100;
+            desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                knn.queries.Clear();
+                knn.trainInput.Clear();
+                random.Run(empty);
+                foreach (var pt in random.PointList)
+                {
+                    var vec = task.pointCloud.Get<Point3f>((int)pt.Y, (int)pt.X);
+                    if (knn.trainInput.Count() == 10)
+                    {
+                        if (vec.Z != 0)
+                        {
+                            knn.queries.Add(pt);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (vec.Z != 0) knn.trainInput.Add(pt);
+                    }
+                }
+            }
+            knn.Run(empty);
+            dst2.SetTo(0);
+            dist.inPoint1 = knn.queries[0];
+            for (int i = 0; i < knn.trainInput.Count(); i++)
+            {
+                var pt = new Point2f(knn.trainInput[i].X, knn.trainInput[i].Y);
+                DrawCircle(dst2, pt, task.DotSize, Scalar.Red);
+                dist.inPoint2 = knn.trainInput[i];
+                dist.Run(src);
+                SetTrueText("depth=" + knn.trainInput[i].Z.ToString() + "\n" + "dist=" + dist.distance.ToString("F0"), pt);
+            }
+            for (int i = 0; i < knn.queries.Count(); i++)
+            {
+                var pt = new Point2f(knn.queries[i].X, knn.queries[i].Y);
+                for (int j = 0; j <= Math.Min(2, knn.trainInput.Count()); j++)
+                {
+                    int index = knn.result[i, j];
+                    if (index >= knn.trainInput.Count() || index < 0) continue;
+                    var nn = new Point2f(knn.trainInput[index].X, knn.trainInput[index].Y);
+                    DrawCircle(dst2, pt, task.DotSize, Scalar.Yellow);
+                    DrawLine(dst2, pt, nn, Scalar.Yellow);
+                    var midPt = new Point2f((pt.X + nn.X) / 2, (pt.Y + nn.Y) / 2);
+                    SetTrueText(j.ToString(), midPt);
+                    SetTrueText("depth=" + knn.queries[i].Z.ToString(), pt);
+                }
+            }
+        }
+    }
+    public class CS_KNN_Core4DTest : CS_Parent
+    {
+        KNN_Core4D knn = new KNN_Core4D();
+        Distance_Point4D dist = new Distance_Point4D();
+        Random_Basics4D random = new Random_Basics4D();
+        public CS_KNN_Core4DTest(VBtask task) : base(task)
+        {
+            labels[2] = "Red=TrainingData, yellow = queries, text shows Euclidean distance to that point from query point";
+            FindSlider("Random Pixel Count").Value = 5;
+            desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                random.Run(empty);
+                knn.trainInput = new List<Vec4f>(random.PointList);
+                knn.queries.Clear();
+                knn.queries.Add(new Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, dst2.Height), msRNG.Next(0, dst2.Height)));
+            }
+            knn.Run(empty);
+            dst2.SetTo(0);
+            dist.inPoint1 = knn.queries[0];
+            for (int i = 0; i < knn.trainInput.Count(); i++)
+            {
+                var pt = new Point2f(knn.trainInput[i][0], knn.trainInput[i][1]);
+                DrawCircle(dst2, pt, task.DotSize, Scalar.Red);
+                dist.inPoint2 = knn.trainInput[i];
+                dist.Run(src);
+                SetTrueText("dist=" + dist.distance.ToString(fmt0), pt);
+            }
+            for (int i = 0; i < knn.queries.Count(); i++)
+            {
+                var pt = new Point2f(knn.queries[i][0], knn.queries[i][1]);
+                for (int j = knn.result.GetLowerBound(1); j <= knn.result.GetUpperBound(1); j++)
+                {
+                    int index = knn.result[i, j];
+                    if (index >= knn.trainInput.Count() || index < 0) continue;
+                    var nn = new Point2f(knn.trainInput[index][0], knn.trainInput[index][1]);
+                    DrawCircle(dst2, pt, task.DotSize, Scalar.Yellow);
+                    DrawLine(dst2, pt, nn, task.HighlightColor);
+                    var midPt = new Point2f((pt.X + nn.X) / 2, (pt.Y + nn.Y) / 2);
+                    SetTrueText(j.ToString(), midPt);
+                }
+            }
+        }
+    }
+    public class CS_KNN_CoreNTest : CS_Parent
+    {
+        KNN_CoreN knn = new KNN_CoreN();
+        public CS_KNN_CoreNTest(VBtask task) : base(task)
+        {
+            labels[2] = "Highlight color (Yellow) is query.  The red dots are the training set.";
+            desc = "Test the use of the general form KNN_CoreN algorithm";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                knn.trainInput.Clear();
+                for (int i = 0; i < knn.options.numPoints; i++)
+                {
+                    for (int j = 0; j < knn.options.knnDimension; j++)
+                    {
+                        knn.trainInput.Add(msRNG.Next(dst2.Height));
+                    }
+                }
+                knn.queries.Clear();
+                for (int j = 0; j < knn.options.knnDimension; j++)
+                {
+                    knn.queries.Add(msRNG.Next(dst2.Height));
+                }
+            }
+            knn.Run(empty);
+            dst2.SetTo(0);
+            for (int i = 0; i < knn.trainInput.Count(); i += knn.options.knnDimension)
+            {
+                var pt = new Point2f(knn.trainInput[i], knn.trainInput[i + 1]);
+                DrawCircle(dst2, pt, task.DotSize, Scalar.Red);
+            }
+            for (int i = 0; i < knn.queries.Count(); i += knn.options.knnDimension)
+            {
+                var pt = new Point2f(knn.queries[i], knn.queries[i + 1]);
+                int index = knn.result[i, 0];
+                if (index * knn.options.knnDimension >= knn.trainInput.Count() || index < 0) continue;
+                var nn = new Point2f(knn.trainInput[index * knn.options.knnDimension], knn.trainInput[index * knn.options.knnDimension + 1]);
+                DrawCircle(dst2, pt, task.DotSize + 1, task.HighlightColor);
+                DrawLine(dst2, pt, nn, task.HighlightColor);
+            }
+            if (standaloneTest())
+            {
+                SetTrueText("Results are easily verified for the 2-dimensional case.  For higher dimension, " + "\n" + 
+                            "the results may appear incorrect because the higher dimensions are projected into " + "\n" +
+                            "a 2-dimensional presentation.", 3);
+            }
+        }
+    }
+    public class CS_KNN_Emax : CS_Parent
+    {
+        Random_Basics random = new Random_Basics();
+        public KNN_Core knn = new KNN_Core();
+        EMax_Basics em = new EMax_Basics();
+        public CS_KNN_Emax(VBtask task) : base(task)
+        {
+            labels[2] = "Output from Emax";
+            labels[3] = "Red=TrainingData, yellow = queries - use EMax sigma to introduce more chaos.";
+            desc = "Emax centroids move but here KNN is used to matched the old and new locations and keep the colors the same.";
+        }
+        public void RunCS(Mat src)
+        {
+            em.Run(src);
+            random.Run(empty);
+            knn.queries = new List<Point2f>(em.centers);
+            knn.Run(src);
+            dst2 = em.dst2 + knn.dst2;
+            knn.displayResults();
+            dst3 = knn.dst2;
+            knn.trainInput = new List<Point2f>(knn.queries);
+        }
+    }
+    public class CS_KNN_TrackMean : CS_Parent
+    {
+        Plot_Histogram plot = new Plot_Histogram();
+        KNN_Basics knn = new KNN_Basics();
+        Feature_Basics feat = new Feature_Basics();
+        const int maxDistance = 50;
+        public float shiftX;
+        public float shiftY;
+        List<Point2f> motionTrack = new List<Point2f>();
+        Mat lastImage;
+        System.Windows.Forms.TrackBar dotSlider;
+        Options_KNN options = new Options_KNN();
+        public CS_KNN_TrackMean(VBtask task) : base(task)
+        {
+            FindSlider("Feature Sample Size").Value = 200;
+            dotSlider = FindSlider("Average distance multiplier");
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new[] { "", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion" };
+            desc = "Track points with KNN and match the goodFeatures from frame to frame";
+        }
+        float plotDiff(List<int> diffList, string xyStr, int labelImage, ref string label)
+        {
+            int count = diffList.Max() - diffList.Min() + 1;
+            float[] hist = new float[maxDistance];
+            int zeroLoc = hist.Length / 2;
+            int nonZero = 0;
+            int zeroCount = 0;
+            foreach (int diff in diffList)
+            {
+                if (diff != 0) nonZero++;
+                else zeroCount++;
+                int diffPlus = diff + zeroLoc;
+                if (diffPlus >= maxDistance) diffPlus = maxDistance - 1;
+                if (diffPlus < 0) diffPlus = 0;
+                hist[diffPlus] += 1;
+            }
+            plot.Run(new Mat(hist.Length, 1, MatType.CV_32F, hist));
+            var histList = hist.ToList();
+            float maxVal = histList.Max();
+            int maxIndex = histList.IndexOf(maxVal);
+            plot.maxValue = (float)Math.Ceiling((maxVal + 50) - (maxVal + 50) % 50);
+            label = xyStr + "Max count = " + maxVal + " at " + (maxIndex - zeroLoc) + " with " + nonZero + " non-zero values or " +
+                    string.Format("{0:0%}", (float)nonZero / (nonZero + zeroCount));
+            float histSum = 0;
+            for (int i = 0; i < histList.Count(); i++)
+            {
+                histSum += histList[i] * (i - zeroLoc);
+            }
+            return histSum / histList.Count();
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.FirstPass) lastImage = src.Clone();
+            int multiplier = dotSlider.Value;
+            feat.Run(src);
+            knn.queries = new List<Point2f>(task.features);
+            knn.Run(src);
+            List<int> diffX = new List<int>();
+            List<int> diffY = new List<int>();
+            Mat correlationMat = new Mat();
+            dst2 = src.Clone();
+            var sz = task.gridSize;
+            foreach (var mps in knn.matches)
+            {
+                var currRect = ValidateRect(new Rect((int)(mps.p1.X - sz), (int)(mps.p1.Y - sz), sz * 2, sz * 2));
+                var prevRect = ValidateRect(new Rect((int)(mps.p2.X - sz), (int)(mps.p2.Y - sz), currRect.Width, currRect.Height));
+                Cv2.MatchTemplate(lastImage[prevRect], src[currRect], correlationMat, feat.options.matchOption);
+                float corrNext = correlationMat.Get<float>(0, 0);
+                DrawCircle(dst2, mps.p1, task.DotSize, task.HighlightColor);
+                diffX.Add((int)(mps.p1.X - mps.p2.X));
+                diffY.Add((int)(mps.p1.Y - mps.p2.Y));
+            }
+            if (diffX.Count() == 0 || diffY.Count() == 0) return;
+            string xLabel = "", yLabel = "";
+            shiftX = multiplier * plotDiff(diffX, " X ", 3, ref xLabel);
+            dst3 = plot.dst2.Clone();
+            dst3.Line(new cv.Point(plot.plotCenter, 0), new cv.Point(plot.plotCenter, dst2.Height), Scalar.White, 1);
+            shiftY = multiplier * plotDiff(diffY, " Y ", 1, ref yLabel);
+            dst1 = plot.dst2;
+            dst1.Line(new cv.Point(plot.plotCenter, 0), new cv.Point(plot.plotCenter, dst2.Height), Scalar.White, 1);
+            lastImage = src.Clone();
+            motionTrack.Add(new Point2f(shiftX + dst2.Width / 2, shiftY + dst2.Height / 2));
+            if (motionTrack.Count() > task.fpsRate) motionTrack.RemoveAt(0);
+            var lastpt = motionTrack[0];
+            foreach (var pt in motionTrack)
+            {
+                DrawLine(dst2, pt, lastpt, Scalar.White);
+                lastpt = pt;
+            }
+            SetTrueText(yLabel, 1);
+            SetTrueText(xLabel, 3);
+        }
+    }
+    public class CS_KNN_ClosestTracker : CS_Parent
+    {
+        public Line_Basics lines = new Line_Basics();
+        public PointPair lastPair = new PointPair();
+        public List<Point2f> trainInput = new List<Point2f>();
+        List<float> minDistances = new List<float>();
+        public CS_KNN_ClosestTracker(VBtask task) : base(task)
+        {
+            labels = new[] { "", "", "Highlight the tracked line (move camera to see track results)", "Candidate lines - standaloneTest() only" };
+            desc = "Find the longest line and keep finding it among the list of lines using a minimized KNN test.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = src.Clone();
+            cv.Point2f p1 = new cv.Point2f(), p2 = new cv.Point2f();
+            if (trainInput.Count() == 0)
+            {
+                lines.Run(src);
+                dst3 = lines.dst2;
+            }
+            else
+            {
+                p1 = lastPair.p1;
+                p2 = lastPair.p2;
+            }
+            foreach (var lp in lines.lpList)
+            {
+                if (trainInput.Count() == 0)
+                {
+                    p1 = lp.p1;
+                    p2 = lp.p2;
+                }
+                trainInput.Add(lp.p1);
+                trainInput.Add(lp.p2);
+                if (trainInput.Count() >= 10) break;
+            }
+            if (trainInput.Count() == 0)
+            {
+                SetTrueText("No lines were found in the current image.");
+                return;
+            }
+            if (lastPair.compare(new PointPair())) lastPair = new PointPair(p1, p2);
+            List<float> distances = new List<float>();
+            for (int i = 0; i < trainInput.Count(); i += 2)
+            {
+                var pt1 = trainInput[i];
+                var pt2 = trainInput[i + 1];
+                distances.Add((float)(Math.Min(pt1.DistanceTo(lastPair.p1) + pt2.DistanceTo(lastPair.p2), pt1.DistanceTo(lastPair.p2) + pt2.DistanceTo(lastPair.p2))));
+            }
+            float minDist = distances.Min();
+            int index = distances.IndexOf(minDist) * 2;
+            p1 = trainInput[index];
+            p2 = trainInput[index + 1];
+            if (minDistances.Count() > 0)
+            {
+                if (minDist > minDistances.Max() * 2)
+                {
+                    Console.WriteLine("Overriding KNN min Distance Rule = " + string.Format("{0:0}", minDist) + " max = " + string.Format("{0:0}", minDistances.Max()));
+                    lastPair = new PointPair(trainInput[0], trainInput[1]);
+                }
+                else
+                {
+                    lastPair = new PointPair(p1, p2);
+                }
+            }
+            else
+            {
+                lastPair = new PointPair(p1, p2);
+            }
+            if (minDist > 0) minDistances.Add(minDist);
+            if (minDistances.Count() > 100) minDistances.RemoveAt(0);
+            DrawLine(dst2, p1, p2, task.HighlightColor);
+            trainInput.Clear();
+        }
+    }
+    public class CS_KNN_ClosestLine : CS_Parent
+    {
+        public Point2f lastP1;
+        public Point2f lastP2;
+        public int lastIndex;
+        public List<Point2f> trainInput = new List<Point2f>();
+        List<float> minDistances;
+        public CS_KNN_ClosestLine(VBtask task) : base(task)
+        {
+            desc = "Try to find the closest pair of points in the traininput.  Dynamically compute distance ceiling to determine when to report fail.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = src.Clone();
+            if (lastP1 == new Point2f())
+            {
+                SetTrueText("CS_KNN_ClosestLine is only run with other KNN algorithms" + "\n" +
+                            "lastP1 and lastP2 need to be initialized by the other algorithm." + "\n" +
+                            "Initialize with a pair of points to track a line. ", 3);
+                return;
+            }
+            List<float> distances = new List<float>();
+            for (int i = 0; i < trainInput.Count(); i += 2)
+            {
+                var pt1 = trainInput[i];
+                var pt2 = trainInput[i + 1];
+                distances.Add((float)(Math.Min(pt1.DistanceTo(lastP1) + pt2.DistanceTo(lastP2), pt1.DistanceTo(lastP2) + pt2.DistanceTo(lastP2))));
+            }
+            float minDist = distances.Min();
+            lastIndex = distances.IndexOf(minDist) * 2;
+            lastP1 = trainInput[lastIndex];
+            lastP2 = trainInput[lastIndex + 1];
+            if (task.FirstPass) minDistances = new List<float> { distances[0] };
+            if (minDist > minDistances.Max() * 4)
+            {
+                Console.WriteLine("Overriding KNN min Distance Rule = " + string.Format("{0:0}", minDist) + " max = " + string.Format("{0:0}", minDistances.Max()));
+                lastP1 = trainInput[0];
+                lastP2 = trainInput[1];
+            }
+            if (minDist > 0) minDistances.Add(minDist);
+            if (minDistances.Count() > 100) minDistances.RemoveAt(0);
+            DrawLine(dst2, lastP1, lastP2, task.HighlightColor);
+            trainInput.Clear();
+        }
+    }
+    public class CS_KNN_ClosestVertical : CS_Parent
+    {
+        public FeatureLine_Finder lines = new FeatureLine_Finder();
+        public KNN_ClosestLine knn = new KNN_ClosestLine();
+        public Point3f pt1 = new Point3f();
+        public Point3f pt2 = new Point3f();
+        public CS_KNN_ClosestVertical(VBtask task) : base(task)
+        {
+            labels = new[] { "", "", "Highlight the tracked line", "Candidate vertical lines are in Blue" };
+            desc = "Test the code find the longest line and track it using a minimized KNN test.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = src.Clone();
+            lines.Run(src);
+            if (lines.sortedVerticals.Count() == 0)
+            {
+                SetTrueText("No vertical lines were found.");
+                return;
+            }
+            int index = lines.sortedVerticals.ElementAt(0).Value;
+            float lastDistance = (float)knn.lastP1.DistanceTo(knn.lastP2);
+            float bestDistance = (float)lines.lines2D[index].DistanceTo(lines.lines2D[index + 1]);
+            if (knn.lastP1 == new Point2f() || lastDistance < 0.75f * bestDistance)
+            {
+                knn.lastP1 = lines.lines2D[index];
+                knn.lastP2 = lines.lines2D[index + 1];
+            }
+            knn.trainInput.Clear();
+            for (int i = 0; i < lines.sortedVerticals.Count(); i++)
+            {
+                index = lines.sortedVerticals.ElementAt(i).Value;
+                knn.trainInput.Add(lines.lines2D[index]);
+                knn.trainInput.Add(lines.lines2D[index + 1]);
+            }
+            knn.Run(src);
+            pt1 = lines.lines3D[knn.lastIndex];
+            pt2 = lines.lines3D[knn.lastIndex + 1];
+            dst3 = lines.dst3;
+            DrawLine(dst2, knn.lastP1, knn.lastP2, task.HighlightColor);
+        }
+    }
+    public class CS_KNN_BasicsOld : CS_Parent
+    {
+        public List<PointPair> matches = new List<PointPair>();
+        public List<Point> noMatch = new List<Point>();
+        public KNN_Core knn = new KNN_Core();
+        public List<Point2f> queries = new List<Point2f>();
+        Random_Basics random = new Random_Basics();
+        public CS_KNN_BasicsOld(VBtask task) : base(task)
+        {
+            labels[2] = "KNN_Core output with many-to-one results";
+            labels[3] = "CS_KNN_BasicsOld output with just the closest match.  Red = training data, yellow = queries.";
+            desc = "Map points 1:1 with losses.  When duplicates are found, toss the farthest.  Too hard to follow.  Trying a better approach.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                if (task.heartBeat)
+                {
+                    random.Run(empty);
+                    knn.trainInput = new List<Point2f>(random.PointList);
+                }
+                random.Run(empty);
+                queries = new List<Point2f>(random.PointList);
+            }
+            if (queries.Count() == 0)
+            {
+                SetTrueText("Place some input points in queries before starting the knn run.");
+                return;
+            }
+            knn.queries = queries;
+            knn.Run(empty);
+            knn.displayResults();
+            dst2 = knn.dst2;
+            var nearest = new List<int>();
+            var sortedResults = new SortedList<int, int>(new CompareAllowIdenticalInteger());
+            for (int i = 0; i < queries.Count(); i++)
+            {
+                nearest.Add(knn.result[i, 0]);
+                sortedResults.Add(knn.result[i, 0], i);
+            }
+            for (int i = 0; i < sortedResults.Count() - 1; i++)
+            {
+                var resultA = sortedResults.ElementAt(i).Key;
+                var resultB = sortedResults.ElementAt(i + 1).Key;
+                if (resultA == resultB)
+                {
+                    var nn = knn.trainInput[resultA];
+                    var queryA = sortedResults.ElementAt(i).Value;
+                    for (int j = i + 1; j < sortedResults.Count(); j++)
+                    {
+                        resultB = sortedResults.ElementAt(j).Key;
+                        if (resultA != resultB) break;
+                        var queryB = sortedResults.ElementAt(j).Value;
+                        var p1 = queries[queryA];
+                        var p2 = queries[queryB];
+                        var distance1 = Math.Sqrt((p1.X - nn.X) * (p1.X - nn.X) + (p1.Y - nn.Y) * (p1.Y - nn.Y));
+                        var distance2 = Math.Sqrt((p2.X - nn.X) * (p2.X - nn.X) + (p2.Y - nn.Y) * (p2.Y - nn.Y));
+                        if (distance1 < distance2)
+                        {
+                            nearest[queryB] = -1;
+                        }
+                        else
+                        {
+                            nearest[queryA] = -1;
+                            queryA = queryB;
+                        }
+                    }
+                }
+            }
+            dst3.SetTo(0);
+            foreach (var pt in knn.trainInput)
+            {
+                DrawCircle(dst3, pt, task.DotSize + 4, Scalar.Red);
+            }
+            noMatch.Clear();
+            matches.Clear();
+            for (int i = 0; i < queries.Count(); i++)
+            {
+                var pt = queries[i];
+                DrawCircle(dst3, pt, task.DotSize + 4, Scalar.Yellow);
+                if (nearest[i] == -1)
+                {
+                    noMatch.Add(new cv.Point((int)pt.X, (int)pt.Y));
+                }
+                else
+                {
+                    if (nearest[i] < knn.trainInput.Count())
+                    {
+                        var nn = knn.trainInput[nearest[i]];
+                        matches.Add(new PointPair(pt, nn));
+                        DrawLine(dst3, nn, pt, Scalar.White);
+                    }
+                }
+            }
+            if (!standaloneTest()) knn.trainInput = new List<Point2f>(queries);
+        }
+    }
+    public class CS_KNN_Farthest : CS_Parent
+    {
+        KNN_Core knn = new KNN_Core();
+        public PointPair mpFar;
+        Random_Basics random = new Random_Basics();
+        public CS_KNN_Farthest(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Lines connecting pairs that are farthest.", "Training Input which is also query input and longest line" };
+            desc = "Use KNN to find the farthest point from each query point.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                if (task.heartBeat)
+                {
+                    random.Run(empty);
+                    knn.trainInput = new List<Point2f>(random.PointList);
+                    knn.queries = new List<Point2f>(knn.trainInput);
+                }
+            }
+            knn.Run(empty);
+            dst2.SetTo(0);
+            dst3.SetTo(0);
+            var farthest = new List<PointPair>();
+            var distances = new List<float>();
+            for (int i = 0; i <= knn.result.GetUpperBound(0) - 1; i++)
+            {
+                int farIndex = knn.result[i, knn.result.GetUpperBound(1)];
+                var mp = new PointPair(knn.queries[i], knn.trainInput[farIndex]);
+                DrawCircle(dst2, mp.p1, task.DotSize + 4, Scalar.Yellow);
+                DrawCircle(dst2, mp.p2, task.DotSize + 4, Scalar.Yellow);
+                DrawLine(dst2, mp.p1, mp.p2, Scalar.Yellow);
+                farthest.Add(mp);
+                distances.Add((float)mp.p1.DistanceTo(mp.p2));
+            }
+            foreach (var pt in knn.queries)
+            {
+                DrawCircle(dst3, pt, task.DotSize + 4, Scalar.Red);
+            }
+            var maxIndex = distances.IndexOf(distances.Max());
+            mpFar = farthest[maxIndex];
+            DrawLine(dst3, mpFar.p1, mpFar.p2, Scalar.White);
+        }
+    }
+    public class CS_KNN_TrackEach : CS_Parent
+    {
+        KNN_Basics knn = new KNN_Basics();
+        Feature_Basics feat = new Feature_Basics();
+        List<List<PointPair>> trackAll = new List<List<PointPair>>();
+        public CS_KNN_TrackEach(VBtask task) : base(task)
+        {
+            desc = "Track each good feature with KNN and match the goodFeatures from frame to frame";
+        }
+        public void RunCS(Mat src)
+        {
+            var minDistance = feat.options.minDistance;
+            if (!task.motionFlag || task.optionsChanged) minDistance = 2;
+            feat.Run(src);
+            knn.queries = new List<Point2f>(task.features);
+            knn.Run(src);
+            var tracker = new List<PointPair>();
+            dst2 = src.Clone();
+            foreach (var mp in knn.matches)
+            {
+                if (mp.p1.DistanceTo(mp.p2) < minDistance) tracker.Add(mp);
+            }
+            trackAll.Add(tracker);
+            for (int i = 0; i < trackAll.Count(); i += 2)
+            {
+                var t1 = trackAll[i];
+                foreach (var mp in t1)
+                {
+                    DrawCircle(dst2, mp.p1, task.DotSize, task.HighlightColor);
+                    DrawCircle(dst2, mp.p2, task.DotSize, task.HighlightColor);
+                    DrawLine(dst2, mp.p1, mp.p2, Scalar.Red);
+                }
+            }
+            labels[2] = task.features.Count().ToString() + " good features were tracked across " + task.frameHistoryCount.ToString() + " frames.";
+            SetTrueText(labels[2] + "\nThe highlighted dots are the good feature points", 3);
+            if (trackAll.Count() > task.frameHistoryCount) trackAll.RemoveAt(0);
+        }
+    }
+    public class CS_LaneFinder_Basics : CS_Parent
+    {
+        LaneFinder_SlopeIntercept lane = new LaneFinder_SlopeIntercept();
+        public CS_LaneFinder_Basics(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            desc = "The basics of lane-finding.  A better name than LaneFinder_SlopeIntercept";
+        }
+        public void RunCS(Mat src)
+        {
+            lane.Run(src);
+            dst0 = lane.dst0;
+            dst1 = lane.dst1;
+            dst2 = lane.dst2;
+            dst3 = lane.dst3;
+        }
+    }
+    public class CS_LaneFinder_Videos : CS_Parent
+    {
+        public Video_Basics video = new Video_Basics();
+        Options_LaneFinder options = new Options_LaneFinder();
+        public CS_LaneFinder_Videos(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            if (standaloneTest()) task.gOptions.setDisplay1();
+
+            desc = "Read in the videos showing road conditions.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            if (task.optionsChanged)
+            {
+                if (options.inputfile.Exists) video.fileNameForm.setFileName(options.inputfile.FullName);
+            }
+            video.Run(empty);
+            dst2 = video.dst2;
+        }
+    }
+    public class CS_LaneFinder_Edges : CS_Parent
+    {
+        LaneFinder_Videos input = new LaneFinder_Videos();
+        Edge_All edges = new Edge_All();
+        public CS_LaneFinder_Edges(VBtask task) : base(task)
+        {
+            desc = "Using the videos provided, find the lane markers.";
+        }
+        public void RunCS(Mat src)
+        {
+            input.Run(empty);
+            dst0 = input.dst2;
+            edges.Run(dst0);
+            dst2 = edges.dst2;
+        }
+    }
+    public class CS_LaneFinder_HLSColor : CS_Parent
+    {
+        public LaneFinder_Videos input = new LaneFinder_Videos();
+        public CS_LaneFinder_HLSColor(VBtask task) : base(task)
+        {
+            labels = new string[] { "HLS color conversion", "InRange White", "InRange Yellow", "Combined InRange White and InRange Yellow results" };
+            desc = "Isolate the colors for the white and yellow";
+        }
+        public void RunCS(Mat src)
+        {
+            input.Run(empty);
+            dst0 = input.dst2.CvtColor(cv.ColorConversionCodes.BGR2HLS);
+            dst1 = dst0.InRange(new Scalar(0, 200, 0), new Scalar(255, 255, 255));
+            dst2 = dst0.InRange(new Scalar(10, 0, 100), new Scalar(40, 255, 255));
+            dst3 = dst1 | dst2;
+        }
+    }
+    public class CS_LaneFinder_ROI : CS_Parent
+    {
+        LaneFinder_HLSColor hls = new LaneFinder_HLSColor();
+        Point[][] pListList = new Point[1][];
+        public CS_LaneFinder_ROI(VBtask task) : base(task)
+        {
+            labels = new string[] { "Original input", "Mask showing ROI", "HLS version with ROI outline", "HLS Mask with ROI outline" };
+            desc = "Define the ROI for the location of the lanes";
+        }
+        public void RunCS(Mat src)
+        {
+            hls.Run(empty);
+            if (task.optionsChanged)
+            {
+                var w = hls.input.video.dst2.Width;
+                var h = hls.input.video.dst2.Height;
+                var bl = new cv.Point(w * 0.1, h * 0.95);
+                var tl = new cv.Point(w * 0.4, h * 0.6);
+                var br = new cv.Point(w * 0.95, h * 0.95);
+                var tr = new cv.Point(w * 0.6, h * 0.6);
+                var pList = new Point[] { bl, tl, tr, br };
+                dst1 = new Mat(new cv.Size(w, h), MatType.CV_8U, 0);
+                dst1.FillConvexPoly(pList, Scalar.White, task.lineType);
+                pListList[0] = pList;
+            }
+            dst0 = hls.input.video.dst2;
+            dst2 = hls.dst0;
+            dst3 = hls.dst3;
+            Cv2.Polylines(dst0, pListList, true, Scalar.White, task.lineWidth, task.lineType, 0);
+            Cv2.Polylines(dst2, pListList, true, Scalar.White, task.lineWidth, task.lineType, 0);
+            Cv2.Polylines(dst3, pListList, true, Scalar.White, task.lineWidth, task.lineType, 0);
+        }
+    }
+    public class CS_LaneFinder_SlopeIntercept : CS_Parent
+    {
+        Hough_LaneFinder hough = new Hough_LaneFinder();
+        public float leftLaneIntercept;
+        public float rightLaneIntercept;
+        public float leftAvgSlope;
+        public float rightAvgSlope;
+        public CS_LaneFinder_SlopeIntercept(VBtask task) : base(task)
+        {
+            desc = "Use the Hough lines found to build a slope intercept format line.";
+        }
+        public void RunCS(Mat src)
+        {
+            hough.Run(empty);
+            dst0 = hough.dst0;
+            dst1 = hough.dst2;
+            dst2 = hough.dst3;
+            dst3 = hough.dst0.Clone();
+            if (hough.segments.Count() == 0) return;
+            var leftIntercept = new List<float>();
+            var leftSlope = new List<float>();
+            var leftWeight = new List<float>();
+            var rightIntercept = new List<float>();
+            var rightSlope = new List<float>();
+            var rightWeight = new List<float>();
+            foreach (var line in hough.segments)
+            {
+                if (line.P1.X == line.P2.X) continue;
+                var slope = (line.P1.Y - line.P2.Y) / (line.P1.X - line.P2.X);
+                if (slope < 0)
+                {
+                    leftIntercept.Add(line.P1.Y - (slope * line.P1.X));
+                    leftSlope.Add(slope);
+                    leftWeight.Add((float)line.P1.DistanceTo(line.P2));
+                }
+                else
+                {
+                    rightIntercept.Add(line.P1.Y - (slope * line.P1.X));
+                    rightSlope.Add(slope);
+                    rightWeight.Add((float)line.P1.DistanceTo(line.P2));
+                }
+            }
+            var mat1 = new Mat(leftWeight.Count(), 1, MatType.CV_32F, leftWeight.ToArray());
+            var mat2 = new Mat(leftSlope.Count(), 1, MatType.CV_32F, leftSlope.ToArray());
+            var mat3 = new Mat(leftIntercept.Count(), 1, MatType.CV_32F, leftIntercept.ToArray());
+            var weight = leftWeight.Sum();
+            leftLaneIntercept = (float)(mat1.Dot(mat3) / weight);
+            leftAvgSlope = (float)(mat1.Dot(mat2) / weight);
+            mat1 = new Mat(rightWeight.Count(), 1, MatType.CV_32F, rightWeight.ToArray());
+            mat2 = new Mat(rightSlope.Count(), 1, MatType.CV_32F, rightSlope.ToArray());
+            mat3 = new Mat(rightIntercept.Count(), 1, MatType.CV_32F, rightIntercept.ToArray());
+            weight = rightWeight.Sum();
+            rightLaneIntercept = (float)(mat1.Dot(mat3) / weight);
+            rightAvgSlope = (float)(mat1.Dot(mat2) / weight);
+            SetTrueText("Left lane intercept = " + string.Format(fmt1, leftLaneIntercept) +
+                        " Right lane intercept = " + string.Format(fmt1, rightLaneIntercept) + "\n" +
+                        "Left slope = " + string.Format(fmt3, leftAvgSlope) +
+                        " Right slope = " + string.Format(fmt3, rightAvgSlope), 3);
+            var tmp = dst2.EmptyClone();
+            var p1 = new cv.Point(0, leftLaneIntercept);
+            var p2 = new cv.Point(-leftLaneIntercept / leftAvgSlope, 0);
+            tmp.Line(p1, p2, Scalar.White, task.lineWidth, task.lineType);
+            p1 = new cv.Point(0, rightLaneIntercept);
+            p2 = new cv.Point((dst0.Height - rightLaneIntercept) / rightAvgSlope, dst2.Height);
+            tmp.Line(p1, p2, Scalar.White, task.lineWidth, task.lineType);
+            tmp.CopyTo(dst2, hough.mask);
+            dst2.CopyTo(dst3, dst2);
         }
     }
 

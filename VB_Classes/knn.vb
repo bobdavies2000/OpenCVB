@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Windows.Forms
 Public Class KNN_Basics : Inherits VB_Parent
     Public matches As New List(Of PointPair)
     Public noMatch As New List(Of cv.Point)
@@ -535,13 +536,6 @@ Public Class KNN_Emax : Inherits VB_Parent
     Public knn As New KNN_Core
     Dim em As New EMax_Basics
     Public Sub New()
-        If check.Setup(traceName) Then
-            check.addCheckBox("Display queries")
-            check.addCheckBox("Display training input and connecting line")
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
-        End If
-
         labels(2) = "Output from Emax"
         labels(3) = "Red=TrainingData, yellow = queries - use EMax sigma to introduce more chaos."
         desc = "Emax centroids move but here KNN is used to matched the old and new locations and keep the colors the same."
@@ -576,9 +570,12 @@ Public Class KNN_TrackMean : Inherits VB_Parent
     Public shiftX As Single
     Public shiftY As Single
     Dim motionTrack As New List(Of cv.Point2f)
+    Dim lastImage As cv.Mat
+    Dim dotSlider As TrackBar
+    Dim options As New Options_KNN
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Average distance multiplier", 1, 20, 10)
         FindSlider("Feature Sample Size").Value = 200
+        dotSlider = FindSlider("Average distance multiplier")
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels = {"", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion"}
         desc = "Track points with KNN and match the goodFeatures from frame to frame"
@@ -611,8 +608,7 @@ Public Class KNN_TrackMean : Inherits VB_Parent
         Return histSum / histList.Count
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static dotSlider = FindSlider("Average distance multiplier")
-        Static lastImage As cv.Mat = src.Clone
+        If task.FirstPass Then lastImage = src.Clone
         Dim multiplier = dotSlider.Value
 
         feat.Run(src)
