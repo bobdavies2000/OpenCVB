@@ -6344,3 +6344,43 @@ Public Class Options_LaneFinder : Inherits VB_Parent
         inputfile = New FileInfo(task.HomeDir + "/Data/" + findRadioText(frm.check))
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class Options_LaPlacianPyramid : Inherits VB_Parent
+    Public img As New cv.Mat
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Sharpest", 0, 10, 5)
+            sliders.setupTrackBar("blurryMin", 0, 10, 1)
+            sliders.setupTrackBar("blurryMed1", 0, 10, 1)
+            sliders.setupTrackBar("blurryMed2", 0, 10, 1)
+            sliders.setupTrackBar("blurryMax", 0, 10, 1)
+            sliders.setupTrackBar("Saturate", 0, 10, 1)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Dim barCount = sliders.mytrackbars.Count
+
+        ' this usage of sliders.mytrackbars(x) is OK as long as this algorithm is not reused in multiple places (which it isn't)
+        Dim levelMat(barCount - 1) As cv.Mat
+        For i = 0 To barCount - 2
+            Dim nextImg = img.PyrDown()
+            levelMat(i) = (img - nextImg.PyrUp(img.Size)) * sliders.mytrackbars(i).Value
+            img = nextImg
+        Next
+        levelMat(barCount - 1) = img * sliders.mytrackbars(barCount - 1).Value
+
+        img = levelMat(barCount - 1)
+        For i = barCount - 1 To 1 Step -1
+            img = img.PyrUp(levelMat(i - 1).Size)
+            img += levelMat(i - 1)
+        Next
+    End Sub
+End Class
+

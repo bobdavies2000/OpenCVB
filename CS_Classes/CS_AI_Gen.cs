@@ -29685,6 +29685,73 @@ public class CS_ApproxPoly_Basics : CS_Parent
             dst2.CopyTo(dst3, dst2);
         }
     }
+    public class CS_Laplacian_PyramidFilter : CS_Parent
+    {
+        Options_LaPlacianPyramid options = new Options_LaPlacianPyramid();
+        public CS_Laplacian_PyramidFilter(VBtask task) : base(task)
+        {
+            desc = "C# version of the Laplacian Pyramid Filter - see http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.54.299.";
+        }
+        public void RunCS(Mat src)
+        {
+            src.ConvertTo(options.img, MatType.CV_32F);
+            options.RunVB();
+            options.img.ConvertTo(dst2, MatType.CV_8UC3);
+        }
+    }
+    public class CS_Laplacian_Basics : CS_Parent
+    {
+        Options_Laplacian options = new Options_Laplacian();
+        Erode_Basics erode = new Erode_Basics();
+        Dilate_Basics dilate = new Dilate_Basics();
+        public CS_Laplacian_Basics(VBtask task) : base(task)
+        {
+            desc = "Laplacian filter - the second derivative.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standaloneTest()) src = src.GaussianBlur(options.kernel, 0, 0);
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            dst3 = src.Laplacian(MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs();
+            erode.Run(dst3.Threshold(options.threshold, 255, ThresholdTypes.Binary));
+            dilate.Run(erode.dst2);
+            dst2 = dilate.dst2;
+            labels[2] = "Laplacian Filter k = " + options.kernel.Width.ToString();
+            labels[3] = "Laplacian after " + erode.options.iterations.ToString() + " erode iterations and " + dilate.options.iterations.ToString() + " dilate iterations";
+        }
+    }
+    public class CS_Laplacian_Blur : CS_Parent
+    {
+        Options_Laplacian options = new Options_Laplacian();
+        public CS_Laplacian_Blur(VBtask task) : base(task)
+        {
+            desc = "Laplacian filter - the second derivative - with different bluring techniques";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            string blurText;
+            if (options.gaussianBlur)
+            {
+                src = src.GaussianBlur(options.kernel, 0, 0);
+                blurText = "Gaussian";
+            }
+            else if (options.boxFilterBlur)
+            {
+                src = src.Blur(options.kernel);
+                blurText = "boxfilter";
+            }
+            else
+            {
+                src = src.MedianBlur(options.kernel.Width);
+                blurText = "MedianBlur";
+            }
+            if (src.Channels() == 3) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            dst2 = src.Laplacian(MatType.CV_16S, options.kernel.Width, options.scale, options.delta).ConvertScaleAbs();
+            labels[2] = "Laplacian+" + blurText + " k = " + options.kernel.Width.ToString();
+        }
+    }
 
 
 

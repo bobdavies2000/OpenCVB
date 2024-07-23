@@ -787,6 +787,9 @@ namespace CS_Classes
 			if (algorithmName == "CS_LaneFinder_ROI") return new CS_LaneFinder_ROI(task);
 			if (algorithmName == "CS_LaneFinder_SlopeIntercept") return new CS_LaneFinder_SlopeIntercept(task);
 			if (algorithmName == "CS_LaneFinder_Videos") return new CS_LaneFinder_Videos(task);
+			if (algorithmName == "CS_Laplacian_Basics") return new CS_Laplacian_Basics(task);
+			if (algorithmName == "CS_Laplacian_Blur") return new CS_Laplacian_Blur(task);
+			if (algorithmName == "CS_Laplacian_PyramidFilter") return new CS_Laplacian_PyramidFilter(task);
 			if (algorithmName == "CS_Line_Basics") return new CS_Line_Basics(task);
 			if (algorithmName == "CS_Mat_4Click") return new CS_Mat_4Click(task);
 			if (algorithmName == "CS_Mat_4to1") return new CS_Mat_4to1(task);

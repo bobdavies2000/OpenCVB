@@ -57,36 +57,14 @@ End Class
 
 
 
-' http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.54.299
 Public Class Laplacian_PyramidFilter : Inherits VB_Parent
+    Dim options As New Options_LaPlacianPyramid
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Sharpest", 0, 10, 1)
-            sliders.setupTrackBar("blurryMin", 0, 10, 1)
-            sliders.setupTrackBar("blurryMed1", 0, 10, 1)
-            sliders.setupTrackBar("blurryMed2", 0, 10, 1)
-            sliders.setupTrackBar("blurryMax", 0, 10, 1)
-            sliders.setupTrackBar("Saturate", 0, 10, 1)
-        End If
-        desc = "VB.Net version of the Laplacian Pyramid Filter - see reference."
+        desc = "VB.Net version of the Laplacian Pyramid Filter - see http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.54.299."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        ' this usage of sliders.mytrackbars(x) is OK as long as this algorithm is not reused in multiple places (which it isn't)
-        Dim levelMat(sliders.mytrackbars.Count - 1) As cv.Mat
-        Dim img As New cv.Mat
-        src.ConvertTo(img, cv.MatType.CV_32F)
-        For i = 0 To sliders.mytrackbars.Count - 2
-            Dim nextImg = img.PyrDown()
-            levelMat(i) = (img - nextImg.PyrUp(img.Size)) * sliders.mytrackbars(i).Value
-            img = nextImg
-        Next
-        levelMat(sliders.mytrackbars.Count - 1) = img * sliders.mytrackbars(sliders.mytrackbars.Count - 1).Value
-
-        img = levelMat(sliders.mytrackbars.Count - 1)
-        For i = sliders.mytrackbars.Count - 1 To 1 Step -1
-            img = img.PyrUp(levelMat(i - 1).Size)
-            img += levelMat(i - 1)
-        Next
-        img.ConvertTo(dst2, cv.MatType.CV_8UC3)
+    Public Sub RunVB(src As cv.Mat)
+        src.ConvertTo(options.img, cv.MatType.CV_32F)
+        options.RunVB()
+        options.img.ConvertTo(dst2, cv.MatType.CV_8UC3)
     End Sub
 End Class
