@@ -1419,6 +1419,7 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Options_Laplacian" Then return new Options_Laplacian
 	if algorithmName = "Options_LaplacianKernels" Then return new Options_LaplacianKernels
 	if algorithmName = "Options_LaPlacianPyramid" Then return new Options_LaPlacianPyramid
+	if algorithmName = "Options_LeftRight" Then return new Options_LeftRight
 	if algorithmName = "Options_LineFinder" Then return new Options_LineFinder
 	if algorithmName = "Options_LUT" Then return new Options_LUT
 	if algorithmName = "Options_MatchCell" Then return new Options_MatchCell

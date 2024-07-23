@@ -6384,3 +6384,24 @@ Public Class Options_LaPlacianPyramid : Inherits VB_Parent
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Options_LeftRight : Inherits VB_Parent
+    Public sliceY As Integer
+    Public sliceHeight As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Slice Starting Y", 0, 300, 25)
+            sliders.setupTrackBar("Slice Height", 1, (dst2.Rows - 10) / 2, 20)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static startYSlider = FindSlider("Slice Starting Y")
+        Static hSlider = FindSlider("Slice Height")
+        sliceY = startYSlider.Value
+        sliceHeight = hSlider.Value
+    End Sub
+End Class

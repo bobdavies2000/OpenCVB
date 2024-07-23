@@ -29752,6 +29752,291 @@ public class CS_ApproxPoly_Basics : CS_Parent
             labels[2] = "Laplacian+" + blurText + " k = " + options.kernel.Width.ToString();
         }
     }
+    public class CS_LeftRight_Basics : CS_Parent
+    {
+        public CS_LeftRight_Basics(VBtask task) : base(task)
+        {
+            if (task.cameraName == "MYNT-EYE-D1000") FindSlider("Alpha (contrast)").Value = 1100;
+            labels = new string[] { "", "", "Left camera image", task.cameraName == "Azure Kinect 4K" ? "No right image" : "Right camera image" };
+            desc = "Display the left and right views as they came from the camera.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = task.leftView;
+            dst3 = task.rightView;
+        }
+    }
+    public class CS_LeftRight_CompareRaw : CS_Parent
+    {
+        Options_LeftRight options = new Options_LeftRight();
+        public CS_LeftRight_CompareRaw(VBtask task) : base(task)
+        {
+            desc = "Show slices of the left and right view next to each other for visual comparison";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            Rect r1 = new Rect(0, options.sliceY, task.leftView.Width, options.sliceHeight);
+            Rect r2 = new Rect(0, 25, task.leftView.Width, options.sliceHeight);
+            dst2.SetTo(0);
+            task.leftView[r1].CopyTo(dst2[r2]);
+            r2.Y += options.sliceHeight;
+            task.rightView[r1].CopyTo(dst2[r2]);
+            dst3 = task.rightView;
+        }
+    }
+    public class CS_LeftRight_Palettized : CS_Parent
+    {
+        public CS_LeftRight_Palettized(VBtask task) : base(task)
+        {
+            desc = "Add color to the 8-bit infrared images.";
+            labels[2] = "Left Image";
+            labels[3] = "Right Image";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = ShowPalette(task.leftView);
+            dst3 = ShowPalette(task.rightView);
+        }
+    }
+    public class CS_LeftRight_BRISK : CS_Parent
+    {
+        BRISK_Basics brisk = new BRISK_Basics();
+        Options_Features options = new Options_Features();
+        public CS_LeftRight_BRISK(VBtask task) : base(task)
+        {
+            FindSlider("Min Distance").Value = 20;
+            labels = new string[] { "", "", "Left Image", "Right Image" };
+            desc = "Add color to the 8-bit infrared images.";
+        }
+        public void RunCS(Mat src)
+        {
+            brisk.Run(task.leftView);
+            dst2 = brisk.dst2.Clone();
+            brisk.Run(task.rightView);
+            dst3 = brisk.dst2.Clone();
+        }
+    }
+    public class CS_LeftRight_Edges : CS_Parent
+    {
+        Edge_Canny edges = new Edge_Canny();
+        public CS_LeftRight_Edges(VBtask task) : base(task)
+        {
+            desc = "Display the edges in the left and right views";
+            labels[2] = "Left Image";
+            labels[3] = "Right Image";
+        }
+        public void RunCS(Mat src)
+        {
+            edges.Run(task.leftView);
+            dst2 = edges.dst2;
+            edges.Run(task.rightView);
+            dst3 = edges.dst2;
+        }
+    }
+    public class CS_LeftRight_Reduction : CS_Parent
+    {
+        public Reduction_Basics reduction = new Reduction_Basics();
+        public CS_LeftRight_Reduction(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Reduced Left Image", "Reduced Right Image" };
+            desc = "Reduce both the left and right color images";
+        }
+        public void RunCS(Mat src)
+        {
+            reduction.Run(task.leftView);
+            dst2 = reduction.dst2.Clone();
+            reduction.Run(task.rightView);
+            dst3 = reduction.dst2.Clone();
+        }
+    }
+    public class CS_LeftRight_Markers : CS_Parent
+    {
+        LeftRight_Reduction redView = new LeftRight_Reduction();
+        public CS_LeftRight_Markers(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            dst0 = new Mat(dst0.Size(), MatType.CV_8U, 0);
+            dst1 = new Mat(dst1.Size(), MatType.CV_8U, 0);
+            labels = new string[] { "", "", "Reduced Left Image", "Reduced Right Image" };
+            desc = "Use the left/right reductions to find hard markers - neighboring pixels of identical values";
+        }
+        public void RunCS(Mat src)
+        {
+            redView.Run(src);
+            dst2 = redView.reduction.dst3.Clone();
+            dst3 = redView.reduction.dst3.Clone();
+            var left = redView.dst2;
+            var right = redView.dst3;
+            // find combinations in the left image - they are markers.
+            var impList = new List<List<int>>();
+            var lineLen = task.gOptions.DebugSliderValue;
+            for (int y = 0; y < left.Height; y++)
+            {
+                var important = new List<int>();
+                var impCounts = new List<int>();
+                for (int x = 0; x < left.Width; x++)
+                {
+                    var m1 = left.Get<byte>(y, x);
+                    if (!important.Contains(m1))
+                    {
+                        important.Add(m1);
+                        impCounts.Add(1);
+                    }
+                    else
+                    {
+                        impCounts[important.IndexOf(m1)] += 1;
+                    }
+                }
+                impList.Add(important);
+                impList.Add(impCounts);
+            }
+            dst0.SetTo(0);
+            dst1.SetTo(0);
+            for (int i = 0; i < left.Rows; i++)
+            {
+                var important = impList[i * 2];
+                var impcounts = impList[i * 2 + 1];
+                var maxVal = important[impcounts.IndexOf(impcounts.Max())];
+                var tmp = left.Row(i).InRange(maxVal, maxVal);
+                dst0.Row(i).SetTo(255, tmp);
+                tmp = right.Row(i).InRange(maxVal, maxVal);
+                dst1.Row(i).SetTo(255, tmp);
+            }
+        }
+    }
+    public class CS_LeftRight_Markers1 : CS_Parent
+    {
+        LeftRight_Reduction redView = new LeftRight_Reduction();
+        public CS_LeftRight_Markers1(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            labels = new string[] { "", "", "Reduced Left Image", "Reduced Right Image" };
+            desc = "Use the left/right reductions to find markers - neighboring pixels of identical values";
+        }
+        public void RunCS(Mat src)
+        {
+            redView.Run(src);
+            dst0 = redView.dst2;
+            dst1 = redView.dst3;
+            // find combinations in the left image - they are markers.
+            List<List<int>> impList = new List<List<int>>();
+            int lineLen = task.gOptions.DebugSliderValue;
+            for (int y = 0; y < dst2.Height; y++)
+            {
+                List<int> important = new List<int>();
+                List<int> impCounts = new List<int>();
+                for (int x = 0; x < dst0.Width; x++)
+                {
+                    byte m1 = dst0.At<byte>(y, x);
+                    if (!important.Contains(m1))
+                    {
+                        important.Add(m1);
+                        impCounts.Add(1);
+                    }
+                    else
+                    {
+                        impCounts[important.IndexOf(m1)] += 1;
+                    }
+                }
+                impList.Add(important);
+                impList.Add(impCounts);
+            }
+            dst2.SetTo(0);
+            dst3.SetTo(0);
+            for (int i = 0; i < dst2.Rows; i++)
+            {
+                List<int> important = impList[i * 2];
+                List<int> impcounts = impList[i * 2 + 1];
+                int maxVal = important[impcounts.IndexOf(impcounts.Max())];
+                Mat tmp = dst0.Row(i).InRange(maxVal, maxVal);
+                dst2.Row(i).SetTo(255, tmp);
+                tmp = dst1.Row(i).InRange(maxVal, maxVal);
+                dst3.Row(i).SetTo(255, tmp);
+            }
+        }
+    }
+    public class CS_LeftRight_Lines : CS_Parent
+    {
+        Line_Basics lines = new Line_Basics();
+        public CS_LeftRight_Lines(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Left camera lines", "Right camera lines" };
+            desc = "Find the lines in the Left and Right images.";
+        }
+        public void RunCS(Mat src)
+        {
+            lines.Run(task.leftView);
+            dst2 = lines.dst2.Clone();
+            lines.Run(task.rightView);
+            dst3 = lines.dst2;
+        }
+    }
+    public class CS_LeftRight_RedCloudRight : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_LeftRight_RedCloudRight(VBtask task) : base(task)
+        {
+            task.redOptions.setUseColorOnly(true);
+            desc = "Segment the right view image with RedCloud";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(task.rightView);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+        }
+    }
+    public class CS_LeftRight_RedCloudLeft : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_LeftRight_RedCloudLeft(VBtask task) : base(task)
+        {
+            task.redOptions.setUseColorOnly(true);
+            desc = "Segment the left view image with RedCloud";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(task.leftView);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+        }
+    }
+    public class CS_LeftRight_RedCloudBoth : CS_Parent
+    {
+        LeftRight_RedCloudRight stLeft = new LeftRight_RedCloudRight();
+        LeftRight_RedCloudLeft stRight = new LeftRight_RedCloudLeft();
+        public CS_LeftRight_RedCloudBoth(VBtask task) : base(task)
+        {
+            desc = "Match cells in the left view to the right view - something is flipped here...";
+        }
+        public void RunCS(Mat src)
+        {
+            stRight.Run(empty);
+            dst2 = stRight.dst2;
+            labels[2] = "Left view - " + stRight.labels[2];
+            stLeft.Run(empty);
+            dst3 = stLeft.dst2;
+            labels[3] = "Right view - " + stLeft.labels[2];
+        }
+    }
+    public class CS_LeftRight_Features : CS_Parent
+    {
+        FeatureLeftRight_Basics feat = new FeatureLeftRight_Basics();
+        public CS_LeftRight_Features(VBtask task) : base(task)
+        {
+            desc = "Placeholder to make it easier to find FeatureLeftRight_Basics";
+        }
+        public void RunCS(Mat src)
+        {
+            feat.Run(src);
+            dst2 = feat.dst2;
+            dst3 = feat.dst3;
+            labels = feat.labels;
+        }
+    }
 
 
 

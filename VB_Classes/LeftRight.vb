@@ -18,28 +18,21 @@ End Class
 
 
 Public Class LeftRight_CompareRaw : Inherits VB_Parent
+    Dim options As New Options_LeftRight
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Slice Starting Y", 0, 300, 25)
-            sliders.setupTrackBar("Slice Height", 1, (dst2.Rows - 10) / 2, 20)
-        End If
-
         desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static startYSlider = FindSlider("Slice Starting Y")
-        Static hSlider = FindSlider("Slice Height")
+        options.RunVB()
 
-        Dim sliceY = startYSlider.Value
-        Dim slideHeight = hSlider.Value
-        Dim r1 = New cv.Rect(0, sliceY, task.leftview.Width, slideHeight)
-        Dim r2 = New cv.Rect(0, 25, task.leftview.Width, slideHeight)
+        Dim r1 = New cv.Rect(0, options.sliceY, task.leftView.Width, options.sliceHeight)
+        Dim r2 = New cv.Rect(0, 25, task.leftView.Width, options.sliceHeight)
         dst2.SetTo(0)
-        task.leftview(r1).CopyTo(dst2(r2))
+        task.leftView(r1).CopyTo(dst2(r2))
 
-        r2.Y += slideHeight
-        task.rightview(r1).CopyTo(dst2(r2))
-        dst3 = task.rightview
+        r2.Y += options.sliceHeight
+        task.rightView(r1).CopyTo(dst2(r2))
+        dst3 = task.rightView
     End Sub
 End Class
 
