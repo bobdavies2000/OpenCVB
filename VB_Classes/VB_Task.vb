@@ -54,6 +54,7 @@ Public Class VBtask : Implements IDisposable
     Public motionFlag As Boolean
     Public motionDetected As Boolean
 
+    Public gravityHorizon As Gravity_Horizon
     Public gravityVec As New PointPair
     Public horizonVec As New PointPair
 
@@ -387,6 +388,7 @@ Public Class VBtask : Implements IDisposable
         'motionCloud = New Motion_PointCloud
         'motionColor = New Motion_Color
         'cMotion = New CameraMotion_Basics
+        gravityHorizon = New Gravity_Horizon
         imuStabilityTest = New Stabilizer_VerticalIMU
 
         updateSettings()
@@ -595,6 +597,7 @@ Public Class VBtask : Implements IDisposable
                 task.color.Rectangle(task.motionRect, cv.Scalar.White, task.lineWidth)
             End If
 
+            gravityHorizon.RunVB(src)
             If task.gOptions.CrossHairs.Checked Then
                 If task.paused = False Then
                     DrawLine(task.color, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)

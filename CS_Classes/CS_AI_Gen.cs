@@ -1279,60 +1279,6 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
 
 
-    public class CS_Line_Basics : CS_Parent
-    {
-        FastLineDetector ld;
-        public List<PointPair> lpList = new List<PointPair>();
-        public Scalar lineColor = Scalar.White;
-
-        public CS_Line_Basics(VBtask task) : base(task)
-        {
-            ld = CvXImgProc.CreateFastLineDetector();
-            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
-            desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present.";
-        }
-
-        public void RunCS(Mat src)
-        {
-            if (src.Channels() == 3)
-                dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
-            else
-                dst2 = src.Clone();
-
-            if (dst2.Type() != MatType.CV_8U)
-                dst2.ConvertTo(dst2, MatType.CV_8U);
-
-            var lines = ld.Detect(dst2);
-
-            var sortByLen = new SortedList<float, PointPair>(new compareAllowIdenticalSingleInverted());
-            foreach (var v in lines)
-            {
-                if (v[0] >= 0 && v[0] <= dst2.Cols && v[1] >= 0 && v[1] <= dst2.Rows &&
-                    v[2] >= 0 && v[2] <= dst2.Cols && v[3] >= 0 && v[3] <= dst2.Rows)
-                {
-                    var p1 = new cv.Point(v[0], v[1]);
-                    var p2 = new cv.Point(v[2], v[3]);
-                    var lp = new PointPair(p1, p2);
-                    sortByLen.Add(lp.length, lp);
-                }
-            }
-
-            dst2 = src;
-            dst3.SetTo(0);
-            lpList.Clear();
-            foreach (var lp in sortByLen.Values)
-            {
-                lpList.Add(lp);
-                DrawLine(dst2, lp.p1, lp.p2, lineColor, task.lineWidth);
-                DrawLine(dst3, lp.p1, lp.p2, 255, task.lineWidth);
-            }
-            labels[2] = lpList.Count + " lines were detected in the current frame";
-        }
-    }
-
-
-
-
 
     public class CS_BackProject_MaskLines : CS_Parent
     {
@@ -30037,6 +29983,1161 @@ public class CS_ApproxPoly_Basics : CS_Parent
             labels = feat.labels;
         }
     }
+    public class CS_Line_Basics : CS_Parent
+    {
+        cv.XImgProc.FastLineDetector ld;
+        public List<PointPair> lpList = new List<PointPair>();
+        public Scalar lineColor = Scalar.White;
+        public CS_Line_Basics(VBtask task) : base(task)
+        {
+            ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector();
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() == 3)
+                dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            else
+                dst2 = src.Clone();
+            if (dst2.Type() != MatType.CV_8U)
+                dst2.ConvertTo(dst2, MatType.CV_8U);
+            var lines = ld.Detect(dst2);
+            var sortByLen = new SortedList<float, PointPair>(new compareAllowIdenticalSingleInverted());
+            foreach (var v in lines)
+            {
+                if (v[0] >= 0 && v[0] <= dst2.Cols && v[1] >= 0 && v[1] <= dst2.Rows &&
+                    v[2] >= 0 && v[2] <= dst2.Cols && v[3] >= 0 && v[3] <= dst2.Rows)
+                {
+                    var p1 = new cv.Point(v[0], v[1]);
+                    var p2 = new cv.Point(v[2], v[3]);
+                    var lp = new PointPair(p1, p2);
+                    sortByLen.Add(lp.length, lp);
+                }
+            }
+            dst2 = src;
+            dst3.SetTo(0);
+            lpList.Clear();
+            foreach (var lp in sortByLen.Values)
+            {
+                lpList.Add(lp);
+                DrawLine(dst2, lp.p1, lp.p2, lineColor);
+                DrawLine(dst3, lp.p1, lp.p2, 255);
+            }
+            labels[2] = lpList.Count().ToString() + " lines were detected in the current frame";
+        }
+    }
+    public class CS_Line_SubsetRect : CS_Parent
+    {
+        cv.XImgProc.FastLineDetector ld;
+        public SortedList<float, PointPair> sortByLen = new SortedList<float, PointPair>(new compareAllowIdenticalSingleInverted());
+        public List<PointPair> mpList = new List<PointPair>();
+        public List<Point2f> ptList = new List<Point2f>();
+        public Rect subsetRect;
+        public Scalar lineColor = Scalar.White;
+        public CS_Line_SubsetRect(VBtask task) : base(task)
+        {
+            subsetRect = new Rect(0, 0, dst2.Width, dst2.Height);
+            ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector();
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Channels() == 3)
+                dst2 = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            else
+                dst2 = src.Clone();
+            if (dst2.Type() != MatType.CV_8U)
+                dst2.ConvertTo(dst2, MatType.CV_8U);
+            var lines = ld.Detect(dst2[subsetRect]);
+            sortByLen.Clear();
+            mpList.Clear();
+            ptList.Clear();
+            foreach (var v in lines)
+            {
+                if (v[0] >= 0 && v[0] <= dst2.Cols && v[1] >= 0 && v[1] <= dst2.Rows &&
+                    v[2] >= 0 && v[2] <= dst2.Cols && v[3] >= 0 && v[3] <= dst2.Rows)
+                {
+                    var p1 = new cv.Point(v[0] + subsetRect.X, v[1] + subsetRect.Y);
+                    var p2 = new cv.Point(v[2] + subsetRect.X, v[3] + subsetRect.Y);
+                    var lp = new PointPair(p1, p2);
+                    mpList.Add(lp);
+                    ptList.Add(p1);
+                    ptList.Add(p2);
+                    sortByLen.Add(lp.length, lp);
+                }
+            }
+            dst2 = src;
+            dst3.SetTo(0);
+            foreach (var lp in sortByLen.Values)
+            {
+                DrawLine(dst2, lp.p1, lp.p2, lineColor);
+                DrawLine(dst3, lp.p1, lp.p2, 255);
+            }
+            labels[2] = mpList.Count().ToString() + " lines were detected in the current frame";
+        }
+    }
+    public class CS_Line_InterceptsUI : CS_Parent
+    {
+        Line_Intercepts lines = new Line_Intercepts();
+        cv.Point p2;
+        System.Windows.Forms.RadioButton redRadio;
+        System.Windows.Forms.RadioButton greenRadio;
+        System.Windows.Forms.RadioButton yellowRadio;
+        System.Windows.Forms.RadioButton blueRadio;
+        public CS_Line_InterceptsUI(VBtask task) : base(task)
+        {
+            redRadio = FindRadio("Show Top intercepts");
+            greenRadio = FindRadio("Show Bottom intercepts");
+            yellowRadio = FindRadio("Show Right intercepts");
+            blueRadio = FindRadio("Show Left intercepts");
+            labels[2] = "Use mouse in right image to highlight lines";
+            desc = "An alternative way to highlight line segments with common slope";
+        }
+        public void RunCS(Mat src)
+        {
+            lines.Run(src);
+            dst3.SetTo(0);
+            var red = new Scalar(0, 0, 255);
+            var green = new Scalar(1, 128, 0);
+            var yellow = new Scalar(2, 255, 255);
+            var blue = new Scalar(254, 0, 0);
+            var center = new cv.Point(dst3.Width / 2, dst3.Height / 2);
+            dst3.Line(new cv.Point(0, 0), center, blue, task.lineWidth, LineTypes.Link4);
+            dst3.Line(new cv.Point(dst2.Width, 0), center, red, task.lineWidth, LineTypes.Link4);
+            dst3.Line(new cv.Point(0, dst2.Height), center, blue, task.lineWidth, LineTypes.Link4);
+            dst3.Line(new cv.Point(dst2.Width, dst2.Height), center, yellow, task.lineWidth, LineTypes.Link4);
+            var mask = new Mat(new cv.Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0);
+            var pt = new cv.Point(center.X, center.Y - 30);
+            cv.Rect r;
+            Cv2.FloodFill(dst3, mask, pt, red, out r, 1, 1, FloodFillFlags.FixedRange | (cv.FloodFillFlags)(255 << 8));
+            pt = new cv.Point(center.X, center.Y + 30);
+            Cv2.FloodFill(dst3, mask, pt, green, out r, 1, 1, FloodFillFlags.FixedRange | (cv.FloodFillFlags)(255 << 8));
+            pt = new cv.Point(center.X - 30, center.Y);
+            Cv2.FloodFill(dst3, mask, pt, blue, out r, 1, 1, FloodFillFlags.FixedRange | (cv.FloodFillFlags)(255 << 8));
+            pt = new cv.Point(center.X + 30, center.Y);
+            Cv2.FloodFill(dst3, mask, pt, yellow, out r, 1, 1, FloodFillFlags.FixedRange | (cv.FloodFillFlags)(255 << 8));
+            var color = dst3.Get<Vec3b>(task.mouseMovePoint.Y, task.mouseMovePoint.X);
+            var p1 = task.mouseMovePoint;
+            if (p1.X == center.X)
+            {
+                if (p1.Y <= center.Y)
+                    p2 = new cv.Point(dst3.Width / 2, 0);
+                else
+                    p2 = new cv.Point(dst3.Width, dst3.Height);
+            }
+            else
+            {
+                var m = (center.Y - p1.Y) / (center.X - p1.X);
+                var b = p1.Y - p1.X * m;
+                if (color[0] == 0) p2 = new cv.Point(-b / m, 0); // red zone
+                if (color[0] == 1) p2 = new cv.Point((dst3.Height - b) / m, dst3.Height); // green
+                if (color[0] == 2) p2 = new cv.Point(dst3.Width, dst3.Width * m + b); // yellow
+                if (color[0] == 254) p2 = new cv.Point(0, b); // blue
+                DrawLine(dst3, center, p2, Scalar.Black);
+            }
+            DrawCircle(dst3, center, task.DotSize, Scalar.White);
+            if (color[0] == 0) redRadio.Checked = true;
+            if (color[0] == 1) greenRadio.Checked = true;
+            if (color[0] == 2) yellowRadio.Checked = true;
+            if (color[0] == 254) blueRadio.Checked = true;
+            lines.hightLightIntercept(dst3);
+            dst2 = lines.dst2;
+        }
+    }
+    public class CS_Line_Intercepts : CS_Parent
+    {
+        public LongLine_Extend extended = new LongLine_Extend();
+        public Line_Basics lines = new Line_Basics();
+        public List<Point2f> p1List = new List<Point2f>();
+        public List<Point2f> p2List = new List<Point2f>();
+        LongLine_Basics longLine = new LongLine_Basics();
+        public Options_Intercepts options = new Options_Intercepts();
+        public SortedList<int, int> intercept = new SortedList<int, int>(new compareAllowIdenticalInteger());
+        public SortedList<int, int> topIntercepts = new SortedList<int, int>(new compareAllowIdenticalInteger());
+        public SortedList<int, int> botIntercepts = new SortedList<int, int>(new compareAllowIdenticalInteger());
+        public SortedList<int, int> leftIntercepts = new SortedList<int, int>(new compareAllowIdenticalInteger());
+        public SortedList<int, int> rightIntercepts = new SortedList<int, int>(new compareAllowIdenticalInteger());
+        public SortedList<int, int>[] interceptArray;
+        public CS_Line_Intercepts(VBtask task) : base(task)
+        {
+            interceptArray = new[] { topIntercepts, botIntercepts, leftIntercepts, rightIntercepts };
+            labels[2] = "Highlight line x- and y-intercepts.  Move mouse over the image.";
+            desc = "Show lines with similar y-intercepts";
+        }
+        public void hightLightIntercept(Mat dst)
+        {
+            foreach (var inter in intercept)
+            {
+                if (Math.Abs(options.mouseMovePoint - inter.Key) < options.interceptRange)
+                {
+                    DrawLine(dst2, p1List[inter.Value], p2List[inter.Value], Scalar.White);
+                    DrawLine(dst2, p1List[inter.Value], p2List[inter.Value], Scalar.Blue);
+                }
+            }
+            foreach (var inter in intercept)
+            {
+                switch (options.selectedIntercept)
+                {
+                    case 0:
+                        dst.Line(new cv.Point(inter.Key, 0), new cv.Point(inter.Key, 10), Scalar.White, task.lineWidth);
+                        break;
+                    case 1:
+                        dst.Line(new cv.Point(inter.Key, dst2.Height), new cv.Point(inter.Key, dst2.Height - 10), Scalar.White, task.lineWidth);
+                        break;
+                    case 2:
+                        dst.Line(new cv.Point(0, inter.Key), new cv.Point(10, inter.Key), Scalar.White, task.lineWidth);
+                        break;
+                    case 3:
+                        dst.Line(new cv.Point(dst2.Width, inter.Key), new cv.Point(dst2.Width - 10, inter.Key), Scalar.White, task.lineWidth);
+                        break;
+                }
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            lines.Run(src);
+            if (lines.lpList.Count() == 0) return;
+            dst2 = src;
+            p1List.Clear();
+            p2List.Clear();
+            intercept = interceptArray[options.selectedIntercept];
+            topIntercepts.Clear();
+            botIntercepts.Clear();
+            leftIntercepts.Clear();
+            rightIntercepts.Clear();
+            int index = 0;
+            foreach (var lp in lines.lpList)
+            {
+                var minXX = Math.Min(lp.p1.X, lp.p2.X);
+                if (lp.p1.X != minXX) // leftmost point is always in p1
+                {
+                    var tmp = lp.p1;
+                    lp.p1 = lp.p2;
+                    lp.p2 = tmp;
+                }
+                p1List.Add(lp.p1);
+                p2List.Add(lp.p2);
+                DrawLine(dst2, lp.p1, lp.p2, Scalar.Yellow);
+                var saveP1 = lp.p1;
+                var saveP2 = lp.p2;
+                var emps = longLine.buildLongLine(lp);
+                if (emps.p1.X == 0) leftIntercepts.Add((int)saveP1.Y, index);
+                if (emps.p1.Y == 0) topIntercepts.Add((int)saveP1.X, index);
+                if (emps.p1.X == dst2.Width) rightIntercepts.Add((int)saveP1.Y, index);
+                if (emps.p1.Y == dst2.Height) botIntercepts.Add((int)saveP1.X, index);
+                if (emps.p2.X == 0) leftIntercepts.Add((int)saveP2.Y, index);
+                if (emps.p2.Y == 0) topIntercepts.Add((int)saveP2.X, index);
+                if (emps.p2.X == dst2.Width) rightIntercepts.Add((int)saveP2.Y, index);
+                if (emps.p2.Y == dst2.Height) botIntercepts.Add((int)saveP2.X, index);
+                index++;
+            }
+            if (standaloneTest()) hightLightIntercept(dst2);
+        }
+    }
+    public class CS_Line_LeftRightImages : CS_Parent
+    {
+        public Line_TimeView leftLines = new Line_TimeView();
+        public Line_TimeView rightLines = new Line_TimeView();
+        public CS_Line_LeftRightImages(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels[2] = "Left image lines(red) with Right(blue)";
+            desc = "Find lines in the infrared images and overlay them in a single image";
+        }
+        public void RunCS(Mat src)
+        {
+            if (!task.cameraStable) dst2.SetTo(Scalar.White);
+            leftLines.Run(task.leftView);
+            dst2.SetTo(Scalar.White);
+            dst2.SetTo(Scalar.Red, leftLines.dst3);
+            rightLines.Run(task.rightView);
+            dst2.SetTo(Scalar.Blue, rightLines.dst3);
+            dst0 = task.leftView;
+            dst1 = task.rightView;
+        }
+    }
+    public class CS_Line_InDepthAndBGR : CS_Parent
+    {
+        Line_Basics lines = new Line_Basics();
+        public List<Point2f> p1List = new List<Point2f>();
+        public List<Point2f> p2List = new List<Point2f>();
+        public List<Point3f> z1List = new List<Point3f>(); // the point cloud values corresponding to p1 and p2
+        public List<Point3f> z2List = new List<Point3f>();
+        public CS_Line_InDepthAndBGR(VBtask task) : base(task)
+        {
+            labels[2] = "Lines defined in BGR";
+            labels[3] = "Lines in BGR confirmed in the point cloud";
+            desc = "Find the BGR lines and confirm they are present in the cloud data.";
+        }
+        public void RunCS(Mat src)
+        {
+            lines.Run(src);
+            dst2 = lines.dst2;
+            if (lines.lpList.Count() == 0) return;
+            var lineList = new List<Rect>();
+            if (task.motionFlag || task.optionsChanged) dst3.SetTo(0);
+            p1List.Clear();
+            p2List.Clear();
+            z1List.Clear();
+            z2List.Clear();
+            foreach (var lp in lines.lpList)
+            {
+                var minXX = Math.Min(lp.p1.X, lp.p2.X);
+                var minYY = Math.Min(lp.p1.Y, lp.p2.Y);
+                var w = Math.Abs(lp.p1.X - lp.p2.X);
+                var h = Math.Abs(lp.p1.Y - lp.p2.Y);
+                var r = new Rect((int)minXX, (int)minYY, (int)(w > 0 ? w : 2), (int)(h > 0 ? h : 2));
+                var mask = new Mat(new cv.Size(w, h), MatType.CV_8U, 0);
+                mask.Line(new cv.Point((int)(lp.p1.X - r.X), (int)(lp.p1.Y - r.Y)), new cv.Point((int)(lp.p2.X - r.X), (int)(lp.p2.Y - r.Y)), 255, task.lineWidth, LineTypes.Link4);
+                var mean = task.pointCloud[r].Mean(mask);
+                if (mean != new Scalar())
+                {
+                    var mmX = GetMinMax(task.pcSplit[0][r], mask);
+                    var mmY = GetMinMax(task.pcSplit[1][r], mask);
+                    var len1 = mmX.minLoc.DistanceTo(mmX.maxLoc);
+                    var len2 = mmY.minLoc.DistanceTo(mmY.maxLoc);
+                    if (len1 > len2)
+                    {
+                        lp.p1 = new cv.Point(mmX.minLoc.X + r.X, mmX.minLoc.Y + r.Y);
+                        lp.p2 = new cv.Point(mmX.maxLoc.X + r.X, mmX.maxLoc.Y + r.Y);
+                    }
+                    else
+                    {
+                        lp.p1 = new cv.Point(mmY.minLoc.X + r.X, mmY.minLoc.Y + r.Y);
+                        lp.p2 = new cv.Point(mmY.maxLoc.X + r.X, mmY.maxLoc.Y + r.Y);
+                    }
+                    if (lp.p1.DistanceTo(lp.p2) > 1)
+                    {
+                        DrawLine(dst3, lp.p1, lp.p2, Scalar.Yellow);
+                        p1List.Add(lp.p1);
+                        p2List.Add(lp.p2);
+                        z1List.Add(task.pointCloud.Get<Point3f>((int)lp.p1.Y, (int)lp.p1.X));
+                        z2List.Add(task.pointCloud.Get<Point3f>((int)lp.p2.Y, (int)lp.p2.X));
+                    }
+                }
+            }
+        }
+    }
+    public class CS_Line_PointSlope : CS_Parent
+    {
+        LongLine_Extend extend = new LongLine_Extend();
+        Line_Basics lines = new Line_Basics();
+        KNN_CoreN knn = new KNN_CoreN();
+        public List<PointPair> bestLines = new List<PointPair>();
+        const int lineCount = 3;
+        const int searchCount = 100;
+        public CS_Line_PointSlope(VBtask task) : base(task)
+        {
+            knn.options.knnDimension = 5; // slope, p1.x, p1.y, p2.x, p2.y
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new[] { "", "TrainInput to KNN", "Tracking these lines", "Query inputs to KNN" };
+            desc = "Find the 3 longest lines in the image and identify them from frame to frame using the point and slope.";
+        }
+        public void RunCS(Mat src)
+        {
+            lines.Run(src);
+            dst2 = src;
+            if (bestLines.Count() < lineCount || task.heartBeat)
+            {
+                dst3.SetTo(0);
+                bestLines.Clear();
+                knn.queries.Clear();
+                foreach (var lp in lines.lpList)
+                {
+                    bestLines.Add(lp);
+                    knn.trainInput.Add(lp.slope);
+                    knn.trainInput.Add(lp.p1.X);
+                    knn.trainInput.Add(lp.p1.Y);
+                    knn.trainInput.Add(lp.p2.X);
+                    knn.trainInput.Add(lp.p2.Y);
+                    DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor);
+                    if (bestLines.Count() >= lineCount) break;
+                }
+            }
+            dst1.SetTo(0);
+            knn.trainInput.Clear();
+            foreach (var lp in lines.lpList)
+            {
+                knn.trainInput.Add(lp.slope);
+                knn.trainInput.Add(lp.p1.X);
+                knn.trainInput.Add(lp.p1.Y);
+                knn.trainInput.Add(lp.p2.X);
+                knn.trainInput.Add(lp.p2.Y);
+                DrawLine(dst1, lp.p1, lp.p2, task.HighlightColor);
+            }
+            if (knn.trainInput.Count() == 0)
+            {
+                SetTrueText("There were no lines detected!  Were there any unusual settings for this run?", 3);
+                return;
+            }
+            knn.Run(empty);
+            if (knn.result == null) return;
+            var nextLines = new List<PointPair>();
+            var usedBest = new List<int>();
+            int index = 0;
+            for (int i = 0; i <= knn.result.GetUpperBound(0); i++)
+            {
+                for (int j = 0; j <= knn.result.GetUpperBound(1); j++)
+                {
+                    index = knn.result[i, j];
+                    if (!usedBest.Contains(index)) break;
+                }
+                usedBest.Add(index);
+                if (index * knn.options.knnDimension + 4 < knn.trainInput.Count())
+                {
+                    var mps = new PointPair(new Point2f(knn.trainInput[index * knn.options.knnDimension + 0], knn.trainInput[index * knn.options.knnDimension + 1]),
+                                            new Point2f(knn.trainInput[index * knn.options.knnDimension + 2], knn.trainInput[index * knn.options.knnDimension + 3]));
+                    mps.slope = knn.trainInput[index * knn.options.knnDimension];
+                    nextLines.Add(mps);
+                }
+            }
+            bestLines = new List<PointPair>(nextLines);
+            foreach (var ptS in bestLines)
+            {
+                DrawLine(dst2, ptS.p1, ptS.p2, task.HighlightColor);
+                DrawLine(dst1, ptS.p1, ptS.p2, Scalar.Red);
+            }
+        }
+    }
+    public class CS_Line_Movement : CS_Parent
+    {
+        public cv.Point p1;
+        public cv.Point p2;
+        Scalar[] gradientColors = new Scalar[100];
+        Kalman_Basics kalman = new Kalman_Basics();
+        int frameCount;
+        cv.Point k1 = new cv.Point(0, 0);
+        cv.Point k2 = new cv.Point(0, 0);
+        public CS_Line_Movement(VBtask task) : base(task)
+        {
+            kalman.kOutput = new float[] { 0.0f, 0.0f, 0.0f, 0.0f };
+            var color1 = Scalar.Yellow;
+            var color2 = Scalar.Blue;
+            double f = 1.0;
+            for (int i = 0; i < gradientColors.Length; i++)
+            {
+                gradientColors[i] = new Scalar(f * color2[0] + (1 - f) * color1[0], f * color2[1] + (1 - f) * color1[1], f * color2[2] + (1 - f) * color1[2]);
+                f -= 1.0 / gradientColors.Length;
+            }
+            labels = new[] { "", "", "Line Movement", "" };
+            desc = "Show the movement of the line provided";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                if (task.FirstPass) k1 = p1;
+                if (task.FirstPass) k2 = p2;
+                if (k1.DistanceTo(p1) == 0 && k2.DistanceTo(p2) == 0)
+                {
+                    k1 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                    k2 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                    dst2.SetTo(0);
+                }
+                kalman.kInput = new float[] { k1.X, k1.Y, k2.X, k2.Y };
+                kalman.Run(empty);
+                p1 = new cv.Point(kalman.kOutput[0], kalman.kOutput[1]);
+                p2 = new cv.Point(kalman.kOutput[2], kalman.kOutput[3]);
+            }
+            frameCount += 1;
+            DrawLine(dst2, p1, p2, gradientColors[frameCount % gradientColors.Length]);
+        }
+    }
+    public class CS_Line_GCloud : CS_Parent
+    {
+        public Line_Basics lines = new Line_Basics();
+        public SortedList<float, gravityLine> sortedVerticals = new SortedList<float, gravityLine>(new compareAllowIdenticalSingleInverted());
+        public SortedList<float, gravityLine> sortedHorizontals = new SortedList<float, gravityLine>(new compareAllowIdenticalSingleInverted());
+        public SortedList<float, gravityLine> allLines = new SortedList<float, gravityLine>(new compareAllowIdenticalSingleInverted());
+        public Options_Features options = new Options_Features();
+        Match_tCell match = new Match_tCell();
+        System.Windows.Forms.TrackBar angleSlider;
+        public CS_Line_GCloud(VBtask task) : base(task)
+        {
+            angleSlider = FindSlider("Angle tolerance in degrees");
+            labels[2] = "CS_Line_GCloud - Blue are vertical lines using the angle thresholds.";
+            desc = "Find all the vertical lines using the point cloud rectified with the IMU vector for gravity.";
+        }
+        public gravityLine updateGLine(Mat src, gravityLine gc, cv.Point p1, cv.Point p2)
+        {
+            gc.tc1.center = p1;
+            gc.tc2.center = p2;
+            gc.tc1 = match.createCell(src, gc.tc1.correlation, p1);
+            gc.tc2 = match.createCell(src, gc.tc2.correlation, p2);
+            gc.tc1.strOut = string.Format("{0}\n{1}m", gc.tc1.correlation.ToString(fmt2), gc.tc1.depth.ToString(fmt2));
+            gc.tc2.strOut = string.Format("{0}\n{1}m", gc.tc2.correlation.ToString(fmt2), gc.tc2.depth.ToString(fmt2));
+            var mean = task.pointCloud[gc.tc1.rect].Mean(task.depthMask[gc.tc1.rect]);
+            gc.pt1 = new Point3f((float)mean[0], (float)mean[1], (float)mean[2]);
+            gc.tc1.depth = gc.pt1.Z;
+            mean = task.pointCloud[gc.tc2.rect].Mean(task.depthMask[gc.tc2.rect]);
+            gc.pt2 = new Point3f((float)mean[0], (float)mean[1], (float)mean[2]);
+            gc.tc2.depth = gc.pt2.Z;
+            gc.len3D = distance3D(gc.pt1, gc.pt2);
+            if (gc.pt1 == new Point3f() || gc.pt2 == new Point3f())
+            {
+                gc.len3D = 0;
+            }
+            else
+            {
+                gc.arcX = (float)(Math.Asin((gc.pt1.X - gc.pt2.X) / gc.len3D) * 57.2958);
+                gc.arcY = (float)Math.Abs(Math.Asin((gc.pt1.Y - gc.pt2.Y) / gc.len3D) * 57.2958);
+                if (gc.arcY > 90) gc.arcY -= 90;
+                gc.arcZ = (float)(Math.Asin((gc.pt1.Z - gc.pt2.Z) / gc.len3D) * 57.2958);
+            }
+            return gc;
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            var maxAngle = angleSlider.Value;
+            dst2 = src.Clone();
+            lines.Run(src.Clone());
+            sortedVerticals.Clear();
+            sortedHorizontals.Clear();
+            foreach (var lp in lines.lpList)
+            {
+                gravityLine gc = updateGLine(src, new gravityLine(), new cv.Point((int)lp.p1.X, (int)lp.p1.Y), new cv.Point((int)lp.p2.X, (int)lp.p2.Y));
+                allLines.Add((int)lp.p1.DistanceTo(lp.p2), gc);
+                if (Math.Abs(90 - gc.arcY) < maxAngle && gc.tc1.depth > 0 && gc.tc2.depth > 0)
+                {
+                    sortedVerticals.Add((int)lp.p1.DistanceTo(lp.p2), gc);
+                    DrawLine(dst2, lp.p1, lp.p2, Scalar.Blue);
+                }
+                if (Math.Abs(gc.arcY) <= maxAngle && gc.tc1.depth > 0 && gc.tc2.depth > 0)
+                {
+                    sortedHorizontals.Add((int)lp.p1.DistanceTo(lp.p2), gc);
+                    DrawLine(dst2, lp.p1, lp.p2, Scalar.Yellow);
+                }
+            }
+            labels[2] = string.Format("{0:00} Horizontal lines were identified and {1:00} Vertical lines were identified.", sortedHorizontals.Count(), sortedVerticals.Count());
+        }
+    }
+    public class CS_Line_DisplayInfo : CS_Parent
+    {
+        public List<tCell> tcells = new List<tCell>();
+        Edge_Canny canny = new Edge_Canny();
+        Blur_Basics blur = new Blur_Basics();
+        public int distance;
+        public int maskCount;
+        int myCurrentFrame = -1;
+        public CS_Line_DisplayInfo(VBtask task) : base(task)
+        {
+            dst1 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            labels[2] = "When running standaloneTest(), a pair of random points is used to test the algorithm.";
+            desc = "Display the line provided in mp";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = src;
+            if (standaloneTest() && task.heartBeat)
+            {
+                tCell tc = new tCell();
+                tcells.Clear();
+                for (int i = 0; i < 2; i++)
+                {
+                    tc.center = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                    tcells.Add(tc);
+                }
+            }
+            if (tcells.Count() < 2) return;
+            if (myCurrentFrame < task.frameCount)
+            {
+                canny.Run(src);
+                blur.Run(canny.dst2);
+                myCurrentFrame = task.frameCount;
+            }
+            dst1.SetTo(0);
+            cv.Point2f p1 = tcells[0].center;
+            cv.Point2f p2 = tcells[1].center;
+            DrawLine(dst1, p1, p2, 255);
+            dst3.SetTo(0);
+            blur.dst2.Threshold(1, 255, ThresholdTypes.Binary).CopyTo(dst3, dst1);
+            distance = (int) p1.DistanceTo(p2);
+            maskCount = dst3.CountNonZero();
+            foreach (var tc in tcells)
+            {
+                //dst2.Rectangle(tc.rect, myHighlightColor);
+                //dst2.Rectangle(tc.searchRect, Scalar.White, task.lineWidth);
+                SetTrueText(tc.strOut, new cv.Point(tc.rect.X, tc.rect.Y));
+            }
+            strOut = "Mask count = " + maskCount + ", Expected count = " + distance + " or " + string.Format("{0:0%}", maskCount / (float)distance) + "\n";
+            DrawLine(dst2, p1, p2, task.HighlightColor);
+            strOut += "Color changes when correlation falls below threshold and new line is detected.\n" +
+                      "Correlation coefficient is shown with the depth in meters.";
+            SetTrueText(strOut, 3);
+        }
+    }
+    public class CS_Line_Perpendicular : CS_Parent
+    {
+        public Point2f p1; // first input point
+        public Point2f p2; // second input point
+        public Point2f r1; // first output point (perpendicular to input)
+        public Point2f r2; // second output point (perpendicular to input)
+        bool externalUse = false;
+        public CS_Line_Perpendicular(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "White is the original line, red dot is midpoint, yellow is perpendicular line", "" };
+            desc = "Find the line perpendicular to the line created by the points provided.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.FirstPass && p1 != new Point2f()) externalUse = true;
+            if (task.heartBeat || externalUse)
+            {
+                if (standaloneTest())
+                {
+                    p1 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                    p2 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                }
+                dst2.SetTo(0);
+                DrawLine(dst2, p1, p2, Scalar.White);
+                float slope;
+                if (p1.X == p2.X) slope = 100000; else slope = (p1.Y - p2.Y) / (p1.X - p2.X);
+                var midPoint = new Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2);
+                DrawCircle(dst2, midPoint, task.DotSize + 2, Scalar.Red);
+                float m = (slope == 0) ? 100000 : -1 / slope;
+                float b = midPoint.Y - m * midPoint.X;
+                r1 = new Point2f(-b / m, 0);
+                r2 = new Point2f((dst2.Height - b) / m, dst2.Height);
+                DrawLine(dst2, r1, r2, Scalar.Yellow);
+            }
+        }
+    }
+    public class CS_Line_CellsVertHoriz : CS_Parent
+    {
+        FeatureLine_Finder lines = new FeatureLine_Finder();
+        RedCloud_Hulls hulls = new RedCloud_Hulls();
+        public CS_Line_CellsVertHoriz(VBtask task) : base(task)
+        {
+            labels[2] = "RedCloud_Hulls output with lines highlighted";
+            desc = "Identify the lines created by the RedCloud Cells and separate vertical from horizontal";
+        }
+        public void RunCS(Mat src)
+        {
+            hulls.Run(src);
+            dst2 = hulls.dst2;
+            lines.Run(dst2.Clone());
+            dst3 = src;
+            for (int i = 0; i < lines.sortedHorizontals.Count(); i++)
+            {
+                var index = lines.sortedHorizontals.ElementAt(i).Value;
+                var p1 = lines.lines2D[index];
+                var p2 = lines.lines2D[index + 1];
+                DrawLine(dst3, p1, p2, Scalar.Yellow);
+            }
+            for (int i = 0; i < lines.sortedVerticals.Count(); i++)
+            {
+                var index = lines.sortedVerticals.ElementAt(i).Value;
+                var p1 = lines.lines2D[index];
+                var p2 = lines.lines2D[index + 1];
+                DrawLine(dst3, p1, p2, Scalar.Blue);
+            }
+            labels[3] = lines.sortedVerticals.Count() + " vertical and " + lines.sortedHorizontals.Count() + " horizontal lines identified in the RedCloud output";
+        }
+    }
+    public class CS_Line_Cells : CS_Parent
+    {
+        Line_Basics lines = new Line_Basics();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_Line_Cells(VBtask task) : base(task)
+        {
+            desc = "Identify all lines in the RedCloud_Basics cell boundaries";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            lines.Run(dst2.Clone());
+            dst3 = lines.dst3;
+            labels[2] = (lines.lpList.Count() / 2) + " lines identified";
+        }
+    }
+    public class CS_Line_ViewSide : CS_Parent
+    {
+        public OpAuto_YRange autoY = new OpAuto_YRange();
+        public Line_Basics lines = new Line_Basics();
+        Projection_HistSide histSide = new Projection_HistSide();
+        public CS_Line_ViewSide(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Hotspots in the Side View", "Lines found in the hotspots of the Side View." };
+            desc = "Find lines in the hotspots for the side view.";
+        }
+        public void RunCS(Mat src)
+        {
+            histSide.Run(src);
+            autoY.Run(histSide.histogram);
+            dst2 = histSide.histogram.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+            lines.Run(dst2.Clone());
+            dst3 = lines.dst3;
+        }
+    }
+    public class CS_Line_ViewTop : CS_Parent
+    {
+        public OpAuto_XRange autoX = new OpAuto_XRange();
+        public Line_Basics lines = new Line_Basics();
+        Projection_HistTop histTop = new Projection_HistTop();
+        public CS_Line_ViewTop(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Hotspots in the Top View", "Lines found in the hotspots of the Top View." };
+            desc = "Find lines in the hotspots for the Top View.";
+        }
+        public void RunCS(Mat src)
+        {
+            histTop.Run(src);
+            autoX.Run(histTop.histogram);
+            dst2 = histTop.histogram.Threshold(0, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+            lines.Run(dst2);
+            dst3 = lines.dst3;
+        }
+    }
+    public class CS_Line_FromContours : CS_Parent
+    {
+        Reduction_Basics reduction = new Reduction_Basics();
+        Line_Basics lines = new Line_Basics();
+        Contour_Gray contours = new Contour_Gray();
+        public CS_Line_FromContours(VBtask task) : base(task)
+        {
+            task.redOptions.setColorSource("Reduction_Basics"); // to enable sliders.
+            lines.lineColor = Scalar.Red;
+            UpdateAdvice("Use the reduction sliders in the redoptions to control contours and subsequent lines found.");
+            desc = "Find the lines in the contours.";
+        }
+        public void RunCS(Mat src)
+        {
+            reduction.Run(src);
+            contours.Run(reduction.dst2);
+            dst2 = contours.dst2.Clone();
+            lines.Run(dst2);
+            dst3.SetTo(0);
+            foreach (var lp in lines.lpList)
+            {
+                DrawLine(dst3, lp.p1, lp.p2, Scalar.White);
+            }
+        }
+    }
+    public class CS_Line_ColorClass : CS_Parent
+    {
+        Color8U_Basics colorClass = new Color8U_Basics();
+        Line_Basics lines = new Line_Basics();
+        public CS_Line_ColorClass(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            labels = new string[] { "", "", "Lines for the current color class", "Color Class input" };
+            desc = "Review lines in all the different color classes";
+        }
+        public void RunCS(Mat src)
+        {
+            colorClass.Run(src);
+            dst1 = colorClass.dst2;
+            lines.Run(dst1 * 255 / colorClass.classCount);
+            dst2 = lines.dst2;
+            dst3 = lines.dst3;
+            labels[1] = "Input to Line_Basics";
+            labels[2] = "Lines found in the " + task.redOptions.colorMethods[task.redOptions.colorInputIndex] + " output";
+        }
+    }
+    public class CS_Line_Canny : CS_Parent
+    {
+        Edge_Canny canny = new Edge_Canny();
+        Line_Basics lines = new Line_Basics();
+        public CS_Line_Canny(VBtask task) : base(task)
+        {
+            FindSlider("Canny Aperture").Value = 7;
+            labels = new string[] { "", "", "Straight lines in Canny output", "Input to Line_Basics" };
+            desc = "Find lines in the Canny output";
+        }
+        public void RunCS(Mat src)
+        {
+            canny.Run(src);
+            dst3 = canny.dst2.Clone();
+            lines.Run(canny.dst2);
+            dst2 = lines.dst3;
+        }
+    }
+    public class CS_Line_TimeViewLines : CS_Parent
+    {
+        Line_TimeView lines = new Line_TimeView();
+        public List<PointPair> lpList = new List<PointPair>();
+        public CS_Line_TimeViewLines(VBtask task) : base(task)
+        {
+            labels[2] = "Lines from the latest Line_TimeLine";
+            labels[3] = "Vertical (blue) Horizontal (Red) Other (Green)";
+            desc = "Find slope and y-intercept of lines over time.";
+        }
+        public void RunCS(Mat src)
+        {
+            lines.Run(src);
+            if (lines.pixelcount == 0) return;
+            lpList.Clear();
+            dst2 = lines.dst3;
+            dst3.SetTo(Scalar.White);
+            int index = lines.frameList.Count() - 1; // the most recent.
+            foreach (var lp in lines.lines.lpList)
+            {
+                DrawLine(dst3, lp.p1, lp.p2, Scalar.Green);
+                lpList.Add(lp);
+                if (lp.slope == 0)
+                {
+                    DrawLine(dst3, lp.p1, lp.p2, Scalar.Red, task.lineWidth * 2 + 1);
+                }
+            }
+        }
+    }
+    public class CS_Line_TimeView : CS_Parent
+    {
+        public List<List<PointPair>> frameList = new List<List<PointPair>>();
+        public Line_Basics lines = new Line_Basics();
+        public int pixelcount;
+        public List<PointPair> mpList = new List<PointPair>();
+        public CS_Line_TimeView(VBtask task) : base(task)
+        {
+            dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "Collect lines over time";
+        }
+        public void RunCS(Mat src)
+        {
+            lines.Run(src);
+            if (task.optionsChanged || task.motionFlag) frameList.Clear();
+            var nextMpList = new List<PointPair>(lines.lpList);
+            frameList.Add(nextMpList);
+            dst2 = src;
+            dst3.SetTo(0);
+            mpList.Clear();
+            int lineTotal = 0;
+            for (int i = 0; i < frameList.Count(); i++)
+            {
+                lineTotal += frameList[i].Count();
+                foreach (var lp in frameList[i])
+                {
+                    DrawLine(dst2, lp.p1, lp.p2, Scalar.Yellow);
+                    DrawLine(dst3, lp.p1, lp.p2, Scalar.White);
+                    mpList.Add(lp);
+                }
+            }
+            if (frameList.Count() >= task.frameHistoryCount) frameList.RemoveAt(0);
+            pixelcount = Cv2.CountNonZero(dst3);
+            labels[3] = "There were " + lineTotal + " lines detected using " + (pixelcount / 1000.0).ToString("#.0") + "k pixels";
+        }
+    }
+    public class CS_Line_Verticals : CS_Parent
+        {
+            public Line_Basics lines = new Line_Basics();
+            public Options_Features options = new Options_Features();
+            public List<gravityLine> verticals = new List<gravityLine>();
+            public int maxAngleX;
+            public int maxAngleZ;
+            IMU_GMatrix gMat = new IMU_GMatrix();
+            System.Windows.Forms.TrackBar cellSlider;
+            System.Windows.Forms.TrackBar angleXSlider;
+            System.Windows.Forms.TrackBar angleZSlider;
+            public CS_Line_Verticals(VBtask task) : base(task)
+            {
+                cellSlider = FindSlider("MatchTemplate Cell Size");
+                angleXSlider = FindSlider("X angle tolerance in degrees");
+                angleZSlider = FindSlider("Z angle tolerance in degrees");
+                desc = "Capture all vertical and horizontal lines.";
+            }
+            public void RunCS(Mat src)
+            {
+                options.RunVB();
+                maxAngleX = angleXSlider.Value;
+                maxAngleZ = angleZSlider.Value;
+                int radius = (int)(cellSlider.Value / 2);
+                lines.Run(src.Clone());
+                if (lines.lpList.Count() == 0) return; // nothing to work with...
+                var lines2 = new List<Point2f>();
+                var lines3 = new List<Point3f>();
+                foreach (var lp in lines.lpList)
+                {
+                    lines2.Add(new Point2f(lp.p1.X, lp.p1.Y));
+                    lines2.Add(new Point2f(lp.p2.X, lp.p2.Y));
+                    lines3.Add(task.pointCloud.Get<Point3f>((int)lp.p1.Y, (int)lp.p1.X));
+                    lines3.Add(task.pointCloud.Get<Point3f>((int)lp.p2.Y, (int)lp.p2.X));
+                }
+                dst2 = src.Clone();
+                gMat.Run(empty);
+                var points = new Mat(lines3.Count(), 3, MatType.CV_32F, lines3.ToArray());
+                var gPoints = (points * gMat.gMatrix).ToMat();
+                verticals.Clear();
+                for (int i = 0; i < gPoints.Rows; i += 2)
+                {
+                    gravityLine vert = new gravityLine();
+                    vert.tc1.center = lines2[i];
+                    vert.tc2.center = lines2[i + 1];
+                    vert.pt1 = gPoints.Get<Point3f>(i + 0, 0);
+                    vert.pt2 = gPoints.Get<Point3f>(i + 1, 0);
+                    vert.len3D = distance3D(vert.pt1, vert.pt2);
+                    double arcX = Math.Asin((vert.pt1.X - vert.pt2.X) / vert.len3D) * 57.2958;
+                    double arcZ = Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958;
+                    if (Math.Abs(arcX) <= maxAngleX && Math.Abs(arcZ) <= maxAngleZ)
+                    {
+                        SetTrueText(arcX.ToString(fmt1) + " X" + "\n" + arcZ.ToString(fmt1) + " Z", lines2[i], 2);
+                        SetTrueText(arcX.ToString(fmt1) + " X" + "\n" + arcZ.ToString(fmt1) + " Z", lines2[i], 3);
+                        DrawLine(dst2, lines2[i], lines2[i + 1], task.HighlightColor);
+                        verticals.Add(vert);
+                    }
+                }
+                labels[2] = verticals.Count() + " vertical lines were found.  Total lines found = " + lines.lpList.Count();
+            }
+        }
+        public class CS_Line_Verts : CS_Parent
+        {
+            Line_Verticals verts = new Line_Verticals();
+            Match_tCell match = new Match_tCell();
+            public List<gravityLine> verticals = new List<gravityLine>();
+            IMU_GMatrix gMat = new IMU_GMatrix();
+            public CS_Line_Verts(VBtask task) : base(task)
+            {
+                labels[3] = "Numbers below are: correlation coefficient, distance in meters, angle from vertical in the X-direction, angle from vertical in the Z-direction";
+                desc = "Find the list of vertical lines and track them until most are lost, then recapture the vertical lines again.";
+            }
+            public void RunCS(Mat src)
+            {
+                if (verticals.Count() < 2 || verticals.Count() < verts.verticals.Count() / 3 || task.optionsChanged)
+                {
+                    verts.Run(src);
+                    foreach (var vert in verts.verticals)
+                    {
+                        var vtmp = vert;
+                        vtmp.tc1 = match.createCell(src, 0, vert.tc1.center);
+                        vtmp.tc2 = match.createCell(src, 0, vert.tc2.center);
+                        verticals.Add(vtmp);
+                    }
+                }
+                dst2 = src.Clone();
+                List<Point2f> lines2 = new List<Point2f>();
+                List<Point3f> lines3 = new List<Point3f>();
+                List<gravityLine> newVerts = new List<gravityLine>();
+                for (int i = 0; i < verticals.Count(); i++)
+                {
+                    var vert = verticals[i];
+                    match.tCells.Clear();
+                    match.tCells.Add(vert.tc1);
+                    match.tCells.Add(vert.tc2);
+                    match.Run(src);
+                    vert.tc1 = match.tCells[0];
+                    vert.tc2 = match.tCells[1];
+                    float correlationMin = verts.options.correlationMin;
+                    if (vert.tc1.correlation >= correlationMin && vert.tc2.correlation >= correlationMin)
+                    {
+                        lines2.Add(vert.tc1.center);
+                        lines2.Add(vert.tc2.center);
+                        lines3.Add(task.pointCloud.Get<Point3f>((int)vert.tc1.center.Y, (int)vert.tc1.center.X));
+                        lines3.Add(task.pointCloud.Get<Point3f>((int)vert.tc2.center.Y, (int)vert.tc2.center.X));
+                    }
+                    newVerts.Add(vert);
+                }
+                if (lines3.Count() > 0)
+                {
+                    gMat.Run(empty);
+                    Mat points = new Mat(lines3.Count(), 3, MatType.CV_32F, lines3.ToArray());
+                    Mat gPoints = (points * gMat.gMatrix).ToMat();
+                    verticals.Clear();
+                    for (int i = 0; i < gPoints.Rows; i += 2)
+                    {
+                        var vert = newVerts[i / 2];
+                        vert.pt1 = gPoints.Get<Point3f>(i + 0, 0);
+                        vert.pt2 = gPoints.Get<Point3f>(i + 1, 0);
+                        vert.len3D = distance3D(vert.pt1, vert.pt2);
+                        float arcX = (float)(Math.Asin((vert.pt1.X - vert.pt2.X) / vert.len3D) * 57.2958);
+                        float arcZ = (float)(Math.Asin((vert.pt1.Z - vert.pt2.Z) / vert.len3D) * 57.2958);
+                        if (Math.Abs(arcX) <= verts.maxAngleX && Math.Abs(arcZ) <= verts.maxAngleZ)
+                        {
+                            SetTrueText(vert.tc1.strOut, new cv.Point(vert.tc1.rect.X, vert.tc1.rect.Y));
+                            SetTrueText(vert.tc1.strOut + "\n" + string.Format(fmt1, arcX) + " X" + "\n" + string.Format(fmt1, arcZ) + " Z",
+                                        new cv.Point(vert.tc1.rect.X, vert.tc1.rect.Y), 3);
+                            DrawLine(dst2, vert.tc1.center, vert.tc2.center, task.HighlightColor);
+                            verticals.Add(vert);
+                        }
+                    }
+                }
+                labels[2] = "Starting with " + verts.verticals.Count().ToString() + " there are " + verticals.Count().ToString() + " lines remaining";
+            }
+        }
+        public class CS_Line_Nearest : CS_Parent
+        {
+            public Point2f pt; // How close is this point to the input line?
+            public PointPair lp = new PointPair(); // the input line.
+            public Point2f nearPoint;
+            public bool onTheLine;
+            public float distance;
+            public CS_Line_Nearest(VBtask task) : base(task)
+            {
+                labels[2] = "Yellow line is input line, white dot is the input point, and the white line is the nearest path to the input line.";
+                desc = "Find the nearest point on a line";
+            }
+            public void RunCS(Mat src)
+            {
+                if (standaloneTest() && task.heartBeat)
+                {
+                    lp.p1 = new Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                    lp.p2 = new Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                    pt = new Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                }
+                float minX = Math.Min(lp.p1.X, lp.p2.X);
+                float minY = Math.Min(lp.p1.Y, lp.p2.Y);
+                float maxX = Math.Max(lp.p1.X, lp.p2.X);
+                float maxY = Math.Max(lp.p1.Y, lp.p2.Y);
+                onTheLine = true;
+                if (lp.p1.X == lp.p2.X)
+                {
+                    nearPoint = new Point2f(lp.p1.X, pt.Y);
+                    if (pt.Y < minY || pt.Y > maxY) onTheLine = false;
+                }
+                else
+                {
+                    float m = (lp.p1.Y - lp.p2.Y) / (lp.p1.X - lp.p2.X);
+                    if (m == 0)
+                    {
+                        nearPoint = new Point2f(pt.X, lp.p1.Y);
+                        if (pt.X < minX || pt.X > maxX) onTheLine = false;
+                    }
+                    else
+                    {
+                        float b1 = lp.p1.Y - lp.p1.X * m;
+                        float b2 = pt.Y + pt.X / m;
+                        Point2f a1 = new Point2f(0, b2);
+                        Point2f a2 = new Point2f(dst2.Width, b2 + dst2.Width / m);
+                        float x = m * (b2 - b1) / (m * m + 1);
+                        nearPoint = new Point2f(x, m * x + b1);
+                        if (nearPoint.X < minX || nearPoint.X > maxX || nearPoint.Y < minY || nearPoint.Y > maxY) onTheLine = false;
+                    }
+                }
+                float distance1 = (float)Math.Sqrt(Math.Pow(pt.X - lp.p1.X, 2) + Math.Pow(pt.Y - lp.p1.Y, 2));
+                float distance2 = (float)Math.Sqrt(Math.Pow(pt.X - lp.p2.X, 2) + Math.Pow(pt.Y - lp.p2.Y, 2));
+                if (!onTheLine) nearPoint = distance1 < distance2 ? lp.p1 : lp.p2;
+                if (standaloneTest())
+                {
+                    dst2.SetTo(0);
+                    DrawLine(dst2, lp.p1, lp.p2, Scalar.Yellow);
+                    DrawLine(dst2, pt, nearPoint, Scalar.White);
+                    DrawCircle(dst2, pt, task.DotSize, Scalar.White);
+                }
+                distance = (float)Math.Sqrt(Math.Pow(pt.X - nearPoint.X, 2) + Math.Pow(pt.Y - nearPoint.Y, 2));
+            }
+        }
+        public class CS_Line_Intersection : CS_Parent
+        {
+            public Point2f p1, p2, p3, p4;
+            public Point2f intersectionPoint;
+            public CS_Line_Intersection(VBtask task) : base(task)
+            {
+                desc = "Determine if 2 lines intersect, where the point is, and if that point is in the image.";
+            }
+            public void RunCS(Mat src)
+            {
+                if (task.heartBeat)
+                {
+                    p1 = new Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                    p2 = new Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                    p3 = new Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                    p4 = new Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                }
+                intersectionPoint = IntersectTest(p1, p2, p3, p4, new Rect(0, 0, src.Width, src.Height));
+                dst2.SetTo(0);
+                DrawLine(dst2, p1, p2, Scalar.Yellow, task.lineWidth + 1);
+                DrawLine(dst2, p3, p4, Scalar.Yellow, task.lineWidth + 1);
+                if (intersectionPoint != new Point2f())
+                {
+                    DrawCircle(dst2, intersectionPoint, task.DotSize + 4, Scalar.White);
+                    labels[2] = "Intersection point = " + (int)intersectionPoint.X + " x " + (int)intersectionPoint.Y;
+                }
+                else
+                {
+                    labels[2] = "Parallel!!!";
+                }
+                if (intersectionPoint.X < 0 || intersectionPoint.X > dst2.Width || intersectionPoint.Y < 0 || intersectionPoint.Y > dst2.Height)
+                {
+                    labels[2] += " (off screen)";
+                }
+            }
+        }
+        public class CS_Line_Gravity : CS_Parent
+        {
+            Line_Basics lines = new Line_Basics();
+            Line_Nearest nearest = new Line_Nearest();
+            public CS_Line_Gravity(VBtask task) : base(task)
+            {
+                task.gOptions.setLineWidth(2);
+                desc = "Find all the lines in the color image that are parallel to gravity or the horizon using distance to the line instead of slope.";
+            }
+            public void RunCS(Mat src)
+            {
+                float pixelDiff = task.gOptions.pixelDiffThreshold;
+                dst2 = src.Clone();
+                lines.Run(src);
+                if (standaloneTest()) dst3 = lines.dst2;
+                nearest.lp = task.gravityVec;
+                DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, Scalar.White);
+                foreach (var lp in lines.lpList)
+                {
+                    Point2f ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, new Rect(0, 0, src.Width, src.Height));
+                    if (ptInter.X >= 0 && ptInter.X < dst2.Width && ptInter.Y >= 0 && ptInter.Y < dst2.Height) continue;
+                    nearest.pt = lp.p1;
+                    nearest.Run(null);
+                    float d1 = nearest.distance;
+                    nearest.pt = lp.p2;
+                    nearest.Run(null);
+                    float d2 = nearest.distance;
+                    if (Math.Abs(d1 - d2) <= pixelDiff)
+                    {
+                        DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor);
+                    }
+                }
+                DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, Scalar.White);
+                nearest.lp = task.horizonVec;
+                foreach (var lp in lines.lpList)
+                {
+                    Point2f ptInter = IntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, new Rect(0, 0, src.Width, src.Height));
+                    if (ptInter.X >= 0 && ptInter.X < dst2.Width && ptInter.Y >= 0 && ptInter.Y < dst2.Height) continue;
+                    nearest.pt = lp.p1;
+                    nearest.Run(null);
+                    float d1 = nearest.distance;
+                    nearest.pt = lp.p2;
+                    nearest.Run(null);
+                    float d2 = nearest.distance;
+                    if (Math.Abs(d1 - d2) <= pixelDiff)
+                    {
+                        DrawLine(dst2, lp.p1, lp.p2, Scalar.Red);
+                    }
+                }
+                labels[2] = "Slope for gravity is " + string.Format(fmt1, task.gravityVec.slope) + ".  Slope for horizon is " + string.Format(fmt1, task.horizonVec.slope);
+            }
+        }
+        public class CS_Line_KNN : CS_Parent
+        {
+            Line_Basics lines = new Line_Basics();
+            Swarm_Basics swarm = new Swarm_Basics();
+            public CS_Line_KNN(VBtask task) : base(task)
+            {
+                FindSlider("Connect X KNN points").Value = 1;
+                dst3 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+                desc = "Use KNN to find the other line end points nearest to each endpoint and connect them with a line.";
+            }
+            public void RunCS(Mat src)
+            {
+                swarm.options.RunVB();
+                lines.Run(src);
+                dst2 = lines.dst2;
+                dst3.SetTo(0);
+                swarm.knn.queries.Clear();
+                foreach (var lp in lines.lpList)
+                {
+                    swarm.knn.queries.Add(lp.p1);
+                    swarm.knn.queries.Add(lp.p2);
+                    DrawLine(dst3, lp.p1, lp.p2, 255);
+                }
+                swarm.knn.trainInput = new List<Point2f>(swarm.knn.queries);
+                swarm.knn.Run(empty);
+                swarm.DrawLines(dst3);
+                labels[2] = lines.labels[2];
+            }
+        }
 
 
 
@@ -30048,6 +31149,6 @@ public class CS_ApproxPoly_Basics : CS_Parent
 
 
 
-}
+    }
 
 

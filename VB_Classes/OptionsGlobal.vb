@@ -358,6 +358,9 @@ Public Class OptionsGlobal
     Public Sub setLineType(val As Integer)
         LineType.SelectedIndex = val
     End Sub
+    Public Sub setLineWidth(val As Integer)
+        LineWidth.Value = val
+    End Sub
     Public Sub setUnfiltered(val As Boolean)
         unFiltered.Checked = val
     End Sub

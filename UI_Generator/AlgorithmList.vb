@@ -1016,7 +1016,6 @@ if algorithmName = "CPP_Stable_BasicsCount" Then return new CPP_Basics(cppFuncti
 	if algorithmName = "Line_FromContours" Then return new Line_FromContours
 	if algorithmName = "Line_GCloud" Then return new Line_GCloud
 	if algorithmName = "Line_Gravity" Then return new Line_Gravity
-	if algorithmName = "Line_GravityIntersect" Then return new Line_GravityIntersect
 	if algorithmName = "Line_InDepthAndBGR" Then return new Line_InDepthAndBGR
 	if algorithmName = "Line_Intercepts" Then return new Line_Intercepts
 	if algorithmName = "Line_InterceptsUI" Then return new Line_InterceptsUI

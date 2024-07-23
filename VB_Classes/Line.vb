@@ -94,18 +94,20 @@ End Class
 
 Public Class Line_InterceptsUI : Inherits VB_Parent
     Dim lines As New Line_Intercepts
-    Dim interceptColor As Integer
     Dim p2 As cv.Point
+    Dim redRadio As System.Windows.Forms.RadioButton
+    Dim greenRadio As System.Windows.Forms.RadioButton
+    Dim yellowRadio As System.Windows.Forms.RadioButton
+    Dim blueRadio As System.Windows.Forms.RadioButton
     Public Sub New()
+        redRadio = FindRadio("Show Top intercepts")
+        greenRadio = FindRadio("Show Bottom intercepts")
+        yellowRadio = FindRadio("Show Right intercepts")
+        blueRadio = FindRadio("Show Left intercepts")
         labels(2) = "Use mouse in right image to highlight lines"
         desc = "An alternative way to highlight line segments with common slope"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static redRadio = FindRadio("Show Top intercepts")
-        Static greenRadio = FindRadio("Show Bottom intercepts")
-        Static yellowRadio = FindRadio("Show Right intercepts")
-        Static blueRadio = FindRadio("Show Left intercepts")
-
         lines.Run(src)
         dst3.SetTo(0)
 
@@ -256,18 +258,13 @@ End Class
 Public Class Line_LeftRightImages : Inherits VB_Parent
     Public leftLines As New Line_TimeView
     Public rightLines As New Line_TimeView
-    Public rgbLines As New Line_TimeView
     Public Sub New()
-        If check.Setup(traceName) Then check.addCheckBox("Show lines from BGR in green")
-
         If standaloneTest() Then task.gOptions.setDisplay1()
         If standaloneTest() Then task.gOptions.setDisplay1()
         labels(2) = "Left image lines(red) with Right(blue)"
         desc = "Find lines in the infrared images and overlay them in a single image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static rgbCheck = FindCheckBox("Show lines from BGR in green")
-
         If task.cameraStable = False Then dst2.SetTo(cv.Scalar.White)
 
         leftLines.Run(task.leftView)
@@ -277,10 +274,6 @@ Public Class Line_LeftRightImages : Inherits VB_Parent
         rightLines.Run(task.rightView)
         dst2.SetTo(cv.Scalar.Blue, rightLines.dst3)
 
-        If rgbCheck.checked Then
-            rgbLines.Run(src)
-            dst2.SetTo(cv.Scalar.Green, rgbLines.dst3)
-        End If
         dst0 = task.leftView
         dst1 = task.rightView
     End Sub
@@ -403,7 +396,7 @@ Public Class Line_PointSlope : Inherits VB_Parent
         End If
 
         knn.Run(empty)
-
+        If knn.result Is Nothing Then Exit Sub
         Dim nextLines As New List(Of PointPair)
         Dim usedBest As New List(Of Integer)
         Dim index As Integer
@@ -488,8 +481,9 @@ Public Class Line_GCloud : Inherits VB_Parent
     Public allLines As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public options As New Options_Features
     Dim match As New Match_tCell
+    Dim angleSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Angle tolerance in degrees", 0, 20, 10)
+        angleSlider = FindSlider("Angle tolerance in degrees")
         labels(2) = "Line_GCloud - Blue are vertical lines using the angle thresholds."
         desc = "Find all the vertical lines using the point cloud rectified with the IMU vector for gravity."
     End Sub
@@ -522,7 +516,7 @@ Public Class Line_GCloud : Inherits VB_Parent
     End Function
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
-        Static angleSlider = FindSlider("Angle tolerance in degrees")
+
         Dim maxAngle = angleSlider.Value
 
         dst2 = src.Clone
@@ -1023,19 +1017,18 @@ Public Class Line_Verticals : Inherits VB_Parent
     Public maxAngleX As Integer
     Public maxAngleZ As Integer
     Dim gMat As New IMU_GMatrix
+    Dim cellSlider As System.Windows.Forms.TrackBar
+    Dim angleXSlider As System.Windows.Forms.TrackBar
+    Dim angleZSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("X angle tolerance in degrees", 0, 10, 2)
-            sliders.setupTrackBar("Z angle tolerance in degrees", 0, 10, 7)
-        End If
+        cellSlider = FindSlider("MatchTemplate Cell Size")
+        angleXSlider = FindSlider("X angle tolerance in degrees")
+        angleZSlider = FindSlider("Z angle tolerance in degrees")
         desc = "Capture all vertical and horizontal lines."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Static cellSlider = FindSlider("MatchTemplate Cell Size")
-        Static angleXSlider = FindSlider("X angle tolerance in degrees")
-        Static angleZSlider = FindSlider("Z angle tolerance in degrees")
         maxAngleX = angleXSlider.Value
         maxAngleZ = angleZSlider.Value
         Dim radius = CInt(cellSlider.Value / 2)
@@ -1267,13 +1260,11 @@ Public Class Line_Gravity : Inherits VB_Parent
     Dim lines As New Line_Basics
     Dim nearest As New Line_Nearest
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Pixel difference threshold", 1, 20, 2)
         task.gOptions.LineWidth.Value = 2
         desc = "Find all the lines in the color image that are parallel to gravity or the horizon using distance to the line instead of slope."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static diffSlider = FindSlider("Pixel difference threshold")
-        Dim pixelDiff = diffSlider.value
+        Dim pixelDiff = task.gOptions.pixelDiffThreshold
 
         dst2 = src.Clone
         lines.Run(src)
@@ -1322,70 +1313,6 @@ Public Class Line_Gravity : Inherits VB_Parent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Line_GravityIntersect : Inherits VB_Parent
-    Dim lines As New Line_Basics
-    Dim nearest As New Line_Nearest
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Min distance to intersection (X1000)", 1, 20, 2)
-        task.gOptions.LineWidth.Value = 2
-        desc = "Find all the lines in the color image that don't intersect the gravity and horizon vectors (indicating they are parallel."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        'Static distSlider = FindSlider("Min distance to intersection (X1000)")
-        'Dim minDistance = distSlider.value
-
-        'dst2 = src.Clone
-        'lines.Run(src)
-        'If standaloneTest() Then dst3 = lines.dst2
-
-        'nearest.lp = task.gravityVec
-        'DrawLine(dst2,task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.White)
-        'For Each lp In lines.lpList
-        '    Dim ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
-        '    If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
-
-        '    nearest.pt = lp.p1
-        '    nearest.Run(Nothing)
-        '    Dim d1 = nearest.distance
-        '    'DrawLine(dst2,nearest.nearPoint, lp.p1, cv.Scalar.Red)
-
-        '    nearest.pt = lp.p2
-        '    nearest.Run(Nothing)
-        '    Dim d2 = nearest.distance
-        '    'DrawLine(dst2,nearest.nearPoint, lp.p2, cv.Scalar.Red)
-
-        '    If Math.Abs(d1 - d2) <= pixelDiff Then
-        '        DrawLine(dst2,lp.p1, lp.p2, task.HighlightColor)
-        '    End If
-        'Next
-
-        'DrawLine(dst2,task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.White)
-        'nearest.lp = task.horizonVec
-        'For Each lp In lines.lpList
-        '    Dim ptInter = IntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2, New cv.Rect(0, 0, src.Width, src.Height))
-        '    If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
-
-        '    nearest.pt = lp.p1
-        '    nearest.Run(Nothing)
-        '    Dim d1 = nearest.distance
-
-        '    nearest.pt = lp.p2
-        '    nearest.Run(Nothing)
-        '    Dim d2 = nearest.distance
-
-        '    If Math.Abs(d1 - d2) <= pixelDiff Then
-        '        DrawLine(dst2,lp.p1, lp.p2, cv.Scalar.Red)
-        '    End If
-        'Next
-        'labels(2) = "Slope for gravity is " + Format(task.gravityVec.slope, fmt1) + ".  Slope for horizon is " + Format(task.horizonVec.slope, fmt1)
-    End Sub
-End Class
 
 
 

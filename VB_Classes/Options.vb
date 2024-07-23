@@ -5765,6 +5765,9 @@ Public Class Options_Features : Inherits VB_Parent
             sliders.setupTrackBar("Blocksize", 1, 21, blockSize)
             sliders.setupTrackBar("Agast Threshold", 1, 100, agastThreshold)
             sliders.setupTrackBar("FAST Threshold", 0, 200, task.FASTthreshold)
+            sliders.setupTrackBar("Angle tolerance in degrees", 0, 20, 10)
+            sliders.setupTrackBar("X angle tolerance in degrees", 0, 10, 2)
+            sliders.setupTrackBar("Z angle tolerance in degrees", 0, 10, 7)
         End If
     End Sub
     Public Sub RunVB()
