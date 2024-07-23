@@ -6,7 +6,7 @@ Public Class KLT_Basics : Inherits VB_Parent
     Public circleColor = cv.Scalar.Red
     Public options As New Options_KLT
     Public Sub New()
-        term = New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
+        term = New cv.TermCriteria(cv.CriteriaTypes.Eps Or cv.CriteriaTypes.Count, 10, 1.0)
         desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
     End Sub
     Public Sub RunVB(src as cv.Mat)

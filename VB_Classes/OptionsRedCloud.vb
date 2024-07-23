@@ -363,4 +363,7 @@ Public Class OptionsRedCloud
     Public Function getHistBins3D() As Integer
         Return histBins3D
     End Function
+    Public Sub setHistBins3D(val As Integer)
+        HistBinBar3D.Value = val
+    End Sub
 End Class

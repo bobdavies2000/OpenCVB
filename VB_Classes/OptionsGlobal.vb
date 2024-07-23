@@ -313,6 +313,9 @@ Public Class OptionsGlobal
     Public Sub setMaxDepth(val As Integer)
         MaxDepthBar.Value = val
     End Sub
+    Public Function getMaxDepthBar() As Integer
+        Return MaxDepthBar.Value
+    End Function
     Public Sub setDisplay0()
         displayDst0.Checked = True
     End Sub

@@ -27959,6 +27959,574 @@ public class CS_ApproxPoly_Basics : CS_Parent
             labels[3] = "Move the camera around to see the impact of the Kalman filter.";
         }
     }
+    public class CS_KLT_Basics : CS_Parent
+    {
+        public Mat status = new Mat();
+        public Mat outputMat = new Mat();
+        public Scalar circleColor = Scalar.Red;
+        public Options_KLT options = new Options_KLT();
+        Mat lastGray;
+        public CS_KLT_Basics(VBtask task) : base(task)
+        {
+            desc = "Track movement with Kanada-Lucas-Tomasi algorithm";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (options.nightMode)
+                dst2.SetTo(0);
+            else
+                src.CopyTo(dst2);
+            if (task.FirstPass) lastGray = src.Clone();
+            if (src.Channels() == 3)
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            TermCriteria term = new TermCriteria(CriteriaTypes.Eps | CriteriaTypes.Count, 10, 1.0);
+            if (options.inputPoints == null)
+            {
+                options.inputPoints = Cv2.GoodFeaturesToTrack(src, options.maxCorners, options.qualityLevel,
+                                                              options.minDistance, new Mat(), options.blockSize, false, 0);
+                if (options.inputPoints.Length > 0)
+                {
+                    options.inputPoints = Cv2.CornerSubPix(src, options.inputPoints, options.subPixWinSize, new cv.Size(-1, -1), term);
+                }
+                outputMat = new Mat(options.inputPoints.Length, 1, MatType.CV_32FC2, options.inputPoints);
+                status = new Mat(outputMat.Rows, outputMat.Cols, MatType.CV_8U, 1);
+            }
+            else if (options.inputPoints.Length > 0)
+            {
+                Mat err = new Mat();
+                // convert the point2f vector to an inputarray (cv.Mat)
+                Mat inputMat = new Mat(options.inputPoints.Length, 1, MatType.CV_32FC2, options.inputPoints);
+                outputMat = inputMat.Clone();
+                Cv2.CalcOpticalFlowPyrLK(lastGray, src, inputMat, outputMat, status, err, options.winSize, 3, term, OpticalFlowFlags.None);
+                int k = 0;
+                for (int i = 0; i < options.inputPoints.Length; i++)
+                {
+                    if (status.Get<byte>(i) != 0)
+                    {
+                        options.inputPoints[k] = outputMat.Get<Point2f>(i);
+                        k++;
+                    }
+                }
+                Array.Resize(ref options.inputPoints, k);
+            }
+            for (int i = 0; i < outputMat.Rows; i++)
+            {
+                Point2f pt = outputMat.Get<Point2f>(i);
+                if (pt.X >= 0 && pt.X <= src.Cols && pt.Y >= 0 && pt.Y <= src.Rows)
+                {
+                    if (status.Get<byte>(i) != 0)
+                    {
+                        DrawCircle(dst2, pt, task.DotSize + 1, circleColor);
+                    }
+                }
+                else
+                {
+                    status.Set<byte>(i, 0); // this point is not visible!
+                }
+            }
+            lastGray = src.Clone();
+            labels[2] = "KLT Basics - " + (options.inputPoints == null ? "0" : options.inputPoints.Length.ToString()) + " points";
+        }
+    }
+    public class CS_KLT_OpticalFlow : CS_Parent
+    {
+        KLT_Basics klt = new KLT_Basics();
+        Point2f[] lastpoints;
+        public CS_KLT_OpticalFlow(VBtask task) : base(task)
+        {
+            desc = "KLT optical flow - needs more work";
+        }
+        public void RunCS(Mat src)
+        {
+            klt.Run(src);
+            if (task.frameCount > 0 && lastpoints != null && klt.options.inputPoints != null)
+            {
+                dst2 = klt.dst2;
+                src.CopyTo(dst3);
+                for (int i = 0; i < klt.options.inputPoints.Length; i++)
+                {
+                    if (klt.status.Get<byte>(i) != 0 && i < lastpoints.Length && i < klt.options.inputPoints.Length)
+                    {
+                        // DrawLine(dst2, lastpoints[i], klt.inputPoints[i], Scalar.Yellow, task.lineWidth + 1, task.lineType);
+                        // static Point2f[] lastFlowPoints = klt.inputPoints;
+                        // DrawLine(dst3, lastFlowPoints[i], klt.inputPoints[i], Scalar.Yellow, task.lineWidth + 1, task.lineType);
+                        // if (task.heartBeat) lastFlowPoints = klt.inputPoints;
+                    }
+                }
+            }
+            lastpoints = klt.options.inputPoints;
+        }
+    }
+    public class CS_KMeans_Basics : CS_Parent
+    {
+        public Options_KMeans options = new Options_KMeans();
+        public Mat colors = new Mat();
+        public bool buildPaletteOutput = true;
+        public Mat saveLabels = new Mat();
+        public int classCount;
+        int lastK = 0;
+        public CS_KMeans_Basics(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "", "Palette output for the kMeans labels" };
+            desc = "Cluster the input using kMeans.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest() && src.Channels() != 1)
+                src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            options.RunVB();
+            classCount = options.kMeansK;
+            if (task.FirstPass) lastK = classCount;
+            if (task.optionsChanged || lastK != classCount)
+            {
+                options.kMeansFlag = KMeansFlags.PpCenters;
+                saveLabels = new Mat();
+            }
+            var columnVector = src.Reshape(src.Channels(), src.Height * src.Width);
+            dst2 = saveLabels;
+            if (columnVector.ElemSize() % 4 != 0 || columnVector.Type() == MatType.CV_32S)
+                columnVector.ConvertTo(columnVector, MatType.CV_32F);
+            TermCriteria term = new TermCriteria(CriteriaTypes.Eps | CriteriaTypes.Count, 10, 1.0);
+            try
+            {
+                if (colors.Width == 0 || colors.Height == 0)
+                    options.kMeansFlag = KMeansFlags.PpCenters;
+                Cv2.Kmeans(columnVector, classCount, dst2, term, 1, options.kMeansFlag, colors);
+            }
+            catch (Exception)
+            {
+                columnVector.SetTo(0);
+                dst2.SetTo(0);
+                Cv2.Kmeans(columnVector, classCount, dst2, term, 1, options.kMeansFlag, colors);
+            }
+            saveLabels = dst2.Clone();
+            dst2.Reshape(1, src.Height).ConvertTo(dst2, MatType.CV_8U);
+            dst3 = ShowPalette(dst2 * 255 / classCount);
+            lastK = classCount;
+            labels[2] = "KMeans labels 0-" + lastK.ToString() + " spread out across 255 values.";
+        }
+    }
+    public class CS_KMeans_MultiChannel : CS_Parent
+    {
+        public Mat colors = new Mat();
+        KMeans_Basics km = new KMeans_Basics();
+        public CS_KMeans_MultiChannel(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "KMeans_Basics output with BGR input", "dst3 contains the labels spread across the palette (dst0 contains the exact labels)" };
+            desc = "Cluster the input using kMeans.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+                task.color.ConvertTo(src, MatType.CV_32FC3);
+            if (src.Type() == MatType.CV_8UC3)
+                src.ConvertTo(src, MatType.CV_32FC3);
+            if (src.Type() == MatType.CV_8U)
+                src.ConvertTo(src, MatType.CV_32F);
+            km.Run(src);
+            dst3 = km.dst2;
+            dst2 = ShowPalette(dst3 * 255 / km.classCount);
+        }
+    }
+    public class CS_KMeans_k2_to_k8 : CS_Parent
+    {
+        Mat_4Click Mats = new Mat_4Click();
+        KMeans_Basics km = new KMeans_Basics();
+        int kmIndex;
+        System.Windows.Forms.TrackBar kSlider;
+        public CS_KMeans_k2_to_k8(VBtask task) : base(task)
+        {
+            kSlider = FindSlider("KMeans k");
+            labels[2] = "kmeans - k=2,4,6,8";
+            desc = "Show clustering with various settings for cluster count.  Draw to select region of interest.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.frameCount % 100 == 0)
+            {
+                kmIndex++;
+                if (kmIndex >= 4) kmIndex = 0;
+            }
+            kSlider.Value = 2;
+            if (kmIndex == 1) kSlider.Value = 4;
+            if (kmIndex == 2) kSlider.Value = 6;
+            if (kmIndex == 3) kSlider.Value = 8;
+            km.Run(src.CvtColor(ColorConversionCodes.BGR2GRAY));
+            Mats.mat[kmIndex] = km.dst2 * 255 / km.classCount;
+            Mats.Run(empty);
+            dst2 = Mats.dst2;
+            dst3 = Mats.dst3;
+        }
+    }
+    public class CS_KMeans_Fuzzy : CS_Parent
+    {
+        KMeans_Image km = new KMeans_Image();
+        public Fuzzy_Basics fuzzyD = new Fuzzy_Basics();
+        public CS_KMeans_Fuzzy(VBtask task) : base(task)
+        {
+            labels[3] = "The white marks areas that are busy while the black marks areas that are consistent in color - not fuzzy.";
+            desc = "Use the KMeans output as input to the Fuzzy detector - those areas which have little info";
+        }
+        public void RunCS(Mat src)
+        {
+            km.Run(src);
+            dst2 = km.km.dst2;
+            fuzzyD.Run(dst2);
+            dst3 = fuzzyD.dst3;
+        }
+    }
+    public class CS_KMeans_MultiGaussian_CPP : CS_Parent
+    {
+        public CS_KMeans_MultiGaussian_CPP(VBtask task) : base(task)
+        {
+            cPtr = KMeans_MultiGaussian_Open();
+            desc = "Use KMeans on a random multi-gaussian distribution.";
+        }
+        public void RunCS(Mat src)
+        {
+            IntPtr imagePtr = KMeans_MultiGaussian_RunCPP(cPtr, src.Rows, src.Cols);
+            if (imagePtr != IntPtr.Zero && task.heartBeat)
+                dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone();
+        }
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero)
+                cPtr = KMeans_MultiGaussian_Close(cPtr);
+        }
+    }
+    public class CS_KMeans_CustomData : CS_Parent
+    {
+        KMeans_Basics km = new KMeans_Basics();
+        public Mat centers = new Mat();
+        Random_Basics random = new Random_Basics();
+        System.Windows.Forms.TrackBar randslider;
+        public CS_KMeans_CustomData(VBtask task) : base(task)
+        {
+            randslider = FindSlider("Random Pixel Count");
+            desc = "Cluster the selected input using kMeans";
+        }
+        public void RunCS(Mat src)
+        {
+            km.options.RunVB();
+            int k = km.options.kMeansK;
+            if (src.Rows < k) k = src.Rows;
+            if (standaloneTest())
+            {
+                if (task.FirstPass) randslider.Value = 50;
+                if (randslider.Value < k) randslider.Value = k;
+                if (task.heartBeat) random.Run(empty);
+                var input = new List<float>();
+                foreach (var pt in random.PointList)
+                {
+                    input.Add(pt.X);
+                    input.Add(pt.Y);
+                }
+                dst0 = new Mat(input.Count(), 1, MatType.CV_32F, input.ToArray());
+            }
+            km.Run(dst0);
+            dst2 = ShowPalette(km.dst2 * 255 / km.classCount);
+        }
+    }
+    public class CS_KMeans_Simple_CPP : CS_Parent
+    {
+        public CS_KMeans_Simple_CPP(VBtask task) : base(task)
+        {
+            cPtr = Kmeans_Simple_Open();
+            desc = "Split the input into 3 levels - zero (no depth), closer to min, closer to max.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest()) src = task.pcSplit[2];
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            var mm = GetMinMax(src, task.depthMask);
+            byte[] cppData = new byte[src.Total() * src.ElemSize()];
+            Marshal.Copy(src.Data, cppData, 0, cppData.Length);
+            GCHandle handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned);
+            IntPtr imagePtr = Kmeans_Simple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, (float)mm.minVal, task.gOptions.getMaxDepthBar());
+            handleSrc.Free();
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr);
+            SetTrueText("Use 'Max Depth' in the global options to set the boundary between blue and yellow.", 3);
+        }
+        public void Close()
+        {
+            if (cPtr != IntPtr.Zero)
+                cPtr = Kmeans_Simple_Close(cPtr);
+        }
+    }
+    public class CS_KMeans_Edges : CS_Parent
+    {
+        Edge_Canny edges = new Edge_Canny();
+        public KMeans_Image km = new KMeans_Image();
+        public int classCount;
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_KMeans_Edges(VBtask task) : base(task)
+        {
+            task.redOptions.setUseColorOnly(true);
+            labels[3] = "KMeans with edges output";
+            desc = "Use edges to isolate regions in the KMeans output - not much different from KMeans_Basics.";
+        }
+        public void RunCS(Mat src)
+        {
+            edges.Run(src);
+            src.SetTo(Scalar.White, edges.dst2);
+            km.Run(src);
+            dst3 = km.dst2 + 1;
+            classCount = km.classCount;
+            redC.Run(dst3);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[3];
+        }
+    }
+    public class CS_KMeans_CompareMulti : CS_Parent
+    {
+        KMeans_Image km = new KMeans_Image();
+        KMeans_MultiChannel multi = new KMeans_MultiChannel();
+        public CS_KMeans_CompareMulti(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "KMeans_Basics output", "KMeans on all 3 channels - recombined" };
+            desc = "Compare the results of using grayscale KMeans with multi-channel KMeans";
+        }
+        public void RunCS(Mat src)
+        {
+            km.Run(src);
+            dst2 = km.dst2;
+            dst2 = ShowPalette(dst2);
+            multi.Run(src);
+            dst3 = multi.dst2;
+            labels[2] = "";
+        }
+    }
+    public class CS_KMeans_TierCount : CS_Parent
+    {
+        KMeans_Basics km = new KMeans_Basics();
+        Depth_TierCount kCount = new Depth_TierCount();
+        public int classCount;
+        System.Windows.Forms.TrackBar kSlider;
+        public CS_KMeans_TierCount(VBtask task) : base(task)
+        {
+            kSlider = FindSlider("KMeans k");
+            desc = "Use the Histogram valleys to find the best 'K' value for the current depth data";
+        }
+        public void RunCS(Mat src)
+        {
+            kCount.Run(src);
+            if (kSlider.Value != kCount.classCount) kSlider.Value = Math.Max(kCount.classCount, kSlider.Minimum);
+            classCount = kCount.classCount;
+            km.Run(task.pcSplit[2]);
+            dst2 = km.dst2 * 255 / km.classCount;
+            dst2.SetTo(0, task.noDepthMask);
+            dst3 = ShowPalette(dst2);
+            labels[2] = "There were " + classCount.ToString() + " tiers (on average) found in the depth valleys histogram.";
+        }
+    }
+    public class CS_KMeans_Image : CS_Parent
+    {
+        public KMeans_Basics km = new KMeans_Basics();
+        public List<Mat> masks = new List<Mat>();
+        public List<int> counts = new List<int>();
+        public int classCount;
+        int maskIndex;
+        public CS_KMeans_Image(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "KMeans output after Palette run", "Each of the KMeans masks is displayed below in rotation." };
+            desc = "Cluster the input image pixels using kMeans and allow any region to be selected for highlight in dst3.";
+        }
+        public void RunCS(Mat src)
+        {
+            km.Run(src);
+            dst2 = ShowPalette(km.dst2 * 255 / km.classCount);
+            classCount = km.options.kMeansK;
+            masks.Clear();
+            counts.Clear();
+            int k = km.options.kMeansK;
+            for (int i = 0; i < k; i++)
+            {
+                Mat mask = km.dst2.InRange(i, i);
+                masks.Add(mask);
+                counts.Add(mask.CountNonZero());
+            }
+            if (task.heartBeat) maskIndex++;
+            if (maskIndex >= masks.Count()) maskIndex = 0;
+            dst3 = masks[maskIndex];
+        }
+    }
+    public class CS_KMeans_DepthPlusGray : CS_Parent
+    {
+        KMeans_Basics km = new KMeans_Basics();
+        Mat[] grayPlus = new Mat[2];
+        public CS_KMeans_DepthPlusGray(VBtask task) : base(task)
+        {
+            km.buildPaletteOutput = false;
+            labels[3] = "KMeans 8-bit results";
+            grayPlus[0] = new Mat(task.WorkingRes, MatType.CV_32F, 0);
+            desc = "Cluster the rgb+depth image pixels using kMeans";
+        }
+        public void RunCS(Mat src)
+        {
+            src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertTo(grayPlus[0], MatType.CV_32F);
+            grayPlus[0].SetTo(0, task.noDepthMask);
+            grayPlus[1] = task.pcSplit[2];
+            Mat merge = new Mat();
+            Cv2.Merge(grayPlus, merge);
+            km.Run(merge);
+            int k = km.options.kMeansK;
+            dst3 = km.dst2;
+            dst3.SetTo(0, task.noDepthMask);
+            if (standaloneTest()) dst2 = ShowPalette(km.dst2 * 255 / k);
+        }
+    }
+    public class CS_KMeans_Dimensions : CS_Parent
+    {
+        public KMeans_Basics km = new KMeans_Basics();
+        System.Windows.Forms.TrackBar dimSlider;
+        public CS_KMeans_Dimensions(VBtask task) : base(task)
+        {
+            dimSlider = FindSlider("Dimension");
+            desc = "Demonstrate how to use KMeans for a variety of dimensions";
+        }
+        public void RunCS(Mat src)
+        {
+            Mat merge = new Mat();
+            switch (dimSlider.Value)
+            {
+                case 1: // grayscale
+                    if (src.Channels() == 1)
+                    {
+                        src.ConvertTo(merge, MatType.CV_32F);
+                    }
+                    else
+                    {
+                        src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertTo(merge, MatType.CV_32F);
+                    }
+                    break;
+                case 2: // pointcloud x and y
+                    Cv2.Merge(new Mat[] { task.pcSplit[0], task.pcSplit[1] }, merge);
+                    break;
+                case 3: // pointcloud dimensions
+                    merge = task.pointCloud;
+                    break;
+                case 4: // color + depth
+                    src.ConvertTo(src, MatType.CV_32F);
+                    task.pcSplit[2] = task.pcSplit[2].Normalize(0, 255, NormTypes.MinMax);
+                    Cv2.Merge(new Mat[] { src, task.pcSplit[2] }, merge);
+                    break;
+                case 5: // color + pcSplit(0) and pcSplit(1)
+                    src.ConvertTo(src, MatType.CV_32F);
+                    task.pcSplit[0] = task.pcSplit[0].Normalize(0, 255, NormTypes.MinMax);
+                    task.pcSplit[1] = task.pcSplit[1].Normalize(0, 255, NormTypes.MinMax);
+                    Cv2.Merge(new Mat[] { src, task.pcSplit[0], task.pcSplit[1] }, merge);
+                    break;
+                case 6: // color + pointcloud
+                    src.ConvertTo(src, MatType.CV_32F);
+                    Mat tmp1 = task.pcSplit[0].Normalize(0, 255, NormTypes.MinMax);
+                    Mat tmp2 = task.pcSplit[1].Normalize(0, 255, NormTypes.MinMax);
+                    Mat tmp3 = task.pcSplit[2].Normalize(0, 255, NormTypes.MinMax);
+                    Cv2.Merge(new Mat[] { src, tmp1, tmp2, tmp3 }, merge);
+                    break;
+            }
+            km.Run(merge);
+            labels[2] = "Dimension = " + dimSlider.Value.ToString();
+            labels[3] = labels[2];
+            dst2 = km.dst2 + 1;
+            dst3 = ShowPalette(dst2 * 255 / km.classCount);
+        }
+    }
+    public class CS_KMeans_Valleys : CS_Parent
+    {
+        KMeans_Basics km = new KMeans_Basics();
+        KMeans_TierCount tiers = new KMeans_TierCount();
+        System.Windows.Forms.TrackBar kSlider;
+        public CS_KMeans_Valleys(VBtask task) : base(task)
+        {
+            kSlider = FindSlider("KMeans k");
+            labels[2] = "8-Bit input to vbPalette output in dst3";
+            desc = "Cluster depth using kMeans - use KMeans_TierCount to determine 'K'";
+        }
+        public void RunCS(Mat src)
+        {
+            tiers.Run(src);
+            kSlider.Value = tiers.classCount;
+            int kMeansK = kSlider.Value;
+            km.Run(task.pcSplit[2]);
+            dst2 = km.dst2 + 1;
+            dst3 = ShowPalette(dst2 * 255 / tiers.classCount);
+            dst3.SetTo(0, task.noDepthMask);
+        }
+    }
+    public class CS_KMeans_Depth : CS_Parent
+    {
+        public KMeans_Basics km = new KMeans_Basics();
+        public int classCount;
+        public CS_KMeans_Depth(VBtask task) : base(task)
+        {
+            FindSlider("KMeans k").Value = 10;
+            labels[2] = "";
+            desc = "Cluster depth using kMeans - useful to split foreground and background";
+        }
+        public void RunCS(Mat src)
+        {
+            km.Run(task.pcSplit[2]);
+            dst2 = km.dst2 + 1;
+            dst2.SetTo(0, task.noDepthMask);
+            classCount = km.classCount;
+            dst3 = ShowPalette(dst2 * 255 / classCount);
+            labels[2] = "Palettized version of the " + classCount.ToString() + " 8UC1 classes";
+        }
+    }
+    public class CS_KMeans_SimKColor : CS_Parent
+    {
+        Hist3Dcolor_PlotHist1D plot1D = new Hist3Dcolor_PlotHist1D();
+        Hist3D_BuildHistogram simK = new Hist3D_BuildHistogram();
+        public int classCount;
+        Mat histogram = new Mat();
+        public CS_KMeans_SimKColor(VBtask task) : base(task)
+        {
+            desc = "Use the gaps in the 3D histogram of the color image to find 'k' and backproject the results.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                plot1D.Run(src);
+                dst3 = plot1D.dst2;
+                labels[3] = "The 3D histogram of the RGB image stream in 1D - note the number of gaps";
+                simK.Run(plot1D.histogram1D);
+                histogram = simK.dst2;
+                classCount = simK.classCount;
+            }
+            Cv2.CalcBackProject(new Mat[] { src }, new int[] { 0, 1, 2 }, histogram, dst1, task.redOptions.rangesBGR);
+            dst2 = ShowPalette(dst1 * 255 / classCount);
+            labels[2] = simK.labels[2] + " with " + task.redOptions.getHistBins3D().ToString() + " histogram bins";
+        }
+    }
+    public class CS_KMeans_SimKDepth : CS_Parent
+    {
+        Hist3Dcloud_PlotHist1D plot1D = new Hist3Dcloud_PlotHist1D();
+        Hist3D_BuildHistogram simK = new Hist3D_BuildHistogram();
+        public int classCount;
+        public CS_KMeans_SimKDepth(VBtask task) : base(task)
+        {
+            desc = "Use the gaps in the 3D histogram of depth to find simK and backproject the results.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (src.Type() != MatType.CV_32FC3) src = task.pointCloud;
+            if (task.heartBeat)
+            {
+                plot1D.Run(src);
+                dst3 = plot1D.dst2;
+                labels[3] = "The 3D histogram of the depth stream in 1D";
+                simK.Run(plot1D.histogram);
+                plot1D.histogram = simK.dst2;
+                classCount = simK.classCount;
+            }
+            Cv2.CalcBackProject(new Mat[] { src }, new int[] { 2 }, plot1D.histogram, dst1, task.redOptions.rangesCloud);
+            dst1 = dst1.ConvertScaleAbs();
+            dst2 = ShowPalette(dst1 * 255 / classCount);
+            labels[2] = simK.labels[2] + " with " + task.redOptions.getHistBins3D().ToString() + " histogram bins";
+        }
+    }
 
 
 

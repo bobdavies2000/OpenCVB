@@ -2783,9 +2783,12 @@ Public Class Options_KMeans : Inherits VB_Parent
     Public kMeansFlag As cv.KMeansFlags
     Public kMeansK As Integer = 5
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("KMeans k", 2, 32, kMeansK)
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("KMeans k", 2, 32, kMeansK)
+            sliders.setupTrackBar("Dimension", 1, 6, 1)
+        End If
 
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Use PpCenters")
             radio.addRadio("Use RandomCenters")
