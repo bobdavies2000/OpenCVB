@@ -6408,3 +6408,25 @@ Public Class Options_LeftRight : Inherits VB_Parent
         sliceHeight = hSlider.Value
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Options_LongLine : Inherits VB_Parent
+    Public maxCount As Integer
+    Public pad As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Number of lines to display", 0, 100, 25)
+            sliders.setupTrackBar("Reduction for width/height in pixels", 1, 20, 3)
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static countSlider = FindSlider("Number of lines to display")
+        Static searchSlider = FindSlider("Reduction for width/height in pixels")
+        maxCount = countSlider.value
+        pad = searchSlider.Value
+    End Sub
+End Class

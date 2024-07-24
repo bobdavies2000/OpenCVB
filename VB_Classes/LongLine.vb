@@ -2,8 +2,8 @@
 Public Class LongLine_Basics : Inherits VB_Parent
     Public lines As New LongLine_Core
     Public lpList As New List(Of PointPair)
+    Dim options As New Options_LongLine
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Number of lines to display", 0, 100, 25)
         lines.lineCount = 1000
         desc = "Identify the longest lines"
     End Sub
@@ -29,8 +29,7 @@ Public Class LongLine_Basics : Inherits VB_Parent
         Return New PointPair(New cv.Point(lp.p1.X, 0), New cv.Point(lp.p1.X, dst2.Height))
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static countSlider = FindSlider("Number of lines to display")
-        Dim maxCount = countSlider.value
+        options.RunVB()
 
         dst2 = src.Clone
         lines.Run(src)
@@ -41,7 +40,7 @@ Public Class LongLine_Basics : Inherits VB_Parent
             DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.White)
             If lp.p1.X > lp.p2.X Then lp = New PointPair(lp.p2, lp.p1)
             lpList.Add(lp)
-            If lpList.Count >= maxCount Then Exit For
+            If lpList.Count >= options.maxCount Then Exit For
         Next
 
         labels(2) = $"{lines.lpList.Count} lines found, longest {lpList.Count} displayed."
@@ -200,22 +199,21 @@ End Class
 
 Public Class LongLine_Match : Inherits VB_Parent
     Dim longest As New LongLine_Consistent
+    Dim options As New Options_LongLine
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Reduction for width/height in pixels", 1, 20, 3)
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, 0)
         desc = "Find the longest line from last image and use matchTemplate to find the line in the latest image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static searchSlider = FindSlider("Reduction for width/height in pixels")
-        Dim pad = searchSlider.Value
+        options.RunVB()
 
         longest.Run(src)
         dst2 = longest.dst2
 
         Dim lp = longest.ptLong
 
-        Dim x1 = Math.Min(lp.p1.X - pad, lp.p2.X - pad), x2 = Math.Max(lp.p1.X + pad, lp.p2.X + pad)
-        Dim y1 = Math.Min(lp.p1.Y - pad, lp.p2.Y - pad), y2 = Math.Max(lp.p1.Y + pad, lp.p2.Y + pad)
+        Dim x1 = Math.Min(lp.p1.X - options.pad, lp.p2.X - options.pad), x2 = Math.Max(lp.p1.X + options.pad, lp.p2.X + options.pad)
+        Dim y1 = Math.Min(lp.p1.Y - options.pad, lp.p2.Y - options.pad), y2 = Math.Max(lp.p1.Y + options.pad, lp.p2.Y + options.pad)
         Dim rect = ValidateRect(New cv.Rect(Math.Min(x1, x2), Math.Min(y1, y2), Math.Abs(x1 - x2), Math.Abs(y1 - y2)))
         dst2.Rectangle(rect, task.HighlightColor, task.lineWidth)
 

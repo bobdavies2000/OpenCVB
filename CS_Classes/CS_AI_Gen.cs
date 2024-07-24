@@ -30223,7 +30223,7 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 DrawLine(dst2, lp.p1, lp.p2, Scalar.Yellow);
                 var saveP1 = lp.p1;
                 var saveP2 = lp.p2;
-                var emps = longLine.buildLongLine(lp);
+                var emps = longLine.BuildLongLine(lp);
                 if (emps.p1.X == 0) leftIntercepts.Add((int)saveP1.Y, index);
                 if (emps.p1.Y == 0) topIntercepts.Add((int)saveP1.X, index);
                 if (emps.p1.X == dst2.Width) rightIntercepts.Add((int)saveP1.Y, index);
@@ -31138,17 +31138,882 @@ public class CS_ApproxPoly_Basics : CS_Parent
                 labels[2] = lines.labels[2];
             }
         }
-
-
-
-
-
-
-
-
-
-
-
+    public class CS_Line3D_Draw : CS_Parent
+    {
+        public cv.Point p1, p2;
+        Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
+        bool toggleFirstSecond;
+        public CS_Line3D_Draw(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            plot.plotCount = 2;
+            dst0 = new Mat(dst0.Size(), MatType.CV_8U, 0);
+            dst1 = new Mat(dst1.Size(), MatType.CV_32F, 0);
+            p1 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+            p2 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+            labels[2] = "Click twice in the image below to draw a line and that line's depth is correlated in X to Z and Y to Z in the plot at right";
+            desc = "Determine where a 3D line is close to the real depth data";
+        }
+        float findCorrelation(Mat pts1, Mat pts2)
+        {
+            Mat correlationMat = new Mat();
+            Cv2.MatchTemplate(pts1, pts2, correlationMat, TemplateMatchModes.CCoeffNormed);
+            return correlationMat.At<float>(0, 0);
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest())
+            {
+                if (task.mouseClickFlag)
+                {
+                    if (!toggleFirstSecond)
+                    {
+                        p1 = task.ClickPoint;
+                    }
+                    else
+                    {
+                        p2 = task.ClickPoint;
+                        toggleFirstSecond = false;
+                    }
+                }
+            }
+            if (toggleFirstSecond) return; // wait until the second point is selected...
+            dst1 = src;
+            DrawLine(dst1, p1, p2, task.HighlightColor);
+            dst0.SetTo(0);
+            DrawLine(dst0, p1, p2, 255);
+            dst1.SetTo(0);
+            task.pcSplit[0].CopyTo(dst1, dst0);
+            var points = dst1.FindNonZero();
+            var nextList = new List<Point3f>();
+            for (int i = 0; i < points.Rows; i++)
+            {
+                var pt = points.At<Point>(i, 0);
+                nextList.Add(task.pointCloud.At<Point3f>(pt.Y, pt.X));
+            }
+            if (nextList.Count() == 0) return; // line is completely in area with no depth.
+            var pts = new Mat(nextList.Count(), 1, MatType.CV_32FC3, nextList.ToArray());
+            var zSplit = pts.Split();
+            var c1 = findCorrelation(zSplit[0], zSplit[2]);
+            var c2 = findCorrelation(zSplit[1], zSplit[2]);
+            plot.plotData = new Scalar(c1, c2, 0);
+            plot.Run(empty);
+            dst2 = plot.dst2;
+            dst3 = plot.dst3;
+            labels[3] = "using " + nextList.Count() + " points, the correlation of X to Z = " + c1.ToString("F3") + " (blue), correlation of Y to Z = " + c2.ToString("F3") + " (green)";
+        }
     }
+    public class CS_Line3D_Checks : CS_Parent
+    {
+        PointCloud_Basics pts = new PointCloud_Basics();
+        public List<Point3f> pcLines = new List<Point3f>();
+        public CS_Line3D_Checks(VBtask task) : base(task)
+        {
+            desc = "Use the first and last points in the sequence to build a single line and then check it against the rest of the sequence.";
+        }
+        public void RunCS(Mat src)
+        {
+            pts.Run(src);
+            dst3 = pts.dst2;
+            pcLines.Clear();
+            for (int y = 0; y < task.gridRows; y++)
+            {
+                var vecList = new List<Point3f>();
+                for (int x = 0; x < task.gridCols; x++)
+                {
+                    var vec = pts.dst3.At<Point3f>(y, x);
+                    if (vec.Z > 0)
+                    {
+                        vecList.Add(vec);
+                    }
+                    else
+                    {
+                        if (vecList.Count() > 2)
+                        {
+                            pcLines.Add(new Point3f(1, 1, 1));
+                            pcLines.Add(vecList[0]);
+                            pcLines.Add(vecList[vecList.Count() - 1]);
+                        }
+                        vecList.Clear();
+                    }
+                }
+            }
+        }
+    }
+    public class CS_Line3D_CandidatesFirstLast : CS_Parent
+    {
+        PointCloud_Basics pts = new PointCloud_Basics();
+        public List<Point3f> pcLines = new List<Point3f>();
+        public Mat pcLinesMat;
+        public int actualCount;
+        public CS_Line3D_CandidatesFirstLast(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Get a list of points from PointCloud_Basics.  Identify first and last as the line in the sequence";
+        }
+        void addLines(List<List<Point3f>> nextList, List<List<Point>> xyList)
+        {
+            var white32 = new Point3f(1, 1, 1);
+            for (int i = 0; i < nextList.Count(); i++)
+            {
+                pcLines.Add(white32);
+                pcLines.Add(nextList[i][0]);
+                pcLines.Add(nextList[i][nextList[i].Count() - 1]);
+            }
+            foreach (var ptlist in xyList)
+            {
+                var p1 = ptlist[0];
+                var p2 = ptlist[ptlist.Count() - 1];
+                DrawLine(dst2, p1, p2, Scalar.White);
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            pts.Run(src);
+            dst2 = pts.dst2;
+            pcLines.Clear();
+            addLines(pts.hList, pts.xyHList);
+            addLines(pts.vList, pts.xyVList);
+            pcLinesMat = new Mat(pcLines.Count(), 1, MatType.CV_32FC3, pcLines.ToArray());
+            labels[2] = "Point series found = " + (pts.hList.Count() + pts.vList.Count());
+        }
+    }
+    public class CS_Line3D_CandidatesAll : CS_Parent
+    {
+        PointCloud_Basics pts = new PointCloud_Basics();
+        public List<Point3f> pcLines = new List<Point3f>();
+        public Mat pcLinesMat;
+        public int actualCount;
+        Point3f white32 = new Point3f(1, 1, 1);
+        public CS_Line3D_CandidatesAll(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Get a list of points from PointCloud_Basics.  Identify all the lines in the sequence";
+        }
+        void addLines(List<List<Point3f>> nextList, List<List<Point>> xyList)
+        {
+            for (int i = 0; i < nextList.Count(); i++)
+            {
+                for (int j = 0; j < nextList[i].Count() - 1; j++)
+                {
+                    pcLines.Add(white32);
+                    pcLines.Add(nextList[i][j]);
+                    pcLines.Add(nextList[i][j + 1]);
+                }
+            }
+            foreach (var ptlist in xyList)
+            {
+                for (int i = 0; i < ptlist.Count() - 1; i++)
+                {
+                    var p1 = ptlist[i];
+                    var p2 = ptlist[i + 1];
+                    DrawLine(dst2, p1, p2, Scalar.White);
+                }
+            }
+        }
+        public void RunCS(Mat src)
+        {
+            pts.Run(src);
+            dst2 = pts.dst2;
+            pcLines.Clear();
+            addLines(pts.hList, pts.xyHList);
+            addLines(pts.vList, pts.xyVList);
+            pcLinesMat = new Mat(pcLines.Count(), 1, MatType.CV_32FC3, pcLines.ToArray());
+            labels[2] = "Point series found = " + (pts.hList.Count() + pts.vList.Count());
+        }
+    }
+    public class CS_LinearRegression_Basics : CS_Parent
+    {
+        public List<float> x = new List<float>();
+        public List<float> y = new List<float>();
+        public cv.Point p1, p2;
+        public CS_LinearRegression_Basics(VBtask task) : base(task)
+        {
+            desc = "A simple example of using OpenCV's linear regression.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standalone)
+            {
+                x = new List<float> { 1, 2, 3, 4, 5 };
+                y = new List<float> { 2, 4, 5, 4, 5 };
+            }
+            if (x.Count() == 0) return; // nothing supplied - happens when the horizon is off the image.
+            var meanX = x.Average();
+            var meanY = y.Average();
+            float numerator = 0, denominator = 0;
+            for (int i = 0; i < x.Count(); i++)
+            {
+                numerator += (x[i] - meanX) * (y[i] - meanY);
+                denominator += (float)Math.Pow(x[i] - meanX, 2);
+            }
+            var m = numerator / denominator;
+            var c = meanY - m * meanX;
+            p1 = new cv.Point(0, (int)c);
+            p2 = new cv.Point(dst2.Width, (int)(m * dst2.Width + c));
+            dst2.SetTo(0);
+            DrawLine(dst2, p1, p2, Scalar.White);
+            for (int i = 0; i < x.Count(); i++)
+            {
+                var pt = new cv.Point(x[i], y[i]);
+                DrawCircle(dst2, pt, task.DotSize, Scalar.Red);
+            }
+        }
+    }
+    public class CS_LinearRegression_Test : CS_Parent
+    {
+        LinearRegression_Basics regress = new LinearRegression_Basics();
+        public CS_LinearRegression_Test(VBtask task) : base(task)
+        {
+            desc = "A simple example of using OpenCV's linear regression.";
+        }
+        public void RunCS(Mat src)
+        {
+            var x = new List<float> { 1, 2, 3, 4, 5 };
+            var y = new List<float> { 2, 4, 5, 4, 5 };
+            regress.x.Clear();
+            regress.y.Clear();
+            for (int i = 0; i < x.Count(); i++)
+            {
+                regress.x.Add(x[i]);
+                regress.y.Add(y[i]);
+            }
+            regress.Run(null);
+            dst2 = regress.dst2;
+        }
+    }
+    public class CS_LinearRegression_Random : CS_Parent
+    {
+        LinearRegression_Basics regress = new LinearRegression_Basics();
+        Random_Basics random = new Random_Basics();
+        public CS_LinearRegression_Random(VBtask task) : base(task)
+        {
+            desc = "A simple example of using OpenCV's linear regression.";
+        }
+        public void RunCS(Mat src)
+        {
+            random.Run(null);
+            regress.x.Clear();
+            regress.y.Clear();
+            for (int i = 0; i < random.PointList.Count(); i++)
+            {
+                regress.x.Add(random.PointList[i].X);
+                regress.y.Add(random.PointList[i].Y);
+            }
+            regress.Run(null);
+            dst2 = regress.dst2;
+        }
+    }
+    public class CS_LineCoin_Basics : CS_Parent
+    {
+        public LongLine_Basics longLines = new LongLine_Basics();
+        public List<PointPair> lpList = new List<PointPair>();
+        List<List<PointPair>> lpLists = new List<List<PointPair>>();
+        public CS_LineCoin_Basics(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "Find the coincident lines in the image and measure their value.";
+        }
+        public List<PointPair> findLines(List<List<PointPair>> lpLists)
+        {
+            var p1List = new List<Point>();
+            var p2List = new List<Point>();
+            var ptCounts = new List<int>();
+            PointPair lp;
+            foreach (var lpList in lpLists)
+            {
+                foreach (var mp in lpList)
+                {
+                    mp.slope = (int)(mp.slope * 10) / 10;
+                    if (mp.slope == 0)
+                    {
+                        lp = new PointPair(new cv.Point(mp.p1.X, 0), new cv.Point(mp.p1.X, dst2.Height));
+                    }
+                    else
+                    {
+                        lp = longLines.BuildLongLine(mp);
+                    }
+                    int index = p1List.IndexOf(new cv.Point((int)lp.p1.X, (int)lp.p1.Y));
+                    if (index >= 0)
+                    {
+                        ptCounts[index] += 1;
+                    }
+                    else
+                    {
+                        p1List.Add(new cv.Point((int)lp.p1.X, (int)lp.p1.Y));
+                        p2List.Add(new cv.Point((int)lp.p2.X, (int)lp.p2.Y));
+                        ptCounts.Add(1);
+                    }
+                }
+            }
+            lpList.Clear();
+            dst2.SetTo(0);
+            for (int i = 0; i < p1List.Count(); i++)
+            {
+                if (ptCounts[i] >= task.frameHistoryCount)
+                {
+                    DrawLine(dst2, p1List[i], p2List[i], 255);
+                    lpList.Add(new PointPair(p1List[i], p2List[i]));
+                }
+            }
+            if (lpLists.Count() >= task.frameHistoryCount) lpLists.RemoveAt(0);
+            return lpList;
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.optionsChanged) lpLists.Clear();
+            longLines.Run(src);
+            lpLists.Add(longLines.lpList);
+            lpList = findLines(lpLists);
+            if (standaloneTest())
+            {
+                dst3 = src;
+                foreach (var lp in lpList)
+                {
+                    DrawLine(dst3, lp.p1, lp.p2, Scalar.White);
+                }
+            }
+            labels[2] = $"The {lpList.Count()} lines below were present in each of the last " + task.frameHistoryCount.ToString() + " frames";
+        }
+    }
+    public class CS_LineCoin_HistoryIntercept : CS_Parent
+    {
+        LineCoin_Basics coin = new LineCoin_Basics();
+        public List<PointPair> lpList = new List<PointPair>();
+        List<List<PointPair>> mpLists = new List<List<PointPair>>();
+        public CS_LineCoin_HistoryIntercept(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst3.Size(), MatType.CV_8U, 0);
+            desc = "find lines with coincident slopes and intercepts.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.optionsChanged) mpLists.Clear();
+            coin.Run(src);
+            dst2 = coin.dst2;
+            labels[2] = $"The {lpList.Count()} lines below were present in each of the last " + task.frameHistoryCount.ToString() + " frames";
+        }
+    }
+    public class CS_LineCoin_Parallel : CS_Parent
+    {
+        LongLine_ExtendParallel parallel = new LongLine_ExtendParallel();
+        Line_Nearest near = new Line_Nearest();
+        public List<coinPoints> coinList = new List<coinPoints>();
+        public CS_LineCoin_Parallel(VBtask task) : base(task)
+        {
+            desc = "Find the lines that are coincident in the parallel lines";
+        }
+        public void RunCS(Mat src)
+        {
+            parallel.Run(src);
+            coinList.Clear();
+            foreach (var cp in parallel.parList)
+            {
+                near.lp = new PointPair(cp.p1, cp.p2);
+                near.pt = cp.p3;
+                near.Run(empty);
+                double d1 = near.distance;
+                near.pt = cp.p4;
+                near.Run(empty);
+                if (near.distance <= 1 || d1 <= 1) coinList.Add(cp);
+            }
+            dst2 = src.Clone();
+            foreach (var cp in coinList)
+            {
+                dst2.Line(cp.p3, cp.p4, Scalar.Red, task.lineWidth + 2, task.lineType);
+                dst2.Line(cp.p1, cp.p2, task.HighlightColor, task.lineWidth + 1, task.lineType);
+            }
+            labels[2] = coinList.Count().ToString() + " coincident lines were detected";
+        }
+    }
+    public class CS_LongLine_Basics : CS_Parent
+    {
+        public LongLine_Core lines = new LongLine_Core();
+        public List<PointPair> lpList = new List<PointPair>();
+        Options_LongLine options = new Options_LongLine();
+        public CS_LongLine_Basics(VBtask task) : base(task)
+        {
+            lines.lineCount = 1000;
+            desc = "Identify the longest lines";
+        }
+        public PointPair BuildLongLine(PointPair lp)
+        {
+            if (lp.p1.X != lp.p2.X)
+            {
+                double b = lp.p1.Y - lp.p1.X * lp.slope;
+                if (lp.p1.Y == lp.p2.Y)
+                {
+                    return new PointPair(new cv.Point(0, lp.p1.Y), new cv.Point(dst2.Width, lp.p1.Y));
+                }
+                else
+                {
+                    int xint1 = (int)(-b / lp.slope);
+                    int xint2 = (int)((dst2.Height - b) / lp.slope);
+                    int yint1 = (int)b;
+                    int yint2 = (int)(lp.slope * dst2.Width + b);
+                    List<Point> points = new List<Point>();
+                    if (xint1 >= 0 && xint1 <= dst2.Width) points.Add(new cv.Point(xint1, 0));
+                    if (xint2 >= 0 && xint2 <= dst2.Width) points.Add(new cv.Point(xint2, dst2.Height));
+                    if (yint1 >= 0 && yint1 <= dst2.Height) points.Add(new cv.Point(0, yint1));
+                    if (yint2 >= 0 && yint2 <= dst2.Height) points.Add(new cv.Point(dst2.Width, yint2));
+                    return new PointPair(points[0], points[1]);
+                }
+            }
+            return new PointPair(new cv.Point(lp.p1.X, 0), new cv.Point(lp.p1.X, dst2.Height));
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            dst2 = src.Clone();
+            lines.Run(src);
+            lpList.Clear();
+            foreach (var lp in lines.lpList)
+            {
+                PointPair lpTmp = BuildLongLine(lp);
+                DrawLine(dst2, lpTmp.p1, lpTmp.p2, Scalar.White);
+                if (lpTmp.p1.X > lpTmp.p2.X) lpTmp = new PointPair(lpTmp.p2, lpTmp.p1);
+                lpList.Add(lpTmp);
+                if (lpList.Count() >= options.maxCount) break;
+            }
+            labels[2] = $"{lines.lpList.Count()} lines found, longest {lpList.Count()} displayed.";
+        }
+    }
+
+    public class LongLine_Basics : VB_Parent
+    {
+        public LongLine_Core lines = new LongLine_Core();
+        public List<PointPair> lpList = new List<PointPair>();
+        private Options_LongLine options = new Options_LongLine();
+
+        public LongLine_Basics()
+        {
+            lines.lineCount = 1000;
+            desc = "Identify the longest lines";
+        }
+
+        public PointPair BuildLongLine(PointPair lp)
+        {
+            if (lp.p1.X != lp.p2.X)
+            {
+                double b = lp.p1.Y - lp.p1.X * lp.slope;
+                if (lp.p1.Y == lp.p2.Y)
+                {
+                    return new PointPair(new Point(0, lp.p1.Y), new Point(dst2.Width, lp.p1.Y));
+                }
+                else
+                {
+                    int xint1 = (int)(-b / lp.slope);
+                    int xint2 = (int)((dst2.Height - b) / lp.slope);
+                    int yint1 = (int)b;
+                    int yint2 = (int)(lp.slope * dst2.Width + b);
+
+                    List<Point> points = new List<Point>();
+                    if (xint1 >= 0 && xint1 <= dst2.Width) points.Add(new Point(xint1, 0));
+                    if (xint2 >= 0 && xint2 <= dst2.Width) points.Add(new Point(xint2, dst2.Height));
+                    if (yint1 >= 0 && yint1 <= dst2.Height) points.Add(new Point(0, yint1));
+                    if (yint2 >= 0 && yint2 <= dst2.Height) points.Add(new Point(dst2.Width, yint2));
+                    return new PointPair(points[0], points[1]);
+                }
+            }
+            return new PointPair(new Point(lp.p1.X, 0), new Point(lp.p1.X, dst2.Height));
+        }
+
+        public void RunVB(Mat src)
+        {
+            options.RunVB();
+
+            dst2 = src.Clone();
+            lines.Run(src);
+
+            lpList.Clear();
+            foreach (var lp in lines.lpList)
+            {
+                PointPair lpTmp = BuildLongLine(lp);
+                DrawLine(dst2, lpTmp.p1, lpTmp.p2, Scalar.White);
+                if (lpTmp.p1.X > lpTmp.p2.X) lpTmp = new PointPair(lpTmp.p2, lpTmp.p1);
+                lpList.Add(lpTmp);
+                if (lpList.Count >= options.maxCount) break;
+            }
+
+            labels[2] = $"{lines.lpList.Count} lines found, longest {lpList.Count} displayed.";
+        }
+    }
+
+    public class CS_LongLine_Core : CS_Parent
+    {
+        public Line_Basics lines = new Line_Basics();
+        public int lineCount = 1; // How many of the longest lines...
+        public List<PointPair> lpList = new List<PointPair>(); // this will be sorted by length - longest first
+        public CS_LongLine_Core(VBtask task) : base(task)
+        {
+            desc = "Isolate the longest X lines.";
+        }
+        public void RunCS(Mat src)
+        {
+            lines.Run(src);
+            dst2 = lines.dst2;
+            if (lines.lpList.Count() == 0) return;
+            dst2 = src;
+            lpList.Clear();
+            foreach (var lp in lines.lpList)
+            {
+                lpList.Add(lp);
+                DrawLine(dst2, lp.p1, lp.p2, task.HighlightColor);
+                if (lpList.Count() >= lineCount) break;
+            }
+        }
+    }
+    public class CS_LongLine_Depth : CS_Parent
+    {
+        LongLine_Consistent longLine = new LongLine_Consistent();
+        Plot_OverTimeScalar plot = new Plot_OverTimeScalar();
+        Kalman_Basics kalman = new Kalman_Basics();
+        public CS_LongLine_Depth(VBtask task) : base(task)
+        {
+            if (standaloneTest()) task.gOptions.setDisplay1();
+            dst0 = new Mat(dst0.Size(), MatType.CV_8U, 0);
+            plot.dst2 = dst3;
+            desc = "Find the longest line in BGR and use it to measure the average depth for the line";
+        }
+        public void RunCS(Mat src)
+        {
+            longLine.Run(src.Clone());
+            dst1 = src;
+            DrawLine(dst1, longLine.ptLong.p1, longLine.ptLong.p2, Scalar.Yellow, task.lineWidth + 2);
+            dst0.SetTo(0);
+            DrawLine(dst0, longLine.ptLong.p1, longLine.ptLong.p2, 255, 3);
+            dst0.SetTo(0, task.noDepthMask);
+            var mm = GetMinMax(task.pcSplit[2], dst0);
+            kalman.kInput = new float[] { mm.minLoc.X, mm.minLoc.Y, mm.maxLoc.X, mm.maxLoc.Y };
+            kalman.Run(empty);
+            mm.minLoc = new cv.Point(kalman.kOutput[0], kalman.kOutput[1]);
+            mm.maxLoc = new cv.Point(kalman.kOutput[2], kalman.kOutput[3]);
+            DrawCircle(dst1, mm.minLoc, task.DotSize, Scalar.Red);
+            DrawCircle(dst1, mm.maxLoc, task.DotSize, Scalar.Blue);
+            SetTrueText($"{mm.minVal:F1}m", new cv.Point(mm.minLoc.X + 5, mm.minLoc.Y), 1);
+            SetTrueText($"{mm.maxVal:F1}m", new cv.Point(mm.maxLoc.X + 5, mm.maxLoc.Y), 1);
+            var depth = task.pcSplit[2].Mean(dst0)[0];
+            SetTrueText($"Average Depth = {depth:F1}m", new cv.Point((longLine.ptLong.p1.X + longLine.ptLong.p2.X) / 2 + 30,
+                                                                     (longLine.ptLong.p1.Y + longLine.ptLong.p2.Y) / 2), 1);
+            labels[3] = $"Mean (blue)/Min (green)/Max (red) = {depth:F1}/{mm.minVal:F1}/{mm.maxVal:F1} meters ";
+            plot.plotData = new Scalar(depth, mm.minVal, mm.maxVal);
+            plot.Run(empty);
+            dst2 = plot.dst2;
+            dst3 = plot.dst3;
+        }
+    }
+    public class CS_LongLine_Consistent : CS_Parent
+    {
+        LongLine_Core longest = new LongLine_Core();
+        public PointPair ptLong;
+        public CS_LongLine_Consistent(VBtask task) : base(task)
+        {
+            longest.lineCount = 4;
+            desc = "Isolate the line that is consistently among the longest lines present in the image.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = src.Clone();
+            longest.Run(src);
+            if (longest.lpList.Count() == 0) return;
+            if (ptLong == null) ptLong = longest.lpList[0];
+            var minDistance = float.MaxValue;
+            PointPair lpMin = null;
+            foreach (var lp in longest.lpList)
+            {
+                var distance = lp.p1.DistanceTo(ptLong.p1) + lp.p2.DistanceTo(ptLong.p2);
+                if (distance < minDistance)
+                {
+                    minDistance = (float)distance;
+                    lpMin = lp;
+                }
+            }
+            labels[2] = $"minDistance = {minDistance:F1}";
+            DrawLine(dst2, ptLong.p1, ptLong.p2, task.HighlightColor);
+            ptLong = lpMin;
+        }
+    }
+    public class CS_LongLine_Point : CS_Parent
+    {
+        LongLine_Consistent longLine = new LongLine_Consistent();
+        Kalman_Basics kalman = new Kalman_Basics();
+        public cv.Point longPt;
+        public CS_LongLine_Point(VBtask task) : base(task)
+        {
+            desc = "Isolate the line that is consistently among the longest lines present in the image and then kalmanize the mid-point";
+        }
+        public void RunCS(Mat src)
+        {
+            longLine.Run(src);
+            dst2 = longLine.dst2;
+            var lp = longLine.ptLong;
+            kalman.kInput = new float[] { lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y };
+            kalman.Run(empty);
+            lp.p1 = new cv.Point(kalman.kOutput[0], kalman.kOutput[1]);
+            lp.p2 = new cv.Point(kalman.kOutput[2], kalman.kOutput[3]);
+            longPt = new cv.Point((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2);
+            DrawCircle(dst2, longPt, task.DotSize, Scalar.Red);
+        }
+    }
+    public class CS_LongLine_Match : CS_Parent
+    {
+        LongLine_Consistent longest = new LongLine_Consistent();
+        Mat template = new cv.Mat();
+        Options_LongLine options = new Options_LongLine();
+        public CS_LongLine_Match(VBtask task) : base(task)
+        {
+            dst3 = new Mat(dst3.Size(), MatType.CV_32F, 0);
+            desc = "Find the longest line from last image and use matchTemplate to find the line in the latest image";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+
+            longest.Run(src);
+            dst2 = longest.dst2;
+            var lp = longest.ptLong;
+            var x1 = Math.Min(lp.p1.X - options.pad, lp.p2.X - options.pad);
+            var x2 = Math.Max(lp.p1.X + options.pad, lp.p2.X + options.pad);
+            var y1 = Math.Min(lp.p1.Y - options.pad, lp.p2.Y - options.pad);
+            var y2 = Math.Max(lp.p1.Y + options.pad, lp.p2.Y + options.pad);
+            var rect = ValidateRect(new Rect((int)Math.Min(x1, x2), (int) Math.Min(y1, y2), (int)Math.Abs(x1 - x2), (int)Math.Abs(y1 - y2)));
+            dst2.Rectangle(rect, task.HighlightColor, task.lineWidth);
+            if (task.FirstPass) template = src[rect].Clone();
+            Cv2.MatchTemplate(template, src, dst0, TemplateMatchModes.CCoeffNormed);
+            var mm = GetMinMax(dst0);
+            mm.maxLoc = new cv.Point(mm.maxLoc.X + rect.Width / 2, mm.maxLoc.Y + rect.Height / 2);
+            DrawCircle(dst2, mm.maxLoc, task.DotSize, Scalar.Red);
+            dst3.SetTo(0);
+            dst0 = dst0.Normalize(0, 255, NormTypes.MinMax);
+            dst0.CopyTo(dst3[new Rect((dst3.Width - dst0.Width) / 2, (dst3.Height - dst0.Height) / 2, dst0.Width, dst0.Height)]);
+            DrawCircle(dst3, mm.maxLoc, task.DotSize, 255);
+            template = src[rect].Clone();
+        }
+    }
+    public class CS_LongLine_ExtendTest : CS_Parent
+    {
+        LongLine_Basics longLine = new LongLine_Basics();
+        public CS_LongLine_ExtendTest(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Random Line drawn", "" };
+            desc = "Test PointPair constructor with random values to make sure lines are extended properly";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.heartBeat)
+            {
+                var p1 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                var p2 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                var mps = new PointPair(p1, p2);
+                var emps = longLine.BuildLongLine(mps);
+                dst2 = src;
+                DrawLine(dst2, emps.p1, emps.p2, task.HighlightColor);
+                DrawCircle(dst2, p1, task.DotSize + 2, Scalar.Red);
+                DrawCircle(dst2, p2, task.DotSize + 2, Scalar.Red);
+            }
+        }
+    }
+    public class CS_LongLine_ExtendAll : CS_Parent
+    {
+        public Line_Basics lines = new Line_Basics();
+        public List<PointPair> lpList = new List<PointPair>();
+        public CS_LongLine_ExtendAll(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Image output from Line_Basics", "The extended line for each line found in Line_Basics" };
+            desc = "Create a list of all the extended lines in an image";
+        }
+        public void RunCS(Mat src)
+        {
+            lines.Run(src);
+            dst2 = lines.dst2;
+            dst3 = src.Clone();
+            lpList.Clear();
+            foreach (var lp in lines.lpList)
+            {
+                lpList.Add(lp);
+                DrawLine(dst3, lp.p1, lp.p2, task.HighlightColor);
+            }
+        }
+    }
+    public class CS_LongLine_ExtendParallel : CS_Parent
+    {
+        LongLine_ExtendAll extendAll = new LongLine_ExtendAll();
+        KNN_Core knn = new KNN_Core();
+        Line_Nearest near = new Line_Nearest();
+        public List<coinPoints> parList = new List<coinPoints>();
+        public CS_LongLine_ExtendParallel(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Image output from Line_Basics", "Parallel extended lines" };
+            desc = "Use KNN to find which lines are near each other and parallel";
+        }
+        public void RunCS(Mat src)
+        {
+            extendAll.Run(src);
+            dst3 = extendAll.dst2;
+            knn.queries.Clear();
+            foreach (var lp in extendAll.lpList)
+            {
+                knn.queries.Add(new Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2));
+            }
+            knn.trainInput = new List<Point2f>(knn.queries);
+            if (knn.queries.Count() == 0) return; // no input...possible in a dark room...
+            knn.Run(empty);
+            dst2 = src.Clone();
+            parList.Clear();
+            var checkList = new List<Point>();
+            for (int i = 0; i <= knn.result.GetUpperBound(0) - 1; i++)
+            {
+                for (int j = 0; j < knn.queries.Count(); j++)
+                {
+                    var index = knn.result[i, j];
+                    if (index >= extendAll.lpList.Count() || index < 0) continue;
+                    var lp = extendAll.lpList[index];
+                    var elp = extendAll.lpList[i];
+                    var mid = knn.queries[i];
+                    var near = knn.trainInput[index];
+                    var distanceMid = mid.DistanceTo(near);
+                    var distance1 = lp.p1.DistanceTo(elp.p1);
+                    var distance2 = lp.p2.DistanceTo(elp.p2);
+                    if (distance1 > distanceMid * 2)
+                    {
+                        distance1 = lp.p1.DistanceTo(elp.p2);
+                        distance2 = lp.p2.DistanceTo(elp.p1);
+                    }
+                    if (distance1 < distanceMid * 2 && distance2 < distanceMid * 2)
+                    {
+                        var cp = new coinPoints();
+                        var mps = extendAll.lines.lpList[index];
+                        cp.p1 = new cv.Point((int)mps.p1.X, (int)mps.p1.Y);
+                        cp.p2 = new cv.Point((int)mps.p2.X, (int)mps.p2.Y);
+                        mps = extendAll.lines.lpList[i];
+                        cp.p3 = new cv.Point((int)mps.p1.X, (int)mps.p1.Y);
+                        cp.p4 = new cv.Point((int)mps.p2.X, (int)mps.p2.Y);
+                        if (!checkList.Contains(cp.p1) && !checkList.Contains(cp.p2) && !checkList.Contains(cp.p3) && !checkList.Contains(cp.p4))
+                        {
+                            if ((cp.p1 == cp.p3 || cp.p1 == cp.p4) && (cp.p2 == cp.p3 || cp.p2 == cp.p4))
+                            {
+                                // duplicate points...
+                            }
+                            else
+                            {
+                                DrawLine(dst2, cp.p1, cp.p2, task.HighlightColor);
+                                DrawLine(dst2, cp.p3, cp.p4, Scalar.Red);
+                                parList.Add(cp);
+                                checkList.Add(cp.p1);
+                                checkList.Add(cp.p2);
+                                checkList.Add(cp.p3);
+                                checkList.Add(cp.p4);
+                            }
+                        }
+                    }
+                }
+            }
+            labels[2] = $"{parList.Count()} parallel lines were found in the image";
+            labels[3] = $"{extendAll.lpList.Count()} lines were found in the image before finding the parallel lines";
+        }
+    }
+    public class CS_LongLine_Extend : CS_Parent
+    {
+        LongLine_Basics lines = new LongLine_Basics();
+        cv.Point saveP1, saveP2, p1, p2;
+        public CS_LongLine_Extend(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Original Line", "Original line Extended" };
+            desc = "Given 2 points, extend the line to the edges of the image.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (standaloneTest() && task.heartBeat)
+            {
+                p1 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                p2 = new cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height));
+                saveP1 = p1;
+                saveP2 = p2;
+            }
+            var mps = new PointPair(p1, p2);
+            var emps = lines.BuildLongLine(mps);
+            if (standaloneTest())
+            {
+                labels[2] = $"{emps.p1} and {emps.p2} started with {saveP1} and {saveP2}";
+                dst2 = src;
+                DrawLine(dst2, emps.p1, emps.p2, task.HighlightColor);
+                DrawCircle(dst2, saveP1, task.DotSize, Scalar.Red);
+                DrawCircle(dst2, saveP2, task.DotSize, Scalar.Red);
+            }
+        }
+    }
+    public class CS_LongLine_NoDepth : CS_Parent
+    {
+        LineCoin_Basics lineHist = new LineCoin_Basics();
+        public CS_LongLine_NoDepth(VBtask task) : base(task)
+        {
+            dst2 = new Mat(dst2.Size(), MatType.CV_8U, 0);
+            desc = "Find any lines in regions without depth.";
+        }
+        public void RunCS(Mat src)
+        {
+            lineHist.Run(src);
+            dst2 = lineHist.dst2;
+            dst2.SetTo(0, task.depthMask);
+        }
+    }
+    public class CS_LongLine_History : CS_Parent
+    {
+        LongLine_Basics lines = new LongLine_Basics();
+        public List<PointPair> lpList = new List<PointPair>();
+        List<List<PointPair>> mpList = new List<List<PointPair>>();
+        public CS_LongLine_History(VBtask task) : base(task)
+        {
+            desc = "Find the longest lines and toss any that are intermittant.";
+        }
+        public void RunCS(Mat src)
+        {
+            lines.Run(src);
+            dst2 = lines.dst2;
+            mpList.Add(lines.lpList);
+            var tmplist = new List<PointPair>();
+            var lpCount = new List<int>();
+            foreach (var list in mpList)
+            {
+                foreach (var lp in list)
+                {
+                    var index = tmplist.IndexOf(lp);
+                    if (index < 0)
+                    {
+                        tmplist.Add(lp);
+                        lpCount.Add(1);
+                    }
+                    else
+                    {
+                        lpCount[index] += 1;
+                    }
+                }
+            }
+            lpList.Clear();
+            for (int i = 0; i < lpCount.Count(); i++)
+            {
+                var count = lpCount[i];
+                if (count >= task.frameHistoryCount) lpList.Add(tmplist[i]);
+            }
+            foreach (var lp in lpList)
+            {
+                DrawLine(dst2, lp.p1, lp.p2, Scalar.White);
+            }
+            if (mpList.Count() > task.frameHistoryCount) mpList.RemoveAt(0);
+            labels[2] = $"{lpList.Count()} were found that were present for every one of the last {task.frameHistoryCount} frames.";
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+}
 
 

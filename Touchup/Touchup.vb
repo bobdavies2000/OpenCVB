@@ -69,6 +69,7 @@ Public Class Touchup
                 inline = Replace(inline, "DepthType.", "MatType.")
                 inline = Replace(inline, "Cv8u", "CV_8U")
                 inline = Replace(inline, "Environment.NewLine", """\n""")
+                inline = Replace(inline, "CvPoint", "cv.Point")
 
                 inline = Replace(inline, "()(", "(")
                 inline = Replace(inline, "()()", "()")

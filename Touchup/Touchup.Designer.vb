@@ -74,7 +74,7 @@ Partial Class Touchup
         Me.rtb.Location = New System.Drawing.Point(22, 107)
         Me.rtb.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.rtb.Name = "rtb"
-        Me.rtb.Size = New System.Drawing.Size(2044, 720)
+        Me.rtb.Size = New System.Drawing.Size(1368, 1480)
         Me.rtb.TabIndex = 4
         Me.rtb.Text = ""
         '
@@ -82,7 +82,7 @@ Partial Class Touchup
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(2086, 848)
+        Me.ClientSize = New System.Drawing.Size(1398, 1593)
         Me.Controls.Add(Me.rtb)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.translate)
