@@ -246,13 +246,12 @@ End Class
 
 Public Class LUT_Create : Inherits VB_Parent
     Dim pixels(2)() As Byte
+    Dim options As New Options_LUT_Create
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("LUT entry diff threshold", 1, 100, 10)
         desc = "Create a LUT table that can map similar pixels to the same exact pixel."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static diffSlider = FindSlider("LUT entry diff threshold")
-        Dim threshold = diffSlider.value
+        options.RunVB()
 
         Dim split = src.Split()
         For i = 0 To 2
@@ -274,7 +273,7 @@ Public Class LUT_Create : Inherits VB_Parent
         For i = 1 To lutI.Count - 1
             Dim vec = lutI(i)
             Dim diff = Math.Abs(vec(0) - lastVec(0)) + Math.Abs(vec(1) - lastVec(1)) + Math.Abs(vec(2) - lastVec(2))
-            If diff < threshold Then
+            If diff < options.lutThreshold Then
                 lutI(i) = lastVec
             Else
                 lastVec = vec

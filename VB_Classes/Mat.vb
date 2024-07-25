@@ -215,68 +215,53 @@ End Class
 
 ' https://stackoverflow.com/questions/11015119/inverse-matrix-opencv-matrix-inv-not-working-properly
 Public Class Mat_Inverse : Inherits VB_Parent
-    Dim flow As New Font_FlowText
     Public matrix(,) As Single = {{1.1688, 0.23, 62.2}, {-0.013, 1.225, -6.29}, {0, 0, 1}}
     Public validateInverse As Boolean
     Public inverse As New cv.Mat
+    Dim options As New Options_Mat
     Public Sub New()
-        flow.parentData = Me
-        If radio.Setup(traceName) Then
-            radio.addRadio("Cholesky")
-            radio.addRadio("Eig (works but results are incorrect)")
-            radio.addRadio("LU")
-            radio.addRadio("Normal (not working)")
-            radio.addRadio("QR (not working)")
-            radio.addRadio("SVD (works but results are incorrect)")
-            radio.check(0).Checked = True
-            radio.check(3).Enabled = False ' not accepted!
-            radio.check(4).Enabled = False ' not accepted!
-        End If
         desc = "Given a 3x3 matrix, invert it and present results."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim nextline = ""
-
-        Dim decompType = cv.DecompTypes.Cholesky
-        Static frm = FindFrm("Mat_Inverse Radio Buttons")
-        For i = 0 To frm.check.Count - 1
-            If frm.check(i).Checked Then
-                decompType = Choose(i + 1, cv.DecompTypes.Cholesky, cv.DecompTypes.Eig, cv.DecompTypes.LU, cv.DecompTypes.Normal,
-                                         cv.DecompTypes.QR, cv.DecompTypes.SVD)
-            End If
-        Next
+        options.RunVB()
 
         If standaloneTest() Or validateInverse Then
-            flow.nextMsg = "Matrix Input"
+            strOut = "Matrix Input " + vbCrLf
             For i = 0 To matrix.GetLength(0) - 1
                 For j = 0 To matrix.GetLength(1) - 1
-                    flow.nextMsg += CStr(matrix(i, j)) + vbTab
+                    strOut += CStr(matrix(i, j)) + vbTab
                 Next
+                strOut += vbCrLf
             Next
+            strOut += vbCrLf
         End If
 
         Dim input = New cv.Mat(3, 3, cv.MatType.CV_32F, matrix)
-        cv.Cv2.Invert(input, inverse, decompType)
+        cv.Cv2.Invert(input, inverse, options.decompType)
 
         If standaloneTest() Or validateInverse Then
-            flow.nextMsg += "Matrix Inverse"
+            strOut += "Matrix Inverse " + vbCrLf
             For i = 0 To matrix.GetLength(0) - 1
                 For j = 0 To matrix.GetLength(1) - 1
-                    flow.nextMsg += CStr(inverse.Get(Of Single)(j, i)) + vbTab
+                    strOut += CStr(inverse.Get(Of Single)(j, i)) + vbTab
                 Next
+                strOut += vbCrLf
             Next
+            strOut += vbCrLf
 
             Dim identity = (input * inverse).ToMat
 
-            flow.nextMsg += "Verify Inverse is correct"
+            strOut += "Verify Inverse is correct " + vbCrLf
             For i = 0 To matrix.GetLength(0) - 1
                 For j = 0 To matrix.GetLength(1) - 1
-                    flow.nextMsg += CStr(identity.Get(Of Single)(j, i)) + vbTab
+                    strOut += CStr(identity.Get(Of Single)(j, i)) + vbTab
                 Next
+                strOut += vbCrLf
             Next
+            strOut += vbCrLf
         End If
 
-        flow.Run(empty)
+        SetTrueText(strOut, RESULT_DST2)
     End Sub
 End Class
 

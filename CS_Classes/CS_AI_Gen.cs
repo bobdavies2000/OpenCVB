@@ -31578,67 +31578,6 @@ public class CS_ApproxPoly_Basics : CS_Parent
             labels[2] = $"{lines.lpList.Count()} lines found, longest {lpList.Count()} displayed.";
         }
     }
-
-    public class LongLine_Basics : VB_Parent
-    {
-        public LongLine_Core lines = new LongLine_Core();
-        public List<PointPair> lpList = new List<PointPair>();
-        private Options_LongLine options = new Options_LongLine();
-
-        public LongLine_Basics()
-        {
-            lines.lineCount = 1000;
-            desc = "Identify the longest lines";
-        }
-
-        public PointPair BuildLongLine(PointPair lp)
-        {
-            if (lp.p1.X != lp.p2.X)
-            {
-                double b = lp.p1.Y - lp.p1.X * lp.slope;
-                if (lp.p1.Y == lp.p2.Y)
-                {
-                    return new PointPair(new Point(0, lp.p1.Y), new Point(dst2.Width, lp.p1.Y));
-                }
-                else
-                {
-                    int xint1 = (int)(-b / lp.slope);
-                    int xint2 = (int)((dst2.Height - b) / lp.slope);
-                    int yint1 = (int)b;
-                    int yint2 = (int)(lp.slope * dst2.Width + b);
-
-                    List<Point> points = new List<Point>();
-                    if (xint1 >= 0 && xint1 <= dst2.Width) points.Add(new Point(xint1, 0));
-                    if (xint2 >= 0 && xint2 <= dst2.Width) points.Add(new Point(xint2, dst2.Height));
-                    if (yint1 >= 0 && yint1 <= dst2.Height) points.Add(new Point(0, yint1));
-                    if (yint2 >= 0 && yint2 <= dst2.Height) points.Add(new Point(dst2.Width, yint2));
-                    return new PointPair(points[0], points[1]);
-                }
-            }
-            return new PointPair(new Point(lp.p1.X, 0), new Point(lp.p1.X, dst2.Height));
-        }
-
-        public void RunVB(Mat src)
-        {
-            options.RunVB();
-
-            dst2 = src.Clone();
-            lines.Run(src);
-
-            lpList.Clear();
-            foreach (var lp in lines.lpList)
-            {
-                PointPair lpTmp = BuildLongLine(lp);
-                DrawLine(dst2, lpTmp.p1, lpTmp.p2, Scalar.White);
-                if (lpTmp.p1.X > lpTmp.p2.X) lpTmp = new PointPair(lpTmp.p2, lpTmp.p1);
-                lpList.Add(lpTmp);
-                if (lpList.Count >= options.maxCount) break;
-            }
-
-            labels[2] = $"{lines.lpList.Count} lines found, longest {lpList.Count} displayed.";
-        }
-    }
-
     public class CS_LongLine_Core : CS_Parent
     {
         public Line_Basics lines = new Line_Basics();
@@ -32003,6 +31942,614 @@ public class CS_ApproxPoly_Basics : CS_Parent
             labels[2] = $"{lpList.Count()} were found that were present for every one of the last {task.frameHistoryCount} frames.";
         }
     }
+    public class CS_LUT_Basics : CS_Parent
+    {
+        public int classCount;
+        Options_LUT options = new Options_LUT();
+        byte[] segment = new byte[256];
+        Mat myLut;
+        public CS_LUT_Basics(VBtask task) : base(task)
+        {
+            labels[3] = "Palettized version of dst2";
+            desc = "Divide the image into n-segments controlled with a slider.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (classCount != options.lutSegments)
+            {
+                classCount = options.lutSegments;
+                int incr = (int)Math.Truncate(255.0 / classCount);
+                for (int i = 0; i < classCount; i++)
+                {
+                    int val = i * incr;
+                    for (int j = 0; j < incr; j++)
+                    {
+                        segment[val + j] = (byte)val;
+                    }
+                }
+                for (int i = incr * classCount; i <= 255; i++)
+                {
+                    segment[i] = 255;
+                }
+                myLut = new Mat(1, 256, MatType.CV_8U, segment);
+            }
+            if (src.Channels() != 1) src = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            dst2 = src.LUT(myLut) * classCount / 255;
+            dst3 = ShowPalette(dst2 * 255 / classCount);
+            labels[2] = "Image segmented into " + (classCount + 1) + " divisions (0-" + classCount + ")";
+        }
+    }
+    public class CS_LUT_Sliders : CS_Parent
+    {
+        Options_LUT options = new Options_LUT();
+        public CS_LUT_Sliders(VBtask task) : base(task)
+        {
+            desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            Mat gray = (src.Channels() == 1) ? src : src.CvtColor(ColorConversionCodes.BGR2GRAY);
+            Mat myLut = new Mat(1, 256, MatType.CV_8U);
+            int splitIndex = 0;
+            for (int i = 0; i <= 255; i++)
+            {
+                myLut.Set<byte>(0, i, (byte)options.vals[splitIndex]);
+                if (i >= options.splits[splitIndex]) splitIndex++;
+            }
+            dst2 = gray.LUT(myLut);
+        }
+    }
+    public class CS_LUT_Reduction : CS_Parent
+    {
+        public Reduction_Basics reduction = new Reduction_Basics();
+        Mat vector = new Mat(256, 1, MatType.CV_8UC3, new Scalar(0));
+        public CS_LUT_Reduction(VBtask task) : base(task)
+        {
+            for (int i = 0; i <= 255; i++)
+            {
+                vector.Set<Vec3b>(i, 0, randomCellColor());
+            }
+            labels[3] = "Custom Color Lookup Table";
+            desc = "Build and use a custom color palette";
+        }
+        public void RunCS(Mat src)
+        {
+            reduction.Run(src);
+            dst2 = reduction.dst2.CvtColor(ColorConversionCodes.GRAY2BGR).LUT(vector);
+        }
+    }
+    public class CS_LUT_RGBDepth : CS_Parent
+    {
+        LUT_Basics lut = new LUT_Basics();
+        public CS_LUT_RGBDepth(VBtask task) : base(task)
+        {
+            desc = "Use a LUT on the RGBDepth to segregate depth data.";
+        }
+        public void RunCS(Mat src)
+        {
+            lut.Run(task.depthRGB.CvtColor(ColorConversionCodes.BGR2GRAY));
+            dst2 = lut.dst2 * 255 / lut.classCount;
+            labels[2] = lut.labels[2];
+        }
+    }
+    public class CS_LUT_Depth32f : CS_Parent
+    {
+        LUT_Basics lut = new LUT_Basics();
+        public CS_LUT_Depth32f(VBtask task) : base(task)
+        {
+            desc = "Use a LUT on the 32-bit depth to segregate depth data.";
+        }
+        public void RunCS(Mat src)
+        {
+            lut.Run(task.pcSplit[2].Normalize(255).ConvertScaleAbs(255));
+            dst2 = lut.dst2 * 255 / lut.classCount;
+            dst2.SetTo(0, task.noDepthMask);
+            labels[2] = lut.labels[2];
+        }
+    }
+    public class CS_LUT_Equalized : CS_Parent
+    {
+        Hist_EqualizeGray eq = new Hist_EqualizeGray();
+        LUT_Basics lut = new LUT_Basics();
+        public CS_LUT_Equalized(VBtask task) : base(task)
+        {
+            labels[2] = "Without Histogram Equalized";
+            labels[3] = "With Histogram Equalized";
+            desc = "Use LUT_Basics but with an equalized histogram image.";
+        }
+        public void RunCS(Mat src)
+        {
+            lut.Run(src);
+            dst3 = lut.dst2 * 255 / lut.classCount;
+            eq.dst3.SetTo(0);
+            eq.Run(src);
+            lut.Run(eq.dst2);
+            dst2 = lut.dst2 * 255 / lut.classCount;
+        }
+    }
+    public class CS_LUT_Watershed : CS_Parent
+    {
+        public Watershed_Basics wShed = new Watershed_Basics();
+        public LUT_Equalized lut = new LUT_Equalized();
+        Edge_Canny edges = new Edge_Canny();
+        public CS_LUT_Watershed(VBtask task) : base(task)
+        {
+            labels[3] = "LUT output with edges highlighted.";
+            labels[2] = "Watershed Results - draw a rectangle to create a region";
+            wShed.UseCorners = true;
+            desc = "Use watershed algorithm with LUT input to identify regions in the image";
+        }
+        public void RunCS(Mat src)
+        {
+            lut.Run(src);
+            dst3 = lut.dst2.CvtColor(ColorConversionCodes.GRAY2BGR);
+            edges.Run(src);
+            dst3.SetTo(Scalar.White, edges.dst2);
+            wShed.Run(dst3);
+            dst2 = wShed.dst3;
+        }
+    }
+    public class CS_LUT_Custom : CS_Parent
+    {
+        Palette_RandomColorMap gradMap = new Palette_RandomColorMap();
+        public Mat colorMap;
+        int saveColorCount = -1;
+        System.Windows.Forms.TrackBar colorSlider;
+        public CS_LUT_Custom(VBtask task) : base(task)
+        {
+            colorSlider = FindSlider("Color transitions");
+            colorSlider.Value = 5;
+            labels[3] = "Custom Color Lookup Table";
+            desc = "Use a palette to provide the lookup table for LUT";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.optionsChanged || task.heartBeat)
+            {
+                if (saveColorCount == 20) colorSlider.Value = 5; else colorSlider.Value++;
+                saveColorCount = colorSlider.Value;
+                gradMap.Run(src);
+                colorMap = gradMap.gradientColorMap.Flip(FlipMode.X);
+            }
+            dst2 = src.LUT(colorMap);
+            dst3 = colorMap.Resize(src.Size());
+        }
+    }
+    public class CS_LUT_RedCloud : CS_Parent
+    {
+        RedCloud_Basics redC = new RedCloud_Basics();
+        Sort_3Channel sort3 = new Sort_3Channel();
+        public CS_LUT_RedCloud(VBtask task) : base(task)
+        {
+            if (standalone) task.gOptions.setDisplay1();
+            desc = "Use LUT on the grayscale image after masking with rc.mask";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            dst3.SetTo(0);
+            var rc = task.rc;
+            src[rc.rect].CopyTo(dst3[rc.rect], rc.mask);
+            sort3.Run(dst3);
+            dst1 = sort3.dst2;
+        }
+    }
+    public class CS_LUT_Create : CS_Parent
+    {
+        byte[][] pixels = new byte[3][];
+        Options_LUT_Create options = new Options_LUT_Create();
+        public CS_LUT_Create(VBtask task) : base(task)
+        {
+            desc = "Create a LUT table that can map similar pixels to the same exact pixel.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            var split = src.Split();
+            for (int i = 0; i <= 2; i++)
+            {
+                if (task.FirstPass) Array.Resize(ref pixels[i], (int)src.Total());
+                Marshal.Copy(split[i].Data, pixels[i], 0, pixels[i].Length);
+            }
+            float[] totals = new float[256];
+            Vec3i[] lutI = new Vec3i[256];
+            for (int i = 0; i < src.Total(); i++)
+            {
+                int index = (int)(0.299 * pixels[2][i] + 0.587 * pixels[1][i] + 0.114 * pixels[0][i]);
+                totals[index] += 1;
+                Vec3i v1 = lutI[index];
+                Vec3i v2 = new Vec3i(pixels[0][i], pixels[1][i], pixels[2][i]);
+                lutI[index] = new Vec3i((v1.Item0 + v2.Item0) / 2, (v1.Item1 + v2.Item1) / 2, (v1.Item2 + v2.Item2) / 2);
+            }
+            Vec3i lastVec = lutI[0];
+            for (int i = 1; i < lutI.Length; i++)
+            {
+                Vec3i vec = lutI[i];
+                int diff = Math.Abs(vec.Item0 - lastVec.Item0) + Math.Abs(vec.Item1 - lastVec.Item1) + Math.Abs(vec.Item2 - lastVec.Item2);
+                if (diff < options.lutThreshold)
+                {
+                    lutI[i] = lastVec;
+                }
+                else
+                {
+                    lastVec = vec;
+                }
+            }
+            Vec3b[] lut = new Vec3b[256];
+            for (int i = 0; i < lutI.Length; i++)
+            {
+                lut[i] = new Vec3b((byte)lutI[i].Item0, (byte)lutI[i].Item1, (byte)lutI[i].Item2);
+            }
+            dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            Mat myLut = new Mat(1, 256, MatType.CV_8UC3, lut);
+            // dst3 = dst2.LUT(myLut); // Not clear why this is failing!
+        }
+    }
+    public class CS_Magnify_Basics : CS_Parent
+    {
+        public CS_Magnify_Basics(VBtask task) : base(task)
+        {
+            task.drawRect = new Rect(10, 10, 50, 50);
+            desc = "Magnify the drawn rectangle on dst2 and put it in dst3.";
+        }
+        public void RunCS(Mat src)
+        {
+            dst2 = src;
+            if (task.drawRect.Width > 0 && task.drawRect.Height > 0)
+            {
+                dst3 = dst2[task.drawRect].Resize(dst3.Size(), 0, 0, InterpolationFlags.Nearest);
+            }
+        }
+    }
+    public class CS_Magnify_Example : CS_Parent
+    {
+        Neighbors_Intersects prep = new Neighbors_Intersects();
+        Magnify_Basics zoom = new Magnify_Basics();
+        public CS_Magnify_Example(VBtask task) : base(task)
+        {
+            desc = "Magnify the output of the algorithm above.";
+        }
+        public void RunCS(Mat src)
+        {
+            prep.Run(src);
+            dst2 = prep.dst2;
+            zoom.Run(dst2);
+            dst3 = zoom.dst3;
+        }
+    }
+    public class CS_Mat_Repeat : CS_Parent
+    {
+        public CS_Mat_Repeat(VBtask task) : base(task)
+        {
+            desc = "Use the repeat method to replicate data.";
+        }
+        public void RunCS(Mat src)
+        {
+            var small = src.Resize(new cv.Size(src.Cols / 10, src.Rows / 10));
+            dst2 = small.Repeat(10, 10);
+            small = task.depthRGB.Resize(new cv.Size(src.Cols / 10, src.Rows / 10));
+            dst3 = small.Repeat(10, 10);
+        }
+    }
+    public class CS_Mat_PointToMat : CS_Parent
+    {
+        Random_Basics random = new Random_Basics();
+        public CS_Mat_PointToMat(VBtask task) : base(task)
+        {
+            labels[2] = "Random_Basics points (original)";
+            labels[3] = "Random_Basics points after format change with indexer";
+            desc = "Convert point2f into a mat of points";
+        }
+        public void RunCS(Mat src)
+        {
+            random.Run(empty);
+            dst2.SetTo(0);
+            foreach (var pt in random.PointList)
+            {
+                DrawCircle(dst2, pt, task.DotSize, Scalar.Yellow);
+            }
+            var rows = random.PointList.Count();
+            var pMat = new Mat(rows, 1, MatType.CV_32FC2, random.PointList.ToArray());
+            var indexer = pMat.GetGenericIndexer<Vec2f>();
+            dst3.SetTo(0);
+            var white = new Vec3b(255, 255, 255);
+            for (int i = 0; i < rows; i++)
+            {
+                dst3.Set<Vec3b>((int)indexer[i][1], (int)indexer[i][0], white);
+            }
+        }
+    }
+    public class CS_Mat_MatToPoint : CS_Parent
+    {
+        public CS_Mat_MatToPoint(VBtask task) : base(task)
+        {
+            desc = "Convert a mat into a vector of points.";
+            labels[2] = "Reconstructed BGR Image";
+        }
+        public void RunCS(Mat src)
+        {
+            var points = new Vec3b[src.Total() - 1];
+            Vec3b vec = new Vec3b();
+            int index = 0;
+            var m3b = src.Clone();
+            var indexer = m3b.GetGenericIndexer<Vec3b>();
+            for (int y = 0; y < src.Rows; y++)
+            {
+                for (int x = 0; x < src.Cols; x++)
+                {
+                    vec = indexer[y, x];
+                    points[index] = new Vec3b(vec[0], vec[1], vec[2]);
+                    index++;
+                }
+            }
+            dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC3, points);
+        }
+    }
+    public class CS_Mat_Tricks : CS_Parent
+    {
+        public CS_Mat_Tricks(VBtask task) : base(task)
+        {
+            labels[2] = "Image squeezed into square Mat";
+            labels[3] = "Mat transposed around the diagonal";
+            desc = "Show some Mat tricks.";
+        }
+        public void RunCS(Mat src)
+        {
+            var mat = src.Resize(new cv.Size(src.Height, src.Height));
+            var roi = new Rect(0, 0, mat.Width, mat.Height);
+            dst2[roi] = mat;
+            dst3[roi] = mat.Transpose();
+        }
+    }
+    public class CS_Mat_RowColRange : CS_Parent
+    {
+        public CS_Mat_RowColRange(VBtask task) : base(task)
+        {
+            labels[2] = "BitwiseNot of RowRange and ColRange";
+            desc = "Perform operation on a range of cols and/or Rows.";
+        }
+        public void RunCS(Mat src)
+        {
+            var midX = src.Width / 2;
+            var midY = src.Height / 2;
+            dst2 = src;
+            Cv2.BitwiseNot(dst2.RowRange(midY - 25, midY + 25), dst2.RowRange(midY - 25, midY + 25));
+            Cv2.BitwiseNot(dst2.ColRange(midX - 25, midX + 25), dst2.ColRange(midX - 25, midX + 25));
+        }
+    }
+
+    public class CS_Mat_MultiplyReview : CS_Parent
+    {
+        Font_FlowText flow = new Font_FlowText();
+        public CS_Mat_MultiplyReview(VBtask task) : base(task)
+        {
+            flow.parentData = this;
+            desc = "Review matrix multiplication";
+        }
+        public void RunCS(Mat src)
+        {
+            int[,] a = { { 1, 4, 2 }, { 2, 5, 1 } };
+            int[,] b = { { 3, 4, 2 }, { 3, 5, 7 }, { 1, 2, 1 } };
+            flow.nextMsg = "Matrix a";
+            for (int i = 0; i < a.GetLength(0); i++)
+            {
+                for (int j = 0; j < a.GetLength(1); j++)
+                {
+                    flow.nextMsg += a[i, j].ToString() + "\t";
+                }
+            }
+            flow.nextMsg += "Matrix b";
+            for (int i = 0; i < b.GetLength(0); i++)
+            {
+                for (int j = 0; j < b.GetLength(1); j++)
+                {
+                    flow.nextMsg += b[i, j].ToString() + "\t";
+                }
+            }
+            int[,] c = new int[a.GetLength(0), b.GetLength(1)];
+            string[,] input = new string[c.GetLength(0), c.GetLength(1)];
+            for (int i = 0; i < c.GetLength(0); i++)
+            {
+                for (int j = 0; j < c.GetLength(1); j++)
+                {
+                    input[i, j] = "";
+                    for (int k = 0; k < a.GetLength(1); k++)
+                    {
+                        c[i, j] += a[i, k] * b[k, j];
+                        input[i, j] += a[i, k].ToString() + "*" + b[k, j].ToString() + (k < a.GetLength(1) - 1 ? " + " : "\t");
+                    }
+                }
+            }
+            flow.nextMsg += "Matrix c = a X b";
+            for (int i = 0; i < a.GetLength(0); i++)
+            {
+                for (int j = 0; j < a.GetLength(1); j++)
+                {
+                    flow.nextMsg += c[i, j].ToString() + " = " + input[i, j];
+                }
+            }
+            flow.Run(empty);
+        }
+    }
+    public class CS_Mat_2to1 : CS_Parent
+    {
+        Mat mat1;
+        Mat mat2;
+        public Mat[] mat;
+        public bool lineSeparators = true; // if they want lines or not...
+        public CS_Mat_2to1(VBtask task) : base(task)
+        {
+            mat1 = new Mat(new cv.Size(dst2.Rows, dst2.Cols), MatType.CV_8UC3, 0);
+            mat2 = mat1.Clone();
+            mat = new Mat[] { mat1, mat2 };
+            labels[2] = "";
+            desc = "Fill a Mat with 2 images";
+        }
+        public void RunCS(Mat src)
+        {
+            var nSize = new cv.Size(task.WorkingRes.Width, task.WorkingRes.Height / 2);
+            var roiTop = new Rect(0, 0, nSize.Width, nSize.Height);
+            var roibot = new Rect(0, nSize.Height, nSize.Width, nSize.Height);
+            if (standaloneTest())
+            {
+                mat1 = src;
+                mat2 = task.depthRGB;
+                mat = new Mat[] { mat1, mat2 };
+            }
+            dst2.SetTo(0);
+            if (mat[0] != null)
+            {
+                if (dst2.Type() != mat[0].Type())
+                    dst2 = new Mat(dst2.Size(), mat[0].Type());
+                for (int i = 0; i <= 1; i++)
+                {
+                    var roi = (i == 0) ? roiTop : roibot;
+                    if (!mat[i].Empty())
+                        dst2[roi] = mat[i].Resize(nSize);
+                }
+                if (lineSeparators)
+                {
+                    dst2.Line(new cv.Point(0, dst2.Height / 2), new cv.Point(dst2.Width, dst2.Height / 2), Scalar.White, task.lineWidth + 1);
+                }
+            }
+        }
+    }
+    public class CS_Mat_ToList : CS_Parent
+    {
+        OpAuto_XRange autoX = new OpAuto_XRange();
+        Projection_HistTop histTop = new Projection_HistTop();
+        public CS_Mat_ToList(VBtask task) : base(task)
+        {
+            desc = "Convert a Mat to List of points in 2 ways to measure which is better";
+        }
+        public void RunCS(Mat src)
+        {
+            histTop.Run(src);
+            autoX.Run(histTop.histogram);
+            dst2 = histTop.histogram.Threshold(task.projectionThreshold, 255, ThresholdTypes.Binary).ConvertScaleAbs();
+            var ptList = new List<Point>();
+            if (task.gOptions.getDebugCheckBox())
+            {
+                for (int y = 0; y < dst2.Height; y++)
+                {
+                    for (int x = 0; x < dst2.Width; x++)
+                    {
+                        if (dst2.At<byte>(y, x) != 0) ptList.Add(new cv.Point(x, y));
+                    }
+                }
+            }
+            else
+            {
+                var points = dst2.FindNonZero();
+                for (int i = 0; i < points.Rows; i++)
+                {
+                    ptList.Add(points.At<Point>(i, 0));
+                }
+            }
+            labels[2] = "There were " + ptList.Count().ToString() + " points identified";
+        }
+    }
+    public class CS_Mat_Inverse : CS_Parent
+    {
+        public float[,] matrix = new float[,] { { 1.1688f, 0.23f, 62.2f }, { -0.013f, 1.225f, -6.29f }, { 0, 0, 1 } };
+        public bool validateInverse;
+        public Mat inverse = new Mat();
+        Options_Mat options = new Options_Mat();
+        public CS_Mat_Inverse(VBtask task) : base(task)
+        {
+            desc = "Given a 3x3 matrix, invert it and present results.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standaloneTest() || validateInverse)
+            {
+                strOut = "Matrix Input " + "\n";
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < matrix.GetLength(1); j++)
+                    {
+                        strOut += matrix[i, j].ToString() + "\t";
+                    }
+                    strOut += "\n";
+                }
+                strOut += "\n";
+            }
+            var input = new Mat(3, 3, MatType.CV_32F, matrix);
+            Cv2.Invert(input, inverse, options.decompType);
+            if (standaloneTest() || validateInverse)
+            {
+                strOut += "Matrix Inverse " + "\n";
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < matrix.GetLength(1); j++)
+                    {
+                        strOut += inverse.At<float>(j, i).ToString() + "\t";
+                    }
+                    strOut += "\n";
+                }
+                strOut += "\n";
+                var identity = (input * inverse).ToMat();
+                strOut += "Verify Inverse is correct " + "\n";
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < matrix.GetLength(1); j++)
+                    {
+                        strOut += identity.At<float>(j, i).ToString() + "\t";
+                    }
+                    strOut += "\n";
+                }
+                strOut += "\n";
+            }
+            SetTrueText(strOut, RESULT_DST2);
+        }
+    }
+
+    //public class CS_Mat_Transpose : CS_Parent
+    //{
+    //    public CS_Mat_Transpose(VBtask task) : base(task)
+    //    {
+    //        desc = "Transpose a Mat and show results.";
+    //        labels[2] = "Color Image Transposed";
+    //        labels[3] = "Color Image Transposed back (artifacts)";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        var trColor = src.Transpose();
+    //        dst2 = trColor.ToMat().Resize(new cv.Size(src.Cols, src.Rows));
+    //        var trBack = dst2.Transpose();
+    //        dst3 = trBack.ToMat().Resize(src.Size());
+    //    }
+    //}
+    //public class CS_Mat_Managed : CS_Parent
+    //{
+    //    Random autoRand = new Random();
+    //    Vec3b[] img = new Vec3b[dst2.Total()];
+    //    Vec3b nextColor = new Vec3b();
+    //    public CS_Mat_Managed(VBtask task) : base(task)
+    //    {
+    //        labels[2] = "Color change is in the managed cv.vec3b array";
+    //        desc = "There is a limited ability to use Mat data in Managed code directly.";
+    //    }
+    //    public void RunCS(Mat src)
+    //    {
+    //        dst2 = new Mat(src.Rows, src.Cols, MatType.CV_8UC3, img);
+    //        if (task.heartBeat)
+    //        {
+    //            nextColor = nextColor == new Vec3b(0, 0, 255) ? new Vec3b(0, 255, 0) : new Vec3b(0, 0, 255);
+    //        }
+    //        for (int i = 0; i < img.Length; i++)
+    //        {
+    //            img[i] = nextColor;
+    //        }
+    //        var rect = new Rect(autoRand.Next(0, src.Width - 50), autoRand.Next(0, src.Height - 50), 50, 50);
+    //        dst2[rect].SetTo(0);
+    //    }
+    //}
 
 
 

@@ -6430,3 +6430,50 @@ Public Class Options_LongLine : Inherits VB_Parent
         pad = searchSlider.Value
     End Sub
 End Class
+
+
+
+
+
+Public Class Options_LUT_Create : Inherits VB_Parent
+    Public lutThreshold As Integer
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("LUT entry diff threshold", 1, 100, 10)
+    End Sub
+    Public Sub RunVB()
+        Static diffSlider = FindSlider("LUT entry diff threshold")
+        lutThreshold = diffSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Mat : Inherits VB_Parent
+    Public decompType As cv.DecompTypes = cv.DecompTypes.Cholesky
+    Public Sub New()
+        If radio.Setup(traceName) Then
+            radio.addRadio("Cholesky")
+            radio.addRadio("Eig (works but results are incorrect)")
+            radio.addRadio("LU")
+            radio.addRadio("Normal (not working)")
+            radio.addRadio("QR (not working)")
+            radio.addRadio("SVD (works but results are incorrect)")
+            radio.check(0).Checked = True
+            radio.check(3).Enabled = False ' not accepted!
+            radio.check(4).Enabled = False ' not accepted!
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        For i = 0 To frm.check.Count - 1
+            If frm.check(i).Checked Then
+                decompType = Choose(i + 1, cv.DecompTypes.Cholesky, cv.DecompTypes.Eig, cv.DecompTypes.LU, cv.DecompTypes.Normal,
+                                         cv.DecompTypes.QR, cv.DecompTypes.SVD)
+                Exit For
+            End If
+        Next
+    End Sub
+End Class

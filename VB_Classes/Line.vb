@@ -233,7 +233,7 @@ Public Class Line_Intercepts : Inherits VB_Parent
 
             Dim saveP1 = lp.p1, saveP2 = lp.p2
 
-            Dim emps = longLine.buildLongLine(lp)
+            Dim emps = longLine.BuildLongLine(lp)
             If emps.p1.X = 0 Then leftIntercepts.Add(saveP1.Y, index)
             If emps.p1.Y = 0 Then topIntercepts.Add(saveP1.X, index)
             If emps.p1.X = dst2.Width Then rightIntercepts.Add(saveP1.Y, index)

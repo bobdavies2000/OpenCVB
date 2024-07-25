@@ -7,7 +7,7 @@ Public Class LongLine_Basics : Inherits VB_Parent
         lines.lineCount = 1000
         desc = "Identify the longest lines"
     End Sub
-    Public Function buildLongLine(lp As PointPair) As PointPair
+    Public Function BuildLongLine(lp As PointPair) As PointPair
         If lp.p1.X <> lp.p2.X Then
             Dim b = lp.p1.Y - lp.p1.X * lp.slope
             If lp.p1.Y = lp.p2.Y Then
@@ -36,7 +36,7 @@ Public Class LongLine_Basics : Inherits VB_Parent
 
         lpList.Clear()
         For Each lp In lines.lpList
-            lp = buildLongLine(lp)
+            lp = BuildLongLine(lp)
             DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.White)
             If lp.p1.X > lp.p2.X Then lp = New PointPair(lp.p2, lp.p1)
             lpList.Add(lp)
@@ -189,7 +189,7 @@ Public Class LongLine_Point : Inherits VB_Parent
         lp.p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
         longPt = New cv.Point((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
 
-        DrawCircle(dst2,longPt, task.DotSize, cv.Scalar.Red)
+        DrawCircle(dst2, longPt, task.DotSize, cv.Scalar.Red)
     End Sub
 End Class
 
@@ -222,12 +222,12 @@ Public Class LongLine_Match : Inherits VB_Parent
         Dim mm As mmData = GetMinMax(dst0)
 
         mm.maxLoc = New cv.Point(mm.maxLoc.X + rect.Width / 2, mm.maxLoc.Y + rect.Height / 2)
-        DrawCircle(dst2,mm.maxLoc, task.DotSize, cv.Scalar.Red)
+        DrawCircle(dst2, mm.maxLoc, task.DotSize, cv.Scalar.Red)
 
         dst3.SetTo(0)
         dst0 = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
         dst0.CopyTo(dst3(New cv.Rect((dst3.Width - dst0.Width) / 2, (dst3.Height - dst0.Height) / 2, dst0.Width, dst0.Height)))
-        DrawCircle(dst3,mm.maxLoc, task.DotSize, 255)
+        DrawCircle(dst3, mm.maxLoc, task.DotSize, 255)
 
         template = src(rect).Clone
     End Sub
@@ -252,11 +252,11 @@ Public Class LongLine_ExtendTest : Inherits VB_Parent
             Dim p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
 
             Dim mps = New PointPair(p1, p2)
-            Dim emps = longLine.buildLongLine(mps)
+            Dim emps = longLine.BuildLongLine(mps)
             dst2 = src
             DrawLine(dst2, emps.p1, emps.p2, task.HighlightColor)
-            DrawCircle(dst2,p1, task.DotSize + 2, cv.Scalar.Red)
-            DrawCircle(dst2,p2, task.DotSize + 2, cv.Scalar.Red)
+            DrawCircle(dst2, p1, task.DotSize + 2, cv.Scalar.Red)
+            DrawCircle(dst2, p2, task.DotSize + 2, cv.Scalar.Red)
         End If
     End Sub
 End Class
@@ -388,7 +388,7 @@ Public Class LongLine_Extend : Inherits VB_Parent
         End If
 
         Dim mps = New PointPair(p1, p2)
-        Dim emps = lines.buildLongLine(mps)
+        Dim emps = lines.BuildLongLine(mps)
 
         If standaloneTest() Then
             labels(2) = emps.p1.ToString + " and " + emps.p2.ToString + " started with " + saveP1.ToString + " and " + saveP2.ToString

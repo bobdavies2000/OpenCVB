@@ -174,10 +174,10 @@ Public Class Gravity_Horizon : Inherits VB_Parent
         desc = "Compute the gravity vector and the horizon vector separately"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        gravity.Run(src)
+        gravity.RunVB(src)
         If gravity.vec.p2.Y > 0 Or gravity.vec.p1.Y > 0 Then task.gravityVec = gravity.vec ' don't update if not found
 
-        horizon.Run(src)
+        horizon.RunVB(src)
         If task.FirstPass Then lastVec = horizon.vec
         If horizon.vec.p1.Y > 0 Then lastVec = horizon.vec
         If horizon.vec.p1.Y = 0 Then horizon.vec = lastVec
