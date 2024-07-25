@@ -33399,4 +33399,281 @@ public class CS_ApproxPoly_Basics : CS_Parent
                         " - Red = current gravity vector, yellow is matchLine output";
         }
     }
+    public class CS_MatchRect_Basics : CS_Parent
+    {
+        public Match_Basics match = new Match_Basics();
+        public cv.Rect rectInput = new cv.Rect();
+        public cv.Rect rectOutput = new cv.Rect();
+        cv.Rect rectSave = new cv.Rect();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_MatchRect_Basics(VBtask task) : base(task)
+        {
+            desc = "Track a RedCloud rectangle using MatchTemplate.  Click on a cell.";
+        }
+        public void RunCS(Mat src)
+        {
+            if (task.optionsChanged) match.correlation = 0;
+            if (match.correlation < match.options.correlationMin || rectSave != rectInput || task.mouseClickFlag)
+            {
+                if (standalone)
+                {
+                    redC.Run(src);
+                    dst2 = redC.dst2;
+                    labels[2] = redC.labels[2];
+                    rectInput = task.rc.rect;
+                }
+                rectSave = rectInput;
+                match.template = src[rectInput].Clone();
+            }
+            match.Run(src);
+            rectOutput = match.matchRect;
+            if (standalone)
+            {
+                if (task.heartBeat) dst3.SetTo(0);
+                dst3.Rectangle(rectOutput, task.HighlightColor, task.lineWidth, task.lineType);
+            }
+        }
+    }
+    public class CS_MatchRect_RedCloud : CS_Parent
+    {
+        MatchRect_Basics matchRect = new MatchRect_Basics();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_MatchRect_RedCloud(VBtask task) : base(task)
+        {
+            desc = "Track a RedCloud cell using MatchTemplate.";
+        }
+        public void RunCS(Mat src)
+        {
+            redC.Run(src);
+            dst2 = redC.dst2;
+            labels[2] = redC.labels[2];
+            task.ClickPoint = task.rc.maxDist;
+            if (task.heartBeat) matchRect.rectInput = task.rc.rect;
+            matchRect.Run(src);
+            if (standalone)
+            {
+                if (task.heartBeat) dst3.SetTo(0);
+                dst3.Rectangle(matchRect.rectOutput, task.HighlightColor, task.lineWidth, task.lineType);
+            }
+            labels[2] = "MatchLine correlation = " + string.Format(fmt3, matchRect.match.correlation) +
+                        " - Red = current gravity vector, yellow is matchLine output";
+        }
+    }
+    public class CS_MatchShapes_Basics : CS_Parent
+    {
+        public cv.Point[][] hull1;
+        public cv.Point[][] hull2;
+        Options_MatchShapes match = new Options_MatchShapes();
+        Options_Contours options = new Options_Contours();
+        public CS_MatchShapes_Basics(VBtask task) : base(task)
+        {
+            FindRadio("CComp").Checked = true;
+            FindRadio("FloodFill").Enabled = false;
+            FindRadio("ApproxNone").Checked = true;
+            dst0 = Cv2.ImRead(task.HomeDir + "Data/star1.png", ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            dst1 = Cv2.ImRead(task.HomeDir + "Data/star2.png", ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+            desc = "MatchShapes compares single hull to single hull - pretty tricky";
+        }
+        public int findBiggestHull(cv.Point[][] hull, int maxLen, int maxIndex, Mat dst)
+        {
+            for (int i = 0; i < hull.Length; i++)
+            {
+                if (hull[i].Length > maxLen)
+                {
+                    maxLen = hull[i].Length;
+                    maxIndex = i;
+                }
+            }
+            foreach (var p in hull[maxIndex])
+            {
+                DrawCircle(dst, p, task.DotSize, Scalar.Yellow);
+            }
+            return maxIndex;
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            match.RunVB();
+            if (standaloneTest())
+            {
+                if (dst0.Channels() != 1)
+                    dst2 = dst0.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+                else
+                    dst2 = dst0;
+                if (dst1.Channels() != 1)
+                    dst3 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
+                else
+                    dst3 = dst1;
+            }
+            dst0 = dst0.Threshold(50, 255, ThresholdTypes.Binary);
+            hull1 = Cv2.FindContoursAsArray(dst0, options.retrievalMode, options.ApproximationMode);
+            dst1 = dst1.Threshold(127, 255, ThresholdTypes.Binary);
+            hull2 = Cv2.FindContoursAsArray(dst1, options.retrievalMode, options.ApproximationMode);
+            int maxLen1 = 0, maxIndex1 = 0, maxLen2 = 0, maxIndex2 = 0;
+            maxIndex1 = findBiggestHull(hull1, maxLen1, maxIndex1, dst2);
+            maxIndex2 = findBiggestHull(hull2, maxLen2, maxIndex2, dst3);
+            var matchVal = Cv2.MatchShapes(hull1[maxIndex1], hull2[maxIndex2], match.matchOption);
+            labels[2] = "MatchShapes returned " + matchVal.ToString(fmt2);
+        }
+    }
+    public class CS_MatchShapes_NearbyHull : CS_Parent
+    {
+        public List<rcData> similarCells = new List<rcData>();
+        public int bestCell;
+        rcData rc = new rcData();
+        Options_MatchShapes options = new Options_MatchShapes();
+        RedCloud_Hulls hulls = new RedCloud_Hulls();
+        public CS_MatchShapes_NearbyHull(VBtask task) : base(task)
+        {
+            labels = new string[] { "", "", "Output of RedCloud_Hulls", "Cells similar to selected cell" };
+            desc = "MatchShapes: Find all the reasonable matches (< 1.0 for matchVal)";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            if (standaloneTest())
+            {
+                hulls.Run(task.color);
+                if (task.redCells.Count() == 0) return;
+                dst2 = hulls.dst2;
+                rc = task.rc;
+            }
+            dst3.SetTo(0);
+            similarCells.Clear();
+            float minMatch = float.MaxValue;
+            foreach (var rc2 in task.redCells)
+            {
+                if (rc2.hull == null || rc.hull == null) continue;
+                if (Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta) continue;
+                var matchVal = Cv2.MatchShapes(rc.hull, rc2.hull, options.matchOption);
+                if (matchVal < options.matchThreshold)
+                {
+                    if (matchVal < minMatch && matchVal > 0)
+                    {
+                        minMatch = (float)matchVal;
+                        bestCell = similarCells.Count();
+                    }
+                    DrawContour(dst3[rc2.rect], rc2.hull, Scalar.White, -1);
+                    similarCells.Add(rc2);
+                }
+            }
+            if (similarCells.Count() == 0)
+                SetTrueText("No matches with match value < " + options.matchThreshold.ToString(fmt2), new cv.Point(5, 5), 3);
+        }
+    }
+    public class CS_MatchShapes_Nearby : CS_Parent
+    {
+        public List<rcData> redCells = new List<rcData>();
+        public List<rcData> similarCells = new List<rcData>();
+        public int bestCell;
+        public rcData rc = new rcData();
+        Options_MatchShapes options = new Options_MatchShapes();
+        public bool runStandalone = false;
+        RedCloud_Basics redC = new RedCloud_Basics();
+        RedCloud_ContourUpdate addTour = new RedCloud_ContourUpdate();
+        public CS_MatchShapes_Nearby(VBtask task) : base(task)
+        {
+            labels = new string[] { "Left floodfill image", "Right floodfill image", "Left image of identified cells", "Right image with identified cells" };
+            desc = "MatchShapes: Find matches at similar latitude (controlled with slider)";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            bool myStandalone = standaloneTest() || runStandalone;
+            if (myStandalone)
+            {
+                redC.Run(task.color);
+                if (task.redCells.Count() == 0) return;
+                dst2 = redC.dst2;
+                addTour.redCells = new List<rcData>(task.redCells);
+                addTour.Run(src);
+                rc = task.rc;
+            }
+            if (task.heartBeat && myStandalone) dst3.SetTo(0);
+            similarCells.Clear();
+            if (task.gOptions.getDisplay0())
+            {
+                dst0 = task.color.Clone();
+                DrawContour(dst0[rc.rect], rc.contour, task.HighlightColor);
+            }
+            float minMatch = float.MaxValue;
+            bestCell = -1;
+            for (int i = 0; i < addTour.redCells.Count(); i++)
+            {
+                var rc2 = addTour.redCells[i];
+                if (rc2.contour == null) continue;
+                var matchVal = Cv2.MatchShapes(rc.contour, rc2.contour, options.matchOption);
+                if (matchVal < options.matchThreshold)
+                {
+                    if (matchVal < minMatch && matchVal > 0)
+                    {
+                        minMatch = (float)matchVal;
+                        bestCell = similarCells.Count();
+                    }
+                    DrawContour(dst3[rc2.rect], rc2.contour, vecToScalar( rc2.color), -1);
+                    similarCells.Add(rc2);
+                }
+            }
+            if (bestCell >= 0)
+            {
+                var rc = similarCells[bestCell];
+                DrawCircle(dst3, rc.maxDist, task.DotSize, Scalar.White);
+                SetTrueText("Best match", rc.maxDist, 3);
+            }
+            if (similarCells.Count() == 0)
+                SetTrueText("No matches with match value < " + options.matchThreshold.ToString(fmt2), new cv.Point(5, 5), 3);
+        }
+    }
+
+    public class CS_MatchShapes_Hulls : CS_Parent
+    {
+        Options_MatchShapes options = new Options_MatchShapes();
+        RedCloud_Hulls hulls = new RedCloud_Hulls();
+        public CS_MatchShapes_Hulls(VBtask task) : base(task)
+        {
+            FindSlider("Match Threshold %").Value = 3;
+            labels = new string[] { "", "", "Output of RedCloud_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below." };
+            desc = "Find all RedCloud hull shapes similar to the one selected.  Use sliders and radio buttons to see impact.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            hulls.Run(src);
+            dst2 = hulls.dst2;
+            if (task.heartBeat) dst3.SetTo(0);
+            var rcX = task.rc;
+            foreach (var rc in task.redCells)
+            {
+                if (rc.hull == null || rcX.hull == null) continue;
+                var matchVal = Cv2.MatchShapes(rcX.hull, rc.hull, options.matchOption);
+                if (matchVal < options.matchThreshold) DrawContour(dst3[rc.rect], rc.hull, Scalar.White, -1);
+            }
+        }
+    }
+    public class CS_MatchShapes_Contours : CS_Parent
+    {
+        Options_MatchShapes options = new Options_MatchShapes();
+        RedCloud_Basics redC = new RedCloud_Basics();
+        public CS_MatchShapes_Contours(VBtask task) : base(task)
+        {
+            FindSlider("Match Threshold %").Value = 3;
+            labels = new string[] { "", "", "Output of RedCloud_Basics", "All RedCloud cells that matched the selected cell with the current settings are below." };
+            desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact.";
+        }
+        public void RunCS(Mat src)
+        {
+            options.RunVB();
+            redC.Run(src);
+            dst2 = redC.dst2;
+            if (task.heartBeat) dst3.SetTo(0);
+            var rcX = task.rc;
+            foreach (var rc in task.redCells)
+            {
+                if (rc.contour == null) continue;
+                var matchVal = Cv2.MatchShapes(rcX.contour, rc.contour, options.matchOption);
+                if (matchVal < options.matchThreshold) DrawContour(dst3[rc.rect], rc.contour, Scalar.White, -1);
+            }
+        }
+    }
+
 }

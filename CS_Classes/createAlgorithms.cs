@@ -895,6 +895,14 @@ namespace CS_Classes
 			if (algorithmName == "CS_MatchLine_Gravity") return new CS_MatchLine_Gravity(task);
 			if (algorithmName == "CS_MatchLine_Horizon") return new CS_MatchLine_Horizon(task);
 			if (algorithmName == "CS_MatchLine_Longest") return new CS_MatchLine_Longest(task);
+			if (algorithmName == "CS_MatchRect_Basics") return new CS_MatchRect_Basics(task);
+			if (algorithmName == "CS_MatchRect_RedCloud") return new CS_MatchRect_RedCloud(task);
+			if (algorithmName == "CS_MatchShapes_Basics") return new CS_MatchShapes_Basics(task);
+			if (algorithmName == "CS_MatchShapes_Contours") return new CS_MatchShapes_Contours(task);
+			if (algorithmName == "CS_MatchShapes_Hulls") return new CS_MatchShapes_Hulls(task);
+			if (algorithmName == "CS_MatchShapes_LeftRight") return new CS_MatchShapes_LeftRight(task);
+			if (algorithmName == "CS_MatchShapes_Nearby") return new CS_MatchShapes_Nearby(task);
+			if (algorithmName == "CS_MatchShapes_NearbyHull") return new CS_MatchShapes_NearbyHull(task);
 			if (algorithmName == "CS_MatrixInverse") return new CS_MatrixInverse(task);
 			if (algorithmName == "CS_OEX_Sobel_Demo") return new CS_OEX_Sobel_Demo(task);
 			if (algorithmName == "CS_OilPaint_Cartoon") return new CS_OilPaint_Cartoon(task);

@@ -283,7 +283,7 @@ End Class
 
 
 Public Class Options_MatchShapes : Inherits VB_Parent
-    Public matchOption = cv.ShapeMatchModes.I1
+    Public matchOption As cv.ShapeMatchModes = cv.ShapeMatchModes.I1
     Public matchThreshold As Single = 0.4
     Public maxYdelta As Single = 0.05
     Public minSize As Single = dst2.Total / 100

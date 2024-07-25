@@ -53,6 +53,8 @@ Public Class Touchup
                 inline = Replace(inline, "task.rightview", "task.rightView", 1, -1, vbTextCompare)
                 inline = Replace(inline, "task.leftview", "task.leftView", 1, -1, vbTextCompare)
                 inline = Replace(inline, "ColorConversion.BgrToGray", "cv.ColorConversionCodes.BGR2GRAY", 1, -1, vbTextCompare)
+                inline = Replace(inline, "ColorConversion.GrayToBgr", "cv.ColorConversionCodes.BGR2GRAY", 1, -1, vbTextCompare)
+
                 inline = Replace(inline, "task.pcSplit(2)", "task.pcSplit[2]")
                 inline = Replace(inline, "task.pcSplit(1)", "task.pcSplit[1]")
                 inline = Replace(inline, "task.pcSplit(i)", "task.pcSplit[i]")
