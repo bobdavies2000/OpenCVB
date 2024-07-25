@@ -891,6 +891,10 @@ namespace CS_Classes
 			if (algorithmName == "CS_Match_RandomTest") return new CS_Match_RandomTest(task);
 			if (algorithmName == "CS_Match_tCell") return new CS_Match_tCell(task);
 			if (algorithmName == "CS_Match_TraceRedC") return new CS_Match_TraceRedC(task);
+			if (algorithmName == "CS_MatchLine_Basics") return new CS_MatchLine_Basics(task);
+			if (algorithmName == "CS_MatchLine_Gravity") return new CS_MatchLine_Gravity(task);
+			if (algorithmName == "CS_MatchLine_Horizon") return new CS_MatchLine_Horizon(task);
+			if (algorithmName == "CS_MatchLine_Longest") return new CS_MatchLine_Longest(task);
 			if (algorithmName == "CS_MatrixInverse") return new CS_MatrixInverse(task);
 			if (algorithmName == "CS_OEX_Sobel_Demo") return new CS_OEX_Sobel_Demo(task);
 			if (algorithmName == "CS_OilPaint_Cartoon") return new CS_OilPaint_Cartoon(task);
